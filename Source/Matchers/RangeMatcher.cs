@@ -27,13 +27,13 @@ namespace Moq
 			// use that generate a lambda that will call the matcher 
 			// instead of comparing the value directly.
 
-			bool inclusive = (bool)args[2];
+			Range range = (Range)args[2];
 			var predicateType = typeof(Predicate<>).MakeGenericType(rangeType);
 
 			ParameterExpression valueParam = Expression.Parameter(rangeType, "x");
 			Expression body;
 
-			if (inclusive)
+			if (range == Range.Inclusive)
 			{
 				// x => x >= from && x <= to
 				body = Expression.AndAlso(

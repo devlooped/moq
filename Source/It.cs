@@ -21,7 +21,7 @@ namespace Moq
 		}
 
 		[Matcher(typeof(RangeMatcher))]
-		public static TValue IsInRange<TValue>(TValue from, TValue to, bool inclusive)
+		public static TValue IsInRange<TValue>(TValue from, TValue to, Range kind)
 			where TValue : IComparable
 		{
 			return default(TValue);

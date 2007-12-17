@@ -22,7 +22,7 @@ namespace Moq.Tests
 		}
 
 		[Test]
-		public void ShouldExpectCall()
+		public void ShouldExpectCallReturn()
 		{
 			var mock = new Mock<ICloneable>();
 			var clone = new object();
@@ -77,7 +77,7 @@ namespace Moq.Tests
 		}
 
 		[Test]
-		public void ShouldExpectCallWithLambdaLazyEvaluate()
+		public void ShouldExpectCallWithReferenceLazyEvaluate()
 		{
 			int a = 25;
 			var mock = new Mock<IFoo>();
@@ -152,8 +152,12 @@ namespace Moq.Tests
 			mock.
 				Expect(x => x.Duplicate(It.Is<int>(value => value < 5 && value > 0))).
 				Returns(() => 1);
-			mock.Expect(x => x.Duplicate(It.Is<int>(value => value <= 0))).Returns(() => 0);
-			mock.Expect(x => x.Duplicate(It.Is<int>(value => value >= 5))).Returns(() => 2);
+			mock.
+				Expect(x => x.Duplicate(It.Is<int>(value => value <= 0))).
+				Returns(() => 0);
+			mock.
+				Expect(x => x.Duplicate(It.Is<int>(value => value >= 5))).
+				Returns(() => 2);
 
 			Assert.AreEqual(1, mock.Value.Duplicate(3));
 			Assert.AreEqual(0, mock.Value.Duplicate(0));
@@ -165,12 +169,6 @@ namespace Moq.Tests
 		[Test]
 		public void ShouldExpectCallWithoutReturnValue()
 		{
-			int i = default(int);
-			string str = default(string);
-
-			Console.Write(i);
-			Console.Write(str);
-
 			var mock = new Mock<IFoo>();
 
 			mock.Expect(x => x.Execute());
@@ -233,8 +231,8 @@ namespace Moq.Tests
 		{
 			var mock = new Mock<IFoo>();
 			
-			mock.Expect(x => x.DoInt(It.IsInRange(1, 5, true))).Returns(1);
-			mock.Expect(x => x.DoInt(It.IsInRange(6, 10, false))).Returns(2);
+			mock.Expect(x => x.DoInt(It.IsInRange(1, 5, Range.Inclusive))).Returns(1);
+			mock.Expect(x => x.DoInt(It.IsInRange(6, 10, Range.Exclusive))).Returns(2);
 
 			Assert.AreEqual(1, mock.Value.DoInt(1));
 			Assert.AreEqual(1, mock.Value.DoInt(2));
@@ -250,7 +248,7 @@ namespace Moq.Tests
 		{
 			var mock = new Mock<IFoo>();
 
-			mock.Expect(x => x.DoInt(It.IsInRange(1, 5, false))).Returns(1);
+			mock.Expect(x => x.DoInt(It.IsInRange(1, 5, Range.Exclusive))).Returns(1);
 
 			Assert.AreEqual(1, mock.Value.DoInt(1));
 		}
