@@ -10,6 +10,11 @@ namespace Moq
 	{
 		object constantValue;
 
+		public ConstantMatcher(object constantValue)
+		{
+			this.constantValue = constantValue;
+		}
+
 		public void Initialize(Expression matcherExpression)
 		{
 			constantValue = ((ConstantExpression)matcherExpression).Value;

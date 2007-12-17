@@ -47,5 +47,15 @@ namespace Moq
 
 			return expression;
 		}
+
+		public static Expression PartialEval(this Expression expression)
+		{
+			return Evaluator.PartialEval(expression);
+		}
+
+		public static Expression CastTo<T>(this Expression expression)
+		{
+			return Expression.Convert(expression, typeof(T));
+		}
 	}
 }

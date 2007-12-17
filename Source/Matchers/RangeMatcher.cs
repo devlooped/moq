@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using System.Linq.Expressions;
+using System.Reflection;
 
 namespace Moq
 {
@@ -13,52 +14,18 @@ namespace Moq
 		public void Initialize(Expression matcherExpression)
 		{
 			var call = matcherExpression as MethodCallExpression;
-			var rangeType = call.Method.GetGenericArguments()[0];
+			//var rangeType = call.Method.GetGenericArguments()[0];
+			var rangeType = typeof(IComparable);
 
-			var args = (from arg in call.Arguments
-					   let evalArg = Evaluator.PartialEval(arg)
-					   select (evalArg.NodeType == ExpressionType.Constant ?
-							((ConstantExpression)evalArg).Value :
-							evalArg)).ToArray();
-
-			// TODO:
-			// Instead of returning evalArg if it's not a constant, 
-			// we could ask the MatcherFactory for an IMatcher and 
-			// use that generate a lambda that will call the matcher 
-			// instead of comparing the value directly.
-
-			Range range = (Range)args[2];
 			var predicateType = typeof(Predicate<>).MakeGenericType(rangeType);
+			var isInRange = typeof(RangeMatcher).GetMethod("IsInRange");
+			var value = Expression.Parameter(rangeType, "x");
 
-			ParameterExpression valueParam = Expression.Parameter(rangeType, "x");
-			Expression body;
-
-			if (range == Range.Inclusive)
-			{
-				// x => x >= from && x <= to
-				body = Expression.AndAlso(
-					Expression.GreaterThanOrEqual(
-						valueParam, 
-						Expression.Constant(args[0])), 
-					Expression.LessThanOrEqual(
-						valueParam, 
-						Expression.Constant(args[1]))
-					);
-			}
-			else
-			{
-				// x => x > from && x < to
-				body = Expression.AndAlso(
-					Expression.GreaterThan(
-						valueParam, 
-						Expression.Constant(args[0])), 
-					Expression.LessThan(
-						valueParam, 
-						Expression.Constant(args[1]))
-					);
-			}
-
-			var predicate = Expression.Lambda(predicateType, body, valueParam);
+			var body = Expression.Call(isInRange, value,
+					call.Arguments[0].CastTo<IComparable>(),
+					call.Arguments[1].CastTo<IComparable>(),
+					call.Arguments[2]);
+			var predicate = Expression.Lambda(predicateType, body, value);
 			var isexpr = Expression.Call(
 				typeof(It).GetMethod("Is").MakeGenericMethod(rangeType),
 				predicate);
@@ -70,6 +37,20 @@ namespace Moq
 		public bool Matches(object value)
 		{
 			return predicateMatcher.Matches(value);
+		}
+
+		public static bool IsInRange(IComparable value, IComparable from, IComparable to, Range rangeKind)
+		{
+			if (rangeKind == Range.Exclusive)
+			{
+				return value.CompareTo(from) > 0 &&
+					value.CompareTo(to) < 0;
+			}
+			else
+			{
+				return value.CompareTo(from) >= 0 &&
+					value.CompareTo(to) <= 0;
+			}
 		}
 	}
 }

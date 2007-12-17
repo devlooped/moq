@@ -85,6 +85,10 @@ namespace Moq.Tests
 			a = 10;
 
 			Assert.AreEqual(10, mock.Value.DoArgument("10"));
+
+			a = 20;
+
+			Assert.AreEqual(20, mock.Value.DoArgument("20"));
 		}
 
 		[Test]
@@ -251,6 +255,22 @@ namespace Moq.Tests
 			mock.Expect(x => x.DoInt(It.IsInRange(1, 5, Range.Exclusive))).Returns(1);
 
 			Assert.AreEqual(1, mock.Value.DoInt(1));
+		}
+
+		[Test]
+		public void ShouldExpectRangeWithVariableAndMethodInvocation()
+		{
+			var mock = new Mock<IFoo>();
+			var from = 1;
+
+			mock.Expect(x => x.DoInt(It.IsInRange(from, GetToRange(), Range.Inclusive))).Returns(1);
+
+			Assert.AreEqual(1, mock.Value.DoInt(1));
+		}
+
+		private int GetToRange()
+		{
+			return 5;
 		}
 
 		// ShouldAllowDynamicResultThroughFunc

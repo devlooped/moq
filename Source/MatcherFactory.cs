@@ -26,12 +26,10 @@ namespace Moq
 			}
 
 			// Try reducing locals to get a constant.
-			Expression reduced = Evaluator.PartialEval(expression);
+			Expression reduced = expression.PartialEval();
 			if (reduced.NodeType == ExpressionType.Constant)
 			{
-				IMatcher matcher = new ConstantMatcher();
-				matcher.Initialize(reduced);
-				return matcher;
+				return new ConstantMatcher(((ConstantExpression)reduced).Value);
 			}
 
 			throw new NotSupportedException(String.Format(
