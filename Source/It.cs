@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using System.Linq.Expressions;
+using System.Text.RegularExpressions;
 
 namespace Moq
 {
@@ -25,6 +26,18 @@ namespace Moq
 			where TValue : IComparable
 		{
 			return default(TValue);
+		}
+
+		[Matcher(typeof(RegexMatcher))]
+		public static string IsRegex(string regex)
+		{
+			return default(string);
+		}
+
+		[Matcher(typeof(RegexMatcher))]
+		public static string IsRegex(string regex, RegexOptions options)
+		{
+			return default(string);
 		}
 	}
 }

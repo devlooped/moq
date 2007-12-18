@@ -57,6 +57,7 @@
     <Compile Include="MatcherFactory.cs" />
     <Compile Include="Matchers\AnyMatcher.cs" />
     <Compile Include="Matchers\ConstantMatcher.cs" />
+    <Compile Include="Matchers\RegexMatcher.cs" />
     <Compile Include="Matchers\RangeMatcher.cs" />
     <Compile Include="Matchers\LazyEvalMatcher.cs" />
     <Compile Include="Matchers\PredicateMatcher.cs" />
