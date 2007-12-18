@@ -16,7 +16,7 @@ namespace Moq.Tests
 		{
 			var mock = new Mock<ICloneable>();
 
-			ICloneable cloneable = mock.Value;
+			ICloneable cloneable = mock.Instance;
 
 			Assert.IsNotNull(cloneable);
 		}
@@ -29,7 +29,7 @@ namespace Moq.Tests
 
 			mock.Expect(x => x.Clone()).Returns(clone);
 
-			Assert.AreEqual(clone, mock.Value.Clone());
+			Assert.AreEqual(clone, mock.Instance.Clone());
 		}
 
 		[Test]
@@ -40,8 +40,8 @@ namespace Moq.Tests
 			mock.Expect(x => x.Do1()).Returns(1);
 			mock.Expect(x => x.Do2()).Returns("foo");
 
-			Assert.AreEqual(1, mock.Value.Do1());
-			Assert.AreEqual("foo", mock.Value.Do2());
+			Assert.AreEqual(1, mock.Instance.Do1());
+			Assert.AreEqual("foo", mock.Instance.Do2());
 		}
 
 		[Test]
@@ -51,8 +51,8 @@ namespace Moq.Tests
 			mock.Expect(x => x.DoInt(1)).Returns(11);
 			mock.Expect(x => x.DoInt(2)).Returns(22);
 
-			Assert.AreEqual(11, mock.Value.DoInt(1));
-			Assert.AreEqual(22, mock.Value.DoInt(2));
+			Assert.AreEqual(11, mock.Instance.DoInt(1));
+			Assert.AreEqual(22, mock.Instance.DoInt(2));
 		}
 
 		[Test]
@@ -62,8 +62,8 @@ namespace Moq.Tests
 			mock.Expect(x => x.DoArgument(null)).Returns(1);
 			mock.Expect(x => x.DoArgument("foo")).Returns(2);
 
-			Assert.AreEqual(1, mock.Value.DoArgument(null));
-			Assert.AreEqual(2, mock.Value.DoArgument("foo"));
+			Assert.AreEqual(1, mock.Instance.DoArgument(null));
+			Assert.AreEqual(2, mock.Instance.DoArgument("foo"));
 		}
 
 		[Test]
@@ -73,7 +73,7 @@ namespace Moq.Tests
 			var mock = new Mock<IFoo>();
 			mock.Expect(x => x.DoArgument(null)).Returns(value);
 
-			Assert.AreEqual(value, mock.Value.DoArgument(null));
+			Assert.AreEqual(value, mock.Instance.DoArgument(null));
 		}
 
 		[Test]
@@ -84,11 +84,11 @@ namespace Moq.Tests
 			mock.Expect(x => x.DoArgument(a.ToString())).Returns(() => a);
 			a = 10;
 
-			Assert.AreEqual(10, mock.Value.DoArgument("10"));
+			Assert.AreEqual(10, mock.Instance.DoArgument("10"));
 
 			a = 20;
 
-			Assert.AreEqual(20, mock.Value.DoArgument("20"));
+			Assert.AreEqual(20, mock.Instance.DoArgument("20"));
 		}
 
 		[Test]
@@ -98,7 +98,7 @@ namespace Moq.Tests
 			
 			mock.Expect(x => x.ValueProperty).Returns(25);
 
-			Assert.AreEqual(25, mock.Value.ValueProperty);
+			Assert.AreEqual(25, mock.Instance.ValueProperty);
 		}
 
 		[ExpectedException(typeof(NotSupportedException))]
@@ -118,7 +118,7 @@ namespace Moq.Tests
 
 			mock.Expect(x => x.Duplicate(value)).Returns(() => value * 2);
 
-			Assert.AreEqual(value * 2, mock.Value.Duplicate(value));
+			Assert.AreEqual(value * 2, mock.Instance.Duplicate(value));
 		}
 
 		[Test]
@@ -129,7 +129,7 @@ namespace Moq.Tests
 
 			mock.Expect(x => x.Duplicate(GetValue(value))).Returns(() => value * 2);
 
-			Assert.AreEqual(value * 2, mock.Value.Duplicate(value * 2));
+			Assert.AreEqual(value * 2, mock.Instance.Duplicate(value * 2));
 		}
 
 		private int GetValue(int value)
@@ -144,8 +144,8 @@ namespace Moq.Tests
 
 			mock.Expect(x => x.Duplicate(It.IsAny<int>())).Returns(() => 5);
 
-			Assert.AreEqual(5, mock.Value.Duplicate(5));
-			Assert.AreEqual(5, mock.Value.Duplicate(25));
+			Assert.AreEqual(5, mock.Instance.Duplicate(5));
+			Assert.AreEqual(5, mock.Instance.Duplicate(25));
 		}
 
 		[Test]
@@ -163,11 +163,11 @@ namespace Moq.Tests
 				Expect(x => x.Duplicate(It.Is<int>(value => value >= 5))).
 				Returns(() => 2);
 
-			Assert.AreEqual(1, mock.Value.Duplicate(3));
-			Assert.AreEqual(0, mock.Value.Duplicate(0));
-			Assert.AreEqual(0, mock.Value.Duplicate(-5));
-			Assert.AreEqual(2, mock.Value.Duplicate(5));
-			Assert.AreEqual(2, mock.Value.Duplicate(6));
+			Assert.AreEqual(1, mock.Instance.Duplicate(3));
+			Assert.AreEqual(0, mock.Instance.Duplicate(0));
+			Assert.AreEqual(0, mock.Instance.Duplicate(-5));
+			Assert.AreEqual(2, mock.Instance.Duplicate(5));
+			Assert.AreEqual(2, mock.Instance.Duplicate(6));
 		}
 
 		[Test]
@@ -177,7 +177,7 @@ namespace Moq.Tests
 
 			mock.Expect(x => x.Execute());
 
-			mock.Value.Execute();
+			mock.Instance.Execute();
 		}
 
 		[Test]
@@ -185,7 +185,7 @@ namespace Moq.Tests
 		{
 			var mock = new Mock<IFoo>();
 
-			mock.Value.Execute();
+			mock.Instance.Execute();
 		}
 
 		[ExpectedException(typeof(InvalidOperationException))]
@@ -194,7 +194,7 @@ namespace Moq.Tests
 		{
 			var mock = new Mock<IFoo>();
 
-			int value = mock.Value.DoArgument("foo");
+			int value = mock.Instance.DoArgument("foo");
 		}
 
 		[ExpectedException(typeof(FormatException))]
@@ -205,7 +205,7 @@ namespace Moq.Tests
 
 			mock.Expect(x => x.Do1()).Throws(new FormatException());
 
-			mock.Value.Do1();
+			mock.Instance.Do1();
 		}
 
 		[Test]
@@ -215,7 +215,7 @@ namespace Moq.Tests
 			bool called = false;
 			mock.Expect(x => x.Execute()).Callback(() => called = true);
 
-			mock.Value.Execute();
+			mock.Instance.Execute();
 			Assert.IsTrue(called);
 		}
 
@@ -226,7 +226,7 @@ namespace Moq.Tests
 			bool called = false;
 			mock.Expect(x => x.Do1()).Callback(() => called = true).Returns(1);
 
-			Assert.AreEqual(1, mock.Value.Do1());
+			Assert.AreEqual(1, mock.Instance.Do1());
 			Assert.IsTrue(called);
 		}
 
@@ -238,12 +238,12 @@ namespace Moq.Tests
 			mock.Expect(x => x.DoInt(It.IsInRange(1, 5, Range.Inclusive))).Returns(1);
 			mock.Expect(x => x.DoInt(It.IsInRange(6, 10, Range.Exclusive))).Returns(2);
 
-			Assert.AreEqual(1, mock.Value.DoInt(1));
-			Assert.AreEqual(1, mock.Value.DoInt(2));
-			Assert.AreEqual(1, mock.Value.DoInt(5));
+			Assert.AreEqual(1, mock.Instance.DoInt(1));
+			Assert.AreEqual(1, mock.Instance.DoInt(2));
+			Assert.AreEqual(1, mock.Instance.DoInt(5));
 
-			Assert.AreEqual(2, mock.Value.DoInt(7));
-			Assert.AreEqual(2, mock.Value.DoInt(9));
+			Assert.AreEqual(2, mock.Instance.DoInt(7));
+			Assert.AreEqual(2, mock.Instance.DoInt(9));
 		}
 
 		[ExpectedException(typeof(InvalidOperationException))]
@@ -254,7 +254,7 @@ namespace Moq.Tests
 
 			mock.Expect(x => x.DoInt(It.IsInRange(1, 5, Range.Exclusive))).Returns(1);
 
-			Assert.AreEqual(1, mock.Value.DoInt(1));
+			Assert.AreEqual(1, mock.Instance.DoInt(1));
 		}
 
 		[Test]
@@ -265,7 +265,24 @@ namespace Moq.Tests
 
 			mock.Expect(x => x.DoInt(It.IsInRange(from, GetToRange(), Range.Inclusive))).Returns(1);
 
-			Assert.AreEqual(1, mock.Value.DoInt(1));
+			Assert.AreEqual(1, mock.Instance.DoInt(1));
+		}
+
+		[ExpectedException(typeof(InvalidOperationException))]
+		[Test]
+		public void ShouldExpectRangeLazyEval()
+		{
+			var mock = new Mock<IFoo>();
+			var from = "a";
+			var to = "d";
+
+			mock.Expect(x => x.DoArgument(It.IsInRange(from, to, Range.Inclusive))).Returns(1);
+
+			Assert.AreEqual(1, mock.Instance.DoArgument("b"));
+
+			from = "c";
+
+			Assert.AreEqual(1, mock.Instance.DoArgument("b"));
 		}
 
 		private int GetToRange()
@@ -292,6 +309,7 @@ namespace Moq.Tests
 			int Duplicate(int value);
 
 			void Execute();
+			void Execute(string arg1, int arg2);
 
 			int ValueProperty { get; set; }
 			int WriteOnlyValue { set; }

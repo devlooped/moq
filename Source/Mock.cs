@@ -13,10 +13,10 @@ namespace Moq
 	{
 		MockProxy<TInterface> proxy = new MockProxy<TInterface>();
 
-		public TInterface Value
+		public TInterface Instance
 		{
 			get
-			{
+			{ 
 				return (TInterface)proxy.GetTransparentProxy();
 			}
 		}
@@ -84,7 +84,7 @@ namespace Moq
 		public static implicit operator TInterface(Mock<TInterface> mock)
 		{
 			// TODO: doesn't work as expected but ONLY with interfaces :S
-			return mock.Value;
+			return mock.Instance;
 		}
 
 		//public static explicit operator TInterface(Mock<TInterface> mock)
