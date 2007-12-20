@@ -362,6 +362,50 @@ namespace Moq.Tests
 			Assert.AreEqual(1, mock.Object.DoInt(2));
 		}
 
+		[Test]
+		public void ShouldGetTypeReturnATypeAssignableFromInterfaceType()
+		{
+			var mock = new Mock<IFoo>();
+			Assert.IsTrue(typeof(IFoo).IsAssignableFrom(mock.Object.GetType()));
+		}
+
+		[Test]
+		public void ShouldEqualsMethodWorkAsReferenceEquals()
+		{
+			var mock1 = new Mock<IFoo>();
+			var mock2 = new Mock<IFoo>();
+
+			Assert.IsTrue(mock1.Object.Equals(mock1.Object));
+			Assert.IsFalse(mock1.Object.Equals(mock2.Object));
+		}
+
+		[Test]
+		public void ShouldGetHashCodeReturnDifferentCodeForEachMock()
+		{
+			var mock1 = new Mock<IFoo>();
+			var mock2 = new Mock<IFoo>();
+
+			Assert.AreEqual(mock1.Object.GetHashCode(), mock1.Object.GetHashCode());
+			Assert.AreEqual(mock2.Object.GetHashCode(), mock2.Object.GetHashCode());
+			Assert.AreNotEqual(mock1.Object.GetHashCode(), mock2.Object.GetHashCode());
+		}
+
+		[Test]
+		public void ShouldToString()
+		{
+			var mock = new Mock<IFoo>();
+			Assert.IsFalse(string.IsNullOrEmpty(mock.Object.ToString()));
+		}
+
+		[Test]
+		public void ShouldOverrideObjectMethods()
+		{
+			var mock = new Mock<IFoo>();
+			mock.Expect(x => x.ToString()).Returns("foo");
+
+			Assert.AreEqual("foo", mock.Object.ToString());
+		}
+
 		class FooService : IFooService { }
 		interface IFooService { }
 

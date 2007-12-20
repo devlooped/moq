@@ -7,8 +7,14 @@ using System.Runtime.Remoting.Proxies;
 namespace Moq
 {
 	internal class MockProxy<TInterface> : RealProxy
+		where TInterface : class
 	{
 		List<IProxyCall> calls = new List<IProxyCall>();
+		TInterface transparentProxy = null;
+		static MethodInfo ObjectGetTypeMethod = Reflector<object>.GetMethod(x => x.GetType());
+		static MethodInfo ObjectEqualsMethod = Reflector<object>.GetMethod(x => x.Equals(null));
+		static MethodInfo ObjectGetHashCodeMethod = Reflector<object>.GetMethod(x => x.GetHashCode());
+		static MethodInfo ObjectToStringMethod = Reflector<object>.GetMethod(x => x.ToString());
 
 		public MockProxy()
 			: base(typeof(TInterface))
@@ -20,11 +26,14 @@ namespace Moq
 			calls.Add(call);
 		}
 
-		public TInterface Value
+		public TInterface TransparentProxy
 		{
 			get
 			{
-				return (TInterface)this.GetTransparentProxy();
+				if (transparentProxy == null)
+					transparentProxy = (TInterface)this.GetTransparentProxy();
+
+				return transparentProxy;
 			}
 		}
 
@@ -37,6 +46,11 @@ namespace Moq
 				if (call != null)
 				{
 					return call.Execute(methodCall);
+				}
+
+				if (methodCall.MethodBase.DeclaringType == typeof(object))
+				{
+					return ExecuteObjectMethod(methodCall);
 				}
 
 				MethodInfo method = methodCall.MethodBase as MethodInfo;
@@ -57,6 +71,34 @@ namespace Moq
 			}
 
 			return new ReturnMessage(null, null, 0, null, methodCall);
+		}
+
+		private IMessage ExecuteObjectMethod(IMethodCallMessage methodCall)
+		{
+			if (methodCall.MethodBase == ObjectGetTypeMethod)
+			{
+				Type type = typeof(TInterface);
+				return new ReturnMessage(type, null, 0, null, methodCall);
+			}
+			else if (methodCall.MethodBase == ObjectEqualsMethod)
+			{
+				bool equals = object.ReferenceEquals(transparentProxy, methodCall.Args[0]);
+				return new ReturnMessage(equals, null, 0, null, methodCall);
+			}
+			else if (methodCall.MethodBase == ObjectGetHashCodeMethod)
+			{
+				int hashCode = GetHashCode();
+				return new ReturnMessage(hashCode, null, 0, null, methodCall);
+			}
+			else if (methodCall.MethodBase == ObjectToStringMethod)
+			{
+				string toString = ToString();
+				return new ReturnMessage(toString, null, 0, null, methodCall);
+			}
+			else
+			{
+				return new ReturnMessage(null, null, 0, null, methodCall);
+			}
 		}
 	}
 }

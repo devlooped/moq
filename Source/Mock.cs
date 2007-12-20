@@ -58,7 +58,7 @@ namespace Moq
 		{
 			get
 			{ 
-				return (TInterface)proxy.GetTransparentProxy();
+				return proxy.TransparentProxy;
 			}
 		}
 
