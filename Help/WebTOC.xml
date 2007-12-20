@@ -1,0 +1,50 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<HelpTOC DTDVersion="1.0" xmlns:msxsl="urn:schemas-microsoft-com:xslt" xmlns:ddue="http://ddue.schemas.microsoft.com/authoring/2003/5">
+  <HelpTOCNode Id="db56e495-4861-459e-8b4a-a3813d5ffc18" Title="Moq Namespace" Url="html/dd9bb368-2453-98f9-307a-d54845fd190b.htm">
+    <HelpTOCNode Id="cde0aacb-8abb-4733-8b12-36c4d3894954" Title="ICall Interface" Url="html/5d56b219-1bdd-1c47-9446-a60397619870.htm">
+      <HelpTOCNode Title="ICall Members" Url="html/3cd42486-67f9-0fe8-4bcd-b9dff269609f.htm" />
+      <HelpTOCNode Id="d54ef306-627d-4a1d-82c8-9dd8ce39c260" Title="ICall Methods " Url="html/80e54d53-e70e-0c99-ecd7-7eec3226ad6b.htm">
+        <HelpTOCNode Title="Callback Method " Url="html/c715fb85-ed93-1fc3-1e14-cdc6b234eeb0.htm" />
+        <HelpTOCNode Title="Throws Method " Url="html/71a68b35-c5b4-704e-5a26-82353ac91ac1.htm" />
+      </HelpTOCNode>
+    </HelpTOCNode>
+    <HelpTOCNode Id="5d4af65a-84d7-44c7-8014-3291be361762" Title="ICall(TResult) Generic Interface" Url="html/23456921-2914-71f5-553a-7d481f31009a.htm">
+      <HelpTOCNode Title="ICall(TResult) Members" Url="html/d9676cd1-d7c6-b71b-a1e9-093f97dfb125.htm" />
+      <HelpTOCNode Id="07d52c1f-35a5-4218-8897-0651e3d6a35b" Title="ICall(TResult) Methods " Url="html/b437953a-2abd-b742-0d13-81b2d7055cc8.htm">
+        <HelpTOCNode Id="d94d7716-be95-49a7-ac37-8c39c1a6af3d" Title="Callback Method " Url="html/3c361112-b48d-c2a3-15f9-e4a820e7287e.htm">
+          <HelpTOCNode Title="Callback Method (Action)" Url="html/95d224f1-cf90-2ac0-edcb-69162eaa12c6.htm" />
+        </HelpTOCNode>
+        <HelpTOCNode Id="7941f6cc-7cfa-4a32-a153-8f18f69e29c0" Title="Returns Method " Url="html/454c1f82-0fa8-04eb-8b89-529f7b873fa0.htm">
+          <HelpTOCNode Title="Returns Method (Func(TResult))" Url="html/b9865344-a0c4-0e7a-bd39-3761cda81b64.htm" />
+          <HelpTOCNode Title="Returns Method (TResult)" Url="html/d6f15104-81f3-f409-d1dd-58d4f4e8c8aa.htm" />
+        </HelpTOCNode>
+      </HelpTOCNode>
+    </HelpTOCNode>
+    <HelpTOCNode Id="8169f811-c66e-405d-bce9-cd097155b8d1" Title="It Class" Url="html/001d58b8-78a7-4eca-a4d1-fff227062833.htm">
+      <HelpTOCNode Title="It Members" Url="html/8ef44092-5b95-2705-d314-3a55e9b9a512.htm" />
+      <HelpTOCNode Id="518e48e7-93f9-4278-84e0-7e0f44c90c08" Title="It Methods " Url="html/f3b2afd9-4e91-7121-e189-c8d19efb1f5b.htm">
+        <HelpTOCNode Title="Is(TValue) Generic Method " Url="html/b80240b3-f790-ef6f-7852-6a93552893f9.htm" />
+        <HelpTOCNode Title="IsAny(TValue) Generic Method " Url="html/bfcfbdce-07a1-4e80-78b6-c6a5afaf69de.htm" />
+        <HelpTOCNode Title="IsInRange(TValue) Generic Method " Url="html/bca3df6a-76fb-4b40-cc1f-f6d9432596f2.htm" />
+        <HelpTOCNode Id="5795a6c8-4287-425b-9fb0-b75016778384" Title="IsRegex Method " Url="html/c5b74ec8-bd83-23b6-0eb0-eb25539d23f9.htm">
+          <HelpTOCNode Title="IsRegex Method (String)" Url="html/0b9eb26d-c80e-ff4b-6543-97bca24c575a.htm" />
+          <HelpTOCNode Title="IsRegex Method (String, RegexOptions)" Url="html/bf412f72-7581-0fff-c3b6-2cc2966906b9.htm" />
+        </HelpTOCNode>
+      </HelpTOCNode>
+    </HelpTOCNode>
+    <HelpTOCNode Id="0c05364c-29cb-4eba-bdea-9aa28a057ba8" Title="Mock(TInterface) Generic Class" Url="html/0692aef3-509d-3e1d-41bc-597a4f85fd6e.htm">
+      <HelpTOCNode Title="Mock(TInterface) Members" Url="html/d46b9004-aa8b-7259-b804-514687d84c1c.htm" />
+      <HelpTOCNode Title="Mock(TInterface) Constructor " Url="html/dae6d159-066c-8d75-1b31-b4c70a4e6eff.htm" />
+      <HelpTOCNode Id="bd7767d5-9a6a-45ed-bd7d-5bafb9bcb7e5" Title="Mock(TInterface) Methods " Url="html/fecbd320-0101-085b-21d2-a385f4aed1a4.htm">
+        <HelpTOCNode Id="8a00a833-ab7c-4396-beb4-cf17ddd084a0" Title="Expect Method " Url="html/c3eb0630-60bb-60c9-a937-1b57ee12dedb.htm">
+          <HelpTOCNode Title="Expect Method (Expression(Action(TInterface)))" Url="html/2b61c99a-220f-c43e-cec2-1a6f81cee17a.htm" />
+          <HelpTOCNode Title="Expect(TResult) Generic Method (Expression(Func(TInterface, TResult)))" Url="html/11844e9f-0087-b72b-7ad6-920119169c19.htm" />
+        </HelpTOCNode>
+      </HelpTOCNode>
+      <HelpTOCNode Id="385a728f-c1ba-46ad-9a6d-ab3d2864a8e5" Title="Mock(TInterface) Properties " Url="html/ab12f603-9e47-22dd-4db4-0fba43355677.htm">
+        <HelpTOCNode Title="Object Property " Url="html/8311782d-7b49-48db-9d08-e645a261e510.htm" />
+      </HelpTOCNode>
+    </HelpTOCNode>
+    <HelpTOCNode Title="Range Enumeration" Url="html/87ebf132-df72-c16e-35f6-fa55debd6854.htm" />
+  </HelpTOCNode>
+</HelpTOC>

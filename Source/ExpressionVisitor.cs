@@ -35,7 +35,7 @@ namespace Moq
 	/// </remarks>
 	/// <author>Matt Warren: http://blogs.msdn.com/mattwar</author>
 	/// <contributor>Documented by InSTEDD: http://www.instedd.org</contributor>
-	public abstract class ExpressionVisitor
+	internal abstract class ExpressionVisitor
 	{
 		/// <summary>
 		/// Default constructor used by derived visitors.

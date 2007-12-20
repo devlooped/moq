@@ -1,5 +1,4 @@
 ﻿using System;
-using System.Linq.Expressions;
 using System.Reflection;
 
 namespace Moq
@@ -8,7 +7,7 @@ namespace Moq
 		AttributeTargets.Method |
 		AttributeTargets.Field |
 		AttributeTargets.Property, Inherited = true)]
-	public class MatcherAttribute : Attribute
+	internal class MatcherAttribute : Attribute
 	{
 		Type matcherType;
 

@@ -9,7 +9,7 @@ namespace Moq
 	/// </summary>
 	/// <author>Matt Warren: http://blogs.msdn.com/mattwar</author>
 	/// <contributor>Documented by InSTEDD: http://www.instedd.org</contributor>
-	public static class Evaluator
+	internal static class Evaluator
 	{
 		/// <summary>
 		/// Performs evaluation and replacement of independent sub-trees

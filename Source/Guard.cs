@@ -1,5 +1,4 @@
 using System;
-using System.Globalization;
 
 internal static class Guard
 {
@@ -19,11 +18,11 @@ internal static class Guard
 	/// </summary>
 	/// <param name="argumentValue">The argument value to check.</param>
 	/// <param name="argumentName">The name of the argument.</param>
-	public static void ArgumentNotNullOrEmptyString(string value, string argumentName)
+	public static void ArgumentNotNullOrEmptyString(string argumentValue, string argumentName)
 	{
-		ArgumentNotNull(value, argumentName);
+		ArgumentNotNull(argumentValue, argumentName);
 
-		if (value.Length == 0)
+		if (argumentValue.Length == 0)
 			throw new ArgumentException(
 				"Value cannot be null or an empty string.",
 				argumentName);

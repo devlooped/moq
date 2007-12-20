@@ -16,10 +16,28 @@ namespace Moq.Tests
 		public void ShouldCreateMockAndExposeInterface()
 		{
 			var mock = new Mock<ICloneable>();
-
+			
 			ICloneable cloneable = mock.Object;
 
 			Assert.IsNotNull(cloneable);
+		}
+
+		[ExpectedException(typeof(ArgumentNullException))]
+		[Test]
+		public void ShouldThrowIfNullExpectAction()
+		{
+			var mock = new Mock<ICloneable>();
+
+			mock.Expect((Expression<Action<ICloneable>>)null);
+		}
+
+		[ExpectedException(typeof(ArgumentNullException))]
+		[Test]
+		public void ShouldThrowIfNullExpectFunction()
+		{
+			var mock = new Mock<ICloneable>();
+
+			mock.Expect((Expression<Func<ICloneable, string>>)null);
 		}
 
 		[Test]

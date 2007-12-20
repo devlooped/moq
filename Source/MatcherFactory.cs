@@ -1,5 +1,5 @@
-﻿using System.Linq.Expressions;
-using System;
+﻿using System;
+using System.Linq.Expressions;
 
 namespace Moq
 {
@@ -7,6 +7,13 @@ namespace Moq
 	{
 		public static IMatcher CreateMatcher(Expression expression)
 		{
+			// TODO: type inference on the call might 
+			// be a smaller type and a Convert expression type 
+			// might be the topmost instead.
+			// i.e.: It.IsInRange(0, 100, Range.Inclusive)
+			// the values are ints, but if the method to call 
+			// expects, say, a double, a Convert node will be on 
+			// the expression.
 			if (expression.NodeType == ExpressionType.Call)
 			{
 				MethodCallExpression call = (MethodCallExpression)expression;
