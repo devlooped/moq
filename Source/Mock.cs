@@ -67,6 +67,12 @@ namespace Moq
 		/// to a void-returning method.
 		/// </summary>
 		/// <param name="expression">Lambda expression that specifies the expected method invocation.</param>
+		/// <example>
+		/// <code>
+		/// var mock = new Mock&lt;IProcessor&gt;();
+		/// mock.Expect(x =&gt; x.Execute("ping"));
+		/// </code>
+		/// </example>
 		public ICall Expect(Expression<Action<TInterface>> expression)
 		{
 			Guard.ArgumentNotNull(expression, "expression");
@@ -84,6 +90,11 @@ namespace Moq
 		/// to a value returning method.
 		/// </summary>
 		/// <param name="expression">Lambda expression that specifies the expected method invocation.</param>
+		/// <example>
+		/// <code>
+		/// mock.Expect(x =&gt; x.HasInventory("Talisker", 50)).Returns(true);
+		/// </code>
+		/// </example>
 		public ICall<TResult> Expect<TResult>(Expression<Func<TInterface, TResult>> expression)
 		{
 			Guard.ArgumentNotNull(expression, "expression");

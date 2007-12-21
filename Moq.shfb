@@ -14,10 +14,10 @@ The Mock&amp;lt;TInterface&amp;gt; class is the core of the library, so it's a g
     <ProjectSummary>Moq (pronounced "Mock-you") is the only mocking library for .NET developed from scratch to take full advantage of .NET 3.5 (i.e. Linq expression trees) and C# 3.0 features (i.e. lambda expressions) that make it the most productive, simple and refactoring-friendly mocking library available.</ProjectSummary>
     <MissingTags>Summary, Parameter, AutoDocumentCtors, Namespace</MissingTags>
     <VisibleItems>InheritedMembers, InheritedFrameworkMembers, Protected, SealedProtected</VisibleItems>
-    <HtmlHelp1xCompilerPath path=".\Tools\HTML Help Workshop\" />
+    <HtmlHelp1xCompilerPath path="" />
     <HtmlHelp2xCompilerPath path="" />
     <OutputPath>.\Help\</OutputPath>
-    <SandcastlePath path=".\Tools\Sandcastle\" />
+    <SandcastlePath path="" />
     <WorkingPath path="" />
     <CleanIntermediates>True</CleanIntermediates>
     <KeepLogFile>True</KeepLogFile>
@@ -42,7 +42,7 @@ The Mock&amp;lt;TInterface&amp;gt; class is the core of the library, so it's a g
     <SdkLinkType>Msdn</SdkLinkType>
     <SdkLinkTarget>Blank</SdkLinkTarget>
     <PresentationStyle>vs2005</PresentationStyle>
-    <NamingMethod>Guid</NamingMethod>
+    <NamingMethod>HashedMemberName</NamingMethod>
     <SyntaxFilters>CSharp</SyntaxFilters>
     <ShowFeedbackControl>False</ShowFeedbackControl>
     <ContentPlacement>AboveNamespaces</ContentPlacement>
