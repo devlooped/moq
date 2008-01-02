@@ -48,7 +48,7 @@ namespace Moq.Tests
 
 			mock.Expect(x => x.Clone()).Returns(clone);
 
-			Assert.AreEqual(clone, mock.Object.Clone());
+			Assert.AreSame(clone, mock.Object.Clone());
 		}
 
 		[Test]
