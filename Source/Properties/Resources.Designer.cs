@@ -70,6 +70,15 @@ namespace Moq.Properties {
         }
         
         /// <summary>
+        ///   Looks up a localized string similar to Type to mock be an interface or an abstract or non-sealed class. .
+        /// </summary>
+        internal static string InvalidMockClass {
+            get {
+                return ResourceManager.GetString("InvalidMockClass", resourceCulture);
+            }
+        }
+        
+        /// <summary>
         ///   Looks up a localized string similar to Property {0}.{1} is write-only..
         /// </summary>
         internal static string PropertyNotReadable {

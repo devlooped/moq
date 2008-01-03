@@ -33,7 +33,6 @@ namespace Moq.Tests
 			Assert.IsNotNull(matcher);
 		}
 
-
 		class MockMatcher : IMatcher
 		{
 			#region IMatcher Members

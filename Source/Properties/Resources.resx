@@ -120,6 +120,9 @@
   <data name="FieldsNotSupported" xml:space="preserve">
     <value>Field calls are not supported. Use interfaces and properties instead.</value>
   </data>
+  <data name="InvalidMockClass" xml:space="preserve">
+    <value>Type to mock be an interface or an abstract or non-sealed class. </value>
+  </data>
   <data name="PropertyNotReadable" xml:space="preserve">
     <value>Property {0}.{1} is write-only.</value>
   </data>

@@ -16,7 +16,7 @@ namespace Moq.Tests
 		public void ShouldCreateMockAndExposeInterface()
 		{
 			var mock = new Mock<ICloneable>();
-			
+
 			ICloneable cloneable = mock.Object;
 
 			Assert.IsNotNull(cloneable);
@@ -48,7 +48,7 @@ namespace Moq.Tests
 
 			mock.Expect(x => x.Clone()).Returns(clone);
 
-			Assert.AreSame(clone, mock.Object.Clone());
+			Assert.AreEqual(clone, mock.Object.Clone());
 		}
 
 		[Test]
@@ -124,7 +124,7 @@ namespace Moq.Tests
 		[Test]
 		public void ShouldThrowIfExpectFieldValue()
 		{
-			var mock = new Mock<Foo>();
+			var mock = new Mock<FooMBRO>();
 
 			mock.Expect(x => x.ValueField);
 		}
@@ -207,13 +207,18 @@ namespace Moq.Tests
 			mock.Object.Execute();
 		}
 
-		[ExpectedException(typeof(InvalidOperationException))]
 		[Test]
-		public void ShouldThowIfUnexpectedCallWithReturnValue()
+		public void ShouldNotThowIfUnexpectedCallWithReturnValue()
 		{
 			var mock = new Mock<IFoo>();
 
 			int value = mock.Object.DoArgument("foo");
+			string str = mock.Object.Do2();
+			AttributeTargets targets = mock.Object.GetTargets();
+
+			Assert.AreEqual(default(int), value);
+			Assert.AreEqual(default(string), str);
+			Assert.AreEqual(default(AttributeTargets), targets);
 		}
 
 		[ExpectedException(typeof(FormatException))]
@@ -265,15 +270,14 @@ namespace Moq.Tests
 			Assert.AreEqual(2, mock.Object.DoInt(9));
 		}
 
-		[ExpectedException(typeof(InvalidOperationException))]
 		[Test]
-		public void ShouldNotExpectOutOfRange()
+		public void ShouldOutOfRangeReturnsDefault()
 		{
 			var mock = new Mock<IFoo>();
 
 			mock.Expect(x => x.DoInt(It.IsInRange(1, 5, Range.Exclusive))).Returns(1);
 
-			Assert.AreEqual(1, mock.Object.DoInt(1));
+			Assert.AreEqual(default(int), mock.Object.DoInt(1));
 		}
 
 		[Test]
@@ -287,7 +291,6 @@ namespace Moq.Tests
 			Assert.AreEqual(1, mock.Object.DoInt(1));
 		}
 
-		[ExpectedException(typeof(InvalidOperationException))]
 		[Test]
 		public void ShouldExpectRangeLazyEval()
 		{
@@ -301,10 +304,9 @@ namespace Moq.Tests
 
 			from = "c";
 
-			Assert.AreEqual(1, mock.Object.DoArgument("b"));
+			Assert.AreEqual(default(int), mock.Object.DoArgument("b"));
 		}
 
-		[ExpectedException(typeof(InvalidOperationException))]
 		[Test]
 		public void ShouldExpectMatchRegexAndLazyEval()
 		{
@@ -321,7 +323,8 @@ namespace Moq.Tests
 
 			reg = "[c-d]+";
 
-			Assert.AreEqual(1, mock.Object.DoArgument("b"));
+			// Will not match neither the 1 and 2 return values we had.
+			Assert.AreEqual(default(int), mock.Object.DoArgument("b"));
 		}
 
 		[Test]
@@ -338,7 +341,7 @@ namespace Moq.Tests
 		public void ShouldCallFirstExpectThatMatches()
 		{
 			var mock = new Mock<IFoo>();
-			mock.Expect(x => x.Execute("ping")).Returns("I'm alive!"); 
+			mock.Expect(x => x.Execute("ping")).Returns("I'm alive!");
 			mock.Expect(x => x.Execute(It.IsAny<string>())).Throws(new ArgumentException());
 
 			Assert.AreEqual("I'm alive!", mock.Object.Execute("ping"));
@@ -397,28 +400,110 @@ namespace Moq.Tests
 			Assert.IsFalse(string.IsNullOrEmpty(mock.Object.ToString()));
 		}
 
+		[Ignore("Castle.DynamicProxy2 doesn't seem to call interceptors for ToString, GetHashCode")]
 		[Test]
 		public void ShouldOverrideObjectMethods()
 		{
 			var mock = new Mock<IFoo>();
+			mock.Expect(x => x.GetHashCode()).Returns(1);
 			mock.Expect(x => x.ToString()).Returns("foo");
 
 			Assert.AreEqual("foo", mock.Object.ToString());
+			Assert.AreEqual(1, mock.Object.GetHashCode());
 		}
 
+		[Test]
+		public void ShouldMockAbstractClass()
+		{
+			var mock = new Mock<FooBase>();
+			mock.Expect(x => x.Check("foo")).Returns(false);
+
+			Assert.IsFalse(mock.Object.Check("foo"));
+			Assert.IsTrue(mock.Object.Check("bar"));
+		}
+
+		[Ignore("Not implemented yet")]
+		[ExpectedException(typeof(ArgumentException))]
+		[Test]
+		public void ShouldThrowIfExpectOnNonVirtual()
+		{
+			var mock = new Mock<FooBase>();
+			mock.Expect(x => x.True()).Returns(false);
+
+			Assert.IsFalse(mock.Object.True());
+		}
+
+		[Test]
+		public void ShouldOverrideNonVirtualForMBRO()
+		{
+			var mock = new Mock<FooMBRO>();
+			mock.Expect(x => x.True()).Returns(false);
+
+			Assert.IsFalse(mock.Object.True());
+		}
+
+		[Test]
+		public void ShouldCallUnderlyingMBRO()
+		{
+			var mock = new Mock<FooMBRO>();
+
+			Assert.IsTrue(mock.Object.True());
+		}
+
+		[Test]
+		public void ShouldCallUnderlyingClassEquals()
+		{
+			var mock = new Mock<FooOverrideEquals>();
+			var mock2 = new Mock<FooOverrideEquals>();
+
+			mock.Object.Name = "Foo";
+			mock2.Object.Name = "Foo";
+
+			Assert.IsTrue(mock.Object.Equals(mock2.Object));
+		}
+
+		[ExpectedException(typeof(ArgumentException))]
+		[Test]
+		public void ShouldThrowIfSealedClass()
+		{
+			var mock = new Mock<FooSealed>();
+		}
+
+		// ShouldInterceptPropertySetter
+
+		public sealed class FooSealed { }
 		class FooService : IFooService { }
 		interface IFooService { }
-
-		// ShouldAllowDynamicResultThroughFunc
 
 		private int GetToRange()
 		{
 			return 5;
 		}
 
-		public class Foo : MarshalByRefObject
+		public class FooOverrideEquals
+		{
+			public string Name { get; set; }
+
+			public override bool Equals(object obj)
+			{
+				return (obj is FooOverrideEquals) &&
+					((FooOverrideEquals)obj).Name == this.Name;
+			}
+
+			public override int GetHashCode()
+			{
+				return Name.GetHashCode();
+			}
+		}
+
+		public class FooMBRO : MarshalByRefObject
 		{
 			public int ValueField;
+
+			public bool True()
+			{
+				return true;
+			}
 		}
 
 		public interface IFoo
@@ -430,6 +515,7 @@ namespace Moq.Tests
 			int DoArgument(string arg);
 
 			int Duplicate(int value);
+			AttributeTargets GetTargets();
 
 			void Execute();
 			string Execute(string command);
@@ -438,6 +524,21 @@ namespace Moq.Tests
 			int ValueProperty { get; set; }
 			int WriteOnlyValue { set; }
 
+		}
+
+		public abstract class FooBase
+		{
+			public abstract void Do(int value);
+
+			public virtual bool Check(string value)
+			{
+				return true;
+			}
+
+			public bool True()
+			{
+				return true;
+			}
 		}
 	}
 }

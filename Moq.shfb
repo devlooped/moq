@@ -4,13 +4,30 @@
     </assemblies>
     <namespaceSummaries>
         <namespaceSummaryItem name="" isDocumented="False" />
-        <namespaceSummaryItem name="Moq" isDocumented="True">Root namespace of Moq (pronounced "Mock-you"), the only mocking library for .NET developed from scratch to take full advantage of .NET 3.5 (i.e. Linq expression trees) and C# 3.0 features (i.e. lambda expressions) that make it the most productive, simple and refactoring-friendly mocking library available.
+        <namespaceSummaryItem name="Castle.Core" isDocumented="False" />
+        <namespaceSummaryItem name="Castle.Core.Configuration" isDocumented="False" />
+        <namespaceSummaryItem name="Castle.Core.Interceptor" isDocumented="False" />
+        <namespaceSummaryItem name="Castle.Core.Internal" isDocumented="False" />
+        <namespaceSummaryItem name="Castle.Core.Logging" isDocumented="False" />
+        <namespaceSummaryItem name="Castle.Core.Logging.Factories" isDocumented="False" />
+        <namespaceSummaryItem name="Castle.Core.Resource" isDocumented="False" />
+        <namespaceSummaryItem name="Castle.DynamicProxy" isDocumented="False" />
+        <namespaceSummaryItem name="Castle.DynamicProxy.Generators" isDocumented="False" />
+        <namespaceSummaryItem name="Castle.DynamicProxy.Generators.Emitters" isDocumented="False" />
+        <namespaceSummaryItem name="Castle.DynamicProxy.Generators.Emitters.CodeBuilders" isDocumented="False" />
+        <namespaceSummaryItem name="Castle.DynamicProxy.Generators.Emitters.SimpleAST" isDocumented="False" />
+        <namespaceSummaryItem name="Castle.DynamicProxy.Serialization" isDocumented="False" />
+        <namespaceSummaryItem name="Moq" isDocumented="True">Root namespace of MoQ (pronounced "Mock-you"), the only mocking library for .NET developed from scratch to take full advantage of .NET 3.5 (i.e. Linq expression trees) and C# 3.0 features (i.e. lambda expressions) that make it the most productive, simple and refactoring-friendly mocking library available.
 &lt;p&gt;
 See the &lt;a href="http://code.google.com/p/moq/wiki/QuickStart"&gt;online quickstarts&lt;/a&gt; for more examples than those available in this code documentation.
 &lt;/p&gt;
-The Mock&amp;lt;TInterface&amp;gt; class is the core of the library, so it's a good place to start.</namespaceSummaryItem>
+The Mock&amp;lt;TTarget&amp;gt; class is the core of the library, so it's a good place to start.</namespaceSummaryItem>
         <namespaceSummaryItem name="Moq.Properties" isDocumented="False" />
     </namespaceSummaries>
+    <componentConfigurations>
+        <component id="Code Block Component" enabled="True" configuration="&lt;component id=&quot;Code Block Component&quot; type=&quot;SandcastleBuilder.Components.CodeBlockComponent&quot; assembly=&quot;{@SHFBFolder}SandcastleBuilder.Components.dll&quot;&gt;&lt;!-- Base path for relative filenames in source attributes&#xD;&#xA;                 (optional) --&gt;&lt;basePath value=&quot;{@ProjectFolder}&quot; /&gt;&lt;!-- Connect to language filter (optional).  If omitted,&#xD;&#xA;                 language filtering is enabled by default. --&gt;&lt;languageFilter value=&quot;true&quot; /&gt;&lt;!-- Code colorizer options (required).&#xD;&#xA;                 Attributes:&#xD;&#xA;                    Language syntax configuration file (required)&#xD;&#xA;                    XSLT style file (required)&#xD;&#xA;                    &quot;Copy&quot; image file URL (required)&#xD;&#xA;                    Default language (optional)&#xD;&#xA;                    Enable line numbering (optional)&#xD;&#xA;                    Enable outlining (optional)&#xD;&#xA;                    Tab size override (optional, 0 = Use syntax file setting)&#xD;&#xA;                    Use language name as default title (optional) --&gt;&lt;colorizer syntaxFile=&quot;{@SHFBFolder}Colorizer\highlight.xml&quot; styleFile=&quot;{@SHFBFolder}Colorizer\highlight.xsl&quot; copyImageUrl=&quot;../icons/CopyCode.gif&quot; language=&quot;cs&quot; numberLines=&quot;false&quot; outlining=&quot;false&quot; tabSize=&quot;0&quot; defaultTitle=&quot;true&quot; /&gt;&lt;/component&gt;" />
+        <component id="Post-transform Component" enabled="True" configuration="&lt;component id=&quot;Post-transform Component&quot; type=&quot;SandcastleBuilder.Components.PostTransformComponent&quot; assembly=&quot;{@SHFBFolder}SandcastleBuilder.Components.dll&quot;&gt;&lt;!-- Code colorizer files (required).&#xD;&#xA;                 Attributes:&#xD;&#xA;                    Stylesheet file (required)&#xD;&#xA;                    Script file (required)&#xD;&#xA;                    &quot;Copy&quot; image file (required) --&gt;&lt;colorizer stylesheet=&quot;{@SHFBFolder}Colorizer\highlight.css&quot; scriptFile=&quot;{@SHFBFolder}Colorizer\highlight.js&quot; copyImage=&quot;{@SHFBFolder}Colorizer\CopyCode.gif&quot; /&gt;&lt;!-- Base output path for the files (required).  This should match&#xD;&#xA;                 the parent folder of the output path of the HTML files (see&#xD;&#xA;                 SaveComponent). --&gt;&lt;outputPath value=&quot;Output\&quot; /&gt;&lt;!-- Logo image file (optional).  Filename is required. The height,&#xD;&#xA;                 width, altText, placement, and alignment attributes are&#xD;&#xA;                 optional. --&gt;&lt;logoFile filename=&quot;&quot; height=&quot;0&quot; width=&quot;0&quot; altText=&quot;&quot; placement=&quot;left&quot; alignment=&quot;left&quot; /&gt;&lt;/component&gt;" />
+    </componentConfigurations>
     <ProjectSummary>Moq (pronounced "Mock-you") is the only mocking library for .NET developed from scratch to take full advantage of .NET 3.5 (i.e. Linq expression trees) and C# 3.0 features (i.e. lambda expressions) that make it the most productive, simple and refactoring-friendly mocking library available.</ProjectSummary>
     <MissingTags>Summary, Parameter, AutoDocumentCtors, Namespace</MissingTags>
     <VisibleItems>InheritedMembers, InheritedFrameworkMembers, Protected, SealedProtected</VisibleItems>
@@ -20,22 +37,22 @@ The Mock&amp;lt;TInterface&amp;gt; class is the core of the library, so it's a g
     <SandcastlePath path="" />
     <WorkingPath path="" />
     <CleanIntermediates>True</CleanIntermediates>
-    <KeepLogFile>True</KeepLogFile>
+    <KeepLogFile>False</KeepLogFile>
     <HelpFileFormat>Help1xAndWebsite</HelpFileFormat>
     <PurgeDuplicateTopics>True</PurgeDuplicateTopics>
     <CppCommentsFixup>False</CppCommentsFixup>
     <FrameworkVersion>3.5</FrameworkVersion>
     <BinaryTOC>True</BinaryTOC>
     <IncludeFavorites>False</IncludeFavorites>
-    <Preliminary>False</Preliminary>
+    <Preliminary>True</Preliminary>
     <RootNamespaceContainer>False</RootNamespaceContainer>
     <RootNamespaceTitle />
-    <HelpTitle>Moq</HelpTitle>
-    <HtmlHelpName>Moq</HtmlHelpName>
+    <HelpTitle>MoQ</HelpTitle>
+    <HtmlHelpName>MoQ</HtmlHelpName>
     <Language>en-US</Language>
     <CopyrightHref />
     <CopyrightText />
-    <FeedbackEMailAddress />
+    <FeedbackEMailAddress>moq@clariusconsulting.net</FeedbackEMailAddress>
     <HeaderText />
     <FooterText />
     <ProjectLinkType>Local</ProjectLinkType>
@@ -44,7 +61,7 @@ The Mock&amp;lt;TInterface&amp;gt; class is the core of the library, so it's a g
     <PresentationStyle>vs2005</PresentationStyle>
     <NamingMethod>HashedMemberName</NamingMethod>
     <SyntaxFilters>CSharp</SyntaxFilters>
-    <ShowFeedbackControl>False</ShowFeedbackControl>
+    <ShowFeedbackControl>True</ShowFeedbackControl>
     <ContentPlacement>AboveNamespaces</ContentPlacement>
     <ContentSiteMap path="" />
     <TopicFileTransform path="" />

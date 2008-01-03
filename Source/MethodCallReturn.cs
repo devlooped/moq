@@ -2,6 +2,7 @@
 using System.Linq.Expressions;
 using System.Reflection;
 using System.Runtime.Remoting.Messaging;
+using Castle.Core.Interceptor;
 
 namespace Moq
 {
@@ -31,12 +32,14 @@ namespace Moq
 			return this;
 		}
 
-		protected override IMethodReturnMessage GetReturnMessage(IMethodCallMessage call)
+		public override void Execute(IInvocation call)
 		{
+			base.Execute(call);
+
 			if (valueFunc != null)
-				return new ReturnMessage(valueFunc(), null, 0, null, call);
+				call.ReturnValue = valueFunc();
 			else
-				return new ReturnMessage(value, null, 0, null, call);
+				call.ReturnValue = value;
 		}
 	}
 }

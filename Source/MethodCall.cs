@@ -3,6 +3,7 @@ using System.Linq;
 using System.Linq.Expressions;
 using System.Reflection;
 using System.Runtime.Remoting.Messaging;
+using Castle.Core.Interceptor;
 
 namespace Moq
 {
@@ -31,14 +32,14 @@ namespace Moq
 			return this;
 		}
 
-		public bool Matches(IMethodCallMessage call)
+		public bool Matches(IInvocation call)
 		{
-			if (call.MethodBase == method &&
-				argumentMatchers.Length == call.ArgCount)
+			if (call.Method == method &&
+				argumentMatchers.Length == call.Arguments.Length)
 			{
 				for (int i = 0; i < argumentMatchers.Length; i++)
 				{
-					if (!argumentMatchers[i].Matches(call.Args[i]))
+					if (!argumentMatchers[i].Matches(call.Arguments[i]))
 						return false;
 				}
 
@@ -48,20 +49,13 @@ namespace Moq
 			return false;
 		}
 
-		public IMethodReturnMessage Execute(IMethodCallMessage call)
+		public virtual void Execute(IInvocation call)
 		{
 			if (callback != null)
 				callback();
 
 			if (exception != null)
-				return new ReturnMessage(exception, call);
-
-			return GetReturnMessage(call);
-		}
-
-		protected virtual IMethodReturnMessage GetReturnMessage(IMethodCallMessage call)
-		{
-			return new ReturnMessage(null, null, 0, null, call);
+				throw exception;
 		}
 	}
 }

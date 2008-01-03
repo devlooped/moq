@@ -45,13 +45,13 @@ namespace Moq.Tests
 			Assert.IsFalse(order.IsFilled);
 		}
 
-		interface IWarehouse
+		public interface IWarehouse
 		{
 			bool HasInventory(string productName, int quantity);
 			void Remove(string productName, int quantity);
 		}
 
-		class Order
+		public class Order
 		{
 			public string ProductName { get; private set; }
 			public int Quantity { get; private set; }
