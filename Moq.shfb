@@ -61,7 +61,7 @@ The Mock&amp;lt;TTarget&amp;gt; class is the core of the library, so it's a good
     <PresentationStyle>vs2005</PresentationStyle>
     <NamingMethod>HashedMemberName</NamingMethod>
     <SyntaxFilters>CSharp</SyntaxFilters>
-    <ShowFeedbackControl>True</ShowFeedbackControl>
+    <ShowFeedbackControl>False</ShowFeedbackControl>
     <ContentPlacement>AboveNamespaces</ContentPlacement>
     <ContentSiteMap path="" />
     <TopicFileTransform path="" />
