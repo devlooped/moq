@@ -52,15 +52,23 @@ namespace Moq
 	public class Mock<T> where T : class
 	{
 		static readonly ProxyGenerator generator = new ProxyGenerator();
-		Interceptor interceptor = new Interceptor();
+		Interceptor interceptor;
 		T instance;
 		RemotingProxy remotingProxy;
 
 		/// <summary>
-		/// Initializes an instance of the mock.
+		/// Initializes an instance of the mock with the <see cref="MockBehavior.Default">default behavior</see>.
 		/// </summary>
-		public Mock()
+		public Mock() : this(MockBehavior.Default) {}
+
+		/// <summary>
+		/// Initializes an instance of the mock, optionally changing the 
+		/// <see cref="MockBehavior.Default">default behavior</see>
+		/// </summary>
+		public Mock(MockBehavior behavior)
 		{
+			interceptor = new Interceptor(behavior);
+
 			if (typeof(MarshalByRefObject).IsAssignableFrom(typeof(T)))
 			{
 				remotingProxy = new RemotingProxy(typeof(T), x => interceptor.Intercept(x));
@@ -92,15 +100,6 @@ namespace Moq
 			{ 
 				return instance;
 			}
-		}
-
-		/// <summary>
-		/// Called by the <see cref="RemotingProxy"/> when a <see cref="MarshalByRefObject"/> 
-		/// is the target type.
-		/// </summary>
-		internal void Intercept(IInvocation invocation)
-		{
-			interceptor.Intercept(invocation);
 		}
 
 		/// <summary>
@@ -136,21 +135,29 @@ namespace Moq
 		/// mock.Expect(x =&gt; x.HasInventory("Talisker", 50)).Returns(true);
 		/// </code>
 		/// </example>
-		public ICall<TResult> Expect<TResult>(Expression<Func<T, TResult>> expression)
+		public ICallReturn<TResult> Expect<TResult>(Expression<Func<T, TResult>> expression)
+		{
+			return (ICallReturn<TResult>)ExpectImpl(
+				expression, 
+				(method, args) => new MethodCallReturn<TResult>(method, args));
+		}
+
+		private IProxyCall ExpectImpl(
+			Expression expression, 
+			Func<MethodInfo, Expression[], IProxyCall> factory)
 		{
 			Guard.ArgumentNotNull(expression, "expression");
 
-			MethodCallExpression methodCall = expression.Body as MethodCallExpression;
-			MemberExpression propField = expression.Body as MemberExpression;
+			LambdaExpression lambda = (LambdaExpression)expression;
+			MethodCallExpression methodCall = lambda.Body as MethodCallExpression;
+			MemberExpression propField = lambda.Body as MemberExpression;
 
-			ICall<TResult> result = null;
+			IProxyCall result = null;
 
 			if (methodCall != null)
 			{
-				var call = new MethodCallReturn<TResult>(
-					methodCall.Method, methodCall.Arguments.ToArray());
-				interceptor.AddCall(call);
-				result = call;
+				result = factory(methodCall.Method, methodCall.Arguments.ToArray());
+				interceptor.AddCall(result);
 			}
 			else if (propField != null)
 			{
@@ -170,9 +177,8 @@ namespace Moq
 							prop.Name), "expression");
 					}
 
-					var call = new MethodCallReturn<TResult>(prop.GetGetMethod());
-					interceptor.AddCall(call);
-					result = call;
+					result = factory(prop.GetGetMethod(), new Expression[0]);
+					interceptor.AddCall(result);
 				}
 				else if (field != null)
 				{
@@ -182,7 +188,7 @@ namespace Moq
 
 			if (result == null)
 			{
-				throw new NotSupportedException();
+				throw new NotSupportedException(expression.ToString());
 			}
 
 			return result;

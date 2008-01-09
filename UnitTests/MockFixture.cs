@@ -199,28 +199,6 @@ namespace Moq.Tests
 			mock.Object.Execute();
 		}
 
-		[Test]
-		public void ShouldNotThowIfUnexpectedCallWithoutReturnValue()
-		{
-			var mock = new Mock<IFoo>();
-
-			mock.Object.Execute();
-		}
-
-		[Test]
-		public void ShouldNotThowIfUnexpectedCallWithReturnValue()
-		{
-			var mock = new Mock<IFoo>();
-
-			int value = mock.Object.DoArgument("foo");
-			string str = mock.Object.Do2();
-			AttributeTargets targets = mock.Object.GetTargets();
-
-			Assert.AreEqual(default(int), value);
-			Assert.AreEqual(default(string), str);
-			Assert.AreEqual(default(AttributeTargets), targets);
-		}
-
 		[ExpectedException(typeof(FormatException))]
 		[Test]
 		public void ShouldThrowIfExpectingThrows()
@@ -270,14 +248,17 @@ namespace Moq.Tests
 			Assert.AreEqual(2, mock.Object.DoInt(9));
 		}
 
+		[ExpectedException(typeof(MockException))]
 		[Test]
-		public void ShouldOutOfRangeReturnsDefault()
+		public void ShouldNotMatchOutOfRange()
 		{
 			var mock = new Mock<IFoo>();
 
 			mock.Expect(x => x.DoInt(It.IsInRange(1, 5, Range.Exclusive))).Returns(1);
 
-			Assert.AreEqual(default(int), mock.Object.DoInt(1));
+			Assert.AreEqual(1, mock.Object.DoInt(2));
+
+			int throwHere = mock.Object.DoInt(1);
 		}
 
 		[Test]
@@ -294,7 +275,7 @@ namespace Moq.Tests
 		[Test]
 		public void ShouldExpectRangeLazyEval()
 		{
-			var mock = new Mock<IFoo>();
+			var mock = new Mock<IFoo>(MockBehavior.Loose);
 			var from = "a";
 			var to = "d";
 
@@ -310,7 +291,7 @@ namespace Moq.Tests
 		[Test]
 		public void ShouldExpectMatchRegexAndLazyEval()
 		{
-			var mock = new Mock<IFoo>();
+			var mock = new Mock<IFoo>(MockBehavior.Loose);
 			var reg = "[a-d]+";
 
 			mock.Expect(x => x.DoArgument(It.IsRegex(reg))).Returns(1);
@@ -469,7 +450,11 @@ namespace Moq.Tests
 			var mock = new Mock<FooSealed>();
 		}
 
-		// ShouldInterceptPropertySetter
+		// ShouldExpectPropertyWithIndexer
+		// ShouldInterceptPropertySetter?
+		// ShouldSupportCtorArguments?
+		// ShouldSupportByRefArguments?
+		// ShouldSupportOutArguments?
 
 		public sealed class FooSealed { }
 		class FooService : IFooService { }

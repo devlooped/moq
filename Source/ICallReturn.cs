@@ -39,7 +39,7 @@ namespace Moq
 	/// Exposes members available to mocked methods that 
 	/// return a value.
 	/// </summary>
-	public interface ICall<TResult> : ICall
+	public interface ICallReturn<TResult> : ICall
 	{
 		/// <summary>
 		/// Specifies the value to return.
@@ -81,6 +81,6 @@ namespace Moq
 		/// Note that in the case of value-returning methods, after the <c>Callback</c> 
 		/// call you still can specify the return value.
 		/// </example>
-		new ICall<TResult> Callback(Action callback);
+		new ICallReturn<TResult> Callback(Action callback);
 	}
 }

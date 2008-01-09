@@ -6,7 +6,7 @@ using Castle.Core.Interceptor;
 
 namespace Moq
 {
-	internal class MethodCallReturn<TResult> : MethodCall, ICall<TResult>, IProxyCall
+	internal class MethodCallReturn<TResult> : MethodCall, ICallReturn<TResult>, IProxyCall
 	{
 		TResult value;
 		Func<TResult> valueFunc;
@@ -26,7 +26,7 @@ namespace Moq
 			this.value = value;
 		}
 
-		public new ICall<TResult> Callback(Action callback)
+		public new ICallReturn<TResult> Callback(Action callback)
 		{
 			base.Callback(callback);
 			return this;

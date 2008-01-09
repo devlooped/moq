@@ -123,13 +123,26 @@
   <data name="InvalidMockClass" xml:space="preserve">
     <value>Type to mock be an interface or an abstract or non-sealed class. </value>
   </data>
+  <data name="MockExceptionMessage" xml:space="preserve">
+    <value>Invocation {0}.{1}({2}) failed with mock behavior {3}.
+{4}</value>
+  </data>
   <data name="PropertyNotReadable" xml:space="preserve">
     <value>Property {0}.{1} is write-only.</value>
   </data>
-  <data name="UndeterminedReturnValue" xml:space="preserve">
-    <value>Call {0}.{1}({2}) was not expected and a return value is needed.</value>
-  </data>
   <data name="UnsupportedExpression" xml:space="preserve">
     <value>Expression {0} is not supported.</value>
+  </data>
+  <data name="NoExpectation" xml:space="preserve">
+    <value>All invocations on the mock must have a corresponding expectation.</value>
+  </data>
+  <data name="AbstractNoExpectation" xml:space="preserve">
+    <value>Invocation on abstract mock member must have a corresponding expectation.</value>
+  </data>
+  <data name="InterfaceNoExpectation" xml:space="preserve">
+    <value>Invocation on interface member must have a corresponding expectation.</value>
+  </data>
+  <data name="ReturnValueNoExpectation" xml:space="preserve">
+    <value>Invocation needs to return a value and therefore must have a corresponding expectation.</value>
   </data>
 </root>

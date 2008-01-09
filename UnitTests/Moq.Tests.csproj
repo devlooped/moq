@@ -52,6 +52,7 @@
   <ItemGroup>
     <Compile Include="Demo.cs" />
     <Compile Include="MatcherAttributeFixture.cs" />
+    <Compile Include="MockBehaviorFixture.cs" />
     <Compile Include="MockFixture.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
   </ItemGroup>

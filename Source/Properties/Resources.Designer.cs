@@ -61,11 +61,29 @@ namespace Moq.Properties {
         }
         
         /// <summary>
+        ///   Looks up a localized string similar to Invocation on abstract mock member must have a corresponding expectation..
+        /// </summary>
+        internal static string AbstractNoExpectation {
+            get {
+                return ResourceManager.GetString("AbstractNoExpectation", resourceCulture);
+            }
+        }
+        
+        /// <summary>
         ///   Looks up a localized string similar to Field calls are not supported. Use interfaces and properties instead..
         /// </summary>
         internal static string FieldsNotSupported {
             get {
                 return ResourceManager.GetString("FieldsNotSupported", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Invocation on interface member must have a corresponding expectation..
+        /// </summary>
+        internal static string InterfaceNoExpectation {
+            get {
+                return ResourceManager.GetString("InterfaceNoExpectation", resourceCulture);
             }
         }
         
@@ -79,6 +97,25 @@ namespace Moq.Properties {
         }
         
         /// <summary>
+        ///   Looks up a localized string similar to Invocation {0}.{1}({2}) failed with mock behavior {3}.
+        ///{4}.
+        /// </summary>
+        internal static string MockExceptionMessage {
+            get {
+                return ResourceManager.GetString("MockExceptionMessage", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to All invocations on the mock must have a corresponding expectation..
+        /// </summary>
+        internal static string NoExpectation {
+            get {
+                return ResourceManager.GetString("NoExpectation", resourceCulture);
+            }
+        }
+        
+        /// <summary>
         ///   Looks up a localized string similar to Property {0}.{1} is write-only..
         /// </summary>
         internal static string PropertyNotReadable {
@@ -88,11 +125,11 @@ namespace Moq.Properties {
         }
         
         /// <summary>
-        ///   Looks up a localized string similar to Call {0}.{1}({2}) was not expected and a return value is needed..
+        ///   Looks up a localized string similar to Invocation needs to return a value and therefore must have a corresponding expectation..
         /// </summary>
-        internal static string UndeterminedReturnValue {
+        internal static string ReturnValueNoExpectation {
             get {
-                return ResourceManager.GetString("UndeterminedReturnValue", resourceCulture);
+                return ResourceManager.GetString("ReturnValueNoExpectation", resourceCulture);
             }
         }
         

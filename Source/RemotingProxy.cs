@@ -10,6 +10,11 @@ using System.Security.Permissions;
 
 namespace Moq
 {
+	/// <summary>
+	/// Adapter for Remoting interception. 
+	/// It allows invocation of the underlying proxied object 
+	/// if a given member is not abstract on the target type.
+	/// </summary>
 	internal class RemotingProxy : RealProxy
 	{
 		Action<IInvocation> interceptor;
@@ -45,6 +50,7 @@ namespace Moq
 			var realObject = GetUnwrappedServer();
 			if (realObject == null)
 			{
+				// NOTE: we do not support parameterized ctors yet.
 				var returnMessage = InitializeServerObject(null);
 				if (returnMessage.Exception == null)
 				{
@@ -53,6 +59,8 @@ namespace Moq
 				}
 				else
 				{
+					// Instantiation of the object failed (maybe it didn't 
+					// have a parameterless ctor, etc.)
 					throw returnMessage.Exception;
 				}
 			}
@@ -62,6 +70,7 @@ namespace Moq
 
 		private IMessage ToMessage(IInvocation invocation, IMethodCallMessage original)
 		{
+			// TODO: we do not support byref and out arguments yet.
 			if (invocation.Method.ReturnType != null &&
 				invocation.Method.ReturnType != typeof(void))
 			{
@@ -149,12 +158,6 @@ namespace Moq
 				throw new NotImplementedException();
 			}
 		}
-
-
-
-
-
-
 
 		private IMessage ExecuteObjectMethod(IMethodCallMessage methodCall)
 		{
