@@ -25,7 +25,7 @@ namespace Moq
 		/// <example>
 		/// <code>
 		/// // Throws an exception for a call to Remove with any string value.
-		/// mock.Expect(x => x.Remove(It.IsAny&gt;string&lt;())).Throws(new InvalidOperationException());
+		/// mock.Expect(x => x.Remove(It.IsAny&lt;string&gt;())).Throws(new InvalidOperationException());
 		/// </code>
 		/// </example>
 		[Matcher(typeof(AnyMatcher))]
@@ -48,6 +48,11 @@ namespace Moq
 		/// <c>Do</c> method is an even number.
 		/// <code>
 		/// mock.Expect(x =&gt; x.Do(It.Is&lt;int&gt;(i =&gt; i % 2 == 0))).Returns(1);
+		/// </code>
+		/// This example shows how to throw an exception if the argument to the 
+		/// method is a negative number:
+		/// <code>
+		/// mock.Expect(x =&gt; x.GetUser(It.Is&lt;int&gt;(i =&gt; i &lt; 0))).Throws(new ArgumentException());
 		/// </code>
 		/// </example>
 		[Matcher(typeof(PredicateMatcher))]
