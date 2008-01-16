@@ -38,7 +38,7 @@ namespace Moq
 		/// </summary>
 		Loose,
 		/// <summary>
-		/// Default mock behavior.
+		/// Default mock behavior, which equals <see cref="Normal"/>.
 		/// </summary>
 		Default = Normal,
 	}

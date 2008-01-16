@@ -6,6 +6,24 @@ namespace Moq
 	/// Exposes members available to mocked methods that do 
 	/// not return a value.
 	/// </summary>
+	/// <remarks>
+	/// <see cref="ICall"/> and <see cref="ICallReturn{TResult}"/> are the 
+	/// return type of the two <c>Mock.Expect</c> overloads. These are the two interfaces that enable the rich 
+	/// intellisense in Visual Studio allowing calls with the format <c>mock.Expect(...).Callback(...).Returns(...)</c>.
+	/// <para>When a call to <c>Expect</c> is performed, the compiler 
+	/// (and Visual Studio intellisense) will automatically pick one interface or the 
+	/// other as the return types depending on the expression passed in the call: if the 
+	/// expression represents a call to a void method, <see cref="ICall"/> members 
+	/// will be available after the <c>Expect</c> invocation, allowing the 
+	/// specification of a <see cref="ICall.Throws"/> or <see cref="ICall.Callback"/> action, but not a <c>Returns</c> one.
+	/// </para>
+	/// <para>
+	/// On the other hand, if the expression passed to the <c>Expect</c> method represents 
+	/// a call to a method that returns a value, the additional <see cref="ICallReturn{TResult}.Returns(TResult)"/> and 
+	/// <see cref="ICallReturn{TResult}.Returns(Func{TResult})"/>
+	/// members are available (<c>Throws</c> and <c>Callback</c> are inherited from <see cref="ICall"/>).
+	/// </para>
+	/// </remarks>
 	public interface ICall
 	{
 		/// <summary>
@@ -39,6 +57,24 @@ namespace Moq
 	/// Exposes members available to mocked methods that 
 	/// return a value.
 	/// </summary>
+	/// <remarks>
+	/// <see cref="ICall"/> and <see cref="ICallReturn{TResult}"/> are the 
+	/// return type of the two <c>Mock.Expect</c> overloads. These are the two interfaces that enable the rich 
+	/// intellisense in Visual Studio allowing calls with the format <c>mock.Expect(...).Callback(...).Returns(...)</c>.
+	/// <para>When a call to <c>Expect</c> is performed, the compiler 
+	/// (and Visual Studio intellisense) will automatically pick one interface or the 
+	/// other as the return types depending on the expression passed in the call: if the 
+	/// expression represents a call to a void method, <see cref="ICall"/> members 
+	/// will be available after the <c>Expect</c> invocation, allowing the 
+	/// specification of a <see cref="ICall.Throws"/> or <see cref="ICall.Callback"/> action, but not a <c>Returns</c> one.
+	/// </para>
+	/// <para>
+	/// On the other hand, if the expression passed to the <c>Expect</c> method represents 
+	/// a call to a method that returns a value, the additional <see cref="ICallReturn{TResult}.Returns(TResult)"/> and 
+	/// <see cref="ICallReturn{TResult}.Returns(Func{TResult})"/>
+	/// members are available (<c>Throws</c> and <c>Callback</c> are inherited from <see cref="ICall"/>).
+	/// </para>
+	/// </remarks>
 	public interface ICallReturn<TResult> : ICall
 	{
 		/// <summary>

@@ -10,8 +10,22 @@ namespace Moq
 	/// <summary>
 	/// Provides a mock implementation of <typeparamref name="T"/>.
 	/// </summary>
-	/// <typeparam name="T">Type of the interface to mock.</typeparam>
+	/// <typeparam name="T">Type to mock, which can be an interface or a class.</typeparam>
 	/// <remarks>
+	/// If the mocked <typeparamref name="T"/> is a <see cref="MarshalByRefObject"/> (such as a 
+	/// Windows Forms control or another <see cref="System.ComponentModel.Component"/>-derived class) 
+	/// all members will be mockeable, even if they are not virtual or abstract.
+	/// <para>
+	/// For regular .NET classes ("POCOs" or Plain Old CLR Objects), only abstract and virtual 
+	/// members can be mocked. 
+	/// </para>
+	/// <para>
+	/// The behavior of the mock with regards to the expectations and the actual calls is determined 
+	/// by the optional <see cref="MockBehavior"/> that can be passed to the <see cref="Mock{T}(MockBehavior)"/> 
+	/// constructor.
+	/// </para>
+	/// </remarks>
+	/// <example>
 	/// The following example shows setting expectations with specific values 
 	/// for method invocations:
 	/// <code>
@@ -48,14 +62,14 @@ namespace Moq
 	/// //verify
 	/// Assert.IsFalse(order.IsFilled);
 	/// </code>
-	/// </remarks>
+	/// </example>
 	public class Mock<T> where T : class
 	{
 		static readonly ProxyGenerator generator = new ProxyGenerator();
 		Interceptor interceptor;
 		T instance;
 		RemotingProxy remotingProxy;
-
+		
 		/// <summary>
 		/// Initializes an instance of the mock with the <see cref="MockBehavior.Default">default behavior</see>.
 		/// </summary>
