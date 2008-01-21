@@ -73,12 +73,18 @@ namespace Moq
 		/// <summary>
 		/// Initializes an instance of the mock with the <see cref="MockBehavior.Default">default behavior</see>.
 		/// </summary>
+		/// <example>
+		/// <code>var mock = new Mock&lt;IFormatProvider&gt;();</code>
+		/// </example>
 		public Mock() : this(MockBehavior.Default) {}
 
 		/// <summary>
 		/// Initializes an instance of the mock, optionally changing the 
 		/// <see cref="MockBehavior.Default">default behavior</see>
 		/// </summary>
+		/// <example>
+		/// <code>var mock = new Mock&lt;IFormatProvider&gt;(MockBehavior.Relaxed);</code>
+		/// </example>
 		public Mock(MockBehavior behavior)
 		{
 			interceptor = new Interceptor(behavior);
@@ -117,8 +123,8 @@ namespace Moq
 		}
 
 		/// <summary>
-		/// Sets an expectation on the mocked interface for a call to 
-		/// to a void-returning method.
+		/// Sets an expectation on the mocked type for a call to 
+		/// to a void method.
 		/// </summary>
 		/// <param name="expression">Lambda expression that specifies the expected method invocation.</param>
 		/// <example>
@@ -140,7 +146,7 @@ namespace Moq
 		}
 
 		/// <summary>
-		/// Sets an expectation on the mocked interface for a call to 
+		/// Sets an expectation on the mocked type for a call to 
 		/// to a value returning method.
 		/// </summary>
 		/// <param name="expression">Lambda expression that specifies the expected method invocation.</param>
@@ -149,6 +155,8 @@ namespace Moq
 		/// mock.Expect(x =&gt; x.HasInventory("Talisker", 50)).Returns(true);
 		/// </code>
 		/// </example>
+		/// <seealso cref="ICallReturn{TResult}.Returns(TResult)"/>
+		/// <seealso cref="ICallReturn{TResult}.Returns(Func{TResult})"/>
 		public ICallReturn<TResult> Expect<TResult>(Expression<Func<T, TResult>> expression)
 		{
 			return (ICallReturn<TResult>)ExpectImpl(
