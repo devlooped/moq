@@ -10,10 +10,10 @@ namespace Moq
 	/// Implements the actual interception and method invocation for 
 	/// all mocks, even MBROs (via the <see cref="RemotingProxy"/>.
 	/// </summary>
-	class Interceptor : MarshalByRefObject, IInterceptor
+	internal class Interceptor : MarshalByRefObject, IInterceptor
 	{
 		MockBehavior behavior;
-		List<IProxyCall> calls = new List<IProxyCall>();
+		Dictionary<string, IProxyCall> calls = new Dictionary<string, IProxyCall>();
 
 		public Interceptor(MockBehavior behavior)
 		{
@@ -33,7 +33,7 @@ namespace Moq
 		private void VerifyOrThrow(Predicate<IProxyCall> match)
 		{
 			var failures = new List<IProxyCall>();
-			foreach (var call in calls)
+			foreach (var call in calls.Values)
 			{
 				if (match(call))
 					failures.Add(call);
@@ -51,12 +51,14 @@ namespace Moq
 
 		public void AddCall(IProxyCall call)
 		{
-			calls.Add(call);
+			calls[call.ExpectExpression.ToString()] = call;
 		}
 
 		public void Intercept(IInvocation invocation)
 		{
-			var call = calls.Find(x => x.Matches(invocation));
+			var call = (from c in calls.Values
+					   where c.Matches(invocation)
+					   select c).FirstOrDefault();
 
 			if (call == null)
 			{

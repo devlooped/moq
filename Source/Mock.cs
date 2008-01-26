@@ -210,6 +210,7 @@ namespace Moq
 
 			if (methodCall != null)
 			{
+				VerifyCanOverride(expression, methodCall.Method);
 				result = factory(expression, methodCall.Method, methodCall.Arguments.ToArray());
 				interceptor.AddCall(result);
 			}
@@ -231,6 +232,7 @@ namespace Moq
 							prop.Name), "expression");
 					}
 
+					VerifyCanOverride(expression, prop.GetGetMethod());
 					result = factory(expression, prop.GetGetMethod(), new Expression[0]);
 					interceptor.AddCall(result);
 				}
@@ -246,6 +248,14 @@ namespace Moq
 			}
 
 			return result;
+		}
+
+		private void VerifyCanOverride(Expression expectation, MethodInfo methodInfo)
+		{
+			if (!methodInfo.IsVirtual && !methodInfo.DeclaringType.IsMarshalByRef)
+				throw new ArgumentException(
+					String.Format(Properties.Resources.ExpectationOnNonOverridableMember,
+					expectation.ToString()));
 		}
 
 		// NOTE: known issue. See https://connect.microsoft.com/VisualStudio/feedback/ViewFeedback.aspx?FeedbackID=318122

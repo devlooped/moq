@@ -449,7 +449,7 @@ namespace Moq.Tests
 			try
 			{
 				mock.Verify();
-				Assert.Fail("SHould have thrown");
+				Assert.Fail("Should have thrown");
 			}
 			catch (MockException mex)
 			{
@@ -505,21 +505,40 @@ namespace Moq.Tests
 			} 
 		}
 
-		[Ignore("Not implemented yet")]
 		[ExpectedException(typeof(ArgumentException))]
 		[Test]
 		public void ShouldThrowIfExpectOnNonVirtual()
 		{
 			var mock = new Mock<FooBase>();
 			mock.Expect(x => x.True()).Returns(false);
+		}
 
-			Assert.IsFalse(mock.Object.True());
+		[Test]
+		public void ShouldNotThrowIfExpectOnNonVirtualButMBRO()
+		{
+			var mock = new Mock<FooMBRO>();
+			mock.Expect(x => x.True()).Returns(false);
+		}
+
+		[Test]
+		public void ShouldOverridePreviousExpectation()
+		{
+			var mock = new Mock<IFoo>();
+
+			mock.Expect(x => x.Do1()).Returns(5);
+
+			Assert.AreEqual(5, mock.Object.Do1());
+
+			mock.Expect(x => x.Do1()).Returns(10);
+
+			Assert.AreEqual(10, mock.Object.Do1());
 		}
 
 		// ShouldReceiveClassCtorArguments
 		// ShouldExpectPropertyWithIndexer
+		// ShouldReceiveArgumentValuesOnCallback
+		// ShouldReceiveArgumentValuesOnReturns
 		// ShouldInterceptPropertySetter?
-		// ShouldSupportCtorArguments?
 		// ShouldSupportByRefArguments?
 		// ShouldSupportOutArguments?
 

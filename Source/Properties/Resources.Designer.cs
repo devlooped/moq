@@ -70,6 +70,16 @@ namespace Moq.Properties {
         }
         
         /// <summary>
+        ///   Looks up a localized string similar to Invalid expectation on a non-overridable member:
+        ///{0}.
+        /// </summary>
+        internal static string ExpectationOnNonOverridableMember {
+            get {
+                return ResourceManager.GetString("ExpectationOnNonOverridableMember", resourceCulture);
+            }
+        }
+        
+        /// <summary>
         ///   Looks up a localized string similar to Field calls are not supported. Use interfaces and properties instead..
         /// </summary>
         internal static string FieldsNotSupported {

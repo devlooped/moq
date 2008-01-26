@@ -149,4 +149,8 @@
     <value>The following expectations were not met:
 {0}</value>
   </data>
+  <data name="ExpectationOnNonOverridableMember" xml:space="preserve">
+    <value>Invalid expectation on a non-overridable member:
+{0}</value>
+  </data>
 </root>
