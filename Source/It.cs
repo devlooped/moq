@@ -5,8 +5,9 @@ using System.Text.RegularExpressions;
 namespace Moq
 {
 	/// <summary>
-	/// Allows the specification of a matching condition for a method 
-	/// invocation, rather than a specific argument value.
+	/// Allows the specification of a matching condition for an 
+	/// argument in a method invocation, rather than a specific 
+	/// argument value. "It" refers to the argument being matched.
 	/// </summary>
 	/// <remarks>
 	/// This class allows the expectation to match a method invocation 

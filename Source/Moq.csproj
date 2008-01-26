@@ -98,9 +98,9 @@
     </None>
   </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
-	<PropertyGroup>
-		<ToolsDir>$(ProjectDir)\..\Tools</ToolsDir>
-	</PropertyGroup>
+  <PropertyGroup>
+    <ToolsDir>$(ProjectDir)\..\Tools</ToolsDir>
+  </PropertyGroup>
   <!-- To modify your build process, add your task inside one of the targets below and uncomment it. 
        Other similar extension points exist, see Microsoft.Common.targets.
   <Target Name="BeforeBuild">
@@ -108,13 +108,13 @@
   <Target Name="AfterBuild">
   </Target>
   -->
-	<!-- TODO: create automatic drop project -->
-	<!--<Import Project="$(ToolsDir)\MSBuild.Community.Tasks.Targets" />-->
-	<Target Name="AfterBuild" Condition=" '$(Configuration)' == 'Release' ">
+  <!-- TODO: create automatic drop project -->
+  <!--<Import Project="$(ToolsDir)\MSBuild.Community.Tasks.Targets" />-->
+  <Target Name="AfterBuild" Condition=" '$(Configuration)' == 'Release' ">
     <CreateItem Include="@(ReferencePath)" Condition="'%(CopyLocal)'=='true'">
       <Output TaskParameter="Include" ItemName="IlmergeAssemblies" />
     </CreateItem>
-		<Exec Command="&quot;$(ToolsDir)\Ilmerge.exe&quot; /internalize:&quot;$(ProjectDir)\..\ilmerge.exclude&quot; /ndebug /keyfile:$(AssemblyOriginatorKeyFile) /out:@(MainAssembly) &quot;@(IntermediateAssembly)&quot; @(IlmergeAssemblies->'&quot;%(FullPath)&quot;', ' ')" />
+    <Exec Command="&quot;$(ToolsDir)\Ilmerge.exe&quot; /internalize:&quot;$(ProjectDir)\..\ilmerge.exclude&quot; /ndebug /keyfile:$(AssemblyOriginatorKeyFile) /out:@(MainAssembly) &quot;@(IntermediateAssembly)&quot; @(IlmergeAssemblies->'&quot;%(FullPath)&quot;', ' ')" />
     <Delete Files="@(ReferenceCopyLocalPaths->'$(OutDir)%(DestinationSubDirectory)%(Filename)%(Extension)')" />
   </Target>
 </Project>

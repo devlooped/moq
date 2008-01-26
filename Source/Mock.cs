@@ -126,6 +126,10 @@ namespace Moq
 		/// Sets an expectation on the mocked type for a call to 
 		/// to a void method.
 		/// </summary>
+		/// <remarks>
+		/// If more than one expectation is set for the same method or property, 
+		/// the latest one wins and is the one that will be executed.
+		/// </remarks>
 		/// <param name="expression">Lambda expression that specifies the expected method invocation.</param>
 		/// <example>
 		/// <code>
@@ -144,6 +148,10 @@ namespace Moq
 		/// Sets an expectation on the mocked type for a call to 
 		/// to a value returning method.
 		/// </summary>
+		/// <remarks>
+		/// If more than one expectation is set for the same method or property, 
+		/// the latest one wins and is the one that will be executed.
+		/// </remarks>
 		/// <param name="expression">Lambda expression that specifies the expected method invocation.</param>
 		/// <example>
 		/// <code>
@@ -162,6 +170,21 @@ namespace Moq
 		/// <summary>
 		/// Verifies that all verifiable expectations have been met.
 		/// </summary>
+		/// <example>
+		/// This example sets up an expectation and marks it as verifiable. After 
+		/// the mock is used, a <see cref="Verify"/> call is issued on the mock 
+		/// to ensure the method in the expectation was invoked:
+		/// <code>
+		/// var mock = new Mock&lt;IWarehouse&gt;();
+		/// mock.Expect(x =&gt; x.HasInventory(TALISKER, 50)).Verifiable().Returns(true);
+		/// ...
+		/// // other test code
+		/// ...
+		/// // Will throw if the test code has didn't call HasInventory.
+		/// mock.Verify();
+		/// </code>
+		/// </example>
+		/// <exception cref="MockException">Not all verifiable expectations were met.</exception>
 		public void Verify()
 		{
 			try
@@ -181,6 +204,22 @@ namespace Moq
 		/// Verifies all expectations regardless of whether they have 
 		/// been flagged as verifiable.
 		/// </summary>
+		/// <example>
+		/// This example sets up an expectation without marking it as verifiable. After 
+		/// the mock is used, a <see cref="VerifyAll"/> call is issued on the mock 
+		/// to ensure that all expectations are met:
+		/// <code>
+		/// var mock = new Mock&lt;IWarehouse&gt;();
+		/// mock.Expect(x =&gt; x.HasInventory(TALISKER, 50)).Returns(true);
+		/// ...
+		/// // other test code
+		/// ...
+		/// // Will throw if the test code has didn't call HasInventory, even 
+		/// // that expectation was not marked as verifiable.
+		/// mock.VerifyAll();
+		/// </code>
+		/// </example>
+		/// <exception cref="MockException">At least one expectation was not met.</exception>
 		public void VerifyAll()
 		{
 			try
