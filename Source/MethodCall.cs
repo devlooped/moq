@@ -9,17 +9,23 @@ namespace Moq
 {
 	internal class MethodCall : ICall, IProxyCall
 	{
+		Expression originalExpression;
 		MethodInfo method;
 		Exception exception;
 		Action callback;
 		IMatcher[] argumentMatchers;
 
-		public MethodCall(MethodInfo method, params Expression[] arguments)
+		public MethodCall(Expression originalExpression, MethodInfo method, params Expression[] arguments)
 		{
+			this.originalExpression = originalExpression;
 			this.method = method;
-			argumentMatchers = (from expr in arguments
+			this.argumentMatchers = (from expr in arguments
 							   select MatcherFactory.CreateMatcher(expr)).ToArray();
 		}
+
+		public bool IsVerifiable { get; set; }
+		public bool Invoked { get; set; }
+		public Expression ExpectExpression { get { return originalExpression; } }
 
 		public void Throws(Exception exception)
 		{
@@ -29,6 +35,13 @@ namespace Moq
 		public ICall Callback(Action callback)
 		{
 			this.callback = callback;
+			return this;
+		}
+
+		public ICall Verifiable()
+		{
+			IsVerifiable = true;
+
 			return this;
 		}
 
@@ -51,6 +64,8 @@ namespace Moq
 
 		public virtual void Execute(IInvocation call)
 		{
+			Invoked = true;
+
 			if (callback != null)
 				callback();
 

@@ -51,6 +51,12 @@ namespace Moq
 		/// </code>
 		/// </example>
 		ICall Callback(Action callback);
+		/// <summary>
+		/// Marks the expectation as verifiable, meaning that a call 
+		/// to <see cref="Mock{T}.Verify"/> will check if this particular 
+		/// expectation was met.
+		/// </summary>
+		ICall Verifiable();
 	}
 
 	/// <summary>
@@ -118,5 +124,11 @@ namespace Moq
 		/// call you still can specify the return value.
 		/// </example>
 		new ICallReturn<TResult> Callback(Action callback);
+		/// <summary>
+		/// Marks the expectation as verifiable, meaning that a call 
+		/// to <see cref="Mock{T}.Verify"/> will check if this particular 
+		/// expectation was met.
+		/// </summary>
+		new ICallReturn<TResult> Verifiable();
 	}
 }

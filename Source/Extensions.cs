@@ -4,6 +4,7 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Linq.Expressions;
 using System.Reflection;
+using Castle.Core.Interceptor;
 
 namespace Moq
 {
@@ -55,6 +56,22 @@ namespace Moq
 		public static Expression CastTo<T>(this Expression expression)
 		{
 			return Expression.Convert(expression, typeof(T));
+		}
+
+		public static string Format(this IInvocation invocation)
+		{
+			return
+				invocation.Method.DeclaringType.Name + "." +
+				invocation.Method.Name + "(" +
+				String.Join(", ",
+					(from x in invocation.Arguments
+					 select x == null ?
+						"null" :
+						x is string ?
+							"\"" + (string)x + "\"" :
+							x.ToString())
+					.ToArray()
+				) + ")";
 		}
 	}
 }

@@ -97,8 +97,8 @@ namespace Moq.Properties {
         }
         
         /// <summary>
-        ///   Looks up a localized string similar to Invocation {0}.{1}({2}) failed with mock behavior {3}.
-        ///{4}.
+        ///   Looks up a localized string similar to {0} invocation failed with mock behavior {1}.
+        ///{2}.
         /// </summary>
         internal static string MockExceptionMessage {
             get {
@@ -139,6 +139,16 @@ namespace Moq.Properties {
         internal static string UnsupportedExpression {
             get {
                 return ResourceManager.GetString("UnsupportedExpression", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to The following expectations were not met:
+        ///{0}.
+        /// </summary>
+        internal static string VerficationFailed {
+            get {
+                return ResourceManager.GetString("VerficationFailed", resourceCulture);
             }
         }
     }

@@ -37,6 +37,7 @@ namespace Moq
 			AbstractNoExpectation,
 			InterfaceNoExpectation,
 			ReturnValueNoExpectation,
+			VerificationFailed
 		}
 
 		ExceptionReason reason;
@@ -55,6 +56,12 @@ namespace Moq
 			this.reason = reason;
 		}
 
+		internal MockException(ExceptionReason reason, string exceptionMessage)
+			: base(exceptionMessage)
+		{
+			this.reason = reason;
+		}
+
 		internal ExceptionReason Reason
 		{
 			get { return reason; }
@@ -65,17 +72,7 @@ namespace Moq
 		{
 			return String.Format(
 				Properties.Resources.MockExceptionMessage, 
-				invocation.Method.DeclaringType.Name,
-				invocation.Method.Name,
-				String.Join(", ",
-					(from x in invocation.Arguments
-					 select x == null ?
-						"null" :
-						x is string ?
-							"\"" + (string)x + "\"" :
-							x.ToString())
-					.ToArray()
-				),
+				invocation.Format(),
 				behavior, 
 				message
 			);

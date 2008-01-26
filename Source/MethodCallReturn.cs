@@ -11,8 +11,8 @@ namespace Moq
 		TResult value;
 		Func<TResult> valueFunc;
 
-		public MethodCallReturn(MethodInfo method, params Expression[] arguments)
-			: base(method, arguments)
+		public MethodCallReturn(Expression originalExpression, MethodInfo method, params Expression[] arguments)
+			: base(originalExpression, method, arguments)
 		{
 		}
 
@@ -29,6 +29,13 @@ namespace Moq
 		public new ICallReturn<TResult> Callback(Action callback)
 		{
 			base.Callback(callback);
+			return this;
+		}
+
+		public new ICallReturn<TResult> Verifiable()
+		{
+			IsVerifiable = true;
+
 			return this;
 		}
 

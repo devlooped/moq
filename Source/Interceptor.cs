@@ -14,17 +14,41 @@ namespace Moq
 	{
 		MockBehavior behavior;
 		List<IProxyCall> calls = new List<IProxyCall>();
-		//List<MethodInfo> objectMethods = new List<MethodInfo>(new MethodInfo[] {
-		//    Reflector<object>.GetMethod(x => x.GetType()), 
-		//    Reflector<object>.GetMethod(x => x.Equals(null)), 
-		//    Reflector<object>.GetMethod(x => x.GetHashCode()), 
-		//    Reflector<object>.GetMethod(x => x.ToString())});
 
 		public Interceptor(MockBehavior behavior)
 		{
 			this.behavior = behavior;
 		}
-		
+
+		internal void Verify()
+		{
+			VerifyOrThrow(call => call.IsVerifiable && !call.Invoked);
+		}
+
+		internal void VerifyAll()
+		{
+			VerifyOrThrow(call => !call.Invoked);
+		}
+
+		private void VerifyOrThrow(Predicate<IProxyCall> match)
+		{
+			var failures = new List<IProxyCall>();
+			foreach (var call in calls)
+			{
+				if (match(call))
+					failures.Add(call);
+			}
+
+			if (failures.Count > 0)
+			{
+				throw new MockException(MockException.ExceptionReason.VerificationFailed,
+					String.Format(Properties.Resources.VerficationFailed, 
+						String.Join("\r\n", 
+						failures.ConvertAll(call => call.ExpectExpression.ToString()).ToArray())
+					));
+			}
+		}
+
 		public void AddCall(IProxyCall call)
 		{
 			calls.Add(call);

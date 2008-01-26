@@ -135,14 +135,9 @@ namespace Moq
 		/// </example>
 		public ICall Expect(Expression<Action<T>> expression)
 		{
-			Guard.ArgumentNotNull(expression, "expression");
-
-			MethodCallExpression methodCall = expression.Body as MethodCallExpression;
-
-			var call = new MethodCallReturn<object>(
-				methodCall.Method, methodCall.Arguments.ToArray());
-			interceptor.AddCall(call);
-			return call;
+			return (ICall)ExpectImpl(
+				expression,
+				(original, method, args) => new MethodCall(original, method, args));
 		}
 
 		/// <summary>
@@ -161,12 +156,49 @@ namespace Moq
 		{
 			return (ICallReturn<TResult>)ExpectImpl(
 				expression, 
-				(method, args) => new MethodCallReturn<TResult>(method, args));
+				(original, method, args) => new MethodCallReturn<TResult>(original, method, args));
+		}
+
+		/// <summary>
+		/// Verifies that all verifiable expectations have been met.
+		/// </summary>
+		public void Verify()
+		{
+			try
+			{
+				interceptor.Verify();
+			}
+			catch (Exception ex)
+			{
+				// Rethrow resetting the call-stack so that 
+				// callers see the exception as happening at 
+				// this call site.
+				throw ex;
+			}
+		}
+
+		/// <summary>
+		/// Verifies all expectations regardless of whether they have 
+		/// been flagged as verifiable.
+		/// </summary>
+		public void VerifyAll()
+		{
+			try
+			{
+				interceptor.VerifyAll();
+			}
+			catch (Exception ex)
+			{
+				// Rethrow resetting the call-stack so that 
+				// callers see the exception as happening at 
+				// this call site.
+				throw ex;
+			}
 		}
 
 		private IProxyCall ExpectImpl(
 			Expression expression, 
-			Func<MethodInfo, Expression[], IProxyCall> factory)
+			Func<Expression, MethodInfo, Expression[], IProxyCall> factory)
 		{
 			Guard.ArgumentNotNull(expression, "expression");
 
@@ -178,7 +210,7 @@ namespace Moq
 
 			if (methodCall != null)
 			{
-				result = factory(methodCall.Method, methodCall.Arguments.ToArray());
+				result = factory(expression, methodCall.Method, methodCall.Arguments.ToArray());
 				interceptor.AddCall(result);
 			}
 			else if (propField != null)
@@ -199,7 +231,7 @@ namespace Moq
 							prop.Name), "expression");
 					}
 
-					result = factory(prop.GetGetMethod(), new Expression[0]);
+					result = factory(expression, prop.GetGetMethod(), new Expression[0]);
 					interceptor.AddCall(result);
 				}
 				else if (field != null)

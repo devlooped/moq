@@ -403,17 +403,6 @@ namespace Moq.Tests
 			Assert.IsTrue(mock.Object.Check("bar"));
 		}
 
-		[Ignore("Not implemented yet")]
-		[ExpectedException(typeof(ArgumentException))]
-		[Test]
-		public void ShouldThrowIfExpectOnNonVirtual()
-		{
-			var mock = new Mock<FooBase>();
-			mock.Expect(x => x.True()).Returns(false);
-
-			Assert.IsFalse(mock.Object.True());
-		}
-
 		[Test]
 		public void ShouldOverrideNonVirtualForMBRO()
 		{
@@ -450,6 +439,74 @@ namespace Moq.Tests
 			var mock = new Mock<FooSealed>();
 		}
 
+		[Test]
+		public void ShouldThrowIfVerifiableExpectationNotCalled()
+		{
+			var mock = new Mock<IFoo>();
+
+			mock.Expect(x => x.Do1()).Verifiable().Returns(5);
+
+			try
+			{
+				mock.Verify();
+				Assert.Fail("SHould have thrown");
+			}
+			catch (MockException mex)
+			{
+				Assert.AreEqual(MockException.ExceptionReason.VerificationFailed, mex.Reason);
+			}
+		}
+
+		[Test]
+		public void ShouldNotThrowVerifyAndNoVerifiableExpectations()
+		{
+			var mock = new Mock<IFoo>();
+
+			mock.Verify();
+		}
+
+		[Test]
+		public void ShouldThrowIfVerifyAllAndNonVerifiable()
+		{
+			var mock = new Mock<IFoo>();
+
+			mock.Expect(x => x.Do1()).Returns(1);
+
+			try
+			{
+				mock.VerifyAll();
+				Assert.Fail("Should have thrown");
+			}
+			catch (MockException mex)
+			{
+				Assert.AreEqual(MockException.ExceptionReason.VerificationFailed, mex.Reason);
+			}
+		}
+
+		[Test]
+		public void ShouldRenderReadableMessageForVerifyFailures()
+		{
+			var mock = new Mock<IFoo>();
+
+			mock.Expect(x => x.Do1());
+			mock.Expect(x => x.Do2());
+			mock.Expect(x => x.DoArgument("Hello World"));
+
+			mock.VerifyAll();
+		}
+
+		[Ignore("Not implemented yet")]
+		[ExpectedException(typeof(ArgumentException))]
+		[Test]
+		public void ShouldThrowIfExpectOnNonVirtual()
+		{
+			var mock = new Mock<FooBase>();
+			mock.Expect(x => x.True()).Returns(false);
+
+			Assert.IsFalse(mock.Object.True());
+		}
+
+		// ShouldReceiveClassCtorArguments
 		// ShouldExpectPropertyWithIndexer
 		// ShouldInterceptPropertySetter?
 		// ShouldSupportCtorArguments?

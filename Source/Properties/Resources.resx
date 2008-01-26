@@ -124,8 +124,8 @@
     <value>Type to mock be an interface or an abstract or non-sealed class. </value>
   </data>
   <data name="MockExceptionMessage" xml:space="preserve">
-    <value>Invocation {0}.{1}({2}) failed with mock behavior {3}.
-{4}</value>
+    <value>{0} invocation failed with mock behavior {1}.
+{2}</value>
   </data>
   <data name="PropertyNotReadable" xml:space="preserve">
     <value>Property {0}.{1} is write-only.</value>
@@ -144,5 +144,9 @@
   </data>
   <data name="ReturnValueNoExpectation" xml:space="preserve">
     <value>Invocation needs to return a value and therefore must have a corresponding expectation.</value>
+  </data>
+  <data name="VerficationFailed" xml:space="preserve">
+    <value>The following expectations were not met:
+{0}</value>
   </data>
 </root>
