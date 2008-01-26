@@ -492,7 +492,17 @@ namespace Moq.Tests
 			mock.Expect(x => x.Do2());
 			mock.Expect(x => x.DoArgument("Hello World"));
 
-			mock.VerifyAll();
+			try
+			{
+				mock.VerifyAll();
+				Assert.Fail("Should have thrown");
+			}
+			catch (Exception ex)
+			{
+				Assert.That(ex.Message.Contains("x => x.Do1()"));
+				Assert.That(ex.Message.Contains("x => x.Do2()"));
+				Assert.That(ex.Message.Contains("x => x.DoArgument(\"Hello World\")"));
+			} 
 		}
 
 		[Ignore("Not implemented yet")]
