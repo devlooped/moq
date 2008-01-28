@@ -1,0 +1,592 @@
+Revision: 56
+Author: kzu.net
+Date: 1:00:35 PM, Monday, January 28, 2008
+Message:
+Updated to v1.4 for next release.
+----
+Modified : /trunk/Source/Properties/AssemblyInfo.cs
+
+
+Revision: 55
+Author: kzu.net
+Date: 1:00:02 PM, Monday, January 28, 2008
+Message:
+Removed unused code from remoting implementation.
+----
+Modified : /trunk/Source/RemotingProxy.cs
+
+
+Revision: 54
+Author: kzu.net
+Date: 12:48:52 PM, Monday, January 28, 2008
+Message:
+Added support for constructor arguments for mocked classes.
+----
+Modified : /trunk/Moq.shfb
+Modified : /trunk/Source/Mock.cs
+Modified : /trunk/Source/Properties/Resources.Designer.cs
+Modified : /trunk/Source/Properties/Resources.resx
+Modified : /trunk/Source/RemotingProxy.cs
+Modified : /trunk/UnitTests/MockFixture.cs
+
+
+Revision: 53
+Author: kzu.net
+Date: 6:36:27 PM, Saturday, January 26, 2008
+Message:
+Improved code documentation.
+----
+Modified : /trunk/Moq.shfb
+Modified : /trunk/Source/It.cs
+Modified : /trunk/Source/Mock.cs
+Modified : /trunk/Source/Moq.csproj
+
+
+Revision: 52
+Author: kzu.net
+Date: 6:07:59 PM, Saturday, January 26, 2008
+Message:
+Upgraded version for release 1.3
+----
+Modified : /trunk/Source/Properties/AssemblyInfo.cs
+
+
+Revision: 51
+Author: kzu.net
+Date: 6:05:57 PM, Saturday, January 26, 2008
+Message:
+Added support for overriding expectations set previously on a Mock.
+Now adding a second expectation for the same method/property call will override the existing one.
+This facilitates setting up default expectations in a fixture setup and overriding when necessary in a specific test.
+----
+Modified : /trunk/Source/Interceptor.cs
+Modified : /trunk/Source/Mock.cs
+Modified : /trunk/Source/Properties/Resources.Designer.cs
+Modified : /trunk/Source/Properties/Resources.resx
+Modified : /trunk/UnitTests/MockFixture.cs
+
+
+Revision: 50
+Author: kzu.net
+Date: 5:11:00 PM, Saturday, January 26, 2008
+Message:
+Fixed failing test
+----
+Modified : /trunk/UnitTests/MockFixture.cs
+
+
+Revision: 49
+Author: kzu.net
+Date: 5:09:09 PM, Saturday, January 26, 2008
+Message:
+Added support for mock verification.
+----
+Modified : /trunk/Source/Extensions.cs
+Modified : /trunk/Source/ICallReturn.cs
+Modified : /trunk/Source/IProxyCall.cs
+Modified : /trunk/Source/Interceptor.cs
+Modified : /trunk/Source/MethodCall.cs
+Modified : /trunk/Source/MethodCallReturn.cs
+Modified : /trunk/Source/Mock.cs
+Modified : /trunk/Source/MockException.cs
+Modified : /trunk/Source/Properties/Resources.Designer.cs
+Modified : /trunk/Source/Properties/Resources.resx
+Modified : /trunk/UnitTests/MockFixture.cs
+
+
+Revision: 48
+Author: kzu.net
+Date: 12:18:38 AM, Monday, January 21, 2008
+Message:
+Improved doc
+----
+Modified : /trunk/Source/Mock.cs
+
+
+Revision: 45
+Author: bcardiff
+Date: 8:46:17 AM, Thursday, January 17, 2008
+Message:
+Change version to 1.2 prior tagging.
+----
+Modified : /trunk/Source/Properties/AssemblyInfo.cs
+
+
+Revision: 44
+Author: kzu.net
+Date: 12:44:09 AM, Wednesday, January 16, 2008
+Message:
+Improved documentation for new features.
+----
+Modified : /trunk/Source/ICallReturn.cs
+Modified : /trunk/Source/Mock.cs
+Modified : /trunk/Source/MockBehavior.cs
+
+
+Revision: 43
+Author: kzu.net
+Date: 12:11:02 AM, Wednesday, January 16, 2008
+Message:
+Doc fixes
+----
+Modified : /trunk/Source/It.cs
+
+
+Revision: 42
+Author: kzu.net
+Date: 9:39:52 AM, Wednesday, January 09, 2008
+Message:
+Added support for MockBehavior to affect the way the mocks expect or throw on calls.
+----
+Modified : /trunk
+Modified : /trunk/Source/ICallReturn.cs
+Modified : /trunk/Source/Interceptor.cs
+Modified : /trunk/Source/MethodCallReturn.cs
+Modified : /trunk/Source/Mock.cs
+Added : /trunk/Source/MockBehavior.cs
+Added : /trunk/Source/MockException.cs
+Modified : /trunk/Source/Moq.csproj
+Modified : /trunk/Source/Properties/Resources.Designer.cs
+Modified : /trunk/Source/Properties/Resources.resx
+Modified : /trunk/Source/RemotingProxy.cs
+Added : /trunk/Tools/MSBuild.Community.Tasks.Targets
+Added : /trunk/Tools/MSBuild.Community.Tasks.dll
+Modified : /trunk/UnitTests/Demo.cs
+Added : /trunk/UnitTests/MockBehaviorFixture.cs
+Modified : /trunk/UnitTests/MockFixture.cs
+Modified : /trunk/UnitTests/Moq.Tests.csproj
+Added : /trunk/ilmerge.exclude
+
+
+Revision: 40
+Author: kzu.net
+Date: 9:53:21 PM, Wednesday, January 02, 2008
+Message:
+1.1 release completed
+----
+Modified : /trunk/Moq.shfb
+Modified : /trunk/Source/Properties/AssemblyInfo.cs
+
+
+Revision: 39
+Author: kzu.net
+Date: 9:47:50 PM, Wednesday, January 02, 2008
+Message:
+Merged branch for dynamic types.
+Added ILMerge so that Castle libraries are merged into MoQ assembly (no need for external references)
+Signed assembly.
+Updated help file.
+----
+Added : /trunk/Lib(Copy from path: /branches/features/dynamic/Lib, Revision, 38
+Replacing : /trunk/Lib/Castle.Core.dll(Copy from path: /branches/features/dynamic/Lib/Castle.Core.dll, Revision, 38
+Replacing : /trunk/Lib/Castle.Core.xml(Copy from path: /branches/features/dynamic/Lib/Castle.Core.xml, Revision, 38
+Replacing : /trunk/Lib/Castle.DynamicProxy2.dll(Copy from path: /branches/features/dynamic/Lib/Castle.DynamicProxy2.dll, Revision, 38
+Replacing : /trunk/Lib/Castle.DynamicProxy2.xml(Copy from path: /branches/features/dynamic/Lib/Castle.DynamicProxy2.xml, Revision, 38
+Modified : /trunk/Moq.shfb
+Added : /trunk/Moq.snk
+Modified : /trunk/Source/IProxyCall.cs
+Added : /trunk/Source/Interceptor.cs(Copy from path: /branches/features/dynamic/Source/Interceptor.cs, Revision, 38
+Modified : /trunk/Source/MethodCall.cs
+Modified : /trunk/Source/MethodCallReturn.cs
+Modified : /trunk/Source/Mock.cs
+Deleted : /trunk/Source/MockProxy.cs
+Modified : /trunk/Source/Moq.csproj
+Modified : /trunk/Source/Properties/AssemblyInfo.cs
+Modified : /trunk/Source/Properties/Resources.Designer.cs
+Modified : /trunk/Source/Properties/Resources.resx
+Added : /trunk/Source/RemotingProxy.cs(Copy from path: /branches/features/dynamic/Source/RemotingProxy.cs, Revision, 38
+Added : /trunk/Tools
+Added : /trunk/Tools/ILMerge.exe
+Modified : /trunk/UnitTests/Demo.cs
+Modified : /trunk/UnitTests/MatcherAttributeFixture.cs
+Modified : /trunk/UnitTests/MockFixture.cs
+Modified : /trunk/UnitTests/Moq.Tests.csproj
+
+
+Revision: 37
+Author: kzu.net
+Date: 8:11:46 AM, Wednesday, January 02, 2008
+Message:
+Fixed unittest to do a AreSame check on the return value.
+----
+Modified : /trunk/UnitTests/MockFixture.cs
+
+
+Revision: 18
+Author: kzu.net
+Date: 9:56:11 PM, Thursday, December 20, 2007
+Message:
+Added readme on how to rebuild the doc.
+----
+Added : /trunk/Readme.txt
+
+
+Revision: 17
+Author: kzu.net
+Date: 9:47:53 PM, Thursday, December 20, 2007
+Message:
+Added sandcastle help file builder project and added more doc comments
+----
+Modified : /trunk
+Modified : /trunk/Moq.shfb
+Modified : /trunk/Source/Mock.cs
+
+
+Revision: 16
+Author: kzu.net
+Date: 9:35:27 PM, Thursday, December 20, 2007
+Message:
+REmoved generated help from SVN
+----
+Deleted : /trunk/Help
+
+
+Revision: 15
+Author: juan.wajnerman
+Date: 3:15:53 PM, Thursday, December 20, 2007
+Message:
+Object methods implementation in the proxy (Equals, GetHashCode, ToString and GetType)
+----
+Modified : /trunk/Source/Mock.cs
+Modified : /trunk/Source/MockProxy.cs
+Modified : /trunk/Source/Moq.csproj
+Added : /trunk/Source/Reflector.cs
+Modified : /trunk/UnitTests/MockFixture.cs
+
+
+Revision: 14
+Author: kzu.net
+Date: 1:36:45 AM, Thursday, December 20, 2007
+Message:
+Added demo tests
+----
+Added : /trunk/UnitTests/Demo.cs
+
+
+Revision: 12
+Author: kzu.net
+Date: 1:34:36 AM, Thursday, December 20, 2007
+Message:
+
+----
+Added : /trunk/Help
+Added : /trunk/Help/CloseSearch.png
+Added : /trunk/Help/CollapseAll.bmp
+Added : /trunk/Help/Collapsed.gif
+Added : /trunk/Help/ExpandAll.bmp
+Added : /trunk/Help/Expanded.gif
+Added : /trunk/Help/FillNode.aspx
+Added : /trunk/Help/Index.aspx
+Added : /trunk/Help/Index.html
+Added : /trunk/Help/Item.gif
+Added : /trunk/Help/LastBuild.log
+Added : /trunk/Help/Moq.chm
+Added : /trunk/Help/Search.gif
+Added : /trunk/Help/SearchHelp.aspx
+Added : /trunk/Help/Splitter.gif
+Added : /trunk/Help/SyncTOC.gif
+Added : /trunk/Help/TOC.css
+Added : /trunk/Help/TOC.js
+Added : /trunk/Help/Web.Config
+Added : /trunk/Help/WebTOC.xml
+Added : /trunk/Help/fti
+Added : /trunk/Help/fti/FTI_100.bin
+Added : /trunk/Help/fti/FTI_101.bin
+Added : /trunk/Help/fti/FTI_102.bin
+Added : /trunk/Help/fti/FTI_103.bin
+Added : /trunk/Help/fti/FTI_104.bin
+Added : /trunk/Help/fti/FTI_105.bin
+Added : /trunk/Help/fti/FTI_107.bin
+Added : /trunk/Help/fti/FTI_108.bin
+Added : /trunk/Help/fti/FTI_109.bin
+Added : /trunk/Help/fti/FTI_110.bin
+Added : /trunk/Help/fti/FTI_111.bin
+Added : /trunk/Help/fti/FTI_112.bin
+Added : /trunk/Help/fti/FTI_113.bin
+Added : /trunk/Help/fti/FTI_114.bin
+Added : /trunk/Help/fti/FTI_115.bin
+Added : /trunk/Help/fti/FTI_116.bin
+Added : /trunk/Help/fti/FTI_117.bin
+Added : /trunk/Help/fti/FTI_118.bin
+Added : /trunk/Help/fti/FTI_119.bin
+Added : /trunk/Help/fti/FTI_97.bin
+Added : /trunk/Help/fti/FTI_98.bin
+Added : /trunk/Help/fti/FTI_99.bin
+Added : /trunk/Help/fti/FTI_Files.bin
+Added : /trunk/Help/html
+Added : /trunk/Help/html/001d58b8-78a7-4eca-a4d1-fff227062833.htm
+Added : /trunk/Help/html/0692aef3-509d-3e1d-41bc-597a4f85fd6e.htm
+Added : /trunk/Help/html/0b9eb26d-c80e-ff4b-6543-97bca24c575a.htm
+Added : /trunk/Help/html/11844e9f-0087-b72b-7ad6-920119169c19.htm
+Added : /trunk/Help/html/23456921-2914-71f5-553a-7d481f31009a.htm
+Added : /trunk/Help/html/2b61c99a-220f-c43e-cec2-1a6f81cee17a.htm
+Added : /trunk/Help/html/3c361112-b48d-c2a3-15f9-e4a820e7287e.htm
+Added : /trunk/Help/html/3cd42486-67f9-0fe8-4bcd-b9dff269609f.htm
+Added : /trunk/Help/html/454c1f82-0fa8-04eb-8b89-529f7b873fa0.htm
+Added : /trunk/Help/html/5d56b219-1bdd-1c47-9446-a60397619870.htm
+Added : /trunk/Help/html/71a68b35-c5b4-704e-5a26-82353ac91ac1.htm
+Added : /trunk/Help/html/80e54d53-e70e-0c99-ecd7-7eec3226ad6b.htm
+Added : /trunk/Help/html/8311782d-7b49-48db-9d08-e645a261e510.htm
+Added : /trunk/Help/html/87ebf132-df72-c16e-35f6-fa55debd6854.htm
+Added : /trunk/Help/html/8ef44092-5b95-2705-d314-3a55e9b9a512.htm
+Added : /trunk/Help/html/95d224f1-cf90-2ac0-edcb-69162eaa12c6.htm
+Added : /trunk/Help/html/ab12f603-9e47-22dd-4db4-0fba43355677.htm
+Added : /trunk/Help/html/b437953a-2abd-b742-0d13-81b2d7055cc8.htm
+Added : /trunk/Help/html/b80240b3-f790-ef6f-7852-6a93552893f9.htm
+Added : /trunk/Help/html/b9865344-a0c4-0e7a-bd39-3761cda81b64.htm
+Added : /trunk/Help/html/bca3df6a-76fb-4b40-cc1f-f6d9432596f2.htm
+Added : /trunk/Help/html/bf412f72-7581-0fff-c3b6-2cc2966906b9.htm
+Added : /trunk/Help/html/bfcfbdce-07a1-4e80-78b6-c6a5afaf69de.htm
+Added : /trunk/Help/html/c3eb0630-60bb-60c9-a937-1b57ee12dedb.htm
+Added : /trunk/Help/html/c5b74ec8-bd83-23b6-0eb0-eb25539d23f9.htm
+Added : /trunk/Help/html/c715fb85-ed93-1fc3-1e14-cdc6b234eeb0.htm
+Added : /trunk/Help/html/d46b9004-aa8b-7259-b804-514687d84c1c.htm
+Added : /trunk/Help/html/d6f15104-81f3-f409-d1dd-58d4f4e8c8aa.htm
+Added : /trunk/Help/html/d9676cd1-d7c6-b71b-a1e9-093f97dfb125.htm
+Added : /trunk/Help/html/dae6d159-066c-8d75-1b31-b4c70a4e6eff.htm
+Added : /trunk/Help/html/dd9bb368-2453-98f9-307a-d54845fd190b.htm
+Added : /trunk/Help/html/f3b2afd9-4e91-7121-e189-c8d19efb1f5b.htm
+Added : /trunk/Help/html/fecbd320-0101-085b-21d2-a385f4aed1a4.htm
+Added : /trunk/Help/icons
+Added : /trunk/Help/icons/CFW.gif
+Added : /trunk/Help/icons/Caution.gif
+Added : /trunk/Help/icons/CopyCode_h.gif
+Added : /trunk/Help/icons/LastChild.gif
+Added : /trunk/Help/icons/adm.gif
+Added : /trunk/Help/icons/adm_arch.gif
+Added : /trunk/Help/icons/adm_dev.gif
+Added : /trunk/Help/icons/adm_dev_arch.gif
+Added : /trunk/Help/icons/alert_caution.gif
+Added : /trunk/Help/icons/alert_note.gif
+Added : /trunk/Help/icons/alert_security.gif
+Added : /trunk/Help/icons/arch.gif
+Added : /trunk/Help/icons/big_adm.gif
+Added : /trunk/Help/icons/big_arch.gif
+Added : /trunk/Help/icons/big_dev.gif
+Added : /trunk/Help/icons/big_kw.gif
+Added : /trunk/Help/icons/box.gif
+Added : /trunk/Help/icons/collall.gif
+Added : /trunk/Help/icons/collapse.gif
+Added : /trunk/Help/icons/collapse_all.gif
+Added : /trunk/Help/icons/copycode.gif
+Added : /trunk/Help/icons/copycodeHighlight.gif
+Added : /trunk/Help/icons/dev.gif
+Added : /trunk/Help/icons/dev_arch.gif
+Added : /trunk/Help/icons/dropdown.gif
+Added : /trunk/Help/icons/dropdownHover.gif
+Added : /trunk/Help/icons/drpdown.gif
+Added : /trunk/Help/icons/drpdown_orange.gif
+Added : /trunk/Help/icons/drpdown_orange_up.gif
+Added : /trunk/Help/icons/drpup.gif
+Added : /trunk/Help/icons/exp.gif
+Added : /trunk/Help/icons/expall.gif
+Added : /trunk/Help/icons/expand_all.gif
+Added : /trunk/Help/icons/filter1a.gif
+Added : /trunk/Help/icons/filter1c.gif
+Added : /trunk/Help/icons/footer.gif
+Added : /trunk/Help/icons/gradient.gif
+Added : /trunk/Help/icons/greencheck.gif
+Added : /trunk/Help/icons/greychck.gif
+Added : /trunk/Help/icons/header_prev_next.jpg
+Added : /trunk/Help/icons/header_sql_tutorial_blank.jpg
+Added : /trunk/Help/icons/header_sql_tutorial_logo.GIF
+Added : /trunk/Help/icons/kw.gif
+Added : /trunk/Help/icons/kw_adm.gif
+Added : /trunk/Help/icons/kw_adm_arch.gif
+Added : /trunk/Help/icons/kw_adm_dev.gif
+Added : /trunk/Help/icons/kw_adm_dev_arch.gif
+Added : /trunk/Help/icons/kw_arch.gif
+Added : /trunk/Help/icons/kw_dev.gif
+Added : /trunk/Help/icons/kw_dev_arch.gif
+Added : /trunk/Help/icons/load.gif
+Added : /trunk/Help/icons/load_hover.gif
+Added : /trunk/Help/icons/note.gif
+Added : /trunk/Help/icons/pencil.GIF
+Added : /trunk/Help/icons/privclass.gif
+Added : /trunk/Help/icons/privdelegate.gif
+Added : /trunk/Help/icons/privenum.gif
+Added : /trunk/Help/icons/privenumeration.gif
+Added : /trunk/Help/icons/privevent.gif
+Added : /trunk/Help/icons/privextension.gif
+Added : /trunk/Help/icons/privfield.gif
+Added : /trunk/Help/icons/privinterface.gif
+Added : /trunk/Help/icons/privmethod.gif
+Added : /trunk/Help/icons/privproperty.gif
+Added : /trunk/Help/icons/privstructure.gif
+Added : /trunk/Help/icons/protclass.gif
+Added : /trunk/Help/icons/protdelegate.gif
+Added : /trunk/Help/icons/protenum.gif
+Added : /trunk/Help/icons/protenumeration.gif
+Added : /trunk/Help/icons/protevent.gif
+Added : /trunk/Help/icons/protextension.gif
+Added : /trunk/Help/icons/protfield.gif
+Added : /trunk/Help/icons/protinterface.gif
+Added : /trunk/Help/icons/protmethod.gif
+Added : /trunk/Help/icons/protoperator.gif
+Added : /trunk/Help/icons/protproperty.gif
+Added : /trunk/Help/icons/protstructure.gif
+Added : /trunk/Help/icons/pubclass.gif
+Added : /trunk/Help/icons/pubdelegate.gif
+Added : /trunk/Help/icons/pubenum.gif
+Added : /trunk/Help/icons/pubenumeration.gif
+Added : /trunk/Help/icons/pubevent.gif
+Added : /trunk/Help/icons/pubextension.gif
+Added : /trunk/Help/icons/pubfield.gif
+Added : /trunk/Help/icons/pubinterface.gif
+Added : /trunk/Help/icons/pubmethod.gif
+Added : /trunk/Help/icons/puboperator.gif
+Added : /trunk/Help/icons/pubproperty.gif
+Added : /trunk/Help/icons/pubstructure.gif
+Added : /trunk/Help/icons/requirements1a.gif
+Added : /trunk/Help/icons/requirements1c.gif
+Added : /trunk/Help/icons/save.gif
+Added : /trunk/Help/icons/save_hover.gif
+Added : /trunk/Help/icons/security.gif
+Added : /trunk/Help/icons/seealso1a.gif
+Added : /trunk/Help/icons/seealso1c.gif
+Added : /trunk/Help/icons/static.gif
+Added : /trunk/Help/icons/xna.gif
+Added : /trunk/Help/scripts
+Added : /trunk/Help/scripts/CheckboxMenu.js
+Added : /trunk/Help/scripts/CommonUtilities.js
+Added : /trunk/Help/scripts/Dropdown.js
+Added : /trunk/Help/scripts/EventUtilities.js
+Added : /trunk/Help/scripts/SplitScreen.js
+Added : /trunk/Help/scripts/highlight.js
+Added : /trunk/Help/scripts/script_feedBack.js
+Added : /trunk/Help/scripts/script_loc.js
+Added : /trunk/Help/scripts/script_manifold.js
+Added : /trunk/Help/styles
+Added : /trunk/Help/styles/Presentation.css
+Added : /trunk/Help/styles/Whidbey
+Added : /trunk/Help/styles/Whidbey/presentation.css
+Added : /trunk/Help/styles/highlight.css
+Added : /trunk/Moq.shfb
+Modified : /trunk/Source/Evaluator.cs
+Modified : /trunk/Source/ExpressionVisitor.cs
+Modified : /trunk/Source/Extensions.cs
+Modified : /trunk/Source/Guard.cs
+Modified : /trunk/Source/ICallReturn.cs
+Modified : /trunk/Source/IMatcher.cs
+Modified : /trunk/Source/It.cs
+Modified : /trunk/Source/MatcherAttribute.cs
+Modified : /trunk/Source/MatcherFactory.cs
+Modified : /trunk/Source/Matchers/AnyMatcher.cs
+Modified : /trunk/Source/Matchers/ConstantMatcher.cs
+Modified : /trunk/Source/Matchers/LazyEvalMatcher.cs
+Modified : /trunk/Source/Matchers/PredicateMatcher.cs
+Modified : /trunk/Source/Matchers/RangeMatcher.cs
+Modified : /trunk/Source/Matchers/RegexMatcher.cs
+Modified : /trunk/Source/Mock.cs
+Modified : /trunk/Source/MockProxy.cs
+Modified : /trunk/Source/Moq.csproj
+Modified : /trunk/Source/Properties/AssemblyInfo.cs
+Modified : /trunk/Source/Range.cs
+Modified : /trunk/UnitTests/MockFixture.cs
+Modified : /trunk/UnitTests/Moq.Tests.csproj
+
+
+Revision: 11
+Author: kzu.net
+Date: 6:09:38 PM, Tuesday, December 18, 2007
+Message:
+Added support for regex-matching.
+----
+Modified : /trunk/Source/It.cs
+Added : /trunk/Source/Matchers/RegexMatcher.cs
+Modified : /trunk/Source/Mock.cs
+Modified : /trunk/Source/Moq.csproj
+Modified : /trunk/UnitTests/MockFixture.cs
+
+
+Revision: 9
+Author: kzu.net
+Date: 11:12:38 PM, Monday, December 17, 2007
+Message:
+Refactored matcher to simplify implementation.
+----
+Modified : /trunk/Source/Matchers/RangeMatcher.cs
+Modified : /trunk/Source/Mock.cs
+Modified : /trunk/UnitTests/MockFixture.cs
+
+
+Revision: 8
+Author: kzu.net
+Date: 10:46:53 AM, Monday, December 17, 2007
+Message:
+Cleanup commented code.
+Added ctor overload to ConstantMatcher
+----
+Modified : /trunk/Source/Extensions.cs
+Modified : /trunk/Source/It.cs
+Modified : /trunk/Source/MatcherFactory.cs
+Modified : /trunk/Source/Matchers/ConstantMatcher.cs
+Modified : /trunk/Source/Matchers/RangeMatcher.cs
+Modified : /trunk/UnitTests/MockFixture.cs
+
+
+Revision: 7
+Author: kzu.net
+Date: 1:21:40 AM, Monday, December 17, 2007
+Message:
+Replace boolean for type of range with an enumeration to make code more readable.
+----
+Modified : /trunk/Source/It.cs
+Modified : /trunk/Source/Matchers/RangeMatcher.cs
+Modified : /trunk/Source/Moq.csproj
+Added : /trunk/Source/Range.cs
+Modified : /trunk/UnitTests/MockFixture.cs
+
+
+Revision: 2
+Author: kzu.net
+Date: 12:24:26 AM, Monday, December 17, 2007
+Message:
+Initial release on Google Code
+----
+Added : /trunk/Moq.sln
+Added : /trunk/Source
+Added : /trunk/Source/Evaluator.cs
+Added : /trunk/Source/ExpressionVisitor.cs
+Added : /trunk/Source/Extensions.cs
+Added : /trunk/Source/Guard.cs
+Added : /trunk/Source/ICallReturn.cs
+Added : /trunk/Source/IMatcher.cs
+Added : /trunk/Source/IProxyCall.cs
+Added : /trunk/Source/It.cs
+Added : /trunk/Source/MatcherAttribute.cs
+Added : /trunk/Source/MatcherFactory.cs
+Added : /trunk/Source/Matchers
+Added : /trunk/Source/Matchers/AnyMatcher.cs
+Added : /trunk/Source/Matchers/ConstantMatcher.cs
+Added : /trunk/Source/Matchers/LazyEvalMatcher.cs
+Added : /trunk/Source/Matchers/PredicateMatcher.cs
+Added : /trunk/Source/Matchers/RangeMatcher.cs
+Added : /trunk/Source/MethodCall.cs
+Added : /trunk/Source/MethodCallReturn.cs
+Added : /trunk/Source/Mock.cs
+Added : /trunk/Source/MockProxy.cs
+Added : /trunk/Source/Moq.csproj
+Added : /trunk/Source/Properties
+Added : /trunk/Source/Properties/AssemblyInfo.cs
+Added : /trunk/Source/Properties/Resources.Designer.cs
+Added : /trunk/Source/Properties/Resources.resx
+Added : /trunk/UnitTests
+Added : /trunk/UnitTests/MatcherAttributeFixture.cs
+Added : /trunk/UnitTests/MockFixture.cs
+Added : /trunk/UnitTests/Moq.Tests.csproj
+Added : /trunk/UnitTests/Properties
+Added : /trunk/UnitTests/Properties/AssemblyInfo.cs
+
+
+Revision: 1
+Author: 
+Date: 11:59:59 PM, Sunday, December 16, 2007
+Message:
+Initial directory structure.
+----
+Added : /branches
+Added : /tags
+Added : /trunk
+
+
