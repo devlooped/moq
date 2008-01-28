@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Reflection;
+using System.Linq;
 using System.Runtime.Remoting.Messaging;
 using System.Runtime.Remoting.Proxies;
 using Castle.Core.Interceptor;
@@ -21,12 +22,29 @@ namespace Moq
 		Type targetType;
 
 		public RemotingProxy(Type targetType, Action<IInvocation> interceptor)
+			: this(targetType, interceptor, new object[0])
+		{
+		}
+
+		public RemotingProxy(Type targetType, Action<IInvocation> interceptor, object[] ctorArgs)
 			: base(targetType)
 		{
 			this.targetType = targetType;
 			this.interceptor = interceptor;
+
+			// During construction, the object is not proxied, and calls
+			// made within the MBRO ctor are done directly on the "this" 
+			// object, not via this proxy. Interception and therefore 
+			// expectations don't work during construction.
+			var instance = Activator.CreateInstance(targetType, ctorArgs);
+			base.AttachServer((MarshalByRefObject)instance);
 		}
-		
+
+		public override object GetTransparentProxy()
+		{
+			return base.GetTransparentProxy();
+		}
+
 		public override IMessage Invoke(IMessage msg)
 		{
 			var methodCall = msg as IMethodCallMessage;
@@ -36,7 +54,7 @@ namespace Moq
 					targetType,
 					methodCall,
 					CallUnderlyingObject);
-				
+
 				interceptor(invocation);
 
 				return ToMessage(invocation, methodCall);
@@ -48,22 +66,6 @@ namespace Moq
 		private IMethodReturnMessage CallUnderlyingObject(IMethodCallMessage methodCall)
 		{
 			var realObject = GetUnwrappedServer();
-			if (realObject == null)
-			{
-				// NOTE: we do not support parameterized ctors yet.
-				var returnMessage = InitializeServerObject(null);
-				if (returnMessage.Exception == null)
-				{
-					realObject = GetUnwrappedServer();
-					SetStubData(this, realObject);
-				}
-				else
-				{
-					// Instantiation of the object failed (maybe it didn't 
-					// have a parameterless ctor, etc.)
-					throw returnMessage.Exception;
-				}
-			}
 
 			return RemotingServices.ExecuteMessage(realObject, methodCall);
 		}
@@ -88,7 +90,7 @@ namespace Moq
 			IMethodCallMessage call;
 			Func<IMethodCallMessage, IMethodReturnMessage> realCall;
 
-			public RemotingInvocation(Type targetType, IMethodCallMessage call, 
+			public RemotingInvocation(Type targetType, IMethodCallMessage call,
 				Func<IMethodCallMessage, IMethodReturnMessage> realCall)
 			{
 				this.targetType = targetType;
@@ -159,33 +161,141 @@ namespace Moq
 			}
 		}
 
-		private IMessage ExecuteObjectMethod(IMethodCallMessage methodCall)
-		{
-			throw new NotImplementedException();
-			//if (methodCall.MethodBase == ObjectGetTypeMethod)
-			//{
-			//    Type type = typeof(TTarget);
-			//    return new ReturnMessage(type, null, 0, null, methodCall);
-			//}
-			//else if (methodCall.MethodBase == ObjectEqualsMethod)
-			//{
-			//    bool equals = object.ReferenceEquals(transparentProxy, methodCall.Args[0]);
-			//    return new ReturnMessage(equals, null, 0, null, methodCall);
-			//}
-			//else if (methodCall.MethodBase == ObjectGetHashCodeMethod)
-			//{
-			//    int hashCode = GetHashCode();
-			//    return new ReturnMessage(hashCode, null, 0, null, methodCall);
-			//}
-			//else if (methodCall.MethodBase == ObjectToStringMethod)
-			//{
-			//    string toString = ToString();
-			//    return new ReturnMessage(toString, null, 0, null, methodCall);
-			//}
-			//else
-			//{
-			//    return new ReturnMessage(null, null, 0, null, methodCall);
-			//}
-		}
+		//class CtorMethodCall : IConstructionCallMessage
+		//{
+		//    object[] ctorArgs;
+		//    System.Collections.Hashtable properties = new System.Collections.Hashtable();
+		//    Type proxyType;
+		//    MethodBase ctorMethod;
+		//    LogicalCallContext context;
+
+		//    public CtorMethodCall(object[] ctorArgs, Type proxyType, LogicalCallContext context)
+		//    {
+		//        this.ctorArgs = ctorArgs;
+		//        this.proxyType = proxyType;
+		//        // Same logic applied internally on Activator.CreateInstance.
+		//        Type[] argTypes = (from arg in ctorArgs
+		//                           select arg == null ? (Type)null : arg.GetType()).ToArray();
+
+		//        ctorMethod = proxyType.GetConstructor(argTypes);
+		//        this.context = context;
+
+		//        //properties.Add("__MethodName", ConstructorInfo.ConstructorName);
+		//        //properties.Add("__ActivationTypeName", proxyType.AssemblyQualifiedName);
+		//        //properties.Add("__Args", ctorArgs);
+		//    }
+
+		//    public object GetInArg(int argNum)
+		//    {
+		//        return ctorArgs[argNum];
+		//    }
+
+		//    public string GetInArgName(int index)
+		//    {
+		//        throw new NotImplementedException();
+		//    }
+
+		//    public int InArgCount
+		//    {
+		//        get { return ctorArgs.Length; }
+		//    }
+
+		//    public object[] InArgs
+		//    {
+		//        get { return ctorArgs; }
+		//    }
+
+		//    public int ArgCount
+		//    {
+		//        get { return ctorArgs.Length; }
+		//    }
+
+		//    public object[] Args
+		//    {
+		//        get { return ctorArgs; }
+		//    }
+
+		//    public object GetArg(int argNum)
+		//    {
+		//        return ctorArgs[argNum];
+		//    }
+
+		//    public string GetArgName(int index)
+		//    {
+		//        throw new NotImplementedException();
+		//    }
+
+		//    public bool HasVarArgs
+		//    {
+		//        get { return false; }
+		//    }
+
+		//    public LogicalCallContext LogicalCallContext
+		//    {
+		//        get { return context; }
+		//    }
+
+		//    public MethodBase MethodBase
+		//    {
+		//        get { return ctorMethod; }
+		//    }
+
+		//    public string MethodName
+		//    {
+		//        get { return ctorMethod.Name; }
+		//    }
+
+		//    public object MethodSignature
+		//    {
+		//        get { throw new NotImplementedException(); }
+		//    }
+
+		//    public string TypeName
+		//    {
+		//        get { return proxyType.AssemblyQualifiedName; }
+		//    }
+
+		//    public string Uri
+		//    {
+		//        get { return String.Empty; }
+		//    }
+
+		//    public System.Collections.IDictionary Properties
+		//    {
+		//        get { return new System.Collections.Hashtable(); }
+		//    }
+
+		//    public Type ActivationType
+		//    {
+		//        get { return proxyType; }
+		//    }
+
+		//    public string ActivationTypeName
+		//    {
+		//        get { throw new NotImplementedException(); }
+		//    }
+
+		//    public IActivator Activator
+		//    {
+		//        get
+		//        {
+		//            throw new NotImplementedException();
+		//        }
+		//        set
+		//        {
+		//            throw new NotImplementedException();
+		//        }
+		//    }
+
+		//    public object[] CallSiteActivationAttributes
+		//    {
+		//        get { throw new NotImplementedException(); }
+		//    }
+
+		//    public System.Collections.IList ContextProperties
+		//    {
+		//        get { throw new NotImplementedException(); }
+		//    }
+		//}
 	}
 }

@@ -69,47 +69,105 @@ namespace Moq
 		Interceptor interceptor;
 		T instance;
 		RemotingProxy remotingProxy;
-		
+
 		/// <summary>
-		/// Initializes an instance of the mock with the <see cref="MockBehavior.Default">default behavior</see>.
+		/// Initializes an instance of the mock with a specific <see cref="MockBehavior">behavior</see> with 
+		/// the given constructor arguments for the class.
+		/// </summary>
+		/// <remarks>
+		/// The mock will try to find the best match constructor given the constructor arguments, and invoke that 
+		/// to initialize the instance. This applies only for classes, not interfaces.
+		/// <para>
+		/// <b>Note:</b> For a <see cref="MarshalByRefObject"/> derived class, any calls done in the constructor itself 
+		/// will not go through the proxied mock and will instead be direct invocations in the underlying 
+		/// object. This is known limitation.
+		/// </para>
+		/// </remarks>
+		/// <example>
+		/// <code>var mock = new Mock&lt;MyProvider&gt;(someArgument, 25);</code>
+		/// </example>
+		public Mock(MockBehavior behavior, params object[] args)
+		{
+			if (args == null) args = new object[0];
+
+			interceptor = new Interceptor(behavior);
+
+			try
+			{
+				if (typeof(MarshalByRefObject).IsAssignableFrom(typeof(T)))
+				{
+					remotingProxy = new RemotingProxy(typeof(T), x => interceptor.Intercept(x), args);
+					// TODO: invoke ctor explicitly?
+					instance = (T)remotingProxy.GetTransparentProxy();
+				}
+				else if (typeof(T).IsInterface)
+				{
+					if (args.Length > 0)
+						throw new ArgumentException(Properties.Resources.ConstructorArgsForInterface);
+
+					instance = generator.CreateInterfaceProxyWithoutTarget<T>(interceptor);
+				}
+				else
+				{
+					try
+					{
+						if (args.Length > 0)
+						{
+							var generatedType = generator.ProxyBuilder.CreateClassProxy(typeof(T), new ProxyGenerationOptions());
+							instance = (T)Activator.CreateInstance(generatedType,
+								new object[] { new IInterceptor[] { interceptor } }.Concat(args).ToArray());
+						}
+						else
+						{
+							instance = generator.CreateClassProxy<T>(interceptor);
+						}
+					}
+					catch (TypeLoadException tle)
+					{
+						throw new ArgumentException(Properties.Resources.InvalidMockClass, tle);
+					}
+				}
+
+			}
+			catch (MissingMethodException mme)
+			{
+				throw new ArgumentException(Properties.Resources.ConstructorNotFound, mme);
+			}
+		}
+
+		/// <summary>
+		/// Initializes an instance of the mock with <see cref="MockBehavior.Default">default behavior</see> and with 
+		/// the given constructor arguments for the class. (Only valid when <typeparamref name="T"/> is a class)
+		/// </summary>
+		/// <remarks>
+		/// The mock will try to find the best match constructor given the constructor arguments, and invoke that 
+		/// to initialize the instance. This applies only for classes, not interfaces.
+		/// <para>
+		/// <b>Note:</b> For a <see cref="MarshalByRefObject"/> derived class, any calls done in the constructor itself 
+		/// will not go through the proxied mock and will instead be direct invocations in the underlying 
+		/// object. This is known limitation.
+		/// </para>
+		/// </remarks>
+		/// <example>
+		/// <code>var mock = new Mock&lt;MyProvider&gt;(someArgument, 25);</code>
+		/// </example>
+		public Mock(params object[] args) : this(MockBehavior.Default, args) { }
+
+		/// <summary>
+		/// Initializes an instance of the mock with <see cref="MockBehavior.Default">default behavior</see>.
 		/// </summary>
 		/// <example>
 		/// <code>var mock = new Mock&lt;IFormatProvider&gt;();</code>
 		/// </example>
-		public Mock() : this(MockBehavior.Default) {}
+		public Mock() : this(MockBehavior.Default) { }
 
 		/// <summary>
-		/// Initializes an instance of the mock, optionally changing the 
-		/// <see cref="MockBehavior.Default">default behavior</see>
+		/// Initializes an instance of the mock with the specified <see cref="MockBehavior">behavior</see>.
 		/// </summary>
 		/// <example>
 		/// <code>var mock = new Mock&lt;IFormatProvider&gt;(MockBehavior.Relaxed);</code>
 		/// </example>
-		public Mock(MockBehavior behavior)
-		{
-			interceptor = new Interceptor(behavior);
-
-			if (typeof(MarshalByRefObject).IsAssignableFrom(typeof(T)))
-			{
-				remotingProxy = new RemotingProxy(typeof(T), x => interceptor.Intercept(x));
-				instance = (T)remotingProxy.GetTransparentProxy();
-			}
-			else if (typeof(T).IsInterface)
-			{
-				instance = generator.CreateInterfaceProxyWithoutTarget<T>(interceptor);
-			}
-			else
-			{
-				try
-				{
-					instance = generator.CreateClassProxy<T>(interceptor);
-				}
-				catch (TypeLoadException tle)
-				{
-					throw new ArgumentException(Properties.Resources.InvalidMockClass, tle);
-				}
-			}
-		}
+		public Mock(MockBehavior behavior) : this(behavior, new object[0]) {}
 
 		/// <summary>
 		/// Exposes the mocked object instance.
@@ -117,7 +175,7 @@ namespace Moq
 		public T Object
 		{
 			get
-			{ 
+			{
 				return instance;
 			}
 		}
@@ -163,7 +221,7 @@ namespace Moq
 		public ICallReturn<TResult> Expect<TResult>(Expression<Func<T, TResult>> expression)
 		{
 			return (ICallReturn<TResult>)ExpectImpl(
-				expression, 
+				expression,
 				(original, method, args) => new MethodCallReturn<TResult>(original, method, args));
 		}
 
@@ -236,7 +294,7 @@ namespace Moq
 		}
 
 		private IProxyCall ExpectImpl(
-			Expression expression, 
+			Expression expression,
 			Func<Expression, MethodInfo, Expression[], IProxyCall> factory)
 		{
 			Guard.ArgumentNotNull(expression, "expression");
@@ -296,6 +354,23 @@ namespace Moq
 					String.Format(Properties.Resources.ExpectationOnNonOverridableMember,
 					expectation.ToString()));
 		}
+
+		class Hook : IProxyGenerationHook
+		{
+			public void MethodsInspected()
+			{
+			}
+
+			public void NonVirtualMemberNotification(Type type, MemberInfo memberInfo)
+			{
+			}
+
+			public bool ShouldInterceptMethod(Type type, MethodInfo memberInfo)
+			{
+				return true;
+			}
+		}
+
 
 		// NOTE: known issue. See https://connect.microsoft.com/VisualStudio/feedback/ViewFeedback.aspx?FeedbackID=318122
 		//public static implicit operator TInterface(Mock<TInterface> mock)

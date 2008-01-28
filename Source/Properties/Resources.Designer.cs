@@ -70,6 +70,24 @@ namespace Moq.Properties {
         }
         
         /// <summary>
+        ///   Looks up a localized string similar to Constructor arguments cannot be passed for interface mocks..
+        /// </summary>
+        internal static string ConstructorArgsForInterface {
+            get {
+                return ResourceManager.GetString("ConstructorArgsForInterface", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to A matching constructor for the given arguments was not found on the mocked type..
+        /// </summary>
+        internal static string ConstructorNotFound {
+            get {
+                return ResourceManager.GetString("ConstructorNotFound", resourceCulture);
+            }
+        }
+        
+        /// <summary>
         ///   Looks up a localized string similar to Invalid expectation on a non-overridable member:
         ///{0}.
         /// </summary>
@@ -98,7 +116,7 @@ namespace Moq.Properties {
         }
         
         /// <summary>
-        ///   Looks up a localized string similar to Type to mock be an interface or an abstract or non-sealed class. .
+        ///   Looks up a localized string similar to Type to mock must be an interface or an abstract or non-sealed class. .
         /// </summary>
         internal static string InvalidMockClass {
             get {

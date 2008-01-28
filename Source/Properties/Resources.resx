@@ -121,7 +121,7 @@
     <value>Field calls are not supported. Use interfaces and properties instead.</value>
   </data>
   <data name="InvalidMockClass" xml:space="preserve">
-    <value>Type to mock be an interface or an abstract or non-sealed class. </value>
+    <value>Type to mock must be an interface or an abstract or non-sealed class. </value>
   </data>
   <data name="MockExceptionMessage" xml:space="preserve">
     <value>{0} invocation failed with mock behavior {1}.
@@ -152,5 +152,11 @@
   <data name="ExpectationOnNonOverridableMember" xml:space="preserve">
     <value>Invalid expectation on a non-overridable member:
 {0}</value>
+  </data>
+  <data name="ConstructorArgsForInterface" xml:space="preserve">
+    <value>Constructor arguments cannot be passed for interface mocks.</value>
+  </data>
+  <data name="ConstructorNotFound" xml:space="preserve">
+    <value>A matching constructor for the given arguments was not found on the mocked type.</value>
   </data>
 </root>

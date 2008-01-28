@@ -534,7 +534,93 @@ namespace Moq.Tests
 			Assert.AreEqual(10, mock.Object.Do1());
 		}
 
-		// ShouldReceiveClassCtorArguments
+		[Test]
+		public void ShouldReceiveClassCtorArguments()
+		{
+			var mock = new Mock<FooWithConstructors>(MockBehavior.Default, "Hello", 26);
+
+			Assert.AreEqual("Hello", mock.Object.StringValue);
+			Assert.AreEqual(26, mock.Object.IntValue);
+
+			// Should also construct without args.
+			mock = new Mock<FooWithConstructors>(MockBehavior.Default);
+
+			Assert.AreEqual(null, mock.Object.StringValue);
+			Assert.AreEqual(0, mock.Object.IntValue);
+		}
+
+		[Test]
+		public void ShouldReceiveClassCtorArgumentsMBRO()
+		{
+			var mock = new Mock<FooWithConstructorsMBRO>(MockBehavior.Default, "Hello", 26);
+
+			Assert.AreEqual("Hello", mock.Object.StringValue);
+			Assert.AreEqual(26, mock.Object.IntValue);
+
+			// Should also construct without args.
+			mock = new Mock<FooWithConstructorsMBRO>(MockBehavior.Default);
+
+			Assert.AreEqual(null, mock.Object.StringValue);
+			Assert.AreEqual(0, mock.Object.IntValue);
+		}
+
+		[Test]
+		public void ShouldConstructClassWithNoDefaultConstructor()
+		{
+			var mock = new Mock<ClassWithNoDefaultConstructor>(MockBehavior.Default, "Hello", 26);
+
+			Assert.AreEqual("Hello", mock.Object.StringValue);
+			Assert.AreEqual(26, mock.Object.IntValue);
+		}
+
+		[Test]
+		public void ShouldConstructClassWithNoDefaultConstructorAndNullValue()
+		{
+			var mock = new Mock<ClassWithNoDefaultConstructor>(MockBehavior.Default, null, 26);
+
+			Assert.AreEqual(null, mock.Object.StringValue);
+			Assert.AreEqual(26, mock.Object.IntValue);
+		}
+
+		[Test]
+		public void ShouldConstructClassWithNoDefaultConstructorMBRO()
+		{
+			var mock = new Mock<ClassWithNoDefaultConstructorMBRO>(MockBehavior.Default, "Hello", 26);
+
+			Assert.AreEqual("Hello", mock.Object.StringValue);
+			Assert.AreEqual(26, mock.Object.IntValue);
+		}
+
+		[Test]
+		public void ShouldConstructClassWithNoDefaultConstructorAndNullValueMBRO()
+		{
+			var mock = new Mock<ClassWithNoDefaultConstructorMBRO>(MockBehavior.Default, null, 26);
+
+			Assert.AreEqual(null, mock.Object.StringValue);
+			Assert.AreEqual(26, mock.Object.IntValue);
+		}
+
+		[Test]
+		[ExpectedException(typeof(ArgumentException))]
+		public void ShouldThrowIfNoMatchingConstructorFound()
+		{
+			var mock = new Mock<ClassWithNoDefaultConstructor>(25, true);
+		}
+
+		[Test]
+		[ExpectedException(typeof(ArgumentException))]
+		public void ShouldThrowIfNoMatchingConstructorFoundMBRO()
+		{
+			var mock = new Mock<ClassWithNoDefaultConstructorMBRO>(25, true);
+		}
+
+		[Test]
+		[ExpectedException(typeof(ArgumentException))]
+		public void ShouldThrowIfArgumentsPassedForInterface()
+		{
+			var mock = new Mock<IFoo>(25, true);
+		}
+
 		// ShouldExpectPropertyWithIndexer
 		// ShouldReceiveArgumentValuesOnCallback
 		// ShouldReceiveArgumentValuesOnReturns
@@ -551,6 +637,72 @@ namespace Moq.Tests
 			return 5;
 		}
 
+		public class ClassWithNoDefaultConstructorMBRO : MarshalByRefObject
+		{
+			public ClassWithNoDefaultConstructorMBRO(string stringValue, int intValue)
+			{
+				this.StringValue = stringValue;
+				this.IntValue = intValue;
+			}
+
+			public string StringValue { get; set; }
+			public int IntValue { get; set; }
+		}
+
+		public class ClassWithNoDefaultConstructor
+		{
+			public ClassWithNoDefaultConstructor(string stringValue, int intValue)
+			{
+				this.StringValue = stringValue;
+				this.IntValue = intValue;
+			}
+
+			public string StringValue { get; set; }
+			public int IntValue { get; set; }
+		}
+
+		public class FooWithConstructorsMBRO : MarshalByRefObject
+		{
+			public FooWithConstructorsMBRO(string stringValue, int intValue)
+			{
+				this.StringValue = stringValue;
+				this.IntValue = intValue;
+			}
+
+			public FooWithConstructorsMBRO()
+			{
+			}
+
+			public override string ToString()
+			{
+				return base.ToString();
+			}
+
+			public string StringValue { get; set; }
+			public int IntValue { get; set; }
+		}
+		
+		public abstract class FooWithConstructors
+		{
+			public FooWithConstructors(string stringValue, int intValue)
+			{
+				this.StringValue = stringValue;
+				this.IntValue = intValue;
+			}
+
+			public FooWithConstructors()
+			{
+			}
+
+			public override string ToString()
+			{
+				return base.ToString();
+			}
+
+			public string StringValue { get; set; }
+			public int IntValue { get; set; }
+		}
+		
 		public class FooOverrideEquals
 		{
 			public string Name { get; set; }
