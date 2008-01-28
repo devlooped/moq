@@ -1,0 +1,22 @@
+Version 1.4
+
+    * Added support for passing constructor arguments for mocked classes.
+    * Improved code documentation 
+
+Version 1.3
+
+    * Added support for overriding expectations set previously on a Mock. Now adding a second expectation for the same method/property call will override the existing one. This facilitates setting up default expectations in a fixture setup and overriding when necessary in a specific test.
+    * Added support for mock verification. Both Verify and VerifyAll are provided for more flexibility (the former only verifies methods marked Verifiable) 
+
+Version 1.2
+
+    * Added support for MockBehavior mock constructor argument to affect the way the mocks expect or throw on calls. 
+
+Version 1.1
+
+    * Merged branch for dynamic types. Now Moq is based on Castle DynamicProxy2 to support a wider range of mock targets.
+    * Added ILMerge so that Castle libraries are merged into Moq assembly (no need for external references and avoid conflicts) 
+
+Version 1.0
+
+    * Initial release, initial documentation process in place, etc. 
