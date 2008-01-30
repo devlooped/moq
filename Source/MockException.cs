@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using Castle.Core.Interceptor;
+using System.Linq.Expressions;
 
 namespace Moq
 {
@@ -44,7 +45,7 @@ namespace Moq
 
 		internal MockException(ExceptionReason reason, MockBehavior behavior,
 			IInvocation invocation)
-			: this(reason, behavior, invocation, 
+			: this(reason, behavior, invocation,
 				Properties.Resources.ResourceManager.GetString(reason.ToString()))
 		{
 		}
@@ -67,13 +68,13 @@ namespace Moq
 			get { return reason; }
 		}
 
-		private static string GetMessage(ExceptionReason reason, MockBehavior behavior, 
+		private static string GetMessage(ExceptionReason reason, MockBehavior behavior,
 			IInvocation invocation, string message)
 		{
 			return String.Format(
-				Properties.Resources.MockExceptionMessage, 
+				Properties.Resources.MockExceptionMessage,
 				invocation.Format(),
-				behavior, 
+				behavior,
 				message
 			);
 		}
@@ -99,4 +100,57 @@ namespace Moq
 			info.AddValue("reason", reason);
 		}
 	}
+
+	/// <devdoc>
+	/// Used by the mock factory to accumulate verification 
+	/// failures.
+	/// </devdoc>
+	internal class MockVerificationException : MockException
+	{
+		Type targetType;
+		List<Expression> failedExpectations;
+
+		public MockVerificationException(Type targetType, List<Expression> failedExpectations)
+			: base(ExceptionReason.VerificationFailed, GetMessage(targetType, failedExpectations))
+		{
+			this.targetType = targetType;
+			this.failedExpectations = failedExpectations;
+		}
+
+		private static string GetMessage(Type targetType, List<Expression> failedExpectations)
+		{
+			return String.Format(Properties.Resources.VerficationFailed, GetRawExpectations(targetType, failedExpectations));
+		}
+
+		private static string GetRawExpectations(Type targetType, List<Expression> failedExpectations)
+		{
+			StringBuilder message = new StringBuilder();
+			string targetTypeName = targetType.Name;
+			foreach (var expr in failedExpectations)
+			{
+				message
+					.Append(targetTypeName)
+					.Append(" ")
+					.AppendLine(expr.ToString());
+			}
+
+			return message.ToString();
+		}
+
+		internal string GetRawExpectations()
+		{
+			return GetRawExpectations(targetType, failedExpectations);
+		}
+
+		/// <summary>
+		/// Supports the serialization infrastructure.
+		/// </summary>
+		protected MockVerificationException(
+		  System.Runtime.Serialization.SerializationInfo info,
+		  System.Runtime.Serialization.StreamingContext context)
+			: base(info, context)
+		{
+		}
+	}
+
 }

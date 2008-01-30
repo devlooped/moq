@@ -24,8 +24,10 @@ namespace Moq.Tests
 			//exercise
 			order.Fill(mock.Object);
 
-			//verify
+			//verify state
 			Assert.IsTrue(order.IsFilled);
+			//verify interaction
+			mock.VerifyAll();
 		}
 
 		public void FillingDoesNotRemoveIfNotEnoughInStock()

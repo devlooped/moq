@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Reflection;
 using Castle.Core.Interceptor;
+using System.Linq.Expressions;
 
 namespace Moq
 {
@@ -13,11 +14,13 @@ namespace Moq
 	internal class Interceptor : MarshalByRefObject, IInterceptor
 	{
 		MockBehavior behavior;
+		Type targetType;
 		Dictionary<string, IProxyCall> calls = new Dictionary<string, IProxyCall>();
 
-		public Interceptor(MockBehavior behavior)
+		public Interceptor(MockBehavior behavior, Type targetType)
 		{
 			this.behavior = behavior;
+			this.targetType = targetType;
 		}
 
 		internal void Verify()
@@ -32,20 +35,16 @@ namespace Moq
 
 		private void VerifyOrThrow(Predicate<IProxyCall> match)
 		{
-			var failures = new List<IProxyCall>();
+			var failures = new List<Expression>();
 			foreach (var call in calls.Values)
 			{
 				if (match(call))
-					failures.Add(call);
+					failures.Add(call.ExpectExpression);
 			}
 
 			if (failures.Count > 0)
 			{
-				throw new MockException(MockException.ExceptionReason.VerificationFailed,
-					String.Format(Properties.Resources.VerficationFailed, 
-						String.Join("\r\n", 
-						failures.ConvertAll(call => call.ExpectExpression.ToString()).ToArray())
-					));
+				throw new MockVerificationException(this.targetType, failures);
 			}
 		}
 

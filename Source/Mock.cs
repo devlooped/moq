@@ -8,6 +8,23 @@ using Castle.Core.Interceptor;
 namespace Moq
 {
 	/// <summary>
+	/// Base class for <see cref="Mock{T}"/> that provides the 
+	/// signature for the verify methods.
+	/// </summary>
+	public abstract class Mock
+	{
+		/// <summary>
+		/// See <see cref="Mock{T}.Verify"/>.
+		/// </summary>
+		public abstract void Verify();
+
+		/// <summary>
+		/// See <see cref="Mock{T}.VerifyAll"/>.
+		/// </summary>
+		public abstract void VerifyAll();
+	}
+
+	/// <summary>
 	/// Provides a mock implementation of <typeparamref name="T"/>.
 	/// </summary>
 	/// <typeparam name="T">Type to mock, which can be an interface or a class.</typeparam>
@@ -63,12 +80,14 @@ namespace Moq
 	/// Assert.IsFalse(order.IsFilled);
 	/// </code>
 	/// </example>
-	public class Mock<T> where T : class
+	public class Mock<T> : Mock
+		where T : class
 	{
 		static readonly ProxyGenerator generator = new ProxyGenerator();
 		Interceptor interceptor;
 		T instance;
 		RemotingProxy remotingProxy;
+		MockBehavior behavior;
 
 		/// <summary>
 		/// Initializes an instance of the mock with a specific <see cref="MockBehavior">behavior</see> with 
@@ -76,7 +95,7 @@ namespace Moq
 		/// </summary>
 		/// <remarks>
 		/// The mock will try to find the best match constructor given the constructor arguments, and invoke that 
-		/// to initialize the instance. This applies only for classes, not interfaces.
+		/// to initialize the instance. This applies only to classes, not interfaces.
 		/// <para>
 		/// <b>Note:</b> For a <see cref="MarshalByRefObject"/> derived class, any calls done in the constructor itself 
 		/// will not go through the proxied mock and will instead be direct invocations in the underlying 
@@ -90,7 +109,8 @@ namespace Moq
 		{
 			if (args == null) args = new object[0];
 
-			interceptor = new Interceptor(behavior);
+			this.behavior = behavior;
+			interceptor = new Interceptor(behavior, typeof(T));
 
 			try
 			{
@@ -180,6 +200,11 @@ namespace Moq
 			}
 		}
 
+		/// <devdoc>
+		/// Used for testing the mock factory.
+		/// </devdoc>
+		internal MockBehavior Behavior { get { return behavior; } }
+
 		/// <summary>
 		/// Sets an expectation on the mocked type for a call to 
 		/// to a void method.
@@ -243,7 +268,7 @@ namespace Moq
 		/// </code>
 		/// </example>
 		/// <exception cref="MockException">Not all verifiable expectations were met.</exception>
-		public void Verify()
+		public override void Verify()
 		{
 			try
 			{
@@ -278,7 +303,7 @@ namespace Moq
 		/// </code>
 		/// </example>
 		/// <exception cref="MockException">At least one expectation was not met.</exception>
-		public void VerifyAll()
+		public override void VerifyAll()
 		{
 			try
 			{
@@ -354,23 +379,6 @@ namespace Moq
 					String.Format(Properties.Resources.ExpectationOnNonOverridableMember,
 					expectation.ToString()));
 		}
-
-		class Hook : IProxyGenerationHook
-		{
-			public void MethodsInspected()
-			{
-			}
-
-			public void NonVirtualMemberNotification(Type type, MemberInfo memberInfo)
-			{
-			}
-
-			public bool ShouldInterceptMethod(Type type, MethodInfo memberInfo)
-			{
-				return true;
-			}
-		}
-
 
 		// NOTE: known issue. See https://connect.microsoft.com/VisualStudio/feedback/ViewFeedback.aspx?FeedbackID=318122
 		//public static implicit operator TInterface(Mock<TInterface> mock)
