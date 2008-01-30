@@ -17,83 +17,75 @@ namespace Moq
 	/// mock can become repetitive and tedious.
 	/// <para>
 	/// This factory class helps in that scenario by providing a 
-	/// disposable object that simplifies creation of multiple 
-	/// mocks with the exact same <see cref="MockBehavior"/> and 
-	/// posterior verification (which happens at factory dispose 
-	/// time).
+	/// simplified creation of multiple mocks with the exact same 
+	/// <see cref="MockBehavior"/> and posterior verification.
 	/// </para>
 	/// </remarks>
 	/// <example>
 	/// The following is a straightforward example on how to 
 	/// create and automatically verify strict mocks:
 	/// <code>
-	/// using (var factory = new MockFactory(MockBehavior.Strict, MockVerification.All))
-	/// {
-	/// 	var foo = factory.Create&lt;IFoo&gt;();
-	/// 	var bar = factory.Create&lt;IBar&gt;();
+	/// var factory = new MockFactory(MockBehavior.Strict);
 	/// 
-	///		// no need to call Verifiable() on the expectation 
-	///		// as we'll be validating all expectations anyway.
-	/// 	foo.Expect(f => f.Do());
-	/// 	bar.Expect(b => b.Redo());
+	/// var foo = factory.Create&lt;IFoo&gt;();
+	/// var bar = factory.Create&lt;IBar&gt;();
 	/// 
-	///		// exercise the mocks here
-	/// } 
+	///	// no need to call Verifiable() on the expectation 
+	///	// as we'll be validating all expectations anyway.
+	/// foo.Expect(f => f.Do());
+	/// bar.Expect(b => b.Redo());
+	/// 
+	///	// exercise the mocks here
+	/// 
+	/// factory.VerifyAll(); 
 	/// // At this point all expectations are already checked 
 	/// // and an optional MockException might be thrown. 
 	/// // Note also that because the mocks are strict, any invocation 
 	/// // that doesn't have a matching expectation will also throw a MockException.
 	/// </code>
 	/// The following examples shows how to setup the factory 
-	/// to create loose mocks that are automatically verified 
-	/// (only for their verifiable expectations) when the test 
-	/// finishes:
+	/// to create loose mocks and later verify only verifiable expectations:
 	/// <code>
-	/// using (var factory = new MockFactory(MockBehavior.Loose, MockVerification.Verifiable))
-	/// {
-	/// 	var foo = factory.Create&lt;IFoo&gt;();
-	/// 	var bar = factory.Create&lt;IBar&gt;();
+	/// var factory = new MockFactory(MockBehavior.Loose);
 	/// 
-	///     // this expectation will be verified at the end of the "using" block
-	/// 	foo.Expect(f => f.Do()).Verifiable();
-	/// 	
-	///     // this expectation will NOT be verified 
-	/// 	foo.Expect(f => f.Calculate());
-	/// 	
-	///     // this expectation will be verified at the end of the "using" block
-	/// 	bar.Expect(b => b.Redo()).Verifiable();
+	/// var foo = factory.Create&lt;IFoo&gt;();
+	/// var bar = factory.Create&lt;IBar&gt;();
 	/// 
-	///		// exercise the mocks here
-	///		// note that because the mocks are Loose, members 
-	///		// called in the interfaces for which no matching
-	///		// expectations exist will NOT throw exceptions, 
-	///		// and will rather return default values.
-	///		
-	/// } 
+	/// // this expectation will be verified at the end of the "using" block
+	/// foo.Expect(f => f.Do()).Verifiable();
+	/// 	
+	/// // this expectation will NOT be verified 
+	/// foo.Expect(f => f.Calculate());
+	/// 	
+	/// // this expectation will be verified at the end of the "using" block
+	/// bar.Expect(b => b.Redo()).Verifiable();
+	/// 
+	///	// exercise the mocks here
+	///	// note that because the mocks are Loose, members 
+	///	// called in the interfaces for which no matching
+	///	// expectations exist will NOT throw exceptions, 
+	///	// and will rather return default values.
+	///	
+	/// factory.Verify();
 	/// // At this point verifiable expectations are already checked 
 	/// // and an optional MockException might be thrown.
 	/// </code>
 	/// </example>
-	/// <seealso cref="MockVerification"/>
 	/// <seealso cref="MockBehavior"/>
-	public sealed class MockFactory : IDisposable
+	public sealed class MockFactory
 	{
 		List<IVerifiable> mocks = new List<IVerifiable>();
 		MockBehavior behavior;
-		MockVerification verification;
 
 		/// <summary>
 		/// Initializes the factory with the given <paramref name="behavior"/> 
-		/// and <paramref name="verification"/> parameters for newly 
-		/// created mocks from the factory.
+		/// for newly created mocks from the factory.
 		/// </summary>
 		/// <param name="behavior">The behavior to use for mocks created 
 		/// using the <see cref="Create{T}()"/> factory method</param>
-		/// <param name="verification">How to verify mocks when the factory is disposed.</param>
-		public MockFactory(MockBehavior behavior, MockVerification verification)
+		public MockFactory(MockBehavior behavior)
 		{
 			this.behavior = behavior;
-			this.verification = verification;
 		}
 
 		/// <summary>
@@ -150,27 +142,36 @@ namespace Moq
 		}
 
 		/// <summary>
-		/// Disposes the factory, optionally causing all mocks 
-		/// to be verified according to the <see cref="MockVerification"/> 
-		/// behavior specified at construction time.
+		/// Verifies all verifiable expectations on all mocks created 
+		/// by this factory.
 		/// </summary>
-		public void Dispose()
+		/// <seealso cref="Mock{T}.Verify"/>
+		/// <exception cref="MockException">One or more mocks had expectations that were not satisfied.</exception>
+		public void Verify()
 		{
-			if (verification == MockVerification.None) return;
+			VerifyImpl(verifiable => verifiable.Verify());
+		}
 
-			Action<IVerifiable> verify;
-			if (verification == MockVerification.All)
-				verify = mock => mock.VerifyAll();
-			else
-				verify = mock => mock.Verify();
+		/// <summary>
+		/// Verifies all verifiable expectations on all mocks created 
+		/// by this factory.
+		/// </summary>
+		/// <seealso cref="Mock{T}.Verify"/>
+		/// <exception cref="MockException">One or more mocks had expectations that were not satisfied.</exception>
+		public void VerifyAll()
+		{
+			VerifyImpl(verifiable => verifiable.VerifyAll());
+		}
 
+		private void VerifyImpl(Action<IVerifiable> verifyAction)
+		{
 			StringBuilder message = new StringBuilder();
 
 			foreach (var mock in mocks)
 			{
 				try
 				{
-					verify(mock);
+					verifyAction(mock);
 				}
 				catch (MockVerificationException mve)
 				{

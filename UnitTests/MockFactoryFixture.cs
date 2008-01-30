@@ -13,7 +13,7 @@ namespace Moq.Tests
 		[Test]
 		public void ShouldCreateFactoryWithMockBehaviorAndVerificationBehavior()
 		{
-			var factory = new MockFactory(MockBehavior.Loose, MockVerification.All);
+			var factory = new MockFactory(MockBehavior.Loose);
 
 			Assert.IsNotNull(factory);
 		}
@@ -21,7 +21,7 @@ namespace Moq.Tests
 		[Test]
 		public void ShouldCreateMocksWithFactoryBehavior()
 		{
-			var factory = new MockFactory(MockBehavior.Loose, MockVerification.All);
+			var factory = new MockFactory(MockBehavior.Loose);
 
 			var mock = factory.Create<IFormatProvider>();
 
@@ -31,7 +31,7 @@ namespace Moq.Tests
 		[Test]
 		public void ShouldCreateMockWithConstructorArgs()
 		{
-			var factory = new MockFactory(MockBehavior.Loose, MockVerification.All);
+			var factory = new MockFactory(MockBehavior.Loose);
 
 			var mock = factory.Create<BaseClass>("foo");
 
@@ -39,18 +39,16 @@ namespace Moq.Tests
 		}
 
 		[Test]
-		public void ShouldDisposeFactoryVerifyAll()
+		public void ShouldVerifyAll()
 		{
 			try
 			{
-				using (var factory = new MockFactory(MockBehavior.Default, MockVerification.All))
-				{
-					var mock = factory.Create<ICloneable>();
+				var factory = new MockFactory(MockBehavior.Default);
+				var mock = factory.Create<ICloneable>();
 
-					mock.Expect(cloneable => cloneable.Clone());
-				}
+				mock.Expect(cloneable => cloneable.Clone());
 
-				Assert.Fail("Should have thrown");
+				factory.VerifyAll();
 			}
 			catch (MockException mex)
 			{
@@ -59,27 +57,17 @@ namespace Moq.Tests
 		}
 
 		[Test]
-		public void ShouldDisposeFactoryVerifyVerifiables()
+		public void ShouldVerifyVerifiables()
 		{
-			// Should not fail
-			using (var factory = new MockFactory(MockBehavior.Default, MockVerification.Verifiable))
-			{
-				var mock = factory.Create<ICloneable>();
-				// non verifiable
-				mock.Expect(cloneable => cloneable.Clone());
-			}
-
 			try
 			{
-				using (var factory = new MockFactory(MockBehavior.Default, MockVerification.Verifiable))
-				{
-					var mock = factory.Create<IFoo>();
+				var factory = new MockFactory(MockBehavior.Default);
+				var mock = factory.Create<IFoo>();
 
-					mock.Expect(foo => foo.Do());
-					mock.Expect(foo => foo.Undo()).Verifiable();
-				}
+				mock.Expect(foo => foo.Do());
+				mock.Expect(foo => foo.Undo()).Verifiable();
 
-				Assert.Fail("Should have thrown");
+				factory.Verify();
 			}
 			catch (MockException mex)
 			{
@@ -90,18 +78,18 @@ namespace Moq.Tests
 		}
 
 		[Test]
-		public void ShouldDisposeAggregateFailures()
+		public void ShouldAggregateFailures()
 		{
 			try
 			{
-				using (var factory = new MockFactory(MockBehavior.Loose, MockVerification.All))
-				{
-					var foo = factory.Create<IFoo>();
-					var bar = factory.Create<IBar>();
+				var factory = new MockFactory(MockBehavior.Loose);
+				var foo = factory.Create<IFoo>();
+				var bar = factory.Create<IBar>();
 
-					foo.Expect(f => f.Do());
-					bar.Expect(b => b.Redo());
-				}
+				foo.Expect(f => f.Do());
+				bar.Expect(b => b.Redo());
+
+				factory.VerifyAll();
 			}
 			catch (MockException mex)
 			{
