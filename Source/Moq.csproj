@@ -62,6 +62,7 @@
     <Compile Include="Interceptor.cs" />
     <Compile Include="IProxyCall.cs" />
     <Compile Include="It.cs" />
+    <Compile Include="IVerifiable.cs" />
     <Compile Include="MatcherAttribute.cs" />
     <Compile Include="MatcherFactory.cs" />
     <Compile Include="Matchers\AnyMatcher.cs" />

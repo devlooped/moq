@@ -78,7 +78,7 @@ namespace Moq
 	/// <seealso cref="MockBehavior"/>
 	public sealed class MockFactory : IDisposable
 	{
-		List<Mock> mocks = new List<Mock>();
+		List<IVerifiable> mocks = new List<IVerifiable>();
 		MockBehavior behavior;
 		MockVerification verification;
 
@@ -158,7 +158,7 @@ namespace Moq
 		{
 			if (verification == MockVerification.None) return;
 
-			Action<Mock> verify;
+			Action<IVerifiable> verify;
 			if (verification == MockVerification.All)
 				verify = mock => mock.VerifyAll();
 			else

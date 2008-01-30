@@ -8,23 +8,6 @@ using Castle.Core.Interceptor;
 namespace Moq
 {
 	/// <summary>
-	/// Base class for <see cref="Mock{T}"/> that provides the 
-	/// signature for the verify methods.
-	/// </summary>
-	public abstract class Mock
-	{
-		/// <summary>
-		/// See <see cref="Mock{T}.Verify"/>.
-		/// </summary>
-		public abstract void Verify();
-
-		/// <summary>
-		/// See <see cref="Mock{T}.VerifyAll"/>.
-		/// </summary>
-		public abstract void VerifyAll();
-	}
-
-	/// <summary>
 	/// Provides a mock implementation of <typeparamref name="T"/>.
 	/// </summary>
 	/// <typeparam name="T">Type to mock, which can be an interface or a class.</typeparam>
@@ -80,7 +63,7 @@ namespace Moq
 	/// Assert.IsFalse(order.IsFilled);
 	/// </code>
 	/// </example>
-	public class Mock<T> : Mock
+	public class Mock<T> : IVerifiable
 		where T : class
 	{
 		static readonly ProxyGenerator generator = new ProxyGenerator();
@@ -268,7 +251,7 @@ namespace Moq
 		/// </code>
 		/// </example>
 		/// <exception cref="MockException">Not all verifiable expectations were met.</exception>
-		public override void Verify()
+		public void Verify()
 		{
 			try
 			{
@@ -303,7 +286,7 @@ namespace Moq
 		/// </code>
 		/// </example>
 		/// <exception cref="MockException">At least one expectation was not met.</exception>
-		public override void VerifyAll()
+		public void VerifyAll()
 		{
 			try
 			{
