@@ -1,3 +1,6 @@
+Version 1.5
+    * Added MockFactory to allow easy construction of multiple mocks with the same behavior and verification  
+
 Version 1.4
 
     * Added support for passing constructor arguments for mocked classes.
