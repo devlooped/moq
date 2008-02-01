@@ -93,7 +93,7 @@ namespace Moq
 		/// mock.Expect(x => x.Execute("ping")).Returns(true);
 		/// </code>
 		/// </example>
-		void Returns(TResult value);
+        ICallReturn<TResult> Returns(TResult value);
 		/// <summary>
 		/// Specifies a function that will calculate the value to return from the method.
 		/// </summary>
@@ -108,7 +108,7 @@ namespace Moq
 		/// is executed and the value the <c>returnValues</c> array has at 
 		/// that moment.
 		/// </example>
-		void Returns(Func<TResult> valueFunction);
+        ICallReturn<TResult> Returns(Func<TResult> valueFunction);
 
         /// <summary>
         /// Specifies a function that will calculate the value to return from the method. 
@@ -125,7 +125,7 @@ namespace Moq
         /// is executed and the value the <c>returnValues</c> array has at 
         /// that moment.
         /// </example>
-        void Returns<T1, T2, T3, T4>(Func<T1, T2, T3, T4, TResult> valueFunction);
+        ICallReturn<TResult> Returns<T1, T2, T3, T4>(Func<T1, T2, T3, T4, TResult> valueFunction);
 
 		/// <summary>
 		/// Specifies a callback to invoke when the method is called.

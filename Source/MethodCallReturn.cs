@@ -18,20 +18,23 @@ namespace Moq
 		{
 		}
 
-		public void Returns(Func<TResult> valueExpression)
+        public ICallReturn<TResult> Returns(Func<TResult> valueExpression)
 		{
             SetReturnDelegate(valueExpression);
 			//this.valueFunc = valueExpression;
+            return this;
 		}
 
-        public void Returns<T1, T2, T3, T4>(Func<T1, T2, T3, T4, TResult> valueExpression)
+        public ICallReturn<TResult> Returns<T1, T2, T3, T4>(Func<T1, T2, T3, T4, TResult> valueExpression)
         {
             SetReturnDelegate(valueExpression);
+            return this;
         }
 
-		public void Returns(TResult value)
+        public ICallReturn<TResult> Returns(TResult value)
 		{
             Returns(() => value);
+            return this;
 		}
 
 		public new ICallReturn<TResult> Callback(Action callback)
