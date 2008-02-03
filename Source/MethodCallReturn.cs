@@ -25,12 +25,6 @@ namespace Moq
             return this;
 		}
 
-        public ICallReturn<TResult> Returns<T1, T2, T3, T4>(Func<T1, T2, T3, T4, TResult> valueExpression)
-        {
-            SetReturnDelegate(valueExpression);
-            return this;
-        }
-
         public ICallReturn<TResult> Returns(TResult value)
 		{
             Returns(() => value);
@@ -63,11 +57,6 @@ namespace Moq
                 call.ReturnValue = valueDel.DynamicInvoke(call.Arguments); //will throw if parameters mismatch
             else
                 call.ReturnValue = valueDel.DynamicInvoke(); //so need this, for the user being able to still use parameterless way
-
-            //if (valueFunc != null)
-            //    call.ReturnValue = valueFunc();
-            //else
-            //    call.ReturnValue = value;
 		}
 	}
 }

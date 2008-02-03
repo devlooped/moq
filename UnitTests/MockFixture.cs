@@ -621,22 +621,6 @@ namespace Moq.Tests
 			var mock = new Mock<IFoo>(25, true);
 		}
 
-        [Test]
-        public void ShouldReceiveArgumentValuesOnReturns()
-        {
-            var mock = new Mock<MockWithMethodParameters>();
-
-            var s = "test";
-            var i = 1;
-            var o = new object();
-            var o1 = new object();
-
-            mock.Expect(ob => ob.GetSomething(It.IsAny<string>(), It.IsAny<int>(), It.IsAny<object>(), It.IsAny<object>()))
-                .Returns<string, int, object, object>((ps, pi, po, po1) => (ps == s) && (pi == i) && (po == o) && (po1 == o1));
-
-            Assert.IsTrue(mock.Object.GetSomething(s, i, o, o1));
-        }
-
 		// ShouldExpectPropertyWithIndexer
 		// ShouldReceiveArgumentValuesOnCallback
 		// ShouldReceiveArgumentValuesOnReturns

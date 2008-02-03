@@ -110,23 +110,6 @@ namespace Moq
 		/// </example>
         ICallReturn<TResult> Returns(Func<TResult> valueFunction);
 
-        /// <summary>
-        /// Specifies a function that will calculate the value to return from the method. 
-        /// The parameters of function will be populated with called method arguments.
-        /// </summary>
-        /// <param name="valueFunction">The function that will calculate the return value.</param>
-        /// <example>
-        /// Return a calculated value when the method is called:
-        /// <code>
-        /// mock.Expect(x => x.Execute("echo")).Returns((s) => s);
-        /// </code>
-        /// The lambda expression to retrieve the return value is lazy-executed, 
-        /// meaning that its value may change depending on the moment the method 
-        /// is executed and the value the <c>returnValues</c> array has at 
-        /// that moment.
-        /// </example>
-        ICallReturn<TResult> Returns<T1, T2, T3, T4>(Func<T1, T2, T3, T4, TResult> valueFunction);
-
 		/// <summary>
 		/// Specifies a callback to invoke when the method is called.
 		/// </summary>
