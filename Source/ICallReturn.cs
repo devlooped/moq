@@ -52,6 +52,40 @@ namespace Moq
 		/// </example>
 		ICall Callback(Action callback);
 		/// <summary>
+		/// Specifies a callback to invoke when the method is called that receives the original
+		/// arguments.
+		/// </summary>
+		/// <typeparam name="T">Argument type of the invoked method.</typeparam>
+		/// <param name="callback">Callback method to invoke.</param>
+		ICall Callback<T>(Action<T> callback);
+		/// <summary>
+		/// Specifies a callback to invoke when the method is called that receives the original
+		/// arguments.
+		/// </summary>
+		/// <typeparam name="T1">Type of the first argument of the invoked method.</typeparam>
+		/// <typeparam name="T2">Type of the second argument of the invoked method.</typeparam>
+		/// <param name="callback">Callback method to invoke.</param>
+		ICall Callback<T1, T2>(Action<T1, T2> callback);
+		/// <summary>
+		/// Specifies a callback to invoke when the method is called that receives the original
+		/// arguments.
+		/// </summary>
+		/// <typeparam name="T1">Type of the first argument of the invoked method.</typeparam>
+		/// <typeparam name="T2">Type of the second argument of the invoked method.</typeparam>
+		/// <typeparam name="T3">Type of the third argument of the invoked method.</typeparam>
+		/// <param name="callback">Callback method to invoke.</param>
+		ICall Callback<T1, T2, T3>(Action<T1, T2, T3> callback);
+		/// <summary>
+		/// Specifies a callback to invoke when the method is called that receives the original
+		/// arguments.
+		/// </summary>
+		/// <typeparam name="T1">Type of the first argument of the invoked method.</typeparam>
+		/// <typeparam name="T2">Type of the second argument of the invoked method.</typeparam>
+		/// <typeparam name="T3">Type of the third argument of the invoked method.</typeparam>
+		/// <typeparam name="T4">Type of the fourth argument of the invoked method.</typeparam>
+		/// <param name="callback">Callback method to invoke.</param>
+		ICall Callback<T1, T2, T3, T4>(Action<T1, T2, T3, T4> callback);
+		/// <summary>
 		/// Marks the expectation as verifiable, meaning that a call 
 		/// to <see cref="Mock{T}.Verify"/> will check if this particular 
 		/// expectation was met.
@@ -109,6 +143,36 @@ namespace Moq
 		/// that moment.
 		/// </example>
         ICallReturn<TResult> Returns(Func<TResult> valueFunction);
+		/// <summary>
+		/// Specifies a function that will calculate the value to return from the method.
+		/// </summary>
+		/// <typeparam name="T">Type of the argument of the invoked method.</typeparam>
+		/// <param name="valueFunction">The function that will calculate the return value.</param>
+		ICallReturn<TResult> Returns<T>(Func<T, TResult> valueFunction);
+		/// <summary>
+		/// Specifies a function that will calculate the value to return from the method.
+		/// </summary>
+		/// <typeparam name="T1">Type of the first argument of the invoked method.</typeparam>
+		/// <typeparam name="T2">Type of the second argument of the invoked method.</typeparam>
+		/// <param name="valueFunction">The function that will calculate the return value.</param>
+		ICallReturn<TResult> Returns<T1, T2>(Func<T1, T2, TResult> valueFunction);
+		/// <summary>
+		/// Specifies a function that will calculate the value to return from the method.
+		/// </summary>
+		/// <typeparam name="T1">Type of the first argument of the invoked method.</typeparam>
+		/// <typeparam name="T2">Type of the second argument of the invoked method.</typeparam>
+		/// <typeparam name="T3">Type of the third argument of the invoked method.</typeparam>
+		/// <param name="valueFunction">The function that will calculate the return value.</param>
+		ICallReturn<TResult> Returns<T1, T2, T3>(Func<T1, T2, T3, TResult> valueFunction);
+		/// <summary>
+		/// Specifies a function that will calculate the value to return from the method.
+		/// </summary>
+		/// <typeparam name="T1">Type of the first argument of the invoked method.</typeparam>
+		/// <typeparam name="T2">Type of the second argument of the invoked method.</typeparam>
+		/// <typeparam name="T3">Type of the third argument of the invoked method.</typeparam>
+		/// <typeparam name="T4">Type of the fourth argument of the invoked method.</typeparam>
+		/// <param name="valueFunction">The function that will calculate the return value.</param>
+		ICallReturn<TResult> Returns<T1, T2, T3, T4>(Func<T1, T2, T3, T4, TResult> valueFunction);
 
 		/// <summary>
 		/// Specifies a callback to invoke when the method is called.
@@ -125,6 +189,40 @@ namespace Moq
 		/// call you still can specify the return value.
 		/// </example>
 		new ICallReturn<TResult> Callback(Action callback);
+		/// <summary>
+		/// Specifies a callback to invoke when the method is called that receives the original
+		/// arguments.
+		/// </summary>
+		/// <typeparam name="T">Type of the argument of the invoked method.</typeparam>
+		/// <param name="callback">Callback method to invoke.</param>
+		new ICallReturn<TResult> Callback<T>(Action<T> callback);
+		/// <summary>
+		/// Specifies a callback to invoke when the method is called that receives the original
+		/// arguments.
+		/// </summary>
+		/// <typeparam name="T1">Type of the first argument of the invoked method.</typeparam>
+		/// <typeparam name="T2">Type of the second argument of the invoked method.</typeparam>
+		/// <param name="callback">Callback method to invoke.</param>
+		new ICallReturn<TResult> Callback<T1, T2>(Action<T1, T2> callback);
+		/// <summary>
+		/// Specifies a callback to invoke when the method is called that receives the original
+		/// arguments.
+		/// </summary>
+		/// <typeparam name="T1">Type of the first argument of the invoked method.</typeparam>
+		/// <typeparam name="T2">Type of the second argument of the invoked method.</typeparam>
+		/// <typeparam name="T3">Type of the third argument of the invoked method.</typeparam>
+		/// <param name="callback">Callback method to invoke.</param>
+		new ICallReturn<TResult> Callback<T1, T2, T3>(Action<T1, T2, T3> callback);
+		/// <summary>
+		/// Specifies a callback to invoke when the method is called that receives the original
+		/// arguments.
+		/// </summary>
+		/// <typeparam name="T1">Type of the first argument of the invoked method.</typeparam>
+		/// <typeparam name="T2">Type of the second argument of the invoked method.</typeparam>
+		/// <typeparam name="T3">Type of the third argument of the invoked method.</typeparam>
+		/// <typeparam name="T4">Type of the fourth argument of the invoked method.</typeparam>
+		/// <param name="callback">Callback method to invoke.</param>
+		new ICallReturn<TResult> Callback<T1, T2, T3, T4>(Action<T1, T2, T3, T4> callback);
 		/// <summary>
 		/// Marks the expectation as verifiable, meaning that a call 
 		/// to <see cref="Mock{T}.Verify"/> will check if this particular 

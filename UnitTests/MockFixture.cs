@@ -621,6 +621,184 @@ namespace Moq.Tests
 			var mock = new Mock<IFoo>(25, true);
 		}
 
+		[Test]
+		public void ShouldCallCallbackWithoutArgumentsForMethodCallWithArguments()
+		{
+			var mock = new Mock<IFoo>();
+			bool called = false;
+			mock.Expect(x => x.DoIt(It.IsAny<string>())).Callback(() => called = true);
+
+			mock.Object.DoIt("blah");
+			Assert.IsTrue(called);
+		}
+
+		[Test]
+		public void ShouldCallCallbackWithOneArgument()
+		{
+			var mock = new Mock<IFoo>();
+			string callbackArg = null;
+			mock.Expect(x => x.DoIt(It.IsAny<string>())).Callback((string s) => callbackArg = s);
+
+			mock.Object.DoIt("blah");
+			Assert.AreEqual("blah", callbackArg);
+		}
+
+		[Test]
+		public void ShouldCallCallbackWithTwoArguments()
+		{
+			var mock = new Mock<IFoo>();
+			string callbackArg1 = null;
+			string callbackArg2 = null;
+			mock.Expect(x => x.DoIt(It.IsAny<string>(), It.IsAny<string>()))
+				.Callback((string s1, string s2) => { callbackArg1 = s1; callbackArg2 = s2; });
+
+			mock.Object.DoIt("blah1", "blah2");
+			Assert.AreEqual("blah1", callbackArg1);
+			Assert.AreEqual("blah2", callbackArg2);
+		}
+
+		[Test]
+		public void ShouldCallCallbackWithThreeArguments()
+		{
+			var mock = new Mock<IFoo>();
+			string callbackArg1 = null;
+			string callbackArg2 = null;
+			string callbackArg3 = null;
+			mock.Expect(x => x.DoIt(It.IsAny<string>(), It.IsAny<string>(), It.IsAny<string>()))
+				.Callback((string s1, string s2, string s3) => { callbackArg1 = s1; callbackArg2 = s2; callbackArg3 = s3; });
+
+			mock.Object.DoIt("blah1", "blah2", "blah3");
+			Assert.AreEqual("blah1", callbackArg1);
+			Assert.AreEqual("blah2", callbackArg2);
+			Assert.AreEqual("blah3", callbackArg3);
+		}
+
+		[Test]
+		public void ShouldCallCallbackWithFourArguments()
+		{
+			var mock = new Mock<IFoo>();
+			string callbackArg1 = null;
+			string callbackArg2 = null;
+			string callbackArg3 = null;
+			string callbackArg4 = null;
+			mock.Expect(x => x.DoIt(It.IsAny<string>(), It.IsAny<string>(), It.IsAny<string>(), It.IsAny<string>()))
+				.Callback((string s1, string s2, string s3, string s4) => { callbackArg1 = s1; callbackArg2 = s2; callbackArg3 = s3; callbackArg4 = s4; });
+
+			mock.Object.DoIt("blah1", "blah2", "blah3", "blah4");
+			Assert.AreEqual("blah1", callbackArg1);
+			Assert.AreEqual("blah2", callbackArg2);
+			Assert.AreEqual("blah3", callbackArg3);
+			Assert.AreEqual("blah4", callbackArg4);
+		}
+
+		[Test]
+		public void ShouldCallCallbackWithOneArgumentForNonVoidMethod()
+		{
+			var mock = new Mock<IFoo>();
+			string callbackArg1 = null;
+			mock.Expect(x => x.Execute(It.IsAny<string>()))
+				.Callback((string s1) => callbackArg1 = s1)
+				.Returns("foo");
+
+			mock.Object.Execute("blah1");
+			Assert.AreEqual("blah1", callbackArg1);
+		}
+
+		[Test]
+		public void ShouldCallCallbackWithTwoArgumentsForNonVoidMethod()
+		{
+			var mock = new Mock<IFoo>();
+			string callbackArg1 = null;
+			string callbackArg2 = null;
+			mock.Expect(x => x.Execute(It.IsAny<string>(), It.IsAny<string>()))
+				.Callback((string s1, string s2) => { callbackArg1 = s1; callbackArg2 = s2; })
+				.Returns("foo");
+
+			mock.Object.Execute("blah1", "blah2");
+			Assert.AreEqual("blah1", callbackArg1);
+			Assert.AreEqual("blah2", callbackArg2);
+		}
+
+		[Test]
+		public void ShouldCallCallbackWithThreeArgumentsForNonVoidMethod()
+		{
+			var mock = new Mock<IFoo>();
+			string callbackArg1 = null;
+			string callbackArg2 = null;
+			string callbackArg3 = null;
+			mock.Expect(x => x.Execute(It.IsAny<string>(), It.IsAny<string>(), It.IsAny<string>()))
+				.Callback((string s1, string s2, string s3) => { callbackArg1 = s1; callbackArg2 = s2; callbackArg3 = s3; })
+				.Returns("foo");
+
+			mock.Object.Execute("blah1", "blah2", "blah3");
+			Assert.AreEqual("blah1", callbackArg1);
+			Assert.AreEqual("blah2", callbackArg2);
+			Assert.AreEqual("blah3", callbackArg3);
+		}
+
+		[Test]
+		public void ShouldCallCallbackWithFourArgumentsForNonVoidMethod()
+		{
+			var mock = new Mock<IFoo>();
+			string callbackArg1 = null;
+			string callbackArg2 = null;
+			string callbackArg3 = null;
+			string callbackArg4 = null;
+			mock.Expect(x => x.Execute(It.IsAny<string>(), It.IsAny<string>(), It.IsAny<string>(), It.IsAny<string>()))
+				.Callback((string s1, string s2, string s3, string s4) => { callbackArg1 = s1; callbackArg2 = s2; callbackArg3 = s3; callbackArg4 = s4; })
+				.Returns("foo");
+
+			mock.Object.Execute("blah1", "blah2", "blah3", "blah4");
+			Assert.AreEqual("blah1", callbackArg1);
+			Assert.AreEqual("blah2", callbackArg2);
+			Assert.AreEqual("blah3", callbackArg3);
+			Assert.AreEqual("blah4", callbackArg4);
+		}
+
+		[Test]
+		public void ShouldReturnUsingOneArgument()
+		{
+			var mock = new Mock<IFoo>();
+			mock.Expect(x => x.Execute(It.IsAny<string>()))
+				.Returns((string s) => s);
+
+			string result = mock.Object.Execute("blah1");
+			Assert.AreEqual("blah1", result);
+		}
+
+		[Test]
+		public void ShouldReturnUsingTwoArguments()
+		{
+			var mock = new Mock<IFoo>();
+			mock.Expect(x => x.Execute(It.IsAny<string>(), It.IsAny<string>()))
+				.Returns((string s1, string s2) => s1 + s2);
+
+			string result = mock.Object.Execute("blah1", "blah2");
+			Assert.AreEqual("blah1blah2", result);
+		}
+
+		[Test]
+		public void ShouldReturnUsingThreeArguments()
+		{
+			var mock = new Mock<IFoo>();
+			mock.Expect(x => x.Execute(It.IsAny<string>(), It.IsAny<string>(), It.IsAny<string>()))
+				.Returns((string s1, string s2, string s3) => s1 + s2 + s3);
+
+			string result = mock.Object.Execute("blah1", "blah2", "blah3");
+			Assert.AreEqual("blah1blah2blah3", result);
+		}
+
+		[Test]
+		public void ShouldReturnUsingFourArguments()
+		{
+			var mock = new Mock<IFoo>();
+			mock.Expect(x => x.Execute(It.IsAny<string>(), It.IsAny<string>(), It.IsAny<string>(), It.IsAny<string>()))
+				.Returns((string s1, string s2, string s3, string s4) => s1 + s2 + s3 + s4);
+
+			string result = mock.Object.Execute("blah1", "blah2", "blah3", "blah4");
+			Assert.AreEqual("blah1blah2blah3blah4", result);
+		}
+
 		// ShouldExpectPropertyWithIndexer
 		// ShouldReceiveArgumentValuesOnCallback
 		// ShouldReceiveArgumentValuesOnReturns
@@ -743,6 +921,10 @@ namespace Moq.Tests
 			int DoInt(int arg);
 			int Do1();
 			string Do2();
+			void DoIt(string arg);
+			void DoIt(string arg1, string arg2);
+			void DoIt(string arg1, string arg2, string arg3);
+			void DoIt(string arg1, string arg2, string arg3, string arg4);
 
 			int DoArgument(string arg);
 
@@ -751,6 +933,9 @@ namespace Moq.Tests
 
 			void Execute();
 			string Execute(string command);
+			string Execute(string arg1, string arg2);
+			string Execute(string arg1, string arg2, string arg3);
+			string Execute(string arg1, string arg2, string arg3, string arg4);
 			void Execute(string arg1, int arg2);
 
 			int ValueProperty { get; set; }

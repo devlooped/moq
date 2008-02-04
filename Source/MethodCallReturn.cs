@@ -31,7 +31,55 @@ namespace Moq
             return this;
 		}
 
+		public ICallReturn<TResult> Returns<T>(Func<T, TResult> valueExpression)
+		{
+			SetReturnDelegate(valueExpression);
+			return this;
+		}
+
+		public ICallReturn<TResult> Returns<T1, T2>(Func<T1, T2, TResult> valueExpression)
+		{
+			SetReturnDelegate(valueExpression);
+			return this;
+		}
+
+		public ICallReturn<TResult> Returns<T1, T2, T3>(Func<T1, T2, T3, TResult> valueExpression)
+		{
+			SetReturnDelegate(valueExpression);
+			return this;
+		}
+
+		public ICallReturn<TResult> Returns<T1, T2, T3, T4>(Func<T1, T2, T3, T4, TResult> valueExpression)
+		{
+			SetReturnDelegate(valueExpression);
+			return this;
+		}
+
 		public new ICallReturn<TResult> Callback(Action callback)
+		{
+			base.Callback(callback);
+			return this;
+		}
+
+		public new ICallReturn<TResult> Callback<T>(Action<T> callback)
+		{
+			base.Callback(callback);
+			return this;
+		}
+
+		public new ICallReturn<TResult> Callback<T1, T2>(Action<T1, T2> callback)
+		{
+			base.Callback(callback);
+			return this;
+		}
+
+		public new ICallReturn<TResult> Callback<T1, T2, T3>(Action<T1, T2, T3> callback)
+		{
+			base.Callback(callback);
+			return this;
+		}
+
+		public new ICallReturn<TResult> Callback<T1, T2, T3, T4>(Action<T1, T2, T3, T4> callback)
 		{
 			base.Callback(callback);
 			return this;

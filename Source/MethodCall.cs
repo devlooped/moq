@@ -12,7 +12,7 @@ namespace Moq
 		Expression originalExpression;
 		MethodInfo method;
 		Exception exception;
-		Action callback;
+		Action<object[]> callback;
 		IMatcher[] argumentMatchers;
 
 		public MethodCall(Expression originalExpression, MethodInfo method, params Expression[] arguments)
@@ -34,8 +34,37 @@ namespace Moq
 
 		public ICall Callback(Action callback)
 		{
-			this.callback = callback;
+			this.callback = delegate { callback(); };
 			return this;
+		}
+
+		public ICall Callback<T>(Action<T> callback)
+		{
+			SetCallbackWithArguments(callback);
+			return this;
+		}
+
+		public ICall Callback<T1, T2>(Action<T1, T2> callback)
+		{
+			SetCallbackWithArguments(callback);
+			return this;
+		}
+
+		public ICall Callback<T1, T2, T3>(Action<T1, T2, T3> callback)
+		{
+			SetCallbackWithArguments(callback);
+			return this;
+		}
+
+		public ICall Callback<T1, T2, T3, T4>(Action<T1, T2, T3, T4> callback)
+		{
+			SetCallbackWithArguments(callback);
+			return this;
+		}
+
+		private void SetCallbackWithArguments(Delegate callback)
+		{
+			this.callback = delegate(object[] args) { callback.DynamicInvoke(args); };
 		}
 
 		public ICall Verifiable()
@@ -67,7 +96,7 @@ namespace Moq
 			Invoked = true;
 
 			if (callback != null)
-				callback();
+				callback(call.Arguments);
 
 			if (exception != null)
 				throw exception;
