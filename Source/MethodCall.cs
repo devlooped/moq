@@ -19,8 +19,7 @@ namespace Moq
 		{
 			this.originalExpression = originalExpression;
 			this.method = method;
-			this.argumentMatchers = (from expr in arguments
-							   select MatcherFactory.CreateMatcher(expr)).ToArray();
+			this.argumentMatchers = arguments.Select(expr => MatcherFactory.CreateMatcher(expr)).ToArray();
 		}
 
 		public bool IsVerifiable { get; set; }
