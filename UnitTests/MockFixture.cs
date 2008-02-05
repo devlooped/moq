@@ -806,15 +806,6 @@ namespace Moq.Tests
 		// ShouldSupportByRefArguments?
 		// ShouldSupportOutArguments?
 
-        public class MockWithMethodParameters
-        {
-            public virtual bool GetSomething(string s, int i, object o, object o1)
-            {
-                return false;
-            }
-        }
-
-
 		public sealed class FooSealed { }
 		class FooService : IFooService { }
 		interface IFooService { }
