@@ -39,7 +39,7 @@ namespace Moq
 			foreach (var call in calls.Values)
 			{
 				if (match(call))
-					failures.Add(call.ExpectExpression);
+					failures.Add(call.ExpectExpression.PartialEval());
 			}
 
 			if (failures.Count > 0)

@@ -458,6 +458,46 @@ namespace Moq.Tests
 		}
 
 		[Test]
+		public void ShouldThrowWithEvaluatedExpressionsIfVerifiableExpectationNotCalled()
+		{
+			var expectedArg = "lorem,ipsum";
+			var mock = new Mock<IFoo>();
+
+			mock.Expect(x => x.DoArgument(expectedArg.Substring(0,5))).Verifiable().Returns(5);
+
+			try
+			{
+				mock.Verify();
+				Assert.Fail("Should have thrown");
+			}
+			catch (MockException mex)
+			{
+				Assert.AreEqual(MockException.ExceptionReason.VerificationFailed, mex.Reason);
+				Assert.IsTrue(mex.Message.Contains(@".DoArgument(""lorem"")"), "Contains evaluated expected argument.");
+			}
+		}
+
+		[Test]
+		public void ShouldThrowExpressionsIfVerifiableExpectationWithLambdaMatcherNotCalled()
+		{
+			var mock = new Mock<IFoo>();
+
+			mock.Expect(x => x.DoArgument(It.Is<string>(s => string.IsNullOrEmpty(s))))
+				.Verifiable().Returns(5);
+
+			try
+			{
+				mock.Verify();
+				Assert.Fail("Should have thrown");
+			}
+			catch (MockException mex)
+			{
+				Assert.AreEqual(MockException.ExceptionReason.VerificationFailed, mex.Reason);
+				Assert.IsTrue(mex.Message.Contains(@".DoArgument(Is(s => IsNullOrEmpty(s)))"), "Contains evaluated expected argument.");
+			}
+		}
+
+		[Test]
 		public void ShouldNotThrowVerifyAndNoVerifiableExpectations()
 		{
 			var mock = new Mock<IFoo>();
