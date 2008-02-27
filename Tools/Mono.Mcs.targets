@@ -1,0 +1,80 @@
+<Project DefaultTargets="Build"
+         xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
+
+    <UsingTask TaskName="ICSharpCode.Build.Tasks.Mcs"
+               AssemblyFile="ICSharpCode.Build.Tasks.dll"/>
+    
+   <PropertyGroup>
+        <MSBuildAllProjects>$(MSBuildAllProjects);Mono.Mcs.targets</MSBuildAllProjects>
+        <DefaultLanguageSourceExtension>.cs</DefaultLanguageSourceExtension>
+        <Language>C#</Language>
+    </PropertyGroup>
+    
+    <Target Name="CreateManifestResourceNames"/>
+
+    <PropertyGroup>
+        <DebugSymbols Condition=" '$(DebugType)' == 'none' ">false</DebugSymbols>
+        <DebugType    Condition=" '$(DebugType)' == 'none' "></DebugType>    
+    </PropertyGroup>
+
+    <ItemGroup>
+        <DocFileItem Include="$(DocumentationFile)" Condition="'$(DocumentationFile)'!=''">
+            <InProject>false</InProject>
+        </DocFileItem>
+    </ItemGroup>
+
+    <PropertyGroup>
+        <CoreCompileDependsOn>_ComputeNonExistentFileProperty</CoreCompileDependsOn>
+    </PropertyGroup>
+    
+    <Target
+        Name="CoreCompile"
+        Inputs="$(MSBuildAllProjects);
+                @(Compile);
+                @(ManifestResourceWithNoCulture);
+                $(ApplicationIcon);
+                $(AssemblyOriginatorKeyFile);
+                @(ManifestNonResxWithNoCultureOnDisk);
+                @(ReferencePath);
+                @(CompiledLicenseFile)"
+        Outputs="@(DocFileItem);
+                 @(IntermediateAssembly);
+                 $(NonExistentFile)"
+        DependsOnTargets="$(CoreCompileDependsOn)"
+    >
+       
+        <Mcs
+              AdditionalLibPaths="$(AdditionalLibPaths)"
+              AddModules="@(AddModules)"
+              AllowUnsafeBlocks="$(AllowUnsafeBlocks)"
+              CheckForOverflowUnderflow="$(CheckForOverflowUnderflow)"
+              CodePage="$(CodePage)"
+              DebugType="$(DebugType)"
+              DefineConstants="$(DefineConstants)"
+              DelaySign="$(DelaySign)"
+              DisabledWarnings="$(NoWarn)"
+              DocumentationFile="@(DocFileItem)"
+              EmitDebugInformation="$(DebugSymbols)"
+              KeyContainer="$(KeyContainerName)"
+              KeyFile="$(KeyOriginatorFile)"
+              LangVersion="$(LangVersion)"
+              MainEntryPoint="$(StartupObject)"
+              NoConfig="true"
+              NoLogo="$(NoLogo)"
+              NoStandardLib="$(NoStdLib)"
+              Optimize="$(Optimize)"
+              OutputAssembly="@(IntermediateAssembly)"
+              References="@(ReferencePath)"
+              Resources="@(ManifestResourceWithNoCulture);@(ManifestNonResxWithNoCultureOnDisk);@(CompiledLicenseFile)"
+              ResponseFiles="$(CompilerResponseFile)"
+              Sources="@(Compile)"
+              TargetType="$(OutputType)"
+              ToolPath="$(McsToolPath)"
+              TreatWarningsAsErrors="$(TreatWarningsAsErrors)"
+              WarningLevel="$(WarningLevel)"
+              Win32Icon="$(ApplicationIcon)"
+              Win32Resource="$(Win32Resource)" />
+    </Target>
+    
+    <Import Project="$(MSBuildBinPath)\Microsoft.Common.targets" />
+</Project>
