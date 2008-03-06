@@ -106,7 +106,9 @@ namespace Moq
 
 			protected override Expression VisitMethodCall(MethodCallExpression m)
 			{
-				calls.Add(m);
+				// We only need to fix generic methods.
+				if (m.Method.IsGenericMethod)
+					calls.Add(m);
 
 				return base.VisitMethodCall(m);
 			}
