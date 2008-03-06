@@ -38,26 +38,6 @@ namespace Moq
 			ForEach<object>(source.OfType<object>(), action);
 		}
 
-		public static Expression StripQuotes(this Expression expression)
-		{
-			while (expression.NodeType == ExpressionType.Quote)
-			{
-				expression = ((UnaryExpression)expression).Operand;
-			}
-
-			return expression;
-		}
-
-		public static Expression PartialEval(this Expression expression)
-		{
-			return Evaluator.PartialEval(expression);
-		}
-
-		public static Expression CastTo<T>(this Expression expression)
-		{
-			return Expression.Convert(expression, typeof(T));
-		}
-
 		public static string Format(this IInvocation invocation)
 		{
 			return

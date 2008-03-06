@@ -50,7 +50,7 @@ namespace Moq
 
 		public void AddCall(IProxyCall call)
 		{
-			calls[call.ExpectExpression.ToString()] = call;
+			calls[call.ExpectExpression.ToStringFixed()] = call;
 		}
 
 		public void Intercept(IInvocation invocation)

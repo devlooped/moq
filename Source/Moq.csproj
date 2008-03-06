@@ -53,6 +53,7 @@
     <Reference Include="System.Xml" />
   </ItemGroup>
   <ItemGroup>
+    <Compile Include="ExpressionExtensions.cs" />
     <Compile Include="Extensions.cs" />
     <Compile Include="Evaluator.cs" />
     <Compile Include="ExpressionVisitor.cs" />

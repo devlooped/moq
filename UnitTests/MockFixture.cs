@@ -56,33 +56,33 @@ namespace Moq.Tests
 		{
 			var mock = new Mock<IFoo>();
 
-			mock.Expect(x => x.Do1()).Returns(1);
-			mock.Expect(x => x.Do2()).Returns("foo");
+			mock.Expect(x => x.DoReturnInt()).Returns(1);
+			mock.Expect(x => x.DoReturnString()).Returns("foo");
 
-			Assert.AreEqual(1, mock.Object.Do1());
-			Assert.AreEqual("foo", mock.Object.Do2());
+			Assert.AreEqual(1, mock.Object.DoReturnInt());
+			Assert.AreEqual("foo", mock.Object.DoReturnString());
 		}
 
 		[Test]
 		public void ShouldExpectCallWithArgument()
 		{
 			var mock = new Mock<IFoo>();
-			mock.Expect(x => x.DoInt(1)).Returns(11);
-			mock.Expect(x => x.DoInt(2)).Returns(22);
+			mock.Expect(x => x.DoIntArgReturnInt(1)).Returns(11);
+			mock.Expect(x => x.DoIntArgReturnInt(2)).Returns(22);
 
-			Assert.AreEqual(11, mock.Object.DoInt(1));
-			Assert.AreEqual(22, mock.Object.DoInt(2));
+			Assert.AreEqual(11, mock.Object.DoIntArgReturnInt(1));
+			Assert.AreEqual(22, mock.Object.DoIntArgReturnInt(2));
 		}
 
 		[Test]
 		public void ShouldExpectCallWithNullArgument()
 		{
 			var mock = new Mock<IFoo>();
-			mock.Expect(x => x.DoArgument(null)).Returns(1);
-			mock.Expect(x => x.DoArgument("foo")).Returns(2);
+			mock.Expect(x => x.DoStringArgReturnInt(null)).Returns(1);
+			mock.Expect(x => x.DoStringArgReturnInt("foo")).Returns(2);
 
-			Assert.AreEqual(1, mock.Object.DoArgument(null));
-			Assert.AreEqual(2, mock.Object.DoArgument("foo"));
+			Assert.AreEqual(1, mock.Object.DoStringArgReturnInt(null));
+			Assert.AreEqual(2, mock.Object.DoStringArgReturnInt("foo"));
 		}
 
 		[Test]
@@ -90,9 +90,9 @@ namespace Moq.Tests
 		{
 			int value = 25;
 			var mock = new Mock<IFoo>();
-			mock.Expect(x => x.DoArgument(null)).Returns(value);
+			mock.Expect(x => x.DoStringArgReturnInt(null)).Returns(value);
 
-			Assert.AreEqual(value, mock.Object.DoArgument(null));
+			Assert.AreEqual(value, mock.Object.DoStringArgReturnInt(null));
 		}
 
 		[Test]
@@ -100,14 +100,14 @@ namespace Moq.Tests
 		{
 			int a = 25;
 			var mock = new Mock<IFoo>();
-			mock.Expect(x => x.DoArgument(a.ToString())).Returns(() => a);
+			mock.Expect(x => x.DoStringArgReturnInt(a.ToString())).Returns(() => a);
 			a = 10;
 
-			Assert.AreEqual(10, mock.Object.DoArgument("10"));
+			Assert.AreEqual(10, mock.Object.DoStringArgReturnInt("10"));
 
 			a = 20;
 
-			Assert.AreEqual(20, mock.Object.DoArgument("20"));
+			Assert.AreEqual(20, mock.Object.DoStringArgReturnInt("20"));
 		}
 
 		[Test]
@@ -205,9 +205,9 @@ namespace Moq.Tests
 		{
 			var mock = new Mock<IFoo>();
 
-			mock.Expect(x => x.Do1()).Throws(new FormatException());
+			mock.Expect(x => x.DoReturnInt()).Throws(new FormatException());
 
-			mock.Object.Do1();
+			mock.Object.DoReturnInt();
 		}
 
 		[Test]
@@ -226,9 +226,9 @@ namespace Moq.Tests
 		{
 			var mock = new Mock<IFoo>();
 			bool called = false;
-			mock.Expect(x => x.Do1()).Callback(() => called = true).Returns(1);
+			mock.Expect(x => x.DoReturnInt()).Callback(() => called = true).Returns(1);
 
-			Assert.AreEqual(1, mock.Object.Do1());
+			Assert.AreEqual(1, mock.Object.DoReturnInt());
 			Assert.IsTrue(called);
 		}
 
@@ -237,15 +237,15 @@ namespace Moq.Tests
 		{
 			var mock = new Mock<IFoo>();
 
-			mock.Expect(x => x.DoInt(It.IsInRange(1, 5, Range.Inclusive))).Returns(1);
-			mock.Expect(x => x.DoInt(It.IsInRange(6, 10, Range.Exclusive))).Returns(2);
+			mock.Expect(x => x.DoIntArgReturnInt(It.IsInRange(1, 5, Range.Inclusive))).Returns(1);
+			mock.Expect(x => x.DoIntArgReturnInt(It.IsInRange(6, 10, Range.Exclusive))).Returns(2);
 
-			Assert.AreEqual(1, mock.Object.DoInt(1));
-			Assert.AreEqual(1, mock.Object.DoInt(2));
-			Assert.AreEqual(1, mock.Object.DoInt(5));
+			Assert.AreEqual(1, mock.Object.DoIntArgReturnInt(1));
+			Assert.AreEqual(1, mock.Object.DoIntArgReturnInt(2));
+			Assert.AreEqual(1, mock.Object.DoIntArgReturnInt(5));
 
-			Assert.AreEqual(2, mock.Object.DoInt(7));
-			Assert.AreEqual(2, mock.Object.DoInt(9));
+			Assert.AreEqual(2, mock.Object.DoIntArgReturnInt(7));
+			Assert.AreEqual(2, mock.Object.DoIntArgReturnInt(9));
 		}
 
 		[ExpectedException(typeof(MockException))]
@@ -254,11 +254,11 @@ namespace Moq.Tests
 		{
 			var mock = new Mock<IFoo>();
 
-			mock.Expect(x => x.DoInt(It.IsInRange(1, 5, Range.Exclusive))).Returns(1);
+			mock.Expect(x => x.DoIntArgReturnInt(It.IsInRange(1, 5, Range.Exclusive))).Returns(1);
 
-			Assert.AreEqual(1, mock.Object.DoInt(2));
+			Assert.AreEqual(1, mock.Object.DoIntArgReturnInt(2));
 
-			int throwHere = mock.Object.DoInt(1);
+			int throwHere = mock.Object.DoIntArgReturnInt(1);
 		}
 
 		[Test]
@@ -267,9 +267,9 @@ namespace Moq.Tests
 			var mock = new Mock<IFoo>();
 			var from = 1;
 
-			mock.Expect(x => x.DoInt(It.IsInRange(from, GetToRange(), Range.Inclusive))).Returns(1);
+			mock.Expect(x => x.DoIntArgReturnInt(It.IsInRange(from, GetToRange(), Range.Inclusive))).Returns(1);
 
-			Assert.AreEqual(1, mock.Object.DoInt(1));
+			Assert.AreEqual(1, mock.Object.DoIntArgReturnInt(1));
 		}
 
 		[Test]
@@ -279,13 +279,13 @@ namespace Moq.Tests
 			var from = "a";
 			var to = "d";
 
-			mock.Expect(x => x.DoArgument(It.IsInRange(from, to, Range.Inclusive))).Returns(1);
+			mock.Expect(x => x.DoStringArgReturnInt(It.IsInRange(from, to, Range.Inclusive))).Returns(1);
 
-			Assert.AreEqual(1, mock.Object.DoArgument("b"));
+			Assert.AreEqual(1, mock.Object.DoStringArgReturnInt("b"));
 
 			from = "c";
 
-			Assert.AreEqual(default(int), mock.Object.DoArgument("b"));
+			Assert.AreEqual(default(int), mock.Object.DoStringArgReturnInt("b"));
 		}
 
 		[Test]
@@ -294,18 +294,18 @@ namespace Moq.Tests
 			var mock = new Mock<IFoo>(MockBehavior.Loose);
 			var reg = "[a-d]+";
 
-			mock.Expect(x => x.DoArgument(It.IsRegex(reg))).Returns(1);
-			mock.Expect(x => x.DoArgument(It.IsRegex(reg, RegexOptions.IgnoreCase))).Returns(2);
+			mock.Expect(x => x.DoStringArgReturnInt(It.IsRegex(reg))).Returns(1);
+			mock.Expect(x => x.DoStringArgReturnInt(It.IsRegex(reg, RegexOptions.IgnoreCase))).Returns(2);
 
-			Assert.AreEqual(1, mock.Object.DoArgument("b"));
-			Assert.AreEqual(1, mock.Object.DoArgument("abc"));
-			Assert.AreEqual(2, mock.Object.DoArgument("B"));
-			Assert.AreEqual(2, mock.Object.DoArgument("BC"));
+			Assert.AreEqual(1, mock.Object.DoStringArgReturnInt("b"));
+			Assert.AreEqual(1, mock.Object.DoStringArgReturnInt("abc"));
+			Assert.AreEqual(2, mock.Object.DoStringArgReturnInt("B"));
+			Assert.AreEqual(2, mock.Object.DoStringArgReturnInt("BC"));
 
 			reg = "[c-d]+";
 
 			// Will not match neither the 1 and 2 return values we had.
-			Assert.AreEqual(default(int), mock.Object.DoArgument("b"));
+			Assert.AreEqual(default(int), mock.Object.DoStringArgReturnInt("b"));
 		}
 
 		[Test]
@@ -341,9 +341,9 @@ namespace Moq.Tests
 		{
 			var mock = new Mock<IFoo>();
 
-			mock.Expect(x => x.DoInt(It.Is<int>(i => i % 2 == 0))).Returns(1);
+			mock.Expect(x => x.DoIntArgReturnInt(It.Is<int>(i => i % 2 == 0))).Returns(1);
 
-			Assert.AreEqual(1, mock.Object.DoInt(2));
+			Assert.AreEqual(1, mock.Object.DoIntArgReturnInt(2));
 		}
 
 		[Test]
@@ -444,7 +444,7 @@ namespace Moq.Tests
 		{
 			var mock = new Mock<IFoo>();
 
-			mock.Expect(x => x.Do1()).Verifiable().Returns(5);
+			mock.Expect(x => x.DoReturnInt()).Verifiable().Returns(5);
 
 			try
 			{
@@ -463,7 +463,7 @@ namespace Moq.Tests
 			var expectedArg = "lorem,ipsum";
 			var mock = new Mock<IFoo>();
 
-			mock.Expect(x => x.DoArgument(expectedArg.Substring(0,5))).Verifiable().Returns(5);
+			mock.Expect(x => x.DoStringArgReturnInt(expectedArg.Substring(0,5))).Verifiable().Returns(5);
 
 			try
 			{
@@ -473,7 +473,7 @@ namespace Moq.Tests
 			catch (MockException mex)
 			{
 				Assert.AreEqual(MockException.ExceptionReason.VerificationFailed, mex.Reason);
-				Assert.IsTrue(mex.Message.Contains(@".DoArgument(""lorem"")"), "Contains evaluated expected argument.");
+				Assert.IsTrue(mex.Message.Contains(@".DoStringArgReturnInt(""lorem"")"), "Contains evaluated expected argument.");
 			}
 		}
 
@@ -482,7 +482,7 @@ namespace Moq.Tests
 		{
 			var mock = new Mock<IFoo>();
 
-			mock.Expect(x => x.DoArgument(It.Is<string>(s => string.IsNullOrEmpty(s))))
+			mock.Expect(x => x.DoStringArgReturnInt(It.Is<string>(s => string.IsNullOrEmpty(s))))
 				.Verifiable().Returns(5);
 
 			try
@@ -493,7 +493,7 @@ namespace Moq.Tests
 			catch (MockException mex)
 			{
 				Assert.AreEqual(MockException.ExceptionReason.VerificationFailed, mex.Reason);
-				Assert.IsTrue(mex.Message.Contains(@".DoArgument(Is(s => IsNullOrEmpty(s)))"), "Contains evaluated expected argument.");
+				Assert.IsTrue(mex.Message.Contains(@".DoStringArgReturnInt(Is(s => IsNullOrEmpty(s)))"), "Contains evaluated expected argument.");
 			}
 		}
 
@@ -510,7 +510,7 @@ namespace Moq.Tests
 		{
 			var mock = new Mock<IFoo>();
 
-			mock.Expect(x => x.Do1()).Returns(1);
+			mock.Expect(x => x.DoReturnInt()).Returns(1);
 
 			try
 			{
@@ -528,9 +528,9 @@ namespace Moq.Tests
 		{
 			var mock = new Mock<IFoo>();
 
-			mock.Expect(x => x.Do1());
-			mock.Expect(x => x.Do2());
-			mock.Expect(x => x.DoArgument("Hello World"));
+			mock.Expect(x => x.DoReturnInt());
+			mock.Expect(x => x.DoReturnString());
+			mock.Expect(x => x.DoStringArgReturnInt("Hello World"));
 
 			try
 			{
@@ -539,9 +539,9 @@ namespace Moq.Tests
 			}
 			catch (Exception ex)
 			{
-				Assert.That(ex.Message.Contains("x => x.Do1()"));
-				Assert.That(ex.Message.Contains("x => x.Do2()"));
-				Assert.That(ex.Message.Contains("x => x.DoArgument(\"Hello World\")"));
+				Assert.That(ex.Message.Contains("x => x.DoReturnInt()"));
+				Assert.That(ex.Message.Contains("x => x.DoReturnString()"));
+				Assert.That(ex.Message.Contains("x => x.DoStringArgReturnInt(\"Hello World\")"));
 			} 
 		}
 
@@ -565,13 +565,13 @@ namespace Moq.Tests
 		{
 			var mock = new Mock<IFoo>();
 
-			mock.Expect(x => x.Do1()).Returns(5);
+			mock.Expect(x => x.DoReturnInt()).Returns(5);
 
-			Assert.AreEqual(5, mock.Object.Do1());
+			Assert.AreEqual(5, mock.Object.DoReturnInt());
 
-			mock.Expect(x => x.Do1()).Returns(10);
+			mock.Expect(x => x.DoReturnInt()).Returns(10);
 
-			Assert.AreEqual(10, mock.Object.Do1());
+			Assert.AreEqual(10, mock.Object.DoReturnInt());
 		}
 
 		[Test]
@@ -666,9 +666,9 @@ namespace Moq.Tests
 		{
 			var mock = new Mock<IFoo>();
 			bool called = false;
-			mock.Expect(x => x.DoIt(It.IsAny<string>())).Callback(() => called = true);
+			mock.Expect(x => x.DoVoidArgs(It.IsAny<string>())).Callback(() => called = true);
 
-			mock.Object.DoIt("blah");
+			mock.Object.DoVoidArgs("blah");
 			Assert.IsTrue(called);
 		}
 
@@ -677,9 +677,9 @@ namespace Moq.Tests
 		{
 			var mock = new Mock<IFoo>();
 			string callbackArg = null;
-			mock.Expect(x => x.DoIt(It.IsAny<string>())).Callback((string s) => callbackArg = s);
+			mock.Expect(x => x.DoVoidArgs(It.IsAny<string>())).Callback((string s) => callbackArg = s);
 
-			mock.Object.DoIt("blah");
+			mock.Object.DoVoidArgs("blah");
 			Assert.AreEqual("blah", callbackArg);
 		}
 
@@ -689,10 +689,10 @@ namespace Moq.Tests
 			var mock = new Mock<IFoo>();
 			string callbackArg1 = null;
 			string callbackArg2 = null;
-			mock.Expect(x => x.DoIt(It.IsAny<string>(), It.IsAny<string>()))
+			mock.Expect(x => x.DoVoidArgs(It.IsAny<string>(), It.IsAny<string>()))
 				.Callback((string s1, string s2) => { callbackArg1 = s1; callbackArg2 = s2; });
 
-			mock.Object.DoIt("blah1", "blah2");
+			mock.Object.DoVoidArgs("blah1", "blah2");
 			Assert.AreEqual("blah1", callbackArg1);
 			Assert.AreEqual("blah2", callbackArg2);
 		}
@@ -704,10 +704,10 @@ namespace Moq.Tests
 			string callbackArg1 = null;
 			string callbackArg2 = null;
 			string callbackArg3 = null;
-			mock.Expect(x => x.DoIt(It.IsAny<string>(), It.IsAny<string>(), It.IsAny<string>()))
+			mock.Expect(x => x.DoVoidArgs(It.IsAny<string>(), It.IsAny<string>(), It.IsAny<string>()))
 				.Callback((string s1, string s2, string s3) => { callbackArg1 = s1; callbackArg2 = s2; callbackArg3 = s3; });
 
-			mock.Object.DoIt("blah1", "blah2", "blah3");
+			mock.Object.DoVoidArgs("blah1", "blah2", "blah3");
 			Assert.AreEqual("blah1", callbackArg1);
 			Assert.AreEqual("blah2", callbackArg2);
 			Assert.AreEqual("blah3", callbackArg3);
@@ -721,10 +721,10 @@ namespace Moq.Tests
 			string callbackArg2 = null;
 			string callbackArg3 = null;
 			string callbackArg4 = null;
-			mock.Expect(x => x.DoIt(It.IsAny<string>(), It.IsAny<string>(), It.IsAny<string>(), It.IsAny<string>()))
+			mock.Expect(x => x.DoVoidArgs(It.IsAny<string>(), It.IsAny<string>(), It.IsAny<string>(), It.IsAny<string>()))
 				.Callback((string s1, string s2, string s3, string s4) => { callbackArg1 = s1; callbackArg2 = s2; callbackArg3 = s3; callbackArg4 = s4; });
 
-			mock.Object.DoIt("blah1", "blah2", "blah3", "blah4");
+			mock.Object.DoVoidArgs("blah1", "blah2", "blah3", "blah4");
 			Assert.AreEqual("blah1", callbackArg1);
 			Assert.AreEqual("blah2", callbackArg2);
 			Assert.AreEqual("blah3", callbackArg3);
@@ -839,6 +839,23 @@ namespace Moq.Tests
 			Assert.AreEqual("blah1blah2blah3blah4", result);
 		}
 
+		[Test]
+		public void ShouldMatchDifferentOverloads()
+		{
+			var mock = new Mock<IFoo>();
+
+			mock.Expect(foo => foo.DoTypeOverload(It.IsAny<Bar>()))
+				.Returns(true);
+			mock.Expect(foo => foo.DoTypeOverload(It.IsAny<Baz>()))
+				.Returns(false);
+
+			bool bar = mock.Object.DoTypeOverload(new Bar());
+			bool baz = mock.Object.DoTypeOverload(new Baz());
+
+			Assert.IsTrue(bar);
+			Assert.IsFalse(baz);
+		}
+
 		// ShouldExpectPropertyWithIndexer
 		// ShouldReceiveArgumentValuesOnCallback
 		// ShouldReceiveArgumentValuesOnReturns
@@ -949,15 +966,15 @@ namespace Moq.Tests
 
 		public interface IFoo
 		{
-			int DoInt(int arg);
-			int Do1();
-			string Do2();
-			void DoIt(string arg);
-			void DoIt(string arg1, string arg2);
-			void DoIt(string arg1, string arg2, string arg3);
-			void DoIt(string arg1, string arg2, string arg3, string arg4);
+			int DoIntArgReturnInt(int arg);
+			int DoReturnInt();
+			string DoReturnString();
+			void DoVoidArgs(string arg);
+			void DoVoidArgs(string arg1, string arg2);
+			void DoVoidArgs(string arg1, string arg2, string arg3);
+			void DoVoidArgs(string arg1, string arg2, string arg3, string arg4);
 
-			int DoArgument(string arg);
+			int DoStringArgReturnInt(string arg);
 
 			int Duplicate(int value);
 			AttributeTargets GetTargets();
@@ -972,7 +989,12 @@ namespace Moq.Tests
 			int ValueProperty { get; set; }
 			int WriteOnlyValue { set; }
 
+			bool DoTypeOverload(Bar bar);
+			bool DoTypeOverload(Baz bar);
 		}
+
+		public class Bar { }
+		public class Baz { }
 
 		public abstract class FooBase
 		{
