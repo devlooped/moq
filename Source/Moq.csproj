@@ -124,7 +124,7 @@
     <CreateItem Include="@(ReferencePath)" Condition="'%(CopyLocal)'=='true'">
       <Output TaskParameter="Include" ItemName="IlmergeAssemblies" />
     </CreateItem>
-    <Exec Command="&quot;$(MSBuildProjectPath)..\Tools\Ilmerge.exe&quot; /internalize:&quot;$(MSBuildProjectPath)..\Tools\ilmerge.exclude&quot; /ndebug /keyfile:$(AssemblyOriginatorKeyFile) /out:@(MainAssembly) &quot;@(IntermediateAssembly)&quot; @(IlmergeAssemblies->'&quot;%(FullPath)&quot;', ' ')" />
+    <Exec Command="&quot;$(MSBuildProjectPath)..\Tools\Ilmerge.exe&quot; /internalize:&quot;$(MSBuildProjectPath)\ilmerge.exclude&quot; /ndebug /keyfile:$(AssemblyOriginatorKeyFile) /out:@(MainAssembly) &quot;@(IntermediateAssembly)&quot; @(IlmergeAssemblies->'&quot;%(FullPath)&quot;', ' ')" />
     <Delete Files="@(ReferenceCopyLocalPaths->'$(OutDir)%(DestinationSubDirectory)%(Filename)%(Extension)')" />
   </Target>
   <ProjectExtensions>
