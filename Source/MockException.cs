@@ -38,7 +38,8 @@ namespace Moq
 			AbstractNoExpectation,
 			InterfaceNoExpectation,
 			ReturnValueNoExpectation,
-			VerificationFailed
+			VerificationFailed, 
+			MoreThanOneCall,
 		}
 
 		ExceptionReason reason;

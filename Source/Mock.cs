@@ -4,13 +4,14 @@ using System.Linq.Expressions;
 using System.Reflection;
 using Castle.DynamicProxy;
 using Castle.Core.Interceptor;
+using Moq.Language.Flow;
 
 namespace Moq
 {
+	///// <typeparam name="T">Type to mock, which can be an interface or a class.</typeparam>
 	/// <summary>
 	/// Provides a mock implementation of <typeparamref name="T"/>.
 	/// </summary>
-	/// <typeparam name="T">Type to mock, which can be an interface or a class.</typeparam>
 	/// <remarks>
 	/// If the mocked <typeparamref name="T"/> is a <see cref="MarshalByRefObject"/> (such as a 
 	/// Windows Forms control or another <see cref="System.ComponentModel.Component"/>-derived class) 
@@ -63,7 +64,7 @@ namespace Moq
 	/// Assert.IsFalse(order.IsFilled);
 	/// </code>
 	/// </example>
-	public class Mock<T> : IVerifiable
+	public class Mock<T> : IVerifiable, IHideObjectMembers
 		where T : class
 	{
 		static readonly ProxyGenerator generator = new ProxyGenerator();
@@ -94,13 +95,13 @@ namespace Moq
 
 			this.behavior = behavior;
 			interceptor = new Interceptor(behavior, typeof(T));
+			var mockType = typeof(T);
 
 			try
 			{
-				if (typeof(MarshalByRefObject).IsAssignableFrom(typeof(T)))
+				if (typeof(MarshalByRefObject).IsAssignableFrom(mockType))
 				{
 					remotingProxy = new RemotingProxy(typeof(T), x => interceptor.Intercept(x), args);
-					// TODO: invoke ctor explicitly?
 					instance = (T)remotingProxy.GetTransparentProxy();
 				}
 				else if (typeof(T).IsInterface)
@@ -203,9 +204,9 @@ namespace Moq
 		/// mock.Expect(x =&gt; x.Execute("ping"));
 		/// </code>
 		/// </example>
-		public ICall Expect(Expression<Action<T>> expression)
+		public IExpect Expect(Expression<Action<T>> expression)
 		{
-			return (ICall)ExpectImpl(
+			return (IExpect)ExpectImpl(
 				expression,
 				(original, method, args) => new MethodCall(original, method, args));
 		}
@@ -224,11 +225,9 @@ namespace Moq
 		/// mock.Expect(x =&gt; x.HasInventory("Talisker", 50)).Returns(true);
 		/// </code>
 		/// </example>
-		/// <seealso cref="ICallReturn{TResult}.Returns(TResult)"/>
-		/// <seealso cref="ICallReturn{TResult}.Returns(Func{TResult})"/>
-		public ICallReturn<TResult> Expect<TResult>(Expression<Func<T, TResult>> expression)
+		public IExpect<TResult> Expect<TResult>(Expression<Func<T, TResult>> expression)
 		{
-			return (ICallReturn<TResult>)ExpectImpl(
+			return (IExpect<TResult>)ExpectImpl(
 				expression,
 				(original, method, args) => new MethodCallReturn<TResult>(original, method, args));
 		}

@@ -4,16 +4,20 @@ using System.Linq.Expressions;
 using System.Reflection;
 using System.Runtime.Remoting.Messaging;
 using Castle.Core.Interceptor;
+using Moq.Language.Primitives;
+using Moq.Language.Flow;
 
 namespace Moq
 {
-	internal class MethodCall : ICall, IProxyCall
+	internal class MethodCall : IProxyCall, IExpect
 	{
 		Expression originalExpression;
 		MethodInfo method;
 		Exception exception;
 		Action<object[]> callback;
 		IMatcher[] argumentMatchers;
+		int callCount;
+		bool isOnce;
 
 		public MethodCall(Expression originalExpression, MethodInfo method, params Expression[] arguments)
 		{
@@ -26,36 +30,37 @@ namespace Moq
 		public bool Invoked { get; set; }
 		public Expression ExpectExpression { get { return originalExpression; } }
 
-		public void Throws(Exception exception)
+		public IOnceVerifies Throws(Exception exception)
 		{
 			this.exception = exception;
+			return this;
 		}
 
-		public ICall Callback(Action callback)
+		public IThrowsOnceVerifies Callback(Action callback)
 		{
 			this.callback = delegate { callback(); };
 			return this;
 		}
 
-		public ICall Callback<T>(Action<T> callback)
+		public IThrowsOnceVerifies Callback<T>(Action<T> callback)
 		{
 			SetCallbackWithArguments(callback);
 			return this;
 		}
 
-		public ICall Callback<T1, T2>(Action<T1, T2> callback)
+		public IThrowsOnceVerifies Callback<T1, T2>(Action<T1, T2> callback)
 		{
 			SetCallbackWithArguments(callback);
 			return this;
 		}
 
-		public ICall Callback<T1, T2, T3>(Action<T1, T2, T3> callback)
+		public IThrowsOnceVerifies Callback<T1, T2, T3>(Action<T1, T2, T3> callback)
 		{
 			SetCallbackWithArguments(callback);
 			return this;
 		}
 
-		public ICall Callback<T1, T2, T3, T4>(Action<T1, T2, T3, T4> callback)
+		public IThrowsOnceVerifies Callback<T1, T2, T3, T4>(Action<T1, T2, T3, T4> callback)
 		{
 			SetCallbackWithArguments(callback);
 			return this;
@@ -66,11 +71,9 @@ namespace Moq
 			this.callback = delegate(object[] args) { callback.DynamicInvoke(args); };
 		}
 
-		public ICall Verifiable()
+		public void Verifiable()
 		{
 			IsVerifiable = true;
-
-			return this;
 		}
 
 		public bool Matches(IInvocation call)
@@ -99,6 +102,21 @@ namespace Moq
 
 			if (exception != null)
 				throw exception;
+
+			callCount++;
+
+			if (isOnce && callCount > 1)
+				throw new MockException(MockException.ExceptionReason.MoreThanOneCall,
+					String.Format(Properties.Resources.MoreThanOneCall,
+					call.Format()));
+		}
+
+
+		public IVerifies AtMostOnce()
+		{
+			isOnce = true;
+
+			return this;
 		}
 	}
 }

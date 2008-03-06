@@ -58,12 +58,21 @@
     <Compile Include="Evaluator.cs" />
     <Compile Include="ExpressionVisitor.cs" />
     <Compile Include="Guard.cs" />
-    <Compile Include="ICallReturn.cs" />
+    <Compile Include="IHideObjectMembers.cs" />
+    <Compile Include="Language\Flow\IOnceVerifies.cs" />
+    <Compile Include="Language\Flow\IReturnsThrows.cs" />
+    <Compile Include="Language\Flow\IThrowsOnceVerifies.cs" />
+    <Compile Include="Language\Primitives\ICallback.cs" />
     <Compile Include="IMatcher.cs" />
     <Compile Include="Interceptor.cs" />
     <Compile Include="IProxyCall.cs" />
+    <Compile Include="Language\Flow\IExpect.cs" />
+    <Compile Include="Language\Primitives\IOccurrence.cs" />
+    <Compile Include="Language\Primitives\IReturns.cs" />
     <Compile Include="It.cs" />
+    <Compile Include="Language\Primitives\IThrows.cs" />
     <Compile Include="IVerifiable.cs" />
+    <Compile Include="Language\Primitives\IVerifies.cs" />
     <Compile Include="MatcherAttribute.cs" />
     <Compile Include="MatcherFactory.cs" />
     <Compile Include="Matchers\AnyMatcher.cs" />
@@ -118,4 +127,9 @@
     <Exec Command="&quot;$(MSBuildProjectPath)..\Tools\Ilmerge.exe&quot; /internalize:&quot;$(MSBuildProjectPath)..\Tools\ilmerge.exclude&quot; /ndebug /keyfile:$(AssemblyOriginatorKeyFile) /out:@(MainAssembly) &quot;@(IntermediateAssembly)&quot; @(IlmergeAssemblies->'&quot;%(FullPath)&quot;', ' ')" />
     <Delete Files="@(ReferenceCopyLocalPaths->'$(OutDir)%(DestinationSubDirectory)%(Filename)%(Extension)')" />
   </Target>
+  <ProjectExtensions>
+    <VisualStudio>
+      <UserProperties Notes="&lt;Notes Project=&quot;1c91ac30-5977-4be5-ba67-8eb186c03514&quot; xmlns=&quot;clr-namespace:StickyNotes.Model;assembly=StickyNotes&quot;&gt;&lt;Notes.StickyNotes&gt;&lt;Note FilePath=&quot;&quot; Content=&quot;&quot; Date=&quot;2008-03-04T16:32:50.278875-02:00&quot; /&gt;&lt;/Notes.StickyNotes&gt;&lt;/Notes&gt;" />
+    </VisualStudio>
+  </ProjectExtensions>
 </Project>

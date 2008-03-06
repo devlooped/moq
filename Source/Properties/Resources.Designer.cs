@@ -135,6 +135,15 @@ namespace Moq.Properties {
         }
         
         /// <summary>
+        ///   Looks up a localized string similar to Expected only one call to {0}..
+        /// </summary>
+        internal static string MoreThanOneCall {
+            get {
+                return ResourceManager.GetString("MoreThanOneCall", resourceCulture);
+            }
+        }
+        
+        /// <summary>
         ///   Looks up a localized string similar to All invocations on the mock must have a corresponding expectation..
         /// </summary>
         internal static string NoExpectation {

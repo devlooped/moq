@@ -444,7 +444,9 @@ namespace Moq.Tests
 		{
 			var mock = new Mock<IFoo>();
 
-			mock.Expect(x => x.DoReturnInt()).Verifiable().Returns(5);
+			mock.Expect(x => x.DoReturnInt())
+				.Returns(5)
+				.Verifiable();
 
 			try
 			{
@@ -463,7 +465,9 @@ namespace Moq.Tests
 			var expectedArg = "lorem,ipsum";
 			var mock = new Mock<IFoo>();
 
-			mock.Expect(x => x.DoStringArgReturnInt(expectedArg.Substring(0,5))).Verifiable().Returns(5);
+			mock.Expect(x => x.DoStringArgReturnInt(expectedArg.Substring(0,5)))
+				.Returns(5)
+				.Verifiable();
 
 			try
 			{
@@ -483,7 +487,8 @@ namespace Moq.Tests
 			var mock = new Mock<IFoo>();
 
 			mock.Expect(x => x.DoStringArgReturnInt(It.Is<string>(s => string.IsNullOrEmpty(s))))
-				.Verifiable().Returns(5);
+				.Returns(5)
+				.Verifiable();
 
 			try
 			{
@@ -510,7 +515,8 @@ namespace Moq.Tests
 		{
 			var mock = new Mock<IFoo>();
 
-			mock.Expect(x => x.DoReturnInt()).Returns(1);
+			mock.Expect(x => x.DoReturnInt())
+				.Returns(1);
 
 			try
 			{
@@ -855,6 +861,35 @@ namespace Moq.Tests
 			Assert.IsTrue(bar);
 			Assert.IsFalse(baz);
 		}
+		[Ignore]
+		[Test]
+		public void ShouldCreateAbstractMBRO()
+		{
+			var mock = new Mock<AbstractMBRO>();
+
+			Assert.AreEqual("foo", mock.Object.Value);
+		}
+
+		[Test]
+		public void ShouldExpectOnceThrowOnSecondCall()
+		{
+			var mock = new Mock<IFoo>();
+			mock.Expect(foo => foo.DoVoidArgs("foo"))
+				.AtMostOnce();
+
+			try
+			{
+				mock.Object.DoVoidArgs("foo");
+				mock.Object.DoVoidArgs("foo");
+
+				Assert.Fail("should fail on two calls");
+			}
+			catch (MockException mex)
+			{
+				Console.WriteLine(mex);
+				Assert.AreEqual(MockException.ExceptionReason.MoreThanOneCall, mex.Reason);
+			}
+		}
 
 		// ShouldExpectPropertyWithIndexer
 		// ShouldReceiveArgumentValuesOnCallback
@@ -962,6 +997,11 @@ namespace Moq.Tests
 			{
 				return true;
 			}
+		}
+
+		public abstract class AbstractMBRO : MarshalByRefObject
+		{
+			public string Value { get; set; }
 		}
 
 		public interface IFoo

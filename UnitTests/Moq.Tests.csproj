@@ -52,6 +52,7 @@
   <ItemGroup>
     <Compile Include="Demo.cs" />
     <Compile Include="ExpressionExtensionsFixture.cs" />
+    <Compile Include="ExtensibilityFixture.cs" />
     <Compile Include="MatcherAttributeFixture.cs" />
     <Compile Include="MockBehaviorFixture.cs" />
     <Compile Include="MockFactoryFixture.cs" />
@@ -77,9 +78,4 @@
   <Target Name="AfterBuild">
   </Target>
   -->
-  <ProjectExtensions>
-    <VisualStudio>
-      <UserProperties Notes="&lt;Notes Project=&quot;81bbc911-4916-4e10-a955-752ae47cb2b9&quot; xmlns=&quot;clr-namespace:StickyNotes.Model;assembly=StickyNotes&quot;&gt;&lt;Notes.StickyNotes&gt;&lt;Note FilePath=&quot;&quot; Content=&quot;&quot; Date=&quot;2008-03-06T05:55:18.8745-02:00&quot; /&gt;&lt;/Notes.StickyNotes&gt;&lt;/Notes&gt;" />
-    </VisualStudio>
-  </ProjectExtensions>
 </Project>

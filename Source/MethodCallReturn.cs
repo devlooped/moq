@@ -3,10 +3,12 @@ using System.Linq.Expressions;
 using System.Reflection;
 using System.Runtime.Remoting.Messaging;
 using Castle.Core.Interceptor;
+using Moq.Language.Primitives;
+using Moq.Language.Flow;
 
 namespace Moq
 {
-	internal class MethodCallReturn<TResult> : MethodCall, ICallReturn<TResult>, IProxyCall
+	internal class MethodCallReturn<TResult> : MethodCall, IProxyCall, IExpect<TResult>
 	{
 		//TResult value;
 		//Func<TResult> valueFunc;
@@ -18,77 +20,70 @@ namespace Moq
 		{
 		}
 
-        public ICallReturn<TResult> Returns(Func<TResult> valueExpression)
+        public IOnceVerifies Returns(Func<TResult> valueExpression)
 		{
             SetReturnDelegate(valueExpression);
 			//this.valueFunc = valueExpression;
             return this;
 		}
 
-        public ICallReturn<TResult> Returns(TResult value)
+        public IOnceVerifies Returns(TResult value)
 		{
             Returns(() => value);
             return this;
 		}
 
-		public ICallReturn<TResult> Returns<T>(Func<T, TResult> valueExpression)
+		public IOnceVerifies Returns<T>(Func<T, TResult> valueExpression)
 		{
 			SetReturnDelegate(valueExpression);
 			return this;
 		}
 
-		public ICallReturn<TResult> Returns<T1, T2>(Func<T1, T2, TResult> valueExpression)
+		public IOnceVerifies Returns<T1, T2>(Func<T1, T2, TResult> valueExpression)
 		{
 			SetReturnDelegate(valueExpression);
 			return this;
 		}
 
-		public ICallReturn<TResult> Returns<T1, T2, T3>(Func<T1, T2, T3, TResult> valueExpression)
+		public IOnceVerifies Returns<T1, T2, T3>(Func<T1, T2, T3, TResult> valueExpression)
 		{
 			SetReturnDelegate(valueExpression);
 			return this;
 		}
 
-		public ICallReturn<TResult> Returns<T1, T2, T3, T4>(Func<T1, T2, T3, T4, TResult> valueExpression)
+		public IOnceVerifies Returns<T1, T2, T3, T4>(Func<T1, T2, T3, T4, TResult> valueExpression)
 		{
 			SetReturnDelegate(valueExpression);
 			return this;
 		}
 
-		public new ICallReturn<TResult> Callback(Action callback)
+		public new IReturnsThrows<TResult> Callback(Action callback)
 		{
 			base.Callback(callback);
 			return this;
 		}
 
-		public new ICallReturn<TResult> Callback<T>(Action<T> callback)
+		public new IReturnsThrows<TResult> Callback<T>(Action<T> callback)
 		{
 			base.Callback(callback);
 			return this;
 		}
 
-		public new ICallReturn<TResult> Callback<T1, T2>(Action<T1, T2> callback)
+		public new IReturnsThrows<TResult> Callback<T1, T2>(Action<T1, T2> callback)
 		{
 			base.Callback(callback);
 			return this;
 		}
 
-		public new ICallReturn<TResult> Callback<T1, T2, T3>(Action<T1, T2, T3> callback)
+		public new IReturnsThrows<TResult> Callback<T1, T2, T3>(Action<T1, T2, T3> callback)
 		{
 			base.Callback(callback);
 			return this;
 		}
 
-		public new ICallReturn<TResult> Callback<T1, T2, T3, T4>(Action<T1, T2, T3, T4> callback)
+		public new IReturnsThrows<TResult> Callback<T1, T2, T3, T4>(Action<T1, T2, T3, T4> callback)
 		{
 			base.Callback(callback);
-			return this;
-		}
-
-		public new ICallReturn<TResult> Verifiable()
-		{
-			IsVerifiable = true;
-
 			return this;
 		}
 

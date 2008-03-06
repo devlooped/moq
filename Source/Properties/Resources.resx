@@ -159,4 +159,7 @@
   <data name="ConstructorNotFound" xml:space="preserve">
     <value>A matching constructor for the given arguments was not found on the mocked type.</value>
   </data>
+  <data name="MoreThanOneCall" xml:space="preserve">
+    <value>Expected only one call to {0}.</value>
+  </data>
 </root>
