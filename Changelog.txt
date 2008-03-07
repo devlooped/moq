@@ -1,5 +1,17 @@
+Version 2.0
+
+    * Refactored fluent API on mocks. This may cause some existing tests to fail, but the fix is trivial (just reorder the calls to Callback, Returns and Verifiable)
+    * Added support for retrieving a Mock<T> from a T instance created by a mock.
+    * Added support for retrieving the invocation arguments from a Callback or Returns.
+    * Implemented AtMostOnce?() constraint 
+
+Version 1.5.1
+
+    * Refactored MockFactory to make it simpler and more explicit to use with regards to verification. Thanks Garry Shutler for the feedback! 
+
 Version 1.5
-    * Added MockFactory to allow easy construction of multiple mocks with the same behavior and verification  
+
+    * Added MockFactory to allow easy construction of multiple mocks with the same behavior and verification 
 
 Version 1.4
 
