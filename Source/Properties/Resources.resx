@@ -162,4 +162,7 @@
   <data name="MoreThanOneCall" xml:space="preserve">
     <value>Expected only one call to {0}.</value>
   </data>
+  <data name="ObjectInstanceNotMock" xml:space="preserve">
+    <value>Object instance was not created by Moq.</value>
+  </data>
 </root>

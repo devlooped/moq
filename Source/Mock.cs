@@ -8,6 +8,7 @@ using Moq.Language.Flow;
 
 namespace Moq
 {
+	// TODO: uncomment documentation when C# bug is fixed: 
 	///// <typeparam name="T">Type to mock, which can be an interface or a class.</typeparam>
 	/// <summary>
 	/// Provides a mock implementation of <typeparamref name="T"/>.
@@ -94,13 +95,15 @@ namespace Moq
 			if (args == null) args = new object[0];
 
 			this.behavior = behavior;
-			interceptor = new Interceptor(behavior, typeof(T));
+			interceptor = new Interceptor(behavior, typeof(T), this);
+			var interfacesTypes = new Type[] { typeof(IMocked<T>) };
 			var mockType = typeof(T);
 
 			try
 			{
 				if (typeof(MarshalByRefObject).IsAssignableFrom(mockType))
 				{
+					// TODO: we're not injecting the IMocked interface on MBROs.
 					remotingProxy = new RemotingProxy(typeof(T), x => interceptor.Intercept(x), args);
 					instance = (T)remotingProxy.GetTransparentProxy();
 				}
@@ -109,7 +112,7 @@ namespace Moq
 					if (args.Length > 0)
 						throw new ArgumentException(Properties.Resources.ConstructorArgsForInterface);
 
-					instance = generator.CreateInterfaceProxyWithoutTarget<T>(interceptor);
+					instance = (T) generator.CreateInterfaceProxyWithoutTarget(typeof(T), interfacesTypes, interceptor);
 				}
 				else
 				{
@@ -117,13 +120,13 @@ namespace Moq
 					{
 						if (args.Length > 0)
 						{
-							var generatedType = generator.ProxyBuilder.CreateClassProxy(typeof(T), new ProxyGenerationOptions());
+							var generatedType = generator.ProxyBuilder.CreateClassProxy(typeof(T), interfacesTypes, new ProxyGenerationOptions());
 							instance = (T)Activator.CreateInstance(generatedType,
 								new object[] { new IInterceptor[] { interceptor } }.Concat(args).ToArray());
 						}
 						else
 						{
-							instance = generator.CreateClassProxy<T>(interceptor);
+							instance = (T) generator.CreateClassProxy(typeof(T), interfacesTypes, interceptor);
 						}
 					}
 					catch (TypeLoadException tle)
@@ -374,5 +377,33 @@ namespace Moq
 		//    // TODO: doesn't work as expected but ONLY with interfaces :S
 		//    throw new NotImplementedException();
 		//}
+	}
+
+	/// <summary>
+	/// Static methods that apply to mocked objects.
+	/// </summary>
+	public sealed class Mock
+	{
+		/// <summary>
+		/// Retrieves the mock object for the given object instance.
+		/// </summary>
+		/// <typeparam name="T">Type of the mock to retrieve. Can be omitted as it's inferred 
+		/// from the object instance passed in as the <paramref name="mocked"/> instance.</typeparam>
+		/// <param name="mocked">The instance of the mocked object.</param>
+		/// <returns>The mock associated with the mocked object.</returns>
+		/// <exception cref="ArgumentException">The received <paramref name="mocked"/> instance 
+		/// was not created by Moq.</exception>
+		public static Mock<T> Get<T>(T mocked)
+			where T : class
+		{
+			if (mocked is IMocked<T>)
+			{
+				return (mocked as IMocked<T>).Mock;
+			}
+			else
+			{
+				throw new ArgumentException(Properties.Resources.ObjectInstanceNotMock, "mocked");
+			}
+		}
 	}
 }

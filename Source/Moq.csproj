@@ -64,6 +64,7 @@
     <Compile Include="Language\Flow\IThrowsOnceVerifies.cs" />
     <Compile Include="Language\Primitives\ICallback.cs" />
     <Compile Include="IMatcher.cs" />
+    <Compile Include="IMocked.cs" />
     <Compile Include="Interceptor.cs" />
     <Compile Include="IProxyCall.cs" />
     <Compile Include="Language\Flow\IExpect.cs" />

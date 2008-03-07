@@ -16,11 +16,13 @@ namespace Moq
 		MockBehavior behavior;
 		Type targetType;
 		Dictionary<string, IProxyCall> calls = new Dictionary<string, IProxyCall>();
+		object mock;
 
-		public Interceptor(MockBehavior behavior, Type targetType)
+		public Interceptor(MockBehavior behavior, Type targetType, object mock)
 		{
 			this.behavior = behavior;
 			this.targetType = targetType;
+			this.mock = mock;
 		}
 
 		internal void Verify()
@@ -55,6 +57,14 @@ namespace Moq
 
 		public void Intercept(IInvocation invocation)
 		{
+			if (invocation.Method.DeclaringType.IsGenericType &&
+				invocation.Method.DeclaringType.GetGenericTypeDefinition() == typeof(IMocked<>))
+			{
+				// "Mixin" of IMocked
+				invocation.ReturnValue = mock;
+				return;
+			}
+
 			var call = (from c in calls.Values
 					   where c.Matches(invocation)
 					   select c).FirstOrDefault();

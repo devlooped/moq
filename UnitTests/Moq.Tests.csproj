@@ -55,6 +55,7 @@
     <Compile Include="ExtensibilityFixture.cs" />
     <Compile Include="MatcherAttributeFixture.cs" />
     <Compile Include="MockBehaviorFixture.cs" />
+    <Compile Include="MockedFixture.cs" />
     <Compile Include="MockFactoryFixture.cs" />
     <Compile Include="MockFixture.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />

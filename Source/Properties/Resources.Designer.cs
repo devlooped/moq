@@ -153,6 +153,15 @@ namespace Moq.Properties {
         }
         
         /// <summary>
+        ///   Looks up a localized string similar to Object instance was not created by Moq..
+        /// </summary>
+        internal static string ObjectInstanceNotMock {
+            get {
+                return ResourceManager.GetString("ObjectInstanceNotMock", resourceCulture);
+            }
+        }
+        
+        /// <summary>
         ///   Looks up a localized string similar to Property {0}.{1} is write-only..
         /// </summary>
         internal static string PropertyNotReadable {
