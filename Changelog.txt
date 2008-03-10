@@ -5,9 +5,7 @@ Version 2.0
     * Added support for retrieving the invocation arguments from a Callback or Returns.
     * Implemented AtMostOnce() constraint 
     * Added support for creating MBROs with protected constructors
-    * 
-    * 
-    * 
+    * Loose mocks now return default empty arrays and IEnumerables instead of nulls
 
 
 Version 1.5.1
