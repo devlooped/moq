@@ -121,7 +121,10 @@ namespace Moq
 					// Return default value.
 					if (invocation.Method.ReturnType.IsValueType)
 					{
-						invocation.ReturnValue = 0;
+						if (invocation.Method.ReturnType.IsAssignableFrom(typeof(int)))
+							invocation.ReturnValue = 0;
+						else
+							invocation.ReturnValue = Activator.CreateInstance(invocation.Method.ReturnType);
 					}
 					else
 					{

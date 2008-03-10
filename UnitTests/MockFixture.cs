@@ -961,6 +961,13 @@ namespace Moq.Tests
 			Assert.AreEqual(0, mock.Object.GetEnumerableObjects().Cast<object>().Count());
 		}
 
+		[Test]
+		public void ShouldReturnDefaultGuidOnLoose()
+		{
+			var mock = new Mock<IFoo>(MockBehavior.Loose);
+			Assert.AreEqual(default(Guid), mock.Object.DoReturnGuid());
+		}
+
 		// ShouldExpectPropertyWithIndexer
 		// ShouldReceiveArgumentValuesOnCallback
 		// ShouldReceiveArgumentValuesOnReturns
@@ -1102,6 +1109,7 @@ namespace Moq.Tests
 			void DoVoidArgs(string arg1, string arg2, string arg3, string arg4);
 
 			int DoStringArgReturnInt(string arg);
+			Guid DoReturnGuid();
 
 			int Duplicate(int value);
 			AttributeTargets GetTargets();
