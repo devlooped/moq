@@ -3,7 +3,12 @@ Version 2.0
     * Refactored fluent API on mocks. This may cause some existing tests to fail, but the fix is trivial (just reorder the calls to Callback, Returns and Verifiable)
     * Added support for retrieving a Mock<T> from a T instance created by a mock.
     * Added support for retrieving the invocation arguments from a Callback or Returns.
-    * Implemented AtMostOnce?() constraint 
+    * Implemented AtMostOnce() constraint 
+    * Added support for creating MBROs with protected constructors
+    * 
+    * 
+    * 
+
 
 Version 1.5.1
 

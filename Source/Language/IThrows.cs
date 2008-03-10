@@ -4,7 +4,7 @@ using System.Linq;
 using System.Text;
 using Moq.Language.Flow;
 
-namespace Moq.Language.Primitives
+namespace Moq.Language
 {
 	/// <summary>
 	/// Defines the <c>Throws</c> verb.
@@ -19,7 +19,8 @@ namespace Moq.Language.Primitives
 		/// This example shows how to throw an exception when the method is 
 		/// invoked with an empty string argument:
 		/// <code>
-		/// mock.Expect(x => x.Execute("")).Throws(new ArgumentException());
+		/// mock.Expect(x => x.Execute(""))
+		///     .Throws(new ArgumentException());
 		/// </code>
 		/// </example>
 		IOnceVerifies Throws(Exception exception);

@@ -41,9 +41,9 @@
       <SpecificVersion>False</SpecificVersion>
       <HintPath>..\Lib\Castle.Core.dll</HintPath>
     </Reference>
-    <Reference Include="Castle.DynamicProxy2, Version=2.0.3.0, Culture=neutral, PublicKeyToken=407dd0808d44fbdc, processorArchitecture=MSIL">
+    <Reference Include="Castle.DynamicProxy, Version=2.0.3.0, Culture=neutral, PublicKeyToken=407dd0808d44fbdc, processorArchitecture=MSIL">
       <SpecificVersion>False</SpecificVersion>
-      <HintPath>..\Lib\Castle.DynamicProxy2.dll</HintPath>
+      <HintPath>..\Lib\Castle.DynamicProxy.dll</HintPath>
     </Reference>
     <Reference Include="System" />
     <Reference Include="System.Core">
@@ -62,18 +62,18 @@
     <Compile Include="Language\Flow\IOnceVerifies.cs" />
     <Compile Include="Language\Flow\IReturnsThrows.cs" />
     <Compile Include="Language\Flow\IThrowsOnceVerifies.cs" />
-    <Compile Include="Language\Primitives\ICallback.cs" />
+    <Compile Include="Language\ICallback.cs" />
     <Compile Include="IMatcher.cs" />
     <Compile Include="IMocked.cs" />
     <Compile Include="Interceptor.cs" />
     <Compile Include="IProxyCall.cs" />
     <Compile Include="Language\Flow\IExpect.cs" />
-    <Compile Include="Language\Primitives\IOccurrence.cs" />
-    <Compile Include="Language\Primitives\IReturns.cs" />
+    <Compile Include="Language\IOccurrence.cs" />
+    <Compile Include="Language\IReturns.cs" />
     <Compile Include="It.cs" />
-    <Compile Include="Language\Primitives\IThrows.cs" />
+    <Compile Include="Language\IThrows.cs" />
     <Compile Include="IVerifiable.cs" />
-    <Compile Include="Language\Primitives\IVerifies.cs" />
+    <Compile Include="Language\IVerifies.cs" />
     <Compile Include="MatcherAttribute.cs" />
     <Compile Include="MatcherFactory.cs" />
     <Compile Include="Matchers\AnyMatcher.cs" />

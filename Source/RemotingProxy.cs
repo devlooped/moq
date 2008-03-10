@@ -36,7 +36,9 @@ namespace Moq
 			// made within the MBRO ctor are done directly on the "this" 
 			// object, not via this proxy. Interception and therefore 
 			// expectations don't work during construction.
-			var instance = Activator.CreateInstance(targetType, ctorArgs);
+			var instance = Activator.CreateInstance(targetType,
+				new object[] { new IInterceptor[] { new NullInterceptor() } }.Concat(ctorArgs).ToArray());
+
 			base.AttachServer((MarshalByRefObject)instance);
 		}
 
@@ -158,6 +160,18 @@ namespace Moq
 			public void SetArgumentValue(int index, object value)
 			{
 				throw new NotImplementedException();
+			}
+		}
+
+		/// <summary>
+		/// We use a null interceptor for the generated class as we'll be already intercepting 
+		/// through remoting, which is more powerful and gives us additional interception 
+		/// points (private members, non-virtuals, etc.).
+		/// </summary>
+		class NullInterceptor : IInterceptor
+		{
+			public void Intercept(IInvocation invocation)
+			{
 			}
 		}
 	}

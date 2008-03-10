@@ -83,8 +83,9 @@ namespace Moq
 		/// to initialize the instance. This applies only to classes, not interfaces.
 		/// <para>
 		/// <b>Note:</b> For a <see cref="MarshalByRefObject"/> derived class, any calls done in the constructor itself 
+		/// (i.e. calls to private members, initialization methods, etc. invoked from the constructor) 
 		/// will not go through the proxied mock and will instead be direct invocations in the underlying 
-		/// object. This is known limitation.
+		/// object. This is a known limitation.
 		/// </para>
 		/// </remarks>
 		/// <example>
@@ -103,8 +104,9 @@ namespace Moq
 			{
 				if (typeof(MarshalByRefObject).IsAssignableFrom(mockType))
 				{
-					// TODO: we're not injecting the IMocked interface on MBROs.
-					remotingProxy = new RemotingProxy(typeof(T), x => interceptor.Intercept(x), args);
+					var generatedType = generator.ProxyBuilder.CreateClassProxy(mockType, interfacesTypes, new ProxyGenerationOptions());
+
+					remotingProxy = new RemotingProxy(generatedType, x => interceptor.Intercept(x), args);
 					instance = (T)remotingProxy.GetTransparentProxy();
 				}
 				else if (typeof(T).IsInterface)
@@ -112,7 +114,7 @@ namespace Moq
 					if (args.Length > 0)
 						throw new ArgumentException(Properties.Resources.ConstructorArgsForInterface);
 
-					instance = (T) generator.CreateInterfaceProxyWithoutTarget(typeof(T), interfacesTypes, interceptor);
+					instance = (T)generator.CreateInterfaceProxyWithoutTarget(mockType, interfacesTypes, interceptor);
 				}
 				else
 				{
@@ -120,13 +122,13 @@ namespace Moq
 					{
 						if (args.Length > 0)
 						{
-							var generatedType = generator.ProxyBuilder.CreateClassProxy(typeof(T), interfacesTypes, new ProxyGenerationOptions());
+							var generatedType = generator.ProxyBuilder.CreateClassProxy(mockType, interfacesTypes, new ProxyGenerationOptions());
 							instance = (T)Activator.CreateInstance(generatedType,
 								new object[] { new IInterceptor[] { interceptor } }.Concat(args).ToArray());
 						}
 						else
 						{
-							instance = (T) generator.CreateClassProxy(typeof(T), interfacesTypes, interceptor);
+							instance = (T)generator.CreateClassProxy(mockType, interfacesTypes, interceptor);
 						}
 					}
 					catch (TypeLoadException tle)
@@ -174,7 +176,7 @@ namespace Moq
 		/// <example>
 		/// <code>var mock = new Mock&lt;IFormatProvider&gt;(MockBehavior.Relaxed);</code>
 		/// </example>
-		public Mock(MockBehavior behavior) : this(behavior, new object[0]) {}
+		public Mock(MockBehavior behavior) : this(behavior, new object[0]) { }
 
 		/// <summary>
 		/// Exposes the mocked object instance.
@@ -380,9 +382,10 @@ namespace Moq
 	}
 
 	/// <summary>
-	/// Static methods that apply to mocked objects.
+	/// Static methods that apply to mocked objects, such as <see cref="Get"/> to 
+	/// retrieve a <see cref="Mock{T}"/> from an object instance.
 	/// </summary>
-	public sealed class Mock
+	public static class Mock 
 	{
 		/// <summary>
 		/// Retrieves the mock object for the given object instance.
@@ -393,6 +396,22 @@ namespace Moq
 		/// <returns>The mock associated with the mocked object.</returns>
 		/// <exception cref="ArgumentException">The received <paramref name="mocked"/> instance 
 		/// was not created by Moq.</exception>
+		/// <example>
+		/// The following example shows how to add a new expectation to an object 
+		/// instance which is not the original <see cref="Mock{T}"/> but rather 
+		/// the object associated with it:
+		/// <code>
+		/// // Typed instance, not the mock, is retrieved from some API.
+		/// HttpContextBase context = GetMockContext();
+		/// 
+		/// // context.Request is the typed object from the "real" API
+		/// // so in order to add an expectation to it, we need to get 
+		/// // the mock that's managing them
+		/// Mock&lt;HttpRequestBase&gt; request = Mock.Get(context.Request);
+		/// mock.Expect(req => req.AppRelativeCurrentExecutionFilePath)
+		///     .Returns(tempUrl);
+		/// </code>
+		/// </example>
 		public static Mock<T> Get<T>(T mocked)
 			where T : class
 		{

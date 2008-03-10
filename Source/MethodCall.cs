@@ -4,8 +4,8 @@ using System.Linq.Expressions;
 using System.Reflection;
 using System.Runtime.Remoting.Messaging;
 using Castle.Core.Interceptor;
-using Moq.Language.Primitives;
 using Moq.Language.Flow;
+using Moq.Language;
 
 namespace Moq
 {

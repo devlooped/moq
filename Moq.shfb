@@ -23,15 +23,30 @@ See the &lt;a href="http://code.google.com/p/moq/wiki/QuickStart"&gt;online quic
 &lt;/p&gt;
 &lt;p&gt;The Mock&amp;lt;T&amp;gt; class is the core of the library, so it's a good place to start.&lt;/p&gt;
 You can also read &lt;a href="http://blogsearch.google.com/blogsearch?q=moq+mock"&gt;blog entries&lt;/a&gt; from around the world about Moq.</namespaceSummaryItem>
+        <namespaceSummaryItem name="Moq.Language" isDocumented="True">This namespace defines the interfaces that contain the methods available in Moq fluent API, such as Expect, Callback, Returns, Throws, etc.
+&lt;p&gt;
+Review the documentation of the available methods on these interfaces for code examples. The way these interfaces are composed, grouped and made visible at different stages during an expectation (i.e. Verifiable is the last "verb" and can't be specified before the Returns) is internal but the API will naturally lead you to the proper way of using it, so don't worry too much about who (and where) exposes these language interfaces. They will show up in Intellisense when it's appropriate. 
+&lt;/p&gt;&lt;p&gt;
+Do use their documentation to learn about options (especially when there are several overloads available) that may be a better fit for a particular scenario.&lt;/p&gt;</namespaceSummaryItem>
+        <namespaceSummaryItem name="Moq.Language.Flow" isDocumented="False" />
         <namespaceSummaryItem name="Moq.Properties" isDocumented="False" />
     </namespaceSummaries>
     <componentConfigurations>
         <component id="Code Block Component" enabled="True" configuration="&lt;component id=&quot;Code Block Component&quot; type=&quot;SandcastleBuilder.Components.CodeBlockComponent&quot; assembly=&quot;{@SHFBFolder}SandcastleBuilder.Components.dll&quot;&gt;&lt;!-- Base path for relative filenames in source attributes&#xD;&#xA;                 (optional) --&gt;&lt;basePath value=&quot;{@ProjectFolder}&quot; /&gt;&lt;!-- Connect to language filter (optional).  If omitted,&#xD;&#xA;                 language filtering is enabled by default. --&gt;&lt;languageFilter value=&quot;true&quot; /&gt;&lt;!-- Code colorizer options (required).&#xD;&#xA;                 Attributes:&#xD;&#xA;                    Language syntax configuration file (required)&#xD;&#xA;                    XSLT style file (required)&#xD;&#xA;                    &quot;Copy&quot; image file URL (required)&#xD;&#xA;                    Default language (optional)&#xD;&#xA;                    Enable line numbering (optional)&#xD;&#xA;                    Enable outlining (optional)&#xD;&#xA;                    Tab size override (optional, 0 = Use syntax file setting)&#xD;&#xA;                    Use language name as default title (optional) --&gt;&lt;colorizer syntaxFile=&quot;{@SHFBFolder}Colorizer\highlight.xml&quot; styleFile=&quot;{@SHFBFolder}Colorizer\highlight.xsl&quot; copyImageUrl=&quot;../icons/CopyCode.gif&quot; language=&quot;cs&quot; numberLines=&quot;false&quot; outlining=&quot;false&quot; tabSize=&quot;0&quot; defaultTitle=&quot;true&quot; /&gt;&lt;/component&gt;" />
         <component id="Post-transform Component" enabled="True" configuration="&lt;component id=&quot;Post-transform Component&quot; type=&quot;SandcastleBuilder.Components.PostTransformComponent&quot; assembly=&quot;{@SHFBFolder}SandcastleBuilder.Components.dll&quot;&gt;&lt;!-- Code colorizer files (required).&#xD;&#xA;                 Attributes:&#xD;&#xA;                    Stylesheet file (required)&#xD;&#xA;                    Script file (required)&#xD;&#xA;                    &quot;Copy&quot; image file (required) --&gt;&lt;colorizer stylesheet=&quot;{@SHFBFolder}Colorizer\highlight.css&quot; scriptFile=&quot;{@SHFBFolder}Colorizer\highlight.js&quot; copyImage=&quot;{@SHFBFolder}Colorizer\CopyCode.gif&quot; /&gt;&lt;!-- Base output path for the files (required).  This should match&#xD;&#xA;                 the parent folder of the output path of the HTML files (see&#xD;&#xA;                 SaveComponent). --&gt;&lt;outputPath value=&quot;Output\&quot; /&gt;&lt;!-- Logo image file (optional).  Filename is required. The height,&#xD;&#xA;                 width, altText, placement, and alignment attributes are&#xD;&#xA;                 optional. --&gt;&lt;logoFile filename=&quot;&quot; height=&quot;0&quot; width=&quot;0&quot; altText=&quot;&quot; placement=&quot;left&quot; alignment=&quot;left&quot; /&gt;&lt;/component&gt;" />
     </componentConfigurations>
+    <apiFilter>
+        <filter entryType="Namespace" fullName="Castle.Core.Interceptor" isExposed="False" />
+        <filter entryType="Namespace" fullName="Castle.DynamicProxy" isExposed="False" />
+        <filter entryType="Namespace" fullName="Moq" isExposed="True">
+            <filter entryType="Interface" fullName="Moq.IHideObjectMembers" filterName="IHideObjectMembers" isExposed="False" />
+            <filter entryType="Interface" fullName="Moq.IMocked`1" filterName="IMocked`1" isExposed="False" />
+        </filter>
+        <filter entryType="Namespace" fullName="Moq.Language.Flow" isExposed="False" />
+    </apiFilter>
     <ProjectSummary />
     <MissingTags>Summary, Parameter, AutoDocumentCtors, Namespace</MissingTags>
-    <VisibleItems>InheritedMembers, InheritedFrameworkMembers, Protected, SealedProtected</VisibleItems>
+    <VisibleItems>InheritedMembers, Protected, SealedProtected</VisibleItems>
     <HtmlHelp1xCompilerPath path="" />
     <HtmlHelp2xCompilerPath path="" />
     <OutputPath>.\Help\</OutputPath>
@@ -45,7 +60,7 @@ You can also read &lt;a href="http://blogsearch.google.com/blogsearch?q=moq+mock
     <FrameworkVersion>3.5</FrameworkVersion>
     <BinaryTOC>True</BinaryTOC>
     <IncludeFavorites>False</IncludeFavorites>
-    <Preliminary>True</Preliminary>
+    <Preliminary>False</Preliminary>
     <RootNamespaceContainer>False</RootNamespaceContainer>
     <RootNamespaceTitle />
     <HelpTitle>Moq</HelpTitle>

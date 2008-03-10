@@ -57,6 +57,8 @@ namespace Moq
 
 		public void Intercept(IInvocation invocation)
 		{
+			// TODO: too many ifs in this method.
+			// see how to refactor with strategies.
 			if (invocation.Method.DeclaringType.IsGenericType &&
 				invocation.Method.DeclaringType.GetGenericTypeDefinition() == typeof(IMocked<>))
 			{
@@ -66,8 +68,8 @@ namespace Moq
 			}
 
 			var call = (from c in calls.Values
-					   where c.Matches(invocation)
-					   select c).FirstOrDefault();
+									where c.Matches(invocation)
+									select c).FirstOrDefault();
 
 			if (call == null)
 			{
@@ -89,7 +91,7 @@ namespace Moq
 					else if (invocation.Method.IsAbstract)
 					{
 						throw new MockException(
-							MockException.ExceptionReason.AbstractNoExpectation, 
+							MockException.ExceptionReason.AbstractNoExpectation,
 							behavior, invocation);
 					}
 				}
@@ -118,9 +120,32 @@ namespace Moq
 				{
 					// Return default value.
 					if (invocation.Method.ReturnType.IsValueType)
-					    invocation.ReturnValue = 0;
+					{
+						invocation.ReturnValue = 0;
+					}
 					else
-					    invocation.ReturnValue = null;
+					{
+						if (invocation.Method.ReturnType.IsArray)
+						{
+							invocation.ReturnValue = Activator.CreateInstance(invocation.Method.ReturnType, 0);
+						}
+						else if (invocation.Method.ReturnType == typeof(System.Collections.IEnumerable))
+						{
+							invocation.ReturnValue = new object[0];
+						}
+						else if (invocation.Method.ReturnType.IsGenericType && 
+							invocation.Method.ReturnType.GetGenericTypeDefinition() == typeof(IEnumerable<>))
+						{
+							var genericListType = typeof(List<>).MakeGenericType(
+								invocation.Method.ReturnType.GetGenericArguments()[0]);
+							invocation.ReturnValue = Activator.CreateInstance(genericListType);
+						}
+						else
+						{
+							// TODO: return empty arrays and lists.
+							invocation.ReturnValue = null;
+						}
+					}
 				}
 				else
 				{

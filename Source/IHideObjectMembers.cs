@@ -7,7 +7,9 @@ using System.ComponentModel;
 namespace Moq
 {
 	/// <summary>
-	/// Base interface for all mock verbs.
+	/// Helper interface used to hide the base <see cref="Object"/> 
+	/// members from the fluent API to make it much cleaner 
+	/// in Visual Studio intellisense.
 	/// </summary>
 	[EditorBrowsable(EditorBrowsableState.Never)]
 	public interface IHideObjectMembers

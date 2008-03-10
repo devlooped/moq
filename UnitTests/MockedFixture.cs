@@ -68,7 +68,6 @@ namespace Moq.Tests
 
 		public class FooMBR : MarshalByRefObject { }
 
-		[Ignore("Not supported for now. We're not generating a new type for MBROs")]
 		[Test]
 		public void ClassMBRMockedShouldImplementMocked()
 		{
@@ -77,7 +76,6 @@ namespace Moq.Tests
 			Assert.IsTrue(mocked is IMocked<FooMBR>);
 		}
 
-		[Ignore("Not supported for now. We're not generating a new type for MBROs")]
 		[Test]
 		public void MockOfMockedClassMBRShouldReturnSame()
 		{

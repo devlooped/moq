@@ -806,7 +806,7 @@ namespace Moq.Tests
 		{
 			var mock = new Mock<IFoo>();
 			mock.Expect(x => x.Execute(It.IsAny<string>()))
-				.Returns((string s) => s);
+				.Returns((string s) => s.ToLower());
 
 			string result = mock.Object.Execute("blah1");
 			Assert.AreEqual("blah1", result);
@@ -891,6 +891,76 @@ namespace Moq.Tests
 			}
 		}
 
+		[Test]
+		public void ShouldCreateMBROWithProtectedCtorAndArgs()
+		{
+			var mock = new Mock<FooWithProtectedCtorArgsMBRO>("foo", 25);
+
+			Assert.AreEqual("foo", mock.Object.StringValue);
+			Assert.AreEqual(25, mock.Object.IntValue);
+		}
+
+		[Test]
+		public void ShouldCreateMBROWithProtectedCtorAndNullArg()
+		{
+			var mock = new Mock<FooWithProtectedCtorArgsMBRO>(null, 25);
+
+			Assert.IsNull(mock.Object.StringValue);
+			Assert.AreEqual(25, mock.Object.IntValue);
+		}
+
+		[Test]
+		public void ShouldCreateMBROWithProtectedCtorOverload()
+		{
+			var mock = new Mock<FooWithProtectedCtorArgsMBRO>("foo");
+
+			Assert.AreEqual("foo", mock.Object.StringValue);
+		}
+
+		[Test]
+		public void ShouldReturnEmptyArrayOnLoose()
+		{
+			var mock = new Mock<IFoo>(MockBehavior.Loose);
+
+			Assert.IsNotNull(mock.Object.GetArray());
+			Assert.AreEqual(0, mock.Object.GetArray().Length);
+		}
+
+		[Test]
+		public void ShouldReturnEmptyArrayTwoDimensionsOnLoose()
+		{
+			var mock = new Mock<IFoo>(MockBehavior.Loose);
+
+			Assert.IsNotNull(mock.Object.GetArrayTwoDimensions());
+			Assert.AreEqual(0, mock.Object.GetArrayTwoDimensions().Length);
+		}
+
+		[Test]
+		public void ShouldReturnNullListOnLoose()
+		{
+			var mock = new Mock<IFoo>(MockBehavior.Loose);
+
+			Assert.IsNull(mock.Object.GetList());
+		}
+
+		[Test]
+		public void ShouldReturnEmptyEnumerableStringOnLoose()
+		{
+			var mock = new Mock<IFoo>(MockBehavior.Loose);
+
+			Assert.IsNotNull(mock.Object.GetEnumerable());
+			Assert.AreEqual(0, mock.Object.GetEnumerable().Count());
+		}
+
+		[Test]
+		public void ShouldReturnEmptyEnumerableObjectsOnLoose()
+		{
+			var mock = new Mock<IFoo>(MockBehavior.Loose);
+
+			Assert.IsNotNull(mock.Object.GetEnumerableObjects());
+			Assert.AreEqual(0, mock.Object.GetEnumerableObjects().Cast<object>().Count());
+		}
+
 		// ShouldExpectPropertyWithIndexer
 		// ShouldReceiveArgumentValuesOnCallback
 		// ShouldReceiveArgumentValuesOnReturns
@@ -922,6 +992,23 @@ namespace Moq.Tests
 		public class ClassWithNoDefaultConstructor
 		{
 			public ClassWithNoDefaultConstructor(string stringValue, int intValue)
+			{
+				this.StringValue = stringValue;
+				this.IntValue = intValue;
+			}
+
+			public string StringValue { get; set; }
+			public int IntValue { get; set; }
+		}
+
+		public class FooWithProtectedCtorArgsMBRO : MarshalByRefObject
+		{
+			protected FooWithProtectedCtorArgsMBRO(string stringValue)
+			{
+				this.StringValue = stringValue;
+			}
+
+			protected FooWithProtectedCtorArgsMBRO(string stringValue, int intValue)
 			{
 				this.StringValue = stringValue;
 				this.IntValue = intValue;
@@ -1031,6 +1118,12 @@ namespace Moq.Tests
 
 			bool DoTypeOverload(Bar bar);
 			bool DoTypeOverload(Baz bar);
+
+			string[] GetArray();
+			string[][] GetArrayTwoDimensions();
+			List<string> GetList();
+			IEnumerable<string> GetEnumerable();
+			IEnumerable GetEnumerableObjects();
 		}
 
 		public class Bar { }
