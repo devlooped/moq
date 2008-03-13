@@ -145,7 +145,6 @@ namespace Moq
 						}
 						else
 						{
-							// TODO: return empty arrays and lists.
 							invocation.ReturnValue = null;
 						}
 					}
