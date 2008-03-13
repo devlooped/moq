@@ -1,4 +1,5 @@
 ﻿using System;
+using System.ComponentModel;
 
 namespace Moq
 {
@@ -24,6 +25,7 @@ namespace Moq
 	/// members are available (<c>Throws</c> and <c>Callback</c> are inherited from <see cref="ICall"/>).
 	/// </para>
 	/// </remarks>
+	[EditorBrowsable(EditorBrowsableState.Never)]
 	public interface ICall
 	{
 		/// <summary>
@@ -115,6 +117,7 @@ namespace Moq
 	/// members are available (<c>Throws</c> and <c>Callback</c> are inherited from <see cref="ICall"/>).
 	/// </para>
 	/// </remarks>
+	[EditorBrowsable(EditorBrowsableState.Never)]
 	public interface ICallReturn<TResult> : ICall
 	{
 		/// <summary>
