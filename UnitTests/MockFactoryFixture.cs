@@ -101,6 +101,25 @@ namespace Moq.Tests
 			}
 		}
 
+		[Test]
+		public void ShouldOverrideDefaultBehavior()
+		{
+			var factory = new MockFactory(MockBehavior.Normal);
+			var mock = factory.Create<IFoo>(MockBehavior.Strict);
+
+			Assert.AreEqual(MockBehavior.Strict, mock.Behavior);
+		}
+
+		[Test]
+		public void ShouldOverrideDefaultBehaviorWithCtorArgs()
+		{
+			var factory = new MockFactory(MockBehavior.Normal);
+			var mock = factory.Create<BaseClass>(MockBehavior.Strict, "Foo");
+
+			Assert.AreEqual(MockBehavior.Strict, mock.Behavior);
+			Assert.AreEqual("Foo", mock.Object.Value);
+		}
+
 		public interface IFoo
 		{
 			void Do();
