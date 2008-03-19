@@ -9,10 +9,32 @@ using Moq.Language;
 
 namespace Moq
 {
+	internal class MethodCall<TProperty> : MethodCall, IExpectSetter<TProperty>
+	{
+		public MethodCall(Expression originalExpression, MethodInfo method, params Expression[] arguments)
+			: base(originalExpression, method, arguments)
+		{
+		}
+
+		public override bool Matches(IInvocation call)
+		{
+			// Need to override default behavior as the arguments will be zero 
+			// whereas the call arguments will be one: the property 
+			// value to set.
+			return call.Method == method;
+		}
+
+		public IThrowsOnceVerifies Callback(Action<TProperty> callback)
+		{
+			SetCallbackWithArguments(callback);
+			return this;
+		}
+	}
+
 	internal class MethodCall : IProxyCall, IExpect
 	{
+		protected MethodInfo method;
 		Expression originalExpression;
-		MethodInfo method;
 		Exception exception;
 		Action<object[]> callback;
 		IMatcher[] argumentMatchers;
@@ -66,7 +88,7 @@ namespace Moq
 			return this;
 		}
 
-		private void SetCallbackWithArguments(Delegate callback)
+		protected void SetCallbackWithArguments(Delegate callback)
 		{
 			this.callback = delegate(object[] args) { callback.DynamicInvoke(args); };
 		}
@@ -76,7 +98,7 @@ namespace Moq
 			IsVerifiable = true;
 		}
 
-		public bool Matches(IInvocation call)
+		public virtual bool Matches(IInvocation call)
 		{
 			if (call.Method == method &&
 				argumentMatchers.Length == call.Arguments.Length)

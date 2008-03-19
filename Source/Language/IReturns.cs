@@ -3,12 +3,14 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using Moq.Language.Flow;
+using System.ComponentModel;
 
 namespace Moq.Language
 {
 	/// <summary>
 	/// Base interface for <see cref="IReturns{TResult}"/>.
 	/// </summary>
+	[EditorBrowsable(EditorBrowsableState.Never)]
 	public interface IReturns : IHideObjectMembers
 	{
 	}
@@ -16,7 +18,8 @@ namespace Moq.Language
 	/// <summary>
 	/// Defines the <c>Returns</c> verb.
 	/// </summary>
-	public interface IReturns<TResult> : IReturns, IHideObjectMembers
+	[EditorBrowsable(EditorBrowsableState.Never)]
+	public interface IReturns<TProperty> : IReturns, IHideObjectMembers
 	{
 		/// <summary>
 		/// Specifies the value to return.
@@ -29,7 +32,7 @@ namespace Moq.Language
 		///     .Returns(true);
 		/// </code>
 		/// </example>
-		IOnceVerifies Returns(TResult value);
+		IOnceVerifies Returns(TProperty value);
 		/// <summary>
 		/// Specifies a function that will calculate the value to return from the method.
 		/// </summary>
@@ -45,7 +48,7 @@ namespace Moq.Language
 		/// is executed and the value the <c>returnValues</c> array has at 
 		/// that moment.
 		/// </example>
-		IOnceVerifies Returns(Func<TResult> valueFunction);
+		IOnceVerifies Returns(Func<TProperty> valueFunction);
 		/// <summary>
 		/// Specifies a function that will calculate the value to return from the method, 
 		/// retrieving the arguments for the invocation.
@@ -65,7 +68,7 @@ namespace Moq.Language
 		///     .Returns((string command) => returnValues[command]);
 		/// </code>
 		/// </example>
-		IOnceVerifies Returns<T>(Func<T, TResult> valueFunction);
+		IOnceVerifies Returns<T>(Func<T, TProperty> valueFunction);
 		/// <summary>
 		/// Specifies a function that will calculate the value to return from the method, 
 		/// retrieving the arguments for the invocation.
@@ -87,7 +90,7 @@ namespace Moq.Language
 		///     .Returns((string arg1, string arg2) => arg1 + arg2);
 		/// </code>
 		/// </example>
-		IOnceVerifies Returns<T1, T2>(Func<T1, T2, TResult> valueFunction);
+		IOnceVerifies Returns<T1, T2>(Func<T1, T2, TProperty> valueFunction);
 		/// <summary>
 		/// Specifies a function that will calculate the value to return from the method, 
 		/// retrieving the arguments for the invocation.
@@ -111,7 +114,7 @@ namespace Moq.Language
 		///     .Returns((string arg1, string arg2, int arg3) => arg1 + arg2 + arg3);
 		/// </code>
 		/// </example>
-		IOnceVerifies Returns<T1, T2, T3>(Func<T1, T2, T3, TResult> valueFunction);
+		IOnceVerifies Returns<T1, T2, T3>(Func<T1, T2, T3, TProperty> valueFunction);
 		/// <summary>
 		/// Specifies a function that will calculate the value to return from the method, 
 		/// retrieving the arguments for the invocation.
@@ -137,6 +140,6 @@ namespace Moq.Language
 		///     .Returns((string arg1, string arg2, int arg3, bool arg4) => arg1 + arg2 + arg3 + arg4);
 		/// </code>
 		/// </example>
-		IOnceVerifies Returns<T1, T2, T3, T4>(Func<T1, T2, T3, T4, TResult> valueFunction);
+		IOnceVerifies Returns<T1, T2, T3, T4>(Func<T1, T2, T3, T4, TProperty> valueFunction);
 	}
 }

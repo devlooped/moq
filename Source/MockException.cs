@@ -40,6 +40,8 @@ namespace Moq
 			ReturnValueNoExpectation,
 			VerificationFailed, 
 			MoreThanOneCall,
+			ExpectedProperty, 
+			ExpectedMethod,
 		}
 
 		ExceptionReason reason;

@@ -4,10 +4,11 @@ using System.Reflection;
 using System.Runtime.Remoting.Messaging;
 using Castle.Core.Interceptor;
 using Moq.Language.Flow;
+using Moq.Language;
 
 namespace Moq
 {
-	internal class MethodCallReturn<TResult> : MethodCall, IProxyCall, IExpect<TResult>
+	internal class MethodCallReturn<TResult> : MethodCall, IProxyCall, IExpect<TResult>, IExpectGetter<TResult>
 	{
 		//TResult value;
 		//Func<TResult> valueFunc;
@@ -53,6 +54,12 @@ namespace Moq
 		public IOnceVerifies Returns<T1, T2, T3, T4>(Func<T1, T2, T3, T4, TResult> valueExpression)
 		{
 			SetReturnDelegate(valueExpression);
+			return this;
+		}
+
+		IReturnsThrowsGetter<TResult> ICallbackGetter<TResult>.Callback(Action callback)
+		{
+			base.Callback(callback);
 			return this;
 		}
 

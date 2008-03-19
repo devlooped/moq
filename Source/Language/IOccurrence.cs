@@ -2,12 +2,14 @@
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
+using System.ComponentModel;
 
 namespace Moq.Language
 {
 	/// <summary>
 	/// Defines occurrence members to constraint expectations.
 	/// </summary>
+	[EditorBrowsable(EditorBrowsableState.Never)]
 	public interface IOccurrence : IHideObjectMembers
 	{
 		/// <summary>

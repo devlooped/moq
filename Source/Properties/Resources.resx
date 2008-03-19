@@ -165,4 +165,14 @@
   <data name="ObjectInstanceNotMock" xml:space="preserve">
     <value>Object instance was not created by Moq.</value>
   </data>
+  <data name="PropertyNotWritable" xml:space="preserve">
+    <value>Property {0}.{1} is read-only.</value>
+  </data>
+  <data name="ExpressionNotProperty" xml:space="preserve">
+    <value>Expression is not a property access: {0}</value>
+  </data>
+  <data name="ExpressionNotMethod" xml:space="preserve">
+    <value>Expression is not a method invocation: {0}
+Expectations for properties should use ExpectGet/ExpectSet instead.</value>
+  </data>
 </root>

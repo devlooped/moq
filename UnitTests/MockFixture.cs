@@ -111,22 +111,19 @@ namespace Moq.Tests
 		}
 
 		[Test]
-		public void ShouldExpectReturnPropertyValue()
-		{
-			var mock = new Mock<IFoo>();
-
-			mock.Expect(x => x.ValueProperty).Returns(25);
-
-			Assert.AreEqual(25, mock.Object.ValueProperty);
-		}
-
-		[ExpectedException(typeof(NotSupportedException))]
-		[Test]
 		public void ShouldThrowIfExpectFieldValue()
 		{
 			var mock = new Mock<FooMBRO>();
 
-			mock.Expect(x => x.ValueField);
+			try
+			{
+				mock.Expect(x => x.ValueField);
+				Assert.Fail();
+			}
+			catch (MockException mex)
+			{
+				Assert.AreEqual(MockException.ExceptionReason.ExpectedMethod, mex.Reason);
+			}
 		}
 
 		[Test]
@@ -886,7 +883,6 @@ namespace Moq.Tests
 			}
 			catch (MockException mex)
 			{
-				Console.WriteLine(mex);
 				Assert.AreEqual(MockException.ExceptionReason.MoreThanOneCall, mex.Reason);
 			}
 		}
@@ -968,10 +964,74 @@ namespace Moq.Tests
 			Assert.AreEqual(default(Guid), mock.Object.DoReturnGuid());
 		}
 
+		[Test]
+		public void ShouldExpectPropertySetter()
+		{
+			var mock = new Mock<IFoo>();
+
+			int value = 0;
+
+			mock.ExpectSet(foo => foo.ValueProperty)
+				.Callback(i => value = i);
+
+			mock.Object.ValueProperty = 5;
+
+			Assert.AreEqual(5, value);
+		}
+
+		[Test]
+		public void ShouldExpectGetter()
+		{
+			var mock = new Mock<IFoo>();
+
+			bool called = false;
+
+			mock.ExpectGet(x => x.ValueProperty)
+				.Callback(() => called = true)
+				.Returns(25);
+
+			Assert.AreEqual(25, mock.Object.ValueProperty);
+			Assert.IsTrue(called);
+		}
+
+		[Test]
+		public void ShouldThrowIfExpectPropertySetterOnMethod()
+		{
+			var mock = new Mock<IFoo>();
+
+			try
+			{
+				mock.ExpectSet(foo => foo.DoIntArgReturnInt(5));
+				Assert.Fail("Should throw on ExpectSet on method instead of property.");
+			}
+			catch (MockException mex)
+			{
+				Assert.AreEqual(MockException.ExceptionReason.ExpectedProperty, mex.Reason);
+			}
+		}
+
+		[Test]
+		public void ShouldThrowIfExpectPropertyGetterOnMethod()
+		{
+			var mock = new Mock<IFoo>();
+
+			try
+			{
+				mock.ExpectGet(foo => foo.DoIntArgReturnInt(5));
+				Assert.Fail("Should throw on ExpectGet on method instead of property.");
+			}
+			catch (MockException mex)
+			{
+				Assert.AreEqual(MockException.ExceptionReason.ExpectedProperty, mex.Reason);
+			}
+		}
+
+		// ShouldThrowIfExpectSetOnMethod
+
+
+		// ShouldOptOutFromCallingBaseImplementation
+
 		// ShouldExpectPropertyWithIndexer
-		// ShouldReceiveArgumentValuesOnCallback
-		// ShouldReceiveArgumentValuesOnReturns
-		// ShouldInterceptPropertySetter?
 		// ShouldSupportByRefArguments?
 		// ShouldSupportOutArguments?
 

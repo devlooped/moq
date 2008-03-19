@@ -3,12 +3,14 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using Moq.Language.Flow;
+using System.ComponentModel;
 
 namespace Moq.Language
 {
 	/// <summary>
 	/// Defines the <c>Throws</c> verb.
 	/// </summary>
+	[EditorBrowsable(EditorBrowsableState.Never)]
 	public interface IThrows : IHideObjectMembers
 	{
 		/// <summary>

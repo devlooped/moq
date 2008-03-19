@@ -98,6 +98,25 @@ namespace Moq.Properties {
         }
         
         /// <summary>
+        ///   Looks up a localized string similar to Expression is not a method invocation: {0}
+        ///Expectations for properties should use ExpectGet/ExpectSet instead..
+        /// </summary>
+        internal static string ExpressionNotMethod {
+            get {
+                return ResourceManager.GetString("ExpressionNotMethod", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Expression is not a property access: {0}.
+        /// </summary>
+        internal static string ExpressionNotProperty {
+            get {
+                return ResourceManager.GetString("ExpressionNotProperty", resourceCulture);
+            }
+        }
+        
+        /// <summary>
         ///   Looks up a localized string similar to Field calls are not supported. Use interfaces and properties instead..
         /// </summary>
         internal static string FieldsNotSupported {
@@ -167,6 +186,15 @@ namespace Moq.Properties {
         internal static string PropertyNotReadable {
             get {
                 return ResourceManager.GetString("PropertyNotReadable", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Property {0}.{1} is read-only..
+        /// </summary>
+        internal static string PropertyNotWritable {
+            get {
+                return ResourceManager.GetString("PropertyNotWritable", resourceCulture);
             }
         }
         

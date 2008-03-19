@@ -74,6 +74,8 @@ namespace Moq
 		RemotingProxy remotingProxy;
 		MockBehavior behavior;
 
+		enum ExpectKind { Method, PropertyGet, PropertySet }
+
 		/// <summary>
 		/// Initializes an instance of the mock with a specific <see cref="MockBehavior">behavior</see> with 
 		/// the given constructor arguments for the class.
@@ -213,6 +215,7 @@ namespace Moq
 		{
 			return (IExpect)ExpectImpl(
 				expression,
+				ExpectKind.Method,
 				(original, method, args) => new MethodCall(original, method, args));
 		}
 
@@ -234,7 +237,55 @@ namespace Moq
 		{
 			return (IExpect<TResult>)ExpectImpl(
 				expression,
+				ExpectKind.Method,
 				(original, method, args) => new MethodCallReturn<TResult>(original, method, args));
+		}
+
+		/// <summary>
+		/// Sets an expectation on the mocked type for a call to 
+		/// to a property getter.
+		/// </summary>
+		/// <remarks>
+		/// If more than one expectation is set for the same property getter, 
+		/// the latest one wins and is the one that will be executed.
+		/// </remarks>
+		/// <typeparam name="TProperty">Type of the property, typically inferred from the received lambda expression.</typeparam>
+		/// <param name="expression">Lambda expression that specifies the expected property getter.</param>
+		/// <example>
+		/// <code>
+		/// mock.ExpectGet(x =&gt; x.Suspended)
+		///     .Returns(true);
+		/// </code>
+		/// </example>
+		public IExpectGetter<TProperty> ExpectGet<TProperty>(Expression<Func<T, TProperty>> expression)
+		{
+			return (IExpectGetter<TProperty>)ExpectImpl(
+				expression,
+				ExpectKind.PropertyGet,
+				(original, method, args) => new MethodCallReturn<TProperty>(original, method, args));
+		}
+
+		/// <summary>
+		/// Sets an expectation on the mocked type for a call to 
+		/// to a property setter.
+		/// </summary>
+		/// <remarks>
+		/// If more than one expectation is set for the same property setter, 
+		/// the latest one wins and is the one that will be executed.
+		/// </remarks>
+		/// <typeparam name="TProperty">Type of the property, typically inferred from the received lambda expression.</typeparam>
+		/// <param name="expression">Lambda expression that specifies the expected property setter.</param>
+		/// <example>
+		/// <code>
+		/// mock.ExpectSet(x =&gt; x.Suspended);
+		/// </code>
+		/// </example>
+		public IExpectSetter<TProperty> ExpectSet<TProperty>(Expression<Func<T, TProperty>> expression)
+		{
+			return (IExpectSetter<TProperty>)ExpectImpl(
+				expression,
+				ExpectKind.PropertySet,
+				(original, method, args) => new MethodCall<TProperty>(original, method, args));
 		}
 
 		/// <summary>
@@ -307,56 +358,97 @@ namespace Moq
 
 		private IProxyCall ExpectImpl(
 			Expression expression,
+			ExpectKind expectKind,
 			Func<Expression, MethodInfo, Expression[], IProxyCall> factory)
 		{
 			Guard.ArgumentNotNull(expression, "expression");
 
 			LambdaExpression lambda = (LambdaExpression)expression;
-			MethodCallExpression methodCall = lambda.Body as MethodCallExpression;
-			MemberExpression propField = lambda.Body as MemberExpression;
-
 			IProxyCall result = null;
 
-			if (methodCall != null)
+			// Verify kind of Expect being used.
+			switch (expectKind)
 			{
-				VerifyCanOverride(expression, methodCall.Method);
-				result = factory(expression, methodCall.Method, methodCall.Arguments.ToArray());
-				interceptor.AddCall(result);
-			}
-			else if (propField != null)
-			{
-				PropertyInfo prop = propField.Member as PropertyInfo;
-				FieldInfo field = propField.Member as FieldInfo;
-				if (prop != null)
-				{
-					// If property is not readable, the compiler won't let 
-					// the user to specify it in the lambda :)
-					// This is just reassuring that in case they build the 
-					// expression tree manually?
-					if (!prop.CanRead)
+				case ExpectKind.Method:
 					{
-						throw new ArgumentException(String.Format(
-							Properties.Resources.PropertyNotReadable,
-							prop.DeclaringType.Name,
-							prop.Name), "expression");
-					}
+						ThrowIfNotMethod(lambda.Body);
+						MethodCallExpression methodCall = (MethodCallExpression)lambda.Body;
 
-					VerifyCanOverride(expression, prop.GetGetMethod());
-					result = factory(expression, prop.GetGetMethod(), new Expression[0]);
-					interceptor.AddCall(result);
-				}
-				else if (field != null)
-				{
-					throw new NotSupportedException(Properties.Resources.FieldsNotSupported);
-				}
+						VerifyCanOverride(expression, methodCall.Method);
+						result = factory(expression, methodCall.Method, methodCall.Arguments.ToArray());
+						interceptor.AddCall(result);
+						break;
+					}
+				case ExpectKind.PropertyGet:
+					{
+						ThrowIfNotProperty(lambda.Body);
+						var prop = (PropertyInfo)((MemberExpression)lambda.Body).Member;
+
+						// If property is not readable, the compiler won't let 
+						// the user to specify it in the lambda :)
+						// This is just reassuring that in case they build the 
+						// expression tree manually?
+						if (!prop.CanRead)
+						{
+							throw new ArgumentException(String.Format(
+								Properties.Resources.PropertyNotReadable,
+								prop.DeclaringType.Name,
+								prop.Name), "expression");
+						}
+
+						var propertyMethod = prop.GetGetMethod();
+						VerifyCanOverride(expression, propertyMethod);
+						result = factory(expression, propertyMethod, new Expression[0]);
+						interceptor.AddCall(result);
+						break;
+					}
+				case ExpectKind.PropertySet:
+					{
+						ThrowIfNotProperty(lambda.Body);
+						var prop = (PropertyInfo)((MemberExpression)lambda.Body).Member;
+
+						if (!prop.CanWrite)
+						{
+							throw new ArgumentException(String.Format(
+								Properties.Resources.PropertyNotWritable,
+								prop.DeclaringType.Name,
+								prop.Name), "expression");
+						}
+
+						var propertyMethod = prop.GetSetMethod();
+						VerifyCanOverride(expression, propertyMethod);
+						result = factory(expression, propertyMethod, new Expression[0]);
+						interceptor.AddCall(result);
+						break;
+					}
+				default:
+					throw new NotSupportedException(expression.ToStringFixed());
 			}
+
 
 			if (result == null)
 			{
-				throw new NotSupportedException(expression.ToString());
+				throw new NotSupportedException(expression.ToStringFixed());
 			}
 
 			return result;
+		}
+
+		private static void ThrowIfNotProperty(Expression expression)
+		{
+			var prop = expression as MemberExpression;
+			if (prop != null && prop.Member is PropertyInfo)
+				return;
+
+			throw new MockException(MockException.ExceptionReason.ExpectedProperty,
+				String.Format(Properties.Resources.ExpressionNotProperty, expression.ToStringFixed()));
+		}
+
+		private static void ThrowIfNotMethod(Expression expression)
+		{
+			if (!(expression is MethodCallExpression))
+				throw new MockException(MockException.ExceptionReason.ExpectedMethod,
+					String.Format(Properties.Resources.ExpressionNotMethod, expression.ToStringFixed()));
 		}
 
 		private void VerifyCanOverride(Expression expectation, MethodInfo methodInfo)
@@ -385,7 +477,7 @@ namespace Moq
 	/// Static methods that apply to mocked objects, such as <see cref="Get"/> to 
 	/// retrieve a <see cref="Mock{T}"/> from an object instance.
 	/// </summary>
-	public static class Mock 
+	public static class Mock
 	{
 		/// <summary>
 		/// Retrieves the mock object for the given object instance.

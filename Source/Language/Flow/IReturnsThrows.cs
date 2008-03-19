@@ -11,4 +11,11 @@ namespace Moq.Language.Flow
 	public interface IReturnsThrows<TResult> : IReturns<TResult>, IThrows, IHideObjectMembers
 	{
 	}
+
+	/// <summary>
+	/// Implements the fluent API.
+	/// </summary>
+	public interface IReturnsThrowsGetter<TProperty> : IReturnsGetter<TProperty>, IThrows, IHideObjectMembers
+	{
+	}
 }

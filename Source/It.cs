@@ -48,12 +48,14 @@ namespace Moq
 		/// This example shows how to return the value <c>1</c> whenever the argument to the 
 		/// <c>Do</c> method is an even number.
 		/// <code>
-		/// mock.Expect(x =&gt; x.Do(It.Is&lt;int&gt;(i =&gt; i % 2 == 0))).Returns(1);
+		/// mock.Expect(x =&gt; x.Do(It.Is&lt;int&gt;(i =&gt; i % 2 == 0)))
+		///     .Returns(1);
 		/// </code>
 		/// This example shows how to throw an exception if the argument to the 
 		/// method is a negative number:
 		/// <code>
-		/// mock.Expect(x =&gt; x.GetUser(It.Is&lt;int&gt;(i =&gt; i &lt; 0))).Throws(new ArgumentException());
+		/// mock.Expect(x =&gt; x.GetUser(It.Is&lt;int&gt;(i =&gt; i &lt; 0)))
+		///     .Throws(new ArgumentException());
 		/// </code>
 		/// </example>
 		[Matcher(typeof(PredicateMatcher))]
@@ -73,7 +75,10 @@ namespace Moq
 		/// The following example shows how to expect a method call 
 		/// with an integer argument within the 0..100 range.
 		/// <code>
-		/// mock.Expect(x =&gt; x.HasInventory(It.IsAny&lt;string&gt;(), It.IsInRange(0, 100, Range.Inclusive))).Returns(false);
+		/// mock.Expect(x =&gt; x.HasInventory(
+		///                          It.IsAny&lt;string&gt;(),
+		///                          It.IsInRange(0, 100, Range.Inclusive)))
+		///     .Returns(false);
 		/// </code>
 		/// </example>
 		[Matcher(typeof(RangeMatcher))]

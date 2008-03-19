@@ -3,12 +3,14 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using Moq.Language.Flow;
+using System.ComponentModel;
 
 namespace Moq.Language
 {
 	/// <summary>
 	/// Defines the <c>Callback</c> verb and overloads.
 	/// </summary>
+	[EditorBrowsable(EditorBrowsableState.Never)]
 	public interface ICallback : IHideObjectMembers
 	{
 		/// <summary>
@@ -118,6 +120,7 @@ namespace Moq.Language
 	/// Defines the <c>Callback</c> verb and overloads for callbacks on 
 	/// expectations that return a value.
 	/// </summary>
+	[EditorBrowsable(EditorBrowsableState.Never)]
 	public interface ICallback<TResult> : IHideObjectMembers
 	{
 		/// <summary>
