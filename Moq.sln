@@ -5,6 +5,14 @@ Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Moq", "Source\Moq.csproj", 
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Moq.Tests", "UnitTests\Moq.Tests.csproj", "{81BBC911-4916-4E10-A955-752AE47CB2B9}"
 EndProject
+Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Extensions", "Extensions", "{18A26EFC-6D99-420F-BB16-A36C4B707B85}"
+EndProject
+Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Mvc", "Mvc", "{B88D8621-5130-43FC-A675-9B5DAFCE9374}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Moq.Mvc", "Extensions\Mvc\Source\Moq.Mvc.csproj", "{C54A9189-A851-4AB8-95D2-B1819B784107}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Moq.Mvc.Tests", "Extensions\Mvc\UnitTests\Moq.Mvc.Tests.csproj", "{E87AC966-7D5A-4C47-B1FE-FEFF3742A182}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
@@ -19,8 +27,21 @@ Global
 		{81BBC911-4916-4E10-A955-752AE47CB2B9}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{81BBC911-4916-4E10-A955-752AE47CB2B9}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{81BBC911-4916-4E10-A955-752AE47CB2B9}.Release|Any CPU.Build.0 = Release|Any CPU
+		{C54A9189-A851-4AB8-95D2-B1819B784107}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{C54A9189-A851-4AB8-95D2-B1819B784107}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{C54A9189-A851-4AB8-95D2-B1819B784107}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{C54A9189-A851-4AB8-95D2-B1819B784107}.Release|Any CPU.Build.0 = Release|Any CPU
+		{E87AC966-7D5A-4C47-B1FE-FEFF3742A182}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{E87AC966-7D5A-4C47-B1FE-FEFF3742A182}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{E87AC966-7D5A-4C47-B1FE-FEFF3742A182}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{E87AC966-7D5A-4C47-B1FE-FEFF3742A182}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
+	EndGlobalSection
+	GlobalSection(NestedProjects) = preSolution
+		{B88D8621-5130-43FC-A675-9B5DAFCE9374} = {18A26EFC-6D99-420F-BB16-A36C4B707B85}
+		{C54A9189-A851-4AB8-95D2-B1819B784107} = {B88D8621-5130-43FC-A675-9B5DAFCE9374}
+		{E87AC966-7D5A-4C47-B1FE-FEFF3742A182} = {B88D8621-5130-43FC-A675-9B5DAFCE9374}
 	EndGlobalSection
 EndGlobal

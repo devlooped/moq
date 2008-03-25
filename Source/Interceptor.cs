@@ -50,9 +50,9 @@ namespace Moq
 			}
 		}
 
-		public void AddCall(IProxyCall call)
+		public void AddCall(IProxyCall call, ExpectKind kind)
 		{
-			calls[call.ExpectExpression.ToStringFixed()] = call;
+			calls[kind.ToString() + ":" + call.ExpectExpression.ToStringFixed()] = call;
 		}
 
 		public void Intercept(IInvocation invocation)

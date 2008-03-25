@@ -74,8 +74,6 @@ namespace Moq
 		RemotingProxy remotingProxy;
 		MockBehavior behavior;
 
-		enum ExpectKind { Method, PropertyGet, PropertySet }
-
 		/// <summary>
 		/// Initializes an instance of the mock with a specific <see cref="MockBehavior">behavior</see> with 
 		/// the given constructor arguments for the class.
@@ -376,7 +374,7 @@ namespace Moq
 
 						VerifyCanOverride(expression, methodCall.Method);
 						result = factory(expression, methodCall.Method, methodCall.Arguments.ToArray());
-						interceptor.AddCall(result);
+						interceptor.AddCall(result, expectKind);
 						break;
 					}
 				case ExpectKind.PropertyGet:
@@ -399,7 +397,7 @@ namespace Moq
 						var propertyMethod = prop.GetGetMethod();
 						VerifyCanOverride(expression, propertyMethod);
 						result = factory(expression, propertyMethod, new Expression[0]);
-						interceptor.AddCall(result);
+						interceptor.AddCall(result, expectKind);
 						break;
 					}
 				case ExpectKind.PropertySet:
@@ -418,7 +416,7 @@ namespace Moq
 						var propertyMethod = prop.GetSetMethod();
 						VerifyCanOverride(expression, propertyMethod);
 						result = factory(expression, propertyMethod, new Expression[0]);
-						interceptor.AddCall(result);
+						interceptor.AddCall(result, expectKind);
 						break;
 					}
 				default:
@@ -460,13 +458,13 @@ namespace Moq
 		}
 
 		// NOTE: known issue. See https://connect.microsoft.com/VisualStudio/feedback/ViewFeedback.aspx?FeedbackID=318122
-		//public static implicit operator TInterface(Mock<TInterface> mock)
+		//public static implicit operator TInterface(Mock<T> mock)
 		//{
 		//    // TODO: doesn't work as expected but ONLY with interfaces :S
 		//    return mock.Object;
 		//}
 
-		//public static explicit operator TInterface(Mock<TInterface> mock)
+		//public static explicit operator TInterface(Mock<T> mock)
 		//{
 		//    // TODO: doesn't work as expected but ONLY with interfaces :S
 		//    throw new NotImplementedException();
