@@ -100,7 +100,7 @@ namespace Moq
 
 		public virtual bool Matches(IInvocation call)
 		{
-			if (call.Method == method &&
+			if (IsEqualMethodOrOverride(call) &&
 				argumentMatchers.Length == call.Arguments.Length)
 			{
 				for (int i = 0; i < argumentMatchers.Length; i++)
@@ -113,6 +113,14 @@ namespace Moq
 			}
 
 			return false;
+		}
+
+		private bool IsEqualMethodOrOverride(IInvocation call)
+		{
+			return call.Method == method ||
+				(call.Method.DeclaringType.IsClass &&
+				call.Method.IsVirtual &&
+				call.Method.GetBaseDefinition() == method);
 		}
 
 		public virtual void Execute(IInvocation call)

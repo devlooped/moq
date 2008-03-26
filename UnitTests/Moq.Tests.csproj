@@ -56,7 +56,8 @@
     <Compile Include="MockFactoryFixture.cs" />
     <Compile Include="MockFixture.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
-    <Compile Include="StubFixture.cs" />
+    <Compile Include="Regressions\StreamFixture.cs" />
+    <Compile Include="Regressions\StubFixture.cs" />
   </ItemGroup>
   <ItemGroup>
     <ProjectReference Include="..\Source\Moq.csproj">

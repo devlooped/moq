@@ -1026,6 +1026,17 @@ namespace Moq.Tests
 			}
 		}
 
+		[Test]
+		public void ShouldSetExpectationOnAbstractMethodMBRO()
+		{
+			var mock = new Mock<AbstractMBRO>();
+
+			mock.Expect(x => x.Get())
+				.Returns(5);
+
+			Assert.AreEqual(5, mock.Object.Get());
+		}
+
 		// ShouldThrowIfExpectSetOnMethod
 
 
@@ -1156,6 +1167,7 @@ namespace Moq.Tests
 		public abstract class AbstractMBRO : MarshalByRefObject
 		{
 			public string Value { get; set; }
+			public abstract int Get();
 		}
 
 		public interface IFoo
