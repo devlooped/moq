@@ -965,6 +965,67 @@ namespace Moq.Tests
 		}
 
 		[Test]
+		public void ShouldReturnNullStringOnLoose()
+		{
+			var mock = new Mock<IFoo>(MockBehavior.Loose);
+
+			Assert.IsNull(mock.Object.DoReturnString());
+		}
+
+		[Test]
+		public void ShouldReturnNullStringOnLooseWithExpect()
+		{
+			var mock = new Mock<IFoo>(MockBehavior.Loose);
+
+			mock.Expect(x => x.DoReturnString());
+
+			Assert.IsNull(mock.Object.DoReturnString());
+		}
+
+		[Test]
+		public void ShouldThrowOnNormalWithExpectButNoReturns()
+		{
+			var mock = new Mock<IFoo>(MockBehavior.Normal);
+
+			mock.Expect(x => x.DoReturnString());
+
+			try
+			{
+				mock.Object.DoReturnString();
+			}
+			catch (MockException mex)
+			{
+				Assert.AreEqual(MockException.ExceptionReason.ReturnValueNoExpectation, mex.Reason);
+			}
+		}
+		
+		[Test]
+		public void ShouldReturnZeroOnLoose()
+		{
+			var mock = new Mock<IFoo>(MockBehavior.Loose);
+
+			Assert.AreEqual(0, mock.Object.DoReturnInt());			
+		}
+
+		[Test]
+		public void ShouldReturnNullReturnValue()
+		{
+			var mock = new Mock<IBag>();
+			mock.Expect(bar => bar.Get("Whatever")).Returns(null);
+			Assert.IsNull(mock.Object.Get("Whatever"));
+			mock.VerifyAll();
+		}
+
+		[Test]
+		public void ShouldReturnNullReturnValueIfNullFunc()
+		{
+			var mock = new Mock<IBag>();
+			mock.Expect(bar => bar.Get("Whatever")).Returns((Func<object>)null);
+			Assert.IsNull(mock.Object.Get("Whatever"));
+			mock.VerifyAll();
+		}
+
+		[Test]
 		public void ShouldExpectPropertySetter()
 		{
 			var mock = new Mock<IFoo>();
@@ -1037,12 +1098,36 @@ namespace Moq.Tests
 			Assert.AreEqual(5, mock.Object.Get());
 		}
 
-		// ShouldThrowIfExpectSetOnMethod
+		[Test]
+		public void ShouldExpectGetIndexedProperty()
+		{
+			var mock = new Mock<IFoo>();
 
+			mock.ExpectGet(foo => foo[0])
+				.Returns(1);
+			mock.ExpectGet(foo => foo[1])
+				.Returns(2);
+
+			Assert.AreEqual(1, mock.Object[0]);
+			Assert.AreEqual(2, mock.Object[1]);
+		}
+
+		[Test]
+		public void ShouldExpectAndExpectGetBeSynonyms()
+		{
+			var mock = new Mock<IFoo>();
+
+			mock.ExpectGet(foo => foo[0])
+				.Returns(1);
+			mock.Expect(foo => foo[1])
+				.Returns(2);
+
+			Assert.AreEqual(1, mock.Object[0]);
+			Assert.AreEqual(2, mock.Object[1]);
+		}
 
 		// ShouldOptOutFromCallingBaseImplementation
 
-		// ShouldExpectPropertyWithIndexer
 		// ShouldSupportByRefArguments?
 		// ShouldSupportOutArguments?
 
@@ -1204,6 +1289,7 @@ namespace Moq.Tests
 			List<string> GetList();
 			IEnumerable<string> GetEnumerable();
 			IEnumerable GetEnumerableObjects();
+			int this[int index] { get; set; }
 		}
 
 		public class Bar { }
@@ -1222,6 +1308,12 @@ namespace Moq.Tests
 			{
 				return true;
 			}
+		}
+
+		public interface IBag
+		{
+			void Add(string key, object o);
+			object Get(string key);
 		}
 	}
 }

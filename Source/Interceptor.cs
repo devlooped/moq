@@ -118,36 +118,7 @@ namespace Moq
 			{
 				if (behavior == MockBehavior.Loose)
 				{
-					// Return default value.
-					if (invocation.Method.ReturnType.IsValueType)
-					{
-						if (invocation.Method.ReturnType.IsAssignableFrom(typeof(int)))
-							invocation.ReturnValue = 0;
-						else
-							invocation.ReturnValue = Activator.CreateInstance(invocation.Method.ReturnType);
-					}
-					else
-					{
-						if (invocation.Method.ReturnType.IsArray)
-						{
-							invocation.ReturnValue = Activator.CreateInstance(invocation.Method.ReturnType, 0);
-						}
-						else if (invocation.Method.ReturnType == typeof(System.Collections.IEnumerable))
-						{
-							invocation.ReturnValue = new object[0];
-						}
-						else if (invocation.Method.ReturnType.IsGenericType && 
-							invocation.Method.ReturnType.GetGenericTypeDefinition() == typeof(IEnumerable<>))
-						{
-							var genericListType = typeof(List<>).MakeGenericType(
-								invocation.Method.ReturnType.GetGenericArguments()[0]);
-							invocation.ReturnValue = Activator.CreateInstance(genericListType);
-						}
-						else
-						{
-							invocation.ReturnValue = null;
-						}
-					}
+					invocation.ReturnValue = new DefaultValue(invocation.Method.ReturnType).Value;
 				}
 				else
 				{

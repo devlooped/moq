@@ -33,11 +33,6 @@ namespace Moq
 			}
 		}
 
-		public static void ForEach(this IEnumerable source, Action<object> action)
-		{
-			ForEach<object>(source.OfType<object>(), action);
-		}
-
 		public static string Format(this IInvocation invocation)
 		{
 			return

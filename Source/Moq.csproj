@@ -54,6 +54,7 @@
     <Reference Include="System.Xml" />
   </ItemGroup>
   <ItemGroup>
+    <Compile Include="DefaultValue.cs" />
     <Compile Include="ExpectKind.cs" />
     <Compile Include="ExpressionExtensions.cs" />
     <Compile Include="Extensions.cs" />

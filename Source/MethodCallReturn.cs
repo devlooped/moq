@@ -10,27 +10,23 @@ namespace Moq
 {
 	internal class MethodCallReturn<TResult> : MethodCall, IProxyCall, IExpect<TResult>, IExpectGetter<TResult>
 	{
-		//TResult value;
-		//Func<TResult> valueFunc;
-
-        Delegate valueDel;
+		Delegate valueDel = (Func<TResult>)(() => (TResult)new DefaultValue(typeof(TResult)).Value);
 
 		public MethodCallReturn(Expression originalExpression, MethodInfo method, params Expression[] arguments)
 			: base(originalExpression, method, arguments)
 		{
 		}
 
-        public IOnceVerifies Returns(Func<TResult> valueExpression)
+		public IOnceVerifies Returns(Func<TResult> valueExpression)
 		{
-            SetReturnDelegate(valueExpression);
-			//this.valueFunc = valueExpression;
-            return this;
+			SetReturnDelegate(valueExpression);
+			return this;
 		}
 
-        public IOnceVerifies Returns(TResult value)
+		public IOnceVerifies Returns(TResult value)
 		{
-            Returns(() => value);
-            return this;
+			Returns(() => value);
+			return this;
 		}
 
 		public IOnceVerifies Returns<T>(Func<T, TResult> valueExpression)
@@ -93,19 +89,22 @@ namespace Moq
 			return this;
 		}
 
-        private void SetReturnDelegate(Delegate valueDel)
-        {
-            this.valueDel = valueDel;
-        }
+		private void SetReturnDelegate(Delegate valueDel)
+		{
+			if (valueDel == null)
+				this.valueDel = (Func<TResult>)(() => default(TResult));
+			else
+				this.valueDel = valueDel;
+		}
 
 		public override void Execute(IInvocation call)
 		{
 			base.Execute(call);
-            
-            if (valueDel.Method.GetParameters().Length != 0)
-                call.ReturnValue = valueDel.DynamicInvoke(call.Arguments); //will throw if parameters mismatch
-            else
-                call.ReturnValue = valueDel.DynamicInvoke(); //so need this, for the user being able to still use parameterless way
+
+			if (valueDel.Method.GetParameters().Length != 0)
+				call.ReturnValue = valueDel.DynamicInvoke(call.Arguments); //will throw if parameters mismatch
+			else
+				call.ReturnValue = valueDel.DynamicInvoke(); //we need this, for the user to be able to use parameterless methods
 		}
 	}
 }

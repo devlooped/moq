@@ -23,66 +23,14 @@ namespace Moq.Tests
 			var position = mockStream.Object.Seek(0, SeekOrigin.Begin);
 
 			Assert.AreEqual(0, position);
-		}
-	}
 
-	public class MyStream : Stream
-	{
-		public override bool CanRead
-		{
-			get { throw new NotImplementedException(); }
-		}
+			mockStream.Expect(stream => stream.Flush());
+			mockStream.Expect(stream => stream.SetLength(100));
 
-		public override bool CanSeek
-		{
-			get { throw new NotImplementedException(); }
-		}
+			mockStream.Object.Flush();
+			mockStream.Object.SetLength(100);
 
-		public override bool CanWrite
-		{
-			get { throw new NotImplementedException(); }
-		}
-
-		public override void Flush()
-		{
-			throw new NotImplementedException();
-		}
-
-		public override long Length
-		{
-			get { throw new NotImplementedException(); }
-		}
-
-		public override long Position
-		{
-			get
-			{
-				throw new NotImplementedException();
-			}
-			set
-			{
-				throw new NotImplementedException();
-			}
-		}
-
-		public override int Read(byte[] buffer, int offset, int count)
-		{
-			throw new NotImplementedException();
-		}
-
-		public override long Seek(long offset, SeekOrigin origin)
-		{
-			return 10;
-		}
-
-		public override void SetLength(long value)
-		{
-			throw new NotImplementedException();
-		}
-
-		public override void Write(byte[] buffer, int offset, int count)
-		{
-			throw new NotImplementedException();
+			mockStream.VerifyAll();
 		}
 	}
 }
