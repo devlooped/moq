@@ -37,7 +37,7 @@ namespace Moq
 			NoExpectation,
 			AbstractNoExpectation,
 			InterfaceNoExpectation,
-			ReturnValueNoExpectation,
+			ReturnValueRequired,
 			VerificationFailed, 
 			MoreThanOneCall,
 			ExpectedProperty, 

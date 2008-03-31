@@ -99,10 +99,15 @@ namespace Moq
 
 			if (call != null)
 			{
+				// We first execute, as there may be a Throws 
+				// and therefore we might never get to the 
+				// next line.
 				call.Execute(invocation);
+				ThrowIfReturnValueRequired(call, invocation);
 			}
 			else if (invocation.Method.DeclaringType == typeof(object))
 			{
+				// Invoke underlying implementation.
 				invocation.Proceed();
 			}
 			else if (invocation.TargetType.IsClass &&
@@ -111,6 +116,7 @@ namespace Moq
 				// For mocked classes, if the target method was not abstract, 
 				// invoke directly.
 				// Will only get here for Normal and below behaviors.
+				// TODO: we may want to provide a way to skip this by the user.
 				invocation.Proceed();
 			}
 			else if (invocation.Method != null && invocation.Method.ReturnType != null &&
@@ -122,9 +128,25 @@ namespace Moq
 				}
 				else
 				{
-					// Will only get this far for Relaxed.
 					throw new MockException(
-						MockException.ExceptionReason.ReturnValueNoExpectation,
+						MockException.ExceptionReason.ReturnValueRequired,
+						behavior, invocation);
+				}
+			}
+		}
+
+		private void ThrowIfReturnValueRequired(IProxyCall call, IInvocation invocation)
+		{
+			if (behavior != MockBehavior.Loose &&
+				invocation.Method != null &&
+				invocation.Method.ReturnType != null &&
+				invocation.Method.ReturnType != typeof(void))
+			{
+				var methodCall = call as MethodCallReturn;
+				if (methodCall == null || !methodCall.HasReturnValue)
+				{
+					throw new MockException(
+						MockException.ExceptionReason.ReturnValueRequired,
 						behavior, invocation);
 				}
 			}

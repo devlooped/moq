@@ -199,11 +199,11 @@ namespace Moq.Properties {
         }
         
         /// <summary>
-        ///   Looks up a localized string similar to Invocation needs to return a value and therefore must have a corresponding expectation that specifies it..
+        ///   Looks up a localized string similar to Invocation needs to return a value and therefore must have a corresponding expectation that provides it..
         /// </summary>
-        internal static string ReturnValueNoExpectation {
+        internal static string ReturnValueRequired {
             get {
-                return ResourceManager.GetString("ReturnValueNoExpectation", resourceCulture);
+                return ResourceManager.GetString("ReturnValueRequired", resourceCulture);
             }
         }
         

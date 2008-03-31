@@ -315,6 +315,7 @@ namespace Moq.Tests
 			Assert.That(provider.Object.GetService(typeof(IFooService)) is FooService);
 		}
 
+		[ExpectedException(typeof(ArgumentException))]
 		[Test]
 		public void ShouldCallFirstExpectThatMatches()
 		{
@@ -323,14 +324,7 @@ namespace Moq.Tests
 			mock.Expect(x => x.Execute(It.IsAny<string>())).Throws(new ArgumentException());
 
 			Assert.AreEqual("I'm alive!", mock.Object.Execute("ping"));
-			try
-			{
-				mock.Object.Execute("asdf");
-				Assert.Fail("didn't throw");
-			}
-			catch (ArgumentException)
-			{
-			}
+			mock.Object.Execute("asdf");
 		}
 
 		[Test]
@@ -992,10 +986,11 @@ namespace Moq.Tests
 			try
 			{
 				mock.Object.DoReturnString();
+				Assert.Fail("SHould throw");
 			}
 			catch (MockException mex)
 			{
-				Assert.AreEqual(MockException.ExceptionReason.ReturnValueNoExpectation, mex.Reason);
+				Assert.AreEqual(MockException.ExceptionReason.ReturnValueRequired, mex.Reason);
 			}
 		}
 		

@@ -8,13 +8,29 @@ using Moq.Language;
 
 namespace Moq
 {
-	internal class MethodCallReturn<TResult> : MethodCall, IProxyCall, IExpect<TResult>, IExpectGetter<TResult>
+	/// <devdoc>
+	/// We need this non-generics base class so that 
+	/// we can use <see cref="HasReturnValue"/> from 
+	/// generic code.
+	/// </devdoc>
+	internal class MethodCallReturn : MethodCall
+	{
+		public MethodCallReturn(Expression originalExpression, MethodInfo method, params Expression[] arguments)
+			: base(originalExpression, method, arguments)
+		{
+		}
+
+		public bool HasReturnValue { get; protected set; }
+	}
+
+	internal class MethodCallReturn<TResult> : MethodCallReturn, IProxyCall, IExpect<TResult>, IExpectGetter<TResult>
 	{
 		Delegate valueDel = (Func<TResult>)(() => (TResult)new DefaultValue(typeof(TResult)).Value);
 
 		public MethodCallReturn(Expression originalExpression, MethodInfo method, params Expression[] arguments)
 			: base(originalExpression, method, arguments)
 		{
+			HasReturnValue = false;
 		}
 
 		public IOnceVerifies Returns(Func<TResult> valueExpression)
@@ -95,6 +111,8 @@ namespace Moq
 				this.valueDel = (Func<TResult>)(() => default(TResult));
 			else
 				this.valueDel = valueDel;
+
+			HasReturnValue = true;
 		}
 
 		public override void Execute(IInvocation call)

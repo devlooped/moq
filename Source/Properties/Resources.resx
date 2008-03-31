@@ -142,8 +142,8 @@
   <data name="InterfaceNoExpectation" xml:space="preserve">
     <value>Invocation on interface member must have a corresponding expectation.</value>
   </data>
-  <data name="ReturnValueNoExpectation" xml:space="preserve">
-    <value>Invocation needs to return a value and therefore must have a corresponding expectation that specifies it.</value>
+  <data name="ReturnValueRequired" xml:space="preserve">
+    <value>Invocation needs to return a value and therefore must have a corresponding expectation that provides it.</value>
   </data>
   <data name="VerficationFailed" xml:space="preserve">
     <value>The following expectations were not met:

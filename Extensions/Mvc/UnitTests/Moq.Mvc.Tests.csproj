@@ -8,7 +8,7 @@
     <ProjectGuid>{E87AC966-7D5A-4C47-B1FE-FEFF3742A182}</ProjectGuid>
     <OutputType>Library</OutputType>
     <AppDesignerFolder>Properties</AppDesignerFolder>
-    <RootNamespace>Moq.Mvc.Tests</RootNamespace>
+    <RootNamespace>Moq.Tests</RootNamespace>
     <AssemblyName>Moq.Mvc.Tests</AssemblyName>
     <TargetFrameworkVersion>v3.5</TargetFrameworkVersion>
     <FileAlignment>512</FileAlignment>

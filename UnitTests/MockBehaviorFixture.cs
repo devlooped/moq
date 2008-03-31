@@ -109,7 +109,7 @@ namespace Moq.Tests
 			}
 			catch (MockException mex)
 			{
-				Assert.AreEqual(MockException.ExceptionReason.ReturnValueNoExpectation, mex.Reason);
+				Assert.AreEqual(MockException.ExceptionReason.ReturnValueRequired, mex.Reason);
 			}
 		}
 
@@ -124,7 +124,7 @@ namespace Moq.Tests
 			}
 			catch (MockException mex)
 			{
-				Assert.AreEqual(MockException.ExceptionReason.ReturnValueNoExpectation, mex.Reason);
+				Assert.AreEqual(MockException.ExceptionReason.ReturnValueRequired, mex.Reason);
 			}
 		}
 
