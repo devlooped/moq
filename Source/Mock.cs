@@ -2,8 +2,8 @@
 using System.Linq;
 using System.Linq.Expressions;
 using System.Reflection;
-using Castle.DynamicProxy;
 using Castle.Core.Interceptor;
+using Castle.DynamicProxy;
 using Moq.Language.Flow;
 
 namespace Moq

@@ -2,10 +2,9 @@
 using System.Linq;
 using System.Linq.Expressions;
 using System.Reflection;
-using System.Runtime.Remoting.Messaging;
 using Castle.Core.Interceptor;
-using Moq.Language.Flow;
 using Moq.Language;
+using Moq.Language.Flow;
 
 namespace Moq
 {

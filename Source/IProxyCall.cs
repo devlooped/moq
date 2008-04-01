@@ -1,6 +1,5 @@
-﻿using System.Runtime.Remoting.Messaging;
+﻿using System.Linq.Expressions;
 using Castle.Core.Interceptor;
-using System.Linq.Expressions;
 
 namespace Moq
 {

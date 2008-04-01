@@ -1,9 +1,6 @@
 ﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using Moq.Language.Flow;
 using System.ComponentModel;
+using Moq.Language.Flow;
 
 namespace Moq.Language
 {

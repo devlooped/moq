@@ -1,13 +1,10 @@
 ﻿using System;
-using System.Collections.Generic;
-using System.Reflection;
 using System.Linq;
+using System.Reflection;
+using System.Runtime.Remoting;
 using System.Runtime.Remoting.Messaging;
 using System.Runtime.Remoting.Proxies;
 using Castle.Core.Interceptor;
-using System.Runtime.Remoting;
-using System.Runtime.Remoting.Activation;
-using System.Security.Permissions;
 
 namespace Moq
 {
