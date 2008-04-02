@@ -1,4 +1,6 @@
 ﻿
+using System;
+using System.ComponentModel;
 namespace Moq
 {
 	/// <summary>
@@ -20,22 +22,26 @@ namespace Moq
 		/// and non-virtual) can be called freely and will end up 
 		/// invoking the implementation on the target type if available.
 		/// </summary>
+		[Obsolete("Use Strict instead. This member will be removed in v3", true)]
+		[EditorBrowsable(EditorBrowsableState.Never)]
 		Normal,
 		/// <summary>
 		/// Will only throw exceptions for abstract methods and 
 		/// interface members which need to return a value and 
 		/// don't have a corresponding expectation.
 		/// </summary>
+		[Obsolete("Use Loose instead. This member will be removed in v3", true)]
+		[EditorBrowsable(EditorBrowsableState.Never)]		
 		Relaxed,
 		/// <summary>
 		/// Will never throw exceptions, returning default  
-		/// values when necessary (null for reference types 
-		/// or zero for value types).
+		/// values when necessary (null for reference types, 
+		/// zero for value types or empty enumerables and arrays).
 		/// </summary>
 		Loose,
 		/// <summary>
-		/// Default mock behavior, which equals <see cref="Normal"/>.
+		/// Default mock behavior, which equals <see cref="Loose"/>.
 		/// </summary>
-		Default = Normal,
+		Default = Loose,
 	}
 }

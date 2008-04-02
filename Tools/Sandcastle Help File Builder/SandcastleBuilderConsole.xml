@@ -1,0 +1,119 @@
+<?xml version="1.0"?>
+<doc>
+    <assembly>
+        <name>SandcastleBuilderConsole</name>
+    </assembly>
+    <members>
+        <member name="T:SandcastleBuilder.ConsoleMode.SandcastleBuilderConsole">
+            <summary>
+            This is the console mode version of the Sandcastle Help File Builder.
+            </summary>
+        </member>
+        <member name="M:SandcastleBuilder.ConsoleMode.SandcastleBuilderConsole.Main(System.String[])">
+            <summary>
+            Main program entry point
+            </summary>
+            <param name="args">The command line arguments.  This should be a
+            list of projects to build and an optional "/v" option to provide
+            verbose output.</param>
+            <returns>Zero on success, non-zero on failure</returns>
+        </member>
+        <member name="M:SandcastleBuilder.ConsoleMode.SandcastleBuilderConsole.LoadResponseFile(System.String,System.Collections.Generic.List{SandcastleBuilder.ConsoleMode.OptionInfo})">
+            <summary>
+            Load settings from a response file.
+            </summary>
+            <param name="filename">The response file to load.</param>
+            <param name="options">The option list to which the content is
+            added.</param>
+            <remarks>Nested response files are supported.  Blank lines and
+            lines starting with '#' (comments) are ignored.</remarks>
+        </member>
+        <member name="M:SandcastleBuilder.ConsoleMode.SandcastleBuilderConsole.AddAssemblyWildCard(System.String,SandcastleBuilder.Utils.SandcastleProject,System.Boolean)">
+            <summary>
+            This is called to add multiple assemblies and/or comments files to
+            a project for documenting.
+            </summary>
+            <param name="wildcard">The wildcard to add.</param>
+            <param name="project">The project to which they are added.</param>
+            <param name="commentsOnly">True if adding comments only, false if
+            adding assembly/comments file pairs.</param>
+        </member>
+        <member name="M:SandcastleBuilder.ConsoleMode.SandcastleBuilderConsole.AddApiFilter(SandcastleBuilder.Utils.SandcastleProject,SandcastleBuilder.ConsoleMode.OptionInfo,System.Boolean)">
+            <summary>
+            This is used to add an <b>ApiFilter</b> entry.
+            </summary>
+            <param name="project">The current project to which the API filter
+            entries are added</param>
+            <param name="option">The command line option information</param>
+            <param name="isExposed">True if it is an include entry or false if
+            it is an exclude entry.</param>
+        </member>
+        <member name="M:SandcastleBuilder.ConsoleMode.SandcastleBuilderConsole.ShowHelp(System.Boolean)">
+            <summary>
+            This is used to show the command line syntax
+            </summary>
+            <param name="launchHelp">True to attempt to launch the help file
+            open to the Console Mode Builder information topic or false to just
+            show the command line help.</param>
+        </member>
+        <member name="M:SandcastleBuilder.ConsoleMode.SandcastleBuilderConsole.BuildProject(SandcastleBuilder.Utils.SandcastleProject)">
+            <summary>
+            This is called to build a project
+            </summary>
+            <param name="project">The project to build</param>
+            <returns>Returns true if successful, false if not</returns>
+        </member>
+        <member name="M:SandcastleBuilder.ConsoleMode.SandcastleBuilderConsole.buildProcess_BuildStepChanged(System.Object,SandcastleBuilder.Utils.BuildProgressEventArgs)">
+            <summary>
+            This is called by the build process thread to update the
+            application with the current build step.
+            </summary>
+            <param name="sender">The sender of the event</param>
+            <param name="e">The event arguments</param>
+        </member>
+        <member name="M:SandcastleBuilder.ConsoleMode.SandcastleBuilderConsole.buildProcess_BuildProgress(System.Object,SandcastleBuilder.Utils.BuildProgressEventArgs)">
+            <summary>
+            This is called by the build process thread to update the
+            application with information about progress.
+            </summary>
+            <param name="sender">The sender of the event</param>
+            <param name="e">The event arguments</param>
+        </member>
+        <member name="T:SandcastleBuilder.ConsoleMode.OptionInfo">
+            <summary>
+            This class holds command line option information.
+            </summary>
+        </member>
+        <member name="M:SandcastleBuilder.ConsoleMode.OptionInfo.#ctor(System.String)">
+            <summary>
+            Constructor
+            </summary>
+            <param name="option">The option text to parse</param>
+        </member>
+        <member name="P:SandcastleBuilder.ConsoleMode.OptionInfo.OptionText">
+            <summary>
+            Get the option text as specified
+            </summary>
+        </member>
+        <member name="P:SandcastleBuilder.ConsoleMode.OptionInfo.Name">
+            <summary>
+            Get the option name
+            </summary>
+        </member>
+        <member name="P:SandcastleBuilder.ConsoleMode.OptionInfo.Value">
+            <summary>
+            Get the option value
+            </summary>
+        </member>
+        <member name="P:SandcastleBuilder.ConsoleMode.OptionInfo.SecondValue">
+            <summary>
+            Get the second option value if there was one
+            </summary>
+        </member>
+        <member name="P:SandcastleBuilder.ConsoleMode.OptionInfo.ThirdValue">
+            <summary>
+            Get the third option value if there was one
+            </summary>
+        </member>
+    </members>
+</doc>

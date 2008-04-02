@@ -12,6 +12,11 @@ namespace Moq
 			// TODO: validate argument or trust the compiler?
 			var call = matcherExpression as MethodCallExpression;
 			var lambda = call.Arguments[0].StripQuotes() as LambdaExpression;
+
+			if (lambda == null)
+				throw new MockException(MockException.ExceptionReason.ExpectedLambda,
+					Properties.Resources.ExpectedLambda);
+
 			predicate = lambda.Compile();
 		}
 

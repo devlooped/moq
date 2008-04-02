@@ -122,7 +122,7 @@ namespace Moq.Tests
 			}
 			catch (MockException mex)
 			{
-				Assert.AreEqual(MockException.ExceptionReason.ExpectedMethod, mex.Reason);
+				Assert.AreEqual(MockException.ExceptionReason.ExpectedMethodOrProperty, mex.Reason);
 			}
 		}
 
@@ -245,17 +245,24 @@ namespace Moq.Tests
 			Assert.AreEqual(2, mock.Object.DoIntArgReturnInt(9));
 		}
 
-		[ExpectedException(typeof(MockException))]
 		[Test]
 		public void ShouldNotMatchOutOfRange()
 		{
-			var mock = new Mock<IFoo>();
+			var mock = new Mock<IFoo>(MockBehavior.Strict);
 
 			mock.Expect(x => x.DoIntArgReturnInt(It.IsInRange(1, 5, Range.Exclusive))).Returns(1);
 
 			Assert.AreEqual(1, mock.Object.DoIntArgReturnInt(2));
 
-			int throwHere = mock.Object.DoIntArgReturnInt(1);
+			try
+			{
+				int throwHere = mock.Object.DoIntArgReturnInt(1);
+				Assert.Fail("Should have thrown");
+			}
+			catch (MockException mex)
+			{
+				Assert.AreEqual(MockException.ExceptionReason.NoExpectation, mex.Reason);
+			}
 		}
 
 		[Test]
@@ -908,78 +915,9 @@ namespace Moq.Tests
 		}
 
 		[Test]
-		public void ShouldReturnEmptyArrayOnLoose()
+		public void ShouldThrowOnStrictWithExpectButNoReturns()
 		{
-			var mock = new Mock<IFoo>(MockBehavior.Loose);
-
-			Assert.IsNotNull(mock.Object.GetArray());
-			Assert.AreEqual(0, mock.Object.GetArray().Length);
-		}
-
-		[Test]
-		public void ShouldReturnEmptyArrayTwoDimensionsOnLoose()
-		{
-			var mock = new Mock<IFoo>(MockBehavior.Loose);
-
-			Assert.IsNotNull(mock.Object.GetArrayTwoDimensions());
-			Assert.AreEqual(0, mock.Object.GetArrayTwoDimensions().Length);
-		}
-
-		[Test]
-		public void ShouldReturnNullListOnLoose()
-		{
-			var mock = new Mock<IFoo>(MockBehavior.Loose);
-
-			Assert.IsNull(mock.Object.GetList());
-		}
-
-		[Test]
-		public void ShouldReturnEmptyEnumerableStringOnLoose()
-		{
-			var mock = new Mock<IFoo>(MockBehavior.Loose);
-
-			Assert.IsNotNull(mock.Object.GetEnumerable());
-			Assert.AreEqual(0, mock.Object.GetEnumerable().Count());
-		}
-
-		[Test]
-		public void ShouldReturnEmptyEnumerableObjectsOnLoose()
-		{
-			var mock = new Mock<IFoo>(MockBehavior.Loose);
-
-			Assert.IsNotNull(mock.Object.GetEnumerableObjects());
-			Assert.AreEqual(0, mock.Object.GetEnumerableObjects().Cast<object>().Count());
-		}
-
-		[Test]
-		public void ShouldReturnDefaultGuidOnLoose()
-		{
-			var mock = new Mock<IFoo>(MockBehavior.Loose);
-			Assert.AreEqual(default(Guid), mock.Object.DoReturnGuid());
-		}
-
-		[Test]
-		public void ShouldReturnNullStringOnLoose()
-		{
-			var mock = new Mock<IFoo>(MockBehavior.Loose);
-
-			Assert.IsNull(mock.Object.DoReturnString());
-		}
-
-		[Test]
-		public void ShouldReturnNullStringOnLooseWithExpect()
-		{
-			var mock = new Mock<IFoo>(MockBehavior.Loose);
-
-			mock.Expect(x => x.DoReturnString());
-
-			Assert.IsNull(mock.Object.DoReturnString());
-		}
-
-		[Test]
-		public void ShouldThrowOnNormalWithExpectButNoReturns()
-		{
-			var mock = new Mock<IFoo>(MockBehavior.Normal);
+			var mock = new Mock<IFoo>(MockBehavior.Strict);
 
 			mock.Expect(x => x.DoReturnString());
 
@@ -994,14 +932,6 @@ namespace Moq.Tests
 			}
 		}
 		
-		[Test]
-		public void ShouldReturnZeroOnLoose()
-		{
-			var mock = new Mock<IFoo>(MockBehavior.Loose);
-
-			Assert.AreEqual(0, mock.Object.DoReturnInt());			
-		}
-
 		[Test]
 		public void ShouldReturnNullReturnValue()
 		{
@@ -1112,13 +1042,29 @@ namespace Moq.Tests
 		{
 			var mock = new Mock<IFoo>();
 
-			mock.ExpectGet(foo => foo[0])
+			mock.ExpectGet(foo => foo.ValueProperty)
 				.Returns(1);
-			mock.Expect(foo => foo[1])
+			mock.Expect(foo => foo.ValueProperty)
 				.Returns(2);
 
-			Assert.AreEqual(1, mock.Object[0]);
-			Assert.AreEqual(2, mock.Object[1]);
+			Assert.AreEqual(2, mock.Object.ValueProperty);
+		}
+
+		[Test]
+		public void ShouldThrowIfItIsWithoutLambda()
+		{
+			var foo = new Mock<IFoo>();
+
+			Expression<Predicate<int>> isSix = (arg) => arg == 6;
+
+			try
+			{
+				foo.Expect((f) => f.DoIntArgReturnInt(It.Is(isSix))).Returns(12);
+			}
+			catch (MockException mex)
+			{
+				Assert.AreEqual(MockException.ExceptionReason.ExpectedLambda, mex.Reason);
+			}
 		}
 
 		// ShouldOptOutFromCallingBaseImplementation
@@ -1261,7 +1207,6 @@ namespace Moq.Tests
 			void DoVoidArgs(string arg1, string arg2, string arg3, string arg4);
 
 			int DoStringArgReturnInt(string arg);
-			Guid DoReturnGuid();
 
 			int Duplicate(int value);
 			AttributeTargets GetTargets();
@@ -1279,11 +1224,6 @@ namespace Moq.Tests
 			bool DoTypeOverload(Bar bar);
 			bool DoTypeOverload(Baz bar);
 
-			string[] GetArray();
-			string[][] GetArrayTwoDimensions();
-			List<string> GetList();
-			IEnumerable<string> GetEnumerable();
-			IEnumerable GetEnumerableObjects();
 			int this[int index] { get; set; }
 		}
 

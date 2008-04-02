@@ -16,7 +16,7 @@ namespace Moq.Tests
 		{
 			//setup - data
 			var order = new Order(TALISKER, 50);
-			var mock = new Mock<IWarehouse>(MockBehavior.Relaxed);
+			var mock = new Mock<IWarehouse>();
 
 			//setup - expectations
 			mock.Expect(x => x.HasInventory(TALISKER, 50)).Returns(true);
@@ -34,7 +34,7 @@ namespace Moq.Tests
 		{
 			//setup - data
 			var order = new Order(TALISKER, 50);
-			var mock = new Mock<IWarehouse>(MockBehavior.Relaxed);
+			var mock = new Mock<IWarehouse>();
 
 			//setup - expectations
 			mock.Expect(x => x.HasInventory(It.IsAny<string>(), It.IsInRange(0, 100, Range.Inclusive))).Returns(false);

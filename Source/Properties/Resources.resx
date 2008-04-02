@@ -136,12 +136,6 @@
   <data name="NoExpectation" xml:space="preserve">
     <value>All invocations on the mock must have a corresponding expectation.</value>
   </data>
-  <data name="AbstractNoExpectation" xml:space="preserve">
-    <value>Invocation on abstract mock member must have a corresponding expectation.</value>
-  </data>
-  <data name="InterfaceNoExpectation" xml:space="preserve">
-    <value>Invocation on interface member must have a corresponding expectation.</value>
-  </data>
   <data name="ReturnValueRequired" xml:space="preserve">
     <value>Invocation needs to return a value and therefore must have a corresponding expectation that provides it.</value>
   </data>
@@ -171,8 +165,10 @@
   <data name="ExpressionNotProperty" xml:space="preserve">
     <value>Expression is not a property access: {0}</value>
   </data>
-  <data name="ExpressionNotMethod" xml:space="preserve">
-    <value>Expression is not a method invocation: {0}
-Expectations for properties should use ExpectGet/ExpectSet instead.</value>
+  <data name="ExpressionNotMethodOrProperty" xml:space="preserve">
+    <value>Expression is not a method invocation or a property get: {0}</value>
+  </data>
+  <data name="ExpectedLambda" xml:space="preserve">
+    <value>A lambda expression is expected as the argument to It.Is&lt;T&gt;.</value>
   </data>
 </root>

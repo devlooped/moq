@@ -61,15 +61,6 @@ namespace Moq.Properties
         }
         
         /// <summary>
-        ///   Looks up a localized string similar to Invocation on abstract mock member must have a corresponding expectation..
-        /// </summary>
-        internal static string AbstractNoExpectation {
-            get {
-                return ResourceManager.GetString("AbstractNoExpectation", resourceCulture);
-            }
-        }
-        
-        /// <summary>
         ///   Looks up a localized string similar to Constructor arguments cannot be passed for interface mocks..
         /// </summary>
         internal static string ConstructorArgsForInterface {
@@ -98,12 +89,20 @@ namespace Moq.Properties
         }
         
         /// <summary>
-        ///   Looks up a localized string similar to Expression is not a method invocation: {0}
-        ///Expectations for properties should use ExpectGet/ExpectSet instead..
+        ///   Looks up a localized string similar to A lambda expression is expected as the argument to It.Is&lt;T&gt;..
         /// </summary>
-        internal static string ExpressionNotMethod {
+        internal static string ExpectedLambda {
             get {
-                return ResourceManager.GetString("ExpressionNotMethod", resourceCulture);
+                return ResourceManager.GetString("ExpectedLambda", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Expression is not a method invocation or a property get: {0}.
+        /// </summary>
+        internal static string ExpressionNotMethodOrProperty {
+            get {
+                return ResourceManager.GetString("ExpressionNotMethodOrProperty", resourceCulture);
             }
         }
         
@@ -122,15 +121,6 @@ namespace Moq.Properties
         internal static string FieldsNotSupported {
             get {
                 return ResourceManager.GetString("FieldsNotSupported", resourceCulture);
-            }
-        }
-        
-        /// <summary>
-        ///   Looks up a localized string similar to Invocation on interface member must have a corresponding expectation..
-        /// </summary>
-        internal static string InterfaceNoExpectation {
-            get {
-                return ResourceManager.GetString("InterfaceNoExpectation", resourceCulture);
             }
         }
         

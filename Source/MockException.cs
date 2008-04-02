@@ -34,13 +34,12 @@ namespace Moq
 		internal enum ExceptionReason
 		{
 			NoExpectation,
-			AbstractNoExpectation,
-			InterfaceNoExpectation,
 			ReturnValueRequired,
 			VerificationFailed, 
 			MoreThanOneCall,
 			ExpectedProperty, 
-			ExpectedMethod,
+			ExpectedMethodOrProperty,
+			ExpectedLambda,
 		}
 
 		ExceptionReason reason;

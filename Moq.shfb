@@ -50,7 +50,7 @@ Do use their documentation to learn about options (especially when there are sev
     <HtmlHelp1xCompilerPath path="" />
     <HtmlHelp2xCompilerPath path="" />
     <OutputPath>.\Help\</OutputPath>
-    <SandcastlePath path="" />
+    <SandcastlePath path=".\Tools\Sandcastle\" />
     <WorkingPath path="" />
     <CleanIntermediates>True</CleanIntermediates>
     <KeepLogFile>False</KeepLogFile>

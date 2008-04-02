@@ -104,7 +104,7 @@ namespace Moq.Tests
 		[Test]
 		public void ShouldOverrideDefaultBehavior()
 		{
-			var factory = new MockFactory(MockBehavior.Normal);
+			var factory = new MockFactory(MockBehavior.Loose);
 			var mock = factory.Create<IFoo>(MockBehavior.Strict);
 
 			Assert.AreEqual(MockBehavior.Strict, mock.Behavior);
@@ -113,7 +113,7 @@ namespace Moq.Tests
 		[Test]
 		public void ShouldOverrideDefaultBehaviorWithCtorArgs()
 		{
-			var factory = new MockFactory(MockBehavior.Normal);
+			var factory = new MockFactory(MockBehavior.Loose);
 			var mock = factory.Create<BaseClass>(MockBehavior.Strict, "Foo");
 
 			Assert.AreEqual(MockBehavior.Strict, mock.Behavior);

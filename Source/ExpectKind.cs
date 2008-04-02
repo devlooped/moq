@@ -1,5 +1,10 @@
 ﻿
 namespace Moq
 {
-	internal enum ExpectKind { Method, PropertyGet, PropertySet }
+	internal enum ExpectKind
+	{
+		MethodOrPropertyGet,
+		PropertyGet, 
+		PropertySet
+	}
 }

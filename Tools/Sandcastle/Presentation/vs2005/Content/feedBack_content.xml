@@ -1,0 +1,24 @@
+<content xml:space="preserve">
+
+  <item id="fb_alias">DevDocs@Microsoft.com</item>
+  <item id="fb_product"></item>
+  <item id="fb_deliverable"></item>
+  <item id="fb_body">%0dThe%20developer%20writing%20teams%20use%20your%20feedback%20to%20improve%20documentation.%20We%20do%20not%20use%20your%20email%20address%20for%20any%20other%20purpose%20and%20we%20dispose%20of%20your%20email%20address%20after%20the%20issue%20you%20report%20is%20resolved.%20While%20we%20are%20working%20to%20resolve%20the%20issue%20you%20report,%20we%20may%20send%20email%20to%20you%20to%20get%20further%20details%20or%20clarification%20on%20the%20feedback%20you%20send%20to%20us.%20After%20the%20issue%20you%20report%20has%20been%20addressed,%20we%20may%20send%20email%20to%20you%20to%20let%20you%20know%20that%20your%20feedback%20has%20been%20addressed.%0AFor%20further%20information%20about%20Microsoft's%20privacy%20policies,%20please%20see%20http://privacy.microsoft.com/en-us/default.aspx.%0A%0d</item>
+   <item id="fb_send">Send</item>
+   <item id="fb_feedBack">feedback</item>
+   <item id="fb_feedBackText"> on this topic to Microsoft.</item>
+   <item id="fb_headerFeedBack">Send Feedback</item>
+   <item id="fb_ratings">false</item>
+
+   <!-- feedback values for sandcastle scenario -->
+
+   <item id="feedback_alias"></item>
+   <item id="feedback_product"></item>
+   <item id="feedback_deliverable"></item>
+   <item id="feedback_fileVersion"></item>
+   <item id="feedback_topicVersion"></item>
+   <item id="feedback_body"></item>
+   <item id="feedback_feedBackText"> on this topic.</item>
+   <item id="feedback_ratings">true</item>	
+
+</content>

@@ -213,7 +213,7 @@ namespace Moq
 		{
 			return (IExpect)ExpectImpl(
 				expression,
-				ExpectKind.Method,
+				ExpectKind.MethodOrPropertyGet,
 				(original, method, args) => new MethodCall(original, method, args));
 		}
 
@@ -235,7 +235,7 @@ namespace Moq
 		{
 			return (IExpect<TResult>)ExpectImpl(
 				expression,
-				ExpectKind.Method,
+				ExpectKind.MethodOrPropertyGet,
 				(original, method, args) => new MethodCallReturn<TResult>(original, method, args));
 		}
 
@@ -367,38 +367,57 @@ namespace Moq
 			// Verify kind of Expect being used.
 			switch (expectKind)
 			{
-				case ExpectKind.Method:
+				case ExpectKind.MethodOrPropertyGet:
 					{
-						ThrowIfNotMethod(lambda.Body);
-						MethodCallExpression methodCall = (MethodCallExpression)lambda.Body;
+						var methodCall = lambda.Body as MethodCallExpression;
+						var memberExpr = lambda.Body as MemberExpression;
 
-						VerifyCanOverride(expression, methodCall.Method);
-						result = factory(expression, methodCall.Method, methodCall.Arguments.ToArray());
+						MethodInfo method;
+						Expression[] args = new Expression[0];
+
+						if (methodCall != null)
+						{
+							method = methodCall.Method;
+							args = methodCall.Arguments.ToArray();
+						}
+						else if (memberExpr != null && memberExpr.Member is PropertyInfo)
+						{
+							var prop = (PropertyInfo)memberExpr.Member;
+							ThrowIfPropertyNotReadable(prop);
+
+							method = prop.GetGetMethod();
+						}
+						else
+						{
+							throw new MockException(MockException.ExceptionReason.ExpectedMethodOrProperty,
+								String.Format(Properties.Resources.ExpressionNotMethodOrProperty, expression.ToStringFixed()));
+						}
+
+						VerifyCanOverride(expression, method);
+						result = factory(expression, method, args);
 						interceptor.AddCall(result, expectKind);
 						break;
 					}
 				case ExpectKind.PropertyGet:
 					{
-						ThrowIfNotProperty(lambda.Body);
-						var prop = (PropertyInfo)((MemberExpression)lambda.Body).Member;
-
-						// If property is not readable, the compiler won't let 
-						// the user to specify it in the lambda :)
-						// This is just reassuring that in case they build the 
-						// expression tree manually?
-						if (!prop.CanRead)
+						if (IsPropertyIndexer(lambda.Body))
 						{
-							throw new ArgumentException(String.Format(
-								Properties.Resources.PropertyNotReadable,
-								prop.DeclaringType.Name,
-								prop.Name), "expression");
+							return ExpectImpl(expression, ExpectKind.MethodOrPropertyGet, factory);
 						}
+						else
+						{
+							ThrowIfNotProperty(lambda.Body);
+							var prop = (PropertyInfo)((MemberExpression)lambda.Body).Member;
 
-						var propertyMethod = prop.GetGetMethod();
-						VerifyCanOverride(expression, propertyMethod);
-						result = factory(expression, propertyMethod, new Expression[0]);
-						interceptor.AddCall(result, expectKind);
-						break;
+							ThrowIfPropertyNotReadable(prop);
+
+							var propertyMethod = prop.GetGetMethod();
+							VerifyCanOverride(expression, propertyMethod);
+							result = factory(expression, propertyMethod, new Expression[0]);
+							interceptor.AddCall(result, expectKind);
+
+							break;
+						}
 					}
 				case ExpectKind.PropertySet:
 					{
@@ -432,6 +451,29 @@ namespace Moq
 			return result;
 		}
 
+		private bool IsPropertyIndexer(Expression expression)
+		{
+			var call = expression as MethodCallExpression;
+
+			return call != null && call.Method.IsSpecialName;
+		}
+
+		private static void ThrowIfPropertyNotReadable(PropertyInfo prop)
+		{
+			// If property is not readable, the compiler won't let 
+			// the user to specify it in the lambda :)
+			// This is just reassuring that in case they build the 
+			// expression tree manually?
+			if (!prop.CanRead)
+			{
+				throw new MockException(MockException.ExceptionReason.ExpectedProperty,
+					String.Format(
+					Properties.Resources.PropertyNotReadable,
+					prop.DeclaringType.Name,
+					prop.Name));
+			}
+		}
+
 		private static void ThrowIfNotProperty(Expression expression)
 		{
 			var prop = expression as MemberExpression;
@@ -440,13 +482,6 @@ namespace Moq
 
 			throw new MockException(MockException.ExceptionReason.ExpectedProperty,
 				String.Format(Properties.Resources.ExpressionNotProperty, expression.ToStringFixed()));
-		}
-
-		private static void ThrowIfNotMethod(Expression expression)
-		{
-			if (!(expression is MethodCallExpression))
-				throw new MockException(MockException.ExceptionReason.ExpectedMethod,
-					String.Format(Properties.Resources.ExpressionNotMethod, expression.ToStringFixed()));
 		}
 
 		private void VerifyCanOverride(Expression expectation, MethodInfo methodInfo)

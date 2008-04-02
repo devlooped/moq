@@ -51,7 +51,10 @@ namespace Moq
 
 		public void AddCall(IProxyCall call, ExpectKind kind)
 		{
-			calls[kind.ToString() + ":" + call.ExpectExpression.ToStringFixed()] = call;
+			if (kind == ExpectKind.PropertySet)
+				calls["set::" + call.ExpectExpression.ToStringFixed()] = call;
+			else
+				calls[call.ExpectExpression.ToStringFixed()] = call;
 		}
 
 		public void Intercept(IInvocation invocation)
@@ -79,21 +82,22 @@ namespace Moq
 						behavior,
 						invocation);
 				}
-				else if (behavior == MockBehavior.Normal)
-				{
-					if (invocation.Method.DeclaringType.IsInterface)
-					{
-						throw new MockException(
-							MockException.ExceptionReason.InterfaceNoExpectation,
-							behavior, invocation);
-					}
-					else if (invocation.Method.IsAbstract)
-					{
-						throw new MockException(
-							MockException.ExceptionReason.AbstractNoExpectation,
-							behavior, invocation);
-					}
-				}
+				// TODO: remove ExceptionReason and corresponding string resource
+				//else if (behavior == MockBehavior.Normal)
+				//{
+				//   if (invocation.Method.DeclaringType.IsInterface)
+				//   {
+				//      throw new MockException(
+				//         MockException.ExceptionReason.InterfaceNoExpectation,
+				//         behavior, invocation);
+				//   }
+				//   else if (invocation.Method.IsAbstract)
+				//   {
+				//      throw new MockException(
+				//         MockException.ExceptionReason.AbstractNoExpectation,
+				//         behavior, invocation);
+				//   }
+				//}
 			}
 
 			if (call != null)
@@ -127,6 +131,7 @@ namespace Moq
 				}
 				else
 				{
+					// TODO: remove when we remove Relaxed.
 					throw new MockException(
 						MockException.ExceptionReason.ReturnValueRequired,
 						behavior, invocation);
