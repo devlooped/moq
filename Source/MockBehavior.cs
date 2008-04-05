@@ -22,7 +22,7 @@ namespace Moq
 		/// and non-virtual) can be called freely and will end up 
 		/// invoking the implementation on the target type if available.
 		/// </summary>
-		[Obsolete("Use Strict instead. This member will be removed in v3", true)]
+		[Obsolete("Use Strict instead. This member will be removed in v3.5", true)]
 		[EditorBrowsable(EditorBrowsableState.Never)]
 		Normal,
 		/// <summary>
@@ -30,7 +30,7 @@ namespace Moq
 		/// interface members which need to return a value and 
 		/// don't have a corresponding expectation.
 		/// </summary>
-		[Obsolete("Use Loose instead. This member will be removed in v3", true)]
+		[Obsolete("Use Loose instead. This member will be removed in v3.5", true)]
 		[EditorBrowsable(EditorBrowsableState.Never)]		
 		Relaxed,
 		/// <summary>

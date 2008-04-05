@@ -1239,6 +1239,16 @@ namespace Moq.Tests
 				return true;
 			}
 
+			public bool GetIsProtected()
+			{
+				return IsProtected();
+			}
+
+			protected virtual bool IsProtected()
+			{
+				return true;
+			}
+
 			public bool True()
 			{
 				return true;

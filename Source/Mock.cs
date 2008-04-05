@@ -5,6 +5,7 @@ using System.Reflection;
 using Castle.Core.Interceptor;
 using Castle.DynamicProxy;
 using Moq.Language.Flow;
+using System.ComponentModel;
 
 namespace Moq
 {
@@ -221,6 +222,7 @@ namespace Moq
 		/// Sets an expectation on the mocked type for a call to 
 		/// to a value returning method.
 		/// </summary>
+		/// <typeparam name="TResult">Type of the return value. Typically omitted as it can be inferred from the expression.</typeparam>
 		/// <remarks>
 		/// If more than one expectation is set for the same method or property, 
 		/// the latest one wins and is the one that will be executed.
@@ -247,7 +249,7 @@ namespace Moq
 		/// If more than one expectation is set for the same property getter, 
 		/// the latest one wins and is the one that will be executed.
 		/// </remarks>
-		/// <typeparam name="TProperty">Type of the property, typically inferred from the received lambda expression.</typeparam>
+		/// <typeparam name="TProperty">Type of the property. Typically omitted as it can be inferred from the expression.</typeparam>
 		/// <param name="expression">Lambda expression that specifies the expected property getter.</param>
 		/// <example>
 		/// <code>
@@ -271,7 +273,7 @@ namespace Moq
 		/// If more than one expectation is set for the same property setter, 
 		/// the latest one wins and is the one that will be executed.
 		/// </remarks>
-		/// <typeparam name="TProperty">Type of the property, typically inferred from the received lambda expression.</typeparam>
+		/// <typeparam name="TProperty">Type of the property. Typically omitted as it can be inferred from the expression.</typeparam>
 		/// <param name="expression">Lambda expression that specifies the expected property setter.</param>
 		/// <example>
 		/// <code>
@@ -362,6 +364,11 @@ namespace Moq
 			Guard.ArgumentNotNull(expression, "expression");
 
 			LambdaExpression lambda = (LambdaExpression)expression;
+			// Remove convert expressions which are passed-in by the MockProtectedExtensions.
+			var convert = lambda.Body as System.Linq.Expressions.UnaryExpression;
+			if (convert != null && convert.NodeType == ExpressionType.Convert)
+				lambda = Expression.Lambda(convert.Operand, lambda.Parameters.ToArray());
+
 			IProxyCall result = null;
 
 			// Verify kind of Expect being used.
@@ -385,7 +392,7 @@ namespace Moq
 							var prop = (PropertyInfo)memberExpr.Member;
 							ThrowIfPropertyNotReadable(prop);
 
-							method = prop.GetGetMethod();
+							method = prop.GetGetMethod(true);
 						}
 						else
 						{
@@ -393,7 +400,7 @@ namespace Moq
 								String.Format(Properties.Resources.ExpressionNotMethodOrProperty, expression.ToStringFixed()));
 						}
 
-						VerifyCanOverride(expression, method);
+						ThrowIfCantOverride(expression, method);
 						result = factory(expression, method, args);
 						interceptor.AddCall(result, expectKind);
 						break;
@@ -411,8 +418,8 @@ namespace Moq
 
 							ThrowIfPropertyNotReadable(prop);
 
-							var propertyMethod = prop.GetGetMethod();
-							VerifyCanOverride(expression, propertyMethod);
+							var propertyMethod = prop.GetGetMethod(true);
+							ThrowIfCantOverride(expression, propertyMethod);
 							result = factory(expression, propertyMethod, new Expression[0]);
 							interceptor.AddCall(result, expectKind);
 
@@ -432,8 +439,8 @@ namespace Moq
 								prop.Name), "expression");
 						}
 
-						var propertyMethod = prop.GetSetMethod();
-						VerifyCanOverride(expression, propertyMethod);
+						var propertyMethod = prop.GetSetMethod(true);
+						ThrowIfCantOverride(expression, propertyMethod);
 						result = factory(expression, propertyMethod, new Expression[0]);
 						interceptor.AddCall(result, expectKind);
 						break;
@@ -484,7 +491,7 @@ namespace Moq
 				String.Format(Properties.Resources.ExpressionNotProperty, expression.ToStringFixed()));
 		}
 
-		private void VerifyCanOverride(Expression expectation, MethodInfo methodInfo)
+		private void ThrowIfCantOverride(Expression expectation, MethodInfo methodInfo)
 		{
 			if (!methodInfo.IsVirtual && !methodInfo.DeclaringType.IsMarshalByRef)
 				throw new ArgumentException(

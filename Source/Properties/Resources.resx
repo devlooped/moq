@@ -171,4 +171,28 @@
   <data name="ExpectedLambda" xml:space="preserve">
     <value>A lambda expression is expected as the argument to It.Is&lt;T&gt;.</value>
   </data>
+  <data name="MethodIsPublic" xml:space="preserve">
+    <value>Method {0}.{1} is public. Use strong-typed Expect overload instead:
+mock.Expect(x =&gt; x.{1}());
+</value>
+  </data>
+  <data name="MemberMissing" xml:space="preserve">
+    <value>Member {0}.{1} does not exist.</value>
+  </data>
+  <data name="UnexpectedPublicProperty" xml:space="preserve">
+    <value>To set expectations for public property {0}.{1}, use the typed overloads, such as:
+mock.Expect(x =&gt; x.{1}).Returns(value);
+mock.ExpectGet(x =&gt; x.{1}).Returns(value); //equivalent to previous one
+mock.ExpectSet(x =&gt; x.{1}).Callback(callbackDelegate);
+</value>
+  </data>
+  <data name="UnsupportedProtectedProperty" xml:space="preserve">
+    <value>To set expectations for protected property {0}.{1}, use:
+mock.Expect&lt;{2}&gt;(x =&gt; x.{1}).Returns(value);
+mock.ExpectGet(x =&gt; x.{1}).Returns(value); //equivalent to previous one
+mock.ExpectSet(x =&gt; x.{1}).Callback(callbackDelegate);</value>
+  </data>
+  <data name="PropertyMissing" xml:space="preserve">
+    <value>Property {0}.{1} does not exist.</value>
+  </data>
 </root>

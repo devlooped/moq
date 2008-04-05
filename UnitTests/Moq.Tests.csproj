@@ -57,6 +57,7 @@
     <Compile Include="MockedFixture.cs" />
     <Compile Include="MockFactoryFixture.cs" />
     <Compile Include="MockFixture.cs" />
+    <Compile Include="ProtectedMockFixture.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
     <Compile Include="Regressions\StreamFixture.cs" />
     <Compile Include="Regressions\StubFixture.cs" />
