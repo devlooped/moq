@@ -463,7 +463,7 @@ namespace Moq.Tests
 			var expectedArg = "lorem,ipsum";
 			var mock = new Mock<IFoo>();
 
-			mock.Expect(x => x.DoStringArgReturnInt(expectedArg.Substring(0,5)))
+			mock.Expect(x => x.DoStringArgReturnInt(expectedArg.Substring(0, 5)))
 				.Returns(5)
 				.Verifiable();
 
@@ -546,7 +546,7 @@ namespace Moq.Tests
 				Assert.That(ex.Message.Contains("x => x.DoReturnInt()"));
 				Assert.That(ex.Message.Contains("x => x.DoReturnString()"));
 				Assert.That(ex.Message.Contains("x => x.DoStringArgReturnInt(\"Hello World\")"));
-			} 
+			}
 		}
 
 		[ExpectedException(typeof(ArgumentException))]
@@ -931,7 +931,7 @@ namespace Moq.Tests
 				Assert.AreEqual(MockException.ExceptionReason.ReturnValueRequired, mex.Reason);
 			}
 		}
-		
+
 		[Test]
 		public void ShouldReturnNullReturnValue()
 		{
@@ -1067,6 +1067,27 @@ namespace Moq.Tests
 			}
 		}
 
+		[ExpectedException(typeof(ArgumentException))]
+		[Test]
+		public void ShouldThrowIfNotOverridableOnConcreteInterfaceImplementation()
+		{
+			var target = new Mock<Doer>();
+
+			target.Expect(t => t.Do());
+			target.Object.Do();
+
+			target.VerifyAll();
+		}
+
+		interface IDo { void Do(); }
+
+		public class Doer : IDo
+		{
+			public void Do()
+			{
+			}
+		}
+
 		// ShouldOptOutFromCallingBaseImplementation
 
 		// ShouldSupportByRefArguments?
@@ -1142,7 +1163,7 @@ namespace Moq.Tests
 			public string StringValue { get; set; }
 			public int IntValue { get; set; }
 		}
-		
+
 		public abstract class FooWithConstructors
 		{
 			public FooWithConstructors(string stringValue, int intValue)
@@ -1163,7 +1184,7 @@ namespace Moq.Tests
 			public string StringValue { get; set; }
 			public int IntValue { get; set; }
 		}
-		
+
 		public class FooOverrideEquals
 		{
 			public string Name { get; set; }

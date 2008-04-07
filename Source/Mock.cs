@@ -493,7 +493,7 @@ namespace Moq
 
 		private void ThrowIfCantOverride(Expression expectation, MethodInfo methodInfo)
 		{
-			if (!methodInfo.IsVirtual && !methodInfo.DeclaringType.IsMarshalByRef)
+			if ((!methodInfo.IsVirtual || methodInfo.IsFinal) && !methodInfo.DeclaringType.IsMarshalByRef)
 				throw new ArgumentException(
 					String.Format(Properties.Resources.ExpectationOnNonOverridableMember,
 					expectation.ToString()));
