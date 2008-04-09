@@ -17,6 +17,9 @@ namespace Moq.Protected
 		IExpect<TResult> Expect<TResult>(string methodOrPropertyName, params object[] args);
 
 		/// <summary/>
-		IExpectSetter<TProperty> ExpectSet<TProperty>(string propertyName, params object[] args);
+		IExpectGetter<TProperty> ExpectGet<TProperty>(string propertyName/*, params object[] args*/);
+
+		/// <summary/>
+		IExpectSetter<TProperty> ExpectSet<TProperty>(string propertyName/*, params object[] args*/);
 	}
 }

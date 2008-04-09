@@ -361,10 +361,15 @@ namespace Moq
 			ExpectKind expectKind,
 			Func<Expression, MethodInfo, Expression[], IProxyCall> factory)
 		{
+			//TODO: this method has to be refactored
+
 			Guard.ArgumentNotNull(expression, "expression");
 
 			LambdaExpression lambda = (LambdaExpression)expression;
 			// Remove convert expressions which are passed-in by the MockProtectedExtensions.
+			// They are passed because LambdaExpression constructor checks the type of 
+			// the returned values, even if the return type is Object and everything 
+			// is able to convert to it. It forces you to be explicit about the conversion.
 			var convert = lambda.Body as System.Linq.Expressions.UnaryExpression;
 			if (convert != null && convert.NodeType == ExpressionType.Convert)
 				lambda = Expression.Lambda(convert.Operand, lambda.Parameters.ToArray());
@@ -493,7 +498,8 @@ namespace Moq
 
 		private void ThrowIfCantOverride(Expression expectation, MethodInfo methodInfo)
 		{
-			if ((!methodInfo.IsVirtual || methodInfo.IsFinal) && !methodInfo.DeclaringType.IsMarshalByRef)
+			if ((!methodInfo.IsVirtual || methodInfo.IsFinal || methodInfo.IsPrivate) &&
+				!methodInfo.DeclaringType.IsMarshalByRef)
 				throw new ArgumentException(
 					String.Format(Properties.Resources.ExpectationOnNonOverridableMember,
 					expectation.ToString()));

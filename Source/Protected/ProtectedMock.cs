@@ -18,24 +18,6 @@ namespace Moq.Protected
 			this.mock = mock;
 		}
 
-		//public IExpect<TResult> Expect<TResult>(string methodOrProperty, params object[] args)
-		//{
-		//   Guard.ArgumentNotNull(mock, "mock");
-
-		//   var method = typeof(T).GetMethod(methodOrProperty,
-		//      BindingFlags.Instance | BindingFlags.NonPublic | BindingFlags.Public);
-		//   var property = typeof(T).GetProperty(methodOrProperty,
-		//      BindingFlags.Instance | BindingFlags.NonPublic | BindingFlags.Public);
-
-		//   ThrowIfMemberMissing(methodOrProperty, method, property);
-
-		//   if (method != null)
-		//      return ExpectMethod(method, args);
-		//   else
-		//      throw new NotSupportedException("Protected properties not supported yet.");
-		//   //   return ExpectProperty(mock, property, args);
-		//}
-
 		public IExpect Expect(string voidMethodName, params object[] args)
 		{
 			Guard.ArgumentNotNullOrEmptyString(voidMethodName, "voidMethodName");
@@ -99,7 +81,24 @@ namespace Moq.Protected
 			}
 		}
 
-		public IExpectSetter<TProperty> ExpectSet<TProperty>(string propertyName, params object[] args)
+		public IExpectGetter<TProperty> ExpectGet<TProperty>(string propertyName)
+		{
+			Guard.ArgumentNotNullOrEmptyString(propertyName, "propertyName");
+
+			var property = typeof(T).GetProperty(propertyName,
+				BindingFlags.Instance | BindingFlags.NonPublic | BindingFlags.Public);
+
+			ThrowIfPropertyMissing(propertyName, property);
+			VerifyProperty(property);
+
+			var param = Expression.Parameter(typeof(T), "x");
+
+			return mock.ExpectGet(Expression.Lambda<Func<T, TProperty>>(
+					Expression.MakeMemberAccess(param, property),
+					param));
+		}
+
+		public IExpectSetter<TProperty> ExpectSet<TProperty>(string propertyName)
 		{
 			Guard.ArgumentNotNullOrEmptyString(propertyName, "propertyName");
 
@@ -151,7 +150,18 @@ namespace Moq.Protected
 			// TODO: take into account lambdas, expressions, etc.
 			foreach (var arg in args)
 			{
-				yield return Expression.Constant(arg);
+				var expr = arg as Expression;
+				if (expr != null)
+				{
+					if (expr.NodeType == ExpressionType.Lambda)
+						yield return ((LambdaExpression)expr).Body;
+					else
+						yield return (Expression)arg;
+				}
+				else
+				{
+					yield return Expression.Constant(arg);
+				}
 			}
 		}
 

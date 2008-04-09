@@ -1079,6 +1079,15 @@ namespace Moq.Tests
 			target.VerifyAll();
 		}
 
+		[ExpectedException(typeof(ArgumentException))]
+		[Test]
+		public void ShouldThrowIfExpectGetOnPropertyWithPrivateSetter()
+		{
+			var mock = new Mock<FooWithPrivateSetter>();
+
+			mock.ExpectSet(m => m.Foo);
+		}
+
 		interface IDo { void Do(); }
 
 		public class Doer : IDo
@@ -1100,6 +1109,11 @@ namespace Moq.Tests
 		private int GetToRange()
 		{
 			return 5;
+		}
+
+		public class FooWithPrivateSetter
+		{
+			public virtual string Foo { get; private set; }
 		}
 
 		public class ClassWithNoDefaultConstructorMBRO : MarshalByRefObject

@@ -4,6 +4,7 @@ using System.Linq;
 using System.Text;
 using NUnit.Framework;
 using Moq.Protected;
+using System.Linq.Expressions;
 
 namespace Moq.Tests
 {
@@ -90,8 +91,6 @@ namespace Moq.Tests
 			mock.Protected().Expect("PublicValue");
 		}
 
-		// -------------------------------------------------
-
 		[ExpectedException(typeof(ArgumentException))]
 		[Test]
 		public void ShouldThrowIfReturnMethodNotFound()
@@ -176,6 +175,19 @@ namespace Moq.Tests
 		}
 
 		[Test]
+		public void ShouldExpectGetProperty()
+		{
+			var mock = new Mock<FooBase>();
+
+			mock
+				.Protected()
+				.ExpectGet<string>("ProtectedValue")
+				.Returns("foo");
+
+			Assert.AreEqual("foo", mock.Object.GetProtectedValue());
+		}
+
+		[Test]
 		public void ShouldExpectPropertySet()
 		{
 			var mock = new Mock<FooBase>();
@@ -222,6 +234,52 @@ namespace Moq.Tests
 			mock.Protected().ExpectSet<string>("PublicValue");
 		}
 
+		[Test]
+		public void ShouldAllowMatchersForArg()
+		{
+			var mock = new Mock<FooBase>();
+
+			mock.Protected()
+				.Expect<string>("StringArg", ItExpr.Is<string>(s => s == "bar"))
+				.Returns("baz");
+
+			Assert.AreEqual("baz", mock.Object.DoStringArg("bar"));
+
+
+			mock.Protected()
+				.Expect<string>("StringArg",
+					ItExpr.Is<string>(s => s.Length >= 2))
+				.Returns("long");
+			mock.Protected()
+				.Expect<string>("StringArg", 
+					ItExpr.Is<string>(s => s.Length < 2))
+				.Returns("short");
+
+			Assert.AreEqual("short", mock.Object.DoStringArg("f"));
+			Assert.AreEqual("long", mock.Object.DoStringArg("foo"));
+
+
+			mock.Protected()
+				.Expect<string>("TwoArgs",
+					ItExpr.IsAny<string>(),
+					5)
+				.Returns("done");
+	
+			Assert.AreEqual("done", mock.Object.DoTwoArgs("foobar", 5));
+			Assert.AreEqual("echo", mock.Object.DoTwoArgs("echo", 15));
+
+			mock.Protected()
+				.Expect<string>("TwoArgs",
+					ItExpr.IsAny<string>(),
+					ItExpr.IsInRange(1, 3, Range.Inclusive))
+				.Returns("inrange");
+
+			Assert.AreEqual("inrange", mock.Object.DoTwoArgs("foobar", 2));
+			Assert.AreEqual("echo", mock.Object.DoTwoArgs("echo", 4));
+		}
+
+		// ShouldExpectIndexedProperty
+
 		public class FooBase
 		{
 			internal protected virtual void ProtectedInternal() { }
@@ -230,7 +288,7 @@ namespace Moq.Tests
 			internal virtual void InternalInt() { }
 
 			public void DoVoid() { Void(); }
-			protected virtual void Void() {}
+			protected virtual void Void() { }
 
 			public void DoVoidArg(string arg) { VoidArg(arg); }
 			protected virtual void VoidArg(string arg) { }
@@ -245,6 +303,15 @@ namespace Moq.Tests
 			public string GetProtectedValue() { return ProtectedValue; }
 			public void SetProtectedValue(string value) { ProtectedValue = value; }
 			protected virtual string ProtectedValue { get; set; }
+
+			protected virtual int this[int index] { get { return 0; } set { } }
+
+
+			public string DoTwoArgs(string arg, int arg1) { return TwoArgs(arg, arg1); } 
+			protected virtual string TwoArgs(string arg, int arg1)
+			{
+				return arg;
+			}
 		}
 	}
 }
