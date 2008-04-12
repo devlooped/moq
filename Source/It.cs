@@ -29,7 +29,7 @@ namespace Moq
 		/// mock.Expect(x => x.Remove(It.IsAny&lt;string&gt;())).Throws(new InvalidOperationException());
 		/// </code>
 		/// </example>
-		[Matcher(typeof(AnyMatcher))]
+		[AdvancedMatcher(typeof(AnyMatcher))]
 		public static TValue IsAny<TValue>()
 		{
 			return default(TValue);
@@ -58,7 +58,7 @@ namespace Moq
 		///     .Throws(new ArgumentException());
 		/// </code>
 		/// </example>
-		[Matcher(typeof(PredicateMatcher))]
+		[AdvancedMatcher(typeof(PredicateMatcher))]
 		public static TValue Is<TValue>(Expression<Predicate<TValue>> match)
 		{
 			return default(TValue);
@@ -81,7 +81,7 @@ namespace Moq
 		///     .Returns(false);
 		/// </code>
 		/// </example>
-		[Matcher(typeof(RangeMatcher))]
+		[AdvancedMatcher(typeof(RangeMatcher))]
 		public static TValue IsInRange<TValue>(TValue from, TValue to, Range rangeKind)
 			where TValue : IComparable
 		{
@@ -99,7 +99,7 @@ namespace Moq
 		/// mock.Expect(x => x.Check(It.IsRegex("[a-z]+"))).Returns(1);
 		/// </code>
 		/// </example>
-		[Matcher(typeof(RegexMatcher))]
+		[AdvancedMatcher(typeof(RegexMatcher))]
 		public static string IsRegex(string regex)
 		{
 			return default(string);
@@ -117,7 +117,7 @@ namespace Moq
 		/// mock.Expect(x => x.Check(It.IsRegex("[a-z]+", RegexOptions.IgnoreCase))).Returns(1);
 		/// </code>
 		/// </example>
-		[Matcher(typeof(RegexMatcher))]
+		[AdvancedMatcher(typeof(RegexMatcher))]
 		public static string IsRegex(string regex, RegexOptions options)
 		{
 			return default(string);

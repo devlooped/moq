@@ -49,10 +49,11 @@
     <Reference Include="System.Xml" />
   </ItemGroup>
   <ItemGroup>
+    <Compile Include="MatcherAttributeFixture.cs" />
     <Compile Include="Demo.cs" />
     <Compile Include="ExpressionExtensionsFixture.cs" />
     <Compile Include="ExtensibilityFixture.cs" />
-    <Compile Include="MatcherAttributeFixture.cs" />
+    <Compile Include="AdvancedMatcherAttributeFixture.cs" />
     <Compile Include="MockBehaviorFixture.cs" />
     <Compile Include="MockedFixture.cs" />
     <Compile Include="MockFactoryFixture.cs" />

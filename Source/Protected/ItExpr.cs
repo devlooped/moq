@@ -65,7 +65,7 @@ namespace Moq.Protected
 		///     .Throws(new ArgumentException());
 		/// </code>
 		/// </example>
-		[Matcher(typeof(PredicateMatcher))]
+		[AdvancedMatcher(typeof(PredicateMatcher))]
 		public static Expression Is<TValue>(Expression<Predicate<TValue>> match)
 		{
 			return Expression.Call(null,
@@ -91,7 +91,7 @@ namespace Moq.Protected
 		///     .Returns(false);
 		/// </code>
 		/// </example>
-		[Matcher(typeof(RangeMatcher))]
+		[AdvancedMatcher(typeof(RangeMatcher))]
 		public static Expression IsInRange<TValue>(TValue from, TValue to, Range rangeKind)
 			where TValue : IComparable
 		{
@@ -113,7 +113,7 @@ namespace Moq.Protected
 		///     .Returns(1);
 		/// </code>
 		/// </example>
-		[Matcher(typeof(RegexMatcher))]
+		[AdvancedMatcher(typeof(RegexMatcher))]
 		public static Expression IsRegex(string regex)
 		{
 			Expression<Func<string>> expr = () => It.IsRegex(regex);
@@ -135,7 +135,7 @@ namespace Moq.Protected
 		///     .Returns(1);
 		/// </code>
 		/// </example>
-		[Matcher(typeof(RegexMatcher))]
+		[AdvancedMatcher(typeof(RegexMatcher))]
 		public static Expression IsRegex(string regex, RegexOptions options)
 		{
 			Expression<Func<string>> expr = () => It.IsRegex(regex, options);

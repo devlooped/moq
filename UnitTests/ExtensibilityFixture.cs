@@ -35,7 +35,7 @@ namespace Moq.Tests
 
 	public static class OrderIs
 	{
-		[Matcher(typeof(BigOrderMatcher))]
+		[AdvancedMatcher(typeof(BigOrderMatcher))]
 		public static Order Big()
 		{
 			return null;

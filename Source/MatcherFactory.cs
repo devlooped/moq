@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Linq;
 using System.Linq.Expressions;
 
 namespace Moq
@@ -17,10 +18,17 @@ namespace Moq
 			if (expression.NodeType == ExpressionType.Call)
 			{
 				MethodCallExpression call = (MethodCallExpression)expression;
-				MatcherAttribute attr = call.Method.GetCustomAttribute<MatcherAttribute>(true);
+				AdvancedMatcherAttribute attr = call.Method.GetCustomAttribute<AdvancedMatcherAttribute>(true);
+				MatcherAttribute staticMatcherMethodAttr = call.Method.GetCustomAttribute<MatcherAttribute>(true);
 				if (attr != null)
 				{
 					IMatcher matcher = attr.CreateMatcher();
+					matcher.Initialize(expression);
+					return matcher;
+				}
+				else if (staticMatcherMethodAttr != null)
+				{
+					IMatcher matcher = new Moq.Matchers.MatcherAttributeMatcher();
 					matcher.Initialize(expression);
 					return matcher;
 				}
