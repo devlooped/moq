@@ -108,7 +108,6 @@
     <Compile Include="RemotingProxy.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
     <Compile Include="Range.cs" />
-    <Compile Include="Reflector.cs" />
   </ItemGroup>
   <ItemGroup>
     <EmbeddedResource Include="Properties\Resources.resx">
