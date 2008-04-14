@@ -41,7 +41,7 @@ namespace Moq.Matchers
 			MethodCallExpression call = (MethodCallExpression) expression;
 			var expectedParametersTypes = new[] { call.Method.ReturnType }.Concat(call.Method.GetParameters().Select(p => p.ParameterType)).ToArray();
 			var method = call.Method.DeclaringType.GetMethod(call.Method.Name, expectedParametersTypes);
-			// TODO throw if validatorMethod doesn't exists			
+			// throw if validatorMethod doesn't exists			
 			if (method == null)
 			{
 				throw new MissingMethodException(string.Format(
@@ -61,7 +61,7 @@ namespace Moq.Matchers
 			var extraArgs = call.Arguments.Select(ae => ((ConstantExpression)ae.PartialEval()).Value);
 			var args = new[] { value }.Concat(extraArgs).ToArray();
 			// for static and non-static method
-			var instance = call.Object == null ? null : (call.Object as ConstantExpression).Value;
+			var instance = call.Object == null ? null : (call.Object.PartialEval() as ConstantExpression).Value;
 			return (bool) validatorMethod.Invoke( instance, args );
 		}
 	}

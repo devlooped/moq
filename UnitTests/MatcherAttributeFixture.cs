@@ -160,5 +160,21 @@ namespace Moq.Tests
 			public static string NotNull() { return null; }
 			public static bool NotNull(string arg) { return arg != null; }
 		}
+
+		[Test]
+		public void AllowHelperClassInstance()
+		{
+			var mock = new Mock<IFoo>(MockBehavior.Strict);
+			var b = new B();
+			mock.Expect(x => x.Bar(b.NotNull()));
+			mock.Object.Bar("a");
+		}
+
+		public class B
+		{
+			[Matcher]
+			public string NotNull() { return null; }
+			public bool NotNull(string arg) { return arg != null; }
+		}
 	}
 }
