@@ -1,0 +1,1 @@
+Get latest version from http://msdn2.microsoft.com/en-us/netframework/aa569269.aspx
