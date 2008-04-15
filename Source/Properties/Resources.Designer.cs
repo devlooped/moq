@@ -61,6 +61,15 @@ namespace Moq.Properties {
         }
         
         /// <summary>
+        ///   Looks up a localized string similar to Can&apos;t set return value for void method {0}..
+        /// </summary>
+        internal static string CantSetReturnValueForVoid {
+            get {
+                return ResourceManager.GetString("CantSetReturnValueForVoid", resourceCulture);
+            }
+        }
+        
+        /// <summary>
         ///   Looks up a localized string similar to Constructor arguments cannot be passed for interface mocks..
         /// </summary>
         internal static string ConstructorArgsForInterface {
@@ -245,6 +254,15 @@ namespace Moq.Properties {
         internal static string UnsupportedExpression {
             get {
                 return ResourceManager.GetString("UnsupportedExpression", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Member {0} is not supported for protected mocking..
+        /// </summary>
+        internal static string UnsupportedMember {
+            get {
+                return ResourceManager.GetString("UnsupportedMember", resourceCulture);
             }
         }
         

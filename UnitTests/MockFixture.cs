@@ -6,6 +6,7 @@ using NUnit.Framework;
 using System.Collections;
 using System.Linq.Expressions;
 using System.Text.RegularExpressions;
+using System.Diagnostics;
 
 namespace Moq.Tests
 {
@@ -401,6 +402,7 @@ namespace Moq.Tests
 			Assert.IsTrue(mock.Object.Check("bar"));
 		}
 
+		[Ignore("Removed special handling for MBRO. It now behaves just like a regular class.")]
 		[Test]
 		public void ShouldOverrideNonVirtualForMBRO()
 		{
@@ -1024,6 +1026,54 @@ namespace Moq.Tests
 		}
 
 		[Test]
+		public void ShouldReturnDefaultForMBRO()
+		{
+			var mock = new Mock<AbstractMBRO>();
+
+			Assert.AreEqual(default(string), mock.Object.Value);
+		}
+
+		[Test]
+		public void ShouldInvokeBaseClassVirtualImplementation()
+		{
+			var mock = new Mock<FooBase>();
+
+			Assert.IsFalse(mock.Object.BaseCalled);
+			mock.Object.BaseCall();
+
+			Assert.AreEqual(default(bool), mock.Object.BaseCall("foo"));
+			Assert.IsTrue(mock.Object.BaseCalled);
+			Assert.IsTrue(mock.Object.BaseReturnCalled);
+		}
+
+		[Test]
+		public void ShouldInvokeBaseClassVirtualImplementationMBRO()
+		{
+			var mock = new Mock<AbstractMBRO>();
+
+			Assert.IsFalse(mock.Object.BaseCalled);
+			mock.Object.BaseCall();
+
+			Assert.IsTrue(mock.Object.BaseCalled);
+
+			Assert.AreEqual(default(bool), mock.Object.BaseCall("foo"));
+			Assert.IsTrue(mock.Object.BaseReturnCalled);
+		}
+
+		[Test]
+		public void ShouldMatchValueOrReturnDefaultForMBRO()
+		{
+			var mock = new Mock<AbstractMBRO>();
+
+			mock.Expect(x => x.Exists("foo")).Returns(true);
+
+			Assert.AreEqual(true, mock.Object.Exists("foo"));
+			// TODO: has to change when we modify behavior to 
+			// invoke default implementation if specified.
+			Assert.AreEqual(false, mock.Object.Exists("baz"));
+		}
+
+		[Test]
 		public void ShouldExpectGetIndexedProperty()
 		{
 			var mock = new Mock<IFoo>();
@@ -1088,6 +1138,14 @@ namespace Moq.Tests
 			mock.ExpectSet(m => m.Foo);
 		}
 
+		// ShouldCallVirtualImplementationIfNoMatch
+		// ShouldCallVirtualImplementationIfNoMatchMBRO
+
+		// ShouldOptOutFromCallingBaseImplementation
+
+		// ShouldSupportByRefArguments?
+		// ShouldSupportOutArguments?
+
 		interface IDo { void Do(); }
 
 		public class Doer : IDo
@@ -1096,11 +1154,6 @@ namespace Moq.Tests
 			{
 			}
 		}
-
-		// ShouldOptOutFromCallingBaseImplementation
-
-		// ShouldSupportByRefArguments?
-		// ShouldSupportOutArguments?
 
 		public sealed class FooSealed { }
 		class FooService : IFooService { }
@@ -1229,6 +1282,36 @@ namespace Moq.Tests
 		{
 			public string Value { get; set; }
 			public abstract int Get();
+			public virtual bool Exists(string value) { return false; }
+
+			private bool baseCalled = false;
+			private bool baseReturnCalled = false;
+
+			public bool BaseCalled
+			{
+				get { Debug.WriteLine("BaseCalled::Get"); return baseCalled; }
+				set { Debug.WriteLine("BaseCall::Set"); baseCalled = value; }
+			}
+
+			public virtual void BaseCall()
+			{
+				Debug.WriteLine("BaseCall");
+				BaseCalled = true;
+			}
+
+			public bool BaseReturnCalled
+			{
+				get { Debug.WriteLine("BaseReturnCalled::Get"); return baseReturnCalled; }
+				set { Debug.WriteLine("BaseReturnCall::Set"); baseReturnCalled = value; }
+			}
+
+
+			public virtual bool BaseCall(string value)
+			{
+				Console.WriteLine("BaseCall(string)");
+				BaseReturnCalled = true;
+				return default(bool);
+			}
 		}
 
 		public interface IFoo
@@ -1287,6 +1370,21 @@ namespace Moq.Tests
 			public bool True()
 			{
 				return true;
+			}
+
+			public bool BaseCalled = false;
+
+			public virtual void BaseCall()
+			{
+				BaseCalled = true;
+			}
+
+			public bool BaseReturnCalled = false;
+
+			public virtual bool BaseCall(string value)
+			{
+				BaseReturnCalled = true;
+				return default(bool);
 			}
 		}
 

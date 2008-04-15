@@ -5,6 +5,7 @@ using System.Text;
 using NUnit.Framework;
 using Moq.Protected;
 using System.Linq.Expressions;
+using System.ComponentModel;
 
 namespace Moq.Tests
 {
@@ -245,7 +246,6 @@ namespace Moq.Tests
 
 			Assert.AreEqual("baz", mock.Object.DoStringArg("bar"));
 
-
 			mock.Protected()
 				.Expect<string>("StringArg",
 					ItExpr.Is<string>(s => s.Length >= 2))
@@ -278,10 +278,76 @@ namespace Moq.Tests
 			Assert.AreEqual("echo", mock.Object.DoTwoArgs("echo", 4));
 		}
 
+		[Test]
+		public void ShouldResolveOverloads()
+		{
+			// NOTE: There are two overloads named "Do" and "DoReturn"
+
+			var mock = new Mock<MethodOverloads>();
+			mock.Protected().Expect("Do", 1, 2).Verifiable();
+			mock.Protected().Expect<string>("DoReturn", "1", "2").Returns("3").Verifiable();
+
+			mock.Object.ExecuteDo(1, 2);
+			Assert.AreEqual("3", mock.Object.ExecuteDoReturn("1", "2"));
+
+			mock.Verify();
+		}
+
+		[ExpectedException(typeof(ArgumentException))]
+		[Test]
+		public void ShouldThrowIfSetReturnForVoid()
+		{
+			var mock = new Mock<MethodOverloads>();
+			mock.Protected().Expect<string>("Do", "1", "2").Returns("3").Verifiable();
+		}
+
+		public class MethodOverloads
+		{
+			public void ExecuteDo(int a, int b)
+			{
+				Do(a, b);
+			}
+
+			protected virtual void Do(int a, int b)
+			{
+			}
+
+			public void ExecuteDo(string a, string b)
+			{
+				Do(a, b);
+			}
+
+			protected virtual void Do(string a, string b)
+			{
+			}
+
+			public int ExecuteDoReturn(int a, int b)
+			{
+				return DoReturn(a, b);
+			}
+
+			protected virtual int DoReturn(int a, int b)
+			{
+				return a + b;
+			}
+
+			public string ExecuteDoReturn(string a, string b)
+			{
+				return DoReturn(a, b);
+			}
+
+			protected virtual string DoReturn(string a, string b)
+			{
+				return a + b;
+			}
+		}
+
 		// ShouldExpectIndexedProperty
 
 		public class FooBase
 		{
+			protected event EventHandler Doing;
+
 			internal protected virtual void ProtectedInternal() { }
 			internal virtual void Internal() { }
 			internal protected virtual void ProtectedInternalInt() { }

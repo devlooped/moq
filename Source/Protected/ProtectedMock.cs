@@ -23,7 +23,10 @@ namespace Moq.Protected
 			Guard.ArgumentNotNullOrEmptyString(voidMethodName, "voidMethodName");
 
 			var method = typeof(T).GetMethod(voidMethodName,
-				BindingFlags.Instance | BindingFlags.NonPublic | BindingFlags.Public);
+				BindingFlags.Instance | BindingFlags.NonPublic | BindingFlags.Public,
+				null,
+				ToArgTypes(args).ToArray(),
+				null);
 
 			var property = typeof(T).GetProperty(voidMethodName,
 				BindingFlags.Instance | BindingFlags.NonPublic | BindingFlags.Public);
@@ -55,7 +58,10 @@ namespace Moq.Protected
 			Guard.ArgumentNotNullOrEmptyString(methodOrPropertyName, "methodOrPropertyName");
 
 			var method = typeof(T).GetMethod(methodOrPropertyName,
-				BindingFlags.Instance | BindingFlags.NonPublic | BindingFlags.Public);
+				BindingFlags.Instance | BindingFlags.NonPublic | BindingFlags.Public,
+				null,
+				ToArgTypes(args).ToArray(),
+				null);
 
 			var property = typeof(T).GetProperty(methodOrPropertyName,
 				BindingFlags.Instance | BindingFlags.NonPublic | BindingFlags.Public);
@@ -69,6 +75,9 @@ namespace Moq.Protected
 
 			if (method != null)
 			{
+				if (method.ReturnType == typeof(void))
+					throw new ArgumentException(Properties.Resources.CantSetReturnValueForVoid);
+
 				return mock.Expect(Expression.Lambda<Func<T, TResult>>(
 						Expression.Call(param, method, ToExpressionArgs(args)),
 						param));
@@ -122,7 +131,7 @@ namespace Moq.Protected
 				if (method.IsPublic)
 					throw new ArgumentException(String.Format(
 						Properties.Resources.MethodIsPublic,
-						method.ReflectedType.Name, 
+						method.ReflectedType.Name,
 						method.Name));
 
 				if (method.IsAssembly || method.IsFamilyOrAssembly || method.IsFamilyAndAssembly)
@@ -145,9 +154,64 @@ namespace Moq.Protected
 			}
 		}
 
+		private IEnumerable<Type> ToArgTypes(object[] args)
+		{
+			if (args != null)
+			{
+				foreach (var arg in args)
+				{
+					if (arg == null)
+					{
+						yield return null;
+					}
+					else
+					{
+						var expr = arg as Expression;
+						if (expr == null)
+						{
+							yield return arg.GetType();
+						}
+						else
+						{
+							if (expr.NodeType == ExpressionType.Call)
+							{
+								yield return ((MethodCallExpression)expr).Method.ReturnType;
+							}
+							else if (expr.NodeType == ExpressionType.MemberAccess)
+							{
+								var member = (MemberExpression)expr;
+
+								switch (member.Member.MemberType)
+								{
+									case MemberTypes.Field:
+										yield return ((FieldInfo)member.Member).FieldType;
+										break;
+									case MemberTypes.Property:
+										yield return ((PropertyInfo)member.Member).PropertyType;
+										break;
+									default:
+										throw new NotSupportedException(String.Format(
+											Properties.Resources.UnsupportedMember,
+											member.Member.Name));
+								}
+							}
+							else
+							{
+								var evalExpr = expr.PartialEval();
+
+								if (evalExpr.NodeType == ExpressionType.Constant)
+									yield return ((ConstantExpression)evalExpr).Type;
+								else
+									yield return null;
+							}
+						}
+					}
+				}
+			}
+		}
+
 		private static IEnumerable<Expression> ToExpressionArgs(object[] args)
 		{
-			// TODO: take into account lambdas, expressions, etc.
 			foreach (var arg in args)
 			{
 				var expr = arg as Expression;
@@ -156,7 +220,7 @@ namespace Moq.Protected
 					if (expr.NodeType == ExpressionType.Lambda)
 						yield return ((LambdaExpression)expr).Body;
 					else
-						yield return (Expression)arg;
+						yield return expr;
 				}
 				else
 				{
@@ -172,7 +236,7 @@ namespace Moq.Protected
 				throw new ArgumentException(String.Format(
 					Properties.Resources.MemberMissing,
 					typeof(T).Name, propertyName));
-			}			
+			}
 		}
 
 		private static void ThrowIfMemberMissing(string memberName, MethodInfo method, PropertyInfo property)

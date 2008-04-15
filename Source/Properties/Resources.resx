@@ -195,4 +195,10 @@ mock.ExpectSet(x =&gt; x.{1}).Callback(callbackDelegate);</value>
   <data name="PropertyMissing" xml:space="preserve">
     <value>Property {0}.{1} does not exist.</value>
   </data>
+  <data name="CantSetReturnValueForVoid" xml:space="preserve">
+    <value>Can't set return value for void method {0}.</value>
+  </data>
+  <data name="UnsupportedMember" xml:space="preserve">
+    <value>Member {0} is not supported for protected mocking.</value>
+  </data>
 </root>

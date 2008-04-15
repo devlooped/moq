@@ -16,47 +16,68 @@ namespace Moq
 	internal class RemotingProxy : RealProxy
 	{
 		Action<IInvocation> interceptor;
+		/// <summary>
+		/// Type of the generated remoting proxy.
+		/// </summary>
 		Type targetType;
+		/// <summary>
+		/// Type of the original mock.
+		/// </summary>
+		Type realType;
+		object instance;
 
-		public RemotingProxy(Type targetType, Action<IInvocation> interceptor)
-			: this(targetType, interceptor, new object[0])
-		{
-		}
-
-		public RemotingProxy(Type targetType, Action<IInvocation> interceptor, object[] ctorArgs)
+		public RemotingProxy(Type targetType, Type realType, Action<IInvocation> interceptor, object[] ctorArgs)
 			: base(targetType)
 		{
 			this.targetType = targetType;
+			this.realType = realType;
 			this.interceptor = interceptor;
 
 			// During construction, the object is not proxied, and calls
 			// made within the MBRO ctor are done directly on the "this" 
 			// object, not via this proxy. Interception and therefore 
 			// expectations don't work during construction.
-			var instance = Activator.CreateInstance(targetType,
+			this.instance = Activator.CreateInstance(targetType,
 				new object[] { new IInterceptor[] { new NullInterceptor() } }.Concat(ctorArgs).ToArray());
 
 			base.AttachServer((MarshalByRefObject)instance);
 		}
 
-		public override object GetTransparentProxy()
-		{
-			return base.GetTransparentProxy();
-		}
-
 		public override IMessage Invoke(IMessage msg)
 		{
 			var methodCall = msg as IMethodCallMessage;
+
 			if (methodCall != null)
 			{
-				var invocation = new RemotingInvocation(
-					targetType,
-					methodCall,
-					CallUnderlyingObject);
+				if (methodCall.MethodName == "FieldGetter" &&
+					methodCall.MethodBase.DeclaringType == typeof(object))
+				{
+					// For consistency with non-MBROs, fields 
+					// are not mockeable and are passed-through to 
+					// the underlying object.
+					object value = realType.GetField(
+						(string)methodCall.Args[1],
+						BindingFlags.NonPublic | BindingFlags.Public | BindingFlags.Instance | BindingFlags.Static)
+						.GetValue(GetUnwrappedServer());
 
-				interceptor(invocation);
+					return new ReturnMessage(
+						value,
+						null,
+						0,
+						null,
+						methodCall);
+				}
+				else
+				{
+					var invocation = new RemotingInvocation(
+						realType,
+						methodCall,
+						CallUnderlyingObject);
 
-				return ToMessage(invocation, methodCall);
+					interceptor(invocation);
+
+					return ToMessage(invocation, methodCall);
+				}
 			}
 
 			return null;

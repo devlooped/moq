@@ -72,7 +72,6 @@ namespace Moq
 		static readonly ProxyGenerator generator = new ProxyGenerator();
 		Interceptor interceptor;
 		T instance;
-		RemotingProxy remotingProxy;
 		MockBehavior behavior;
 
 		/// <summary>
@@ -103,14 +102,16 @@ namespace Moq
 
 			try
 			{
-				if (typeof(MarshalByRefObject).IsAssignableFrom(mockType))
-				{
-					var generatedType = generator.ProxyBuilder.CreateClassProxy(mockType, interfacesTypes, new ProxyGenerationOptions());
+				//TODO: remove all the remoting crap? Or fix to force it to call the 
+				//underlying object somehow?
+				//if (typeof(MarshalByRefObject).IsAssignableFrom(mockType))
+				//{
+				//   var generatedType = generator.ProxyBuilder.CreateClassProxy(mockType, interfacesTypes, new ProxyGenerationOptions());
+				//   var remotingProxy = new RemotingProxy(generatedType, mockType, x => interceptor.Intercept(x), args);
 
-					remotingProxy = new RemotingProxy(generatedType, x => interceptor.Intercept(x), args);
-					instance = (T)remotingProxy.GetTransparentProxy();
-				}
-				else if (typeof(T).IsInterface)
+				//   instance = (T)remotingProxy.GetTransparentProxy();
+				//}
+				if (typeof(T).IsInterface)
 				{
 					if (args.Length > 0)
 						throw new ArgumentException(Properties.Resources.ConstructorArgsForInterface);
