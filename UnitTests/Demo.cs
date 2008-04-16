@@ -47,6 +47,54 @@ namespace Moq.Tests
 			Assert.IsFalse(order.IsFilled);
 		}
 
+		public void TestPresenterSelection()
+		{
+			var mockView = new Mock<IOrdersView>();
+			var mockedEvent = mockView.CreateEventHandler<OrderEventArgs>();
+
+			var presenter = new OrdersPresenter(mockView.Object);
+
+			// Check that the presenter has no selection by default
+			Assert.IsNull(presenter.SelectedOrder);
+
+			// Create a mock event handler of the appropriate type
+			var handler = mockView.CreateEventHandler<OrderEventArgs>();
+			// Associate it with the event we want to raise
+			mockView.Object.OrderSelected += handler;
+			// Finally raise the event with a specific arguments data
+			handler.Raise(new OrderEventArgs { Order = new Order("moq", 500) });
+
+			// Now the presenter reacted to the event, and we have a selected order
+			Assert.IsNotNull(presenter.SelectedOrder);
+			Assert.AreEqual("moq", presenter.SelectedOrder.ProductName);
+		}
+
+		public class OrderEventArgs : EventArgs
+		{
+			public Order Order { get; set; }
+		}
+
+		public interface IOrdersView
+		{
+			event EventHandler<OrderEventArgs> OrderSelected;
+		}
+
+		public class OrdersPresenter
+		{
+			public OrdersPresenter(IOrdersView view)
+			{
+				view.OrderSelected += (sender, args) => DoOrderSelection(args.Order);
+			}
+
+			public Order SelectedOrder { get; private set; }
+
+			private void DoOrderSelection(Order selectedOrder)
+			{
+				// Do something when the view selects an order.
+				SelectedOrder = selectedOrder;
+			}
+		}
+
 		public interface IWarehouse
 		{
 			bool HasInventory(string productName, int quantity);

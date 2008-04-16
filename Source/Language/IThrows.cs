@@ -22,6 +22,6 @@ namespace Moq.Language
 		///     .Throws(new ArgumentException());
 		/// </code>
 		/// </example>
-		IOnceVerifies Throws(Exception exception);
+		IOnceVerifiesRaise Throws(Exception exception);
 	}
 }

@@ -227,6 +227,15 @@ namespace Moq.Properties {
         }
         
         /// <summary>
+        ///   Looks up a localized string similar to Cannot raise a mocked event unless it has been associated (attached) to a concrete event in a mocked object..
+        /// </summary>
+        internal static string RaisedUnassociatedEvent {
+            get {
+                return ResourceManager.GetString("RaisedUnassociatedEvent", resourceCulture);
+            }
+        }
+        
+        /// <summary>
         ///   Looks up a localized string similar to Invocation needs to return a value and therefore must have a corresponding expectation that provides it..
         /// </summary>
         internal static string ReturnValueRequired {

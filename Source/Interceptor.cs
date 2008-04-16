@@ -15,9 +15,9 @@ namespace Moq
 		MockBehavior behavior;
 		Type targetType;
 		Dictionary<string, IProxyCall> calls = new Dictionary<string, IProxyCall>();
-		object mock;
+		Mock mock;
 
-		public Interceptor(MockBehavior behavior, Type targetType, object mock)
+		public Interceptor(MockBehavior behavior, Type targetType, Mock mock)
 		{
 			this.behavior = behavior;
 			this.targetType = targetType;
@@ -66,6 +66,27 @@ namespace Moq
 			{
 				// "Mixin" of IMocked
 				invocation.ReturnValue = mock;
+				return;
+			}
+
+			// Special case for events.
+			if (invocation.Method.IsSpecialName &&
+				invocation.Method.Name.StartsWith("add_"))
+			{
+				var delegateInstance = (Delegate)invocation.Arguments[0];
+				// TODO: validate we can get the event?
+				var eventInfo = targetType.GetEvent(invocation.Method.Name.Replace("add_", ""));
+				var mockEvent = delegateInstance.Target as MockedEvent;
+
+				if (mockEvent != null)
+				{
+					mockEvent.Event = eventInfo;
+				}
+				else
+				{
+					mock.AddEventHandler(eventInfo, (Delegate)invocation.Arguments[0]);
+				}
+
 				return;
 			}
 

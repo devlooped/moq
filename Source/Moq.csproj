@@ -56,6 +56,7 @@
   <ItemGroup>
     <Compile Include="DefaultValue.cs" />
     <Compile Include="ExpectKind.cs" />
+    <Compile Include="Language\IRaise.cs" />
     <Compile Include="MatcherAttribute.cs" />
     <Compile Include="ExpressionExtensions.cs" />
     <Compile Include="Extensions.cs" />
@@ -65,9 +66,9 @@
     <Compile Include="IHideObjectMembers.cs" />
     <Compile Include="Language\IReturnsGetter.cs" />
     <Compile Include="Language\ICallbackGetter.cs" />
-    <Compile Include="Language\Flow\IOnceVerifies.cs" />
+    <Compile Include="Language\Flow\IOnceVerifiesRaise.cs" />
     <Compile Include="Language\Flow\IReturnsThrows.cs" />
-    <Compile Include="Language\Flow\IThrowsOnceVerifies.cs" />
+    <Compile Include="Language\Flow\IThrowsOnceVerifiesRaise.cs" />
     <Compile Include="Language\ICallback.cs" />
     <Compile Include="IMatcher.cs" />
     <Compile Include="IMocked.cs" />
@@ -94,6 +95,7 @@
     <Compile Include="MethodCallReturn.cs" />
     <Compile Include="Mock.cs" />
     <Compile Include="MockBehavior.cs" />
+    <Compile Include="MockedEvent.cs" />
     <Compile Include="MockException.cs" />
     <Compile Include="MockFactory.cs" />
     <Compile Include="Properties\Resources.Designer.cs">

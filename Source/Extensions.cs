@@ -8,6 +8,9 @@ namespace Moq
 {
 	internal static class Extensions
 	{
+		static readonly FieldInfo remoteStackTraceString = typeof(Exception).GetField("_remoteStackTraceString",
+										 BindingFlags.Instance | BindingFlags.NonPublic);
+
 		public static TAttribute GetCustomAttribute<TAttribute>(this ICustomAttributeProvider source, bool inherit)
 			where TAttribute : Attribute
 		{
@@ -45,6 +48,19 @@ namespace Moq
 							x.ToString())
 					.ToArray()
 				) + ")";
+		}
+
+		public static object InvokePreserveStack(this Delegate del, params object[] args)
+		{
+			try
+			{
+				return del.DynamicInvoke(args);
+			}
+			catch (Exception ex)
+			{
+				remoteStackTraceString.SetValue(ex.InnerException, ex.InnerException.StackTrace);
+				throw ex.InnerException;
+			}
 		}
 	}
 }

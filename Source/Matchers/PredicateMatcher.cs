@@ -22,7 +22,7 @@ namespace Moq
 
 		public bool Matches(object value)
 		{
-			return (bool)predicate.DynamicInvoke(value);
+			return (bool)predicate.InvokePreserveStack(value);
 		}
 	}
 }

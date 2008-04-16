@@ -5,7 +5,7 @@ using System.Reflection;
 using Castle.Core.Interceptor;
 using Castle.DynamicProxy;
 using Moq.Language.Flow;
-using System.ComponentModel;
+using System.Collections.Generic;
 
 namespace Moq
 {
@@ -66,7 +66,7 @@ namespace Moq
 	/// Assert.IsFalse(order.IsFilled);
 	/// </code>
 	/// </example>
-	public class Mock<T> : IVerifiable, IHideObjectMembers
+	public class Mock<T> : Mock, IVerifiable, IHideObjectMembers
 		where T : class
 	{
 		static readonly ProxyGenerator generator = new ProxyGenerator();
@@ -183,12 +183,20 @@ namespace Moq
 		/// <summary>
 		/// Exposes the mocked object instance.
 		/// </summary>
-		public T Object
+		public new T Object
 		{
 			get
 			{
 				return instance;
 			}
+		}
+
+		/// <summary>
+		/// Returns the mocked object value.
+		/// </summary>
+		protected override object GetObject()
+		{
+			return instance;
 		}
 
 		/// <devdoc>
@@ -365,15 +373,7 @@ namespace Moq
 			//TODO: this method has to be refactored
 
 			Guard.ArgumentNotNull(expression, "expression");
-
-			LambdaExpression lambda = (LambdaExpression)expression;
-			// Remove convert expressions which are passed-in by the MockProtectedExtensions.
-			// They are passed because LambdaExpression constructor checks the type of 
-			// the returned values, even if the return type is Object and everything 
-			// is able to convert to it. It forces you to be explicit about the conversion.
-			var convert = lambda.Body as System.Linq.Expressions.UnaryExpression;
-			if (convert != null && convert.NodeType == ExpressionType.Convert)
-				lambda = Expression.Lambda(convert.Operand, lambda.Parameters.ToArray());
+			LambdaExpression lambda = GetLambda(expression);
 
 			IProxyCall result = null;
 
@@ -464,6 +464,19 @@ namespace Moq
 			return result;
 		}
 
+		private static LambdaExpression GetLambda(Expression expression)
+		{
+			LambdaExpression lambda = (LambdaExpression)expression;
+			// Remove convert expressions which are passed-in by the MockProtectedExtensions.
+			// They are passed because LambdaExpression constructor checks the type of 
+			// the returned values, even if the return type is Object and everything 
+			// is able to convert to it. It forces you to be explicit about the conversion.
+			var convert = lambda.Body as System.Linq.Expressions.UnaryExpression;
+			if (convert != null && convert.NodeType == ExpressionType.Convert)
+				lambda = Expression.Lambda(convert.Operand, lambda.Parameters.ToArray());
+			return lambda;
+		}
+
 		private bool IsPropertyIndexer(Expression expression)
 		{
 			var call = expression as MethodCallExpression;
@@ -524,7 +537,7 @@ namespace Moq
 	/// Static methods that apply to mocked objects, such as <see cref="Get"/> to 
 	/// retrieve a <see cref="Mock{T}"/> from an object instance.
 	/// </summary>
-	public static class Mock
+	public abstract class Mock
 	{
 		/// <summary>
 		/// Retrieves the mock object for the given object instance.
@@ -561,6 +574,116 @@ namespace Moq
 			else
 			{
 				throw new ArgumentException(Properties.Resources.ObjectInstanceNotMock, "mocked");
+			}
+		}
+
+		Dictionary<EventInfo, List<Delegate>> invocationLists = new Dictionary<EventInfo, List<Delegate>>();
+
+		/// <summary>
+		/// Exposes the mocked object instance.
+		/// </summary>
+		public object Object { get { return GetObject(); } }
+
+		/// <summary>
+		/// Returns the mocked object value.
+		/// </summary>
+		protected abstract object GetObject();
+
+		internal void AddEventHandler(EventInfo ev, Delegate handler)
+		{
+			List<Delegate> handlers;
+			if (!invocationLists.TryGetValue(ev, out handlers))
+			{
+				handlers = new List<Delegate>();
+				invocationLists.Add(ev, handlers);
+			}
+
+			handlers.Add(handler);
+		}
+
+		internal IEnumerable<Delegate> GetInvocationList(EventInfo ev)
+		{
+			List<Delegate> handlers;
+			if (!invocationLists.TryGetValue(ev, out handlers))
+				return new Delegate[0];
+			else
+				return handlers;
+		}
+
+		/// <summary>
+		/// Creates a handler that can be associated to an event receiving 
+		/// the given <typeparamref name="TEventArgs"/> and can be used 
+		/// to raise the event.
+		/// </summary>
+		/// <typeparam name="TEventArgs">Type of <see cref="EventArgs"/> 
+		/// data passed in to the event.</typeparam>
+		/// <example>
+		/// This example shows how to invoke an event with a custom event arguments 
+		/// class in a view that will cause its corresponding presenter to 
+		/// react by changing its state:
+		/// <code>
+		/// var mockView = new Mock&lt;IOrdersView&gt;();
+		/// var mockedEvent = mockView.CreateEventHandler&lt;OrderEventArgs&gt;();
+		/// 
+		/// var presenter = new OrdersPresenter(mockView.Object);
+		/// 
+		/// // Check that the presenter has no selection by default
+		/// Assert.IsNull(presenter.SelectedOrder);
+		/// 
+		/// // Create a mock event handler of the appropriate type
+		/// var handler = mockView.CreateEventHandler&lt;OrderEventArgs&gt;();
+		/// // Associate it with the event we want to raise
+		/// mockView.Object.Cancel += handler;
+		/// // Finally raise the event with a specific arguments data
+		/// handler.Raise(new OrderEventArgs { Order = new Order("moq", 500) });
+		/// 
+		/// // Now the presenter reacted to the event, and we have a selected order
+		/// Assert.IsNotNull(presenter.SelectedOrder);
+		/// Assert.AreEqual("moq", presenter.SelectedOrder.ProductName);
+		/// </code>
+		/// </example>
+		public MockedEvent<TEventArgs> CreateEventHandler<TEventArgs>() where TEventArgs : EventArgs
+		{
+			return new MockedEvent<TEventArgs>(this);
+		}
+
+		/// <summary>
+		/// Creates a handler that can be associated to an event receiving 
+		/// a generic <see cref="EventArgs"/> and can be used 
+		/// to raise the event.
+		/// </summary>
+		/// <example>
+		/// This example shows how to invoke a generic event in a view that will 
+		/// cause its corresponding presenter to react by changing its state:
+		/// <code>
+		/// var mockView = new Mock&lt;IOrdersView&gt;();
+		/// var mockedEvent = mockView.CreateEventHandler();
+		/// 
+		/// var presenter = new OrdersPresenter(mockView.Object);
+		/// 
+		/// // Check that the presenter is not in the "Canceled" state
+		/// Assert.IsFalse(presenter.IsCanceled);
+		/// 
+		/// // Create a mock event handler of the appropriate type
+		/// var handler = mockView.CreateEventHandler();
+		/// // Associate it with the event we want to raise
+		/// mockView.Object.Cancel += handler;
+		/// // Finally raise the event
+		/// handler.Raise(EventArgs.Empty);
+		/// 
+		/// // Now the presenter reacted to the event, and changed its state
+		/// Assert.IsTrue(presenter.IsCanceled);
+		/// </code>
+		/// </example>
+		public MockedEvent<EventArgs> CreateEventHandler()
+		{
+			return new MockedEvent<EventArgs>(this);
+		}
+
+		class NullMockedEvent : MockedEvent
+		{
+			public NullMockedEvent(Mock mock) : base(mock)
+			{
 			}
 		}
 	}

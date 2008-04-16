@@ -6,7 +6,7 @@ namespace Moq.Language.Flow
 	/// Implements the fluent API.
 	/// </summary>
 	[EditorBrowsable(EditorBrowsableState.Never)]
-	public interface IExpect : ICallback, IThrowsOnceVerifies, IHideObjectMembers
+	public interface IExpect : ICallback, IThrowsOnceVerifiesRaise, IRaise, IHideObjectMembers
 	{
 	}
 
@@ -30,7 +30,7 @@ namespace Moq.Language.Flow
 	/// Implements the fluent API.
 	/// </summary>
 	[EditorBrowsable(EditorBrowsableState.Never)]
-	public interface IExpectSetter<TProperty> : ICallbackSetter<TProperty>, IThrowsOnceVerifies, IHideObjectMembers
+	public interface IExpectSetter<TProperty> : ICallbackSetter<TProperty>, IThrowsOnceVerifiesRaise, IRaise, IHideObjectMembers
 	{
 	}
 }

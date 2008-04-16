@@ -23,7 +23,7 @@ namespace Moq.Language
 		///     .Callback(() => called = true);
 		/// </code>
 		/// </example>
-		IThrowsOnceVerifies Callback(Action callback);
+		IThrowsOnceVerifiesRaise Callback(Action callback);
 		/// <summary>
 		/// Specifies a callback to invoke when the method is called that receives the original
 		/// arguments.
@@ -41,7 +41,7 @@ namespace Moq.Language
 		///     .Callback((string command) => Console.WriteLine(command));
 		/// </code>
 		/// </example>
-		IThrowsOnceVerifies Callback<T>(Action<T> callback);
+		IThrowsOnceVerifiesRaise Callback<T>(Action<T> callback);
 		/// <summary>
 		/// Specifies a callback to invoke when the method is called that receives the original
 		/// arguments.
@@ -62,7 +62,7 @@ namespace Moq.Language
 		///     .Callback((string arg1, string arg2) => Console.WriteLine(arg1 + arg2));
 		/// </code>
 		/// </example>
-		IThrowsOnceVerifies Callback<T1, T2>(Action<T1, T2> callback);
+		IThrowsOnceVerifiesRaise Callback<T1, T2>(Action<T1, T2> callback);
 		/// <summary>
 		/// Specifies a callback to invoke when the method is called that receives the original
 		/// arguments.
@@ -85,7 +85,7 @@ namespace Moq.Language
 		///     .Callback((string arg1, string arg2, int arg3) => Console.WriteLine(arg1 + arg2 + arg3));
 		/// </code>
 		/// </example>
-		IThrowsOnceVerifies Callback<T1, T2, T3>(Action<T1, T2, T3> callback);
+		IThrowsOnceVerifiesRaise Callback<T1, T2, T3>(Action<T1, T2, T3> callback);
 		/// <summary>
 		/// Specifies a callback to invoke when the method is called that receives the original
 		/// arguments.
@@ -110,7 +110,7 @@ namespace Moq.Language
 		///     .Callback((string arg1, string arg2, int arg3, bool arg4) => Console.WriteLine(arg1 + arg2 + arg3 + arg4));
 		/// </code>
 		/// </example>
-		IThrowsOnceVerifies Callback<T1, T2, T3, T4>(Action<T1, T2, T3, T4> callback);
+		IThrowsOnceVerifiesRaise Callback<T1, T2, T3, T4>(Action<T1, T2, T3, T4> callback);
 	}
 
 	/// <summary>

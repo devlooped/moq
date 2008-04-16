@@ -32,37 +32,37 @@ namespace Moq
 			HasReturnValue = false;
 		}
 
-		public IOnceVerifies Returns(Func<TResult> valueExpression)
+		public IOnceVerifiesRaise Returns(Func<TResult> valueExpression)
 		{
 			SetReturnDelegate(valueExpression);
 			return this;
 		}
 
-		public IOnceVerifies Returns(TResult value)
+		public IOnceVerifiesRaise Returns(TResult value)
 		{
 			Returns(() => value);
 			return this;
 		}
 
-		public IOnceVerifies Returns<T>(Func<T, TResult> valueExpression)
+		public IOnceVerifiesRaise Returns<T>(Func<T, TResult> valueExpression)
 		{
 			SetReturnDelegate(valueExpression);
 			return this;
 		}
 
-		public IOnceVerifies Returns<T1, T2>(Func<T1, T2, TResult> valueExpression)
+		public IOnceVerifiesRaise Returns<T1, T2>(Func<T1, T2, TResult> valueExpression)
 		{
 			SetReturnDelegate(valueExpression);
 			return this;
 		}
 
-		public IOnceVerifies Returns<T1, T2, T3>(Func<T1, T2, T3, TResult> valueExpression)
+		public IOnceVerifiesRaise Returns<T1, T2, T3>(Func<T1, T2, T3, TResult> valueExpression)
 		{
 			SetReturnDelegate(valueExpression);
 			return this;
 		}
 
-		public IOnceVerifies Returns<T1, T2, T3, T4>(Func<T1, T2, T3, T4, TResult> valueExpression)
+		public IOnceVerifiesRaise Returns<T1, T2, T3, T4>(Func<T1, T2, T3, T4, TResult> valueExpression)
 		{
 			SetReturnDelegate(valueExpression);
 			return this;
@@ -119,9 +119,9 @@ namespace Moq
 			base.Execute(call);
 
 			if (valueDel.Method.GetParameters().Length != 0)
-				call.ReturnValue = valueDel.DynamicInvoke(call.Arguments); //will throw if parameters mismatch
+				call.ReturnValue = valueDel.InvokePreserveStack(call.Arguments); //will throw if parameters mismatch
 			else
-				call.ReturnValue = valueDel.DynamicInvoke(); //we need this, for the user to be able to use parameterless methods
+				call.ReturnValue = valueDel.InvokePreserveStack(); //we need this, for the user to be able to use parameterless methods
 		}
 	}
 }

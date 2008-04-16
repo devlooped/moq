@@ -23,7 +23,7 @@ namespace Moq
 			return call.Method == method;
 		}
 
-		public IThrowsOnceVerifies Callback(Action<TProperty> callback)
+		public IThrowsOnceVerifiesRaise Callback(Action<TProperty> callback)
 		{
 			SetCallbackWithArguments(callback);
 			return this;
@@ -39,6 +39,8 @@ namespace Moq
 		IMatcher[] argumentMatchers;
 		int callCount;
 		bool isOnce;
+		MockedEvent mockEvent; 
+		EventArgs mockEventArgs;
 
 		public MethodCall(Expression originalExpression, MethodInfo method, params Expression[] arguments)
 		{
@@ -51,37 +53,37 @@ namespace Moq
 		public bool Invoked { get; set; }
 		public Expression ExpectExpression { get { return originalExpression; } }
 
-		public IOnceVerifies Throws(Exception exception)
+		public IOnceVerifiesRaise Throws(Exception exception)
 		{
 			this.exception = exception;
 			return this;
 		}
 
-		public IThrowsOnceVerifies Callback(Action callback)
+		public IThrowsOnceVerifiesRaise Callback(Action callback)
 		{
 			this.callback = delegate { callback(); };
 			return this;
 		}
 
-		public IThrowsOnceVerifies Callback<T>(Action<T> callback)
+		public IThrowsOnceVerifiesRaise Callback<T>(Action<T> callback)
 		{
 			SetCallbackWithArguments(callback);
 			return this;
 		}
 
-		public IThrowsOnceVerifies Callback<T1, T2>(Action<T1, T2> callback)
+		public IThrowsOnceVerifiesRaise Callback<T1, T2>(Action<T1, T2> callback)
 		{
 			SetCallbackWithArguments(callback);
 			return this;
 		}
 
-		public IThrowsOnceVerifies Callback<T1, T2, T3>(Action<T1, T2, T3> callback)
+		public IThrowsOnceVerifiesRaise Callback<T1, T2, T3>(Action<T1, T2, T3> callback)
 		{
 			SetCallbackWithArguments(callback);
 			return this;
 		}
 
-		public IThrowsOnceVerifies Callback<T1, T2, T3, T4>(Action<T1, T2, T3, T4> callback)
+		public IThrowsOnceVerifiesRaise Callback<T1, T2, T3, T4>(Action<T1, T2, T3, T4> callback)
 		{
 			SetCallbackWithArguments(callback);
 			return this;
@@ -89,7 +91,7 @@ namespace Moq
 
 		protected void SetCallbackWithArguments(Delegate callback)
 		{
-			this.callback = delegate(object[] args) { callback.DynamicInvoke(args); };
+			this.callback = delegate(object[] args) { callback.InvokePreserveStack(args); };
 		}
 
 		public void Verifiable()
@@ -138,12 +140,25 @@ namespace Moq
 				throw new MockException(MockException.ExceptionReason.MoreThanOneCall,
 					String.Format(Properties.Resources.MoreThanOneCall,
 					call.Format()));
-		}
 
+			if (mockEvent != null)
+				mockEvent.DoRaise(mockEventArgs);
+		}
 
 		public IVerifies AtMostOnce()
 		{
 			isOnce = true;
+
+			return this;
+		}
+
+		public IVerifies Raises(MockedEvent eventHandler, EventArgs args)
+		{
+			Guard.ArgumentNotNull(eventHandler, "eventHandler");
+			Guard.ArgumentNotNull(args, "args");
+
+			mockEvent = eventHandler;
+			mockEventArgs = args;
 
 			return this;
 		}
