@@ -49,8 +49,8 @@ Do use their documentation to learn about options (especially when there are sev
     <VisibleItems>InheritedMembers, Protected, SealedProtected</VisibleItems>
     <HtmlHelp1xCompilerPath path="" />
     <HtmlHelp2xCompilerPath path="" />
-    <OutputPath>.\Help\</OutputPath>
-    <SandcastlePath path=".\Tools\Sandcastle\" />
+    <OutputPath>..\build\Help\</OutputPath>
+    <SandcastlePath path="..\build\Sandcastle\" />
     <WorkingPath path="" />
     <CleanIntermediates>True</CleanIntermediates>
     <KeepLogFile>False</KeepLogFile>

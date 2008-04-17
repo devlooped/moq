@@ -34,7 +34,7 @@ namespace Moq.Language
 		/// Specifies a function that will calculate the value to return from the method.
 		/// </summary>
 		/// <param name="valueFunction">The function that will calculate the return value.</param>
-		/// <example>
+		/// <example group="returns">
 		/// Return a calculated value when the method is called:
 		/// <code>
 		/// mock.Expect(x => x.Execute("ping"))
@@ -52,7 +52,7 @@ namespace Moq.Language
 		/// </summary>
 		/// <typeparam name="T">Type of the argument of the invoked method.</typeparam>
 		/// <param name="valueFunction">The function that will calculate the return value.</param>
-		/// <example>
+		/// <example group="returns">
 		/// Return a calculated value which is evaluated lazily at the time of the invocation.
 		/// <para>
 		/// The lookup list can change between invocations and the expectation 
@@ -73,7 +73,7 @@ namespace Moq.Language
 		/// <typeparam name="T1">Type of the first argument of the invoked method.</typeparam>
 		/// <typeparam name="T2">Type of the second argument of the invoked method.</typeparam>
 		/// <param name="valueFunction">The function that will calculate the return value.</param>
-		/// <example>
+		/// <example group="returns">
 		/// Return a calculated value which is evaluated lazily at the time of the invocation.
 		/// <para>
 		/// The return value is calculated from the value of the actual method invocation arguments. 
@@ -96,7 +96,7 @@ namespace Moq.Language
 		/// <typeparam name="T2">Type of the second argument of the invoked method.</typeparam>
 		/// <typeparam name="T3">Type of the third argument of the invoked method.</typeparam>
 		/// <param name="valueFunction">The function that will calculate the return value.</param>
-		/// <example>
+		/// <example group="returns">
 		/// Return a calculated value which is evaluated lazily at the time of the invocation.
 		/// <para>
 		/// The return value is calculated from the value of the actual method invocation arguments. 
@@ -121,7 +121,7 @@ namespace Moq.Language
 		/// <typeparam name="T3">Type of the third argument of the invoked method.</typeparam>
 		/// <typeparam name="T4">Type of the fourth argument of the invoked method.</typeparam>
 		/// <param name="valueFunction">The function that will calculate the return value.</param>
-		/// <example>
+		/// <example group="returns">
 		/// Return a calculated value which is evaluated lazily at the time of the invocation.
 		/// <para>
 		/// The return value is calculated from the value of the actual method invocation arguments. 

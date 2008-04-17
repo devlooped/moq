@@ -1,3 +1,13 @@
+Version 2.5
+    * Added support for mocking protected members
+    * Added new way of extending argument matchers which is now very straightforward
+    * Added support for mocking events
+    * Added support for firing mocks from expectations
+    * Removed usage of MBROs which caused inconsistencies in mocking features
+    * Added ExpectGet and ExpectSet to better support properties, and provide better intellisense.
+    * 
+
+
 Version 2.0
 
     * Refactored fluent API on mocks. This may cause some existing tests to fail, but the fix is trivial (just reorder the calls to Callback, Returns and Verifiable)

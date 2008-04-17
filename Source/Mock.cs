@@ -11,6 +11,7 @@ namespace Moq
 {
 	// TODO: uncomment documentation when C# bug is fixed: 
 	///// <typeparam name="T">Type to mock, which can be an interface or a class.</typeparam>
+	// TODO: remove reference to MBROs from documentation and code.
 	/// <summary>
 	/// Provides a mock implementation of <typeparamref name="T"/>.
 	/// </summary>
@@ -28,7 +29,7 @@ namespace Moq
 	/// constructor.
 	/// </para>
 	/// </remarks>
-	/// <example>
+	/// <example group="overview" order="0">
 	/// The following example shows setting expectations with specific values 
 	/// for method invocations:
 	/// <code>
@@ -54,10 +55,16 @@ namespace Moq
 	/// 
 	/// //setup - expectations
 	/// //shows how to expect a value within a range
-	/// mock.Expect(x => x.HasInventory(It.IsAny&lt;string&gt;(), It.IsInRange(0, 100, Range.Inclusive))).Returns(false);
+	/// mock.Expect(x => x.HasInventory(
+	///			It.IsAny&lt;string&gt;(), 
+	///			It.IsInRange(0, 100, Range.Inclusive)))
+	///     .Returns(false);
 	/// 
 	/// //shows how to throw for unexpected calls. contrast with the "verify" approach of other mock libraries.
-	/// mock.Expect(x => x.Remove(It.IsAny&lt;string&gt;(), It.IsAny&lt;int&gt;())).Throws(new InvalidOperationException());
+	/// mock.Expect(x => x.Remove(
+	///			It.IsAny&lt;string&gt;(), 
+	///			It.IsAny&lt;int&gt;()))
+	///     .Throws(new InvalidOperationException());
 	/// 
 	/// //exercise
 	/// order.Fill(mock.Object);
@@ -213,7 +220,7 @@ namespace Moq
 		/// the latest one wins and is the one that will be executed.
 		/// </remarks>
 		/// <param name="expression">Lambda expression that specifies the expected method invocation.</param>
-		/// <example>
+		/// <example group="expectations">
 		/// <code>
 		/// var mock = new Mock&lt;IProcessor&gt;();
 		/// mock.Expect(x =&gt; x.Execute("ping"));
@@ -237,7 +244,7 @@ namespace Moq
 		/// the latest one wins and is the one that will be executed.
 		/// </remarks>
 		/// <param name="expression">Lambda expression that specifies the expected method invocation.</param>
-		/// <example>
+		/// <example group="expectations">
 		/// <code>
 		/// mock.Expect(x =&gt; x.HasInventory("Talisker", 50)).Returns(true);
 		/// </code>
@@ -260,7 +267,7 @@ namespace Moq
 		/// </remarks>
 		/// <typeparam name="TProperty">Type of the property. Typically omitted as it can be inferred from the expression.</typeparam>
 		/// <param name="expression">Lambda expression that specifies the expected property getter.</param>
-		/// <example>
+		/// <example group="expectations">
 		/// <code>
 		/// mock.ExpectGet(x =&gt; x.Suspended)
 		///     .Returns(true);
@@ -284,7 +291,7 @@ namespace Moq
 		/// </remarks>
 		/// <typeparam name="TProperty">Type of the property. Typically omitted as it can be inferred from the expression.</typeparam>
 		/// <param name="expression">Lambda expression that specifies the expected property setter.</param>
-		/// <example>
+		/// <example group="expectations">
 		/// <code>
 		/// mock.ExpectSet(x =&gt; x.Suspended);
 		/// </code>
@@ -300,7 +307,7 @@ namespace Moq
 		/// <summary>
 		/// Verifies that all verifiable expectations have been met.
 		/// </summary>
-		/// <example>
+		/// <example group="verification">
 		/// This example sets up an expectation and marks it as verifiable. After 
 		/// the mock is used, a <see cref="Verify"/> call is issued on the mock 
 		/// to ensure the method in the expectation was invoked:
@@ -334,7 +341,7 @@ namespace Moq
 		/// Verifies all expectations regardless of whether they have 
 		/// been flagged as verifiable.
 		/// </summary>
-		/// <example>
+		/// <example group="verification">
 		/// This example sets up an expectation without marking it as verifiable. After 
 		/// the mock is used, a <see cref="VerifyAll"/> call is issued on the mock 
 		/// to ensure that all expectations are met:
@@ -548,17 +555,17 @@ namespace Moq
 		/// <returns>The mock associated with the mocked object.</returns>
 		/// <exception cref="ArgumentException">The received <paramref name="mocked"/> instance 
 		/// was not created by Moq.</exception>
-		/// <example>
+		/// <example group="advanced">
 		/// The following example shows how to add a new expectation to an object 
 		/// instance which is not the original <see cref="Mock{T}"/> but rather 
 		/// the object associated with it:
 		/// <code>
-		/// // Typed instance, not the mock, is retrieved from some API.
+		/// // Typed instance, not the mock, is retrieved from some test API.
 		/// HttpContextBase context = GetMockContext();
 		/// 
 		/// // context.Request is the typed object from the "real" API
 		/// // so in order to add an expectation to it, we need to get 
-		/// // the mock that's managing them
+		/// // the mock that "owns" it
 		/// Mock&lt;HttpRequestBase&gt; request = Mock.Get(context.Request);
 		/// mock.Expect(req => req.AppRelativeCurrentExecutionFilePath)
 		///     .Returns(tempUrl);

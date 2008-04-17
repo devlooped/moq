@@ -23,9 +23,9 @@ namespace Moq
 	/// <see cref="Create{T}(MockBehavior)"/>) and posterior verification.
 	/// </para>
 	/// </remarks>
-	/// <example>
+	/// <example group="factory">
 	/// The following is a straightforward example on how to 
-	/// create and automatically verify strict mocks:
+	/// create and automatically verify strict mocks using a <see cref="MockFactory"/>:
 	/// <code>
 	/// var factory = new MockFactory(MockBehavior.Strict);
 	/// 
@@ -113,9 +113,9 @@ namespace Moq
 		/// </summary>
 		/// <typeparam name="T">Type to mock.</typeparam>
 		/// <returns>A new <see cref="Mock{T}"/>.</returns>
-		/// <example>
+		/// <example ignore="true">
 		/// <code>
-		/// var factory = new MockFactory(MockBehavior.Relaxed);
+		/// var factory = new MockFactory(MockBehavior.Strict);
 		/// 
 		/// var foo = factory.Create&lt;IFoo&gt;();
 		/// // use mock on tests
@@ -142,7 +142,7 @@ namespace Moq
 		/// <typeparam name="T">Type to mock.</typeparam>
 		/// <param name="args">Constructor arguments for mocked classes.</param>
 		/// <returns>A new <see cref="Mock{T}"/>.</returns>
-		/// <example>
+		/// <example ignore="true">
 		/// <code>
 		/// var factory = new MockFactory(MockBehavior.Default);
 		/// 
@@ -170,11 +170,11 @@ namespace Moq
 		/// <param name="behavior">Behavior to use for the mock, which overrides 
 		/// the default behavior specified at factory construction time.</param>
 		/// <returns>A new <see cref="Mock{T}"/>.</returns>
-		/// <example>
+		/// <example group="factory">
 		/// The following example shows how to create a mock with a different 
 		/// behavior to that specified as the default for the factory:
 		/// <code>
-		/// var factory = new MockFactory(MockBehavior.Relaxed);
+		/// var factory = new MockFactory(MockBehavior.Strict);
 		/// 
 		/// var foo = factory.Create&lt;IFoo&gt;(MockBehavior.Normal);
 		/// </code>
@@ -199,7 +199,7 @@ namespace Moq
 		/// the default behavior specified at factory construction time.</param>
 		/// <param name="args">Constructor arguments for mocked classes.</param>
 		/// <returns>A new <see cref="Mock{T}"/>.</returns>
-		/// <example>
+		/// <example group="factory">
 		/// The following example shows how to create a mock with a different 
 		/// behavior to that specified as the default for the factory, passing 
 		/// constructor arguments:
