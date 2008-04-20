@@ -299,35 +299,6 @@ namespace Moq.Tests
 			Assert.IsTrue(raised);
 		}
 
-		[Test]
-		public void ShouldRaiseEventWithFuncArgs()
-		{
-			var mock = new Mock<IAdder<string>>();
-
-			var handler = mock.CreateEventHandler();
-
-			mock.Expect(add => add.Do(It.IsAny<string>(), It.IsAny<int>(), It.IsAny<bool>(), It.IsAny<string>()))
-				.Raises(handler, (object[] args) => new FooArgs { Args = args });
-
-			mock.Object.Added += handler;
-
-			var raised = false;
-			handler.Raised += (sender, args) => raised = true;
-
-			mock.Object.Added += (sender, args) =>
-			{
-				Assert.That(args is FooArgs);
-				Assert.AreEqual("foo", ((FooArgs)args).Args[0]);
-				Assert.AreEqual(5, ((FooArgs)args).Args[1]);
-				Assert.AreEqual(true, ((FooArgs)args).Args[2]);
-				Assert.AreEqual("bar", ((FooArgs)args).Args[3]);
-			};
-
-			mock.Object.Do("foo", 5, true, "bar");
-
-			Assert.IsTrue(raised);
-		}
-
 		public interface IAdder<T>
 		{
 			event EventHandler Added;

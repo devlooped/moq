@@ -102,17 +102,5 @@ namespace Moq.Language
 		/// <typeparam name="T4">Type of the fourth argument received by the expected invocation.</typeparam>
 		/// <seealso cref="Raises(MockedEvent, EventArgs)"/>
 		IVerifies Raises<T1, T2, T3, T4>(MockedEvent eventHandler, Func<T1, T2, T3, T4, EventArgs> func);
-
-		/// <summary>
-		/// Specifies the mocked event that will be raised 
-		/// when the expectation is met.
-		/// </summary>
-		/// <param name="eventHandler">The mocked event, retrieved from 
-		/// <see cref="Mock.CreateEventHandler"/> or <see cref="Mock.CreateEventHandler{TEventArgs}"/>.
-		/// </param>
-		/// <param name="func">A function that will build the <see cref="EventArgs"/> 
-		/// to pass when raising the event.</param>
-		/// <seealso cref="Raises(MockedEvent, EventArgs)"/>
-		IVerifies Raises(MockedEvent eventHandler, Func<object[], EventArgs> func);
 	}
 }

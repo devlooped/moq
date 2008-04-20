@@ -196,11 +196,6 @@ namespace Moq
 			return RaisesImpl(eventHandler, func);
 		}
 
-		public IVerifies Raises(MockedEvent eventHandler, Func<object[], EventArgs> func)
-		{
-			return RaisesImpl(eventHandler, func);
-		}
-
 		private IVerifies RaisesImpl(MockedEvent eventHandler, Delegate func)
 		{
 			Guard.ArgumentNotNull(eventHandler, "eventHandler");
