@@ -7,6 +7,29 @@ using Castle.DynamicProxy;
 using Moq.Language.Flow;
 using System.Collections.Generic;
 
+namespace Moq.Classic
+{
+	/// <summary>
+	/// 
+	/// </summary>
+	public static class MockClassic
+	{
+		/// <summary />
+		//[System.ComponentModel.EditorBrowsable(System.ComponentModel.EditorBrowsableState.Never)]
+		public static void Expect<T>(this Mock<T> mock, Expression<Action<T>> expression, string value)
+			where T : class
+		{
+		}
+
+		/// <summary />
+		public static void Setup<T>(this Mock<T> mock, Expression<Action<T>> expression)
+			where T : class
+		{
+			mock.Expect(expression);
+		}
+	}
+}
+
 namespace Moq
 {
 	// TODO: uncomment documentation when C# bug is fixed: 
@@ -544,7 +567,7 @@ namespace Moq
 	/// Static methods that apply to mocked objects, such as <see cref="Get"/> to 
 	/// retrieve a <see cref="Mock{T}"/> from an object instance.
 	/// </summary>
-	public abstract class Mock
+	public abstract class Mock : IHideObjectMembers
 	{
 		/// <summary>
 		/// Retrieves the mock object for the given object instance.
@@ -653,6 +676,11 @@ namespace Moq
 		{
 			return new MockedEvent<TEventArgs>(this);
 		}
+
+		/// <summary>
+		/// 
+		/// </summary>
+		public void Foo() { }
 
 		/// <summary>
 		/// Creates a handler that can be associated to an event receiving 

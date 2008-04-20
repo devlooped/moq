@@ -56,7 +56,12 @@ namespace Moq
 			{
 				return del.DynamicInvoke(args);
 			}
-			catch (Exception ex)
+			catch (TargetParameterCountException pce)
+			{
+				remoteStackTraceString.SetValue(pce.InnerException, pce.InnerException.StackTrace);
+				throw pce.InnerException;
+			}
+			catch (TargetInvocationException ex)
 			{
 				remoteStackTraceString.SetValue(ex.InnerException, ex.InnerException.StackTrace);
 				throw ex.InnerException;

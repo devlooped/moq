@@ -39,8 +39,8 @@ namespace Moq
 		IMatcher[] argumentMatchers;
 		int callCount;
 		bool isOnce;
-		MockedEvent mockEvent; 
-		EventArgs mockEventArgs;
+		MockedEvent mockEvent;
+		Delegate mockEventArgsFunc;
 
 		public MethodCall(Expression originalExpression, MethodInfo method, params Expression[] arguments)
 		{
@@ -142,7 +142,19 @@ namespace Moq
 					call.Format()));
 
 			if (mockEvent != null)
-				mockEvent.DoRaise(mockEventArgs);
+			{
+				var argsFuncType = mockEventArgsFunc.GetType();
+
+				if (argsFuncType.IsGenericType &&
+					argsFuncType.GetGenericArguments().Length == 1)
+				{
+					mockEvent.DoRaise((EventArgs)mockEventArgsFunc.InvokePreserveStack());
+				}
+				else
+				{
+					mockEvent.DoRaise((EventArgs)mockEventArgsFunc.InvokePreserveStack(call.Arguments));
+				}
+			}
 		}
 
 		public IVerifies AtMostOnce()
@@ -154,11 +166,48 @@ namespace Moq
 
 		public IVerifies Raises(MockedEvent eventHandler, EventArgs args)
 		{
-			Guard.ArgumentNotNull(eventHandler, "eventHandler");
 			Guard.ArgumentNotNull(args, "args");
 
+			return RaisesImpl(eventHandler, (Func<EventArgs>)(() => args));
+		}
+
+		public IVerifies Raises(MockedEvent eventHandler, Func<EventArgs> func)
+		{
+			return RaisesImpl(eventHandler, func);
+		}
+
+		public IVerifies Raises<T>(MockedEvent eventHandler, Func<T, EventArgs> func)
+		{
+			return RaisesImpl(eventHandler, func);
+		}
+
+		public IVerifies Raises<T1, T2>(MockedEvent eventHandler, Func<T1, T2, EventArgs> func)
+		{
+			return RaisesImpl(eventHandler, func);
+		}
+
+		public IVerifies Raises<T1, T2, T3>(MockedEvent eventHandler, Func<T1, T2, T3, EventArgs> func)
+		{
+			return RaisesImpl(eventHandler, func);
+		}
+
+		public IVerifies Raises<T1, T2, T3, T4>(MockedEvent eventHandler, Func<T1, T2, T3, T4, EventArgs> func)
+		{
+			return RaisesImpl(eventHandler, func);
+		}
+
+		public IVerifies Raises(MockedEvent eventHandler, Func<object[], EventArgs> func)
+		{
+			return RaisesImpl(eventHandler, func);
+		}
+
+		private IVerifies RaisesImpl(MockedEvent eventHandler, Delegate func)
+		{
+			Guard.ArgumentNotNull(eventHandler, "eventHandler");
+			Guard.ArgumentNotNull(func, "func");
+
 			mockEvent = eventHandler;
-			mockEventArgs = args;
+			mockEventArgsFunc = func;
 
 			return this;
 		}
