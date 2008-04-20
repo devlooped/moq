@@ -2,7 +2,7 @@
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
-using NUnit.Framework;
+using Xunit;
 using System.Linq.Expressions;
 using System.IO;
 using System.Runtime.Remoting;
@@ -10,10 +10,9 @@ using System.Runtime.Remoting.Proxies;
 
 namespace Moq.Tests
 {
-	[TestFixture]
 	public class StreamFixture
 	{
-		[Test]
+		[Fact]
 		public void ShouldMockStream()
 		{
 			var mockStream = new Mock<Stream>();
@@ -22,7 +21,7 @@ namespace Moq.Tests
 
 			var position = mockStream.Object.Seek(0, SeekOrigin.Begin);
 
-			Assert.AreEqual(0, position);
+			Assert.Equal(0, position);
 
 			mockStream.Expect(stream => stream.Flush());
 			mockStream.Expect(stream => stream.SetLength(100));

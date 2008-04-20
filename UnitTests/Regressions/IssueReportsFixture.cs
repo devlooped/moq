@@ -2,15 +2,14 @@
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
-using NUnit.Framework;
+using Xunit;
 using System.Diagnostics;
 
 namespace Moq.Tests.Regressions
 {
-	[TestFixture]
 	public class IssueReportsFixture
 	{
-		[Test]
+		[Fact]
 		public void Repro()
 		{
 			Mock<TraceListener> traceListener = new Mock<TraceListener>();

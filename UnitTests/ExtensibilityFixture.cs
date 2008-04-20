@@ -2,14 +2,13 @@
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
-using NUnit.Framework;
+using Xunit;
 
 namespace Moq.Tests
 {
-	[TestFixture]
 	public class ExtensibilityFixture
 	{
-		[Test]
+		[Fact]
 		public void ShouldExtendMatching()
 		{
 			var mock = new Mock<IOrderRepository>();
@@ -20,7 +19,7 @@ namespace Moq.Tests
 			{
 				mock.Object.Save(new Order { Amount = 1000 });
 
-				Assert.Fail("Should have failed for big order");
+				Assert.True(false, "Should have failed for big order");
 			}
 			catch (InvalidOperationException)
 			{

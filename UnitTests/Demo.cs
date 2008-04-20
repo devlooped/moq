@@ -2,17 +2,16 @@
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
-using NUnit.Framework;
+using Xunit;
 using Moq.Classic;
 
 namespace Moq.Tests
 {
-	[TestFixture]
 	public class Demo
 	{
 		private static string TALISKER = "Talisker";
 
-		[Test]
+		[Fact]
 		public void FillingRemovesInventoryIfInStock()
 		{
 			//setup - data
@@ -26,7 +25,7 @@ namespace Moq.Tests
 			order.Fill(mock.Object);
 
 			//verify state
-			Assert.IsTrue(order.IsFilled);
+			Assert.True(order.IsFilled);
 			//verify interaction
 			mock.VerifyAll();
 		}
@@ -45,7 +44,7 @@ namespace Moq.Tests
 			order.Fill(mock.Object);
 
 			//verify
-			Assert.IsFalse(order.IsFilled);
+			Assert.False(order.IsFilled);
 		}
 
 		public void TestPresenterSelection()
@@ -56,7 +55,7 @@ namespace Moq.Tests
 			var presenter = new OrdersPresenter(mockView.Object);
 
 			// Check that the presenter has no selection by default
-			Assert.IsNull(presenter.SelectedOrder);
+			Assert.Null(presenter.SelectedOrder);
 
 			// Create a mock event handler of the appropriate type
 			var handler = mockView.CreateEventHandler<OrderEventArgs>();
@@ -66,8 +65,8 @@ namespace Moq.Tests
 			handler.Raise(new OrderEventArgs { Order = new Order("moq", 500) });
 
 			// Now the presenter reacted to the event, and we have a selected order
-			Assert.IsNotNull(presenter.SelectedOrder);
-			Assert.AreEqual("moq", presenter.SelectedOrder.ProductName);
+			Assert.NotNull(presenter.SelectedOrder);
+			Assert.Equal("moq", presenter.SelectedOrder.ProductName);
 		}
 
 		public class OrderEventArgs : EventArgs

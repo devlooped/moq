@@ -2,35 +2,32 @@
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
-using NUnit.Framework;
+using Xunit;
 using System.Linq.Expressions;
 
 namespace Moq.Tests
 {
-	[TestFixture]
 	public class AdvancedMatcherAttributeFixture
 	{
-		[ExpectedException(typeof(ArgumentNullException))]
-		[Test]
+		[Fact]
 		public void ShouldThrowIfNullMatcherType()
 		{
-			new AdvancedMatcherAttribute(null);
+			Assert.Throws<ArgumentNullException>(() => new AdvancedMatcherAttribute(null));
 		}
 
-		[ExpectedException(typeof(ArgumentException))]
-		[Test]
+		[Fact]
 		public void ShouldThrowIfMatcherNotIExpressionMatcher()
 		{
-			AdvancedMatcherAttribute attr = new AdvancedMatcherAttribute(typeof(object));
+			Assert.Throws<ArgumentException>(() => new AdvancedMatcherAttribute(typeof(object)));
 		}
 
-		[Test]
+		[Fact]
 		public void ShouldCreateMatcher()
 		{
 			AdvancedMatcherAttribute attr = new AdvancedMatcherAttribute(typeof(MockMatcher));
 			IMatcher matcher = attr.CreateMatcher();
 
-			Assert.IsNotNull(matcher);
+			Assert.NotNull(matcher);
 		}
 
 		class MockMatcher : IMatcher

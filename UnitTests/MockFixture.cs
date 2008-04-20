@@ -2,7 +2,7 @@
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
-using NUnit.Framework;
+using Xunit;
 using System.Collections;
 using System.Linq.Expressions;
 using System.Text.RegularExpressions;
@@ -10,38 +10,35 @@ using System.Diagnostics;
 
 namespace Moq.Tests
 {
-	[TestFixture]
 	public class MockFixture
 	{
-		[Test]
+		[Fact]
 		public void ShouldCreateMockAndExposeInterface()
 		{
 			var mock = new Mock<ICloneable>();
 
 			ICloneable cloneable = mock.Object;
 
-			Assert.IsNotNull(cloneable);
+			Assert.NotNull(cloneable);
 		}
 
-		[ExpectedException(typeof(ArgumentNullException))]
-		[Test]
+		[Fact]
 		public void ShouldThrowIfNullExpectAction()
 		{
 			var mock = new Mock<ICloneable>();
 
-			mock.Expect((Expression<Action<ICloneable>>)null);
+			Assert.Throws<ArgumentNullException>(() => mock.Expect((Expression<Action<ICloneable>>)null));
 		}
 
-		[ExpectedException(typeof(ArgumentNullException))]
-		[Test]
+		[Fact]
 		public void ShouldThrowIfNullExpectFunction()
 		{
 			var mock = new Mock<ICloneable>();
 
-			mock.Expect((Expression<Func<ICloneable, string>>)null);
+			Assert.Throws<ArgumentNullException>(() => mock.Expect((Expression<Func<ICloneable, string>>)null));
 		}
 
-		[Test]
+		[Fact]
 		public void ShouldExpectCallReturn()
 		{
 			var mock = new Mock<ICloneable>();
@@ -49,10 +46,10 @@ namespace Moq.Tests
 
 			mock.Expect(x => x.Clone()).Returns(clone);
 
-			Assert.AreEqual(clone, mock.Object.Clone());
+			Assert.Equal(clone, mock.Object.Clone());
 		}
 
-		[Test]
+		[Fact]
 		public void ShouldExpectDifferentMethodCalls()
 		{
 			var mock = new Mock<IFoo>();
@@ -60,43 +57,43 @@ namespace Moq.Tests
 			mock.Expect(x => x.DoReturnInt()).Returns(1);
 			mock.Expect(x => x.DoReturnString()).Returns("foo");
 
-			Assert.AreEqual(1, mock.Object.DoReturnInt());
-			Assert.AreEqual("foo", mock.Object.DoReturnString());
+			Assert.Equal(1, mock.Object.DoReturnInt());
+			Assert.Equal("foo", mock.Object.DoReturnString());
 		}
 
-		[Test]
+		[Fact]
 		public void ShouldExpectCallWithArgument()
 		{
 			var mock = new Mock<IFoo>();
 			mock.Expect(x => x.DoIntArgReturnInt(1)).Returns(11);
 			mock.Expect(x => x.DoIntArgReturnInt(2)).Returns(22);
 
-			Assert.AreEqual(11, mock.Object.DoIntArgReturnInt(1));
-			Assert.AreEqual(22, mock.Object.DoIntArgReturnInt(2));
+			Assert.Equal(11, mock.Object.DoIntArgReturnInt(1));
+			Assert.Equal(22, mock.Object.DoIntArgReturnInt(2));
 		}
 
-		[Test]
+		[Fact]
 		public void ShouldExpectCallWithNullArgument()
 		{
 			var mock = new Mock<IFoo>();
 			mock.Expect(x => x.DoStringArgReturnInt(null)).Returns(1);
 			mock.Expect(x => x.DoStringArgReturnInt("foo")).Returns(2);
 
-			Assert.AreEqual(1, mock.Object.DoStringArgReturnInt(null));
-			Assert.AreEqual(2, mock.Object.DoStringArgReturnInt("foo"));
+			Assert.Equal(1, mock.Object.DoStringArgReturnInt(null));
+			Assert.Equal(2, mock.Object.DoStringArgReturnInt("foo"));
 		}
 
-		[Test]
+		[Fact]
 		public void ShouldExpectCallWithVariable()
 		{
 			int value = 25;
 			var mock = new Mock<IFoo>();
 			mock.Expect(x => x.DoStringArgReturnInt(null)).Returns(value);
 
-			Assert.AreEqual(value, mock.Object.DoStringArgReturnInt(null));
+			Assert.Equal(value, mock.Object.DoStringArgReturnInt(null));
 		}
 
-		[Test]
+		[Fact]
 		public void ShouldExpectCallWithReferenceLazyEvaluate()
 		{
 			int a = 25;
@@ -104,14 +101,14 @@ namespace Moq.Tests
 			mock.Expect(x => x.DoStringArgReturnInt(a.ToString())).Returns(() => a);
 			a = 10;
 
-			Assert.AreEqual(10, mock.Object.DoStringArgReturnInt("10"));
+			Assert.Equal(10, mock.Object.DoStringArgReturnInt("10"));
 
 			a = 20;
 
-			Assert.AreEqual(20, mock.Object.DoStringArgReturnInt("20"));
+			Assert.Equal(20, mock.Object.DoStringArgReturnInt("20"));
 		}
 
-		[Test]
+		[Fact]
 		public void ShouldThrowIfExpectFieldValue()
 		{
 			var mock = new Mock<FooMBRO>();
@@ -119,15 +116,15 @@ namespace Moq.Tests
 			try
 			{
 				mock.Expect(x => x.ValueField);
-				Assert.Fail();
+				Assert.True(false, "Shouldn't have reached here");
 			}
 			catch (MockException mex)
 			{
-				Assert.AreEqual(MockException.ExceptionReason.ExpectedMethodOrProperty, mex.Reason);
+				Assert.Equal(MockException.ExceptionReason.ExpectedMethodOrProperty, mex.Reason);
 			}
 		}
 
-		[Test]
+		[Fact]
 		public void ShouldExpectMethodCallWithVariable()
 		{
 			int value = 5;
@@ -135,10 +132,10 @@ namespace Moq.Tests
 
 			mock.Expect(x => x.Duplicate(value)).Returns(() => value * 2);
 
-			Assert.AreEqual(value * 2, mock.Object.Duplicate(value));
+			Assert.Equal(value * 2, mock.Object.Duplicate(value));
 		}
 
-		[Test]
+		[Fact]
 		public void ShouldExpectMethodCallWithMethodCall()
 		{
 			int value = 5;
@@ -146,7 +143,7 @@ namespace Moq.Tests
 
 			mock.Expect(x => x.Duplicate(GetValue(value))).Returns(() => value * 2);
 
-			Assert.AreEqual(value * 2, mock.Object.Duplicate(value * 2));
+			Assert.Equal(value * 2, mock.Object.Duplicate(value * 2));
 		}
 
 		private int GetValue(int value)
@@ -154,18 +151,18 @@ namespace Moq.Tests
 			return value * 2;
 		}
 
-		[Test]
+		[Fact]
 		public void ShouldMatchAnyArgument()
 		{
 			var mock = new Mock<IFoo>();
 
 			mock.Expect(x => x.Duplicate(It.IsAny<int>())).Returns(5);
 
-			Assert.AreEqual(5, mock.Object.Duplicate(5));
-			Assert.AreEqual(5, mock.Object.Duplicate(25));
+			Assert.Equal(5, mock.Object.Duplicate(5));
+			Assert.Equal(5, mock.Object.Duplicate(25));
 		}
 
-		[Test]
+		[Fact]
 		public void ShouldMatchPredicateArgument()
 		{
 			var mock = new Mock<IFoo>();
@@ -180,14 +177,14 @@ namespace Moq.Tests
 				Expect(x => x.Duplicate(It.Is<int>(value => value >= 5))).
 				Returns(2);
 
-			Assert.AreEqual(1, mock.Object.Duplicate(3));
-			Assert.AreEqual(0, mock.Object.Duplicate(0));
-			Assert.AreEqual(0, mock.Object.Duplicate(-5));
-			Assert.AreEqual(2, mock.Object.Duplicate(5));
-			Assert.AreEqual(2, mock.Object.Duplicate(6));
+			Assert.Equal(1, mock.Object.Duplicate(3));
+			Assert.Equal(0, mock.Object.Duplicate(0));
+			Assert.Equal(0, mock.Object.Duplicate(-5));
+			Assert.Equal(2, mock.Object.Duplicate(5));
+			Assert.Equal(2, mock.Object.Duplicate(6));
 		}
 
-		[Test]
+		[Fact]
 		public void ShouldExpectCallWithoutReturnValue()
 		{
 			var mock = new Mock<IFoo>();
@@ -197,18 +194,17 @@ namespace Moq.Tests
 			mock.Object.Execute();
 		}
 
-		[ExpectedException(typeof(FormatException))]
-		[Test]
+		[Fact]
 		public void ShouldThrowIfExpectingThrows()
 		{
 			var mock = new Mock<IFoo>();
 
 			mock.Expect(x => x.DoReturnInt()).Throws(new FormatException());
 
-			mock.Object.DoReturnInt();
+			Assert.Throws<FormatException>(() => mock.Object.DoReturnInt());
 		}
 
-		[Test]
+		[Fact]
 		public void ShouldExecuteCallbackWhenVoidMethodIsCalled()
 		{
 			var mock = new Mock<IFoo>();
@@ -216,21 +212,21 @@ namespace Moq.Tests
 			mock.Expect(x => x.Execute()).Callback(() => called = true);
 
 			mock.Object.Execute();
-			Assert.IsTrue(called);
+			Assert.True(called);
 		}
 
-		[Test]
+		[Fact]
 		public void ShouldExecuteCallbackWhenNonVoidMethodIsCalled()
 		{
 			var mock = new Mock<IFoo>();
 			bool called = false;
 			mock.Expect(x => x.DoReturnInt()).Callback(() => called = true).Returns(1);
 
-			Assert.AreEqual(1, mock.Object.DoReturnInt());
-			Assert.IsTrue(called);
+			Assert.Equal(1, mock.Object.DoReturnInt());
+			Assert.True(called);
 		}
 
-		[Test]
+		[Fact]
 		public void ShouldExpectRanges()
 		{
 			var mock = new Mock<IFoo>();
@@ -238,35 +234,35 @@ namespace Moq.Tests
 			mock.Expect(x => x.DoIntArgReturnInt(It.IsInRange(1, 5, Range.Inclusive))).Returns(1);
 			mock.Expect(x => x.DoIntArgReturnInt(It.IsInRange(6, 10, Range.Exclusive))).Returns(2);
 
-			Assert.AreEqual(1, mock.Object.DoIntArgReturnInt(1));
-			Assert.AreEqual(1, mock.Object.DoIntArgReturnInt(2));
-			Assert.AreEqual(1, mock.Object.DoIntArgReturnInt(5));
+			Assert.Equal(1, mock.Object.DoIntArgReturnInt(1));
+			Assert.Equal(1, mock.Object.DoIntArgReturnInt(2));
+			Assert.Equal(1, mock.Object.DoIntArgReturnInt(5));
 
-			Assert.AreEqual(2, mock.Object.DoIntArgReturnInt(7));
-			Assert.AreEqual(2, mock.Object.DoIntArgReturnInt(9));
+			Assert.Equal(2, mock.Object.DoIntArgReturnInt(7));
+			Assert.Equal(2, mock.Object.DoIntArgReturnInt(9));
 		}
 
-		[Test]
+		[Fact]
 		public void ShouldNotMatchOutOfRange()
 		{
 			var mock = new Mock<IFoo>(MockBehavior.Strict);
 
 			mock.Expect(x => x.DoIntArgReturnInt(It.IsInRange(1, 5, Range.Exclusive))).Returns(1);
 
-			Assert.AreEqual(1, mock.Object.DoIntArgReturnInt(2));
+			Assert.Equal(1, mock.Object.DoIntArgReturnInt(2));
 
 			try
 			{
 				int throwHere = mock.Object.DoIntArgReturnInt(1);
-				Assert.Fail("Should have thrown");
+				Assert.True(false, "Should have thrown");
 			}
 			catch (MockException mex)
 			{
-				Assert.AreEqual(MockException.ExceptionReason.NoExpectation, mex.Reason);
+				Assert.Equal(MockException.ExceptionReason.NoExpectation, mex.Reason);
 			}
 		}
 
-		[Test]
+		[Fact]
 		public void ShouldExpectRangeWithVariableAndMethodInvocation()
 		{
 			var mock = new Mock<IFoo>();
@@ -274,10 +270,10 @@ namespace Moq.Tests
 
 			mock.Expect(x => x.DoIntArgReturnInt(It.IsInRange(from, GetToRange(), Range.Inclusive))).Returns(1);
 
-			Assert.AreEqual(1, mock.Object.DoIntArgReturnInt(1));
+			Assert.Equal(1, mock.Object.DoIntArgReturnInt(1));
 		}
 
-		[Test]
+		[Fact]
 		public void ShouldExpectRangeLazyEval()
 		{
 			var mock = new Mock<IFoo>(MockBehavior.Loose);
@@ -286,14 +282,14 @@ namespace Moq.Tests
 
 			mock.Expect(x => x.DoStringArgReturnInt(It.IsInRange(from, to, Range.Inclusive))).Returns(1);
 
-			Assert.AreEqual(1, mock.Object.DoStringArgReturnInt("b"));
+			Assert.Equal(1, mock.Object.DoStringArgReturnInt("b"));
 
 			from = "c";
 
-			Assert.AreEqual(default(int), mock.Object.DoStringArgReturnInt("b"));
+			Assert.Equal(default(int), mock.Object.DoStringArgReturnInt("b"));
 		}
 
-		[Test]
+		[Fact]
 		public void ShouldExpectMatchRegexAndLazyEval()
 		{
 			var mock = new Mock<IFoo>(MockBehavior.Loose);
@@ -302,125 +298,123 @@ namespace Moq.Tests
 			mock.Expect(x => x.DoStringArgReturnInt(It.IsRegex(reg))).Returns(1);
 			mock.Expect(x => x.DoStringArgReturnInt(It.IsRegex(reg, RegexOptions.IgnoreCase))).Returns(2);
 
-			Assert.AreEqual(1, mock.Object.DoStringArgReturnInt("b"));
-			Assert.AreEqual(1, mock.Object.DoStringArgReturnInt("abc"));
-			Assert.AreEqual(2, mock.Object.DoStringArgReturnInt("B"));
-			Assert.AreEqual(2, mock.Object.DoStringArgReturnInt("BC"));
+			Assert.Equal(1, mock.Object.DoStringArgReturnInt("b"));
+			Assert.Equal(1, mock.Object.DoStringArgReturnInt("abc"));
+			Assert.Equal(2, mock.Object.DoStringArgReturnInt("B"));
+			Assert.Equal(2, mock.Object.DoStringArgReturnInt("BC"));
 
 			reg = "[c-d]+";
 
 			// Will not match neither the 1 and 2 return values we had.
-			Assert.AreEqual(default(int), mock.Object.DoStringArgReturnInt("b"));
+			Assert.Equal(default(int), mock.Object.DoStringArgReturnInt("b"));
 		}
 
-		[Test]
+		[Fact]
 		public void ShouldReturnService()
 		{
 			var provider = new Mock<IServiceProvider>();
 
 			provider.Expect(x => x.GetService(typeof(IFooService))).Returns(new FooService());
 
-			Assert.That(provider.Object.GetService(typeof(IFooService)) is FooService);
+			Assert.True(provider.Object.GetService(typeof(IFooService)) is FooService);
 		}
 
-		[ExpectedException(typeof(ArgumentException))]
-		[Test]
+		[Fact]
 		public void ShouldCallFirstExpectThatMatches()
 		{
 			var mock = new Mock<IFoo>();
 			mock.Expect(x => x.Execute("ping")).Returns("I'm alive!");
 			mock.Expect(x => x.Execute(It.IsAny<string>())).Throws(new ArgumentException());
 
-			Assert.AreEqual("I'm alive!", mock.Object.Execute("ping"));
-			mock.Object.Execute("asdf");
+			Assert.Equal("I'm alive!", mock.Object.Execute("ping"));
+
+			Assert.Throws<ArgumentException>(() => mock.Object.Execute("asdf"));
 		}
 
-		[Test]
+		[Fact]
 		public void ShouldTestEvenNumbers()
 		{
 			var mock = new Mock<IFoo>();
 
 			mock.Expect(x => x.DoIntArgReturnInt(It.Is<int>(i => i % 2 == 0))).Returns(1);
 
-			Assert.AreEqual(1, mock.Object.DoIntArgReturnInt(2));
+			Assert.Equal(1, mock.Object.DoIntArgReturnInt(2));
 		}
 
-		[Test]
+		[Fact]
 		public void ShouldGetTypeReturnATypeAssignableFromInterfaceType()
 		{
 			var mock = new Mock<IFoo>();
-			Assert.IsTrue(typeof(IFoo).IsAssignableFrom(mock.Object.GetType()));
+			Assert.True(typeof(IFoo).IsAssignableFrom(mock.Object.GetType()));
 		}
 
-		[Test]
+		[Fact]
 		public void ShouldEqualsMethodWorkAsReferenceEquals()
 		{
 			var mock1 = new Mock<IFoo>();
 			var mock2 = new Mock<IFoo>();
 
-			Assert.IsTrue(mock1.Object.Equals(mock1.Object));
-			Assert.IsFalse(mock1.Object.Equals(mock2.Object));
+			Assert.True(mock1.Object.Equals(mock1.Object));
+			Assert.False(mock1.Object.Equals(mock2.Object));
 		}
 
-		[Test]
+		[Fact]
 		public void ShouldGetHashCodeReturnDifferentCodeForEachMock()
 		{
 			var mock1 = new Mock<IFoo>();
 			var mock2 = new Mock<IFoo>();
 
-			Assert.AreEqual(mock1.Object.GetHashCode(), mock1.Object.GetHashCode());
-			Assert.AreEqual(mock2.Object.GetHashCode(), mock2.Object.GetHashCode());
-			Assert.AreNotEqual(mock1.Object.GetHashCode(), mock2.Object.GetHashCode());
+			Assert.Equal(mock1.Object.GetHashCode(), mock1.Object.GetHashCode());
+			Assert.Equal(mock2.Object.GetHashCode(), mock2.Object.GetHashCode());
+			Assert.NotEqual(mock1.Object.GetHashCode(), mock2.Object.GetHashCode());
 		}
 
-		[Test]
+		[Fact]
 		public void ShouldToString()
 		{
 			var mock = new Mock<IFoo>();
-			Assert.IsFalse(string.IsNullOrEmpty(mock.Object.ToString()));
+			Assert.False(string.IsNullOrEmpty(mock.Object.ToString()));
 		}
 
-		[Ignore("Castle.DynamicProxy2 doesn't seem to call interceptors for ToString, GetHashCode")]
-		[Test]
+		[Fact(Skip="Castle.DynamicProxy2 doesn't seem to call interceptors for ToString, GetHashCode")]
 		public void ShouldOverrideObjectMethods()
 		{
 			var mock = new Mock<IFoo>();
 			mock.Expect(x => x.GetHashCode()).Returns(1);
 			mock.Expect(x => x.ToString()).Returns("foo");
 
-			Assert.AreEqual("foo", mock.Object.ToString());
-			Assert.AreEqual(1, mock.Object.GetHashCode());
+			Assert.Equal("foo", mock.Object.ToString());
+			Assert.Equal(1, mock.Object.GetHashCode());
 		}
 
-		[Test]
+		[Fact]
 		public void ShouldMockAbstractClass()
 		{
 			var mock = new Mock<FooBase>();
 			mock.Expect(x => x.Check("foo")).Returns(false);
 
-			Assert.IsFalse(mock.Object.Check("foo"));
-			Assert.IsTrue(mock.Object.Check("bar"));
+			Assert.False(mock.Object.Check("foo"));
+			Assert.True(mock.Object.Check("bar"));
 		}
 
-		[Ignore("Removed special handling for MBRO. It now behaves just like a regular class.")]
-		[Test]
+		[Fact(Skip="Removed special handling for MBRO. It now behaves just like a regular class.")]
 		public void ShouldOverrideNonVirtualForMBRO()
 		{
 			var mock = new Mock<FooMBRO>();
 			mock.Expect(x => x.True()).Returns(false);
 
-			Assert.IsFalse(mock.Object.True());
+			Assert.False(mock.Object.True());
 		}
 
-		[Test]
+		[Fact]
 		public void ShouldCallUnderlyingMBRO()
 		{
 			var mock = new Mock<FooMBRO>();
 
-			Assert.IsTrue(mock.Object.True());
+			Assert.True(mock.Object.True());
 		}
 
-		[Test]
+		[Fact]
 		public void ShouldCallUnderlyingClassEquals()
 		{
 			var mock = new Mock<FooOverrideEquals>();
@@ -429,17 +423,16 @@ namespace Moq.Tests
 			mock.Object.Name = "Foo";
 			mock2.Object.Name = "Foo";
 
-			Assert.IsTrue(mock.Object.Equals(mock2.Object));
+			Assert.True(mock.Object.Equals(mock2.Object));
 		}
 
-		[ExpectedException(typeof(ArgumentException))]
-		[Test]
+		[Fact]
 		public void ShouldThrowIfSealedClass()
 		{
-			var mock = new Mock<FooSealed>();
+			Assert.Throws<ArgumentException>(() => new Mock<FooSealed>());
 		}
 
-		[Test]
+		[Fact]
 		public void ShouldThrowIfVerifiableExpectationNotCalled()
 		{
 			var mock = new Mock<IFoo>();
@@ -451,15 +444,15 @@ namespace Moq.Tests
 			try
 			{
 				mock.Verify();
-				Assert.Fail("Should have thrown");
+				Assert.True(false, "Should have thrown");
 			}
 			catch (MockException mex)
 			{
-				Assert.AreEqual(MockException.ExceptionReason.VerificationFailed, mex.Reason);
+				Assert.Equal(MockException.ExceptionReason.VerificationFailed, mex.Reason);
 			}
 		}
 
-		[Test]
+		[Fact]
 		public void ShouldThrowWithEvaluatedExpressionsIfVerifiableExpectationNotCalled()
 		{
 			var expectedArg = "lorem,ipsum";
@@ -472,16 +465,16 @@ namespace Moq.Tests
 			try
 			{
 				mock.Verify();
-				Assert.Fail("Should have thrown");
+				Assert.True(false, "Should have thrown");
 			}
 			catch (MockException mex)
 			{
-				Assert.AreEqual(MockException.ExceptionReason.VerificationFailed, mex.Reason);
-				Assert.IsTrue(mex.Message.Contains(@".DoStringArgReturnInt(""lorem"")"), "Contains evaluated expected argument.");
+				Assert.Equal(MockException.ExceptionReason.VerificationFailed, mex.Reason);
+				Assert.True(mex.Message.Contains(@".DoStringArgReturnInt(""lorem"")"), "Contains evaluated expected argument.");
 			}
 		}
 
-		[Test]
+		[Fact]
 		public void ShouldThrowExpressionsIfVerifiableExpectationWithLambdaMatcherNotCalled()
 		{
 			var mock = new Mock<IFoo>();
@@ -493,16 +486,16 @@ namespace Moq.Tests
 			try
 			{
 				mock.Verify();
-				Assert.Fail("Should have thrown");
+				Assert.True(false, "Should have thrown");
 			}
 			catch (MockException mex)
 			{
-				Assert.AreEqual(MockException.ExceptionReason.VerificationFailed, mex.Reason);
-				Assert.IsTrue(mex.Message.Contains(@".DoStringArgReturnInt(Is(s => IsNullOrEmpty(s)))"), "Contains evaluated expected argument.");
+				Assert.Equal(MockException.ExceptionReason.VerificationFailed, mex.Reason);
+				Assert.True(mex.Message.Contains(@".DoStringArgReturnInt(Is(s => IsNullOrEmpty(s)))"), "Contains evaluated expected argument.");
 			}
 		}
 
-		[Test]
+		[Fact]
 		public void ShouldNotThrowVerifyAndNoVerifiableExpectations()
 		{
 			var mock = new Mock<IFoo>();
@@ -510,7 +503,7 @@ namespace Moq.Tests
 			mock.Verify();
 		}
 
-		[Test]
+		[Fact]
 		public void ShouldThrowIfVerifyAllAndNonVerifiable()
 		{
 			var mock = new Mock<IFoo>();
@@ -521,15 +514,15 @@ namespace Moq.Tests
 			try
 			{
 				mock.VerifyAll();
-				Assert.Fail("Should have thrown");
+				Assert.True(false, "Should have thrown");
 			}
 			catch (MockException mex)
 			{
-				Assert.AreEqual(MockException.ExceptionReason.VerificationFailed, mex.Reason);
+				Assert.Equal(MockException.ExceptionReason.VerificationFailed, mex.Reason);
 			}
 		}
 
-		[Test]
+		[Fact]
 		public void ShouldRenderReadableMessageForVerifyFailures()
 		{
 			var mock = new Mock<IFoo>();
@@ -541,133 +534,130 @@ namespace Moq.Tests
 			try
 			{
 				mock.VerifyAll();
-				Assert.Fail("Should have thrown");
+				Assert.True(false, "Should have thrown");
 			}
 			catch (Exception ex)
 			{
-				Assert.That(ex.Message.Contains("x => x.DoReturnInt()"));
-				Assert.That(ex.Message.Contains("x => x.DoReturnString()"));
-				Assert.That(ex.Message.Contains("x => x.DoStringArgReturnInt(\"Hello World\")"));
+				Assert.True(ex.Message.Contains("x => x.DoReturnInt()"));
+				Assert.True(ex.Message.Contains("x => x.DoReturnString()"));
+				Assert.True(ex.Message.Contains("x => x.DoStringArgReturnInt(\"Hello World\")"));
 			}
 		}
 
-		[ExpectedException(typeof(ArgumentException))]
-		[Test]
+		[Fact]
 		public void ShouldThrowIfExpectOnNonVirtual()
 		{
 			var mock = new Mock<FooBase>();
-			mock.Expect(x => x.True()).Returns(false);
+			
+			Assert.Throws<ArgumentException>(() => mock.Expect(x => x.True()).Returns(false));
 		}
 
-		[Test]
+		[Fact]
 		public void ShouldNotThrowIfExpectOnNonVirtualButMBRO()
 		{
 			var mock = new Mock<FooMBRO>();
 			mock.Expect(x => x.True()).Returns(false);
 		}
 
-		[Test]
+		[Fact]
 		public void ShouldOverridePreviousExpectation()
 		{
 			var mock = new Mock<IFoo>();
 
 			mock.Expect(x => x.DoReturnInt()).Returns(5);
 
-			Assert.AreEqual(5, mock.Object.DoReturnInt());
+			Assert.Equal(5, mock.Object.DoReturnInt());
 
 			mock.Expect(x => x.DoReturnInt()).Returns(10);
 
-			Assert.AreEqual(10, mock.Object.DoReturnInt());
+			Assert.Equal(10, mock.Object.DoReturnInt());
 		}
 
-		[Test]
+		[Fact]
 		public void ShouldReceiveClassCtorArguments()
 		{
 			var mock = new Mock<FooWithConstructors>(MockBehavior.Default, "Hello", 26);
 
-			Assert.AreEqual("Hello", mock.Object.StringValue);
-			Assert.AreEqual(26, mock.Object.IntValue);
+			Assert.Equal("Hello", mock.Object.StringValue);
+			Assert.Equal(26, mock.Object.IntValue);
 
 			// Should also construct without args.
 			mock = new Mock<FooWithConstructors>(MockBehavior.Default);
 
-			Assert.AreEqual(null, mock.Object.StringValue);
-			Assert.AreEqual(0, mock.Object.IntValue);
+			Assert.Equal(null, mock.Object.StringValue);
+			Assert.Equal(0, mock.Object.IntValue);
 		}
 
-		[Test]
+		[Fact]
 		public void ShouldReceiveClassCtorArgumentsMBRO()
 		{
 			var mock = new Mock<FooWithConstructorsMBRO>(MockBehavior.Default, "Hello", 26);
 
-			Assert.AreEqual("Hello", mock.Object.StringValue);
-			Assert.AreEqual(26, mock.Object.IntValue);
+			Assert.Equal("Hello", mock.Object.StringValue);
+			Assert.Equal(26, mock.Object.IntValue);
 
 			// Should also construct without args.
 			mock = new Mock<FooWithConstructorsMBRO>(MockBehavior.Default);
 
-			Assert.AreEqual(null, mock.Object.StringValue);
-			Assert.AreEqual(0, mock.Object.IntValue);
+			Assert.Equal(null, mock.Object.StringValue);
+			Assert.Equal(0, mock.Object.IntValue);
 		}
 
-		[Test]
+		[Fact]
 		public void ShouldConstructClassWithNoDefaultConstructor()
 		{
 			var mock = new Mock<ClassWithNoDefaultConstructor>(MockBehavior.Default, "Hello", 26);
 
-			Assert.AreEqual("Hello", mock.Object.StringValue);
-			Assert.AreEqual(26, mock.Object.IntValue);
+			Assert.Equal("Hello", mock.Object.StringValue);
+			Assert.Equal(26, mock.Object.IntValue);
 		}
 
-		[Test]
+		[Fact]
 		public void ShouldConstructClassWithNoDefaultConstructorAndNullValue()
 		{
 			var mock = new Mock<ClassWithNoDefaultConstructor>(MockBehavior.Default, null, 26);
 
-			Assert.AreEqual(null, mock.Object.StringValue);
-			Assert.AreEqual(26, mock.Object.IntValue);
+			Assert.Equal(null, mock.Object.StringValue);
+			Assert.Equal(26, mock.Object.IntValue);
 		}
 
-		[Test]
+		[Fact]
 		public void ShouldConstructClassWithNoDefaultConstructorMBRO()
 		{
 			var mock = new Mock<ClassWithNoDefaultConstructorMBRO>(MockBehavior.Default, "Hello", 26);
 
-			Assert.AreEqual("Hello", mock.Object.StringValue);
-			Assert.AreEqual(26, mock.Object.IntValue);
+			Assert.Equal("Hello", mock.Object.StringValue);
+			Assert.Equal(26, mock.Object.IntValue);
 		}
 
-		[Test]
+		[Fact]
 		public void ShouldConstructClassWithNoDefaultConstructorAndNullValueMBRO()
 		{
 			var mock = new Mock<ClassWithNoDefaultConstructorMBRO>(MockBehavior.Default, null, 26);
 
-			Assert.AreEqual(null, mock.Object.StringValue);
-			Assert.AreEqual(26, mock.Object.IntValue);
+			Assert.Equal(null, mock.Object.StringValue);
+			Assert.Equal(26, mock.Object.IntValue);
 		}
 
-		[Test]
-		[ExpectedException(typeof(ArgumentException))]
+		[Fact]
 		public void ShouldThrowIfNoMatchingConstructorFound()
 		{
-			var mock = new Mock<ClassWithNoDefaultConstructor>(25, true);
+			Assert.Throws<ArgumentException>(() => new Mock<ClassWithNoDefaultConstructor>(25, true));
 		}
 
-		[Test]
-		[ExpectedException(typeof(ArgumentException))]
+		[Fact]
 		public void ShouldThrowIfNoMatchingConstructorFoundMBRO()
 		{
-			var mock = new Mock<ClassWithNoDefaultConstructorMBRO>(25, true);
+			Assert.Throws<ArgumentException>(() => new Mock<ClassWithNoDefaultConstructorMBRO>(25, true));
 		}
 
-		[Test]
-		[ExpectedException(typeof(ArgumentException))]
+		[Fact]
 		public void ShouldThrowIfArgumentsPassedForInterface()
 		{
-			var mock = new Mock<IFoo>(25, true);
+			Assert.Throws<ArgumentException>(() => new Mock<IFoo>(25, true));
 		}
 
-		[Test]
+		[Fact]
 		public void ShouldCallCallbackWithoutArgumentsForMethodCallWithArguments()
 		{
 			var mock = new Mock<IFoo>();
@@ -675,10 +665,10 @@ namespace Moq.Tests
 			mock.Expect(x => x.DoVoidArgs(It.IsAny<string>())).Callback(() => called = true);
 
 			mock.Object.DoVoidArgs("blah");
-			Assert.IsTrue(called);
+			Assert.True(called);
 		}
 
-		[Test]
+		[Fact]
 		public void ShouldCallCallbackWithOneArgument()
 		{
 			var mock = new Mock<IFoo>();
@@ -686,10 +676,10 @@ namespace Moq.Tests
 			mock.Expect(x => x.DoVoidArgs(It.IsAny<string>())).Callback((string s) => callbackArg = s);
 
 			mock.Object.DoVoidArgs("blah");
-			Assert.AreEqual("blah", callbackArg);
+			Assert.Equal("blah", callbackArg);
 		}
 
-		[Test]
+		[Fact]
 		public void ShouldCallCallbackWithTwoArguments()
 		{
 			var mock = new Mock<IFoo>();
@@ -699,11 +689,11 @@ namespace Moq.Tests
 				.Callback((string s1, string s2) => { callbackArg1 = s1; callbackArg2 = s2; });
 
 			mock.Object.DoVoidArgs("blah1", "blah2");
-			Assert.AreEqual("blah1", callbackArg1);
-			Assert.AreEqual("blah2", callbackArg2);
+			Assert.Equal("blah1", callbackArg1);
+			Assert.Equal("blah2", callbackArg2);
 		}
 
-		[Test]
+		[Fact]
 		public void ShouldCallCallbackWithThreeArguments()
 		{
 			var mock = new Mock<IFoo>();
@@ -714,12 +704,12 @@ namespace Moq.Tests
 				.Callback((string s1, string s2, string s3) => { callbackArg1 = s1; callbackArg2 = s2; callbackArg3 = s3; });
 
 			mock.Object.DoVoidArgs("blah1", "blah2", "blah3");
-			Assert.AreEqual("blah1", callbackArg1);
-			Assert.AreEqual("blah2", callbackArg2);
-			Assert.AreEqual("blah3", callbackArg3);
+			Assert.Equal("blah1", callbackArg1);
+			Assert.Equal("blah2", callbackArg2);
+			Assert.Equal("blah3", callbackArg3);
 		}
 
-		[Test]
+		[Fact]
 		public void ShouldCallCallbackWithFourArguments()
 		{
 			var mock = new Mock<IFoo>();
@@ -731,13 +721,13 @@ namespace Moq.Tests
 				.Callback((string s1, string s2, string s3, string s4) => { callbackArg1 = s1; callbackArg2 = s2; callbackArg3 = s3; callbackArg4 = s4; });
 
 			mock.Object.DoVoidArgs("blah1", "blah2", "blah3", "blah4");
-			Assert.AreEqual("blah1", callbackArg1);
-			Assert.AreEqual("blah2", callbackArg2);
-			Assert.AreEqual("blah3", callbackArg3);
-			Assert.AreEqual("blah4", callbackArg4);
+			Assert.Equal("blah1", callbackArg1);
+			Assert.Equal("blah2", callbackArg2);
+			Assert.Equal("blah3", callbackArg3);
+			Assert.Equal("blah4", callbackArg4);
 		}
 
-		[Test]
+		[Fact]
 		public void ShouldCallCallbackWithOneArgumentForNonVoidMethod()
 		{
 			var mock = new Mock<IFoo>();
@@ -747,10 +737,10 @@ namespace Moq.Tests
 				.Returns("foo");
 
 			mock.Object.Execute("blah1");
-			Assert.AreEqual("blah1", callbackArg1);
+			Assert.Equal("blah1", callbackArg1);
 		}
 
-		[Test]
+		[Fact]
 		public void ShouldCallCallbackWithTwoArgumentsForNonVoidMethod()
 		{
 			var mock = new Mock<IFoo>();
@@ -761,11 +751,11 @@ namespace Moq.Tests
 				.Returns("foo");
 
 			mock.Object.Execute("blah1", "blah2");
-			Assert.AreEqual("blah1", callbackArg1);
-			Assert.AreEqual("blah2", callbackArg2);
+			Assert.Equal("blah1", callbackArg1);
+			Assert.Equal("blah2", callbackArg2);
 		}
 
-		[Test]
+		[Fact]
 		public void ShouldCallCallbackWithThreeArgumentsForNonVoidMethod()
 		{
 			var mock = new Mock<IFoo>();
@@ -777,12 +767,12 @@ namespace Moq.Tests
 				.Returns("foo");
 
 			mock.Object.Execute("blah1", "blah2", "blah3");
-			Assert.AreEqual("blah1", callbackArg1);
-			Assert.AreEqual("blah2", callbackArg2);
-			Assert.AreEqual("blah3", callbackArg3);
+			Assert.Equal("blah1", callbackArg1);
+			Assert.Equal("blah2", callbackArg2);
+			Assert.Equal("blah3", callbackArg3);
 		}
 
-		[Test]
+		[Fact]
 		public void ShouldCallCallbackWithFourArgumentsForNonVoidMethod()
 		{
 			var mock = new Mock<IFoo>();
@@ -795,13 +785,13 @@ namespace Moq.Tests
 				.Returns("foo");
 
 			mock.Object.Execute("blah1", "blah2", "blah3", "blah4");
-			Assert.AreEqual("blah1", callbackArg1);
-			Assert.AreEqual("blah2", callbackArg2);
-			Assert.AreEqual("blah3", callbackArg3);
-			Assert.AreEqual("blah4", callbackArg4);
+			Assert.Equal("blah1", callbackArg1);
+			Assert.Equal("blah2", callbackArg2);
+			Assert.Equal("blah3", callbackArg3);
+			Assert.Equal("blah4", callbackArg4);
 		}
 
-		[Test]
+		[Fact]
 		public void ShouldReturnUsingOneArgument()
 		{
 			var mock = new Mock<IFoo>();
@@ -809,10 +799,10 @@ namespace Moq.Tests
 				.Returns((string s) => s.ToLower());
 
 			string result = mock.Object.Execute("blah1");
-			Assert.AreEqual("blah1", result);
+			Assert.Equal("blah1", result);
 		}
 
-		[Test]
+		[Fact]
 		public void ShouldReturnUsingTwoArguments()
 		{
 			var mock = new Mock<IFoo>();
@@ -820,10 +810,10 @@ namespace Moq.Tests
 				.Returns((string s1, string s2) => s1 + s2);
 
 			string result = mock.Object.Execute("blah1", "blah2");
-			Assert.AreEqual("blah1blah2", result);
+			Assert.Equal("blah1blah2", result);
 		}
 
-		[Test]
+		[Fact]
 		public void ShouldReturnUsingThreeArguments()
 		{
 			var mock = new Mock<IFoo>();
@@ -831,10 +821,10 @@ namespace Moq.Tests
 				.Returns((string s1, string s2, string s3) => s1 + s2 + s3);
 
 			string result = mock.Object.Execute("blah1", "blah2", "blah3");
-			Assert.AreEqual("blah1blah2blah3", result);
+			Assert.Equal("blah1blah2blah3", result);
 		}
 
-		[Test]
+		[Fact]
 		public void ShouldReturnUsingFourArguments()
 		{
 			var mock = new Mock<IFoo>();
@@ -842,10 +832,10 @@ namespace Moq.Tests
 				.Returns((string s1, string s2, string s3, string s4) => s1 + s2 + s3 + s4);
 
 			string result = mock.Object.Execute("blah1", "blah2", "blah3", "blah4");
-			Assert.AreEqual("blah1blah2blah3blah4", result);
+			Assert.Equal("blah1blah2blah3blah4", result);
 		}
 
-		[Test]
+		[Fact]
 		public void ShouldMatchDifferentOverloads()
 		{
 			var mock = new Mock<IFoo>();
@@ -858,19 +848,19 @@ namespace Moq.Tests
 			bool bar = mock.Object.DoTypeOverload(new Bar());
 			bool baz = mock.Object.DoTypeOverload(new Baz());
 
-			Assert.IsTrue(bar);
-			Assert.IsFalse(baz);
+			Assert.True(bar);
+			Assert.False(baz);
 		}
-		[Ignore]
-		[Test]
+
+		[Fact(Skip="MBRO support dropped for now")]
 		public void ShouldCreateAbstractMBRO()
 		{
 			var mock = new Mock<AbstractMBRO>();
 
-			Assert.AreEqual("foo", mock.Object.Value);
+			Assert.Equal("foo", mock.Object.Value);
 		}
 
-		[Test]
+		[Fact]
 		public void ShouldExpectOnceThrowOnSecondCall()
 		{
 			var mock = new Mock<IFoo>();
@@ -882,41 +872,41 @@ namespace Moq.Tests
 				mock.Object.DoVoidArgs("foo");
 				mock.Object.DoVoidArgs("foo");
 
-				Assert.Fail("should fail on two calls");
+				Assert.True(false, "should fail on two calls");
 			}
 			catch (MockException mex)
 			{
-				Assert.AreEqual(MockException.ExceptionReason.MoreThanOneCall, mex.Reason);
+				Assert.Equal(MockException.ExceptionReason.MoreThanOneCall, mex.Reason);
 			}
 		}
 
-		[Test]
+		[Fact]
 		public void ShouldCreateMBROWithProtectedCtorAndArgs()
 		{
 			var mock = new Mock<FooWithProtectedCtorArgsMBRO>("foo", 25);
 
-			Assert.AreEqual("foo", mock.Object.StringValue);
-			Assert.AreEqual(25, mock.Object.IntValue);
+			Assert.Equal("foo", mock.Object.StringValue);
+			Assert.Equal(25, mock.Object.IntValue);
 		}
 
-		[Test]
+		[Fact]
 		public void ShouldCreateMBROWithProtectedCtorAndNullArg()
 		{
 			var mock = new Mock<FooWithProtectedCtorArgsMBRO>(null, 25);
 
-			Assert.IsNull(mock.Object.StringValue);
-			Assert.AreEqual(25, mock.Object.IntValue);
+			Assert.Null(mock.Object.StringValue);
+			Assert.Equal(25, mock.Object.IntValue);
 		}
 
-		[Test]
+		[Fact]
 		public void ShouldCreateMBROWithProtectedCtorOverload()
 		{
 			var mock = new Mock<FooWithProtectedCtorArgsMBRO>("foo");
 
-			Assert.AreEqual("foo", mock.Object.StringValue);
+			Assert.Equal("foo", mock.Object.StringValue);
 		}
 
-		[Test]
+		[Fact]
 		public void ShouldThrowOnStrictWithExpectButNoReturns()
 		{
 			var mock = new Mock<IFoo>(MockBehavior.Strict);
@@ -926,33 +916,33 @@ namespace Moq.Tests
 			try
 			{
 				mock.Object.DoReturnString();
-				Assert.Fail("SHould throw");
+				Assert.True(false, "SHould throw");
 			}
 			catch (MockException mex)
 			{
-				Assert.AreEqual(MockException.ExceptionReason.ReturnValueRequired, mex.Reason);
+				Assert.Equal(MockException.ExceptionReason.ReturnValueRequired, mex.Reason);
 			}
 		}
 
-		[Test]
+		[Fact]
 		public void ShouldReturnNullReturnValue()
 		{
 			var mock = new Mock<IBag>();
 			mock.Expect(bar => bar.Get("Whatever")).Returns(null);
-			Assert.IsNull(mock.Object.Get("Whatever"));
+			Assert.Null(mock.Object.Get("Whatever"));
 			mock.VerifyAll();
 		}
 
-		[Test]
+		[Fact]
 		public void ShouldReturnNullReturnValueIfNullFunc()
 		{
 			var mock = new Mock<IBag>();
 			mock.Expect(bar => bar.Get("Whatever")).Returns((Func<object>)null);
-			Assert.IsNull(mock.Object.Get("Whatever"));
+			Assert.Null(mock.Object.Get("Whatever"));
 			mock.VerifyAll();
 		}
 
-		[Test]
+		[Fact]
 		public void ShouldExpectPropertySetter()
 		{
 			var mock = new Mock<IFoo>();
@@ -964,10 +954,10 @@ namespace Moq.Tests
 
 			mock.Object.ValueProperty = 5;
 
-			Assert.AreEqual(5, value);
+			Assert.Equal(5, value);
 		}
 
-		[Test]
+		[Fact]
 		public void ShouldExpectGetter()
 		{
 			var mock = new Mock<IFoo>();
@@ -978,11 +968,11 @@ namespace Moq.Tests
 				.Callback(() => called = true)
 				.Returns(25);
 
-			Assert.AreEqual(25, mock.Object.ValueProperty);
-			Assert.IsTrue(called);
+			Assert.Equal(25, mock.Object.ValueProperty);
+			Assert.True(called);
 		}
 
-		[Test]
+		[Fact]
 		public void ShouldThrowIfExpectPropertySetterOnMethod()
 		{
 			var mock = new Mock<IFoo>();
@@ -990,15 +980,15 @@ namespace Moq.Tests
 			try
 			{
 				mock.ExpectSet(foo => foo.DoIntArgReturnInt(5));
-				Assert.Fail("Should throw on ExpectSet on method instead of property.");
+				Assert.True(false, "Should throw on ExpectSet on method instead of property.");
 			}
 			catch (MockException mex)
 			{
-				Assert.AreEqual(MockException.ExceptionReason.ExpectedProperty, mex.Reason);
+				Assert.Equal(MockException.ExceptionReason.ExpectedProperty, mex.Reason);
 			}
 		}
 
-		[Test]
+		[Fact]
 		public void ShouldThrowIfExpectPropertyGetterOnMethod()
 		{
 			var mock = new Mock<IFoo>();
@@ -1006,15 +996,15 @@ namespace Moq.Tests
 			try
 			{
 				mock.ExpectGet(foo => foo.DoIntArgReturnInt(5));
-				Assert.Fail("Should throw on ExpectGet on method instead of property.");
+				Assert.True(false, "Should throw on ExpectGet on method instead of property.");
 			}
 			catch (MockException mex)
 			{
-				Assert.AreEqual(MockException.ExceptionReason.ExpectedProperty, mex.Reason);
+				Assert.Equal(MockException.ExceptionReason.ExpectedProperty, mex.Reason);
 			}
 		}
 
-		[Test]
+		[Fact]
 		public void ShouldSetExpectationOnAbstractMethodMBRO()
 		{
 			var mock = new Mock<AbstractMBRO>();
@@ -1022,58 +1012,58 @@ namespace Moq.Tests
 			mock.Expect(x => x.Get())
 				.Returns(5);
 
-			Assert.AreEqual(5, mock.Object.Get());
+			Assert.Equal(5, mock.Object.Get());
 		}
 
-		[Test]
+		[Fact]
 		public void ShouldReturnDefaultForMBRO()
 		{
 			var mock = new Mock<AbstractMBRO>();
 
-			Assert.AreEqual(default(string), mock.Object.Value);
+			Assert.Equal(default(string), mock.Object.Value);
 		}
 
-		[Test]
+		[Fact]
 		public void ShouldInvokeBaseClassVirtualImplementation()
 		{
 			var mock = new Mock<FooBase>();
 
-			Assert.IsFalse(mock.Object.BaseCalled);
+			Assert.False(mock.Object.BaseCalled);
 			mock.Object.BaseCall();
 
-			Assert.AreEqual(default(bool), mock.Object.BaseCall("foo"));
-			Assert.IsTrue(mock.Object.BaseCalled);
-			Assert.IsTrue(mock.Object.BaseReturnCalled);
+			Assert.Equal(default(bool), mock.Object.BaseCall("foo"));
+			Assert.True(mock.Object.BaseCalled);
+			Assert.True(mock.Object.BaseReturnCalled);
 		}
 
-		[Test]
+		[Fact]
 		public void ShouldInvokeBaseClassVirtualImplementationMBRO()
 		{
 			var mock = new Mock<AbstractMBRO>();
 
-			Assert.IsFalse(mock.Object.BaseCalled);
+			Assert.False(mock.Object.BaseCalled);
 			mock.Object.BaseCall();
 
-			Assert.IsTrue(mock.Object.BaseCalled);
+			Assert.True(mock.Object.BaseCalled);
 
-			Assert.AreEqual(default(bool), mock.Object.BaseCall("foo"));
-			Assert.IsTrue(mock.Object.BaseReturnCalled);
+			Assert.Equal(default(bool), mock.Object.BaseCall("foo"));
+			Assert.True(mock.Object.BaseReturnCalled);
 		}
 
-		[Test]
+		[Fact]
 		public void ShouldMatchValueOrReturnDefaultForMBRO()
 		{
 			var mock = new Mock<AbstractMBRO>();
 
 			mock.Expect(x => x.Exists("foo")).Returns(true);
 
-			Assert.AreEqual(true, mock.Object.Exists("foo"));
+			Assert.Equal(true, mock.Object.Exists("foo"));
 			// TODO: has to change when we modify behavior to 
 			// invoke default implementation if specified.
-			Assert.AreEqual(false, mock.Object.Exists("baz"));
+			Assert.Equal(false, mock.Object.Exists("baz"));
 		}
 
-		[Test]
+		[Fact]
 		public void ShouldExpectGetIndexedProperty()
 		{
 			var mock = new Mock<IFoo>();
@@ -1083,11 +1073,11 @@ namespace Moq.Tests
 			mock.ExpectGet(foo => foo[1])
 				.Returns(2);
 
-			Assert.AreEqual(1, mock.Object[0]);
-			Assert.AreEqual(2, mock.Object[1]);
+			Assert.Equal(1, mock.Object[0]);
+			Assert.Equal(2, mock.Object[1]);
 		}
 
-		[Test]
+		[Fact]
 		public void ShouldExpectAndExpectGetBeSynonyms()
 		{
 			var mock = new Mock<IFoo>();
@@ -1097,10 +1087,10 @@ namespace Moq.Tests
 			mock.Expect(foo => foo.ValueProperty)
 				.Returns(2);
 
-			Assert.AreEqual(2, mock.Object.ValueProperty);
+			Assert.Equal(2, mock.Object.ValueProperty);
 		}
 
-		[Test]
+		[Fact]
 		public void ShouldThrowIfItIsWithoutLambda()
 		{
 			var foo = new Mock<IFoo>();
@@ -1113,29 +1103,24 @@ namespace Moq.Tests
 			}
 			catch (MockException mex)
 			{
-				Assert.AreEqual(MockException.ExceptionReason.ExpectedLambda, mex.Reason);
+				Assert.Equal(MockException.ExceptionReason.ExpectedLambda, mex.Reason);
 			}
 		}
 
-		[ExpectedException(typeof(ArgumentException))]
-		[Test]
+		[Fact]
 		public void ShouldThrowIfNotOverridableOnConcreteInterfaceImplementation()
 		{
 			var target = new Mock<Doer>();
 
-			target.Expect(t => t.Do());
-			target.Object.Do();
-
-			target.VerifyAll();
+			Assert.Throws<ArgumentException>(() => target.Expect(t => t.Do()));
 		}
 
-		[ExpectedException(typeof(ArgumentException))]
-		[Test]
+		[Fact]
 		public void ShouldThrowIfExpectGetOnPropertyWithPrivateSetter()
 		{
 			var mock = new Mock<FooWithPrivateSetter>();
 
-			mock.ExpectSet(m => m.Foo);
+			Assert.Throws<ArgumentException>(() => mock.ExpectSet(m => m.Foo));
 		}
 
 		// ShouldCallVirtualImplementationIfNoMatch

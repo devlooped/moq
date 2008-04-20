@@ -2,16 +2,15 @@
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
-using NUnit.Framework;
+using Xunit;
 using System.Linq.Expressions;
 
 namespace Moq.Tests
 {
-	[TestFixture]
 	public class StubFixture
 	{
 
-		[Test]
+		[Fact]
 		public void ShouldExpectPropertyGetterAndSetterWithSameExpression()
 		{
 			var mock = new Mock<IFoo>();
@@ -20,10 +19,10 @@ namespace Moq.Tests
 			mock.ExpectSet(x => x.ValueProperty);
 
 			mock.Object.ValueProperty = 7;
-			Assert.AreEqual(25, mock.Object.ValueProperty);
+			Assert.Equal(25, mock.Object.ValueProperty);
 		}
 
-		[Test]
+		[Fact]
 		public void ShouldExpectPropertyGetterAndSetterWithoutSameExpression()
 		{
 			var mock = new Mock<IFoo>();
@@ -32,7 +31,7 @@ namespace Moq.Tests
 			mock.ExpectSet(y => y.ValueProperty);
 
 			mock.Object.ValueProperty = 7;
-			Assert.AreEqual(25, mock.Object.ValueProperty);
+			Assert.Equal(25, mock.Object.ValueProperty);
 		}
 	}
 

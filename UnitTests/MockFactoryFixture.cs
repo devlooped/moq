@@ -2,43 +2,42 @@
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
-using NUnit.Framework;
+using Xunit;
 using System.Linq.Expressions;
 
 namespace Moq.Tests
 {
-	[TestFixture]
 	public class MockFactoryFixture
 	{
-		[Test]
+		[Fact]
 		public void ShouldCreateFactoryWithMockBehaviorAndVerificationBehavior()
 		{
 			var factory = new MockFactory(MockBehavior.Loose);
 
-			Assert.IsNotNull(factory);
+			Assert.NotNull(factory);
 		}
 
-		[Test]
+		[Fact]
 		public void ShouldCreateMocksWithFactoryBehavior()
 		{
 			var factory = new MockFactory(MockBehavior.Loose);
 
 			var mock = factory.Create<IFormatProvider>();
 
-			Assert.AreEqual(MockBehavior.Loose, mock.Behavior);
+			Assert.Equal(MockBehavior.Loose, mock.Behavior);
 		}
 
-		[Test]
+		[Fact]
 		public void ShouldCreateMockWithConstructorArgs()
 		{
 			var factory = new MockFactory(MockBehavior.Loose);
 
 			var mock = factory.Create<BaseClass>("foo");
 
-			Assert.AreEqual("foo", mock.Object.Value);
+			Assert.Equal("foo", mock.Object.Value);
 		}
 
-		[Test]
+		[Fact]
 		public void ShouldVerifyAll()
 		{
 			try
@@ -52,11 +51,11 @@ namespace Moq.Tests
 			}
 			catch (MockException mex)
 			{
-				Assert.AreEqual(MockException.ExceptionReason.VerificationFailed, mex.Reason);
+				Assert.Equal(MockException.ExceptionReason.VerificationFailed, mex.Reason);
 			}
 		}
 
-		[Test]
+		[Fact]
 		public void ShouldVerifyVerifiables()
 		{
 			try
@@ -71,13 +70,13 @@ namespace Moq.Tests
 			}
 			catch (MockException mex)
 			{
-				Assert.AreEqual(MockException.ExceptionReason.VerificationFailed, mex.Reason);
+				Assert.Equal(MockException.ExceptionReason.VerificationFailed, mex.Reason);
 				Expression<Action<IFoo>> doExpr = foo => foo.Do();
-				Assert.IsFalse(mex.Message.Contains(doExpr.ToString()));
+				Assert.False(mex.Message.Contains(doExpr.ToString()));
 			}
 		}
 
-		[Test]
+		[Fact]
 		public void ShouldAggregateFailures()
 		{
 			try
@@ -94,30 +93,30 @@ namespace Moq.Tests
 			catch (MockException mex)
 			{
 				Expression<Action<IFoo>> fooExpect = f => f.Do();
-				Assert.IsTrue(mex.Message.Contains(fooExpect.ToString()));
+				Assert.True(mex.Message.Contains(fooExpect.ToString()));
 
 				Expression<Action<IBar>> barExpect = b => b.Redo();
-				Assert.IsTrue(mex.Message.Contains(barExpect.ToString()));
+				Assert.True(mex.Message.Contains(barExpect.ToString()));
 			}
 		}
 
-		[Test]
+		[Fact]
 		public void ShouldOverrideDefaultBehavior()
 		{
 			var factory = new MockFactory(MockBehavior.Loose);
 			var mock = factory.Create<IFoo>(MockBehavior.Strict);
 
-			Assert.AreEqual(MockBehavior.Strict, mock.Behavior);
+			Assert.Equal(MockBehavior.Strict, mock.Behavior);
 		}
 
-		[Test]
+		[Fact]
 		public void ShouldOverrideDefaultBehaviorWithCtorArgs()
 		{
 			var factory = new MockFactory(MockBehavior.Loose);
 			var mock = factory.Create<BaseClass>(MockBehavior.Strict, "Foo");
 
-			Assert.AreEqual(MockBehavior.Strict, mock.Behavior);
-			Assert.AreEqual("Foo", mock.Object.Value);
+			Assert.Equal(MockBehavior.Strict, mock.Behavior);
+			Assert.Equal("Foo", mock.Object.Value);
 		}
 
 		public interface IFoo

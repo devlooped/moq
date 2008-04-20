@@ -1,0 +1,83 @@
+<?xml version="1.0"?>
+<doc>
+    <assembly>
+        <name>xunitext.nunit</name>
+    </assembly>
+    <members>
+        <member name="T:XunitExt.NUnit.NUnitCommand">
+            <summary>
+            Represents the execution of an NUnit test fixture.
+            </summary>
+        </member>
+        <member name="M:XunitExt.NUnit.NUnitCommand.ChooseNextTest(System.Collections.Generic.ICollection{System.Reflection.MethodInfo})">
+            <summary>
+            Allows the test class command to choose the next test to be run from the list of
+            tests that have not yet been run, thereby allowing it to choose the run order.
+            </summary>
+            <param name="testsLeftToRun">The tests remaining to be run</param>
+            <returns>The index of the test that should be run</returns>
+        </member>
+        <member name="M:XunitExt.NUnit.NUnitCommand.ClassFinish">
+            <summary>
+            Execute actions to be run after all the test methods of this test class are run.
+            </summary>
+            <returns>Returns the <see cref="T:System.Exception"/> thrown during execution, if any; null, otherwise</returns>
+        </member>
+        <member name="M:XunitExt.NUnit.NUnitCommand.ClassStart">
+            <summary>
+            Execute actions to be run before any of the test methods of this test class are run.
+            </summary>
+            <returns>Returns the <see cref="T:System.Exception"/> thrown during execution, if any; null, otherwise</returns>
+        </member>
+        <member name="M:XunitExt.NUnit.NUnitCommand.EnumerateTestCommands(Xunit.Sdk.IMethodInfo)">
+            <summary>
+            Enumerates the test commands for a given test method in this test class.
+            </summary>
+            <param name="testMethod">The method under test</param>
+            <returns>The test commands for the given test method</returns>
+        </member>
+        <member name="M:XunitExt.NUnit.NUnitCommand.EnumerateTestMethods">
+            <summary>
+            Enumerates the methods which are test methods in this test class.
+            </summary>
+            <returns>The test methods</returns>
+        </member>
+        <member name="M:XunitExt.NUnit.NUnitCommand.IsTestMethod(Xunit.Sdk.IMethodInfo)">
+            <summary>
+            Determines if a given <see cref="T:Xunit.Sdk.IMethodInfo"/> refers to a test method.
+            </summary>
+            <param name="testMethod">The test method to validate</param>
+            <returns>True if the method is a test method; false, otherwise</returns>
+        </member>
+        <member name="P:XunitExt.NUnit.NUnitCommand.ObjectUnderTest">
+            <summary>
+            Gets the object instance that is under test. May return null if you wish
+            the test framework to create a new object instance for each test method.
+            </summary>
+        </member>
+        <member name="P:XunitExt.NUnit.NUnitCommand.TypeUnderTest">
+            <summary>
+            Sets the type that is being tested
+            </summary>
+        </member>
+        <member name="T:XunitExt.NUnit.ResultMapper">
+            <summary>
+            Internal class for <see cref="T:XunitExt.NUnit.RunWithNUnitAttribute"/>.
+            </summary>
+        </member>
+        <member name="M:XunitExt.NUnit.ResultMapper.MapTestCaseResult(NUnit.Core.TestCaseResult)">
+            <summary/>
+        </member>
+        <member name="T:XunitExt.NUnit.RunWithNUnitAttribute">
+            <summary>
+            Tells the xUnit.net runner that the class contains NUnit 2.x unit tests. The tests
+            are run with the installed version of NUnit on the machine.
+            </summary>
+        </member>
+        <member name="M:XunitExt.NUnit.RunWithNUnitAttribute.#ctor">
+            <summary>
+            Creates a new instance of <see cref="T:XunitExt.NUnit.RunWithNUnitAttribute"/>.
+            </summary>
+        </member>
+    </members>
+</doc>

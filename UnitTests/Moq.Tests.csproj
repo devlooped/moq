@@ -33,10 +33,13 @@
     <WarningLevel>4</WarningLevel>
   </PropertyGroup>
   <ItemGroup>
-    <Reference Include="Castle.Core, Version=1.0.3.0, Culture=neutral, PublicKeyToken=407dd0808d44fbdc, processorArchitecture=MSIL" />
-    <Reference Include="Castle.DynamicProxy, Version=2.0.3.0, Culture=neutral, PublicKeyToken=407dd0808d44fbdc, processorArchitecture=MSIL" />
-    <Reference Include="nunit.framework, Version=2.4.5.0, Culture=neutral, PublicKeyToken=96d09a1eb7f44a77, processorArchitecture=MSIL">
+    <Reference Include="Castle.Core, Version=1.0.3.0, Culture=neutral, PublicKeyToken=407dd0808d44fbdc, processorArchitecture=MSIL">
       <SpecificVersion>False</SpecificVersion>
+      <HintPath>..\Lib\Castle\Castle.Core.dll</HintPath>
+    </Reference>
+    <Reference Include="Castle.DynamicProxy, Version=2.0.3.0, Culture=neutral, PublicKeyToken=407dd0808d44fbdc, processorArchitecture=MSIL">
+      <SpecificVersion>False</SpecificVersion>
+      <HintPath>..\Lib\Castle\Castle.DynamicProxy.dll</HintPath>
     </Reference>
     <Reference Include="System" />
     <Reference Include="System.Core">
@@ -47,6 +50,10 @@
       <RequiredTargetFramework>3.0</RequiredTargetFramework>
     </Reference>
     <Reference Include="System.Xml" />
+    <Reference Include="xunit, Version=1.0.0.1252, Culture=neutral, PublicKeyToken=8d05b1bb7a6fdb6c, processorArchitecture=MSIL">
+      <SpecificVersion>False</SpecificVersion>
+      <HintPath>..\Lib\xUnit\xunit.dll</HintPath>
+    </Reference>
   </ItemGroup>
   <ItemGroup>
     <Compile Include="MatcherAttributeFixture.cs" />
@@ -84,4 +91,15 @@
   <Target Name="AfterBuild">
   </Target>
   -->
+	<UsingTask
+	  AssemblyFile="$(MSBuildProjectPath)..\Lib\xUnit\xunitext.runner.msbuild.dll"
+	  TaskName="XunitExt.Runner.MSBuild.xunit"/>
+
+	<Target Name="AfterBuild" Condition=" '$(Configuration)' == 'Release' ">
+		<!-- Run xUnit tests -->
+		<Copy SourceFiles="$(MSBuildProjectPath)..\Lib\xUnit\xunit.dll" DestinationFolder="$(OutDir)"/>
+		<xunit Assembly="@(MainAssembly)" />
+		<Delete Files="$(OutDir)\xunit.dll"/>
+	</Target>
+
 </Project>

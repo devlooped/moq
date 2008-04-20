@@ -67,7 +67,7 @@ namespace Moq
 	/// order.Fill(mock.Object);
 	/// 
 	/// //verify
-	/// Assert.IsTrue(order.IsFilled);
+	/// Assert.True(order.IsFilled);
 	/// </code>
 	/// The following example shows how to use the <see cref="It"/> class 
 	/// to specify conditions for arguments instead of specific values:
@@ -93,7 +93,7 @@ namespace Moq
 	/// order.Fill(mock.Object);
 	/// 
 	/// //verify
-	/// Assert.IsFalse(order.IsFilled);
+	/// Assert.False(order.IsFilled);
 	/// </code>
 	/// </example>
 	public class Mock<T> : Mock, IVerifiable, IHideObjectMembers
@@ -658,7 +658,7 @@ namespace Moq
 		/// var presenter = new OrdersPresenter(mockView.Object);
 		/// 
 		/// // Check that the presenter has no selection by default
-		/// Assert.IsNull(presenter.SelectedOrder);
+		/// Assert.Null(presenter.SelectedOrder);
 		/// 
 		/// // Create a mock event handler of the appropriate type
 		/// var handler = mockView.CreateEventHandler&lt;OrderEventArgs&gt;();
@@ -668,8 +668,8 @@ namespace Moq
 		/// handler.Raise(new OrderEventArgs { Order = new Order("moq", 500) });
 		/// 
 		/// // Now the presenter reacted to the event, and we have a selected order
-		/// Assert.IsNotNull(presenter.SelectedOrder);
-		/// Assert.AreEqual("moq", presenter.SelectedOrder.ProductName);
+		/// Assert.NotNull(presenter.SelectedOrder);
+		/// Assert.Equal("moq", presenter.SelectedOrder.ProductName);
 		/// </code>
 		/// </example>
 		public MockedEvent<TEventArgs> CreateEventHandler<TEventArgs>() where TEventArgs : EventArgs
@@ -697,7 +697,7 @@ namespace Moq
 		/// var presenter = new OrdersPresenter(mockView.Object);
 		/// 
 		/// // Check that the presenter is not in the "Canceled" state
-		/// Assert.IsFalse(presenter.IsCanceled);
+		/// Assert.False(presenter.IsCanceled);
 		/// 
 		/// // Create a mock event handler of the appropriate type
 		/// var handler = mockView.CreateEventHandler();
@@ -707,7 +707,7 @@ namespace Moq
 		/// handler.Raise(EventArgs.Empty);
 		/// 
 		/// // Now the presenter reacted to the event, and changed its state
-		/// Assert.IsTrue(presenter.IsCanceled);
+		/// Assert.True(presenter.IsCanceled);
 		/// </code>
 		/// </example>
 		public MockedEvent<EventArgs> CreateEventHandler()

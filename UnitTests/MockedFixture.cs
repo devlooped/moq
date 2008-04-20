@@ -2,47 +2,46 @@ using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
-using NUnit.Framework;
+using Xunit;
 
 namespace Moq.Tests
 {
-    [TestFixture]
     public class MockedFixture
     {
 		public class FooBase { }
 		public class Foo : FooBase { }
 		public interface IFoo { }
 
-        [Test]
+        [Fact]
         public void InterfaceMockedShouldImplementMocked()
         {
             Mock<IFoo> mock = new Mock<IFoo>();
             IFoo mocked = mock.Object;
-            Assert.IsTrue(mocked is IMocked<IFoo>);
+            Assert.True(mocked is IMocked<IFoo>);
         }
 
-        [Test]
+        [Fact]
         public void MockOfMockedInterfaceShouldReturnSame()
         {
             Mock<IFoo> mock = new Mock<IFoo>();
             IMocked<IFoo> mocked = mock.Object as IMocked<IFoo>;
-            Assert.AreSame(mock, mocked.Mock);
+            Assert.Same(mock, mocked.Mock);
         }
 
-        [Test]
+        [Fact]
         public void ClassMockedShouldImplementMocked()
         {
             Mock<Foo> mock = new Mock<Foo>();
             Foo mocked = mock.Object;
-            Assert.IsTrue(mocked is IMocked<Foo>);
+            Assert.True(mocked is IMocked<Foo>);
         }
 
-        [Test]
+        [Fact]
         public void MockOfMockedClassShouldReturnSame()
         {
             Mock<Foo> mock = new Mock<Foo>();
             IMocked<Foo> mocked = mock.Object as IMocked<Foo>;
-            Assert.AreSame(mock, mocked.Mock);
+            Assert.Same(mock, mocked.Mock);
         }
 
 		public class FooWithCtor 
@@ -50,61 +49,62 @@ namespace Moq.Tests
 			public FooWithCtor(int a) { }
 		}
 
-		[Test]
+		[Fact]
 		public void ClassWithCtorMockedShouldImplementMocked()
 		{
 			Mock<FooWithCtor> mock = new Mock<FooWithCtor>(5);
 			FooWithCtor mocked = mock.Object;
-			Assert.IsTrue(mocked is IMocked<FooWithCtor>);
+			Assert.True(mocked is IMocked<FooWithCtor>);
 		}
 
-		[Test]
+		[Fact]
 		public void MockOfMockedClassWithCtorShouldReturnSame()
 		{
 			Mock<FooWithCtor> mock = new Mock<FooWithCtor>(5);
 			IMocked<FooWithCtor> mocked = mock.Object as IMocked<FooWithCtor>;
-			Assert.AreSame(mock, mocked.Mock);
+			Assert.Same(mock, mocked.Mock);
 		}
 
 		public class FooMBR : MarshalByRefObject { }
 
-		[Test]
+		[Fact]
 		public void ClassMBRMockedShouldImplementMocked()
 		{
 			Mock<FooMBR> mock = new Mock<FooMBR>();
 			FooMBR mocked = mock.Object;
-			Assert.IsTrue(mocked is IMocked<FooMBR>);
+			Assert.True(mocked is IMocked<FooMBR>);
 		}
 
-		[Test]
+		[Fact]
 		public void MockOfMockedClassMBRShouldReturnSame()
 		{
 			Mock<FooMBR> mock = new Mock<FooMBR>();
 			IMocked<FooMBR> mocked = mock.Object as IMocked<FooMBR>;
-			Assert.AreSame(mock, mocked.Mock);
+			Assert.Same(mock, mocked.Mock);
 		}
 
-		[Test]
+		[Fact]
 		public void GetReturnsMockForAMocked()
 		{
 			var mock = new Mock<IFoo>();
 			var mocked = mock.Object;
-			Assert.AreSame(mock, Mock.Get(mocked));
+			Assert.Same(mock, Mock.Get(mocked));
 		}
 
-		[Test]
+		[Fact]
 		public void GetReturnsMockForAMockedAbstract()
 		{
 			var mock = new Mock<FooBase>();
 			var mocked = mock.Object;
-			Assert.AreSame(mock, Mock.Get(mocked));
+			Assert.Same(mock, Mock.Get(mocked));
 		}
 
-		[Test]
-		[ExpectedException(ExceptionType = typeof(ArgumentException), ExpectedMessage = "Object instance was not created by Moq.\r\nParameter name: mocked")]
+		[Fact]
 		public void GetThrowsIfObjectIsNotMocked()
 		{
-			Mock.Get("foo");
+			Assert.Throws<ArgumentException>(
+				"Object instance was not created by Moq.\r\nParameter name: mocked", 
+				() => Mock.Get("foo"));
 		}
     }
 }
