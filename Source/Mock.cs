@@ -34,18 +34,11 @@ namespace Moq
 {
 	// TODO: uncomment documentation when C# bug is fixed: 
 	///// <typeparam name="T">Type to mock, which can be an interface or a class.</typeparam>
-	// TODO: remove reference to MBROs from documentation and code.
 	/// <summary>
 	/// Provides a mock implementation of <typeparamref name="T"/>.
 	/// </summary>
 	/// <remarks>
-	/// If the mocked <typeparamref name="T"/> is a <see cref="MarshalByRefObject"/> (such as a 
-	/// Windows Forms control or another <see cref="System.ComponentModel.Component"/>-derived class) 
-	/// all members will be mockeable, even if they are not virtual or abstract.
-	/// <para>
-	/// For regular .NET classes ("POCOs" or Plain Old CLR Objects), only abstract and virtual 
-	/// members can be mocked. 
-	/// </para>
+	/// Only abstract and virtual members of classes can be mocked.
 	/// <para>
 	/// The behavior of the mock with regards to the expectations and the actual calls is determined 
 	/// by the optional <see cref="MockBehavior"/> that can be passed to the <see cref="Mock{T}(MockBehavior)"/> 
@@ -111,12 +104,6 @@ namespace Moq
 		/// <remarks>
 		/// The mock will try to find the best match constructor given the constructor arguments, and invoke that 
 		/// to initialize the instance. This applies only to classes, not interfaces.
-		/// <para>
-		/// <b>Note:</b> For a <see cref="MarshalByRefObject"/> derived class, any calls done in the constructor itself 
-		/// (i.e. calls to private members, initialization methods, etc. invoked from the constructor) 
-		/// will not go through the proxied mock and will instead be direct invocations in the underlying 
-		/// object. This is a known limitation.
-		/// </para>
 		/// </remarks>
 		/// <example>
 		/// <code>var mock = new Mock&lt;MyProvider&gt;(someArgument, 25);</code>
@@ -132,15 +119,6 @@ namespace Moq
 
 			try
 			{
-				//TODO: remove all the remoting crap? Or fix to force it to call the 
-				//underlying object somehow?
-				//if (typeof(MarshalByRefObject).IsAssignableFrom(mockType))
-				//{
-				//   var generatedType = generator.ProxyBuilder.CreateClassProxy(mockType, interfacesTypes, new ProxyGenerationOptions());
-				//   var remotingProxy = new RemotingProxy(generatedType, mockType, x => interceptor.Intercept(x), args);
-
-				//   instance = (T)remotingProxy.GetTransparentProxy();
-				//}
 				if (typeof(T).IsInterface)
 				{
 					if (args.Length > 0)
@@ -183,11 +161,6 @@ namespace Moq
 		/// <remarks>
 		/// The mock will try to find the best match constructor given the constructor arguments, and invoke that 
 		/// to initialize the instance. This applies only for classes, not interfaces.
-		/// <para>
-		/// <b>Note:</b> For a <see cref="MarshalByRefObject"/> derived class, any calls done in the constructor itself 
-		/// will not go through the proxied mock and will instead be direct invocations in the underlying 
-		/// object. This is known limitation.
-		/// </para>
 		/// </remarks>
 		/// <example>
 		/// <code>var mock = new Mock&lt;MyProvider&gt;(someArgument, 25);</code>
@@ -542,8 +515,7 @@ namespace Moq
 
 		private void ThrowIfCantOverride(Expression expectation, MethodInfo methodInfo)
 		{
-			if ((!methodInfo.IsVirtual || methodInfo.IsFinal || methodInfo.IsPrivate) &&
-				!methodInfo.DeclaringType.IsMarshalByRef)
+			if (!methodInfo.IsVirtual || methodInfo.IsFinal || methodInfo.IsPrivate)
 				throw new ArgumentException(
 					String.Format(Properties.Resources.ExpectationOnNonOverridableMember,
 					expectation.ToString()));

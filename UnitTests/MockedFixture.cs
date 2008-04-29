@@ -65,24 +65,6 @@ namespace Moq.Tests
 			Assert.Same(mock, mocked.Mock);
 		}
 
-		public class FooMBR : MarshalByRefObject { }
-
-		[Fact]
-		public void ClassMBRMockedShouldImplementMocked()
-		{
-			Mock<FooMBR> mock = new Mock<FooMBR>();
-			FooMBR mocked = mock.Object;
-			Assert.True(mocked is IMocked<FooMBR>);
-		}
-
-		[Fact]
-		public void MockOfMockedClassMBRShouldReturnSame()
-		{
-			Mock<FooMBR> mock = new Mock<FooMBR>();
-			IMocked<FooMBR> mocked = mock.Object as IMocked<FooMBR>;
-			Assert.Same(mock, mocked.Mock);
-		}
-
 		[Fact]
 		public void GetReturnsMockForAMocked()
 		{

@@ -111,7 +111,7 @@ namespace Moq.Tests
 		[Fact]
 		public void ShouldThrowIfExpectFieldValue()
 		{
-			var mock = new Mock<FooMBRO>();
+			var mock = new Mock<FooBase>();
 
 			try
 			{
@@ -397,23 +397,6 @@ namespace Moq.Tests
 			Assert.True(mock.Object.Check("bar"));
 		}
 
-		[Fact(Skip="Removed special handling for MBRO. It now behaves just like a regular class.")]
-		public void ShouldOverrideNonVirtualForMBRO()
-		{
-			var mock = new Mock<FooMBRO>();
-			mock.Expect(x => x.True()).Returns(false);
-
-			Assert.False(mock.Object.True());
-		}
-
-		[Fact]
-		public void ShouldCallUnderlyingMBRO()
-		{
-			var mock = new Mock<FooMBRO>();
-
-			Assert.True(mock.Object.True());
-		}
-
 		[Fact]
 		public void ShouldCallUnderlyingClassEquals()
 		{
@@ -553,13 +536,6 @@ namespace Moq.Tests
 		}
 
 		[Fact]
-		public void ShouldNotThrowIfExpectOnNonVirtualButMBRO()
-		{
-			var mock = new Mock<FooMBRO>();
-			mock.Expect(x => x.True()).Returns(false);
-		}
-
-		[Fact]
 		public void ShouldOverridePreviousExpectation()
 		{
 			var mock = new Mock<IFoo>();
@@ -589,21 +565,6 @@ namespace Moq.Tests
 		}
 
 		[Fact]
-		public void ShouldReceiveClassCtorArgumentsMBRO()
-		{
-			var mock = new Mock<FooWithConstructorsMBRO>(MockBehavior.Default, "Hello", 26);
-
-			Assert.Equal("Hello", mock.Object.StringValue);
-			Assert.Equal(26, mock.Object.IntValue);
-
-			// Should also construct without args.
-			mock = new Mock<FooWithConstructorsMBRO>(MockBehavior.Default);
-
-			Assert.Equal(null, mock.Object.StringValue);
-			Assert.Equal(0, mock.Object.IntValue);
-		}
-
-		[Fact]
 		public void ShouldConstructClassWithNoDefaultConstructor()
 		{
 			var mock = new Mock<ClassWithNoDefaultConstructor>(MockBehavior.Default, "Hello", 26);
@@ -622,33 +583,9 @@ namespace Moq.Tests
 		}
 
 		[Fact]
-		public void ShouldConstructClassWithNoDefaultConstructorMBRO()
-		{
-			var mock = new Mock<ClassWithNoDefaultConstructorMBRO>(MockBehavior.Default, "Hello", 26);
-
-			Assert.Equal("Hello", mock.Object.StringValue);
-			Assert.Equal(26, mock.Object.IntValue);
-		}
-
-		[Fact]
-		public void ShouldConstructClassWithNoDefaultConstructorAndNullValueMBRO()
-		{
-			var mock = new Mock<ClassWithNoDefaultConstructorMBRO>(MockBehavior.Default, null, 26);
-
-			Assert.Equal(null, mock.Object.StringValue);
-			Assert.Equal(26, mock.Object.IntValue);
-		}
-
-		[Fact]
 		public void ShouldThrowIfNoMatchingConstructorFound()
 		{
 			Assert.Throws<ArgumentException>(() => new Mock<ClassWithNoDefaultConstructor>(25, true));
-		}
-
-		[Fact]
-		public void ShouldThrowIfNoMatchingConstructorFoundMBRO()
-		{
-			Assert.Throws<ArgumentException>(() => new Mock<ClassWithNoDefaultConstructorMBRO>(25, true));
 		}
 
 		[Fact]
@@ -852,14 +789,6 @@ namespace Moq.Tests
 			Assert.False(baz);
 		}
 
-		[Fact(Skip="MBRO support dropped for now")]
-		public void ShouldCreateAbstractMBRO()
-		{
-			var mock = new Mock<AbstractMBRO>();
-
-			Assert.Equal("foo", mock.Object.Value);
-		}
-
 		[Fact]
 		public void ShouldExpectOnceThrowOnSecondCall()
 		{
@@ -878,32 +807,6 @@ namespace Moq.Tests
 			{
 				Assert.Equal(MockException.ExceptionReason.MoreThanOneCall, mex.Reason);
 			}
-		}
-
-		[Fact]
-		public void ShouldCreateMBROWithProtectedCtorAndArgs()
-		{
-			var mock = new Mock<FooWithProtectedCtorArgsMBRO>("foo", 25);
-
-			Assert.Equal("foo", mock.Object.StringValue);
-			Assert.Equal(25, mock.Object.IntValue);
-		}
-
-		[Fact]
-		public void ShouldCreateMBROWithProtectedCtorAndNullArg()
-		{
-			var mock = new Mock<FooWithProtectedCtorArgsMBRO>(null, 25);
-
-			Assert.Null(mock.Object.StringValue);
-			Assert.Equal(25, mock.Object.IntValue);
-		}
-
-		[Fact]
-		public void ShouldCreateMBROWithProtectedCtorOverload()
-		{
-			var mock = new Mock<FooWithProtectedCtorArgsMBRO>("foo");
-
-			Assert.Equal("foo", mock.Object.StringValue);
 		}
 
 		[Fact]
@@ -1005,25 +908,6 @@ namespace Moq.Tests
 		}
 
 		[Fact]
-		public void ShouldSetExpectationOnAbstractMethodMBRO()
-		{
-			var mock = new Mock<AbstractMBRO>();
-
-			mock.Expect(x => x.Get())
-				.Returns(5);
-
-			Assert.Equal(5, mock.Object.Get());
-		}
-
-		[Fact]
-		public void ShouldReturnDefaultForMBRO()
-		{
-			var mock = new Mock<AbstractMBRO>();
-
-			Assert.Equal(default(string), mock.Object.Value);
-		}
-
-		[Fact]
 		public void ShouldInvokeBaseClassVirtualImplementation()
 		{
 			var mock = new Mock<FooBase>();
@@ -1034,33 +918,6 @@ namespace Moq.Tests
 			Assert.Equal(default(bool), mock.Object.BaseCall("foo"));
 			Assert.True(mock.Object.BaseCalled);
 			Assert.True(mock.Object.BaseReturnCalled);
-		}
-
-		[Fact]
-		public void ShouldInvokeBaseClassVirtualImplementationMBRO()
-		{
-			var mock = new Mock<AbstractMBRO>();
-
-			Assert.False(mock.Object.BaseCalled);
-			mock.Object.BaseCall();
-
-			Assert.True(mock.Object.BaseCalled);
-
-			Assert.Equal(default(bool), mock.Object.BaseCall("foo"));
-			Assert.True(mock.Object.BaseReturnCalled);
-		}
-
-		[Fact]
-		public void ShouldMatchValueOrReturnDefaultForMBRO()
-		{
-			var mock = new Mock<AbstractMBRO>();
-
-			mock.Expect(x => x.Exists("foo")).Returns(true);
-
-			Assert.Equal(true, mock.Object.Exists("foo"));
-			// TODO: has to change when we modify behavior to 
-			// invoke default implementation if specified.
-			Assert.Equal(false, mock.Object.Exists("baz"));
 		}
 
 		[Fact]
@@ -1154,62 +1011,12 @@ namespace Moq.Tests
 			public virtual string Foo { get; private set; }
 		}
 
-		public class ClassWithNoDefaultConstructorMBRO : MarshalByRefObject
-		{
-			public ClassWithNoDefaultConstructorMBRO(string stringValue, int intValue)
-			{
-				this.StringValue = stringValue;
-				this.IntValue = intValue;
-			}
-
-			public string StringValue { get; set; }
-			public int IntValue { get; set; }
-		}
-
 		public class ClassWithNoDefaultConstructor
 		{
 			public ClassWithNoDefaultConstructor(string stringValue, int intValue)
 			{
 				this.StringValue = stringValue;
 				this.IntValue = intValue;
-			}
-
-			public string StringValue { get; set; }
-			public int IntValue { get; set; }
-		}
-
-		public class FooWithProtectedCtorArgsMBRO : MarshalByRefObject
-		{
-			protected FooWithProtectedCtorArgsMBRO(string stringValue)
-			{
-				this.StringValue = stringValue;
-			}
-
-			protected FooWithProtectedCtorArgsMBRO(string stringValue, int intValue)
-			{
-				this.StringValue = stringValue;
-				this.IntValue = intValue;
-			}
-
-			public string StringValue { get; set; }
-			public int IntValue { get; set; }
-		}
-
-		public class FooWithConstructorsMBRO : MarshalByRefObject
-		{
-			public FooWithConstructorsMBRO(string stringValue, int intValue)
-			{
-				this.StringValue = stringValue;
-				this.IntValue = intValue;
-			}
-
-			public FooWithConstructorsMBRO()
-			{
-			}
-
-			public override string ToString()
-			{
-				return base.ToString();
 			}
 
 			public string StringValue { get; set; }
@@ -1253,52 +1060,6 @@ namespace Moq.Tests
 			}
 		}
 
-		public class FooMBRO : MarshalByRefObject
-		{
-			public int ValueField;
-
-			public bool True()
-			{
-				return true;
-			}
-		}
-
-		public abstract class AbstractMBRO : MarshalByRefObject
-		{
-			public string Value { get; set; }
-			public abstract int Get();
-			public virtual bool Exists(string value) { return false; }
-
-			private bool baseCalled = false;
-			private bool baseReturnCalled = false;
-
-			public bool BaseCalled
-			{
-				get { Debug.WriteLine("BaseCalled::Get"); return baseCalled; }
-				set { Debug.WriteLine("BaseCall::Set"); baseCalled = value; }
-			}
-
-			public virtual void BaseCall()
-			{
-				Debug.WriteLine("BaseCall");
-				BaseCalled = true;
-			}
-
-			public bool BaseReturnCalled
-			{
-				get { Debug.WriteLine("BaseReturnCalled::Get"); return baseReturnCalled; }
-				set { Debug.WriteLine("BaseReturnCall::Set"); baseReturnCalled = value; }
-			}
-
-
-			public virtual bool BaseCall(string value)
-			{
-				Console.WriteLine("BaseCall(string)");
-				BaseReturnCalled = true;
-				return default(bool);
-			}
-		}
-
 		public interface IFoo
 		{
 			int DoIntArgReturnInt(int arg);
@@ -1335,6 +1096,7 @@ namespace Moq.Tests
 
 		public abstract class FooBase
 		{
+			public int ValueField;
 			public abstract void Do(int value);
 
 			public virtual bool Check(string value)

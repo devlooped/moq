@@ -8,7 +8,7 @@ namespace Moq
 {
 	/// <summary>
 	/// Implements the actual interception and method invocation for 
-	/// all mocks, even MBROs (via the <see cref="RemotingProxy"/>.
+	/// all mocks.
 	/// </summary>
 	internal class Interceptor : MarshalByRefObject, IInterceptor
 	{
