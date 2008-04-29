@@ -634,12 +634,17 @@
         </member>
         <member name="P:XunitExt.TheoryCommand.Name">
             <summary>
-            Gets the fully-qualified name of the test method.
+            Gets the display name of the test method.
             </summary>
         </member>
         <member name="P:XunitExt.TheoryCommand.Parameters">
             <summary>
-            Gets the parameters that are passed to the test command.
+            Gets the parameter values that are passed to the test method.
+            </summary>
+        </member>
+        <member name="P:XunitExt.TheoryCommand.TestMethod">
+            <summary>
+            Gets the method under test.
             </summary>
         </member>
         <member name="T:XunitExt.TraceAttribute">

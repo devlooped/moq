@@ -547,12 +547,7 @@
         </member>
         <member name="P:Xunit.Sdk.ITestCommand.Name">
             <summary>
-            Gets the fully-qualified name of the test method.
-            </summary>
-        </member>
-        <member name="P:Xunit.Sdk.ITestCommand.Parameters">
-            <summary>
-            Gets the parameters that are passed to the test command.
+            Gets the display name of the test method.
             </summary>
         </member>
         <member name="M:Xunit.Sdk.DelegatingTestCommand.#ctor(Xunit.Sdk.ITestCommand)">
@@ -576,11 +571,6 @@
         <member name="P:Xunit.Sdk.DelegatingTestCommand.Name">
             <summary>
             Gets the fully-qualified name of the test method.
-            </summary>
-        </member>
-        <member name="P:Xunit.Sdk.DelegatingTestCommand.Parameters">
-            <summary>
-            Gets the parameters that are passed to the test command.
             </summary>
         </member>
         <member name="M:Xunit.Sdk.BeforeAfterCommand.#ctor(Xunit.Sdk.ITestCommand,System.Reflection.MethodInfo)">
@@ -694,7 +684,10 @@
             Rethrows an exception object without losing the existing stack trace information
             </summary>
             <param name="ex">The exception to re-throw.</param>
-            <remarks>See: http://www.dotnetjunkies.com/WebLog/chris.taylor/archive/2004/03/03/8353.aspx</remarks>
+            <remarks>
+            For more information on this technique, see
+            http://www.dotnetjunkies.com/WebLog/chris.taylor/archive/2004/03/03/8353.aspx
+            </remarks>
         </member>
         <member name="T:Xunit.Sdk.XmlUtility">
             <summary>
@@ -1280,11 +1273,13 @@
             Implementation of <see cref="T:Xunit.Sdk.ITestCommand"/> that represents a skipped test.
             </summary>
         </member>
-        <member name="M:Xunit.Sdk.SkipCommand.#ctor(System.Reflection.MethodInfo)">
+        <member name="M:Xunit.Sdk.SkipCommand.#ctor(System.Reflection.MethodInfo,System.String)">
             <summary>
             Creates a new instance of the <see cref="T:Xunit.Sdk.SkipCommand"/> class.
             </summary>
             <param name="testMethod">The method that is being skipped</param>
+            <param name="displayName">The display name for the test. If null, the fully qualified
+            type name is used.</param>
         </member>
         <member name="M:Xunit.Sdk.SkipCommand.Execute(System.Object)">
             <summary>
@@ -1296,11 +1291,6 @@
         <member name="P:Xunit.Sdk.SkipCommand.Name">
             <summary>
             Gets the fully-qualified name of the test method.
-            </summary>
-        </member>
-        <member name="P:Xunit.Sdk.SkipCommand.Parameters">
-            <summary>
-            Gets the parameters that are passed to the test command.
             </summary>
         </member>
         <member name="T:Xunit.Sdk.TestCommand">
@@ -1327,12 +1317,7 @@
         </member>
         <member name="P:Xunit.Sdk.TestCommand.Name">
             <summary>
-            Gets the fully-qualified name of the test method.
-            </summary>
-        </member>
-        <member name="P:Xunit.Sdk.TestCommand.Parameters">
-            <summary>
-            Gets the parameters that are passed to the test command.
+            Gets the display name of the test method.
             </summary>
         </member>
         <member name="T:Xunit.Sdk.TestCommandFactory">
@@ -1424,6 +1409,7 @@
             Delegate which is used to provide live test run status
             </summary>
             <param name="result">A single test result during the test run</param>
+            <returns>Return true to continue running tests; false to cancel test run</returns>
         </member>
         <member name="T:Xunit.Sdk.AssemblyResult">
             <summary>
@@ -1571,30 +1557,24 @@
             Represents the results from running a test method
             </summary>
         </member>
-        <member name="M:Xunit.Sdk.MethodResult.#ctor(System.Reflection.MethodInfo,System.Object[])">
+        <member name="M:Xunit.Sdk.MethodResult.#ctor(System.Reflection.MethodInfo,System.String)">
             <summary>
-            Creates a new instance of the <see cref="T:Xunit.Sdk.MethodResult"/> class. The traits for
+            Initializes a new instance of the <see cref="T:Xunit.Sdk.MethodResult"/> class. The traits for
             the test method are discovered using reflection.
             </summary>
-            <param name="method">The method under test</param>
-            <param name="parameters">The parameters passed to the test method</param>
+            <param name="method">The method under test.</param>
+            <param name="displayName">The display name for the test. If null, the fully qualified
+            type name is used.</param>
         </member>
-        <member name="M:Xunit.Sdk.MethodResult.#ctor(System.Reflection.MethodInfo,System.Collections.Generic.Dictionary{System.String,System.String},System.Object[])">
+        <member name="M:Xunit.Sdk.MethodResult.#ctor(System.String,System.String,System.String,System.Collections.Generic.Dictionary{System.String,System.String})">
             <summary>
-            Creates a new instance of the <see cref="T:Xunit.Sdk.MethodResult"/> class.
+            Initializes a new instance of the <see cref="T:Xunit.Sdk.MethodResult"/> class.
             </summary>
-            <param name="method">The method under test</param>
-            <param name="traits">The traits attached to the method under test</param>
-            <param name="parameters">The parameters passed to the test method</param>
-        </member>
-        <member name="M:Xunit.Sdk.MethodResult.#ctor(System.String,System.String,System.Collections.Generic.Dictionary{System.String,System.String},System.Object[])">
-            <summary>
-            Creates a new instance of the <see cref="T:Xunit.Sdk.MethodResult"/> class.
-            </summary>
-            <param name="methodName">The name of the method under test</param>
-            <param name="typeName">The name of hte type under test</param>
-            <param name="traits">The traits attached to the method under test</param>
-            <param name="parameters">The parameters passed to the test method</param>
+            <param name="methodName">The name of the method under test.</param>
+            <param name="typeName">The type of the method under test.</param>
+            <param name="displayName">The display name for the test. If null, the fully qualified
+            type name is used.</param>
+            <param name="traits">The traits.</param>
         </member>
         <member name="M:Xunit.Sdk.MethodResult.ToXml(System.Xml.XmlNode)">
             <summary>
@@ -1602,6 +1582,12 @@
             </summary>
             <param name="parentNode">The parent node.</param>
             <returns>The newly created XML node.</returns>
+        </member>
+        <member name="P:Xunit.Sdk.MethodResult.DisplayName">
+            <summary>
+            Gets or sets the display name of the method under test. This is the value that's shown
+            during failures and in the resulting output XML.
+            </summary>
         </member>
         <member name="P:Xunit.Sdk.MethodResult.MethodName">
             <summary>
@@ -1618,21 +1604,23 @@
             Gets the name of the type under test.
             </summary>
         </member>
-        <member name="M:Xunit.Sdk.FailedResult.#ctor(System.Reflection.MethodInfo,System.Exception,System.Object[])">
+        <member name="M:Xunit.Sdk.FailedResult.#ctor(System.Reflection.MethodInfo,System.Exception,System.String)">
             <summary>
             Creates a new instance of the <see cref="T:Xunit.Sdk.FailedResult"/> class.
             </summary>
             <param name="method">The method under test</param>
             <param name="exception">The exception throw by the test</param>
-            <param name="parameters">The parameters passed to the test</param>
+            <param name="displayName">The display name for the test. If null, the fully qualified
+            type name is used.</param>
         </member>
-        <member name="M:Xunit.Sdk.FailedResult.#ctor(System.String,System.String,System.Collections.Generic.Dictionary{System.String,System.String},System.String,System.String,System.String)">
+        <member name="M:Xunit.Sdk.FailedResult.#ctor(System.String,System.String,System.String,System.Collections.Generic.Dictionary{System.String,System.String},System.String,System.String,System.String)">
             <summary>
             Creates a new instance of the <see cref="T:Xunit.Sdk.FailedResult"/> class.
             </summary>
             <param name="methodName">The name of the method under test</param>
             <param name="typeName">The name of the type under test</param>
-            <param name="properties">The custom properties attached to the test method</param>
+            <param name="displayName">The display name of the test</param>
+            <param name="traits">The custom properties attached to the test method</param>
             <param name="exceptionType">The full type name of the exception throw</param>
             <param name="message">The exception message</param>
             <param name="stackTrace">The exception stack trace</param>
@@ -1664,20 +1652,23 @@
             Represents a passing test result.
             </summary>
         </member>
-        <member name="M:Xunit.Sdk.PassedResult.#ctor(System.Reflection.MethodInfo,System.Object[])">
+        <member name="M:Xunit.Sdk.PassedResult.#ctor(System.Reflection.MethodInfo,System.String)">
             <summary>
             Create a new instance of the <see cref="T:Xunit.Sdk.PassedResult"/> class.
             </summary>
             <param name="method">The method under test</param>
-            <param name="parameters">The parameters passed to the test method</param>
+            <param name="displayName">The display name for the test. If null, the fully qualified
+            type name is used.</param>
         </member>
-        <member name="M:Xunit.Sdk.PassedResult.#ctor(System.String,System.String,System.Collections.Generic.Dictionary{System.String,System.String})">
+        <member name="M:Xunit.Sdk.PassedResult.#ctor(System.String,System.String,System.String,System.Collections.Generic.Dictionary{System.String,System.String})">
             <summary>
             Create a new instance of the <see cref="T:Xunit.Sdk.PassedResult"/> class.
             </summary>
             <param name="methodName">The name of the method under test</param>
             <param name="typeName">The name of the type under test</param>
-            <param name="properties">The custom properties attached to the test method</param>
+            <param name="displayName">The display name for the test. If null, the fully qualified
+            type name is used.</param>
+            <param name="traits">The custom properties attached to the test method</param>
         </member>
         <member name="M:Xunit.Sdk.PassedResult.ToXml(System.Xml.XmlNode)">
             <summary>
@@ -1691,18 +1682,23 @@
             Represents a skipped test result.
             </summary>
         </member>
-        <member name="M:Xunit.Sdk.SkipResult.#ctor(System.Reflection.MethodInfo)">
+        <member name="M:Xunit.Sdk.SkipResult.#ctor(System.Reflection.MethodInfo,System.String)">
             <summary>
-            Creates a new instance of the <see cref="T:Xunit.Sdk.SkipResult"/> class.
+            Creates a new instance of the <see cref="T:Xunit.Sdk.SkipResult"/> class. Uses reflection to discover
+            the skip reason.
             </summary>
             <param name="method">The method under test</param>
+            <param name="displayName">The display name for the test. If null, the fully qualified
+            type name is used.</param>
         </member>
-        <member name="M:Xunit.Sdk.SkipResult.#ctor(System.String,System.String,System.Collections.Generic.Dictionary{System.String,System.String},System.String)">
+        <member name="M:Xunit.Sdk.SkipResult.#ctor(System.String,System.String,System.String,System.Collections.Generic.Dictionary{System.String,System.String},System.String)">
             <summary>
             Creates a new instance of the <see cref="T:Xunit.Sdk.SkipResult"/> class.
             </summary>
             <param name="methodName">The name of the method under test</param>
             <param name="typeName">The name of the type under test</param>
+            <param name="displayName">The display name for the test. If null, the fully qualified
+            type name is used.</param>
             <param name="traits">The traits attached to the method under test</param>
             <param name="reason">The skip reason</param>
         </member>

@@ -36,38 +36,49 @@
             <returns>Returns the number of tests, if known; returns -1 if not known. May not represent
             an exact count, but should be a best effort guess by the framework.</returns>
         </member>
-        <member name="M:Xunit.ExecutorWrapper.RunAssembly(System.Action{System.Xml.XmlNode})">
+        <member name="M:Xunit.ExecutorWrapper.RunAssembly(System.Predicate{System.Xml.XmlNode})">
             <summary>
             Runs all the tests in an assembly.
             </summary>
             <param name="callback">The callback which is called as each test/class/assembly is
-            finished. Returns XML nodes that are part of the xUnit XML output format.</param>
+            finished, providing XML nodes that are part of the xUnit.net XML output format.
+            Test runs can be cancelled by returning false to the callback. If null, there are
+            no status callbacks (and cancellation isn't possible).</param>
             <returns>Returns the fully-formed assembly node for the assembly that was just run.</returns>
         </member>
-        <member name="M:Xunit.ExecutorWrapper.RunClass(System.String,System.Action{System.Xml.XmlNode})">
+        <member name="M:Xunit.ExecutorWrapper.RunClass(System.String,System.Predicate{System.Xml.XmlNode})">
             <summary>
             Runs all the tests in the given class.
             </summary>
             <param name="type">The type.</param>
-            <param name="callback">The callback.</param>
+            <param name="callback">The callback which is called as each test/class is
+            finished, providing XML nodes that are part of the xUnit.net XML output format.
+            Test runs can be cancelled by returning false to the callback. If null, there are
+            no status callbacks (and cancellation isn't possible).</param>
             <returns>Returns the fully-formed class node for the class that was just run.</returns>
         </member>
-        <member name="M:Xunit.ExecutorWrapper.RunTest(System.String,System.String,System.Action{System.Xml.XmlNode})">
+        <member name="M:Xunit.ExecutorWrapper.RunTest(System.String,System.String,System.Predicate{System.Xml.XmlNode})">
             <summary>
             Runs a single test in a class.
             </summary>
             <param name="type">The type to run.</param>
             <param name="method">The method to run.</param>
-            <param name="callback">The callback.</param>
+            <param name="callback">The callback which is called as each test/class is
+            finished, providing XML nodes that are part of the xUnit.net XML output format.
+            Test runs can be cancelled by returning false to the callback. If null, there are
+            no status callbacks (and cancellation isn't possible).</param>
             <returns>Returns the fully-formed class node for the class of the test that was just run.</returns>
         </member>
-        <member name="M:Xunit.ExecutorWrapper.RunTests(System.String,System.Collections.Generic.List{System.String},System.Action{System.Xml.XmlNode})">
+        <member name="M:Xunit.ExecutorWrapper.RunTests(System.String,System.Collections.Generic.List{System.String},System.Predicate{System.Xml.XmlNode})">
             <summary>
             Runs several tests in a single class.
             </summary>
             <param name="type">The type.</param>
             <param name="methods">The methods to run.</param>
-            <param name="callback">The callback.</param>
+            <param name="callback">The callback which is called as each test/class is
+            finished, providing XML nodes that are part of the xUnit.net XML output format.
+            Test runs can be cancelled by returning false to the callback. If null, there are
+            no status callbacks (and cancellation isn't possible).</param>
             <returns>Returns the fully-formed class node for the class of the tests that were just run.</returns>
         </member>
         <member name="P:Xunit.ExecutorWrapper.AssemblyFilename">
