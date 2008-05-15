@@ -1,10 +1,9 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Linq;
-using System.Text;
-using Moq.Language.Flow;
-using System.Reflection;
 using System.Linq.Expressions;
+using System.Reflection;
+using Moq.Language.Flow;
 
 namespace Moq.Protected
 {

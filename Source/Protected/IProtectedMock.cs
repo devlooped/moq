@@ -1,5 +1,4 @@
-﻿using System;
-using Moq.Language.Flow;
+﻿using Moq.Language.Flow;
 
 namespace Moq.Protected
 {
