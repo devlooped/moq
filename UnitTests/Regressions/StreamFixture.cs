@@ -1,12 +1,5 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
+﻿using System.IO;
 using Xunit;
-using System.Linq.Expressions;
-using System.IO;
-using System.Runtime.Remoting;
-using System.Runtime.Remoting.Proxies;
 
 namespace Moq.Tests
 {

@@ -72,7 +72,7 @@ namespace Moq.Tests
 		public void ShouldRaiseEventWhenExpectationMet()
 		{
 			var mock = new Mock<IAdder<string>>();
-			
+
 			var handler = mock.CreateEventHandler();
 			var raised = false;
 			handler.Raised += delegate { raised = true; };
@@ -200,7 +200,7 @@ namespace Moq.Tests
 			handler.Raised += (sender, args) => raised = true;
 
 			mock.Object.Added += (sender, args) =>
-			{ 
+			{
 				Assert.True(args is FooArgs);
 				Assert.Equal("foo", ((FooArgs)args).Value);
 			};
@@ -294,7 +294,13 @@ namespace Moq.Tests
 			Assert.True(raised);
 		}
 
-
+		[Fact]
+		public void ShouldAttachToInheritedEvent()
+		{
+			var bar = new Mock<IDerived>(MockBehavior.Strict);
+			bar.Object.Event += (o, e) => { ;}; // Exception Fired here
+		}
+	
 		public interface IAdder<T>
 		{
 			event EventHandler Added;
@@ -329,5 +335,12 @@ namespace Moq.Tests
 			event EventHandler<FooArgs> FooSelected;
 			event EventHandler Canceled;
 		}
+
+		public interface IParent
+		{
+			event EventHandler<EventArgs> Event;
+		}
+
+		public interface IDerived : IParent { }
 	}
 }

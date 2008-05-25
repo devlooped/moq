@@ -1,11 +1,6 @@
 ﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using Xunit;
 using Moq.Protected;
-using System.Linq.Expressions;
-using System.ComponentModel;
+using Xunit;
 
 namespace Moq.Tests
 {
