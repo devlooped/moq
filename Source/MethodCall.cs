@@ -61,7 +61,7 @@ namespace Moq
 
 		public ICallbackResult Callback(Action callback)
 		{
-			this.callback = delegate { callback(); };
+			SetCallbackWithoutArguments(callback);
 			return this;
 		}
 
@@ -89,7 +89,12 @@ namespace Moq
 			return this;
 		}
 
-		protected void SetCallbackWithArguments(Delegate callback)
+		protected virtual void SetCallbackWithoutArguments(Action callback)
+		{
+			this.callback = delegate { callback(); };
+		}
+
+		protected virtual void SetCallbackWithArguments(Delegate callback)
 		{
 			this.callback = delegate(object[] args) { callback.InvokePreserveStack(args); };
 		}

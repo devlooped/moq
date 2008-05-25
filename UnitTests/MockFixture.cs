@@ -975,6 +975,34 @@ namespace Moq.Tests
 			Assert.Throws<ArgumentException>(() => mock.ExpectSet(m => m.Foo));
 		}
 
+		[Fact]
+		public void ShouldInvokeCallbackAfterReturnsCall()
+		{
+			var mock = new Mock<IFoo>();
+			bool returnsCalled = false;
+
+			mock.Expect(foo => foo.DoReturnInt())
+				.Callback(() => Assert.False(returnsCalled))
+				.Returns(() => { returnsCalled = true; return 5; })
+				.Callback(() => Assert.True(returnsCalled));
+
+			mock.Object.DoReturnInt();
+		}
+
+		[Fact]
+		public void ShouldInvokeCallbackAfterReturnsCallWithArg()
+		{
+			var mock = new Mock<IFoo>();
+			bool returnsCalled = false;
+
+			mock.Expect(foo => foo.DoStringArgReturnInt(It.IsAny<string>()))
+				.Callback<string>(s => Assert.False(returnsCalled))
+				.Returns(() => { returnsCalled = true; return 5; })
+				.Callback<string>(s => Assert.True(returnsCalled));
+
+			mock.Object.DoStringArgReturnInt("foo");
+		}
+
 		// ShouldCallVirtualImplementationIfNoMatch
 		// ShouldCallVirtualImplementationIfNoMatchMBRO
 

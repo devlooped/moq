@@ -25,6 +25,7 @@ namespace Moq
 	internal class MethodCallReturn<TResult> : MethodCallReturn, IProxyCall, IExpect<TResult>, IExpectGetter<TResult>, IReturnsResult
 	{
 		Delegate valueDel = (Func<TResult>)(() => (TResult)new DefaultValue(typeof(TResult)).Value);
+		Action<object[]> afterReturnCallback;
 
 		public MethodCallReturn(Expression originalExpression, MethodInfo method, params Expression[] arguments)
 			: base(originalExpression, method, arguments)
@@ -112,6 +113,22 @@ namespace Moq
 				this.valueDel = valueDel;
 
 			HasReturnValue = true;
+		}
+
+		protected override void SetCallbackWithoutArguments(Action callback)
+		{
+			if (HasReturnValue)
+				this.afterReturnCallback = delegate { callback(); };
+			else
+				base.SetCallbackWithoutArguments(callback);
+		}
+
+		protected override void SetCallbackWithArguments(Delegate callback)
+		{
+			if (HasReturnValue)
+				this.afterReturnCallback = delegate(object[] args) { callback.InvokePreserveStack(args); };
+			else
+				base.SetCallbackWithArguments(callback);
 		}
 
 		public override void Execute(IInvocation call)
