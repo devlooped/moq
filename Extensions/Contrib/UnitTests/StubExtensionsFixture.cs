@@ -7,9 +7,8 @@ using System.Linq.Expressions;
 
 namespace Moq.Tests
 {
-	public class StubFixture
+	public class StubExtensionsFixture
 	{
-
 		[Fact]
 		public void ShouldExpectPropertyGetterAndSetterWithSameExpression()
 		{
@@ -39,22 +38,4 @@ namespace Moq.Tests
 	{
 		int ValueProperty { get; set; }
 	}
-
-	public static class PropertyStub
-	{
-		public static void Stub<T, TProperty>(this Mock<T> mock, Expression<Func<T, TProperty>> property)
-			 where T : class
-		{
-			mock.Stub(property, default(TProperty));
-		}
-
-		public static void Stub<T, TProperty>(this Mock<T> mock, Expression<Func<T, TProperty>> property, TProperty defaultValue)
-			 where T : class
-		{
-			TProperty value = defaultValue;
-			mock.ExpectGet(property).Returns(() => value);
-			mock.ExpectSet(property).Callback(p => value = p);
-		}
-	}
-
 }

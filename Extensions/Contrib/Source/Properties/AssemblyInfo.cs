@@ -1,35 +1,22 @@
 ﻿using System.Reflection;
-using System.Runtime.InteropServices;
+using System.Runtime.CompilerServices;
 
-// General Information about an assembly is controlled through the following 
-// set of attributes. Change these attribute values to modify the information
-// associated with an assembly.
-[assembly: AssemblyTitle("Source")]
-[assembly: AssemblyDescription("")]
-[assembly: AssemblyConfiguration("")]
-[assembly: AssemblyCompany("")]
-[assembly: AssemblyProduct("Source")]
-[assembly: AssemblyCopyright("Copyright ©  2008")]
+[assembly: AssemblyTitle("MoQ Contrib")]
+[assembly: AssemblyDescription("Community contributions to MoQ")]
+[assembly: AssemblyProduct("MoQ Contrib")]
 [assembly: AssemblyTrademark("")]
 [assembly: AssemblyCulture("")]
+[assembly: AssemblyVersion("2.5.*")]
+[assembly: AssemblyFileVersion("2.5.0.0")]
 
-// Setting ComVisible to false makes the types in this assembly not visible 
-// to COM components.  If you need to access a type in this assembly from 
-// COM, set the ComVisible attribute to true on that type.
-[assembly: ComVisible(false)]
+[assembly: InternalsVisibleTo("Moq.Contrib.Tests, PublicKey=00240000048000009400000006020000002400005253413100040000010001009f7a95086500f8f66d892174803850fed9c22225c2ccfff21f39c8af8abfa5415b1664efd0d8e0a6f7f2513b1c11659bd84723dc7900c3d481b833a73a2bcf1ed94c16c4be64d54352c86956c89930444e9ac15124d3693e3f029818e8410f167399d6b995324b635e95353ba97bfab856abbaeb9b40c9b160070c6325e22ddc")]
 
-// The following GUID is for the ID of the typelib if this project is exposed to COM
-[assembly: Guid("1d9a574a-9a91-40e6-aa6d-56ce61d10378")]
-
-// Version information for an assembly consists of the following four values:
-//
-//      Major Version
-//      Minor Version 
-//      Build Number
-//      Revision
-//
-// You can specify all the values or you can default the Build and Revision Numbers 
-// by using the '*' as shown below:
-// [assembly: AssemblyVersion("1.0.*")]
-[assembly: AssemblyVersion("1.0.0.0")]
-[assembly: AssemblyFileVersion("1.0.0.0")]
+/// <group name="overview" title="Overview" order="0" />
+/// <group name="expectations" title="Setting expectations" order="1" />
+/// <group name="returns" title="Returning values from members" order="2" />
+/// <group name="verification" title="Verifying expectations" order="3" />
+/// <group name="advanced" title="Advanced scenarios" order="99" />
+/// <group name="factory" title="Using MockFactory for consistency across mocks" order="4" />
+internal static class ThisAssembly
+{
+}
