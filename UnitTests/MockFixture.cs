@@ -1003,6 +1003,111 @@ namespace Moq.Tests
 			mock.Object.DoStringArgReturnInt("foo");
 		}
 
+		[Fact]
+		public void ShouldThrowIfVerifyVoidMethodWithExpressionFails()
+		{
+			var mock = new Mock<IFoo>();
+
+			try
+			{
+				mock.Verify(f => f.Execute());
+				Assert.True(false, "Should have thrown");
+			}
+			catch (MockException mex)
+			{
+				Assert.Equal(MockException.ExceptionReason.VerificationFailed, mex.Reason);
+			}
+		}
+
+		[Fact]
+		public void ShouldVerifyVoidMethodWithExpression()
+		{
+			var mock = new Mock<IFoo>();
+
+			mock.Object.Execute();
+
+			mock.Verify(f => f.Execute());
+		}
+
+		[Fact]
+		public void ShouldThrowIfVerifyReturningMethodWithExpressionFails()
+		{
+			var mock = new Mock<IFoo>();
+
+			try
+			{
+				mock.Verify(f => f.Execute("ping"));
+				Assert.True(false, "Should have thrown");
+			}
+			catch (MockException mex)
+			{
+				Assert.Equal(MockException.ExceptionReason.VerificationFailed, mex.Reason);
+			}
+		}
+
+		[Fact]
+		public void ShouldVerifyReturningMethodWithExpression()
+		{
+			var mock = new Mock<IFoo>();
+
+			mock.Object.Execute("ping");
+
+			mock.Verify(f => f.Execute("ping"));
+		}
+
+		[Fact]
+		public void ShouldVerifyPropertyGetWithExpression()
+		{
+			var mock = new Mock<IFoo>();
+
+			var v = mock.Object.ValueProperty;
+
+			mock.VerifyGet(f => f.ValueProperty);
+		}
+
+		[Fact]
+		public void ShouldThrowIfVerifyPropertyGetWithExpressionFails()
+		{
+			var mock = new Mock<IFoo>();
+
+			try
+			{
+				mock.VerifyGet(f => f.ValueProperty);
+				Assert.True(false, "Should have thrown");
+			}
+			catch (MockException mex)
+			{
+				Assert.Equal(MockException.ExceptionReason.VerificationFailed, mex.Reason);
+			}
+		}
+
+		[Fact]
+		public void ShouldVerifyPropertySetWithExpression()
+		{
+			var mock = new Mock<IFoo>();
+
+			mock.Object.ValueProperty = 5;
+
+			mock.VerifySet(f => f.ValueProperty);
+		}
+
+		[Fact]
+		public void ShouldThrowIfVerifyPropertySetWithExpressionFails()
+		{
+			var mock = new Mock<IFoo>();
+
+			try
+			{
+				mock.VerifySet(f => f.ValueProperty);
+				Assert.True(false, "Should have thrown");
+			}
+			catch (MockException mex)
+			{
+				Assert.Equal(MockException.ExceptionReason.VerificationFailed, mex.Reason);
+			}
+		}
+
+
 		// ShouldCallVirtualImplementationIfNoMatch
 		// ShouldCallVirtualImplementationIfNoMatchMBRO
 

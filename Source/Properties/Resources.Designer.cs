@@ -200,6 +200,15 @@ namespace Moq.Properties {
         }
         
         /// <summary>
+        ///   Looks up a localized string similar to The given invocation was not performed on the mock..
+        /// </summary>
+        internal static string NoMatchingCall {
+            get {
+                return ResourceManager.GetString("NoMatchingCall", resourceCulture);
+            }
+        }
+        
+        /// <summary>
         ///   Looks up a localized string similar to Object instance was not created by Moq..
         /// </summary>
         internal static string ObjectInstanceNotMock {

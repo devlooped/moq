@@ -201,24 +201,9 @@ namespace Moq
 		/// </example>
 		public IExpect Expect(Expression<Action<T>> expression)
 		{
-			Guard.ArgumentNotNull(expression, "expression");
-			LambdaExpression lambda = GetLambda(expression);
-
-			var methodCall = lambda.Body as MethodCallExpression;
-
 			MethodInfo method;
-			Expression[] args = new Expression[0];
-
-			if (methodCall != null)
-			{
-				method = methodCall.Method;
-				args = methodCall.Arguments.ToArray();
-			}
-			else
-			{
-				throw new MockException(MockException.ExceptionReason.ExpectedMethod,
-					String.Format(Properties.Resources.ExpressionNotMethod, expression.ToStringFixed()));
-			}
+			Expression[] args;
+			GetMethodArguments(expression, out method, out args);
 
 			ThrowIfCantOverride(expression, method);
 			var call = new MethodCall(expression, method, args);
@@ -244,32 +229,9 @@ namespace Moq
 		/// </example>
 		public IExpect<TResult> Expect<TResult>(Expression<Func<T, TResult>> expression)
 		{
-			Guard.ArgumentNotNull(expression, "expression");
-			LambdaExpression lambda = GetLambda(expression);
-
-			var methodCall = lambda.Body as MethodCallExpression;
-			var memberExpr = lambda.Body as MemberExpression;
-
 			MethodInfo method;
-			Expression[] args = new Expression[0];
-
-			if (methodCall != null)
-			{
-				method = methodCall.Method;
-				args = methodCall.Arguments.ToArray();
-			}
-			else if (memberExpr != null && memberExpr.Member is PropertyInfo)
-			{
-				var prop = (PropertyInfo)memberExpr.Member;
-				ThrowIfPropertyNotReadable(prop);
-
-				method = prop.GetGetMethod(true);
-			}
-			else
-			{
-				throw new MockException(MockException.ExceptionReason.ExpectedMethodOrProperty,
-					String.Format(Properties.Resources.ExpressionNotMethodOrProperty, expression.ToStringFixed()));
-			}
+			Expression[] args;
+			GetMethodOrPropertyArguments<TResult>(expression, out method, out args);
 
 			ThrowIfCantOverride(expression, method);
 			var call = new MethodCallReturn<TResult>(expression, method, args);
@@ -338,21 +300,7 @@ namespace Moq
 		/// </example>
 		public IExpectSetter<TProperty> ExpectSet<TProperty>(Expression<Func<T, TProperty>> expression)
 		{
-			Guard.ArgumentNotNull(expression, "expression");
-			LambdaExpression lambda = GetLambda(expression);
-
-			ThrowIfNotProperty(lambda.Body);
-			var prop = (PropertyInfo)((MemberExpression)lambda.Body).Member;
-
-			if (!prop.CanWrite)
-			{
-				throw new ArgumentException(String.Format(
-					Properties.Resources.PropertyNotWritable,
-					prop.DeclaringType.Name,
-					prop.Name), "expression");
-			}
-
-			var propSet = prop.GetSetMethod(true);
+			var propSet = GetProperySetter(expression);
 			ThrowIfCantOverride(expression, propSet);
 			var call = new MethodCall<TProperty>(expression, propSet, new Expression[0]);
 			interceptor.AddCall(call, ExpectKind.PropertySet);
@@ -361,27 +309,121 @@ namespace Moq
 		}
 
 		/// <summary>
-		/// Verifies that all verifiable expectations have been met.
+		/// Verifies that a specific invocation matching the given 
+		/// expression was performed on the mock. Use in conjuntion 
+		/// with the default <see cref="MockBehavior.Loose"/>.
 		/// </summary>
 		/// <example group="verification">
-		/// This example sets up an expectation and marks it as verifiable. After 
-		/// the mock is used, a <see cref="Verify()"/> call is issued on the mock 
-		/// to ensure the method in the expectation was invoked:
+		/// This example assumes that the mock has been used, 
+		/// and later we want to verify that a given invocation 
+		/// with specific parameters was performed:
 		/// <code>
-		/// var mock = new Mock&lt;IWarehouse&gt;();
-		/// mock.Expect(x =&gt; x.HasInventory(TALISKER, 50)).Verifiable().Returns(true);
-		/// ...
-		/// // other test code
-		/// ...
-		/// // Will throw if the test code has didn't call HasInventory.
-		/// mock.Verify();
+		/// var mock = new Mock&lt;IProcessor&gt;();
+		/// // exercise mock
+		/// //...
+		/// // Will throw if the test code didn't call Execute with a "ping" string argument.
+		/// mock.Verify(proc =&gt; proc.Execute("ping"));
 		/// </code>
 		/// </example>
-		/// <exception cref="MockException">Not all verifiable expectations were met.</exception>
+		/// <exception cref="MockException">The invocation was not performed on the mock.</exception>
 		public virtual void Verify(Expression<Action<T>> expression)
 		{
+			MethodInfo method;
+			Expression[] args;
+			GetMethodArguments(expression, out method, out args);
 
+			var expected = new MethodCall(expression, method, args);
+			var actual = interceptor.ActualCalls.FirstOrDefault(i => expected.Matches(i));
+
+			if (actual == null)
+				throw new MockException(MockException.ExceptionReason.VerificationFailed,
+					Properties.Resources.NoMatchingCall);
 		}
+
+		/// <summary>
+		/// Verifies that a specific invocation matching the given 
+		/// expression was performed on the mock. Use in conjuntion 
+		/// with the default <see cref="MockBehavior.Loose"/>.
+		/// </summary>
+		/// <example group="verification">
+		/// This example assumes that the mock has been used, 
+		/// and later we want to verify that a given invocation 
+		/// with specific parameters was performed:
+		/// <code>
+		/// var mock = new Mock&lt;IWarehouse&gt;();
+		/// // exercise mock
+		/// //...
+		/// // Will throw if the test code didn't call HasInventory.
+		/// mock.Verify(warehouse =&gt; warehouse.HasInventory(TALISKER, 50));
+		/// </code>
+		/// </example>
+		/// <exception cref="MockException">The invocation was not performed on the mock.</exception>
+		public virtual void Verify<TResult>(Expression<Func<T, TResult>> expression)
+		{
+			MethodInfo method;
+			Expression[] args;
+			GetMethodOrPropertyArguments<TResult>(expression, out method, out args);
+
+			var expected = new MethodCallReturn<TResult>(expression, method, args);
+			var actual = interceptor.ActualCalls.FirstOrDefault(i => expected.Matches(i));
+
+			if (actual == null)
+				throw new MockException(MockException.ExceptionReason.VerificationFailed,
+					Properties.Resources.NoMatchingCall);
+		}
+
+		/// <summary>
+		/// Verifies that a property was read on the mock. 
+		/// Use in conjuntion with the default <see cref="MockBehavior.Loose"/>.
+		/// </summary>
+		/// <example group="verification">
+		/// This example assumes that the mock has been used, 
+		/// and later we want to verify that a given property 
+		/// was retrieved from it:
+		/// <code>
+		/// var mock = new Mock&lt;IWarehouse&gt;();
+		/// // exercise mock
+		/// //...
+		/// // Will throw if the test code didn't retrieve the IsClosed property.
+		/// mock.VerifyGet(warehouse =&gt; warehouse.IsClosed);
+		/// </code>
+		/// </example>
+		/// <exception cref="MockException">The invocation was not performed on the mock.</exception>
+		public virtual void VerifyGet<TProperty>(Expression<Func<T, TProperty>> expression)
+		{
+			// Just for consistency with the Expect/ExpectGet pair.
+			Verify(expression);
+		}
+
+		/// <summary>
+		/// Verifies that a property has been set on the mock. 
+		/// Use in conjuntion with the default <see cref="MockBehavior.Loose"/>.
+		/// </summary>
+		/// <example group="verification">
+		/// This example assumes that the mock has been used, 
+		/// and later we want to verify that a given invocation 
+		/// with specific parameters was performed:
+		/// <code>
+		/// var mock = new Mock&lt;IWarehouse&gt;();
+		/// // exercise mock
+		/// //...
+		/// // Will throw if the test code didn't set the IsClosed property.
+		/// mock.VerifySet(warehouse =&gt; warehouse.IsClosed);
+		/// </code>
+		/// </example>
+		/// <exception cref="MockException">The invocation was not performed on the mock.</exception>
+		public virtual void VerifySet<TProperty>(Expression<Func<T, TProperty>> expression)
+		{
+			var propSet = GetProperySetter(expression);
+			var expected = new MethodCall<TProperty>(expression, propSet, new Expression[0]);
+
+			var actual = interceptor.ActualCalls.FirstOrDefault(i => expected.Matches(i));
+
+			if (actual == null)
+				throw new MockException(MockException.ExceptionReason.VerificationFailed,
+					Properties.Resources.NoMatchingCall);
+		}
+
 
 		/// <summary>
 		/// Verifies that all verifiable expectations have been met.
@@ -462,6 +504,73 @@ namespace Moq
 			if (convert != null && convert.NodeType == ExpressionType.Convert)
 				lambda = Expression.Lambda(convert.Operand, lambda.Parameters.ToArray());
 			return lambda;
+		}
+
+		private static void GetMethodArguments(Expression<Action<T>> expression, out MethodInfo method, out Expression[] args)
+		{
+			Guard.ArgumentNotNull(expression, "expression");
+			LambdaExpression lambda = GetLambda(expression);
+
+			var methodCall = lambda.Body as MethodCallExpression;
+			args = new Expression[0];
+
+			if (methodCall != null)
+			{
+				method = methodCall.Method;
+				args = methodCall.Arguments.ToArray();
+			}
+			else
+			{
+				throw new MockException(MockException.ExceptionReason.ExpectedMethod,
+					String.Format(Properties.Resources.ExpressionNotMethod, expression.ToStringFixed()));
+			}
+		}
+
+		private static void GetMethodOrPropertyArguments<TResult>(Expression<Func<T, TResult>> expression, out MethodInfo method, out Expression[] args)
+		{
+			Guard.ArgumentNotNull(expression, "expression");
+			LambdaExpression lambda = GetLambda(expression);
+
+			var methodCall = lambda.Body as MethodCallExpression;
+			var memberExpr = lambda.Body as MemberExpression;
+
+			if (methodCall != null)
+			{
+				method = methodCall.Method;
+				args = methodCall.Arguments.ToArray();
+			}
+			else if (memberExpr != null && memberExpr.Member is PropertyInfo)
+			{
+				var prop = (PropertyInfo)memberExpr.Member;
+				ThrowIfPropertyNotReadable(prop);
+
+				method = prop.GetGetMethod(true);
+				args = new Expression[0];
+			}
+			else
+			{
+				throw new MockException(MockException.ExceptionReason.ExpectedMethodOrProperty,
+					String.Format(Properties.Resources.ExpressionNotMethodOrProperty, expression.ToStringFixed()));
+			}
+		}
+
+		private static MethodInfo GetProperySetter<TProperty>(Expression<Func<T, TProperty>> expression)
+		{
+			Guard.ArgumentNotNull(expression, "expression");
+			LambdaExpression lambda = GetLambda(expression);
+
+			ThrowIfNotProperty(lambda.Body);
+			var prop = (PropertyInfo)((MemberExpression)lambda.Body).Member;
+
+			if (!prop.CanWrite)
+			{
+				throw new ArgumentException(String.Format(
+					Properties.Resources.PropertyNotWritable,
+					prop.DeclaringType.Name,
+					prop.Name), "expression");
+			}
+
+			return prop.GetSetMethod(true);
 		}
 
 		private bool IsPropertyIndexer(Expression expression)

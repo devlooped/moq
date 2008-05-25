@@ -207,4 +207,7 @@ mock.ExpectSet(x =&gt; x.{1}).Callback(callbackDelegate);</value>
   <data name="ExpressionNotMethod" xml:space="preserve">
     <value>Expression is not a method invocation: {0}</value>
   </data>
+  <data name="NoMatchingCall" xml:space="preserve">
+    <value>The given invocation was not performed on the mock.</value>
+  </data>
 </root>

@@ -26,6 +26,8 @@ namespace Moq
 			this.mock = mock;
 		}
 
+		internal IEnumerable<IInvocation> ActualCalls { get { return actualInvocations; } }
+
 		internal void Verify()
 		{
 			VerifyOrThrow(call => call.IsVerifiable && !call.Invoked);
@@ -96,9 +98,7 @@ namespace Moq
 			// always save to support Verify[expression] pattern.
 			actualInvocations.Add(invocation);
 
-			var call = (from c in calls.Values
-							where c.Matches(invocation)
-							select c).FirstOrDefault();
+			var call = calls.Values.FirstOrDefault(c => c.Matches(invocation));
 
 			if (call == null)
 			{
