@@ -22,7 +22,7 @@ namespace Moq
 		public bool HasReturnValue { get; protected set; }
 	}
 
-	internal class MethodCallReturn<TResult> : MethodCallReturn, IProxyCall, IExpect<TResult>, IExpectGetter<TResult>
+	internal class MethodCallReturn<TResult> : MethodCallReturn, IProxyCall, IExpect<TResult>, IExpectGetter<TResult>, IReturnsResult
 	{
 		Delegate valueDel = (Func<TResult>)(() => (TResult)new DefaultValue(typeof(TResult)).Value);
 
@@ -32,37 +32,37 @@ namespace Moq
 			HasReturnValue = false;
 		}
 
-		public IOnceVerifiesRaise Returns(Func<TResult> valueExpression)
+		public IReturnsResult Returns(Func<TResult> valueExpression)
 		{
 			SetReturnDelegate(valueExpression);
 			return this;
 		}
 
-		public IOnceVerifiesRaise Returns(TResult value)
+		public IReturnsResult Returns(TResult value)
 		{
 			Returns(() => value);
 			return this;
 		}
 
-		public IOnceVerifiesRaise Returns<T>(Func<T, TResult> valueExpression)
+		public IReturnsResult Returns<T>(Func<T, TResult> valueExpression)
 		{
 			SetReturnDelegate(valueExpression);
 			return this;
 		}
 
-		public IOnceVerifiesRaise Returns<T1, T2>(Func<T1, T2, TResult> valueExpression)
+		public IReturnsResult Returns<T1, T2>(Func<T1, T2, TResult> valueExpression)
 		{
 			SetReturnDelegate(valueExpression);
 			return this;
 		}
 
-		public IOnceVerifiesRaise Returns<T1, T2, T3>(Func<T1, T2, T3, TResult> valueExpression)
+		public IReturnsResult Returns<T1, T2, T3>(Func<T1, T2, T3, TResult> valueExpression)
 		{
 			SetReturnDelegate(valueExpression);
 			return this;
 		}
 
-		public IOnceVerifiesRaise Returns<T1, T2, T3, T4>(Func<T1, T2, T3, T4, TResult> valueExpression)
+		public IReturnsResult Returns<T1, T2, T3, T4>(Func<T1, T2, T3, T4, TResult> valueExpression)
 		{
 			SetReturnDelegate(valueExpression);
 			return this;

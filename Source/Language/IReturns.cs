@@ -29,7 +29,7 @@ namespace Moq.Language
 		///     .Returns(true);
 		/// </code>
 		/// </example>
-		IOnceVerifiesRaise Returns(TProperty value);
+		IReturnsResult Returns(TProperty value);
 		/// <summary>
 		/// Specifies a function that will calculate the value to return from the method.
 		/// </summary>
@@ -45,7 +45,7 @@ namespace Moq.Language
 		/// is executed and the value the <c>returnValues</c> array has at 
 		/// that moment.
 		/// </example>
-		IOnceVerifiesRaise Returns(Func<TProperty> valueFunction);
+		IReturnsResult Returns(Func<TProperty> valueFunction);
 		/// <summary>
 		/// Specifies a function that will calculate the value to return from the method, 
 		/// retrieving the arguments for the invocation.
@@ -65,7 +65,7 @@ namespace Moq.Language
 		///     .Returns((string command) => returnValues[command]);
 		/// </code>
 		/// </example>
-		IOnceVerifiesRaise Returns<T>(Func<T, TProperty> valueFunction);
+		IReturnsResult Returns<T>(Func<T, TProperty> valueFunction);
 		/// <summary>
 		/// Specifies a function that will calculate the value to return from the method, 
 		/// retrieving the arguments for the invocation.
@@ -87,7 +87,7 @@ namespace Moq.Language
 		///     .Returns((string arg1, string arg2) => arg1 + arg2);
 		/// </code>
 		/// </example>
-		IOnceVerifiesRaise Returns<T1, T2>(Func<T1, T2, TProperty> valueFunction);
+		IReturnsResult Returns<T1, T2>(Func<T1, T2, TProperty> valueFunction);
 		/// <summary>
 		/// Specifies a function that will calculate the value to return from the method, 
 		/// retrieving the arguments for the invocation.
@@ -111,7 +111,7 @@ namespace Moq.Language
 		///     .Returns((string arg1, string arg2, int arg3) => arg1 + arg2 + arg3);
 		/// </code>
 		/// </example>
-		IOnceVerifiesRaise Returns<T1, T2, T3>(Func<T1, T2, T3, TProperty> valueFunction);
+		IReturnsResult Returns<T1, T2, T3>(Func<T1, T2, T3, TProperty> valueFunction);
 		/// <summary>
 		/// Specifies a function that will calculate the value to return from the method, 
 		/// retrieving the arguments for the invocation.
@@ -137,6 +137,6 @@ namespace Moq.Language
 		///     .Returns((string arg1, string arg2, int arg3, bool arg4) => arg1 + arg2 + arg3 + arg4);
 		/// </code>
 		/// </example>
-		IOnceVerifiesRaise Returns<T1, T2, T3, T4>(Func<T1, T2, T3, T4, TProperty> valueFunction);
+		IReturnsResult Returns<T1, T2, T3, T4>(Func<T1, T2, T3, T4, TProperty> valueFunction);
 	}
 }

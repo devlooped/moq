@@ -23,6 +23,6 @@ namespace Moq.Language
 		///     .Callback((bool state) => Console.WriteLine(state));
 		/// </code>
 		/// </example>
-		IThrowsOnceVerifiesRaise Callback(Action<TProperty> callback);
+		ICallbackResult Callback(Action<TProperty> callback);
 	}
 }

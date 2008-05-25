@@ -23,7 +23,7 @@ namespace Moq
 			return call.Method == method;
 		}
 
-		public IThrowsOnceVerifiesRaise Callback(Action<TProperty> callback)
+		public ICallbackResult Callback(Action<TProperty> callback)
 		{
 			SetCallbackWithArguments(callback);
 			return this;
@@ -53,37 +53,37 @@ namespace Moq
 		public bool Invoked { get; set; }
 		public Expression ExpectExpression { get { return originalExpression; } }
 
-		public IOnceVerifiesRaise Throws(Exception exception)
+		public IThrowsResult Throws(Exception exception)
 		{
 			this.exception = exception;
 			return this;
 		}
 
-		public IThrowsOnceVerifiesRaise Callback(Action callback)
+		public ICallbackResult Callback(Action callback)
 		{
 			this.callback = delegate { callback(); };
 			return this;
 		}
 
-		public IThrowsOnceVerifiesRaise Callback<T>(Action<T> callback)
+		public ICallbackResult Callback<T>(Action<T> callback)
 		{
 			SetCallbackWithArguments(callback);
 			return this;
 		}
 
-		public IThrowsOnceVerifiesRaise Callback<T1, T2>(Action<T1, T2> callback)
+		public ICallbackResult Callback<T1, T2>(Action<T1, T2> callback)
 		{
 			SetCallbackWithArguments(callback);
 			return this;
 		}
 
-		public IThrowsOnceVerifiesRaise Callback<T1, T2, T3>(Action<T1, T2, T3> callback)
+		public ICallbackResult Callback<T1, T2, T3>(Action<T1, T2, T3> callback)
 		{
 			SetCallbackWithArguments(callback);
 			return this;
 		}
 
-		public IThrowsOnceVerifiesRaise Callback<T1, T2, T3, T4>(Action<T1, T2, T3, T4> callback)
+		public ICallbackResult Callback<T1, T2, T3, T4>(Action<T1, T2, T3, T4> callback)
 		{
 			SetCallbackWithArguments(callback);
 			return this;

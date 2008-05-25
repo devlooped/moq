@@ -21,7 +21,7 @@ namespace Moq.Language
 		///     .Returns(true);
 		/// </code>
 		/// </example>
-		IOnceVerifiesRaise Returns(TProperty value);
+		IReturnsResult Returns(TProperty value);
 		/// <summary>
 		/// Specifies a function that will calculate the value to return for the property.
 		/// </summary>
@@ -37,6 +37,6 @@ namespace Moq.Language
 		/// is retrieved and the value the <c>returnValues</c> array has at 
 		/// that moment.
 		/// </example>
-		IOnceVerifiesRaise Returns(Func<TProperty> valueFunction);
+		IReturnsResult Returns(Func<TProperty> valueFunction);
 	}
 }
