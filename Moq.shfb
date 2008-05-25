@@ -1,5 +1,6 @@
 ﻿<project schemaVersion="1.6.0.2">
     <assemblies>
+        <assembly assemblyPath=".\Extensions\Contrib\Source\bin\Release\Moq.Contrib.dll" xmlCommentsPath=".\Extensions\Contrib\Source\bin\Release\Moq.Contrib.xml" commentsOnly="False" />
         <assembly assemblyPath=".\Source\bin\Release\Moq.dll" xmlCommentsPath=".\Source\bin\Release\Moq.xml" commentsOnly="False" />
     </assemblies>
     <namespaceSummaries>
