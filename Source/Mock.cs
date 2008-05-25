@@ -201,10 +201,30 @@ namespace Moq
 		/// </example>
 		public IExpect Expect(Expression<Action<T>> expression)
 		{
-			return (IExpect)ExpectImpl(
-				expression,
-				ExpectKind.MethodOrPropertyGet,
-				(original, method, args) => new MethodCall(original, method, args));
+			Guard.ArgumentNotNull(expression, "expression");
+			LambdaExpression lambda = GetLambda(expression);
+
+			var methodCall = lambda.Body as MethodCallExpression;
+
+			MethodInfo method;
+			Expression[] args = new Expression[0];
+
+			if (methodCall != null)
+			{
+				method = methodCall.Method;
+				args = methodCall.Arguments.ToArray();
+			}
+			else
+			{
+				throw new MockException(MockException.ExceptionReason.ExpectedMethod,
+					String.Format(Properties.Resources.ExpressionNotMethod, expression.ToStringFixed()));
+			}
+
+			ThrowIfCantOverride(expression, method);
+			var call = new MethodCall(expression, method, args);
+			interceptor.AddCall(call, ExpectKind.Other);
+
+			return call;
 		}
 
 		/// <summary>
@@ -224,10 +244,38 @@ namespace Moq
 		/// </example>
 		public IExpect<TResult> Expect<TResult>(Expression<Func<T, TResult>> expression)
 		{
-			return (IExpect<TResult>)ExpectImpl(
-				expression,
-				ExpectKind.MethodOrPropertyGet,
-				(original, method, args) => new MethodCallReturn<TResult>(original, method, args));
+			Guard.ArgumentNotNull(expression, "expression");
+			LambdaExpression lambda = GetLambda(expression);
+
+			var methodCall = lambda.Body as MethodCallExpression;
+			var memberExpr = lambda.Body as MemberExpression;
+
+			MethodInfo method;
+			Expression[] args = new Expression[0];
+
+			if (methodCall != null)
+			{
+				method = methodCall.Method;
+				args = methodCall.Arguments.ToArray();
+			}
+			else if (memberExpr != null && memberExpr.Member is PropertyInfo)
+			{
+				var prop = (PropertyInfo)memberExpr.Member;
+				ThrowIfPropertyNotReadable(prop);
+
+				method = prop.GetGetMethod(true);
+			}
+			else
+			{
+				throw new MockException(MockException.ExceptionReason.ExpectedMethodOrProperty,
+					String.Format(Properties.Resources.ExpressionNotMethodOrProperty, expression.ToStringFixed()));
+			}
+
+			ThrowIfCantOverride(expression, method);
+			var call = new MethodCallReturn<TResult>(expression, method, args);
+			interceptor.AddCall(call, ExpectKind.Other);
+
+			return call;
 		}
 
 		/// <summary>
@@ -248,10 +296,29 @@ namespace Moq
 		/// </example>
 		public IExpectGetter<TProperty> ExpectGet<TProperty>(Expression<Func<T, TProperty>> expression)
 		{
-			return (IExpectGetter<TProperty>)ExpectImpl(
-				expression,
-				ExpectKind.PropertyGet,
-				(original, method, args) => new MethodCallReturn<TProperty>(original, method, args));
+			Guard.ArgumentNotNull(expression, "expression");
+			LambdaExpression lambda = GetLambda(expression);
+
+			if (IsPropertyIndexer(lambda.Body))
+			{
+				// Treat indexers as regular method invocations.
+				return (IExpectGetter<TProperty>)Expect(expression);
+			}
+			else
+			{
+				ThrowIfNotProperty(lambda.Body);
+				var prop = (PropertyInfo)((MemberExpression)lambda.Body).Member;
+
+				ThrowIfPropertyNotReadable(prop);
+
+				var propGet = prop.GetGetMethod(true);
+				ThrowIfCantOverride(expression, propGet);
+
+				var call = new MethodCallReturn<TProperty>(expression, propGet, new Expression[0]);
+				interceptor.AddCall(call, ExpectKind.Other);
+
+				return call;
+			}
 		}
 
 		/// <summary>
@@ -271,10 +338,26 @@ namespace Moq
 		/// </example>
 		public IExpectSetter<TProperty> ExpectSet<TProperty>(Expression<Func<T, TProperty>> expression)
 		{
-			return (IExpectSetter<TProperty>)ExpectImpl(
-				expression,
-				ExpectKind.PropertySet,
-				(original, method, args) => new MethodCall<TProperty>(original, method, args));
+			Guard.ArgumentNotNull(expression, "expression");
+			LambdaExpression lambda = GetLambda(expression);
+
+			ThrowIfNotProperty(lambda.Body);
+			var prop = (PropertyInfo)((MemberExpression)lambda.Body).Member;
+
+			if (!prop.CanWrite)
+			{
+				throw new ArgumentException(String.Format(
+					Properties.Resources.PropertyNotWritable,
+					prop.DeclaringType.Name,
+					prop.Name), "expression");
+			}
+
+			var propSet = prop.GetSetMethod(true);
+			ThrowIfCantOverride(expression, propSet);
+			var call = new MethodCall<TProperty>(expression, propSet, new Expression[0]);
+			interceptor.AddCall(call, ExpectKind.PropertySet);
+
+			return call;
 		}
 
 		/// <summary>
@@ -282,7 +365,30 @@ namespace Moq
 		/// </summary>
 		/// <example group="verification">
 		/// This example sets up an expectation and marks it as verifiable. After 
-		/// the mock is used, a <see cref="Verify"/> call is issued on the mock 
+		/// the mock is used, a <see cref="Verify()"/> call is issued on the mock 
+		/// to ensure the method in the expectation was invoked:
+		/// <code>
+		/// var mock = new Mock&lt;IWarehouse&gt;();
+		/// mock.Expect(x =&gt; x.HasInventory(TALISKER, 50)).Verifiable().Returns(true);
+		/// ...
+		/// // other test code
+		/// ...
+		/// // Will throw if the test code has didn't call HasInventory.
+		/// mock.Verify();
+		/// </code>
+		/// </example>
+		/// <exception cref="MockException">Not all verifiable expectations were met.</exception>
+		public virtual void Verify(Expression<Action<T>> expression)
+		{
+
+		}
+
+		/// <summary>
+		/// Verifies that all verifiable expectations have been met.
+		/// </summary>
+		/// <example group="verification">
+		/// This example sets up an expectation and marks it as verifiable. After 
+		/// the mock is used, a <see cref="Verify()"/> call is issued on the mock 
 		/// to ensure the method in the expectation was invoked:
 		/// <code>
 		/// var mock = new Mock&lt;IWarehouse&gt;();
@@ -343,105 +449,6 @@ namespace Moq
 				// this call site.
 				throw ex;
 			}
-		}
-
-		private IProxyCall ExpectImpl(
-			Expression expression,
-			ExpectKind expectKind,
-			Func<Expression, MethodInfo, Expression[], IProxyCall> factory)
-		{
-			//TODO: this method has to be refactored
-
-			Guard.ArgumentNotNull(expression, "expression");
-			LambdaExpression lambda = GetLambda(expression);
-
-			IProxyCall result = null;
-
-			// Verify kind of Expect being used.
-			switch (expectKind)
-			{
-				case ExpectKind.MethodOrPropertyGet:
-					{
-						var methodCall = lambda.Body as MethodCallExpression;
-						var memberExpr = lambda.Body as MemberExpression;
-
-						MethodInfo method;
-						Expression[] args = new Expression[0];
-
-						if (methodCall != null)
-						{
-							method = methodCall.Method;
-							args = methodCall.Arguments.ToArray();
-						}
-						else if (memberExpr != null && memberExpr.Member is PropertyInfo)
-						{
-							var prop = (PropertyInfo)memberExpr.Member;
-							ThrowIfPropertyNotReadable(prop);
-
-							method = prop.GetGetMethod(true);
-						}
-						else
-						{
-							throw new MockException(MockException.ExceptionReason.ExpectedMethodOrProperty,
-								String.Format(Properties.Resources.ExpressionNotMethodOrProperty, expression.ToStringFixed()));
-						}
-
-						ThrowIfCantOverride(expression, method);
-						result = factory(expression, method, args);
-						interceptor.AddCall(result, expectKind);
-						break;
-					}
-				case ExpectKind.PropertyGet:
-					{
-						if (IsPropertyIndexer(lambda.Body))
-						{
-							return ExpectImpl(expression, ExpectKind.MethodOrPropertyGet, factory);
-						}
-						else
-						{
-							ThrowIfNotProperty(lambda.Body);
-							var prop = (PropertyInfo)((MemberExpression)lambda.Body).Member;
-
-							ThrowIfPropertyNotReadable(prop);
-
-							var propertyMethod = prop.GetGetMethod(true);
-							ThrowIfCantOverride(expression, propertyMethod);
-							result = factory(expression, propertyMethod, new Expression[0]);
-							interceptor.AddCall(result, expectKind);
-
-							break;
-						}
-					}
-				case ExpectKind.PropertySet:
-					{
-						ThrowIfNotProperty(lambda.Body);
-						var prop = (PropertyInfo)((MemberExpression)lambda.Body).Member;
-
-						if (!prop.CanWrite)
-						{
-							throw new ArgumentException(String.Format(
-								Properties.Resources.PropertyNotWritable,
-								prop.DeclaringType.Name,
-								prop.Name), "expression");
-						}
-
-						var propertyMethod = prop.GetSetMethod(true);
-						ThrowIfCantOverride(expression, propertyMethod);
-						result = factory(expression, propertyMethod, new Expression[0]);
-						interceptor.AddCall(result, expectKind);
-						break;
-					}
-				default:
-					throw new NotSupportedException(expression.ToStringFixed());
-			}
-
-
-			if (result == null)
-			{
-				throw new NotSupportedException(expression.ToStringFixed());
-			}
-
-			return result;
 		}
 
 		private static LambdaExpression GetLambda(Expression expression)
@@ -661,7 +668,8 @@ namespace Moq
 
 		class NullMockedEvent : MockedEvent
 		{
-			public NullMockedEvent(Mock mock) : base(mock)
+			public NullMockedEvent(Mock mock)
+				: base(mock)
 			{
 			}
 		}

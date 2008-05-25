@@ -204,4 +204,7 @@ mock.ExpectSet(x =&gt; x.{1}).Callback(callbackDelegate);</value>
   <data name="RaisedUnassociatedEvent" xml:space="preserve">
     <value>Cannot raise a mocked event unless it has been associated (attached) to a concrete event in a mocked object.</value>
   </data>
+  <data name="ExpressionNotMethod" xml:space="preserve">
+    <value>Expression is not a method invocation: {0}</value>
+  </data>
 </root>

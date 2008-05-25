@@ -228,7 +228,7 @@ namespace Moq
 		/// Verifies all verifiable expectations on all mocks created 
 		/// by this factory.
 		/// </summary>
-		/// <seealso cref="Mock{T}.Verify"/>
+		/// <seealso cref="Mock{T}.Verify()"/>
 		/// <exception cref="MockException">One or more mocks had expectations that were not satisfied.</exception>
 		public void Verify()
 		{
@@ -239,7 +239,7 @@ namespace Moq
 		/// Verifies all verifiable expectations on all mocks created 
 		/// by this factory.
 		/// </summary>
-		/// <seealso cref="Mock{T}.Verify"/>
+		/// <seealso cref="Mock{T}.Verify()"/>
 		/// <exception cref="MockException">One or more mocks had expectations that were not satisfied.</exception>
 		public void VerifyAll()
 		{

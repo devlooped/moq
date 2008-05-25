@@ -37,7 +37,8 @@ namespace Moq
 			ReturnValueRequired,
 			VerificationFailed, 
 			MoreThanOneCall,
-			ExpectedProperty, 
+			ExpectedProperty,
+			ExpectedMethod,
 			ExpectedMethodOrProperty,
 			ExpectedLambda,
 		}
