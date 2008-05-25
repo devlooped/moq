@@ -24,6 +24,15 @@ namespace Moq
 			return Evaluator.PartialEval(expression);
 		}
 
+		public static Expression PartialMatcherAwareEval(this Expression expression)
+		{
+			return Evaluator.PartialEval(expression, 
+				e => e.NodeType != ExpressionType.Parameter &&
+					!(e.NodeType == ExpressionType.Call &&
+					((MethodCallExpression)e).Method.GetCustomAttribute<AdvancedMatcherAttribute>(true) != null)
+			);
+		}
+
 		public static Expression CastTo<T>(this Expression expression)
 		{
 			return Expression.Convert(expression, typeof(T));

@@ -41,7 +41,7 @@ namespace Moq
 			foreach (var call in calls.Values)
 			{
 				if (match(call))
-					failures.Add(call.ExpectExpression.PartialEval());
+					failures.Add(call.ExpectExpression.PartialMatcherAwareEval());
 			}
 
 			if (failures.Count > 0)
@@ -52,10 +52,12 @@ namespace Moq
 
 		public void AddCall(IProxyCall call, ExpectKind kind)
 		{
+			var expr = call.ExpectExpression.PartialMatcherAwareEval();
+
 			if (kind == ExpectKind.PropertySet)
-				calls["set::" + call.ExpectExpression.ToStringFixed()] = call;
+				calls["set::" + expr.ToStringFixed()] = call;
 			else
-				calls[call.ExpectExpression.ToStringFixed()] = call;
+				calls[expr.ToStringFixed()] = call;
 		}
 
     public void Intercept(IInvocation invocation) {
