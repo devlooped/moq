@@ -3,6 +3,8 @@ using Xunit;
 using System.Collections.Generic;
 using System;
 using System.Linq;
+using System.ServiceModel.Web;
+using System.ServiceModel;
 
 namespace Moq.Tests.Regressions
 {
@@ -59,5 +61,41 @@ namespace Moq.Tests.Regressions
 		}
 
 		#endregion
+
+		[Fact]
+		public void ProxiesAndHostsWCF()
+		{
+			var generator = new Castle.DynamicProxy.ProxyGenerator();
+			var proxy = generator.CreateClassProxy<ServiceImplementation>();
+			var host = new WebServiceHost(proxy, new Uri("http://localhost:7777"));
+
+			host.Open();
+		}
+
+		[Fact]
+		public void ProxiesAndHostsWCFMock()
+		{
+			//var generator = new Castle.DynamicProxy.ProxyGenerator();
+			var proxy = new Mock<ServiceImplementation>();
+			var host = new WebServiceHost(proxy.Object, new Uri("http://localhost:7777"));
+
+			host.Open();
+		}
+
+		[ServiceContract]
+		public interface IServiceContract
+		{
+			[OperationContract]
+			void Do();
+		}
+
+		[ServiceBehavior(InstanceContextMode = InstanceContextMode.Single)]
+		public class ServiceImplementation : IServiceContract
+		{
+			public void Do()
+			{
+				throw new NotImplementedException();
+			}
+		}
 	}
 }
