@@ -62,6 +62,21 @@ namespace Moq.Tests.Regressions
 
 		#endregion
 
+		#region 62
+
+		public interface ISomething<T>
+		{
+			void DoSomething<U>() where U : T;
+		}
+
+		[Fact(Skip="Still failing on Castle.DynamicProxy2")]
+		public void CreatesMockWithGenericsConstraints()
+		{
+			var mock = new Mock<ISomething<object>>();
+		}
+
+		#endregion
+
 		[Fact]
 		public void ProxiesAndHostsWCF()
 		{
