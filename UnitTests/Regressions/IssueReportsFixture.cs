@@ -82,9 +82,10 @@ namespace Moq.Tests.Regressions
 		{
 			var generator = new Castle.DynamicProxy.ProxyGenerator();
 			var proxy = generator.CreateClassProxy<ServiceImplementation>();
-			var host = new WebServiceHost(proxy, new Uri("http://localhost:7777"));
-
-			host.Open();
+			using (var host = new WebServiceHost(proxy, new Uri("http://localhost:7777")))
+			{
+				host.Open();
+			}
 		}
 
 		[Fact]
@@ -92,9 +93,10 @@ namespace Moq.Tests.Regressions
 		{
 			//var generator = new Castle.DynamicProxy.ProxyGenerator();
 			var proxy = new Mock<ServiceImplementation>();
-			var host = new WebServiceHost(proxy.Object, new Uri("http://localhost:7777"));
-
-			host.Open();
+			using (var host = new WebServiceHost(proxy.Object, new Uri("http://localhost:7777")))
+			{
+				host.Open();
+			}
 		}
 
 		[ServiceContract]

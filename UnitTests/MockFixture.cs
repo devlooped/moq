@@ -8,7 +8,7 @@ namespace Moq.Tests
 	public class MockFixture
 	{
 		[Fact]
-		public void ShouldCreateMockAndExposeInterface()
+		public void CreatesMockAndExposesInterface()
 		{
 			var mock = new Mock<ICloneable>();
 
@@ -18,7 +18,7 @@ namespace Moq.Tests
 		}
 
 		[Fact]
-		public void ShouldThrowIfNullExpectAction()
+		public void ThrowsIfNullExpectAction()
 		{
 			var mock = new Mock<ICloneable>();
 
@@ -26,7 +26,7 @@ namespace Moq.Tests
 		}
 
 		[Fact]
-		public void ShouldThrowIfNullExpectFunction()
+		public void ThrowsIfNullExpectFunction()
 		{
 			var mock = new Mock<ICloneable>();
 
@@ -34,7 +34,7 @@ namespace Moq.Tests
 		}
 
 		[Fact]
-		public void ShouldExpectCallReturn()
+		public void ReturnsValue()
 		{
 			var mock = new Mock<ICloneable>();
 			var clone = new object();
@@ -45,7 +45,7 @@ namespace Moq.Tests
 		}
 
 		[Fact]
-		public void ShouldExpectDifferentMethodCalls()
+		public void DifferentMethodCallsReturnDifferentValues()
 		{
 			var mock = new Mock<IFoo>();
 
@@ -57,7 +57,7 @@ namespace Moq.Tests
 		}
 
 		[Fact]
-		public void ShouldExpectCallWithArgument()
+		public void MethodCallsWithDifferentArgumentsReturnDifferentValues()
 		{
 			var mock = new Mock<IFoo>();
 			mock.Expect(x => x.DoIntArgReturnInt(1)).Returns(11);
@@ -68,7 +68,7 @@ namespace Moq.Tests
 		}
 
 		[Fact]
-		public void ShouldExpectCallWithNullArgument()
+		public void DifferentiatesCallWithNullArgument()
 		{
 			var mock = new Mock<IFoo>();
 			mock.Expect(x => x.DoStringArgReturnInt(null)).Returns(1);
@@ -79,7 +79,7 @@ namespace Moq.Tests
 		}
 
 		[Fact]
-		public void ShouldExpectCallWithVariable()
+		public void ReturnsValueFromVariable()
 		{
 			int value = 25;
 			var mock = new Mock<IFoo>();
@@ -89,7 +89,7 @@ namespace Moq.Tests
 		}
 
 		[Fact]
-		public void ShouldExpectCallWithReferenceLazyEvaluate()
+		public void ReturnsValueFromLambdaLazyEvaluation()
 		{
 			int a = 25;
 			var mock = new Mock<IFoo>();
@@ -104,7 +104,7 @@ namespace Moq.Tests
 		}
 
 		[Fact]
-		public void ShouldThrowIfExpectFieldValue()
+		public void ThrowsIfExpectationSetForField()
 		{
 			var mock = new Mock<FooBase>();
 
@@ -120,7 +120,7 @@ namespace Moq.Tests
 		}
 
 		[Fact]
-		public void ShouldExpectMethodCallWithVariable()
+		public void CallParameterCanBeVariable()
 		{
 			int value = 5;
 			var mock = new Mock<IFoo>();
@@ -131,7 +131,7 @@ namespace Moq.Tests
 		}
 
 		[Fact]
-		public void ShouldExpectMethodCallWithMethodCall()
+		public void CallParameterCanBeMethodCall()
 		{
 			int value = 5;
 			var mock = new Mock<IFoo>();
@@ -147,7 +147,7 @@ namespace Moq.Tests
 		}
 
 		[Fact]
-		public void ShouldMatchAnyArgument()
+		public void MatchesAnyParameterValue()
 		{
 			var mock = new Mock<IFoo>();
 
@@ -158,7 +158,7 @@ namespace Moq.Tests
 		}
 
 		[Fact]
-		public void ShouldMatchPredicateArgument()
+		public void MatchesPredicateParameter()
 		{
 			var mock = new Mock<IFoo>();
 
@@ -180,7 +180,7 @@ namespace Moq.Tests
 		}
 
 		[Fact]
-		public void ShouldExpectCallWithoutReturnValue()
+		public void ExpectsVoidCall()
 		{
 			var mock = new Mock<IFoo>();
 
@@ -190,7 +190,7 @@ namespace Moq.Tests
 		}
 
 		[Fact]
-		public void ShouldThrowIfExpectingThrows()
+		public void ThrowsIfExpectationThrows()
 		{
 			var mock = new Mock<IFoo>();
 
@@ -200,7 +200,7 @@ namespace Moq.Tests
 		}
 
 		[Fact]
-		public void ShouldExecuteCallbackWhenVoidMethodIsCalled()
+		public void ExecutesCallbackWhenVoidMethodIsCalled()
 		{
 			var mock = new Mock<IFoo>();
 			bool called = false;
@@ -211,7 +211,7 @@ namespace Moq.Tests
 		}
 
 		[Fact]
-		public void ShouldExecuteCallbackWhenNonVoidMethodIsCalled()
+		public void ExecutesCallbackWhenNonVoidMethodIsCalled()
 		{
 			var mock = new Mock<IFoo>();
 			bool called = false;
@@ -222,7 +222,7 @@ namespace Moq.Tests
 		}
 
 		[Fact]
-		public void ShouldExpectRanges()
+		public void MatchesRanges()
 		{
 			var mock = new Mock<IFoo>();
 
@@ -238,7 +238,7 @@ namespace Moq.Tests
 		}
 
 		[Fact]
-		public void ShouldNotMatchOutOfRange()
+		public void DoesNotMatchOutOfRange()
 		{
 			var mock = new Mock<IFoo>(MockBehavior.Strict);
 
@@ -258,7 +258,7 @@ namespace Moq.Tests
 		}
 
 		[Fact]
-		public void ShouldExpectRangeWithVariableAndMethodInvocation()
+		public void RangesCanIncludeVariableAndMethodInvocation()
 		{
 			var mock = new Mock<IFoo>();
 			var from = 1;
@@ -269,7 +269,7 @@ namespace Moq.Tests
 		}
 
 		[Fact]
-		public void ShouldExpectRangeLazyEval()
+		public void RangesAreLazyEvaluated()
 		{
 			var mock = new Mock<IFoo>(MockBehavior.Loose);
 			var from = "a";
@@ -285,7 +285,7 @@ namespace Moq.Tests
 		}
 
 		[Fact]
-		public void ShouldExpectMatchRegexAndLazyEval()
+		public void RegexMatchesAndLazyEvaluates()
 		{
 			var mock = new Mock<IFoo>(MockBehavior.Loose);
 			var reg = "[a-d]+";
@@ -305,7 +305,7 @@ namespace Moq.Tests
 		}
 
 		[Fact]
-		public void ShouldReturnService()
+		public void ReturnsServiceFromServiceProvider()
 		{
 			var provider = new Mock<IServiceProvider>();
 
@@ -315,7 +315,7 @@ namespace Moq.Tests
 		}
 
 		[Fact]
-		public void ShouldCallFirstExpectThatMatches()
+		public void InvokesFirstExpectationThatMatches()
 		{
 			var mock = new Mock<IFoo>();
 			mock.Expect(x => x.Execute("ping")).Returns("I'm alive!");
@@ -327,7 +327,7 @@ namespace Moq.Tests
 		}
 
 		[Fact]
-		public void ShouldTestEvenNumbers()
+		public void MatchesEvenNumbersWithLambdaMatching()
 		{
 			var mock = new Mock<IFoo>();
 
@@ -337,14 +337,14 @@ namespace Moq.Tests
 		}
 
 		[Fact]
-		public void ShouldGetTypeReturnATypeAssignableFromInterfaceType()
+		public void MockObjectIsAssignableToMockedInterface()
 		{
 			var mock = new Mock<IFoo>();
 			Assert.True(typeof(IFoo).IsAssignableFrom(mock.Object.GetType()));
 		}
 
 		[Fact]
-		public void ShouldEqualsMethodWorkAsReferenceEquals()
+		public void MockObjectsEqualityIsReferenceEquals()
 		{
 			var mock1 = new Mock<IFoo>();
 			var mock2 = new Mock<IFoo>();
@@ -354,7 +354,7 @@ namespace Moq.Tests
 		}
 
 		[Fact]
-		public void ShouldGetHashCodeReturnDifferentCodeForEachMock()
+		public void HashCodeIsDifferentForEachMock()
 		{
 			var mock1 = new Mock<IFoo>();
 			var mock2 = new Mock<IFoo>();
@@ -365,14 +365,14 @@ namespace Moq.Tests
 		}
 
 		[Fact]
-		public void ShouldToString()
+		public void ToStringIsNullOrEmpty()
 		{
 			var mock = new Mock<IFoo>();
-			Assert.False(string.IsNullOrEmpty(mock.Object.ToString()));
+			Assert.False(String.IsNullOrEmpty(mock.Object.ToString()));
 		}
 
 		[Fact(Skip="Castle.DynamicProxy2 doesn't seem to call interceptors for ToString, GetHashCode")]
-		public void ShouldOverrideObjectMethods()
+		public void OverridesObjectMethods()
 		{
 			var mock = new Mock<IFoo>();
 			mock.Expect(x => x.GetHashCode()).Returns(1);
@@ -383,7 +383,7 @@ namespace Moq.Tests
 		}
 
 		[Fact]
-		public void ShouldMockAbstractClass()
+		public void OverridesBehaviorFromAbstractClass()
 		{
 			var mock = new Mock<FooBase>();
 			mock.Expect(x => x.Check("foo")).Returns(false);
@@ -393,7 +393,7 @@ namespace Moq.Tests
 		}
 
 		[Fact]
-		public void ShouldCallUnderlyingClassEquals()
+		public void CallsUnderlyingClassEquals()
 		{
 			var mock = new Mock<FooOverrideEquals>();
 			var mock2 = new Mock<FooOverrideEquals>();
@@ -405,13 +405,13 @@ namespace Moq.Tests
 		}
 
 		[Fact]
-		public void ShouldThrowIfSealedClass()
+		public void ThrowsIfSealedClass()
 		{
 			Assert.Throws<ArgumentException>(() => new Mock<FooSealed>());
 		}
 
 		[Fact]
-		public void ShouldThrowIfVerifiableExpectationNotCalled()
+		public void ThrowsIfVerifiableExpectationNotCalled()
 		{
 			var mock = new Mock<IFoo>();
 
@@ -431,7 +431,7 @@ namespace Moq.Tests
 		}
 
 		[Fact]
-		public void ShouldThrowWithEvaluatedExpressionsIfVerifiableExpectationNotCalled()
+		public void ThrowsWithEvaluatedExpressionsIfVerifiableExpectationNotCalled()
 		{
 			var expectedArg = "lorem,ipsum";
 			var mock = new Mock<IFoo>();
@@ -453,7 +453,7 @@ namespace Moq.Tests
 		}
 
 		[Fact]
-		public void ShouldThrowExpressionsIfVerifiableExpectationWithLambdaMatcherNotCalled()
+		public void ThrowsWithExpressionIfVerifiableExpectationWithLambdaMatcherNotCalled()
 		{
 			var mock = new Mock<IFoo>();
 
@@ -474,7 +474,7 @@ namespace Moq.Tests
 		}
 
 		[Fact]
-		public void ShouldNotThrowVerifyAndNoVerifiableExpectations()
+		public void VerifiesNoOpIfNoVerifiableExpectations()
 		{
 			var mock = new Mock<IFoo>();
 
@@ -482,7 +482,7 @@ namespace Moq.Tests
 		}
 
 		[Fact]
-		public void ShouldThrowIfVerifyAllAndNonVerifiable()
+		public void ThrowsIfVerifyAllNotMet()
 		{
 			var mock = new Mock<IFoo>();
 
@@ -501,7 +501,7 @@ namespace Moq.Tests
 		}
 
 		[Fact]
-		public void ShouldRenderReadableMessageForVerifyFailures()
+		public void RendersReadableMessageForVerifyFailures()
 		{
 			var mock = new Mock<IFoo>();
 
@@ -523,7 +523,7 @@ namespace Moq.Tests
 		}
 
 		[Fact]
-		public void ShouldThrowIfExpectOnNonVirtual()
+		public void ThrowsIfExpectOnNonVirtual()
 		{
 			var mock = new Mock<FooBase>();
 			
@@ -531,7 +531,7 @@ namespace Moq.Tests
 		}
 
 		[Fact]
-		public void ShouldOverridePreviousExpectation()
+		public void OverridesPreviousExpectation()
 		{
 			var mock = new Mock<IFoo>();
 
@@ -545,7 +545,7 @@ namespace Moq.Tests
 		}
 
 		[Fact]
-		public void ShouldReceiveClassCtorArguments()
+		public void ConstructsObjectsWithCtorArguments()
 		{
 			var mock = new Mock<FooWithConstructors>(MockBehavior.Default, "Hello", 26);
 
@@ -560,7 +560,7 @@ namespace Moq.Tests
 		}
 
 		[Fact]
-		public void ShouldConstructClassWithNoDefaultConstructor()
+		public void ConstructsClassWithNoDefaultConstructor()
 		{
 			var mock = new Mock<ClassWithNoDefaultConstructor>(MockBehavior.Default, "Hello", 26);
 
@@ -569,7 +569,7 @@ namespace Moq.Tests
 		}
 
 		[Fact]
-		public void ShouldConstructClassWithNoDefaultConstructorAndNullValue()
+		public void ConstructsClassWithNoDefaultConstructorAndNullValue()
 		{
 			var mock = new Mock<ClassWithNoDefaultConstructor>(MockBehavior.Default, null, 26);
 
@@ -578,19 +578,19 @@ namespace Moq.Tests
 		}
 
 		[Fact]
-		public void ShouldThrowIfNoMatchingConstructorFound()
+		public void ThrowsIfNoMatchingConstructorFound()
 		{
 			Assert.Throws<ArgumentException>(() => new Mock<ClassWithNoDefaultConstructor>(25, true));
 		}
 
 		[Fact]
-		public void ShouldThrowIfArgumentsPassedForInterface()
+		public void ThrowsIfArgumentsPassedForInterface()
 		{
 			Assert.Throws<ArgumentException>(() => new Mock<IFoo>(25, true));
 		}
 
 		[Fact]
-		public void ShouldCallCallbackWithoutArgumentsForMethodCallWithArguments()
+		public void CallbackCalledWithoutArgumentsForMethodCallWithArguments()
 		{
 			var mock = new Mock<IFoo>();
 			bool called = false;
@@ -601,7 +601,7 @@ namespace Moq.Tests
 		}
 
 		[Fact]
-		public void ShouldCallCallbackWithOneArgument()
+		public void CallbackCalledWithOneArgument()
 		{
 			var mock = new Mock<IFoo>();
 			string callbackArg = null;
@@ -612,7 +612,7 @@ namespace Moq.Tests
 		}
 
 		[Fact]
-		public void ShouldCallCallbackWithTwoArguments()
+		public void CallbackCalledWithTwoArguments()
 		{
 			var mock = new Mock<IFoo>();
 			string callbackArg1 = null;
@@ -626,7 +626,7 @@ namespace Moq.Tests
 		}
 
 		[Fact]
-		public void ShouldCallCallbackWithThreeArguments()
+		public void CallbackCalledWithThreeArguments()
 		{
 			var mock = new Mock<IFoo>();
 			string callbackArg1 = null;
@@ -642,7 +642,7 @@ namespace Moq.Tests
 		}
 
 		[Fact]
-		public void ShouldCallCallbackWithFourArguments()
+		public void CallbackCalledWithFourArguments()
 		{
 			var mock = new Mock<IFoo>();
 			string callbackArg1 = null;
@@ -660,7 +660,7 @@ namespace Moq.Tests
 		}
 
 		[Fact]
-		public void ShouldCallCallbackWithOneArgumentForNonVoidMethod()
+		public void CallbackCalledWithOneArgumentForNonVoidMethod()
 		{
 			var mock = new Mock<IFoo>();
 			string callbackArg1 = null;
@@ -673,7 +673,7 @@ namespace Moq.Tests
 		}
 
 		[Fact]
-		public void ShouldCallCallbackWithTwoArgumentsForNonVoidMethod()
+		public void CallbackCalledWithTwoArgumentsForNonVoidMethod()
 		{
 			var mock = new Mock<IFoo>();
 			string callbackArg1 = null;
@@ -688,7 +688,7 @@ namespace Moq.Tests
 		}
 
 		[Fact]
-		public void ShouldCallCallbackWithThreeArgumentsForNonVoidMethod()
+		public void CallbackCalledWithThreeArgumentsForNonVoidMethod()
 		{
 			var mock = new Mock<IFoo>();
 			string callbackArg1 = null;
@@ -705,7 +705,7 @@ namespace Moq.Tests
 		}
 
 		[Fact]
-		public void ShouldCallCallbackWithFourArgumentsForNonVoidMethod()
+		public void CallbackCalledWithFourArgumentsForNonVoidMethod()
 		{
 			var mock = new Mock<IFoo>();
 			string callbackArg1 = null;
@@ -724,7 +724,7 @@ namespace Moq.Tests
 		}
 
 		[Fact]
-		public void ShouldReturnUsingOneArgument()
+		public void ReturnsCalledUsingOneArgument()
 		{
 			var mock = new Mock<IFoo>();
 			mock.Expect(x => x.Execute(It.IsAny<string>()))
@@ -735,7 +735,7 @@ namespace Moq.Tests
 		}
 
 		[Fact]
-		public void ShouldReturnUsingTwoArguments()
+		public void ReturnsCalledUsingTwoArguments()
 		{
 			var mock = new Mock<IFoo>();
 			mock.Expect(x => x.Execute(It.IsAny<string>(), It.IsAny<string>()))
@@ -746,7 +746,7 @@ namespace Moq.Tests
 		}
 
 		[Fact]
-		public void ShouldReturnUsingThreeArguments()
+		public void ReturnsCalledUsingThreeArguments()
 		{
 			var mock = new Mock<IFoo>();
 			mock.Expect(x => x.Execute(It.IsAny<string>(), It.IsAny<string>(), It.IsAny<string>()))
@@ -757,7 +757,7 @@ namespace Moq.Tests
 		}
 
 		[Fact]
-		public void ShouldReturnUsingFourArguments()
+		public void ReturnsCalledUsingFourArguments()
 		{
 			var mock = new Mock<IFoo>();
 			mock.Expect(x => x.Execute(It.IsAny<string>(), It.IsAny<string>(), It.IsAny<string>(), It.IsAny<string>()))
@@ -768,7 +768,7 @@ namespace Moq.Tests
 		}
 
 		[Fact]
-		public void ShouldMatchDifferentOverloads()
+		public void MatchsDifferentOverloadsWithItIsAny()
 		{
 			var mock = new Mock<IFoo>();
 
@@ -785,7 +785,7 @@ namespace Moq.Tests
 		}
 
 		[Fact]
-		public void ShouldExpectOnceThrowOnSecondCall()
+		public void OnceThrowsOnSecondCall()
 		{
 			var mock = new Mock<IFoo>();
 			mock.Expect(foo => foo.DoVoidArgs("foo"))
@@ -805,7 +805,7 @@ namespace Moq.Tests
 		}
 
 		[Fact]
-		public void ShouldThrowOnStrictWithExpectButNoReturns()
+		public void ThrowsOnStrictWithExpectButNoReturns()
 		{
 			var mock = new Mock<IFoo>(MockBehavior.Strict);
 
@@ -823,7 +823,7 @@ namespace Moq.Tests
 		}
 
 		[Fact]
-		public void ShouldReturnNullReturnValue()
+		public void ReturnsNullValueIfSpecified()
 		{
 			var mock = new Mock<IBag>();
 			mock.Expect(bar => bar.Get("Whatever")).Returns(null);
@@ -832,7 +832,7 @@ namespace Moq.Tests
 		}
 
 		[Fact]
-		public void ShouldReturnNullReturnValueIfNullFunc()
+		public void ReturnsNullValueIfNullFunc()
 		{
 			var mock = new Mock<IBag>();
 			mock.Expect(bar => bar.Get("Whatever")).Returns((Func<object>)null);
@@ -841,7 +841,7 @@ namespace Moq.Tests
 		}
 
 		[Fact]
-		public void ShouldExpectPropertySetter()
+		public void ExpectsPropertySetter()
 		{
 			var mock = new Mock<IFoo>();
 
@@ -856,7 +856,7 @@ namespace Moq.Tests
 		}
 
 		[Fact]
-		public void ShouldExpectGetter()
+		public void ExpectsPropertyGetter()
 		{
 			var mock = new Mock<IFoo>();
 
@@ -871,7 +871,7 @@ namespace Moq.Tests
 		}
 
 		[Fact]
-		public void ShouldThrowIfExpectPropertySetterOnMethod()
+		public void ThrowsIfExpectPropertySetterOnMethod()
 		{
 			var mock = new Mock<IFoo>();
 
@@ -887,7 +887,7 @@ namespace Moq.Tests
 		}
 
 		[Fact]
-		public void ShouldThrowIfExpectPropertyGetterOnMethod()
+		public void ThrowsIfExpectPropertyGetterOnMethod()
 		{
 			var mock = new Mock<IFoo>();
 
@@ -903,7 +903,7 @@ namespace Moq.Tests
 		}
 
 		[Fact]
-		public void ShouldInvokeBaseClassVirtualImplementation()
+		public void CallsBaseClassVirtualImplementationByDefault()
 		{
 			var mock = new Mock<FooBase>();
 
@@ -916,7 +916,21 @@ namespace Moq.Tests
 		}
 
 		[Fact]
-		public void ShouldExpectGetIndexedProperty()
+		public void DoesNotCallBaseClassVirtualImplementationIfSpecified()
+		{
+			var mock = new Mock<FooBase>();
+
+			mock.CallBase = false;
+
+			Assert.False(mock.Object.BaseCalled);
+			mock.Object.BaseCall();
+
+			Assert.Equal(default(bool), mock.Object.BaseCall("foo"));
+			Assert.False(mock.Object.BaseCalled);
+		}
+
+		[Fact]
+		public void ExpectsGetIndexedProperty()
 		{
 			var mock = new Mock<IFoo>();
 
@@ -930,7 +944,7 @@ namespace Moq.Tests
 		}
 
 		[Fact]
-		public void ShouldExpectAndExpectGetBeSynonyms()
+		public void ExpectAndExpectGetAreSynonyms()
 		{
 			var mock = new Mock<IFoo>();
 
@@ -943,7 +957,7 @@ namespace Moq.Tests
 		}
 
 		[Fact]
-		public void ShouldThrowIfItIsWithoutLambda()
+		public void ThrowsIfItIsWithoutLambda()
 		{
 			var foo = new Mock<IFoo>();
 
@@ -960,7 +974,7 @@ namespace Moq.Tests
 		}
 
 		[Fact]
-		public void ShouldThrowIfNotOverridableOnConcreteInterfaceImplementation()
+		public void ThrowsIfExpecationSetForNotOverridableMember()
 		{
 			var target = new Mock<Doer>();
 
@@ -968,7 +982,7 @@ namespace Moq.Tests
 		}
 
 		[Fact]
-		public void ShouldThrowIfExpectGetOnPropertyWithPrivateSetter()
+		public void ThrowsIfExpectGetOnPropertyWithPrivateSetter()
 		{
 			var mock = new Mock<FooWithPrivateSetter>();
 
@@ -976,7 +990,7 @@ namespace Moq.Tests
 		}
 
 		[Fact]
-		public void ShouldInvokeCallbackAfterReturnsCall()
+		public void CallbackCalledAfterReturnsCall()
 		{
 			var mock = new Mock<IFoo>();
 			bool returnsCalled = false;
@@ -990,7 +1004,7 @@ namespace Moq.Tests
 		}
 
 		[Fact]
-		public void ShouldInvokeCallbackAfterReturnsCallWithArg()
+		public void CallbackCalledAfterReturnsCallWithArg()
 		{
 			var mock = new Mock<IFoo>();
 			bool returnsCalled = false;
@@ -1004,7 +1018,7 @@ namespace Moq.Tests
 		}
 
 		[Fact]
-		public void ShouldThrowIfVerifyVoidMethodWithExpressionFails()
+		public void ThrowsIfVerifyVoidMethodWithExpressionFails()
 		{
 			var mock = new Mock<IFoo>();
 
@@ -1020,7 +1034,7 @@ namespace Moq.Tests
 		}
 
 		[Fact]
-		public void ShouldVerifyVoidMethodWithExpression()
+		public void VerifiesVoidMethodWithExpression()
 		{
 			var mock = new Mock<IFoo>();
 
@@ -1030,7 +1044,7 @@ namespace Moq.Tests
 		}
 
 		[Fact]
-		public void ShouldThrowIfVerifyReturningMethodWithExpressionFails()
+		public void ThrowsIfVerifyReturningMethodWithExpressionFails()
 		{
 			var mock = new Mock<IFoo>();
 
@@ -1046,7 +1060,7 @@ namespace Moq.Tests
 		}
 
 		[Fact]
-		public void ShouldVerifyReturningMethodWithExpression()
+		public void VerifiesReturningMethodWithExpression()
 		{
 			var mock = new Mock<IFoo>();
 
@@ -1056,7 +1070,7 @@ namespace Moq.Tests
 		}
 
 		[Fact]
-		public void ShouldVerifyPropertyGetWithExpression()
+		public void VerifiesPropertyGetWithExpression()
 		{
 			var mock = new Mock<IFoo>();
 
@@ -1066,7 +1080,7 @@ namespace Moq.Tests
 		}
 
 		[Fact]
-		public void ShouldThrowIfVerifyPropertyGetWithExpressionFails()
+		public void ThrowsIfVerifyPropertyGetWithExpressionFails()
 		{
 			var mock = new Mock<IFoo>();
 
@@ -1082,7 +1096,7 @@ namespace Moq.Tests
 		}
 
 		[Fact]
-		public void ShouldVerifyPropertySetWithExpression()
+		public void VerifiesPropertySetWithExpression()
 		{
 			var mock = new Mock<IFoo>();
 
@@ -1092,7 +1106,7 @@ namespace Moq.Tests
 		}
 
 		[Fact]
-		public void ShouldThrowIfVerifyPropertySetWithExpressionFails()
+		public void ThrowsIfVerifyPropertySetWithExpressionFails()
 		{
 			var mock = new Mock<IFoo>();
 

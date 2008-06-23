@@ -87,6 +87,8 @@ namespace Moq
 		/// </example>
 		public Mock(MockBehavior behavior, params object[] args)
 		{
+			this.CallBase = true;
+
 			if (args == null) args = new object[0];
 
 			this.behavior = behavior;
@@ -678,6 +680,12 @@ namespace Moq
 		/// Exposes the mocked object instance.
 		/// </summary>
 		public object Object { get { return GetObject(); } }
+
+		/// <summary>
+		/// Whether the base member virtual implementation will be called 
+		/// for mocked classes if no expectation is met. Defaults to <see langword="true"/>.
+		/// </summary>
+		public bool CallBase { get; set; }
 
 		/// <summary>
 		/// Returns the mocked object value.

@@ -141,7 +141,8 @@ namespace Moq
 				invocation.Proceed();
 			}
 			else if (invocation.TargetType.IsClass &&
-			  !invocation.Method.IsAbstract)
+			  !invocation.Method.IsAbstract 
+				&& mock.CallBase)
 			{
 				// For mocked classes, if the target method was not abstract, 
 				// invoke directly.
