@@ -5,6 +5,9 @@ Version 2.5
     * Added support for firing mocks from expectations
     * Removed usage of MBROs which caused inconsistencies in mocking features
     * Added ExpectGet and ExpectSet to better support properties, and provide better intellisense.
+    * Added verification with expressions, which better supports Arrange-Act-Assert testing model (can do Verify(m => m.Do(...)))
+    * Added Throws<TException>
+    * Added mock.CallBase property to specify whether the virtual members base implementation should be called
     * 
 
 
