@@ -59,6 +59,13 @@ namespace Moq
 			return this;
 		}
 
+		public IThrowsResult Throws<TException>() 
+			where TException : Exception, new()
+		{
+			this.exception = new TException();
+			return this;
+		}
+
 		public ICallbackResult Callback(Action callback)
 		{
 			SetCallbackWithoutArguments(callback);

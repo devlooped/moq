@@ -200,6 +200,16 @@ namespace Moq.Tests
 		}
 
 		[Fact]
+		public void ThrowsIfExpectationThrowsWithGenericsExceptionType()
+		{
+			var mock = new Mock<IFoo>();
+
+			mock.Expect(x => x.DoReturnInt()).Throws<FormatException>();
+
+			Assert.Throws<FormatException>(() => mock.Object.DoReturnInt());
+		}
+
+		[Fact]
 		public void ExecutesCallbackWhenVoidMethodIsCalled()
 		{
 			var mock = new Mock<IFoo>();
