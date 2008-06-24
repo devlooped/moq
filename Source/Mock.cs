@@ -87,7 +87,7 @@ namespace Moq
 		/// </example>
 		public Mock(MockBehavior behavior, params object[] args)
 		{
-			this.CallBase = true;
+			this.CallBase = false;
 
 			if (args == null) args = new object[0];
 
