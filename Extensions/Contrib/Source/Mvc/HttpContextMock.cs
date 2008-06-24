@@ -11,34 +11,79 @@ namespace Moq.Mvc
 	/// </summary>
 	public class HttpContextMock : Mock<HttpContextBase>
 	{
-		Mock<HttpApplicationStateBase> httpApplicationState = new HttpApplicationStateMock();
-		Mock<HttpRequestBase> httpRequest = new HttpRequestMock();
-		Mock<HttpResponseBase> httpResponse = new HttpResponseMock();
-		Mock<HttpServerUtilityBase> httpServerUtility = new HttpServerUtilityMock();
-		Mock<HttpSessionStateBase> httpSessionState = new HttpSessionStateMock();
-
 		/// <summary>
 		/// Default Constructor
 		/// </summary>
 		public HttpContextMock()
 		{
-			this.ExpectGet(c => c.Application).Returns(httpApplicationState.Object);
-			this.ExpectGet(c => c.Request).Returns(httpRequest.Object);
-			this.ExpectGet(c => c.Response).Returns(httpResponse.Object);
-			this.ExpectGet(c => c.Server).Returns(httpServerUtility.Object);
-			this.ExpectGet(c => c.Session).Returns(httpSessionState.Object);
+			this.HttpApplicationState = new HttpApplicationStateMock();
+			this.HttpRequest = new HttpRequestMock();
+			this.HttpResponse = new HttpResponseMock();
+			this.HttpServerUtility = new HttpServerUtilityMock();
+			this.HttpSessionState = new HttpSessionStateMock();
+
+			this.ExpectGet(c => c.Application).Returns(this.HttpApplicationState.Object);
+			this.ExpectGet(c => c.Request).Returns(this.HttpRequest.Object);
+			this.ExpectGet(c => c.Response).Returns(this.HttpResponse.Object);
+			this.ExpectGet(c => c.Server).Returns(this.HttpServerUtility.Object);
+			this.ExpectGet(c => c.Session).Returns(this.HttpSessionState.Object);
 		}
 
+		/// <summary>
+		/// 
+		/// </summary>
+		public HttpApplicationStateMock HttpApplicationState
+		{
+			get;
+			private set;
+		}
+
+		/// <summary>
+		/// 
+		/// </summary>
+		public HttpRequestMock HttpRequest
+		{
+			get;
+			private set;
+		}
+
+		/// <summary>
+		/// 
+		/// </summary>
+		public HttpResponseMock HttpResponse
+		{
+			get;
+			private set;
+		}
+
+		/// <summary>
+		/// 
+		/// </summary>
+		public HttpServerUtilityMock HttpServerUtility
+		{
+			get;
+			private set;
+		}
+
+		/// <summary>
+		/// 
+		/// </summary>
+		public HttpSessionStateMock HttpSessionState
+		{
+			get;
+			private set;
+		}
+		
 		/// <summary>
 		/// Verify only the mock expectations marked as Verifiable
 		/// </summary>
 		public override void Verify()
 		{
-			httpApplicationState.Verify();
-			httpRequest.Verify();
-			httpResponse.Verify();
-			httpServerUtility.Verify();
-			httpSessionState.Verify();
+			this.HttpApplicationState.Verify();
+			this.HttpRequest.Verify();
+			this.HttpResponse.Verify();
+			this.HttpServerUtility.Verify();
+			this.HttpSessionState.Verify();
 
 			base.Verify();
 		}
@@ -48,11 +93,11 @@ namespace Moq.Mvc
 		/// </summary>
 		public override void VerifyAll()
 		{
-			httpApplicationState.VerifyAll();
-			httpRequest.VerifyAll();
-			httpResponse.VerifyAll();
-			httpServerUtility.VerifyAll();
-			httpSessionState.VerifyAll();
+			this.HttpApplicationState.VerifyAll();
+			this.HttpRequest.VerifyAll();
+			this.HttpResponse.VerifyAll();
+			this.HttpServerUtility.VerifyAll();
+			this.HttpSessionState.VerifyAll();
 
 			base.VerifyAll();
 		}
