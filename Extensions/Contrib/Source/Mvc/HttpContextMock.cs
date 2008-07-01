@@ -32,47 +32,27 @@ namespace Moq.Mvc
 		/// <summary>
 		/// 
 		/// </summary>
-		public HttpApplicationStateMock HttpApplicationState
-		{
-			get;
-			private set;
-		}
+		public HttpApplicationStateMock HttpApplicationState { get; private set; }
 
 		/// <summary>
 		/// 
 		/// </summary>
-		public HttpRequestMock HttpRequest
-		{
-			get;
-			private set;
-		}
+		public HttpRequestMock HttpRequest { get; private set; }
 
 		/// <summary>
 		/// 
 		/// </summary>
-		public HttpResponseMock HttpResponse
-		{
-			get;
-			private set;
-		}
+		public HttpResponseMock HttpResponse { get; private set; }
 
 		/// <summary>
 		/// 
 		/// </summary>
-		public HttpServerUtilityMock HttpServerUtility
-		{
-			get;
-			private set;
-		}
+		public HttpServerUtilityMock HttpServerUtility { get; private set; }
 
 		/// <summary>
 		/// 
 		/// </summary>
-		public HttpSessionStateMock HttpSessionState
-		{
-			get;
-			private set;
-		}
+		public HttpSessionStateMock HttpSessionState { get; private set; }
 		
 		/// <summary>
 		/// Verify only the mock expectations marked as Verifiable

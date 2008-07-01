@@ -3,7 +3,7 @@
   <PropertyGroup>
     <Configuration Condition=" '$(Configuration)' == '' ">Debug</Configuration>
     <Platform Condition=" '$(Platform)' == '' ">AnyCPU</Platform>
-    <ProductVersion>9.0.21022</ProductVersion>
+    <ProductVersion>9.0.30428</ProductVersion>
     <SchemaVersion>2.0</SchemaVersion>
     <ProjectGuid>{57FA1865-FE1B-4E53-9201-160AC75B5011}</ProjectGuid>
     <OutputType>Library</OutputType>
@@ -60,6 +60,7 @@
   </ItemGroup>
   <ItemGroup>
     <Compile Include="Mvc\HttpApplicationStateMock.cs" />
+    <Compile Include="Mvc\HttpCachePolicyBaseMock.cs" />
     <Compile Include="Mvc\HttpContextMock.cs" />
     <Compile Include="Mvc\HttpRequestMock.cs" />
     <Compile Include="Mvc\HttpResponseMock.cs" />
