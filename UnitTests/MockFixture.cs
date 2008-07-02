@@ -396,6 +396,8 @@ namespace Moq.Tests
 		public void OverridesBehaviorFromAbstractClass()
 		{
 			var mock = new Mock<FooBase>();
+			mock.CallBase = true;
+
 			mock.Expect(x => x.Check("foo")).Returns(false);
 
 			Assert.False(mock.Object.Check("foo"));
@@ -407,6 +409,8 @@ namespace Moq.Tests
 		{
 			var mock = new Mock<FooOverrideEquals>();
 			var mock2 = new Mock<FooOverrideEquals>();
+
+			mock.CallBase = true;
 
 			mock.Object.Name = "Foo";
 			mock2.Object.Name = "Foo";
@@ -913,16 +917,14 @@ namespace Moq.Tests
 		}
 
 		[Fact]
-		public void CallsBaseClassVirtualImplementationByDefault()
+		public void DoesNotCallBaseClassVirtualImplementationByDefault()
 		{
 			var mock = new Mock<FooBase>();
 
 			Assert.False(mock.Object.BaseCalled);
 			mock.Object.BaseCall();
 
-			Assert.Equal(default(bool), mock.Object.BaseCall("foo"));
-			Assert.True(mock.Object.BaseCalled);
-			Assert.True(mock.Object.BaseReturnCalled);
+			Assert.False(mock.Object.BaseCalled);
 		}
 
 		[Fact]

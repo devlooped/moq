@@ -221,6 +221,8 @@ namespace Moq.Tests
 
 			Assert.Equal("baz", mock.Object.DoStringArg("bar"));
 
+			mock = new Mock<FooBase>();
+
 			mock.Protected()
 				.Expect<string>("StringArg",
 					ItExpr.Is<string>(s => s.Length >= 2))
@@ -234,6 +236,9 @@ namespace Moq.Tests
 			Assert.Equal("long", mock.Object.DoStringArg("foo"));
 
 
+			mock = new Mock<FooBase>();
+			mock.CallBase = true;
+
 			mock.Protected()
 				.Expect<string>("TwoArgs",
 					ItExpr.IsAny<string>(),
@@ -242,6 +247,9 @@ namespace Moq.Tests
 	
 			Assert.Equal("done", mock.Object.DoTwoArgs("foobar", 5));
 			Assert.Equal("echo", mock.Object.DoTwoArgs("echo", 15));
+
+			mock = new Mock<FooBase>();
+			mock.CallBase = true;
 
 			mock.Protected()
 				.Expect<string>("TwoArgs",
