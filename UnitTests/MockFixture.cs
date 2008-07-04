@@ -484,7 +484,7 @@ namespace Moq.Tests
 			catch (MockException mex)
 			{
 				Assert.Equal(MockException.ExceptionReason.VerificationFailed, mex.Reason);
-				Assert.True(mex.Message.Contains(@".DoStringArgReturnInt(Is(s => IsNullOrEmpty(s)))"), "Contains evaluated expected argument.");
+				Assert.True(mex.Message.Contains(@".DoStringArgReturnInt(Is<String>(s => IsNullOrEmpty(s)))"), "Contains evaluated expected argument.");
 			}
 		}
 

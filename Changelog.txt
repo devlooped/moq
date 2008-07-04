@@ -8,7 +8,8 @@ Version 2.5
     * Added verification with expressions, which better supports Arrange-Act-Assert testing model (can do Verify(m => m.Do(...)))
     * Added Throws<TException>
     * Added mock.CallBase property to specify whether the virtual members base implementation should be called
-    * Added support for implementing and setting expectations on additional interfaces in the mock, via the new mock.As<TInterface>() method.
+    * Added support for implementing and setting expectations on additional interfaces in the mock, via the new mock.As<TInterface>() method (thanks Fernando Simonazzi!)
+    * Improved argument type matching for Is/IsAny  (thanks Jeremy.Skinner!)
 
 
 Version 2.0

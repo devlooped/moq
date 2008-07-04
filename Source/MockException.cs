@@ -133,7 +133,7 @@ namespace Moq
 				message
 					.Append(targetTypeName)
 					.Append(" ")
-					.AppendLine(expr.ToString());
+					.AppendLine(expr.ToStringFixed());
 			}
 
 			return message.ToString();
