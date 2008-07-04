@@ -355,7 +355,6 @@ namespace Moq.Tests
 
 			protected virtual int this[int index] { get { return 0; } set { } }
 
-
 			public string DoTwoArgs(string arg, int arg1) { return TwoArgs(arg, arg1); } 
 			protected virtual string TwoArgs(string arg, int arg1)
 			{
