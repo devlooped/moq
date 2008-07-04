@@ -15,7 +15,7 @@ namespace Moq
 	{
 		MockBehavior behavior;
 		Type targetType;
-		Dictionary<string, IProxyCall> calls = new Dictionary<string, IProxyCall>();
+		Dictionary<ExpressionKey, IProxyCall> calls = new Dictionary<ExpressionKey, IProxyCall>();
 		Mock mock;
 		List<IInvocation> actualInvocations = new List<IInvocation>();
 
@@ -57,10 +57,20 @@ namespace Moq
 		{
 			var expr = call.ExpectExpression.PartialMatcherAwareEval();
 
+			var s = expr.ToStringFixed();
+
 			if (kind == ExpectKind.PropertySet)
-				calls["set::" + expr.ToStringFixed()] = call;
-			else
-				calls[expr.ToStringFixed()] = call;
+				s = "set::" + s;
+
+			var constants = new ConstantsVisitor(expr).Values;
+			var key = new ExpressionKey(s, constants);
+
+			calls[key] = call;
+
+			//if (kind == ExpectKind.PropertySet)
+			//    calls["set::" + expr.ToStringFixed()] = call;
+			//else
+			//    calls[expr.ToStringFixed()] = call;
 		}
 
 		public void Intercept(IInvocation invocation)
@@ -225,6 +235,72 @@ namespace Moq
 						MockException.ExceptionReason.ReturnValueRequired,
 						behavior, invocation);
 				}
+			}
+		}
+
+		class ExpressionKey
+		{
+			string fixedString;
+			List<object> values;
+
+			public ExpressionKey(string fixedString, List<object> values)
+			{
+				this.fixedString = fixedString;
+				this.values = values;
+			}
+
+			public override bool Equals(object obj)
+			{
+				if (Object.ReferenceEquals(this, obj))
+					return true;
+
+				var key = obj as ExpressionKey;
+				
+				if (key == null)
+					return false;
+
+				var eq = key.fixedString == this.fixedString &&
+					key.values.Count == this.values.Count;
+
+				var i = 0;
+
+				while (eq && i < this.values.Count)
+				{
+					eq |= this.values[i] == key.values[i];
+				}
+
+				return eq;
+			}
+
+			public override int GetHashCode()
+			{
+				var hash = fixedString.GetHashCode();
+
+				foreach (var value in values)
+				{
+					if (value != null)
+						hash ^= value.GetHashCode();
+				}
+
+				return hash;
+			}
+		}
+
+		class ConstantsVisitor : ExpressionVisitor
+		{
+			public ConstantsVisitor(Expression expression)
+			{
+				Values = new List<object>();
+				base.Visit(expression);
+			}
+
+			public List<object> Values { get; set; }
+
+			protected override Expression VisitConstant(ConstantExpression c)
+			{
+				Values.Add(c.Value);
+
+				return base.VisitConstant(c);
 			}
 		}
 	}

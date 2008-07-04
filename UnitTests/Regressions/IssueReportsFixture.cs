@@ -62,7 +62,7 @@ namespace Moq.Tests.Regressions
 
 		#endregion
 
-		#region 62
+		#region #62
 
 		public interface ISomething<T>
 		{
@@ -73,6 +73,31 @@ namespace Moq.Tests.Regressions
 		public void CreatesMockWithGenericsConstraints()
 		{
 			var mock = new Mock<ISomething<object>>();
+		}
+
+		#endregion
+
+		#region #60
+
+		public interface IFoo
+		{
+			void DoThings(object arg);
+		}
+
+		[Fact]
+		public void TwoExpectations()
+		{
+			Mock<IFoo> mocked = new Mock<IFoo>(MockBehavior.Strict);
+			object arg1 = new object();
+			object arg2 = new object();
+
+			mocked.Expect(m => m.DoThings(arg1));
+			mocked.Expect(m => m.DoThings(arg2));
+
+			mocked.Object.DoThings(arg1);
+			mocked.Object.DoThings(arg2);
+
+			mocked.VerifyAll();
 		}
 
 		#endregion
