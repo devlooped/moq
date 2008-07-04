@@ -128,6 +128,47 @@ namespace Moq.Tests.Regressions
 
 		#endregion
 
+		#region #49
+
+		[Fact]
+		public void UsesCustomMatchersWithGenerics()
+		{
+			var mock = new Mock<IEvaluateLatest>();
+
+			mock.Expect(e => e.Method(IsEqual.To(5))).Returns(1);
+			mock.Expect(e => e.Method(IsEqual.To<int, string>(6, "foo"))).Returns(2);
+
+			Assert.Equal(1, mock.Object.Method(5));
+			Assert.Equal(2, mock.Object.Method(6));
+		}
+
+		static class IsEqual
+		{
+			[Matcher]
+			public static T To<T>(T value)
+			{
+				return value;
+			}
+
+			public static bool To<T>(T left, T right)
+			{
+				return left.Equals(right);
+			}
+
+			[Matcher]
+			public static T To<T, U>(T value, U value2)
+			{
+				return value;
+			}
+
+			public static bool To<T, U>(T left, T right, U value)
+			{
+				return left.Equals(right);
+			}
+		}
+
+		#endregion
+
 		// run "netsh http add urlacl url=http://+:7777/ user=[domain]\[user]"
 		// to avoid running the test as an admin
 		[Fact]
