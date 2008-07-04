@@ -1,10 +1,9 @@
-﻿using System.Diagnostics;
-using Xunit;
+﻿using System;
 using System.Collections.Generic;
-using System;
 using System.Linq;
-using System.ServiceModel.Web;
 using System.ServiceModel;
+using System.ServiceModel.Web;
+using Xunit;
 
 namespace Moq.Tests.Regressions
 {
@@ -179,6 +178,29 @@ namespace Moq.Tests.Regressions
 
 			Assert.Throws<ArgumentException>(() => Mock.Get(m));
 		}
+
+		#endregion
+
+		#region #69
+
+		public interface IFooPtr
+		{
+			IntPtr Get(string input);
+		}
+
+		[Fact(Skip = "Looks like a bug in DP2. See #69.")]
+		public void ReturnsIntPtr()
+		{
+			Mock<IFooPtr> mock = new Mock<IFooPtr>(MockBehavior.Strict);
+			IntPtr ret = new IntPtr(3);
+
+			mock.Expect(m => m.Get("a")).Returns(ret);
+
+			IntPtr ret3 = mock.Object.Get("a");
+
+			Assert.Equal(ret, mock.Object.Get("a"));
+		}
+
 
 		#endregion
 
