@@ -102,6 +102,31 @@ namespace Moq.Tests.Regressions
 
 		#endregion
 
+		#region #21
+
+		[Fact]
+		public void MatchesLatestExpectations()
+		{
+			var mock = new Mock<IEvaluateLatest>();
+
+			mock.Expect(m => m.Method(It.IsAny<int>())).Returns(0);
+			mock.Expect(m => m.Method(It.IsInRange<int>(0, 20, Range.Inclusive))).Returns(1);
+
+			mock.Expect(m => m.Method(5)).Returns(2);
+			mock.Expect(m => m.Method(10)).Returns(3);
+
+			Assert.Equal(3, mock.Object.Method(10));
+			Assert.Equal(2, mock.Object.Method(5));
+			Assert.Equal(1, mock.Object.Method(6));
+			Assert.Equal(0, mock.Object.Method(25));
+		}
+
+		public interface IEvaluateLatest
+		{
+			int Method(int value);
+		}
+
+		#endregion
 
 		// run "netsh http add urlacl url=http://+:7777/ user=[domain]\[user]"
 		// to avoid running the test as an admin

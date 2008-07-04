@@ -108,7 +108,7 @@ namespace Moq
 			// always save to support Verify[expression] pattern.
 			actualInvocations.Add(invocation);
 
-			var call = calls.Values.FirstOrDefault(c => c.Matches(invocation));
+			var call = calls.Values.LastOrDefault(c => c.Matches(invocation));
 
 			if (call == null)
 			{

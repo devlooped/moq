@@ -301,8 +301,8 @@ namespace Moq.Tests
 			var mock = new Mock<IFoo>(MockBehavior.Loose);
 			var reg = "[a-d]+";
 
-			mock.Expect(x => x.DoStringArgReturnInt(It.IsRegex(reg))).Returns(1);
 			mock.Expect(x => x.DoStringArgReturnInt(It.IsRegex(reg, RegexOptions.IgnoreCase))).Returns(2);
+			mock.Expect(x => x.DoStringArgReturnInt(It.IsRegex(reg))).Returns(1);
 
 			Assert.Equal(1, mock.Object.DoStringArgReturnInt("b"));
 			Assert.Equal(1, mock.Object.DoStringArgReturnInt("abc"));
@@ -326,11 +326,11 @@ namespace Moq.Tests
 		}
 
 		[Fact]
-		public void InvokesFirstExpectationThatMatches()
+		public void InvokesLastExpectationThatMatches()
 		{
 			var mock = new Mock<IFoo>();
-			mock.Expect(x => x.Execute("ping")).Returns("I'm alive!");
 			mock.Expect(x => x.Execute(It.IsAny<string>())).Throws(new ArgumentException());
+			mock.Expect(x => x.Execute("ping")).Returns("I'm alive!");
 
 			Assert.Equal("I'm alive!", mock.Object.Execute("ping"));
 
