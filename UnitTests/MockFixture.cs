@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Collections.Generic;
 using System.Linq.Expressions;
 using System.Text.RegularExpressions;
 using Xunit;
@@ -381,7 +382,7 @@ namespace Moq.Tests
 			Assert.False(String.IsNullOrEmpty(mock.Object.ToString()));
 		}
 
-		[Fact(Skip="Castle.DynamicProxy2 doesn't seem to call interceptors for ToString, GetHashCode")]
+		[Fact(Skip = "Castle.DynamicProxy2 doesn't seem to call interceptors for ToString, GetHashCode")]
 		public void OverridesObjectMethods()
 		{
 			var mock = new Mock<IFoo>();
@@ -540,7 +541,7 @@ namespace Moq.Tests
 		public void ThrowsIfExpectOnNonVirtual()
 		{
 			var mock = new Mock<FooBase>();
-			
+
 			Assert.Throws<ArgumentException>(() => mock.Expect(x => x.True()).Returns(false));
 		}
 
@@ -594,7 +595,10 @@ namespace Moq.Tests
 		[Fact]
 		public void ThrowsIfNoMatchingConstructorFound()
 		{
-			Assert.Throws<ArgumentException>(() => new Mock<ClassWithNoDefaultConstructor>(25, true));
+			Assert.Throws<ArgumentException>(() => 
+			{
+				Console.WriteLine(new Mock<ClassWithNoDefaultConstructor>(25, true).Object);
+			});
 		}
 
 		[Fact]
@@ -1133,6 +1137,61 @@ namespace Moq.Tests
 			}
 		}
 
+		[Fact]
+		public void ShouldThrowIfAsIsInvokedAfterInstanceIsRetrieved()
+		{
+			var mock = new Mock<IBag>();
+
+			var instance = mock.Object;
+
+			Assert.Throws<InvalidOperationException>(() => mock.As<IFoo>());
+		}
+
+		[Fact]
+		public void ShouldThrowIfAsIsInvokedWithANonInterfaceTypeParameter()
+		{
+			var mock = new Mock<IBag>();
+
+			Assert.Throws<ArgumentException>(() => mock.As<object>());
+		}
+
+		[Fact]
+		public void ShouldExpectGetOnANewInterface()
+		{
+			var mock = new Mock<IBag>();
+
+			bool called = false;
+
+			mock.As<IFoo>().ExpectGet(x => x.ValueProperty)
+				.Callback(() => called = true)
+				.Returns(25);
+
+			Assert.Equal(25, ((IFoo)mock.Object).ValueProperty);
+			Assert.True(called);
+		}
+
+		[Fact]
+		public void ShouldExpectCallWithArgumentOnNewInterface()
+		{
+			var mock = new Mock<IBag>();
+			mock.As<IFoo>().Expect(x => x.DoIntArgReturnInt(100)).Returns(10);
+
+			Assert.Equal(10, ((IFoo)mock.Object).DoIntArgReturnInt(100));
+		}
+
+		[Fact]
+		public void ShouldExpectPropertySetterOnNewInterface()
+		{
+			bool called = false;
+			int value = 0;
+			var mock = new Mock<IBag>();
+			mock.As<IFoo>().ExpectSet(x => x.ValueProperty).Callback(i => { value = i; called = true; });
+
+			((IFoo)mock.Object).ValueProperty = 100;
+
+			Assert.Equal(100, value);
+			Assert.True(called);
+		}
 
 		// ShouldCallVirtualImplementationIfNoMatch
 		// ShouldCallVirtualImplementationIfNoMatchMBRO

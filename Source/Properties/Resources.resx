@@ -210,4 +210,10 @@ mock.ExpectSet(x =&gt; x.{1}).Callback(callbackDelegate);</value>
   <data name="NoMatchingCall" xml:space="preserve">
     <value>The given invocation was not performed on the mock.</value>
   </data>
+  <data name="AlreadyInitialized" xml:space="preserve">
+    <value>Mock type has already been initialized by accessing its Object property. Adding interfaces must be done before that.</value>
+  </data>
+  <data name="AsMustBeInterface" xml:space="preserve">
+    <value>Can only add interfaces to the mock.</value>
+  </data>
 </root>
