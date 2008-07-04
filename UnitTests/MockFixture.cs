@@ -1193,10 +1193,64 @@ namespace Moq.Tests
 			Assert.True(called);
 		}
 
-		// ShouldCallVirtualImplementationIfNoMatch
-		// ShouldCallVirtualImplementationIfNoMatchMBRO
+		[Fact]
+		public void MockAsExistingInterfaceAfterObjectSucceedsIfNotNew()
+		{
+			var mock = new Mock<IBag>();
 
-		// ShouldOptOutFromCallingBaseImplementation
+			mock.As<IFoo>().ExpectGet(x => x.ValueProperty).Returns(25);
+
+			Assert.Equal(25, ((IFoo)mock.Object).ValueProperty);
+
+			var fm = mock.As<IFoo>();
+
+			fm.Expect(f => f.Execute());
+		}
+
+		[Fact]
+		public void GetMockFromAddedInterfaceWorks()
+		{
+			var bag = new Mock<IBag>();
+			var foo = bag.As<IFoo>();
+
+			foo.ExpectGet(x => x.ValueProperty).Returns(25);
+
+			IFoo f = bag.Object as IFoo;
+
+			var foomock = Mock.Get(f);
+
+			Assert.NotNull(foomock);
+		}
+
+		[Fact]
+		public void GetMockFromNonAddedInterfaceThrows()
+		{
+			var bag = new Mock<IBag>();
+			bag.As<IFoo>();
+			bag.As<ICloneable>();
+			object b = bag.Object;
+
+			Assert.Throws<ArgumentException>(() => Mock.Get(b));
+		}
+
+		[Fact]
+		public void VerifiesExpectationOnAddedInterface()
+		{
+			var bag = new Mock<IBag>();
+			var foo = bag.As<IFoo>();
+
+			foo.Expect(f => f.Execute()).Verifiable();
+
+			Assert.Throws<MockVerificationException>(() => foo.Verify());
+			Assert.Throws<MockVerificationException>(() => foo.VerifyAll());
+			Assert.Throws<MockException>(() => foo.Verify(f => f.Execute()));
+
+			foo.Object.Execute();
+
+			foo.Verify();
+			foo.VerifyAll();
+			foo.Verify(f => f.Execute());
+		}
 
 		// ShouldSupportByRefArguments?
 		// ShouldSupportOutArguments?

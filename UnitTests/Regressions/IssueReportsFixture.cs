@@ -169,6 +169,19 @@ namespace Moq.Tests.Regressions
 
 		#endregion
 
+		#region #68
+
+		[Fact]
+		public void GetMockCastedToObjectThrows()
+		{
+			var mock = new Mock<IAsyncResult>();
+			object m = mock.Object;
+
+			Assert.Throws<ArgumentException>(() => Mock.Get(m));
+		}
+
+		#endregion
+
 		// run "netsh http add urlacl url=http://+:7777/ user=[domain]\[user]"
 		// to avoid running the test as an admin
 		[Fact]

@@ -80,6 +80,12 @@ namespace Moq
 			if (invocation.Method.DeclaringType.IsGenericType &&
 			  invocation.Method.DeclaringType.GetGenericTypeDefinition() == typeof(IMocked<>))
 			{
+				// "Mixin" of IMocked<T>
+				invocation.ReturnValue = mock;
+				return;
+			}
+			else if (invocation.Method.DeclaringType == typeof(IMocked))
+			{
 				// "Mixin" of IMocked
 				invocation.ReturnValue = mock;
 				return;

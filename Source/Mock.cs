@@ -41,12 +41,48 @@ namespace Moq
 		///     .Returns(tempUrl);
 		/// </code>
 		/// </example>
-		public static Mock<T> Get<T>(T mocked)
+		public static IMock<T> Get<T>(T mocked)
 			where T : class
 		{
 			if (mocked is IMocked<T>)
 			{
+				// This would be the fastest check.
 				return (mocked as IMocked<T>).Mock;
+			}
+			else if (mocked is IMocked)
+			{
+				// We may have received a T of an implemented 
+				// interface in the mock.
+				var mock = ((IMocked)mocked).Mock;
+				var imockedType = mocked.GetType().GetInterface("IMocked`1");
+				var mockedType = imockedType.GetGenericArguments()[0];
+
+				if (mock.ImplementedInterfaces.Contains(typeof(T)))
+				{
+					var asMethod = mock.GetType().GetMethod("As");
+					var asInterface = asMethod.MakeGenericMethod(typeof(T));
+					var asMock = asInterface.Invoke(mock, null);
+
+					return (IMock<T>)asMock;
+				}
+				else
+				{
+					// Alternatively, we may have been asked 
+					// for a type that is assignable to the 
+					// one for the mock.
+					// This is not valid as generic types 
+					// do not support covariance on 
+					// the generic parameters.
+					var types = String.Join(", ",
+							new[] { mockedType }
+							// Skip first interface which is always our internal IMocked<T>
+							.Concat(mock.ImplementedInterfaces.Skip(1))
+							.Select(t => t.Name)
+							.ToArray());
+
+					throw new ArgumentException(String.Format(Properties.Resources.InvalidMockGetType, 
+						typeof(T).Name, types));
+				}
 			}
 			else
 			{
@@ -62,7 +98,13 @@ namespace Moq
 		protected Mock()
 		{
 			this.CallBase = false;
+			ImplementedInterfaces = new List<Type>();
 		}
+
+		/// <summary>
+		/// Exposes the list of extra interfaces implemented by the mock.
+		/// </summary>
+		protected internal List<Type> ImplementedInterfaces { get; private set; }
 
 		/// <summary>
 		/// Whether the base member virtual implementation will be called 

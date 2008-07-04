@@ -170,6 +170,17 @@ namespace Moq.Properties {
         }
         
         /// <summary>
+        ///   Looks up a localized string similar to Cannot retrieve a mock with the given object type {0} as it&apos;s not the main type of the mock or any of its additional interfaces.
+        ///Please cast the argument to one of the supported types: {1}.
+        ///Remember that there&apos;s no generics covariance in the CLR, so your object must be one of these types in order for the call to succeed..
+        /// </summary>
+        internal static string InvalidMockGetType {
+            get {
+                return ResourceManager.GetString("InvalidMockGetType", resourceCulture);
+            }
+        }
+        
+        /// <summary>
         ///   Looks up a localized string similar to Member {0}.{1} does not exist..
         /// </summary>
         internal static string MemberMissing {

@@ -216,4 +216,9 @@ mock.ExpectSet(x =&gt; x.{1}).Callback(callbackDelegate);</value>
   <data name="AsMustBeInterface" xml:space="preserve">
     <value>Can only add interfaces to the mock.</value>
   </data>
+  <data name="InvalidMockGetType" xml:space="preserve">
+    <value>Cannot retrieve a mock with the given object type {0} as it's not the main type of the mock or any of its additional interfaces.
+Please cast the argument to one of the supported types: {1}.
+Remember that there's no generics covariance in the CLR, so your object must be one of these types in order for the call to succeed.</value>
+  </data>
 </root>

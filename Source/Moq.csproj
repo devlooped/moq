@@ -56,7 +56,7 @@
   <ItemGroup>
     <Compile Include="DefaultValue.cs" />
     <Compile Include="ExpectKind.cs" />
-    <Compile Include="ISetExpectations.cs" />
+    <Compile Include="IMock.cs" />
     <Compile Include="Language\Flow\IReturnsResult.cs" />
     <Compile Include="Language\IRaise.cs" />
     <Compile Include="MatcherAttribute.cs" />

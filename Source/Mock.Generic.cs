@@ -67,7 +67,7 @@ namespace Moq
 	/// Assert.False(order.IsFilled);
 	/// </code>
 	/// </example>
-	public class Mock<T> : Mock, IVerifiable, IHideObjectMembers, ISetExpectations<T>
+	public class Mock<T> : Mock, IVerifiable, IHideObjectMembers, IMock<T>
 		where T : class
 	{
 		static readonly ProxyGenerator generator = new ProxyGenerator();
@@ -75,7 +75,6 @@ namespace Moq
 		T instance;
 		MockBehavior behavior;
 		object[] constructorArguments;
-		List<Type> interfacesTypes;
 
 		/// <summary>
 		/// Initializes an instance of the mock with a specific <see cref="MockBehavior">behavior</see> with 
@@ -94,9 +93,8 @@ namespace Moq
 
 			this.behavior = behavior;
 			interceptor = new Interceptor(behavior, typeof(T), this);
-			var interfacesTypes = new Type[] { typeof(IMocked<T>) };
 			this.constructorArguments = args;
-			this.interfacesTypes = new List<Type> { typeof(IMocked<T>) };
+			this.ImplementedInterfaces.Add(typeof(IMocked<T>));
 
 			CheckParameters();
 		}
@@ -126,7 +124,7 @@ namespace Moq
 				if (mockType.IsInterface)
 				{
 					instance
-						= (T)generator.CreateInterfaceProxyWithoutTarget(mockType, interfacesTypes.ToArray(), interceptor);
+						= (T)generator.CreateInterfaceProxyWithoutTarget(mockType, base.ImplementedInterfaces.ToArray(), interceptor);
 				}
 				else
 				{
@@ -134,14 +132,14 @@ namespace Moq
 					{
 						if (constructorArguments.Length > 0)
 						{
-							var generatedType = generator.ProxyBuilder.CreateClassProxy(mockType, interfacesTypes.ToArray(), new ProxyGenerationOptions());
+							var generatedType = generator.ProxyBuilder.CreateClassProxy(mockType, base.ImplementedInterfaces.ToArray(), new ProxyGenerationOptions());
 							instance
 								= (T)Activator.CreateInstance(generatedType,
 									new object[] { new IInterceptor[] { interceptor } }.Concat(constructorArguments).ToArray());
 						}
 						else
 						{
-							instance = (T)generator.CreateClassProxy(mockType, interfacesTypes.ToArray(), interceptor);
+							instance = (T)generator.CreateClassProxy(mockType, base.ImplementedInterfaces.ToArray(), interceptor);
 						}
 					}
 					catch (TypeLoadException tle)
@@ -216,7 +214,7 @@ namespace Moq
 		internal MockBehavior Behavior { get { return behavior; } }
 
 		/// <summary>
-		/// See <see cref="ISetExpectations{T}.Expect(Expression{Action{T}})"/>.
+		/// Implements <see cref="IMock{T}.Expect(Expression{Action{T}})"/>.
 		/// </summary>
 		public IExpect Expect(Expression<Action<T>> expression)
 		{
@@ -243,7 +241,7 @@ namespace Moq
 		}
 
 		/// <summary>
-		/// See <see cref="ISetExpectations{T}.Expect{TResult}(Expression{Func{T, TResult}})"/>.
+		/// Implements <see cref="IMock{T}.Expect{TResult}(Expression{Func{T, TResult}})"/>.
 		/// </summary>
 		public IExpect<TResult> Expect<TResult>(Expression<Func<T, TResult>> expression)
 		{
@@ -270,7 +268,7 @@ namespace Moq
 		}
 
 		/// <summary>
-		/// See <see cref="ISetExpectations{T}.ExpectGet{TProperty}(Expression{Func{T, TProperty}})"/>.
+		/// Implements <see cref="IMock{T}.ExpectGet{TProperty}(Expression{Func{T, TProperty}})"/>.
 		/// </summary>
 		public IExpectGetter<TProperty> ExpectGet<TProperty>(Expression<Func<T, TProperty>> expression)
 		{
@@ -309,7 +307,7 @@ namespace Moq
 		}
 
 		/// <summary>
-		/// See <see cref="ISetExpectations{T}.ExpectSet{TProperty}(Expression{Func{T, TProperty}})"/>.
+		/// Implements <see cref="IMock{T}.ExpectSet{TProperty}(Expression{Func{T, TProperty}})"/>.
 		/// </summary>
 		public IExpectSetter<TProperty> ExpectSet<TProperty>(Expression<Func<T, TProperty>> expression)
 		{
@@ -333,25 +331,20 @@ namespace Moq
 		}
 
 		/// <summary>
-		/// Verifies that a specific invocation matching the given 
-		/// expression was performed on the mock. Use in conjuntion 
-		/// with the default <see cref="MockBehavior.Loose"/>.
+		/// Implements <see cref="IMock{T}.Verify(Expression{Action{T}})"/>.
 		/// </summary>
-		/// <example group="verification">
-		/// This example assumes that the mock has been used, 
-		/// and later we want to verify that a given invocation 
-		/// with specific parameters was performed:
-		/// <code>
-		/// var mock = new Mock&lt;IProcessor&gt;();
-		/// // exercise mock
-		/// //...
-		/// // Will throw if the test code didn't call Execute with a "ping" string argument.
-		/// mock.Verify(proc =&gt; proc.Execute("ping"));
-		/// </code>
-		/// </example>
-		/// <exception cref="MockException">The invocation was not performed on the mock.</exception>
 		public virtual void Verify(Expression<Action<T>> expression)
 		{
+			Verify(expression, interceptor);
+		}
+
+		private static void Verify(Expression<Action<T>> expression, Interceptor interceptor)
+		{
+			// Made static so that it can be called from the AsInterface private class
+
+			Guard.ArgumentNotNull(expression, "expression");
+			Guard.ArgumentNotNull(interceptor, "interceptor");
+
 			MethodInfo method;
 			Expression[] args;
 			GetMethodArguments(expression, out method, out args);
@@ -365,25 +358,20 @@ namespace Moq
 		}
 
 		/// <summary>
-		/// Verifies that a specific invocation matching the given 
-		/// expression was performed on the mock. Use in conjuntion 
-		/// with the default <see cref="MockBehavior.Loose"/>.
+		/// Implements <see cref="IMock{T}.Verify{TResult}(Expression{Func{T, TResult}})"/>.
 		/// </summary>
-		/// <example group="verification">
-		/// This example assumes that the mock has been used, 
-		/// and later we want to verify that a given invocation 
-		/// with specific parameters was performed:
-		/// <code>
-		/// var mock = new Mock&lt;IWarehouse&gt;();
-		/// // exercise mock
-		/// //...
-		/// // Will throw if the test code didn't call HasInventory.
-		/// mock.Verify(warehouse =&gt; warehouse.HasInventory(TALISKER, 50));
-		/// </code>
-		/// </example>
-		/// <exception cref="MockException">The invocation was not performed on the mock.</exception>
 		public virtual void Verify<TResult>(Expression<Func<T, TResult>> expression)
 		{
+			Verify(expression, interceptor);
+		}
+
+		private static void Verify<TResult>(Expression<Func<T, TResult>> expression, Interceptor interceptor)
+		{
+			// Made static so that it can be called from the AsInterface private class
+
+			Guard.ArgumentNotNull(expression, "expression");
+			Guard.ArgumentNotNull(interceptor, "interceptor");
+
 			MethodInfo method;
 			Expression[] args;
 			GetMethodOrPropertyArguments<T, TResult>(expression, out method, out args);
@@ -397,47 +385,37 @@ namespace Moq
 		}
 
 		/// <summary>
-		/// Verifies that a property was read on the mock. 
-		/// Use in conjuntion with the default <see cref="MockBehavior.Loose"/>.
+		/// Implements <see cref="IMock{T}.VerifyGet{TProperty}(Expression{Func{T, TProperty}})"/>.
 		/// </summary>
-		/// <example group="verification">
-		/// This example assumes that the mock has been used, 
-		/// and later we want to verify that a given property 
-		/// was retrieved from it:
-		/// <code>
-		/// var mock = new Mock&lt;IWarehouse&gt;();
-		/// // exercise mock
-		/// //...
-		/// // Will throw if the test code didn't retrieve the IsClosed property.
-		/// mock.VerifyGet(warehouse =&gt; warehouse.IsClosed);
-		/// </code>
-		/// </example>
-		/// <exception cref="MockException">The invocation was not performed on the mock.</exception>
 		public virtual void VerifyGet<TProperty>(Expression<Func<T, TProperty>> expression)
 		{
+			Verify(expression, interceptor);
+		}
+
+		private static void VerifyGet<TProperty>(Expression<Func<T, TProperty>> expression, Interceptor interceptor)
+		{
+			// Made static so that it can be called from the AsInterface private class
+
 			// Just for consistency with the Expect/ExpectGet pair.
-			Verify(expression);
+			Verify(expression, interceptor);
 		}
 
 		/// <summary>
-		/// Verifies that a property has been set on the mock. 
-		/// Use in conjuntion with the default <see cref="MockBehavior.Loose"/>.
+		/// Implements <see cref="IMock{T}.VerifySet{TProperty}(Expression{Func{T, TProperty}})"/>.
 		/// </summary>
-		/// <example group="verification">
-		/// This example assumes that the mock has been used, 
-		/// and later we want to verify that a given invocation 
-		/// with specific parameters was performed:
-		/// <code>
-		/// var mock = new Mock&lt;IWarehouse&gt;();
-		/// // exercise mock
-		/// //...
-		/// // Will throw if the test code didn't set the IsClosed property.
-		/// mock.VerifySet(warehouse =&gt; warehouse.IsClosed);
-		/// </code>
-		/// </example>
-		/// <exception cref="MockException">The invocation was not performed on the mock.</exception>
 		public virtual void VerifySet<TProperty>(Expression<Func<T, TProperty>> expression)
 		{
+			VerifySet(expression, interceptor);
+		}
+
+		private static void VerifySet<TProperty>(Expression<Func<T, TProperty>> expression, Interceptor interceptor)
+		{
+			// Made static so that it can be called from the AsInterface private class
+
+			Guard.ArgumentNotNull(expression, "expression");
+			Guard.ArgumentNotNull(interceptor, "interceptor");
+
+
 			var propSet = GetProperySetter(expression);
 			var expected = new MethodCall<TProperty>(expression, propSet, new Expression[0]);
 
@@ -449,24 +427,14 @@ namespace Moq
 		}
 
 		/// <summary>
-		/// Verifies that all verifiable expectations have been met.
+		/// Implements <see cref="IMock{T}.Verify()"/>.
 		/// </summary>
-		/// <example group="verification">
-		/// This example sets up an expectation and marks it as verifiable. After 
-		/// the mock is used, a <see cref="Verify()"/> call is issued on the mock 
-		/// to ensure the method in the expectation was invoked:
-		/// <code>
-		/// var mock = new Mock&lt;IWarehouse&gt;();
-		/// mock.Expect(x =&gt; x.HasInventory(TALISKER, 50)).Verifiable().Returns(true);
-		/// ...
-		/// // other test code
-		/// ...
-		/// // Will throw if the test code has didn't call HasInventory.
-		/// mock.Verify();
-		/// </code>
-		/// </example>
-		/// <exception cref="MockException">Not all verifiable expectations were met.</exception>
 		public virtual void Verify()
+		{
+			Verify(interceptor);
+		}
+
+		private static void Verify(Interceptor interceptor)
 		{
 			try
 			{
@@ -482,26 +450,14 @@ namespace Moq
 		}
 
 		/// <summary>
-		/// Verifies all expectations regardless of whether they have 
-		/// been flagged as verifiable.
+		/// Implements <see cref="IMock{T}.VerifyAll()"/>.
 		/// </summary>
-		/// <example group="verification">
-		/// This example sets up an expectation without marking it as verifiable. After 
-		/// the mock is used, a <see cref="VerifyAll"/> call is issued on the mock 
-		/// to ensure that all expectations are met:
-		/// <code>
-		/// var mock = new Mock&lt;IWarehouse&gt;();
-		/// mock.Expect(x =&gt; x.HasInventory(TALISKER, 50)).Returns(true);
-		/// ...
-		/// // other test code
-		/// ...
-		/// // Will throw if the test code has didn't call HasInventory, even 
-		/// // that expectation was not marked as verifiable.
-		/// mock.VerifyAll();
-		/// </code>
-		/// </example>
-		/// <exception cref="MockException">At least one expectation was not met.</exception>
 		public virtual void VerifyAll()
+		{
+			VerifyAll(interceptor);
+		}
+
+		private static void VerifyAll(Interceptor interceptor)
 		{
 			try
 			{
@@ -517,41 +473,12 @@ namespace Moq
 		}
 
 		/// <summary>
-		/// Adds an interface implementation to the mock, 
-		/// allowing expectations to be set for it.
+		/// Implements <see cref="IMock{T}.As{TInterface}"/>.
 		/// </summary>
-		/// <remarks>
-		/// This method can only be called before the first use 
-		/// of the mock <see cref="Object"/> property, at which 
-		/// point the runtime type has already been generated 
-		/// and no more interfaces can be added to it.
-		/// <para>
-		/// Also, <typeparamref name="TInterface"/> must be an 
-		/// interface and not a class, which must be specified 
-		/// when creating the mock instead.
-		/// </para>
-		/// </remarks>
-		/// <exception cref="InvalidOperationException">The mock type 
-		/// has already been generated by accessing the <see cref="Object"/> property.</exception>
-		/// <exception cref="ArgumentException">The <typeparamref name="TInterface"/> specified 
-		/// is not an interface.</exception>
-		/// <example>
-		/// The following example creates a mock for the main interface 
-		/// and later adds <see cref="IDisposable"/> to it to verify 
-		/// it's called by the consumer code:
-		/// <code>
-		/// var mock = new Mock&lt;IProcessor&gt;();
-		/// mock.Expect(x =&gt; x.Execute("ping"));
-		/// 
-		/// // add IDisposable interface
-		/// var disposable = mock.As&lt;IDisposable&gt;();
-		/// disposable.Expect(d => d.Dispose()).Verifiable();
-		/// </code>
-		/// </example>
-		public virtual ISetExpectations<TInterface> As<TInterface>()
+		public virtual IMock<TInterface> As<TInterface>()
 			where TInterface : class
 		{
-			if (this.instance != null)
+			if (this.instance != null && !base.ImplementedInterfaces.Contains(typeof(TInterface)))
 			{
 				throw new InvalidOperationException(Properties.Resources.AlreadyInitialized);
 			}
@@ -560,9 +487,9 @@ namespace Moq
 				throw new ArgumentException(Properties.Resources.AsMustBeInterface);
 			}
 
-			if (!this.interfacesTypes.Contains(typeof(TInterface)))
+			if (!base.ImplementedInterfaces.Contains(typeof(TInterface)))
 			{
-				this.interfacesTypes.Add(typeof(TInterface));
+				base.ImplementedInterfaces.Add(typeof(TInterface));
 			}
 
 			return new AsInterface<TInterface>(this);
@@ -702,7 +629,7 @@ namespace Moq
 		//    throw new NotImplementedException();
 		//}
 
-		private class AsInterface<TInterface> : ISetExpectations<TInterface>
+		private class AsInterface<TInterface> : IMock<TInterface>
 			where TInterface : class
 		{
 			Mock<T> owner;
@@ -710,6 +637,16 @@ namespace Moq
 			public AsInterface(Mock<T> owner)
 			{
 				this.owner = owner;
+			}
+
+			public IMock<TNewInterface> As<TNewInterface>() where TNewInterface : class
+			{
+				return owner.As<TNewInterface>();
+			}
+
+			public TInterface Object
+			{
+				get { return owner.Object as TInterface; }
 			}
 
 			public IExpect<TResult> Expect<TResult>(Expression<Func<TInterface, TResult>> expression)
@@ -730,6 +667,36 @@ namespace Moq
 			public IExpectSetter<TProperty> ExpectSet<TProperty>(Expression<Func<TInterface, TProperty>> expression)
 			{
 				return Mock<T>.SetUpExpectSet(expression, this.owner.interceptor);
+			}
+
+			public void Verify()
+			{
+				Mock<T>.Verify(owner.interceptor);
+			}
+
+			public void VerifyAll()
+			{
+				Mock<T>.VerifyAll(owner.interceptor);
+			}
+
+			public void Verify(Expression<Action<TInterface>> expression)
+			{
+				Mock<TInterface>.Verify(expression, owner.interceptor);
+			}
+
+			public void Verify<TResult>(Expression<Func<TInterface, TResult>> expression)
+			{
+				Mock<TInterface>.Verify<TResult>(expression, owner.interceptor);
+			}
+
+			public void VerifyGet<TProperty>(Expression<Func<TInterface, TProperty>> expression)
+			{
+				Mock<TInterface>.VerifyGet<TProperty>(expression, owner.interceptor);
+			}
+
+			public void VerifySet<TProperty>(Expression<Func<TInterface, TProperty>> expression)
+			{
+				Mock<TInterface>.VerifySet<TProperty>(expression, owner.interceptor);
 			}
 		}
 	}
