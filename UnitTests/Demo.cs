@@ -1,5 +1,7 @@
 ﻿using System;
 using Xunit;
+using System.Collections;
+using System.Collections.Generic;
 
 namespace Moq.Tests
 {
@@ -73,6 +75,22 @@ namespace Moq.Tests
 		public interface IOrdersView
 		{
 			event EventHandler<OrderEventArgs> OrderSelected;
+		}
+
+		[Fact]
+		public void ShouldTest()
+		{
+			var mock = new Mock<IRepository<Order>>();
+
+			mock.Expect(x => x.Save(It.Is<List<Order>>(l => l.Count == 0)))
+				.Throws<ArgumentException>();
+
+		
+		}
+
+		public interface IRepository<TEntity>
+		{
+			void Save(IList<TEntity> entities);
 		}
 
 		public class OrdersPresenter
