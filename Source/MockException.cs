@@ -124,6 +124,8 @@ namespace Moq
 		/// <summary>
 		/// Supports the serialization infrastructure.
 		/// </summary>
+		/// <param name="info">Serialization information.</param>
+		/// <param name="context">Streaming context.</param>
 		protected MockException(
 		  System.Runtime.Serialization.SerializationInfo info,
 		  System.Runtime.Serialization.StreamingContext context)
@@ -135,6 +137,8 @@ namespace Moq
 		/// <summary>
 		/// Supports the serialization infrastructure.
 		/// </summary>
+		/// <param name="info">Serialization information.</param>
+		/// <param name="context">Streaming context.</param>
 		public override void GetObjectData(
 		  System.Runtime.Serialization.SerializationInfo info,
 		  System.Runtime.Serialization.StreamingContext context)

@@ -47,6 +47,7 @@ namespace Moq.Language
 	/// <summary>
 	/// Defines the <c>Returns</c> verb for property get expectations.
 	/// </summary>
+	/// <typeparam name="TProperty">Type of the property.</typeparam>
 	[EditorBrowsable(EditorBrowsableState.Never)]
 	public interface IReturnsGetter<TProperty> : IReturns, IHideObjectMembers
 	{
@@ -62,6 +63,7 @@ namespace Moq.Language
 		/// </code>
 		/// </example>
 		IReturnsResult Returns(TProperty value);
+
 		/// <summary>
 		/// Specifies a function that will calculate the value to return for the property.
 		/// </summary>

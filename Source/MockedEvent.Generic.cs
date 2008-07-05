@@ -64,6 +64,7 @@ namespace Moq
 		/// Raises the associated event with the given 
 		/// event argument data.
 		/// </summary>
+		/// <param name="args">Data to pass to the event.</param>
 		public void Raise(TEventArgs args)
 		{
 			base.DoRaise(args);
@@ -73,6 +74,7 @@ namespace Moq
 		/// Provides support for attaching a <see cref="MockedEvent{TEventArgs}"/> to 
 		/// a generic <see cref="EventHandler{TEventArgs}"/> event.
 		/// </summary>
+		/// <param name="mockEvent">Event to convert.</param>
 		public static implicit operator EventHandler<TEventArgs>(MockedEvent<TEventArgs> mockEvent)
 		{
 			return mockEvent.Handle;

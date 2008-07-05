@@ -69,6 +69,7 @@ namespace Moq
 		/// mock.Expect(x => x.Remove(It.IsAny&lt;string&gt;())).Throws(new InvalidOperationException());
 		/// </code>
 		/// </example>
+		/// <typeparam name="TValue">Type of the value.</typeparam>
 		[AdvancedMatcher(typeof(AnyMatcher))]
 		public static TValue IsAny<TValue>()
 		{

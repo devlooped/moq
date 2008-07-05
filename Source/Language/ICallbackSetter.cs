@@ -48,6 +48,7 @@ namespace Moq.Language
 	/// Defines the <c>Callback</c> verb for property setter expectations.
 	/// </summary>
 	/// <seealso cref="Mock{T}.ExpectSet"/>
+	/// <typeparam name="TProperty">Type of the property.</typeparam>
 	[EditorBrowsable(EditorBrowsableState.Never)]
 	public interface ICallbackSetter<TProperty> : IHideObjectMembers
 	{ 

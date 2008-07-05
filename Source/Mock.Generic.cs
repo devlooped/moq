@@ -48,64 +48,12 @@ using Moq.Language.Flow;
 
 namespace Moq
 {
-	// TODO: uncomment documentation when C# bug is fixed: 
-	///// <typeparam name="T">Type to mock, which can be an interface or a class.</typeparam>
 	/// <summary>
-	/// Provides a mock implementation of <typeparamref name="T"/>.
+	/// Core implementation of the <see cref="IMock{T}"/> interface. 
 	/// </summary>
-	/// <remarks>
-	/// Only abstract and virtual members of classes can be mocked.
-	/// <para>
-	/// The behavior of the mock with regards to the expectations and the actual calls is determined 
-	/// by the optional <see cref="MockBehavior"/> that can be passed to the <see cref="Mock{T}(MockBehavior)"/> 
-	/// constructor.
-	/// </para>
-	/// </remarks>
-	/// <example group="overview" order="0">
-	/// The following example shows setting expectations with specific values 
-	/// for method invocations:
-	/// <code>
-	/// //setup - data
-	/// var order = new Order(TALISKER, 50);
-	/// var mock = new Mock&lt;IWarehouse&gt;();
-	/// 
-	/// //setup - expectations
-	/// mock.Expect(x => x.HasInventory(TALISKER, 50)).Returns(true);
-	/// 
-	/// //exercise
-	/// order.Fill(mock.Object);
-	/// 
-	/// //verify
-	/// Assert.True(order.IsFilled);
-	/// </code>
-	/// The following example shows how to use the <see cref="It"/> class 
-	/// to specify conditions for arguments instead of specific values:
-	/// <code>
-	/// //setup - data
-	/// var order = new Order(TALISKER, 50);
-	/// var mock = new Mock&lt;IWarehouse&gt;();
-	/// 
-	/// //setup - expectations
-	/// //shows how to expect a value within a range
-	/// mock.Expect(x => x.HasInventory(
-	///			It.IsAny&lt;string&gt;(), 
-	///			It.IsInRange(0, 100, Range.Inclusive)))
-	///     .Returns(false);
-	/// 
-	/// //shows how to throw for unexpected calls. contrast with the "verify" approach of other mock libraries.
-	/// mock.Expect(x => x.Remove(
-	///			It.IsAny&lt;string&gt;(), 
-	///			It.IsAny&lt;int&gt;()))
-	///     .Throws(new InvalidOperationException());
-	/// 
-	/// //exercise
-	/// order.Fill(mock.Object);
-	/// 
-	/// //verify
-	/// Assert.False(order.IsFilled);
-	/// </code>
-	/// </example>
-	public class Mock<T> : Mock, IVerifiable, IHideObjectMembers, IMock<T>
+	/// <seealso cref="IMock{T}"/>
+	/// <typeparam name="T">Type to mock.</typeparam>
+	public class Mock<T> : Mock, IVerifiable, IMock<T>
 		where T : class
 	{
 		static readonly ProxyGenerator generator = new ProxyGenerator();
@@ -125,6 +73,8 @@ namespace Moq
 		/// <example>
 		/// <code>var mock = new Mock&lt;MyProvider&gt;(someArgument, 25);</code>
 		/// </example>
+		/// <param name="behavior">Behavior of the mock.</param>
+		/// <param name="args">Optional constructor arguments if the mocked type is a class.</param>
 		public Mock(MockBehavior behavior, params object[] args)
 		{
 			if (args == null) args = new object[0];
@@ -204,6 +154,7 @@ namespace Moq
 		/// <example>
 		/// <code>var mock = new Mock&lt;MyProvider&gt;(someArgument, 25);</code>
 		/// </example>
+		/// <param name="args">Optional constructor arguments if the mocked type is a class.</param>
 		public Mock(params object[] args) : this(MockBehavior.Default, args) { }
 
 		/// <summary>
@@ -220,6 +171,7 @@ namespace Moq
 		/// <example>
 		/// <code>var mock = new Mock&lt;IFormatProvider&gt;(MockBehavior.Relaxed);</code>
 		/// </example>
+		/// <param name="behavior">Behavior of the mock.</param>
 		public Mock(MockBehavior behavior) : this(behavior, new object[0]) { }
 
 		/// <summary>
@@ -253,6 +205,7 @@ namespace Moq
 		/// <summary>
 		/// Implements <see cref="IMock{T}.Expect(Expression{Action{T}})"/>.
 		/// </summary>
+		/// <param name="expression">Lambda expression that specifies the expected method invocation.</param>
 		public IExpect Expect(Expression<Action<T>> expression)
 		{
 			return SetUpExpect<T>(expression, this.interceptor);
@@ -280,6 +233,8 @@ namespace Moq
 		/// <summary>
 		/// Implements <see cref="IMock{T}.Expect{TResult}(Expression{Func{T, TResult}})"/>.
 		/// </summary>
+		/// <typeparam name="TResult">Type of the return value. Typically omitted as it can be inferred from the expression.</typeparam>
+		/// <param name="expression">Lambda expression that specifies the expected method invocation.</param>
 		public IExpect<TResult> Expect<TResult>(Expression<Func<T, TResult>> expression)
 		{
 			return SetUpExpect(expression, this.interceptor);
@@ -307,6 +262,8 @@ namespace Moq
 		/// <summary>
 		/// Implements <see cref="IMock{T}.ExpectGet{TProperty}(Expression{Func{T, TProperty}})"/>.
 		/// </summary>
+		/// <typeparam name="TProperty">Type of the property. Typically omitted as it can be inferred from the expression.</typeparam>
+		/// <param name="expression">Lambda expression that specifies the expected property getter.</param>
 		public IExpectGetter<TProperty> ExpectGet<TProperty>(Expression<Func<T, TProperty>> expression)
 		{
 			return SetUpExpectGet(expression, this.interceptor);
@@ -346,6 +303,8 @@ namespace Moq
 		/// <summary>
 		/// Implements <see cref="IMock{T}.ExpectSet{TProperty}(Expression{Func{T, TProperty}})"/>.
 		/// </summary>
+		/// <typeparam name="TProperty">Type of the property. Typically omitted as it can be inferred from the expression.</typeparam>
+		/// <param name="expression">Lambda expression that specifies the expected property setter.</param>
 		public IExpectSetter<TProperty> ExpectSet<TProperty>(Expression<Func<T, TProperty>> expression)
 		{
 			return SetUpExpectSet<T, TProperty>(expression, this.interceptor);
@@ -370,6 +329,7 @@ namespace Moq
 		/// <summary>
 		/// Implements <see cref="IMock{T}.Verify(Expression{Action{T}})"/>.
 		/// </summary>
+		/// <param name="expression">Expression to verify.</param>
 		public virtual void Verify(Expression<Action<T>> expression)
 		{
 			Verify(expression, interceptor);
@@ -397,6 +357,8 @@ namespace Moq
 		/// <summary>
 		/// Implements <see cref="IMock{T}.Verify{TResult}(Expression{Func{T, TResult}})"/>.
 		/// </summary>
+		/// <param name="expression">Expression to verify.</param>
+		/// <typeparam name="TResult">Type of return value from the expression.</typeparam>
 		public virtual void Verify<TResult>(Expression<Func<T, TResult>> expression)
 		{
 			Verify(expression, interceptor);
@@ -424,6 +386,9 @@ namespace Moq
 		/// <summary>
 		/// Implements <see cref="IMock{T}.VerifyGet{TProperty}(Expression{Func{T, TProperty}})"/>.
 		/// </summary>
+		/// <param name="expression">Expression to verify.</param>
+		/// <typeparam name="TProperty">Type of the property to verify. Typically omitted as it can 
+		/// be inferred from the expression's return type.</typeparam>
 		public virtual void VerifyGet<TProperty>(Expression<Func<T, TProperty>> expression)
 		{
 			Verify(expression, interceptor);
@@ -440,6 +405,9 @@ namespace Moq
 		/// <summary>
 		/// Implements <see cref="IMock{T}.VerifySet{TProperty}(Expression{Func{T, TProperty}})"/>.
 		/// </summary>
+		/// <param name="expression">Expression to verify.</param>
+		/// <typeparam name="TProperty">Type of the property to verify. Typically omitted as it can 
+		/// be inferred from the expression's return type.</typeparam>
 		public virtual void VerifySet<TProperty>(Expression<Func<T, TProperty>> expression)
 		{
 			VerifySet(expression, interceptor);
@@ -512,6 +480,7 @@ namespace Moq
 		/// <summary>
 		/// Implements <see cref="IMock{T}.As{TInterface}"/>.
 		/// </summary>
+		/// <typeparam name="TInterface">Type of interface to cast the mock to.</typeparam>
 		public virtual IMock<TInterface> As<TInterface>()
 			where TInterface : class
 		{

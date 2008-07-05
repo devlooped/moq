@@ -64,6 +64,7 @@ namespace Moq.Language
 		/// </code>
 		/// </example>
 		ICallbackResult Callback(Action callback);
+		
 		/// <summary>
 		/// Specifies a callback to invoke when the method is called that receives the original
 		/// arguments.
@@ -82,6 +83,7 @@ namespace Moq.Language
 		/// </code>
 		/// </example>
 		ICallbackResult Callback<T>(Action<T> callback);
+		
 		/// <summary>
 		/// Specifies a callback to invoke when the method is called that receives the original
 		/// arguments.
@@ -103,6 +105,7 @@ namespace Moq.Language
 		/// </code>
 		/// </example>
 		ICallbackResult Callback<T1, T2>(Action<T1, T2> callback);
+		
 		/// <summary>
 		/// Specifies a callback to invoke when the method is called that receives the original
 		/// arguments.
@@ -126,6 +129,7 @@ namespace Moq.Language
 		/// </code>
 		/// </example>
 		ICallbackResult Callback<T1, T2, T3>(Action<T1, T2, T3> callback);
+		
 		/// <summary>
 		/// Specifies a callback to invoke when the method is called that receives the original
 		/// arguments.
@@ -157,6 +161,7 @@ namespace Moq.Language
 	/// Defines the <c>Callback</c> verb and overloads for callbacks on 
 	/// expectations that return a value.
 	/// </summary>
+	/// <typeparam name="TResult">Type of the return value of the expectation.</typeparam>
 	[EditorBrowsable(EditorBrowsableState.Never)]
 	public interface ICallback<TResult> : IHideObjectMembers
 	{
@@ -177,6 +182,7 @@ namespace Moq.Language
 		/// call you can still specify the return value.
 		/// </example>
 		IReturnsThrows<TResult> Callback(Action callback);
+		
 		/// <summary>
 		/// Specifies a callback to invoke when the method is called that receives the original
 		/// arguments.
@@ -196,6 +202,7 @@ namespace Moq.Language
 		/// </code>
 		/// </example>
 		IReturnsThrows<TResult> Callback<T>(Action<T> callback);
+		
 		/// <summary>
 		/// Specifies a callback to invoke when the method is called that receives the original
 		/// arguments.
@@ -218,6 +225,7 @@ namespace Moq.Language
 		/// </code>
 		/// </example>
 		IReturnsThrows<TResult> Callback<T1, T2>(Action<T1, T2> callback);
+		
 		/// <summary>
 		/// Specifies a callback to invoke when the method is called that receives the original
 		/// arguments.
@@ -242,6 +250,7 @@ namespace Moq.Language
 		/// </code>
 		/// </example>
 		IReturnsThrows<TResult> Callback<T1, T2, T3>(Action<T1, T2, T3> callback);
+		
 		/// <summary>
 		/// Specifies a callback to invoke when the method is called that receives the original
 		/// arguments.

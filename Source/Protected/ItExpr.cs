@@ -73,6 +73,7 @@ namespace Moq.Protected
 		///     .Throws(new InvalidOperationException());
 		/// </code>
 		/// </example>
+		/// <typeparam name="TValue">Type of the value.</typeparam>
 		public static Expression IsAny<TValue>()
 		{
 			Expression<Func<TValue>> expr = () => It.IsAny<TValue>();

@@ -44,9 +44,62 @@ using Moq.Language.Flow;
 
 namespace Moq
 {
+	/// <typeparam name="T">Type to mock, which can be an interface or a class.</typeparam>
 	/// <summary>
-	/// Represents a mock of <typeparamref name="T"/> which can receive expectations.
+	/// Provides a mock implementation of <typeparamref name="T"/>.
 	/// </summary>
+	/// <remarks>
+	/// Only abstract and virtual members of classes can be mocked.
+	/// <para>
+	/// The behavior of the mock with regards to the expectations and the actual calls is determined 
+	/// by the optional <see cref="MockBehavior"/> that can be passed to the <see cref="Mock{T}(MockBehavior)"/> 
+	/// constructor.
+	/// </para>
+	/// </remarks>
+	/// <example group="overview" order="0">
+	/// The following example shows setting expectations with specific values 
+	/// for method invocations:
+	/// <code>
+	/// //setup - data
+	/// var order = new Order(TALISKER, 50);
+	/// var mock = new Mock&lt;IWarehouse&gt;();
+	/// 
+	/// //setup - expectations
+	/// mock.Expect(x => x.HasInventory(TALISKER, 50)).Returns(true);
+	/// 
+	/// //exercise
+	/// order.Fill(mock.Object);
+	/// 
+	/// //verify
+	/// Assert.True(order.IsFilled);
+	/// </code>
+	/// The following example shows how to use the <see cref="It"/> class 
+	/// to specify conditions for arguments instead of specific values:
+	/// <code>
+	/// //setup - data
+	/// var order = new Order(TALISKER, 50);
+	/// var mock = new Mock&lt;IWarehouse&gt;();
+	/// 
+	/// //setup - expectations
+	/// //shows how to expect a value within a range
+	/// mock.Expect(x => x.HasInventory(
+	///			It.IsAny&lt;string&gt;(), 
+	///			It.IsInRange(0, 100, Range.Inclusive)))
+	///     .Returns(false);
+	/// 
+	/// //shows how to throw for unexpected calls. contrast with the "verify" approach of other mock libraries.
+	/// mock.Expect(x => x.Remove(
+	///			It.IsAny&lt;string&gt;(), 
+	///			It.IsAny&lt;int&gt;()))
+	///     .Throws(new InvalidOperationException());
+	/// 
+	/// //exercise
+	/// order.Fill(mock.Object);
+	/// 
+	/// //verify
+	/// Assert.False(order.IsFilled);
+	/// </code>
+	/// </example>
 	public interface IMock<T> : IHideObjectMembers
 	 where T : class
 	{
@@ -82,6 +135,7 @@ namespace Moq
 		/// disposable.Expect(d => d.Dispose()).Verifiable();
 		/// </code>
 		/// </example>
+		/// <typeparam name="TInterface">Type of interface to cast the mock to.</typeparam>
 		IMock<TInterface> As<TInterface>() where TInterface : class;
 
 		/// <summary>
@@ -218,6 +272,7 @@ namespace Moq
 		/// </code>
 		/// </example>
 		/// <exception cref="MockException">The invocation was not performed on the mock.</exception>
+		/// <param name="expression">Expression to verify.</param>
 		void Verify(System.Linq.Expressions.Expression<Action<T>> expression);
 
 		/// <summary>
@@ -238,6 +293,8 @@ namespace Moq
 		/// </code>
 		/// </example>
 		/// <exception cref="MockException">The invocation was not performed on the mock.</exception>
+		/// <param name="expression">Expression to verify.</param>
+		/// <typeparam name="TResult">Type of return value from the expression.</typeparam>
 		void Verify<TResult>(System.Linq.Expressions.Expression<Func<T, TResult>> expression);
 
 		/// <summary>
@@ -257,6 +314,9 @@ namespace Moq
 		/// </code>
 		/// </example>
 		/// <exception cref="MockException">The invocation was not performed on the mock.</exception>
+		/// <param name="expression">Expression to verify.</param>
+		/// <typeparam name="TProperty">Type of the property to verify. Typically omitted as it can 
+		/// be inferred from the expression's return type.</typeparam>
 		void VerifyGet<TProperty>(System.Linq.Expressions.Expression<Func<T, TProperty>> expression);
 
 		/// <summary>
@@ -276,7 +336,9 @@ namespace Moq
 		/// </code>
 		/// </example>
 		/// <exception cref="MockException">The invocation was not performed on the mock.</exception>
+		/// <param name="expression">Expression to verify.</param>
+		/// <typeparam name="TProperty">Type of the property to verify. Typically omitted as it can 
+		/// be inferred from the expression's return type.</typeparam>
 		void VerifySet<TProperty>(System.Linq.Expressions.Expression<Func<T, TProperty>> expression);
-
 	}
 }

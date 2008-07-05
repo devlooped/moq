@@ -94,6 +94,7 @@ namespace Moq
 		/// Provides support for attaching a <see cref="MockedEvent"/> to 
 		/// a generic <see cref="EventHandler"/> event.
 		/// </summary>
+		/// <param name="mockEvent">Event to convert.</param>
 		public static implicit operator EventHandler(MockedEvent mockEvent)
 		{
 			return mockEvent.Handle;
