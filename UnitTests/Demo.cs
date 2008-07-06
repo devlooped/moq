@@ -77,22 +77,6 @@ namespace Moq.Tests
 			event EventHandler<OrderEventArgs> OrderSelected;
 		}
 
-		[Fact]
-		public void ShouldTest()
-		{
-			var mock = new Mock<IRepository<Order>>();
-
-			mock.Expect(x => x.Save(It.Is<List<Order>>(l => l.Count == 0)))
-				.Throws<ArgumentException>();
-
-		
-		}
-
-		public interface IRepository<TEntity>
-		{
-			void Save(IList<TEntity> entities);
-		}
-
 		public class OrdersPresenter
 		{
 			public OrdersPresenter(IOrdersView view)
@@ -137,5 +121,43 @@ namespace Moq.Tests
 			}
 
 		}
+
+		public void When_user_forgot_password_should_save_user()
+		{
+			var userRepository = new Mock<IUserRepository>();
+			var smsSender = new Mock<ISmsSender>();
+
+			var theUser = new User { HashedPassword = "this is not hashed password" };
+
+			userRepository.Expect(x => x.GetUserByName("ayende")).Returns(theUser);
+
+			var controllerUnderTest = new LoginController(userRepository.Object, smsSender.Object);
+
+			controllerUnderTest.ForgotMyPassword("ayende");
+
+			userRepository.Verify(x => x.Save(theUser));
+		}
+
+		public interface ISmsSender { }
+		public interface IUserRepository
+		{
+			void Save(User user);
+			User GetUserByName(string username);
+		}
+
+		public class User
+		{
+			public string HashedPassword { get; set; }
+		}
+
+		public class LoginController
+		{
+			public LoginController(IUserRepository repo, ISmsSender sender)
+			{
+			}
+
+			public void ForgotMyPassword(string username) { }
+		}
+
 	}
 }

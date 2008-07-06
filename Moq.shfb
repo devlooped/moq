@@ -49,6 +49,7 @@ Do use their documentation to learn about options (especially when there are sev
         <filter entryType="Namespace" fullName="Castle.DynamicProxy" isExposed="False" />
         <filter entryType="Namespace" fullName="Moq" isExposed="True">
             <filter entryType="Interface" fullName="Moq.IHideObjectMembers" filterName="IHideObjectMembers" isExposed="False" />
+            <filter entryType="Interface" fullName="Moq.IMocked" filterName="IMocked" isExposed="False" />
             <filter entryType="Interface" fullName="Moq.IMocked`1" filterName="IMocked`1" isExposed="False" />
         </filter>
         <filter entryType="Namespace" fullName="Moq.Language.Flow" isExposed="False" />
