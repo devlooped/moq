@@ -130,7 +130,7 @@ namespace Moq
 	/// </code>
 	/// </example>
 	/// <seealso cref="MockBehavior"/>
-	public sealed class MockFactory
+	public class MockFactory
 	{
 		List<IVerifiable> mocks = new List<IVerifiable>();
 		MockBehavior defaultBehavior;
@@ -146,6 +146,12 @@ namespace Moq
 		{
 			this.defaultBehavior = defaultBehavior;
 		}
+
+		/// <summary>
+		/// Gets the mocks that have been created by this factory and 
+		/// that will get verified together.
+		/// </summary>
+		protected IEnumerable<IVerifiable> Mocks { get { return mocks; } }
 
 		/// <summary>
 		/// Creates a new mock with the default <see cref="MockBehavior"/> 
@@ -166,7 +172,7 @@ namespace Moq
 		public Mock<T> Create<T>()
 			where T : class
 		{
-			return CreateImpl<T>(defaultBehavior, new object[0]);
+			return CreateMock<T>(defaultBehavior, new object[0]);
 		}
 
 		/// <summary>
@@ -198,9 +204,9 @@ namespace Moq
 			// "fix" compiler picking this overload instead of 
 			// the one receiving the mock behavior.
 			if (args.Length > 0 && args[0] is MockBehavior)
-				return CreateImpl<T>((MockBehavior)args[0], args.Skip(1).ToArray());
+				return CreateMock<T>((MockBehavior)args[0], args.Skip(1).ToArray());
 			else
-				return CreateImpl<T>(defaultBehavior, args);
+				return CreateMock<T>(defaultBehavior, args);
 		}
 
 		/// <summary>
@@ -222,7 +228,7 @@ namespace Moq
 		public Mock<T> Create<T>(MockBehavior behavior)
 			where T : class
 		{
-			return CreateImpl<T>(behavior, new object[0]);
+			return CreateMock<T>(behavior, new object[0]);
 		}
 
 		/// <summary>
@@ -252,10 +258,10 @@ namespace Moq
 		public Mock<T> Create<T>(MockBehavior behavior, params object[] args)
 			where T : class
 		{
-			return CreateImpl<T>(behavior, args);
+			return CreateMock<T>(behavior, args);
 		}
 
-		private Mock<T> CreateImpl<T>(MockBehavior behavior, object[] args)
+		protected virtual Mock<T> CreateMock<T>(MockBehavior behavior, object[] args)
 			where T : class
 		{
 			var mock = new Mock<T>(behavior, args);
@@ -270,9 +276,9 @@ namespace Moq
 		/// </summary>
 		/// <seealso cref="Mock{T}.Verify()"/>
 		/// <exception cref="MockException">One or more mocks had expectations that were not satisfied.</exception>
-		public void Verify()
+		public virtual void Verify()
 		{
-			VerifyImpl(verifiable => verifiable.Verify());
+			VerifyMocks(verifiable => verifiable.Verify());
 		}
 
 		/// <summary>
@@ -281,12 +287,20 @@ namespace Moq
 		/// </summary>
 		/// <seealso cref="Mock{T}.Verify()"/>
 		/// <exception cref="MockException">One or more mocks had expectations that were not satisfied.</exception>
-		public void VerifyAll()
+		public virtual void VerifyAll()
 		{
-			VerifyImpl(verifiable => verifiable.VerifyAll());
+			VerifyMocks(verifiable => verifiable.VerifyAll());
 		}
 
-		private void VerifyImpl(Action<IVerifiable> verifyAction)
+		/// <summary>
+		/// Invokes <paramref name="verifyAction"/> for each mock 
+		/// in <see cref="Mocks"/>, and accumulates the resulting 
+		/// <see cref="MockVerificationException"/> that might be 
+		/// thrown from the action.
+		/// </summary>
+		/// <param name="verifyAction">The action to execute against 
+		/// each mock.</param>
+		protected virtual void VerifyMocks(Action<IVerifiable> verifyAction)
 		{
 			StringBuilder message = new StringBuilder();
 
