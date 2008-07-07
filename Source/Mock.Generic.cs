@@ -53,7 +53,7 @@ namespace Moq
 	/// </summary>
 	/// <seealso cref="IMock{T}"/>
 	/// <typeparam name="T">Type to mock.</typeparam>
-	public class Mock<T> : Mock, IVerifiable, IMock<T>
+	public class Mock<T> : Mock, IMock<T>
 		where T : class
 	{
 		static readonly ProxyGenerator generator = new ProxyGenerator();
@@ -434,7 +434,7 @@ namespace Moq
 		/// <summary>
 		/// Implements <see cref="IMock{T}.Verify()"/>.
 		/// </summary>
-		public virtual void Verify()
+		public override void Verify()
 		{
 			Verify(interceptor);
 		}
@@ -457,7 +457,7 @@ namespace Moq
 		/// <summary>
 		/// Implements <see cref="IMock{T}.VerifyAll()"/>.
 		/// </summary>
-		public virtual void VerifyAll()
+		public override void VerifyAll()
 		{
 			VerifyAll(interceptor);
 		}

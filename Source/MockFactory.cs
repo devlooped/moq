@@ -132,7 +132,7 @@ namespace Moq
 	/// <seealso cref="MockBehavior"/>
 	public class MockFactory
 	{
-		List<IVerifiable> mocks = new List<IVerifiable>();
+		List<IMock> mocks = new List<IMock>();
 		MockBehavior defaultBehavior;
 
 		/// <summary>
@@ -151,7 +151,7 @@ namespace Moq
 		/// Gets the mocks that have been created by this factory and 
 		/// that will get verified together.
 		/// </summary>
-		protected IEnumerable<IVerifiable> Mocks { get { return mocks; } }
+		protected IEnumerable<IMock> Mocks { get { return mocks; } }
 
 		/// <summary>
 		/// Creates a new mock with the default <see cref="MockBehavior"/> 
@@ -261,6 +261,12 @@ namespace Moq
 			return CreateMock<T>(behavior, args);
 		}
 
+		/// <summary>
+		/// Implements creation of a new mock within the factory.
+		/// </summary>
+		/// <typeparam name="T">Type to mock.</typeparam>
+		/// <param name="behavior">The behavior for the new mock.</param>
+		/// <param name="args">Optional arguments for the construction of the mock.</param>
 		protected virtual Mock<T> CreateMock<T>(MockBehavior behavior, object[] args)
 			where T : class
 		{
@@ -300,7 +306,7 @@ namespace Moq
 		/// </summary>
 		/// <param name="verifyAction">The action to execute against 
 		/// each mock.</param>
-		protected virtual void VerifyMocks(Action<IVerifiable> verifyAction)
+		protected virtual void VerifyMocks(Action<IMock> verifyAction)
 		{
 			StringBuilder message = new StringBuilder();
 

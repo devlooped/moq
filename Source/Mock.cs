@@ -50,7 +50,7 @@ namespace Moq
 	/// apply to mocked objects, such as <see cref="Get"/> to 
 	/// retrieve a <see cref="Mock{T}"/> from an object instance.
 	/// </summary>
-	public abstract class Mock : IHideObjectMembers
+	public abstract class Mock : IMock, IHideObjectMembers
 	{
 		/// <summary>
 		/// Retrieves the mock object for the given object instance.
@@ -143,13 +143,12 @@ namespace Moq
 		protected internal List<Type> ImplementedInterfaces { get; private set; }
 
 		/// <summary>
-		/// Whether the base member virtual implementation will be called 
-		/// for mocked classes if no expectation is met. Defaults to <see langword="true"/>.
+		/// Implements <see cref="IMock.CallBase"/>.
 		/// </summary>
 		public bool CallBase { get; set; }
 
 		/// <summary>
-		/// Exposes the mocked object instance.
+		/// The mocked object instance. Implements <see cref="IMock.Object"/>.
 		/// </summary>
 		public object Object { get { return GetObject(); } }
 
@@ -157,6 +156,16 @@ namespace Moq
 		/// Returns the mocked object value.
 		/// </summary>
 		protected abstract object GetObject();
+
+		/// <summary>
+		/// Implements <see cref="IMock.Verify"/>.
+		/// </summary>
+		public abstract void Verify();
+
+		/// <summary>
+		/// Implements <see cref="IMock.VerifyAll"/>.
+		/// </summary>
+		public abstract void VerifyAll();
 
 		internal void AddEventHandler(EventInfo ev, Delegate handler)
 		{
@@ -180,70 +189,17 @@ namespace Moq
 		}
 
 		/// <summary>
-		/// Creates a handler that can be associated to an event receiving 
-		/// the given <typeparamref name="TEventArgs"/> and can be used 
-		/// to raise the event.
+		/// Implements <see cref="IMock.CreateEventHandler{TEventArgs}()"/>.
 		/// </summary>
-		/// <typeparam name="TEventArgs">Type of <see cref="EventArgs"/> 
-		/// data passed in to the event.</typeparam>
-		/// <example>
-		/// This example shows how to invoke an event with a custom event arguments 
-		/// class in a view that will cause its corresponding presenter to 
-		/// react by changing its state:
-		/// <code>
-		/// var mockView = new Mock&lt;IOrdersView&gt;();
-		/// var mockedEvent = mockView.CreateEventHandler&lt;OrderEventArgs&gt;();
-		/// 
-		/// var presenter = new OrdersPresenter(mockView.Object);
-		/// 
-		/// // Check that the presenter has no selection by default
-		/// Assert.Null(presenter.SelectedOrder);
-		/// 
-		/// // Create a mock event handler of the appropriate type
-		/// var handler = mockView.CreateEventHandler&lt;OrderEventArgs&gt;();
-		/// // Associate it with the event we want to raise
-		/// mockView.Object.Cancel += handler;
-		/// // Finally raise the event with a specific arguments data
-		/// handler.Raise(new OrderEventArgs { Order = new Order("moq", 500) });
-		/// 
-		/// // Now the presenter reacted to the event, and we have a selected order
-		/// Assert.NotNull(presenter.SelectedOrder);
-		/// Assert.Equal("moq", presenter.SelectedOrder.ProductName);
-		/// </code>
-		/// </example>
+		/// <typeparam name="TEventArgs">Type of event argument class.</typeparam>
 		public MockedEvent<TEventArgs> CreateEventHandler<TEventArgs>() where TEventArgs : EventArgs
 		{
 			return new MockedEvent<TEventArgs>(this);
 		}
 
 		/// <summary>
-		/// Creates a handler that can be associated to an event receiving 
-		/// a generic <see cref="EventArgs"/> and can be used 
-		/// to raise the event.
+		/// Implements <see cref="IMock.CreateEventHandler()"/>
 		/// </summary>
-		/// <example>
-		/// This example shows how to invoke a generic event in a view that will 
-		/// cause its corresponding presenter to react by changing its state:
-		/// <code>
-		/// var mockView = new Mock&lt;IOrdersView&gt;();
-		/// var mockedEvent = mockView.CreateEventHandler();
-		/// 
-		/// var presenter = new OrdersPresenter(mockView.Object);
-		/// 
-		/// // Check that the presenter is not in the "Canceled" state
-		/// Assert.False(presenter.IsCanceled);
-		/// 
-		/// // Create a mock event handler of the appropriate type
-		/// var handler = mockView.CreateEventHandler();
-		/// // Associate it with the event we want to raise
-		/// mockView.Object.Cancel += handler;
-		/// // Finally raise the event
-		/// handler.Raise(EventArgs.Empty);
-		/// 
-		/// // Now the presenter reacted to the event, and changed its state
-		/// Assert.True(presenter.IsCanceled);
-		/// </code>
-		/// </example>
 		public MockedEvent<EventArgs> CreateEventHandler()
 		{
 			return new MockedEvent<EventArgs>(this);

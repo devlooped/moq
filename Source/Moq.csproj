@@ -56,7 +56,7 @@
   <ItemGroup>
     <Compile Include="DefaultValue.cs" />
     <Compile Include="ExpectKind.cs" />
-    <Compile Include="IMock.cs" />
+    <Compile Include="IMock.Generic.cs" />
     <Compile Include="Language\Flow\IReturnsResult.cs" />
     <Compile Include="Language\IRaise.cs" />
     <Compile Include="MatcherAttribute.cs" />
@@ -82,7 +82,6 @@
     <Compile Include="Language\IReturns.cs" />
     <Compile Include="It.cs" />
     <Compile Include="Language\IThrows.cs" />
-    <Compile Include="IVerifiable.cs" />
     <Compile Include="Language\IVerifies.cs" />
     <Compile Include="AdvancedMatcherAttribute.cs" />
     <Compile Include="MatcherFactory.cs" />
@@ -123,6 +122,7 @@
     <None Include="..\Moq.snk">
       <Link>Moq.snk</Link>
     </None>
+    <Compile Include="IMock.cs" />
     <Compile Include="Mock.Generic.cs" />
     <Compile Include="MockedEvent.Generic.cs" />
   </ItemGroup>
