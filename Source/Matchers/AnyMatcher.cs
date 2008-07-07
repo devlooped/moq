@@ -56,7 +56,7 @@ namespace Moq
 		{
 			// Fail the match if the type of the value is not the same 
 			// as the type originally specified in the It.IsAny<T>
-			if (!matcherType.IsAssignableFrom(value.GetType()))
+			if (value != null && !matcherType.IsAssignableFrom(value.GetType()))
 			{
 				return false;
 			}

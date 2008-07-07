@@ -64,7 +64,7 @@ namespace Moq
 
 		public bool Matches(object value)
 		{
-			if (!matcherType.IsAssignableFrom(value.GetType()))
+			if (value != null && !matcherType.IsAssignableFrom(value.GetType()))
 			{
 				return false;
 			}

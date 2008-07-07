@@ -71,6 +71,11 @@ namespace Moq
 
 		public static bool IsInRange(IComparable value, IComparable from, IComparable to, Range rangeKind)
 		{
+			if (value == null)
+			{
+				return false;
+			}
+
 			if (rangeKind == Range.Exclusive)
 			{
 				return value.CompareTo(from) > 0 &&

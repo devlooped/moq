@@ -152,9 +152,12 @@ namespace Moq.Tests
 			var mock = new Mock<IFoo>();
 
 			mock.Expect(x => x.Duplicate(It.IsAny<int>())).Returns(5);
+			mock.Expect(x => x.Execute(It.IsAny<string>())).Returns("foo");
 
 			Assert.Equal(5, mock.Object.Duplicate(5));
 			Assert.Equal(5, mock.Object.Duplicate(25));
+			Assert.Equal("foo", mock.Object.Execute("hello"));
+			Assert.Equal("foo", mock.Object.Execute((string)null));
 		}
 
 		[Fact]

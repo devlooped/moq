@@ -60,7 +60,9 @@ namespace Moq
 		public bool Matches(object value)
 		{
 			if (value == null && !(value is string))
+			{
 				return false;
+			}
 
 			Regex regex;
 
