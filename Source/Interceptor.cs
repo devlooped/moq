@@ -313,6 +313,7 @@ namespace Moq
 				while (eq && i < this.values.Count)
 				{
 					eq |= this.values[i] == key.values[i];
+					i++;
 				}
 
 				return eq;
