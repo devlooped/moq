@@ -209,12 +209,15 @@ namespace Moq.Tests.Regressions
 		[Fact]
 		public void ProxiesAndHostsWCF()
 		{
+#if DEBUG
+			// On release mode, castle is ILMerged into Moq.dll and this won't compile
 			var generator = new Castle.DynamicProxy.ProxyGenerator();
 			var proxy = generator.CreateClassProxy<ServiceImplementation>();
 			using (var host = new WebServiceHost(proxy, new Uri("http://localhost:7777")))
 			{
 				host.Open();
 			}
+#endif
 		}
 
 		// run "netsh http add urlacl url=http://+:7777/ user=[domain]\[user]"
