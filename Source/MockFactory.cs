@@ -222,7 +222,7 @@ namespace Moq
 		/// <code>
 		/// var factory = new MockFactory(MockBehavior.Strict);
 		/// 
-		/// var foo = factory.Create&lt;IFoo&gt;(MockBehavior.Normal);
+		/// var foo = factory.Create&lt;IFoo&gt;(MockBehavior.Loose);
 		/// </code>
 		/// </example>
 		public Mock<T> Create<T>(MockBehavior behavior)

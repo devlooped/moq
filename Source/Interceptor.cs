@@ -165,22 +165,6 @@ namespace Moq
 					  behavior,
 					  invocation);
 				}
-				// TODO: remove ExceptionReason and corresponding string resource
-				//else if (behavior == MockBehavior.Normal)
-				//{
-				//   if (invocation.Method.DeclaringType.IsInterface)
-				//   {
-				//      throw new MockException(
-				//         MockException.ExceptionReason.InterfaceNoExpectation,
-				//         behavior, invocation);
-				//   }
-				//   else if (invocation.Method.IsAbstract)
-				//   {
-				//      throw new MockException(
-				//         MockException.ExceptionReason.AbstractNoExpectation,
-				//         behavior, invocation);
-				//   }
-				//}
 			}
 
 			if (call != null)

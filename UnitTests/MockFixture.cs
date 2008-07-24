@@ -1012,13 +1012,18 @@ namespace Moq.Tests
 		{
 			var mock = new Mock<IFoo>();
 			bool returnsCalled = false;
+			bool beforeCalled = false;
+			bool afterCalled = false;
 
 			mock.Expect(foo => foo.DoReturnInt())
-				.Callback(() => Assert.False(returnsCalled))
+				.Callback(() => { Assert.False(returnsCalled); beforeCalled = true; })
 				.Returns(() => { returnsCalled = true; return 5; })
-				.Callback(() => Assert.True(returnsCalled));
+				.Callback(() => { Assert.True(returnsCalled); afterCalled = true; });
 
 			mock.Object.DoReturnInt();
+
+			Assert.True(beforeCalled);
+			Assert.True(afterCalled);
 		}
 
 		[Fact]

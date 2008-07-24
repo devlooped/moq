@@ -179,6 +179,9 @@ namespace Moq
 				call.ReturnValue = valueDel.InvokePreserveStack(call.Arguments); //will throw if parameters mismatch
 			else
 				call.ReturnValue = valueDel.InvokePreserveStack(); //we need this, for the user to be able to use parameterless methods
+
+			if (afterReturnCallback != null)
+				afterReturnCallback(call.Arguments);
 		}
 	}
 }
