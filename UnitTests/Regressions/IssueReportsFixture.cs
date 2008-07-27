@@ -204,6 +204,53 @@ namespace Moq.Tests.Regressions
 
 		#endregion
 
+		#region #85
+
+		public class Issue85
+		{
+			[Fact]
+			public void FooTest()
+			{
+				// Setup
+				var fooMock = new Mock<Foo>();
+				fooMock.CallBase = true;
+				fooMock.Expect(o => o.GetBar()).Returns(new Bar());
+				var bar = ((IFoolery)fooMock.Object).DoStuffToBar();
+				Assert.NotNull(bar);
+			}
+
+			public interface IFoolery
+			{
+				Bar DoStuffToBar();
+			}
+
+			public class Foo : IFoolery
+			{
+				public virtual Bar GetBar()
+				{
+					return new Bar();
+				}
+
+				Bar IFoolery.DoStuffToBar()
+				{
+					return DoWeirdStuffToBar();
+				}
+
+				protected internal virtual Bar DoWeirdStuffToBar()
+				{
+					var bar = GetBar();
+					//Would do stuff here.
+					return bar;
+				}
+			}
+
+			public class Bar
+			{
+			}
+		}
+
+		#endregion
+
 		// run "netsh http add urlacl url=http://+:7777/ user=[domain]\[user]"
 		// to avoid running the test as an admin
 		[Fact]
