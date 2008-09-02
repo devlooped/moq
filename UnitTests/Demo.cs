@@ -122,6 +122,32 @@ namespace Moq.Tests
 
 		}
 
+		[Fact]
+		public void ProjectHomePageDemo()
+		{
+			var mock = new Mock<ILoveThisFramework>();
+
+			// WOW! No record/reply weirdness?! :)
+			mock.Expect(framework => framework.ShouldDownload(It.IsAny<Version>()))
+				 .Callback((Version version) =>
+					  Console.WriteLine("Someone wanted version {0}!!!", version))
+				 .Returns(true)
+				 .AtMostOnce();
+
+			// Hand mock.Object as a collaborator and exercise it, 
+			// like calling methods on it...
+			ILoveThisFramework lovable = mock.Object;
+			bool download = lovable.ShouldDownload(new Version("2.0.0.0"));
+
+			mock.VerifyAll();
+			mock.Verify(framework => framework.ShouldDownload(new Version("2.0.0.0")));
+		}
+
+		public interface ILoveThisFramework
+		{
+			bool ShouldDownload(Version version);
+		}
+
 		public void When_user_forgot_password_should_save_user()
 		{
 			var userRepository = new Mock<IUserRepository>();

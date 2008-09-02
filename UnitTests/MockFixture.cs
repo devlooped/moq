@@ -1259,6 +1259,17 @@ namespace Moq.Tests
 			foo.Verify(f => f.Execute());
 		}
 
+		[Fact]
+		public void VerifiesExpectationOnAddedInterfaceCastedDynamically()
+		{
+			var bag = new Mock<IBag>();
+			bag.As<IFoo>();
+
+			((IFoo)bag.Object).Execute();
+
+			bag.As<IFoo>().Verify(f => f.Execute());
+		}
+
 		// ShouldSupportByRefArguments?
 		// ShouldSupportOutArguments?
 
