@@ -597,7 +597,7 @@ namespace Moq.Tests
 		[Fact]
 		public void ThrowsIfNoMatchingConstructorFound()
 		{
-			Assert.Throws<ArgumentException>(() => 
+			Assert.Throws<ArgumentException>(() =>
 			{
 				Console.WriteLine(new Mock<ClassWithNoDefaultConstructor>(25, true).Object);
 			});
@@ -1268,6 +1268,17 @@ namespace Moq.Tests
 			((IFoo)bag.Object).Execute();
 
 			bag.As<IFoo>().Verify(f => f.Execute());
+		}
+
+		[Fact]
+		public void GetsTwoDifferentMocks()
+		{
+			var mock1 = new Mock<IFoo>();
+			var mock2 = new Mock<IFoo>();
+
+			var omg = object.ReferenceEquals(mock1.Object, mock2.Object);
+
+			Assert.False(omg);
 		}
 
 		// ShouldSupportByRefArguments?
