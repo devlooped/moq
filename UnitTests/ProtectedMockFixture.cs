@@ -53,11 +53,11 @@ namespace Moq.Tests
 		}
 
 		[Fact]
-		public void ShouldThrowIfVoidMethodIsProtectedInternal()
+		public void ShouldNotThrowIfVoidMethodIsProtectedInternal()
 		{
 			var mock = new Mock<FooBase>();
 
-			Assert.Throws<ArgumentException>(() => mock.Protected().Expect("ProtectedInternal"));
+			mock.Protected().Expect("ProtectedInternal");
 		}
 
 		[Fact]
@@ -93,11 +93,11 @@ namespace Moq.Tests
 		}
 
 		[Fact]
-		public void ShouldThrowIfReturnMethodIsProtectedInternal()
+		public void ShouldNotThrowIfReturnMethodIsProtectedInternal()
 		{
 			var mock = new Mock<FooBase>();
 
-			Assert.Throws<ArgumentException>(() => mock.Protected().Expect<int>("ProtectedInternalInt"));
+			mock.Protected().Expect<int>("ProtectedInternalInt");
 		}
 
 		[Fact]
@@ -125,6 +125,17 @@ namespace Moq.Tests
 				 .Returns(5);
 
 			Assert.Equal(5, mock.Object.DoInt());
+		}
+
+		[Fact]
+		public void ShouldExpectProtectedInternalVirtualMethod()
+		{
+			var mock = new Mock<FooBase>();
+			mock.Protected()
+				 .Expect<int>("ProtectedInternalInt")
+				 .Returns(5);
+
+			Assert.Equal(5, mock.Object.DoProtectedInternalInt());
 		}
 
 		[Fact]
@@ -331,10 +342,12 @@ namespace Moq.Tests
 		{
 			protected event EventHandler Doing;
 
-			internal protected virtual void ProtectedInternal() { }
+			internal protected virtual int ProtectedInternal() { return 0; }
 			internal virtual void Internal() { }
-			internal protected virtual void ProtectedInternalInt() { }
-			internal virtual void InternalInt() { }
+
+			public int DoProtectedInternalInt() { return ProtectedInternalInt(); }
+			internal protected virtual int ProtectedInternalInt() { return 0; }
+			internal virtual int InternalInt() { return 0; }
 
 			public void DoVoid() { Void(); }
 			protected virtual void Void() { }
