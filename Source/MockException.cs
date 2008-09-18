@@ -77,10 +77,6 @@ namespace Moq
 			ReturnValueRequired,
 			VerificationFailed, 
 			MoreThanOneCall,
-			ExpectedProperty,
-			ExpectedMethod,
-			ExpectedMethodOrProperty,
-			ExpectedLambda,
 		}
 
 		ExceptionReason reason;

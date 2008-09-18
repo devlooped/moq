@@ -108,15 +108,7 @@ namespace Moq.Tests
 		{
 			var mock = new Mock<FooBase>();
 
-			try
-			{
-				mock.Expect(x => x.ValueField);
-				Assert.True(false, "Shouldn't have reached here");
-			}
-			catch (MockException mex)
-			{
-				Assert.Equal(MockException.ExceptionReason.ExpectedMethodOrProperty, mex.Reason);
-			}
+			Assert.Throws<ArgumentException>(() => mock.Expect(x => x.ValueField));
 		}
 
 		[Fact]
@@ -895,15 +887,7 @@ namespace Moq.Tests
 		{
 			var mock = new Mock<IFoo>();
 
-			try
-			{
-				mock.ExpectSet(foo => foo.DoIntArgReturnInt(5));
-				Assert.True(false, "Should throw on ExpectSet on method instead of property.");
-			}
-			catch (MockException mex)
-			{
-				Assert.Equal(MockException.ExceptionReason.ExpectedProperty, mex.Reason);
-			}
+			Assert.Throws<ArgumentException>(() => mock.ExpectSet(foo => foo.DoIntArgReturnInt(5)));
 		}
 
 		[Fact]
@@ -911,15 +895,7 @@ namespace Moq.Tests
 		{
 			var mock = new Mock<IFoo>();
 
-			try
-			{
-				mock.ExpectGet(foo => foo.DoIntArgReturnInt(5));
-				Assert.True(false, "Should throw on ExpectGet on method instead of property.");
-			}
-			catch (MockException mex)
-			{
-				Assert.Equal(MockException.ExceptionReason.ExpectedProperty, mex.Reason);
-			}
+			Assert.Throws<ArgumentException>(() => mock.ExpectGet(foo => foo.DoIntArgReturnInt(5)));
 		}
 
 		[Fact]
@@ -980,15 +956,8 @@ namespace Moq.Tests
 			var foo = new Mock<IFoo>();
 
 			Expression<Predicate<int>> isSix = (arg) => arg == 6;
-
-			try
-			{
-				foo.Expect((f) => f.DoIntArgReturnInt(It.Is(isSix))).Returns(12);
-			}
-			catch (MockException mex)
-			{
-				Assert.Equal(MockException.ExceptionReason.ExpectedLambda, mex.Reason);
-			}
+			
+			Assert.Throws<ArgumentException>(() => foo.Expect((f) => f.DoIntArgReturnInt(It.Is(isSix))).Returns(12));
 		}
 
 		[Fact]

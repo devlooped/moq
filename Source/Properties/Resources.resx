@@ -165,9 +165,6 @@
   <data name="ExpressionNotProperty" xml:space="preserve">
     <value>Expression is not a property access: {0}</value>
   </data>
-  <data name="ExpressionNotMethodOrProperty" xml:space="preserve">
-    <value>Expression is not a method invocation or a property get: {0}</value>
-  </data>
   <data name="ExpectedLambda" xml:space="preserve">
     <value>A lambda expression is expected as the argument to It.Is&lt;T&gt;.</value>
   </data>
