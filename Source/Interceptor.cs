@@ -150,6 +150,24 @@ namespace Moq
 
 				return;
 			}
+			else if (IsEventDettach(invocation))
+			{
+				var delegateInstance = (Delegate)invocation.Arguments[0];
+				// TODO: validate we can get the event?
+				EventInfo eventInfo = GetEventFromName(invocation.Method.Name.Replace("remove_", ""));
+				var mockEvent = delegateInstance.Target as MockedEvent;
+
+				if (mockEvent != null)
+				{
+					mockEvent.Event = null;
+				}
+				else
+				{
+					mock.RemoveEventHandler(eventInfo, (Delegate)invocation.Arguments[0]);
+				}
+
+				return;
+			}
 
 			// always save to support Verify[expression] pattern.
 			actualInvocations.Add(invocation);
@@ -211,6 +229,12 @@ namespace Moq
 		{
 			return invocation.Method.IsSpecialName &&
 					  invocation.Method.Name.StartsWith("add_");
+		}
+
+		private static bool IsEventDettach(IInvocation invocation)
+		{
+			return invocation.Method.IsSpecialName &&
+					  invocation.Method.Name.StartsWith("remove_");
 		}
 
 		/// <summary>

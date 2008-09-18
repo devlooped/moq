@@ -179,6 +179,15 @@ namespace Moq
 			handlers.Add(handler);
 		}
 
+		internal void RemoveEventHandler(EventInfo ev, Delegate handler)
+		{
+			List<Delegate> handlers;
+			if (invocationLists.TryGetValue(ev, out handlers))
+			{
+				handlers.Remove(handler);
+			}
+		}
+
 		internal IEnumerable<Delegate> GetInvocationList(EventInfo ev)
 		{
 			List<Delegate> handlers;

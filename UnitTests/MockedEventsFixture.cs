@@ -300,6 +300,77 @@ namespace Moq.Tests
 			var bar = new Mock<IDerived>(MockBehavior.Strict);
 			bar.Object.Event += (o, e) => { ;}; // Exception Fired here
 		}
+
+		[Fact]
+		public void ShouldThrowIfRaisingDettachedEvent()
+		{
+			var mock = new Mock<IFooView>();
+			var handler = mock.CreateEventHandler();
+
+			mock.Object.Canceled += handler;
+
+			handler.Raise(EventArgs.Empty);
+
+			mock.Object.Canceled -= handler;
+
+			Assert.Throws<InvalidOperationException>(() => handler.Raise(EventArgs.Empty));
+		}
+
+		[Fact]
+		public void ShouldAttachAndDetachListener()
+		{
+			var parent = new Mock<IParent>(MockBehavior.Strict);
+			var raised = false;
+			EventHandler<EventArgs> listener = (sender, args) => raised = true;
+
+			var handler = parent.CreateEventHandler();
+			parent.Object.Event += handler;
+			
+			parent.Object.Event += listener;
+
+			handler.Raise(EventArgs.Empty);
+
+			Assert.True(raised);
+
+			raised = false;
+
+			parent.Object.Event -= listener;
+
+			handler.Raise(EventArgs.Empty);
+
+			Assert.False(raised);
+		}
+
+		bool raisedField = false;
+
+		[Fact]
+		public void ShouldAttachAndDetachListenerMethod()
+		{
+			var parent = new Mock<IParent>(MockBehavior.Strict);
+			raisedField = false;
+
+			var handler = parent.CreateEventHandler();
+			parent.Object.Event += handler;
+
+			parent.Object.Event += OnRaised;
+
+			handler.Raise(EventArgs.Empty);
+
+			Assert.True(raisedField);
+
+			raisedField = false;
+
+			parent.Object.Event -= OnRaised;
+
+			handler.Raise(EventArgs.Empty);
+
+			Assert.False(raisedField);
+		}
+
+		private void OnRaised(object sender, EventArgs e)
+		{
+			raisedField = true;
+		}
 	
 		public interface IAdder<T>
 		{
