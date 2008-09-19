@@ -81,6 +81,7 @@
     <Compile Include="ExpressionExtensionsFixture.cs" />
     <Compile Include="ExtensibilityFixture.cs" />
     <Compile Include="AdvancedMatcherAttributeFixture.cs" />
+    <Compile Include="Matchers\AnyMatcherFixture.cs" />
     <Compile Include="MockBehaviorFixture.cs" />
     <Compile Include="MockedFixture.cs" />
     <Compile Include="MockedEventsFixture.cs" />
