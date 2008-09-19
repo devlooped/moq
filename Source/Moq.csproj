@@ -143,6 +143,7 @@
       <Link>Moq.snk</Link>
     </None>
     <Compile Include="IMock.cs" />
+    <Compile Include="Language\INever.cs" />
     <Compile Include="Mock.Generic.cs" />
     <Compile Include="MockedEvent.Generic.cs" />
   </ItemGroup>

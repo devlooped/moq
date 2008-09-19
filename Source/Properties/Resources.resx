@@ -218,4 +218,7 @@ mock.ExpectSet(x =&gt; x.{1}).Callback(callbackDelegate);</value>
 Please cast the argument to one of the supported types: {1}.
 Remember that there's no generics covariance in the CLR, so your object must be one of these types in order for the call to succeed.</value>
   </data>
+  <data name="ExpectedNever" xml:space="preserve">
+    <value>Invocation {0} should not have been made.</value>
+  </data>
 </root>

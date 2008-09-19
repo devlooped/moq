@@ -125,6 +125,15 @@ namespace Moq.Properties {
         }
         
         /// <summary>
+        ///   Looks up a localized string similar to Invocation {0} should not have been made..
+        /// </summary>
+        internal static string ExpectedNever {
+            get {
+                return ResourceManager.GetString("ExpectedNever", resourceCulture);
+            }
+        }
+        
+        /// <summary>
         ///   Looks up a localized string similar to Expression is not a method invocation: {0}.
         /// </summary>
         internal static string ExpressionNotMethod {

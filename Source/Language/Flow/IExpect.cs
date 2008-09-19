@@ -46,7 +46,7 @@ namespace Moq.Language.Flow
 	/// Implements the fluent API.
 	/// </summary>
 	[EditorBrowsable(EditorBrowsableState.Never)]
-	public interface IExpect : ICallback, ICallbackResult, IRaise, IHideObjectMembers
+	public interface IExpect : ICallback, ICallbackResult, IRaise, INever, IHideObjectMembers
 	{
 	}
 
@@ -54,7 +54,7 @@ namespace Moq.Language.Flow
 	/// Implements the fluent API.
 	/// </summary>
 	[EditorBrowsable(EditorBrowsableState.Never)]
-	public interface IExpect<TResult> : ICallback<TResult>, IReturnsThrows<TResult>, IHideObjectMembers
+	public interface IExpect<TResult> : ICallback<TResult>, IReturnsThrows<TResult>, INever, IHideObjectMembers
 	{
 	}
 
@@ -62,7 +62,7 @@ namespace Moq.Language.Flow
 	/// Implements the fluent API.
 	/// </summary>
 	[EditorBrowsable(EditorBrowsableState.Never)]
-	public interface IExpectGetter<TProperty> : ICallbackGetter<TProperty>, IReturnsThrowsGetter<TProperty>, IHideObjectMembers
+	public interface IExpectGetter<TProperty> : ICallbackGetter<TProperty>, IReturnsThrowsGetter<TProperty>, INever, IHideObjectMembers
 	{
 	}
 
@@ -70,7 +70,7 @@ namespace Moq.Language.Flow
 	/// Implements the fluent API.
 	/// </summary>
 	[EditorBrowsable(EditorBrowsableState.Never)]
-	public interface IExpectSetter<TProperty> : ICallbackSetter<TProperty>, ICallbackResult, IRaise, IHideObjectMembers
+	public interface IExpectSetter<TProperty> : ICallbackSetter<TProperty>, ICallbackResult, IRaise, INever, IHideObjectMembers
 	{
 	}
 }

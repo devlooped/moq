@@ -79,6 +79,7 @@ namespace Moq
 		IMatcher[] argumentMatchers;
 		int callCount;
 		bool isOnce;
+		bool isNever;
 		MockedEvent mockEvent;
 		Delegate mockEventArgsFunc;
 
@@ -193,6 +194,11 @@ namespace Moq
 					String.Format(Properties.Resources.MoreThanOneCall,
 					call.Format()));
 
+			if (isNever)
+				throw new MockException(MockException.ExceptionReason.ExpectedNever,
+					String.Format(Properties.Resources.ExpectedNever,
+					call.Format()));
+
 			if (mockEvent != null)
 			{
 				var argsFuncType = mockEventArgsFunc.GetType();
@@ -214,6 +220,11 @@ namespace Moq
 			isOnce = true;
 
 			return this;
+		}
+
+		public void Never()
+		{
+			isNever = true;
 		}
 
 		public IVerifies Raises(MockedEvent eventHandler, EventArgs args)

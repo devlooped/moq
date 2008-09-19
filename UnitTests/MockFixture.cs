@@ -1250,6 +1250,63 @@ namespace Moq.Tests
 			Assert.False(omg);
 		}
 
+		[Fact]
+		public void ExpectsMethodNeverHappen()
+		{
+			var mock = new Mock<IFoo>();
+
+			mock.Expect(m => m.Execute("ping")).Returns("ack");
+			mock.Expect(m => m.Execute("ack")).Never();
+
+			Assert.Equal("ack", mock.Object.Execute("ping"));
+
+			try
+			{
+				mock.Object.Execute("ack");
+				Assert.False(true, "Should have thrown");
+			}
+			catch (MockException mex)
+			{
+				Assert.Equal(MockException.ExceptionReason.ExpectedNever, mex.Reason);
+			}
+		}
+
+		[Fact]
+		public void ExpectsPropertyGetNeverHappen()
+		{
+			var mock = new Mock<IFoo>();
+
+			mock.ExpectGet(m => m.ValueProperty).Never();
+
+			try
+			{
+				var value = mock.Object.ValueProperty;
+				Assert.False(true, "Should have thrown");
+			}
+			catch (MockException mex)
+			{
+				Assert.Equal(MockException.ExceptionReason.ExpectedNever, mex.Reason);
+			}
+		}
+
+		[Fact]
+		public void ExpectsPropertySetNeverHappen()
+		{
+			var mock = new Mock<IFoo>();
+
+			mock.ExpectSet(m => m.ValueProperty).Never();
+
+			try
+			{
+				mock.Object.ValueProperty = 5;
+				Assert.False(true, "Should have thrown");
+			}
+			catch (MockException mex)
+			{
+				Assert.Equal(MockException.ExceptionReason.ExpectedNever, mex.Reason);
+			}
+		}
+
 		// ShouldSupportByRefArguments?
 		// ShouldSupportOutArguments?
 
