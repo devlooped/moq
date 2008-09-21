@@ -56,6 +56,7 @@ namespace Moq
 		MockBehavior behavior;
 		Type targetType;
 		Dictionary<ExpressionKey, IProxyCall> calls = new Dictionary<ExpressionKey, IProxyCall>();
+		List<IProxyCall> orderedCalls = new List<IProxyCall>();
 		Mock mock;
 		List<IInvocation> actualInvocations = new List<IInvocation>();
 
@@ -105,7 +106,14 @@ namespace Moq
 			var constants = new ConstantsVisitor(expr).Values;
 			var key = new ExpressionKey(s, constants);
 
+			if (calls.ContainsKey(key))
+			{
+				// Remove previous from ordered calls
+				orderedCalls.Remove(calls[key]);
+			}
+
 			calls[key] = call;
+			orderedCalls.Add(call);
 
 			//if (kind == ExpectKind.PropertySet)
 			//    calls["set::" + expr.ToStringFixed()] = call;
@@ -172,7 +180,7 @@ namespace Moq
 			// always save to support Verify[expression] pattern.
 			actualInvocations.Add(invocation);
 
-			var call = calls.Values.LastOrDefault(c => c.Matches(invocation));
+			var call = orderedCalls.LastOrDefault(c => c.Matches(invocation));
 
 			if (call == null)
 			{

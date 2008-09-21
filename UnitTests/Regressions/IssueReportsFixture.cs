@@ -251,6 +251,28 @@ namespace Moq.Tests.Regressions
 
 		#endregion
 
+		#region 89
+
+		public class Issue89
+		{
+			[Fact]
+			public void That_last_expectation_should_win()
+			{
+				var mock = new Mock<ISample>();
+				mock.Expect(s => s.Get(1)).Returns("blah");
+				mock.Expect(s => s.Get(It.IsAny<int>())).Returns("foo");
+				mock.Expect(s => s.Get(1)).Returns("bar");
+				Assert.Equal("bar", mock.Object.Get(1));
+			}
+
+			public interface ISample
+			{
+				string Get(int i);
+			}
+		}
+
+		#endregion
+
 		// run "netsh http add urlacl url=http://+:7777/ user=[domain]\[user]"
 		// to avoid running the test as an admin
 		[Fact]
