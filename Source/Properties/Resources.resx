@@ -227,4 +227,7 @@ Remember that there's no generics covariance in the CLR, so your object must be 
   <data name="UnsupportedIntermediateType" xml:space="preserve">
     <value>Expression contains intermediate property access {0}.{1} which is of type {2} and cannot be mocked. Unsupported expression {3}.</value>
   </data>
+  <data name="MoreThanNCalls" xml:space="preserve">
+    <value>Expected only {0} calls to {1}.</value>
+  </data>
 </root>

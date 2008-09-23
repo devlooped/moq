@@ -59,5 +59,16 @@ namespace Moq.Language
 		/// </code>
 		/// </example>
 		IVerifies AtMostOnce();
+		/// <summary>
+		/// The expected invocation can happen at most specified number of times.
+		/// </summary>
+		/// <example>
+		/// <code>
+		/// var mock = new Mock&lt;ICommand&gt;();
+		/// mock.Expect(foo => foo.Execute("ping"))
+		///     .AtMost( 5 );
+		/// </code>
+		/// </example>
+		IVerifies AtMost( int callCount);
 	}
 }

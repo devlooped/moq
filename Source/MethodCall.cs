@@ -103,6 +103,7 @@ namespace Moq
 		bool isNever;
 		MockedEvent mockEvent;
 		Delegate mockEventArgsFunc;
+		private int? expectedCallCount = null;
 
 		public MethodCall(Expression originalExpression, MethodInfo method, params Expression[] arguments)
 		{
@@ -215,10 +216,18 @@ namespace Moq
 					String.Format(Properties.Resources.MoreThanOneCall,
 					call.Format()));
 
+
 			if (isNever)
 				throw new MockException(MockException.ExceptionReason.ExpectedNever,
 					String.Format(Properties.Resources.ExpectedNever,
 					call.Format()));
+
+
+			if (expectedCallCount.HasValue && callCount > expectedCallCount)
+				throw new MockException(MockException.ExceptionReason.MoreThanNCalls,
+					String.Format(Properties.Resources.MoreThanNCalls, expectedCallCount,
+					call.Format()));
+
 
 			if (mockEvent != null)
 			{
@@ -246,6 +255,15 @@ namespace Moq
 		public void Never()
 		{
 			isNever = true;
+		}
+
+
+
+		public IVerifies AtMost( int callCount )
+		{
+			expectedCallCount = callCount;
+
+			return this;
 		}
 
 		public IVerifies Raises(MockedEvent eventHandler, EventArgs args)

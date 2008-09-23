@@ -87,6 +87,33 @@ namespace Moq.Tests
 			}
 		}
 
+		[Fact]
+		public void RepeatThrowsOnNPlusOneCall()
+		{
+			var repeat = 5;
+			var mock = new Mock<IFoo>();
+			mock.Expect(foo => foo.Execute("ping"))
+				.Returns("ack")
+				.AtMost(5);
+
+			var calls = 0;
+			try
+			{
+				while (calls <= repeat + 1)
+				{
+					mock.Object.Execute("ping");
+					calls++;
+				}
+
+				Assert.True(false, "should fail on two calls");
+			}
+			catch (MockException mex)
+			{
+				Assert.Equal(MockException.ExceptionReason.MoreThanNCalls, mex.Reason);
+				Assert.Equal(calls, repeat);
+			}
+		}
+
 		public interface IFoo
 		{
 			int Value { get; set; }

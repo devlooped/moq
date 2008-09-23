@@ -211,6 +211,15 @@ namespace Moq.Properties {
         }
         
         /// <summary>
+        ///   Looks up a localized string similar to Expected only {0} calls to {1}..
+        /// </summary>
+        internal static string MoreThanNCalls {
+            get {
+                return ResourceManager.GetString("MoreThanNCalls", resourceCulture);
+            }
+        }
+        
+        /// <summary>
         ///   Looks up a localized string similar to Expected only one call to {0}..
         /// </summary>
         internal static string MoreThanOneCall {
