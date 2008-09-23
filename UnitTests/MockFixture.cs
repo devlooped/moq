@@ -291,7 +291,7 @@ namespace Moq.Tests
 		{
 			var mock = new Mock<IFoo>();
 
-			int value = 0;
+			int? value = 0;
 
 			mock.ExpectSet(foo => foo.Value)
 				.Callback(i => value = i);
@@ -299,6 +299,44 @@ namespace Moq.Tests
 			mock.Object.Value = 5;
 
 			Assert.Equal(5, value);
+		}
+
+		[Fact]
+		public void ExpectsPropertySetterWithValue()
+		{
+			var mock = new Mock<IFoo>();
+			mock.ExpectSet(m => m.Value, 5);
+
+			Assert.Throws<MockVerificationException>(() => mock.VerifyAll());
+
+			mock.Object.Value = 5;
+
+			mock.VerifyAll();
+			mock.VerifySet(m => m.Value);
+		}
+
+		[Fact]
+		public void ExpectsPropertySetterWithNullValue()
+		{
+			var mock = new Mock<IFoo>(MockBehavior.Strict);
+			mock.ExpectSet(m => m.Value, null);
+
+			Assert.Throws<MockException>(() => { mock.Object.Value = 5; });
+			Assert.Throws<MockVerificationException>(() => mock.VerifyAll());
+
+			mock.Object.Value = null;
+
+			mock.VerifyAll();
+			mock.VerifySet(m => m.Value);
+		}
+
+		[Fact]
+		public void ThrowsIfPropertySetterWithWrongValue()
+		{
+			var mock = new Mock<IFoo>(MockBehavior.Strict);
+			mock.ExpectSet(m => m.Value, 5);
+
+			Assert.Throws<MockException>(() => { mock.Object.Value = 6; });
 		}
 
 		[Fact]
@@ -472,7 +510,7 @@ namespace Moq.Tests
 
 		public interface IFoo
 		{
-			int Value { get; set; }
+			int? Value { get; set; }
 			int Echo(int value);
 			void Submit();
 			string Execute(string command);

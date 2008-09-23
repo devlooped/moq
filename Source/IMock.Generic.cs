@@ -213,6 +213,24 @@ namespace Moq
 		IExpectSetter<TProperty> ExpectSet<TProperty>(Expression<Func<T, TProperty>> expression);
 
 		/// <summary>
+		/// Sets an expectation on the mocked type for a call to 
+		/// to a property setter with a specific value.
+		/// </summary>
+		/// <remarks>
+		/// More than one expectation can be set for the setter with 
+		/// different values.
+		/// </remarks>
+		/// <typeparam name="TProperty">Type of the property. Typically omitted as it can be inferred from the expression.</typeparam>
+		/// <param name="expression">Lambda expression that specifies the expected property setter.</param>
+		/// <param name="value">The value expected to be set for the property.</param>
+		/// <example group="expectations">
+		/// <code>
+		/// mock.ExpectSet(x =&gt; x.Suspended, true);
+		/// </code>
+		/// </example>
+		IExpectSetter<TProperty> ExpectSet<TProperty>(Expression<Func<T, TProperty>> expression, TProperty value);
+
+		/// <summary>
 		/// Implements <see cref="IMock.Verify"/>.
 		/// </summary>
 		void Verify();
@@ -308,5 +326,28 @@ namespace Moq
 		/// <typeparam name="TProperty">Type of the property to verify. Typically omitted as it can 
 		/// be inferred from the expression's return type.</typeparam>
 		void VerifySet<TProperty>(System.Linq.Expressions.Expression<Func<T, TProperty>> expression);
+
+		/// <summary>
+		/// Verifies that a property has been set on the mock to the given value.
+		/// Use in conjuntion with the default <see cref="MockBehavior.Loose"/>.
+		/// </summary>
+		/// <example group="verification">
+		/// This example assumes that the mock has been used, 
+		/// and later we want to verify that a given invocation 
+		/// with specific parameters was performed:
+		/// <code>
+		/// var mock = new Mock&lt;IWarehouse&gt;();
+		/// // exercise mock
+		/// //...
+		/// // Will throw if the test code didn't set the IsClosed property to true
+		/// mock.VerifySet(warehouse =&gt; warehouse.IsClosed, true);
+		/// </code>
+		/// </example>
+		/// <exception cref="MockException">The invocation was not performed on the mock.</exception>
+		/// <param name="expression">Expression to verify.</param>
+		/// <param name="value">The value that should have been set on the property.</param>
+		/// <typeparam name="TProperty">Type of the property to verify. Typically omitted as it can 
+		/// be inferred from the expression's return type.</typeparam>
+		void VerifySet<TProperty>(Expression<Func<T, TProperty>> expression, TProperty value);
 	}
 }

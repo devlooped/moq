@@ -253,6 +253,17 @@ namespace Moq
 			return SetUpExpectSet<T, TProperty>(expression, this.Interceptor);
 		}
 
+		/// <summary>
+		/// Implements <see cref="IMock{T}.ExpectSet{TProperty}(Expression{Func{T, TProperty}}, TProperty)"/>.
+		/// </summary>
+		/// <typeparam name="TProperty">Type of the property. Typically omitted as it can be inferred from the expression.</typeparam>
+		/// <param name="expression">Lambda expression that specifies the expected property setter.</param>
+		/// <param name="value">The value expected to be set for the property.</param>
+		public IExpectSetter<TProperty> ExpectSet<TProperty>(Expression<Func<T, TProperty>> expression, TProperty value)
+		{
+			return SetUpExpectSet(expression, value, this.Interceptor);
+		}
+
 		#endregion
 
 		#region Verify
@@ -349,6 +360,18 @@ namespace Moq
 			VerifySet(expression, Interceptor);
 		}
 
+		/// <summary>
+		/// Implements <see cref="IMock{T}.VerifySet{TProperty}(Expression{Func{T, TProperty}}, TProperty)"/>.
+		/// </summary>
+		/// <param name="expression">Expression to verify.</param>
+		/// <param name="value">The value that should have been set on the property.</param>
+		/// <typeparam name="TProperty">Type of the property to verify. Typically omitted as it can 
+		/// be inferred from the expression's return type.</typeparam>
+		public virtual void VerifySet<TProperty>(Expression<Func<T, TProperty>> expression, TProperty value)
+		{
+			VerifySet(expression, value, Interceptor);
+		}
+
 		private static void VerifySet<TProperty>(Expression<Func<T, TProperty>> expression, Interceptor interceptor)
 		{
 			// Made static so that it can be called from the AsInterface private class
@@ -356,7 +379,22 @@ namespace Moq
 
 			var prop = expression.ToLambda().ToPropertyInfo();
 
-			var expected = new MethodCall<TProperty>(expression, prop.GetSetMethod(), new Expression[0]);
+			var expected = new SetterMethodCall<TProperty>(expression, prop.GetSetMethod());
+			var actual = interceptor.ActualCalls.FirstOrDefault(i => expected.Matches(i));
+
+			if (actual == null)
+				throw new MockException(MockException.ExceptionReason.VerificationFailed,
+					Properties.Resources.NoMatchingCall);
+		}
+
+		private static void VerifySet<TProperty>(Expression<Func<T, TProperty>> expression, TProperty value, Interceptor interceptor)
+		{
+			// Made static so that it can be called from the AsInterface private class
+			Guard.ArgumentNotNull(interceptor, "interceptor");
+
+			var prop = expression.ToLambda().ToPropertyInfo();
+
+			var expected = new SetterMethodCall<TProperty>(expression, prop.GetSetMethod(), value);
 			var actual = interceptor.ActualCalls.FirstOrDefault(i => expected.Matches(i));
 
 			if (actual == null)
@@ -445,7 +483,12 @@ namespace Moq
 
 			public IExpectSetter<TProperty> ExpectSet<TProperty>(Expression<Func<TInterface, TProperty>> expression)
 			{
-				return Mock<T>.SetUpExpectSet(expression, this.owner.Interceptor);
+				return Mock.SetUpExpectSet(expression, this.owner.Interceptor);
+			}
+
+			public IExpectSetter<TProperty> ExpectSet<TProperty>(Expression<Func<TInterface, TProperty>> expression, TProperty value)
+			{
+				return Mock.SetUpExpectSet(expression, value, this.owner.Interceptor);
 			}
 
 			public void Verify()
@@ -476,6 +519,11 @@ namespace Moq
 			public void VerifySet<TProperty>(Expression<Func<TInterface, TProperty>> expression)
 			{
 				Mock<TInterface>.VerifySet<TProperty>(expression, owner.Interceptor);
+			}
+
+			public void VerifySet<TProperty>(Expression<Func<TInterface, TProperty>> expression, TProperty value)
+			{
+				Mock<TInterface>.VerifySet<TProperty>(expression, value, owner.Interceptor);
 			}
 		}
 

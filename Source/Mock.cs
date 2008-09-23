@@ -314,7 +314,7 @@ namespace Moq
 			}
 		}
 
-		internal static MethodCall<TProperty> SetUpExpectSet<T1, TProperty>(Expression<Func<T1, TProperty>> expression, Interceptor interceptor)
+		internal static SetterMethodCall<TProperty> SetUpExpectSet<T1, TProperty>(Expression<Func<T1, TProperty>> expression, Interceptor interceptor)
 		{
 			Guard.ArgumentNotNull(interceptor, "interceptor");
 
@@ -327,8 +327,25 @@ namespace Moq
 			var propSet = prop.GetSetMethod(true);
 			ThrowIfCantOverride(expression, propSet);
 
-			var call = new MethodCall<TProperty>(expression, propSet, new Expression[0]);
+			var call = new SetterMethodCall<TProperty>(expression, propSet);
 			interceptor.AddCall(call, ExpectKind.PropertySet);
+
+			return call;
+		}
+
+		internal static SetterMethodCall<TProperty> SetUpExpectSet<T1, TProperty>(Expression<Func<T1, TProperty>> expression, TProperty value, Interceptor interceptor)
+		{
+			// Thanks to the ASP.NET MVC team for this "suggestion"!
+			var lambda = expression.ToLambda();
+			var prop = lambda.ToPropertyInfo();
+			ThrowIfPropertyNotWritable(prop);
+
+			// We generate an invocation to the setter method with the given value
+			var setter = prop.GetSetMethod();
+			ThrowIfCantOverride(expression, setter);
+
+			var call = new SetterMethodCall<TProperty>(expression, setter, value);
+			interceptor.AddCall(call, ExpectKind.Other);
 
 			return call;
 		}

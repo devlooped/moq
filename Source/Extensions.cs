@@ -76,6 +76,25 @@ namespace Moq
 
 		public static string Format(this IInvocation invocation)
 		{
+			// Special-case for getters && setters
+			if (invocation.Method.IsSpecialName)
+			{
+				if (invocation.Method.Name.StartsWith("get_"))
+					return
+						invocation.Method.DeclaringType.Name + "." +
+						invocation.Method.Name.Substring(4);
+				else if (invocation.Method.Name.StartsWith("set_"))
+					return
+						invocation.Method.DeclaringType.Name + "." +
+						invocation.Method.Name.Substring(4) + " = " +
+						(from x in invocation.Arguments
+						 select x == null ?
+								"null" :
+								x is string ?
+									"\"" + (string)x + "\"" :
+									x.ToString()).First();
+			}
+
 			return
 				invocation.Method.DeclaringType.Name + "." +
 				invocation.Method.Name + "(" +

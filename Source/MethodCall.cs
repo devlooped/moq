@@ -48,11 +48,21 @@ using Moq.Language.Flow;
 
 namespace Moq
 {
-	internal class MethodCall<TProperty> : MethodCall, IExpectSetter<TProperty>
+	internal class SetterMethodCall<TProperty> : MethodCall, IExpectSetter<TProperty>
 	{
-		public MethodCall(Expression originalExpression, MethodInfo method, params Expression[] arguments)
-			: base(originalExpression, method, arguments)
+		bool checkValue = false;
+		TProperty value;
+
+		public SetterMethodCall(Expression originalExpression, MethodInfo method)
+			: base(originalExpression, method, new Expression[0])
 		{
+		}
+
+		public SetterMethodCall(Expression originalExpression, MethodInfo method, TProperty value)
+			: base(originalExpression, method, new Expression[0])
+		{
+			checkValue = true;
+			this.value = value;
 		}
 
 		public override bool Matches(IInvocation call)
@@ -60,7 +70,18 @@ namespace Moq
 			// Need to override default behavior as the arguments will be zero 
 			// whereas the call arguments will be one: the property 
 			// value to set.
-			return call.Method == method;
+
+			if (call.Method != method)
+				return false;
+
+			if (checkValue)
+			{
+				// If the ctor that received a value was used, 
+				// we'll use it for comparison.
+				return Object.Equals(value, call.Arguments[0]);
+			}
+
+			return true;
 		}
 
 		public ICallbackResult Callback(Action<TProperty> callback)

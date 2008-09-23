@@ -39,6 +39,8 @@
 // http://www.opensource.org/licenses/bsd-license.php]
 
 using System;
+using System.Linq;
+using System.Linq.Expressions;
 using System.ComponentModel;
 using Moq.Language.Flow;
 
@@ -47,7 +49,8 @@ namespace Moq.Language
 	/// <summary>
 	/// Defines the <c>Callback</c> verb for property setter expectations.
 	/// </summary>
-	/// <seealso cref="Mock{T}.ExpectSet"/>
+	/// <seealso cref="IMock{T}.ExpectSet{TProperty}(Expression{Func{T, TProperty}})"/>
+	/// <seealso cref="IMock{T}.ExpectSet{TProperty}(Expression{Func{T, TProperty}}, TProperty)"/>
 	/// <typeparam name="TProperty">Type of the property.</typeparam>
 	[EditorBrowsable(EditorBrowsableState.Never)]
 	public interface ICallbackSetter<TProperty> : IHideObjectMembers

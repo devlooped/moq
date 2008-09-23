@@ -221,9 +221,23 @@ namespace Moq.Tests
 			}
 		}
 
+		[Fact]
+		public void VerifiesSetter()
+		{
+			var mock = new Mock<IFoo>();
+			mock.ExpectSet(m => m.Value, 5);
+
+			mock.Object.Value = 1;
+			mock.Object.Value = 5;
+
+			mock.VerifySet(m => m.Value);
+			Assert.Throws<MockException>(() => mock.VerifySet(m => m.Value, 2));
+			mock.VerifySet(m => m.Value, 5);
+		}
+
 		public interface IFoo
 		{
-			int Value { get; set; }
+			int? Value { get; set; }
 			int Echo(int value);
 			void Submit();
 			string Execute(string command);

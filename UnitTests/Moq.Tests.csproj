@@ -91,6 +91,7 @@
     <Compile Include="MockFactoryFixture.cs" />
     <Compile Include="MockFixture.cs" />
     <Compile Include="OccurrenceFixture.cs" />
+    <Compile Include="OutRefFixture.cs" />
     <Compile Include="ProtectedMockFixture.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
     <Compile Include="Regressions\ArgumentTypeFixture.cs" />
