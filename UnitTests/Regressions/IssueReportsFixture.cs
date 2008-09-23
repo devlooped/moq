@@ -33,6 +33,30 @@ namespace Moq.Tests.Regressions
 
 		#endregion
 
+		#region 48
+
+		public class Issue48
+		{
+			[Fact]
+			public void ExpectsOnIndexer()
+			{
+				var mock = new Mock<ISomeInterface>();
+				mock.Expect(m => m[0]).Returns("a");
+				mock.Expect(m => m[1]).Returns("b");
+
+				Assert.Equal("a", mock.Object[0]);
+				Assert.Equal("b", mock.Object[1]);
+				Assert.Equal(default(string), mock.Object[2]);
+			}
+
+			public interface ISomeInterface
+			{
+				string this[int index] { get; set; }
+			}
+		}
+
+		#endregion
+
 		#region #52
 
 		[Fact]
