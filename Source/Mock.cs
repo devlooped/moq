@@ -42,6 +42,9 @@ using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Reflection;
+using System.Linq.Expressions;
+using Moq.Language.Flow;
+using Moq.Language;
 
 namespace Moq
 {
@@ -111,12 +114,12 @@ namespace Moq
 					// the generic parameters.
 					var types = String.Join(", ",
 							new[] { mockedType }
-							// Skip first interface which is always our internal IMocked<T>
+						// Skip first interface which is always our internal IMocked<T>
 							.Concat(mock.ImplementedInterfaces.Skip(1))
 							.Select(t => t.Name)
 							.ToArray());
 
-					throw new ArgumentException(String.Format(Properties.Resources.InvalidMockGetType, 
+					throw new ArgumentException(String.Format(Properties.Resources.InvalidMockGetType,
 						typeof(T).Name, types));
 				}
 			}
@@ -127,6 +130,17 @@ namespace Moq
 		}
 
 		Dictionary<EventInfo, List<Delegate>> invocationLists = new Dictionary<EventInfo, List<Delegate>>();
+		Dictionary<PropertyInfo, Mock> innerMocks = new Dictionary<PropertyInfo, Mock>();
+
+		//static MethodInfo genericSetupExpectVoid;
+		//static MethodInfo genericSetupExpectReturn;
+		//static MethodInfo genericSetupExpectGet;
+		//static MethodInfo genericSetupExpectSet;
+
+		//static Mock()
+		//{
+		//    genericSetupExpectVoid = typeof(Mock).GetMethod("SetupExpect
+		//}
 
 		/// <summary>
 		/// Initializes the mock
@@ -136,6 +150,8 @@ namespace Moq
 			this.CallBase = false;
 			ImplementedInterfaces = new List<Type>();
 		}
+
+		internal Interceptor Interceptor { get; set; }
 
 		/// <summary>
 		/// Exposes the list of extra interfaces implemented by the mock.
@@ -158,6 +174,12 @@ namespace Moq
 		protected abstract object GetObject();
 
 		/// <summary>
+		/// Retrieves the type of the mocked object, its generic type argument.
+		/// This is used in the auto-mocking of hierarchy access.
+		/// </summary>
+		internal abstract Type MockedType { get; }
+
+		/// <summary>
 		/// Implements <see cref="IMock.Verify"/>.
 		/// </summary>
 		public abstract void Verify();
@@ -166,6 +188,285 @@ namespace Moq
 		/// Implements <see cref="IMock.VerifyAll"/>.
 		/// </summary>
 		public abstract void VerifyAll();
+
+		internal static void Verify(Interceptor interceptor)
+		{
+			// Made static so it can be called from As<TInterface>
+			try
+			{
+				interceptor.Verify();
+				foreach (var mock in interceptor.Mock.innerMocks.Values)
+				{
+					mock.Verify();
+				}
+			}
+			catch (Exception ex)
+			{
+				// Rethrow resetting the call-stack so that 
+				// callers see the exception as happening at 
+				// this call site.
+				// TODO: see how to mangle the stacktrace so 
+				// that the mock doesn't even show up there.
+				throw ex;
+			}
+		}
+
+		internal static void VerifyAll(Interceptor interceptor)
+		{
+			// Made static so it can be called from As<TInterface>
+			try
+			{
+				interceptor.VerifyAll();
+				foreach (var mock in interceptor.Mock.innerMocks.Values)
+				{
+					mock.VerifyAll();
+				}
+			}
+			catch (Exception ex)
+			{
+				// Rethrow resetting the call-stack so that 
+				// callers see the exception as happening at 
+				// this call site.
+				throw ex;
+			}
+		}
+
+		#region Expect
+
+		internal static MethodCall SetUpExpect<T1>(Expression<Action<T1>> expression, Interceptor interceptor)
+		{
+			Guard.ArgumentNotNull(interceptor, "interceptor");
+
+			// Made static so that it can be called from the AsInterface private 
+			// class when adding interfaces via As<TInterface>
+
+			var methodCall = expression.ToLambda().ToMethodCall();
+			MethodInfo method = methodCall.Method;
+			Expression[] args = methodCall.Arguments.ToArray();
+
+			ThrowIfCantOverride(expression, method);
+			var call = new MethodCall(expression, method, args);
+			interceptor.AddCall(call, ExpectKind.Other);
+
+			return call;
+		}
+
+		internal static MethodCallReturn<TResult> SetUpExpect<T1, TResult>(Expression<Func<T1, TResult>> expression, Interceptor interceptor)
+		{
+			Guard.ArgumentNotNull(interceptor, "interceptor");
+
+			// Made static so that it can be called from the AsInterface private 
+			// class when adding interfaces via As<TInterface>
+
+			var lambda = expression.ToLambda();
+
+			if (lambda.IsProperty())
+				return SetUpExpectGet(expression, interceptor);
+
+			var methodCall = lambda.ToMethodCall();
+			MethodInfo method = methodCall.Method;
+			Expression[] args = methodCall.Arguments.ToArray();
+
+			ThrowIfCantOverride(expression, method);
+			var call = new MethodCallReturn<TResult>(expression, method, args);
+
+			// Build intermediate hierarchy if necessary
+			var visitor = new AutoMockPropertiesVisitor(interceptor.Mock);
+			var target = visitor.SetupMocks(lambda.Body);
+			interceptor = target.Interceptor;
+
+			interceptor.AddCall(call, ExpectKind.Other);
+
+			return call;
+		}
+
+		internal static MethodCallReturn<TProperty> SetUpExpectGet<T1, TProperty>(Expression<Func<T1, TProperty>> expression, Interceptor interceptor)
+		{
+			// Made static so that it can be called from the AsInterface private 
+			// class when adding interfaces via As<TInterface>
+
+			Guard.ArgumentNotNull(interceptor, "interceptor");
+			LambdaExpression lambda = expression.ToLambda();
+
+			if (lambda.IsPropertyIndexer())
+			{
+				// Treat indexers as regular method invocations.
+				return SetUpExpect<T1, TProperty>(expression, interceptor);
+			}
+			else
+			{
+				var prop = lambda.ToPropertyInfo();
+				ThrowIfPropertyNotReadable(prop);
+
+				var propGet = prop.GetGetMethod(true);
+				ThrowIfCantOverride(expression, propGet);
+
+				var call = new MethodCallReturn<TProperty>(expression, propGet, new Expression[0]);
+
+				// Build intermediate hierarchy if necessary
+				var visitor = new AutoMockPropertiesVisitor(interceptor.Mock);
+				var target = visitor.SetupMocks(lambda.Body);
+				interceptor = target.Interceptor;
+
+				interceptor.AddCall(call, ExpectKind.Other);
+
+				return call;
+			}
+		}
+
+		internal static MethodCall<TProperty> SetUpExpectSet<T1, TProperty>(Expression<Func<T1, TProperty>> expression, Interceptor interceptor)
+		{
+			Guard.ArgumentNotNull(interceptor, "interceptor");
+
+			// Made static so that it can be called from the AsInterface private 
+			// class when adding interfaces via As<TInterface>
+
+			var prop = expression.ToLambda().ToPropertyInfo();
+			ThrowIfPropertyNotWritable(prop);
+
+			var propSet = prop.GetSetMethod(true);
+			ThrowIfCantOverride(expression, propSet);
+
+			var call = new MethodCall<TProperty>(expression, propSet, new Expression[0]);
+			interceptor.AddCall(call, ExpectKind.PropertySet);
+
+			return call;
+		}
+
+		private static void ThrowIfPropertyNotWritable(PropertyInfo prop)
+		{
+			if (!prop.CanWrite)
+			{
+				throw new ArgumentException(String.Format(
+					Properties.Resources.PropertyNotWritable,
+					prop.DeclaringType.Name,
+					prop.Name), "expression");
+			}
+		}
+
+		private static void ThrowIfPropertyNotReadable(PropertyInfo prop)
+		{
+			// If property is not readable, the compiler won't let 
+			// the user to specify it in the lambda :)
+			// This is just reassuring that in case they build the 
+			// expression tree manually?
+			if (!prop.CanRead)
+			{
+				throw new ArgumentException(String.Format(
+					Properties.Resources.PropertyNotReadable,
+					prop.DeclaringType.Name,
+					prop.Name));
+			}
+		}
+
+		private static void ThrowIfCantOverride(Expression expectation, MethodInfo methodInfo)
+		{
+			if (!methodInfo.IsVirtual || methodInfo.IsFinal || methodInfo.IsPrivate)
+				throw new ArgumentException(
+					String.Format(Properties.Resources.ExpectationOnNonOverridableMember,
+					expectation.ToString()));
+		}
+
+		class AutoMockPropertiesVisitor : ExpressionVisitor
+		{
+			Mock ownerMock;
+			List<PropertyInfo> properties = new List<PropertyInfo>();
+			bool first = true;
+
+			public AutoMockPropertiesVisitor(Mock ownerMock)
+			{
+				this.ownerMock = ownerMock;
+			}
+
+			public Mock SetupMocks(Expression expression)
+			{
+				var withoutLast = Visit(expression);
+				var targetMock = ownerMock;
+				var props = properties.AsEnumerable();
+
+				foreach (var prop in props.Reverse())
+				{
+					Mock mock;
+					if (!ownerMock.innerMocks.TryGetValue(prop, out mock))
+					{
+						// TODO: this may throw TargetInvocationException, 
+						// cleanup stacktrace.
+						ValidateTypeToMock(prop, expression);
+
+						var mockType = typeof(Mock<>).MakeGenericType(prop.PropertyType);
+
+						mock = (Mock)Activator.CreateInstance(mockType);
+						ownerMock.innerMocks.Add(prop, mock);
+
+						var targetType = targetMock.MockedType;
+
+						// TODO: cache method
+						var setupGet = typeof(Mock).GetMethod("SetUpExpectGet", BindingFlags.Static | BindingFlags.NonPublic | BindingFlags.InvokeMethod);
+						setupGet = setupGet.MakeGenericMethod(targetType, prop.PropertyType);
+						var param = Expression.Parameter(targetType, "mock");
+						var expr = Expression.Lambda(Expression.MakeMemberAccess(param, prop), param);
+						var result = setupGet.Invoke(targetMock, new object[] { expr, targetMock.Interceptor });
+						var returns = result.GetType().GetMethod("Returns", new[] { prop.PropertyType });
+						returns.Invoke(result, new[] { mock.Object });
+					}
+
+					targetMock = mock;
+				}
+
+				return targetMock;
+			}
+
+			private void ValidateTypeToMock(PropertyInfo prop, Expression expr)
+			{
+				if (prop.PropertyType.IsValueType || prop.PropertyType.IsSealed)
+					throw new NotSupportedException(String.Format(
+						Properties.Resources.UnsupportedIntermediateType,
+						prop.DeclaringType.Name, prop.Name, prop.PropertyType, expr));
+			}
+
+			protected override Expression VisitMethodCall(MethodCallExpression m)
+			{
+				if (first)
+				{
+					first = false;
+					return base.Visit(m.Object);
+				}
+				else
+				{
+					throw new NotSupportedException(String.Format(
+						Properties.Resources.UnsupportedIntermediateExpression, m));
+				}
+			}
+
+			protected override Expression VisitMemberAccess(MemberExpression m)
+			{
+				if (first)
+				{
+					first = false;
+					return base.Visit(m.Expression);
+				}
+	
+				if (m.Member is FieldInfo)
+					throw new NotSupportedException(String.Format(
+						Properties.Resources.FieldsNotSupported, m));
+
+				if (m.Expression.NodeType != ExpressionType.MemberAccess &&
+					m.Expression.NodeType != ExpressionType.Parameter)
+					throw new NotSupportedException(String.Format(
+						Properties.Resources.UnsupportedIntermediateExpression, m));
+
+				var prop = (PropertyInfo)m.Member;
+				//var targetType = ((MemberExpression)m.Expression).Type;
+
+				properties.Add(prop);
+
+				return base.VisitMemberAccess(m);
+			}
+		}
+
+		#endregion
+
+		#region Events
 
 		internal void AddEventHandler(EventInfo ev, Delegate handler)
 		{
@@ -221,5 +522,7 @@ namespace Moq
 			{
 			}
 		}
+
+		#endregion
 	}
 }

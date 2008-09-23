@@ -118,7 +118,7 @@
     <value>System.Resources.ResXResourceWriter, System.Windows.Forms, Version=2.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089</value>
   </resheader>
   <data name="FieldsNotSupported" xml:space="preserve">
-    <value>Field calls are not supported. Use interfaces and properties instead.</value>
+    <value>Expression {0} involves a field access, which is not supported. Use properties instead.</value>
   </data>
   <data name="InvalidMockClass" xml:space="preserve">
     <value>Type to mock must be an interface or an abstract or non-sealed class. </value>
@@ -220,5 +220,11 @@ Remember that there's no generics covariance in the CLR, so your object must be 
   </data>
   <data name="ExpectedNever" xml:space="preserve">
     <value>Invocation {0} should not have been made.</value>
+  </data>
+  <data name="UnsupportedIntermediateExpression" xml:space="preserve">
+    <value>Only property accesses are supported in intermediate invocations on an expectation. Unsupported expression {0}.</value>
+  </data>
+  <data name="UnsupportedIntermediateType" xml:space="preserve">
+    <value>Expression contains intermediate property access {0}.{1} which is of type {2} and cannot be mocked. Unsupported expression {3}.</value>
   </data>
 </root>

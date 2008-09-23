@@ -68,6 +68,7 @@ namespace Moq
 		}
 
 		internal IEnumerable<IInvocation> ActualCalls { get { return actualInvocations; } }
+		internal Mock Mock { get { return mock; } }
 
 		internal void Verify()
 		{

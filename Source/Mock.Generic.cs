@@ -45,6 +45,7 @@ using System.Reflection;
 using Castle.Core.Interceptor;
 using Castle.DynamicProxy;
 using Moq.Language.Flow;
+using System.Collections.Generic;
 
 namespace Moq
 {
@@ -57,7 +58,6 @@ namespace Moq
 		where T : class
 	{
 		static readonly ProxyGenerator generator = new ProxyGenerator();
-		Interceptor interceptor;
 		T instance;
 		MockBehavior behavior;
 		object[] constructorArguments;
@@ -113,7 +113,7 @@ namespace Moq
 			if (args == null) args = new object[0];
 
 			this.behavior = behavior;
-			interceptor = new Interceptor(behavior, typeof(T), this);
+			this.Interceptor = new Interceptor(behavior, typeof(T), this);
 			this.constructorArguments = args;
 			this.ImplementedInterfaces.Add(typeof(IMocked<T>));
 
@@ -164,7 +164,7 @@ namespace Moq
 				if (mockType.IsInterface)
 				{
 					instance
-						= (T)generator.CreateInterfaceProxyWithoutTarget(mockType, base.ImplementedInterfaces.ToArray(), interceptor);
+						= (T)generator.CreateInterfaceProxyWithoutTarget(mockType, base.ImplementedInterfaces.ToArray(), Interceptor);
 				}
 				else
 				{
@@ -175,11 +175,11 @@ namespace Moq
 							var generatedType = generator.ProxyBuilder.CreateClassProxy(mockType, base.ImplementedInterfaces.ToArray(), new ProxyGenerationOptions());
 							instance
 								= (T)Activator.CreateInstance(generatedType,
-									new object[] { new IInterceptor[] { interceptor } }.Concat(constructorArguments).ToArray());
+									new object[] { new IInterceptor[] { Interceptor } }.Concat(constructorArguments).ToArray());
 						}
 						else
 						{
-							instance = (T)generator.CreateClassProxy(mockType, base.ImplementedInterfaces.ToArray(), interceptor);
+							instance = (T)generator.CreateClassProxy(mockType, base.ImplementedInterfaces.ToArray(), Interceptor);
 						}
 					}
 					catch (TypeLoadException tle)
@@ -203,6 +203,8 @@ namespace Moq
 			return Object;
 		}
 
+		internal override Type MockedType { get { return typeof(T); } }
+
 		/// <devdoc>
 		/// Used for testing the mock factory.
 		/// </devdoc>
@@ -218,25 +220,7 @@ namespace Moq
 		/// <param name="expression">Lambda expression that specifies the expected method invocation.</param>
 		public IExpect Expect(Expression<Action<T>> expression)
 		{
-			return SetUpExpect<T>(expression, this.interceptor);
-		}
-
-		private static IExpect SetUpExpect<T1>(Expression<Action<T1>> expression, Interceptor interceptor)
-		{
-			Guard.ArgumentNotNull(interceptor, "interceptor");
-
-			// Made static so that it can be called from the AsInterface private 
-			// class when adding interfaces via As<TInterface>
-
-			var methodCall = expression.ToLambda().ToMethodCall();
-			MethodInfo method = methodCall.Method;
-			Expression[] args = methodCall.Arguments.ToArray();
-
-			ThrowIfCantOverride(expression, method);
-			var call = new MethodCall(expression, method, args);
-			interceptor.AddCall(call, ExpectKind.Other);
-
-			return call;
+			return Mock.SetUpExpect<T>(expression, this.Interceptor);
 		}
 
 		/// <summary>
@@ -246,30 +230,7 @@ namespace Moq
 		/// <param name="expression">Lambda expression that specifies the expected method invocation.</param>
 		public IExpect<TResult> Expect<TResult>(Expression<Func<T, TResult>> expression)
 		{
-			return SetUpExpect(expression, this.interceptor);
-		}
-
-		private static MethodCallReturn<TResult> SetUpExpect<T1, TResult>(Expression<Func<T1, TResult>> expression, Interceptor interceptor)
-		{
-			Guard.ArgumentNotNull(interceptor, "interceptor");
-
-			// Made static so that it can be called from the AsInterface private 
-			// class when adding interfaces via As<TInterface>
-
-			var lambda = expression.ToLambda();
-
-			if (lambda.IsProperty())
-				return SetUpExpectGet(expression, interceptor);
-
-			var methodCall = lambda.ToMethodCall();
-			MethodInfo method = methodCall.Method;
-			Expression[] args = methodCall.Arguments.ToArray();
-
-			ThrowIfCantOverride(expression, method);
-			var call = new MethodCallReturn<TResult>(expression, method, args);
-			interceptor.AddCall(call, ExpectKind.Other);
-
-			return call;
+			return SetUpExpect(expression, this.Interceptor);
 		}
 
 		/// <summary>
@@ -279,35 +240,7 @@ namespace Moq
 		/// <param name="expression">Lambda expression that specifies the expected property getter.</param>
 		public IExpectGetter<TProperty> ExpectGet<TProperty>(Expression<Func<T, TProperty>> expression)
 		{
-			return SetUpExpectGet(expression, this.interceptor);
-		}
-
-		private static MethodCallReturn<TProperty> SetUpExpectGet<T1, TProperty>(Expression<Func<T1, TProperty>> expression, Interceptor interceptor)
-		{
-			// Made static so that it can be called from the AsInterface private 
-			// class when adding interfaces via As<TInterface>
-
-			Guard.ArgumentNotNull(interceptor, "interceptor");
-			LambdaExpression lambda = expression.ToLambda();
-
-			if (lambda.IsPropertyIndexer())
-			{
-				// Treat indexers as regular method invocations.
-				return SetUpExpect<T1, TProperty>(expression, interceptor);
-			}
-			else
-			{
-				var prop = lambda.ToPropertyInfo();
-				ThrowIfPropertyNotReadable(prop);
-
-				var propGet = prop.GetGetMethod(true);
-				ThrowIfCantOverride(expression, propGet);
-
-				var call = new MethodCallReturn<TProperty>(expression, propGet, new Expression[0]);
-				interceptor.AddCall(call, ExpectKind.Other);
-
-				return call;
-			}
+			return SetUpExpectGet(expression, this.Interceptor);
 		}
 
 		/// <summary>
@@ -317,26 +250,7 @@ namespace Moq
 		/// <param name="expression">Lambda expression that specifies the expected property setter.</param>
 		public IExpectSetter<TProperty> ExpectSet<TProperty>(Expression<Func<T, TProperty>> expression)
 		{
-			return SetUpExpectSet<T, TProperty>(expression, this.interceptor);
-		}
-
-		private static IExpectSetter<TProperty> SetUpExpectSet<T1, TProperty>(Expression<Func<T1, TProperty>> expression, Interceptor interceptor)
-		{
-			Guard.ArgumentNotNull(interceptor, "interceptor");
-
-			// Made static so that it can be called from the AsInterface private 
-			// class when adding interfaces via As<TInterface>
-
-			var prop = expression.ToLambda().ToPropertyInfo();
-			ThrowIfPropertyNotWritable(prop);
-
-			var propSet = prop.GetSetMethod(true);
-			ThrowIfCantOverride(expression, propSet);
-
-			var call = new MethodCall<TProperty>(expression, propSet, new Expression[0]);
-			interceptor.AddCall(call, ExpectKind.PropertySet);
-
-			return call;
+			return SetUpExpectSet<T, TProperty>(expression, this.Interceptor);
 		}
 
 		#endregion
@@ -349,7 +263,7 @@ namespace Moq
 		/// <param name="expression">Expression to verify.</param>
 		public virtual void Verify(Expression<Action<T>> expression)
 		{
-			Verify(expression, interceptor);
+			Verify(expression, Interceptor);
 		}
 
 		/// <devdoc>
@@ -378,7 +292,7 @@ namespace Moq
 		/// <typeparam name="TResult">Type of return value from the expression.</typeparam>
 		public virtual void Verify<TResult>(Expression<Func<T, TResult>> expression)
 		{
-			Verify(expression, interceptor);
+			Verify(expression, Interceptor);
 		}
 
 		private static void Verify<TResult>(Expression<Func<T, TResult>> expression, Interceptor interceptor)
@@ -407,7 +321,7 @@ namespace Moq
 		/// be inferred from the expression's return type.</typeparam>
 		public virtual void VerifyGet<TProperty>(Expression<Func<T, TProperty>> expression)
 		{
-			VerifyGet(expression, interceptor);
+			VerifyGet(expression, Interceptor);
 		}
 
 		private static void VerifyGet<TProperty>(Expression<Func<T, TProperty>> expression, Interceptor interceptor)
@@ -432,7 +346,7 @@ namespace Moq
 		/// be inferred from the expression's return type.</typeparam>
 		public virtual void VerifySet<TProperty>(Expression<Func<T, TProperty>> expression)
 		{
-			VerifySet(expression, interceptor);
+			VerifySet(expression, Interceptor);
 		}
 
 		private static void VerifySet<TProperty>(Expression<Func<T, TProperty>> expression, Interceptor interceptor)
@@ -455,24 +369,7 @@ namespace Moq
 		/// </summary>
 		public override void Verify()
 		{
-			Verify(interceptor);
-		}
-
-		private static void Verify(Interceptor interceptor)
-		{
-			try
-			{
-				interceptor.Verify();
-			}
-			catch (Exception ex)
-			{
-				// Rethrow resetting the call-stack so that 
-				// callers see the exception as happening at 
-				// this call site.
-				// TODO: see how to mangle the stacktrace so 
-				// that the mock doesn't even show up there.
-				throw ex;
-			}
+			Mock.Verify(Interceptor);
 		}
 
 		/// <summary>
@@ -480,22 +377,7 @@ namespace Moq
 		/// </summary>
 		public override void VerifyAll()
 		{
-			VerifyAll(interceptor);
-		}
-
-		private static void VerifyAll(Interceptor interceptor)
-		{
-			try
-			{
-				interceptor.VerifyAll();
-			}
-			catch (Exception ex)
-			{
-				// Rethrow resetting the call-stack so that 
-				// callers see the exception as happening at 
-				// this call site.
-				throw ex;
-			}
+			Mock.VerifyAll(Interceptor);
 		}
 
 		#endregion
@@ -548,89 +430,60 @@ namespace Moq
 
 			public IExpect<TResult> Expect<TResult>(Expression<Func<TInterface, TResult>> expression)
 			{
-				return Mock<T>.SetUpExpect(expression, this.owner.interceptor);
+				return Mock<T>.SetUpExpect(expression, this.owner.Interceptor);
 			}
 
 			public IExpect Expect(Expression<Action<TInterface>> expression)
 			{
-				return Mock<T>.SetUpExpect(expression, this.owner.interceptor);
+				return Mock<T>.SetUpExpect(expression, this.owner.Interceptor);
 			}
 
 			public IExpectGetter<TProperty> ExpectGet<TProperty>(Expression<Func<TInterface, TProperty>> expression)
 			{
-				return Mock<T>.SetUpExpectGet(expression, this.owner.interceptor);
+				return Mock<T>.SetUpExpectGet(expression, this.owner.Interceptor);
 			}
 
 			public IExpectSetter<TProperty> ExpectSet<TProperty>(Expression<Func<TInterface, TProperty>> expression)
 			{
-				return Mock<T>.SetUpExpectSet(expression, this.owner.interceptor);
+				return Mock<T>.SetUpExpectSet(expression, this.owner.Interceptor);
 			}
 
 			public void Verify()
 			{
-				Mock<T>.Verify(owner.interceptor);
+				Mock.Verify(owner.Interceptor);
 			}
 
 			public void VerifyAll()
 			{
-				Mock<T>.VerifyAll(owner.interceptor);
+				Mock.VerifyAll(owner.Interceptor);
 			}
 
 			public void Verify(Expression<Action<TInterface>> expression)
 			{
-				Mock<TInterface>.Verify(expression, owner.interceptor);
+				Mock<TInterface>.Verify(expression, owner.Interceptor);
 			}
 
 			public void Verify<TResult>(Expression<Func<TInterface, TResult>> expression)
 			{
-				Mock<TInterface>.Verify<TResult>(expression, owner.interceptor);
+				Mock<TInterface>.Verify<TResult>(expression, owner.Interceptor);
 			}
 
 			public void VerifyGet<TProperty>(Expression<Func<TInterface, TProperty>> expression)
 			{
-				Mock<TInterface>.VerifyGet<TProperty>(expression, owner.interceptor);
+				Mock<TInterface>.VerifyGet<TProperty>(expression, owner.Interceptor);
 			}
 
 			public void VerifySet<TProperty>(Expression<Func<TInterface, TProperty>> expression)
 			{
-				Mock<TInterface>.VerifySet<TProperty>(expression, owner.interceptor);
+				Mock<TInterface>.VerifySet<TProperty>(expression, owner.Interceptor);
 			}
 		}
 
 		#endregion
 
-		private static void ThrowIfPropertyNotWritable(PropertyInfo prop)
+		private Mock GetMockTargetForExpression(Expression expect)
 		{
-			if (!prop.CanWrite)
-			{
-				throw new ArgumentException(String.Format(
-					Properties.Resources.PropertyNotWritable,
-					prop.DeclaringType.Name,
-					prop.Name), "expression");
-			}
-		}
-
-		private static void ThrowIfPropertyNotReadable(PropertyInfo prop)
-		{
-			// If property is not readable, the compiler won't let 
-			// the user to specify it in the lambda :)
-			// This is just reassuring that in case they build the 
-			// expression tree manually?
-			if (!prop.CanRead)
-			{
-				throw new ArgumentException(String.Format(
-					Properties.Resources.PropertyNotReadable,
-					prop.DeclaringType.Name,
-					prop.Name));
-			}
-		}
-
-		private static void ThrowIfCantOverride(Expression expectation, MethodInfo methodInfo)
-		{
-			if (!methodInfo.IsVirtual || methodInfo.IsFinal || methodInfo.IsPrivate)
-				throw new ArgumentException(
-					String.Format(Properties.Resources.ExpectationOnNonOverridableMember,
-					expectation.ToString()));
+			return this;
 		}
 
 		// NOTE: known issue. See https://connect.microsoft.com/VisualStudio/feedback/ViewFeedback.aspx?FeedbackID=318122

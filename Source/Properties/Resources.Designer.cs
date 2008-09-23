@@ -152,7 +152,7 @@ namespace Moq.Properties {
         }
         
         /// <summary>
-        ///   Looks up a localized string similar to Field calls are not supported. Use interfaces and properties instead..
+        ///   Looks up a localized string similar to Expression {0} involves a field access, which is not supported. Use properties instead..
         /// </summary>
         internal static string FieldsNotSupported {
             get {
@@ -310,6 +310,24 @@ namespace Moq.Properties {
         internal static string UnsupportedExpression {
             get {
                 return ResourceManager.GetString("UnsupportedExpression", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Only property accesses are supported in intermediate invocations on an expectation. Unsupported expression {0}..
+        /// </summary>
+        internal static string UnsupportedIntermediateExpression {
+            get {
+                return ResourceManager.GetString("UnsupportedIntermediateExpression", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Expression contains intermediate property access {0}.{1} which is of type {2} and cannot be mocked. Unsupported expression {3}..
+        /// </summary>
+        internal static string UnsupportedIntermediateType {
+            get {
+                return ResourceManager.GetString("UnsupportedIntermediateType", resourceCulture);
             }
         }
         
