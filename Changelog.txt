@@ -1,3 +1,15 @@
+Version 3.0
+    * Added support for mocking methods with out and ref parameters (Issue #50)
+    * Applied patch contributed by slava for Issue #72: add support to limit numbor of calls on mocked method (we now have mock.Expect(...).AtMost(5))
+    * Implemented Issue #94: Easier setter verification: Now we support ExpectSet(m => m.Value, "foo") and VerifySet(m => m.Value, 5)
+    * Implemented issue #96: Automatically chain mocks when setting expectations. It's now possible to specify expectations for an entire hierarchy of objects just starting from the root mock. THIS IS REALLY COOL!!!
+    * Fixed Issue #89: Expects() does not always return last expectation
+    * Implemented Issue 91: Expect a method/property to never be called (added Never() method to an expectation. Can be used on methods, property getters and setters)
+    * Fixed Issue 86: IsAny<T> should check if the value is actually of type T
+    * Fixed Issue 88: Cannot mock protected internal virtual methods using Moq.Protected
+    * Fixed Issue 90: Removing event handlers from mocked objects
+    * Updated demo and added one more test for the dynamic addition of interfaces
+
 Version 2.5
     * Added support for mocking protected members
     * Added new way of extending argument matchers which is now very straightforward
