@@ -39,7 +39,9 @@
 // http://www.opensource.org/licenses/bsd-license.php]
 
 using System;
+using System.Linq;
 using System.Linq.Expressions;
+using System.Reflection;
 
 namespace Moq.Stub
 {
@@ -120,6 +122,87 @@ namespace Moq.Stub
 			TProperty value = initialValue;
 			mock.ExpectGet(property).Returns(() => value);
 			mock.ExpectSet(property).Callback(p => value = p);
+		}
+
+		/// <summary>
+		/// Stubs all properties on the mock, setting the default value to 
+		/// the one generated as specified by the <see cref="IMock.DefaultValue"/> 
+		/// property.
+		/// </summary>
+		/// <typeparam name="T">Mocked type, typically omitted as it can be inferred from the mock argument.</typeparam>
+		/// <param name="mock">The mock to stub.</param>
+		public static void StubAll<T>(this Mock<T> mock)
+			 where T : class
+		{
+			// Crazy reflection stuff below. Ah... the goodies of generics :)
+			var mockType = typeof(T);
+			foreach (var property in mockType.GetProperties())
+			{
+				if (property.CanRead)
+				{
+					var expect = GetPropertyExpression(mockType, property);
+					object initialValue = mock.DefaultValueProvider.ProvideDefault(property.GetGetMethod(), new object[0]);
+					var closure = Activator.CreateInstance(
+						typeof(ValueClosure<>).MakeGenericType(property.PropertyType), initialValue);
+					
+					var resultGet = mock
+						.GetType()
+						.GetMethod("ExpectGet")
+						.MakeGenericMethod(property.PropertyType)
+						.Invoke(mock, new[] { expect });
+
+					var returnsGet = resultGet.GetType().GetMethod("Returns", new[] { typeof(Func<>).MakeGenericType(property.PropertyType) });
+
+					var getFunc = Activator.CreateInstance(
+						typeof(Func<>).MakeGenericType(property.PropertyType),
+						closure,
+						closure.GetType().GetMethod("GetValue").MethodHandle.GetFunctionPointer());
+
+					returnsGet.Invoke(resultGet, new[] { getFunc });
+
+					if (property.CanWrite)
+					{
+						var resultSet = mock
+							.GetType()
+							.GetMethods()
+							// Couldn't make it work passing the generic types to GetMethod()
+							.Where(m => m.Name == "ExpectSet" && m.GetParameters().Length == 1)
+							.First()
+							.MakeGenericMethod(property.PropertyType)
+							.Invoke(mock, new[] { expect });
+
+						var callbackSet = resultSet.GetType().GetMethod("Callback", new[] { typeof(Action<>).MakeGenericType(property.PropertyType) });
+
+						var setFunc = Activator.CreateInstance(
+							typeof(Action<>).MakeGenericType(property.PropertyType),
+							closure,
+							closure.GetType().GetMethod("SetValue").MethodHandle.GetFunctionPointer());
+
+						callbackSet.Invoke(resultSet, new[] { setFunc });
+					}
+				}
+			}
+		}
+
+		private static Expression GetPropertyExpression(Type mockType, PropertyInfo property)
+		{
+			var param = Expression.Parameter(mockType, "m");
+			return Expression.Lambda(
+				Expression.MakeMemberAccess(param, property),
+				param);
+		}
+
+		private class ValueClosure<TValue>
+		{
+			public ValueClosure(TValue initialValue)
+			{
+				Value = initialValue;
+			}
+
+			public TValue Value { get; set; }
+
+			public TValue GetValue() { return Value; }
+			public void SetValue(TValue value) { Value = value; }
 		}
 	}
 }

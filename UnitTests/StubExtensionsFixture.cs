@@ -1,5 +1,7 @@
 ﻿using Xunit;
 using Moq.Stub;
+using System;
+using System.Reflection;
 
 namespace Moq.Tests
 {
@@ -56,10 +58,35 @@ namespace Moq.Tests
 
 			Assert.Equal(15, mock.Object.ValueProperty);
 		}
-	}
 
-	public interface IFoo
-	{
-		int ValueProperty { get; set; }
+		[Fact]
+		public void StubsAllProperties()
+		{
+			var mock = new Mock<IFoo>();
+
+			mock.StubAll();
+
+			mock.Object.ValueProperty = 5;
+			Assert.Equal(5, mock.Object.ValueProperty);
+
+			var obj = new object();
+			mock.Object.Object = obj;
+			Assert.Same(obj, mock.Object.Object);
+
+			var bar = new Mock<IBar>();
+			mock.Object.Bar = bar.Object;
+			Assert.Same(bar.Object, mock.Object.Bar);
+		}
+
+		private object GetValue() { return new object(); }
+
+		public interface IFoo
+		{
+			int ValueProperty { get; set; }
+			object Object { get; set; }
+			IBar Bar { get; set; }
+		}
+
+		public interface IBar { }
 	}
 }
