@@ -78,6 +78,17 @@ namespace Moq.Tests
 			Assert.Same(bar.Object, mock.Object.Bar);
 		}
 
+		[Fact]
+		public void StubsAllHierarchy()
+		{
+			var mock = new Mock<IFoo>() { DefaultValue = DefaultValue.Mock };
+
+			mock.StubAll();
+
+			mock.Object.Bar.Value = 5;
+			Assert.Equal(5, mock.Object.Bar.Value);
+		}
+
 		private object GetValue() { return new object(); }
 
 		public interface IFoo
@@ -87,6 +98,9 @@ namespace Moq.Tests
 			IBar Bar { get; set; }
 		}
 
-		public interface IBar { }
+		public interface IBar
+		{
+			int Value { get; set; }
+		}
 	}
 }

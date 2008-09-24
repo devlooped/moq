@@ -131,20 +131,33 @@ namespace Moq.Stub
 		/// </summary>
 		/// <typeparam name="T">Mocked type, typically omitted as it can be inferred from the mock argument.</typeparam>
 		/// <param name="mock">The mock to stub.</param>
+		/// <remarks>
+		/// If the mock <see cref="IMock.DefaultValue"/> is set to <see cref="DefaultValue.Mock"/>, 
+		/// the mocked default values will also be stubbed recursively.
+		/// </remarks>
 		public static void StubAll<T>(this Mock<T> mock)
 			 where T : class
 		{
+			StubAll((Mock)mock);
+		}
+
+		private static void StubAll(Mock mock)
+		{
 			// Crazy reflection stuff below. Ah... the goodies of generics :)
-			var mockType = typeof(T);
+			var mockType = mock.MockedType;
 			foreach (var property in mockType.GetProperties())
 			{
 				if (property.CanRead)
 				{
 					var expect = GetPropertyExpression(mockType, property);
 					object initialValue = mock.DefaultValueProvider.ProvideDefault(property.GetGetMethod(), new object[0]);
+
+					if (initialValue is IMocked)
+						StubAll(((IMocked)initialValue).Mock);
+
 					var closure = Activator.CreateInstance(
 						typeof(ValueClosure<>).MakeGenericType(property.PropertyType), initialValue);
-					
+
 					var resultGet = mock
 						.GetType()
 						.GetMethod("ExpectGet")
