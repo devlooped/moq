@@ -1,5 +1,5 @@
 Version 3.0
-	* Added support for stubbing properties from moq-contrib: now you can do mock.Stub(m => m.Value) and add stub behavior to the property.
+    * Added support for stubbing properties from moq-contrib: now you can do mock.Stub(m => m.Value) and add stub behavior to the property.
     * Added support for mocking methods with out and ref parameters (Issue #50)
     * Applied patch contributed by slava for Issue #72: add support to limit numbor of calls on mocked method (we now have mock.Expect(...).AtMost(5))
     * Implemented Issue #94: Easier setter verification: Now we support ExpectSet(m => m.Value, "foo") and VerifySet(m => m.Value, 5)
