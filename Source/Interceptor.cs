@@ -224,7 +224,7 @@ namespace Moq
 			{
 				if (behavior == MockBehavior.Loose)
 				{
-					invocation.ReturnValue = new DefaultValue(invocation.Method.ReturnType).Value;
+					invocation.ReturnValue = mock.DefaultValueProvider.ProvideDefault(invocation.Method, invocation.Arguments);
 				}
 				else
 				{

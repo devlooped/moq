@@ -13,6 +13,12 @@ namespace Moq
 		bool CallBase { get; set; }
 
 		/// <summary>
+		/// Determines how to generate default values for loose mocks on 
+		/// unexpected invocations.
+		/// </summary>
+		DefaultValue DefaultValue { get; set; }
+
+		/// <summary>
 		/// Creates a handler that can be associated to an event receiving 
 		/// the given <typeparamref name="TEventArgs"/> and can be used 
 		/// to raise the event.

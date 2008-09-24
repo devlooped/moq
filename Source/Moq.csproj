@@ -74,7 +74,7 @@
     <Reference Include="System.Xml" />
   </ItemGroup>
   <ItemGroup>
-    <Compile Include="DefaultValue.cs" />
+    <Compile Include="EmptyDefaultValueProvider.cs" />
     <Compile Include="ExpectKind.cs" />
     <Compile Include="IMock.Generic.cs" />
     <Compile Include="Language\Flow\IReturnsResult.cs" />
@@ -142,10 +142,13 @@
     <None Include="..\Moq.snk">
       <Link>Moq.snk</Link>
     </None>
+    <Compile Include="DefaultValue.cs" />
+    <Compile Include="IDefaultValueProvider.cs" />
     <Compile Include="IMock.cs" />
     <Compile Include="Language\INever.cs" />
     <Compile Include="Matchers\RefMatcher.cs" />
     <Compile Include="Mock.Generic.cs" />
+    <Compile Include="MockDefaultValueProvider.cs" />
     <Compile Include="MockedEvent.Generic.cs" />
     <Compile Include="SetterMethodCall.cs" />
     <Compile Include="Stub\StubExtensions.cs" />

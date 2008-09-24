@@ -64,7 +64,7 @@ namespace Moq
 
 	internal class MethodCallReturn<TResult> : MethodCallReturn, IProxyCall, IExpect<TResult>, IExpectGetter<TResult>, IReturnsResult
 	{
-		Delegate valueDel = (Func<TResult>)(() => (TResult)new DefaultValue(typeof(TResult)).Value);
+		Delegate valueDel = (Func<TResult>)(() => default(TResult));
 		Action<object[]> afterReturnCallback;
 
 		public MethodCallReturn(Expression originalExpression, MethodInfo method, params Expression[] arguments)

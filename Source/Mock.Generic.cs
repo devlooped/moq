@@ -121,18 +121,11 @@ namespace Moq
 
 		private void CheckParameters()
 		{
-			if (typeof(T).IsInterface)
-			{
-				if (this.constructorArguments.Length > 0)
-					throw new ArgumentException(Properties.Resources.ConstructorArgsForInterface);
-			}
-			else
-			{
-				if (!(typeof(T).IsAbstract || !typeof(T).IsSealed))
-				{
-					throw new ArgumentException(Properties.Resources.InvalidMockClass);
-				}
-			}
+			if (!typeof(T).IsMockeable())
+				throw new ArgumentException(Properties.Resources.InvalidMockClass);
+
+			if (typeof(T).IsInterface && this.constructorArguments.Length > 0)
+				throw new ArgumentException(Properties.Resources.ConstructorArgsForInterface);
 		}
 
 		#endregion

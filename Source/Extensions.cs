@@ -66,14 +66,6 @@ namespace Moq
 			}
 		}
 
-		public static void ForEach<TItem>(this IEnumerable<TItem> source, Action<TItem> action)
-		{
-			foreach (var item in source)
-			{
-				action(item);
-			}
-		}
-
 		public static string Format(this IInvocation invocation)
 		{
 			// Special-case for getters && setters
@@ -125,6 +117,14 @@ namespace Moq
 				remoteStackTraceString.SetValue(ex.InnerException, ex.InnerException.StackTrace);
 				throw ex.InnerException;
 			}
+		}
+
+		public static bool IsMockeable(this Type typeToMock)
+		{
+			return 
+				typeToMock.IsInterface ||
+				typeToMock.IsAbstract ||
+				!typeToMock.IsSealed;
 		}
 	}
 }

@@ -127,6 +127,7 @@ namespace Moq
 			}
 		}
 
+		DefaultValue defaultValue;
 		Dictionary<EventInfo, List<Delegate>> invocationLists = new Dictionary<EventInfo, List<Delegate>>();
 		Dictionary<PropertyInfo, Mock> innerMocks = new Dictionary<PropertyInfo, Mock>();
 
@@ -146,6 +147,7 @@ namespace Moq
 		protected Mock()
 		{
 			this.CallBase = false;
+			this.DefaultValue = DefaultValue.Empty;
 			ImplementedInterfaces = new List<Type>();
 		}
 
@@ -160,6 +162,30 @@ namespace Moq
 		/// Implements <see cref="IMock.CallBase"/>.
 		/// </summary>
 		public bool CallBase { get; set; }
+
+		/// <summary>
+		/// Implements <see cref="IMock.DefaultValue"/>.
+		/// </summary>
+		public DefaultValue DefaultValue
+		{
+			get { return defaultValue; }
+			set
+			{
+				defaultValue = value;
+				if (defaultValue == DefaultValue.Mock)
+					DefaultValueProvider = new MockDefaultValueProvider();
+				else
+					DefaultValueProvider = new EmptyDefaultValueProvider();
+			}
+		}
+
+		/// <summary>
+		/// Specifies the class that will determine the default 
+		/// value to return when invocations are made that 
+		/// have no expectations and need to return a default 
+		/// value (for loose mocks).
+		/// </summary>
+		internal IDefaultValueProvider DefaultValueProvider { get; private set; }
 
 		/// <summary>
 		/// The mocked object instance. Implements <see cref="IMock.Object"/>.
@@ -560,7 +586,7 @@ namespace Moq
 					first = false;
 					return base.Visit(m.Expression);
 				}
-	
+
 				if (m.Member is FieldInfo)
 					throw new NotSupportedException(String.Format(
 						Properties.Resources.FieldsNotSupported, m));

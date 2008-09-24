@@ -78,6 +78,7 @@
     <Compile Include="AsInterfaceFixture.cs" />
     <Compile Include="AutoMockHierarchiesFixture.cs" />
     <Compile Include="CallbacksFixture.cs" />
+    <Compile Include="EmptyDefaultValueProviderFixture.cs" />
     <Compile Include="MatcherAttributeFixture.cs" />
     <Compile Include="Demo.cs" />
     <Compile Include="ExpressionExtensionsFixture.cs" />
@@ -86,6 +87,7 @@
     <Compile Include="MatchersFixture.cs" />
     <Compile Include="Matchers\AnyMatcherFixture.cs" />
     <Compile Include="MockBehaviorFixture.cs" />
+    <Compile Include="MockDefaultValueProviderFixture.cs" />
     <Compile Include="MockedFixture.cs" />
     <Compile Include="MockedEventsFixture.cs" />
     <Compile Include="MockFactoryFixture.cs" />

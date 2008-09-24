@@ -110,6 +110,94 @@ namespace Moq.Tests
 			Assert.Null(mock.Object.DoReturnString());
 		}
 
+		[Fact]
+		public void ReturnsMockDefaultValueForLooseBehaviorOnInterface()
+		{
+			var mock = new Mock<IFoo>(MockBehavior.Loose) { DefaultValue = DefaultValue.Mock };
+
+			var value = mock.Object.GetObject();
+
+			Assert.True(value is IMocked);
+		}
+
+		[Fact]
+		public void ReturnsMockDefaultValueForLooseBehaviorOnAbstract()
+		{
+			var mock = new Mock<Foo>(MockBehavior.Loose) { DefaultValue = DefaultValue.Mock };
+
+			var value = mock.Object.Bar;
+
+			Assert.True(value is IMocked);
+
+			value = mock.Object.GetBar();
+
+			Assert.True(value is IMocked);
+		}
+
+		[Fact]
+		public void ReturnsEmptyArrayOnLooseWithMockDefaultValue()
+		{
+			var mock = new Mock<IFoo>(MockBehavior.Loose) { DefaultValue = DefaultValue.Mock };
+
+			Assert.NotNull(mock.Object.GetArray());
+			Assert.Equal(0, mock.Object.GetArray().Length);
+		}
+
+		[Fact]
+		public void ReturnsEmptyArrayTwoDimensionsOnLooseWithMockDefaultValue()
+		{
+			var mock = new Mock<IFoo>(MockBehavior.Loose) { DefaultValue = DefaultValue.Mock };
+
+			Assert.NotNull(mock.Object.GetArrayTwoDimensions());
+			Assert.Equal(0, mock.Object.GetArrayTwoDimensions().Length);
+		}
+
+		[Fact]
+		public void ReturnsMockListOnLooseWithMockDefaultValue()
+		{
+			var mock = new Mock<IFoo>(MockBehavior.Loose) { DefaultValue = DefaultValue.Mock };
+
+			Assert.NotNull(mock.Object.GetList());
+
+			var list = mock.Object.GetList();
+
+			list.Add("foo");
+
+			Assert.Equal("foo", list[0]);
+		}
+
+		[Fact]
+		public void ReturnsEmptyEnumerableStringOnLooseWithMockDefaultValue()
+		{
+			var mock = new Mock<IFoo>(MockBehavior.Loose) { DefaultValue = DefaultValue.Mock };
+
+			Assert.NotNull(mock.Object.GetEnumerable());
+			Assert.Equal(0, mock.Object.GetEnumerable().Count());
+		}
+
+		[Fact]
+		public void ReturnsEmptyEnumerableObjectsOnLooseWithMockDefaultValue()
+		{
+			var mock = new Mock<IFoo>(MockBehavior.Loose) { DefaultValue = DefaultValue.Mock };
+
+			Assert.NotNull(mock.Object.GetEnumerableObjects());
+			Assert.Equal(0, mock.Object.GetEnumerableObjects().Cast<object>().Count());
+		}
+
+		[Fact]
+		public void ReturnsDefaultGuidOnLooseWithMockDefaultValueWithMockDefaultValue()
+		{
+			var mock = new Mock<IFoo>(MockBehavior.Loose) { DefaultValue = DefaultValue.Mock };
+			Assert.Equal(default(Guid), mock.Object.GetGuid());
+		}
+
+		[Fact]
+		public void ReturnsNullStringOnLooseWithMockDefaultValue()
+		{
+			var mock = new Mock<IFoo>(MockBehavior.Loose) { DefaultValue = DefaultValue.Mock };
+
+			Assert.Null(mock.Object.DoReturnString());
+		}
 
 		public interface IFoo
 		{
@@ -125,8 +213,13 @@ namespace Moq.Tests
 			string DoReturnString();
 		}
 
+		public interface IBar { }
+
 		public abstract class Foo : IFoo
 		{
+			public abstract IBar Bar { get; set; }
+			public abstract IBar GetBar();
+
 			public abstract void Do();
 			public abstract object GetObject();
 			public abstract string DoReturnString();
