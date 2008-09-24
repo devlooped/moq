@@ -29,6 +29,53 @@ namespace Moq.Tests
 		}
 
 		[Fact]
+		public void CreatesMockForAccessedPropertyWithVoidMethod()
+		{
+			var mock = new Mock<IFoo>();
+
+			mock.Expect(m => m.Bar.Baz.Do());
+
+			Assert.Throws<MockVerificationException>(() => mock.VerifyAll());
+
+			Assert.NotNull(mock.Object.Bar);
+			Assert.NotNull(mock.Object.Bar.Baz);
+
+			mock.Object.Bar.Baz.Do();
+
+			mock.VerifyAll();
+		}
+
+		[Fact]
+		public void CreatesMockForAccessedPropertyWithSetterWithValue()
+		{
+			var mock = new Mock<IFoo>();
+
+			mock.ExpectSet(m => m.Bar.Value, 5);
+
+			Assert.NotNull(mock.Object.Bar);
+			Assert.Throws<MockVerificationException>(() => mock.VerifyAll());
+
+			mock.Object.Bar.Value = 5;
+
+			mock.VerifyAll();
+		}
+
+		[Fact]
+		public void CreatesMockForAccessedPropertyWithSetter()
+		{
+			var mock = new Mock<IFoo>();
+
+			mock.ExpectSet(m => m.Bar.Value);
+
+			Assert.NotNull(mock.Object.Bar);
+			Assert.Throws<MockVerificationException>(() => mock.VerifyAll());
+
+			mock.Object.Bar.Value = 5;
+
+			mock.VerifyAll();
+		}
+
+		[Fact]
 		public void VerifiesAllHierarchy()
 		{
 			var mock = new Mock<IFoo>();
@@ -54,6 +101,95 @@ namespace Moq.Tests
 			var bar = mock.Object.Bar;
 
 			Assert.Throws<MockVerificationException>(() => mock.Verify());
+		}
+
+		[Fact]
+		public void VerifiesReturnWithExpression()
+		{
+			var mock = new Mock<IFoo>();
+
+			mock.Expect(m => m.Bar.Do("ping")).Returns("ack").Verifiable();
+
+			Assert.Throws<MockException>(() => mock.Verify(m => m.Bar.Do("ping")));
+
+			var result = mock.Object.Bar.Do("ping");
+
+			Assert.Equal("ack", result);
+			mock.Verify(m => m.Bar.Do("ping"));
+		}
+
+		[Fact]
+		public void VerifiesVoidWithExpression()
+		{
+			var mock = new Mock<IFoo>();
+
+			mock.Expect(m => m.Bar.Baz.Do());
+
+			Assert.Throws<MockException>(() => mock.Verify(m => m.Bar.Baz.Do()));
+
+			mock.Object.Bar.Baz.Do();
+
+			mock.Verify(m => m.Bar.Baz.Do());
+		}
+
+		[Fact]
+		public void VerifiesGetWithExpression()
+		{
+			var mock = new Mock<IFoo>();
+
+			mock.ExpectGet(m => m.Bar.Value).Returns(5);
+
+			Assert.Throws<MockException>(() => mock.VerifyGet(m => m.Bar.Value));
+
+			var result = mock.Object.Bar.Value;
+
+			Assert.Equal(5, result);
+
+			mock.VerifyGet(m => m.Bar.Value);
+		}
+
+		[Fact]
+		public void VerifiesGetWithExpression2()
+		{
+			var mock = new Mock<IFoo>();
+
+			mock.Expect(m => m.Bar.Value).Returns(5);
+
+			Assert.Throws<MockException>(() => mock.Verify(m => m.Bar.Value));
+
+			var result = mock.Object.Bar.Value;
+
+			Assert.Equal(5, result);
+
+			mock.Verify(m => m.Bar.Value);
+		}
+
+		[Fact]
+		public void VerifiesSetWithExpression()
+		{
+			var mock = new Mock<IFoo>();
+
+			mock.ExpectSet(m => m.Bar.Value);
+
+			Assert.Throws<MockException>(() => mock.VerifySet(m => m.Bar.Value));
+
+			mock.Object.Bar.Value = 5;
+
+			mock.VerifySet(m => m.Bar.Value);
+		}
+
+		[Fact]
+		public void VerifiesSetWithExpressionAndValue()
+		{
+			var mock = new Mock<IFoo>();
+
+			mock.ExpectSet(m => m.Bar.Value, 5);
+
+			Assert.Throws<MockException>(() => mock.VerifySet(m => m.Bar.Value, 5));
+
+			mock.Object.Bar.Value = 5;
+
+			mock.VerifySet(m => m.Bar.Value, 5);
 		}
 
 		[Fact]
@@ -119,6 +255,7 @@ namespace Moq.Tests
 		public interface IBaz
 		{
 			string Do(string command);
+			void Do();
 		}
 	}
 }

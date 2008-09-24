@@ -276,25 +276,6 @@ namespace Moq
 			Verify(expression, Interceptor);
 		}
 
-		/// <devdoc>
-		/// Made static so that it can be called from the AsInterface private class
-		/// </devdoc>
-		private static void Verify(Expression<Action<T>> expression, Interceptor interceptor)
-		{
-			Guard.ArgumentNotNull(interceptor, "interceptor");
-
-			var methodCall = expression.ToLambda().ToMethodCall();
-			MethodInfo method = methodCall.Method;
-			Expression[] args = methodCall.Arguments.ToArray();
-
-			var expected = new MethodCall(expression, method, args);
-			var actual = interceptor.ActualCalls.FirstOrDefault(i => expected.Matches(i));
-
-			if (actual == null)
-				throw new MockException(MockException.ExceptionReason.VerificationFailed,
-					Properties.Resources.NoMatchingCall);
-		}
-
 		/// <summary>
 		/// Implements <see cref="IMock{T}.Verify{TResult}(Expression{Func{T, TResult}})"/>.
 		/// </summary>
@@ -303,24 +284,6 @@ namespace Moq
 		public virtual void Verify<TResult>(Expression<Func<T, TResult>> expression)
 		{
 			Verify(expression, Interceptor);
-		}
-
-		private static void Verify<TResult>(Expression<Func<T, TResult>> expression, Interceptor interceptor)
-		{
-			// Made static so that it can be called from the AsInterface private class
-
-			Guard.ArgumentNotNull(interceptor, "interceptor");
-
-			var methodCall = expression.ToLambda().ToMethodCall();
-			MethodInfo method = methodCall.Method;
-			Expression[] args = methodCall.Arguments.ToArray();
-
-			var expected = new MethodCallReturn<TResult>(expression, method, args);
-			var actual = interceptor.ActualCalls.FirstOrDefault(i => expected.Matches(i));
-
-			if (actual == null)
-				throw new MockException(MockException.ExceptionReason.VerificationFailed,
-					Properties.Resources.NoMatchingCall);
 		}
 
 		/// <summary>
@@ -332,20 +295,6 @@ namespace Moq
 		public virtual void VerifyGet<TProperty>(Expression<Func<T, TProperty>> expression)
 		{
 			VerifyGet(expression, Interceptor);
-		}
-
-		private static void VerifyGet<TProperty>(Expression<Func<T, TProperty>> expression, Interceptor interceptor)
-		{
-			// Made static so that it can be called from the AsInterface private class
-
-			var prop = expression.ToLambda().ToPropertyInfo();
-
-			var expected = new MethodCallReturn<TProperty>(expression, prop.GetGetMethod(), new Expression[0]);
-			var actual = interceptor.ActualCalls.FirstOrDefault(i => expected.Matches(i));
-
-			if (actual == null)
-				throw new MockException(MockException.ExceptionReason.VerificationFailed,
-					Properties.Resources.NoMatchingCall);
 		}
 
 		/// <summary>
@@ -369,36 +318,6 @@ namespace Moq
 		public virtual void VerifySet<TProperty>(Expression<Func<T, TProperty>> expression, TProperty value)
 		{
 			VerifySet(expression, value, Interceptor);
-		}
-
-		private static void VerifySet<TProperty>(Expression<Func<T, TProperty>> expression, Interceptor interceptor)
-		{
-			// Made static so that it can be called from the AsInterface private class
-			Guard.ArgumentNotNull(interceptor, "interceptor");
-
-			var prop = expression.ToLambda().ToPropertyInfo();
-
-			var expected = new SetterMethodCall<TProperty>(expression, prop.GetSetMethod());
-			var actual = interceptor.ActualCalls.FirstOrDefault(i => expected.Matches(i));
-
-			if (actual == null)
-				throw new MockException(MockException.ExceptionReason.VerificationFailed,
-					Properties.Resources.NoMatchingCall);
-		}
-
-		private static void VerifySet<TProperty>(Expression<Func<T, TProperty>> expression, TProperty value, Interceptor interceptor)
-		{
-			// Made static so that it can be called from the AsInterface private class
-			Guard.ArgumentNotNull(interceptor, "interceptor");
-
-			var prop = expression.ToLambda().ToPropertyInfo();
-
-			var expected = new SetterMethodCall<TProperty>(expression, prop.GetSetMethod(), value);
-			var actual = interceptor.ActualCalls.FirstOrDefault(i => expected.Matches(i));
-
-			if (actual == null)
-				throw new MockException(MockException.ExceptionReason.VerificationFailed,
-					Properties.Resources.NoMatchingCall);
 		}
 
 		/// <summary>
@@ -467,17 +386,17 @@ namespace Moq
 
 			public IExpect<TResult> Expect<TResult>(Expression<Func<TInterface, TResult>> expression)
 			{
-				return Mock<T>.SetUpExpect(expression, this.owner.Interceptor);
+				return Mock.SetUpExpect(expression, this.owner.Interceptor);
 			}
 
 			public IExpect Expect(Expression<Action<TInterface>> expression)
 			{
-				return Mock<T>.SetUpExpect(expression, this.owner.Interceptor);
+				return Mock.SetUpExpect(expression, this.owner.Interceptor);
 			}
 
 			public IExpectGetter<TProperty> ExpectGet<TProperty>(Expression<Func<TInterface, TProperty>> expression)
 			{
-				return Mock<T>.SetUpExpectGet(expression, this.owner.Interceptor);
+				return Mock.SetUpExpectGet(expression, this.owner.Interceptor);
 			}
 
 			public IExpectSetter<TProperty> ExpectSet<TProperty>(Expression<Func<TInterface, TProperty>> expression)
@@ -502,36 +421,31 @@ namespace Moq
 
 			public void Verify(Expression<Action<TInterface>> expression)
 			{
-				Mock<TInterface>.Verify(expression, owner.Interceptor);
+				Mock.Verify(expression, owner.Interceptor);
 			}
 
 			public void Verify<TResult>(Expression<Func<TInterface, TResult>> expression)
 			{
-				Mock<TInterface>.Verify<TResult>(expression, owner.Interceptor);
+				Mock.Verify<TInterface, TResult>(expression, owner.Interceptor);
 			}
 
 			public void VerifyGet<TProperty>(Expression<Func<TInterface, TProperty>> expression)
 			{
-				Mock<TInterface>.VerifyGet<TProperty>(expression, owner.Interceptor);
+				Mock.VerifyGet<TInterface, TProperty>(expression, owner.Interceptor);
 			}
 
 			public void VerifySet<TProperty>(Expression<Func<TInterface, TProperty>> expression)
 			{
-				Mock<TInterface>.VerifySet<TProperty>(expression, owner.Interceptor);
+				Mock.VerifySet<TInterface, TProperty>(expression, owner.Interceptor);
 			}
 
 			public void VerifySet<TProperty>(Expression<Func<TInterface, TProperty>> expression, TProperty value)
 			{
-				Mock<TInterface>.VerifySet<TProperty>(expression, value, owner.Interceptor);
+				Mock.VerifySet<TInterface, TProperty>(expression, value, owner.Interceptor);
 			}
 		}
 
 		#endregion
-
-		private Mock GetMockTargetForExpression(Expression expect)
-		{
-			return this;
-		}
 
 		// NOTE: known issue. See https://connect.microsoft.com/VisualStudio/feedback/ViewFeedback.aspx?FeedbackID=318122
 		//public static implicit operator TInterface(Mock<T> mock)

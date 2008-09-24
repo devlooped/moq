@@ -177,6 +177,8 @@ namespace Moq
 		/// </summary>
 		internal abstract Type MockedType { get; }
 
+		#region Verify
+
 		/// <summary>
 		/// Implements <see cref="IMock.Verify"/>.
 		/// </summary>
@@ -229,14 +231,110 @@ namespace Moq
 			}
 		}
 
+		internal static void Verify<T, TResult>(Expression<Func<T, TResult>> expression, Interceptor interceptor)
+		{
+			if (expression.ToLambda().IsProperty())
+			{
+				VerifyGet<T, TResult>(expression, interceptor);
+			}
+			else
+			{
+				Func<Expression, MethodInfo, Expression[], IProxyCall> factory =
+					(e, m, a) => new MethodCallReturn<TResult>(e, m, a);
+
+				VerifyMethod(expression, interceptor, factory);
+			}
+		}
+
+		private static void VerifyMethod(Expression expression, Interceptor interceptor, Func<Expression, MethodInfo, Expression[], IProxyCall> expectationFactory)
+		{
+			Guard.ArgumentNotNull(interceptor, "interceptor");
+
+			var lambda = expression.ToLambda();
+			var methodCall = lambda.ToMethodCall();
+			MethodInfo method = methodCall.Method;
+			Expression[] args = methodCall.Arguments.ToArray();
+
+			var expected = expectationFactory(expression, method, args);
+			var targetInterceptor = GetInterceptor(lambda, interceptor.Mock);
+			var actual = targetInterceptor.ActualCalls.FirstOrDefault(i => expected.Matches(i));
+
+			if (actual == null)
+				throw new MockException(MockException.ExceptionReason.VerificationFailed,
+					Properties.Resources.NoMatchingCall);
+		}
+
+		internal static void Verify<T>(Expression<Action<T>> expression, Interceptor interceptor)
+		{
+			Guard.ArgumentNotNull(interceptor, "interceptor");
+
+			var lambda = expression.ToLambda();
+			var methodCall = lambda.ToMethodCall();
+			MethodInfo method = methodCall.Method;
+			Expression[] args = methodCall.Arguments.ToArray();
+
+			var expected = new MethodCall(expression, method, args);
+			var targetInterceptor = GetInterceptor(lambda, interceptor.Mock);
+			var actual = targetInterceptor.ActualCalls.FirstOrDefault(i => expected.Matches(i));
+
+			if (actual == null)
+				throw new MockException(MockException.ExceptionReason.VerificationFailed,
+					Properties.Resources.NoMatchingCall);
+		}
+
+		internal static void VerifyGet<T, TProperty>(Expression<Func<T, TProperty>> expression, Interceptor interceptor)
+		{
+			var lambda = expression.ToLambda();
+			var prop = lambda.ToPropertyInfo();
+
+			var expected = new MethodCallReturn<TProperty>(expression, prop.GetGetMethod(), new Expression[0]);
+			var targetInterceptor = GetInterceptor(lambda, interceptor.Mock);
+			var actual = targetInterceptor.ActualCalls.FirstOrDefault(i => expected.Matches(i));
+
+			if (actual == null)
+				throw new MockException(MockException.ExceptionReason.VerificationFailed,
+					Properties.Resources.NoMatchingCall);
+		}
+
+		internal static void VerifySet<T, TProperty>(Expression<Func<T, TProperty>> expression, Interceptor interceptor)
+		{
+			Guard.ArgumentNotNull(interceptor, "interceptor");
+
+			var lambda = expression.ToLambda();
+			var prop = lambda.ToPropertyInfo();
+
+			var expected = new SetterMethodCall<TProperty>(expression, prop.GetSetMethod());
+			var targetInterceptor = GetInterceptor(lambda, interceptor.Mock);
+			var actual = targetInterceptor.ActualCalls.FirstOrDefault(i => expected.Matches(i));
+
+			if (actual == null)
+				throw new MockException(MockException.ExceptionReason.VerificationFailed,
+					Properties.Resources.NoMatchingCall);
+		}
+
+		internal static void VerifySet<T, TProperty>(Expression<Func<T, TProperty>> expression, TProperty value, Interceptor interceptor)
+		{
+			Guard.ArgumentNotNull(interceptor, "interceptor");
+
+			var lambda = expression.ToLambda();
+			var prop = lambda.ToPropertyInfo();
+
+			var expected = new SetterMethodCall<TProperty>(expression, prop.GetSetMethod(), value);
+			var targetInterceptor = GetInterceptor(lambda, interceptor.Mock);
+			var actual = targetInterceptor.ActualCalls.FirstOrDefault(i => expected.Matches(i));
+
+			if (actual == null)
+				throw new MockException(MockException.ExceptionReason.VerificationFailed,
+					Properties.Resources.NoMatchingCall);
+		}
+
+		#endregion
+
 		#region Expect
 
 		internal static MethodCall SetUpExpect<T1>(Expression<Action<T1>> expression, Interceptor interceptor)
 		{
 			Guard.ArgumentNotNull(interceptor, "interceptor");
-
-			// Made static so that it can be called from the AsInterface private 
-			// class when adding interfaces via As<TInterface>
 
 			var methodCall = expression.ToLambda().ToMethodCall();
 			MethodInfo method = methodCall.Method;
@@ -244,17 +342,18 @@ namespace Moq
 
 			ThrowIfCantOverride(expression, method);
 			var call = new MethodCall(expression, method, args);
-			interceptor.AddCall(call, ExpectKind.Other);
+
+			var targetInterceptor = GetInterceptor(expression, interceptor.Mock);
+
+			targetInterceptor.AddCall(call, ExpectKind.Other);
 
 			return call;
 		}
 
 		internal static MethodCallReturn<TResult> SetUpExpect<T1, TResult>(Expression<Func<T1, TResult>> expression, Interceptor interceptor)
 		{
+			// TODO: maybe we should pass the Mock around, rather than the interceptor?
 			Guard.ArgumentNotNull(interceptor, "interceptor");
-
-			// Made static so that it can be called from the AsInterface private 
-			// class when adding interfaces via As<TInterface>
 
 			var lambda = expression.ToLambda();
 
@@ -268,21 +367,15 @@ namespace Moq
 			ThrowIfCantOverride(expression, method);
 			var call = new MethodCallReturn<TResult>(expression, method, args);
 
-			// Build intermediate hierarchy if necessary
-			var visitor = new AutoMockPropertiesVisitor(interceptor.Mock);
-			var target = visitor.SetupMocks(lambda.Body);
-			interceptor = target.Interceptor;
+			var targetInterceptor = GetInterceptor(lambda, interceptor.Mock);
 
-			interceptor.AddCall(call, ExpectKind.Other);
+			targetInterceptor.AddCall(call, ExpectKind.Other);
 
 			return call;
 		}
 
 		internal static MethodCallReturn<TProperty> SetUpExpectGet<T1, TProperty>(Expression<Func<T1, TProperty>> expression, Interceptor interceptor)
 		{
-			// Made static so that it can be called from the AsInterface private 
-			// class when adding interfaces via As<TInterface>
-
 			Guard.ArgumentNotNull(interceptor, "interceptor");
 			LambdaExpression lambda = expression.ToLambda();
 
@@ -301,12 +394,9 @@ namespace Moq
 
 				var call = new MethodCallReturn<TProperty>(expression, propGet, new Expression[0]);
 
-				// Build intermediate hierarchy if necessary
-				var visitor = new AutoMockPropertiesVisitor(interceptor.Mock);
-				var target = visitor.SetupMocks(lambda.Body);
-				interceptor = target.Interceptor;
+				var targetInterceptor = GetInterceptor(expression, interceptor.Mock);
 
-				interceptor.AddCall(call, ExpectKind.Other);
+				targetInterceptor.AddCall(call, ExpectKind.Other);
 
 				return call;
 			}
@@ -316,9 +406,6 @@ namespace Moq
 		{
 			Guard.ArgumentNotNull(interceptor, "interceptor");
 
-			// Made static so that it can be called from the AsInterface private 
-			// class when adding interfaces via As<TInterface>
-
 			var prop = expression.ToLambda().ToPropertyInfo();
 			ThrowIfPropertyNotWritable(prop);
 
@@ -326,26 +413,39 @@ namespace Moq
 			ThrowIfCantOverride(expression, propSet);
 
 			var call = new SetterMethodCall<TProperty>(expression, propSet);
-			interceptor.AddCall(call, ExpectKind.PropertySet);
+			var targetInterceptor = GetInterceptor(expression, interceptor.Mock);
+
+			targetInterceptor.AddCall(call, ExpectKind.PropertySet);
 
 			return call;
 		}
 
 		internal static SetterMethodCall<TProperty> SetUpExpectSet<T1, TProperty>(Expression<Func<T1, TProperty>> expression, TProperty value, Interceptor interceptor)
 		{
-			// Thanks to the ASP.NET MVC team for this "suggestion"!
 			var lambda = expression.ToLambda();
 			var prop = lambda.ToPropertyInfo();
 			ThrowIfPropertyNotWritable(prop);
 
-			// We generate an invocation to the setter method with the given value
 			var setter = prop.GetSetMethod();
 			ThrowIfCantOverride(expression, setter);
 
 			var call = new SetterMethodCall<TProperty>(expression, setter, value);
-			interceptor.AddCall(call, ExpectKind.Other);
+			var targetInterceptor = GetInterceptor(expression, interceptor.Mock);
+
+			targetInterceptor.AddCall(call, ExpectKind.Other);
 
 			return call;
+		}
+
+		/// <summary>
+		/// Gets the interceptor target for the given expression and root mock, 
+		/// building the intermediate hierarchy of mock objects if necessary.
+		/// </summary>
+		private static Interceptor GetInterceptor(LambdaExpression lambda, Mock mock)
+		{
+			var visitor = new AutoMockPropertiesVisitor(mock);
+			var target = visitor.SetupMocks(lambda.Body);
+			return target.Interceptor;
 		}
 
 		private static void ThrowIfPropertyNotWritable(PropertyInfo prop)
