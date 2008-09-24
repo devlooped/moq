@@ -1,5 +1,5 @@
 Version 3.0
-	* Now you can override the default value generated for non-expected invocations. See Issue #55: Add new MockBehavior to return mocks of interfaces instead of nulls.
+	* Implemented Issue #55: We now provide a mock.DefaultValue = [DefaultValue.Empty | DefaultValue.Mock] which will provide the current behavior (default) or mocks for mockeable return types for loose mock invocations without expectations.
     * Added support for stubbing properties from moq-contrib: now you can do mock.Stub(m => m.Value) and add stub behavior to the property.
     * Added support for mocking methods with out and ref parameters (Issue #50)
     * Applied patch contributed by slava for Issue #72: add support to limit numbor of calls on mocked method (we now have mock.Expect(...).AtMost(5))
