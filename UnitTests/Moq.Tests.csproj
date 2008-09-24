@@ -98,6 +98,7 @@
     <Compile Include="Regressions\IssueReportsFixture.cs" />
     <Compile Include="Regressions\StreamFixture.cs" />
     <Compile Include="ReturnsFixture.cs" />
+    <Compile Include="StubExtensionsFixture.cs" />
     <Compile Include="VerifyFixture.cs" />
   </ItemGroup>
   <ItemGroup>

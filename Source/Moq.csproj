@@ -148,6 +148,7 @@
     <Compile Include="Mock.Generic.cs" />
     <Compile Include="MockedEvent.Generic.cs" />
     <Compile Include="SetterMethodCall.cs" />
+    <Compile Include="Stub\StubExtensions.cs" />
   </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
   <!--<Import Project="$(MSBuildProjectPath)..\Tools\Mono.Mcs.targets" />-->
