@@ -1,17 +1,10 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using Xunit;
-using Moq.Language.Flow;
-using System.Linq.Expressions;
-using System.Reflection;
+﻿using Xunit;
 
 namespace Moq.Tests
 {
 	public class OutRefFixture
 	{
-		[Fact(Skip = "Not implemented yet")]
+		[Fact]
 		public void ExpectsOutArgument()
 		{
 			var mock = new Mock<IFoo>();
@@ -26,9 +19,39 @@ namespace Moq.Tests
 			Assert.Equal(expected, actual);
 		}
 
+		[Fact]
+		public void ExpectsRefArgument()
+		{
+			var mock = new Mock<IFoo>();
+			string expected = "ack";
+
+			mock.Expect(m => m.Echo(ref expected)).Returns<string>(s => s);
+
+			string actual = mock.Object.Echo(ref expected);
+
+			Assert.Equal(expected, actual);
+		}
+
+		[Fact]
+		public void RefOnlyMatchesSameInstance()
+		{
+			var mock = new Mock<IFoo>(MockBehavior.Strict);
+			string expected = "ack";
+
+			mock.Expect(m => m.Echo(ref expected)).Returns<string>(s => s);
+
+			string actual = null;
+			Assert.Throws<MockException>(() => mock.Object.Echo(ref actual));
+		}
+
+		// ThrowsIfOutIsNotConstant
+		// ThrowsIfRefIsNotConstant
+
 		public interface IFoo
 		{
+			T Echo<T>(ref T value);
 			bool Execute(string command, out string result);
+			void Submit(string command, ref string result);
 			int Value { get; set; }
 		}
 	}

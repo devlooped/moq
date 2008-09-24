@@ -144,8 +144,10 @@
     </None>
     <Compile Include="IMock.cs" />
     <Compile Include="Language\INever.cs" />
+    <Compile Include="Matchers\RefMatcher.cs" />
     <Compile Include="Mock.Generic.cs" />
     <Compile Include="MockedEvent.Generic.cs" />
+    <Compile Include="SetterMethodCall.cs" />
   </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
   <!--<Import Project="$(MSBuildProjectPath)..\Tools\Mono.Mcs.targets" />-->

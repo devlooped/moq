@@ -39,7 +39,7 @@
 // http://www.opensource.org/licenses/bsd-license.php]
 
 using System;
-using System.Linq;
+using System.Collections.Generic;
 using System.Linq.Expressions;
 using System.Reflection;
 using Castle.Core.Interceptor;
@@ -48,73 +48,136 @@ using Moq.Language.Flow;
 
 namespace Moq
 {
-	internal class SetterMethodCall<TProperty> : MethodCall, IExpectSetter<TProperty>
-	{
-		bool checkValue = false;
-		TProperty value;
-
-		public SetterMethodCall(Expression originalExpression, MethodInfo method)
-			: base(originalExpression, method, new Expression[0])
-		{
-		}
-
-		public SetterMethodCall(Expression originalExpression, MethodInfo method, TProperty value)
-			: base(originalExpression, method, new Expression[0])
-		{
-			checkValue = true;
-			this.value = value;
-		}
-
-		public override bool Matches(IInvocation call)
-		{
-			// Need to override default behavior as the arguments will be zero 
-			// whereas the call arguments will be one: the property 
-			// value to set.
-
-			if (call.Method != method)
-				return false;
-
-			if (checkValue)
-			{
-				// If the ctor that received a value was used, 
-				// we'll use it for comparison.
-				return Object.Equals(value, call.Arguments[0]);
-			}
-
-			return true;
-		}
-
-		public ICallbackResult Callback(Action<TProperty> callback)
-		{
-			SetCallbackWithArguments(callback);
-			return this;
-		}
-	}
-
 	internal class MethodCall : IProxyCall, IExpect
 	{
 		protected MethodInfo method;
 		Expression originalExpression;
 		Exception exception;
 		Action<object[]> callback;
-		IMatcher[] argumentMatchers;
+		List<IMatcher> argumentMatchers = new List<IMatcher>();
 		int callCount;
 		bool isOnce;
 		bool isNever;
 		MockedEvent mockEvent;
 		Delegate mockEventArgsFunc;
-		private int? expectedCallCount = null;
+		int? expectedCallCount = null;
+		List<KeyValuePair<int, Expression>> outValues = new List<KeyValuePair<int, Expression>>();
+
+		public bool IsVerifiable { get; set; }
+		public bool Invoked { get; set; }
+		public Expression ExpectExpression { get { return originalExpression; } }
 
 		public MethodCall(Expression originalExpression, MethodInfo method, params Expression[] arguments)
 		{
 			this.originalExpression = originalExpression;
 			this.method = method;
-			this.argumentMatchers = arguments.Select(expr => MatcherFactory.CreateMatcher(expr)).ToArray();
+
+			var parameters = method.GetParameters();
+			for (int i = 0; i < parameters.Length; i++)
+			{
+				var parameter = parameters[i];
+				var argument = arguments[i];
+				if (parameter.IsOut)
+				{
+					outValues.Add(new KeyValuePair<int, Expression>(i, argument));
+				}
+				else if (parameter.ParameterType.IsByRef)
+				{
+					var value = argument.PartialEval();
+					if (value.NodeType == ExpressionType.Constant)
+						argumentMatchers.Add(new RefMatcher(((ConstantExpression)value).Value));
+					else
+						throw new NotSupportedException();
+				}
+				else
+				{
+					argumentMatchers.Add(MatcherFactory.CreateMatcher(argument));
+				}
+			}
 		}
 
-		public bool IsVerifiable { get; set; }
-		public bool Invoked { get; set; }
-		public Expression ExpectExpression { get { return originalExpression; } }
+		public void SetOutParameters(IInvocation call)
+		{
+			foreach (var item in outValues)
+			{
+				var value = item.Value.PartialEval();
+				if (value.NodeType == ExpressionType.Constant)
+					call.SetArgumentValue(item.Key, ((ConstantExpression)value).Value);
+				else
+					throw new NotSupportedException();
+			}
+		}
+
+		public virtual bool Matches(IInvocation call)
+		{
+			var args = new List<object>();
+			var parameters = call.Method.GetParameters();
+			for (int i = 0; i < parameters.Length; i++)
+			{
+				if (!parameters[i].IsOut)
+					args.Add(call.Arguments[i]);
+			}
+
+			if (IsEqualMethodOrOverride(call) &&
+				argumentMatchers.Count == args.Count)
+			{
+				for (int i = 0; i < argumentMatchers.Count; i++)
+				{
+					if (!argumentMatchers[i].Matches(args[i]))
+						return false;
+				}
+
+				return true;
+			}
+
+			return false;
+		}
+
+		public virtual void Execute(IInvocation call)
+		{
+			Invoked = true;
+
+			if (callback != null)
+				callback(call.Arguments);
+
+			if (exception != null)
+				throw exception;
+
+			callCount++;
+
+			if (isOnce && callCount > 1)
+				throw new MockException(MockException.ExceptionReason.MoreThanOneCall,
+					String.Format(Properties.Resources.MoreThanOneCall,
+					call.Format()));
+
+
+			if (isNever)
+				throw new MockException(MockException.ExceptionReason.ExpectedNever,
+					String.Format(Properties.Resources.ExpectedNever,
+					call.Format()));
+
+
+			if (expectedCallCount.HasValue && callCount > expectedCallCount)
+				throw new MockException(MockException.ExceptionReason.MoreThanNCalls,
+					String.Format(Properties.Resources.MoreThanNCalls, expectedCallCount,
+					call.Format()));
+
+
+			if (mockEvent != null)
+			{
+				var argsFuncType = mockEventArgsFunc.GetType();
+
+				if (argsFuncType.IsGenericType &&
+					argsFuncType.GetGenericArguments().Length == 1)
+				{
+					mockEvent.DoRaise((EventArgs)mockEventArgsFunc.InvokePreserveStack());
+				}
+				else
+				{
+					mockEvent.DoRaise((EventArgs)mockEventArgsFunc.InvokePreserveStack(call.Arguments));
+				}
+			}
+		}
 
 		public IThrowsResult Throws(Exception exception)
 		{
@@ -174,75 +237,12 @@ namespace Moq
 			IsVerifiable = true;
 		}
 
-		public virtual bool Matches(IInvocation call)
-		{
-			if (IsEqualMethodOrOverride(call) &&
-				argumentMatchers.Length == call.Arguments.Length)
-			{
-				for (int i = 0; i < argumentMatchers.Length; i++)
-				{
-					if (!argumentMatchers[i].Matches(call.Arguments[i]))
-						return false;
-				}
-
-				return true;
-			}
-
-			return false;
-		}
-
 		private bool IsEqualMethodOrOverride(IInvocation call)
 		{
 			return call.Method == method ||
 				(call.Method.DeclaringType.IsClass &&
 				call.Method.IsVirtual &&
 				call.Method.GetBaseDefinition() == method);
-		}
-
-		public virtual void Execute(IInvocation call)
-		{
-			Invoked = true;
-
-			if (callback != null)
-				callback(call.Arguments);
-
-			if (exception != null)
-				throw exception;
-
-			callCount++;
-
-			if (isOnce && callCount > 1)
-				throw new MockException(MockException.ExceptionReason.MoreThanOneCall,
-					String.Format(Properties.Resources.MoreThanOneCall,
-					call.Format()));
-
-
-			if (isNever)
-				throw new MockException(MockException.ExceptionReason.ExpectedNever,
-					String.Format(Properties.Resources.ExpectedNever,
-					call.Format()));
-
-
-			if (expectedCallCount.HasValue && callCount > expectedCallCount)
-				throw new MockException(MockException.ExceptionReason.MoreThanNCalls,
-					String.Format(Properties.Resources.MoreThanNCalls, expectedCallCount,
-					call.Format()));
-
-
-			if (mockEvent != null)
-			{
-				var argsFuncType = mockEventArgsFunc.GetType();
-
-				if (argsFuncType.IsGenericType &&
-					argsFuncType.GetGenericArguments().Length == 1)
-				{
-					mockEvent.DoRaise((EventArgs)mockEventArgsFunc.InvokePreserveStack());
-				}
-				else
-				{
-					mockEvent.DoRaise((EventArgs)mockEventArgsFunc.InvokePreserveStack(call.Arguments));
-				}
-			}
 		}
 
 		public IVerifies AtMostOnce()
@@ -256,8 +256,6 @@ namespace Moq
 		{
 			isNever = true;
 		}
-
-
 
 		public IVerifies AtMost( int callCount )
 		{

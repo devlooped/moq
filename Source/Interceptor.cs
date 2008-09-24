@@ -196,6 +196,8 @@ namespace Moq
 
 			if (call != null)
 			{
+				call.SetOutParameters(invocation);
+
 				// We first execute, as there may be a Throws 
 				// and therefore we might never get to the 
 				// next line.

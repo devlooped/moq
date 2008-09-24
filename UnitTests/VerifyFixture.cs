@@ -1,7 +1,4 @@
 ﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
 using Xunit;
 
 namespace Moq.Tests
@@ -222,7 +219,7 @@ namespace Moq.Tests
 		}
 
 		[Fact]
-		public void VerifiesSetter()
+		public void VerifiesSetterWithExpression()
 		{
 			var mock = new Mock<IFoo>();
 			mock.ExpectSet(m => m.Value, 5);
@@ -235,9 +232,37 @@ namespace Moq.Tests
 			mock.VerifySet(m => m.Value, 5);
 		}
 
+		[Fact]
+		public void VerifiesRefWithExpression()
+		{
+			var mock = new Mock<IFoo>();
+			var expected = "ping";
+
+			Assert.Throws<MockException>(() => mock.Verify(m => m.EchoRef(ref expected)));
+
+			mock.Object.EchoRef(ref expected);
+
+			mock.Verify(m => m.EchoRef(ref expected));
+		}
+
+		[Fact]
+		public void VerifiesOutWithExpression()
+		{
+			var mock = new Mock<IFoo>();
+			var expected = "ping";
+
+			Assert.Throws<MockException>(() => mock.Verify(m => m.EchoOut(out expected)));
+
+			mock.Object.EchoOut(out expected);
+
+			mock.Verify(m => m.EchoOut(out expected));
+		}
+
 		public interface IFoo
 		{
 			int? Value { get; set; }
+			void EchoRef<T>(ref T value);
+			void EchoOut<T>(out T value);
 			int Echo(int value);
 			void Submit();
 			string Execute(string command);

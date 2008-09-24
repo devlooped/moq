@@ -1,7 +1,5 @@
 ﻿using System;
 using Xunit;
-using System.Collections;
-using System.Collections.Generic;
 
 namespace Moq.Tests
 {

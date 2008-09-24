@@ -38,29 +38,27 @@
 //[This is the BSD license, see
 // http://www.opensource.org/licenses/bsd-license.php]
 
+using System;
+using System.Linq.Expressions;
 
 namespace Moq
 {
-	/// <summary>
-	/// Options to customize the behavior of the mock. 
-	/// </summary>
-	public enum MockBehavior
+	internal class RefMatcher : IMatcher
 	{
-		/// <summary>
-		/// Causes the mock to always throw 
-		/// an exception for invocations that don't have a 
-		/// corresponding expectation.
-		/// </summary>
-		Strict, 
-		/// <summary>
-		/// Will never throw exceptions, returning default  
-		/// values when necessary (null for reference types, 
-		/// zero for value types or empty enumerables and arrays).
-		/// </summary>
-		Loose,
-		/// <summary>
-		/// Default mock behavior, which equals <see cref="Loose"/>.
-		/// </summary>
-		Default = Loose,
+		object reference;
+
+		public RefMatcher(object reference)
+		{
+			this.reference = reference;
+		}
+
+		public bool Matches(object value)
+		{
+			return Object.ReferenceEquals(reference, value);
+		}
+
+		public void Initialize(Expression matcherExpression)
+		{
+		}
 	}
 }

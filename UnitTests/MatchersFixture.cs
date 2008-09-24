@@ -1,10 +1,7 @@
 ﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using Xunit;
-using System.Text.RegularExpressions;
 using System.Linq.Expressions;
+using System.Text.RegularExpressions;
+using Xunit;
 
 namespace Moq.Tests
 {
@@ -164,6 +161,17 @@ namespace Moq.Tests
 			Expression<Predicate<int>> isSix = (arg) => arg == 6;
 
 			Assert.Throws<ArgumentException>(() => foo.Expect((f) => f.Echo(It.Is(isSix))).Returns(12));
+		}
+
+		[Fact]
+		public void MatchesSameReference()
+		{
+			var a = new object();
+			var b = new object();
+
+			var matcher = new RefMatcher(a);
+			Assert.True(matcher.Matches(a));
+			Assert.False(matcher.Matches(b));
 		}
 
 		private int GetToRange()

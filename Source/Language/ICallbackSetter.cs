@@ -39,9 +39,8 @@
 // http://www.opensource.org/licenses/bsd-license.php]
 
 using System;
-using System.Linq;
-using System.Linq.Expressions;
 using System.ComponentModel;
+using System.Linq.Expressions;
 using Moq.Language.Flow;
 
 namespace Moq.Language
