@@ -14,6 +14,12 @@ namespace Moq
 	internal class MockDefaultValueProvider : EmptyDefaultValueProvider
 	{
 		Dictionary<MemberInfo, object> cachedMocks = new Dictionary<MemberInfo, object>();
+		Mock owner;
+
+		public MockDefaultValueProvider(Mock owner)
+		{
+			this.owner = owner;
+		}
 
 		public override object ProvideDefault(MethodInfo member, object[] arguments)
 		{
@@ -24,7 +30,8 @@ namespace Moq
 				!cachedMocks.TryGetValue(member, out value))
 			{
 				var mockType = typeof(Mock<>).MakeGenericType(member.ReturnType);
-				var mock = (IMock)Activator.CreateInstance(mockType);
+				var mock = (Mock)Activator.CreateInstance(mockType, owner.Behavior);
+				mock.DefaultValue = owner.DefaultValue;
 
 				value = mock.Object;
 				cachedMocks.Add(member, value);

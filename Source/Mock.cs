@@ -78,7 +78,7 @@ namespace Moq
 		///     .Returns(tempUrl);
 		/// </code>
 		/// </example>
-		public static IMock<T> Get<T>(T mocked)
+		public static Mock<T> Get<T>(T mocked)
 			where T : class
 		{
 			if (mocked is IMocked<T>)
@@ -100,7 +100,7 @@ namespace Moq
 					var asInterface = asMethod.MakeGenericMethod(typeof(T));
 					var asMock = asInterface.Invoke(mock, null);
 
-					return (IMock<T>)asMock;
+					return (Mock<T>)asMock;
 				}
 				else
 				{
@@ -151,6 +151,8 @@ namespace Moq
 			ImplementedInterfaces = new List<Type>();
 		}
 
+		internal MockBehavior Behavior { get; set; }
+
 		internal Interceptor Interceptor { get; set; }
 
 		/// <summary>
@@ -173,7 +175,7 @@ namespace Moq
 			{
 				defaultValue = value;
 				if (defaultValue == DefaultValue.Mock)
-					DefaultValueProvider = new MockDefaultValueProvider();
+					DefaultValueProvider = new MockDefaultValueProvider(this);
 				else
 					DefaultValueProvider = new EmptyDefaultValueProvider();
 			}
@@ -536,7 +538,8 @@ namespace Moq
 
 						var mockType = typeof(Mock<>).MakeGenericType(prop.PropertyType);
 
-						mock = (Mock)Activator.CreateInstance(mockType);
+						mock = (Mock)Activator.CreateInstance(mockType, ownerMock.Behavior);
+						mock.DefaultValue = ownerMock.DefaultValue;
 						ownerMock.innerMocks.Add(prop, mock);
 
 						var targetType = targetMock.MockedType;

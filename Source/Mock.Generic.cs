@@ -58,7 +58,6 @@ namespace Moq
 	{
 		static readonly ProxyGenerator generator = new ProxyGenerator();
 		T instance;
-		MockBehavior behavior;
 		object[] constructorArguments;
 
 		#region Ctors
@@ -111,7 +110,7 @@ namespace Moq
 		{
 			if (args == null) args = new object[0];
 
-			this.behavior = behavior;
+			this.Behavior = behavior;
 			this.Interceptor = new Interceptor(behavior, typeof(T), this);
 			this.constructorArguments = args;
 			this.ImplementedInterfaces.Add(typeof(IMocked<T>));
@@ -196,11 +195,6 @@ namespace Moq
 		}
 
 		internal override Type MockedType { get { return typeof(T); } }
-
-		/// <devdoc>
-		/// Used for testing the mock factory.
-		/// </devdoc>
-		internal MockBehavior Behavior { get { return behavior; } }
 
 		#endregion
 

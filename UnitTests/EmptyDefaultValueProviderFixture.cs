@@ -51,7 +51,7 @@ namespace Moq.Tests
 		[Fact]
 		public void ProvidesEmptyEnumerable()
 		{
-			var provider = new MockDefaultValueProvider();
+			var provider = new EmptyDefaultValueProvider();
 
 			var value = provider.ProvideDefault(typeof(IFoo).GetProperty("Indexes").GetGetMethod(), new object[0]);
 			Assert.True(value is IEnumerable<int> && ((IEnumerable<int>)value).Count() == 0);
@@ -60,7 +60,7 @@ namespace Moq.Tests
 		[Fact]
 		public void ProvidesEmptyArray()
 		{
-			var provider = new MockDefaultValueProvider();
+			var provider = new EmptyDefaultValueProvider();
 
 			var value = provider.ProvideDefault(typeof(IFoo).GetProperty("Bars").GetGetMethod(), new object[0]);
 			Assert.True(value is IBar[] && ((IBar[])value).Length == 0);

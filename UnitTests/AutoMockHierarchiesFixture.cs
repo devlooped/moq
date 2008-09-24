@@ -16,6 +16,20 @@ namespace Moq.Tests
 		}
 
 		[Fact]
+		public void NewMocksHaveSameBehaviorAndDefaultValueAsOwner()
+		{
+			var mock = new Mock<IFoo>();
+
+			mock.ExpectGet(m => m.Bar.Value).Returns(5);
+
+			var barMock = Mock.Get(mock.Object.Bar);
+
+			Assert.Equal(mock.Behavior, barMock.Behavior);
+			Assert.Equal(mock.DefaultValue, barMock.DefaultValue);
+		}
+
+
+		[Fact]
 		public void CreatesMockForAccessedPropertyWithMethod()
 		{
 			var mock = new Mock<IFoo>();
