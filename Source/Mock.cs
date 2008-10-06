@@ -129,7 +129,6 @@ namespace Moq
 
 		DefaultValue defaultValue;
 		Dictionary<EventInfo, List<Delegate>> invocationLists = new Dictionary<EventInfo, List<Delegate>>();
-		Dictionary<PropertyInfo, Mock> innerMocks = new Dictionary<PropertyInfo, Mock>();
 
 		//static MethodInfo genericSetupExpectVoid;
 		//static MethodInfo genericSetupExpectReturn;
@@ -149,9 +148,11 @@ namespace Moq
 			this.CallBase = false;
 			this.DefaultValue = DefaultValue.Empty;
 			ImplementedInterfaces = new List<Type>();
+			InnerMocks = new Dictionary<MethodInfo, Mock>();
 		}
 
 		internal Interceptor Interceptor { get; set; }
+		internal Dictionary<MethodInfo, Mock> InnerMocks { get; set; }
 
 		/// <summary>
 		/// Exposes the list of extra interfaces implemented by the mock.
@@ -226,7 +227,7 @@ namespace Moq
 			try
 			{
 				interceptor.Verify();
-				foreach (var mock in interceptor.Mock.innerMocks.Values)
+				foreach (var mock in interceptor.Mock.InnerMocks.Values)
 				{
 					mock.Verify();
 				}
@@ -248,7 +249,7 @@ namespace Moq
 			try
 			{
 				interceptor.VerifyAll();
-				foreach (var mock in interceptor.Mock.innerMocks.Values)
+				foreach (var mock in interceptor.Mock.InnerMocks.Values)
 				{
 					mock.VerifyAll();
 				}
@@ -533,7 +534,8 @@ namespace Moq
 				foreach (var prop in props.Reverse())
 				{
 					Mock mock;
-					if (!ownerMock.innerMocks.TryGetValue(prop, out mock))
+					var propGet = prop.GetGetMethod();
+					if (!ownerMock.InnerMocks.TryGetValue(propGet, out mock))
 					{
 						// TODO: this may throw TargetInvocationException, 
 						// cleanup stacktrace.
@@ -543,7 +545,7 @@ namespace Moq
 
 						mock = (Mock)Activator.CreateInstance(mockType, ownerMock.Behavior);
 						mock.DefaultValue = ownerMock.DefaultValue;
-						ownerMock.innerMocks.Add(prop, mock);
+						ownerMock.InnerMocks.Add(propGet, mock);
 
 						var targetType = targetMock.MockedType;
 

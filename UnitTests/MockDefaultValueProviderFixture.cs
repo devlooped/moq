@@ -65,6 +65,20 @@ namespace Moq.Tests
 			Assert.Equal(mock.DefaultValue, barMock.DefaultValue);
 		}
 
+		[Fact]
+		public void CreatedMockIsVerifiedWithOwner()
+		{
+			var mock = new Mock<IFoo>();
+			var provider = new MockDefaultValueProvider(mock);
+
+			var value = provider.ProvideDefault(typeof(IFoo).GetProperty("Bar").GetGetMethod(), new object[0]);
+
+			var barMock = Mock.Get((IBar)value);
+			barMock.Expect(b => b.Do()).Verifiable();
+
+			Assert.Throws<MockVerificationException>(() => mock.Verify());
+		}
+
 		public interface IFoo
 		{
 			IBar Bar { get; set; }
@@ -73,6 +87,6 @@ namespace Moq.Tests
 			IBar[] Bars { get; set; }
 		}
 
-		public interface IBar { }
+		public interface IBar { void Do(); }
 	}
 }
