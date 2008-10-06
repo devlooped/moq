@@ -53,7 +53,7 @@ Do use their documentation to learn about options (especially when there are sev
     <ProjectSummary />
     <MissingTags>Summary, Parameter, AutoDocumentCtors, Namespace, TypeParameter</MissingTags>
     <VisibleItems>InheritedMembers, Protected, SealedProtected</VisibleItems>
-    <HtmlHelp1xCompilerPath path="" />
+    <HtmlHelp1xCompilerPath path="..\build\HTML Help Workshop\" />
     <HtmlHelp2xCompilerPath path="" />
     <OutputPath>..\build\Help\</OutputPath>
     <SandcastlePath path="..\build\Sandcastle\" />
