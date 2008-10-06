@@ -1,2 +1,0 @@
-1 - Requisites: FinalBuilder 6
-2 - CollabNet SVN: http://www.collab.net/downloads/subversion/
