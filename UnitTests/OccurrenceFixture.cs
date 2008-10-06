@@ -48,6 +48,16 @@ namespace Moq.Tests
 		}
 
 		[Fact]
+		public void VerifiesMethodNeverHappenSucceeds()
+		{
+			var mock = new Mock<IFoo>();
+
+			mock.Expect(m => m.Execute("ping")).Never();
+
+			mock.VerifyAll();
+		}
+
+		[Fact]
 		public void ExpectsPropertyGetNeverHappen()
 		{
 			var mock = new Mock<IFoo>();

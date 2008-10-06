@@ -57,13 +57,13 @@ namespace Moq
 		List<IMatcher> argumentMatchers = new List<IMatcher>();
 		int callCount;
 		bool isOnce;
-		bool isNever;
 		MockedEvent mockEvent;
 		Delegate mockEventArgsFunc;
 		int? expectedCallCount = null;
 		List<KeyValuePair<int, Expression>> outValues = new List<KeyValuePair<int, Expression>>();
 
 		public bool IsVerifiable { get; set; }
+		public bool IsNever { get; set; }
 		public bool Invoked { get; set; }
 		public Expression ExpectExpression { get { return originalExpression; } }
 
@@ -151,7 +151,7 @@ namespace Moq
 					call.Format()));
 
 
-			if (isNever)
+			if (IsNever)
 				throw new MockException(MockException.ExceptionReason.ExpectedNever,
 					String.Format(Properties.Resources.ExpectedNever,
 					call.Format()));
@@ -254,7 +254,7 @@ namespace Moq
 
 		public void Never()
 		{
-			isNever = true;
+			IsNever = true;
 		}
 
 		public IVerifies AtMost( int callCount )

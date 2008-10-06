@@ -72,12 +72,16 @@ namespace Moq
 
 		internal void Verify()
 		{
-			VerifyOrThrow(call => call.IsVerifiable && !call.Invoked);
+			// The IsNever case would have thrown the moment the member is invoked, 
+			// so we can safely skip here all such expectations.
+			VerifyOrThrow(call => call.IsVerifiable && !call.IsNever && !call.Invoked);
 		}
 
 		internal void VerifyAll()
 		{
-			VerifyOrThrow(call => !call.Invoked);
+			// The IsNever case would have thrown the moment the member is invoked, 
+			// so we can safely skip here all such expectations.
+			VerifyOrThrow(call => !call.IsNever && !call.Invoked);
 		}
 
 		private void VerifyOrThrow(Predicate<IProxyCall> match)
