@@ -144,6 +144,17 @@ namespace Moq
 		T Object { get; }
 
 		/// <summary>
+		/// Specifies the behavior to use when returning default values for 
+		/// unexpected invocations.
+		/// </summary>
+		DefaultValue DefaultValue { get; set; }
+
+		/// <summary>
+		/// Behavior of the mock, according to the value set in the constructor.
+		/// </summary>
+		MockBehavior Behavior { get; }
+
+		/// <summary>
 		/// Sets an expectation on the mocked type for a call to 
 		/// to a value returning method.
 		/// </summary>

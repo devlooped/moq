@@ -371,6 +371,17 @@ namespace Moq
 				get { return owner.Object as TInterface; }
 			}
 
+			public DefaultValue DefaultValue
+			{
+				get { return owner.DefaultValue; }
+				set { owner.DefaultValue = value; }
+			}
+
+			public MockBehavior Behavior
+			{
+				get { return owner.Behavior; }
+			}
+
 			public IExpect<TResult> Expect<TResult>(Expression<Func<TInterface, TResult>> expression)
 			{
 				return Mock.SetUpExpect(expression, this.owner.Interceptor);

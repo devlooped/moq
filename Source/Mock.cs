@@ -78,7 +78,7 @@ namespace Moq
 		///     .Returns(tempUrl);
 		/// </code>
 		/// </example>
-		public static Mock<T> Get<T>(T mocked)
+		public static IMock<T> Get<T>(T mocked)
 			where T : class
 		{
 			if (mocked is IMocked<T>)
@@ -100,7 +100,7 @@ namespace Moq
 					var asInterface = asMethod.MakeGenericMethod(typeof(T));
 					var asMock = asInterface.Invoke(mock, null);
 
-					return (Mock<T>)asMock;
+					return (IMock<T>)asMock;
 				}
 				else
 				{
@@ -151,8 +151,6 @@ namespace Moq
 			ImplementedInterfaces = new List<Type>();
 		}
 
-		internal MockBehavior Behavior { get; set; }
-
 		internal Interceptor Interceptor { get; set; }
 
 		/// <summary>
@@ -161,12 +159,17 @@ namespace Moq
 		protected internal List<Type> ImplementedInterfaces { get; private set; }
 
 		/// <summary>
+		/// Implements <see cref="IMock{T}.Behavior"/>.
+		/// </summary>
+		public MockBehavior Behavior { get; internal set; }
+
+		/// <summary>
 		/// Implements <see cref="IMock.CallBase"/>.
 		/// </summary>
 		public bool CallBase { get; set; }
 
 		/// <summary>
-		/// Implements <see cref="IMock.DefaultValue"/>.
+		/// Implements <see cref="IMock{T}.DefaultValue"/>.
 		/// </summary>
 		public DefaultValue DefaultValue
 		{
