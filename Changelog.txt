@@ -1,5 +1,5 @@
 Version 2.6
-	* Implemented Issue #55: We now provide a mock.DefaultValue = [DefaultValue.Empty | DefaultValue.Mock] which will provide the current behavior (default) or mocks for mockeable return types for loose mock invocations without expectations.
+    * Implemented Issue #55: We now provide a mock.DefaultValue = [DefaultValue.Empty | DefaultValue.Mock] which will provide the current behavior (default) or mocks for mockeable return types for loose mock invocations without expectations.
     * Added support for stubbing properties from moq-contrib: now you can do mock.Stub(m => m.Value) and add stub behavior to the property. mock.StubAll() is also provided. This integrates with the DefaultValue behavior too, so you can stub entire hierarchies :).
     * Added support for mocking methods with out and ref parameters (Issue #50)
     * Applied patch contributed by slava for Issue #72: add support to limit numbor of calls on mocked method (we now have mock.Expect(...).AtMost(5))
