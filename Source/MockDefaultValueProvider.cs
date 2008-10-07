@@ -23,7 +23,7 @@ namespace Moq
 		public override object ProvideDefault(MethodInfo member, object[] arguments)
 		{
 			var value = base.ProvideDefault(member, arguments);
-			Mock mock;
+			Mock mock = null;
 
 			if (value == null &&
 				member.ReturnType.IsMockeable() &&
@@ -33,11 +33,13 @@ namespace Moq
 				mock = (Mock)Activator.CreateInstance(mockType, owner.Behavior);
 				mock.DefaultValue = owner.DefaultValue;
 				
-				value = mock.Object;
 				owner.InnerMocks.Add(member, mock);
 			}
 
-			return value;
+			if (mock != null)
+				return mock.Object;
+			else
+				return value;
 		}
 	}
 }
