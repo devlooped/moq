@@ -116,22 +116,64 @@ namespace Moq.Tests
 			Assert.Equal("Foo", mock.Object.Value);
 		}
 
+		[Fact]
+		public void ShouldCreateMocksWithFactoryDefaultValue()
+		{
+			var factory = new MockFactory(MockBehavior.Loose) { DefaultValue = DefaultValue.Mock };
+
+			var mock = factory.Create<IFoo>();
+
+			Assert.NotNull(mock.Object.Bar());
+		}
+
+		[Fact]
+		public void ShouldCreateMocksWithFactoryCallBase()
+		{
+			var factory = new MockFactory(MockBehavior.Loose);
+
+			var mock = factory.Create<BaseClass>();
+
+			mock.Object.BaseMethod();
+
+			Assert.False(mock.Object.BaseCalled);
+
+			factory.CallBase = true;
+
+			mock = factory.Create<BaseClass>();
+
+			mock.Object.BaseMethod();
+
+			Assert.True(mock.Object.BaseCalled);
+		}
+
 		public interface IFoo
 		{
 			void Do();
 			void Undo();
+			IBar Bar();
 		}
 
 		public interface IBar { void Redo(); }
 
 		public abstract class BaseClass
 		{
+			public bool BaseCalled;
+
+			public BaseClass()
+			{
+			}
+
 			public BaseClass(string value)
 			{
 				this.Value = value;
 			}
 
 			public string Value { get; set; }
+
+			public virtual void BaseMethod()
+			{
+				BaseCalled = true;
+			}
 		}
 	}
 }
