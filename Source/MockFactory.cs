@@ -132,8 +132,7 @@ namespace Moq
 	/// <seealso cref="MockBehavior"/>
 	public class MockFactory
 	{
-		// TODO: see if we can do away with IMock
-		List<Mock> mocks = new List<Mock>();
+		List<IMock> mocks = new List<IMock>();
 		MockBehavior defaultBehavior;
 
 		/// <summary>
@@ -164,7 +163,7 @@ namespace Moq
 		/// Gets the mocks that have been created by this factory and 
 		/// that will get verified together.
 		/// </summary>
-		protected internal IEnumerable<Mock> Mocks { get { return mocks; } }
+		protected IEnumerable<IMock> Mocks { get { return mocks; } }
 
 		/// <summary>
 		/// Creates a new mock with the default <see cref="MockBehavior"/> 
@@ -290,6 +289,57 @@ namespace Moq
 			mock.DefaultValue = this.DefaultValue;
 
 			return mock;
+		}
+
+		/// <summary>
+		/// Verifies all verifiable expectations on all mocks created 
+		/// by this factory.
+		/// </summary>
+		/// <seealso cref="Mock{T}.Verify()"/>
+		/// <exception cref="MockException">One or more mocks had expectations that were not satisfied.</exception>
+		public virtual void Verify()
+		{
+			VerifyMocks(verifiable => verifiable.Verify());
+		}
+
+		/// <summary>
+		/// Verifies all verifiable expectations on all mocks created 
+		/// by this factory.
+		/// </summary>
+		/// <seealso cref="Mock{T}.Verify()"/>
+		/// <exception cref="MockException">One or more mocks had expectations that were not satisfied.</exception>
+		public virtual void VerifyAll()
+		{
+			VerifyMocks(verifiable => verifiable.VerifyAll());
+		}
+
+		/// <summary>
+		/// Invokes <paramref name="verifyAction"/> for each mock 
+		/// in <see cref="Mocks"/>, and accumulates the resulting 
+		/// <see cref="MockVerificationException"/> that might be 
+		/// thrown from the action.
+		/// </summary>
+		/// <param name="verifyAction">The action to execute against 
+		/// each mock.</param>
+		protected virtual void VerifyMocks(Action<IMock> verifyAction)
+		{
+			StringBuilder message = new StringBuilder();
+
+			foreach (var mock in mocks)
+			{
+				try
+				{
+					verifyAction(mock);
+				}
+				catch (MockVerificationException mve)
+				{
+					message.AppendLine(mve.GetRawExpectations());
+				}
+			}
+
+			if (message.ToString().Length > 0)
+				throw new MockException(MockException.ExceptionReason.VerificationFailed,
+					String.Format(Properties.Resources.VerficationFailed, message));
 		}
 	}
 }
