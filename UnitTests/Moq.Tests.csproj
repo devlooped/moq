@@ -76,7 +76,7 @@
   </ItemGroup>
   <ItemGroup>
     <Compile Include="AsInterfaceFixture.cs" />
-    <Compile Include="AutoMockHierarchiesFixture.cs" />
+    <Compile Include="RecursiveMocksFixture.cs" />
     <Compile Include="CallbacksFixture.cs" />
     <Compile Include="EmptyDefaultValueProviderFixture.cs" />
     <Compile Include="MatcherAttributeFixture.cs" />

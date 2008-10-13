@@ -3,7 +3,7 @@ using Xunit;
 
 namespace Moq.Tests
 {
-	public class AutoMockHierarchiesFixture
+	public class RecursiveMocksFixture
 	{
 		[Fact]
 		public void CreatesMockForAccessedProperty()
@@ -115,6 +115,39 @@ namespace Moq.Tests
 			var bar = mock.Object.Bar;
 
 			Assert.Throws<MockVerificationException>(() => mock.Verify());
+		}
+
+		[Fact]
+		public void VerifiesHierarchyMethodWithExpression()
+		{
+			var mock = new Mock<IFoo>();
+
+			Assert.Throws<MockException>(() => mock.Verify(m => m.Bar.Do("ping")));
+
+			mock.Object.Bar.Do("ping");
+			mock.Verify(m => m.Bar.Do("ping"));
+		}
+
+		[Fact]
+		public void VerifiesHierarchyPropertyGetWithExpression()
+		{
+			var mock = new Mock<IFoo>();
+
+			Assert.Throws<MockException>(() => mock.VerifyGet(m => m.Bar.Value));
+
+			var value = mock.Object.Bar.Value;
+			mock.VerifyGet(m => m.Bar.Value);
+		}
+
+		[Fact]
+		public void VerifiesHierarchyPropertySetWithExpression()
+		{
+			var mock = new Mock<IFoo>();
+
+			Assert.Throws<MockException>(() => mock.VerifySet(m => m.Bar.Value));
+
+			mock.Object.Bar.Value = 5;
+			mock.VerifySet(m => m.Bar.Value);
 		}
 
 		[Fact]
