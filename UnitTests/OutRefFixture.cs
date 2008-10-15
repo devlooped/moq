@@ -20,6 +20,23 @@ namespace Moq.Tests
 		}
 
 		[Fact]
+		public void ExpectsOutEagerlyEvaluates()
+		{
+			var mock = new Mock<IFoo>();
+			string expected = "ack";
+
+			mock.Expect(m => m.Execute("ping", out expected)).Returns(true);
+
+			expected = "foo";
+
+			string actual;
+			bool ok = mock.Object.Execute("ping", out actual);
+
+			Assert.True(ok);
+			Assert.Equal("ack", actual);
+		}
+
+		[Fact]
 		public void ExpectsRefArgument()
 		{
 			var mock = new Mock<IFoo>();

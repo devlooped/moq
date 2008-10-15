@@ -60,7 +60,7 @@ namespace Moq
 		MockedEvent mockEvent;
 		Delegate mockEventArgsFunc;
 		int? expectedCallCount = null;
-		List<KeyValuePair<int, Expression>> outValues = new List<KeyValuePair<int, Expression>>();
+		List<KeyValuePair<int, object>> outValues = new List<KeyValuePair<int, object>>();
 
 		public bool IsVerifiable { get; set; }
 		public bool IsNever { get; set; }
@@ -79,7 +79,13 @@ namespace Moq
 				var argument = arguments[i];
 				if (parameter.IsOut)
 				{
-					outValues.Add(new KeyValuePair<int, Expression>(i, argument));
+					//changed to eager-evaluate.
+					//outValues.Add(new KeyValuePair<int, Expression>(i, argument));
+					var value = argument.PartialEval();
+					if (value.NodeType == ExpressionType.Constant)
+						outValues.Add(new KeyValuePair<int, object>(i, ((ConstantExpression)value).Value));
+					else
+						throw new NotSupportedException("Out expression must evaluate to a constant value.");
 				}
 				else if (parameter.ParameterType.IsByRef)
 				{
@@ -87,7 +93,7 @@ namespace Moq
 					if (value.NodeType == ExpressionType.Constant)
 						argumentMatchers.Add(new RefMatcher(((ConstantExpression)value).Value));
 					else
-						throw new NotSupportedException();
+						throw new NotSupportedException("Ref expression must evaluate to a constant value.");
 				}
 				else
 				{
@@ -100,11 +106,9 @@ namespace Moq
 		{
 			foreach (var item in outValues)
 			{
-				var value = item.Value.PartialEval();
-				if (value.NodeType == ExpressionType.Constant)
-					call.SetArgumentValue(item.Key, ((ConstantExpression)value).Value);
-				else
-					throw new NotSupportedException();
+				// it's already evaluated here
+				// TODO: refactor so that we 
+				call.SetArgumentValue(item.Key, item.Value);
 			}
 		}
 
