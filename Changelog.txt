@@ -3,7 +3,7 @@ Version 2.6
     * Added support for stubbing properties from moq-contrib: now you can do mock.Stub(m => m.Value) and add stub behavior to the property. mock.StubAll() is also provided. This integrates with the DefaultValue behavior too, so you can stub entire hierarchies :).
     * Added support for mocking methods with out and ref parameters (Issue #50)
     * Applied patch contributed by slava for Issue #72: add support to limit numbor of calls on mocked method (we now have mock.Expect(...).AtMost(5))
-    * Implemented Issue #94: Easier setter verification: Now we support ExpectSet(m => m.Value, "foo") and VerifySet(m => m.Value, 5)
+    * Implemented Issue #94: Easier setter verification: Now we support ExpectSet(m => m.Value, "foo") and VerifySet(m => m.Value, 5) (Thanks ASP.NET MVC Team!)
     * Implemented issue #96: Automatically chain mocks when setting expectations. It's now possible to specify expectations for an entire hierarchy of objects just starting from the root mock. THIS IS REALLY COOL!!!
     * Fixed Issue #89: Expects() does not always return last expectation
     * Implemented Issue 91: Expect a method/property to never be called (added Never() method to an expectation. Can be used on methods, property getters and setters)
