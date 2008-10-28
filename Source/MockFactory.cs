@@ -132,7 +132,7 @@ namespace Moq
 	/// <seealso cref="MockBehavior"/>
 	public class MockFactory
 	{
-		List<IMock> mocks = new List<IMock>();
+		List<Mock> mocks = new List<Mock>();
 		MockBehavior defaultBehavior;
 
 		/// <summary>
@@ -163,7 +163,7 @@ namespace Moq
 		/// Gets the mocks that have been created by this factory and 
 		/// that will get verified together.
 		/// </summary>
-		protected IEnumerable<IMock> Mocks { get { return mocks; } }
+		protected internal IEnumerable<Mock> Mocks { get { return mocks; } }
 
 		/// <summary>
 		/// Creates a new mock with the default <see cref="MockBehavior"/> 
@@ -292,28 +292,6 @@ namespace Moq
 		}
 
 		/// <summary>
-		/// Verifies all verifiable expectations on all mocks created 
-		/// by this factory.
-		/// </summary>
-		/// <seealso cref="Mock{T}.Verify()"/>
-		/// <exception cref="MockException">One or more mocks had expectations that were not satisfied.</exception>
-		public virtual void Verify()
-		{
-			VerifyMocks(verifiable => verifiable.Verify());
-		}
-
-		/// <summary>
-		/// Verifies all verifiable expectations on all mocks created 
-		/// by this factory.
-		/// </summary>
-		/// <seealso cref="Mock{T}.Verify()"/>
-		/// <exception cref="MockException">One or more mocks had expectations that were not satisfied.</exception>
-		public virtual void VerifyAll()
-		{
-			VerifyMocks(verifiable => verifiable.VerifyAll());
-		}
-
-		/// <summary>
 		/// Invokes <paramref name="verifyAction"/> for each mock 
 		/// in <see cref="Mocks"/>, and accumulates the resulting 
 		/// <see cref="MockVerificationException"/> that might be 
@@ -321,7 +299,7 @@ namespace Moq
 		/// </summary>
 		/// <param name="verifyAction">The action to execute against 
 		/// each mock.</param>
-		protected virtual void VerifyMocks(Action<IMock> verifyAction)
+		protected virtual void VerifyMocks(Action<Mock> verifyAction)
 		{
 			StringBuilder message = new StringBuilder();
 

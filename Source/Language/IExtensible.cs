@@ -43,24 +43,13 @@ using System.ComponentModel;
 namespace Moq.Language
 {
 	/// <summary>
-	/// Defines the <c>Verifiable</c> verb.
+	/// Hook interface for extensions to plug in, after the 
+	/// built-in language flow of Moq has ended. Extension assemblies can 
+	/// provide extension methods on top of this interface to 
+	/// plug in additional behavior.
 	/// </summary>
 	[EditorBrowsable(EditorBrowsableState.Never)]
-	public interface IVerifies : IHideObjectMembers
+	public interface IExtensible : IHideObjectMembers
 	{
-		/// <summary>
-		/// Marks the expectation as verifiable, meaning that a call 
-		/// to <see cref="Mock{T}.Verify()"/> will check if this particular 
-		/// expectation was met.
-		/// </summary>
-		/// <example>
-		/// The following example marks the expectation as verifiable:
-		/// <code>
-		/// mock.Expect(x => x.Execute("ping"))
-		///     .Returns(true)
-		///     .Verifiable();
-		/// </code>
-		/// </example>
-		void Verifiable();
 	}
 }

@@ -51,7 +51,7 @@ namespace Moq
 	/// apply to mocked objects, such as <see cref="Get"/> to 
 	/// retrieve a <see cref="Mock{T}"/> from an object instance.
 	/// </summary>
-	public abstract class Mock : IMock, IHideObjectMembers
+	public abstract class Mock : IHideObjectMembers
 	{
 		/// <summary>
 		/// Retrieves the mock object for the given object instance.
@@ -78,7 +78,7 @@ namespace Moq
 		///     .Returns(tempUrl);
 		/// </code>
 		/// </example>
-		public static IMock<T> Get<T>(T mocked)
+		public static Mock<T> Get<T>(T mocked)
 			where T : class
 		{
 			if (mocked is IMocked<T>)
@@ -100,7 +100,7 @@ namespace Moq
 					var asInterface = asMethod.MakeGenericMethod(typeof(T));
 					var asMock = asInterface.Invoke(mock, null);
 
-					return (IMock<T>)asMock;
+					return (Mock<T>)asMock;
 				}
 				else
 				{
@@ -127,7 +127,11 @@ namespace Moq
 			}
 		}
 
-		DefaultValue defaultValue;
+		bool callBase = false;
+		DefaultValue defaultValue = DefaultValue.Empty;
+		IDefaultValueProvider defaultValueProvider = new EmptyDefaultValueProvider();
+		List<Type> implementedInterfaces = new List<Type>();
+		Dictionary<MethodInfo, Mock> innerMocks = new Dictionary<MethodInfo, Mock>();
 		Dictionary<EventInfo, List<Delegate>> invocationLists = new Dictionary<EventInfo, List<Delegate>>();
 
 		//static MethodInfo genericSetupExpectVoid;
@@ -140,48 +144,39 @@ namespace Moq
 		//    genericSetupExpectVoid = typeof(Mock).GetMethod("SetupExpect
 		//}
 
-		/// <summary>
-		/// Initializes the mock
-		/// </summary>
-		protected Mock()
-		{
-			this.CallBase = false;
-			this.DefaultValue = DefaultValue.Empty;
-			ImplementedInterfaces = new List<Type>();
-			InnerMocks = new Dictionary<MethodInfo, Mock>();
-		}
-
-		internal Interceptor Interceptor { get; set; }
-		internal Dictionary<MethodInfo, Mock> InnerMocks { get; set; }
+		internal virtual Interceptor Interceptor { get; set; }
+		internal virtual Dictionary<MethodInfo, Mock> InnerMocks { get { return innerMocks; } set { innerMocks = value; } }
 
 		/// <summary>
 		/// Exposes the list of extra interfaces implemented by the mock.
 		/// </summary>
-		protected internal List<Type> ImplementedInterfaces { get; private set; }
+		protected internal List<Type> ImplementedInterfaces { get { return implementedInterfaces; } }
 
 		/// <summary>
-		/// Implements <see cref="IMock{T}.Behavior"/>.
+		/// Behavior of the mock, according to the value set in the constructor.
 		/// </summary>
-		public MockBehavior Behavior { get; internal set; }
+		public virtual MockBehavior Behavior { get; internal set; }
 
 		/// <summary>
-		/// Implements <see cref="IMock.CallBase"/>.
+		/// Whether the base member virtual implementation will be called 
+		/// for mocked classes if no expectation is met. Defaults to <see langword="true"/>.
 		/// </summary>
-		public bool CallBase { get; set; }
+		public virtual bool CallBase { get { return callBase; } set { callBase = value; } }
 
 		/// <summary>
-		/// Implements <see cref="IMock{T}.DefaultValue"/>.
+		/// Specifies the behavior to use when returning default values for 
+		/// unexpected invocations on loose mocks.
 		/// </summary>
-		public DefaultValue DefaultValue
+		public virtual DefaultValue DefaultValue
 		{
 			get { return defaultValue; }
 			set
 			{
 				defaultValue = value;
 				if (defaultValue == DefaultValue.Mock)
-					DefaultValueProvider = new MockDefaultValueProvider(this);
+					defaultValueProvider = new MockDefaultValueProvider(this);
 				else
-					DefaultValueProvider = new EmptyDefaultValueProvider();
+					defaultValueProvider = new EmptyDefaultValueProvider();
 			}
 		}
 
@@ -191,10 +186,10 @@ namespace Moq
 		/// have no expectations and need to return a default 
 		/// value (for loose mocks).
 		/// </summary>
-		internal IDefaultValueProvider DefaultValueProvider { get; private set; }
+		internal IDefaultValueProvider DefaultValueProvider { get { return defaultValueProvider; } }
 
 		/// <summary>
-		/// The mocked object instance. Implements <see cref="IMock.Object"/>.
+		/// Gets the mocked object instance.
 		/// </summary>
 		public object Object { get { return GetObject(); } }
 
@@ -210,58 +205,6 @@ namespace Moq
 		internal abstract Type MockedType { get; }
 
 		#region Verify
-
-		/// <summary>
-		/// Implements <see cref="IMock.Verify"/>.
-		/// </summary>
-		public abstract void Verify();
-
-		/// <summary>
-		/// Implements <see cref="IMock.VerifyAll"/>.
-		/// </summary>
-		public abstract void VerifyAll();
-
-		internal static void Verify(Interceptor interceptor)
-		{
-			// Made static so it can be called from As<TInterface>
-			try
-			{
-				interceptor.Verify();
-				foreach (var mock in interceptor.Mock.InnerMocks.Values)
-				{
-					mock.Verify();
-				}
-			}
-			catch (Exception ex)
-			{
-				// Rethrow resetting the call-stack so that 
-				// callers see the exception as happening at 
-				// this call site.
-				// TODO: see how to mangle the stacktrace so 
-				// that the mock doesn't even show up there.
-				throw ex;
-			}
-		}
-
-		internal static void VerifyAll(Interceptor interceptor)
-		{
-			// Made static so it can be called from As<TInterface>
-			try
-			{
-				interceptor.VerifyAll();
-				foreach (var mock in interceptor.Mock.InnerMocks.Values)
-				{
-					mock.VerifyAll();
-				}
-			}
-			catch (Exception ex)
-			{
-				// Rethrow resetting the call-stack so that 
-				// callers see the exception as happening at 
-				// this call site.
-				throw ex;
-			}
-		}
 
 		internal static void Verify<T, TResult>(Expression<Func<T, TResult>> expression, Interceptor interceptor)
 		{
@@ -648,18 +591,71 @@ namespace Moq
 		}
 
 		/// <summary>
-		/// Implements <see cref="IMock.CreateEventHandler{TEventArgs}()"/>.
+		/// Creates a handler that can be associated to an event receiving 
+		/// the given <typeparamref name="TEventArgs"/> and can be used 
+		/// to raise the event.
 		/// </summary>
-		/// <typeparam name="TEventArgs">Type of event argument class.</typeparam>
-		public MockedEvent<TEventArgs> CreateEventHandler<TEventArgs>() where TEventArgs : EventArgs
+		/// <typeparam name="TEventArgs">Type of <see cref="EventArgs"/> 
+		/// data passed in to the event.</typeparam>
+		/// <example>
+		/// This example shows how to invoke an event with a custom event arguments 
+		/// class in a view that will cause its corresponding presenter to 
+		/// react by changing its state:
+		/// <code>
+		/// var mockView = new Mock&lt;IOrdersView&gt;();
+		/// var mockedEvent = mockView.CreateEventHandler&lt;OrderEventArgs&gt;();
+		/// 
+		/// var presenter = new OrdersPresenter(mockView.Object);
+		/// 
+		/// // Check that the presenter has no selection by default
+		/// Assert.Null(presenter.SelectedOrder);
+		/// 
+		/// // Create a mock event handler of the appropriate type
+		/// var handler = mockView.CreateEventHandler&lt;OrderEventArgs&gt;();
+		/// // Associate it with the event we want to raise
+		/// mockView.Object.Cancel += handler;
+		/// // Finally raise the event with a specific arguments data
+		/// handler.Raise(new OrderEventArgs { Order = new Order("moq", 500) });
+		/// 
+		/// // Now the presenter reacted to the event, and we have a selected order
+		/// Assert.NotNull(presenter.SelectedOrder);
+		/// Assert.Equal("moq", presenter.SelectedOrder.ProductName);
+		/// </code>
+		/// </example>
+		public virtual MockedEvent<TEventArgs> CreateEventHandler<TEventArgs>() where TEventArgs : EventArgs
 		{
 			return new MockedEvent<TEventArgs>(this);
 		}
 
 		/// <summary>
-		/// Implements <see cref="IMock.CreateEventHandler()"/>
+		/// Creates a handler that can be associated to an event receiving 
+		/// a generic <see cref="EventArgs"/> and can be used 
+		/// to raise the event.
 		/// </summary>
-		public MockedEvent<EventArgs> CreateEventHandler()
+		/// <example>
+		/// This example shows how to invoke a generic event in a view that will 
+		/// cause its corresponding presenter to react by changing its state:
+		/// <code>
+		/// var mockView = new Mock&lt;IOrdersView&gt;();
+		/// var mockedEvent = mockView.CreateEventHandler();
+		/// 
+		/// var presenter = new OrdersPresenter(mockView.Object);
+		/// 
+		/// // Check that the presenter is not in the "Canceled" state
+		/// Assert.False(presenter.IsCanceled);
+		/// 
+		/// // Create a mock event handler of the appropriate type
+		/// var handler = mockView.CreateEventHandler();
+		/// // Associate it with the event we want to raise
+		/// mockView.Object.Cancel += handler;
+		/// // Finally raise the event
+		/// handler.Raise(EventArgs.Empty);
+		/// 
+		/// // Now the presenter reacted to the event, and changed its state
+		/// Assert.True(presenter.IsCanceled);
+		/// </code>
+		/// </example>
+		public virtual MockedEvent<EventArgs> CreateEventHandler()
 		{
 			return new MockedEvent<EventArgs>(this);
 		}

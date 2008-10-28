@@ -5,15 +5,15 @@
     <Platform Condition=" '$(Platform)' == '' ">AnyCPU</Platform>
     <ProductVersion>9.0.30729</ProductVersion>
     <SchemaVersion>2.0</SchemaVersion>
-    <ProjectGuid>{81BBC911-4916-4E10-A955-752AE47CB2B9}</ProjectGuid>
+    <ProjectGuid>{6D199BBA-59F8-4440-A98E-AEA377793E86}</ProjectGuid>
     <OutputType>Library</OutputType>
     <AppDesignerFolder>Properties</AppDesignerFolder>
-    <RootNamespace>Moq.Tests</RootNamespace>
-    <AssemblyName>Moq.Tests</AssemblyName>
+    <RootNamespace>Moq.Legacy</RootNamespace>
+    <AssemblyName>Moq.Legacy</AssemblyName>
     <TargetFrameworkVersion>v3.5</TargetFrameworkVersion>
     <FileAlignment>512</FileAlignment>
     <SignAssembly>true</SignAssembly>
-    <AssemblyOriginatorKeyFile>..\Moq.snk</AssemblyOriginatorKeyFile>
+    <AssemblyOriginatorKeyFile>..\..\Moq.snk</AssemblyOriginatorKeyFile>
   </PropertyGroup>
   <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Debug|AnyCPU' ">
     <DebugSymbols>true</DebugSymbols>
@@ -51,70 +51,33 @@
   <ItemGroup>
     <Reference Include="Castle.Core, Version=1.0.3.0, Culture=neutral, PublicKeyToken=407dd0808d44fbdc, processorArchitecture=MSIL">
       <SpecificVersion>False</SpecificVersion>
-      <HintPath>..\Lib\Castle\Castle.Core.dll</HintPath>
+      <HintPath>..\..\Lib\Castle\Castle.Core.dll</HintPath>
     </Reference>
     <Reference Include="Castle.DynamicProxy2, Version=2.0.3.0, Culture=neutral, PublicKeyToken=407dd0808d44fbdc, processorArchitecture=MSIL">
       <SpecificVersion>False</SpecificVersion>
-      <HintPath>..\Lib\Castle\Castle.DynamicProxy2.dll</HintPath>
+      <HintPath>..\..\Lib\Castle\Castle.DynamicProxy2.dll</HintPath>
     </Reference>
     <Reference Include="System" />
     <Reference Include="System.Core">
       <RequiredTargetFramework>3.5</RequiredTargetFramework>
     </Reference>
     <Reference Include="System.Data" />
-    <Reference Include="System.ServiceModel">
-      <RequiredTargetFramework>3.0</RequiredTargetFramework>
-    </Reference>
-    <Reference Include="System.ServiceModel.Web">
-      <RequiredTargetFramework>3.5</RequiredTargetFramework>
-    </Reference>
     <Reference Include="System.Xml" />
-    <Reference Include="xunit, Version=1.0.0.1252, Culture=neutral, PublicKeyToken=8d05b1bb7a6fdb6c, processorArchitecture=MSIL">
-      <SpecificVersion>False</SpecificVersion>
-      <HintPath>..\Lib\xUnit\xunit.dll</HintPath>
-    </Reference>
   </ItemGroup>
   <ItemGroup>
-    <Compile Include="AsInterfaceFixture.cs" />
-    <Compile Include="RecursiveMocksFixture.cs" />
-    <Compile Include="CallbacksFixture.cs" />
-    <Compile Include="EmptyDefaultValueProviderFixture.cs" />
-    <Compile Include="MatcherAttributeFixture.cs" />
-    <Compile Include="Demo.cs" />
-    <Compile Include="ExpressionExtensionsFixture.cs" />
-    <Compile Include="ExtensibilityFixture.cs" />
-    <Compile Include="AdvancedMatcherAttributeFixture.cs" />
-    <Compile Include="MatchersFixture.cs" />
-    <Compile Include="Matchers\AnyMatcherFixture.cs" />
-    <Compile Include="MockBehaviorFixture.cs" />
-    <Compile Include="MockDefaultValueProviderFixture.cs" />
-    <Compile Include="MockedFixture.cs" />
-    <Compile Include="MockedEventsFixture.cs" />
-    <Compile Include="MockFactoryFixture.cs" />
-    <Compile Include="MockFixture.cs" />
-    <Compile Include="OccurrenceFixture.cs" />
-    <Compile Include="OutRefFixture.cs" />
-    <Compile Include="ProtectedMockFixture.cs" />
+    <Compile Include="MockExtensions.cs" />
+    <Compile Include="MockFactoryExtensions.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
-    <Compile Include="Regressions\ArgumentTypeFixture.cs" />
-    <Compile Include="Regressions\IssueReportsFixture.cs" />
-    <Compile Include="Regressions\StreamFixture.cs" />
-    <Compile Include="ReturnsFixture.cs" />
-    <Compile Include="StubExtensionsFixture.cs" />
-    <Compile Include="VerifyFixture.cs" />
+    <Compile Include="VerifiableExtension.cs" />
   </ItemGroup>
   <ItemGroup>
-    <ProjectReference Include="..\Legacy\Moq.Legacy\Moq.Legacy.csproj">
-      <Project>{6D199BBA-59F8-4440-A98E-AEA377793E86}</Project>
-      <Name>Moq.Legacy</Name>
-    </ProjectReference>
-    <ProjectReference Include="..\Source\Moq.csproj">
+    <ProjectReference Include="..\..\Source\Moq.csproj">
       <Project>{1C91AC30-5977-4BE5-BA67-8EB186C03514}</Project>
       <Name>Moq</Name>
     </ProjectReference>
   </ItemGroup>
   <ItemGroup>
-    <None Include="..\Moq.snk">
+    <None Include="..\..\Moq.snk">
       <Link>Moq.snk</Link>
     </None>
   </ItemGroup>
@@ -126,11 +89,4 @@
   <Target Name="AfterBuild">
   </Target>
   -->
-  <UsingTask AssemblyFile="$(MSBuildProjectPath)..\Lib\xUnit\xunitext.runner.msbuild.dll" TaskName="XunitExt.Runner.MSBuild.xunit" />
-  <Target Name="AfterBuild" Condition=" '$(Configuration)' == 'Release' ">
-    <!-- Run xUnit tests -->
-    <Copy SourceFiles="$(MSBuildProjectPath)..\Lib\xUnit\xunit.dll" DestinationFolder="$(OutDir)" />
-    <xunit Assembly="@(MainAssembly)" />
-    <Delete Files="$(OutDir)\xunit.dll" />
-  </Target>
 </Project>

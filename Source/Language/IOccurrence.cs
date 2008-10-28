@@ -58,7 +58,7 @@ namespace Moq.Language
 		///     .AtMostOnce();
 		/// </code>
 		/// </example>
-		IVerifies AtMostOnce();
+		IExtensible AtMostOnce();
 		/// <summary>
 		/// The expected invocation can happen at most specified number of times.
 		/// </summary>
@@ -69,6 +69,6 @@ namespace Moq.Language
 		///     .AtMost( 5 );
 		/// </code>
 		/// </example>
-		IVerifies AtMost( int callCount);
+		IExtensible AtMost( int callCount);
 	}
 }

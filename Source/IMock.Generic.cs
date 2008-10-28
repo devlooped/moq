@@ -242,16 +242,6 @@ namespace Moq
 		IExpectSetter<TProperty> ExpectSet<TProperty>(Expression<Func<T, TProperty>> expression, TProperty value);
 
 		/// <summary>
-		/// Implements <see cref="IMock.Verify"/>.
-		/// </summary>
-		void Verify();
-
-		/// <summary>
-		/// Implements <see cref="IMock.VerifyAll"/>.
-		/// </summary>
-		void VerifyAll();
-
-		/// <summary>
 		/// Verifies that a specific invocation matching the given 
 		/// expression was performed on the mock. Use in conjuntion 
 		/// with the default <see cref="MockBehavior.Loose"/>.

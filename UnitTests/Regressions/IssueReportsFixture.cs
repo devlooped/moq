@@ -299,7 +299,7 @@ namespace Moq.Tests.Regressions
 
 		// run "netsh http add urlacl url=http://+:7777/ user=[domain]\[user]"
 		// to avoid running the test as an admin
-		[Fact]
+		[Fact(Skip="Doesn't work in Mono")]
 		public void ProxiesAndHostsWCF()
 		{
 #if DEBUG
@@ -315,7 +315,7 @@ namespace Moq.Tests.Regressions
 
 		// run "netsh http add urlacl url=http://+:7777/ user=[domain]\[user]"
 		// to avoid running the test as an admin
-		[Fact]
+		[Fact(Skip="Doesn't work in Mono")]
 		public void ProxiesAndHostsWCFMock()
 		{
 			//var generator = new Castle.DynamicProxy.ProxyGenerator();

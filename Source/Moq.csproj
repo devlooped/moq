@@ -76,7 +76,6 @@
   <ItemGroup>
     <Compile Include="EmptyDefaultValueProvider.cs" />
     <Compile Include="ExpectKind.cs" />
-    <Compile Include="IMock.Generic.cs" />
     <Compile Include="Language\Flow\IReturnsResult.cs" />
     <Compile Include="Language\IRaise.cs" />
     <Compile Include="MatcherAttribute.cs" />
@@ -102,7 +101,7 @@
     <Compile Include="Language\IReturns.cs" />
     <Compile Include="It.cs" />
     <Compile Include="Language\IThrows.cs" />
-    <Compile Include="Language\IVerifies.cs" />
+    <Compile Include="Language\IExtensible.cs" />
     <Compile Include="AdvancedMatcherAttribute.cs" />
     <Compile Include="MatcherFactory.cs" />
     <Compile Include="Matchers\AnyMatcher.cs" />
@@ -144,7 +143,6 @@
     </None>
     <Compile Include="DefaultValue.cs" />
     <Compile Include="IDefaultValueProvider.cs" />
-    <Compile Include="IMock.cs" />
     <Compile Include="Language\INever.cs" />
     <Compile Include="Matchers\RefMatcher.cs" />
     <Compile Include="Mock.Generic.cs" />

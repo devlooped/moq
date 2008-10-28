@@ -126,13 +126,13 @@ namespace Moq.Stub
 
 		/// <summary>
 		/// Stubs all properties on the mock, setting the default value to 
-		/// the one generated as specified by the <see cref="IMock.DefaultValue"/> 
+		/// the one generated as specified by the <see cref="Mock.DefaultValue"/> 
 		/// property.
 		/// </summary>
 		/// <typeparam name="T">Mocked type, typically omitted as it can be inferred from the mock argument.</typeparam>
 		/// <param name="mock">The mock to stub.</param>
 		/// <remarks>
-		/// If the mock <see cref="IMock.DefaultValue"/> is set to <see cref="DefaultValue.Mock"/>, 
+		/// If the mock <see cref="Mock.DefaultValue"/> is set to <see cref="DefaultValue.Mock"/>, 
 		/// the mocked default values will also be stubbed recursively.
 		/// </remarks>
 		public static void StubAll<T>(this Mock<T> mock)
