@@ -142,6 +142,7 @@
       <Link>Moq.snk</Link>
     </None>
     <Compile Include="DefaultValue.cs" />
+    <Compile Include="EventInfoCallback.cs" />
     <Compile Include="IDefaultValueProvider.cs" />
     <Compile Include="Language\INever.cs" />
     <Compile Include="Matchers\RefMatcher.cs" />

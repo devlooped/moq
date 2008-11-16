@@ -1,5 +1,6 @@
 ﻿using System;
 using Xunit;
+using System.ComponentModel;
 
 namespace Moq.Tests
 {
@@ -325,7 +326,7 @@ namespace Moq.Tests
 
 			var handler = parent.CreateEventHandler();
 			parent.Object.Event += handler;
-			
+
 			parent.Object.Event += listener;
 
 			handler.Raise(EventArgs.Empty);
@@ -367,11 +368,64 @@ namespace Moq.Tests
 			Assert.False(raisedField);
 		}
 
+		[Fact]
+		public void RaisesEvent()
+		{
+			var mock = new Mock<IAdder<string>>();
+
+			bool raised = false;
+			mock.Object.Added += (sender, args) => raised = true;
+
+			mock.Raise(a => a.Added -= null, EventArgs.Empty);
+
+			Assert.True(raised);
+		}
+
+		[Fact]
+		public void RaisesPropertyChanged()
+		{
+			var mock = new Mock<IParent>();
+
+			var prop = "";
+			mock.Object.PropertyChanged += (sender, args) => prop = args.PropertyName;
+
+			mock.Raise(x => x.PropertyChanged -= null, new PropertyChangedEventArgs("foo"));
+
+			Assert.Equal("foo", prop);
+		}
+
+		[Fact]
+		public void FailsIfArgumentException()
+		{
+			var mock = new Mock<IParent>();
+
+			var prop = "";
+			mock.Object.PropertyChanged += (sender, args) => prop = args.PropertyName;
+
+			Assert.Throws<ArgumentException>(() => mock.Raise(x => x.PropertyChanged -= null, EventArgs.Empty));
+		}
+
+		[Fact]
+		public void RaisesEventOnSubObject()
+		{
+			var mock = new Mock<IParent> { DefaultValue = DefaultValue.Mock };
+
+			bool raised = false;
+			mock.Object.Adder.Added += (sender, args) => raised = true;
+
+			Assert.Same(mock.Object.Adder, mock.Object.Adder);
+
+			mock.Raise(p => p.Adder.Added += null, EventArgs.Empty);
+
+			Assert.True(raised);
+
+		}
+
 		private void OnRaised(object sender, EventArgs e)
 		{
 			raisedField = true;
 		}
-	
+
 		public interface IAdder<T>
 		{
 			event EventHandler Added;
@@ -407,9 +461,11 @@ namespace Moq.Tests
 			event EventHandler Canceled;
 		}
 
-		public interface IParent
+		public interface IParent : INotifyPropertyChanged
 		{
 			event EventHandler<EventArgs> Event;
+			event PropertyChangedEventHandler PropertyChanged;
+			IAdder<int> Adder { get; set; }
 		}
 
 		public interface IDerived : IParent { }

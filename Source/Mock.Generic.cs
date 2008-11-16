@@ -372,7 +372,7 @@ namespace Moq
 
 		#region Verify
 
-		/// <summary>
+        /// <summary>
 		/// Verifies that a specific invocation matching the given 
 		/// expression was performed on the mock. Use in conjuntion 
 		/// with the default <see cref="MockBehavior.Loose"/>.
@@ -666,6 +666,47 @@ namespace Moq
 		}
 
 		#endregion
+
+		/// <summary>
+		/// Raises the event referenced in <paramref name="eventExpression"/> using 
+		/// the given <paramref name="sender"/> and <paramref name="args"/> arguments.
+		/// </summary>
+		/// <exception cref="ArgumentException">The <paramref name="args"/> arguments are 
+		/// invalid for the target event invocation, or the <paramref name="eventExpression"/> is 
+		/// not an event attach or detach expression.</exception>
+		/// <example>
+		/// The following example shows how to raise a <see cref="System.ComponentModel.INotifyPropertyChanged.PropertyChanged"/> event:
+		/// <code>
+		/// var mock = new Mock&lt;IViewModel&gt;();
+		/// 
+		/// mock.Raise(x => x.PropertyChanged -= null, new PropertyChangedEventArgs("Name"));
+		/// </code>
+		/// </example>
+		public void Raise(Action<T> eventExpression, EventArgs args)
+		{
+			using (var callback = new EventInfoCallback())
+			{
+				callback.AddInterceptor(this.Interceptor);
+
+				eventExpression(this.Object);
+
+				if (callback.EventInfo == null)
+					throw new ArgumentException("Expression is not an event attach or detach.");
+
+				var me = new MockedEvent(callback.Mock);
+				me.Event = callback.EventInfo;
+
+				try
+				{
+					me.DoRaise(args);
+				}
+				catch (Exception e)
+				{
+					// Reset stacktrace so user gets this call site only.
+					throw e;
+				}
+			}
+		}
 
 		// NOTE: known issue. See https://connect.microsoft.com/VisualStudio/feedback/ViewFeedback.aspx?FeedbackID=318122
 		//public static implicit operator TInterface(Mock<T> mock)

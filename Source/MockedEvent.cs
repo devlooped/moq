@@ -82,7 +82,7 @@ namespace Moq
 				throw new InvalidOperationException(Properties.Resources.RaisedUnassociatedEvent);
 
 			if (Raised != null)
-				Raised(this, EventArgs.Empty);
+				Raised(this.mock.Object, EventArgs.Empty);
 
 			foreach (var del in mock.GetInvocationList(Event))
 			{

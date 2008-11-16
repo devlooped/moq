@@ -70,6 +70,11 @@ namespace Moq
 		internal IEnumerable<IInvocation> ActualCalls { get { return actualInvocations; } }
 		internal Mock Mock { get { return mock; } }
 
+		/// <summary>
+		/// Used to call back into a caller whenever an event attach/remove is intercepted.
+		/// </summary>
+		internal EventInfoCallback EventCallback { get; set; }
+
 		internal void Verify()
 		{
 			// The IsNever case would have thrown the moment the member is invoked, 
@@ -133,7 +138,7 @@ namespace Moq
 			if (invocation.Method.DeclaringType.IsGenericType &&
 			  invocation.Method.DeclaringType.GetGenericTypeDefinition() == typeof(IMocked<>))
 			{
-				// "Mixin" of IMocked<T>
+				// "Mixin" of IMocked<T> 
 				invocation.ReturnValue = mock;
 				return;
 			}
@@ -150,15 +155,21 @@ namespace Moq
 				var delegateInstance = (Delegate)invocation.Arguments[0];
 				// TODO: validate we can get the event?
 				EventInfo eventInfo = GetEventFromName(invocation.Method.Name.Replace("add_", ""));
-				var mockEvent = delegateInstance.Target as MockedEvent;
 
-				if (mockEvent != null)
+				if (EventCallback != null) EventCallback.SetEvent(mock, eventInfo);
+
+				if (delegateInstance != null)
 				{
-					mockEvent.Event = eventInfo;
-				}
-				else
-				{
-					mock.AddEventHandler(eventInfo, (Delegate)invocation.Arguments[0]);
+					var mockEvent = delegateInstance.Target as MockedEvent;
+
+					if (mockEvent != null)
+					{
+						mockEvent.Event = eventInfo;
+					}
+					else
+					{
+						mock.AddEventHandler(eventInfo, (Delegate)invocation.Arguments[0]);
+					}
 				}
 
 				return;
@@ -168,15 +179,21 @@ namespace Moq
 				var delegateInstance = (Delegate)invocation.Arguments[0];
 				// TODO: validate we can get the event?
 				EventInfo eventInfo = GetEventFromName(invocation.Method.Name.Replace("remove_", ""));
-				var mockEvent = delegateInstance.Target as MockedEvent;
 
-				if (mockEvent != null)
+				if (EventCallback != null) EventCallback.SetEvent(mock, eventInfo);
+
+				if (delegateInstance != null)
 				{
-					mockEvent.Event = null;
-				}
-				else
-				{
-					mock.RemoveEventHandler(eventInfo, (Delegate)invocation.Arguments[0]);
+					var mockEvent = delegateInstance.Target as MockedEvent;
+
+					if (mockEvent != null)
+					{
+						mockEvent.Event = null;
+					}
+					else
+					{
+						mock.RemoveEventHandler(eventInfo, (Delegate)invocation.Arguments[0]);
+					}
 				}
 
 				return;
@@ -229,6 +246,12 @@ namespace Moq
 				if (behavior == MockBehavior.Loose)
 				{
 					invocation.ReturnValue = mock.DefaultValueProvider.ProvideDefault(invocation.Method, invocation.Arguments);
+
+					// Event callbacks may need to be set if the returned value is a mock.
+					if (invocation.ReturnValue is IMocked && EventCallback != null)
+					{
+						EventCallback.AddInterceptor(((IMocked)invocation.ReturnValue).Mock.Interceptor);
+					}
 				}
 				else
 				{
