@@ -54,10 +54,33 @@ namespace Moq.Protected
 	/// <see cref="It"/> for protected expectations.</para>
 	/// This class allows the expectation to match a method invocation 
 	/// with an arbitrary value, with a value in a specified range, or 
-	/// even one that matches a given predicate.
+	/// even one that matches a given predicate, or null.
 	/// </remarks>
 	public static class ItExpr
 	{
+		/// <summary>
+		/// Matches a null value of the given <paramref name="TValue"/> type.
+		/// </summary>
+		/// <remarks>
+		/// Required for protected mocks as the null value cannot be used 
+		/// directly as it prevents proper method overload selection.
+		/// </remarks>
+		/// <example>
+		/// <code>
+		/// // Throws an exception for a call to Remove with a null string value.
+		/// mock.Protected()
+		///     .Expect("Remove", ItExpr.IsNull&lt;string&gt;())
+		///     .Throws(new InvalidOperationException());
+		/// </code>
+		/// </example>
+		/// <typeparam name="TValue">Type of the value.</typeparam>
+		public static Expression IsNull<TValue>()
+		{
+			Expression<Func<TValue>> expr = () => It.Is<TValue>(v => Object.Equals(v, default(TValue)));
+
+			return expr.Body;
+		}
+
 		/// <summary>
 		/// Matches any value of the given <paramref name="TValue"/> type.
 		/// </summary>

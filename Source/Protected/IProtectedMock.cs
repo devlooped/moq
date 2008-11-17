@@ -55,7 +55,8 @@ namespace Moq.Protected
 		/// arguments for the method call.
 		/// </summary>
 		/// <param name="voidMethodName">Name of the void method to be invoke.</param>
-		/// <param name="args">Optional arguments for the invocation.</param>
+		/// <param name="args">Optional arguments for the invocation. If argument matchers are used, 
+		/// remember to use <see cref="ItExpr"/> rather than <see cref="It"/>.</param>
 		IExpect Expect(string voidMethodName, params object[] args);
 
 		/// <summary>
@@ -64,7 +65,8 @@ namespace Moq.Protected
 		/// arguments for the method call.
 		/// </summary>
 		/// <param name="methodOrPropertyName">Name of the method or property to be invoke.</param>
-		/// <param name="args">Optional arguments for the invocation.</param>
+		/// <param name="args">Optional arguments for the invocation. If argument matchers are used, 
+		/// remember to use <see cref="ItExpr"/> rather than <see cref="It"/>.</param>
 		/// <typeparam name="TResult">Return type of the method or property.</typeparam>
 		IExpect<TResult> Expect<TResult>(string methodOrPropertyName, params object[] args);
 
@@ -74,7 +76,7 @@ namespace Moq.Protected
 		/// </summary>
 		/// <param name="propertyName">Name of the property.</param>
 		/// <typeparam name="TProperty">Type of the property.</typeparam>
-		IExpectGetter<TProperty> ExpectGet<TProperty>(string propertyName/*, params object[] args*/);
+		IExpectGetter<TProperty> ExpectGet<TProperty>(string propertyName);
 
 		/// <summary>
 		/// Sets an expectation on a property setter with the given 
@@ -82,6 +84,6 @@ namespace Moq.Protected
 		/// </summary>
 		/// <param name="propertyName">Name of the property.</param>
 		/// <typeparam name="TProperty">Type of the property.</typeparam>
-		IExpectSetter<TProperty> ExpectSet<TProperty>(string propertyName/*, params object[] args*/);
+		IExpectSetter<TProperty> ExpectSet<TProperty>(string propertyName);
 	}
 }

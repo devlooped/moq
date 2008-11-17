@@ -201,7 +201,7 @@ namespace Moq.Protected
 				{
 					if (arg == null)
 					{
-						yield return null;
+						throw new ArgumentException("Use ItExpr.IsNull<TValue> rather than a null argument value, as it prevents proper method lookup.");
 					}
 					else
 					{
@@ -246,6 +246,10 @@ namespace Moq.Protected
 						}
 					}
 				}
+			}
+			else
+			{
+				throw new ArgumentException("Use ItExpr.IsNull<TValue> rather than a null argument value, as it prevents proper method lookup.");
 			}
 		}
 

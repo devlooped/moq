@@ -222,15 +222,33 @@ namespace Moq.Tests
 		}
 
 		[Fact]
+		public void NullIsInvalidForArgument()
+		{
+			var mock = new Mock<FooBase>();
+
+			Assert.Throws<ArgumentException>(() => mock.Protected()
+				.Expect<string>("StringArg", null)
+				.Returns("null"));
+		}
+
+		[Fact]
 		public void ShouldAllowMatchersForArg()
 		{
 			var mock = new Mock<FooBase>();
+
+			mock.Protected()
+				.Expect<string>("StringArg", ItExpr.IsNull<string>())
+				.Returns("null");
+
+			Assert.Equal("null", mock.Object.DoStringArg(null));
+
 
 			mock.Protected()
 				.Expect<string>("StringArg", ItExpr.Is<string>(s => s == "bar"))
 				.Returns("baz");
 
 			Assert.Equal("baz", mock.Object.DoStringArg("bar"));
+
 
 			mock = new Mock<FooBase>();
 
