@@ -682,6 +682,25 @@ namespace Moq
 		/// mock.Raise(x => x.PropertyChanged -= null, new PropertyChangedEventArgs("Name"));
 		/// </code>
 		/// </example>
+		/// <example>
+		/// This example shows how to invoke an event with a custom event arguments 
+		/// class in a view that will cause its corresponding presenter to 
+		/// react by changing its state:
+		/// <code>
+		/// var mockView = new Mock&lt;IOrdersView&gt;();
+		/// var presenter = new OrdersPresenter(mockView.Object);
+		/// 
+		/// // Check that the presenter has no selection by default
+		/// Assert.Null(presenter.SelectedOrder);
+		/// 
+		/// // Raise the event with a specific arguments data
+		/// mockView.Raise(v => v.SelectionChanged += null, new OrderEventArgs { Order = new Order("moq", 500) });
+		/// 
+		/// // Now the presenter reacted to the event, and we have a selected order
+		/// Assert.NotNull(presenter.SelectedOrder);
+		/// Assert.Equal("moq", presenter.SelectedOrder.ProductName);
+		/// </code>
+		/// </example>
 		public void Raise(Action<T> eventExpression, EventArgs args)
 		{
 			using (var callback = new EventInfoCallback())
@@ -691,7 +710,7 @@ namespace Moq
 				eventExpression(this.Object);
 
 				if (callback.EventInfo == null)
-					throw new ArgumentException("Expression is not an event attach or detach.");
+					throw new ArgumentException("Expression is not an event attach or detach, or event is defined on a class but was not marked virtual.");
 
 				var me = new MockedEvent(callback.Mock);
 				me.Event = callback.EventInfo;

@@ -43,6 +43,7 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Linq.Expressions;
 using System.Reflection;
+using System.ComponentModel;
 
 namespace Moq
 {
@@ -622,6 +623,7 @@ namespace Moq
 		/// Assert.Equal("moq", presenter.SelectedOrder.ProductName);
 		/// </code>
 		/// </example>
+		[EditorBrowsable(EditorBrowsableState.Never)] // TODO: remove on v3.5
 		public virtual MockedEvent<TEventArgs> CreateEventHandler<TEventArgs>() where TEventArgs : EventArgs
 		{
 			return new MockedEvent<TEventArgs>(this);
@@ -655,6 +657,7 @@ namespace Moq
 		/// Assert.True(presenter.IsCanceled);
 		/// </code>
 		/// </example>
+		[EditorBrowsable(EditorBrowsableState.Never)] // TODO: remove on v3.5
 		public virtual MockedEvent<EventArgs> CreateEventHandler()
 		{
 			return new MockedEvent<EventArgs>(this);

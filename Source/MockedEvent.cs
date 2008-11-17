@@ -40,6 +40,7 @@
 
 using System;
 using System.Reflection;
+using System.ComponentModel;
 
 namespace Moq
 {
@@ -47,6 +48,7 @@ namespace Moq
 	/// Represents a generic event that has been mocked and can 
 	/// be rised.
 	/// </summary>
+	[EditorBrowsable(EditorBrowsableState.Never)] // TODO: remove from v3.5
 	public class MockedEvent
 	{
 		/// <summary>

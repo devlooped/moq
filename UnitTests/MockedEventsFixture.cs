@@ -421,6 +421,24 @@ namespace Moq.Tests
 
 		}
 
+		[Fact]
+		public void EventRaisingFailsOnClasses()
+		{
+			var mock = new Mock<WithEvent>();
+
+			var raised = false;
+			mock.Object.Event += delegate { raised = true; };
+
+			mock.Raise(x => x.Event += null, EventArgs.Empty);
+
+			Assert.True(raised);
+		}
+
+		public class WithEvent
+		{
+			public virtual event EventHandler Event;
+		}
+
 		private void OnRaised(object sender, EventArgs e)
 		{
 			raisedField = true;
