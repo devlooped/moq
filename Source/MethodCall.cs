@@ -40,6 +40,7 @@
 
 using System;
 using System.Collections.Generic;
+using System.Linq;
 using System.Linq.Expressions;
 using System.Reflection;
 using Castle.Core.Interceptor;
@@ -233,7 +234,32 @@ namespace Moq
 
 		protected virtual void SetCallbackWithArguments(Delegate callback)
 		{
+			var expectedParams = this.method.GetParameters();
+			var actualParams = callback.Method.GetParameters();
+
+			if (expectedParams.Length == actualParams.Length)
+			{
+				for (int i = 0; i < expectedParams.Length; i++)
+				{
+					if (expectedParams[i].ParameterType != actualParams[i].ParameterType)
+						ThrowParameterMismatch(expectedParams, actualParams);			
+				}
+			}
+			else
+			{
+				ThrowParameterMismatch(expectedParams, actualParams);
+			}
+
 			this.callback = delegate(object[] args) { callback.InvokePreserveStack(args); };
+		}
+
+		private void ThrowParameterMismatch(ParameterInfo[] expected, ParameterInfo[] actual)
+		{
+			throw new ArgumentException(String.Format(
+				"Invalid callback. Expectation on method with parameters ({0}) cannot invoke callback with parameters ({1}).", 
+				String.Join(",", expected.Select(p => p.ParameterType.Name).ToArray()),
+				String.Join(",", actual.Select(p => p.ParameterType.Name).ToArray())
+			));
 		}
 
 		public void Verifiable()

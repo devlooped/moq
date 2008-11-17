@@ -1,4 +1,5 @@
 ﻿using Xunit;
+using System;
 
 namespace Moq.Tests
 {
@@ -35,6 +36,16 @@ namespace Moq.Tests
 
 			mock.Object.Submit("blah");
 			Assert.True(called);
+		}
+
+		[Fact]
+		public void FriendlyErrorWhenCallbackArgumentCountNotMatch()
+		{
+			var mock = new Mock<IFoo>();
+
+			Assert.Throws<ArgumentException>(() => 
+				mock.Expect(x => x.Submit(It.IsAny<string>()))
+					.Callback((string s1, string s2) => System.Console.WriteLine(s1 + s2)));
 		}
 
 		[Fact]
