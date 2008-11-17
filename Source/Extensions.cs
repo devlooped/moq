@@ -126,5 +126,27 @@ namespace Moq
 				typeToMock.IsAbstract ||
 				!typeToMock.IsSealed;
 		}
+
+		public static bool CanOverrideGet(this PropertyInfo property)
+		{
+			if (property.CanRead)
+			{
+				var getter = property.GetGetMethod();
+				return getter != null && getter.IsVirtual && !getter.IsFinal;
+			}
+
+			return false;
+		}
+
+		public static bool CanOverrideSet(this PropertyInfo property)
+		{
+			if (property.CanWrite)
+			{
+				var setter = property.GetSetMethod();
+				return setter != null && setter.IsVirtual && !setter.IsFinal;
+			}
+
+			return false;
+		}
 	}
 }

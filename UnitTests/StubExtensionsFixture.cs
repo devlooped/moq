@@ -89,6 +89,34 @@ namespace Moq.Tests
 			Assert.Equal(5, mock.Object.Bar.Value);
 		}
 
+		[Fact]
+		public void StubsInheritedInterfaceProperties()
+		{
+			var mock = new Mock<IBaz>();
+
+			mock.StubAll();
+
+			mock.Object.Value = 5;
+			Assert.Equal(5, mock.Object.Value);
+
+			mock.Object.Name = "foo";
+			Assert.Equal("foo", mock.Object.Name);
+		}
+
+		[Fact]
+		public void StubsInheritedClassProperties()
+		{
+			var mock = new Mock<Base>();
+
+			mock.StubAll();
+
+			mock.Object.BaseValue = 5;
+			Assert.Equal(5, mock.Object.BaseValue);
+
+			mock.Object.Value = 10;
+			Assert.Equal(10, mock.Object.Value);
+		}
+
 		private object GetValue() { return new object(); }
 
 		public interface IFoo
@@ -98,9 +126,25 @@ namespace Moq.Tests
 			IBar Bar { get; set; }
 		}
 
+		public class Derived : Base
+		{
+			public string Name { get; set; }
+		}
+
+		public abstract class Base : IBar
+		{
+			public int BaseValue { get; set; }
+			public int Value { get; set; }
+		}
+
 		public interface IBar
 		{
 			int Value { get; set; }
+		}
+
+		public interface IBaz : IBar
+		{
+			string Name { get; set; }
 		}
 	}
 }

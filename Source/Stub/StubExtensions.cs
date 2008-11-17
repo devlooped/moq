@@ -42,6 +42,7 @@ using System;
 using System.Linq;
 using System.Linq.Expressions;
 using System.Reflection;
+using System.Collections.Generic;
 
 namespace Moq.Stub
 {
@@ -145,9 +146,18 @@ namespace Moq.Stub
 		{
 			// Crazy reflection stuff below. Ah... the goodies of generics :)
 			var mockType = mock.MockedType;
-			foreach (var property in mockType.GetProperties())
+			var properties = new List<PropertyInfo>();
+			properties.AddRange(mockType.GetProperties());
+			// Add all implemented properties too.
+			properties.AddRange(
+				from i in mockType.GetInterfaces()
+				from p in i.GetProperties()
+				select p);
+			// Add all properties from base classes
+
+			foreach (var property in properties)
 			{
-				if (property.CanRead)
+				if (property.CanRead && property.CanOverrideGet())
 				{
 					var expect = GetPropertyExpression(mockType, property);
 					object initialValue = mock.DefaultValueProvider.ProvideDefault(property.GetGetMethod(), new object[0]);
@@ -173,7 +183,7 @@ namespace Moq.Stub
 
 					returnsGet.Invoke(resultGet, new[] { getFunc });
 
-					if (property.CanWrite)
+					if (property.CanWrite && property.CanOverrideSet())
 					{
 						var resultSet = mock
 							.GetType()
