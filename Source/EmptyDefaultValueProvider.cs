@@ -92,8 +92,6 @@ namespace Moq
 					var genericListType = typeof(List<>).MakeGenericType(genericType);
 					var list = Activator.CreateInstance(genericListType);
 
-					var methods = typeof(Queryable).GetMethods();
-
 					return typeof(Queryable).GetMethods()
 						.Single(x => x.Name == "AsQueryable" && x.IsGenericMethod)
 						.MakeGenericMethod(genericType)
