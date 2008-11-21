@@ -41,6 +41,7 @@
 using System;
 using System.Collections.Generic;
 using System.Reflection;
+using System.Linq;
 
 namespace Moq
 {
@@ -73,12 +74,30 @@ namespace Moq
 				{
 					return new object[0];
 				}
+				else if (valueType == typeof(IQueryable))
+				{
+					return new object[0].AsQueryable();
+				}
 				else if (valueType.IsGenericType &&
 					valueType.GetGenericTypeDefinition() == typeof(IEnumerable<>))
 				{
 					var genericListType = typeof(List<>).MakeGenericType(
 						valueType.GetGenericArguments()[0]);
 					return Activator.CreateInstance(genericListType);
+				}
+				else if (valueType.IsGenericType &&
+					valueType.GetGenericTypeDefinition() == typeof(IQueryable<>))
+				{
+					var genericType = valueType.GetGenericArguments()[0];
+					var genericListType = typeof(List<>).MakeGenericType(genericType);
+					var list = Activator.CreateInstance(genericListType);
+
+					var methods = typeof(Queryable).GetMethods();
+
+					return typeof(Queryable).GetMethods()
+						.Single(x => x.Name == "AsQueryable" && x.IsGenericMethod)
+						.MakeGenericMethod(genericType)
+						.Invoke(null, new[] { list });
 				}
 				else
 				{

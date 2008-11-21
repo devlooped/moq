@@ -78,6 +78,26 @@ namespace Moq.Tests
 			Assert.Null(value2);
 		}
 
+		[Fact]
+		public void ProvideEmptyQueryable()
+		{
+			var provider = new EmptyDefaultValueProvider();
+			var value = provider.ProvideDefault(typeof(IFoo).GetProperty("Queryable").GetGetMethod(), new object[0]);
+
+			Assert.IsAssignableFrom<IQueryable<int>>(value);
+			Assert.Equal(0, ((IQueryable<int>)value).Count());
+		}
+
+		[Fact]
+		public void ProvideEmptyQueryableObjects()
+		{
+			var provider = new EmptyDefaultValueProvider();
+			var value = provider.ProvideDefault(typeof(IFoo).GetProperty("QueryableObjects").GetGetMethod(), new object[0]);
+
+			Assert.IsAssignableFrom<IQueryable>(value);
+			Assert.Equal(0, ((IQueryable)value).Cast<object>().Count());
+		}
+
 		public interface IFoo
 		{
 			object Object { get; set; }
@@ -88,6 +108,8 @@ namespace Moq.Tests
 			PlatformID Platform { get; set; }
 			IEnumerable<int> Indexes { get; set; }
 			IBar[] Bars { get; set; }
+			IQueryable<int> Queryable { get; }
+			IQueryable QueryableObjects { get; }
 		}
 
 		public interface IBar { }

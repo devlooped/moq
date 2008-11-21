@@ -176,12 +176,30 @@ namespace Moq.Tests
 		}
 
 		[Fact]
+		public void ReturnsEmptyQueryableStringOnLooseWithMockDefaultValue()
+		{
+			var mock = new Mock<IFoo>(MockBehavior.Loose) { DefaultValue = DefaultValue.Mock };
+
+			Assert.NotNull(mock.Object.GetQueryable());
+			Assert.Equal(0, mock.Object.GetQueryable().Count());
+		}
+
+		[Fact]
 		public void ReturnsEmptyEnumerableObjectsOnLooseWithMockDefaultValue()
 		{
 			var mock = new Mock<IFoo>(MockBehavior.Loose) { DefaultValue = DefaultValue.Mock };
 
 			Assert.NotNull(mock.Object.GetEnumerableObjects());
 			Assert.Equal(0, mock.Object.GetEnumerableObjects().Cast<object>().Count());
+		}
+
+		[Fact]
+		public void ReturnsEmptyQueryableObjectsOnLooseWithMockDefaultValue()
+		{
+			var mock = new Mock<IFoo>(MockBehavior.Loose) { DefaultValue = DefaultValue.Mock };
+
+			Assert.NotNull(mock.Object.GetQueryableObjects());
+			Assert.Equal(0, mock.Object.GetQueryableObjects().Cast<object>().Count());
 		}
 
 		[Fact]
@@ -211,6 +229,8 @@ namespace Moq.Tests
 			IEnumerable<string> GetEnumerable();
 			IEnumerable GetEnumerableObjects();
 			string DoReturnString();
+			IQueryable<string> GetQueryable();
+			IQueryable GetQueryableObjects();
 		}
 
 		public interface IBar { }
@@ -273,6 +293,16 @@ namespace Moq.Tests
 			public Guid GetGuid()
 			{
 				return default(Guid);
+			}
+
+			public IQueryable<string> GetQueryable()
+			{
+				return new string[0].AsQueryable();
+			}
+
+			public IQueryable GetQueryableObjects()
+			{
+				return new object[0].AsQueryable();
 			}
 		}
 	}
