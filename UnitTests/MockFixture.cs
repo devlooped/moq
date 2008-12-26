@@ -437,6 +437,58 @@ namespace Moq.Tests
 			Assert.Throws<ArgumentException>(() => target.Expect(t => t.Do()));
 		}
 
+		[Fact]
+		public void ExpectWithParamArrayEmptyMatchArguments()
+		{
+			string expected = "bar";
+			string argument = "foo";
+
+			var target = new Mock<IParams>();
+			target.Expect(x => x.ExecuteByName(argument)).Returns(expected);
+
+			string actual = target.Object.ExecuteByName(argument);
+			Assert.Equal(expected, actual);
+		}
+
+		[Fact]
+		public void ExpectWithParamArrayNotMatchDifferntLengthInArguments()
+		{
+			string notExpected = "bar";
+			string argument = "foo";
+
+			var target = new Mock<IParams>();
+			target.Expect(x => x.ExecuteParams(argument, It.IsAny<string>())).Returns(notExpected);
+
+			string actual = target.Object.ExecuteParams(argument);
+			Assert.NotEqual(notExpected, actual);
+		}
+
+		[Fact]
+		public void ExpectWithParamArrayMatchArguments()
+		{
+			string expected = "bar";
+			string argument = "foo";
+
+			var target = new Mock<IParams>();
+			target.Expect(x => x.ExecuteParams(argument, It.IsAny<string>())).Returns(expected);
+
+			string ret = target.Object.ExecuteParams(argument, "baz");
+			Assert.Equal(expected, ret);
+		}
+
+		[Fact]
+		public void ExpecteWithArrayNotMatchTwoDifferentArrayInstances()
+		{
+			string expected = "bar";
+			string argument = "foo";
+
+			var target = new Mock<IParams>();
+			target.Expect(x => x.ExecuteArray(new string[] { argument, It.IsAny<string>() })).Returns(expected);
+
+			string ret = target.Object.ExecuteArray(new string[] { argument, "baz" });
+			Assert.Equal(null, ret);
+		}
+
 		// ShouldSupportByRefArguments?
 		// ShouldSupportOutArguments?
 
@@ -514,6 +566,13 @@ namespace Moq.Tests
 			void Submit();
 			string Execute(string command);
 			int this[int index] { get; set; }
+		}
+
+		public interface IParams
+		{
+			string ExecuteByName(string name, params object[] args);
+			string ExecuteParams(params string[] args);
+			string ExecuteArray(string[] args);
 		}
 
 		public abstract class FooBase

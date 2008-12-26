@@ -96,6 +96,12 @@ namespace Moq
 					else
 						throw new NotSupportedException("Ref expression must evaluate to a constant value.");
 				}
+				else if (parameter.GetCustomAttribute<ParamArrayAttribute>(true) != null)
+				{
+					IMatcher matcher = new ParamArrayMatcher();
+					matcher.Initialize(argument);
+					argumentMatchers.Add(matcher);
+				}
 				else
 				{
 					argumentMatchers.Add(MatcherFactory.CreateMatcher(argument));
@@ -190,7 +196,7 @@ namespace Moq
 			return this;
 		}
 
-		public IThrowsResult Throws<TException>() 
+		public IThrowsResult Throws<TException>()
 			where TException : Exception, new()
 		{
 			this.exception = new TException();
@@ -242,7 +248,7 @@ namespace Moq
 				for (int i = 0; i < expectedParams.Length; i++)
 				{
 					if (expectedParams[i].ParameterType != actualParams[i].ParameterType)
-						ThrowParameterMismatch(expectedParams, actualParams);			
+						ThrowParameterMismatch(expectedParams, actualParams);
 				}
 			}
 			else
@@ -256,7 +262,7 @@ namespace Moq
 		private void ThrowParameterMismatch(ParameterInfo[] expected, ParameterInfo[] actual)
 		{
 			throw new ArgumentException(String.Format(
-				"Invalid callback. Expectation on method with parameters ({0}) cannot invoke callback with parameters ({1}).", 
+				"Invalid callback. Expectation on method with parameters ({0}) cannot invoke callback with parameters ({1}).",
 				String.Join(",", expected.Select(p => p.ParameterType.Name).ToArray()),
 				String.Join(",", actual.Select(p => p.ParameterType.Name).ToArray())
 			));
@@ -287,7 +293,7 @@ namespace Moq
 			IsNever = true;
 		}
 
-		public IExtensible AtMost( int callCount )
+		public IExtensible AtMost(int callCount)
 		{
 			expectedCallCount = callCount;
 
