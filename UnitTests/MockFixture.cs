@@ -489,6 +489,18 @@ namespace Moq.Tests
 			Assert.Equal(null, ret);
 		}
 
+		[Fact]
+		public void ExpectGetAndExpectSetMatchArguments()
+		{
+			var target = new Mock<IFoo>();
+			target.ExpectGet(d => d.Value).Returns(1);
+			target.ExpectSet(d => d.Value, 2);
+
+			target.Object.Value = target.Object.Value + 1;
+
+			target.VerifyAll();
+		}
+
 		// ShouldSupportByRefArguments?
 		// ShouldSupportOutArguments?
 

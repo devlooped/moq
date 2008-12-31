@@ -40,10 +40,10 @@
 
 using System;
 using System.Collections.Generic;
+using System.ComponentModel;
 using System.Linq;
 using System.Linq.Expressions;
 using System.Reflection;
-using System.ComponentModel;
 
 namespace Moq
 {
@@ -408,7 +408,7 @@ namespace Moq
 			var call = new SetterMethodCall<TProperty>(expression, setter, value);
 			var targetInterceptor = GetInterceptor(expression, interceptor.Mock);
 
-			targetInterceptor.AddCall(call, ExpectKind.Other);
+			targetInterceptor.AddCall(call, ExpectKind.PropertySet);
 
 			return call;
 		}
