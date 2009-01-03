@@ -138,13 +138,13 @@ namespace Moq
 			if (invocation.Method.DeclaringType.IsGenericType &&
 			  invocation.Method.DeclaringType.GetGenericTypeDefinition() == typeof(IMocked<>))
 			{
-				// "Mixin" of IMocked<T> 
+				// "Mixin" of IMocked<T>.Mock
 				invocation.ReturnValue = mock;
 				return;
 			}
 			else if (invocation.Method.DeclaringType == typeof(IMocked))
 			{
-				// "Mixin" of IMocked
+				// "Mixin" of IMocked.Mock
 				invocation.ReturnValue = mock;
 				return;
 			}
@@ -174,7 +174,7 @@ namespace Moq
 
 				return;
 			}
-			else if (IsEventDettach(invocation))
+			else if (IsEventDetach(invocation))
 			{
 				var delegateInstance = (Delegate)invocation.Arguments[0];
 				// TODO: validate we can get the event?
@@ -231,34 +231,24 @@ namespace Moq
 				invocation.Proceed();
 			}
 			else if (invocation.TargetType.IsClass &&
-			  !invocation.Method.IsAbstract 
+			  !invocation.Method.IsAbstract
 				&& mock.CallBase)
 			{
 				// For mocked classes, if the target method was not abstract, 
 				// invoke directly.
-				// Will only get here for Normal and below behaviors.
+				// Will only get here for Loose behavior.
 				// TODO: we may want to provide a way to skip this by the user.
 				invocation.Proceed();
 			}
 			else if (invocation.Method != null && invocation.Method.ReturnType != null &&
 			  invocation.Method.ReturnType != typeof(void))
 			{
-				if (behavior == MockBehavior.Loose)
-				{
-					invocation.ReturnValue = mock.DefaultValueProvider.ProvideDefault(invocation.Method, invocation.Arguments);
+				invocation.ReturnValue = mock.DefaultValueProvider.ProvideDefault(invocation.Method, invocation.Arguments);
 
-					// Event callbacks may need to be set if the returned value is a mock.
-					if (invocation.ReturnValue is IMocked && EventCallback != null)
-					{
-						EventCallback.AddInterceptor(((IMocked)invocation.ReturnValue).Mock.Interceptor);
-					}
-				}
-				else
+				// Event callbacks may need to be set if the returned value is a mock.
+				if (invocation.ReturnValue is IMocked && EventCallback != null)
 				{
-					// TODO: remove when we remove Relaxed.
-					throw new MockException(
-					  MockException.ExceptionReason.ReturnValueRequired,
-					  behavior, invocation);
+					EventCallback.AddInterceptor(((IMocked)invocation.ReturnValue).Mock.Interceptor);
 				}
 			}
 		}
@@ -269,7 +259,7 @@ namespace Moq
 					  invocation.Method.Name.StartsWith("add_");
 		}
 
-		private static bool IsEventDettach(IInvocation invocation)
+		private static bool IsEventDetach(IInvocation invocation)
 		{
 			return invocation.Method.IsSpecialName &&
 					  invocation.Method.Name.StartsWith("remove_");
@@ -347,7 +337,7 @@ namespace Moq
 					return true;
 
 				var key = obj as ExpressionKey;
-				
+
 				if (key == null)
 					return false;
 
