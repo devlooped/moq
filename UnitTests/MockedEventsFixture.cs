@@ -1,6 +1,8 @@
 ﻿using System;
 using Xunit;
+using System.Linq;
 using System.ComponentModel;
+using System.Collections.Generic;
 
 namespace Moq.Tests
 {
@@ -421,22 +423,39 @@ namespace Moq.Tests
 
 		}
 
-		[Fact]
-		public void EventRaisingFailsOnClasses()
+		[Fact(Skip="Events on non-virtual events not supported yet")]
+		public void EventRaisingFailsOnNonVirtualEvent()
 		{
 			var mock = new Mock<WithEvent>();
 
 			var raised = false;
 			mock.Object.Event += delegate { raised = true; };
 
+			// TODO: fix!!! We should go the GetInvocationList route here...
 			mock.Raise(x => x.Event += null, EventArgs.Empty);
+
+			Assert.True(raised);
+		}
+
+		[Fact]
+		public void EventRaisingSucceedsOnVirtualEvent()
+		{
+			var mock = new Mock<WithEvent>();
+
+			var raised = false;
+			mock.Object.VirtualEvent += delegate { raised = true; };
+
+			// TODO: fix!!! We should go the GetInvocationList route here...
+			mock.Raise(x => x.VirtualEvent += null, EventArgs.Empty);
 
 			Assert.True(raised);
 		}
 
 		public class WithEvent
 		{
-			public virtual event EventHandler Event;
+			public event EventHandler Event;
+			public virtual event EventHandler VirtualEvent;
+			public object Value { get; set; }
 		}
 
 		private void OnRaised(object sender, EventArgs e)
