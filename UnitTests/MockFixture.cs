@@ -501,8 +501,35 @@ namespace Moq.Tests
 			target.VerifyAll();
 		}
 
+		[Fact]
+		public void ArgumentNullMatchProperCtor()
+		{
+			var target = new Mock<Foo>(null);
+			Assert.Null(target.Object.Bar);
+		}
+
 		// ShouldSupportByRefArguments?
 		// ShouldSupportOutArguments?
+
+		public class Foo
+		{
+			public Foo() : this(new Bar()) { }
+
+			public Foo(IBar bar)
+			{
+				this.Bar = bar;
+			}
+
+			public IBar Bar { get; private set; }
+		}
+
+		public class Bar : IBar
+		{
+		}
+
+		public interface IBar
+		{
+		}
 
 		interface IDo { void Do(); }
 

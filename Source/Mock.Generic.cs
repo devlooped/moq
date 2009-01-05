@@ -174,7 +174,7 @@ namespace Moq
 		/// <param name="args">Optional constructor arguments if the mocked type is a class.</param>
 		public Mock(MockBehavior behavior, params object[] args)
 		{
-			if (args == null) args = new object[0];
+			if (args == null) args = new object[] { null };
 
 			this.Behavior = behavior;
 			this.Interceptor = new Interceptor(behavior, typeof(T), this);
@@ -372,7 +372,7 @@ namespace Moq
 
 		#region Verify
 
-        /// <summary>
+		/// <summary>
 		/// Verifies that a specific invocation matching the given 
 		/// expression was performed on the mock. Use in conjuntion 
 		/// with the default <see cref="MockBehavior.Loose"/>.
@@ -559,7 +559,8 @@ namespace Moq
 		{
 			Mock<T> owner;
 
-			public AsInterface(Mock<T> owner) : base(true)
+			public AsInterface(Mock<T> owner)
+				: base(true)
 			{
 				this.owner = owner;
 			}
