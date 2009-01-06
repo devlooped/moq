@@ -89,7 +89,8 @@ namespace Moq.Matchers
 				var candidates = from m in call.Method.DeclaringType.GetMethods(
 									BindingFlags.Public |
 									BindingFlags.NonPublic |
-									BindingFlags.Static)
+									BindingFlags.Static | 
+									BindingFlags.Instance)
 								 where
 									m.Name == call.Method.Name &&
 									m.IsGenericMethodDefinition &&

@@ -11,6 +11,20 @@ namespace Moq.Tests
 		}
 
 		[Fact]
+		public void ShouldFindGenericMethodMatcher()
+		{
+			var foo = new Mock<IFoo>();
+
+			foo.Object.Bar("asdf");
+			
+			foo.Verify(f => f.Bar(Any<string>()));
+		}
+
+		[Matcher]
+		public T Any<T>() { return default(T); }
+		public bool Any<T>(T value) { return true; }
+
+		[Fact]
 		public void ShouldTranslateToUseMatcherImplementation()
 		{			
 			var mock = new Mock<IFoo>(MockBehavior.Strict);
