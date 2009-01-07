@@ -8,6 +8,7 @@ using System.Web.Mvc;
 using System.Web.Security;
 using System.Web.SessionState;
 using System.Xml.Linq;
+using System.Web.Routing;
 
 namespace ProductsMvcSample
 {
@@ -23,19 +24,18 @@ namespace ProductsMvcSample
 
 		public static void RegisterRoutes(RouteCollection routes)
 		{
-			routes.Add(new Route
-			{
-				Url = "[controller]/[action]/[id]",
-				Defaults = new { action = "Index", id = (string)null },
-				RouteHandler = typeof(MvcRouteHandler)
-			});
+			routes.MapRoute(
+				"Default",                                              // Route name
+				"{controller}/{action}/{id}",                           // URL with parameters
+				new { controller = "Home", action = "Index", id = "" }, // Parameter defaults
+				new { controller = @"[^\.]*" }							// Parameter constraints
+			);
 
-			routes.Add(new Route
-			{
-				Url = "Default.aspx",
-				Defaults = new { controller = "Home", action = "Index", id = (string)null },
-				RouteHandler = typeof(MvcRouteHandler)
-			});
+			routes.MapRoute(
+				"Root",													// Route name
+				"Default.aspx",											// URL with parameters
+				new { controller = "Home", action = "Index", id = "" } // Parameter defaults
+			);
 		}
 	}
 }

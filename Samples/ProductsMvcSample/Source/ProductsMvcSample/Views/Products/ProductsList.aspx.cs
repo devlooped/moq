@@ -1,7 +1,7 @@
 ﻿using System;
 using System.Web;
-using System.Web.Mvc;
 using ProductsMvcSample.Models;
+using System.Web.Mvc;
 
 namespace ProductsMvcSample.Views.Products
 {
@@ -10,7 +10,7 @@ namespace ProductsMvcSample.Views.Products
 		protected override void OnLoad(EventArgs e)
 		{
 			base.OnLoad(e);
-			Title = "Products of " + ViewData.CategoryName;
+			Title = "Products of " + ViewData.Model.CategoryName;
 		}
 	}
 }

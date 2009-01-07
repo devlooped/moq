@@ -8,6 +8,7 @@ using Moq;
 using System.Linq.Expressions;
 using NUnit.Framework;
 using System.ComponentModel;
+using System.Web.Routing;
 
 namespace ProductsMvcSample.Tests
 {
@@ -43,16 +44,16 @@ namespace ProductsMvcSample.Tests
 			}
 		}
 
-		public static Mock<IHttpContext> MockHttpContext()
+		public static Mock<HttpContextBase> MockHttpContext()
 		{
-			var context = new Mock<IHttpContext>();
+			var context = new Mock<HttpContextBase> { DefaultValue = DefaultValue.Mock };
 			return context;
 		}
 
-		public static Mock<IHttpRequest> MockGet(Mock<IHttpContext> httpContext, string relativeUrl)
+		public static Mock<HttpRequestBase> MockGet(Mock<HttpContextBase> httpContext, string relativeUrl)
 		{
-			var request = new Mock<IHttpRequest>();
-			httpContext.Expect(x => x.Request).Returns(request.Object);
+			var request = new Mock<HttpRequestBase>();
+			httpContext.Setup(x => x.Request).Returns(request.Object);
 			#region parse relativeUrl
 			var fragments = relativeUrl.Split('?');
 			var filePath = fragments[0];
@@ -64,10 +65,10 @@ namespace ProductsMvcSample.Tests
 					queryString.Add(token.Split('=')[0], token.Split('=')[1]);
 			}
 			#endregion
-			request.Expect(x => x.AppRelativeCurrentExecutionFilePath).Returns(filePath);
-			request.Expect(x => x.QueryString).Returns(queryString);
-			request.Expect(x => x.PathInfo).Returns(string.Empty);
-			request.Expect(x => x.HttpMethod).Returns("GET");
+			request.Setup(x => x.AppRelativeCurrentExecutionFilePath).Returns(filePath);
+			request.Setup(x => x.QueryString).Returns(queryString);
+			request.Setup(x => x.PathInfo).Returns(string.Empty);
+			request.Setup(x => x.HttpMethod).Returns("GET");
 			return request;
 		}
 

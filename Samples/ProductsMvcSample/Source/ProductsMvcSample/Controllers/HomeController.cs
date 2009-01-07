@@ -6,11 +6,9 @@ namespace ProductsMvcSample.Controllers
 {
 	public class HomeController : Controller
 	{
-
-		[ControllerAction]
 		public void Index()
 		{
-			RenderView("Welcome");
+			View("Welcome");
 		}
 	}
 }
