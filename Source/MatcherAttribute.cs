@@ -49,7 +49,7 @@ namespace Moq
 	/// </summary>
 	/// <remarks>
 	/// The argument matching is used to determine whether a concrete 
-	/// invocation in the mock matches a given expectation. This 
+	/// invocation in the mock matches a given setup. This 
 	/// matching mechanism is fully extensible. 
 	/// <para>
 	/// There are two parts of a matcher: the compiler matcher 
@@ -81,7 +81,7 @@ namespace Moq
 	/// var order = new Order { ... };
 	/// var mock = new Mock&lt;IRepository&lt;Order&gt;&gt;();
 	/// 
-	/// mock.Expect(x =&gt; x.Save(Orders.Contains(order)))
+	/// mock.Setup(x =&gt; x.Save(Orders.Contains(order)))
 	///     .Throws&lt;ArgumentException&gt;();
 	/// </code>
 	/// Note that the return value from the compiler matcher is irrelevant. 
@@ -107,11 +107,11 @@ namespace Moq
 	/// At runtime, the mocked method will be invoked with a specific 
 	/// list of orders. This value will be passed to this runtime 
 	/// matcher as the first argument, while the second argument is the 
-	/// one specified in the expectation (<c>x.Save(Orders.Contains(order))</c>).
+	/// one specified in the setup (<c>x.Save(Orders.Contains(order))</c>).
 	/// <para>
 	/// The boolean returned determines whether the given argument has been 
 	/// matched. If all arguments to the expected method are matched, then 
-	/// the expectation is verified.
+	/// the setup matches and is evaluated.
 	/// </para>
 	/// </description>
 	/// </item>
@@ -144,7 +144,7 @@ namespace Moq
 	/// var order = new Order { ... };
 	/// var mock = new Mock&lt;IRepository&lt;Order&gt;&gt;();
 	/// 
-	/// mock.Expect(x =&gt; x.Save(Orders.Contains(order)))
+	/// mock.Setup(x =&gt; x.Save(Orders.Contains(order)))
 	///     .Throws&lt;ArgumentException&gt;();
 	///     
 	/// // use mock, invoke Save, and have the matcher filter.

@@ -66,7 +66,7 @@ namespace Moq
 		public bool IsVerifiable { get; set; }
 		public bool IsNever { get; set; }
 		public bool Invoked { get; set; }
-		public Expression ExpectExpression { get { return originalExpression; } }
+		public Expression SetupExpression { get { return originalExpression; } }
 
 		public MethodCall(Expression originalExpression, MethodInfo method, params Expression[] arguments)
 		{
@@ -163,8 +163,8 @@ namespace Moq
 
 
 			if (IsNever)
-				throw new MockException(MockException.ExceptionReason.ExpectedNever,
-					String.Format(Properties.Resources.ExpectedNever,
+				throw new MockException(MockException.ExceptionReason.SetupNever,
+					String.Format(Properties.Resources.SetupNever,
 					call.Format()));
 
 
@@ -262,7 +262,7 @@ namespace Moq
 		private void ThrowParameterMismatch(ParameterInfo[] expected, ParameterInfo[] actual)
 		{
 			throw new ArgumentException(String.Format(
-				"Invalid callback. Expectation on method with parameters ({0}) cannot invoke callback with parameters ({1}).",
+				"Invalid callback. Setup on method with parameters ({0}) cannot invoke callback with parameters ({1}).",
 				String.Join(",", expected.Select(p => p.ParameterType.Name).ToArray()),
 				String.Join(",", actual.Select(p => p.ParameterType.Name).ToArray())
 			));

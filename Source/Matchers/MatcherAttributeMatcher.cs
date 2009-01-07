@@ -49,7 +49,7 @@ namespace Moq.Matchers
 	/// <summary>
 	/// Matcher to treat static functions as matchers.
 	/// 
-	/// mock.Expect(x => x.StringMethod(A.MagicString()));
+	/// mock.Setup(x => x.StringMethod(A.MagicString()));
 	/// 
 	/// pbulic static class A 
 	/// {

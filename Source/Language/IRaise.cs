@@ -51,23 +51,23 @@ namespace Moq.Language
 	{
 		/// <summary>
 		/// Specifies the mocked event that will be raised 
-		/// when the expectation is met.
+		/// when the setup is met.
 		/// </summary>
 		/// <param name="eventHandler">The mocked event, retrieved from 
 		/// <see cref="Mock.CreateEventHandler"/> or <see cref="Mock.CreateEventHandler{TEventArgs}"/>.
 		/// </param>
 		/// <param name="args">The event args to pass when raising the event.</param>
 		/// <example>
-		/// The following example shows how to set an expectation that will 
-		/// raise an event when it's met:
+		/// The following example shows how to raise an event when 
+		/// the setup is met:
 		/// <code>
 		/// var mock = new Mock&lt;IContainer&gt;();
 		/// // create handler to associate with the event to raise
 		/// var handler = mock.CreateEventHandler();
 		/// // associate the handler with the event to raise
 		/// mock.Object.Added += handler;
-		/// // set the expectation and the handler to raise
-		/// mock.Expect(add => add.Add(It.IsAny&lt;string&gt;(), It.IsAny&lt;object&gt;()))
+		/// // setup the invocation and the handler to raise
+		/// mock.Setup(add => add.Add(It.IsAny&lt;string&gt;(), It.IsAny&lt;object&gt;()))
 		///     .Raises(handler, EventArgs.Empty);
 		/// </code>
 		/// </example>
@@ -75,7 +75,7 @@ namespace Moq.Language
 
 		/// <summary>
 		/// Specifies the mocked event that will be raised 
-		/// when the expectation is met.
+		/// when the setup is matched.
 		/// </summary>
 		/// <param name="eventHandler">The mocked event, retrieved from 
 		/// <see cref="Mock.CreateEventHandler"/> or <see cref="Mock.CreateEventHandler{TEventArgs}"/>.
@@ -87,7 +87,7 @@ namespace Moq.Language
 
 		/// <summary>
 		/// Specifies the mocked event that will be raised 
-		/// when the expectation is met.
+		/// when the setup is matched.
 		/// </summary>
 		/// <param name="eventHandler">The mocked event, retrieved from 
 		/// <see cref="Mock.CreateEventHandler"/> or <see cref="Mock.CreateEventHandler{TEventArgs}"/>.
@@ -100,7 +100,7 @@ namespace Moq.Language
 
 		/// <summary>
 		/// Specifies the mocked event that will be raised 
-		/// when the expectation is met.
+		/// when the setup is matched.
 		/// </summary>
 		/// <param name="eventHandler">The mocked event, retrieved from 
 		/// <see cref="Mock.CreateEventHandler"/> or <see cref="Mock.CreateEventHandler{TEventArgs}"/>.
@@ -114,7 +114,7 @@ namespace Moq.Language
 
 		/// <summary>
 		/// Specifies the mocked event that will be raised 
-		/// when the expectation is met.
+		/// when the setup is matched.
 		/// </summary>
 		/// <param name="eventHandler">The mocked event, retrieved from 
 		/// <see cref="Mock.CreateEventHandler"/> or <see cref="Mock.CreateEventHandler{TEventArgs}"/>.
@@ -129,7 +129,7 @@ namespace Moq.Language
 
 		/// <summary>
 		/// Specifies the mocked event that will be raised 
-		/// when the expectation is met.
+		/// when the setup is matched.
 		/// </summary>
 		/// <param name="eventHandler">The mocked event, retrieved from 
 		/// <see cref="Mock.CreateEventHandler"/> or <see cref="Mock.CreateEventHandler{TEventArgs}"/>.

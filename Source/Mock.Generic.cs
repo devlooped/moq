@@ -56,21 +56,21 @@ namespace Moq
 	/// <remarks>
 	/// Only abstract and virtual members of classes can be mocked.
 	/// <para>
-	/// The behavior of the mock with regards to the expectations and the actual calls is determined 
+	/// The behavior of the mock with regards to the setups and the actual calls is determined 
 	/// by the optional <see cref="MockBehavior"/> that can be passed to the <see cref="Mock{T}(MockBehavior)"/> 
 	/// constructor.
 	/// </para>
 	/// </remarks>
 	/// <example group="overview" order="0">
-	/// The following example shows setting expectations with specific values 
+	/// The following example shows establishing setups with specific values 
 	/// for method invocations:
 	/// <code>
 	/// //setup - data
 	/// var order = new Order(TALISKER, 50);
 	/// var mock = new Mock&lt;IWarehouse&gt;();
 	/// 
-	/// //setup - expectations
-	/// mock.Expect(x => x.HasInventory(TALISKER, 50)).Returns(true);
+	/// //setup 
+	/// mock.Setup(x => x.HasInventory(TALISKER, 50)).Returns(true);
 	/// 
 	/// //exercise
 	/// order.Fill(mock.Object);
@@ -85,15 +85,15 @@ namespace Moq
 	/// var order = new Order(TALISKER, 50);
 	/// var mock = new Mock&lt;IWarehouse&gt;();
 	/// 
-	/// //setup - expectations
+	/// //setup
 	/// //shows how to expect a value within a range
-	/// mock.Expect(x => x.HasInventory(
+	/// mock.Setup(x => x.HasInventory(
 	///			It.IsAny&lt;string&gt;(), 
 	///			It.IsInRange(0, 100, Range.Inclusive)))
 	///     .Returns(false);
 	/// 
-	/// //shows how to throw for unexpected calls. contrast with the "verify" approach of other mock libraries.
-	/// mock.Expect(x => x.Remove(
+	/// //shows how to throw for unexpected calls.
+	/// mock.Setup(x => x.Remove(
 	///			It.IsAny&lt;string&gt;(), 
 	///			It.IsAny&lt;int&gt;()))
 	///     .Throws(new InvalidOperationException());
@@ -267,15 +267,15 @@ namespace Moq
 		#region Setup
 
 		/// <summary>
-		/// Sets an expectation on the mocked type for a call to 
+		/// Specifies a setup on the mocked type for a call to 
 		/// to a void method.
 		/// </summary>
 		/// <remarks>
-		/// If more than one expectation is set for the same method or property, 
+		/// If more than one setup is specified for the same method or property, 
 		/// the latest one wins and is the one that will be executed.
 		/// </remarks>
 		/// <param name="expression">Lambda expression that specifies the expected method invocation.</param>
-		/// <example group="expectations">
+		/// <example group="setups">
 		/// <code>
 		/// var mock = new Mock&lt;IProcessor&gt;();
 		/// mock.Setup(x =&gt; x.Execute("ping"));
@@ -287,16 +287,16 @@ namespace Moq
 		}
 
 		/// <summary>
-		/// Sets an expectation on the mocked type for a call to 
+		/// Specifies a setup on the mocked type for a call to 
 		/// to a value returning method.
 		/// </summary>
 		/// <typeparam name="TResult">Type of the return value. Typically omitted as it can be inferred from the expression.</typeparam>
 		/// <remarks>
-		/// If more than one expectation is set for the same method or property, 
+		/// If more than one setup is specified for the same method or property, 
 		/// the latest one wins and is the one that will be executed.
 		/// </remarks>
 		/// <param name="expression">Lambda expression that specifies the method invocation.</param>
-		/// <example group="expectations">
+		/// <example group="setups">
 		/// <code>
 		/// mock.Setup(x =&gt; x.HasInventory("Talisker", 50)).Returns(true);
 		/// </code>
@@ -307,7 +307,7 @@ namespace Moq
 		}
 
 		/// <summary>
-		/// Sets an expectation on the mocked type for a call to 
+		/// Specifies a setup on the mocked type for a call to 
 		/// to a property getter.
 		/// </summary>
 		/// <remarks>
@@ -316,7 +316,7 @@ namespace Moq
 		/// </remarks>
 		/// <typeparam name="TProperty">Type of the property. Typically omitted as it can be inferred from the expression.</typeparam>
 		/// <param name="expression">Lambda expression that specifies the property getter.</param>
-		/// <example group="expectations">
+		/// <example group="setups">
 		/// <code>
 		/// mock.SetupGet(x =&gt; x.Suspended)
 		///     .Returns(true);
@@ -328,16 +328,16 @@ namespace Moq
 		}
 
 		/// <summary>
-		/// Sets an expectation on the mocked type for a call to 
+		/// Specifies a setup on the mocked type for a call to 
 		/// to a property setter.
 		/// </summary>
 		/// <remarks>
-		/// If more than one expectation is set for the same property setter, 
+		/// If more than one setup is set for the same property setter, 
 		/// the latest one wins and is the one that will be executed.
 		/// </remarks>
 		/// <typeparam name="TProperty">Type of the property. Typically omitted as it can be inferred from the expression.</typeparam>
 		/// <param name="expression">Lambda expression that specifies the property setter.</param>
-		/// <example group="expectations">
+		/// <example group="setups">
 		/// <code>
 		/// mock.SetupSet(x =&gt; x.Suspended);
 		/// </code>
@@ -348,7 +348,7 @@ namespace Moq
 		}
 
 		/// <summary>
-		/// Sets an expectation on the mocked type for a call to 
+		/// Specifies a setup on the mocked type for a call to 
 		/// to a property setter with a specific value.
 		/// </summary>
 		/// <remarks>
@@ -358,7 +358,7 @@ namespace Moq
 		/// <typeparam name="TProperty">Type of the property. Typically omitted as it can be inferred from the expression.</typeparam>
 		/// <param name="expression">Lambda expression that specifies the property setter.</param>
 		/// <param name="value">The value to be set for the property.</param>
-		/// <example group="expectations">
+		/// <example group="setups">
 		/// <code>
 		/// mock.SetupSet(x =&gt; x.Suspended, true);
 		/// </code>
@@ -503,7 +503,7 @@ namespace Moq
 
 		/// <summary>
 		/// Adds an interface implementation to the mock, 
-		/// allowing expectations to be set for it.
+		/// allowing setups to be specified for it.
 		/// </summary>
 		/// <remarks>
 		/// This method can only be called before the first use 
@@ -526,11 +526,11 @@ namespace Moq
 		/// it's called by the consumer code:
 		/// <code>
 		/// var mock = new Mock&lt;IProcessor&gt;();
-		/// mock.Expect(x =&gt; x.Execute("ping"));
+		/// mock.Setup(x =&gt; x.Execute("ping"));
 		/// 
 		/// // add IDisposable interface
 		/// var disposable = mock.As&lt;IDisposable&gt;();
-		/// disposable.Expect(d => d.Dispose()).Verifiable();
+		/// disposable.Setup(d => d.Dispose()).Verifiable();
 		/// </code>
 		/// </example>
 		/// <typeparam name="TInterface">Type of interface to cast the mock to.</typeparam>

@@ -56,7 +56,7 @@ namespace Moq
 			matcherType = call.Type;
 
 			if (lambda == null)
-				throw new ArgumentException(Properties.Resources.ExpectedLambda);
+				throw new ArgumentException(Properties.Resources.SetupLambda);
 
 			predicate = lambda.Compile();
 		}

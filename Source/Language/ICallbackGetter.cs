@@ -45,9 +45,9 @@ using Moq.Language.Flow;
 namespace Moq.Language
 {
 	/// <summary>
-	/// Defines the <c>Callback</c> verb for property getter expectations.
+	/// Defines the <c>Callback</c> verb for property getter setups.
 	/// </summary>
-	/// <seealso cref="Mock{T}.ExpectGet"/>
+	/// <seealso cref="Mock{T}.SetupGet"/>
 	/// <typeparam name="TProperty">Type of the property.</typeparam>
 	[EditorBrowsable(EditorBrowsableState.Never)]
 	public interface ICallbackGetter<TProperty> : IHideObjectMembers
@@ -59,7 +59,7 @@ namespace Moq.Language
 		/// <example>
 		/// Invokes the given callback with the property value being set. 
 		/// <code>
-		/// mock.ExpectGet(x => x.Suspended)
+		/// mock.SetupGet(x => x.Suspended)
 		///     .Callback(() => called = true)
 		///     .Returns(true);
 		/// </code>

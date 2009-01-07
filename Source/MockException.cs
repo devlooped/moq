@@ -47,7 +47,7 @@ using Castle.Core.Interceptor;
 namespace Moq
 {
 	/// <summary>
-	/// Exception thrown by mocks when expectations are not met, 
+	/// Exception thrown by mocks when setups are not matched, 
 	/// the mock is not properly setup, etc.
 	/// </summary>
 	/// <remarks>
@@ -73,12 +73,12 @@ namespace Moq
 		/// </summary>
 		internal enum ExceptionReason
 		{
-			NoExpectation,
+			NoSetup,
 			ReturnValueRequired,
 			VerificationFailed, 
 			MoreThanOneCall,
 			MoreThanNCalls,
-			ExpectedNever,
+			SetupNever,
 		}
 
 		ExceptionReason reason;
@@ -152,25 +152,25 @@ namespace Moq
 	internal class MockVerificationException : MockException
 	{
 		Type targetType;
-		List<Expression> failedExpectations;
+		List<Expression> failedSetups;
 
-		public MockVerificationException(Type targetType, List<Expression> failedExpectations)
-			: base(ExceptionReason.VerificationFailed, GetMessage(targetType, failedExpectations))
+		public MockVerificationException(Type targetType, List<Expression> failedSetups)
+			: base(ExceptionReason.VerificationFailed, GetMessage(targetType, failedSetups))
 		{
 			this.targetType = targetType;
-			this.failedExpectations = failedExpectations;
+			this.failedSetups = failedSetups;
 		}
 
-		private static string GetMessage(Type targetType, List<Expression> failedExpectations)
+		private static string GetMessage(Type targetType, List<Expression> failedSetups)
 		{
-			return String.Format(Properties.Resources.VerficationFailed, GetRawExpectations(targetType, failedExpectations));
+			return String.Format(Properties.Resources.VerficationFailed, GetRawSetups(targetType, failedSetups));
 		}
 
-		private static string GetRawExpectations(Type targetType, List<Expression> failedExpectations)
+		private static string GetRawSetups(Type targetType, List<Expression> failedSetups)
 		{
 			StringBuilder message = new StringBuilder();
 			string targetTypeName = targetType.Name;
-			foreach (var expr in failedExpectations)
+			foreach (var expr in failedSetups)
 			{
 				message
 					.Append(targetTypeName)
@@ -181,9 +181,9 @@ namespace Moq
 			return message.ToString();
 		}
 
-		internal string GetRawExpectations()
+		internal string GetRawSetups()
 		{
-			return GetRawExpectations(targetType, failedExpectations);
+			return GetRawSetups(targetType, failedSetups);
 		}
 
 		/// <summary>

@@ -78,14 +78,14 @@ namespace Moq
 		internal void Verify()
 		{
 			// The IsNever case would have thrown the moment the member is invoked, 
-			// so we can safely skip here all such expectations.
+			// so we can safely skip here all such setups.
 			VerifyOrThrow(call => call.IsVerifiable && !call.IsNever && !call.Invoked);
 		}
 
 		internal void VerifyAll()
 		{
 			// The IsNever case would have thrown the moment the member is invoked, 
-			// so we can safely skip here all such expectations.
+			// so we can safely skip here all such setups.
 			VerifyOrThrow(call => !call.IsNever && !call.Invoked);
 		}
 
@@ -95,7 +95,7 @@ namespace Moq
 			foreach (var call in calls.Values)
 			{
 				if (match(call))
-					failures.Add(call.ExpectExpression.PartialMatcherAwareEval());
+					failures.Add(call.SetupExpression.PartialMatcherAwareEval());
 			}
 
 			if (failures.Count > 0)
@@ -106,7 +106,7 @@ namespace Moq
 
 		public void AddCall(IProxyCall call, ExpectKind kind)
 		{
-			var expr = call.ExpectExpression.PartialMatcherAwareEval();
+			var expr = call.SetupExpression.PartialMatcherAwareEval();
 
 			var s = expr.ToStringFixed();
 
@@ -209,7 +209,7 @@ namespace Moq
 				if (behavior == MockBehavior.Strict)
 				{
 					throw new MockException(
-					  MockException.ExceptionReason.NoExpectation,
+					  MockException.ExceptionReason.NoSetup,
 					  behavior,
 					  invocation);
 				}

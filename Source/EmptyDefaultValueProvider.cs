@@ -47,7 +47,7 @@ namespace Moq
 {
 	/// <summary>
 	/// A <see cref="IDefaultValueProvider"/> that returns an empty default value 
-	/// for invocations that do not have expectations or return values, with loose mocks.
+	/// for invocations that do not have setups or return values, with loose mocks.
 	/// This is the default behavior for a mock.
 	/// </summary>
 	internal class EmptyDefaultValueProvider : IDefaultValueProvider

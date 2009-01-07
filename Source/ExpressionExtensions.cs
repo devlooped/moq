@@ -86,7 +86,7 @@ namespace Moq
 
 			if (methodCall == null)
 				throw new ArgumentException(String.Format(
-					Properties.Resources.ExpressionNotMethod, expression.ToStringFixed()));
+					Properties.Resources.SetupNotMethod, expression.ToStringFixed()));
 			else
 				return methodCall;
 		}
@@ -108,7 +108,7 @@ namespace Moq
 			}
 
 			throw new ArgumentException(String.Format(
-				Properties.Resources.ExpressionNotProperty, expression.ToStringFixed()));
+				Properties.Resources.SetupNotProperty, expression.ToStringFixed()));
 		}
 
 		/// <summary>

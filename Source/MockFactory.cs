@@ -72,44 +72,44 @@ namespace Moq
 	/// var foo = factory.Create&lt;IFoo&gt;();
 	/// var bar = factory.Create&lt;IBar&gt;();
 	/// 
-	///	// no need to call Verifiable() on the expectation 
-	///	// as we'll be validating all expectations anyway.
-	/// foo.Expect(f => f.Do());
-	/// bar.Expect(b => b.Redo());
+	///	// no need to call Verifiable() on the setup 
+	///	// as we'll be validating all of them anyway.
+	/// foo.Setup(f => f.Do());
+	/// bar.Setup(b => b.Redo());
 	/// 
 	///	// exercise the mocks here
 	/// 
 	/// factory.VerifyAll(); 
-	/// // At this point all expectations are already checked 
+	/// // At this point all setups are already checked 
 	/// // and an optional MockException might be thrown. 
 	/// // Note also that because the mocks are strict, any invocation 
-	/// // that doesn't have a matching expectation will also throw a MockException.
+	/// // that doesn't have a matching setup will also throw a MockException.
 	/// </code>
 	/// The following examples shows how to setup the factory 
-	/// to create loose mocks and later verify only verifiable expectations:
+	/// to create loose mocks and later verify only verifiable setups:
 	/// <code>
 	/// var factory = new MockFactory(MockBehavior.Loose);
 	/// 
 	/// var foo = factory.Create&lt;IFoo&gt;();
 	/// var bar = factory.Create&lt;IBar&gt;();
 	/// 
-	/// // this expectation will be verified at the end of the "using" block
-	/// foo.Expect(f => f.Do()).Verifiable();
+	/// // this setup will be verified when we verify the factory
+	/// foo.Setup(f => f.Do()).Verifiable();
 	/// 	
-	/// // this expectation will NOT be verified 
-	/// foo.Expect(f => f.Calculate());
+	/// // this setup will NOT be verified 
+	/// foo.Setup(f => f.Calculate());
 	/// 	
-	/// // this expectation will be verified at the end of the "using" block
-	/// bar.Expect(b => b.Redo()).Verifiable();
+	/// // this setup will be verified when we verify the factory
+	/// bar.Setup(b => b.Redo()).Verifiable();
 	/// 
 	///	// exercise the mocks here
 	///	// note that because the mocks are Loose, members 
 	///	// called in the interfaces for which no matching
-	///	// expectations exist will NOT throw exceptions, 
+	///	// setups exist will NOT throw exceptions, 
 	///	// and will rather return default values.
 	///	
 	/// factory.Verify();
-	/// // At this point verifiable expectations are already checked 
+	/// // At this point verifiable setups are already checked 
 	/// // and an optional MockException might be thrown.
 	/// </code>
 	/// The following examples shows how to setup the factory with a 
@@ -122,7 +122,7 @@ namespace Moq
 	/// var foo = factory.Create&lt;IFoo&gt;(MockBehavior.Loose);
 	/// var bar = factory.Create&lt;IBar&gt;();
 	/// 
-	/// // set expectations
+	/// // specify setups
 	/// 
 	///	// exercise the mocks here
 	///	
@@ -149,7 +149,7 @@ namespace Moq
 
 		/// <summary>
 		/// Whether the base member virtual implementation will be called 
-		/// for mocked classes if no expectation is met. Defaults to <see langword="true"/>.
+		/// for mocked classes if no setup is matched. Defaults to <see langword="true"/>.
 		/// </summary>
 		public bool CallBase { get; set; }
 
@@ -311,7 +311,7 @@ namespace Moq
 				}
 				catch (MockVerificationException mve)
 				{
-					message.AppendLine(mve.GetRawExpectations());
+					message.AppendLine(mve.GetRawSetups());
 				}
 			}
 

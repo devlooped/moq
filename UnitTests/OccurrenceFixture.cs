@@ -43,7 +43,7 @@ namespace Moq.Tests
 			}
 			catch (MockException mex)
 			{
-				Assert.Equal(MockException.ExceptionReason.ExpectedNever, mex.Reason);
+				Assert.Equal(MockException.ExceptionReason.SetupNever, mex.Reason);
 			}
 		}
 
@@ -71,7 +71,7 @@ namespace Moq.Tests
 			}
 			catch (MockException mex)
 			{
-				Assert.Equal(MockException.ExceptionReason.ExpectedNever, mex.Reason);
+				Assert.Equal(MockException.ExceptionReason.SetupNever, mex.Reason);
 			}
 		}
 
@@ -89,7 +89,7 @@ namespace Moq.Tests
 			}
 			catch (MockException mex)
 			{
-				Assert.Equal(MockException.ExceptionReason.ExpectedNever, mex.Reason);
+				Assert.Equal(MockException.ExceptionReason.SetupNever, mex.Reason);
 			}
 		}
 

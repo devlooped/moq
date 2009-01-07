@@ -133,18 +133,18 @@
   <data name="UnsupportedExpression" xml:space="preserve">
     <value>Expression {0} is not supported.</value>
   </data>
-  <data name="NoExpectation" xml:space="preserve">
-    <value>All invocations on the mock must have a corresponding expectation.</value>
+  <data name="NoSetup" xml:space="preserve">
+    <value>All invocations on the mock must have a corresponding setup.</value>
   </data>
   <data name="ReturnValueRequired" xml:space="preserve">
-    <value>Invocation needs to return a value and therefore must have a corresponding expectation that provides it.</value>
+    <value>Invocation needs to return a value and therefore must have a corresponding setup that provides it.</value>
   </data>
   <data name="VerficationFailed" xml:space="preserve">
-    <value>The following expectations were not met:
+    <value>The following setups were not matched:
 {0}</value>
   </data>
-  <data name="ExpectationOnNonOverridableMember" xml:space="preserve">
-    <value>Invalid expectation on a non-overridable member:
+  <data name="SetupOnNonOverridableMember" xml:space="preserve">
+    <value>Invalid setup on a non-overridable member:
 {0}</value>
   </data>
   <data name="ConstructorArgsForInterface" xml:space="preserve">
@@ -162,32 +162,32 @@
   <data name="PropertyNotWritable" xml:space="preserve">
     <value>Property {0}.{1} is read-only.</value>
   </data>
-  <data name="ExpressionNotProperty" xml:space="preserve">
+  <data name="SetupNotProperty" xml:space="preserve">
     <value>Expression is not a property access: {0}</value>
   </data>
-  <data name="ExpectedLambda" xml:space="preserve">
+  <data name="SetupLambda" xml:space="preserve">
     <value>A lambda expression is expected as the argument to It.Is&lt;T&gt;.</value>
   </data>
   <data name="MethodIsPublic" xml:space="preserve">
     <value>Method {0}.{1} is public. Use strong-typed Expect overload instead:
-mock.Expect(x =&gt; x.{1}());
+mock.Setup(x =&gt; x.{1}());
 </value>
   </data>
   <data name="MemberMissing" xml:space="preserve">
     <value>Member {0}.{1} does not exist.</value>
   </data>
   <data name="UnexpectedPublicProperty" xml:space="preserve">
-    <value>To set expectations for public property {0}.{1}, use the typed overloads, such as:
-mock.Expect(x =&gt; x.{1}).Returns(value);
-mock.ExpectGet(x =&gt; x.{1}).Returns(value); //equivalent to previous one
-mock.ExpectSet(x =&gt; x.{1}).Callback(callbackDelegate);
+    <value>To specify a setup for public property {0}.{1}, use the typed overloads, such as:
+mock.Setup(x =&gt; x.{1}).Returns(value);
+mock.SetupGet(x =&gt; x.{1}).Returns(value); //equivalent to previous one
+mock.SetupSet(x =&gt; x.{1}).Callback(callbackDelegate);
 </value>
   </data>
   <data name="UnsupportedProtectedProperty" xml:space="preserve">
-    <value>To set expectations for protected property {0}.{1}, use:
-mock.Expect&lt;{2}&gt;(x =&gt; x.{1}).Returns(value);
-mock.ExpectGet(x =&gt; x.{1}).Returns(value); //equivalent to previous one
-mock.ExpectSet(x =&gt; x.{1}).Callback(callbackDelegate);</value>
+    <value>To specify a setup for protected property {0}.{1}, use:
+mock.Setup&lt;{2}&gt;(x =&gt; x.{1}).Returns(value);
+mock.SetupGet(x =&gt; x.{1}).Returns(value); //equivalent to previous one
+mock.SetupSet(x =&gt; x.{1}).Callback(callbackDelegate);</value>
   </data>
   <data name="PropertyMissing" xml:space="preserve">
     <value>Property {0}.{1} does not exist.</value>
@@ -201,7 +201,7 @@ mock.ExpectSet(x =&gt; x.{1}).Callback(callbackDelegate);</value>
   <data name="RaisedUnassociatedEvent" xml:space="preserve">
     <value>Cannot raise a mocked event unless it has been associated (attached) to a concrete event in a mocked object.</value>
   </data>
-  <data name="ExpressionNotMethod" xml:space="preserve">
+  <data name="SetupNotMethod" xml:space="preserve">
     <value>Expression is not a method invocation: {0}</value>
   </data>
   <data name="NoMatchingCall" xml:space="preserve">
@@ -218,11 +218,11 @@ mock.ExpectSet(x =&gt; x.{1}).Callback(callbackDelegate);</value>
 Please cast the argument to one of the supported types: {1}.
 Remember that there's no generics covariance in the CLR, so your object must be one of these types in order for the call to succeed.</value>
   </data>
-  <data name="ExpectedNever" xml:space="preserve">
+  <data name="SetupNever" xml:space="preserve">
     <value>Invocation {0} should not have been made.</value>
   </data>
   <data name="UnsupportedIntermediateExpression" xml:space="preserve">
-    <value>Only property accesses are supported in intermediate invocations on an expectation. Unsupported expression {0}.</value>
+    <value>Only property accesses are supported in intermediate invocations on a setup. Unsupported expression {0}.</value>
   </data>
   <data name="UnsupportedIntermediateType" xml:space="preserve">
     <value>Expression contains intermediate property access {0}.{1} which is of type {2} and cannot be mocked. Unsupported expression {3}.</value>

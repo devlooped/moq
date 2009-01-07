@@ -43,14 +43,14 @@ using Moq.Language.Flow;
 namespace Moq.Protected
 {
 	/// <summary>
-	/// Allows expectations to be set for protected members by using their 
+	/// Allows setups to be specified for protected members by using their 
 	/// name as a string, rather than strong-typing them which is not possible 
 	/// due to their visibility.
 	/// </summary>
 	public interface IProtectedMock : IHideObjectMembers
 	{
 		/// <summary>
-		/// Sets an expectation on the void method with the given 
+		/// Specifies a setup on the void method with the given 
 		/// <paramref name="voidMethodName"/>, optionally specifying 
 		/// arguments for the method call.
 		/// </summary>
@@ -60,7 +60,7 @@ namespace Moq.Protected
 		ISetup Expect(string voidMethodName, params object[] args);
 
 		/// <summary>
-		/// Sets an expectation on a property or a non void method with the given 
+		/// Specifies a setup on a property or a non void method with the given 
 		/// <paramref name="methodOrPropertyName"/>, optionally specifying 
 		/// arguments for the method call.
 		/// </summary>
@@ -71,7 +71,7 @@ namespace Moq.Protected
 		ISetup<TResult> Expect<TResult>(string methodOrPropertyName, params object[] args);
 
 		/// <summary>
-		/// Sets an expectation on a property getter with the given 
+		/// Specifies a setup on a property getter with the given 
 		/// <paramref name="propertyName"/>.
 		/// </summary>
 		/// <param name="propertyName">Name of the property.</param>
@@ -79,7 +79,7 @@ namespace Moq.Protected
 		ISetupGetter<TProperty> ExpectGet<TProperty>(string propertyName);
 
 		/// <summary>
-		/// Sets an expectation on a property setter with the given 
+		/// Specifies a setup on a property setter with the given 
 		/// <paramref name="propertyName"/>.
 		/// </summary>
 		/// <param name="propertyName">Name of the property.</param>

@@ -49,7 +49,7 @@ namespace Moq
 		/// <summary>
 		/// Causes the mock to always throw 
 		/// an exception for invocations that don't have a 
-		/// corresponding expectation.
+		/// corresponding setup.
 		/// </summary>
 		Strict, 
 		/// <summary>

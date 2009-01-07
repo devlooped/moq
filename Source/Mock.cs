@@ -64,7 +64,7 @@ namespace Moq
 		/// <exception cref="ArgumentException">The received <paramref name="mocked"/> instance 
 		/// was not created by Moq.</exception>
 		/// <example group="advanced">
-		/// The following example shows how to add a new expectation to an object 
+		/// The following example shows how to add a new setup to an object 
 		/// instance which is not the original <see cref="Mock{T}"/> but rather 
 		/// the object associated with it:
 		/// <code>
@@ -72,10 +72,10 @@ namespace Moq
 		/// HttpContextBase context = GetMockContext();
 		/// 
 		/// // context.Request is the typed object from the "real" API
-		/// // so in order to add an expectation to it, we need to get 
+		/// // so in order to add a setup to it, we need to get 
 		/// // the mock that "owns" it
 		/// Mock&lt;HttpRequestBase&gt; request = Mock.Get(context.Request);
-		/// mock.Expect(req => req.AppRelativeCurrentExecutionFilePath)
+		/// mock.Setup(req => req.AppRelativeCurrentExecutionFilePath)
 		///     .Returns(tempUrl);
 		/// </code>
 		/// </example>
@@ -160,7 +160,7 @@ namespace Moq
 
 		/// <summary>
 		/// Whether the base member virtual implementation will be called 
-		/// for mocked classes if no expectation is met. Defaults to <see langword="true"/>.
+		/// for mocked classes if no setup is matched. Defaults to <see langword="true"/>.
 		/// </summary>
 		public virtual bool CallBase { get { return callBase; } set { callBase = value; } }
 
@@ -184,7 +184,7 @@ namespace Moq
 		/// <summary>
 		/// Specifies the class that will determine the default 
 		/// value to return when invocations are made that 
-		/// have no expectations and need to return a default 
+		/// have no setups and need to return a default 
 		/// value (for loose mocks).
 		/// </summary>
 		internal IDefaultValueProvider DefaultValueProvider { get { return defaultValueProvider; } }
@@ -222,7 +222,7 @@ namespace Moq
 			}
 		}
 
-		private static void VerifyMethod(Expression expression, Interceptor interceptor, Func<Expression, MethodInfo, Expression[], IProxyCall> expectationFactory)
+		private static void VerifyMethod(Expression expression, Interceptor interceptor, Func<Expression, MethodInfo, Expression[], IProxyCall> setupFactory)
 		{
 			Guard.ArgumentNotNull(interceptor, "interceptor");
 
@@ -231,7 +231,7 @@ namespace Moq
 			MethodInfo method = methodCall.Method;
 			Expression[] args = methodCall.Arguments.ToArray();
 
-			var expected = expectationFactory(expression, method, args);
+			var expected = setupFactory(expression, method, args);
 			var targetInterceptor = GetInterceptor(lambda, interceptor.Mock);
 			var actual = targetInterceptor.ActualCalls.FirstOrDefault(i => expected.Matches(i));
 
@@ -450,12 +450,12 @@ namespace Moq
 			}
 		}
 
-		private static void ThrowIfCantOverride(Expression expectation, MethodInfo methodInfo)
+		private static void ThrowIfCantOverride(Expression setup, MethodInfo methodInfo)
 		{
 			if (!methodInfo.IsVirtual || methodInfo.IsFinal || methodInfo.IsPrivate)
 				throw new ArgumentException(
-					String.Format(Properties.Resources.ExpectationOnNonOverridableMember,
-					expectation.ToString()));
+					String.Format(Properties.Resources.SetupOnNonOverridableMember,
+					setup.ToString()));
 		}
 
 		class AutoMockPropertiesVisitor : ExpressionVisitor

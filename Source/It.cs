@@ -50,7 +50,7 @@ namespace Moq
 	/// argument value. "It" refers to the argument being matched.
 	/// </summary>
 	/// <remarks>
-	/// This class allows the expectation to match a method invocation 
+	/// This class allows the setup to match a method invocation 
 	/// with an arbitrary value, with a value in a specified range, or 
 	/// even one that matches a given predicate.
 	/// </remarks>
@@ -66,7 +66,7 @@ namespace Moq
 		/// <example>
 		/// <code>
 		/// // Throws an exception for a call to Remove with any string value.
-		/// mock.Expect(x => x.Remove(It.IsAny&lt;string&gt;())).Throws(new InvalidOperationException());
+		/// mock.Setup(x => x.Remove(It.IsAny&lt;string&gt;())).Throws(new InvalidOperationException());
 		/// </code>
 		/// </example>
 		/// <typeparam name="TValue">Type of the value.</typeparam>
@@ -89,13 +89,13 @@ namespace Moq
 		/// This example shows how to return the value <c>1</c> whenever the argument to the 
 		/// <c>Do</c> method is an even number.
 		/// <code>
-		/// mock.Expect(x =&gt; x.Do(It.Is&lt;int&gt;(i =&gt; i % 2 == 0)))
+		/// mock.Setup(x =&gt; x.Do(It.Is&lt;int&gt;(i =&gt; i % 2 == 0)))
 		///     .Returns(1);
 		/// </code>
 		/// This example shows how to throw an exception if the argument to the 
 		/// method is a negative number:
 		/// <code>
-		/// mock.Expect(x =&gt; x.GetUser(It.Is&lt;int&gt;(i =&gt; i &lt; 0)))
+		/// mock.Setup(x =&gt; x.GetUser(It.Is&lt;int&gt;(i =&gt; i &lt; 0)))
 		///     .Throws(new ArgumentException());
 		/// </code>
 		/// </example>
@@ -116,7 +116,7 @@ namespace Moq
 		/// The following example shows how to expect a method call 
 		/// with an integer argument within the 0..100 range.
 		/// <code>
-		/// mock.Expect(x =&gt; x.HasInventory(
+		/// mock.Setup(x =&gt; x.HasInventory(
 		///                          It.IsAny&lt;string&gt;(),
 		///                          It.IsInRange(0, 100, Range.Inclusive)))
 		///     .Returns(false);
@@ -137,7 +137,7 @@ namespace Moq
 		/// The following example shows how to expect a call to a method where the 
 		/// string argument matches the given regular expression:
 		/// <code>
-		/// mock.Expect(x => x.Check(It.IsRegex("[a-z]+"))).Returns(1);
+		/// mock.Setup(x => x.Check(It.IsRegex("[a-z]+"))).Returns(1);
 		/// </code>
 		/// </example>
 		[AdvancedMatcher(typeof(RegexMatcher))]
@@ -155,7 +155,7 @@ namespace Moq
 		/// The following example shows how to expect a call to a method where the 
 		/// string argument matches the given regular expression, in a case insensitive way:
 		/// <code>
-		/// mock.Expect(x => x.Check(It.IsRegex("[a-z]+", RegexOptions.IgnoreCase))).Returns(1);
+		/// mock.Setup(x => x.Check(It.IsRegex("[a-z]+", RegexOptions.IgnoreCase))).Returns(1);
 		/// </code>
 		/// </example>
 		[AdvancedMatcher(typeof(RegexMatcher))]

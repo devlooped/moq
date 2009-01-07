@@ -45,7 +45,7 @@ using Moq.Language.Flow;
 namespace Moq.Language
 {
 	/// <summary>
-	/// Defines the <c>Returns</c> verb for property get expectations.
+	/// Defines the <c>Returns</c> verb for property get setups.
 	/// </summary>
 	/// <typeparam name="TProperty">Type of the property.</typeparam>
 	[EditorBrowsable(EditorBrowsableState.Never)]
@@ -58,7 +58,7 @@ namespace Moq.Language
 		/// <example>
 		/// Return a <c>true</c> value from the property getter call:
 		/// <code>
-		/// mock.ExpectGet(x => x.Suspended)
+		/// mock.SetupGet(x => x.Suspended)
 		///     .Returns(true);
 		/// </code>
 		/// </example>
@@ -71,7 +71,7 @@ namespace Moq.Language
 		/// <example>
 		/// Return a calculated value when the property is retrieved:
 		/// <code>
-		/// mock.ExpectGet(x => x.Suspended)
+		/// mock.SetupGet(x => x.Suspended)
 		///     .Returns(() => returnValues[0]);
 		/// </code>
 		/// The lambda expression to retrieve the return value is lazy-executed, 

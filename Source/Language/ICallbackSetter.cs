@@ -46,10 +46,10 @@ using Moq.Language.Flow;
 namespace Moq.Language
 {
 	/// <summary>
-	/// Defines the <c>Callback</c> verb for property setter expectations.
+	/// Defines the <c>Callback</c> verb for property setter setups.
 	/// </summary>
-	/// <seealso cref="Mock{T}.ExpectSet{TProperty}(Expression{Func{T, TProperty}})"/>
-	/// <seealso cref="Mock{T}.ExpectSet{TProperty}(Expression{Func{T, TProperty}}, TProperty)"/>
+	/// <seealso cref="Mock{T}.SetupSet{TProperty}(Expression{Func{T, TProperty}})"/>
+	/// <seealso cref="Mock{T}.SetupSet{TProperty}(Expression{Func{T, TProperty}}, TProperty)"/>
 	/// <typeparam name="TProperty">Type of the property.</typeparam>
 	[EditorBrowsable(EditorBrowsableState.Never)]
 	public interface ICallbackSetter<TProperty> : IHideObjectMembers
@@ -62,7 +62,7 @@ namespace Moq.Language
 		/// <example>
 		/// Invokes the given callback with the property value being set. 
 		/// <code>
-		/// mock.ExpectSet(x => x.Suspended)
+		/// mock.SetupSet(x => x.Suspended)
 		///     .Callback((bool state) => Console.WriteLine(state));
 		/// </code>
 		/// </example>

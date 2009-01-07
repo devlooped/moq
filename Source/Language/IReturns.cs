@@ -66,7 +66,7 @@ namespace Moq.Language
 		/// <example>
 		/// Return a <c>true</c> value from the method call:
 		/// <code>
-		/// mock.Expect(x => x.Execute("ping"))
+		/// mock.Setup(x => x.Execute("ping"))
 		///     .Returns(true);
 		/// </code>
 		/// </example>
@@ -79,7 +79,7 @@ namespace Moq.Language
 		/// <example group="returns">
 		/// Return a calculated value when the method is called:
 		/// <code>
-		/// mock.Expect(x => x.Execute("ping"))
+		/// mock.Setup(x => x.Execute("ping"))
 		///     .Returns(() => returnValues[0]);
 		/// </code>
 		/// The lambda expression to retrieve the return value is lazy-executed, 
@@ -98,13 +98,13 @@ namespace Moq.Language
 		/// <example group="returns">
 		/// Return a calculated value which is evaluated lazily at the time of the invocation.
 		/// <para>
-		/// The lookup list can change between invocations and the expectation 
+		/// The lookup list can change between invocations and the setup 
 		/// will return different values accordingly. Also, notice how the specific 
 		/// string argument is retrieved by simply declaring it as part of the lambda 
 		/// expression:
 		/// </para>
 		/// <code>
-		/// mock.Expect(x => x.Execute(It.IsAny&lt;string&gt;()))
+		/// mock.Setup(x => x.Execute(It.IsAny&lt;string&gt;()))
 		///     .Returns((string command) => returnValues[command]);
 		/// </code>
 		/// </example>
@@ -125,7 +125,7 @@ namespace Moq.Language
 		/// expression:
 		/// </para>
 		/// <code>
-		/// mock.Expect(x => x.Execute(
+		/// mock.Setup(x => x.Execute(
 		///                     It.IsAny&lt;string&gt;(), 
 		///                     It.IsAny&lt;string&gt;()))
 		///     .Returns((string arg1, string arg2) => arg1 + arg2);
@@ -149,7 +149,7 @@ namespace Moq.Language
 		/// expression:
 		/// </para>
 		/// <code>
-		/// mock.Expect(x => x.Execute(
+		/// mock.Setup(x => x.Execute(
 		///                      It.IsAny&lt;string&gt;(), 
 		///                      It.IsAny&lt;string&gt;(), 
 		///                      It.IsAny&lt;int&gt;()))
@@ -175,7 +175,7 @@ namespace Moq.Language
 		/// expression:
 		/// </para>
 		/// <code>
-		/// mock.Expect(x => x.Execute(
+		/// mock.Setup(x => x.Execute(
 		///                       It.IsAny&lt;string&gt;(), 
 		///                       It.IsAny&lt;string&gt;(), 
 		///                       It.IsAny&lt;int&gt;(), 

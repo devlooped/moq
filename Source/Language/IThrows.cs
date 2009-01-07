@@ -58,7 +58,7 @@ namespace Moq.Language
 		/// This example shows how to throw an exception when the method is 
 		/// invoked with an empty string argument:
 		/// <code>
-		/// mock.Expect(x =&gt; x.Execute(""))
+		/// mock.Setup(x =&gt; x.Execute(""))
 		///     .Throws(new ArgumentException());
 		/// </code>
 		/// </example>
@@ -67,12 +67,12 @@ namespace Moq.Language
 		/// <summary>
 		/// Specifies the type of exception to throw when the method is invoked.
 		/// </summary>
-		/// <typeparam name="TException">Type of exception to instantiate and throw when the expectation is met.</typeparam>
+		/// <typeparam name="TException">Type of exception to instantiate and throw when the setup is matched.</typeparam>
 		/// <example>
 		/// This example shows how to throw an exception when the method is 
 		/// invoked with an empty string argument:
 		/// <code>
-		/// mock.Expect(x =&gt; x.Execute(""))
+		/// mock.Setup(x =&gt; x.Execute(""))
 		///     .Throws&lt;ArgumentException&gt;();
 		/// </code>
 		/// </example>

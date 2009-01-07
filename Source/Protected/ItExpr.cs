@@ -46,13 +46,13 @@ namespace Moq.Protected
 {
 	/// <summary>
 	/// Allows the specification of a matching condition for an 
-	/// argument in a protected member expectation, rather than a specific 
+	/// argument in a protected member setup, rather than a specific 
 	/// argument value. "ItExpr" refers to the argument being matched.
 	/// </summary>
 	/// <remarks>
 	/// <para>Use this variant of argument matching instead of 
-	/// <see cref="It"/> for protected expectations.</para>
-	/// This class allows the expectation to match a method invocation 
+	/// <see cref="It"/> for protected setups.</para>
+	/// This class allows the setup to match a method invocation 
 	/// with an arbitrary value, with a value in a specified range, or 
 	/// even one that matches a given predicate, or null.
 	/// </remarks>
@@ -69,7 +69,7 @@ namespace Moq.Protected
 		/// <code>
 		/// // Throws an exception for a call to Remove with a null string value.
 		/// mock.Protected()
-		///     .Expect("Remove", ItExpr.IsNull&lt;string&gt;())
+		///     .Setup("Remove", ItExpr.IsNull&lt;string&gt;())
 		///     .Throws(new InvalidOperationException());
 		/// </code>
 		/// </example>
@@ -92,7 +92,7 @@ namespace Moq.Protected
 		/// <code>
 		/// // Throws an exception for a call to Remove with any string value.
 		/// mock.Protected()
-		///     .Expect("Remove", ItExpr.IsAny&lt;string&gt;())
+		///     .Setup("Remove", ItExpr.IsAny&lt;string&gt;())
 		///     .Throws(new InvalidOperationException());
 		/// </code>
 		/// </example>
@@ -118,14 +118,14 @@ namespace Moq.Protected
 		/// <c>Do</c> method is an even number.
 		/// <code>
 		/// mock.Protected()
-		///     .Expect("Do", ItExpr.Is&lt;int&gt;(i =&gt; i % 2 == 0))
+		///     .Setup("Do", ItExpr.Is&lt;int&gt;(i =&gt; i % 2 == 0))
 		///     .Returns(1);
 		/// </code>
 		/// This example shows how to throw an exception if the argument to the 
 		/// method is a negative number:
 		/// <code>
 		/// mock.Protected()
-		///     .Expect("GetUser", ItExpr.Is&lt;int&gt;(i =&gt; i &lt; 0))
+		///     .Setup("GetUser", ItExpr.Is&lt;int&gt;(i =&gt; i &lt; 0))
 		///     .Throws(new ArgumentException());
 		/// </code>
 		/// </example>
@@ -149,7 +149,7 @@ namespace Moq.Protected
 		/// with an integer argument within the 0..100 range.
 		/// <code>
 		/// mock.Protected()
-		///     .Expect("HasInventory",
+		///     .Setup("HasInventory",
 		///             ItExpr.IsAny&lt;string&gt;(),
 		///             ItExpr.IsInRange(0, 100, Range.Inclusive))
 		///     .Returns(false);
@@ -173,7 +173,7 @@ namespace Moq.Protected
 		/// string argument matches the given regular expression:
 		/// <code>
 		/// mock.Protected()
-		///     .Expect("Check", ItExpr.IsRegex("[a-z]+"))
+		///     .Setup("Check", ItExpr.IsRegex("[a-z]+"))
 		///     .Returns(1);
 		/// </code>
 		/// </example>
@@ -195,7 +195,7 @@ namespace Moq.Protected
 		/// string argument matches the given regular expression, in a case insensitive way:
 		/// <code>
 		/// mock.Protected()
-		///     .Expect("Check", ItExpr.IsRegex("[a-z]+", RegexOptions.IgnoreCase))
+		///     .Setup("Check", ItExpr.IsRegex("[a-z]+", RegexOptions.IgnoreCase))
 		///     .Returns(1);
 		/// </code>
 		/// </example>

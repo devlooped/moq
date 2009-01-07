@@ -175,7 +175,7 @@ namespace Moq.Protected
 
 				if (method.IsAssembly || method.IsFamilyAndAssembly)
 					throw new ArgumentException(String.Format(
-						Properties.Resources.ExpectationOnNonOverridableMember,
+						Properties.Resources.SetupOnNonOverridableMember,
 						method.ReflectedType.Name + "." + method.Name));
 			}
 		}

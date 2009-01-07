@@ -49,7 +49,7 @@ namespace Moq
 				}
 				catch (MockVerificationException mve)
 				{
-					message.AppendLine(mve.GetRawExpectations());
+					message.AppendLine(mve.GetRawSetups());
 				}
 			}
 

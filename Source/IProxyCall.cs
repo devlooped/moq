@@ -51,6 +51,6 @@ namespace Moq
 		bool IsVerifiable { get; set; }
 		bool IsNever { get; set; }
 		bool Invoked { get; set; }
-		Expression ExpectExpression { get; }
+		Expression SetupExpression { get; }
 	}
 }

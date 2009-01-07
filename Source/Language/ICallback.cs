@@ -59,7 +59,7 @@ namespace Moq.Language
 		/// value that can be used later:
 		/// <code>
 		/// bool called = false;
-		/// mock.Expect(x => x.Execute())
+		/// mock.Setup(x => x.Execute())
 		///     .Callback(() => called = true);
 		/// </code>
 		/// </example>
@@ -78,7 +78,7 @@ namespace Moq.Language
 		/// it as part of the lambda expression for the callback:
 		/// </para>
 		/// <code>
-		/// mock.Expect(x => x.Execute(It.IsAny&lt;string&gt;()))
+		/// mock.Setup(x => x.Execute(It.IsAny&lt;string&gt;()))
 		///     .Callback((string command) => Console.WriteLine(command));
 		/// </code>
 		/// </example>
@@ -98,7 +98,7 @@ namespace Moq.Language
 		/// them as part of the lambda expression for the callback:
 		/// </para>
 		/// <code>
-		/// mock.Expect(x => x.Execute(
+		/// mock.Setup(x => x.Execute(
 		///                      It.IsAny&lt;string&gt;(), 
 		///                      It.IsAny&lt;string&gt;()))
 		///     .Callback((string arg1, string arg2) => Console.WriteLine(arg1 + arg2));
@@ -121,7 +121,7 @@ namespace Moq.Language
 		/// them as part of the lambda expression for the callback:
 		/// </para>
 		/// <code>
-		/// mock.Expect(x => x.Execute(
+		/// mock.Setup(x => x.Execute(
 		///                      It.IsAny&lt;string&gt;(), 
 		///                      It.IsAny&lt;string&gt;(), 
 		///                      It.IsAny&lt;int&gt;()))
@@ -146,7 +146,7 @@ namespace Moq.Language
 		/// them as part of the lambda expression for the callback:
 		/// </para>
 		/// <code>
-		/// mock.Expect(x => x.Execute(
+		/// mock.Setup(x => x.Execute(
 		///                      It.IsAny&lt;string&gt;(), 
 		///                      It.IsAny&lt;string&gt;(), 
 		///                      It.IsAny&lt;int&gt;(),
@@ -159,9 +159,9 @@ namespace Moq.Language
 
 	/// <summary>
 	/// Defines the <c>Callback</c> verb and overloads for callbacks on 
-	/// expectations that return a value.
+	/// setups that return a value.
 	/// </summary>
-	/// <typeparam name="TResult">Type of the return value of the expectation.</typeparam>
+	/// <typeparam name="TResult">Type of the return value of the setup.</typeparam>
 	[EditorBrowsable(EditorBrowsableState.Never)]
 	public interface ICallback<TResult> : IHideObjectMembers
 	{
@@ -174,7 +174,7 @@ namespace Moq.Language
 		/// value that can be used later:
 		/// <code>
 		/// bool called = false;
-		/// mock.Expect(x => x.Execute())
+		/// mock.Setup(x => x.Execute())
 		///     .Callback(() => called = true)
 		///     .Returns(true);
 		/// </code>
@@ -196,7 +196,7 @@ namespace Moq.Language
 		/// it as part of the lambda expression for the callback:
 		/// </para>
 		/// <code>
-		/// mock.Expect(x => x.Execute(It.IsAny&lt;string&gt;()))
+		/// mock.Setup(x => x.Execute(It.IsAny&lt;string&gt;()))
 		///     .Callback((string command) => Console.WriteLine(command))
 		///     .Returns(true);
 		/// </code>
@@ -217,7 +217,7 @@ namespace Moq.Language
 		/// them as part of the lambda expression for the callback:
 		/// </para>
 		/// <code>
-		/// mock.Expect(x => x.Execute(
+		/// mock.Setup(x => x.Execute(
 		///                      It.IsAny&lt;string&gt;(), 
 		///                      It.IsAny&lt;string&gt;()))
 		///     .Callback((string arg1, string arg2) => Console.WriteLine(arg1 + arg2))
@@ -241,7 +241,7 @@ namespace Moq.Language
 		/// them as part of the lambda expression for the callback:
 		/// </para>
 		/// <code>
-		/// mock.Expect(x => x.Execute(
+		/// mock.Setup(x => x.Execute(
 		///                      It.IsAny&lt;string&gt;(), 
 		///                      It.IsAny&lt;string&gt;(), 
 		///                      It.IsAny&lt;int&gt;()))
@@ -267,7 +267,7 @@ namespace Moq.Language
 		/// them as part of the lambda expression for the callback:
 		/// </para>
 		/// <code>
-		/// mock.Expect(x => x.Execute(
+		/// mock.Setup(x => x.Execute(
 		///                      It.IsAny&lt;string&gt;(), 
 		///                      It.IsAny&lt;string&gt;(), 
 		///                      It.IsAny&lt;int&gt;(),

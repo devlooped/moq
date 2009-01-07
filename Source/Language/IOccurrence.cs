@@ -43,7 +43,7 @@ using System.ComponentModel;
 namespace Moq.Language
 {
 	/// <summary>
-	/// Defines occurrence members to constraint expectations.
+	/// Defines occurrence members to constraint setups.
 	/// </summary>
 	[EditorBrowsable(EditorBrowsableState.Never)]
 	public interface IOccurrence : IHideObjectMembers
@@ -54,7 +54,7 @@ namespace Moq.Language
 		/// <example>
 		/// <code>
 		/// var mock = new Mock&lt;ICommand&gt;();
-		/// mock.Expect(foo => foo.Execute("ping"))
+		/// mock.Setup(foo => foo.Execute("ping"))
 		///     .AtMostOnce();
 		/// </code>
 		/// </example>
@@ -65,7 +65,7 @@ namespace Moq.Language
 		/// <example>
 		/// <code>
 		/// var mock = new Mock&lt;ICommand&gt;();
-		/// mock.Expect(foo => foo.Execute("ping"))
+		/// mock.Setup(foo => foo.Execute("ping"))
 		///     .AtMost( 5 );
 		/// </code>
 		/// </example>
