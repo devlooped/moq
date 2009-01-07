@@ -7,17 +7,20 @@ using Moq.Language;
 
 namespace Moq
 {
+	/// <summary>
+	/// Adds <c>Verifiable</c> verb to mock setups.
+	/// </summary>
 	public static class VerifiableExtension
 	{
 		/// <summary>
-		/// Marks the expectation as verifiable, meaning that a call 
-		/// to <see cref="Mock{T}.Verify()"/> will check if this particular 
-		/// expectation was met.
+		/// Marks the setup as verifiable, meaning that a call 
+		/// to <c>mock.Verify()</c> will check if this particular 
+		/// setup was matched.
 		/// </summary>
 		/// <example>
-		/// The following example marks the expectation as verifiable:
+		/// The following example marks the setup as verifiable:
 		/// <code>
-		/// mock.Expect(x => x.Execute("ping"))
+		/// mock.Setup(x => x.Execute("ping"))
 		///     .Returns(true)
 		///     .Verifiable();
 		/// </code>
@@ -27,11 +30,37 @@ namespace Moq
 			((MethodCall)mock).IsVerifiable = true;
 		}
 
+		/// <summary>
+		/// Marks the setup as verifiable, meaning that a call 
+		/// to <c>mock.Verify()</c> will check if this particular 
+		/// setup was matched.
+		/// </summary>
+		/// <example>
+		/// The following example marks the setup as verifiable:
+		/// <code>
+		/// mock.Setup(x => x.Execute(""))
+		///     .Throws(new ArgumentException())
+		///     .Verifiable();
+		/// </code>
+		/// </example>
 		public static void Verifiable(this IThrowsResult mock)
 		{
 			((MethodCall)mock).IsVerifiable = true;
 		}
 
+		/// <summary>
+		/// Marks the setup as verifiable, meaning that a call 
+		/// to <c>mock.Verify()</c> will check if this particular 
+		/// setup was matched.
+		/// </summary>
+		/// <example>
+		/// The following example marks the setup as verifiable:
+		/// <code>
+		/// mock.Setup(x => x.Execute("ping"))
+		///     .Returns(true)
+		///     .Verifiable();
+		/// </code>
+		/// </example>
 		public static void Verifiable(this IExtensible mock)
 		{
 			((MethodCall)mock).IsVerifiable = true;

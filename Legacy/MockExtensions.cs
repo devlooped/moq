@@ -25,6 +25,7 @@ namespace Moq
 		/// If more than one expectation is set for the same method or property, 
 		/// the latest one wins and is the one that will be executed.
 		/// </remarks>
+		/// <param name="mock">The mock where the expectation will be set.</param>
 		/// <param name="expression">Lambda expression that specifies the expected method invocation.</param>
 		/// <example group="expectations">
 		/// <code>
@@ -45,10 +46,12 @@ namespace Moq
 		/// to a value returning method.
 		/// </summary>
 		/// <typeparam name="TResult">Type of the return value. Typically omitted as it can be inferred from the expression.</typeparam>
+		/// <typeparam name="T">Type of the mocked interface or class.</typeparam>
 		/// <remarks>
 		/// If more than one expectation is set for the same method or property, 
 		/// the latest one wins and is the one that will be executed.
 		/// </remarks>
+		/// <param name="mock">The mock where the expectation will be set.</param>
 		/// <param name="expression">Lambda expression that specifies the expected method invocation.</param>
 		/// <example group="expectations">
 		/// <code>
@@ -72,6 +75,8 @@ namespace Moq
 		/// the latest one wins and is the one that will be executed.
 		/// </remarks>
 		/// <typeparam name="TProperty">Type of the property. Typically omitted as it can be inferred from the expression.</typeparam>
+		/// <typeparam name="T">Type of the mocked interface or class.</typeparam>
+		/// <param name="mock">The mock where the expectation will be set.</param>
 		/// <param name="expression">Lambda expression that specifies the expected property getter.</param>
 		/// <example group="expectations">
 		/// <code>
@@ -96,6 +101,8 @@ namespace Moq
 		/// the latest one wins and is the one that will be executed.
 		/// </remarks>
 		/// <typeparam name="TProperty">Type of the property. Typically omitted as it can be inferred from the expression.</typeparam>
+		/// <typeparam name="T">Type of the mocked interface or class.</typeparam>
+		/// <param name="mock">The mock where the expectation will be set.</param>
 		/// <param name="expression">Lambda expression that specifies the expected property setter.</param>
 		/// <example group="expectations">
 		/// <code>
@@ -119,6 +126,8 @@ namespace Moq
 		/// different values.
 		/// </remarks>
 		/// <typeparam name="TProperty">Type of the property. Typically omitted as it can be inferred from the expression.</typeparam>
+		/// <typeparam name="T">Type of the mocked interface or class.</typeparam>
+		/// <param name="mock">The mock where the expectation will be set.</param>
 		/// <param name="expression">Lambda expression that specifies the expected property setter.</param>
 		/// <param name="value">The value expected to be set for the property.</param>
 		/// <example group="expectations">
@@ -141,11 +150,11 @@ namespace Moq
 		/// </summary>
 		/// <example group="verification">
 		/// This example sets up an expectation and marks it as verifiable. After 
-		/// the mock is used, a <see cref="Verify()"/> call is issued on the mock 
-		/// to ensure the method in the expectation was invoked:
+		/// the mock is used, a <c>Verify()</c> call is issued on the mock 
+		/// to ensure the method in the setup was invoked:
 		/// <code>
 		/// var mock = new Mock&lt;IWarehouse&gt;();
-		/// mock.Expect(x =&gt; x.HasInventory(TALISKER, 50)).Verifiable().Returns(true);
+		/// mock.Setup(x =&gt; x.HasInventory(TALISKER, 50)).Verifiable().Returns(true);
 		/// ...
 		/// // other test code
 		/// ...

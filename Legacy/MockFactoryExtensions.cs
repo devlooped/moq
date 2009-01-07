@@ -5,13 +5,15 @@ using System.Text;
 
 namespace Moq
 {
+	/// <summary>
+	/// Provides extensions for legacy code for <see cref="MockFactory"/>.
+	/// </summary>
 	public static class MockFactoryExtensions
 	{
 		/// <summary>
 		/// Verifies all verifiable expectations on all mocks created 
 		/// by this factory.
 		/// </summary>
-		/// <seealso cref="Mock{T}.Verify()"/>
 		/// <exception cref="MockException">One or more mocks had expectations that were not satisfied.</exception>
 		public static void Verify(this MockFactory factory)
 		{
@@ -22,7 +24,6 @@ namespace Moq
 		/// Verifies all verifiable expectations on all mocks created 
 		/// by this factory.
 		/// </summary>
-		/// <seealso cref="Mock{T}.Verify()"/>
 		/// <exception cref="MockException">One or more mocks had expectations that were not satisfied.</exception>
 		public static void VerifyAll(this MockFactory factory)
 		{
@@ -31,7 +32,7 @@ namespace Moq
 
 		/// <summary>
 		/// Invokes <paramref name="verifyAction"/> for each mock 
-		/// in <see cref="Mocks"/>, and accumulates the resulting 
+		/// in <see cref="MockFactory.Mocks"/>, and accumulates the resulting 
 		/// <see cref="MockVerificationException"/> that might be 
 		/// thrown from the action.
 		/// </summary>
