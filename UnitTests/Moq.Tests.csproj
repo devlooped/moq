@@ -79,15 +79,8 @@
     </Reference>
   </ItemGroup>
   <ItemGroup>
-    <Compile Include="..\Lib\NetFx.Reflection\Reflect.cs">
-      <Link>Instrumentation\Reflect.cs</Link>
-    </Compile>
     <Compile Include="AsInterfaceFixture.cs" />
     <Compile Include="IlFixture.cs" />
-    <Compile Include="Instrumentation\CecilExtensions.cs" />
-    <Compile Include="Instrumentation\CecilExtensionsFixture.cs" />
-    <Compile Include="Instrumentation\InstrumentationFixture.cs" />
-    <Compile Include="Instrumentation\InvocationFixture.cs" />
     <Compile Include="RecursiveMocksFixture.cs" />
     <Compile Include="CallbacksFixture.cs" />
     <Compile Include="EmptyDefaultValueProviderFixture.cs" />
@@ -116,7 +109,7 @@
     <Compile Include="VerifyFixture.cs" />
   </ItemGroup>
   <ItemGroup>
-    <ProjectReference Include="..\Legacy\Moq.Legacy\Moq.Legacy.csproj">
+    <ProjectReference Include="..\Legacy\Moq.Legacy.csproj">
       <Project>{6D199BBA-59F8-4440-A98E-AEA377793E86}</Project>
       <Name>Moq.Legacy</Name>
     </ProjectReference>

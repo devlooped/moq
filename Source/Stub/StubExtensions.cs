@@ -121,8 +121,8 @@ namespace Moq.Stub
 			 where T : class
 		{
 			TProperty value = initialValue;
-			mock.ExpectGet(property).Returns(() => value);
-			mock.ExpectSet(property).Callback(p => value = p);
+			mock.SetupGet(property).Returns(() => value);
+			mock.SetupSet(property).Callback(p => value = p);
 		}
 
 		/// <summary>
@@ -170,7 +170,7 @@ namespace Moq.Stub
 
 					var resultGet = mock
 						.GetType()
-						.GetMethod("ExpectGet")
+						.GetMethod("SetupGet")
 						.MakeGenericMethod(property.PropertyType)
 						.Invoke(mock, new[] { expect });
 
@@ -189,7 +189,7 @@ namespace Moq.Stub
 							.GetType()
 							.GetMethods()
 							// Couldn't make it work passing the generic types to GetMethod()
-							.Where(m => m.Name == "ExpectSet" && m.GetParameters().Length == 1)
+							.Where(m => m.Name == "SetupSet" && m.GetParameters().Length == 1)
 							.First()
 							.MakeGenericMethod(property.PropertyType)
 							.Invoke(mock, new[] { expect });

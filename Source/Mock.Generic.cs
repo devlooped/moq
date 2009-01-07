@@ -264,7 +264,7 @@ namespace Moq
 
 		#endregion
 
-		#region Expect
+		#region Setup
 
 		/// <summary>
 		/// Sets an expectation on the mocked type for a call to 
@@ -278,10 +278,10 @@ namespace Moq
 		/// <example group="expectations">
 		/// <code>
 		/// var mock = new Mock&lt;IProcessor&gt;();
-		/// mock.Expect(x =&gt; x.Execute("ping"));
+		/// mock.Setup(x =&gt; x.Execute("ping"));
 		/// </code>
 		/// </example>
-		public virtual IExpect Expect(Expression<Action<T>> expression)
+		public virtual ISetup Setup(Expression<Action<T>> expression)
 		{
 			return Mock.SetUpExpect<T>(expression, this.Interceptor);
 		}
@@ -295,13 +295,13 @@ namespace Moq
 		/// If more than one expectation is set for the same method or property, 
 		/// the latest one wins and is the one that will be executed.
 		/// </remarks>
-		/// <param name="expression">Lambda expression that specifies the expected method invocation.</param>
+		/// <param name="expression">Lambda expression that specifies the method invocation.</param>
 		/// <example group="expectations">
 		/// <code>
-		/// mock.Expect(x =&gt; x.HasInventory("Talisker", 50)).Returns(true);
+		/// mock.Setup(x =&gt; x.HasInventory("Talisker", 50)).Returns(true);
 		/// </code>
 		/// </example>
-		public virtual IExpect<TResult> Expect<TResult>(Expression<Func<T, TResult>> expression)
+		public virtual ISetup<TResult> Setup<TResult>(Expression<Func<T, TResult>> expression)
 		{
 			return SetUpExpect(expression, this.Interceptor);
 		}
@@ -311,18 +311,18 @@ namespace Moq
 		/// to a property getter.
 		/// </summary>
 		/// <remarks>
-		/// If more than one expectation is set for the same property getter, 
+		/// If more than one setup is set for the same property getter, 
 		/// the latest one wins and is the one that will be executed.
 		/// </remarks>
 		/// <typeparam name="TProperty">Type of the property. Typically omitted as it can be inferred from the expression.</typeparam>
-		/// <param name="expression">Lambda expression that specifies the expected property getter.</param>
+		/// <param name="expression">Lambda expression that specifies the property getter.</param>
 		/// <example group="expectations">
 		/// <code>
-		/// mock.ExpectGet(x =&gt; x.Suspended)
+		/// mock.SetupGet(x =&gt; x.Suspended)
 		///     .Returns(true);
 		/// </code>
 		/// </example>
-		public virtual IExpectGetter<TProperty> ExpectGet<TProperty>(Expression<Func<T, TProperty>> expression)
+		public virtual ISetupGetter<TProperty> SetupGet<TProperty>(Expression<Func<T, TProperty>> expression)
 		{
 			return SetUpExpectGet(expression, this.Interceptor);
 		}
@@ -336,13 +336,13 @@ namespace Moq
 		/// the latest one wins and is the one that will be executed.
 		/// </remarks>
 		/// <typeparam name="TProperty">Type of the property. Typically omitted as it can be inferred from the expression.</typeparam>
-		/// <param name="expression">Lambda expression that specifies the expected property setter.</param>
+		/// <param name="expression">Lambda expression that specifies the property setter.</param>
 		/// <example group="expectations">
 		/// <code>
-		/// mock.ExpectSet(x =&gt; x.Suspended);
+		/// mock.SetupSet(x =&gt; x.Suspended);
 		/// </code>
 		/// </example>
-		public virtual IExpectSetter<TProperty> ExpectSet<TProperty>(Expression<Func<T, TProperty>> expression)
+		public virtual ISetupSetter<TProperty> SetupSet<TProperty>(Expression<Func<T, TProperty>> expression)
 		{
 			return SetUpExpectSet<T, TProperty>(expression, this.Interceptor);
 		}
@@ -352,18 +352,18 @@ namespace Moq
 		/// to a property setter with a specific value.
 		/// </summary>
 		/// <remarks>
-		/// More than one expectation can be set for the setter with 
+		/// More than one setup can be set for the setter with 
 		/// different values.
 		/// </remarks>
 		/// <typeparam name="TProperty">Type of the property. Typically omitted as it can be inferred from the expression.</typeparam>
-		/// <param name="expression">Lambda expression that specifies the expected property setter.</param>
-		/// <param name="value">The value expected to be set for the property.</param>
+		/// <param name="expression">Lambda expression that specifies the property setter.</param>
+		/// <param name="value">The value to be set for the property.</param>
 		/// <example group="expectations">
 		/// <code>
-		/// mock.ExpectSet(x =&gt; x.Suspended, true);
+		/// mock.SetupSet(x =&gt; x.Suspended, true);
 		/// </code>
 		/// </example>
-		public virtual IExpectSetter<TProperty> ExpectSet<TProperty>(Expression<Func<T, TProperty>> expression, TProperty value)
+		public virtual ISetupSetter<TProperty> SetupSet<TProperty>(Expression<Func<T, TProperty>> expression, TProperty value)
 		{
 			return SetUpExpectSet(expression, value, this.Interceptor);
 		}
@@ -565,27 +565,27 @@ namespace Moq
 				this.owner = owner;
 			}
 
-			public override IExpect<TResult> Expect<TResult>(Expression<Func<TInterface, TResult>> expression)
+			public override ISetup<TResult> Setup<TResult>(Expression<Func<TInterface, TResult>> expression)
 			{
 				return Mock.SetUpExpect(expression, owner.Interceptor);
 			}
 
-			public override IExpect Expect(Expression<Action<TInterface>> expression)
+			public override ISetup Setup(Expression<Action<TInterface>> expression)
 			{
 				return Mock.SetUpExpect(expression, owner.Interceptor);
 			}
 
-			public override IExpectGetter<TProperty> ExpectGet<TProperty>(Expression<Func<TInterface, TProperty>> expression)
+			public override ISetupGetter<TProperty> SetupGet<TProperty>(Expression<Func<TInterface, TProperty>> expression)
 			{
 				return Mock.SetUpExpectGet(expression, owner.Interceptor);
 			}
 
-			public override IExpectSetter<TProperty> ExpectSet<TProperty>(Expression<Func<TInterface, TProperty>> expression)
+			public override ISetupSetter<TProperty> SetupSet<TProperty>(Expression<Func<TInterface, TProperty>> expression)
 			{
 				return Mock.SetUpExpectSet(expression, owner.Interceptor);
 			}
 
-			public override IExpectSetter<TProperty> ExpectSet<TProperty>(Expression<Func<TInterface, TProperty>> expression, TProperty value)
+			public override ISetupSetter<TProperty> SetupSet<TProperty>(Expression<Func<TInterface, TProperty>> expression, TProperty value)
 			{
 				return Mock.SetUpExpectSet(expression, value, owner.Interceptor);
 			}

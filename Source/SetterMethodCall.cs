@@ -6,7 +6,7 @@ using Moq.Protected;
 
 namespace Moq
 {
-	internal class SetterMethodCall<TProperty> : MethodCall, IExpectSetter<TProperty>
+	internal class SetterMethodCall<TProperty> : MethodCall, ISetupSetter<TProperty>
 	{
 		public SetterMethodCall(Expression originalExpression, MethodInfo method)
 			: base(originalExpression, method, new[] { ItExpr.IsAny<TProperty>() })

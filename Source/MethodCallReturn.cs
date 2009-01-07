@@ -62,7 +62,7 @@ namespace Moq
 		public bool HasReturnValue { get; protected set; }
 	}
 
-	internal class MethodCallReturn<TResult> : MethodCallReturn, IProxyCall, IExpect<TResult>, IExpectGetter<TResult>, IReturnsResult
+	internal class MethodCallReturn<TResult> : MethodCallReturn, IProxyCall, ISetup<TResult>, ISetupGetter<TResult>, IReturnsResult
 	{
 		Delegate valueDel = (Func<TResult>)(() => default(TResult));
 		Action<object[]> afterReturnCallback;

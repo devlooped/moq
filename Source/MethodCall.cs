@@ -49,7 +49,7 @@ using Moq.Language.Flow;
 
 namespace Moq
 {
-	internal class MethodCall : IProxyCall, IExpect
+	internal class MethodCall : IProxyCall, ISetup
 	{
 		protected MethodInfo method;
 		Expression originalExpression;

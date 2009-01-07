@@ -97,7 +97,7 @@
     <Compile Include="IMocked.cs" />
     <Compile Include="Interceptor.cs" />
     <Compile Include="IProxyCall.cs" />
-    <Compile Include="Language\Flow\IExpect.cs" />
+    <Compile Include="Language\Flow\ISetup.cs" />
     <Compile Include="Language\ICallbackSetter.cs" />
     <Compile Include="Language\IOccurrence.cs" />
     <Compile Include="Language\IReturns.cs" />
@@ -146,14 +146,6 @@
     <Compile Include="DefaultValue.cs" />
     <Compile Include="EventInfoCallback.cs" />
     <Compile Include="IDefaultValueProvider.cs" />
-    <Compile Include="Instrumentation\IInstrumented.cs" />
-    <Compile Include="Instrumentation\IInterceptor.cs">
-      <SubType>Code</SubType>
-    </Compile>
-    <Compile Include="Instrumentation\IInvocation.cs">
-      <SubType>Code</SubType>
-    </Compile>
-    <Compile Include="Instrumentation\Invocation.cs" />
     <Compile Include="Language\INever.cs" />
     <Compile Include="Matchers\ParamArrayMatcher.cs" />
     <Compile Include="Matchers\RefMatcher.cs" />

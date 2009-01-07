@@ -57,7 +57,7 @@ namespace Moq.Protected
 			this.mock = mock;
 		}
 
-		public IExpect Expect(string voidMethodName, params object[] args)
+		public ISetup Expect(string voidMethodName, params object[] args)
 		{
 			Guard.ArgumentNotNullOrEmptyString(voidMethodName, "voidMethodName");
 
@@ -79,7 +79,7 @@ namespace Moq.Protected
 			{
 				var param = Expression.Parameter(typeof(T), "x");
 
-				return mock.Expect(Expression.Lambda<Action<T>>(
+				return mock.Setup(Expression.Lambda<Action<T>>(
 						Expression.Call(param, method, ToExpressionArgs(args)),
 						param));
 			}
@@ -92,7 +92,7 @@ namespace Moq.Protected
 			}
 		}
 
-		public IExpect<TResult> Expect<TResult>(string methodOrPropertyName, params object[] args)
+		public ISetup<TResult> Expect<TResult>(string methodOrPropertyName, params object[] args)
 		{
 			Guard.ArgumentNotNullOrEmptyString(methodOrPropertyName, "methodOrPropertyName");
 
@@ -117,19 +117,19 @@ namespace Moq.Protected
 				if (method.ReturnType == typeof(void))
 					throw new ArgumentException(Properties.Resources.CantSetReturnValueForVoid);
 
-				return mock.Expect(Expression.Lambda<Func<T, TResult>>(
+				return mock.Setup(Expression.Lambda<Func<T, TResult>>(
 						Expression.Call(param, method, ToExpressionArgs(args)),
 						param));
 			}
 			else
 			{
-				return mock.Expect(Expression.Lambda<Func<T, TResult>>(
+				return mock.Setup(Expression.Lambda<Func<T, TResult>>(
 						Expression.MakeMemberAccess(param, property),
 						param));
 			}
 		}
 
-		public IExpectGetter<TProperty> ExpectGet<TProperty>(string propertyName)
+		public ISetupGetter<TProperty> ExpectGet<TProperty>(string propertyName)
 		{
 			Guard.ArgumentNotNullOrEmptyString(propertyName, "propertyName");
 
@@ -141,12 +141,12 @@ namespace Moq.Protected
 
 			var param = Expression.Parameter(typeof(T), "x");
 
-			return mock.ExpectGet(Expression.Lambda<Func<T, TProperty>>(
+			return mock.SetupGet(Expression.Lambda<Func<T, TProperty>>(
 					Expression.MakeMemberAccess(param, property),
 					param));
 		}
 
-		public IExpectSetter<TProperty> ExpectSet<TProperty>(string propertyName)
+		public ISetupSetter<TProperty> ExpectSet<TProperty>(string propertyName)
 		{
 			Guard.ArgumentNotNullOrEmptyString(propertyName, "propertyName");
 
@@ -158,7 +158,7 @@ namespace Moq.Protected
 
 			var param = Expression.Parameter(typeof(T), "x");
 
-			return mock.ExpectSet(Expression.Lambda<Func<T, TProperty>>(
+			return mock.SetupSet(Expression.Lambda<Func<T, TProperty>>(
 					Expression.MakeMemberAccess(param, property),
 					param));
 		}
