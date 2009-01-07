@@ -57,7 +57,7 @@
       <SpecificVersion>False</SpecificVersion>
       <HintPath>..\Lib\Castle\Castle.DynamicProxy2.dll</HintPath>
     </Reference>
-    <Reference Include="Mono.Cecil, Version=0.6.0.0, Culture=neutral, PublicKeyToken=0738eb9f132ed756">
+    <Reference Include="Mono.Cecil, Version=0.6.9.0, Culture=neutral, processorArchitecture=MSIL">
       <SpecificVersion>False</SpecificVersion>
       <HintPath>..\Lib\Mono.Cecil.dll</HintPath>
     </Reference>
@@ -65,6 +65,7 @@
     <Reference Include="System.Core">
       <RequiredTargetFramework>3.5</RequiredTargetFramework>
     </Reference>
+    <Reference Include="System.Data" />
     <Reference Include="System.ServiceModel">
       <RequiredTargetFramework>3.0</RequiredTargetFramework>
     </Reference>
@@ -78,8 +79,15 @@
     </Reference>
   </ItemGroup>
   <ItemGroup>
+    <Compile Include="..\Lib\NetFx.Reflection\Reflect.cs">
+      <Link>Instrumentation\Reflect.cs</Link>
+    </Compile>
     <Compile Include="AsInterfaceFixture.cs" />
     <Compile Include="IlFixture.cs" />
+    <Compile Include="Instrumentation\CecilExtensions.cs" />
+    <Compile Include="Instrumentation\CecilExtensionsFixture.cs" />
+    <Compile Include="Instrumentation\InstrumentationFixture.cs" />
+    <Compile Include="Instrumentation\InvocationFixture.cs" />
     <Compile Include="RecursiveMocksFixture.cs" />
     <Compile Include="CallbacksFixture.cs" />
     <Compile Include="EmptyDefaultValueProviderFixture.cs" />
