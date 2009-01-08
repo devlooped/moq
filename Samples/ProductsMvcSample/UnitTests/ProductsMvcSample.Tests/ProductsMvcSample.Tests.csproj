@@ -69,9 +69,13 @@
   </ItemGroup>
   <ItemGroup>
     <Compile Include="Controllers\ProductsControllerFixture.cs" />
-    <Compile Include="MvcTestHelper.cs" />
+    <Compile Include="MvcTestHelper.cs">
+      <SubType>Code</SubType>
+    </Compile>
     <Compile Include="Properties\AssemblyInfo.cs" />
-    <Compile Include="Routes\ProductsRoutesFixture.cs" />
+    <Compile Include="Routes\ProductsRoutesFixture.cs">
+      <SubType>Code</SubType>
+    </Compile>
   </ItemGroup>
   <ItemGroup>
     <ProjectReference Include="..\..\Source\ProductsMvcSample\ProductsMvcSample.csproj">

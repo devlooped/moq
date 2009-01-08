@@ -30,6 +30,10 @@
     <WarningLevel>4</WarningLevel>
   </PropertyGroup>
   <ItemGroup>
+    <Reference Include="Microsoft.Web.Mvc, Version=1.0.0.0, Culture=neutral, processorArchitecture=MSIL">
+      <SpecificVersion>False</SpecificVersion>
+      <HintPath>..\..\..\Lib\Microsoft.Web.Mvc.dll</HintPath>
+    </Reference>
     <Reference Include="Moq, Version=3.0.107.1, Culture=neutral, PublicKeyToken=69f491c39445e920, processorArchitecture=MSIL">
       <SpecificVersion>False</SpecificVersion>
       <HintPath>..\..\..\Lib\Moq.dll</HintPath>
@@ -74,6 +78,10 @@
   <ItemGroup>
     <Compile Include="Controllers\HomeController.cs" />
     <Compile Include="Controllers\ProductsController.cs" />
+    <Compile Include="Default.aspx.cs">
+      <DependentUpon>Default.aspx</DependentUpon>
+      <SubType>ASPXCodeBehind</SubType>
+    </Compile>
     <Compile Include="Global.asax.cs">
       <DependentUpon>Global.asax</DependentUpon>
     </Compile>
@@ -97,8 +105,6 @@
   </ItemGroup>
   <ItemGroup>
     <Content Include="Default.aspx" />
-  </ItemGroup>
-  <ItemGroup>
     <Content Include="Views\Home\Welcome.aspx" />
     <Content Include="Views\Products\ProductsList.aspx" />
     <Content Include="Views\Shared\Site.Master" />

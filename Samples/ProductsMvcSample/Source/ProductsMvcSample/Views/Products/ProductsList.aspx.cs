@@ -1,7 +1,6 @@
 ﻿using System;
-using System.Web;
-using ProductsMvcSample.Models;
 using System.Web.Mvc;
+using ProductsMvcSample.Models;
 
 namespace ProductsMvcSample.Views.Products
 {

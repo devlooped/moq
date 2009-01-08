@@ -3,10 +3,10 @@
 </asp:Content>
 <asp:Content ID="Content2" ContentPlaceHolderID="mainContent" runat="server">
 
-<h1><%= ViewData.CategoryName %></h1>
+<h1><%= ViewData.Model.CategoryName %></h1>
 
 <ul>
-<% foreach (var product in ViewData.Products)
+<% foreach (var product in ViewData.Model.Products)
    { %>
 	<li><%= product.Name %></li>	   
 <% } %>

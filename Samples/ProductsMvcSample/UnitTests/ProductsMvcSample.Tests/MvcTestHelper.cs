@@ -43,45 +43,5 @@ namespace ProductsMvcSample.Tests
 				Assert.AreEqual(expectedValue, actualValue, String.Format("Argument for '{0}'.", parameter.Name));
 			}
 		}
-
-		public static Mock<HttpContextBase> MockHttpContext()
-		{
-			var context = new Mock<HttpContextBase> { DefaultValue = DefaultValue.Mock };
-			return context;
-		}
-
-		public static Mock<HttpRequestBase> MockGet(Mock<HttpContextBase> httpContext, string relativeUrl)
-		{
-			var request = new Mock<HttpRequestBase>();
-			httpContext.Setup(x => x.Request).Returns(request.Object);
-			#region parse relativeUrl
-			var fragments = relativeUrl.Split('?');
-			var filePath = fragments[0];
-			var queryStringFragment = fragments.Length < 2 ? string.Empty : fragments[1];
-			var queryString = new System.Collections.Specialized.NameValueCollection();
-			foreach (var token in queryStringFragment.Split('&'))
-			{
-				if (!string.IsNullOrEmpty(token))
-					queryString.Add(token.Split('=')[0], token.Split('=')[1]);
-			}
-			#endregion
-			request.Setup(x => x.AppRelativeCurrentExecutionFilePath).Returns(filePath);
-			request.Setup(x => x.QueryString).Returns(queryString);
-			request.Setup(x => x.PathInfo).Returns(string.Empty);
-			request.Setup(x => x.HttpMethod).Returns("GET");
-			return request;
-		}
-
-		public static void MakeControllerTestable(Controller controller, IViewFactory viewFactory)
-		{
-			var httpContext = new Mock<IHttpContext>();
-			httpContext.Expect(x => x.Session).Returns((IHttpSessionState)null);
-			var controllerContext = new ControllerContext(httpContext.Object, new RouteData(), new Mock<IController>().Object);
-			var tempData = new TempDataDictionary(httpContext.Object);
-			controller.ControllerContext = controllerContext;
-			controller.GetType().GetProperty("TempData").SetValue(controller, tempData, null);
-
-			controller.ViewFactory = viewFactory;
-		}
 	}
 }

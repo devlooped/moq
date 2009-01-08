@@ -1,13 +1,5 @@
 ﻿using System;
-using System.Data;
-using System.Configuration;
-using System.Collections;
-using System.Linq;
-using System.Web;
 using System.Web.Mvc;
-using System.Web.Security;
-using System.Web.SessionState;
-using System.Xml.Linq;
 using System.Web.Routing;
 
 namespace ProductsMvcSample
@@ -34,7 +26,7 @@ namespace ProductsMvcSample
 			routes.MapRoute(
 				"Root",													// Route name
 				"Default.aspx",											// URL with parameters
-				new { controller = "Home", action = "Index", id = "" } // Parameter defaults
+				new { controller = "Home", action = "Index", id = "" }	// Parameter defaults
 			);
 		}
 	}

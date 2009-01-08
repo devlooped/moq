@@ -1,8 +1,6 @@
-﻿using System;
-using System.Web;
-using ProductsMvcSample.Services;
+﻿using System.Web.Mvc;
 using ProductsMvcSample.Models;
-using System.Web.Mvc;
+using ProductsMvcSample.Services;
 
 namespace ProductsMvcSample.Controllers
 {
@@ -21,17 +19,18 @@ namespace ProductsMvcSample.Controllers
 			this.catalogService = catalogService;
 		}
 
-		public void Index()
+		public ActionResult Index()
 		{
+			return View();
 		}
 
-		public void Category(int id)
+		public ActionResult Category(int id)
 		{
 			var model = new ProductsListViewData();
 			model.CategoryId = id;
 			model.CategoryName = catalogService.GetCategoryName(id);
 			model.Products.AddRange(catalogService.GetProducts(id) ?? new Product[0]);
-			View("ProductsList", model);
+			return View("ProductsList", model);
 		}
 	}
 }
