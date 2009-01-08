@@ -12,7 +12,7 @@ namespace Moq
 	/// Extensions for backwards compatibility with legacy test code 
 	/// that uses older features of the API.
 	/// </summary>
-	public static class IMockExtensions
+	public static class MockExtensions
 	{
 		#region Legacy Expect
 
