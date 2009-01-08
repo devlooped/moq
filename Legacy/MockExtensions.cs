@@ -164,7 +164,6 @@ namespace Moq
 		/// </example>
 		/// <exception cref="MockException">Not all verifiable expectations were met.</exception>
 		[Obsolete("To verify invocations, use Verify passing an explicit expression instead (i.e. mock.Verify(m => m.Do());).", false)]
-		[EditorBrowsable(EditorBrowsableState.Never)]
 		public static void Verify(this Mock mock)
 		{
 			try
@@ -207,7 +206,6 @@ namespace Moq
 		/// </example>
 		/// <exception cref="MockException">At least one expectation was not met.</exception>
 		[Obsolete("To verify invocations, use Verify passing an explicit expression instead (i.e. mock.Verify(m => m.Do());).", false)]
-		[EditorBrowsable(EditorBrowsableState.Never)]
 		public static void VerifyAll(this Mock mock)
 		{
 			// Made static so it can be called from As<TInterface>
