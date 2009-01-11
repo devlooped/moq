@@ -46,6 +46,7 @@ using Castle.Core.Interceptor;
 using Castle.DynamicProxy;
 using Moq.Language.Flow;
 using System.Collections.Generic;
+using System.ComponentModel;
 
 namespace Moq
 {
@@ -105,7 +106,7 @@ namespace Moq
 	/// Assert.False(order.IsFilled);
 	/// </code>
 	/// </example>
-	public class Mock<T> : Mock
+	public partial class Mock<T> : Mock
 		where T : class
 	{
 		static readonly ProxyGenerator generator = new ProxyGenerator();

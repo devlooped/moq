@@ -150,6 +150,8 @@
     <Compile Include="Matchers\ParamArrayMatcher.cs" />
     <Compile Include="Matchers\RefMatcher.cs" />
     <Compile Include="Mock.Generic.cs" />
+    <Compile Include="Mock.Generic.Legacy.cs" />
+    <Compile Include="Mock.Legacy.cs" />
     <Compile Include="MockDefaultValueProvider.cs" />
     <Compile Include="MockedEvent.Generic.cs" />
     <Compile Include="SetterMethodCall.cs" />

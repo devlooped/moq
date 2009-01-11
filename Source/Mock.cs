@@ -52,7 +52,7 @@ namespace Moq
 	/// apply to mocked objects, such as <see cref="Get"/> to 
 	/// retrieve a <see cref="Mock{T}"/> from an object instance.
 	/// </summary>
-	public abstract class Mock : IHideObjectMembers
+	public abstract partial class Mock : IHideObjectMembers
 	{
 		/// <summary>
 		/// Retrieves the mock object for the given object instance.

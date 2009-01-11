@@ -14,7 +14,7 @@ namespace Store.Tests
 			// Arrange
 			var catalog = new Mock<ICatalogService>();
 			var view = new Mock<IProductsView>();
-
+			
 			// Act
 			var presenter = new ProductsPresenter(catalog.Object, view.Object);
 
@@ -29,7 +29,7 @@ namespace Store.Tests
 			var catalog = new Mock<ICatalogService>();
 			var view = new Mock<IProductsView>();
 			var presenter = new ProductsPresenter(catalog.Object, view.Object);
-
+			
 			// Act
 			view.Raise(
 				v => v.CategorySelected += null, 

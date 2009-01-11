@@ -2,17 +2,17 @@
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
-using System.Linq.Expressions;
-using Moq.Language.Flow;
 using System.ComponentModel;
+using Moq.Language.Flow;
+using System.Linq.Expressions;
 
 namespace Moq
 {
-	/// <summary>
-	/// Extensions for backwards compatibility with legacy test code 
-	/// that uses older features of the API.
-	/// </summary>
-	public static class MockExtensions
+    // Keeps legacy members that hidden and are provided 
+    // for backwards compatibility (so that existing projects 
+    // still compile, but people don't see them).
+    // When a reference to Moq.Legacy.dll is added to a projects, 
+    public partial class Mock
 	{
 		/// <summary>
 		/// Verifies that all verifiable expectations have been met.
@@ -23,23 +23,23 @@ namespace Moq
 		/// to ensure the method in the setup was invoked:
 		/// <code>
 		/// var mock = new Mock&lt;IWarehouse&gt;();
-		/// mock.Setup(x =&gt; x.HasInventory(TALISKER, 50)).Verifiable().Returns(true);
+		/// this.Setup(x =&gt; x.HasInventory(TALISKER, 50)).Verifiable().Returns(true);
 		/// ...
 		/// // other test code
 		/// ...
 		/// // Will throw if the test code has didn't call HasInventory.
-		/// mock.Verify();
+		/// this.Verify();
 		/// </code>
 		/// </example>
 		/// <exception cref="MockException">Not all verifiable expectations were met.</exception>
-		[Obsolete("To verify invocations, use Verify passing an explicit expression instead (i.e. mock.Verify(m => m.Do());).", false)]
-        [EditorBrowsable(EditorBrowsableState.Always)]
-		public static void Verify(this Mock mock)
+		[Obsolete("To verify invocations, use Verify passing an explicit expression instead (i.e. this.Verify(m => m.Do());).", false)]
+		[EditorBrowsable(EditorBrowsableState.Never)]
+		public void Verify()
 		{
 			try
 			{
-				mock.Interceptor.Verify();
-				foreach (var inner in mock.InnerMocks.Values)
+				this.Interceptor.Verify();
+				foreach (var inner in this.InnerMocks.Values)
 				{
 					inner.Verify();
 				}
@@ -65,25 +65,24 @@ namespace Moq
 		/// to ensure that all expectations are met:
 		/// <code>
 		/// var mock = new Mock&lt;IWarehouse&gt;();
-		/// mock.Expect(x =&gt; x.HasInventory(TALISKER, 50)).Returns(true);
+		/// this.Expect(x =&gt; x.HasInventory(TALISKER, 50)).Returns(true);
 		/// ...
 		/// // other test code
 		/// ...
 		/// // Will throw if the test code has didn't call HasInventory, even 
 		/// // that expectation was not marked as verifiable.
-		/// mock.VerifyAll();
+		/// this.VerifyAll();
 		/// </code>
 		/// </example>
 		/// <exception cref="MockException">At least one expectation was not met.</exception>
-		[Obsolete("To verify invocations, use Verify passing an explicit expression instead (i.e. mock.Verify(m => m.Do());).", false)]
-        [EditorBrowsable(EditorBrowsableState.Always)]
-        public static void VerifyAll(this Mock mock)
+		[Obsolete("To verify invocations, use Verify passing an explicit expression instead (i.e. this.Verify(m => m.Do());).", false)]
+		[EditorBrowsable(EditorBrowsableState.Never)]
+		public void VerifyAll()
 		{
-			// Made static so it can be called from As<TInterface>
 			try
 			{
-				mock.Interceptor.VerifyAll();
-				foreach (var inner in mock.InnerMocks.Values)
+				this.Interceptor.VerifyAll();
+				foreach (var inner in this.InnerMocks.Values)
 				{
 					inner.VerifyAll();
 				}
