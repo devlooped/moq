@@ -369,6 +369,176 @@ namespace Moq
 			return SetUpExpectSet(expression, value, this.Interceptor);
 		}
 
+        /// <summary>
+        /// Specifies that the given property should have "property behavior", 
+        /// meaning that setting its value will cause it to be saved and 
+        /// later returned when the property is requested. (this is also 
+        /// known as "stubbing").
+        /// </summary>
+        /// <typeparam name="TProperty">Type of the property, inferred from the property 
+        /// expression (does not need to be specified).</typeparam>
+        /// <param name="property">Property expression to stub.</param>
+        /// <example>
+        /// If you have an interface with an int property <c>Value</c>, you might 
+        /// stub it using the following straightforward call:
+        /// <code>
+        /// var mock = new Mock&lt;IHaveValue&gt;();
+        /// mock.Stub(v => v.Value);
+        /// </code>
+        /// After the <c>Stub</c> call has been issued, setting and 
+        /// retrieving the object value will behave as expected:
+        /// <code>
+        /// IHaveValue v = mock.Object;
+        /// 
+        /// v.Value = 5;
+        /// Assert.Equal(5, v.Value);
+        /// </code>
+        /// </example>
+        public virtual void SetupProperty<TProperty>(Expression<Func<T, TProperty>> property)
+        {
+            SetupProperty(property, default(TProperty));
+        }
+
+        /// <summary>
+        /// Specifies that the given property should have "property behavior", 
+        /// meaning that setting its value will cause it to be saved and 
+        /// later returned when the property is requested. This overload 
+        /// allows setting the initial value for the property. (this is also 
+        /// known as "stubbing").
+        /// </summary>
+        /// <typeparam name="TProperty">Type of the property, inferred from the property 
+        /// expression (does not need to be specified).</typeparam>
+        /// <param name="property">Property expression to stub.</param>
+        /// <param name="initialValue">Initial value for the property.</param>
+        /// <example>
+        /// If you have an interface with an int property <c>Value</c>, you might 
+        /// stub it using the following straightforward call:
+        /// <code>
+        /// var mock = new Mock&lt;IHaveValue&gt;();
+        /// mock.SetupProperty(v => v.Value, 5);
+        /// </code>
+        /// After the <c>SetupProperty</c> call has been issued, setting and 
+        /// retrieving the object value will behave as expected:
+        /// <code>
+        /// IHaveValue v = mock.Object;
+        /// // Initial value was stored
+        /// Assert.Equal(5, v.Value);
+        /// 
+        /// // New value set which changes the initial value
+        /// v.Value = 6;
+        /// Assert.Equal(6, v.Value);
+        /// </code>
+        /// </example>
+        public virtual void SetupProperty<TProperty>(Expression<Func<T, TProperty>> property, TProperty initialValue)
+        {
+            TProperty value = initialValue;
+            SetupGet(property).Returns(() => value);
+            SetupSet(property).Callback(p => value = p);
+        }
+
+        /// <summary>
+        /// Specifies that the all properties on the mock should have "property behavior", 
+        /// meaning that setting its value will cause it to be saved and 
+        /// later returned when the property is requested. (this is also 
+        /// known as "stubbing"). The default value for each property will be the 
+        /// one generated as specified by the <see cref="Mock.DefaultValue"/> property for the mock.
+        /// </summary>
+        /// <remarks>
+        /// If the mock <see cref="Mock.DefaultValue"/> is set to <see cref="DefaultValue.Mock"/>, 
+        /// the mocked default values will also get all properties setup recursively.
+        /// </remarks>
+        public virtual void SetupAllProperties()
+        {
+            SetupAllProperties(this);
+        }
+
+        private static void SetupAllProperties(Mock mock)
+        {
+            // Crazy reflection stuff below. Ah... the goodies of generics :)
+            var mockType = mock.MockedType;
+            var properties = new List<PropertyInfo>();
+            properties.AddRange(mockType.GetProperties());
+            // Add all implemented properties too.
+            properties.AddRange(
+                from i in mockType.GetInterfaces()
+                from p in i.GetProperties()
+                select p);
+            // Add all properties from base classes
+            properties = properties.Distinct().ToList();
+
+            foreach (var property in properties)
+            {
+                if (property.CanRead && property.CanOverrideGet())
+                {
+                    var expect = GetPropertyExpression(mockType, property);
+                    object initialValue = mock.DefaultValueProvider.ProvideDefault(property.GetGetMethod(), new object[0]);
+
+                    if (initialValue is IMocked)
+                        SetupAllProperties(((IMocked)initialValue).Mock);
+
+                    var closure = Activator.CreateInstance(
+                        typeof(ValueClosure<>).MakeGenericType(property.PropertyType), initialValue);
+
+                    var resultGet = mock
+                        .GetType()
+                        .GetMethod("SetupGet")
+                        .MakeGenericMethod(property.PropertyType)
+                        .Invoke(mock, new[] { expect });
+
+                    var returnsGet = resultGet.GetType().GetMethod("Returns", new[] { typeof(Func<>).MakeGenericType(property.PropertyType) });
+
+                    var getFunc = Activator.CreateInstance(
+                        typeof(Func<>).MakeGenericType(property.PropertyType),
+                        closure,
+                        closure.GetType().GetMethod("GetValue").MethodHandle.GetFunctionPointer());
+
+                    returnsGet.Invoke(resultGet, new[] { getFunc });
+
+                    if (property.CanWrite && property.CanOverrideSet())
+                    {
+                        var resultSet = mock
+                            .GetType()
+                            .GetMethods()
+                            // Couldn't make it work passing the generic types to GetMethod()
+                            .Where(m => m.Name == "SetupSet" && m.GetParameters().Length == 1)
+                            .First()
+                            .MakeGenericMethod(property.PropertyType)
+                            .Invoke(mock, new[] { expect });
+
+                        var callbackSet = resultSet.GetType().GetMethod("Callback", new[] { typeof(Action<>).MakeGenericType(property.PropertyType) });
+
+                        var setFunc = Activator.CreateInstance(
+                            typeof(Action<>).MakeGenericType(property.PropertyType),
+                            closure,
+                            closure.GetType().GetMethod("SetValue").MethodHandle.GetFunctionPointer());
+
+                        callbackSet.Invoke(resultSet, new[] { setFunc });
+                    }
+                }
+            }
+        }
+
+        private static Expression GetPropertyExpression(Type mockType, PropertyInfo property)
+        {
+            var param = Expression.Parameter(mockType, "m");
+            return Expression.Lambda(
+                Expression.MakeMemberAccess(param, property),
+                param);
+        }
+
+        private class ValueClosure<TValue>
+        {
+            public ValueClosure(TValue initialValue)
+            {
+                Value = initialValue;
+            }
+
+            public TValue Value { get; set; }
+
+            public TValue GetValue() { return Value; }
+            public void SetValue(TValue value) { Value = value; }
+        }
+
 		#endregion
 
 		#region Verify

@@ -1,5 +1,4 @@
 ﻿using Xunit;
-using Moq.Stub;
 using System;
 using System.Reflection;
 
@@ -12,8 +11,8 @@ namespace Moq.Tests
 		{
 			var mock = new Mock<IFoo>();
 
-			mock.ExpectGet(x => x.ValueProperty).Returns(25);
-			mock.ExpectSet(x => x.ValueProperty);
+			mock.SetupGet(x => x.ValueProperty).Returns(25);
+			mock.SetupSet(x => x.ValueProperty);
 
 			mock.Object.ValueProperty = 7;
 			Assert.Equal(25, mock.Object.ValueProperty);
@@ -24,8 +23,8 @@ namespace Moq.Tests
 		{
 			var mock = new Mock<IFoo>();
 
-			mock.ExpectGet(x => x.ValueProperty).Returns(25);
-			mock.ExpectSet(y => y.ValueProperty);
+			mock.SetupGet(x => x.ValueProperty).Returns(25);
+			mock.SetupSet(y => y.ValueProperty);
 
 			mock.Object.ValueProperty = 7;
 			Assert.Equal(25, mock.Object.ValueProperty);
@@ -36,7 +35,7 @@ namespace Moq.Tests
 		{
 			var mock = new Mock<IFoo>();
 
-			mock.Stub(f => f.ValueProperty);
+			mock.SetupProperty(f => f.ValueProperty);
 
 			Assert.Equal(0, mock.Object.ValueProperty);
 
@@ -50,7 +49,7 @@ namespace Moq.Tests
 		{
 			var mock = new Mock<IFoo>();
 
-			mock.Stub(f => f.ValueProperty, 5);
+			mock.SetupProperty(f => f.ValueProperty, 5);
 
 			Assert.Equal(5, mock.Object.ValueProperty);
 
@@ -64,7 +63,7 @@ namespace Moq.Tests
 		{
 			var mock = new Mock<IFoo>();
 
-			mock.StubAll();
+			mock.SetupAllProperties();
 
 			mock.Object.ValueProperty = 5;
 			Assert.Equal(5, mock.Object.ValueProperty);
@@ -83,7 +82,7 @@ namespace Moq.Tests
 		{
 			var mock = new Mock<IFoo>() { DefaultValue = DefaultValue.Mock };
 
-			mock.StubAll();
+			mock.SetupAllProperties();
 
 			mock.Object.Bar.Value = 5;
 			Assert.Equal(5, mock.Object.Bar.Value);
@@ -94,7 +93,7 @@ namespace Moq.Tests
 		{
 			var mock = new Mock<IBaz>();
 
-			mock.StubAll();
+			mock.SetupAllProperties();
 
 			mock.Object.Value = 5;
 			Assert.Equal(5, mock.Object.Value);
@@ -108,7 +107,7 @@ namespace Moq.Tests
 		{
 			var mock = new Mock<Base>();
 
-			mock.StubAll();
+			mock.SetupAllProperties();
 
 			mock.Object.BaseValue = 5;
 			Assert.Equal(5, mock.Object.BaseValue);
