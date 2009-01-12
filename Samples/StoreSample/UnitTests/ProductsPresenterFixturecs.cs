@@ -14,13 +14,14 @@ namespace Store.Tests
 			// Arrange
 			var catalog = new Mock<ICatalogService>();
 			var view = new Mock<IProductsView>();
-			
+
 			// Act
 			var presenter = new ProductsPresenter(catalog.Object, view.Object);
 
 			// Assert
 			view.Verify(v => v.SetCategories(It.IsAny<IEnumerable<Category>>()));
 		}
+
 
 		[Test]
 		public void ShouldCategorySelectionSetProducts()
