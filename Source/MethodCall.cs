@@ -46,6 +46,7 @@ using System.Reflection;
 using Castle.Core.Interceptor;
 using Moq.Language;
 using Moq.Language.Flow;
+using System.Globalization;
 
 namespace Moq
 {
@@ -158,19 +159,22 @@ namespace Moq
 
 			if (isOnce && callCount > 1)
 				throw new MockException(MockException.ExceptionReason.MoreThanOneCall,
-					String.Format(Properties.Resources.MoreThanOneCall,
+					String.Format(CultureInfo.CurrentCulture, 
+					Properties.Resources.MoreThanOneCall,
 					call.Format()));
 
 
 			if (IsNever)
 				throw new MockException(MockException.ExceptionReason.SetupNever,
-					String.Format(Properties.Resources.SetupNever,
+					String.Format(CultureInfo.CurrentCulture, 
+					Properties.Resources.SetupNever,
 					call.Format()));
 
 
 			if (expectedCallCount.HasValue && callCount > expectedCallCount)
 				throw new MockException(MockException.ExceptionReason.MoreThanNCalls,
-					String.Format(Properties.Resources.MoreThanNCalls, expectedCallCount,
+					String.Format(CultureInfo.CurrentCulture, 
+					Properties.Resources.MoreThanNCalls, expectedCallCount,
 					call.Format()));
 
 
@@ -259,9 +263,9 @@ namespace Moq
 			this.callback = delegate(object[] args) { callback.InvokePreserveStack(args); };
 		}
 
-		private void ThrowParameterMismatch(ParameterInfo[] expected, ParameterInfo[] actual)
+		private static void ThrowParameterMismatch(ParameterInfo[] expected, ParameterInfo[] actual)
 		{
-			throw new ArgumentException(String.Format(
+			throw new ArgumentException(String.Format(CultureInfo.CurrentCulture, 
 				"Invalid callback. Setup on method with parameters ({0}) cannot invoke callback with parameters ({1}).",
 				String.Join(",", expected.Select(p => p.ParameterType.Name).ToArray()),
 				String.Join(",", actual.Select(p => p.ParameterType.Name).ToArray())

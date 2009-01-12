@@ -32,6 +32,7 @@ namespace Moq
 		/// </code>
 		/// </example>
 		/// <exception cref="MockException">Not all verifiable expectations were met.</exception>
+		[System.Diagnostics.CodeAnalysis.SuppressMessage("Microsoft.Usage", "CA2200:RethrowToPreserveStackDetails", Justification = "We want to explicitly reset the stack trace here.")]
 		[Obsolete("To verify invocations, use Verify passing an explicit expression instead (i.e. this.Verify(m => m.Do());).", false)]
 		[EditorBrowsable(EditorBrowsableState.Never)]
 		public void Verify()
@@ -75,6 +76,7 @@ namespace Moq
 		/// </code>
 		/// </example>
 		/// <exception cref="MockException">At least one expectation was not met.</exception>
+		[System.Diagnostics.CodeAnalysis.SuppressMessage("Microsoft.Usage", "CA2200:RethrowToPreserveStackDetails", Justification = "We want to explicitly reset the stack trace here.")]
 		[Obsolete("To verify invocations, use Verify passing an explicit expression instead (i.e. this.Verify(m => m.Do());).", false)]
 		[EditorBrowsable(EditorBrowsableState.Never)]
 		public void VerifyAll()

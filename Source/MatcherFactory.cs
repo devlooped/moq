@@ -40,6 +40,7 @@
 
 using System;
 using System.Linq.Expressions;
+using System.Globalization;
 
 namespace Moq
 {
@@ -86,7 +87,7 @@ namespace Moq
 				return new ConstantMatcher(((ConstantExpression)reduced).Value);
 			}
 
-			throw new NotSupportedException(String.Format(
+			throw new NotSupportedException(String.Format(CultureInfo.CurrentCulture, 
 				Properties.Resources.UnsupportedExpression, 
 				expression));
 		}

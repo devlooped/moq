@@ -59,7 +59,8 @@ namespace Moq
 
 		public bool Matches(object value)
 		{
-			if (value == null && !(value is string))
+			var svalue = value as string;
+			if (value == null)
 			{
 				return false;
 			}
@@ -77,7 +78,7 @@ namespace Moq
 				regex = new Regex(pattern, options);
 			}
 
-			return regex.IsMatch((string)value);
+			return regex.IsMatch(svalue);
 		}
 	}
 }

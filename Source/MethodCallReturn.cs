@@ -62,7 +62,7 @@ namespace Moq
 		public bool HasReturnValue { get; protected set; }
 	}
 
-	internal class MethodCallReturn<TResult> : MethodCallReturn, IProxyCall, ISetup<TResult>, ISetupGetter<TResult>, IReturnsResult
+	internal sealed class MethodCallReturn<TResult> : MethodCallReturn, IProxyCall, ISetup<TResult>, ISetupGetter<TResult>, IReturnsResult
 	{
 		Delegate valueDel = (Func<TResult>)(() => default(TResult));
 		Action<object[]> afterReturnCallback;
@@ -121,24 +121,28 @@ namespace Moq
 			return this;
 		}
 
+		[System.Diagnostics.CodeAnalysis.SuppressMessage("Microsoft.Design", "CA1061:DoNotHideBaseClassMethods", Justification = "This class provides typed members for the method-returning interfaces. It's never used through the base class type.")]
 		public new IReturnsThrows<TResult> Callback<T>(Action<T> callback)
 		{
 			base.Callback(callback);
 			return this;
 		}
 
+		[System.Diagnostics.CodeAnalysis.SuppressMessage("Microsoft.Design", "CA1061:DoNotHideBaseClassMethods", Justification = "This class provides typed members for the method-returning interfaces. It's never used through the base class type.")]
 		public new IReturnsThrows<TResult> Callback<T1, T2>(Action<T1, T2> callback)
 		{
 			base.Callback(callback);
 			return this;
 		}
 
+		[System.Diagnostics.CodeAnalysis.SuppressMessage("Microsoft.Design", "CA1061:DoNotHideBaseClassMethods", Justification = "This class provides typed members for the method-returning interfaces. It's never used through the base class type.")]
 		public new IReturnsThrows<TResult> Callback<T1, T2, T3>(Action<T1, T2, T3> callback)
 		{
 			base.Callback(callback);
 			return this;
 		}
 
+		[System.Diagnostics.CodeAnalysis.SuppressMessage("Microsoft.Design", "CA1061:DoNotHideBaseClassMethods", Justification = "This class provides typed members for the method-returning interfaces. It's never used through the base class type.")]
 		public new IReturnsThrows<TResult> Callback<T1, T2, T3, T4>(Action<T1, T2, T3, T4> callback)
 		{
 			base.Callback(callback);

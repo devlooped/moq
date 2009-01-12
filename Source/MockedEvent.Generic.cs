@@ -65,6 +65,7 @@ namespace Moq
 		/// event argument data.
 		/// </summary>
 		/// <param name="args">Data to pass to the event.</param>
+		[System.Diagnostics.CodeAnalysis.SuppressMessage("Microsoft.Design", "CA1030:UseEventsWhereAppropriate", Justification = "It raises an event, it's not one.")]
 		public void Raise(TEventArgs args)
 		{
 			base.DoRaise(args);

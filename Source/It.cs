@@ -99,6 +99,7 @@ namespace Moq
 		///     .Throws(new ArgumentException());
 		/// </code>
 		/// </example>
+		[System.Diagnostics.CodeAnalysis.SuppressMessage("Microsoft.Usage", "CA1801:ReviewUnusedParameters", MessageId = "match")]
 		[AdvancedMatcher(typeof(PredicateMatcher))]
 		public static TValue Is<TValue>(Expression<Predicate<TValue>> match)
 		{
@@ -122,6 +123,9 @@ namespace Moq
 		///     .Returns(false);
 		/// </code>
 		/// </example>
+		[System.Diagnostics.CodeAnalysis.SuppressMessage ("Microsoft.Usage", "CA1801:ReviewUnusedParameters", MessageId="to")]
+		[System.Diagnostics.CodeAnalysis.SuppressMessage("Microsoft.Usage", "CA1801:ReviewUnusedParameters", MessageId = "rangeKind")]
+		[System.Diagnostics.CodeAnalysis.SuppressMessage("Microsoft.Usage", "CA1801:ReviewUnusedParameters", MessageId = "from")]
 		[AdvancedMatcher(typeof(RangeMatcher))]
 		public static TValue IsInRange<TValue>(TValue from, TValue to, Range rangeKind)
 			where TValue : IComparable
@@ -140,6 +144,7 @@ namespace Moq
 		/// mock.Setup(x => x.Check(It.IsRegex("[a-z]+"))).Returns(1);
 		/// </code>
 		/// </example>
+		[System.Diagnostics.CodeAnalysis.SuppressMessage("Microsoft.Usage", "CA1801:ReviewUnusedParameters", MessageId = "regex")]
 		[AdvancedMatcher(typeof(RegexMatcher))]
 		public static string IsRegex(string regex)
 		{
@@ -158,6 +163,8 @@ namespace Moq
 		/// mock.Setup(x => x.Check(It.IsRegex("[a-z]+", RegexOptions.IgnoreCase))).Returns(1);
 		/// </code>
 		/// </example>
+		[System.Diagnostics.CodeAnalysis.SuppressMessage ("Microsoft.Usage", "CA1801:ReviewUnusedParameters", MessageId="regex")]
+		[System.Diagnostics.CodeAnalysis.SuppressMessage ("Microsoft.Usage", "CA1801:ReviewUnusedParameters", MessageId="options")]
 		[AdvancedMatcher(typeof(RegexMatcher))]
 		public static string IsRegex(string regex, RegexOptions options)
 		{

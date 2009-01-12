@@ -44,6 +44,7 @@ using System.ComponentModel;
 using System.Linq;
 using System.Linq.Expressions;
 using System.Reflection;
+using System.Globalization;
 
 namespace Moq
 {
@@ -82,16 +83,18 @@ namespace Moq
 		public static Mock<T> Get<T>(T mocked)
 			where T : class
 		{
-			if (mocked is IMocked<T>)
+			var mockedOfT = mocked as IMocked<T>;
+			var mockedPlain = mocked as IMocked;
+			if (mockedOfT != null)
 			{
 				// This would be the fastest check.
-				return (mocked as IMocked<T>).Mock;
+				return mockedOfT.Mock;
 			}
-			else if (mocked is IMocked)
+			else if (mockedPlain != null)
 			{
 				// We may have received a T of an implemented 
 				// interface in the mock.
-				var mock = ((IMocked)mocked).Mock;
+				var mock = mockedPlain.Mock;
 				var imockedType = mocked.GetType().GetInterface("IMocked`1");
 				var mockedType = imockedType.GetGenericArguments()[0];
 
@@ -113,12 +116,13 @@ namespace Moq
 					// the generic parameters.
 					var types = String.Join(", ",
 							new[] { mockedType }
-						// Skip first interface which is always our internal IMocked<T>
+							// Skip first interface which is always our internal IMocked<T>
 							.Concat(mock.ImplementedInterfaces.Skip(1))
 							.Select(t => t.Name)
 							.ToArray());
 
-					throw new ArgumentException(String.Format(Properties.Resources.InvalidMockGetType,
+					throw new ArgumentException(String.Format(CultureInfo.CurrentCulture, 
+						Properties.Resources.InvalidMockGetType,
 						typeof(T).Name, types));
 				}
 			}
@@ -141,7 +145,7 @@ namespace Moq
 		/// <summary>
 		/// Exposes the list of extra interfaces implemented by the mock.
 		/// </summary>
-		protected internal List<Type> ImplementedInterfaces { get { return implementedInterfaces; } }
+		internal List<Type> ImplementedInterfaces { get { return implementedInterfaces; } }
 
 		/// <summary>
 		/// Behavior of the mock, according to the value set in the constructor.
@@ -182,11 +186,14 @@ namespace Moq
 		/// <summary>
 		/// Gets the mocked object instance.
 		/// </summary>
+		[System.Diagnostics.CodeAnalysis.SuppressMessage("Microsoft.Naming", "CA1716:IdentifiersShouldNotMatchKeywords", MessageId = "Object", Justification = "Exposes the mocked object instance, so it's appropriate.")]
+		[System.Diagnostics.CodeAnalysis.SuppressMessage("Microsoft.Naming", "CA1721:PropertyNamesShouldNotMatchGetMethods", Justification = "The public Object property is the only one visible to Moq consumers. The protected member is for internal use only.")]
 		public object Object { get { return GetObject(); } }
 
 		/// <summary>
 		/// Returns the mocked object value.
 		/// </summary>
+		[System.Diagnostics.CodeAnalysis.SuppressMessage("Microsoft.Design", "CA1024:UsePropertiesWhereAppropriate", Justification = "This is actually the protected virtual implementation of the property Object.")]
 		protected abstract object GetObject();
 
 		/// <summary>
@@ -414,11 +421,12 @@ namespace Moq
 			return target.Interceptor;
 		}
 
+		[System.Diagnostics.CodeAnalysis.SuppressMessage("Microsoft.Usage", "CA2208:InstantiateArgumentExceptionsCorrectly", Justification = "This is a helper method for the one receiving the expression.")]
 		private static void ThrowIfPropertyNotWritable(PropertyInfo prop)
 		{
 			if (!prop.CanWrite)
 			{
-				throw new ArgumentException(String.Format(
+				throw new ArgumentException(String.Format(CultureInfo.CurrentCulture,
 					Properties.Resources.PropertyNotWritable,
 					prop.DeclaringType.Name,
 					prop.Name), "expression");
@@ -433,7 +441,7 @@ namespace Moq
 			// expression tree manually?
 			if (!prop.CanRead)
 			{
-				throw new ArgumentException(String.Format(
+				throw new ArgumentException(String.Format(CultureInfo.CurrentCulture,
 					Properties.Resources.PropertyNotReadable,
 					prop.DeclaringType.Name,
 					prop.Name));
@@ -444,7 +452,8 @@ namespace Moq
 		{
 			if (!methodInfo.IsVirtual || methodInfo.IsFinal || methodInfo.IsPrivate)
 				throw new ArgumentException(
-					String.Format(Properties.Resources.SetupOnNonOverridableMember,
+					String.Format(CultureInfo.CurrentCulture,
+					Properties.Resources.SetupOnNonOverridableMember,
 					setup.ToString()));
 		}
 
@@ -499,10 +508,10 @@ namespace Moq
 				return targetMock;
 			}
 
-			private void ValidateTypeToMock(PropertyInfo prop, Expression expr)
+			private static void ValidateTypeToMock(PropertyInfo prop, Expression expr)
 			{
 				if (prop.PropertyType.IsValueType || prop.PropertyType.IsSealed)
-					throw new NotSupportedException(String.Format(
+					throw new NotSupportedException(String.Format(CultureInfo.CurrentCulture, 
 						Properties.Resources.UnsupportedIntermediateType,
 						prop.DeclaringType.Name, prop.Name, prop.PropertyType, expr));
 			}
@@ -516,7 +525,7 @@ namespace Moq
 				}
 				else
 				{
-					throw new NotSupportedException(String.Format(
+					throw new NotSupportedException(String.Format(CultureInfo.CurrentCulture, 
 						Properties.Resources.UnsupportedIntermediateExpression, m));
 				}
 			}
@@ -530,12 +539,12 @@ namespace Moq
 				}
 
 				if (m.Member is FieldInfo)
-					throw new NotSupportedException(String.Format(
+					throw new NotSupportedException(String.Format(CultureInfo.CurrentCulture, 
 						Properties.Resources.FieldsNotSupported, m));
 
 				if (m.Expression.NodeType != ExpressionType.MemberAccess &&
 					m.Expression.NodeType != ExpressionType.Parameter)
-					throw new NotSupportedException(String.Format(
+					throw new NotSupportedException(String.Format(CultureInfo.CurrentCulture, 
 						Properties.Resources.UnsupportedIntermediateExpression, m));
 
 				var prop = (PropertyInfo)m.Member;
@@ -651,14 +660,6 @@ namespace Moq
 		public virtual MockedEvent<EventArgs> CreateEventHandler()
 		{
 			return new MockedEvent<EventArgs>(this);
-		}
-
-		class NullMockedEvent : MockedEvent
-		{
-			public NullMockedEvent(Mock mock)
-				: base(mock)
-			{
-			}
 		}
 
 		#endregion

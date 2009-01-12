@@ -256,13 +256,13 @@ namespace Moq
 		private static bool IsEventAttach(IInvocation invocation)
 		{
 			return invocation.Method.IsSpecialName &&
-					  invocation.Method.Name.StartsWith("add_");
+					  invocation.Method.Name.StartsWith("add_", StringComparison.Ordinal);
 		}
 
 		private static bool IsEventDetach(IInvocation invocation)
 		{
 			return invocation.Method.IsSpecialName &&
-					  invocation.Method.Name.StartsWith("remove_");
+						invocation.Method.Name.StartsWith("remove_", StringComparison.Ordinal);
 		}
 
 		/// <summary>

@@ -53,7 +53,7 @@ namespace Moq.Language
 		/// <summary>
 		/// Specifies a callback to invoke when the method is called.
 		/// </summary>
-		/// <param name="callback">Callback method to invoke.</param>
+		/// <param name="action">Callback method to invoke.</param>
 		/// <example>
 		/// The following example specifies a callback to set a boolean 
 		/// value that can be used later:
@@ -63,14 +63,14 @@ namespace Moq.Language
 		///     .Callback(() => called = true);
 		/// </code>
 		/// </example>
-		ICallbackResult Callback(Action callback);
+		ICallbackResult Callback(Action action);
 		
 		/// <summary>
 		/// Specifies a callback to invoke when the method is called that receives the original
 		/// arguments.
 		/// </summary>
 		/// <typeparam name="T">Argument type of the invoked method.</typeparam>
-		/// <param name="callback">Callback method to invoke.</param>
+		/// <param name="action">Callback method to invoke.</param>
 		/// <example>
 		/// Invokes the given callback with the concrete invocation argument value. 
 		/// <para>
@@ -82,7 +82,7 @@ namespace Moq.Language
 		///     .Callback((string command) => Console.WriteLine(command));
 		/// </code>
 		/// </example>
-		ICallbackResult Callback<T>(Action<T> callback);
+		ICallbackResult Callback<T>(Action<T> action);
 		
 		/// <summary>
 		/// Specifies a callback to invoke when the method is called that receives the original
@@ -90,7 +90,7 @@ namespace Moq.Language
 		/// </summary>
 		/// <typeparam name="T1">Type of the first argument of the invoked method.</typeparam>
 		/// <typeparam name="T2">Type of the second argument of the invoked method.</typeparam>
-		/// <param name="callback">Callback method to invoke.</param>
+		/// <param name="action">Callback method to invoke.</param>
 		/// <example>
 		/// Invokes the given callback with the concrete invocation arguments values. 
 		/// <para>
@@ -104,7 +104,7 @@ namespace Moq.Language
 		///     .Callback((string arg1, string arg2) => Console.WriteLine(arg1 + arg2));
 		/// </code>
 		/// </example>
-		ICallbackResult Callback<T1, T2>(Action<T1, T2> callback);
+		ICallbackResult Callback<T1, T2>(Action<T1, T2> action);
 		
 		/// <summary>
 		/// Specifies a callback to invoke when the method is called that receives the original
@@ -113,7 +113,7 @@ namespace Moq.Language
 		/// <typeparam name="T1">Type of the first argument of the invoked method.</typeparam>
 		/// <typeparam name="T2">Type of the second argument of the invoked method.</typeparam>
 		/// <typeparam name="T3">Type of the third argument of the invoked method.</typeparam>
-		/// <param name="callback">Callback method to invoke.</param>
+		/// <param name="action">Callback method to invoke.</param>
 		/// <example>
 		/// Invokes the given callback with the concrete invocation arguments values. 
 		/// <para>
@@ -128,7 +128,7 @@ namespace Moq.Language
 		///     .Callback((string arg1, string arg2, int arg3) => Console.WriteLine(arg1 + arg2 + arg3));
 		/// </code>
 		/// </example>
-		ICallbackResult Callback<T1, T2, T3>(Action<T1, T2, T3> callback);
+		ICallbackResult Callback<T1, T2, T3>(Action<T1, T2, T3> action);
 		
 		/// <summary>
 		/// Specifies a callback to invoke when the method is called that receives the original
@@ -138,7 +138,7 @@ namespace Moq.Language
 		/// <typeparam name="T2">Type of the second argument of the invoked method.</typeparam>
 		/// <typeparam name="T3">Type of the third argument of the invoked method.</typeparam>
 		/// <typeparam name="T4">Type of the fourth argument of the invoked method.</typeparam>
-		/// <param name="callback">Callback method to invoke.</param>
+		/// <param name="action">Callback method to invoke.</param>
 		/// <example>
 		/// Invokes the given callback with the concrete invocation arguments values. 
 		/// <para>
@@ -154,7 +154,7 @@ namespace Moq.Language
 		///     .Callback((string arg1, string arg2, int arg3, bool arg4) => Console.WriteLine(arg1 + arg2 + arg3 + arg4));
 		/// </code>
 		/// </example>
-		ICallbackResult Callback<T1, T2, T3, T4>(Action<T1, T2, T3, T4> callback);
+		ICallbackResult Callback<T1, T2, T3, T4>(Action<T1, T2, T3, T4> action);
 	}
 
 	/// <summary>
@@ -168,7 +168,7 @@ namespace Moq.Language
 		/// <summary>
 		/// Specifies a callback to invoke when the method is called.
 		/// </summary>
-		/// <param name="callback">Callback method to invoke.</param>
+		/// <param name="action">Callback method to invoke.</param>
 		/// <example>
 		/// The following example specifies a callback to set a boolean 
 		/// value that can be used later:
@@ -181,14 +181,14 @@ namespace Moq.Language
 		/// Note that in the case of value-returning methods, after the <c>Callback</c> 
 		/// call you can still specify the return value.
 		/// </example>
-		IReturnsThrows<TResult> Callback(Action callback);
+		IReturnsThrows<TResult> Callback(Action action);
 		
 		/// <summary>
 		/// Specifies a callback to invoke when the method is called that receives the original
 		/// arguments.
 		/// </summary>
 		/// <typeparam name="T">Type of the argument of the invoked method.</typeparam>
-		/// <param name="callback">Callback method to invoke.</param>
+		/// <param name="action">Callback method to invoke.</param>
 		/// <example>
 		/// Invokes the given callback with the concrete invocation argument value. 
 		/// <para>
@@ -201,7 +201,7 @@ namespace Moq.Language
 		///     .Returns(true);
 		/// </code>
 		/// </example>
-		IReturnsThrows<TResult> Callback<T>(Action<T> callback);
+		IReturnsThrows<TResult> Callback<T>(Action<T> action);
 		
 		/// <summary>
 		/// Specifies a callback to invoke when the method is called that receives the original
@@ -209,7 +209,7 @@ namespace Moq.Language
 		/// </summary>
 		/// <typeparam name="T1">Type of the first argument of the invoked method.</typeparam>
 		/// <typeparam name="T2">Type of the second argument of the invoked method.</typeparam>
-		/// <param name="callback">Callback method to invoke.</param>
+		/// <param name="action">Callback method to invoke.</param>
 		/// <example>
 		/// Invokes the given callback with the concrete invocation arguments values. 
 		/// <para>
@@ -224,7 +224,7 @@ namespace Moq.Language
 		///     .Returns(true);
 		/// </code>
 		/// </example>
-		IReturnsThrows<TResult> Callback<T1, T2>(Action<T1, T2> callback);
+		IReturnsThrows<TResult> Callback<T1, T2>(Action<T1, T2> action);
 		
 		/// <summary>
 		/// Specifies a callback to invoke when the method is called that receives the original
@@ -233,7 +233,7 @@ namespace Moq.Language
 		/// <typeparam name="T1">Type of the first argument of the invoked method.</typeparam>
 		/// <typeparam name="T2">Type of the second argument of the invoked method.</typeparam>
 		/// <typeparam name="T3">Type of the third argument of the invoked method.</typeparam>
-		/// <param name="callback">Callback method to invoke.</param>
+		/// <param name="action">Callback method to invoke.</param>
 		/// <example>
 		/// Invokes the given callback with the concrete invocation arguments values. 
 		/// <para>
@@ -249,7 +249,7 @@ namespace Moq.Language
 		///     .Returns(true);
 		/// </code>
 		/// </example>
-		IReturnsThrows<TResult> Callback<T1, T2, T3>(Action<T1, T2, T3> callback);
+		IReturnsThrows<TResult> Callback<T1, T2, T3>(Action<T1, T2, T3> action);
 		
 		/// <summary>
 		/// Specifies a callback to invoke when the method is called that receives the original
@@ -259,7 +259,7 @@ namespace Moq.Language
 		/// <typeparam name="T2">Type of the second argument of the invoked method.</typeparam>
 		/// <typeparam name="T3">Type of the third argument of the invoked method.</typeparam>
 		/// <typeparam name="T4">Type of the fourth argument of the invoked method.</typeparam>
-		/// <param name="callback">Callback method to invoke.</param>
+		/// <param name="action">Callback method to invoke.</param>
 		/// <example>
 		/// Invokes the given callback with the concrete invocation arguments values. 
 		/// <para>
@@ -276,6 +276,6 @@ namespace Moq.Language
 		///     .Returns(true);
 		/// </code>
 		/// </example>
-		IReturnsThrows<TResult> Callback<T1, T2, T3, T4>(Action<T1, T2, T3, T4> callback);
+		IReturnsThrows<TResult> Callback<T1, T2, T3, T4>(Action<T1, T2, T3, T4> action);
 	}
 }

@@ -58,7 +58,7 @@ namespace Moq.Language
 		/// Specifies a callback to invoke when the property is set that receives the 
 		/// property value being set.
 		/// </summary>
-		/// <param name="callback">Callback method to invoke.</param>
+		/// <param name="action">Callback method to invoke.</param>
 		/// <example>
 		/// Invokes the given callback with the property value being set. 
 		/// <code>
@@ -66,6 +66,6 @@ namespace Moq.Language
 		///     .Callback((bool state) => Console.WriteLine(state));
 		/// </code>
 		/// </example>
-		ICallbackResult Callback(Action<TProperty> callback);
+		ICallbackResult Callback(Action<TProperty> action);
 	}
 }

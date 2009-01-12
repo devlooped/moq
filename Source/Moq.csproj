@@ -36,6 +36,7 @@
     <DocumentationFile>bin\Release\Moq.xml</DocumentationFile>
     <TreatWarningsAsErrors>true</TreatWarningsAsErrors>
     <RunCodeAnalysis>true</RunCodeAnalysis>
+    <CodeAnalysisRules>-Microsoft.Design#CA1006;-Microsoft.Design#CA1004;-Microsoft.Maintainability#CA1500;-Microsoft.Naming#CA1704</CodeAnalysisRules>
   </PropertyGroup>
   <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Debug|x86' ">
     <DebugSymbols>true</DebugSymbols>
@@ -145,6 +146,7 @@
     </None>
     <Compile Include="DefaultValue.cs" />
     <Compile Include="EventInfoCallback.cs" />
+    <Compile Include="GlobalSuppressions.cs" />
     <Compile Include="IDefaultValueProvider.cs" />
     <Compile Include="Language\INever.cs" />
     <Compile Include="Matchers\ParamArrayMatcher.cs" />

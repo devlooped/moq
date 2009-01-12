@@ -52,6 +52,8 @@ namespace Moq
 	public interface IHideObjectMembers
 	{
 		/// <summary/>
+		[System.Diagnostics.CodeAnalysis.SuppressMessage("Microsoft.Design", "CA1024:UsePropertiesWhereAppropriate", Justification = "We're hiding Object.GetType")]
+		[System.Diagnostics.CodeAnalysis.SuppressMessage("Microsoft.Naming", "CA1716:IdentifiersShouldNotMatchKeywords", MessageId = "GetType", Justification = "We're hiding Object.GetType")]
 		[EditorBrowsable(EditorBrowsableState.Never)]
 		Type GetType();
 
@@ -65,6 +67,6 @@ namespace Moq
 
 		/// <summary/>
 		[EditorBrowsable(EditorBrowsableState.Never)]
-		bool Equals(object obj);
+		bool Equals(object other);
 	}
 }

@@ -45,6 +45,7 @@ using System.Linq.Expressions;
 using System.Reflection;
 using System.Runtime.CompilerServices;
 using System.Text;
+using System.Globalization;
 
 namespace Moq
 {
@@ -60,7 +61,7 @@ namespace Moq
 
 			LambdaExpression lambda = expression as LambdaExpression;
 			if (lambda == null)
-				throw new ArgumentException(String.Format(
+				throw new ArgumentException(String.Format(CultureInfo.CurrentCulture,
 					Properties.Resources.UnsupportedExpression, expression));
 
 			// Remove convert expressions which are passed-in by the MockProtectedExtensions.
@@ -85,7 +86,7 @@ namespace Moq
 			var methodCall = expression.Body as MethodCallExpression;
 
 			if (methodCall == null)
-				throw new ArgumentException(String.Format(
+				throw new ArgumentException(String.Format(CultureInfo.CurrentCulture,
 					Properties.Resources.SetupNotMethod, expression.ToStringFixed()));
 			else
 				return methodCall;
@@ -107,7 +108,7 @@ namespace Moq
 				}
 			}
 
-			throw new ArgumentException(String.Format(
+			throw new ArgumentException(String.Format(CultureInfo.CurrentCulture,
 				Properties.Resources.SetupNotProperty, expression.ToStringFixed()));
 		}
 
@@ -203,7 +204,7 @@ namespace Moq
 			return new ToStringFixVisitor(expression).ExpressionString;
 		}
 
-		internal class ToStringFixVisitor : ExpressionVisitor
+		internal sealed class ToStringFixVisitor : ExpressionVisitor
 		{
 			string expressionString;
 			List<MethodCallExpression> calls = new List<MethodCallExpression>();
@@ -224,7 +225,7 @@ namespace Moq
 				expressionString = fullString;
 			}
 
-			private string BuildCallExpressionString(MethodCallExpression call)
+			private static string BuildCallExpressionString(MethodCallExpression call)
 			{
 				var builder = new StringBuilder();
 				int startIndex = 0;

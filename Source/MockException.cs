@@ -43,6 +43,8 @@ using System.Collections.Generic;
 using System.Linq.Expressions;
 using System.Text;
 using Castle.Core.Interceptor;
+using System.Globalization;
+using System.Security.Permissions;
 
 namespace Moq
 {
@@ -63,6 +65,7 @@ namespace Moq
 	/// allow the test to pass.
 	/// </para>
 	/// </remarks>
+	[System.Diagnostics.CodeAnalysis.SuppressMessage("Microsoft.Design", "CA1032:ImplementStandardExceptionConstructors", Justification = "It's only initialized internally.")]
 	[Serializable]
 	public class MockException : Exception
 	{
@@ -92,7 +95,7 @@ namespace Moq
 
 		internal MockException(ExceptionReason reason, MockBehavior behavior,
 			IInvocation invocation, string message)
-			: base(GetMessage(reason, behavior, invocation, message))
+			: base(GetMessage(behavior, invocation, message))
 		{
 			this.reason = reason;
 		}
@@ -108,10 +111,10 @@ namespace Moq
 			get { return reason; }
 		}
 
-		private static string GetMessage(ExceptionReason reason, MockBehavior behavior,
+		private static string GetMessage(MockBehavior behavior,
 			IInvocation invocation, string message)
 		{
-			return String.Format(
+			return String.Format(CultureInfo.CurrentCulture, 
 				Properties.Resources.MockExceptionMessage,
 				invocation.Format(),
 				behavior,
@@ -137,10 +140,12 @@ namespace Moq
 		/// </summary>
 		/// <param name="info">Serialization information.</param>
 		/// <param name="context">Streaming context.</param>
+		[SecurityPermission(SecurityAction.LinkDemand, Flags = SecurityPermissionFlag.SerializationFormatter)]
 		public override void GetObjectData(
 		  System.Runtime.Serialization.SerializationInfo info,
 		  System.Runtime.Serialization.StreamingContext context)
 		{
+			base.GetObjectData(info, context);
 			info.AddValue("reason", reason);
 		}
 	}
@@ -149,6 +154,7 @@ namespace Moq
 	/// Used by the mock factory to accumulate verification 
 	/// failures.
 	/// </devdoc>
+	[Serializable]
 	internal class MockVerificationException : MockException
 	{
 		Type targetType;
@@ -163,7 +169,8 @@ namespace Moq
 
 		private static string GetMessage(Type targetType, List<Expression> failedSetups)
 		{
-			return String.Format(Properties.Resources.VerficationFailed, GetRawSetups(targetType, failedSetups));
+			return String.Format(CultureInfo.CurrentCulture, 
+				Properties.Resources.VerficationFailed, GetRawSetups(targetType, failedSetups));
 		}
 
 		private static string GetRawSetups(Type targetType, List<Expression> failedSetups)

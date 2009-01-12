@@ -47,7 +47,7 @@ namespace Moq
 		AttributeTargets.Method /*|
 		AttributeTargets.Property*/
 		, Inherited = true)]
-	internal class AdvancedMatcherAttribute : Attribute
+	internal sealed class AdvancedMatcherAttribute : Attribute
 	{
 		Type matcherType;
 
@@ -61,12 +61,11 @@ namespace Moq
 
 		public Type MatcherType { get { return matcherType; } }
 
-		public virtual IMatcher CreateMatcher()
+		public IMatcher CreateMatcher()
 		{
 			try
 			{
 				return (IMatcher)Activator.CreateInstance(matcherType);
-
 			}
 			catch (TargetInvocationException tie)
 			{

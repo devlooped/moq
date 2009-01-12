@@ -201,6 +201,8 @@ namespace Moq
 		/// <summary>
 		/// Exposes the mocked object instance.
 		/// </summary>
+		[System.Diagnostics.CodeAnalysis.SuppressMessage("Microsoft.Naming", "CA1716:IdentifiersShouldNotMatchKeywords", MessageId = "Object", Justification = "Exposes the mocked object instance, so it's appropriate.")]
+		[System.Diagnostics.CodeAnalysis.SuppressMessage("Microsoft.Naming", "CA1721:PropertyNamesShouldNotMatchGetMethods", Justification = "The public Object property is the only one visible to Moq consumers. The protected member is for internal use only.")]
 		public virtual new T Object
 		{
 			get
@@ -256,6 +258,7 @@ namespace Moq
 		/// <summary>
 		/// Returns the mocked object value.
 		/// </summary>
+		[System.Diagnostics.CodeAnalysis.SuppressMessage("Microsoft.Design", "CA1024:UsePropertiesWhereAppropriate", Justification = "This is actually the protected virtual implementation of the property Object.")]
 		protected override object GetObject()
 		{
 			return Object;
@@ -394,6 +397,7 @@ namespace Moq
 		/// Assert.Equal(5, v.Value);
 		/// </code>
 		/// </example>
+		[System.Diagnostics.CodeAnalysis.SuppressMessage("Microsoft.Naming", "CA1716:IdentifiersShouldNotMatchKeywords", MessageId = "Property", Justification = "This sets properties, so it's appropriate.")]
 		public virtual void SetupProperty<TProperty>(Expression<Func<T, TProperty>> property)
 		{
 			SetupProperty(property, default(TProperty));
@@ -429,6 +433,7 @@ namespace Moq
 		/// Assert.Equal(6, v.Value);
 		/// </code>
 		/// </example>
+		[System.Diagnostics.CodeAnalysis.SuppressMessage("Microsoft.Naming", "CA1716:IdentifiersShouldNotMatchKeywords", MessageId = "Property", Justification = "We're setting up a property, so it's appropriate.")]
 		public virtual void SetupProperty<TProperty>(Expression<Func<T, TProperty>> property, TProperty initialValue)
 		{
 			TProperty value = initialValue;
@@ -472,9 +477,9 @@ namespace Moq
 				{
 					var expect = GetPropertyExpression(mockType, property);
 					object initialValue = mock.DefaultValueProvider.ProvideDefault(property.GetGetMethod(), new object[0]);
-
-					if (initialValue is IMocked)
-						SetupAllProperties(((IMocked)initialValue).Mock);
+					var mocked = initialValue as IMocked;
+					if (mocked != null)
+						SetupAllProperties(mocked.Mock);
 
 					var closure = Activator.CreateInstance(
 							typeof(ValueClosure<>).MakeGenericType(property.PropertyType), initialValue);
@@ -692,6 +697,7 @@ namespace Moq
 		/// </code>
 		/// </example>
 		/// <typeparam name="TInterface">Type of interface to cast the mock to.</typeparam>
+		[System.Diagnostics.CodeAnalysis.SuppressMessage("Microsoft.Naming", "CA1716:IdentifiersShouldNotMatchKeywords", MessageId = "As", Justification = "We want the method called exactly as the keyword because that's what it does, it adds an implemented interface so that you can cast it later.")]
 		public virtual Mock<TInterface> As<TInterface>()
 			where TInterface : class
 		{
@@ -715,6 +721,7 @@ namespace Moq
 		private class AsInterface<TInterface> : Mock<TInterface>
 			where TInterface : class
 		{
+			[System.Diagnostics.CodeAnalysis.SuppressMessage("Microsoft.Performance", "CA1823:AvoidUnusedPrivateFields", Justification = "It's used right below!")]
 			Mock<T> owner;
 
 			public AsInterface(Mock<T> owner)
@@ -860,6 +867,8 @@ namespace Moq
 		/// Assert.Equal("moq", presenter.SelectedOrder.ProductName);
 		/// </code>
 		/// </example>
+		[System.Diagnostics.CodeAnalysis.SuppressMessage("Microsoft.Design", "CA1030:UseEventsWhereAppropriate", Justification = "Raises the event, rather than being one.")]
+		[System.Diagnostics.CodeAnalysis.SuppressMessage("Microsoft.Usage", "CA2200:RethrowToPreserveStackDetails", Justification = "We want to reset the stack trace to avoid Moq noise in it.")]
 		public void Raise(Action<T> eventExpression, EventArgs args)
 		{
 			using (var callback = new EventInfoCallback())

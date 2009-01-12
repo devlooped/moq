@@ -45,19 +45,11 @@ using Moq.Language.Flow;
 namespace Moq.Language
 {
 	/// <summary>
-	/// Base interface for <see cref="IReturns{TResult}"/>.
-	/// </summary>
-	[EditorBrowsable(EditorBrowsableState.Never)]
-	public interface IReturns : IHideObjectMembers
-	{
-	}
-
-	/// <summary>
 	/// Defines the <c>Returns</c> verb.
 	/// </summary>
 	/// <typeparam name="TResult">Type of the return value from the expression.</typeparam>
 	[EditorBrowsable(EditorBrowsableState.Never)]
-	public interface IReturns<TResult> : IReturns, IHideObjectMembers
+	public interface IReturns<TResult> : IHideObjectMembers
 	{
 		/// <summary>
 		/// Specifies the value to return.

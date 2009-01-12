@@ -43,6 +43,7 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Linq.Expressions;
 using System.Reflection;
+using System.Globalization;
 
 namespace Moq.Matchers
 {
@@ -75,9 +76,9 @@ namespace Moq.Matchers
 			this.matcherExpression = matcherExpression;
 		}
 
-		private MethodInfo ResolveValidatorMethod(Expression expression)
+		private static MethodInfo ResolveValidatorMethod(Expression expression)
 		{
-			MethodCallExpression call = (MethodCallExpression) expression;
+			MethodCallExpression call = (MethodCallExpression)expression;
 			var expectedParametersTypes = new[] { call.Method.ReturnType }.Concat(call.Method.GetParameters().Select(p => p.ParameterType)).ToArray();
 
 			MethodInfo method = null;
@@ -86,21 +87,22 @@ namespace Moq.Matchers
 			{
 				// This is the "hard" way in .NET 3.5 as GetMethod does not support
 				// passing generic type arguments for the query.
-				var candidates = from m in call.Method.DeclaringType.GetMethods(
-									BindingFlags.Public |
-									BindingFlags.NonPublic |
-									BindingFlags.Static | 
-									BindingFlags.Instance)
-								 where
-									m.Name == call.Method.Name &&
-									m.IsGenericMethodDefinition &&
-									m.GetGenericArguments().Length ==
-									call.Method.GetGenericMethodDefinition().GetGenericArguments().Length && 
-									AreEqual(expectedParametersTypes, 
-											m.MakeGenericMethod(call.Method.GetGenericArguments())
-											 .GetParameters()
-											 .Select(p => p.ParameterType))
-								 select m.MakeGenericMethod(call.Method.GetGenericArguments());
+				var candidates =
+					from m in call.Method.DeclaringType.GetMethods(
+						BindingFlags.Public |
+						BindingFlags.NonPublic |
+						BindingFlags.Static |
+						BindingFlags.Instance)
+					where
+					  m.Name == call.Method.Name &&
+					  m.IsGenericMethodDefinition &&
+					  m.GetGenericArguments().Length ==
+					  call.Method.GetGenericMethodDefinition().GetGenericArguments().Length &&
+					  AreEqual(expectedParametersTypes,
+							  m.MakeGenericMethod(call.Method.GetGenericArguments())
+								.GetParameters()
+								.Select(p => p.ParameterType))
+					select m.MakeGenericMethod(call.Method.GetGenericArguments());
 
 				method = candidates.FirstOrDefault();
 			}
@@ -112,11 +114,11 @@ namespace Moq.Matchers
 			// throw if validatorMethod doesn't exists			
 			if (method == null)
 			{
-				throw new MissingMethodException(string.Format(
+				throw new MissingMethodException(String.Format(CultureInfo.CurrentCulture,
 					"public {0}bool {1}({2}) in class {3}.",
-					call.Method.IsStatic ? "static " : string.Empty,
-					call.Method.Name, 
-					string.Join(", ", expectedParametersTypes.Select(x => x.ToString()).ToArray()),
+					call.Method.IsStatic ? "static " : String.Empty,
+					call.Method.Name,
+					String.Join(", ", expectedParametersTypes.Select(x => x.ToString()).ToArray()),
 					call.Method.DeclaringType.ToString()));
 			}
 			return method;
@@ -130,11 +132,11 @@ namespace Moq.Matchers
 			var args = new[] { value }.Concat(extraArgs).ToArray();
 			// for static and non-static method
 			var instance = call.Object == null ? null : (call.Object.PartialEval() as ConstantExpression).Value;
-			return (bool) validatorMethod.Invoke( instance, args );
+			return (bool)validatorMethod.Invoke(instance, args);
 		}
 
 		// TODO: move to EnumerableExtensions in NetFx?
-		private bool AreEqual<T>(IEnumerable<T> first, IEnumerable<T> second)
+		private static bool AreEqual<T>(IEnumerable<T> first, IEnumerable<T> second)
 		{
 			var f = first.ToList();
 			var s = second.ToList();
@@ -145,7 +147,7 @@ namespace Moq.Matchers
 			{
 				if (!f[i].Equals(s[i])) return false;
 			}
-			
+
 			return true;
 		}
 

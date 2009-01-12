@@ -103,12 +103,12 @@ namespace Moq
 				}
 				if (this.candidates.Contains(exp))
 				{
-					return this.Evaluate(exp);
+					return Evaluate(exp);
 				}
 				return base.Visit(exp);
 			}
 
-			private Expression Evaluate(Expression e)
+			private static Expression Evaluate(Expression e)
 			{
 				if (e.NodeType == ExpressionType.Constant)
 				{

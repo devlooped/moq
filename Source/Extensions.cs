@@ -66,16 +66,17 @@ namespace Moq
 			}
 		}
 
+		[System.Diagnostics.CodeAnalysis.SuppressMessage("Microsoft.Performance", "CA1800:DoNotCastUnnecessarily", Justification="The linq expression is way more readable this way.")]
 		public static string Format(this IInvocation invocation)
 		{
 			// Special-case for getters && setters
 			if (invocation.Method.IsSpecialName)
 			{
-				if (invocation.Method.Name.StartsWith("get_"))
+				if (invocation.Method.Name.StartsWith("get_", StringComparison.Ordinal))
 					return
 						invocation.Method.DeclaringType.Name + "." +
 						invocation.Method.Name.Substring(4);
-				else if (invocation.Method.Name.StartsWith("set_"))
+				else if (invocation.Method.Name.StartsWith("set_", StringComparison.Ordinal))
 					return
 						invocation.Method.DeclaringType.Name + "." +
 						invocation.Method.Name.Substring(4) + " = " +

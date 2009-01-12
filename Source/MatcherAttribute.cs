@@ -150,7 +150,8 @@ namespace Moq
 	/// // use mock, invoke Save, and have the matcher filter.
 	/// </code>
 	/// </example>
-	public class MatcherAttribute : Attribute
+	[AttributeUsage(AttributeTargets.Method)]
+	public sealed class MatcherAttribute : Attribute
 	{
 	}
 }

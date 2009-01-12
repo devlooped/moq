@@ -4,7 +4,7 @@ using System.Reflection;
 
 namespace Moq
 {
-	internal class EventInfoCallback : IDisposable
+	internal sealed class EventInfoCallback : IDisposable
 	{
 		List<Interceptor> interceptors = new List<Interceptor>();
 

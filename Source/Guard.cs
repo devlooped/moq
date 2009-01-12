@@ -39,6 +39,7 @@
 // http://www.opensource.org/licenses/bsd-license.php]
 
 using System;
+using System.Globalization;
 
 internal static class Guard
 {
@@ -73,11 +74,11 @@ internal static class Guard
 		if (!targetType.IsAssignableFrom(typeToAssign))
 		{
 			if (targetType.IsInterface)
-				throw new ArgumentException(String.Format(
+				throw new ArgumentException(String.Format(CultureInfo.CurrentCulture,
 					"Type {0} does not implement required interface {1}",
 					typeToAssign, targetType));
 			else
-				throw new ArgumentException(String.Format(
+				throw new ArgumentException(String.Format(CultureInfo.CurrentCulture,
 					"Type {0} does not from required type {1}",
 					typeToAssign, targetType));
 		}
@@ -88,11 +89,11 @@ internal static class Guard
 		if (!targetType.IsAssignableFrom(typeToAssign))
 		{
 			if (targetType.IsInterface)
-				throw new ArgumentException(String.Format(
+				throw new ArgumentException(String.Format(CultureInfo.CurrentCulture,
 					"Type {0} does not implement required interface {1}",
 					typeToAssign, targetType), argumentName);
 			else
-				throw new ArgumentException(String.Format(
+				throw new ArgumentException(String.Format(CultureInfo.CurrentCulture,
 					"Type {0} does not from required type {1}",
 					typeToAssign, targetType), argumentName);
 		}

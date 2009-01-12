@@ -55,7 +55,7 @@ namespace Moq.Language
 		/// <summary>
 		/// Specifies a callback to invoke when the property is retrieved.
 		/// </summary>
-		/// <param name="callback">Callback method to invoke.</param>
+		/// <param name="action">Callback method to invoke.</param>
 		/// <example>
 		/// Invokes the given callback with the property value being set. 
 		/// <code>
@@ -64,6 +64,6 @@ namespace Moq.Language
 		///     .Returns(true);
 		/// </code>
 		/// </example>
-		IReturnsThrowsGetter<TProperty> Callback(Action callback);
+		IReturnsThrowsGetter<TProperty> Callback(Action action);
 	}
 }

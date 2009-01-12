@@ -44,6 +44,7 @@ using System.Linq;
 using System.Linq.Expressions;
 using System.Reflection;
 using Moq.Language.Flow;
+using System.Globalization;
 
 namespace Moq.Protected
 {
@@ -85,7 +86,7 @@ namespace Moq.Protected
 			}
 			else
 			{
-				throw new ArgumentException(String.Format(
+				throw new ArgumentException(String.Format(CultureInfo.CurrentCulture, 
 					Properties.Resources.UnsupportedProtectedProperty,
 					property.ReflectedType.Name,
 					property.Name));
@@ -163,30 +164,30 @@ namespace Moq.Protected
 					param));
 		}
 
-		private void VerifyMethod(MethodInfo method)
+		private static void VerifyMethod(MethodInfo method)
 		{
 			if (method != null)
 			{
 				if (method.IsPublic)
-					throw new ArgumentException(String.Format(
+					throw new ArgumentException(String.Format(CultureInfo.CurrentCulture, 
 						Properties.Resources.MethodIsPublic,
 						method.ReflectedType.Name,
 						method.Name));
 
 				if (method.IsAssembly || method.IsFamilyAndAssembly)
-					throw new ArgumentException(String.Format(
+					throw new ArgumentException(String.Format(CultureInfo.CurrentCulture, 
 						Properties.Resources.SetupOnNonOverridableMember,
 						method.ReflectedType.Name + "." + method.Name));
 			}
 		}
 
-		private void VerifyProperty(PropertyInfo property)
+		private static void VerifyProperty(PropertyInfo property)
 		{
 			if (property != null &&
 				((property.CanRead && property.GetGetMethod() != null ||
 				(property.CanWrite && property.GetSetMethod() != null))))
 			{
-				throw new ArgumentException(String.Format(
+				throw new ArgumentException(String.Format(CultureInfo.CurrentCulture, 
 					Properties.Resources.UnexpectedPublicProperty,
 					property.ReflectedType.Name,
 					property.Name));
@@ -272,11 +273,11 @@ namespace Moq.Protected
 			}
 		}
 
-		private void ThrowIfPropertyMissing(string propertyName, PropertyInfo property)
+		private static void ThrowIfPropertyMissing(string propertyName, PropertyInfo property)
 		{
 			if (property == null)
 			{
-				throw new ArgumentException(String.Format(
+				throw new ArgumentException(String.Format(CultureInfo.CurrentCulture, 
 					Properties.Resources.MemberMissing,
 					typeof(T).Name, propertyName));
 			}
@@ -286,7 +287,7 @@ namespace Moq.Protected
 		{
 			if (method == null && property == null)
 			{
-				throw new ArgumentException(String.Format(
+				throw new ArgumentException(String.Format(CultureInfo.CurrentCulture, 
 					Properties.Resources.MemberMissing,
 					typeof(T).Name, memberName));
 			}

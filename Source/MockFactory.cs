@@ -43,6 +43,7 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using System.ComponentModel;
+using System.Globalization;
 
 namespace Moq
 {
@@ -344,7 +345,7 @@ namespace Moq
 
 			if (message.ToString().Length > 0)
 				throw new MockException(MockException.ExceptionReason.VerificationFailed,
-					String.Format(Properties.Resources.VerficationFailed, message));
+					String.Format(CultureInfo.CurrentCulture, Properties.Resources.VerficationFailed, message));
 		}
 	}
 }

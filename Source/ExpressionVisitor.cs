@@ -42,6 +42,7 @@ using System;
 using System.Collections.Generic;
 using System.Collections.ObjectModel;
 using System.Linq.Expressions;
+using System.Globalization;
 
 namespace Moq
 {
@@ -88,6 +89,7 @@ namespace Moq
 		/// Visits the <see cref="Expression"/>, determining which 
 		/// of the concrete Visit methods to call.
 		/// </summary>
+		[System.Diagnostics.CodeAnalysis.SuppressMessage("Microsoft.Maintainability", "CA1502:AvoidExcessiveComplexity")]
 		protected virtual Expression Visit(Expression exp)
 		{
 			if (exp == null)
@@ -154,7 +156,9 @@ namespace Moq
 				case ExpressionType.ListInit:
 					return this.VisitListInit((ListInitExpression)exp);
 				default:
-					throw new Exception(string.Format("Unhandled expression type: '{0}'", exp.NodeType));
+					throw new ArgumentException(String.Format(
+						CultureInfo.CurrentCulture, 
+						"Unhandled expression type: '{0}'", exp.NodeType), "exp");
 			}
 		}
 
@@ -178,7 +182,7 @@ namespace Moq
 				case MemberBindingType.ListBinding:
 					return this.VisitMemberListBinding((MemberListBinding)binding);
 				default:
-					throw new Exception(string.Format("Unhandled binding type '{0}'", binding.BindingType));
+					throw new ArgumentException(String.Format(CultureInfo.CurrentCulture, "Unhandled binding type '{0}'", binding.BindingType), "binding");
 			}
 		}
 
