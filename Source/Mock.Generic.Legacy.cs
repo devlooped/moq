@@ -28,14 +28,14 @@ namespace Moq
 		/// <example group="expectations">
 		/// <code>
 		/// var mock = new Mock&lt;IProcessor&gt;();
-		/// this.Expect(x =&gt; x.Execute("ping"));
+		/// this.Setup(x =&gt; x.Execute("ping"));
 		/// </code>
 		/// </example>
 		[Obsolete("Expect has been renamed to Setup.", false)]
 		[EditorBrowsable(EditorBrowsableState.Never)]
 		public ISetup Expect(Expression<Action<T>> expression)
 		{
-			return Mock.SetUpExpect<T>(expression, this.Interceptor);
+			return Setup(expression);
 		}
 
 		/// <summary>
@@ -50,14 +50,14 @@ namespace Moq
 		/// <param name="expression">Lambda expression that specifies the expected method invocation.</param>
 		/// <example group="expectations">
 		/// <code>
-		/// this.Expect(x =&gt; x.HasInventory("Talisker", 50)).Returns(true);
+		/// this.Setup(x =&gt; x.HasInventory("Talisker", 50)).Returns(true);
 		/// </code>
 		/// </example>
 		[Obsolete("Expect has been renamed to Setup.", false)]
 		[EditorBrowsable(EditorBrowsableState.Never)]
 		public ISetup<TResult> Expect<TResult>(Expression<Func<T, TResult>> expression)
 		{
-			return Mock.SetUpExpect(expression, this.Interceptor);
+			return Setup(expression);
 		}
 
 		/// <summary>
@@ -72,7 +72,7 @@ namespace Moq
 		/// <param name="expression">Lambda expression that specifies the expected property getter.</param>
 		/// <example group="expectations">
 		/// <code>
-		/// this.ExpectGet(x =&gt; x.Suspended)
+		/// this.SetupGet(x =&gt; x.Suspended)
 		///     .Returns(true);
 		/// </code>
 		/// </example>
@@ -80,7 +80,7 @@ namespace Moq
 		[EditorBrowsable(EditorBrowsableState.Never)]
 		public ISetupGetter<TProperty> ExpectGet<TProperty>(Expression<Func<T, TProperty>> expression)
 		{
-			return Mock.SetUpExpectGet(expression, this.Interceptor);
+			return SetupGet(expression);
 		}
 
 		/// <summary>
@@ -95,14 +95,14 @@ namespace Moq
 		/// <param name="expression">Lambda expression that specifies the expected property setter.</param>
 		/// <example group="expectations">
 		/// <code>
-		/// this.ExpectSet(x =&gt; x.Suspended);
+		/// this.SetupSet(x =&gt; x.Suspended);
 		/// </code>
 		/// </example>
 		[Obsolete("ExpectSet has been renamed to SetupSet.", false)]
 		[EditorBrowsable(EditorBrowsableState.Never)]
 		public ISetupSetter<TProperty> ExpectSet<TProperty>(Expression<Func<T, TProperty>> expression)
 		{
-			return Mock.SetUpExpectSet<T, TProperty>(expression, this.Interceptor);
+			return SetupSet<TProperty>(expression);
 		}
 
 		/// <summary>
@@ -118,14 +118,14 @@ namespace Moq
 		/// <param name="value">The value expected to be set for the property.</param>
 		/// <example group="expectations">
 		/// <code>
-		/// this.ExpectSet(x =&gt; x.Suspended, true);
+		/// this.SetupSet(x =&gt; x.Suspended, true);
 		/// </code>
 		/// </example>
 		[Obsolete("ExpectSet has been renamed to SetupSet.", false)]
 		[EditorBrowsable(EditorBrowsableState.Never)]
 		public ISetupSetter<TProperty> ExpectSet<TProperty>(Expression<Func<T, TProperty>> expression, TProperty value)
 		{
-			return Mock.SetUpExpectSet(expression, value, this.Interceptor);
+			return SetupSet(expression, value);
 		}
 	}
 }

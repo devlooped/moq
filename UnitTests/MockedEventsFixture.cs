@@ -80,7 +80,7 @@ namespace Moq.Tests
 			var raised = false;
 			handler.Raised += delegate { raised = true; };
 
-			mock.Expect(add => add.Add(It.IsAny<string>()))
+			mock.Setup(add => add.Add(It.IsAny<string>()))
 				.Raises(handler, EventArgs.Empty);
 
 			mock.Object.Added += handler;
@@ -99,7 +99,7 @@ namespace Moq.Tests
 			var raised = false;
 			handler.Raised += delegate { raised = true; };
 
-			mock.Expect(add => add.Add(It.IsAny<string>()))
+			mock.Setup(add => add.Add(It.IsAny<string>()))
 				.Raises(handler, EventArgs.Empty);
 
 			mock.Object.Added += handler;
@@ -119,7 +119,7 @@ namespace Moq.Tests
 			handler.Raised += delegate { raised = true; };
 			mock.Object.Added += handler;
 
-			mock.Expect(add => add.Insert(It.IsAny<string>(), 0))
+			mock.Setup(add => add.Insert(It.IsAny<string>(), 0))
 				.Returns(1)
 				.Raises(handler, EventArgs.Empty);
 
@@ -134,7 +134,7 @@ namespace Moq.Tests
 		{
 			var mock = new Mock<IAdder<string>>();
 
-			Assert.Throws<ArgumentNullException>(() => mock.Expect(add => add.Add(It.IsAny<string>()))
+			Assert.Throws<ArgumentNullException>(() => mock.Setup(add => add.Add(It.IsAny<string>()))
 				.Raises(null, EventArgs.Empty));
 		}
 
@@ -143,7 +143,7 @@ namespace Moq.Tests
 		{
 			var mock = new Mock<IAdder<string>>();
 
-			Assert.Throws<ArgumentNullException>(() => mock.Expect(add => add.Add(It.IsAny<string>()))
+			Assert.Throws<ArgumentNullException>(() => mock.Setup(add => add.Add(It.IsAny<string>()))
 				.Raises(mock.CreateEventHandler(), (EventArgs)null));
 		}
 
@@ -177,7 +177,7 @@ namespace Moq.Tests
 			var raised = false;
 			handler.Raised += delegate { raised = true; };
 
-			mock.Expect(add => add.Add(It.IsAny<string>()))
+			mock.Setup(add => add.Add(It.IsAny<string>()))
 				.Raises(handler, () => EventArgs.Empty);
 
 			mock.Object.Added += handler;
@@ -194,7 +194,7 @@ namespace Moq.Tests
 
 			var handler = mock.CreateEventHandler();
 
-			mock.Expect(add => add.Add(It.IsAny<string>()))
+			mock.Setup(add => add.Add(It.IsAny<string>()))
 				.Raises(handler, (string s) => new FooArgs { Value = s });
 
 			mock.Object.Added += handler;
@@ -220,7 +220,7 @@ namespace Moq.Tests
 
 			var handler = mock.CreateEventHandler();
 
-			mock.Expect(add => add.Do(It.IsAny<string>(), It.IsAny<int>()))
+			mock.Setup(add => add.Do(It.IsAny<string>(), It.IsAny<int>()))
 				.Raises(handler, (string s, int i) => new FooArgs { Args = new object[] { s, i } });
 
 			mock.Object.Added += handler;
@@ -247,7 +247,7 @@ namespace Moq.Tests
 
 			var handler = mock.CreateEventHandler();
 
-			mock.Expect(add => add.Do(It.IsAny<string>(), It.IsAny<int>(), It.IsAny<bool>()))
+			mock.Setup(add => add.Do(It.IsAny<string>(), It.IsAny<int>(), It.IsAny<bool>()))
 				.Raises(handler, (string s, int i, bool b) => new FooArgs { Args = new object[] { s, i, b } });
 
 			mock.Object.Added += handler;
@@ -275,7 +275,7 @@ namespace Moq.Tests
 
 			var handler = mock.CreateEventHandler();
 
-			mock.Expect(add => add.Do(It.IsAny<string>(), It.IsAny<int>(), It.IsAny<bool>(), It.IsAny<string>()))
+			mock.Setup(add => add.Do(It.IsAny<string>(), It.IsAny<int>(), It.IsAny<bool>(), It.IsAny<string>()))
 				.Raises(handler, (string s, int i, bool b, string v) => new FooArgs { Args = new object[] { s, i, b, v } });
 
 			mock.Object.Added += handler;

@@ -30,7 +30,7 @@ namespace Moq.Tests
 
 			bool called = false;
 
-			mock.As<IFoo>().ExpectGet(x => x.Value)
+			mock.As<IFoo>().SetupGet(x => x.Value)
 				.Callback(() => called = true)
 				.Returns(25);
 
@@ -42,7 +42,7 @@ namespace Moq.Tests
 		public void ShouldExpectCallWithArgumentOnNewInterface()
 		{
 			var mock = new Mock<IBag>();
-			mock.As<IFoo>().Expect(x => x.Execute("ping")).Returns("ack");
+			mock.As<IFoo>().Setup(x => x.Execute("ping")).Returns("ack");
 
 			Assert.Equal("ack", ((IFoo)mock.Object).Execute("ping"));
 		}
@@ -53,7 +53,7 @@ namespace Moq.Tests
 			bool called = false;
 			int value = 0;
 			var mock = new Mock<IBag>();
-			mock.As<IFoo>().ExpectSet(x => x.Value).Callback(i => { value = i; called = true; });
+			mock.As<IFoo>().SetupSet(x => x.Value).Callback(i => { value = i; called = true; });
 
 			((IFoo)mock.Object).Value = 100;
 
@@ -66,13 +66,13 @@ namespace Moq.Tests
 		{
 			var mock = new Mock<IBag>();
 
-			mock.As<IFoo>().ExpectGet(x => x.Value).Returns(25);
+			mock.As<IFoo>().SetupGet(x => x.Value).Returns(25);
 
 			Assert.Equal(25, ((IFoo)mock.Object).Value);
 
 			var fm = mock.As<IFoo>();
 
-			fm.Expect(f => f.Execute());
+			fm.Setup(f => f.Execute());
 		}
 
 		[Fact]
@@ -81,7 +81,7 @@ namespace Moq.Tests
 			var bag = new Mock<IBag>();
 			var foo = bag.As<IFoo>();
 
-			foo.ExpectGet(x => x.Value).Returns(25);
+			foo.SetupGet(x => x.Value).Returns(25);
 
 			IFoo f = bag.Object as IFoo;
 
@@ -107,7 +107,7 @@ namespace Moq.Tests
 			var bag = new Mock<IBag>();
 			var foo = bag.As<IFoo>();
 
-			foo.Expect(f => f.Execute()).Verifiable();
+			foo.Setup(f => f.Execute()).Verifiable();
 
 			Assert.Throws<MockVerificationException>(() => foo.Verify());
 			Assert.Throws<MockVerificationException>(() => foo.VerifyAll());

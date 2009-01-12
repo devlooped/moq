@@ -105,7 +105,7 @@ namespace Moq.Tests
 		{
 			var mock = new Mock<IFoo>(MockBehavior.Loose);
 
-			mock.Expect(x => x.DoReturnString());
+			mock.Setup(x => x.DoReturnString());
 
 			Assert.Null(mock.Object.DoReturnString());
 		}

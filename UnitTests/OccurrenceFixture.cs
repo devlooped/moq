@@ -8,7 +8,7 @@ namespace Moq.Tests
 		public void OnceThrowsOnSecondCall()
 		{
 			var mock = new Mock<IFoo>();
-			mock.Expect(foo => foo.Execute("ping"))
+			mock.Setup(foo => foo.Execute("ping"))
 				.Returns("ack")
 				.AtMostOnce();
 
@@ -31,8 +31,8 @@ namespace Moq.Tests
 		{
 			var mock = new Mock<IFoo>();
 
-			mock.Expect(m => m.Execute("ping")).Returns("ack");
-			mock.Expect(m => m.Execute("ack")).Never();
+			mock.Setup(m => m.Execute("ping")).Returns("ack");
+			mock.Setup(m => m.Execute("ack")).Never();
 
 			Assert.Equal("ack", mock.Object.Execute("ping"));
 
@@ -52,7 +52,7 @@ namespace Moq.Tests
 		{
 			var mock = new Mock<IFoo>();
 
-			mock.Expect(m => m.Execute("ping")).Never();
+			mock.Setup(m => m.Execute("ping")).Never();
 
 			mock.VerifyAll();
 		}
@@ -62,7 +62,7 @@ namespace Moq.Tests
 		{
 			var mock = new Mock<IFoo>();
 
-			mock.ExpectGet(m => m.Value).Never();
+			mock.SetupGet(m => m.Value).Never();
 
 			try
 			{
@@ -80,7 +80,7 @@ namespace Moq.Tests
 		{
 			var mock = new Mock<IFoo>();
 
-			mock.ExpectSet(m => m.Value).Never();
+			mock.SetupSet(m => m.Value).Never();
 
 			try
 			{
@@ -98,7 +98,7 @@ namespace Moq.Tests
 		{
 			var repeat = 5;
 			var mock = new Mock<IFoo>();
-			mock.Expect(foo => foo.Execute("ping"))
+			mock.Setup(foo => foo.Execute("ping"))
 				.Returns("ack")
 				.AtMost(5);
 

@@ -46,7 +46,7 @@ namespace Moq.Language.Flow
 	/// Implements the fluent API.
 	/// </summary>
 	[EditorBrowsable(EditorBrowsableState.Never)]
-	public interface ISetup : ICallback, ICallbackResult, IRaise, INever, IExtensible, IHideObjectMembers
+	public interface ISetup : ICallback, ICallbackResult, IRaise, INever, IVerifies, IHideObjectMembers
 	{
 	}
 
@@ -54,7 +54,7 @@ namespace Moq.Language.Flow
 	/// Implements the fluent API.
 	/// </summary>
 	[EditorBrowsable(EditorBrowsableState.Never)]
-	public interface ISetup<TResult> : ICallback<TResult>, IReturnsThrows<TResult>, INever, IExtensible, IHideObjectMembers
+	public interface ISetup<TResult> : ICallback<TResult>, IReturnsThrows<TResult>, INever, IVerifies, IHideObjectMembers
 	{
 	}
 
@@ -62,7 +62,7 @@ namespace Moq.Language.Flow
 	/// Implements the fluent API.
 	/// </summary>
 	[EditorBrowsable(EditorBrowsableState.Never)]
-	public interface ISetupGetter<TProperty> : ICallbackGetter<TProperty>, IReturnsThrowsGetter<TProperty>, INever, IExtensible, IHideObjectMembers
+	public interface ISetupGetter<TProperty> : ICallbackGetter<TProperty>, IReturnsThrowsGetter<TProperty>, INever, IVerifies, IHideObjectMembers
 	{
 	}
 
@@ -70,7 +70,7 @@ namespace Moq.Language.Flow
 	/// Implements the fluent API.
 	/// </summary>
 	[EditorBrowsable(EditorBrowsableState.Never)]
-	public interface ISetupSetter<TProperty> : ICallbackSetter<TProperty>, ICallbackResult, IRaise, INever, IExtensible, IHideObjectMembers
+	public interface ISetupSetter<TProperty> : ICallbackSetter<TProperty>, ICallbackResult, IRaise, INever, IVerifies, IHideObjectMembers
 	{
 	}
 }

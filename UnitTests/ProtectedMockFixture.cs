@@ -15,25 +15,25 @@ namespace Moq.Tests
 		[Fact]
 		public void ShouldThrowIfNullMemberName()
 		{
-			Assert.Throws<ArgumentNullException>(() => new Mock<FooBase>().Protected().Expect((string)null));
+			Assert.Throws<ArgumentNullException>(() => new Mock<FooBase>().Protected().Setup((string)null));
 		}
 
 		[Fact]
 		public void ShouldThrowIfNullMemberName2()
 		{
-			Assert.Throws<ArgumentNullException>(() => new Mock<FooBase>().Protected().Expect<int>((string)null));
+			Assert.Throws<ArgumentNullException>(() => new Mock<FooBase>().Protected().Setup<int>((string)null));
 		}
 
 		[Fact]
 		public void ShouldThrowIfEmptyMemberName()
 		{
-			Assert.Throws<ArgumentException>(() => new Mock<FooBase>().Protected().Expect(string.Empty));
+			Assert.Throws<ArgumentException>(() => new Mock<FooBase>().Protected().Setup(string.Empty));
 		}
 
 		[Fact]
 		public void ShouldThrowIfEmptyMemberName2()
 		{
-			Assert.Throws<ArgumentException>(() => new Mock<FooBase>().Protected().Expect<int>(string.Empty));
+			Assert.Throws<ArgumentException>(() => new Mock<FooBase>().Protected().Setup<int>(string.Empty));
 		}
 
 		[Fact]
@@ -41,7 +41,7 @@ namespace Moq.Tests
 		{
 			var mock = new Mock<FooBase>();
 
-			Assert.Throws<ArgumentException>(() => mock.Protected().Expect("Foo"));
+			Assert.Throws<ArgumentException>(() => mock.Protected().Setup("Foo"));
 		}
 
 		[Fact]
@@ -49,7 +49,7 @@ namespace Moq.Tests
 		{
 			var mock = new Mock<FooBase>();
 
-			Assert.Throws<ArgumentException>(() => mock.Protected().Expect("DoVoid"));
+			Assert.Throws<ArgumentException>(() => mock.Protected().Setup("DoVoid"));
 		}
 
 		[Fact]
@@ -57,7 +57,7 @@ namespace Moq.Tests
 		{
 			var mock = new Mock<FooBase>();
 
-			mock.Protected().Expect("ProtectedInternal");
+			mock.Protected().Setup("ProtectedInternal");
 		}
 
 		[Fact]
@@ -65,7 +65,7 @@ namespace Moq.Tests
 		{
 			var mock = new Mock<FooBase>();
 
-			Assert.Throws<ArgumentException>(() => mock.Protected().Expect("Internal"));
+			Assert.Throws<ArgumentException>(() => mock.Protected().Setup("Internal"));
 		}
 
 		[Fact]
@@ -73,7 +73,7 @@ namespace Moq.Tests
 		{
 			var mock = new Mock<FooBase>();
 
-			Assert.Throws<ArgumentException>(() => mock.Protected().Expect("PublicValue"));
+			Assert.Throws<ArgumentException>(() => mock.Protected().Setup("PublicValue"));
 		}
 
 		[Fact]
@@ -81,7 +81,7 @@ namespace Moq.Tests
 		{
 			var mock = new Mock<FooBase>();
 
-			Assert.Throws<ArgumentException>(() => mock.Protected().Expect<int>("Foo"));
+			Assert.Throws<ArgumentException>(() => mock.Protected().Setup<int>("Foo"));
 		}
 
 		[Fact]
@@ -89,7 +89,7 @@ namespace Moq.Tests
 		{
 			var mock = new Mock<FooBase>();
 
-			Assert.Throws<ArgumentException>(() => mock.Protected().Expect<int>("DoInt"));
+			Assert.Throws<ArgumentException>(() => mock.Protected().Setup<int>("DoInt"));
 		}
 
 		[Fact]
@@ -97,7 +97,7 @@ namespace Moq.Tests
 		{
 			var mock = new Mock<FooBase>();
 
-			mock.Protected().Expect<int>("ProtectedInternalInt");
+			mock.Protected().Setup<int>("ProtectedInternalInt");
 		}
 
 		[Fact]
@@ -105,7 +105,7 @@ namespace Moq.Tests
 		{
 			var mock = new Mock<FooBase>();
 
-			Assert.Throws<ArgumentException>(() => mock.Protected().Expect<int>("InternalInt"));
+			Assert.Throws<ArgumentException>(() => mock.Protected().Setup<int>("InternalInt"));
 		}
 
 		[Fact]
@@ -113,7 +113,7 @@ namespace Moq.Tests
 		{
 			var mock = new Mock<FooBase>();
 
-			Assert.Throws<ArgumentException>(() => mock.Protected().Expect<string>("PublicValue"));
+			Assert.Throws<ArgumentException>(() => mock.Protected().Setup<string>("PublicValue"));
 		}
 
 		[Fact]
@@ -121,7 +121,7 @@ namespace Moq.Tests
 		{
 			var mock = new Mock<FooBase>();
 			mock.Protected()
-				 .Expect<int>("Int")
+				 .Setup<int>("Int")
 				 .Returns(5);
 
 			Assert.Equal(5, mock.Object.DoInt());
@@ -132,7 +132,7 @@ namespace Moq.Tests
 		{
 			var mock = new Mock<FooBase>();
 			mock.Protected()
-				 .Expect<int>("ProtectedInternalInt")
+				 .Setup<int>("ProtectedInternalInt")
 				 .Returns(5);
 
 			Assert.Equal(5, mock.Object.DoProtectedInternalInt());
@@ -145,7 +145,7 @@ namespace Moq.Tests
 
 			mock
 				.Protected()
-				.Expect("Void");
+				.Setup("Void");
 
 			mock.Object.DoVoid();
 
@@ -159,7 +159,7 @@ namespace Moq.Tests
 
 			mock
 				.Protected()
-				.Expect<string>("ProtectedValue")
+				.Setup<string>("ProtectedValue")
 				.Returns("foo");
 
 			Assert.Equal("foo", mock.Object.GetProtectedValue());
@@ -172,7 +172,7 @@ namespace Moq.Tests
 
 			mock
 				.Protected()
-				.ExpectGet<string>("ProtectedValue")
+				.SetupGet<string>("ProtectedValue")
 				.Returns("foo");
 
 			Assert.Equal("foo", mock.Object.GetProtectedValue());
@@ -186,7 +186,7 @@ namespace Moq.Tests
 
 			mock
 				.Protected()
-				.ExpectSet<string>("ProtectedValue")
+				.SetupSet<string>("ProtectedValue")
 				.Callback(v => value = v);
 
 			mock.Object.SetProtectedValue("foo");
@@ -198,19 +198,19 @@ namespace Moq.Tests
 		[Fact]
 		public void ShouldThrowIfNullPropertySet()
 		{
-			Assert.Throws<ArgumentNullException>(() => new Mock<FooBase>().Protected().ExpectSet<string>(null));
+			Assert.Throws<ArgumentNullException>(() => new Mock<FooBase>().Protected().SetupSet<string>(null));
 		}
 
 		[Fact]
 		public void ShouldThrowIfEmptyPropertySet()
 		{
-			Assert.Throws<ArgumentException>(() => new Mock<FooBase>().Protected().ExpectSet<string>(string.Empty));
+			Assert.Throws<ArgumentException>(() => new Mock<FooBase>().Protected().SetupSet<string>(string.Empty));
 		}
 
 		[Fact]
 		public void ShouldThrowIfPropertySetNotExists()
 		{
-			Assert.Throws<ArgumentException>(() => new Mock<FooBase>().Protected().ExpectSet<string>("Foo"));
+			Assert.Throws<ArgumentException>(() => new Mock<FooBase>().Protected().SetupSet<string>("Foo"));
 		}
 
 		[Fact]
@@ -218,7 +218,7 @@ namespace Moq.Tests
 		{
 			var mock = new Mock<FooBase>();
 
-			Assert.Throws<ArgumentException>(() => mock.Protected().ExpectSet<string>("PublicValue"));
+			Assert.Throws<ArgumentException>(() => mock.Protected().SetupSet<string>("PublicValue"));
 		}
 
 		[Fact]
@@ -227,7 +227,7 @@ namespace Moq.Tests
 			var mock = new Mock<FooBase>();
 
 			Assert.Throws<ArgumentException>(() => mock.Protected()
-				.Expect<string>("StringArg", null)
+				.Setup<string>("StringArg", null)
 				.Returns("null"));
 		}
 
@@ -237,14 +237,14 @@ namespace Moq.Tests
 			var mock = new Mock<FooBase>();
 
 			mock.Protected()
-				.Expect<string>("StringArg", ItExpr.IsNull<string>())
+				.Setup<string>("StringArg", ItExpr.IsNull<string>())
 				.Returns("null");
 
 			Assert.Equal("null", mock.Object.DoStringArg(null));
 
 
 			mock.Protected()
-				.Expect<string>("StringArg", ItExpr.Is<string>(s => s == "bar"))
+				.Setup<string>("StringArg", ItExpr.Is<string>(s => s == "bar"))
 				.Returns("baz");
 
 			Assert.Equal("baz", mock.Object.DoStringArg("bar"));
@@ -253,11 +253,11 @@ namespace Moq.Tests
 			mock = new Mock<FooBase>();
 
 			mock.Protected()
-				.Expect<string>("StringArg",
+				.Setup<string>("StringArg",
 					ItExpr.Is<string>(s => s.Length >= 2))
 				.Returns("long");
 			mock.Protected()
-				.Expect<string>("StringArg", 
+				.Setup<string>("StringArg", 
 					ItExpr.Is<string>(s => s.Length < 2))
 				.Returns("short");
 
@@ -269,7 +269,7 @@ namespace Moq.Tests
 			mock.CallBase = true;
 
 			mock.Protected()
-				.Expect<string>("TwoArgs",
+				.Setup<string>("TwoArgs",
 					ItExpr.IsAny<string>(),
 					5)
 				.Returns("done");
@@ -281,7 +281,7 @@ namespace Moq.Tests
 			mock.CallBase = true;
 
 			mock.Protected()
-				.Expect<string>("TwoArgs",
+				.Setup<string>("TwoArgs",
 					ItExpr.IsAny<string>(),
 					ItExpr.IsInRange(1, 3, Range.Inclusive))
 				.Returns("inrange");
@@ -296,8 +296,8 @@ namespace Moq.Tests
 			// NOTE: There are two overloads named "Do" and "DoReturn"
 
 			var mock = new Mock<MethodOverloads>();
-			mock.Protected().Expect("Do", 1, 2).Verifiable();
-			mock.Protected().Expect<string>("DoReturn", "1", "2").Returns("3").Verifiable();
+			mock.Protected().Setup("Do", 1, 2).Verifiable();
+			mock.Protected().Setup<string>("DoReturn", "1", "2").Returns("3").Verifiable();
 
 			mock.Object.ExecuteDo(1, 2);
 			Assert.Equal("3", mock.Object.ExecuteDoReturn("1", "2"));
@@ -310,7 +310,7 @@ namespace Moq.Tests
 		{
 			var mock = new Mock<MethodOverloads>();
 
-			Assert.Throws<ArgumentException>(() => mock.Protected().Expect<string>("Do", "1", "2").Returns("3"));
+			Assert.Throws<ArgumentException>(() => mock.Protected().Setup<string>("Do", "1", "2").Returns("3"));
 		}
 
 		public class MethodOverloads

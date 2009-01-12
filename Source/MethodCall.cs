@@ -281,7 +281,7 @@ namespace Moq
 				call.Method.GetBaseDefinition() == method);
 		}
 
-		public IExtensible AtMostOnce()
+		public IVerifies AtMostOnce()
 		{
 			isOnce = true;
 
@@ -293,46 +293,46 @@ namespace Moq
 			IsNever = true;
 		}
 
-		public IExtensible AtMost(int callCount)
+		public IVerifies AtMost(int callCount)
 		{
 			expectedCallCount = callCount;
 
 			return this;
 		}
 
-		public IExtensible Raises(MockedEvent eventHandler, EventArgs args)
+		public IVerifies Raises(MockedEvent eventHandler, EventArgs args)
 		{
 			Guard.ArgumentNotNull(args, "args");
 
 			return RaisesImpl(eventHandler, (Func<EventArgs>)(() => args));
 		}
 
-		public IExtensible Raises(MockedEvent eventHandler, Func<EventArgs> func)
+		public IVerifies Raises(MockedEvent eventHandler, Func<EventArgs> func)
 		{
 			return RaisesImpl(eventHandler, func);
 		}
 
-		public IExtensible Raises<T>(MockedEvent eventHandler, Func<T, EventArgs> func)
+		public IVerifies Raises<T>(MockedEvent eventHandler, Func<T, EventArgs> func)
 		{
 			return RaisesImpl(eventHandler, func);
 		}
 
-		public IExtensible Raises<T1, T2>(MockedEvent eventHandler, Func<T1, T2, EventArgs> func)
+		public IVerifies Raises<T1, T2>(MockedEvent eventHandler, Func<T1, T2, EventArgs> func)
 		{
 			return RaisesImpl(eventHandler, func);
 		}
 
-		public IExtensible Raises<T1, T2, T3>(MockedEvent eventHandler, Func<T1, T2, T3, EventArgs> func)
+		public IVerifies Raises<T1, T2, T3>(MockedEvent eventHandler, Func<T1, T2, T3, EventArgs> func)
 		{
 			return RaisesImpl(eventHandler, func);
 		}
 
-		public IExtensible Raises<T1, T2, T3, T4>(MockedEvent eventHandler, Func<T1, T2, T3, T4, EventArgs> func)
+		public IVerifies Raises<T1, T2, T3, T4>(MockedEvent eventHandler, Func<T1, T2, T3, T4, EventArgs> func)
 		{
 			return RaisesImpl(eventHandler, func);
 		}
 
-		private IExtensible RaisesImpl(MockedEvent eventHandler, Delegate func)
+		private IVerifies RaisesImpl(MockedEvent eventHandler, Delegate func)
 		{
 			Guard.ArgumentNotNull(eventHandler, "eventHandler");
 			Guard.ArgumentNotNull(func, "func");

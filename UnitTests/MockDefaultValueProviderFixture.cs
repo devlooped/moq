@@ -74,7 +74,7 @@ namespace Moq.Tests
 			var value = provider.ProvideDefault(typeof(IFoo).GetProperty("Bar").GetGetMethod(), new object[0]);
 
 			var barMock = Mock.Get((IBar)value);
-			barMock.Expect(b => b.Do()).Verifiable();
+			barMock.Setup(b => b.Do()).Verifiable();
 
 			Assert.Throws<MockVerificationException>(() => mock.Verify());
 		}

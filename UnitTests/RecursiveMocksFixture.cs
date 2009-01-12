@@ -10,7 +10,7 @@ namespace Moq.Tests
 		{
 			var mock = new Mock<IFoo>();
 
-			mock.ExpectGet(m => m.Bar.Value).Returns(5);
+			mock.SetupGet(m => m.Bar.Value).Returns(5);
 
 			Assert.Equal(5, mock.Object.Bar.Value);
 		}
@@ -20,7 +20,7 @@ namespace Moq.Tests
 		{
 			var mock = new Mock<IFoo>();
 
-			mock.ExpectGet(m => m.Bar.Value).Returns(5);
+			mock.SetupGet(m => m.Bar.Value).Returns(5);
 
 			var barMock = Mock.Get(mock.Object.Bar);
 
@@ -34,8 +34,8 @@ namespace Moq.Tests
 		{
 			var mock = new Mock<IFoo>();
 
-			mock.Expect(m => m.Bar.Do("ping")).Returns("ack");
-			mock.Expect(m => m.Bar.Baz.Do("ping")).Returns("ack");
+			mock.Setup(m => m.Bar.Do("ping")).Returns("ack");
+			mock.Setup(m => m.Bar.Baz.Do("ping")).Returns("ack");
 
 			Assert.Equal("ack", mock.Object.Bar.Do("ping"));
 			Assert.Equal("ack", mock.Object.Bar.Baz.Do("ping"));
@@ -47,7 +47,7 @@ namespace Moq.Tests
 		{
 			var mock = new Mock<IFoo>();
 
-			mock.Expect(m => m.Bar.Baz.Do());
+			mock.Setup(m => m.Bar.Baz.Do());
 
 			Assert.Throws<MockVerificationException>(() => mock.VerifyAll());
 
@@ -64,7 +64,7 @@ namespace Moq.Tests
 		{
 			var mock = new Mock<IFoo>();
 
-			mock.ExpectSet(m => m.Bar.Value, 5);
+			mock.SetupSet(m => m.Bar.Value, 5);
 
 			Assert.NotNull(mock.Object.Bar);
 			Assert.Throws<MockVerificationException>(() => mock.VerifyAll());
@@ -79,7 +79,7 @@ namespace Moq.Tests
 		{
 			var mock = new Mock<IFoo>();
 
-			mock.ExpectSet(m => m.Bar.Value);
+			mock.SetupSet(m => m.Bar.Value);
 
 			Assert.NotNull(mock.Object.Bar);
 			Assert.Throws<MockVerificationException>(() => mock.VerifyAll());
@@ -94,8 +94,8 @@ namespace Moq.Tests
 		{
 			var mock = new Mock<IFoo>();
 
-			mock.Expect(m => m.Bar.Do("ping")).Returns("ack");
-			mock.Expect(m => m.Do("ping")).Returns("ack");
+			mock.Setup(m => m.Bar.Do("ping")).Returns("ack");
+			mock.Setup(m => m.Do("ping")).Returns("ack");
 
 			mock.Object.Do("ping");
 			var bar = mock.Object.Bar;
@@ -108,8 +108,8 @@ namespace Moq.Tests
 		{
 			var mock = new Mock<IFoo>();
 
-			mock.Expect(m => m.Bar.Do("ping")).Returns("ack").Verifiable();
-			mock.Expect(m => m.Do("ping")).Returns("ack");
+			mock.Setup(m => m.Bar.Do("ping")).Returns("ack").Verifiable();
+			mock.Setup(m => m.Do("ping")).Returns("ack");
 
 			mock.Object.Do("ping");
 			var bar = mock.Object.Bar;
@@ -155,7 +155,7 @@ namespace Moq.Tests
 		{
 			var mock = new Mock<IFoo>();
 
-			mock.Expect(m => m.Bar.Do("ping")).Returns("ack").Verifiable();
+			mock.Setup(m => m.Bar.Do("ping")).Returns("ack").Verifiable();
 
 			Assert.Throws<MockException>(() => mock.Verify(m => m.Bar.Do("ping")));
 
@@ -170,7 +170,7 @@ namespace Moq.Tests
 		{
 			var mock = new Mock<IFoo>();
 
-			mock.Expect(m => m.Bar.Baz.Do());
+			mock.Setup(m => m.Bar.Baz.Do());
 
 			Assert.Throws<MockException>(() => mock.Verify(m => m.Bar.Baz.Do()));
 
@@ -184,7 +184,7 @@ namespace Moq.Tests
 		{
 			var mock = new Mock<IFoo>();
 
-			mock.ExpectGet(m => m.Bar.Value).Returns(5);
+			mock.SetupGet(m => m.Bar.Value).Returns(5);
 
 			Assert.Throws<MockException>(() => mock.VerifyGet(m => m.Bar.Value));
 
@@ -200,7 +200,7 @@ namespace Moq.Tests
 		{
 			var mock = new Mock<IFoo>();
 
-			mock.Expect(m => m.Bar.Value).Returns(5);
+			mock.Setup(m => m.Bar.Value).Returns(5);
 
 			Assert.Throws<MockException>(() => mock.Verify(m => m.Bar.Value));
 
@@ -216,7 +216,7 @@ namespace Moq.Tests
 		{
 			var mock = new Mock<IFoo>();
 
-			mock.ExpectSet(m => m.Bar.Value);
+			mock.SetupSet(m => m.Bar.Value);
 
 			Assert.Throws<MockException>(() => mock.VerifySet(m => m.Bar.Value));
 
@@ -230,7 +230,7 @@ namespace Moq.Tests
 		{
 			var mock = new Mock<IFoo>();
 
-			mock.ExpectSet(m => m.Bar.Value, 5);
+			mock.SetupSet(m => m.Bar.Value, 5);
 
 			Assert.Throws<MockException>(() => mock.VerifySet(m => m.Bar.Value, 5));
 
@@ -244,7 +244,7 @@ namespace Moq.Tests
 		{
 			var mock = new Mock<Foo>();
 
-			Assert.Throws<NotSupportedException>(() => mock.Expect(m => m.BarField.Do("ping")));
+			Assert.Throws<NotSupportedException>(() => mock.Setup(m => m.BarField.Do("ping")));
 		}
 
 		[Fact]
@@ -252,7 +252,7 @@ namespace Moq.Tests
 		{
 			var mock = new Mock<Foo>();
 
-			Assert.Throws<NotSupportedException>(() => mock.Expect(m => m.GetBar().Do("ping")));
+			Assert.Throws<NotSupportedException>(() => mock.Setup(m => m.GetBar().Do("ping")));
 		}
 
 		[Fact]
@@ -260,7 +260,7 @@ namespace Moq.Tests
 		{
 			var mock = new Mock<IFoo>();
 
-			Assert.Throws<NotSupportedException>(() => mock.Expect(m => m.Bar.Value.ToString()));
+			Assert.Throws<NotSupportedException>(() => mock.Setup(m => m.Bar.Value.ToString()));
 		}
 
 		[Fact]
@@ -268,7 +268,7 @@ namespace Moq.Tests
 		{
 			var mock = new Mock<IFoo>();
 
-			Assert.Throws<NotSupportedException>(() => mock.Expect(m => m[0].Do("ping")).Returns("ack"));
+			Assert.Throws<NotSupportedException>(() => mock.Setup(m => m[0].Do("ping")).Returns("ack"));
 		}
 
 		public class Foo : IFoo

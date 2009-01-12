@@ -10,7 +10,7 @@ namespace Moq.Tests
 			var mock = new Mock<IFoo>();
 			string expected = "ack";
 
-			mock.Expect(m => m.Execute("ping", out expected)).Returns(true);
+			mock.Setup(m => m.Execute("ping", out expected)).Returns(true);
 
 			string actual;
 			bool ok = mock.Object.Execute("ping", out actual);
@@ -25,7 +25,7 @@ namespace Moq.Tests
 			var mock = new Mock<IFoo>();
 			string expected = "ack";
 
-			mock.Expect(m => m.Execute("ping", out expected)).Returns(true);
+			mock.Setup(m => m.Execute("ping", out expected)).Returns(true);
 
 			expected = "foo";
 
@@ -42,7 +42,7 @@ namespace Moq.Tests
 			var mock = new Mock<IFoo>();
 			string expected = "ack";
 
-			mock.Expect(m => m.Echo(ref expected)).Returns<string>(s => s);
+			mock.Setup(m => m.Echo(ref expected)).Returns<string>(s => s);
 
 			string actual = mock.Object.Echo(ref expected);
 
@@ -55,7 +55,7 @@ namespace Moq.Tests
 			var mock = new Mock<IFoo>(MockBehavior.Strict);
 			string expected = "ack";
 
-			mock.Expect(m => m.Echo(ref expected)).Returns<string>(s => s);
+			mock.Setup(m => m.Echo(ref expected)).Returns<string>(s => s);
 
 			string actual = null;
 			Assert.Throws<MockException>(() => mock.Object.Echo(ref actual));

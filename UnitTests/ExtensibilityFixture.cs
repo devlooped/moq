@@ -9,7 +9,7 @@ namespace Moq.Tests
 		public void ShouldExtendMatching()
 		{
 			var mock = new Mock<IOrderRepository>();
-			mock.Expect(repo => repo.Save(OrderIs.Big()))
+			mock.Setup(repo => repo.Save(OrderIs.Big()))
 				.Throws(new InvalidOperationException());
 
 			try

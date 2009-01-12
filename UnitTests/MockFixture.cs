@@ -21,7 +21,7 @@ namespace Moq.Tests
 		{
 			var mock = new Mock<ICloneable>();
 
-			Assert.Throws<ArgumentNullException>(() => mock.Expect((Expression<Action<ICloneable>>)null));
+			Assert.Throws<ArgumentNullException>(() => mock.Setup((Expression<Action<ICloneable>>)null));
 		}
 
 		[Fact]
@@ -29,7 +29,7 @@ namespace Moq.Tests
 		{
 			var mock = new Mock<ICloneable>();
 
-			Assert.Throws<ArgumentNullException>(() => mock.Expect((Expression<Func<ICloneable, string>>)null));
+			Assert.Throws<ArgumentNullException>(() => mock.Setup((Expression<Func<ICloneable, string>>)null));
 		}
 
 		[Fact]
@@ -37,7 +37,7 @@ namespace Moq.Tests
 		{
 			var mock = new Mock<FooBase>();
 
-			Assert.Throws<ArgumentException>(() => mock.Expect(x => x.ValueField));
+			Assert.Throws<ArgumentException>(() => mock.Setup(x => x.ValueField));
 		}
 
 		[Fact]
@@ -46,7 +46,7 @@ namespace Moq.Tests
 			int value = 5;
 			var mock = new Mock<IFoo>();
 
-			mock.Expect(x => x.Echo(value)).Returns(() => value * 2);
+			mock.Setup(x => x.Echo(value)).Returns(() => value * 2);
 
 			Assert.Equal(value * 2, mock.Object.Echo(value));
 		}
@@ -57,7 +57,7 @@ namespace Moq.Tests
 			int value = 5;
 			var mock = new Mock<IFoo>();
 
-			mock.Expect(x => x.Echo(GetValue(value))).Returns(() => value * 2);
+			mock.Setup(x => x.Echo(GetValue(value))).Returns(() => value * 2);
 
 			Assert.Equal(value * 2, mock.Object.Echo(value * 2));
 		}
@@ -72,7 +72,7 @@ namespace Moq.Tests
 		{
 			var mock = new Mock<IFoo>();
 
-			mock.Expect(x => x.Submit());
+			mock.Setup(x => x.Submit());
 
 			mock.Object.Submit();
 		}
@@ -82,7 +82,7 @@ namespace Moq.Tests
 		{
 			var mock = new Mock<IFoo>();
 
-			mock.Expect(x => x.Submit()).Throws(new FormatException());
+			mock.Setup(x => x.Submit()).Throws(new FormatException());
 
 			Assert.Throws<FormatException>(() => mock.Object.Submit());
 		}
@@ -92,7 +92,7 @@ namespace Moq.Tests
 		{
 			var mock = new Mock<IFoo>();
 
-			mock.Expect(x => x.Submit()).Throws<FormatException>();
+			mock.Setup(x => x.Submit()).Throws<FormatException>();
 
 			Assert.Throws<FormatException>(() => mock.Object.Submit());
 		}
@@ -102,7 +102,7 @@ namespace Moq.Tests
 		{
 			var provider = new Mock<IServiceProvider>();
 
-			provider.Expect(x => x.GetService(typeof(IFooService))).Returns(new FooService());
+			provider.Setup(x => x.GetService(typeof(IFooService))).Returns(new FooService());
 
 			Assert.True(provider.Object.GetService(typeof(IFooService)) is FooService);
 		}
@@ -111,8 +111,8 @@ namespace Moq.Tests
 		public void InvokesLastExpectationThatMatches()
 		{
 			var mock = new Mock<IFoo>();
-			mock.Expect(x => x.Execute(It.IsAny<string>())).Throws(new ArgumentException());
-			mock.Expect(x => x.Execute("ping")).Returns("I'm alive!");
+			mock.Setup(x => x.Execute(It.IsAny<string>())).Throws(new ArgumentException());
+			mock.Setup(x => x.Execute("ping")).Returns("I'm alive!");
 
 			Assert.Equal("I'm alive!", mock.Object.Execute("ping"));
 
@@ -158,8 +158,8 @@ namespace Moq.Tests
 		public void OverridesObjectMethods()
 		{
 			var mock = new Mock<IFoo>();
-			mock.Expect(x => x.GetHashCode()).Returns(1);
-			mock.Expect(x => x.ToString()).Returns("foo");
+			mock.Setup(x => x.GetHashCode()).Returns(1);
+			mock.Setup(x => x.ToString()).Returns("foo");
 
 			Assert.Equal("foo", mock.Object.ToString());
 			Assert.Equal(1, mock.Object.GetHashCode());
@@ -171,7 +171,7 @@ namespace Moq.Tests
 			var mock = new Mock<FooBase>();
 			mock.CallBase = true;
 
-			mock.Expect(x => x.Check("foo")).Returns(false);
+			mock.Setup(x => x.Check("foo")).Returns(false);
 
 			Assert.False(mock.Object.Check("foo"));
 			Assert.True(mock.Object.Check("bar"));
@@ -202,7 +202,7 @@ namespace Moq.Tests
 		{
 			var mock = new Mock<FooBase>();
 
-			Assert.Throws<ArgumentException>(() => mock.Expect(x => x.True()).Returns(false));
+			Assert.Throws<ArgumentException>(() => mock.Setup(x => x.True()).Returns(false));
 		}
 
 		[Fact]
@@ -210,11 +210,11 @@ namespace Moq.Tests
 		{
 			var mock = new Mock<IFoo>();
 
-			mock.Expect(x => x.Echo(1)).Returns(5);
+			mock.Setup(x => x.Echo(1)).Returns(5);
 
 			Assert.Equal(5, mock.Object.Echo(1));
 
-			mock.Expect(x => x.Echo(1)).Returns(10);
+			mock.Setup(x => x.Echo(1)).Returns(10);
 
 			Assert.Equal(10, mock.Object.Echo(1));
 		}
@@ -272,7 +272,7 @@ namespace Moq.Tests
 		{
 			var mock = new Mock<IFoo>(MockBehavior.Strict);
 
-			mock.Expect(x => x.Execute("ping"));
+			mock.Setup(x => x.Execute("ping"));
 
 			try
 			{
@@ -292,7 +292,7 @@ namespace Moq.Tests
 
 			int? value = 0;
 
-			mock.ExpectSet(foo => foo.Value)
+			mock.SetupSet(foo => foo.Value)
 				.Callback(i => value = i);
 
 			mock.Object.Value = 5;
@@ -304,7 +304,7 @@ namespace Moq.Tests
 		public void ExpectsPropertySetterWithValue()
 		{
 			var mock = new Mock<IFoo>();
-			mock.ExpectSet(m => m.Value, 5);
+			mock.SetupSet(m => m.Value, 5);
 
 			Assert.Throws<MockVerificationException>(() => mock.VerifyAll());
 
@@ -318,7 +318,7 @@ namespace Moq.Tests
 		public void ExpectsPropertySetterWithNullValue()
 		{
 			var mock = new Mock<IFoo>(MockBehavior.Strict);
-			mock.ExpectSet(m => m.Value, null);
+			mock.SetupSet(m => m.Value, null);
 
 			Assert.Throws<MockException>(() => { mock.Object.Value = 5; });
 			Assert.Throws<MockVerificationException>(() => mock.VerifyAll());
@@ -333,7 +333,7 @@ namespace Moq.Tests
 		public void ThrowsIfPropertySetterWithWrongValue()
 		{
 			var mock = new Mock<IFoo>(MockBehavior.Strict);
-			mock.ExpectSet(m => m.Value, 5);
+			mock.SetupSet(m => m.Value, 5);
 
 			Assert.Throws<MockException>(() => { mock.Object.Value = 6; });
 		}
@@ -345,7 +345,7 @@ namespace Moq.Tests
 
 			bool called = false;
 
-			mock.ExpectGet(x => x.Value)
+			mock.SetupGet(x => x.Value)
 				.Callback(() => called = true)
 				.Returns(25);
 
@@ -358,7 +358,7 @@ namespace Moq.Tests
 		{
 			var mock = new Mock<IFoo>();
 
-			Assert.Throws<ArgumentException>(() => mock.ExpectSet(foo => foo.Echo(5)));
+			Assert.Throws<ArgumentException>(() => mock.SetupSet(foo => foo.Echo(5)));
 		}
 
 		[Fact]
@@ -366,7 +366,7 @@ namespace Moq.Tests
 		{
 			var mock = new Mock<IFoo>();
 
-			Assert.Throws<ArgumentException>(() => mock.ExpectGet(foo => foo.Echo(5)));
+			Assert.Throws<ArgumentException>(() => mock.SetupGet(foo => foo.Echo(5)));
 		}
 
 		[Fact]
@@ -399,9 +399,9 @@ namespace Moq.Tests
 		{
 			var mock = new Mock<IFoo>();
 
-			mock.ExpectGet(foo => foo[0])
+			mock.SetupGet(foo => foo[0])
 				.Returns(1);
-			mock.ExpectGet(foo => foo[1])
+			mock.SetupGet(foo => foo[1])
 				.Returns(2);
 
 			Assert.Equal(1, mock.Object[0]);
@@ -413,9 +413,9 @@ namespace Moq.Tests
 		{
 			var mock = new Mock<IFoo>();
 
-			mock.ExpectGet(foo => foo.Value)
+			mock.SetupGet(foo => foo.Value)
 				.Returns(1);
-			mock.Expect(foo => foo.Value)
+			mock.Setup(foo => foo.Value)
 				.Returns(2);
 
 			Assert.Equal(2, mock.Object.Value);
@@ -426,7 +426,7 @@ namespace Moq.Tests
 		{
 			var mock = new Mock<FooWithPrivateSetter>();
 
-			Assert.Throws<ArgumentException>(() => mock.ExpectSet(m => m.Foo));
+			Assert.Throws<ArgumentException>(() => mock.SetupSet(m => m.Foo));
 		}
 
 		[Fact]
@@ -434,7 +434,7 @@ namespace Moq.Tests
 		{
 			var target = new Mock<Doer>();
 
-			Assert.Throws<ArgumentException>(() => target.Expect(t => t.Do()));
+			Assert.Throws<ArgumentException>(() => target.Setup(t => t.Do()));
 		}
 
 		[Fact]
@@ -444,7 +444,7 @@ namespace Moq.Tests
 			string argument = "foo";
 
 			var target = new Mock<IParams>();
-			target.Expect(x => x.ExecuteByName(argument)).Returns(expected);
+			target.Setup(x => x.ExecuteByName(argument)).Returns(expected);
 
 			string actual = target.Object.ExecuteByName(argument);
 			Assert.Equal(expected, actual);
@@ -457,7 +457,7 @@ namespace Moq.Tests
 			string argument = "foo";
 
 			var target = new Mock<IParams>();
-			target.Expect(x => x.ExecuteParams(argument, It.IsAny<string>())).Returns(notExpected);
+			target.Setup(x => x.ExecuteParams(argument, It.IsAny<string>())).Returns(notExpected);
 
 			string actual = target.Object.ExecuteParams(argument);
 			Assert.NotEqual(notExpected, actual);
@@ -470,7 +470,7 @@ namespace Moq.Tests
 			string argument = "foo";
 
 			var target = new Mock<IParams>();
-			target.Expect(x => x.ExecuteParams(argument, It.IsAny<string>())).Returns(expected);
+			target.Setup(x => x.ExecuteParams(argument, It.IsAny<string>())).Returns(expected);
 
 			string ret = target.Object.ExecuteParams(argument, "baz");
 			Assert.Equal(expected, ret);
@@ -483,7 +483,7 @@ namespace Moq.Tests
 			string argument = "foo";
 
 			var target = new Mock<IParams>();
-			target.Expect(x => x.ExecuteArray(new string[] { argument, It.IsAny<string>() })).Returns(expected);
+			target.Setup(x => x.ExecuteArray(new string[] { argument, It.IsAny<string>() })).Returns(expected);
 
 			string ret = target.Object.ExecuteArray(new string[] { argument, "baz" });
 			Assert.Equal(null, ret);
@@ -493,8 +493,8 @@ namespace Moq.Tests
 		public void ExpectGetAndExpectSetMatchArguments()
 		{
 			var target = new Mock<IFoo>();
-			target.ExpectGet(d => d.Value).Returns(1);
-			target.ExpectSet(d => d.Value, 2);
+			target.SetupGet(d => d.Value).Returns(1);
+			target.SetupSet(d => d.Value, 2);
 
 			target.Object.Value = target.Object.Value + 1;
 

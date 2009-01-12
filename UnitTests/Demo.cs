@@ -15,7 +15,7 @@ namespace Moq.Tests
 			var mock = new Mock<IWarehouse>();
 
 			//setup - expectations
-			mock.Expect(x => x.HasInventory(TALISKER, 50)).Returns(true);
+			mock.Setup(x => x.HasInventory(TALISKER, 50)).Returns(true);
 
 			//exercise
 			order.Fill(mock.Object);
@@ -33,8 +33,8 @@ namespace Moq.Tests
 			var mock = new Mock<IWarehouse>();
 
 			//setup - expectations
-			mock.Expect(x => x.HasInventory(It.IsAny<string>(), It.IsInRange(0, 100, Range.Inclusive))).Returns(false);
-			mock.Expect(x => x.Remove(It.IsAny<string>(), It.IsAny<int>())).Throws(new InvalidOperationException());
+			mock.Setup(x => x.HasInventory(It.IsAny<string>(), It.IsInRange(0, 100, Range.Inclusive))).Returns(false);
+			mock.Setup(x => x.Remove(It.IsAny<string>(), It.IsAny<int>())).Throws(new InvalidOperationException());
 
 			//exercise
 			order.Fill(mock.Object);
@@ -126,7 +126,7 @@ namespace Moq.Tests
 			var mock = new Mock<ILoveThisFramework>();
 
 			// WOW! No record/reply weirdness?! :)
-			mock.Expect(framework => framework.ShouldDownload(It.IsAny<Version>()))
+			mock.Setup(framework => framework.ShouldDownload(It.IsAny<Version>()))
 				 .Callback((Version version) =>
 					  Console.WriteLine("Someone wanted version {0}!!!", version))
 				 .Returns(true)
@@ -153,7 +153,7 @@ namespace Moq.Tests
 
 			var theUser = new User { HashedPassword = "this is not hashed password" };
 
-			userRepository.Expect(x => x.GetUserByName("ayende")).Returns(theUser);
+			userRepository.Setup(x => x.GetUserByName("ayende")).Returns(theUser);
 
 			var controllerUnderTest = new LoginController(userRepository.Object, smsSender.Object);
 

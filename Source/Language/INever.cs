@@ -14,7 +14,7 @@ namespace Moq.Language
 		/// <example>
 		/// <code>
 		/// var mock = new Mock&lt;ICommand&gt;();
-		/// mock.Expect(foo => foo.Execute("ping"))
+		/// mock.Setup(foo => foo.Execute("ping"))
 		///     .Never();
 		/// </code>
 		/// </example>

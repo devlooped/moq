@@ -71,7 +71,7 @@ namespace Moq.Language
 		///     .Raises(handler, EventArgs.Empty);
 		/// </code>
 		/// </example>
-		IExtensible Raises(MockedEvent eventHandler, EventArgs args);
+		IVerifies Raises(MockedEvent eventHandler, EventArgs args);
 
 		/// <summary>
 		/// Specifies the mocked event that will be raised 
@@ -83,7 +83,7 @@ namespace Moq.Language
 		/// <param name="func">A function that will build the <see cref="EventArgs"/> 
 		/// to pass when raising the event.</param>
 		/// <seealso cref="Raises(MockedEvent, EventArgs)"/>
-		IExtensible Raises(MockedEvent eventHandler, Func<EventArgs> func);
+		IVerifies Raises(MockedEvent eventHandler, Func<EventArgs> func);
 
 		/// <summary>
 		/// Specifies the mocked event that will be raised 
@@ -96,7 +96,7 @@ namespace Moq.Language
 		/// to pass when raising the event.</param>
 		/// <typeparam name="T">Type of the argument received by the expected invocation.</typeparam>
 		/// <seealso cref="Raises(MockedEvent, EventArgs)"/>
-		IExtensible Raises<T>(MockedEvent eventHandler, Func<T, EventArgs> func);
+		IVerifies Raises<T>(MockedEvent eventHandler, Func<T, EventArgs> func);
 
 		/// <summary>
 		/// Specifies the mocked event that will be raised 
@@ -110,7 +110,7 @@ namespace Moq.Language
 		/// <typeparam name="T1">Type of the first argument received by the expected invocation.</typeparam>
 		/// <typeparam name="T2">Type of the second argument received by the expected invocation.</typeparam>
 		/// <seealso cref="Raises(MockedEvent, EventArgs)"/>
-		IExtensible Raises<T1, T2>(MockedEvent eventHandler, Func<T1, T2, EventArgs> func);
+		IVerifies Raises<T1, T2>(MockedEvent eventHandler, Func<T1, T2, EventArgs> func);
 
 		/// <summary>
 		/// Specifies the mocked event that will be raised 
@@ -125,7 +125,7 @@ namespace Moq.Language
 		/// <typeparam name="T2">Type of the second argument received by the expected invocation.</typeparam>
 		/// <typeparam name="T3">Type of the third argument received by the expected invocation.</typeparam>
 		/// <seealso cref="Raises(MockedEvent, EventArgs)"/>
-		IExtensible Raises<T1, T2, T3>(MockedEvent eventHandler, Func<T1, T2, T3, EventArgs> func);
+		IVerifies Raises<T1, T2, T3>(MockedEvent eventHandler, Func<T1, T2, T3, EventArgs> func);
 
 		/// <summary>
 		/// Specifies the mocked event that will be raised 
@@ -141,6 +141,6 @@ namespace Moq.Language
 		/// <typeparam name="T3">Type of the third argument received by the expected invocation.</typeparam>
 		/// <typeparam name="T4">Type of the fourth argument received by the expected invocation.</typeparam>
 		/// <seealso cref="Raises(MockedEvent, EventArgs)"/>
-		IExtensible Raises<T1, T2, T3, T4>(MockedEvent eventHandler, Func<T1, T2, T3, T4, EventArgs> func);
+		IVerifies Raises<T1, T2, T3, T4>(MockedEvent eventHandler, Func<T1, T2, T3, T4, EventArgs> func);
 	}
 }

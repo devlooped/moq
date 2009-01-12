@@ -8,11 +8,11 @@ using System.Linq.Expressions;
 
 namespace Moq
 {
-    // Keeps legacy members that hidden and are provided 
-    // for backwards compatibility (so that existing projects 
-    // still compile, but people don't see them).
-    // When a reference to Moq.Legacy.dll is added to a projects, 
-    public partial class Mock
+	// Keeps legacy members that hidden and are provided 
+	// for backwards compatibility (so that existing projects 
+	// still compile, but people don't see them).
+	// When a reference to Moq.Legacy.dll is added to a projects, 
+	public partial class Mock
 	{
 		/// <summary>
 		/// Verifies that all verifiable expectations have been met.
@@ -65,7 +65,7 @@ namespace Moq
 		/// to ensure that all expectations are met:
 		/// <code>
 		/// var mock = new Mock&lt;IWarehouse&gt;();
-		/// this.Expect(x =&gt; x.HasInventory(TALISKER, 50)).Returns(true);
+		/// this.Setup(x =&gt; x.HasInventory(TALISKER, 50)).Returns(true);
 		/// ...
 		/// // other test code
 		/// ...

@@ -284,7 +284,7 @@ namespace Moq
 		/// </example>
 		public virtual ISetup Setup(Expression<Action<T>> expression)
 		{
-			return Mock.SetUpExpect<T>(expression, this.Interceptor);
+			return Mock.Setup<T>(expression, this.Interceptor);
 		}
 
 		/// <summary>
@@ -304,7 +304,7 @@ namespace Moq
 		/// </example>
 		public virtual ISetup<TResult> Setup<TResult>(Expression<Func<T, TResult>> expression)
 		{
-			return SetUpExpect(expression, this.Interceptor);
+			return Setup(expression, this.Interceptor);
 		}
 
 		/// <summary>
@@ -325,7 +325,7 @@ namespace Moq
 		/// </example>
 		public virtual ISetupGetter<TProperty> SetupGet<TProperty>(Expression<Func<T, TProperty>> expression)
 		{
-			return SetUpExpectGet(expression, this.Interceptor);
+			return SetupGet(expression, this.Interceptor);
 		}
 
 		/// <summary>
@@ -345,7 +345,7 @@ namespace Moq
 		/// </example>
 		public virtual ISetupSetter<TProperty> SetupSet<TProperty>(Expression<Func<T, TProperty>> expression)
 		{
-			return SetUpExpectSet<T, TProperty>(expression, this.Interceptor);
+			return SetupSet<T, TProperty>(expression, this.Interceptor);
 		}
 
 		/// <summary>
@@ -366,7 +366,7 @@ namespace Moq
 		/// </example>
 		public virtual ISetupSetter<TProperty> SetupSet<TProperty>(Expression<Func<T, TProperty>> expression, TProperty value)
 		{
-			return SetUpExpectSet(expression, value, this.Interceptor);
+			return SetupSet(expression, value, this.Interceptor);
 		}
 
 		/// <summary>
@@ -725,27 +725,27 @@ namespace Moq
 
 			public override ISetup<TResult> Setup<TResult>(Expression<Func<TInterface, TResult>> expression)
 			{
-				return Mock.SetUpExpect(expression, owner.Interceptor);
+				return Mock.Setup(expression, owner.Interceptor);
 			}
 
 			public override ISetup Setup(Expression<Action<TInterface>> expression)
 			{
-				return Mock.SetUpExpect(expression, owner.Interceptor);
+				return Mock.Setup(expression, owner.Interceptor);
 			}
 
 			public override ISetupGetter<TProperty> SetupGet<TProperty>(Expression<Func<TInterface, TProperty>> expression)
 			{
-				return Mock.SetUpExpectGet(expression, owner.Interceptor);
+				return Mock.SetupGet(expression, owner.Interceptor);
 			}
 
 			public override ISetupSetter<TProperty> SetupSet<TProperty>(Expression<Func<TInterface, TProperty>> expression)
 			{
-				return Mock.SetUpExpectSet(expression, owner.Interceptor);
+				return Mock.SetupSet(expression, owner.Interceptor);
 			}
 
 			public override ISetupSetter<TProperty> SetupSet<TProperty>(Expression<Func<TInterface, TProperty>> expression, TProperty value)
 			{
-				return Mock.SetUpExpectSet(expression, value, owner.Interceptor);
+				return Mock.SetupSet(expression, value, owner.Interceptor);
 			}
 
 			internal override Dictionary<MethodInfo, Mock> InnerMocks

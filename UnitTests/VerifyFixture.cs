@@ -10,7 +10,7 @@ namespace Moq.Tests
 		{
 			var mock = new Mock<IFoo>();
 
-			mock.Expect(x => x.Submit()).Verifiable();
+			mock.Setup(x => x.Submit()).Verifiable();
 
 			try
 			{
@@ -29,7 +29,7 @@ namespace Moq.Tests
 			var expectedArg = "lorem,ipsum";
 			var mock = new Mock<IFoo>();
 
-			mock.Expect(x => x.Execute(expectedArg.Substring(0, 5)))
+			mock.Setup(x => x.Execute(expectedArg.Substring(0, 5)))
 				.Returns("ack")
 				.Verifiable();
 
@@ -50,7 +50,7 @@ namespace Moq.Tests
 		{
 			var mock = new Mock<IFoo>();
 
-			mock.Expect(x => x.Execute(It.Is<string>(s => string.IsNullOrEmpty(s))))
+			mock.Setup(x => x.Execute(It.Is<string>(s => string.IsNullOrEmpty(s))))
 				.Returns("ack")
 				.Verifiable();
 
@@ -79,7 +79,7 @@ namespace Moq.Tests
 		{
 			var mock = new Mock<IFoo>();
 
-			mock.Expect(x => x.Submit());
+			mock.Setup(x => x.Submit());
 
 			try
 			{
@@ -97,9 +97,9 @@ namespace Moq.Tests
 		{
 			var mock = new Mock<IFoo>();
 
-			mock.Expect(x => x.Submit());
-			mock.Expect(x => x.Echo(1));
-			mock.Expect(x => x.Execute("ping"));
+			mock.Setup(x => x.Submit());
+			mock.Setup(x => x.Echo(1));
+			mock.Setup(x => x.Execute("ping"));
 
 			try
 			{
@@ -222,7 +222,7 @@ namespace Moq.Tests
 		public void VerifiesSetterWithExpression()
 		{
 			var mock = new Mock<IFoo>();
-			mock.ExpectSet(m => m.Value, 5);
+			mock.SetupSet(m => m.Value, 5);
 
 			mock.Object.Value = 1;
 			mock.Object.Value = 5;

@@ -42,6 +42,7 @@ using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
+using System.ComponentModel;
 
 namespace Moq
 {
@@ -289,6 +290,32 @@ namespace Moq
 			mock.DefaultValue = this.DefaultValue;
 
 			return mock;
+		}
+
+		/// <summary>
+		/// Verifies all verifiable expectations on all mocks created 
+		/// by this factory.
+		/// </summary>
+		/// <seealso cref="Mock.Verify()"/>
+		/// <exception cref="MockException">One or more mocks had expectations that were not satisfied.</exception>
+		[Obsolete("Use Verify(expression) on each mock instead, to verify explicitly after the mock has been used.")]
+		[EditorBrowsable(EditorBrowsableState.Never)]
+		public virtual void Verify()
+		{
+			VerifyMocks(verifiable => verifiable.Verify());
+		}
+
+		/// <summary>
+		/// Verifies all verifiable expectations on all mocks created 
+		/// by this factory.
+		/// </summary>
+		/// <seealso cref="Mock.Verify()"/>
+		/// <exception cref="MockException">One or more mocks had expectations that were not satisfied.</exception>
+		[Obsolete("Use Verify(expression) on each mock instead, to verify explicitly after the mock has been used.")]
+		[EditorBrowsable(EditorBrowsableState.Never)]
+		public virtual void VerifyAll()
+		{
+			VerifyMocks(verifiable => verifiable.VerifyAll());
 		}
 
 		/// <summary>

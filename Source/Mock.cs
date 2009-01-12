@@ -135,16 +135,6 @@ namespace Moq
 		Dictionary<MethodInfo, Mock> innerMocks = new Dictionary<MethodInfo, Mock>();
 		Dictionary<EventInfo, List<Delegate>> invocationLists = new Dictionary<EventInfo, List<Delegate>>();
 
-		//static MethodInfo genericSetupExpectVoid;
-		//static MethodInfo genericSetupExpectReturn;
-		//static MethodInfo genericSetupExpectGet;
-		//static MethodInfo genericSetupExpectSet;
-
-		//static Mock()
-		//{
-		//    genericSetupExpectVoid = typeof(Mock).GetMethod("SetupExpect
-		//}
-
 		internal virtual Interceptor Interceptor { get; set; }
 		internal virtual Dictionary<MethodInfo, Mock> InnerMocks { get { return innerMocks; } set { innerMocks = value; } }
 
@@ -306,9 +296,9 @@ namespace Moq
 
 		#endregion
 
-		#region Expect
+		#region Setup
 
-		internal static MethodCall SetUpExpect<T1>(Expression<Action<T1>> expression, Interceptor interceptor)
+		internal static MethodCall Setup<T1>(Expression<Action<T1>> expression, Interceptor interceptor)
 		{
 			Guard.ArgumentNotNull(interceptor, "interceptor");
 
@@ -326,7 +316,7 @@ namespace Moq
 			return call;
 		}
 
-		internal static MethodCallReturn<TResult> SetUpExpect<T1, TResult>(Expression<Func<T1, TResult>> expression, Interceptor interceptor)
+		internal static MethodCallReturn<TResult> Setup<T1, TResult>(Expression<Func<T1, TResult>> expression, Interceptor interceptor)
 		{
 			// TODO: maybe we should pass the Mock around, rather than the interceptor?
 			Guard.ArgumentNotNull(interceptor, "interceptor");
@@ -334,7 +324,7 @@ namespace Moq
 			var lambda = expression.ToLambda();
 
 			if (lambda.IsProperty())
-				return SetUpExpectGet(expression, interceptor);
+				return SetupGet(expression, interceptor);
 
 			var methodCall = lambda.ToMethodCall();
 			MethodInfo method = methodCall.Method;
@@ -350,7 +340,7 @@ namespace Moq
 			return call;
 		}
 
-		internal static MethodCallReturn<TProperty> SetUpExpectGet<T1, TProperty>(Expression<Func<T1, TProperty>> expression, Interceptor interceptor)
+		internal static MethodCallReturn<TProperty> SetupGet<T1, TProperty>(Expression<Func<T1, TProperty>> expression, Interceptor interceptor)
 		{
 			Guard.ArgumentNotNull(interceptor, "interceptor");
 			LambdaExpression lambda = expression.ToLambda();
@@ -358,7 +348,7 @@ namespace Moq
 			if (lambda.IsPropertyIndexer())
 			{
 				// Treat indexers as regular method invocations.
-				return SetUpExpect<T1, TProperty>(expression, interceptor);
+				return Setup<T1, TProperty>(expression, interceptor);
 			}
 			else
 			{
@@ -378,7 +368,7 @@ namespace Moq
 			}
 		}
 
-		internal static SetterMethodCall<TProperty> SetUpExpectSet<T1, TProperty>(Expression<Func<T1, TProperty>> expression, Interceptor interceptor)
+		internal static SetterMethodCall<TProperty> SetupSet<T1, TProperty>(Expression<Func<T1, TProperty>> expression, Interceptor interceptor)
 		{
 			Guard.ArgumentNotNull(interceptor, "interceptor");
 
@@ -396,7 +386,7 @@ namespace Moq
 			return call;
 		}
 
-		internal static SetterMethodCall<TProperty> SetUpExpectSet<T1, TProperty>(Expression<Func<T1, TProperty>> expression, TProperty value, Interceptor interceptor)
+		internal static SetterMethodCall<TProperty> SetupSet<T1, TProperty>(Expression<Func<T1, TProperty>> expression, TProperty value, Interceptor interceptor)
 		{
 			var lambda = expression.ToLambda();
 			var prop = lambda.ToPropertyInfo();
@@ -494,7 +484,7 @@ namespace Moq
 						var targetType = targetMock.MockedType;
 
 						// TODO: cache method
-						var setupGet = typeof(Mock).GetMethod("SetUpExpectGet", BindingFlags.Static | BindingFlags.NonPublic | BindingFlags.InvokeMethod);
+						var setupGet = typeof(Mock).GetMethod("SetupGet", BindingFlags.Static | BindingFlags.NonPublic | BindingFlags.InvokeMethod);
 						setupGet = setupGet.MakeGenericMethod(targetType, prop.PropertyType);
 						var param = Expression.Parameter(targetType, "mock");
 						var expr = Expression.Lambda(Expression.MakeMemberAccess(param, prop), param);

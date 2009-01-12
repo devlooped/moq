@@ -35,7 +35,7 @@
     <WarningLevel>4</WarningLevel>
     <DocumentationFile>bin\Release\Moq.xml</DocumentationFile>
     <TreatWarningsAsErrors>true</TreatWarningsAsErrors>
-    <RunCodeAnalysis>false</RunCodeAnalysis>
+    <RunCodeAnalysis>true</RunCodeAnalysis>
   </PropertyGroup>
   <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Debug|x86' ">
     <DebugSymbols>true</DebugSymbols>
@@ -103,7 +103,7 @@
     <Compile Include="Language\IReturns.cs" />
     <Compile Include="It.cs" />
     <Compile Include="Language\IThrows.cs" />
-    <Compile Include="Language\IExtensible.cs" />
+    <Compile Include="Language\IVerifies.cs" />
     <Compile Include="AdvancedMatcherAttribute.cs" />
     <Compile Include="MatcherFactory.cs" />
     <Compile Include="Matchers\AnyMatcher.cs" />
@@ -150,7 +150,9 @@
     <Compile Include="Matchers\ParamArrayMatcher.cs" />
     <Compile Include="Matchers\RefMatcher.cs" />
     <Compile Include="Mock.Generic.cs" />
-    <Compile Include="Mock.Generic.Legacy.cs" />
+    <Compile Include="Mock.Generic.Legacy.cs">
+      <SubType>Code</SubType>
+    </Compile>
     <Compile Include="Mock.Legacy.cs" />
     <Compile Include="MockDefaultValueProvider.cs" />
     <Compile Include="MockedEvent.Generic.cs" />

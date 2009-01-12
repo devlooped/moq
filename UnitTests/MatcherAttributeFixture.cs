@@ -28,7 +28,7 @@ namespace Moq.Tests
 		public void ShouldTranslateToUseMatcherImplementation()
 		{			
 			var mock = new Mock<IFoo>(MockBehavior.Strict);
-			mock.Expect(x => x.Bar(IsMagicString()));
+			mock.Setup(x => x.Bar(IsMagicString()));
 			IsMagicStringCalled = false;
 			mock.Object.Bar("magic");
 			Assert.True(IsMagicStringCalled);
@@ -39,7 +39,7 @@ namespace Moq.Tests
 		public void ShouldTranslateToUseMatcherImplementation2()
 		{
 			var mock = new Mock<IFoo>(MockBehavior.Strict);
-			mock.Expect(x => x.Bar(IsMagicString()));
+			mock.Setup(x => x.Bar(IsMagicString()));
 			IsMagicStringCalled = false;
 			Exception expectedException = null;
 			try
@@ -68,7 +68,7 @@ namespace Moq.Tests
 		public void ShouldUseAditionalArguments()
 		{
 			var mock = new Mock<IFoo>(MockBehavior.Strict);
-			mock.Expect(x => x.Bar(StartsWith("ma")));
+			mock.Setup(x => x.Bar(StartsWith("ma")));
 			mock.Object.Bar("magic");
 		}
 
@@ -76,7 +76,7 @@ namespace Moq.Tests
 		public void ShouldUseAditionalArguments2()
 		{
 			var mock = new Mock<IFoo>(MockBehavior.Strict);
-			mock.Expect(x => x.Bar(StartsWith("ma")));
+			mock.Setup(x => x.Bar(StartsWith("ma")));
 			Assert.Throws<MockException>(() => mock.Object.Bar("no-magic"));
 		}
 
@@ -94,7 +94,7 @@ namespace Moq.Tests
 			
 			Assert.Throws<MissingMethodException>(
 				"public static bool MatcherHookWithoutMatcherMethod(System.String) in class Moq.Tests.MatcherAttributeFixture.", 
-				() => mock.Expect(x => x.Bar(MatcherHookWithoutMatcherMethod())));
+				() => mock.Setup(x => x.Bar(MatcherHookWithoutMatcherMethod())));
 		}
 
 		[Matcher]
@@ -107,7 +107,7 @@ namespace Moq.Tests
 			
 			Assert.Throws<MissingMethodException>(
 				"public static bool MatcherHook2WithoutMatcherMethod(System.String, System.Int32) in class Moq.Tests.MatcherAttributeFixture.",
-				() => mock.Expect(x => x.Bar(MatcherHook2WithoutMatcherMethod(6))));
+				() => mock.Setup(x => x.Bar(MatcherHook2WithoutMatcherMethod(6))));
 		}
 
 		[Matcher]
@@ -117,7 +117,7 @@ namespace Moq.Tests
 		public void UseCurrentInstanceAsContext()
 		{
 			var mock = new Mock<IFoo>(MockBehavior.Strict);
-			mock.Expect(x => x.Bar(NonStaticMatcherHook()));
+			mock.Setup(x => x.Bar(NonStaticMatcherHook()));
 			NonStaticMatcherHookExpectedArg = "Do It";
 
 			mock.Object.Bar("Do It");
@@ -135,7 +135,7 @@ namespace Moq.Tests
 
 			Assert.Throws<MissingMethodException>(
 				"public bool NonStaticMatcherHookWithoutMatcherMethod(System.String) in class Moq.Tests.MatcherAttributeFixture.",
-				() => mock.Expect(x => x.Bar(NonStaticMatcherHookWithoutMatcherMethod())));
+				() => mock.Setup(x => x.Bar(NonStaticMatcherHookWithoutMatcherMethod())));
 		}
 
 		[Matcher]
@@ -145,7 +145,7 @@ namespace Moq.Tests
 		//public void AllowStaticPropertyAsMatcherHook()
 		//{
 		//    var mock = new Mock<IFoo>(MockBehavior.Strict);
-		//    mock.Expect(x => x.Bar(NotNull));
+		//    mock.Setup(x => x.Bar(NotNull));
 		//    mock.Object.Bar("a");
 		//}
 
@@ -157,7 +157,7 @@ namespace Moq.Tests
 		public void AllowStaticMethodsInHelperClassAsMatcherHook()
 		{
 		    var mock = new Mock<IFoo>(MockBehavior.Strict);
-		    mock.Expect(x => x.Bar(A.NotNull()));
+		    mock.Setup(x => x.Bar(A.NotNull()));
 		    mock.Object.Bar("a");
 		}
 
@@ -173,7 +173,7 @@ namespace Moq.Tests
 		{
 			var mock = new Mock<IFoo>(MockBehavior.Strict);
 			var b = new B();
-			mock.Expect(x => x.Bar(b.NotNull()));
+			mock.Setup(x => x.Bar(b.NotNull()));
 			mock.Object.Bar("a");
 		}
 

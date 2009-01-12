@@ -42,7 +42,7 @@ namespace Moq.Tests
 				var factory = new MockFactory(MockBehavior.Default);
 				var mock = factory.Create<ICloneable>();
 
-				mock.Expect(cloneable => cloneable.Clone());
+				mock.Setup(cloneable => cloneable.Clone());
 
 				factory.VerifyAll();
 			}
@@ -60,8 +60,8 @@ namespace Moq.Tests
 				var factory = new MockFactory(MockBehavior.Default);
 				var mock = factory.Create<IFoo>();
 
-				mock.Expect(foo => foo.Do());
-				mock.Expect(foo => foo.Undo()).Verifiable();
+				mock.Setup(foo => foo.Do());
+				mock.Setup(foo => foo.Undo()).Verifiable();
 
 				factory.Verify();
 			}
@@ -82,8 +82,8 @@ namespace Moq.Tests
 				var foo = factory.Create<IFoo>();
 				var bar = factory.Create<IBar>();
 
-				foo.Expect(f => f.Do());
-				bar.Expect(b => b.Redo());
+				foo.Setup(f => f.Do());
+				bar.Setup(b => b.Redo());
 
 				factory.VerifyAll();
 			}

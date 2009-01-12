@@ -109,10 +109,6 @@
     <Compile Include="VerifyFixture.cs" />
   </ItemGroup>
   <ItemGroup>
-    <ProjectReference Include="..\Legacy\Moq.Legacy.csproj">
-      <Project>{6D199BBA-59F8-4440-A98E-AEA377793E86}</Project>
-      <Name>Moq.Legacy</Name>
-    </ProjectReference>
     <ProjectReference Include="..\Source\Moq.csproj">
       <Project>{1C91AC30-5977-4BE5-BA67-8EB186C03514}</Project>
       <Name>Moq</Name>

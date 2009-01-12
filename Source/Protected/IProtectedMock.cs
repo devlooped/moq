@@ -50,17 +50,17 @@ namespace Moq.Protected
 	public interface IProtectedMock : IHideObjectMembers
 	{
 		/// <summary>
-		/// Specifies a setup on the void method with the given 
+		/// Specifies a setup for a void method invocation with the given 
 		/// <paramref name="voidMethodName"/>, optionally specifying 
 		/// arguments for the method call.
 		/// </summary>
 		/// <param name="voidMethodName">Name of the void method to be invoke.</param>
 		/// <param name="args">Optional arguments for the invocation. If argument matchers are used, 
 		/// remember to use <see cref="ItExpr"/> rather than <see cref="It"/>.</param>
-		ISetup Expect(string voidMethodName, params object[] args);
+		ISetup Setup(string voidMethodName, params object[] args);
 
 		/// <summary>
-		/// Specifies a setup on a property or a non void method with the given 
+		/// Specifies a setup for an invocation on a property or a non void method with the given 
 		/// <paramref name="methodOrPropertyName"/>, optionally specifying 
 		/// arguments for the method call.
 		/// </summary>
@@ -68,22 +68,22 @@ namespace Moq.Protected
 		/// <param name="args">Optional arguments for the invocation. If argument matchers are used, 
 		/// remember to use <see cref="ItExpr"/> rather than <see cref="It"/>.</param>
 		/// <typeparam name="TResult">Return type of the method or property.</typeparam>
-		ISetup<TResult> Expect<TResult>(string methodOrPropertyName, params object[] args);
+		ISetup<TResult> Setup<TResult>(string methodOrPropertyName, params object[] args);
 
 		/// <summary>
-		/// Specifies a setup on a property getter with the given 
+		/// Specifies a setup for an invocation on a property getter with the given 
 		/// <paramref name="propertyName"/>.
 		/// </summary>
 		/// <param name="propertyName">Name of the property.</param>
 		/// <typeparam name="TProperty">Type of the property.</typeparam>
-		ISetupGetter<TProperty> ExpectGet<TProperty>(string propertyName);
+		ISetupGetter<TProperty> SetupGet<TProperty>(string propertyName);
 
 		/// <summary>
-		/// Specifies a setup on a property setter with the given 
+		/// Specifies a setup for an invocation on a property setter with the given 
 		/// <paramref name="propertyName"/>.
 		/// </summary>
 		/// <param name="propertyName">Name of the property.</param>
 		/// <typeparam name="TProperty">Type of the property.</typeparam>
-		ISetupSetter<TProperty> ExpectSet<TProperty>(string propertyName);
+		ISetupSetter<TProperty> SetupSet<TProperty>(string propertyName);
 	}
 }

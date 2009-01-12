@@ -33,26 +33,10 @@ namespace Moq
 		/// </example>
 		/// <exception cref="MockException">Not all verifiable expectations were met.</exception>
 		[Obsolete("To verify invocations, use Verify passing an explicit expression instead (i.e. mock.Verify(m => m.Do());).", false)]
-        [EditorBrowsable(EditorBrowsableState.Always)]
+		[EditorBrowsable(EditorBrowsableState.Always)]
 		public static void Verify(this Mock mock)
 		{
-			try
-			{
-				mock.Interceptor.Verify();
-				foreach (var inner in mock.InnerMocks.Values)
-				{
-					inner.Verify();
-				}
-			}
-			catch (Exception ex)
-			{
-				// Rethrow resetting the call-stack so that 
-				// callers see the exception as happening at 
-				// this call site.
-				// TODO: see how to mangle the stacktrace so 
-				// that the mock doesn't even show up there.
-				throw ex;
-			}
+			mock.Verify();
 		}
 
 		/// <summary>
@@ -76,25 +60,10 @@ namespace Moq
 		/// </example>
 		/// <exception cref="MockException">At least one expectation was not met.</exception>
 		[Obsolete("To verify invocations, use Verify passing an explicit expression instead (i.e. mock.Verify(m => m.Do());).", false)]
-        [EditorBrowsable(EditorBrowsableState.Always)]
-        public static void VerifyAll(this Mock mock)
+		[EditorBrowsable(EditorBrowsableState.Always)]
+		public static void VerifyAll(this Mock mock)
 		{
-			// Made static so it can be called from As<TInterface>
-			try
-			{
-				mock.Interceptor.VerifyAll();
-				foreach (var inner in mock.InnerMocks.Values)
-				{
-					inner.VerifyAll();
-				}
-			}
-			catch (Exception ex)
-			{
-				// Rethrow resetting the call-stack so that 
-				// callers see the exception as happening at 
-				// this call site.
-				throw ex;
-			}
+			mock.VerifyAll();
 		}
 	}
 }

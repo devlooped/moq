@@ -18,7 +18,7 @@ namespace Moq.Tests.Regressions
 
 			var mock = new Mock<IMyClass>(MockBehavior.Strict);
 			mock
-				.Expect(m => m.GetValuesSince(It.IsAny<DateTime>()))
+				.Setup(m => m.GetValuesSince(It.IsAny<DateTime>()))
 				.Returns(items);
 
 			var actual = mock.Object.GetValuesSince(DateTime.Now).ToList();
@@ -41,8 +41,8 @@ namespace Moq.Tests.Regressions
 			public void ExpectsOnIndexer()
 			{
 				var mock = new Mock<ISomeInterface>();
-				mock.Expect(m => m[0]).Returns("a");
-				mock.Expect(m => m[1]).Returns("b");
+				mock.Setup(m => m[0]).Returns("a");
+				mock.Setup(m => m[1]).Returns("b");
 
 				Assert.Equal("a", mock.Object[0]);
 				Assert.Equal("b", mock.Object[1]);
@@ -67,7 +67,7 @@ namespace Moq.Tests.Regressions
 
 			foreach (var id in ids)
 			{
-				mock.Expect(x => x.DoSomething(id));
+				mock.Setup(x => x.DoSomething(id));
 			}
 
 			var component = mock.Object;
@@ -114,8 +114,8 @@ namespace Moq.Tests.Regressions
 			object arg1 = new object();
 			object arg2 = new object();
 
-			mocked.Expect(m => m.DoThings(arg1));
-			mocked.Expect(m => m.DoThings(arg2));
+			mocked.Setup(m => m.DoThings(arg1));
+			mocked.Setup(m => m.DoThings(arg2));
 
 			mocked.Object.DoThings(arg1);
 			mocked.Object.DoThings(arg2);
@@ -132,11 +132,11 @@ namespace Moq.Tests.Regressions
 		{
 			var mock = new Mock<IEvaluateLatest>();
 
-			mock.Expect(m => m.Method(It.IsAny<int>())).Returns(0);
-			mock.Expect(m => m.Method(It.IsInRange<int>(0, 20, Range.Inclusive))).Returns(1);
+			mock.Setup(m => m.Method(It.IsAny<int>())).Returns(0);
+			mock.Setup(m => m.Method(It.IsInRange<int>(0, 20, Range.Inclusive))).Returns(1);
 
-			mock.Expect(m => m.Method(5)).Returns(2);
-			mock.Expect(m => m.Method(10)).Returns(3);
+			mock.Setup(m => m.Method(5)).Returns(2);
+			mock.Setup(m => m.Method(10)).Returns(3);
 
 			Assert.Equal(3, mock.Object.Method(10));
 			Assert.Equal(2, mock.Object.Method(5));
@@ -158,8 +158,8 @@ namespace Moq.Tests.Regressions
 		{
 			var mock = new Mock<IEvaluateLatest>();
 
-			mock.Expect(e => e.Method(IsEqual.To(5))).Returns(1);
-			mock.Expect(e => e.Method(IsEqual.To<int, string>(6, "foo"))).Returns(2);
+			mock.Setup(e => e.Method(IsEqual.To(5))).Returns(1);
+			mock.Setup(e => e.Method(IsEqual.To<int, string>(6, "foo"))).Returns(2);
 
 			Assert.Equal(1, mock.Object.Method(5));
 			Assert.Equal(2, mock.Object.Method(6));
@@ -218,7 +218,7 @@ namespace Moq.Tests.Regressions
 			Mock<IFooPtr> mock = new Mock<IFooPtr>(MockBehavior.Strict);
 			IntPtr ret = new IntPtr(3);
 
-			mock.Expect(m => m.Get("a")).Returns(ret);
+			mock.Setup(m => m.Get("a")).Returns(ret);
 
 			IntPtr ret3 = mock.Object.Get("a");
 
@@ -238,7 +238,7 @@ namespace Moq.Tests.Regressions
 				// Setup
 				var fooMock = new Mock<Foo>();
 				fooMock.CallBase = true;
-				fooMock.Expect(o => o.GetBar()).Returns(new Bar());
+				fooMock.Setup(o => o.GetBar()).Returns(new Bar());
 				var bar = ((IFoolery)fooMock.Object).DoStuffToBar();
 				Assert.NotNull(bar);
 			}
@@ -283,9 +283,9 @@ namespace Moq.Tests.Regressions
 			public void That_last_expectation_should_win()
 			{
 				var mock = new Mock<ISample>();
-				mock.Expect(s => s.Get(1)).Returns("blah");
-				mock.Expect(s => s.Get(It.IsAny<int>())).Returns("foo");
-				mock.Expect(s => s.Get(1)).Returns("bar");
+				mock.Setup(s => s.Get(1)).Returns("blah");
+				mock.Setup(s => s.Get(It.IsAny<int>())).Returns("foo");
+				mock.Setup(s => s.Get(1)).Returns("bar");
 				Assert.Equal("bar", mock.Object.Get(1));
 			}
 

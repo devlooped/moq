@@ -11,7 +11,7 @@ namespace Moq.Tests
 			var mock = new Mock<ICloneable>();
 			var clone = new object();
 
-			mock.Expect(x => x.Clone()).Returns(clone);
+			mock.Setup(x => x.Clone()).Returns(clone);
 
 			Assert.Equal(clone, mock.Object.Clone());
 		}
@@ -20,7 +20,7 @@ namespace Moq.Tests
 		public void ReturnsNullValueIfSpecified()
 		{
 			var mock = new Mock<IFoo>();
-			mock.Expect(foo => foo.Execute("Whatever")).Returns((string)null);
+			mock.Setup(foo => foo.Execute("Whatever")).Returns((string)null);
 			Assert.Null(mock.Object.Execute("Whatever"));
 			mock.VerifyAll();
 		}
@@ -29,7 +29,7 @@ namespace Moq.Tests
 		public void ReturnsNullValueIfNullFunc()
 		{
 			var mock = new Mock<IFoo>();
-			mock.Expect(foo => foo.Execute("Whatever")).Returns((Func<string>)null);
+			mock.Setup(foo => foo.Execute("Whatever")).Returns((Func<string>)null);
 			Assert.Null(mock.Object.Execute("Whatever"));
 			mock.VerifyAll();
 		}
@@ -39,8 +39,8 @@ namespace Moq.Tests
 		{
 			var mock = new Mock<IFoo>();
 
-			mock.Expect(x => x.Execute("ping")).Returns("ack");
-			mock.Expect(x => x.Execute("ping", "foo")).Returns("ack2");
+			mock.Setup(x => x.Execute("ping")).Returns("ack");
+			mock.Setup(x => x.Execute("ping", "foo")).Returns("ack2");
 
 			Assert.Equal("ack", mock.Object.Execute("ping"));
 			Assert.Equal("ack2", mock.Object.Execute("ping", "foo"));
@@ -50,8 +50,8 @@ namespace Moq.Tests
 		public void DifferentArgumentsReturnDifferentValues()
 		{
 			var mock = new Mock<IFoo>();
-			mock.Expect(x => x.Execute("ping")).Returns("ack");
-			mock.Expect(x => x.Execute("send")).Returns("ok");
+			mock.Setup(x => x.Execute("ping")).Returns("ack");
+			mock.Setup(x => x.Execute("send")).Returns("ok");
 
 			Assert.Equal("ack", mock.Object.Execute("ping"));
 			Assert.Equal("ok", mock.Object.Execute("send"));
@@ -61,8 +61,8 @@ namespace Moq.Tests
 		public void DifferentiatesCallWithNullArgument()
 		{
 			var mock = new Mock<IFoo>();
-			mock.Expect(x => x.Execute(null)).Returns("null");
-			mock.Expect(x => x.Execute("ping")).Returns("ack");
+			mock.Setup(x => x.Execute(null)).Returns("null");
+			mock.Setup(x => x.Execute("ping")).Returns("ack");
 
 			Assert.Equal("null", mock.Object.Execute(null));
 			Assert.Equal("ack", mock.Object.Execute("ping"));
@@ -73,7 +73,7 @@ namespace Moq.Tests
 		{
 			var value = "ack";
 			var mock = new Mock<IFoo>();
-			mock.Expect(x => x.Execute(null)).Returns(value);
+			mock.Setup(x => x.Execute(null)).Returns(value);
 
 			Assert.Equal(value, mock.Object.Execute(null));
 		}
@@ -83,7 +83,7 @@ namespace Moq.Tests
 		{
 			var a = "25";
 			var mock = new Mock<IFoo>();
-			mock.Expect(x => x.Execute(a.ToString())).Returns(() => a);
+			mock.Setup(x => x.Execute(a.ToString())).Returns(() => a);
 			a = "10";
 
 			Assert.Equal("10", mock.Object.Execute("10"));
@@ -97,7 +97,7 @@ namespace Moq.Tests
 		public void PassesOneArgumentToReturns()
 		{
 			var mock = new Mock<IFoo>();
-			mock.Expect(x => x.Execute(It.IsAny<string>()))
+			mock.Setup(x => x.Execute(It.IsAny<string>()))
 				.Returns((string s) => s.ToLower());
 
 			string result = mock.Object.Execute("blah1");
@@ -108,7 +108,7 @@ namespace Moq.Tests
 		public void PassesTwoArgumentsToReturns()
 		{
 			var mock = new Mock<IFoo>();
-			mock.Expect(x => x.Execute(It.IsAny<string>(), It.IsAny<string>()))
+			mock.Setup(x => x.Execute(It.IsAny<string>(), It.IsAny<string>()))
 				.Returns((string s1, string s2) => s1 + s2);
 
 			string result = mock.Object.Execute("blah1", "blah2");
@@ -119,7 +119,7 @@ namespace Moq.Tests
 		public void PassesThreeArgumentsToReturns()
 		{
 			var mock = new Mock<IFoo>();
-			mock.Expect(x => x.Execute(It.IsAny<string>(), It.IsAny<string>(), It.IsAny<string>()))
+			mock.Setup(x => x.Execute(It.IsAny<string>(), It.IsAny<string>(), It.IsAny<string>()))
 				.Returns((string s1, string s2, string s3) => s1 + s2 + s3);
 
 			string result = mock.Object.Execute("blah1", "blah2", "blah3");
@@ -130,7 +130,7 @@ namespace Moq.Tests
 		public void PassesFourArgumentsToReturns()
 		{
 			var mock = new Mock<IFoo>();
-			mock.Expect(x => x.Execute(It.IsAny<string>(), It.IsAny<string>(), It.IsAny<string>(), It.IsAny<string>()))
+			mock.Setup(x => x.Execute(It.IsAny<string>(), It.IsAny<string>(), It.IsAny<string>(), It.IsAny<string>()))
 				.Returns((string s1, string s2, string s3, string s4) => s1 + s2 + s3 + s4);
 
 			string result = mock.Object.Execute("blah1", "blah2", "blah3", "blah4");

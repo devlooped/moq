@@ -12,8 +12,8 @@ namespace Moq.Tests
 		{
 			var mock = new Mock<IFoo>();
 
-			mock.Expect(x => x.Echo(It.IsAny<int>())).Returns(5);
-			mock.Expect(x => x.Execute(It.IsAny<string>())).Returns("foo");
+			mock.Setup(x => x.Echo(It.IsAny<int>())).Returns(5);
+			mock.Setup(x => x.Execute(It.IsAny<string>())).Returns("foo");
 
 			Assert.Equal(5, mock.Object.Echo(5));
 			Assert.Equal(5, mock.Object.Echo(25));
@@ -48,8 +48,8 @@ namespace Moq.Tests
 		{
 			var mock = new Mock<IFoo>();
 
-			mock.Expect(x => x.Echo(It.IsInRange(1, 5, Range.Inclusive))).Returns(1);
-			mock.Expect(x => x.Echo(It.IsInRange(6, 10, Range.Exclusive))).Returns(2);
+			mock.Setup(x => x.Echo(It.IsInRange(1, 5, Range.Inclusive))).Returns(1);
+			mock.Setup(x => x.Echo(It.IsInRange(6, 10, Range.Exclusive))).Returns(2);
 
 			Assert.Equal(1, mock.Object.Echo(1));
 			Assert.Equal(1, mock.Object.Echo(2));
@@ -64,7 +64,7 @@ namespace Moq.Tests
 		{
 			var mock = new Mock<IFoo>(MockBehavior.Strict);
 
-			mock.Expect(x => x.Echo(It.IsInRange(1, 5, Range.Exclusive))).Returns(1);
+			mock.Setup(x => x.Echo(It.IsInRange(1, 5, Range.Exclusive))).Returns(1);
 
 			Assert.Equal(1, mock.Object.Echo(2));
 
@@ -85,7 +85,7 @@ namespace Moq.Tests
 			var mock = new Mock<IFoo>();
 			var from = 1;
 
-			mock.Expect(x => x.Echo(It.IsInRange(from, GetToRange(), Range.Inclusive))).Returns(1);
+			mock.Setup(x => x.Echo(It.IsInRange(from, GetToRange(), Range.Inclusive))).Returns(1);
 
 			Assert.Equal(1, mock.Object.Echo(1));
 		}
@@ -97,7 +97,7 @@ namespace Moq.Tests
 			var from = "a";
 			var to = "d";
 
-			mock.Expect(x => x.Execute(It.IsInRange(from, to, Range.Inclusive))).Returns("ack");
+			mock.Setup(x => x.Execute(It.IsInRange(from, to, Range.Inclusive))).Returns("ack");
 
 			Assert.Equal("ack", mock.Object.Execute("b"));
 
@@ -112,8 +112,8 @@ namespace Moq.Tests
 			var mock = new Mock<IFoo>(MockBehavior.Loose);
 			var reg = "[a-d]+";
 
-			mock.Expect(x => x.Execute(It.IsRegex(reg, RegexOptions.IgnoreCase))).Returns("foo");
-			mock.Expect(x => x.Execute(It.IsRegex(reg))).Returns("bar");
+			mock.Setup(x => x.Execute(It.IsRegex(reg, RegexOptions.IgnoreCase))).Returns("foo");
+			mock.Setup(x => x.Execute(It.IsRegex(reg))).Returns("bar");
 
 			Assert.Equal("bar", mock.Object.Execute("b"));
 			Assert.Equal("bar", mock.Object.Execute("abc"));
@@ -131,7 +131,7 @@ namespace Moq.Tests
 		{
 			var mock = new Mock<IFoo>();
 
-			mock.Expect(x => x.Echo(It.Is<int>(i => i % 2 == 0))).Returns(1);
+			mock.Setup(x => x.Echo(It.Is<int>(i => i % 2 == 0))).Returns(1);
 
 			Assert.Equal(1, mock.Object.Echo(2));
 		}
@@ -141,9 +141,9 @@ namespace Moq.Tests
 		{
 			var mock = new Mock<IFoo>();
 
-			mock.Expect(foo => foo.DoTypeOverload(It.IsAny<Bar>()))
+			mock.Setup(foo => foo.DoTypeOverload(It.IsAny<Bar>()))
 				.Returns(true);
-			mock.Expect(foo => foo.DoTypeOverload(It.IsAny<Baz>()))
+			mock.Setup(foo => foo.DoTypeOverload(It.IsAny<Baz>()))
 				.Returns(false);
 
 			bool bar = mock.Object.DoTypeOverload(new Bar());
@@ -160,7 +160,7 @@ namespace Moq.Tests
 
 			Expression<Predicate<int>> isSix = (arg) => arg == 6;
 
-			Assert.Throws<ArgumentException>(() => foo.Expect((f) => f.Echo(It.Is(isSix))).Returns(12));
+			Assert.Throws<ArgumentException>(() => foo.Setup((f) => f.Echo(It.Is(isSix))).Returns(12));
 		}
 
 		[Fact]
