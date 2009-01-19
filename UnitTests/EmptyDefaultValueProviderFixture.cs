@@ -29,6 +29,16 @@ namespace Moq.Tests
 		}
 
 		[Fact]
+		public void ProvidesNullInt()
+		{
+			var provider = new EmptyDefaultValueProvider();
+
+			var value = provider.ProvideDefault(typeof(IFoo).GetProperty("NullableIntValue").GetGetMethod(), new object[0]);
+
+			Assert.Null(value);
+		}
+
+		[Fact]
 		public void ProvidesDefaultBool()
 		{
 			var provider = new EmptyDefaultValueProvider();
@@ -105,6 +115,7 @@ namespace Moq.Tests
 			string StringValue { get; set; }
 			int IntValue { get; set; }
 			bool BoolValue { get; set; }
+			int? NullableIntValue { get; set; }
 			PlatformID Platform { get; set; }
 			IEnumerable<int> Indexes { get; set; }
 			IBar[] Bars { get; set; }

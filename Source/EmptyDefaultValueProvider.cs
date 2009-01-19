@@ -59,7 +59,11 @@ namespace Moq
 			// Return default value.
 			if (valueType.IsValueType)
 			{
-				if (valueType.IsAssignableFrom(typeof(int)))
+				// For nullable value types, return null.
+				if (valueType.IsGenericType &&
+					valueType.GetGenericTypeDefinition() == typeof(Nullable<>))
+					return null;
+				else if (valueType.IsAssignableFrom(typeof(int)))
 					return 0;
 				else
 					return Activator.CreateInstance(valueType);
