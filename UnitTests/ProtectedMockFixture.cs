@@ -313,6 +313,17 @@ namespace Moq.Tests
 			Assert.Throws<ArgumentException>(() => mock.Protected().Setup<string>("Do", "1", "2").Returns("3"));
 		}
 
+		[Fact]
+		public void ShouldExpectProtectedMethodInBaseClass()
+		{
+			var mock = new Mock<FooDerived>();
+			mock.Protected()
+				 .Setup<int>("Int")
+				 .Returns(5);
+
+			Assert.Equal(5, mock.Object.DoInt());
+		}
+
 		public class MethodOverloads
 		{
 			public void ExecuteDo(int a, int b)
@@ -391,6 +402,10 @@ namespace Moq.Tests
 			{
 				return arg;
 			}
+		}
+
+		public class FooDerived : FooBase
+		{
 		}
 	}
 }

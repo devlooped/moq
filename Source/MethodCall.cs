@@ -279,10 +279,31 @@ namespace Moq
 
 		private bool IsEqualMethodOrOverride(IInvocation call)
 		{
-			return call.Method == method ||
+			if (call.Method == method)
+				return true;
+
+			if ((call.Method == method) ||
 				(call.Method.DeclaringType.IsClass &&
 				call.Method.IsVirtual &&
-				call.Method.GetBaseDefinition() == method);
+				method.DeclaringType.IsClass &&
+				method.IsVirtual &&
+				(call.Method.GetBaseDefinition() == method.GetBaseDefinition())))
+			{
+				if (method.IsGenericMethod)
+				{
+					var callMethodGenericArguments = call.Method.GetGenericArguments();
+					var methodGenericArguments = method.GetGenericArguments();
+
+					for (int argumentIndex = 0; argumentIndex < methodGenericArguments.Length; argumentIndex++)
+						if (!methodGenericArguments[argumentIndex].Equals(
+							callMethodGenericArguments[argumentIndex]))
+							return false;
+				}
+
+				return true;
+			}
+
+			return false;
 		}
 
 		public IVerifies AtMostOnce()

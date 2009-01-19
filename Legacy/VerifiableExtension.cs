@@ -27,7 +27,7 @@ namespace Moq
 		/// </example>
 		public static void Verifiable(this IReturnsResult mock)
 		{
-			((MethodCall)mock).IsVerifiable = true;
+			mock.Verifiable();
 		}
 
 		/// <summary>
@@ -45,7 +45,7 @@ namespace Moq
 		/// </example>
 		public static void Verifiable(this IThrowsResult mock)
 		{
-			((MethodCall)mock).IsVerifiable = true;
+			mock.Verifiable();
 		}
 
 		/// <summary>
@@ -63,7 +63,7 @@ namespace Moq
 		/// </example>
 		public static void Verifiable(this IVerifies mock)
 		{
-			((MethodCall)mock).IsVerifiable = true;
+			mock.Verifiable();
 		}
 	}
 }

@@ -48,6 +48,7 @@
     <DocumentationFile>
     </DocumentationFile>
     <TreatWarningsAsErrors>true</TreatWarningsAsErrors>
+    <NoWarn>0618</NoWarn>
   </PropertyGroup>
   <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Release|x86' ">
     <OutputPath>bin\Release\</OutputPath>

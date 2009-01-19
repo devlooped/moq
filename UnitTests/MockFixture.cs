@@ -508,6 +508,18 @@ namespace Moq.Tests
 			Assert.Null(target.Object.Bar);
 		}
 
+		[Fact]
+		public void DistinguishesSameMethodsWithDifferentGenericArguments()
+		{
+			var mock = new Mock<FooBase>();
+
+			mock.Setup(foo => foo.Generic<int>()).Returns(2);
+			mock.Setup(foo => foo.Generic<string>()).Returns(3);
+
+			Assert.Equal(2, mock.Object.Generic<int>());
+			Assert.Equal(3, mock.Object.Generic<string>());
+		}
+
 		// ShouldSupportByRefArguments?
 		// ShouldSupportOutArguments?
 
@@ -644,6 +656,11 @@ namespace Moq.Tests
 			public virtual void BaseCall()
 			{
 				BaseCalled = true;
+			}
+
+			public virtual int Generic<T>()
+			{
+				return 0;
 			}
 
 			public bool BaseReturnCalled = false;
