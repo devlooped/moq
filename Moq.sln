@@ -11,8 +11,6 @@ Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Solution Items", "Solution 
 		License.txt = License.txt
 	EndProjectSection
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Moq.Legacy", "Legacy\Moq.Legacy.csproj", "{6D199BBA-59F8-4440-A98E-AEA377793E86}"
-EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
@@ -37,14 +35,6 @@ Global
 		{81BBC911-4916-4E10-A955-752AE47CB2B9}.Release|Any CPU.Build.0 = Release|Any CPU
 		{81BBC911-4916-4E10-A955-752AE47CB2B9}.Release|x86.ActiveCfg = Release|x86
 		{81BBC911-4916-4E10-A955-752AE47CB2B9}.Release|x86.Build.0 = Release|x86
-		{6D199BBA-59F8-4440-A98E-AEA377793E86}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
-		{6D199BBA-59F8-4440-A98E-AEA377793E86}.Debug|Any CPU.Build.0 = Debug|Any CPU
-		{6D199BBA-59F8-4440-A98E-AEA377793E86}.Debug|x86.ActiveCfg = Debug|x86
-		{6D199BBA-59F8-4440-A98E-AEA377793E86}.Debug|x86.Build.0 = Debug|x86
-		{6D199BBA-59F8-4440-A98E-AEA377793E86}.Release|Any CPU.ActiveCfg = Release|Any CPU
-		{6D199BBA-59F8-4440-A98E-AEA377793E86}.Release|Any CPU.Build.0 = Release|Any CPU
-		{6D199BBA-59F8-4440-A98E-AEA377793E86}.Release|x86.ActiveCfg = Release|x86
-		{6D199BBA-59F8-4440-A98E-AEA377793E86}.Release|x86.Build.0 = Release|x86
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE

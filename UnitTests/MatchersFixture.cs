@@ -27,13 +27,13 @@ namespace Moq.Tests
 			var mock = new Mock<IFoo>();
 
 			mock.
-				Expect(x => x.Echo(It.Is<int>(value => value < 5 && value > 0))).
+				Setup(x => x.Echo(It.Is<int>(value => value < 5 && value > 0))).
 				Returns(1);
 			mock.
-				Expect(x => x.Echo(It.Is<int>(value => value <= 0))).
+				Setup(x => x.Echo(It.Is<int>(value => value <= 0))).
 				Returns(0);
 			mock.
-				Expect(x => x.Echo(It.Is<int>(value => value >= 5))).
+				Setup(x => x.Echo(It.Is<int>(value => value >= 5))).
 				Returns(2);
 
 			Assert.Equal(1, mock.Object.Echo(3));

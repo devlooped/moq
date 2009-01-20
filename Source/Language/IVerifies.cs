@@ -62,8 +62,6 @@ namespace Moq.Language
 		///     .Verifiable();
 		/// </code>
 		/// </example>
-		[Obsolete("Use Verify(expression) to verify explicitly after the mock has been used.", false)]
-		[EditorBrowsable(EditorBrowsableState.Never)]
 		void Verifiable();
 	}
 }
