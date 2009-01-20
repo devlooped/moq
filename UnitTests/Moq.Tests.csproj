@@ -128,7 +128,7 @@
   <Target Name="AfterBuild">
   </Target>
   -->
-  <UsingTask AssemblyFile="$(MSBuildProjectPath)..\Lib\xUnit\xunitext.runner.msbuild.dll" TaskName="XunitExt.Runner.MSBuild.xunit" />
+  <UsingTask AssemblyFile="$(MSBuildProjectPath)..\Lib\xUnit\xunit.runner.msbuild.dll" TaskName="Xunit.Runner.MSBuild.xunit" />
   <Target Name="AfterBuild" Condition=" '$(Configuration)' == 'Release' ">
     <!-- Run xUnit tests -->
     <Copy SourceFiles="$(MSBuildProjectPath)..\Lib\xUnit\xunit.dll" DestinationFolder="$(OutDir)" />
