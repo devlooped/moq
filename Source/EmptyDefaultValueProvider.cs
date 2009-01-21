@@ -59,53 +59,63 @@ namespace Moq
 			// Return default value.
 			if (valueType.IsValueType)
 			{
-				// For nullable value types, return null.
-				if (valueType.IsGenericType &&
-					valueType.GetGenericTypeDefinition() == typeof(Nullable<>))
-					return null;
-				else if (valueType.IsAssignableFrom(typeof(int)))
-					return 0;
-				else
-					return Activator.CreateInstance(valueType);
+				return GetValueTypeDefault(valueType);
 			}
 			else
 			{
-				if (valueType.IsArray)
-				{
-					return Activator.CreateInstance(valueType, 0);
-				}
-				else if (valueType == typeof(System.Collections.IEnumerable))
-				{
-					return new object[0];
-				}
-				else if (valueType == typeof(IQueryable))
-				{
-					return new object[0].AsQueryable();
-				}
-				else if (valueType.IsGenericType &&
-					valueType.GetGenericTypeDefinition() == typeof(IEnumerable<>))
-				{
-					var genericListType = typeof(List<>).MakeGenericType(
-						valueType.GetGenericArguments()[0]);
-					return Activator.CreateInstance(genericListType);
-				}
-				else if (valueType.IsGenericType &&
-					valueType.GetGenericTypeDefinition() == typeof(IQueryable<>))
-				{
-					var genericType = valueType.GetGenericArguments()[0];
-					var genericListType = typeof(List<>).MakeGenericType(genericType);
-					var list = Activator.CreateInstance(genericListType);
-
-					return typeof(Queryable).GetMethods()
-						.Single(x => x.Name == "AsQueryable" && x.IsGenericMethod)
-						.MakeGenericMethod(genericType)
-						.Invoke(null, new[] { list });
-				}
-				else
-				{
-					return null;
-				}
+				return GetReferenceTypeDefault(valueType);
 			}
+		}
+
+		private static object GetReferenceTypeDefault(Type valueType)
+		{
+			if (valueType.IsArray)
+			{
+				return Activator.CreateInstance(valueType, 0);
+			}
+			else if (valueType == typeof(System.Collections.IEnumerable))
+			{
+				return new object[0];
+			}
+			else if (valueType == typeof(IQueryable))
+			{
+				return new object[0].AsQueryable();
+			}
+			else if (valueType.IsGenericType &&
+				valueType.GetGenericTypeDefinition() == typeof(IEnumerable<>))
+			{
+				var genericListType = typeof(List<>).MakeGenericType(
+					valueType.GetGenericArguments()[0]);
+				return Activator.CreateInstance(genericListType);
+			}
+			else if (valueType.IsGenericType &&
+				valueType.GetGenericTypeDefinition() == typeof(IQueryable<>))
+			{
+				var genericType = valueType.GetGenericArguments()[0];
+				var genericListType = typeof(List<>).MakeGenericType(genericType);
+				var list = Activator.CreateInstance(genericListType);
+
+				return typeof(Queryable).GetMethods()
+					.Single(x => x.Name == "AsQueryable" && x.IsGenericMethod)
+					.MakeGenericMethod(genericType)
+					.Invoke(null, new[] { list });
+			}
+			else
+			{
+				return null;
+			}
+		}
+
+		private static object GetValueTypeDefault(Type valueType)
+		{
+			// For nullable value types, return null.
+			if (valueType.IsGenericType &&
+				valueType.GetGenericTypeDefinition() == typeof(Nullable<>))
+				return null;
+			else if (valueType.IsAssignableFrom(typeof(int)))
+				return 0;
+			else
+				return Activator.CreateInstance(valueType);
 		}
 	}
 }
