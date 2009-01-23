@@ -39,6 +39,7 @@
 // http://www.opensource.org/licenses/bsd-license.php]
 
 using System;
+using System.Collections;
 using System.Linq.Expressions;
 
 namespace Moq
@@ -59,7 +60,40 @@ namespace Moq
 
 		public bool Matches(object value)
 		{
+            if (constantValue is IEnumerable && value is IEnumerable)
+            {
+                return MatchesEnumerable(value);
+            }
+
 			return Object.Equals(constantValue, value);
 		}
+
+        private bool MatchesEnumerable(object value)
+        {
+            IEnumerator constantValueEnumerator = ((IEnumerable)constantValue).GetEnumerator();
+            IEnumerator valueEnumerator = ((IEnumerable)value).GetEnumerator();
+
+            while (true)
+            {
+                bool constantValueEnumeratorHasNext = constantValueEnumerator.MoveNext();
+                bool valueEnumeratorHasNext = valueEnumerator.MoveNext();
+
+                if (constantValueEnumeratorHasNext & valueEnumeratorHasNext)
+                {
+                    if (!Object.Equals(constantValueEnumerator.Current, valueEnumerator.Current))
+                    {
+                        return false;
+                    }
+                }
+                else if (constantValueEnumeratorHasNext != valueEnumeratorHasNext)
+                {
+                    return false;
+                }
+                else
+                {
+                    return true;
+                }
+            }
+        }
 	}
 }

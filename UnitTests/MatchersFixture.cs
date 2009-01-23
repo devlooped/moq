@@ -174,6 +174,28 @@ namespace Moq.Tests
 			Assert.False(matcher.Matches(b));
 		}
 
+        [Fact]
+        public void MatchesEnumerableParameterValue()
+        {
+            var mock = new Mock<IFoo>();
+
+            mock.Setup(x => x.DoAddition(new int[] {2, 4, 6})).Returns(12);
+
+            Assert.Equal(12, mock.Object.DoAddition(new int[] { 2, 4, 6 }));
+        }
+
+        [Fact]
+        public void DoesNotMatchDifferentEnumerableParameterValue()
+        {
+            var mock = new Mock<IFoo>();
+
+            mock.Setup(x => x.DoAddition(new int[] { 2, 4, 6 })).Returns(12);
+
+            Assert.Equal(0, mock.Object.DoAddition(new int[] {2, 4}));
+            Assert.Equal(0, mock.Object.DoAddition(new int[] {2, 4, 5}));
+            Assert.Equal(0, mock.Object.DoAddition(new int[] {2, 4, 6, 8}));
+        }
+
 		private int GetToRange()
 		{
 			return 5;
@@ -188,6 +210,7 @@ namespace Moq.Tests
 			string Execute(string command);
 			bool DoTypeOverload(Bar bar);
 			bool DoTypeOverload(Baz baz);
+		    int DoAddition(int[] numbers);
 		}
 	}
 }
