@@ -175,14 +175,19 @@ namespace Moq
 
 		private static string GetRawSetups(Type targetType, List<KeyValuePair<Expression, string>> failedSetups)
 		{
-			StringBuilder message = new StringBuilder();
-			string targetTypeName = targetType.Name;
+			var message = new StringBuilder();
 			foreach (var setup in failedSetups)
 			{
 				if (setup.Value != null)
 					message.Append(setup.Value).Append(": ");
 
-				message.AppendLine(setup.Key.ToStringFixed());
+				var lambda = setup.Key.ToLambda();
+				var targetTypeName = lambda.Parameters[0].Type.Name;
+
+				message
+					.Append(targetTypeName)
+					.Append(" ")
+					.AppendLine(setup.Key.ToStringFixed());
 			}
 
 			return message.ToString();

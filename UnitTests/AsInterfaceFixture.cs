@@ -76,6 +76,26 @@ namespace Moq.Tests
 		}
 
 		[Fact]
+		public void ThrowsWithTargetTypeName()
+		{
+			var bag = new Mock<IBag>();
+			var foo = bag.As<IFoo>();
+
+			bag.Setup(b => b.Add("foo", "bar")).Verifiable();
+			foo.Setup(f => f.Execute()).Verifiable();
+
+			try
+			{
+				bag.Verify();
+			}
+			catch (MockVerificationException me)
+			{
+				Assert.Contains(typeof(IFoo).Name, me.Message);
+				Assert.Contains(typeof(IBag).Name, me.Message);
+			}
+		}
+
+		[Fact]
 		public void GetMockFromAddedInterfaceWorks()
 		{
 			var bag = new Mock<IBag>();
