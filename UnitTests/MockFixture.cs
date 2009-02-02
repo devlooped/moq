@@ -301,20 +301,6 @@ namespace Moq.Tests
 		}
 
 		[Fact]
-		public void ExpectsPropertySetterWithValue()
-		{
-			var mock = new Mock<IFoo>();
-			mock.SetupSet(m => m.Value, 5);
-
-			Assert.Throws<MockVerificationException>(() => mock.VerifyAll());
-
-			mock.Object.Value = 5;
-
-			mock.VerifyAll();
-			mock.VerifySet(m => m.Value);
-		}
-
-		[Fact]
 		public void ExpectsPropertySetterWithNullValue()
 		{
 			var mock = new Mock<IFoo>(MockBehavior.Strict);
