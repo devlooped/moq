@@ -24,6 +24,25 @@ namespace Moq.Tests
 		}
 
 		[Fact]
+		public void ThrowsIfVerifiableExpectationNotCalledWithMessage()
+		{
+			var mock = new Mock<IFoo>();
+
+			mock.Setup(x => x.Submit()).Verifiable("Kaboom!");
+
+			try
+			{
+				mock.Verify();
+				Assert.True(false, "Should have thrown");
+			}
+			catch (MockException mex)
+			{
+				Assert.Contains("Kaboom!", mex.Message);
+				Assert.Equal(MockException.ExceptionReason.VerificationFailed, mex.Reason);
+			}
+		}
+
+		[Fact]
 		public void ThrowsWithEvaluatedExpressionsIfVerifiableExpectationNotCalled()
 		{
 			var expectedArg = "lorem,ipsum";
