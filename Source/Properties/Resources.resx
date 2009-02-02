@@ -205,7 +205,8 @@ mock.SetupSet(x =&gt; x.{1}).Callback(callbackDelegate);</value>
     <value>Expression is not a method invocation: {0}</value>
   </data>
   <data name="NoMatchingCall" xml:space="preserve">
-    <value>The given invocation was not performed on the mock.</value>
+    <value>{0}
+Invocation was not performed on the mock: {1}</value>
   </data>
   <data name="AlreadyInitialized" xml:space="preserve">
     <value>Mock type has already been initialized by accessing its Object property. Adding interfaces must be done before that.</value>

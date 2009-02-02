@@ -27,6 +27,21 @@ namespace Moq.Tests
 			Assert.NotNull(matcher);
 		}
 
+		[Fact]
+		public void ShouldExposeMatcherType()
+		{
+			AdvancedMatcherAttribute attr = new AdvancedMatcherAttribute(typeof(MockMatcher));
+
+			Assert.Equal(typeof(MockMatcher), attr.MatcherType);
+		}
+
+		[Fact]
+		public void ShouldThrowRealException()
+		{
+			AdvancedMatcherAttribute attr = new AdvancedMatcherAttribute(typeof(ThrowingMatcher));
+			Assert.Throws<ArgumentException>(() => attr.CreateMatcher());
+		}
+
 		class MockMatcher : IMatcher
 		{
 			#region IMatcher Members
@@ -43,6 +58,22 @@ namespace Moq.Tests
 			#endregion
 		}
 
+		class ThrowingMatcher : IMatcher
+		{
+			public ThrowingMatcher()
+			{
+				throw new ArgumentException();
+			}
+
+			public void Initialize(Expression matcherExpression)
+			{
+			}
+
+			public bool Matches(object value)
+			{
+				return false;
+			}
+		}
 	}
 
 }

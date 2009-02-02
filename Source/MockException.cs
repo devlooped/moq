@@ -158,31 +158,31 @@ namespace Moq
 	internal class MockVerificationException : MockException
 	{
 		Type targetType;
-		List<Expression> failedSetups;
+		List<KeyValuePair<Expression, string>> failedSetups;
 
-		public MockVerificationException(Type targetType, List<Expression> failedSetups)
+		public MockVerificationException(Type targetType, List<KeyValuePair<Expression, string>> failedSetups)
 			: base(ExceptionReason.VerificationFailed, GetMessage(targetType, failedSetups))
 		{
 			this.targetType = targetType;
 			this.failedSetups = failedSetups;
 		}
 
-		private static string GetMessage(Type targetType, List<Expression> failedSetups)
+		private static string GetMessage(Type targetType, List<KeyValuePair<Expression, string>> failedSetups)
 		{
 			return String.Format(CultureInfo.CurrentCulture, 
 				Properties.Resources.VerficationFailed, GetRawSetups(targetType, failedSetups));
 		}
 
-		private static string GetRawSetups(Type targetType, List<Expression> failedSetups)
+		private static string GetRawSetups(Type targetType, List<KeyValuePair<Expression, string>> failedSetups)
 		{
 			StringBuilder message = new StringBuilder();
 			string targetTypeName = targetType.Name;
-			foreach (var expr in failedSetups)
+			foreach (var setup in failedSetups)
 			{
-				message
-					.Append(targetTypeName)
-					.Append(" ")
-					.AppendLine(expr.ToStringFixed());
+				if (setup.Value != null)
+					message.Append(setup.Value).Append(": ");
+
+				message.AppendLine(setup.Key.ToStringFixed());
 			}
 
 			return message.ToString();

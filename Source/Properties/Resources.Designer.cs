@@ -183,7 +183,8 @@ namespace Moq.Properties {
         }
         
         /// <summary>
-        ///   Looks up a localized string similar to The given invocation was not performed on the mock..
+        ///   Looks up a localized string similar to {0}
+        ///Invocation was not performed on the mock: {1}.
         /// </summary>
         internal static string NoMatchingCall {
             get {

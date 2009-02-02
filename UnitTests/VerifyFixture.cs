@@ -177,6 +177,171 @@ namespace Moq.Tests
 		}
 
 		[Fact]
+		public void VerifiesReturningMethodWithExpressionAndMessage()
+		{
+			var mock = new Mock<IFoo>();
+
+			try
+			{
+				mock.Verify(f => f.Execute("ping"), "Execute should have been invoked with 'ping'");
+			}
+			catch (MockException me)
+			{
+				Assert.True(me.Message.Contains("Execute should have been invoked with 'ping'"));
+				Assert.True(me.Message.Contains("f.Execute(\"ping\")"));
+			}
+		}
+
+		[Fact]
+		public void VerifiesVoidMethodWithExpressionAndMessage()
+		{
+			var mock = new Mock<IFoo>();
+
+			try
+			{
+				mock.Verify(f => f.Submit(), "Submit should be invoked");
+			}
+			catch (MockException me)
+			{
+				Assert.True(me.Message.Contains("Submit should be invoked"));
+				Assert.True(me.Message.Contains("f.Submit()"));
+			}
+		}
+
+		[Fact]
+		public void VerifiesPropertyGetWithExpressionAndMessage()
+		{
+			var mock = new Mock<IFoo>();
+
+			try
+			{
+				mock.VerifyGet(f => f.Value, "Nobody called .Value");
+			}
+			catch (MockException me)
+			{
+				Assert.True(me.Message.Contains("Nobody called .Value"));
+				Assert.True(me.Message.Contains("f.Value"));
+			}
+		}
+
+		[Fact]
+		public void VerifiesPropertySetWithExpressionAndMessage()
+		{
+			var mock = new Mock<IFoo>();
+
+			try
+			{
+				mock.VerifySet(f => f.Value, "Nobody called .Value");
+			}
+			catch (MockException me)
+			{
+				Assert.True(me.Message.Contains("Nobody called .Value"));
+				Assert.True(me.Message.Contains("f.Value"));
+			}
+		}
+
+		[Fact]
+		public void VerifiesPropertySetValueWithExpressionAndMessage()
+		{
+			var mock = new Mock<IFoo>();
+
+			try
+			{
+				mock.VerifySet(f => f.Value, 5, "Nobody called .Value");
+			}
+			catch (MockException me)
+			{
+				Assert.True(me.Message.Contains("Nobody called .Value"));
+				Assert.True(me.Message.Contains("f.Value"));
+			}
+		}
+
+		[Fact]
+		public void AsInterfaceVerifiesReturningMethodWithExpressionAndMessage()
+		{
+			var disposable = new Mock<IDisposable>();
+			var mock = disposable.As<IFoo>();
+
+			try
+			{
+				mock.Verify(f => f.Execute("ping"), "Execute should have been invoked with 'ping'");
+			}
+			catch (MockException me)
+			{
+				Assert.True(me.Message.Contains("Execute should have been invoked with 'ping'"));
+				Assert.True(me.Message.Contains("f.Execute(\"ping\")"));
+			}
+		}
+
+		[Fact]
+		public void AsInferfaceVerifiesVoidMethodWithExpressionAndMessage()
+		{
+			var disposable = new Mock<IDisposable>();
+			var mock = disposable.As<IFoo>();
+
+			try
+			{
+				mock.Verify(f => f.Submit(), "Submit should be invoked");
+			}
+			catch (MockException me)
+			{
+				Assert.True(me.Message.Contains("Submit should be invoked"));
+				Assert.True(me.Message.Contains("f.Submit()"));
+			}
+		}
+
+		[Fact]
+		public void AsInterfaceVerifiesPropertyGetWithExpressionAndMessage()
+		{
+			var disposable = new Mock<IDisposable>();
+			var mock = disposable.As<IFoo>();
+
+			try
+			{
+				mock.VerifyGet(f => f.Value, "Nobody called .Value");
+			}
+			catch (MockException me)
+			{
+				Assert.True(me.Message.Contains("Nobody called .Value"));
+				Assert.True(me.Message.Contains("f.Value"));
+			}
+		}
+
+		[Fact]
+		public void AsInterfaceVerifiesPropertySetWithExpressionAndMessage()
+		{
+			var disposable = new Mock<IDisposable>();
+			var mock = disposable.As<IFoo>();
+
+			try
+			{
+				mock.VerifySet(f => f.Value, "Nobody called .Value");
+			}
+			catch (MockException me)
+			{
+				Assert.True(me.Message.Contains("Nobody called .Value"));
+				Assert.True(me.Message.Contains("f.Value"));
+			}
+		}
+
+		[Fact]
+		public void AsInterfaceVerifiesPropertySetValueWithExpressionAndMessage()
+		{
+			var disposable = new Mock<IDisposable>();
+			var mock = disposable.As<IFoo>();
+
+			try
+			{
+				mock.VerifySet(f => f.Value, 5, "Nobody called .Value");
+			}
+			catch (MockException me)
+			{
+				Assert.True(me.Message.Contains("Nobody called .Value"));
+				Assert.True(me.Message.Contains("f.Value"));
+			}
+		}
+
+		[Fact]
 		public void ThrowsIfVerifyPropertyGetWithExpressionFails()
 		{
 			var mock = new Mock<IFoo>();

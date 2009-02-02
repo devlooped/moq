@@ -49,6 +49,7 @@ namespace Moq
 		void Execute(IInvocation call);
 		void SetOutParameters(IInvocation call);
 		bool IsVerifiable { get; set; }
+		string FailMessage { get; set; }
 		bool IsNever { get; set; }
 		bool Invoked { get; set; }
 		Expression SetupExpression { get; }

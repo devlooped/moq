@@ -127,6 +127,9 @@ namespace Moq
 			// having members that we need just internally for the legacy 
 			// extensions to work, and we don't want them publicly in an IMock 
 			// interface. It's a messy issue... discuss with team.
+			// The skipInitialize parameter is not used at all, and it's 
+			// just to differentiate this ctor that should do nothing 
+			// from the regular one which initializes the proxy, etc.
 		}
 
 		/// <summary>
@@ -556,8 +559,35 @@ namespace Moq
 		/// <param name="expression">Expression to verify.</param>
 		public virtual void Verify(Expression<Action<T>> expression)
 		{
-			Verify(expression, Interceptor);
+			Verify(expression, Interceptor, null);
 		}
+
+		/// <summary>
+		/// Verifies that a specific invocation matching the given 
+		/// expression was performed on the mock, specifying a failure  
+		/// error message. Use in conjuntion 
+		/// with the default <see cref="MockBehavior.Loose"/>.
+		/// </summary>
+		/// <example group="verification">
+		/// This example assumes that the mock has been used, 
+		/// and later we want to verify that a given invocation 
+		/// with specific parameters was performed:
+		/// <code>
+		/// var mock = new Mock&lt;IProcessor&gt;();
+		/// // exercise mock
+		/// //...
+		/// // Will throw if the test code didn't call Execute with a "ping" string argument.
+		/// mock.Verify(proc =&gt; proc.Execute("ping"));
+		/// </code>
+		/// </example>
+		/// <exception cref="MockException">The invocation was not performed on the mock.</exception>
+		/// <param name="expression">Expression to verify.</param>
+		/// <param name="failMessage">Message to show if verification fails.</param>
+		public virtual void Verify(Expression<Action<T>> expression, string failMessage)
+		{
+			Verify(expression, Interceptor, failMessage);
+		}
+
 
 		/// <summary>
 		/// Verifies that a specific invocation matching the given 
@@ -581,7 +611,34 @@ namespace Moq
 		/// <typeparam name="TResult">Type of return value from the expression.</typeparam>
 		public virtual void Verify<TResult>(Expression<Func<T, TResult>> expression)
 		{
-			Verify(expression, Interceptor);
+			Verify(expression, Interceptor, null);
+		}
+
+		/// <summary>
+		/// Verifies that a specific invocation matching the given 
+		/// expression was performed on the mock, specifying a failure  
+		/// error message.
+		/// Use in conjuntion with the default <see cref="MockBehavior.Loose"/>.
+		/// </summary>
+		/// <example group="verification">
+		/// This example assumes that the mock has been used, 
+		/// and later we want to verify that a given invocation 
+		/// with specific parameters was performed:
+		/// <code>
+		/// var mock = new Mock&lt;IWarehouse&gt;();
+		/// // exercise mock
+		/// //...
+		/// // Will throw if the test code didn't call HasInventory.
+		/// mock.Verify(warehouse =&gt; warehouse.HasInventory(TALISKER, 50), "When filling orders, inventory has to be checked");
+		/// </code>
+		/// </example>
+		/// <exception cref="MockException">The invocation was not performed on the mock.</exception>
+		/// <param name="expression">Expression to verify.</param>
+		/// <param name="failMessage">Message to show if verification fails.</param>
+		/// <typeparam name="TResult">Type of return value from the expression.</typeparam>
+		public virtual void Verify<TResult>(Expression<Func<T, TResult>> expression, string failMessage)
+		{
+			Verify(expression, Interceptor, failMessage);
 		}
 
 		/// <summary>
@@ -606,7 +663,34 @@ namespace Moq
 		/// be inferred from the expression's return type.</typeparam>
 		public virtual void VerifyGet<TProperty>(Expression<Func<T, TProperty>> expression)
 		{
-			VerifyGet(expression, Interceptor);
+			VerifyGet(expression, Interceptor, null);
+		}
+
+		/// <summary>
+		/// Verifies that a property was read on the mock, specifying a failure  
+		/// error message. 
+		/// Use in conjuntion with the default <see cref="MockBehavior.Loose"/>.
+		/// </summary>
+		/// <example group="verification">
+		/// This example assumes that the mock has been used, 
+		/// and later we want to verify that a given property 
+		/// was retrieved from it:
+		/// <code>
+		/// var mock = new Mock&lt;IWarehouse&gt;();
+		/// // exercise mock
+		/// //...
+		/// // Will throw if the test code didn't retrieve the IsClosed property.
+		/// mock.VerifyGet(warehouse =&gt; warehouse.IsClosed);
+		/// </code>
+		/// </example>
+		/// <exception cref="MockException">The invocation was not performed on the mock.</exception>
+		/// <param name="expression">Expression to verify.</param>
+		/// <param name="failMessage">Message to show if verification fails.</param>
+		/// <typeparam name="TProperty">Type of the property to verify. Typically omitted as it can 
+		/// be inferred from the expression's return type.</typeparam>
+		public virtual void VerifyGet<TProperty>(Expression<Func<T, TProperty>> expression, string failMessage)
+		{
+			VerifyGet(expression, Interceptor, failMessage);
 		}
 
 		/// <summary>
@@ -631,7 +715,7 @@ namespace Moq
 		/// be inferred from the expression's return type.</typeparam>
 		public virtual void VerifySet<TProperty>(Expression<Func<T, TProperty>> expression)
 		{
-			VerifySet(expression, Interceptor);
+			VerifySet(expression, Interceptor, null);
 		}
 
 		/// <summary>
@@ -657,7 +741,62 @@ namespace Moq
 		/// be inferred from the expression's return type.</typeparam>
 		public virtual void VerifySet<TProperty>(Expression<Func<T, TProperty>> expression, TProperty value)
 		{
-			VerifySet(expression, value, Interceptor);
+			VerifySet(expression, value, Interceptor, null);
+		}
+
+		/// <summary>
+		/// Verifies that a property has been set on the mock, specifying a failure  
+		/// error message. 
+		/// Use in conjuntion with the default <see cref="MockBehavior.Loose"/>.
+		/// </summary>
+		/// <example group="verification">
+		/// This example assumes that the mock has been used, 
+		/// and later we want to verify that a given invocation 
+		/// with specific parameters was performed:
+		/// <code>
+		/// var mock = new Mock&lt;IWarehouse&gt;();
+		/// // exercise mock
+		/// //...
+		/// // Will throw if the test code didn't set the IsClosed property.
+		/// mock.VerifySet(warehouse =&gt; warehouse.IsClosed);
+		/// </code>
+		/// </example>
+		/// <exception cref="MockException">The invocation was not performed on the mock.</exception>
+		/// <param name="expression">Expression to verify.</param>
+		/// <param name="failMessage">Message to show if verification fails.</param>
+		/// <typeparam name="TProperty">Type of the property to verify. Typically omitted as it can 
+		/// be inferred from the expression's return type.</typeparam>
+		public virtual void VerifySet<TProperty>(Expression<Func<T, TProperty>> expression, string failMessage)
+		{
+			VerifySet(expression, Interceptor, failMessage);
+		}
+
+		/// <summary>
+		/// Verifies that a property has been set on the mock to the given value, specifying a failure  
+		/// error message. 
+		/// Use in conjuntion with the default <see cref="MockBehavior.Loose"/>.
+		/// </summary>
+		/// <example group="verification">
+		/// This example assumes that the mock has been used, 
+		/// and later we want to verify that a given invocation 
+		/// with specific parameters was performed:
+		/// <code>
+		/// var mock = new Mock&lt;IWarehouse&gt;();
+		/// // exercise mock
+		/// //...
+		/// // Will throw if the test code didn't set the IsClosed property to true
+		/// mock.VerifySet(warehouse =&gt; warehouse.IsClosed, true);
+		/// </code>
+		/// </example>
+		/// <exception cref="MockException">The invocation was not performed on the mock.</exception>
+		/// <param name="expression">Expression to verify.</param>
+		/// <param name="value">The value that should have been set on the property.</param>
+		/// <param name="failMessage">Message to show if verification fails.</param>
+		/// <typeparam name="TProperty">Type of the property to verify. Typically omitted as it can 
+		/// be inferred from the expression's return type.</typeparam>
+		public virtual void VerifySet<TProperty>(Expression<Func<T, TProperty>> expression, TProperty value, string failMessage)
+		{
+			VerifySet(expression, value, Interceptor, failMessage);
 		}
 
 		#endregion
@@ -730,6 +869,11 @@ namespace Moq
 				this.owner = owner;
 			}
 
+			public override void SetupAllProperties()
+			{
+				SetupAllProperties(owner);
+			}
+
 			public override ISetup<TResult> Setup<TResult>(Expression<Func<TInterface, TResult>> expression)
 			{
 				return Mock.Setup(expression, owner.Interceptor);
@@ -797,27 +941,52 @@ namespace Moq
 
 			public override void Verify(Expression<Action<TInterface>> expression)
 			{
-				Mock.Verify(expression, owner.Interceptor);
+				Mock.Verify(expression, owner.Interceptor, null);
+			}
+
+			public override void Verify(Expression<Action<TInterface>> expression, string failMessage)
+			{
+				Mock.Verify(expression, owner.Interceptor, failMessage);
 			}
 
 			public override void Verify<TResult>(Expression<Func<TInterface, TResult>> expression)
 			{
-				Mock.Verify<TInterface, TResult>(expression, owner.Interceptor);
+				Mock.Verify<TInterface, TResult>(expression, owner.Interceptor, null);
+			}
+
+			public override void Verify<TResult>(Expression<Func<TInterface, TResult>> expression, string failMessage)
+			{
+				Mock.Verify<TInterface, TResult>(expression, owner.Interceptor, failMessage);
 			}
 
 			public override void VerifyGet<TProperty>(Expression<Func<TInterface, TProperty>> expression)
 			{
-				Mock.VerifyGet<TInterface, TProperty>(expression, owner.Interceptor);
+				Mock.VerifyGet<TInterface, TProperty>(expression, owner.Interceptor, null);
+			}
+
+			public override void VerifyGet<TProperty>(Expression<Func<TInterface, TProperty>> expression, string failMessage)
+			{
+				Mock.VerifyGet<TInterface, TProperty>(expression, owner.Interceptor, failMessage);
 			}
 
 			public override void VerifySet<TProperty>(Expression<Func<TInterface, TProperty>> expression)
 			{
-				Mock.VerifySet<TInterface, TProperty>(expression, owner.Interceptor);
+				Mock.VerifySet<TInterface, TProperty>(expression, owner.Interceptor, null);
 			}
 
 			public override void VerifySet<TProperty>(Expression<Func<TInterface, TProperty>> expression, TProperty value)
 			{
-				Mock.VerifySet<TInterface, TProperty>(expression, value, owner.Interceptor);
+				Mock.VerifySet<TInterface, TProperty>(expression, value, owner.Interceptor, null);
+			}
+
+			public override void VerifySet<TProperty>(Expression<Func<TInterface, TProperty>> expression, string failMessage)
+			{
+				Mock.VerifySet<TInterface, TProperty>(expression, owner.Interceptor, failMessage);
+			}
+
+			public override void VerifySet<TProperty>(Expression<Func<TInterface, TProperty>> expression, TProperty value, string failMessage)
+			{
+				Mock.VerifySet<TInterface, TProperty>(expression, value, owner.Interceptor, failMessage);
 			}
 
 			public override MockedEvent<TEventArgs> CreateEventHandler<TEventArgs>()

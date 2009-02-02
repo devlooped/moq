@@ -64,6 +64,7 @@ namespace Moq
 		int? expectedCallCount = null;
 		List<KeyValuePair<int, object>> outValues = new List<KeyValuePair<int, object>>();
 
+		public string FailMessage { get; set; }
 		public bool IsVerifiable { get; set; }
 		public bool IsNever { get; set; }
 		public bool Invoked { get; set; }
@@ -275,6 +276,12 @@ namespace Moq
 		public void Verifiable()
 		{
 			IsVerifiable = true;
+		}
+
+		public void Verifiable(string failMessage)
+		{
+			IsVerifiable = true;
+			FailMessage = failMessage;
 		}
 
 		private bool IsEqualMethodOrOverride(IInvocation call)

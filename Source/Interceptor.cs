@@ -91,11 +91,13 @@ namespace Moq
 
 		private void VerifyOrThrow(Predicate<IProxyCall> match)
 		{
-			var failures = new List<Expression>();
+			var failures = new List<KeyValuePair<Expression, string>>();
 			foreach (var call in calls.Values)
 			{
 				if (match(call))
-					failures.Add(call.SetupExpression.PartialMatcherAwareEval());
+					failures.Add(new KeyValuePair<Expression,string>(
+						call.SetupExpression.PartialMatcherAwareEval(), 
+						call.FailMessage));
 			}
 
 			if (failures.Count > 0)

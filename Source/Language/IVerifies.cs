@@ -63,5 +63,20 @@ namespace Moq.Language
 		/// </code>
 		/// </example>
 		void Verifiable();
+
+		/// <summary>
+		/// Marks the expectation as verifiable, meaning that a call 
+		/// to <see cref="Mock.Verify()"/> will check if this particular 
+		/// expectation was met, and specifies a message for failures.
+		/// </summary>
+		/// <example>
+		/// The following example marks the expectation as verifiable:
+		/// <code>
+		/// mock.Expect(x => x.Execute("ping"))
+		///     .Returns(true)
+		///     .Verifiable("Ping should be executed always!");
+		/// </code>
+		/// </example>
+		void Verifiable(string failMessage);
 	}
 }

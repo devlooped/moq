@@ -284,22 +284,24 @@ namespace Moq
 			}
 		}
 
-		internal static void Verify<T, TResult>(Expression<Func<T, TResult>> expression, Interceptor interceptor)
+		internal static void Verify<T, TResult>(Expression<Func<T, TResult>> expression, 
+			Interceptor interceptor, string failMessage)
 		{
 			if (expression.ToLambda().IsProperty())
 			{
-				VerifyGet<T, TResult>(expression, interceptor);
+				VerifyGet<T, TResult>(expression, interceptor, failMessage);
 			}
 			else
 			{
 				Func<Expression, MethodInfo, Expression[], IProxyCall> factory =
 					(e, m, a) => new MethodCallReturn<TResult>(e, m, a);
 
-				VerifyMethod(expression, interceptor, factory);
+				VerifyMethod(expression, interceptor, factory, failMessage);
 			}
 		}
 
-		private static void VerifyMethod(Expression expression, Interceptor interceptor, Func<Expression, MethodInfo, Expression[], IProxyCall> setupFactory)
+		private static void VerifyMethod(Expression expression, Interceptor interceptor, 
+			Func<Expression, MethodInfo, Expression[], IProxyCall> setupFactory, string failMessage)
 		{
 			Guard.ArgumentNotNull(interceptor, "interceptor");
 
@@ -313,11 +315,10 @@ namespace Moq
 			var actual = targetInterceptor.ActualCalls.FirstOrDefault(i => expected.Matches(i));
 
 			if (actual == null)
-				throw new MockException(MockException.ExceptionReason.VerificationFailed,
-					Properties.Resources.NoMatchingCall);
+				ThrowVerifyException(expression, failMessage);
 		}
 
-		internal static void Verify<T>(Expression<Action<T>> expression, Interceptor interceptor)
+		internal static void Verify<T>(Expression<Action<T>> expression, Interceptor interceptor, string failMessage)
 		{
 			Guard.ArgumentNotNull(interceptor, "interceptor");
 
@@ -331,11 +332,11 @@ namespace Moq
 			var actual = targetInterceptor.ActualCalls.FirstOrDefault(i => expected.Matches(i));
 
 			if (actual == null)
-				throw new MockException(MockException.ExceptionReason.VerificationFailed,
-					Properties.Resources.NoMatchingCall);
+				ThrowVerifyException(expression, failMessage);
 		}
 
-		internal static void VerifyGet<T, TProperty>(Expression<Func<T, TProperty>> expression, Interceptor interceptor)
+		internal static void VerifyGet<T, TProperty>(Expression<Func<T, TProperty>> expression, 
+			Interceptor interceptor, string failMessage)
 		{
 			var lambda = expression.ToLambda();
 			var prop = lambda.ToPropertyInfo();
@@ -345,11 +346,11 @@ namespace Moq
 			var actual = targetInterceptor.ActualCalls.FirstOrDefault(i => expected.Matches(i));
 
 			if (actual == null)
-				throw new MockException(MockException.ExceptionReason.VerificationFailed,
-					Properties.Resources.NoMatchingCall);
+				ThrowVerifyException(expression, failMessage);
 		}
 
-		internal static void VerifySet<T, TProperty>(Expression<Func<T, TProperty>> expression, Interceptor interceptor)
+		internal static void VerifySet<T, TProperty>(Expression<Func<T, TProperty>> expression, 
+			Interceptor interceptor, string failMessage)
 		{
 			Guard.ArgumentNotNull(interceptor, "interceptor");
 
@@ -361,11 +362,11 @@ namespace Moq
 			var actual = targetInterceptor.ActualCalls.FirstOrDefault(i => expected.Matches(i));
 
 			if (actual == null)
-				throw new MockException(MockException.ExceptionReason.VerificationFailed,
-					Properties.Resources.NoMatchingCall);
+				ThrowVerifyException(expression, failMessage);
 		}
 
-		internal static void VerifySet<T, TProperty>(Expression<Func<T, TProperty>> expression, TProperty value, Interceptor interceptor)
+		internal static void VerifySet<T, TProperty>(Expression<Func<T, TProperty>> expression, TProperty value, 
+			Interceptor interceptor, string failMessage)
 		{
 			Guard.ArgumentNotNull(interceptor, "interceptor");
 
@@ -377,8 +378,14 @@ namespace Moq
 			var actual = targetInterceptor.ActualCalls.FirstOrDefault(i => expected.Matches(i));
 
 			if (actual == null)
-				throw new MockException(MockException.ExceptionReason.VerificationFailed,
-					Properties.Resources.NoMatchingCall);
+				ThrowVerifyException(expression, failMessage);
+		}
+
+		private static void ThrowVerifyException(Expression expression, string failMessage)
+		{
+			throw new MockException(MockException.ExceptionReason.VerificationFailed,
+				String.Format(CultureInfo.CurrentCulture, Properties.Resources.NoMatchingCall,
+					failMessage, expression.ToStringFixed()));
 		}
 
 		#endregion
