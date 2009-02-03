@@ -288,9 +288,9 @@ namespace Moq
 		/// mock.Setup(x =&gt; x.Execute("ping"));
 		/// </code>
 		/// </example>
-		public virtual ISetup Setup(Expression<Action<T>> expression)
+		public virtual ISetup<T> Setup(Expression<Action<T>> expression)
 		{
-			return Mock.Setup<T>(expression, this.Interceptor);
+			return Mock.Setup<T>(this, expression);
 		}
 
 		/// <summary>
@@ -308,9 +308,9 @@ namespace Moq
 		/// mock.Setup(x =&gt; x.HasInventory("Talisker", 50)).Returns(true);
 		/// </code>
 		/// </example>
-		public virtual ISetup<TResult> Setup<TResult>(Expression<Func<T, TResult>> expression)
+		public virtual ISetup<T, TResult> Setup<TResult>(Expression<Func<T, TResult>> expression)
 		{
-			return Setup(expression, this.Interceptor);
+			return Setup(this, expression);
 		}
 
 		/// <summary>
@@ -329,9 +329,9 @@ namespace Moq
 		///     .Returns(true);
 		/// </code>
 		/// </example>
-		public virtual ISetupGetter<TProperty> SetupGet<TProperty>(Expression<Func<T, TProperty>> expression)
+		public virtual ISetupGetter<T, TProperty> SetupGet<TProperty>(Expression<Func<T, TProperty>> expression)
 		{
-			return SetupGet(expression, this.Interceptor);
+			return SetupGet(this, expression);
 		}
 
 		/// <summary>
@@ -349,9 +349,9 @@ namespace Moq
 		/// mock.SetupSet(x =&gt; x.Suspended);
 		/// </code>
 		/// </example>
-		public virtual ISetupSetter<TProperty> SetupSet<TProperty>(Expression<Func<T, TProperty>> expression)
+		public virtual ISetupSetter<T, TProperty> SetupSet<TProperty>(Expression<Func<T, TProperty>> expression)
 		{
-			return SetupSet<T, TProperty>(expression, this.Interceptor);
+			return SetupSet<T, TProperty>(this, expression);
 		}
 
 		/// <summary>
@@ -370,9 +370,9 @@ namespace Moq
 		/// mock.SetupSet(x =&gt; x.Suspended, true);
 		/// </code>
 		/// </example>
-		public virtual ISetupSetter<TProperty> SetupSet<TProperty>(Expression<Func<T, TProperty>> expression, TProperty value)
+		public virtual ISetupSetter<T, TProperty> SetupSet<TProperty>(Expression<Func<T, TProperty>> expression, TProperty value)
 		{
-			return SetupSet(expression, value, this.Interceptor);
+			return SetupSet(this, expression, value);
 		}
 
 		/// <summary>
@@ -559,7 +559,7 @@ namespace Moq
 		/// <param name="expression">Expression to verify.</param>
 		public virtual void Verify(Expression<Action<T>> expression)
 		{
-			Verify(expression, Interceptor, null);
+			Verify(expression, null);
 		}
 
 		/// <summary>
@@ -585,7 +585,7 @@ namespace Moq
 		/// <param name="failMessage">Message to show if verification fails.</param>
 		public virtual void Verify(Expression<Action<T>> expression, string failMessage)
 		{
-			Verify(expression, Interceptor, failMessage);
+			Verify(this, expression, failMessage);
 		}
 
 
@@ -611,7 +611,7 @@ namespace Moq
 		/// <typeparam name="TResult">Type of return value from the expression.</typeparam>
 		public virtual void Verify<TResult>(Expression<Func<T, TResult>> expression)
 		{
-			Verify(expression, Interceptor, null);
+			Verify(this, expression, null);
 		}
 
 		/// <summary>
@@ -638,7 +638,7 @@ namespace Moq
 		/// <typeparam name="TResult">Type of return value from the expression.</typeparam>
 		public virtual void Verify<TResult>(Expression<Func<T, TResult>> expression, string failMessage)
 		{
-			Verify(expression, Interceptor, failMessage);
+			Verify(this, expression, failMessage);
 		}
 
 		/// <summary>
@@ -663,7 +663,7 @@ namespace Moq
 		/// be inferred from the expression's return type.</typeparam>
 		public virtual void VerifyGet<TProperty>(Expression<Func<T, TProperty>> expression)
 		{
-			VerifyGet(expression, Interceptor, null);
+			VerifyGet(this, expression, null);
 		}
 
 		/// <summary>
@@ -690,7 +690,7 @@ namespace Moq
 		/// be inferred from the expression's return type.</typeparam>
 		public virtual void VerifyGet<TProperty>(Expression<Func<T, TProperty>> expression, string failMessage)
 		{
-			VerifyGet(expression, Interceptor, failMessage);
+			VerifyGet(this, expression, failMessage);
 		}
 
 		/// <summary>
@@ -715,7 +715,7 @@ namespace Moq
 		/// be inferred from the expression's return type.</typeparam>
 		public virtual void VerifySet<TProperty>(Expression<Func<T, TProperty>> expression)
 		{
-			VerifySet(expression, Interceptor, null);
+			VerifySet(this, expression, null);
 		}
 
 		/// <summary>
@@ -741,7 +741,7 @@ namespace Moq
 		/// be inferred from the expression's return type.</typeparam>
 		public virtual void VerifySet<TProperty>(Expression<Func<T, TProperty>> expression, TProperty value)
 		{
-			VerifySet(expression, value, Interceptor, null);
+			VerifySet(this, expression, value, null);
 		}
 
 		/// <summary>
@@ -768,7 +768,7 @@ namespace Moq
 		/// be inferred from the expression's return type.</typeparam>
 		public virtual void VerifySet<TProperty>(Expression<Func<T, TProperty>> expression, string failMessage)
 		{
-			VerifySet(expression, Interceptor, failMessage);
+			VerifySet(this, expression, failMessage);
 		}
 
 		/// <summary>
@@ -796,7 +796,7 @@ namespace Moq
 		/// be inferred from the expression's return type.</typeparam>
 		public virtual void VerifySet<TProperty>(Expression<Func<T, TProperty>> expression, TProperty value, string failMessage)
 		{
-			VerifySet(expression, value, Interceptor, failMessage);
+			VerifySet(this, expression, value, failMessage);
 		}
 
 		#endregion
@@ -874,29 +874,29 @@ namespace Moq
 				SetupAllProperties(owner);
 			}
 
-			public override ISetup<TResult> Setup<TResult>(Expression<Func<TInterface, TResult>> expression)
+			public override ISetup<TInterface, TResult> Setup<TResult>(Expression<Func<TInterface, TResult>> expression)
 			{
-				return Mock.Setup(expression, owner.Interceptor);
+				return Mock.Setup(owner, expression);
 			}
 
-			public override ISetup Setup(Expression<Action<TInterface>> expression)
+			public override ISetup<TInterface> Setup(Expression<Action<TInterface>> expression)
 			{
-				return Mock.Setup(expression, owner.Interceptor);
+				return Mock.Setup(owner, expression);
 			}
 
-			public override ISetupGetter<TProperty> SetupGet<TProperty>(Expression<Func<TInterface, TProperty>> expression)
+			public override ISetupGetter<TInterface, TProperty> SetupGet<TProperty>(Expression<Func<TInterface, TProperty>> expression)
 			{
-				return Mock.SetupGet(expression, owner.Interceptor);
+				return Mock.SetupGet(owner, expression);
 			}
 
-			public override ISetupSetter<TProperty> SetupSet<TProperty>(Expression<Func<TInterface, TProperty>> expression)
+			public override ISetupSetter<TInterface, TProperty> SetupSet<TProperty>(Expression<Func<TInterface, TProperty>> expression)
 			{
-				return Mock.SetupSet(expression, owner.Interceptor);
+				return Mock.SetupSet(owner, expression);
 			}
 
-			public override ISetupSetter<TProperty> SetupSet<TProperty>(Expression<Func<TInterface, TProperty>> expression, TProperty value)
+			public override ISetupSetter<TInterface, TProperty> SetupSet<TProperty>(Expression<Func<TInterface, TProperty>> expression, TProperty value)
 			{
-				return Mock.SetupSet(expression, value, owner.Interceptor);
+				return Mock.SetupSet(owner, expression, value);
 			}
 
 			internal override Dictionary<MethodInfo, Mock> InnerMocks
@@ -941,52 +941,52 @@ namespace Moq
 
 			public override void Verify(Expression<Action<TInterface>> expression)
 			{
-				Mock.Verify(expression, owner.Interceptor, null);
+				Mock.Verify(owner, expression, null);
 			}
 
 			public override void Verify(Expression<Action<TInterface>> expression, string failMessage)
 			{
-				Mock.Verify(expression, owner.Interceptor, failMessage);
+				Mock.Verify(owner, expression, failMessage);
 			}
 
 			public override void Verify<TResult>(Expression<Func<TInterface, TResult>> expression)
 			{
-				Mock.Verify<TInterface, TResult>(expression, owner.Interceptor, null);
+				Mock.Verify<TInterface, TResult>(owner, expression, null);
 			}
 
 			public override void Verify<TResult>(Expression<Func<TInterface, TResult>> expression, string failMessage)
 			{
-				Mock.Verify<TInterface, TResult>(expression, owner.Interceptor, failMessage);
+				Mock.Verify<TInterface, TResult>(owner, expression, failMessage);
 			}
 
 			public override void VerifyGet<TProperty>(Expression<Func<TInterface, TProperty>> expression)
 			{
-				Mock.VerifyGet<TInterface, TProperty>(expression, owner.Interceptor, null);
+				Mock.VerifyGet<TInterface, TProperty>(owner, expression, null);
 			}
 
 			public override void VerifyGet<TProperty>(Expression<Func<TInterface, TProperty>> expression, string failMessage)
 			{
-				Mock.VerifyGet<TInterface, TProperty>(expression, owner.Interceptor, failMessage);
+				Mock.VerifyGet<TInterface, TProperty>(owner, expression, failMessage);
 			}
 
 			public override void VerifySet<TProperty>(Expression<Func<TInterface, TProperty>> expression)
 			{
-				Mock.VerifySet<TInterface, TProperty>(expression, owner.Interceptor, null);
+				Mock.VerifySet<TInterface, TProperty>(owner, expression, null);
 			}
 
 			public override void VerifySet<TProperty>(Expression<Func<TInterface, TProperty>> expression, TProperty value)
 			{
-				Mock.VerifySet<TInterface, TProperty>(expression, value, owner.Interceptor, null);
+				Mock.VerifySet<TInterface, TProperty>(owner, expression, value, null);
 			}
 
 			public override void VerifySet<TProperty>(Expression<Func<TInterface, TProperty>> expression, string failMessage)
 			{
-				Mock.VerifySet<TInterface, TProperty>(expression, owner.Interceptor, failMessage);
+				Mock.VerifySet<TInterface, TProperty>(owner, expression, failMessage);
 			}
 
 			public override void VerifySet<TProperty>(Expression<Func<TInterface, TProperty>> expression, TProperty value, string failMessage)
 			{
-				Mock.VerifySet<TInterface, TProperty>(expression, value, owner.Interceptor, failMessage);
+				Mock.VerifySet<TInterface, TProperty>(owner, expression, value, failMessage);
 			}
 
 			public override MockedEvent<TEventArgs> CreateEventHandler<TEventArgs>()
@@ -1040,27 +1040,19 @@ namespace Moq
 		[System.Diagnostics.CodeAnalysis.SuppressMessage("Microsoft.Usage", "CA2200:RethrowToPreserveStackDetails", Justification = "We want to reset the stack trace to avoid Moq noise in it.")]
 		public void Raise(Action<T> eventExpression, EventArgs args)
 		{
-			using (var callback = new EventInfoCallback())
+			var ev = eventExpression.GetEvent();
+
+			var me = new MockedEvent(this);
+			me.Event = ev;
+
+			try
 			{
-				callback.AddInterceptor(this.Interceptor);
-
-				eventExpression(this.Object);
-
-				if (callback.EventInfo == null)
-					throw new ArgumentException("Expression is not an event attach or detach, or event is defined on a class but was not marked virtual.");
-
-				var me = new MockedEvent(callback.Mock);
-				me.Event = callback.EventInfo;
-
-				try
-				{
-					me.DoRaise(args);
-				}
-				catch (Exception e)
-				{
-					// Reset stacktrace so user gets this call site only.
-					throw e;
-				}
+				me.DoRaise(args);
+			}
+			catch (Exception e)
+			{
+				// Reset stacktrace so user gets this call site only.
+				throw e;
 			}
 		}
 

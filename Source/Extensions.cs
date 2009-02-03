@@ -43,6 +43,7 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Reflection;
 using Castle.Core.Interceptor;
+using System.Globalization;
 
 namespace Moq
 {
@@ -148,6 +149,44 @@ namespace Moq
 			}
 
 			return false;
+		}
+
+		public static EventInfo GetEvent<TMock>(this Action<TMock> eventExpression)
+		{
+			Guard.ArgumentNotNull(eventExpression, "eventExpression");
+
+			var reader = new Indy.IL2CPU.IL.ILReader(eventExpression.Method);
+			MethodBase addRemove = null;
+			while (reader.Read())
+			{
+				if (reader.OpCode == Indy.IL2CPU.IL.OpCodeEnum.Callvirt &&
+					(reader.OperandValueMethod.Name.StartsWith("add_") ||
+					reader.OperandValueMethod.Name.StartsWith("remove_")))
+				{
+					addRemove = reader.OperandValueMethod;
+					break;
+				}
+			}
+
+			if (addRemove == null)
+			{
+				throw new ArgumentException("Expression is not an event attach or detach.");
+			}
+
+			var ev = addRemove.DeclaringType.GetEvent(
+					addRemove.Name.Replace("add_", "").Replace("remove_", ""));
+
+			if (ev == null)
+			{
+				throw new ArgumentException(String.Format(CultureInfo.CurrentCulture,
+					"Could not locate event for attach or detach method {0}.", addRemove.ToString()));
+			}
+			else if (!addRemove.IsVirtual)
+			{
+				throw new ArgumentException("Event must be declared on an interface, or be marked virtual.");
+			}
+
+			return ev;
 		}
 	}
 }

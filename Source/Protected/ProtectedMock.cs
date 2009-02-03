@@ -48,7 +48,7 @@ using System.Globalization;
 
 namespace Moq.Protected
 {
-	internal class ProtectedMock<T> : IProtectedMock
+	internal class ProtectedMock<T> : IProtectedMock<T>
 			where T : class
 	{
 		Mock<T> mock;
@@ -58,7 +58,7 @@ namespace Moq.Protected
 			this.mock = mock;
 		}
 
-		public ISetup Setup(string voidMethodName, params object[] args)
+		public ISetup<T> Setup(string voidMethodName, params object[] args)
 		{
 			Guard.ArgumentNotNullOrEmptyString(voidMethodName, "voidMethodName");
 
@@ -93,7 +93,7 @@ namespace Moq.Protected
 			}
 		}
 
-		public ISetup<TResult> Setup<TResult>(string methodOrPropertyName, params object[] args)
+		public ISetup<T, TResult> Setup<TResult>(string methodOrPropertyName, params object[] args)
 		{
 			Guard.ArgumentNotNullOrEmptyString(methodOrPropertyName, "methodOrPropertyName");
 
@@ -130,7 +130,7 @@ namespace Moq.Protected
 			}
 		}
 
-		public ISetupGetter<TProperty> SetupGet<TProperty>(string propertyName)
+		public ISetupGetter<T, TProperty> SetupGet<TProperty>(string propertyName)
 		{
 			Guard.ArgumentNotNullOrEmptyString(propertyName, "propertyName");
 
@@ -147,7 +147,7 @@ namespace Moq.Protected
 					param));
 		}
 
-		public ISetupSetter<TProperty> SetupSet<TProperty>(string propertyName)
+		public ISetupSetter<T, TProperty> SetupSet<TProperty>(string propertyName)
 		{
 			Guard.ArgumentNotNullOrEmptyString(propertyName, "propertyName");
 

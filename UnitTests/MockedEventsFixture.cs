@@ -135,7 +135,7 @@ namespace Moq.Tests
 			var mock = new Mock<IAdder<string>>();
 
 			Assert.Throws<ArgumentNullException>(() => mock.Setup(add => add.Add(It.IsAny<string>()))
-				.Raises(null, EventArgs.Empty));
+				.Raises((MockedEvent)null, EventArgs.Empty));
 		}
 
 		[Fact]
@@ -408,7 +408,7 @@ namespace Moq.Tests
 		}
 
 		[Fact]
-		public void RaisesEventOnSubObject()
+		public void DoesNotRaiseEventOnSubObject()
 		{
 			var mock = new Mock<IParent> { DefaultValue = DefaultValue.Mock };
 
@@ -419,20 +419,58 @@ namespace Moq.Tests
 
 			mock.Raise(p => p.Adder.Added += null, EventArgs.Empty);
 
-			Assert.True(raised);
-
+			Assert.False(raised);
 		}
 
-		[Fact(Skip="Events on non-virtual events not supported yet")]
+		[Fact]
+		public void RaisesEventWithActionLambda()
+		{
+			var mock = new Mock<IWithEvent>();
+
+			mock.SetupSet(m => m.Value).Raises(m => m.InterfaceEvent += null, EventArgs.Empty);
+
+			var raised = false;
+			mock.Object.InterfaceEvent += (sender, args) => raised = true;
+
+			mock.Object.Value = 5;
+
+			Assert.True(raised);
+		}
+
+		[Fact]
+		public void RaisesEventWithActionLambdaOnClass()
+		{
+			var mock = new Mock<WithEvent>();
+
+			mock.SetupSet(m => m.Value).Raises(m => m.VirtualEvent += null, EventArgs.Empty);
+
+			var raised = false;
+			mock.Object.VirtualEvent += (sender, args) => raised = true;
+
+			mock.Object.Value = 5;
+
+			Assert.True(raised);
+		}
+
+		[Fact]
+		public void RaisesThrowsIfEventNonVirtual()
+		{
+			var mock = new Mock<WithEvent>();
+
+			Assert.Throws<ArgumentException>(() => 
+				mock.SetupSet(m => m.Value).Raises(m => m.ClassEvent += null, EventArgs.Empty));
+		}
+
+		[Fact(Skip = "Events on non-virtual events not supported yet")]
 		public void EventRaisingFailsOnNonVirtualEvent()
 		{
 			var mock = new Mock<WithEvent>();
 
 			var raised = false;
-			mock.Object.Event += delegate { raised = true; };
+			mock.Object.ClassEvent += delegate { raised = true; };
 
 			// TODO: fix!!! We should go the GetInvocationList route here...
-			mock.Raise(x => x.Event += null, EventArgs.Empty);
+			mock.Raise(x => x.ClassEvent += null, EventArgs.Empty);
 
 			Assert.True(raised);
 		}
@@ -451,11 +489,82 @@ namespace Moq.Tests
 			Assert.True(raised);
 		}
 
-		public class WithEvent
+		[Fact]
+		public void RaisesEventWithActionLambdaOneArg()
 		{
-			public event EventHandler Event;
+			var mock = new Mock<IAdder<int>>();
+
+			mock.Setup(m => m.Do("foo")).Raises<string>(m => m.Done += null, s => new DoneArgs { Value = s });
+
+			DoneArgs args = null;
+			mock.Object.Done += (sender, e) => args = e;
+
+			mock.Object.Do("foo");
+
+			Assert.NotNull(args);
+			Assert.Equal("foo", args.Value);
+		}
+
+		[Fact]
+		public void RaisesEventWithActionLambdaTwoArgs()
+		{
+			var mock = new Mock<IAdder<int>>();
+
+			mock.Setup(m => m.Do("foo", 5)).Raises(m => m.Done += null, (string s, int i) => new DoneArgs { Value = s + i });
+
+			DoneArgs args = null;
+			mock.Object.Done += (sender, e) => args = e;
+
+			mock.Object.Do("foo", 5);
+
+			Assert.NotNull(args);
+			Assert.Equal("foo5", args.Value);
+		}
+
+		[Fact]
+		public void RaisesEventWithActionLambdaThreeArgs()
+		{
+			var mock = new Mock<IAdder<int>>();
+
+			mock.Setup(m => m.Do("foo", 5, true)).Raises(m => m.Done += null, (string s, int i, bool b) => new DoneArgs { Value = s + i + b });
+
+			DoneArgs args = null;
+			mock.Object.Done += (sender, e) => args = e;
+
+			mock.Object.Do("foo", 5, true);
+
+			Assert.NotNull(args);
+			Assert.Equal("foo5True", args.Value);
+		}
+
+		[Fact]
+		public void RaisesEventWithActionLambdaFourArgs()
+		{
+			var mock = new Mock<IAdder<int>>();
+
+			mock.Setup(m => m.Do("foo", 5, true, "bar")).Raises(m => m.Done += null, (string s, int i, bool b, string s1) => new DoneArgs { Value = s + i + b + s1});
+
+			DoneArgs args = null;
+			mock.Object.Done += (sender, e) => args = e;
+
+			mock.Object.Do("foo", 5, true, "bar");
+
+			Assert.NotNull(args);
+			Assert.Equal("foo5Truebar", args.Value);
+		}
+
+		public interface IWithEvent
+		{
+			event EventHandler InterfaceEvent;
+			object Value { get; set; }
+		}
+
+		public class WithEvent : IWithEvent
+		{
+			public event EventHandler InterfaceEvent;
+			public event EventHandler ClassEvent;
 			public virtual event EventHandler VirtualEvent;
-			public object Value { get; set; }
+			public virtual object Value { get; set; }
 		}
 
 		private void OnRaised(object sender, EventArgs e)
@@ -463,11 +572,18 @@ namespace Moq.Tests
 			raisedField = true;
 		}
 
+		public class DoneArgs : EventArgs
+		{
+			public string Value { get; set; }
+		}
+
 		public interface IAdder<T>
 		{
+			event EventHandler<DoneArgs> Done;
 			event EventHandler Added;
 			void Add(T value);
 			int Insert(T value, int index);
+			void Do(string s);
 			void Do(string s, int i);
 			void Do(string s, int i, bool b);
 			void Do(string s, int i, bool b, string v);

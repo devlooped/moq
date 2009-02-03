@@ -146,10 +146,13 @@
       <Link>Moq.snk</Link>
     </None>
     <Compile Include="DefaultValue.cs" />
-    <Compile Include="EventInfoCallback.cs" />
     <Compile Include="GlobalSuppressions.cs" />
     <Compile Include="IDefaultValueProvider.cs" />
+    <Compile Include="IL\Enums.cs" />
+    <Compile Include="IL\ILReader.cs" />
+    <Compile Include="IL\ILReader.Utilities.cs" />
     <Compile Include="Language\INever.cs" />
+    <Compile Include="Language\IRaise.Legacy.cs" />
     <Compile Include="Matchers\ParamArrayMatcher.cs" />
     <Compile Include="Matchers\RefMatcher.cs" />
     <Compile Include="Mock.Generic.cs" />
@@ -160,6 +163,9 @@
     <Compile Include="MockDefaultValueProvider.cs" />
     <Compile Include="MockedEvent.Generic.cs" />
     <Compile Include="SetterMethodCall.cs" />
+  </ItemGroup>
+  <ItemGroup>
+    <Content Include="IL\Readme.txt" />
   </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
   <!--<Import Project="$(MSBuildProjectPath)..\Tools\Mono.Mcs.targets" />-->

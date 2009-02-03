@@ -52,8 +52,48 @@ using System.IO;
 
 namespace Moq
 {
-	internal class MethodCall : IProxyCall, ISetup
+	internal class MethodCall<TMock> : MethodCall, ISetup<TMock>
 	{
+		public MethodCall(Mock mock, Expression originalExpression, MethodInfo method, 
+			params Expression[] arguments)
+			: base(mock, originalExpression, method, arguments)
+		{
+		}
+
+		public IVerifies Raises(Action<TMock> eventExpression, EventArgs args)
+		{
+			return Raises(eventExpression, () => args);
+		}
+
+		public IVerifies Raises(Action<TMock> eventExpression, Func<EventArgs> func)
+		{
+			return RaisesImpl(eventExpression, func);
+		}
+
+		public IVerifies Raises<T1>(Action<TMock> eventExpression, Func<T1, EventArgs> func)
+		{
+			return RaisesImpl(eventExpression, func);
+		}
+
+		public IVerifies Raises<T1, T2>(Action<TMock> eventExpression, Func<T1, T2, EventArgs> func)
+		{
+			return RaisesImpl(eventExpression, func);
+		}
+
+		public IVerifies Raises<T1, T2, T3>(Action<TMock> eventExpression, Func<T1, T2, T3, EventArgs> func)
+		{
+			return RaisesImpl(eventExpression, func);
+		}
+
+		public IVerifies Raises<T1, T2, T3, T4>(Action<TMock> eventExpression, Func<T1, T2, T3, T4, EventArgs> func)
+		{
+			return RaisesImpl(eventExpression, func);
+		}
+	}
+
+	internal class MethodCall : IProxyCall, ICallbackResult, IVerifies, IThrowsResult
+	{
+		protected Mock mock;
 		protected MethodInfo method;
 		Expression originalExpression;
 		Exception exception;
@@ -77,8 +117,9 @@ namespace Moq
 		public bool Invoked { get; set; }
 		public Expression SetupExpression { get { return originalExpression; } }
 
-		public MethodCall(Expression originalExpression, MethodInfo method, params Expression[] arguments)
+		public MethodCall(Mock mock, Expression originalExpression, MethodInfo method, params Expression[] arguments)
 		{
+			this.mock = mock;
 			this.originalExpression = originalExpression;
 			this.method = method;
 
@@ -410,6 +451,17 @@ namespace Moq
 			Guard.ArgumentNotNull(func, "func");
 
 			mockEvent = eventHandler;
+			mockEventArgsFunc = func;
+
+			return this;
+		}
+
+		protected IVerifies RaisesImpl<TMock>(Action<TMock> eventExpression, Delegate func)
+		{
+			var ev = eventExpression.GetEvent();
+
+			mockEvent = new MockedEvent(mock);
+			mockEvent.Event = ev;
 			mockEventArgsFunc = func;
 
 			return this;

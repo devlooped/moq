@@ -50,7 +50,7 @@ namespace Moq.Language
 	/// <seealso cref="Mock{T}.SetupGet"/>
 	/// <typeparam name="TProperty">Type of the property.</typeparam>
 	[EditorBrowsable(EditorBrowsableState.Never)]
-	public interface ICallbackGetter<TProperty> : IHideObjectMembers
+	public interface ICallbackGetter<TMock, TProperty> : IHideObjectMembers
 	{ 
 		/// <summary>
 		/// Specifies a callback to invoke when the property is retrieved.
@@ -64,6 +64,6 @@ namespace Moq.Language
 		///     .Returns(true);
 		/// </code>
 		/// </example>
-		IReturnsThrowsGetter<TProperty> Callback(Action action);
+		IReturnsThrowsGetter<TMock, TProperty> Callback(Action action);
 	}
 }

@@ -70,11 +70,6 @@ namespace Moq
 		internal IEnumerable<IInvocation> ActualCalls { get { return actualInvocations; } }
 		internal Mock Mock { get { return mock; } }
 
-		/// <summary>
-		/// Used to call back into a caller whenever an event attach/remove is intercepted.
-		/// </summary>
-		internal EventInfoCallback EventCallback { get; set; }
-
 		internal void Verify()
 		{
 			// The IsNever case would have thrown the moment the member is invoked, 
@@ -152,8 +147,6 @@ namespace Moq
 				// TODO: validate we can get the event?
 				EventInfo eventInfo = GetEventFromName(invocation.Method.Name.Replace("add_", ""));
 
-				if (EventCallback != null) EventCallback.SetEvent(mock, eventInfo);
-
 				if (delegateInstance != null)
 				{
 					var mockEvent = delegateInstance.Target as MockedEvent;
@@ -175,8 +168,6 @@ namespace Moq
 				var delegateInstance = (Delegate)invocation.Arguments[0];
 				// TODO: validate we can get the event?
 				EventInfo eventInfo = GetEventFromName(invocation.Method.Name.Replace("remove_", ""));
-
-				if (EventCallback != null) EventCallback.SetEvent(mock, eventInfo);
 
 				if (delegateInstance != null)
 				{
@@ -240,12 +231,6 @@ namespace Moq
 			  invocation.Method.ReturnType != typeof(void))
 			{
 				invocation.ReturnValue = mock.DefaultValueProvider.ProvideDefault(invocation.Method, invocation.Arguments);
-
-				// Event callbacks may need to be set if the returned value is a mock.
-				if (invocation.ReturnValue is IMocked && EventCallback != null)
-				{
-					EventCallback.AddInterceptor(((IMocked)invocation.ReturnValue).Mock.Interceptor);
-				}
 			}
 		}
 

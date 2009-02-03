@@ -17,6 +17,18 @@ namespace Moq.Tests
 		}
 
 		[Fact]
+		public void ReadsIL()
+		{
+			Action<System.ComponentModel.IComponent> action = f => f.Disposed += null;
+
+			var reader = new Indy.IL2CPU.IL.ILReader(action.Method);
+			while (reader.Read())
+			{
+				Console.WriteLine(reader.OpCode);
+			}
+		}
+
+		[Fact]
 		public void ThrowsIfNullExpectAction()
 		{
 			var mock = new Mock<ICloneable>();

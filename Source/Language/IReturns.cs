@@ -49,7 +49,7 @@ namespace Moq.Language
 	/// </summary>
 	/// <typeparam name="TResult">Type of the return value from the expression.</typeparam>
 	[EditorBrowsable(EditorBrowsableState.Never)]
-	public interface IReturns<TResult> : IHideObjectMembers
+	public interface IReturns<TMock, TResult> : IHideObjectMembers
 	{
 		/// <summary>
 		/// Specifies the value to return.
@@ -62,7 +62,7 @@ namespace Moq.Language
 		///     .Returns(true);
 		/// </code>
 		/// </example>
-		IReturnsResult Returns(TResult value);
+		IReturnsResult<TMock> Returns(TResult value);
 
 		/// <summary>
 		/// Specifies a function that will calculate the value to return from the method.
@@ -79,7 +79,7 @@ namespace Moq.Language
 		/// is executed and the value the <c>returnValues</c> array has at 
 		/// that moment.
 		/// </example>
-		IReturnsResult Returns(Func<TResult> valueFunction);
+		IReturnsResult<TMock> Returns(Func<TResult> valueFunction);
 
 		/// <summary>
 		/// Specifies a function that will calculate the value to return from the method, 
@@ -100,7 +100,7 @@ namespace Moq.Language
 		///     .Returns((string command) => returnValues[command]);
 		/// </code>
 		/// </example>
-		IReturnsResult Returns<T>(Func<T, TResult> valueFunction);
+		IReturnsResult<TMock> Returns<T>(Func<T, TResult> valueFunction);
 
 		/// <summary>
 		/// Specifies a function that will calculate the value to return from the method, 
@@ -123,7 +123,7 @@ namespace Moq.Language
 		///     .Returns((string arg1, string arg2) => arg1 + arg2);
 		/// </code>
 		/// </example>
-		IReturnsResult Returns<T1, T2>(Func<T1, T2, TResult> valueFunction);
+		IReturnsResult<TMock> Returns<T1, T2>(Func<T1, T2, TResult> valueFunction);
 
 		/// <summary>
 		/// Specifies a function that will calculate the value to return from the method, 
@@ -148,7 +148,7 @@ namespace Moq.Language
 		///     .Returns((string arg1, string arg2, int arg3) => arg1 + arg2 + arg3);
 		/// </code>
 		/// </example>
-		IReturnsResult Returns<T1, T2, T3>(Func<T1, T2, T3, TResult> valueFunction);
+		IReturnsResult<TMock> Returns<T1, T2, T3>(Func<T1, T2, T3, TResult> valueFunction);
 
 		/// <summary>
 		/// Specifies a function that will calculate the value to return from the method, 
@@ -175,6 +175,6 @@ namespace Moq.Language
 		///     .Returns((string arg1, string arg2, int arg3, bool arg4) => arg1 + arg2 + arg3 + arg4);
 		/// </code>
 		/// </example>
-		IReturnsResult Returns<T1, T2, T3, T4>(Func<T1, T2, T3, T4, TResult> valueFunction);
+		IReturnsResult<TMock> Returns<T1, T2, T3, T4>(Func<T1, T2, T3, T4, TResult> valueFunction);
 	}
 }

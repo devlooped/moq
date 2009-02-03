@@ -47,7 +47,7 @@ namespace Moq.Protected
 	/// name as a string, rather than strong-typing them which is not possible 
 	/// due to their visibility.
 	/// </summary>
-	public interface IProtectedMock : IHideObjectMembers
+	public interface IProtectedMock<T> : IHideObjectMembers
 	{
 		/// <summary>
 		/// Specifies a setup for a void method invocation with the given 
@@ -57,7 +57,7 @@ namespace Moq.Protected
 		/// <param name="voidMethodName">Name of the void method to be invoke.</param>
 		/// <param name="args">Optional arguments for the invocation. If argument matchers are used, 
 		/// remember to use <see cref="ItExpr"/> rather than <see cref="It"/>.</param>
-		ISetup Setup(string voidMethodName, params object[] args);
+		ISetup<T> Setup(string voidMethodName, params object[] args);
 
 		/// <summary>
 		/// Specifies a setup for an invocation on a property or a non void method with the given 
@@ -68,7 +68,7 @@ namespace Moq.Protected
 		/// <param name="args">Optional arguments for the invocation. If argument matchers are used, 
 		/// remember to use <see cref="ItExpr"/> rather than <see cref="It"/>.</param>
 		/// <typeparam name="TResult">Return type of the method or property.</typeparam>
-		ISetup<TResult> Setup<TResult>(string methodOrPropertyName, params object[] args);
+		ISetup<T, TResult> Setup<TResult>(string methodOrPropertyName, params object[] args);
 
 		/// <summary>
 		/// Specifies a setup for an invocation on a property getter with the given 
@@ -76,7 +76,7 @@ namespace Moq.Protected
 		/// </summary>
 		/// <param name="propertyName">Name of the property.</param>
 		/// <typeparam name="TProperty">Type of the property.</typeparam>
-		ISetupGetter<TProperty> SetupGet<TProperty>(string propertyName);
+		ISetupGetter<T, TProperty> SetupGet<TProperty>(string propertyName);
 
 		/// <summary>
 		/// Specifies a setup for an invocation on a property setter with the given 
@@ -84,6 +84,6 @@ namespace Moq.Protected
 		/// </summary>
 		/// <param name="propertyName">Name of the property.</param>
 		/// <typeparam name="TProperty">Type of the property.</typeparam>
-		ISetupSetter<TProperty> SetupSet<TProperty>(string propertyName);
+		ISetupSetter<T, TProperty> SetupSet<TProperty>(string propertyName);
 	}
 }

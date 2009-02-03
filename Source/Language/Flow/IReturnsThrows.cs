@@ -46,7 +46,7 @@ namespace Moq.Language.Flow
 	/// Implements the fluent API.
 	/// </summary>
 	[EditorBrowsable(EditorBrowsableState.Never)]
-	public interface IReturnsThrows<TResult> : IReturns<TResult>, IThrows, IHideObjectMembers
+	public interface IReturnsThrows<TMock, TResult> : IReturns<TMock, TResult>, IThrows, IHideObjectMembers
 	{
 	}
 
@@ -54,7 +54,7 @@ namespace Moq.Language.Flow
 	/// Implements the fluent API.
 	/// </summary>
 	[EditorBrowsable(EditorBrowsableState.Never)]
-	public interface IReturnsThrowsGetter<TProperty> : IReturnsGetter<TProperty>, IThrows, IHideObjectMembers
+	public interface IReturnsThrowsGetter<TMock, TProperty> : IReturnsGetter<TMock, TProperty>, IThrows, IHideObjectMembers
 	{
 	}
 }

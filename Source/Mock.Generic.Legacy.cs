@@ -33,7 +33,7 @@ namespace Moq
 		/// </example>
 		[Obsolete("Expect has been renamed to Setup.", false)]
 		[EditorBrowsable(EditorBrowsableState.Never)]
-		public ISetup Expect(Expression<Action<T>> expression)
+		public ISetup<T> Expect(Expression<Action<T>> expression)
 		{
 			return Setup(expression);
 		}
@@ -55,7 +55,7 @@ namespace Moq
 		/// </example>
 		[Obsolete("Expect has been renamed to Setup.", false)]
 		[EditorBrowsable(EditorBrowsableState.Never)]
-		public ISetup<TResult> Expect<TResult>(Expression<Func<T, TResult>> expression)
+		public ISetup<T, TResult> Expect<TResult>(Expression<Func<T, TResult>> expression)
 		{
 			return Setup(expression);
 		}
@@ -78,7 +78,7 @@ namespace Moq
 		/// </example>
 		[Obsolete("ExpectGet has been renamed to SetupGet.", false)]
 		[EditorBrowsable(EditorBrowsableState.Never)]
-		public ISetupGetter<TProperty> ExpectGet<TProperty>(Expression<Func<T, TProperty>> expression)
+		public ISetupGetter<T, TProperty> ExpectGet<TProperty>(Expression<Func<T, TProperty>> expression)
 		{
 			return SetupGet(expression);
 		}
@@ -100,7 +100,7 @@ namespace Moq
 		/// </example>
 		[Obsolete("ExpectSet has been renamed to SetupSet.", false)]
 		[EditorBrowsable(EditorBrowsableState.Never)]
-		public ISetupSetter<TProperty> ExpectSet<TProperty>(Expression<Func<T, TProperty>> expression)
+		public ISetupSetter<T, TProperty> ExpectSet<TProperty>(Expression<Func<T, TProperty>> expression)
 		{
 			return SetupSet<TProperty>(expression);
 		}
@@ -123,7 +123,7 @@ namespace Moq
 		/// </example>
 		[Obsolete("ExpectSet has been renamed to SetupSet.", false)]
 		[EditorBrowsable(EditorBrowsableState.Never)]
-		public ISetupSetter<TProperty> ExpectSet<TProperty>(Expression<Func<T, TProperty>> expression, TProperty value)
+		public ISetupSetter<T, TProperty> ExpectSet<TProperty>(Expression<Func<T, TProperty>> expression, TProperty value)
 		{
 			return SetupSet(expression, value);
 		}
