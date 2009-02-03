@@ -47,6 +47,7 @@ namespace Moq.Language
 	/// <summary>
 	/// Defines the <c>Returns</c> verb.
 	/// </summary>
+	/// <typeparam name="TMock">Mocked type.</typeparam>
 	/// <typeparam name="TResult">Type of the return value from the expression.</typeparam>
 	[EditorBrowsable(EditorBrowsableState.Never)]
 	public interface IReturns<TMock, TResult> : IHideObjectMembers

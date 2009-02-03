@@ -47,6 +47,7 @@ namespace Moq.Language
 	/// <summary>
 	/// Defines the <c>Returns</c> verb for property get setups.
 	/// </summary>
+	/// <typeparam name="TMock">Mocked type.</typeparam>
 	/// <typeparam name="TProperty">Type of the property.</typeparam>
 	[EditorBrowsable(EditorBrowsableState.Never)]
 	public interface IReturnsGetter<TMock, TProperty> : IHideObjectMembers

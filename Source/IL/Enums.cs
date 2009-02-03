@@ -17,7 +17,7 @@ using System.Collections.Generic;
 using System.Linq;
 
 namespace Indy.IL2CPU.IL {
-	public enum OpCodeEnum: ushort {
+	internal enum OpCodeEnum: ushort {
 		Nop = 0x0000,
 		Break = 0x0001,
 		Ldarg_0 = 0x0002,

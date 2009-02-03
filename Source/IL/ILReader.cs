@@ -19,7 +19,7 @@ using System.Reflection;
 using System.IO;
 
 namespace Indy.IL2CPU.IL {
-	public partial class ILReader {
+	internal partial class ILReader {
 		private readonly MethodBody mBody;
 		private MemoryStream mStream;
 		private MethodBase mMethod;

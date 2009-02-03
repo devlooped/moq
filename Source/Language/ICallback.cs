@@ -161,6 +161,7 @@ namespace Moq.Language
 	/// Defines the <c>Callback</c> verb and overloads for callbacks on 
 	/// setups that return a value.
 	/// </summary>
+	/// <typeparam name="TMock">Mocked type.</typeparam>
 	/// <typeparam name="TResult">Type of the return value of the setup.</typeparam>
 	[EditorBrowsable(EditorBrowsableState.Never)]
 	public interface ICallback<TMock, TResult> : IHideObjectMembers

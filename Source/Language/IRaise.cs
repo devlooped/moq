@@ -84,7 +84,7 @@ namespace Moq.Language
 		/// <param name="eventExpression">An expression that represents an event attach or detach action.</param>
 		/// <param name="func">A function that will build the <see cref="EventArgs"/> 
 		/// to pass when raising the event.</param>
-		/// <typeparam name="T">Type of the argument received by the expected invocation.</typeparam>
+		/// <typeparam name="T1">Type of the argument received by the expected invocation.</typeparam>
 		/// <seealso cref="Raises(Action{T}, EventArgs)"/>
 		IVerifies Raises<T1>(Action<T> eventExpression, Func<T1, EventArgs> func);
 
