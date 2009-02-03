@@ -110,9 +110,14 @@ namespace Moq
 			}
 			catch (TargetInvocationException ex)
 			{
-				remoteStackTraceString.SetValue(ex.InnerException, ex.InnerException.StackTrace);
+				ex.InnerException.SetStackTrace(ex.InnerException.StackTrace);
 				throw ex.InnerException;
 			}
+		}
+
+		public static void SetStackTrace(this Exception exception, string stackTrace)
+		{
+			remoteStackTraceString.SetValue(exception, stackTrace);
 		}
 
 		public static bool IsMockeable(this Type typeToMock)
