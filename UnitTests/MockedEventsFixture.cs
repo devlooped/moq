@@ -391,7 +391,7 @@ namespace Moq.Tests
 			var prop = "";
 			mock.Object.PropertyChanged += (sender, args) => prop = args.PropertyName;
 
-			mock.Raise(x => x.PropertyChanged -= null, new PropertyChangedEventArgs("foo"));
+			mock.Raise(x => x.PropertyChanged -= It.IsAny<PropertyChangedEventHandler>(), new PropertyChangedEventArgs("foo"));
 
 			Assert.Equal("foo", prop);
 		}
