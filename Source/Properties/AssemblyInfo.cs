@@ -10,7 +10,7 @@ using System.Resources;
 [assembly: AssemblyProduct("Moq")]
 [assembly: AssemblyTrademark("")]
 [assembly: AssemblyCulture("")]
-[assembly: AssemblyVersion("3.0.112.1")]
+[assembly: AssemblyVersion("3.0.203.1")]
 [assembly: AssemblyFileVersion("3.0.0.0")]
 [assembly: CLSCompliant(true)]
 [assembly: ComVisible(false)]
