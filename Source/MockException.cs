@@ -158,36 +158,48 @@ namespace Moq
 	internal class MockVerificationException : MockException
 	{
 		Type targetType;
-		List<KeyValuePair<Expression, string>> failedSetups;
+		List<IProxyCall> failedSetups;
 
-		public MockVerificationException(Type targetType, List<KeyValuePair<Expression, string>> failedSetups)
+		public MockVerificationException(Type targetType, List<IProxyCall> failedSetups)
 			: base(ExceptionReason.VerificationFailed, GetMessage(targetType, failedSetups))
 		{
 			this.targetType = targetType;
 			this.failedSetups = failedSetups;
 		}
 
-		private static string GetMessage(Type targetType, List<KeyValuePair<Expression, string>> failedSetups)
+		private static string GetMessage(Type targetType, List<IProxyCall> failedSetups)
 		{
 			return String.Format(CultureInfo.CurrentCulture, 
 				Properties.Resources.VerficationFailed, GetRawSetups(targetType, failedSetups));
 		}
 
-		private static string GetRawSetups(Type targetType, List<KeyValuePair<Expression, string>> failedSetups)
+		private static string GetRawSetups(Type targetType, List<IProxyCall> failedSetups)
 		{
 			var message = new StringBuilder();
 			foreach (var setup in failedSetups)
 			{
-				if (setup.Value != null)
-					message.Append(setup.Value).Append(": ");
+				if (setup.FailMessage != null)
+					message.Append(setup.FailMessage).Append(": ");
 
-				var lambda = setup.Key.ToLambda();
+				var lambda = setup.SetupExpression.PartialMatcherAwareEval().ToLambda();
 				var targetTypeName = lambda.Parameters[0].Type.Name;
 
 				message
 					.Append(targetTypeName)
 					.Append(" ")
-					.AppendLine(setup.Key.ToStringFixed());
+					.Append(lambda.ToStringFixed());
+
+				if (setup.TestMethod != null)
+					message
+						.Append(" (")
+						.Append(setup.TestMethod.Name)
+						.Append("() in ")
+						.Append(setup.FileName)
+						.Append(": line ")
+						.Append(setup.FileLine)
+						.AppendLine(")");
+
+				message.AppendLine();
 			}
 
 			return message.ToString();

@@ -412,7 +412,6 @@ namespace Moq
 
 		internal static MethodCallReturn<TResult> Setup<T1, TResult>(Expression<Func<T1, TResult>> expression, Interceptor interceptor)
 		{
-			// TODO: maybe we should pass the Mock around, rather than the interceptor?
 			Guard.ArgumentNotNull(interceptor, "interceptor");
 
 			var lambda = expression.ToLambda();

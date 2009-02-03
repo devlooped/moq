@@ -40,6 +40,7 @@
 
 using System.Linq.Expressions;
 using Castle.Core.Interceptor;
+using System.Reflection;
 
 namespace Moq
 {
@@ -53,5 +54,10 @@ namespace Moq
 		bool IsNever { get; set; }
 		bool Invoked { get; set; }
 		Expression SetupExpression { get; }
+
+		// Where the setup was performed.
+		string FileName { get; }
+		int FileLine { get; }
+		MethodBase TestMethod { get; }
 	}
 }

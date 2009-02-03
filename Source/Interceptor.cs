@@ -89,16 +89,10 @@ namespace Moq
 			VerifyOrThrow(call => !call.IsNever && !call.Invoked);
 		}
 
-		private void VerifyOrThrow(Predicate<IProxyCall> match)
+		private void VerifyOrThrow(Func<IProxyCall, bool> match)
 		{
-			var failures = new List<KeyValuePair<Expression, string>>();
-			foreach (var call in calls.Values)
-			{
-				if (match(call))
-					failures.Add(new KeyValuePair<Expression,string>(
-						call.SetupExpression.PartialMatcherAwareEval(), 
-						call.FailMessage));
-			}
+			var failures = new List<IProxyCall>(
+				calls.Values.Where(match));
 
 			if (failures.Count > 0)
 			{

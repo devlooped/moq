@@ -1,5 +1,6 @@
 ﻿using System;
 using Xunit;
+using Moq;
 
 namespace Moq.Tests
 {
@@ -108,28 +109,6 @@ namespace Moq.Tests
 			catch (MockException mex)
 			{
 				Assert.Equal(MockException.ExceptionReason.VerificationFailed, mex.Reason);
-			}
-		}
-
-		[Fact]
-		public void RendersReadableMessageForVerifyFailures()
-		{
-			var mock = new Mock<IFoo>();
-
-			mock.Setup(x => x.Submit());
-			mock.Setup(x => x.Echo(1));
-			mock.Setup(x => x.Execute("ping"));
-
-			try
-			{
-				mock.VerifyAll();
-				Assert.True(false, "Should have thrown");
-			}
-			catch (Exception ex)
-			{
-				Assert.True(ex.Message.Contains("x => x.Submit()"));
-				Assert.True(ex.Message.Contains("x => x.Echo(1)"));
-				Assert.True(ex.Message.Contains("x => x.Execute(\"ping\")"));
 			}
 		}
 
@@ -450,6 +429,34 @@ namespace Moq.Tests
 			int Echo(int value);
 			void Submit();
 			string Execute(string command);
+		}
+	}
+}
+
+namespace SomeNamespace
+{
+	public class VerifyExceptionsFixture
+	{
+		[Fact]
+		public void RendersReadableMessageForVerifyFailures()
+		{
+			var mock = new Mock<Moq.Tests.VerifyFixture.IFoo>();
+
+			mock.Setup(x => x.Submit());
+			mock.Setup(x => x.Echo(1));
+			mock.Setup(x => x.Execute("ping"));
+
+			try
+			{
+				mock.VerifyAll();
+				Assert.True(false, "Should have thrown");
+			}
+			catch (Exception ex)
+			{
+				Assert.True(ex.Message.Contains("x => x.Submit()"));
+				Assert.True(ex.Message.Contains("x => x.Echo(1)"));
+				Assert.True(ex.Message.Contains("x => x.Execute(\"ping\")"));
+			}
 		}
 	}
 }

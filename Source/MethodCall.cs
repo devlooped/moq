@@ -47,6 +47,8 @@ using Castle.Core.Interceptor;
 using Moq.Language;
 using Moq.Language.Flow;
 using System.Globalization;
+using System.Diagnostics;
+using System.IO;
 
 namespace Moq
 {
@@ -63,6 +65,11 @@ namespace Moq
 		Delegate mockEventArgsFunc;
 		int? expectedCallCount = null;
 		List<KeyValuePair<int, object>> outValues = new List<KeyValuePair<int, object>>();
+
+		// Where the setup was performed.
+		public string FileName { get; private set; }
+		public int FileLine { get; private set; }
+		public MethodBase TestMethod { get; private set; }
 
 		public string FailMessage { get; set; }
 		public bool IsVerifiable { get; set; }
@@ -108,6 +115,39 @@ namespace Moq
 				{
 					argumentMatchers.Add(MatcherFactory.CreateMatcher(argument));
 				}
+			}
+
+			SetFileInfo();
+		}
+
+		private void SetFileInfo()
+		{
+			var thisMethod = MethodBase.GetCurrentMethod();
+			var stack = new StackTrace(true);
+			var index = 0;
+
+			// Move 'till our own frame first
+			while (stack.GetFrame(index).GetMethod() != thisMethod 
+				&& index <= stack.FrameCount)
+			{
+				index++;
+			}
+
+			// Move 'till we're at the entry point 
+			// into Moq API
+			// Move 'till our own frame first
+			while (stack.GetFrame(index).GetMethod().DeclaringType.Namespace.StartsWith("Moq")
+				&& index <= stack.FrameCount)
+			{
+				index++;
+			}
+
+			if (index < stack.FrameCount)
+			{
+				var frame = stack.GetFrame(index);
+				FileLine = frame.GetFileLineNumber();
+				FileName = Path.GetFileName(frame.GetFileName());
+				TestMethod = frame.GetMethod();
 			}
 		}
 
