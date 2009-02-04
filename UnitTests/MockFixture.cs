@@ -325,6 +325,24 @@ namespace Moq.Tests
 			mock.VerifyAll();
 		}
 
+		//[Fact]
+		//public void SetterLambdaUsesItIsAnyMatcher()
+		//{
+		//   var mock = new Mock<IFoo>();
+
+		//   mock.SetupSet(foo => foo.Count = It.IsAny<int>());
+
+		//   Assert.Throws<MockVerificationException>(() => mock.VerifyAll());
+
+		//   mock.Object.Count = 6;
+
+		//   Assert.Throws<MockVerificationException>(() => mock.VerifyAll());
+
+		//   mock.Object.Count = 5;
+
+		//   mock.VerifyAll();
+		//}
+
 		[Fact]
 		public void ExpectsPropertySetterLambdaCoercesNullable()
 		{
@@ -678,7 +696,7 @@ namespace Moq.Tests
 		{
 			object Object { get; set; }
 			IBar Bar { get; set; }
-			int Count { get; set; }
+			int Count { set; }
 			int? Value { get; set; }
 			int Echo(int value);
 			void Submit();
