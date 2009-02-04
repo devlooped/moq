@@ -452,7 +452,7 @@ namespace Moq
 		{
 			return SetupSetImpl<T1, SetterMethodCall<T1, TProperty>>(mock, setterExpression, 
 				(m, expr, method, value) => 
-					new SetterMethodCall<T1, TProperty>(m, expr, method, (TProperty)value));
+					new SetterMethodCall<T1, TProperty>(m, expr, method, value));
 		}
 
 		internal static MethodCall<T1> SetupSet<T1>(Mock<T1> mock,
@@ -461,16 +461,17 @@ namespace Moq
 		{
 			return SetupSetImpl<T1, MethodCall<T1>>(mock, setterExpression, 
 				(m, expr, method, value) => 
-					new MethodCall<T1>(m, expr, method, Expression.Constant(value)));
+					new MethodCall<T1>(m, expr, method, value));
 		}
 
 		private static TCall SetupSetImpl<T1, TCall>(Mock<T1> mock,
-			Action<T1> setterExpression, Func<Mock, Expression, MethodInfo, object, TCall> callFactory)
+			Action<T1> setterExpression, Func<Mock, Expression, MethodInfo, Expression, TCall> callFactory)
 			where T1 : class
 			where TCall : MethodCall
 		{
 			var reader = new ILReader(setterExpression.Method);
 			MethodBase setter = null;
+			MethodInfo matcher = null;
 
 			while (reader.Read())
 			{
@@ -478,33 +479,51 @@ namespace Moq
 					reader.OperandValueMethod.Name.StartsWith("set_"))
 				{
 					setter = reader.OperandValueMethod;
-					break;
 				}
+				else if (reader.OpCode == OpCodeEnum.Call || reader.OpCode == OpCodeEnum.Callvirt)
+				{
+					// See if we have a supported matcher invocation.
+					var m = reader.OperandValueMethod;
+					if (m.GetCustomAttribute<AdvancedMatcherAttribute>(true) != null ||
+						m.GetCustomAttribute<MatcherAttribute>(true) != null)
+					{
+						if (m.GetParameters().Length != 0)
+							throw new NotSupportedException(Properties.Resources.UnsupportedMatcherParamsForSetter);
+						if (!m.IsStatic)
+							throw new NotSupportedException(Properties.Resources.UnsupportedNonStaticMatcherForSetter);
+
+						// Can always cast as the matcher attribute is only valid on methods.
+						matcher = (MethodInfo)m;
+					}
+ 				}
 			}
 
 			if (setter == null)
-				throw new ArgumentException("Expression is not a property setter invocation.");
-			if (!setter.IsVirtual || setter.IsFinal || setter.IsPrivate)
-				throw new ArgumentException(
-					String.Format(CultureInfo.CurrentCulture,
-					Properties.Resources.SetupOnNonOverridableMember,
-					typeof(T1).Name + "." + setter.Name.Substring(4)));
+				throw new ArgumentException(Properties.Resources.SetupNotSetter);
+			ThrowIfCantOverride<T1>(setter);
 
 			using (var context = new FluentMockContext())
 			{
 				setterExpression(mock.Object);
 
 				var last = context.LastInvocation;
-				var x = Expression.Parameter(last.Mock.GetType().GetGenericArguments()[0], "x");
+				var x = Expression.Parameter(last.Invocation.Method.DeclaringType, "x");
 
-				// TODO: support for matchers
-				var value = last.Invocation.Arguments[0] != null &&
-					last.Invocation.Arguments[0].GetType() == setter.GetParameters()[0].ParameterType ?
-					// Add a cast if values do not match exactly (i.e. for Nullable<T>
-					(Expression)Expression.Constant(last.Invocation.Arguments[0]) :
-					(Expression)Expression.Convert(
-						Expression.Constant(last.Invocation.Arguments[0]), 
-						setter.GetParameters()[0].ParameterType);
+				Expression value;
+				if (matcher == null)
+				{
+					value = last.Invocation.Arguments[0] != null &&
+						last.Invocation.Arguments[0].GetType() == setter.GetParameters()[0].ParameterType ?
+						(Expression)Expression.Constant(last.Invocation.Arguments[0]) :
+						// Add a cast if values do not match exactly (i.e. for Nullable<T>)
+						(Expression)Expression.Convert(
+							Expression.Constant(last.Invocation.Arguments[0]),
+							setter.GetParameters()[0].ParameterType);
+				}
+				else
+				{
+					value = Expression.Call(matcher);
+				}
 
 				var lambda = Expression.Lambda(typeof(Action<>).MakeGenericType(x.Type),
 					Expression.Call(
@@ -513,7 +532,7 @@ namespace Moq
 						value),
 					x);
 
-				var call = callFactory(mock, lambda, last.Invocation.Method, last.Invocation.Arguments[0]);
+				var call = callFactory(mock, lambda, last.Invocation.Method, value);
 				var targetInterceptor = last.Mock.Interceptor;
 
 				targetInterceptor.AddCall(call, ExpectKind.PropertySet);
@@ -601,11 +620,25 @@ namespace Moq
 
 		private static void ThrowIfCantOverride(Expression setup, MethodInfo methodInfo)
 		{
-			if (!methodInfo.IsVirtual || methodInfo.IsFinal || methodInfo.IsPrivate)
+			if (CantOverride(methodInfo))
 				throw new ArgumentException(
 					String.Format(CultureInfo.CurrentCulture,
 					Properties.Resources.SetupOnNonOverridableMember,
 					setup.ToString()));
+		}
+
+		private static void ThrowIfCantOverride<T1>(MethodBase setter) where T1 : class
+		{
+			if (CantOverride(setter))
+				throw new ArgumentException(
+					String.Format(CultureInfo.CurrentCulture,
+					Properties.Resources.SetupOnNonOverridableMember,
+					typeof(T1).Name + "." + setter.Name.Substring(4)));
+		}
+		 
+		private static bool CantOverride(MethodBase method)
+		{
+			return !method.IsVirtual || method.IsFinal || method.IsPrivate;
 		}
 
 		class AutoMockPropertiesVisitor : ExpressionVisitor

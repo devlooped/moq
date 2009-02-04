@@ -231,4 +231,13 @@ Remember that there's no generics covariance in the CLR, so your object must be 
   <data name="MoreThanNCalls" xml:space="preserve">
     <value>Expected only {0} calls to {1}.</value>
   </data>
+  <data name="SetupNotSetter" xml:space="preserve">
+    <value>Expression is not a property setter invocation.</value>
+  </data>
+  <data name="UnsupportedMatcherParamsForSetter" xml:space="preserve">
+    <value>Setter expression cannot use argument matchers that receive parameters.</value>
+  </data>
+  <data name="UnsupportedNonStaticMatcherForSetter" xml:space="preserve">
+    <value>Setter expression can only use static custom matchers.</value>
+  </data>
 </root>

@@ -129,10 +129,7 @@ namespace Moq
 			return Mock.SetupSet(this, expression, value);
 		}
 	}
-//}
 
-//namespace Moq.Legacy
-//{
 	/// <summary>
 	/// Holds extensions that would cause conflicts with new APIs if available 
 	/// in the core Moq namespace (even if hidden), such as the SetupSet legacy 

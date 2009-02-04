@@ -18,6 +18,11 @@ namespace Moq
 		{
 		}
 
+		public SetterMethodCall(Mock mock, Expression originalExpression, MethodInfo method, Expression value)
+			: base(mock, originalExpression, method, new[] { value })
+		{
+		}
+
 		public ICallbackResult Callback(Action<TProperty> callback)
 		{
 			SetCallbackWithArguments(callback);

@@ -325,23 +325,40 @@ namespace Moq.Tests
 			mock.VerifyAll();
 		}
 
-		//[Fact]
-		//public void SetterLambdaUsesItIsAnyMatcher()
-		//{
-		//   var mock = new Mock<IFoo>();
+		[Fact]
+		public void SetterLambdaUsesItIsAnyMatcher()
+		{
+			var mock = new Mock<IFoo>();
 
-		//   mock.SetupSet(foo => foo.Count = It.IsAny<int>());
+			mock.SetupSet(foo => foo.Count = It.IsAny<int>());
 
-		//   Assert.Throws<MockVerificationException>(() => mock.VerifyAll());
+			Assert.Throws<MockVerificationException>(() => mock.VerifyAll());
 
-		//   mock.Object.Count = 6;
+			mock.Object.Count = 6;
 
-		//   Assert.Throws<MockVerificationException>(() => mock.VerifyAll());
+			mock.VerifyAll();
+		}
 
-		//   mock.Object.Count = 5;
+		[Fact]
+		public void SetterLambdaThrowsIfMatcherArguments()
+		{
+			var mock = new Mock<IFoo>();
 
-		//   mock.VerifyAll();
-		//}
+			Assert.Throws<NotSupportedException>(() =>
+				mock.SetupSet(foo => foo.Count = It.IsInRange<int>(1, 5, Range.Inclusive)));
+		}
+
+		[Fact]
+		public void SetterLambdaThrowsIfMatcherNonStatic()
+		{
+			var mock = new Mock<IFoo>();
+
+			Assert.Throws<NotSupportedException>(() => mock.SetupSet(foo => foo.Count = BigInt()));
+		}
+
+		[Matcher]
+		private int BigInt() { return 0; }
+		private bool BigInt(int value) { return value > 2; }
 
 		[Fact]
 		public void ExpectsPropertySetterLambdaCoercesNullable()
@@ -599,9 +616,6 @@ namespace Moq.Tests
 			Assert.Equal(2, mock.Object.Generic<int>());
 			Assert.Equal(3, mock.Object.Generic<string>());
 		}
-
-		// ShouldSupportByRefArguments?
-		// ShouldSupportOutArguments?
 
 		public class Foo
 		{

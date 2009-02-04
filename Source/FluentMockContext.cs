@@ -16,6 +16,7 @@ namespace Moq
 		List<MockInvocation> invocations = new List<MockInvocation>();
 
 		public static FluentMockContext Current { get { return current; } }
+		public static bool SkipRecording { get { return current != null; } }
 
 		public FluentMockContext()
 		{

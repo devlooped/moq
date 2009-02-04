@@ -292,6 +292,15 @@ namespace Moq.Properties {
         }
         
         /// <summary>
+        ///   Looks up a localized string similar to Expression is not a property setter invocation..
+        /// </summary>
+        internal static string SetupNotSetter {
+            get {
+                return ResourceManager.GetString("SetupNotSetter", resourceCulture);
+            }
+        }
+        
+        /// <summary>
         ///   Looks up a localized string similar to Invalid setup on a non-overridable member:
         ///{0}.
         /// </summary>
@@ -342,11 +351,29 @@ namespace Moq.Properties {
         }
         
         /// <summary>
+        ///   Looks up a localized string similar to Setter expression cannot use argument matchers that receive parameters..
+        /// </summary>
+        internal static string UnsupportedMatcherParamsForSetter {
+            get {
+                return ResourceManager.GetString("UnsupportedMatcherParamsForSetter", resourceCulture);
+            }
+        }
+        
+        /// <summary>
         ///   Looks up a localized string similar to Member {0} is not supported for protected mocking..
         /// </summary>
         internal static string UnsupportedMember {
             get {
                 return ResourceManager.GetString("UnsupportedMember", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Setter expression can only use static custom matchers..
+        /// </summary>
+        internal static string UnsupportedNonStaticMatcherForSetter {
+            get {
+                return ResourceManager.GetString("UnsupportedNonStaticMatcherForSetter", resourceCulture);
             }
         }
         

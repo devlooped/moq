@@ -503,14 +503,13 @@ namespace Moq
 
 					if (property.CanWrite && property.CanOverrideSet())
 					{
-						var resultSet = mock
-								.GetType()
+						var resultSet = typeof(MockExtensions)
 								.GetMethods()
 								// Couldn't make it work passing the generic types to GetMethod()
-								.Where(m => m.Name == "SetupSet" && m.GetParameters().Length == 1)
+								.Where(m => m.Name == "SetupSet" && m.GetParameters().Length == 2)
 								.First()
-								.MakeGenericMethod(property.PropertyType)
-								.Invoke(mock, new[] { expect });
+								.MakeGenericMethod(mock.GetType().GetGenericArguments()[0], property.PropertyType)
+								.Invoke(mock, new object[] { mock, expect });
 
 						var callbackSet = resultSet.GetType().GetMethod("Callback", new[] { typeof(Action<>).MakeGenericType(property.PropertyType) });
 
