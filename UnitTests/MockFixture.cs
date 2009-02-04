@@ -312,7 +312,7 @@ namespace Moq.Tests
 		{
 			var mock = new Mock<IFoo>();
 
-			mock.SetupSet<int?>(foo => foo.Value = 5);
+			mock.SetupSet(foo => foo.Count = 5);
 
 			Assert.Throws<MockVerificationException>(() => mock.VerifyAll());
 
@@ -326,12 +326,30 @@ namespace Moq.Tests
 		}
 
 		[Fact]
+		public void ExpectsPropertySetterLambdaCoercesNullable()
+		{
+			var mock = new Mock<IFoo>();
+
+			mock.SetupSet(foo => foo.Value = 5);
+
+			Assert.Throws<MockVerificationException>(() => mock.VerifyAll());
+
+			mock.Object.Value = 6;
+
+			Assert.Throws<MockVerificationException>(() => mock.VerifyAll());
+
+			mock.Object.Value = 5;
+
+			mock.VerifyAll();
+		}
+
+		[Fact]
 		public void ExpectsPropertySetterLambdaValueReference()
 		{
 			var mock = new Mock<IFoo>();
 			var obj = new object();
 
-			mock.SetupSet<object>(foo => foo.Object = obj);
+			mock.SetupSet(foo => foo.Object = obj);
 
 			Assert.Throws<MockVerificationException>(() => mock.VerifyAll());
 

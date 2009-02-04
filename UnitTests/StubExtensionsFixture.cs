@@ -7,30 +7,6 @@ namespace Moq.Tests
 	public class StubExtensionsFixture
 	{
 		[Fact]
-		public void ShouldExpectPropertyGetterAndSetterWithSameExpression()
-		{
-			var mock = new Mock<IFoo>();
-
-			mock.SetupGet(x => x.ValueProperty).Returns(25);
-			mock.SetupSet(x => x.ValueProperty);
-
-			mock.Object.ValueProperty = 7;
-			Assert.Equal(25, mock.Object.ValueProperty);
-		}
-
-		[Fact]
-		public void ShouldExpectPropertyGetterAndSetterWithoutSameExpression()
-		{
-			var mock = new Mock<IFoo>();
-
-			mock.SetupGet(x => x.ValueProperty).Returns(25);
-			mock.SetupSet(y => y.ValueProperty);
-
-			mock.Object.ValueProperty = 7;
-			Assert.Equal(25, mock.Object.ValueProperty);
-		}
-
-		[Fact]
 		public void ShouldStubPropertyWithoutInitialValue()
 		{
 			var mock = new Mock<IFoo>();

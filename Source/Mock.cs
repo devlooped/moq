@@ -450,6 +450,25 @@ namespace Moq
 			Action<T1> setterExpression)
 			where T1 : class
 		{
+			return SetupSetImpl<T1, SetterMethodCall<T1, TProperty>>(mock, setterExpression, 
+				(m, expr, method, value) => 
+					new SetterMethodCall<T1, TProperty>(m, expr, method, (TProperty)value));
+		}
+
+		internal static MethodCall<T1> SetupSet<T1>(Mock<T1> mock,
+			Action<T1> setterExpression)
+			where T1 : class
+		{
+			return SetupSetImpl<T1, MethodCall<T1>>(mock, setterExpression, 
+				(m, expr, method, value) => 
+					new MethodCall<T1>(m, expr, method, Expression.Constant(value)));
+		}
+
+		private static TCall SetupSetImpl<T1, TCall>(Mock<T1> mock,
+			Action<T1> setterExpression, Func<Mock, Expression, MethodInfo, object, TCall> callFactory)
+			where T1 : class
+			where TCall : MethodCall
+		{
 			var reader = new ILReader(setterExpression.Method);
 			MethodBase setter = null;
 
@@ -477,16 +496,24 @@ namespace Moq
 
 				var last = context.LastInvocation;
 				var x = Expression.Parameter(last.Mock.GetType().GetGenericArguments()[0], "x");
-				var lambda = Expression.Lambda(typeof(Action<>).MakeGenericType(x.Type), 
+
+				// TODO: support for matchers
+				var value = last.Invocation.Arguments[0] != null &&
+					last.Invocation.Arguments[0].GetType() == setter.GetParameters()[0].ParameterType ?
+					// Add a cast if values do not match exactly (i.e. for Nullable<T>
+					(Expression)Expression.Constant(last.Invocation.Arguments[0]) :
+					(Expression)Expression.Convert(
+						Expression.Constant(last.Invocation.Arguments[0]), 
+						setter.GetParameters()[0].ParameterType);
+
+				var lambda = Expression.Lambda(typeof(Action<>).MakeGenericType(x.Type),
 					Expression.Call(
 						x,
 						last.Invocation.Method,
-						// TODO: support for matchers
-						Expression.Constant(last.Invocation.Arguments[0])), 
+						value),
 					x);
 
-				var call = new SetterMethodCall<T1, TProperty>(mock, lambda, last.Invocation.Method, 
-					(TProperty)last.Invocation.Arguments[0]);
+				var call = callFactory(mock, lambda, last.Invocation.Method, last.Invocation.Arguments[0]);
 				var targetInterceptor = last.Mock.Interceptor;
 
 				targetInterceptor.AddCall(call, ExpectKind.PropertySet);
@@ -495,7 +522,9 @@ namespace Moq
 			}
 		}
 
-		internal static SetterMethodCall<T1, TProperty> SetupSet<T1, TProperty>(Mock mock, 
+		#region Legacy
+
+		internal static SetterMethodCall<T1, TProperty> SetupSet<T1, TProperty>(Mock mock,
 			Expression<Func<T1, TProperty>> expression)
 		{
 			var prop = expression.ToLambda().ToPropertyInfo();
@@ -512,7 +541,7 @@ namespace Moq
 			return call;
 		}
 
-		internal static SetterMethodCall<T1, TProperty> SetupSet<T1, TProperty>(Mock mock, 
+		internal static SetterMethodCall<T1, TProperty> SetupSet<T1, TProperty>(Mock mock,
 			Expression<Func<T1, TProperty>> expression, TProperty value)
 		{
 			var lambda = expression.ToLambda();
@@ -529,6 +558,8 @@ namespace Moq
 
 			return call;
 		}
+
+		#endregion
 
 		/// <summary>
 		/// Gets the interceptor target for the given expression and root mock, 

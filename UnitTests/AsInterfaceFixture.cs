@@ -53,7 +53,7 @@ namespace Moq.Tests
 			bool called = false;
 			int value = 0;
 			var mock = new Mock<IBag>();
-			mock.As<IFoo>().SetupSet(x => x.Value).Callback(i => { value = i; called = true; });
+			mock.As<IFoo>().SetupSet(x => x.Value = 100).Callback<int>(i => { value = i; called = true; });
 
 			((IFoo)mock.Object).Value = 100;
 

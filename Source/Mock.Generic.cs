@@ -355,6 +355,26 @@ namespace Moq
 		}
 
 		/// <summary>
+		/// Specifies a setup on the mocked type for a call to 
+		/// to a property setter. Argument matchers are not supported.
+		/// </summary>
+		/// <remarks>
+		/// If more than one setup is set for the same property setter, 
+		/// the latest one wins and is the one that will be executed.
+		/// </remarks>
+		/// <typeparam name="TProperty">Type of the property. Typically omitted as it can be inferred from the expression.</typeparam>
+		/// <param name="propertySetExpression">Lambda expression that sets a property to a value.</param>
+		/// <example group="setups">
+		/// <code>
+		/// mock.SetupSet(x =&gt; x.Suspended = true);
+		/// </code>
+		/// </example>
+		public virtual ISetup<T> SetupSet(Action<T> propertySetExpression)
+		{
+			return Mock.SetupSet<T>(this, propertySetExpression);
+		}
+
+		/// <summary>
 		/// Specifies that the given property should have "property behavior", 
 		/// meaning that setting its value will cause it to be saved and 
 		/// later returned when the property is requested. (this is also 

@@ -8,52 +8,6 @@ using System.Linq.Expressions;
 
 namespace Moq
 {
-	public static class MockExtensions
-	{
-		/// <summary>
-		/// Specifies a setup on the mocked type for a call to 
-		/// to a property setter.
-		/// </summary>
-		/// <remarks>
-		/// If more than one setup is set for the same property setter, 
-		/// the latest one wins and is the one that will be executed.
-		/// </remarks>
-		/// <typeparam name="TProperty">Type of the property. Typically omitted as it can be inferred from the expression.</typeparam>
-		/// <param name="expression">Lambda expression that specifies the property setter.</param>
-		/// <example group="setups">
-		/// <code>
-		/// mock.SetupSet(x =&gt; x.Suspended);
-		/// </code>
-		/// </example>
-		public static ISetupSetter<T, TProperty> SetupSet<T, TProperty>(this Mock<T> mock, Expression<Func<T, TProperty>> expression)
-			where T : class
-		{
-			return Mock.SetupSet<T, TProperty>(mock, expression);
-		}
-
-		/// <summary>
-		/// Specifies a setup on the mocked type for a call to 
-		/// to a property setter with a specific value.
-		/// </summary>
-		/// <remarks>
-		/// More than one setup can be set for the setter with 
-		/// different values.
-		/// </remarks>
-		/// <typeparam name="TProperty">Type of the property. Typically omitted as it can be inferred from the expression.</typeparam>
-		/// <param name="expression">Lambda expression that specifies the property setter.</param>
-		/// <param name="value">The value to be set for the property.</param>
-		/// <example group="setups">
-		/// <code>
-		/// mock.SetupSet(x =&gt; x.Suspended, true);
-		/// </code>
-		/// </example>
-		public static ISetupSetter<T, TProperty> SetupSet<T, TProperty>(this Mock<T> mock, Expression<Func<T, TProperty>> expression, TProperty value)
-			where T : class
-		{
-			return Mock.SetupSet(mock, expression, value);
-		}
-	}
-
 	// Keeps legacy members that are hidden and are provided 
 	// for backwards compatibility (so that existing projects 
 	// still compile, but people don't see them).
@@ -173,6 +127,60 @@ namespace Moq
 		public ISetupSetter<T, TProperty> ExpectSet<TProperty>(Expression<Func<T, TProperty>> expression, TProperty value)
 		{
 			return Mock.SetupSet(this, expression, value);
+		}
+	}
+//}
+
+//namespace Moq.Legacy
+//{
+	/// <summary>
+	/// Holds extensions that would cause conflicts with new APIs if available 
+	/// in the core Moq namespace (even if hidden), such as the SetupSet legacy 
+	/// members.
+	/// </summary>
+	public static class MockExtensions
+	{
+		/// <summary>
+		/// Specifies a setup on the mocked type for a call to 
+		/// to a property setter.
+		/// </summary>
+		/// <remarks>
+		/// If more than one setup is set for the same property setter, 
+		/// the latest one wins and is the one that will be executed.
+		/// </remarks>
+		/// <typeparam name="TProperty">Type of the property. Typically omitted as it can be inferred from the expression.</typeparam>
+		/// <param name="expression">Lambda expression that specifies the property setter.</param>
+		/// <example group="setups">
+		/// <code>
+		/// mock.SetupSet(x =&gt; x.Suspended);
+		/// </code>
+		/// </example>
+		public static ISetupSetter<T, TProperty> SetupSet<T, TProperty>(this Mock<T> mock, Expression<Func<T, TProperty>> expression)
+			where T : class
+		{
+			return Mock.SetupSet<T, TProperty>(mock, expression);
+		}
+
+		/// <summary>
+		/// Specifies a setup on the mocked type for a call to 
+		/// to a property setter with a specific value.
+		/// </summary>
+		/// <remarks>
+		/// More than one setup can be set for the setter with 
+		/// different values.
+		/// </remarks>
+		/// <typeparam name="TProperty">Type of the property. Typically omitted as it can be inferred from the expression.</typeparam>
+		/// <param name="expression">Lambda expression that specifies the property setter.</param>
+		/// <param name="value">The value to be set for the property.</param>
+		/// <example group="setups">
+		/// <code>
+		/// mock.SetupSet(x =&gt; x.Suspended, true);
+		/// </code>
+		/// </example>
+		public static ISetupSetter<T, TProperty> SetupSet<T, TProperty>(this Mock<T> mock, Expression<Func<T, TProperty>> expression, TProperty value)
+			where T : class
+		{
+			return Mock.SetupSet(mock, expression, value);
 		}
 	}
 }
