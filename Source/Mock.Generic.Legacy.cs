@@ -146,6 +146,8 @@ namespace Moq
 		/// the latest one wins and is the one that will be executed.
 		/// </remarks>
 		/// <typeparam name="TProperty">Type of the property. Typically omitted as it can be inferred from the expression.</typeparam>
+		/// <typeparam name="T">Type of the mock.</typeparam>
+		/// <param name="mock">The target mock for the setup.</param>
 		/// <param name="expression">Lambda expression that specifies the property setter.</param>
 		/// <example group="setups">
 		/// <code>
@@ -167,6 +169,8 @@ namespace Moq
 		/// different values.
 		/// </remarks>
 		/// <typeparam name="TProperty">Type of the property. Typically omitted as it can be inferred from the expression.</typeparam>
+		/// <typeparam name="T">Type of the mock.</typeparam>
+		/// <param name="mock">The target mock for the setup.</param>
 		/// <param name="expression">Lambda expression that specifies the property setter.</param>
 		/// <param name="value">The value to be set for the property.</param>
 		/// <example group="setups">

@@ -326,6 +326,27 @@ namespace Moq.Tests
 		}
 
 		[Fact]
+		public void CallbackReceivesValueWithPropertySetterLambda()
+		{
+			var mock = new Mock<IFoo>();
+			int value = 0;
+			int value2 = 0;
+
+			mock.SetupSet(foo => foo.Count = It.IsAny<int>()).Callback<int>(v => value = v);
+			mock.SetupSet<int>(foo => foo.Count = 3).Callback(v => value2 = v);
+
+			mock.Object.Count = 6;
+
+			Assert.Equal(6, value);
+			Assert.Equal(0, value2);
+
+			mock.Object.Count = 3;
+
+			Assert.Equal(3, value2);
+		}
+
+
+		[Fact]
 		public void SetterLambdaUsesItIsAnyMatcher()
 		{
 			var mock = new Mock<IFoo>();
