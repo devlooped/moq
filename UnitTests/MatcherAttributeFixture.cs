@@ -25,6 +25,24 @@ namespace Moq.Tests
 		public bool Any<T>(T value) { return true; }
 
 		[Fact]
+		public void ShouldFindPrivateMethodMatcher()
+		{
+			var foo = new Mock<IFoo>();
+
+			foo.Object.Bar("asd");
+
+			Assert.Throws<MockException>(() => foo.Verify(f => f.Bar(OddLength())));
+
+			foo.Object.Bar("asdf");
+
+			foo.Verify(f => f.Bar(OddLength()));
+		}
+
+		[Matcher]
+		private static string OddLength() { return default(string); }
+		private static bool OddLength(string value) { return value.Length % 2 == 0; }
+
+		[Fact]
 		public void ShouldTranslateToUseMatcherImplementation()
 		{			
 			var mock = new Mock<IFoo>(MockBehavior.Strict);

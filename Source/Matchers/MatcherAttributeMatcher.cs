@@ -108,7 +108,14 @@ namespace Moq.Matchers
 			}
 			else
 			{
-				method = call.Method.DeclaringType.GetMethod(call.Method.Name, expectedParametersTypes);
+				method = call.Method.DeclaringType.GetMethod(call.Method.Name,
+						BindingFlags.Public |
+						BindingFlags.NonPublic |
+						BindingFlags.Static |
+						BindingFlags.Instance,
+						null, 
+						expectedParametersTypes, 
+						null);
 			}
 
 			// throw if validatorMethod doesn't exists			

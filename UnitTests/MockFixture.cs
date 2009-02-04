@@ -340,6 +340,24 @@ namespace Moq.Tests
 		}
 
 		[Fact]
+		public void SetterLambdaUsesCustomMatcher()
+		{
+			var mock = new Mock<IFoo>();
+
+			mock.SetupSet(foo => foo.Count = OddInt());
+
+			Assert.Throws<MockVerificationException>(() => mock.VerifyAll());
+
+			mock.Object.Count = 3;
+
+			Assert.Throws<MockVerificationException>(() => mock.VerifyAll());
+
+			mock.Object.Count = 6;
+
+			mock.VerifyAll();
+		}
+
+		[Fact]
 		public void SetterLambdaThrowsIfMatcherArguments()
 		{
 			var mock = new Mock<IFoo>();
@@ -355,6 +373,10 @@ namespace Moq.Tests
 
 			Assert.Throws<NotSupportedException>(() => mock.SetupSet(foo => foo.Count = BigInt()));
 		}
+
+		[Matcher]
+		private static int OddInt() { return 0; }
+		private static bool OddInt(int value) { return value % 2 == 0; }
 
 		[Matcher]
 		private int BigInt() { return 0; }
