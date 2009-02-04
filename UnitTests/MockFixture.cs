@@ -19,13 +19,8 @@ namespace Moq.Tests
 		[Fact]
 		public void ReadsIL()
 		{
-			Action<System.ComponentModel.IComponent> action = f => f.Disposed += null;
-
-			var reader = new Indy.IL2CPU.IL.ILReader(action.Method);
-			while (reader.Read())
-			{
-				Console.WriteLine(reader.OpCode);
-			}
+			var value = 5;
+			Action<IFoo> action = f => f.Value = value;
 		}
 
 		[Fact]
@@ -313,6 +308,57 @@ namespace Moq.Tests
 		}
 
 		[Fact]
+		public void ExpectsPropertySetterLambda()
+		{
+			var mock = new Mock<IFoo>();
+
+			mock.SetupSet<int?>(foo => foo.Value = 5);
+
+			Assert.Throws<MockVerificationException>(() => mock.VerifyAll());
+
+			mock.Object.Count = 6;
+
+			Assert.Throws<MockVerificationException>(() => mock.VerifyAll());
+
+			mock.Object.Count = 5;
+
+			mock.VerifyAll();
+		}
+
+		[Fact]
+		public void ExpectsPropertySetterLambdaValueReference()
+		{
+			var mock = new Mock<IFoo>();
+			var obj = new object();
+
+			mock.SetupSet<object>(foo => foo.Object = obj);
+
+			Assert.Throws<MockVerificationException>(() => mock.VerifyAll());
+
+			mock.Object.Object = new object();
+
+			Assert.Throws<MockVerificationException>(() => mock.VerifyAll());
+
+			mock.Object.Object = obj;
+
+			mock.VerifyAll();
+		}
+
+		[Fact]
+		public void ExpectsPropertySetterLambdaRecursive()
+		{
+			var mock = new Mock<IFoo>();
+
+			mock.SetupSet<string>(foo => foo.Bar.Value = "bar");
+
+			Assert.Throws<MockVerificationException>(() => mock.VerifyAll());
+
+			mock.Object.Bar.Value = "bar";
+
+			mock.VerifyAll();
+		}
+
+		[Fact]
 		public void ExpectsPropertySetterWithNullValue()
 		{
 			var mock = new Mock<IFoo>(MockBehavior.Strict);
@@ -535,10 +581,12 @@ namespace Moq.Tests
 
 		public class Bar : IBar
 		{
+			public string Value { get; set; }
 		}
 
 		public interface IBar
 		{
+			string Value { get; set; }
 		}
 
 		interface IDo { void Do(); }
@@ -610,6 +658,9 @@ namespace Moq.Tests
 
 		public interface IFoo
 		{
+			object Object { get; set; }
+			IBar Bar { get; set; }
+			int Count { get; set; }
 			int? Value { get; set; }
 			int Echo(int value);
 			void Submit();

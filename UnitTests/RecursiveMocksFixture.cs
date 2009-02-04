@@ -16,6 +16,17 @@ namespace Moq.Tests
 		}
 
 		[Fact]
+		public void RetrievesSameMockForProperty()
+		{
+			var mock = new Mock<IFoo> { DefaultValue = DefaultValue.Mock };
+
+			var b1 = mock.Object.Bar;
+			var b2 = mock.Object.Bar;
+
+			Assert.Same(b1, b2);
+		}
+
+		[Fact]
 		public void NewMocksHaveSameBehaviorAndDefaultValueAsOwner()
 		{
 			var mock = new Mock<IFoo>();

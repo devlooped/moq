@@ -124,6 +124,9 @@ namespace Moq
 
 		public void Intercept(IInvocation invocation)
 		{
+			if (FluentMockContext.Current != null)
+				FluentMockContext.Current.Add(mock, invocation);
+
 			// TODO: too many ifs in this method.
 			// see how to refactor with strategies.
 			if (invocation.Method.DeclaringType.IsGenericType &&
@@ -230,7 +233,11 @@ namespace Moq
 			else if (invocation.Method != null && invocation.Method.ReturnType != null &&
 			  invocation.Method.ReturnType != typeof(void))
 			{
-				invocation.ReturnValue = mock.DefaultValueProvider.ProvideDefault(invocation.Method, invocation.Arguments);
+				Mock recursiveMock;
+				if (mock.InnerMocks.TryGetValue(invocation.Method, out recursiveMock))
+					invocation.ReturnValue = recursiveMock.Object;
+				else
+					invocation.ReturnValue = mock.DefaultValueProvider.ProvideDefault(invocation.Method, invocation.Arguments);
 			}
 		}
 

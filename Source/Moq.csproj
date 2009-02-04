@@ -160,6 +160,7 @@
       <SubType>Code</SubType>
     </Compile>
     <Compile Include="Mock.Legacy.cs" />
+    <Compile Include="FluentMockContext.cs" />
     <Compile Include="MockDefaultValueProvider.cs" />
     <Compile Include="MockedEvent.Generic.cs" />
     <Compile Include="SetterMethodCall.cs" />

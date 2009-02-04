@@ -45,6 +45,7 @@ using System.Linq;
 using System.Linq.Expressions;
 using System.Reflection;
 using System.Globalization;
+using Indy.IL2CPU.IL;
 
 namespace Moq
 {
@@ -440,6 +441,55 @@ namespace Moq
 				var targetInterceptor = GetInterceptor(expression, mock);
 
 				targetInterceptor.AddCall(call, ExpectKind.Other);
+
+				return call;
+			}
+		}
+
+		internal static SetterMethodCall<T1, TProperty> SetupSet<T1, TProperty>(Mock<T1> mock,
+			Action<T1> setterExpression)
+			where T1 : class
+		{
+			var reader = new ILReader(setterExpression.Method);
+			MethodBase setter = null;
+
+			while (reader.Read())
+			{
+				if (reader.OpCode == OpCodeEnum.Callvirt &&
+					reader.OperandValueMethod.Name.StartsWith("set_"))
+				{
+					setter = reader.OperandValueMethod;
+					break;
+				}
+			}
+
+			if (setter == null)
+				throw new ArgumentException("Expression is not a property setter invocation.");
+			if (!setter.IsVirtual || setter.IsFinal || setter.IsPrivate)
+				throw new ArgumentException(
+					String.Format(CultureInfo.CurrentCulture,
+					Properties.Resources.SetupOnNonOverridableMember,
+					typeof(T1).Name + "." + setter.Name.Substring(4)));
+
+			using (var context = new FluentMockContext())
+			{
+				setterExpression(mock.Object);
+
+				var last = context.LastInvocation;
+				var x = Expression.Parameter(last.Mock.GetType().GetGenericArguments()[0], "x");
+				var lambda = Expression.Lambda(typeof(Action<>).MakeGenericType(x.Type), 
+					Expression.Call(
+						x,
+						last.Invocation.Method,
+						// TODO: support for matchers
+						Expression.Constant(last.Invocation.Arguments[0])), 
+					x);
+
+				var call = new SetterMethodCall<T1, TProperty>(mock, lambda, last.Invocation.Method, 
+					(TProperty)last.Invocation.Arguments[0]);
+				var targetInterceptor = last.Mock.Interceptor;
+
+				targetInterceptor.AddCall(call, ExpectKind.PropertySet);
 
 				return call;
 			}

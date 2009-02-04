@@ -310,7 +310,7 @@ namespace Moq
 		/// </example>
 		public virtual ISetup<T, TResult> Setup<TResult>(Expression<Func<T, TResult>> expression)
 		{
-			return Setup(this, expression);
+			return Mock.Setup(this, expression);
 		}
 
 		/// <summary>
@@ -331,48 +331,27 @@ namespace Moq
 		/// </example>
 		public virtual ISetupGetter<T, TProperty> SetupGet<TProperty>(Expression<Func<T, TProperty>> expression)
 		{
-			return SetupGet(this, expression);
+			return Mock.SetupGet(this, expression);
 		}
 
 		/// <summary>
 		/// Specifies a setup on the mocked type for a call to 
-		/// to a property setter.
+		/// to a property setter. Argument matchers are not supported.
 		/// </summary>
 		/// <remarks>
 		/// If more than one setup is set for the same property setter, 
 		/// the latest one wins and is the one that will be executed.
 		/// </remarks>
 		/// <typeparam name="TProperty">Type of the property. Typically omitted as it can be inferred from the expression.</typeparam>
-		/// <param name="expression">Lambda expression that specifies the property setter.</param>
+		/// <param name="propertySetExpression">Lambda expression that sets a property to a value.</param>
 		/// <example group="setups">
 		/// <code>
-		/// mock.SetupSet(x =&gt; x.Suspended);
+		/// mock.SetupSet(x =&gt; x.Suspended = true);
 		/// </code>
 		/// </example>
-		public virtual ISetupSetter<T, TProperty> SetupSet<TProperty>(Expression<Func<T, TProperty>> expression)
+		public virtual ISetupSetter<T, TProperty> SetupSet<TProperty>(Action<T> propertySetExpression)
 		{
-			return SetupSet<T, TProperty>(this, expression);
-		}
-
-		/// <summary>
-		/// Specifies a setup on the mocked type for a call to 
-		/// to a property setter with a specific value.
-		/// </summary>
-		/// <remarks>
-		/// More than one setup can be set for the setter with 
-		/// different values.
-		/// </remarks>
-		/// <typeparam name="TProperty">Type of the property. Typically omitted as it can be inferred from the expression.</typeparam>
-		/// <param name="expression">Lambda expression that specifies the property setter.</param>
-		/// <param name="value">The value to be set for the property.</param>
-		/// <example group="setups">
-		/// <code>
-		/// mock.SetupSet(x =&gt; x.Suspended, true);
-		/// </code>
-		/// </example>
-		public virtual ISetupSetter<T, TProperty> SetupSet<TProperty>(Expression<Func<T, TProperty>> expression, TProperty value)
-		{
-			return SetupSet(this, expression, value);
+			return Mock.SetupSet<T, TProperty>(this, propertySetExpression);
 		}
 
 		/// <summary>
@@ -441,7 +420,7 @@ namespace Moq
 		{
 			TProperty value = initialValue;
 			SetupGet(property).Returns(() => value);
-			SetupSet(property).Callback(p => value = p);
+			SetupSet<T, TProperty>(this, property).Callback(p => value = p);
 		}
 
 		/// <summary>
@@ -507,7 +486,7 @@ namespace Moq
 						var resultSet = mock
 								.GetType()
 								.GetMethods()
-							// Couldn't make it work passing the generic types to GetMethod()
+								// Couldn't make it work passing the generic types to GetMethod()
 								.Where(m => m.Name == "SetupSet" && m.GetParameters().Length == 1)
 								.First()
 								.MakeGenericMethod(property.PropertyType)
@@ -889,15 +868,15 @@ namespace Moq
 				return Mock.SetupGet(owner, expression);
 			}
 
-			public override ISetupSetter<TInterface, TProperty> SetupSet<TProperty>(Expression<Func<TInterface, TProperty>> expression)
-			{
-				return Mock.SetupSet(owner, expression);
-			}
+			//public override ISetupSetter<TInterface, TProperty> SetupSet<TProperty>(Expression<Func<TInterface, TProperty>> expression)
+			//{
+			//   return Mock.SetupSet(owner, expression);
+			//}
 
-			public override ISetupSetter<TInterface, TProperty> SetupSet<TProperty>(Expression<Func<TInterface, TProperty>> expression, TProperty value)
-			{
-				return Mock.SetupSet(owner, expression, value);
-			}
+			//public override ISetupSetter<TInterface, TProperty> SetupSet<TProperty>(Expression<Func<TInterface, TProperty>> expression, TProperty value)
+			//{
+			//   return Mock.SetupSet(owner, expression, value);
+			//}
 
 			internal override Dictionary<MethodInfo, Mock> InnerMocks
 			{
