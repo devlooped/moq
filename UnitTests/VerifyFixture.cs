@@ -421,6 +421,20 @@ namespace Moq.Tests
 			mock.Verify(m => m.EchoOut(out expected));
 		}
 
+		[Fact]
+		public void VerifiesTimes()
+		{
+			var mock = new Mock<IFoo>();
+
+			//Assert.Throws<MockException>(mock.Verify(f => f.Execute("ping"), 1));
+
+			//mock.Object.Execute("ping");
+
+			//mock.Verify(f => f.Execute("ping"), 1);
+		}
+
+
+
 		public interface IFoo
 		{
 			int? Value { get; set; }

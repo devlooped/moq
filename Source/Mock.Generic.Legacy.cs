@@ -154,6 +154,7 @@ namespace Moq
 		/// mock.SetupSet(x =&gt; x.Suspended);
 		/// </code>
 		/// </example>
+		[EditorBrowsable(EditorBrowsableState.Never)]
 		public static ISetupSetter<T, TProperty> SetupSet<T, TProperty>(this Mock<T> mock, Expression<Func<T, TProperty>> expression)
 			where T : class
 		{
@@ -178,10 +179,125 @@ namespace Moq
 		/// mock.SetupSet(x =&gt; x.Suspended, true);
 		/// </code>
 		/// </example>
+		[EditorBrowsable(EditorBrowsableState.Never)]
 		public static ISetupSetter<T, TProperty> SetupSet<T, TProperty>(this Mock<T> mock, Expression<Func<T, TProperty>> expression, TProperty value)
 			where T : class
 		{
 			return Mock.SetupSet(mock, expression, value);
+		}
+
+		/// <summary>
+		/// Verifies that a property has been set on the mock. 
+		/// Use in conjuntion with the default <see cref="MockBehavior.Loose"/>.
+		/// </summary>
+		/// <example group="verification">
+		/// This example assumes that the mock has been used, 
+		/// and later we want to verify that a given invocation 
+		/// with specific parameters was performed:
+		/// <code>
+		/// var mock = new Mock&lt;IWarehouse&gt;();
+		/// // exercise mock
+		/// //...
+		/// // Will throw if the test code didn't set the IsClosed property.
+		/// mock.VerifySet(warehouse =&gt; warehouse.IsClosed);
+		/// </code>
+		/// </example>
+		/// <exception cref="MockException">The invocation was not performed on the mock.</exception>
+		/// <param name="expression">Expression to verify.</param>
+		/// <typeparam name="TProperty">Type of the property to verify. Typically omitted as it can 
+		/// be inferred from the expression's return type.</typeparam>
+		[EditorBrowsable(EditorBrowsableState.Never)]
+		public static void VerifySet<T, TProperty>(this Mock<T> mock, Expression<Func<T, TProperty>> expression)
+			where T : class
+		{
+			Mock.VerifySet(mock, expression, null);
+		}
+
+		/// <summary>
+		/// Verifies that a property has been set on the mock to the given value.
+		/// Use in conjuntion with the default <see cref="MockBehavior.Loose"/>.
+		/// </summary>
+		/// <example group="verification">
+		/// This example assumes that the mock has been used, 
+		/// and later we want to verify that a given invocation 
+		/// with specific parameters was performed:
+		/// <code>
+		/// var mock = new Mock&lt;IWarehouse&gt;();
+		/// // exercise mock
+		/// //...
+		/// // Will throw if the test code didn't set the IsClosed property to true
+		/// mock.VerifySet(warehouse =&gt; warehouse.IsClosed, true);
+		/// </code>
+		/// </example>
+		/// <exception cref="MockException">The invocation was not performed on the mock.</exception>
+		/// <param name="expression">Expression to verify.</param>
+		/// <param name="value">The value that should have been set on the property.</param>
+		/// <typeparam name="TProperty">Type of the property to verify. Typically omitted as it can 
+		/// be inferred from the expression's return type.</typeparam>
+		[EditorBrowsable(EditorBrowsableState.Never)]
+		public static void VerifySet<T, TProperty>(this Mock<T> mock, Expression<Func<T, TProperty>> expression, TProperty value)
+			where T : class
+		{
+			Mock.VerifySet(mock, expression, value, null);
+		}
+
+		/// <summary>
+		/// Verifies that a property has been set on the mock, specifying a failure  
+		/// error message. 
+		/// Use in conjuntion with the default <see cref="MockBehavior.Loose"/>.
+		/// </summary>
+		/// <example group="verification">
+		/// This example assumes that the mock has been used, 
+		/// and later we want to verify that a given invocation 
+		/// with specific parameters was performed:
+		/// <code>
+		/// var mock = new Mock&lt;IWarehouse&gt;();
+		/// // exercise mock
+		/// //...
+		/// // Will throw if the test code didn't set the IsClosed property.
+		/// mock.VerifySet(warehouse =&gt; warehouse.IsClosed);
+		/// </code>
+		/// </example>
+		/// <exception cref="MockException">The invocation was not performed on the mock.</exception>
+		/// <param name="expression">Expression to verify.</param>
+		/// <param name="failMessage">Message to show if verification fails.</param>
+		/// <typeparam name="TProperty">Type of the property to verify. Typically omitted as it can 
+		/// be inferred from the expression's return type.</typeparam>
+		[EditorBrowsable(EditorBrowsableState.Never)]
+		public static void VerifySet<T, TProperty>(this Mock<T> mock, Expression<Func<T, TProperty>> expression, string failMessage)
+			where T : class
+		{
+			Mock.VerifySet(mock, expression, failMessage);
+		}
+
+		/// <summary>
+		/// Verifies that a property has been set on the mock to the given value, specifying a failure  
+		/// error message. 
+		/// Use in conjuntion with the default <see cref="MockBehavior.Loose"/>.
+		/// </summary>
+		/// <example group="verification">
+		/// This example assumes that the mock has been used, 
+		/// and later we want to verify that a given invocation 
+		/// with specific parameters was performed:
+		/// <code>
+		/// var mock = new Mock&lt;IWarehouse&gt;();
+		/// // exercise mock
+		/// //...
+		/// // Will throw if the test code didn't set the IsClosed property to true
+		/// mock.VerifySet(warehouse =&gt; warehouse.IsClosed, true);
+		/// </code>
+		/// </example>
+		/// <exception cref="MockException">The invocation was not performed on the mock.</exception>
+		/// <param name="expression">Expression to verify.</param>
+		/// <param name="value">The value that should have been set on the property.</param>
+		/// <param name="failMessage">Message to show if verification fails.</param>
+		/// <typeparam name="TProperty">Type of the property to verify. Typically omitted as it can 
+		/// be inferred from the expression's return type.</typeparam>
+		[EditorBrowsable(EditorBrowsableState.Never)]
+		public static void VerifySet<T, TProperty>(this Mock<T> mock, Expression<Func<T, TProperty>> expression, TProperty value, string failMessage)
+			where T : class
+		{
+			Mock.VerifySet(mock, expression, value, failMessage);
 		}
 	}
 }
