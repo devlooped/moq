@@ -204,6 +204,8 @@ namespace Moq
 		/// </example>
 		/// <exception cref="MockException">The invocation was not performed on the mock.</exception>
 		/// <param name="expression">Expression to verify.</param>
+		/// <param name="mock">The mock instance.</param>
+		/// <typeparam name="T">Mocked type.</typeparam>
 		/// <typeparam name="TProperty">Type of the property to verify. Typically omitted as it can 
 		/// be inferred from the expression's return type.</typeparam>
 		[EditorBrowsable(EditorBrowsableState.Never)]
@@ -232,6 +234,8 @@ namespace Moq
 		/// <exception cref="MockException">The invocation was not performed on the mock.</exception>
 		/// <param name="expression">Expression to verify.</param>
 		/// <param name="value">The value that should have been set on the property.</param>
+		/// <param name="mock">The mock instance.</param>
+		/// <typeparam name="T">Mocked type.</typeparam>
 		/// <typeparam name="TProperty">Type of the property to verify. Typically omitted as it can 
 		/// be inferred from the expression's return type.</typeparam>
 		[EditorBrowsable(EditorBrowsableState.Never)]
@@ -261,6 +265,8 @@ namespace Moq
 		/// <exception cref="MockException">The invocation was not performed on the mock.</exception>
 		/// <param name="expression">Expression to verify.</param>
 		/// <param name="failMessage">Message to show if verification fails.</param>
+		/// <param name="mock">The mock instance.</param>
+		/// <typeparam name="T">Mocked type.</typeparam>
 		/// <typeparam name="TProperty">Type of the property to verify. Typically omitted as it can 
 		/// be inferred from the expression's return type.</typeparam>
 		[EditorBrowsable(EditorBrowsableState.Never)]
@@ -291,6 +297,8 @@ namespace Moq
 		/// <param name="expression">Expression to verify.</param>
 		/// <param name="value">The value that should have been set on the property.</param>
 		/// <param name="failMessage">Message to show if verification fails.</param>
+		/// <param name="mock">The mock instance.</param>
+		/// <typeparam name="T">Mocked type.</typeparam>
 		/// <typeparam name="TProperty">Type of the property to verify. Typically omitted as it can 
 		/// be inferred from the expression's return type.</typeparam>
 		[EditorBrowsable(EditorBrowsableState.Never)]
