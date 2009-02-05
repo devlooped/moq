@@ -371,6 +371,25 @@ namespace Moq
 				ThrowVerifyException(expression, failMessage);
 		}
 
+		internal static void VerifySet<T>(Mock<T> mock, Action<T> setterExpression, string failMessage)
+			where T : class
+		{
+			Interceptor targetInterceptor = null;
+			Expression expression = null;
+			var expected = CreateSetterCall<T, MethodCall<T>>(mock, setterExpression,
+				(m, expr, method, value) =>
+				{
+					targetInterceptor = m.Interceptor;
+					expression = expr;
+					return new MethodCall<T>(m, expr, method, value);
+				});
+
+			var actual = targetInterceptor.ActualCalls.FirstOrDefault(i => expected.Matches(i));
+			
+			if (actual == null)
+				ThrowVerifyException(expression, failMessage);
+		}
+
 		private static void ThrowVerifyException(Expression expression, string failMessage)
 		{
 			throw new MockException(MockException.ExceptionReason.VerificationFailed,
@@ -450,21 +469,29 @@ namespace Moq
 			Action<T1> setterExpression)
 			where T1 : class
 		{
-			return SetupSetImpl<T1, SetterMethodCall<T1, TProperty>>(mock, setterExpression, 
-				(m, expr, method, value) => 
-					new SetterMethodCall<T1, TProperty>(m, expr, method, value));
+			return CreateSetterCall<T1, SetterMethodCall<T1, TProperty>>(mock, setterExpression,
+				(m, expr, method, value) =>
+				{
+					var call = new SetterMethodCall<T1, TProperty>(m, expr, method, value);
+					m.Interceptor.AddCall(call, ExpectKind.PropertySet);
+					return call;
+				});
 		}
 
 		internal static MethodCall<T1> SetupSet<T1>(Mock<T1> mock,
 			Action<T1> setterExpression)
 			where T1 : class
 		{
-			return SetupSetImpl<T1, MethodCall<T1>>(mock, setterExpression, 
+			return CreateSetterCall<T1, MethodCall<T1>>(mock, setterExpression, 
 				(m, expr, method, value) => 
-					new MethodCall<T1>(m, expr, method, value));
+				{
+					var call = new MethodCall<T1>(m, expr, method, value);
+					m.Interceptor.AddCall(call, ExpectKind.PropertySet);
+					return call;
+				});
 		}
 
-		private static TCall SetupSetImpl<T1, TCall>(Mock<T1> mock,
+		private static TCall CreateSetterCall<T1, TCall>(Mock<T1> mock,
 			Action<T1> setterExpression, Func<Mock, Expression, MethodInfo, Expression, TCall> callFactory)
 			where T1 : class
 			where TCall : MethodCall
@@ -532,12 +559,7 @@ namespace Moq
 						value),
 					x);
 
-				var call = callFactory(mock, lambda, last.Invocation.Method, value);
-				var targetInterceptor = last.Mock.Interceptor;
-
-				targetInterceptor.AddCall(call, ExpectKind.PropertySet);
-
-				return call;
+				return callFactory(last.Mock, lambda, last.Invocation.Method, value);
 			}
 		}
 

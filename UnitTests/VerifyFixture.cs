@@ -396,6 +396,37 @@ namespace Moq.Tests
 		}
 
 		[Fact]
+		public void VerifiesSetterWithAction()
+		{
+			var mock = new Mock<IFoo>();
+
+			Assert.Throws<MockException>(() => mock.VerifySet(m => m.Value = 2));
+
+			mock.Object.Value = 2;
+
+			mock.VerifySet(m => m.Value = 2);
+		}
+
+		[Fact]
+		public void VerifiesSetterWithActionAndMessage()
+		{
+			var mock = new Mock<IFoo>();
+
+			try
+			{
+				mock.VerifySet(m => m.Value = 2, "foo");
+			}
+			catch (MockException me)
+			{
+				Assert.Contains("foo", me.Message);
+			}
+
+			mock.Object.Value = 2;
+
+			mock.VerifySet(m => m.Value = 2, "foo");
+		}
+
+		[Fact]
 		public void VerifiesRefWithExpression()
 		{
 			var mock = new Mock<IFoo>();
@@ -437,6 +468,7 @@ namespace Moq.Tests
 
 		public interface IFoo
 		{
+			int WriteOnly { set; }
 			int? Value { get; set; }
 			void EchoRef<T>(ref T value);
 			void EchoOut<T>(out T value);

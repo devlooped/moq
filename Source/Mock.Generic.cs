@@ -485,9 +485,9 @@ namespace Moq
 		/// </example>
 		/// <exception cref="MockException">The invocation was not performed on the mock.</exception>
 		/// <param name="expression">Expression to verify.</param>
-		public virtual void Verify(Expression<Action<T>> expression)
+		public void Verify(Expression<Action<T>> expression)
 		{
-			Verify(expression, null);
+			Mock.Verify(this, expression, null);
 		}
 
 		/// <summary>
@@ -511,9 +511,9 @@ namespace Moq
 		/// <exception cref="MockException">The invocation was not performed on the mock.</exception>
 		/// <param name="expression">Expression to verify.</param>
 		/// <param name="failMessage">Message to show if verification fails.</param>
-		public virtual void Verify(Expression<Action<T>> expression, string failMessage)
+		public void Verify(Expression<Action<T>> expression, string failMessage)
 		{
-			Verify(this, expression, failMessage);
+			Mock.Verify(this, expression, failMessage);
 		}
 
 		/// <summary>
@@ -536,9 +536,9 @@ namespace Moq
 		/// <exception cref="MockException">The invocation was not performed on the mock.</exception>
 		/// <param name="expression">Expression to verify.</param>
 		/// <typeparam name="TResult">Type of return value from the expression.</typeparam>
-		public virtual void Verify<TResult>(Expression<Func<T, TResult>> expression)
+		public void Verify<TResult>(Expression<Func<T, TResult>> expression)
 		{
-			Verify(this, expression, null);
+			Mock.Verify(this, expression, null);
 		}
 
 		/// <summary>
@@ -563,9 +563,9 @@ namespace Moq
 		/// <param name="expression">Expression to verify.</param>
 		/// <param name="failMessage">Message to show if verification fails.</param>
 		/// <typeparam name="TResult">Type of return value from the expression.</typeparam>
-		public virtual void Verify<TResult>(Expression<Func<T, TResult>> expression, string failMessage)
+		public void Verify<TResult>(Expression<Func<T, TResult>> expression, string failMessage)
 		{
-			Verify(this, expression, failMessage);
+			Mock.Verify(this, expression, failMessage);
 		}
 
 		/// <summary>
@@ -588,9 +588,9 @@ namespace Moq
 		/// <param name="expression">Expression to verify.</param>
 		/// <typeparam name="TProperty">Type of the property to verify. Typically omitted as it can 
 		/// be inferred from the expression's return type.</typeparam>
-		public virtual void VerifyGet<TProperty>(Expression<Func<T, TProperty>> expression)
+		public void VerifyGet<TProperty>(Expression<Func<T, TProperty>> expression)
 		{
-			VerifyGet(this, expression, null);
+			Mock.VerifyGet(this, expression, null);
 		}
 
 		/// <summary>
@@ -615,9 +615,57 @@ namespace Moq
 		/// <param name="failMessage">Message to show if verification fails.</param>
 		/// <typeparam name="TProperty">Type of the property to verify. Typically omitted as it can 
 		/// be inferred from the expression's return type.</typeparam>
-		public virtual void VerifyGet<TProperty>(Expression<Func<T, TProperty>> expression, string failMessage)
+		public void VerifyGet<TProperty>(Expression<Func<T, TProperty>> expression, string failMessage)
 		{
-			VerifyGet(this, expression, failMessage);
+			Mock.VerifyGet(this, expression, failMessage);
+		}
+
+		/// <summary>
+		/// Verifies that a property was set on the mock.
+		/// Use in conjuntion with the default <see cref="MockBehavior.Loose"/>.
+		/// </summary>
+		/// <example group="verification">
+		/// This example assumes that the mock has been used, 
+		/// and later we want to verify that a given property 
+		/// was set on it:
+		/// <code>
+		/// var mock = new Mock&lt;IWarehouse&gt;();
+		/// // exercise mock
+		/// //...
+		/// // Will throw if the test code didn't set the IsClosed property.
+		/// mock.VerifySet(warehouse =&gt; warehouse.IsClosed = true);
+		/// </code>
+		/// </example>
+		/// <exception cref="MockException">The invocation was not performed on the mock.</exception>
+		/// <param name="setterExpression">Expression to verify.</param>
+		public void VerifySet(Action<T> setterExpression)
+		{
+			Mock.VerifySet(this, setterExpression, null);
+		}
+
+		/// <summary>
+		/// Verifies that a property was set on the mock, specifying 
+		/// a failure message.
+		/// Use in conjuntion with the default <see cref="MockBehavior.Loose"/>.
+		/// </summary>
+		/// <example group="verification">
+		/// This example assumes that the mock has been used, 
+		/// and later we want to verify that a given property 
+		/// was set on it:
+		/// <code>
+		/// var mock = new Mock&lt;IWarehouse&gt;();
+		/// // exercise mock
+		/// //...
+		/// // Will throw if the test code didn't set the IsClosed property.
+		/// mock.VerifySet(warehouse =&gt; warehouse.IsClosed = true, "Warehouse should always be closed after the action");
+		/// </code>
+		/// </example>
+		/// <exception cref="MockException">The invocation was not performed on the mock.</exception>
+		/// <param name="setterExpression">Expression to verify.</param>
+		/// <param name="failMessage">Message to show if verification fails.</param>
+		public void VerifySet(Action<T> setterExpression, string failMessage)
+		{
+			Mock.VerifySet(this, setterExpression, failMessage);
 		}
 
 		#endregion
