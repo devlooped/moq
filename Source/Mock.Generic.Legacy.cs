@@ -135,7 +135,7 @@ namespace Moq
 	/// in the core Moq namespace (even if hidden), such as the SetupSet legacy 
 	/// members.
 	/// </summary>
-	public static class MockExtensions
+	public static class MockLegacyExtensions
 	{
 		/// <summary>
 		/// Specifies a setup on the mocked type for a call to 

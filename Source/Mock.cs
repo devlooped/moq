@@ -285,37 +285,6 @@ namespace Moq
 			}
 		}
 
-		internal static void Verify<T, TResult>(Mock mock, Expression<Func<T, TResult>> expression, string failMessage)
-		{
-			if (expression.ToLambda().IsProperty())
-			{
-				VerifyGet<T, TResult>(mock, expression, failMessage);
-			}
-			else
-			{
-				Func<Expression, MethodInfo, Expression[], IProxyCall> factory =
-					(e, m, a) => new MethodCallReturn<T, TResult>(mock, e, m, a);
-
-				VerifyMethod(mock, expression, factory, failMessage);
-			}
-		}
-
-		private static void VerifyMethod(Mock mock, Expression expression, 
-			Func<Expression, MethodInfo, Expression[], IProxyCall> setupFactory, string failMessage)
-		{
-			var lambda = expression.ToLambda();
-			var methodCall = lambda.ToMethodCall();
-			MethodInfo method = methodCall.Method;
-			Expression[] args = methodCall.Arguments.ToArray();
-
-			var expected = setupFactory(expression, method, args);
-			var targetInterceptor = GetInterceptor(lambda, mock);
-			var actual = targetInterceptor.ActualCalls.FirstOrDefault(i => expected.Matches(i));
-
-			if (actual == null)
-				ThrowVerifyException(expression, failMessage);
-		}
-
 		internal static void Verify<T>(Mock mock, Expression<Action<T>> expression, string failMessage)
 		{
 			var lambda = expression.ToLambda();
@@ -329,6 +298,28 @@ namespace Moq
 
 			if (actual == null)
 				ThrowVerifyException(expression, failMessage);
+		}
+
+		internal static void Verify<T, TResult>(Mock mock, Expression<Func<T, TResult>> expression, string failMessage)
+		{
+			if (expression.ToLambda().IsProperty())
+			{
+				VerifyGet<T, TResult>(mock, expression, failMessage);
+			}
+			else
+			{
+				var lambda = expression.ToLambda();
+				var methodCall = lambda.ToMethodCall();
+				MethodInfo method = methodCall.Method;
+				Expression[] args = methodCall.Arguments.ToArray();
+
+				var expected = new MethodCallReturn<T, TResult>(mock, expression, method, args);
+				var targetInterceptor = GetInterceptor(lambda, mock);
+				var actual = targetInterceptor.ActualCalls.FirstOrDefault(i => expected.Matches(i));
+
+				if (actual == null)
+					ThrowVerifyException(expression, failMessage);
+			}
 		}
 
 		internal static void VerifyGet<T, TProperty>(Mock mock, Expression<Func<T, TProperty>> expression, string failMessage)
@@ -607,7 +598,7 @@ namespace Moq
 
 					if (property.CanWrite && property.CanOverrideSet())
 					{
-						var resultSet = typeof(MockExtensions)
+						var resultSet = typeof(MockLegacyExtensions)
 								.GetMethods()
 							// Couldn't make it work passing the generic types to GetMethod()
 								.Where(m => m.Name == "SetupSet" && m.GetParameters().Length == 2)

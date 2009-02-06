@@ -452,19 +452,20 @@ namespace Moq.Tests
 			mock.Verify(m => m.EchoOut(out expected));
 		}
 
-		[Fact]
-		public void VerifiesTimes()
-		{
-			var mock = new Mock<IFoo>();
-
-			//Assert.Throws<MockException>(mock.Verify(f => f.Execute("ping"), 1));
-
-			//mock.Object.Execute("ping");
-
-			//mock.Verify(f => f.Execute("ping"), 1);
-		}
-
-
+		//[Fact]
+		//public void VerifiesTimes()
+		//{
+				// mock.Verify(f => f.Submit(), Times.AtLeastOnce);
+				// mock.Verify(f => f.Submit(), Times.AtLeast(3));
+				// mock.Verify(f => f.Submit(), Times.AtMostOnce);
+				// mock.Verify(f => f.Submit(), Times.AtMost(2));
+				// mock.Verify(f => f.Submit(), Times.Exactly(5));
+				// mock.Verify(f => f.Submit(), Times.Between(1, 5, Range.Inclusive));
+				// Should render friendly messages somehow too :S
+				// Actual implementations of Verify* could all receive a Func<int, bool> 
+				// that we would set by default to AtLeastOnce, which is the current 
+				// behavior.
+		//}
 
 		public interface IFoo
 		{
