@@ -38,9 +38,9 @@
 //[This is the BSD license, see
 // http://www.opensource.org/licenses/bsd-license.php]
 
-using System.Linq.Expressions;
 using System;
 using System.Linq;
+using System.Linq.Expressions;
 
 namespace Moq
 {
@@ -63,27 +63,17 @@ namespace Moq
 			}
 			else
 			{
-				this.matchers = this.arrayInitExpression.Expressions.Select(e => MatcherFactory.CreateMatcher(e))
-					.ToArray();
+				this.matchers = this.arrayInitExpression.Expressions
+					.Select(e => MatcherFactory.CreateMatcher(e)).ToArray();
 			}
 		}
 
 		public bool Matches(object value)
 		{
 			Array values = value as Array;
-			if (values == null)
+			if (values == null || this.matchers.Length != values.Length)
 			{
 				return false;
-			}
-
-			if (this.matchers.Length != values.Length)
-			{
-				return false;
-			}
-
-			if (values.Length == 0)
-			{
-				return true;
 			}
 
 			for (int index = 0; index < values.Length; index++)
