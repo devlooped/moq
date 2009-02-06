@@ -461,6 +461,8 @@ namespace Moq.Tests
 				// mock.Verify(f => f.Submit(), Times.AtMost(2));
 				// mock.Verify(f => f.Submit(), Times.Exactly(5));
 				// mock.Verify(f => f.Submit(), Times.Between(1, 5, Range.Inclusive));
+				// mock.Verify(f => f.Submit(), Times.Never);
+			
 				// Should render friendly messages somehow too :S
 				// Actual implementations of Verify* could all receive a Func<int, bool> 
 				// that we would set by default to AtLeastOnce, which is the current 
