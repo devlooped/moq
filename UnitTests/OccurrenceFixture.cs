@@ -12,18 +12,9 @@ namespace Moq.Tests
 				.Returns("ack")
 				.AtMostOnce();
 
-			try
-			{
-				Assert.Equal("ack", mock.Object.Execute("ping"));
-
-				mock.Object.Execute("ping");
-
-				Assert.True(false, "should fail on two calls");
-			}
-			catch (MockException mex)
-			{
-				Assert.Equal(MockException.ExceptionReason.MoreThanOneCall, mex.Reason);
-			}
+			Assert.Equal("ack", mock.Object.Execute("ping"));
+			MockException mex = Assert.Throws<MockException>(() => mock.Object.Execute("ping"));
+			Assert.Equal(MockException.ExceptionReason.MoreThanOneCall, mex.Reason);
 		}
 
 		[Fact]
@@ -36,15 +27,8 @@ namespace Moq.Tests
 
 			Assert.Equal("ack", mock.Object.Execute("ping"));
 
-			try
-			{
-				mock.Object.Execute("ack");
-				Assert.False(true, "Should have thrown");
-			}
-			catch (MockException mex)
-			{
-				Assert.Equal(MockException.ExceptionReason.SetupNever, mex.Reason);
-			}
+			MockException mex = Assert.Throws<MockException>(() => mock.Object.Execute("ack"));
+			Assert.Equal(MockException.ExceptionReason.SetupNever, mex.Reason);
 		}
 
 		[Fact]
@@ -64,15 +48,9 @@ namespace Moq.Tests
 
 			mock.SetupGet(m => m.Value).Never();
 
-			try
-			{
-				var value = mock.Object.Value;
-				Assert.False(true, "Should have thrown");
-			}
-			catch (MockException mex)
-			{
-				Assert.Equal(MockException.ExceptionReason.SetupNever, mex.Reason);
-			}
+			int value;
+			MockException mex = Assert.Throws<MockException>(() => value = mock.Object.Value);
+			Assert.Equal(MockException.ExceptionReason.SetupNever, mex.Reason);
 		}
 
 		[Fact]
@@ -82,15 +60,8 @@ namespace Moq.Tests
 
 			mock.SetupSet(m => m.Value).Never();
 
-			try
-			{
-				mock.Object.Value = 5;
-				Assert.False(true, "Should have thrown");
-			}
-			catch (MockException mex)
-			{
-				Assert.Equal(MockException.ExceptionReason.SetupNever, mex.Reason);
-			}
+			MockException mex = Assert.Throws<MockException>(() => mock.Object.Value = 5);
+			Assert.Equal(MockException.ExceptionReason.SetupNever, mex.Reason);
 		}
 
 		[Fact]
@@ -103,7 +74,7 @@ namespace Moq.Tests
 				.AtMost(5);
 
 			var calls = 0;
-			try
+			MockException mex = Assert.Throws<MockException>(() =>
 			{
 				while (calls <= repeat + 1)
 				{
@@ -112,12 +83,10 @@ namespace Moq.Tests
 				}
 
 				Assert.True(false, "should fail on two calls");
-			}
-			catch (MockException mex)
-			{
-				Assert.Equal(MockException.ExceptionReason.MoreThanNCalls, mex.Reason);
-				Assert.Equal(calls, repeat);
-			}
+			});
+
+			Assert.Equal(MockException.ExceptionReason.MoreThanNCalls, mex.Reason);
+			Assert.Equal(calls, repeat);
 		}
 
 		public interface IFoo

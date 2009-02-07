@@ -41,11 +41,13 @@
 using System;
 using System.Collections.Generic;
 using System.ComponentModel;
+using System.Diagnostics.CodeAnalysis;
+using System.Globalization;
 using System.Linq;
 using System.Linq.Expressions;
 using System.Reflection;
-using System.Globalization;
 using Indy.IL2CPU.IL;
+using Moq.Properties;
 
 namespace Moq
 {
@@ -117,12 +119,12 @@ namespace Moq
 					// the generic parameters.
 					var types = String.Join(", ",
 							new[] { mockedType }
-							// Skip first interface which is always our internal IMocked<T>
+						// Skip first interface which is always our internal IMocked<T>
 							.Concat(mock.ImplementedInterfaces.Skip(1))
 							.Select(t => t.Name)
 							.ToArray());
 
-					throw new ArgumentException(String.Format(CultureInfo.CurrentCulture, 
+					throw new ArgumentException(String.Format(CultureInfo.CurrentCulture,
 						Properties.Resources.InvalidMockGetType,
 						typeof(T).Name, types));
 				}
@@ -187,14 +189,14 @@ namespace Moq
 		/// <summary>
 		/// Gets the mocked object instance.
 		/// </summary>
-		[System.Diagnostics.CodeAnalysis.SuppressMessage("Microsoft.Naming", "CA1716:IdentifiersShouldNotMatchKeywords", MessageId = "Object", Justification = "Exposes the mocked object instance, so it's appropriate.")]
-		[System.Diagnostics.CodeAnalysis.SuppressMessage("Microsoft.Naming", "CA1721:PropertyNamesShouldNotMatchGetMethods", Justification = "The public Object property is the only one visible to Moq consumers. The protected member is for internal use only.")]
+		[SuppressMessage("Microsoft.Naming", "CA1716:IdentifiersShouldNotMatchKeywords", MessageId = "Object", Justification = "Exposes the mocked object instance, so it's appropriate.")]
+		[SuppressMessage("Microsoft.Naming", "CA1721:PropertyNamesShouldNotMatchGetMethods", Justification = "The public Object property is the only one visible to Moq consumers. The protected member is for internal use only.")]
 		public object Object { get { return GetObject(); } }
 
 		/// <summary>
 		/// Returns the mocked object value.
 		/// </summary>
-		[System.Diagnostics.CodeAnalysis.SuppressMessage("Microsoft.Design", "CA1024:UsePropertiesWhereAppropriate", Justification = "This is actually the protected virtual implementation of the property Object.")]
+		[SuppressMessage("Microsoft.Design", "CA1024:UsePropertiesWhereAppropriate", Justification = "This is actually the protected virtual implementation of the property Object.")]
 		protected abstract object GetObject();
 
 		/// <summary>
@@ -223,7 +225,7 @@ namespace Moq
 		/// </code>
 		/// </example>
 		/// <exception cref="MockException">Not all verifiable expectations were met.</exception>
-		[System.Diagnostics.CodeAnalysis.SuppressMessage("Microsoft.Usage", "CA2200:RethrowToPreserveStackDetails", Justification = "We want to explicitly reset the stack trace here.")]
+		[SuppressMessage("Microsoft.Usage", "CA2200:RethrowToPreserveStackDetails", Justification = "We want to explicitly reset the stack trace here.")]
 		public void Verify()
 		{
 			try
@@ -265,7 +267,7 @@ namespace Moq
 		/// </code>
 		/// </example>
 		/// <exception cref="MockException">At least one expectation was not met.</exception>
-		[System.Diagnostics.CodeAnalysis.SuppressMessage("Microsoft.Usage", "CA2200:RethrowToPreserveStackDetails", Justification = "We want to explicitly reset the stack trace here.")]
+		[SuppressMessage("Microsoft.Usage", "CA2200:RethrowToPreserveStackDetails", Justification = "We want to explicitly reset the stack trace here.")]
 		public void VerifyAll()
 		{
 			try
@@ -285,7 +287,11 @@ namespace Moq
 			}
 		}
 
-		internal static void Verify<T>(Mock mock, Expression<Action<T>> expression, string failMessage)
+		internal static void Verify<T>(
+			Mock mock,
+			Expression<Action<T>> expression,
+			Times times,
+			string failMessage)
 		{
 			var lambda = expression.ToLambda();
 			var methodCall = lambda.ToMethodCall();
@@ -293,76 +299,80 @@ namespace Moq
 			Expression[] args = methodCall.Arguments.ToArray();
 
 			var expected = new MethodCall(mock, expression, method, args);
-			var targetInterceptor = GetInterceptor(lambda, mock);
-			var actual = targetInterceptor.ActualCalls.FirstOrDefault(i => expected.Matches(i));
-
-			if (actual == null)
-				ThrowVerifyException(expression, failMessage);
+			VerifyCalls(GetInterceptor(lambda, mock), expected, expression, times, failMessage);
 		}
 
-		internal static void Verify<T, TResult>(Mock mock, Expression<Func<T, TResult>> expression, string failMessage)
+		internal static void Verify<T, TResult>(
+			Mock mock,
+			Expression<Func<T, TResult>> expression,
+			Times times,
+			string failMessage)
 		{
-			if (expression.ToLambda().IsProperty())
+			var lambda = expression.ToLambda();
+			if (lambda.IsProperty())
 			{
-				VerifyGet<T, TResult>(mock, expression, failMessage);
+				VerifyGet<T, TResult>(mock, expression, times, failMessage);
 			}
 			else
 			{
-				var lambda = expression.ToLambda();
 				var methodCall = lambda.ToMethodCall();
 				MethodInfo method = methodCall.Method;
 				Expression[] args = methodCall.Arguments.ToArray();
 
 				var expected = new MethodCallReturn<T, TResult>(mock, expression, method, args);
-				var targetInterceptor = GetInterceptor(lambda, mock);
-				var actual = targetInterceptor.ActualCalls.FirstOrDefault(i => expected.Matches(i));
-
-				if (actual == null)
-					ThrowVerifyException(expression, failMessage);
+				VerifyCalls(GetInterceptor(lambda, mock), expected, expression, times, failMessage);
 			}
 		}
 
-		internal static void VerifyGet<T, TProperty>(Mock mock, Expression<Func<T, TProperty>> expression, string failMessage)
+		internal static void VerifyGet<T, TProperty>(
+			Mock mock,
+			Expression<Func<T, TProperty>> expression,
+			Times times,
+			string failMessage)
 		{
 			var lambda = expression.ToLambda();
 			var prop = lambda.ToPropertyInfo();
 
-			var expected = new MethodCallReturn<T, TProperty>(mock, expression, prop.GetGetMethod(), new Expression[0]);
-			var targetInterceptor = GetInterceptor(lambda, mock);
-			var actual = targetInterceptor.ActualCalls.FirstOrDefault(i => expected.Matches(i));
-
-			if (actual == null)
-				ThrowVerifyException(expression, failMessage);
+			var expected = new MethodCallReturn<T, TProperty>(
+				mock,
+				expression,
+				prop.GetGetMethod(),
+				new Expression[0]);
+			VerifyCalls(GetInterceptor(lambda, mock), expected, expression, times, failMessage);
 		}
 
-		internal static void VerifySet<T, TProperty>(Mock mock, Expression<Func<T, TProperty>> expression, string failMessage)
+		internal static void VerifySet<T, TProperty>(
+			Mock mock,
+			Expression<Func<T, TProperty>> expression,
+			Times times,
+			string failMessage)
 		{
 			var lambda = expression.ToLambda();
 			var prop = lambda.ToPropertyInfo();
 
 			var expected = new SetterMethodCall<T, TProperty>(mock, expression, prop.GetSetMethod());
-			var targetInterceptor = GetInterceptor(lambda, mock);
-			var actual = targetInterceptor.ActualCalls.FirstOrDefault(i => expected.Matches(i));
-
-			if (actual == null)
-				ThrowVerifyException(expression, failMessage);
+			VerifyCalls(GetInterceptor(lambda, mock), expected, expression, times, failMessage);
 		}
 
-		internal static void VerifySet<T, TProperty>(Mock mock, Expression<Func<T, TProperty>> expression,
-			TProperty value, string failMessage)
+		internal static void VerifySet<T, TProperty>(
+			Mock mock,
+			Expression<Func<T, TProperty>> expression,
+			TProperty value,
+			Times times,
+			string failMessage)
 		{
 			var lambda = expression.ToLambda();
 			var prop = lambda.ToPropertyInfo();
 
 			var expected = new SetterMethodCall<T, TProperty>(mock, expression, prop.GetSetMethod(), value);
-			var targetInterceptor = GetInterceptor(lambda, mock);
-			var actual = targetInterceptor.ActualCalls.FirstOrDefault(i => expected.Matches(i));
-
-			if (actual == null)
-				ThrowVerifyException(expression, failMessage);
+			VerifyCalls(GetInterceptor(lambda, mock), expected, expression, times, failMessage);
 		}
 
-		internal static void VerifySet<T>(Mock<T> mock, Action<T> setterExpression, string failMessage)
+		internal static void VerifySet<T>(
+			Mock<T> mock,
+			Action<T> setterExpression,
+			Times times,
+			string failMessage)
 			where T : class
 		{
 			Interceptor targetInterceptor = null;
@@ -375,17 +385,28 @@ namespace Moq
 					return new MethodCall<T>(m, expr, method, value);
 				});
 
-			var actual = targetInterceptor.ActualCalls.FirstOrDefault(i => expected.Matches(i));
-			
-			if (actual == null)
-				ThrowVerifyException(expression, failMessage);
+			VerifyCalls(targetInterceptor, expected, expression, times, failMessage);
 		}
 
-		private static void ThrowVerifyException(Expression expression, string failMessage)
+		private static void VerifyCalls(
+			Interceptor targetInterceptor,
+			MethodCall expected,
+			Expression expression,
+			Times times,
+			string failMessage)
 		{
-			throw new MockException(MockException.ExceptionReason.VerificationFailed,
-				String.Format(CultureInfo.CurrentCulture, Properties.Resources.NoMatchingCall,
-					failMessage, expression.ToStringFixed()));
+			int callCount = targetInterceptor.ActualCalls.Where(i => expected.Matches(i)).Count();
+			if (!times.Verify(callCount))
+			{
+				ThrowVerifyException(expression, times, failMessage);
+			}
+		}
+
+		private static void ThrowVerifyException(Expression expression, Times times, string failMessage)
+		{
+			throw new MockException(
+				MockException.ExceptionReason.VerificationFailed,
+				times.GetExceptionMessage(failMessage, expression.ToStringFixed()));
 		}
 
 		#endregion
@@ -473,8 +494,8 @@ namespace Moq
 			Action<T1> setterExpression)
 			where T1 : class
 		{
-			return CreateSetterCall<T1, MethodCall<T1>>(mock, setterExpression, 
-				(m, expr, method, value) => 
+			return CreateSetterCall<T1, MethodCall<T1>>(mock, setterExpression,
+				(m, expr, method, value) =>
 				{
 					var call = new MethodCall<T1>(m, expr, method, value);
 					m.Interceptor.AddCall(call, ExpectKind.PropertySet);
@@ -513,7 +534,7 @@ namespace Moq
 						// Can always cast as the matcher attribute is only valid on methods.
 						matcher = (MethodInfo)m;
 					}
- 				}
+				}
 			}
 
 			if (setter == null)
@@ -721,7 +742,7 @@ namespace Moq
 					Properties.Resources.SetupOnNonOverridableMember,
 					typeof(T1).Name + "." + setter.Name.Substring(4)));
 		}
-		 
+
 		private static bool CantOverride(MethodBase method)
 		{
 			return !method.IsVirtual || method.IsFinal || method.IsPrivate;
@@ -781,7 +802,7 @@ namespace Moq
 			private static void ValidateTypeToMock(PropertyInfo prop, Expression expr)
 			{
 				if (prop.PropertyType.IsValueType || prop.PropertyType.IsSealed)
-					throw new NotSupportedException(String.Format(CultureInfo.CurrentCulture, 
+					throw new NotSupportedException(String.Format(CultureInfo.CurrentCulture,
 						Properties.Resources.UnsupportedIntermediateType,
 						prop.DeclaringType.Name, prop.Name, prop.PropertyType, expr));
 			}
@@ -795,7 +816,7 @@ namespace Moq
 				}
 				else
 				{
-					throw new NotSupportedException(String.Format(CultureInfo.CurrentCulture, 
+					throw new NotSupportedException(String.Format(CultureInfo.CurrentCulture,
 						Properties.Resources.UnsupportedIntermediateExpression, m));
 				}
 			}
@@ -809,12 +830,12 @@ namespace Moq
 				}
 
 				if (m.Member is FieldInfo)
-					throw new NotSupportedException(String.Format(CultureInfo.CurrentCulture, 
+					throw new NotSupportedException(String.Format(CultureInfo.CurrentCulture,
 						Properties.Resources.FieldsNotSupported, m));
 
 				if (m.Expression.NodeType != ExpressionType.MemberAccess &&
 					m.Expression.NodeType != ExpressionType.Parameter)
-					throw new NotSupportedException(String.Format(CultureInfo.CurrentCulture, 
+					throw new NotSupportedException(String.Format(CultureInfo.CurrentCulture,
 						Properties.Resources.UnsupportedIntermediateExpression, m));
 
 				var prop = (PropertyInfo)m.Member;

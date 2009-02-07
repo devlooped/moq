@@ -92,7 +92,7 @@ namespace Moq.Tests.Regressions
 			void DoSomething<U>() where U : T;
 		}
 
-		[Fact(Skip = "Still failing on Castle.DynamicProxy2")]
+		[Fact]
 		public void CreatesMockWithGenericsConstraints()
 		{
 			var mock = new Mock<ISomething<object>>();
@@ -212,7 +212,7 @@ namespace Moq.Tests.Regressions
 			IntPtr Get(string input);
 		}
 
-		[Fact(Skip = "Looks like a bug in DP2. See #69.")]
+		[Fact]
 		public void ReturnsIntPtr()
 		{
 			Mock<IFooPtr> mock = new Mock<IFooPtr>(MockBehavior.Strict);
@@ -299,7 +299,7 @@ namespace Moq.Tests.Regressions
 
 		// run "netsh http add urlacl url=http://+:7777/ user=[domain]\[user]"
 		// to avoid running the test as an admin
-		[Fact(Skip="Doesn't work in Mono")]
+		[Fact(Skip = "Doesn't work in Mono")]
 		public void ProxiesAndHostsWCF()
 		{
 #if DEBUG
@@ -315,7 +315,7 @@ namespace Moq.Tests.Regressions
 
 		// run "netsh http add urlacl url=http://+:7777/ user=[domain]\[user]"
 		// to avoid running the test as an admin
-		[Fact(Skip="Doesn't work in Mono")]
+		[Fact(Skip = "Doesn't work in Mono")]
 		public void ProxiesAndHostsWCFMock()
 		{
 			//var generator = new Castle.DynamicProxy.ProxyGenerator();

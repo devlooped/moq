@@ -45,6 +45,7 @@ using System.Text;
 using Castle.Core.Interceptor;
 using System.Globalization;
 using System.Security.Permissions;
+using System.Diagnostics.CodeAnalysis;
 
 namespace Moq
 {
@@ -65,7 +66,7 @@ namespace Moq
 	/// allow the test to pass.
 	/// </para>
 	/// </remarks>
-	[System.Diagnostics.CodeAnalysis.SuppressMessage("Microsoft.Design", "CA1032:ImplementStandardExceptionConstructors", Justification = "It's only initialized internally.")]
+	[SuppressMessage("Microsoft.Design", "CA1032:ImplementStandardExceptionConstructors", Justification = "It's only initialized internally.")]
 	[Serializable]
 	public class MockException : Exception
 	{
@@ -78,7 +79,7 @@ namespace Moq
 		{
 			NoSetup,
 			ReturnValueRequired,
-			VerificationFailed, 
+			VerificationFailed,
 			MoreThanOneCall,
 			MoreThanNCalls,
 			SetupNever,
@@ -114,7 +115,7 @@ namespace Moq
 		private static string GetMessage(MockBehavior behavior,
 			IInvocation invocation, string message)
 		{
-			return String.Format(CultureInfo.CurrentCulture, 
+			return String.Format(CultureInfo.CurrentCulture,
 				Properties.Resources.MockExceptionMessage,
 				invocation.Format(),
 				behavior,
@@ -169,7 +170,7 @@ namespace Moq
 
 		private static string GetMessage(Type targetType, List<IProxyCall> failedSetups)
 		{
-			return String.Format(CultureInfo.CurrentCulture, 
+			return String.Format(CultureInfo.CurrentCulture,
 				Properties.Resources.VerficationFailed, GetRawSetups(targetType, failedSetups));
 		}
 

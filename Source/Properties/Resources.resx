@@ -204,7 +204,7 @@ mock.SetupSet(x =&gt; x.{1}).Callback(callbackDelegate);</value>
   <data name="SetupNotMethod" xml:space="preserve">
     <value>Expression is not a method invocation: {0}</value>
   </data>
-  <data name="NoMatchingCall" xml:space="preserve">
+  <data name="NoMatchingCallsAtLeastOnce" xml:space="preserve">
     <value>{0}
 Invocation was not performed on the mock: {1}</value>
   </data>
@@ -239,5 +239,38 @@ Remember that there's no generics covariance in the CLR, so your object must be 
   </data>
   <data name="UnsupportedNonStaticMatcherForSetter" xml:space="preserve">
     <value>Setter expression can only use static custom matchers.</value>
+  </data>
+  <data name="ArgumentCannotBeEmpty" xml:space="preserve">
+    <value>Value cannot be an empty string.</value>
+  </data>
+  <data name="TypeNotImplementInterface" xml:space="preserve">
+    <value>Type {0} does not implement required interface {1}</value>
+  </data>
+  <data name="TypeNotInheritFromType" xml:space="preserve">
+    <value>Type {0} does not from required type {1}</value>
+  </data>
+  <data name="NoMatchingCallsAtLeast" xml:space="preserve">
+    <value>{0}
+Invocation was performed on the mock less than {2} times: {1}</value>
+  </data>
+  <data name="NoMatchingCallsAtMost" xml:space="preserve">
+    <value>{0}
+Invocation was performed on the mock more than {3} times: {1}</value>
+  </data>
+  <data name="NoMatchingCallsAtMostOnce" xml:space="preserve">
+    <value>{0}
+Invocation was performed on the mock more than a time: {1}</value>
+  </data>
+	<data name="NoMatchingCallsBetween" xml:space="preserve">
+    <value>{0}
+Invocation was performed on the mock less than {2} times or more than {3} times: {1}</value>
+  </data>
+	<data name="NoMatchingCallsExactly" xml:space="preserve">
+    <value>{0}
+Invocation was not performed on the mock {2} times: {1}</value>
+  </data>
+	<data name="NoMatchingCallsNever" xml:space="preserve">
+    <value>{0}
+Invocation was performed on the mock: {1}</value>
   </data>
 </root>

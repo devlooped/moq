@@ -104,6 +104,7 @@
     <Compile Include="Regressions\StreamFixture.cs" />
     <Compile Include="ReturnsFixture.cs" />
     <Compile Include="StubExtensionsFixture.cs" />
+    <Compile Include="TimesFixture.cs" />
     <Compile Include="VerifyFixture.cs" />
   </ItemGroup>
   <ItemGroup>

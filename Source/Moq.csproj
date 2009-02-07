@@ -164,6 +164,7 @@
     <Compile Include="MockDefaultValueProvider.cs" />
     <Compile Include="MockedEvent.Generic.cs" />
     <Compile Include="SetterMethodCall.cs" />
+    <Compile Include="Times.cs" />
   </ItemGroup>
   <ItemGroup>
     <Content Include="IL\Readme.txt" />

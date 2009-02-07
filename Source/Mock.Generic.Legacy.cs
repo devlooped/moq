@@ -14,7 +14,7 @@ namespace Moq
 	// A bug in EditorBrowsable actually prevents us from moving these members 
 	// completely to extension methods, as the attribute is not honored and 
 	// therefore the members are always visible.
-	
+
 	public partial class Mock<T>
 	{
 		/// <summary>
@@ -212,7 +212,7 @@ namespace Moq
 		public static void VerifySet<T, TProperty>(this Mock<T> mock, Expression<Func<T, TProperty>> expression)
 			where T : class
 		{
-			Mock.VerifySet(mock, expression, null);
+			Mock.VerifySet(mock, expression, Times.AtLeastOnce(), null);
 		}
 
 		/// <summary>
@@ -242,7 +242,7 @@ namespace Moq
 		public static void VerifySet<T, TProperty>(this Mock<T> mock, Expression<Func<T, TProperty>> expression, TProperty value)
 			where T : class
 		{
-			Mock.VerifySet(mock, expression, value, null);
+			Mock.VerifySet(mock, expression, value, Times.AtLeastOnce(), null);
 		}
 
 		/// <summary>
@@ -273,7 +273,7 @@ namespace Moq
 		public static void VerifySet<T, TProperty>(this Mock<T> mock, Expression<Func<T, TProperty>> expression, string failMessage)
 			where T : class
 		{
-			Mock.VerifySet(mock, expression, failMessage);
+			Mock.VerifySet(mock, expression, Times.AtLeastOnce(), failMessage);
 		}
 
 		/// <summary>
@@ -305,7 +305,7 @@ namespace Moq
 		public static void VerifySet<T, TProperty>(this Mock<T> mock, Expression<Func<T, TProperty>> expression, TProperty value, string failMessage)
 			where T : class
 		{
-			Mock.VerifySet(mock, expression, value, failMessage);
+			Mock.VerifySet(mock, expression, value, Times.AtLeastOnce(), failMessage);
 		}
 	}
 }
