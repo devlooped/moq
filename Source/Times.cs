@@ -50,13 +50,13 @@ namespace Moq
 	{
 		private int from;
 		private int to;
-		private string exceptionMessage;
+		private string messageFormat;
 
-		private Times(int from, int to, string exceptionMessage)
+		private Times(int from, int to, string messageFormat)
 		{
 			this.from = from;
 			this.to = to;
-			this.exceptionMessage = exceptionMessage;
+			this.messageFormat = messageFormat;
 		}
 
 		/// <summary>
@@ -146,7 +146,7 @@ namespace Moq
 		{
 			return string.Format(
 				CultureInfo.CurrentCulture,
-				this.exceptionMessage,
+				this.messageFormat,
 				failMessage,
 				expression,
 				this.from,
