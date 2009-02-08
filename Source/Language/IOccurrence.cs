@@ -58,6 +58,7 @@ namespace Moq.Language
 		///     .AtMostOnce();
 		/// </code>
 		/// </example>
+		[EditorBrowsable(EditorBrowsableState.Never)]
 		IVerifies AtMostOnce();
 		/// <summary>
 		/// The expected invocation can happen at most specified number of times.
@@ -69,6 +70,7 @@ namespace Moq.Language
 		///     .AtMost( 5 );
 		/// </code>
 		/// </example>
-		IVerifies AtMost( int callCount);
+		[EditorBrowsable(EditorBrowsableState.Never)]
+		IVerifies AtMost(int callCount);
 	}
 }
