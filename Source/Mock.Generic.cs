@@ -218,7 +218,7 @@ namespace Moq
 			}
 		}
 
-		[__Protected]
+		[__Protect]
 		private void InitializeInstance()
 		{
 			var mockType = typeof(T);
