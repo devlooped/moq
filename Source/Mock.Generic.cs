@@ -218,45 +218,47 @@ namespace Moq
 			}
 		}
 
-		[__Protect]
 		private void InitializeInstance()
 		{
-			var mockType = typeof(T);
-
-			try
+			PexProtector.Invoke(() =>
 			{
-				if (mockType.IsInterface)
+				var mockType = typeof(T);
+
+				try
 				{
-					instance
-						= (T)generator.CreateInterfaceProxyWithoutTarget(mockType, base.ImplementedInterfaces.ToArray(), Interceptor);
-				}
-				else
-				{
-					try
+					if (mockType.IsInterface)
 					{
-						if (constructorArguments.Length > 0)
+						instance
+							= (T)generator.CreateInterfaceProxyWithoutTarget(mockType, base.ImplementedInterfaces.ToArray(), Interceptor);
+					}
+					else
+					{
+						try
 						{
-							var generatedType = generator.ProxyBuilder.CreateClassProxy(mockType, base.ImplementedInterfaces.ToArray(), new ProxyGenerationOptions());
-							instance
-								= (T)Activator.CreateInstance(generatedType,
-									new object[] { new IInterceptor[] { Interceptor } }.Concat(constructorArguments).ToArray());
+							if (constructorArguments.Length > 0)
+							{
+								var generatedType = generator.ProxyBuilder.CreateClassProxy(mockType, base.ImplementedInterfaces.ToArray(), new ProxyGenerationOptions());
+								instance
+									= (T)Activator.CreateInstance(generatedType,
+										new object[] { new IInterceptor[] { Interceptor } }.Concat(constructorArguments).ToArray());
+							}
+							else
+							{
+								instance = (T)generator.CreateClassProxy(mockType, base.ImplementedInterfaces.ToArray(), Interceptor);
+							}
 						}
-						else
+						catch (TypeLoadException tle)
 						{
-							instance = (T)generator.CreateClassProxy(mockType, base.ImplementedInterfaces.ToArray(), Interceptor);
+							throw new ArgumentException(Properties.Resources.InvalidMockClass, tle);
 						}
 					}
-					catch (TypeLoadException tle)
-					{
-						throw new ArgumentException(Properties.Resources.InvalidMockClass, tle);
-					}
-				}
 
-			}
-			catch (MissingMethodException mme)
-			{
-				throw new ArgumentException(Properties.Resources.ConstructorNotFound, mme);
-			}
+				}
+				catch (MissingMethodException mme)
+				{
+					throw new ArgumentException(Properties.Resources.ConstructorNotFound, mme);
+				}
+			});
 		}
 
 		/// <summary>
