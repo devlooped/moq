@@ -14,5 +14,10 @@ namespace Moq
 		{
 			action();
 		}
+
+		public static T Invoke<T>(Func<T> function)
+		{
+			return function();
+		}
 	}
 }

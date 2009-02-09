@@ -415,92 +415,107 @@ namespace Moq
 
 		internal static MethodCall<T1> Setup<T1>(Mock mock, Expression<Action<T1>> expression)
 		{
-			var methodCall = expression.ToLambda().ToMethodCall();
-			MethodInfo method = methodCall.Method;
-			Expression[] args = methodCall.Arguments.ToArray();
-
-			ThrowIfCantOverride(expression, method);
-			var call = new MethodCall<T1>(mock, expression, method, args);
-
-			var targetInterceptor = GetInterceptor(expression, mock);
-
-			targetInterceptor.AddCall(call, ExpectKind.Other);
-
-			return call;
-		}
-
-		internal static MethodCallReturn<T1, TResult> Setup<T1, TResult>(Mock mock, Expression<Func<T1, TResult>> expression)
-		{
-			var lambda = expression.ToLambda();
-
-			if (lambda.IsProperty())
-				return SetupGet(mock, expression);
-
-			var methodCall = lambda.ToMethodCall();
-			MethodInfo method = methodCall.Method;
-			Expression[] args = methodCall.Arguments.ToArray();
-
-			ThrowIfCantOverride(expression, method);
-			var call = new MethodCallReturn<T1, TResult>(mock, expression, method, args);
-
-			var targetInterceptor = GetInterceptor(lambda, mock);
-
-			targetInterceptor.AddCall(call, ExpectKind.Other);
-
-			return call;
-		}
-
-		internal static MethodCallReturn<T1, TProperty> SetupGet<T1, TProperty>(Mock mock, Expression<Func<T1, TProperty>> expression)
-		{
-			LambdaExpression lambda = expression.ToLambda();
-
-			if (lambda.IsPropertyIndexer())
+			return PexProtector.Invoke(() =>
 			{
-				// Treat indexers as regular method invocations.
-				return Setup<T1, TProperty>(mock, expression);
-			}
-			else
-			{
-				var prop = lambda.ToPropertyInfo();
-				ThrowIfPropertyNotReadable(prop);
+				var methodCall = expression.ToLambda().ToMethodCall();
+				MethodInfo method = methodCall.Method;
+				Expression[] args = methodCall.Arguments.ToArray();
 
-				var propGet = prop.GetGetMethod(true);
-				ThrowIfCantOverride(expression, propGet);
-
-				var call = new MethodCallReturn<T1, TProperty>(mock, expression, propGet, new Expression[0]);
+				ThrowIfCantOverride(expression, method);
+				var call = new MethodCall<T1>(mock, expression, method, args);
 
 				var targetInterceptor = GetInterceptor(expression, mock);
 
 				targetInterceptor.AddCall(call, ExpectKind.Other);
 
 				return call;
-			}
+			});
+		}
+
+		internal static MethodCallReturn<T1, TResult> Setup<T1, TResult>(Mock mock, Expression<Func<T1, TResult>> expression)
+		{
+			return PexProtector.Invoke(() =>
+			{
+				var lambda = expression.ToLambda();
+
+				if (lambda.IsProperty())
+					return SetupGet(mock, expression);
+
+				var methodCall = lambda.ToMethodCall();
+				MethodInfo method = methodCall.Method;
+				Expression[] args = methodCall.Arguments.ToArray();
+
+				ThrowIfCantOverride(expression, method);
+				var call = new MethodCallReturn<T1, TResult>(mock, expression, method, args);
+
+				var targetInterceptor = GetInterceptor(lambda, mock);
+
+				targetInterceptor.AddCall(call, ExpectKind.Other);
+
+				return call;
+			});
+		}
+
+		internal static MethodCallReturn<T1, TProperty> SetupGet<T1, TProperty>(Mock mock, Expression<Func<T1, TProperty>> expression)
+		{
+			return PexProtector.Invoke(() =>
+			{
+				LambdaExpression lambda = expression.ToLambda();
+
+				if (lambda.IsPropertyIndexer())
+				{
+					// Treat indexers as regular method invocations.
+					return Setup<T1, TProperty>(mock, expression);
+				}
+				else
+				{
+					var prop = lambda.ToPropertyInfo();
+					ThrowIfPropertyNotReadable(prop);
+
+					var propGet = prop.GetGetMethod(true);
+					ThrowIfCantOverride(expression, propGet);
+
+					var call = new MethodCallReturn<T1, TProperty>(mock, expression, propGet, new Expression[0]);
+
+					var targetInterceptor = GetInterceptor(expression, mock);
+
+					targetInterceptor.AddCall(call, ExpectKind.Other);
+
+					return call;
+				}
+			});
 		}
 
 		internal static SetterMethodCall<T1, TProperty> SetupSet<T1, TProperty>(Mock<T1> mock,
 			Action<T1> setterExpression)
 			where T1 : class
 		{
-			return CreateSetterCall<T1, SetterMethodCall<T1, TProperty>>(mock, setterExpression,
-				(m, expr, method, value) =>
-				{
-					var call = new SetterMethodCall<T1, TProperty>(m, expr, method, value);
-					m.Interceptor.AddCall(call, ExpectKind.PropertySet);
-					return call;
-				});
+			return PexProtector.Invoke(() =>
+			{
+				return CreateSetterCall<T1, SetterMethodCall<T1, TProperty>>(mock, setterExpression,
+					(m, expr, method, value) =>
+					{
+						var call = new SetterMethodCall<T1, TProperty>(m, expr, method, value);
+						m.Interceptor.AddCall(call, ExpectKind.PropertySet);
+						return call;
+					});
+			});
 		}
 
 		internal static MethodCall<T1> SetupSet<T1>(Mock<T1> mock,
 			Action<T1> setterExpression)
 			where T1 : class
 		{
-			return CreateSetterCall<T1, MethodCall<T1>>(mock, setterExpression,
-				(m, expr, method, value) =>
-				{
-					var call = new MethodCall<T1>(m, expr, method, value);
-					m.Interceptor.AddCall(call, ExpectKind.PropertySet);
-					return call;
-				});
+			return PexProtector.Invoke(() =>
+			{
+				return CreateSetterCall<T1, MethodCall<T1>>(mock, setterExpression,
+					(m, expr, method, value) =>
+					{
+						var call = new MethodCall<T1>(m, expr, method, value);
+						m.Interceptor.AddCall(call, ExpectKind.PropertySet);
+						return call;
+					});
+			});
 		}
 
 		private static TCall CreateSetterCall<T1, TCall>(Mock<T1> mock,
@@ -577,67 +592,70 @@ namespace Moq
 
 		internal static void SetupAllProperties(Mock mock)
 		{
-			// Crazy reflection stuff below. Ah... the goodies of generics :)
-			var mockType = mock.MockedType;
-			var properties = new List<PropertyInfo>();
-			properties.AddRange(mockType.GetProperties());
-			// Add all implemented properties too.
-			properties.AddRange(
-					from i in mockType.GetInterfaces()
-					from p in i.GetProperties()
-					select p);
-			// Add all properties from base classes
-			properties = properties.Distinct().ToList();
-
-			foreach (var property in properties)
+			PexProtector.Invoke(() =>
 			{
-				if (property.CanRead && property.CanOverrideGet())
+				// Crazy reflection stuff below. Ah... the goodies of generics :)
+				var mockType = mock.MockedType;
+				var properties = new List<PropertyInfo>();
+				properties.AddRange(mockType.GetProperties());
+				// Add all implemented properties too.
+				properties.AddRange(
+						from i in mockType.GetInterfaces()
+						from p in i.GetProperties()
+						select p);
+				// Add all properties from base classes
+				properties = properties.Distinct().ToList();
+
+				foreach (var property in properties)
 				{
-					var expect = GetPropertyExpression(mockType, property);
-					object initialValue = mock.DefaultValueProvider.ProvideDefault(property.GetGetMethod(), new object[0]);
-					var mocked = initialValue as IMocked;
-					if (mocked != null)
-						SetupAllProperties(mocked.Mock);
-
-					var closure = Activator.CreateInstance(
-							typeof(ValueClosure<>).MakeGenericType(property.PropertyType), initialValue);
-
-					var resultGet = mock
-							.GetType()
-							.GetMethod("SetupGet")
-							.MakeGenericMethod(property.PropertyType)
-							.Invoke(mock, new[] { expect });
-
-					var returnsGet = resultGet.GetType().GetMethod("Returns", new[] { typeof(Func<>).MakeGenericType(property.PropertyType) });
-
-					var getFunc = Activator.CreateInstance(
-							typeof(Func<>).MakeGenericType(property.PropertyType),
-							closure,
-							closure.GetType().GetMethod("GetValue").MethodHandle.GetFunctionPointer());
-
-					returnsGet.Invoke(resultGet, new[] { getFunc });
-
-					if (property.CanWrite && property.CanOverrideSet())
+					if (property.CanRead && property.CanOverrideGet())
 					{
-						var resultSet = typeof(MockLegacyExtensions)
-								.GetMethods()
-							// Couldn't make it work passing the generic types to GetMethod()
-								.Where(m => m.Name == "SetupSet" && m.GetParameters().Length == 2)
-								.First()
-								.MakeGenericMethod(mock.GetType().GetGenericArguments()[0], property.PropertyType)
-								.Invoke(mock, new object[] { mock, expect });
+						var expect = GetPropertyExpression(mockType, property);
+						object initialValue = mock.DefaultValueProvider.ProvideDefault(property.GetGetMethod(), new object[0]);
+						var mocked = initialValue as IMocked;
+						if (mocked != null)
+							SetupAllProperties(mocked.Mock);
 
-						var callbackSet = resultSet.GetType().GetMethod("Callback", new[] { typeof(Action<>).MakeGenericType(property.PropertyType) });
+						var closure = Activator.CreateInstance(
+								typeof(ValueClosure<>).MakeGenericType(property.PropertyType), initialValue);
 
-						var setFunc = Activator.CreateInstance(
-								typeof(Action<>).MakeGenericType(property.PropertyType),
+						var resultGet = mock
+								.GetType()
+								.GetMethod("SetupGet")
+								.MakeGenericMethod(property.PropertyType)
+								.Invoke(mock, new[] { expect });
+
+						var returnsGet = resultGet.GetType().GetMethod("Returns", new[] { typeof(Func<>).MakeGenericType(property.PropertyType) });
+
+						var getFunc = Activator.CreateInstance(
+								typeof(Func<>).MakeGenericType(property.PropertyType),
 								closure,
-								closure.GetType().GetMethod("SetValue").MethodHandle.GetFunctionPointer());
+								closure.GetType().GetMethod("GetValue").MethodHandle.GetFunctionPointer());
 
-						callbackSet.Invoke(resultSet, new[] { setFunc });
+						returnsGet.Invoke(resultGet, new[] { getFunc });
+
+						if (property.CanWrite && property.CanOverrideSet())
+						{
+							var resultSet = typeof(MockLegacyExtensions)
+									.GetMethods()
+								// Couldn't make it work passing the generic types to GetMethod()
+									.Where(m => m.Name == "SetupSet" && m.GetParameters().Length == 2)
+									.First()
+									.MakeGenericMethod(mock.GetType().GetGenericArguments()[0], property.PropertyType)
+									.Invoke(mock, new object[] { mock, expect });
+
+							var callbackSet = resultSet.GetType().GetMethod("Callback", new[] { typeof(Action<>).MakeGenericType(property.PropertyType) });
+
+							var setFunc = Activator.CreateInstance(
+									typeof(Action<>).MakeGenericType(property.PropertyType),
+									closure,
+									closure.GetType().GetMethod("SetValue").MethodHandle.GetFunctionPointer());
+
+							callbackSet.Invoke(resultSet, new[] { setFunc });
+						}
 					}
 				}
-			}
+			});
 		}
 
 		private static Expression GetPropertyExpression(Type mockType, PropertyInfo property)
