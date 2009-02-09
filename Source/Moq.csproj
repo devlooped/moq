@@ -163,6 +163,7 @@
     <Compile Include="FluentMockContext.cs" />
     <Compile Include="MockDefaultValueProvider.cs" />
     <Compile Include="MockedEvent.Generic.cs" />
+    <Compile Include="PexProtectedAttribute.cs" />
     <Compile Include="SetterMethodCall.cs" />
     <Compile Include="Times.cs" />
   </ItemGroup>

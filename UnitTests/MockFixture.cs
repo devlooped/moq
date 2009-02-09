@@ -16,12 +16,6 @@ namespace Moq.Tests
 			Assert.NotNull(cloneable);
 		}
 
-		[Fact]
-		public void ReadsIL()
-		{
-			var value = 5;
-			Action<IFoo> action = f => f.Value = value;
-		}
 
 		[Fact]
 		public void ThrowsIfNullExpectAction()
