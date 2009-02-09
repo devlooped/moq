@@ -158,23 +158,21 @@ namespace Moq
 	[Serializable]
 	internal class MockVerificationException : MockException
 	{
-		Type targetType;
 		List<IProxyCall> failedSetups;
 
-		public MockVerificationException(Type targetType, List<IProxyCall> failedSetups)
-			: base(ExceptionReason.VerificationFailed, GetMessage(targetType, failedSetups))
+		public MockVerificationException(List<IProxyCall> failedSetups)
+			: base(ExceptionReason.VerificationFailed, GetMessage(failedSetups))
 		{
-			this.targetType = targetType;
 			this.failedSetups = failedSetups;
 		}
 
-		private static string GetMessage(Type targetType, List<IProxyCall> failedSetups)
+		private static string GetMessage(List<IProxyCall> failedSetups)
 		{
 			return String.Format(CultureInfo.CurrentCulture,
-				Properties.Resources.VerficationFailed, GetRawSetups(targetType, failedSetups));
+				Properties.Resources.VerficationFailed, GetRawSetups(failedSetups));
 		}
 
-		private static string GetRawSetups(Type targetType, List<IProxyCall> failedSetups)
+		private static string GetRawSetups(List<IProxyCall> failedSetups)
 		{
 			var message = new StringBuilder();
 			foreach (var setup in failedSetups)
@@ -208,7 +206,7 @@ namespace Moq
 
 		internal string GetRawSetups()
 		{
-			return GetRawSetups(targetType, failedSetups);
+			return GetRawSetups(failedSetups);
 		}
 
 		/// <summary>

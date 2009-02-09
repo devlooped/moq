@@ -91,7 +91,7 @@ namespace Moq
 
 			if (failures.Count > 0)
 			{
-				throw new MockVerificationException(this.targetType, failures);
+				throw new MockVerificationException(failures);
 			}
 		}
 
