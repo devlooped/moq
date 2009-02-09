@@ -275,7 +275,7 @@ namespace Moq.Tests.Regressions
 
 		#endregion
 
-		#region 89
+		#region #89
 
 		public class Issue89
 		{
