@@ -124,7 +124,7 @@ namespace Moq.Tests
 			Times target = Times.Between(3, 8, Range.Exclusive);
 
 			Assert.Equal(
-				"param1\r\nInvocation was performed on the mock less than 4 times or more than 7 times: param2",
+				"param1\r\nInvocation was performed on the mock less or equal than 3 times or more or equal than 8 times: param2",
 				target.GetExceptionMessage("param1", "param2"));
 		}
 

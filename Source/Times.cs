@@ -38,8 +38,9 @@
 //[This is the BSD license, see
 // http://www.opensource.org/licenses/bsd-license.php]
 
-using Moq.Properties;
 using System.Globalization;
+using Moq.Properties;
+using System;
 
 namespace Moq
 {
@@ -48,12 +49,14 @@ namespace Moq
 	/// </summary>
 	public class Times
 	{
+		private Func<int, bool> evaluator;
+		private string messageFormat;
 		private int from;
 		private int to;
-		private string messageFormat;
 
-		private Times(int from, int to, string messageFormat)
+		private Times(Func<int, bool> evaluator, int from, int to, string messageFormat)
 		{
+			this.evaluator = evaluator;
 			this.from = from;
 			this.to = to;
 			this.messageFormat = messageFormat;
@@ -66,9 +69,9 @@ namespace Moq
 		/// <returns>An object defining the allowed number of invocations.</returns>
 		public static Times AtLeast(int times)
 		{
-			Guard.ArgumentNotOutOfRange(times, 1, int.MaxValue, "times");
+			Guard.ArgumentNotOutOfRangeInclusive(times, 1, int.MaxValue, "times");
 
-			return new Times(times, int.MaxValue, Resources.NoMatchingCallsAtLeast);
+			return new Times(c => c >= times, times, int.MaxValue, Resources.NoMatchingCallsAtLeast);
 		}
 
 		/// <summary>
@@ -77,7 +80,7 @@ namespace Moq
 		/// <returns>An object defining the allowed number of invocations.</returns>
 		public static Times AtLeastOnce()
 		{
-			return new Times(1, int.MaxValue, Resources.NoMatchingCallsAtLeastOnce);
+			return new Times(c => c >= 1, 1, int.MaxValue, Resources.NoMatchingCallsAtLeastOnce);
 		}
 
 		/// <summary>
@@ -87,9 +90,9 @@ namespace Moq
 		/// <returns>An object defining the allowed number of invocations.</returns>
 		public static Times AtMost(int times)
 		{
-			Guard.ArgumentNotOutOfRange(times, 0, int.MaxValue, "times");
+			Guard.ArgumentNotOutOfRangeInclusive(times, 0, int.MaxValue, "times");
 
-			return new Times(0, times, Resources.NoMatchingCallsAtMost);
+			return new Times(c => c >= 0 && c <= times, 0, times, Resources.NoMatchingCallsAtMost);
 		}
 
 		/// <summary>
@@ -98,7 +101,7 @@ namespace Moq
 		/// <returns>An object defining the allowed number of invocations.</returns>
 		public static Times AtMostOnce()
 		{
-			return new Times(0, 1, Resources.NoMatchingCallsAtMostOnce);
+			return new Times(c => c >= 0 && c <= 1, 0, 1, Resources.NoMatchingCallsAtMostOnce);
 		}
 
 		/// <summary>
@@ -113,24 +116,29 @@ namespace Moq
 		{
 			if (rangeKind == Range.Exclusive)
 			{
-				Guard.ArgumentNotOutOfRange(from + 1, 1, to - 1, "from");
-				return new Times(from + 1, to - 1, Resources.NoMatchingCallsBetween);
+				Guard.ArgumentNotOutOfRangeExclusive(from, 0, to, "from");
+				if (to - from == 1)
+				{
+					throw new ArgumentOutOfRangeException("to");
+				}
+
+				return new Times(c => c > from && c < to, from, to, Resources.NoMatchingCallsBetweenExclusive);
 			}
 
-			Guard.ArgumentNotOutOfRange(from, 0, to, "from");
-			return new Times(from, to, Resources.NoMatchingCallsBetween);
+			Guard.ArgumentNotOutOfRangeInclusive(from, 0, to, "from");
+			return new Times(c => c >= from && c <= to, from, to, Resources.NoMatchingCallsBetweenInclusive);
 		}
 
 		/// <summary>
 		/// Specifies that a mocked method should be invoked exactly <paramref name="times"/> times.
 		/// </summary>
-		/// <param name="calls">The times that a method or property can be called.</param>
+		/// <param name="times">The times that a method or property can be called.</param>
 		/// <returns>An object defining the allowed number of invocations.</returns>
-		public static Times Exactly(int calls)
+		public static Times Exactly(int times)
 		{
-			Guard.ArgumentNotOutOfRange(calls, 0, int.MaxValue, "times");
+			Guard.ArgumentNotOutOfRangeInclusive(times, 0, int.MaxValue, "times");
 
-			return new Times(calls, calls, Resources.NoMatchingCallsExactly);
+			return new Times(c => c == times, times, times, Resources.NoMatchingCallsExactly);
 		}
 
 		/// <summary>
@@ -139,7 +147,7 @@ namespace Moq
 		/// <returns>An object defining the allowed number of invocations.</returns>
 		public static Times Never()
 		{
-			return new Times(0, 0, Resources.NoMatchingCallsNever);
+			return new Times(c => c == 0, 0, 0, Resources.NoMatchingCallsNever);
 		}
 
 		internal string GetExceptionMessage(string failMessage, string expression)
@@ -155,7 +163,7 @@ namespace Moq
 
 		internal bool Verify(int calls)
 		{
-			return calls >= this.from && calls <= this.to;
+			return this.evaluator(calls);
 		}
 	}
 }

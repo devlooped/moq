@@ -74,7 +74,7 @@ internal static class Guard
 
 
 	/// <summary>
-	/// Checks an argument to ensure it is in the specified range.
+	/// Checks an argument to ensure it is in the specified range including the edges.
 	/// </summary>
 	/// <typeparam name="T">Type of the argument to check, it must be an <see cref="IComparable"/> type.
 	/// </typeparam>
@@ -82,10 +82,28 @@ internal static class Guard
 	/// <param name="from">The minimun allowed value for the argument.</param>
 	/// <param name="to">The maximun allowed value for the argument.</param>
 	/// <param name="argumentName">The name of the argument.</param>
-	public static void ArgumentNotOutOfRange<T>(T value, T from, T to, string argumentName)
+	public static void ArgumentNotOutOfRangeInclusive<T>(T value, T from, T to, string argumentName)
 			where T : IComparable
 	{
 		if (value != null && (value.CompareTo(from) < 0 || value.CompareTo(to) > 0))
+		{
+			throw new ArgumentOutOfRangeException(argumentName);
+		}
+	}
+
+	/// <summary>
+	/// Checks an argument to ensure it is in the specified range excluding the edges.
+	/// </summary>
+	/// <typeparam name="T">Type of the argument to check, it must be an <see cref="IComparable"/> type.
+	/// </typeparam>
+	/// <param name="value">The argument value to check.</param>
+	/// <param name="from">The minimun allowed value for the argument.</param>
+	/// <param name="to">The maximun allowed value for the argument.</param>
+	/// <param name="argumentName">The name of the argument.</param>
+	public static void ArgumentNotOutOfRangeExclusive<T>(T value, T from, T to, string argumentName)
+			where T : IComparable
+	{
+		if (value != null && (value.CompareTo(from) <= 0 || value.CompareTo(to) >= 0))
 		{
 			throw new ArgumentOutOfRangeException(argumentName);
 		}

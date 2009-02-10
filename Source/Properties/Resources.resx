@@ -261,16 +261,20 @@ Invocation was performed on the mock more than {3} times: {1}</value>
     <value>{0}
 Invocation was performed on the mock more than a time: {1}</value>
   </data>
-	<data name="NoMatchingCallsBetween" xml:space="preserve">
+  <data name="NoMatchingCallsBetweenInclusive" xml:space="preserve">
     <value>{0}
 Invocation was performed on the mock less than {2} times or more than {3} times: {1}</value>
   </data>
-	<data name="NoMatchingCallsExactly" xml:space="preserve">
+  <data name="NoMatchingCallsExactly" xml:space="preserve">
     <value>{0}
 Invocation was not performed on the mock {2} times: {1}</value>
   </data>
-	<data name="NoMatchingCallsNever" xml:space="preserve">
+  <data name="NoMatchingCallsNever" xml:space="preserve">
     <value>{0}
 Invocation was performed on the mock: {1}</value>
+  </data>
+  <data name="NoMatchingCallsBetweenExclusive" xml:space="preserve">
+    <value>{0}
+Invocation was performed on the mock less or equal than {2} times or more or equal than {3} times: {1}</value>
   </data>
 </root>

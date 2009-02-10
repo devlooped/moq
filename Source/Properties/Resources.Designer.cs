@@ -233,11 +233,21 @@ namespace Moq.Properties {
         
         /// <summary>
         ///   Looks up a localized string similar to {0}
+        ///Invocation was performed on the mock less or equal than {2} times or more or equal than {3} times: {1}.
+        /// </summary>
+        internal static string NoMatchingCallsBetweenExclusive {
+            get {
+                return ResourceManager.GetString("NoMatchingCallsBetweenExclusive", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to {0}
         ///Invocation was performed on the mock less than {2} times or more than {3} times: {1}.
         /// </summary>
-        internal static string NoMatchingCallsBetween {
+        internal static string NoMatchingCallsBetweenInclusive {
             get {
-                return ResourceManager.GetString("NoMatchingCallsBetween", resourceCulture);
+                return ResourceManager.GetString("NoMatchingCallsBetweenInclusive", resourceCulture);
             }
         }
         
