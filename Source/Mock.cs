@@ -98,7 +98,11 @@ namespace Moq
 				// We may have received a T of an implemented 
 				// interface in the mock.
 				var mock = mockedPlain.Mock;
+#if SILVERLIGHT
+				var imockedType = mocked.GetType().GetInterface("IMocked`1", false);
+#else
 				var imockedType = mocked.GetType().GetInterface("IMocked`1");
+#endif
 				var mockedType = imockedType.GetGenericArguments()[0];
 
 				if (mock.ImplementedInterfaces.Contains(typeof(T)))
@@ -368,6 +372,7 @@ namespace Moq
 			VerifyCalls(GetInterceptor(lambda, mock), expected, expression, times, failMessage);
 		}
 
+#if !SILVERLIGHT
 		internal static void VerifySet<T>(
 			Mock<T> mock,
 			Action<T> setterExpression,
@@ -387,7 +392,7 @@ namespace Moq
 
 			VerifyCalls(targetInterceptor, expected, expression, times, failMessage);
 		}
-
+#endif
 		private static void VerifyCalls(
 			Interceptor targetInterceptor,
 			MethodCall expected,
@@ -486,6 +491,7 @@ namespace Moq
 			});
 		}
 
+#if !SILVERLIGHT
 		internal static SetterMethodCall<T1, TProperty> SetupSet<T1, TProperty>(Mock<T1> mock,
 			Action<T1> setterExpression)
 			where T1 : class
@@ -657,6 +663,7 @@ namespace Moq
 				}
 			});
 		}
+#endif
 
 		private static Expression GetPropertyExpression(Type mockType, PropertyInfo property)
 		{

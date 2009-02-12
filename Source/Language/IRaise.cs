@@ -37,7 +37,7 @@
 
 //[This is the BSD license, see
 // http://www.opensource.org/licenses/bsd-license.php]
-
+#if !SILVERLIGHT
 using System;
 using System.ComponentModel;
 
@@ -128,3 +128,4 @@ namespace Moq.Language
 		IVerifies Raises<T1, T2, T3, T4>(Action<T> eventExpression, Func<T1, T2, T3, T4, EventArgs> func);
 	}
 }
+#endif

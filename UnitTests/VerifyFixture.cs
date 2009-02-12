@@ -379,6 +379,7 @@ namespace Moq.Tests
 			mock.VerifySet(m => m.Value, 5);
 		}
 
+#if !SILVERLIGHT
 		[Fact]
 		public void VerifiesSetterWithAction()
 		{
@@ -409,6 +410,7 @@ namespace Moq.Tests
 
 			mock.VerifySet(m => m.Value = 2, "foo");
 		}
+#endif
 
 		[Fact]
 		public void VerifiesRefWithExpression()
@@ -895,6 +897,7 @@ namespace Moq.Tests
 			Assert.Equal(MockException.ExceptionReason.VerificationFailed, mex.Reason);
 		}
 
+#if !SILVERLIGHT
 		[Fact]
 		public void ThrowsIfVerifySetAtMostOnceAndMoreThanOneCall()
 		{
@@ -909,6 +912,7 @@ namespace Moq.Tests
 				mock.VerifySet(f => f.Value = 3, Times.AtMostOnce()));
 			Assert.Equal(MockException.ExceptionReason.VerificationFailed, mex.Reason);
 		}
+#endif
 
 		public interface IFoo
 		{

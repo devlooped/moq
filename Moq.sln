@@ -1,4 +1,3 @@
-﻿
 Microsoft Visual Studio Solution File, Format Version 10.00
 # Visual Studio 2008
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Moq", "Source\Moq.csproj", "{1C91AC30-5977-4BE5-BA67-8EB186C03514}"
@@ -10,6 +9,12 @@ Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Solution Items", "Solution 
 		Changelog.txt = Changelog.txt
 		License.txt = License.txt
 	EndProjectSection
+EndProject
+Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Silverlight", "Silverlight", "{48EC9EB4-F52B-4404-89D7-5804E17B24D0}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Moq.Silverlight", "Source.Silverlight\Moq.Silverlight.csproj", "{5136C8E1-E17F-481F-B29A-C7FAB528BD2D}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Moq.Tests.Silverlight", "UnitTests.Silverlight\Moq.Tests.Silverlight.csproj", "{02A2F6A6-D8CF-45EB-A424-BFD8C26034CE}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
@@ -35,8 +40,24 @@ Global
 		{81BBC911-4916-4E10-A955-752AE47CB2B9}.Release|Any CPU.Build.0 = Release|Any CPU
 		{81BBC911-4916-4E10-A955-752AE47CB2B9}.Release|x86.ActiveCfg = Release|x86
 		{81BBC911-4916-4E10-A955-752AE47CB2B9}.Release|x86.Build.0 = Release|x86
+		{5136C8E1-E17F-481F-B29A-C7FAB528BD2D}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{5136C8E1-E17F-481F-B29A-C7FAB528BD2D}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{5136C8E1-E17F-481F-B29A-C7FAB528BD2D}.Debug|x86.ActiveCfg = Debug|Any CPU
+		{5136C8E1-E17F-481F-B29A-C7FAB528BD2D}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{5136C8E1-E17F-481F-B29A-C7FAB528BD2D}.Release|Any CPU.Build.0 = Release|Any CPU
+		{5136C8E1-E17F-481F-B29A-C7FAB528BD2D}.Release|x86.ActiveCfg = Release|Any CPU
+		{02A2F6A6-D8CF-45EB-A424-BFD8C26034CE}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{02A2F6A6-D8CF-45EB-A424-BFD8C26034CE}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{02A2F6A6-D8CF-45EB-A424-BFD8C26034CE}.Debug|x86.ActiveCfg = Debug|Any CPU
+		{02A2F6A6-D8CF-45EB-A424-BFD8C26034CE}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{02A2F6A6-D8CF-45EB-A424-BFD8C26034CE}.Release|Any CPU.Build.0 = Release|Any CPU
+		{02A2F6A6-D8CF-45EB-A424-BFD8C26034CE}.Release|x86.ActiveCfg = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
+	EndGlobalSection
+	GlobalSection(NestedProjects) = preSolution
+		{5136C8E1-E17F-481F-B29A-C7FAB528BD2D} = {48EC9EB4-F52B-4404-89D7-5804E17B24D0}
+		{02A2F6A6-D8CF-45EB-A424-BFD8C26034CE} = {48EC9EB4-F52B-4404-89D7-5804E17B24D0}
 	EndGlobalSection
 EndGlobal

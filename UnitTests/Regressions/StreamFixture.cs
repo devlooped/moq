@@ -5,7 +5,11 @@ namespace Moq.Tests
 {
 	public class StreamFixture
 	{
+#if SILVERLIGHT
+		[Fact(Skip = "Can't run in silverlight.")]
+#else
 		[Fact]
+#endif
 		public void ShouldMockStream()
 		{
 			var mockStream = new Mock<Stream>();

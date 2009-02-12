@@ -42,7 +42,7 @@ namespace Moq.Tests
 			Assert.Throws<ArgumentException>(() => attr.CreateMatcher());
 		}
 
-		class MockMatcher : IMatcher
+		public class MockMatcher : IMatcher
 		{
 			#region IMatcher Members
 
@@ -58,7 +58,7 @@ namespace Moq.Tests
 			#endregion
 		}
 
-		class ThrowingMatcher : IMatcher
+		public class ThrowingMatcher : IMatcher
 		{
 			public ThrowingMatcher()
 			{

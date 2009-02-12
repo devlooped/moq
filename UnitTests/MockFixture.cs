@@ -9,28 +9,28 @@ namespace Moq.Tests
 		[Fact]
 		public void CreatesMockAndExposesInterface()
 		{
-			var mock = new Mock<ICloneable>();
+			var mock = new Mock<IComparable>();
 
-			ICloneable cloneable = mock.Object;
+			IComparable comparable = mock.Object;
 
-			Assert.NotNull(cloneable);
+			Assert.NotNull(comparable);
 		}
 
 
 		[Fact]
 		public void ThrowsIfNullExpectAction()
 		{
-			var mock = new Mock<ICloneable>();
+			var mock = new Mock<IComparable>();
 
-			Assert.Throws<ArgumentNullException>(() => mock.Setup((Expression<Action<ICloneable>>)null));
+			Assert.Throws<ArgumentNullException>(() => mock.Setup((Expression<Action<IComparable>>)null));
 		}
 
 		[Fact]
 		public void ThrowsIfNullExpectFunction()
 		{
-			var mock = new Mock<ICloneable>();
+			var mock = new Mock<IComparable>();
 
-			Assert.Throws<ArgumentNullException>(() => mock.Setup((Expression<Func<ICloneable, string>>)null));
+			Assert.Throws<ArgumentNullException>(() => mock.Setup((Expression<Func<IComparable, string>>)null));
 		}
 
 		[Fact]
@@ -288,6 +288,7 @@ namespace Moq.Tests
 			}
 		}
 
+#if !SILVERLIGHT
 		[Fact]
 		public void ExpectsPropertySetter()
 		{
@@ -341,7 +342,6 @@ namespace Moq.Tests
 			Assert.Equal(3, value2);
 		}
 
-
 		[Fact]
 		public void SetterLambdaUsesItIsAnyMatcher()
 		{
@@ -390,6 +390,7 @@ namespace Moq.Tests
 
 			Assert.Throws<NotSupportedException>(() => mock.SetupSet(foo => foo.Count = BigInt()));
 		}
+#endif
 
 		[Matcher]
 		private static int OddInt() { return 0; }
@@ -399,6 +400,7 @@ namespace Moq.Tests
 		private int BigInt() { return 0; }
 		private bool BigInt(int value) { return value > 2; }
 
+#if !SILVERLIGHT
 		[Fact]
 		public void ExpectsPropertySetterLambdaCoercesNullable()
 		{
@@ -449,6 +451,7 @@ namespace Moq.Tests
 
 			mock.VerifyAll();
 		}
+#endif
 
 		[Fact]
 		public void ExpectsPropertySetterWithNullValue()

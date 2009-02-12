@@ -370,6 +370,7 @@ namespace Moq.Tests
 			Assert.False(raisedField);
 		}
 
+#if !SILVERLIGHT
 		[Fact]
 		public void RaisesEvent()
 		{
@@ -552,6 +553,7 @@ namespace Moq.Tests
 			Assert.NotNull(args);
 			Assert.Equal("foo5Truebar", args.Value);
 		}
+#endif
 
 		public interface IWithEvent
 		{

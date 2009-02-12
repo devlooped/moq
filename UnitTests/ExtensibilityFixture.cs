@@ -37,7 +37,7 @@ namespace Moq.Tests
 			return null;
 		}
 
-		class BigOrderMatcher : IMatcher
+		public class BigOrderMatcher : IMatcher
 		{
 			public void Initialize(System.Linq.Expressions.Expression matcherExpression)
 			{

@@ -40,9 +40,9 @@ namespace Moq.Tests
 			try
 			{
 				var factory = new MockFactory(MockBehavior.Default);
-				var mock = factory.Create<ICloneable>();
+				var mock = factory.Create<IFoo>();
 
-				mock.Setup(cloneable => cloneable.Clone());
+				mock.Setup(foo => foo.Do());
 
 				factory.VerifyAll();
 			}

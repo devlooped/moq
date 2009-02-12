@@ -337,6 +337,7 @@ namespace Moq
 			return Mock.SetupGet(this, expression);
 		}
 
+#if !SILVERLIGHT
 		/// <summary>
 		/// Specifies a setup on the mocked type for a call to 
 		/// to a property setter. 
@@ -379,6 +380,7 @@ namespace Moq
 		{
 			return Mock.SetupSet<T>(this, setterExpression);
 		}
+#endif
 
 		/// <summary>
 		/// Specifies that the given property should have "property behavior", 
@@ -449,6 +451,7 @@ namespace Moq
 			SetupSet<T, TProperty>(this, property).Callback(p => value = p);
 		}
 
+#if !SILVERLIGHT
 		/// <summary>
 		/// Specifies that the all properties on the mock should have "property behavior", 
 		/// meaning that setting its value will cause it to be saved and 
@@ -464,6 +467,7 @@ namespace Moq
 		{
 			SetupAllProperties(this);
 		}
+#endif
 
 		#endregion
 
@@ -712,6 +716,7 @@ namespace Moq
 			Mock.VerifyGet(this, expression, times, failMessage);
 		}
 
+#if !SILVERLIGHT
 		/// <summary>
 		/// Verifies that a property was set on the mock.
 		/// Use in conjuntion with the default <see cref="MockBehavior.Loose"/>.
@@ -787,6 +792,7 @@ namespace Moq
 		{
 			Mock.VerifySet(this, setterExpression, times, failMessage);
 		}
+#endif
 
 		#endregion
 
@@ -913,6 +919,7 @@ namespace Moq
 
 		#endregion
 
+#if !SILVERLIGHT
 		/// <summary>
 		/// Raises the event referenced in <paramref name="eventExpression"/> using 
 		/// the given <paramref name="sender"/> and <paramref name="args"/> arguments.
@@ -966,7 +973,7 @@ namespace Moq
 				throw e;
 			}
 		}
-
+#endif
 		// NOTE: known issue. See https://connect.microsoft.com/VisualStudio/feedback/ViewFeedback.aspx?FeedbackID=318122
 		//public static implicit operator TInterface(Mock<T> mock)
 		//{

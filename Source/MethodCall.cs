@@ -60,6 +60,7 @@ namespace Moq
 		{
 		}
 
+#if !SILVERLIGHT
 		public IVerifies Raises(Action<TMock> eventExpression, EventArgs args)
 		{
 			return Raises(eventExpression, () => args);
@@ -89,6 +90,7 @@ namespace Moq
 		{
 			return RaisesImpl(eventExpression, func);
 		}
+#endif
 	}
 
 	internal class MethodCall : IProxyCall, ICallbackResult, IVerifies, IThrowsResult
@@ -163,6 +165,7 @@ namespace Moq
 
 		private void SetFileInfo()
 		{
+#if !SILVERLIGHT
 			var thisMethod = MethodBase.GetCurrentMethod();
 			var stack = new StackTrace(true);
 			var index = 0;
@@ -190,6 +193,7 @@ namespace Moq
 				FileName = Path.GetFileName(frame.GetFileName());
 				TestMethod = frame.GetMethod();
 			}
+#endif
 		}
 
 		public void SetOutParameters(IInvocation call)
@@ -456,6 +460,7 @@ namespace Moq
 			return this;
 		}
 
+#if !SILVERLIGHT
 		protected IVerifies RaisesImpl<TMock>(Action<TMock> eventExpression, Delegate func)
 		{
 			var ev = eventExpression.GetEvent();
@@ -466,5 +471,6 @@ namespace Moq
 
 			return this;
 		}
+#endif
 	}
 }

@@ -1,0 +1,177 @@
+﻿<Project ToolsVersion="3.5" DefaultTargets="Build" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
+  <PropertyGroup>
+    <Configuration Condition=" '$(Configuration)' == '' ">Debug</Configuration>
+    <Platform Condition=" '$(Platform)' == '' ">AnyCPU</Platform>
+    <ProductVersion>9.0.30729</ProductVersion>
+    <SchemaVersion>2.0</SchemaVersion>
+    <ProjectGuid>{02A2F6A6-D8CF-45EB-A424-BFD8C26034CE}</ProjectGuid>
+    <ProjectTypeGuids>{A1591282-1198-4647-A2B1-27E5FF5F6F3B};{fae04ec0-301f-11d3-bf4b-00c04f79efbc}</ProjectTypeGuids>
+    <OutputType>Library</OutputType>
+    <AppDesignerFolder>Properties</AppDesignerFolder>
+    <RootNamespace>Moq.Tests</RootNamespace>
+    <AssemblyName>Moq.Tests.Silverlight</AssemblyName>
+    <TargetFrameworkVersion>v3.5</TargetFrameworkVersion>
+    <SilverlightApplication>true</SilverlightApplication>
+    <SupportedCultures>
+    </SupportedCultures>
+    <XapOutputs>true</XapOutputs>
+    <GenerateSilverlightManifest>true</GenerateSilverlightManifest>
+    <XapFilename>Moq.Tests.Silverlight.xap</XapFilename>
+    <SilverlightManifestTemplate>Properties\AppManifest.xml</SilverlightManifestTemplate>
+    <SilverlightAppEntry>Moq.Tests.Silverlight.App</SilverlightAppEntry>
+    <TestPageFileName>TestPage.html</TestPageFileName>
+    <CreateTestPage>true</CreateTestPage>
+    <ValidateXaml>true</ValidateXaml>
+    <ThrowErrorsInValidation>false</ThrowErrorsInValidation>
+    <SignAssembly>true</SignAssembly>
+    <AssemblyOriginatorKeyFile>..\Moq.snk</AssemblyOriginatorKeyFile>
+  </PropertyGroup>
+  <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Debug|AnyCPU' ">
+    <DebugSymbols>true</DebugSymbols>
+    <DebugType>full</DebugType>
+    <Optimize>false</Optimize>
+    <OutputPath>Bin\Debug</OutputPath>
+    <DefineConstants>DEBUG;TRACE;SILVERLIGHT</DefineConstants>
+    <NoStdLib>true</NoStdLib>
+    <NoConfig>true</NoConfig>
+    <ErrorReport>prompt</ErrorReport>
+    <WarningLevel>4</WarningLevel>
+  </PropertyGroup>
+  <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Release|AnyCPU' ">
+    <DebugType>pdbonly</DebugType>
+    <Optimize>true</Optimize>
+    <OutputPath>Bin\Release</OutputPath>
+    <DefineConstants>TRACE;SILVERLIGHT</DefineConstants>
+    <NoStdLib>true</NoStdLib>
+    <NoConfig>true</NoConfig>
+    <ErrorReport>prompt</ErrorReport>
+    <WarningLevel>4</WarningLevel>
+  </PropertyGroup>
+  <ItemGroup>
+    <Reference Include="Microsoft.Silverlight.Testing, Version=2.0.21103.1925, Culture=neutral, PublicKeyToken=31bf3856ad364e35, processorArchitecture=MSIL">
+      <SpecificVersion>False</SpecificVersion>
+      <HintPath>..\Lib\Microsoft\Microsoft.Silverlight.Testing.dll</HintPath>
+    </Reference>
+    <Reference Include="Microsoft.VisualStudio.QualityTools.UnitTesting.Silverlight, Version=2.0.21024.1838, Culture=neutral, PublicKeyToken=31bf3856ad364e35, processorArchitecture=MSIL">
+      <SpecificVersion>False</SpecificVersion>
+      <HintPath>..\Lib\Microsoft\Microsoft.VisualStudio.QualityTools.UnitTesting.Silverlight.dll</HintPath>
+    </Reference>
+    <Reference Include="System.ServiceModel" />
+    <Reference Include="System.Windows" />
+    <Reference Include="mscorlib" />
+    <Reference Include="system" />
+    <Reference Include="System.Core" />
+    <Reference Include="System.Net" />
+    <Reference Include="System.Xml" />
+    <Reference Include="System.Windows.Browser" />
+    <Reference Include="XunitLight.Silverlight, Version=1.0.0.0, Culture=neutral, PublicKeyToken=d8d79242a2031a99, processorArchitecture=MSIL">
+      <SpecificVersion>False</SpecificVersion>
+      <HintPath>..\Lib\Microsoft\XunitLight.Silverlight.dll</HintPath>
+    </Reference>
+  </ItemGroup>
+  <ItemGroup>
+    <Compile Include="..\UnitTests\AdvancedMatcherAttributeFixture.cs">
+      <Link>AdvancedMatcherAttributeFixture.cs</Link>
+    </Compile>
+    <Compile Include="..\UnitTests\AsInterfaceFixture.cs">
+      <Link>AsInterfaceFixture.cs</Link>
+    </Compile>
+    <Compile Include="..\UnitTests\CallbacksFixture.cs">
+      <Link>CallbacksFixture.cs</Link>
+    </Compile>
+    <Compile Include="..\UnitTests\Demo.cs">
+      <Link>Demo.cs</Link>
+    </Compile>
+    <Compile Include="..\UnitTests\EmptyDefaultValueProviderFixture.cs">
+      <Link>EmptyDefaultValueProviderFixture.cs</Link>
+    </Compile>
+    <Compile Include="..\UnitTests\ExpressionExtensionsFixture.cs">
+      <Link>ExpressionExtensionsFixture.cs</Link>
+    </Compile>
+    <Compile Include="..\UnitTests\ExtensibilityFixture.cs">
+      <Link>ExtensibilityFixture.cs</Link>
+    </Compile>
+    <Compile Include="..\UnitTests\MatcherAttributeFixture.cs">
+      <Link>MatcherAttributeFixture.cs</Link>
+    </Compile>
+    <Compile Include="..\UnitTests\MatchersFixture.cs">
+      <Link>MatchersFixture.cs</Link>
+    </Compile>
+    <Compile Include="..\UnitTests\Matchers\AnyMatcherFixture.cs">
+      <Link>Matchers\AnyMatcherFixture.cs</Link>
+    </Compile>
+    <Compile Include="..\UnitTests\MockBehaviorFixture.cs">
+      <Link>MockBehaviorFixture.cs</Link>
+    </Compile>
+    <Compile Include="..\UnitTests\MockDefaultValueProviderFixture.cs">
+      <Link>MockDefaultValueProviderFixture.cs</Link>
+    </Compile>
+    <Compile Include="..\UnitTests\MockedEventsFixture.cs">
+      <Link>MockedEventsFixture.cs</Link>
+    </Compile>
+    <Compile Include="..\UnitTests\MockedFixture.cs">
+      <Link>MockedFixture.cs</Link>
+    </Compile>
+    <Compile Include="..\UnitTests\MockFactoryFixture.cs">
+      <Link>MockFactoryFixture.cs</Link>
+    </Compile>
+    <Compile Include="..\UnitTests\MockFixture.cs">
+      <Link>MockFixture.cs</Link>
+    </Compile>
+    <Compile Include="..\UnitTests\Regressions\ArgumentTypeFixture.cs">
+      <Link>Regressions\ArgumentTypeFixture.cs</Link>
+    </Compile>
+    <Compile Include="..\UnitTests\Regressions\IssueReportsFixture.cs">
+      <Link>Regressions\IssueReportsFixture.cs</Link>
+    </Compile>
+    <Compile Include="..\UnitTests\Regressions\StreamFixture.cs">
+      <Link>Regressions\StreamFixture.cs</Link>
+    </Compile>
+    <Compile Include="..\UnitTests\StubExtensionsFixture.cs">
+      <Link>StubExtensionsFixture.cs</Link>
+    </Compile>
+    <Compile Include="..\UnitTests\TimesFixture.cs">
+      <Link>TimesFixture.cs</Link>
+    </Compile>
+    <Compile Include="..\UnitTests\VerifyFixture.cs">
+      <Link>VerifyFixture.cs</Link>
+    </Compile>
+    <Compile Include="App.xaml.cs">
+      <DependentUpon>App.xaml</DependentUpon>
+    </Compile>
+    <Compile Include="Properties\AssemblyInfo.cs" />
+  </ItemGroup>
+  <ItemGroup>
+    <ApplicationDefinition Include="App.xaml">
+      <Generator>MSBuild:MarkupCompilePass1</Generator>
+      <SubType>Designer</SubType>
+    </ApplicationDefinition>
+  </ItemGroup>
+  <ItemGroup>
+    <None Include="..\Moq.snk">
+      <Link>Moq.snk</Link>
+    </None>
+    <None Include="Properties\AppManifest.xml" />
+  </ItemGroup>
+  <ItemGroup>
+    <ProjectReference Include="..\Source.Silverlight\Moq.Silverlight.csproj">
+      <Project>{5136C8E1-E17F-481F-B29A-C7FAB528BD2D}</Project>
+      <Name>Moq.Silverlight</Name>
+    </ProjectReference>
+  </ItemGroup>
+  <Import Project="$(MSBuildExtensionsPath)\Microsoft\Silverlight\v2.0\Microsoft.Silverlight.CSharp.targets" />
+  <!-- To modify your build process, add your task inside one of the targets below and uncomment it. 
+       Other similar extension points exist, see Microsoft.Common.targets.
+  <Target Name="BeforeBuild">
+  </Target>
+  <Target Name="AfterBuild">
+  </Target>
+  -->
+  <ProjectExtensions>
+    <VisualStudio>
+      <FlavorProperties GUID="{A1591282-1198-4647-A2B1-27E5FF5F6F3B}">
+        <SilverlightProjectProperties />
+      </FlavorProperties>
+    </VisualStudio>
+  </ProjectExtensions>
+</Project>

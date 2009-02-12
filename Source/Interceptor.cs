@@ -51,7 +51,11 @@ namespace Moq
 	/// Implements the actual interception and method invocation for 
 	/// all mocks.
 	/// </summary>
+#if SILVERLIGHT
+	internal class Interceptor : IInterceptor
+#else
 	internal class Interceptor : MarshalByRefObject, IInterceptor
+#endif
 	{
 		MockBehavior behavior;
 		Type targetType;
@@ -288,7 +292,11 @@ namespace Moq
 			Type baseType = initialType.BaseType;
 			if (baseType != null)
 				yield return baseType;
+#if SILVERLIGHT
+			foreach (var implementedInterface in Castle.DynamicProxy.SilverlightExtensions.Extensions.FindInterfaces(initialType, new TypeFilter((foo, bar) => true), null))
+#else
 			foreach (var implementedInterface in initialType.FindInterfaces(new TypeFilter((foo, bar) => true), null))
+#endif
 			{
 				yield return implementedInterface;
 			}

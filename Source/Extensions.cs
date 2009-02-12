@@ -111,7 +111,24 @@ namespace Moq
 			}
 			catch (TargetInvocationException ex)
 			{
+#if SILVERLIGHT
+			/* The test listed below fails when we call the setValue in silverlight...
+			 * 
+			 * 
+			 * Assembly:
+			 *    Moq.Tests.Silverlight.MSTest
+			 * Namespace:
+			 *    Moq.Tests
+			 * Test class:
+			 *    MockedEventsFixture
+			 * Test method:
+			 *    ShouldPreserveStackTraceWhenRaisingEvent
+			 * at System.Reflection.RtFieldInfo.PerformVisibilityCheckOnField(IntPtr field, Object target, IntPtr declaringType, FieldAttributes attr, UInt32 invocationFlags) at System.Reflection.RtFieldInfo.InternalSetValue(Object obj, Object value, BindingFlags invokeAttr, Binder binder, CultureInfo culture, Boolean doVisibilityCheck, Boolean doCheckConsistency) at System.Reflection.RtFieldInfo.InternalSetValue(Object obj, Object value, BindingFlags invokeAttr, Binder binder, CultureInfo culture, Boolean doVisibilityCheck) at System.Reflection.RtFieldInfo.SetValue(Object obj, Object value, BindingFlags invokeAttr, Binder binder, CultureInfo culture) at System.Reflection.FieldInfo.SetValue(Object obj, Object value) at Moq.Extensions.InvokePreserveStack(Delegate del, Object[] args) at Moq.MockedEvent.DoRaise(EventArgs args) at Moq.MockedEvent`1.Raise(TEventArgs args) at Moq.Tests.MockedEventsFixture.<>c__DisplayClass16.<ShouldPreserveStackTraceWhenRaisingEvent>b__14() at Xunit.Record.Exception(ThrowsDelegate code)
+			 */
+#else
+				remoteStackTraceString.SetValue(ex.InnerException, ex.InnerException.StackTrace);
 				ex.InnerException.SetStackTrace(ex.InnerException.StackTrace);
+#endif
 				throw ex.InnerException;
 			}
 		}
@@ -150,7 +167,7 @@ namespace Moq
 
 			return false;
 		}
-
+#if !SILVERLIGHT
 		public static EventInfo GetEvent<TMock>(this Action<TMock> eventExpression)
 		{
 			Guard.ArgumentNotNull(eventExpression, "eventExpression");
@@ -188,5 +205,6 @@ namespace Moq
 
 			return ev;
 		}
+#endif
 	}
 }

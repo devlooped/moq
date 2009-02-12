@@ -16,7 +16,7 @@ namespace Moq.Tests
 			var foo = new Mock<IFoo>();
 
 			foo.Object.Bar("asdf");
-			
+
 			foo.Verify(f => f.Bar(Any<string>()));
 		}
 
@@ -24,7 +24,11 @@ namespace Moq.Tests
 		public T Any<T>() { return default(T); }
 		public bool Any<T>(T value) { return true; }
 
+#if SILVERLIGHT
+		[Fact(Skip = "Won't run in silverlight")]
+#else
 		[Fact]
+#endif
 		public void ShouldFindPrivateMethodMatcher()
 		{
 			var foo = new Mock<IFoo>();
@@ -40,11 +44,12 @@ namespace Moq.Tests
 
 		[Matcher]
 		private static string OddLength() { return default(string); }
+
 		private static bool OddLength(string value) { return value.Length % 2 == 0; }
 
 		[Fact]
 		public void ShouldTranslateToUseMatcherImplementation()
-		{			
+		{
 			var mock = new Mock<IFoo>(MockBehavior.Strict);
 			mock.Setup(x => x.Bar(IsMagicString()));
 			IsMagicStringCalled = false;
@@ -109,9 +114,9 @@ namespace Moq.Tests
 		public void ExpectMissingMatcherMethod()
 		{
 			var mock = new Mock<IFoo>(MockBehavior.Strict);
-			
+
 			Assert.Throws<MissingMethodException>(
-				"public static bool MatcherHookWithoutMatcherMethod(System.String) in class Moq.Tests.MatcherAttributeFixture.", 
+				"public static bool MatcherHookWithoutMatcherMethod(System.String) in class Moq.Tests.MatcherAttributeFixture.",
 				() => mock.Setup(x => x.Bar(MatcherHookWithoutMatcherMethod())));
 		}
 
@@ -122,7 +127,7 @@ namespace Moq.Tests
 		public void ExpectMissingMatcherWithArgsMethod()
 		{
 			var mock = new Mock<IFoo>(MockBehavior.Strict);
-			
+
 			Assert.Throws<MissingMethodException>(
 				"public static bool MatcherHook2WithoutMatcherMethod(System.String, System.Int32) in class Moq.Tests.MatcherAttributeFixture.",
 				() => mock.Setup(x => x.Bar(MatcherHook2WithoutMatcherMethod(6))));
@@ -174,9 +179,9 @@ namespace Moq.Tests
 		[Fact]
 		public void AllowStaticMethodsInHelperClassAsMatcherHook()
 		{
-		    var mock = new Mock<IFoo>(MockBehavior.Strict);
-		    mock.Setup(x => x.Bar(A.NotNull()));
-		    mock.Object.Bar("a");
+			var mock = new Mock<IFoo>(MockBehavior.Strict);
+			mock.Setup(x => x.Bar(A.NotNull()));
+			mock.Object.Bar("a");
 		}
 
 		public static class A

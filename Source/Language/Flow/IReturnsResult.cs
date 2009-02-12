@@ -46,7 +46,11 @@ namespace Moq.Language.Flow
 	/// Implements the fluent API.
 	/// </summary>
 	[EditorBrowsable(EditorBrowsableState.Never)]
+#if SILVERLIGHT
+	public interface IReturnsResult<TMock> : ICallback, IOccurrence, IRaise, IVerifies, IHideObjectMembers
+#else
 	public interface IReturnsResult<TMock> : ICallback, IOccurrence, IRaise<TMock>, IRaise, IVerifies, IHideObjectMembers
+#endif
 	{
 	}
 }

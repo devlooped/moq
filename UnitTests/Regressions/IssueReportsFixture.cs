@@ -2,7 +2,9 @@
 using System.Collections.Generic;
 using System.Linq;
 using System.ServiceModel;
+#if !SILVERLIGHT
 using System.ServiceModel.Web;
+#endif
 using Xunit;
 
 namespace Moq.Tests.Regressions
@@ -165,7 +167,7 @@ namespace Moq.Tests.Regressions
 			Assert.Equal(2, mock.Object.Method(6));
 		}
 
-		static class IsEqual
+		public static class IsEqual
 		{
 			[Matcher]
 			public static T To<T>(T value)
@@ -296,7 +298,7 @@ namespace Moq.Tests.Regressions
 		}
 
 		#endregion
-
+#if !SILVERLIGHT
 		// run "netsh http add urlacl url=http://+:7777/ user=[domain]\[user]"
 		// to avoid running the test as an admin
 		[Fact(Skip = "Doesn't work in Mono")]
@@ -325,6 +327,7 @@ namespace Moq.Tests.Regressions
 				host.Open();
 			}
 		}
+#endif
 
 		[ServiceContract]
 		public interface IServiceContract
@@ -333,6 +336,7 @@ namespace Moq.Tests.Regressions
 			void Do();
 		}
 
+#if !SILVERLIGHT
 		[ServiceBehavior(InstanceContextMode = InstanceContextMode.Single)]
 		public class ServiceImplementation : IServiceContract
 		{
@@ -341,5 +345,6 @@ namespace Moq.Tests.Regressions
 				throw new NotImplementedException();
 			}
 		}
+#endif
 	}
 }

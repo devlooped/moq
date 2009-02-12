@@ -33,7 +33,7 @@ namespace Moq.Tests
 
 			Assert.Equal(15, mock.Object.ValueProperty);
 		}
-
+#if !SILVERLIGHT
 		[Fact]
 		public void StubsAllProperties()
 		{
@@ -91,6 +91,7 @@ namespace Moq.Tests
 			mock.Object.Value = 10;
 			Assert.Equal(10, mock.Object.Value);
 		}
+#endif
 
 		private object GetValue() { return new object(); }
 

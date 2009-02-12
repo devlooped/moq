@@ -46,7 +46,11 @@ namespace Moq.Language.Flow
 	/// Implements the fluent API.
 	/// </summary>
 	[EditorBrowsable(EditorBrowsableState.Never)]
+#if SILVERLIGHT
+	public interface ISetup<TMock> : ICallback, ICallbackResult, IRaise, INever, IVerifies, IHideObjectMembers
+#else
 	public interface ISetup<TMock> : ICallback, ICallbackResult, IRaise<TMock>, IRaise, INever, IVerifies, IHideObjectMembers
+#endif
 	{
 	}
 
@@ -70,7 +74,11 @@ namespace Moq.Language.Flow
 	/// Implements the fluent API.
 	/// </summary>
 	[EditorBrowsable(EditorBrowsableState.Never)]
+#if SILVERLIGHT
+	public interface ISetupSetter<TMock, TProperty> : ICallbackSetter<TProperty>, ICallbackResult, IRaise, INever, IVerifies, IHideObjectMembers
+#else
 	public interface ISetupSetter<TMock, TProperty> : ICallbackSetter<TProperty>, ICallbackResult, IRaise<TMock>, IRaise, INever, IVerifies, IHideObjectMembers
+#endif
 	{
 	}
 }
