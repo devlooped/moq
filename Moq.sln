@@ -14,7 +14,7 @@ Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Silverlight", "Silverlight"
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Moq.Silverlight", "Source.Silverlight\Moq.Silverlight.csproj", "{5136C8E1-E17F-481F-B29A-C7FAB528BD2D}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Moq.Tests.Silverlight", "UnitTests.Silverlight\Moq.Tests.Silverlight.csproj", "{02A2F6A6-D8CF-45EB-A424-BFD8C26034CE}"
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Moq.Silverlight.Tests", "UnitTests.Silverlight\Moq.Silverlight.Tests.csproj", "{02A2F6A6-D8CF-45EB-A424-BFD8C26034CE}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution

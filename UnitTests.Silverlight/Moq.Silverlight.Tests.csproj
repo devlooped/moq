@@ -9,7 +9,7 @@
     <OutputType>Library</OutputType>
     <AppDesignerFolder>Properties</AppDesignerFolder>
     <RootNamespace>Moq.Tests</RootNamespace>
-    <AssemblyName>Moq.Tests.Silverlight</AssemblyName>
+    <AssemblyName>Moq.Silverlight.Tests</AssemblyName>
     <TargetFrameworkVersion>v3.5</TargetFrameworkVersion>
     <SilverlightApplication>true</SilverlightApplication>
     <SupportedCultures>
