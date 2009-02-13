@@ -65,13 +65,13 @@ namespace Moq
 		/// <summary>
 		/// Specifies that a mocked method should be invoked <paramref name="times"/> times as minimum.
 		/// </summary>
-		/// <param name="times">The minimun number of times.</param>
+		/// <param name="callCount">The minimun number of times.</param>
 		/// <returns>An object defining the allowed number of invocations.</returns>
-		public static Times AtLeast(int times)
+		public static Times AtLeast(int callCount)
 		{
-			Guard.ArgumentNotOutOfRangeInclusive(times, 1, int.MaxValue, "times");
+			Guard.ArgumentNotOutOfRangeInclusive(callCount, 1, int.MaxValue, "callCount");
 
-			return new Times(c => c >= times, times, int.MaxValue, Resources.NoMatchingCallsAtLeast);
+			return new Times(c => c >= callCount, callCount, int.MaxValue, Resources.NoMatchingCallsAtLeast);
 		}
 
 		/// <summary>
@@ -86,13 +86,13 @@ namespace Moq
 		/// <summary>
 		/// Specifies that a mocked method should be invoked <paramref name="times"/> time as maximun.
 		/// </summary>
-		/// <param name="times">The maximun number of times.</param>
+		/// <param name="callCount">The maximun number of times.</param>
 		/// <returns>An object defining the allowed number of invocations.</returns>
-		public static Times AtMost(int times)
+		public static Times AtMost(int callCount)
 		{
-			Guard.ArgumentNotOutOfRangeInclusive(times, 0, int.MaxValue, "times");
+			Guard.ArgumentNotOutOfRangeInclusive(callCount, 0, int.MaxValue, "callCount");
 
-			return new Times(c => c >= 0 && c <= times, 0, times, Resources.NoMatchingCallsAtMost);
+			return new Times(c => c >= 0 && c <= callCount, 0, callCount, Resources.NoMatchingCallsAtMost);
 		}
 
 		/// <summary>
@@ -108,37 +108,45 @@ namespace Moq
 		/// Specifies that a mocked method should be invoked between <paramref name="from"/> and
 		/// <paramref name="to"/> times.
 		/// </summary>
-		/// <param name="from">The minimun number of times.</param>
-		/// <param name="to">The maximun number of times.</param>
+		/// <param name="callCountFrom">The minimun number of times.</param>
+		/// <param name="callCountTo">The maximun number of times.</param>
 		/// <param name="rangeKind">The kind of range. See <see cref="Range"/>.</param>
 		/// <returns>An object defining the allowed number of invocations.</returns>
-		public static Times Between(int from, int to, Range rangeKind)
+		public static Times Between(int callCountFrom, int callCountTo, Range rangeKind)
 		{
 			if (rangeKind == Range.Exclusive)
 			{
-				Guard.ArgumentNotOutOfRangeExclusive(from, 0, to, "from");
-				if (to - from == 1)
+				Guard.ArgumentNotOutOfRangeExclusive(callCountFrom, 0, callCountTo, "callCountFrom");
+				if (callCountTo - callCountFrom == 1)
 				{
-					throw new ArgumentOutOfRangeException("to");
+					throw new ArgumentOutOfRangeException("callCountTo");
 				}
 
-				return new Times(c => c > from && c < to, from, to, Resources.NoMatchingCallsBetweenExclusive);
+				return new Times(
+					c => c > callCountFrom && c < callCountTo,
+					callCountFrom,
+					callCountTo,
+					Resources.NoMatchingCallsBetweenExclusive);
 			}
 
-			Guard.ArgumentNotOutOfRangeInclusive(from, 0, to, "from");
-			return new Times(c => c >= from && c <= to, from, to, Resources.NoMatchingCallsBetweenInclusive);
+			Guard.ArgumentNotOutOfRangeInclusive(callCountFrom, 0, callCountTo, "callCountFrom");
+			return new Times(
+				c => c >= callCountFrom && c <= callCountTo,
+				callCountFrom,
+				callCountTo,
+				Resources.NoMatchingCallsBetweenInclusive);
 		}
 
 		/// <summary>
 		/// Specifies that a mocked method should be invoked exactly <paramref name="times"/> times.
 		/// </summary>
-		/// <param name="times">The times that a method or property can be called.</param>
+		/// <param name="callCount">The times that a method or property can be called.</param>
 		/// <returns>An object defining the allowed number of invocations.</returns>
-		public static Times Exactly(int times)
+		public static Times Exactly(int callCount)
 		{
-			Guard.ArgumentNotOutOfRangeInclusive(times, 0, int.MaxValue, "times");
+			Guard.ArgumentNotOutOfRangeInclusive(callCount, 0, int.MaxValue, "callCount");
 
-			return new Times(c => c == times, times, times, Resources.NoMatchingCallsExactly);
+			return new Times(c => c == callCount, callCount, callCount, Resources.NoMatchingCallsExactly);
 		}
 
 		/// <summary>
@@ -161,9 +169,9 @@ namespace Moq
 				this.to);
 		}
 
-		internal bool Verify(int calls)
+		internal bool Verify(int callCount)
 		{
-			return this.evaluator(calls);
+			return this.evaluator(callCount);
 		}
 	}
 }
