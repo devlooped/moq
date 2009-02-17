@@ -57,22 +57,21 @@ namespace Moq
 	internal class Interceptor : MarshalByRefObject, IInterceptor
 #endif
 	{
-		MockBehavior behavior;
-		Type targetType;
-		Dictionary<ExpressionKey, IProxyCall> calls = new Dictionary<ExpressionKey, IProxyCall>();
-		List<IProxyCall> orderedCalls = new List<IProxyCall>();
-		Mock mock;
-		List<IInvocation> actualInvocations = new List<IInvocation>();
+		private MockBehavior behavior;
+		private Type targetType;
+		private Dictionary<ExpressionKey, IProxyCall> calls = new Dictionary<ExpressionKey, IProxyCall>();
+		private List<IProxyCall> orderedCalls = new List<IProxyCall>();
+		private List<IInvocation> actualInvocations = new List<IInvocation>();
 
 		public Interceptor(MockBehavior behavior, Type targetType, Mock mock)
 		{
 			this.behavior = behavior;
 			this.targetType = targetType;
-			this.mock = mock;
+			this.Mock = mock;
 		}
 
 		internal IEnumerable<IInvocation> ActualCalls { get { return actualInvocations; } }
-		internal Mock Mock { get { return mock; } }
+		internal Mock Mock { get; private set; }
 
 		internal void Verify()
 		{
@@ -90,8 +89,7 @@ namespace Moq
 
 		private void VerifyOrThrow(Func<IProxyCall, bool> match)
 		{
-			var failures = new List<IProxyCall>(
-				calls.Values.Where(match));
+			var failures = calls.Values.Where(match).ToList();
 
 			if (failures.Count > 0)
 			{
@@ -106,7 +104,9 @@ namespace Moq
 			var s = expr.ToStringFixed();
 
 			if (kind == ExpectKind.PropertySet)
+			{
 				s = "set::" + s;
+			}
 
 			var constants = new ConstantsVisitor(expr).Values;
 			var key = new ExpressionKey(s, constants);
@@ -129,7 +129,7 @@ namespace Moq
 		public void Intercept(IInvocation invocation)
 		{
 			if (FluentMockContext.Current != null)
-				FluentMockContext.Current.Add(mock, invocation);
+				FluentMockContext.Current.Add(this.Mock, invocation);
 
 			// TODO: too many ifs in this method.
 			// see how to refactor with strategies.
@@ -137,13 +137,13 @@ namespace Moq
 			  invocation.Method.DeclaringType.GetGenericTypeDefinition() == typeof(IMocked<>))
 			{
 				// "Mixin" of IMocked<T>.Mock
-				invocation.ReturnValue = mock;
+				invocation.ReturnValue = this.Mock;
 				return;
 			}
 			else if (invocation.Method.DeclaringType == typeof(IMocked))
 			{
 				// "Mixin" of IMocked.Mock
-				invocation.ReturnValue = mock;
+				invocation.ReturnValue = this.Mock;
 				return;
 			}
 
@@ -164,7 +164,7 @@ namespace Moq
 					}
 					else
 					{
-						mock.AddEventHandler(eventInfo, (Delegate)invocation.Arguments[0]);
+						this.Mock.AddEventHandler(eventInfo, (Delegate)invocation.Arguments[0]);
 					}
 				}
 
@@ -186,7 +186,7 @@ namespace Moq
 					}
 					else
 					{
-						mock.RemoveEventHandler(eventInfo, (Delegate)invocation.Arguments[0]);
+						this.Mock.RemoveEventHandler(eventInfo, (Delegate)invocation.Arguments[0]);
 					}
 				}
 
@@ -229,7 +229,7 @@ namespace Moq
 			}
 			else if (invocation.TargetType.IsClass &&
 			  !invocation.Method.IsAbstract
-				&& mock.CallBase)
+				&& this.Mock.CallBase)
 			{
 				// For mocked classes, if the target method was not abstract, 
 				// invoke directly.
@@ -241,10 +241,16 @@ namespace Moq
 			  invocation.Method.ReturnType != typeof(void))
 			{
 				Mock recursiveMock;
-				if (mock.InnerMocks.TryGetValue(invocation.Method, out recursiveMock))
+				if (this.Mock.InnerMocks.TryGetValue(invocation.Method, out recursiveMock))
+				{
 					invocation.ReturnValue = recursiveMock.Object;
+				}
 				else
-					invocation.ReturnValue = mock.DefaultValueProvider.ProvideDefault(invocation.Method, invocation.Arguments);
+				{
+					invocation.ReturnValue = this.Mock.DefaultValueProvider.ProvideDefault(
+						invocation.Method,
+						invocation.Arguments);
+				}
 			}
 		}
 

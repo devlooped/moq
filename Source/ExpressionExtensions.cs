@@ -179,7 +179,7 @@ namespace Moq
 
 		public static Expression PartialMatcherAwareEval(this Expression expression)
 		{
-			return Evaluator.PartialEval(expression, 
+			return Evaluator.PartialEval(expression,
 				e => e.NodeType != ExpressionType.Parameter &&
 					!(e.NodeType == ExpressionType.Call &&
 					((MethodCallExpression)e).Method.GetCustomAttribute<AdvancedMatcherAttribute>(true) != null)
@@ -206,23 +206,28 @@ namespace Moq
 
 		internal sealed class ToStringFixVisitor : ExpressionVisitor
 		{
-			string expressionString;
-			List<MethodCallExpression> calls = new List<MethodCallExpression>();
+			private List<MethodCallExpression> calls = new List<MethodCallExpression>();
 
 			public ToStringFixVisitor(Expression expression)
 			{
-				Visit(expression);
+				this.Visit(expression);
 
 				string fullString = expression.ToString();
 
 				foreach (var call in calls)
 				{
 					string properCallString = BuildCallExpressionString(call);
+					string improperCallString = call.ToString();
 
-					fullString = fullString.Replace(call.ToString(), properCallString);
+					int index = fullString.IndexOf(improperCallString);
+					if (index != -1)
+					{
+						fullString = fullString.Substring(0, index) + properCallString +
+									 fullString.Substring(index + improperCallString.Length);
+					}
 				}
 
-				expressionString = fullString;
+				this.ExpressionString = fullString;
 			}
 
 			private static string BuildCallExpressionString(MethodCallExpression call)
@@ -268,13 +273,15 @@ namespace Moq
 				return properCallString;
 			}
 
-			public string ExpressionString { get { return expressionString; } }
+			public string ExpressionString { get; private set; }
 
 			protected override Expression VisitMethodCall(MethodCallExpression m)
 			{
 				// We only need to fix generic methods.
 				if (m.Method.IsGenericMethod)
+				{
 					calls.Add(m);
+				}
 
 				return base.VisitMethodCall(m);
 			}

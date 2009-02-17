@@ -6,6 +6,7 @@ using System.ServiceModel;
 using System.ServiceModel.Web;
 #endif
 using Xunit;
+using System.Net.Mail;
 
 namespace Moq.Tests.Regressions
 {
@@ -298,6 +299,32 @@ namespace Moq.Tests.Regressions
 		}
 
 		#endregion
+
+		#region #134
+
+		public class Issue134
+		{
+			[Fact]
+			public void Test()
+			{
+				Mock<IFoo> target = new Mock<IFoo>();
+				target.Setup(t => t.Submit(It.IsAny<string>(), It.IsAny<string>(), It.IsAny<int>()));
+
+				MockException e = Assert.Throws<MockVerificationException>(() => target.VerifyAll());
+
+				Assert.Contains(
+					"IFoo t => t.Submit(IsAny<String>(), IsAny<String>(), new [] {IsAny<Int32>()})",
+					e.Message);
+			}
+
+			public interface IFoo
+			{
+				void Submit(string mailServer, string from, params int[] toRecipient);
+			}
+		}
+
+		#endregion
+
 #if !SILVERLIGHT
 		// run "netsh http add urlacl url=http://+:7777/ user=[domain]\[user]"
 		// to avoid running the test as an admin

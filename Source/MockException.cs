@@ -40,12 +40,11 @@
 
 using System;
 using System.Collections.Generic;
-using System.Linq.Expressions;
-using System.Text;
-using Castle.Core.Interceptor;
+using System.Diagnostics.CodeAnalysis;
 using System.Globalization;
 using System.Security.Permissions;
-using System.Diagnostics.CodeAnalysis;
+using System.Text;
+using Castle.Core.Interceptor;
 
 namespace Moq
 {
@@ -184,25 +183,23 @@ namespace Moq
 			foreach (var setup in failedSetups)
 			{
 				if (setup.FailMessage != null)
+				{
 					message.Append(setup.FailMessage).Append(": ");
+				}
 
 				var lambda = setup.SetupExpression.PartialMatcherAwareEval().ToLambda();
 				var targetTypeName = lambda.Parameters[0].Type.Name;
 
-				message
-					.Append(targetTypeName)
-					.Append(" ")
-					.Append(lambda.ToStringFixed());
+				message.Append(targetTypeName).Append(" ").Append(lambda.ToStringFixed());
 
 				if (setup.TestMethod != null)
-					message
-						.Append(" (")
-						.Append(setup.TestMethod.Name)
-						.Append("() in ")
-						.Append(setup.FileName)
-						.Append(": line ")
-						.Append(setup.FileLine)
-						.AppendLine(")");
+				{
+					message.AppendFormat(
+						" ({0}() in {1}: line {2})",
+						setup.TestMethod.Name,
+						setup.FileName,
+						setup.FileLine);
+				}
 
 				message.AppendLine();
 			}
@@ -227,5 +224,4 @@ namespace Moq
 		}
 #endif
 	}
-
 }
