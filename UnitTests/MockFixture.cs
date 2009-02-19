@@ -590,7 +590,7 @@ namespace Moq.Tests
 		}
 
 		[Fact]
-		public void ExpectWithParamArrayNotMatchDifferntLengthInArguments()
+		public void ExpectWithParamArrayNotMatchDifferentLengthInArguments()
 		{
 			string notExpected = "bar";
 			string argument = "foo";
