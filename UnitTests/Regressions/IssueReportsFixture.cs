@@ -6,7 +6,6 @@ using System.ServiceModel;
 using System.ServiceModel.Web;
 #endif
 using Xunit;
-using System.Net.Mail;
 
 namespace Moq.Tests.Regressions
 {

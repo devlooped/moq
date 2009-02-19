@@ -311,6 +311,7 @@ namespace Moq
 			Expression<Func<T, TResult>> expression,
 			Times times,
 			string failMessage)
+			where T : class
 		{
 			var lambda = expression.ToLambda();
 			if (lambda.IsProperty())
@@ -333,6 +334,7 @@ namespace Moq
 			Expression<Func<T, TProperty>> expression,
 			Times times,
 			string failMessage)
+			where T : class
 		{
 			var lambda = expression.ToLambda();
 			var prop = lambda.ToPropertyInfo();
@@ -350,6 +352,7 @@ namespace Moq
 			Expression<Func<T, TProperty>> expression,
 			Times times,
 			string failMessage)
+			where T : class
 		{
 			var lambda = expression.ToLambda();
 			var prop = lambda.ToPropertyInfo();
@@ -364,6 +367,7 @@ namespace Moq
 			TProperty value,
 			Times times,
 			string failMessage)
+			where T : class
 		{
 			var lambda = expression.ToLambda();
 			var prop = lambda.ToPropertyInfo();
@@ -419,6 +423,7 @@ namespace Moq
 		#region Setup
 
 		internal static MethodCall<T1> Setup<T1>(Mock mock, Expression<Action<T1>> expression)
+			where T1 : class
 		{
 			return PexProtector.Invoke(() =>
 			{
@@ -438,6 +443,7 @@ namespace Moq
 		}
 
 		internal static MethodCallReturn<T1, TResult> Setup<T1, TResult>(Mock mock, Expression<Func<T1, TResult>> expression)
+			where T1 : class
 		{
 			return PexProtector.Invoke(() =>
 			{
@@ -462,6 +468,7 @@ namespace Moq
 		}
 
 		internal static MethodCallReturn<T1, TProperty> SetupGet<T1, TProperty>(Mock mock, Expression<Func<T1, TProperty>> expression)
+			where T1 : class
 		{
 			return PexProtector.Invoke(() =>
 			{
@@ -677,6 +684,7 @@ namespace Moq
 
 		internal static SetterMethodCall<T1, TProperty> SetupSet<T1, TProperty>(Mock mock,
 			Expression<Func<T1, TProperty>> expression)
+			where T1 : class
 		{
 			var prop = expression.ToLambda().ToPropertyInfo();
 			ThrowIfPropertyNotWritable(prop);
@@ -694,6 +702,7 @@ namespace Moq
 
 		internal static SetterMethodCall<T1, TProperty> SetupSet<T1, TProperty>(Mock mock,
 			Expression<Func<T1, TProperty>> expression, TProperty value)
+			where T1 : class
 		{
 			var lambda = expression.ToLambda();
 			var prop = lambda.ToPropertyInfo();

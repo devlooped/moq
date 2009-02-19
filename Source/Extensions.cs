@@ -167,27 +167,21 @@ namespace Moq
 
 			return false;
 		}
-#if !SILVERLIGHT
-		public static EventInfo GetEvent<TMock>(this Action<TMock> eventExpression)
+
+		public static EventInfo GetEvent<TMock>(this Action<TMock> eventExpression, TMock mock)
+			where TMock : class
 		{
 			Guard.ArgumentNotNull(eventExpression, "eventExpression");
 
-			var reader = new Indy.IL2CPU.IL.ILReader(eventExpression.Method);
 			MethodBase addRemove = null;
-			while (reader.Read())
+			using (var context = new FluentMockContext())
 			{
-				if (reader.OpCode == Indy.IL2CPU.IL.OpCodeEnum.Callvirt &&
-					(reader.OperandValueMethod.Name.StartsWith("add_") ||
-					reader.OperandValueMethod.Name.StartsWith("remove_")))
-				{
-					addRemove = reader.OperandValueMethod;
-					break;
-				}
-			}
+				eventExpression(mock);
 
-			if (addRemove == null)
-			{
-				throw new ArgumentException("Expression is not an event attach or detach.");
+				if (context.LastInvocation == null)
+					throw new ArgumentException("Expression is not an event attach or detach, or the event is declared in a class but not marked virtual.");
+
+				addRemove = context.LastInvocation.Invocation.Method;
 			}
 
 			var ev = addRemove.DeclaringType.GetEvent(
@@ -198,13 +192,8 @@ namespace Moq
 				throw new ArgumentException(String.Format(CultureInfo.CurrentCulture,
 					"Could not locate event for attach or detach method {0}.", addRemove.ToString()));
 			}
-			else if (!addRemove.IsVirtual)
-			{
-				throw new ArgumentException("Event must be declared on an interface, or be marked virtual.");
-			}
 
 			return ev;
 		}
-#endif
 	}
 }

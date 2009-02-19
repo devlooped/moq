@@ -52,6 +52,7 @@ namespace Moq.Language
 	/// <typeparam name="TProperty">Type of the property.</typeparam>
 	[EditorBrowsable(EditorBrowsableState.Never)]
 	public interface ICallbackGetter<TMock, TProperty> : IHideObjectMembers
+		where TMock : class
 	{ 
 		/// <summary>
 		/// Specifies a callback to invoke when the property is retrieved.

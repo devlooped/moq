@@ -47,6 +47,7 @@ namespace Moq.Language.Flow
 	/// </summary>
 	[EditorBrowsable(EditorBrowsableState.Never)]
 	public interface IReturnsThrows<TMock, TResult> : IReturns<TMock, TResult>, IThrows, IHideObjectMembers
+		where TMock : class
 	{
 	}
 
@@ -55,6 +56,7 @@ namespace Moq.Language.Flow
 	/// </summary>
 	[EditorBrowsable(EditorBrowsableState.Never)]
 	public interface IReturnsThrowsGetter<TMock, TProperty> : IReturnsGetter<TMock, TProperty>, IThrows, IHideObjectMembers
+		where TMock : class
 	{
 	}
 }

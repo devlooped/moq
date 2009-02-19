@@ -51,6 +51,7 @@ namespace Moq.Language
 	/// <typeparam name="TProperty">Type of the property.</typeparam>
 	[EditorBrowsable(EditorBrowsableState.Never)]
 	public interface IReturnsGetter<TMock, TProperty> : IHideObjectMembers
+		where TMock : class
 	{
 		/// <summary>
 		/// Specifies the value to return.

@@ -63,6 +63,7 @@ namespace Moq
 	}
 
 	internal sealed class MethodCallReturn<TMock, TResult> : MethodCallReturn, IProxyCall, ISetup<TMock, TResult>, ISetupGetter<TMock, TResult>, IReturnsResult<TMock>
+		where TMock : class
 	{
 		Delegate valueDel = (Func<TResult>)(() => default(TResult));
 		Action<object[]> afterReturnCallback;

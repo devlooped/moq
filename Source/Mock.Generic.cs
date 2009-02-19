@@ -919,7 +919,6 @@ namespace Moq
 
 		#endregion
 
-#if !SILVERLIGHT
 		/// <summary>
 		/// Raises the event referenced in <paramref name="eventExpression"/> using 
 		/// the given <paramref name="sender"/> and <paramref name="args"/> arguments.
@@ -958,7 +957,7 @@ namespace Moq
 		[SuppressMessage("Microsoft.Usage", "CA2200:RethrowToPreserveStackDetails", Justification = "We want to reset the stack trace to avoid Moq noise in it.")]
 		public void Raise(Action<T> eventExpression, EventArgs args)
 		{
-			var ev = eventExpression.GetEvent();
+			var ev = eventExpression.GetEvent(this.Object);
 
 			var me = new MockedEvent(this);
 			me.Event = ev;
@@ -973,7 +972,7 @@ namespace Moq
 				throw e;
 			}
 		}
-#endif
+
 		// NOTE: known issue. See https://connect.microsoft.com/VisualStudio/feedback/ViewFeedback.aspx?FeedbackID=318122
 		//public static implicit operator TInterface(Mock<T> mock)
 		//{

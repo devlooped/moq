@@ -28,7 +28,7 @@ namespace Moq
 			invocations.Add(new MockInvocation(mock, invocation));
 		}
 
-		public MockInvocation LastInvocation { get { return invocations[invocations.Count - 1]; } }
+		public MockInvocation LastInvocation { get { return invocations.LastOrDefault(); } }
 
 		public void Dispose()
 		{

@@ -51,6 +51,7 @@ namespace Moq.Language
 	/// <typeparam name="TResult">Type of the return value from the expression.</typeparam>
 	[EditorBrowsable(EditorBrowsableState.Never)]
 	public interface IReturns<TMock, TResult> : IHideObjectMembers
+		where TMock : class
 	{
 		/// <summary>
 		/// Specifies the value to return.

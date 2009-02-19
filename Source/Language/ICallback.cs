@@ -165,6 +165,7 @@ namespace Moq.Language
 	/// <typeparam name="TResult">Type of the return value of the setup.</typeparam>
 	[EditorBrowsable(EditorBrowsableState.Never)]
 	public interface ICallback<TMock, TResult> : IHideObjectMembers
+		where TMock : class
 	{
 		/// <summary>
 		/// Specifies a callback to invoke when the method is called.
