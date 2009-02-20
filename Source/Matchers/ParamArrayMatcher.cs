@@ -49,10 +49,6 @@ namespace Moq
 		private NewArrayExpression arrayInitExpression;
 		private IMatcher[] matchers;
 
-		internal ParamArrayMatcher()
-		{
-		}
-
 		public void Initialize(Expression arrayInitExpression)
 		{
 			this.arrayInitExpression = arrayInitExpression as NewArrayExpression;

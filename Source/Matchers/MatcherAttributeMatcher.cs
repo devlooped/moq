@@ -90,7 +90,6 @@ namespace Moq.Matchers
 				var candidates =
 					from m in call.Method.DeclaringType.GetMethods(
 						BindingFlags.Public |
-						BindingFlags.NonPublic |
 						BindingFlags.Static |
 						BindingFlags.Instance)
 					where
@@ -110,7 +109,6 @@ namespace Moq.Matchers
 			{
 				method = call.Method.DeclaringType.GetMethod(call.Method.Name,
 						BindingFlags.Public |
-						BindingFlags.NonPublic |
 						BindingFlags.Static |
 						BindingFlags.Instance,
 						null, 

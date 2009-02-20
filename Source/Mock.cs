@@ -46,7 +46,6 @@ using System.Globalization;
 using System.Linq;
 using System.Linq.Expressions;
 using System.Reflection;
-using Indy.IL2CPU.IL;
 using Moq.Properties;
 
 namespace Moq
@@ -536,48 +535,27 @@ namespace Moq
 			where T1 : class
 			where TCall : MethodCall
 		{
-			var reader = new ILReader(setterExpression.Method);
-			MethodBase setter = null;
-			MethodInfo matcher = null;
-
-			while (reader.Read())
-			{
-				if (reader.OpCode == OpCodeEnum.Callvirt &&
-					reader.OperandValueMethod.Name.StartsWith("set_"))
-				{
-					setter = reader.OperandValueMethod;
-				}
-				else if (reader.OpCode == OpCodeEnum.Call || reader.OpCode == OpCodeEnum.Callvirt)
-				{
-					// See if we have a supported matcher invocation.
-					var m = reader.OperandValueMethod;
-					if (m.GetCustomAttribute<AdvancedMatcherAttribute>(true) != null ||
-						m.GetCustomAttribute<MatcherAttribute>(true) != null)
-					{
-						if (m.GetParameters().Length != 0)
-							throw new NotSupportedException(Properties.Resources.UnsupportedMatcherParamsForSetter);
-						if (!m.IsStatic)
-							throw new NotSupportedException(Properties.Resources.UnsupportedNonStaticMatcherForSetter);
-
-						// Can always cast as the matcher attribute is only valid on methods.
-						matcher = (MethodInfo)m;
-					}
-				}
-			}
-
-			if (setter == null)
-				throw new ArgumentException(Properties.Resources.SetupNotSetter);
-			ThrowIfCantOverride<T1>(setter);
-
 			using (var context = new FluentMockContext())
 			{
 				setterExpression(mock.Object);
 
 				var last = context.LastInvocation;
+
+				if (last == null)
+					throw new ArgumentException(String.Format(
+						CultureInfo.InvariantCulture, 
+						"SetupSet"));
+
+				var setter = last.Invocation.Method;
+				if (!setter.IsSpecialName || !setter.Name.StartsWith("set_"))
+					throw new ArgumentException(Properties.Resources.SetupNotSetter);
+
+				// No need to call ThrowIfCantOverride as non-overridable would have thrown above already.
+
 				var x = Expression.Parameter(last.Invocation.Method.DeclaringType, "x");
 
 				Expression value;
-				if (matcher == null)
+				if (context.LastInvocation.Matcher == null)
 				{
 					value = last.Invocation.Arguments[0] != null &&
 						last.Invocation.Arguments[0].GetType() == setter.GetParameters()[0].ParameterType ?
@@ -589,7 +567,7 @@ namespace Moq
 				}
 				else
 				{
-					value = Expression.Call(matcher);
+					value = context.LastInvocation.Matcher;
 				}
 
 				var lambda = Expression.Lambda(typeof(Action<>).MakeGenericType(x.Type),

@@ -357,39 +357,41 @@ namespace Moq.Tests
 		}
 
 		[Fact]
-		public void SetterLambdaUsesCustomMatcher()
+		public void SetterLambdaUsesItIsInRangeMatcher()
 		{
 			var mock = new Mock<IFoo>();
 
-			mock.SetupSet(foo => foo.Count = OddInt());
-
-			Assert.Throws<MockVerificationException>(() => mock.VerifyAll());
-
-			mock.Object.Count = 3;
+			mock.SetupSet(foo => foo.Count = It.IsInRange(1, 5, Range.Inclusive));
 
 			Assert.Throws<MockVerificationException>(() => mock.VerifyAll());
 
 			mock.Object.Count = 6;
 
+			Assert.Throws<MockVerificationException>(() => mock.VerifyAll());
+
+			mock.Object.Count = 5;
+
 			mock.VerifyAll();
 		}
 
 		[Fact]
-		public void SetterLambdaThrowsIfMatcherArguments()
+		public void SetterLambdaUsesItIsPredicateMatcher()
 		{
 			var mock = new Mock<IFoo>();
 
-			Assert.Throws<NotSupportedException>(() =>
-				mock.SetupSet(foo => foo.Count = It.IsInRange<int>(1, 5, Range.Inclusive)));
+			mock.SetupSet(foo => foo.Count = It.Is<int>(v => v % 2 == 0));
+
+			Assert.Throws<MockVerificationException>(() => mock.VerifyAll());
+
+			mock.Object.Count = 7;
+
+			Assert.Throws<MockVerificationException>(() => mock.VerifyAll());
+
+			mock.Object.Count = 4;
+
+			mock.VerifyAll();
 		}
 
-		[Fact]
-		public void SetterLambdaThrowsIfMatcherNonStatic()
-		{
-			var mock = new Mock<IFoo>();
-
-			Assert.Throws<NotSupportedException>(() => mock.SetupSet(foo => foo.Count = BigInt()));
-		}
 #endif
 
 		[Matcher]
@@ -400,7 +402,6 @@ namespace Moq.Tests
 		private int BigInt() { return 0; }
 		private bool BigInt(int value) { return value > 2; }
 
-#if !SILVERLIGHT
 		[Fact]
 		public void ExpectsPropertySetterLambdaCoercesNullable()
 		{
@@ -451,7 +452,6 @@ namespace Moq.Tests
 
 			mock.VerifyAll();
 		}
-#endif
 
 		[Fact]
 		public void ExpectsPropertySetterWithNullValue()

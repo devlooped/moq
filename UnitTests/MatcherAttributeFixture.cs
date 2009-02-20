@@ -24,27 +24,18 @@ namespace Moq.Tests
 		public T Any<T>() { return default(T); }
 		public bool Any<T>(T value) { return true; }
 
-#if SILVERLIGHT
-		[Fact(Skip = "Won't run in silverlight")]
-#else
 		[Fact]
-#endif
-		public void ShouldFindPrivateMethodMatcher()
+		public void ShouldNotFindPrivateMethodMatcher()
 		{
 			var foo = new Mock<IFoo>();
 
 			foo.Object.Bar("asd");
 
-			Assert.Throws<MockException>(() => foo.Verify(f => f.Bar(OddLength())));
-
-			foo.Object.Bar("asdf");
-
-			foo.Verify(f => f.Bar(OddLength()));
+			Assert.Throws<MissingMethodException>(() => foo.Verify(f => f.Bar(OddLength())));
 		}
 
 		[Matcher]
 		private static string OddLength() { return default(string); }
-
 		private static bool OddLength(string value) { return value.Length % 2 == 0; }
 
 		[Fact]

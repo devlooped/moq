@@ -39,8 +39,10 @@
 // http://www.opensource.org/licenses/bsd-license.php]
 
 using System;
+using System.Linq;
 using System.Linq.Expressions;
 using System.Text.RegularExpressions;
+using System.Reflection;
 
 namespace Moq
 {
@@ -73,6 +75,7 @@ namespace Moq
 		[AdvancedMatcher(typeof(AnyMatcher))]
 		public static TValue IsAny<TValue>()
 		{
+			SetLastMatcher<TValue>(MethodBase.GetCurrentMethod());
 			return default(TValue);
 		}
 
@@ -103,6 +106,7 @@ namespace Moq
 		[AdvancedMatcher(typeof(PredicateMatcher))]
 		public static TValue Is<TValue>(Expression<Predicate<TValue>> match)
 		{
+			SetLastMatcher<TValue>(MethodBase.GetCurrentMethod(), match);
 			return default(TValue);
 		}
 
@@ -130,6 +134,7 @@ namespace Moq
 		public static TValue IsInRange<TValue>(TValue from, TValue to, Range rangeKind)
 			where TValue : IComparable
 		{
+			SetLastMatcher<TValue>(MethodBase.GetCurrentMethod(), from, to, rangeKind);
 			return default(TValue);
 		}
 
@@ -148,6 +153,7 @@ namespace Moq
 		[AdvancedMatcher(typeof(RegexMatcher))]
 		public static string IsRegex(string regex)
 		{
+			SetLastMatcher<string>(MethodBase.GetCurrentMethod(), regex);
 			return default(string);
 		}
 
@@ -168,7 +174,35 @@ namespace Moq
 		[AdvancedMatcher(typeof(RegexMatcher))]
 		public static string IsRegex(string regex, RegexOptions options)
 		{
+			SetLastMatcher<string>(MethodBase.GetCurrentMethod(), regex, options);
 			return default(string);
+		}
+
+		/// <devdoc>
+		/// This method is used to set an expression as the last matcher invoked, 
+		/// which is used in the SetupSet to allow matchers in the prop = value 
+		/// delegate expression. This delegate is executed in "fluent" mode in 
+		/// order to capture the value being set, and construct the corresponding 
+		/// methodcall. This method ensures that when we execute the delegate, we 
+		/// also track the matcher that was invoked, so that when we create the 
+		/// methodcall we build the expression using it, rather than the null/default 
+		/// value returned from the actual invocation.
+		/// </devdoc>
+		private static void SetLastMatcher<TValue>(MethodBase invokedMethod, params object[] args)
+		{
+			if (FluentMockContext.IsActive)
+			{
+				var concreteMethod = invokedMethod.IsGenericMethodDefinition ?
+					((MethodInfo)invokedMethod).MakeGenericMethod(typeof(TValue)) :
+					(MethodInfo)invokedMethod;
+
+				FluentMockContext.Current.LastMatcherInvocation =
+					Expression.Call(
+						concreteMethod,
+						args.Select(a => a is Expression ? (Expression)a : Expression.Constant(a))
+							.ToArray()
+					);
+			}
 		}
 	}
 }

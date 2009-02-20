@@ -196,7 +196,7 @@ namespace Moq
 			// Save to support Verify[expression] pattern, but only if we're 
 			// not running in a fluent invocation context, which is a recorder-like 
 			// mode we use to evaluate delegates by actually running them.
-			if (!FluentMockContext.SkipRecording)
+			if (!FluentMockContext.IsActive)
 				actualInvocations.Add(invocation);
 
 			var call = orderedCalls.LastOrDefault(c => c.Matches(invocation));

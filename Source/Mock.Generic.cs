@@ -337,7 +337,6 @@ namespace Moq
 			return Mock.SetupGet(this, expression);
 		}
 
-#if !SILVERLIGHT
 		/// <summary>
 		/// Specifies a setup on the mocked type for a call to 
 		/// to a property setter. 
@@ -380,7 +379,6 @@ namespace Moq
 		{
 			return Mock.SetupSet<T>(this, setterExpression);
 		}
-#endif
 
 		/// <summary>
 		/// Specifies that the given property should have "property behavior", 
