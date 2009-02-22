@@ -1,0 +1,3 @@
+Unit test framework provided by http://code.msdn.microsoft.com/silverlightut
+
+XunitLight.Silverlight.dll: see xUnit\XunitLight.Silverlight folder
