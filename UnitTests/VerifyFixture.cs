@@ -1,7 +1,6 @@
 ﻿using System;
-using Xunit;
 using Moq;
-using System.Diagnostics;
+using Xunit;
 
 namespace Moq.Tests
 {

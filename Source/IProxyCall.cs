@@ -39,8 +39,8 @@
 // http://www.opensource.org/licenses/bsd-license.php]
 
 using System.Linq.Expressions;
-using Castle.Core.Interceptor;
 using System.Reflection;
+using Castle.Core.Interceptor;
 
 namespace Moq
 {

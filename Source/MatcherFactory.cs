@@ -39,8 +39,8 @@
 // http://www.opensource.org/licenses/bsd-license.php]
 
 using System;
-using System.Linq.Expressions;
 using System.Globalization;
+using System.Linq.Expressions;
 
 namespace Moq
 {

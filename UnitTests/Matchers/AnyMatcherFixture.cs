@@ -1,7 +1,6 @@
 ﻿using System;
 using System.Linq.Expressions;
 using Xunit;
-using System.ComponentModel;
 
 namespace Moq.Tests.Matchers
 {

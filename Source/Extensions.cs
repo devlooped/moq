@@ -39,11 +39,10 @@
 // http://www.opensource.org/licenses/bsd-license.php]
 
 using System;
-using System.Collections.Generic;
+using System.Globalization;
 using System.Linq;
 using System.Reflection;
 using Castle.Core.Interceptor;
-using System.Globalization;
 
 namespace Moq
 {

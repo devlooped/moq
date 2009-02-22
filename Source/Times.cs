@@ -38,9 +38,9 @@
 //[This is the BSD license, see
 // http://www.opensource.org/licenses/bsd-license.php]
 
+using System;
 using System.Globalization;
 using Moq.Properties;
-using System;
 
 namespace Moq
 {

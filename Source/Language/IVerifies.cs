@@ -39,7 +39,6 @@
 // http://www.opensource.org/licenses/bsd-license.php]
 
 using System.ComponentModel;
-using System;
 
 namespace Moq.Language
 {

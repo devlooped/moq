@@ -1,6 +1,6 @@
-﻿using System.IO;
+﻿using System.Diagnostics;
+using System.IO;
 using Xunit;
-using System.Diagnostics;
 
 namespace Moq.Tests
 {

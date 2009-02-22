@@ -40,10 +40,9 @@
 
 using System;
 using System.Collections.Generic;
+using System.Globalization;
 using System.Linq;
 using System.Text;
-using System.ComponentModel;
-using System.Globalization;
 
 namespace Moq
 {

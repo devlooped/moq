@@ -39,9 +39,9 @@
 // http://www.opensource.org/licenses/bsd-license.php]
 
 using System;
+using System.ComponentModel;
 using System.Linq;
 using System.Reflection;
-using System.ComponentModel;
 
 namespace Moq
 {
