@@ -48,33 +48,54 @@ namespace Moq
 	{
 		public static IMatcher CreateMatcher(Expression expression)
 		{
-			// TODO: type inference on the call might 
-			// be a smaller type and a Convert expression type 
+			// Type inference on the call might 
+			// do automatic conversion to the desired 
+			// method argument type, and a Convert expression type 
 			// might be the topmost instead.
 			// i.e.: It.IsInRange(0, 100, Range.Inclusive)
 			// the values are ints, but if the method to call 
 			// expects, say, a double, a Convert node will be on 
 			// the expression.
+			if (expression.NodeType == ExpressionType.Convert)
+				expression = ((UnaryExpression)expression).Operand;
+
+			// SetupSet passes a custom expression.
+			if (expression is MatchExpression)
+				return new Matcher(((MatchExpression)expression).Match);
+
 			if (expression.NodeType == ExpressionType.Call)
 			{
 				MethodCallExpression call = (MethodCallExpression)expression;
+
+				// Try to determine if invocation is to a matcher.
+				using (var context = new FluentMockContext())
+				{
+					Expression.Lambda<Action>(call).Compile().Invoke();
+
+					if (context.LastMatch != null)
+						return new Matcher(context.LastMatch);
+				}
+
 				AdvancedMatcherAttribute attr = call.Method.GetCustomAttribute<AdvancedMatcherAttribute>(true);
+#pragma warning disable 618
 				MatcherAttribute staticMatcherMethodAttr = call.Method.GetCustomAttribute<MatcherAttribute>(true);
+#pragma warning restore 618
+
 				if (attr != null)
 				{
-					IMatcher matcher = attr.CreateMatcher();
+					var matcher = attr.CreateMatcher();
 					matcher.Initialize(expression);
 					return matcher;
 				}
 				else if (staticMatcherMethodAttr != null)
 				{
-					IMatcher matcher = new Moq.Matchers.MatcherAttributeMatcher();
+					var matcher = new Moq.Matchers.MatcherAttributeMatcher();
 					matcher.Initialize(expression);
 					return matcher;
 				}
 				else
 				{
-					IMatcher matcher = new LazyEvalMatcher();
+					var matcher = new LazyEvalMatcher();
 					matcher.Initialize(expression);
 					return matcher;
 				}

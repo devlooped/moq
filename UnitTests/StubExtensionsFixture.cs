@@ -1,6 +1,7 @@
 ﻿using Xunit;
 using System;
 using System.Reflection;
+using System.Diagnostics;
 
 namespace Moq.Tests
 {
@@ -33,7 +34,9 @@ namespace Moq.Tests
 
 			Assert.Equal(15, mock.Object.ValueProperty);
 		}
+
 #if !SILVERLIGHT
+		[Conditional("DESKTOP")]
 		[Fact]
 		public void StubsAllProperties()
 		{
@@ -53,6 +56,7 @@ namespace Moq.Tests
 			Assert.Same(bar.Object, mock.Object.Bar);
 		}
 
+		[Conditional("DESKTOP")]
 		[Fact]
 		public void StubsAllHierarchy()
 		{
@@ -64,6 +68,7 @@ namespace Moq.Tests
 			Assert.Equal(5, mock.Object.Bar.Value);
 		}
 
+		[Conditional("DESKTOP")]
 		[Fact]
 		public void StubsInheritedInterfaceProperties()
 		{
@@ -78,6 +83,7 @@ namespace Moq.Tests
 			Assert.Equal("foo", mock.Object.Name);
 		}
 
+		[Conditional("DESKTOP")]
 		[Fact]
 		public void StubsInheritedClassProperties()
 		{

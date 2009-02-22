@@ -1,0 +1,277 @@
+﻿<?xml version="1.0" encoding="utf-8" ?>
+<docs>
+	<doc for="Mock{T}">
+		<summary>
+			Provides a mock implementation of <typeparamref name="T"/>.
+		</summary>
+		<remarks>
+			Only abstract and virtual members of classes can be mocked.
+			<para>
+				The behavior of the mock with regards to the setups and the actual calls is determined
+				by the optional <see cref="MockBehavior"/> that can be passed to the <see cref="Mock{T}(MockBehavior)"/>
+				constructor.
+			</para>
+		</remarks>
+		<typeparam name="T">Type to mock, which can be an interface or a class.</typeparam>
+		<example group="overview" order="0">
+			The following example shows establishing setups with specific values
+			for method invocations:
+			<code>
+				//setup - data
+				var order = new Order(TALISKER, 50);
+				var mock = new Mock&lt;IWarehouse&gt;();
+
+				//setup
+				mock.Setup(x => x.HasInventory(TALISKER, 50)).Returns(true);
+
+				//exercise
+				order.Fill(mock.Object);
+
+				//verify
+				Assert.True(order.IsFilled);
+			</code>
+			The following example shows how to use the <see cref="It"/> class
+			to specify conditions for arguments instead of specific values:
+			<code>
+				//setup - data
+				var order = new Order(TALISKER, 50);
+				var mock = new Mock&lt;IWarehouse&gt;();
+
+				//setup
+				//shows how to expect a value within a range
+				mock.Setup(x => x.HasInventory(
+				It.IsAny&lt;string&gt;(),
+				It.IsInRange(0, 100, Range.Inclusive)))
+				.Returns(false);
+
+				//shows how to throw for unexpected calls.
+				mock.Setup(x => x.Remove(
+				It.IsAny&lt;string&gt;(),
+				It.IsAny&lt;int&gt;()))
+				.Throws(new InvalidOperationException());
+
+				//exercise
+				order.Fill(mock.Object);
+
+				//verify
+				Assert.False(order.IsFilled);
+			</code>
+		</example>
+	</doc>
+	<doc for="Mock{T}.ctor()">
+		<summary>
+			Initializes an instance of the mock with <see cref="MockBehavior.Default">default behavior</see>.
+		</summary>
+		<example>
+			<code>var mock = new Mock&lt;IFormatProvider&gt;();</code>
+		</example>
+	</doc>
+	<doc for="Mock{T}.ctor(object[])">
+		<summary>
+			Initializes an instance of the mock with <see cref="MockBehavior.Default">default behavior</see> and with
+			the given constructor arguments for the class. (Only valid when <typeparamref name="T"/> is a class)
+		</summary>
+		<remarks>
+			The mock will try to find the best match constructor given the constructor arguments, and invoke that
+			to initialize the instance. This applies only for classes, not interfaces.
+		</remarks>
+		<example>
+			<code>var mock = new Mock&lt;MyProvider&gt;(someArgument, 25);</code>
+		</example>
+		<param name="args">Optional constructor arguments if the mocked type is a class.</param>
+	</doc>
+	<doc for="Mock{T}.ctor(MockBehavior)">
+		<summary>
+			Initializes an instance of the mock with the specified <see cref="MockBehavior">behavior</see>.
+		</summary>
+		<example>
+			<code>var mock = new Mock&lt;IFormatProvider&gt;(MockBehavior.Relaxed);</code>
+		</example>
+		<param name="behavior">Behavior of the mock.</param>
+	</doc>
+	<doc for="Mock{T}.ctor(MockBehavior,object[])">
+		<summary>
+			Initializes an instance of the mock with a specific <see cref="MockBehavior">behavior</see> with
+			the given constructor arguments for the class.
+		</summary>
+		<remarks>
+			The mock will try to find the best match constructor given the constructor arguments, and invoke that
+			to initialize the instance. This applies only to classes, not interfaces.
+		</remarks>
+		<example>
+			<code>var mock = new Mock&lt;MyProvider&gt;(someArgument, 25);</code>
+		</example>
+		<param name="behavior">Behavior of the mock.</param>
+		<param name="args">Optional constructor arguments if the mocked type is a class.</param>
+	</doc>
+	<doc for="Mock{T}.Object">
+		<summary>
+			Exposes the mocked object instance.
+		</summary>
+	</doc>
+	<doc for="Mock{T}.Setup">
+		<summary>
+			Specifies a setup on the mocked type for a call to
+			to a void method.
+		</summary>
+		<remarks>
+			If more than one setup is specified for the same method or property,
+			the latest one wins and is the one that will be executed.
+		</remarks>
+		<param name="expression">Lambda expression that specifies the expected method invocation.</param>
+		<example group="setups">
+			<code>
+				var mock = new Mock&lt;IProcessor&gt;();
+				mock.Setup(x =&gt; x.Execute("ping"));
+			</code>
+		</example>
+	</doc>
+	<doc for="Mock{T}.Setup{TResult}">
+		<summary>
+			Specifies a setup on the mocked type for a call to
+			to a value returning method.
+		</summary>
+		<typeparam name="TResult">Type of the return value. Typically omitted as it can be inferred from the expression.</typeparam>
+		<remarks>
+			If more than one setup is specified for the same method or property,
+			the latest one wins and is the one that will be executed.
+		</remarks>
+		<param name="expression">Lambda expression that specifies the method invocation.</param>
+		<example group="setups">
+			<code>
+				mock.Setup(x =&gt; x.HasInventory("Talisker", 50)).Returns(true);
+			</code>
+		</example>
+	</doc>
+	<doc for="Mock{T}.SetupGet">
+		<summary>
+			Specifies a setup on the mocked type for a call to
+			to a property getter.
+		</summary>
+		<remarks>
+			If more than one setup is set for the same property getter,
+			the latest one wins and is the one that will be executed.
+		</remarks>
+		<typeparam name="TProperty">Type of the property. Typically omitted as it can be inferred from the expression.</typeparam>
+		<param name="expression">Lambda expression that specifies the property getter.</param>
+		<example group="setups">
+			<code>
+				mock.SetupGet(x =&gt; x.Suspended)
+				.Returns(true);
+			</code>
+		</example>
+	</doc>
+	<doc for="Mock{T}.SetupSet{TProperty}">
+		<summary>
+			Specifies a setup on the mocked type for a call to
+			to a property setter.
+		</summary>
+		<remarks>
+			If more than one setup is set for the same property setter,
+			the latest one wins and is the one that will be executed.
+			<para>
+				This overloads allows the use of a callback already
+				typed for the property type.
+			</para>
+		</remarks>
+		<typeparam name="TProperty">Type of the property. Typically omitted as it can be inferred from the expression.</typeparam>
+		<param name="setterExpression">Lambda expression that sets a property to a value.</param>
+		<example group="setups">
+			<code>
+				mock.SetupSet(x =&gt; x.Suspended = true);
+			</code>
+		</example>
+	</doc>
+	<doc for="Mock{T}.SetupSet">
+		<summary>
+			Specifies a setup on the mocked type for a call to
+			to a property setter.
+		</summary>
+		<remarks>
+			If more than one setup is set for the same property setter,
+			the latest one wins and is the one that will be executed.
+		</remarks>
+		<param name="setterExpression">Lambda expression that sets a property to a value.</param>
+		<example group="setups">
+			<code>
+				mock.SetupSet(x =&gt; x.Suspended = true);
+			</code>
+		</example>
+	</doc>
+	<doc for="Mock{T}.SetupProperty(property)">
+		<summary>
+			Specifies that the given property should have "property behavior",
+			meaning that setting its value will cause it to be saved and
+			later returned when the property is requested. (this is also
+			known as "stubbing").
+		</summary>
+		<typeparam name="TProperty">
+			Type of the property, inferred from the property
+			expression (does not need to be specified).
+		</typeparam>
+		<param name="property">Property expression to stub.</param>
+		<example>
+			If you have an interface with an int property <c>Value</c>, you might
+			stub it using the following straightforward call:
+			<code>
+				var mock = new Mock&lt;IHaveValue&gt;();
+				mock.Stub(v => v.Value);
+			</code>
+			After the <c>Stub</c> call has been issued, setting and
+			retrieving the object value will behave as expected:
+			<code>
+				IHaveValue v = mock.Object;
+
+				v.Value = 5;
+				Assert.Equal(5, v.Value);
+			</code>
+		</example>
+	</doc>
+	<doc for="Mock{T}.SetupProperty(property,initialValue)">
+		<summary>
+			Specifies that the given property should have "property behavior",
+			meaning that setting its value will cause it to be saved and
+			later returned when the property is requested. This overload
+			allows setting the initial value for the property. (this is also
+			known as "stubbing").
+		</summary>
+		<typeparam name="TProperty">
+			Type of the property, inferred from the property
+			expression (does not need to be specified).
+		</typeparam>
+		<param name="property">Property expression to stub.</param>
+		<param name="initialValue">Initial value for the property.</param>
+		<example>
+			If you have an interface with an int property <c>Value</c>, you might
+			stub it using the following straightforward call:
+			<code>
+				var mock = new Mock&lt;IHaveValue&gt;();
+				mock.SetupProperty(v => v.Value, 5);
+			</code>
+			After the <c>SetupProperty</c> call has been issued, setting and
+			retrieving the object value will behave as expected:
+			<code>
+				IHaveValue v = mock.Object;
+				// Initial value was stored
+				Assert.Equal(5, v.Value);
+
+				// New value set which changes the initial value
+				v.Value = 6;
+				Assert.Equal(6, v.Value);
+			</code>
+		</example>
+	</doc>
+	<doc for="Mock{T}.SetupAllProperties">
+		<summary>
+			Specifies that the all properties on the mock should have "property behavior",
+			meaning that setting its value will cause it to be saved and
+			later returned when the property is requested. (this is also
+			known as "stubbing"). The default value for each property will be the
+			one generated as specified by the <see cref="Mock.DefaultValue"/> property for the mock.
+		</summary>
+		<remarks>
+			If the mock <see cref="Mock.DefaultValue"/> is set to <see cref="DefaultValue.Mock"/>,
+			the mocked default values will also get all properties setup recursively.
+		</remarks>
+	</doc>
+</docs>

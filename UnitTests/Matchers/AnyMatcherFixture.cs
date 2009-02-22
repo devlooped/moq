@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Linq.Expressions;
 using Xunit;
+using System.ComponentModel;
 
 namespace Moq.Tests.Matchers
 {
@@ -9,7 +10,10 @@ namespace Moq.Tests.Matchers
 		[Fact]
 		public void MatchesNull()
 		{
-			var matcher = new AnyMatcher();
+			var expr = ToExpression<object>(() => It.IsAny<object>()).ToLambda().Body;
+
+			var matcher = MatcherFactory.CreateMatcher(expr);
+			matcher.Initialize(expr);
 
 			Assert.True(matcher.Matches(null));
 		}
@@ -23,6 +27,17 @@ namespace Moq.Tests.Matchers
 			matcher.Initialize(expr);
 
 			Assert.True(matcher.Matches("foo"));
+		}
+
+		[Fact]
+		public void MatchesIfAssignableInterface()
+		{
+			var expr = ToExpression<IDisposable>(() => It.IsAny<IDisposable>()).ToLambda().Body;
+
+			var matcher = MatcherFactory.CreateMatcher(expr);
+			matcher.Initialize(expr);
+
+			Assert.True(matcher.Matches(new Disposable()));
 		}
 
 		[Fact]
@@ -40,5 +55,14 @@ namespace Moq.Tests.Matchers
 		{
 			return expr;
 		}
+
+		class Disposable : IDisposable
+		{
+			public void Dispose()
+			{
+				throw new NotImplementedException();
+			}
+		}
+
 	}
 }

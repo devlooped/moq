@@ -72,11 +72,12 @@ namespace Moq
 		/// </code>
 		/// </example>
 		/// <typeparam name="TValue">Type of the value.</typeparam>
-		[AdvancedMatcher(typeof(AnyMatcher))]
 		public static TValue IsAny<TValue>()
 		{
-			SetLastMatcher<TValue>(MethodBase.GetCurrentMethod());
-			return default(TValue);
+			return SetLastMatch(new Match<TValue>(value =>
+			{
+				return value == null || typeof(TValue).IsAssignableFrom(value.GetType());
+			}));
 		}
 
 		/// <summary>
@@ -103,11 +104,9 @@ namespace Moq
 		/// </code>
 		/// </example>
 		[System.Diagnostics.CodeAnalysis.SuppressMessage("Microsoft.Usage", "CA1801:ReviewUnusedParameters", MessageId = "match")]
-		[AdvancedMatcher(typeof(PredicateMatcher))]
 		public static TValue Is<TValue>(Expression<Predicate<TValue>> match)
 		{
-			SetLastMatcher<TValue>(MethodBase.GetCurrentMethod(), match);
-			return default(TValue);
+			return SetLastMatch(new Match<TValue>(value => match.Compile().Invoke(value)));
 		}
 
 		/// <summary>
@@ -130,12 +129,27 @@ namespace Moq
 		[System.Diagnostics.CodeAnalysis.SuppressMessage ("Microsoft.Usage", "CA1801:ReviewUnusedParameters", MessageId="to")]
 		[System.Diagnostics.CodeAnalysis.SuppressMessage("Microsoft.Usage", "CA1801:ReviewUnusedParameters", MessageId = "rangeKind")]
 		[System.Diagnostics.CodeAnalysis.SuppressMessage("Microsoft.Usage", "CA1801:ReviewUnusedParameters", MessageId = "from")]
-		[AdvancedMatcher(typeof(RangeMatcher))]
 		public static TValue IsInRange<TValue>(TValue from, TValue to, Range rangeKind)
 			where TValue : IComparable
 		{
-			SetLastMatcher<TValue>(MethodBase.GetCurrentMethod(), from, to, rangeKind);
-			return default(TValue);
+			return SetLastMatch(new Match<TValue>(value =>
+			{
+				if (value == null)
+				{
+					return false;
+				}
+
+				if (rangeKind == Range.Exclusive)
+				{
+					return value.CompareTo(from) > 0 &&
+						value.CompareTo(to) < 0;
+				}
+				else
+				{
+					return value.CompareTo(from) >= 0 &&
+						value.CompareTo(to) <= 0;
+				}
+			}));
 		}
 
 		/// <summary>
@@ -150,11 +164,16 @@ namespace Moq
 		/// </code>
 		/// </example>
 		[System.Diagnostics.CodeAnalysis.SuppressMessage("Microsoft.Usage", "CA1801:ReviewUnusedParameters", MessageId = "regex")]
-		[AdvancedMatcher(typeof(RegexMatcher))]
 		public static string IsRegex(string regex)
 		{
-			SetLastMatcher<string>(MethodBase.GetCurrentMethod(), regex);
-			return default(string);
+			// The regex is constructed only once.
+			var re = new Regex(regex);
+
+			return SetLastMatch(new Match<string>(value =>
+			{
+				// But evaluated every time :)
+				return re.IsMatch(value);
+			}));
 		}
 
 		/// <summary>
@@ -171,11 +190,16 @@ namespace Moq
 		/// </example>
 		[System.Diagnostics.CodeAnalysis.SuppressMessage ("Microsoft.Usage", "CA1801:ReviewUnusedParameters", MessageId="regex")]
 		[System.Diagnostics.CodeAnalysis.SuppressMessage ("Microsoft.Usage", "CA1801:ReviewUnusedParameters", MessageId="options")]
-		[AdvancedMatcher(typeof(RegexMatcher))]
 		public static string IsRegex(string regex, RegexOptions options)
 		{
-			SetLastMatcher<string>(MethodBase.GetCurrentMethod(), regex, options);
-			return default(string);
+			// The regex is constructed only once.
+			var re = new Regex(regex, options);
+
+			return SetLastMatch(new Match<string>(value =>
+			{
+				// But evaluated every time :)
+				return re.IsMatch(value);
+			}));
 		}
 
 		/// <devdoc>
@@ -188,21 +212,12 @@ namespace Moq
 		/// methodcall we build the expression using it, rather than the null/default 
 		/// value returned from the actual invocation.
 		/// </devdoc>
-		private static void SetLastMatcher<TValue>(MethodBase invokedMethod, params object[] args)
+		private static Match<TValue> SetLastMatch<TValue>(Match<TValue> match)
 		{
 			if (FluentMockContext.IsActive)
-			{
-				var concreteMethod = invokedMethod.IsGenericMethodDefinition ?
-					((MethodInfo)invokedMethod).MakeGenericMethod(typeof(TValue)) :
-					(MethodInfo)invokedMethod;
+				FluentMockContext.Current.LastMatch = match;
 
-				FluentMockContext.Current.LastMatcherInvocation =
-					Expression.Call(
-						concreteMethod,
-						args.Select(a => a is Expression ? (Expression)a : Expression.Constant(a))
-							.ToArray()
-					);
-			}
+			return match;
 		}
 	}
 }

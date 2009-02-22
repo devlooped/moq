@@ -92,7 +92,7 @@ namespace Moq.Tests
 		}
 
 		[Fact]
-		public void RangesAreLazyEvaluated()
+		public void RangesAreEagerEvaluated()
 		{
 			var mock = new Mock<IFoo>(MockBehavior.Loose);
 			var from = "a";
@@ -104,11 +104,11 @@ namespace Moq.Tests
 
 			from = "c";
 
-			Assert.Equal(default(string), mock.Object.Execute("b"));
+			Assert.Equal("ack", mock.Object.Execute("b"));
 		}
 
 		[Fact]
-		public void RegexMatchesAndLazyEvaluates()
+		public void RegexMatchesAndEagerlyEvaluates()
 		{
 			var mock = new Mock<IFoo>(MockBehavior.Loose);
 			var reg = "[a-d]+";
@@ -123,8 +123,9 @@ namespace Moq.Tests
 
 			reg = "[c-d]+";
 
-			// Will not match neither the 1 and 2 return values we had.
-			Assert.Equal(default(string), mock.Object.Execute("b"));
+			// Will still match both the 1 and 2 return values we had.
+			Assert.Equal("bar", mock.Object.Execute("b"));
+			Assert.Equal("foo", mock.Object.Execute("B"));
 		}
 
 		[Fact]
@@ -138,7 +139,7 @@ namespace Moq.Tests
 		}
 
 		[Fact]
-		public void MatchsDifferentOverloadsWithItIsAny()
+		public void MatchesDifferentOverloadsWithItIsAny()
 		{
 			var mock = new Mock<IFoo>();
 
@@ -155,13 +156,15 @@ namespace Moq.Tests
 		}
 
 		[Fact]
-		public void ThrowsIfItIsWithoutLambda()
+		public void CanExternalizeLambda()
 		{
 			var foo = new Mock<IFoo>();
 
 			Expression<Predicate<int>> isSix = (arg) => arg == 6;
 
-			Assert.Throws<ArgumentException>(() => foo.Setup((f) => f.Echo(It.Is(isSix))).Returns(12));
+			foo.Setup((f) => f.Echo(It.Is(isSix))).Returns(12);
+
+			Assert.Equal(12, foo.Object.Echo(6));
 		}
 
 		[Fact]

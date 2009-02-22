@@ -33,11 +33,11 @@ namespace Moq
 
 		public void Add(Mock mock, IInvocation invocation)
 		{
-			invocations.Add(new MockInvocation(mock, invocation, LastMatcherInvocation));
+			invocations.Add(new MockInvocation(mock, invocation, LastMatch));
 		}
 
 		public MockInvocation LastInvocation { get { return invocations.LastOrDefault(); } }
-		public Expression LastMatcherInvocation { get; set; }
+		public Match LastMatch { get; set; }
 
 		public void Dispose()
 		{
@@ -53,11 +53,11 @@ namespace Moq
 		{
 			DefaultValue defaultValue;
 
-			public MockInvocation(Mock mock, IInvocation invocation, Expression matcher)
+			public MockInvocation(Mock mock, IInvocation invocation, Match matcher)
 			{
 				this.Mock = mock;
 				this.Invocation = invocation;
-				this.Matcher = matcher;
+				this.Match = matcher;
 				defaultValue = mock.DefaultValue;
 				// Temporarily set mock default value to Mock so that recursion works.
 				mock.DefaultValue = DefaultValue.Mock;
@@ -65,7 +65,7 @@ namespace Moq
 
 			public Mock Mock { get; private set; }
 			public IInvocation Invocation { get; private set; }
-			public Expression Matcher { get; private set; }
+			public Match Match { get; private set; }
 
 			public void Dispose()
 			{

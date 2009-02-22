@@ -40,6 +40,30 @@
     <WarningLevel>4</WarningLevel>
     <DocumentationFile>bin\Release\Moq.Silverlight.xml</DocumentationFile>
   </PropertyGroup>
+  <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Debug|x86' ">
+    <DebugSymbols>true</DebugSymbols>
+    <OutputPath>bin\x86\Debug\</OutputPath>
+    <DefineConstants>DEBUG;TRACE;SILVERLIGHT</DefineConstants>
+    <DocumentationFile>bin\Debug\Moq.Silverlight.xml</DocumentationFile>
+    <NoStdLib>true</NoStdLib>
+    <DebugType>full</DebugType>
+    <PlatformTarget>x86</PlatformTarget>
+    <CodeAnalysisUseTypeNameInSuppression>true</CodeAnalysisUseTypeNameInSuppression>
+    <CodeAnalysisModuleSuppressionsFile>GlobalSuppressions.cs</CodeAnalysisModuleSuppressionsFile>
+    <ErrorReport>prompt</ErrorReport>
+  </PropertyGroup>
+  <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Release|x86' ">
+    <OutputPath>bin\x86\Release\</OutputPath>
+    <DefineConstants>TRACE;SILVERLIGHT</DefineConstants>
+    <DocumentationFile>bin\Release\Moq.Silverlight.xml</DocumentationFile>
+    <Optimize>true</Optimize>
+    <NoStdLib>true</NoStdLib>
+    <DebugType>pdbonly</DebugType>
+    <PlatformTarget>x86</PlatformTarget>
+    <CodeAnalysisUseTypeNameInSuppression>true</CodeAnalysisUseTypeNameInSuppression>
+    <CodeAnalysisModuleSuppressionsFile>GlobalSuppressions.cs</CodeAnalysisModuleSuppressionsFile>
+    <ErrorReport>prompt</ErrorReport>
+  </PropertyGroup>
   <ItemGroup>
     <Reference Include="Castle.Core-Silverlight, Version=1.0.3.0, Culture=neutral, PublicKeyToken=407dd0808d44fbdc, processorArchitecture=MSIL">
       <SpecificVersion>False</SpecificVersion>
@@ -92,15 +116,6 @@
     </Compile>
     <Compile Include="..\Source\IHideObjectMembers.cs">
       <Link>IHideObjectMembers.cs</Link>
-    </Compile>
-    <Compile Include="..\Source\IL\Enums.cs">
-      <Link>IL\Enums.cs</Link>
-    </Compile>
-    <Compile Include="..\Source\IL\ILReader.cs">
-      <Link>IL\ILReader.cs</Link>
-    </Compile>
-    <Compile Include="..\Source\IL\ILReader.Utilities.cs">
-      <Link>IL\ILReader.Utilities.cs</Link>
     </Compile>
     <Compile Include="..\Source\IMatcher.cs">
       <Link>IMatcher.cs</Link>
@@ -162,29 +177,26 @@
     <Compile Include="..\Source\Language\IThrows.cs">
       <Link>Language\IThrows.cs</Link>
     </Compile>
+    <Compile Include="..\Source\Match.cs">
+      <Link>Match.cs</Link>
+    </Compile>
     <Compile Include="..\Source\MatcherAttribute.cs">
       <Link>MatcherAttribute.cs</Link>
     </Compile>
     <Compile Include="..\Source\MatcherFactory.cs">
       <Link>MatcherFactory.cs</Link>
     </Compile>
-    <Compile Include="..\Source\Matchers\AnyMatcher.cs">
-      <Link>Matchers\AnyMatcher.cs</Link>
-    </Compile>
     <Compile Include="..\Source\Matchers\ConstantMatcher.cs">
       <Link>Matchers\ConstantMatcher.cs</Link>
+    </Compile>
+    <Compile Include="..\Source\Matchers\Matcher.cs">
+      <Link>Matchers\Matcher.cs</Link>
     </Compile>
     <Compile Include="..\Source\Matchers\MatcherAttributeMatcher.cs">
       <Link>Matchers\MatcherAttributeMatcher.cs</Link>
     </Compile>
     <Compile Include="..\Source\Matchers\ParamArrayMatcher.cs">
       <Link>Matchers\ParamArrayMatcher.cs</Link>
-    </Compile>
-    <Compile Include="..\Source\Matchers\RegexMatcher.cs">
-      <Link>Matchers\RegexMatcher.cs</Link>
-    </Compile>
-    <Compile Include="..\Source\Matchers\RangeMatcher.cs">
-      <Link>Matchers\RangeMatcher.cs</Link>
     </Compile>
     <Compile Include="..\Source\Matchers\LazyEvalMatcher.cs">
       <Link>Matchers\LazyEvalMatcher.cs</Link>
@@ -224,6 +236,9 @@
     </Compile>
     <Compile Include="..\Source\MockException.cs">
       <Link>MockException.cs</Link>
+    </Compile>
+    <Compile Include="..\Source\MockExtensions.cs">
+      <Link>MockExtensions.cs</Link>
     </Compile>
     <Compile Include="..\Source\MockFactory.cs">
       <Link>MockFactory.cs</Link>
@@ -280,11 +295,9 @@
     <None Include="..\Moq.snk">
       <Link>Moq.snk</Link>
     </None>
-  </ItemGroup>
-  <ItemGroup>
-    <Content Include="..\Source\IL\Readme.txt">
-      <Link>IL\Readme.txt</Link>
-    </Content>
+    <None Include="..\Source\Mock.xdoc">
+      <Link>Mock.xdoc</Link>
+    </None>
   </ItemGroup>
   <Import Project="$(MSBuildExtensionsPath)\Microsoft\Silverlight\v2.0\Microsoft.Silverlight.CSharp.targets" />
   <!-- To modify your build process, add your task inside one of the targets below and uncomment it. 

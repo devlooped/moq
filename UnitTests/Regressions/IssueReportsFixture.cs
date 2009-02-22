@@ -6,6 +6,7 @@ using System.ServiceModel;
 using System.ServiceModel.Web;
 #endif
 using Xunit;
+using System.Diagnostics;
 
 namespace Moq.Tests.Regressions
 {
@@ -353,16 +354,7 @@ namespace Moq.Tests.Regressions
 				host.Open();
 			}
 		}
-#endif
 
-		[ServiceContract]
-		public interface IServiceContract
-		{
-			[OperationContract]
-			void Do();
-		}
-
-#if !SILVERLIGHT
 		[ServiceBehavior(InstanceContextMode = InstanceContextMode.Single)]
 		public class ServiceImplementation : IServiceContract
 		{
@@ -372,5 +364,13 @@ namespace Moq.Tests.Regressions
 			}
 		}
 #endif
+
+		[ServiceContract]
+		public interface IServiceContract
+		{
+			[OperationContract]
+			void Do();
+		}
+
 	}
 }

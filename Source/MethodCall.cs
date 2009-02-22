@@ -162,6 +162,7 @@ namespace Moq
 			SetFileInfo();
 		}
 
+		[Conditional("DESKTOP")]
 		private void SetFileInfo()
 		{
 #if !SILVERLIGHT

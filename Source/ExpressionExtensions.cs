@@ -46,6 +46,7 @@ using System.Reflection;
 using System.Runtime.CompilerServices;
 using System.Text;
 using System.Globalization;
+using System.Text.RegularExpressions;
 
 namespace Moq
 {
@@ -182,8 +183,19 @@ namespace Moq
 			return Evaluator.PartialEval(expression,
 				e => e.NodeType != ExpressionType.Parameter &&
 					!(e.NodeType == ExpressionType.Call &&
-					((MethodCallExpression)e).Method.GetCustomAttribute<AdvancedMatcherAttribute>(true) != null)
+					((MethodCallExpression)e).Method.GetCustomAttribute<AdvancedMatcherAttribute>(true) != null) && 
+					!(e.NodeType == ExpressionType.Call && ReturnsMatch((MethodCallExpression)e)) 
 			);
+		}
+
+		private static bool ReturnsMatch(MethodCallExpression expression)
+		{
+			using (var context = new FluentMockContext())
+			{
+				Expression.Lambda<Action>(expression).Compile().Invoke();
+
+				return context.LastMatch != null;
+			}
 		}
 
 		/// <summary>
@@ -204,9 +216,33 @@ namespace Moq
 			return new ToStringFixVisitor(expression).ExpressionString;
 		}
 
+		internal sealed class RemoveMatcherConvertVisitor : ExpressionVisitor
+		{
+			public RemoveMatcherConvertVisitor(Expression expression)
+			{
+				 this.Expression = this.Visit(expression);
+			}
+
+			protected override Expression VisitUnary(UnaryExpression u)
+			{
+				if (u.NodeType == ExpressionType.Convert &&
+					u.Operand.NodeType == ExpressionType.Call &&
+					typeof(Match).IsAssignableFrom(((MethodCallExpression)u.Operand).Method.ReturnType))
+				{
+					// Remove the cast.
+					return u.Operand;
+				}
+
+				return base.VisitUnary(u);
+			}
+
+			public Expression Expression { get; private set; }
+		}
+
 		internal sealed class ToStringFixVisitor : ExpressionVisitor
 		{
 			private List<MethodCallExpression> calls = new List<MethodCallExpression>();
+			private Regex convertRegex = new Regex(@"Convert\((.+?)\)");
 
 			public ToStringFixVisitor(Expression expression)
 			{
@@ -226,6 +262,8 @@ namespace Moq
 									 fullString.Substring(index + improperCallString.Length);
 					}
 				}
+
+				fullString = convertRegex.Replace(fullString, m => m.Groups[1].Value);
 
 				this.ExpressionString = fullString;
 			}
@@ -285,6 +323,18 @@ namespace Moq
 
 				return base.VisitMethodCall(m);
 			}
+
+			//protected override Expression VisitUnary(UnaryExpression u)
+			//{
+			//   if (u.NodeType == ExpressionType.Convert &&
+			//      u.Operand.NodeType == ExpressionType.Call &&
+			//      typeof(Match).IsAssignableFrom(((MethodCallExpression)u.Operand).Method.ReturnType))
+			//   {
+			//      return u.Operand;
+			//   }
+
+			//   return base.VisitUnary(u);
+			//}
 		}
 	}
 }

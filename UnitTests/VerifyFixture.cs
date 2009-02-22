@@ -1,6 +1,7 @@
 ﻿using System;
 using Xunit;
 using Moq;
+using System.Diagnostics;
 
 namespace Moq.Tests
 {
@@ -379,7 +380,6 @@ namespace Moq.Tests
 			mock.VerifySet(m => m.Value, 5);
 		}
 
-#if !SILVERLIGHT
 		[Fact]
 		public void VerifiesSetterWithAction()
 		{
@@ -410,7 +410,6 @@ namespace Moq.Tests
 
 			mock.VerifySet(m => m.Value = 2, "foo");
 		}
-#endif
 
 		[Fact]
 		public void VerifiesRefWithExpression()

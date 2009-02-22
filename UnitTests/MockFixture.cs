@@ -329,7 +329,7 @@ namespace Moq.Tests
 			int value = 0;
 			int value2 = 0;
 
-			mock.SetupSet(foo => foo.Count = It.IsAny<int>()).Callback<int>(v => value = v);
+			mock.SetupSet(foo => foo.Count = 6).Callback<int>(v => value = v);
 			mock.SetupSet<int>(foo => foo.Count = 3).Callback(v => value2 = v);
 
 			mock.Object.Count = 6;

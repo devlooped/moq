@@ -1,5 +1,7 @@
 ﻿using System;
 using Xunit;
+using System.Linq;
+using System.Collections.Generic;
 
 namespace Moq.Tests
 {
@@ -22,11 +24,39 @@ namespace Moq.Tests
 			{
 			}
 		}
+
+		[Fact]
+		public void ShouldExtendWithSimpleMatchers()
+		{
+			var order = new Order();
+			var mock = new Mock<IOrderRepository>();
+
+			Order repo = new Match<Order>(r => true);
+
+			mock.Setup(x => x.Save(Orders.Contains(order)))
+				 .Throws<ArgumentException>();
+
+			Assert.Throws<ArgumentException>(() => mock.Object.Save(new [] { order }));
+		}
+	}
+
+	public static class Orders
+	{
+		public static IEnumerable<Order> Contains(Order order)
+		{
+			return new Match<IEnumerable<Order>>(orders => orders.Contains(order)).Convert();
+		}
+
+		public static Order IsBig()
+		{
+			return new Match<Order>(o => o.Amount >= 1000);
+		}
 	}
 
 	public interface IOrderRepository
 	{
 		void Save(Order order);
+		void Save(IEnumerable<Order> orders);
 	}
 
 	public static class OrderIs

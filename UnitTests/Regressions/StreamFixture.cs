@@ -1,15 +1,14 @@
 ﻿using System.IO;
 using Xunit;
+using System.Diagnostics;
 
 namespace Moq.Tests
 {
 	public class StreamFixture
 	{
-#if SILVERLIGHT
-		[Fact(Skip = "Can't run in silverlight.")]
-#else
+#if !SILVERLIGHT
+		[Conditional("DESKTOP")]
 		[Fact]
-#endif
 		public void ShouldMockStream()
 		{
 			var mockStream = new Mock<Stream>();
@@ -28,5 +27,6 @@ namespace Moq.Tests
 
 			mockStream.VerifyAll();
 		}
+#endif
 	}
 }
