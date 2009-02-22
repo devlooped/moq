@@ -142,6 +142,7 @@
     <None Include="..\Moq.snk">
       <Link>Moq.snk</Link>
     </None>
+    <None Include="Match.xdoc" />
     <None Include="Mock.Generic.xdoc" />
     <None Include="Mock.xdoc" />
     <Compile Include="DefaultValue.cs" />

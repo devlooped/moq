@@ -44,7 +44,6 @@ namespace Moq
 
 		/// <summary>
 		/// Verifies that a property has been set on the mock, regarless of its value.
-		/// Use in conjuntion with the default <see cref="MockBehavior.Loose"/>.
 		/// </summary>
 		/// <example group="verification">
 		/// This example assumes that the mock has been used, 
@@ -74,7 +73,6 @@ namespace Moq
 		/// <summary>
 		/// Verifies that a property has been set on the mock, specifying a failure  
 		/// error message. 
-		/// Use in conjuntion with the default <see cref="MockBehavior.Loose"/>.
 		/// </summary>
 		/// <example group="verification">
 		/// This example assumes that the mock has been used, 

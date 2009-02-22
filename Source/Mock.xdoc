@@ -1,5 +1,5 @@
 ﻿<?xml version="1.0" encoding="utf-8" ?>
-<docs>
+<docs xml:space="preserve">
 	<doc for="Mock">
 		<summary>
 			Base class for mocks and static helper class with methods that
@@ -34,7 +34,7 @@
 				// the mock that "owns" it
 				Mock&lt;HttpRequestBase&gt; request = Mock.Get(context.Request);
 				mock.Setup(req => req.AppRelativeCurrentExecutionFilePath)
-				.Returns(tempUrl);
+					 .Returns(tempUrl);
 			</code>
 		</example>		
 	</doc>

@@ -1,11 +1,11 @@
 ﻿<?xml version="1.0" encoding="utf-8" ?>
-<docs>
+<docs xml:space="preserve">
 	<doc for="Mock{T}">
 		<summary>
 			Provides a mock implementation of <typeparamref name="T"/>.
 		</summary>
 		<remarks>
-			Only abstract and virtual members of classes can be mocked.
+			Any interface type can be used for mocking, but for classes, only abstract and virtual members can be mocked.
 			<para>
 				The behavior of the mock with regards to the setups and the actual calls is determined
 				by the optional <see cref="MockBehavior"/> that can be passed to the <see cref="Mock{T}(MockBehavior)"/>
@@ -17,43 +17,41 @@
 			The following example shows establishing setups with specific values
 			for method invocations:
 			<code>
-				//setup - data
+				// Arrange
 				var order = new Order(TALISKER, 50);
 				var mock = new Mock&lt;IWarehouse&gt;();
 
-				//setup
 				mock.Setup(x => x.HasInventory(TALISKER, 50)).Returns(true);
 
-				//exercise
+				// Act
 				order.Fill(mock.Object);
 
-				//verify
+				// Assert
 				Assert.True(order.IsFilled);
 			</code>
 			The following example shows how to use the <see cref="It"/> class
 			to specify conditions for arguments instead of specific values:
 			<code>
-				//setup - data
+				// Arrange
 				var order = new Order(TALISKER, 50);
 				var mock = new Mock&lt;IWarehouse&gt;();
 
-				//setup
-				//shows how to expect a value within a range
+				// shows how to expect a value within a range
 				mock.Setup(x => x.HasInventory(
-				It.IsAny&lt;string&gt;(),
-				It.IsInRange(0, 100, Range.Inclusive)))
-				.Returns(false);
+							It.IsAny&lt;string&gt;(),
+							It.IsInRange(0, 100, Range.Inclusive)))
+					 .Returns(false);
 
-				//shows how to throw for unexpected calls.
+				// shows how to throw for unexpected calls.
 				mock.Setup(x => x.Remove(
-				It.IsAny&lt;string&gt;(),
-				It.IsAny&lt;int&gt;()))
-				.Throws(new InvalidOperationException());
+							It.IsAny&lt;string&gt;(),
+							It.IsAny&lt;int&gt;()))
+					 .Throws(new InvalidOperationException());
 
-				//exercise
+				// Act
 				order.Fill(mock.Object);
 
-				//verify
+				// Assert
 				Assert.False(order.IsFilled);
 			</code>
 		</example>
@@ -157,7 +155,7 @@
 		<example group="setups">
 			<code>
 				mock.SetupGet(x =&gt; x.Suspended)
-				.Returns(true);
+					 .Returns(true);
 			</code>
 		</example>
 	</doc>
@@ -379,7 +377,6 @@
 			Verifies that a specific invocation matching the given
 			expression was performed on the mock, specifying a failure
 			error message.
-			Use in conjuntion with the default <see cref="MockBehavior.Loose"/>.
 		</summary>
 		<example group="verification">
 			This example assumes that the mock has been used,
@@ -403,7 +400,6 @@
 			Verifies that a specific invocation matching the given
 			expression was performed on the mock, specifying a failure
 			error message.
-			Use in conjuntion with the default <see cref="MockBehavior.Loose"/>.
 		</summary>
 		<exception cref="MockException">
 			The invocation was not call the times specified by
@@ -417,7 +413,6 @@
 	<doc for="Mock{T}.VerifyGet(expression)">
 		<summary>
 			Verifies that a property was read on the mock.
-			Use in conjuntion with the default <see cref="MockBehavior.Loose"/>.
 		</summary>
 		<example group="verification">
 			This example assumes that the mock has been used,
@@ -441,7 +436,6 @@
 	<doc for="Mock{T}.VerifyGet(expression,times)">
 		<summary>
 			Verifies that a property was read on the mock.
-			Use in conjuntion with the default <see cref="MockBehavior.Loose"/>.
 		</summary>
 		<exception cref="MockException">
 			The invocation was not call the times specified by
@@ -458,7 +452,6 @@
 		<summary>
 			Verifies that a property was read on the mock, specifying a failure
 			error message.
-			Use in conjuntion with the default <see cref="MockBehavior.Loose"/>.
 		</summary>
 		<example group="verification">
 			This example assumes that the mock has been used,
@@ -484,7 +477,6 @@
 		<summary>
 			Verifies that a property was read on the mock, specifying a failure
 			error message.
-			Use in conjuntion with the default <see cref="MockBehavior.Loose"/>.
 		</summary>
 		<exception cref="MockException">
 			The invocation was not call the times specified by
@@ -501,7 +493,6 @@
 	<doc for="Mock{T}.VerifySet(expression)">
 		<summary>
 			Verifies that a property was set on the mock.
-			Use in conjuntion with the default <see cref="MockBehavior.Loose"/>.
 		</summary>
 		<example group="verification">
 			This example assumes that the mock has been used,
@@ -521,7 +512,6 @@
 	<doc for="Mock{T}.VerifySet(expression,times)">
 		<summary>
 			Verifies that a property was set on the mock.
-			Use in conjuntion with the default <see cref="MockBehavior.Loose"/>.
 		</summary>
 		<exception cref="MockException">
 			The invocation was not call the times specified by
@@ -534,7 +524,6 @@
 		<summary>
 			Verifies that a property was set on the mock, specifying
 			a failure message.
-			Use in conjuntion with the default <see cref="MockBehavior.Loose"/>.
 		</summary>
 		<example group="verification">
 			This example assumes that the mock has been used,

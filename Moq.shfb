@@ -44,10 +44,23 @@ Do use their documentation to learn about options (especially when there are sev
     <apiFilter>
         <filter entryType="Namespace" fullName="Castle.Core.Interceptor" isExposed="False" />
         <filter entryType="Namespace" fullName="Castle.DynamicProxy" isExposed="False" />
+        <filter entryType="Namespace" fullName="Castle.DynamicProxy.Generators" isExposed="False" />
         <filter entryType="Namespace" fullName="Moq" isExposed="True">
             <filter entryType="Interface" fullName="Moq.IHideObjectMembers" filterName="IHideObjectMembers" isExposed="False" />
             <filter entryType="Interface" fullName="Moq.IMocked" filterName="IMocked" isExposed="False" />
             <filter entryType="Interface" fullName="Moq.IMocked`1" filterName="IMocked`1" isExposed="False" />
+            <filter entryType="Class" fullName="Moq.Match" filterName="Match" isExposed="False" />
+            <filter entryType="Class" fullName="Moq.MatcherAttribute" filterName="MatcherAttribute" isExposed="False" />
+            <filter entryType="Class" fullName="Moq.Mock" filterName="Mock" isExposed="True">
+                <filter entryType="Method" fullName="Moq.Mock.CreateEventHandler" filterName="CreateEventHandler" isExposed="False" />
+            </filter>
+            <filter entryType="Class" fullName="Moq.MockedEvent" filterName="MockedEvent" isExposed="False" />
+            <filter entryType="Class" fullName="Moq.MockedEvent`1" filterName="MockedEvent`1" isExposed="False" />
+            <filter entryType="Class" fullName="Moq.MockLegacyExtensions" filterName="MockLegacyExtensions" isExposed="False" />
+        </filter>
+        <filter entryType="Namespace" fullName="Moq.Language" isExposed="True">
+            <filter entryType="Interface" fullName="Moq.Language.INever" filterName="INever" isExposed="False" />
+            <filter entryType="Interface" fullName="Moq.Language.IOccurrence" filterName="IOccurrence" isExposed="False" />
         </filter>
         <filter entryType="Namespace" fullName="Moq.Language.Flow" isExposed="False" />
     </apiFilter>

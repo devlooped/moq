@@ -63,6 +63,7 @@ namespace Moq.Language
 		/// <summary>
 		/// The expected invocation can happen at most specified number of times.
 		/// </summary>
+		/// <param name="callCount">The number of times to accept calls.</param>
 		/// <example>
 		/// <code>
 		/// var mock = new Mock&lt;ICommand&gt;();
