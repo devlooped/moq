@@ -370,6 +370,31 @@ namespace Moq.Tests
 			Assert.False(raisedField);
 		}
 
+        [Fact]
+        public void ShouldAllowListenerListToBeModifiedDuringEventHandling()
+        {
+            var parent = new Mock<IParent>(MockBehavior.Strict);
+
+            var handler = parent.CreateEventHandler();
+            parent.Object.Event += handler;
+
+            parent.Object.Event += delegate
+                                       {
+                                           parent.Object.Event += delegate { raisedField = true;};
+                                       };
+
+            handler.Raise(EventArgs.Empty);
+
+            // we don't expect the inner event to be raised the first time
+            Assert.False(raisedField);
+
+            // the second time around, the event handler added the first time
+            // should kick in
+            handler.Raise(EventArgs.Empty);
+            
+            Assert.True(raisedField);
+        }
+
 		[Fact]
 		public void RaisesEvent()
 		{

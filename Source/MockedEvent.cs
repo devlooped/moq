@@ -39,6 +39,7 @@
 // http://www.opensource.org/licenses/bsd-license.php]
 
 using System;
+using System.Linq;
 using System.Reflection;
 using System.ComponentModel;
 
@@ -86,7 +87,7 @@ namespace Moq
 			if (Raised != null)
 				Raised(this.mock.Object, EventArgs.Empty);
 
-			foreach (var del in mock.GetInvocationList(Event))
+			foreach (var del in mock.GetInvocationList(Event).ToList())
 			{
 				del.InvokePreserveStack(mock.Object, args);
 			}
