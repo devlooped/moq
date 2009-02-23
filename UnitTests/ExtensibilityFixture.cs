@@ -38,6 +38,39 @@ namespace Moq.Tests
 
 			Assert.Throws<ArgumentException>(() => mock.Object.Save(new [] { order }));
 		}
+
+		[Fact]
+		public void ShouldExtendWithPropertyMatchers()
+		{
+			var mock = new Mock<IOrderRepository>();
+			mock.Setup(repo => repo.Save(Orders.IsSmall))
+				.Throws(new InvalidOperationException());
+
+			try
+			{
+				mock.Object.Save(new Order { Amount = 50 });
+
+				Assert.True(false, "Should have failed for small order");
+			}
+			catch (InvalidOperationException)
+			{
+			}
+		}
+
+		[Fact]
+		public void SetterMatcherRendersNicely()
+		{
+			var mock = new Mock<IOrderRepository>();
+
+			try
+			{
+				mock.VerifySet(repo => repo.Value = It.IsAny<int>());
+			}
+			catch (MockException me)
+			{
+				Console.WriteLine(me.Message);
+			}
+		}
 	}
 
 	public static class Orders
@@ -51,12 +84,21 @@ namespace Moq.Tests
 		{
 			return Match<Order>.Create(o => o.Amount >= 1000);
 		}
+
+		public static Order IsSmall
+		{
+			get
+			{
+				return Match<Order>.Create(o => o.Amount <= 1000);
+			}
+		}
 	}
 
 	public interface IOrderRepository
 	{
 		void Save(Order order);
 		void Save(IEnumerable<Order> orders);
+		int Value { get; set; }
 	}
 
 	public static class OrderIs

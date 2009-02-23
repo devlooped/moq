@@ -65,7 +65,7 @@ namespace Moq
 
 			if (expression.NodeType == ExpressionType.Call)
 			{
-				MethodCallExpression call = (MethodCallExpression)expression;
+				var call = (MethodCallExpression)expression;
 
 				// Try to determine if invocation is to a matcher.
 				using (var context = new FluentMockContext())
@@ -98,6 +98,19 @@ namespace Moq
 					var matcher = new LazyEvalMatcher();
 					matcher.Initialize(expression);
 					return matcher;
+				}
+			}
+			else if (expression.NodeType == ExpressionType.MemberAccess)
+			{
+				var access = (MemberExpression)expression;
+
+				// Try to determine if invocation is to a matcher.
+				using (var context = new FluentMockContext())
+				{
+					Expression.Lambda<Action>(access).Compile().Invoke();
+
+					if (context.LastMatch != null)
+						return new Matcher(context.LastMatch);
 				}
 			}
 
