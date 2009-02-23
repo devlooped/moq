@@ -21,21 +21,19 @@
 		</remarks>
 		<example>
 			Creating a custom matcher is straightforward. You just need to create a method
-			that returns an instance of <see cref="Match{T}"/> with your matching condition:
+			that returns a value from a call to <see cref="Match{T}.Create"/> with your matching condition:
 			<code>
 				public Order IsBigOrder()
 				{
-					return new Match&lt;Order&gt;(o => o.GrandTotal &gt;= 5000);
+					return Match&lt;Order&gt;.Create(o => o.GrandTotal &gt;= 5000);
 				}
 			</code>
-			The <see cref="Match{T}"/> class is implicitly convertible to the return type,
-			which must be the type expected by the mock setup invocation:
+			This method can be used in any mock setup invocation:
 			<code>
 				mock.Setup(m => m.Submit(IsBigOrder()).Throws&lt;UnauthorizedAccessException&gt;();
 			</code>
-			By returning the appropriate type from the custom matcher method, the compiler
-			is satisfied, but at runtime Moq knows that the return value was a matcher and
-			evaluates your predicate with the actual value passed-in.
+			At runtime, Moq knows that the return value was a matcher and
+			evaluates your predicate with the actual value passed into your predicate.
 			<para>
 				Another example might be a case where you want to match a lists of orders
 				that contains a particular one. You might create matcher like the following:
@@ -45,7 +43,7 @@
 				{
 					public static IEnumerable&lt;Order&gt; Contains(Order order)
 					{
-						return new Match&lt;IEnumerable&lt;Order&gt;&gt;(orders => orders.Contains(order));
+						return Match&lt;IEnumerable&lt;Order&gt;&gt;.Create(orders => orders.Contains(order));
 					}
 				}
 			</code>
@@ -60,27 +58,14 @@
 			</code>
 		</example>
 	</doc>
-	<doc for="Match{T}.ctor">
+	<doc for="Match{T}.Create">
 		<summary>
 			Initializes the match with the condition that
 			will be checked in order to match invocation
 			values.
 		</summary>
-	</doc>
-	<doc for="Match{T}.Convert">
-		<summary>
-			If the target type to match is an interface, the implicit cast will not work and
-			you need to explicitly convert the matcher to the target type to satisfy the compiler.
-		</summary>
 		<remarks>
-			For more information about this well-known .NET limitation, see
-			https://connect.microsoft.com/VisualStudio/feedback/ViewFeedback.aspx?FeedbackID=318122
+			 <seealso cref="Match{T}"/>
 		</remarks>
-	</doc>
-	<doc for="Match{T}.operator">
-		<summary>
-			Satisfies the compiler when the matcher is used
-			to specify an argument value.
-		</summary>
 	</doc>
 </docs>

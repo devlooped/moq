@@ -66,11 +66,16 @@ namespace Moq
 	{
 		Predicate<T> condition;
 
-		/// <include file='Match.xdoc' path='docs/doc[@for="Match{T}.ctor"]/*'/>
-		public Match(Predicate<T> condition)
+		private Match(Predicate<T> condition)
 		{
 			this.condition = condition;
 			SetLastMatch(this);
+		}
+
+		/// <include file='Match.xdoc' path='docs/doc[@for="Match{T}.Create"]/*'/>
+		public static T Create(Predicate<T> condition)
+		{
+			return new Match<T>(condition).Convert();
 		}
 
 		internal override bool Matches(object value)
@@ -82,13 +87,7 @@ namespace Moq
 		}
 
 		/// <include file='Match.xdoc' path='docs/doc[@for="Match{T}.Convert"]/*'/>
-		public T Convert()
-		{
-			return default(T);
-		}
-
-		/// <include file='Match.xdoc' path='docs/doc[@for="Match{T}.operator"]/*'/>
-		public static implicit operator T(Match<T> match)
+		private T Convert()
 		{
 			return default(T);
 		}
@@ -98,7 +97,9 @@ namespace Moq
 		/// which is used in the SetupSet to allow matchers in the prop = value 
 		/// delegate expression. This delegate is executed in "fluent" mode in 
 		/// order to capture the value being set, and construct the corresponding 
-		/// methodcall. This method ensures that when we execute the delegate, we 
+		/// methodcall.
+		/// This is also used in the MatcherFactory for each argument expression.
+		/// This method ensures that when we execute the delegate, we 
 		/// also track the matcher that was invoked, so that when we create the 
 		/// methodcall we build the expression using it, rather than the null/default 
 		/// value returned from the actual invocation.

@@ -27,15 +27,15 @@ namespace Moq.Tests
 			Assert.True(mock.Object.Do(5));
 		}
 
-		public Match<TValue> Any<TValue>()
+		public TValue Any<TValue>()
 		{
-			return new Match<TValue>(v => true);
+			return Match<TValue>.Create(v => true);
 		}
 
-		public Match<TValue> Between<TValue>(TValue from, TValue to, Range rangeKind)
+		public TValue Between<TValue>(TValue from, TValue to, Range rangeKind)
 			where TValue : IComparable
 		{
-			return new Match<TValue>(value =>
+			return Match<TValue>.Create(value =>
 			{
 				if (value == null)
 				{

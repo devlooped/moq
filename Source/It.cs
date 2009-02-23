@@ -50,17 +50,17 @@ namespace Moq
 		/// <include file='It.xdoc' path='docs/doc[@for="It.IsAny"]/*'/>
 		public static TValue IsAny<TValue>()
 		{
-			return Match<TValue>.SetLastMatch(new Match<TValue>(value =>
+			return Match<TValue>.Create(value =>
 			{
 				return value == null || typeof(TValue).IsAssignableFrom(value.GetType());
-			}));
+			});
 		}
 
 		/// <include file='It.xdoc' path='docs/doc[@for="It.Is"]/*'/>
 		[System.Diagnostics.CodeAnalysis.SuppressMessage("Microsoft.Usage", "CA1801:ReviewUnusedParameters", MessageId = "match")]
 		public static TValue Is<TValue>(Expression<Predicate<TValue>> match)
 		{
-			return Match<TValue>.SetLastMatch(new Match<TValue>(value => match.Compile().Invoke(value)));
+			return Match<TValue>.Create(value => match.Compile().Invoke(value));
 		}
 
 		/// <include file='It.xdoc' path='docs/doc[@for="It.IsInRange"]/*'/>
@@ -70,7 +70,7 @@ namespace Moq
 		public static TValue IsInRange<TValue>(TValue from, TValue to, Range rangeKind)
 			where TValue : IComparable
 		{
-			return Match<TValue>.SetLastMatch(new Match<TValue>(value =>
+			return Match<TValue>.Create(value =>
 			{
 				if (value == null)
 				{
@@ -87,7 +87,7 @@ namespace Moq
 					return value.CompareTo(from) >= 0 &&
 						value.CompareTo(to) <= 0;
 				}
-			}));
+			});
 		}
 
 		/// <include file='It.xdoc' path='docs/doc[@for="It.IsRegex(regex)"]/*'/>
@@ -97,11 +97,11 @@ namespace Moq
 			// The regex is constructed only once.
 			var re = new Regex(regex);
 
-			return Match<string>.SetLastMatch(new Match<string>(value =>
+			return Match<string>.Create(value =>
 			{
 				// But evaluated every time :)
 				return re.IsMatch(value);
-			}));
+			});
 		}
 
 		/// <include file='It.xdoc' path='docs/doc[@for="It.IsRegex(regex,options)"]/*'/>
@@ -112,11 +112,11 @@ namespace Moq
 			// The regex is constructed only once.
 			var re = new Regex(regex, options);
 
-			return Match<string>.SetLastMatch(new Match<string>(value =>
+			return Match<string>.Create(value =>
 			{
 				// But evaluated every time :)
 				return re.IsMatch(value);
-			}));
+			});
 		}
 	}
 }
