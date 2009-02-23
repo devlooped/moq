@@ -70,8 +70,7 @@ namespace Moq
 		public Match(Predicate<T> condition)
 		{
 			this.condition = condition;
-			if (FluentMockContext.IsActive)
-				FluentMockContext.Current.LastMatch = this;
+			SetLastMatch(this);
 		}
 
 		internal override bool Matches(object value)
@@ -92,6 +91,24 @@ namespace Moq
 		public static implicit operator T(Match<T> match)
 		{
 			return default(T);
+		}
+
+		/// <devdoc>
+		/// This method is used to set an expression as the last matcher invoked, 
+		/// which is used in the SetupSet to allow matchers in the prop = value 
+		/// delegate expression. This delegate is executed in "fluent" mode in 
+		/// order to capture the value being set, and construct the corresponding 
+		/// methodcall. This method ensures that when we execute the delegate, we 
+		/// also track the matcher that was invoked, so that when we create the 
+		/// methodcall we build the expression using it, rather than the null/default 
+		/// value returned from the actual invocation.
+		/// </devdoc>
+		internal static Match<TValue> SetLastMatch<TValue>(Match<TValue> match)
+		{
+			if (FluentMockContext.IsActive)
+				FluentMockContext.Current.LastMatch = match;
+
+			return match;
 		}
 	}
 

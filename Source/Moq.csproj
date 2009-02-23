@@ -142,6 +142,7 @@
     <None Include="..\Moq.snk">
       <Link>Moq.snk</Link>
     </None>
+    <None Include="It.xdoc" />
     <None Include="Match.xdoc" />
     <None Include="Mock.Generic.xdoc" />
     <None Include="Mock.xdoc" />
@@ -184,6 +185,8 @@
     </CreateItem>
     <Exec Command="&quot;$(MSBuildProjectPath)..\Tools\Ilmerge.exe&quot; /internalize:&quot;$(MSBuildProjectPath)ilmerge.exclude&quot; /ndebug /keyfile:$(AssemblyOriginatorKeyFile) /out:@(MainAssembly) &quot;@(IntermediateAssembly)&quot; @(IlmergeAssemblies->'&quot;%(FullPath)&quot;', ' ')" />
     <Delete Files="@(ReferenceCopyLocalPaths->'$(OutDir)%(DestinationSubDirectory)%(Filename)%(Extension)')" />
+    <Delete Files="$(OutDir)Moq.dll.CodeAnalysisLog.xml" ContinueOnError="true" />
+    <Delete Files="$(OutDir)Moq.dll.lastcodeanalysissucceeded" ContinueOnError="true" />
   </Target>
   <ProjectExtensions>
     <VisualStudio>
