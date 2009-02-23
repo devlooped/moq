@@ -337,7 +337,7 @@ namespace Moq
 			{
 				for (int i = 0; i < expectedParams.Length; i++)
 				{
-					if (expectedParams[i].ParameterType != actualParams[i].ParameterType)
+					if (!actualParams[i].ParameterType.IsAssignableFrom(expectedParams[i].ParameterType))
 						ThrowParameterMismatch(expectedParams, actualParams);
 				}
 			}

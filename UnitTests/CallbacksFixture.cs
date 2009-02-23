@@ -206,6 +206,32 @@ namespace Moq.Tests
 			Assert.True(returnsCalled);
 		}
 
+		[Fact]
+		public void CallbackCanReceiveABaseClass()
+		{
+			var mock = new Mock<IInterface>(MockBehavior.Strict);
+			mock.Setup(foo => foo.Method(It.IsAny<Derived>())).Callback<Derived>(TraceMe);
+
+			mock.Object.Method(new Derived());
+		}
+
+		public interface IInterface
+		{
+			void Method(Derived b);
+		}
+
+		public class Base
+		{
+		}
+
+		public class Derived : Base
+		{
+		}
+
+		private void TraceMe(Base b)
+		{
+		}
+		
 		public interface IFoo
 		{
 			void Submit();
