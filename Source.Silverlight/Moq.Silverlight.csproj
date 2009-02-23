@@ -311,7 +311,7 @@
     <CreateItem Include="@(ReferencePath)" Condition="'%(CopyLocal)'=='true'">
       <Output TaskParameter="Include" ItemName="IlmergeAssemblies" />
     </CreateItem>
-    <Exec Command="&quot;$(MSBuildProjectPath)..\Tools\Ilmerge.exe&quot; /lib=&quot;C:\Program Files (x86)\Microsoft SDKs\Silverlight\v2.0\Reference Assemblies&quot; /internalize:&quot;$(MSBuildProjectPath)..\Source\ilmerge.exclude&quot; /ndebug /keyfile:$(AssemblyOriginatorKeyFile) /out:@(MainAssembly) &quot;@(IntermediateAssembly)&quot; @(IlmergeAssemblies->'&quot;%(FullPath)&quot;', ' ')" />
+    <Exec Command="&quot;$(MSBuildProjectPath)..\Tools\Ilmerge.exe&quot; /targetplatform:v2,&quot;C:\Program Files (x86)\Microsoft SDKs\Silverlight\v2.0\Reference Assemblies&quot; /lib:&quot;C:\Program Files (x86)\Microsoft SDKs\Silverlight\v2.0\Reference Assemblies&quot; /internalize:&quot;$(MSBuildProjectPath)..\Source\ilmerge.exclude&quot; /ndebug /keyfile:$(AssemblyOriginatorKeyFile) /out:@(MainAssembly) &quot;@(IntermediateAssembly)&quot; @(IlmergeAssemblies->'&quot;%(FullPath)&quot;', ' ')" />
     <Delete Files="@(ReferenceCopyLocalPaths->'$(OutDir)%(DestinationSubDirectory)%(Filename)%(Extension)')" />
   </Target>
   <ProjectExtensions>
