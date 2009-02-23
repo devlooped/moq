@@ -180,10 +180,7 @@
   <!-- TODO: create automatic drop project -->
   <!--<Import Project="$(ToolsDir)\MSBuild.Community.Tasks.Targets" />-->
   <Target Name="AfterBuild" Condition=" '$(Configuration)' == 'Release' ">
-    <CreateItem Include="@(ReferencePath)" Condition="'%(CopyLocal)'=='true'">
-      <Output TaskParameter="Include" ItemName="IlmergeAssemblies" />
-    </CreateItem>
-    <Exec Command="&quot;$(MSBuildProjectPath)..\Tools\Ilmerge.exe&quot; /internalize:&quot;$(MSBuildProjectPath)ilmerge.exclude&quot; /ndebug /keyfile:$(AssemblyOriginatorKeyFile) /out:@(MainAssembly) &quot;@(IntermediateAssembly)&quot; @(IlmergeAssemblies->'&quot;%(FullPath)&quot;', ' ')" />
+    <Exec Command="&quot;$(MSBuildProjectPath)..\Tools\Ilmerge.exe&quot; /internalize:&quot;$(MSBuildProjectPath)ilmerge.exclude&quot; /ndebug /keyfile:$(AssemblyOriginatorKeyFile) /out:@(MainAssembly) &quot;@(IntermediateAssembly)&quot; @(ReferenceCopyLocalPaths->'&quot;%(FullPath)&quot;', ' ')" />
     <Delete Files="@(ReferenceCopyLocalPaths->'$(OutDir)%(DestinationSubDirectory)%(Filename)%(Extension)')" />
     <Delete Files="$(OutDir)Moq.dll.CodeAnalysisLog.xml" ContinueOnError="true" />
     <Delete Files="$(OutDir)Moq.dll.lastcodeanalysissucceeded" ContinueOnError="true" />
