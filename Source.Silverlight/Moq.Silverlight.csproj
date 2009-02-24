@@ -90,9 +90,6 @@
     <Compile Include="..\Source\Evaluator.cs">
       <Link>Evaluator.cs</Link>
     </Compile>
-    <Compile Include="..\Source\ExpectKind.cs">
-      <Link>ExpectKind.cs</Link>
-    </Compile>
     <Compile Include="..\Source\ExpressionExtensions.cs">
       <Link>ExpressionExtensions.cs</Link>
     </Compile>
@@ -278,6 +275,9 @@
     </Compile>
     <Compile Include="..\Source\SetterMethodCall.cs">
       <Link>SetterMethodCall.cs</Link>
+    </Compile>
+    <Compile Include="..\Source\SetupKind.cs">
+      <Link>SetupKind.cs</Link>
     </Compile>
     <Compile Include="..\Source\Times.cs">
       <Link>Times.cs</Link>
