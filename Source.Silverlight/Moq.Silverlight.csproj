@@ -315,7 +315,11 @@
   </Target>
   -->
 	<Target Name="AfterBuild" Condition=" '$(Configuration)' == 'Release' ">
-		<Exec Command="&quot;$(MSBuildProjectPath)..\Tools\Ilmerge.exe&quot; /targetplatform:v2,&quot;$(SilverlightBuildResources)Reference Assemblies&quot; /lib:&quot;$(SilverlightBuildResources)Reference Assemblies&quot; /internalize:&quot;$(MSBuildProjectPath)..\Source\ilmerge.exclude&quot; /ndebug /keyfile:$(AssemblyOriginatorKeyFile) /out:@(MainAssembly) &quot;@(IntermediateAssembly)&quot; @(ReferenceCopyLocalPaths->'&quot;%(FullPath)&quot;', ' ')" />
+		<!-- Silverlight version of this task includes the pdbs :S -->
+		<CreateItem Include="@(ReferenceCopyLocalPaths)" Condition="'%(Extension)'=='.dll'">
+			<Output TaskParameter="Include" ItemName="IlmergeAssemblies" />
+		</CreateItem>
+		<Exec Command="&quot;$(MSBuildProjectPath)..\Tools\Ilmerge.exe&quot; /targetplatform:v2,&quot;$(SilverlightBuildResources)Reference Assemblies&quot; /lib:&quot;$(SilverlightBuildResources)Reference Assemblies&quot; /internalize:&quot;$(MSBuildProjectPath)..\Source\ilmerge.exclude&quot; /ndebug /keyfile:$(AssemblyOriginatorKeyFile) /out:@(MainAssembly) &quot;@(IntermediateAssembly)&quot; @(IlmergeAssemblies->'&quot;%(FullPath)&quot;', ' ')" />
 		<Delete Files="@(ReferenceCopyLocalPaths->'$(OutDir)%(DestinationSubDirectory)%(Filename)%(Extension)')" />
 	</Target>
 	<ProjectExtensions>
