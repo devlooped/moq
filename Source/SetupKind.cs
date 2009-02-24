@@ -41,7 +41,7 @@
 
 namespace Moq
 {
-	internal enum ExpectKind
+	internal enum SetupKind
 	{
 		PropertySet,
 		Other, 

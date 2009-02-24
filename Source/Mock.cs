@@ -358,7 +358,7 @@ namespace Moq
 
 				var targetInterceptor = GetInterceptor(expression, mock);
 
-				targetInterceptor.AddCall(call, ExpectKind.Other);
+				targetInterceptor.AddCall(call, SetupKind.Other);
 
 				return call;
 			});
@@ -383,7 +383,7 @@ namespace Moq
 
 				var targetInterceptor = GetInterceptor(lambda, mock);
 
-				targetInterceptor.AddCall(call, ExpectKind.Other);
+				targetInterceptor.AddCall(call, SetupKind.Other);
 
 				return call;
 			});
@@ -413,7 +413,7 @@ namespace Moq
 
 					var targetInterceptor = GetInterceptor(expression, mock);
 
-					targetInterceptor.AddCall(call, ExpectKind.Other);
+					targetInterceptor.AddCall(call, SetupKind.Other);
 
 					return call;
 				}
@@ -430,7 +430,7 @@ namespace Moq
 					(m, expr, method, value) =>
 					{
 						var call = new SetterMethodCall<T1, TProperty>(m, expr, method, value);
-						m.Interceptor.AddCall(call, ExpectKind.PropertySet);
+						m.Interceptor.AddCall(call, SetupKind.PropertySet);
 						return call;
 					});
 			});
@@ -446,7 +446,7 @@ namespace Moq
 					(m, expr, method, value) =>
 					{
 						var call = new MethodCall<T1>(m, expr, method, value);
-						m.Interceptor.AddCall(call, ExpectKind.PropertySet);
+						m.Interceptor.AddCall(call, SetupKind.PropertySet);
 						return call;
 					});
 			});
@@ -465,7 +465,7 @@ namespace Moq
 			var call = new SetterMethodCall<T1, TProperty>(mock, expression, propSet);
 			var targetInterceptor = GetInterceptor(expression, mock);
 
-			targetInterceptor.AddCall(call, ExpectKind.PropertySet);
+			targetInterceptor.AddCall(call, SetupKind.PropertySet);
 
 			return call;
 		}

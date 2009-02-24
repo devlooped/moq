@@ -16,7 +16,6 @@ namespace Moq.Tests
 			Assert.NotNull(comparable);
 		}
 
-
 		[Fact]
 		public void ThrowsIfNullExpectAction()
 		{
@@ -390,6 +389,61 @@ namespace Moq.Tests
 			mock.Object.Count = 4;
 
 			mock.VerifyAll();
+		}
+
+		[Fact]
+		public void SetterLambdaCannotHaveMultipleSetups()
+		{
+			var mock = new Mock<IFoo>();
+
+			mock.SetupSet(foo => foo.Count = It.IsAny<int>())
+				.Throws<ArgumentOutOfRangeException>();
+			Assert.Throws<ArgumentOutOfRangeException>(() => mock.Object.Count = 5);
+
+			mock.SetupSet(foo => foo.Count = It.IsInRange(1, 5, Range.Inclusive))
+				.Throws<ArgumentException>();
+			Assert.Throws<ArgumentException>(() => mock.Object.Count = 5);
+		}
+
+		[Fact]
+		public void SetterLambdaDoesNotCountAsInvocation()
+		{
+			var mock = new Mock<IFoo>();
+
+			mock.SetupSet(foo => foo.Count = 5);
+
+			Assert.Throws<MockVerificationException>(() => mock.VerifyAll());
+
+			mock.Object.Count = 5;
+			mock.VerifyAll();
+		}
+
+		[Fact]
+		public void SetterLambdaWithStrictMockWorks()
+		{
+			var mock = new Mock<IFoo>(MockBehavior.Strict);
+
+			mock.SetupSet(foo => foo.Count = 5);
+		}
+
+
+		[Fact]
+		public void ShouldAllowMultipleCustomMatcherWithArguments()
+		{
+			var mock = new Mock<IFoo>();
+
+			mock.Setup(m => m.Echo(IsMultipleOf(2))).Returns(2);
+			mock.Setup(m => m.Echo(IsMultipleOf(3))).Returns(3);
+
+			Assert.Equal(2, mock.Object.Echo(4));
+			Assert.Equal(2, mock.Object.Echo(8));
+			Assert.Equal(3, mock.Object.Echo(9));
+			Assert.Equal(3, mock.Object.Echo(3));
+		}
+
+		private int IsMultipleOf(int value)
+		{
+			return Match<int>.Create(i => i % value == 0);
 		}
 
 #endif

@@ -411,6 +411,27 @@ namespace Moq.Tests
 		}
 
 		[Fact]
+		public void VerifiesSetterWithActionAndMatcher()
+		{
+			var mock = new Mock<IFoo>();
+
+			try
+			{
+				mock.VerifySet(m => m.Value = It.IsAny<int>());
+				Assert.False(true, "Should have failed");
+			}
+			catch (MockException me)
+			{
+			}
+
+			mock.Object.Value = 2;
+
+			mock.VerifySet(m => m.Value = It.IsAny<int>());
+			mock.VerifySet(m => m.Value = It.IsInRange(1,2, Range.Inclusive));
+			mock.VerifySet(m => m.Value = It.Is<int>(i => i % 2 == 0));
+		}
+
+		[Fact]
 		public void VerifiesRefWithExpression()
 		{
 			var mock = new Mock<IFoo>();

@@ -97,13 +97,13 @@ namespace Moq
 			}
 		}
 
-		public void AddCall(IProxyCall call, ExpectKind kind)
+		public void AddCall(IProxyCall call, SetupKind kind)
 		{
 			var expr = call.SetupExpression.PartialMatcherAwareEval();
 
 			var s = expr.ToStringFixed();
 
-			if (kind == ExpectKind.PropertySet)
+			if (kind == SetupKind.PropertySet)
 			{
 				s = "set::" + s;
 			}
@@ -128,7 +128,8 @@ namespace Moq
 
 		public void Intercept(IInvocation invocation)
 		{
-			if (FluentMockContext.Current != null)
+			// Track current invocation if we're in "record" mode in a fluent invocation context.
+			if (FluentMockContext.IsActive)
 				FluentMockContext.Current.Add(this.Mock, invocation);
 
 			// TODO: too many ifs in this method.
@@ -148,60 +149,65 @@ namespace Moq
 			}
 
 			// Special case for events.
-			if (IsEventAttach(invocation))
+			if (!FluentMockContext.IsActive)
 			{
-				var delegateInstance = (Delegate)invocation.Arguments[0];
-				// TODO: validate we can get the event?
-				EventInfo eventInfo = GetEventFromName(invocation.Method.Name.Replace("add_", ""));
-
-				if (delegateInstance != null)
+				if (IsEventAttach(invocation))
 				{
-					var mockEvent = delegateInstance.Target as MockedEvent;
+					var delegateInstance = (Delegate)invocation.Arguments[0];
+					// TODO: validate we can get the event?
+					EventInfo eventInfo = GetEventFromName(invocation.Method.Name.Replace("add_", ""));
 
-					if (mockEvent != null)
+					if (delegateInstance != null)
 					{
-						mockEvent.Event = eventInfo;
+						var mockEvent = delegateInstance.Target as MockedEvent;
+
+						if (mockEvent != null)
+						{
+							mockEvent.Event = eventInfo;
+						}
+						else
+						{
+							this.Mock.AddEventHandler(eventInfo, (Delegate)invocation.Arguments[0]);
+						}
 					}
-					else
-					{
-						this.Mock.AddEventHandler(eventInfo, (Delegate)invocation.Arguments[0]);
-					}
+
+					return;
 				}
-
-				return;
-			}
-			else if (IsEventDetach(invocation))
-			{
-				var delegateInstance = (Delegate)invocation.Arguments[0];
-				// TODO: validate we can get the event?
-				EventInfo eventInfo = GetEventFromName(invocation.Method.Name.Replace("remove_", ""));
-
-				if (delegateInstance != null)
+				else if (IsEventDetach(invocation))
 				{
-					var mockEvent = delegateInstance.Target as MockedEvent;
+					var delegateInstance = (Delegate)invocation.Arguments[0];
+					// TODO: validate we can get the event?
+					EventInfo eventInfo = GetEventFromName(invocation.Method.Name.Replace("remove_", ""));
 
-					if (mockEvent != null)
+					if (delegateInstance != null)
 					{
-						mockEvent.Event = null;
+						var mockEvent = delegateInstance.Target as MockedEvent;
+
+						if (mockEvent != null)
+						{
+							mockEvent.Event = null;
+						}
+						else
+						{
+							this.Mock.RemoveEventHandler(eventInfo, (Delegate)invocation.Arguments[0]);
+						}
 					}
-					else
-					{
-						this.Mock.RemoveEventHandler(eventInfo, (Delegate)invocation.Arguments[0]);
-					}
+
+					return;
 				}
-
-				return;
 			}
 
-			// Save to support Verify[expression] pattern, but only if we're 
-			// not running in a fluent invocation context, which is a recorder-like 
-			// mode we use to evaluate delegates by actually running them.
+			// Save to support Verify[expression] pattern.
+			// In a fluent invocation context, which is a recorder-like 
+			// mode we use to evaluate delegates by actually running them, 
+			// we don't want to count the invocation, or actually run 
+			// previous setups.
 			if (!FluentMockContext.IsActive)
 				actualInvocations.Add(invocation);
 
-			var call = orderedCalls.LastOrDefault(c => c.Matches(invocation));
+			var call = FluentMockContext.IsActive ? (IProxyCall) null : orderedCalls.LastOrDefault(c => c.Matches(invocation));
 
-			if (call == null)
+			if (call == null && !FluentMockContext.IsActive)
 			{
 				if (behavior == MockBehavior.Strict)
 				{
