@@ -70,6 +70,10 @@ namespace Moq.Tests
 			{
 				Console.WriteLine(me.Message);
 			}
+
+			mock.Object.Value = 25;
+
+			mock.VerifySet(repo => repo.Value = It.IsInRange(10, 25, Range.Inclusive));
 		}
 	}
 
