@@ -49,7 +49,6 @@ namespace Moq.Tests
 		}
 
 #if !SILVERLIGHT
-		[Conditional("DESKTOP")]
 		[Fact]
 		public void ShouldExpectPropertySetterOnNewInterface()
 		{

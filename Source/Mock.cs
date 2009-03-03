@@ -532,7 +532,6 @@ namespace Moq
 		}
 
 #if !SILVERLIGHT
-		[Conditional("DESKTOP")]
 		internal static void SetupAllProperties(Mock mock)
 		{
 			// Dunno why the conditional is not kicking in. I'm getting 

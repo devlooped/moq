@@ -34,7 +34,6 @@ namespace Moq.Tests
 		}
 
 #if !SILVERLIGHT
-		[Conditional("DESKTOP")]
 		[Fact]
 		public void StubsAllProperties()
 		{
@@ -54,7 +53,6 @@ namespace Moq.Tests
 			Assert.Same(bar.Object, mock.Object.Bar);
 		}
 
-		[Conditional("DESKTOP")]
 		[Fact]
 		public void StubsAllHierarchy()
 		{
@@ -66,7 +64,6 @@ namespace Moq.Tests
 			Assert.Equal(5, mock.Object.Bar.Value);
 		}
 
-		[Conditional("DESKTOP")]
 		[Fact]
 		public void StubsInheritedInterfaceProperties()
 		{
@@ -81,7 +78,6 @@ namespace Moq.Tests
 			Assert.Equal("foo", mock.Object.Name);
 		}
 
-		[Conditional("DESKTOP")]
 		[Fact]
 		public void StubsInheritedClassProperties()
 		{

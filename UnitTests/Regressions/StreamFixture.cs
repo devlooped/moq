@@ -7,7 +7,6 @@ namespace Moq.Tests
 	public class StreamFixture
 	{
 #if !SILVERLIGHT
-		[Conditional("DESKTOP")]
 		[Fact]
 		public void ShouldMockStream()
 		{

@@ -230,7 +230,6 @@ namespace Moq
 
 #if !SILVERLIGHT
 		/// <include file='Mock.Generic.xdoc' path='docs/doc[@for="Mock{T}.SetupAllProperties"]/*'/>
-		[Conditional("DESKTOP")]
 		public void SetupAllProperties()
 		{
 			SetupAllProperties(this);

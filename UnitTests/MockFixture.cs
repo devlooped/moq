@@ -7,6 +7,18 @@ namespace Moq.Tests
 	public class MockFixture
 	{
 		[Fact]
+		public void Fact()
+		{
+			var foo = new Mock<IFoo>();
+
+			var count = 0;
+
+			foo.Setup(f => f.Echo(5))
+				.Returns(count)
+				.Callback(() => count++);
+		}
+		
+		[Fact]
 		public void CreatesMockAndExposesInterface()
 		{
 			var mock = new Mock<IComparable>();
