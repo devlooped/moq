@@ -155,6 +155,7 @@
     <Compile Include="Matchers\Matcher.cs" />
     <Compile Include="Matchers\ParamArrayMatcher.cs" />
     <Compile Include="Matchers\RefMatcher.cs" />
+    <Compile Include="MethodCall.Legacy.cs" />
     <Compile Include="Mock.Generic.cs" />
     <Compile Include="Mock.Generic.Legacy.cs">
       <SubType>Code</SubType>

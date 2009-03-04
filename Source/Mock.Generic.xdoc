@@ -599,7 +599,7 @@
 			the given <paramref name="sender"/> and <paramref name="args"/> arguments.
 		</summary>
 		<exception cref="ArgumentException">
-			The <paramref name="args"/> arguments are
+			The <paramref name="args"/> argument is
 			invalid for the target event invocation, or the <paramref name="eventExpression"/> is
 			not an event attach or detach expression.
 		</exception>
@@ -630,5 +630,26 @@
 				Assert.Equal("moq", presenter.SelectedOrder.ProductName);
 			</code>
 		</example>		
+	</doc>
+	<doc for="Mock{T}.Raise(args)">
+		<summary>
+			Raises the event referenced in <paramref name="eventExpression"/> using
+			the given <paramref name="sender"/> and <paramref name="args"/> arguments 
+			for a non-EventHandler typed event.
+		</summary>
+		<exception cref="ArgumentException">
+			The <paramref name="args"/> arguments are
+			invalid for the target event invocation, or the <paramref name="eventExpression"/> is
+			not an event attach or detach expression.
+		</exception>
+		<example>
+			The following example shows how to raise a custom event that does not adhere to 
+			the standard <c>EventHandler</c>:
+			<code>
+				var mock = new Mock&lt;IViewModel&gt;();
+
+				mock.Raise(x => x.MyEvent -= null, "Name", bool, 25);
+			</code>
+		</example>
 	</doc>
 </docs>

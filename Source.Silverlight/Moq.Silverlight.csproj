@@ -1,332 +1,335 @@
 ﻿<Project ToolsVersion="3.5" DefaultTargets="Build" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
-	<PropertyGroup>
-		<Configuration Condition=" '$(Configuration)' == '' ">Debug</Configuration>
-		<Platform Condition=" '$(Platform)' == '' ">AnyCPU</Platform>
-		<ProductVersion>9.0.30729</ProductVersion>
-		<SchemaVersion>2.0</SchemaVersion>
-		<ProjectGuid>{5136C8E1-E17F-481F-B29A-C7FAB528BD2D}</ProjectGuid>
-		<ProjectTypeGuids>{A1591282-1198-4647-A2B1-27E5FF5F6F3B};{fae04ec0-301f-11d3-bf4b-00c04f79efbc}</ProjectTypeGuids>
-		<OutputType>Library</OutputType>
-		<AppDesignerFolder>Properties</AppDesignerFolder>
-		<RootNamespace>Moq</RootNamespace>
-		<AssemblyName>Moq.Silverlight</AssemblyName>
-		<TargetFrameworkVersion>v3.5</TargetFrameworkVersion>
-		<SilverlightApplication>false</SilverlightApplication>
-		<ValidateXaml>true</ValidateXaml>
-		<ThrowErrorsInValidation>false</ThrowErrorsInValidation>
-		<SignAssembly>true</SignAssembly>
-		<AssemblyOriginatorKeyFile>..\Moq.snk</AssemblyOriginatorKeyFile>
-	</PropertyGroup>
-	<PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Debug|AnyCPU' ">
-		<DebugSymbols>true</DebugSymbols>
-		<DebugType>full</DebugType>
-		<Optimize>false</Optimize>
-		<OutputPath>bin\Debug\</OutputPath>
-		<DefineConstants>DEBUG;TRACE;SILVERLIGHT</DefineConstants>
-		<NoStdLib>true</NoStdLib>
-		<NoConfig>true</NoConfig>
-		<ErrorReport>prompt</ErrorReport>
-		<WarningLevel>4</WarningLevel>
-		<DocumentationFile>bin\Debug\Moq.Silverlight.xml</DocumentationFile>
-	</PropertyGroup>
-	<PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Release|AnyCPU' ">
-		<DebugType>pdbonly</DebugType>
-		<Optimize>true</Optimize>
-		<OutputPath>bin\Release\</OutputPath>
-		<DefineConstants>TRACE;SILVERLIGHT</DefineConstants>
-		<NoStdLib>true</NoStdLib>
-		<NoConfig>true</NoConfig>
-		<ErrorReport>prompt</ErrorReport>
-		<WarningLevel>4</WarningLevel>
-		<DocumentationFile>bin\Release\Moq.Silverlight.xml</DocumentationFile>
-	</PropertyGroup>
-	<PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Debug|x86' ">
-		<DebugSymbols>true</DebugSymbols>
-		<OutputPath>bin\Debug\</OutputPath>
-		<DefineConstants>DEBUG;TRACE;SILVERLIGHT</DefineConstants>
-		<DocumentationFile>bin\Debug\Moq.Silverlight.xml</DocumentationFile>
-		<NoStdLib>true</NoStdLib>
-		<DebugType>full</DebugType>
-		<PlatformTarget>x86</PlatformTarget>
-		<CodeAnalysisUseTypeNameInSuppression>true</CodeAnalysisUseTypeNameInSuppression>
-		<CodeAnalysisModuleSuppressionsFile>GlobalSuppressions.cs</CodeAnalysisModuleSuppressionsFile>
-		<ErrorReport>prompt</ErrorReport>
-	</PropertyGroup>
-	<PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Release|x86' ">
-		<OutputPath>bin\Release\</OutputPath>
-		<DefineConstants>TRACE;SILVERLIGHT</DefineConstants>
-		<DocumentationFile>bin\Release\Moq.Silverlight.xml</DocumentationFile>
-		<Optimize>true</Optimize>
-		<NoStdLib>true</NoStdLib>
-		<DebugType>pdbonly</DebugType>
-		<PlatformTarget>x86</PlatformTarget>
-		<CodeAnalysisUseTypeNameInSuppression>true</CodeAnalysisUseTypeNameInSuppression>
-		<CodeAnalysisModuleSuppressionsFile>GlobalSuppressions.cs</CodeAnalysisModuleSuppressionsFile>
-		<ErrorReport>prompt</ErrorReport>
-	</PropertyGroup>
-	<ItemGroup>
-		<Reference Include="Castle.Core-Silverlight, Version=1.0.3.0, Culture=neutral, PublicKeyToken=407dd0808d44fbdc, processorArchitecture=MSIL">
-			<SpecificVersion>False</SpecificVersion>
-			<HintPath>..\Lib\Castle\Castle.Core-Silverlight.dll</HintPath>
-		</Reference>
-		<Reference Include="Castle.DynamicProxy-Silverlight, Version=0.0.0.0, Culture=neutral, PublicKeyToken=407dd0808d44fbdc, processorArchitecture=MSIL">
-			<SpecificVersion>False</SpecificVersion>
-			<HintPath>..\Lib\Castle\Castle.DynamicProxy-Silverlight.dll</HintPath>
-		</Reference>
-		<Reference Include="mscorlib" />
-		<Reference Include="system" />
-		<Reference Include="System.Core" />
-	</ItemGroup>
-	<ItemGroup>
-		<Compile Include="..\Source\AdvancedMatcherAttribute.cs">
-			<Link>AdvancedMatcherAttribute.cs</Link>
-		</Compile>
-		<Compile Include="..\Source\DefaultValue.cs">
-			<Link>DefaultValue.cs</Link>
-		</Compile>
-		<Compile Include="..\Source\EmptyDefaultValueProvider.cs">
-			<Link>EmptyDefaultValueProvider.cs</Link>
-		</Compile>
-		<Compile Include="..\Source\Evaluator.cs">
-			<Link>Evaluator.cs</Link>
-		</Compile>
-		<Compile Include="..\Source\ExpressionExtensions.cs">
-			<Link>ExpressionExtensions.cs</Link>
-		</Compile>
-		<Compile Include="..\Source\ExpressionVisitor.cs">
-			<Link>ExpressionVisitor.cs</Link>
-		</Compile>
-		<Compile Include="..\Source\Extensions.cs">
-			<Link>Extensions.cs</Link>
-		</Compile>
-		<Compile Include="..\Source\FluentMockContext.cs">
-			<Link>FluentMockContext.cs</Link>
-		</Compile>
-		<Compile Include="..\Source\GlobalSuppressions.cs">
-			<Link>GlobalSuppressions.cs</Link>
-		</Compile>
-		<Compile Include="..\Source\Guard.cs">
-			<Link>Guard.cs</Link>
-		</Compile>
-		<Compile Include="..\Source\IDefaultValueProvider.cs">
-			<Link>IDefaultValueProvider.cs</Link>
-		</Compile>
-		<Compile Include="..\Source\IHideObjectMembers.cs">
-			<Link>IHideObjectMembers.cs</Link>
-		</Compile>
-		<Compile Include="..\Source\IMatcher.cs">
-			<Link>IMatcher.cs</Link>
-		</Compile>
-		<Compile Include="..\Source\IMocked.cs">
-			<Link>IMocked.cs</Link>
-		</Compile>
-		<Compile Include="..\Source\Interceptor.cs">
-			<Link>Interceptor.cs</Link>
-		</Compile>
-		<Compile Include="..\Source\IProxyCall.cs">
-			<Link>IProxyCall.cs</Link>
-		</Compile>
-		<Compile Include="..\Source\It.cs">
-			<Link>It.cs</Link>
-		</Compile>
-		<Compile Include="..\Source\Language\Flow\IReturnsResult.cs">
-			<Link>Language\Flow\IReturnsResult.cs</Link>
-		</Compile>
-		<Compile Include="..\Source\Language\Flow\ISetup.cs">
-			<Link>Language\Flow\ISetup.cs</Link>
-		</Compile>
-		<Compile Include="..\Source\Language\IRaise.cs">
-			<Link>Language\IRaise.cs</Link>
-		</Compile>
-		<Compile Include="..\Source\Language\IRaise.Legacy.cs">
-			<Link>Language\IRaise.Legacy.cs</Link>
-		</Compile>
-		<Compile Include="..\Source\Language\IVerifies.cs">
-			<Link>Language\IVerifies.cs</Link>
-		</Compile>
-		<Compile Include="..\Source\Language\IReturnsGetter.cs">
-			<Link>Language\IReturnsGetter.cs</Link>
-		</Compile>
-		<Compile Include="..\Source\Language\ICallbackGetter.cs">
-			<Link>Language\ICallbackGetter.cs</Link>
-		</Compile>
-		<Compile Include="..\Source\Language\Flow\IThrowsResult.cs">
-			<Link>Language\Flow\IThrowsResult.cs</Link>
-		</Compile>
-		<Compile Include="..\Source\Language\Flow\IReturnsThrows.cs">
-			<Link>Language\Flow\IReturnsThrows.cs</Link>
-		</Compile>
-		<Compile Include="..\Source\Language\Flow\ICallbackResult.cs">
-			<Link>Language\Flow\ICallbackResult.cs</Link>
-		</Compile>
-		<Compile Include="..\Source\Language\ICallback.cs">
-			<Link>Language\ICallback.cs</Link>
-		</Compile>
-		<Compile Include="..\Source\Language\ICallbackSetter.cs">
-			<Link>Language\ICallbackSetter.cs</Link>
-		</Compile>
-		<Compile Include="..\Source\Language\IOccurrence.cs">
-			<Link>Language\IOccurrence.cs</Link>
-		</Compile>
-		<Compile Include="..\Source\Language\IReturns.cs">
-			<Link>Language\IReturns.cs</Link>
-		</Compile>
-		<Compile Include="..\Source\Language\IThrows.cs">
-			<Link>Language\IThrows.cs</Link>
-		</Compile>
-		<Compile Include="..\Source\Match.cs">
-			<Link>Match.cs</Link>
-		</Compile>
-		<Compile Include="..\Source\MatcherAttribute.cs">
-			<Link>MatcherAttribute.cs</Link>
-		</Compile>
-		<Compile Include="..\Source\MatcherFactory.cs">
-			<Link>MatcherFactory.cs</Link>
-		</Compile>
-		<Compile Include="..\Source\Matchers\ConstantMatcher.cs">
-			<Link>Matchers\ConstantMatcher.cs</Link>
-		</Compile>
-		<Compile Include="..\Source\Matchers\Matcher.cs">
-			<Link>Matchers\Matcher.cs</Link>
-		</Compile>
-		<Compile Include="..\Source\Matchers\MatcherAttributeMatcher.cs">
-			<Link>Matchers\MatcherAttributeMatcher.cs</Link>
-		</Compile>
-		<Compile Include="..\Source\Matchers\ParamArrayMatcher.cs">
-			<Link>Matchers\ParamArrayMatcher.cs</Link>
-		</Compile>
-		<Compile Include="..\Source\Matchers\LazyEvalMatcher.cs">
-			<Link>Matchers\LazyEvalMatcher.cs</Link>
-		</Compile>
-		<Compile Include="..\Source\Matchers\PredicateMatcher.cs">
-			<Link>Matchers\PredicateMatcher.cs</Link>
-		</Compile>
-		<Compile Include="..\Source\MethodCall.cs">
-			<Link>MethodCall.cs</Link>
-		</Compile>
-		<Compile Include="..\Source\MethodCallReturn.cs">
-			<Link>MethodCallReturn.cs</Link>
-		</Compile>
-		<Compile Include="..\Source\Mock.cs">
-			<Link>Mock.cs</Link>
-		</Compile>
-		<Compile Include="..\Source\Mock.Generic.cs">
-			<Link>Mock.Generic.cs</Link>
-		</Compile>
-		<Compile Include="..\Source\Mock.Generic.Legacy.cs">
-			<Link>Mock.Generic.Legacy.cs</Link>
-		</Compile>
-		<Compile Include="..\Source\Mock.Legacy.cs">
-			<Link>Mock.Legacy.cs</Link>
-		</Compile>
-		<Compile Include="..\Source\MockBehavior.cs">
-			<Link>MockBehavior.cs</Link>
-		</Compile>
-		<Compile Include="..\Source\MockDefaultValueProvider.cs">
-			<Link>MockDefaultValueProvider.cs</Link>
-		</Compile>
-		<Compile Include="..\Source\MockedEvent.cs">
-			<Link>MockedEvent.cs</Link>
-		</Compile>
-		<Compile Include="..\Source\MockedEvent.Generic.cs">
-			<Link>MockedEvent.Generic.cs</Link>
-		</Compile>
-		<Compile Include="..\Source\MockException.cs">
-			<Link>MockException.cs</Link>
-		</Compile>
-		<Compile Include="..\Source\MockExtensions.cs">
-			<Link>MockExtensions.cs</Link>
-		</Compile>
-		<Compile Include="..\Source\MockFactory.cs">
-			<Link>MockFactory.cs</Link>
-		</Compile>
-		<Compile Include="..\Source\PexProtector.cs">
-			<Link>PexProtector.cs</Link>
-		</Compile>
-		<Compile Include="..\Source\Protected\IProtectedMock.cs">
-			<Link>Protected\IProtectedMock.cs</Link>
-		</Compile>
-		<Compile Include="..\Source\Protected\ItExpr.cs">
-			<Link>Protected\ItExpr.cs</Link>
-		</Compile>
-		<Compile Include="..\Source\Protected\ProtectedExtension.cs">
-			<Link>Protected\ProtectedExtension.cs</Link>
-		</Compile>
-		<Compile Include="..\Source\Protected\ProtectedMock.cs">
-			<Link>Protected\ProtectedMock.cs</Link>
-		</Compile>
-		<Compile Include="..\Source\Properties\AssemblyInfo.cs">
-			<Link>Properties\AssemblyInfo.cs</Link>
-		</Compile>
-		<Compile Include="..\Source\Language\INever.cs">
-			<Link>Language\INever.cs</Link>
-		</Compile>
-		<Compile Include="..\Source\Matchers\RefMatcher.cs">
-			<Link>Matchers\RefMatcher.cs</Link>
-		</Compile>
-		<Compile Include="..\Source\Properties\Resources.Designer.cs">
-			<Link>Properties\Resources.Designer.cs</Link>
-			<AutoGen>True</AutoGen>
-			<DesignTime>True</DesignTime>
-			<DependentUpon>Resources.resx</DependentUpon>
-		</Compile>
-		<Compile Include="..\Source\Range.cs">
-			<Link>Range.cs</Link>
-		</Compile>
-		<Compile Include="..\Source\SetterMethodCall.cs">
-			<Link>SetterMethodCall.cs</Link>
-		</Compile>
-		<Compile Include="..\Source\SetupKind.cs">
-			<Link>SetupKind.cs</Link>
-		</Compile>
-		<Compile Include="..\Source\Times.cs">
-			<Link>Times.cs</Link>
-		</Compile>
-	</ItemGroup>
-	<ItemGroup>
-		<EmbeddedResource Include="..\Source\Properties\Resources.resx">
-			<Link>Properties\Resources.resx</Link>
-			<Generator>ResXFileCodeGenerator</Generator>
-			<SubType>Designer</SubType>
-			<LastGenOutput>Resources.Designer.cs</LastGenOutput>
-		</EmbeddedResource>
-	</ItemGroup>
-	<ItemGroup>
-		<None Include="..\Moq.snk">
-			<Link>Moq.snk</Link>
-		</None>
-		<None Include="..\Source\Mock.xdoc">
-			<Link>Mock.xdoc</Link>
-		</None>
-	</ItemGroup>
-	<PropertyGroup>
-		<SilverlightBuildResources>..\Lib\Silverlight SDK\</SilverlightBuildResources>
-		<TargetFrameworkDirectory>$(SilverlightBuildResources)Reference Assemblies\</TargetFrameworkDirectory>
-		<TargetFrameworkSDKDirectory>$(SilverlightBuildResources)Libraries\Client\</TargetFrameworkSDKDirectory>
-		<SilverlightRuntimeVersion>2.0.31005.0</SilverlightRuntimeVersion>
-	</PropertyGroup>
-	<Import Project="$(SilverlightBuildResources)MSBuild\Microsoft.Silverlight.CSharp.targets" />
-	<!--<Import Project="$(MSBuildExtensionsPath)\Microsoft\Silverlight\v2.0\Microsoft.Silverlight.CSharp.targets" />-->
-	<!-- To modify your build process, add your task inside one of the targets below and uncomment it. 
+  <PropertyGroup>
+    <Configuration Condition=" '$(Configuration)' == '' ">Debug</Configuration>
+    <Platform Condition=" '$(Platform)' == '' ">AnyCPU</Platform>
+    <ProductVersion>9.0.30729</ProductVersion>
+    <SchemaVersion>2.0</SchemaVersion>
+    <ProjectGuid>{5136C8E1-E17F-481F-B29A-C7FAB528BD2D}</ProjectGuid>
+    <ProjectTypeGuids>{A1591282-1198-4647-A2B1-27E5FF5F6F3B};{fae04ec0-301f-11d3-bf4b-00c04f79efbc}</ProjectTypeGuids>
+    <OutputType>Library</OutputType>
+    <AppDesignerFolder>Properties</AppDesignerFolder>
+    <RootNamespace>Moq</RootNamespace>
+    <AssemblyName>Moq.Silverlight</AssemblyName>
+    <TargetFrameworkVersion>v3.5</TargetFrameworkVersion>
+    <SilverlightApplication>false</SilverlightApplication>
+    <ValidateXaml>true</ValidateXaml>
+    <ThrowErrorsInValidation>false</ThrowErrorsInValidation>
+    <SignAssembly>true</SignAssembly>
+    <AssemblyOriginatorKeyFile>..\Moq.snk</AssemblyOriginatorKeyFile>
+  </PropertyGroup>
+  <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Debug|AnyCPU' ">
+    <DebugSymbols>true</DebugSymbols>
+    <DebugType>full</DebugType>
+    <Optimize>false</Optimize>
+    <OutputPath>bin\Debug\</OutputPath>
+    <DefineConstants>DEBUG;TRACE;SILVERLIGHT</DefineConstants>
+    <NoStdLib>true</NoStdLib>
+    <NoConfig>true</NoConfig>
+    <ErrorReport>prompt</ErrorReport>
+    <WarningLevel>4</WarningLevel>
+    <DocumentationFile>bin\Debug\Moq.Silverlight.xml</DocumentationFile>
+  </PropertyGroup>
+  <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Release|AnyCPU' ">
+    <DebugType>pdbonly</DebugType>
+    <Optimize>true</Optimize>
+    <OutputPath>bin\Release\</OutputPath>
+    <DefineConstants>TRACE;SILVERLIGHT</DefineConstants>
+    <NoStdLib>true</NoStdLib>
+    <NoConfig>true</NoConfig>
+    <ErrorReport>prompt</ErrorReport>
+    <WarningLevel>4</WarningLevel>
+    <DocumentationFile>bin\Release\Moq.Silverlight.xml</DocumentationFile>
+  </PropertyGroup>
+  <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Debug|x86' ">
+    <DebugSymbols>true</DebugSymbols>
+    <OutputPath>bin\Debug\</OutputPath>
+    <DefineConstants>DEBUG;TRACE;SILVERLIGHT</DefineConstants>
+    <DocumentationFile>bin\Debug\Moq.Silverlight.xml</DocumentationFile>
+    <NoStdLib>true</NoStdLib>
+    <DebugType>full</DebugType>
+    <PlatformTarget>x86</PlatformTarget>
+    <CodeAnalysisUseTypeNameInSuppression>true</CodeAnalysisUseTypeNameInSuppression>
+    <CodeAnalysisModuleSuppressionsFile>GlobalSuppressions.cs</CodeAnalysisModuleSuppressionsFile>
+    <ErrorReport>prompt</ErrorReport>
+  </PropertyGroup>
+  <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Release|x86' ">
+    <OutputPath>bin\Release\</OutputPath>
+    <DefineConstants>TRACE;SILVERLIGHT</DefineConstants>
+    <DocumentationFile>bin\Release\Moq.Silverlight.xml</DocumentationFile>
+    <Optimize>true</Optimize>
+    <NoStdLib>true</NoStdLib>
+    <DebugType>pdbonly</DebugType>
+    <PlatformTarget>x86</PlatformTarget>
+    <CodeAnalysisUseTypeNameInSuppression>true</CodeAnalysisUseTypeNameInSuppression>
+    <CodeAnalysisModuleSuppressionsFile>GlobalSuppressions.cs</CodeAnalysisModuleSuppressionsFile>
+    <ErrorReport>prompt</ErrorReport>
+  </PropertyGroup>
+  <ItemGroup>
+    <Reference Include="Castle.Core-Silverlight, Version=1.0.3.0, Culture=neutral, PublicKeyToken=407dd0808d44fbdc, processorArchitecture=MSIL">
+      <SpecificVersion>False</SpecificVersion>
+      <HintPath>..\Lib\Castle\Castle.Core-Silverlight.dll</HintPath>
+    </Reference>
+    <Reference Include="Castle.DynamicProxy-Silverlight, Version=0.0.0.0, Culture=neutral, PublicKeyToken=407dd0808d44fbdc, processorArchitecture=MSIL">
+      <SpecificVersion>False</SpecificVersion>
+      <HintPath>..\Lib\Castle\Castle.DynamicProxy-Silverlight.dll</HintPath>
+    </Reference>
+    <Reference Include="mscorlib" />
+    <Reference Include="system" />
+    <Reference Include="System.Core" />
+  </ItemGroup>
+  <ItemGroup>
+    <Compile Include="..\Source\AdvancedMatcherAttribute.cs">
+      <Link>AdvancedMatcherAttribute.cs</Link>
+    </Compile>
+    <Compile Include="..\Source\DefaultValue.cs">
+      <Link>DefaultValue.cs</Link>
+    </Compile>
+    <Compile Include="..\Source\EmptyDefaultValueProvider.cs">
+      <Link>EmptyDefaultValueProvider.cs</Link>
+    </Compile>
+    <Compile Include="..\Source\Evaluator.cs">
+      <Link>Evaluator.cs</Link>
+    </Compile>
+    <Compile Include="..\Source\ExpressionExtensions.cs">
+      <Link>ExpressionExtensions.cs</Link>
+    </Compile>
+    <Compile Include="..\Source\ExpressionVisitor.cs">
+      <Link>ExpressionVisitor.cs</Link>
+    </Compile>
+    <Compile Include="..\Source\Extensions.cs">
+      <Link>Extensions.cs</Link>
+    </Compile>
+    <Compile Include="..\Source\FluentMockContext.cs">
+      <Link>FluentMockContext.cs</Link>
+    </Compile>
+    <Compile Include="..\Source\GlobalSuppressions.cs">
+      <Link>GlobalSuppressions.cs</Link>
+    </Compile>
+    <Compile Include="..\Source\Guard.cs">
+      <Link>Guard.cs</Link>
+    </Compile>
+    <Compile Include="..\Source\IDefaultValueProvider.cs">
+      <Link>IDefaultValueProvider.cs</Link>
+    </Compile>
+    <Compile Include="..\Source\IHideObjectMembers.cs">
+      <Link>IHideObjectMembers.cs</Link>
+    </Compile>
+    <Compile Include="..\Source\IMatcher.cs">
+      <Link>IMatcher.cs</Link>
+    </Compile>
+    <Compile Include="..\Source\IMocked.cs">
+      <Link>IMocked.cs</Link>
+    </Compile>
+    <Compile Include="..\Source\Interceptor.cs">
+      <Link>Interceptor.cs</Link>
+    </Compile>
+    <Compile Include="..\Source\IProxyCall.cs">
+      <Link>IProxyCall.cs</Link>
+    </Compile>
+    <Compile Include="..\Source\It.cs">
+      <Link>It.cs</Link>
+    </Compile>
+    <Compile Include="..\Source\Language\Flow\IReturnsResult.cs">
+      <Link>Language\Flow\IReturnsResult.cs</Link>
+    </Compile>
+    <Compile Include="..\Source\Language\Flow\ISetup.cs">
+      <Link>Language\Flow\ISetup.cs</Link>
+    </Compile>
+    <Compile Include="..\Source\Language\IRaise.cs">
+      <Link>Language\IRaise.cs</Link>
+    </Compile>
+    <Compile Include="..\Source\Language\IRaise.Legacy.cs">
+      <Link>Language\IRaise.Legacy.cs</Link>
+    </Compile>
+    <Compile Include="..\Source\Language\IVerifies.cs">
+      <Link>Language\IVerifies.cs</Link>
+    </Compile>
+    <Compile Include="..\Source\Language\IReturnsGetter.cs">
+      <Link>Language\IReturnsGetter.cs</Link>
+    </Compile>
+    <Compile Include="..\Source\Language\ICallbackGetter.cs">
+      <Link>Language\ICallbackGetter.cs</Link>
+    </Compile>
+    <Compile Include="..\Source\Language\Flow\IThrowsResult.cs">
+      <Link>Language\Flow\IThrowsResult.cs</Link>
+    </Compile>
+    <Compile Include="..\Source\Language\Flow\IReturnsThrows.cs">
+      <Link>Language\Flow\IReturnsThrows.cs</Link>
+    </Compile>
+    <Compile Include="..\Source\Language\Flow\ICallbackResult.cs">
+      <Link>Language\Flow\ICallbackResult.cs</Link>
+    </Compile>
+    <Compile Include="..\Source\Language\ICallback.cs">
+      <Link>Language\ICallback.cs</Link>
+    </Compile>
+    <Compile Include="..\Source\Language\ICallbackSetter.cs">
+      <Link>Language\ICallbackSetter.cs</Link>
+    </Compile>
+    <Compile Include="..\Source\Language\IOccurrence.cs">
+      <Link>Language\IOccurrence.cs</Link>
+    </Compile>
+    <Compile Include="..\Source\Language\IReturns.cs">
+      <Link>Language\IReturns.cs</Link>
+    </Compile>
+    <Compile Include="..\Source\Language\IThrows.cs">
+      <Link>Language\IThrows.cs</Link>
+    </Compile>
+    <Compile Include="..\Source\Match.cs">
+      <Link>Match.cs</Link>
+    </Compile>
+    <Compile Include="..\Source\MatcherAttribute.cs">
+      <Link>MatcherAttribute.cs</Link>
+    </Compile>
+    <Compile Include="..\Source\MatcherFactory.cs">
+      <Link>MatcherFactory.cs</Link>
+    </Compile>
+    <Compile Include="..\Source\Matchers\ConstantMatcher.cs">
+      <Link>Matchers\ConstantMatcher.cs</Link>
+    </Compile>
+    <Compile Include="..\Source\Matchers\Matcher.cs">
+      <Link>Matchers\Matcher.cs</Link>
+    </Compile>
+    <Compile Include="..\Source\Matchers\MatcherAttributeMatcher.cs">
+      <Link>Matchers\MatcherAttributeMatcher.cs</Link>
+    </Compile>
+    <Compile Include="..\Source\Matchers\ParamArrayMatcher.cs">
+      <Link>Matchers\ParamArrayMatcher.cs</Link>
+    </Compile>
+    <Compile Include="..\Source\Matchers\LazyEvalMatcher.cs">
+      <Link>Matchers\LazyEvalMatcher.cs</Link>
+    </Compile>
+    <Compile Include="..\Source\Matchers\PredicateMatcher.cs">
+      <Link>Matchers\PredicateMatcher.cs</Link>
+    </Compile>
+    <Compile Include="..\Source\MethodCall.cs">
+      <Link>MethodCall.cs</Link>
+    </Compile>
+    <Compile Include="..\Source\MethodCall.Legacy.cs">
+      <Link>MethodCall.Legacy.cs</Link>
+    </Compile>
+    <Compile Include="..\Source\MethodCallReturn.cs">
+      <Link>MethodCallReturn.cs</Link>
+    </Compile>
+    <Compile Include="..\Source\Mock.cs">
+      <Link>Mock.cs</Link>
+    </Compile>
+    <Compile Include="..\Source\Mock.Generic.cs">
+      <Link>Mock.Generic.cs</Link>
+    </Compile>
+    <Compile Include="..\Source\Mock.Generic.Legacy.cs">
+      <Link>Mock.Generic.Legacy.cs</Link>
+    </Compile>
+    <Compile Include="..\Source\Mock.Legacy.cs">
+      <Link>Mock.Legacy.cs</Link>
+    </Compile>
+    <Compile Include="..\Source\MockBehavior.cs">
+      <Link>MockBehavior.cs</Link>
+    </Compile>
+    <Compile Include="..\Source\MockDefaultValueProvider.cs">
+      <Link>MockDefaultValueProvider.cs</Link>
+    </Compile>
+    <Compile Include="..\Source\MockedEvent.cs">
+      <Link>MockedEvent.cs</Link>
+    </Compile>
+    <Compile Include="..\Source\MockedEvent.Generic.cs">
+      <Link>MockedEvent.Generic.cs</Link>
+    </Compile>
+    <Compile Include="..\Source\MockException.cs">
+      <Link>MockException.cs</Link>
+    </Compile>
+    <Compile Include="..\Source\MockExtensions.cs">
+      <Link>MockExtensions.cs</Link>
+    </Compile>
+    <Compile Include="..\Source\MockFactory.cs">
+      <Link>MockFactory.cs</Link>
+    </Compile>
+    <Compile Include="..\Source\PexProtector.cs">
+      <Link>PexProtector.cs</Link>
+    </Compile>
+    <Compile Include="..\Source\Protected\IProtectedMock.cs">
+      <Link>Protected\IProtectedMock.cs</Link>
+    </Compile>
+    <Compile Include="..\Source\Protected\ItExpr.cs">
+      <Link>Protected\ItExpr.cs</Link>
+    </Compile>
+    <Compile Include="..\Source\Protected\ProtectedExtension.cs">
+      <Link>Protected\ProtectedExtension.cs</Link>
+    </Compile>
+    <Compile Include="..\Source\Protected\ProtectedMock.cs">
+      <Link>Protected\ProtectedMock.cs</Link>
+    </Compile>
+    <Compile Include="..\Source\Properties\AssemblyInfo.cs">
+      <Link>Properties\AssemblyInfo.cs</Link>
+    </Compile>
+    <Compile Include="..\Source\Language\INever.cs">
+      <Link>Language\INever.cs</Link>
+    </Compile>
+    <Compile Include="..\Source\Matchers\RefMatcher.cs">
+      <Link>Matchers\RefMatcher.cs</Link>
+    </Compile>
+    <Compile Include="..\Source\Properties\Resources.Designer.cs">
+      <Link>Properties\Resources.Designer.cs</Link>
+      <AutoGen>True</AutoGen>
+      <DesignTime>True</DesignTime>
+      <DependentUpon>Resources.resx</DependentUpon>
+    </Compile>
+    <Compile Include="..\Source\Range.cs">
+      <Link>Range.cs</Link>
+    </Compile>
+    <Compile Include="..\Source\SetterMethodCall.cs">
+      <Link>SetterMethodCall.cs</Link>
+    </Compile>
+    <Compile Include="..\Source\SetupKind.cs">
+      <Link>SetupKind.cs</Link>
+    </Compile>
+    <Compile Include="..\Source\Times.cs">
+      <Link>Times.cs</Link>
+    </Compile>
+  </ItemGroup>
+  <ItemGroup>
+    <EmbeddedResource Include="..\Source\Properties\Resources.resx">
+      <Link>Properties\Resources.resx</Link>
+      <Generator>ResXFileCodeGenerator</Generator>
+      <SubType>Designer</SubType>
+      <LastGenOutput>Resources.Designer.cs</LastGenOutput>
+    </EmbeddedResource>
+  </ItemGroup>
+  <ItemGroup>
+    <None Include="..\Moq.snk">
+      <Link>Moq.snk</Link>
+    </None>
+    <None Include="..\Source\Mock.xdoc">
+      <Link>Mock.xdoc</Link>
+    </None>
+  </ItemGroup>
+  <PropertyGroup>
+    <SilverlightBuildResources>..\Lib\Silverlight SDK\</SilverlightBuildResources>
+    <TargetFrameworkDirectory>$(SilverlightBuildResources)Reference Assemblies\</TargetFrameworkDirectory>
+    <TargetFrameworkSDKDirectory>$(SilverlightBuildResources)Libraries\Client\</TargetFrameworkSDKDirectory>
+    <SilverlightRuntimeVersion>2.0.31005.0</SilverlightRuntimeVersion>
+  </PropertyGroup>
+  <Import Project="$(SilverlightBuildResources)MSBuild\Microsoft.Silverlight.CSharp.targets" />
+  <!--<Import Project="$(MSBuildExtensionsPath)\Microsoft\Silverlight\v2.0\Microsoft.Silverlight.CSharp.targets" />-->
+  <!-- To modify your build process, add your task inside one of the targets below and uncomment it. 
        Other similar extension points exist, see Microsoft.Common.targets.
   <Target Name="BeforeBuild">
   </Target>
   <Target Name="AfterBuild">
   </Target>
   -->
-	<Target Name="AfterBuild" Condition=" '$(Configuration)' == 'Release' ">
-		<!-- Silverlight version of this task includes the pdbs :S -->
-		<CreateItem Include="@(ReferenceCopyLocalPaths)" Condition="'%(Extension)'=='.dll'">
-			<Output TaskParameter="Include" ItemName="IlmergeAssemblies" />
-		</CreateItem>
-		<Exec Command="&quot;$(MSBuildProjectPath)..\Tools\Ilmerge.exe&quot; /targetplatform:v2,&quot;$(SilverlightBuildResources)Reference Assemblies&quot; /lib:&quot;$(SilverlightBuildResources)Reference Assemblies&quot; /internalize:&quot;$(MSBuildProjectPath)..\Source\ilmerge.exclude&quot; /ndebug /keyfile:$(AssemblyOriginatorKeyFile) /out:@(MainAssembly) &quot;@(IntermediateAssembly)&quot; @(IlmergeAssemblies->'&quot;%(FullPath)&quot;', ' ')" />
-		<Delete Files="@(ReferenceCopyLocalPaths->'$(OutDir)%(DestinationSubDirectory)%(Filename)%(Extension)')" />
-	</Target>
-	<ProjectExtensions>
-		<VisualStudio>
-			<FlavorProperties GUID="{A1591282-1198-4647-A2B1-27E5FF5F6F3B}">
-				<SilverlightProjectProperties />
-			</FlavorProperties>
-		</VisualStudio>
-	</ProjectExtensions>
+  <Target Name="AfterBuild" Condition=" '$(Configuration)' == 'Release' ">
+    <!-- Silverlight version of this task includes the pdbs :S -->
+    <CreateItem Include="@(ReferenceCopyLocalPaths)" Condition="'%(Extension)'=='.dll'">
+      <Output TaskParameter="Include" ItemName="IlmergeAssemblies" />
+    </CreateItem>
+    <Exec Command="&quot;$(MSBuildProjectPath)..\Tools\Ilmerge.exe&quot; /targetplatform:v2,&quot;$(SilverlightBuildResources)Reference Assemblies&quot; /lib:&quot;$(SilverlightBuildResources)Reference Assemblies&quot; /internalize:&quot;$(MSBuildProjectPath)..\Source\ilmerge.exclude&quot; /ndebug /keyfile:$(AssemblyOriginatorKeyFile) /out:@(MainAssembly) &quot;@(IntermediateAssembly)&quot; @(IlmergeAssemblies->'&quot;%(FullPath)&quot;', ' ')" />
+    <Delete Files="@(ReferenceCopyLocalPaths->'$(OutDir)%(DestinationSubDirectory)%(Filename)%(Extension)')" />
+  </Target>
+  <ProjectExtensions>
+    <VisualStudio>
+      <FlavorProperties GUID="{A1591282-1198-4647-A2B1-27E5FF5F6F3B}">
+        <SilverlightProjectProperties />
+      </FlavorProperties>
+    </VisualStudio>
+  </ProjectExtensions>
 </Project>

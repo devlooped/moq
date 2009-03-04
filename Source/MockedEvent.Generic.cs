@@ -39,6 +39,7 @@
 // http://www.opensource.org/licenses/bsd-license.php]
 
 using System;
+using System.ComponentModel;
 
 namespace Moq
 {
@@ -52,6 +53,7 @@ namespace Moq
 	/// event handler which follows .NET practice of providing <c>object sender, EventArgs args</c> 
 	/// kind of signature.
 	/// </remarks>
+	[EditorBrowsable(EditorBrowsableState.Never)] // TODO: remove from v4.0
 	public class MockedEvent<TEventArgs> : MockedEvent
 		where TEventArgs : EventArgs
 	{

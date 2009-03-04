@@ -90,9 +90,14 @@ namespace Moq
 		{
 			return RaisesImpl(eventExpression, func);
 		}
+
+		public IVerifies Raises(Action<TMock> eventExpression, params object[] args)
+		{
+			return RaisesImpl(eventExpression, args);
+		}
 	}
 
-	internal class MethodCall : IProxyCall, ICallbackResult, IVerifies, IThrowsResult
+	internal partial class MethodCall : IProxyCall, ICallbackResult, IVerifies, IThrowsResult
 	{
 		protected Mock mock;
 		protected MethodInfo method;
@@ -104,6 +109,7 @@ namespace Moq
 		bool isOnce;
 		MockedEvent mockEvent;
 		Delegate mockEventArgsFunc;
+		object[] mockEventArgsParams;
 		int? expectedCallCount = null;
 		List<KeyValuePair<int, object>> outValues = new List<KeyValuePair<int, object>>();
 
@@ -266,16 +272,23 @@ namespace Moq
 
 			if (mockEvent != null)
 			{
-				var argsFuncType = mockEventArgsFunc.GetType();
-
-				if (argsFuncType.IsGenericType &&
-					argsFuncType.GetGenericArguments().Length == 1)
+				if (mockEventArgsParams != null)
 				{
-					mockEvent.DoRaise((EventArgs)mockEventArgsFunc.InvokePreserveStack());
+					mockEvent.DoRaise(mockEventArgsParams);
 				}
 				else
 				{
-					mockEvent.DoRaise((EventArgs)mockEventArgsFunc.InvokePreserveStack(call.Arguments));
+					var argsFuncType = mockEventArgsFunc.GetType();
+
+					if (argsFuncType.IsGenericType &&
+						argsFuncType.GetGenericArguments().Length == 1)
+					{
+						mockEvent.DoRaise((EventArgs)mockEventArgsFunc.InvokePreserveStack());
+					}
+					else
+					{
+						mockEvent.DoRaise((EventArgs)mockEventArgsFunc.InvokePreserveStack(call.Arguments));
+					}
 				}
 			}
 		}
@@ -417,49 +430,6 @@ namespace Moq
 			return this;
 		}
 
-		public IVerifies Raises(MockedEvent eventHandler, EventArgs args)
-		{
-			Guard.ArgumentNotNull(args, "args");
-
-			return RaisesImpl(eventHandler, (Func<EventArgs>)(() => args));
-		}
-
-		public IVerifies Raises(MockedEvent eventHandler, Func<EventArgs> func)
-		{
-			return RaisesImpl(eventHandler, func);
-		}
-
-		public IVerifies Raises<T>(MockedEvent eventHandler, Func<T, EventArgs> func)
-		{
-			return RaisesImpl(eventHandler, func);
-		}
-
-		public IVerifies Raises<T1, T2>(MockedEvent eventHandler, Func<T1, T2, EventArgs> func)
-		{
-			return RaisesImpl(eventHandler, func);
-		}
-
-		public IVerifies Raises<T1, T2, T3>(MockedEvent eventHandler, Func<T1, T2, T3, EventArgs> func)
-		{
-			return RaisesImpl(eventHandler, func);
-		}
-
-		public IVerifies Raises<T1, T2, T3, T4>(MockedEvent eventHandler, Func<T1, T2, T3, T4, EventArgs> func)
-		{
-			return RaisesImpl(eventHandler, func);
-		}
-
-		private IVerifies RaisesImpl(MockedEvent eventHandler, Delegate func)
-		{
-			Guard.ArgumentNotNull(eventHandler, "eventHandler");
-			Guard.ArgumentNotNull(func, "func");
-
-			mockEvent = eventHandler;
-			mockEventArgsFunc = func;
-
-			return this;
-		}
-
 		protected IVerifies RaisesImpl<TMock>(Action<TMock> eventExpression, Delegate func)
 			where TMock : class
 		{
@@ -468,6 +438,18 @@ namespace Moq
 			mockEvent = new MockedEvent(mock);
 			mockEvent.Event = ev;
 			mockEventArgsFunc = func;
+
+			return this;
+		}
+
+		protected IVerifies RaisesImpl<TMock>(Action<TMock> eventExpression, params object[] args)
+			where TMock : class
+		{
+			var ev = eventExpression.GetEvent((TMock)mock.Object);
+
+			mockEvent = new MockedEvent(mock);
+			mockEvent.Event = ev;
+			mockEventArgsParams = args;
 
 			return this;
 		}

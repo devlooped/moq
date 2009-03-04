@@ -450,6 +450,27 @@ namespace Moq
 			}
 		}
 
+		/// <include file='Mock.Generic.xdoc' path='docs/doc[@for="Mock{T}.Raise(args)"]/*'/>
+		[SuppressMessage("Microsoft.Design", "CA1030:UseEventsWhereAppropriate", Justification = "Raises the event, rather than being one.")]
+		[SuppressMessage("Microsoft.Usage", "CA2200:RethrowToPreserveStackDetails", Justification = "We want to reset the stack trace to avoid Moq noise in it.")]
+		public void Raise(Action<T> eventExpression, params object[] args)
+		{
+			var ev = eventExpression.GetEvent(this.Object);
+
+			var me = new MockedEvent(this);
+			me.Event = ev;
+
+			try
+			{
+				me.DoRaise(args);
+			}
+			catch (Exception e)
+			{
+				// Reset stacktrace so user gets this call site only.
+				throw e;
+			}
+		}
+
 		// NOTE: known issue. See https://connect.microsoft.com/VisualStudio/feedback/ViewFeedback.aspx?FeedbackID=318122
 		//public static implicit operator TInterface(Mock<T> mock)
 		//{

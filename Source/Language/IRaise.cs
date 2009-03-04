@@ -125,5 +125,13 @@ namespace Moq.Language
 		/// <typeparam name="T4">Type of the fourth argument received by the expected invocation.</typeparam>
 		/// <seealso cref="Raises(Action{T}, EventArgs)"/>
 		IVerifies Raises<T1, T2, T3, T4>(Action<T> eventExpression, Func<T1, T2, T3, T4, EventArgs> func);
+
+		/// <summary>
+		/// Specifies the custom event that will be raised 
+		/// when the setup is matched.
+		/// </summary>
+		/// <param name="eventExpression">An expression that represents an event attach or detach action.</param>
+		/// <param name="args">The arguments to pass to the custom delegate (non EventHandler-compatible).</param>
+		IVerifies Raises(Action<T> eventExpression, params object[] args);
 	}
 }

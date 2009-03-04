@@ -49,7 +49,7 @@ namespace Moq
 	/// Represents a generic event that has been mocked and can 
 	/// be rised.
 	/// </summary>
-	[EditorBrowsable(EditorBrowsableState.Never)] // TODO: remove from v3.5
+	[EditorBrowsable(EditorBrowsableState.Never)] // TODO: remove from v4.0?
 	public class MockedEvent
 	{
 		/// <summary>
@@ -90,6 +90,26 @@ namespace Moq
 			foreach (var del in mock.GetInvocationList(Event).ToList())
 			{
 				del.InvokePreserveStack(mock.Object, args);
+			}
+		}
+
+		/// <summary>
+		/// Raises the associated event with the given 
+		/// event argument data.
+		/// </summary>
+		internal void DoRaise(params object[] args)
+		{
+			if (Event == null)
+				throw new InvalidOperationException(Properties.Resources.RaisedUnassociatedEvent);
+
+			if (Raised != null)
+				Raised(this.mock.Object, EventArgs.Empty);
+
+			foreach (var del in mock.GetInvocationList(Event).ToList())
+			{
+				// Non EventHandler-compatible delegates get the straight 
+				// arguments, not the typical "sender, args" arguments.
+				del.InvokePreserveStack(args);
 			}
 		}
 

@@ -76,32 +76,37 @@ namespace Moq
 
 		public IVerifies Raises(Action<TMock> eventExpression, EventArgs args)
 		{
-			throw new NotImplementedException();
+			return Raises(eventExpression, () => args);
 		}
 
 		public IVerifies Raises(Action<TMock> eventExpression, Func<EventArgs> func)
 		{
-			throw new NotImplementedException();
+			return RaisesImpl(eventExpression, func);
 		}
 
 		public IVerifies Raises<T1>(Action<TMock> eventExpression, Func<T1, EventArgs> func)
 		{
-			throw new NotImplementedException();
+			return RaisesImpl(eventExpression, func);
 		}
 
 		public IVerifies Raises<T1, T2>(Action<TMock> eventExpression, Func<T1, T2, EventArgs> func)
 		{
-			throw new NotImplementedException();
+			return RaisesImpl(eventExpression, func);
 		}
 
 		public IVerifies Raises<T1, T2, T3>(Action<TMock> eventExpression, Func<T1, T2, T3, EventArgs> func)
 		{
-			throw new NotImplementedException();
+			return RaisesImpl(eventExpression, func);
 		}
 
 		public IVerifies Raises<T1, T2, T3, T4>(Action<TMock> eventExpression, Func<T1, T2, T3, T4, EventArgs> func)
 		{
-			throw new NotImplementedException();
+			return RaisesImpl(eventExpression, func);
+		}
+
+		public IVerifies Raises(Action<TMock> eventExpression, params object[] args)
+		{
+			return RaisesImpl(eventExpression, args);
 		}
 
 		public IReturnsResult<TMock> Returns(Func<TResult> valueExpression)

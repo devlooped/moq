@@ -576,9 +576,43 @@ namespace Moq.Tests
 			Assert.Equal("foo5Truebar", args.Value);
 		}
 
+		[Fact]
+		public void RaisesCustomEventWithLambda()
+		{
+			var mock = new Mock<IWithEvent>();
+			string message = null;
+			int? value = null;
+
+			mock.Object.CustomEvent += (s, i) => { message = s; value = i; };
+
+			mock.Raise(x => x.CustomEvent += null, "foo", 5);
+
+			Assert.Equal("foo", message);
+			Assert.Equal(5, value);
+		}
+
+		[Fact]
+		public void RaisesCustomEventWithLambdaOnPropertySet()
+		{
+			var mock = new Mock<IWithEvent>();
+			string message = null;
+			int? value = null;
+
+			mock.Object.CustomEvent += (s, i) => { message = s; value = i; };
+			mock.SetupSet(w => w.Value = 5).Raises(x => x.CustomEvent += null, "foo", 5);
+
+			mock.Object.Value = 5;
+
+			Assert.Equal("foo", message);
+			Assert.Equal(5, value);
+		}
+
+		public delegate void CustomEvent(string message, int value);
+
 		public interface IWithEvent
 		{
 			event EventHandler InterfaceEvent;
+			event CustomEvent CustomEvent;
 			object Value { get; set; }
 		}
 
@@ -586,6 +620,7 @@ namespace Moq.Tests
 		{
 			public event EventHandler InterfaceEvent;
 			public event EventHandler ClassEvent;
+			public event CustomEvent CustomEvent;
 			public virtual event EventHandler VirtualEvent;
 			public virtual object Value { get; set; }
 		}
