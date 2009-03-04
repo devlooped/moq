@@ -45,16 +45,19 @@ namespace Moq
 {
 	internal class RefMatcher : IMatcher
 	{
-		object reference;
+		Func<object, bool> equals;
 
 		public RefMatcher(object reference)
 		{
-			this.reference = reference;
+			if (reference != null && reference.GetType().IsValueType)
+				equals = value => Object.Equals(reference, value);
+			else
+				equals = value => Object.ReferenceEquals(reference, value);
 		}
 
 		public bool Matches(object value)
 		{
-			return Object.ReferenceEquals(reference, value);
+			return equals(value);
 		}
 
 		public void Initialize(Expression matcherExpression)

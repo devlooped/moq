@@ -1,4 +1,5 @@
 ﻿using Xunit;
+using System;
 
 namespace Moq.Tests
 {
@@ -61,6 +62,28 @@ namespace Moq.Tests
 			Assert.Throws<MockException>(() => mock.Object.Echo(ref actual));
 		}
 
+		[Fact]
+		public void RefTakesGuidParameter()
+		{
+			var mock = new Mock<IFoo>(MockBehavior.Strict);
+			var expected = Guid.NewGuid();
+
+			mock.Setup(m => m.GuidMethod(ref expected)).Returns(true);
+
+			Assert.Equal(true, mock.Object.GuidMethod(ref expected));
+		}
+
+		[Fact]
+		public void RefWorksWithOtherValueTypes()
+		{
+			var mock = new Mock<IFoo>(MockBehavior.Strict);
+			var expected = 5;
+
+			mock.Setup(m => m.IntMethod(ref expected)).Returns(true);
+
+			Assert.Equal(true, mock.Object.IntMethod(ref expected));
+		}
+		
 		// ThrowsIfOutIsNotConstant
 		// ThrowsIfRefIsNotConstant
 
@@ -70,6 +93,8 @@ namespace Moq.Tests
 			bool Execute(string command, out string result);
 			void Submit(string command, ref string result);
 			int Value { get; set; }
+			bool GuidMethod(ref Guid guid);
+			bool IntMethod(ref int value);
 		}
 	}
 }
