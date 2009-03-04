@@ -352,6 +352,40 @@ namespace Moq.Tests.Regressions
 
 		#endregion
 
+		#region #145
+
+		public class _145
+		{
+			public interface IResolver
+			{
+				string Resolve<T>();
+			}
+
+			public class DataWriter<T>
+			{
+			}
+
+			public class DataA { }
+			public class DataB { }
+
+			[Fact]
+			public void ShouldDifferentiateBetweenGenericsParams()
+			{
+				var mock = new Mock<IResolver>();
+				mock.Setup(m => m.Resolve<DataWriter<DataA>>()).Returns("Success A");
+
+				Assert.Equal("Success A", mock.Object.Resolve<DataWriter<DataA>>());
+
+				mock.Setup(m => m.Resolve<DataWriter<DataB>>()).Returns("Success B");
+
+				Assert.Equal("Success B", mock.Object.Resolve<DataWriter<DataB>>());
+				Assert.Equal("Success A", mock.Object.Resolve<DataWriter<DataA>>());
+			}
+
+		}
+
+		#endregion
+
 #if !SILVERLIGHT
 		// run "netsh http add urlacl url=http://+:7777/ user=[domain]\[user]"
 		// to avoid running the test as an admin

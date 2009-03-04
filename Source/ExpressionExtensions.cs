@@ -292,9 +292,8 @@ namespace Moq
 				if (call.Method.IsGenericMethod)
 				{
 					builder.Append("<");
-					builder.Append(String.Join(", ",
-						(from arg in call.Method.GetGenericArguments()
-						 select arg.Name).ToArray()));
+					builder.Append(String.Join(", ", 
+						call.Method.GetGenericArguments().Select(t => GetTypeName(t)).ToArray()));
 					builder.Append(">");
 				}
 
@@ -309,6 +308,20 @@ namespace Moq
 
 				string properCallString = builder.ToString();
 				return properCallString;
+			}
+
+			private static string GetTypeName(Type type)
+			{
+				if (type.IsGenericType)
+				{
+					return type.Name.Substring(0, type.Name.IndexOf('`')) +
+						"<" + String.Join(",", type.GetGenericArguments().Select(t => GetTypeName(t)).ToArray()) +
+						">";
+				}
+				else
+				{
+					return type.Name;
+				}
 			}
 
 			public string ExpressionString { get; private set; }
