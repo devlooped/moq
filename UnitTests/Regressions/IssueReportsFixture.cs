@@ -354,34 +354,6 @@ namespace Moq.Tests.Regressions
 
 		#endregion
 
-		#region #138
-
-		public class _138
-		{
-			public interface SuperFoo
-			{
-				string Bar { get; set; }
-			}
-			public interface Foo : SuperFoo
-			{
-				string Baz { get; set; }
-			}
-
-			[Fact]
-			public void superFooMockSetupAllProperties()
-			{
-				var fac = new MockFactory(MockBehavior.Default);
-				var superFooMock = fac.Create<SuperFoo>();
-				superFooMock.SetupAllProperties();
-
-				var superFoo = superFooMock.Object;
-				superFoo.Bar = "Bar";
-				Assert.Equal("Bar", superFoo.Bar);
-			}
-		}
-
-		#endregion
-
 		#region #145
 
 		public class _145
@@ -417,6 +389,35 @@ namespace Moq.Tests.Regressions
 		#endregion
 
 #if !SILVERLIGHT
+	
+		#region #138
+
+		public class _138
+		{
+			public interface SuperFoo
+			{
+				string Bar { get; set; }
+			}
+			public interface Foo : SuperFoo
+			{
+				string Baz { get; set; }
+			}
+
+			[Fact]
+			public void superFooMockSetupAllProperties()
+			{
+				var fac = new MockFactory(MockBehavior.Default);
+				var superFooMock = fac.Create<SuperFoo>();
+				superFooMock.SetupAllProperties();
+
+				var superFoo = superFooMock.Object;
+				superFoo.Bar = "Bar";
+				Assert.Equal("Bar", superFoo.Bar);
+			}
+		}
+
+		#endregion
+
 		// run "netsh http add urlacl url=http://+:7777/ user=[domain]\[user]"
 		// to avoid running the test as an admin
 		[Fact(Skip = "Doesn't work in Mono")]
