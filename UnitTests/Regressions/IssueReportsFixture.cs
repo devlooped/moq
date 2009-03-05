@@ -324,6 +324,36 @@ namespace Moq.Tests.Regressions
 
 		#endregion
 
+		#region #136
+
+		public class _136
+		{
+			public interface IIndexedFoo
+			{
+				string this[int key] { get; set; }
+			}
+
+			[Fact(Skip="Fix for 3.5")]
+			public void ShouldThrowIfSetupSetIndexer()
+			{
+				var foo = new Mock<IIndexedFoo>();
+
+				Assert.Throws<ArgumentException>(() => foo.SetupSet(f => f[0]));
+			}
+
+			[Fact(Skip = "Fix for 3.5")]
+			public void ShouldSetIndexer()
+			{
+				var foo = new Mock<IIndexedFoo>(MockBehavior.Strict);
+
+				foo.SetupSet(f => f[0] = "foo");
+
+				foo.Object[0] = "foo";
+			}
+		}
+
+		#endregion
+
 		#region #138
 
 		public class _138
