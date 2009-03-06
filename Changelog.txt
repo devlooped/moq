@@ -1,3 +1,31 @@
+Version 3.0
+    * Silverlight support! Finally integrated Jason's Silverlight contribution! Issue #73
+    * Brand-new simplified event raising syntax (#130): mock.Raise(foo => foo.MyEvent += null, new MyArgs(...));
+    * Support for custom event signatures (not compatible with EventHandler): mock.Raise(foo => foo.MyEvent += null, arg1, arg2, arg3);
+    * Substantially improved property setter behavior: mock.VerifySet(foo => foo.Value = "foo");  //(also available for SetupSet
+    * Renamed Expect* with Setup*
+    * Vastly simplified custom argument matchers: public int IsOdd() { return Match<int>.Create(v => i % 2 == 0); }
+    * Added support for verifying how many times a member was invoked: mock.Verify(foo => foo.Do(), Times.Never());
+    * Added simple sample app named StoreSample
+    * Moved Stub functionality to the core API (SetupProperty and SetupAllProperties)
+    * Fixed sample ASP.NET MVC app to work with latest version
+    * Allow custom matchers to be created with a substantially simpler API
+    * Fixed issue #145 which prevented discrimination of setups by generic method argument types
+    * Fixed issue #141 which prevented ref arguments matching value types (i.e. a Guid)
+    * Implemented improvement #131: Add support for It.IsAny and custom argument matchers for SetupSet/VerifySet
+    * Implemented improvement #124 to render better error messages
+    * Applied patch from David Kirkland for improvement #125 to improve matching of enumerable parameters
+    * Implemented improvement #122 to provide custom errors for Verify
+    * Implemented improvement #121 to provide null as default value for Nullable<T>
+    * Fixed issue #112 which fixes passing a null argument to a mock constructor
+    * Implemented improvement #111 to better support params arguments
+    * Fixed bug #105 about improperly overwriting setups for property getter and setter
+    * Applied patch from Ihar.Bury for issue #99 related to protected expectations 
+    * Fixed issue #97 on not being able to use SetupSet/VerifySet if property did not have a getter
+    * Better integration with Pex (http://research.microsoft.com/en-us/projects/Pex/)
+    * Various other minor fixes (#134, #135, #137, #138, #140, etc.)
+    
+
 Version 2.6
     * Implemented Issue #55: We now provide a mock.DefaultValue = [DefaultValue.Empty | DefaultValue.Mock] which will provide the current behavior (default) or mocks for mockeable return types for loose mock invocations without expectations.
     * Added support for stubbing properties from moq-contrib: now you can do mock.Stub(m => m.Value) and add stub behavior to the property. mock.StubAll() is also provided. This integrates with the DefaultValue behavior too, so you can stub entire hierarchies :).
