@@ -9,7 +9,7 @@ using System.Runtime.InteropServices;
 [assembly: AssemblyProduct("Moq")]
 [assembly: AssemblyTrademark("")]
 [assembly: AssemblyCulture("")]
-[assembly: AssemblyVersion("3.0.305.2")]
+[assembly: AssemblyVersion("3.0.305.3")]
 [assembly: AssemblyFileVersion("3.0.0.0")]
 
 [assembly: ComVisible(false)]
