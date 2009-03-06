@@ -54,8 +54,19 @@ Do use their documentation to learn about options (especially when there are sev
             <filter entryType="Class" fullName="Moq.Mock" filterName="Mock" isExposed="True">
                 <filter entryType="Method" fullName="Moq.Mock.CreateEventHandler" filterName="CreateEventHandler" isExposed="False" />
             </filter>
+            <filter entryType="Class" fullName="Moq.Mock`1" filterName="Mock`1" isExposed="True">
+                <filter entryType="Method" fullName="Moq.Mock`1.Expect" filterName="Expect" isExposed="False" />
+                <filter entryType="Method" fullName="Moq.Mock`1.ExpectGet" filterName="ExpectGet" isExposed="False" />
+                <filter entryType="Method" fullName="Moq.Mock`1.ExpectSet" filterName="ExpectSet" isExposed="False" />
+                <filter entryType="Method" fullName="Moq.Mock`1.GetObject" filterName="GetObject" isExposed="False" />
+            </filter>
             <filter entryType="Class" fullName="Moq.MockedEvent" filterName="MockedEvent" isExposed="False" />
             <filter entryType="Class" fullName="Moq.MockedEvent`1" filterName="MockedEvent`1" isExposed="False" />
+            <filter entryType="Class" fullName="Moq.MockFactory" filterName="MockFactory" isExposed="True">
+                <filter entryType="Method" fullName="Moq.MockFactory.CreateMock" filterName="CreateMock" isExposed="False" />
+                <filter entryType="Method" fullName="Moq.MockFactory.VerifyMocks" filterName="VerifyMocks" isExposed="False" />
+                <filter entryType="Property" fullName="Moq.MockFactory.Mocks" filterName="Mocks" isExposed="False" />
+            </filter>
             <filter entryType="Class" fullName="Moq.MockLegacyExtensions" filterName="MockLegacyExtensions" isExposed="False" />
         </filter>
         <filter entryType="Namespace" fullName="Moq.Language" isExposed="True">
@@ -65,7 +76,7 @@ Do use their documentation to learn about options (especially when there are sev
         <filter entryType="Namespace" fullName="Moq.Language.Flow" isExposed="False" />
     </apiFilter>
     <ProjectSummary />
-    <MissingTags>Summary, Parameter, AutoDocumentCtors, Namespace, TypeParameter</MissingTags>
+    <MissingTags>Summary, Parameter, AutoDocumentCtors, Namespace</MissingTags>
     <VisibleItems>InheritedMembers, Protected, SealedProtected</VisibleItems>
     <HtmlHelp1xCompilerPath path="..\build\HTML Help Workshop\" />
     <HtmlHelp2xCompilerPath path="" />
