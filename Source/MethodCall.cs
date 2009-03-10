@@ -185,7 +185,6 @@ namespace Moq
 
 			// Move 'till we're at the entry point 
 			// into Moq API
-			// Move 'till our own frame first
 			while (stack.GetFrame(index).GetMethod().DeclaringType.Namespace.StartsWith("Moq")
 				&& index <= stack.FrameCount)
 			{
