@@ -118,7 +118,7 @@ namespace Moq
 		/// this.SetupSet(x =&gt; x.Suspended, true);
 		/// </code>
 		/// </example>
-		[Obsolete("ExpectSet has been renamed to SetupSet.", false)]
+		[Obsolete("ExpectSet has been renamed to SetupSet, and the new syntax allows you to pass the value in the expression itself, like f => f.Value = 25.", true)]
 		[EditorBrowsable(EditorBrowsableState.Never)]
 		public ISetupSetter<T, TProperty> ExpectSet<TProperty>(Expression<Func<T, TProperty>> expression, TProperty value)
 		{
@@ -152,6 +152,7 @@ namespace Moq
 		/// </code>
 		/// </example>
 		[EditorBrowsable(EditorBrowsableState.Never)]
+		[Obsolete("The new syntax allows you to pass the value in the expression itself, like f => f.Value = 25.", true)]
 		public static ISetupSetter<T, TProperty> SetupSet<T, TProperty>(this Mock<T> mock, Expression<Func<T, TProperty>> expression, TProperty value)
 			where T : class
 		{
