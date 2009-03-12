@@ -75,7 +75,7 @@ namespace Moq.Tests
 		{
 			var mock = new Mock<IFoo>();
 
-			mock.SetupSet(m => m.Bar.Value, 5);
+			mock.SetupSet(m => m.Bar.Value = 5);
 
 			Assert.NotNull(mock.Object.Bar);
 			Assert.Throws<MockVerificationException>(() => mock.VerifyAll());
@@ -241,13 +241,13 @@ namespace Moq.Tests
 		{
 			var mock = new Mock<IFoo>();
 
-			mock.SetupSet(m => m.Bar.Value, 5);
+			mock.SetupSet(m => m.Bar.Value = 5);
 
-			Assert.Throws<MockException>(() => mock.VerifySet(m => m.Bar.Value, 5));
+			Assert.Throws<MockException>(() => mock.VerifySet(m => m.Bar.Value = 5));
 
 			mock.Object.Bar.Value = 5;
 
-			mock.VerifySet(m => m.Bar.Value, 5);
+			mock.VerifySet(m => m.Bar.Value = 5);
 		}
 
 		[Fact]

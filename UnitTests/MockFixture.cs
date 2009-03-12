@@ -523,7 +523,7 @@ namespace Moq.Tests
 		public void ExpectsPropertySetterWithNullValue()
 		{
 			var mock = new Mock<IFoo>(MockBehavior.Strict);
-			mock.SetupSet(m => m.Value, null);
+			mock.SetupSet(m => m.Value = null);
 
 			Assert.Throws<MockException>(() => { mock.Object.Value = 5; });
 			Assert.Throws<MockVerificationException>(() => mock.VerifyAll());
@@ -538,7 +538,7 @@ namespace Moq.Tests
 		public void ThrowsIfPropertySetterWithWrongValue()
 		{
 			var mock = new Mock<IFoo>(MockBehavior.Strict);
-			mock.SetupSet(m => m.Value, 5);
+			mock.SetupSet(m => m.Value = 5);
 
 			Assert.Throws<MockException>(() => { mock.Object.Value = 6; });
 		}
@@ -699,7 +699,7 @@ namespace Moq.Tests
 		{
 			var target = new Mock<IFoo>();
 			target.SetupGet(d => d.Value).Returns(1);
-			target.SetupSet(d => d.Value, 2);
+			target.SetupSet(d => d.Value = 2);
 
 			target.Object.Value = target.Object.Value + 1;
 

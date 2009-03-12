@@ -485,10 +485,12 @@ namespace Moq
 				setterExpression(mock.Object);
 
 				var last = context.LastInvocation;
+
 				if (last == null)
-				{
-					throw new ArgumentException(string.Format(CultureInfo.InvariantCulture, "SetupSet"));
-				}
+					throw new ArgumentException(String.Format(
+						CultureInfo.InvariantCulture, 
+						Properties.Resources.SetupOnNonOverridableMember,
+						""));
 
 				var setter = last.Invocation.Method;
 				if (!setter.IsSpecialName || !setter.Name.StartsWith("set_"))

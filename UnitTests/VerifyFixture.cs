@@ -241,7 +241,7 @@ namespace Moq.Tests
 
 			try
 			{
-				mock.VerifySet(f => f.Value, 5, "Nobody called .Value");
+				mock.VerifySet(f => f.Value = 5, "Nobody called .Value");
 			}
 			catch (MockException me)
 			{
@@ -321,7 +321,7 @@ namespace Moq.Tests
 
 			try
 			{
-				mock.VerifySet(f => f.Value, 5, "Nobody called .Value");
+				mock.VerifySet(f => f.Value = 5, "Nobody called .Value");
 			}
 			catch (MockException me)
 			{
@@ -363,20 +363,6 @@ namespace Moq.Tests
 			{
 				Assert.Equal(MockException.ExceptionReason.VerificationFailed, mex.Reason);
 			}
-		}
-
-		[Fact]
-		public void VerifiesSetterWithExpression()
-		{
-			var mock = new Mock<IFoo>();
-			mock.SetupSet(m => m.Value, 5);
-
-			mock.Object.Value = 1;
-			mock.Object.Value = 5;
-
-			mock.VerifySet(m => m.Value);
-			Assert.Throws<MockException>(() => mock.VerifySet(m => m.Value, 2));
-			mock.VerifySet(m => m.Value, 5);
 		}
 
 		[Fact]
