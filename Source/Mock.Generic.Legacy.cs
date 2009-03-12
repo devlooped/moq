@@ -14,20 +14,8 @@ namespace Moq
 	public partial class Mock<T>
 	{
 		/// <summary>
-		/// Sets an expectation on the mocked type for a call to 
-		/// to a void method.
+		/// Obsolete.
 		/// </summary>
-		/// <remarks>
-		/// If more than one expectation is set for the same method or property, 
-		/// the latest one wins and is the one that will be executed.
-		/// </remarks>
-		/// <param name="expression">Lambda expression that specifies the expected method invocation.</param>
-		/// <example group="expectations">
-		/// <code>
-		/// var mock = new Mock&lt;IProcessor&gt;();
-		/// this.Setup(x =&gt; x.Execute("ping"));
-		/// </code>
-		/// </example>
 		[Obsolete("Expect has been renamed to Setup.", false)]
 		[EditorBrowsable(EditorBrowsableState.Never)]
 		public ISetup<T> Expect(Expression<Action<T>> expression)
@@ -36,20 +24,8 @@ namespace Moq
 		}
 
 		/// <summary>
-		/// Sets an expectation on the mocked type for a call to 
-		/// to a value returning method.
+		/// Obsolete.
 		/// </summary>
-		/// <typeparam name="TResult">Type of the return value. Typically omitted as it can be inferred from the expression.</typeparam>
-		/// <remarks>
-		/// If more than one expectation is set for the same method or property, 
-		/// the latest one wins and is the one that will be executed.
-		/// </remarks>
-		/// <param name="expression">Lambda expression that specifies the expected method invocation.</param>
-		/// <example group="expectations">
-		/// <code>
-		/// this.Setup(x =&gt; x.HasInventory("Talisker", 50)).Returns(true);
-		/// </code>
-		/// </example>
 		[Obsolete("Expect has been renamed to Setup.", false)]
 		[EditorBrowsable(EditorBrowsableState.Never)]
 		public ISetup<T, TResult> Expect<TResult>(Expression<Func<T, TResult>> expression)
@@ -58,21 +34,8 @@ namespace Moq
 		}
 
 		/// <summary>
-		/// Sets an expectation on the mocked type for a call to 
-		/// to a property getter.
+		/// Obsolete.
 		/// </summary>
-		/// <remarks>
-		/// If more than one expectation is set for the same property getter, 
-		/// the latest one wins and is the one that will be executed.
-		/// </remarks>
-		/// <typeparam name="TProperty">Type of the property. Typically omitted as it can be inferred from the expression.</typeparam>
-		/// <param name="expression">Lambda expression that specifies the expected property getter.</param>
-		/// <example group="expectations">
-		/// <code>
-		/// this.SetupGet(x =&gt; x.Suspended)
-		///     .Returns(true);
-		/// </code>
-		/// </example>
 		[Obsolete("ExpectGet has been renamed to SetupGet.", false)]
 		[EditorBrowsable(EditorBrowsableState.Never)]
 		public ISetupGetter<T, TProperty> ExpectGet<TProperty>(Expression<Func<T, TProperty>> expression)
@@ -81,20 +44,8 @@ namespace Moq
 		}
 
 		/// <summary>
-		/// Sets an expectation on the mocked type for a call to 
-		/// to a property setter.
+		/// Obsolete.
 		/// </summary>
-		/// <remarks>
-		/// If more than one expectation is set for the same property setter, 
-		/// the latest one wins and is the one that will be executed.
-		/// </remarks>
-		/// <typeparam name="TProperty">Type of the property. Typically omitted as it can be inferred from the expression.</typeparam>
-		/// <param name="expression">Lambda expression that specifies the expected property setter.</param>
-		/// <example group="expectations">
-		/// <code>
-		/// this.SetupSet(x =&gt; x.Suspended);
-		/// </code>
-		/// </example>
 		[Obsolete("ExpectSet has been renamed to SetupSet.", false)]
 		[EditorBrowsable(EditorBrowsableState.Never)]
 		public ISetupSetter<T, TProperty> ExpectSet<TProperty>(Expression<Func<T, TProperty>> expression)
@@ -103,21 +54,8 @@ namespace Moq
 		}
 
 		/// <summary>
-		/// Sets an expectation on the mocked type for a call to 
-		/// to a property setter with a specific value.
+		/// Obsolete.
 		/// </summary>
-		/// <remarks>
-		/// More than one expectation can be set for the setter with 
-		/// different values.
-		/// </remarks>
-		/// <typeparam name="TProperty">Type of the property. Typically omitted as it can be inferred from the expression.</typeparam>
-		/// <param name="expression">Lambda expression that specifies the expected property setter.</param>
-		/// <param name="value">The value expected to be set for the property.</param>
-		/// <example group="expectations">
-		/// <code>
-		/// this.SetupSet(x =&gt; x.Suspended, true);
-		/// </code>
-		/// </example>
 		[Obsolete("ExpectSet has been renamed to SetupSet, and the new syntax allows you to pass the value in the expression itself, like f => f.Value = 25.", true)]
 		[EditorBrowsable(EditorBrowsableState.Never)]
 		public ISetupSetter<T, TProperty> ExpectSet<TProperty>(Expression<Func<T, TProperty>> expression, TProperty value)
@@ -134,23 +72,8 @@ namespace Moq
 	public static class MockLegacyExtensions
 	{
 		/// <summary>
-		/// Specifies a setup on the mocked type for a call to 
-		/// to a property setter with a specific value.
+		/// Obsolete.
 		/// </summary>
-		/// <remarks>
-		/// More than one setup can be set for the setter with 
-		/// different values.
-		/// </remarks>
-		/// <typeparam name="TProperty">Type of the property. Typically omitted as it can be inferred from the expression.</typeparam>
-		/// <typeparam name="T">Type of the mock.</typeparam>
-		/// <param name="mock">The target mock for the setup.</param>
-		/// <param name="expression">Lambda expression that specifies the property setter.</param>
-		/// <param name="value">The value to be set for the property.</param>
-		/// <example group="setups">
-		/// <code>
-		/// mock.SetupSet(x =&gt; x.Suspended, true);
-		/// </code>
-		/// </example>
 		[EditorBrowsable(EditorBrowsableState.Never)]
 		[Obsolete("The new syntax allows you to pass the value in the expression itself, like f => f.Value = 25.", true)]
 		public static ISetupSetter<T, TProperty> SetupSet<T, TProperty>(this Mock<T> mock, Expression<Func<T, TProperty>> expression, TProperty value)
@@ -160,29 +83,10 @@ namespace Moq
 		}
 
 		/// <summary>
-		/// Verifies that a property has been set on the mock to the given value.
-		/// Use in conjuntion with the default <see cref="MockBehavior.Loose"/>.
+		/// Obsolete.
 		/// </summary>
-		/// <example group="verification">
-		/// This example assumes that the mock has been used, 
-		/// and later we want to verify that a given invocation 
-		/// with specific parameters was performed:
-		/// <code>
-		/// var mock = new Mock&lt;IWarehouse&gt;();
-		/// // exercise mock
-		/// //...
-		/// // Will throw if the test code didn't set the IsClosed property to true
-		/// mock.VerifySet(warehouse =&gt; warehouse.IsClosed, true);
-		/// </code>
-		/// </example>
-		/// <exception cref="MockException">The invocation was not performed on the mock.</exception>
-		/// <param name="expression">Expression to verify.</param>
-		/// <param name="value">The value that should have been set on the property.</param>
-		/// <param name="mock">The mock instance.</param>
-		/// <typeparam name="T">Mocked type.</typeparam>
-		/// <typeparam name="TProperty">Type of the property to verify. Typically omitted as it can 
-		/// be inferred from the expression's return type.</typeparam>
 		[EditorBrowsable(EditorBrowsableState.Never)]
+		[Obsolete("Use the new syntax, which allows you to pass the value in the expression itself, mock.VerifySet(m => m.Value = 25);", true)]
 		public static void VerifySet<T, TProperty>(this Mock<T> mock, Expression<Func<T, TProperty>> expression, TProperty value)
 			where T : class
 		{
@@ -190,31 +94,10 @@ namespace Moq
 		}
 
 		/// <summary>
-		/// Verifies that a property has been set on the mock to the given value, specifying a failure  
-		/// error message. 
-		/// Use in conjuntion with the default <see cref="MockBehavior.Loose"/>.
+		/// Obsolete.
 		/// </summary>
-		/// <example group="verification">
-		/// This example assumes that the mock has been used, 
-		/// and later we want to verify that a given invocation 
-		/// with specific parameters was performed:
-		/// <code>
-		/// var mock = new Mock&lt;IWarehouse&gt;();
-		/// // exercise mock
-		/// //...
-		/// // Will throw if the test code didn't set the IsClosed property to true
-		/// mock.VerifySet(warehouse =&gt; warehouse.IsClosed, true);
-		/// </code>
-		/// </example>
-		/// <exception cref="MockException">The invocation was not performed on the mock.</exception>
-		/// <param name="expression">Expression to verify.</param>
-		/// <param name="value">The value that should have been set on the property.</param>
-		/// <param name="failMessage">Message to show if verification fails.</param>
-		/// <param name="mock">The mock instance.</param>
-		/// <typeparam name="T">Mocked type.</typeparam>
-		/// <typeparam name="TProperty">Type of the property to verify. Typically omitted as it can 
-		/// be inferred from the expression's return type.</typeparam>
 		[EditorBrowsable(EditorBrowsableState.Never)]
+		[Obsolete("Use the new syntax, which allows you to pass the value in the expression itself, mock.VerifySet(m => m.Value = 25, failMessage);", true)]
 		public static void VerifySet<T, TProperty>(this Mock<T> mock, Expression<Func<T, TProperty>> expression, TProperty value, string failMessage)
 			where T : class
 		{
