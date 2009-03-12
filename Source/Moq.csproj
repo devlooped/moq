@@ -167,6 +167,7 @@
     <Compile Include="MockExtensions.cs" />
     <Compile Include="PexProtector.cs" />
     <Compile Include="SetterMethodCall.cs" />
+    <Compile Include="Sub\StubExtensions.cs" />
     <Compile Include="Times.cs" />
   </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />

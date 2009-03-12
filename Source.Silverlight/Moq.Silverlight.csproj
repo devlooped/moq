@@ -282,6 +282,9 @@
     <Compile Include="..\Source\SetupKind.cs">
       <Link>SetupKind.cs</Link>
     </Compile>
+    <Compile Include="..\Source\Sub\StubExtensions.cs">
+      <Link>Stub\StubExtensions.cs</Link>
+    </Compile>
     <Compile Include="..\Source\Times.cs">
       <Link>Times.cs</Link>
     </Compile>
