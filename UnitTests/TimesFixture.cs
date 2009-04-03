@@ -236,5 +236,26 @@ namespace Moq.Tests
 			Assert.False(target.Verify(1));
 			Assert.False(target.Verify(int.MaxValue));
 		}
+
+		[Fact]
+		public void OnceGetExceptionMessage()
+		{
+			Times target = Times.Once();
+
+			Assert.Equal(
+				"param1\r\nInvocation was not performed on the mock once: param2",
+				target.GetExceptionMessage("param1", "param2"));
+		}
+
+		[Fact]
+		public void OnceChecksOneTime()
+		{
+			Times target = Times.Once();
+
+			Assert.False(target.Verify(-1));
+			Assert.False(target.Verify(0));
+			Assert.True(target.Verify(1));
+			Assert.False(target.Verify(int.MaxValue));
+		}
 	}
 }
