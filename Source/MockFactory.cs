@@ -150,7 +150,7 @@ namespace Moq
 
 		/// <summary>
 		/// Whether the base member virtual implementation will be called 
-		/// for mocked classes if no setup is matched. Defaults to <see langword="true"/>.
+		/// for mocked classes if no setup is matched. Defaults to <see langword="false"/>.
 		/// </summary>
 		public bool CallBase { get; set; }
 

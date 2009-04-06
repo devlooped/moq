@@ -46,7 +46,7 @@
 	<doc for="Mock.CallBase">
 		<summary>
 			Whether the base member virtual implementation will be called
-			for mocked classes if no setup is matched. Defaults to <see langword="true"/>.
+			for mocked classes if no setup is matched. Defaults to <see langword="false"/>.
 		</summary>
 	</doc>
 	<doc for="Mock.DefaultValue">
