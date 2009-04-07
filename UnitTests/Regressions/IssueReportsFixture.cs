@@ -418,6 +418,53 @@ namespace Moq.Tests.Regressions
 
 		#endregion
 
+		#region #111
+
+		public class _111
+		{
+			public class Class1Tests
+			{
+				[Fact]
+				public void TestDoIt()
+				{
+					Mock<IMyInterface> MyMock = new Mock<IMyInterface>();
+					Class1 myClass = new Class1(MyMock.Object);
+
+					MyMock.Setup(p => p.DoIt(It.IsAny<string>(),	It.IsAny<int[]>())).Returns(String.Empty); //also tried It.IsAny<int>()
+
+					myClass.DoSomething();
+
+					MyMock.VerifyAll();
+				}
+
+			}
+
+			public interface IMyInterface
+			{
+				string DoIt(string myString, params int[] myInts);
+			}
+
+			public class Class1
+			{
+				private readonly IMyInterface myInterface;
+
+				public Class1(IMyInterface myInterface)
+				{
+					this.myInterface = myInterface;
+				}
+
+
+				public void DoSomething()
+				{
+					int[] ints = new[] { 0, 1, 2 };
+
+					myInterface.DoIt("myString", ints);
+				}
+			}
+		}
+
+		#endregion
+
 #if !SILVERLIGHT
 
 		#region #138
