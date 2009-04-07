@@ -80,6 +80,7 @@
   <ItemGroup>
     <Compile Include="AsInterfaceFixture.cs" />
     <Compile Include="CustomMatcherFixture.cs" />
+    <Compile Include="PropertiesFixture.cs" />
     <Compile Include="RecursiveMocksFixture.cs" />
     <Compile Include="CallbacksFixture.cs" />
     <Compile Include="EmptyDefaultValueProviderFixture.cs" />
