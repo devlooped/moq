@@ -682,7 +682,7 @@ namespace Moq.Tests
 		}
 
 		[Fact]
-		public void ExpecteWithArrayNotMatchTwoDifferentArrayInstances()
+		public void ExpectWithArrayNotMatchTwoDifferentArrayInstances()
 		{
 			string expected = "bar";
 			string argument = "foo";
