@@ -11,7 +11,7 @@ namespace Moq.Tests.Matchers
 		{
 			var expr = ToExpression<object>(() => It.IsAny<object>()).ToLambda().Body;
 
-			var matcher = MatcherFactory.CreateMatcher(expr);
+			var matcher = MatcherFactory.CreateMatcher(expr, false);
 			matcher.Initialize(expr);
 
 			Assert.True(matcher.Matches(null));
@@ -22,7 +22,7 @@ namespace Moq.Tests.Matchers
 		{
 			var expr = ToExpression<object>(() => It.IsAny<object>()).ToLambda().Body;
 
-			var matcher = MatcherFactory.CreateMatcher(expr);
+			var matcher = MatcherFactory.CreateMatcher(expr, false);
 			matcher.Initialize(expr);
 
 			Assert.True(matcher.Matches("foo"));
@@ -33,7 +33,7 @@ namespace Moq.Tests.Matchers
 		{
 			var expr = ToExpression<IDisposable>(() => It.IsAny<IDisposable>()).ToLambda().Body;
 
-			var matcher = MatcherFactory.CreateMatcher(expr);
+			var matcher = MatcherFactory.CreateMatcher(expr, false);
 			matcher.Initialize(expr);
 
 			Assert.True(matcher.Matches(new Disposable()));
@@ -44,7 +44,7 @@ namespace Moq.Tests.Matchers
 		{
 			var expr = ToExpression<IFormatProvider>(() => It.IsAny<IFormatProvider>()).ToLambda().Body;
 
-			var matcher = MatcherFactory.CreateMatcher(expr);
+			var matcher = MatcherFactory.CreateMatcher(expr, false);
 			matcher.Initialize(expr);
 
 			Assert.False(matcher.Matches("foo"));
@@ -62,6 +62,5 @@ namespace Moq.Tests.Matchers
 				throw new NotImplementedException();
 			}
 		}
-
 	}
 }

@@ -367,48 +367,75 @@ namespace Moq.Tests.Regressions
 
 		#endregion
 
-		#region #111
+		#region #111 & #155
 
 		public class _111
 		{
-			public class Class1Tests
+			[Fact]
+			public void TestTypedParams()
 			{
-				[Fact]
-				public void TestDoIt()
-				{
-					Mock<IMyInterface> MyMock = new Mock<IMyInterface>();
-					Class1 myClass = new Class1(MyMock.Object);
+				var mock = new Mock<IParams>(MockBehavior.Strict);
+				mock.Setup(p => p.Submit(It.IsAny<string>(), It.IsAny<int[]>()));
 
-					MyMock.Setup(p => p.DoIt(It.IsAny<string>(),	It.IsAny<int[]>())).Returns(String.Empty); //also tried It.IsAny<int>()
+				mock.Object.Submit("foo", 0, 1, 2);
+				mock.Object.Submit("foo");
 
-					myClass.DoSomething();
-
-					MyMock.VerifyAll();
-				}
-
+				mock.VerifyAll();
 			}
 
-			public interface IMyInterface
+			[Fact]
+			public void TestObjectParams()
 			{
-				string DoIt(string myString, params int[] myInts);
+				var mock = new Mock<IParams>(MockBehavior.Strict);
+				mock.Setup(p => p.Execute(It.IsAny<int>(), It.IsAny<object[]>()));
+
+				mock.Object.Execute(1, "0", "1", "2");
+				mock.Object.Execute(1);
+
+				mock.VerifyAll();
 			}
 
-			public class Class1
+			[Fact]
+			public void TestObjectParamsWithArray()
 			{
-				private readonly IMyInterface myInterface;
+				var mock = new Mock<IParams>(MockBehavior.Strict);
+				mock.Setup(p => p.Execute(It.IsAny<int>(), It.IsAny<string[]>(), It.IsAny<int>()));
 
-				public Class1(IMyInterface myInterface)
-				{
-					this.myInterface = myInterface;
-				}
+				mock.Object.Execute(1, new string[] { "0", "1" }, 3);
 
+				mock.Verify(p => p.Execute(It.IsAny<int>(), It.IsAny<object[]>()));
+				mock.Verify(p => p.Execute(It.IsAny<int>(), It.IsAny<string[]>(), It.IsAny<int>()));
+				mock.Verify(p => p.Execute(It.IsAny<int>(), It.IsAny<object[]>(), It.IsAny<int>()));
+			}
 
-				public void DoSomething()
-				{
-					int[] ints = new[] { 0, 1, 2 };
+			[Fact]
+			public void TestTypedParamsInEachArgument()
+			{
+				var mock = new Mock<IParams>(MockBehavior.Strict);
+				mock.Setup(p => p.Submit(It.IsAny<string>(), It.IsAny<int>(), It.IsAny<int>()));
 
-					myInterface.DoIt("myString", ints);
-				}
+				mock.Object.Submit("foo", 0, 1);
+
+				mock.Verify(p => p.Submit(It.IsAny<string>(), It.IsAny<int>(), It.IsAny<int>()));
+				mock.Verify(p => p.Submit(It.IsAny<string>(), It.Is<int[]>(a => a.Length == 2)));
+				mock.VerifyAll();
+			}
+
+			[Fact]
+			public void TestParamsWithReturnValue()
+			{
+				var mock = new Mock<IParams>();
+				mock.Setup(x => x.GetValue("Matt")).Returns("SomeString");
+
+				var ret = mock.Object.GetValue("Matt");
+				Assert.Equal("SomeString", ret);
+			}
+
+			public interface IParams
+			{
+				void Submit(string name, params int[] values);
+				void Execute(int value, params object[] values);
+				string GetValue(string name, params object[] args);
 			}
 		}
 

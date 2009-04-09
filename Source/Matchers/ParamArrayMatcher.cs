@@ -49,19 +49,10 @@ namespace Moq
 		private NewArrayExpression arrayInitExpression;
 		private IMatcher[] matchers;
 
-		public void Initialize(Expression arrayInitExpression)
+		internal ParamArrayMatcher(NewArrayExpression matcherExpression)
 		{
-			this.arrayInitExpression = arrayInitExpression as NewArrayExpression;
-
-			if (this.arrayInitExpression == null)
-			{
-				this.matchers = new IMatcher[0];
-			}
-			else
-			{
-				this.matchers = this.arrayInitExpression.Expressions
-					.Select(e => MatcherFactory.CreateMatcher(e)).ToArray();
-			}
+			this.arrayInitExpression = matcherExpression;
+			this.Initialize();
 		}
 
 		public bool Matches(object value)
@@ -81,6 +72,25 @@ namespace Moq
 			}
 
 			return true;
+		}
+
+		void IMatcher.Initialize(Expression matcherExpression)
+		{
+			this.arrayInitExpression = matcherExpression as NewArrayExpression;
+			this.Initialize();
+		}
+
+		private void Initialize()
+		{
+			if (this.arrayInitExpression != null)
+			{
+				this.matchers = this.arrayInitExpression.Expressions
+					.Select(e => MatcherFactory.CreateMatcher(e, false)).ToArray();
+			}
+			else
+			{
+				this.matchers = new IMatcher[0];
+			}
 		}
 	}
 }

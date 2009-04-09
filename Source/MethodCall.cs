@@ -55,7 +55,7 @@ namespace Moq
 	internal class MethodCall<TMock> : MethodCall, ISetup<TMock>
 		where TMock : class
 	{
-		public MethodCall(Mock mock, Expression originalExpression, MethodInfo method, 
+		public MethodCall(Mock mock, Expression originalExpression, MethodInfo method,
 			params Expression[] arguments)
 			: base(mock, originalExpression, method, arguments)
 		{
@@ -153,15 +153,10 @@ namespace Moq
 					else
 						throw new NotSupportedException("Ref expression must evaluate to a constant value.");
 				}
-				else if (parameter.GetCustomAttribute<ParamArrayAttribute>(true) != null)
-				{
-					IMatcher matcher = new ParamArrayMatcher();
-					matcher.Initialize(argument);
-					argumentMatchers.Add(matcher);
-				}
 				else
 				{
-					argumentMatchers.Add(MatcherFactory.CreateMatcher(argument));
+					var isParamArray = parameter.GetCustomAttribute<ParamArrayAttribute>(true) != null;
+					argumentMatchers.Add(MatcherFactory.CreateMatcher(argument, isParamArray));
 				}
 			}
 
@@ -177,7 +172,7 @@ namespace Moq
 			var index = 0;
 
 			// Move 'till our own frame first
-			while (stack.GetFrame(index).GetMethod() != thisMethod 
+			while (stack.GetFrame(index).GetMethod() != thisMethod
 				&& index <= stack.FrameCount)
 			{
 				index++;
@@ -250,21 +245,21 @@ namespace Moq
 
 			if (isOnce && callCount > 1)
 				throw new MockException(MockException.ExceptionReason.MoreThanOneCall,
-					String.Format(CultureInfo.CurrentCulture, 
+					String.Format(CultureInfo.CurrentCulture,
 					Properties.Resources.MoreThanOneCall,
 					call.Format()));
 
 
 			if (IsNever)
 				throw new MockException(MockException.ExceptionReason.SetupNever,
-					String.Format(CultureInfo.CurrentCulture, 
+					String.Format(CultureInfo.CurrentCulture,
 					Properties.Resources.SetupNever,
 					call.Format()));
 
 
 			if (expectedCallCount.HasValue && callCount > expectedCallCount)
 				throw new MockException(MockException.ExceptionReason.MoreThanNCalls,
-					String.Format(CultureInfo.CurrentCulture, 
+					String.Format(CultureInfo.CurrentCulture,
 					Properties.Resources.MoreThanNCalls, expectedCallCount,
 					call.Format()));
 
@@ -363,7 +358,7 @@ namespace Moq
 
 		private static void ThrowParameterMismatch(ParameterInfo[] expected, ParameterInfo[] actual)
 		{
-			throw new ArgumentException(String.Format(CultureInfo.CurrentCulture, 
+			throw new ArgumentException(String.Format(CultureInfo.CurrentCulture,
 				"Invalid callback. Setup on method with parameters ({0}) cannot invoke callback with parameters ({1}).",
 				String.Join(",", expected.Select(p => p.ParameterType.Name).ToArray()),
 				String.Join(",", actual.Select(p => p.ParameterType.Name).ToArray())

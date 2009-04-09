@@ -239,15 +239,11 @@ namespace Moq.Tests
 		{
 			var mock = new Mock<IFoo>();
 
-			try
-			{
-				mock.VerifySet(f => f.Value = 5, "Nobody called .Value");
-			}
-			catch (MockException me)
-			{
-				Assert.True(me.Message.Contains("Nobody called .Value"));
-				Assert.True(me.Message.Contains("f.Value"));
-			}
+			var me = Assert.Throws<MockException>(
+				() => mock.VerifySet(f => f.Value = 5, "Nobody called .Value"));
+
+			Assert.True(me.Message.Contains("Nobody called .Value"));
+			Assert.True(me.Message.Contains("f.Value"));
 		}
 
 		[Fact]
@@ -256,15 +252,11 @@ namespace Moq.Tests
 			var disposable = new Mock<IDisposable>();
 			var mock = disposable.As<IFoo>();
 
-			try
-			{
-				mock.Verify(f => f.Execute("ping"), "Execute should have been invoked with 'ping'");
-			}
-			catch (MockException me)
-			{
-				Assert.True(me.Message.Contains("Execute should have been invoked with 'ping'"));
-				Assert.True(me.Message.Contains("f.Execute(\"ping\")"));
-			}
+			var me = Assert.Throws<MockException>(
+				() => mock.Verify(f => f.Execute("ping"), "Execute should have been invoked with 'ping'"));
+
+			Assert.True(me.Message.Contains("Execute should have been invoked with 'ping'"));
+			Assert.True(me.Message.Contains("f.Execute(\"ping\")"));
 		}
 
 		[Fact]
@@ -273,15 +265,11 @@ namespace Moq.Tests
 			var disposable = new Mock<IDisposable>();
 			var mock = disposable.As<IFoo>();
 
-			try
-			{
-				mock.Verify(f => f.Submit(), "Submit should be invoked");
-			}
-			catch (MockException me)
-			{
-				Assert.True(me.Message.Contains("Submit should be invoked"));
-				Assert.True(me.Message.Contains("f.Submit()"));
-			}
+			var me = Assert.Throws<MockException>(
+				() => mock.Verify(f => f.Submit(), "Submit should be invoked"));
+
+			Assert.True(me.Message.Contains("Submit should be invoked"));
+			Assert.True(me.Message.Contains("f.Submit()"));
 		}
 
 		[Fact]
@@ -290,8 +278,8 @@ namespace Moq.Tests
 			var disposable = new Mock<IDisposable>();
 			var mock = disposable.As<IFoo>();
 
-			MockException me = Assert.Throws<MockException>(() =>
-				mock.VerifyGet(f => f.Value, "Nobody called .Value"));
+			MockException me = Assert.Throws<MockException>(
+				() => mock.VerifyGet(f => f.Value, "Nobody called .Value"));
 			Assert.True(me.Message.Contains("Nobody called .Value"));
 			Assert.True(me.Message.Contains("f.Value"));
 		}
@@ -319,15 +307,11 @@ namespace Moq.Tests
 			var disposable = new Mock<IDisposable>();
 			var mock = disposable.As<IFoo>();
 
-			try
-			{
-				mock.VerifySet(f => f.Value = 5, "Nobody called .Value");
-			}
-			catch (MockException me)
-			{
-				Assert.True(me.Message.Contains("Nobody called .Value"));
-				Assert.True(me.Message.Contains("f.Value"));
-			}
+			var me = Assert.Throws<MockException>(
+				() => mock.VerifySet(f => f.Value = 5, "Nobody called .Value"));
+
+			Assert.True(me.Message.Contains("Nobody called .Value"));
+			Assert.True(me.Message.Contains("f.Value"));
 		}
 
 		[Fact]
@@ -413,7 +397,7 @@ namespace Moq.Tests
 			mock.Object.Value = 2;
 
 			mock.VerifySet(m => m.Value = It.IsAny<int>());
-			mock.VerifySet(m => m.Value = It.IsInRange(1,2, Range.Inclusive));
+			mock.VerifySet(m => m.Value = It.IsInRange(1, 2, Range.Inclusive));
 			mock.VerifySet(m => m.Value = It.Is<int>(i => i % 2 == 0));
 		}
 

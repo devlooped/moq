@@ -26,15 +26,12 @@ namespace Moq.Tests
 		{
 			var mock = new Mock<IFoo>();
 
-			mock.
-				Setup(x => x.Echo(It.Is<int>(value => value < 5 && value > 0))).
-				Returns(1);
-			mock.
-				Setup(x => x.Echo(It.Is<int>(value => value <= 0))).
-				Returns(0);
-			mock.
-				Setup(x => x.Echo(It.Is<int>(value => value >= 5))).
-				Returns(2);
+			mock.Setup(x => x.Echo(It.Is<int>(value => value < 5 && value > 0)))
+				.Returns(1);
+			mock.Setup(x => x.Echo(It.Is<int>(value => value <= 0)))
+				.Returns(0);
+			mock.Setup(x => x.Echo(It.Is<int>(value => value >= 5)))
+				.Returns(2);
 
 			Assert.Equal(1, mock.Object.Echo(3));
 			Assert.Equal(0, mock.Object.Echo(0));
@@ -68,15 +65,8 @@ namespace Moq.Tests
 
 			Assert.Equal(1, mock.Object.Echo(2));
 
-			try
-			{
-				int throwHere = mock.Object.Echo(1);
-				Assert.True(false, "Should have thrown");
-			}
-			catch (MockException mex)
-			{
-				Assert.Equal(MockException.ExceptionReason.NoSetup, mex.Reason);
-			}
+			var mex = Assert.Throws<MockException>(() => mock.Object.Echo(1));
+			Assert.Equal(MockException.ExceptionReason.NoSetup, mex.Reason);
 		}
 
 		[Fact]

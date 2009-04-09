@@ -46,7 +46,7 @@ namespace Moq
 {
 	internal static class MatcherFactory
 	{
-		public static IMatcher CreateMatcher(Expression expression)
+		public static IMatcher CreateMatcher(Expression expression, bool isParamArray)
 		{
 			// Type inference on the call might 
 			// do automatic conversion to the desired 
@@ -56,12 +56,23 @@ namespace Moq
 			// the values are ints, but if the method to call 
 			// expects, say, a double, a Convert node will be on 
 			// the expression.
+			if (isParamArray && (expression.NodeType == ExpressionType.NewArrayInit ||
+				!expression.Type.IsArray))
+			{
+				return new ParamArrayMatcher((NewArrayExpression)expression);
+			}
+
 			if (expression.NodeType == ExpressionType.Convert)
+			{
 				expression = ((UnaryExpression)expression).Operand;
+			}
 
 			// SetupSet passes a custom expression.
-			if (expression is MatchExpression)
-				return new Matcher(((MatchExpression)expression).Match);
+			var matchExpression = expression as MatchExpression;
+			if (matchExpression != null)
+			{
+				return new Matcher(matchExpression.Match);
+			}
 
 			if (expression.NodeType == ExpressionType.Call)
 			{
@@ -121,8 +132,8 @@ namespace Moq
 				return new ConstantMatcher(((ConstantExpression)reduced).Value);
 			}
 
-			throw new NotSupportedException(String.Format(CultureInfo.CurrentCulture, 
-				Properties.Resources.UnsupportedExpression, 
+			throw new NotSupportedException(String.Format(CultureInfo.CurrentCulture,
+				Properties.Resources.UnsupportedExpression,
 				expression));
 		}
 	}
