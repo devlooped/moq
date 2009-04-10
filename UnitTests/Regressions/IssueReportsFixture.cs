@@ -454,10 +454,44 @@ namespace Moq.Tests.Regressions
 				mock.Verify(x => x.SetIt(id));
 			}
 
+			[Fact]
+			public void ImplicitInterface()
+			{
+				var barMock = new Mock<IBar>();
+				var baz = new Baz(barMock.Object);
+				baz.DoBarFoo(new Mock<IFoo>().Object);
+				Assert.Throws<MockException>(() => barMock.Verify(x => x.DoFoo(It.IsAny<Foo>())));
+			}
+
 			public interface IFoo
 			{
 				long Id { get; set; }
 				void SetIt(long it);
+			}
+
+			public class Foo : IFoo
+			{
+				public long Id { get; set; }
+				public void SetIt(long it) { }
+			}
+
+			public interface IBar
+			{
+				void DoFoo(IFoo foo);
+			}
+
+			public class Baz
+			{
+				private readonly IBar _bar;
+				public Baz(IBar bar)
+				{
+					_bar = bar;
+				}
+
+				public void DoBarFoo(IFoo foo)
+				{
+					_bar.DoFoo(foo);
+				}
 			}
 		}
 
