@@ -398,7 +398,7 @@ namespace Moq.Tests.Regressions
 			[Fact]
 			public void TestObjectParamsWithArray()
 			{
-				var mock = new Mock<IParams>(MockBehavior.Strict);
+				var mock = new Mock<IParams>();
 				mock.Setup(p => p.Execute(It.IsAny<int>(), It.IsAny<string[]>(), It.IsAny<int>()));
 
 				mock.Object.Execute(1, new string[] { "0", "1" }, 3);
@@ -436,6 +436,28 @@ namespace Moq.Tests.Regressions
 				void Submit(string name, params int[] values);
 				void Execute(int value, params object[] values);
 				string GetValue(string name, params object[] args);
+			}
+		}
+
+		#endregion
+
+		#region #159
+
+		public class _159
+		{
+			[Fact]
+			public void ImplicitIntToLong()
+			{
+				int id = 1;
+				var mock = new Mock<IFoo>();
+				mock.Object.SetIt(id);
+				mock.Verify(x => x.SetIt(id));
+			}
+
+			public interface IFoo
+			{
+				long Id { get; set; }
+				void SetIt(long it);
 			}
 		}
 

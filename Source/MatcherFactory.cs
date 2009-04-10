@@ -41,12 +41,13 @@
 using System;
 using System.Globalization;
 using System.Linq.Expressions;
+using Moq.Properties;
 
 namespace Moq
 {
 	internal static class MatcherFactory
 	{
-		public static IMatcher CreateMatcher(Expression expression, bool isParamArray)
+		public static IMatcher CreateMatcher(Expression expression, bool isParams)
 		{
 			// Type inference on the call might 
 			// do automatic conversion to the desired 
@@ -56,12 +57,12 @@ namespace Moq
 			// the values are ints, but if the method to call 
 			// expects, say, a double, a Convert node will be on 
 			// the expression.
-			if (isParamArray && (expression.NodeType == ExpressionType.NewArrayInit ||
-				!expression.Type.IsArray))
+			if (isParams && (expression.NodeType == ExpressionType.NewArrayInit || !expression.Type.IsArray))
 			{
 				return new ParamArrayMatcher((NewArrayExpression)expression);
 			}
 
+			var originalExpression = expression;
 			if (expression.NodeType == ExpressionType.Convert)
 			{
 				expression = ((UnaryExpression)expression).Operand;
@@ -113,28 +114,24 @@ namespace Moq
 			}
 			else if (expression.NodeType == ExpressionType.MemberAccess)
 			{
-				var access = (MemberExpression)expression;
-
 				// Try to determine if invocation is to a matcher.
 				using (var context = new FluentMockContext())
 				{
-					Expression.Lambda<Action>(access).Compile().Invoke();
-
+					Expression.Lambda<Action>((MemberExpression)expression).Compile().Invoke();
 					if (context.LastMatch != null)
 						return new Matcher(context.LastMatch);
 				}
 			}
 
 			// Try reducing locals to get a constant.
-			Expression reduced = expression.PartialEval();
+			var reduced = originalExpression.PartialEval();
 			if (reduced.NodeType == ExpressionType.Constant)
 			{
 				return new ConstantMatcher(((ConstantExpression)reduced).Value);
 			}
 
-			throw new NotSupportedException(String.Format(CultureInfo.CurrentCulture,
-				Properties.Resources.UnsupportedExpression,
-				expression));
+			throw new NotSupportedException(
+				string.Format(CultureInfo.CurrentCulture, Resources.UnsupportedExpression, expression));
 		}
 	}
 }

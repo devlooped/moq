@@ -208,21 +208,24 @@ namespace Moq
 
 		public virtual bool Matches(IInvocation call)
 		{
-			var args = new List<object>();
 			var parameters = call.Method.GetParameters();
+			var args = new List<object>();
 			for (int i = 0; i < parameters.Length; i++)
 			{
 				if (!parameters[i].IsOut)
+				{
 					args.Add(call.Arguments[i]);
+				}
 			}
 
-			if (IsEqualMethodOrOverride(call) &&
-				argumentMatchers.Count == args.Count)
+			if (argumentMatchers.Count == args.Count && IsEqualMethodOrOverride(call))
 			{
 				for (int i = 0; i < argumentMatchers.Count; i++)
 				{
 					if (!argumentMatchers[i].Matches(args[i]))
+					{
 						return false;
+					}
 				}
 
 				return true;

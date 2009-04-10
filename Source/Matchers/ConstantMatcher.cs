@@ -41,12 +41,13 @@
 using System;
 using System.Collections;
 using System.Linq.Expressions;
+using System.Globalization;
 
 namespace Moq
 {
 	internal class ConstantMatcher : IMatcher
 	{
-		object constantValue;
+		private object constantValue;
 
 		public ConstantMatcher(object constantValue)
 		{
@@ -62,38 +63,32 @@ namespace Moq
 		{
 			if (constantValue is IEnumerable && value is IEnumerable)
 			{
-				return MatchesEnumerable(value);
+				return this.MatchesEnumerable(value);
 			}
 
-			return Object.Equals(constantValue, value);
+			return object.Equals(constantValue, value);
 		}
 
 		private bool MatchesEnumerable(object value)
 		{
-			IEnumerator constantValueEnumerator = ((IEnumerable)constantValue).GetEnumerator();
-			IEnumerator valueEnumerator = ((IEnumerable)value).GetEnumerator();
+			IEnumerator constValues = ((IEnumerable)constantValue).GetEnumerator();
+			IEnumerator values = ((IEnumerable)value).GetEnumerator();
 
-			while (true)
+			bool constValuesHasNext = constValues.MoveNext();
+			bool valuesHasNext = values.MoveNext();
+
+			while (constValuesHasNext && valuesHasNext)
 			{
-				bool constantValueEnumeratorHasNext = constantValueEnumerator.MoveNext();
-				bool valueEnumeratorHasNext = valueEnumerator.MoveNext();
-
-				if (constantValueEnumeratorHasNext & valueEnumeratorHasNext)
-				{
-					if (!Object.Equals(constantValueEnumerator.Current, valueEnumerator.Current))
-					{
-						return false;
-					}
-				}
-				else if (constantValueEnumeratorHasNext != valueEnumeratorHasNext)
+				if (!object.Equals(constValues.Current, values.Current))
 				{
 					return false;
 				}
-				else
-				{
-					return true;
-				}
+
+				constValuesHasNext = constValues.MoveNext();
+				valuesHasNext = values.MoveNext();
 			}
+
+			return constValuesHasNext == valuesHasNext;
 		}
 	}
 }
