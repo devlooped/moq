@@ -259,7 +259,7 @@ Invocation was performed on the mock more than {3} times: {1}</value>
   </data>
   <data name="NoMatchingCallsAtMostOnce" xml:space="preserve">
     <value>{0}
-Invocation was performed on the mock more than a time: {1}</value>
+Invocation was performed on the mock more than once: {1}</value>
   </data>
   <data name="NoMatchingCallsBetweenInclusive" xml:space="preserve">
     <value>{0}
@@ -271,7 +271,7 @@ Invocation was not performed on the mock {2} times: {1}</value>
   </data>
   <data name="NoMatchingCallsNever" xml:space="preserve">
     <value>{0}
-Invocation was performed on the mock: {1}</value>
+Invocation should not have been performed on the mock: {1}</value>
   </data>
   <data name="NoMatchingCallsBetweenExclusive" xml:space="preserve">
     <value>{0}
