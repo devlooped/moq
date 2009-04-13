@@ -459,8 +459,8 @@ namespace Moq.Tests.Regressions
 			{
 				var barMock = new Mock<IBar>();
 				var baz = new Baz(barMock.Object);
-				baz.DoBarFoo(new Mock<IFoo>().Object);
-				Assert.Throws<MockException>(() => barMock.Verify(x => x.DoFoo(It.IsAny<Foo>())));
+				baz.DoBarFoo(new Foo());
+				barMock.Verify(x => x.DoFoo(It.IsAny<Foo>()));
 			}
 
 			public interface IFoo
