@@ -226,8 +226,8 @@ namespace Moq
 			MethodInfo method = methodCall.Method;
 			Expression[] args = methodCall.Arguments.ToArray();
 
-			var expected = new MethodCall(mock, expression, method, args);
-			VerifyCalls(GetInterceptor(lambda, mock), expected, expression, times, failMessage);
+			var expected = new MethodCall(mock, expression, method, args) { FailMessage = failMessage };
+			VerifyCalls(GetInterceptor(lambda, mock), expected, expression, times);
 		}
 
 		internal static void Verify<T, TResult>(
@@ -248,8 +248,8 @@ namespace Moq
 				MethodInfo method = methodCall.Method;
 				Expression[] args = methodCall.Arguments.ToArray();
 
-				var expected = new MethodCallReturn<T, TResult>(mock, expression, method, args);
-				VerifyCalls(GetInterceptor(lambda, mock), expected, expression, times, failMessage);
+				var expected = new MethodCallReturn<T, TResult>(mock, expression, method, args) { FailMessage = failMessage };
+				VerifyCalls(GetInterceptor(lambda, mock), expected, expression, times);
 			}
 		}
 
@@ -267,8 +267,8 @@ namespace Moq
 				mock,
 				expression,
 				prop.GetGetMethod(),
-				new Expression[0]);
-			VerifyCalls(GetInterceptor(lambda, mock), expected, expression, times, failMessage);
+				new Expression[0]) { FailMessage = failMessage };
+			VerifyCalls(GetInterceptor(lambda, mock), expected, expression, times);
 		}
 
 		internal static void VerifySet<T, TProperty>(
@@ -281,8 +281,8 @@ namespace Moq
 			var lambda = expression.ToLambda();
 			var prop = lambda.ToPropertyInfo();
 
-			var expected = new SetterMethodCall<T, TProperty>(mock, expression, prop.GetSetMethod());
-			VerifyCalls(GetInterceptor(lambda, mock), expected, expression, times, failMessage);
+			var expected = new SetterMethodCall<T, TProperty>(mock, expression, prop.GetSetMethod()) { FailMessage = failMessage };
+			VerifyCalls(GetInterceptor(lambda, mock), expected, expression, times);
 		}
 
 		internal static void VerifySet<T, TProperty>(
@@ -296,8 +296,8 @@ namespace Moq
 			var lambda = expression.ToLambda();
 			var prop = lambda.ToPropertyInfo();
 
-			var expected = new SetterMethodCall<T, TProperty>(mock, expression, prop.GetSetMethod(), value);
-			VerifyCalls(GetInterceptor(lambda, mock), expected, expression, times, failMessage);
+			var expected = new SetterMethodCall<T, TProperty>(mock, expression, prop.GetSetMethod(), value) { FailMessage = failMessage };
+			VerifyCalls(GetInterceptor(lambda, mock), expected, expression, times);
 		}
 
 		internal static void VerifySet<T>(
@@ -314,31 +314,30 @@ namespace Moq
 				{
 					targetInterceptor = m.Interceptor;
 					expression = expr;
-					return new MethodCall<T>(m, expr, method, value);
+					return new MethodCall<T>(m, expr, method, value) { FailMessage = failMessage };
 				});
 
-			VerifyCalls(targetInterceptor, expected, expression, times, failMessage);
+			VerifyCalls(targetInterceptor, expected, expression, times);
 		}
 
 		private static void VerifyCalls(
 			Interceptor targetInterceptor,
 			MethodCall expected,
 			Expression expression,
-			Times times,
-			string failMessage)
+			Times times)
 		{
 			int callCount = targetInterceptor.ActualCalls.Where(i => expected.Matches(i)).Count();
 			if (!times.Verify(callCount))
 			{
-				ThrowVerifyException(expression, times, failMessage);
+				ThrowVerifyException(expected, expression, times);
 			}
 		}
 
-		private static void ThrowVerifyException(Expression expression, Times times, string failMessage)
+		private static void ThrowVerifyException(IProxyCall expected, Expression expression, Times times)
 		{
 			throw new MockException(
 				MockException.ExceptionReason.VerificationFailed,
-				times.GetExceptionMessage(failMessage, expression.ToStringFixed()));
+				times.GetExceptionMessage(expected.FailMessage, expression.ToStringFixed()));
 		}
 
 		#endregion
@@ -500,7 +499,9 @@ namespace Moq
 
 				// No need to call ThrowIfCantOverride as non-overridable would have thrown above already.
 
-				var x = Expression.Parameter(last.Invocation.Method.DeclaringType, "x");
+				var x = Expression.Parameter(last.Invocation.Method.DeclaringType,
+					// Get the variable name as used in the actual delegate :)
+					setterExpression.Method.GetParameters()[0].Name);
 
 				var arguments = last.Invocation.Arguments;
 				var parameters = setter.GetParameters();
@@ -525,21 +526,27 @@ namespace Moq
 				{
 					var matchers = new Expression[arguments.Length];
 					var valueIndex = arguments.Length - 1;
+					var propertyType = setter.GetParameters()[valueIndex].ParameterType;
 
-					var matcherMethod = typeof(Match)
-						.GetMethod("Matcher", BindingFlags.Static | BindingFlags.NonPublic)
-						.MakeGenericMethod(parameters[valueIndex].ParameterType);
-					values[valueIndex] = Expression.Call(matcherMethod);
+					// If the value matcher is not equal to the property 
+					// type (i.e. prop is int?, but you use It.IsAny<int>())
+					// add a cast.
+					if (last.Match.RenderExpression.Type != propertyType)
+						values[valueIndex] = Expression.Convert(last.Match.RenderExpression, propertyType);
+					else
+						values[valueIndex] = last.Match.RenderExpression;
+
 					matchers[valueIndex] = new MatchExpression(last.Match);
 
 					if (arguments.Length == 2)
 					{
+						// TODO: what about multi-index setters?
 						// Add the index value for the property indexer
 						values[0] = GetValueExpression(arguments[0], parameters[0].ParameterType);
-						// No matcher supported now for the index
+						// TODO: No matcher supported now for the index
 						matchers[0] = values[0];
 					}
-
+					
 					var lambda = Expression.Lambda(
 						typeof(Action<>).MakeGenericType(x.Type),
 						Expression.Call(x, last.Invocation.Method, values),
@@ -685,7 +692,7 @@ namespace Moq
 				throw new ArgumentException(
 					String.Format(CultureInfo.CurrentCulture,
 					Properties.Resources.SetupOnNonOverridableMember,
-					setup.ToString()));
+					setup.ToStringFixed()));
 		}
 
 		private static void ThrowIfCantOverride<T1>(MethodBase setter) where T1 : class

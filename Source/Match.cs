@@ -41,6 +41,7 @@
 using System;
 using System.ComponentModel;
 using System.Linq.Expressions;
+using System.Reflection;
 
 namespace Moq
 {
@@ -49,11 +50,14 @@ namespace Moq
 	public abstract class Match
 	{
 		/// <devdoc>
-		/// Provided for the sole purpose of rendering the delegate passed to SetupSet.
+		/// Provided for the sole purpose of rendering the delegate passed to the 
+		/// matcher constructor if no friendly render lambda is provided.
 		/// </devdoc>
 		internal static TValue Matcher<TValue>() { return default(TValue); }
 
 		internal abstract bool Matches(object value);
+
+		internal Expression RenderExpression { get; set; }
 
 		// This would allow custom matchers in SetupSet. Need to document guidelines.
 		//public static void Track<TValue>(MethodBase invocation, params object[] args)
@@ -64,18 +68,36 @@ namespace Moq
 	/// <include file='Match.xdoc' path='docs/doc[@for="Match{T}"]/*'/>
 	public class Match<T> : Match
 	{
-		Predicate<T> condition;
+		static readonly Expression<Func<T>> defaultRender = Expression.Lambda<Func<T>>(
+			Expression.Call(
+				typeof(Match)
+					.GetMethod("Matcher", BindingFlags.Static | BindingFlags.NonPublic)
+					.MakeGenericMethod(typeof(T))));
 
-		private Match(Predicate<T> condition)
+		internal Predicate<T> Condition { get; set; }
+
+		private Match(Predicate<T> condition, Expression<Func<T>> renderExpression)
 		{
-			this.condition = condition;
+			this.Condition = condition;
+			this.RenderExpression = renderExpression.Body;
 			SetLastMatch(this);
 		}
 
-		/// <include file='Match.xdoc' path='docs/doc[@for="Match{T}.Create"]/*'/>
+		private Match(Predicate<T> condition)
+			: this(condition, defaultRender)
+		{
+		}
+
+		/// <include file='Match.xdoc' path='docs/doc[@for="Match{T}.Create(condition)"]/*'/>
 		public static T Create(Predicate<T> condition)
 		{
 			return new Match<T>(condition).Convert();
+		}
+
+		/// <include file='Match.xdoc' path='docs/doc[@for="Match{T}.Create(condition,renderExpression"]/*'/>
+		public static T Create(Predicate<T> condition, Expression<Func<T>> renderExpression)
+		{
+			return new Match<T>(condition, renderExpression).Convert();
 		}
 
 		internal override bool Matches(object value)
@@ -83,7 +105,7 @@ namespace Moq
 			if (value != null && !(value is T))
 				return false;
 
-			return condition((T)value);
+			return this.Condition((T)value);
 		}
 
 		/// <include file='Match.xdoc' path='docs/doc[@for="Match{T}.Convert"]/*'/>

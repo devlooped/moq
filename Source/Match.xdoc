@@ -21,11 +21,15 @@
 		</remarks>
 		<example>
 			Creating a custom matcher is straightforward. You just need to create a method
-			that returns a value from a call to <see cref="Match{T}.Create"/> with your matching condition:
+			that returns a value from a call to <see cref="Match{T}.Create(Predicate{T})"/> with 
+			your matching condition and optional friendly render expression:
 			<code>
 				public Order IsBigOrder()
 				{
-					return Match&lt;Order&gt;.Create(o => o.GrandTotal &gt;= 5000);
+					return Match&lt;Order&gt;.Create(
+						o => o.GrandTotal &gt;= 5000, 
+						/* a friendly expression to render on failures */
+						() => IsBigOrder());
 				}
 			</code>
 			This method can be used in any mock setup invocation:
@@ -58,14 +62,27 @@
 			</code>
 		</example>
 	</doc>
-	<doc for="Match{T}.Create">
+	<doc for="Match{T}.Create(condition)">
 		<summary>
 			Initializes the match with the condition that
 			will be checked in order to match invocation
 			values.
 		</summary>
+		<param name="condition">The condition to match against actual values.</param>
 		<remarks>
 			 <seealso cref="Match{T}"/>
 		</remarks>
 	</doc>
-</docs>
+	<doc for="Match{T}.Create(condition,renderExpression)">
+		<summary>
+			Initializes the match with the condition that
+			will be checked in order to match invocation
+			values.
+		</summary>
+		<param name="condition">The condition to match against actual values.</param>
+		<param name="renderExpression">A lambda representation of the matcher, to be used 
+		when rendering error messages, such as <c>() => It.IsAny&lt;string&lt;()</c>.</param>
+		<remarks>
+			 <seealso cref="Match{T}"/>
+		</remarks>
+	</doc></docs>

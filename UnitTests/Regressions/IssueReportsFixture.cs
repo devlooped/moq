@@ -312,7 +312,7 @@ namespace Moq.Tests.Regressions
 				MockException e = Assert.Throws<MockVerificationException>(() => target.VerifyAll());
 
 				Assert.Contains(
-					"IFoo t => t.Submit(IsAny<String>(), IsAny<String>(), new [] {IsAny<Int32>()})",
+					"IFoo t => t.Submit(It.IsAny<String>(), It.IsAny<String>(), new [] {It.IsAny<Int32>()})",
 					e.Message);
 			}
 

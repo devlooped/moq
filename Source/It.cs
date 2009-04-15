@@ -53,14 +53,16 @@ namespace Moq
 			return Match<TValue>.Create(value =>
 			{
 				return value == null || typeof(TValue).IsAssignableFrom(value.GetType());
-			});
+			}, () => It.IsAny<TValue>());
 		}
 
 		/// <include file='It.xdoc' path='docs/doc[@for="It.Is"]/*'/>
 		[System.Diagnostics.CodeAnalysis.SuppressMessage("Microsoft.Usage", "CA1801:ReviewUnusedParameters", MessageId = "match")]
 		public static TValue Is<TValue>(Expression<Predicate<TValue>> match)
 		{
-			return Match<TValue>.Create(value => match.Compile().Invoke(value));
+			return Match<TValue>.Create(
+				value => match.Compile().Invoke(value), 
+				() => It.Is<TValue>(match));
 		}
 
 		/// <include file='It.xdoc' path='docs/doc[@for="It.IsInRange"]/*'/>
@@ -87,7 +89,8 @@ namespace Moq
 					return value.CompareTo(from) >= 0 &&
 						value.CompareTo(to) <= 0;
 				}
-			});
+			}, 
+			() => It.IsInRange(from, to, rangeKind));
 		}
 
 		/// <include file='It.xdoc' path='docs/doc[@for="It.IsRegex(regex)"]/*'/>
@@ -101,7 +104,8 @@ namespace Moq
 			{
 				// But evaluated every time :)
 				return re.IsMatch(value);
-			});
+			}, 
+			() => It.IsRegex(regex));
 		}
 
 		/// <include file='It.xdoc' path='docs/doc[@for="It.IsRegex(regex,options)"]/*'/>
@@ -116,7 +120,8 @@ namespace Moq
 			{
 				// But evaluated every time :)
 				return re.IsMatch(value);
-			});
+			}, 
+			() => It.IsRegex(regex, options));
 		}
 	}
 }

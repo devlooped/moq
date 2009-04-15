@@ -183,8 +183,8 @@ namespace Moq
 			return Evaluator.PartialEval(expression,
 				e => e.NodeType != ExpressionType.Parameter &&
 					!(e.NodeType == ExpressionType.Call &&
-					((MethodCallExpression)e).Method.GetCustomAttribute<AdvancedMatcherAttribute>(true) != null) && 
-					!(e.NodeType == ExpressionType.Call && ReturnsMatch((MethodCallExpression)e)) 
+					((MethodCallExpression)e).Method.GetCustomAttribute<AdvancedMatcherAttribute>(true) != null) &&
+					!(e.NodeType == ExpressionType.Call && ReturnsMatch((MethodCallExpression)e))
 			);
 		}
 
@@ -220,7 +220,7 @@ namespace Moq
 		{
 			public RemoveMatcherConvertVisitor(Expression expression)
 			{
-				 this.Expression = this.Visit(expression);
+				this.Expression = this.Visit(expression);
 			}
 
 			protected override Expression VisitUnary(UnaryExpression u)
@@ -239,6 +239,15 @@ namespace Moq
 			public Expression Expression { get; private set; }
 		}
 
+		// TODO: this whole class' approach is weak. We 
+		// basically collect all calls in a tree, 
+		// which is a graph, but we collect them on a list.
+		// Then we do sequential matching of the wrong ToString 
+		// and replace with our rendering. Not sure if this 
+		// will work for nested calls, etc. Seems to 
+		// work fine for the typical mock setups and verification 
+		// expressions, but I don't think it's reliable as a 
+		// general purpose solution.
 		internal sealed class ToStringFixVisitor : ExpressionVisitor
 		{
 			private List<MethodCallExpression> calls = new List<MethodCallExpression>();
@@ -248,19 +257,19 @@ namespace Moq
 			{
 				this.Visit(expression);
 
-				string fullString = expression.ToString();
-
+				var fullString = expression.ToString();
+				
 				foreach (var call in calls)
 				{
-					string properCallString = BuildCallExpressionString(call);
-					string improperCallString = call.ToString();
-
-					int index = fullString.IndexOf(improperCallString);
+					var properCallString = BuildCallExpressionString(call);
+					var improperCallString = call.ToString();
+					// We do it this way so that we replace one call 
+					// at a time, as there may be many that match the 
+					// improper rendering (i.e. multiple It.IsAny)
+					var index = fullString.IndexOf(improperCallString);
 					if (index != -1)
-					{
 						fullString = fullString.Substring(0, index) + properCallString +
 									 fullString.Substring(index + improperCallString.Length);
-					}
 				}
 
 				fullString = convertRegex.Replace(fullString, m => m.Groups[1].Value);
@@ -271,7 +280,7 @@ namespace Moq
 			private static string BuildCallExpressionString(MethodCallExpression call)
 			{
 				var builder = new StringBuilder();
-				int startIndex = 0;
+				var startIndex = 0;
 				Expression targetExpr = call.Object;
 
 				if (Attribute.GetCustomAttribute(call.Method, typeof(ExtensionAttribute)) != null)
@@ -284,27 +293,65 @@ namespace Moq
 
 				if (targetExpr != null)
 				{
-					builder.Append(targetExpr.ToString());
-					builder.Append(".");
+					builder.Append(targetExpr.ToStringFixed());
 				}
-
-				builder.Append(call.Method.Name);
-				if (call.Method.IsGenericMethod)
+				else
 				{
-					builder.Append("<");
-					builder.Append(String.Join(", ", 
-						call.Method.GetGenericArguments().Select(t => GetTypeName(t)).ToArray()));
-					builder.Append(">");
+					// Method is static
+					builder.Append(call.Method.DeclaringType.Name);
 				}
 
-				builder.Append("(");
+				if (call.Method.IsSpecialName &&
+					call.Method.Name.StartsWith("get_Item"))
+				{
+					builder
+						.Append("[")
+						.Append(String.Join(", ",
+							call.Arguments.Select(arg => arg.ToString()).ToArray()))
+						.Append("]");
+				}
+				else if (call.Method.IsSpecialName &&
+					call.Method.Name.StartsWith("set_Item"))
+				{
+					builder
+						.Append("[")
+						.Append(String.Join(", ",
+							call.Arguments.TakeWhile(arg => arg != call.Arguments.Last())
+							.Select(arg => arg.ToString()).ToArray()))
+						.Append("]");
 
-				builder.Append(String.Join(", ",
-					(from c in call.Arguments
-					 select c.ToString()).ToArray(),
-					startIndex, call.Arguments.Count - startIndex));
+					builder.Append(" = ");
+					builder.Append(call.Arguments.Last().ToStringFixed());
+				}
+				else if (call.Method.IsSpecialName &&
+					(call.Method.Name.StartsWith("get_") || 
+					call.Method.Name.StartsWith("set_")))
+				{
+					builder.Append(".");
+					builder.Append(call.Method.Name.Substring(4));
+				}
+				else
+				{
+					builder.Append(".");
+					builder.Append(call.Method.Name);
+					
+					if (call.Method.IsGenericMethod)
+					{
+						builder.Append("<");
+						builder.Append(String.Join(", ",
+							call.Method.GetGenericArguments().Select(t => GetTypeName(t)).ToArray()));
+						builder.Append(">");
+					}
 
-				builder.Append(")");
+					builder.Append("(");
+
+					builder.Append(String.Join(", ",
+						(from c in call.Arguments
+						 select c.ToString()).ToArray(),
+						startIndex, call.Arguments.Count - startIndex));
+
+					builder.Append(")");
+				}
 
 				string properCallString = builder.ToString();
 				return properCallString;
@@ -328,11 +375,8 @@ namespace Moq
 
 			protected override Expression VisitMethodCall(MethodCallExpression m)
 			{
-				// We only need to fix generic methods.
-				if (m.Method.IsGenericMethod)
-				{
-					calls.Add(m);
-				}
+				// We fix generic methods but also renderings of property accesses.
+				calls.Add(m);
 
 				return base.VisitMethodCall(m);
 			}

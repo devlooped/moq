@@ -6,16 +6,6 @@ namespace Moq.Tests
 	public class TimesFixture
 	{
 		[Fact]
-		public void AtLeastOnceGetExceptionMessage()
-		{
-			Times target = Times.AtLeastOnce();
-
-			Assert.Equal(
-				"param1\r\nInvocation was not performed on the mock: param2",
-				target.GetExceptionMessage("param1", "param2"));
-		}
-
-		[Fact]
 		public void AtLeastOnceRangesBetweenOneAndMaxValue()
 		{
 			Times target = Times.AtLeastOnce();
@@ -25,16 +15,6 @@ namespace Moq.Tests
 			Assert.True(target.Verify(1));
 			Assert.True(target.Verify(5));
 			Assert.True(target.Verify(int.MaxValue));
-		}
-
-		[Fact]
-		public void AtLeastGetExceptionMessage()
-		{
-			Times target = Times.AtLeast(3);
-
-			Assert.Equal(
-				"param1\r\nInvocation was performed on the mock less than 3 times: param2",
-				target.GetExceptionMessage("param1", "param2"));
 		}
 
 		[Fact]
@@ -57,16 +37,6 @@ namespace Moq.Tests
 		}
 
 		[Fact]
-		public void AtMostOnceGetExceptionMessage()
-		{
-			Times target = Times.AtMostOnce();
-
-			Assert.Equal(
-				"param1\r\nInvocation was performed on the mock more than a time: param2",
-				target.GetExceptionMessage("param1", "param2"));
-		}
-
-		[Fact]
 		public void AtMostOnceRangesBetweenZeroAndOne()
 		{
 			Times target = Times.AtMostOnce();
@@ -76,16 +46,6 @@ namespace Moq.Tests
 			Assert.True(target.Verify(1));
 			Assert.False(target.Verify(5));
 			Assert.False(target.Verify(int.MaxValue));
-		}
-
-		[Fact]
-		public void AtMostGetExceptionMessage()
-		{
-			Times target = Times.AtMost(5);
-
-			Assert.Equal(
-				"param1\r\nInvocation was performed on the mock more than 5 times: param2",
-				target.GetExceptionMessage("param1", "param2"));
 		}
 
 		[Fact]
@@ -106,26 +66,6 @@ namespace Moq.Tests
 			Assert.True(target.Verify(10));
 			Assert.False(target.Verify(11));
 			Assert.False(target.Verify(int.MaxValue));
-		}
-
-		[Fact]
-		public void BetweenInclusiveGetExceptionMessage()
-		{
-			Times target = Times.Between(3, 5, Range.Inclusive);
-
-			Assert.Equal(
-				"param1\r\nInvocation was performed on the mock less than 3 times or more than 5 times: param2",
-				target.GetExceptionMessage("param1", "param2"));
-		}
-
-		[Fact]
-		public void BetweenExclusiveGetExceptionMessage()
-		{
-			Times target = Times.Between(3, 8, Range.Exclusive);
-
-			Assert.Equal(
-				"param1\r\nInvocation was performed on the mock less or equal than 3 times or more or equal than 8 times: param2",
-				target.GetExceptionMessage("param1", "param2"));
 		}
 
 		[Fact]
@@ -187,16 +127,6 @@ namespace Moq.Tests
 		}
 
 		[Fact]
-		public void ExactlyGetExceptionMessage()
-		{
-			Times target = Times.Exactly(6);
-
-			Assert.Equal(
-				"param1\r\nInvocation was not performed on the mock 6 times: param2",
-				target.GetExceptionMessage("param1", "param2"));
-		}
-
-		[Fact]
 		public void ExactlyThrowsIfTimesLessThanZero()
 		{
 			Assert.Throws<ArgumentOutOfRangeException>(() => Times.Exactly(-1));
@@ -217,16 +147,6 @@ namespace Moq.Tests
 		}
 
 		[Fact]
-		public void NeverGetExceptionMessage()
-		{
-			Times target = Times.Never();
-
-			Assert.Equal(
-				"param1\r\nInvocation was performed on the mock: param2",
-				target.GetExceptionMessage("param1", "param2"));
-		}
-
-		[Fact]
 		public void NeverChecksZeroTimes()
 		{
 			Times target = Times.Never();
@@ -235,16 +155,6 @@ namespace Moq.Tests
 			Assert.True(target.Verify(0));
 			Assert.False(target.Verify(1));
 			Assert.False(target.Verify(int.MaxValue));
-		}
-
-		[Fact]
-		public void OnceGetExceptionMessage()
-		{
-			Times target = Times.Once();
-
-			Assert.Equal(
-				"param1\r\nInvocation was not performed on the mock once: param2",
-				target.GetExceptionMessage("param1", "param2"));
 		}
 
 		[Fact]

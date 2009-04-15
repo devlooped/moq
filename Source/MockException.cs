@@ -42,6 +42,7 @@ using System;
 using System.Collections.Generic;
 using System.Diagnostics.CodeAnalysis;
 using System.Globalization;
+using System.Linq;
 using System.Security.Permissions;
 using System.Text;
 using Castle.Core.Interceptor;
@@ -179,32 +180,35 @@ namespace Moq
 
 		private static string GetRawSetups(List<IProxyCall> failedSetups)
 		{
-			var message = new StringBuilder();
-			foreach (var setup in failedSetups)
-			{
-				if (setup.FailMessage != null)
-				{
-					message.Append(setup.FailMessage).Append(": ");
-				}
+			return failedSetups.Aggregate("", 
+					(s, call) => s + call.ToString() + Environment.NewLine);
 
-				var lambda = setup.SetupExpression.PartialMatcherAwareEval().ToLambda();
-				var targetTypeName = lambda.Parameters[0].Type.Name;
+			//var message = new StringBuilder();
+			//foreach (var setup in failedSetups)
+			//{
+			//   if (setup.FailMessage != null)
+			//   {
+			//      message.Append(setup.FailMessage).Append(": ");
+			//   }
 
-				message.Append(targetTypeName).Append(" ").Append(lambda.ToStringFixed());
+			//   var lambda = setup.SetupExpression.PartialMatcherAwareEval().ToLambda();
+			//   var targetTypeName = lambda.Parameters[0].Type.Name;
 
-				if (setup.TestMethod != null)
-				{
-					message.AppendFormat(
-						" ({0}() in {1}: line {2})",
-						setup.TestMethod.Name,
-						setup.FileName,
-						setup.FileLine);
-				}
+			//   message.Append(targetTypeName).Append(" ").Append(lambda.ToStringFixed());
 
-				message.AppendLine();
-			}
+			//   if (setup.TestMethod != null)
+			//   {
+			//      message.AppendFormat(
+			//         " ({0}() in {1}: line {2})",
+			//         setup.TestMethod.Name,
+			//         setup.FileName,
+			//         setup.FileLine);
+			//   }
 
-			return message.ToString();
+			//   message.AppendLine();
+			//}
+
+			//return message.ToString();
 		}
 
 		internal string GetRawSetups()

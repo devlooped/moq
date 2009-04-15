@@ -82,7 +82,7 @@ namespace Moq.Tests
 			catch (MockException mex)
 			{
 				Assert.Equal(MockException.ExceptionReason.VerificationFailed, mex.Reason);
-				Assert.True(mex.Message.Contains(@".Execute(Is<String>(s => IsNullOrEmpty(s)))"), "Contains evaluated expected argument.");
+				Assert.Contains(@".Execute(It.Is<String>(s => String.IsNullOrEmpty(s)))", mex.Message);
 			}
 		}
 
@@ -242,8 +242,8 @@ namespace Moq.Tests
 			var me = Assert.Throws<MockException>(
 				() => mock.VerifySet(f => f.Value = 5, "Nobody called .Value"));
 
-			Assert.True(me.Message.Contains("Nobody called .Value"));
-			Assert.True(me.Message.Contains("f.Value"));
+			Assert.Contains("Nobody called .Value", me.Message);
+			Assert.Contains("f.Value", me.Message);
 		}
 
 		[Fact]
@@ -288,7 +288,7 @@ namespace Moq.Tests
 		public void AsInterfaceVerifiesPropertySetWithExpressionAndMessage()
 		{
 			var disposable = new Mock<IDisposable>();
-			var mock = disposable.As<IFoo>();
+			var mock = disposable.As<IBar>();
 
 			try
 			{
@@ -305,7 +305,7 @@ namespace Moq.Tests
 		public void AsInterfaceVerifiesPropertySetValueWithExpressionAndMessage()
 		{
 			var disposable = new Mock<IDisposable>();
-			var mock = disposable.As<IFoo>();
+			var mock = disposable.As<IBar>();
 
 			var me = Assert.Throws<MockException>(
 				() => mock.VerifySet(f => f.Value = 5, "Nobody called .Value"));
@@ -390,9 +390,7 @@ namespace Moq.Tests
 				mock.VerifySet(m => m.Value = It.IsAny<int>());
 				Assert.False(true, "Should have failed");
 			}
-			catch (MockException me)
-			{
-			}
+			catch { }
 
 			mock.Object.Value = 2;
 
@@ -902,6 +900,11 @@ namespace Moq.Tests
 			Assert.Equal(MockException.ExceptionReason.VerificationFailed, mex.Reason);
 		}
 #endif
+
+		public interface IBar
+		{
+			int? Value { get; set; }
+		}
 
 		public interface IFoo
 		{

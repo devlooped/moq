@@ -62,7 +62,7 @@ namespace Moq
 		public bool HasReturnValue { get; protected set; }
 	}
 
-	internal sealed class MethodCallReturn<TMock, TResult> : MethodCallReturn, IProxyCall, ISetup<TMock, TResult>, ISetupGetter<TMock, TResult>, IReturnsResult<TMock>
+	internal sealed class MethodCallReturn<TMock, TResult> : MethodCallReturn, ISetup<TMock, TResult>, ISetupGetter<TMock, TResult>, IReturnsResult<TMock>
 		where TMock : class
 	{
 		Delegate valueDel = (Func<TResult>)(() => default(TResult));

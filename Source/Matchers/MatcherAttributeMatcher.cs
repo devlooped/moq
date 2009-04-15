@@ -123,7 +123,7 @@ namespace Moq.Matchers
 					"public {0}bool {1}({2}) in class {3}.",
 					call.Method.IsStatic ? "static " : String.Empty,
 					call.Method.Name,
-					String.Join(", ", expectedParametersTypes.Select(x => x.ToString()).ToArray()),
+					String.Join(", ", expectedParametersTypes.Select(x => x.Name).ToArray()),
 					call.Method.DeclaringType.ToString()));
 			}
 			return method;

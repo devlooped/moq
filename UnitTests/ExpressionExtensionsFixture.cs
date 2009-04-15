@@ -16,6 +16,26 @@ namespace Moq.Tests
 		}
 
 		[Fact]
+		public void PrefixesStaticMethodWithClass()
+		{
+			Expression<Action> expr = () => DoStatic(5);
+
+			var value = expr.ToStringFixed();
+
+			Assert.Contains("ExpressionExtensionsFixture.DoStatic(5)", value);
+		}
+
+		[Fact]
+		public void PrefixesStaticGenericMethodWithClass()
+		{
+			Expression<Action> expr = () => DoStaticGeneric(5);
+
+			var value = expr.ToStringFixed();
+
+			Assert.Contains("ExpressionExtensionsFixture.DoStaticGeneric<Int32>(5)", value);
+		}
+
+		[Fact]
 		public void ToLambdaThrowsIfNullExpression()
 		{
 			Assert.Throws<ArgumentNullException>(() => ExpressionExtensions.ToLambda(null));
@@ -115,6 +135,9 @@ namespace Moq.Tests
 		}
 
 		private void Do<T>(T value) { }
+
+		private static void DoStatic(int value) { }
+		private static void DoStaticGeneric<T>(T value) { }
 
 		public interface IFoo
 		{

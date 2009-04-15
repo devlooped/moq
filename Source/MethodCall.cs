@@ -49,6 +49,7 @@ using System.Reflection;
 using Castle.Core.Interceptor;
 using Moq.Language;
 using Moq.Language.Flow;
+using System.Text;
 
 namespace Moq
 {
@@ -250,21 +251,21 @@ namespace Moq
 				throw new MockException(MockException.ExceptionReason.MoreThanOneCall,
 					String.Format(CultureInfo.CurrentCulture,
 					Properties.Resources.MoreThanOneCall,
-					call.Format()));
+					SetupExpression.ToStringFixed()));
 
 
 			if (IsNever)
 				throw new MockException(MockException.ExceptionReason.SetupNever,
 					String.Format(CultureInfo.CurrentCulture,
 					Properties.Resources.SetupNever,
-					call.Format()));
+					SetupExpression.ToStringFixed()));
 
 
 			if (expectedCallCount.HasValue && callCount > expectedCallCount)
 				throw new MockException(MockException.ExceptionReason.MoreThanNCalls,
 					String.Format(CultureInfo.CurrentCulture,
 					Properties.Resources.MoreThanNCalls, expectedCallCount,
-					call.Format()));
+					SetupExpression.ToStringFixed()));
 
 
 			if (mockEvent != null)
@@ -449,6 +450,32 @@ namespace Moq
 			mockEventArgsParams = args;
 
 			return this;
+		}
+
+		public override string ToString()
+		{
+			var message = new StringBuilder();
+			
+			if (FailMessage != null)
+			{
+				message.Append(FailMessage).Append(": ");
+			}
+
+			var lambda = SetupExpression.PartialMatcherAwareEval().ToLambda();
+			var targetTypeName = lambda.Parameters[0].Type.Name;
+
+			message.Append(targetTypeName).Append(" ").Append(lambda.ToStringFixed());
+
+			if (TestMethod != null && FileName != null && FileLine != 0)
+			{
+				message.AppendFormat(
+					" ({0}() in {1}: line {2})",
+					TestMethod.Name,
+					FileName,
+					FileLine);
+			}
+
+			return message.ToString().Trim();
 		}
 	}
 }
