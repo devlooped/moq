@@ -273,7 +273,7 @@ namespace Moq.Properties {
         
         /// <summary>
         ///   Looks up a localized string similar to {0}
-        ///Invocation was not performed on the mock once: {1}.
+        ///Invocation was performed more than once on the mock: {1}.
         /// </summary>
         internal static string NoMatchingCallsOnce {
             get {

@@ -249,24 +249,15 @@ namespace Moq
 
 			if (isOnce && callCount > 1)
 				throw new MockException(MockException.ExceptionReason.MoreThanOneCall,
-					String.Format(CultureInfo.CurrentCulture,
-					Properties.Resources.MoreThanOneCall,
-					SetupExpression.ToStringFixed()));
-
+					Times.Once().GetExceptionMessage(FailMessage, SetupExpression.ToStringFixed()));
 
 			if (IsNever)
 				throw new MockException(MockException.ExceptionReason.SetupNever,
-					String.Format(CultureInfo.CurrentCulture,
-					Properties.Resources.SetupNever,
-					SetupExpression.ToStringFixed()));
-
+					Times.Never().GetExceptionMessage(FailMessage, SetupExpression.ToStringFixed()));
 
 			if (expectedCallCount.HasValue && callCount > expectedCallCount)
 				throw new MockException(MockException.ExceptionReason.MoreThanNCalls,
-					String.Format(CultureInfo.CurrentCulture,
-					Properties.Resources.MoreThanNCalls, expectedCallCount,
-					SetupExpression.ToStringFixed()));
-
+					Times.AtMost(expectedCallCount.Value).GetExceptionMessage(FailMessage, SetupExpression.ToStringFixed()));
 
 			if (mockEvent != null)
 			{

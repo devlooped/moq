@@ -2,6 +2,7 @@
 using System.Collections.Generic;
 using System.Linq;
 using System.ServiceModel;
+using Moq.Protected;
 #if !SILVERLIGHT
 using System.ServiceModel.Web;
 #endif
@@ -522,6 +523,157 @@ namespace Moq.Tests.Regressions
 
 				Assert.Equal(MembershipCreateStatus.Invalid, provider.Object.CreateUser("", "", ""));
 			}
+		}
+
+		#endregion
+
+		#region #160
+
+		public class _160
+		{
+			[Fact]
+			public void ShouldMockHtmlControl()
+			{
+				// CallBase was missing
+				var htmlInputTextMock = new Mock<System.Web.UI.HtmlControls.HtmlInputText>() { CallBase = true };
+				Assert.True(htmlInputTextMock.Object.Visible);
+			}
+		}
+
+		#endregion
+
+		#region 153
+
+		public class _153
+		{
+			public struct SomeClass<T> // Struct just to avoid having to implement Equals/GetHashCode
+			{
+				public static implicit operator SomeClass<T>(T t)
+				{
+					return new SomeClass<T>();
+				}
+
+				public static SomeClass<T> From(T t)
+				{
+					return t;
+				}
+			}
+
+			public interface IIfc
+			{
+				int Get(SomeClass<string> id);
+			}
+
+			public class ImplicitConversionProblem
+			{
+				[Fact]
+				public void ImplicitSetupVerifyAll_Fails()
+				{
+					const string s = "XYZ";
+					var mock = new Mock<IIfc>();
+					mock.Setup(ifc => ifc.Get(s)).Returns(17);
+
+					var result = mock.Object.Get(s);
+
+					mock.VerifyAll(); // MockVerificationException here
+					Assert.Equal(17, result);
+				}
+
+				[Fact]
+				public void ExplicitSetupVerifyAll_Works()
+				{
+					const string s = "XYZ";
+					var mock = new Mock<IIfc>();
+					mock.Setup(ifc => ifc.Get(SomeClass<string>.From(s))).Returns(17);
+
+					var result = mock.Object.Get(s);
+
+					mock.VerifyAll();
+					Assert.Equal(17, result);
+				}
+
+				[Fact]
+				public void ExplicitSetupImplicitVerification_Fails()
+				{
+					const string s = "XYZ";
+					var mock = new Mock<IIfc>();
+					mock.Setup(ifc => ifc.Get(SomeClass<string>.From(s))).Returns(17);
+
+					var result = mock.Object.Get(s);
+
+					// Here the problem can be seen even in the exception message:
+					// Invocation was not performed on the mock: ifc => ifc.Get("XYZ")
+					// -----------------------------------------------------------^
+					mock.Verify(ifc => ifc.Get(s));
+					Assert.Equal(17, result);
+				}
+
+				[Fact]
+				public void ImplicitSetupExplicitVerification_Fails()
+				{
+					const string s = "XYZ";
+					var mock = new Mock<IIfc>();
+					mock.Setup(ifc => ifc.Get(s)).Returns(17);
+
+					var result = mock.Object.Get(s);
+
+					// This verification passes oddly enough
+					mock.Verify(ifc => ifc.Get(SomeClass<string>.From(s)));
+
+					// This assert fails, indicating that the setup was not used
+					Assert.Equal(17, result);
+				}
+			}
+		}
+
+		#endregion
+
+		#region #146
+
+		public class _146
+		{
+			public interface IFoo
+			{
+				bool Property { get; set; }
+				string StringProperty { get; set; }
+			}
+
+			[Fact]
+			public void StrictMockPropertySet()
+			{
+				var mock = new Mock<IFoo>(MockBehavior.Strict);
+				
+				mock.SetupSet(v => v.Property = false);
+
+				Assert.Throws<MockException>(() => mock.VerifySet(v => v.Property = false));
+
+				mock.Object.Property = false;
+
+				mock.VerifySet(v => v.Property = false);
+			}
+		}
+
+		#endregion
+
+		#region #158
+
+		public class _158
+		{
+			public class Foo
+			{
+				public virtual void Boo() { Bar(); Bar(); }
+				protected virtual void Bar() { }
+			}
+
+			[Fact]
+			public void ShouldRenderCustomMessage()
+			{
+				var foo = new Mock<Foo> { CallBase = true };
+				foo.Protected().Setup("Bar").AtMostOnce().Verifiable("Hello");
+
+				Assert.Throws<MockException>("Hello", () => foo.Object.Boo());
+			}
+
 		}
 
 		#endregion

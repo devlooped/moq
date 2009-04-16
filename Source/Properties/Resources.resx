@@ -279,6 +279,6 @@ Invocation was performed on the mock less or equal than {2} times or more or equ
   </data>
   <data name="NoMatchingCallsOnce" xml:space="preserve">
     <value>{0}
-Invocation was not performed on the mock once: {1}</value>
+Invocation was performed more than once on the mock: {1}</value>
   </data>
 </root>
