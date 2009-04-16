@@ -678,6 +678,74 @@ namespace Moq.Tests.Regressions
 
 		#endregion
 
+		#region #161
+
+		public class _161
+		{
+			[Fact]
+			public void InvertEqualObjects()
+			{
+				var foo1 = new Foo { Id = "1" };
+				var foo = new Foo { Id = "2" };
+
+				var dependency = new Mock<IDependency>();
+
+				dependency.Setup(x => x.DoThis(foo, foo1))
+				  .Returns(new Foo());
+
+				var f = dependency.Object.DoThis(foo, foo1);
+
+				dependency.Verify(x => x.DoThis(foo, foo1));
+				dependency.Verify(x => x.DoThis(foo1, foo), Times.Never());
+			}
+
+			[Fact(Skip="Wrong Equals implemention in the report. Won't Fix")]
+			public void ExampleFailingTest()
+			{
+				var foo1 = new Foo();
+				var foo = new Foo();
+
+
+				var sut = new Perfectly_fine_yet_failing_test();
+				var dependency = new Mock<IDependency>();
+
+				dependency.Setup(x => x.DoThis(foo, foo1))
+				  .Returns(new Foo());
+
+				sut.Do(dependency.Object, foo, foo1);
+
+				dependency.Verify(x => x.DoThis(foo, foo1));
+				dependency.Verify(x => x.DoThis(foo1, foo), Times.Never());
+			}
+
+			public class Perfectly_fine_yet_failing_test
+			{
+				public void Do(IDependency dependency, Foo foo, Foo foo1)
+				{
+					var foo2 = dependency.DoThis(foo, foo1);
+					if (foo2 == null)
+						foo2 = dependency.DoThis(foo1, foo);
+				}
+			}
+
+			public interface IDependency
+			{
+				Foo DoThis(Foo foo, Foo foo1);
+			}
+
+			public class Foo
+			{
+				public string Id { get; set; }
+
+				public override bool Equals(object obj)
+				{
+					return obj is Foo && ((Foo)obj).Id == Id;
+				}
+			}
+		}
+
+		#endregion
+
 #if !SILVERLIGHT
 
 		#region #138
