@@ -497,6 +497,35 @@ namespace Moq.Tests.Regressions
 
 		#endregion
 
+		#region #152
+
+		public class _152
+		{
+			public enum MembershipCreateStatus { Created, Duplicated, Invalid }
+			public interface IMembershipService
+			{
+				int MinPasswordLength { get; }
+				bool ValidateUser(string userName, string password);
+				MembershipCreateStatus CreateUser(string userName, string password, string email);
+				bool ChangePassword(string userName, string oldPassword, string newPassword);
+			}
+
+			[Fact]
+			public void ShouldReturnEnum()
+			{
+				var provider = new Mock<IMembershipService>();
+
+				// For some reason, this particular lambda doesn't let me specify
+				// a method return value for the method even though it returns a 
+				// MembershipCreateStatus enum
+				provider.Setup(p => p.CreateUser(string.Empty, string.Empty, string.Empty)).Returns(MembershipCreateStatus.Invalid);
+
+				Assert.Equal(MembershipCreateStatus.Invalid, provider.Object.CreateUser("", "", ""));
+			}
+		}
+
+		#endregion
+
 #if !SILVERLIGHT
 
 		#region #138
