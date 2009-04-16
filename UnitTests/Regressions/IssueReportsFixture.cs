@@ -527,21 +527,6 @@ namespace Moq.Tests.Regressions
 
 		#endregion
 
-		#region #160
-
-		public class _160
-		{
-			[Fact]
-			public void ShouldMockHtmlControl()
-			{
-				// CallBase was missing
-				var htmlInputTextMock = new Mock<System.Web.UI.HtmlControls.HtmlInputText>() { CallBase = true };
-				Assert.True(htmlInputTextMock.Object.Visible);
-			}
-		}
-
-		#endregion
-
 		#region 153
 
 		public class _153
@@ -747,6 +732,21 @@ namespace Moq.Tests.Regressions
 		#endregion
 
 #if !SILVERLIGHT
+
+		#region #160
+
+		public class _160
+		{
+			[Fact]
+			public void ShouldMockHtmlControl()
+			{
+				// CallBase was missing
+				var htmlInputTextMock = new Mock<System.Web.UI.HtmlControls.HtmlInputText>() { CallBase = true };
+				Assert.True(htmlInputTextMock.Object.Visible);
+			}
+		}
+
+		#endregion
 
 		#region #138
 
