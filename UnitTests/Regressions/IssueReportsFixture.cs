@@ -373,13 +373,34 @@ namespace Moq.Tests.Regressions
 		public class _111
 		{
 			[Fact]
+			public void TestTypedParamsWithNoParams()
+			{
+				var mock = new Mock<IParams>(MockBehavior.Strict);
+				mock.Setup(p => p.Submit(It.IsAny<string>(), It.IsAny<int[]>()));
+
+				mock.Object.Submit("foo");
+
+				mock.VerifyAll();
+			}
+
+			[Fact]
 			public void TestTypedParams()
 			{
 				var mock = new Mock<IParams>(MockBehavior.Strict);
 				mock.Setup(p => p.Submit(It.IsAny<string>(), It.IsAny<int[]>()));
 
 				mock.Object.Submit("foo", 0, 1, 2);
-				mock.Object.Submit("foo");
+
+				mock.VerifyAll();
+			}
+
+			[Fact]
+			public void TestObjectParamsWithoutParams()
+			{
+				var mock = new Mock<IParams>(MockBehavior.Strict);
+				mock.Setup(p => p.Execute(It.IsAny<int>(), It.IsAny<object[]>()));
+
+				mock.Object.Execute(1);
 
 				mock.VerifyAll();
 			}
@@ -391,9 +412,21 @@ namespace Moq.Tests.Regressions
 				mock.Setup(p => p.Execute(It.IsAny<int>(), It.IsAny<object[]>()));
 
 				mock.Object.Execute(1, "0", "1", "2");
-				mock.Object.Execute(1);
 
 				mock.VerifyAll();
+			}
+
+			[Fact]
+			public void TestObjectParamsWithExpectedValues()
+			{
+				var mock = new Mock<IParams>(MockBehavior.Strict);
+				mock.Setup(p => p.Execute(5, "foo", "bar"));
+
+				Assert.Throws<MockException>(() => mock.Object.Execute(5, "bar", "foo"));
+
+				mock.Object.Execute(5, "foo", "bar");
+
+				mock.Verify(p => p.Execute(5, "foo", "bar"));
 			}
 
 			[Fact]
