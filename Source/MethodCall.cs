@@ -248,16 +248,19 @@ namespace Moq
 			callCount++;
 
 			if (isOnce && callCount > 1)
-				throw new MockException(MockException.ExceptionReason.MoreThanOneCall,
-					Times.Once().GetExceptionMessage(FailMessage, SetupExpression.ToStringFixed()));
+				throw new MockException(
+					MockException.ExceptionReason.MoreThanOneCall,
+					Times.Once().GetExceptionMessage(FailMessage, SetupExpression.ToStringFixed(), callCount));
 
 			if (IsNever)
-				throw new MockException(MockException.ExceptionReason.SetupNever,
-					Times.Never().GetExceptionMessage(FailMessage, SetupExpression.ToStringFixed()));
+				throw new MockException(
+					MockException.ExceptionReason.SetupNever,
+					Times.Never().GetExceptionMessage(FailMessage, SetupExpression.ToStringFixed(), callCount));
 
 			if (expectedCallCount.HasValue && callCount > expectedCallCount)
-				throw new MockException(MockException.ExceptionReason.MoreThanNCalls,
-					Times.AtMost(expectedCallCount.Value).GetExceptionMessage(FailMessage, SetupExpression.ToStringFixed()));
+				throw new MockException(
+					MockException.ExceptionReason.MoreThanNCalls,
+					Times.AtMost(expectedCallCount.Value).GetExceptionMessage(FailMessage, SetupExpression.ToStringFixed(), callCount));
 
 			if (mockEvent != null)
 			{
@@ -446,7 +449,7 @@ namespace Moq
 		public override string ToString()
 		{
 			var message = new StringBuilder();
-			
+
 			if (FailMessage != null)
 			{
 				message.Append(FailMessage).Append(": ");

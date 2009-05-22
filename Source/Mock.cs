@@ -329,15 +329,19 @@ namespace Moq
 			int callCount = targetInterceptor.ActualCalls.Where(i => expected.Matches(i)).Count();
 			if (!times.Verify(callCount))
 			{
-				ThrowVerifyException(expected, expression, times);
+				ThrowVerifyException(expected, expression, times, callCount);
 			}
 		}
 
-		private static void ThrowVerifyException(IProxyCall expected, Expression expression, Times times)
+		private static void ThrowVerifyException(
+			IProxyCall expected,
+			Expression expression,
+			Times times,
+			int callCount)
 		{
 			throw new MockException(
 				MockException.ExceptionReason.VerificationFailed,
-				times.GetExceptionMessage(expected.FailMessage, expression.ToStringFixed()));
+				times.GetExceptionMessage(expected.FailMessage, expression.ToStringFixed(), callCount));
 		}
 
 		#endregion

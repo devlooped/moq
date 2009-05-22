@@ -167,7 +167,7 @@ namespace Moq
 			return new Times(c => c == 1, 1, 1, Resources.NoMatchingCallsOnce);
 		}
 
-		internal string GetExceptionMessage(string failMessage, string expression)
+		internal string GetExceptionMessage(string failMessage, string expression, int callCount)
 		{
 			return string.Format(
 				CultureInfo.CurrentCulture,
@@ -175,7 +175,8 @@ namespace Moq
 				failMessage,
 				expression,
 				this.from,
-				this.to);
+				this.to,
+				callCount);
 		}
 
 		internal bool Verify(int callCount)

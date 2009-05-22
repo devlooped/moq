@@ -206,7 +206,7 @@ mock.SetupSet(x =&gt; x.{1}).Callback(callbackDelegate);</value>
   </data>
   <data name="NoMatchingCallsAtLeastOnce" xml:space="preserve">
     <value>{0}
-Invocation was not performed on the mock: {1}</value>
+Expected invocation on the mock at least once, but was never performed: {1}</value>
   </data>
   <data name="AlreadyInitialized" xml:space="preserve">
     <value>Mock type has already been initialized by accessing its Object property. Adding interfaces must be done before that.</value>
@@ -251,34 +251,34 @@ Remember that there's no generics covariance in the CLR, so your object must be 
   </data>
   <data name="NoMatchingCallsAtLeast" xml:space="preserve">
     <value>{0}
-Invocation was performed on the mock less than {2} times: {1}</value>
+Expected invocation on the mock at least {2} times, but was {4} times: {1}</value>
   </data>
   <data name="NoMatchingCallsAtMost" xml:space="preserve">
     <value>{0}
-Invocation was performed on the mock more than {3} times: {1}</value>
+Expected invocation on the mock at most {3} times, but was {4} times: {1}</value>
   </data>
   <data name="NoMatchingCallsAtMostOnce" xml:space="preserve">
     <value>{0}
-Invocation was performed on the mock more than once: {1}</value>
+Expected invocation on the mock at most once, but was {4} times: {1}</value>
   </data>
   <data name="NoMatchingCallsBetweenInclusive" xml:space="preserve">
     <value>{0}
-Invocation was performed on the mock less than {2} times or more than {3} times: {1}</value>
+Expected invocation on the mock between {2} and {3} times (Inclusive), but was {4} times: {1}</value>
   </data>
   <data name="NoMatchingCallsExactly" xml:space="preserve">
     <value>{0}
-Invocation was not performed on the mock {2} times: {1}</value>
+Expected invocation on the mock exactly {2} times, but was {4} times: {1}</value>
   </data>
   <data name="NoMatchingCallsNever" xml:space="preserve">
     <value>{0}
-Invocation should not have been performed on the mock: {1}</value>
+Expected invocation on the mock should never have been performed, but was {4} times: {1}</value>
   </data>
   <data name="NoMatchingCallsBetweenExclusive" xml:space="preserve">
     <value>{0}
-Invocation was performed on the mock less or equal than {2} times or more or equal than {3} times: {1}</value>
+Expected invocation on the mock between {2} and {3} times (Exclusive), but was {4} times: {1}</value>
   </data>
   <data name="NoMatchingCallsOnce" xml:space="preserve">
     <value>{0}
-Invocation was performed more than once on the mock: {1}</value>
+Expected invocation on the mock once, but was {4} times: {1}</value>
   </data>
 </root>
