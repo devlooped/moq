@@ -42,6 +42,8 @@ using System;
 using System.Collections;
 using System.Linq.Expressions;
 using System.Globalization;
+using System.Linq;
+using System.Collections.Generic;
 
 namespace Moq
 {
@@ -61,34 +63,24 @@ namespace Moq
 
 		public bool Matches(object value)
 		{
+			if (object.Equals(constantValue, value))
+			{
+				return true;
+			}
+
 			if (constantValue is IEnumerable && value is IEnumerable)
 			{
 				return this.MatchesEnumerable(value);
 			}
 
-			return object.Equals(constantValue, value);
+			return false;
 		}
 
 		private bool MatchesEnumerable(object value)
 		{
-			IEnumerator constValues = ((IEnumerable)constantValue).GetEnumerator();
-			IEnumerator values = ((IEnumerable)value).GetEnumerator();
-
-			bool constValuesHasNext = constValues.MoveNext();
-			bool valuesHasNext = values.MoveNext();
-
-			while (constValuesHasNext && valuesHasNext)
-			{
-				if (!object.Equals(constValues.Current, values.Current))
-				{
-					return false;
-				}
-
-				constValuesHasNext = constValues.MoveNext();
-				valuesHasNext = values.MoveNext();
-			}
-
-			return constValuesHasNext == valuesHasNext;
+			IEnumerable constValues = (IEnumerable)constantValue;
+			IEnumerable values = (IEnumerable)value;
+			return constValues.Cast<object>().SequenceEqual(values.Cast<object>());
 		}
 	}
 }

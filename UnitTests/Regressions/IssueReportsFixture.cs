@@ -7,6 +7,7 @@ using Moq.Protected;
 using System.ServiceModel.Web;
 #endif
 using Xunit;
+using System.Collections;
 
 namespace Moq.Tests.Regressions
 {
@@ -660,7 +661,7 @@ namespace Moq.Tests.Regressions
 			public void StrictMockPropertySet()
 			{
 				var mock = new Mock<IFoo>(MockBehavior.Strict);
-				
+
 				mock.SetupSet(v => v.Property = false);
 
 				Assert.Throws<MockException>(() => mock.VerifySet(v => v.Property = false));
@@ -717,7 +718,7 @@ namespace Moq.Tests.Regressions
 				dependency.Verify(x => x.DoThis(foo1, foo), Times.Never());
 			}
 
-			[Fact(Skip="Wrong Equals implemention in the report. Won't Fix")]
+			[Fact(Skip = "Wrong Equals implemention in the report. Won't Fix")]
 			public void ExampleFailingTest()
 			{
 				var foo1 = new Foo();
@@ -804,6 +805,33 @@ namespace Moq.Tests.Regressions
 				var superFoo = superFooMock.Object;
 				superFoo.Bar = "Bar";
 				Assert.Equal("Bar", superFoo.Bar);
+			}
+		}
+
+		#endregion
+
+		#region #174
+
+		public class _174
+		{
+			[Fact]
+			public void Test()
+			{
+				var serviceNo1Mock = new Mock<IServiceNo1>();
+				var collaboratorMock = new Mock<ISomeCollaborator>();
+
+				collaboratorMock.Object.Collaborate(serviceNo1Mock.Object);
+
+				collaboratorMock.Verify(o => o.Collaborate(serviceNo1Mock.Object));
+			}
+
+			public interface ISomeCollaborator
+			{
+				void Collaborate(IServiceNo1 serviceNo1);
+			}
+
+			public interface IServiceNo1 : IEnumerable
+			{
 			}
 		}
 
