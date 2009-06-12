@@ -91,11 +91,7 @@ namespace Moq.Proxy
 			}
 		}
 
-#if SILVERLIGHT
 		private class Interceptor : IInterceptor
-#else
-		private class Interceptor : MarshalByRefObject, IInterceptor
-#endif
 		{
 			private ICallInterceptor interceptor;
 
@@ -115,7 +111,7 @@ namespace Moq.Proxy
 		{
 			private IInvocation invocation;
 
-			public CallContext(IInvocation invocation)
+			internal CallContext(IInvocation invocation)
 			{
 				this.invocation = invocation;
 			}
@@ -130,25 +126,25 @@ namespace Moq.Proxy
 				get { return this.invocation.Method; }
 			}
 
-			public void Proceed()
-			{
-				this.invocation.Proceed();
-			}
-
 			public object ReturnValue
 			{
 				get { return this.invocation.ReturnValue; }
 				set { this.invocation.ReturnValue = value; }
 			}
 
-			public void SetArgumentValue(int index, object value)
-			{
-				this.invocation.SetArgumentValue(index, value);
-			}
-
 			public Type TargetType
 			{
 				get { return this.invocation.TargetType; }
+			}
+
+			public void InvokeBase()
+			{
+				this.invocation.Proceed();
+			}
+
+			public void SetArgumentValue(int index, object value)
+			{
+				this.invocation.SetArgumentValue(index, value);
 			}
 		}
 	}

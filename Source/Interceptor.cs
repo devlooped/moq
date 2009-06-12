@@ -231,7 +231,7 @@ namespace Moq
 			else if (invocation.Method.DeclaringType == typeof(object))
 			{
 				// Invoke underlying implementation.
-				invocation.Proceed();
+				invocation.InvokeBase();
 			}
 			else if (invocation.TargetType.IsClass &&
 			  !invocation.Method.IsAbstract
@@ -241,7 +241,7 @@ namespace Moq
 				// invoke directly.
 				// Will only get here for Loose behavior.
 				// TODO: we may want to provide a way to skip this by the user.
-				invocation.Proceed();
+				invocation.InvokeBase();
 			}
 			else if (invocation.Method != null && invocation.Method.ReturnType != null &&
 			  invocation.Method.ReturnType != typeof(void))

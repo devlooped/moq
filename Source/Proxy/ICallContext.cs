@@ -55,7 +55,7 @@ namespace Moq.Proxy
 		Type TargetType { get; }
 
 		// TODO analyze delete
-		void Proceed();
+		void InvokeBase();
 
 		void SetArgumentValue(int index, object value);
 	}
