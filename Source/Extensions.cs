@@ -39,10 +39,11 @@
 // http://www.opensource.org/licenses/bsd-license.php]
 
 using System;
+using System.Diagnostics.CodeAnalysis;
 using System.Globalization;
 using System.Linq;
 using System.Reflection;
-using Castle.Core.Interceptor;
+using Moq.Proxy;
 
 namespace Moq
 {
@@ -66,8 +67,8 @@ namespace Moq
 			}
 		}
 
-		[System.Diagnostics.CodeAnalysis.SuppressMessage("Microsoft.Performance", "CA1800:DoNotCastUnnecessarily", Justification="The linq expression is way more readable this way.")]
-		public static string Format(this IInvocation invocation)
+		[SuppressMessage("Microsoft.Performance", "CA1800:DoNotCastUnnecessarily", Justification="The linq expression is way more readable this way.")]
+		public static string Format(this ICallContext invocation)
 		{
 			// Special-case for getters && setters
 			if (invocation.Method.IsSpecialName)

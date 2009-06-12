@@ -41,9 +41,9 @@
 using System;
 using System.Linq.Expressions;
 using System.Reflection;
-using Castle.Core.Interceptor;
 using Moq.Language;
 using Moq.Language.Flow;
+using Moq.Proxy;
 
 namespace Moq
 {
@@ -211,7 +211,7 @@ namespace Moq
 				base.SetCallbackWithArguments(callback);
 		}
 
-		public override void Execute(IInvocation call)
+		public override void Execute(ICallContext call)
 		{
 			base.Execute(call);
 

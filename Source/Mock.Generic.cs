@@ -40,24 +40,20 @@
 
 using System;
 using System.Collections.Generic;
-using System.Diagnostics;
 using System.Diagnostics.CodeAnalysis;
-using System.Linq;
 using System.Linq.Expressions;
 using System.Reflection;
-using Castle.Core.Interceptor;
-using Castle.DynamicProxy;
 using Moq.Language.Flow;
+using Moq.Proxy;
 
 namespace Moq
 {
 	/// <include file='Mock.Generic.xdoc' path='docs/doc[@for="Mock{T}"]/*'/>
-	public partial class Mock<T> : Mock
-		where T : class
+	public partial class Mock<T> : Mock where T : class
 	{
-		static readonly ProxyGenerator generator = new ProxyGenerator();
-		T instance;
-		object[] constructorArguments;
+		private static IProxyFactory proxyFactory = new CastleProxyFactory();
+		private T instance;
+		private object[] constructorArguments;
 
 		#region Ctors
 
@@ -110,17 +106,18 @@ namespace Moq
 		#region Properties
 
 		/// <include file='Mock.Generic.xdoc' path='docs/doc[@for="Mock{T}.Object"]/*'/>
-		[System.Diagnostics.CodeAnalysis.SuppressMessage("Microsoft.Naming", "CA1716:IdentifiersShouldNotMatchKeywords", MessageId = "Object", Justification = "Exposes the mocked object instance, so it's appropriate.")]
-		[System.Diagnostics.CodeAnalysis.SuppressMessage("Microsoft.Naming", "CA1721:PropertyNamesShouldNotMatchGetMethods", Justification = "The public Object property is the only one visible to Moq consumers. The protected member is for internal use only.")]
+		[SuppressMessage("Microsoft.Naming", "CA1716:IdentifiersShouldNotMatchKeywords", MessageId = "Object", Justification = "Exposes the mocked object instance, so it's appropriate.")]
+		[SuppressMessage("Microsoft.Naming", "CA1721:PropertyNamesShouldNotMatchGetMethods", Justification = "The public Object property is the only one visible to Moq consumers. The protected member is for internal use only.")]
 		public virtual new T Object
 		{
 			get
 			{
 				if (this.instance == null)
 				{
-					InitializeInstance();
+					this.InitializeInstance();
 				}
-				return instance;
+
+				return this.instance;
 			}
 		}
 
@@ -128,55 +125,26 @@ namespace Moq
 		{
 			PexProtector.Invoke(() =>
 			{
-				var mockType = typeof(T);
-
-				try
-				{
-					if (mockType.IsInterface)
-					{
-						instance
-							= (T)generator.CreateInterfaceProxyWithoutTarget(mockType, base.ImplementedInterfaces.ToArray(), Interceptor);
-					}
-					else
-					{
-						try
-						{
-							if (constructorArguments.Length > 0)
-							{
-								var generatedType = generator.ProxyBuilder.CreateClassProxy(mockType, base.ImplementedInterfaces.ToArray(), new ProxyGenerationOptions());
-								instance
-									= (T)Activator.CreateInstance(generatedType,
-										new object[] { new IInterceptor[] { Interceptor } }.Concat(constructorArguments).ToArray());
-							}
-							else
-							{
-								instance = (T)generator.CreateClassProxy(mockType, base.ImplementedInterfaces.ToArray(), Interceptor);
-							}
-						}
-						catch (TypeLoadException tle)
-						{
-							throw new ArgumentException(Properties.Resources.InvalidMockClass, tle);
-						}
-					}
-
-				}
-				catch (MissingMethodException mme)
-				{
-					throw new ArgumentException(Properties.Resources.ConstructorNotFound, mme);
-				}
+				this.instance = proxyFactory.CreateProxy<T>(
+					this.Interceptor,
+					this.ImplementedInterfaces.ToArray(),
+					this.constructorArguments);
 			});
 		}
 
 		/// <summary>
 		/// Returns the mocked object value.
 		/// </summary>
-		[System.Diagnostics.CodeAnalysis.SuppressMessage("Microsoft.Design", "CA1024:UsePropertiesWhereAppropriate", Justification = "This is actually the protected virtual implementation of the property Object.")]
+		[SuppressMessage("Microsoft.Design", "CA1024:UsePropertiesWhereAppropriate", Justification = "This is actually the protected virtual implementation of the property Object.")]
 		protected override object GetObject()
 		{
 			return Object;
 		}
 
-		internal override Type MockedType { get { return typeof(T); } }
+		internal override Type MockedType
+		{
+			get { return typeof(T); }
+		}
 
 		#endregion
 

@@ -41,7 +41,6 @@
 using System;
 using System.Collections.Generic;
 using System.ComponentModel;
-using System.Diagnostics;
 using System.Diagnostics.CodeAnalysis;
 using System.Globalization;
 using System.Linq;
@@ -54,7 +53,7 @@ namespace Moq
 	/// <include file='Mock.xdoc' path='docs/doc[@for="Mock"]/*'/>
 	public abstract partial class Mock : IHideObjectMembers
 	{
-		bool callBase = false;
+		private bool callBase;
 		DefaultValue defaultValue = DefaultValue.Empty;
 		IDefaultValueProvider defaultValueProvider = new EmptyDefaultValueProvider();
 		List<Type> implementedInterfaces = new List<Type>();
@@ -62,8 +61,7 @@ namespace Moq
 		Dictionary<EventInfo, List<Delegate>> invocationLists = new Dictionary<EventInfo, List<Delegate>>();
 
 		/// <include file='Mock.xdoc' path='docs/doc[@for="Mock.Get"]/*'/>
-		public static Mock<T> Get<T>(T mocked)
-			where T : class
+		public static Mock<T> Get<T>(T mocked) where T : class
 		{
 			var mockedOfT = mocked as IMocked<T>;
 			var mockedPlain = mocked as IMocked;
@@ -119,6 +117,7 @@ namespace Moq
 		}
 
 		internal virtual Interceptor Interceptor { get; set; }
+
 		internal virtual Dictionary<MethodInfo, Mock> InnerMocks { get { return innerMocks; } set { innerMocks = value; } }
 
 		/// <include file='Mock.xdoc' path='docs/doc[@for="Mock.Behavior"]/*'/>
@@ -491,12 +490,12 @@ namespace Moq
 
 				if (last == null)
 					throw new ArgumentException(String.Format(
-						CultureInfo.InvariantCulture, 
+						CultureInfo.InvariantCulture,
 						Properties.Resources.SetupOnNonOverridableMember,
 						""));
 
 				var setter = last.Invocation.Method;
-				if (!setter.IsSpecialName || !setter.Name.StartsWith("set_"))
+				if (!setter.IsSpecialName || !setter.Name.StartsWith("set_", StringComparison.Ordinal))
 				{
 					throw new ArgumentException(Resources.SetupNotSetter);
 				}
@@ -550,7 +549,7 @@ namespace Moq
 						// TODO: No matcher supported now for the index
 						matchers[0] = values[0];
 					}
-					
+
 					var lambda = Expression.Lambda(
 						typeof(Action<>).MakeGenericType(x.Type),
 						Expression.Call(x, last.Invocation.Method, values),

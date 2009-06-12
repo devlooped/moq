@@ -44,8 +44,8 @@ using System.Diagnostics.CodeAnalysis;
 using System.Globalization;
 using System.Linq;
 using System.Security.Permissions;
-using System.Text;
-using Castle.Core.Interceptor;
+using Moq.Properties;
+using Moq.Proxy;
 
 namespace Moq
 {
@@ -87,17 +87,17 @@ namespace Moq
 			SetupNever,
 		}
 
-		ExceptionReason reason;
+		private ExceptionReason reason;
 
 		internal MockException(ExceptionReason reason, MockBehavior behavior,
-			IInvocation invocation)
+			ICallContext invocation)
 			: this(reason, behavior, invocation,
 				Properties.Resources.ResourceManager.GetString(reason.ToString()))
 		{
 		}
 
 		internal MockException(ExceptionReason reason, MockBehavior behavior,
-			IInvocation invocation, string message)
+			ICallContext invocation, string message)
 			: base(GetMessage(behavior, invocation, message))
 		{
 			this.reason = reason;
@@ -114,11 +114,14 @@ namespace Moq
 			get { return reason; }
 		}
 
-		private static string GetMessage(MockBehavior behavior,
-			IInvocation invocation, string message)
+		private static string GetMessage(
+			MockBehavior behavior,
+			ICallContext invocation,
+			string message)
 		{
-			return String.Format(CultureInfo.CurrentCulture,
-				Properties.Resources.MockExceptionMessage,
+			return string.Format(
+				CultureInfo.CurrentCulture,
+				Resources.MockExceptionMessage,
 				invocation.Format(),
 				behavior,
 				message

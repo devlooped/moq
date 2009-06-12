@@ -180,22 +180,24 @@ namespace Moq
 
 		public static Expression PartialMatcherAwareEval(this Expression expression)
 		{
-			return Evaluator.PartialEval(expression,
+			return Evaluator.PartialEval(
+				expression,
 				e => e.NodeType != ExpressionType.Parameter &&
-					!(e.NodeType == ExpressionType.Call &&
-					((MethodCallExpression)e).Method.GetCustomAttribute<AdvancedMatcherAttribute>(true) != null) &&
-					!(e.NodeType == ExpressionType.Call && ReturnsMatch((MethodCallExpression)e))
-			);
+					(e.NodeType != ExpressionType.Call || !ReturnsMatch((MethodCallExpression)e)));
 		}
 
 		private static bool ReturnsMatch(MethodCallExpression expression)
 		{
-			using (var context = new FluentMockContext())
+			if (expression.Method.GetCustomAttribute<AdvancedMatcherAttribute>(true) == null)
 			{
-				Expression.Lambda<Action>(expression).Compile().Invoke();
-
-				return context.LastMatch != null;
+				using (var context = new FluentMockContext())
+				{
+					Expression.Lambda<Action>(expression).Compile().Invoke();
+					return context.LastMatch != null;
+				}
 			}
+
+			return true;
 		}
 
 		/// <summary>
@@ -258,7 +260,7 @@ namespace Moq
 				this.Visit(expression);
 
 				var fullString = expression.ToString();
-				
+
 				foreach (var call in calls)
 				{
 					var properCallString = BuildCallExpressionString(call);
@@ -266,7 +268,7 @@ namespace Moq
 					// We do it this way so that we replace one call 
 					// at a time, as there may be many that match the 
 					// improper rendering (i.e. multiple It.IsAny)
-					var index = fullString.IndexOf(improperCallString);
+					var index = fullString.IndexOf(improperCallString, StringComparison.Ordinal);
 					if (index != -1)
 						fullString = fullString.Substring(0, index) + properCallString +
 									 fullString.Substring(index + improperCallString.Length);
@@ -302,7 +304,7 @@ namespace Moq
 				}
 
 				if (call.Method.IsSpecialName &&
-					call.Method.Name.StartsWith("get_Item"))
+					call.Method.Name.StartsWith("get_Item", StringComparison.Ordinal))
 				{
 					builder
 						.Append("[")
@@ -311,7 +313,7 @@ namespace Moq
 						.Append("]");
 				}
 				else if (call.Method.IsSpecialName &&
-					call.Method.Name.StartsWith("set_Item"))
+					call.Method.Name.StartsWith("set_Item", StringComparison.Ordinal))
 				{
 					builder
 						.Append("[")
@@ -324,8 +326,8 @@ namespace Moq
 					builder.Append(call.Arguments.Last().ToStringFixed());
 				}
 				else if (call.Method.IsSpecialName &&
-					(call.Method.Name.StartsWith("get_") || 
-					call.Method.Name.StartsWith("set_")))
+					(call.Method.Name.StartsWith("get_", StringComparison.Ordinal) ||
+					call.Method.Name.StartsWith("set_", StringComparison.Ordinal)))
 				{
 					builder.Append(".");
 					builder.Append(call.Method.Name.Substring(4));
@@ -334,7 +336,7 @@ namespace Moq
 				{
 					builder.Append(".");
 					builder.Append(call.Method.Name);
-					
+
 					if (call.Method.IsGenericMethod)
 					{
 						builder.Append("<");

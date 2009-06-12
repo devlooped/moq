@@ -46,10 +46,10 @@ using System.IO;
 using System.Linq;
 using System.Linq.Expressions;
 using System.Reflection;
-using Castle.Core.Interceptor;
+using System.Text;
 using Moq.Language;
 using Moq.Language.Flow;
-using System.Text;
+using Moq.Proxy;
 
 namespace Moq
 {
@@ -181,7 +181,7 @@ namespace Moq
 
 			// Move 'till we're at the entry point 
 			// into Moq API
-			while (stack.GetFrame(index).GetMethod().DeclaringType.Namespace.StartsWith("Moq")
+			while (stack.GetFrame(index).GetMethod().DeclaringType.Namespace.StartsWith("Moq", StringComparison.Ordinal)
 				&& index <= stack.FrameCount)
 			{
 				index++;
@@ -197,7 +197,7 @@ namespace Moq
 #endif
 		}
 
-		public void SetOutParameters(IInvocation call)
+		public void SetOutParameters(ICallContext call)
 		{
 			foreach (var item in outValues)
 			{
@@ -207,7 +207,7 @@ namespace Moq
 			}
 		}
 
-		public virtual bool Matches(IInvocation call)
+		public virtual bool Matches(ICallContext call)
 		{
 			var parameters = call.Method.GetParameters();
 			var args = new List<object>();
@@ -235,7 +235,7 @@ namespace Moq
 			return false;
 		}
 
-		public virtual void Execute(IInvocation call)
+		public virtual void Execute(ICallContext call)
 		{
 			Invoked = true;
 
@@ -374,7 +374,7 @@ namespace Moq
 			FailMessage = failMessage;
 		}
 
-		private bool IsEqualMethodOrOverride(IInvocation call)
+		private bool IsEqualMethodOrOverride(ICallContext call)
 		{
 			if (call.Method == method)
 				return true;

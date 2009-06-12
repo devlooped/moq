@@ -41,7 +41,7 @@
 using System;
 using System.Collections.Generic;
 using System.Linq;
-using Castle.Core.Interceptor;
+using Moq.Proxy;
 
 namespace Moq
 {
@@ -70,7 +70,7 @@ namespace Moq
 			current = this;
 		}
 
-		public void Add(Mock mock, IInvocation invocation)
+		public void Add(Mock mock, ICallContext invocation)
 		{
 			invocations.Add(new MockInvocation(mock, invocation, LastMatch));
 		}
@@ -90,9 +90,9 @@ namespace Moq
 
 		internal class MockInvocation : IDisposable
 		{
-			DefaultValue defaultValue;
+			private DefaultValue defaultValue;
 
-			public MockInvocation(Mock mock, IInvocation invocation, Match matcher)
+			public MockInvocation(Mock mock, ICallContext invocation, Match matcher)
 			{
 				this.Mock = mock;
 				this.Invocation = invocation;
@@ -103,7 +103,9 @@ namespace Moq
 			}
 
 			public Mock Mock { get; private set; }
-			public IInvocation Invocation { get; private set; }
+
+			public ICallContext Invocation { get; private set; }
+			
 			public Match Match { get; private set; }
 
 			public void Dispose()

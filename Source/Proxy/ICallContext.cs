@@ -38,26 +38,25 @@
 //[This is the BSD license, see
 // http://www.opensource.org/licenses/bsd-license.php]
 
-using System.Linq.Expressions;
+using System;
 using System.Reflection;
-using Moq.Proxy;
 
-namespace Moq
+namespace Moq.Proxy
 {
-	internal interface IProxyCall
+	internal interface ICallContext
 	{
-		bool Matches(ICallContext call);
-		void Execute(ICallContext call);
-		void SetOutParameters(ICallContext call);
-		bool IsVerifiable { get; set; }
-		string FailMessage { get; set; }
-		bool IsNever { get; set; }
-		bool Invoked { get; set; }
-		Expression SetupExpression { get; }
+		object[] Arguments { get; }
 
-		// Where the setup was performed.
-		string FileName { get; }
-		int FileLine { get; }
-		MethodBase TestMethod { get; }
+		MethodInfo Method { get; }
+
+		object ReturnValue { get; set; }
+
+		// TODO analyze delete
+		Type TargetType { get; }
+
+		// TODO analyze delete
+		void Proceed();
+
+		void SetArgumentValue(int index, object value);
 	}
 }

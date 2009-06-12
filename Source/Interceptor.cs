@@ -43,7 +43,7 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Linq.Expressions;
 using System.Reflection;
-using Castle.Core.Interceptor;
+using Moq.Proxy;
 
 namespace Moq
 {
@@ -51,17 +51,13 @@ namespace Moq
 	/// Implements the actual interception and method invocation for 
 	/// all mocks.
 	/// </summary>
-#if SILVERLIGHT
-	internal class Interceptor : IInterceptor
-#else
-	internal class Interceptor : MarshalByRefObject, IInterceptor
-#endif
+	internal class Interceptor : ICallInterceptor
 	{
 		private MockBehavior behavior;
 		private Type targetType;
 		private Dictionary<ExpressionKey, IProxyCall> calls = new Dictionary<ExpressionKey, IProxyCall>();
 		private List<IProxyCall> orderedCalls = new List<IProxyCall>();
-		private List<IInvocation> actualInvocations = new List<IInvocation>();
+		private List<ICallContext> actualInvocations = new List<ICallContext>();
 
 		public Interceptor(MockBehavior behavior, Type targetType, Mock mock)
 		{
@@ -70,7 +66,11 @@ namespace Moq
 			this.Mock = mock;
 		}
 
-		internal IEnumerable<IInvocation> ActualCalls { get { return actualInvocations; } }
+		internal IEnumerable<ICallContext> ActualCalls
+		{
+			get { return actualInvocations; }
+		}
+
 		internal Mock Mock { get; private set; }
 
 		internal void Verify()
@@ -126,7 +126,7 @@ namespace Moq
 			//    calls[expr.ToStringFixed()] = call;
 		}
 
-		public void Intercept(IInvocation invocation)
+		public void Intercept(ICallContext invocation)
 		{
 			// Track current invocation if we're in "record" mode in a fluent invocation context.
 			if (FluentMockContext.IsActive)
@@ -205,7 +205,7 @@ namespace Moq
 			if (!FluentMockContext.IsActive)
 				actualInvocations.Add(invocation);
 
-			var call = FluentMockContext.IsActive ? (IProxyCall) null : orderedCalls.LastOrDefault(c => c.Matches(invocation));
+			var call = FluentMockContext.IsActive ? (IProxyCall)null : orderedCalls.LastOrDefault(c => c.Matches(invocation));
 
 			if (call == null && !FluentMockContext.IsActive)
 			{
@@ -260,13 +260,13 @@ namespace Moq
 			}
 		}
 
-		private static bool IsEventAttach(IInvocation invocation)
+		private static bool IsEventAttach(ICallContext invocation)
 		{
 			return invocation.Method.IsSpecialName &&
 					  invocation.Method.Name.StartsWith("add_", StringComparison.Ordinal);
 		}
 
-		private static bool IsEventDetach(IInvocation invocation)
+		private static bool IsEventDetach(ICallContext invocation)
 		{
 			return invocation.Method.IsSpecialName &&
 						invocation.Method.Name.StartsWith("remove_", StringComparison.Ordinal);
@@ -299,22 +299,18 @@ namespace Moq
 		/// Given a type return all of its ancestors, both types and interfaces.
 		/// </summary>
 		/// <param name="initialType">The type to find immediate ancestors of</param>
-		private IEnumerable<Type> GetAncestorTypes(Type initialType)
+		private static IEnumerable<Type> GetAncestorTypes(Type initialType)
 		{
 			Type baseType = initialType.BaseType;
 			if (baseType != null)
-				yield return baseType;
-#if SILVERLIGHT
-			foreach (var implementedInterface in Castle.DynamicProxy.SilverlightExtensions.Extensions.FindInterfaces(initialType, new TypeFilter((foo, bar) => true), null))
-#else
-			foreach (var implementedInterface in initialType.FindInterfaces(new TypeFilter((foo, bar) => true), null))
-#endif
 			{
-				yield return implementedInterface;
+				return new Type[] { baseType };
 			}
+
+			return initialType.GetInterfaces();
 		}
 
-		private void ThrowIfReturnValueRequired(IProxyCall call, IInvocation invocation)
+		private void ThrowIfReturnValueRequired(IProxyCall call, ICallContext invocation)
 		{
 			if (behavior != MockBehavior.Loose &&
 				invocation.Method != null &&

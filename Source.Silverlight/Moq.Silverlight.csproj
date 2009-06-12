@@ -273,6 +273,18 @@
       <DesignTime>True</DesignTime>
       <DependentUpon>Resources.resx</DependentUpon>
     </Compile>
+    <Compile Include="..\Source\Proxy\CastleProxyFactory.cs">
+      <Link>Poxy\CastleProxyFactory.cs</Link>
+    </Compile>
+    <Compile Include="..\Source\Proxy\ICallContext.cs">
+      <Link>Poxy\ICallContext.cs</Link>
+    </Compile>
+    <Compile Include="..\Source\Proxy\ICallInterceptor.cs">
+      <Link>Poxy\ICallInterceptor.cs</Link>
+    </Compile>
+    <Compile Include="..\Source\Proxy\IProxyFactory.cs">
+      <Link>Poxy\IProxyFactory.cs</Link>
+    </Compile>
     <Compile Include="..\Source\Range.cs">
       <Link>Range.cs</Link>
     </Compile>

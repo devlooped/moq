@@ -74,6 +74,7 @@
     <Reference Include="System.Core">
       <RequiredTargetFramework>3.5</RequiredTargetFramework>
     </Reference>
+    <Reference Include="System.Data" />
     <Reference Include="System.Xml" />
   </ItemGroup>
   <ItemGroup>
@@ -165,6 +166,10 @@
     <Compile Include="MockedEvent.Generic.cs" />
     <Compile Include="MockExtensions.cs" />
     <Compile Include="PexProtector.cs" />
+    <Compile Include="Proxy\ICallContext.cs" />
+    <Compile Include="Proxy\CastleProxyFactory.cs" />
+    <Compile Include="Proxy\ICallInterceptor.cs" />
+    <Compile Include="Proxy\IProxyFactory.cs" />
     <Compile Include="SetterMethodCall.cs" />
     <Compile Include="Sub\StubExtensions.cs" />
     <Compile Include="Times.cs" />
