@@ -118,7 +118,11 @@ namespace Moq
 
 		internal virtual Interceptor Interceptor { get; set; }
 
-		internal virtual Dictionary<MethodInfo, Mock> InnerMocks { get { return innerMocks; } set { innerMocks = value; } }
+		internal virtual Dictionary<MethodInfo, Mock> InnerMocks
+		{
+			get { return this.innerMocks; }
+			set { this.innerMocks = value; }
+		}
 
 		/// <include file='Mock.xdoc' path='docs/doc[@for="Mock.Behavior"]/*'/>
 		public virtual MockBehavior Behavior { get; internal set; }
@@ -161,12 +165,18 @@ namespace Moq
 		/// have no setups and need to return a default 
 		/// value (for loose mocks).
 		/// </summary>
-		internal IDefaultValueProvider DefaultValueProvider { get { return defaultValueProvider; } }
+		internal IDefaultValueProvider DefaultValueProvider
+		{
+			get { return this.defaultValueProvider; }
+		}
 
 		/// <summary>
 		/// Exposes the list of extra interfaces implemented by the mock.
 		/// </summary>
-		internal List<Type> ImplementedInterfaces { get { return implementedInterfaces; } }
+		internal List<Type> ImplementedInterfaces
+		{
+			get { return this.implementedInterfaces; }
+		}
 
 		#region Verify
 
@@ -598,7 +608,9 @@ namespace Moq
 						object initialValue = mock.DefaultValueProvider.ProvideDefault(property.GetGetMethod(), new object[0]);
 						var mocked = initialValue as IMocked;
 						if (mocked != null)
+						{
 							SetupAllProperties(mocked.Mock);
+						}
 
 						var closure = Activator.CreateInstance(
 								typeof(ValueClosure<>).MakeGenericType(property.PropertyType), initialValue);
@@ -646,9 +658,7 @@ namespace Moq
 		private static Expression GetPropertyExpression(Type mockType, PropertyInfo property)
 		{
 			var param = Expression.Parameter(mockType, "m");
-			return Expression.Lambda(
-					Expression.MakeMemberAccess(param, property),
-					param);
+			return Expression.Lambda(Expression.MakeMemberAccess(param, property), param);
 		}
 
 		/// <summary>
@@ -662,13 +672,14 @@ namespace Moq
 			return target.Interceptor;
 		}
 
-		[System.Diagnostics.CodeAnalysis.SuppressMessage("Microsoft.Usage", "CA2208:InstantiateArgumentExceptionsCorrectly", Justification = "This is a helper method for the one receiving the expression.")]
+		[SuppressMessage("Microsoft.Usage", "CA2208:InstantiateArgumentExceptionsCorrectly", Justification = "This is a helper method for the one receiving the expression.")]
 		private static void ThrowIfPropertyNotWritable(PropertyInfo prop)
 		{
 			if (!prop.CanWrite)
 			{
-				throw new ArgumentException(String.Format(CultureInfo.CurrentCulture,
-					Properties.Resources.PropertyNotWritable,
+				throw new ArgumentException(string.Format(
+					CultureInfo.CurrentCulture,
+					Resources.PropertyNotWritable,
 					prop.DeclaringType.Name,
 					prop.Name), "expression");
 			}
@@ -682,8 +693,9 @@ namespace Moq
 			// expression tree manually?
 			if (!prop.CanRead)
 			{
-				throw new ArgumentException(String.Format(CultureInfo.CurrentCulture,
-					Properties.Resources.PropertyNotReadable,
+				throw new ArgumentException(string.Format(
+					CultureInfo.CurrentCulture,
+					Resources.PropertyNotReadable,
 					prop.DeclaringType.Name,
 					prop.Name));
 			}
@@ -692,19 +704,23 @@ namespace Moq
 		private static void ThrowIfCantOverride(Expression setup, MethodInfo methodInfo)
 		{
 			if (CantOverride(methodInfo))
-				throw new ArgumentException(
-					String.Format(CultureInfo.CurrentCulture,
-					Properties.Resources.SetupOnNonOverridableMember,
+			{
+				throw new ArgumentException(string.Format(
+					CultureInfo.CurrentCulture,
+					Resources.SetupOnNonOverridableMember,
 					setup.ToStringFixed()));
+			}
 		}
 
-		private static void ThrowIfCantOverride<T1>(MethodBase setter) where T1 : class
+		private static void ThrowIfCantOverride<T>(MethodBase setter) where T : class
 		{
 			if (CantOverride(setter))
-				throw new ArgumentException(
-					String.Format(CultureInfo.CurrentCulture,
-					Properties.Resources.SetupOnNonOverridableMember,
-					typeof(T1).Name + "." + setter.Name.Substring(4)));
+			{
+				throw new ArgumentException(string.Format(
+					CultureInfo.CurrentCulture,
+					Resources.SetupOnNonOverridableMember,
+					typeof(T).Name + "." + setter.Name.Substring(4)));
+			}
 		}
 
 		private static bool CantOverride(MethodBase method)
@@ -712,11 +728,12 @@ namespace Moq
 			return !method.IsVirtual || method.IsFinal || method.IsPrivate;
 		}
 
-		class AutoMockPropertiesVisitor : ExpressionVisitor
+		private class AutoMockPropertiesVisitor : ExpressionVisitor
 		{
-			Mock ownerMock;
-			List<PropertyInfo> properties = new List<PropertyInfo>();
-			bool first = true;
+			private static readonly MethodInfo setupGetMethod = typeof(Mock).GetMethod("SetupGet", BindingFlags.Static | BindingFlags.NonPublic | BindingFlags.InvokeMethod);
+			private Mock ownerMock;
+			private List<PropertyInfo> properties = new List<PropertyInfo>();
+			private bool first = true;
 
 			public AutoMockPropertiesVisitor(Mock ownerMock)
 			{
@@ -725,15 +742,14 @@ namespace Moq
 
 			public Mock SetupMocks(Expression expression)
 			{
-				var withoutLast = Visit(expression);
-				var targetMock = ownerMock;
-				var props = properties.AsEnumerable();
+				this.Visit(expression);
+				var targetMock = this.ownerMock;
 
-				foreach (var prop in props.Reverse())
+				foreach (var prop in properties.AsEnumerable().Reverse())
 				{
 					Mock mock;
 					var propGet = prop.GetGetMethod();
-					if (!ownerMock.InnerMocks.TryGetValue(propGet, out mock))
+					if (!targetMock.InnerMocks.TryGetValue(propGet, out mock))
 					{
 						// TODO: this may throw TargetInvocationException, 
 						// cleanup stacktrace.
@@ -741,15 +757,14 @@ namespace Moq
 
 						var mockType = typeof(Mock<>).MakeGenericType(prop.PropertyType);
 
-						mock = (Mock)Activator.CreateInstance(mockType, ownerMock.Behavior);
-						mock.DefaultValue = ownerMock.DefaultValue;
-						ownerMock.InnerMocks.Add(propGet, mock);
+						mock = (Mock)Activator.CreateInstance(mockType, targetMock.Behavior);
+						mock.DefaultValue = targetMock.DefaultValue;
+						targetMock.InnerMocks.Add(propGet, mock);
 
 						var targetType = targetMock.MockedType;
 
 						// TODO: cache method
-						var setupGet = typeof(Mock).GetMethod("SetupGet", BindingFlags.Static | BindingFlags.NonPublic | BindingFlags.InvokeMethod);
-						setupGet = setupGet.MakeGenericMethod(targetType, prop.PropertyType);
+						var setupGet = setupGetMethod.MakeGenericMethod(targetType, prop.PropertyType);
 						var param = Expression.Parameter(targetType, "mock");
 						var expr = Expression.Lambda(Expression.MakeMemberAccess(param, prop), param);
 						var result = setupGet.Invoke(targetMock, new object[] { targetMock, expr });
@@ -766,9 +781,15 @@ namespace Moq
 			private static void ValidateTypeToMock(PropertyInfo prop, Expression expr)
 			{
 				if (prop.PropertyType.IsValueType || prop.PropertyType.IsSealed)
-					throw new NotSupportedException(String.Format(CultureInfo.CurrentCulture,
-						Properties.Resources.UnsupportedIntermediateType,
-						prop.DeclaringType.Name, prop.Name, prop.PropertyType, expr));
+				{
+					throw new NotSupportedException(string.Format(
+						CultureInfo.CurrentCulture,
+						Resources.UnsupportedIntermediateType,
+						prop.DeclaringType.Name,
+						prop.Name,
+						prop.PropertyType,
+						expr));
+				}
 			}
 
 			protected override Expression VisitMethodCall(MethodCallExpression m)
@@ -778,11 +799,11 @@ namespace Moq
 					first = false;
 					return base.Visit(m.Object);
 				}
-				else
-				{
-					throw new NotSupportedException(String.Format(CultureInfo.CurrentCulture,
-						Properties.Resources.UnsupportedIntermediateExpression, m));
-				}
+
+				throw new NotSupportedException(string.Format(
+					CultureInfo.CurrentCulture,
+					Resources.UnsupportedIntermediateExpression,
+					m));
 			}
 
 			protected override Expression VisitMemberAccess(MemberExpression m)
@@ -794,13 +815,21 @@ namespace Moq
 				}
 
 				if (m.Member is FieldInfo)
-					throw new NotSupportedException(String.Format(CultureInfo.CurrentCulture,
-						Properties.Resources.FieldsNotSupported, m));
+				{
+					throw new NotSupportedException(string.Format(
+						CultureInfo.CurrentCulture,
+						Resources.FieldsNotSupported,
+						m));
+				}
 
 				if (m.Expression.NodeType != ExpressionType.MemberAccess &&
 					m.Expression.NodeType != ExpressionType.Parameter)
-					throw new NotSupportedException(String.Format(CultureInfo.CurrentCulture,
-						Properties.Resources.UnsupportedIntermediateExpression, m));
+				{
+					throw new NotSupportedException(string.Format(
+						CultureInfo.CurrentCulture,
+						Resources.UnsupportedIntermediateExpression,
+						m));
+				}
 
 				var prop = (PropertyInfo)m.Member;
 				//var targetType = ((MemberExpression)m.Expression).Type;
@@ -840,9 +869,11 @@ namespace Moq
 		{
 			List<Delegate> handlers;
 			if (!invocationLists.TryGetValue(ev, out handlers))
+			{
 				return new Delegate[0];
-			else
-				return handlers;
+			}
+
+			return handlers;
 		}
 
 		/// <include file='Mock.xdoc' path='docs/doc[@for="Mock.CreateEventHandler{TEventArgs}"]/*'/>

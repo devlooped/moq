@@ -8,6 +8,7 @@ using System.ServiceModel.Web;
 #endif
 using Xunit;
 using System.Collections;
+using System.Text;
 
 namespace Moq.Tests.Regressions
 {
@@ -832,6 +833,62 @@ namespace Moq.Tests.Regressions
 
 			public interface IServiceNo1 : IEnumerable
 			{
+			}
+		}
+
+		#endregion
+
+		#region Recursive issue
+
+		public class RecursiveFixture
+		{
+			[Fact]
+			public void TestRecursive()
+			{
+				var mock = new Mock<ControllerContext>() { DefaultValue = DefaultValue.Mock };
+				mock.Setup(c => c.HttpContext.Response.Write("stuff"));
+
+				mock.Object.HttpContext.Response.Write("stuff");
+				mock.Object.HttpContext.Response.ContentEncoding = Encoding.UTF32;
+
+				Assert.Throws<MockException>(() => mock.VerifySet(
+					c => c.HttpContext.Response.ContentEncoding = It.IsAny<Encoding>(),
+					Times.Never()));
+			}
+
+			public class ControllerContext
+			{
+				public virtual HttpContext HttpContext { get; set; }
+			}
+
+			public abstract class HttpContext
+			{
+				protected HttpContext()
+				{
+				}
+
+				public virtual HttpResponse Response
+				{
+					get { throw new NotImplementedException(); }
+				}
+			}
+
+			public abstract class HttpResponse
+			{
+				protected HttpResponse()
+				{
+				}
+
+				public virtual Encoding ContentEncoding
+				{
+					get { throw new NotImplementedException(); }
+					set { throw new NotImplementedException(); }
+				}
+
+				public virtual void Write(string s)
+				{
+					throw new NotImplementedException();
+				}
 			}
 		}
 
