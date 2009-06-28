@@ -9,6 +9,7 @@ using System.ServiceModel.Web;
 using Xunit;
 using System.Collections;
 using System.Text;
+using Moq;
 
 namespace Moq.Tests.Regressions
 {
@@ -939,6 +940,22 @@ namespace Moq.Tests.Regressions
 			[OperationContract]
 			void Do();
 		}
-
 	}
 }
+
+#region #181
+
+// NOTE class without namespace
+public class _181
+{
+	[Fact]
+	public void ReproTest()
+	{
+		var mock = new Mock<IDisposable>();
+		mock.Object.Dispose();
+
+		mock.Verify(d => d.Dispose());
+	}
+}
+
+#endregion
