@@ -730,7 +730,6 @@ namespace Moq
 
 		private class AutoMockPropertiesVisitor : ExpressionVisitor
 		{
-			private static readonly MethodInfo setupGetMethod = typeof(Mock).GetMethod("SetupGet", BindingFlags.Static | BindingFlags.NonPublic | BindingFlags.InvokeMethod);
 			private Mock ownerMock;
 			private List<PropertyInfo> properties = new List<PropertyInfo>();
 			private bool first = true;
@@ -764,7 +763,8 @@ namespace Moq
 						var targetType = targetMock.MockedType;
 
 						// TODO: cache method
-						var setupGet = setupGetMethod.MakeGenericMethod(targetType, prop.PropertyType);
+						var setupGet = typeof(Mock).GetMethod("SetupGet", BindingFlags.Static | BindingFlags.NonPublic | BindingFlags.InvokeMethod)
+							.MakeGenericMethod(targetType, prop.PropertyType);
 						var param = Expression.Parameter(targetType, "mock");
 						var expr = Expression.Lambda(Expression.MakeMemberAccess(param, prop), param);
 						var result = setupGet.Invoke(targetMock, new object[] { targetMock, expr });
