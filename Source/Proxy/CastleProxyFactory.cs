@@ -102,8 +102,7 @@ namespace Moq.Proxy
 
 			public void Intercept(IInvocation invocation)
 			{
-				var context = new CallContext(invocation);
-				this.interceptor.Intercept(context);
+				this.interceptor.Intercept(new CallContext(invocation));
 			}
 		}
 

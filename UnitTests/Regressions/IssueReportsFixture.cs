@@ -39,7 +39,7 @@ namespace Moq.Tests.Regressions
 
 		#endregion
 
-		#region 48
+		#region #48
 
 		public class Issue48
 		{
@@ -762,6 +762,25 @@ namespace Moq.Tests.Regressions
 				{
 					return obj is Foo && ((Foo)obj).Id == Id;
 				}
+			}
+		}
+
+		#endregion
+
+		#region #177
+
+		public class _177
+		{
+			[Fact]
+			public void Test()
+			{
+				var mock = new Mock<IMyInterface>();
+				Assert.NotNull(mock.Object);
+			}
+
+			public interface IMyInterface
+			{
+				void DoStuff<TFrom, TTo>() where TTo : TFrom;
 			}
 		}
 
