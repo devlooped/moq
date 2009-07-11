@@ -68,10 +68,15 @@ namespace Moq
 
 		internal IEnumerable<ICallContext> ActualCalls
 		{
-			get { return actualInvocations; }
+			get { return this.actualInvocations; }
 		}
 
 		internal Mock Mock { get; private set; }
+
+		internal IEnumerable<IProxyCall> OrderedCalls
+		{
+			get { return this.orderedCalls; }
+		}
 
 		internal void Verify()
 		{
@@ -195,27 +200,20 @@ namespace Moq
 
 					return;
 				}
-			}
 
-			// Save to support Verify[expression] pattern.
-			// In a fluent invocation context, which is a recorder-like 
-			// mode we use to evaluate delegates by actually running them, 
-			// we don't want to count the invocation, or actually run 
-			// previous setups.
-			if (!FluentMockContext.IsActive)
+				// Save to support Verify[expression] pattern.
+				// In a fluent invocation context, which is a recorder-like 
+				// mode we use to evaluate delegates by actually running them, 
+				// we don't want to count the invocation, or actually run 
+				// previous setups.
 				actualInvocations.Add(invocation);
+			}
 
 			var call = FluentMockContext.IsActive ? (IProxyCall)null : orderedCalls.LastOrDefault(c => c.Matches(invocation));
 
-			if (call == null && !FluentMockContext.IsActive)
+			if (call == null && !FluentMockContext.IsActive && behavior == MockBehavior.Strict)
 			{
-				if (behavior == MockBehavior.Strict)
-				{
-					throw new MockException(
-					  MockException.ExceptionReason.NoSetup,
-					  behavior,
-					  invocation);
-				}
+				throw new MockException(MockException.ExceptionReason.NoSetup, behavior, invocation);
 			}
 
 			if (call != null)
@@ -233,9 +231,7 @@ namespace Moq
 				// Invoke underlying implementation.
 				invocation.InvokeBase();
 			}
-			else if (invocation.TargetType.IsClass &&
-			  !invocation.Method.IsAbstract
-				&& this.Mock.CallBase)
+			else if (invocation.TargetType.IsClass && !invocation.Method.IsAbstract && this.Mock.CallBase)
 			{
 				// For mocked classes, if the target method was not abstract, 
 				// invoke directly.
@@ -244,7 +240,7 @@ namespace Moq
 				invocation.InvokeBase();
 			}
 			else if (invocation.Method != null && invocation.Method.ReturnType != null &&
-			  invocation.Method.ReturnType != typeof(void))
+				invocation.Method.ReturnType != typeof(void))
 			{
 				Mock recursiveMock;
 				if (this.Mock.InnerMocks.TryGetValue(invocation.Method, out recursiveMock))
@@ -263,7 +259,7 @@ namespace Moq
 		private static bool IsEventAttach(ICallContext invocation)
 		{
 			return invocation.Method.IsSpecialName &&
-					  invocation.Method.Name.StartsWith("add_", StringComparison.Ordinal);
+				invocation.Method.Name.StartsWith("add_", StringComparison.Ordinal);
 		}
 
 		private static bool IsEventDetach(ICallContext invocation)
@@ -327,10 +323,10 @@ namespace Moq
 			}
 		}
 
-		class ExpressionKey
+		private class ExpressionKey
 		{
-			string fixedString;
-			List<object> values;
+			private string fixedString;
+			private List<object> values;
 
 			public ExpressionKey(string fixedString, List<object> values)
 			{
@@ -376,7 +372,7 @@ namespace Moq
 			}
 		}
 
-		class ConstantsVisitor : ExpressionVisitor
+		private class ConstantsVisitor : ExpressionVisitor
 		{
 			public ConstantsVisitor(Expression expression)
 			{

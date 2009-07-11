@@ -138,7 +138,7 @@ namespace Moq
 		[SuppressMessage("Microsoft.Design", "CA1024:UsePropertiesWhereAppropriate", Justification = "This is actually the protected virtual implementation of the property Object.")]
 		protected override object GetObject()
 		{
-			return Object;
+			return this.Object;
 		}
 
 		internal override Type MockedType
@@ -345,7 +345,6 @@ namespace Moq
 			internal override Dictionary<MethodInfo, Mock> InnerMocks
 			{
 				get { return owner.InnerMocks; }
-				set { owner.InnerMocks = value; }
 			}
 
 			internal override Interceptor Interceptor

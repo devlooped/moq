@@ -281,4 +281,8 @@ Expected invocation on the mock between {2} and {3} times (Exclusive), but was {
     <value>{0}
 Expected invocation on the mock once, but was {4} times: {1}</value>
   </data>
+  <data name="SetupOnNonMemberMethod" xml:space="preserve">
+    <value>Invalid setup on a non-member method:
+{0}</value>
+  </data>
 </root>

@@ -390,6 +390,16 @@ namespace Moq.Properties {
         }
         
         /// <summary>
+        ///   Looks up a localized string similar to Invalid setup on a non-member method:
+        ///{0}.
+        /// </summary>
+        internal static string SetupOnNonMemberMethod {
+            get {
+                return ResourceManager.GetString("SetupOnNonMemberMethod", resourceCulture);
+            }
+        }
+        
+        /// <summary>
         ///   Looks up a localized string similar to Invalid setup on a non-overridable member:
         ///{0}.
         /// </summary>

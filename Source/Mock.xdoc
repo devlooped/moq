@@ -7,6 +7,11 @@
 			retrieve a <see cref="Mock{T}"/> from an object instance.
 		</summary>
 	</doc>
+	<doc for="Mock.ctor">
+		<summary>
+			Initializes a new instance of the <see cref="Mock"/> class.
+		</summary>
+	</doc>
 	<doc for="Mock.Get">
 		<summary>
 			Retrieves the mock object for the given object instance.

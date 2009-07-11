@@ -786,6 +786,25 @@ namespace Moq.Tests.Regressions
 
 		#endregion
 
+		#region #185
+
+		public class _185
+		{
+			[Fact]
+			public void Test()
+			{
+				var mock = new Mock<IList<string>>();
+				ArgumentException e = Assert.Throws<ArgumentException>(
+					() => mock.Setup(l => l.FirstOrDefault()).Returns("Hello world"));
+
+				Assert.Equal(
+					"Invalid setup on a non-member method:\r\nl => l.FirstOrDefault<String>()",
+					e.Message);
+			}
+		}
+
+		#endregion
+
 		#region Recursive issue
 
 		public class RecursiveFixture

@@ -54,11 +54,16 @@ namespace Moq
 	public abstract partial class Mock : IHideObjectMembers
 	{
 		private bool callBase;
-		DefaultValue defaultValue = DefaultValue.Empty;
-		IDefaultValueProvider defaultValueProvider = new EmptyDefaultValueProvider();
-		List<Type> implementedInterfaces = new List<Type>();
-		Dictionary<MethodInfo, Mock> innerMocks = new Dictionary<MethodInfo, Mock>();
-		Dictionary<EventInfo, List<Delegate>> invocationLists = new Dictionary<EventInfo, List<Delegate>>();
+		private DefaultValue defaultValue = DefaultValue.Empty;
+		private IDefaultValueProvider defaultValueProvider = new EmptyDefaultValueProvider();
+		private Dictionary<EventInfo, List<Delegate>> invocationLists = new Dictionary<EventInfo, List<Delegate>>();
+
+		/// <include file='Mock.xdoc' path='docs/doc[@for="Mock.ctor"]/*'/>
+		protected Mock()
+		{
+			this.ImplementedInterfaces = new List<Type>();
+			this.InnerMocks = new Dictionary<MethodInfo, Mock>();
+		}
 
 		/// <include file='Mock.xdoc' path='docs/doc[@for="Mock.Get"]/*'/>
 		public static Mock<T> Get<T>(T mocked) where T : class
@@ -98,16 +103,19 @@ namespace Moq
 					// This is not valid as generic types 
 					// do not support covariance on 
 					// the generic parameters.
-					var types = String.Join(", ",
-							new[] { mockedType }
+					var types = string.Join(
+						", ",
+						new[] { mockedType }
 						// Skip first interface which is always our internal IMocked<T>
 							.Concat(mock.ImplementedInterfaces.Skip(1))
 							.Select(t => t.Name)
 							.ToArray());
 
-					throw new ArgumentException(String.Format(CultureInfo.CurrentCulture,
-						Properties.Resources.InvalidMockGetType,
-						typeof(T).Name, types));
+					throw new ArgumentException(string.Format(
+						CultureInfo.CurrentCulture,
+						Resources.InvalidMockGetType,
+						typeof(T).Name,
+						types));
 				}
 			}
 			else
@@ -118,11 +126,7 @@ namespace Moq
 
 		internal virtual Interceptor Interceptor { get; set; }
 
-		internal virtual Dictionary<MethodInfo, Mock> InnerMocks
-		{
-			get { return this.innerMocks; }
-			set { this.innerMocks = value; }
-		}
+		internal virtual Dictionary<MethodInfo, Mock> InnerMocks { get; private set; }
 
 		/// <include file='Mock.xdoc' path='docs/doc[@for="Mock.Behavior"]/*'/>
 		public virtual MockBehavior Behavior { get; internal set; }
@@ -147,7 +151,10 @@ namespace Moq
 		/// <include file='Mock.xdoc' path='docs/doc[@for="Mock.Object"]/*'/>
 		[SuppressMessage("Microsoft.Naming", "CA1716:IdentifiersShouldNotMatchKeywords", MessageId = "Object", Justification = "Exposes the mocked object instance, so it's appropriate.")]
 		[SuppressMessage("Microsoft.Naming", "CA1721:PropertyNamesShouldNotMatchGetMethods", Justification = "The public Object property is the only one visible to Moq consumers. The protected member is for internal use only.")]
-		public object Object { get { return GetObject(); } }
+		public object Object
+		{
+			get { return this.GetObject(); }
+		}
 
 		/// <include file='Mock.xdoc' path='docs/doc[@for="Mock.GetObject"]/*'/>
 		[SuppressMessage("Microsoft.Design", "CA1024:UsePropertiesWhereAppropriate", Justification = "This is actually the protected virtual implementation of the property Object.")]
@@ -173,10 +180,7 @@ namespace Moq
 		/// <summary>
 		/// Exposes the list of extra interfaces implemented by the mock.
 		/// </summary>
-		internal List<Type> ImplementedInterfaces
-		{
-			get { return this.implementedInterfaces; }
-		}
+		internal List<Type> ImplementedInterfaces { get; private set; }
 
 		#region Verify
 
@@ -366,6 +370,7 @@ namespace Moq
 				MethodInfo method = methodCall.Method;
 				Expression[] args = methodCall.Arguments.ToArray();
 
+				ThrowIfNotMember(expression, method);
 				ThrowIfCantOverride(expression, method);
 				var call = new MethodCall<T1>(mock, expression, method, args);
 
@@ -391,6 +396,7 @@ namespace Moq
 				MethodInfo method = methodCall.Method;
 				Expression[] args = methodCall.Arguments.ToArray();
 
+				ThrowIfNotMember(expression, method);
 				ThrowIfCantOverride(expression, method);
 				var call = new MethodCallReturn<T1, TResult>(mock, expression, method, args);
 
@@ -708,6 +714,17 @@ namespace Moq
 				throw new ArgumentException(string.Format(
 					CultureInfo.CurrentCulture,
 					Resources.SetupOnNonOverridableMember,
+					setup.ToStringFixed()));
+			}
+		}
+
+		private static void ThrowIfNotMember(Expression setup, MethodInfo method)
+		{
+			if (method.IsStatic)
+			{
+				throw new ArgumentException(string.Format(
+					CultureInfo.CurrentCulture,
+					Resources.SetupOnNonMemberMethod,
 					setup.ToStringFixed()));
 			}
 		}

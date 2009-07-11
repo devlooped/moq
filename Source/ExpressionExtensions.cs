@@ -308,8 +308,7 @@ namespace Moq
 				{
 					builder
 						.Append("[")
-						.Append(String.Join(", ",
-							call.Arguments.Select(arg => arg.ToString()).ToArray()))
+						.Append(string.Join(", ", call.Arguments.Select(arg => arg.ToString()).ToArray()))
 						.Append("]");
 				}
 				else if (call.Method.IsSpecialName &&
@@ -317,20 +316,24 @@ namespace Moq
 				{
 					builder
 						.Append("[")
-						.Append(String.Join(", ",
-							call.Arguments.TakeWhile(arg => arg != call.Arguments.Last())
+						.Append(string.Join(", ", call.Arguments.Take(call.Arguments.Count - 1)
 							.Select(arg => arg.ToString()).ToArray()))
-						.Append("]");
-
-					builder.Append(" = ");
-					builder.Append(call.Arguments.Last().ToStringFixed());
+						.Append("] = ")
+						.Append(call.Arguments.Last().ToStringFixed());
 				}
 				else if (call.Method.IsSpecialName &&
-					(call.Method.Name.StartsWith("get_", StringComparison.Ordinal) ||
-					call.Method.Name.StartsWith("set_", StringComparison.Ordinal)))
+					call.Method.Name.StartsWith("get_", StringComparison.Ordinal))
 				{
-					builder.Append(".");
-					builder.Append(call.Method.Name.Substring(4));
+					builder.Append(".").Append(call.Method.Name.Substring(4));
+				}
+				else if (call.Method.IsSpecialName &&
+					call.Method.Name.StartsWith("set_", StringComparison.Ordinal))
+				{
+					builder
+						.Append(".")
+						.Append(call.Method.Name.Substring(4))
+						.Append(" = ")
+						.Append(call.Arguments.Last().ToStringFixed());
 				}
 				else
 				{
@@ -340,18 +343,18 @@ namespace Moq
 					if (call.Method.IsGenericMethod)
 					{
 						builder.Append("<");
-						builder.Append(String.Join(", ",
+						builder.Append(string.Join(
+							", ",
 							call.Method.GetGenericArguments().Select(t => GetTypeName(t)).ToArray()));
 						builder.Append(">");
 					}
 
 					builder.Append("(");
-
-					builder.Append(String.Join(", ",
-						(from c in call.Arguments
-						 select c.ToString()).ToArray(),
-						startIndex, call.Arguments.Count - startIndex));
-
+					builder.Append(string.Join(
+						", ",
+						call.Arguments.Select(a => a.ToString()).ToArray(),
+						startIndex,
+						call.Arguments.Count - startIndex));
 					builder.Append(")");
 				}
 

@@ -67,7 +67,7 @@ namespace Moq
 			}
 		}
 
-		[SuppressMessage("Microsoft.Performance", "CA1800:DoNotCastUnnecessarily", Justification="The linq expression is way more readable this way.")]
+		[SuppressMessage("Microsoft.Performance", "CA1800:DoNotCastUnnecessarily", Justification = "The linq expression is way more readable this way.")]
 		public static string Format(this ICallContext invocation)
 		{
 			// Special-case for getters && setters
@@ -140,7 +140,7 @@ namespace Moq
 
 		public static bool IsMockeable(this Type typeToMock)
 		{
-			return 
+			return
 				typeToMock.IsInterface ||
 				typeToMock.IsAbstract ||
 				!typeToMock.IsSealed;
