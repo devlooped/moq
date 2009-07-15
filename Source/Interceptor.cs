@@ -106,7 +106,7 @@ namespace Moq
 		{
 			var expr = call.SetupExpression.PartialMatcherAwareEval();
 
-			var s = expr.ToStringFixed();
+			var s = expr.ToStringFixed(true);
 
 			if (kind == SetupKind.PropertySet)
 			{
@@ -135,7 +135,9 @@ namespace Moq
 		{
 			// Track current invocation if we're in "record" mode in a fluent invocation context.
 			if (FluentMockContext.IsActive)
+			{
 				FluentMockContext.Current.Add(this.Mock, invocation);
+			}
 
 			// TODO: too many ifs in this method.
 			// see how to refactor with strategies.

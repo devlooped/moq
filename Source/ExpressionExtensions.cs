@@ -215,7 +215,12 @@ namespace Moq
 		/// </devdoc>
 		public static string ToStringFixed(this Expression expression)
 		{
-			return new ToStringFixVisitor(expression).ExpressionString;
+			return new ToStringFixVisitor(expression, false).ExpressionString;
+		}
+
+		internal static string ToStringFixed(this Expression expression, bool useFullTypeName)
+		{
+			return new ToStringFixVisitor(expression, useFullTypeName).ExpressionString;
 		}
 
 		internal sealed class RemoveMatcherConvertVisitor : ExpressionVisitor
@@ -255,7 +260,7 @@ namespace Moq
 			private List<MethodCallExpression> calls = new List<MethodCallExpression>();
 			private Regex convertRegex = new Regex(@"Convert\((.+?)\)");
 
-			public ToStringFixVisitor(Expression expression)
+			public ToStringFixVisitor(Expression expression, bool useFullTypeName)
 			{
 				this.Visit(expression);
 
@@ -263,15 +268,17 @@ namespace Moq
 
 				foreach (var call in calls)
 				{
-					var properCallString = BuildCallExpressionString(call);
+					var properCallString = BuildCallExpressionString(call, useFullTypeName);
 					var improperCallString = call.ToString();
 					// We do it this way so that we replace one call 
 					// at a time, as there may be many that match the 
 					// improper rendering (i.e. multiple It.IsAny)
 					var index = fullString.IndexOf(improperCallString, StringComparison.Ordinal);
 					if (index != -1)
+					{
 						fullString = fullString.Substring(0, index) + properCallString +
 									 fullString.Substring(index + improperCallString.Length);
+					}
 				}
 
 				fullString = convertRegex.Replace(fullString, m => m.Groups[1].Value);
@@ -279,11 +286,20 @@ namespace Moq
 				this.ExpressionString = fullString;
 			}
 
-			private static string BuildCallExpressionString(MethodCallExpression call)
+			public string ExpressionString { get; private set; }
+
+			protected override Expression VisitMethodCall(MethodCallExpression m)
+			{
+				// We fix generic methods but also renderings of property accesses.
+				calls.Add(m);
+				return base.VisitMethodCall(m);
+			}
+
+			private static string BuildCallExpressionString(MethodCallExpression call, bool useFullTypeName)
 			{
 				var builder = new StringBuilder();
 				var startIndex = 0;
-				Expression targetExpr = call.Object;
+				var targetExpr = call.Object;
 
 				if (Attribute.GetCustomAttribute(call.Method, typeof(ExtensionAttribute)) != null)
 				{
@@ -295,7 +311,7 @@ namespace Moq
 
 				if (targetExpr != null)
 				{
-					builder.Append(targetExpr.ToStringFixed());
+					builder.Append(targetExpr.ToStringFixed(useFullTypeName));
 				}
 				else
 				{
@@ -306,20 +322,18 @@ namespace Moq
 				if (call.Method.IsSpecialName &&
 					call.Method.Name.StartsWith("get_Item", StringComparison.Ordinal))
 				{
-					builder
-						.Append("[")
+					builder.Append("[")
 						.Append(string.Join(", ", call.Arguments.Select(arg => arg.ToString()).ToArray()))
 						.Append("]");
 				}
 				else if (call.Method.IsSpecialName &&
 					call.Method.Name.StartsWith("set_Item", StringComparison.Ordinal))
 				{
-					builder
-						.Append("[")
+					builder.Append("[")
 						.Append(string.Join(", ", call.Arguments.Take(call.Arguments.Count - 1)
 							.Select(arg => arg.ToString()).ToArray()))
 						.Append("] = ")
-						.Append(call.Arguments.Last().ToStringFixed());
+						.Append(call.Arguments.Last().ToStringFixed(useFullTypeName));
 				}
 				else if (call.Method.IsSpecialName &&
 					call.Method.Name.StartsWith("get_", StringComparison.Ordinal))
@@ -329,11 +343,10 @@ namespace Moq
 				else if (call.Method.IsSpecialName &&
 					call.Method.Name.StartsWith("set_", StringComparison.Ordinal))
 				{
-					builder
-						.Append(".")
+					builder.Append(".")
 						.Append(call.Method.Name.Substring(4))
 						.Append(" = ")
-						.Append(call.Arguments.Last().ToStringFixed());
+						.Append(call.Arguments.Last().ToStringFixed(useFullTypeName));
 				}
 				else
 				{
@@ -342,11 +355,8 @@ namespace Moq
 
 					if (call.Method.IsGenericMethod)
 					{
-						builder.Append("<");
-						builder.Append(string.Join(
-							", ",
-							call.Method.GetGenericArguments().Select(t => GetTypeName(t)).ToArray()));
-						builder.Append(">");
+						builder.Append(
+							GetGenericArguments(call.Method.GetGenericArguments(), useFullTypeName));
 					}
 
 					builder.Append("(");
@@ -362,28 +372,27 @@ namespace Moq
 				return properCallString;
 			}
 
-			private static string GetTypeName(Type type)
+			private static string GetTypeName(Type type, bool useFullTypeName)
 			{
 				if (type.IsGenericType)
 				{
 					return type.Name.Substring(0, type.Name.IndexOf('`')) +
-						"<" + String.Join(",", type.GetGenericArguments().Select(t => GetTypeName(t)).ToArray()) +
-						">";
+						GetGenericArguments(type.GetGenericArguments(), useFullTypeName);
 				}
-				else
+
+				if (useFullTypeName)
 				{
-					return type.Name;
+					return type.FullName;
 				}
+
+				return type.Name;
 			}
 
-			public string ExpressionString { get; private set; }
-
-			protected override Expression VisitMethodCall(MethodCallExpression m)
+			private static string GetGenericArguments(IEnumerable<Type> arguments, bool useFullTypeName)
 			{
-				// We fix generic methods but also renderings of property accesses.
-				calls.Add(m);
-
-				return base.VisitMethodCall(m);
+				return "<" +
+					string.Join(",", arguments.Select(t => GetTypeName(t, useFullTypeName)).ToArray()) +
+					">";
 			}
 
 			//protected override Expression VisitUnary(UnaryExpression u)

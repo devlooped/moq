@@ -390,11 +390,13 @@ namespace Moq
 				var lambda = expression.ToLambda();
 
 				if (lambda.IsProperty())
+				{
 					return SetupGet(mock, expression);
+				}
 
 				var methodCall = lambda.ToMethodCall();
-				MethodInfo method = methodCall.Method;
-				Expression[] args = methodCall.Arguments.ToArray();
+				var method = methodCall.Method;
+				var args = methodCall.Arguments.ToArray();
 
 				ThrowIfNotMember(expression, method);
 				ThrowIfCantOverride(expression, method);

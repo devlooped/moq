@@ -805,6 +805,44 @@ namespace Moq.Tests.Regressions
 
 		#endregion
 
+		#region #187
+
+		public class _187
+		{
+			[Fact]
+			public void Test()
+			{
+				var mock = new Mock<IGeneric>();
+
+				mock.Setup(r => r.Get<Foo.Inner>()).Returns(new Object());
+				mock.Setup(r => r.Get<Bar.Inner>()).Returns(new Object());
+
+				Assert.NotNull(mock.Object.Get<Foo.Inner>());
+				Assert.NotNull(mock.Object.Get<Bar.Inner>());
+			}
+
+			public class Foo
+			{
+				public class Inner
+				{
+				}
+			}
+
+			public class Bar
+			{
+				public class Inner
+				{
+				}
+			}
+
+			public interface IGeneric
+			{
+				object Get<T>() where T : new();
+			}
+		}
+
+		#endregion
+
 		#region Recursive issue
 
 		public class RecursiveFixture
