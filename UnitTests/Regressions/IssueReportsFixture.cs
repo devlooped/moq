@@ -854,7 +854,7 @@ namespace Moq.Tests.Regressions
 				mock.Setup(c => c.HttpContext.Response.Write("stuff"));
 
 				mock.Object.HttpContext.Response.Write("stuff");
-				mock.Object.HttpContext.Response.ContentEncoding = Encoding.UTF32;
+				mock.Object.HttpContext.Response.ContentEncoding = Encoding.UTF8;
 
 				Assert.Throws<MockException>(() => mock.VerifySet(
 					c => c.HttpContext.Response.ContentEncoding = It.IsAny<Encoding>(),
