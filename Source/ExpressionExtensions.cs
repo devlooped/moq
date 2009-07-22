@@ -394,18 +394,6 @@ namespace Moq
 					string.Join(",", arguments.Select(t => GetTypeName(t, useFullTypeName)).ToArray()) +
 					">";
 			}
-
-			//protected override Expression VisitUnary(UnaryExpression u)
-			//{
-			//   if (u.NodeType == ExpressionType.Convert &&
-			//      u.Operand.NodeType == ExpressionType.Call &&
-			//      typeof(Match).IsAssignableFrom(((MethodCallExpression)u.Operand).Method.ReturnType))
-			//   {
-			//      return u.Operand;
-			//   }
-
-			//   return base.VisitUnary(u);
-			//}
 		}
 	}
 }

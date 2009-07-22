@@ -41,6 +41,7 @@
 using System;
 using System.Collections.Generic;
 using System.Collections.ObjectModel;
+using System.Diagnostics.CodeAnalysis;
 using System.Globalization;
 using System.Linq.Expressions;
 
@@ -89,7 +90,7 @@ namespace Moq
 		/// Visits the <see cref="Expression"/>, determining which 
 		/// of the concrete Visit methods to call.
 		/// </summary>
-		[System.Diagnostics.CodeAnalysis.SuppressMessage("Microsoft.Maintainability", "CA1502:AvoidExcessiveComplexity")]
+		[SuppressMessage("Microsoft.Maintainability", "CA1502:AvoidExcessiveComplexity")]
 		protected virtual Expression Visit(Expression exp)
 		{
 			if (exp == null)
@@ -97,6 +98,16 @@ namespace Moq
 
 			switch (exp.NodeType)
 			{
+				case ExpressionType.Parameter:
+					return this.VisitParameter((ParameterExpression)exp);
+				case ExpressionType.Call:
+					return this.VisitMethodCall((MethodCallExpression)exp);
+				case ExpressionType.Lambda:
+					return this.VisitLambda((LambdaExpression)exp);
+				case ExpressionType.Constant:
+					return this.VisitConstant((ConstantExpression)exp);
+				case ExpressionType.MemberAccess:
+					return this.VisitMemberAccess((MemberExpression)exp);
 				case ExpressionType.Negate:
 				case ExpressionType.NegateChecked:
 				case ExpressionType.Not:
@@ -130,20 +141,6 @@ namespace Moq
 				case ExpressionType.LeftShift:
 				case ExpressionType.ExclusiveOr:
 					return this.VisitBinary((BinaryExpression)exp);
-				case ExpressionType.TypeIs:
-					return this.VisitTypeIs((TypeBinaryExpression)exp);
-				case ExpressionType.Conditional:
-					return this.VisitConditional((ConditionalExpression)exp);
-				case ExpressionType.Constant:
-					return this.VisitConstant((ConstantExpression)exp);
-				case ExpressionType.Parameter:
-					return this.VisitParameter((ParameterExpression)exp);
-				case ExpressionType.MemberAccess:
-					return this.VisitMemberAccess((MemberExpression)exp);
-				case ExpressionType.Call:
-					return this.VisitMethodCall((MethodCallExpression)exp);
-				case ExpressionType.Lambda:
-					return this.VisitLambda((LambdaExpression)exp);
 				case ExpressionType.New:
 					return this.VisitNew((NewExpression)exp);
 				case ExpressionType.NewArrayInit:
@@ -153,6 +150,10 @@ namespace Moq
 					return this.VisitInvocation((InvocationExpression)exp);
 				case ExpressionType.MemberInit:
 					return this.VisitMemberInit((MemberInitExpression)exp);
+				case ExpressionType.TypeIs:
+					return this.VisitTypeIs((TypeBinaryExpression)exp);
+				case ExpressionType.Conditional:
+					return this.VisitConditional((ConditionalExpression)exp);
 				case ExpressionType.ListInit:
 					return this.VisitListInit((ListInitExpression)exp);
 				default:
