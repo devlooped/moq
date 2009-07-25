@@ -3,15 +3,15 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Reflection;
 
-namespace Moq.Visualizer
+namespace Moq
 {
-	internal static class MemberExtensions
+	internal static class MemberInfoExtensions
 	{
-		public static string GetName(this MethodBase method)
+		public static string GetFullName(this MethodBase method)
 		{
 			if (method.IsGenericMethod)
 			{
-				return method.Name + GetGenericArguments(method.GetGenericArguments(), t => GetName(t));
+				return method.Name + GetGenericArguments(method.GetGenericArguments(), t => GetFullName(t));
 			}
 
 			return method.Name;
@@ -28,6 +28,16 @@ namespace Moq.Visualizer
 			return type.FullName;
 		}
 
+		public static string GetName(this MethodBase method)
+		{
+			if (method.IsGenericMethod)
+			{
+				return method.Name + GetGenericArguments(method.GetGenericArguments(), t => GetName(t));
+			}
+
+			return method.Name;
+		}
+
 		public static string GetName(this Type type)
 		{
 			if (type.IsGenericType)
@@ -37,6 +47,16 @@ namespace Moq.Visualizer
 			}
 
 			return type.Name;
+		}
+
+		public static bool IsPropertyGetter(this MethodBase method)
+		{
+			return method.IsSpecialName && method.Name.StartsWith("get_", StringComparison.Ordinal);
+		}
+
+		public static bool IsPropertySetter(this MethodBase method)
+		{
+			return method.IsSpecialName && method.Name.StartsWith("set_", StringComparison.Ordinal);
 		}
 
 		private static string GetGenericArguments(IEnumerable<Type> types, Func<Type, string> typeGetter)

@@ -10,6 +10,7 @@ using Xunit;
 using System.Collections;
 using System.Text;
 using Moq;
+using System.ComponentModel;
 
 namespace Moq.Tests.Regressions
 {
@@ -895,6 +896,54 @@ namespace Moq.Tests.Regressions
 					throw new NotImplementedException();
 				}
 			}
+		}
+
+		#endregion
+
+		#region #190
+
+		public class _190
+		{
+			[Fact]
+			public void Test()
+			{
+				var mock = new Mock<IDisposable>().As<IComponent>();
+				mock.SetupAllProperties();
+
+				ISite site = new FooSite();
+				mock.Object.Site = site;
+				Assert.Same(site, mock.Object.Site);
+			}
+
+			public class FooSite : ISite
+			{
+				public IComponent Component
+				{
+					get { throw new NotImplementedException(); }
+				}
+
+				public IContainer Container
+				{
+					get { throw new NotImplementedException(); }
+				}
+
+				public bool DesignMode
+				{
+					get { throw new NotImplementedException(); }
+				}
+
+				public string Name
+				{
+					get { throw new NotImplementedException(); }
+					set { throw new NotImplementedException(); }
+				}
+
+				public object GetService(Type serviceType)
+				{
+					throw new NotImplementedException();
+				}
+			}
+
 		}
 
 		#endregion

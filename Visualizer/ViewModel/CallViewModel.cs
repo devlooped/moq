@@ -1,5 +1,5 @@
 ﻿using System;
-using System.Collections;
+using System.Collections.Generic;
 using System.Linq;
 using System.Reflection;
 
@@ -11,18 +11,14 @@ namespace Moq.Visualizer.ViewModel
 		internal CallViewModel(MethodInfo methodInfo, object[] arguments, object returnValue)
 		{
 			this.Method = methodInfo.GetName();
-			// TODO maiby I will need an ArgumentViewModel
-			//methodInfo.GetParameters().Select(pi => pi.Name);
-			this.Arguments = arguments.Select(a => this.GetValue(a)).ToArray();
+			this.IsVoid = methodInfo.ReturnType == typeof(void);
+
+			var index = 0;
+			this.Arguments = methodInfo.GetParameters()
+				.Select(pi => new ParameterViewModel(pi, this.GetValue(arguments[index++]))).ToArray();
+
 			this.ReturnValue = this.GetValue(returnValue);
 			this.MethodCall = this.GetMethodCall(methodInfo);
-		}
-
-		internal CallViewModel(string method, object[] arguments, object returnValue, string methodCall)
-		{
-			this.Method = method;
-			this.Arguments = arguments;
-			this.ReturnValue = returnValue;
 		}
 
 		private object GetValue(object value)
@@ -30,10 +26,21 @@ namespace Moq.Visualizer.ViewModel
 			if (value != null)
 			{
 				// TODO get type from ParameterInfo, because of possible conversion errors
+				// NOTE Primitive types are: Boolean, Byte, SByte, Int16, UInt16, Int32, UInt32, Int64, UInt64, IntPtr, UIntPtr, Char, Double, and Single
 				var type = value.GetType();
-				if (type.IsPrimitive || type.IsEnum)
+				if (type.IsPrimitive || value is decimal || value is DateTime || value is TimeSpan)
 				{
 					return value;
+				}
+
+				// TODO take care about BitMap enums
+				if (type.IsEnum)
+				{
+					var values = value.ToString().Split(
+						new char[] { ',', ' ' },
+						StringSplitOptions.RemoveEmptyEntries);
+					var typeName = type.GetName();
+					return string.Join(" | ", values.Select(v => typeName + "." + v).ToArray());
 				}
 
 				if (value is string)
@@ -41,18 +48,20 @@ namespace Moq.Visualizer.ViewModel
 					return "\"" + value + "\"";
 				}
 
-				return "<" + value.GetType().GetFullName() + ">";
+				return "<" + type.GetName() + ">";
 			}
 
 			return value;
 		}
 
-		public IEnumerable Arguments { get; private set; }
+		public IEnumerable<ParameterViewModel> Arguments { get; private set; }
 
 		public bool IsExpanded
 		{
 			get { return false; }
 		}
+
+		public bool IsVoid { get; private set; }
 
 		public bool HasSetup { get; set; }
 
@@ -68,24 +77,44 @@ namespace Moq.Visualizer.ViewModel
 		// TODO indexers
 		private string GetMethodCall(MethodInfo method)
 		{
-			if (method.IsSpecialName && method.Name.StartsWith("get_"))
+			if (method.IsPropertyGetter())
 			{
-				return method.Name.Substring(4) + " --> " + this.ReturnValue;
+				return method.Name.Substring(4) + " → " + this.ReturnValue;
 			}
 
-			if (method.IsSpecialName && method.Name.StartsWith("set_"))
+			if (method.IsPropertySetter())
 			{
-				return method.Name.Substring(4) + " = " + this.GetValue(this.Arguments.Cast<object>().ElementAt(0));
+				return method.Name.Substring(4) + " = " + this.GetValue(this.Arguments.ElementAt(0).Value);
 			}
 
 			var methodCall = this.Method + "(" +
-				string.Join(",", this.Arguments.Cast<object>().Select(a => a.ToString()).ToArray()) + ")";
-			if (this.ReturnValue == null)
+				string.Join(",", this.Arguments.Select(a => GetKind(a) + a.Name + ": " + a.Value.ToString()).ToArray()) + ")";
+			if (this.IsVoid)
 			{
 				return methodCall;
 			}
 
-			return " --> " + this.ReturnValue.ToString();
+			return " → " + this.ReturnValue.ToString();
+		}
+
+		private static string GetKind(ParameterViewModel a)
+		{
+			if (a.IsIn)
+			{
+				return string.Empty;
+			}
+
+			if (a.IsOut)
+			{
+				return "out ";
+			}
+
+			if (a.IsRef)
+			{
+				return "ref ";
+			}
+
+			throw new Exception();
 		}
 	}
 }

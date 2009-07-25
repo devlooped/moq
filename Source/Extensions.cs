@@ -70,37 +70,34 @@ namespace Moq
 		[SuppressMessage("Microsoft.Performance", "CA1800:DoNotCastUnnecessarily", Justification = "The linq expression is way more readable this way.")]
 		public static string Format(this ICallContext invocation)
 		{
-			// Special-case for getters && setters
-			if (invocation.Method.IsSpecialName)
+			if (invocation.Method.IsPropertyGetter())
 			{
-				if (invocation.Method.Name.StartsWith("get_", StringComparison.Ordinal))
-					return
-						invocation.Method.DeclaringType.Name + "." +
-						invocation.Method.Name.Substring(4);
-				else if (invocation.Method.Name.StartsWith("set_", StringComparison.Ordinal))
-					return
-						invocation.Method.DeclaringType.Name + "." +
-						invocation.Method.Name.Substring(4) + " = " +
-						(from x in invocation.Arguments
-						 select x == null ?
-								"null" :
-								x is string ?
-									"\"" + (string)x + "\"" :
-									x.ToString()).First();
+				return invocation.Method.DeclaringType.Name + "." + invocation.Method.Name.Substring(4);
 			}
 
-			return
-				invocation.Method.DeclaringType.Name + "." +
-				invocation.Method.Name + "(" +
-				String.Join(", ",
-					(from x in invocation.Arguments
-					 select x == null ?
-						"null" :
-						x is string ?
-							"\"" + (string)x + "\"" :
-							x.ToString())
-					.ToArray()
-				) + ")";
+			if (invocation.Method.IsPropertySetter())
+			{
+				return invocation.Method.DeclaringType.Name + "." +
+					invocation.Method.Name.Substring(4) + " = " + GetValue(invocation.Arguments.First());
+			}
+
+			return invocation.Method.DeclaringType.Name + "." + invocation.Method.Name + "(" +
+				string.Join(", ", invocation.Arguments.Select(a => GetValue(a)).ToArray()) + ")";
+		}
+
+		public static string GetValue(object value)
+		{
+			if (value == null)
+			{
+				return "null";
+			}
+
+			if (value is string)
+			{
+				return "\"" + (string)value + "\"";
+			}
+
+			return value.ToString();
 		}
 
 		public static object InvokePreserveStack(this Delegate del, params object[] args)

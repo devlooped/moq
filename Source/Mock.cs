@@ -598,22 +598,20 @@ namespace Moq
 			{
 				// Crazy reflection stuff below. Ah... the goodies of generics :)
 				var mockType = mock.MockedType;
-				var properties = new List<PropertyInfo>();
-				properties.AddRange(mockType.GetProperties());
-				// Add all implemented properties too.
-				properties.AddRange(
-						from i in mockType.GetInterfaces()
-						from p in i.GetProperties()
-						select p);
-				// Add all properties from base classes
-				properties = properties.Distinct().ToList();
+				var poperties = mockType.GetProperties()
+					.Concat(from i in mockType.GetInterfaces()
+							from p in i.GetProperties()
+							select p)
+					.Distinct();
 
-				foreach (var property in properties)
+				foreach (var property in poperties)
 				{
 					if (property.CanRead && property.CanOverrideGet())
 					{
 						var expect = GetPropertyExpression(mockType, property);
-						object initialValue = mock.DefaultValueProvider.ProvideDefault(property.GetGetMethod(), new object[0]);
+						object initialValue = mock.DefaultValueProvider.ProvideDefault(
+							property.GetGetMethod(),
+							new object[0]);
 						var mocked = initialValue as IMocked;
 						if (mocked != null)
 						{
@@ -623,13 +621,12 @@ namespace Moq
 						var closure = Activator.CreateInstance(
 								typeof(ValueClosure<>).MakeGenericType(property.PropertyType), initialValue);
 
-						var resultGet = mock
-								.GetType()
-								.GetMethod("SetupGet")
-								.MakeGenericMethod(property.PropertyType)
-								.Invoke(mock, new[] { expect });
+						var resultGet = mock.GetType().GetMethod("SetupGet")
+							.MakeGenericMethod(property.PropertyType)
+							.Invoke(mock, new[] { expect });
 
-						var returnsGet = resultGet.GetType().GetMethod("Returns", new[] { typeof(Func<>).MakeGenericType(property.PropertyType) });
+						var returnsGet = resultGet.GetType()
+							.GetMethod("Returns", new[] { typeof(Func<>).MakeGenericType(property.PropertyType) });
 
 						var getFunc = Activator.CreateInstance(
 								typeof(Func<>).MakeGenericType(property.PropertyType),
@@ -640,15 +637,13 @@ namespace Moq
 
 						if (property.CanWrite && property.CanOverrideSet())
 						{
-							var resultSet = typeof(MockExtensions)
-									.GetMethods()
-								// Couldn't make it work passing the generic types to GetMethod()
-									.Where(m => m.Name == "SetupSet" && m.GetParameters().Length == 2)
-									.First()
-									.MakeGenericMethod(mock.GetType().GetGenericArguments()[0], property.PropertyType)
-									.Invoke(mock, new object[] { mock, expect });
+							var resultSet = typeof(MockExtensions).GetMethod("SetupSet")
+								.MakeGenericMethod(mockType, property.PropertyType)
+								.Invoke(mock, new object[] { mock, expect });
 
-							var callbackSet = resultSet.GetType().GetMethod("Callback", new[] { typeof(Action<>).MakeGenericType(property.PropertyType) });
+							var callbackSet = resultSet.GetType().GetMethod(
+								"Callback",
+								new[] { typeof(Action<>).MakeGenericType(property.PropertyType) });
 
 							var setFunc = Activator.CreateInstance(
 									typeof(Action<>).MakeGenericType(property.PropertyType),

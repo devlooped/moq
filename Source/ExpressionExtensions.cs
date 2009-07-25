@@ -47,6 +47,7 @@ using System.Reflection;
 using System.Runtime.CompilerServices;
 using System.Text;
 using System.Text.RegularExpressions;
+using Moq.Properties;
 
 namespace Moq
 {
@@ -85,12 +86,15 @@ namespace Moq
 			Guard.ArgumentNotNull(expression, "expression");
 
 			var methodCall = expression.Body as MethodCallExpression;
-
 			if (methodCall == null)
-				throw new ArgumentException(String.Format(CultureInfo.CurrentCulture,
-					Properties.Resources.SetupNotMethod, expression.ToStringFixed()));
-			else
-				return methodCall;
+			{
+				throw new ArgumentException(string.Format(
+					CultureInfo.CurrentCulture,
+					Resources.SetupNotMethod,
+					expression.ToStringFixed()));
+			}
+
+			return methodCall;
 		}
 
 		/// <summary>
@@ -335,13 +339,11 @@ namespace Moq
 						.Append("] = ")
 						.Append(call.Arguments.Last().ToStringFixed(useFullTypeName));
 				}
-				else if (call.Method.IsSpecialName &&
-					call.Method.Name.StartsWith("get_", StringComparison.Ordinal))
+				else if (call.Method.IsPropertyGetter())
 				{
 					builder.Append(".").Append(call.Method.Name.Substring(4));
 				}
-				else if (call.Method.IsSpecialName &&
-					call.Method.Name.StartsWith("set_", StringComparison.Ordinal))
+				else if (call.Method.IsPropertySetter())
 				{
 					builder.Append(".")
 						.Append(call.Method.Name.Substring(4))
@@ -350,49 +352,18 @@ namespace Moq
 				}
 				else
 				{
-					builder.Append(".");
-					builder.Append(call.Method.Name);
-
-					if (call.Method.IsGenericMethod)
-					{
-						builder.Append(
-							GetGenericArguments(call.Method.GetGenericArguments(), useFullTypeName));
-					}
-
-					builder.Append("(");
-					builder.Append(string.Join(
-						", ",
-						call.Arguments.Select(a => a.ToString()).ToArray(),
-						startIndex,
-						call.Arguments.Count - startIndex));
-					builder.Append(")");
+					builder.Append(".")
+						.Append(useFullTypeName ? call.Method.GetFullName() : call.Method.GetName())
+						.Append("(")
+						.Append(string.Join(
+							", ",
+							call.Arguments.Select(a => a.ToString()).ToArray(),
+							startIndex,
+							call.Arguments.Count - startIndex))
+						.Append(")");
 				}
 
-				string properCallString = builder.ToString();
-				return properCallString;
-			}
-
-			private static string GetTypeName(Type type, bool useFullTypeName)
-			{
-				if (type.IsGenericType)
-				{
-					return type.Name.Substring(0, type.Name.IndexOf('`')) +
-						GetGenericArguments(type.GetGenericArguments(), useFullTypeName);
-				}
-
-				if (useFullTypeName)
-				{
-					return type.FullName;
-				}
-
-				return type.Name;
-			}
-
-			private static string GetGenericArguments(IEnumerable<Type> arguments, bool useFullTypeName)
-			{
-				return "<" +
-					string.Join(",", arguments.Select(t => GetTypeName(t, useFullTypeName)).ToArray()) +
-					">";
+				return builder.ToString();
 			}
 		}
 	}
