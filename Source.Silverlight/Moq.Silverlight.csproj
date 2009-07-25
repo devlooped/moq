@@ -201,6 +201,9 @@
     <Compile Include="..\Source\Matchers\PredicateMatcher.cs">
       <Link>Matchers\PredicateMatcher.cs</Link>
     </Compile>
+    <Compile Include="..\Source\MemberInfoExtensions.cs">
+      <Link>MemberInfoExtensions.cs</Link>
+    </Compile>
     <Compile Include="..\Source\MethodCall.cs">
       <Link>MethodCall.cs</Link>
     </Compile>

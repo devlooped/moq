@@ -900,6 +900,8 @@ namespace Moq.Tests.Regressions
 
 		#endregion
 
+#if !SILVERLIGHT
+
 		#region #190
 
 		public class _190
@@ -947,8 +949,6 @@ namespace Moq.Tests.Regressions
 		}
 
 		#endregion
-
-#if !SILVERLIGHT
 
 		#region #160
 
