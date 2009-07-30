@@ -2,7 +2,7 @@
     x:Class="Moq.Visualizer.MockVisualizerView"
     xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
     xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
-	xmlns:v="clr-namespace:Moq.Visualizer.ViewModel">
+	xmlns:v="clr-namespace:Moq.Visualizer">
 	<DockPanel>
 		<WrapPanel DockPanel.Dock="Top">
 			<TextBlock Text="Behavior:" Width="80" />

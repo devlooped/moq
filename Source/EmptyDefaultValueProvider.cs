@@ -39,6 +39,7 @@
 // http://www.opensource.org/licenses/bsd-license.php]
 
 using System;
+using System.Collections;
 using System.Collections.Generic;
 using System.Linq;
 using System.Reflection;
@@ -61,10 +62,8 @@ namespace Moq
 			{
 				return GetValueTypeDefault(valueType);
 			}
-			else
-			{
-				return GetReferenceTypeDefault(valueType);
-			}
+
+			return GetReferenceTypeDefault(valueType);
 		}
 
 		private static object GetReferenceTypeDefault(Type valueType)
@@ -73,7 +72,7 @@ namespace Moq
 			{
 				return Activator.CreateInstance(valueType, 0);
 			}
-			else if (valueType == typeof(System.Collections.IEnumerable))
+			else if (valueType == typeof(IEnumerable))
 			{
 				return new object[0];
 			}
@@ -81,41 +80,38 @@ namespace Moq
 			{
 				return new object[0].AsQueryable();
 			}
-			else if (valueType.IsGenericType &&
-				valueType.GetGenericTypeDefinition() == typeof(IEnumerable<>))
+			else if (valueType.IsGenericType && valueType.GetGenericTypeDefinition() == typeof(IEnumerable<>))
 			{
-				var genericListType = typeof(List<>).MakeGenericType(
-					valueType.GetGenericArguments()[0]);
+				var genericListType = typeof(List<>).MakeGenericType(valueType.GetGenericArguments()[0]);
 				return Activator.CreateInstance(genericListType);
 			}
-			else if (valueType.IsGenericType &&
-				valueType.GetGenericTypeDefinition() == typeof(IQueryable<>))
+			else if (valueType.IsGenericType && valueType.GetGenericTypeDefinition() == typeof(IQueryable<>))
 			{
 				var genericType = valueType.GetGenericArguments()[0];
 				var genericListType = typeof(List<>).MakeGenericType(genericType);
-				var list = Activator.CreateInstance(genericListType);
 
 				return typeof(Queryable).GetMethods()
 					.Single(x => x.Name == "AsQueryable" && x.IsGenericMethod)
 					.MakeGenericMethod(genericType)
-					.Invoke(null, new[] { list });
+					.Invoke(null, new[] { Activator.CreateInstance(genericListType) });
 			}
-			else
-			{
-				return null;
-			}
+
+			return null;
 		}
 
 		private static object GetValueTypeDefault(Type valueType)
 		{
 			// For nullable value types, return null.
-			if (valueType.IsGenericType &&
-				valueType.GetGenericTypeDefinition() == typeof(Nullable<>))
+			if (valueType.IsGenericType && valueType.GetGenericTypeDefinition() == typeof(Nullable<>))
+			{
 				return null;
+			}
 			else if (valueType.IsAssignableFrom(typeof(int)))
+			{
 				return 0;
-			else
-				return Activator.CreateInstance(valueType);
+			}
+
+			return Activator.CreateInstance(valueType);
 		}
 	}
 }

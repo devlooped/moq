@@ -1,7 +1,7 @@
 ﻿using System;
 using System.Reflection;
 
-namespace Moq.Visualizer.ViewModel
+namespace Moq.Visualizer
 {
 	[Serializable]
 	public class ParameterViewModel

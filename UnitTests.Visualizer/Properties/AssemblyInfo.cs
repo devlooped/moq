@@ -1,15 +1,16 @@
 ﻿using System.Reflection;
+using System.Runtime.CompilerServices;
 using System.Runtime.InteropServices;
 
 // General Information about an assembly is controlled through the following 
 // set of attributes. Change these attribute values to modify the information
 // associated with an assembly.
-[assembly: AssemblyTitle("Moq.Tests")]
+[assembly: AssemblyTitle("UnitTests.Visualizer")]
 [assembly: AssemblyDescription("")]
 [assembly: AssemblyConfiguration("")]
-[assembly: AssemblyCompany("Clarius Consulting SA")]
-[assembly: AssemblyProduct("Moq.Tests")]
-[assembly: AssemblyCopyright("Copyright © Clarius Consulting SA 2007")]
+[assembly: AssemblyCompany("Microsoft")]
+[assembly: AssemblyProduct("UnitTests.Visualizer")]
+[assembly: AssemblyCopyright("Copyright © Microsoft 2009")]
 [assembly: AssemblyTrademark("")]
 [assembly: AssemblyCulture("")]
 
@@ -19,7 +20,7 @@ using System.Runtime.InteropServices;
 [assembly: ComVisible(false)]
 
 // The following GUID is for the ID of the typelib if this project is exposed to COM
-[assembly: Guid("32d141f9-9a50-4ce1-8d27-abdb7f320dea")]
+[assembly: Guid("3a3f0f06-7487-4e50-b9cf-9ff2eb6e62a0")]
 
 // Version information for an assembly consists of the following four values:
 //

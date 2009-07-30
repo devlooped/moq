@@ -67,7 +67,6 @@ namespace Moq
 			}
 		}
 
-		[SuppressMessage("Microsoft.Performance", "CA1800:DoNotCastUnnecessarily", Justification = "The linq expression is way more readable this way.")]
 		public static string Format(this ICallContext invocation)
 		{
 			if (invocation.Method.IsPropertyGetter())
@@ -92,9 +91,10 @@ namespace Moq
 				return "null";
 			}
 
-			if (value is string)
+			var typedValue = value as string;
+			if (typedValue != null)
 			{
-				return "\"" + (string)value + "\"";
+				return "\"" + typedValue + "\"";
 			}
 
 			return value.ToString();
@@ -137,10 +137,7 @@ namespace Moq
 
 		public static bool IsMockeable(this Type typeToMock)
 		{
-			return
-				typeToMock.IsInterface ||
-				typeToMock.IsAbstract ||
-				!typeToMock.IsSealed;
+			return typeToMock.IsInterface || typeToMock.IsAbstract || !typeToMock.IsSealed;
 		}
 
 		public static bool CanOverrideGet(this PropertyInfo property)
@@ -176,18 +173,22 @@ namespace Moq
 				eventExpression(mock);
 
 				if (context.LastInvocation == null)
+				{
 					throw new ArgumentException("Expression is not an event attach or detach, or the event is declared in a class but not marked virtual.");
+				}
 
 				addRemove = context.LastInvocation.Invocation.Method;
 			}
 
 			var ev = addRemove.DeclaringType.GetEvent(
-					addRemove.Name.Replace("add_", "").Replace("remove_", ""));
+				addRemove.Name.Replace("add_", "").Replace("remove_", ""));
 
 			if (ev == null)
 			{
-				throw new ArgumentException(String.Format(CultureInfo.CurrentCulture,
-					"Could not locate event for attach or detach method {0}.", addRemove.ToString()));
+				throw new ArgumentException(string.Format(
+					CultureInfo.CurrentCulture,
+					"Could not locate event for attach or detach method {0}.",
+					addRemove));
 			}
 
 			return ev;

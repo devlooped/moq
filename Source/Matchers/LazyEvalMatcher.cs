@@ -45,7 +45,7 @@ namespace Moq
 {
 	internal class LazyEvalMatcher : IMatcher
 	{
-		Expression matcherExpression;
+		private Expression matcherExpression;
 
 		public void Initialize(Expression matcherExpression)
 		{

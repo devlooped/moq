@@ -1,7 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 
-namespace Moq.Visualizer.ViewModel
+namespace Moq.Visualizer
 {
 	[Serializable]
 	public abstract class ContainerViewModel

@@ -2,7 +2,6 @@
 using System.Linq;
 using Microsoft.VisualStudio.DebuggerVisualizers;
 using Moq.Proxy;
-using Moq.Visualizer.ViewModel;
 
 namespace Moq.Visualizer
 {

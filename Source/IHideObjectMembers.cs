@@ -40,6 +40,7 @@
 
 using System;
 using System.ComponentModel;
+using System.Diagnostics.CodeAnalysis;
 
 namespace Moq
 {
@@ -52,8 +53,8 @@ namespace Moq
 	public interface IHideObjectMembers
 	{
 		/// <summary/>
-		[System.Diagnostics.CodeAnalysis.SuppressMessage("Microsoft.Design", "CA1024:UsePropertiesWhereAppropriate", Justification = "We're hiding Object.GetType")]
-		[System.Diagnostics.CodeAnalysis.SuppressMessage("Microsoft.Naming", "CA1716:IdentifiersShouldNotMatchKeywords", MessageId = "GetType", Justification = "We're hiding Object.GetType")]
+		[SuppressMessage("Microsoft.Design", "CA1024:UsePropertiesWhereAppropriate", Justification = "We're hiding Object.GetType")]
+		[SuppressMessage("Microsoft.Naming", "CA1716:IdentifiersShouldNotMatchKeywords", MessageId = "GetType", Justification = "We're hiding Object.GetType")]
 		[EditorBrowsable(EditorBrowsableState.Never)]
 		Type GetType();
 

@@ -3,12 +3,12 @@ using System.Collections.Generic;
 using System.Linq;
 using Moq.Proxy;
 
-namespace Moq.Visualizer.ViewModel
+namespace Moq.Visualizer
 {
 	[Serializable]
 	public class MockContextViewModel
 	{
-		public MockContextViewModel(Mock mock)
+		internal MockContextViewModel(Mock mock)
 		{
 			this.Behavior = mock.Behavior;
 			this.DefaultValue = mock.DefaultValue;
@@ -42,11 +42,7 @@ namespace Moq.Visualizer.ViewModel
 			var call = new ContainerViewModel<CallViewModel>("Invocations without setup", calls) { IsExpanded = true };
 			var im = new ContainerViewModel<MockViewModel>("Inner Mocks", innerMocks) { IsExpanded = false };
 
-			return new MockViewModel(
-				mock.MockedType,
-				setup,
-				call,
-				im) { IsExpanded = true };
+			return new MockViewModel(mock.MockedType, setup, call, im) { IsExpanded = true };
 		}
 
 		private static CallViewModel GetCall(ICallContext callContext)

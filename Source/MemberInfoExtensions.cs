@@ -49,6 +49,16 @@ namespace Moq
 			return type.Name;
 		}
 
+		public static bool IsEventAttach(this MethodBase method)
+		{
+			return method.IsSpecialName && method.Name.StartsWith("add_", StringComparison.Ordinal);
+		}
+
+		public static bool IsEventDetach(this MethodBase method)
+		{
+			return method.IsSpecialName && method.Name.StartsWith("remove_", StringComparison.Ordinal);
+		}
+
 		public static bool IsPropertyGetter(this MethodBase method)
 		{
 			return method.IsSpecialName && method.Name.StartsWith("get_", StringComparison.Ordinal);

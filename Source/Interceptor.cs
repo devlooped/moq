@@ -158,11 +158,11 @@ namespace Moq
 			// Special case for events.
 			if (!FluentMockContext.IsActive)
 			{
-				if (IsEventAttach(invocation))
+				if (invocation.Method.IsEventAttach())
 				{
 					var delegateInstance = (Delegate)invocation.Arguments[0];
 					// TODO: validate we can get the event?
-					EventInfo eventInfo = GetEventFromName(invocation.Method.Name.Replace("add_", ""));
+					var eventInfo = GetEventFromName(invocation.Method.Name.Substring(4));
 
 					if (delegateInstance != null)
 					{
@@ -180,11 +180,11 @@ namespace Moq
 
 					return;
 				}
-				else if (IsEventDetach(invocation))
+				else if (invocation.Method.IsEventDetach())
 				{
 					var delegateInstance = (Delegate)invocation.Arguments[0];
 					// TODO: validate we can get the event?
-					EventInfo eventInfo = GetEventFromName(invocation.Method.Name.Replace("remove_", ""));
+					var eventInfo = GetEventFromName(invocation.Method.Name.Substring(7));
 
 					if (delegateInstance != null)
 					{
@@ -258,18 +258,6 @@ namespace Moq
 			}
 		}
 
-		private static bool IsEventAttach(ICallContext invocation)
-		{
-			return invocation.Method.IsSpecialName &&
-				invocation.Method.Name.StartsWith("add_", StringComparison.Ordinal);
-		}
-
-		private static bool IsEventDetach(ICallContext invocation)
-		{
-			return invocation.Method.IsSpecialName &&
-						invocation.Method.Name.StartsWith("remove_", StringComparison.Ordinal);
-		}
-
 		/// <summary>
 		/// Get an eventInfo for a given event name.  Search type ancestors depth first if necessary.
 		/// </summary>
@@ -283,8 +271,10 @@ namespace Moq
 				var currentType = depthFirstProgress.Dequeue();
 				var eventInfo = currentType.GetEvent(eventName);
 				if (eventInfo != null)
+				{
 					return eventInfo;
-				//else
+				}
+
 				foreach (var implementedType in GetAncestorTypes(currentType))
 				{
 					depthFirstProgress.Enqueue(implementedType);
@@ -302,7 +292,7 @@ namespace Moq
 			Type baseType = initialType.BaseType;
 			if (baseType != null)
 			{
-				return new Type[] { baseType };
+				return new[] { baseType };
 			}
 
 			return initialType.GetInterfaces();
@@ -320,7 +310,8 @@ namespace Moq
 				{
 					throw new MockException(
 						MockException.ExceptionReason.ReturnValueRequired,
-						behavior, invocation);
+						behavior,
+						invocation);
 				}
 			}
 		}
@@ -338,23 +329,24 @@ namespace Moq
 
 			public override bool Equals(object obj)
 			{
-				if (Object.ReferenceEquals(this, obj))
+				if (object.ReferenceEquals(this, obj))
+				{
 					return true;
+				}
 
 				var key = obj as ExpressionKey;
-
 				if (key == null)
-					return false;
-
-				var eq = key.fixedString == this.fixedString &&
-					key.values.Count == this.values.Count;
-
-				var i = 0;
-
-				while (eq && i < this.values.Count)
 				{
-					eq |= this.values[i] == key.values[i];
-					i++;
+					return false;
+				}
+
+				var eq = key.fixedString == this.fixedString && key.values.Count == this.values.Count;
+
+				var index = 0;
+				while (eq && index < this.values.Count)
+				{
+					eq |= this.values[index] == key.values[index];
+					index++;
 				}
 
 				return eq;
@@ -367,7 +359,9 @@ namespace Moq
 				foreach (var value in values)
 				{
 					if (value != null)
+					{
 						hash ^= value.GetHashCode();
+					}
 				}
 
 				return hash;

@@ -1,5 +1,4 @@
 ﻿using System.Windows.Forms;
-using Moq.Visualizer.ViewModel;
 
 namespace Moq.Visualizer
 {
