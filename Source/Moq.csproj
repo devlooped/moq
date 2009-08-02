@@ -61,6 +61,9 @@
     <ErrorReport>prompt</ErrorReport>
     <DebugSymbols>true</DebugSymbols>
   </PropertyGroup>
+  <PropertyGroup>
+    <MergeReferences>true</MergeReferences>
+  </PropertyGroup>
   <ItemGroup>
     <Reference Include="Castle.Core, Version=1.0.3.0, Culture=neutral, PublicKeyToken=407dd0808d44fbdc, processorArchitecture=MSIL">
       <SpecificVersion>False</SpecificVersion>
@@ -186,7 +189,7 @@
   -->
   <!-- TODO: create automatic drop project -->
   <!--<Import Project="$(ToolsDir)\MSBuild.Community.Tasks.Targets" />-->
-  <Target Name="AfterBuild" Condition=" '$(Configuration)' == 'Release' ">
+  <Target Name="AfterBuild" Condition=" '$(Configuration)' == 'Release' and '$(MergeReferences)' == 'true' ">
     <Exec Command="&quot;$(MSBuildProjectPath)..\Tools\Ilmerge.exe&quot; /internalize:&quot;$(MSBuildProjectPath)ilmerge.exclude&quot; /ndebug /keyfile:$(AssemblyOriginatorKeyFile) /out:@(MainAssembly) &quot;@(IntermediateAssembly)&quot; @(ReferenceCopyLocalPaths->'&quot;%(FullPath)&quot;', ' ')" />
     <Delete Files="@(ReferenceCopyLocalPaths->'$(OutDir)%(DestinationSubDirectory)%(Filename)%(Extension)')" />
     <Delete Files="$(OutDir)Moq.dll.CodeAnalysisLog.xml" ContinueOnError="true" />
