@@ -168,31 +168,39 @@ namespace Moq
 		private void SetFileInfo()
 		{
 #if !SILVERLIGHT
-			var thisMethod = MethodBase.GetCurrentMethod();
-			var stack = new StackTrace(true);
-			var index = 0;
-
-			// Move 'till our own frame first
-			while (stack.GetFrame(index).GetMethod() != thisMethod && index <= stack.FrameCount)
+			try
 			{
-				index++;
+				var thisMethod = MethodBase.GetCurrentMethod();
+				var stack = new StackTrace(true);
+				var index = 0;
+
+				// Move 'till our own frame first
+				while (stack.GetFrame(index).GetMethod() != thisMethod && index <= stack.FrameCount)
+				{
+					index++;
+				}
+
+				// Move 'till we're at the entry point 
+				// into Moq API
+				var mockAssembly = Assembly.GetExecutingAssembly();
+				while (stack.GetFrame(index).GetMethod().DeclaringType.Assembly == mockAssembly &&
+					index <= stack.FrameCount)
+				{
+					index++;
+				}
+
+				if (index < stack.FrameCount)
+				{
+					var frame = stack.GetFrame(index);
+					this.FileLine = frame.GetFileLineNumber();
+					this.FileName = Path.GetFileName(frame.GetFileName());
+					TestMethod = frame.GetMethod();
+				}
+
 			}
-
-			// Move 'till we're at the entry point 
-			// into Moq API
-			var mockAssembly = Assembly.GetExecutingAssembly();
-			while (stack.GetFrame(index).GetMethod().DeclaringType.Assembly == mockAssembly &&
-				index <= stack.FrameCount)
+			catch { }
 			{
-				index++;
-			}
-
-			if (index < stack.FrameCount)
-			{
-				var frame = stack.GetFrame(index);
-				this.FileLine = frame.GetFileLineNumber();
-				this.FileName = Path.GetFileName(frame.GetFileName());
-				TestMethod = frame.GetMethod();
+				// Must NEVER fail, as this is a nice-to-have feature only.
 			}
 #endif
 		}
