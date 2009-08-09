@@ -11,6 +11,7 @@ using System.Collections;
 using System.Text;
 using Moq;
 using System.ComponentModel;
+using System.Reflection;
 
 namespace Moq.Tests.Regressions
 {

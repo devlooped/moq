@@ -259,14 +259,6 @@ namespace Moq.Tests
 		}
 
 		[Fact]
-		public void IntermediateMethodInvocationNotSupported()
-		{
-			var mock = new Mock<Foo>();
-
-			Assert.Throws<NotSupportedException>(() => mock.Setup(m => m.GetBar().Do("ping")));
-		}
-
-		[Fact]
 		public void NonMockeableTypeThrows()
 		{
 			var mock = new Mock<IFoo>();
@@ -282,6 +274,16 @@ namespace Moq.Tests
 			Assert.Throws<NotSupportedException>(() => mock.Setup(m => m[0].Do("ping")).Returns("ack"));
 		}
 
+		[Fact]
+		public void IntermediateMethodInvocationNotSupported()
+		{
+			var mock = new Mock<Foo>();
+
+			Assert.Throws<NotSupportedException>(() => mock.Setup(m => m.GetBar().Do("ping")));
+		}
+
+
+	
 		public class Foo : IFoo
 		{
 
@@ -308,6 +310,7 @@ namespace Moq.Tests
 			int Value { get; set; }
 			string Do(string command);
 			IBaz Baz { get; set; }
+			IBaz GetBaz(string value);
 		}
 
 		public interface IBaz
