@@ -282,7 +282,29 @@ namespace Moq.Tests
 			Assert.Throws<NotSupportedException>(() => mock.Setup(m => m.GetBar().Do("ping")));
 		}
 
+		[Fact]
+		public void FullMethodInvocationsSupportedInsideFluent()
+		{
+			var fooMock = new Mock<IFoo>(MockBehavior.Strict);
+			fooMock.Setup(f => f.Bar.GetBaz("hey").Value).Returns(5);
 
+			// We'd need to transform to multiple setup calls 
+			// for a typical fluent setup outside of a query context.
+			var factory = new MockFactory(MockBehavior.Strict);
+			var baz = factory
+				.Create<IBaz>()
+				.Setup(z => z.Value)
+				.Returns(5)
+				.AsMocked();
+
+			var bar = factory
+				.Create<IBar>()
+				.Setup(b => b.GetBaz("hey"))
+				.Returns(baz)
+				.AsMocked();
+
+			fooMock.Setup(f => f.Bar).Returns(bar);
+		}
 	
 		public class Foo : IFoo
 		{
@@ -315,6 +337,7 @@ namespace Moq.Tests
 
 		public interface IBaz
 		{
+			int Value { get; set; }
 			string Do(string command);
 			void Do();
 		}

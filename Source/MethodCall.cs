@@ -100,7 +100,8 @@ namespace Moq
 
 	internal partial class MethodCall : IProxyCall, ICallbackResult, IVerifies, IThrowsResult
 	{
-		protected Mock mock;
+		// Internal for AsMockExtensions
+		protected internal Mock mock;
 		protected MethodInfo method;
 		Expression originalExpression;
 		Exception exception;

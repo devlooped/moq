@@ -149,6 +149,7 @@
     <None Include="Match.xdoc" />
     <None Include="Mock.Generic.xdoc" />
     <None Include="Mock.xdoc" />
+    <Compile Include="AsMockExtensions.cs" />
     <Compile Include="DefaultValue.cs" />
     <Compile Include="GlobalSuppressions.cs" />
     <Compile Include="IDefaultValueProvider.cs" />
