@@ -64,6 +64,19 @@ namespace Moq.Tests
 		}
 
 		[Fact]
+		public void NewMocksHaveSameCallBaseAsOwner()
+		{
+			var mock = new Mock<IFoo> { CallBase = true };
+			var provider = new MockDefaultValueProvider(mock);
+
+			var value = provider.ProvideDefault(typeof(IFoo).GetProperty("Bar").GetGetMethod(), new object[0]);
+
+			var barMock = Mock.Get((IBar)value);
+
+			Assert.Equal(mock.CallBase, barMock.CallBase);
+		}
+
+		[Fact]
 		public void CreatedMockIsVerifiedWithOwner()
 		{
 			var mock = new Mock<IFoo>();

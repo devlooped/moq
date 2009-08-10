@@ -69,6 +69,7 @@ namespace Moq
 				var mockType = typeof(Mock<>).MakeGenericType(member.ReturnType);
 				mock = (Mock)Activator.CreateInstance(mockType, owner.Behavior);
 				mock.DefaultValue = owner.DefaultValue;
+				mock.CallBase = owner.CallBase;
 				
 				owner.InnerMocks.Add(member, mock);
 			}
