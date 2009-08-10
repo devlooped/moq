@@ -137,7 +137,12 @@ namespace Moq
 
 		public static bool IsMockeable(this Type typeToMock)
 		{
-			return typeToMock.IsInterface || typeToMock.IsAbstract || !typeToMock.IsSealed;
+			// A value type does not match any of these three 
+			// condition and therefore returns false.
+			return 
+				typeToMock.IsInterface || 
+				typeToMock.IsAbstract || 
+				(typeToMock.IsClass && !typeToMock.IsSealed);
 		}
 
 		public static bool CanOverrideGet(this PropertyInfo property)

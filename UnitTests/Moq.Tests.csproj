@@ -82,6 +82,7 @@
     <Compile Include="AsInterfaceFixture.cs" />
     <Compile Include="AsMockExtensionsFixture.cs" />
     <Compile Include="CustomMatcherFixture.cs" />
+    <Compile Include="ExtensionsFixture.cs" />
     <Compile Include="PropertiesFixture.cs" />
     <Compile Include="RecursiveMocksFixture.cs" />
     <Compile Include="CallbacksFixture.cs" />
