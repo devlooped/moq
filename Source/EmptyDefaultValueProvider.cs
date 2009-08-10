@@ -53,7 +53,7 @@ namespace Moq
 	/// </summary>
 	internal class EmptyDefaultValueProvider : IDefaultValueProvider
 	{
-		public virtual object ProvideDefault(MethodInfo member, object[] arguments)
+		public virtual object ProvideDefault(MethodInfo member)
 		{
 			var valueType = member.ReturnType;
 

@@ -57,9 +57,9 @@ namespace Moq
 			this.owner = owner;
 		}
 
-		public override object ProvideDefault(MethodInfo member, object[] arguments)
+		public override object ProvideDefault(MethodInfo member)
 		{
-			var value = base.ProvideDefault(member, arguments);
+			var value = base.ProvideDefault(member);
 			Mock mock = null;
 
 			if (value == null &&

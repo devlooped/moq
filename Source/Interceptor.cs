@@ -251,9 +251,7 @@ namespace Moq
 				}
 				else
 				{
-					invocation.ReturnValue = this.Mock.DefaultValueProvider.ProvideDefault(
-						invocation.Method,
-						invocation.Arguments);
+					invocation.ReturnValue = this.Mock.DefaultValueProvider.ProvideDefault(invocation.Method);
 				}
 			}
 		}

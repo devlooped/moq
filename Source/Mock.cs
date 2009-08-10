@@ -609,9 +609,7 @@ namespace Moq
 					if (property.CanRead && property.CanOverrideGet())
 					{
 						var expect = GetPropertyExpression(mockType, property);
-						object initialValue = mock.DefaultValueProvider.ProvideDefault(
-							property.GetGetMethod(),
-							new object[0]);
+						object initialValue = mock.DefaultValueProvider.ProvideDefault(property.GetGetMethod());
 						var mocked = initialValue as IMocked;
 						if (mocked != null)
 						{

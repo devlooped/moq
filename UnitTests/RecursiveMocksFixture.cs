@@ -282,7 +282,7 @@ namespace Moq.Tests
 			Assert.Throws<NotSupportedException>(() => mock.Setup(m => m.GetBar().Do("ping")));
 		}
 
-		[Fact]
+		[Fact(Skip="Not supported yet")]
 		public void FullMethodInvocationsSupportedInsideFluent()
 		{
 			var fooMock = new Mock<IFoo>(MockBehavior.Strict);

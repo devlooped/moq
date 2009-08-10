@@ -55,8 +55,6 @@ namespace Moq
 		/// </summary>
 		/// <param name="member">The member to provide a default 
 		/// value for.</param>
-		/// <param name="arguments">Optional arguments passed in 
-		/// to the call that requires a default value.</param>
-		object ProvideDefault(MethodInfo member, object[] arguments);
+		object ProvideDefault(MethodInfo member);
 	}
 }

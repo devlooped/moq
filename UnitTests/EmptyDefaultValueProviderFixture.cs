@@ -12,7 +12,7 @@ namespace Moq.Tests
 		{
 			var provider = new EmptyDefaultValueProvider();
 
-			var value = provider.ProvideDefault(typeof(IFoo).GetProperty("StringValue").GetGetMethod(), new object[0]);
+			var value = provider.ProvideDefault(typeof(IFoo).GetProperty("StringValue").GetGetMethod());
 
 			Assert.Null(value);
 		}
@@ -22,7 +22,7 @@ namespace Moq.Tests
 		{
 			var provider = new EmptyDefaultValueProvider();
 
-			var value = provider.ProvideDefault(typeof(IFoo).GetProperty("IntValue").GetGetMethod(), new object[0]);
+			var value = provider.ProvideDefault(typeof(IFoo).GetProperty("IntValue").GetGetMethod());
 
 			Assert.Equal(default(int), value);
 		}
@@ -32,7 +32,7 @@ namespace Moq.Tests
 		{
 			var provider = new EmptyDefaultValueProvider();
 
-			var value = provider.ProvideDefault(typeof(IFoo).GetProperty("NullableIntValue").GetGetMethod(), new object[0]);
+			var value = provider.ProvideDefault(typeof(IFoo).GetProperty("NullableIntValue").GetGetMethod());
 
 			Assert.Null(value);
 		}
@@ -42,7 +42,7 @@ namespace Moq.Tests
 		{
 			var provider = new EmptyDefaultValueProvider();
 
-			var value = provider.ProvideDefault(typeof(IFoo).GetProperty("BoolValue").GetGetMethod(), new object[0]);
+			var value = provider.ProvideDefault(typeof(IFoo).GetProperty("BoolValue").GetGetMethod());
 
 			Assert.Equal(default(bool), value);
 		}
@@ -52,7 +52,7 @@ namespace Moq.Tests
 		{
 			var provider = new EmptyDefaultValueProvider();
 
-			var value = provider.ProvideDefault(typeof(IFoo).GetProperty("Platform").GetGetMethod(), new object[0]);
+			var value = provider.ProvideDefault(typeof(IFoo).GetProperty("Platform").GetGetMethod());
 
 			Assert.Equal(default(PlatformID), value);
 		}
@@ -62,7 +62,7 @@ namespace Moq.Tests
 		{
 			var provider = new EmptyDefaultValueProvider();
 
-			var value = provider.ProvideDefault(typeof(IFoo).GetProperty("Indexes").GetGetMethod(), new object[0]);
+			var value = provider.ProvideDefault(typeof(IFoo).GetProperty("Indexes").GetGetMethod());
 			Assert.True(value is IEnumerable<int> && ((IEnumerable<int>)value).Count() == 0);
 		}
 
@@ -71,7 +71,7 @@ namespace Moq.Tests
 		{
 			var provider = new EmptyDefaultValueProvider();
 
-			var value = provider.ProvideDefault(typeof(IFoo).GetProperty("Bars").GetGetMethod(), new object[0]);
+			var value = provider.ProvideDefault(typeof(IFoo).GetProperty("Bars").GetGetMethod());
 			Assert.True(value is IBar[] && ((IBar[])value).Length == 0);
 		}
 
@@ -80,8 +80,8 @@ namespace Moq.Tests
 		{
 			var provider = new EmptyDefaultValueProvider();
 
-			var value1 = provider.ProvideDefault(typeof(IFoo).GetProperty("Bar").GetGetMethod(), new object[0]);
-			var value2 = provider.ProvideDefault(typeof(IFoo).GetProperty("Object").GetGetMethod(), new object[0]);
+			var value1 = provider.ProvideDefault(typeof(IFoo).GetProperty("Bar").GetGetMethod());
+			var value2 = provider.ProvideDefault(typeof(IFoo).GetProperty("Object").GetGetMethod());
 
 			Assert.Null(value1);
 			Assert.Null(value2);
@@ -91,7 +91,7 @@ namespace Moq.Tests
 		public void ProvideEmptyQueryable()
 		{
 			var provider = new EmptyDefaultValueProvider();
-			var value = provider.ProvideDefault(typeof(IFoo).GetProperty("Queryable").GetGetMethod(), new object[0]);
+			var value = provider.ProvideDefault(typeof(IFoo).GetProperty("Queryable").GetGetMethod());
 
 			Assert.IsAssignableFrom<IQueryable<int>>(value);
 			Assert.Equal(0, ((IQueryable<int>)value).Count());
@@ -101,7 +101,7 @@ namespace Moq.Tests
 		public void ProvideEmptyQueryableObjects()
 		{
 			var provider = new EmptyDefaultValueProvider();
-			var value = provider.ProvideDefault(typeof(IFoo).GetProperty("QueryableObjects").GetGetMethod(), new object[0]);
+			var value = provider.ProvideDefault(typeof(IFoo).GetProperty("QueryableObjects").GetGetMethod());
 
 			Assert.IsAssignableFrom<IQueryable>(value);
 			Assert.Equal(0, ((IQueryable)value).Cast<object>().Count());
