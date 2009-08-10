@@ -4,6 +4,7 @@ using System.Linq;
 using System.Text;
 using System.Reflection;
 using Moq.Language.Flow;
+using System.ComponentModel;
 
 namespace Moq
 {
@@ -92,7 +93,19 @@ namespace Moq
 		#endregion
 
 		/// <summary>
-		/// Calls <see cref="Mock.Get{T}"/> for the given instance.
+		///	Throws, as invoking AsMock on a non-generic mock 
+		///	without passing the type of interface to retrieve 
+		///	or add to a mock is not supported.
+		///	</summary>
+		public static void AsMock(this Mock mock)
+		{
+			throw new NotSupportedException();
+		}
+
+		/// <summary>
+		/// Retrieves the mock associated with the given instance. If the 
+		/// object is a <see cref="Mock"/>, this method is equivalent to calling 
+		/// <see cref="Mock.As{TInterface}"/>.
 		/// </summary>
 		/// <returns>The mock associated with the object.</returns>
 		/// <remarks>
@@ -102,9 +115,12 @@ namespace Moq
 			where T : class
 		{
 			var call = @object as MethodCall;
+			var mock = @object as Mock;
 			// This may be called at any point in a fluent mock setup.
 			if (call != null)
 				return (Mock<T>)call.mock;
+			else if (mock != null)
+				return mock.As<T>();
 			else
 				return Mock.Get(@object);
 		}

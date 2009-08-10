@@ -53,6 +53,7 @@ namespace Moq
 	/// <include file='Mock.xdoc' path='docs/doc[@for="Mock"]/*'/>
 	public abstract partial class Mock : IHideObjectMembers
 	{
+		private bool isInitialized;
 		private bool callBase;
 		private DefaultValue defaultValue = DefaultValue.Empty;
 		private IDefaultValueProvider defaultValueProvider = new EmptyDefaultValueProvider();
@@ -153,12 +154,19 @@ namespace Moq
 		[SuppressMessage("Microsoft.Naming", "CA1721:PropertyNamesShouldNotMatchGetMethods", Justification = "The public Object property is the only one visible to Moq consumers. The protected member is for internal use only.")]
 		public object Object
 		{
-			get { return this.GetObject(); }
+			get { return GetObject(); }
 		}
 
-		/// <include file='Mock.xdoc' path='docs/doc[@for="Mock.GetObject"]/*'/>
+		private object GetObject()
+		{
+			var value = OnGetObject();
+			isInitialized = true;
+			return value;
+		}
+
+		/// <include file='Mock.xdoc' path='docs/doc[@for="Mock.OnGetObject"]/*'/>
 		[SuppressMessage("Microsoft.Design", "CA1024:UsePropertiesWhereAppropriate", Justification = "This is actually the protected virtual implementation of the property Object.")]
-		protected abstract object GetObject();
+		protected abstract object OnGetObject();
 
 		/// <summary>
 		/// Retrieves the type of the mocked object, its generic type argument.
@@ -900,6 +908,32 @@ namespace Moq
 		public virtual MockedEvent<EventArgs> CreateEventHandler()
 		{
 			return new MockedEvent<EventArgs>(this);
+		}
+
+		#endregion
+
+		#region As<TInterface>
+
+		/// <include file='Mock.xdoc' path='docs/doc[@for="Mock.As{TInterface}"]/*'/>
+		[SuppressMessage("Microsoft.Naming", "CA1716:IdentifiersShouldNotMatchKeywords", MessageId = "As", Justification = "We want the method called exactly as the keyword because that's what it does, it adds an implemented interface so that you can cast it later.")]
+		public virtual Mock<TInterface> As<TInterface>()
+			where TInterface : class
+		{
+			if (isInitialized && !ImplementedInterfaces.Contains(typeof(TInterface)))
+			{
+				throw new InvalidOperationException(Properties.Resources.AlreadyInitialized);
+			}
+			if (!typeof(TInterface).IsInterface)
+			{
+				throw new ArgumentException(Properties.Resources.AsMustBeInterface);
+			}
+
+			if (!ImplementedInterfaces.Contains(typeof(TInterface)))
+			{
+				ImplementedInterfaces.Add(typeof(TInterface));
+			}
+
+			return new AsInterface<TInterface>(this);
 		}
 
 		#endregion

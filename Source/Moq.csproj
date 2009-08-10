@@ -43,8 +43,7 @@
     <DebugSymbols>true</DebugSymbols>
     <OutputPath>bin\Debug\</OutputPath>
     <DefineConstants>TRACE;DEBUG;DESKTOP</DefineConstants>
-    <DocumentationFile>
-    </DocumentationFile>
+    <DocumentationFile>bin\Debug\Moq.xml</DocumentationFile>
     <TreatWarningsAsErrors>true</TreatWarningsAsErrors>
     <DebugType>full</DebugType>
     <PlatformTarget>x86</PlatformTarget>
@@ -149,6 +148,7 @@
     <None Include="Match.xdoc" />
     <None Include="Mock.Generic.xdoc" />
     <None Include="Mock.xdoc" />
+    <Compile Include="AsInterface.cs" />
     <Compile Include="AsMockExtensions.cs" />
     <Compile Include="DefaultValue.cs" />
     <Compile Include="GlobalSuppressions.cs" />

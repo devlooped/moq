@@ -60,7 +60,7 @@ namespace Moq
 		/// <summary>
 		/// Ctor invoked by AsTInterface exclusively.
 		/// </summary>
-		private Mock(bool skipInitialize)
+		internal Mock(bool skipInitialize)
 		{
 			// HACK: this is quick hackish. 
 			// In order to avoid having an IMock<T> I relevant members 
@@ -110,15 +110,7 @@ namespace Moq
 		[SuppressMessage("Microsoft.Naming", "CA1721:PropertyNamesShouldNotMatchGetMethods", Justification = "The public Object property is the only one visible to Moq consumers. The protected member is for internal use only.")]
 		public virtual new T Object
 		{
-			get
-			{
-				if (this.instance == null)
-				{
-					this.InitializeInstance();
-				}
-
-				return this.instance;
-			}
+			get { return (T)base.Object; }
 		}
 
 		private void InitializeInstance()
@@ -136,9 +128,14 @@ namespace Moq
 		/// Returns the mocked object value.
 		/// </summary>
 		[SuppressMessage("Microsoft.Design", "CA1024:UsePropertiesWhereAppropriate", Justification = "This is actually the protected virtual implementation of the property Object.")]
-		protected override object GetObject()
+		protected override object OnGetObject()
 		{
-			return this.Object;
+			if (this.instance == null)
+			{
+				this.InitializeInstance();
+			}
+
+			return this.instance;
 		}
 
 		internal override Type MockedType
@@ -302,96 +299,6 @@ namespace Moq
 		public void VerifySet(Action<T> setterExpression, Times times, string failMessage)
 		{
 			Mock.VerifySet(this, setterExpression, times, failMessage);
-		}
-
-		#endregion
-
-		#region As<TInterface>
-
-		/// <include file='Mock.Generic.xdoc' path='docs/doc[@for="Mock{T}.As{TInterface}"]/*'/>
-		[SuppressMessage("Microsoft.Naming", "CA1716:IdentifiersShouldNotMatchKeywords", MessageId = "As", Justification = "We want the method called exactly as the keyword because that's what it does, it adds an implemented interface so that you can cast it later.")]
-		public virtual Mock<TInterface> As<TInterface>()
-			where TInterface : class
-		{
-			if (this.instance != null && !base.ImplementedInterfaces.Contains(typeof(TInterface)))
-			{
-				throw new InvalidOperationException(Properties.Resources.AlreadyInitialized);
-			}
-			if (!typeof(TInterface).IsInterface)
-			{
-				throw new ArgumentException(Properties.Resources.AsMustBeInterface);
-			}
-
-			if (!base.ImplementedInterfaces.Contains(typeof(TInterface)))
-			{
-				base.ImplementedInterfaces.Add(typeof(TInterface));
-			}
-
-			return new AsInterface<TInterface>(this);
-		}
-
-		private class AsInterface<TInterface> : Mock<TInterface>
-			where TInterface : class
-		{
-			[System.Diagnostics.CodeAnalysis.SuppressMessage("Microsoft.Performance", "CA1823:AvoidUnusedPrivateFields", Justification = "It's used right below!")]
-			Mock<T> owner;
-
-			public AsInterface(Mock<T> owner)
-				: base(true)
-			{
-				this.owner = owner;
-			}
-
-			internal override Dictionary<MethodInfo, Mock> InnerMocks
-			{
-				get { return owner.InnerMocks; }
-			}
-
-			internal override Interceptor Interceptor
-			{
-				get { return owner.Interceptor; }
-				set { owner.Interceptor = value; }
-			}
-
-			internal override Type MockedType { get { return typeof(TInterface); } }
-
-			public override MockBehavior Behavior
-			{
-				get { return owner.Behavior; }
-				internal set { owner.Behavior = value; }
-			}
-
-			public override bool CallBase
-			{
-				get { return owner.CallBase; }
-				set { owner.CallBase = value; }
-			}
-
-			public override DefaultValue DefaultValue
-			{
-				get { return owner.DefaultValue; }
-				set { owner.DefaultValue = value; }
-			}
-
-			public override TInterface Object
-			{
-				get { return owner.Object as TInterface; }
-			}
-
-			public override Mock<TNewInterface> As<TNewInterface>()
-			{
-				return owner.As<TNewInterface>();
-			}
-
-			public override MockedEvent<TEventArgs> CreateEventHandler<TEventArgs>()
-			{
-				return owner.CreateEventHandler<TEventArgs>();
-			}
-
-			public override MockedEvent<EventArgs> CreateEventHandler()
-			{
-				return owner.CreateEventHandler();
-			}
 		}
 
 		#endregion

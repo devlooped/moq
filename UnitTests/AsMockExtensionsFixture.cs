@@ -99,6 +99,14 @@ namespace Moq.Tests
 			Assert.Same(mock, foo);
 		}
 
+		[Fact]
+		public void ThrowsIfAsMockWithoutTForNonGenericMock()
+		{
+			Mock mock = new Mock<IFoo>();
+
+			Assert.Throws<NotSupportedException>(() => mock.AsMock());
+		}
+
 		public interface IFoo
 		{
 			int Value { get; set; }
