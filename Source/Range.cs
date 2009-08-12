@@ -1,4 +1,4 @@
-﻿//Copyright (c) 2007, Moq Team 
+﻿//Copyright (c) 2007. Clarius Consulting, Manas Technology Solutions, InSTEDD
 //http://code.google.com/p/moq/
 //All rights reserved.
 
@@ -15,7 +15,7 @@
 //    and the following disclaimer in the documentation 
 //    and/or other materials provided with the distribution.
     
-//    * Neither the name of the Moq Team nor the 
+//    * Neither the name of Clarius Consulting, Manas Technology Solutions or InSTEDD nor the 
 //    names of its contributors may be used to endorse 
 //    or promote products derived from this software 
 //    without specific prior written permission.
