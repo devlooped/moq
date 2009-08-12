@@ -48,6 +48,7 @@ using System.Runtime.CompilerServices;
 using System.Text;
 using System.Text.RegularExpressions;
 using Moq.Properties;
+using IQToolkit;
 
 namespace Moq
 {

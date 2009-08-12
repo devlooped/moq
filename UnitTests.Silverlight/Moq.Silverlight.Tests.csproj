@@ -138,6 +138,9 @@
     <Compile Include="..\UnitTests\MockFixture.cs">
       <Link>MockFixture.cs</Link>
     </Compile>
+    <Compile Include="..\UnitTests\QueryableMocksFixture.cs">
+      <Link>QueryableMocksFixture.cs</Link>
+    </Compile>
     <Compile Include="..\UnitTests\Regressions\IssueReportsFixture.cs">
       <Link>Regressions\IssueReportsFixture.cs</Link>
     </Compile>
@@ -176,14 +179,14 @@
       <Name>Moq.Silverlight</Name>
     </ProjectReference>
   </ItemGroup>
-	<PropertyGroup>
-		<SilverlightBuildResources>..\Lib\Silverlight SDK\</SilverlightBuildResources>
-		<TargetFrameworkDirectory>$(SilverlightBuildResources)Reference Assemblies\</TargetFrameworkDirectory>
-		<TargetFrameworkSDKDirectory>$(SilverlightBuildResources)Libraries\Client\</TargetFrameworkSDKDirectory>
-		<SilverlightRuntimeVersion>2.0.31005.0</SilverlightRuntimeVersion>
-	</PropertyGroup>
-	<Import Project="$(SilverlightBuildResources)MSBuild\Microsoft.Silverlight.CSharp.targets" />
-	<!--<Import Project="$(MSBuildExtensionsPath)\Microsoft\Silverlight\v2.0\Microsoft.Silverlight.CSharp.targets" />-->
+  <PropertyGroup>
+    <SilverlightBuildResources>..\Lib\Silverlight SDK\</SilverlightBuildResources>
+    <TargetFrameworkDirectory>$(SilverlightBuildResources)Reference Assemblies\</TargetFrameworkDirectory>
+    <TargetFrameworkSDKDirectory>$(SilverlightBuildResources)Libraries\Client\</TargetFrameworkSDKDirectory>
+    <SilverlightRuntimeVersion>2.0.31005.0</SilverlightRuntimeVersion>
+  </PropertyGroup>
+  <Import Project="$(SilverlightBuildResources)MSBuild\Microsoft.Silverlight.CSharp.targets" />
+  <!--<Import Project="$(MSBuildExtensionsPath)\Microsoft\Silverlight\v2.0\Microsoft.Silverlight.CSharp.targets" />-->
   <!-- To modify your build process, add your task inside one of the targets below and uncomment it. 
        Other similar extension points exist, see Microsoft.Common.targets.
   <Target Name="BeforeBuild">

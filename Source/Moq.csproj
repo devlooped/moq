@@ -88,7 +88,6 @@
     <Compile Include="ExpressionExtensions.cs" />
     <Compile Include="Extensions.cs" />
     <Compile Include="Evaluator.cs" />
-    <Compile Include="ExpressionVisitor.cs" />
     <Compile Include="Guard.cs" />
     <Compile Include="IHideObjectMembers.cs" />
     <Compile Include="Language\IReturnsGetter.cs" />
@@ -149,12 +148,16 @@
     <None Include="Mock.Generic.xdoc" />
     <None Include="Mock.xdoc" />
     <Compile Include="AsInterface.cs" />
-    <Compile Include="AsMockExtensions.cs" />
     <Compile Include="DefaultValue.cs" />
     <Compile Include="GlobalSuppressions.cs" />
     <Compile Include="IDefaultValueProvider.cs" />
     <Compile Include="Language\INever.cs" />
     <Compile Include="Language\IRaise.Legacy.cs" />
+    <Compile Include="Linq\ExpressionReplacer.cs" />
+    <Compile Include="Linq\ExpressionVisitor.cs" />
+    <Compile Include="Linq\Query.cs" />
+    <Compile Include="Linq\QueryProvider.cs" />
+    <Compile Include="Linq\TypeHelper.cs" />
     <Compile Include="Match.cs" />
     <Compile Include="Matchers\Matcher.cs" />
     <Compile Include="Matchers\ParamArrayMatcher.cs" />
@@ -170,6 +173,7 @@
     <Compile Include="MockDefaultValueProvider.cs" />
     <Compile Include="MockedEvent.Generic.cs" />
     <Compile Include="MockExtensions.cs" />
+    <Compile Include="Mocks.cs" />
     <Compile Include="PexProtector.cs" />
     <Compile Include="Proxy\ICallContext.cs" />
     <Compile Include="Proxy\CastleProxyFactory.cs" />
