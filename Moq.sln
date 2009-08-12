@@ -62,13 +62,11 @@ Global
 		{335EAF40-60EF-40D7-84A8-E33D255FA59F}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{335EAF40-60EF-40D7-84A8-E33D255FA59F}.Debug|x86.ActiveCfg = Debug|Any CPU
 		{335EAF40-60EF-40D7-84A8-E33D255FA59F}.Release|Any CPU.ActiveCfg = Release|Any CPU
-		{335EAF40-60EF-40D7-84A8-E33D255FA59F}.Release|Any CPU.Build.0 = Release|Any CPU
 		{335EAF40-60EF-40D7-84A8-E33D255FA59F}.Release|x86.ActiveCfg = Release|Any CPU
 		{A84563A0-8A70-43D9-A1C0-530955413318}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
 		{A84563A0-8A70-43D9-A1C0-530955413318}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{A84563A0-8A70-43D9-A1C0-530955413318}.Debug|x86.ActiveCfg = Debug|Any CPU
 		{A84563A0-8A70-43D9-A1C0-530955413318}.Release|Any CPU.ActiveCfg = Release|Any CPU
-		{A84563A0-8A70-43D9-A1C0-530955413318}.Release|Any CPU.Build.0 = Release|Any CPU
 		{A84563A0-8A70-43D9-A1C0-530955413318}.Release|x86.ActiveCfg = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
