@@ -48,6 +48,7 @@ using System.Linq.Expressions;
 using System.Reflection;
 using Moq.Properties;
 using IQToolkit;
+using System.Runtime.CompilerServices;
 
 namespace Moq
 {
@@ -249,7 +250,7 @@ namespace Moq
 			Expression[] args = methodCall.Arguments.ToArray();
 
 			var expected = new MethodCall(mock, expression, method, args) { FailMessage = failMessage };
-			VerifyCalls(GetInterceptor(lambda, mock), expected, expression, times);
+			VerifyCalls(GetInterceptor(methodCall.Object, mock), expected, expression, times);
 		}
 
 		internal static void Verify<T, TResult>(
@@ -271,7 +272,7 @@ namespace Moq
 				Expression[] args = methodCall.Arguments.ToArray();
 
 				var expected = new MethodCallReturn<T, TResult>(mock, expression, method, args) { FailMessage = failMessage };
-				VerifyCalls(GetInterceptor(lambda, mock), expected, expression, times);
+				VerifyCalls(GetInterceptor(methodCall.Object, mock), expected, expression, times);
 			}
 		}
 
@@ -290,7 +291,7 @@ namespace Moq
 				expression,
 				prop.GetGetMethod(),
 				new Expression[0]) { FailMessage = failMessage };
-			VerifyCalls(GetInterceptor(lambda, mock), expected, expression, times);
+			VerifyCalls(GetInterceptor(((MemberExpression)lambda.Body).Expression, mock), expected, expression, times);
 		}
 
 		internal static void VerifySet<T, TProperty>(
@@ -304,7 +305,7 @@ namespace Moq
 			var prop = lambda.ToPropertyInfo();
 
 			var expected = new SetterMethodCall<T, TProperty>(mock, expression, prop.GetSetMethod()) { FailMessage = failMessage };
-			VerifyCalls(GetInterceptor(lambda, mock), expected, expression, times);
+			VerifyCalls(GetInterceptor(((MemberExpression)lambda.Body).Expression, mock), expected, expression, times);
 		}
 
 		internal static void VerifySet<T, TProperty>(
@@ -319,7 +320,7 @@ namespace Moq
 			var prop = lambda.ToPropertyInfo();
 
 			var expected = new SetterMethodCall<T, TProperty>(mock, expression, prop.GetSetMethod(), value) { FailMessage = failMessage };
-			VerifyCalls(GetInterceptor(lambda, mock), expected, expression, times);
+			VerifyCalls(GetInterceptor(((MemberExpression)lambda.Body).Expression, mock), expected, expression, times);
 		}
 
 		internal static void VerifySet<T>(
@@ -383,7 +384,7 @@ namespace Moq
 				ThrowIfCantOverride(expression, method);
 				var call = new MethodCall<T1>(mock, expression, method, args);
 
-				var targetInterceptor = GetInterceptor(expression, mock);
+				var targetInterceptor = GetInterceptor(methodCall.Object, mock);
 
 				targetInterceptor.AddCall(call, SetupKind.Other);
 
@@ -411,7 +412,7 @@ namespace Moq
 				ThrowIfCantOverride(expression, method);
 				var call = new MethodCallReturn<T1, TResult>(mock, expression, method, args);
 
-				var targetInterceptor = GetInterceptor(lambda, mock);
+				var targetInterceptor = GetInterceptor(methodCall.Object, mock);
 
 				targetInterceptor.AddCall(call, SetupKind.Other);
 
@@ -440,8 +441,8 @@ namespace Moq
 					ThrowIfCantOverride(expression, propGet);
 
 					var call = new MethodCallReturn<T1, TProperty>(mock, expression, propGet, new Expression[0]);
-
-					var targetInterceptor = GetInterceptor(expression, mock);
+					// Directly casting to MemberExpression is fine as ToPropertyInfo would throw if it wasn't
+					var targetInterceptor = GetInterceptor(((MemberExpression)expression.Body).Expression, mock);
 
 					targetInterceptor.AddCall(call, SetupKind.Other);
 
@@ -495,7 +496,7 @@ namespace Moq
 			ThrowIfCantOverride(expression, propSet);
 
 			var call = new SetterMethodCall<T1, TProperty>(mock, expression, propSet);
-			var targetInterceptor = GetInterceptor(expression, mock);
+			var targetInterceptor = GetInterceptor(((MemberExpression)expression.Body).Expression, mock);
 
 			targetInterceptor.AddCall(call, SetupKind.PropertySet);
 
@@ -675,11 +676,21 @@ namespace Moq
 		/// Gets the interceptor target for the given expression and root mock, 
 		/// building the intermediate hierarchy of mock objects if necessary.
 		/// </summary>
-		private static Interceptor GetInterceptor(LambdaExpression lambda, Mock mock)
+		private static Interceptor GetInterceptor(Expression fluentExpression, Mock mock)
 		{
-			var visitor = new AutoMockPropertiesVisitor(mock);
-			var target = visitor.SetupMocks(lambda.Body);
-			return target.Interceptor;
+			//var visitor = new AutoMockPropertiesVisitor(mock);
+			//var target = visitor.SetupMocks(lambda.Body);
+			//return target.Interceptor;
+
+			var targetExpression = FluentMockVisitor.Accept(fluentExpression, mock);
+			var targetLambda = Expression.Lambda<Func<Mock>>(
+				Expression.Convert(
+					targetExpression,
+					typeof(Mock)));
+
+			var targetObject = targetLambda.Compile()();
+
+			return targetObject.Interceptor;
 		}
 
 		[SuppressMessage("Microsoft.Usage", "CA2208:InstantiateArgumentExceptionsCorrectly", Justification = "This is a helper method for the one receiving the expression.")]
@@ -749,115 +760,100 @@ namespace Moq
 			return !method.IsVirtual || method.IsFinal || method.IsPrivate;
 		}
 
-		private class AutoMockPropertiesVisitor : ExpressionVisitor
+		private class FluentMockVisitor : ExpressionVisitor
 		{
-			private Mock ownerMock;
-			private List<PropertyInfo> properties = new List<PropertyInfo>();
-			private bool first = true;
+			static readonly MethodInfo FluentMockGenericMethod = ((Func<Mock<string>, Expression<Func<string, string>>, Mock<string>>)
+				QueryableMockExtensions.FluentMock<string, string>).Method.GetGenericMethodDefinition();
+			static readonly MethodInfo MockGetGenericMethod = ((Func<string, Mock<string>>)Moq.Mock.Get<string>)
+				.Method.GetGenericMethodDefinition();
 
-			public AutoMockPropertiesVisitor(Mock ownerMock)
+			Expression expression;
+			Mock mock;
+
+			public FluentMockVisitor(Expression expression, Mock mock)
 			{
-				this.ownerMock = ownerMock;
+				this.expression = expression;
+				this.mock = mock;
 			}
 
-			public Mock SetupMocks(Expression expression)
+			public static Expression Accept(Expression expression, Mock mock)
 			{
-				this.Visit(expression);
-				var targetMock = this.ownerMock;
-
-				foreach (var prop in properties.AsEnumerable().Reverse())
-				{
-					Mock mock;
-					var propGet = prop.GetGetMethod();
-					if (!targetMock.InnerMocks.TryGetValue(propGet, out mock))
-					{
-						// TODO: this may throw TargetInvocationException, 
-						// cleanup stacktrace.
-						ValidateTypeToMock(prop, expression);
-
-						var mockType = typeof(Mock<>).MakeGenericType(prop.PropertyType);
-
-						mock = (Mock)Activator.CreateInstance(mockType, targetMock.Behavior);
-						mock.DefaultValue = targetMock.DefaultValue;
-						targetMock.InnerMocks.Add(propGet, mock);
-
-						var targetType = targetMock.MockedType;
-
-						// TODO: cache method
-						var setupGet = typeof(Mock).GetMethod("SetupGet", BindingFlags.Static | BindingFlags.NonPublic | BindingFlags.InvokeMethod)
-							.MakeGenericMethod(targetType, prop.PropertyType);
-						var param = Expression.Parameter(targetType, "mock");
-						var expr = Expression.Lambda(Expression.MakeMemberAccess(param, prop), param);
-						var result = setupGet.Invoke(targetMock, new object[] { targetMock, expr });
-						var returns = result.GetType().GetMethod("Returns", new[] { prop.PropertyType });
-						returns.Invoke(result, new[] { mock.Object });
-					}
-
-					targetMock = mock;
-				}
-
-				return targetMock;
+				return new FluentMockVisitor(expression, mock).Accept();
 			}
 
-			private static void ValidateTypeToMock(PropertyInfo prop, Expression expr)
+			public Expression Accept()
 			{
-				if (prop.PropertyType.IsValueType || prop.PropertyType.IsSealed)
-				{
-					throw new NotSupportedException(string.Format(
-						CultureInfo.CurrentCulture,
-						Resources.UnsupportedIntermediateType,
-						prop.DeclaringType.Name,
-						prop.Name,
-						prop.PropertyType,
-						expr));
-				}
+				return Visit(expression);
+			}
+
+			protected override Expression VisitParameter(ParameterExpression p)
+			{
+				// the actual first object being used in a fluent expression, 
+				// which will be against the actual mock rather than 
+				// the parameter.
+				return Expression.Constant(mock);
 			}
 
 			protected override Expression VisitMethodCall(MethodCallExpression m)
 			{
-				if (first)
-				{
-					first = false;
-					return base.Visit(m.Object);
-				}
+				var lambdaParam = Expression.Parameter(m.Object.Type, "mock");
+				Expression lambdaBody = Expression.Call(lambdaParam, m.Method, m.Arguments);
+				var targetMethod = GetTargetMethod(m.Object.Type, m.Method.ReturnType);
 
-				throw new NotSupportedException(string.Format(
-					CultureInfo.CurrentCulture,
-					Resources.UnsupportedIntermediateExpression,
-					m));
+				return TranslateFluent(m.Object.Type, m.Method.ReturnType, targetMethod, Visit(m.Object), lambdaParam, lambdaBody);
 			}
 
 			protected override Expression VisitMemberAccess(MemberExpression m)
 			{
-				if (first)
+				// Translate differently member accesses over transparent
+				// compiler-generated types as they are typically the 
+				// anonymous types generated to build up the query expressions.
+				if (m.Expression.NodeType == ExpressionType.Parameter &&
+					m.Expression.Type.GetCustomAttribute<CompilerGeneratedAttribute>(false) != null)
 				{
-					first = false;
-					return base.Visit(m.Expression);
+					var memberType = m.Member is FieldInfo ?
+						((FieldInfo)m.Member).FieldType :
+						((PropertyInfo)m.Member).PropertyType;
+
+					// Generate a Mock.Get over the entire member access rather.
+					// <anonymous_type>.foo => Mock.Get(<anonymous_type>.foo)
+					return Expression.Call(null,
+						MockGetGenericMethod.MakeGenericMethod(memberType), m);
 				}
 
+				// If member is not mock-able, actually, including being a sealed class, etc.?
 				if (m.Member is FieldInfo)
-				{
-					throw new NotSupportedException(string.Format(
-						CultureInfo.CurrentCulture,
-						Resources.FieldsNotSupported,
-						m));
-				}
+					throw new NotSupportedException();
 
-				if (m.Expression.NodeType != ExpressionType.MemberAccess &&
-					m.Expression.NodeType != ExpressionType.Parameter)
-				{
-					throw new NotSupportedException(string.Format(
-						CultureInfo.CurrentCulture,
-						Resources.UnsupportedIntermediateExpression,
-						m));
-				}
+				var lambdaParam = Expression.Parameter(m.Expression.Type, "mock");
+				Expression lambdaBody = Expression.MakeMemberAccess(lambdaParam, m.Member);
+				var targetMethod = GetTargetMethod(m.Expression.Type, ((PropertyInfo)m.Member).PropertyType);
 
-				var prop = (PropertyInfo)m.Member;
-				//var targetType = ((MemberExpression)m.Expression).Type;
+				return TranslateFluent(m.Expression.Type, ((PropertyInfo)m.Member).PropertyType, targetMethod, Visit(m.Expression), lambdaParam, lambdaBody);
+			}
 
-				properties.Add(prop);
+			private Expression TranslateFluent(Type objectType, Type returnType, MethodInfo targetMethod, Expression instance, ParameterExpression lambdaParam, Expression lambdaBody)
+			{
+				var mockType = typeof(Mock<>).MakeGenericType(returnType);
+				var funcType = typeof(Func<,>).MakeGenericType(objectType, returnType);
 
-				return base.VisitMemberAccess(m);
+				// This is the fluent extension method one, so pass the instance as one more arg.
+				return Expression.Call(
+					targetMethod,
+					instance,
+					Expression.Lambda(
+						funcType,
+						lambdaBody,
+						lambdaParam
+					)
+				);
+			}
+
+			private MethodInfo GetTargetMethod(Type objectType, Type returnType)
+			{
+				returnType.ThrowIfNotMockeable();
+				//.FluentMock(mock => mock.Solution)
+				return FluentMockGenericMethod.MakeGenericMethod(objectType, returnType);
 			}
 		}
 

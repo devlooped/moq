@@ -11,8 +11,8 @@ namespace Moq.Tests
 		[Fact]
 		public void ShouldSupportReturningMultipleMocks()
 		{
-			var mocks = (from foo in Mocks.Query<IFoo>()
-						 from bar in Mocks.Query<IBar>()
+			var mocks = (from foo in Mocks.CreateQuery<IFoo>()
+						 from bar in Mocks.CreateQuery<IBar>()
 						 where
 								 foo.Name == "Foo" &&
 								 foo.Find("1").Baz(It.IsAny<string>()).Value == 1 &&
@@ -28,7 +28,7 @@ namespace Moq.Tests
 		[Fact]
 		public void ShouldSupportMultipleSetups()
 		{
-			var instance = (from f in Mocks.Query<IFoo>()
+			var instance = (from f in Mocks.CreateQuery<IFoo>()
 							where
 								f.Name == "Foo" &&
 								f.Find("1").Baz(It.Is<string>(s => s.Length > 0)).Value == 99 &&
@@ -50,7 +50,7 @@ namespace Moq.Tests
 		[Fact]
 		public void ShouldSupportItIsAny()
 		{
-			var instance = (from f in Mocks.Query<IFoo>()
+			var instance = (from f in Mocks.CreateQuery<IFoo>()
 							where f.Bar.Baz(It.IsAny<string>()).Value == 5
 							select f)
 							.First();
@@ -62,7 +62,7 @@ namespace Moq.Tests
 		[Fact]
 		public void TranslateToFluentMocks()
 		{
-			var instance = (from f in Mocks.Query<IFoo>()
+			var instance = (from f in Mocks.CreateQuery<IFoo>()
 							where f.Bar.Baz("hey").Value == 5
 							select f)
 							.First();

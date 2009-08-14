@@ -267,22 +267,30 @@ namespace Moq.Tests
 		}
 
 		[Fact]
-		public void IntermediateIndexerAccessNotSupportedForNow()
+		public void IntermediateIndexerAccessIsSupported()
 		{
 			var mock = new Mock<IFoo>();
 
-			Assert.Throws<NotSupportedException>(() => mock.Setup(m => m[0].Do("ping")).Returns("ack"));
+			mock.Setup(m => m[0].Do("ping")).Returns("ack");
+
+			var result = mock.Object[0].Do("ping");
+
+			Assert.Equal("ack", result);
 		}
 
 		[Fact]
-		public void IntermediateMethodInvocationNotSupported()
+		public void IntermediateMethodInvocationAreSupported()
 		{
-			var mock = new Mock<Foo>();
+			var mock = new Mock<IFoo>();
 
-			Assert.Throws<NotSupportedException>(() => mock.Setup(m => m.GetBar().Do("ping")));
+			mock.Setup(m => m.GetBar().Do("ping")).Returns("ack");
+
+			var result = mock.Object.GetBar().Do("ping");
+
+			Assert.Equal("ack", result);
 		}
 
-		[Fact(Skip="Not supported yet")]
+		[Fact]
 		public void FullMethodInvocationsSupportedInsideFluent()
 		{
 			var fooMock = new Mock<IFoo>(MockBehavior.Strict);
@@ -310,6 +318,7 @@ namespace Moq.Tests
 			IBar Bar { get; set; }
 			IBar this[int index] { get; set; }
 			string Do(string command);
+			IBar GetBar();
 		}
 
 		public interface IBar

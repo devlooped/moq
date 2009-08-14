@@ -44,6 +44,8 @@ using System.Globalization;
 using System.Linq;
 using System.Reflection;
 using Moq.Proxy;
+using System.Linq.Expressions;
+using Moq.Properties;
 
 namespace Moq
 {
@@ -133,6 +135,21 @@ namespace Moq
 		public static void SetStackTrace(this Exception exception, string stackTrace)
 		{
 			remoteStackTraceString.SetValue(exception, stackTrace);
+		}
+
+		public static void ThrowIfNotMockeable(this Type typeToMock)
+		{
+			if (!IsMockeable(typeToMock))
+				throw new NotSupportedException(Properties.Resources.InvalidMockClass);
+		}
+
+		public static void ThrowIfNotMockeable(this MemberExpression memberAccess)
+		{
+			if (memberAccess.Member is FieldInfo)
+				throw new NotSupportedException(string.Format(
+					CultureInfo.CurrentCulture,
+					Resources.FieldsNotSupported,
+					memberAccess));
 		}
 
 		public static bool IsMockeable(this Type typeToMock)

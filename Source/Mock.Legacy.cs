@@ -58,7 +58,7 @@ namespace Moq
 			ThrowIfCantOverride(expression, setter);
 
 			var call = new SetterMethodCall<T1, TProperty>(mock, expression, setter, value);
-			var targetInterceptor = GetInterceptor(expression, mock);
+			var targetInterceptor = GetInterceptor(((MemberExpression)lambda.Body).Expression, mock);
 
 			targetInterceptor.AddCall(call, SetupKind.PropertySet);
 

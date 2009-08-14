@@ -208,7 +208,7 @@ namespace Moq.Tests
 		[Fact]
 		public void ThrowsIfSealedClass()
 		{
-			Assert.Throws<ArgumentException>(() => new Mock<FooSealed>());
+			Assert.Throws<NotSupportedException>(() => new Mock<FooSealed>());
 		}
 
 		[Fact]

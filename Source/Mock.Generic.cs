@@ -94,8 +94,7 @@ namespace Moq
 
 		private void CheckParameters()
 		{
-			if (!typeof(T).IsMockeable())
-				throw new ArgumentException(Properties.Resources.InvalidMockClass);
+			typeof(T).ThrowIfNotMockeable();
 
 			if (typeof(T).IsInterface && this.constructorArguments.Length > 0)
 				throw new ArgumentException(Properties.Resources.ConstructorArgsForInterface);

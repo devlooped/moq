@@ -64,7 +64,7 @@ namespace Moq
 		/// Creates a query for mocks of the given type.
 		/// </summary>
 		/// <typeparam name="T">The type of mocked object to query.</typeparam>
-		public static IQueryable<T> Query<T>()
+		public static IQueryable<T> CreateQuery<T>()
 		{
 			return new MockQueryable<T>();
 		}
@@ -418,6 +418,8 @@ namespace Moq
 			where T : class
 			where TResult : class
 		{
+			typeof(TResult).ThrowIfNotMockeable();
+
 			MethodInfo info;
 
 			if (setup.Body.NodeType == ExpressionType.MemberAccess)
