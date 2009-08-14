@@ -298,7 +298,16 @@ namespace Moq.Tests
 
 			Assert.Equal(5, fooMock.Object.Bar.GetBaz("hey").Value);
 		}
-	
+
+		[Fact]
+		public void FullMethodInvocationInsideFluentCanUseMatchers()
+		{
+			var fooMock = new Mock<IFoo>(MockBehavior.Strict);
+			fooMock.Setup(f => f.Bar.GetBaz(It.IsAny<string>()).Value).Returns(5);
+
+			Assert.Equal(5, fooMock.Object.Bar.GetBaz("foo").Value);
+		}
+
 		public class Foo : IFoo
 		{
 
