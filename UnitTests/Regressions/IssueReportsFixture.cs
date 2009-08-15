@@ -728,7 +728,6 @@ namespace Moq.Tests.Regressions
 				var foo1 = new Foo();
 				var foo = new Foo();
 
-
 				var sut = new Perfectly_fine_yet_failing_test();
 				var dependency = new Mock<IDependency>();
 

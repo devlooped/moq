@@ -6,19 +6,19 @@ namespace Moq.Visualizer
 	[Serializable]
 	public abstract class ContainerViewModel
 	{
-		protected ContainerViewModel(string label)
+		protected ContainerViewModel(string name)
 		{
-			this.Label = label;
+			this.Name = name;
 		}
 
-		public string Label { get; private set; }
+		public string Name { get; private set; }
 	}
 
 	[Serializable]
 	public class ContainerViewModel<T> : ContainerViewModel
 	{
-		public ContainerViewModel(string label, IEnumerable<T> children)
-			: base(label)
+		public ContainerViewModel(string name, IEnumerable<T> children)
+			: base(name)
 		{
 			this.Children = children;
 		}

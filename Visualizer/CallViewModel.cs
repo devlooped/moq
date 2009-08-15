@@ -23,35 +23,35 @@ namespace Moq.Visualizer
 
 		private object GetValue(object value)
 		{
-			if (value != null)
+			if (value == null)
 			{
-				// TODO get type from ParameterInfo, because of possible conversion errors
-				// NOTE Primitive types are: Boolean, Byte, SByte, Int16, UInt16, Int32, UInt32, Int64, UInt64, IntPtr, UIntPtr, Char, Double, and Single
-				var type = value.GetType();
-				if (type.IsPrimitive || value is decimal || value is DateTime || value is TimeSpan)
-				{
-					return value;
-				}
-
-				// TODO take care about BitMap enums
-				if (type.IsEnum)
-				{
-					var values = value.ToString().Split(
-						new char[] { ',', ' ' },
-						StringSplitOptions.RemoveEmptyEntries);
-					var typeName = type.GetName();
-					return string.Join(" | ", values.Select(v => typeName + "." + v).ToArray());
-				}
-
-				if (value is string)
-				{
-					return "\"" + value + "\"";
-				}
-
-				return "<" + type.GetName() + ">";
+				return "<null>";
 			}
 
-			return value;
+			// TODO get type from ParameterInfo, because of possible conversion errors
+			// NOTE Primitive types are: Boolean, Byte, SByte, Int16, UInt16, Int32, UInt32, Int64, UInt64, IntPtr, UIntPtr, Char, Double, and Single
+			var type = value.GetType();
+			if (type.IsPrimitive || value is decimal || value is DateTime || value is TimeSpan)
+			{
+				return value;
+			}
+
+			// TODO take care about BitMap enums
+			if (type.IsEnum)
+			{
+				var values = value.ToString().Split(
+					new char[] { ',', ' ' },
+					StringSplitOptions.RemoveEmptyEntries);
+				var typeName = type.GetName();
+				return string.Join(" | ", values.Select(v => typeName + "." + v).ToArray());
+			}
+
+			if (value is string)
+			{
+				return "\"" + value + "\"";
+			}
+
+			return "<" + type.GetName() + ">";
 		}
 
 		public IEnumerable<ParameterViewModel> Arguments { get; private set; }

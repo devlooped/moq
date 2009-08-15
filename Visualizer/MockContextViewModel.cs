@@ -2,6 +2,7 @@
 using System.Collections.Generic;
 using System.Linq;
 using Moq.Proxy;
+using Moq.Visualizer.Properties;
 
 namespace Moq.Visualizer
 {
@@ -13,7 +14,7 @@ namespace Moq.Visualizer
 			this.Behavior = mock.Behavior;
 			this.DefaultValue = mock.DefaultValue;
 			this.CallBase = mock.CallBase;
-			this.SetMocks(GetMock(mock));
+			this.Mocks = new[] { GetMock(mock) };
 		}
 
 		public MockBehavior Behavior { get; private set; }
@@ -24,9 +25,9 @@ namespace Moq.Visualizer
 
 		public IEnumerable<MockViewModel> Mocks { get; private set; }
 
-		private void SetMocks(params MockViewModel[] mocks)
+		private static ContainerViewModel CreateExpandedContainer<T>(string name, IEnumerable<T> children)
 		{
-			this.Mocks = mocks;
+			return new ContainerViewModel<T>(name, children.ToArray()) { IsExpanded = true };
 		}
 
 		private static MockViewModel GetMock(Mock mock)
@@ -34,15 +35,18 @@ namespace Moq.Visualizer
 			var actualCalls = mock.Interceptor.ActualCalls.ToDictionary(ac => ac, i => GetCall(i));
 
 			var setups = mock.Interceptor.OrderedCalls.Select(s => GetSetup(s, actualCalls))
-				.OrderBy(s => s.SetupExpression).ToArray();
-			var calls = actualCalls.Values.Where(c => !c.HasSetup).ToArray();
-			var innerMocks = mock.InnerMocks.Values.Select(m => GetMock(m)).ToArray();
+				.OrderBy(s => s.SetupExpression);
+			var calls = actualCalls.Values.Where(c => !c.HasSetup);
+			var innerMocks = mock.InnerMocks.Values.Select(m => GetMock(m));
 
-			var setup = new ContainerViewModel<SetupViewModel>("Setups", setups) { IsExpanded = true };
-			var call = new ContainerViewModel<CallViewModel>("Invocations without setup", calls) { IsExpanded = true };
-			var im = new ContainerViewModel<MockViewModel>("Inner Mocks", innerMocks) { IsExpanded = false };
-
-			return new MockViewModel(mock.MockedType, setup, call, im) { IsExpanded = true };
+			return new MockViewModel(
+				mock.MockedType,
+				CreateExpandedContainer<SetupViewModel>(Resources.SetupsContainerName, setups),
+				CreateExpandedContainer<CallViewModel>(Resources.OtherCallsContainerName, calls),
+				CreateExpandedContainer<MockViewModel>(Resources.MocksContainerName, innerMocks))
+			{
+				IsExpanded = true
+			};
 		}
 
 		private static CallViewModel GetCall(ICallContext callContext)
@@ -50,7 +54,9 @@ namespace Moq.Visualizer
 			return new CallViewModel(callContext.Method, callContext.Arguments, callContext.ReturnValue);
 		}
 
-		private static SetupViewModel GetSetup(IProxyCall proxyCall, IDictionary<ICallContext, CallViewModel> actualCalls)
+		private static SetupViewModel GetSetup(
+			IProxyCall proxyCall,
+			IDictionary<ICallContext, CallViewModel> actualCalls)
 		{
 			if (proxyCall.Invoked)
 			{
@@ -60,7 +66,7 @@ namespace Moq.Visualizer
 					proxyCall.SetupExpression.ToStringFixed(),
 					proxyCall.IsVerifiable,
 					proxyCall.IsNever,
-					new ContainerViewModel<CallViewModel>("Invocations", setupCalls.ToArray()) { IsExpanded = true });
+					CreateExpandedContainer<CallViewModel>("Invocations", setupCalls));
 			}
 
 			return new SetupViewModel(

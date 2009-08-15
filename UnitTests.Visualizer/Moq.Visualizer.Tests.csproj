@@ -37,6 +37,8 @@
     <Reference Include="System.Core">
       <RequiredTargetFramework>3.5</RequiredTargetFramework>
     </Reference>
+    <Reference Include="System.Data" />
+    <Reference Include="System.Xml" />
     <Reference Include="xunit, Version=1.1.0.1323, Culture=neutral, PublicKeyToken=8d05b1bb7a6fdb6c, processorArchitecture=MSIL">
       <SpecificVersion>False</SpecificVersion>
       <HintPath>..\Lib\xUnit\xunit.dll</HintPath>
@@ -45,6 +47,7 @@
   <ItemGroup>
     <Compile Include="MockContextViewModelFixture.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
+    <Compile Include="SetupViewModelFixture.cs" />
   </ItemGroup>
   <ItemGroup>
     <ProjectReference Include="..\Source\Moq.csproj">

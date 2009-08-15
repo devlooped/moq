@@ -1,7 +1,5 @@
 ﻿using System.IO;
-using System.Linq;
 using Microsoft.VisualStudio.DebuggerVisualizers;
-using Moq.Proxy;
 
 namespace Moq.Visualizer
 {

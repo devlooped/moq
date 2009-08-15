@@ -12,9 +12,9 @@ namespace Moq.Visualizer
 			bool isNever,
 			params ContainerViewModel[] containers)
 		{
+			this.SetupExpression = setupExpression;
 			this.IsNever = isNever;
 			this.IsVerifiable = isVerifiable;
-			this.SetupExpression = setupExpression;
 			this.Containers = containers;
 		}
 

@@ -8,7 +8,10 @@ namespace Moq.Visualizer
 			IDialogVisualizerService windowService,
 			IVisualizerObjectProvider objectProvider)
 		{
-			windowService.ShowDialog(new MockVisualizerForm(objectProvider.GetObject()));
+			using (var visualizer = new MockVisualizerForm(objectProvider.GetObject()))
+			{
+				windowService.ShowDialog(visualizer);
+			}
 		}
 	}
 }
