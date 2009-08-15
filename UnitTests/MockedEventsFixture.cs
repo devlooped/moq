@@ -623,6 +623,15 @@ namespace Moq.Tests
 			public event CustomEvent CustomEvent;
 			public virtual event EventHandler VirtualEvent;
 			public virtual object Value { get; set; }
+
+			// NOTE Dummy method to skip VS Warnings
+			private void Attach()
+			{
+				this.InterfaceEvent += (s, e) => { };
+				this.ClassEvent += (s, e) => { };
+				this.CustomEvent += (s, e) => { };
+				this.VirtualEvent += (s, e) => { };
+			}
 		}
 
 		private void OnRaised(object sender, EventArgs e)
@@ -675,10 +684,11 @@ namespace Moq.Tests
 		public interface IParent : INotifyPropertyChanged
 		{
 			event EventHandler<EventArgs> Event;
-			event PropertyChangedEventHandler PropertyChanged;
 			IAdder<int> Adder { get; set; }
 		}
 
-		public interface IDerived : IParent { }
+		public interface IDerived : IParent
+		{ 
+		}
 	}
 }

@@ -764,6 +764,11 @@ namespace Moq.Tests.Regressions
 				{
 					return obj is Foo && ((Foo)obj).Id == Id;
 				}
+
+				public override int GetHashCode()
+				{
+					return base.GetHashCode();
+				}
 			}
 		}
 

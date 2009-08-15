@@ -257,7 +257,7 @@ namespace Moq.Tests
 					ItExpr.Is<string>(s => s.Length >= 2))
 				.Returns("long");
 			mock.Protected()
-				.Setup<string>("StringArg", 
+				.Setup<string>("StringArg",
 					ItExpr.Is<string>(s => s.Length < 2))
 				.Returns("short");
 
@@ -273,7 +273,7 @@ namespace Moq.Tests
 					ItExpr.IsAny<string>(),
 					5)
 				.Returns("done");
-	
+
 			Assert.Equal("done", mock.Object.DoTwoArgs("foobar", 5));
 			Assert.Equal("echo", mock.Object.DoTwoArgs("echo", 15));
 
@@ -369,35 +369,93 @@ namespace Moq.Tests
 
 		public class FooBase
 		{
-			protected event EventHandler Doing;
+			internal protected virtual int ProtectedInternal()
+			{
+				return 0;
+			}
 
-			internal protected virtual int ProtectedInternal() { return 0; }
-			internal virtual void Internal() { }
+			internal virtual void Internal()
+			{
+			}
 
-			public int DoProtectedInternalInt() { return ProtectedInternalInt(); }
-			internal protected virtual int ProtectedInternalInt() { return 0; }
-			internal virtual int InternalInt() { return 0; }
+			public int DoProtectedInternalInt()
+			{
+				return ProtectedInternalInt();
+			}
 
-			public void DoVoid() { Void(); }
-			protected virtual void Void() { }
+			internal protected virtual int ProtectedInternalInt()
+			{
+				return 0;
+			}
 
-			public void DoVoidArg(string arg) { VoidArg(arg); }
-			protected virtual void VoidArg(string arg) { }
+			internal virtual int InternalInt()
+			{
+				return 0;
+			}
 
-			public int DoInt() { return Int(); }
-			protected virtual int Int() { return 0; }
+			public void DoVoid()
+			{
+				Void();
+			}
 
-			public string DoStringArg(string arg) { return StringArg(arg); }
-			protected virtual string StringArg(string arg) { return arg; }
+			protected virtual void Void()
+			{
+			}
+
+			public void DoVoidArg(string arg)
+			{
+				VoidArg(arg);
+			}
+
+			protected virtual void VoidArg(string arg)
+			{
+			}
+
+			public int DoInt()
+			{
+				return Int();
+			}
+
+			protected virtual int Int()
+			{
+				return 0;
+			}
+
+			public string DoStringArg(string arg)
+			{
+				return StringArg(arg);
+			}
+
+			protected virtual string StringArg(string arg)
+			{
+				return arg;
+			}
 
 			public string PublicValue { get; set; }
-			public string GetProtectedValue() { return ProtectedValue; }
-			public void SetProtectedValue(string value) { ProtectedValue = value; }
+
+			public string GetProtectedValue()
+			{
+				return ProtectedValue;
+			}
+
+			public void SetProtectedValue(string value)
+			{
+				ProtectedValue = value;
+			}
+
 			protected virtual string ProtectedValue { get; set; }
 
-			protected virtual int this[int index] { get { return 0; } set { } }
+			protected virtual int this[int index]
+			{
+				get { return 0; }
+				set { }
+			}
 
-			public string DoTwoArgs(string arg, int arg1) { return TwoArgs(arg, arg1); } 
+			public string DoTwoArgs(string arg, int arg1)
+			{
+				return TwoArgs(arg, arg1);
+			}
+
 			protected virtual string TwoArgs(string arg, int arg1)
 			{
 				return arg;
