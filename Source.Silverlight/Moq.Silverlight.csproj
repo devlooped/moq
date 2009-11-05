@@ -111,9 +111,6 @@
     <Compile Include="..\Source\DefaultValue.cs">
       <Link>DefaultValue.cs</Link>
     </Compile>
-    <Compile Include="..\Source\Delegates.cs">
-      <Link>Delegates.cs</Link>
-    </Compile>
     <Compile Include="..\Source\EmptyDefaultValueProvider.cs">
       <Link>EmptyDefaultValueProvider.cs</Link>
     </Compile>
@@ -204,9 +201,6 @@
     <Compile Include="..\Source\Linq\ExpressionReplacer.cs">
       <Link>Linq\ExpressionReplacer.cs</Link>
     </Compile>
-    <Compile Include="..\Source\Linq\ExpressionVisitor.cs">
-      <Link>Linq\ExpressionVisitor.cs</Link>
-    </Compile>
     <Compile Include="..\Source\Linq\Query.cs">
       <Link>Linq\Query.cs</Link>
     </Compile>
@@ -254,6 +248,15 @@
     </Compile>
     <Compile Include="..\Source\MethodCallReturn.cs">
       <Link>MethodCallReturn.cs</Link>
+    </Compile>
+    <Compile Include="..\Source\Microsoft\Delegates.cs">
+      <Link>Microsoft\Delegates.cs</Link>
+      <AutoGen>True</AutoGen>
+      <DesignTime>True</DesignTime>
+      <DependentUpon>Delegates.tt</DependentUpon>
+    </Compile>
+    <Compile Include="..\Source\Microsoft\ExpressionVisitor.cs">
+      <Link>Microsoft\ExpressionVisitor.cs</Link>
     </Compile>
     <Compile Include="..\Source\Mock.cs">
       <Link>Mock.cs</Link>
@@ -361,6 +364,11 @@
     <None Include="..\Moq.snk">
       <Link>Moq.snk</Link>
     </None>
+    <None Include="..\Source\Microsoft\Delegates.tt">
+      <Link>Microsoft\Delegates.tt</Link>
+      <Generator>TextTemplatingFileGenerator</Generator>
+      <LastGenOutput>Delegates.cs</LastGenOutput>
+    </None>
     <None Include="..\Source\Mock.xdoc">
       <Link>Mock.xdoc</Link>
     </None>
@@ -386,6 +394,9 @@
       <ProductName>Windows Installer 3.1</ProductName>
       <Install>true</Install>
     </BootstrapperPackage>
+  </ItemGroup>
+  <ItemGroup>
+    <Service Include="{508349B6-6B84-4DF5-91F0-309BEEBAD82D}" />
   </ItemGroup>
   <PropertyGroup>
     <SilverlightBuildResources>..\Lib\Silverlight SDK\</SilverlightBuildResources>

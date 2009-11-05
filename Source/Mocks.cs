@@ -136,7 +136,7 @@ namespace Moq
 				return expressions;
 			}
 
-			protected override Expression Visit(Expression exp)
+			public override Expression Visit(Expression exp)
 			{
 				expressions.Add(exp);
 				return base.Visit(exp);
@@ -275,7 +275,7 @@ namespace Moq
 				return TranslateFluent(m.Object.Type, m.Method.ReturnType, targetMethod, Visit(m.Object), lambdaParam, lambdaBody);
 			}
 
-			protected override Expression VisitMemberAccess(MemberExpression m)
+			protected override Expression VisitMember(MemberExpression m)
 			{
 				// Translate differently member accesses over transparent
 				// compiler-generated types as they are typically the 

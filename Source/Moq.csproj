@@ -51,7 +51,7 @@
     <DebugType>full</DebugType>
     <Optimize>true</Optimize>
     <OutputPath>bin\Release\</OutputPath>
-    <DefineConstants>TRACE;CODE_ANALYSIS;DESKTOP</DefineConstants>
+    <DefineConstants>TRACE;CODE_ANALYSIS;CODE_ANALYSIS;CODE_ANALYSIS;DESKTOP</DefineConstants>
     <ErrorReport>prompt</ErrorReport>
     <WarningLevel>4</WarningLevel>
     <DocumentationFile>bin\Release\Moq.xml</DocumentationFile>
@@ -102,8 +102,13 @@
     <Reference Include="System.Xml" />
   </ItemGroup>
   <ItemGroup>
-    <Compile Include="Delegates.cs" Condition=" $(TargetFrameworkVersion) == 'v3.5' " />
     <Compile Include="EmptyDefaultValueProvider.cs" />
+    <Compile Include="Microsoft\Delegates.cs" Condition=" $(TargetFrameworkVersion) == 'v3.5' ">
+      <AutoGen>True</AutoGen>
+      <DesignTime>True</DesignTime>
+      <DependentUpon>Delegates.tt</DependentUpon>
+    </Compile>
+    <Compile Include="Microsoft\ExpressionVisitor.cs" Condition=" $(TargetFrameworkVersion) == 'v3.5' " />
     <Compile Include="SetupKind.cs" />
     <Compile Include="Language\Flow\IReturnsResult.cs" />
     <Compile Include="Language\IRaise.cs" />
@@ -170,6 +175,10 @@
       <SubType>Designer</SubType>
     </None>
     <None Include="Match.xdoc" />
+    <None Include="Microsoft\Delegates.tt" Condition=" $(TargetFrameworkVersion) == 'v3.5' ">
+      <Generator>TextTemplatingFileGenerator</Generator>
+      <LastGenOutput>Delegates.cs</LastGenOutput>
+    </None>
     <None Include="Mock.Generic.xdoc">
       <SubType>Designer</SubType>
     </None>
@@ -183,7 +192,6 @@
     <Compile Include="Language\INever.cs" />
     <Compile Include="Language\IRaise.Legacy.cs" />
     <Compile Include="Linq\ExpressionReplacer.cs" />
-    <Compile Include="Linq\ExpressionVisitor.cs" Condition=" $(TargetFrameworkVersion) == 'v3.5' " />
     <Compile Include="Linq\Query.cs" />
     <Compile Include="Linq\QueryProvider.cs" />
     <Compile Include="Linq\TypeHelper.cs" />

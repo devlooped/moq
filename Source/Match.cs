@@ -138,11 +138,25 @@ namespace Moq
 	internal class MatchExpression : Expression
 	{
 		public MatchExpression(Match match)
+#if !NET4
 			: base(ExpressionType.Call, typeof(Match))
+#endif
 		{
 			this.Match = match;
 		}
 
 		public Match Match { get; private set; }
+
+#if NET4
+		public override ExpressionType NodeType
+		{
+			get { return ExpressionType.Call; }
+		}
+
+		public override Type Type
+		{
+			get { return typeof(Match); }
+		}
+#endif
 	}
 }

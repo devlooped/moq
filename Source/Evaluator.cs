@@ -104,7 +104,7 @@ namespace Moq
 				return this.Visit(exp);
 			}
 
-			protected override Expression Visit(Expression exp)
+			public override Expression Visit(Expression exp)
 			{
 				if (exp == null)
 				{
@@ -161,7 +161,7 @@ namespace Moq
 				return this.candidates;
 			}
 
-			protected override Expression Visit(Expression expression)
+			public override Expression Visit(Expression expression)
 			{
 				if (expression != null)
 				{

@@ -7,7 +7,7 @@ using System.Collections.ObjectModel;
 using System.Linq.Expressions;
 using System.Reflection;
 
-namespace IQToolkit 
+namespace System.Linq.Expressions 
 {
     internal abstract class ExpressionVisitor
     {
@@ -15,7 +15,7 @@ namespace IQToolkit
         {
         }
 
-        protected virtual Expression Visit(Expression exp)
+        public virtual Expression Visit(Expression exp)
         {
             if (exp == null)
                 return exp;
@@ -65,7 +65,7 @@ namespace IQToolkit
                 case ExpressionType.Parameter:
                     return this.VisitParameter((ParameterExpression)exp);
                 case ExpressionType.MemberAccess:
-                    return this.VisitMemberAccess((MemberExpression)exp);
+                    return this.VisitMember((MemberExpression)exp);
                 case ExpressionType.Call:
                     return this.VisitMethodCall((MethodCallExpression)exp);
                 case ExpressionType.Lambda:
@@ -197,7 +197,7 @@ namespace IQToolkit
             return p;
         }
 
-        protected virtual Expression VisitMemberAccess(MemberExpression m)
+        protected virtual Expression VisitMember(MemberExpression m)
         {
             Expression exp = this.Visit(m.Expression);
             return this.UpdateMemberAccess(m, exp, m.Member);

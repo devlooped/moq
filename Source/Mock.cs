@@ -803,7 +803,7 @@ namespace Moq
 				return TranslateFluent(m.Object.Type, m.Method.ReturnType, targetMethod, Visit(m.Object), lambdaParam, lambdaBody);
 			}
 
-			protected override Expression VisitMemberAccess(MemberExpression m)
+			protected override Expression VisitMember(MemberExpression m)
 			{
 				// Translate differently member accesses over transparent
 				// compiler-generated types as they are typically the 

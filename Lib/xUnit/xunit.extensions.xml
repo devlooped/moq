@@ -656,7 +656,7 @@
             multiple times (once with each data row).
             </summary>
         </member>
-        <member name="M:Xunit.Extensions.TheoryAttribute.EnumerateTestCommands(System.Reflection.MethodInfo)">
+        <member name="M:Xunit.Extensions.TheoryAttribute.EnumerateTestCommands(Xunit.Sdk.IMethodInfo)">
             <summary>
             Creates instances of <see cref="T:Xunit.Extensions.TheoryCommand"/> which represent individual intended
             invocations of the test method, one per data row in the data source.
@@ -669,11 +669,12 @@
             Represents a single invocation of a data theory test method.
             </summary>
         </member>
-        <member name="M:Xunit.Extensions.TheoryCommand.#ctor(System.Reflection.MethodInfo,System.Object[])">
+        <member name="M:Xunit.Extensions.TheoryCommand.#ctor(Xunit.Sdk.IMethodInfo,System.String,System.Object[])">
             <summary>
             Creates a new instance of <see cref="T:Xunit.Extensions.TheoryCommand"/>.
             </summary>
             <param name="testMethod">The method under test</param>
+            <param name="displayName">The display name of the method under test</param>
             <param name="parameters">The parameters to be passed to the test method</param>
         </member>
         <member name="M:Xunit.Extensions.TheoryCommand.Execute(System.Object)">

@@ -1,0 +1,64 @@
+﻿<#@ template debug="false" hostspecific="false" language="C#" #>
+<#@ output extension=".cs" #>
+<#@ Assembly Name="System.Core" #>
+<#@ Import Namespace="System.Linq" #>
+using System.Diagnostics.CodeAnalysis;
+
+namespace System
+{
+<#
+var parameterName = new [] { "first", "second", "third", "fourth", "fifth", "sixth", "seventh", "eighth", "nineth", "tenth", "eleventh", "twelfth", "thirteenth", "fourteenth", "fifteenth", "sixteenth" };
+var parameterNumber = new [] { "one", "two", "third", "four", "five", "six", "seven", "eight", "nine", "ten", "eleven", "twelve", "thirteen", "fourteen", "fifteen", "sixteen" };
+
+for (var index = 5; index <= 16; index++)
+{
+#>
+	/// <summary>
+	/// Encapsulates a method that has <#= parameterNumber[index - 1] #> parameters and does not return a value.
+	/// </summary>
+<#
+	for (var typeIndex = 1; typeIndex <= index; typeIndex++)
+	{
+#>
+	/// <typeparam name="T<#= typeIndex #>">The type of the <#= parameterName[typeIndex - 1] #> parameter of the method that this delegate encapsulates.</typeparam>
+<#
+	}
+
+	for (var typeIndex = 1; typeIndex <= index; typeIndex++)
+	{
+#>
+	/// <param name="arg<#= typeIndex #>">The <#= parameterName[typeIndex - 1] #> parameter of the method that this delegate encapsulates.</param>
+<#
+	}
+#>
+	[SuppressMessage("Microsoft.Design", "CA1005:AvoidExcessiveParametersOnGenericTypes", Justification = "The number of type parameters is necessary to provide the desired behavior.")]
+	public delegate void Action<<#= string.Join(", ", Enumerable.Range(1, index).Select(n => "T" + n).ToArray()) #>>(<#= string.Join(", ", Enumerable.Range(1, index).Select(n => "T" + n + " arg" + n).ToArray()) #>);
+
+	/// <summary>
+	/// Encapsulates a method that has <#= parameterNumber[index - 1] #> parameters and returns a value of the type specified by the <typeparamref name="TResult" /> parameter.
+	/// </summary>
+<#
+	for (var typeIndex = 1; typeIndex <= index; typeIndex++)
+	{
+#>
+	/// <typeparam name="T<#= typeIndex #>">The type of the <#= parameterName[typeIndex - 1] #> parameter of the method that this delegate encapsulates.</typeparam>
+<#
+	}
+#>
+	/// <typeparam name="TResult">The type of the return value of the method that this delegate encapsulates.</typeparam>
+<#
+	for (var typeIndex = 1; typeIndex <= index; typeIndex++)
+	{
+#>
+	/// <param name="arg<#= typeIndex #>">The <#= parameterName[typeIndex - 1] #> parameter of the method that this delegate encapsulates.</param>
+<#
+	}
+#>
+	/// <return>The return value of the method that this delegate encapsulates.</return>
+	[SuppressMessage("Microsoft.Design", "CA1005:AvoidExcessiveParametersOnGenericTypes", Justification = "The number of type parameters is necessary to provide the desired behavior.")]
+	public delegate TResult Func<<#= string.Join(", ", Enumerable.Range(1, index).Select(n => "T" + n).ToArray()) #>, TResult>(<#= string.Join(", ", Enumerable.Range(1, index).Select(n => "T" + n + " arg" + n).ToArray()) #>);
+
+<#
+}
+#>
+}

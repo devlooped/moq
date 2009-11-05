@@ -38,12 +38,13 @@ namespace IQToolkit
             return expression;
         }
 
-        protected override Expression Visit(Expression exp)
+        public override Expression Visit(Expression exp)
         {
             if (exp == this.searchFor)
             {
                 return this.replaceWith;
             }
+
             return base.Visit(exp);
         }
     }
