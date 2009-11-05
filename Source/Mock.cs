@@ -46,9 +46,9 @@ using System.Globalization;
 using System.Linq;
 using System.Linq.Expressions;
 using System.Reflection;
-using Moq.Properties;
-using IQToolkit;
 using System.Runtime.CompilerServices;
+using IQToolkit;
+using Moq.Properties;
 
 namespace Moq
 {
@@ -156,7 +156,7 @@ namespace Moq
 		[SuppressMessage("Microsoft.Naming", "CA1721:PropertyNamesShouldNotMatchGetMethods", Justification = "The public Object property is the only one visible to Moq consumers. The protected member is for internal use only.")]
 		public object Object
 		{
-			get { return GetObject(); }
+			get { return this.GetObject(); }
 		}
 
 		private object GetObject()
@@ -268,8 +268,8 @@ namespace Moq
 			else
 			{
 				var methodCall = lambda.ToMethodCall();
-				MethodInfo method = methodCall.Method;
-				Expression[] args = methodCall.Arguments.ToArray();
+				var method = methodCall.Method;
+				var args = methodCall.Arguments.ToArray();
 
 				var expected = new MethodCallReturn<T, TResult>(mock, expression, method, args) { FailMessage = failMessage };
 				VerifyCalls(GetInterceptor(methodCall.Object, mock), expected, expression, times);
@@ -349,7 +349,7 @@ namespace Moq
 			Expression expression,
 			Times times)
 		{
-			int callCount = targetInterceptor.ActualCalls.Where(i => expected.Matches(i)).Count();
+			var callCount = targetInterceptor.ActualCalls.Where(ac => expected.Matches(ac)).Count();
 			if (!times.Verify(callCount))
 			{
 				ThrowVerifyException(expected, expression, times, callCount);

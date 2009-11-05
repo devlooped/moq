@@ -14,7 +14,7 @@
 	</doc>
 	<doc for="It.IsAny">
 		<summary>
-			Matches any value of the given <paramref name="TValue"/> type.
+			Matches any value of the given <typeparamref name="TValue"/> type.
 		</summary>
 		<remarks>
 			Typically used when the actual argument value for a method

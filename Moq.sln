@@ -1,9 +1,5 @@
-Microsoft Visual Studio Solution File, Format Version 10.00
-# Visual Studio 2008
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Moq", "Source\Moq.csproj", "{1C91AC30-5977-4BE5-BA67-8EB186C03514}"
-EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Moq.Tests", "UnitTests\Moq.Tests.csproj", "{81BBC911-4916-4E10-A955-752AE47CB2B9}"
-EndProject
+Microsoft Visual Studio Solution File, Format Version 11.00
+# Visual Studio 2010
 Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Solution Items", "Solution Items", "{A5A5B8C3-D43F-43C6-AEC7-6FA7C35B8BE9}"
 	ProjectSection(SolutionItems) = preProject
 		Changelog.txt = Changelog.txt
@@ -11,6 +7,10 @@ Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Solution Items", "Solution 
 	EndProjectSection
 EndProject
 Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Silverlight", "Silverlight", "{48EC9EB4-F52B-4404-89D7-5804E17B24D0}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Moq", "Source\Moq.csproj", "{1C91AC30-5977-4BE5-BA67-8EB186C03514}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Moq.Tests", "UnitTests\Moq.Tests.csproj", "{81BBC911-4916-4E10-A955-752AE47CB2B9}"
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Moq.Silverlight", "Source.Silverlight\Moq.Silverlight.csproj", "{5136C8E1-E17F-481F-B29A-C7FAB528BD2D}"
 EndProject

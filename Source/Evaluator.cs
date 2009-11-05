@@ -82,7 +82,7 @@ namespace Moq
 		/// <summary>
 		/// Evaluates and replaces sub-trees when first candidate is reached (top-down)
 		/// </summary>
-		class SubtreeEvaluator : ExpressionVisitor
+		private class SubtreeEvaluator : ExpressionVisitor
 		{
 #if SILVERLIGHT
 			List<Expression> candidates;

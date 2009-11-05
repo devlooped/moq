@@ -72,7 +72,7 @@ namespace Moq
 			return RaisesImpl(eventExpression, func);
 		}
 
-		public IVerifies Raises<T1>(Action<TMock> eventExpression, Func<T1, EventArgs> func)
+		public IVerifies Raises<T>(Action<TMock> eventExpression, Func<T, EventArgs> func)
 		{
 			return RaisesImpl(eventExpression, func);
 		}
@@ -92,6 +92,66 @@ namespace Moq
 			return RaisesImpl(eventExpression, func);
 		}
 
+		public IVerifies Raises<T1, T2, T3, T4, T5>(Action<TMock> eventExpression, Func<T1, T2, T3, T4, T5, EventArgs> func)
+		{
+			return RaisesImpl(eventExpression, func);
+		}
+
+		public IVerifies Raises<T1, T2, T3, T4, T5, T6>(Action<TMock> eventExpression, Func<T1, T2, T3, T4, T5, T6, EventArgs> func)
+		{
+			return RaisesImpl(eventExpression, func);
+		}
+
+		public IVerifies Raises<T1, T2, T3, T4, T5, T6, T7>(Action<TMock> eventExpression, Func<T1, T2, T3, T4, T5, T6, T7, EventArgs> func)
+		{
+			return RaisesImpl(eventExpression, func);
+		}
+
+		public IVerifies Raises<T1, T2, T3, T4, T5, T6, T7, T8>(Action<TMock> eventExpression, Func<T1, T2, T3, T4, T5, T6, T7, T8, EventArgs> func)
+		{
+			return RaisesImpl(eventExpression, func);
+		}
+
+		public IVerifies Raises<T1, T2, T3, T4, T5, T6, T7, T8, T9>(Action<TMock> eventExpression, Func<T1, T2, T3, T4, T5, T6, T7, T8, T9, EventArgs> func)
+		{
+			return RaisesImpl(eventExpression, func);
+		}
+
+		public IVerifies Raises<T1, T2, T3, T4, T5, T6, T7, T8, T9, T10>(Action<TMock> eventExpression, Func<T1, T2, T3, T4, T5, T6, T7, T8, T9, T10, EventArgs> func)
+		{
+			return RaisesImpl(eventExpression, func);
+		}
+
+		public IVerifies Raises<T1, T2, T3, T4, T5, T6, T7, T8, T9, T10, T11>(Action<TMock> eventExpression, Func<T1, T2, T3, T4, T5, T6, T7, T8, T9, T10, T11, EventArgs> func)
+		{
+			return RaisesImpl(eventExpression, func);
+		}
+
+		public IVerifies Raises<T1, T2, T3, T4, T5, T6, T7, T8, T9, T10, T11, T12>(Action<TMock> eventExpression, Func<T1, T2, T3, T4, T5, T6, T7, T8, T9, T10, T11, T12, EventArgs> func)
+		{
+			return RaisesImpl(eventExpression, func);
+		}
+
+		public IVerifies Raises<T1, T2, T3, T4, T5, T6, T7, T8, T9, T10, T11, T12, T13>(Action<TMock> eventExpression, Func<T1, T2, T3, T4, T5, T6, T7, T8, T9, T10, T11, T12, T13, EventArgs> func)
+		{
+			return RaisesImpl(eventExpression, func);
+		}
+
+		public IVerifies Raises<T1, T2, T3, T4, T5, T6, T7, T8, T9, T10, T11, T12, T13, T14>(Action<TMock> eventExpression, Func<T1, T2, T3, T4, T5, T6, T7, T8, T9, T10, T11, T12, T13, T14, EventArgs> func)
+		{
+			return RaisesImpl(eventExpression, func);
+		}
+
+		public IVerifies Raises<T1, T2, T3, T4, T5, T6, T7, T8, T9, T10, T11, T12, T13, T14, T15>(Action<TMock> eventExpression, Func<T1, T2, T3, T4, T5, T6, T7, T8, T9, T10, T11, T12, T13, T14, T15, EventArgs> func)
+		{
+			return RaisesImpl(eventExpression, func);
+		}
+
+		public IVerifies Raises<T1, T2, T3, T4, T5, T6, T7, T8, T9, T10, T11, T12, T13, T14, T15, T16>(Action<TMock> eventExpression, Func<T1, T2, T3, T4, T5, T6, T7, T8, T9, T10, T11, T12, T13, T14, T15, T16, EventArgs> func)
+		{
+			return RaisesImpl(eventExpression, func);
+		}
+
 		public IVerifies Raises(Action<TMock> eventExpression, params object[] args)
 		{
 			return RaisesImpl(eventExpression, args);
@@ -103,17 +163,17 @@ namespace Moq
 		// Internal for AsMockExtensions
 		protected internal Mock mock;
 		protected MethodInfo method;
-		Expression originalExpression;
-		Exception exception;
-		Action<object[]> callback;
-		List<IMatcher> argumentMatchers = new List<IMatcher>();
-		int callCount;
-		bool isOnce;
-		MockedEvent mockEvent;
-		Delegate mockEventArgsFunc;
-		object[] mockEventArgsParams;
-		int? expectedCallCount = null;
-		List<KeyValuePair<int, object>> outValues = new List<KeyValuePair<int, object>>();
+		private Expression originalExpression;
+		private Exception exception;
+		private Action<object[]> callback;
+		private List<IMatcher> argumentMatchers = new List<IMatcher>();
+		private int callCount;
+		private bool isOnce;
+		private MockedEvent mockEvent;
+		private Delegate mockEventArgsFunc;
+		private object[] mockEventArgsParams;
+		private int? expectedCallCount = null;
+		private List<KeyValuePair<int, object>> outValues = new List<KeyValuePair<int, object>>();
 
 		// Where the setup was performed.
 		public string FileName { get; private set; }
@@ -199,7 +259,7 @@ namespace Moq
 				}
 
 			}
-			catch { }
+			catch
 			{
 				// Must NEVER fail, as this is a nice-to-have feature only.
 			}
@@ -332,6 +392,78 @@ namespace Moq
 		}
 
 		public ICallbackResult Callback<T1, T2, T3, T4>(Action<T1, T2, T3, T4> callback)
+		{
+			SetCallbackWithArguments(callback);
+			return this;
+		}
+
+		public ICallbackResult Callback<T1, T2, T3, T4, T5>(Action<T1, T2, T3, T4, T5> callback)
+		{
+			SetCallbackWithArguments(callback);
+			return this;
+		}
+
+		public ICallbackResult Callback<T1, T2, T3, T4, T5, T6>(Action<T1, T2, T3, T4, T5, T6> callback)
+		{
+			SetCallbackWithArguments(callback);
+			return this;
+		}
+
+		public ICallbackResult Callback<T1, T2, T3, T4, T5, T6, T7>(Action<T1, T2, T3, T4, T5, T6, T7> callback)
+		{
+			SetCallbackWithArguments(callback);
+			return this;
+		}
+
+		public ICallbackResult Callback<T1, T2, T3, T4, T5, T6, T7, T8>(Action<T1, T2, T3, T4, T5, T6, T7, T8> callback)
+		{
+			SetCallbackWithArguments(callback);
+			return this;
+		}
+
+		public ICallbackResult Callback<T1, T2, T3, T4, T5, T6, T7, T8, T9>(Action<T1, T2, T3, T4, T5, T6, T7, T8, T9> callback)
+		{
+			SetCallbackWithArguments(callback);
+			return this;
+		}
+
+		public ICallbackResult Callback<T1, T2, T3, T4, T5, T6, T7, T8, T9, T10>(Action<T1, T2, T3, T4, T5, T6, T7, T8, T9, T10> callback)
+		{
+			SetCallbackWithArguments(callback);
+			return this;
+		}
+
+		public ICallbackResult Callback<T1, T2, T3, T4, T5, T6, T7, T8, T9, T10, T11>(Action<T1, T2, T3, T4, T5, T6, T7, T8, T9, T10, T11> callback)
+		{
+			SetCallbackWithArguments(callback);
+			return this;
+		}
+
+		public ICallbackResult Callback<T1, T2, T3, T4, T5, T6, T7, T8, T9, T10, T11, T12>(Action<T1, T2, T3, T4, T5, T6, T7, T8, T9, T10, T11, T12> callback)
+		{
+			SetCallbackWithArguments(callback);
+			return this;
+		}
+
+		public ICallbackResult Callback<T1, T2, T3, T4, T5, T6, T7, T8, T9, T10, T11, T12, T13>(Action<T1, T2, T3, T4, T5, T6, T7, T8, T9, T10, T11, T12, T13> callback)
+		{
+			SetCallbackWithArguments(callback);
+			return this;
+		}
+
+		public ICallbackResult Callback<T1, T2, T3, T4, T5, T6, T7, T8, T9, T10, T11, T12, T13, T14>(Action<T1, T2, T3, T4, T5, T6, T7, T8, T9, T10, T11, T12, T13, T14> callback)
+		{
+			SetCallbackWithArguments(callback);
+			return this;
+		}
+
+		public ICallbackResult Callback<T1, T2, T3, T4, T5, T6, T7, T8, T9, T10, T11, T12, T13, T14, T15>(Action<T1, T2, T3, T4, T5, T6, T7, T8, T9, T10, T11, T12, T13, T14, T15> callback)
+		{
+			SetCallbackWithArguments(callback);
+			return this;
+		}
+
+		public ICallbackResult Callback<T1, T2, T3, T4, T5, T6, T7, T8, T9, T10, T11, T12, T13, T14, T15, T16>(Action<T1, T2, T3, T4, T5, T6, T7, T8, T9, T10, T11, T12, T13, T14, T15, T16> callback)
 		{
 			SetCallbackWithArguments(callback);
 			return this;

@@ -62,7 +62,7 @@
 	</doc>
 	<doc for="Mock.Object">
 		<summary>
-			Gets the mocked object instance, which is of the mocked type <typeparamref name="T"/>.
+			Gets the mocked object instance.
 		</summary>
 	</doc>
 	<doc for="Mock.OnGetObject">

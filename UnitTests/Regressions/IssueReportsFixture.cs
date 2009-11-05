@@ -11,7 +11,23 @@ using System.Collections;
 using System.Text;
 using Moq;
 using System.ComponentModel;
-using System.Reflection;
+
+#region #181
+
+// NOTE class without namespace
+public class _181
+{
+	[Fact]
+	public void ReproTest()
+	{
+		var mock = new Mock<IDisposable>();
+		mock.Object.Dispose();
+
+		mock.Verify(d => d.Dispose());
+	}
+}
+
+#endregion
 
 namespace Moq.Tests.Regressions
 {
@@ -905,7 +921,79 @@ namespace Moq.Tests.Regressions
 
 		#endregion
 
+		#region Silverlight excluded
+
 #if !SILVERLIGHT
+
+		#region #138
+
+		public class _138
+		{
+			public interface SuperFoo
+			{
+				string Bar { get; set; }
+			}
+			public interface Foo : SuperFoo
+			{
+				string Baz { get; set; }
+			}
+
+			[Fact]
+			public void superFooMockSetupAllProperties()
+			{
+				var fac = new MockFactory(MockBehavior.Default);
+				var superFooMock = fac.Create<SuperFoo>();
+				superFooMock.SetupAllProperties();
+
+				var superFoo = superFooMock.Object;
+				superFoo.Bar = "Bar";
+				Assert.Equal("Bar", superFoo.Bar);
+			}
+		}
+
+		#endregion
+
+		#region #160
+
+		public class _160
+		{
+			[Fact]
+			public void ShouldMockHtmlControl()
+			{
+				// CallBase was missing
+				var htmlInputTextMock = new Mock<System.Web.UI.HtmlControls.HtmlInputText>() { CallBase = true };
+				Assert.True(htmlInputTextMock.Object.Visible);
+			}
+		}
+
+		#endregion
+
+		#region #174
+
+		public class _174
+		{
+			[Fact]
+			public void Test()
+			{
+				var serviceNo1Mock = new Mock<IServiceNo1>();
+				var collaboratorMock = new Mock<ISomeCollaborator>();
+
+				collaboratorMock.Object.Collaborate(serviceNo1Mock.Object);
+
+				collaboratorMock.Verify(o => o.Collaborate(serviceNo1Mock.Object));
+			}
+
+			public interface ISomeCollaborator
+			{
+				void Collaborate(IServiceNo1 serviceNo1);
+			}
+
+			public interface IServiceNo1 : IEnumerable
+			{
+			}
+		}
+
+		#endregion
 
 		#region #190
 
@@ -955,76 +1043,6 @@ namespace Moq.Tests.Regressions
 
 		#endregion
 
-		#region #160
-
-		public class _160
-		{
-			[Fact]
-			public void ShouldMockHtmlControl()
-			{
-				// CallBase was missing
-				var htmlInputTextMock = new Mock<System.Web.UI.HtmlControls.HtmlInputText>() { CallBase = true };
-				Assert.True(htmlInputTextMock.Object.Visible);
-			}
-		}
-
-		#endregion
-
-		#region #138
-
-		public class _138
-		{
-			public interface SuperFoo
-			{
-				string Bar { get; set; }
-			}
-			public interface Foo : SuperFoo
-			{
-				string Baz { get; set; }
-			}
-
-			[Fact]
-			public void superFooMockSetupAllProperties()
-			{
-				var fac = new MockFactory(MockBehavior.Default);
-				var superFooMock = fac.Create<SuperFoo>();
-				superFooMock.SetupAllProperties();
-
-				var superFoo = superFooMock.Object;
-				superFoo.Bar = "Bar";
-				Assert.Equal("Bar", superFoo.Bar);
-			}
-		}
-
-		#endregion
-
-		#region #174
-
-		public class _174
-		{
-			[Fact]
-			public void Test()
-			{
-				var serviceNo1Mock = new Mock<IServiceNo1>();
-				var collaboratorMock = new Mock<ISomeCollaborator>();
-
-				collaboratorMock.Object.Collaborate(serviceNo1Mock.Object);
-
-				collaboratorMock.Verify(o => o.Collaborate(serviceNo1Mock.Object));
-			}
-
-			public interface ISomeCollaborator
-			{
-				void Collaborate(IServiceNo1 serviceNo1);
-			}
-
-			public interface IServiceNo1 : IEnumerable
-			{
-			}
-		}
-
-		#endregion
-
 		// run "netsh http add urlacl url=http://+:7777/ user=[domain]\[user]"
 		// to avoid running the test as an admin
 		[Fact(Skip = "Doesn't work in Mono")]
@@ -1062,7 +1080,6 @@ namespace Moq.Tests.Regressions
 				throw new NotImplementedException();
 			}
 		}
-#endif
 
 		[ServiceContract]
 		public interface IServiceContract
@@ -1070,22 +1087,9 @@ namespace Moq.Tests.Regressions
 			[OperationContract]
 			void Do();
 		}
+
+#endif
+
+		#endregion
 	}
 }
-
-#region #181
-
-// NOTE class without namespace
-public class _181
-{
-	[Fact]
-	public void ReproTest()
-	{
-		var mock = new Mock<IDisposable>();
-		mock.Object.Dispose();
-
-		mock.Verify(d => d.Dispose());
-	}
-}
-
-#endregion

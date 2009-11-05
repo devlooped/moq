@@ -557,7 +557,7 @@
 	<doc for="Mock{T}.Raise">
 		<summary>
 			Raises the event referenced in <paramref name="eventExpression"/> using
-			the given <paramref name="sender"/> and <paramref name="args"/> arguments.
+			the given <paramref name="args"/> argument.
 		</summary>
 		<exception cref="ArgumentException">
 			The <paramref name="args"/> argument is
@@ -595,8 +595,7 @@
 	<doc for="Mock{T}.Raise(args)">
 		<summary>
 			Raises the event referenced in <paramref name="eventExpression"/> using
-			the given <paramref name="sender"/> and <paramref name="args"/> arguments 
-			for a non-EventHandler typed event.
+			the given <paramref name="args"/> argument for a non-EventHandler typed event.
 		</summary>
 		<exception cref="ArgumentException">
 			The <paramref name="args"/> arguments are

@@ -88,9 +88,9 @@ namespace Moq
 						return new Matcher(context.LastMatch);
 				}
 
-				AdvancedMatcherAttribute attr = call.Method.GetCustomAttribute<AdvancedMatcherAttribute>(true);
+				var attr = call.Method.GetCustomAttribute<AdvancedMatcherAttribute>(true);
 #pragma warning disable 618
-				MatcherAttribute staticMatcherMethodAttr = call.Method.GetCustomAttribute<MatcherAttribute>(true);
+				var staticMatcherMethodAttr = call.Method.GetCustomAttribute<MatcherAttribute>(true);
 #pragma warning restore 618
 
 				if (attr != null)

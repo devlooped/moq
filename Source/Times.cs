@@ -63,7 +63,7 @@ namespace Moq
 		}
 
 		/// <summary>
-		/// Specifies that a mocked method should be invoked <paramref name="times"/> times as minimum.
+		/// Specifies that a mocked method should be invoked <paramref name="callCount"/> times as minimum.
 		/// </summary>
 		/// <param name="callCount">The minimun number of times.</param>
 		/// <returns>An object defining the allowed number of invocations.</returns>
@@ -84,7 +84,7 @@ namespace Moq
 		}
 
 		/// <summary>
-		/// Specifies that a mocked method should be invoked <paramref name="times"/> time as maximun.
+		/// Specifies that a mocked method should be invoked <paramref name="callCount"/> time as maximun.
 		/// </summary>
 		/// <param name="callCount">The maximun number of times.</param>
 		/// <returns>An object defining the allowed number of invocations.</returns>
@@ -105,8 +105,8 @@ namespace Moq
 		}
 
 		/// <summary>
-		/// Specifies that a mocked method should be invoked between <paramref name="from"/> and
-		/// <paramref name="to"/> times.
+		/// Specifies that a mocked method should be invoked between <paramref name="callCountFrom"/> and
+		/// <paramref name="callCountTo"/> times.
 		/// </summary>
 		/// <param name="callCountFrom">The minimun number of times.</param>
 		/// <param name="callCountTo">The maximun number of times.</param>
@@ -138,7 +138,7 @@ namespace Moq
 		}
 
 		/// <summary>
-		/// Specifies that a mocked method should be invoked exactly <paramref name="times"/> times.
+		/// Specifies that a mocked method should be invoked exactly <paramref name="callCount"/> times.
 		/// </summary>
 		/// <param name="callCount">The times that a method or property can be called.</param>
 		/// <returns>An object defining the allowed number of invocations.</returns>

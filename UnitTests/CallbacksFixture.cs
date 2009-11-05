@@ -108,6 +108,98 @@ namespace Moq.Tests
 		}
 
 		[Fact]
+		public void CallbackCalledWithFiveArguments()
+		{
+			var mock = new Mock<IFoo>();
+			string callbackArg1 = null;
+			string callbackArg2 = null;
+			string callbackArg3 = null;
+			string callbackArg4 = null;
+			string callbackArg5 = null;
+			mock.Setup(x => x.Submit(It.IsAny<string>(), It.IsAny<string>(), It.IsAny<string>(), It.IsAny<string>(), It.IsAny<string>()))
+				.Callback((string s1, string s2, string s3, string s4, string s5) => { callbackArg1 = s1; callbackArg2 = s2; callbackArg3 = s3; callbackArg4 = s4; callbackArg5 = s5; });
+
+			mock.Object.Submit("blah1", "blah2", "blah3", "blah4", "blah5");
+			Assert.Equal("blah1", callbackArg1);
+			Assert.Equal("blah2", callbackArg2);
+			Assert.Equal("blah3", callbackArg3);
+			Assert.Equal("blah4", callbackArg4);
+			Assert.Equal("blah5", callbackArg5);
+		}
+
+		[Fact]
+		public void CallbackCalledWithSixArguments()
+		{
+			var mock = new Mock<IFoo>();
+			string callbackArg1 = null;
+			string callbackArg2 = null;
+			string callbackArg3 = null;
+			string callbackArg4 = null;
+			string callbackArg5 = null;
+			string callbackArg6 = null;
+			mock.Setup(x => x.Submit(It.IsAny<string>(), It.IsAny<string>(), It.IsAny<string>(), It.IsAny<string>(), It.IsAny<string>(), It.IsAny<string>()))
+				.Callback((string s1, string s2, string s3, string s4, string s5, string s6) => { callbackArg1 = s1; callbackArg2 = s2; callbackArg3 = s3; callbackArg4 = s4; callbackArg5 = s5; callbackArg6 = s6; });
+
+			mock.Object.Submit("blah1", "blah2", "blah3", "blah4", "blah5", "blah6");
+			Assert.Equal("blah1", callbackArg1);
+			Assert.Equal("blah2", callbackArg2);
+			Assert.Equal("blah3", callbackArg3);
+			Assert.Equal("blah4", callbackArg4);
+			Assert.Equal("blah5", callbackArg5);
+			Assert.Equal("blah6", callbackArg6);
+		}
+
+		[Fact]
+		public void CallbackCalledWithSevenArguments()
+		{
+			var mock = new Mock<IFoo>();
+			string callbackArg1 = null;
+			string callbackArg2 = null;
+			string callbackArg3 = null;
+			string callbackArg4 = null;
+			string callbackArg5 = null;
+			string callbackArg6 = null;
+			string callbackArg7 = null;
+			mock.Setup(x => x.Submit(It.IsAny<string>(), It.IsAny<string>(), It.IsAny<string>(), It.IsAny<string>(), It.IsAny<string>(), It.IsAny<string>(), It.IsAny<string>()))
+				.Callback((string s1, string s2, string s3, string s4, string s5, string s6, string s7) => { callbackArg1 = s1; callbackArg2 = s2; callbackArg3 = s3; callbackArg4 = s4; callbackArg5 = s5; callbackArg6 = s6; callbackArg7 = s7; });
+
+			mock.Object.Submit("blah1", "blah2", "blah3", "blah4", "blah5", "blah6", "blah7");
+			Assert.Equal("blah1", callbackArg1);
+			Assert.Equal("blah2", callbackArg2);
+			Assert.Equal("blah3", callbackArg3);
+			Assert.Equal("blah4", callbackArg4);
+			Assert.Equal("blah5", callbackArg5);
+			Assert.Equal("blah6", callbackArg6);
+			Assert.Equal("blah7", callbackArg7);
+		}
+
+		[Fact]
+		public void CallbackCalledWithEightArguments()
+		{
+			var mock = new Mock<IFoo>();
+			string callbackArg1 = null;
+			string callbackArg2 = null;
+			string callbackArg3 = null;
+			string callbackArg4 = null;
+			string callbackArg5 = null;
+			string callbackArg6 = null;
+			string callbackArg7 = null;
+			string callbackArg8 = null;
+			mock.Setup(x => x.Submit(It.IsAny<string>(), It.IsAny<string>(), It.IsAny<string>(), It.IsAny<string>(), It.IsAny<string>(), It.IsAny<string>(), It.IsAny<string>(), It.IsAny<string>()))
+				.Callback((string s1, string s2, string s3, string s4, string s5, string s6, string s7, string s8) => { callbackArg1 = s1; callbackArg2 = s2; callbackArg3 = s3; callbackArg4 = s4; callbackArg5 = s5; callbackArg6 = s6; callbackArg7 = s7; callbackArg8 = s8; });
+
+			mock.Object.Submit("blah1", "blah2", "blah3", "blah4", "blah5", "blah6", "blah7", "blah8");
+			Assert.Equal("blah1", callbackArg1);
+			Assert.Equal("blah2", callbackArg2);
+			Assert.Equal("blah3", callbackArg3);
+			Assert.Equal("blah4", callbackArg4);
+			Assert.Equal("blah5", callbackArg5);
+			Assert.Equal("blah6", callbackArg6);
+			Assert.Equal("blah7", callbackArg7);
+			Assert.Equal("blah8", callbackArg8);
+		}
+
+		[Fact]
 		public void CallbackCalledWithOneArgumentForNonVoidMethod()
 		{
 			var mock = new Mock<IFoo>();
@@ -169,6 +261,102 @@ namespace Moq.Tests
 			Assert.Equal("blah2", callbackArg2);
 			Assert.Equal("blah3", callbackArg3);
 			Assert.Equal("blah4", callbackArg4);
+		}
+
+		[Fact]
+		public void CallbackCalledWithFiveArgumentsForNonVoidMethod()
+		{
+			var mock = new Mock<IFoo>();
+			string callbackArg1 = null;
+			string callbackArg2 = null;
+			string callbackArg3 = null;
+			string callbackArg4 = null;
+			string callbackArg5 = null;
+			mock.Setup(x => x.Execute(It.IsAny<string>(), It.IsAny<string>(), It.IsAny<string>(), It.IsAny<string>(), It.IsAny<string>()))
+				.Callback((string s1, string s2, string s3, string s4, string s5) => { callbackArg1 = s1; callbackArg2 = s2; callbackArg3 = s3; callbackArg4 = s4; callbackArg5 = s5; })
+				.Returns("foo");
+
+			mock.Object.Execute("blah1", "blah2", "blah3", "blah4", "blah5");
+			Assert.Equal("blah1", callbackArg1);
+			Assert.Equal("blah2", callbackArg2);
+			Assert.Equal("blah3", callbackArg3);
+			Assert.Equal("blah4", callbackArg4);
+			Assert.Equal("blah5", callbackArg5);
+		}
+
+		[Fact]
+		public void CallbackCalledWithSixArgumentsForNonVoidMethod()
+		{
+			var mock = new Mock<IFoo>();
+			string callbackArg1 = null;
+			string callbackArg2 = null;
+			string callbackArg3 = null;
+			string callbackArg4 = null;
+			string callbackArg5 = null;
+			string callbackArg6 = null;
+			mock.Setup(x => x.Execute(It.IsAny<string>(), It.IsAny<string>(), It.IsAny<string>(), It.IsAny<string>(), It.IsAny<string>(), It.IsAny<string>()))
+				.Callback((string s1, string s2, string s3, string s4, string s5, string s6) => { callbackArg1 = s1; callbackArg2 = s2; callbackArg3 = s3; callbackArg4 = s4; callbackArg5 = s5; callbackArg6 = s6; })
+				.Returns("foo");
+
+			mock.Object.Execute("blah1", "blah2", "blah3", "blah4", "blah5", "blah6");
+			Assert.Equal("blah1", callbackArg1);
+			Assert.Equal("blah2", callbackArg2);
+			Assert.Equal("blah3", callbackArg3);
+			Assert.Equal("blah4", callbackArg4);
+			Assert.Equal("blah5", callbackArg5);
+			Assert.Equal("blah6", callbackArg6);
+		}
+
+		[Fact]
+		public void CallbackCalledWithSevenArgumentsForNonVoidMethod()
+		{
+			var mock = new Mock<IFoo>();
+			string callbackArg1 = null;
+			string callbackArg2 = null;
+			string callbackArg3 = null;
+			string callbackArg4 = null;
+			string callbackArg5 = null;
+			string callbackArg6 = null;
+			string callbackArg7 = null;
+			mock.Setup(x => x.Execute(It.IsAny<string>(), It.IsAny<string>(), It.IsAny<string>(), It.IsAny<string>(), It.IsAny<string>(), It.IsAny<string>(), It.IsAny<string>()))
+				.Callback((string s1, string s2, string s3, string s4, string s5, string s6, string s7) => { callbackArg1 = s1; callbackArg2 = s2; callbackArg3 = s3; callbackArg4 = s4; callbackArg5 = s5; callbackArg6 = s6; callbackArg7 = s7; })
+				.Returns("foo");
+
+			mock.Object.Execute("blah1", "blah2", "blah3", "blah4", "blah5", "blah6", "blah7");
+			Assert.Equal("blah1", callbackArg1);
+			Assert.Equal("blah2", callbackArg2);
+			Assert.Equal("blah3", callbackArg3);
+			Assert.Equal("blah4", callbackArg4);
+			Assert.Equal("blah5", callbackArg5);
+			Assert.Equal("blah6", callbackArg6);
+			Assert.Equal("blah7", callbackArg7);
+		}
+
+		[Fact]
+		public void CallbackCalledWithEightArgumentsForNonVoidMethod()
+		{
+			var mock = new Mock<IFoo>();
+			string callbackArg1 = null;
+			string callbackArg2 = null;
+			string callbackArg3 = null;
+			string callbackArg4 = null;
+			string callbackArg5 = null;
+			string callbackArg6 = null;
+			string callbackArg7 = null;
+			string callbackArg8 = null;
+			mock.Setup(x => x.Execute(It.IsAny<string>(), It.IsAny<string>(), It.IsAny<string>(), It.IsAny<string>(), It.IsAny<string>(), It.IsAny<string>(), It.IsAny<string>(), It.IsAny<string>()))
+				.Callback((string s1, string s2, string s3, string s4, string s5, string s6, string s7, string s8) => { callbackArg1 = s1; callbackArg2 = s2; callbackArg3 = s3; callbackArg4 = s4; callbackArg5 = s5; callbackArg6 = s6; callbackArg7 = s7; callbackArg8 = s8; })
+				.Returns("foo");
+
+			mock.Object.Execute("blah1", "blah2", "blah3", "blah4", "blah5", "blah6", "blah7", "blah8");
+			Assert.Equal("blah1", callbackArg1);
+			Assert.Equal("blah2", callbackArg2);
+			Assert.Equal("blah3", callbackArg3);
+			Assert.Equal("blah4", callbackArg4);
+			Assert.Equal("blah5", callbackArg5);
+			Assert.Equal("blah6", callbackArg6);
+			Assert.Equal("blah7", callbackArg7);
+			Assert.Equal("blah8", callbackArg8);
 		}
 
 		[Fact]
@@ -239,10 +427,18 @@ namespace Moq.Tests
 			string Submit(string arg1, string arg2);
 			string Submit(string arg1, string arg2, string arg3);
 			string Submit(string arg1, string arg2, string arg3, string arg4);
+			void Submit(string arg1, string arg2, string arg3, string arg4, string arg5);
+			void Submit(string arg1, string arg2, string arg3, string arg4, string arg5, string arg6);
+			void Submit(string arg1, string arg2, string arg3, string arg4, string arg5, string arg6, string arg7);
+			void Submit(string arg1, string arg2, string arg3, string arg4, string arg5, string arg6, string arg7, string arg8);
 			string Execute(string command);
 			string Execute(string arg1, string arg2);
 			string Execute(string arg1, string arg2, string arg3);
 			string Execute(string arg1, string arg2, string arg3, string arg4);
+			string Execute(string arg1, string arg2, string arg3, string arg4, string arg5);
+			string Execute(string arg1, string arg2, string arg3, string arg4, string arg5, string arg6);
+			string Execute(string arg1, string arg2, string arg3, string arg4, string arg5, string arg6, string arg7);
+			string Execute(string arg1, string arg2, string arg3, string arg4, string arg5, string arg6, string arg7, string arg8);
 
 			int Value { get; set; }
 		}

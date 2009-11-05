@@ -59,7 +59,7 @@ namespace Moq.Protected
 	public static class ItExpr
 	{
 		/// <summary>
-		/// Matches a null value of the given <paramref name="TValue"/> type.
+		/// Matches a null value of the given <typeparamref name="TValue"/> type.
 		/// </summary>
 		/// <remarks>
 		/// Required for protected mocks as the null value cannot be used 
@@ -82,7 +82,7 @@ namespace Moq.Protected
 		}
 
 		/// <summary>
-		/// Matches any value of the given <paramref name="TValue"/> type.
+		/// Matches any value of the given <typeparamref name="TValue"/> type.
 		/// </summary>
 		/// <remarks>
 		/// Typically used when the actual argument value for a method 

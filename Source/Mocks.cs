@@ -40,17 +40,13 @@
 
 using System;
 using System.Collections.Generic;
-using System.Linq;
-using System.Text;
 using System.ComponentModel;
-using Moq;
-using IQToolkit;
+using System.Linq;
 using System.Linq.Expressions;
 using System.Reflection;
-using Moq.Language.Flow;
-using Moq.Language;
-using System.Collections;
 using System.Runtime.CompilerServices;
+using IQToolkit;
+using Moq.Language;
 
 namespace Moq
 {
@@ -130,7 +126,7 @@ namespace Moq
 			}
 		}
 
-		class ExpressionCollector : ExpressionVisitor
+		private class ExpressionCollector : ExpressionVisitor
 		{
 			List<Expression> expressions = new List<Expression>();
 

@@ -577,6 +577,74 @@ namespace Moq.Tests
 		}
 
 		[Fact]
+		public void RaisesEventWithActionLambdaFiveArgs()
+		{
+			var mock = new Mock<IAdder<int>>();
+
+			mock.Setup(m => m.Do("foo", 5, true, "bar", 5))
+				.Raises(m => m.Done += null, (string s, int i, bool b, string s1, int arg5) => new DoneArgs { Value = s + i + b + s1 + arg5 });
+
+			DoneArgs args = null;
+			mock.Object.Done += (sender, e) => args = e;
+
+			mock.Object.Do("foo", 5, true, "bar", 5);
+
+			Assert.NotNull(args);
+			Assert.Equal("foo5Truebar5", args.Value);
+		}
+
+		[Fact]
+		public void RaisesEventWithActionLambdaSixArgs()
+		{
+			var mock = new Mock<IAdder<int>>();
+
+			mock.Setup(m => m.Do("foo", 5, true, "bar", 5, 6))
+				.Raises(m => m.Done += null, (string s, int i, bool b, string s1, int arg5, int arg6) => new DoneArgs { Value = s + i + b + s1 + arg5 + arg6 });
+
+			DoneArgs args = null;
+			mock.Object.Done += (sender, e) => args = e;
+
+			mock.Object.Do("foo", 5, true, "bar", 5, 6);
+
+			Assert.NotNull(args);
+			Assert.Equal("foo5Truebar56", args.Value);
+		}
+
+		[Fact]
+		public void RaisesEventWithActionLambdaSevenArgs()
+		{
+			var mock = new Mock<IAdder<int>>();
+
+			mock.Setup(m => m.Do("foo", 5, true, "bar", 5, 6, 7))
+				.Raises(m => m.Done += null, (string s, int i, bool b, string s1, int arg5, int arg6, int arg7) => new DoneArgs { Value = s + i + b + s1 + arg5 + arg6 + arg7 });
+
+			DoneArgs args = null;
+			mock.Object.Done += (sender, e) => args = e;
+
+			mock.Object.Do("foo", 5, true, "bar", 5, 6, 7);
+
+			Assert.NotNull(args);
+			Assert.Equal("foo5Truebar567", args.Value);
+		}
+
+		[Fact]
+		public void RaisesEventWithActionLambdaEightArgs()
+		{
+			var mock = new Mock<IAdder<int>>();
+
+			mock.Setup(m => m.Do("foo", 5, true, "bar", 5, 6, 7, 8))
+				.Raises(m => m.Done += null, (string s, int i, bool b, string s1, int arg5, int arg6, int arg7, int arg8) => new DoneArgs { Value = s + i + b + s1 + arg5 + arg6 + arg7 + arg8 });
+
+			DoneArgs args = null;
+			mock.Object.Done += (sender, e) => args = e;
+
+			mock.Object.Do("foo", 5, true, "bar", 5, 6, 7, 8);
+
+			Assert.NotNull(args);
+			Assert.Equal("foo5Truebar5678", args.Value);
+		}
+
+		[Fact]
 		public void RaisesCustomEventWithLambda()
 		{
 			var mock = new Mock<IWithEvent>();
@@ -654,6 +722,10 @@ namespace Moq.Tests
 			void Do(string s, int i);
 			void Do(string s, int i, bool b);
 			void Do(string s, int i, bool b, string v);
+			void Do(string s, int i, bool b, string v, int arg5);
+			void Do(string s, int i, bool b, string v, int arg5, int arg6);
+			void Do(string s, int i, bool b, string v, int arg5, int arg6, int arg7);
+			void Do(string s, int i, bool b, string v, int arg5, int arg6, int arg7, int arg8);
 		}
 
 		public class FooPresenter
