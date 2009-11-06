@@ -10,7 +10,7 @@
     <AppDesignerFolder>Properties</AppDesignerFolder>
     <RootNamespace>Moq.Visualizer.Tests</RootNamespace>
     <AssemblyName>Moq.Visualizer.Tests</AssemblyName>
-    <TargetFrameworkVersion>v3.5</TargetFrameworkVersion>
+    <TargetFrameworkVersion>v4.0</TargetFrameworkVersion>
     <FileAlignment>512</FileAlignment>
     <SignAssembly>true</SignAssembly>
     <AssemblyOriginatorKeyFile>..\Moq.snk</AssemblyOriginatorKeyFile>
@@ -33,6 +33,7 @@
     <IsWebBootstrapper>false</IsWebBootstrapper>
     <UseApplicationTrust>false</UseApplicationTrust>
     <BootstrapperEnabled>true</BootstrapperEnabled>
+    <TargetFrameworkProfile />
   </PropertyGroup>
   <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Debug|AnyCPU' ">
     <DebugSymbols>true</DebugSymbols>
@@ -74,10 +75,6 @@
     <ProjectReference Include="..\Source\Moq.csproj">
       <Project>{1C91AC30-5977-4BE5-BA67-8EB186C03514}</Project>
       <Name>Moq</Name>
-    </ProjectReference>
-    <ProjectReference Include="..\Visualizer\Moq.Visualizer.csproj">
-      <Project>{335EAF40-60EF-40D7-84A8-E33D255FA59F}</Project>
-      <Name>Moq.Visualizer</Name>
     </ProjectReference>
   </ItemGroup>
   <ItemGroup>

@@ -1,4 +1,4 @@
-﻿#if NET35
+﻿#if NET35 || SILVERLIGHT
 using System.Diagnostics.CodeAnalysis;
 
 namespace System

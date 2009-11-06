@@ -1,6 +1,6 @@
 ﻿// Copyright (c) Microsoft Corporation.  All rights reserved.
 // This source code is made available under the terms of the Microsoft Public License (MS-PL)
-#if NET35
+#if NET35 || SILVERLIGHT
 using System;
 using System.Collections.Generic;
 using System.Collections.ObjectModel;
