@@ -40,7 +40,7 @@
     <DebugType>full</DebugType>
     <Optimize>false</Optimize>
     <OutputPath>bin\Debug\</OutputPath>
-    <DefineConstants>TRACE;DEBUG;DESKTOP</DefineConstants>
+    <DefineConstants>TRACE;DEBUG;DESKTOP;NET35</DefineConstants>
     <ErrorReport>prompt</ErrorReport>
     <WarningLevel>4</WarningLevel>
     <DocumentationFile>bin\Debug\Moq.xml</DocumentationFile>
@@ -51,7 +51,7 @@
     <DebugType>full</DebugType>
     <Optimize>true</Optimize>
     <OutputPath>bin\Release\</OutputPath>
-    <DefineConstants>TRACE;CODE_ANALYSIS;CODE_ANALYSIS;CODE_ANALYSIS;DESKTOP</DefineConstants>
+    <DefineConstants>TRACE;NET35</DefineConstants>
     <ErrorReport>prompt</ErrorReport>
     <WarningLevel>4</WarningLevel>
     <DocumentationFile>bin\Release\Moq.xml</DocumentationFile>
@@ -103,15 +103,29 @@
   </ItemGroup>
   <ItemGroup>
     <Compile Include="EmptyDefaultValueProvider.cs" />
-    <Compile Include="Microsoft\Delegates.cs" Condition=" $(TargetFrameworkVersion) == 'v3.5' ">
+    <Compile Include="Language\ICallback.cs">
+      <AutoGen>True</AutoGen>
+      <DesignTime>True</DesignTime>
+      <DependentUpon>ICallback.tt</DependentUpon>
+    </Compile>
+    <Compile Include="Language\IRaise.cs">
+      <AutoGen>True</AutoGen>
+      <DesignTime>True</DesignTime>
+      <DependentUpon>IRaise.tt</DependentUpon>
+    </Compile>
+    <Compile Include="Language\IReturns.cs">
+      <AutoGen>True</AutoGen>
+      <DesignTime>True</DesignTime>
+      <DependentUpon>IReturns.tt</DependentUpon>
+    </Compile>
+    <Compile Include="Microsoft\Delegates.cs">
       <AutoGen>True</AutoGen>
       <DesignTime>True</DesignTime>
       <DependentUpon>Delegates.tt</DependentUpon>
     </Compile>
-    <Compile Include="Microsoft\ExpressionVisitor.cs" Condition=" $(TargetFrameworkVersion) == 'v3.5' " />
+    <Compile Include="Microsoft\ExpressionVisitor.cs" />
     <Compile Include="SetupKind.cs" />
     <Compile Include="Language\Flow\IReturnsResult.cs" />
-    <Compile Include="Language\IRaise.cs" />
     <Compile Include="MatcherAttribute.cs" />
     <Compile Include="ExpressionExtensions.cs" />
     <Compile Include="Extensions.cs" />
@@ -123,7 +137,6 @@
     <Compile Include="Language\Flow\IThrowsResult.cs" />
     <Compile Include="Language\Flow\IReturnsThrows.cs" />
     <Compile Include="Language\Flow\ICallbackResult.cs" />
-    <Compile Include="Language\ICallback.cs" />
     <Compile Include="IMatcher.cs" />
     <Compile Include="IMocked.cs" />
     <Compile Include="Interceptor.cs" />
@@ -131,7 +144,6 @@
     <Compile Include="Language\Flow\ISetup.cs" />
     <Compile Include="Language\ICallbackSetter.cs" />
     <Compile Include="Language\IOccurrence.cs" />
-    <Compile Include="Language\IReturns.cs" />
     <Compile Include="It.cs" />
     <Compile Include="Language\IThrows.cs" />
     <Compile Include="Language\IVerifies.cs" />
@@ -174,8 +186,20 @@
     <None Include="It.xdoc">
       <SubType>Designer</SubType>
     </None>
+    <None Include="Language\ICallback.tt">
+      <Generator>TextTemplatingFileGenerator</Generator>
+      <LastGenOutput>ICallback.cs</LastGenOutput>
+    </None>
+    <None Include="Language\IRaise.tt">
+      <Generator>TextTemplatingFileGenerator</Generator>
+      <LastGenOutput>IRaise.cs</LastGenOutput>
+    </None>
+    <None Include="Language\IReturns.tt">
+      <Generator>TextTemplatingFileGenerator</Generator>
+      <LastGenOutput>IReturns.cs</LastGenOutput>
+    </None>
     <None Include="Match.xdoc" />
-    <None Include="Microsoft\Delegates.tt" Condition=" $(TargetFrameworkVersion) == 'v3.5' ">
+    <None Include="Microsoft\Delegates.tt">
       <Generator>TextTemplatingFileGenerator</Generator>
       <LastGenOutput>Delegates.cs</LastGenOutput>
     </None>
@@ -219,6 +243,7 @@
     <Compile Include="SetterMethodCall.cs" />
     <Compile Include="Sub\StubExtensions.cs" />
     <Compile Include="Times.cs" />
+    <None Include="Includes\GenericTypeParameters.tt" />
   </ItemGroup>
   <ItemGroup>
     <BootstrapperPackage Include="Microsoft.Net.Client.3.5">

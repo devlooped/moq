@@ -87,7 +87,7 @@ namespace Moq.Language
 		/// Specifies a function that will calculate the value to return from the method, 
 		/// retrieving the arguments for the invocation.
 		/// </summary>
-		/// <typeparam name="T">Type of the argument of the invoked method.</typeparam>
+		/// <typeparam name="T">The type of the argument of the invoked method.</typeparam>
 		/// <param name="valueFunction">The function that will calculate the return value.</param>
 		/// <example group="returns">
 		/// Return a calculated value which is evaluated lazily at the time of the invocation.
@@ -99,10 +99,11 @@ namespace Moq.Language
 		/// </para>
 		/// <code>
 		/// mock.Setup(x => x.Execute(It.IsAny&lt;string&gt;()))
-		///     .Returns((string command) => returnValues[command]);
+		///     .Returns(command => returnValues[command]);
 		/// </code>
 		/// </example>
 		IReturnsResult<TMock> Returns<T>(Func<T, TResult> valueFunction);
+
 
 		/// <summary>
 		/// Specifies a function that will calculate the value to return from the method, 
@@ -122,7 +123,7 @@ namespace Moq.Language
 		/// mock.Setup(x => x.Execute(
 		///                      It.IsAny&lt;int&gt;(), 
 		///                      It.IsAny&lt;int&gt;()))
-		///     .Returns((string arg1, string arg2) => arg1 + arg2);
+		///     .Returns((arg1, arg2) => arg1 + arg2);
 		/// </code>
 		/// </example>
 		IReturnsResult<TMock> Returns<T1, T2>(Func<T1, T2, TResult> valueFunction);
@@ -147,7 +148,7 @@ namespace Moq.Language
 		///                      It.IsAny&lt;int&gt;(), 
 		///                      It.IsAny&lt;int&gt;(), 
 		///                      It.IsAny&lt;int&gt;()))
-		///     .Returns((string arg1, string arg2, string arg3) => arg1 + arg2 + arg3);
+		///     .Returns((arg1, arg2, arg3) => arg1 + arg2 + arg3);
 		/// </code>
 		/// </example>
 		IReturnsResult<TMock> Returns<T1, T2, T3>(Func<T1, T2, T3, TResult> valueFunction);
@@ -174,7 +175,7 @@ namespace Moq.Language
 		///                      It.IsAny&lt;int&gt;(), 
 		///                      It.IsAny&lt;int&gt;(), 
 		///                      It.IsAny&lt;int&gt;()))
-		///     .Returns((string arg1, string arg2, string arg3, string arg4) => arg1 + arg2 + arg3 + arg4);
+		///     .Returns((arg1, arg2, arg3, arg4) => arg1 + arg2 + arg3 + arg4);
 		/// </code>
 		/// </example>
 		IReturnsResult<TMock> Returns<T1, T2, T3, T4>(Func<T1, T2, T3, T4, TResult> valueFunction);
@@ -203,7 +204,7 @@ namespace Moq.Language
 		///                      It.IsAny&lt;int&gt;(), 
 		///                      It.IsAny&lt;int&gt;(), 
 		///                      It.IsAny&lt;int&gt;()))
-		///     .Returns((string arg1, string arg2, string arg3, string arg4, string arg5) => arg1 + arg2 + arg3 + arg4 + arg5);
+		///     .Returns((arg1, arg2, arg3, arg4, arg5) => arg1 + arg2 + arg3 + arg4 + arg5);
 		/// </code>
 		/// </example>
 		IReturnsResult<TMock> Returns<T1, T2, T3, T4, T5>(Func<T1, T2, T3, T4, T5, TResult> valueFunction);
@@ -234,7 +235,7 @@ namespace Moq.Language
 		///                      It.IsAny&lt;int&gt;(), 
 		///                      It.IsAny&lt;int&gt;(), 
 		///                      It.IsAny&lt;int&gt;()))
-		///     .Returns((string arg1, string arg2, string arg3, string arg4, string arg5, string arg6) => arg1 + arg2 + arg3 + arg4 + arg5 + arg6);
+		///     .Returns((arg1, arg2, arg3, arg4, arg5, arg6) => arg1 + arg2 + arg3 + arg4 + arg5 + arg6);
 		/// </code>
 		/// </example>
 		IReturnsResult<TMock> Returns<T1, T2, T3, T4, T5, T6>(Func<T1, T2, T3, T4, T5, T6, TResult> valueFunction);
@@ -267,7 +268,7 @@ namespace Moq.Language
 		///                      It.IsAny&lt;int&gt;(), 
 		///                      It.IsAny&lt;int&gt;(), 
 		///                      It.IsAny&lt;int&gt;()))
-		///     .Returns((string arg1, string arg2, string arg3, string arg4, string arg5, string arg6, string arg7) => arg1 + arg2 + arg3 + arg4 + arg5 + arg6 + arg7);
+		///     .Returns((arg1, arg2, arg3, arg4, arg5, arg6, arg7) => arg1 + arg2 + arg3 + arg4 + arg5 + arg6 + arg7);
 		/// </code>
 		/// </example>
 		IReturnsResult<TMock> Returns<T1, T2, T3, T4, T5, T6, T7>(Func<T1, T2, T3, T4, T5, T6, T7, TResult> valueFunction);
@@ -302,7 +303,7 @@ namespace Moq.Language
 		///                      It.IsAny&lt;int&gt;(), 
 		///                      It.IsAny&lt;int&gt;(), 
 		///                      It.IsAny&lt;int&gt;()))
-		///     .Returns((string arg1, string arg2, string arg3, string arg4, string arg5, string arg6, string arg7, string arg8) => arg1 + arg2 + arg3 + arg4 + arg5 + arg6 + arg7 + arg8);
+		///     .Returns((arg1, arg2, arg3, arg4, arg5, arg6, arg7, arg8) => arg1 + arg2 + arg3 + arg4 + arg5 + arg6 + arg7 + arg8);
 		/// </code>
 		/// </example>
 		IReturnsResult<TMock> Returns<T1, T2, T3, T4, T5, T6, T7, T8>(Func<T1, T2, T3, T4, T5, T6, T7, T8, TResult> valueFunction);
@@ -339,7 +340,7 @@ namespace Moq.Language
 		///                      It.IsAny&lt;int&gt;(), 
 		///                      It.IsAny&lt;int&gt;(), 
 		///                      It.IsAny&lt;int&gt;()))
-		///     .Returns((string arg1, string arg2, string arg3, string arg4, string arg5, string arg6, string arg7, string arg8, string arg9) => arg1 + arg2 + arg3 + arg4 + arg5 + arg6 + arg7 + arg8 + arg9);
+		///     .Returns((arg1, arg2, arg3, arg4, arg5, arg6, arg7, arg8, arg9) => arg1 + arg2 + arg3 + arg4 + arg5 + arg6 + arg7 + arg8 + arg9);
 		/// </code>
 		/// </example>
 		IReturnsResult<TMock> Returns<T1, T2, T3, T4, T5, T6, T7, T8, T9>(Func<T1, T2, T3, T4, T5, T6, T7, T8, T9, TResult> valueFunction);
@@ -378,7 +379,7 @@ namespace Moq.Language
 		///                      It.IsAny&lt;int&gt;(), 
 		///                      It.IsAny&lt;int&gt;(), 
 		///                      It.IsAny&lt;int&gt;()))
-		///     .Returns((string arg1, string arg2, string arg3, string arg4, string arg5, string arg6, string arg7, string arg8, string arg9, string arg10) => arg1 + arg2 + arg3 + arg4 + arg5 + arg6 + arg7 + arg8 + arg9 + arg10);
+		///     .Returns((arg1, arg2, arg3, arg4, arg5, arg6, arg7, arg8, arg9, arg10) => arg1 + arg2 + arg3 + arg4 + arg5 + arg6 + arg7 + arg8 + arg9 + arg10);
 		/// </code>
 		/// </example>
 		IReturnsResult<TMock> Returns<T1, T2, T3, T4, T5, T6, T7, T8, T9, T10>(Func<T1, T2, T3, T4, T5, T6, T7, T8, T9, T10, TResult> valueFunction);
@@ -419,7 +420,7 @@ namespace Moq.Language
 		///                      It.IsAny&lt;int&gt;(), 
 		///                      It.IsAny&lt;int&gt;(), 
 		///                      It.IsAny&lt;int&gt;()))
-		///     .Returns((string arg1, string arg2, string arg3, string arg4, string arg5, string arg6, string arg7, string arg8, string arg9, string arg10, string arg11) => arg1 + arg2 + arg3 + arg4 + arg5 + arg6 + arg7 + arg8 + arg9 + arg10 + arg11);
+		///     .Returns((arg1, arg2, arg3, arg4, arg5, arg6, arg7, arg8, arg9, arg10, arg11) => arg1 + arg2 + arg3 + arg4 + arg5 + arg6 + arg7 + arg8 + arg9 + arg10 + arg11);
 		/// </code>
 		/// </example>
 		IReturnsResult<TMock> Returns<T1, T2, T3, T4, T5, T6, T7, T8, T9, T10, T11>(Func<T1, T2, T3, T4, T5, T6, T7, T8, T9, T10, T11, TResult> valueFunction);
@@ -462,7 +463,7 @@ namespace Moq.Language
 		///                      It.IsAny&lt;int&gt;(), 
 		///                      It.IsAny&lt;int&gt;(), 
 		///                      It.IsAny&lt;int&gt;()))
-		///     .Returns((string arg1, string arg2, string arg3, string arg4, string arg5, string arg6, string arg7, string arg8, string arg9, string arg10, string arg11, string arg12) => arg1 + arg2 + arg3 + arg4 + arg5 + arg6 + arg7 + arg8 + arg9 + arg10 + arg11 + arg12);
+		///     .Returns((arg1, arg2, arg3, arg4, arg5, arg6, arg7, arg8, arg9, arg10, arg11, arg12) => arg1 + arg2 + arg3 + arg4 + arg5 + arg6 + arg7 + arg8 + arg9 + arg10 + arg11 + arg12);
 		/// </code>
 		/// </example>
 		IReturnsResult<TMock> Returns<T1, T2, T3, T4, T5, T6, T7, T8, T9, T10, T11, T12>(Func<T1, T2, T3, T4, T5, T6, T7, T8, T9, T10, T11, T12, TResult> valueFunction);
@@ -507,7 +508,7 @@ namespace Moq.Language
 		///                      It.IsAny&lt;int&gt;(), 
 		///                      It.IsAny&lt;int&gt;(), 
 		///                      It.IsAny&lt;int&gt;()))
-		///     .Returns((string arg1, string arg2, string arg3, string arg4, string arg5, string arg6, string arg7, string arg8, string arg9, string arg10, string arg11, string arg12, string arg13) => arg1 + arg2 + arg3 + arg4 + arg5 + arg6 + arg7 + arg8 + arg9 + arg10 + arg11 + arg12 + arg13);
+		///     .Returns((arg1, arg2, arg3, arg4, arg5, arg6, arg7, arg8, arg9, arg10, arg11, arg12, arg13) => arg1 + arg2 + arg3 + arg4 + arg5 + arg6 + arg7 + arg8 + arg9 + arg10 + arg11 + arg12 + arg13);
 		/// </code>
 		/// </example>
 		IReturnsResult<TMock> Returns<T1, T2, T3, T4, T5, T6, T7, T8, T9, T10, T11, T12, T13>(Func<T1, T2, T3, T4, T5, T6, T7, T8, T9, T10, T11, T12, T13, TResult> valueFunction);
@@ -554,7 +555,7 @@ namespace Moq.Language
 		///                      It.IsAny&lt;int&gt;(), 
 		///                      It.IsAny&lt;int&gt;(), 
 		///                      It.IsAny&lt;int&gt;()))
-		///     .Returns((string arg1, string arg2, string arg3, string arg4, string arg5, string arg6, string arg7, string arg8, string arg9, string arg10, string arg11, string arg12, string arg13, string arg14) => arg1 + arg2 + arg3 + arg4 + arg5 + arg6 + arg7 + arg8 + arg9 + arg10 + arg11 + arg12 + arg13 + arg14);
+		///     .Returns((arg1, arg2, arg3, arg4, arg5, arg6, arg7, arg8, arg9, arg10, arg11, arg12, arg13, arg14) => arg1 + arg2 + arg3 + arg4 + arg5 + arg6 + arg7 + arg8 + arg9 + arg10 + arg11 + arg12 + arg13 + arg14);
 		/// </code>
 		/// </example>
 		IReturnsResult<TMock> Returns<T1, T2, T3, T4, T5, T6, T7, T8, T9, T10, T11, T12, T13, T14>(Func<T1, T2, T3, T4, T5, T6, T7, T8, T9, T10, T11, T12, T13, T14, TResult> valueFunction);
@@ -603,7 +604,7 @@ namespace Moq.Language
 		///                      It.IsAny&lt;int&gt;(), 
 		///                      It.IsAny&lt;int&gt;(), 
 		///                      It.IsAny&lt;int&gt;()))
-		///     .Returns((string arg1, string arg2, string arg3, string arg4, string arg5, string arg6, string arg7, string arg8, string arg9, string arg10, string arg11, string arg12, string arg13, string arg14, string arg15) => arg1 + arg2 + arg3 + arg4 + arg5 + arg6 + arg7 + arg8 + arg9 + arg10 + arg11 + arg12 + arg13 + arg14 + arg15);
+		///     .Returns((arg1, arg2, arg3, arg4, arg5, arg6, arg7, arg8, arg9, arg10, arg11, arg12, arg13, arg14, arg15) => arg1 + arg2 + arg3 + arg4 + arg5 + arg6 + arg7 + arg8 + arg9 + arg10 + arg11 + arg12 + arg13 + arg14 + arg15);
 		/// </code>
 		/// </example>
 		IReturnsResult<TMock> Returns<T1, T2, T3, T4, T5, T6, T7, T8, T9, T10, T11, T12, T13, T14, T15>(Func<T1, T2, T3, T4, T5, T6, T7, T8, T9, T10, T11, T12, T13, T14, T15, TResult> valueFunction);
@@ -654,7 +655,7 @@ namespace Moq.Language
 		///                      It.IsAny&lt;int&gt;(), 
 		///                      It.IsAny&lt;int&gt;(), 
 		///                      It.IsAny&lt;int&gt;()))
-		///     .Returns((string arg1, string arg2, string arg3, string arg4, string arg5, string arg6, string arg7, string arg8, string arg9, string arg10, string arg11, string arg12, string arg13, string arg14, string arg15, string arg16) => arg1 + arg2 + arg3 + arg4 + arg5 + arg6 + arg7 + arg8 + arg9 + arg10 + arg11 + arg12 + arg13 + arg14 + arg15 + arg16);
+		///     .Returns((arg1, arg2, arg3, arg4, arg5, arg6, arg7, arg8, arg9, arg10, arg11, arg12, arg13, arg14, arg15, arg16) => arg1 + arg2 + arg3 + arg4 + arg5 + arg6 + arg7 + arg8 + arg9 + arg10 + arg11 + arg12 + arg13 + arg14 + arg15 + arg16);
 		/// </code>
 		/// </example>
 		IReturnsResult<TMock> Returns<T1, T2, T3, T4, T5, T6, T7, T8, T9, T10, T11, T12, T13, T14, T15, T16>(Func<T1, T2, T3, T4, T5, T6, T7, T8, T9, T10, T11, T12, T13, T14, T15, T16, TResult> valueFunction);

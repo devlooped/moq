@@ -77,13 +77,12 @@ namespace Moq.Language
 		IVerifies Raises(Action<T> eventExpression, Func<EventArgs> func);
 
 		/// <summary>
-		/// Specifies the event that will be raised 
-		/// when the setup is matched.
+		/// Specifies the event that will be raised when the setup is matched.
 		/// </summary>
-		/// <param name="eventExpression">An expression that represents an event attach or detach action.</param>
-		/// <param name="func">A function that will build the <see cref="EventArgs"/> 
+		/// <param name="eventExpression">The expression that represents an event attach or detach action.</param>
+		/// <param name="func">The function that will build the <see cref="EventArgs"/> 
 		/// to pass when raising the event.</param>
-		/// <typeparam name="T1">Type of the argument received by the expected invocation.</typeparam>
+		/// <typeparam name="T1">The type of the first argument received by the expected invocation.</typeparam>
 		/// <seealso cref="Raises(Action{T}, EventArgs)"/>
 		IVerifies Raises<T1>(Action<T> eventExpression, Func<T1, EventArgs> func);
 

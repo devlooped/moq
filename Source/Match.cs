@@ -138,7 +138,7 @@ namespace Moq
 	internal class MatchExpression : Expression
 	{
 		public MatchExpression(Match match)
-#if !NET4
+#if NET35
 			: base(ExpressionType.Call, typeof(Match))
 #endif
 		{
@@ -147,7 +147,7 @@ namespace Moq
 
 		public Match Match { get; private set; }
 
-#if NET4
+#if !NET35
 		public override ExpressionType NodeType
 		{
 			get { return ExpressionType.Call; }

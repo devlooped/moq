@@ -53,24 +53,23 @@ namespace Moq.Language
 		/// <summary>
 		/// Specifies a callback to invoke when the method is called.
 		/// </summary>
-		/// <param name="action">Callback method to invoke.</param>
+		/// <param name="action">The callback method to invoke.</param>
 		/// <example>
 		/// The following example specifies a callback to set a boolean 
 		/// value that can be used later:
 		/// <code>
-		/// bool called = false;
+		/// var called = false;
 		/// mock.Setup(x => x.Execute())
 		///     .Callback(() => called = true);
 		/// </code>
 		/// </example>
 		ICallbackResult Callback(Action action);
-		
+
 		/// <summary>
-		/// Specifies a callback to invoke when the method is called that receives the original
-		/// arguments.
+		/// Specifies a callback to invoke when the method is called that receives the original arguments.
 		/// </summary>
-		/// <typeparam name="T">Argument type of the invoked method.</typeparam>
-		/// <param name="action">Callback method to invoke.</param>
+		/// <typeparam name="T">The argument type of the invoked method.</typeparam>
+		/// <param name="action">The callback method to invoke.</param>
 		/// <example>
 		/// Invokes the given callback with the concrete invocation argument value. 
 		/// <para>
@@ -79,14 +78,13 @@ namespace Moq.Language
 		/// </para>
 		/// <code>
 		/// mock.Setup(x => x.Execute(It.IsAny&lt;string&gt;()))
-		///     .Callback((string command) => Console.WriteLine(command));
+		///     .Callback(command => Console.WriteLine(command));
 		/// </code>
 		/// </example>
 		ICallbackResult Callback<T>(Action<T> action);
 
 		/// <summary>
-		/// Specifies a callback to invoke when the method is called that receives the original
-		/// arguments.
+		/// Specifies a callback to invoke when the method is called that receives the original arguments.
 		/// </summary>
 		/// <typeparam name="T1">The type of the first argument of the invoked method.</typeparam>
 		/// <typeparam name="T2">The type of the second argument of the invoked method.</typeparam>
@@ -102,14 +100,13 @@ namespace Moq.Language
 		/// mock.Setup(x => x.Execute(
 		///                      It.IsAny&lt;string&gt;(),
 		///                      It.IsAny&lt;string&gt;()))
-		///     .Callback((string arg1, string arg2) => Console.WriteLine(arg1 + arg2));
+		///     .Callback((arg1, arg2) => Console.WriteLine(arg1 + arg2));
 		/// </code>
 		/// </example>
 		ICallbackResult Callback<T1, T2>(Action<T1, T2> action);
 
 		/// <summary>
-		/// Specifies a callback to invoke when the method is called that receives the original
-		/// arguments.
+		/// Specifies a callback to invoke when the method is called that receives the original arguments.
 		/// </summary>
 		/// <typeparam name="T1">The type of the first argument of the invoked method.</typeparam>
 		/// <typeparam name="T2">The type of the second argument of the invoked method.</typeparam>
@@ -127,14 +124,13 @@ namespace Moq.Language
 		///                      It.IsAny&lt;string&gt;(),
 		///                      It.IsAny&lt;string&gt;(),
 		///                      It.IsAny&lt;string&gt;()))
-		///     .Callback((string arg1, string arg2, string arg3) => Console.WriteLine(arg1 + arg2 + arg3));
+		///     .Callback((arg1, arg2, arg3) => Console.WriteLine(arg1 + arg2 + arg3));
 		/// </code>
 		/// </example>
 		ICallbackResult Callback<T1, T2, T3>(Action<T1, T2, T3> action);
 
 		/// <summary>
-		/// Specifies a callback to invoke when the method is called that receives the original
-		/// arguments.
+		/// Specifies a callback to invoke when the method is called that receives the original arguments.
 		/// </summary>
 		/// <typeparam name="T1">The type of the first argument of the invoked method.</typeparam>
 		/// <typeparam name="T2">The type of the second argument of the invoked method.</typeparam>
@@ -154,14 +150,13 @@ namespace Moq.Language
 		///                      It.IsAny&lt;string&gt;(),
 		///                      It.IsAny&lt;string&gt;(),
 		///                      It.IsAny&lt;string&gt;()))
-		///     .Callback((string arg1, string arg2, string arg3, string arg4) => Console.WriteLine(arg1 + arg2 + arg3 + arg4));
+		///     .Callback((arg1, arg2, arg3, arg4) => Console.WriteLine(arg1 + arg2 + arg3 + arg4));
 		/// </code>
 		/// </example>
 		ICallbackResult Callback<T1, T2, T3, T4>(Action<T1, T2, T3, T4> action);
 
 		/// <summary>
-		/// Specifies a callback to invoke when the method is called that receives the original
-		/// arguments.
+		/// Specifies a callback to invoke when the method is called that receives the original arguments.
 		/// </summary>
 		/// <typeparam name="T1">The type of the first argument of the invoked method.</typeparam>
 		/// <typeparam name="T2">The type of the second argument of the invoked method.</typeparam>
@@ -183,14 +178,13 @@ namespace Moq.Language
 		///                      It.IsAny&lt;string&gt;(),
 		///                      It.IsAny&lt;string&gt;(),
 		///                      It.IsAny&lt;string&gt;()))
-		///     .Callback((string arg1, string arg2, string arg3, string arg4, string arg5) => Console.WriteLine(arg1 + arg2 + arg3 + arg4 + arg5));
+		///     .Callback((arg1, arg2, arg3, arg4, arg5) => Console.WriteLine(arg1 + arg2 + arg3 + arg4 + arg5));
 		/// </code>
 		/// </example>
 		ICallbackResult Callback<T1, T2, T3, T4, T5>(Action<T1, T2, T3, T4, T5> action);
 
 		/// <summary>
-		/// Specifies a callback to invoke when the method is called that receives the original
-		/// arguments.
+		/// Specifies a callback to invoke when the method is called that receives the original arguments.
 		/// </summary>
 		/// <typeparam name="T1">The type of the first argument of the invoked method.</typeparam>
 		/// <typeparam name="T2">The type of the second argument of the invoked method.</typeparam>
@@ -214,14 +208,13 @@ namespace Moq.Language
 		///                      It.IsAny&lt;string&gt;(),
 		///                      It.IsAny&lt;string&gt;(),
 		///                      It.IsAny&lt;string&gt;()))
-		///     .Callback((string arg1, string arg2, string arg3, string arg4, string arg5, string arg6) => Console.WriteLine(arg1 + arg2 + arg3 + arg4 + arg5 + arg6));
+		///     .Callback((arg1, arg2, arg3, arg4, arg5, arg6) => Console.WriteLine(arg1 + arg2 + arg3 + arg4 + arg5 + arg6));
 		/// </code>
 		/// </example>
 		ICallbackResult Callback<T1, T2, T3, T4, T5, T6>(Action<T1, T2, T3, T4, T5, T6> action);
 
 		/// <summary>
-		/// Specifies a callback to invoke when the method is called that receives the original
-		/// arguments.
+		/// Specifies a callback to invoke when the method is called that receives the original arguments.
 		/// </summary>
 		/// <typeparam name="T1">The type of the first argument of the invoked method.</typeparam>
 		/// <typeparam name="T2">The type of the second argument of the invoked method.</typeparam>
@@ -247,14 +240,13 @@ namespace Moq.Language
 		///                      It.IsAny&lt;string&gt;(),
 		///                      It.IsAny&lt;string&gt;(),
 		///                      It.IsAny&lt;string&gt;()))
-		///     .Callback((string arg1, string arg2, string arg3, string arg4, string arg5, string arg6, string arg7) => Console.WriteLine(arg1 + arg2 + arg3 + arg4 + arg5 + arg6 + arg7));
+		///     .Callback((arg1, arg2, arg3, arg4, arg5, arg6, arg7) => Console.WriteLine(arg1 + arg2 + arg3 + arg4 + arg5 + arg6 + arg7));
 		/// </code>
 		/// </example>
 		ICallbackResult Callback<T1, T2, T3, T4, T5, T6, T7>(Action<T1, T2, T3, T4, T5, T6, T7> action);
 
 		/// <summary>
-		/// Specifies a callback to invoke when the method is called that receives the original
-		/// arguments.
+		/// Specifies a callback to invoke when the method is called that receives the original arguments.
 		/// </summary>
 		/// <typeparam name="T1">The type of the first argument of the invoked method.</typeparam>
 		/// <typeparam name="T2">The type of the second argument of the invoked method.</typeparam>
@@ -282,14 +274,13 @@ namespace Moq.Language
 		///                      It.IsAny&lt;string&gt;(),
 		///                      It.IsAny&lt;string&gt;(),
 		///                      It.IsAny&lt;string&gt;()))
-		///     .Callback((string arg1, string arg2, string arg3, string arg4, string arg5, string arg6, string arg7, string arg8) => Console.WriteLine(arg1 + arg2 + arg3 + arg4 + arg5 + arg6 + arg7 + arg8));
+		///     .Callback((arg1, arg2, arg3, arg4, arg5, arg6, arg7, arg8) => Console.WriteLine(arg1 + arg2 + arg3 + arg4 + arg5 + arg6 + arg7 + arg8));
 		/// </code>
 		/// </example>
 		ICallbackResult Callback<T1, T2, T3, T4, T5, T6, T7, T8>(Action<T1, T2, T3, T4, T5, T6, T7, T8> action);
 
 		/// <summary>
-		/// Specifies a callback to invoke when the method is called that receives the original
-		/// arguments.
+		/// Specifies a callback to invoke when the method is called that receives the original arguments.
 		/// </summary>
 		/// <typeparam name="T1">The type of the first argument of the invoked method.</typeparam>
 		/// <typeparam name="T2">The type of the second argument of the invoked method.</typeparam>
@@ -319,14 +310,13 @@ namespace Moq.Language
 		///                      It.IsAny&lt;string&gt;(),
 		///                      It.IsAny&lt;string&gt;(),
 		///                      It.IsAny&lt;string&gt;()))
-		///     .Callback((string arg1, string arg2, string arg3, string arg4, string arg5, string arg6, string arg7, string arg8, string arg9) => Console.WriteLine(arg1 + arg2 + arg3 + arg4 + arg5 + arg6 + arg7 + arg8 + arg9));
+		///     .Callback((arg1, arg2, arg3, arg4, arg5, arg6, arg7, arg8, arg9) => Console.WriteLine(arg1 + arg2 + arg3 + arg4 + arg5 + arg6 + arg7 + arg8 + arg9));
 		/// </code>
 		/// </example>
 		ICallbackResult Callback<T1, T2, T3, T4, T5, T6, T7, T8, T9>(Action<T1, T2, T3, T4, T5, T6, T7, T8, T9> action);
 
 		/// <summary>
-		/// Specifies a callback to invoke when the method is called that receives the original
-		/// arguments.
+		/// Specifies a callback to invoke when the method is called that receives the original arguments.
 		/// </summary>
 		/// <typeparam name="T1">The type of the first argument of the invoked method.</typeparam>
 		/// <typeparam name="T2">The type of the second argument of the invoked method.</typeparam>
@@ -358,14 +348,13 @@ namespace Moq.Language
 		///                      It.IsAny&lt;string&gt;(),
 		///                      It.IsAny&lt;string&gt;(),
 		///                      It.IsAny&lt;string&gt;()))
-		///     .Callback((string arg1, string arg2, string arg3, string arg4, string arg5, string arg6, string arg7, string arg8, string arg9, string arg10) => Console.WriteLine(arg1 + arg2 + arg3 + arg4 + arg5 + arg6 + arg7 + arg8 + arg9 + arg10));
+		///     .Callback((arg1, arg2, arg3, arg4, arg5, arg6, arg7, arg8, arg9, arg10) => Console.WriteLine(arg1 + arg2 + arg3 + arg4 + arg5 + arg6 + arg7 + arg8 + arg9 + arg10));
 		/// </code>
 		/// </example>
 		ICallbackResult Callback<T1, T2, T3, T4, T5, T6, T7, T8, T9, T10>(Action<T1, T2, T3, T4, T5, T6, T7, T8, T9, T10> action);
 
 		/// <summary>
-		/// Specifies a callback to invoke when the method is called that receives the original
-		/// arguments.
+		/// Specifies a callback to invoke when the method is called that receives the original arguments.
 		/// </summary>
 		/// <typeparam name="T1">The type of the first argument of the invoked method.</typeparam>
 		/// <typeparam name="T2">The type of the second argument of the invoked method.</typeparam>
@@ -399,14 +388,13 @@ namespace Moq.Language
 		///                      It.IsAny&lt;string&gt;(),
 		///                      It.IsAny&lt;string&gt;(),
 		///                      It.IsAny&lt;string&gt;()))
-		///     .Callback((string arg1, string arg2, string arg3, string arg4, string arg5, string arg6, string arg7, string arg8, string arg9, string arg10, string arg11) => Console.WriteLine(arg1 + arg2 + arg3 + arg4 + arg5 + arg6 + arg7 + arg8 + arg9 + arg10 + arg11));
+		///     .Callback((arg1, arg2, arg3, arg4, arg5, arg6, arg7, arg8, arg9, arg10, arg11) => Console.WriteLine(arg1 + arg2 + arg3 + arg4 + arg5 + arg6 + arg7 + arg8 + arg9 + arg10 + arg11));
 		/// </code>
 		/// </example>
 		ICallbackResult Callback<T1, T2, T3, T4, T5, T6, T7, T8, T9, T10, T11>(Action<T1, T2, T3, T4, T5, T6, T7, T8, T9, T10, T11> action);
 
 		/// <summary>
-		/// Specifies a callback to invoke when the method is called that receives the original
-		/// arguments.
+		/// Specifies a callback to invoke when the method is called that receives the original arguments.
 		/// </summary>
 		/// <typeparam name="T1">The type of the first argument of the invoked method.</typeparam>
 		/// <typeparam name="T2">The type of the second argument of the invoked method.</typeparam>
@@ -442,14 +430,13 @@ namespace Moq.Language
 		///                      It.IsAny&lt;string&gt;(),
 		///                      It.IsAny&lt;string&gt;(),
 		///                      It.IsAny&lt;string&gt;()))
-		///     .Callback((string arg1, string arg2, string arg3, string arg4, string arg5, string arg6, string arg7, string arg8, string arg9, string arg10, string arg11, string arg12) => Console.WriteLine(arg1 + arg2 + arg3 + arg4 + arg5 + arg6 + arg7 + arg8 + arg9 + arg10 + arg11 + arg12));
+		///     .Callback((arg1, arg2, arg3, arg4, arg5, arg6, arg7, arg8, arg9, arg10, arg11, arg12) => Console.WriteLine(arg1 + arg2 + arg3 + arg4 + arg5 + arg6 + arg7 + arg8 + arg9 + arg10 + arg11 + arg12));
 		/// </code>
 		/// </example>
 		ICallbackResult Callback<T1, T2, T3, T4, T5, T6, T7, T8, T9, T10, T11, T12>(Action<T1, T2, T3, T4, T5, T6, T7, T8, T9, T10, T11, T12> action);
 
 		/// <summary>
-		/// Specifies a callback to invoke when the method is called that receives the original
-		/// arguments.
+		/// Specifies a callback to invoke when the method is called that receives the original arguments.
 		/// </summary>
 		/// <typeparam name="T1">The type of the first argument of the invoked method.</typeparam>
 		/// <typeparam name="T2">The type of the second argument of the invoked method.</typeparam>
@@ -487,14 +474,13 @@ namespace Moq.Language
 		///                      It.IsAny&lt;string&gt;(),
 		///                      It.IsAny&lt;string&gt;(),
 		///                      It.IsAny&lt;string&gt;()))
-		///     .Callback((string arg1, string arg2, string arg3, string arg4, string arg5, string arg6, string arg7, string arg8, string arg9, string arg10, string arg11, string arg12, string arg13) => Console.WriteLine(arg1 + arg2 + arg3 + arg4 + arg5 + arg6 + arg7 + arg8 + arg9 + arg10 + arg11 + arg12 + arg13));
+		///     .Callback((arg1, arg2, arg3, arg4, arg5, arg6, arg7, arg8, arg9, arg10, arg11, arg12, arg13) => Console.WriteLine(arg1 + arg2 + arg3 + arg4 + arg5 + arg6 + arg7 + arg8 + arg9 + arg10 + arg11 + arg12 + arg13));
 		/// </code>
 		/// </example>
 		ICallbackResult Callback<T1, T2, T3, T4, T5, T6, T7, T8, T9, T10, T11, T12, T13>(Action<T1, T2, T3, T4, T5, T6, T7, T8, T9, T10, T11, T12, T13> action);
 
 		/// <summary>
-		/// Specifies a callback to invoke when the method is called that receives the original
-		/// arguments.
+		/// Specifies a callback to invoke when the method is called that receives the original arguments.
 		/// </summary>
 		/// <typeparam name="T1">The type of the first argument of the invoked method.</typeparam>
 		/// <typeparam name="T2">The type of the second argument of the invoked method.</typeparam>
@@ -534,14 +520,13 @@ namespace Moq.Language
 		///                      It.IsAny&lt;string&gt;(),
 		///                      It.IsAny&lt;string&gt;(),
 		///                      It.IsAny&lt;string&gt;()))
-		///     .Callback((string arg1, string arg2, string arg3, string arg4, string arg5, string arg6, string arg7, string arg8, string arg9, string arg10, string arg11, string arg12, string arg13, string arg14) => Console.WriteLine(arg1 + arg2 + arg3 + arg4 + arg5 + arg6 + arg7 + arg8 + arg9 + arg10 + arg11 + arg12 + arg13 + arg14));
+		///     .Callback((arg1, arg2, arg3, arg4, arg5, arg6, arg7, arg8, arg9, arg10, arg11, arg12, arg13, arg14) => Console.WriteLine(arg1 + arg2 + arg3 + arg4 + arg5 + arg6 + arg7 + arg8 + arg9 + arg10 + arg11 + arg12 + arg13 + arg14));
 		/// </code>
 		/// </example>
 		ICallbackResult Callback<T1, T2, T3, T4, T5, T6, T7, T8, T9, T10, T11, T12, T13, T14>(Action<T1, T2, T3, T4, T5, T6, T7, T8, T9, T10, T11, T12, T13, T14> action);
 
 		/// <summary>
-		/// Specifies a callback to invoke when the method is called that receives the original
-		/// arguments.
+		/// Specifies a callback to invoke when the method is called that receives the original arguments.
 		/// </summary>
 		/// <typeparam name="T1">The type of the first argument of the invoked method.</typeparam>
 		/// <typeparam name="T2">The type of the second argument of the invoked method.</typeparam>
@@ -583,14 +568,13 @@ namespace Moq.Language
 		///                      It.IsAny&lt;string&gt;(),
 		///                      It.IsAny&lt;string&gt;(),
 		///                      It.IsAny&lt;string&gt;()))
-		///     .Callback((string arg1, string arg2, string arg3, string arg4, string arg5, string arg6, string arg7, string arg8, string arg9, string arg10, string arg11, string arg12, string arg13, string arg14, string arg15) => Console.WriteLine(arg1 + arg2 + arg3 + arg4 + arg5 + arg6 + arg7 + arg8 + arg9 + arg10 + arg11 + arg12 + arg13 + arg14 + arg15));
+		///     .Callback((arg1, arg2, arg3, arg4, arg5, arg6, arg7, arg8, arg9, arg10, arg11, arg12, arg13, arg14, arg15) => Console.WriteLine(arg1 + arg2 + arg3 + arg4 + arg5 + arg6 + arg7 + arg8 + arg9 + arg10 + arg11 + arg12 + arg13 + arg14 + arg15));
 		/// </code>
 		/// </example>
 		ICallbackResult Callback<T1, T2, T3, T4, T5, T6, T7, T8, T9, T10, T11, T12, T13, T14, T15>(Action<T1, T2, T3, T4, T5, T6, T7, T8, T9, T10, T11, T12, T13, T14, T15> action);
 
 		/// <summary>
-		/// Specifies a callback to invoke when the method is called that receives the original
-		/// arguments.
+		/// Specifies a callback to invoke when the method is called that receives the original arguments.
 		/// </summary>
 		/// <typeparam name="T1">The type of the first argument of the invoked method.</typeparam>
 		/// <typeparam name="T2">The type of the second argument of the invoked method.</typeparam>
@@ -634,55 +618,52 @@ namespace Moq.Language
 		///                      It.IsAny&lt;string&gt;(),
 		///                      It.IsAny&lt;string&gt;(),
 		///                      It.IsAny&lt;string&gt;()))
-		///     .Callback((string arg1, string arg2, string arg3, string arg4, string arg5, string arg6, string arg7, string arg8, string arg9, string arg10, string arg11, string arg12, string arg13, string arg14, string arg15, string arg16) => Console.WriteLine(arg1 + arg2 + arg3 + arg4 + arg5 + arg6 + arg7 + arg8 + arg9 + arg10 + arg11 + arg12 + arg13 + arg14 + arg15 + arg16));
+		///     .Callback((arg1, arg2, arg3, arg4, arg5, arg6, arg7, arg8, arg9, arg10, arg11, arg12, arg13, arg14, arg15, arg16) => Console.WriteLine(arg1 + arg2 + arg3 + arg4 + arg5 + arg6 + arg7 + arg8 + arg9 + arg10 + arg11 + arg12 + arg13 + arg14 + arg15 + arg16));
 		/// </code>
 		/// </example>
 		ICallbackResult Callback<T1, T2, T3, T4, T5, T6, T7, T8, T9, T10, T11, T12, T13, T14, T15, T16>(Action<T1, T2, T3, T4, T5, T6, T7, T8, T9, T10, T11, T12, T13, T14, T15, T16> action);
 	}
 
 	/// <summary>
-	/// Defines the <c>Callback</c> verb and overloads for callbacks on 
+	/// Defines the <c>Callback</c> verb and overloads for callbacks on
 	/// setups that return a value.
 	/// </summary>
 	/// <typeparam name="TMock">Mocked type.</typeparam>
 	/// <typeparam name="TResult">Type of the return value of the setup.</typeparam>
-	[EditorBrowsable(EditorBrowsableState.Never)]
 	public interface ICallback<TMock, TResult> : IHideObjectMembers
 		where TMock : class
 	{
 		/// <summary>
 		/// Specifies a callback to invoke when the method is called.
 		/// </summary>
-		/// <param name="action">Callback method to invoke.</param>
+		/// <param name="action">The callback method to invoke.</param>
 		/// <example>
-		/// The following example specifies a callback to set a boolean 
-		/// value that can be used later:
+		/// The following example specifies a callback to set a boolean value that can be used later:
 		/// <code>
-		/// bool called = false;
+		/// var called = false;
 		/// mock.Setup(x => x.Execute())
 		///     .Callback(() => called = true)
 		///     .Returns(true);
 		/// </code>
-		/// Note that in the case of value-returning methods, after the <c>Callback</c> 
+		/// Note that in the case of value-returning methods, after the <c>Callback</c>
 		/// call you can still specify the return value.
 		/// </example>
 		IReturnsThrows<TMock, TResult> Callback(Action action);
-		
+ 
 		/// <summary>
-		/// Specifies a callback to invoke when the method is called that receives the original
-		/// arguments.
+		/// Specifies a callback to invoke when the method is called that receives the original arguments.
 		/// </summary>
-		/// <typeparam name="T">Type of the argument of the invoked method.</typeparam>
+		/// <typeparam name="T">The type of the argument of the invoked method.</typeparam>
 		/// <param name="action">Callback method to invoke.</param>
 		/// <example>
-		/// Invokes the given callback with the concrete invocation argument value. 
+		/// Invokes the given callback with the concrete invocation argument value.
 		/// <para>
-		/// Notice how the specific string argument is retrieved by simply declaring 
+		/// Notice how the specific string argument is retrieved by simply declaring
 		/// it as part of the lambda expression for the callback:
 		/// </para>
 		/// <code>
 		/// mock.Setup(x => x.Execute(It.IsAny&lt;string&gt;()))
-		///     .Callback((string command) => Console.WriteLine(command))
+		///     .Callback(command => Console.WriteLine(command))
 		///     .Returns(true);
 		/// </code>
 		/// </example>
@@ -706,7 +687,7 @@ namespace Moq.Language
 		/// mock.Setup(x => x.Execute(
 		///                      It.IsAny&lt;string&gt;(),
 		///                      It.IsAny&lt;string&gt;()))
-		///     .Callback((string arg1, string arg2) => Console.WriteLine(arg1 + arg2));
+		///     .Callback((arg1, arg2) => Console.WriteLine(arg1 + arg2));
 		/// </code>
 		/// </example>
 		IReturnsThrows<TMock, TResult> Callback<T1, T2>(Action<T1, T2> action);
@@ -731,7 +712,7 @@ namespace Moq.Language
 		///                      It.IsAny&lt;string&gt;(),
 		///                      It.IsAny&lt;string&gt;(),
 		///                      It.IsAny&lt;string&gt;()))
-		///     .Callback((string arg1, string arg2, string arg3) => Console.WriteLine(arg1 + arg2 + arg3));
+		///     .Callback((arg1, arg2, arg3) => Console.WriteLine(arg1 + arg2 + arg3));
 		/// </code>
 		/// </example>
 		IReturnsThrows<TMock, TResult> Callback<T1, T2, T3>(Action<T1, T2, T3> action);
@@ -758,7 +739,7 @@ namespace Moq.Language
 		///                      It.IsAny&lt;string&gt;(),
 		///                      It.IsAny&lt;string&gt;(),
 		///                      It.IsAny&lt;string&gt;()))
-		///     .Callback((string arg1, string arg2, string arg3, string arg4) => Console.WriteLine(arg1 + arg2 + arg3 + arg4));
+		///     .Callback((arg1, arg2, arg3, arg4) => Console.WriteLine(arg1 + arg2 + arg3 + arg4));
 		/// </code>
 		/// </example>
 		IReturnsThrows<TMock, TResult> Callback<T1, T2, T3, T4>(Action<T1, T2, T3, T4> action);
@@ -787,7 +768,7 @@ namespace Moq.Language
 		///                      It.IsAny&lt;string&gt;(),
 		///                      It.IsAny&lt;string&gt;(),
 		///                      It.IsAny&lt;string&gt;()))
-		///     .Callback((string arg1, string arg2, string arg3, string arg4, string arg5) => Console.WriteLine(arg1 + arg2 + arg3 + arg4 + arg5));
+		///     .Callback((arg1, arg2, arg3, arg4, arg5) => Console.WriteLine(arg1 + arg2 + arg3 + arg4 + arg5));
 		/// </code>
 		/// </example>
 		IReturnsThrows<TMock, TResult> Callback<T1, T2, T3, T4, T5>(Action<T1, T2, T3, T4, T5> action);
@@ -818,7 +799,7 @@ namespace Moq.Language
 		///                      It.IsAny&lt;string&gt;(),
 		///                      It.IsAny&lt;string&gt;(),
 		///                      It.IsAny&lt;string&gt;()))
-		///     .Callback((string arg1, string arg2, string arg3, string arg4, string arg5, string arg6) => Console.WriteLine(arg1 + arg2 + arg3 + arg4 + arg5 + arg6));
+		///     .Callback((arg1, arg2, arg3, arg4, arg5, arg6) => Console.WriteLine(arg1 + arg2 + arg3 + arg4 + arg5 + arg6));
 		/// </code>
 		/// </example>
 		IReturnsThrows<TMock, TResult> Callback<T1, T2, T3, T4, T5, T6>(Action<T1, T2, T3, T4, T5, T6> action);
@@ -851,7 +832,7 @@ namespace Moq.Language
 		///                      It.IsAny&lt;string&gt;(),
 		///                      It.IsAny&lt;string&gt;(),
 		///                      It.IsAny&lt;string&gt;()))
-		///     .Callback((string arg1, string arg2, string arg3, string arg4, string arg5, string arg6, string arg7) => Console.WriteLine(arg1 + arg2 + arg3 + arg4 + arg5 + arg6 + arg7));
+		///     .Callback((arg1, arg2, arg3, arg4, arg5, arg6, arg7) => Console.WriteLine(arg1 + arg2 + arg3 + arg4 + arg5 + arg6 + arg7));
 		/// </code>
 		/// </example>
 		IReturnsThrows<TMock, TResult> Callback<T1, T2, T3, T4, T5, T6, T7>(Action<T1, T2, T3, T4, T5, T6, T7> action);
@@ -886,7 +867,7 @@ namespace Moq.Language
 		///                      It.IsAny&lt;string&gt;(),
 		///                      It.IsAny&lt;string&gt;(),
 		///                      It.IsAny&lt;string&gt;()))
-		///     .Callback((string arg1, string arg2, string arg3, string arg4, string arg5, string arg6, string arg7, string arg8) => Console.WriteLine(arg1 + arg2 + arg3 + arg4 + arg5 + arg6 + arg7 + arg8));
+		///     .Callback((arg1, arg2, arg3, arg4, arg5, arg6, arg7, arg8) => Console.WriteLine(arg1 + arg2 + arg3 + arg4 + arg5 + arg6 + arg7 + arg8));
 		/// </code>
 		/// </example>
 		IReturnsThrows<TMock, TResult> Callback<T1, T2, T3, T4, T5, T6, T7, T8>(Action<T1, T2, T3, T4, T5, T6, T7, T8> action);
@@ -923,7 +904,7 @@ namespace Moq.Language
 		///                      It.IsAny&lt;string&gt;(),
 		///                      It.IsAny&lt;string&gt;(),
 		///                      It.IsAny&lt;string&gt;()))
-		///     .Callback((string arg1, string arg2, string arg3, string arg4, string arg5, string arg6, string arg7, string arg8, string arg9) => Console.WriteLine(arg1 + arg2 + arg3 + arg4 + arg5 + arg6 + arg7 + arg8 + arg9));
+		///     .Callback((arg1, arg2, arg3, arg4, arg5, arg6, arg7, arg8, arg9) => Console.WriteLine(arg1 + arg2 + arg3 + arg4 + arg5 + arg6 + arg7 + arg8 + arg9));
 		/// </code>
 		/// </example>
 		IReturnsThrows<TMock, TResult> Callback<T1, T2, T3, T4, T5, T6, T7, T8, T9>(Action<T1, T2, T3, T4, T5, T6, T7, T8, T9> action);
@@ -962,7 +943,7 @@ namespace Moq.Language
 		///                      It.IsAny&lt;string&gt;(),
 		///                      It.IsAny&lt;string&gt;(),
 		///                      It.IsAny&lt;string&gt;()))
-		///     .Callback((string arg1, string arg2, string arg3, string arg4, string arg5, string arg6, string arg7, string arg8, string arg9, string arg10) => Console.WriteLine(arg1 + arg2 + arg3 + arg4 + arg5 + arg6 + arg7 + arg8 + arg9 + arg10));
+		///     .Callback((arg1, arg2, arg3, arg4, arg5, arg6, arg7, arg8, arg9, arg10) => Console.WriteLine(arg1 + arg2 + arg3 + arg4 + arg5 + arg6 + arg7 + arg8 + arg9 + arg10));
 		/// </code>
 		/// </example>
 		IReturnsThrows<TMock, TResult> Callback<T1, T2, T3, T4, T5, T6, T7, T8, T9, T10>(Action<T1, T2, T3, T4, T5, T6, T7, T8, T9, T10> action);
@@ -1003,7 +984,7 @@ namespace Moq.Language
 		///                      It.IsAny&lt;string&gt;(),
 		///                      It.IsAny&lt;string&gt;(),
 		///                      It.IsAny&lt;string&gt;()))
-		///     .Callback((string arg1, string arg2, string arg3, string arg4, string arg5, string arg6, string arg7, string arg8, string arg9, string arg10, string arg11) => Console.WriteLine(arg1 + arg2 + arg3 + arg4 + arg5 + arg6 + arg7 + arg8 + arg9 + arg10 + arg11));
+		///     .Callback((arg1, arg2, arg3, arg4, arg5, arg6, arg7, arg8, arg9, arg10, arg11) => Console.WriteLine(arg1 + arg2 + arg3 + arg4 + arg5 + arg6 + arg7 + arg8 + arg9 + arg10 + arg11));
 		/// </code>
 		/// </example>
 		IReturnsThrows<TMock, TResult> Callback<T1, T2, T3, T4, T5, T6, T7, T8, T9, T10, T11>(Action<T1, T2, T3, T4, T5, T6, T7, T8, T9, T10, T11> action);
@@ -1046,7 +1027,7 @@ namespace Moq.Language
 		///                      It.IsAny&lt;string&gt;(),
 		///                      It.IsAny&lt;string&gt;(),
 		///                      It.IsAny&lt;string&gt;()))
-		///     .Callback((string arg1, string arg2, string arg3, string arg4, string arg5, string arg6, string arg7, string arg8, string arg9, string arg10, string arg11, string arg12) => Console.WriteLine(arg1 + arg2 + arg3 + arg4 + arg5 + arg6 + arg7 + arg8 + arg9 + arg10 + arg11 + arg12));
+		///     .Callback((arg1, arg2, arg3, arg4, arg5, arg6, arg7, arg8, arg9, arg10, arg11, arg12) => Console.WriteLine(arg1 + arg2 + arg3 + arg4 + arg5 + arg6 + arg7 + arg8 + arg9 + arg10 + arg11 + arg12));
 		/// </code>
 		/// </example>
 		IReturnsThrows<TMock, TResult> Callback<T1, T2, T3, T4, T5, T6, T7, T8, T9, T10, T11, T12>(Action<T1, T2, T3, T4, T5, T6, T7, T8, T9, T10, T11, T12> action);
@@ -1091,7 +1072,7 @@ namespace Moq.Language
 		///                      It.IsAny&lt;string&gt;(),
 		///                      It.IsAny&lt;string&gt;(),
 		///                      It.IsAny&lt;string&gt;()))
-		///     .Callback((string arg1, string arg2, string arg3, string arg4, string arg5, string arg6, string arg7, string arg8, string arg9, string arg10, string arg11, string arg12, string arg13) => Console.WriteLine(arg1 + arg2 + arg3 + arg4 + arg5 + arg6 + arg7 + arg8 + arg9 + arg10 + arg11 + arg12 + arg13));
+		///     .Callback((arg1, arg2, arg3, arg4, arg5, arg6, arg7, arg8, arg9, arg10, arg11, arg12, arg13) => Console.WriteLine(arg1 + arg2 + arg3 + arg4 + arg5 + arg6 + arg7 + arg8 + arg9 + arg10 + arg11 + arg12 + arg13));
 		/// </code>
 		/// </example>
 		IReturnsThrows<TMock, TResult> Callback<T1, T2, T3, T4, T5, T6, T7, T8, T9, T10, T11, T12, T13>(Action<T1, T2, T3, T4, T5, T6, T7, T8, T9, T10, T11, T12, T13> action);
@@ -1138,7 +1119,7 @@ namespace Moq.Language
 		///                      It.IsAny&lt;string&gt;(),
 		///                      It.IsAny&lt;string&gt;(),
 		///                      It.IsAny&lt;string&gt;()))
-		///     .Callback((string arg1, string arg2, string arg3, string arg4, string arg5, string arg6, string arg7, string arg8, string arg9, string arg10, string arg11, string arg12, string arg13, string arg14) => Console.WriteLine(arg1 + arg2 + arg3 + arg4 + arg5 + arg6 + arg7 + arg8 + arg9 + arg10 + arg11 + arg12 + arg13 + arg14));
+		///     .Callback((arg1, arg2, arg3, arg4, arg5, arg6, arg7, arg8, arg9, arg10, arg11, arg12, arg13, arg14) => Console.WriteLine(arg1 + arg2 + arg3 + arg4 + arg5 + arg6 + arg7 + arg8 + arg9 + arg10 + arg11 + arg12 + arg13 + arg14));
 		/// </code>
 		/// </example>
 		IReturnsThrows<TMock, TResult> Callback<T1, T2, T3, T4, T5, T6, T7, T8, T9, T10, T11, T12, T13, T14>(Action<T1, T2, T3, T4, T5, T6, T7, T8, T9, T10, T11, T12, T13, T14> action);
@@ -1187,7 +1168,7 @@ namespace Moq.Language
 		///                      It.IsAny&lt;string&gt;(),
 		///                      It.IsAny&lt;string&gt;(),
 		///                      It.IsAny&lt;string&gt;()))
-		///     .Callback((string arg1, string arg2, string arg3, string arg4, string arg5, string arg6, string arg7, string arg8, string arg9, string arg10, string arg11, string arg12, string arg13, string arg14, string arg15) => Console.WriteLine(arg1 + arg2 + arg3 + arg4 + arg5 + arg6 + arg7 + arg8 + arg9 + arg10 + arg11 + arg12 + arg13 + arg14 + arg15));
+		///     .Callback((arg1, arg2, arg3, arg4, arg5, arg6, arg7, arg8, arg9, arg10, arg11, arg12, arg13, arg14, arg15) => Console.WriteLine(arg1 + arg2 + arg3 + arg4 + arg5 + arg6 + arg7 + arg8 + arg9 + arg10 + arg11 + arg12 + arg13 + arg14 + arg15));
 		/// </code>
 		/// </example>
 		IReturnsThrows<TMock, TResult> Callback<T1, T2, T3, T4, T5, T6, T7, T8, T9, T10, T11, T12, T13, T14, T15>(Action<T1, T2, T3, T4, T5, T6, T7, T8, T9, T10, T11, T12, T13, T14, T15> action);
@@ -1238,7 +1219,7 @@ namespace Moq.Language
 		///                      It.IsAny&lt;string&gt;(),
 		///                      It.IsAny&lt;string&gt;(),
 		///                      It.IsAny&lt;string&gt;()))
-		///     .Callback((string arg1, string arg2, string arg3, string arg4, string arg5, string arg6, string arg7, string arg8, string arg9, string arg10, string arg11, string arg12, string arg13, string arg14, string arg15, string arg16) => Console.WriteLine(arg1 + arg2 + arg3 + arg4 + arg5 + arg6 + arg7 + arg8 + arg9 + arg10 + arg11 + arg12 + arg13 + arg14 + arg15 + arg16));
+		///     .Callback((arg1, arg2, arg3, arg4, arg5, arg6, arg7, arg8, arg9, arg10, arg11, arg12, arg13, arg14, arg15, arg16) => Console.WriteLine(arg1 + arg2 + arg3 + arg4 + arg5 + arg6 + arg7 + arg8 + arg9 + arg10 + arg11 + arg12 + arg13 + arg14 + arg15 + arg16));
 		/// </code>
 		/// </example>
 		IReturnsThrows<TMock, TResult> Callback<T1, T2, T3, T4, T5, T6, T7, T8, T9, T10, T11, T12, T13, T14, T15, T16>(Action<T1, T2, T3, T4, T5, T6, T7, T8, T9, T10, T11, T12, T13, T14, T15, T16> action);
