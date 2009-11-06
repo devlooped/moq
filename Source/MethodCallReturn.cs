@@ -44,7 +44,6 @@ using System.Reflection;
 using Moq.Language;
 using Moq.Language.Flow;
 using Moq.Proxy;
-using System.Diagnostics.CodeAnalysis;
 
 namespace Moq
 {
@@ -63,7 +62,7 @@ namespace Moq
 		public bool HasReturnValue { get; protected set; }
 	}
 
-	internal sealed class MethodCallReturn<TMock, TResult> : MethodCallReturn, ISetup<TMock, TResult>, ISetupGetter<TMock, TResult>, IReturnsResult<TMock>
+	internal sealed partial class MethodCallReturn<TMock, TResult> : MethodCallReturn, ISetup<TMock, TResult>, ISetupGetter<TMock, TResult>, IReturnsResult<TMock>
 		where TMock : class
 	{
 		Delegate valueDel = (Func<TResult>)(() => default(TResult));
@@ -82,87 +81,7 @@ namespace Moq
 
 		public IVerifies Raises(Action<TMock> eventExpression, Func<EventArgs> func)
 		{
-			return RaisesImpl(eventExpression, func);
-		}
-
-		public IVerifies Raises<T1>(Action<TMock> eventExpression, Func<T1, EventArgs> func)
-		{
-			return RaisesImpl(eventExpression, func);
-		}
-
-		public IVerifies Raises<T1, T2>(Action<TMock> eventExpression, Func<T1, T2, EventArgs> func)
-		{
-			return RaisesImpl(eventExpression, func);
-		}
-
-		public IVerifies Raises<T1, T2, T3>(Action<TMock> eventExpression, Func<T1, T2, T3, EventArgs> func)
-		{
-			return RaisesImpl(eventExpression, func);
-		}
-
-		public IVerifies Raises<T1, T2, T3, T4>(Action<TMock> eventExpression, Func<T1, T2, T3, T4, EventArgs> func)
-		{
-			return RaisesImpl(eventExpression, func);
-		}
-
-		public IVerifies Raises<T1, T2, T3, T4, T5>(Action<TMock> eventExpression, Func<T1, T2, T3, T4, T5, EventArgs> func)
-		{
-			return RaisesImpl(eventExpression, func);
-		}
-
-		public IVerifies Raises<T1, T2, T3, T4, T5, T6>(Action<TMock> eventExpression, Func<T1, T2, T3, T4, T5, T6, EventArgs> func)
-		{
-			return RaisesImpl(eventExpression, func);
-		}
-
-		public IVerifies Raises<T1, T2, T3, T4, T5, T6, T7>(Action<TMock> eventExpression, Func<T1, T2, T3, T4, T5, T6, T7, EventArgs> func)
-		{
-			return RaisesImpl(eventExpression, func);
-		}
-
-		public IVerifies Raises<T1, T2, T3, T4, T5, T6, T7, T8>(Action<TMock> eventExpression, Func<T1, T2, T3, T4, T5, T6, T7, T8, EventArgs> func)
-		{
-			return RaisesImpl(eventExpression, func);
-		}
-
-		public IVerifies Raises<T1, T2, T3, T4, T5, T6, T7, T8, T9>(Action<TMock> eventExpression, Func<T1, T2, T3, T4, T5, T6, T7, T8, T9, EventArgs> func)
-		{
-			return RaisesImpl(eventExpression, func);
-		}
-
-		public IVerifies Raises<T1, T2, T3, T4, T5, T6, T7, T8, T9, T10>(Action<TMock> eventExpression, Func<T1, T2, T3, T4, T5, T6, T7, T8, T9, T10, EventArgs> func)
-		{
-			return RaisesImpl(eventExpression, func);
-		}
-
-		public IVerifies Raises<T1, T2, T3, T4, T5, T6, T7, T8, T9, T10, T11>(Action<TMock> eventExpression, Func<T1, T2, T3, T4, T5, T6, T7, T8, T9, T10, T11, EventArgs> func)
-		{
-			return RaisesImpl(eventExpression, func);
-		}
-
-		public IVerifies Raises<T1, T2, T3, T4, T5, T6, T7, T8, T9, T10, T11, T12>(Action<TMock> eventExpression, Func<T1, T2, T3, T4, T5, T6, T7, T8, T9, T10, T11, T12, EventArgs> func)
-		{
-			return RaisesImpl(eventExpression, func);
-		}
-
-		public IVerifies Raises<T1, T2, T3, T4, T5, T6, T7, T8, T9, T10, T11, T12, T13>(Action<TMock> eventExpression, Func<T1, T2, T3, T4, T5, T6, T7, T8, T9, T10, T11, T12, T13, EventArgs> func)
-		{
-			return RaisesImpl(eventExpression, func);
-		}
-
-		public IVerifies Raises<T1, T2, T3, T4, T5, T6, T7, T8, T9, T10, T11, T12, T13, T14>(Action<TMock> eventExpression, Func<T1, T2, T3, T4, T5, T6, T7, T8, T9, T10, T11, T12, T13, T14, EventArgs> func)
-		{
-			return RaisesImpl(eventExpression, func);
-		}
-
-		public IVerifies Raises<T1, T2, T3, T4, T5, T6, T7, T8, T9, T10, T11, T12, T13, T14, T15>(Action<TMock> eventExpression, Func<T1, T2, T3, T4, T5, T6, T7, T8, T9, T10, T11, T12, T13, T14, T15, EventArgs> func)
-		{
-			return RaisesImpl(eventExpression, func);
-		}
-
-		public IVerifies Raises<T1, T2, T3, T4, T5, T6, T7, T8, T9, T10, T11, T12, T13, T14, T15, T16>(Action<TMock> eventExpression, Func<T1, T2, T3, T4, T5, T6, T7, T8, T9, T10, T11, T12, T13, T14, T15, T16, EventArgs> func)
-		{
-			return RaisesImpl(eventExpression, func);
+			return this.RaisesImpl(eventExpression, func);
 		}
 
 		public IVerifies Raises(Action<TMock> eventExpression, params object[] args)
@@ -182,102 +101,6 @@ namespace Moq
 			return this;
 		}
 
-		public IReturnsResult<TMock> Returns<T>(Func<T, TResult> valueExpression)
-		{
-			SetReturnDelegate(valueExpression);
-			return this;
-		}
-
-		public IReturnsResult<TMock> Returns<T1, T2>(Func<T1, T2, TResult> valueExpression)
-		{
-			SetReturnDelegate(valueExpression);
-			return this;
-		}
-
-		public IReturnsResult<TMock> Returns<T1, T2, T3>(Func<T1, T2, T3, TResult> valueExpression)
-		{
-			SetReturnDelegate(valueExpression);
-			return this;
-		}
-
-		public IReturnsResult<TMock> Returns<T1, T2, T3, T4>(Func<T1, T2, T3, T4, TResult> valueExpression)
-		{
-			SetReturnDelegate(valueExpression);
-			return this;
-		}
-
-		public IReturnsResult<TMock> Returns<T1, T2, T3, T4, T5>(Func<T1, T2, T3, T4, T5, TResult> valueExpression)
-		{
-			SetReturnDelegate(valueExpression);
-			return this;
-		}
-
-		public IReturnsResult<TMock> Returns<T1, T2, T3, T4, T5, T6>(Func<T1, T2, T3, T4, T5, T6, TResult> valueExpression)
-		{
-			SetReturnDelegate(valueExpression);
-			return this;
-		}
-
-		public IReturnsResult<TMock> Returns<T1, T2, T3, T4, T5, T6, T7>(Func<T1, T2, T3, T4, T5, T6, T7, TResult> valueExpression)
-		{
-			SetReturnDelegate(valueExpression);
-			return this;
-		}
-
-		public IReturnsResult<TMock> Returns<T1, T2, T3, T4, T5, T6, T7, T8>(Func<T1, T2, T3, T4, T5, T6, T7, T8, TResult> valueExpression)
-		{
-			SetReturnDelegate(valueExpression);
-			return this;
-		}
-
-		public IReturnsResult<TMock> Returns<T1, T2, T3, T4, T5, T6, T7, T8, T9>(Func<T1, T2, T3, T4, T5, T6, T7, T8, T9, TResult> valueExpression)
-		{
-			SetReturnDelegate(valueExpression);
-			return this;
-		}
-
-		public IReturnsResult<TMock> Returns<T1, T2, T3, T4, T5, T6, T7, T8, T9, T10>(Func<T1, T2, T3, T4, T5, T6, T7, T8, T9, T10, TResult> valueExpression)
-		{
-			SetReturnDelegate(valueExpression);
-			return this;
-		}
-
-		public IReturnsResult<TMock> Returns<T1, T2, T3, T4, T5, T6, T7, T8, T9, T10, T11>(Func<T1, T2, T3, T4, T5, T6, T7, T8, T9, T10, T11, TResult> valueExpression)
-		{
-			SetReturnDelegate(valueExpression);
-			return this;
-		}
-
-		public IReturnsResult<TMock> Returns<T1, T2, T3, T4, T5, T6, T7, T8, T9, T10, T11, T12>(Func<T1, T2, T3, T4, T5, T6, T7, T8, T9, T10, T11, T12, TResult> valueExpression)
-		{
-			SetReturnDelegate(valueExpression);
-			return this;
-		}
-
-		public IReturnsResult<TMock> Returns<T1, T2, T3, T4, T5, T6, T7, T8, T9, T10, T11, T12, T13>(Func<T1, T2, T3, T4, T5, T6, T7, T8, T9, T10, T11, T12, T13, TResult> valueExpression)
-		{
-			SetReturnDelegate(valueExpression);
-			return this;
-		}
-
-		public IReturnsResult<TMock> Returns<T1, T2, T3, T4, T5, T6, T7, T8, T9, T10, T11, T12, T13, T14>(Func<T1, T2, T3, T4, T5, T6, T7, T8, T9, T10, T11, T12, T13, T14, TResult> valueExpression)
-		{
-			SetReturnDelegate(valueExpression);
-			return this;
-		}
-
-		public IReturnsResult<TMock> Returns<T1, T2, T3, T4, T5, T6, T7, T8, T9, T10, T11, T12, T13, T14, T15>(Func<T1, T2, T3, T4, T5, T6, T7, T8, T9, T10, T11, T12, T13, T14, T15, TResult> valueExpression)
-		{
-			SetReturnDelegate(valueExpression);
-			return this;
-		}
-
-		public IReturnsResult<TMock> Returns<T1, T2, T3, T4, T5, T6, T7, T8, T9, T10, T11, T12, T13, T14, T15, T16>(Func<T1, T2, T3, T4, T5, T6, T7, T8, T9, T10, T11, T12, T13, T14, T15, T16, TResult> valueExpression)
-		{
-			SetReturnDelegate(valueExpression);
-			return this;
-		}
-
 		IReturnsThrowsGetter<TMock, TResult> ICallbackGetter<TMock, TResult>.Callback(Action callback)
 		{
 			base.Callback(callback);
@@ -285,118 +108,6 @@ namespace Moq
 		}
 
 		public new IReturnsThrows<TMock, TResult> Callback(Action callback)
-		{
-			base.Callback(callback);
-			return this;
-		}
-
-		[SuppressMessage("Microsoft.Design", "CA1061:DoNotHideBaseClassMethods", Justification = "This class provides typed members for the method-returning interfaces. It's never used through the base class type.")]
-		public new IReturnsThrows<TMock, TResult> Callback<T>(Action<T> callback)
-		{
-			base.Callback(callback);
-			return this;
-		}
-
-		[SuppressMessage("Microsoft.Design", "CA1061:DoNotHideBaseClassMethods", Justification = "This class provides typed members for the method-returning interfaces. It's never used through the base class type.")]
-		public new IReturnsThrows<TMock, TResult> Callback<T1, T2>(Action<T1, T2> callback)
-		{
-			base.Callback(callback);
-			return this;
-		}
-
-		[SuppressMessage("Microsoft.Design", "CA1061:DoNotHideBaseClassMethods", Justification = "This class provides typed members for the method-returning interfaces. It's never used through the base class type.")]
-		public new IReturnsThrows<TMock, TResult> Callback<T1, T2, T3>(Action<T1, T2, T3> callback)
-		{
-			base.Callback(callback);
-			return this;
-		}
-
-		[SuppressMessage("Microsoft.Design", "CA1061:DoNotHideBaseClassMethods", Justification = "This class provides typed members for the method-returning interfaces. It's never used through the base class type.")]
-		public new IReturnsThrows<TMock, TResult> Callback<T1, T2, T3, T4>(Action<T1, T2, T3, T4> callback)
-		{
-			base.Callback(callback);
-			return this;
-		}
-
-		[SuppressMessage("Microsoft.Design", "CA1061:DoNotHideBaseClassMethods", Justification = "This class provides typed members for the method-returning interfaces. It's never used through the base class type.")]
-		public new IReturnsThrows<TMock, TResult> Callback<T1, T2, T3, T4, T5>(Action<T1, T2, T3, T4, T5> callback)
-		{
-			base.Callback(callback);
-			return this;
-		}
-
-		[SuppressMessage("Microsoft.Design", "CA1061:DoNotHideBaseClassMethods", Justification = "This class provides typed members for the method-returning interfaces. It's never used through the base class type.")]
-		public new IReturnsThrows<TMock, TResult> Callback<T1, T2, T3, T4, T5, T6>(Action<T1, T2, T3, T4, T5, T6> callback)
-		{
-			base.Callback(callback);
-			return this;
-		}
-
-		[SuppressMessage("Microsoft.Design", "CA1061:DoNotHideBaseClassMethods", Justification = "This class provides typed members for the method-returning interfaces. It's never used through the base class type.")]
-		public new IReturnsThrows<TMock, TResult> Callback<T1, T2, T3, T4, T5, T6, T7>(Action<T1, T2, T3, T4, T5, T6, T7> callback)
-		{
-			base.Callback(callback);
-			return this;
-		}
-
-		[SuppressMessage("Microsoft.Design", "CA1061:DoNotHideBaseClassMethods", Justification = "This class provides typed members for the method-returning interfaces. It's never used through the base class type.")]
-		public new IReturnsThrows<TMock, TResult> Callback<T1, T2, T3, T4, T5, T6, T7, T8>(Action<T1, T2, T3, T4, T5, T6, T7, T8> callback)
-		{
-			base.Callback(callback);
-			return this;
-		}
-
-		[SuppressMessage("Microsoft.Design", "CA1061:DoNotHideBaseClassMethods", Justification = "This class provides typed members for the method-returning interfaces. It's never used through the base class type.")]
-		public new IReturnsThrows<TMock, TResult> Callback<T1, T2, T3, T4, T5, T6, T7, T8, T9>(Action<T1, T2, T3, T4, T5, T6, T7, T8, T9> callback)
-		{
-			base.Callback(callback);
-			return this;
-		}
-
-		[SuppressMessage("Microsoft.Design", "CA1061:DoNotHideBaseClassMethods", Justification = "This class provides typed members for the method-returning interfaces. It's never used through the base class type.")]
-		public new IReturnsThrows<TMock, TResult> Callback<T1, T2, T3, T4, T5, T6, T7, T8, T9, T10>(Action<T1, T2, T3, T4, T5, T6, T7, T8, T9, T10> callback)
-		{
-			base.Callback(callback);
-			return this;
-		}
-
-		[SuppressMessage("Microsoft.Design", "CA1061:DoNotHideBaseClassMethods", Justification = "This class provides typed members for the method-returning interfaces. It's never used through the base class type.")]
-		public new IReturnsThrows<TMock, TResult> Callback<T1, T2, T3, T4, T5, T6, T7, T8, T9, T10, T11>(Action<T1, T2, T3, T4, T5, T6, T7, T8, T9, T10, T11> callback)
-		{
-			base.Callback(callback);
-			return this;
-		}
-
-		[SuppressMessage("Microsoft.Design", "CA1061:DoNotHideBaseClassMethods", Justification = "This class provides typed members for the method-returning interfaces. It's never used through the base class type.")]
-		public new IReturnsThrows<TMock, TResult> Callback<T1, T2, T3, T4, T5, T6, T7, T8, T9, T10, T11, T12>(Action<T1, T2, T3, T4, T5, T6, T7, T8, T9, T10, T11, T12> callback)
-		{
-			base.Callback(callback);
-			return this;
-		}
-
-		[SuppressMessage("Microsoft.Design", "CA1061:DoNotHideBaseClassMethods", Justification = "This class provides typed members for the method-returning interfaces. It's never used through the base class type.")]
-		public new IReturnsThrows<TMock, TResult> Callback<T1, T2, T3, T4, T5, T6, T7, T8, T9, T10, T11, T12, T13>(Action<T1, T2, T3, T4, T5, T6, T7, T8, T9, T10, T11, T12, T13> callback)
-		{
-			base.Callback(callback);
-			return this;
-		}
-
-		[SuppressMessage("Microsoft.Design", "CA1061:DoNotHideBaseClassMethods", Justification = "This class provides typed members for the method-returning interfaces. It's never used through the base class type.")]
-		public new IReturnsThrows<TMock, TResult> Callback<T1, T2, T3, T4, T5, T6, T7, T8, T9, T10, T11, T12, T13, T14>(Action<T1, T2, T3, T4, T5, T6, T7, T8, T9, T10, T11, T12, T13, T14> callback)
-		{
-			base.Callback(callback);
-			return this;
-		}
-
-		[SuppressMessage("Microsoft.Design", "CA1061:DoNotHideBaseClassMethods", Justification = "This class provides typed members for the method-returning interfaces. It's never used through the base class type.")]
-		public new IReturnsThrows<TMock, TResult> Callback<T1, T2, T3, T4, T5, T6, T7, T8, T9, T10, T11, T12, T13, T14, T15>(Action<T1, T2, T3, T4, T5, T6, T7, T8, T9, T10, T11, T12, T13, T14, T15> callback)
-		{
-			base.Callback(callback);
-			return this;
-		}
-
-		[SuppressMessage("Microsoft.Design", "CA1061:DoNotHideBaseClassMethods", Justification = "This class provides typed members for the method-returning interfaces. It's never used through the base class type.")]
-		public new IReturnsThrows<TMock, TResult> Callback<T1, T2, T3, T4, T5, T6, T7, T8, T9, T10, T11, T12, T13, T14, T15, T16>(Action<T1, T2, T3, T4, T5, T6, T7, T8, T9, T10, T11, T12, T13, T14, T15, T16> callback)
 		{
 			base.Callback(callback);
 			return this;

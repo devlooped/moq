@@ -118,6 +118,16 @@
       <DesignTime>True</DesignTime>
       <DependentUpon>IReturns.tt</DependentUpon>
     </Compile>
+    <Compile Include="MethodCall.Generated.cs">
+      <AutoGen>True</AutoGen>
+      <DesignTime>True</DesignTime>
+      <DependentUpon>MethodCall.tt</DependentUpon>
+    </Compile>
+    <Compile Include="MethodCallReturn.Generated.cs">
+      <AutoGen>True</AutoGen>
+      <DesignTime>True</DesignTime>
+      <DependentUpon>MethodCallReturn.tt</DependentUpon>
+    </Compile>
     <Compile Include="Microsoft\Delegates.cs">
       <AutoGen>True</AutoGen>
       <DesignTime>True</DesignTime>
@@ -199,6 +209,10 @@
       <LastGenOutput>IReturns.cs</LastGenOutput>
     </None>
     <None Include="Match.xdoc" />
+    <None Include="MethodCallReturn.tt">
+      <Generator>TextTemplatingFileGenerator</Generator>
+      <LastGenOutput>MethodCallReturn.Generated.cs</LastGenOutput>
+    </None>
     <None Include="Microsoft\Delegates.tt">
       <Generator>TextTemplatingFileGenerator</Generator>
       <LastGenOutput>Delegates.cs</LastGenOutput>
@@ -244,6 +258,10 @@
     <Compile Include="Sub\StubExtensions.cs" />
     <Compile Include="Times.cs" />
     <None Include="Includes\GenericTypeParameters.tt" />
+    <None Include="MethodCall.tt">
+      <Generator>TextTemplatingFileGenerator</Generator>
+      <LastGenOutput>MethodCall.Generated.cs</LastGenOutput>
+    </None>
   </ItemGroup>
   <ItemGroup>
     <BootstrapperPackage Include="Microsoft.Net.Client.3.5">

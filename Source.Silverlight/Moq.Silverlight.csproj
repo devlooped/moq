@@ -243,11 +243,17 @@
     <Compile Include="..\Source\MethodCall.cs">
       <Link>MethodCall.cs</Link>
     </Compile>
+    <Compile Include="..\Source\MethodCall.Generated.cs">
+      <Link>MethodCall.Generated.cs</Link>
+    </Compile>
     <Compile Include="..\Source\MethodCall.Legacy.cs">
       <Link>MethodCall.Legacy.cs</Link>
     </Compile>
     <Compile Include="..\Source\MethodCallReturn.cs">
       <Link>MethodCallReturn.cs</Link>
+    </Compile>
+    <Compile Include="..\Source\MethodCallReturn.Generated.cs">
+      <Link>MethodCallReturn.Generated.cs</Link>
     </Compile>
     <Compile Include="..\Source\Microsoft\Delegates.cs">
       <Link>Microsoft\Delegates.cs</Link>

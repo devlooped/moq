@@ -1,0 +1,59 @@
+﻿<#@ template debug="false" hostspecific="false" language="C#" #>
+<#@ output extension=".Generated.cs" #>
+<#@ Assembly Name="System.Core" #>
+<#@ Import Namespace="System.Linq" #>
+using System;
+using System.Diagnostics.CodeAnalysis;
+using Moq.Language;
+using Moq.Language.Flow;
+
+namespace Moq
+{
+	internal sealed partial class MethodCallReturn<TMock, TResult>
+	{
+		public IVerifies Raises<T>(Action<TMock> eventExpression, Func<T, EventArgs> func)
+		{
+			return this.RaisesImpl(eventExpression, func);
+		}
+
+		public IReturnsResult<TMock> Returns<T>(Func<T, TResult> valueExpression)
+		{
+			this.SetReturnDelegate(valueExpression);
+			return this;
+		}
+		
+		[SuppressMessage("Microsoft.Design", "CA1061:DoNotHideBaseClassMethods", Justification = "This class provides typed members for the method-returning interfaces. It's never used through the base class type.")]
+		public new IReturnsThrows<TMock, TResult> Callback<T>(Action<T> callback)
+		{
+			base.Callback(callback);
+			return this;
+		}
+<#
+for (var typeCount = 2; typeCount <= GenericTypeMax; typeCount++)
+{
+	var typeList = GetGenericList(typeCount, GenericTypeFormat);
+#>
+
+		public IVerifies Raises<<#= typeList #>>(Action<TMock> eventExpression, Func<<#= typeList #>, EventArgs> func)
+		{
+			return this.RaisesImpl(eventExpression, func);
+		}
+
+		public IReturnsResult<TMock> Returns<<#= typeList #>>(Func<<#= typeList #>, TResult> valueExpression)
+		{
+			this.SetReturnDelegate(valueExpression);
+			return this;
+		}
+
+		[SuppressMessage("Microsoft.Design", "CA1061:DoNotHideBaseClassMethods", Justification = "This class provides typed members for the method-returning interfaces. It's never used through the base class type.")]
+		public new IReturnsThrows<TMock, TResult> Callback<<#= typeList #>>(Action<<#= typeList #>> callback)
+		{
+			base.Callback(callback);
+			return this;
+		}
+<#
+}
+#>
+	}
+}
+<#@ Include File="Includes\GenericTypeParameters.tt" #>
