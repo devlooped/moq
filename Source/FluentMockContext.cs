@@ -51,11 +51,14 @@ namespace Moq
 	internal class FluentMockContext : IDisposable
 	{
 		[ThreadStatic]
-		static FluentMockContext current;
+		private static FluentMockContext current;
 
-		List<MockInvocation> invocations = new List<MockInvocation>();
+		private List<MockInvocation> invocations = new List<MockInvocation>();
 
-		public static FluentMockContext Current { get { return current; } }
+		public static FluentMockContext Current
+		{
+			get { return current; }
+		}
 
 		/// <summary>
 		/// Having an active fluent mock context means that the invocation 
@@ -63,7 +66,10 @@ namespace Moq
 		/// target method and arguments that need to be matched later 
 		/// when the actual invocation is made.
 		/// </summary>
-		public static bool IsActive { get { return current != null; } }
+		public static bool IsActive
+		{
+			get { return current != null; }
+		}
 
 		public FluentMockContext()
 		{
@@ -105,7 +111,7 @@ namespace Moq
 			public Mock Mock { get; private set; }
 
 			public ICallContext Invocation { get; private set; }
-			
+
 			public Match Match { get; private set; }
 
 			public void Dispose()

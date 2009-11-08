@@ -156,10 +156,7 @@ namespace Moq
 		{
 			// A value type does not match any of these three 
 			// condition and therefore returns false.
-			return 
-				typeToMock.IsInterface || 
-				typeToMock.IsAbstract || 
-				(typeToMock.IsClass && !typeToMock.IsSealed);
+			return typeToMock.IsInterface || typeToMock.IsAbstract || (typeToMock.IsClass && !typeToMock.IsSealed);
 		}
 
 		public static bool CanOverrideGet(this PropertyInfo property)
@@ -187,7 +184,7 @@ namespace Moq
 		public static EventInfo GetEvent<TMock>(this Action<TMock> eventExpression, TMock mock)
 			where TMock : class
 		{
-			Guard.ArgumentNotNull(eventExpression, "eventExpression");
+			Guard.NotNull(() => eventExpression, eventExpression);
 
 			MethodBase addRemove = null;
 			using (var context = new FluentMockContext())

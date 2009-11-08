@@ -71,25 +71,32 @@ namespace Moq
 		}
 
 		/// <include file='Mock.Generic.xdoc' path='docs/doc[@for="Mock{T}.ctor()"]/*'/>
-		public Mock() : this(MockBehavior.Default) { }
+		public Mock() : this(MockBehavior.Default)
+		{
+		}
 
 		/// <include file='Mock.Generic.xdoc' path='docs/doc[@for="Mock{T}.ctor(object[])"]/*'/>
-		public Mock(params object[] args) : this(MockBehavior.Default, args) { }
+		public Mock(params object[] args) : this(MockBehavior.Default, args)
+		{
+		}
 
 		/// <include file='Mock.Generic.xdoc' path='docs/doc[@for="Mock{T}.ctor(MockBehavior)"]/*'/>
-		public Mock(MockBehavior behavior) : this(behavior, new object[0]) { }
+		public Mock(MockBehavior behavior) : this(behavior, new object[0])
+		{
+		}
 
 		/// <include file='Mock.Generic.xdoc' path='docs/doc[@for="Mock{T}.ctor(MockBehavior,object[])"]/*'/>
 		public Mock(MockBehavior behavior, params object[] args)
 		{
-			if (args == null) args = new object[] { null };
+			if (args == null)
+				args = new object[] { null };
 
 			this.Behavior = behavior;
 			this.Interceptor = new Interceptor(behavior, typeof(T), this);
 			this.constructorArguments = args;
 			this.ImplementedInterfaces.Add(typeof(IMocked<T>));
 
-			CheckParameters();
+			this.CheckParameters();
 		}
 
 		private void CheckParameters()

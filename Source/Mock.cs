@@ -47,7 +47,6 @@ using System.Linq;
 using System.Linq.Expressions;
 using System.Reflection;
 using System.Runtime.CompilerServices;
-using IQToolkit;
 using Moq.Properties;
 
 namespace Moq
@@ -72,22 +71,19 @@ namespace Moq
 		public static Mock<T> Get<T>(T mocked) where T : class
 		{
 			var mockedOfT = mocked as IMocked<T>;
-			var mockedPlain = mocked as IMocked;
 			if (mockedOfT != null)
 			{
 				// This would be the fastest check.
 				return mockedOfT.Mock;
 			}
-			else if (mockedPlain != null)
+
+			var mockedPlain = mocked as IMocked;
+			if (mockedPlain != null)
 			{
 				// We may have received a T of an implemented 
 				// interface in the mock.
 				var mock = mockedPlain.Mock;
-#if SILVERLIGHT
 				var imockedType = mocked.GetType().GetInterface("IMocked`1", false);
-#else
-				var imockedType = mocked.GetType().GetInterface("IMocked`1");
-#endif
 				var mockedType = imockedType.GetGenericArguments()[0];
 
 				if (mock.ImplementedInterfaces.Contains(typeof(T)))
@@ -98,33 +94,29 @@ namespace Moq
 
 					return (Mock<T>)asMock;
 				}
-				else
-				{
-					// Alternatively, we may have been asked 
-					// for a type that is assignable to the 
-					// one for the mock.
-					// This is not valid as generic types 
-					// do not support covariance on 
-					// the generic parameters.
-					var types = string.Join(
-						", ",
-						new[] { mockedType }
-						// Skip first interface which is always our internal IMocked<T>
-							.Concat(mock.ImplementedInterfaces.Skip(1))
-							.Select(t => t.Name)
-							.ToArray());
 
-					throw new ArgumentException(string.Format(
-						CultureInfo.CurrentCulture,
-						Resources.InvalidMockGetType,
-						typeof(T).Name,
-						types));
-				}
+				// Alternatively, we may have been asked 
+				// for a type that is assignable to the 
+				// one for the mock.
+				// This is not valid as generic types 
+				// do not support covariance on 
+				// the generic parameters.
+				var types = string.Join(
+					", ",
+					new[] { mockedType }
+					// Skip first interface which is always our internal IMocked<T>
+						.Concat(mock.ImplementedInterfaces.Skip(1))
+						.Select(t => t.Name)
+						.ToArray());
+
+				throw new ArgumentException(string.Format(
+					CultureInfo.CurrentCulture,
+					Resources.InvalidMockGetType,
+					typeof(T).Name,
+					types));
 			}
-			else
-			{
-				throw new ArgumentException(Properties.Resources.ObjectInstanceNotMock, "mocked");
-			}
+
+			throw new ArgumentException(Resources.ObjectInstanceNotMock, "mocked");
 		}
 
 		internal virtual Interceptor Interceptor { get; set; }
@@ -425,29 +417,27 @@ namespace Moq
 		{
 			return PexProtector.Invoke(() =>
 			{
-				LambdaExpression lambda = expression.ToLambda();
+				var lambda = expression.ToLambda();
 
 				if (lambda.IsPropertyIndexer())
 				{
 					// Treat indexers as regular method invocations.
 					return Setup<T1, TProperty>(mock, expression);
 				}
-				else
-				{
-					var prop = lambda.ToPropertyInfo();
-					ThrowIfPropertyNotReadable(prop);
 
-					var propGet = prop.GetGetMethod(true);
-					ThrowIfCantOverride(expression, propGet);
+				var prop = lambda.ToPropertyInfo();
+				ThrowIfPropertyNotReadable(prop);
 
-					var call = new MethodCallReturn<T1, TProperty>(mock, expression, propGet, new Expression[0]);
-					// Directly casting to MemberExpression is fine as ToPropertyInfo would throw if it wasn't
-					var targetInterceptor = GetInterceptor(((MemberExpression)expression.Body).Expression, mock);
+				var propGet = prop.GetGetMethod(true);
+				ThrowIfCantOverride(expression, propGet);
 
-					targetInterceptor.AddCall(call, SetupKind.Other);
+				var call = new MethodCallReturn<T1, TProperty>(mock, expression, propGet, new Expression[0]);
+				// Directly casting to MemberExpression is fine as ToPropertyInfo would throw if it wasn't
+				var targetInterceptor = GetInterceptor(((MemberExpression)expression.Body).Expression, mock);
 
-					return call;
-				}
+				targetInterceptor.AddCall(call, SetupKind.Other);
+
+				return call;
 			});
 		}
 

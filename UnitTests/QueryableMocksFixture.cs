@@ -1,7 +1,4 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
+﻿using System.Linq;
 using Xunit;
 
 namespace Moq.Tests
@@ -89,6 +86,50 @@ namespace Moq.Tests
 			Assert.Equal(instance2.Bar.Baz("hey").Value, 5);
 		}
 
+		[Fact]
+		public void ShouldSupportBooleanExpression()
+		{
+			var instance = (from f in Mocks.CreateQuery<IBaz>()
+							where f.IsValid
+							select f)
+							.First();
+
+			Assert.True(instance.IsValid);
+		}
+
+		[Fact]
+		public void ShouldSupportNotBooleanExpression()
+		{
+			var instance = (from f in Mocks.CreateQuery<IBaz>()
+							where !f.IsValid
+							select f)
+							.First();
+
+			Assert.False(instance.IsValid);
+		}
+
+		[Fact]
+		public void ShouldSupportBooleanEqualsToTrue()
+		{
+			var instance = (from f in Mocks.CreateQuery<IBaz>()
+							where f.IsValid == true
+							select f)
+							.First();
+
+			Assert.True(instance.IsValid);
+		}
+
+		[Fact]
+		public void ShouldSupportBooleanEqualsToFalse()
+		{
+			var instance = (from f in Mocks.CreateQuery<IBaz>()
+							where f.IsValid == false
+							select f)
+							.First();
+
+			Assert.False(instance.IsValid);
+		}
+
 		public interface IFoo
 		{
 			IBar Bar { get; set; }
@@ -107,6 +148,7 @@ namespace Moq.Tests
 		{
 			int Value { get; set; }
 			int this[string key1, bool key2] { get; set; }
+			bool IsValid { get; set; }
 		}
 	}
 }

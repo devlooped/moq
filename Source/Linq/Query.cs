@@ -6,101 +6,79 @@ using System.Collections;
 using System.Collections.Generic;
 using System.Linq;
 using System.Linq.Expressions;
-using System.Reflection;
-using System.Text;
 
-namespace IQToolkit
+namespace Moq.Linq
 {
-    internal interface IQueryText
-    {
-        string GetQueryText(Expression expression);
-    }
+	internal interface IQueryText
+	{
+		string GetQueryText(Expression expression);
+	}
 
-    /// <summary>
-    /// A default implementation of IQueryable for use with QueryProvider
-    /// </summary>
-    internal class Query<T> : IQueryable<T>, IQueryable, IEnumerable<T>, IEnumerable, IOrderedQueryable<T>, IOrderedQueryable
-    {
-        IQueryProvider provider;
-        Expression expression;
+	/// <summary>
+	/// A default implementation of IQueryable for use with QueryProvider
+	/// </summary>
+	internal class Query<T> : IQueryable<T>, IQueryable, IEnumerable<T>, IEnumerable, IOrderedQueryable<T>, IOrderedQueryable
+	{
+		public Query(IQueryProvider provider)
+		{
+			Guard.NotNull(() => provider, provider);
 
-        public Query(IQueryProvider provider)
-        {
-            if (provider == null)
-            {
-                throw new ArgumentNullException("Provider");
-            }
-            this.provider = provider;
-            this.expression = Expression.Constant(this);
-        }
+			this.Provider = provider;
+			this.Expression = Expression.Constant(this);
+		}
 
-        public Query(QueryProvider provider, Expression expression)
-        {
-            if (provider == null)
-            {
-                throw new ArgumentNullException("Provider");
-            }
-            if (expression == null)
-            {
-                throw new ArgumentNullException("expression");
-            }
-            if (!typeof(IQueryable<T>).IsAssignableFrom(expression.Type))
-            {
-                throw new ArgumentOutOfRangeException("expression");
-            }
-            this.provider = provider;
-            this.expression = expression;
-        }
+		public Query(QueryProvider provider, Expression expression)
+		{
+			Guard.NotNull(() => provider, provider);
+			Guard.NotNull(() => expression, expression);
+			Guard.CanBeAssigned(() => expression, expression.Type, typeof(IQueryable<T>));
 
-        public Expression Expression
-        {
-            get { return this.expression; }
-        }
+			this.Provider = provider;
+			this.Expression = expression;
+		}
 
-        public Type ElementType
-        {
-            get { return typeof(T); }
-        }
+		public Expression Expression { get; private set; }
 
-        public IQueryProvider Provider
-        {
-            get { return this.provider; }
-        }
+		public Type ElementType
+		{
+			get { return typeof(T); }
+		}
 
-        public IEnumerator<T> GetEnumerator()
-        {
-            return ((IEnumerable<T>)this.provider.Execute(this.expression)).GetEnumerator();
-        }
+		public IQueryProvider Provider { get; private set; }
 
-        IEnumerator IEnumerable.GetEnumerator()
-        {
-            return ((IEnumerable)this.provider.Execute(this.expression)).GetEnumerator();
-        }
+		public IEnumerator<T> GetEnumerator()
+		{
+			return ((IEnumerable<T>)this.Provider.Execute(this.Expression)).GetEnumerator();
+		}
 
-        public override string ToString()
-        {
-            if (this.expression.NodeType == ExpressionType.Constant &&
-                ((ConstantExpression)this.expression).Value == this)
-            {
-                return "Query(" + typeof(T) + ")";
-            }
-            else
-            {
-                return this.expression.ToString();
-            }
-        }
+		IEnumerator IEnumerable.GetEnumerator()
+		{
+			return ((IEnumerable)this.Provider.Execute(this.Expression)).GetEnumerator();
+		}
 
-        public string QueryText
-        {
-            get 
-            {
-                IQueryText iqt = this.provider as IQueryText;
-                if (iqt != null)
-                {
-                    return iqt.GetQueryText(this.expression);
-                }
-                return "";
-            }
-        }
-    }
+		public override string ToString()
+		{
+			if (this.Expression.NodeType == ExpressionType.Constant &&
+				((ConstantExpression)this.Expression).Value == this)
+			{
+				return "Query(" + typeof(T) + ")";
+			}
+
+			return this.Expression.ToString();
+		}
+
+		public string QueryText
+		{
+			get
+			{
+				var queryText = this.Provider as IQueryText;
+				if (queryText != null)
+				{
+					return queryText.GetQueryText(this.Expression);
+				}
+
+				return string.Empty;
+			}
+		}
+	}
 }

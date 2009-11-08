@@ -46,27 +46,25 @@ namespace Moq
 	[AttributeUsage(AttributeTargets.Method, Inherited = true)]
 	internal sealed class AdvancedMatcherAttribute : Attribute
 	{
-		Type matcherType;
-
 		public AdvancedMatcherAttribute(Type matcherType)
 		{
-			Guard.ArgumentNotNull(matcherType, "matcherType");
-			Guard.CanBeAssigned(matcherType, typeof(IMatcher), "matcherType");
+			Guard.NotNull(() => matcherType, matcherType);
+			Guard.CanBeAssigned(() => matcherType, matcherType, typeof(IMatcher));
 
-			this.matcherType = matcherType;
+			this.MatcherType = matcherType;
 		}
 
-		public Type MatcherType { get { return matcherType; } }
+		public Type MatcherType { get; private set; }
 
 		public IMatcher CreateMatcher()
 		{
 			try
 			{
-				return (IMatcher)Activator.CreateInstance(matcherType);
+				return (IMatcher)Activator.CreateInstance(MatcherType);
 			}
-			catch (TargetInvocationException tie)
+			catch (TargetInvocationException e)
 			{
-				throw tie.InnerException;
+				throw e.InnerException;
 			}
 		}
 	}

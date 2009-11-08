@@ -368,30 +368,30 @@ namespace Moq.Tests
 			Assert.False(raisedField);
 		}
 
-        [Fact]
-        public void ShouldAllowListenerListToBeModifiedDuringEventHandling()
-        {
-            var parent = new Mock<IParent>(MockBehavior.Strict);
+		[Fact]
+		public void ShouldAllowListenerListToBeModifiedDuringEventHandling()
+		{
+			var parent = new Mock<IParent>(MockBehavior.Strict);
 
-            var handler = parent.CreateEventHandler();
-            parent.Object.Event += handler;
+			var handler = parent.CreateEventHandler();
+			parent.Object.Event += handler;
 
-            parent.Object.Event += delegate
-                                       {
-                                           parent.Object.Event += delegate { raisedField = true;};
-                                       };
+			parent.Object.Event += delegate
+									   {
+										   parent.Object.Event += delegate { raisedField = true; };
+									   };
 
-            handler.Raise(EventArgs.Empty);
+			handler.Raise(EventArgs.Empty);
 
-            // we don't expect the inner event to be raised the first time
-            Assert.False(raisedField);
+			// we don't expect the inner event to be raised the first time
+			Assert.False(raisedField);
 
-            // the second time around, the event handler added the first time
-            // should kick in
-            handler.Raise(EventArgs.Empty);
-            
-            Assert.True(raisedField);
-        }
+			// the second time around, the event handler added the first time
+			// should kick in
+			handler.Raise(EventArgs.Empty);
+
+			Assert.True(raisedField);
+		}
 
 		[Fact]
 		public void RaisesEvent()
@@ -480,7 +480,7 @@ namespace Moq.Tests
 		{
 			var mock = new Mock<WithEvent>();
 
-			Assert.Throws<ArgumentException>(() => 
+			Assert.Throws<ArgumentException>(() =>
 				mock.SetupSet(m => m.Value).Raises(m => m.ClassEvent += null, EventArgs.Empty));
 		}
 
@@ -565,7 +565,7 @@ namespace Moq.Tests
 		{
 			var mock = new Mock<IAdder<int>>();
 
-			mock.Setup(m => m.Do("foo", 5, true, "bar")).Raises(m => m.Done += null, (string s, int i, bool b, string s1) => new DoneArgs { Value = s + i + b + s1});
+			mock.Setup(m => m.Do("foo", 5, true, "bar")).Raises(m => m.Done += null, (string s, int i, bool b, string s1) => new DoneArgs { Value = s + i + b + s1 });
 
 			DoneArgs args = null;
 			mock.Object.Done += (sender, e) => args = e;
@@ -686,20 +686,11 @@ namespace Moq.Tests
 
 		public class WithEvent : IWithEvent
 		{
-			public event EventHandler InterfaceEvent;
-			public event EventHandler ClassEvent;
-			public event CustomEvent CustomEvent;
-			public virtual event EventHandler VirtualEvent;
+			public event EventHandler InterfaceEvent = (s, e) => { };
+			public event EventHandler ClassEvent = (s, e) => { };
+			public event CustomEvent CustomEvent = (s, e) => { };
+			public virtual event EventHandler VirtualEvent = (s, e) => { };
 			public virtual object Value { get; set; }
-
-			// NOTE Dummy method to skip VS Warnings
-			private void Attach()
-			{
-				this.InterfaceEvent += (s, e) => { };
-				this.ClassEvent += (s, e) => { };
-				this.CustomEvent += (s, e) => { };
-				this.VirtualEvent += (s, e) => { };
-			}
 		}
 
 		private void OnRaised(object sender, EventArgs e)
@@ -760,7 +751,7 @@ namespace Moq.Tests
 		}
 
 		public interface IDerived : IParent
-		{ 
+		{
 		}
 	}
 }

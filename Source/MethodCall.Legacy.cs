@@ -39,9 +39,6 @@
 // http://www.opensource.org/licenses/bsd-license.php]
 
 using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
 using Moq.Language;
 
 namespace Moq
@@ -50,7 +47,7 @@ namespace Moq
 	{
 		public IVerifies Raises(MockedEvent eventHandler, EventArgs args)
 		{
-			Guard.ArgumentNotNull(args, "args");
+			Guard.NotNull(() => args, args);
 
 			return RaisesImpl(eventHandler, (Func<EventArgs>)(() => args));
 		}
@@ -82,8 +79,8 @@ namespace Moq
 
 		private IVerifies RaisesImpl(MockedEvent eventHandler, Delegate func)
 		{
-			Guard.ArgumentNotNull(eventHandler, "eventHandler");
-			Guard.ArgumentNotNull(func, "func");
+			Guard.NotNull(() => eventHandler, eventHandler);
+			Guard.NotNull(() => func, func);
 
 			mockEvent = eventHandler;
 			mockEventArgsFunc = func;

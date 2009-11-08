@@ -60,7 +60,7 @@ namespace Moq.Protected
 
 		public ISetup<T> Setup(string voidMethodName, params object[] args)
 		{
-			Guard.ArgumentNotNullOrEmptyString(voidMethodName, "voidMethodName");
+			Guard.NotNullOrEmpty(() => voidMethodName, voidMethodName);
 
 			var method = typeof(T).GetMethod(voidMethodName,
 				BindingFlags.Instance | BindingFlags.NonPublic | BindingFlags.Public,
@@ -86,7 +86,7 @@ namespace Moq.Protected
 			}
 			else
 			{
-				throw new ArgumentException(String.Format(CultureInfo.CurrentCulture, 
+				throw new ArgumentException(String.Format(CultureInfo.CurrentCulture,
 					Properties.Resources.UnsupportedProtectedProperty,
 					property.ReflectedType.Name,
 					property.Name));
@@ -95,7 +95,7 @@ namespace Moq.Protected
 
 		public ISetup<T, TResult> Setup<TResult>(string methodOrPropertyName, params object[] args)
 		{
-			Guard.ArgumentNotNullOrEmptyString(methodOrPropertyName, "methodOrPropertyName");
+			Guard.NotNullOrEmpty(() => methodOrPropertyName, methodOrPropertyName);
 
 			var method = typeof(T).GetMethod(methodOrPropertyName,
 				BindingFlags.Instance | BindingFlags.NonPublic | BindingFlags.Public,
@@ -132,7 +132,7 @@ namespace Moq.Protected
 
 		public ISetupGetter<T, TProperty> SetupGet<TProperty>(string propertyName)
 		{
-			Guard.ArgumentNotNullOrEmptyString(propertyName, "propertyName");
+			Guard.NotNullOrEmpty(() => propertyName, propertyName);
 
 			var property = typeof(T).GetProperty(propertyName,
 				BindingFlags.Instance | BindingFlags.NonPublic | BindingFlags.Public);
@@ -149,7 +149,7 @@ namespace Moq.Protected
 
 		public ISetupSetter<T, TProperty> SetupSet<TProperty>(string propertyName)
 		{
-			Guard.ArgumentNotNullOrEmptyString(propertyName, "propertyName");
+			Guard.NotNullOrEmpty(() => propertyName, propertyName);
 
 			var property = typeof(T).GetProperty(propertyName,
 				BindingFlags.Instance | BindingFlags.NonPublic | BindingFlags.Public);
@@ -169,13 +169,13 @@ namespace Moq.Protected
 			if (method != null)
 			{
 				if (method.IsPublic)
-					throw new ArgumentException(String.Format(CultureInfo.CurrentCulture, 
+					throw new ArgumentException(String.Format(CultureInfo.CurrentCulture,
 						Properties.Resources.MethodIsPublic,
 						method.ReflectedType.Name,
 						method.Name));
 
 				if (method.IsAssembly || method.IsFamilyAndAssembly)
-					throw new ArgumentException(String.Format(CultureInfo.CurrentCulture, 
+					throw new ArgumentException(String.Format(CultureInfo.CurrentCulture,
 						Properties.Resources.SetupOnNonOverridableMember,
 						method.ReflectedType.Name + "." + method.Name));
 			}
@@ -187,7 +187,7 @@ namespace Moq.Protected
 				((property.CanRead && property.GetGetMethod() != null ||
 				(property.CanWrite && property.GetSetMethod() != null))))
 			{
-				throw new ArgumentException(String.Format(CultureInfo.CurrentCulture, 
+				throw new ArgumentException(String.Format(CultureInfo.CurrentCulture,
 					Properties.Resources.UnexpectedPublicProperty,
 					property.ReflectedType.Name,
 					property.Name));
@@ -277,7 +277,7 @@ namespace Moq.Protected
 		{
 			if (property == null)
 			{
-				throw new ArgumentException(String.Format(CultureInfo.CurrentCulture, 
+				throw new ArgumentException(String.Format(CultureInfo.CurrentCulture,
 					Properties.Resources.MemberMissing,
 					typeof(T).Name, propertyName));
 			}
@@ -287,7 +287,7 @@ namespace Moq.Protected
 		{
 			if (method == null && property == null)
 			{
-				throw new ArgumentException(String.Format(CultureInfo.CurrentCulture, 
+				throw new ArgumentException(String.Format(CultureInfo.CurrentCulture,
 					Properties.Resources.MemberMissing,
 					typeof(T).Name, memberName));
 			}

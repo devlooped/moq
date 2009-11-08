@@ -39,55 +39,55 @@
 // http://www.opensource.org/licenses/bsd-license.php]
 
 using System;
+using System.Diagnostics;
 using System.Globalization;
+using System.Linq.Expressions;
 using Moq.Properties;
 
+[DebuggerStepThrough]
 internal static class Guard
 {
 	/// <summary>
-	/// Checks an argument to ensure it isn't null.
+	/// Ensures the given <paramref name="value"/> is not null.
+	/// Throws <see cref="ArgumentNullException"/> otherwise.
 	/// </summary>
-	/// <param name="value">The argument value to check.</param>
-	/// <param name="argumentName">The name of the argument.</param>
-	public static void ArgumentNotNull(object value, string argumentName)
+	public static void NotNull<T>(Expression<Func<T>> reference, T value)
 	{
 		if (value == null)
 		{
-			throw new ArgumentNullException(argumentName);
+			throw new ArgumentNullException(GetParameterName(reference));
 		}
 	}
 
 	/// <summary>
-	/// Checks a string argument to ensure it isn't null or empty.
+	/// Ensures the given string <paramref name="value"/> is not null or empty.
+	/// Throws <see cref="ArgumentNullException"/> in the first case, or 
+	/// <see cref="ArgumentException"/> in the latter.
 	/// </summary>
-	/// <param name="argumentValue">The argument value to check.</param>
-	/// <param name="argumentName">The name of the argument.</param>
-	public static void ArgumentNotNullOrEmptyString(string argumentValue, string argumentName)
+	public static void NotNullOrEmpty(Expression<Func<string>> reference, string value)
 	{
-		ArgumentNotNull(argumentValue, argumentName);
-
-		if (argumentValue.Length == 0)
+		NotNull<string>(reference, value);
+		if (value.Length == 0)
 		{
-			throw new ArgumentException(Resources.ArgumentCannotBeEmpty, argumentName);
+			throw new ArgumentException(Resources.ArgumentCannotBeEmpty, GetParameterName(reference));
 		}
 	}
-
 
 	/// <summary>
 	/// Checks an argument to ensure it is in the specified range including the edges.
 	/// </summary>
 	/// <typeparam name="T">Type of the argument to check, it must be an <see cref="IComparable"/> type.
 	/// </typeparam>
+	/// <param name="reference">The expression containing the name of the argument.</param>
 	/// <param name="value">The argument value to check.</param>
 	/// <param name="from">The minimun allowed value for the argument.</param>
 	/// <param name="to">The maximun allowed value for the argument.</param>
-	/// <param name="argumentName">The name of the argument.</param>
-	public static void ArgumentNotOutOfRangeInclusive<T>(T value, T from, T to, string argumentName)
+	public static void NotOutOfRangeInclusive<T>(Expression<Func<T>> reference, T value, T from, T to)
 			where T : IComparable
 	{
 		if (value != null && (value.CompareTo(from) < 0 || value.CompareTo(to) > 0))
 		{
-			throw new ArgumentOutOfRangeException(argumentName);
+			throw new ArgumentOutOfRangeException(GetParameterName(reference));
 		}
 	}
 
@@ -96,20 +96,20 @@ internal static class Guard
 	/// </summary>
 	/// <typeparam name="T">Type of the argument to check, it must be an <see cref="IComparable"/> type.
 	/// </typeparam>
+	/// <param name="reference">The expression containing the name of the argument.</param>
 	/// <param name="value">The argument value to check.</param>
 	/// <param name="from">The minimun allowed value for the argument.</param>
 	/// <param name="to">The maximun allowed value for the argument.</param>
-	/// <param name="argumentName">The name of the argument.</param>
-	public static void ArgumentNotOutOfRangeExclusive<T>(T value, T from, T to, string argumentName)
+	public static void NotOutOfRangeExclusive<T>(Expression<Func<T>> reference, T value, T from, T to)
 			where T : IComparable
 	{
 		if (value != null && (value.CompareTo(from) <= 0 || value.CompareTo(to) >= 0))
 		{
-			throw new ArgumentOutOfRangeException(argumentName);
+			throw new ArgumentOutOfRangeException(GetParameterName(reference));
 		}
 	}
 
-	public static void CanBeAssigned(Type typeToAssign, Type targetType, string argumentName)
+	public static void CanBeAssigned(Expression<Func<object>> reference, Type typeToAssign, Type targetType)
 	{
 		if (!targetType.IsAssignableFrom(typeToAssign))
 		{
@@ -119,14 +119,21 @@ internal static class Guard
 					CultureInfo.CurrentCulture,
 					Resources.TypeNotImplementInterface,
 					typeToAssign,
-					targetType), argumentName);
+					targetType), GetParameterName(reference));
 			}
 
 			throw new ArgumentException(string.Format(
 				CultureInfo.CurrentCulture,
 				Resources.TypeNotInheritFromType,
 				typeToAssign,
-				targetType), argumentName);
+				targetType), GetParameterName(reference));
 		}
+	}
+
+	private static string GetParameterName(Expression reference)
+	{
+		var lambda = (LambdaExpression)reference;
+		var member = (MemberExpression)lambda.Body;
+		return member.Member.Name;
 	}
 }

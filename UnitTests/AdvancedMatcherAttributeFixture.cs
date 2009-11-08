@@ -21,8 +21,8 @@ namespace Moq.Tests
 		[Fact]
 		public void ShouldCreateMatcher()
 		{
-			AdvancedMatcherAttribute attr = new AdvancedMatcherAttribute(typeof(MockMatcher));
-			IMatcher matcher = attr.CreateMatcher();
+			var attr = new AdvancedMatcherAttribute(typeof(MockMatcher));
+			var matcher = attr.CreateMatcher();
 
 			Assert.NotNull(matcher);
 		}
@@ -30,7 +30,7 @@ namespace Moq.Tests
 		[Fact]
 		public void ShouldExposeMatcherType()
 		{
-			AdvancedMatcherAttribute attr = new AdvancedMatcherAttribute(typeof(MockMatcher));
+			var attr = new AdvancedMatcherAttribute(typeof(MockMatcher));
 
 			Assert.Equal(typeof(MockMatcher), attr.MatcherType);
 		}
@@ -38,7 +38,7 @@ namespace Moq.Tests
 		[Fact]
 		public void ShouldThrowRealException()
 		{
-			AdvancedMatcherAttribute attr = new AdvancedMatcherAttribute(typeof(ThrowingMatcher));
+			var attr = new AdvancedMatcherAttribute(typeof(ThrowingMatcher));
 			Assert.Throws<ArgumentException>(() => attr.CreateMatcher());
 		}
 
@@ -75,5 +75,4 @@ namespace Moq.Tests
 			}
 		}
 	}
-
 }

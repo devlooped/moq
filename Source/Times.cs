@@ -69,7 +69,7 @@ namespace Moq
 		/// <returns>An object defining the allowed number of invocations.</returns>
 		public static Times AtLeast(int callCount)
 		{
-			Guard.ArgumentNotOutOfRangeInclusive(callCount, 1, int.MaxValue, "callCount");
+			Guard.NotOutOfRangeInclusive(() => callCount, callCount, 1, int.MaxValue);
 
 			return new Times(c => c >= callCount, callCount, int.MaxValue, Resources.NoMatchingCallsAtLeast);
 		}
@@ -90,7 +90,7 @@ namespace Moq
 		/// <returns>An object defining the allowed number of invocations.</returns>
 		public static Times AtMost(int callCount)
 		{
-			Guard.ArgumentNotOutOfRangeInclusive(callCount, 0, int.MaxValue, "callCount");
+			Guard.NotOutOfRangeInclusive(() => callCount, callCount, 0, int.MaxValue);
 
 			return new Times(c => c >= 0 && c <= callCount, 0, callCount, Resources.NoMatchingCallsAtMost);
 		}
@@ -116,7 +116,7 @@ namespace Moq
 		{
 			if (rangeKind == Range.Exclusive)
 			{
-				Guard.ArgumentNotOutOfRangeExclusive(callCountFrom, 0, callCountTo, "callCountFrom");
+				Guard.NotOutOfRangeExclusive(() => callCountFrom, callCountFrom, 0, callCountTo);
 				if (callCountTo - callCountFrom == 1)
 				{
 					throw new ArgumentOutOfRangeException("callCountTo");
@@ -129,7 +129,7 @@ namespace Moq
 					Resources.NoMatchingCallsBetweenExclusive);
 			}
 
-			Guard.ArgumentNotOutOfRangeInclusive(callCountFrom, 0, callCountTo, "callCountFrom");
+			Guard.NotOutOfRangeInclusive(() => callCountFrom, callCountFrom, 0, callCountTo);
 			return new Times(
 				c => c >= callCountFrom && c <= callCountTo,
 				callCountFrom,
@@ -144,7 +144,7 @@ namespace Moq
 		/// <returns>An object defining the allowed number of invocations.</returns>
 		public static Times Exactly(int callCount)
 		{
-			Guard.ArgumentNotOutOfRangeInclusive(callCount, 0, int.MaxValue, "callCount");
+			Guard.NotOutOfRangeInclusive(() => callCount, callCount, 0, int.MaxValue);
 
 			return new Times(c => c == callCount, callCount, callCount, Resources.NoMatchingCallsExactly);
 		}

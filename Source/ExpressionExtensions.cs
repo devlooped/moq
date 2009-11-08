@@ -48,7 +48,6 @@ using System.Runtime.CompilerServices;
 using System.Text;
 using System.Text.RegularExpressions;
 using Moq.Properties;
-using IQToolkit;
 
 namespace Moq
 {
@@ -60,7 +59,7 @@ namespace Moq
 		/// </summary>
 		public static LambdaExpression ToLambda(this Expression expression)
 		{
-			Guard.ArgumentNotNull(expression, "expression");
+			Guard.NotNull(() => expression, expression);
 
 			LambdaExpression lambda = expression as LambdaExpression;
 			if (lambda == null)
@@ -84,7 +83,7 @@ namespace Moq
 		/// <exception cref="ArgumentException">If the body is not a method call.</exception>
 		public static MethodCallExpression ToMethodCall(this LambdaExpression expression)
 		{
-			Guard.ArgumentNotNull(expression, "expression");
+			Guard.NotNull(() => expression, expression);
 
 			var methodCall = expression.Body as MethodCallExpression;
 			if (methodCall == null)
@@ -123,7 +122,7 @@ namespace Moq
 		/// </summary>
 		public static bool IsProperty(this LambdaExpression expression)
 		{
-			Guard.ArgumentNotNull(expression, "expression");
+			Guard.NotNull(() => expression, expression);
 
 			return IsProperty(expression.Body);
 		}
@@ -133,7 +132,7 @@ namespace Moq
 		/// </summary>
 		public static bool IsProperty(this Expression expression)
 		{
-			Guard.ArgumentNotNull(expression, "expression");
+			Guard.NotNull(() => expression, expression);
 
 			var prop = expression as MemberExpression;
 
@@ -148,7 +147,7 @@ namespace Moq
 		/// </summary>
 		public static bool IsPropertyIndexer(this LambdaExpression expression)
 		{
-			Guard.ArgumentNotNull(expression, "expression");
+			Guard.NotNull(() => expression, expression);
 
 			return IsPropertyIndexer(expression.Body);
 		}
@@ -161,7 +160,7 @@ namespace Moq
 		/// </summary>
 		public static bool IsPropertyIndexer(this Expression expression)
 		{
-			Guard.ArgumentNotNull(expression, "expression");
+			Guard.NotNull(() => expression, expression);
 
 			var call = expression as MethodCallExpression;
 

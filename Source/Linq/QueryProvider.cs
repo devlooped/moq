@@ -2,14 +2,11 @@
 // This source code is made available under the terms of the Microsoft Public License (MS-PL)
 
 using System;
-using System.Collections;
-using System.Collections.Generic;
 using System.Linq;
 using System.Linq.Expressions;
 using System.Reflection;
-using System.Text;
 
-namespace IQToolkit
+namespace Moq.Linq
 {
     /// <summary>
     /// A basic abstract LINQ query provider
@@ -20,9 +17,9 @@ namespace IQToolkit
         {
         }
 
-        IQueryable<S> IQueryProvider.CreateQuery<S>(Expression expression)
+        IQueryable<T> IQueryProvider.CreateQuery<T>(Expression expression)
         {
-            return new Query<S>(this, expression);
+            return new Query<T>(this, expression);
         }
 
         IQueryable IQueryProvider.CreateQuery(Expression expression)
@@ -32,15 +29,15 @@ namespace IQToolkit
             {
                 return (IQueryable)Activator.CreateInstance(typeof(Query<>).MakeGenericType(elementType), new object[] { this, expression });
             }
-            catch (TargetInvocationException tie)
+            catch (TargetInvocationException e)
             {
-                throw tie.InnerException;
+                throw e.InnerException;
             }
         }
 
-        S IQueryProvider.Execute<S>(Expression expression)
+        T IQueryProvider.Execute<T>(Expression expression)
         {
-            return (S)this.Execute(expression);
+            return (T)this.Execute(expression);
         }
 
         object IQueryProvider.Execute(Expression expression)

@@ -41,7 +41,6 @@
 using System;
 using System.Collections.Generic;
 using System.Linq.Expressions;
-using IQToolkit;
 
 namespace Moq
 {
