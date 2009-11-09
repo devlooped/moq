@@ -171,11 +171,11 @@ namespace Moq.Tests
 		{
 			var mock = new Mock<IFoo>();
 
-			var me = Assert.Throws<MockException>(
+			var e = Assert.Throws<MockException>(
 				() => mock.VerifySet(f => f.Value = 5, "Nobody called .Value"));
 
-			Assert.Contains("Nobody called .Value", me.Message);
-			Assert.Contains("f.Value", me.Message);
+			Assert.Contains("Nobody called .Value", e.Message);
+			Assert.Contains("f.Value", e.Message);
 		}
 
 		[Fact]
@@ -233,11 +233,11 @@ namespace Moq.Tests
 			var disposable = new Mock<IDisposable>();
 			var mock = disposable.As<IBar>();
 
-			var me = Assert.Throws<MockException>(
+			var e = Assert.Throws<MockException>(
 				() => mock.VerifySet(f => f.Value = 5, "Nobody called .Value"));
 
-			Assert.True(me.Message.Contains("Nobody called .Value"));
-			Assert.True(me.Message.Contains("f.Value"));
+			Assert.True(e.Message.Contains("Nobody called .Value"));
+			Assert.True(e.Message.Contains("f.Value"));
 		}
 
 		[Fact]

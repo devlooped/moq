@@ -19,7 +19,7 @@ namespace System.Linq.Expressions
 		public static ReadOnlyCollection<T> Visit<T>(ReadOnlyCollection<T> nodes, Func<T, T> elementVisitor)
 		{
 			List<T> list = null;
-			for (int index = 0, count = nodes.Count; index < count; index++)
+			for (var index = 0; index < nodes.Count; index++)
 			{
 				var expression = elementVisitor(nodes[index]);
 				if (list != null)
@@ -28,7 +28,7 @@ namespace System.Linq.Expressions
 				}
 				else if (!object.ReferenceEquals(expression, nodes[index]))
 				{
-					list = new List<T>(count);
+					list = new List<T>(nodes.Count);
 					for (var j = 0; j < index; j++)
 					{
 						list.Add(nodes[j]);
@@ -120,7 +120,7 @@ namespace System.Linq.Expressions
 			if (nodes != null)
 			{
 				List<Expression> list = null;
-				for (int index = 0, count = nodes.Count; index < count; index++)
+				for (var index = 0; index < nodes.Count; index++)
 				{
 					var node = this.Visit(nodes[index]);
 					if (list != null)
@@ -129,7 +129,7 @@ namespace System.Linq.Expressions
 					}
 					else if (node != nodes[index])
 					{
-						list = new List<Expression>(count);
+						list = new List<Expression>(nodes.Count);
 						for (int j = 0; j < index; j++)
 						{
 							list.Add(nodes[j]);
@@ -187,9 +187,15 @@ namespace System.Linq.Expressions
 			return this.UpdateInvocation(node, expression, args);
 		}
 
+		protected virtual Expression VisitLambda(LambdaExpression node)
+		{
+			var body = this.Visit(node.Body);
+			return this.UpdateLambda(node, node.Type, body, node.Parameters);
+		}
+
 		protected virtual Expression VisitListInit(ListInitExpression node)
 		{
-			var newExpression = this.VisitNew(node.NewExpression);
+			var newExpression = (NewExpression)this.VisitNew(node.NewExpression);
 			var initializers = Visit<ElementInit>(node.Initializers, n => this.VisitElementInit(n));
 			return this.UpdateListInit(node, newExpression, initializers);
 		}
@@ -223,7 +229,7 @@ namespace System.Linq.Expressions
 
 		protected virtual Expression VisitMemberInit(MemberInitExpression node)
 		{
-			var newExpression = this.VisitNew(node.NewExpression);
+			var newExpression = (NewExpression)this.VisitNew(node.NewExpression);
 			var bindings = Visit<MemberBinding>(node.Bindings, n => this.VisitMemberBinding(n));
 			return this.UpdateMemberInit(node, newExpression, bindings);
 		}
@@ -247,7 +253,7 @@ namespace System.Linq.Expressions
 			return this.UpdateMethodCall(node, obj, node.Method, args);
 		}
 
-		protected virtual NewExpression VisitNew(NewExpression node)
+		protected virtual Expression VisitNew(NewExpression node)
 		{
 			var args = this.Visit(node.Arguments);
 			return this.UpdateNew(node, node.Constructor, args, node.Members);
@@ -477,12 +483,6 @@ namespace System.Linq.Expressions
 			}
 
 			return node;
-		}
-
-		private Expression VisitLambda(LambdaExpression node)
-		{
-			var body = this.Visit(node.Body);
-			return this.UpdateLambda(node, node.Type, body, node.Parameters);
 		}
 
 		private Expression VisitUnknown(Expression node)

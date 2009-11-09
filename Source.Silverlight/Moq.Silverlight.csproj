@@ -120,6 +120,9 @@
     <Compile Include="..\Source\ExpressionExtensions.cs">
       <Link>ExpressionExtensions.cs</Link>
     </Compile>
+    <Compile Include="..\Source\ExpressionStringBuilder.cs">
+      <Link>ExpressionStringBuilder.cs</Link>
+    </Compile>
     <Compile Include="..\Source\Extensions.cs">
       <Link>Extensions.cs</Link>
     </Compile>

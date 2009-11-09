@@ -328,13 +328,13 @@ namespace Moq.Tests.Regressions
 			[Fact]
 			public void Test()
 			{
-				Mock<IFoo> target = new Mock<IFoo>();
+				var target = new Mock<IFoo>();
 				target.Setup(t => t.Submit(It.IsAny<string>(), It.IsAny<string>(), It.IsAny<int>()));
 
-				MockException e = Assert.Throws<MockVerificationException>(() => target.VerifyAll());
+				var e = Assert.Throws<MockVerificationException>(() => target.VerifyAll());
 
 				Assert.Contains(
-					"IFoo t => t.Submit(It.IsAny<String>(), It.IsAny<String>(), new [] {It.IsAny<Int32>()})",
+					"IFoo t => t.Submit(It.IsAny<String>(), It.IsAny<String>(), new[] { It.IsAny<Int32>() })",
 					e.Message);
 			}
 

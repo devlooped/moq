@@ -64,6 +64,16 @@ namespace Moq
 			return method.IsSpecialName && method.Name.StartsWith("get_", StringComparison.Ordinal);
 		}
 
+		public static bool IsPropertyIndexerGetter(this MethodBase method)
+		{
+			return method.IsSpecialName && method.Name.StartsWith("get_Item", StringComparison.Ordinal);
+		}
+
+		public static bool IsPropertyIndexerSetter(this MethodBase method)
+		{
+			return method.IsSpecialName && method.Name.StartsWith("set_Item", StringComparison.Ordinal);
+		}
+
 		public static bool IsPropertySetter(this MethodBase method)
 		{
 			return method.IsSpecialName && method.Name.StartsWith("set_", StringComparison.Ordinal);

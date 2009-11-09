@@ -219,12 +219,17 @@ namespace Moq
 		/// </devdoc>
 		public static string ToStringFixed(this Expression expression)
 		{
-			return new ToStringFixVisitor(expression, false).ExpressionString;
+			return ExpressionStringBuilder.GetString(expression);
 		}
 
 		internal static string ToStringFixed(this Expression expression, bool useFullTypeName)
 		{
-			return new ToStringFixVisitor(expression, useFullTypeName).ExpressionString;
+			if (useFullTypeName)
+			{
+				return ExpressionStringBuilder.GetString(expression, method => method.GetFullName());
+			}
+
+			return ExpressionStringBuilder.GetString(expression, method => method.GetName());
 		}
 
 		internal sealed class RemoveMatcherConvertVisitor : ExpressionVisitor
@@ -248,123 +253,6 @@ namespace Moq
 			}
 
 			public Expression Expression { get; private set; }
-		}
-
-		// TODO: this whole class' approach is weak. We 
-		// basically collect all calls in a tree, 
-		// which is a graph, but we collect them on a list.
-		// Then we do sequential matching of the wrong ToString 
-		// and replace with our rendering. Not sure if this 
-		// will work for nested calls, etc. Seems to 
-		// work fine for the typical mock setups and verification 
-		// expressions, but I don't think it's reliable as a 
-		// general purpose solution.
-		internal sealed class ToStringFixVisitor : ExpressionVisitor
-		{
-			private List<MethodCallExpression> calls = new List<MethodCallExpression>();
-			private Regex convertRegex = new Regex(@"Convert\((.+?)\)");
-
-			public ToStringFixVisitor(Expression expression, bool useFullTypeName)
-			{
-				this.Visit(expression);
-
-				var fullString = expression.ToString();
-
-				foreach (var call in calls)
-				{
-					var properCallString = BuildCallExpressionString(call, useFullTypeName);
-					var improperCallString = call.ToString();
-					// We do it this way so that we replace one call 
-					// at a time, as there may be many that match the 
-					// improper rendering (i.e. multiple It.IsAny)
-					var index = fullString.IndexOf(improperCallString, StringComparison.Ordinal);
-					if (index != -1)
-					{
-						fullString = fullString.Substring(0, index) + properCallString +
-									 fullString.Substring(index + improperCallString.Length);
-					}
-				}
-
-				fullString = convertRegex.Replace(fullString, m => m.Groups[1].Value);
-
-				this.ExpressionString = fullString;
-			}
-
-			public string ExpressionString { get; private set; }
-
-			protected override Expression VisitMethodCall(MethodCallExpression m)
-			{
-				// We fix generic methods but also renderings of property accesses.
-				calls.Add(m);
-				return base.VisitMethodCall(m);
-			}
-
-			private static string BuildCallExpressionString(MethodCallExpression call, bool useFullTypeName)
-			{
-				var builder = new StringBuilder();
-				var startIndex = 0;
-				var targetExpr = call.Object;
-
-				if (Attribute.GetCustomAttribute(call.Method, typeof(ExtensionAttribute)) != null)
-				{
-					// We should start rendering the args for the invocation from the 
-					// second argument.
-					startIndex = 1;
-					targetExpr = call.Arguments[0];
-				}
-
-				if (targetExpr != null)
-				{
-					builder.Append(targetExpr.ToStringFixed(useFullTypeName));
-				}
-				else
-				{
-					// Method is static
-					builder.Append(call.Method.DeclaringType.Name);
-				}
-
-				if (call.Method.IsSpecialName &&
-					call.Method.Name.StartsWith("get_Item", StringComparison.Ordinal))
-				{
-					builder.Append("[")
-						.Append(string.Join(", ", call.Arguments.Select(arg => arg.ToString()).ToArray()))
-						.Append("]");
-				}
-				else if (call.Method.IsSpecialName &&
-					call.Method.Name.StartsWith("set_Item", StringComparison.Ordinal))
-				{
-					builder.Append("[")
-						.Append(string.Join(", ", call.Arguments.Take(call.Arguments.Count - 1)
-							.Select(arg => arg.ToString()).ToArray()))
-						.Append("] = ")
-						.Append(call.Arguments.Last().ToStringFixed(useFullTypeName));
-				}
-				else if (call.Method.IsPropertyGetter())
-				{
-					builder.Append(".").Append(call.Method.Name.Substring(4));
-				}
-				else if (call.Method.IsPropertySetter())
-				{
-					builder.Append(".")
-						.Append(call.Method.Name.Substring(4))
-						.Append(" = ")
-						.Append(call.Arguments.Last().ToStringFixed(useFullTypeName));
-				}
-				else
-				{
-					builder.Append(".")
-						.Append(useFullTypeName ? call.Method.GetFullName() : call.Method.GetName())
-						.Append("(")
-						.Append(string.Join(
-							", ",
-							call.Arguments.Select(a => a.ToString()).ToArray(),
-							startIndex,
-							call.Arguments.Count - startIndex))
-						.Append(")");
-				}
-
-				return builder.ToString();
-			}
 		}
 	}
 }
