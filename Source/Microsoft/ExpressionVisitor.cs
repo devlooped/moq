@@ -9,7 +9,7 @@ using System.Reflection;
 
 namespace System.Linq.Expressions
 {
-	[DebuggerStepThrough]
+	//[DebuggerStepThrough]
 	internal abstract class ExpressionVisitor
 	{
 		protected ExpressionVisitor()
@@ -98,7 +98,10 @@ namespace System.Linq.Expressions
 				case ExpressionType.Call:
 					return this.VisitMethodCall((MethodCallExpression)node);
 				case ExpressionType.Lambda:
-					return this.VisitLambda((LambdaExpression)node);
+					return (Expression)this.GetType()
+						.GetMethod("VisitLambda", BindingFlags.NonPublic | BindingFlags.Instance)
+						.MakeGenericMethod(new[] { node.Type })
+						.Invoke(this, new[] { node });
 				case ExpressionType.New:
 					return this.VisitNew((NewExpression)node);
 				case ExpressionType.NewArrayInit:
@@ -187,7 +190,7 @@ namespace System.Linq.Expressions
 			return this.UpdateInvocation(node, expression, args);
 		}
 
-		protected virtual Expression VisitLambda(LambdaExpression node)
+		protected virtual Expression VisitLambda<T>(Expression<T> node)
 		{
 			var body = this.Visit(node.Body);
 			return this.UpdateLambda(node, node.Type, body, node.Parameters);

@@ -1,4 +1,5 @@
 using System;
+using System.Collections.Generic;
 using System.Linq;
 using System.Linq.Expressions;
 using System.Reflection;
@@ -119,11 +120,7 @@ namespace Moq
 			return node;
 		}
 
-#if NET35 || SILVERLIGHT
-			protected override Expression VisitLambda(LambdaExpression node)
-#else
 		protected override Expression VisitLambda<T>(Expression<T> node)
-#endif
 		{
 			if (node.Parameters.Count == 1)
 			{
@@ -132,18 +129,7 @@ namespace Moq
 			else
 			{
 				this.output.Append("(");
-				bool appendComma = false;
-				foreach (var parameter in node.Parameters)
-				{
-					if (appendComma)
-					{
-						this.output.Append(", ");
-					}
-
-					this.VisitParameter(parameter);
-					appendComma = true;
-				}
-
+				this.Visit(node.Parameters, n => this.VisitParameter(n), 0, node.Parameters.Count);
 				this.output.Append(")");
 			}
 
@@ -225,12 +211,12 @@ namespace Moq
 
 		protected override Expression VisitMethodCall(MethodCallExpression node)
 		{
-			var analizedParam = 0;
+			var paramFrom = 0;
 			var expression = node.Object;
 
 			if (Attribute.GetCustomAttribute(node.Method, typeof(ExtensionAttribute)) != null)
 			{
-				analizedParam = 1;
+				paramFrom = 1;
 				expression = node.Arguments[0];
 			}
 
@@ -245,18 +231,15 @@ namespace Moq
 
 			if (node.Method.IsPropertyIndexerGetter())
 			{
-				// TODO should use visit
-				this.output.Append("[")
-					.Append(string.Join(", ", node.Arguments.Select(arg => arg.ToString()).ToArray()))
-					.Append("]");
+				this.output.Append("[");
+				this.Visit(node.Arguments, n => this.Visit(n), paramFrom, node.Arguments.Count);
+				this.output.Append("]");
 			}
 			else if (node.Method.IsPropertyIndexerSetter())
 			{
-				// TODO should use visit
-				this.output.Append("[")
-					.Append(string.Join(", ", node.Arguments.Take(node.Arguments.Count - 1)
-						.Select(arg => arg.ToString()).ToArray()))
-					.Append("] = ");
+				this.output.Append("[");
+				this.Visit(node.Arguments, n => this.Visit(n), paramFrom, node.Arguments.Count - 1);
+				this.output.Append("] = ");
 				this.Visit(node.Arguments.Last());
 			}
 			else if (node.Method.IsPropertyGetter())
@@ -265,28 +248,13 @@ namespace Moq
 			}
 			else if (node.Method.IsPropertySetter())
 			{
-				this.output.Append(".")
-					.Append(node.Method.Name.Substring(4))
-					.Append(" = ");
+				this.output.Append(".").Append(node.Method.Name.Substring(4)).Append(" = ");
 				this.Visit(node.Arguments.Last());
 			}
 			else
 			{
-				this.output.Append(".")
-					.Append(this.getMethodName(node.Method))
-					.Append("(");
-				var appendComma = false;
-				for (var index = analizedParam; index < node.Arguments.Count; index++)
-				{
-					if (appendComma)
-					{
-						output.Append(", ");
-					}
-
-					this.Visit(node.Arguments[index]);
-					appendComma = true;
-				}
-
+				this.output.Append(".").Append(this.getMethodName(node.Method)).Append("(");
+				this.Visit(node.Arguments, n => this.Visit(n), paramFrom, node.Arguments.Count);
 				output.Append(")");
 			}
 
@@ -422,6 +390,21 @@ namespace Moq
 		private static bool IsParentEnclosed(Expression node)
 		{
 			return node.NodeType == ExpressionType.AndAlso || node.NodeType == ExpressionType.OrElse;
+		}
+
+		private void Visit<T>(IList<T> arguments, Func<T, Expression> elementVisitor, int paramFrom, int paramTo)
+		{
+			var appendComma = false;
+			for (var index = paramFrom; index < paramTo; index++)
+			{
+				if (appendComma)
+				{
+					this.output.Append(", ");
+				}
+
+				elementVisitor(arguments[index]);
+				appendComma = true;
+			}
 		}
 	}
 }
