@@ -865,6 +865,65 @@ namespace Moq.Tests.Regressions
 
 		#endregion
 
+		#region #183
+
+		public class _183
+		{
+			[Fact]
+			public void Test()
+			{
+				var mock = new Mock<IFoo>();
+				mock.Setup(m => m.Execute(1));
+				mock.Setup(m => m.Execute(It.IsInRange(2, 20, Range.Exclusive)));
+				mock.Setup(m => m.Execute(3, "Caption"));
+
+				mock.Object.Execute(3);
+				mock.Object.Execute(4);
+				mock.Object.Execute(5);
+
+				var e = Assert.Throws<MockException>(() => mock.Verify(m => m.Execute(0)));
+				Assert.Contains(
+					"\r\nConfigured setups and invocations:" +
+					"\r\nm => m.Execute(1), Times.Never" +
+					"\r\nm => m.Execute(It.IsInRange<Int32>(2, 20, Range.Exclusive)), Times.Exactly(3)",
+					e.Message);
+			}
+
+			[Fact]
+			public void TestGeneric()
+			{
+				var mock = new Mock<IFoo>();
+				mock.Setup(m => m.Execute<int>(1, 10));
+				mock.Setup(m => m.Execute<string>(1, "Foo"));
+
+				mock.Object.Execute(1, 10);
+
+				var e = Assert.Throws<MockException>(() => mock.Verify(m => m.Execute<int>(1, 1)));
+				Assert.Contains(
+					"\r\nConfigured setups and invocations:\r\nm => m.Execute<Int32>(1, 10), Times.Once",
+					e.Message);
+			}
+
+			[Fact]
+			public void TestNoSetups()
+			{
+				var mock = new Mock<IFoo>();
+
+				var e = Assert.Throws<MockException>(() => mock.Verify(m => m.Execute(1)));
+				Assert.Contains("\r\nNo setups configured.", e.Message);
+
+			}
+
+			public interface IFoo
+			{
+				void Execute(int param);
+				void Execute(int param, string caption);
+				void Execute<T>(int p, T param);
+			}
+		}
+
+		#endregion
+
 		#region Recursive issue
 
 		public class RecursiveFixture

@@ -335,6 +335,21 @@ namespace Moq
 			VerifyCalls(targetInterceptor, expected, expression, times);
 		}
 
+		private static MethodInfo GetMethod(Expression expression)
+		{
+			var lambda = expression.ToLambda();
+			if (lambda != null)
+			{
+				var method = lambda.Body as MethodCallExpression;
+				if (method != null)
+				{
+					return method.Method;
+				}
+			}
+
+			return null;
+		}
+
 		private static void VerifyCalls(
 			Interceptor targetInterceptor,
 			MethodCall expected,
@@ -344,19 +359,48 @@ namespace Moq
 			var callCount = targetInterceptor.ActualCalls.Where(ac => expected.Matches(ac)).Count();
 			if (!times.Verify(callCount))
 			{
-				ThrowVerifyException(expected, expression, times, callCount);
+				var setups = targetInterceptor.OrderedCalls
+					.Where(oc => GetMethod(oc.SetupExpression) == GetMethod(expression));
+				ThrowVerifyException(expected, setups, expression, times, callCount);
 			}
 		}
 
 		private static void ThrowVerifyException(
-			IProxyCall expected,
+			MethodCall expected,
+			IEnumerable<IProxyCall> setups,
 			Expression expression,
 			Times times,
 			int callCount)
 		{
-			throw new MockException(
-				MockException.ExceptionReason.VerificationFailed,
-				times.GetExceptionMessage(expected.FailMessage, expression.ToStringFixed(), callCount));
+			var message = times.GetExceptionMessage(expected.FailMessage, expression.ToStringFixed(), callCount) +
+				Environment.NewLine + FormatSetupsInfo(setups);
+			throw new MockException(MockException.ExceptionReason.VerificationFailed, message);
+		}
+
+		private static string FormatSetupsInfo(IEnumerable<IProxyCall> setups)
+		{
+			var expressionSetups = setups
+				.Select(s => s.SetupExpression.ToStringFixed() + ", " + FormatCallCount(s.CallCount))
+				.ToArray();
+
+			return expressionSetups.Length == 0 ?
+				"No setups configured." :
+				"Configured setups and invocations:" + Environment.NewLine + string.Join(Environment.NewLine, expressionSetups);
+		}
+
+		private static string FormatCallCount(int callCount)
+		{
+			if (callCount == 0)
+			{
+				return "Times.Never";
+			}
+
+			if (callCount == 1)
+			{
+				return "Times.Once";
+			}
+
+			return string.Format(CultureInfo.CurrentCulture, "Times.Exactly({0})", callCount);
 		}
 
 		#endregion
@@ -369,8 +413,8 @@ namespace Moq
 			return PexProtector.Invoke(() =>
 			{
 				var methodCall = expression.ToLambda().ToMethodCall();
-				MethodInfo method = methodCall.Method;
-				Expression[] args = methodCall.Arguments.ToArray();
+				var method = methodCall.Method;
+				var args = methodCall.Arguments.ToArray();
 
 				ThrowIfNotMember(expression, method);
 				ThrowIfCantOverride(expression, method);

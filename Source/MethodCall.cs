@@ -87,7 +87,6 @@ namespace Moq
 		private Exception exception;
 		private Action<object[]> callback;
 		private List<IMatcher> argumentMatchers = new List<IMatcher>();
-		private int callCount;
 		private bool isOnce;
 		private MockedEvent mockEvent;
 		private Delegate mockEventArgsFunc;
@@ -102,9 +101,16 @@ namespace Moq
 
 		public string FailMessage { get; set; }
 		public bool IsVerifiable { get; set; }
+		// TODO should be obsolete
 		public bool IsNever { get; set; }
 		public bool Invoked { get; set; }
-		public Expression SetupExpression { get { return originalExpression; } }
+
+		public Expression SetupExpression
+		{
+			get { return originalExpression; }
+		}
+
+		public int CallCount { get; private set; }
 
 		public MethodCall(Mock mock, Expression originalExpression, MethodInfo method, params Expression[] arguments)
 		{
@@ -119,21 +125,23 @@ namespace Moq
 				var argument = arguments[i];
 				if (parameter.IsOut)
 				{
-					//changed to eager-evaluate.
-					//outValues.Add(new KeyValuePair<int, Expression>(i, argument));
 					var value = argument.PartialEval();
-					if (value.NodeType == ExpressionType.Constant)
-						outValues.Add(new KeyValuePair<int, object>(i, ((ConstantExpression)value).Value));
-					else
+					if (value.NodeType != ExpressionType.Constant)
+					{
 						throw new NotSupportedException("Out expression must evaluate to a constant value.");
+					}
+
+					outValues.Add(new KeyValuePair<int, object>(i, ((ConstantExpression)value).Value));
 				}
 				else if (parameter.ParameterType.IsByRef)
 				{
 					var value = argument.PartialEval();
-					if (value.NodeType == ExpressionType.Constant)
-						argumentMatchers.Add(new RefMatcher(((ConstantExpression)value).Value));
-					else
+					if (value.NodeType != ExpressionType.Constant)
+					{
 						throw new NotSupportedException("Ref expression must evaluate to a constant value.");
+					}
+
+					argumentMatchers.Add(new RefMatcher(((ConstantExpression)value).Value));
 				}
 				else
 				{
@@ -142,7 +150,7 @@ namespace Moq
 				}
 			}
 
-			SetFileInfo();
+			this.SetFileInfo();
 		}
 
 		[Conditional("DESKTOP")]
@@ -226,7 +234,7 @@ namespace Moq
 
 		public virtual void Execute(ICallContext call)
 		{
-			Invoked = true;
+			this.Invoked = true;
 
 			if (callback != null)
 				callback(call.Arguments);
@@ -234,22 +242,28 @@ namespace Moq
 			if (exception != null)
 				throw exception;
 
-			callCount++;
+			this.CallCount++;
 
-			if (isOnce && callCount > 1)
+			if (this.isOnce && this.CallCount > 1)
+			{
 				throw new MockException(
 					MockException.ExceptionReason.MoreThanOneCall,
-					Times.Once().GetExceptionMessage(FailMessage, SetupExpression.ToStringFixed(), callCount));
+					Times.Once().GetExceptionMessage(FailMessage, SetupExpression.ToStringFixed(), this.CallCount));
+			}
 
 			if (IsNever)
+			{
 				throw new MockException(
 					MockException.ExceptionReason.SetupNever,
-					Times.Never().GetExceptionMessage(FailMessage, SetupExpression.ToStringFixed(), callCount));
+					Times.Never().GetExceptionMessage(FailMessage, SetupExpression.ToStringFixed(), this.CallCount));
+			}
 
-			if (expectedCallCount.HasValue && callCount > expectedCallCount)
+			if (expectedCallCount.HasValue && this.CallCount > expectedCallCount)
+			{
 				throw new MockException(
 					MockException.ExceptionReason.MoreThanNCalls,
-					Times.AtMost(expectedCallCount.Value).GetExceptionMessage(FailMessage, SetupExpression.ToStringFixed(), callCount));
+					Times.AtMost(expectedCallCount.Value).GetExceptionMessage(FailMessage, SetupExpression.ToStringFixed(), CallCount));
+			}
 
 			if (mockEvent != null)
 			{
@@ -260,9 +274,7 @@ namespace Moq
 				else
 				{
 					var argsFuncType = mockEventArgsFunc.GetType();
-
-					if (argsFuncType.IsGenericType &&
-						argsFuncType.GetGenericArguments().Length == 1)
+					if (argsFuncType.IsGenericType && argsFuncType.GetGenericArguments().Length == 1)
 					{
 						mockEvent.DoRaise((EventArgs)mockEventArgsFunc.InvokePreserveStack());
 					}

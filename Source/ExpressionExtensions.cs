@@ -103,7 +103,6 @@ namespace Moq
 		public static PropertyInfo ToPropertyInfo(this LambdaExpression expression)
 		{
 			var prop = expression.Body as MemberExpression;
-
 			if (prop != null)
 			{
 				var info = prop.Member as PropertyInfo;
@@ -113,8 +112,10 @@ namespace Moq
 				}
 			}
 
-			throw new ArgumentException(String.Format(CultureInfo.CurrentCulture,
-				Properties.Resources.SetupNotProperty, expression.ToStringFixed()));
+			throw new ArgumentException(string.Format(
+				CultureInfo.CurrentCulture,
+				Resources.SetupNotProperty,
+				expression.ToStringFixed()));
 		}
 
 		/// <summary>
