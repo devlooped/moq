@@ -44,45 +44,6 @@
     <DebugSymbols>true</DebugSymbols>
     <CodeAnalysisRuleSet>Migrated rules for Moq.ruleset</CodeAnalysisRuleSet>
   </PropertyGroup>
-  <PropertyGroup Condition="'$(Configuration)|$(Platform)' == 'Debug35|AnyCPU'">
-    <DebugSymbols>true</DebugSymbols>
-    <OutputPath>bin\Debug35\</OutputPath>
-    <DefineConstants>TRACE;DEBUG;DESKTOP;NET35</DefineConstants>
-    <DocumentationFile>bin\Debug\Moq.xml</DocumentationFile>
-    <TreatWarningsAsErrors>true</TreatWarningsAsErrors>
-    <DebugType>full</DebugType>
-    <PlatformTarget>AnyCPU</PlatformTarget>
-    <CodeAnalysisLogFile>bin\Debug\Moq.dll.CodeAnalysisLog.xml</CodeAnalysisLogFile>
-    <CodeAnalysisInputAssembly>bin\Debug35\Moq.dll</CodeAnalysisInputAssembly>
-    <CodeAnalysisUseTypeNameInSuppression>true</CodeAnalysisUseTypeNameInSuppression>
-    <CodeAnalysisModuleSuppressionsFile>GlobalSuppressions.cs</CodeAnalysisModuleSuppressionsFile>
-    <ErrorReport>prompt</ErrorReport>
-    <CodeAnalysisRuleSet>AllRules.ruleset</CodeAnalysisRuleSet>
-    <CodeAnalysisRuleSetDirectories>;C:\Program Files (x86)\Microsoft Visual Studio 10.0\Team Tools\Static Analysis Tools\\Rule Sets</CodeAnalysisRuleSetDirectories>
-    <CodeAnalysisRuleDirectories>;C:\Program Files (x86)\Microsoft Visual Studio 10.0\Team Tools\Static Analysis Tools\FxCop\\Rules</CodeAnalysisRuleDirectories>
-  </PropertyGroup>
-  <PropertyGroup Condition="'$(Configuration)|$(Platform)' == 'Release35|AnyCPU'">
-    <DebugSymbols>true</DebugSymbols>
-    <OutputPath>bin\Release35\</OutputPath>
-    <DefineConstants>CODE_ANALYSIS;TRACE;NET35</DefineConstants>
-    <DocumentationFile>bin\Release\Moq.xml</DocumentationFile>
-    <Optimize>true</Optimize>
-    <TreatWarningsAsErrors>true</TreatWarningsAsErrors>
-    <DebugType>full</DebugType>
-    <PlatformTarget>AnyCPU</PlatformTarget>
-    <RunCodeAnalysis>true</RunCodeAnalysis>
-    <CodeAnalysisLogFile>bin\Release\Moq.dll.CodeAnalysisLog.xml</CodeAnalysisLogFile>
-    <CodeAnalysisInputAssembly>bin\Release35\Moq.dll</CodeAnalysisInputAssembly>
-    <CodeAnalysisUseTypeNameInSuppression>true</CodeAnalysisUseTypeNameInSuppression>
-    <CodeAnalysisModuleSuppressionsFile>GlobalSuppressions.cs</CodeAnalysisModuleSuppressionsFile>
-    <ErrorReport>prompt</ErrorReport>
-    <CodeAnalysisRuleSet>Migrated rules for Moq.ruleset</CodeAnalysisRuleSet>
-    <CodeAnalysisRuleSetDirectories>;C:\Program Files (x86)\Microsoft Visual Studio 10.0\Team Tools\Static Analysis Tools\\Rule Sets</CodeAnalysisRuleSetDirectories>
-    <CodeAnalysisIgnoreBuiltInRuleSets>false</CodeAnalysisIgnoreBuiltInRuleSets>
-    <CodeAnalysisRuleDirectories>;C:\Program Files (x86)\Microsoft Visual Studio 10.0\Team Tools\Static Analysis Tools\FxCop\\Rules</CodeAnalysisRuleDirectories>
-    <CodeAnalysisIgnoreBuiltInRules>false</CodeAnalysisIgnoreBuiltInRules>
-    <CodeAnalysisFailOnMissingRules>false</CodeAnalysisFailOnMissingRules>
-  </PropertyGroup>
   <ItemGroup>
     <Reference Include="Castle.Core, Version=1.0.3.0, Culture=neutral, PublicKeyToken=407dd0808d44fbdc, processorArchitecture=MSIL">
       <SpecificVersion>False</SpecificVersion>
@@ -97,6 +58,8 @@
     <Reference Include="System.Xml" />
   </ItemGroup>
   <ItemGroup>
+    <Compile Include="MatchExpression.Silverlight.cs" Condition=" '$(TargetFrameworkVersion)' == 'v3.5'" />
+    <Compile Include="MatchExpression.cs" Condition=" '$(TargetFrameworkVersion)' == 'v4.0'" />
     <Compile Include="EmptyDefaultValueProvider.cs" />
     <Compile Include="ExpressionStringBuilder.cs" />
     <Compile Include="Language\ICallback.cs">
@@ -124,12 +87,12 @@
       <DesignTime>True</DesignTime>
       <DependentUpon>MethodCallReturn.tt</DependentUpon>
     </Compile>
-    <Compile Include="Microsoft\Delegates.cs">
+    <Compile Include="Microsoft\Delegates.cs" Condition=" '$(TargetFrameworkVersion)' == 'v3.5'">
       <AutoGen>True</AutoGen>
       <DesignTime>True</DesignTime>
       <DependentUpon>Delegates.tt</DependentUpon>
     </Compile>
-    <Compile Include="Microsoft\ExpressionVisitor.cs" />
+    <Compile Include="Microsoft\ExpressionVisitor.cs" Condition=" '$(TargetFrameworkVersion)' == 'v3.5'" />
     <Compile Include="SetupKind.cs" />
     <Compile Include="Language\Flow\IReturnsResult.cs" />
     <Compile Include="MatcherAttribute.cs" />
@@ -209,7 +172,7 @@
       <Generator>TextTemplatingFileGenerator</Generator>
       <LastGenOutput>MethodCallReturn.Generated.cs</LastGenOutput>
     </None>
-    <None Include="Microsoft\Delegates.tt">
+    <None Include="Microsoft\Delegates.tt" Condition=" '$(TargetFrameworkVersion)' == 'v3.5'">
       <Generator>TextTemplatingFileGenerator</Generator>
       <LastGenOutput>Delegates.cs</LastGenOutput>
     </None>
