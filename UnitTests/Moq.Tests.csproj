@@ -97,15 +97,15 @@
     <Compile Include="VerifyFixture.cs" />
   </ItemGroup>
   <ItemGroup>
+    <None Include="..\Moq.snk">
+      <Link>Moq.snk</Link>
+    </None>
+  </ItemGroup>
+  <ItemGroup>
     <ProjectReference Include="..\Source\Moq.csproj">
       <Project>{1C91AC30-5977-4BE5-BA67-8EB186C03514}</Project>
       <Name>Moq</Name>
     </ProjectReference>
-  </ItemGroup>
-  <ItemGroup>
-    <None Include="..\Moq.snk">
-      <Link>Moq.snk</Link>
-    </None>
   </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
   <UsingTask AssemblyFile="$(MSBuildProjectPath)..\Lib\xUnit\xunit.runner.msbuild.dll" TaskName="Xunit.Runner.MSBuild.xunit" />

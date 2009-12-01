@@ -924,6 +924,50 @@ namespace Moq.Tests.Regressions
 
 		#endregion
 
+		#region #223
+
+		public class _223
+		{
+			[Fact]
+			public void TestSetup()
+			{
+				this.TestSetupHelper<Foo>();
+			}
+
+			public void TestSetupHelper<T>() where T : class, IFoo<int>
+			{
+				var expected = 2;
+
+				var target = new Mock<T>();
+				target.Setup(p => p.DoInt32(0)).Returns(expected);
+				target.Setup(p => p.DoGeneric(0)).Returns(expected);
+
+				Assert.Equal(expected, target.Object.DoInt32(0));
+				Assert.Equal(expected, target.Object.DoGeneric(0));
+			}
+
+			public interface IFoo<T>
+			{
+				int DoInt32(int value);
+				T DoGeneric(int value);
+			}
+
+			public class Foo : IFoo<int>
+			{
+				public virtual int DoInt32(int value)
+				{
+					return 4;
+				}
+
+				public virtual int DoGeneric(int value)
+				{
+					return 5;
+				}
+			}
+		}
+
+		#endregion
+
 		#region Recursive issue
 
 		public class RecursiveFixture

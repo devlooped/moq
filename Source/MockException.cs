@@ -183,8 +183,7 @@ namespace Moq
 
 		private static string GetRawSetups(List<IProxyCall> failedSetups)
 		{
-			return failedSetups.Aggregate("", 
-					(s, call) => s + call.ToString() + Environment.NewLine);
+			return failedSetups.Aggregate(string.Empty, (s, call) => s + call.ToString() + Environment.NewLine);
 
 			//var message = new StringBuilder();
 			//foreach (var setup in failedSetups)

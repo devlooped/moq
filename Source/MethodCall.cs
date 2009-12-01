@@ -216,7 +216,7 @@ namespace Moq
 				}
 			}
 
-			if (argumentMatchers.Count == args.Count && IsEqualMethodOrOverride(call))
+			if (argumentMatchers.Count == args.Count && this.IsEqualMethodOrOverride(call))
 			{
 				for (int i = 0; i < argumentMatchers.Count; i++)
 				{
@@ -333,45 +333,44 @@ namespace Moq
 
 		private static void ThrowParameterMismatch(ParameterInfo[] expected, ParameterInfo[] actual)
 		{
-			throw new ArgumentException(String.Format(CultureInfo.CurrentCulture,
+			throw new ArgumentException(string.Format(
+				CultureInfo.CurrentCulture,
 				"Invalid callback. Setup on method with parameters ({0}) cannot invoke callback with parameters ({1}).",
-				String.Join(",", expected.Select(p => p.ParameterType.Name).ToArray()),
-				String.Join(",", actual.Select(p => p.ParameterType.Name).ToArray())
+				string.Join(",", expected.Select(p => p.ParameterType.Name).ToArray()),
+				string.Join(",", actual.Select(p => p.ParameterType.Name).ToArray())
 			));
 		}
 
 		public void Verifiable()
 		{
-			IsVerifiable = true;
+			this.IsVerifiable = true;
 		}
 
 		public void Verifiable(string failMessage)
 		{
-			IsVerifiable = true;
-			FailMessage = failMessage;
+			this.IsVerifiable = true;
+			this.FailMessage = failMessage;
 		}
 
 		private bool IsEqualMethodOrOverride(ICallContext call)
 		{
-			if (call.Method == method)
-				return true;
-
-			if ((call.Method == method) ||
-				(call.Method.DeclaringType.IsClass &&
-				call.Method.IsVirtual &&
-				method.DeclaringType.IsClass &&
-				method.IsVirtual &&
-				(call.Method.GetBaseDefinition() == method.GetBaseDefinition())))
+			if (call.Method == this.method)
 			{
-				if (method.IsGenericMethod)
-				{
-					var callMethodGenericArguments = call.Method.GetGenericArguments();
-					var methodGenericArguments = method.GetGenericArguments();
+				return true;
+			}
 
-					for (int argumentIndex = 0; argumentIndex < methodGenericArguments.Length; argumentIndex++)
-						if (!methodGenericArguments[argumentIndex].Equals(
-							callMethodGenericArguments[argumentIndex]))
-							return false;
+			if (this.method.DeclaringType.IsAssignableFrom(call.Method.DeclaringType))
+			{
+				if (!this.method.Name.Equals(call.Method.Name, StringComparison.Ordinal) ||
+					this.method.ReturnType != call.Method.ReturnType ||
+					!call.Method.GetParameterTypes().SequenceEqual(this.method.GetParameterTypes()))
+				{
+					return false;
+				}
+
+				if (method.IsGenericMethod && !call.Method.GetGenericArguments().SequenceEqual(method.GetGenericArguments()))
+				{
+					return false;
 				}
 
 				return true;
@@ -382,20 +381,18 @@ namespace Moq
 
 		public IVerifies AtMostOnce()
 		{
-			isOnce = true;
-
+			this.isOnce = true;
 			return this;
 		}
 
 		public void Never()
 		{
-			IsNever = true;
+			this.IsNever = true;
 		}
 
 		public IVerifies AtMost(int callCount)
 		{
-			expectedCallCount = callCount;
-
+			this.expectedCallCount = callCount;
 			return this;
 		}
 

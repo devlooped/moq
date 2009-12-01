@@ -236,10 +236,9 @@ namespace Moq
 			Times times,
 			string failMessage)
 		{
-			var lambda = expression.ToLambda();
-			var methodCall = lambda.ToMethodCall();
-			MethodInfo method = methodCall.Method;
-			Expression[] args = methodCall.Arguments.ToArray();
+			var methodCall = expression.ToMethodCall();
+			var method = methodCall.Method;
+			var args = methodCall.Arguments.ToArray();
 
 			var expected = new MethodCall(mock, expression, method, args) { FailMessage = failMessage };
 			VerifyCalls(GetInterceptor(methodCall.Object, mock), expected, expression, times);
@@ -252,18 +251,20 @@ namespace Moq
 			string failMessage)
 			where T : class
 		{
-			var lambda = expression.ToLambda();
-			if (lambda.IsProperty())
+			if (expression.IsProperty())
 			{
 				VerifyGet<T, TResult>(mock, expression, times, failMessage);
 			}
 			else
 			{
-				var methodCall = lambda.ToMethodCall();
+				var methodCall = expression.ToMethodCall();
 				var method = methodCall.Method;
 				var args = methodCall.Arguments.ToArray();
 
-				var expected = new MethodCallReturn<T, TResult>(mock, expression, method, args) { FailMessage = failMessage };
+				var expected = new MethodCallReturn<T, TResult>(mock, expression, method, args)
+				{
+					FailMessage = failMessage
+				};
 				VerifyCalls(GetInterceptor(methodCall.Object, mock), expected, expression, times);
 			}
 		}
@@ -275,15 +276,12 @@ namespace Moq
 			string failMessage)
 			where T : class
 		{
-			var lambda = expression.ToLambda();
-			var prop = lambda.ToPropertyInfo();
-
-			var expected = new MethodCallReturn<T, TProperty>(
-				mock,
-				expression,
-				prop.GetGetMethod(),
-				new Expression[0]) { FailMessage = failMessage };
-			VerifyCalls(GetInterceptor(((MemberExpression)lambda.Body).Expression, mock), expected, expression, times);
+			var method = expression.ToPropertyInfo().GetGetMethod();
+			var expected = new MethodCallReturn<T, TProperty>(mock, expression, method, new Expression[0])
+			{
+				FailMessage = failMessage
+			};
+			VerifyCalls(GetInterceptor(((MemberExpression)expression.Body).Expression, mock), expected, expression, times);
 		}
 
 		internal static void VerifySet<T, TProperty>(
@@ -293,11 +291,12 @@ namespace Moq
 			string failMessage)
 			where T : class
 		{
-			var lambda = expression.ToLambda();
-			var prop = lambda.ToPropertyInfo();
-
-			var expected = new SetterMethodCall<T, TProperty>(mock, expression, prop.GetSetMethod()) { FailMessage = failMessage };
-			VerifyCalls(GetInterceptor(((MemberExpression)lambda.Body).Expression, mock), expected, expression, times);
+			var method = expression.ToPropertyInfo().GetSetMethod();
+			var expected = new SetterMethodCall<T, TProperty>(mock, expression, method)
+			{
+				FailMessage = failMessage
+			};
+			VerifyCalls(GetInterceptor(((MemberExpression)expression.Body).Expression, mock), expected, expression, times);
 		}
 
 		internal static void VerifySet<T, TProperty>(
@@ -308,11 +307,12 @@ namespace Moq
 			string failMessage)
 			where T : class
 		{
-			var lambda = expression.ToLambda();
-			var prop = lambda.ToPropertyInfo();
-
-			var expected = new SetterMethodCall<T, TProperty>(mock, expression, prop.GetSetMethod(), value) { FailMessage = failMessage };
-			VerifyCalls(GetInterceptor(((MemberExpression)lambda.Body).Expression, mock), expected, expression, times);
+			var method = expression.ToPropertyInfo().GetSetMethod();
+			var expected = new SetterMethodCall<T, TProperty>(mock, expression, method, value)
+			{
+				FailMessage = failMessage
+			};
+			VerifyCalls(GetInterceptor(((MemberExpression)expression.Body).Expression, mock), expected, expression, times);
 		}
 
 		internal static void VerifySet<T>(
@@ -412,7 +412,7 @@ namespace Moq
 		{
 			return PexProtector.Invoke(() =>
 			{
-				var methodCall = expression.ToLambda().ToMethodCall();
+				var methodCall = expression.ToMethodCall();
 				var method = methodCall.Method;
 				var args = methodCall.Arguments.ToArray();
 
@@ -433,14 +433,12 @@ namespace Moq
 		{
 			return PexProtector.Invoke(() =>
 			{
-				var lambda = expression.ToLambda();
-
-				if (lambda.IsProperty())
+				if (expression.IsProperty())
 				{
 					return SetupGet(mock, expression);
 				}
 
-				var methodCall = lambda.ToMethodCall();
+				var methodCall = expression.ToMethodCall();
 				var method = methodCall.Method;
 				var args = methodCall.Arguments.ToArray();
 
@@ -456,20 +454,20 @@ namespace Moq
 			});
 		}
 
-		internal static MethodCallReturn<T1, TProperty> SetupGet<T1, TProperty>(Mock mock, Expression<Func<T1, TProperty>> expression)
+		internal static MethodCallReturn<T1, TProperty> SetupGet<T1, TProperty>(
+			Mock mock,
+			Expression<Func<T1, TProperty>> expression)
 			where T1 : class
 		{
 			return PexProtector.Invoke(() =>
 			{
-				var lambda = expression.ToLambda();
-
-				if (lambda.IsPropertyIndexer())
+				if (expression.IsPropertyIndexer())
 				{
 					// Treat indexers as regular method invocations.
 					return Setup<T1, TProperty>(mock, expression);
 				}
 
-				var prop = lambda.ToPropertyInfo();
+				var prop = expression.ToPropertyInfo();
 				ThrowIfPropertyNotReadable(prop);
 
 				var propGet = prop.GetGetMethod(true);
@@ -523,7 +521,7 @@ namespace Moq
 			Expression<Func<T1, TProperty>> expression)
 			where T1 : class
 		{
-			var prop = expression.ToLambda().ToPropertyInfo();
+			var prop = expression.ToPropertyInfo();
 			ThrowIfPropertyNotWritable(prop);
 
 			var propSet = prop.GetSetMethod(true);

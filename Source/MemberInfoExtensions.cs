@@ -49,6 +49,11 @@ namespace Moq
 			return type.Name;
 		}
 
+		public static IEnumerable<Type> GetParameterTypes(this MethodBase method)
+		{
+			return method.GetParameters().Select(parameter => parameter.ParameterType);
+		}
+
 		public static bool IsEventAttach(this MethodBase method)
 		{
 			return method.IsSpecialName && method.Name.StartsWith("add_", StringComparison.Ordinal);
