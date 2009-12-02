@@ -81,7 +81,11 @@ namespace Moq
 			invocations.Add(new MockInvocation(mock, invocation, LastMatch));
 		}
 
-		public MockInvocation LastInvocation { get { return invocations.LastOrDefault(); } }
+		public MockInvocation LastInvocation
+		{
+			get { return invocations.LastOrDefault(); }
+		}
+
 		public Match LastMatch { get; set; }
 
 		public void Dispose()

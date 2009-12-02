@@ -56,6 +56,7 @@ namespace Moq
 		private MockBehavior behavior;
 		private Type targetType;
 		private Dictionary<ExpressionKey, IProxyCall> calls = new Dictionary<ExpressionKey, IProxyCall>();
+		private Dictionary<EventInfo, List<Delegate>> invocationLists = new Dictionary<EventInfo, List<Delegate>>();
 		private List<IProxyCall> orderedCalls = new List<IProxyCall>();
 		private List<ICallContext> actualInvocations = new List<ICallContext>();
 
@@ -95,7 +96,6 @@ namespace Moq
 		private void VerifyOrThrow(Func<IProxyCall, bool> match)
 		{
 			var failures = calls.Values.Where(match).ToList();
-
 			if (failures.Count > 0)
 			{
 				throw new MockVerificationException(failures);
@@ -162,19 +162,18 @@ namespace Moq
 				{
 					var delegateInstance = (Delegate)invocation.Arguments[0];
 					// TODO: validate we can get the event?
-					var eventInfo = GetEventFromName(invocation.Method.Name.Substring(4));
+					var eventInfo = this.GetEventFromName(invocation.Method.Name.Substring(4));
 
 					if (delegateInstance != null)
 					{
 						var mockEvent = delegateInstance.Target as MockedEvent;
-
 						if (mockEvent != null)
 						{
 							mockEvent.Event = eventInfo;
 						}
 						else
 						{
-							this.Mock.AddEventHandler(eventInfo, (Delegate)invocation.Arguments[0]);
+							this.AddEventHandler(eventInfo, (Delegate)invocation.Arguments[0]);
 						}
 					}
 
@@ -184,7 +183,7 @@ namespace Moq
 				{
 					var delegateInstance = (Delegate)invocation.Arguments[0];
 					// TODO: validate we can get the event?
-					var eventInfo = GetEventFromName(invocation.Method.Name.Substring(7));
+					var eventInfo = this.GetEventFromName(invocation.Method.Name.Substring(7));
 
 					if (delegateInstance != null)
 					{
@@ -196,7 +195,7 @@ namespace Moq
 						}
 						else
 						{
-							this.Mock.RemoveEventHandler(eventInfo, (Delegate)invocation.Arguments[0]);
+							this.RemoveEventHandler(eventInfo, (Delegate)invocation.Arguments[0]);
 						}
 					}
 
@@ -262,7 +261,7 @@ namespace Moq
 		/// <param name="eventName">Name of the event, with the set_ or get_ prefix already removed</param>
 		private EventInfo GetEventFromName(string eventName)
 		{
-			var depthFirstProgress = new Queue<Type>();
+			var depthFirstProgress = new Queue<Type>(this.Mock.ImplementedInterfaces.Skip(1));
 			depthFirstProgress.Enqueue(targetType);
 			while (depthFirstProgress.Count > 0)
 			{
@@ -278,6 +277,7 @@ namespace Moq
 					depthFirstProgress.Enqueue(implementedType);
 				}
 			}
+
 			return null;
 		}
 
@@ -287,7 +287,7 @@ namespace Moq
 		/// <param name="initialType">The type to find immediate ancestors of</param>
 		private static IEnumerable<Type> GetAncestorTypes(Type initialType)
 		{
-			Type baseType = initialType.BaseType;
+			var baseType = initialType.BaseType;
 			if (baseType != null)
 			{
 				return new[] { baseType };
@@ -312,6 +312,38 @@ namespace Moq
 						invocation);
 				}
 			}
+		}
+
+		internal void AddEventHandler(EventInfo ev, Delegate handler)
+		{
+			List<Delegate> handlers;
+			if (!this.invocationLists.TryGetValue(ev, out handlers))
+			{
+				handlers = new List<Delegate>();
+				invocationLists.Add(ev, handlers);
+			}
+
+			handlers.Add(handler);
+		}
+
+		internal void RemoveEventHandler(EventInfo ev, Delegate handler)
+		{
+			List<Delegate> handlers;
+			if (this.invocationLists.TryGetValue(ev, out handlers))
+			{
+				handlers.Remove(handler);
+			}
+		}
+
+		internal IEnumerable<Delegate> GetInvocationList(EventInfo ev)
+		{
+			List<Delegate> handlers;
+			if (!this.invocationLists.TryGetValue(ev, out handlers))
+			{
+				return new Delegate[0];
+			}
+
+			return handlers;
 		}
 
 		private class ExpressionKey

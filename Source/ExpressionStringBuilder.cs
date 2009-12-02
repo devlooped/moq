@@ -1,5 +1,6 @@
 using System;
 using System.Collections.Generic;
+using System.Globalization;
 using System.Linq;
 using System.Linq.Expressions;
 using System.Reflection;
@@ -197,7 +198,10 @@ namespace Moq
 					break;
 
 				default:
-					throw new Exception(string.Format("Unhandled binding type '{0}'", node.BindingType));
+					throw new InvalidOperationException(string.Format(
+						CultureInfo.CurrentCulture,
+						"Unhandled binding type '{0}'",
+						node.BindingType));
 			}
 
 			return node;

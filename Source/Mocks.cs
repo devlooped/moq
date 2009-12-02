@@ -222,10 +222,6 @@ namespace Moq
 				var sourceType = targetObject.Type;
 				var returnType = left.Type;
 
-				var mockType = typeof(Mock<>).MakeGenericType(sourceType);
-				var actionType = typeof(Action<>).MakeGenericType(mockType);
-				var funcType = typeof(Func<,>).MakeGenericType(sourceType, returnType);
-
 				// where dte.Solution == solution
 				// becomes:	
 				// where Mock.Get(dte).Setup(mock => mock.Solution).Returns(solution) != null
@@ -322,7 +318,13 @@ namespace Moq
 			}
 
 			// Args like: string IFoo (mock => mock.Value)
-			private Expression TranslateFluent(Type objectType, Type returnType, MethodInfo targetMethod, Expression instance, ParameterExpression lambdaParam, Expression lambdaBody)
+			private static Expression TranslateFluent(
+				Type objectType,
+				Type returnType,
+				MethodInfo targetMethod,
+				Expression instance,
+				ParameterExpression lambdaParam,
+				Expression lambdaBody)
 			{
 				var funcType = typeof(Func<,>).MakeGenericType(objectType, returnType);
 
@@ -366,7 +368,7 @@ namespace Moq
 				return targetMethod;
 			}
 
-			private MethodInfo GetSetupMethod(Type objectType, Type returnType)
+			private static MethodInfo GetSetupMethod(Type objectType, Type returnType)
 			{
 				return typeof(Mock<>)
 					.MakeGenericType(objectType)

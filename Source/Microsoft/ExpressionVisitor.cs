@@ -114,7 +114,7 @@ namespace System.Linq.Expressions
 					return this.VisitListInit((ListInitExpression)node);
 			}
 
-			return this.VisitUnknown(node);
+			return VisitUnknown(node);
 		}
 
 		public ReadOnlyCollection<Expression> Visit(ReadOnlyCollection<Expression> nodes)
@@ -155,7 +155,7 @@ namespace System.Linq.Expressions
 			Expression left = this.Visit(node.Left);
 			Expression right = this.Visit(node.Right);
 			Expression conversion = this.Visit(node.Conversion);
-			return this.UpdateBinary(node, left, right, conversion, node.IsLiftedToNull, node.Method);
+			return UpdateBinary(node, left, right, conversion, node.IsLiftedToNull, node.Method);
 		}
 
 		protected virtual Expression VisitConditional(ConditionalExpression node)
@@ -163,7 +163,7 @@ namespace System.Linq.Expressions
 			var test = this.Visit(node.Test);
 			var ifTrue = this.Visit(node.IfTrue);
 			var ifFalse = this.Visit(node.IfFalse);
-			return this.UpdateConditional(node, test, ifTrue, ifFalse);
+			return UpdateConditional(node, test, ifTrue, ifFalse);
 		}
 
 		protected virtual Expression VisitConstant(ConstantExpression node)
@@ -186,32 +186,32 @@ namespace System.Linq.Expressions
 		{
 			var args = this.Visit(node.Arguments);
 			var expression = this.Visit(node.Expression);
-			return this.UpdateInvocation(node, expression, args);
+			return UpdateInvocation(node, expression, args);
 		}
 
 		protected virtual Expression VisitLambda<T>(Expression<T> node)
 		{
 			var body = this.Visit(node.Body);
-			return this.UpdateLambda(node, node.Type, body, node.Parameters);
+			return UpdateLambda(node, node.Type, body, node.Parameters);
 		}
 
 		protected virtual Expression VisitListInit(ListInitExpression node)
 		{
 			var newExpression = (NewExpression)this.VisitNew(node.NewExpression);
 			var initializers = Visit<ElementInit>(node.Initializers, n => this.VisitElementInit(n));
-			return this.UpdateListInit(node, newExpression, initializers);
+			return UpdateListInit(node, newExpression, initializers);
 		}
 
 		protected virtual Expression VisitMember(MemberExpression node)
 		{
 			var expression = this.Visit(node.Expression);
-			return this.UpdateMember(node, expression, node.Member);
+			return UpdateMember(node, expression, node.Member);
 		}
 
 		protected virtual MemberAssignment VisitMemberAssignment(MemberAssignment node)
 		{
 			var expression = this.Visit(node.Expression);
-			return this.UpdateMemberAssignment(node, node.Member, expression);
+			return UpdateMemberAssignment(node, node.Member, expression);
 		}
 
 		protected virtual MemberBinding VisitMemberBinding(MemberBinding node)
@@ -226,45 +226,48 @@ namespace System.Linq.Expressions
 					return this.VisitMemberListBinding((MemberListBinding)node);
 			}
 
-			throw new Exception(string.Format("Unhandled binding type '{0}'", node.BindingType));
+			throw new InvalidOperationException(string.Format(
+				CultureInfo.CurrentCulture,
+				"Unhandled binding type '{0}'",
+				node.BindingType));
 		}
 
 		protected virtual Expression VisitMemberInit(MemberInitExpression node)
 		{
 			var newExpression = (NewExpression)this.VisitNew(node.NewExpression);
 			var bindings = Visit<MemberBinding>(node.Bindings, n => this.VisitMemberBinding(n));
-			return this.UpdateMemberInit(node, newExpression, bindings);
+			return UpdateMemberInit(node, newExpression, bindings);
 		}
 
 		protected virtual MemberListBinding VisitMemberListBinding(MemberListBinding node)
 		{
 			var initializers = Visit<ElementInit>(node.Initializers, n => this.VisitElementInit(n));
-			return this.UpdateMemberListBinding(node, node.Member, initializers);
+			return UpdateMemberListBinding(node, node.Member, initializers);
 		}
 
 		protected virtual MemberMemberBinding VisitMemberMemberBinding(MemberMemberBinding node)
 		{
 			var bindings = Visit<MemberBinding>(node.Bindings, n => this.VisitMemberBinding(n));
-			return this.UpdateMemberMemberBinding(node, node.Member, bindings);
+			return UpdateMemberMemberBinding(node, node.Member, bindings);
 		}
 
 		protected virtual Expression VisitMethodCall(MethodCallExpression node)
 		{
 			var obj = this.Visit(node.Object);
 			var args = this.Visit(node.Arguments);
-			return this.UpdateMethodCall(node, obj, node.Method, args);
+			return UpdateMethodCall(node, obj, node.Method, args);
 		}
 
 		protected virtual Expression VisitNew(NewExpression node)
 		{
 			var args = this.Visit(node.Arguments);
-			return this.UpdateNew(node, node.Constructor, args, node.Members);
+			return UpdateNew(node, node.Constructor, args, node.Members);
 		}
 
 		protected virtual Expression VisitNewArray(NewArrayExpression node)
 		{
 			var expressions = this.Visit(node.Expressions);
-			return this.UpdateNewArray(node, node.Type, expressions);
+			return UpdateNewArray(node, node.Type, expressions);
 		}
 
 		protected virtual Expression VisitParameter(ParameterExpression node)
@@ -275,16 +278,16 @@ namespace System.Linq.Expressions
 		protected virtual Expression VisitTypeBinary(TypeBinaryExpression node)
 		{
 			var expression = this.Visit(node.Expression);
-			return this.UpdateTypeBinary(node, expression, node.TypeOperand);
+			return UpdateTypeBinary(node, expression, node.TypeOperand);
 		}
 
 		protected virtual Expression VisitUnary(UnaryExpression node)
 		{
 			var operand = this.Visit(node.Operand);
-			return this.UpdateUnary(node, operand, node.Type, node.Method);
+			return UpdateUnary(node, operand, node.Type, node.Method);
 		}
 
-		private BinaryExpression UpdateBinary(
+		private static BinaryExpression UpdateBinary(
 			BinaryExpression node,
 			Expression left,
 			Expression right,
@@ -306,7 +309,7 @@ namespace System.Linq.Expressions
 			return node;
 		}
 
-		private ConditionalExpression UpdateConditional(
+		private static ConditionalExpression UpdateConditional(
 			ConditionalExpression node,
 			Expression test,
 			Expression ifTrue,
@@ -320,7 +323,7 @@ namespace System.Linq.Expressions
 			return node;
 		}
 
-		private InvocationExpression UpdateInvocation(
+		private static InvocationExpression UpdateInvocation(
 			InvocationExpression node,
 			Expression expression,
 			IEnumerable<Expression> args)
@@ -333,7 +336,7 @@ namespace System.Linq.Expressions
 			return node;
 		}
 
-		private LambdaExpression UpdateLambda(
+		private static LambdaExpression UpdateLambda(
 			LambdaExpression node,
 			Type delegateType,
 			Expression body,
@@ -347,7 +350,7 @@ namespace System.Linq.Expressions
 			return node;
 		}
 
-		private ListInitExpression UpdateListInit(
+		private static ListInitExpression UpdateListInit(
 			ListInitExpression node,
 			NewExpression newExpression,
 			IEnumerable<ElementInit> initializers)
@@ -360,7 +363,7 @@ namespace System.Linq.Expressions
 			return node;
 		}
 
-		private MemberExpression UpdateMember(MemberExpression node, Expression expression, MemberInfo member)
+		private static MemberExpression UpdateMember(MemberExpression node, Expression expression, MemberInfo member)
 		{
 			if (expression != node.Expression || member != node.Member)
 			{
@@ -370,7 +373,7 @@ namespace System.Linq.Expressions
 			return node;
 		}
 
-		private MemberAssignment UpdateMemberAssignment(MemberAssignment node, MemberInfo member, Expression expression)
+		private static MemberAssignment UpdateMemberAssignment(MemberAssignment node, MemberInfo member, Expression expression)
 		{
 			if (expression != node.Expression || member != node.Member)
 			{
@@ -380,7 +383,7 @@ namespace System.Linq.Expressions
 			return node;
 		}
 
-		private MemberInitExpression UpdateMemberInit(
+		private static MemberInitExpression UpdateMemberInit(
 			MemberInitExpression node,
 			NewExpression newExpression,
 			IEnumerable<MemberBinding> bindings)
@@ -393,7 +396,7 @@ namespace System.Linq.Expressions
 			return node;
 		}
 
-		private MemberListBinding UpdateMemberListBinding(
+		private static MemberListBinding UpdateMemberListBinding(
 			MemberListBinding node,
 			MemberInfo member,
 			IEnumerable<ElementInit> initializers)
@@ -406,7 +409,7 @@ namespace System.Linq.Expressions
 			return node;
 		}
 
-		private MemberMemberBinding UpdateMemberMemberBinding(
+		private static MemberMemberBinding UpdateMemberMemberBinding(
 			MemberMemberBinding node,
 			MemberInfo member,
 			IEnumerable<MemberBinding> bindings)
@@ -419,7 +422,7 @@ namespace System.Linq.Expressions
 			return node;
 		}
 
-		private MethodCallExpression UpdateMethodCall(
+		private static MethodCallExpression UpdateMethodCall(
 			MethodCallExpression node,
 			Expression obj,
 			MethodInfo method,
@@ -433,7 +436,7 @@ namespace System.Linq.Expressions
 			return node;
 		}
 
-		private NewExpression UpdateNew(
+		private static NewExpression UpdateNew(
 			NewExpression node,
 			ConstructorInfo constructor,
 			IEnumerable<Expression> args,
@@ -452,7 +455,10 @@ namespace System.Linq.Expressions
 			return node;
 		}
 
-		private NewArrayExpression UpdateNewArray(NewArrayExpression node, Type arrayType, IEnumerable<Expression> expressions)
+		private static NewArrayExpression UpdateNewArray(
+			NewArrayExpression node,
+			Type arrayType,
+			IEnumerable<Expression> expressions)
 		{
 			if (expressions != node.Expressions || node.Type != arrayType)
 			{
@@ -467,7 +473,7 @@ namespace System.Linq.Expressions
 			return node;
 		}
 
-		private TypeBinaryExpression UpdateTypeBinary(TypeBinaryExpression node, Expression expression, Type typeOperand)
+		private static TypeBinaryExpression UpdateTypeBinary(TypeBinaryExpression node, Expression expression, Type typeOperand)
 		{
 			if (expression != node.Expression || typeOperand != node.TypeOperand)
 			{
@@ -477,7 +483,7 @@ namespace System.Linq.Expressions
 			return node;
 		}
 
-		private UnaryExpression UpdateUnary(UnaryExpression node, Expression operand, Type resultType, MethodInfo method)
+		private static UnaryExpression UpdateUnary(UnaryExpression node, Expression operand, Type resultType, MethodInfo method)
 		{
 			if (node.Operand != operand || node.Type != resultType || node.Method != method)
 			{
@@ -487,9 +493,9 @@ namespace System.Linq.Expressions
 			return node;
 		}
 
-		private Expression VisitUnknown(Expression node)
+		private static Expression VisitUnknown(Expression node)
 		{
-			throw new Exception(string.Format(
+			throw new InvalidOperationException(string.Format(
 				CultureInfo.CurrentCulture,
 				"Unhandled expression type: '{0}'",
 				node.NodeType));

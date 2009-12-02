@@ -54,6 +54,7 @@ namespace Moq
 	/// kind of signature.
 	/// </remarks>
 	[EditorBrowsable(EditorBrowsableState.Never)] // TODO: remove from v4.0
+	[Obsolete("Remove on v4.0")]
 	public class MockedEvent<TEventArgs> : MockedEvent
 		where TEventArgs : EventArgs
 	{

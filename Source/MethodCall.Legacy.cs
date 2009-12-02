@@ -45,6 +45,7 @@ namespace Moq
 {
 	partial class MethodCall
 	{
+		[Obsolete("Remove on v4.0")]
 		public IVerifies Raises(MockedEvent eventHandler, EventArgs args)
 		{
 			Guard.NotNull(() => args, args);
@@ -52,31 +53,37 @@ namespace Moq
 			return RaisesImpl(eventHandler, (Func<EventArgs>)(() => args));
 		}
 
+		[Obsolete("Remove on v4.0")]
 		public IVerifies Raises(MockedEvent eventHandler, Func<EventArgs> func)
 		{
 			return RaisesImpl(eventHandler, func);
 		}
 
+		[Obsolete("Remove on v4.0")]
 		public IVerifies Raises<T>(MockedEvent eventHandler, Func<T, EventArgs> func)
 		{
 			return RaisesImpl(eventHandler, func);
 		}
 
+		[Obsolete("Remove on v4.0")]
 		public IVerifies Raises<T1, T2>(MockedEvent eventHandler, Func<T1, T2, EventArgs> func)
 		{
 			return RaisesImpl(eventHandler, func);
 		}
 
+		[Obsolete("Remove on v4.0")]
 		public IVerifies Raises<T1, T2, T3>(MockedEvent eventHandler, Func<T1, T2, T3, EventArgs> func)
 		{
 			return RaisesImpl(eventHandler, func);
 		}
 
+		[Obsolete("Remove on v4.0")]
 		public IVerifies Raises<T1, T2, T3, T4>(MockedEvent eventHandler, Func<T1, T2, T3, T4, EventArgs> func)
 		{
 			return RaisesImpl(eventHandler, func);
 		}
 
+		[Obsolete("Remove on v4.0")]
 		private IVerifies RaisesImpl(MockedEvent eventHandler, Delegate func)
 		{
 			Guard.NotNull(() => eventHandler, eventHandler);

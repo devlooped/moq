@@ -128,7 +128,6 @@ namespace Moq.Linq
 
         public static bool IsInteger(Type type)
         {
-            Type nnType = GetNonNullableType(type);
             switch (Type.GetTypeCode(type))
             {
                 case TypeCode.SByte:

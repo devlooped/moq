@@ -42,6 +42,7 @@ using System;
 using System.ComponentModel;
 using System.Linq;
 using System.Reflection;
+using Moq.Properties;
 
 namespace Moq
 {
@@ -49,20 +50,20 @@ namespace Moq
 	/// Represents a generic event that has been mocked and can 
 	/// be rised.
 	/// </summary>
-	[EditorBrowsable(EditorBrowsableState.Never)] // TODO: remove from v4.0?
+	[EditorBrowsable(EditorBrowsableState.Never)] // TODO Remove on v4.0
 	public class MockedEvent
 	{
-		/// <summary>
-		/// Event raised whenever the mocked event is rised.
-		/// </summary>
-		public event EventHandler Raised;
-
-		Mock mock;
+		private Mock mock;
 
 		internal MockedEvent(Mock mock)
 		{
 			this.mock = mock;
 		}
+
+		/// <summary>
+		/// Event raised whenever the mocked event is rised.
+		/// </summary>
+		public event EventHandler Raised;
 
 		internal EventInfo Event { get; set; }
 
@@ -81,13 +82,17 @@ namespace Moq
 		/// </summary>
 		internal void DoRaise(EventArgs args)
 		{
-			if (Event == null)
+			if (this.Event == null)
+			{
 				throw new InvalidOperationException(Properties.Resources.RaisedUnassociatedEvent);
+			}
 
-			if (Raised != null)
-				Raised(this.mock.Object, EventArgs.Empty);
+			if (this.Raised != null)
+			{
+				this.Raised(this.mock.Object, EventArgs.Empty);
+			}
 
-			foreach (var del in mock.GetInvocationList(Event).ToList())
+			foreach (var del in mock.Interceptor.GetInvocationList(this.Event).ToArray())
 			{
 				del.InvokePreserveStack(mock.Object, args);
 			}
@@ -99,13 +104,17 @@ namespace Moq
 		/// </summary>
 		internal void DoRaise(params object[] args)
 		{
-			if (Event == null)
-				throw new InvalidOperationException(Properties.Resources.RaisedUnassociatedEvent);
+			if (this.Event == null)
+			{
+				throw new InvalidOperationException(Resources.RaisedUnassociatedEvent);
+			}
 
-			if (Raised != null)
-				Raised(this.mock.Object, EventArgs.Empty);
+			if (this.Raised != null)
+			{
+				this.Raised(this.mock.Object, EventArgs.Empty);
+			}
 
-			foreach (var del in mock.GetInvocationList(Event).ToList())
+			foreach (var del in mock.Interceptor.GetInvocationList(Event).ToArray())
 			{
 				// Non EventHandler-compatible delegates get the straight 
 				// arguments, not the typical "sender, args" arguments.

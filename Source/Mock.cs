@@ -58,7 +58,6 @@ namespace Moq
 		private bool callBase;
 		private DefaultValue defaultValue = DefaultValue.Empty;
 		private IDefaultValueProvider defaultValueProvider = new EmptyDefaultValueProvider();
-		private Dictionary<EventInfo, List<Delegate>> invocationLists = new Dictionary<EventInfo, List<Delegate>>();
 
 		/// <include file='Mock.xdoc' path='docs/doc[@for="Mock.ctor"]/*'/>
 		protected Mock()
@@ -127,7 +126,11 @@ namespace Moq
 		public virtual MockBehavior Behavior { get; internal set; }
 
 		/// <include file='Mock.xdoc' path='docs/doc[@for="Mock.CallBase"]/*'/>
-		public virtual bool CallBase { get { return callBase; } set { callBase = value; } }
+		public virtual bool CallBase
+		{
+			get { return callBase; }
+			set { callBase = value; }
+		}
 
 		/// <include file='Mock.xdoc' path='docs/doc[@for="Mock.DefaultValue"]/*'/>
 		public virtual DefaultValue DefaultValue
@@ -153,8 +156,8 @@ namespace Moq
 
 		private object GetObject()
 		{
-			var value = OnGetObject();
-			isInitialized = true;
+			var value = this.OnGetObject();
+			this.isInitialized = true;
 			return value;
 		}
 
@@ -335,19 +338,17 @@ namespace Moq
 			VerifyCalls(targetInterceptor, expected, expression, times);
 		}
 
-		private static MethodInfo GetMethod(Expression expression)
+		private static bool AreSameMethod(Expression left, Expression right)
 		{
-			var lambda = expression.ToLambda();
-			if (lambda != null)
+			var leftLambda = left.ToLambda();
+			var rightLambda = right.ToLambda();
+			if (leftLambda != null && rightLambda != null &&
+				leftLambda.Body is MethodCallExpression && rightLambda.Body is MethodCallExpression)
 			{
-				var method = lambda.Body as MethodCallExpression;
-				if (method != null)
-				{
-					return method.Method;
-				}
+				return leftLambda.ToMethodCall().Method == rightLambda.ToMethodCall().Method;
 			}
 
-			return null;
+			return false;
 		}
 
 		private static void VerifyCalls(
@@ -359,8 +360,7 @@ namespace Moq
 			var callCount = targetInterceptor.ActualCalls.Where(ac => expected.Matches(ac)).Count();
 			if (!times.Verify(callCount))
 			{
-				var setups = targetInterceptor.OrderedCalls
-					.Where(oc => GetMethod(oc.SetupExpression) == GetMethod(expression));
+				var setups = targetInterceptor.OrderedCalls.Where(oc => AreSameMethod(oc.SetupExpression, expression));
 				ThrowVerifyException(expected, setups, expression, times, callCount);
 			}
 		}
@@ -864,9 +864,14 @@ namespace Moq
 				return TranslateFluent(m.Expression.Type, ((PropertyInfo)m.Member).PropertyType, targetMethod, Visit(m.Expression), lambdaParam, lambdaBody);
 			}
 
-			private Expression TranslateFluent(Type objectType, Type returnType, MethodInfo targetMethod, Expression instance, ParameterExpression lambdaParam, Expression lambdaBody)
+			private static Expression TranslateFluent(
+				Type objectType,
+				Type returnType,
+				MethodInfo targetMethod,
+				Expression instance,
+				ParameterExpression lambdaParam,
+				Expression lambdaBody)
 			{
-				var mockType = typeof(Mock<>).MakeGenericType(returnType);
 				var funcType = typeof(Func<,>).MakeGenericType(objectType, returnType);
 
 				// This is the fluent extension method one, so pass the instance as one more arg.
@@ -881,10 +886,9 @@ namespace Moq
 				);
 			}
 
-			private MethodInfo GetTargetMethod(Type objectType, Type returnType)
+			private static MethodInfo GetTargetMethod(Type objectType, Type returnType)
 			{
 				returnType.ThrowIfNotMockeable();
-				//.FluentMock(mock => mock.Solution)
 				return FluentMockGenericMethod.MakeGenericMethod(objectType, returnType);
 			}
 		}
@@ -893,47 +897,17 @@ namespace Moq
 
 		#region Events
 
-		internal void AddEventHandler(EventInfo ev, Delegate handler)
-		{
-			List<Delegate> handlers;
-			if (!invocationLists.TryGetValue(ev, out handlers))
-			{
-				handlers = new List<Delegate>();
-				invocationLists.Add(ev, handlers);
-			}
-
-			handlers.Add(handler);
-		}
-
-		internal void RemoveEventHandler(EventInfo ev, Delegate handler)
-		{
-			List<Delegate> handlers;
-			if (invocationLists.TryGetValue(ev, out handlers))
-			{
-				handlers.Remove(handler);
-			}
-		}
-
-		internal IEnumerable<Delegate> GetInvocationList(EventInfo ev)
-		{
-			List<Delegate> handlers;
-			if (!invocationLists.TryGetValue(ev, out handlers))
-			{
-				return new Delegate[0];
-			}
-
-			return handlers;
-		}
-
 		/// <include file='Mock.xdoc' path='docs/doc[@for="Mock.CreateEventHandler{TEventArgs}"]/*'/>
-		[EditorBrowsable(EditorBrowsableState.Never)] // TODO: remove on v3.5
+		[EditorBrowsable(EditorBrowsableState.Never)]
+		[Obsolete("Remove on v3.5")]
 		public virtual MockedEvent<TEventArgs> CreateEventHandler<TEventArgs>() where TEventArgs : EventArgs
 		{
 			return new MockedEvent<TEventArgs>(this);
 		}
 
 		/// <include file='Mock.xdoc' path='docs/doc[@for="Mock.CreateEventHandler"]/*'/>
-		[EditorBrowsable(EditorBrowsableState.Never)] // TODO: remove on v3.5
+		[EditorBrowsable(EditorBrowsableState.Never)]
+		[Obsolete("Remove on v3.5")]
 		public virtual MockedEvent<EventArgs> CreateEventHandler()
 		{
 			return new MockedEvent<EventArgs>(this);
@@ -948,18 +922,19 @@ namespace Moq
 		public virtual Mock<TInterface> As<TInterface>()
 			where TInterface : class
 		{
-			if (isInitialized && !ImplementedInterfaces.Contains(typeof(TInterface)))
+			if (this.isInitialized && !this.ImplementedInterfaces.Contains(typeof(TInterface)))
 			{
-				throw new InvalidOperationException(Properties.Resources.AlreadyInitialized);
-			}
-			if (!typeof(TInterface).IsInterface)
-			{
-				throw new ArgumentException(Properties.Resources.AsMustBeInterface);
+				throw new InvalidOperationException(Resources.AlreadyInitialized);
 			}
 
-			if (!ImplementedInterfaces.Contains(typeof(TInterface)))
+			if (!typeof(TInterface).IsInterface)
 			{
-				ImplementedInterfaces.Add(typeof(TInterface));
+				throw new ArgumentException(Resources.AsMustBeInterface);
+			}
+
+			if (!this.ImplementedInterfaces.Contains(typeof(TInterface)))
+			{
+				this.ImplementedInterfaces.Add(typeof(TInterface));
 			}
 
 			return new AsInterface<TInterface>(this);

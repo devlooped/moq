@@ -40,8 +40,7 @@
 
 using System;
 using System.Collections.Generic;
-using System.Linq;
-using System.Text;
+using System.ComponentModel;
 using System.Reflection;
 
 namespace Moq
@@ -49,8 +48,7 @@ namespace Moq
 	internal class AsInterface<TInterface> : Mock<TInterface>
 		where TInterface : class
 	{
-		[System.Diagnostics.CodeAnalysis.SuppressMessage("Microsoft.Performance", "CA1823:AvoidUnusedPrivateFields", Justification = "It's used right below!")]
-		Mock owner;
+		private Mock owner;
 
 		public AsInterface(Mock owner)
 			: base(true)
@@ -60,53 +58,60 @@ namespace Moq
 
 		internal override Dictionary<MethodInfo, Mock> InnerMocks
 		{
-			get { return owner.InnerMocks; }
+			get { return this.owner.InnerMocks; }
 		}
 
 		internal override Interceptor Interceptor
 		{
-			get { return owner.Interceptor; }
-			set { owner.Interceptor = value; }
+			get { return this.owner.Interceptor; }
+			set { this.owner.Interceptor = value; }
 		}
 
-		internal override Type MockedType { get { return typeof(TInterface); } }
+		internal override Type MockedType
+		{
+			get { return typeof(TInterface); }
+		}
 
 		public override MockBehavior Behavior
 		{
-			get { return owner.Behavior; }
-			internal set { owner.Behavior = value; }
+			get { return this.owner.Behavior; }
+			internal set { this.owner.Behavior = value; }
 		}
 
 		public override bool CallBase
 		{
-			get { return owner.CallBase; }
-			set { owner.CallBase = value; }
+			get { return this.owner.CallBase; }
+			set { this.owner.CallBase = value; }
 		}
 
 		public override DefaultValue DefaultValue
 		{
-			get { return owner.DefaultValue; }
-			set { owner.DefaultValue = value; }
+			get { return this.owner.DefaultValue; }
+			set { this.owner.DefaultValue = value; }
 		}
 
 		public override TInterface Object
 		{
-			get { return owner.Object as TInterface; }
+			get { return this.owner.Object as TInterface; }
 		}
 
 		public override Mock<TNewInterface> As<TNewInterface>()
 		{
-			return owner.As<TNewInterface>();
+			return this.owner.As<TNewInterface>();
 		}
 
+		[EditorBrowsable(EditorBrowsableState.Never)]
+		[Obsolete("Remove in v3.5")]
 		public override MockedEvent<TEventArgs> CreateEventHandler<TEventArgs>()
 		{
-			return owner.CreateEventHandler<TEventArgs>();
+			return this.owner.CreateEventHandler<TEventArgs>();
 		}
 
+		[EditorBrowsable(EditorBrowsableState.Never)]
+		[Obsolete("Remove in v3.5")]
 		public override MockedEvent<EventArgs> CreateEventHandler()
 		{
-			return owner.CreateEventHandler();
+			return this.owner.CreateEventHandler();
 		}
 	}
 }

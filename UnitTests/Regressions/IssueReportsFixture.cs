@@ -808,6 +808,42 @@ namespace Moq.Tests.Regressions
 
 		#endregion
 
+		#region #184
+
+		public class _184
+		{
+			[Fact]
+			public void Test()
+			{
+				var fooRaised = false;
+				var barRaised = false;
+
+				var fooMock = new Mock<IFoo>();
+				var barMock = fooMock.As<IBar>();
+
+				fooMock.Object.FooEvent += (s, e) => fooRaised = true;
+				barMock.Object.BarEvent += (s, e) => barRaised = true;
+
+				fooMock.Raise(m => m.FooEvent += null, EventArgs.Empty);
+				barMock.Raise(m => m.BarEvent += null, EventArgs.Empty);
+
+				Assert.True(fooRaised);
+				Assert.True(barRaised);
+			}
+
+			public interface IFoo
+			{
+				event EventHandler FooEvent;
+			}
+
+			public interface IBar
+			{
+				event EventHandler BarEvent;
+			}
+		}
+
+		#endregion
+
 		#region #185
 
 		public class _185

@@ -71,7 +71,8 @@ namespace Moq.Language
 		///     .Raises(handler, EventArgs.Empty);
 		/// </code>
 		/// </example>
-		[EditorBrowsable(EditorBrowsableState.Never)] // TODO: remove on v3.5
+		[EditorBrowsable(EditorBrowsableState.Never)]
+		[Obsolete("Remove on v3.5")]
 		IVerifies Raises(MockedEvent eventHandler, EventArgs args);
 
 		/// <summary>
@@ -85,6 +86,7 @@ namespace Moq.Language
 		/// to pass when raising the event.</param>
 		/// <seealso cref="Raises(MockedEvent, EventArgs)"/>
 		[EditorBrowsable(EditorBrowsableState.Never)] // TODO: remove on v3.5
+		[Obsolete("Remove on v3.5")]
 		IVerifies Raises(MockedEvent eventHandler, Func<EventArgs> func);
 
 		/// <summary>
@@ -98,7 +100,8 @@ namespace Moq.Language
 		/// to pass when raising the event.</param>
 		/// <typeparam name="T">Type of the argument received by the expected invocation.</typeparam>
 		/// <seealso cref="Raises(MockedEvent, EventArgs)"/>
-		[EditorBrowsable(EditorBrowsableState.Never)] // TODO: remove on v3.5
+		[EditorBrowsable(EditorBrowsableState.Never)]
+		[Obsolete("Remove on v3.5")]
 		IVerifies Raises<T>(MockedEvent eventHandler, Func<T, EventArgs> func);
 
 		/// <summary>
@@ -113,7 +116,8 @@ namespace Moq.Language
 		/// <typeparam name="T1">Type of the first argument received by the expected invocation.</typeparam>
 		/// <typeparam name="T2">Type of the second argument received by the expected invocation.</typeparam>
 		/// <seealso cref="Raises(MockedEvent, EventArgs)"/>
-		[EditorBrowsable(EditorBrowsableState.Never)] // TODO: remove on v3.5
+		[EditorBrowsable(EditorBrowsableState.Never)]
+		[Obsolete("Remove on v3.5")]
 		IVerifies Raises<T1, T2>(MockedEvent eventHandler, Func<T1, T2, EventArgs> func);
 
 		/// <summary>
@@ -129,7 +133,8 @@ namespace Moq.Language
 		/// <typeparam name="T2">Type of the second argument received by the expected invocation.</typeparam>
 		/// <typeparam name="T3">Type of the third argument received by the expected invocation.</typeparam>
 		/// <seealso cref="Raises(MockedEvent, EventArgs)"/>
-		[EditorBrowsable(EditorBrowsableState.Never)] // TODO: remove on v3.5
+		[EditorBrowsable(EditorBrowsableState.Never)]
+		[Obsolete("Remove on v3.5")]
 		IVerifies Raises<T1, T2, T3>(MockedEvent eventHandler, Func<T1, T2, T3, EventArgs> func);
 
 		/// <summary>
@@ -146,7 +151,8 @@ namespace Moq.Language
 		/// <typeparam name="T3">Type of the third argument received by the expected invocation.</typeparam>
 		/// <typeparam name="T4">Type of the fourth argument received by the expected invocation.</typeparam>
 		/// <seealso cref="Raises(MockedEvent, EventArgs)"/>
-		[EditorBrowsable(EditorBrowsableState.Never)] // TODO: remove on v3.5
+		[EditorBrowsable(EditorBrowsableState.Never)]
+		[Obsolete("Remove in v3.5")]
 		IVerifies Raises<T1, T2, T3, T4>(MockedEvent eventHandler, Func<T1, T2, T3, T4, EventArgs> func);
 	}
 }
