@@ -515,5 +515,15 @@ namespace Moq.Properties {
                 return ResourceManager.GetString("VerficationFailed", resourceCulture);
             }
         }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Invalid verify on a non-overridable member:
+        ///{0}.
+        /// </summary>
+        internal static string VerifyOnNonOverridableMember {
+            get {
+                return ResourceManager.GetString("VerifyOnNonOverridableMember", resourceCulture);
+            }
+        }
     }
 }

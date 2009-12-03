@@ -5,8 +5,8 @@ private const int GenericTypeMin = 5;
 private const string GenericTypeFormat = "T{0}";
 private const string GenericArgumentFormat = "T{0} arg{0}";
 
-private static readonly string[] ordinalNumbers = new [] { "first", "second", "third", "fourth", "fifth", "sixth", "seventh", "eighth", "nineth", "tenth", "eleventh", "twelfth", "thirteenth", "fourteenth", "fifteenth", "sixteenth" };
-private static readonly string[] wordNumbers = new [] { "one", "two", "third", "four", "five", "six", "seven", "eight", "nine", "ten", "eleven", "twelve", "thirteen", "fourteen", "fifteen", "sixteen" };
+private static readonly string[] ordinalNumbers = new[] { "first", "second", "third", "fourth", "fifth", "sixth", "seventh", "eighth", "nineth", "tenth", "eleventh", "twelfth", "thirteenth", "fourteenth", "fifteenth", "sixteenth" };
+private static readonly string[] wordNumbers = new[] { "one", "two", "third", "four", "five", "six", "seven", "eight", "nine", "ten", "eleven", "twelve", "thirteen", "fourteen", "fifteen", "sixteen" };
 
 public static string ConvertToWord(int number)
 {

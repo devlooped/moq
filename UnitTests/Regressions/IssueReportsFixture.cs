@@ -959,6 +959,36 @@ namespace Moq.Tests.Regressions
 		}
 
 		#endregion
+	
+		#region #186
+
+		public class _186
+		{
+			[Fact]
+			public void TestVerifyMessage()
+			{
+				var mock = new Mock<Foo>();
+				mock.Setup(m => m.OnExecute());
+
+				var e = Assert.Throws<ArgumentException>(() => mock.Verify(m => m.Execute()));
+				Assert.True(e.Message.StartsWith("Invalid verify on a non-overridable member:\r\n"));
+			}
+
+			public class Foo
+			{
+				public void Execute()
+				{
+					this.OnExecute();
+				}
+
+				public virtual void OnExecute()
+				{
+					throw new NotImplementedException();
+				}
+			}
+		}
+ 
+		#endregion
 
 		#region #223
 

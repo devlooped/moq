@@ -78,7 +78,7 @@ namespace Moq.Language
 		/// </para>
 		/// <code>
 		/// mock.Setup(x => x.Execute(It.IsAny&lt;string&gt;()))
-		///     .Callback(command => Console.WriteLine(command));
+		///     .Callback((string command) => Console.WriteLine(command));
 		/// </code>
 		/// </example>
 		ICallbackResult Callback<T>(Action<T> action);
@@ -100,7 +100,7 @@ namespace Moq.Language
 		/// mock.Setup(x => x.Execute(
 		///                      It.IsAny&lt;string&gt;(),
 		///                      It.IsAny&lt;string&gt;()))
-		///     .Callback((arg1, arg2) => Console.WriteLine(arg1 + arg2));
+		///     .Callback((string arg1, string arg2) => Console.WriteLine(arg1 + arg2));
 		/// </code>
 		/// </example>
 		ICallbackResult Callback<T1, T2>(Action<T1, T2> action);
@@ -124,7 +124,7 @@ namespace Moq.Language
 		///                      It.IsAny&lt;string&gt;(),
 		///                      It.IsAny&lt;string&gt;(),
 		///                      It.IsAny&lt;string&gt;()))
-		///     .Callback((arg1, arg2, arg3) => Console.WriteLine(arg1 + arg2 + arg3));
+		///     .Callback((string arg1, string arg2, string arg3) => Console.WriteLine(arg1 + arg2 + arg3));
 		/// </code>
 		/// </example>
 		ICallbackResult Callback<T1, T2, T3>(Action<T1, T2, T3> action);
@@ -150,7 +150,7 @@ namespace Moq.Language
 		///                      It.IsAny&lt;string&gt;(),
 		///                      It.IsAny&lt;string&gt;(),
 		///                      It.IsAny&lt;string&gt;()))
-		///     .Callback((arg1, arg2, arg3, arg4) => Console.WriteLine(arg1 + arg2 + arg3 + arg4));
+		///     .Callback((string arg1, string arg2, string arg3, string arg4) => Console.WriteLine(arg1 + arg2 + arg3 + arg4));
 		/// </code>
 		/// </example>
 		ICallbackResult Callback<T1, T2, T3, T4>(Action<T1, T2, T3, T4> action);
@@ -178,7 +178,7 @@ namespace Moq.Language
 		///                      It.IsAny&lt;string&gt;(),
 		///                      It.IsAny&lt;string&gt;(),
 		///                      It.IsAny&lt;string&gt;()))
-		///     .Callback((arg1, arg2, arg3, arg4, arg5) => Console.WriteLine(arg1 + arg2 + arg3 + arg4 + arg5));
+		///     .Callback((string arg1, string arg2, string arg3, string arg4, string arg5) => Console.WriteLine(arg1 + arg2 + arg3 + arg4 + arg5));
 		/// </code>
 		/// </example>
 		ICallbackResult Callback<T1, T2, T3, T4, T5>(Action<T1, T2, T3, T4, T5> action);
@@ -208,7 +208,7 @@ namespace Moq.Language
 		///                      It.IsAny&lt;string&gt;(),
 		///                      It.IsAny&lt;string&gt;(),
 		///                      It.IsAny&lt;string&gt;()))
-		///     .Callback((arg1, arg2, arg3, arg4, arg5, arg6) => Console.WriteLine(arg1 + arg2 + arg3 + arg4 + arg5 + arg6));
+		///     .Callback((string arg1, string arg2, string arg3, string arg4, string arg5, string arg6) => Console.WriteLine(arg1 + arg2 + arg3 + arg4 + arg5 + arg6));
 		/// </code>
 		/// </example>
 		ICallbackResult Callback<T1, T2, T3, T4, T5, T6>(Action<T1, T2, T3, T4, T5, T6> action);
@@ -240,7 +240,7 @@ namespace Moq.Language
 		///                      It.IsAny&lt;string&gt;(),
 		///                      It.IsAny&lt;string&gt;(),
 		///                      It.IsAny&lt;string&gt;()))
-		///     .Callback((arg1, arg2, arg3, arg4, arg5, arg6, arg7) => Console.WriteLine(arg1 + arg2 + arg3 + arg4 + arg5 + arg6 + arg7));
+		///     .Callback((string arg1, string arg2, string arg3, string arg4, string arg5, string arg6, string arg7) => Console.WriteLine(arg1 + arg2 + arg3 + arg4 + arg5 + arg6 + arg7));
 		/// </code>
 		/// </example>
 		ICallbackResult Callback<T1, T2, T3, T4, T5, T6, T7>(Action<T1, T2, T3, T4, T5, T6, T7> action);
@@ -274,7 +274,7 @@ namespace Moq.Language
 		///                      It.IsAny&lt;string&gt;(),
 		///                      It.IsAny&lt;string&gt;(),
 		///                      It.IsAny&lt;string&gt;()))
-		///     .Callback((arg1, arg2, arg3, arg4, arg5, arg6, arg7, arg8) => Console.WriteLine(arg1 + arg2 + arg3 + arg4 + arg5 + arg6 + arg7 + arg8));
+		///     .Callback((string arg1, string arg2, string arg3, string arg4, string arg5, string arg6, string arg7, string arg8) => Console.WriteLine(arg1 + arg2 + arg3 + arg4 + arg5 + arg6 + arg7 + arg8));
 		/// </code>
 		/// </example>
 		ICallbackResult Callback<T1, T2, T3, T4, T5, T6, T7, T8>(Action<T1, T2, T3, T4, T5, T6, T7, T8> action);
@@ -310,7 +310,7 @@ namespace Moq.Language
 		///                      It.IsAny&lt;string&gt;(),
 		///                      It.IsAny&lt;string&gt;(),
 		///                      It.IsAny&lt;string&gt;()))
-		///     .Callback((arg1, arg2, arg3, arg4, arg5, arg6, arg7, arg8, arg9) => Console.WriteLine(arg1 + arg2 + arg3 + arg4 + arg5 + arg6 + arg7 + arg8 + arg9));
+		///     .Callback((string arg1, string arg2, string arg3, string arg4, string arg5, string arg6, string arg7, string arg8, string arg9) => Console.WriteLine(arg1 + arg2 + arg3 + arg4 + arg5 + arg6 + arg7 + arg8 + arg9));
 		/// </code>
 		/// </example>
 		ICallbackResult Callback<T1, T2, T3, T4, T5, T6, T7, T8, T9>(Action<T1, T2, T3, T4, T5, T6, T7, T8, T9> action);
@@ -348,7 +348,7 @@ namespace Moq.Language
 		///                      It.IsAny&lt;string&gt;(),
 		///                      It.IsAny&lt;string&gt;(),
 		///                      It.IsAny&lt;string&gt;()))
-		///     .Callback((arg1, arg2, arg3, arg4, arg5, arg6, arg7, arg8, arg9, arg10) => Console.WriteLine(arg1 + arg2 + arg3 + arg4 + arg5 + arg6 + arg7 + arg8 + arg9 + arg10));
+		///     .Callback((string arg1, string arg2, string arg3, string arg4, string arg5, string arg6, string arg7, string arg8, string arg9, string arg10) => Console.WriteLine(arg1 + arg2 + arg3 + arg4 + arg5 + arg6 + arg7 + arg8 + arg9 + arg10));
 		/// </code>
 		/// </example>
 		ICallbackResult Callback<T1, T2, T3, T4, T5, T6, T7, T8, T9, T10>(Action<T1, T2, T3, T4, T5, T6, T7, T8, T9, T10> action);
@@ -388,7 +388,7 @@ namespace Moq.Language
 		///                      It.IsAny&lt;string&gt;(),
 		///                      It.IsAny&lt;string&gt;(),
 		///                      It.IsAny&lt;string&gt;()))
-		///     .Callback((arg1, arg2, arg3, arg4, arg5, arg6, arg7, arg8, arg9, arg10, arg11) => Console.WriteLine(arg1 + arg2 + arg3 + arg4 + arg5 + arg6 + arg7 + arg8 + arg9 + arg10 + arg11));
+		///     .Callback((string arg1, string arg2, string arg3, string arg4, string arg5, string arg6, string arg7, string arg8, string arg9, string arg10, string arg11) => Console.WriteLine(arg1 + arg2 + arg3 + arg4 + arg5 + arg6 + arg7 + arg8 + arg9 + arg10 + arg11));
 		/// </code>
 		/// </example>
 		ICallbackResult Callback<T1, T2, T3, T4, T5, T6, T7, T8, T9, T10, T11>(Action<T1, T2, T3, T4, T5, T6, T7, T8, T9, T10, T11> action);
@@ -430,7 +430,7 @@ namespace Moq.Language
 		///                      It.IsAny&lt;string&gt;(),
 		///                      It.IsAny&lt;string&gt;(),
 		///                      It.IsAny&lt;string&gt;()))
-		///     .Callback((arg1, arg2, arg3, arg4, arg5, arg6, arg7, arg8, arg9, arg10, arg11, arg12) => Console.WriteLine(arg1 + arg2 + arg3 + arg4 + arg5 + arg6 + arg7 + arg8 + arg9 + arg10 + arg11 + arg12));
+		///     .Callback((string arg1, string arg2, string arg3, string arg4, string arg5, string arg6, string arg7, string arg8, string arg9, string arg10, string arg11, string arg12) => Console.WriteLine(arg1 + arg2 + arg3 + arg4 + arg5 + arg6 + arg7 + arg8 + arg9 + arg10 + arg11 + arg12));
 		/// </code>
 		/// </example>
 		ICallbackResult Callback<T1, T2, T3, T4, T5, T6, T7, T8, T9, T10, T11, T12>(Action<T1, T2, T3, T4, T5, T6, T7, T8, T9, T10, T11, T12> action);
@@ -474,7 +474,7 @@ namespace Moq.Language
 		///                      It.IsAny&lt;string&gt;(),
 		///                      It.IsAny&lt;string&gt;(),
 		///                      It.IsAny&lt;string&gt;()))
-		///     .Callback((arg1, arg2, arg3, arg4, arg5, arg6, arg7, arg8, arg9, arg10, arg11, arg12, arg13) => Console.WriteLine(arg1 + arg2 + arg3 + arg4 + arg5 + arg6 + arg7 + arg8 + arg9 + arg10 + arg11 + arg12 + arg13));
+		///     .Callback((string arg1, string arg2, string arg3, string arg4, string arg5, string arg6, string arg7, string arg8, string arg9, string arg10, string arg11, string arg12, string arg13) => Console.WriteLine(arg1 + arg2 + arg3 + arg4 + arg5 + arg6 + arg7 + arg8 + arg9 + arg10 + arg11 + arg12 + arg13));
 		/// </code>
 		/// </example>
 		ICallbackResult Callback<T1, T2, T3, T4, T5, T6, T7, T8, T9, T10, T11, T12, T13>(Action<T1, T2, T3, T4, T5, T6, T7, T8, T9, T10, T11, T12, T13> action);
@@ -520,7 +520,7 @@ namespace Moq.Language
 		///                      It.IsAny&lt;string&gt;(),
 		///                      It.IsAny&lt;string&gt;(),
 		///                      It.IsAny&lt;string&gt;()))
-		///     .Callback((arg1, arg2, arg3, arg4, arg5, arg6, arg7, arg8, arg9, arg10, arg11, arg12, arg13, arg14) => Console.WriteLine(arg1 + arg2 + arg3 + arg4 + arg5 + arg6 + arg7 + arg8 + arg9 + arg10 + arg11 + arg12 + arg13 + arg14));
+		///     .Callback((string arg1, string arg2, string arg3, string arg4, string arg5, string arg6, string arg7, string arg8, string arg9, string arg10, string arg11, string arg12, string arg13, string arg14) => Console.WriteLine(arg1 + arg2 + arg3 + arg4 + arg5 + arg6 + arg7 + arg8 + arg9 + arg10 + arg11 + arg12 + arg13 + arg14));
 		/// </code>
 		/// </example>
 		ICallbackResult Callback<T1, T2, T3, T4, T5, T6, T7, T8, T9, T10, T11, T12, T13, T14>(Action<T1, T2, T3, T4, T5, T6, T7, T8, T9, T10, T11, T12, T13, T14> action);
@@ -568,7 +568,7 @@ namespace Moq.Language
 		///                      It.IsAny&lt;string&gt;(),
 		///                      It.IsAny&lt;string&gt;(),
 		///                      It.IsAny&lt;string&gt;()))
-		///     .Callback((arg1, arg2, arg3, arg4, arg5, arg6, arg7, arg8, arg9, arg10, arg11, arg12, arg13, arg14, arg15) => Console.WriteLine(arg1 + arg2 + arg3 + arg4 + arg5 + arg6 + arg7 + arg8 + arg9 + arg10 + arg11 + arg12 + arg13 + arg14 + arg15));
+		///     .Callback((string arg1, string arg2, string arg3, string arg4, string arg5, string arg6, string arg7, string arg8, string arg9, string arg10, string arg11, string arg12, string arg13, string arg14, string arg15) => Console.WriteLine(arg1 + arg2 + arg3 + arg4 + arg5 + arg6 + arg7 + arg8 + arg9 + arg10 + arg11 + arg12 + arg13 + arg14 + arg15));
 		/// </code>
 		/// </example>
 		ICallbackResult Callback<T1, T2, T3, T4, T5, T6, T7, T8, T9, T10, T11, T12, T13, T14, T15>(Action<T1, T2, T3, T4, T5, T6, T7, T8, T9, T10, T11, T12, T13, T14, T15> action);
@@ -618,7 +618,7 @@ namespace Moq.Language
 		///                      It.IsAny&lt;string&gt;(),
 		///                      It.IsAny&lt;string&gt;(),
 		///                      It.IsAny&lt;string&gt;()))
-		///     .Callback((arg1, arg2, arg3, arg4, arg5, arg6, arg7, arg8, arg9, arg10, arg11, arg12, arg13, arg14, arg15, arg16) => Console.WriteLine(arg1 + arg2 + arg3 + arg4 + arg5 + arg6 + arg7 + arg8 + arg9 + arg10 + arg11 + arg12 + arg13 + arg14 + arg15 + arg16));
+		///     .Callback((string arg1, string arg2, string arg3, string arg4, string arg5, string arg6, string arg7, string arg8, string arg9, string arg10, string arg11, string arg12, string arg13, string arg14, string arg15, string arg16) => Console.WriteLine(arg1 + arg2 + arg3 + arg4 + arg5 + arg6 + arg7 + arg8 + arg9 + arg10 + arg11 + arg12 + arg13 + arg14 + arg15 + arg16));
 		/// </code>
 		/// </example>
 		ICallbackResult Callback<T1, T2, T3, T4, T5, T6, T7, T8, T9, T10, T11, T12, T13, T14, T15, T16>(Action<T1, T2, T3, T4, T5, T6, T7, T8, T9, T10, T11, T12, T13, T14, T15, T16> action);

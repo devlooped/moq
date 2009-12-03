@@ -82,7 +82,7 @@ namespace Moq.Language
 		/// </para>
 		/// <code>
 		/// mock.Setup(x => x.Execute(It.IsAny&lt;string&gt;()))
-		///     .Callback(command => Console.WriteLine(command));
+		///     .Callback((string command) => Console.WriteLine(command));
 		/// </code>
 		/// </example>
 		ICallbackResult Callback<T>(Action<T> action);
@@ -122,7 +122,7 @@ for (var typeCount = 2; typeCount <= GenericTypeMax; typeCount++)
 	}
 #>
 		///                      It.IsAny&lt;string&gt;()))
-		///     .Callback((<#= GetGenericList(typeCount, "arg{0}") #>) => Console.WriteLine(<#= GetGenericList(typeCount, "arg{0}", " + ") #>));
+		///     .Callback((<#= GetGenericList(typeCount, "string arg{0}") #>) => Console.WriteLine(<#= GetGenericList(typeCount, "arg{0}", " + ") #>));
 		/// </code>
 		/// </example>
 		ICallbackResult Callback<<#= typeList #>>(Action<<#= typeList #>> action);
