@@ -18,53 +18,6 @@ namespace Moq.Tests
 		}
 
 		[Fact]
-		public void ExpectsMethodNeverHappen()
-		{
-			var mock = new Mock<IFoo>();
-
-			mock.Setup(m => m.Execute("ping")).Returns("ack");
-			mock.Setup(m => m.Execute("ack")).Never();
-
-			Assert.Equal("ack", mock.Object.Execute("ping"));
-
-			MockException mex = Assert.Throws<MockException>(() => mock.Object.Execute("ack"));
-			Assert.Equal(MockException.ExceptionReason.SetupNever, mex.Reason);
-		}
-
-		[Fact]
-		public void VerifiesMethodNeverHappenSucceeds()
-		{
-			var mock = new Mock<IFoo>();
-
-			mock.Setup(m => m.Execute("ping")).Never();
-
-			mock.VerifyAll();
-		}
-
-		[Fact]
-		public void ExpectsPropertyGetNeverHappen()
-		{
-			var mock = new Mock<IFoo>();
-
-			mock.SetupGet(m => m.Value).Never();
-
-			int value;
-			MockException mex = Assert.Throws<MockException>(() => value = mock.Object.Value);
-			Assert.Equal(MockException.ExceptionReason.SetupNever, mex.Reason);
-		}
-
-		[Fact]
-		public void ExpectsPropertySetNeverHappen()
-		{
-			var mock = new Mock<IFoo>();
-
-			mock.SetupSet(m => m.Value).Never();
-
-			MockException mex = Assert.Throws<MockException>(() => mock.Object.Value = 5);
-			Assert.Equal(MockException.ExceptionReason.SetupNever, mex.Reason);
-		}
-
-		[Fact]
 		public void RepeatThrowsOnNPlusOneCall()
 		{
 			var repeat = 5;

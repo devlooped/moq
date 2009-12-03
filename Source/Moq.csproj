@@ -186,7 +186,6 @@
     <Compile Include="DefaultValue.cs" />
     <Compile Include="GlobalSuppressions.cs" />
     <Compile Include="IDefaultValueProvider.cs" />
-    <Compile Include="Language\INever.cs" />
     <Compile Include="Language\IRaise.Legacy.cs" />
     <Compile Include="Linq\ExpressionReplacer.cs" />
     <Compile Include="Linq\Query.cs" />

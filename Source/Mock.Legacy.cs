@@ -55,7 +55,7 @@ namespace Moq
 			ThrowIfPropertyNotWritable(prop);
 
 			var setter = prop.GetSetMethod();
-			ThrowIfCantOverrideOnSetup(expression, setter);
+			ThrowIfCantOverride(expression, setter);
 
 			var call = new SetterMethodCall<T1, TProperty>(mock, expression, setter, value);
 			var targetInterceptor = GetInterceptor(((MemberExpression)expression.Body).Expression, mock);

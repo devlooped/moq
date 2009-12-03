@@ -241,7 +241,7 @@ namespace Moq
 		{
 			var methodCall = expression.ToMethodCall();
 			var method = methodCall.Method;
-			ThrowIfCantOverrideOnVerify(expression, method);
+			ThrowIfNonVirtual(expression, method);
 			var args = methodCall.Arguments.ToArray();
 
 			var expected = new MethodCall(mock, expression, method, args) { FailMessage = failMessage };
@@ -263,7 +263,7 @@ namespace Moq
 			{
 				var methodCall = expression.ToMethodCall();
 				var method = methodCall.Method;
-				ThrowIfCantOverrideOnVerify(expression, method);
+				ThrowIfNonVirtual(expression, method);
 				var args = methodCall.Arguments.ToArray();
 
 				var expected = new MethodCallReturn<T, TResult>(mock, expression, method, args)
@@ -282,7 +282,7 @@ namespace Moq
 			where T : class
 		{
 			var method = expression.ToPropertyInfo().GetGetMethod();
-			ThrowIfCantOverrideOnVerify(expression, method);
+			ThrowIfNonVirtual(expression, method);
 			
 			var expected = new MethodCallReturn<T, TProperty>(mock, expression, method, new Expression[0])
 			{
@@ -299,7 +299,7 @@ namespace Moq
 			where T : class
 		{
 			var method = expression.ToPropertyInfo().GetSetMethod();
-			ThrowIfCantOverrideOnVerify(expression, method);
+			ThrowIfNonVirtual(expression, method);
 
 			var expected = new SetterMethodCall<T, TProperty>(mock, expression, method)
 			{
@@ -317,7 +317,7 @@ namespace Moq
 			where T : class
 		{
 			var method = expression.ToPropertyInfo().GetSetMethod();
-			ThrowIfCantOverrideOnVerify(expression, method);
+			ThrowIfNonVirtual(expression, method);
 
 			var expected = new SetterMethodCall<T, TProperty>(mock, expression, method, value)
 			{
@@ -425,7 +425,7 @@ namespace Moq
 				var args = methodCall.Arguments.ToArray();
 
 				ThrowIfNotMember(expression, method);
-				ThrowIfCantOverrideOnSetup(expression, method);
+				ThrowIfCantOverride(expression, method);
 				var call = new MethodCall<T1>(mock, expression, method, args);
 
 				var targetInterceptor = GetInterceptor(methodCall.Object, mock);
@@ -451,7 +451,7 @@ namespace Moq
 				var args = methodCall.Arguments.ToArray();
 
 				ThrowIfNotMember(expression, method);
-				ThrowIfCantOverrideOnSetup(expression, method);
+				ThrowIfCantOverride(expression, method);
 				var call = new MethodCallReturn<T1, TResult>(mock, expression, method, args);
 
 				var targetInterceptor = GetInterceptor(methodCall.Object, mock);
@@ -479,7 +479,7 @@ namespace Moq
 				ThrowIfPropertyNotReadable(prop);
 
 				var propGet = prop.GetGetMethod(true);
-				ThrowIfCantOverrideOnSetup(expression, propGet);
+				ThrowIfCantOverride(expression, propGet);
 
 				var call = new MethodCallReturn<T1, TProperty>(mock, expression, propGet, new Expression[0]);
 				// Directly casting to MemberExpression is fine as ToPropertyInfo would throw if it wasn't
@@ -533,7 +533,7 @@ namespace Moq
 			ThrowIfPropertyNotWritable(prop);
 
 			var propSet = prop.GetSetMethod(true);
-			ThrowIfCantOverrideOnSetup(expression, propSet);
+			ThrowIfCantOverride(expression, propSet);
 
 			var call = new SetterMethodCall<T1, TProperty>(mock, expression, propSet);
 			var targetInterceptor = GetInterceptor(((MemberExpression)expression.Body).Expression, mock);
@@ -762,7 +762,7 @@ namespace Moq
 			}
 		}
 
-		private static void ThrowIfCantOverrideOnSetup(Expression setup, MethodInfo method)
+		private static void ThrowIfCantOverride(Expression setup, MethodInfo method)
 		{
 			if (CantOverride(method))
 			{
@@ -773,13 +773,13 @@ namespace Moq
 			}
 		}
 
-		private static void ThrowIfCantOverrideOnVerify(Expression verify, MethodInfo method)
+		private static void ThrowIfNonVirtual(Expression verify, MethodInfo method)
 		{
 			if (CantOverride(method))
 			{
 				throw new ArgumentException(string.Format(
 					CultureInfo.CurrentCulture,
-					Resources.VerifyOnNonOverridableMember,
+					Resources.VerifyOnNonVirtualMember,
 					verify.ToStringFixed()));
 			}
 		}

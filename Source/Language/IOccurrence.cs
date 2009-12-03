@@ -39,6 +39,7 @@
 // http://www.opensource.org/licenses/bsd-license.php]
 
 using System.ComponentModel;
+using System;
 
 namespace Moq.Language
 {
@@ -58,6 +59,7 @@ namespace Moq.Language
 		///     .AtMostOnce();
 		/// </code>
 		/// </example>
+		[Obsolete("To verify this condition, use the overload to Verify that receives Times.AtMostOnce().")]
 		[EditorBrowsable(EditorBrowsableState.Never)]
 		IVerifies AtMostOnce();
 		/// <summary>
@@ -71,6 +73,7 @@ namespace Moq.Language
 		///     .AtMost( 5 );
 		/// </code>
 		/// </example>
+		[Obsolete("To verify this condition, use the overload to Verify that receives Times.AtMost(callCount).")]
 		[EditorBrowsable(EditorBrowsableState.Never)]
 		IVerifies AtMost(int callCount);
 	}

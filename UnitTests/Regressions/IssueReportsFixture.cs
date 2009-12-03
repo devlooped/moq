@@ -971,7 +971,7 @@ namespace Moq.Tests.Regressions
 				mock.Setup(m => m.OnExecute());
 
 				var e = Assert.Throws<ArgumentException>(() => mock.Verify(m => m.Execute()));
-				Assert.True(e.Message.StartsWith("Invalid verify on a non-overridable member:\r\n"));
+				Assert.True(e.Message.StartsWith("Invalid verify on a non-virtual member:\r\n"));
 			}
 
 			public class Foo

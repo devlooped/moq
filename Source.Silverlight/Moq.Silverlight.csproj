@@ -324,9 +324,6 @@
     <Compile Include="..\Source\Properties\AssemblyInfo.cs">
       <Link>Properties\AssemblyInfo.cs</Link>
     </Compile>
-    <Compile Include="..\Source\Language\INever.cs">
-      <Link>Language\INever.cs</Link>
-    </Compile>
     <Compile Include="..\Source\Matchers\RefMatcher.cs">
       <Link>Matchers\RefMatcher.cs</Link>
     </Compile>

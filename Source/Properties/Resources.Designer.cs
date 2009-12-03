@@ -517,12 +517,12 @@ namespace Moq.Properties {
         }
         
         /// <summary>
-        ///   Looks up a localized string similar to Invalid verify on a non-overridable member:
+        ///   Looks up a localized string similar to Invalid verify on a non-virtual member:
         ///{0}.
         /// </summary>
-        internal static string VerifyOnNonOverridableMember {
+        internal static string VerifyOnNonVirtualMember {
             get {
-                return ResourceManager.GetString("VerifyOnNonOverridableMember", resourceCulture);
+                return ResourceManager.GetString("VerifyOnNonVirtualMember", resourceCulture);
             }
         }
     }
