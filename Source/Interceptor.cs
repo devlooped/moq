@@ -81,16 +81,12 @@ namespace Moq
 
 		internal void Verify()
 		{
-			// The IsNever case would have thrown the moment the member is invoked, 
-			// so we can safely skip here all such setups.
-			VerifyOrThrow(call => call.IsVerifiable && !call.IsNever && !call.Invoked);
+			VerifyOrThrow(call => call.IsVerifiable && !call.Invoked);
 		}
 
 		internal void VerifyAll()
 		{
-			// The IsNever case would have thrown the moment the member is invoked, 
-			// so we can safely skip here all such setups.
-			VerifyOrThrow(call => !call.IsNever && !call.Invoked);
+			VerifyOrThrow(call => !call.Invoked);
 		}
 
 		private void VerifyOrThrow(Func<IProxyCall, bool> match)
@@ -166,15 +162,7 @@ namespace Moq
 
 					if (delegateInstance != null)
 					{
-						var mockEvent = delegateInstance.Target as MockedEvent;
-						if (mockEvent != null)
-						{
-							mockEvent.Event = eventInfo;
-						}
-						else
-						{
-							this.AddEventHandler(eventInfo, (Delegate)invocation.Arguments[0]);
-						}
+						this.AddEventHandler(eventInfo, (Delegate)invocation.Arguments[0]);
 					}
 
 					return;
@@ -187,16 +175,7 @@ namespace Moq
 
 					if (delegateInstance != null)
 					{
-						var mockEvent = delegateInstance.Target as MockedEvent;
-
-						if (mockEvent != null)
-						{
-							mockEvent.Event = null;
-						}
-						else
-						{
-							this.RemoveEventHandler(eventInfo, (Delegate)invocation.Arguments[0]);
-						}
+						this.RemoveEventHandler(eventInfo, (Delegate)invocation.Arguments[0]);
 					}
 
 					return;

@@ -11,10 +11,6 @@ namespace Moq.Tests
 		{
 			var view = new Mock<IFooView>();
 
-			var handler = view.CreateEventHandler<FooArgs>();
-
-			view.Object.FooSelected += handler;
-
 			var presenter = new FooPresenter(view.Object);
 			bool fired = false;
 
@@ -25,7 +21,7 @@ namespace Moq.Tests
 					Assert.Equal("foo", ((FooArgs)args).Value);
 				};
 
-			handler.Raise(new FooArgs { Value = "foo" });
+			view.Raise(v => v.FooSelected += null, new FooArgs { Value = "foo" });
 
 			Assert.True(fired);
 		}
@@ -38,9 +34,7 @@ namespace Moq.Tests
 
 			Assert.False(presenter.Canceled);
 
-			var handler = view.CreateEventHandler();
-			view.Object.Canceled += handler;
-			handler.Raise(EventArgs.Empty);
+			view.Raise(v => v.Canceled += null, EventArgs.Empty);
 
 			Assert.True(presenter.Canceled);
 		}
@@ -49,13 +43,11 @@ namespace Moq.Tests
 		public void ShouldExpectAddGenericHandler()
 		{
 			var view = new Mock<IFooView>();
-			var handler = view.CreateEventHandler();
-			view.Object.Canceled += handler;
 			var presenter = new FooPresenter(view.Object);
 
 			Assert.False(presenter.Canceled);
 
-			handler.Raise(EventArgs.Empty);
+			view.Raise(v => v.Canceled += null, EventArgs.Empty);
 
 			Assert.True(presenter.Canceled);
 		}
@@ -74,14 +66,11 @@ namespace Moq.Tests
 		{
 			var mock = new Mock<IAdder<string>>();
 
-			var handler = mock.CreateEventHandler();
 			var raised = false;
-			handler.Raised += delegate { raised = true; };
-
 			mock.Setup(add => add.Add(It.IsAny<string>()))
-				.Raises(handler, EventArgs.Empty);
+				.Raises(m => m.Added += null, EventArgs.Empty);
 
-			mock.Object.Added += handler;
+			mock.Object.Added += (s, e) => raised = true;
 
 			mock.Object.Add("foo");
 
@@ -93,14 +82,11 @@ namespace Moq.Tests
 		{
 			var mock = new Mock<IAdder<string>>();
 
-			var handler = mock.CreateEventHandler();
 			var raised = false;
-			handler.Raised += delegate { raised = true; };
-
 			mock.Setup(add => add.Add(It.IsAny<string>()))
-				.Raises(handler, EventArgs.Empty);
+				.Raises(m => m.Added += null, EventArgs.Empty);
 
-			mock.Object.Added += handler;
+			mock.Object.Added += (s, e) => raised = true;
 
 			mock.Object.Add("foo");
 
@@ -112,14 +98,12 @@ namespace Moq.Tests
 		{
 			var mock = new Mock<IAdder<string>>();
 
-			var handler = mock.CreateEventHandler();
 			var raised = false;
-			handler.Raised += delegate { raised = true; };
-			mock.Object.Added += handler;
+			mock.Object.Added += (s, e) => raised = true;
 
 			mock.Setup(add => add.Insert(It.IsAny<string>(), 0))
 				.Returns(1)
-				.Raises(handler, EventArgs.Empty);
+				.Raises(m => m.Added += null, EventArgs.Empty);
 
 			int value = mock.Object.Insert("foo", 0);
 
@@ -128,42 +112,12 @@ namespace Moq.Tests
 		}
 
 		[Fact]
-		public void ShouldThrowIfRaisesNullMockedEvent()
-		{
-			var mock = new Mock<IAdder<string>>();
-
-			Assert.Throws<ArgumentNullException>(() => mock.Setup(add => add.Add(It.IsAny<string>()))
-				.Raises((MockedEvent)null, EventArgs.Empty));
-		}
-
-		[Fact]
-		public void ShouldThrowIfRaisesNullArgs()
-		{
-			var mock = new Mock<IAdder<string>>();
-
-			Assert.Throws<ArgumentNullException>(() => mock.Setup(add => add.Add(It.IsAny<string>()))
-				.Raises(mock.CreateEventHandler(), (EventArgs)null));
-		}
-
-		[Fact]
 		public void ShouldPreserveStackTraceWhenRaisingEvent()
 		{
 			var mock = new Mock<IAdder<string>>();
-			var handler = mock.CreateEventHandler();
+			mock.Object.Added += (s, e) => { throw new InvalidOperationException(); };
 
-			mock.Object.Added += handler;
-			mock.Object.Added += delegate { throw new InvalidOperationException(); };
-
-			Assert.Throws<InvalidOperationException>(() => handler.Raise(EventArgs.Empty));
-		}
-
-		[Fact]
-		public void ShouldThrowIfRaisingNonAttachedEvent()
-		{
-			var mock = new Mock<IFooView>();
-			var handler = mock.CreateEventHandler();
-
-			Assert.Throws<InvalidOperationException>(() => handler.Raise(EventArgs.Empty));
+			Assert.Throws<InvalidOperationException>(() => mock.Raise(m => m.Added += null, EventArgs.Empty));
 		}
 
 		[Fact]
@@ -171,15 +125,11 @@ namespace Moq.Tests
 		{
 			var mock = new Mock<IAdder<string>>();
 
-			var handler = mock.CreateEventHandler();
 			var raised = false;
-			handler.Raised += delegate { raised = true; };
-
 			mock.Setup(add => add.Add(It.IsAny<string>()))
-				.Raises(handler, () => EventArgs.Empty);
+				.Raises(m => m.Added += null, () => EventArgs.Empty);
 
-			mock.Object.Added += handler;
-
+			mock.Object.Added += (s, e) => raised = true;
 			mock.Object.Add("foo");
 
 			Assert.True(raised);
@@ -190,18 +140,14 @@ namespace Moq.Tests
 		{
 			var mock = new Mock<IAdder<string>>();
 
-			var handler = mock.CreateEventHandler();
-
 			mock.Setup(add => add.Add(It.IsAny<string>()))
-				.Raises(handler, (string s) => new FooArgs { Value = s });
-
-			mock.Object.Added += handler;
+				.Raises(m => m.Added += null, (string s) => new FooArgs { Value = s });
 
 			var raised = false;
-			handler.Raised += (sender, args) => raised = true;
 
 			mock.Object.Added += (sender, args) =>
 			{
+				raised = true;
 				Assert.True(args is FooArgs);
 				Assert.Equal("foo", ((FooArgs)args).Value);
 			};
@@ -216,18 +162,14 @@ namespace Moq.Tests
 		{
 			var mock = new Mock<IAdder<string>>();
 
-			var handler = mock.CreateEventHandler();
-
 			mock.Setup(add => add.Do(It.IsAny<string>(), It.IsAny<int>()))
-				.Raises(handler, (string s, int i) => new FooArgs { Args = new object[] { s, i } });
-
-			mock.Object.Added += handler;
+				.Raises(m => m.Added += null, (string s, int i) => new FooArgs { Args = new object[] { s, i } });
 
 			var raised = false;
-			handler.Raised += (sender, args) => raised = true;
 
 			mock.Object.Added += (sender, args) =>
 			{
+				raised = true;
 				Assert.True(args is FooArgs);
 				Assert.Equal("foo", ((FooArgs)args).Args[0]);
 				Assert.Equal(5, ((FooArgs)args).Args[1]);
@@ -243,18 +185,14 @@ namespace Moq.Tests
 		{
 			var mock = new Mock<IAdder<string>>();
 
-			var handler = mock.CreateEventHandler();
-
 			mock.Setup(add => add.Do(It.IsAny<string>(), It.IsAny<int>(), It.IsAny<bool>()))
-				.Raises(handler, (string s, int i, bool b) => new FooArgs { Args = new object[] { s, i, b } });
-
-			mock.Object.Added += handler;
+				.Raises(m => m.Added += null, (string s, int i, bool b) => new FooArgs { Args = new object[] { s, i, b } });
 
 			var raised = false;
-			handler.Raised += (sender, args) => raised = true;
 
 			mock.Object.Added += (sender, args) =>
 			{
+				raised = true;
 				Assert.True(args is FooArgs);
 				Assert.Equal("foo", ((FooArgs)args).Args[0]);
 				Assert.Equal(5, ((FooArgs)args).Args[1]);
@@ -271,18 +209,14 @@ namespace Moq.Tests
 		{
 			var mock = new Mock<IAdder<string>>();
 
-			var handler = mock.CreateEventHandler();
-
 			mock.Setup(add => add.Do(It.IsAny<string>(), It.IsAny<int>(), It.IsAny<bool>(), It.IsAny<string>()))
-				.Raises(handler, (string s, int i, bool b, string v) => new FooArgs { Args = new object[] { s, i, b, v } });
-
-			mock.Object.Added += handler;
+				.Raises(m => m.Added += null, (string s, int i, bool b, string v) => new FooArgs { Args = new object[] { s, i, b, v } });
 
 			var raised = false;
-			handler.Raised += (sender, args) => raised = true;
 
 			mock.Object.Added += (sender, args) =>
 			{
+				raised = true;
 				Assert.True(args is FooArgs);
 				Assert.Equal("foo", ((FooArgs)args).Args[0]);
 				Assert.Equal(5, ((FooArgs)args).Args[1]);
@@ -303,33 +237,15 @@ namespace Moq.Tests
 		}
 
 		[Fact]
-		public void ShouldThrowIfRaisingDettachedEvent()
-		{
-			var mock = new Mock<IFooView>();
-			var handler = mock.CreateEventHandler();
-
-			mock.Object.Canceled += handler;
-
-			handler.Raise(EventArgs.Empty);
-
-			mock.Object.Canceled -= handler;
-
-			Assert.Throws<InvalidOperationException>(() => handler.Raise(EventArgs.Empty));
-		}
-
-		[Fact]
 		public void ShouldAttachAndDetachListener()
 		{
 			var parent = new Mock<IParent>(MockBehavior.Strict);
 			var raised = false;
 			EventHandler<EventArgs> listener = (sender, args) => raised = true;
 
-			var handler = parent.CreateEventHandler();
-			parent.Object.Event += handler;
-
 			parent.Object.Event += listener;
 
-			handler.Raise(EventArgs.Empty);
+			parent.Raise(p => p.Event += null, EventArgs.Empty);
 
 			Assert.True(raised);
 
@@ -337,7 +253,7 @@ namespace Moq.Tests
 
 			parent.Object.Event -= listener;
 
-			handler.Raise(EventArgs.Empty);
+			parent.Raise(p => p.Event += null, EventArgs.Empty);
 
 			Assert.False(raised);
 		}
@@ -350,12 +266,9 @@ namespace Moq.Tests
 			var parent = new Mock<IParent>(MockBehavior.Strict);
 			raisedField = false;
 
-			var handler = parent.CreateEventHandler();
-			parent.Object.Event += handler;
+			parent.Object.Event += this.OnRaised;
 
-			parent.Object.Event += OnRaised;
-
-			handler.Raise(EventArgs.Empty);
+			parent.Raise(p => p.Event += null, EventArgs.Empty);
 
 			Assert.True(raisedField);
 
@@ -363,7 +276,7 @@ namespace Moq.Tests
 
 			parent.Object.Event -= OnRaised;
 
-			handler.Raise(EventArgs.Empty);
+			parent.Raise(p => p.Event += null, EventArgs.Empty);
 
 			Assert.False(raisedField);
 		}
@@ -373,22 +286,19 @@ namespace Moq.Tests
 		{
 			var parent = new Mock<IParent>(MockBehavior.Strict);
 
-			var handler = parent.CreateEventHandler();
-			parent.Object.Event += handler;
-
 			parent.Object.Event += delegate
-									   {
-										   parent.Object.Event += delegate { raisedField = true; };
-									   };
+			{
+				parent.Object.Event += delegate { raisedField = true; };
+			};
 
-			handler.Raise(EventArgs.Empty);
+			parent.Raise(p => p.Event += null, EventArgs.Empty);
 
 			// we don't expect the inner event to be raised the first time
 			Assert.False(raisedField);
 
 			// the second time around, the event handler added the first time
 			// should kick in
-			handler.Raise(EventArgs.Empty);
+			parent.Raise(p => p.Event += null, EventArgs.Empty);
 
 			Assert.True(raisedField);
 		}

@@ -39,10 +39,8 @@
 // http://www.opensource.org/licenses/bsd-license.php]
 
 using System;
-using System.Collections.Generic;
 using System.Diagnostics.CodeAnalysis;
 using System.Linq.Expressions;
-using System.Reflection;
 using Moq.Language.Flow;
 using Moq.Proxy;
 
@@ -71,17 +69,20 @@ namespace Moq
 		}
 
 		/// <include file='Mock.Generic.xdoc' path='docs/doc[@for="Mock{T}.ctor()"]/*'/>
-		public Mock() : this(MockBehavior.Default)
+		public Mock()
+			: this(MockBehavior.Default)
 		{
 		}
 
 		/// <include file='Mock.Generic.xdoc' path='docs/doc[@for="Mock{T}.ctor(object[])"]/*'/>
-		public Mock(params object[] args) : this(MockBehavior.Default, args)
+		public Mock(params object[] args)
+			: this(MockBehavior.Default, args)
 		{
 		}
 
 		/// <include file='Mock.Generic.xdoc' path='docs/doc[@for="Mock{T}.ctor(MockBehavior)"]/*'/>
-		public Mock(MockBehavior behavior) : this(behavior, new object[0])
+		public Mock(MockBehavior behavior)
+			: this(behavior, new object[0])
 		{
 		}
 
@@ -316,12 +317,9 @@ namespace Moq
 		{
 			var ev = eventExpression.GetEvent(this.Object);
 
-			var me = new MockedEvent(this);
-			me.Event = ev;
-
 			try
 			{
-				me.DoRaise(args);
+				this.DoRaise(ev, args);
 			}
 			catch (Exception e)
 			{
@@ -337,12 +335,9 @@ namespace Moq
 		{
 			var ev = eventExpression.GetEvent(this.Object);
 
-			var me = new MockedEvent(this);
-			me.Event = ev;
-
 			try
 			{
-				me.DoRaise(args);
+				this.DoRaise(ev, args);
 			}
 			catch (Exception e)
 			{

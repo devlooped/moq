@@ -46,7 +46,7 @@ namespace Moq.Language.Flow
 	/// Implements the fluent API.
 	/// </summary>
 	[EditorBrowsable(EditorBrowsableState.Never)]
-	public interface ISetup<TMock> : ICallback, ICallbackResult, IRaise<TMock>, IRaise, IVerifies, IHideObjectMembers
+	public interface ISetup<TMock> : ICallback, ICallbackResult, IRaise<TMock>, IVerifies, IHideObjectMembers
 		where TMock : class
 	{
 	}
@@ -73,7 +73,7 @@ namespace Moq.Language.Flow
 	/// Implements the fluent API.
 	/// </summary>
 	[EditorBrowsable(EditorBrowsableState.Never)]
-	public interface ISetupSetter<TMock, TProperty> : ICallbackSetter<TProperty>, ICallbackResult, IRaise<TMock>, IRaise, IVerifies, IHideObjectMembers
+	public interface ISetupSetter<TMock, TProperty> : ICallbackSetter<TProperty>, ICallbackResult, IRaise<TMock>, IVerifies, IHideObjectMembers
 		where TMock : class
 	{
 	}

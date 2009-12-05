@@ -40,7 +40,6 @@
 
 using System;
 using System.Collections.Generic;
-using System.ComponentModel;
 using System.Reflection;
 
 namespace Moq
@@ -98,20 +97,6 @@ namespace Moq
 		public override Mock<TNewInterface> As<TNewInterface>()
 		{
 			return this.owner.As<TNewInterface>();
-		}
-
-		[EditorBrowsable(EditorBrowsableState.Never)]
-		[Obsolete("Remove in v3.5")]
-		public override MockedEvent<TEventArgs> CreateEventHandler<TEventArgs>()
-		{
-			return this.owner.CreateEventHandler<TEventArgs>();
-		}
-
-		[EditorBrowsable(EditorBrowsableState.Never)]
-		[Obsolete("Remove in v3.5")]
-		public override MockedEvent<EventArgs> CreateEventHandler()
-		{
-			return this.owner.CreateEventHandler();
 		}
 	}
 }

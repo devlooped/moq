@@ -40,7 +40,6 @@
 
 using System;
 using System.Collections.Generic;
-using System.ComponentModel;
 using System.Diagnostics.CodeAnalysis;
 using System.Globalization;
 using System.Linq;
@@ -914,22 +913,42 @@ namespace Moq
 
 		#endregion
 
-		#region Events
+		#region Raise
 
-		/// <include file='Mock.xdoc' path='docs/doc[@for="Mock.CreateEventHandler{TEventArgs}"]/*'/>
-		[EditorBrowsable(EditorBrowsableState.Never)]
-		[Obsolete("Remove on v3.5")]
-		public virtual MockedEvent<TEventArgs> CreateEventHandler<TEventArgs>() where TEventArgs : EventArgs
+		/// <summary>
+		/// Raises the associated event with the given 
+		/// event argument data.
+		/// </summary>
+		internal void DoRaise(EventInfo ev, EventArgs args)
 		{
-			return new MockedEvent<TEventArgs>(this);
+			if (ev == null)
+			{
+				throw new InvalidOperationException(Resources.RaisedUnassociatedEvent);
+			}
+
+			foreach (var del in this.Interceptor.GetInvocationList(ev).ToArray())
+			{
+				del.InvokePreserveStack(this.Object, args);
+			}
 		}
 
-		/// <include file='Mock.xdoc' path='docs/doc[@for="Mock.CreateEventHandler"]/*'/>
-		[EditorBrowsable(EditorBrowsableState.Never)]
-		[Obsolete("Remove on v3.5")]
-		public virtual MockedEvent<EventArgs> CreateEventHandler()
+		/// <summary>
+		/// Raises the associated event with the given 
+		/// event argument data.
+		/// </summary>
+		internal void DoRaise(EventInfo ev, params object[] args)
 		{
-			return new MockedEvent<EventArgs>(this);
+			if (ev == null)
+			{
+				throw new InvalidOperationException(Resources.RaisedUnassociatedEvent);
+			}
+
+			foreach (var del in this.Interceptor.GetInvocationList(ev).ToArray())
+			{
+				// Non EventHandler-compatible delegates get the straight 
+				// arguments, not the typical "sender, args" arguments.
+				del.InvokePreserveStack(args);
+			}
 		}
 
 		#endregion

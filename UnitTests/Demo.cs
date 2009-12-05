@@ -46,19 +46,13 @@ namespace Moq.Tests
 		public void TestPresenterSelection()
 		{
 			var mockView = new Mock<IOrdersView>();
-			var mockedEvent = mockView.CreateEventHandler<OrderEventArgs>();
-
 			var presenter = new OrdersPresenter(mockView.Object);
 
 			// Check that the presenter has no selection by default
 			Assert.Null(presenter.SelectedOrder);
 
-			// Create a mock event handler of the appropriate type
-			var handler = mockView.CreateEventHandler<OrderEventArgs>();
-			// Associate it with the event we want to raise
-			mockView.Object.OrderSelected += handler;
 			// Finally raise the event with a specific arguments data
-			handler.Raise(new OrderEventArgs { Order = new Order("moq", 500) });
+			mockView.Raise(mv => mv.OrderSelected += null, new OrderEventArgs { Order = new Order("moq", 500) });
 
 			// Now the presenter reacted to the event, and we have a selected order
 			Assert.NotNull(presenter.SelectedOrder);

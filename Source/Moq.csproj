@@ -126,7 +126,6 @@
     <Compile Include="MethodCallReturn.cs" />
     <Compile Include="Mock.cs" />
     <Compile Include="MockBehavior.cs" />
-    <Compile Include="MockedEvent.cs" />
     <Compile Include="MockException.cs" />
     <Compile Include="MockFactory.cs" />
     <Compile Include="Properties\Resources.Designer.cs">
@@ -186,7 +185,6 @@
     <Compile Include="DefaultValue.cs" />
     <Compile Include="GlobalSuppressions.cs" />
     <Compile Include="IDefaultValueProvider.cs" />
-    <Compile Include="Language\IRaise.Legacy.cs" />
     <Compile Include="Linq\ExpressionReplacer.cs" />
     <Compile Include="Linq\Query.cs" />
     <Compile Include="Linq\QueryProvider.cs" />
@@ -196,7 +194,6 @@
     <Compile Include="Matchers\ParamArrayMatcher.cs" />
     <Compile Include="Matchers\RefMatcher.cs" />
     <Compile Include="MemberInfoExtensions.cs" />
-    <Compile Include="MethodCall.Legacy.cs" />
     <Compile Include="Mock.Generic.cs" />
     <Compile Include="Mock.Generic.Legacy.cs">
       <SubType>Code</SubType>
@@ -204,7 +201,6 @@
     <Compile Include="FluentMockContext.cs" />
     <Compile Include="Mock.Legacy.cs" />
     <Compile Include="MockDefaultValueProvider.cs" />
-    <Compile Include="MockedEvent.Generic.cs" />
     <Compile Include="MockExtensions.cs" />
     <Compile Include="Mocks.cs" />
     <Compile Include="PexProtector.cs" />

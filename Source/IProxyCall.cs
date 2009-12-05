@@ -49,7 +49,6 @@ namespace Moq
 		int CallCount { get; }
 		string FailMessage { get; set; }
 		bool Invoked { get; set; }
-		bool IsNever { get; set; }
 		bool IsVerifiable { get; set; }
 		Expression SetupExpression { get; }
 

@@ -165,9 +165,6 @@
     <Compile Include="..\Source\Language\IRaise.cs">
       <Link>Language\IRaise.cs</Link>
     </Compile>
-    <Compile Include="..\Source\Language\IRaise.Legacy.cs">
-      <Link>Language\IRaise.Legacy.cs</Link>
-    </Compile>
     <Compile Include="..\Source\Language\IVerifies.cs">
       <Link>Language\IVerifies.cs</Link>
     </Compile>
@@ -252,9 +249,6 @@
     <Compile Include="..\Source\MethodCall.Generated.cs">
       <Link>MethodCall.Generated.cs</Link>
     </Compile>
-    <Compile Include="..\Source\MethodCall.Legacy.cs">
-      <Link>MethodCall.Legacy.cs</Link>
-    </Compile>
     <Compile Include="..\Source\MethodCallReturn.cs">
       <Link>MethodCallReturn.cs</Link>
     </Compile>
@@ -287,12 +281,6 @@
     </Compile>
     <Compile Include="..\Source\MockDefaultValueProvider.cs">
       <Link>MockDefaultValueProvider.cs</Link>
-    </Compile>
-    <Compile Include="..\Source\MockedEvent.cs">
-      <Link>MockedEvent.cs</Link>
-    </Compile>
-    <Compile Include="..\Source\MockedEvent.Generic.cs">
-      <Link>MockedEvent.Generic.cs</Link>
     </Compile>
     <Compile Include="..\Source\MockException.cs">
       <Link>MockException.cs</Link>

@@ -88,7 +88,7 @@ namespace Moq
 		private Action<object[]> callback;
 		private List<IMatcher> argumentMatchers = new List<IMatcher>();
 		private bool isOnce;
-		private MockedEvent mockEvent;
+		private EventInfo mockEvent;
 		private Delegate mockEventArgsFunc;
 		private object[] mockEventArgsParams;
 		private int? expectedCallCount = null;
@@ -101,8 +101,6 @@ namespace Moq
 
 		public string FailMessage { get; set; }
 		public bool IsVerifiable { get; set; }
-		// TODO should be obsolete
-		public bool IsNever { get; set; }
 		public bool Invoked { get; set; }
 
 		public Expression SetupExpression
@@ -251,13 +249,6 @@ namespace Moq
 					Times.Once().GetExceptionMessage(FailMessage, SetupExpression.ToStringFixed(), this.CallCount));
 			}
 
-			if (IsNever)
-			{
-				throw new MockException(
-					MockException.ExceptionReason.SetupNever,
-					Times.Never().GetExceptionMessage(FailMessage, SetupExpression.ToStringFixed(), this.CallCount));
-			}
-
 			if (expectedCallCount.HasValue && this.CallCount > expectedCallCount)
 			{
 				throw new MockException(
@@ -265,22 +256,22 @@ namespace Moq
 					Times.AtMost(expectedCallCount.Value).GetExceptionMessage(FailMessage, SetupExpression.ToStringFixed(), CallCount));
 			}
 
-			if (mockEvent != null)
+			if (this.mockEvent != null)
 			{
 				if (mockEventArgsParams != null)
 				{
-					mockEvent.DoRaise(mockEventArgsParams);
+					this.mock.DoRaise(this.mockEvent, mockEventArgsParams);
 				}
 				else
 				{
 					var argsFuncType = mockEventArgsFunc.GetType();
 					if (argsFuncType.IsGenericType && argsFuncType.GetGenericArguments().Length == 1)
 					{
-						mockEvent.DoRaise((EventArgs)mockEventArgsFunc.InvokePreserveStack());
+						this.mock.DoRaise(this.mockEvent, (EventArgs)mockEventArgsFunc.InvokePreserveStack());
 					}
 					else
 					{
-						mockEvent.DoRaise((EventArgs)mockEventArgsFunc.InvokePreserveStack(call.Arguments));
+						this.mock.DoRaise(this.mockEvent, (EventArgs)mockEventArgsFunc.InvokePreserveStack(call.Arguments));
 					}
 				}
 			}
@@ -385,11 +376,6 @@ namespace Moq
 			return this;
 		}
 
-		public void Never()
-		{
-			this.IsNever = true;
-		}
-
 		public IVerifies AtMost(int callCount)
 		{
 			this.expectedCallCount = callCount;
@@ -399,24 +385,16 @@ namespace Moq
 		protected IVerifies RaisesImpl<TMock>(Action<TMock> eventExpression, Delegate func)
 			where TMock : class
 		{
-			var ev = eventExpression.GetEvent((TMock)mock.Object);
-
-			mockEvent = new MockedEvent(mock);
-			mockEvent.Event = ev;
-			mockEventArgsFunc = func;
-
+			this.mockEvent = eventExpression.GetEvent((TMock)mock.Object);
+			this.mockEventArgsFunc = func;
 			return this;
 		}
 
 		protected IVerifies RaisesImpl<TMock>(Action<TMock> eventExpression, params object[] args)
 			where TMock : class
 		{
-			var ev = eventExpression.GetEvent((TMock)mock.Object);
-
-			mockEvent = new MockedEvent(mock);
-			mockEvent.Event = ev;
-			mockEventArgsParams = args;
-
+			this.mockEvent = eventExpression.GetEvent((TMock)mock.Object);
+			this.mockEventArgsParams = args;
 			return this;
 		}
 
@@ -424,9 +402,9 @@ namespace Moq
 		{
 			var message = new StringBuilder();
 
-			if (FailMessage != null)
+			if (this.FailMessage != null)
 			{
-				message.Append(FailMessage).Append(": ");
+				message.Append(this.FailMessage).Append(": ");
 			}
 
 			var lambda = SetupExpression.PartialMatcherAwareEval().ToLambda();
