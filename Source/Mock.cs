@@ -238,6 +238,8 @@ namespace Moq
 			Times times,
 			string failMessage)
 		{
+			Guard.NotNull(() => times, times);
+
 			var methodCall = expression.ToMethodCall();
 			var method = methodCall.Method;
 			ThrowIfNonVirtual(expression, method);
@@ -254,6 +256,8 @@ namespace Moq
 			string failMessage)
 			where T : class
 		{
+			Guard.NotNull(() => times, times);
+
 			if (expression.IsProperty())
 			{
 				VerifyGet<T, TResult>(mock, expression, times, failMessage);
@@ -282,7 +286,7 @@ namespace Moq
 		{
 			var method = expression.ToPropertyInfo().GetGetMethod();
 			ThrowIfNonVirtual(expression, method);
-			
+
 			var expected = new MethodCallReturn<T, TProperty>(mock, expression, method, new Expression[0])
 			{
 				FailMessage = failMessage
@@ -554,15 +558,16 @@ namespace Moq
 				setterExpression(mock.Object);
 
 				var last = context.LastInvocation;
-
 				if (last == null)
-					throw new ArgumentException(String.Format(
+				{
+					throw new ArgumentException(string.Format(
 						CultureInfo.InvariantCulture,
-						Properties.Resources.SetupOnNonOverridableMember,
-						""));
+						Resources.SetupOnNonOverridableMember,
+						string.Empty));
+				}
 
 				var setter = last.Invocation.Method;
-				if (!setter.IsSpecialName || !setter.Name.StartsWith("set_", StringComparison.Ordinal))
+				if (!setter.IsPropertySetter())
 				{
 					throw new ArgumentException(Resources.SetupNotSetter);
 				}

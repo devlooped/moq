@@ -64,6 +64,5 @@ namespace Moq
 
 			return call;
 		}
-
 	}
 }

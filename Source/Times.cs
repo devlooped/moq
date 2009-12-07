@@ -47,7 +47,7 @@ namespace Moq
 	/// <summary>
 	/// Defines the number of invocations allowed by a mocked method.
 	/// </summary>
-	public class Times
+	public struct Times
 	{
 		private Func<int, bool> evaluator;
 		private string messageFormat;

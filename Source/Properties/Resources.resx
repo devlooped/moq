@@ -183,12 +183,6 @@ mock.SetupGet(x =&gt; x.{1}).Returns(value); //equivalent to previous one
 mock.SetupSet(x =&gt; x.{1}).Callback(callbackDelegate);
 </value>
   </data>
-  <data name="UnsupportedProtectedProperty" xml:space="preserve">
-    <value>To specify a setup for protected property {0}.{1}, use:
-mock.Setup&lt;{2}&gt;(x =&gt; x.{1}).Returns(value);
-mock.SetupGet(x =&gt; x.{1}).Returns(value); //equivalent to previous one
-mock.SetupSet(x =&gt; x.{1}).Callback(callbackDelegate);</value>
-  </data>
   <data name="PropertyMissing" xml:space="preserve">
     <value>Property {0}.{1} does not exist.</value>
   </data>

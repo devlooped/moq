@@ -495,18 +495,6 @@ namespace Moq.Properties {
         }
         
         /// <summary>
-        ///   Looks up a localized string similar to To specify a setup for protected property {0}.{1}, use:
-        ///mock.Setup&lt;{2}&gt;(x =&gt; x.{1}).Returns(value);
-        ///mock.SetupGet(x =&gt; x.{1}).Returns(value); //equivalent to previous one
-        ///mock.SetupSet(x =&gt; x.{1}).Callback(callbackDelegate);.
-        /// </summary>
-        internal static string UnsupportedProtectedProperty {
-            get {
-                return ResourceManager.GetString("UnsupportedProtectedProperty", resourceCulture);
-            }
-        }
-        
-        /// <summary>
         ///   Looks up a localized string similar to The following setups were not matched:
         ///{0}.
         /// </summary>

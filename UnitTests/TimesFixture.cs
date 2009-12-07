@@ -8,7 +8,7 @@ namespace Moq.Tests
 		[Fact]
 		public void AtLeastOnceRangesBetweenOneAndMaxValue()
 		{
-			Times target = Times.AtLeastOnce();
+			var target = Times.AtLeastOnce();
 
 			Assert.False(target.Verify(-1));
 			Assert.False(target.Verify(0));
@@ -27,7 +27,7 @@ namespace Moq.Tests
 		[Fact]
 		public void AtLeastRangesBetweenTimesAndMaxValue()
 		{
-			Times target = Times.AtLeast(10);
+			var target = Times.AtLeast(10);
 
 			Assert.False(target.Verify(-1));
 			Assert.False(target.Verify(0));
@@ -39,7 +39,7 @@ namespace Moq.Tests
 		[Fact]
 		public void AtMostOnceRangesBetweenZeroAndOne()
 		{
-			Times target = Times.AtMostOnce();
+			var target = Times.AtMostOnce();
 
 			Assert.False(target.Verify(-1));
 			Assert.True(target.Verify(0));
@@ -58,7 +58,7 @@ namespace Moq.Tests
 		[Fact]
 		public void AtMostRangesBetweenZeroAndTimes()
 		{
-			Times target = Times.AtMost(10);
+			var target = Times.AtMost(10);
 
 			Assert.False(target.Verify(-1));
 			Assert.True(target.Verify(0));
@@ -86,7 +86,7 @@ namespace Moq.Tests
 		[Fact]
 		public void BetweenInclusiveRangesBetweenFromAndTo()
 		{
-			Times target = Times.Between(10, 20, Range.Inclusive);
+			var target = Times.Between(10, 20, Range.Inclusive);
 
 			Assert.False(target.Verify(0));
 			Assert.False(target.Verify(9));
@@ -115,7 +115,7 @@ namespace Moq.Tests
 		[Fact]
 		public void BetweenExclusiveRangesBetweenFromPlusOneAndToMinusOne()
 		{
-			Times target = Times.Between(10, 20, Range.Exclusive);
+			var target = Times.Between(10, 20, Range.Exclusive);
 
 			Assert.False(target.Verify(0));
 			Assert.False(target.Verify(10));
@@ -136,7 +136,7 @@ namespace Moq.Tests
 		[Fact]
 		public void ExactlyCheckExactTimes()
 		{
-			Times target = Times.Exactly(10);
+			var target = Times.Exactly(10);
 
 			Assert.False(target.Verify(-1));
 			Assert.False(target.Verify(0));
@@ -149,7 +149,7 @@ namespace Moq.Tests
 		[Fact]
 		public void NeverChecksZeroTimes()
 		{
-			Times target = Times.Never();
+			var target = Times.Never();
 
 			Assert.False(target.Verify(-1));
 			Assert.True(target.Verify(0));
@@ -160,7 +160,7 @@ namespace Moq.Tests
 		[Fact]
 		public void OnceChecksOneTime()
 		{
-			Times target = Times.Once();
+			var target = Times.Once();
 
 			Assert.False(target.Verify(-1));
 			Assert.False(target.Verify(0));

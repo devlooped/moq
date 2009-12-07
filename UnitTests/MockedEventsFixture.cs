@@ -15,11 +15,11 @@ namespace Moq.Tests
 			bool fired = false;
 
 			presenter.Fired += (sender, args) =>
-				{
-					fired = true;
-					Assert.True(args is FooArgs);
-					Assert.Equal("foo", ((FooArgs)args).Value);
-				};
+			{
+				fired = true;
+				Assert.True(args is FooArgs);
+				Assert.Equal("foo", ((FooArgs)args).Value);
+			};
 
 			view.Raise(v => v.FooSelected += null, new FooArgs { Value = "foo" });
 
@@ -390,8 +390,8 @@ namespace Moq.Tests
 		{
 			var mock = new Mock<WithEvent>();
 
-			Assert.Throws<ArgumentException>(() =>
-				mock.SetupSet(m => m.Value).Raises(m => m.ClassEvent += null, EventArgs.Empty));
+			Assert.Throws<ArgumentException>(
+				() => mock.SetupSet(m => m.Value).Raises(m => m.ClassEvent += null, EventArgs.Empty));
 		}
 
 		[Fact(Skip = "Events on non-virtual events not supported yet")]
@@ -414,7 +414,7 @@ namespace Moq.Tests
 			var mock = new Mock<WithEvent>();
 
 			var raised = false;
-			mock.Object.VirtualEvent += delegate { raised = true; };
+			mock.Object.VirtualEvent += (s, e) => raised = true;
 
 			// TODO: fix!!! We should go the GetInvocationList route here...
 			mock.Raise(x => x.VirtualEvent += null, EventArgs.Empty);
@@ -443,7 +443,8 @@ namespace Moq.Tests
 		{
 			var mock = new Mock<IAdder<int>>();
 
-			mock.Setup(m => m.Do("foo", 5)).Raises(m => m.Done += null, (string s, int i) => new DoneArgs { Value = s + i });
+			mock.Setup(m => m.Do("foo", 5))
+				.Raises(m => m.Done += null, (string s, int i) => new DoneArgs { Value = s + i });
 
 			DoneArgs args = null;
 			mock.Object.Done += (sender, e) => args = e;
@@ -459,7 +460,8 @@ namespace Moq.Tests
 		{
 			var mock = new Mock<IAdder<int>>();
 
-			mock.Setup(m => m.Do("foo", 5, true)).Raises(m => m.Done += null, (string s, int i, bool b) => new DoneArgs { Value = s + i + b });
+			mock.Setup(m => m.Do("foo", 5, true))
+				.Raises(m => m.Done += null, (string s, int i, bool b) => new DoneArgs { Value = s + i + b });
 
 			DoneArgs args = null;
 			mock.Object.Done += (sender, e) => args = e;
@@ -475,7 +477,8 @@ namespace Moq.Tests
 		{
 			var mock = new Mock<IAdder<int>>();
 
-			mock.Setup(m => m.Do("foo", 5, true, "bar")).Raises(m => m.Done += null, (string s, int i, bool b, string s1) => new DoneArgs { Value = s + i + b + s1 });
+			mock.Setup(m => m.Do("foo", 5, true, "bar"))
+				.Raises(m => m.Done += null, (string s, int i, bool b, string s1) => new DoneArgs { Value = s + i + b + s1 });
 
 			DoneArgs args = null;
 			mock.Object.Done += (sender, e) => args = e;
@@ -635,8 +638,8 @@ namespace Moq.Tests
 
 			public FooPresenter(IFooView view)
 			{
-				view.FooSelected += (sender, args) => Fired(sender, args);
-				view.Canceled += delegate { Canceled = true; };
+				view.FooSelected += (s, e) => Fired(s, e);
+				view.Canceled += (s, e) => Canceled = true;
 			}
 
 			public bool Canceled { get; set; }

@@ -41,217 +41,266 @@
 using System;
 using System.Collections.Generic;
 using System.Globalization;
-using System.Linq;
 using System.Linq.Expressions;
 using System.Reflection;
 using Moq.Language.Flow;
+using Moq.Properties;
 
 namespace Moq.Protected
 {
 	internal class ProtectedMock<T> : IProtectedMock<T>
 			where T : class
 	{
-		Mock<T> mock;
+		private Mock<T> mock;
 
 		public ProtectedMock(Mock<T> mock)
 		{
 			this.mock = mock;
 		}
 
-		public ISetup<T> Setup(string voidMethodName, params object[] args)
+		#region Setup
+
+		public ISetup<T> Setup(string methodName, params object[] args)
 		{
-			Guard.NotNullOrEmpty(() => voidMethodName, voidMethodName);
+			Guard.NotNullOrEmpty(() => methodName, methodName);
 
-			var method = typeof(T).GetMethod(voidMethodName,
-				BindingFlags.Instance | BindingFlags.NonPublic | BindingFlags.Public,
-				null,
-				ToArgTypes(args).ToArray(),
-				null);
+			var method = GetMethod(methodName, args);
+			ThrowIfMemberMissing(methodName, method);
+			ThrowIfPublicMethod(method);
+			ThrowIfCantOverride(method);
 
-			var property = typeof(T).GetProperty(voidMethodName,
-				BindingFlags.Instance | BindingFlags.NonPublic | BindingFlags.Public);
-
-			ThrowIfMemberMissing(voidMethodName, method, property);
-
-			VerifyMethod(method);
-			VerifyProperty(property);
-
-			if (method != null)
-			{
-				var param = Expression.Parameter(typeof(T), "x");
-
-				return mock.Setup(Expression.Lambda<Action<T>>(
-						Expression.Call(param, method, ToExpressionArgs(args)),
-						param));
-			}
-			else
-			{
-				throw new ArgumentException(String.Format(CultureInfo.CurrentCulture,
-					Properties.Resources.UnsupportedProtectedProperty,
-					property.ReflectedType.Name,
-					property.Name));
-			}
+			return Mock.Setup(mock, GetMethodCall(method, args));
 		}
 
-		public ISetup<T, TResult> Setup<TResult>(string methodOrPropertyName, params object[] args)
+		public ISetup<T, TResult> Setup<TResult>(string methodName, params object[] args)
 		{
-			Guard.NotNullOrEmpty(() => methodOrPropertyName, methodOrPropertyName);
+			Guard.NotNullOrEmpty(() => methodName, methodName);
 
-			var method = typeof(T).GetMethod(methodOrPropertyName,
-				BindingFlags.Instance | BindingFlags.NonPublic | BindingFlags.Public,
-				null,
-				ToArgTypes(args).ToArray(),
-				null);
-
-			var property = typeof(T).GetProperty(methodOrPropertyName,
-				BindingFlags.Instance | BindingFlags.NonPublic | BindingFlags.Public);
-
-			ThrowIfMemberMissing(methodOrPropertyName, method, property);
-
-			VerifyMethod(method);
-			VerifyProperty(property);
-
-			var param = Expression.Parameter(typeof(T), "x");
-
-			if (method != null)
+			var property = GetProperty(methodName);
+			if (property != null)
 			{
-				if (method.ReturnType == typeof(void))
-					throw new ArgumentException(Properties.Resources.CantSetReturnValueForVoid);
+				ThrowIfPublicProperty(property);
+				// TODO should consider property indexers
+				return Mock.SetupGet(mock, GetMemberAccess<TResult>(property));
+			}
 
-				return mock.Setup(Expression.Lambda<Func<T, TResult>>(
-						Expression.Call(param, method, ToExpressionArgs(args)),
-						param));
-			}
-			else
-			{
-				return mock.Setup(Expression.Lambda<Func<T, TResult>>(
-						Expression.MakeMemberAccess(param, property),
-						param));
-			}
+			var method = GetMethod(methodName, args);
+			ThrowIfMemberMissing(methodName, method);
+			ThrowIfVoidMethod(method);
+			ThrowIfPublicMethod(method);
+			ThrowIfCantOverride(method);
+
+			return Mock.Setup(mock, GetMethodCall<TResult>(method, args));
 		}
 
 		public ISetupGetter<T, TProperty> SetupGet<TProperty>(string propertyName)
 		{
 			Guard.NotNullOrEmpty(() => propertyName, propertyName);
 
-			var property = typeof(T).GetProperty(propertyName,
-				BindingFlags.Instance | BindingFlags.NonPublic | BindingFlags.Public);
-
-			ThrowIfPropertyMissing(propertyName, property);
-			VerifyProperty(property);
-
-			var param = Expression.Parameter(typeof(T), "x");
-
-			return mock.SetupGet(Expression.Lambda<Func<T, TProperty>>(
-					Expression.MakeMemberAccess(param, property),
-					param));
+			var property = GetProperty(propertyName);
+			ThrowIfMemberMissing(propertyName, property);
+			ThrowIfPublicProperty(property);
+			return Mock.SetupGet(mock, GetMemberAccess<TProperty>(property));
 		}
 
 		public ISetupSetter<T, TProperty> SetupSet<TProperty>(string propertyName)
 		{
 			Guard.NotNullOrEmpty(() => propertyName, propertyName);
 
-			var property = typeof(T).GetProperty(propertyName,
-				BindingFlags.Instance | BindingFlags.NonPublic | BindingFlags.Public);
-
-			ThrowIfPropertyMissing(propertyName, property);
-			VerifyProperty(property);
-
-			var param = Expression.Parameter(typeof(T), "x");
-
-			return mock.SetupSet(Expression.Lambda<Func<T, TProperty>>(
-					Expression.MakeMemberAccess(param, property),
-					param));
+			var property = GetProperty(propertyName);
+			ThrowIfMemberMissing(propertyName, property);
+			ThrowIfPublicProperty(property);
+			return Mock.SetupSet(mock, GetMemberAccess<TProperty>(property));
 		}
 
-		private static void VerifyMethod(MethodInfo method)
-		{
-			if (method != null)
-			{
-				if (method.IsPublic)
-					throw new ArgumentException(String.Format(CultureInfo.CurrentCulture,
-						Properties.Resources.MethodIsPublic,
-						method.ReflectedType.Name,
-						method.Name));
+		#endregion
 
-				if (method.IsAssembly || method.IsFamilyAndAssembly)
-					throw new ArgumentException(String.Format(CultureInfo.CurrentCulture,
-						Properties.Resources.SetupOnNonOverridableMember,
-						method.ReflectedType.Name + "." + method.Name));
+		#region Verify
+
+		public void Verify(string methodName, Times times, object[] args)
+		{
+			Guard.NotNullOrEmpty(() => methodName, methodName);
+
+			var method = GetMethod(methodName, args);
+			ThrowIfMemberMissing(methodName, method);
+			ThrowIfPublicMethod(method);
+			ThrowIfCantOverride(method);
+
+			Mock.Verify(mock, GetMethodCall(method, args), times, null);
+		}
+
+		public void Verify<TResult>(string methodName, Times times, object[] args)
+		{
+			Guard.NotNullOrEmpty(() => methodName, methodName);
+
+			var method = GetMethod(methodName, args);
+			ThrowIfMemberMissing(methodName, method);
+			ThrowIfPublicMethod(method);
+			ThrowIfCantOverride(method);
+
+		}
+
+		#endregion
+
+		private static Expression<Func<T, TResult>> GetMemberAccess<TResult>(PropertyInfo property)
+		{
+			var param = Expression.Parameter(typeof(T), "mock");
+			return Expression.Lambda<Func<T, TResult>>(Expression.MakeMemberAccess(param, property), param);
+		}
+
+		private static MethodInfo GetMethod(string methodName, params object[] args)
+		{
+			return typeof(T).GetMethod(
+				methodName,
+				BindingFlags.Instance | BindingFlags.NonPublic | BindingFlags.Public,
+				null,
+				ToArgTypes(args),
+				null);
+		}
+
+		private Expression<Func<T, TResult>> GetMethodCall<TResult>(MethodInfo method, object[] args)
+		{
+			var param = Expression.Parameter(typeof(T), "mock");
+			return Expression.Lambda<Func<T, TResult>>(Expression.Call(param, method, ToExpressionArgs(args)), param);
+		}
+
+		private Expression<Action<T>> GetMethodCall(MethodInfo method, object[] args)
+		{
+			var param = Expression.Parameter(typeof(T), "mock");
+			return Expression.Lambda<Action<T>>(Expression.Call(param, method, ToExpressionArgs(args)), param);
+		}
+
+		// TODO should support arguments for property indexers
+		private static PropertyInfo GetProperty(string propertyName)
+		{
+			return typeof(T).GetProperty(
+				propertyName,
+				BindingFlags.Instance | BindingFlags.NonPublic | BindingFlags.Public);
+		}
+
+		private static void ThrowIfNonVirtual(MethodInfo method)
+		{
+			if (method.IsAssembly || method.IsFamilyAndAssembly)
+			{
+				throw new ArgumentException(string.Format(
+					CultureInfo.CurrentCulture,
+					Resources.VerifyOnNonVirtualMember,
+					method.ReflectedType.Name + "." + method.Name));
 			}
 		}
 
-		private static void VerifyProperty(PropertyInfo property)
+		private static void ThrowIfCantOverride(MethodInfo method)
 		{
-			if (property != null &&
-				((property.CanRead && property.GetGetMethod() != null ||
-				(property.CanWrite && property.GetSetMethod() != null))))
+			if (method.IsAssembly || method.IsFamilyAndAssembly)
 			{
-				throw new ArgumentException(String.Format(CultureInfo.CurrentCulture,
-					Properties.Resources.UnexpectedPublicProperty,
+				throw new ArgumentException(string.Format(
+					CultureInfo.CurrentCulture,
+					Resources.SetupOnNonOverridableMember,
+					method.ReflectedType.Name + "." + method.Name));
+			}
+		}
+
+		private static void ThrowIfMemberMissing(string memberName, MemberInfo member)
+		{
+			if (member == null)
+			{
+				throw new ArgumentException(string.Format(
+					CultureInfo.CurrentCulture,
+					Resources.MemberMissing,
+					typeof(T).Name,
+					memberName));
+			}
+		}
+
+		private static void ThrowIfPublicMethod(MethodInfo method)
+		{
+			if (method.IsPublic)
+			{
+				throw new ArgumentException(string.Format(
+					CultureInfo.CurrentCulture,
+					Resources.MethodIsPublic,
+					method.ReflectedType.Name,
+					method.Name));
+			}
+		}
+
+		private static void ThrowIfPublicProperty(PropertyInfo property)
+		{
+			if (property.CanRead && property.GetGetMethod() != null ||
+				property.CanWrite && property.GetSetMethod() != null)
+			{
+				throw new ArgumentException(string.Format(
+					CultureInfo.CurrentCulture,
+					Resources.UnexpectedPublicProperty,
 					property.ReflectedType.Name,
 					property.Name));
 			}
 		}
 
-		private IEnumerable<Type> ToArgTypes(object[] args)
+		private static void ThrowIfVoidMethod(MethodInfo method)
 		{
-			if (args != null)
+			if (method.ReturnType == typeof(void))
 			{
-				foreach (var arg in args)
-				{
-					if (arg == null)
-					{
-						throw new ArgumentException("Use ItExpr.IsNull<TValue> rather than a null argument value, as it prevents proper method lookup.");
-					}
-					else
-					{
-						var expr = arg as Expression;
-						if (expr == null)
-						{
-							yield return arg.GetType();
-						}
-						else
-						{
-							if (expr.NodeType == ExpressionType.Call)
-							{
-								yield return ((MethodCallExpression)expr).Method.ReturnType;
-							}
-							else if (expr.NodeType == ExpressionType.MemberAccess)
-							{
-								var member = (MemberExpression)expr;
-
-								switch (member.Member.MemberType)
-								{
-									case MemberTypes.Field:
-										yield return ((FieldInfo)member.Member).FieldType;
-										break;
-									case MemberTypes.Property:
-										yield return ((PropertyInfo)member.Member).PropertyType;
-										break;
-									default:
-										throw new NotSupportedException(String.Format(
-											Properties.Resources.UnsupportedMember,
-											member.Member.Name));
-								}
-							}
-							else
-							{
-								var evalExpr = expr.PartialEval();
-
-								if (evalExpr.NodeType == ExpressionType.Constant)
-									yield return ((ConstantExpression)evalExpr).Type;
-								else
-									yield return null;
-							}
-						}
-					}
-				}
+				throw new ArgumentException(Resources.CantSetReturnValueForVoid);
 			}
-			else
+		}
+
+		private static Type[] ToArgTypes(object[] args)
+		{
+			if (args == null)
 			{
 				throw new ArgumentException("Use ItExpr.IsNull<TValue> rather than a null argument value, as it prevents proper method lookup.");
 			}
+
+			var types = new Type[args.Length];
+			for (int index = 0; index < args.Length; index++)
+			{
+				if (args[index] == null)
+				{
+					throw new ArgumentException("Use ItExpr.IsNull<TValue> rather than a null argument value, as it prevents proper method lookup.");
+				}
+
+				var expr = args[index] as Expression;
+				if (expr == null)
+				{
+					types[index] = args[index].GetType();
+				}
+				else if (expr.NodeType == ExpressionType.Call)
+				{
+					types[index] = ((MethodCallExpression)expr).Method.ReturnType;
+				}
+				else if (expr.NodeType == ExpressionType.MemberAccess)
+				{
+					var member = (MemberExpression)expr;
+					switch (member.Member.MemberType)
+					{
+						case MemberTypes.Field:
+							types[index] = ((FieldInfo)member.Member).FieldType;
+							break;
+						case MemberTypes.Property:
+							types[index] = ((PropertyInfo)member.Member).PropertyType;
+							break;
+						default:
+							throw new NotSupportedException(string.Format(
+								Resources.UnsupportedMember,
+								member.Member.Name));
+					}
+				}
+				else
+				{
+					var evalExpr = expr.PartialEval();
+					if (evalExpr.NodeType == ExpressionType.Constant)
+					{
+						types[index] = ((ConstantExpression)evalExpr).Type;
+					}
+					else
+					{
+						types[index] = null;
+					}
+				}
+			}
+
+			return types;
 		}
 
 		private static IEnumerable<Expression> ToExpressionArgs(object[] args)
@@ -262,34 +311,18 @@ namespace Moq.Protected
 				if (expr != null)
 				{
 					if (expr.NodeType == ExpressionType.Lambda)
+					{
 						yield return ((LambdaExpression)expr).Body;
+					}
 					else
+					{
 						yield return expr;
+					}
 				}
 				else
 				{
 					yield return Expression.Constant(arg);
 				}
-			}
-		}
-
-		private static void ThrowIfPropertyMissing(string propertyName, PropertyInfo property)
-		{
-			if (property == null)
-			{
-				throw new ArgumentException(String.Format(CultureInfo.CurrentCulture,
-					Properties.Resources.MemberMissing,
-					typeof(T).Name, propertyName));
-			}
-		}
-
-		private static void ThrowIfMemberMissing(string memberName, MethodInfo method, PropertyInfo property)
-		{
-			if (method == null && property == null)
-			{
-				throw new ArgumentException(String.Format(CultureInfo.CurrentCulture,
-					Properties.Resources.MemberMissing,
-					typeof(T).Name, memberName));
 			}
 		}
 	}

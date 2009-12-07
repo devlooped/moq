@@ -159,9 +159,7 @@ namespace Moq.Tests
 		{
 			var mock = new Mock<IFoo>();
 
-			MockException me = Assert.Throws<MockException>(
-				() => mock.VerifySet(f => f.Value, "Nobody called .Value"));
-
+			var me = Assert.Throws<MockException>(() => mock.VerifySet(f => f.Value, "Nobody called .Value"));
 			Assert.True(me.Message.Contains("Nobody called .Value"));
 			Assert.True(me.Message.Contains("f.Value"));
 		}
@@ -171,9 +169,7 @@ namespace Moq.Tests
 		{
 			var mock = new Mock<IFoo>();
 
-			var e = Assert.Throws<MockException>(
-				() => mock.VerifySet(f => f.Value = 5, "Nobody called .Value"));
-
+			var e = Assert.Throws<MockException>(() => mock.VerifySet(f => f.Value = 5, "Nobody called .Value"));
 			Assert.Contains("Nobody called .Value", e.Message);
 			Assert.Contains("f.Value", e.Message);
 		}
@@ -210,8 +206,7 @@ namespace Moq.Tests
 			var disposable = new Mock<IDisposable>();
 			var mock = disposable.As<IFoo>();
 
-			MockException me = Assert.Throws<MockException>(
-				() => mock.VerifyGet(f => f.Value, "Nobody called .Value"));
+			var me = Assert.Throws<MockException>(() => mock.VerifyGet(f => f.Value, "Nobody called .Value"));
 			Assert.True(me.Message.Contains("Nobody called .Value"));
 			Assert.True(me.Message.Contains("f.Value"));
 		}
@@ -233,9 +228,7 @@ namespace Moq.Tests
 			var disposable = new Mock<IDisposable>();
 			var mock = disposable.As<IBar>();
 
-			var e = Assert.Throws<MockException>(
-				() => mock.VerifySet(f => f.Value = 5, "Nobody called .Value"));
-
+			var e = Assert.Throws<MockException>(() => mock.VerifySet(f => f.Value = 5, "Nobody called .Value"));
 			Assert.True(e.Message.Contains("Nobody called .Value"));
 			Assert.True(e.Message.Contains("f.Value"));
 		}
@@ -245,7 +238,7 @@ namespace Moq.Tests
 		{
 			var mock = new Mock<IFoo>();
 
-			MockException mex = Assert.Throws<MockException>(() => mock.VerifyGet(f => f.Value));
+			var mex = Assert.Throws<MockException>(() => mock.VerifyGet(f => f.Value));
 			Assert.Equal(MockException.ExceptionReason.VerificationFailed, mex.Reason);
 		}
 
@@ -374,8 +367,7 @@ namespace Moq.Tests
 
 			mock.Object.Submit();
 
-			MockException mex = Assert.Throws<MockException>(() =>
-				mock.Verify(foo => foo.Submit(), Times.Never()));
+			var mex = Assert.Throws<MockException>(() => mock.Verify(foo => foo.Submit(), Times.Never()));
 			Assert.Equal(MockException.ExceptionReason.VerificationFailed, mex.Reason);
 			Assert.True(mex.Message.StartsWith(
 				"\r\nExpected invocation on the mock should never have been performed, but was 1 times: foo => foo.Submit()"));
@@ -386,8 +378,7 @@ namespace Moq.Tests
 		{
 			var mock = new Mock<IFoo>();
 
-			MockException mex = Assert.Throws<MockException>(() =>
-				mock.Verify(foo => foo.Submit(), Times.AtLeastOnce()));
+			var mex = Assert.Throws<MockException>(() => mock.Verify(foo => foo.Submit(), Times.AtLeastOnce()));
 			Assert.Equal(MockException.ExceptionReason.VerificationFailed, mex.Reason);
 			Assert.True(mex.Message.StartsWith(
 				"\r\nExpected invocation on the mock at least once, but was never performed: foo => foo.Submit()"));
@@ -405,8 +396,7 @@ namespace Moq.Tests
 			mock.Object.Submit();
 			mock.Object.Submit();
 
-			MockException mex = Assert.Throws<MockException>(
-				() => mock.Verify(foo => foo.Submit(), Times.AtLeast(3)));
+			var mex = Assert.Throws<MockException>(() => mock.Verify(foo => foo.Submit(), Times.AtLeast(3)));
 			Assert.Equal(MockException.ExceptionReason.VerificationFailed, mex.Reason);
 			Assert.True(mex.Message.StartsWith(
 				"\r\nExpected invocation on the mock at least 3 times, but was 2 times: foo => foo.Submit()"));
@@ -426,8 +416,7 @@ namespace Moq.Tests
 			mock.Object.Submit();
 			mock.Object.Submit();
 
-			var mex = Assert.Throws<MockException>(
-				() => mock.Verify(foo => foo.Submit(), Times.Exactly(5)));
+			var mex = Assert.Throws<MockException>(() => mock.Verify(foo => foo.Submit(), Times.Exactly(5)));
 			Assert.Equal(MockException.ExceptionReason.VerificationFailed, mex.Reason);
 			Assert.True(mex.Message.StartsWith(
 				"\r\nExpected invocation on the mock exactly 5 times, but was 4 times: foo => foo.Submit()"));
@@ -449,8 +438,7 @@ namespace Moq.Tests
 		{
 			var mock = new Mock<IFoo>();
 
-			var mex = Assert.Throws<MockException>(
-				() => mock.Verify(foo => foo.Submit(), Times.Once()));
+			var mex = Assert.Throws<MockException>(() => mock.Verify(foo => foo.Submit(), Times.Once()));
 			Assert.Equal(MockException.ExceptionReason.VerificationFailed, mex.Reason);
 			Assert.True(mex.Message.StartsWith(
 				"\r\nExpected invocation on the mock once, but was 0 times: foo => foo.Submit()"));

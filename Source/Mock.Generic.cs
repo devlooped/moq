@@ -310,6 +310,8 @@ namespace Moq
 
 		#endregion
 
+		#region Raise
+
 		/// <include file='Mock.Generic.xdoc' path='docs/doc[@for="Mock{T}.Raise"]/*'/>
 		[SuppressMessage("Microsoft.Design", "CA1030:UseEventsWhereAppropriate", Justification = "Raises the event, rather than being one.")]
 		[SuppressMessage("Microsoft.Usage", "CA2200:RethrowToPreserveStackDetails", Justification = "We want to reset the stack trace to avoid Moq noise in it.")]
@@ -345,6 +347,8 @@ namespace Moq
 				throw e;
 			}
 		}
+
+		#endregion
 
 		// NOTE: known issue. See https://connect.microsoft.com/VisualStudio/feedback/ViewFeedback.aspx?FeedbackID=318122
 		//public static implicit operator TInterface(Mock<T> mock)

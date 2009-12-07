@@ -50,41 +50,73 @@ namespace Moq.Protected
 	public interface IProtectedMock<TMock> : IHideObjectMembers
 		where TMock : class
 	{
+		#region Setup
+
 		/// <summary>
 		/// Specifies a setup for a void method invocation with the given 
-		/// <paramref name="voidMethodName"/>, optionally specifying 
-		/// arguments for the method call.
+		/// <paramref name="voidMethodName"/>, optionally specifying arguments for the method call.
 		/// </summary>
-		/// <param name="voidMethodName">Name of the void method to be invoke.</param>
-		/// <param name="args">Optional arguments for the invocation. If argument matchers are used, 
+		/// <param name="voidMethodName">The name of the void method to be invoked.</param>
+		/// <param name="args">The optional arguments for the invocation. If argument matchers are used, 
 		/// remember to use <see cref="ItExpr"/> rather than <see cref="It"/>.</param>
 		ISetup<TMock> Setup(string voidMethodName, params object[] args);
 
 		/// <summary>
 		/// Specifies a setup for an invocation on a property or a non void method with the given 
-		/// <paramref name="methodOrPropertyName"/>, optionally specifying 
-		/// arguments for the method call.
+		/// <paramref name="methodOrPropertyName"/>, optionally specifying arguments for the method call.
 		/// </summary>
-		/// <param name="methodOrPropertyName">Name of the method or property to be invoke.</param>
-		/// <param name="args">Optional arguments for the invocation. If argument matchers are used, 
+		/// <param name="methodOrPropertyName">The name of the method or property to be invoked.</param>
+		/// <param name="args">The optional arguments for the invocation. If argument matchers are used, 
 		/// remember to use <see cref="ItExpr"/> rather than <see cref="It"/>.</param>
-		/// <typeparam name="TResult">Return type of the method or property.</typeparam>
+		/// <typeparam name="TResult">The return type of the method or property.</typeparam>
 		ISetup<TMock, TResult> Setup<TResult>(string methodOrPropertyName, params object[] args);
 
 		/// <summary>
 		/// Specifies a setup for an invocation on a property getter with the given 
 		/// <paramref name="propertyName"/>.
 		/// </summary>
-		/// <param name="propertyName">Name of the property.</param>
-		/// <typeparam name="TProperty">Type of the property.</typeparam>
+		/// <param name="propertyName">The name of the property.</param>
+		/// <typeparam name="TProperty">The type of the property.</typeparam>
 		ISetupGetter<TMock, TProperty> SetupGet<TProperty>(string propertyName);
 
 		/// <summary>
 		/// Specifies a setup for an invocation on a property setter with the given 
 		/// <paramref name="propertyName"/>.
 		/// </summary>
-		/// <param name="propertyName">Name of the property.</param>
-		/// <typeparam name="TProperty">Type of the property.</typeparam>
+		/// <param name="propertyName">The name of the property.</param>
+		/// <typeparam name="TProperty">The type of the property.</typeparam>
 		ISetupSetter<TMock, TProperty> SetupSet<TProperty>(string propertyName);
+
+		#endregion
+
+		#region Verify
+
+		/// <summary>
+		/// Specifies a verify for a void method with the given <paramref name="methodName"/>,
+		/// optionally specifying arguments for the method call. Use in conjuntion with the default
+		/// <see cref="MockBehavior.Loose"/>.
+		/// </summary>
+		/// <exception cref="MockException">The invocation was not call the times specified by
+		/// <paramref name="times"/>.</exception>
+		/// <param name="methodName">The name of the void method to be verified.</param>
+		/// <param name="times">The number of times a method is allowed to be called.</param>
+		/// <param name="args">The optional arguments for the invocation. If argument matchers are used, 
+		/// remember to use <see cref="ItExpr"/> rather than <see cref="It"/>.</param>
+		void Verify(string methodName, Times times, params object[] args);
+
+		/// <summary>
+		/// Specifies a verify for an invocation on a property or a non void method with the given 
+		/// <paramref name="methodName"/>, optionally specifying arguments for the method call.
+		/// </summary>
+		/// <exception cref="MockException">The invocation was not call the times specified by 
+		/// <paramref name="times"/>.</exception>
+		/// <param name="methodName">The name of the method or property to be invoked.</param>
+		/// <param name="args">The optional arguments for the invocation. If argument matchers are used, 
+		/// remember to use <see cref="ItExpr"/> rather than <see cref="It"/>.</param>
+		/// <param name="times">The number of times a method is allowed to be called.</param>
+		/// <typeparam name="TResult">The type of return value from the expression.</typeparam>
+		void Verify<TResult>(string methodName, Times times, params object[] args);
+
+		#endregion
 	}
 }
