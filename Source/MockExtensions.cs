@@ -76,6 +76,7 @@ namespace Moq
 		/// This method is not legacy, but must be on an extension method to avoid 
 		/// confusing the compiler with the new Action syntax.
 		/// </devdoc>
+		[Obsolete]
 		public static ISetupSetter<T, TProperty> SetupSet<T, TProperty>(this Mock<T> mock, Expression<Func<T, TProperty>> expression)
 			where T : class
 		{
@@ -103,12 +104,12 @@ namespace Moq
 		/// <typeparam name="T">Mocked type.</typeparam>
 		/// <typeparam name="TProperty">Type of the property to verify. Typically omitted as it can 
 		/// be inferred from the expression's return type.</typeparam>
+		[Obsolete]
 		public static void VerifySet<T, TProperty>(this Mock<T> mock, Expression<Func<T, TProperty>> expression)
 			where T : class
 		{
 			Mock.VerifySet(mock, expression, Times.AtLeastOnce(), null);
 		}
-
 
 		/// <summary>
 		/// Verifies that a property has been set on the mock, specifying a failure  
@@ -133,6 +134,7 @@ namespace Moq
 		/// <typeparam name="T">Mocked type.</typeparam>
 		/// <typeparam name="TProperty">Type of the property to verify. Typically omitted as it can 
 		/// be inferred from the expression's return type.</typeparam>
+		[Obsolete]
 		public static void VerifySet<T, TProperty>(this Mock<T> mock, Expression<Func<T, TProperty>> expression, string failMessage)
 			where T : class
 		{
@@ -164,6 +166,7 @@ namespace Moq
 		/// <param name="expression">Expression to verify.</param>
 		/// <typeparam name="TProperty">Type of the property to verify. Typically omitted as it can 
 		/// be inferred from the expression's return type.</typeparam>
+		[Obsolete]
 		public static void VerifySet<T, TProperty>(this Mock<T> mock, Expression<Func<T, TProperty>> expression, Times times)
 			where T : class
 		{
@@ -197,11 +200,11 @@ namespace Moq
 		/// <param name="expression">Expression to verify.</param>
 		/// <typeparam name="TProperty">Type of the property to verify. Typically omitted as it can 
 		/// be inferred from the expression's return type.</typeparam>
+		[Obsolete]
 		public static void VerifySet<T, TProperty>(this Mock<T> mock, Expression<Func<T, TProperty>> expression, Times times, string failMessage)
 			where T : class
 		{
 			Mock.VerifySet(mock, expression, times, null);
 		}
 	}
-
 }

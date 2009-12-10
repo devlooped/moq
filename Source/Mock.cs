@@ -284,7 +284,7 @@ namespace Moq
 			string failMessage)
 			where T : class
 		{
-			var method = expression.ToPropertyInfo().GetGetMethod();
+			var method = expression.ToPropertyInfo().GetGetMethod(true);
 			ThrowIfNonVirtual(expression, method);
 
 			var expected = new MethodCallReturn<T, TProperty>(mock, expression, method, new Expression[0])
@@ -294,6 +294,7 @@ namespace Moq
 			VerifyCalls(GetInterceptor(((MemberExpression)expression.Body).Expression, mock), expected, expression, times);
 		}
 
+		[Obsolete]
 		internal static void VerifySet<T, TProperty>(
 			Mock mock,
 			Expression<Func<T, TProperty>> expression,
@@ -311,6 +312,7 @@ namespace Moq
 			VerifyCalls(GetInterceptor(((MemberExpression)expression.Body).Expression, mock), expected, expression, times);
 		}
 
+		[Obsolete]
 		internal static void VerifySet<T, TProperty>(
 			Mock mock,
 			Expression<Func<T, TProperty>> expression,
@@ -727,13 +729,9 @@ namespace Moq
 			//return target.Interceptor;
 
 			var targetExpression = FluentMockVisitor.Accept(fluentExpression, mock);
-			var targetLambda = Expression.Lambda<Func<Mock>>(
-				Expression.Convert(
-					targetExpression,
-					typeof(Mock)));
+			var targetLambda = Expression.Lambda<Func<Mock>>(Expression.Convert(targetExpression, typeof(Mock)));
 
 			var targetObject = targetLambda.Compile()();
-
 			return targetObject.Interceptor;
 		}
 

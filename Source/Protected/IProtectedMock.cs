@@ -117,6 +117,30 @@ namespace Moq.Protected
 		/// <typeparam name="TResult">The type of return value from the expression.</typeparam>
 		void Verify<TResult>(string methodName, Times times, params object[] args);
 
+		/// <summary>
+		/// Specifies a verify for an invocation on a property getter with the given 
+		/// <paramref name="propertyName"/>.
+		/// <exception cref="MockException">The invocation was not call the times specified by 
+		/// <paramref name="times"/>.</exception>
+		/// </summary>
+		/// <param name="propertyName">The name of the property.</param>
+		/// <param name="times">The number of times a method is allowed to be called.</param>
+		/// <typeparam name="TProperty">The type of the property.</typeparam>
+		// TODO should receive args to support indexers
+		void VerifyGet<TProperty>(string propertyName, Times times);
+
+		/// <summary>
+		/// Specifies a setup for an invocation on a property setter with the given 
+		/// <paramref name="propertyName"/>.
+		/// </summary>
+		/// <exception cref="MockException">The invocation was not call the times specified by 
+		/// <paramref name="times"/>.</exception>
+		/// <param name="propertyName">The name of the property.</param>
+		/// <param name="times">The number of times a method is allowed to be called.</param>
+		/// <typeparam name="TProperty">The type of the property.</typeparam>
+		// TODO should receive args to support indexers
+		void VerifySet<TProperty>(string propertyName, Times times);
+
 		#endregion
 	}
 }

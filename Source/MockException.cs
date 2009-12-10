@@ -167,21 +167,23 @@ namespace Moq
 #endif
 	internal class MockVerificationException : MockException
 	{
-		List<IProxyCall> failedSetups;
+		IProxyCall[] failedSetups;
 
-		public MockVerificationException(List<IProxyCall> failedSetups)
+		public MockVerificationException(IProxyCall[] failedSetups)
 			: base(ExceptionReason.VerificationFailed, GetMessage(failedSetups))
 		{
 			this.failedSetups = failedSetups;
 		}
 
-		private static string GetMessage(List<IProxyCall> failedSetups)
+		private static string GetMessage(IProxyCall[] failedSetups)
 		{
-			return String.Format(CultureInfo.CurrentCulture,
-				Properties.Resources.VerficationFailed, GetRawSetups(failedSetups));
+			return string.Format(
+				CultureInfo.CurrentCulture,
+				Resources.VerficationFailed,
+				GetRawSetups(failedSetups));
 		}
 
-		private static string GetRawSetups(List<IProxyCall> failedSetups)
+		private static string GetRawSetups(IProxyCall[] failedSetups)
 		{
 			return failedSetups.Aggregate(string.Empty, (s, call) => s + call.ToString() + Environment.NewLine);
 

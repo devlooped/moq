@@ -1,161 +1,151 @@
 ﻿using System;
 using Moq.Protected;
 using Xunit;
+using System.Linq.Expressions;
 
 namespace Moq.Tests
 {
 	public partial class ProtectedMockFixture
 	{
 		[Fact]
-		public void ShouldThrowIfNullMock()
+		public void ThrowsIfNullMock()
 		{
 			Assert.Throws<ArgumentNullException>(() => ProtectedExtension.Protected((Mock<string>)null));
 		}
 
 		[Fact]
-		public void ShouldThrowIfNullMemberNameInSetup()
+		public void ThrowsIfSetupNullVoidMethodName()
 		{
 			Assert.Throws<ArgumentNullException>(() => new Mock<FooBase>().Protected().Setup(null));
 		}
 
 		[Fact]
-		public void ShouldThrowIfEmptyMemberNameInSetup()
+		public void ThrowsIfSetupEmptyVoidMethodName()
 		{
 			Assert.Throws<ArgumentException>(() => new Mock<FooBase>().Protected().Setup(string.Empty));
 		}
 
 		[Fact]
-		public void ShouldThrowIfNullMemberNameInReturnSetup()
+		public void ThrowsIfSetupResultNullMethodName()
 		{
 			Assert.Throws<ArgumentNullException>(() => new Mock<FooBase>().Protected().Setup<int>(null));
 		}
 
 		[Fact]
-		public void ShouldThrowIfEmptyMemberNameInReturnSetup()
+		public void ThrowsIfSetupResultEmptyMethodName()
 		{
 			Assert.Throws<ArgumentException>(() => new Mock<FooBase>().Protected().Setup<int>(string.Empty));
 		}
 
 		[Fact]
-		public void ShouldThrowIfSetupVoidMethodNotFound()
+		public void ThrowsIfSetupVoidMethodNotFound()
 		{
-			var mock = new Mock<FooBase>();
-
-			Assert.Throws<ArgumentException>(() => mock.Protected().Setup("Foo"));
+			Assert.Throws<ArgumentException>(() => new Mock<FooBase>().Protected().Setup("Foo"));
 		}
 
 		[Fact]
-		public void ShouldThrowIfSetupVoidMethodIsPublic()
+		public void ThrowsIfSetupResultMethodNotFound()
 		{
-			var mock = new Mock<FooBase>();
-
-			Assert.Throws<ArgumentException>(() => mock.Protected().Setup("DoVoid"));
+			Assert.Throws<ArgumentException>(() => new Mock<FooBase>().Protected().Setup<int>("Foo"));
 		}
 
 		[Fact]
-		public void ShouldNotThrowIfSetupVoidMethodIsProtectedInternal()
+		public void ThrowsIfSetupPublicVoidMethod()
 		{
-			var mock = new Mock<FooBase>();
-
-			mock.Protected().Setup("ProtectedInternal");
+			Assert.Throws<ArgumentException>(() => new Mock<FooBase>().Protected().Setup("Public"));
 		}
 
 		[Fact]
-		public void ShouldThrowIfSetupVoidMethodIsInternal()
+		public void ThrowsIfSetupPublicResultMethod()
 		{
-			var mock = new Mock<FooBase>();
-
-			Assert.Throws<ArgumentException>(() => mock.Protected().Setup("Internal"));
+			Assert.Throws<ArgumentException>(() => new Mock<FooBase>().Protected().Setup<int>("PublicInt"));
 		}
 
 		[Fact]
-		public void ShouldThrowIfSetupVoidMethodIsPublicProperty()
+		public void ThrowsIfSetupNonVirtualVoidMethod()
 		{
-			var mock = new Mock<FooBase>();
-
-			Assert.Throws<ArgumentException>(() => mock.Protected().Setup("PublicValue"));
+			Assert.Throws<ArgumentException>(() => new Mock<FooBase>().Protected().Setup("NonVirtual"));
 		}
 
 		[Fact]
-		public void ShouldThrowIfSetupReturnMethodNotFound()
+		public void ThrowsIfSetupNonVirtualResultMethod()
 		{
-			var mock = new Mock<FooBase>();
-
-			Assert.Throws<ArgumentException>(() => mock.Protected().Setup<int>("Foo"));
+			Assert.Throws<ArgumentException>(() => new Mock<FooBase>().Protected().Setup<int>("NonVirtualInt"));
 		}
 
-		[Fact]
-		public void ShouldThrowIfSetupReturnMethodIsPublic()
+		[Fact(Skip = "Check this, the interceptor is not called")]
+		public void SetupAllowsInternalVoidMethod()
 		{
 			var mock = new Mock<FooBase>();
+			mock.Protected().Setup("Internal");
+			mock.Object.Internal();
 
-			Assert.Throws<ArgumentException>(() => mock.Protected().Setup<int>("DoInt"));
+			mock.VerifyAll();
 		}
 
-		[Fact]
-		public void ShouldNotThrowIfSetupReturnMethodIsProtectedInternal()
-		{
-			var mock = new Mock<FooBase>();
-
-			mock.Protected().Setup<int>("ProtectedInternalInt");
-		}
-
-		[Fact]
-		public void ShouldThrowIfSetupReturnMethodIsInternal()
-		{
-			var mock = new Mock<FooBase>();
-
-			Assert.Throws<ArgumentException>(() => mock.Protected().Setup<int>("InternalInt"));
-		}
-
-		[Fact]
-		public void ShouldThrowIfSetupReturnMethodIsPublicProperty()
-		{
-			var mock = new Mock<FooBase>();
-
-			Assert.Throws<ArgumentException>(() => mock.Protected().Setup<string>("PublicValue"));
-		}
-
-		[Fact]
-		public void ShouldExpectProtectedMethod()
+		[Fact(Skip = "Check this, the interceptor is not called")]
+		public void SetupAllowsInternalResultMethod()
 		{
 			var mock = new Mock<FooBase>();
 			mock.Protected()
-				.Setup<int>("Int")
+				.Setup<int>("InternalInt")
 				.Returns(5);
 
-			Assert.Equal(5, mock.Object.DoInt());
+			Assert.Equal(5, mock.Object.InternalInt());
 		}
 
 		[Fact]
-		public void ShouldExpectProtectedInternalVirtualMethod()
+		public void SetupAllowsProtectedInternalVoidMethod()
+		{
+			var mock = new Mock<FooBase>();
+			mock.Protected().Setup("ProtectedInternal");
+			mock.Object.ProtectedInternal();
+
+			mock.VerifyAll();
+		}
+
+		[Fact]
+		public void SetupAllowsProtectedInternalResultMethod()
 		{
 			var mock = new Mock<FooBase>();
 			mock.Protected()
 				.Setup<int>("ProtectedInternalInt")
 				.Returns(5);
 
-			Assert.Equal(5, mock.Object.DoProtectedInternalInt());
+			Assert.Equal(5, mock.Object.ProtectedInternalInt());
 		}
 
 		[Fact]
-		public void ShouldExpectProtectedMethodVoid()
+		public void SetupAllowsProtectedVoidMethod()
 		{
 			var mock = new Mock<FooBase>();
-
-			mock.Protected()
-				.Setup("Void");
-
-			mock.Object.DoVoid();
+			mock.Protected().Setup("Protected");
+			mock.Object.DoProtected();
 
 			mock.VerifyAll();
 		}
 
 		[Fact]
-		public void ShouldExpectProperty()
+		public void SetupAllowsProtectedResultMethod()
 		{
 			var mock = new Mock<FooBase>();
+			mock.Protected()
+				.Setup<int>("ProtectedInt")
+				.Returns(5);
 
+			Assert.Equal(5, mock.Object.DoProtectedInt());
+		}
+
+		[Fact]
+		public void ThrowsIfSetupVoidMethodIsProperty()
+		{
+			Assert.Throws<ArgumentException>(() => new Mock<FooBase>().Protected().Setup("ProtectedValue"));
+		}
+
+		[Fact]
+		public void SetupResultAllowsProperty()
+		{
+			var mock = new Mock<FooBase>();
 			mock.Protected()
 				.Setup<string>("ProtectedValue")
 				.Returns("foo");
@@ -164,10 +154,67 @@ namespace Moq.Tests
 		}
 
 		[Fact]
-		public void ShouldExpectGetProperty()
+		public void ThrowsIfSetupGetNullPropertyName()
+		{
+			Assert.Throws<ArgumentNullException>(() => new Mock<FooBase>().Protected().SetupGet<string>(null));
+		}
+
+		[Fact]
+		public void ThrowsIfSetupGetEmptyPropertyName()
+		{
+			Assert.Throws<ArgumentException>(() => new Mock<FooBase>().Protected().SetupGet<string>(string.Empty));
+		}
+
+		[Fact]
+		public void ThrowsIfSetupGetPropertyNotFound()
+		{
+			Assert.Throws<ArgumentException>(() => new Mock<FooBase>().Protected().SetupGet<int>("Foo"));
+		}
+
+		[Fact]
+		public void ThrowsIfSetupGetPropertyWithoutPropertyGet()
+		{
+			Assert.Throws<ArgumentException>(() => new Mock<FooBase>().Protected().SetupGet<int>("OnlySet"));
+		}
+
+		[Fact]
+		public void ThrowsIfSetupGetPublicPropertyGet()
+		{
+			Assert.Throws<ArgumentException>(() => new Mock<FooBase>().Protected().SetupGet<int>("PublicValue"));
+		}
+
+		[Fact]
+		public void ThrowsIfSetupGetNonVirtualProperty()
+		{
+			Assert.Throws<ArgumentException>(() => new Mock<FooBase>().Protected().SetupGet<string>("NonVirtualValue"));
+		}
+
+		[Fact(Skip = "Check this, the interceptor is not called")]
+		public void SetupGetAllowsInternalPropertyGet()
 		{
 			var mock = new Mock<FooBase>();
+			mock.Protected()
+				.SetupGet<string>("InternalValue")
+				.Returns("foo");
 
+			Assert.Equal("foo", mock.Object.InternalValue);
+		}
+
+		[Fact]
+		public void SetupGetAllowsProtectedInternalPropertyGet()
+		{
+			var mock = new Mock<FooBase>();
+			mock.Protected()
+				.SetupGet<string>("ProtectedInternalValue")
+				.Returns("foo");
+
+			Assert.Equal("foo", mock.Object.ProtectedInternalValue);
+		}
+
+		[Fact]
+		public void SetupGetAllowsProtectedPropertyGet()
+		{
+			var mock = new Mock<FooBase>();
 			mock.Protected()
 				.SetupGet<string>("ProtectedValue")
 				.Returns("foo");
@@ -176,11 +223,76 @@ namespace Moq.Tests
 		}
 
 		[Fact]
-		public void ShouldExpectPropertySet()
+		public void ThrowsIfSetupSetNullPropertyName()
+		{
+			Assert.Throws<ArgumentNullException>(() => new Mock<FooBase>().Protected().SetupSet<string>(null));
+		}
+
+		[Fact]
+		public void ThrowsIfSetupSetEmptyPropertyName()
+		{
+			Assert.Throws<ArgumentException>(() => new Mock<FooBase>().Protected().SetupSet<string>(string.Empty));
+		}
+
+		[Fact]
+		public void ThrowsIfSetupSetPropertyNotFound()
+		{
+			Assert.Throws<ArgumentException>(() => new Mock<FooBase>().Protected().SetupSet<int>("Foo"));
+		}
+
+		[Fact]
+		public void ThrowsIfSetupSetPropertyWithoutPropertySet()
+		{
+			Assert.Throws<ArgumentException>(() => new Mock<FooBase>().Protected().SetupSet<int>("OnlyGet"));
+		}
+
+		[Fact]
+		public void ThrowsIfSetupSetPublicPropertySet()
+		{
+			Assert.Throws<ArgumentException>(() => new Mock<FooBase>().Protected().SetupSet<int>("PublicValue"));
+		}
+
+		[Fact]
+		public void ThrowsIfSetupSetNonVirtualProperty()
+		{
+			Assert.Throws<ArgumentException>(() => new Mock<FooBase>().Protected().SetupSet<string>("NonVirtualValue"));
+		}
+
+		[Fact(Skip = "Check this, the interceptor is not called")]
+		public void SetupSetAllowsInternalPropertySet()
 		{
 			var mock = new Mock<FooBase>();
-			var value = "";
+			var value = string.Empty;
+			mock.Protected()
+				.SetupSet<string>("InternalValue")
+				.Callback(v => value = v);
 
+			mock.Object.InternalValue = "foo";
+
+			Assert.Equal("foo", value);
+			mock.VerifyAll();
+		}
+
+		[Fact]
+		public void SetupSetAllowsProtectedInternalPropertySet()
+		{
+			var mock = new Mock<FooBase>();
+			var value = string.Empty;
+			mock.Protected()
+				.SetupSet<string>("ProtectedInternalValue")
+				.Callback(v => value = v);
+
+			mock.Object.ProtectedInternalValue = "foo";
+
+			Assert.Equal("foo", value);
+			mock.VerifyAll();
+		}
+
+		[Fact]
+		public void SetupSetAllowsProtectedPropertySet()
+		{
+			var mock = new Mock<FooBase>();
+			var value = string.Empty;
 			mock.Protected()
 				.SetupSet<string>("ProtectedValue")
 				.Callback(v => value = v);
@@ -192,43 +304,15 @@ namespace Moq.Tests
 		}
 
 		[Fact]
-		public void ShouldThrowIfNullPropertySet()
+		public void ThrowsIfNullArgs()
 		{
-			Assert.Throws<ArgumentNullException>(() => new Mock<FooBase>().Protected().SetupSet<string>(null));
-		}
-
-		[Fact]
-		public void ShouldThrowIfEmptyPropertySet()
-		{
-			Assert.Throws<ArgumentException>(() => new Mock<FooBase>().Protected().SetupSet<string>(string.Empty));
-		}
-
-		[Fact]
-		public void ShouldThrowIfPropertySetNotExists()
-		{
-			Assert.Throws<ArgumentException>(() => new Mock<FooBase>().Protected().SetupSet<string>("Foo"));
-		}
-
-		[Fact]
-		public void ShouldThrowIfPropertySetIsPublic()
-		{
-			var mock = new Mock<FooBase>();
-
-			Assert.Throws<ArgumentException>(() => mock.Protected().SetupSet<string>("PublicValue"));
-		}
-
-		[Fact]
-		public void NullIsInvalidForArgument()
-		{
-			var mock = new Mock<FooBase>();
-
-			Assert.Throws<ArgumentException>(() => mock.Protected()
+			Assert.Throws<ArgumentException>(() => new Mock<FooBase>().Protected()
 				.Setup<string>("StringArg", null)
 				.Returns("null"));
 		}
 
 		[Fact]
-		public void ShouldAllowMatchersForArg()
+		public void AllowMatchersForArgs()
 		{
 			var mock = new Mock<FooBase>();
 
@@ -278,10 +362,9 @@ namespace Moq.Tests
 		}
 
 		[Fact]
-		public void ShouldResolveOverloads()
+		public void ResolveOverloads()
 		{
 			// NOTE: There are two overloads named "Do" and "DoReturn"
-
 			var mock = new Mock<MethodOverloads>();
 			mock.Protected().Setup("Do", 1, 2).Verifiable();
 			mock.Protected().Setup<string>("DoReturn", "1", "2").Returns("3").Verifiable();
@@ -293,66 +376,105 @@ namespace Moq.Tests
 		}
 
 		[Fact]
-		public void ShouldThrowIfSetReturnForVoid()
+		public void ThrowsIfSetReturnsForVoidMethod()
 		{
-			var mock = new Mock<MethodOverloads>();
-
-			Assert.Throws<ArgumentException>(() => mock.Protected().Setup<string>("Do", "1", "2").Returns("3"));
+			Assert.Throws<ArgumentException>(
+				() => new Mock<MethodOverloads>().Protected().Setup<string>("Do", "1", "2").Returns("3"));
 		}
 
 		[Fact]
-		public void ShouldExpectProtectedMethodInBaseClass()
+		public void SetupResultAllowsProtectedMethodInBaseClass()
 		{
 			var mock = new Mock<FooDerived>();
 			mock.Protected()
-				.Setup<int>("Int")
+				.Setup<int>("ProtectedInt")
 				.Returns(5);
 
-			Assert.Equal(5, mock.Object.DoInt());
+			Assert.Equal(5, mock.Object.DoProtectedInt());
 		}
 
 		[Fact]
-		public void ShouldThrowIfNullMemberNameInVerify()
+		public void ThrowsIfVerifyNullVoidMethodName()
 		{
 			Assert.Throws<ArgumentNullException>(() => new Mock<FooBase>().Protected().Verify(null, Times.Once()));
 		}
 
 		[Fact]
-		public void ShouldThrowIfEmptyMemberNameInVerify()
+		public void ThrowsIfVerifyEmptyVoidMethodName()
 		{
 			Assert.Throws<ArgumentException>(() => new Mock<FooBase>().Protected().Verify(string.Empty, Times.Once()));
 		}
 
 		[Fact]
-		public void ShouldThrowIfNullMemberNameInReturnVerify()
+		public void ThrowsIfVerifyNullResultMethodName()
 		{
 			Assert.Throws<ArgumentNullException>(() => new Mock<FooBase>().Protected().Verify<int>(null, Times.Once()));
 		}
 
 		[Fact]
-		public void ShouldThrowIfEmptyMemberNameInReturnVerify()
+		public void ThrowsIfVerifyEmptyResultMethodName()
 		{
 			Assert.Throws<ArgumentException>(() => new Mock<FooBase>().Protected().Verify<int>(string.Empty, Times.Once()));
 		}
 
 		[Fact]
-		public void ShouldThrowIfVerifyVoidMethodNotFound()
+		public void ThrowsIfVerifyVoidMethodNotFound()
 		{
-			var mock = new Mock<FooBase>();
-
-			Assert.Throws<ArgumentException>(() => mock.Protected().Verify("Foo", Times.Once()));
+			Assert.Throws<ArgumentException>(() => new Mock<FooBase>().Protected().Verify("Foo", Times.Once()));
 		}
 
 		[Fact]
-		public void ShouldThrowIfVerifyVoidMethodIsPublic()
+		public void ThrowsIfVerifyResultMethodNotFound()
 		{
-			var mock = new Mock<FooBase>();
-
-			Assert.Throws<ArgumentException>(() => mock.Protected().Verify("DoVoid", Times.Once()));
+			Assert.Throws<ArgumentException>(() => new Mock<FooBase>().Protected().Verify<int>("Foo", Times.Once()));
 		}
 
 		[Fact]
-		public void ShouldNotThrowIfVerifyVoidMethodIsProtectedInternal()
+		public void ThrowsIfVerifyPublicVoidMethod()
+		{
+			Assert.Throws<ArgumentException>(() => new Mock<FooBase>().Protected().Verify("Public", Times.Once()));
+		}
+
+		[Fact]
+		public void ThrowsIfVerifyPublicResultMethod()
+		{
+			Assert.Throws<ArgumentException>(
+				() => new Mock<FooBase>().Protected().Verify<int>("PublicInt", Times.Once()));
+		}
+
+		[Fact]
+		public void ThrowsIfVerifyNonVirtualVoidMethod()
+		{
+			Assert.Throws<ArgumentException>(() => new Mock<FooBase>().Protected().Verify("NonVirtual", Times.Once()));
+		}
+
+		[Fact]
+		public void ThrowsIfVerifyNonVirtualResultMethod()
+		{
+			Assert.Throws<ArgumentException>(
+				() => new Mock<FooBase>().Protected().Verify<int>("NonVirtualInt", Times.Once()));
+		}
+
+		[Fact(Skip = "Check this, the interceptor is not called")]
+		public void VerifyAllowsInternalVoidMethod()
+		{
+			var mock = new Mock<FooBase>();
+			mock.Object.Internal();
+
+			mock.Protected().Verify("Internal", Times.Once());
+		}
+
+		[Fact(Skip = "Check this, the interceptor is not called")]
+		public void VerifyAllowsInternalResultMethod()
+		{
+			var mock = new Mock<FooBase>();
+			mock.Object.InternalInt();
+
+			mock.Protected().Verify<int>("InternalInt", Times.Once());
+		}
+
+		[Fact]
+		public void VerifyAllowsProtectedInternalVoidMethod()
 		{
 			var mock = new Mock<FooBase>();
 			mock.Object.ProtectedInternal();
@@ -361,122 +483,303 @@ namespace Moq.Tests
 		}
 
 		[Fact]
-		public void ShouldThrowIfVerifyVoidMethodIsInternal()
+		public void VerifyAllowsProtectedInternalResultMethod()
 		{
 			var mock = new Mock<FooBase>();
-
-			Assert.Throws<ArgumentException>(() => mock.Protected().Verify("Internal", Times.Once()));
-		}
-
-		[Fact]
-		public void ShouldThrowIfVerifyVoidMethodIsPublicProperty()
-		{
-			var mock = new Mock<FooBase>();
-
-			Assert.Throws<ArgumentException>(() => mock.Protected().Verify("PublicValue", Times.Once()));
-		}
-
-		[Fact]
-		public void ShouldThrowIfVerifyReturnMethodNotFound()
-		{
-			var mock = new Mock<FooBase>();
-
-			Assert.Throws<ArgumentException>(() => mock.Protected().Verify<int>("Foo", Times.Once()));
-		}
-
-		[Fact]
-		public void ShouldThrowIfVerifyReturnMethodIsPublic()
-		{
-			var mock = new Mock<FooBase>();
-
-			Assert.Throws<ArgumentException>(() => mock.Protected().Verify<int>("DoInt", Times.Once()));
-		}
-
-		[Fact]
-		public void ShouldNotThrowIfVerifyReturnMethodIsProtectedInternal()
-		{
-			var mock = new Mock<FooBase>();
+			mock.Object.ProtectedInternalInt();
 
 			mock.Protected().Verify<int>("ProtectedInternalInt", Times.Once());
 		}
 
 		[Fact]
-		public void ShouldThrowIfVerifyReturnMethodIsInternal()
+		public void VerifyAllowsProtectedVoidMethod()
 		{
 			var mock = new Mock<FooBase>();
+			mock.Object.DoProtected();
 
-			Assert.Throws<ArgumentException>(() => mock.Protected().Verify<int>("InternalInt", Times.Once()));
+			mock.Protected().Verify("Protected", Times.Once());
 		}
 
 		[Fact]
-		public void ShouldThrowIfVerifyReturnMethodIsPublicProperty()
+		public void VerifyAllowsProtectedResultMethod()
 		{
 			var mock = new Mock<FooBase>();
+			mock.Object.DoProtectedInt();
 
-			Assert.Throws<ArgumentException>(() => mock.Protected().Verify<string>("PublicValue", Times.Once()));
+			mock.Protected().Verify<int>("ProtectedInt", Times.Once());
 		}
 
 		[Fact]
-		public void ShouldThrowIfVerifyVoidMethodTimesNotReached()
+		public void ThrowsIfVerifyVoidMethodIsProperty()
 		{
-			var mock = new Mock<FooBase>();
-			mock.Object.DoVoid();
-
-			Assert.Throws<MockException>(() => mock.Protected().Verify("Void", Times.Exactly(2)));
+			Assert.Throws<ArgumentException>(
+				() => new Mock<FooBase>().Protected().Verify("ProtectedValue", Times.Once()));
 		}
 
 		[Fact]
-		public void ShouldNotThrowIfVerifyVoidMethodTimesReached()
+		public void VerifyResultAllowsProperty()
 		{
 			var mock = new Mock<FooBase>();
-			mock.Object.DoVoid();
-			mock.Object.DoVoid();
+			mock.Object.GetProtectedValue();
 
-			mock.Protected().Verify("Void", Times.Exactly(2));
+			mock.Protected().Verify<string>("ProtectedValue", Times.Once());
 		}
 
 		[Fact]
-		public void ShouldThrowIfVerifyReturnMethodTimesNotReached()
+		public void ThrowsIfVerifyVoidMethodTimesNotReached()
 		{
 			var mock = new Mock<FooBase>();
-			mock.Object.DoInt();
+			mock.Object.DoProtected();
 
-			Assert.Throws<MockException>(() => mock.Protected().Verify("Int", Times.Exactly(2)));
+			Assert.Throws<MockException>(() => mock.Protected().Verify("Protected", Times.Exactly(2)));
 		}
 
 		[Fact]
-		public void ShouldNotThrowIfVerifyReturnMethodTimesReached()
+		public void ThrowsIfVerifyResultMethodTimesNotReached()
 		{
 			var mock = new Mock<FooBase>();
-			mock.Object.DoInt();
-			mock.Object.DoInt();
+			mock.Object.DoProtectedInt();
 
-			mock.Protected().Verify("Int", Times.Exactly(2));
+			Assert.Throws<MockException>(() => mock.Protected().Verify("ProtectedInt", Times.Exactly(2)));
+		}
+
+		[Fact]
+		public void DoesNotThrowIfVerifyVoidMethodTimesReached()
+		{
+			var mock = new Mock<FooBase>();
+			mock.Object.DoProtected();
+			mock.Object.DoProtected();
+
+			mock.Protected().Verify("Protected", Times.Exactly(2));
+		}
+
+		[Fact]
+		public void DoesNotThrowIfVerifyReturnMethodTimesReached()
+		{
+			var mock = new Mock<FooBase>();
+			mock.Object.DoProtectedInt();
+			mock.Object.DoProtectedInt();
+
+			mock.Protected().Verify<int>("ProtectedInt", Times.Exactly(2));
+		}
+
+		[Fact]
+		public void ThrowsIfVerifyPropertyTimesNotReached()
+		{
+			var mock = new Mock<FooBase>();
+			mock.Object.GetProtectedValue();
+
+			Assert.Throws<MockException>(() => mock.Protected().Verify<string>("ProtectedValue", Times.Exactly(2)));
+		}
+
+		[Fact]
+		public void DoesNotThrowIfVerifyPropertyTimesReached()
+		{
+			var mock = new Mock<FooBase>();
+			mock.Object.GetProtectedValue();
+			mock.Object.GetProtectedValue();
+
+			mock.Protected().Verify<string>("ProtectedValue", Times.Exactly(2));
+		}
+
+		[Fact]
+		public void ThrowsIfVerifyGetNullPropertyName()
+		{
+			Assert.Throws<ArgumentNullException>(() => new Mock<FooBase>().Protected().VerifyGet<int>(null, Times.Once()));
+		}
+
+		[Fact]
+		public void ThrowsIfVerifyGetEmptyPropertyName()
+		{
+			Assert.Throws<ArgumentException>(() => new Mock<FooBase>().Protected().VerifyGet<int>(string.Empty, Times.Once()));
+		}
+
+		[Fact]
+		public void ThrowsIfVerifyGetPropertyNotFound()
+		{
+			Assert.Throws<ArgumentException>(() => new Mock<FooBase>().Protected().VerifyGet<int>("Foo", Times.Once()));
+		}
+
+		[Fact]
+		public void ThrowsIfVerifyGetPropertyWithoutPropertyGet()
+		{
+			Assert.Throws<ArgumentException>(() => new Mock<FooBase>().Protected().VerifyGet<int>("OnlySet", Times.Once()));
+		}
+
+		[Fact]
+		public void ThrowsIfVerifyGetIsPublicPropertyGet()
+		{
+			Assert.Throws<ArgumentException>(
+				() => new Mock<FooBase>().Protected().VerifyGet<string>("PublicValue", Times.Once()));
+		}
+
+		[Fact(Skip = "Check this, the interceptor is not called")]
+		public void VerifyGetAllowsInternalProperty()
+		{
+			var mock = new Mock<FooBase>();
+			var value = mock.Object.InternalValue;
+
+			Assert.Throws<ArgumentException>(() => mock.Protected().VerifyGet<string>("InternalValue", Times.Once()));
+		}
+
+		[Fact]
+		public void VerifyGetAllowsProtectedInternalPropertyGet()
+		{
+			var mock = new Mock<FooBase>();
+			var value = mock.Object.ProtectedInternalValue;
+
+			mock.Protected().VerifyGet<string>("ProtectedInternalValue", Times.Once());
+		}
+
+		[Fact]
+		public void VerifyGetAllowsProtectedPropertyGet()
+		{
+			var mock = new Mock<FooBase>();
+			mock.Object.GetProtectedValue();
+
+			mock.Protected().VerifyGet<string>("ProtectedValue", Times.Once());
+		}
+
+		[Fact]
+		public void ThrowsIfVerifyGetNonVirtualPropertyGet()
+		{
+			Assert.Throws<ArgumentException>(
+				() => new Mock<FooBase>().Protected().VerifyGet<string>("NonVirtualValue", Times.Once()));
+		}
+
+		[Fact]
+		public void ThrowsIfVerifyGetTimesNotReached()
+		{
+			var mock = new Mock<FooBase>();
+			mock.Object.GetProtectedValue();
+
+			Assert.Throws<MockException>(() => mock.Protected().VerifyGet<string>("ProtectedValue", Times.Exactly(2)));
+		}
+
+		[Fact]
+		public void DoesNotThrowIfVerifyGetPropertyTimesReached()
+		{
+			var mock = new Mock<FooBase>();
+			mock.Object.GetProtectedValue();
+			mock.Object.GetProtectedValue();
+
+			mock.Protected().VerifyGet<string>("ProtectedValue", Times.Exactly(2));
+		}
+	}
+
+	public partial class ProtectedMockFixture
+	{
+
+		[Fact]
+		public void ThrowsIfVerifySetNullPropertyName()
+		{
+			Assert.Throws<ArgumentNullException>(
+				() => new Mock<FooBase>().Protected().VerifySet<string>(null, Times.Once()));
+		}
+
+		[Fact]
+		public void ThrowsIfVerifySetEmptyPropertyName()
+		{
+			Assert.Throws<ArgumentException>(
+				() => new Mock<FooBase>().Protected().VerifySet<string>(string.Empty, Times.Once()));
+		}
+
+		[Fact]
+		public void ThrowsIfVerifySetPropertyNotFound()
+		{
+			Assert.Throws<ArgumentException>(() => new Mock<FooBase>().Protected().VerifySet<int>("Foo", Times.Once()));
+		}
+
+		[Fact]
+		public void ThrowsIfVerifySetPropertyWithoutPropertySet()
+		{
+			Assert.Throws<ArgumentException>(() => new Mock<FooBase>().Protected().VerifySet<int>("OnlyGet", Times.Once()));
+		}
+
+		[Fact]
+		public void ThrowsIfVerifySetPublicPropertySet()
+		{
+			Assert.Throws<ArgumentException>(
+				() => new Mock<FooBase>().Protected().VerifySet<int>("PublicValue", Times.Once()));
+		}
+
+		[Fact]
+		public void ThrowsIfVerifySetNonVirtualPropertySet()
+		{
+			Assert.Throws<ArgumentException>(
+				() => new Mock<FooBase>().Protected().VerifySet<string>("NonVirtualValue", Times.Once()));
+		}
+
+		[Fact(Skip = "Check this, the interceptor is not called")]
+		public void VerifySetAllowsInternalPropertySet()
+		{
+			var mock = new Mock<FooBase>();
+			mock.Object.InternalValue = "foo";
+
+			// TODO arguments + indexes
+			mock.Protected().VerifySet<string>("InternalValue", Times.Once());
+		}
+
+		[Fact]
+		public void VerifySetAllowsProtectedInternalPropertySet()
+		{
+			var mock = new Mock<FooBase>();
+			mock.Object.ProtectedInternalValue = "foo";
+
+			mock.Protected().VerifySet<string>("ProtectedInternalValue", Times.Once());
+		}
+
+		[Fact]
+		public void VerifySetAllowsProtectedPropertySet()
+		{
+			var mock = new Mock<FooBase>();
+			mock.Object.SetProtectedValue("foo");
+
+			mock.Protected().VerifySet<string>("ProtectedValue", Times.Once());
+		}
+
+		[Fact]
+		public void ThrowsIfVerifySetTimesNotReached()
+		{
+			var mock = new Mock<FooBase>();
+			mock.Object.SetProtectedValue("Foo");
+
+			Assert.Throws<MockException>(() => mock.Protected().VerifySet<string>("ProtectedValue", Times.Exactly(2)));
+		}
+
+		[Fact]
+		public void DoesNotThrowIfVerifySetPropertyTimesReached()
+		{
+			var mock = new Mock<FooBase>();
+			mock.Object.SetProtectedValue("foo");
+			mock.Object.SetProtectedValue("foo");
+
+			mock.Protected().VerifySet<string>("ProtectedValue", Times.Exactly(2));
 		}
 
 		public class MethodOverloads
 		{
 			public void ExecuteDo(int a, int b)
 			{
-				Do(a, b);
+				this.Do(a, b);
+			}
+
+			public void ExecuteDo(string a, string b)
+			{
+				this.Do(a, b);
+			}
+
+			public int ExecuteDoReturn(int a, int b)
+			{
+				return this.DoReturn(a, b);
 			}
 
 			protected virtual void Do(int a, int b)
 			{
 			}
 
-			public void ExecuteDo(string a, string b)
-			{
-				Do(a, b);
-			}
-
 			protected virtual void Do(string a, string b)
 			{
-			}
-
-			public int ExecuteDoReturn(int a, int b)
-			{
-				return DoReturn(a, b);
 			}
 
 			protected virtual int DoReturn(int a, int b)
@@ -495,83 +798,19 @@ namespace Moq.Tests
 			}
 		}
 
-		// ShouldExpectIndexedProperty
-
 		public class FooBase
 		{
-			internal protected virtual int ProtectedInternal()
-			{
-				return 0;
-			}
+			public virtual string PublicValue { get; set; }
 
-			internal virtual void Internal()
-			{
-			}
+			internal virtual string InternalValue { get; set; }
 
-			public int DoProtectedInternalInt()
-			{
-				return ProtectedInternalInt();
-			}
+			protected internal virtual string ProtectedInternalValue { get; set; }
 
-			internal protected virtual int ProtectedInternalInt()
-			{
-				return 0;
-			}
+			protected string NonVirtualValue { get; set; }
 
-			internal virtual int InternalInt()
-			{
-				return 0;
-			}
+			protected virtual int OnlyGet { get; private set; }
 
-			public void DoVoid()
-			{
-				Void();
-			}
-
-			protected virtual void Void()
-			{
-			}
-
-			public void DoVoidArg(string arg)
-			{
-				VoidArg(arg);
-			}
-
-			protected virtual void VoidArg(string arg)
-			{
-			}
-
-			public int DoInt()
-			{
-				return Int();
-			}
-
-			protected virtual int Int()
-			{
-				return 0;
-			}
-
-			public string DoStringArg(string arg)
-			{
-				return StringArg(arg);
-			}
-
-			protected virtual string StringArg(string arg)
-			{
-				return arg;
-			}
-
-			public string PublicValue { get; set; }
-
-			public string GetProtectedValue()
-			{
-				return ProtectedValue;
-			}
-
-			public void SetProtectedValue(string value)
-			{
-				ProtectedValue = value;
-			}
+			protected virtual int OnlySet { private get; set; }
 
 			protected virtual string ProtectedValue { get; set; }
 
@@ -581,9 +820,84 @@ namespace Moq.Tests
 				set { }
 			}
 
+			public void DoProtected()
+			{
+				this.Protected();
+			}
+
+			public int DoProtectedInt()
+			{
+				return this.ProtectedInt();
+			}
+
+			public string DoStringArg(string arg)
+			{
+				return this.StringArg(arg);
+			}
+
 			public string DoTwoArgs(string arg, int arg1)
 			{
-				return TwoArgs(arg, arg1);
+				return this.TwoArgs(arg, arg1);
+			}
+
+			public string GetProtectedValue()
+			{
+				return this.ProtectedValue;
+			}
+
+			public virtual void Public()
+			{
+			}
+
+			public virtual int PublicInt()
+			{
+				return 10;
+			}
+
+			public void SetProtectedValue(string value)
+			{
+				this.ProtectedValue = value;
+			}
+
+			internal virtual void Internal()
+			{
+			}
+
+			internal virtual int InternalInt()
+			{
+				return 11;
+			}
+
+			internal protected virtual void ProtectedInternal()
+			{
+			}
+
+			internal protected virtual int ProtectedInternalInt()
+			{
+				return 0;
+			}
+
+			protected virtual void Protected()
+			{
+			}
+
+			protected virtual int ProtectedInt()
+			{
+				return 2;
+			}
+
+			protected void NonVirtual()
+			{
+			}
+
+			protected int NonVirtualInt()
+			{
+				return 2;
+			}
+
+			protected virtual string StringArg(string arg)
+			{
+				return arg;
 			}
 
 			protected virtual string TwoArgs(string arg, int arg1)

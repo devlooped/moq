@@ -67,7 +67,6 @@ namespace Moq.Protected
 			var method = GetMethod(methodName, args);
 			ThrowIfMemberMissing(methodName, method);
 			ThrowIfPublicMethod(method);
-			ThrowIfCantOverride(method);
 
 			return Mock.Setup(mock, GetMethodCall(method, args));
 		}
@@ -88,7 +87,6 @@ namespace Moq.Protected
 			ThrowIfMemberMissing(methodName, method);
 			ThrowIfVoidMethod(method);
 			ThrowIfPublicMethod(method);
-			ThrowIfCantOverride(method);
 
 			return Mock.Setup(mock, GetMethodCall<TResult>(method, args));
 		}
@@ -124,7 +122,6 @@ namespace Moq.Protected
 			var method = GetMethod(methodName, args);
 			ThrowIfMemberMissing(methodName, method);
 			ThrowIfPublicMethod(method);
-			ThrowIfCantOverride(method);
 
 			Mock.Verify(mock, GetMethodCall(method, args), times, null);
 		}
@@ -133,11 +130,47 @@ namespace Moq.Protected
 		{
 			Guard.NotNullOrEmpty(() => methodName, methodName);
 
+			var property = GetProperty(methodName);
+			if (property != null)
+			{
+				ThrowIfPublicProperty(property);
+				// TODO should consider property indexers
+				Mock.VerifyGet(mock, GetMemberAccess<TResult>(property), times, null);
+				return;
+			}
+
 			var method = GetMethod(methodName, args);
 			ThrowIfMemberMissing(methodName, method);
 			ThrowIfPublicMethod(method);
-			ThrowIfCantOverride(method);
 
+			Mock.Verify(mock, GetMethodCall<TResult>(method, args), times, null);
+		}
+
+		// TODO should receive args to support indexers
+		public void VerifyGet<TProperty>(string propertyName, Times times)
+		{
+			Guard.NotNullOrEmpty(() => propertyName, propertyName);
+
+			var property = GetProperty(propertyName);
+			ThrowIfMemberMissing(propertyName, property);
+			ThrowIfPublicProperty(property);
+
+			// TODO should consider property indexers
+			Mock.VerifyGet(mock, GetMemberAccess<TProperty>(property), times, null);
+		}
+
+		// TODO should receive args to support indexers
+		public void VerifySet<TProperty>(string propertyName, Times times)
+		{
+			Guard.NotNullOrEmpty(() => propertyName, propertyName);
+
+			var property = GetProperty(propertyName);
+			ThrowIfMemberMissing(propertyName, property);
+			ThrowIfPublicProperty(property);
+
+			// TODO should consider property indexers
+			// TODO should receive the parameter here
+			Mock.VerifySet(mock, GetSetterExpression(property, ItExpr.IsAny<TProperty>()), times, null);
 		}
 
 		#endregion
@@ -158,13 +191,13 @@ namespace Moq.Protected
 				null);
 		}
 
-		private Expression<Func<T, TResult>> GetMethodCall<TResult>(MethodInfo method, object[] args)
+		private static Expression<Func<T, TResult>> GetMethodCall<TResult>(MethodInfo method, object[] args)
 		{
 			var param = Expression.Parameter(typeof(T), "mock");
 			return Expression.Lambda<Func<T, TResult>>(Expression.Call(param, method, ToExpressionArgs(args)), param);
 		}
 
-		private Expression<Action<T>> GetMethodCall(MethodInfo method, object[] args)
+		private static Expression<Action<T>> GetMethodCall(MethodInfo method, object[] args)
 		{
 			var param = Expression.Parameter(typeof(T), "mock");
 			return Expression.Lambda<Action<T>>(Expression.Call(param, method, ToExpressionArgs(args)), param);
@@ -178,6 +211,14 @@ namespace Moq.Protected
 				BindingFlags.Instance | BindingFlags.NonPublic | BindingFlags.Public);
 		}
 
+		private static Action<T> GetSetterExpression(PropertyInfo property, Expression value)
+		{
+			var param = Expression.Parameter(typeof(T), "mock");
+			return Expression.Lambda<Action<T>>(
+				Expression.Call(param, property.GetSetMethod(true), value),
+				param).Compile();
+		}
+
 		private static void ThrowIfNonVirtual(MethodInfo method)
 		{
 			if (method.IsAssembly || method.IsFamilyAndAssembly)
@@ -185,17 +226,6 @@ namespace Moq.Protected
 				throw new ArgumentException(string.Format(
 					CultureInfo.CurrentCulture,
 					Resources.VerifyOnNonVirtualMember,
-					method.ReflectedType.Name + "." + method.Name));
-			}
-		}
-
-		private static void ThrowIfCantOverride(MethodInfo method)
-		{
-			if (method.IsAssembly || method.IsFamilyAndAssembly)
-			{
-				throw new ArgumentException(string.Format(
-					CultureInfo.CurrentCulture,
-					Resources.SetupOnNonOverridableMember,
 					method.ReflectedType.Name + "." + method.Name));
 			}
 		}

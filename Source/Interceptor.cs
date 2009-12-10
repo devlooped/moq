@@ -91,8 +91,8 @@ namespace Moq
 
 		private void VerifyOrThrow(Func<IProxyCall, bool> match)
 		{
-			var failures = calls.Values.Where(match).ToList();
-			if (failures.Count > 0)
+			var failures = calls.Values.Where(match).ToArray();
+			if (failures.Length > 0)
 			{
 				throw new MockVerificationException(failures);
 			}
