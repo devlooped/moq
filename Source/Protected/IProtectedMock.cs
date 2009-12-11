@@ -84,8 +84,10 @@ namespace Moq.Protected
 		/// <paramref name="propertyName"/>.
 		/// </summary>
 		/// <param name="propertyName">The name of the property.</param>
+		/// <param name="value">The property value. If argument matchers are used, 
+		/// remember to use <see cref="ItExpr"/> rather than <see cref="It"/>.</param>
 		/// <typeparam name="TProperty">The type of the property.</typeparam>
-		ISetupSetter<TMock, TProperty> SetupSet<TProperty>(string propertyName);
+		ISetupSetter<TMock, TProperty> SetupSet<TProperty>(string propertyName, object value);
 
 		#endregion
 
@@ -137,9 +139,11 @@ namespace Moq.Protected
 		/// <paramref name="times"/>.</exception>
 		/// <param name="propertyName">The name of the property.</param>
 		/// <param name="times">The number of times a method is allowed to be called.</param>
-		/// <typeparam name="TProperty">The type of the property.</typeparam>
+		/// <param name="value">The property value.</param>
+		/// <typeparam name="TProperty">The type of the property. If argument matchers are used, 
+		/// remember to use <see cref="ItExpr"/> rather than <see cref="It"/>.</typeparam>
 		// TODO should receive args to support indexers
-		void VerifySet<TProperty>(string propertyName, Times times);
+		void VerifySet<TProperty>(string propertyName, Times times, object value);
 
 		#endregion
 	}

@@ -496,8 +496,7 @@ namespace Moq
 			});
 		}
 
-		internal static SetterMethodCall<T1, TProperty> SetupSet<T1, TProperty>(Mock<T1> mock,
-			Action<T1> setterExpression)
+		internal static SetterMethodCall<T1, TProperty> SetupSet<T1, TProperty>(Mock<T1> mock, Action<T1> setterExpression)
 			where T1 : class
 		{
 			return PexProtector.Invoke(() =>
@@ -530,7 +529,8 @@ namespace Moq
 			});
 		}
 
-		internal static SetterMethodCall<T1, TProperty> SetupSet<T1, TProperty>(Mock mock,
+		internal static SetterMethodCall<T1, TProperty> SetupSet<T1, TProperty>(
+			Mock mock,
 			Expression<Func<T1, TProperty>> expression)
 			where T1 : class
 		{

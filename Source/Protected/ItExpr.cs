@@ -100,7 +100,6 @@ namespace Moq.Protected
 		public static Expression IsAny<TValue>()
 		{
 			Expression<Func<TValue>> expr = () => It.IsAny<TValue>();
-
 			return expr.Body;
 		}
 

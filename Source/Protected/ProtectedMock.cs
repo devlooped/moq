@@ -41,6 +41,7 @@
 using System;
 using System.Collections.Generic;
 using System.Globalization;
+using System.Linq;
 using System.Linq.Expressions;
 using System.Reflection;
 using Moq.Language.Flow;
@@ -101,14 +102,15 @@ namespace Moq.Protected
 			return Mock.SetupGet(mock, GetMemberAccess<TProperty>(property));
 		}
 
-		public ISetupSetter<T, TProperty> SetupSet<TProperty>(string propertyName)
+		public ISetupSetter<T, TProperty> SetupSet<TProperty>(string propertyName, object value)
 		{
 			Guard.NotNullOrEmpty(() => propertyName, propertyName);
 
 			var property = GetProperty(propertyName);
 			ThrowIfMemberMissing(propertyName, property);
 			ThrowIfPublicProperty(property);
-			return Mock.SetupSet(mock, GetMemberAccess<TProperty>(property));
+
+			return Mock.SetupSet<T, TProperty>(mock, GetSetterExpression(property, ItExpr.IsAny<TProperty>()));
 		}
 
 		#endregion
@@ -160,7 +162,7 @@ namespace Moq.Protected
 		}
 
 		// TODO should receive args to support indexers
-		public void VerifySet<TProperty>(string propertyName, Times times)
+		public void VerifySet<TProperty>(string propertyName, Times times, object value)
 		{
 			Guard.NotNullOrEmpty(() => propertyName, propertyName);
 
@@ -333,27 +335,26 @@ namespace Moq.Protected
 			return types;
 		}
 
+		private static Expression ToExpressionArg(object arg)
+		{
+			var lambda = arg as LambdaExpression;
+			if (lambda != null)
+			{
+				return lambda.Body;
+			}
+
+			var expression = arg as Expression;
+			if (expression!=null)
+			{
+				return expression;
+			}
+
+			return Expression.Constant(arg);
+		}
+
 		private static IEnumerable<Expression> ToExpressionArgs(object[] args)
 		{
-			foreach (var arg in args)
-			{
-				var expr = arg as Expression;
-				if (expr != null)
-				{
-					if (expr.NodeType == ExpressionType.Lambda)
-					{
-						yield return ((LambdaExpression)expr).Body;
-					}
-					else
-					{
-						yield return expr;
-					}
-				}
-				else
-				{
-					yield return Expression.Constant(arg);
-				}
-			}
+			return args.Select(arg => ToExpressionArg(arg));
 		}
 	}
 }

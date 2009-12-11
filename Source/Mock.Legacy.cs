@@ -46,6 +46,7 @@ namespace Moq
 	// Keeps legacy implementations.
 	public partial class Mock
 	{
+		[Obsolete]
 		internal static SetterMethodCall<T1, TProperty> SetupSet<T1, TProperty>(
 			Mock mock,
 			Expression<Func<T1, TProperty>> expression, TProperty value)

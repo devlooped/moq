@@ -173,7 +173,7 @@
 			</para>
 		</remarks>
 		<typeparam name="TProperty">Type of the property. Typically omitted as it can be inferred from the expression.</typeparam>
-		<param name="setterExpression">Lambda expression that sets a property to a value.</param>
+		<param name="setterExpression">The Lambda expression that sets a property to a value.</param>
 		<example group="setups">
 			<code>
 				mock.SetupSet(x =&gt; x.Suspended = true);
