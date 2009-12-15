@@ -189,9 +189,6 @@
     <Compile Include="..\Source\Language\ICallbackSetter.cs">
       <Link>Language\ICallbackSetter.cs</Link>
     </Compile>
-    <Compile Include="..\Source\Language\IOccurrence.cs">
-      <Link>Language\IOccurrence.cs</Link>
-    </Compile>
     <Compile Include="..\Source\Language\IReturns.cs">
       <Link>Language\IReturns.cs</Link>
     </Compile>
@@ -212,9 +209,6 @@
     </Compile>
     <Compile Include="..\Source\Match.cs">
       <Link>Match.cs</Link>
-    </Compile>
-    <Compile Include="..\Source\MatcherAttribute.cs">
-      <Link>MatcherAttribute.cs</Link>
     </Compile>
     <Compile Include="..\Source\MatcherFactory.cs">
       <Link>MatcherFactory.cs</Link>
@@ -270,12 +264,6 @@
     <Compile Include="..\Source\Mock.Generic.cs">
       <Link>Mock.Generic.cs</Link>
     </Compile>
-    <Compile Include="..\Source\Mock.Generic.Legacy.cs">
-      <Link>Mock.Generic.Legacy.cs</Link>
-    </Compile>
-    <Compile Include="..\Source\Mock.Legacy.cs">
-      <Link>Mock.Legacy.cs</Link>
-    </Compile>
     <Compile Include="..\Source\MockBehavior.cs">
       <Link>MockBehavior.cs</Link>
     </Compile>
@@ -285,14 +273,29 @@
     <Compile Include="..\Source\MockException.cs">
       <Link>MockException.cs</Link>
     </Compile>
-    <Compile Include="..\Source\MockExtensions.cs">
-      <Link>MockExtensions.cs</Link>
-    </Compile>
     <Compile Include="..\Source\MockFactory.cs">
       <Link>MockFactory.cs</Link>
     </Compile>
     <Compile Include="..\Source\Mocks.cs">
       <Link>Mocks.cs</Link>
+    </Compile>
+    <Compile Include="..\Source\Obsolete\IOccurrence.cs">
+      <Link>Obsolete\IOccurrence.cs</Link>
+    </Compile>
+    <Compile Include="..\Source\Obsolete\MatcherAttribute.cs">
+      <Link>Obsolete\MatcherAttribute.cs</Link>
+    </Compile>
+    <Compile Include="..\Source\Obsolete\Mock.Generic.Legacy.cs">
+      <Link>Obsolete\Mock.Generic.Legacy.cs</Link>
+    </Compile>
+    <Compile Include="..\Source\Obsolete\Mock.Legacy.cs">
+      <Link>Obsolete\Mock.Legacy.cs</Link>
+    </Compile>
+    <Compile Include="..\Source\Obsolete\MockExtensions.cs">
+      <Link>Obsolete\MockExtensions.cs</Link>
+    </Compile>
+    <Compile Include="..\Source\Obsolete\StubExtensions.cs">
+      <Link>Obsolete\StubExtensions.cs</Link>
     </Compile>
     <Compile Include="..\Source\PexProtector.cs">
       <Link>PexProtector.cs</Link>
@@ -341,9 +344,6 @@
     </Compile>
     <Compile Include="..\Source\SetupKind.cs">
       <Link>SetupKind.cs</Link>
-    </Compile>
-    <Compile Include="..\Source\Sub\StubExtensions.cs">
-      <Link>Stub\StubExtensions.cs</Link>
     </Compile>
     <Compile Include="..\Source\Times.cs">
       <Link>Times.cs</Link>

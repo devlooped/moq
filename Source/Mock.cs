@@ -294,43 +294,6 @@ namespace Moq
 			VerifyCalls(GetInterceptor(((MemberExpression)expression.Body).Expression, mock), expected, expression, times);
 		}
 
-		[Obsolete]
-		internal static void VerifySet<T, TProperty>(
-			Mock mock,
-			Expression<Func<T, TProperty>> expression,
-			Times times,
-			string failMessage)
-			where T : class
-		{
-			var method = expression.ToPropertyInfo().GetSetMethod();
-			ThrowIfNonVirtual(expression, method);
-
-			var expected = new SetterMethodCall<T, TProperty>(mock, expression, method)
-			{
-				FailMessage = failMessage
-			};
-			VerifyCalls(GetInterceptor(((MemberExpression)expression.Body).Expression, mock), expected, expression, times);
-		}
-
-		[Obsolete]
-		internal static void VerifySet<T, TProperty>(
-			Mock mock,
-			Expression<Func<T, TProperty>> expression,
-			TProperty value,
-			Times times,
-			string failMessage)
-			where T : class
-		{
-			var method = expression.ToPropertyInfo().GetSetMethod();
-			ThrowIfNonVirtual(expression, method);
-
-			var expected = new SetterMethodCall<T, TProperty>(mock, expression, method, value)
-			{
-				FailMessage = failMessage
-			};
-			VerifyCalls(GetInterceptor(((MemberExpression)expression.Body).Expression, mock), expected, expression, times);
-		}
-
 		internal static void VerifySet<T>(
 			Mock<T> mock,
 			Action<T> setterExpression,

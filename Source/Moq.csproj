@@ -93,9 +93,14 @@
       <DependentUpon>Delegates.tt</DependentUpon>
     </Compile>
     <Compile Include="Microsoft\ExpressionVisitor.cs" Condition=" '$(TargetFrameworkVersion)' == 'v3.5'" />
+    <Compile Include="Obsolete\IOccurrence.cs" />
+    <Compile Include="Obsolete\MatcherAttribute.cs" />
+    <Compile Include="Obsolete\Mock.Generic.Legacy.cs" />
+    <Compile Include="Obsolete\Mock.Legacy.cs" />
+    <Compile Include="Obsolete\MockExtensions.cs" />
+    <Compile Include="Obsolete\StubExtensions.cs" />
     <Compile Include="SetupKind.cs" />
     <Compile Include="Language\Flow\IReturnsResult.cs" />
-    <Compile Include="MatcherAttribute.cs" />
     <Compile Include="ExpressionExtensions.cs" />
     <Compile Include="Extensions.cs" />
     <Compile Include="Evaluator.cs" />
@@ -112,7 +117,6 @@
     <Compile Include="IProxyCall.cs" />
     <Compile Include="Language\Flow\ISetup.cs" />
     <Compile Include="Language\ICallbackSetter.cs" />
-    <Compile Include="Language\IOccurrence.cs" />
     <Compile Include="It.cs" />
     <Compile Include="Language\IThrows.cs" />
     <Compile Include="Language\IVerifies.cs" />
@@ -195,13 +199,8 @@
     <Compile Include="Matchers\RefMatcher.cs" />
     <Compile Include="MemberInfoExtensions.cs" />
     <Compile Include="Mock.Generic.cs" />
-    <Compile Include="Mock.Generic.Legacy.cs">
-      <SubType>Code</SubType>
-    </Compile>
     <Compile Include="FluentMockContext.cs" />
-    <Compile Include="Mock.Legacy.cs" />
     <Compile Include="MockDefaultValueProvider.cs" />
-    <Compile Include="MockExtensions.cs" />
     <Compile Include="Mocks.cs" />
     <Compile Include="PexProtector.cs" />
     <Compile Include="Proxy\ICallContext.cs" />
@@ -209,7 +208,6 @@
     <Compile Include="Proxy\ICallInterceptor.cs" />
     <Compile Include="Proxy\IProxyFactory.cs" />
     <Compile Include="SetterMethodCall.cs" />
-    <Compile Include="Sub\StubExtensions.cs" />
     <Compile Include="Times.cs" />
     <None Include="Includes\GenericTypeParameters.tt" />
     <None Include="MethodCall.tt">
