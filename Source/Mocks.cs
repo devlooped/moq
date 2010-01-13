@@ -64,7 +64,7 @@ namespace Moq
 		/// <returns>The mock of the given type.</returns>
 		public static T First<T>(Expression<Func<T, bool>> setupCondition)
 		{
-			return Mocks.CreateQuery<T>().First(setupCondition);
+			return Mocks.CreateQuery<T>().Where(setupCondition).First();
 		}
 
 		/// <summary>
