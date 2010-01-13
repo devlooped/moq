@@ -57,6 +57,17 @@ namespace Moq
 	public static class Mocks
 	{
 		/// <summary>
+		/// Returns a mock of the given type.
+		/// </summary>
+		/// <typeparam name="T">The type of mocked object.</typeparam>
+		/// <param name="setupCondition">The expressions to be set as setup conditions.</param>
+		/// <returns>The mock of the given type.</returns>
+		public static T First<T>(Expression<Func<T, bool>> setupCondition)
+		{
+			return Mocks.CreateQuery<T>().First(setupCondition);
+		}
+
+		/// <summary>
 		/// Creates a query for mocks of the given type.
 		/// </summary>
 		/// <typeparam name="T">The type of mocked object to query.</typeparam>
