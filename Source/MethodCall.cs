@@ -50,6 +50,7 @@ using System.Text;
 using Moq.Language;
 using Moq.Language.Flow;
 using Moq.Proxy;
+using Moq.Properties;
 
 namespace Moq
 {
@@ -117,29 +118,31 @@ namespace Moq
 			this.method = method;
 
 			var parameters = method.GetParameters();
-			for (int i = 0; i < parameters.Length; i++)
+			for (int index = 0; index < parameters.Length; index++)
 			{
-				var parameter = parameters[i];
-				var argument = arguments[i];
-				if (parameter.IsOut)
+				var parameter = parameters[index];
+				var argument = arguments[index];
+				if (parameter.ParameterType.IsByRef)
 				{
 					var value = argument.PartialEval();
-					if (value.NodeType != ExpressionType.Constant)
+					if (parameter.IsOut)
 					{
-						throw new NotSupportedException("Out expression must evaluate to a constant value.");
-					}
+						if (value.NodeType != ExpressionType.Constant)
+						{
+							throw new NotSupportedException(Resources.OutExpressionMustBueConstantValue);
+						}
 
-					outValues.Add(new KeyValuePair<int, object>(i, ((ConstantExpression)value).Value));
-				}
-				else if (parameter.ParameterType.IsByRef)
-				{
-					var value = argument.PartialEval();
-					if (value.NodeType != ExpressionType.Constant)
+						outValues.Add(new KeyValuePair<int, object>(index, ((ConstantExpression)value).Value));
+					}
+					else
 					{
-						throw new NotSupportedException("Ref expression must evaluate to a constant value.");
-					}
+						if (value.NodeType != ExpressionType.Constant)
+						{
+							throw new NotSupportedException(Resources.RefExpressionMustBeConstantValue);
+						}
 
-					argumentMatchers.Add(new RefMatcher(((ConstantExpression)value).Value));
+						argumentMatchers.Add(new RefMatcher(((ConstantExpression)value).Value));
+					}
 				}
 				else
 				{
@@ -194,7 +197,7 @@ namespace Moq
 
 		public void SetOutParameters(ICallContext call)
 		{
-			foreach (var item in outValues)
+			foreach (var item in this.outValues)
 			{
 				// it's already evaluated here
 				// TODO: refactor so that we 

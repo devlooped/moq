@@ -300,6 +300,15 @@ namespace Moq.Properties {
         }
         
         /// <summary>
+        ///   Looks up a localized string similar to Out expression must evaluate to a constant value..
+        /// </summary>
+        internal static string OutExpressionMustBueConstantValue {
+            get {
+                return ResourceManager.GetString("OutExpressionMustBueConstantValue", resourceCulture);
+            }
+        }
+        
+        /// <summary>
         ///   Looks up a localized string similar to Property {0}.{1} does not exist..
         /// </summary>
         internal static string PropertyMissing {
@@ -332,6 +341,15 @@ namespace Moq.Properties {
         internal static string RaisedUnassociatedEvent {
             get {
                 return ResourceManager.GetString("RaisedUnassociatedEvent", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Ref expression must evaluate to a constant value..
+        /// </summary>
+        internal static string RefExpressionMustBeConstantValue {
+            get {
+                return ResourceManager.GetString("RefExpressionMustBeConstantValue", resourceCulture);
             }
         }
         

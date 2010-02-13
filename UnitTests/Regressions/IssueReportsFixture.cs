@@ -11,6 +11,7 @@ using System.Collections;
 using System.Text;
 using Moq;
 using System.ComponentModel;
+using System.IO;
 
 #region #181
 
@@ -959,7 +960,7 @@ namespace Moq.Tests.Regressions
 		}
 
 		#endregion
-	
+
 		#region #186
 
 		public class _186
@@ -987,7 +988,7 @@ namespace Moq.Tests.Regressions
 				}
 			}
 		}
- 
+
 		#endregion
 
 		#region #223
@@ -1029,6 +1030,29 @@ namespace Moq.Tests.Regressions
 				{
 					return 5;
 				}
+			}
+		}
+
+		#endregion
+
+		#region #230
+
+		public class _230
+		{
+			[Fact]
+			public void Test()
+			{
+				var data = new byte[] { 2, 1, 2 };
+				var stream = new Mock<Stream>();
+
+				stream.SetupGet(m => m.Length)
+					.Returns(data.Length);
+				stream.Setup(m => m.Read(It.IsAny<byte[]>(), It.IsAny<int>(), It.IsAny<int>()))
+					.Callback<byte[], int, int>((b, o, c) => data.CopyTo(b, 0))
+					.Returns(data.Length);
+
+				var contents = new byte[stream.Object.Length];
+				stream.Object.Read(contents, 0, (int)stream.Object.Length);
 			}
 		}
 
