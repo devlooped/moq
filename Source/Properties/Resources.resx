@@ -283,7 +283,7 @@ Expected invocation on the mock once, but was {4} times: {1}</value>
     <value>Invalid verify on a non-virtual member:
 {0}</value>
   </data>
-  <data name="OutExpressionMustBueConstantValue" xml:space="preserve">
+  <data name="OutExpressionMustBeConstantValue" xml:space="preserve">
     <value>Out expression must evaluate to a constant value.</value>
   </data>
   <data name="RefExpressionMustBeConstantValue" xml:space="preserve">

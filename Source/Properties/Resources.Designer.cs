@@ -302,9 +302,9 @@ namespace Moq.Properties {
         /// <summary>
         ///   Looks up a localized string similar to Out expression must evaluate to a constant value..
         /// </summary>
-        internal static string OutExpressionMustBueConstantValue {
+        internal static string OutExpressionMustBeConstantValue {
             get {
-                return ResourceManager.GetString("OutExpressionMustBueConstantValue", resourceCulture);
+                return ResourceManager.GetString("OutExpressionMustBeConstantValue", resourceCulture);
             }
         }
         

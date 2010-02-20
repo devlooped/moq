@@ -1052,7 +1052,7 @@ namespace Moq.Tests.Regressions
 					.Returns(data.Length);
 
 				var contents = new byte[stream.Object.Length];
-				stream.Object.Read(contents, 0, (int)stream.Object.Length);
+				Assert.DoesNotThrow(() => stream.Object.Read(contents, 0, (int)stream.Object.Length));
 			}
 		}
 
@@ -1232,6 +1232,19 @@ namespace Moq.Tests.Regressions
 				}
 			}
 
+		}
+
+		#endregion
+
+		#region #205
+
+		public class _205
+		{
+			[Fact]
+			public void Test()
+			{
+				Assert.DoesNotThrow(() => new Mock<IDataErrorInfo>().SetupAllProperties());
+			}
 		}
 
 		#endregion

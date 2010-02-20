@@ -49,8 +49,8 @@ using System.Reflection;
 using System.Text;
 using Moq.Language;
 using Moq.Language.Flow;
-using Moq.Proxy;
 using Moq.Properties;
+using Moq.Proxy;
 
 namespace Moq
 {
@@ -122,27 +122,25 @@ namespace Moq
 			{
 				var parameter = parameters[index];
 				var argument = arguments[index];
-				if (parameter.ParameterType.IsByRef)
+				if (parameter.IsOutArgument())
 				{
-					var value = argument.PartialEval();
-					if (parameter.IsOut)
+					var constant = argument.PartialEval() as ConstantExpression;
+					if (constant == null)
 					{
-						if (value.NodeType != ExpressionType.Constant)
-						{
-							throw new NotSupportedException(Resources.OutExpressionMustBueConstantValue);
-						}
-
-						outValues.Add(new KeyValuePair<int, object>(index, ((ConstantExpression)value).Value));
+						throw new NotSupportedException(Resources.OutExpressionMustBeConstantValue);
 					}
-					else
+
+					outValues.Add(new KeyValuePair<int, object>(index, constant.Value));
+				}
+				else if (parameter.IsRefArgument())
+				{
+					var constant = argument.PartialEval() as ConstantExpression;
+					if (constant == null)
 					{
-						if (value.NodeType != ExpressionType.Constant)
-						{
-							throw new NotSupportedException(Resources.RefExpressionMustBeConstantValue);
-						}
-
-						argumentMatchers.Add(new RefMatcher(((ConstantExpression)value).Value));
+						throw new NotSupportedException(Resources.RefExpressionMustBeConstantValue);
 					}
+
+					argumentMatchers.Add(new RefMatcher(constant.Value));
 				}
 				else
 				{
@@ -211,7 +209,7 @@ namespace Moq
 			var args = new List<object>();
 			for (int i = 0; i < parameters.Length; i++)
 			{
-				if (!parameters[i].IsOut)
+				if (!parameters[i].IsOutArgument())
 				{
 					args.Add(call.Arguments[i]);
 				}

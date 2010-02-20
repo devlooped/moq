@@ -9,12 +9,12 @@ namespace Moq.Tests
 		public void ExpectsOutArgument()
 		{
 			var mock = new Mock<IFoo>();
-			string expected = "ack";
+			var expected = "ack";
 
 			mock.Setup(m => m.Execute("ping", out expected)).Returns(true);
 
 			string actual;
-			bool ok = mock.Object.Execute("ping", out actual);
+			var ok = mock.Object.Execute("ping", out actual);
 
 			Assert.True(ok);
 			Assert.Equal(expected, actual);
@@ -83,7 +83,7 @@ namespace Moq.Tests
 
 			Assert.Equal(true, mock.Object.IntMethod(ref expected));
 		}
-		
+
 		// ThrowsIfOutIsNotConstant
 		// ThrowsIfRefIsNotConstant
 

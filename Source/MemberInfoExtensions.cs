@@ -84,6 +84,16 @@ namespace Moq
 			return method.IsSpecialName && method.Name.StartsWith("set_", StringComparison.Ordinal);
 		}
 
+		public static bool IsRefArgument(this ParameterInfo parameter)
+		{
+			return parameter.ParameterType.IsByRef && (parameter.Attributes & ParameterAttributes.Out) == ParameterAttributes.None;
+		}
+
+		public static bool IsOutArgument(this ParameterInfo parameter)
+		{
+			return parameter.ParameterType.IsByRef && (parameter.Attributes & ParameterAttributes.Out) == ParameterAttributes.Out;
+		}
+
 		private static string GetGenericArguments(IEnumerable<Type> types, Func<Type, string> typeGetter)
 		{
 			return "<" + string.Join(",", types.Select(typeGetter).ToArray()) + ">";

@@ -618,17 +618,15 @@ namespace Moq
 				// Crazy reflection stuff below. Ah... the goodies of generics :)
 				var mockType = mock.MockedType;
 				var poperties = mockType.GetProperties()
-					.Concat(from i in mockType.GetInterfaces()
-							from p in i.GetProperties()
-							select p)
+					.Concat(mockType.GetInterfaces().SelectMany(i => i.GetProperties()))
 					.Distinct();
 
 				foreach (var property in poperties)
 				{
-					if (property.CanRead && property.CanOverrideGet())
+					if (property.CanRead && property.CanOverrideGet() && property.GetIndexParameters().Length == 0)
 					{
 						var expect = GetPropertyExpression(mockType, property);
-						object initialValue = mock.DefaultValueProvider.ProvideDefault(property.GetGetMethod());
+						var initialValue = mock.DefaultValueProvider.ProvideDefault(property.GetGetMethod());
 						var mocked = initialValue as IMocked;
 						if (mocked != null)
 						{
