@@ -1,4 +1,5 @@
-﻿using System.Linq;
+﻿using System;
+using System.Linq;
 using Xunit;
 
 namespace Moq.Tests
@@ -89,10 +90,7 @@ namespace Moq.Tests
 		[Fact]
 		public void ShouldSupportBooleanExpression()
 		{
-			var instance = (from f in Mocks.CreateQuery<IBaz>()
-							where f.IsValid
-							select f)
-							.First();
+			var instance = Mocks.CreateQuery<IBaz>().Where(f => f.IsValid).First();
 
 			Assert.True(instance.IsValid);
 		}
@@ -100,10 +98,7 @@ namespace Moq.Tests
 		[Fact]
 		public void ShouldSupportNotBooleanExpression()
 		{
-			var instance = (from f in Mocks.CreateQuery<IBaz>()
-							where !f.IsValid
-							select f)
-							.First();
+			var instance = Mocks.CreateQuery<IBaz>().Where(f => !f.IsValid).First();
 
 			Assert.False(instance.IsValid);
 		}
@@ -111,10 +106,7 @@ namespace Moq.Tests
 		[Fact]
 		public void ShouldSupportBooleanEqualsToTrue()
 		{
-			var instance = (from f in Mocks.CreateQuery<IBaz>()
-							where f.IsValid == true
-							select f)
-							.First();
+			var instance = Mocks.CreateQuery<IBaz>().Where(f => f.IsValid == true).First();
 
 			Assert.True(instance.IsValid);
 		}
@@ -122,12 +114,17 @@ namespace Moq.Tests
 		[Fact]
 		public void ShouldSupportBooleanEqualsToFalse()
 		{
-			var instance = (from f in Mocks.CreateQuery<IBaz>()
-							where f.IsValid == false
-							select f)
-							.First();
+			var instance = Mocks.CreateQuery<IBaz>().Where(f => f.IsValid == false).First();
 
 			Assert.False(instance.IsValid);
+		}
+
+		[Fact]
+		public void ShouldSupportEnumExpressions()
+		{
+			var instance = Mocks.CreateQuery<IFoo>().Where(f => f.Targets == AttributeTargets.Class).First();
+
+			Assert.Equal(AttributeTargets.Class, instance.Targets);
 		}
 
 		public interface IFoo
@@ -135,6 +132,7 @@ namespace Moq.Tests
 			IBar Bar { get; set; }
 			string Name { get; set; }
 			IBar Find(string id);
+			AttributeTargets Targets { get; set; }
 		}
 
 		public interface IBar

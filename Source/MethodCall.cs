@@ -159,32 +159,20 @@ namespace Moq
 			try
 			{
 				var thisMethod = MethodBase.GetCurrentMethod();
-				var stack = new StackTrace(true);
-				var index = 0;
-
-				// Move 'till our own frame first
-				while (stack.GetFrame(index).GetMethod() != thisMethod && index <= stack.FrameCount)
-				{
-					index++;
-				}
-
-				// Move 'till we're at the entry point 
-				// into Moq API
 				var mockAssembly = Assembly.GetExecutingAssembly();
-				while (stack.GetFrame(index).GetMethod().DeclaringType.Assembly == mockAssembly &&
-					index <= stack.FrameCount)
-				{
-					index++;
-				}
 
-				if (index < stack.FrameCount)
+				// Move 'till we're at the entry point into Moq API
+				var frame = new StackTrace(true).GetFrames()
+					.SkipWhile(f => f.GetMethod() != thisMethod)
+					.SkipWhile(f => f.GetMethod().DeclaringType == null || f.GetMethod().DeclaringType.Assembly == mockAssembly)
+					.FirstOrDefault();
+
+				if (frame != null)
 				{
-					var frame = stack.GetFrame(index);
 					this.FileLine = frame.GetFileLineNumber();
 					this.FileName = Path.GetFileName(frame.GetFileName());
-					TestMethod = frame.GetMethod();
+					this.TestMethod = frame.GetMethod();
 				}
-
 			}
 			catch
 			{

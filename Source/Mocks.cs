@@ -125,7 +125,7 @@ namespace Moq
 				replaced = QueryableToEnumerableReplacer.ReplaceAll(replaced);
 
 				var lambda = Expression.Lambda(typeof(Func<>).MakeGenericType(replaced.Type), replaced);
-				return lambda.Compile().DynamicInvoke(null);
+				return lambda.Compile().DynamicInvoke();
 			}
 
 			public override string GetQueryText(Expression expression)
@@ -198,6 +198,12 @@ namespace Moq
 						case ExpressionType.Call:
 							var methodCall = (MethodCallExpression)node.Left;
 							return ConvertToSetup(methodCall.Object, methodCall, node.Right);
+
+						case ExpressionType.Convert:
+							var left =(UnaryExpression)node.Left;
+							var methodCall1 = (MemberExpression)left.Operand;
+							var right = Expression.Convert(node.Right, methodCall1.Type);
+							return ConvertToSetup(methodCall1.Expression, methodCall1, right);
 					}
 				}
 
