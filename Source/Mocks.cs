@@ -192,18 +192,34 @@ namespace Moq
 					switch (node.Left.NodeType)
 					{
 						case ExpressionType.MemberAccess:
-							var memberAccess = (MemberExpression)node.Left;
-							return ConvertToSetup(memberAccess.Expression, memberAccess, node.Right);
+							var member = (MemberExpression)node.Left;
+							return ConvertToSetup(member.Expression, member, node.Right);
 
 						case ExpressionType.Call:
-							var methodCall = (MethodCallExpression)node.Left;
-							return ConvertToSetup(methodCall.Object, methodCall, node.Right);
+							var method = (MethodCallExpression)node.Left;
+							return ConvertToSetup(method.Object, method, node.Right);
 
 						case ExpressionType.Convert:
-							var left =(UnaryExpression)node.Left;
-							var methodCall1 = (MemberExpression)left.Operand;
-							var right = Expression.Convert(node.Right, methodCall1.Type);
-							return ConvertToSetup(methodCall1.Expression, methodCall1, right);
+							var left = (UnaryExpression)node.Left;
+
+							switch (left.Operand.NodeType)
+							{
+								case ExpressionType.MemberAccess:
+									var memberOperand = (MemberExpression)left.Operand;
+									return ConvertToSetup(
+										memberOperand.Expression,
+										memberOperand,
+										Expression.Convert(node.Right, memberOperand.Type));
+
+								case ExpressionType.Call:
+									var methodOperand = (MethodCallExpression)left.Operand;
+									return ConvertToSetup(
+										methodOperand.Object,
+										methodOperand,
+										Expression.Convert(node.Right, methodOperand.Type));
+							}
+
+							break;
 					}
 				}
 
