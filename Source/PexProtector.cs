@@ -39,12 +39,16 @@
 // http://www.opensource.org/licenses/bsd-license.php]
 
 using System;
+using System.Diagnostics;
 
-internal sealed class __ProtectAttribute : Attribute { }
+internal sealed class __ProtectAttribute : Attribute
+{
+}
 
 namespace Moq
 {
 	[__Protect]
+    [DebuggerStepThrough]
 	internal static class PexProtector
 	{
 		public static void Invoke(Action action)

@@ -1058,9 +1058,30 @@ namespace Moq.Tests.Regressions
 
 		#endregion
 
-		#region Recursive issue
+        #region #245
 
-		public class RecursiveFixture
+        public class _245
+        {
+            [Fact]
+            public void Test()
+            {
+                var mock = new Mock<ITest>();
+
+                ITest instance;
+                Assert.DoesNotThrow(() => instance = mock.Object);
+            }
+
+            public interface ITest
+            {
+                void Do<T1, T2>() where T2 : T1;
+            }
+        }
+
+        #endregion
+
+        #region Recursive issue
+
+        public class RecursiveFixture
 		{
 			[Fact]
 			public void TestRecursive()

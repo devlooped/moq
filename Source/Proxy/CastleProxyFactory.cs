@@ -66,27 +66,20 @@ namespace Moq.Proxy
 			{
 				try
 				{
-					if (arguments.Length > 0)
-					{
-						var generatedType = generator.ProxyBuilder.CreateClassProxy(
-							mockType,
-							interfaces,
-							new ProxyGenerationOptions());
-						return (T)Activator.CreateInstance(
-							generatedType,
-							new object[] { new IInterceptor[] { new Interceptor(interceptor) } }
-							.Concat(arguments).ToArray());
-					}
-
-					return (T)generator.CreateClassProxy(mockType, interfaces, new Interceptor(interceptor));
+					return (T)generator.CreateClassProxy(
+						mockType,
+						interfaces,
+						new ProxyGenerationOptions(),
+						arguments,
+						new Interceptor(interceptor));
 				}
-				catch (TypeLoadException tle) // TODO put in the upper method ?
+				catch (TypeLoadException e) // TODO put in the upper method ?
 				{
-					throw new ArgumentException(Resources.InvalidMockClass, tle);
+					throw new ArgumentException(Resources.InvalidMockClass, e);
 				}
-				catch (MissingMethodException mme)
+				catch (MissingMethodException e)
 				{
-					throw new ArgumentException(Resources.ConstructorNotFound, mme);
+					throw new ArgumentException(Resources.ConstructorNotFound, e);
 				}
 			}
 		}
