@@ -174,7 +174,7 @@ namespace Moq.Tests
 
 			mock.Setup(x => x.DoAddition(new int[] { 2, 4, 6 })).Returns(12);
 
-			Assert.Equal(12, mock.Object.DoAddition(new int[] { 2, 4, 6 }));
+			Assert.Equal(12, mock.Object.DoAddition(new[] { 2, 4, 6 }));
 		}
 
 		[Fact]
@@ -182,11 +182,11 @@ namespace Moq.Tests
 		{
 			var mock = new Mock<IFoo>();
 
-			mock.Setup(x => x.DoAddition(new int[] { 2, 4, 6 })).Returns(12);
+			mock.Setup(x => x.DoAddition(new[] { 2, 4, 6 })).Returns(12);
 
-			Assert.Equal(0, mock.Object.DoAddition(new int[] { 2, 4 }));
-			Assert.Equal(0, mock.Object.DoAddition(new int[] { 2, 4, 5 }));
-			Assert.Equal(0, mock.Object.DoAddition(new int[] { 2, 4, 6, 8 }));
+			Assert.Equal(0, mock.Object.DoAddition(new[] { 2, 4 }));
+			Assert.Equal(0, mock.Object.DoAddition(new[] { 2, 4, 5 }));
+			Assert.Equal(0, mock.Object.DoAddition(new[] { 2, 4, 6, 8 }));
 		}
 
 		private int GetToRange()
