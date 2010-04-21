@@ -39,17 +39,18 @@
 // http://www.opensource.org/licenses/bsd-license.php]
 
 using System;
-using System.Linq;
 using System.Reflection;
+using System.Security.Permissions;
 using Castle.Core.Interceptor;
 using Castle.DynamicProxy;
+using Castle.DynamicProxy.Generators;
 using Moq.Properties;
 
 namespace Moq.Proxy
 {
 	internal class CastleProxyFactory : IProxyFactory
 	{
-		private static readonly ProxyGenerator generator = new ProxyGenerator();
+		private static readonly ProxyGenerator generator = CreateProxyGenerator();
 
 		public T CreateProxy<T>(ICallInterceptor interceptor, Type[] interfaces, object[] arguments)
 		{
@@ -82,6 +83,16 @@ namespace Moq.Proxy
 					throw new ArgumentException(Resources.ConstructorNotFound, e);
 				}
 			}
+		}
+
+		private static ProxyGenerator CreateProxyGenerator()
+		{
+			if (!AttributesToAvoidReplicating.Contains(typeof(SecurityPermissionAttribute)))
+			{
+				AttributesToAvoidReplicating.Add<SecurityPermissionAttribute>();
+			}
+
+			return new ProxyGenerator();
 		}
 
 		private class Interceptor : IInterceptor
