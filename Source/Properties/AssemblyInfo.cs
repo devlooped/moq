@@ -10,7 +10,7 @@ using System;
 [assembly: AssemblyProduct("Moq")]
 [assembly: AssemblyTrademark("")]
 [assembly: AssemblyCulture("")]
-[assembly: AssemblyVersion("4.0.812.4")]
+[assembly: AssemblyVersion("4.0.423.5")]
 [assembly: AssemblyFileVersion("4.0.0.0")]
 
 [assembly: ComVisible(false)]
