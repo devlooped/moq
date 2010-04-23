@@ -3,7 +3,7 @@
   <PropertyGroup>
     <Configuration Condition=" '$(Configuration)' == '' ">Debug</Configuration>
     <Platform Condition=" '$(Platform)' == '' ">AnyCPU</Platform>
-    <ProductVersion>9.0.30729</ProductVersion>
+    <ProductVersion>8.0.50727</ProductVersion>
     <SchemaVersion>2.0</SchemaVersion>
     <ProjectGuid>{5136C8E1-E17F-481F-B29A-C7FAB528BD2D}</ProjectGuid>
     <ProjectTypeGuids>{A1591282-1198-4647-A2B1-27E5FF5F6F3B};{fae04ec0-301f-11d3-bf4b-00c04f79efbc}</ProjectTypeGuids>
@@ -11,31 +11,19 @@
     <AppDesignerFolder>Properties</AppDesignerFolder>
     <RootNamespace>Moq</RootNamespace>
     <AssemblyName>Moq.Silverlight</AssemblyName>
-    <TargetFrameworkVersion>v3.5</TargetFrameworkVersion>
+    <TargetFrameworkIdentifier>Silverlight</TargetFrameworkIdentifier>
+    <TargetFrameworkVersion>v3.0</TargetFrameworkVersion>
+    <SilverlightVersion>$(TargetFrameworkVersion)</SilverlightVersion>
     <SilverlightApplication>false</SilverlightApplication>
     <ValidateXaml>true</ValidateXaml>
     <ThrowErrorsInValidation>false</ThrowErrorsInValidation>
     <SignAssembly>true</SignAssembly>
     <AssemblyOriginatorKeyFile>..\Moq.snk</AssemblyOriginatorKeyFile>
-    <FileUpgradeFlags>
-    </FileUpgradeFlags>
-    <OldToolsVersion>3.5</OldToolsVersion>
-    <UpgradeBackupLocation />
-    <PublishUrl>publish\</PublishUrl>
-    <Install>true</Install>
-    <InstallFrom>Disk</InstallFrom>
-    <UpdateEnabled>false</UpdateEnabled>
-    <UpdateMode>Foreground</UpdateMode>
-    <UpdateInterval>7</UpdateInterval>
-    <UpdateIntervalUnits>Days</UpdateIntervalUnits>
-    <UpdatePeriodically>false</UpdatePeriodically>
-    <UpdateRequired>false</UpdateRequired>
-    <MapFileExtensions>true</MapFileExtensions>
-    <ApplicationRevision>0</ApplicationRevision>
-    <ApplicationVersion>1.0.0.%2a</ApplicationVersion>
-    <IsWebBootstrapper>false</IsWebBootstrapper>
-    <UseApplicationTrust>false</UseApplicationTrust>
-    <BootstrapperEnabled>true</BootstrapperEnabled>
+    <SignManifests>false</SignManifests>
+    <TargetFrameworkProfile />
+  </PropertyGroup>
+  <PropertyGroup Condition="'$(MSBuildToolsVersion)' == '3.5'">
+    <TargetFrameworkVersion>v3.5</TargetFrameworkVersion>
   </PropertyGroup>
   <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Debug|AnyCPU' ">
     <DebugSymbols>true</DebugSymbols>
@@ -54,7 +42,7 @@
     <DebugType>pdbonly</DebugType>
     <Optimize>true</Optimize>
     <OutputPath>bin\Release\</OutputPath>
-    <DefineConstants>TRACE;SILVERLIGHT;NET35</DefineConstants>
+    <DefineConstants>TRACE;SILVERLIGHT</DefineConstants>
     <NoStdLib>true</NoStdLib>
     <NoConfig>true</NoConfig>
     <ErrorReport>prompt</ErrorReport>
@@ -231,8 +219,11 @@
     <Compile Include="..\Source\Matchers\PredicateMatcher.cs">
       <Link>Matchers\PredicateMatcher.cs</Link>
     </Compile>
-    <Compile Include="..\Source\MatchExpression.Silverlight.cs">
-      <Link>MatchExpression.Silverlight.cs</Link>
+    <Compile Include="..\Source\MatchExpression.PreV4.cs" Condition=" '$(TargetFrameworkVersion)' != 'v4.0'">
+      <Link>MatchExpression.PreV4.cs</Link>
+    </Compile>
+    <Compile Include="..\Source\MatchExpression.cs" Condition=" '$(TargetFrameworkVersion)' == 'v4.0'">
+      <Link>MatchExpression.cs</Link>
     </Compile>
     <Compile Include="..\Source\MemberInfoExtensions.cs">
       <Link>MemberInfoExtensions.cs</Link>
@@ -249,13 +240,10 @@
     <Compile Include="..\Source\MethodCallReturn.Generated.cs">
       <Link>MethodCallReturn.Generated.cs</Link>
     </Compile>
-    <Compile Include="..\Source\Microsoft\Delegates.cs">
+    <Compile Include="..\Source\Microsoft\Delegates.cs" Condition=" '$(TargetFrameworkVersion)' != 'v4.0'">
       <Link>Microsoft\Delegates.cs</Link>
-      <AutoGen>True</AutoGen>
-      <DesignTime>True</DesignTime>
-      <DependentUpon>Delegates.tt</DependentUpon>
     </Compile>
-    <Compile Include="..\Source\Microsoft\ExpressionVisitor.cs">
+    <Compile Include="..\Source\Microsoft\ExpressionVisitor.cs" Condition=" '$(TargetFrameworkVersion)' != 'v4.0'">
       <Link>Microsoft\ExpressionVisitor.cs</Link>
     </Compile>
     <Compile Include="..\Source\Mock.cs">
@@ -361,63 +349,11 @@
     <None Include="..\Moq.snk">
       <Link>Moq.snk</Link>
     </None>
-    <None Include="..\Source\Microsoft\Delegates.tt">
-      <Link>Microsoft\Delegates.tt</Link>
-      <Generator>TextTemplatingFileGenerator</Generator>
-      <LastGenOutput>Delegates.cs</LastGenOutput>
-    </None>
     <None Include="..\Source\Mock.xdoc">
       <Link>Mock.xdoc</Link>
     </None>
   </ItemGroup>
-  <ItemGroup>
-    <BootstrapperPackage Include="Microsoft.Net.Client.3.5">
-      <Visible>False</Visible>
-      <ProductName>.NET Framework 3.5 SP1 Client Profile</ProductName>
-      <Install>false</Install>
-    </BootstrapperPackage>
-    <BootstrapperPackage Include="Microsoft.Net.Framework.3.5.SP1">
-      <Visible>False</Visible>
-      <ProductName>.NET Framework 3.5 SP1</ProductName>
-      <Install>true</Install>
-    </BootstrapperPackage>
-    <BootstrapperPackage Include="Microsoft.VisualBasic.PowerPacks.10.0">
-      <Visible>False</Visible>
-      <ProductName>Microsoft Visual Basic PowerPacks 10.0</ProductName>
-      <Install>true</Install>
-    </BootstrapperPackage>
-    <BootstrapperPackage Include="Microsoft.Windows.Installer.3.1">
-      <Visible>False</Visible>
-      <ProductName>Windows Installer 3.1</ProductName>
-      <Install>true</Install>
-    </BootstrapperPackage>
-  </ItemGroup>
-  <ItemGroup>
-    <Service Include="{508349B6-6B84-4DF5-91F0-309BEEBAD82D}" />
-  </ItemGroup>
-  <PropertyGroup>
-    <SilverlightBuildResources>..\Lib\Silverlight SDK\</SilverlightBuildResources>
-    <TargetFrameworkDirectory>$(SilverlightBuildResources)Reference Assemblies\</TargetFrameworkDirectory>
-    <TargetFrameworkSDKDirectory>$(SilverlightBuildResources)Libraries\Client\</TargetFrameworkSDKDirectory>
-    <SilverlightRuntimeVersion>2.0.31005.0</SilverlightRuntimeVersion>
-  </PropertyGroup>
-  <Import Project="$(SilverlightBuildResources)MSBuild\Microsoft.Silverlight.CSharp.targets" />
-  <!--<Import Project="$(MSBuildExtensionsPath)\Microsoft\Silverlight\v2.0\Microsoft.Silverlight.CSharp.targets" />-->
-  <!-- To modify your build process, add your task inside one of the targets below and uncomment it. 
-       Other similar extension points exist, see Microsoft.Common.targets.
-  <Target Name="BeforeBuild">
-  </Target>
-  <Target Name="AfterBuild">
-  </Target>
-  -->
-  <Target Name="AfterBuild" Condition=" '$(Configuration)' == 'Release' ">
-    <!-- Silverlight version of this task includes the pdbs :S -->
-    <!--<CreateItem Include="@(ReferenceCopyLocalPaths)" Condition="'%(Extension)'=='.dll'">
-      <Output TaskParameter="Include" ItemName="IlmergeAssemblies" />
-    </CreateItem>
-    <Exec Command="&quot;$(MSBuildProjectPath)..\Tools\Ilmerge.exe&quot; /targetplatform:v2,&quot;$(SilverlightBuildResources)Reference Assemblies&quot; /lib:&quot;$(SilverlightBuildResources)Reference Assemblies&quot; /internalize:&quot;$(MSBuildProjectPath)..\Source\ilmerge.exclude&quot; /ndebug /keyfile:$(AssemblyOriginatorKeyFile) /out:@(MainAssembly) &quot;@(IntermediateAssembly)&quot; @(IlmergeAssemblies->'&quot;%(FullPath)&quot;', ' ')" />
-    <Delete Files="@(ReferenceCopyLocalPaths->'$(OutDir)%(DestinationSubDirectory)%(Filename)%(Extension)')" />-->
-  </Target>
+  <Import Project="$(MSBuildExtensionsPath32)\Microsoft\Silverlight\$(SilverlightVersion)\Microsoft.Silverlight.CSharp.targets" />
   <ProjectExtensions>
     <VisualStudio>
       <FlavorProperties GUID="{A1591282-1198-4647-A2B1-27E5FF5F6F3B}">
