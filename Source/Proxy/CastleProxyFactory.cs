@@ -87,10 +87,12 @@ namespace Moq.Proxy
 
 		private static ProxyGenerator CreateProxyGenerator()
 		{
+#pragma warning disable 618
 			if (!AttributesToAvoidReplicating.Contains(typeof(SecurityPermissionAttribute)))
 			{
 				AttributesToAvoidReplicating.Add<SecurityPermissionAttribute>();
 			}
+#pragma warning restore 618
 
 			return new ProxyGenerator();
 		}

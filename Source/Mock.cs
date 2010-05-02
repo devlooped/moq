@@ -488,7 +488,6 @@ namespace Moq
 						m.Interceptor.AddCall(call, SetupKind.PropertySet);
 						return call;
 					});
-
 			});
 		}
 
