@@ -98,7 +98,7 @@ namespace System.Linq.Expressions
 					return this.VisitMethodCall((MethodCallExpression)node);
 				case ExpressionType.Lambda:
 					return (Expression)this.GetType()
-						.GetMethod("VisitLambda", BindingFlags.NonPublic | BindingFlags.Instance)
+						.GetMethod("VisitLambdaInternal", BindingFlags.NonPublic | BindingFlags.Instance)
 						.MakeGenericMethod(new[] { node.Type })
 						.Invoke(this, new[] { node });
 				case ExpressionType.New:
@@ -193,6 +193,12 @@ namespace System.Linq.Expressions
 		{
 			var body = this.Visit(node.Body);
 			return UpdateLambda(node, node.Type, body, node.Parameters);
+		}
+
+		// internal method because Silverlight 3 does not support reflection over protected methods
+		internal Expression VisitLambdaInternal<T>(Expression<T> node)
+		{
+			return this.VisitLambda<T>(node);
 		}
 
 		protected virtual Expression VisitListInit(ListInitExpression node)
