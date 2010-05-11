@@ -56,7 +56,7 @@ namespace Moq
 		private MockBehavior behavior;
 		private Type targetType;
 		private Dictionary<ExpressionKey, IProxyCall> calls = new Dictionary<ExpressionKey, IProxyCall>();
-		private Dictionary<EventInfo, List<Delegate>> invocationLists = new Dictionary<EventInfo, List<Delegate>>();
+		private Dictionary<string, List<Delegate>> invocationLists = new Dictionary<string, List<Delegate>>();
 		private List<IProxyCall> orderedCalls = new List<IProxyCall>();
 		private List<ICallContext> actualInvocations = new List<ICallContext>();
 
@@ -296,10 +296,10 @@ namespace Moq
 		internal void AddEventHandler(EventInfo ev, Delegate handler)
 		{
 			List<Delegate> handlers;
-			if (!this.invocationLists.TryGetValue(ev, out handlers))
+			if (!this.invocationLists.TryGetValue(ev.Name, out handlers))
 			{
 				handlers = new List<Delegate>();
-				invocationLists.Add(ev, handlers);
+				invocationLists.Add(ev.Name, handlers);
 			}
 
 			handlers.Add(handler);
@@ -308,7 +308,7 @@ namespace Moq
 		internal void RemoveEventHandler(EventInfo ev, Delegate handler)
 		{
 			List<Delegate> handlers;
-			if (this.invocationLists.TryGetValue(ev, out handlers))
+			if (this.invocationLists.TryGetValue(ev.Name, out handlers))
 			{
 				handlers.Remove(handler);
 			}
@@ -317,7 +317,7 @@ namespace Moq
 		internal IEnumerable<Delegate> GetInvocationList(EventInfo ev)
 		{
 			List<Delegate> handlers;
-			if (!this.invocationLists.TryGetValue(ev, out handlers))
+			if (!this.invocationLists.TryGetValue(ev.Name, out handlers))
 			{
 				return new Delegate[0];
 			}

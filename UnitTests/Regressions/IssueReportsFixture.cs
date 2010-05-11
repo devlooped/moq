@@ -1058,30 +1058,57 @@ namespace Moq.Tests.Regressions
 
 		#endregion
 
-        #region #245
+		#region #242
 
-        public class _245
-        {
-            [Fact]
-            public void Test()
-            {
-                var mock = new Mock<ITest>();
+		public class _242
+		{
+			[Fact]
+			public void PropertyChangedTest()
+			{
+				var mock = new Mock<PropertyChangedInherited>();
+				int callbacks = 0;
+				mock.Object.PropertyChanged += (sender, args) => callbacks++;
 
-                ITest instance;
-                Assert.DoesNotThrow(() => instance = mock.Object);
-            }
+				mock.Raise(m => m.PropertyChanged += null, new PropertyChangedEventArgs("Foo"));
+				Assert.Equal(1, callbacks);
+			}
 
-            public interface ITest
-            {
-                void Do<T1, T2>() where T2 : T1;
-            }
-        }
+			public class PropertyChangedBase : INotifyPropertyChanged
+			{
+				public virtual event PropertyChangedEventHandler PropertyChanged = (s, e) => { };
+			}
 
-        #endregion
+			public class PropertyChangedInherited : PropertyChangedBase
+			{
+			}
+		}
 
-        #region Recursive issue
+		#endregion
 
-        public class RecursiveFixture
+		#region #245
+
+		public class _245
+		{
+			[Fact]
+			public void Test()
+			{
+				var mock = new Mock<ITest>();
+
+				ITest instance;
+				Assert.DoesNotThrow(() => instance = mock.Object);
+			}
+
+			public interface ITest
+			{
+				void Do<T1, T2>() where T2 : T1;
+			}
+		}
+
+		#endregion
+
+		#region Recursive issue
+
+		public class RecursiveFixture
 		{
 			[Fact]
 			public void TestRecursive()
