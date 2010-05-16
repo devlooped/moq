@@ -58,21 +58,13 @@ namespace Moq.Proxy
 
 			if (mockType.IsInterface)
 			{
-				return (T)generator.CreateInterfaceProxyWithoutTarget(
-					mockType,
-					interfaces,
-					new Interceptor(interceptor));
+				return (T)generator.CreateInterfaceProxyWithoutTarget(mockType, interfaces, new Interceptor(interceptor));
 			}
 			else
 			{
 				try
 				{
-					return (T)generator.CreateClassProxy(
-						mockType,
-						interfaces,
-						new ProxyGenerationOptions(),
-						arguments,
-						new Interceptor(interceptor));
+					return (T)generator.CreateClassProxy(mockType, interfaces, new ProxyGenerationOptions(), arguments, new Interceptor(interceptor));
 				}
 				catch (TypeLoadException e) // TODO put in the upper method ?
 				{

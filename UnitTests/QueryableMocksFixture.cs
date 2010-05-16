@@ -6,7 +6,7 @@ namespace Moq.Tests
 {
 	public class QueryableMocksFixture
 	{
-		[Fact]
+		[Fact(Timeout = 10000)]
 		public void ShouldSupportReturningMultipleMocks()
 		{
 			var mocks = (from foo in Mocks.CreateQuery<IFoo>()
@@ -23,7 +23,7 @@ namespace Moq.Tests
 			Assert.Equal(mocks.Bar.Id, "A");
 		}
 
-		[Fact]
+		[Fact(Timeout = 10000)]
 		public void ShouldSupportMultipleSetups()
 		{
 			var instance = (from f in Mocks.CreateQuery<IFoo>()
@@ -45,7 +45,7 @@ namespace Moq.Tests
 			Assert.Equal(instance.Bar.Baz("foo").Value, 5);
 		}
 
-		[Fact]
+		[Fact(Timeout = 10000)]
 		public void ShouldSupportItIsAny()
 		{
 			var instance = (from f in Mocks.CreateQuery<IFoo>()
@@ -57,7 +57,7 @@ namespace Moq.Tests
 			Assert.Equal(instance.Bar.Baz("bar").Value, 5);
 		}
 
-		[Fact]
+		[Fact(Timeout = 10000)]
 		public void TranslateToFluentMocks()
 		{
 			var instance = (from f in Mocks.CreateQuery<IFoo>()
@@ -87,42 +87,59 @@ namespace Moq.Tests
 			Assert.Equal(instance2.Bar.Baz("hey").Value, 5);
 		}
 
-		[Fact]
-		public void ShouldSupportBooleanExpression()
+		[Fact(Timeout = 10000)]
+		public void ShouldSupportBoolean()
 		{
-			var instance = Mocks.CreateQuery<IBaz>().Where(f => f.IsValid).First();
+			var instance = Mocks.CreateQuery<IBaz>().First(x => x.IsValid);
 
 			Assert.True(instance.IsValid);
 		}
 
-		[Fact]
-		public void ShouldSupportNotBooleanExpression()
+		[Fact(Timeout = 10000)]
+		public void ShouldSupportBooleanNegation()
 		{
-			var instance = Mocks.CreateQuery<IBaz>().Where(f => !f.IsValid).First();
+			var instance = Mocks.CreateQuery<IBaz>().First(x => !x.IsValid);
 
 			Assert.False(instance.IsValid);
 		}
 
-		[Fact]
-		public void ShouldSupportBooleanEqualsToTrue()
+		[Fact(Timeout = 10000)]
+		public void ShouldSupportBooleanEqualsTrue()
 		{
-			var instance = Mocks.CreateQuery<IBaz>().Where(f => f.IsValid == true).First();
+			var instance = Mocks.CreateQuery<IBaz>().First(f => f.IsValid == true);
 
 			Assert.True(instance.IsValid);
 		}
 
-		[Fact]
-		public void ShouldSupportBooleanEqualsToFalse()
+		[Fact(Timeout = 10000)]
+		public void ShouldSupportTrueEqualsBoolean()
+		{
+			var instance = Mocks.CreateQuery<IBaz>().First(f => true == f.IsValid);
+
+			Assert.True(instance.IsValid);
+		}
+
+		[Fact(Timeout = 10000)]
+		public void ShouldSupportBooleanEqualsFalse()
 		{
 			var instance = Mocks.CreateQuery<IBaz>().Where(f => f.IsValid == false).First();
 
 			Assert.False(instance.IsValid);
 		}
 
-		[Fact]
-		public void ShouldSupportEnumExpressions()
+		[Fact(Timeout = 10000)]
+		public void ShouldSupportBooleanInCondition()
 		{
-			var instance = Mocks.CreateQuery<IFoo>().Where(f => f.Targets == AttributeTargets.Class).First();
+			var instance = Mocks.CreateQuery<IBaz>().First(x => x.IsValid && x.Value == 1);
+
+			Assert.True(instance.IsValid);
+			Assert.Equal(1, instance.Value);
+		}
+
+		[Fact(Timeout = 10000)]
+		public void ShouldSupportEnumExpression()
+		{
+			var instance = Mocks.CreateQuery<IFoo>().First(f => f.Targets == AttributeTargets.Class);
 
 			Assert.Equal(AttributeTargets.Class, instance.Targets);
 		}

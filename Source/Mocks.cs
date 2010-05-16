@@ -44,8 +44,6 @@ using System.ComponentModel;
 using System.Linq;
 using System.Linq.Expressions;
 using System.Reflection;
-using System.Runtime.CompilerServices;
-using Moq.Language;
 using Moq.Linq;
 
 namespace Moq
@@ -57,31 +55,23 @@ namespace Moq
 	public static class Mocks
 	{
 		/// <summary>
+		/// Creates a query for mocks of the given type.
+		/// </summary>
+		/// <typeparam name="T">The type of mocked object to query.</typeparam>
+		public static IQueryable<T> CreateQuery<T>() where T : class
+		{
+			return new MockQueryable<T>();
+		}
+
+		/// <summary>
 		/// Returns a mock of the given type.
 		/// </summary>
 		/// <typeparam name="T">The type of mocked object.</typeparam>
 		/// <param name="setupCondition">The expressions to be set as setup conditions.</param>
 		/// <returns>The mock of the given type.</returns>
-		public static T First<T>(Expression<Func<T, bool>> setupCondition)
+		public static T First<T>(Expression<Func<T, bool>> setupCondition) where T : class
 		{
-			return Mocks.CreateQuery<T>().Where(setupCondition).First();
-		}
-
-		/// <summary>
-		/// Creates a query for mocks of the given type.
-		/// </summary>
-		/// <typeparam name="T">The type of mocked object to query.</typeparam>
-		public static IQueryable<T> CreateQuery<T>()
-		{
-			return new MockQueryable<T>();
-		}
-
-		private class MockQueryable<T> : Query<T>
-		{
-			public MockQueryable()
-				: base(new MockQueryProvider())
-			{
-			}
+			return Mocks.CreateQuery<T>().First(setupCondition);
 		}
 
 		/// <summary>
@@ -92,361 +82,13 @@ namespace Moq
 		/// <typeparam name="T"></typeparam>
 		/// <returns></returns>
 		[EditorBrowsable(EditorBrowsableState.Never)]
-		public static IEnumerable<T> CreateReal<T>()
-			where T : class
+		public static IEnumerable<T> CreateReal<T>() where T : class
 		{
-			while (true)
+			do
 			{
 				yield return new Mock<T>().Object;
 			}
-		}
-
-		private class MockQueryProvider : QueryProvider
-		{
-			private static readonly MethodInfo createMockMethod = typeof(Mocks).GetMethod("Create");
-			private static readonly MethodInfo createRealMockMethod = typeof(Mocks).GetMethod("CreateReal");
-
-			public override object Execute(Expression expression)
-			{
-				var createCalls = new ExpressionCollector().Collect(expression)
-					.OfType<MethodCallExpression>()
-					.Where(c => c.Method.IsGenericMethod && c.Method.GetGenericMethodDefinition() == createMockMethod)
-					.ToArray();
-
-				var replaceWith = createCalls
-					.Select(call => Expression.Call(
-						call.Object,
-						createRealMockMethod.MakeGenericMethod(call.Method.GetGenericArguments()),
-						call.Arguments.ToArray()))
-					.ToArray();
-
-				var replaced = ExpressionReplacer.ReplaceAll(expression, createCalls, replaceWith);
-				replaced = MockSetupsReplacer.Accept(replaced);
-				replaced = QueryableToEnumerableReplacer.ReplaceAll(replaced);
-
-				var lambda = Expression.Lambda(typeof(Func<>).MakeGenericType(replaced.Type), replaced);
-				return lambda.Compile().DynamicInvoke();
-			}
-
-			public override string GetQueryText(Expression expression)
-			{
-				throw new NotImplementedException();
-			}
-		}
-
-		private class ExpressionCollector : ExpressionVisitor
-		{
-			private List<Expression> expressions = new List<Expression>();
-
-			public IEnumerable<Expression> Collect(Expression exp)
-			{
-				this.Visit(exp);
-				return expressions;
-			}
-
-			public override Expression Visit(Expression exp)
-			{
-				this.expressions.Add(exp);
-				return base.Visit(exp);
-			}
-		}
-
-		private class MockSetupsReplacer : ExpressionVisitor
-		{
-			private Expression expression;
-			private Stack<MethodCallExpression> whereCalls = new Stack<MethodCallExpression>();
-
-			public MockSetupsReplacer(Expression expression)
-			{
-				this.expression = expression;
-			}
-
-			public static Expression Accept(Expression expression)
-			{
-				return new MockSetupsReplacer(expression).Accept();
-			}
-
-			public Expression Accept()
-			{
-				return this.Visit(expression);
-			}
-
-			protected override Expression VisitMethodCall(MethodCallExpression node)
-			{
-				// We only translate Where for now.
-				if (node.Method.DeclaringType == typeof(Queryable) && node.Method.Name == "Where")
-				{
-					whereCalls.Push(node);
-					var result = base.VisitMethodCall(node);
-					whereCalls.Pop();
-					return result;
-				}
-
-				return base.VisitMethodCall(node);
-			}
-
-			protected override Expression VisitBinary(BinaryExpression node)
-			{
-				if (whereCalls.Count != 0 && node.NodeType == ExpressionType.Equal)
-				{
-					switch (node.Left.NodeType)
-					{
-						case ExpressionType.MemberAccess:
-							var member = (MemberExpression)node.Left;
-							return ConvertToSetup(member.Expression, member, node.Right);
-
-						case ExpressionType.Call:
-							var method = (MethodCallExpression)node.Left;
-							return ConvertToSetup(method.Object, method, node.Right);
-
-						case ExpressionType.Convert:
-							var left = (UnaryExpression)node.Left;
-
-							switch (left.Operand.NodeType)
-							{
-								case ExpressionType.MemberAccess:
-									var memberOperand = (MemberExpression)left.Operand;
-									return ConvertToSetup(
-										memberOperand.Expression,
-										memberOperand,
-										Expression.Convert(node.Right, memberOperand.Type));
-
-								case ExpressionType.Call:
-									var methodOperand = (MethodCallExpression)left.Operand;
-									return ConvertToSetup(
-										methodOperand.Object,
-										methodOperand,
-										Expression.Convert(node.Right, methodOperand.Type));
-							}
-
-							break;
-					}
-				}
-
-				return base.VisitBinary(node);
-			}
-
-			protected override Expression VisitUnary(UnaryExpression node)
-			{
-				if (node.NodeType == ExpressionType.Quote && node.Operand.NodeType == ExpressionType.Lambda)
-				{
-					var oldLambda = (LambdaExpression)node.Operand;
-					var isNotExpression = oldLambda.Body.NodeType == ExpressionType.Not;
-					var memberAccess = isNotExpression ?
-						((UnaryExpression)oldLambda.Body).Operand as MemberExpression :
-						oldLambda.Body as MemberExpression;
-
-					if (memberAccess != null)
-					{
-						// where f.IsValid becomes where f.IsValid == true
-						var equal = Expression.Equal(memberAccess, Expression.Constant(!isNotExpression));
-						var lambda = Expression.Lambda(equal, (ParameterExpression)memberAccess.Expression);
-						var quote = Expression.Quote(lambda);
-						return base.VisitUnary(quote);
-					}
-				}
-
-				return base.VisitUnary(node);
-			}
-
-			private static Expression ConvertToSetup(Expression targetObject, Expression left, Expression right)
-			{
-				// TODO: throw if target is a static class?
-				var sourceType = targetObject.Type;
-				var returnType = left.Type;
-
-				// where dte.Solution == solution
-				// becomes:	
-				// where Mock.Get(dte).Setup(mock => mock.Solution).Returns(solution) != null
-
-				var returnsMethod = typeof(IReturns<,>)
-					.MakeGenericType(sourceType, returnType)
-					.GetMethod("Returns", new[] { returnType });
-
-				return Expression.NotEqual(
-					Expression.Call(FluentMockVisitor.Accept(left), returnsMethod, right),
-					Expression.Constant(null));
-			}
-		}
-
-		private class FluentMockVisitor : ExpressionVisitor
-		{
-			private static readonly MethodInfo FluentMockGenericMethod = ((Func<Mock<string>, Expression<Func<string, string>>, Mock<string>>)
-				QueryableMockExtensions.FluentMock<string, string>).Method.GetGenericMethodDefinition();
-			static readonly MethodInfo MockGetGenericMethod = ((Func<string, Mock<string>>)Moq.Mock.Get<string>)
-				.Method.GetGenericMethodDefinition();
-
-			private Expression expression;
-
-			/// <summary>
-			/// The first method call or member access will be the 
-			/// last segment of the expression (depth-first traversal), 
-			/// which is the one we have to Setup rather than FluentMock.
-			/// And the last one is the one we have to Mock.Get rather 
-			/// than FluentMock.
-			/// </summary>
-			private bool isFirst = true;
-
-			public FluentMockVisitor(Expression expression)
-			{
-				this.expression = expression;
-			}
-
-			public static Expression Accept(Expression expression)
-			{
-				return new FluentMockVisitor(expression).Accept();
-			}
-
-			public Expression Accept()
-			{
-				return this.Visit(expression);
-			}
-
-			protected override Expression VisitParameter(ParameterExpression node)
-			{
-				// the actual first object being used in a fluent expression.
-				return Expression.Call(null, MockGetGenericMethod.MakeGenericMethod(node.Type), node);
-			}
-
-			protected override Expression VisitMethodCall(MethodCallExpression node)
-			{
-				var lambdaParam = Expression.Parameter(node.Object.Type, "mock");
-				var lambdaBody = Expression.Call(lambdaParam, node.Method, node.Arguments);
-				var targetMethod = GetTargetMethod(node.Object.Type, node.Method.ReturnType);
-				if (isFirst)
-				{
-					isFirst = false;
-				}
-
-				return TranslateFluent(node.Object.Type, node.Method.ReturnType, targetMethod, Visit(node.Object), lambdaParam, lambdaBody);
-			}
-
-			protected override Expression VisitMember(MemberExpression node)
-			{
-				// Translate differently member accesses over transparent
-				// compiler-generated types as they are typically the 
-				// anonymous types generated to build up the query expressions.
-				if (node.Expression.NodeType == ExpressionType.Parameter &&
-					node.Expression.Type.GetCustomAttribute<CompilerGeneratedAttribute>(false) != null)
-				{
-					var memberType = node.Member is FieldInfo ?
-						((FieldInfo)node.Member).FieldType :
-						((PropertyInfo)node.Member).PropertyType;
-
-					// Generate a Mock.Get over the entire member access rather.
-					// <anonymous_type>.foo => Mock.Get(<anonymous_type>.foo)
-					return Expression.Call(null, MockGetGenericMethod.MakeGenericMethod(memberType), node);
-				}
-
-				// If member is not mock-able, actually, including being a sealed class, etc.?
-				if (node.Member is FieldInfo)
-					throw new NotSupportedException();
-
-				var lambdaParam = Expression.Parameter(node.Expression.Type, "mock");
-				Expression lambdaBody = Expression.MakeMemberAccess(lambdaParam, node.Member);
-				var targetMethod = GetTargetMethod(node.Expression.Type, ((PropertyInfo)node.Member).PropertyType);
-				if (isFirst) isFirst = false;
-
-				return TranslateFluent(node.Expression.Type, ((PropertyInfo)node.Member).PropertyType, targetMethod, Visit(node.Expression), lambdaParam, lambdaBody);
-			}
-
-			// Args like: string IFoo (mock => mock.Value)
-			private static Expression TranslateFluent(
-				Type objectType,
-				Type returnType,
-				MethodInfo targetMethod,
-				Expression instance,
-				ParameterExpression lambdaParam,
-				Expression lambdaBody)
-			{
-				var funcType = typeof(Func<,>).MakeGenericType(objectType, returnType);
-
-				// This is the fluent extension method one, so pass the instance as one more arg.
-				if (targetMethod.IsStatic)
-					return Expression.Call(
-						targetMethod,
-						instance,
-						Expression.Lambda(
-							funcType,
-							lambdaBody,
-							lambdaParam
-						)
-					);
-				else
-					return Expression.Call(
-						instance,
-						targetMethod,
-						Expression.Lambda(
-							funcType,
-							lambdaBody,
-							lambdaParam
-						)
-					);
-			}
-
-			private MethodInfo GetTargetMethod(Type objectType, Type returnType)
-			{
-				MethodInfo targetMethod;
-				// dte.Solution =>
-				if (isFirst)
-				{
-					//.Setup(mock => mock.Solution)
-					targetMethod = GetSetupMethod(objectType, returnType);
-				}
-				else
-				{
-					//.FluentMock(mock => mock.Solution)
-					targetMethod = FluentMockGenericMethod.MakeGenericMethod(objectType, returnType);
-				}
-				return targetMethod;
-			}
-
-			private static MethodInfo GetSetupMethod(Type objectType, Type returnType)
-			{
-				return typeof(Mock<>)
-					.MakeGenericType(objectType)
-					.GetMethods()
-					.First(mi => mi.Name == "Setup" && mi.IsGenericMethod)
-					.MakeGenericMethod(returnType);
-			}
-		}
-
-		private class QueryableToEnumerableReplacer : ExpressionVisitor
-		{
-			private Expression expression;
-
-			public QueryableToEnumerableReplacer(Expression expression)
-			{
-				this.expression = expression;
-			}
-
-			public static Expression ReplaceAll(Expression expression)
-			{
-				return new QueryableToEnumerableReplacer(expression).ReplaceAll();
-			}
-
-			public Expression ReplaceAll()
-			{
-				return this.Visit(expression);
-			}
-
-			protected override Expression VisitConstant(ConstantExpression node)
-			{
-				if (node.Type.IsGenericType && node.Type.GetGenericTypeDefinition() == typeof(MockQueryable<>))
-				{
-					var targetType = node.Type.GetGenericArguments()[0];
-					var createRealMethod = typeof(Mocks).GetMethod("CreateReal").MakeGenericMethod(targetType);
-					var createRealExpr = Expression.Call(null, createRealMethod);
-					var asQueryableMethod = typeof(Queryable).GetMethods()
-						.Where(mi => mi.Name == "AsQueryable" && mi.IsGenericMethodDefinition)
-						.Single()
-						.MakeGenericMethod(targetType);
-
-					return Expression.Call(null, asQueryableMethod, createRealExpr);
-				}
-
-				return base.VisitConstant(node);
-			}
+			while (true);
 		}
 	}
 

@@ -86,11 +86,7 @@ namespace Moq
 
 				if (mock.ImplementedInterfaces.Contains(typeof(T)))
 				{
-					var asMethod = mock.GetType().GetMethod("As");
-					var asInterface = asMethod.MakeGenericMethod(typeof(T));
-					var asMock = asInterface.Invoke(mock, null);
-
-					return (Mock<T>)asMock;
+					return mock.As<T>();
 				}
 
 				// Alternatively, we may have been asked 
@@ -633,17 +629,19 @@ namespace Moq
 						}
 
 						var closure = Activator.CreateInstance(
-								typeof(ValueClosure<>).MakeGenericType(property.PropertyType), initialValue);
+								typeof(ValueClosure<>).MakeGenericType(property.PropertyType),
+								initialValue);
 
 						var resultGet = mock.GetType().GetMethod("SetupGet")
 							.MakeGenericMethod(property.PropertyType)
 							.Invoke(mock, new[] { expect });
 
-						var returnsGet = resultGet.GetType()
-							.GetMethod("Returns", new[] { typeof(Func<>).MakeGenericType(property.PropertyType) });
+						var getterType = typeof(Func<>).MakeGenericType(property.PropertyType);
+
+						var returnsGet = resultGet.GetType().GetMethod("Returns", new[] { getterType });
 
 						var getFunc = Activator.CreateInstance(
-								typeof(Func<>).MakeGenericType(property.PropertyType),
+								getterType,
 								closure,
 								closure.GetType().GetMethod("GetValue").MethodHandle.GetFunctionPointer());
 
@@ -655,12 +653,12 @@ namespace Moq
 								.MakeGenericMethod(mockType, property.PropertyType)
 								.Invoke(mock, new object[] { mock, expect });
 
-							var callbackSet = resultSet.GetType().GetMethod(
-								"Callback",
-								new[] { typeof(Action<>).MakeGenericType(property.PropertyType) });
+							var setterType = typeof(Action<>).MakeGenericType(property.PropertyType);
+
+							var callbackSet = resultSet.GetType().GetMethod("Callback", new[] { setterType });
 
 							var setFunc = Activator.CreateInstance(
-									typeof(Action<>).MakeGenericType(property.PropertyType),
+									setterType,
 									closure,
 									closure.GetType().GetMethod("SetValue").MethodHandle.GetFunctionPointer());
 

@@ -183,17 +183,14 @@
     <Compile Include="..\Source\Language\IThrows.cs">
       <Link>Language\IThrows.cs</Link>
     </Compile>
-    <Compile Include="..\Source\Linq\ExpressionReplacer.cs">
-      <Link>Linq\ExpressionReplacer.cs</Link>
+    <Compile Include="..\Source\Linq\FluentMockVisitor.cs">
+      <Link>Linq\FluentMockVisitor.cs</Link>
     </Compile>
-    <Compile Include="..\Source\Linq\Query.cs">
-      <Link>Linq\Query.cs</Link>
+    <Compile Include="..\Source\Linq\MockQuery.cs">
+      <Link>Linq\MockQuery.cs</Link>
     </Compile>
-    <Compile Include="..\Source\Linq\QueryProvider.cs">
-      <Link>Linq\QueryProvider.cs</Link>
-    </Compile>
-    <Compile Include="..\Source\Linq\TypeHelper.cs">
-      <Link>Linq\TypeHelper.cs</Link>
+    <Compile Include="..\Source\Linq\MockSetupsBuilder.cs">
+      <Link>Linq\MockSetupsBuilder.cs</Link>
     </Compile>
     <Compile Include="..\Source\Match.cs">
       <Link>Match.cs</Link>

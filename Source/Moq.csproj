@@ -14,7 +14,6 @@
     <FileAlignment>512</FileAlignment>
     <SignAssembly>true</SignAssembly>
     <AssemblyOriginatorKeyFile>..\Moq.snk</AssemblyOriginatorKeyFile>
-    <MergeReferences>true</MergeReferences>
     <TargetFrameworkProfile />
   </PropertyGroup>
   <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Debug|AnyCPU' ">
@@ -28,6 +27,7 @@
     <DocumentationFile>bin\Debug\Moq.xml</DocumentationFile>
     <TreatWarningsAsErrors>true</TreatWarningsAsErrors>
     <CodeAnalysisRuleSet>AllRules.ruleset</CodeAnalysisRuleSet>
+    <MergeReferences>false</MergeReferences>
   </PropertyGroup>
   <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Release|AnyCPU' ">
     <DebugType>full</DebugType>
@@ -39,10 +39,8 @@
     <DocumentationFile>bin\Release\Moq.xml</DocumentationFile>
     <TreatWarningsAsErrors>true</TreatWarningsAsErrors>
     <RunCodeAnalysis>true</RunCodeAnalysis>
-    <CodeAnalysisRules>
-    </CodeAnalysisRules>
     <DebugSymbols>true</DebugSymbols>
-    <CodeAnalysisRuleSet>Migrated rules for Moq.ruleset</CodeAnalysisRuleSet>
+    <MergeReferences>true</MergeReferences>
   </PropertyGroup>
   <ItemGroup>
     <Reference Include="Castle.Core, Version=1.0.3.0, Culture=neutral, PublicKeyToken=407dd0808d44fbdc, processorArchitecture=MSIL">
@@ -58,6 +56,8 @@
     <Reference Include="System.Xml" />
   </ItemGroup>
   <ItemGroup>
+    <Compile Include="Linq\FluentMockVisitor.cs" />
+    <Compile Include="Linq\MockSetupsBuilder.cs" />
     <Compile Include="MatchExpression.PreV4.cs" Condition=" '$(TargetFrameworkVersion)' != 'v4.0'" />
     <Compile Include="MatchExpression.cs" Condition=" '$(TargetFrameworkVersion)' == 'v4.0'" />
     <Compile Include="EmptyDefaultValueProvider.cs" />
@@ -189,10 +189,7 @@
     <Compile Include="DefaultValue.cs" />
     <Compile Include="GlobalSuppressions.cs" />
     <Compile Include="IDefaultValueProvider.cs" />
-    <Compile Include="Linq\ExpressionReplacer.cs" />
-    <Compile Include="Linq\Query.cs" />
-    <Compile Include="Linq\QueryProvider.cs" />
-    <Compile Include="Linq\TypeHelper.cs" />
+    <Compile Include="Linq\MockQuery.cs" />
     <Compile Include="Match.cs" />
     <Compile Include="Matchers\Matcher.cs" />
     <Compile Include="Matchers\ParamArrayMatcher.cs" />
@@ -219,7 +216,7 @@
     <Service Include="{508349B6-6B84-4DF5-91F0-309BEEBAD82D}" />
   </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
-  <Target Name="AfterBuild" Condition=" '$(Configuration)' == 'Release' and '$(MergeReferences)' == 'true' ">
+  <Target Name="AfterBuild" Condition=" '$(MergeReferences)' == 'true' ">
     <Exec Command="&quot;$(MSBuildProjectPath)..\Tools\Ilmerge.exe&quot; /internalize:&quot;$(MSBuildProjectPath)ilmerge.exclude&quot; /ndebug /keyfile:$(AssemblyOriginatorKeyFile) /out:@(MainAssembly) &quot;@(IntermediateAssembly)&quot; @(ReferenceCopyLocalPaths->'&quot;%(FullPath)&quot;', ' ')" Condition=" '$(TargetFrameworkVersion)' != 'v4.0'" />
     <Exec Command="&quot;$(MSBuildProjectPath)..\Tools\Ilmerge.exe&quot; /internalize:&quot;$(MSBuildProjectPath)ilmerge.exclude&quot; /ndebug /keyfile:$(AssemblyOriginatorKeyFile) /out:@(MainAssembly) /targetplatform:v4,$(MSBuildToolsPath) &quot;@(IntermediateAssembly)&quot; @(ReferenceCopyLocalPaths->'&quot;%(FullPath)&quot;', ' ')" Condition=" '$(TargetFrameworkVersion)' == 'v4.0'" />
     <Delete Files="@(ReferenceCopyLocalPaths->'$(OutDir)%(DestinationSubDirectory)%(Filename)%(Extension)')" />
