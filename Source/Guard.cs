@@ -132,10 +132,9 @@ namespace Moq
 			}
 		}
 
-		private static string GetParameterName(Expression reference)
+		private static string GetParameterName(LambdaExpression reference)
 		{
-			var lambda = (LambdaExpression)reference;
-			var member = (MemberExpression)lambda.Body;
+			var member = (MemberExpression)reference.Body;
 			return member.Member.Name;
 		}
 	}

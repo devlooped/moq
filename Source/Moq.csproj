@@ -41,6 +41,7 @@
     <RunCodeAnalysis>true</RunCodeAnalysis>
     <DebugSymbols>true</DebugSymbols>
     <MergeReferences>true</MergeReferences>
+    <CodeAnalysisRuleSet>..\Moq.ruleset</CodeAnalysisRuleSet>
   </PropertyGroup>
   <ItemGroup>
     <Reference Include="Castle.Core, Version=1.0.3.0, Culture=neutral, PublicKeyToken=407dd0808d44fbdc, processorArchitecture=MSIL">
@@ -98,7 +99,6 @@
     <Compile Include="Obsolete\Mock.Generic.Legacy.cs" />
     <Compile Include="Obsolete\Mock.Legacy.cs" />
     <Compile Include="Obsolete\MockExtensions.cs" />
-    <Compile Include="Obsolete\StubExtensions.cs" />
     <Compile Include="SetupKind.cs" />
     <Compile Include="Language\Flow\IReturnsResult.cs" />
     <Compile Include="ExpressionExtensions.cs" />
@@ -156,7 +156,7 @@
       <Link>Moq.snk</Link>
     </None>
     <None Include="It.xdoc">
-      <SubType>Designer</SubType>
+      <DependentUpon>It.cs</DependentUpon>
     </None>
     <None Include="Language\ICallback.tt">
       <Generator>TextTemplatingFileGenerator</Generator>
@@ -170,7 +170,9 @@
       <Generator>TextTemplatingFileGenerator</Generator>
       <LastGenOutput>IReturns.cs</LastGenOutput>
     </None>
-    <None Include="Match.xdoc" />
+    <None Include="Match.xdoc">
+      <DependentUpon>Match.cs</DependentUpon>
+    </None>
     <None Include="MethodCallReturn.tt">
       <Generator>TextTemplatingFileGenerator</Generator>
       <LastGenOutput>MethodCallReturn.Generated.cs</LastGenOutput>
@@ -180,10 +182,10 @@
       <LastGenOutput>Delegates.cs</LastGenOutput>
     </None>
     <None Include="Mock.Generic.xdoc">
-      <SubType>Designer</SubType>
+      <DependentUpon>Mock.Generic.cs</DependentUpon>
     </None>
     <None Include="Mock.xdoc">
-      <SubType>Designer</SubType>
+      <DependentUpon>Mock.cs</DependentUpon>
     </None>
     <Compile Include="AsInterface.cs" />
     <Compile Include="DefaultValue.cs" />
@@ -210,6 +212,9 @@
     <None Include="MethodCall.tt">
       <Generator>TextTemplatingFileGenerator</Generator>
       <LastGenOutput>MethodCall.Generated.cs</LastGenOutput>
+    </None>
+    <None Include="Times.xdoc">
+      <DependentUpon>Times.cs</DependentUpon>
     </None>
   </ItemGroup>
   <ItemGroup>

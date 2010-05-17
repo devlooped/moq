@@ -44,9 +44,7 @@ using Moq.Properties;
 
 namespace Moq
 {
-	/// <summary>
-	/// Defines the number of invocations allowed by a mocked method.
-	/// </summary>
+	/// <include file='Times.xdoc' path='docs/doc[@for="Times"]/*'/>
 	public struct Times
 	{
 		private Func<int, bool> evaluator;
@@ -62,11 +60,7 @@ namespace Moq
 			this.messageFormat = messageFormat;
 		}
 
-		/// <summary>
-		/// Specifies that a mocked method should be invoked <paramref name="callCount"/> times as minimum.
-		/// </summary>
-		/// <param name="callCount">The minimun number of times.</param>
-		/// <returns>An object defining the allowed number of invocations.</returns>
+		/// <include file='Times.xdoc' path='docs/doc[@for="Times.AtLeast"]/*'/>
 		public static Times AtLeast(int callCount)
 		{
 			Guard.NotOutOfRangeInclusive(() => callCount, callCount, 1, int.MaxValue);
@@ -74,20 +68,13 @@ namespace Moq
 			return new Times(c => c >= callCount, callCount, int.MaxValue, Resources.NoMatchingCallsAtLeast);
 		}
 
-		/// <summary>
-		/// Specifies that a mocked method should be invoked one time as minimum.
-		/// </summary>
-		/// <returns>An object defining the allowed number of invocations.</returns>
+		/// <include file='Times.xdoc' path='docs/doc[@for="Times.AtLeastOnce"]/*'/>
 		public static Times AtLeastOnce()
 		{
 			return new Times(c => c >= 1, 1, int.MaxValue, Resources.NoMatchingCallsAtLeastOnce);
 		}
 
-		/// <summary>
-		/// Specifies that a mocked method should be invoked <paramref name="callCount"/> time as maximun.
-		/// </summary>
-		/// <param name="callCount">The maximun number of times.</param>
-		/// <returns>An object defining the allowed number of invocations.</returns>
+		/// <include file='Times.xdoc' path='docs/doc[@for="Times.AtMost"]/*'/>
 		public static Times AtMost(int callCount)
 		{
 			Guard.NotOutOfRangeInclusive(() => callCount, callCount, 0, int.MaxValue);
@@ -95,23 +82,13 @@ namespace Moq
 			return new Times(c => c >= 0 && c <= callCount, 0, callCount, Resources.NoMatchingCallsAtMost);
 		}
 
-		/// <summary>
-		/// Specifies that a mocked method should be invoked one time as maximun.
-		/// </summary>
-		/// <returns>An object defining the allowed number of invocations.</returns>
+		/// <include file='Times.xdoc' path='docs/doc[@for="Times.AtMostOnce"]/*'/>
 		public static Times AtMostOnce()
 		{
 			return new Times(c => c >= 0 && c <= 1, 0, 1, Resources.NoMatchingCallsAtMostOnce);
 		}
 
-		/// <summary>
-		/// Specifies that a mocked method should be invoked between <paramref name="callCountFrom"/> and
-		/// <paramref name="callCountTo"/> times.
-		/// </summary>
-		/// <param name="callCountFrom">The minimun number of times.</param>
-		/// <param name="callCountTo">The maximun number of times.</param>
-		/// <param name="rangeKind">The kind of range. See <see cref="Range"/>.</param>
-		/// <returns>An object defining the allowed number of invocations.</returns>
+		/// <include file='Times.xdoc' path='docs/doc[@for="Times.Between"]/*'/>
 		public static Times Between(int callCountFrom, int callCountTo, Range rangeKind)
 		{
 			if (rangeKind == Range.Exclusive)
@@ -137,11 +114,7 @@ namespace Moq
 				Resources.NoMatchingCallsBetweenInclusive);
 		}
 
-		/// <summary>
-		/// Specifies that a mocked method should be invoked exactly <paramref name="callCount"/> times.
-		/// </summary>
-		/// <param name="callCount">The times that a method or property can be called.</param>
-		/// <returns>An object defining the allowed number of invocations.</returns>
+		/// <include file='Times.xdoc' path='docs/doc[@for="Times.Exactly"]/*'/>
 		public static Times Exactly(int callCount)
 		{
 			Guard.NotOutOfRangeInclusive(() => callCount, callCount, 0, int.MaxValue);
@@ -149,22 +122,46 @@ namespace Moq
 			return new Times(c => c == callCount, callCount, callCount, Resources.NoMatchingCallsExactly);
 		}
 
-		/// <summary>
-		/// Specifies that a mocked method should not be invoked.
-		/// </summary>
-		/// <returns>An object defining the allowed number of invocations.</returns>
+		/// <include file='Times.xdoc' path='docs/doc[@for="Times.Never"]/*'/>
 		public static Times Never()
 		{
 			return new Times(c => c == 0, 0, 0, Resources.NoMatchingCallsNever);
 		}
 
-		/// <summary>
-		/// Specifies that a mocked method should be invoked exactly one time.
-		/// </summary>
-		/// <returns>An object defining the allowed number of invocations.</returns>
+		/// <include file='Times.xdoc' path='docs/doc[@for="Times.Once"]/*'/>
 		public static Times Once()
 		{
 			return new Times(c => c == 1, 1, 1, Resources.NoMatchingCallsOnce);
+		}
+
+		/// <include file='Times.xdoc' path='docs/doc[@for="Times.Equals"]/*'/>
+		public override bool Equals(object obj)
+		{
+			if (obj is Times)
+			{
+				var other = (Times)obj;
+				return this.from == other.from && this.to == other.to;
+			}
+
+			return false;
+		}
+
+		/// <include file='Times.xdoc' path='docs/doc[@for="Times.GetHashCode"]/*'/>
+		public override int GetHashCode()
+		{
+			return this.from.GetHashCode() ^ this.to.GetHashCode();
+		}
+
+		/// <include file='Times.xdoc' path='docs/doc[@for="Times.op_Equality"]/*'/>
+		public static bool operator ==(Times left, Times right)
+		{
+			return left.Equals(right);
+		}
+
+		/// <include file='Times.xdoc' path='docs/doc[@for="Times.op_Inequality"]/*'/>
+		public static bool operator !=(Times left, Times right)
+		{
+			return !left.Equals(right);
 		}
 
 		internal string GetExceptionMessage(string failMessage, string expression, int callCount)

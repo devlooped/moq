@@ -279,9 +279,6 @@
     <Compile Include="..\Source\Obsolete\MockExtensions.cs">
       <Link>Obsolete\MockExtensions.cs</Link>
     </Compile>
-    <Compile Include="..\Source\Obsolete\StubExtensions.cs">
-      <Link>Obsolete\StubExtensions.cs</Link>
-    </Compile>
     <Compile Include="..\Source\PexProtector.cs">
       <Link>PexProtector.cs</Link>
     </Compile>
@@ -348,8 +345,21 @@
     </None>
     <None Include="..\Source\Mock.xdoc">
       <Link>Mock.xdoc</Link>
+			<DependentUpon>Mock.cs</DependentUpon>
     </None>
-  </ItemGroup>
+		<None Include="..\Source\It.xdoc">
+			<Link>It.xdoc</Link>
+			<DependentUpon>It.cs</DependentUpon>
+		</None>
+		<None Include="..\Source\Times.xdoc">
+			<Link>Times.xdoc</Link>
+			<DependentUpon>Times.cs</DependentUpon>
+		</None>
+		<None Include="..\Source\Mock.Generic.xdoc">
+			<Link>Mock.Generic.xdoc</Link>
+			<DependentUpon>Mock.Generic.cs</DependentUpon>
+		</None>
+	</ItemGroup>
   <Import Project="$(MSBuildExtensionsPath32)\Microsoft\Silverlight\$(SilverlightVersion)\Microsoft.Silverlight.CSharp.targets" />
   <ProjectExtensions>
     <VisualStudio>

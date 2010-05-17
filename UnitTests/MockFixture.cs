@@ -17,7 +17,7 @@ namespace Moq.Tests
 				.Returns(count)
 				.Callback(() => count++);
 		}
-		
+
 		[Fact]
 		public void CreatesMockAndExposesInterface()
 		{
@@ -460,9 +460,18 @@ namespace Moq.Tests
 
 #endif
 
+#pragma warning disable 618
 		[Matcher]
-		private static int OddInt() { return 0; }
-		private static bool OddInt(int value) { return value % 2 == 0; }
+		private static int OddInt()
+		{
+			return 0;
+		}
+#pragma warning restore 618
+
+		private static bool OddInt(int value)
+		{
+			return value % 2 == 0;
+		}
 
 		[Matcher]
 		private int BigInt() { return 0; }
@@ -531,7 +540,7 @@ namespace Moq.Tests
 			mock.Object.Value = null;
 
 			mock.VerifyAll();
-			mock.VerifySet(m => m.Value);
+			mock.VerifySet(m => m.Value = It.IsAny<int?>());
 		}
 
 		[Fact]

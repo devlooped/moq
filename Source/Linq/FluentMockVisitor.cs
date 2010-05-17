@@ -52,7 +52,8 @@ namespace Moq.Linq
 	{
 		private static readonly MethodInfo FluentMockGenericMethod = ((Func<Mock<string>, Expression<Func<string, string>>, Mock<string>>)
 			QueryableMockExtensions.FluentMock<string, string>).Method.GetGenericMethodDefinition();
-		static readonly MethodInfo MockGetGenericMethod = ((Func<string, Mock<string>>)Moq.Mock.Get<string>)
+
+		private static readonly MethodInfo MockGetGenericMethod = ((Func<string, Mock<string>>)Mock.Get<string>)
 			.Method.GetGenericMethodDefinition();
 
 		private Expression expression;
@@ -102,29 +103,37 @@ namespace Moq.Linq
 
 		protected override Expression VisitMember(MemberExpression node)
 		{
+			if (node == null)
+			{
+				return null;
+			}
+
+			// If member is not mock-able, actually, including being a sealed class, etc.?
+			if (node.Member is FieldInfo)
+			{
+				throw new NotSupportedException();
+			}
+
 			// Translate differently member accesses over transparent
 			// compiler-generated types as they are typically the 
 			// anonymous types generated to build up the query expressions.
 			if (node.Expression.NodeType == ExpressionType.Parameter &&
 				node.Expression.Type.GetCustomAttribute<CompilerGeneratedAttribute>(false) != null)
 			{
-				var memberType = node.Member is FieldInfo ?
-					((FieldInfo)node.Member).FieldType :
-					((PropertyInfo)node.Member).PropertyType;
+				var memberType = ((PropertyInfo)node.Member).PropertyType;
 
 				// Generate a Mock.Get over the entire member access rather.
 				// <anonymous_type>.foo => Mock.Get(<anonymous_type>.foo)
 				return Expression.Call(null, MockGetGenericMethod.MakeGenericMethod(memberType), node);
 			}
 
-			// If member is not mock-able, actually, including being a sealed class, etc.?
-			if (node.Member is FieldInfo)
-				throw new NotSupportedException();
-
 			var lambdaParam = Expression.Parameter(node.Expression.Type, "mock");
 			Expression lambdaBody = Expression.MakeMemberAccess(lambdaParam, node.Member);
 			var targetMethod = GetTargetMethod(node.Expression.Type, ((PropertyInfo)node.Member).PropertyType);
-			if (isFirst) isFirst = false;
+			if (isFirst)
+			{
+				isFirst = false;
+			}
 
 			return TranslateFluent(node.Expression.Type, ((PropertyInfo)node.Member).PropertyType, targetMethod, Visit(node.Expression), lambdaParam, lambdaBody);
 		}
@@ -142,25 +151,11 @@ namespace Moq.Linq
 
 			// This is the fluent extension method one, so pass the instance as one more arg.
 			if (targetMethod.IsStatic)
-				return Expression.Call(
-					targetMethod,
-					instance,
-					Expression.Lambda(
-						funcType,
-						lambdaBody,
-						lambdaParam
-					)
-				);
-			else
-				return Expression.Call(
-					instance,
-					targetMethod,
-					Expression.Lambda(
-						funcType,
-						lambdaBody,
-						lambdaParam
-					)
-				);
+			{
+				return Expression.Call(targetMethod, instance, Expression.Lambda(funcType, lambdaBody, lambdaParam));
+			}
+
+			return Expression.Call(instance, targetMethod, Expression.Lambda(funcType, lambdaBody, lambdaParam));
 		}
 
 		private MethodInfo GetTargetMethod(Type objectType, Type returnType)
@@ -177,6 +172,7 @@ namespace Moq.Linq
 				//.FluentMock(mock => mock.Solution)
 				targetMethod = FluentMockGenericMethod.MakeGenericMethod(objectType, returnType);
 			}
+
 			return targetMethod;
 		}
 
@@ -189,5 +185,4 @@ namespace Moq.Linq
 				.MakeGenericMethod(returnType);
 		}
 	}
-
 }

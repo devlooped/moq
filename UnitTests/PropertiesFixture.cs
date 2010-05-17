@@ -56,7 +56,9 @@ namespace Moq.Tests
 		{
 			var foo = new Mock<IIndexedFoo>();
 
+#pragma warning disable 618
 			Assert.Throws<ArgumentException>(() => foo.SetupSet(f => f[0]));
+#pragma warning restore 618
 		}
 
 		[Fact]

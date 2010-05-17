@@ -115,6 +115,7 @@ namespace Moq.Tests
 		}
 
 		[Fact]
+		[Obsolete]
 		public void ProjectHomePageDemo()
 		{
 			var mock = new Mock<ILoveThisFramework>();

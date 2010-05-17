@@ -360,7 +360,7 @@ namespace Moq.Tests
 		{
 			var mock = new Mock<IWithEvent>();
 
-			mock.SetupSet(m => m.Value).Raises(m => m.InterfaceEvent += null, EventArgs.Empty);
+			mock.SetupSet(m => m.Value = It.IsAny<int>()).Raises(m => m.InterfaceEvent += null, EventArgs.Empty);
 
 			var raised = false;
 			mock.Object.InterfaceEvent += (sender, args) => raised = true;
@@ -375,7 +375,7 @@ namespace Moq.Tests
 		{
 			var mock = new Mock<WithEvent>();
 
-			mock.SetupSet(m => m.Value).Raises(m => m.VirtualEvent += null, EventArgs.Empty);
+			mock.SetupSet(m => m.Value = It.IsAny<int>()).Raises(m => m.VirtualEvent += null, EventArgs.Empty);
 
 			var raised = false;
 			mock.Object.VirtualEvent += (sender, args) => raised = true;
@@ -391,7 +391,7 @@ namespace Moq.Tests
 			var mock = new Mock<WithEvent>();
 
 			Assert.Throws<ArgumentException>(
-				() => mock.SetupSet(m => m.Value).Raises(m => m.ClassEvent += null, EventArgs.Empty));
+				() => mock.SetupSet(m => m.Value = It.IsAny<int>()).Raises(m => m.ClassEvent += null, EventArgs.Empty));
 		}
 
 		[Fact(Skip = "Events on non-virtual events not supported yet")]

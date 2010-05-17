@@ -1,0 +1,112 @@
+﻿<?xml version="1.0" encoding="utf-8" ?>
+<docs xml:space="preserve">
+	<doc for="Times">
+		<summary>
+			Defines the number of invocations allowed by a mocked method.
+		</summary>
+	</doc>
+	<doc for="Times.AtLeast">
+		<summary>
+			Specifies that a mocked method should be invoked <paramref name="callCount"/> times as minimum.
+		</summary>
+		<param name="callCount">The minimun number of times.</param>
+		<returns>An object defining the allowed number of invocations.</returns>
+	</doc>
+	<doc for="Times.AtLeastOnce">
+		<summary>
+			Specifies that a mocked method should be invoked one time as minimum.
+		</summary>
+		<returns>An object defining the allowed number of invocations.</returns>
+	</doc>
+	<doc for="Times.AtMost">
+		<summary>
+			Specifies that a mocked method should be invoked <paramref name="callCount"/> time as maximun.
+		</summary>
+		<param name="callCount">The maximun number of times.</param>
+		<returns>An object defining the allowed number of invocations.</returns>
+	</doc>
+	<doc for="Times.AtMostOnce">
+		<summary>
+			Specifies that a mocked method should be invoked one time as maximun.
+		</summary>
+		<returns>An object defining the allowed number of invocations.</returns>
+	</doc>
+	<doc for="Times.Between">
+		<summary>
+			Specifies that a mocked method should be invoked between <paramref name="callCountFrom"/> and
+			<paramref name="callCountTo"/> times.
+		</summary>
+		<param name="callCountFrom">The minimun number of times.</param>
+		<param name="callCountTo">The maximun number of times.</param>
+		<param name="rangeKind">
+			The kind of range. See <see cref="Range"/>.
+		</param>
+		<returns>An object defining the allowed number of invocations.</returns>
+	</doc>
+	<doc for="Times.Exactly">
+		<summary>
+			Specifies that a mocked method should be invoked exactly <paramref name="callCount"/> times.
+		</summary>
+		<param name="callCount">The times that a method or property can be called.</param>
+		<returns>An object defining the allowed number of invocations.</returns>
+	</doc>
+	<doc for="Times.Never">
+		<summary>
+			Specifies that a mocked method should not be invoked.
+		</summary>
+		<returns>An object defining the allowed number of invocations.</returns>
+	</doc>
+	<doc for="Times.Once">
+		<summary>
+			Specifies that a mocked method should be invoked exactly one time.
+		</summary>
+		<returns>An object defining the allowed number of invocations.</returns>
+	</doc>
+	<doc for="Times.Equals">
+		<summary>
+			Determines whether the specified <see cref="object"/> is equal to this instance.
+		</summary>
+		<param name="obj">
+			The <see cref="object"/> to compare with this instance.
+		</param>
+		<returns>
+			<c>true</c> if the specified <see cref="object"/> is equal to this instance; otherwise, <c>false</c>.
+		</returns>
+	</doc>
+	<doc for="Times.GetHashCode">
+		<summary>
+			Returns a hash code for this instance.
+		</summary>
+		<returns>
+			A hash code for this instance, suitable for use in hashing algorithms and data structures like a hash table.
+		</returns>
+	</doc>
+	<doc for="Times.op_Equality">
+		<summary>
+			Determines whether two specified <see cref="Times"/> objects have the same value.
+		</summary>
+		<param name="left">
+			The first <see cref="Times"/>.
+		</param>
+		<param name="right">
+			The second <see cref="Times"/>.
+		</param>
+		<returns>
+			<c>true</c> if the value of left is the same as the value of right; otherwise, <c>false</c>.
+		</returns>
+	</doc>
+	<doc for="Times.op_Inequality">
+		<summary>
+			Determines whether two specified <see cref="Times"/> objects have different values.
+		</summary>
+		<param name="left">
+			The first <see cref="Times"/>.
+		</param>
+		<param name="right">
+			The second <see cref="Times"/>.
+		</param>
+		<returns>
+			<c>true</c> if the value of left is different from the value of right; otherwise, <c>false</c>.
+		</returns>
+	</doc>
+</docs>

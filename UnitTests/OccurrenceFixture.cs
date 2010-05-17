@@ -1,10 +1,12 @@
-﻿using Xunit;
+﻿using System;
+using Xunit;
 
 namespace Moq.Tests
 {
 	public class OccurrenceFixture
 	{
 		[Fact]
+		[Obsolete]
 		public void OnceThrowsOnSecondCall()
 		{
 			var mock = new Mock<IFoo>();
@@ -18,6 +20,7 @@ namespace Moq.Tests
 		}
 
 		[Fact]
+		[Obsolete]
 		public void RepeatThrowsOnNPlusOneCall()
 		{
 			var repeat = 5;

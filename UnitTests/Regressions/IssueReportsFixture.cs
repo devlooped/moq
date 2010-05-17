@@ -192,22 +192,26 @@ namespace Moq.Tests.Regressions
 
 		public static class IsEqual
 		{
+#pragma warning disable 618
 			[Matcher]
 			public static T To<T>(T value)
 			{
 				return value;
 			}
+#pragma warning restore 618
 
 			public static bool To<T>(T left, T right)
 			{
 				return left.Equals(right);
 			}
 
+#pragma warning disable 618
 			[Matcher]
 			public static T To<T, U>(T value, U value2)
 			{
 				return value;
 			}
+#pragma warning restore 618
 
 			public static bool To<T, U>(T left, T right, U value)
 			{
@@ -701,10 +705,18 @@ namespace Moq.Tests.Regressions
 		{
 			public class Foo
 			{
-				public virtual void Boo() { Bar(); Bar(); }
-				protected virtual void Bar() { }
+				public virtual void Boo()
+				{
+					Bar();
+					Bar();
+				}
+
+				protected virtual void Bar()
+				{
+				}
 			}
 
+#pragma warning disable 618
 			[Fact]
 			public void ShouldRenderCustomMessage()
 			{
@@ -713,7 +725,7 @@ namespace Moq.Tests.Regressions
 
 				Assert.Throws<MockException>("Hello", () => foo.Object.Boo());
 			}
-
+#pragma warning restore 618
 		}
 
 		#endregion

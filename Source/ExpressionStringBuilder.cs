@@ -33,37 +33,40 @@ namespace Moq
 
 		protected override Expression VisitBinary(BinaryExpression node)
 		{
-			if (node.NodeType == ExpressionType.ArrayIndex)
+			if (node != null)
 			{
-				this.Visit(node.Left);
-				this.output.Append("[");
-				this.Visit(node.Right);
-				this.output.Append("]");
-			}
-			else
-			{
-				var @operator = GetStringOperator(node.NodeType);
-				if (IsParentEnclosed(node.Left))
+				if (node.NodeType == ExpressionType.ArrayIndex)
 				{
-					this.output.Append("(");
 					this.Visit(node.Left);
-					this.output.Append(")");
+					this.output.Append("[");
+					this.Visit(node.Right);
+					this.output.Append("]");
 				}
 				else
 				{
-					this.Visit(node.Left);
-				}
+					var @operator = GetStringOperator(node.NodeType);
+					if (IsParentEnclosed(node.Left))
+					{
+						this.output.Append("(");
+						this.Visit(node.Left);
+						this.output.Append(")");
+					}
+					else
+					{
+						this.Visit(node.Left);
+					}
 
-				output.Append(" ").Append(@operator).Append(" ");
-				if (IsParentEnclosed(node.Right))
-				{
-					this.output.Append("(");
-					this.Visit(node.Right);
-					this.output.Append(")");
-				}
-				else
-				{
-					this.Visit(node.Right);
+					output.Append(" ").Append(@operator).Append(" ");
+					if (IsParentEnclosed(node.Right))
+					{
+						this.output.Append("(");
+						this.Visit(node.Right);
+						this.output.Append(")");
+					}
+					else
+					{
+						this.Visit(node.Right);
+					}
 				}
 			}
 
@@ -72,38 +75,40 @@ namespace Moq
 
 		protected override Expression VisitConditional(ConditionalExpression node)
 		{
-			this.Visit(node.Test);
-			this.Visit(node.IfTrue);
-			this.Visit(node.IfFalse);
+			if (node != null)
+			{
+				this.Visit(node.Test);
+				this.Visit(node.IfTrue);
+				this.Visit(node.IfFalse);
+			}
+
 			return node;
 		}
 
 		protected override Expression VisitConstant(ConstantExpression node)
 		{
-			var value = node.Value;
-			if (value != null)
+			if (node != null)
 			{
-				if (value is string)
+				var value = node.Value;
+				if (value != null)
 				{
-					this.output.Append('"').Append(value).Append('"');
-				}
-				else if (value.ToString() == value.GetType().ToString())
-				{
-					// Perhaps is better without nothing (at least for local variables)
-					//builder.Append("<value>");
-				}
-				else if (node.Type.IsEnum)
-				{
-					this.output.Append(node.Type.Name).Append(".").Append(value);
+					if (value is string)
+					{
+						this.output.Append('"').Append(value).Append('"');
+					}
+					else if (node.Type.IsEnum)
+					{
+						this.output.Append(node.Type.Name).Append(".").Append(value);
+					}
+					else if (value.ToString() != value.GetType().ToString())
+					{
+						this.output.Append(value);
+					}
 				}
 				else
 				{
-					this.output.Append(value);
+					this.output.Append("null");
 				}
-			}
-			else
-			{
-				this.output.Append("null");
 			}
 
 			return node;
@@ -111,31 +116,42 @@ namespace Moq
 
 		protected override ElementInit VisitElementInit(ElementInit node)
 		{
-			this.Visit(node.Arguments);
+			if (node != null)
+			{
+				this.Visit(node.Arguments);
+			}
+
 			return node;
 		}
 
 		protected override Expression VisitInvocation(InvocationExpression node)
 		{
-			this.Visit(node.Arguments);
+			if (node != null)
+			{
+				this.Visit(node.Arguments);
+			}
+
 			return node;
 		}
 
 		protected override Expression VisitLambda<T>(Expression<T> node)
 		{
-			if (node.Parameters.Count == 1)
+			if (node != null)
 			{
-				this.VisitParameter(node.Parameters[0]);
-			}
-			else
-			{
-				this.output.Append("(");
-				this.Visit(node.Parameters, n => this.VisitParameter(n), 0, node.Parameters.Count);
-				this.output.Append(")");
-			}
+				if (node.Parameters.Count == 1)
+				{
+					this.VisitParameter(node.Parameters[0]);
+				}
+				else
+				{
+					this.output.Append("(");
+					this.Visit(node.Parameters, n => this.VisitParameter(n), 0, node.Parameters.Count);
+					this.output.Append(")");
+				}
 
-			output.Append(" => ");
-			this.Visit(node.Body);
+				output.Append(" => ");
+				this.Visit(node.Body);
+			}
 
 			return node;
 		}
@@ -267,21 +283,33 @@ namespace Moq
 
 		protected override Expression VisitNew(NewExpression node)
 		{
-			this.Visit(node.Arguments);
+			if (node != null)
+			{
+				this.Visit(node.Arguments);
+			}
+
 			return node;
 		}
 
 		protected override Expression VisitNewArray(NewArrayExpression node)
 		{
-			this.output.Append("new[] { ");
-			this.Visit(node.Expressions);
-			this.output.Append(" }");
+			if (node != null)
+			{
+				this.output.Append("new[] { ");
+				this.Visit(node.Expressions);
+				this.output.Append(" }");
+			}
+
 			return node;
 		}
 
 		protected override Expression VisitParameter(ParameterExpression node)
 		{
-			this.output.Append(node.Name != null ? node.Name : "<param>");
+			if (node != null)
+			{
+				this.output.Append(node.Name != null ? node.Name : "<param>");
+			}
+
 			return node;
 		}
 

@@ -90,7 +90,7 @@ namespace Moq.Tests
 		{
 			var mock = new Mock<IFoo>();
 
-			mock.SetupSet(m => m.Bar.Value);
+			mock.SetupSet(m => m.Bar.Value = It.IsAny<int>());
 
 			Assert.NotNull(mock.Object.Bar);
 			Assert.Throws<MockVerificationException>(() => mock.VerifyAll());
@@ -155,10 +155,10 @@ namespace Moq.Tests
 		{
 			var mock = new Mock<IFoo>();
 
-			Assert.Throws<MockException>(() => mock.VerifySet(m => m.Bar.Value));
+			Assert.Throws<MockException>(() => mock.VerifySet(m => m.Bar.Value = It.IsAny<int>()));
 
 			mock.Object.Bar.Value = 5;
-			mock.VerifySet(m => m.Bar.Value);
+			mock.VerifySet(m => m.Bar.Value = It.IsAny<int>());
 		}
 
 		[Fact]
@@ -227,13 +227,13 @@ namespace Moq.Tests
 		{
 			var mock = new Mock<IFoo>();
 
-			mock.SetupSet(m => m.Bar.Value);
+			mock.SetupSet(m => m.Bar.Value = It.IsAny<int>());
 
-			Assert.Throws<MockException>(() => mock.VerifySet(m => m.Bar.Value));
+			Assert.Throws<MockException>(() => mock.VerifySet(m => m.Bar.Value = It.IsAny<int>()));
 
 			mock.Object.Bar.Value = 5;
 
-			mock.VerifySet(m => m.Bar.Value);
+			mock.VerifySet(m => m.Bar.Value = It.IsAny<int>());
 		}
 
 		[Fact]

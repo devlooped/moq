@@ -314,6 +314,7 @@ namespace Moq.Protected
 							break;
 						default:
 							throw new NotSupportedException(string.Format(
+								Resources.Culture,
 								Resources.UnsupportedMember,
 								member.Member.Name));
 					}

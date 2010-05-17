@@ -41,97 +41,36 @@
 using System.Collections.Generic;
 using System.Linq;
 using System.Linq.Expressions;
+using System.Reflection;
 using Moq.Language;
-using System;
 
 namespace Moq.Linq
 {
 	internal class MockSetupsBuilder : ExpressionVisitor
 	{
+		private static readonly string[] queryableMethods = new[] { "First", "Where" };
+
 		private int stackIndex;
-
-		protected override Expression VisitMethodCall(MethodCallExpression node)
-		{
-			if (node.Method.DeclaringType == typeof(Queryable) &&
-				(node.Method.Name == "Where" || node.Method.Name == "First"))
-			{
-				this.stackIndex++;
-				var result = base.VisitMethodCall(node);
-				this.stackIndex--;
-				return result;
-			}
-
-			return base.VisitMethodCall(node);
-		}
 
 		protected override Expression VisitBinary(BinaryExpression node)
 		{
 			if (this.stackIndex > 0 && node.NodeType == ExpressionType.Equal)
 			{
-				switch (node.Left.NodeType)
-				{
-					case ExpressionType.MemberAccess:
-						var member = (MemberExpression)node.Left;
-						return ConvertToSetup(member.Expression, member, node.Right);
-
-					case ExpressionType.Call:
-						var method = (MethodCallExpression)node.Left;
-						return ConvertToSetup(method.Object, method, node.Right);
-
-					case ExpressionType.Convert:
-						var left = (UnaryExpression)node.Left;
-
-						switch (left.Operand.NodeType)
-						{
-							case ExpressionType.MemberAccess:
-								var memberOperand = (MemberExpression)left.Operand;
-								return ConvertToSetup(
-									memberOperand.Expression,
-									memberOperand,
-									Expression.Convert(node.Right, memberOperand.Type));
-
-							case ExpressionType.Call:
-								var methodOperand = (MethodCallExpression)left.Operand;
-								return ConvertToSetup(
-									methodOperand.Object,
-									methodOperand,
-									Expression.Convert(node.Right, methodOperand.Type));
-						}
-
-						break;
-				}
+				return ConvertToSetup(node.Left, node.Right) ?? base.VisitBinary(node);
 			}
 
 			return base.VisitBinary(node);
-		}
-
-		protected override Expression VisitUnary(UnaryExpression node)
-		{
-			if (this.stackIndex > 0 && node.Operand.NodeType == ExpressionType.MemberAccess && node.Type == typeof(bool))
-			{
-				var member = (MemberExpression)node.Operand;
-				return ConvertToSetup(member.Expression, member, Expression.Constant(false));
-			}
-
-			return base.VisitUnary(node);
 		}
 
 		protected override Expression VisitConstant(ConstantExpression node)
 		{
 			if (node.Type.IsGenericType && node.Type.GetGenericTypeDefinition() == typeof(MockQueryable<>))
 			{
-				var targetType = node.Type.GetGenericArguments()[0];
+				var asQueryableMethod = typeof(Mocks)
+					.GetMethod("CreateQueryable", BindingFlags.NonPublic | BindingFlags.Static)
+					.MakeGenericMethod(node.Type.GetGenericArguments()[0]);
 
-				var createRealMethod = typeof(Mocks).GetMethod("CreateReal")
-					.MakeGenericMethod(targetType);
-				var createRealExpr = Expression.Call(null, createRealMethod);
-
-				var asQueryableMethod = typeof(Queryable).GetMethods()
-					.Where(mi => mi.Name == "AsQueryable" && mi.IsGenericMethodDefinition)
-					.Single()
-					.MakeGenericMethod(targetType);
-
-				return Expression.Call(null, asQueryableMethod, createRealExpr);
+				return Expression.Call(null, asQueryableMethod);
 			}
 
 			return base.VisitConstant(node);
@@ -139,12 +78,63 @@ namespace Moq.Linq
 
 		protected override Expression VisitMember(MemberExpression node)
 		{
-			if (this.stackIndex > 0 && node.Type == typeof(bool))
+			if (node != null && this.stackIndex > 0 && node.Type == typeof(bool))
 			{
 				return ConvertToSetup(node.Expression, node, Expression.Constant(true));
 			}
 
 			return base.VisitMember(node);
+		}
+
+		protected override Expression VisitMethodCall(MethodCallExpression node)
+		{
+			if (node != null)
+			{
+				if (node.Method.DeclaringType == typeof(Queryable) && queryableMethods.Contains(node.Method.Name))
+				{
+					this.stackIndex++;
+					var result = base.VisitMethodCall(node);
+					this.stackIndex--;
+					return result;
+				}
+
+				if (this.stackIndex > 0 && node.Type == typeof(bool))
+				{
+					return ConvertToSetup(node.Object, node, Expression.Constant(true));
+				}
+			}
+
+			return base.VisitMethodCall(node);
+		}
+
+		protected override Expression VisitUnary(UnaryExpression node)
+		{
+			if (this.stackIndex > 0 && node.NodeType == ExpressionType.Not)
+			{
+				return ConvertToSetup(node.Operand, Expression.Constant(false)) ?? base.VisitUnary(node);
+			}
+
+			return base.VisitUnary(node);
+		}
+
+		private static Expression ConvertToSetup(Expression left, Expression right)
+		{
+			switch (left.NodeType)
+			{
+				case ExpressionType.MemberAccess:
+					var member = (MemberExpression)left;
+					return ConvertToSetup(member.Expression, member, right);
+
+				case ExpressionType.Call:
+					var method = (MethodCallExpression)left;
+					return ConvertToSetup(method.Object, method, right);
+
+				case ExpressionType.Convert:
+					var left1 = (UnaryExpression)left;
+					return ConvertToSetup(left1.Operand, Expression.Convert(right, left1.Operand.Type));
+			}
+
+			return null;
 		}
 
 		private static Expression ConvertToSetup(Expression targetObject, Expression left, Expression right)

@@ -236,17 +236,17 @@ namespace Moq
 				this.Expression = this.Visit(expression);
 			}
 
-			protected override Expression VisitUnary(UnaryExpression u)
+			protected override Expression VisitUnary(UnaryExpression expression)
 			{
-				if (u.NodeType == ExpressionType.Convert &&
-					u.Operand.NodeType == ExpressionType.Call &&
-					typeof(Match).IsAssignableFrom(((MethodCallExpression)u.Operand).Method.ReturnType))
+				if (expression.NodeType == ExpressionType.Convert &&
+					expression.Operand.NodeType == ExpressionType.Call &&
+					typeof(Match).IsAssignableFrom(((MethodCallExpression)expression.Operand).Method.ReturnType))
 				{
 					// Remove the cast.
-					return u.Operand;
+					return expression.Operand;
 				}
 
-				return base.VisitUnary(u);
+				return base.VisitUnary(expression);
 			}
 
 			public Expression Expression { get; private set; }

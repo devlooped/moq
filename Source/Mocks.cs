@@ -75,14 +75,19 @@ namespace Moq
 		}
 
 		/// <summary>
+		/// Wraps the enumerator inside a queryable.
+		/// </summary>
+		internal static IQueryable<T> CreateQueryable<T>() where T : class
+		{
+			return new EnumerableQuery<T>(CreateEnumerable<T>());
+		}
+
+		/// <summary>
 		/// Method that is turned into the actual call from .Query{T}, to 
 		/// transform the queryable query into a normal enumerable query.
 		/// This method should not be used by consumers.
 		/// </summary>
-		/// <typeparam name="T"></typeparam>
-		/// <returns></returns>
-		[EditorBrowsable(EditorBrowsableState.Never)]
-		public static IEnumerable<T> CreateReal<T>() where T : class
+		private static IEnumerable<T> CreateEnumerable<T>() where T : class
 		{
 			do
 			{
