@@ -41,6 +41,7 @@
 using System;
 using System.Linq.Expressions;
 using System.Text.RegularExpressions;
+using System.Diagnostics.CodeAnalysis;
 
 namespace Moq
 {
@@ -56,7 +57,7 @@ namespace Moq
 		}
 
 		/// <include file='It.xdoc' path='docs/doc[@for="It.Is"]/*'/>
-		[System.Diagnostics.CodeAnalysis.SuppressMessage("Microsoft.Usage", "CA1801:ReviewUnusedParameters", MessageId = "match")]
+		[SuppressMessage("Microsoft.Design", "CA1006:DoNotNestGenericTypesInMemberSignatures")]
 		public static TValue Is<TValue>(Expression<Predicate<TValue>> match)
 		{
 			return Match<TValue>.Create(
@@ -65,9 +66,6 @@ namespace Moq
 		}
 
 		/// <include file='It.xdoc' path='docs/doc[@for="It.IsInRange"]/*'/>
-		[System.Diagnostics.CodeAnalysis.SuppressMessage("Microsoft.Usage", "CA1801:ReviewUnusedParameters", MessageId = "to")]
-		[System.Diagnostics.CodeAnalysis.SuppressMessage("Microsoft.Usage", "CA1801:ReviewUnusedParameters", MessageId = "rangeKind")]
-		[System.Diagnostics.CodeAnalysis.SuppressMessage("Microsoft.Usage", "CA1801:ReviewUnusedParameters", MessageId = "from")]
 		public static TValue IsInRange<TValue>(TValue from, TValue to, Range rangeKind)
 			where TValue : IComparable
 		{
@@ -89,7 +87,6 @@ namespace Moq
 		}
 
 		/// <include file='It.xdoc' path='docs/doc[@for="It.IsRegex(regex)"]/*'/>
-		[System.Diagnostics.CodeAnalysis.SuppressMessage("Microsoft.Usage", "CA1801:ReviewUnusedParameters", MessageId = "regex")]
 		public static string IsRegex(string regex)
 		{
 			// The regex is constructed only once.
@@ -100,8 +97,6 @@ namespace Moq
 		}
 
 		/// <include file='It.xdoc' path='docs/doc[@for="It.IsRegex(regex,options)"]/*'/>
-		[System.Diagnostics.CodeAnalysis.SuppressMessage("Microsoft.Usage", "CA1801:ReviewUnusedParameters", MessageId = "regex")]
-		[System.Diagnostics.CodeAnalysis.SuppressMessage("Microsoft.Usage", "CA1801:ReviewUnusedParameters", MessageId = "options")]
 		public static string IsRegex(string regex, RegexOptions options)
 		{
 			// The regex is constructed only once.

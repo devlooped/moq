@@ -67,8 +67,8 @@ namespace Moq.Matchers
 	/// </summary>
 	internal class MatcherAttributeMatcher : IMatcher
 	{
-		MethodInfo validatorMethod;
-		Expression matcherExpression;
+		private MethodInfo validatorMethod;
+		private Expression matcherExpression;
 
 		public void Initialize(Expression matcherExpression)
 		{

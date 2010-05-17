@@ -29,13 +29,13 @@ namespace Moq.Tests
 
 		public TValue Any<TValue>()
 		{
-			return Match<TValue>.Create(v => true);
+			return Match.Create<TValue>(v => true);
 		}
 
 		public TValue Between<TValue>(TValue from, TValue to, Range rangeKind)
 			where TValue : IComparable
 		{
-			return Match<TValue>.Create(value =>
+			return Match.Create<TValue>(value =>
 			{
 				if (value == null)
 				{

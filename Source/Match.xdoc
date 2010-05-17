@@ -21,7 +21,7 @@
 		</remarks>
 		<example>
 			Creating a custom matcher is straightforward. You just need to create a method
-			that returns a value from a call to <see cref="Match{T}.Create(Predicate{T})"/> with 
+			that returns a value from a call to <see cref="Match.Create{T}(Predicate{T})"/> with 
 			your matching condition and optional friendly render expression:
 			<code>
 				public Order IsBigOrder()
@@ -62,7 +62,7 @@
 			</code>
 		</example>
 	</doc>
-	<doc for="Match{T}.Create(condition)">
+	<doc for="Match.Create{T}(condition)">
 		<summary>
 			Initializes the match with the condition that
 			will be checked in order to match invocation
@@ -73,7 +73,7 @@
 			 <seealso cref="Match{T}"/>
 		</remarks>
 	</doc>
-	<doc for="Match{T}.Create(condition,renderExpression)">
+	<doc for="Match.Create{T}(condition,renderExpression)">
 		<summary>
 			Initializes the match with the condition that
 			will be checked in order to match invocation

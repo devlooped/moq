@@ -54,7 +54,7 @@ namespace Moq.Linq
 
 		protected override Expression VisitBinary(BinaryExpression node)
 		{
-			if (this.stackIndex > 0 && node.NodeType == ExpressionType.Equal)
+			if (node != null && this.stackIndex > 0 && node.NodeType == ExpressionType.Equal)
 			{
 				return ConvertToSetup(node.Left, node.Right) ?? base.VisitBinary(node);
 			}
@@ -64,7 +64,7 @@ namespace Moq.Linq
 
 		protected override Expression VisitConstant(ConstantExpression node)
 		{
-			if (node.Type.IsGenericType && node.Type.GetGenericTypeDefinition() == typeof(MockQueryable<>))
+			if (node != null && node.Type.IsGenericType && node.Type.GetGenericTypeDefinition() == typeof(MockQueryable<>))
 			{
 				var asQueryableMethod = typeof(Mocks)
 					.GetMethod("CreateQueryable", BindingFlags.NonPublic | BindingFlags.Static)
@@ -109,7 +109,7 @@ namespace Moq.Linq
 
 		protected override Expression VisitUnary(UnaryExpression node)
 		{
-			if (this.stackIndex > 0 && node.NodeType == ExpressionType.Not)
+			if (node != null && this.stackIndex > 0 && node.NodeType == ExpressionType.Not)
 			{
 				return ConvertToSetup(node.Operand, Expression.Constant(false)) ?? base.VisitUnary(node);
 			}

@@ -158,66 +158,89 @@ namespace Moq
 
 		protected override Expression VisitListInit(ListInitExpression node)
 		{
-			this.VisitNew(node.NewExpression);
-			Visit(node.Initializers, n => this.VisitElementInit(n));
+			if (node != null)
+			{
+				this.VisitNew(node.NewExpression);
+				Visit(node.Initializers, n => this.VisitElementInit(n));
+			}
+
 			return node;
 		}
 
 		protected override Expression VisitMember(MemberExpression node)
 		{
-			if (node.Expression != null)
+			if (node != null)
 			{
-				this.Visit(node.Expression);
-			}
-			else
-			{
-				this.output.Append(node.Member.DeclaringType.Name);
+				if (node.Expression != null)
+				{
+					this.Visit(node.Expression);
+				}
+				else
+				{
+					this.output.Append(node.Member.DeclaringType.Name);
+				}
+
+				this.output.Append(".").Append(node.Member.Name);
 			}
 
-			this.output.Append(".").Append(node.Member.Name);
 			return node;
 		}
 
 		protected override Expression VisitMemberInit(MemberInitExpression node)
 		{
-			this.VisitNew(node.NewExpression);
-			Visit(node.Bindings, n => this.VisitMemberBinding(n));
+			if (node != null)
+			{
+				this.VisitNew(node.NewExpression);
+				Visit(node.Bindings, n => this.VisitMemberBinding(n));
+			}
+
 			return node;
 		}
 
 		protected override MemberListBinding VisitMemberListBinding(MemberListBinding node)
 		{
-			Visit(node.Initializers, n => this.VisitElementInit(n));
+			if (node != null)
+			{
+				Visit(node.Initializers, n => this.VisitElementInit(n));
+			}
+
 			return node;
 		}
 
 		protected override MemberAssignment VisitMemberAssignment(MemberAssignment node)
 		{
-			this.Visit(node.Expression);
+			if (node != null)
+			{
+				this.Visit(node.Expression);
+			}
+
 			return node;
 		}
 
 		protected override MemberBinding VisitMemberBinding(MemberBinding node)
 		{
-			switch (node.BindingType)
+			if (node != null)
 			{
-				case MemberBindingType.Assignment:
-					this.VisitMemberAssignment((MemberAssignment)node);
-					break;
+				switch (node.BindingType)
+				{
+					case MemberBindingType.Assignment:
+						this.VisitMemberAssignment((MemberAssignment)node);
+						break;
 
-				case MemberBindingType.MemberBinding:
-					this.VisitMemberMemberBinding((MemberMemberBinding)node);
-					break;
+					case MemberBindingType.MemberBinding:
+						this.VisitMemberMemberBinding((MemberMemberBinding)node);
+						break;
 
-				case MemberBindingType.ListBinding:
-					this.VisitMemberListBinding((MemberListBinding)node);
-					break;
+					case MemberBindingType.ListBinding:
+						this.VisitMemberListBinding((MemberListBinding)node);
+						break;
 
-				default:
-					throw new InvalidOperationException(string.Format(
-						CultureInfo.CurrentCulture,
-						"Unhandled binding type '{0}'",
-						node.BindingType));
+					default:
+						throw new InvalidOperationException(string.Format(
+							CultureInfo.CurrentCulture,
+							"Unhandled binding type '{0}'",
+							node.BindingType));
+				}
 			}
 
 			return node;
@@ -225,57 +248,64 @@ namespace Moq
 
 		protected override MemberMemberBinding VisitMemberMemberBinding(MemberMemberBinding node)
 		{
-			Visit(node.Bindings, n => this.VisitMemberBinding(n));
+			if (node != null)
+			{
+				Visit(node.Bindings, n => this.VisitMemberBinding(n));
+			}
+
 			return node;
 		}
 
 		protected override Expression VisitMethodCall(MethodCallExpression node)
 		{
-			var paramFrom = 0;
-			var expression = node.Object;
+			if (node != null)
+			{
+				var paramFrom = 0;
+				var expression = node.Object;
 
-			if (Attribute.GetCustomAttribute(node.Method, typeof(ExtensionAttribute)) != null)
-			{
-				paramFrom = 1;
-				expression = node.Arguments[0];
-			}
+				if (Attribute.GetCustomAttribute(node.Method, typeof(ExtensionAttribute)) != null)
+				{
+					paramFrom = 1;
+					expression = node.Arguments[0];
+				}
 
-			if (expression != null)
-			{
-				this.Visit(expression);
-			}
-			else // Method is static
-			{
-				this.output.Append(node.Method.DeclaringType.Name);
-			}
+				if (expression != null)
+				{
+					this.Visit(expression);
+				}
+				else // Method is static
+				{
+					this.output.Append(node.Method.DeclaringType.Name);
+				}
 
-			if (node.Method.IsPropertyIndexerGetter())
-			{
-				this.output.Append("[");
-				this.Visit(node.Arguments, n => this.Visit(n), paramFrom, node.Arguments.Count);
-				this.output.Append("]");
-			}
-			else if (node.Method.IsPropertyIndexerSetter())
-			{
-				this.output.Append("[");
-				this.Visit(node.Arguments, n => this.Visit(n), paramFrom, node.Arguments.Count - 1);
-				this.output.Append("] = ");
-				this.Visit(node.Arguments.Last());
-			}
-			else if (node.Method.IsPropertyGetter())
-			{
-				this.output.Append(".").Append(node.Method.Name.Substring(4));
-			}
-			else if (node.Method.IsPropertySetter())
-			{
-				this.output.Append(".").Append(node.Method.Name.Substring(4)).Append(" = ");
-				this.Visit(node.Arguments.Last());
-			}
-			else
-			{
-				this.output.Append(".").Append(this.getMethodName(node.Method)).Append("(");
-				this.Visit(node.Arguments, n => this.Visit(n), paramFrom, node.Arguments.Count);
-				output.Append(")");
+				if (node.Method.IsPropertyIndexerGetter())
+				{
+					this.output.Append("[");
+					this.Visit(node.Arguments, n => this.Visit(n), paramFrom, node.Arguments.Count);
+					this.output.Append("]");
+				}
+				else if (node.Method.IsPropertyIndexerSetter())
+				{
+					this.output.Append("[");
+					this.Visit(node.Arguments, n => this.Visit(n), paramFrom, node.Arguments.Count - 1);
+					this.output.Append("] = ");
+					this.Visit(node.Arguments.Last());
+				}
+				else if (node.Method.IsPropertyGetter())
+				{
+					this.output.Append(".").Append(node.Method.Name.Substring(4));
+				}
+				else if (node.Method.IsPropertySetter())
+				{
+					this.output.Append(".").Append(node.Method.Name.Substring(4)).Append(" = ");
+					this.Visit(node.Arguments.Last());
+				}
+				else
+				{
+					this.output.Append(".").Append(this.getMethodName(node.Method)).Append("(");
+					this.Visit(node.Arguments, n => this.Visit(n), paramFrom, node.Arguments.Count);
+					output.Append(")");
+				}
 			}
 
 			return node;
@@ -315,34 +345,37 @@ namespace Moq
 
 		protected override Expression VisitTypeBinary(TypeBinaryExpression node)
 		{
-			return this.Visit(node.Expression);
+			return node != null ? this.Visit(node.Expression) : node;
 		}
 
 		protected override Expression VisitUnary(UnaryExpression node)
 		{
-			switch (node.NodeType)
+			if (node != null)
 			{
-				case ExpressionType.Negate:
-				case ExpressionType.NegateChecked:
-					this.output.Append("-");
-					this.Visit(node.Operand);
-					break;
+				switch (node.NodeType)
+				{
+					case ExpressionType.Negate:
+					case ExpressionType.NegateChecked:
+						this.output.Append("-");
+						this.Visit(node.Operand);
+						break;
 
-				case ExpressionType.Not:
-					this.output.Append("!(");
-					this.Visit(node.Operand);
-					this.output.Append(")");
-					break;
+					case ExpressionType.Not:
+						this.output.Append("!(");
+						this.Visit(node.Operand);
+						this.output.Append(")");
+						break;
 
-				case ExpressionType.Quote:
-					this.Visit(node.Operand);
-					break;
+					case ExpressionType.Quote:
+						this.Visit(node.Operand);
+						break;
 
-				case ExpressionType.TypeAs:
-					this.output.Append("(");
-					this.Visit(node.Operand);
-					this.output.Append(" as ").Append(node.Type.Name).Append(")");
-					break;
+					case ExpressionType.TypeAs:
+						this.output.Append("(");
+						this.Visit(node.Operand);
+						this.output.Append(" as ").Append(node.Type.Name).Append(")");
+						break;
+				}
 			}
 
 			return node;

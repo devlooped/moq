@@ -238,12 +238,15 @@ namespace Moq
 
 			protected override Expression VisitUnary(UnaryExpression expression)
 			{
-				if (expression.NodeType == ExpressionType.Convert &&
-					expression.Operand.NodeType == ExpressionType.Call &&
-					typeof(Match).IsAssignableFrom(((MethodCallExpression)expression.Operand).Method.ReturnType))
+				if (expression != null)
 				{
-					// Remove the cast.
-					return expression.Operand;
+					if (expression.NodeType == ExpressionType.Convert &&
+						expression.Operand.NodeType == ExpressionType.Call &&
+						typeof(Match).IsAssignableFrom(((MethodCallExpression)expression.Operand).Method.ReturnType))
+					{
+						// Remove the cast.
+						return expression.Operand;
+					}
 				}
 
 				return base.VisitUnary(expression);

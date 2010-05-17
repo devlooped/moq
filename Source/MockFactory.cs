@@ -43,6 +43,7 @@ using System.Collections.Generic;
 using System.Globalization;
 using System.Linq;
 using System.Text;
+using Moq.Properties;
 
 namespace Moq
 {
@@ -324,7 +325,7 @@ namespace Moq
 		/// each mock.</param>
 		protected virtual void VerifyMocks(Action<Mock> verifyAction)
 		{
-			StringBuilder message = new StringBuilder();
+			var message = new StringBuilder();
 
 			foreach (var mock in mocks)
 			{
@@ -339,8 +340,11 @@ namespace Moq
 			}
 
 			if (message.ToString().Length > 0)
-				throw new MockException(MockException.ExceptionReason.VerificationFailed,
-					String.Format(CultureInfo.CurrentCulture, Properties.Resources.VerficationFailed, message));
+			{
+				throw new MockException(
+					MockException.ExceptionReason.VerificationFailed,
+					string.Format(CultureInfo.CurrentCulture, Resources.VerficationFailed, message));
+			}
 		}
 	}
 }

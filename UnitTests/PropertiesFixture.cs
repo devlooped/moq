@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using Xunit;
+using System.Linq.Expressions;
 
 namespace Moq.Tests
 {
@@ -17,7 +18,7 @@ namespace Moq.Tests
 		{
 			string this[int key] { get; set; }
 			string this[int key1, string key2, bool key3, DateTime key4] { get; set; }
-			
+
 			IBar this[int key1, string key2, DateTime key4] { get; set; }
 		}
 
@@ -49,16 +50,6 @@ namespace Moq.Tests
 			var result = foo.Object[1, "foo", true, DateTime.Now];
 
 			Assert.Equal("bar", result);
-		}
-
-		[Fact]
-		public void ShouldThrowIfSetupSetIndexer()
-		{
-			var foo = new Mock<IIndexedFoo>();
-
-#pragma warning disable 618
-			Assert.Throws<ArgumentException>(() => foo.SetupSet(f => f[0]));
-#pragma warning restore 618
 		}
 
 		[Fact]

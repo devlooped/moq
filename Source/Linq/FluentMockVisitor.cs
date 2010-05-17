@@ -45,6 +45,7 @@ using System.Text;
 using System.Reflection;
 using System.Linq.Expressions;
 using System.Runtime.CompilerServices;
+using System.Diagnostics.CodeAnalysis;
 
 namespace Moq.Linq
 {
@@ -84,12 +85,22 @@ namespace Moq.Linq
 
 		protected override Expression VisitParameter(ParameterExpression node)
 		{
+			if (node == null)
+			{
+				return null;
+			}
+
 			// the actual first object being used in a fluent expression.
 			return Expression.Call(null, MockGetGenericMethod.MakeGenericMethod(node.Type), node);
 		}
 
 		protected override Expression VisitMethodCall(MethodCallExpression node)
 		{
+			if (node == null)
+			{
+				return null;
+			}
+
 			var lambdaParam = Expression.Parameter(node.Object.Type, "mock");
 			var lambdaBody = Expression.Call(lambdaParam, node.Method, node.Arguments);
 			var targetMethod = GetTargetMethod(node.Object.Type, node.Method.ReturnType);

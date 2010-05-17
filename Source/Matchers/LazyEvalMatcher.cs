@@ -45,20 +45,22 @@ namespace Moq
 {
 	internal class LazyEvalMatcher : IMatcher
 	{
-		private Expression matcherExpression;
+		private Expression expression;
 
 		public void Initialize(Expression matcherExpression)
 		{
-			this.matcherExpression = matcherExpression;
+			this.expression = matcherExpression;
 		}
 
 		public bool Matches(object value)
 		{
-			Expression eval = Evaluator.PartialEval(matcherExpression);
+			var eval = Evaluator.PartialEval(this.expression);
 			if (eval.NodeType == ExpressionType.Constant)
-				return Object.Equals(((ConstantExpression)eval).Value, value);
-			else
-				return false;
+			{
+				return object.Equals(((ConstantExpression)eval).Value, value);
+			}
+
+			return false;
 		}
 	}
 }

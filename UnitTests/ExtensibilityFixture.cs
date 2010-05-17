@@ -31,7 +31,7 @@ namespace Moq.Tests
 			var order = new Order();
 			var mock = new Mock<IOrderRepository>();
 
-			Order repo = Match<Order>.Create(r => true);
+			Order repo = Match.Create<Order>(r => true);
 
 			mock.Setup(x => x.Save(Orders.Contains(order)))
 				 .Throws<ArgumentException>();
@@ -81,19 +81,19 @@ namespace Moq.Tests
 	{
 		public static IEnumerable<Order> Contains(Order order)
 		{
-			return Match<IEnumerable<Order>>.Create(orders => orders.Contains(order));
+			return Match.Create<IEnumerable<Order>>(orders => orders.Contains(order));
 		}
 
 		public static Order IsBig()
 		{
-			return Match<Order>.Create(o => o.Amount >= 1000);
+			return Match.Create<Order>(o => o.Amount >= 1000);
 		}
 
 		public static Order IsSmall
 		{
 			get
 			{
-				return Match<Order>.Create(o => o.Amount <= 1000);
+				return Match.Create<Order>(o => o.Amount <= 1000);
 			}
 		}
 	}

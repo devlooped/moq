@@ -307,8 +307,8 @@ namespace Moq.Tests
 
 			int? value = 0;
 
-			mock.SetupSet(foo => foo.Value)
-				.Callback(i => value = i);
+			mock.SetupSet(foo => foo.Value = It.IsAny<int?>())
+				.Callback<int?>(i => value = i);
 
 			mock.Object.Value = 5;
 
@@ -455,7 +455,7 @@ namespace Moq.Tests
 
 		private int IsMultipleOf(int value)
 		{
-			return Match<int>.Create(i => i % value == 0);
+			return Match.Create<int>(i => i % value == 0);
 		}
 
 #endif
@@ -473,9 +473,18 @@ namespace Moq.Tests
 			return value % 2 == 0;
 		}
 
+#pragma warning disable 618
 		[Matcher]
-		private int BigInt() { return 0; }
-		private bool BigInt(int value) { return value > 2; }
+		private int BigInt()
+		{
+			return 0;
+		}
+#pragma warning restore 618
+
+		private bool BigInt(int value)
+		{
+			return value > 2;
+		}
 
 		[Fact]
 		public void ExpectsPropertySetterLambdaCoercesNullable()
@@ -633,14 +642,6 @@ namespace Moq.Tests
 				.Returns(2);
 
 			Assert.Equal(2, mock.Object.Value);
-		}
-
-		[Fact]
-		public void ThrowsIfExpectGetOnPropertyWithPrivateSetter()
-		{
-			var mock = new Mock<FooWithPrivateSetter>();
-
-			Assert.Throws<ArgumentException>(() => mock.SetupSet(m => m.Foo));
 		}
 
 		[Fact]

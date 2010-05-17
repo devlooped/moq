@@ -111,15 +111,18 @@ namespace Moq
 			where T : class
 			where TResult : class
 		{
+			Guard.NotNull(() => mock, mock);
+			Guard.NotNull(() => setup, setup);
 			typeof(TResult).ThrowIfNotMockeable();
 
 			MethodInfo info;
-
 			if (setup.Body.NodeType == ExpressionType.MemberAccess)
 			{
 				var property = ((MemberExpression)setup.Body).Member as PropertyInfo;
 				if (property == null)
+				{
 					throw new NotSupportedException("Fields are not supported");
+				}
 
 				info = property.GetGetMethod();
 			}
@@ -133,8 +136,10 @@ namespace Moq
 			}
 
 			if (!info.ReturnType.IsMockeable())
+			{
 				// We should have a type.ThrowIfNotMockeable() rather, so that we can reuse it.
 				throw new NotSupportedException();
+			}
 
 			Mock fluentMock;
 			if (!mock.InnerMocks.TryGetValue(info, out fluentMock))

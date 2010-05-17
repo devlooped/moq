@@ -381,7 +381,7 @@ namespace Moq
 		{
 			public ConstantsVisitor(Expression expression)
 			{
-				Values = new List<object>();
+				this.Values = new List<object>();
 				base.Visit(expression);
 			}
 
@@ -389,7 +389,10 @@ namespace Moq
 
 			protected override Expression VisitConstant(ConstantExpression c)
 			{
-				Values.Add(c.Value);
+				if (c != null)
+				{
+					Values.Add(c.Value);
+				}
 
 				return base.VisitConstant(c);
 			}
