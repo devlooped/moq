@@ -116,9 +116,13 @@ namespace Moq
 		private void SetReturnDelegate(Delegate valueDel)
 		{
 			if (valueDel == null)
+			{
 				this.valueDel = (Func<TResult>)(() => default(TResult));
+			}
 			else
+			{
 				this.valueDel = valueDel;
+			}
 
 			HasReturnValue = true;
 		}

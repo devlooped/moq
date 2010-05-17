@@ -67,11 +67,32 @@ namespace Moq
 		/// Returns a mock of the given type.
 		/// </summary>
 		/// <typeparam name="T">The type of mocked object.</typeparam>
+		/// <returns>The mock of the given type.</returns>
+		public static T First<T>() where T : class
+		{
+			return Mocks.CreateQuery<T>().First();
+		}
+
+		/// <summary>
+		/// Returns a mock of the given type.
+		/// </summary>
+		/// <typeparam name="T">The type of mocked object.</typeparam>
 		/// <param name="setupCondition">The expressions to be set as setup conditions.</param>
 		/// <returns>The mock of the given type.</returns>
 		public static T First<T>(Expression<Func<T, bool>> setupCondition) where T : class
 		{
 			return Mocks.CreateQuery<T>().First(setupCondition);
+		}
+
+		/// <summary>
+		/// Returns a mock of the given type.
+		/// </summary>
+		/// <typeparam name="T">The type of mocked object.</typeparam>
+		/// <param name="setupCondition">The expressions to be set as setup conditions.</param>
+		/// <returns>The mocks of the given type.</returns>
+		public static IEnumerable<T> Where<T>(Expression<Func<T, bool>> setupCondition) where T : class
+		{
+			return Mocks.CreateQuery<T>().Where(setupCondition);
 		}
 
 		/// <summary>

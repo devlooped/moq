@@ -41,6 +41,7 @@
 using System;
 using System.Collections.Generic;
 using System.Diagnostics;
+using System.Diagnostics.CodeAnalysis;
 using System.Globalization;
 using System.IO;
 using System.Linq;
@@ -153,6 +154,7 @@ namespace Moq
 		}
 
 		[Conditional("DESKTOP")]
+		[SuppressMessage("Microsoft.Design", "CA1031:DoNotCatchGeneralExceptionTypes")]
 		private void SetFileInfo()
 		{
 #if !SILVERLIGHT
@@ -279,6 +281,7 @@ namespace Moq
 			return this;
 		}
 
+		[SuppressMessage("Microsoft.Maintainability", "CA1500:VariableNamesShouldNotMatchFieldNames", MessageId = "callback")]
 		public ICallbackResult Callback(Action callback)
 		{
 			SetCallbackWithoutArguments(callback);

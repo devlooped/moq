@@ -188,6 +188,14 @@ namespace Moq.Tests
 			Assert.True(target.HasElements("2"));
 		}
 
+		[Fact]
+		public void ShouldSupportMocksFirst()
+		{
+			var target = Mocks.CreateQuery<IBaz>().First();
+
+			Assert.NotNull(target);
+		}
+
 		public interface IFoo
 		{
 			IBar Bar { get; set; }
