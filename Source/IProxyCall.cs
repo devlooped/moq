@@ -51,6 +51,7 @@ namespace Moq
 		bool Invoked { get; set; }
 		bool IsVerifiable { get; set; }
 		Expression SetupExpression { get; }
+		MethodInfo Method { get; }
 
 		bool Matches(ICallContext call);
 		void Execute(ICallContext call);

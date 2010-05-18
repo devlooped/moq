@@ -65,18 +65,18 @@ namespace Moq
 	internal sealed partial class MethodCallReturn<TMock, TResult> : MethodCallReturn, ISetup<TMock, TResult>, ISetupGetter<TMock, TResult>, IReturnsResult<TMock>
 		where TMock : class
 	{
-		Delegate valueDel = (Func<TResult>)(() => default(TResult));
-		Action<object[]> afterReturnCallback;
+		private Delegate valueDel = (Func<TResult>)(() => default(TResult));
+		private Action<object[]> afterReturnCallback;
 
 		public MethodCallReturn(Mock mock, Expression originalExpression, MethodInfo method, params Expression[] arguments)
 			: base(mock, originalExpression, method, arguments)
 		{
-			HasReturnValue = false;
+			this.HasReturnValue = false;
 		}
 
 		public IVerifies Raises(Action<TMock> eventExpression, EventArgs args)
 		{
-			return Raises(eventExpression, () => args);
+			return this.Raises(eventExpression, () => args);
 		}
 
 		public IVerifies Raises(Action<TMock> eventExpression, Func<EventArgs> func)
@@ -86,7 +86,7 @@ namespace Moq
 
 		public IVerifies Raises(Action<TMock> eventExpression, params object[] args)
 		{
-			return RaisesImpl(eventExpression, args);
+			return this.RaisesImpl(eventExpression, args);
 		}
 
 		public IReturnsResult<TMock> Returns(Func<TResult> valueExpression)
@@ -113,34 +113,42 @@ namespace Moq
 			return this;
 		}
 
-		private void SetReturnDelegate(Delegate valueDel)
+		private void SetReturnDelegate(Delegate value)
 		{
-			if (valueDel == null)
+			if (value == null)
 			{
 				this.valueDel = (Func<TResult>)(() => default(TResult));
 			}
 			else
 			{
-				this.valueDel = valueDel;
+				this.valueDel = value;
 			}
 
-			HasReturnValue = true;
+			this.HasReturnValue = true;
 		}
 
 		protected override void SetCallbackWithoutArguments(Action callback)
 		{
-			if (HasReturnValue)
+			if (this.HasReturnValue)
+			{
 				this.afterReturnCallback = delegate { callback(); };
+			}
 			else
+			{
 				base.SetCallbackWithoutArguments(callback);
+			}
 		}
 
 		protected override void SetCallbackWithArguments(Delegate callback)
 		{
-			if (HasReturnValue)
+			if (this.HasReturnValue)
+			{
 				this.afterReturnCallback = delegate(object[] args) { callback.InvokePreserveStack(args); };
+			}
 			else
+			{
 				base.SetCallbackWithArguments(callback);
+			}
 		}
 
 		public override void Execute(ICallContext call)

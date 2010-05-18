@@ -7,18 +7,6 @@ namespace Moq.Tests
 	public class MockFixture
 	{
 		[Fact]
-		public void Fact()
-		{
-			var foo = new Mock<IFoo>();
-
-			var count = 0;
-
-			foo.Setup(f => f.Echo(5))
-				.Returns(count)
-				.Callback(() => count++);
-		}
-
-		[Fact]
 		public void CreatesMockAndExposesInterface()
 		{
 			var mock = new Mock<IComparable>();
@@ -299,6 +287,18 @@ namespace Moq.Tests
 			}
 		}
 
+		[Fact]
+		public void AllowsSetupNewHiddenProperties()
+		{
+			var value = new Mock<INewBar>().Object;
+
+			var target = new Mock<INewFoo>();
+			target.As<IFoo>().SetupGet(x => x.Bar).Returns(value);
+			target.Setup(x => x.Bar).Returns(value);
+
+			Assert.Equal(target.Object.Bar, target.As<IFoo>().Object.Bar);
+		}
+
 #if !SILVERLIGHT
 		[Fact]
 		public void ExpectsPropertySetter()
@@ -437,7 +437,6 @@ namespace Moq.Tests
 
 			mock.SetupSet(foo => foo.Count = 5);
 		}
-
 
 		[Fact]
 		public void ShouldAllowMultipleCustomMatcherWithArguments()
@@ -887,6 +886,15 @@ namespace Moq.Tests
 				BaseReturnCalled = true;
 				return default(bool);
 			}
+		}
+
+		public interface INewFoo : IFoo
+		{
+			new INewBar Bar { get; set; }
+		}
+
+		public interface INewBar : IBar
+		{
 		}
 	}
 }

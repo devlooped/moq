@@ -41,6 +41,7 @@
 using System;
 using System.Collections.Generic;
 using System.ComponentModel;
+using System.Diagnostics.CodeAnalysis;
 using System.Linq;
 using System.Linq.Expressions;
 using System.Reflection;
@@ -79,6 +80,7 @@ namespace Moq
 		/// <typeparam name="T">The type of mocked object.</typeparam>
 		/// <param name="setupCondition">The expressions to be set as setup conditions.</param>
 		/// <returns>The mock of the given type.</returns>
+		[SuppressMessage("Microsoft.Design", "CA1006:DoNotNestGenericTypesInMemberSignatures")]
 		public static T First<T>(Expression<Func<T, bool>> setupCondition) where T : class
 		{
 			return Mocks.CreateQuery<T>().First(setupCondition);
@@ -90,6 +92,7 @@ namespace Moq
 		/// <typeparam name="T">The type of mocked object.</typeparam>
 		/// <param name="setupCondition">The expressions to be set as setup conditions.</param>
 		/// <returns>The mocks of the given type.</returns>
+		[SuppressMessage("Microsoft.Design", "CA1006:DoNotNestGenericTypesInMemberSignatures")]
 		public static IEnumerable<T> Where<T>(Expression<Func<T, bool>> setupCondition) where T : class
 		{
 			return Mocks.CreateQuery<T>().Where(setupCondition);
@@ -128,6 +131,7 @@ namespace Moq
 		/// Retrieves a fluent mock from the given setup expression.
 		/// </summary>
 		[EditorBrowsable(EditorBrowsableState.Never)]
+		[SuppressMessage("Microsoft.Design", "CA1006:DoNotNestGenericTypesInMemberSignatures")]
 		public static Mock<TResult> FluentMock<T, TResult>(this Mock<T> mock, Expression<Func<T, TResult>> setup)
 			where T : class
 			where TResult : class

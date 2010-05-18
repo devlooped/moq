@@ -98,9 +98,6 @@
     </Reference>
   </ItemGroup>
   <ItemGroup>
-    <Compile Include="..\Source\ExpressionStringBuilder.cs">
-      <Link>ExpressionStringBuilder.cs</Link>
-    </Compile>
     <Compile Include="..\UnitTests\AdvancedMatcherAttributeFixture.cs">
       <Link>AdvancedMatcherAttributeFixture.cs</Link>
     </Compile>

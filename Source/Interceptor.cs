@@ -101,16 +101,14 @@ namespace Moq
 		public void AddCall(IProxyCall call, SetupKind kind)
 		{
 			var expr = call.SetupExpression.PartialMatcherAwareEval();
-
-			var s = expr.ToStringFixed(true);
-
+			var keyText = call.Method.DeclaringType.FullName + "::" + expr.ToStringFixed(true);
 			if (kind == SetupKind.PropertySet)
 			{
-				s = "set::" + s;
+				keyText = "set::" + keyText;
 			}
 
 			var constants = new ConstantsVisitor(expr).Values;
-			var key = new ExpressionKey(s, constants);
+			var key = new ExpressionKey(keyText, constants);
 
 			if (calls.ContainsKey(key))
 			{
@@ -120,11 +118,6 @@ namespace Moq
 
 			calls[key] = call;
 			orderedCalls.Add(call);
-
-			//if (kind == ExpectKind.PropertySet)
-			//    calls["set::" + expr.ToStringFixed()] = call;
-			//else
-			//    calls[expr.ToStringFixed()] = call;
 		}
 
 		public void Intercept(ICallContext invocation)

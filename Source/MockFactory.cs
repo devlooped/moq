@@ -217,10 +217,12 @@ namespace Moq
 		{
 			// "fix" compiler picking this overload instead of 
 			// the one receiving the mock behavior.
-			if (args.Length > 0 && args[0] is MockBehavior)
+			if (args != null && args.Length > 0 && args[0] is MockBehavior)
+			{
 				return CreateMock<T>((MockBehavior)args[0], args.Skip(1).ToArray());
-			else
-				return CreateMock<T>(defaultBehavior, args);
+			}
+
+			return CreateMock<T>(defaultBehavior, args);
 		}
 
 		/// <summary>
@@ -325,6 +327,8 @@ namespace Moq
 		/// each mock.</param>
 		protected virtual void VerifyMocks(Action<Mock> verifyAction)
 		{
+			Guard.NotNull(() => verifyAction, verifyAction);
+
 			var message = new StringBuilder();
 
 			foreach (var mock in mocks)

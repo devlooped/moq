@@ -805,42 +805,58 @@ namespace Moq
 				return Expression.Constant(mock);
 			}
 
-			protected override Expression VisitMethodCall(MethodCallExpression m)
+			protected override Expression VisitMethodCall(MethodCallExpression node)
 			{
-				var lambdaParam = Expression.Parameter(m.Object.Type, "mock");
-				Expression lambdaBody = Expression.Call(lambdaParam, m.Method, m.Arguments);
-				var targetMethod = GetTargetMethod(m.Object.Type, m.Method.ReturnType);
+				if (node == null)
+				{
+					return null;
+				}
 
-				return TranslateFluent(m.Object.Type, m.Method.ReturnType, targetMethod, Visit(m.Object), lambdaParam, lambdaBody);
+				var lambdaParam = Expression.Parameter(node.Object.Type, "mock");
+				Expression lambdaBody = Expression.Call(lambdaParam, node.Method, node.Arguments);
+				var targetMethod = GetTargetMethod(node.Object.Type, node.Method.ReturnType);
+
+				return TranslateFluent(
+					node.Object.Type,
+					node.Method.ReturnType,
+					targetMethod,
+					this.Visit(node.Object),
+					lambdaParam,
+					lambdaBody);
 			}
 
-			protected override Expression VisitMember(MemberExpression m)
+			protected override Expression VisitMember(MemberExpression node)
 			{
+				if (node == null)
+				{
+					return null;
+				}
+
 				// Translate differently member accesses over transparent
 				// compiler-generated types as they are typically the 
 				// anonymous types generated to build up the query expressions.
-				if (m.Expression.NodeType == ExpressionType.Parameter &&
-					m.Expression.Type.GetCustomAttribute<CompilerGeneratedAttribute>(false) != null)
+				if (node.Expression.NodeType == ExpressionType.Parameter &&
+					node.Expression.Type.GetCustomAttribute<CompilerGeneratedAttribute>(false) != null)
 				{
-					var memberType = m.Member is FieldInfo ?
-						((FieldInfo)m.Member).FieldType :
-						((PropertyInfo)m.Member).PropertyType;
+					var memberType = node.Member is FieldInfo ?
+						((FieldInfo)node.Member).FieldType :
+						((PropertyInfo)node.Member).PropertyType;
 
 					// Generate a Mock.Get over the entire member access rather.
 					// <anonymous_type>.foo => Mock.Get(<anonymous_type>.foo)
 					return Expression.Call(null,
-						MockGetGenericMethod.MakeGenericMethod(memberType), m);
+						MockGetGenericMethod.MakeGenericMethod(memberType), node);
 				}
 
 				// If member is not mock-able, actually, including being a sealed class, etc.?
-				if (m.Member is FieldInfo)
+				if (node.Member is FieldInfo)
 					throw new NotSupportedException();
 
-				var lambdaParam = Expression.Parameter(m.Expression.Type, "mock");
-				Expression lambdaBody = Expression.MakeMemberAccess(lambdaParam, m.Member);
-				var targetMethod = GetTargetMethod(m.Expression.Type, ((PropertyInfo)m.Member).PropertyType);
+				var lambdaParam = Expression.Parameter(node.Expression.Type, "mock");
+				Expression lambdaBody = Expression.MakeMemberAccess(lambdaParam, node.Member);
+				var targetMethod = GetTargetMethod(node.Expression.Type, ((PropertyInfo)node.Member).PropertyType);
 
-				return TranslateFluent(m.Expression.Type, ((PropertyInfo)m.Member).PropertyType, targetMethod, Visit(m.Expression), lambdaParam, lambdaBody);
+				return TranslateFluent(node.Expression.Type, ((PropertyInfo)node.Member).PropertyType, targetMethod, Visit(node.Expression), lambdaParam, lambdaBody);
 			}
 
 			private static Expression TranslateFluent(

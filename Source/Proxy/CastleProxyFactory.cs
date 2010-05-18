@@ -66,7 +66,7 @@ namespace Moq.Proxy
 				{
 					return (T)generator.CreateClassProxy(mockType, interfaces, new ProxyGenerationOptions(), arguments, new Interceptor(interceptor));
 				}
-				catch (TypeLoadException e) // TODO put in the upper method ?
+				catch (TypeLoadException e)
 				{
 					throw new ArgumentException(Resources.InvalidMockClass, e);
 				}

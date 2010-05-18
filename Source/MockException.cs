@@ -39,11 +39,11 @@
 // http://www.opensource.org/licenses/bsd-license.php]
 
 using System;
-using System.Collections.Generic;
 using System.Diagnostics.CodeAnalysis;
 using System.Globalization;
 using System.Linq;
-using System.Security.Permissions;
+using System.Runtime.Serialization;
+using System.Security;
 using Moq.Properties;
 using Moq.Proxy;
 
@@ -147,10 +147,8 @@ namespace Moq
 		/// </summary>
 		/// <param name="info">Serialization information.</param>
 		/// <param name="context">Streaming context.</param>
-		[SecurityPermission(SecurityAction.LinkDemand, Flags = SecurityPermissionFlag.SerializationFormatter)]
-		public override void GetObjectData(
-		  System.Runtime.Serialization.SerializationInfo info,
-		  System.Runtime.Serialization.StreamingContext context)
+		[SecurityCritical]
+		public override void GetObjectData(SerializationInfo info, StreamingContext context)
 		{
 			base.GetObjectData(info, context);
 			info.AddValue("reason", reason);

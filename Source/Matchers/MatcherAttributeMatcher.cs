@@ -70,15 +70,15 @@ namespace Moq.Matchers
 		private MethodInfo validatorMethod;
 		private Expression matcherExpression;
 
-		public void Initialize(Expression matcherExpression)
+		public void Initialize(Expression matchExpression)
 		{
-			this.validatorMethod = ResolveValidatorMethod(matcherExpression);
-			this.matcherExpression = matcherExpression;
+			this.validatorMethod = ResolveValidatorMethod(matchExpression);
+			this.matcherExpression = matchExpression;
 		}
 
 		private static MethodInfo ResolveValidatorMethod(Expression expression)
 		{
-			MethodCallExpression call = (MethodCallExpression)expression;
+			var call = (MethodCallExpression)expression;
 			var expectedParametersTypes = new[] { call.Method.ReturnType }.Concat(call.Method.GetParameters().Select(p => p.ParameterType)).ToArray();
 
 			MethodInfo method = null;
@@ -155,6 +155,5 @@ namespace Moq.Matchers
 
 			return true;
 		}
-
 	}
 }
