@@ -9,8 +9,8 @@ namespace Moq.Tests
 		[Fact]
 		public void ShouldSupportReturningMultipleMocks()
 		{
-			var target = (from foo in Mocks.CreateQuery<IFoo>()
-						  from bar in Mocks.CreateQuery<IBar>()
+			var target = (from foo in Mocks.Of<IFoo>()
+						  from bar in Mocks.Of<IBar>()
 						  where
 							foo.Name == "Foo" &&
 							foo.Find("1").Baz(It.IsAny<string>()).Value == 1 &&
@@ -26,7 +26,7 @@ namespace Moq.Tests
 		[Fact]
 		public void ShouldSupportMultipleSetups()
 		{
-			var target = (from f in Mocks.CreateQuery<IFoo>()
+			var target = (from f in Mocks.Of<IFoo>()
 						  where
 							f.Name == "Foo" &&
 							f.Find("1").Baz(It.Is<string>(s => s.Length > 0)).Value == 99 &&
@@ -48,7 +48,7 @@ namespace Moq.Tests
 		[Fact]
 		public void ShouldSupportItIsAny()
 		{
-			var target = (from f in Mocks.CreateQuery<IFoo>()
+			var target = (from f in Mocks.Of<IFoo>()
 						  where f.Bar.Baz(It.IsAny<string>()).Value == 5
 						  select f)
 						  .First();
@@ -60,7 +60,7 @@ namespace Moq.Tests
 		[Fact]
 		public void TranslateToFluentMocks()
 		{
-			var target = (from f in Mocks.CreateQuery<IFoo>()
+			var target = (from f in Mocks.Of<IFoo>()
 							where f.Bar.Baz("hey").Value == 5
 							select f)
 							.First();
@@ -90,7 +90,7 @@ namespace Moq.Tests
 		[Fact]
 		public void ShouldSupportBoolean()
 		{
-			var target = Mocks.CreateQuery<IBaz>().First(x => x.IsValid);
+			var target = Mocks.Of<IBaz>().First(x => x.IsValid);
 
 			Assert.True(target.IsValid);
 		}
@@ -98,7 +98,7 @@ namespace Moq.Tests
 		[Fact]
 		public void ShouldSupportBooleanNegation()
 		{
-			var target = Mocks.CreateQuery<IBaz>().First(x => !x.IsValid);
+			var target = Mocks.Of<IBaz>().First(x => !x.IsValid);
 
 			Assert.False(target.IsValid);
 		}
@@ -106,7 +106,7 @@ namespace Moq.Tests
 		[Fact]
 		public void ShouldSupportBooleanEqualsTrue()
 		{
-			var target = Mocks.CreateQuery<IBaz>().First(f => f.IsValid == true);
+			var target = Mocks.Of<IBaz>().First(f => f.IsValid == true);
 
 			Assert.True(target.IsValid);
 		}
@@ -114,7 +114,7 @@ namespace Moq.Tests
 		[Fact]
 		public void ShouldSupportTrueEqualsBoolean()
 		{
-			var target = Mocks.CreateQuery<IBaz>().First(f => true == f.IsValid);
+			var target = Mocks.Of<IBaz>().First(f => true == f.IsValid);
 
 			Assert.True(target.IsValid);
 		}
@@ -122,7 +122,7 @@ namespace Moq.Tests
 		[Fact]
 		public void ShouldSupportBooleanEqualsFalse()
 		{
-			var target = Mocks.CreateQuery<IBaz>().Where(f => f.IsValid == false).First();
+			var target = Mocks.Of<IBaz>().Where(f => f.IsValid == false).First();
 
 			Assert.False(target.IsValid);
 		}
@@ -130,7 +130,7 @@ namespace Moq.Tests
 		[Fact]
 		public void ShouldSupportBooleanInCondition()
 		{
-			var target = Mocks.CreateQuery<IBaz>().First(x => x.IsValid && x.Value == 1);
+			var target = Mocks.Of<IBaz>().First(x => x.IsValid && x.Value == 1);
 
 			Assert.True(target.IsValid);
 			Assert.Equal(1, target.Value);
@@ -139,7 +139,7 @@ namespace Moq.Tests
 		[Fact]
 		public void ShouldSupportEnum()
 		{
-			var target = Mocks.CreateQuery<IFoo>().First(f => f.Targets == AttributeTargets.Class);
+			var target = Mocks.Of<IFoo>().First(f => f.Targets == AttributeTargets.Class);
 
 			Assert.Equal(AttributeTargets.Class, target.Targets);
 		}
@@ -148,7 +148,7 @@ namespace Moq.Tests
 		public void ShoulSupportMethod()
 		{
 			var expected = new Mock<IBar>().Object;
-			var target = Mocks.CreateQuery<IFoo>().First(x => x.Find(It.IsAny<string>()) == expected);
+			var target = Mocks.Of<IFoo>().First(x => x.Find(It.IsAny<string>()) == expected);
 
 			Assert.Equal(expected, target.Find("3"));
 		}
@@ -156,7 +156,7 @@ namespace Moq.Tests
 		[Fact]
 		public void ShouldSupportIndexer()
 		{
-			var target = Mocks.CreateQuery<IBaz>().First(x => x["3", It.IsAny<bool>()] == 10);
+			var target = Mocks.Of<IBaz>().First(x => x["3", It.IsAny<bool>()] == 10);
 
 			Assert.NotEqual(10, target["1", true]);
 			Assert.Equal(10, target["3", true]);
@@ -166,7 +166,7 @@ namespace Moq.Tests
 		[Fact]
 		public void ShouldSupportBooleanMethod()
 		{
-			var target = Mocks.CreateQuery<IBaz>().First(x => x.HasElements("3"));
+			var target = Mocks.Of<IBaz>().First(x => x.HasElements("3"));
 
 			Assert.True(target.HasElements("3"));
 		}
@@ -174,7 +174,7 @@ namespace Moq.Tests
 		[Fact]
 		public void ShouldSupportBooleanMethodNegation()
 		{
-			var target = Mocks.CreateQuery<IBaz>().First(x => !x.HasElements("3"));
+			var target = Mocks.Of<IBaz>().First(x => !x.HasElements("3"));
 
 			Assert.False(target.HasElements("3"));
 		}
@@ -182,7 +182,7 @@ namespace Moq.Tests
 		[Fact]
 		public void ShouldSupportMultipleMethod()
 		{
-			var target = Mocks.CreateQuery<IBaz>().First(x => !x.HasElements("1") && x.HasElements("2"));
+			var target = Mocks.Of<IBaz>().First(x => !x.HasElements("1") && x.HasElements("2"));
 
 			Assert.False(target.HasElements("1"));
 			Assert.True(target.HasElements("2"));
@@ -191,7 +191,7 @@ namespace Moq.Tests
 		[Fact]
 		public void ShouldSupportMocksFirst()
 		{
-			var target = Mocks.CreateQuery<IBaz>().First();
+			var target = Mocks.Of<IBaz>().First();
 
 			Assert.NotNull(target);
 		}

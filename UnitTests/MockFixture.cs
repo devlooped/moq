@@ -299,6 +299,31 @@ namespace Moq.Tests
 			Assert.Equal(target.Object.Bar, target.As<IFoo>().Object.Bar);
 		}
 
+		[Fact]
+		public void AllowsSetupNewHiddenBaseProperty()
+		{
+			var value = new Mock<INewBar>().Object;
+
+			var target = new Mock<INewFoo>();
+			target.As<IFoo>().SetupGet(x => x.Bar).Returns(value);
+
+			Assert.Equal(value, target.As<IFoo>().Object.Bar);
+			Assert.Null(target.Object.Bar);
+		}
+
+		[Fact]
+		public void AllowsSetupNewHiddenInheritedProperty()
+		{
+			var value = new Mock<INewBar>().Object;
+
+			var target = new Mock<INewFoo>();
+			target.As<IFoo>();
+			target.SetupGet(x => x.Bar).Returns(value);
+
+			Assert.Equal(value, target.Object.Bar);
+			Assert.Null(target.As<IFoo>().Object.Bar);
+		}
+
 #if !SILVERLIGHT
 		[Fact]
 		public void ExpectsPropertySetter()

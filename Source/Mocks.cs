@@ -59,43 +59,9 @@ namespace Moq
 		/// Creates a query for mocks of the given type.
 		/// </summary>
 		/// <typeparam name="T">The type of mocked object to query.</typeparam>
-		public static IQueryable<T> CreateQuery<T>() where T : class
+		public static IQueryable<T> Of<T>() where T : class
 		{
 			return new MockQueryable<T>();
-		}
-
-		/// <summary>
-		/// Returns a mock of the given type.
-		/// </summary>
-		/// <typeparam name="T">The type of mocked object.</typeparam>
-		/// <returns>The mock of the given type.</returns>
-		public static T First<T>() where T : class
-		{
-			return Mocks.CreateQuery<T>().First();
-		}
-
-		/// <summary>
-		/// Returns a mock of the given type.
-		/// </summary>
-		/// <typeparam name="T">The type of mocked object.</typeparam>
-		/// <param name="setupCondition">The expressions to be set as setup conditions.</param>
-		/// <returns>The mock of the given type.</returns>
-		[SuppressMessage("Microsoft.Design", "CA1006:DoNotNestGenericTypesInMemberSignatures")]
-		public static T First<T>(Expression<Func<T, bool>> setupCondition) where T : class
-		{
-			return Mocks.CreateQuery<T>().First(setupCondition);
-		}
-
-		/// <summary>
-		/// Returns a mock of the given type.
-		/// </summary>
-		/// <typeparam name="T">The type of mocked object.</typeparam>
-		/// <param name="setupCondition">The expressions to be set as setup conditions.</param>
-		/// <returns>The mocks of the given type.</returns>
-		[SuppressMessage("Microsoft.Design", "CA1006:DoNotNestGenericTypesInMemberSignatures")]
-		public static IEnumerable<T> Where<T>(Expression<Func<T, bool>> setupCondition) where T : class
-		{
-			return Mocks.CreateQuery<T>().Where(setupCondition);
 		}
 
 		/// <summary>

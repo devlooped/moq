@@ -1,17 +1,18 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Linq;
-using System.ServiceModel;
 using Moq.Protected;
 #if !SILVERLIGHT
 using System.ServiceModel.Web;
 #endif
 using Xunit;
-using System.Collections;
 using System.Text;
 using Moq;
 using System.ComponentModel;
 using System.IO;
+using System.Reflection;
+using System.Collections;
+using System.ServiceModel;
 
 #region #181
 
@@ -1115,6 +1116,22 @@ namespace Moq.Tests.Regressions
 				void Do<T1, T2>() where T2 : T1;
 			}
 		}
+
+		#endregion
+
+		#region #250
+
+		public class _250
+		{
+			[Fact(Skip = "Not properly tested")]
+			public void Test()
+			{
+				var target = new Mock<MethodInfo>();
+
+				Assert.NotNull(target.Object);
+			}
+		}
+
 
 		#endregion
 

@@ -3,45 +3,41 @@ using Xunit;
 
 namespace Moq.Tests
 {
-    public class MockedFixture
-    {
-		public class FooBase { }
-		public class Foo : FooBase { }
-		public interface IFoo { }
+	public class MockedFixture
+	{
+		[Fact]
+		public void InterfaceMockedShouldImplementMocked()
+		{
+			Mock<IFoo> mock = new Mock<IFoo>();
+			IFoo mocked = mock.Object;
+			Assert.True(mocked is IMocked<IFoo>);
+		}
 
-        [Fact]
-        public void InterfaceMockedShouldImplementMocked()
-        {
-            Mock<IFoo> mock = new Mock<IFoo>();
-            IFoo mocked = mock.Object;
-            Assert.True(mocked is IMocked<IFoo>);
-        }
+		[Fact]
+		public void MockOfMockedInterfaceShouldReturnSame()
+		{
+			Mock<IFoo> mock = new Mock<IFoo>();
+			IMocked<IFoo> mocked = mock.Object as IMocked<IFoo>;
+			Assert.Same(mock, mocked.Mock);
+		}
 
-        [Fact]
-        public void MockOfMockedInterfaceShouldReturnSame()
-        {
-            Mock<IFoo> mock = new Mock<IFoo>();
-            IMocked<IFoo> mocked = mock.Object as IMocked<IFoo>;
-            Assert.Same(mock, mocked.Mock);
-        }
+		[Fact]
+		public void ClassMockedShouldImplementMocked()
+		{
+			Mock<Foo> mock = new Mock<Foo>();
+			Foo mocked = mock.Object;
+			Assert.True(mocked is IMocked<Foo>);
+		}
 
-        [Fact]
-        public void ClassMockedShouldImplementMocked()
-        {
-            Mock<Foo> mock = new Mock<Foo>();
-            Foo mocked = mock.Object;
-            Assert.True(mocked is IMocked<Foo>);
-        }
+		[Fact]
+		public void MockOfMockedClassShouldReturnSame()
+		{
+			Mock<Foo> mock = new Mock<Foo>();
+			IMocked<Foo> mocked = mock.Object as IMocked<Foo>;
+			Assert.Same(mock, mocked.Mock);
+		}
 
-        [Fact]
-        public void MockOfMockedClassShouldReturnSame()
-        {
-            Mock<Foo> mock = new Mock<Foo>();
-            IMocked<Foo> mocked = mock.Object as IMocked<Foo>;
-            Assert.Same(mock, mocked.Mock);
-        }
-
-		public class FooWithCtor 
+		public class FooWithCtor
 		{
 			public FooWithCtor(int a) { }
 		}
@@ -82,8 +78,20 @@ namespace Moq.Tests
 		public void GetThrowsIfObjectIsNotMocked()
 		{
 			Assert.Throws<ArgumentException>(
-				"Object instance was not created by Moq.\r\nParameter name: mocked", 
+				"Object instance was not created by Moq.\r\nParameter name: mocked",
 				() => Mock.Get("foo"));
 		}
-    }
+
+		public class FooBase
+		{
+		}
+		
+		public class Foo : FooBase
+		{
+		}
+		
+		public interface IFoo
+		{
+		}
+	}
 }
