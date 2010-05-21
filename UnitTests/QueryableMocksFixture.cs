@@ -46,6 +46,28 @@ namespace Moq.Tests
 		}
 
 		[Fact]
+		public void ShouldHavePropertyBehaviorWhenQueried()
+		{
+			var target = Mocks.Of<IFoo>().First(f => f.Name == "foo");
+
+			Assert.Equal(target.Name, "foo");
+
+			target.Name = "bar";
+
+			Assert.Equal("bar", target.Name);
+		}
+
+		[Fact]
+		public void ShouldHavePropertyBehaviorAllProperties()
+		{
+			var target = Mocks.Of<IFoo>().First();
+
+			target.Name = "bar";
+
+			Assert.Equal(target.Name, "bar");
+		}
+
+		[Fact]
 		public void ShouldSupportItIsAny()
 		{
 			var target = (from f in Mocks.Of<IFoo>()
@@ -61,8 +83,8 @@ namespace Moq.Tests
 		public void TranslateToFluentMocks()
 		{
 			var target = (from f in Mocks.Of<IFoo>()
-							where f.Bar.Baz("hey").Value == 5
-							select f)
+						  where f.Bar.Baz("hey").Value == 5
+						  select f)
 							.First();
 
 			// f.Bar.Baz("hey").Value 

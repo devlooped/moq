@@ -43,6 +43,7 @@ using System.Linq;
 using System.Linq.Expressions;
 using System.Reflection;
 using Moq.Language;
+using System;
 
 namespace Moq.Linq
 {
@@ -123,7 +124,7 @@ namespace Moq.Linq
 			{
 				case ExpressionType.MemberAccess:
 					var member = (MemberExpression)left;
-					return ConvertToSetup(member.Expression, member, right);
+					return ConvertToSetupProperty(member.Expression, member, right);
 
 				case ExpressionType.Call:
 					var method = (MethodCallExpression)left;
@@ -137,6 +138,38 @@ namespace Moq.Linq
 			return null;
 		}
 
+		private static Expression ConvertToSetupProperty(Expression targetObject, Expression left, Expression right)
+		{
+			// TODO: throw if target is a static class?
+			var sourceType = targetObject.Type;
+			var propertyType = ((PropertyInfo)((MemberExpression)left).Member).PropertyType;
+
+			// where foo.Name == "bar"
+			// becomes:	
+			// where Mock.Get(foo).SetupProperty(mock => mock.Name, "bar") != null
+			//Mock<System.ComponentModel.IComponent> m;
+
+			// This will get up to and including the Mock.Get(foo).Setup(mock => mock.Name) call.
+			var propertySetup = FluentMockVisitor.Accept(left);
+			// We need to go back one level, to the target expression of the Setup call, 
+			// which would be the Mock.Get(foo), where we will actually invoke SetupProperty instead.
+			if (propertySetup.NodeType != ExpressionType.Call)
+				throw new NotSupportedException("Unexpected translation of a member access: " + propertySetup.ToStringFixed());
+
+			var mockExpression = ((MethodCallExpression)propertySetup).Object;
+			var propertyExpression = ((MethodCallExpression)propertySetup).Arguments.First().StripQuotes();
+
+			var setupPropertyMethod = typeof(Mock<>)
+				.MakeGenericType(sourceType)
+				.GetMethods()
+				.First(method => method.Name == "SetupProperty" && method.GetParameters().Length == 2)
+				.MakeGenericMethod(propertyType);
+
+			return Expression.NotEqual(
+				Expression.Call(mockExpression, setupPropertyMethod, propertyExpression, right),
+				Expression.Constant(null));
+		}
+
 		private static Expression ConvertToSetup(Expression targetObject, Expression left, Expression right)
 		{
 			// TODO: throw if target is a static class?
@@ -146,6 +179,7 @@ namespace Moq.Linq
 			// where dte.Solution == solution
 			// becomes:	
 			// where Mock.Get(dte).Setup(mock => mock.Solution).Returns(solution) != null
+			//Mock<System.ComponentModel.IComponent> m;
 
 			var returnsMethod = typeof(IReturns<,>)
 				.MakeGenericType(sourceType, returnType)

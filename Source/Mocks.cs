@@ -46,17 +46,20 @@ using System.Linq;
 using System.Linq.Expressions;
 using System.Reflection;
 using Moq.Linq;
+using Moq.Properties;
+using System.Globalization;
 
 namespace Moq
 {
 	/// <summary>
 	/// Allows querying the universe of mocks for those that behave 
-	/// according to the query specification.
+	/// according to the LINQ query specification.
 	/// </summary>
 	public static class Mocks
 	{
 		/// <summary>
-		/// Creates a query for mocks of the given type.
+		/// Access the universe of mocks of the given type, to retrieve those 
+		/// that behave according to the LINQ query specification.
 		/// </summary>
 		/// <typeparam name="T">The type of mocked object to query.</typeparam>
 		public static IQueryable<T> Of<T>() where T : class
@@ -69,7 +72,7 @@ namespace Moq
 		/// </summary>
 		internal static IQueryable<T> CreateQueryable<T>() where T : class
 		{
-			return new EnumerableQuery<T>(CreateEnumerable<T>());
+			return CreateEnumerable<T>().AsQueryable();
 		}
 
 		/// <summary>
@@ -81,7 +84,9 @@ namespace Moq
 		{
 			do
 			{
-				yield return new Mock<T>().Object;
+				var mock = new Mock<T>();
+				mock.SetupAllProperties();
+				yield return mock.Object;
 			}
 			while (true);
 		}
@@ -112,7 +117,10 @@ namespace Moq
 				var property = ((MemberExpression)setup.Body).Member as PropertyInfo;
 				if (property == null)
 				{
-					throw new NotSupportedException("Fields are not supported");
+					throw new NotSupportedException(string.Format(
+						Resources.FieldsNotSupported,
+						CultureInfo.CurrentCulture,
+						setup.Body.ToStringFixed()));
 				}
 
 				info = property.GetGetMethod();
@@ -123,19 +131,16 @@ namespace Moq
 			}
 			else
 			{
-				throw new NotSupportedException("Unsupported expression: " + setup.ToString());
+				throw new NotSupportedException("Unsupported expression: " + setup.ToStringFixed());
 			}
 
-			if (!info.ReturnType.IsMockeable())
-			{
-				// We should have a type.ThrowIfNotMockeable() rather, so that we can reuse it.
-				throw new NotSupportedException();
-			}
+			info.ReturnType.ThrowIfNotMockeable();
 
 			Mock fluentMock;
 			if (!mock.InnerMocks.TryGetValue(info, out fluentMock))
 			{
 				fluentMock = ((IMocked)new MockDefaultValueProvider(mock).ProvideDefault(info)).Mock;
+				((Mock<TResult>)fluentMock).SetupAllProperties();
 			}
 
 			var result = (TResult)fluentMock.Object;

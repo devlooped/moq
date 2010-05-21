@@ -197,19 +197,21 @@ namespace Moq
 		/// <include file='Mock.Generic.xdoc' path='docs/doc[@for="Mock{T}.SetupProperty(property)"]/*'/>
 		[SuppressMessage("Microsoft.Design", "CA1006:DoNotNestGenericTypesInMemberSignatures")]
 		[SuppressMessage("Microsoft.Naming", "CA1716:IdentifiersShouldNotMatchKeywords", MessageId = "Property", Justification = "This sets properties, so it's appropriate.")]
-		public void SetupProperty<TProperty>(Expression<Func<T, TProperty>> property)
+		public Mock<T> SetupProperty<TProperty>(Expression<Func<T, TProperty>> property)
 		{
 			SetupProperty(property, default(TProperty));
+			return this;
 		}
 
 		/// <include file='Mock.Generic.xdoc' path='docs/doc[@for="Mock{T}.SetupProperty(property,initialValue)"]/*'/>
 		[SuppressMessage("Microsoft.Design", "CA1006:DoNotNestGenericTypesInMemberSignatures")]
 		[SuppressMessage("Microsoft.Naming", "CA1716:IdentifiersShouldNotMatchKeywords", MessageId = "Property", Justification = "We're setting up a property, so it's appropriate.")]
-		public void SetupProperty<TProperty>(Expression<Func<T, TProperty>> property, TProperty initialValue)
+		public Mock<T> SetupProperty<TProperty>(Expression<Func<T, TProperty>> property, TProperty initialValue)
 		{
 			TProperty value = initialValue;
 			SetupGet(property).Returns(() => value);
 			SetupSet<T, TProperty>(this, property).Callback(p => value = p);
+			return this;
 		}
 
 #if !SILVERLIGHT
