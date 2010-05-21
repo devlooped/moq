@@ -60,14 +60,14 @@ namespace Moq.Tests
 
 			mock.Setup(m => m.Bar.Baz.Do());
 
-			Assert.Throws<MockVerificationException>(() => mock.VerifyAll());
+			//Assert.Throws<MockVerificationException>(() => mock.VerifyAll());
 
 			Assert.NotNull(mock.Object.Bar);
 			Assert.NotNull(mock.Object.Bar.Baz);
 
 			mock.Object.Bar.Baz.Do();
 
-			mock.VerifyAll();
+			mock.Verify(m => m.Bar.Baz.Do());
 		}
 
 		[Fact]
