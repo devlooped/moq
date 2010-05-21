@@ -214,9 +214,10 @@ namespace Moq
 
 #if !SILVERLIGHT
 		/// <include file='Mock.Generic.xdoc' path='docs/doc[@for="Mock{T}.SetupAllProperties"]/*'/>
-		public void SetupAllProperties()
+		public Mock<T> SetupAllProperties()
 		{
 			SetupAllProperties(this);
+			return this;
 		}
 #endif
 
