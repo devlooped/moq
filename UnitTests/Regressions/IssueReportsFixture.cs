@@ -1135,6 +1135,34 @@ namespace Moq.Tests.Regressions
 
 		#endregion
 
+		#region #251
+
+		public class _251
+		{
+			[Fact]
+			public void Test()
+			{
+				var repositoryMock = new Mock<IRepository<string>>();
+
+				var repository = repositoryMock.Object;
+				repository.Save("test");
+
+				repositoryMock.Verify(m => m.Save("test"));
+			}
+
+			public interface IRepository
+			{
+				void Save(string value);
+			}
+
+			public interface IRepository<T> : IRepository
+			{
+				void Save(T value);
+			}
+		}
+
+		#endregion
+
 		#region Recursive issue
 
 		public class RecursiveFixture
