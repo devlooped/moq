@@ -39,7 +39,6 @@
 // http://www.opensource.org/licenses/bsd-license.php]
 
 using System;
-using System.Collections.Generic;
 using System.Globalization;
 using System.Linq;
 using System.Linq.Expressions;
@@ -51,8 +50,8 @@ namespace Moq.Linq
 {
 	internal class MockSetupsBuilder : ExpressionVisitor
 	{
-		private static readonly HashSet<string> queryableMethods = new HashSet<string> { "First", "Where" };
-		private static readonly HashSet<string> unsupportedMethods = new HashSet<string> { "All", "Any", "FirstOrDefault", "Last", "LastOrDefault", "Single", "SingleOrDefault" };
+		private static readonly string[] queryableMethods = new[] { "First", "Where" };
+		private static readonly string[] unsupportedMethods = new[] { "All", "Any", "FirstOrDefault", "Last", "LastOrDefault", "Single", "SingleOrDefault" };
 
 		private int stackIndex;
 
