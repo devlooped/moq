@@ -61,10 +61,32 @@ namespace Moq
 		/// Access the universe of mocks of the given type, to retrieve those 
 		/// that behave according to the LINQ query specification.
 		/// </summary>
-		/// <typeparam name="T">The type of mocked object to query.</typeparam>
+		/// <typeparam name="T">The type of the mocked object to query.</typeparam>
 		public static IQueryable<T> Of<T>() where T : class
 		{
 			return new MockQueryable<T>();
+		}
+
+		/// <summary>
+		/// Creates an mock object of the indicated type.
+		/// </summary>
+		/// <typeparam name="T">The type of the mocked object.</typeparam>
+		/// <returns>The mocked object created.</returns>
+		public static T OneOf<T>() where T : class
+		{
+			return new MockQueryable<T>().First<T>();
+		}
+
+		/// <summary>
+		/// Creates an mock object of the indicated type.
+		/// </summary>
+		/// <param name="predicate">The predicate with the setup expressions.</param>
+		/// <typeparam name="T">The type of the mocked object.</typeparam>
+		/// <returns>The mocked object created.</returns>
+		[SuppressMessage("Microsoft.Design", "CA1006:DoNotNestGenericTypesInMemberSignatures", Justification = "By Design")]
+		public static T OneOf<T>(Expression<Func<T, bool>> predicate) where T : class
+		{
+			return new MockQueryable<T>().First<T>(predicate);
 		}
 
 		/// <summary>

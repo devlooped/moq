@@ -260,6 +260,23 @@ namespace Moq.Tests
 			Assert.Throws<NotSupportedException>(() => Mocks.Of<IFoo>().SingleOrDefault());
 		}
 
+		[Fact]
+		public void ShouldOneOfCreateNewMock()
+		{
+			var target = Mocks.OneOf<IFoo>();
+
+			Assert.NotNull(Mock.Get(target));
+		}
+
+		[Fact]
+		public void ShouldOneOfWithPredicateCreateNewMock()
+		{
+			var target = Mocks.OneOf<IFoo>(x => x.Name == "Foo");
+
+			Assert.NotNull(Mock.Get(target));
+			Assert.Equal("Foo", target.Name);
+		}
+
 		public interface IFoo
 		{
 			IBar Bar { get; set; }
