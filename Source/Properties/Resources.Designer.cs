@@ -144,6 +144,15 @@ namespace Moq.Properties {
         }
         
         /// <summary>
+        ///   Looks up a localized string similar to LINQ method &apos;{0}&apos; not supported..
+        /// </summary>
+        internal static string LinqMethodNotSupported {
+            get {
+                return ResourceManager.GetString("LinqMethodNotSupported", resourceCulture);
+            }
+        }
+        
+        /// <summary>
         ///   Looks up a localized string similar to Member {0}.{1} does not exist..
         /// </summary>
         internal static string MemberMissing {

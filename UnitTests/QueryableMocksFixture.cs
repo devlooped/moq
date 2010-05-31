@@ -218,6 +218,48 @@ namespace Moq.Tests
 			Assert.NotNull(target);
 		}
 
+		[Fact]
+		public void ShouldThrowsIfAll()
+		{
+			Assert.Throws<NotSupportedException>(() => Mocks.Of<IFoo>().All(x => x.Name == "Foo"));
+		}
+
+		[Fact]
+		public void ShouldThrowsIfAny()
+		{
+			Assert.Throws<NotSupportedException>(() => Mocks.Of<IFoo>().Any());
+		}
+
+		[Fact]
+		public void ShouldThrowsIfFirstOrDefault()
+		{
+			Assert.Throws<NotSupportedException>(() => Mocks.Of<IFoo>().FirstOrDefault());
+		}
+
+		[Fact]
+		public void ShouldThrowsIfLast()
+		{
+			Assert.Throws<NotSupportedException>(() => Mocks.Of<IFoo>().Last());
+		}
+
+		[Fact]
+		public void ShouldThrowsIfLastOrDefault()
+		{
+			Assert.Throws<NotSupportedException>(() => Mocks.Of<IFoo>().LastOrDefault());
+		}
+
+		[Fact]
+		public void ShouldThrowsIfSingle()
+		{
+			Assert.Throws<NotSupportedException>(() => Mocks.Of<IFoo>().Single());
+		}
+
+		[Fact]
+		public void ShouldThrowsIfSingleOrDefault()
+		{
+			Assert.Throws<NotSupportedException>(() => Mocks.Of<IFoo>().SingleOrDefault());
+		}
+
 		public interface IFoo
 		{
 			IBar Bar { get; set; }

@@ -289,4 +289,7 @@ Expected invocation on the mock once, but was {4} times: {1}</value>
   <data name="RefExpressionMustBeConstantValue" xml:space="preserve">
     <value>Ref expression must evaluate to a constant value.</value>
   </data>
+  <data name="LinqMethodNotSupported" xml:space="preserve">
+    <value>LINQ method '{0}' not supported.</value>
+  </data>
 </root>

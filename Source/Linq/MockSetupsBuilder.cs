@@ -39,16 +39,20 @@
 // http://www.opensource.org/licenses/bsd-license.php]
 
 using System;
+using System.Collections.Generic;
+using System.Globalization;
 using System.Linq;
 using System.Linq.Expressions;
 using System.Reflection;
 using Moq.Language;
+using Moq.Properties;
 
 namespace Moq.Linq
 {
 	internal class MockSetupsBuilder : ExpressionVisitor
 	{
-		private static readonly string[] queryableMethods = new[] { "First", "Where" };
+		private static readonly HashSet<string> queryableMethods = new HashSet<string> { "First", "Where" };
+		private static readonly HashSet<string> unsupportedMethods = new HashSet<string> { "All", "Any", "FirstOrDefault", "Last", "LastOrDefault", "Single", "SingleOrDefault" };
 
 		private int stackIndex;
 
@@ -96,6 +100,14 @@ namespace Moq.Linq
 					var result = base.VisitMethodCall(node);
 					this.stackIndex--;
 					return result;
+				}
+
+				if (unsupportedMethods.Contains(node.Method.Name))
+				{
+					throw new NotSupportedException(string.Format(
+						CultureInfo.CurrentCulture,
+						Resources.LinqMethodNotSupported,
+						node.Method.Name));
 				}
 
 				if (this.stackIndex > 0 && node.Type == typeof(bool))
