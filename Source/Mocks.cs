@@ -42,12 +42,12 @@ using System;
 using System.Collections.Generic;
 using System.ComponentModel;
 using System.Diagnostics.CodeAnalysis;
+using System.Globalization;
 using System.Linq;
 using System.Linq.Expressions;
 using System.Reflection;
 using Moq.Linq;
 using Moq.Properties;
-using System.Globalization;
 
 namespace Moq
 {
@@ -85,7 +85,9 @@ namespace Moq
 			do
 			{
 				var mock = new Mock<T>();
+#if !SILVERLIGHT
 				mock.SetupAllProperties();
+#endif
 				yield return mock.Object;
 			}
 			while (true);
@@ -118,8 +120,8 @@ namespace Moq
 				if (property == null)
 				{
 					throw new NotSupportedException(string.Format(
-						Resources.FieldsNotSupported,
 						CultureInfo.CurrentCulture,
+						Resources.FieldsNotSupported,
 						setup.Body.ToStringFixed()));
 				}
 
@@ -140,7 +142,9 @@ namespace Moq
 			if (!mock.InnerMocks.TryGetValue(info, out fluentMock))
 			{
 				fluentMock = ((IMocked)new MockDefaultValueProvider(mock).ProvideDefault(info)).Mock;
-				((Mock<TResult>)fluentMock).SetupAllProperties();
+#if !SILVERLIGHT
+				Mock.SetupAllProperties(fluentMock);
+#endif
 			}
 
 			var result = (TResult)fluentMock.Object;

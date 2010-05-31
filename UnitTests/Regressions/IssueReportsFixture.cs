@@ -587,7 +587,7 @@ namespace Moq.Tests.Regressions
 
 		#endregion
 
-		#region 153
+		#region #153
 
 		public class _153
 		{

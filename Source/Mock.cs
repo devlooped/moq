@@ -606,65 +606,33 @@ namespace Moq
 #if !SILVERLIGHT
 		internal static void SetupAllProperties(Mock mock)
 		{
-			// Dunno why the conditional is not kicking in. I'm getting 
-			// a compilation error on MethodHandle.GetFunctionPointer.
 			PexProtector.Invoke(() =>
 			{
-				// Crazy reflection stuff below. Ah... the goodies of generics :)
 				var mockType = mock.MockedType;
-				var poperties = mockType.GetProperties()
+				var properties = mockType.GetProperties()
 					.Concat(mockType.GetInterfaces().SelectMany(i => i.GetProperties()))
+					.Where(p =>
+						p.CanRead && p.CanWrite &&
+						p.GetIndexParameters().Length == 0 &&
+						p.CanOverrideGet() && p.CanOverrideSet())
 					.Distinct();
 
-				foreach (var property in poperties)
+				foreach (var property in properties)
 				{
-					if (property.CanRead && property.CanOverrideGet() && property.GetIndexParameters().Length == 0)
+					var expression = GetPropertyExpression(mockType, property);
+					var initialValue = mock.DefaultValueProvider.ProvideDefault(property.GetGetMethod());
+
+					var mocked = initialValue as IMocked;
+					if (mocked != null)
 					{
-						var expect = GetPropertyExpression(mockType, property);
-						var initialValue = mock.DefaultValueProvider.ProvideDefault(property.GetGetMethod());
-						var mocked = initialValue as IMocked;
-						if (mocked != null)
-						{
-							SetupAllProperties(mocked.Mock);
-						}
-
-						var closure = Activator.CreateInstance(
-								typeof(ValueClosure<>).MakeGenericType(property.PropertyType),
-								initialValue);
-
-						var resultGet = mock.GetType().GetMethod("SetupGet")
-							.MakeGenericMethod(property.PropertyType)
-							.Invoke(mock, new[] { expect });
-
-						var getterType = typeof(Func<>).MakeGenericType(property.PropertyType);
-
-						var returnsGet = resultGet.GetType().GetMethod("Returns", new[] { getterType });
-
-						var getFunc = Activator.CreateInstance(
-								getterType,
-								closure,
-								closure.GetType().GetMethod("GetValue").MethodHandle.GetFunctionPointer());
-
-						returnsGet.Invoke(resultGet, new[] { getFunc });
-
-						if (property.CanWrite && property.CanOverrideSet())
-						{
-							var resultSet = typeof(MockExtensions).GetMethod("SetupSet")
-								.MakeGenericMethod(mockType, property.PropertyType)
-								.Invoke(mock, new object[] { mock, expect });
-
-							var setterType = typeof(Action<>).MakeGenericType(property.PropertyType);
-
-							var callbackSet = resultSet.GetType().GetMethod("Callback", new[] { setterType });
-
-							var setFunc = Activator.CreateInstance(
-									setterType,
-									closure,
-									closure.GetType().GetMethod("SetValue").MethodHandle.GetFunctionPointer());
-
-							callbackSet.Invoke(resultSet, new[] { setFunc });
-						}
+						SetupAllProperties(mocked.Mock);
 					}
+
+					var method = mock.GetType().GetMethods()
+						.First(m => m.Name == "SetupProperty" && m.GetParameters().Length == 2)
+						.MakeGenericMethod(property.PropertyType);
+
+					method.Invoke(mock, new[] { expression, initialValue });
 				}
 			});
 		}

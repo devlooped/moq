@@ -38,12 +38,11 @@
 //[This is the BSD license, see
 // http://www.opensource.org/licenses/bsd-license.php]
 
-using System.Collections.Generic;
+using System;
 using System.Linq;
 using System.Linq.Expressions;
 using System.Reflection;
 using Moq.Language;
-using System;
 
 namespace Moq.Linq
 {
@@ -156,8 +155,9 @@ namespace Moq.Linq
 			if (propertySetup.NodeType != ExpressionType.Call)
 				throw new NotSupportedException("Unexpected translation of a member access: " + propertySetup.ToStringFixed());
 
-			var mockExpression = ((MethodCallExpression)propertySetup).Object;
-			var propertyExpression = ((MethodCallExpression)propertySetup).Arguments.First().StripQuotes();
+			var propertyCall = (MethodCallExpression)propertySetup;
+			var mockExpression = propertyCall.Object;
+			var propertyExpression = propertyCall.Arguments.First().StripQuotes();
 
 			var setupPropertyMethod = typeof(Mock<>)
 				.MakeGenericType(sourceType)
