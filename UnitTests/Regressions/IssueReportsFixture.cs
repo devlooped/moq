@@ -1071,6 +1071,59 @@ namespace Moq.Tests.Regressions
 
 		#endregion
 
+		#region #232
+
+		public class _232
+		{
+			[Fact]
+			public void Test()
+			{
+				var repository = new Mock<IRepository>();
+				var svc = new Service(repository.Object);
+
+				svc.Create();
+
+				repository.Verify(r => r.Insert(It.IsAny<Foo>()), Times.Once());
+				repository.Verify(r => r.Insert(It.IsAny<Bar>()), Times.Once());
+				repository.Verify(r => r.Insert(It.IsAny<IEntity>()), Times.Exactly(2));
+			}
+
+			public interface IRepository
+			{
+				void Insert(IEntity entity);
+			}
+
+			public interface IEntity
+			{
+			}
+
+			public class Foo : IEntity
+			{
+			}
+
+			public class Bar : IEntity
+			{
+			}
+
+			public class Service
+			{
+				private IRepository repository;
+
+				public Service(IRepository repository)
+				{
+					this.repository = repository;
+				}
+
+				public void Create()
+				{
+					repository.Insert(new Foo());
+					repository.Insert(new Bar());
+				}
+			}
+		}
+
+		#endregion
+
 		#region #242
 
 		public class _242
