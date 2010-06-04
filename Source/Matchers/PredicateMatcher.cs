@@ -45,8 +45,8 @@ namespace Moq
 {
 	internal class PredicateMatcher : IMatcher
 	{
-		Delegate predicate;
-		Type matcherType;
+		private Delegate predicate;
+		private Type matcherType;
 
 		public void Initialize(Expression matcherExpression)
 		{

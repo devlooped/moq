@@ -107,6 +107,9 @@
     <Compile Include="..\UnitTests\CallbacksFixture.cs">
       <Link>CallbacksFixture.cs</Link>
     </Compile>
+    <Compile Include="..\UnitTests\ConditionalSetups.cs">
+      <Link>ConditionalSetups.cs</Link>
+    </Compile>
     <Compile Include="..\UnitTests\Demo.cs">
       <Link>Demo.cs</Link>
     </Compile>
@@ -146,14 +149,29 @@
     <Compile Include="..\UnitTests\MockFixture.cs">
       <Link>MockFixture.cs</Link>
     </Compile>
+    <Compile Include="..\UnitTests\MockSequenceFixture.cs">
+      <Link>MockSequenceFixture.cs</Link>
+    </Compile>
+    <Compile Include="..\UnitTests\OutRefFixture.cs">
+      <Link>OutRefFixture.cs</Link>
+    </Compile>
     <Compile Include="..\UnitTests\QueryableMocksFixture.cs">
       <Link>QueryableMocksFixture.cs</Link>
+    </Compile>
+    <Compile Include="..\UnitTests\RecursiveMocksFixture.cs">
+      <Link>RecursiveMocksFixture.cs</Link>
     </Compile>
     <Compile Include="..\UnitTests\Regressions\IssueReportsFixture.cs">
       <Link>Regressions\IssueReportsFixture.cs</Link>
     </Compile>
     <Compile Include="..\UnitTests\Regressions\StreamFixture.cs">
       <Link>Regressions\StreamFixture.cs</Link>
+    </Compile>
+    <Compile Include="..\UnitTests\ReturnsFixture.cs">
+      <Link>ReturnsFixture.cs</Link>
+    </Compile>
+    <Compile Include="..\UnitTests\SequenceExtensionsFixture.cs">
+      <Link>SequenceExtensionsFixture.cs</Link>
     </Compile>
     <Compile Include="..\UnitTests\StubExtensionsFixture.cs">
       <Link>StubExtensionsFixture.cs</Link>

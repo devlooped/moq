@@ -58,9 +58,9 @@ namespace Moq
 	internal partial class MethodCall<TMock> : MethodCall, ISetup<TMock>
 		where TMock : class
 	{
-		public MethodCall(Mock mock, Expression originalExpression, MethodInfo method,
+		public MethodCall(Mock mock, Func<bool> condition, Expression originalExpression, MethodInfo method,
 			params Expression[] arguments)
-			: base(mock, originalExpression, method, arguments)
+			: base(mock, condition, originalExpression, method, arguments)
 		{
 		}
 
@@ -92,30 +92,13 @@ namespace Moq
 		private Delegate mockEventArgsFunc;
 		private object[] mockEventArgsParams;
 		private int? expectedCallCount = null;
+		protected Func<bool> condition;
 		private List<KeyValuePair<int, object>> outValues = new List<KeyValuePair<int, object>>();
 
-		// Where the setup was performed.
-		public MethodInfo Method { get; private set; }
-		public string FileName { get; private set; }
-		public int FileLine { get; private set; }
-		public MethodBase TestMethod { get; private set; }
-
-		public string FailMessage { get; set; }
-		public bool IsVerifiable { get; set; }
-		public bool Invoked { get; set; }
-
-		public Expression SetupExpression
-		{
-			get { return this.originalExpression; }
-		}
-
-		public int CallCount { get; private set; }
-
-		protected internal Mock Mock { get; private set; }
-
-		public MethodCall(Mock mock, Expression originalExpression, MethodInfo method, params Expression[] arguments)
+		public MethodCall(Mock mock, Func<bool> condition, Expression originalExpression, MethodInfo method, params Expression[] arguments)
 		{
 			this.Mock = mock;
+			this.condition = condition;
 			this.originalExpression = originalExpression;
 			this.Method = method;
 
@@ -153,6 +136,32 @@ namespace Moq
 
 			this.SetFileInfo();
 		}
+
+		public string FailMessage { get; set; }
+
+		public bool IsConditional
+		{
+			get { return condition != null; }
+		}
+
+		public bool IsVerifiable { get; set; }
+
+		public bool Invoked { get; set; }
+
+		// Where the setup was performed.
+		public MethodInfo Method { get; private set; }
+		public string FileName { get; private set; }
+		public int FileLine { get; private set; }
+		public MethodBase TestMethod { get; private set; }
+
+		public Expression SetupExpression
+		{
+			get { return this.originalExpression; }
+		}
+
+		public int CallCount { get; private set; }
+
+		protected internal Mock Mock { get; private set; }
 
 		[Conditional("DESKTOP")]
 		[SuppressMessage("Microsoft.Design", "CA1031:DoNotCatchGeneralExceptionTypes")]
@@ -196,6 +205,11 @@ namespace Moq
 
 		public virtual bool Matches(ICallContext call)
 		{
+			if (condition != null && !condition())
+			{
+				return false;
+			}
+
 			var parameters = call.Method.GetParameters();
 			var args = new List<object>();
 			for (int i = 0; i < parameters.Length; i++)

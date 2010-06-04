@@ -87,39 +87,28 @@ namespace Moq.Matchers
 			{
 				// This is the "hard" way in .NET 3.5 as GetMethod does not support
 				// passing generic type arguments for the query.
-				var candidates =
-					from m in call.Method.DeclaringType.GetMethods(
-						BindingFlags.Public |
-						BindingFlags.Static |
-						BindingFlags.Instance)
-					where
-					  m.Name == call.Method.Name &&
-					  m.IsGenericMethodDefinition &&
-					  m.GetGenericArguments().Length ==
-					  call.Method.GetGenericMethodDefinition().GetGenericArguments().Length &&
-					  AreEqual(expectedParametersTypes,
-							  m.MakeGenericMethod(call.Method.GetGenericArguments())
-								.GetParameters()
-								.Select(p => p.ParameterType))
-					select m.MakeGenericMethod(call.Method.GetGenericArguments());
+				var genericArgs = call.Method.GetGenericArguments();
 
-				method = candidates.FirstOrDefault();
+				method = call.Method.DeclaringType.GetMethods()
+					.Where(m =>
+						m.Name == call.Method.Name &&
+						m.IsGenericMethodDefinition &&
+						m.GetGenericArguments().Length ==
+							call.Method.GetGenericMethodDefinition().GetGenericArguments().Length &&
+						expectedParametersTypes.SequenceEqual(
+							m.MakeGenericMethod(genericArgs).GetParameters().Select(p => p.ParameterType)))
+					.Select(m => m.MakeGenericMethod(genericArgs))
+					.FirstOrDefault();
 			}
 			else
 			{
-				method = call.Method.DeclaringType.GetMethod(call.Method.Name,
-						BindingFlags.Public |
-						BindingFlags.Static |
-						BindingFlags.Instance,
-						null, 
-						expectedParametersTypes, 
-						null);
+				method = call.Method.DeclaringType.GetMethod(call.Method.Name, expectedParametersTypes);
 			}
 
 			// throw if validatorMethod doesn't exists			
 			if (method == null)
 			{
-				throw new MissingMethodException(String.Format(CultureInfo.CurrentCulture,
+				throw new MissingMethodException(string.Format(CultureInfo.CurrentCulture,
 					"public {0}bool {1}({2}) in class {3}.",
 					call.Method.IsStatic ? "static " : String.Empty,
 					call.Method.Name,
@@ -138,22 +127,6 @@ namespace Moq.Matchers
 			// for static and non-static method
 			var instance = call.Object == null ? null : (call.Object.PartialEval() as ConstantExpression).Value;
 			return (bool)validatorMethod.Invoke(instance, args);
-		}
-
-		// TODO: move to EnumerableExtensions in NetFx?
-		private static bool AreEqual<T>(IEnumerable<T> first, IEnumerable<T> second)
-		{
-			var f = first.ToList();
-			var s = second.ToList();
-
-			if (f.Count != s.Count) return false;
-
-			for (int i = 0; i < f.Count; i++)
-			{
-				if (!f[i].Equals(s[i])) return false;
-			}
-
-			return true;
 		}
 	}
 }

@@ -57,6 +57,9 @@
     <Reference Include="System.Xml" />
   </ItemGroup>
   <ItemGroup>
+    <Compile Include="ConditionalContext.cs" />
+    <Compile Include="Language\ISetupSequentialResult.cs" />
+    <Compile Include="Language\ISetupConditionResult.cs" />
     <Compile Include="Linq\FluentMockVisitor.cs" />
     <Compile Include="Linq\MockSetupsBuilder.cs" />
     <Compile Include="MatchExpression.PreV4.cs" Condition=" '$(TargetFrameworkVersion)' != 'v4.0'" />
@@ -94,11 +97,13 @@
       <DependentUpon>Delegates.tt</DependentUpon>
     </Compile>
     <Compile Include="Microsoft\ExpressionVisitor.cs" Condition=" '$(TargetFrameworkVersion)' != 'v4.0'" />
+    <Compile Include="MockSequence.cs" />
     <Compile Include="Obsolete\IOccurrence.cs" />
     <Compile Include="Obsolete\MatcherAttribute.cs" />
     <Compile Include="Obsolete\Mock.Generic.Legacy.cs" />
     <Compile Include="Obsolete\Mock.Legacy.cs" />
     <Compile Include="Obsolete\MockExtensions.cs" />
+    <Compile Include="SequenceExtensions.cs" />
     <Compile Include="SetupKind.cs" />
     <Compile Include="Language\Flow\IReturnsResult.cs" />
     <Compile Include="ExpressionExtensions.cs" />
@@ -207,6 +212,7 @@
     <Compile Include="Proxy\ICallInterceptor.cs" />
     <Compile Include="Proxy\IProxyFactory.cs" />
     <Compile Include="SetterMethodCall.cs" />
+    <Compile Include="SetupSequentialContext.cs" />
     <Compile Include="Times.cs" />
     <None Include="Includes\GenericTypeParameters.tt" />
     <None Include="MethodCall.tt">

@@ -43,6 +43,7 @@ using System.Diagnostics.CodeAnalysis;
 using System.Linq.Expressions;
 using Moq.Language.Flow;
 using Moq.Proxy;
+using Moq.Language;
 
 namespace Moq
 {
@@ -165,14 +166,14 @@ namespace Moq
 		[SuppressMessage("Microsoft.Design", "CA1006:DoNotNestGenericTypesInMemberSignatures")]
 		public ISetup<T> Setup(Expression<Action<T>> expression)
 		{
-			return Mock.Setup<T>(this, expression);
+			return Mock.Setup<T>(this, expression, null);
 		}
 
 		/// <include file='Mock.Generic.xdoc' path='docs/doc[@for="Mock{T}.Setup{TResult}"]/*'/>
 		[SuppressMessage("Microsoft.Design", "CA1006:DoNotNestGenericTypesInMemberSignatures")]
 		public ISetup<T, TResult> Setup<TResult>(Expression<Func<T, TResult>> expression)
 		{
-			return Mock.Setup(this, expression);
+			return Mock.Setup(this, expression, null);
 		}
 
 		/// <include file='Mock.Generic.xdoc' path='docs/doc[@for="Mock{T}.SetupGet"]/*'/>
@@ -214,15 +215,21 @@ namespace Moq
 			return this;
 		}
 
-#if !SILVERLIGHT
 		/// <include file='Mock.Generic.xdoc' path='docs/doc[@for="Mock{T}.SetupAllProperties"]/*'/>
 		public Mock<T> SetupAllProperties()
 		{
 			SetupAllProperties(this);
 			return this;
 		}
-#endif
 
+		#endregion
+
+		#region When
+		/// <include file='Mock.Generic.xdoc' path='docs/doc[@for="Mock{T}.When"]/*'/>
+		public ISetupConditionResult<T> When(Func<bool> condition)
+		{
+			return new ConditionalContext<T>(this, condition);
+		}
 		#endregion
 
 		#region Verify

@@ -69,7 +69,7 @@ namespace Moq.Protected
 			ThrowIfMemberMissing(methodName, method);
 			ThrowIfPublicMethod(method);
 
-			return Mock.Setup(mock, GetMethodCall(method, args));
+			return Mock.Setup(mock, GetMethodCall(method, args), null);
 		}
 
 		public ISetup<T, TResult> Setup<TResult>(string methodName, params object[] args)
@@ -89,7 +89,7 @@ namespace Moq.Protected
 			ThrowIfVoidMethod(method);
 			ThrowIfPublicMethod(method);
 
-			return Mock.Setup(mock, GetMethodCall<TResult>(method, args));
+			return Mock.Setup(mock, GetMethodCall<TResult>(method, args), null);
 		}
 
 		public ISetupGetter<T, TProperty> SetupGet<TProperty>(string propertyName)
@@ -345,7 +345,7 @@ namespace Moq.Protected
 			}
 
 			var expression = arg as Expression;
-			if (expression!=null)
+			if (expression != null)
 			{
 				return expression;
 			}

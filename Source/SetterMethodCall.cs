@@ -50,17 +50,17 @@ namespace Moq
 		where TMock : class
 	{
 		public SetterMethodCall(Mock mock, Expression originalExpression, MethodInfo method)
-			: base(mock, originalExpression, method, new[] { ItExpr.IsAny<TProperty>() })
+			: base(mock, null, originalExpression, method, new[] { ItExpr.IsAny<TProperty>() })
 		{
 		}
 
 		public SetterMethodCall(Mock mock, Expression originalExpression, MethodInfo method, TProperty value)
-			: base(mock, originalExpression, method, new[] { ItExpr.Is<TProperty>(arg => Object.Equals(arg, value)) })
+			: base(mock, null, originalExpression, method, new[] { ItExpr.Is<TProperty>(arg => Object.Equals(arg, value)) })
 		{
 		}
 
 		public SetterMethodCall(Mock mock, Expression originalExpression, MethodInfo method, Expression value)
-			: base(mock, originalExpression, method, new[] { value })
+			: base(mock, null, originalExpression, method, new[] { value })
 		{
 		}
 

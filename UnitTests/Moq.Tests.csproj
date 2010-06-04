@@ -65,8 +65,10 @@
   </ItemGroup>
   <ItemGroup>
     <Compile Include="AsInterfaceFixture.cs" />
+    <Compile Include="ConditionalSetups.cs" />
     <Compile Include="CustomMatcherFixture.cs" />
     <Compile Include="ExtensionsFixture.cs" />
+    <Compile Include="MockSequenceFixture.cs" />
     <Compile Include="PropertiesFixture.cs" />
     <Compile Include="QueryableMocksFixture.cs" />
     <Compile Include="RecursiveMocksFixture.cs" />
@@ -91,6 +93,7 @@
     <Compile Include="Properties\AssemblyInfo.cs" />
     <Compile Include="Regressions\IssueReportsFixture.cs" />
     <Compile Include="Regressions\StreamFixture.cs" />
+    <Compile Include="SequenceExtensionsFixture.cs" />
     <Compile Include="ReturnsFixture.cs" />
     <Compile Include="StubExtensionsFixture.cs" />
     <Compile Include="TimesFixture.cs" />

@@ -107,9 +107,7 @@ namespace Moq
 			do
 			{
 				var mock = new Mock<T>();
-#if !SILVERLIGHT
 				mock.SetupAllProperties();
-#endif
 				yield return mock.Object;
 			}
 			while (true);
@@ -164,9 +162,7 @@ namespace Moq
 			if (!mock.InnerMocks.TryGetValue(info, out fluentMock))
 			{
 				fluentMock = ((IMocked)new MockDefaultValueProvider(mock).ProvideDefault(info)).Mock;
-#if !SILVERLIGHT
 				Mock.SetupAllProperties(fluentMock);
-#endif
 			}
 
 			var result = (TResult)fluentMock.Object;

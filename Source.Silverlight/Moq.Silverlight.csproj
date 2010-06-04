@@ -96,6 +96,9 @@
     <Compile Include="..\Source\AsInterface.cs">
       <Link>AsInterface.cs</Link>
     </Compile>
+    <Compile Include="..\Source\ConditionalContext.cs">
+      <Link>ConditionalContext.cs</Link>
+    </Compile>
     <Compile Include="..\Source\DefaultValue.cs">
       <Link>DefaultValue.cs</Link>
     </Compile>
@@ -152,6 +155,12 @@
     </Compile>
     <Compile Include="..\Source\Language\IRaise.cs">
       <Link>Language\IRaise.cs</Link>
+    </Compile>
+    <Compile Include="..\Source\Language\ISetupConditionResult.cs">
+      <Link>Language\ISetupConditionResult.cs</Link>
+    </Compile>
+    <Compile Include="..\Source\Language\ISetupSequentialResult.cs">
+      <Link>Language\ISetupSequentialResult.cs</Link>
     </Compile>
     <Compile Include="..\Source\Language\IVerifies.cs">
       <Link>Language\IVerifies.cs</Link>
@@ -264,6 +273,9 @@
     <Compile Include="..\Source\Mocks.cs">
       <Link>Mocks.cs</Link>
     </Compile>
+    <Compile Include="..\Source\MockSequence.cs">
+      <Link>MockSequence.cs</Link>
+    </Compile>
     <Compile Include="..\Source\Obsolete\IOccurrence.cs">
       <Link>Obsolete\IOccurrence.cs</Link>
     </Compile>
@@ -321,11 +333,17 @@
     <Compile Include="..\Source\Range.cs">
       <Link>Range.cs</Link>
     </Compile>
+    <Compile Include="..\Source\SequenceExtensions.cs">
+      <Link>SequenceExtensions.cs</Link>
+    </Compile>
     <Compile Include="..\Source\SetterMethodCall.cs">
       <Link>SetterMethodCall.cs</Link>
     </Compile>
     <Compile Include="..\Source\SetupKind.cs">
       <Link>SetupKind.cs</Link>
+    </Compile>
+    <Compile Include="..\Source\SetupSequentialContext.cs">
+      <Link>SetupSequentialContext.cs</Link>
     </Compile>
     <Compile Include="..\Source\Times.cs">
       <Link>Times.cs</Link>

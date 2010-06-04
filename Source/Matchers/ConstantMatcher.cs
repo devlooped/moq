@@ -78,8 +78,8 @@ namespace Moq
 
 		private bool MatchesEnumerable(object value)
 		{
-			IEnumerable constValues = (IEnumerable)constantValue;
-			IEnumerable values = (IEnumerable)value;
+			var constValues = (IEnumerable)constantValue;
+			var values = (IEnumerable)value;
 			return constValues.Cast<object>().SequenceEqual(values.Cast<object>());
 		}
 	}
