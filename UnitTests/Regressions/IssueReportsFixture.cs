@@ -1204,7 +1204,7 @@ namespace Moq.Tests.Regressions
 
 		public class _250
 		{
-			[Fact(Skip = "Fails on DynamicProxy")]
+			[Fact]
 			public void Test()
 			{
 				var target = new Mock<MethodInfo>();

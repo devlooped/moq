@@ -58,7 +58,7 @@ namespace Moq
 
 		public void Initialize(Expression matcherExpression)
 		{
-			constantValue = ((ConstantExpression)matcherExpression).Value;
+			this.constantValue = ((ConstantExpression)matcherExpression).Value;
 		}
 
 		public bool Matches(object value)
@@ -68,7 +68,7 @@ namespace Moq
 				return true;
 			}
 
-			if (constantValue is IEnumerable && value is IEnumerable)
+			if (this.constantValue is IEnumerable && value is IEnumerable)
 			{
 				return this.MatchesEnumerable(value);
 			}
