@@ -51,10 +51,10 @@ namespace Moq.Linq
 {
 	internal class FluentMockVisitor : ExpressionVisitor
 	{
-		private static readonly MethodInfo FluentMockGenericMethod = ((Func<Mock<string>, Expression<Func<string, string>>, Mock<string>>)
+		private static readonly MethodInfo fluentMockGenericMethod = ((Func<Mock<string>, Expression<Func<string, string>>, Mock<string>>)
 			QueryableMockExtensions.FluentMock<string, string>).Method.GetGenericMethodDefinition();
 
-		private static readonly MethodInfo MockGetGenericMethod = ((Func<string, Mock<string>>)Mock.Get<string>)
+		private static readonly MethodInfo mockGetGenericMethod = ((Func<string, Mock<string>>)Mock.Get<string>)
 			.Method.GetGenericMethodDefinition();
 
 		private Expression expression;
@@ -91,7 +91,7 @@ namespace Moq.Linq
 			}
 
 			// the actual first object being used in a fluent expression.
-			return Expression.Call(null, MockGetGenericMethod.MakeGenericMethod(node.Type), node);
+			return Expression.Call(null, mockGetGenericMethod.MakeGenericMethod(node.Type), node);
 		}
 
 		protected override Expression VisitMethodCall(MethodCallExpression node)
@@ -135,7 +135,7 @@ namespace Moq.Linq
 
 				// Generate a Mock.Get over the entire member access rather.
 				// <anonymous_type>.foo => Mock.Get(<anonymous_type>.foo)
-				return Expression.Call(null, MockGetGenericMethod.MakeGenericMethod(memberType), node);
+				return Expression.Call(null, mockGetGenericMethod.MakeGenericMethod(memberType), node);
 			}
 
 			var lambdaParam = Expression.Parameter(node.Expression.Type, "mock");
@@ -181,7 +181,7 @@ namespace Moq.Linq
 			else
 			{
 				//.FluentMock(mock => mock.Solution)
-				targetMethod = FluentMockGenericMethod.MakeGenericMethod(objectType, returnType);
+				targetMethod = fluentMockGenericMethod.MakeGenericMethod(objectType, returnType);
 			}
 
 			return targetMethod;

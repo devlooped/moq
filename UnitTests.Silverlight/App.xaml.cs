@@ -1,23 +1,24 @@
 using System;
+using System.Diagnostics;
 using System.Windows;
 using Microsoft.Silverlight.Testing;
 using Microsoft.Silverlight.Testing.UnitTesting.Metadata.XunitLight;
+using System.Windows.Browser;
 
 namespace Moq.Tests.Silverlight
 {
 	public partial class App : Application
 	{
-
 		public App()
 		{
-			this.Startup += this.Application_Startup;
-			this.Exit += this.Application_Exit;
-			this.UnhandledException += this.Application_UnhandledException;
+			this.Startup += this.OnApplicationStartup;
+			this.Exit += this.OnApplicationExit;
+			this.UnhandledException += this.OnApplicationUnhandledException;
 
-			InitializeComponent();
+			this.InitializeComponent();
 		}
 
-		private void Application_Startup(object sender, StartupEventArgs e)
+		private void OnApplicationStartup(object sender, StartupEventArgs e)
 		{
 			/*
 			 * Wire the XunitLight test harness provider into the silverlight testing framework
@@ -27,16 +28,16 @@ namespace Moq.Tests.Silverlight
 			this.RootVisual = UnitTestSystem.CreateTestPage();
 		}
 
-		private void Application_Exit(object sender, EventArgs e)
+		private void OnApplicationExit(object sender, EventArgs e)
 		{
-
 		}
-		private void Application_UnhandledException(object sender, ApplicationUnhandledExceptionEventArgs e)
+
+		private void OnApplicationUnhandledException(object sender, ApplicationUnhandledExceptionEventArgs e)
 		{
 			// If the app is running outside of the debugger then report the exception using
 			// the browser's exception mechanism. On IE this will display it a yellow alert 
 			// icon in the status bar and Firefox will display a script error.
-			if (!System.Diagnostics.Debugger.IsAttached)
+			if (!Debugger.IsAttached)
 			{
 
 				// NOTE: This will allow the application to continue running after an exception has been thrown
@@ -44,17 +45,21 @@ namespace Moq.Tests.Silverlight
 				// For production applications this error handling should be replaced with something that will 
 				// report the error to the website and stop the application.
 				e.Handled = true;
-				Deployment.Current.Dispatcher.BeginInvoke(delegate { ReportErrorToDOM(e); });
+				Deployment.Current.Dispatcher.BeginInvoke(
+					(Action<ApplicationUnhandledExceptionEventArgs>)this.ReportErrorToDOM,
+					e);
 			}
 		}
+
 		private void ReportErrorToDOM(ApplicationUnhandledExceptionEventArgs e)
 		{
 			try
 			{
-				string errorMsg = e.ExceptionObject.Message + e.ExceptionObject.StackTrace;
-				errorMsg = errorMsg.Replace('"', '\'').Replace("\r\n", @"\n");
+				var errorMsg = e.ExceptionObject.Message + e.ExceptionObject.StackTrace
+					.Replace('"', '\'')
+					.Replace("\r\n", @"\n");
 
-				System.Windows.Browser.HtmlPage.Window.Eval("throw new Error(\"Unhandled Error in Silverlight 2 Application " + errorMsg + "\");");
+				HtmlPage.Window.Eval("throw new Error(\"Unhandled Error in Silverlight 2 Application " + errorMsg + "\");");
 			}
 			catch (Exception)
 			{

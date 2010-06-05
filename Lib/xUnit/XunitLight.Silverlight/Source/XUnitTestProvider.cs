@@ -1,7 +1,7 @@
-using System;
+﻿using System;
 using System.Collections.Generic;
 using System.Reflection;
-using ITestHarness = Microsoft.Silverlight.Testing.Harness.ITestHarness;
+using Microsoft.Silverlight.Testing.Harness;
 
 namespace Microsoft.Silverlight.Testing.UnitTesting.Metadata.XunitLight
 {
@@ -13,7 +13,7 @@ namespace Microsoft.Silverlight.Testing.UnitTesting.Metadata.XunitLight
 		/// <summary>
 		/// Name of this provider.
 		/// </summary>
-		private const string ProviderName = "xUnit";
+		private const string ProviderName = "xUnitLite";
 
 		/// <summary>
 		/// The capabilities of the xUnit provider.
@@ -54,7 +54,7 @@ namespace Microsoft.Silverlight.Testing.UnitTesting.Metadata.XunitLight
 		/// <param name="testHarness">The unit test harness.</param>
 		/// <param name="assemblyReference">Assembly reflection object.</param>
 		/// <returns>Returns the assembly metadata interface.</returns>
-		public IAssembly GetUnitTestAssembly(ITestHarness testHarness, Assembly assemblyReference)
+		public IAssembly GetUnitTestAssembly(UnitTestHarness testHarness, Assembly assemblyReference)
 		{
 			if (_assemblyCache.ContainsKey(assemblyReference))
 			{

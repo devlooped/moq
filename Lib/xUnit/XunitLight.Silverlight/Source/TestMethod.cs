@@ -1,4 +1,4 @@
-using System;
+﻿using System;
 using System.Collections.Generic;
 using System.Reflection;
 using Microsoft.Silverlight.Testing.Harness;
@@ -189,8 +189,6 @@ namespace Microsoft.Silverlight.Testing.UnitTesting.Metadata.XunitLight
 			get
 			{
 				return null;
-				//                VS.PriorityAttribute pri = ReflectionUtility.GetAttribute(this, ProviderAttributes.Priority, true) as VS.PriorityAttribute;
-				//                return new Priority(pri == null ? DefaultPriority : pri.Priority);
 			}
 		}
 

@@ -1,10 +1,9 @@
-using System;
+﻿using System;
 using System.Collections;
 using System.Collections.Generic;
 using System.Linq;
 using System.Reflection;
 using Microsoft.Silverlight.Testing.Harness;
-using Microsoft.Silverlight.Testing.UnitTesting.Harness;
 
 namespace Microsoft.Silverlight.Testing.UnitTesting.Metadata.XunitLight
 {
@@ -26,7 +25,7 @@ namespace Microsoft.Silverlight.Testing.UnitTesting.Metadata.XunitLight
 		/// <summary>
 		/// The unit test harness.
 		/// </summary>
-		private ITestHarness _harness;
+		private UnitTestHarness _harness;
 
 		/// <summary>
 		/// Creates a new unit test assembly wrapper.
@@ -34,7 +33,7 @@ namespace Microsoft.Silverlight.Testing.UnitTesting.Metadata.XunitLight
 		/// <param name="provider">Unit test metadata provider.</param>
 		/// <param name="unitTestHarness">A reference to the unit test harness.</param>
 		/// <param name="assembly">Assembly reflection object.</param>
-		public UnitTestFrameworkAssembly(IUnitTestProvider provider, ITestHarness unitTestHarness, Assembly assembly)
+		public UnitTestFrameworkAssembly(IUnitTestProvider provider, UnitTestHarness unitTestHarness, Assembly assembly)
 		{
 			_provider = provider;
 			_harness = unitTestHarness;
@@ -80,7 +79,7 @@ namespace Microsoft.Silverlight.Testing.UnitTesting.Metadata.XunitLight
 		/// <summary>
 		/// Gets the test harness used to initialize the assembly.
 		/// </summary>
-		public ITestHarness TestHarness
+		public UnitTestHarness TestHarness
 		{
 			get { return _harness; }
 		}
@@ -101,10 +100,7 @@ namespace Microsoft.Silverlight.Testing.UnitTesting.Metadata.XunitLight
 		/// interface objects.</returns>
 		public ICollection<ITestClass> GetTestClasses()
 		{
-			//ICollection<Type> classes = ReflectionUtility.GetTypesWithAttribute(_assembly, ProviderAttributes.TestClass);
-			ICollection<Type> classes = _assembly.GetTypes()
-				.Where(t => t.IsPublic && (ReflectionUtility.GetMethodsWithAttribute(t, typeof(Xunit.FactAttribute)).Count > 0))
-				.ToList();
+			ICollection<Type> classes = _assembly.GetTypes().Where(t => ContainsAMethodWithAFactAttribute(t)).ToList();
 
 			List<ITestClass> tests = new List<ITestClass>(classes.Count);
 			foreach (Type type in classes)
@@ -112,6 +108,23 @@ namespace Microsoft.Silverlight.Testing.UnitTesting.Metadata.XunitLight
 				tests.Add(new TestClass(this, type));
 			}
 			return tests;
+		}
+
+		private bool ContainsAMethodWithAFactAttribute(Type type)
+		{
+			if (type.IsPublic || type.IsNestedPublic)
+			{
+				if ((ReflectionUtility.GetMethodsWithAttribute(type, typeof(Xunit.FactAttribute)).Count > 0))
+					return true;
+
+				foreach (Type t in type.GetNestedTypes(BindingFlags.Public))
+				{
+					if (ContainsAMethodWithAFactAttribute(t))
+						return true;
+				}
+			}
+
+			return false;
 		}
 	}
 

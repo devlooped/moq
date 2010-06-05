@@ -1,9 +1,8 @@
-using System;
+﻿using System;
 using System.Collections;
 using System.Collections.Generic;
 using System.Reflection;
 using Microsoft.Silverlight.Testing.Harness;
-using Microsoft.Silverlight.Testing.UnitTesting.Harness;
 
 namespace Microsoft.Silverlight.Testing.UnitTesting.Metadata.XunitLight
 {
@@ -20,7 +19,7 @@ namespace Microsoft.Silverlight.Testing.UnitTesting.Metadata.XunitLight
 		{
 			_tests = new List<ITestMethod>();
 
-			_m = new Dictionary<Methods, LazyMethodInfo>(4);
+			//_m = new Dictionary<Methods, LazyMethodInfo>(4);
 			//_m[Methods.ClassCleanup] = null;
 			//_m[Methods.ClassInitialize] = null;
 			//_m[Methods.TestCleanup] = null;

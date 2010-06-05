@@ -1,8 +1,4 @@
-<Application xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
-             xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml" 
-             x:Class="Moq.Tests.Silverlight.App"
-             >
-    <Application.Resources>
-        
-    </Application.Resources>
-</Application>
+<Application
+	xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+	xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml" 
+	x:Class="Moq.Tests.Silverlight.App" />

@@ -92,9 +92,8 @@
     <Reference Include="System.ServiceModel" />
     <Reference Include="System.Windows" />
     <Reference Include="System.Windows.Browser" />
-    <Reference Include="XunitLight.Silverlight, Version=1.0.0.0, Culture=neutral, PublicKeyToken=d8d79242a2031a99, processorArchitecture=MSIL">
-      <SpecificVersion>False</SpecificVersion>
-      <HintPath>..\Lib\Microsoft\XunitLight.Silverlight.dll</HintPath>
+    <Reference Include="XunitLight.Silverlight">
+      <HintPath>..\Lib\xUnit\XunitLight.Silverlight\XunitLight.Silverlight.dll</HintPath>
     </Reference>
   </ItemGroup>
   <ItemGroup>

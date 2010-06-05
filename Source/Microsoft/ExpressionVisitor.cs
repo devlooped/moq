@@ -11,6 +11,9 @@ namespace System.Linq.Expressions
 	[DebuggerStepThrough]
 	internal abstract class ExpressionVisitor
 	{
+		private static readonly MethodInfo visitLamdaMethod = typeof(ExpressionVisitor)
+			.GetMethod("VisitLambdaInternal", BindingFlags.NonPublic | BindingFlags.Instance);
+
 		protected ExpressionVisitor()
 		{
 		}
@@ -97,8 +100,7 @@ namespace System.Linq.Expressions
 				case ExpressionType.Call:
 					return this.VisitMethodCall((MethodCallExpression)node);
 				case ExpressionType.Lambda:
-					return (Expression)this.GetType()
-						.GetMethod("VisitLambdaInternal", BindingFlags.NonPublic | BindingFlags.Instance)
+					return (Expression)visitLamdaMethod
 						.MakeGenericMethod(new[] { node.Type })
 						.Invoke(this, new[] { node });
 				case ExpressionType.New:
