@@ -1076,6 +1076,38 @@ namespace Moq.Tests.Regressions
 
 		#endregion
 
+		#region #229
+
+		public class _229
+		{
+			[Fact]
+			public void Test()
+			{
+				var target = new Mock<Foo> { CallBase = true };
+
+				var raised = false;
+				target.Object.MyEvent += (s, e) => raised = true;
+				target.Object.RaiseMyEvent();
+
+				Assert.True(raised);
+			}
+
+			public class Foo
+			{
+				public virtual event EventHandler MyEvent;
+
+				public void RaiseMyEvent()
+				{
+					if (this.MyEvent != null)
+					{
+						this.MyEvent(this, EventArgs.Empty);
+					}
+				}
+			}
+		}
+
+		#endregion
+
 		#region #230
 
 		public class _230

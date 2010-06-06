@@ -131,11 +131,6 @@ namespace Moq.Proxy
 				set { this.invocation.ReturnValue = value; }
 			}
 
-			public Type TargetType
-			{
-				get { return this.invocation.TargetType; }
-			}
-
 			public void InvokeBase()
 			{
 				this.invocation.Proceed();

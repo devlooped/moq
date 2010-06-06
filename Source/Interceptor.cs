@@ -162,7 +162,11 @@ namespace Moq
 					// TODO: validate we can get the event?
 					var eventInfo = this.GetEventFromName(invocation.Method.Name.Substring(4));
 
-					if (delegateInstance != null)
+					if (this.Mock.CallBase)
+					{
+						invocation.InvokeBase();
+					}
+					else if (delegateInstance != null)
 					{
 						this.AddEventHandler(eventInfo, (Delegate)invocation.Arguments[0]);
 					}
@@ -175,7 +179,11 @@ namespace Moq
 					// TODO: validate we can get the event?
 					var eventInfo = this.GetEventFromName(invocation.Method.Name.Substring(7));
 
-					if (delegateInstance != null)
+					if (this.Mock.CallBase)
+					{
+						invocation.InvokeBase();
+					}
+					else if (delegateInstance != null)
 					{
 						this.RemoveEventHandler(eventInfo, (Delegate)invocation.Arguments[0]);
 					}
