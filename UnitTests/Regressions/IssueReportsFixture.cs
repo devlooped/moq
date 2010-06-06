@@ -1,18 +1,21 @@
 ﻿using System;
+using System.Collections;
 using System.Collections.Generic;
-using System.Linq;
-using Moq.Protected;
-#if !SILVERLIGHT
-using System.ServiceModel.Web;
-#endif
-using Xunit;
-using System.Text;
-using Moq;
 using System.ComponentModel;
 using System.IO;
+using System.Linq;
 using System.Reflection;
-using System.Collections;
 using System.ServiceModel;
+using System.Text;
+using Moq;
+using Moq.Protected;
+using Xunit;
+
+#if !SILVERLIGHT
+using System.ServiceModel.Web;
+using System.Threading.Tasks;
+using System.Web.UI.HtmlControls;
+#endif
 
 #region #181
 
@@ -759,6 +762,23 @@ namespace Moq.Tests.Regressions
 
 		#endregion
 
+		#region #160
+
+#if !SILVERLIGHT
+		public class _160
+		{
+			[Fact]
+			public void ShouldMockHtmlControl()
+			{
+				// CallBase was missing
+				var htmlInputTextMock = new Mock<HtmlInputText>() { CallBase = true };
+				Assert.True(htmlInputTextMock.Object.Visible);
+			}
+		}
+#endif
+
+		#endregion
+
 		#region #161
 
 		public class _161
@@ -826,6 +846,33 @@ namespace Moq.Tests.Regressions
 				{
 					return base.GetHashCode();
 				}
+			}
+		}
+
+		#endregion
+
+		#region #174
+
+		public class _174
+		{
+			[Fact]
+			public void Test()
+			{
+				var serviceNo1Mock = new Mock<IServiceNo1>();
+				var collaboratorMock = new Mock<ISomeCollaborator>();
+
+				collaboratorMock.Object.Collaborate(serviceNo1Mock.Object);
+
+				collaboratorMock.Verify(o => o.Collaborate(serviceNo1Mock.Object));
+			}
+
+			public interface ISomeCollaborator
+			{
+				void Collaborate(IServiceNo1 serviceNo1);
+			}
+
+			public interface IServiceNo1 : IEnumerable
+			{
 			}
 		}
 
@@ -1027,6 +1074,73 @@ namespace Moq.Tests.Regressions
 				{
 					throw new NotImplementedException();
 				}
+			}
+		}
+
+		#endregion
+
+		#region #190
+
+		public class _190
+		{
+			[Fact]
+			public void Test()
+			{
+				var mock = new Mock<IDisposable>().As<IComponent>();
+				mock.SetupAllProperties();
+
+				ISite site = new FooSite();
+				mock.Object.Site = site;
+				Assert.Same(site, mock.Object.Site);
+			}
+
+			public class FooSite : ISite
+			{
+				public IComponent Component
+				{
+					get { throw new NotImplementedException(); }
+				}
+
+				public IContainer Container
+				{
+					get { throw new NotImplementedException(); }
+				}
+
+				public bool DesignMode
+				{
+					get { throw new NotImplementedException(); }
+				}
+
+				public string Name
+				{
+					get { throw new NotImplementedException(); }
+					set { throw new NotImplementedException(); }
+				}
+
+				public object GetService(Type serviceType)
+				{
+					throw new NotImplementedException();
+				}
+			}
+
+		}
+
+		#endregion
+
+		#region #205
+
+		public class _205
+		{
+			[Fact]
+			public void Test()
+			{
+				Assert.DoesNotThrow(() => new Mock<IFoo>().SetupAllProperties());
+			}
+
+			public interface IFoo
+			{
+				string Error { get; set; }
+				string this[int index] { get; set; }
 			}
 		}
 
@@ -1335,109 +1449,6 @@ namespace Moq.Tests.Regressions
 		#region Silverlight excluded
 
 #if !SILVERLIGHT
-
-		#region #160
-
-		public class _160
-		{
-			[Fact]
-			public void ShouldMockHtmlControl()
-			{
-				// CallBase was missing
-				var htmlInputTextMock = new Mock<System.Web.UI.HtmlControls.HtmlInputText>() { CallBase = true };
-				Assert.True(htmlInputTextMock.Object.Visible);
-			}
-		}
-
-		#endregion
-
-		#region #174
-
-		public class _174
-		{
-			[Fact]
-			public void Test()
-			{
-				var serviceNo1Mock = new Mock<IServiceNo1>();
-				var collaboratorMock = new Mock<ISomeCollaborator>();
-
-				collaboratorMock.Object.Collaborate(serviceNo1Mock.Object);
-
-				collaboratorMock.Verify(o => o.Collaborate(serviceNo1Mock.Object));
-			}
-
-			public interface ISomeCollaborator
-			{
-				void Collaborate(IServiceNo1 serviceNo1);
-			}
-
-			public interface IServiceNo1 : IEnumerable
-			{
-			}
-		}
-
-		#endregion
-
-		#region #190
-
-		public class _190
-		{
-			[Fact]
-			public void Test()
-			{
-				var mock = new Mock<IDisposable>().As<IComponent>();
-				mock.SetupAllProperties();
-
-				ISite site = new FooSite();
-				mock.Object.Site = site;
-				Assert.Same(site, mock.Object.Site);
-			}
-
-			public class FooSite : ISite
-			{
-				public IComponent Component
-				{
-					get { throw new NotImplementedException(); }
-				}
-
-				public IContainer Container
-				{
-					get { throw new NotImplementedException(); }
-				}
-
-				public bool DesignMode
-				{
-					get { throw new NotImplementedException(); }
-				}
-
-				public string Name
-				{
-					get { throw new NotImplementedException(); }
-					set { throw new NotImplementedException(); }
-				}
-
-				public object GetService(Type serviceType)
-				{
-					throw new NotImplementedException();
-				}
-			}
-
-		}
-
-		#endregion
-
-		#region #205
-
-		public class _205
-		{
-			[Fact]
-			public void Test()
-			{
-				Assert.DoesNotThrow(() => new Mock<IDataErrorInfo>().SetupAllProperties());
-			}
-		}
-
-		#endregion
 
 		// run "netsh http add urlacl url=http://+:7777/ user=[domain]\[user]"
 		// to avoid running the test as an admin

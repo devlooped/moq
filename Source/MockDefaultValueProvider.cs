@@ -50,7 +50,7 @@ namespace Moq
 	/// </summary>
 	internal class MockDefaultValueProvider : EmptyDefaultValueProvider
 	{
-		Mock owner;
+		private Mock owner;
 
 		public MockDefaultValueProvider(Mock owner)
 		{
@@ -62,22 +62,22 @@ namespace Moq
 			var value = base.ProvideDefault(member);
 			Mock mock = null;
 
-			if (value == null &&
-				member.ReturnType.IsMockeable() &&
-				!owner.InnerMocks.TryGetValue(member, out mock))
+			if (value == null && member.ReturnType.IsMockeable() && !owner.InnerMocks.TryGetValue(member, out mock))
 			{
 				var mockType = typeof(Mock<>).MakeGenericType(member.ReturnType);
 				mock = (Mock)Activator.CreateInstance(mockType, owner.Behavior);
 				mock.DefaultValue = owner.DefaultValue;
 				mock.CallBase = owner.CallBase;
-				
+
 				owner.InnerMocks.Add(member, mock);
 			}
 
 			if (mock != null)
+			{
 				return mock.Object;
-			else
-				return value;
+			}
+
+			return value;
 		}
 	}
 }
