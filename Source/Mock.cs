@@ -113,32 +113,29 @@ namespace Moq
 			throw new ArgumentException(Resources.ObjectInstanceNotMock, "mocked");
 		}
 
-		internal virtual Interceptor Interceptor { get; set; }
-
-		internal virtual Dictionary<MethodInfo, Mock> InnerMocks { get; private set; }
-
 		/// <include file='Mock.xdoc' path='docs/doc[@for="Mock.Behavior"]/*'/>
 		public virtual MockBehavior Behavior { get; internal set; }
 
 		/// <include file='Mock.xdoc' path='docs/doc[@for="Mock.CallBase"]/*'/>
 		public virtual bool CallBase
 		{
-			get { return callBase; }
-			set { callBase = value; }
+			get { return this.callBase; }
+			set { this.callBase = value; }
 		}
 
 		/// <include file='Mock.xdoc' path='docs/doc[@for="Mock.DefaultValue"]/*'/>
 		public virtual DefaultValue DefaultValue
 		{
-			get { return defaultValue; }
-			set
-			{
-				defaultValue = value;
-				if (defaultValue == DefaultValue.Mock)
-					defaultValueProvider = new MockDefaultValueProvider(this);
-				else
-					defaultValueProvider = new EmptyDefaultValueProvider();
-			}
+			get { return this.defaultValue; }
+			set { this.SetDefaultValue(value); }
+		}
+
+		private void SetDefaultValue(DefaultValue value)
+		{
+			this.defaultValue = value;
+			this.defaultValueProvider = defaultValue == DefaultValue.Mock ?
+				new MockDefaultValueProvider(this) :
+				new EmptyDefaultValueProvider();
 		}
 
 		/// <include file='Mock.xdoc' path='docs/doc[@for="Mock.Object"]/*'/>
@@ -155,6 +152,10 @@ namespace Moq
 			this.isInitialized = true;
 			return value;
 		}
+
+		internal virtual Interceptor Interceptor { get; set; }
+
+		internal virtual Dictionary<MethodInfo, Mock> InnerMocks { get; private set; }
 
 		/// <include file='Mock.xdoc' path='docs/doc[@for="Mock.OnGetObject"]/*'/>
 		[SuppressMessage("Microsoft.Design", "CA1024:UsePropertiesWhereAppropriate", Justification = "This is actually the protected virtual implementation of the property Object.")]
@@ -648,10 +649,6 @@ namespace Moq
 		/// </summary>
 		private static Interceptor GetInterceptor(Expression fluentExpression, Mock mock)
 		{
-			//var visitor = new AutoMockPropertiesVisitor(mock);
-			//var target = visitor.SetupMocks(lambda.Body);
-			//return target.Interceptor;
-
 			var targetExpression = FluentMockVisitor.Accept(fluentExpression, mock);
 			var targetLambda = Expression.Lambda<Func<Mock>>(Expression.Convert(targetExpression, typeof(Mock)));
 
@@ -922,5 +919,16 @@ namespace Moq
 		}
 
 		#endregion
+
+		#region Default Values
+
+		/// <include file='Mock.Generic.xdoc' path='docs/doc[@for="Mock.SetReturnDefault{TReturn}"]/*'/>
+		public void SetReturnsDefault<TReturn>(TReturn value)
+		{
+			this.DefaultValueProvider.DefineDefault(value);
+		}
+
+		#endregion
+
 	}
 }

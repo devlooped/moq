@@ -397,17 +397,4 @@ namespace Moq
 		//    throw new NotImplementedException();
 		//}
 	}
-
-	internal class ValueClosure<TValue>
-	{
-		public ValueClosure(TValue initialValue)
-		{
-			Value = initialValue;
-		}
-
-		public TValue Value { get; set; }
-
-		public TValue GetValue() { return Value; }
-		public void SetValue(TValue value) { Value = value; }
-	}
 }

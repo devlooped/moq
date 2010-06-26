@@ -53,17 +53,23 @@ namespace Moq
 	/// </summary>
 	internal class EmptyDefaultValueProvider : IDefaultValueProvider
 	{
+		private Dictionary<Type, object> defaultValues = new Dictionary<Type, object>();
+
+		public virtual void DefineDefault<T>(T value)
+		{
+			this.defaultValues[typeof(T)] = value;
+		}
+
 		public virtual object ProvideDefault(MethodInfo member)
 		{
 			var valueType = member.ReturnType;
 
-			// Return default value.
-			if (valueType.IsValueType)
+			if (this.defaultValues.ContainsKey(valueType))
 			{
-				return GetValueTypeDefault(valueType);
+				return this.defaultValues[valueType];
 			}
 
-			return GetReferenceTypeDefault(valueType);
+			return valueType.IsValueType ? GetValueTypeDefault(valueType) : GetReferenceTypeDefault(valueType);
 		}
 
 		private static object GetReferenceTypeDefault(Type valueType)
@@ -105,10 +111,6 @@ namespace Moq
 			if (valueType.IsGenericType && valueType.GetGenericTypeDefinition() == typeof(Nullable<>))
 			{
 				return null;
-			}
-			else if (valueType.IsAssignableFrom(typeof(int)))
-			{
-				return 0;
 			}
 
 			return Activator.CreateInstance(valueType);

@@ -1,0 +1,24 @@
+﻿<?xml version="1.0" encoding="utf-8" ?>
+<docs>
+	<doc for="IDefaultValueProvider">
+		<summary>
+			Interface to be implemented by classes that determine the
+			default value of non-expected invocations.
+		</summary>
+	</doc>
+	<doc for="IDefaultValueProvider.DefineDefault">
+		<summary>
+			Defines the default value to return in all the methods returning <typeparamref name="T"/>.
+		</summary>
+		<typeparam name="T">The type of the return value.</typeparam>
+		<param name="value">The value to set as default.</param>
+	</doc>
+	<doc for="IDefaultValueProvider.ProvideDefault">
+		<summary>
+			Provides a value for the given member and arguments.
+		</summary>
+		<param name="member">
+			The member to provide a default	value for.
+		</param>
+	</doc>
+</docs>

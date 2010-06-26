@@ -115,6 +115,15 @@ namespace Moq.Properties {
         }
         
         /// <summary>
+        ///   Looks up a localized string similar to Could not locate event for attach or detach method {0}..
+        /// </summary>
+        internal static string EventNofFound {
+            get {
+                return ResourceManager.GetString("EventNofFound", resourceCulture);
+            }
+        }
+        
+        /// <summary>
         ///   Looks up a localized string similar to Expression {0} involves a field access, which is not supported. Use properties instead..
         /// </summary>
         internal static string FieldsNotSupported {

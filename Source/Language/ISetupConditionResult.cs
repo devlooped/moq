@@ -1,5 +1,6 @@
 ﻿using System;
 using System.ComponentModel;
+using System.Diagnostics.CodeAnalysis;
 using System.Linq.Expressions;
 using Moq.Language.Flow;
 
@@ -16,6 +17,7 @@ namespace Moq.Language
 		/// </summary>
 		/// <param name="expression"></param>
 		/// <returns></returns>
+		[SuppressMessage("Microsoft.Design", "CA1006:DoNotNestGenericTypesInMemberSignatures", Justification = "By design")]
 		ISetup<TMock> Setup(Expression<Action<TMock>> expression);
 
 		/// <summary>
@@ -24,6 +26,7 @@ namespace Moq.Language
 		/// <typeparam name="TResult"></typeparam>
 		/// <param name="expression"></param>
 		/// <returns></returns>
+		[SuppressMessage("Microsoft.Design", "CA1006:DoNotNestGenericTypesInMemberSignatures", Justification = "By design")]
 		ISetup<TMock, TResult> Setup<TResult>(Expression<Func<TMock, TResult>> expression);
 	}
 }

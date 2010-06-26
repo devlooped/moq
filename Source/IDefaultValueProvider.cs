@@ -43,18 +43,14 @@ using System.Reflection;
 
 namespace Moq
 {
-	/// <summary>
-	/// Interface to be implemented by classes that determine the 
-	/// default value of non-expected invocations.
-	/// </summary>
+	/// <include file='IDefaultValueProvider.xdoc' path='docs/doc[@for="IDefaultValueProvider"]/*'/>
 	[EditorBrowsable(EditorBrowsableState.Advanced)]
 	internal interface IDefaultValueProvider
 	{
-		/// <summary>
-		/// Provides a value for the given member and arguments.
-		/// </summary>
-		/// <param name="member">The member to provide a default 
-		/// value for.</param>
+		/// <include file='IDefaultValueProvider.xdoc' path='docs/doc[@for="IDefaultValueProvider.DefineDefault"]/*'/>
+		void DefineDefault<T>(T value);
+
+		/// <include file='IDefaultValueProvider.xdoc' path='docs/doc[@for="IDefaultValueProvider.ProvideDefault"]/*'/>
 		object ProvideDefault(MethodInfo member);
 	}
 }

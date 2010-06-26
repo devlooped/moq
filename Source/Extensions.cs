@@ -200,13 +200,13 @@ namespace Moq
 			}
 
 			var ev = addRemove.DeclaringType.GetEvent(
-				addRemove.Name.Replace("add_", "").Replace("remove_", ""));
+				addRemove.Name.Replace("add_", string.Empty).Replace("remove_", string.Empty));
 
 			if (ev == null)
 			{
 				throw new ArgumentException(string.Format(
 					CultureInfo.CurrentCulture,
-					"Could not locate event for attach or detach method {0}.",
+					Resources.EventNofFound,
 					addRemove));
 			}
 

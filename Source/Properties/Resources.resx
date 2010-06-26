@@ -292,4 +292,7 @@ Expected invocation on the mock once, but was {4} times: {1}</value>
   <data name="LinqMethodNotSupported" xml:space="preserve">
     <value>LINQ method '{0}' not supported.</value>
   </data>
+  <data name="EventNofFound" xml:space="preserve">
+    <value>Could not locate event for attach or detach method {0}.</value>
+  </data>
 </root>

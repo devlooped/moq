@@ -48,7 +48,7 @@ internal sealed class __ProtectAttribute : Attribute
 namespace Moq
 {
 	[__Protect]
-    [DebuggerStepThrough]
+	[DebuggerStepThrough]
 	internal static class PexProtector
 	{
 		public static void Invoke(Action action)

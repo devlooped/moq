@@ -151,4 +151,11 @@
 		</example>
 		<typeparam name="TInterface">Type of interface to cast the mock to.</typeparam>
 	</doc>
+	<doc for="Mock.SetReturnDefault{TReturn}">
+		<summary>
+			Defines the default value to return in all mocked methods or properties returning <typeparamref name="TReturn"/>.
+		</summary>
+		<typeparam name="TReturn">The type to define the default.</typeparam>
+		<param name="value">The default value.</param>
+	</doc>
 </docs>
