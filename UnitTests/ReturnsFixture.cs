@@ -1,5 +1,6 @@
 ﻿using System;
 using Xunit;
+using System.Collections.Generic;
 
 namespace Moq.Tests
 {
@@ -183,6 +184,33 @@ namespace Moq.Tests
 			Assert.Equal("blah1blah2blah3blah4blah5blah6blah7blah8", result);
 		}
 
+		[Fact]
+		public void ReturnsDefaultValueType()
+		{
+			var mock = new Mock<IFoo>();
+			mock.SetReturnsDefault(true);
+
+			Assert.Equal(true, mock.Object.ReturnBool());
+		}
+
+		[Fact]
+		public void ReturnsDefaultReferenceValue()
+		{
+			var mock = new Mock<IFoo>();
+			mock.SetReturnsDefault<IList<int>>(new List<int>());
+
+			Assert.NotNull(mock.Object.ReturnIntList());
+		}
+
+		[Fact]
+		public void ReturnsDefaultValueOnProperty()
+		{
+			var mock = new Mock<IFoo>();
+			mock.SetReturnsDefault(int.MinValue);
+
+			Assert.Equal(int.MinValue, mock.Object.Value);
+		}
+
 		public interface IFoo
 		{
 			void Execute();
@@ -194,6 +222,8 @@ namespace Moq.Tests
 			string Execute(string arg1, string arg2, string arg3, string arg4, string arg5, string arg6);
 			string Execute(string arg1, string arg2, string arg3, string arg4, string arg5, string arg6, string arg7);
 			string Execute(string arg1, string arg2, string arg3, string arg4, string arg5, string arg6, string arg7, string arg8);
+			bool ReturnBool();
+			IList<int> ReturnIntList();
 
 			int Value { get; set; }
 		}
