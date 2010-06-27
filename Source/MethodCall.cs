@@ -50,6 +50,7 @@ using System.Reflection;
 using System.Text;
 using Moq.Language;
 using Moq.Language.Flow;
+using Moq.Matchers;
 using Moq.Properties;
 using Moq.Proxy;
 

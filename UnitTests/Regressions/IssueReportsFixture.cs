@@ -4,6 +4,7 @@ using System.Collections.Generic;
 using System.ComponentModel;
 using System.IO;
 using System.Linq;
+using System.Linq.Expressions;
 using System.Reflection;
 using System.ServiceModel;
 using System.Text;
@@ -13,7 +14,6 @@ using Xunit;
 
 #if !SILVERLIGHT
 using System.ServiceModel.Web;
-using System.Threading.Tasks;
 using System.Web.UI.HtmlControls;
 #endif
 
@@ -1123,6 +1123,42 @@ namespace Moq.Tests.Regressions
 				}
 			}
 
+		}
+
+		#endregion
+
+		#region #204
+
+		public class _204
+		{
+			[Fact]
+			public void Test()
+			{
+				var mock = new Mock<IRepository>();
+				mock.Setup(x => x.Select<User>(u => u.Id == 100))
+					.Returns(new User() { Id = 100 });
+
+				var user = mock.Object.Select<User>(usr => usr.Id == 100);
+				Assert.Equal(100, user.Id);
+				mock.Verify(x => x.Select<User>(usr => usr.Id == 100), Times.Once());
+
+				user = mock.Object.Select<User>(usr => usr.Id == 101);
+				Assert.Null(user);
+				mock.Verify(x => x.Select<User>(usr => usr.Id == 101), Times.Once());
+
+				mock.Verify(x => x.Select<User>(usr => usr.Id == 102), Times.Never());
+				mock.Verify(x => x.Select<User>(It.IsAny<Expression<Func<User, bool>>>()), Times.Exactly(2));
+			}
+
+			public interface IRepository
+			{
+				T Select<T>(Expression<Func<T, bool>> filter) where T : class;
+			}
+
+			public class User
+			{
+				public int Id { get; set; }
+			}
 		}
 
 		#endregion

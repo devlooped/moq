@@ -41,7 +41,7 @@
 using System;
 using System.Linq.Expressions;
 
-namespace Moq
+namespace Moq.Matchers
 {
 	internal class PredicateMatcher : IMatcher
 	{

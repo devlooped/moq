@@ -12,7 +12,7 @@
     <RootNamespace>Moq</RootNamespace>
     <AssemblyName>Moq.Silverlight</AssemblyName>
     <TargetFrameworkIdentifier>Silverlight</TargetFrameworkIdentifier>
-    <TargetFrameworkVersion>v3.0</TargetFrameworkVersion>
+    <TargetFrameworkVersion>v4.0</TargetFrameworkVersion>
     <SilverlightVersion>$(TargetFrameworkVersion)</SilverlightVersion>
     <SilverlightApplication>false</SilverlightApplication>
     <ValidateXaml>true</ValidateXaml>
@@ -209,6 +209,12 @@
     </Compile>
     <Compile Include="..\Source\Matchers\ConstantMatcher.cs">
       <Link>Matchers\ConstantMatcher.cs</Link>
+    </Compile>
+    <Compile Include="..\Source\Matchers\ExpressionComparer.cs">
+      <Link>Matchers\ExpressionComparer.cs</Link>
+    </Compile>
+    <Compile Include="..\Source\Matchers\ExpressionMatcher.cs">
+      <Link>Matchers\ExpressionMatcher.cs</Link>
     </Compile>
     <Compile Include="..\Source\Matchers\Matcher.cs">
       <Link>Matchers\Matcher.cs</Link>

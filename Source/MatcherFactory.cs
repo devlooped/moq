@@ -42,6 +42,7 @@ using System;
 using System.Globalization;
 using System.Linq.Expressions;
 using Moq.Properties;
+using Moq.Matchers;
 
 namespace Moq
 {
@@ -85,7 +86,9 @@ namespace Moq
 					Expression.Lambda<Action>(call).Compile().Invoke();
 
 					if (context.LastMatch != null)
+					{
 						return new Matcher(context.LastMatch);
+					}
 				}
 
 				var attr = call.Method.GetCustomAttribute<AdvancedMatcherAttribute>(true);
@@ -101,7 +104,7 @@ namespace Moq
 				}
 				else if (staticMatcherMethodAttr != null)
 				{
-					var matcher = new Moq.Matchers.MatcherAttributeMatcher();
+					var matcher = new MatcherAttributeMatcher();
 					matcher.Initialize(expression);
 					return matcher;
 				}
@@ -119,7 +122,9 @@ namespace Moq
 				{
 					Expression.Lambda<Action>((MemberExpression)expression).Compile().Invoke();
 					if (context.LastMatch != null)
+					{
 						return new Matcher(context.LastMatch);
+					}
 				}
 			}
 
@@ -128,6 +133,11 @@ namespace Moq
 			if (reduced.NodeType == ExpressionType.Constant)
 			{
 				return new ConstantMatcher(((ConstantExpression)reduced).Value);
+			}
+
+			if (reduced.NodeType == ExpressionType.Quote)
+			{
+				return new ExpressionMatcher(((UnaryExpression)expression).Operand);
 			}
 
 			throw new NotSupportedException(

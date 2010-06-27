@@ -39,58 +39,32 @@
 // http://www.opensource.org/licenses/bsd-license.php]
 
 using System;
-using System.Linq;
 using System.Linq.Expressions;
 
 namespace Moq.Matchers
 {
-	internal class ParamArrayMatcher : IMatcher
+	internal class ExpressionMatcher : IMatcher
 	{
-		private NewArrayExpression arrayInitExpression;
-		private IMatcher[] matchers;
+		private Expression expression;
 
-		internal ParamArrayMatcher(NewArrayExpression matcherExpression)
+		public ExpressionMatcher(Expression matcherExpression)
 		{
-			this.arrayInitExpression = matcherExpression;
-			this.Initialize();
-		}
-
-		public bool Matches(object value)
-		{
-			Array values = value as Array;
-			if (values == null || this.matchers.Length != values.Length)
-			{
-				return false;
-			}
-
-			for (int index = 0; index < values.Length; index++)
-			{
-				if (!this.matchers[index].Matches(values.GetValue(index)))
-				{
-					return false;
-				}
-			}
-
-			return true;
+			this.expression = matcherExpression;
 		}
 
 		void IMatcher.Initialize(Expression matcherExpression)
 		{
-			this.arrayInitExpression = matcherExpression as NewArrayExpression;
-			this.Initialize();
 		}
 
-		private void Initialize()
+		public bool Matches(object value)
 		{
-			if (this.arrayInitExpression != null)
+			var valueExpression = value as Expression;
+			if (value == null)
 			{
-				this.matchers = this.arrayInitExpression.Expressions
-					.Select(e => MatcherFactory.CreateMatcher(e, false)).ToArray();
+				return false;
 			}
-			else
-			{
-				this.matchers = new IMatcher[0];
-			}
+
+			return ExpressionComparer.Default.Equals(this.expression, valueExpression);
 		}
 	}
 }

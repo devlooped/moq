@@ -45,7 +45,7 @@ using System.Globalization;
 using System.Linq;
 using System.Collections.Generic;
 
-namespace Moq
+namespace Moq.Matchers
 {
 	internal class ConstantMatcher : IMatcher
 	{

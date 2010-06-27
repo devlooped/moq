@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Linq.Expressions;
 using System.Text.RegularExpressions;
+using Moq.Matchers;
 using Xunit;
 
 namespace Moq.Tests

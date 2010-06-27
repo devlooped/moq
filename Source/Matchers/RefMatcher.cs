@@ -41,18 +41,22 @@
 using System;
 using System.Linq.Expressions;
 
-namespace Moq
+namespace Moq.Matchers
 {
 	internal class RefMatcher : IMatcher
 	{
-		Func<object, bool> equals;
+		private Func<object, bool> equals;
 
 		public RefMatcher(object reference)
 		{
 			if (reference != null && reference.GetType().IsValueType)
-				equals = value => Object.Equals(reference, value);
+			{
+				equals = value => object.Equals(reference, value);
+			}
 			else
-				equals = value => Object.ReferenceEquals(reference, value);
+			{
+				equals = value => object.ReferenceEquals(reference, value);
+			}
 		}
 
 		public bool Matches(object value)

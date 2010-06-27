@@ -62,6 +62,8 @@
     <Compile Include="Language\ISetupConditionResult.cs" />
     <Compile Include="Linq\FluentMockVisitor.cs" />
     <Compile Include="Linq\MockSetupsBuilder.cs" />
+    <Compile Include="Matchers\ExpressionComparer.cs" />
+    <Compile Include="Matchers\ExpressionMatcher.cs" />
     <Compile Include="MatchExpression.PreV4.cs" Condition=" '$(TargetFrameworkVersion)' != 'v4.0'" />
     <Compile Include="MatchExpression.cs" Condition=" '$(TargetFrameworkVersion)' == 'v4.0'" />
     <Compile Include="EmptyDefaultValueProvider.cs" />

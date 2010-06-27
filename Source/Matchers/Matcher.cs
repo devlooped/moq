@@ -40,11 +40,11 @@
 
 using System.Linq.Expressions;
 
-namespace Moq
+namespace Moq.Matchers
 {
 	internal class Matcher : IMatcher
 	{
-		Match match;
+		private Match match;
 
 		public Matcher(Match match)
 		{
