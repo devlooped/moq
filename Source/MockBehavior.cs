@@ -51,7 +51,12 @@ namespace Moq
 		/// an exception for invocations that don't have a 
 		/// corresponding setup.
 		/// </summary>
-		Strict, 
+		/// <value>
+		/// Causes the mock to always throw 
+		/// an exception for invocations that don't have a 
+		/// corresponding setup.
+		/// </value>
+		Strict,
 		/// <summary>
 		/// Will never throw exceptions, returning default  
 		/// values when necessary (null for reference types, 

@@ -225,11 +225,13 @@ namespace Moq
 		#endregion
 
 		#region When
+
 		/// <include file='Mock.Generic.xdoc' path='docs/doc[@for="Mock{T}.When"]/*'/>
 		public ISetupConditionResult<T> When(Func<bool> condition)
 		{
 			return new ConditionalContext<T>(this, condition);
 		}
+
 		#endregion
 
 		#region Verify

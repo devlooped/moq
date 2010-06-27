@@ -50,6 +50,7 @@ namespace Moq
 				{
 					this.NextStep();
 				}
+
 				return c;
 			});
 		}

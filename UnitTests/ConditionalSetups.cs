@@ -8,13 +8,13 @@ namespace Moq.Tests
 		[Fact]
 		public void Lang()
 		{
-			var m = new Mock<IFoo>();
+			var mock = new Mock<IFoo>();
 
-			m.When(() => true)
+			mock.When(() => true)
 				.Setup(x => x.M1())
 				.Returns("bar");
 
-			m.When(() => true)
+			mock.When(() => true)
 				.Setup(x => x.M2());
 		}
 

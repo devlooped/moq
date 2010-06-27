@@ -193,6 +193,7 @@
     </None>
     <None Include="Mock.Generic.xdoc">
       <DependentUpon>Mock.Generic.cs</DependentUpon>
+      <SubType>Designer</SubType>
     </None>
     <None Include="Mock.xdoc">
       <DependentUpon>Mock.cs</DependentUpon>
