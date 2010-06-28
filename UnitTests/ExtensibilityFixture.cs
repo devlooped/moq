@@ -36,7 +36,7 @@ namespace Moq.Tests
 			mock.Setup(x => x.Save(Orders.Contains(order)))
 				 .Throws<ArgumentException>();
 
-			Assert.Throws<ArgumentException>(() => mock.Object.Save(new [] { order }));
+			Assert.Throws<ArgumentException>(() => mock.Object.Save(new[] { order }));
 		}
 
 		[Fact]

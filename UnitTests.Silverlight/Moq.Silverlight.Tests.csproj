@@ -35,7 +35,8 @@
     <DebugType>full</DebugType>
     <Optimize>false</Optimize>
     <OutputPath>bin\Debug\</OutputPath>
-    <DefineConstants>DEBUG;TRACE;SILVERLIGHT</DefineConstants>
+    <DefineConstants Condition=" '$(TargetFrameworkVersion)' == 'v4.0' ">DEBUG;TRACE;SILVERLIGHT</DefineConstants>
+    <DefineConstants Condition=" '$(TargetFrameworkVersion)' == 'v3.0' ">DEBUG;TRACE;SILVERLIGHT;NET3</DefineConstants>
     <NoStdLib>true</NoStdLib>
     <NoConfig>true</NoConfig>
     <ErrorReport>prompt</ErrorReport>
@@ -46,7 +47,8 @@
     <DebugType>pdbonly</DebugType>
     <Optimize>true</Optimize>
     <OutputPath>bin\Release\</OutputPath>
-    <DefineConstants>TRACE;SILVERLIGHT</DefineConstants>
+    <DefineConstants Condition=" '$(TargetFrameworkVersion)' == 'v4.0' ">TRACE;SILVERLIGHT</DefineConstants>
+    <DefineConstants Condition=" '$(TargetFrameworkVersion)' == 'v3.0' ">TRACE;SILVERLIGHT;NET3</DefineConstants>
     <NoStdLib>true</NoStdLib>
     <NoConfig>true</NoConfig>
     <ErrorReport>prompt</ErrorReport>

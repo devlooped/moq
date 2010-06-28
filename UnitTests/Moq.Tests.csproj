@@ -21,7 +21,8 @@
     <DebugType>full</DebugType>
     <Optimize>false</Optimize>
     <OutputPath>bin\Debug\</OutputPath>
-    <DefineConstants>TRACE;DEBUG;DESKTOP</DefineConstants>
+    <DefineConstants Condition=" '$(TargetFrameworkVersion)' == 'v4.0' ">TRACE;DEBUG;DESKTOP</DefineConstants>
+    <DefineConstants Condition=" '$(TargetFrameworkVersion)' == 'v3.5' ">TRACE;DEBUG;DESKTOP;NET3</DefineConstants>
     <ErrorReport>prompt</ErrorReport>
     <WarningLevel>4</WarningLevel>
     <CodeAnalysisRuleSet>AllRules.ruleset</CodeAnalysisRuleSet>
@@ -30,7 +31,8 @@
     <DebugType>full</DebugType>
     <Optimize>true</Optimize>
     <OutputPath>bin\Release\</OutputPath>
-    <DefineConstants>TRACE;DESKTOP</DefineConstants>
+    <DefineConstants Condition=" '$(TargetFrameworkVersion)' == 'v4.0' ">TRACE;DESKTOP</DefineConstants>
+    <DefineConstants Condition=" '$(TargetFrameworkVersion)' == 'v3.5' ">TRACE;DESKTOP;NET3</DefineConstants>
     <ErrorReport>prompt</ErrorReport>
     <WarningLevel>4</WarningLevel>
     <DebugSymbols>true</DebugSymbols>

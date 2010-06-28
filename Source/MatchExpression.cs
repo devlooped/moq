@@ -45,12 +45,17 @@ namespace Moq
 {
 	internal class MatchExpression : Expression
 	{
+#if NET3
+		public MatchExpression(Match match)
+			: base(ExpressionType.Call, typeof(Match))
+		{
+			this.Match = match;
+		}
+#else
 		public MatchExpression(Match match)
 		{
 			this.Match = match;
 		}
-
-		public Match Match { get; private set; }
 
 		public override ExpressionType NodeType
 		{
@@ -61,5 +66,8 @@ namespace Moq
 		{
 			get { return typeof(Match); }
 		}
+#endif
+
+		public Match Match { get; private set; }
 	}
 }

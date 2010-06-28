@@ -6,6 +6,7 @@ namespace Moq.Tests
 {
 	public class QueryableMocksFixture
 	{
+#if !(NET3 && SILVERLIGHT)
 		[Fact]
 		public void ShouldSupportReturningMultipleMocks()
 		{
@@ -22,6 +23,7 @@ namespace Moq.Tests
 			Assert.Equal(target.Foo.Find("1").Baz("hello").Value, 1);
 			Assert.Equal(target.Bar.Id, "A");
 		}
+#endif
 
 		[Fact]
 		public void ShouldSupportMultipleSetups()

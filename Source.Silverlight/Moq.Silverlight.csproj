@@ -31,6 +31,8 @@
     <Optimize>false</Optimize>
     <OutputPath>bin\Debug\</OutputPath>
     <DefineConstants>TRACE;DEBUG;SILVERLIGHT</DefineConstants>
+    <DefineConstants Condition=" '$(TargetFrameworkVersion)' == 'v4.0' ">TRACE;DEBUG;SILVERLIGHT</DefineConstants>
+    <DefineConstants Condition=" '$(TargetFrameworkVersion)' == 'v3.0' ">TRACE;DEBUG;SILVERLIGHT;NET3</DefineConstants>
     <NoStdLib>true</NoStdLib>
     <NoConfig>true</NoConfig>
     <ErrorReport>prompt</ErrorReport>
@@ -42,7 +44,8 @@
     <DebugType>pdbonly</DebugType>
     <Optimize>true</Optimize>
     <OutputPath>bin\Release\</OutputPath>
-    <DefineConstants>TRACE;SILVERLIGHT</DefineConstants>
+    <DefineConstants Condition=" '$(TargetFrameworkVersion)' == 'v4.0' ">TRACE;SILVERLIGHT</DefineConstants>
+    <DefineConstants Condition=" '$(TargetFrameworkVersion)' == 'v3.0' ">TRACE;SILVERLIGHT;NET3</DefineConstants>
     <NoStdLib>true</NoStdLib>
     <NoConfig>true</NoConfig>
     <ErrorReport>prompt</ErrorReport>
@@ -231,10 +234,7 @@
     <Compile Include="..\Source\Matchers\PredicateMatcher.cs">
       <Link>Matchers\PredicateMatcher.cs</Link>
     </Compile>
-    <Compile Include="..\Source\MatchExpression.PreV4.cs" Condition=" '$(TargetFrameworkVersion)' != 'v4.0'">
-      <Link>MatchExpression.PreV4.cs</Link>
-    </Compile>
-    <Compile Include="..\Source\MatchExpression.cs" Condition=" '$(TargetFrameworkVersion)' == 'v4.0'">
+    <Compile Include="..\Source\MatchExpression.cs">
       <Link>MatchExpression.cs</Link>
     </Compile>
     <Compile Include="..\Source\MemberInfoExtensions.cs">
@@ -252,10 +252,10 @@
     <Compile Include="..\Source\MethodCallReturn.Generated.cs">
       <Link>MethodCallReturn.Generated.cs</Link>
     </Compile>
-    <Compile Include="..\Source\Microsoft\Delegates.cs" Condition=" '$(TargetFrameworkVersion)' != 'v4.0'">
+    <Compile Include="..\Source\Microsoft\Delegates.cs">
       <Link>Microsoft\Delegates.cs</Link>
     </Compile>
-    <Compile Include="..\Source\Microsoft\ExpressionVisitor.cs" Condition=" '$(TargetFrameworkVersion)' != 'v4.0'">
+    <Compile Include="..\Source\Microsoft\ExpressionVisitor.cs">
       <Link>Microsoft\ExpressionVisitor.cs</Link>
     </Compile>
     <Compile Include="..\Source\Mock.cs">

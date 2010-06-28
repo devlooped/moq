@@ -21,7 +21,8 @@
     <DebugType>full</DebugType>
     <Optimize>false</Optimize>
     <OutputPath>bin\Debug\</OutputPath>
-    <DefineConstants>TRACE;DEBUG;DESKTOP</DefineConstants>
+    <DefineConstants Condition=" '$(TargetFrameworkVersion)' == 'v4.0' ">TRACE;DEBUG;DESKTOP</DefineConstants>
+    <DefineConstants Condition=" '$(TargetFrameworkVersion)' == 'v3.5' ">TRACE;DEBUG;DESKTOP;NET3</DefineConstants>
     <ErrorReport>prompt</ErrorReport>
     <WarningLevel>4</WarningLevel>
     <DocumentationFile>bin\Debug\Moq.xml</DocumentationFile>
@@ -33,7 +34,8 @@
     <DebugType>full</DebugType>
     <Optimize>true</Optimize>
     <OutputPath>bin\Release\</OutputPath>
-    <DefineConstants>TRACE;CODE_ANALYSIS</DefineConstants>
+    <DefineConstants Condition=" '$(TargetFrameworkVersion)' == 'v4.0' ">TRACE;CODE_ANALYSIS</DefineConstants>
+    <DefineConstants Condition=" '$(TargetFrameworkVersion)' == 'v3.5' ">TRACE;CODE_ANALYSIS;NET3</DefineConstants>
     <ErrorReport>prompt</ErrorReport>
     <WarningLevel>4</WarningLevel>
     <DocumentationFile>bin\Release\Moq.xml</DocumentationFile>
@@ -64,8 +66,7 @@
     <Compile Include="Linq\MockSetupsBuilder.cs" />
     <Compile Include="Matchers\ExpressionComparer.cs" />
     <Compile Include="Matchers\ExpressionMatcher.cs" />
-    <Compile Include="MatchExpression.PreV4.cs" Condition=" '$(TargetFrameworkVersion)' != 'v4.0'" />
-    <Compile Include="MatchExpression.cs" Condition=" '$(TargetFrameworkVersion)' == 'v4.0'" />
+    <Compile Include="MatchExpression.cs" />
     <Compile Include="EmptyDefaultValueProvider.cs" />
     <Compile Include="ExpressionStringBuilder.cs" />
     <Compile Include="Language\ICallback.cs">
@@ -93,12 +94,12 @@
       <DesignTime>True</DesignTime>
       <DependentUpon>MethodCallReturn.tt</DependentUpon>
     </Compile>
-    <Compile Include="Microsoft\Delegates.cs" Condition=" '$(TargetFrameworkVersion)' != 'v4.0'">
+    <Compile Include="Microsoft\Delegates.cs">
       <AutoGen>True</AutoGen>
       <DesignTime>True</DesignTime>
       <DependentUpon>Delegates.tt</DependentUpon>
     </Compile>
-    <Compile Include="Microsoft\ExpressionVisitor.cs" Condition=" '$(TargetFrameworkVersion)' != 'v4.0'" />
+    <Compile Include="Microsoft\ExpressionVisitor.cs" />
     <Compile Include="MockSequence.cs" />
     <Compile Include="Obsolete\IOccurrence.cs" />
     <Compile Include="Obsolete\MatcherAttribute.cs" />
@@ -187,7 +188,7 @@
       <Generator>TextTemplatingFileGenerator</Generator>
       <LastGenOutput>MethodCallReturn.Generated.cs</LastGenOutput>
     </None>
-    <None Include="Microsoft\Delegates.tt" Condition=" '$(TargetFrameworkVersion)' != 'v4.0'">
+    <None Include="Microsoft\Delegates.tt">
       <Generator>TextTemplatingFileGenerator</Generator>
       <LastGenOutput>Delegates.cs</LastGenOutput>
     </None>

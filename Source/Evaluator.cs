@@ -70,12 +70,7 @@ namespace Moq
 		/// <returns>A new tree with sub-trees evaluated and replaced.</returns>
 		public static Expression PartialEval(Expression expression)
 		{
-			return PartialEval(expression, Evaluator.CanBeEvaluatedLocally);
-		}
-
-		private static bool CanBeEvaluatedLocally(Expression expression)
-		{
-			return expression.NodeType != ExpressionType.Parameter;
+			return PartialEval(expression, e => e.NodeType != ExpressionType.Parameter);
 		}
 
 		/// <summary>
@@ -84,9 +79,9 @@ namespace Moq
 		private class SubtreeEvaluator : ExpressionVisitor
 		{
 #if SILVERLIGHT
-			List<Expression> candidates;
+			private List<Expression> candidates;
 #else
-			HashSet<Expression> candidates;
+			private HashSet<Expression> candidates;
 #endif
 
 #if SILVERLIGHT
@@ -132,15 +127,15 @@ namespace Moq
 		/// Performs bottom-up analysis to determine which nodes can possibly
 		/// be part of an evaluated sub-tree.
 		/// </summary>
-		class Nominator : ExpressionVisitor
+		private class Nominator : ExpressionVisitor
 		{
-			Func<Expression, bool> fnCanBeEvaluated;
+			private Func<Expression, bool> fnCanBeEvaluated;
 #if SILVERLIGHT
-			List<Expression> candidates;
+			private List<Expression> candidates;
 #else
-			HashSet<Expression> candidates;
+			private HashSet<Expression> candidates;
 #endif
-			bool cannotBeEvaluated;
+			private bool cannotBeEvaluated;
 
 			internal Nominator(Func<Expression, bool> fnCanBeEvaluated)
 			{
@@ -178,8 +173,10 @@ namespace Moq
 							this.cannotBeEvaluated = true;
 						}
 					}
+
 					this.cannotBeEvaluated |= saveCannotBeEvaluated;
 				}
+
 				return expression;
 			}
 		}

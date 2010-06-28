@@ -2,6 +2,7 @@
 <#@ output extension=".cs" #>
 <#@ Assembly Name="System.Core" #>
 <#@ Import Namespace="System.Linq" #>
+#if NET3
 using System.Diagnostics.CodeAnalysis;
 
 namespace System
@@ -61,4 +62,5 @@ for (var typeCount = GenericTypeMin; typeCount <= GenericTypeMax; typeCount++)
 }
 #>
 }
+#endif
 <#@ Include File="..\Includes\GenericTypeParameters.tt" #>

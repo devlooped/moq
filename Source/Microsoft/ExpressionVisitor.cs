@@ -1,5 +1,6 @@
 // Copyright (c) Microsoft Corporation.  All rights reserved.
 // This source code is made available under the terms of the Microsoft Public License (MS-PL)
+#if NET3
 using System.Collections.Generic;
 using System.Collections.ObjectModel;
 using System.Diagnostics;
@@ -11,9 +12,6 @@ namespace System.Linq.Expressions
 	[DebuggerStepThrough]
 	internal abstract class ExpressionVisitor
 	{
-		private static readonly MethodInfo visitLamdaMethod = typeof(ExpressionVisitor)
-			.GetMethod("VisitLambdaInternal", BindingFlags.NonPublic | BindingFlags.Instance);
-
 		protected ExpressionVisitor()
 		{
 		}
@@ -100,9 +98,7 @@ namespace System.Linq.Expressions
 				case ExpressionType.Call:
 					return this.VisitMethodCall((MethodCallExpression)node);
 				case ExpressionType.Lambda:
-					return (Expression)visitLamdaMethod
-						.MakeGenericMethod(new[] { node.Type })
-						.Invoke(this, new[] { node });
+					return this.VisitLambda((LambdaExpression)node);
 				case ExpressionType.New:
 					return this.VisitNew((NewExpression)node);
 				case ExpressionType.NewArrayInit:
@@ -152,12 +148,6 @@ namespace System.Linq.Expressions
 			return nodes;
 		}
 
-		internal virtual Expression VisitLambdaInternal<T>(Expression<T> node)
-		{
-			// To support Silverlight as it not support reflection over protected methods
-			return this.VisitLambda<T>(node);
-		}
-
 		protected virtual Expression VisitBinary(BinaryExpression node)
 		{
 			Expression left = this.Visit(node.Left);
@@ -197,7 +187,7 @@ namespace System.Linq.Expressions
 			return UpdateInvocation(node, expression, args);
 		}
 
-		protected virtual Expression VisitLambda<T>(Expression<T> node)
+		protected virtual Expression VisitLambda(LambdaExpression node)
 		{
 			var body = this.Visit(node.Body);
 			return UpdateLambda(node, node.Type, body, node.Parameters);
@@ -510,3 +500,4 @@ namespace System.Linq.Expressions
 		}
 	}
 }
+#endif
