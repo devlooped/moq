@@ -6,7 +6,7 @@ namespace Moq.Tests
 {
 	public class QueryableMocksFixture
 	{
-#if !(NET3 && SILVERLIGHT)
+#if !NET3x || !SILVERLIGHT
 		[Fact]
 		public void ShouldSupportReturningMultipleMocks()
 		{

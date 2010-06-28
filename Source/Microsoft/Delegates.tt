@@ -2,7 +2,7 @@
 <#@ output extension=".cs" #>
 <#@ Assembly Name="System.Core" #>
 <#@ Import Namespace="System.Linq" #>
-#if NET3
+#if NET3x
 using System.Diagnostics.CodeAnalysis;
 
 namespace System

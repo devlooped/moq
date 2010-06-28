@@ -134,7 +134,7 @@ namespace Moq
 			return node;
 		}
 
-#if NET3
+#if NET3x
 		protected override Expression VisitLambda(LambdaExpression node)
 #else
 		protected override Expression VisitLambda<T>(Expression<T> node)

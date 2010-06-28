@@ -1,4 +1,4 @@
-﻿#if NET3
+﻿#if NET3x
 using System.Diagnostics.CodeAnalysis;
 
 namespace System

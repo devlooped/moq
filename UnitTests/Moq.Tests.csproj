@@ -10,7 +10,7 @@
     <AppDesignerFolder>Properties</AppDesignerFolder>
     <RootNamespace>Moq.Tests</RootNamespace>
     <AssemblyName>Moq.Tests</AssemblyName>
-    <TargetFrameworkVersion>v4.0</TargetFrameworkVersion>
+    <TargetFrameworkVersion>v3.5</TargetFrameworkVersion>
     <FileAlignment>512</FileAlignment>
     <SignAssembly>true</SignAssembly>
     <AssemblyOriginatorKeyFile>..\Moq.snk</AssemblyOriginatorKeyFile>
@@ -21,8 +21,8 @@
     <DebugType>full</DebugType>
     <Optimize>false</Optimize>
     <OutputPath>bin\Debug\</OutputPath>
-    <DefineConstants Condition=" '$(TargetFrameworkVersion)' == 'v4.0' ">TRACE;DEBUG;DESKTOP</DefineConstants>
-    <DefineConstants Condition=" '$(TargetFrameworkVersion)' == 'v3.5' ">TRACE;DEBUG;DESKTOP;NET3</DefineConstants>
+    <DefineConstants>TRACE;DEBUG;DESKTOP</DefineConstants>
+    <DefineConstants Condition=" '$(TargetFrameworkVersion)' == 'v3.5' ">TRACE;DEBUG;DESKTOP;NET3x</DefineConstants>
     <ErrorReport>prompt</ErrorReport>
     <WarningLevel>4</WarningLevel>
     <CodeAnalysisRuleSet>AllRules.ruleset</CodeAnalysisRuleSet>
@@ -31,8 +31,8 @@
     <DebugType>full</DebugType>
     <Optimize>true</Optimize>
     <OutputPath>bin\Release\</OutputPath>
-    <DefineConstants Condition=" '$(TargetFrameworkVersion)' == 'v4.0' ">TRACE;DESKTOP</DefineConstants>
-    <DefineConstants Condition=" '$(TargetFrameworkVersion)' == 'v3.5' ">TRACE;DESKTOP;NET3</DefineConstants>
+    <DefineConstants>TRACE;DESKTOP</DefineConstants>
+    <DefineConstants Condition=" '$(TargetFrameworkVersion)' == 'v3.5' ">TRACE;DESKTOP;NET3x</DefineConstants>
     <ErrorReport>prompt</ErrorReport>
     <WarningLevel>4</WarningLevel>
     <DebugSymbols>true</DebugSymbols>

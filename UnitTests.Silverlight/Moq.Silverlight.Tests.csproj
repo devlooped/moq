@@ -11,7 +11,7 @@
     <AppDesignerFolder>Properties</AppDesignerFolder>
     <RootNamespace>Moq.Tests</RootNamespace>
     <AssemblyName>Moq.Silverlight.Tests</AssemblyName>
-    <TargetFrameworkVersion>v4.0</TargetFrameworkVersion>
+    <TargetFrameworkVersion>v3.0</TargetFrameworkVersion>
     <SilverlightVersion>$(TargetFrameworkVersion)</SilverlightVersion>
     <SilverlightApplication>true</SilverlightApplication>
     <SupportedCultures>
@@ -35,8 +35,8 @@
     <DebugType>full</DebugType>
     <Optimize>false</Optimize>
     <OutputPath>bin\Debug\</OutputPath>
-    <DefineConstants Condition=" '$(TargetFrameworkVersion)' == 'v4.0' ">DEBUG;TRACE;SILVERLIGHT</DefineConstants>
-    <DefineConstants Condition=" '$(TargetFrameworkVersion)' == 'v3.0' ">DEBUG;TRACE;SILVERLIGHT;NET3</DefineConstants>
+    <DefineConstants>DEBUG;TRACE;SILVERLIGHT</DefineConstants>
+    <DefineConstants Condition=" '$(TargetFrameworkVersion)' == 'v3.0' ">DEBUG;TRACE;SILVERLIGHT;NET3x</DefineConstants>
     <NoStdLib>true</NoStdLib>
     <NoConfig>true</NoConfig>
     <ErrorReport>prompt</ErrorReport>
@@ -47,8 +47,8 @@
     <DebugType>pdbonly</DebugType>
     <Optimize>true</Optimize>
     <OutputPath>bin\Release\</OutputPath>
-    <DefineConstants Condition=" '$(TargetFrameworkVersion)' == 'v4.0' ">TRACE;SILVERLIGHT</DefineConstants>
-    <DefineConstants Condition=" '$(TargetFrameworkVersion)' == 'v3.0' ">TRACE;SILVERLIGHT;NET3</DefineConstants>
+    <DefineConstants>TRACE;SILVERLIGHT</DefineConstants>
+    <DefineConstants Condition=" '$(TargetFrameworkVersion)' == 'v3.0' ">TRACE;SILVERLIGHT;NET3x</DefineConstants>
     <NoStdLib>true</NoStdLib>
     <NoConfig>true</NoConfig>
     <ErrorReport>prompt</ErrorReport>
