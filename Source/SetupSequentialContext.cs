@@ -9,7 +9,7 @@ namespace Moq
 		where TMock : class
 	{
 		private int currentStep;
-		private int countOfExpectations;
+		private int expectationsCount;
 		private Mock<TMock> mock;
 		private Expression<Func<TMock, TResult>> expression;
 
@@ -17,16 +17,14 @@ namespace Moq
 			Mock<TMock> mock,
 			Expression<Func<TMock, TResult>> expression)
 		{
-			currentStep = 0;
-			countOfExpectations = 0;
 			this.mock = mock;
 			this.expression = expression;
 		}
 
 		private ISetup<TMock, TResult> GetSetup()
 		{
-			var expectationStep = countOfExpectations;
-			countOfExpectations++;
+			var expectationStep = this.expectationsCount;
+			this.expectationsCount++;
 
 			return this.mock
 				.When(() => currentStep == expectationStep)
@@ -40,18 +38,18 @@ namespace Moq
 
 		public ISetupSequentialResult<TResult> Returns(TResult value)
 		{
-			EndSetup(GetSetup().Returns(value));
+			this.EndSetup(GetSetup().Returns(value));
 			return this;
 		}
 
 		public void Throws(Exception exception)
 		{
-			GetSetup().Throws(exception);
+			this.GetSetup().Throws(exception);
 		}
 
 		public void Throws<TException>() where TException : Exception, new()
 		{
-			GetSetup().Throws<TException>();
+			this.GetSetup().Throws<TException>();
 		}
 	}
 }

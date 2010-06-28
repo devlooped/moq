@@ -38,8 +38,7 @@ namespace Moq
 		internal ISetupConditionResult<TMock> For<TMock>(Mock<TMock> mock)
 			where TMock : class
 		{
-			var expectationPosition = sequenceLength;
-			sequenceLength++;
+			var expectationPosition = sequenceLength++;
 
 			// HACK assume condition is only
 			// evaluated once. issues to attach callback lately.

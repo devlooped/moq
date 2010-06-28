@@ -47,10 +47,10 @@ namespace Moq
 	public partial class Mock
 	{
 		[Obsolete]
-		internal static SetterMethodCall<T1, TProperty> SetupSet<T1, TProperty>(
+		internal static SetterMethodCall<T, TProperty> SetupSet<T, TProperty>(
 			Mock mock,
-			Expression<Func<T1, TProperty>> expression, TProperty value)
-			where T1 : class
+			Expression<Func<T, TProperty>> expression, TProperty value)
+			where T : class
 		{
 			var prop = expression.ToPropertyInfo();
 			ThrowIfPropertyNotWritable(prop);
@@ -58,7 +58,7 @@ namespace Moq
 			var setter = prop.GetSetMethod();
 			ThrowIfCantOverride(expression, setter);
 
-			var call = new SetterMethodCall<T1, TProperty>(mock, expression, setter, value);
+			var call = new SetterMethodCall<T, TProperty>(mock, expression, setter, value);
 			var targetInterceptor = GetInterceptor(((MemberExpression)expression.Body).Expression, mock);
 
 			targetInterceptor.AddCall(call, SetupKind.PropertySet);

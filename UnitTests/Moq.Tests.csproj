@@ -10,7 +10,7 @@
     <AppDesignerFolder>Properties</AppDesignerFolder>
     <RootNamespace>Moq.Tests</RootNamespace>
     <AssemblyName>Moq.Tests</AssemblyName>
-    <TargetFrameworkVersion>v3.5</TargetFrameworkVersion>
+    <TargetFrameworkVersion>v4.0</TargetFrameworkVersion>
     <FileAlignment>512</FileAlignment>
     <SignAssembly>true</SignAssembly>
     <AssemblyOriginatorKeyFile>..\Moq.snk</AssemblyOriginatorKeyFile>
@@ -67,7 +67,7 @@
   </ItemGroup>
   <ItemGroup>
     <Compile Include="AsInterfaceFixture.cs" />
-    <Compile Include="ConditionalSetups.cs" />
+    <Compile Include="ConditionalSetupFixture.cs" />
     <Compile Include="CustomMatcherFixture.cs" />
     <Compile Include="ExtensionsFixture.cs" />
     <Compile Include="MockSequenceFixture.cs" />

@@ -59,14 +59,14 @@ namespace Moq
 		{
 		}
 
-		public SetterMethodCall(Mock mock, Expression originalExpression, MethodInfo method, Expression value)
-			: base(mock, null, originalExpression, method, new[] { value })
+		public SetterMethodCall(Mock mock, Func<bool> condition, Expression originalExpression, MethodInfo method, Expression value)
+			: base(mock, condition, originalExpression, method, new[] { value })
 		{
 		}
 
 		public ICallbackResult Callback(Action<TProperty> callback)
 		{
-			SetCallbackWithArguments(callback);
+			this.SetCallbackWithArguments(callback);
 			return this;
 		}
 	}

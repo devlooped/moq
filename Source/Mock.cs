@@ -300,8 +300,7 @@ namespace Moq
 		{
 			Interceptor targetInterceptor = null;
 			Expression expression = null;
-			var expected = SetupSetImpl<T, MethodCall<T>>(mock, setterExpression,
-				(m, expr, method, value) =>
+			var expected = SetupSetImpl<T, MethodCall<T>>(mock, setterExpression, (m, expr, method, value) =>
 				{
 					targetInterceptor = m.Interceptor;
 					expression = expr;
@@ -380,8 +379,8 @@ namespace Moq
 
 		#region Setup
 
-		internal static MethodCall<T1> Setup<T1>(Mock mock, Expression<Action<T1>> expression, Func<bool> condition)
-			where T1 : class
+		internal static MethodCall<T> Setup<T>(Mock mock, Expression<Action<T>> expression, Func<bool> condition)
+			where T : class
 		{
 			return PexProtector.Invoke(() =>
 			{
@@ -391,7 +390,7 @@ namespace Moq
 
 				ThrowIfNotMember(expression, method);
 				ThrowIfCantOverride(expression, method);
-				var call = new MethodCall<T1>(mock, condition, expression, method, args);
+				var call = new MethodCall<T>(mock, condition, expression, method, args);
 
 				var targetInterceptor = GetInterceptor(methodCall.Object, mock);
 
@@ -401,14 +400,17 @@ namespace Moq
 			});
 		}
 
-		internal static MethodCallReturn<T1, TResult> Setup<T1, TResult>(Mock mock, Expression<Func<T1, TResult>> expression, Func<bool> condition)
-			where T1 : class
+		internal static MethodCallReturn<T, TResult> Setup<T, TResult>(
+			Mock mock,
+			Expression<Func<T, TResult>> expression,
+			Func<bool> condition)
+			where T : class
 		{
 			return PexProtector.Invoke(() =>
 			{
 				if (expression.IsProperty())
 				{
-					return SetupGet(mock, expression);
+					return SetupGet(mock, expression, condition);
 				}
 
 				var methodCall = expression.ToMethodCall();
@@ -417,7 +419,7 @@ namespace Moq
 
 				ThrowIfNotMember(expression, method);
 				ThrowIfCantOverride(expression, method);
-				var call = new MethodCallReturn<T1, TResult>(mock, condition, expression, method, args);
+				var call = new MethodCallReturn<T, TResult>(mock, condition, expression, method, args);
 
 				var targetInterceptor = GetInterceptor(methodCall.Object, mock);
 
@@ -427,17 +429,18 @@ namespace Moq
 			});
 		}
 
-		internal static MethodCallReturn<T1, TProperty> SetupGet<T1, TProperty>(
+		internal static MethodCallReturn<T, TProperty> SetupGet<T, TProperty>(
 			Mock mock,
-			Expression<Func<T1, TProperty>> expression)
-			where T1 : class
+			Expression<Func<T, TProperty>> expression,
+			Func<bool> condition)
+			where T : class
 		{
 			return PexProtector.Invoke(() =>
 			{
 				if (expression.IsPropertyIndexer())
 				{
 					// Treat indexers as regular method invocations.
-					return Setup<T1, TProperty>(mock, expression, null);
+					return Setup<T, TProperty>(mock, expression, condition);
 				}
 
 				var prop = expression.ToPropertyInfo();
@@ -446,7 +449,7 @@ namespace Moq
 				var propGet = prop.GetGetMethod(true);
 				ThrowIfCantOverride(expression, propGet);
 
-				var call = new MethodCallReturn<T1, TProperty>(mock, null, expression, propGet, new Expression[0]);
+				var call = new MethodCallReturn<T, TProperty>(mock, condition, expression, propGet, new Expression[0]);
 				// Directly casting to MemberExpression is fine as ToPropertyInfo would throw if it wasn't
 				var targetInterceptor = GetInterceptor(((MemberExpression)expression.Body).Expression, mock);
 
@@ -456,42 +459,47 @@ namespace Moq
 			});
 		}
 
-		internal static SetterMethodCall<T1, TProperty> SetupSet<T1, TProperty>(Mock<T1> mock, Action<T1> setterExpression)
-			where T1 : class
+		internal static SetterMethodCall<T, TProperty> SetupSet<T, TProperty>(
+			Mock<T> mock,
+			Action<T> setterExpression,
+			Func<bool> condition)
+			where T : class
 		{
 			return PexProtector.Invoke(() =>
 			{
-				return SetupSetImpl<T1, SetterMethodCall<T1, TProperty>>(mock, setterExpression,
+				return SetupSetImpl<T, SetterMethodCall<T, TProperty>>(
+					mock,
+					setterExpression,
 					(m, expr, method, value) =>
 					{
-						var call = new SetterMethodCall<T1, TProperty>(m, expr, method, value[0]);
+						var call = new SetterMethodCall<T, TProperty>(m, condition, expr, method, value[0]);
 						m.Interceptor.AddCall(call, SetupKind.PropertySet);
 						return call;
 					});
 			});
 		}
 
-		internal static MethodCall<T1> SetupSet<T1>(Mock<T1> mock, Action<T1> setterExpression)
-			where T1 : class
+		internal static MethodCall<T> SetupSet<T>(Mock<T> mock, Action<T> setterExpression, Func<bool> condition)
+			where T : class
 		{
 			return PexProtector.Invoke(() =>
 			{
-				return SetupSetImpl<T1, MethodCall<T1>>(
+				return SetupSetImpl<T, MethodCall<T>>(
 					mock,
 					setterExpression,
 					(m, expr, method, values) =>
 					{
-						var call = new MethodCall<T1>(m, null, expr, method, values);
+						var call = new MethodCall<T>(m, condition, expr, method, values);
 						m.Interceptor.AddCall(call, SetupKind.PropertySet);
 						return call;
 					});
 			});
 		}
 
-		internal static SetterMethodCall<T1, TProperty> SetupSet<T1, TProperty>(
+		internal static SetterMethodCall<T, TProperty> SetupSet<T, TProperty>(
 			Mock mock,
-			Expression<Func<T1, TProperty>> expression)
-			where T1 : class
+			Expression<Func<T, TProperty>> expression)
+			where T : class
 		{
 			var prop = expression.ToPropertyInfo();
 			ThrowIfPropertyNotWritable(prop);
@@ -499,7 +507,7 @@ namespace Moq
 			var propSet = prop.GetSetMethod(true);
 			ThrowIfCantOverride(expression, propSet);
 
-			var call = new SetterMethodCall<T1, TProperty>(mock, expression, propSet);
+			var call = new SetterMethodCall<T, TProperty>(mock, expression, propSet);
 			var targetInterceptor = GetInterceptor(((MemberExpression)expression.Body).Expression, mock);
 
 			targetInterceptor.AddCall(call, SetupKind.PropertySet);
@@ -507,11 +515,11 @@ namespace Moq
 			return call;
 		}
 
-		private static TCall SetupSetImpl<T1, TCall>(
-			Mock<T1> mock,
-			Action<T1> setterExpression,
+		private static TCall SetupSetImpl<T, TCall>(
+			Mock<T> mock,
+			Action<T> setterExpression,
 			Func<Mock, Expression, MethodInfo, Expression[], TCall> callFactory)
-			where T1 : class
+			where T : class
 			where TCall : MethodCall
 		{
 			using (var context = new FluentMockContext())
@@ -568,9 +576,13 @@ namespace Moq
 					// type (i.e. prop is int?, but you use It.IsAny<int>())
 					// add a cast.
 					if (last.Match.RenderExpression.Type != propertyType)
+					{
 						values[valueIndex] = Expression.Convert(last.Match.RenderExpression, propertyType);
+					}
 					else
+					{
 						values[valueIndex] = last.Match.RenderExpression;
+					}
 
 					matchers[valueIndex] = new MatchExpression(last.Match);
 

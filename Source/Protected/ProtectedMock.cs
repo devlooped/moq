@@ -81,7 +81,7 @@ namespace Moq.Protected
 			{
 				ThrowIfPublicProperty(property);
 				// TODO should consider property indexers
-				return Mock.SetupGet(mock, GetMemberAccess<TResult>(property));
+				return Mock.SetupGet(mock, GetMemberAccess<TResult>(property), null);
 			}
 
 			var method = GetMethod(methodName, args);
@@ -99,7 +99,7 @@ namespace Moq.Protected
 			var property = GetProperty(propertyName);
 			ThrowIfMemberMissing(propertyName, property);
 			ThrowIfPublicProperty(property);
-			return Mock.SetupGet(mock, GetMemberAccess<TProperty>(property));
+			return Mock.SetupGet(mock, GetMemberAccess<TProperty>(property), null);
 		}
 
 		public ISetupSetter<T, TProperty> SetupSet<TProperty>(string propertyName, object value)
@@ -110,7 +110,7 @@ namespace Moq.Protected
 			ThrowIfMemberMissing(propertyName, property);
 			ThrowIfPublicProperty(property);
 
-			return Mock.SetupSet<T, TProperty>(mock, GetSetterExpression(property, ItExpr.IsAny<TProperty>()));
+			return Mock.SetupSet<T, TProperty>(mock, GetSetterExpression(property, ItExpr.IsAny<TProperty>()), null);
 		}
 
 		#endregion

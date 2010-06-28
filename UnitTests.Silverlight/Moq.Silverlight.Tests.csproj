@@ -11,7 +11,7 @@
     <AppDesignerFolder>Properties</AppDesignerFolder>
     <RootNamespace>Moq.Tests</RootNamespace>
     <AssemblyName>Moq.Silverlight.Tests</AssemblyName>
-    <TargetFrameworkVersion>v3.0</TargetFrameworkVersion>
+    <TargetFrameworkVersion>v4.0</TargetFrameworkVersion>
     <SilverlightVersion>$(TargetFrameworkVersion)</SilverlightVersion>
     <SilverlightApplication>true</SilverlightApplication>
     <SupportedCultures>
@@ -108,8 +108,8 @@
     <Compile Include="..\UnitTests\CallbacksFixture.cs">
       <Link>CallbacksFixture.cs</Link>
     </Compile>
-    <Compile Include="..\UnitTests\ConditionalSetups.cs">
-      <Link>ConditionalSetups.cs</Link>
+    <Compile Include="..\UnitTests\ConditionalSetupFixture.cs">
+      <Link>ConditionalSetupFixture.cs</Link>
     </Compile>
     <Compile Include="..\UnitTests\Demo.cs">
       <Link>Demo.cs</Link>
