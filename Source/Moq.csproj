@@ -60,6 +60,24 @@
   </ItemGroup>
   <ItemGroup>
     <Compile Include="ConditionalContext.cs" />
+    <Compile Include="Language\ICallback.cs" />
+    <Compile Include="Language\ICallback.Generated.cs">
+      <AutoGen>True</AutoGen>
+      <DesignTime>True</DesignTime>
+      <DependentUpon>ICallback.tt</DependentUpon>
+    </Compile>
+    <Compile Include="Language\IRaise.cs" />
+    <Compile Include="Language\IRaise.Generated.cs">
+      <AutoGen>True</AutoGen>
+      <DesignTime>True</DesignTime>
+      <DependentUpon>IRaise.tt</DependentUpon>
+    </Compile>
+    <Compile Include="Language\IReturns.cs" />
+    <Compile Include="Language\IReturns.Generated.cs">
+      <AutoGen>True</AutoGen>
+      <DesignTime>True</DesignTime>
+      <DependentUpon>IReturns.tt</DependentUpon>
+    </Compile>
     <Compile Include="Language\ISetupSequentialResult.cs" />
     <Compile Include="Language\ISetupConditionResult.cs" />
     <Compile Include="Linq\FluentMockVisitor.cs" />
@@ -69,21 +87,6 @@
     <Compile Include="MatchExpression.cs" />
     <Compile Include="EmptyDefaultValueProvider.cs" />
     <Compile Include="ExpressionStringBuilder.cs" />
-    <Compile Include="Language\ICallback.cs">
-      <AutoGen>True</AutoGen>
-      <DesignTime>True</DesignTime>
-      <DependentUpon>ICallback.tt</DependentUpon>
-    </Compile>
-    <Compile Include="Language\IRaise.cs">
-      <AutoGen>True</AutoGen>
-      <DesignTime>True</DesignTime>
-      <DependentUpon>IRaise.tt</DependentUpon>
-    </Compile>
-    <Compile Include="Language\IReturns.cs">
-      <AutoGen>True</AutoGen>
-      <DesignTime>True</DesignTime>
-      <DependentUpon>IReturns.tt</DependentUpon>
-    </Compile>
     <Compile Include="MethodCall.Generated.cs">
       <AutoGen>True</AutoGen>
       <DesignTime>True</DesignTime>
@@ -171,15 +174,15 @@
     </None>
     <None Include="Language\ICallback.tt">
       <Generator>TextTemplatingFileGenerator</Generator>
-      <LastGenOutput>ICallback.cs</LastGenOutput>
+      <LastGenOutput>ICallback.Generated.cs</LastGenOutput>
     </None>
     <None Include="Language\IRaise.tt">
       <Generator>TextTemplatingFileGenerator</Generator>
-      <LastGenOutput>IRaise.cs</LastGenOutput>
+      <LastGenOutput>IRaise.Generated.cs</LastGenOutput>
     </None>
     <None Include="Language\IReturns.tt">
       <Generator>TextTemplatingFileGenerator</Generator>
-      <LastGenOutput>IReturns.cs</LastGenOutput>
+      <LastGenOutput>IReturns.Generated.cs</LastGenOutput>
     </None>
     <None Include="Match.xdoc">
       <DependentUpon>Match.cs</DependentUpon>

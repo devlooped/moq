@@ -153,12 +153,16 @@ namespace Moq.Linq
 		{
 			// TODO: throw if target is a static class?
 			var sourceType = targetObject.Type;
-			var propertyType = ((PropertyInfo)((MemberExpression)left).Member).PropertyType;
+			var property = (PropertyInfo)((MemberExpression)left).Member;
+
+			if (!property.CanWrite)
+				return ConvertToSetup(targetObject, left, right);
+
+			var propertyType = property.PropertyType;
 
 			// where foo.Name == "bar"
 			// becomes:	
 			// where Mock.Get(foo).SetupProperty(mock => mock.Name, "bar") != null
-			//Mock<System.ComponentModel.IComponent> m;
 
 			// This will get up to and including the Mock.Get(foo).Setup(mock => mock.Name) call.
 			var propertySetup = FluentMockVisitor.Accept(left);

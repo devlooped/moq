@@ -1,5 +1,5 @@
 ﻿<#@ template debug="false" hostspecific="false" language="C#" #>
-<#@ output extension=".cs" #>
+<#@ output extension=".Generated.cs" #>
 <#@ Assembly Name="System.Core" #>
 <#@ Import Namespace="System.Linq" #>
 //Copyright (c) 2007. Clarius Consulting, Manas Technology Solutions, InSTEDD
@@ -54,38 +54,6 @@ namespace Moq.Language
 	[EditorBrowsable(EditorBrowsableState.Never)]
 	public interface ICallback : IHideObjectMembers
 	{
-		/// <summary>
-		/// Specifies a callback to invoke when the method is called.
-		/// </summary>
-		/// <param name="action">The callback method to invoke.</param>
-		/// <example>
-		/// The following example specifies a callback to set a boolean 
-		/// value that can be used later:
-		/// <code>
-		/// var called = false;
-		/// mock.Setup(x => x.Execute())
-		///     .Callback(() => called = true);
-		/// </code>
-		/// </example>
-		ICallbackResult Callback(Action action);
-
-		/// <summary>
-		/// Specifies a callback to invoke when the method is called that receives the original arguments.
-		/// </summary>
-		/// <typeparam name="T">The argument type of the invoked method.</typeparam>
-		/// <param name="action">The callback method to invoke.</param>
-		/// <example>
-		/// Invokes the given callback with the concrete invocation argument value. 
-		/// <para>
-		/// Notice how the specific string argument is retrieved by simply declaring 
-		/// it as part of the lambda expression for the callback:
-		/// </para>
-		/// <code>
-		/// mock.Setup(x => x.Execute(It.IsAny&lt;string&gt;()))
-		///     .Callback((string command) => Console.WriteLine(command));
-		/// </code>
-		/// </example>
-		ICallbackResult Callback<T>(Action<T> action);
 <#
 for (var typeCount = 2; typeCount <= GenericTypeMax; typeCount++)
 {
@@ -140,41 +108,6 @@ for (var typeCount = 2; typeCount <= GenericTypeMax; typeCount++)
 	public interface ICallback<TMock, TResult> : IHideObjectMembers
 		where TMock : class
 	{
-		/// <summary>
-		/// Specifies a callback to invoke when the method is called.
-		/// </summary>
-		/// <param name="action">The callback method to invoke.</param>
-		/// <example>
-		/// The following example specifies a callback to set a boolean value that can be used later:
-		/// <code>
-		/// var called = false;
-		/// mock.Setup(x => x.Execute())
-		///     .Callback(() => called = true)
-		///     .Returns(true);
-		/// </code>
-		/// Note that in the case of value-returning methods, after the <c>Callback</c>
-		/// call you can still specify the return value.
-		/// </example>
-		IReturnsThrows<TMock, TResult> Callback(Action action);
- 
-		/// <summary>
-		/// Specifies a callback to invoke when the method is called that receives the original arguments.
-		/// </summary>
-		/// <typeparam name="T">The type of the argument of the invoked method.</typeparam>
-		/// <param name="action">Callback method to invoke.</param>
-		/// <example>
-		/// Invokes the given callback with the concrete invocation argument value.
-		/// <para>
-		/// Notice how the specific string argument is retrieved by simply declaring
-		/// it as part of the lambda expression for the callback:
-		/// </para>
-		/// <code>
-		/// mock.Setup(x => x.Execute(It.IsAny&lt;string&gt;()))
-		///     .Callback(command => Console.WriteLine(command))
-		///     .Returns(true);
-		/// </code>
-		/// </example>
-		IReturnsThrows<TMock, TResult> Callback<T>(Action<T> action);
 <#
 for (var typeCount = 2; typeCount <= GenericTypeMax; typeCount++)
 {
