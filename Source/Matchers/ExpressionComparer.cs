@@ -62,6 +62,11 @@ namespace Moq.Matchers
 				return true;
 			}
 
+			if (x == null || y == null)
+			{
+				return false;
+			}
+
 			if (x.NodeType == y.NodeType)
 			{
 				switch (x.NodeType)
@@ -106,7 +111,7 @@ namespace Moq.Matchers
 					case ExpressionType.Conditional:
 						return this.EqualsConditional((ConditionalExpression)x, (ConditionalExpression)y);
 					case ExpressionType.Constant:
-						return this.EqualsConstant((ConstantExpression)x, (ConstantExpression)y);
+						return EqualsConstant((ConstantExpression)x, (ConstantExpression)y);
 					case ExpressionType.Parameter:
 						return this.EqualsParameter((ParameterExpression)x, (ParameterExpression)y);
 					case ExpressionType.MemberAccess:
@@ -134,10 +139,10 @@ namespace Moq.Matchers
 
 		public int GetHashCode(Expression obj)
 		{
-			return obj.GetHashCode();
+			return obj == null ? 0 : obj.GetHashCode();
 		}
 
-		private bool Equals<T>(ReadOnlyCollection<T> x, ReadOnlyCollection<T> y, Func<T, T, bool> comparer)
+		private static bool Equals<T>(ReadOnlyCollection<T> x, ReadOnlyCollection<T> y, Func<T, T, bool> comparer)
 		{
 			if (x.Count != y.Count)
 			{
@@ -166,31 +171,31 @@ namespace Moq.Matchers
 			return this.Equals(x.Test, y.Test) && this.Equals(x.IfTrue, y.IfTrue) && this.Equals(x.IfFalse, y.IfFalse);
 		}
 
-		private bool EqualsConstant(ConstantExpression x, ConstantExpression y)
+		private static bool EqualsConstant(ConstantExpression x, ConstantExpression y)
 		{
 			return object.Equals(x.Value, y.Value);
 		}
 
 		private bool EqualsElementInit(ElementInit x, ElementInit y)
 		{
-			return x.AddMethod == y.AddMethod && this.Equals(x.Arguments, y.Arguments, this.Equals);
+			return x.AddMethod == y.AddMethod && Equals(x.Arguments, y.Arguments, this.Equals);
 		}
 
 		private bool EqualsInvocation(InvocationExpression x, InvocationExpression y)
 		{
-			return this.Equals(x.Expression, y.Expression) && this.Equals(x.Arguments, y.Arguments, this.Equals);
+			return this.Equals(x.Expression, y.Expression) && Equals(x.Arguments, y.Arguments, this.Equals);
 		}
 
 		private bool EqualsLambda(LambdaExpression x, LambdaExpression y)
 		{
 			return x.GetType() == y.GetType() && this.Equals(x.Body, y.Body) &&
-				this.Equals(x.Parameters, y.Parameters, this.EqualsParameter);
+				Equals(x.Parameters, y.Parameters, this.EqualsParameter);
 		}
 
 		private bool EqualsListInit(ListInitExpression x, ListInitExpression y)
 		{
 			return this.EqualsNew(x.NewExpression, y.NewExpression) &&
-				this.Equals(x.Initializers, y.Initializers, this.EqualsElementInit);
+				Equals(x.Initializers, y.Initializers, this.EqualsElementInit);
 		}
 
 		private bool EqualsMemberAssignment(MemberAssignment x, MemberAssignment y)
@@ -224,33 +229,33 @@ namespace Moq.Matchers
 		private bool EqualsMemberInit(MemberInitExpression x, MemberInitExpression y)
 		{
 			return this.EqualsNew(x.NewExpression, y.NewExpression) &&
-				this.Equals(x.Bindings, y.Bindings, this.EqualsMemberBinding);
+				Equals(x.Bindings, y.Bindings, this.EqualsMemberBinding);
 		}
 
 		private bool EqualsMemberListBinding(MemberListBinding x, MemberListBinding y)
 		{
-			return this.Equals(x.Initializers, y.Initializers, this.EqualsElementInit);
+			return Equals(x.Initializers, y.Initializers, this.EqualsElementInit);
 		}
 
 		private bool EqualsMemberMemberBinding(MemberMemberBinding x, MemberMemberBinding y)
 		{
-			return this.Equals(x.Bindings, y.Bindings, this.EqualsMemberBinding);
+			return Equals(x.Bindings, y.Bindings, this.EqualsMemberBinding);
 		}
 
 		private bool EqualsMethodCall(MethodCallExpression x, MethodCallExpression y)
 		{
 			return x.Method == y.Method && this.Equals(x.Object, y.Object) &&
-				this.Equals(x.Arguments, y.Arguments, this.Equals);
+				Equals(x.Arguments, y.Arguments, this.Equals);
 		}
 
 		private bool EqualsNewArray(NewArrayExpression x, NewArrayExpression y)
 		{
-			return x.Type == y.Type && this.Equals(x.Expressions, y.Expressions, this.Equals);
+			return x.Type == y.Type && Equals(x.Expressions, y.Expressions, this.Equals);
 		}
 
 		private bool EqualsNew(NewExpression x, NewExpression y)
 		{
-			return x.Constructor == y.Constructor && this.Equals(x.Arguments, y.Arguments, this.Equals);
+			return x.Constructor == y.Constructor && Equals(x.Arguments, y.Arguments, this.Equals);
 		}
 
 		private bool EqualsParameter(ParameterExpression x, ParameterExpression y)

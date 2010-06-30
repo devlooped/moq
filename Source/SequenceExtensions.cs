@@ -12,7 +12,7 @@ namespace Moq
 	/// <summary>
 	/// Helper for sequencing return values in the same method.
 	/// </summary>
-	public static class ReturnSequenceExtensions
+	public static class SequenceExtensions
 	{
 		/// <summary>
 		/// Return a sequence of values, once per call.

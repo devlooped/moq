@@ -1,8 +1,4 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using Xunit;
+﻿using Xunit;
 
 namespace Moq.Tests
 {
@@ -13,13 +9,13 @@ namespace Moq.Tests
 		{
 			var a = new Mock<IFoo>(MockBehavior.Strict);
 			var b = new Mock<IFoo>(MockBehavior.Strict);
-			
-			MockSequence t = new MockSequence();
-			a.InSequence(t).Setup(x => x.M(100)).Returns(101);
-			b.InSequence(t).Setup(x => x.M(200)).Returns(201);
 
-			a.Object.M(100);
-			b.Object.M(200);
+			var sequence = new MockSequence();
+			a.InSequence(sequence).Setup(x => x.Do(100)).Returns(101);
+			b.InSequence(sequence).Setup(x => x.Do(200)).Returns(201);
+
+			a.Object.Do(100);
+			b.Object.Do(200);
 		}
 
 		[Fact]
@@ -28,14 +24,11 @@ namespace Moq.Tests
 			var a = new Mock<IFoo>(MockBehavior.Strict);
 			var b = new Mock<IFoo>(MockBehavior.Strict);
 
-			MockSequence t = new MockSequence();
-			a.InSequence(t).Setup(x => x.M(100)).Returns(101);
-			b.InSequence(t).Setup(x => x.M(200)).Returns(201);
+			var sequence = new MockSequence();
+			a.InSequence(sequence).Setup(x => x.Do(100)).Returns(101);
+			b.InSequence(sequence).Setup(x => x.Do(200)).Returns(201);
 
-			Assert.Throws<MockException>(() =>
-			{
-				b.Object.M(200);
-			});
+			Assert.Throws<MockException>(() => b.Object.Do(200));
 		}
 
 		[Fact]
@@ -44,21 +37,15 @@ namespace Moq.Tests
 			var a = new Mock<IFoo>(MockBehavior.Strict);
 			var b = new Mock<IFoo>(MockBehavior.Strict);
 
-			MockSequence t = new MockSequence();
-			a.InSequence(t).Setup(x => x.M(100)).Returns(101);
-			b.InSequence(t).Setup(x => x.M(200)).Returns(201);
+			var sequence = new MockSequence();
+			a.InSequence(sequence).Setup(x => x.Do(100)).Returns(101);
+			b.InSequence(sequence).Setup(x => x.Do(200)).Returns(201);
 
-			Assert.Equal(101, a.Object.M(100));
-			Assert.Equal(201, b.Object.M(200));
+			Assert.Equal(101, a.Object.Do(100));
+			Assert.Equal(201, b.Object.Do(200));
 
-			Assert.Throws<MockException>(() =>
-			{
-				Assert.Equal(101, a.Object.M(100));
-			});
-			Assert.Throws<MockException>(() =>
-			{
-				Assert.Equal(201, b.Object.M(200));
-			});
+			Assert.Throws<MockException>(() => a.Object.Do(100));
+			Assert.Throws<MockException>(() => b.Object.Do(200));
 		}
 
 		[Fact]
@@ -67,23 +54,23 @@ namespace Moq.Tests
 			var a = new Mock<IFoo>(MockBehavior.Strict);
 			var b = new Mock<IFoo>(MockBehavior.Strict);
 
-			MockSequence t = new MockSequence() { Cyclic = true };
-			a.InSequence(t).Setup(x => x.M(100)).Returns(101);
-			b.InSequence(t).Setup(x => x.M(200)).Returns(201);
+			var sequence = new MockSequence { Cyclic = true };
+			a.InSequence(sequence).Setup(x => x.Do(100)).Returns(101);
+			b.InSequence(sequence).Setup(x => x.Do(200)).Returns(201);
 
-			Assert.Equal(101, a.Object.M(100));
-			Assert.Equal(201, b.Object.M(200));
-			
-			Assert.Equal(101, a.Object.M(100));
-			Assert.Equal(201, b.Object.M(200));
+			Assert.Equal(101, a.Object.Do(100));
+			Assert.Equal(201, b.Object.Do(200));
 
-			Assert.Equal(101, a.Object.M(100));
-			Assert.Equal(201, b.Object.M(200));
+			Assert.Equal(101, a.Object.Do(100));
+			Assert.Equal(201, b.Object.Do(200));
+
+			Assert.Equal(101, a.Object.Do(100));
+			Assert.Equal(201, b.Object.Do(200));
 		}
 
 		public interface IFoo
 		{
-			int M(int p);
+			int Do(int arg);
 		}
 	}
 }
