@@ -46,13 +46,8 @@ using System.ComponentModel;
 
 namespace Moq.Language
 {
-	/// <summary>
-	/// Defines the <c>Raises</c> verb.
-	/// </summary>
-	[EditorBrowsable(EditorBrowsableState.Never)]
-	public interface IRaise<T> : IHideObjectMembers
-	{
-<#
+	partial interface IRaise<T>
+	{ <#
 for (var typeCount = 1; typeCount <= GenericTypeMax; typeCount++)
 {
 	var typeList = GetGenericList(typeCount, GenericTypeFormat);

@@ -44,13 +44,8 @@ using Moq.Language.Flow;
 
 namespace Moq.Language
 {
-	/// <summary>
-	/// Defines the <c>Callback</c> verb and overloads.
-	/// </summary>
-	[EditorBrowsable(EditorBrowsableState.Never)]
-	public interface ICallback : IHideObjectMembers
-	{
-
+	partial interface ICallback
+	{ 
 		/// <summary>
 		/// Specifies a callback to invoke when the method is called that receives the original arguments.
 		/// </summary>
@@ -592,13 +587,7 @@ namespace Moq.Language
 		ICallbackResult Callback<T1, T2, T3, T4, T5, T6, T7, T8, T9, T10, T11, T12, T13, T14, T15, T16>(Action<T1, T2, T3, T4, T5, T6, T7, T8, T9, T10, T11, T12, T13, T14, T15, T16> action);
 	}
 
-	/// <summary>
-	/// Defines the <c>Callback</c> verb and overloads for callbacks on
-	/// setups that return a value.
-	/// </summary>
-	/// <typeparam name="TMock">Mocked type.</typeparam>
-	/// <typeparam name="TResult">Type of the return value of the setup.</typeparam>
-	public interface ICallback<TMock, TResult> : IHideObjectMembers
+	partial interface ICallback<TMock, TResult>
 		where TMock : class
 	{
 

@@ -155,8 +155,17 @@
     <Compile Include="..\Source\Language\Flow\ISetup.cs">
       <Link>Language\Flow\ISetup.cs</Link>
     </Compile>
+    <Compile Include="..\Source\Language\ICallback.Generated.cs">
+      <Link>Language\ICallback.Generated.cs</Link>
+    </Compile>
     <Compile Include="..\Source\Language\IRaise.cs">
       <Link>Language\IRaise.cs</Link>
+    </Compile>
+    <Compile Include="..\Source\Language\IRaise.Generated.cs">
+      <Link>Language\IRaise.Generated.cs</Link>
+    </Compile>
+    <Compile Include="..\Source\Language\IReturns.Generated.cs">
+      <Link>Language\IReturns.Generated.cs</Link>
     </Compile>
     <Compile Include="..\Source\Language\ISetupConditionResult.cs">
       <Link>Language\ISetupConditionResult.cs</Link>

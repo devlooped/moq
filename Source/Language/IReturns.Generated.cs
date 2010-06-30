@@ -44,14 +44,7 @@ using Moq.Language.Flow;
 
 namespace Moq.Language
 {
-	/// <summary>
-	/// Defines the <c>Returns</c> verb.
-	/// </summary>
-	/// <typeparam name="TMock">Mocked type.</typeparam>
-	/// <typeparam name="TResult">Type of the return value from the expression.</typeparam>
-	[EditorBrowsable(EditorBrowsableState.Never)]
-	public interface IReturns<TMock, TResult> : IHideObjectMembers
-		where TMock : class
+	partial interface IReturns<TMock, TResult>
 	{ 
 		/// <summary>
 		/// Specifies a function that will calculate the value to return from the method, 

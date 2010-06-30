@@ -42,13 +42,8 @@ using System.ComponentModel;
 
 namespace Moq.Language
 {
-	/// <summary>
-	/// Defines the <c>Raises</c> verb.
-	/// </summary>
-	[EditorBrowsable(EditorBrowsableState.Never)]
-	public interface IRaise<T> : IHideObjectMembers
-	{
-
+	partial interface IRaise<T>
+	{ 
 		/// <summary>
 		/// Specifies the event that will be raised when the setup is matched.
 		/// </summary>

@@ -46,7 +46,7 @@ namespace Moq.Language
 	/// Defines the <c>Raises</c> verb.
 	/// </summary>
 	[EditorBrowsable(EditorBrowsableState.Never)]
-	public interface IRaise<T> : IHideObjectMembers
+	public partial interface IRaise<T> : IHideObjectMembers
 	{
 		/// <summary>
 		/// Specifies the event that will be raised 

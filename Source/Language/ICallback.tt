@@ -48,13 +48,8 @@ using Moq.Language.Flow;
 
 namespace Moq.Language
 {
-	/// <summary>
-	/// Defines the <c>Callback</c> verb and overloads.
-	/// </summary>
-	[EditorBrowsable(EditorBrowsableState.Never)]
-	public interface ICallback : IHideObjectMembers
-	{
-<#
+	partial interface ICallback
+	{ <#
 for (var typeCount = 2; typeCount <= GenericTypeMax; typeCount++)
 {
 	var typeList = GetGenericList(typeCount, GenericTypeFormat);
@@ -99,13 +94,7 @@ for (var typeCount = 2; typeCount <= GenericTypeMax; typeCount++)
 #>
 	}
 
-	/// <summary>
-	/// Defines the <c>Callback</c> verb and overloads for callbacks on
-	/// setups that return a value.
-	/// </summary>
-	/// <typeparam name="TMock">Mocked type.</typeparam>
-	/// <typeparam name="TResult">Type of the return value of the setup.</typeparam>
-	public interface ICallback<TMock, TResult> : IHideObjectMembers
+	partial interface ICallback<TMock, TResult>
 		where TMock : class
 	{
 <#
