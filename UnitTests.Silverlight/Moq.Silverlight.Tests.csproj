@@ -123,6 +123,15 @@
     <Compile Include="..\UnitTests\ExtensibilityFixture.cs">
       <Link>ExtensibilityFixture.cs</Link>
     </Compile>
+    <Compile Include="..\UnitTests\Linq\QueryableMocksFixture.cs">
+      <Link>Linq\QueryableMocksFixture.cs</Link>
+    </Compile>
+    <Compile Include="..\UnitTests\Linq\SupportedQuerying.cs">
+      <Link>Linq\SupportedQuerying.cs</Link>
+    </Compile>
+    <Compile Include="..\UnitTests\Linq\UnsupportedQuerying.cs">
+      <Link>Linq\UnsupportedQuerying.cs</Link>
+    </Compile>
     <Compile Include="..\UnitTests\MatcherAttributeFixture.cs">
       <Link>MatcherAttributeFixture.cs</Link>
     </Compile>
@@ -155,9 +164,6 @@
     </Compile>
     <Compile Include="..\UnitTests\OutRefFixture.cs">
       <Link>OutRefFixture.cs</Link>
-    </Compile>
-    <Compile Include="..\UnitTests\QueryableMocksFixture.cs">
-      <Link>QueryableMocksFixture.cs</Link>
     </Compile>
     <Compile Include="..\UnitTests\RecursiveMocksFixture.cs">
       <Link>RecursiveMocksFixture.cs</Link>

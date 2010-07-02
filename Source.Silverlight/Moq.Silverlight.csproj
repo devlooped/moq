@@ -209,6 +209,9 @@
     <Compile Include="..\Source\Linq\MockQuery.cs">
       <Link>Linq\MockQuery.cs</Link>
     </Compile>
+    <Compile Include="..\Source\Linq\Mocks.cs">
+      <Link>Linq\Mocks.cs</Link>
+    </Compile>
     <Compile Include="..\Source\Linq\MockSetupsBuilder.cs">
       <Link>Linq\MockSetupsBuilder.cs</Link>
     </Compile>
@@ -283,9 +286,6 @@
     </Compile>
     <Compile Include="..\Source\MockFactory.cs">
       <Link>MockFactory.cs</Link>
-    </Compile>
-    <Compile Include="..\Source\Mocks.cs">
-      <Link>Mocks.cs</Link>
     </Compile>
     <Compile Include="..\Source\MockSequence.cs">
       <Link>MockSequence.cs</Link>

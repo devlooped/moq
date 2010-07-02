@@ -71,8 +71,10 @@
     <Compile Include="CustomMatcherFixture.cs" />
     <Compile Include="ExtensionsFixture.cs" />
     <Compile Include="MockSequenceFixture.cs" />
+    <Compile Include="Linq\SupportedQuerying.cs" />
+    <Compile Include="Linq\UnsupportedQuerying.cs" />
     <Compile Include="PropertiesFixture.cs" />
-    <Compile Include="QueryableMocksFixture.cs" />
+    <Compile Include="Linq\QueryableMocksFixture.cs" />
     <Compile Include="RecursiveMocksFixture.cs" />
     <Compile Include="CallbacksFixture.cs" />
     <Compile Include="EmptyDefaultValueProviderFixture.cs" />

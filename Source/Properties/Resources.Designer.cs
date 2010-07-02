@@ -153,11 +153,29 @@ namespace Moq.Properties {
         }
         
         /// <summary>
+        ///   Looks up a localized string similar to The equals (&quot;==&quot; or &quot;=&quot; in VB) and the conditional &apos;and&apos; (&quot;&amp;&amp;&quot; or &quot;AndAlso&quot; in VB) operators are the only ones supported in the query specification expression. Unsupported expression: {0}.
+        /// </summary>
+        internal static string LinqBinaryOperatorNotSupported {
+            get {
+                return ResourceManager.GetString("LinqBinaryOperatorNotSupported", resourceCulture);
+            }
+        }
+        
+        /// <summary>
         ///   Looks up a localized string similar to LINQ method &apos;{0}&apos; not supported..
         /// </summary>
         internal static string LinqMethodNotSupported {
             get {
                 return ResourceManager.GetString("LinqMethodNotSupported", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Expression contains a call to a method which is not virtual (overridable in VB) or abstract. Unsupported expression: {0}.
+        /// </summary>
+        internal static string LinqMethodNotVirtual {
+            get {
+                return ResourceManager.GetString("LinqMethodNotVirtual", resourceCulture);
             }
         }
         
@@ -327,6 +345,15 @@ namespace Moq.Properties {
         }
         
         /// <summary>
+        ///   Looks up a localized string similar to Property {0}.{1} does not have a getter..
+        /// </summary>
+        internal static string PropertyGetNotFound {
+            get {
+                return ResourceManager.GetString("PropertyGetNotFound", resourceCulture);
+            }
+        }
+        
+        /// <summary>
         ///   Looks up a localized string similar to Property {0}.{1} does not exist..
         /// </summary>
         internal static string PropertyMissing {
@@ -350,6 +377,15 @@ namespace Moq.Properties {
         internal static string PropertyNotWritable {
             get {
                 return ResourceManager.GetString("PropertyNotWritable", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Property {0}.{1} does not have a setter..
+        /// </summary>
+        internal static string PropertySetNotFound {
+            get {
+                return ResourceManager.GetString("PropertySetNotFound", resourceCulture);
             }
         }
         
@@ -426,8 +462,7 @@ namespace Moq.Properties {
         }
         
         /// <summary>
-        ///   Looks up a localized string similar to Invalid setup on a non-member method:
-        ///{0}.
+        ///   Looks up a localized string similar to Expression references a method that does not belong to the mocked object: {0}.
         /// </summary>
         internal static string SetupOnNonMemberMethod {
             get {
@@ -436,8 +471,7 @@ namespace Moq.Properties {
         }
         
         /// <summary>
-        ///   Looks up a localized string similar to Invalid setup on a non-overridable member:
-        ///{0}.
+        ///   Looks up a localized string similar to Invalid setup on a non-virtual (overridable in VB) member: {0}.
         /// </summary>
         internal static string SetupOnNonOverridableMember {
             get {
@@ -477,7 +511,7 @@ namespace Moq.Properties {
         }
         
         /// <summary>
-        ///   Looks up a localized string similar to Expression {0} is not supported..
+        ///   Looks up a localized string similar to Unsupported expression: {0}.
         /// </summary>
         internal static string UnsupportedExpression {
             get {
@@ -541,8 +575,7 @@ namespace Moq.Properties {
         }
         
         /// <summary>
-        ///   Looks up a localized string similar to Invalid verify on a non-virtual member:
-        ///{0}.
+        ///   Looks up a localized string similar to Invalid verify on a non-virtual (overridable in VB) member: {0}.
         /// </summary>
         internal static string VerifyOnNonVirtualMember {
             get {

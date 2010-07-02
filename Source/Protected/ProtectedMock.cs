@@ -99,6 +99,8 @@ namespace Moq.Protected
 			var property = GetProperty(propertyName);
 			ThrowIfMemberMissing(propertyName, property);
 			ThrowIfPublicProperty(property);
+			property.ThrowIfNoGetter();
+
 			return Mock.SetupGet(mock, GetMemberAccess<TProperty>(property), null);
 		}
 
@@ -109,6 +111,7 @@ namespace Moq.Protected
 			var property = GetProperty(propertyName);
 			ThrowIfMemberMissing(propertyName, property);
 			ThrowIfPublicProperty(property);
+			property.ThrowIfNoSetter();
 
 			return Mock.SetupSet<T, TProperty>(mock, GetSetterExpression(property, ItExpr.IsAny<TProperty>()), null);
 		}
@@ -156,6 +159,7 @@ namespace Moq.Protected
 			var property = GetProperty(propertyName);
 			ThrowIfMemberMissing(propertyName, property);
 			ThrowIfPublicProperty(property);
+			property.ThrowIfNoGetter();
 
 			// TODO should consider property indexers
 			Mock.VerifyGet(mock, GetMemberAccess<TProperty>(property), times, null);
@@ -169,6 +173,7 @@ namespace Moq.Protected
 			var property = GetProperty(propertyName);
 			ThrowIfMemberMissing(propertyName, property);
 			ThrowIfPublicProperty(property);
+			property.ThrowIfNoSetter();
 
 			// TODO should consider property indexers
 			// TODO should receive the parameter here
@@ -216,6 +221,7 @@ namespace Moq.Protected
 		private static Action<T> GetSetterExpression(PropertyInfo property, Expression value)
 		{
 			var param = Expression.Parameter(typeof(T), "mock");
+
 			return Expression.Lambda<Action<T>>(
 				Expression.Call(param, property.GetSetMethod(true), value),
 				param).Compile();

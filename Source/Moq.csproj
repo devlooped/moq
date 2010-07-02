@@ -105,7 +105,7 @@
     <Compile Include="Microsoft\ExpressionVisitor.cs" />
     <Compile Include="MockSequence.cs" />
     <Compile Include="Obsolete\IOccurrence.cs" />
-    <Compile Include="Obsolete\MatcherAttribute.cs" />
+    <Compile Include="MatcherAttribute.cs" />
     <Compile Include="Obsolete\Mock.Generic.Legacy.cs" />
     <Compile Include="Obsolete\Mock.Legacy.cs" />
     <Compile Include="Obsolete\MockExtensions.cs" />
@@ -215,7 +215,7 @@
     <Compile Include="Mock.Generic.cs" />
     <Compile Include="FluentMockContext.cs" />
     <Compile Include="MockDefaultValueProvider.cs" />
-    <Compile Include="Mocks.cs" />
+    <Compile Include="Linq\Mocks.cs" />
     <Compile Include="PexProtector.cs" />
     <Compile Include="Proxy\ICallContext.cs" />
     <Compile Include="Proxy\CastleProxyFactory.cs" />

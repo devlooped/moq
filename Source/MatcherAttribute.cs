@@ -156,9 +156,7 @@ namespace Moq
 	/// // use mock, invoke Save, and have the matcher filter.
 	/// </code>
 	/// </example>
-	[Obsolete("Use a simple method returning a new Match<T> instead. See Match<T> documentation for an example.", false)]
-	[EditorBrowsable(EditorBrowsableState.Never)]
-	[AttributeUsage(AttributeTargets.Method, Inherited=true)]
+	[AttributeUsage(AttributeTargets.Method, Inherited = true)]
 	public sealed class MatcherAttribute : Attribute
 	{
 	}

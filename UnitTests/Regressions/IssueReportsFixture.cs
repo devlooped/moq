@@ -15,6 +15,7 @@ using Xunit;
 #if !SILVERLIGHT
 using System.ServiceModel.Web;
 using System.Web.UI.HtmlControls;
+using Moq.Properties;
 #endif
 
 #region #181
@@ -941,12 +942,9 @@ namespace Moq.Tests.Regressions
 			public void Test()
 			{
 				var mock = new Mock<IList<string>>();
-				ArgumentException e = Assert.Throws<ArgumentException>(
+				Assert.Throws<NotSupportedException>(
+					Resources.SetupOnNonMemberMethod,
 					() => mock.Setup(l => l.FirstOrDefault()).Returns("Hello world"));
-
-				Assert.Equal(
-					"Invalid setup on a non-member method:\r\nl => l.FirstOrDefault<String>()",
-					e.Message);
 			}
 		}
 
@@ -1059,8 +1057,8 @@ namespace Moq.Tests.Regressions
 				var mock = new Mock<Foo>();
 				mock.Setup(m => m.OnExecute());
 
-				var e = Assert.Throws<ArgumentException>(() => mock.Verify(m => m.Execute()));
-				Assert.True(e.Message.StartsWith("Invalid verify on a non-virtual member:\r\n"));
+				var e = Assert.Throws<NotSupportedException>(() => mock.Verify(m => m.Execute()));
+				Assert.True(e.Message.StartsWith("Invalid verify"));
 			}
 
 			public class Foo

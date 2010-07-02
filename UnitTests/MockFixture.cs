@@ -204,7 +204,7 @@ namespace Moq.Tests
 		{
 			var mock = new Mock<FooBase>();
 
-			Assert.Throws<ArgumentException>(() => mock.Setup(x => x.True()).Returns(false));
+			Assert.Throws<NotSupportedException>(() => mock.Setup(x => x.True()).Returns(false));
 		}
 
 		[Fact]
@@ -673,7 +673,7 @@ namespace Moq.Tests
 		{
 			var target = new Mock<Doer>();
 
-			Assert.Throws<ArgumentException>(() => target.Setup(t => t.Do()));
+			Assert.Throws<NotSupportedException>(() => target.Setup(t => t.Do()));
 		}
 
 		[Fact]

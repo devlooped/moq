@@ -52,17 +52,31 @@ namespace Moq.Linq
 	{
 		private static readonly MethodInfo createQueryableMethod = typeof(Mocks)
 			.GetMethod("CreateQueryable", BindingFlags.NonPublic | BindingFlags.Static);
-
-		private static readonly string[] queryableMethods = new[] { "First", "Where" };
-		private static readonly string[] unsupportedMethods = new[] { "All", "Any", "FirstOrDefault", "Last", "LastOrDefault", "Single", "SingleOrDefault" };
+		private static readonly string[] queryableMethods = new[] { "First", "Where", "FirstOrDefault" };
+		private static readonly string[] unsupportedMethods = new[] { "All", "Any", "Last", "LastOrDefault", "Single", "SingleOrDefault" };
 
 		private int stackIndex;
 
 		protected override Expression VisitBinary(BinaryExpression node)
 		{
-			if (node != null && this.stackIndex > 0 && node.NodeType == ExpressionType.Equal)
+			if (node != null && this.stackIndex > 0)
 			{
-				return ConvertToSetup(node.Left, node.Right) ?? base.VisitBinary(node);
+				if (node.NodeType != ExpressionType.Equal && node.NodeType != ExpressionType.AndAlso)
+					throw new NotSupportedException(string.Format(CultureInfo.CurrentCulture, Resources.LinqBinaryOperatorNotSupported, node.ToStringFixed()));
+
+				if (node.NodeType == ExpressionType.Equal)
+				{
+					// TODO: throw if a matcher is used on either side of the expression.
+					//ThrowIfMatcherIsUsed(
+
+					// Account for the inverted assignement/querying like "false == foo.IsValid" scenario
+					if (node.Left.NodeType == ExpressionType.Constant)
+						// Invert left & right nodes in this case.
+						return ConvertToSetup(node.Right, node.Left) ?? base.VisitBinary(node);
+					else
+						// Perform straight conversion where the right handside will be the setup return value.
+						return ConvertToSetup(node.Left, node.Right) ?? base.VisitBinary(node);
+				}
 			}
 
 			return base.VisitBinary(node);
@@ -135,10 +149,19 @@ namespace Moq.Linq
 			{
 				case ExpressionType.MemberAccess:
 					var member = (MemberExpression)left;
+					member.ThrowIfNotMockeable();
+
 					return ConvertToSetupProperty(member.Expression, member, right);
 
 				case ExpressionType.Call:
 					var method = (MethodCallExpression)left;
+
+					if (!method.Method.CanOverride())
+						throw new NotSupportedException(string.Format(
+							CultureInfo.CurrentCulture,
+							Resources.LinqMethodNotVirtual,
+							method.ToStringFixed()));
+
 					return ConvertToSetup(method.Object, method, right);
 
 				case ExpressionType.Convert:
@@ -153,16 +176,16 @@ namespace Moq.Linq
 		{
 			// TODO: throw if target is a static class?
 			var sourceType = targetObject.Type;
-			var property = (PropertyInfo)((MemberExpression)left).Member;
-
-			if (!property.CanWrite)
-				return ConvertToSetup(targetObject, left, right);
-
-			var propertyType = property.PropertyType;
+			var propertyInfo = (PropertyInfo)((MemberExpression)left).Member;
+			var propertyType = propertyInfo.PropertyType;
 
 			// where foo.Name == "bar"
 			// becomes:	
 			// where Mock.Get(foo).SetupProperty(mock => mock.Name, "bar") != null
+
+			// if the property is readonly, we can only do a Setup(...) which is the same as a method setup.
+			if (!propertyInfo.CanWrite)
+				return ConvertToSetup(targetObject, left, right);
 
 			// This will get up to and including the Mock.Get(foo).Setup(mock => mock.Name) call.
 			var propertySetup = FluentMockVisitor.Accept(left);
@@ -175,15 +198,17 @@ namespace Moq.Linq
 			var mockExpression = propertyCall.Object;
 			var propertyExpression = propertyCall.Arguments.First().StripQuotes();
 
-			var setupPropertyMethod = typeof(Mock<>)
-				.MakeGenericType(sourceType)
-				.GetMethods()
-				.First(method => method.Name == "SetupProperty" && method.GetParameters().Length == 2)
-				.MakeGenericMethod(propertyType);
+			// Because Mocks.CreateMocks (the underlying implementation of the IQueryable provider
+			// already sets up all properties as stubs, we can safely just set the value here, 
+			// which also allows the use of this querying capability against plain DTO even 
+			// if their properties are not virtual.
+			var setPropertyMethod = typeof(Mocks)
+				.GetMethod("SetPropery", BindingFlags.Static | BindingFlags.NonPublic)
+				.MakeGenericMethod(mockExpression.Type.GetGenericArguments().First(), propertyInfo.PropertyType);
 
-			return Expression.NotEqual(
-				Expression.Call(mockExpression, setupPropertyMethod, propertyExpression, right),
-				Expression.Constant(null));
+			return Expression.Equal(
+				Expression.Call(setPropertyMethod, mockExpression, propertyCall.Arguments.First(), right),
+				Expression.Constant(true));
 		}
 
 		private static Expression ConvertToSetup(Expression targetObject, Expression left, Expression right)
@@ -191,11 +216,6 @@ namespace Moq.Linq
 			// TODO: throw if target is a static class?
 			var sourceType = targetObject.Type;
 			var returnType = left.Type;
-
-			// where dte.Solution == solution
-			// becomes:	
-			// where Mock.Get(dte).Setup(mock => mock.Solution).Returns(solution) != null
-			//Mock<System.ComponentModel.IComponent> m;
 
 			var returnsMethod = typeof(IReturns<,>)
 				.MakeGenericType(sourceType, returnType)

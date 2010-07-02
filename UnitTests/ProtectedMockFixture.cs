@@ -64,13 +64,13 @@ namespace Moq.Tests
 		[Fact]
 		public void ThrowsIfSetupNonVirtualVoidMethod()
 		{
-			Assert.Throws<ArgumentException>(() => new Mock<FooBase>().Protected().Setup("NonVirtual"));
+			Assert.Throws<NotSupportedException>(() => new Mock<FooBase>().Protected().Setup("NonVirtual"));
 		}
 
 		[Fact]
 		public void ThrowsIfSetupNonVirtualResultMethod()
 		{
-			Assert.Throws<ArgumentException>(() => new Mock<FooBase>().Protected().Setup<int>("NonVirtualInt"));
+			Assert.Throws<NotSupportedException>(() => new Mock<FooBase>().Protected().Setup<int>("NonVirtualInt"));
 		}
 
 		[Fact(Skip = "Check this, the interceptor is not called")]
@@ -186,7 +186,7 @@ namespace Moq.Tests
 		[Fact]
 		public void ThrowsIfSetupGetNonVirtualProperty()
 		{
-			Assert.Throws<ArgumentException>(() => new Mock<FooBase>().Protected().SetupGet<string>("NonVirtualValue"));
+			Assert.Throws<NotSupportedException>(() => new Mock<FooBase>().Protected().SetupGet<string>("NonVirtualValue"));
 		}
 
 		[Fact(Skip = "Check this, the interceptor is not called")]
@@ -451,13 +451,13 @@ namespace Moq.Tests
 		[Fact]
 		public void ThrowsIfVerifyNonVirtualVoidMethod()
 		{
-			Assert.Throws<ArgumentException>(() => new Mock<FooBase>().Protected().Verify("NonVirtual", Times.Once()));
+			Assert.Throws<NotSupportedException>(() => new Mock<FooBase>().Protected().Verify("NonVirtual", Times.Once()));
 		}
 
 		[Fact]
 		public void ThrowsIfVerifyNonVirtualResultMethod()
 		{
-			Assert.Throws<ArgumentException>(
+			Assert.Throws<NotSupportedException>(
 				() => new Mock<FooBase>().Protected().Verify<int>("NonVirtualInt", Times.Once()));
 		}
 
@@ -649,7 +649,7 @@ namespace Moq.Tests
 		[Fact]
 		public void ThrowsIfVerifyGetNonVirtualPropertyGet()
 		{
-			Assert.Throws<ArgumentException>(
+			Assert.Throws<NotSupportedException>(
 				() => new Mock<FooBase>().Protected().VerifyGet<string>("NonVirtualValue", Times.Once()));
 		}
 
@@ -817,9 +817,9 @@ namespace Moq.Tests
 
 			protected string NonVirtualValue { get; set; }
 
-			protected virtual int OnlyGet { get; private set; }
+			protected virtual int OnlyGet { get { return 0; } }
 
-			protected virtual int OnlySet { private get; set; }
+			protected virtual int OnlySet { set { } }
 
 			protected virtual string ProtectedValue { get; set; }
 

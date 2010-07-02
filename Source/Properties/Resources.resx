@@ -131,7 +131,7 @@
     <value>Property {0}.{1} is write-only.</value>
   </data>
   <data name="UnsupportedExpression" xml:space="preserve">
-    <value>Expression {0} is not supported.</value>
+    <value>Unsupported expression: {0}</value>
   </data>
   <data name="NoSetup" xml:space="preserve">
     <value>All invocations on the mock must have a corresponding setup.</value>
@@ -144,8 +144,7 @@
 {0}</value>
   </data>
   <data name="SetupOnNonOverridableMember" xml:space="preserve">
-    <value>Invalid setup on a non-overridable member:
-{0}</value>
+    <value>Invalid setup on a non-virtual (overridable in VB) member: {0}</value>
   </data>
   <data name="ConstructorArgsForInterface" xml:space="preserve">
     <value>Constructor arguments cannot be passed for interface mocks.</value>
@@ -276,12 +275,10 @@ Expected invocation on the mock between {2} and {3} times (Exclusive), but was {
 Expected invocation on the mock once, but was {4} times: {1}</value>
   </data>
   <data name="SetupOnNonMemberMethod" xml:space="preserve">
-    <value>Invalid setup on a non-member method:
-{0}</value>
+    <value>Expression references a method that does not belong to the mocked object: {0}</value>
   </data>
   <data name="VerifyOnNonVirtualMember" xml:space="preserve">
-    <value>Invalid verify on a non-virtual member:
-{0}</value>
+    <value>Invalid verify on a non-virtual (overridable in VB) member: {0}</value>
   </data>
   <data name="OutExpressionMustBeConstantValue" xml:space="preserve">
     <value>Out expression must evaluate to a constant value.</value>
@@ -294,5 +291,17 @@ Expected invocation on the mock once, but was {4} times: {1}</value>
   </data>
   <data name="EventNofFound" xml:space="preserve">
     <value>Could not locate event for attach or detach method {0}.</value>
+  </data>
+  <data name="LinqBinaryOperatorNotSupported" xml:space="preserve">
+    <value>The equals ("==" or "=" in VB) and the conditional 'and' ("&amp;&amp;" or "AndAlso" in VB) operators are the only ones supported in the query specification expression. Unsupported expression: {0}</value>
+  </data>
+  <data name="LinqMethodNotVirtual" xml:space="preserve">
+    <value>Expression contains a call to a method which is not virtual (overridable in VB) or abstract. Unsupported expression: {0}</value>
+  </data>
+  <data name="PropertySetNotFound" xml:space="preserve">
+    <value>Property {0}.{1} does not have a setter.</value>
+  </data>
+  <data name="PropertyGetNotFound" xml:space="preserve">
+    <value>Property {0}.{1} does not have a getter.</value>
   </data>
 </root>

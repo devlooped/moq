@@ -149,7 +149,25 @@ namespace Moq
 				throw new NotSupportedException(string.Format(
 					CultureInfo.CurrentCulture,
 					Resources.FieldsNotSupported,
-					memberAccess));
+					memberAccess.ToStringFixed()));
+		}
+
+		public static void ThrowIfNoGetter(this PropertyInfo property)
+		{
+			if (property.GetGetMethod(true) == null)
+				throw new ArgumentException(string.Format(
+					CultureInfo.CurrentCulture,
+					Resources.PropertyGetNotFound,
+					property.DeclaringType.Name, property.Name));
+		}
+
+		public static void ThrowIfNoSetter(this PropertyInfo property)
+		{
+			if (property.GetSetMethod(true) == null)
+				throw new ArgumentException(string.Format(
+					CultureInfo.CurrentCulture,
+					Resources.PropertySetNotFound,
+					property.DeclaringType.Name, property.Name));
 		}
 
 		public static bool IsMockeable(this Type typeToMock)
@@ -157,6 +175,11 @@ namespace Moq
 			// A value type does not match any of these three 
 			// condition and therefore returns false.
 			return typeToMock.IsInterface || typeToMock.IsAbstract || (typeToMock.IsClass && !typeToMock.IsSealed);
+		}
+
+		public static bool CanOverride(this MethodBase method)
+		{
+			return method.IsVirtual && !method.IsFinal && !method.IsPrivate;
 		}
 
 		public static bool CanOverrideGet(this PropertyInfo property)

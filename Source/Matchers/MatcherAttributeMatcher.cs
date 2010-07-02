@@ -52,7 +52,7 @@ namespace Moq.Matchers
 	/// 
 	/// mock.Setup(x => x.StringMethod(A.MagicString()));
 	/// 
-	/// pbulic static class A 
+	/// public static class A 
 	/// {
 	///     [Matcher]
 	///     public static string MagicString() { return null; }
@@ -62,7 +62,7 @@ namespace Moq.Matchers
 	///     }
 	/// }
 	/// 
-	/// Will success if: mock.Object.StringMethod("magic");
+	/// Will succeed if: mock.Object.StringMethod("magic");
 	/// and fail with any other call.
 	/// </summary>
 	internal class MatcherAttributeMatcher : IMatcher

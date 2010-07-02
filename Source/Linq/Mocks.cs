@@ -55,6 +55,12 @@ namespace Moq
 	/// Allows querying the universe of mocks for those that behave 
 	/// according to the LINQ query specification.
 	/// </summary>
+	/// <devdoc>
+	/// This entry-point into Linq to Mocks is the only one in the root Moq 
+	/// namespace to ease discovery. But to get all the mocking extension 
+	/// methods on Object, a using of Moq.Linq must be done, so that the 
+	/// polluting of the intellisense for all objects is an explicit opt-in.
+	/// </devdoc>
 	public static class Mocks
 	{
 		/// <summary>
@@ -94,23 +100,39 @@ namespace Moq
 		/// </summary>
 		internal static IQueryable<T> CreateQueryable<T>() where T : class
 		{
-			return CreateEnumerable<T>().AsQueryable();
+			return CreateMocks<T>().AsQueryable();
 		}
 
 		/// <summary>
 		/// Method that is turned into the actual call from .Query{T}, to 
 		/// transform the queryable query into a normal enumerable query.
-		/// This method should not be used by consumers.
+		/// This method is never used directly by consumers.
 		/// </summary>
-		private static IEnumerable<T> CreateEnumerable<T>() where T : class
+		private static IEnumerable<T> CreateMocks<T>() where T : class
 		{
 			do
 			{
 				var mock = new Mock<T>();
 				mock.SetupAllProperties();
+
 				yield return mock.Object;
 			}
 			while (true);
+		}
+
+		/// <summary>
+		/// Extension method used to support Linq-like setup properties that are not virtual but do have 
+		/// a getter and a setter, thereby allowing the use of Linq to Mocks to quickly initialize Dtos too :)
+		/// </summary>
+		internal static bool SetPropery<T, TResult>(Mock<T> target, Expression<Func<T, TResult>> propertyReference, TResult value)
+			where T : class
+		{
+			var memberExpr = (MemberExpression)propertyReference.Body;
+			var member = (PropertyInfo)memberExpr.Member;
+
+			member.SetValue(target.Object, value, null);
+
+			return true;
 		}
 	}
 
@@ -136,16 +158,10 @@ namespace Moq
 			MethodInfo info;
 			if (setup.Body.NodeType == ExpressionType.MemberAccess)
 			{
-				var property = ((MemberExpression)setup.Body).Member as PropertyInfo;
-				if (property == null)
-				{
-					throw new NotSupportedException(string.Format(
-						CultureInfo.CurrentCulture,
-						Resources.FieldsNotSupported,
-						setup.Body.ToStringFixed()));
-				}
+				var memberExpr = ((MemberExpression)setup.Body);
+				memberExpr.ThrowIfNotMockeable();
 
-				info = property.GetGetMethod();
+				info = ((PropertyInfo)memberExpr.Member).GetGetMethod();
 			}
 			else if (setup.Body.NodeType == ExpressionType.Call)
 			{
@@ -162,7 +178,9 @@ namespace Moq
 			if (!mock.InnerMocks.TryGetValue(info, out fluentMock))
 			{
 				fluentMock = ((IMocked)new MockDefaultValueProvider(mock).ProvideDefault(info)).Mock;
+#if !SILVERLIGHT
 				Mock.SetupAllProperties(fluentMock);
+#endif
 			}
 
 			var result = (TResult)fluentMock.Object;

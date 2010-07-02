@@ -239,7 +239,7 @@ namespace Moq
 
 			var methodCall = expression.ToMethodCall();
 			var method = methodCall.Method;
-			ThrowIfNonVirtual(expression, method);
+			ThrowIfVerifyNonVirtual(expression, method);
 			var args = methodCall.Arguments.ToArray();
 
 			var expected = new MethodCall(mock, null, expression, method, args) { FailMessage = failMessage };
@@ -263,7 +263,7 @@ namespace Moq
 			{
 				var methodCall = expression.ToMethodCall();
 				var method = methodCall.Method;
-				ThrowIfNonVirtual(expression, method);
+				ThrowIfVerifyNonVirtual(expression, method);
 				var args = methodCall.Arguments.ToArray();
 
 				var expected = new MethodCallReturn<T, TResult>(mock, null, expression, method, args)
@@ -282,7 +282,7 @@ namespace Moq
 			where T : class
 		{
 			var method = expression.ToPropertyInfo().GetGetMethod(true);
-			ThrowIfNonVirtual(expression, method);
+			ThrowIfVerifyNonVirtual(expression, method);
 
 			var expected = new MethodCallReturn<T, TProperty>(mock, null, expression, method, new Expression[0])
 			{
@@ -699,20 +699,20 @@ namespace Moq
 
 		private static void ThrowIfCantOverride(Expression setup, MethodInfo method)
 		{
-			if (CantOverride(method))
+			if (!method.CanOverride())
 			{
-				throw new ArgumentException(string.Format(
+				throw new NotSupportedException(string.Format(
 					CultureInfo.CurrentCulture,
 					Resources.SetupOnNonOverridableMember,
 					setup.ToStringFixed()));
 			}
 		}
 
-		private static void ThrowIfNonVirtual(Expression verify, MethodInfo method)
+		private static void ThrowIfVerifyNonVirtual(Expression verify, MethodInfo method)
 		{
-			if (CantOverride(method))
+			if (!method.CanOverride())
 			{
-				throw new ArgumentException(string.Format(
+				throw new NotSupportedException(string.Format(
 					CultureInfo.CurrentCulture,
 					Resources.VerifyOnNonVirtualMember,
 					verify.ToStringFixed()));
@@ -723,7 +723,7 @@ namespace Moq
 		{
 			if (method.IsStatic)
 			{
-				throw new ArgumentException(string.Format(
+				throw new NotSupportedException(string.Format(
 					CultureInfo.CurrentCulture,
 					Resources.SetupOnNonMemberMethod,
 					setup.ToStringFixed()));
@@ -732,18 +732,13 @@ namespace Moq
 
 		private static void ThrowIfCantOverride<T>(MethodBase setter) where T : class
 		{
-			if (CantOverride(setter))
+			if (!setter.CanOverride())
 			{
-				throw new ArgumentException(string.Format(
+				throw new NotSupportedException(string.Format(
 					CultureInfo.CurrentCulture,
 					Resources.SetupOnNonOverridableMember,
 					typeof(T).Name + "." + setter.Name.Substring(4)));
 			}
-		}
-
-		private static bool CantOverride(MethodBase method)
-		{
-			return !method.IsVirtual || method.IsFinal || method.IsPrivate;
 		}
 
 		private class FluentMockVisitor : ExpressionVisitor

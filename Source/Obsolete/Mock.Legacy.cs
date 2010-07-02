@@ -75,7 +75,7 @@ namespace Moq
 			where T : class
 		{
 			var method = expression.ToPropertyInfo().GetSetMethod();
-			ThrowIfNonVirtual(expression, method);
+			ThrowIfVerifyNonVirtual(expression, method);
 
 			var expected = new SetterMethodCall<T, TProperty>(mock, expression, method)
 			{
@@ -94,7 +94,7 @@ namespace Moq
 			where T : class
 		{
 			var method = expression.ToPropertyInfo().GetSetMethod();
-			ThrowIfNonVirtual(expression, method);
+			ThrowIfVerifyNonVirtual(expression, method);
 
 			var expected = new SetterMethodCall<T, TProperty>(mock, expression, method, value)
 			{

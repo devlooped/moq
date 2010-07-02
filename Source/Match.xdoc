@@ -6,6 +6,9 @@
 			completely replacing the built-in <see cref="It"/> class with your own argument
 			matching rules.
 		</summary>
+		<remarks>
+			 See also <see cref="Match{T}"/>.
+		</remarks>
 	</doc>
 	<doc for="Match{T}">
 		<summary>
@@ -24,6 +27,7 @@
 			that returns a value from a call to <see cref="Match.Create{T}(Predicate{T})"/> with 
 			your matching condition and optional friendly render expression:
 			<code>
+				[Matcher]
 				public Order IsBigOrder()
 				{
 					return Match&lt;Order&gt;.Create(
@@ -36,7 +40,8 @@
 			<code>
 				mock.Setup(m => m.Submit(IsBigOrder()).Throws&lt;UnauthorizedAccessException&gt;();
 			</code>
-			At runtime, Moq knows that the return value was a matcher and
+			At runtime, Moq knows that the return value was a matcher (note that the method MUST be 
+			annotated with the [Matcher] attribute in order to determine this) and
 			evaluates your predicate with the actual value passed into your predicate.
 			<para>
 				Another example might be a case where you want to match a lists of orders
@@ -45,6 +50,7 @@
 			<code>
 				public static class Orders
 				{
+					[Matcher]
 					public static IEnumerable&lt;Order&gt; Contains(Order order)
 					{
 						return Match&lt;IEnumerable&lt;Order&gt;&gt;.Create(orders => orders.Contains(order));
