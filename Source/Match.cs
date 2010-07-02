@@ -47,7 +47,6 @@ using System.Reflection;
 namespace Moq
 {
 	/// <include file='Match.xdoc' path='docs/doc[@for="Match"]/*'/>
-	[EditorBrowsable(EditorBrowsableState.Never)]
 	public abstract class Match
 	{
 		/// <devdoc>
@@ -56,7 +55,7 @@ namespace Moq
 		/// </devdoc>
 		internal static TValue Matcher<TValue>()
 		{
-			return default(TValue); 
+			return default(TValue);
 		}
 
 		internal abstract bool Matches(object value);
