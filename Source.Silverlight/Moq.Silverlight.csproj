@@ -218,6 +218,9 @@
     <Compile Include="..\Source\Match.cs">
       <Link>Match.cs</Link>
     </Compile>
+    <Compile Include="..\Source\MatcherAttribute.cs">
+      <Link>MatcherAttribute.cs</Link>
+    </Compile>
     <Compile Include="..\Source\MatcherFactory.cs">
       <Link>MatcherFactory.cs</Link>
     </Compile>
@@ -292,9 +295,6 @@
     </Compile>
     <Compile Include="..\Source\Obsolete\IOccurrence.cs">
       <Link>Obsolete\IOccurrence.cs</Link>
-    </Compile>
-    <Compile Include="..\Source\Obsolete\MatcherAttribute.cs">
-      <Link>Obsolete\MatcherAttribute.cs</Link>
     </Compile>
     <Compile Include="..\Source\Obsolete\Mock.Generic.Legacy.cs">
       <Link>Obsolete\Mock.Generic.Legacy.cs</Link>

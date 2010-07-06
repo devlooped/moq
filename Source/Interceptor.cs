@@ -133,6 +133,11 @@ namespace Moq
 		[SuppressMessage("Microsoft.Maintainability", "CA1502:AvoidExcessiveComplexity")]
 		public void Intercept(ICallContext invocation)
 		{
+			if (invocation.Method.IsDestructor())
+			{
+				return;
+			}
+
 			// Track current invocation if we're in "record" mode in a fluent invocation context.
 			if (FluentMockContext.IsActive)
 			{
@@ -202,7 +207,6 @@ namespace Moq
 			}
 
 			var call = FluentMockContext.IsActive ? (IProxyCall)null : orderedCalls.LastOrDefault(c => c.Matches(invocation));
-
 			if (call == null && !FluentMockContext.IsActive && behavior == MockBehavior.Strict)
 			{
 				throw new MockException(MockException.ExceptionReason.NoSetup, behavior, invocation);

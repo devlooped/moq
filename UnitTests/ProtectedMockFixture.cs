@@ -73,27 +73,6 @@ namespace Moq.Tests
 			Assert.Throws<NotSupportedException>(() => new Mock<FooBase>().Protected().Setup<int>("NonVirtualInt"));
 		}
 
-		[Fact(Skip = "Check this, the interceptor is not called")]
-		public void SetupAllowsInternalVoidMethod()
-		{
-			var mock = new Mock<FooBase>();
-			mock.Protected().Setup("Internal");
-			mock.Object.Internal();
-
-			mock.VerifyAll();
-		}
-
-		[Fact(Skip = "Check this, the interceptor is not called")]
-		public void SetupAllowsInternalResultMethod()
-		{
-			var mock = new Mock<FooBase>();
-			mock.Protected()
-				.Setup<int>("InternalInt")
-				.Returns(5);
-
-			Assert.Equal(5, mock.Object.InternalInt());
-		}
-
 		[Fact]
 		public void SetupAllowsProtectedInternalVoidMethod()
 		{
@@ -189,17 +168,6 @@ namespace Moq.Tests
 			Assert.Throws<NotSupportedException>(() => new Mock<FooBase>().Protected().SetupGet<string>("NonVirtualValue"));
 		}
 
-		[Fact(Skip = "Check this, the interceptor is not called")]
-		public void SetupGetAllowsInternalPropertyGet()
-		{
-			var mock = new Mock<FooBase>();
-			mock.Protected()
-				.SetupGet<string>("InternalValue")
-				.Returns("foo");
-
-			Assert.Equal("foo", mock.Object.InternalValue);
-		}
-
 		[Fact]
 		public void SetupGetAllowsProtectedInternalPropertyGet()
 		{
@@ -262,21 +230,6 @@ namespace Moq.Tests
 		{
 			Assert.Throws<ArgumentException>(
 				() => new Mock<FooBase>().Protected().SetupSet<string>("NonVirtualValue", ItExpr.IsAny<string>()));
-		}
-
-		[Fact(Skip = "Check this, the interceptor is not called")]
-		public void SetupSetAllowsInternalPropertySet()
-		{
-			var mock = new Mock<FooBase>();
-			var value = string.Empty;
-			mock.Protected()
-				.SetupSet<string>("InternalValue", ItExpr.IsAny<string>())
-				.Callback(v => value = v);
-
-			mock.Object.InternalValue = "foo";
-
-			Assert.Equal("foo", value);
-			mock.VerifyAll();
 		}
 
 		[Fact]
@@ -461,24 +414,6 @@ namespace Moq.Tests
 				() => new Mock<FooBase>().Protected().Verify<int>("NonVirtualInt", Times.Once()));
 		}
 
-		[Fact(Skip = "Check this, the interceptor is not called")]
-		public void VerifyAllowsInternalVoidMethod()
-		{
-			var mock = new Mock<FooBase>();
-			mock.Object.Internal();
-
-			mock.Protected().Verify("Internal", Times.Once());
-		}
-
-		[Fact(Skip = "Check this, the interceptor is not called")]
-		public void VerifyAllowsInternalResultMethod()
-		{
-			var mock = new Mock<FooBase>();
-			mock.Object.InternalInt();
-
-			mock.Protected().Verify<int>("InternalInt", Times.Once());
-		}
-
 		[Fact]
 		public void VerifyAllowsProtectedInternalVoidMethod()
 		{
@@ -619,15 +554,6 @@ namespace Moq.Tests
 				() => new Mock<FooBase>().Protected().VerifyGet<string>("PublicValue", Times.Once()));
 		}
 
-		[Fact(Skip = "Check this, the interceptor is not called")]
-		public void VerifyGetAllowsInternalProperty()
-		{
-			var mock = new Mock<FooBase>();
-			var value = mock.Object.InternalValue;
-
-			Assert.Throws<ArgumentException>(() => mock.Protected().VerifyGet<string>("InternalValue", Times.Once()));
-		}
-
 		[Fact]
 		public void VerifyGetAllowsProtectedInternalPropertyGet()
 		{
@@ -718,16 +644,6 @@ namespace Moq.Tests
 				() => new Mock<FooBase>().Protected().VerifySet<string>("NonVirtualValue", Times.Once(), ItExpr.IsAny<string>()));
 		}
 
-		[Fact(Skip = "Check this, the interceptor is not called")]
-		public void VerifySetAllowsInternalPropertySet()
-		{
-			var mock = new Mock<FooBase>();
-			mock.Object.InternalValue = "foo";
-
-			// TODO arguments + indexes
-			mock.Protected().VerifySet<string>("InternalValue", Times.Once(), ItExpr.IsAny<string>());
-		}
-
 		[Fact]
 		public void VerifySetAllowsProtectedInternalPropertySet()
 		{
@@ -811,15 +727,19 @@ namespace Moq.Tests
 		{
 			public virtual string PublicValue { get; set; }
 
-			internal virtual string InternalValue { get; set; }
-
 			protected internal virtual string ProtectedInternalValue { get; set; }
 
 			protected string NonVirtualValue { get; set; }
 
-			protected virtual int OnlyGet { get { return 0; } }
+			protected virtual int OnlyGet
+			{
+				get { return 0; }
+			}
 
-			protected virtual int OnlySet { set { } }
+			protected virtual int OnlySet
+			{
+				set { }
+			}
 
 			protected virtual string ProtectedValue { get; set; }
 
@@ -866,15 +786,6 @@ namespace Moq.Tests
 			public void SetProtectedValue(string value)
 			{
 				this.ProtectedValue = value;
-			}
-
-			internal virtual void Internal()
-			{
-			}
-
-			internal virtual int InternalInt()
-			{
-				return 11;
 			}
 
 			internal protected virtual void ProtectedInternal()

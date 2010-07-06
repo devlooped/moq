@@ -6,16 +6,16 @@ using System.IO;
 using System.Linq;
 using System.Linq.Expressions;
 using System.Reflection;
-using System.ServiceModel;
 using System.Text;
 using Moq;
+using Moq.Properties;
 using Moq.Protected;
 using Xunit;
 
 #if !SILVERLIGHT
+using System.ServiceModel;
 using System.ServiceModel.Web;
 using System.Web.UI.HtmlControls;
-using Moq.Properties;
 #endif
 
 #region #181
@@ -1419,6 +1419,35 @@ namespace Moq.Tests.Regressions
 			public interface IRepository<T> : IRepository
 			{
 				void Save(T value);
+			}
+		}
+
+		#endregion
+
+		#region #256
+
+		public class _256
+		{
+			[Fact]
+			public void TestFinalizeNotMocked()
+			{
+				var mock = new Mock<ClassWithFinalizer>(MockBehavior.Strict);
+				mock.Setup(m => m.Foo).Returns(10);
+				mock.Setup(m => m.Bar).Returns("Hello mocked world!");
+				var instance = mock.Object;
+
+				Assert.Equal(10, instance.Foo);
+			}
+
+			public class ClassWithFinalizer
+			{
+				public virtual int Foo { get; set; }
+				public virtual string Bar { get; set; }
+
+				~ClassWithFinalizer()
+				{
+
+				}
 			}
 		}
 
