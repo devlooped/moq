@@ -79,7 +79,7 @@ namespace Moq.Protected
 			var property = GetProperty(methodName);
 			if (property != null)
 			{
-				ThrowIfPublicProperty(property);
+				ThrowIfPublicGetter(property);
 				// TODO should consider property indexers
 				return Mock.SetupGet(mock, GetMemberAccess<TResult>(property), null);
 			}
@@ -98,7 +98,7 @@ namespace Moq.Protected
 
 			var property = GetProperty(propertyName);
 			ThrowIfMemberMissing(propertyName, property);
-			ThrowIfPublicProperty(property);
+			ThrowIfPublicGetter(property);
 			property.ThrowIfNoGetter();
 
 			return Mock.SetupGet(mock, GetMemberAccess<TProperty>(property), null);
@@ -110,7 +110,7 @@ namespace Moq.Protected
 
 			var property = GetProperty(propertyName);
 			ThrowIfMemberMissing(propertyName, property);
-			ThrowIfPublicProperty(property);
+			ThrowIfPublicSetter(property);
 			property.ThrowIfNoSetter();
 
 			return Mock.SetupSet<T, TProperty>(mock, GetSetterExpression(property, ItExpr.IsAny<TProperty>()), null);
@@ -138,7 +138,7 @@ namespace Moq.Protected
 			var property = GetProperty(methodName);
 			if (property != null)
 			{
-				ThrowIfPublicProperty(property);
+				ThrowIfPublicGetter(property);
 				// TODO should consider property indexers
 				Mock.VerifyGet(mock, GetMemberAccess<TResult>(property), times, null);
 				return;
@@ -158,7 +158,7 @@ namespace Moq.Protected
 
 			var property = GetProperty(propertyName);
 			ThrowIfMemberMissing(propertyName, property);
-			ThrowIfPublicProperty(property);
+			ThrowIfPublicGetter(property);
 			property.ThrowIfNoGetter();
 
 			// TODO should consider property indexers
@@ -172,7 +172,7 @@ namespace Moq.Protected
 
 			var property = GetProperty(propertyName);
 			ThrowIfMemberMissing(propertyName, property);
-			ThrowIfPublicProperty(property);
+			ThrowIfPublicSetter(property);
 			property.ThrowIfNoSetter();
 
 			// TODO should consider property indexers
@@ -262,10 +262,21 @@ namespace Moq.Protected
 			}
 		}
 
-		private static void ThrowIfPublicProperty(PropertyInfo property)
+		private static void ThrowIfPublicGetter(PropertyInfo property)
 		{
-			if (property.CanRead && property.GetGetMethod() != null ||
-				property.CanWrite && property.GetSetMethod() != null)
+			if (property.CanRead && property.GetGetMethod() != null)
+			{
+				throw new ArgumentException(string.Format(
+					CultureInfo.CurrentCulture,
+					Resources.UnexpectedPublicProperty,
+					property.ReflectedType.Name,
+					property.Name));
+			}
+		}
+
+		private static void ThrowIfPublicSetter(PropertyInfo property)
+		{
+			if (property.CanWrite && property.GetSetMethod() != null)
 			{
 				throw new ArgumentException(string.Format(
 					CultureInfo.CurrentCulture,

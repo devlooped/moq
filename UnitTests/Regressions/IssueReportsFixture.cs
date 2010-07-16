@@ -1453,6 +1453,34 @@ namespace Moq.Tests.Regressions
 
 		#endregion
 
+		#region #261
+
+		public class _261
+		{
+			[Fact]
+			public void Test()
+			{
+				var mock = new Mock<Foo>();
+				mock.Protected().SetupSet<int>("Status", 42);
+
+				mock.Object.SetStatus(42);
+
+				mock.Protected().VerifySet<int>("Status", Times.Once(), 42);
+			}
+
+			public class Foo
+			{
+				public virtual int Status { get; protected set; }
+
+				internal void SetStatus(int value)
+				{
+					this.Status = value;
+				}
+			}
+		}
+
+		#endregion
+
 		#region Recursive issue
 
 		public class RecursiveFixture
