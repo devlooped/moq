@@ -47,6 +47,7 @@ using System.Linq.Expressions;
 using System.Reflection;
 using System.Runtime.CompilerServices;
 using Moq.Properties;
+using Moq.Proxy;
 
 namespace Moq
 {
@@ -333,19 +334,21 @@ namespace Moq
 			if (!times.Verify(callCount))
 			{
 				var setups = targetInterceptor.OrderedCalls.Where(oc => AreSameMethod(oc.SetupExpression, expression));
-				ThrowVerifyException(expected, setups, expression, times, callCount);
+				ThrowVerifyException(expected, setups, targetInterceptor.ActualCalls, expression, times, callCount);
 			}
 		}
 
 		private static void ThrowVerifyException(
 			MethodCall expected,
 			IEnumerable<IProxyCall> setups,
+			IEnumerable<ICallContext> actualCalls,
 			Expression expression,
 			Times times,
 			int callCount)
 		{
 			var message = times.GetExceptionMessage(expected.FailMessage, expression.ToStringFixed(), callCount) +
-				Environment.NewLine + FormatSetupsInfo(setups);
+				Environment.NewLine + FormatSetupsInfo(setups) +
+				Environment.NewLine + FormatInvocations(actualCalls);
 			throw new MockException(MockException.ExceptionReason.VerificationFailed, message);
 		}
 
@@ -357,7 +360,7 @@ namespace Moq
 
 			return expressionSetups.Length == 0 ?
 				"No setups configured." :
-				"Configured setups and invocations:" + Environment.NewLine + string.Join(Environment.NewLine, expressionSetups);
+				Environment.NewLine + "Configured setups:" + Environment.NewLine + string.Join(Environment.NewLine, expressionSetups);
 		}
 
 		private static string FormatCallCount(int callCount)
@@ -373,6 +376,17 @@ namespace Moq
 			}
 
 			return string.Format(CultureInfo.CurrentCulture, "Times.Exactly({0})", callCount);
+		}
+
+		private static string FormatInvocations(IEnumerable<ICallContext> invocations)
+		{
+			var formattedInvocations = invocations
+				.Select(i => i.Format())
+				.ToArray();
+
+			return formattedInvocations.Length == 0 ?
+				"No invocations performed." :
+				Environment.NewLine + "Performed invocations:" + Environment.NewLine + string.Join(Environment.NewLine, formattedInvocations);
 		}
 
 		#endregion

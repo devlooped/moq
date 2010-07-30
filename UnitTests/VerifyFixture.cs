@@ -838,6 +838,37 @@ namespace Moq.Tests
 		}
 #endif
 
+		[Fact]
+		public void IncludesActualCallsInFailureMessage()
+		{
+			var mock = new Moq.Mock<IFoo>();
+
+			mock.Object.Execute("ping");
+			mock.Object.Echo(42);
+			mock.Object.Submit();
+
+			var mex = Assert.Throws<MockException>(() => mock.Verify(f => f.Execute("pong")));
+
+			Assert.Contains(
+				Environment.NewLine +
+				"Performed invocations:" + Environment.NewLine +
+				"IFoo.Execute(\"ping\")" + Environment.NewLine +
+				"IFoo.Echo(42)" + Environment.NewLine +
+				"IFoo.Submit()",
+				mex.Message);
+		}
+
+		[Fact]
+		public void IncludesMessageAboutNoActualCallsInFailureMessage()
+		{
+			var mock = new Moq.Mock<IFoo>();
+
+			MockException mex = Assert.Throws<MockException>(() => mock.Verify(f => f.Execute("pong")));
+
+			Assert.Contains(Environment.NewLine + "No invocations performed.", mex.Message);
+		}
+
+
 		public interface IBar
 		{
 			int? Value { get; set; }
