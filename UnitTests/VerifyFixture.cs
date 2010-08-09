@@ -821,7 +821,6 @@ namespace Moq.Tests
 			Assert.Equal(MockException.ExceptionReason.VerificationFailed, mex.Reason);
 		}
 
-#if !SILVERLIGHT
 		[Fact]
 		public void ThrowsIfVerifySetAtMostOnceAndMoreThanOneCall()
 		{
@@ -836,7 +835,6 @@ namespace Moq.Tests
 				() => mock.VerifySet(f => f.Value = 3, Times.AtMostOnce()));
 			Assert.Equal(MockException.ExceptionReason.VerificationFailed, mex.Reason);
 		}
-#endif
 
 		[Fact]
 		public void IncludesActualCallsInFailureMessage()

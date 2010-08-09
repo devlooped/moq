@@ -78,17 +78,9 @@ namespace Moq
 		/// </summary>
 		private class SubtreeEvaluator : ExpressionVisitor
 		{
-#if SILVERLIGHT
-			private List<Expression> candidates;
-#else
 			private HashSet<Expression> candidates;
-#endif
 
-#if SILVERLIGHT
-			internal SubtreeEvaluator(List<Expression> candidates)
-#else
 			internal SubtreeEvaluator(HashSet<Expression> candidates)
-#endif
 			{
 				this.candidates = candidates;
 			}
@@ -130,11 +122,7 @@ namespace Moq
 		private class Nominator : ExpressionVisitor
 		{
 			private Func<Expression, bool> fnCanBeEvaluated;
-#if SILVERLIGHT
-			private List<Expression> candidates;
-#else
 			private HashSet<Expression> candidates;
-#endif
 			private bool cannotBeEvaluated;
 
 			internal Nominator(Func<Expression, bool> fnCanBeEvaluated)
@@ -142,15 +130,9 @@ namespace Moq
 				this.fnCanBeEvaluated = fnCanBeEvaluated;
 			}
 
-#if SILVERLIGHT
-			internal List<Expression> Nominate(Expression expression)
-			{
-				this.candidates = new List<Expression>();
-#else
 			internal HashSet<Expression> Nominate(Expression expression)
 			{
 				this.candidates = new HashSet<Expression>();
-#endif
 				this.Visit(expression);
 				return this.candidates;
 			}

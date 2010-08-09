@@ -1380,22 +1380,6 @@ namespace Moq.Tests.Regressions
 
 		#endregion
 
-		#region #250
-
-		public class _250
-		{
-			[Fact]
-			public void Test()
-			{
-				var target = new Mock<MethodInfo>();
-
-				Assert.NotNull(target.Object);
-			}
-		}
-
-
-		#endregion
-
 		#region #251
 
 		public class _251
@@ -1538,6 +1522,25 @@ namespace Moq.Tests.Regressions
 		#endregion
 
 		#region Silverlight excluded
+
+		#region #250
+
+		/// <summary>
+		/// Silverlight MethodInfo protected constructor is internal, unlike desktop .NET
+		/// </summary>
+		public class _250
+		{
+			[Fact]
+			public void Test()
+			{
+				var target = new Mock<MethodInfo>();
+
+				Assert.NotNull(target.Object);
+			}
+		}
+
+		#endregion
+
 
 #if !SILVERLIGHT
 

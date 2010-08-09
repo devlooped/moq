@@ -48,7 +48,6 @@ namespace Moq.Tests
 			Assert.Equal("ack", ((IFoo)mock.Object).Execute("ping"));
 		}
 
-#if !SILVERLIGHT
 		[Fact]
 		public void ShouldExpectPropertySetterOnNewInterface()
 		{
@@ -62,7 +61,6 @@ namespace Moq.Tests
 			Assert.Equal(100, value);
 			Assert.True(called);
 		}
-#endif
 
 		[Fact]
 		public void MockAsExistingInterfaceAfterObjectSucceedsIfNotNew()

@@ -168,7 +168,6 @@ namespace Moq
 		[SuppressMessage("Microsoft.Design", "CA1031:DoNotCatchGeneralExceptionTypes")]
 		private void SetFileInfo()
 		{
-#if !SILVERLIGHT
 			try
 			{
 				var thisMethod = MethodBase.GetCurrentMethod();
@@ -191,7 +190,6 @@ namespace Moq
 			{
 				// Must NEVER fail, as this is a nice-to-have feature only.
 			}
-#endif
 		}
 
 		public void SetOutParameters(ICallContext call)

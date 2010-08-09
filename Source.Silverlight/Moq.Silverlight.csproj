@@ -81,11 +81,7 @@
   <ItemGroup>
     <Reference Include="Castle.Core, Version=1.2.0.0, Culture=neutral, PublicKeyToken=407dd0808d44fbdc, processorArchitecture=MSIL">
       <SpecificVersion>False</SpecificVersion>
-      <HintPath>..\Lib\Castle\sl-30\Castle.Core.dll</HintPath>
-    </Reference>
-    <Reference Include="Castle.DynamicProxy2, Version=2.2.0.0, Culture=neutral, PublicKeyToken=407dd0808d44fbdc, processorArchitecture=MSIL">
-      <SpecificVersion>False</SpecificVersion>
-      <HintPath>..\Lib\Castle\sl-30\Castle.DynamicProxy2.dll</HintPath>
+      <HintPath>..\Lib\Castle\bin-SL4\Castle.Core.dll</HintPath>
     </Reference>
     <Reference Include="mscorlib" />
     <Reference Include="system" />

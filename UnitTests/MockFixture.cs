@@ -324,7 +324,6 @@ namespace Moq.Tests
 			Assert.Null(target.As<IFoo>().Object.Bar);
 		}
 
-#if !SILVERLIGHT
 		[Fact]
 		public void ExpectsPropertySetter()
 		{
@@ -481,8 +480,6 @@ namespace Moq.Tests
 		{
 			return Match.Create<int>(i => i % value == 0);
 		}
-
-#endif
 
 #pragma warning disable 618
 		[Matcher]

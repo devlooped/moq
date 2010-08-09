@@ -41,7 +41,6 @@
 using System;
 using System.Reflection;
 using System.Security.Permissions;
-using Castle.Core.Interceptor;
 using Castle.DynamicProxy;
 using Castle.DynamicProxy.Generators;
 using Moq.Properties;

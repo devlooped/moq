@@ -6,7 +6,6 @@ namespace Moq.Tests
 {
 	public class StreamFixture
 	{
-#if !SILVERLIGHT
 		[Fact]
 		public void ShouldMockStream()
 		{
@@ -26,6 +25,5 @@ namespace Moq.Tests
 
 			mockStream.VerifyAll();
 		}
-#endif
 	}
 }
