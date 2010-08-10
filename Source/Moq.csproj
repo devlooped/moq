@@ -29,6 +29,8 @@
     <TreatWarningsAsErrors>true</TreatWarningsAsErrors>
     <CodeAnalysisRuleSet>AllRules.ruleset</CodeAnalysisRuleSet>
     <MergeReferences>false</MergeReferences>
+    <NoWarn>
+    </NoWarn>
   </PropertyGroup>
   <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Release|AnyCPU' ">
     <DebugType>full</DebugType>
@@ -53,6 +55,7 @@
     <Reference Condition="'$(TargetFrameworkVersion)' == 'v3.5'" Include="Castle.Core, Version=1.2.0.0, Culture=neutral, PublicKeyToken=407dd0808d44fbdc, processorArchitecture=MSIL">
       <SpecificVersion>False</SpecificVersion>
       <HintPath>..\Lib\Castle\bin-NET35\Castle.Core.dll</HintPath>
+			<Visible>False</Visible>
     </Reference>
     <Reference Include="System" />
     <Reference Include="System.Core" />
@@ -81,6 +84,8 @@
     <Compile Include="Language\ISetupSequentialResult.cs" />
     <Compile Include="Language\ISetupConditionResult.cs" />
     <Compile Include="Linq\FluentMockVisitor.cs" />
+    <Compile Include="Linq\Mock.cs" />
+    <Compile Include="Linq\MockRepository.cs" />
     <Compile Include="Linq\MockSetupsBuilder.cs" />
     <Compile Include="Matchers\ExpressionComparer.cs" />
     <Compile Include="Matchers\ExpressionMatcher.cs" />
@@ -109,6 +114,7 @@
     <Compile Include="Obsolete\Mock.Generic.Legacy.cs" />
     <Compile Include="Obsolete\Mock.Legacy.cs" />
     <Compile Include="Obsolete\MockExtensions.cs" />
+    <Compile Include="Obsolete\MockFactory.cs" />
     <Compile Include="SequenceExtensions.cs" />
     <Compile Include="SetupKind.cs" />
     <Compile Include="Language\Flow\IReturnsResult.cs" />
@@ -142,7 +148,7 @@
     <Compile Include="Mock.cs" />
     <Compile Include="MockBehavior.cs" />
     <Compile Include="MockException.cs" />
-    <Compile Include="MockFactory.cs" />
+    <Compile Include="MockRepository.cs" />
     <Compile Include="Properties\Resources.Designer.cs">
       <AutoGen>True</AutoGen>
       <DesignTime>True</DesignTime>

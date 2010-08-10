@@ -4,22 +4,22 @@ using Xunit;
 
 namespace Moq.Tests
 {
-	public class MockFactoryFixture
+	public class MockRepositoryFixture
 	{
 		[Fact]
 		public void ShouldCreateFactoryWithMockBehaviorAndVerificationBehavior()
 		{
-			var factory = new MockFactory(MockBehavior.Loose);
+			var repository = new MockRepository(MockBehavior.Loose);
 
-			Assert.NotNull(factory);
+			Assert.NotNull(repository);
 		}
 
 		[Fact]
 		public void ShouldCreateMocksWithFactoryBehavior()
 		{
-			var factory = new MockFactory(MockBehavior.Loose);
+			var repository = new MockRepository(MockBehavior.Loose);
 
-			var mock = factory.Create<IFormatProvider>();
+			var mock = repository.Create<IFormatProvider>();
 
 			Assert.Equal(MockBehavior.Loose, mock.Behavior);
 		}
@@ -27,9 +27,9 @@ namespace Moq.Tests
 		[Fact]
 		public void ShouldCreateMockWithConstructorArgs()
 		{
-			var factory = new MockFactory(MockBehavior.Loose);
+			var repository = new MockRepository(MockBehavior.Loose);
 
-			var mock = factory.Create<BaseClass>("foo");
+			var mock = repository.Create<BaseClass>("foo");
 
 			Assert.Equal("foo", mock.Object.Value);
 		}
@@ -39,12 +39,12 @@ namespace Moq.Tests
 		{
 			try
 			{
-				var factory = new MockFactory(MockBehavior.Default);
-				var mock = factory.Create<IFoo>();
+				var repository = new MockRepository(MockBehavior.Default);
+				var mock = repository.Create<IFoo>();
 
 				mock.Setup(foo => foo.Do());
 
-				factory.VerifyAll();
+				repository.VerifyAll();
 			}
 			catch (MockException mex)
 			{
@@ -57,13 +57,13 @@ namespace Moq.Tests
 		{
 			try
 			{
-				var factory = new MockFactory(MockBehavior.Default);
-				var mock = factory.Create<IFoo>();
+				var repository = new MockRepository(MockBehavior.Default);
+				var mock = repository.Create<IFoo>();
 
 				mock.Setup(foo => foo.Do());
 				mock.Setup(foo => foo.Undo()).Verifiable();
 
-				factory.Verify();
+				repository.Verify();
 			}
 			catch (MockException mex)
 			{
@@ -78,14 +78,14 @@ namespace Moq.Tests
 		{
 			try
 			{
-				var factory = new MockFactory(MockBehavior.Loose);
-				var foo = factory.Create<IFoo>();
-				var bar = factory.Create<IBar>();
+				var repository = new MockRepository(MockBehavior.Loose);
+				var foo = repository.Create<IFoo>();
+				var bar = repository.Create<IBar>();
 
 				foo.Setup(f => f.Do());
 				bar.Setup(b => b.Redo());
 
-				factory.VerifyAll();
+				repository.VerifyAll();
 			}
 			catch (MockException mex)
 			{
@@ -100,8 +100,8 @@ namespace Moq.Tests
 		[Fact]
 		public void ShouldOverrideDefaultBehavior()
 		{
-			var factory = new MockFactory(MockBehavior.Loose);
-			var mock = factory.Create<IFoo>(MockBehavior.Strict);
+			var repository = new MockRepository(MockBehavior.Loose);
+			var mock = repository.Create<IFoo>(MockBehavior.Strict);
 
 			Assert.Equal(MockBehavior.Strict, mock.Behavior);
 		}
@@ -109,8 +109,8 @@ namespace Moq.Tests
 		[Fact]
 		public void ShouldOverrideDefaultBehaviorWithCtorArgs()
 		{
-			var factory = new MockFactory(MockBehavior.Loose);
-			var mock = factory.Create<BaseClass>(MockBehavior.Strict, "Foo");
+			var repository = new MockRepository(MockBehavior.Loose);
+			var mock = repository.Create<BaseClass>(MockBehavior.Strict, "Foo");
 
 			Assert.Equal(MockBehavior.Strict, mock.Behavior);
 			Assert.Equal("Foo", mock.Object.Value);
@@ -119,9 +119,9 @@ namespace Moq.Tests
 		[Fact]
 		public void ShouldCreateMocksWithFactoryDefaultValue()
 		{
-			var factory = new MockFactory(MockBehavior.Loose) { DefaultValue = DefaultValue.Mock };
+			var repository = new MockRepository(MockBehavior.Loose) { DefaultValue = DefaultValue.Mock };
 
-			var mock = factory.Create<IFoo>();
+			var mock = repository.Create<IFoo>();
 
 			Assert.NotNull(mock.Object.Bar());
 		}
@@ -129,17 +129,17 @@ namespace Moq.Tests
 		[Fact]
 		public void ShouldCreateMocksWithFactoryCallBase()
 		{
-			var factory = new MockFactory(MockBehavior.Loose);
+			var repository = new MockRepository(MockBehavior.Loose);
 
-			var mock = factory.Create<BaseClass>();
+			var mock = repository.Create<BaseClass>();
 
 			mock.Object.BaseMethod();
 
 			Assert.False(mock.Object.BaseCalled);
 
-			factory.CallBase = true;
+			repository.CallBase = true;
 
-			mock = factory.Create<BaseClass>();
+			mock = repository.Create<BaseClass>();
 
 			mock.Object.BaseMethod();
 

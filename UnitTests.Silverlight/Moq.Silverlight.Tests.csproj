@@ -123,6 +123,9 @@
     <Compile Include="..\UnitTests\ExtensibilityFixture.cs">
       <Link>ExtensibilityFixture.cs</Link>
     </Compile>
+    <Compile Include="..\UnitTests\Linq\MockRepositoryQuerying.cs">
+      <Link>Linq\MockRepositoryQuerying.cs</Link>
+    </Compile>
     <Compile Include="..\UnitTests\Linq\QueryableMocksFixture.cs">
       <Link>Linq\QueryableMocksFixture.cs</Link>
     </Compile>
@@ -153,11 +156,11 @@
     <Compile Include="..\UnitTests\MockedFixture.cs">
       <Link>MockedFixture.cs</Link>
     </Compile>
-    <Compile Include="..\UnitTests\MockFactoryFixture.cs">
-      <Link>MockFactoryFixture.cs</Link>
-    </Compile>
     <Compile Include="..\UnitTests\MockFixture.cs">
       <Link>MockFixture.cs</Link>
+    </Compile>
+    <Compile Include="..\UnitTests\MockRepositoryFixture.cs">
+      <Link>MockRepositoryFixture.cs</Link>
     </Compile>
     <Compile Include="..\UnitTests\MockSequenceFixture.cs">
       <Link>MockSequenceFixture.cs</Link>

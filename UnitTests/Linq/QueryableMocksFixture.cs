@@ -119,8 +119,8 @@ namespace Moq.Tests
 		[Fact]
 		public void ShouldSupportSettingDtoPropertyValue()
 		{
-			//var target = Mocks.OneOf<IFoo>(x => x.Bar.Id == "foo");
-			var target = Mocks.OneOf<Dto>(x => x.Value == "foo");
+			//var target = Mock.Of<IFoo>(x => x.Bar.Id == "foo");
+			var target = Mock.Of<Dto>(x => x.Value == "foo");
 
 			Assert.Equal("foo", target.Value);
 		}
@@ -128,7 +128,7 @@ namespace Moq.Tests
 		[Fact]
 		public void ShouldOneOfCreateNewMock()
 		{
-			var target = Mocks.OneOf<IFoo>();
+			var target = Mock.Of<IFoo>();
 
 			Assert.NotNull(Mock.Get(target));
 		}
@@ -136,7 +136,7 @@ namespace Moq.Tests
 		[Fact]
 		public void ShouldOneOfWithPredicateCreateNewMock()
 		{
-			var target = Mocks.OneOf<IFoo>(x => x.Name == "Foo");
+			var target = Mock.Of<IFoo>(x => x.Name == "Foo");
 
 			Assert.NotNull(Mock.Get(target));
 			Assert.Equal("Foo", target.Name);
@@ -145,10 +145,10 @@ namespace Moq.Tests
 		[Fact]
 		public void ShouldAllowFluentOnReadOnlyGetterProperty()
 		{
-			var target = Mocks.OneOf<IFoo>(x => x.Bars == new[] 
+			var target = Mock.Of<IFoo>(x => x.Bars == new[] 
 			{ 
-				Mocks.OneOf<IBar>(b => b.Id == "1"), 
-				Mocks.OneOf<IBar>(b => b.Id == "2"), 
+				Mock.Of<IBar>(b => b.Id == "1"), 
+				Mock.Of<IBar>(b => b.Id == "2"), 
 			});
 
 			Assert.NotNull(Mock.Get(target));
@@ -158,10 +158,24 @@ namespace Moq.Tests
 		[Fact]
 		public void ShouldAllowFluentOnNonVirtualReadWriteProperty()
 		{
-			var target = Mocks.OneOf<Dto>(x => x.Value == "foo");
+			var target = Mock.Of<Dto>(x => x.Value == "foo");
 
 			Assert.NotNull(Mock.Get(target));
 			Assert.Equal("foo", target.Value);
+		}
+
+		[Fact]
+		public void InvokeViaExpression()
+		{
+			var call = Expression.Call(Expression.Constant(this), this.GetType().GetMethod("Do"));
+
+			var lambda = Expression.Lambda<Action>(call);
+			lambda.Compile().Invoke();
+		}
+
+		public void Do()
+		{
+			Console.WriteLine("Done");
 		}
 
 		public class Dto

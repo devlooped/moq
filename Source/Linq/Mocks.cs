@@ -63,6 +63,9 @@ namespace Moq
 	/// </devdoc>
 	public static class Mocks
 	{
+		private static readonly MethodInfo createQueryableMethod = typeof(Mocks)
+			.GetMethod("CreateQueryable", BindingFlags.NonPublic | BindingFlags.Static);
+
 		/// <summary>
 		/// Access the universe of mocks of the given type, to retrieve those 
 		/// that behave according to the LINQ query specification.
@@ -70,7 +73,19 @@ namespace Moq
 		/// <typeparam name="T">The type of the mocked object to query.</typeparam>
 		public static IQueryable<T> Of<T>() where T : class
 		{
-			return new MockQueryable<T>();
+			return CreateMockQuery<T>();
+		}
+
+		/// <summary>
+		/// Access the universe of mocks of the given type, to retrieve those 
+		/// that behave according to the LINQ query specification.
+		/// </summary>
+		/// <param name="specification">The predicate with the setup expressions.</param>
+		/// <typeparam name="T">The type of the mocked object to query.</typeparam>
+		[SuppressMessage("Microsoft.Design", "CA1006:DoNotNestGenericTypesInMemberSignatures", Justification = "By design")]
+		public static IQueryable<T> Of<T>(Expression<Func<T, bool>> specification) where T : class
+		{
+			return CreateMockQuery<T>().Where(specification);
 		}
 
 		/// <summary>
@@ -78,21 +93,33 @@ namespace Moq
 		/// </summary>
 		/// <typeparam name="T">The type of the mocked object.</typeparam>
 		/// <returns>The mocked object created.</returns>
+		[EditorBrowsable(EditorBrowsableState.Never)]
+		[Obsolete("Moved to Mock.Of<T>, as it's a single one, so no reason to be on Mocks.", true)]
 		public static T OneOf<T>() where T : class
 		{
-			return new MockQueryable<T>().First<T>();
+			return CreateMockQuery<T>().First<T>();
 		}
 
 		/// <summary>
 		/// Creates an mock object of the indicated type.
 		/// </summary>
-		/// <param name="predicate">The predicate with the setup expressions.</param>
+		/// <param name="specification">The predicate with the setup expressions.</param>
 		/// <typeparam name="T">The type of the mocked object.</typeparam>
 		/// <returns>The mocked object created.</returns>
 		[SuppressMessage("Microsoft.Design", "CA1006:DoNotNestGenericTypesInMemberSignatures", Justification = "By Design")]
-		public static T OneOf<T>(Expression<Func<T, bool>> predicate) where T : class
+		[EditorBrowsable(EditorBrowsableState.Never)]
+		[Obsolete("Moved to Mock.Of<T>, as it's a single one, so no reason to be on Mocks.", true)]
+		public static T OneOf<T>(Expression<Func<T, bool>> specification) where T : class
 		{
-			return new MockQueryable<T>().First<T>(predicate);
+			return CreateMockQuery<T>().First<T>(specification);
+		}
+
+		/// <summary>
+		/// Creates the mock query with the underlying queriable implementation.
+		/// </summary>
+		internal static IQueryable<T> CreateMockQuery<T>() where T : class
+		{
+			return new MockQueryable<T>(Expression.Call(null, createQueryableMethod.MakeGenericMethod(typeof(T))));
 		}
 
 		/// <summary>

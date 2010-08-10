@@ -43,6 +43,7 @@ using System.Collections;
 using System.Collections.Generic;
 using System.Linq;
 using System.Linq.Expressions;
+using System.Reflection;
 
 namespace Moq.Linq
 {
@@ -51,16 +52,28 @@ namespace Moq.Linq
 	/// </summary>
 	internal class MockQueryable<T> : IQueryable<T>, IQueryProvider
 	{
-		public MockQueryable()
+		private MethodCallExpression underlyingCreateMocks;
+
+		/// <summary>
+		/// The <paramref name="underlyingCreateMocks"/> is a 
+		/// static method that returns an IQueryable of Mocks of T which is used to 
+		/// apply the linq specification to.
+		/// </summary>
+		public MockQueryable(MethodCallExpression underlyingCreateMocks)
 		{
+			Guard.NotNull(() => underlyingCreateMocks, underlyingCreateMocks);
+
 			this.Expression = Expression.Constant(this);
+			this.underlyingCreateMocks = underlyingCreateMocks;
 		}
 
-		public MockQueryable(Expression expression)
+		public MockQueryable(MethodCallExpression underlyingCreateMocks, Expression expression)
 		{
+			Guard.NotNull(() => underlyingCreateMocks, underlyingCreateMocks);
 			Guard.NotNull(() => expression, expression);
 			Guard.CanBeAssigned(() => expression, expression.Type, typeof(IQueryable<T>));
 
+			this.underlyingCreateMocks = underlyingCreateMocks;
 			this.Expression = expression;
 		}
 
@@ -83,7 +96,7 @@ namespace Moq.Linq
 
 		public IQueryable<TElement> CreateQuery<TElement>(Expression expression)
 		{
-			return new MockQueryable<TElement>(expression);
+			return new MockQueryable<TElement>(this.underlyingCreateMocks, expression);
 		}
 
 		public object Execute(Expression expression)
@@ -93,7 +106,7 @@ namespace Moq.Linq
 
 		public TResult Execute<TResult>(Expression expression)
 		{
-			var replaced = new MockSetupsBuilder().Visit(expression);
+			var replaced = new MockSetupsBuilder(this.underlyingCreateMocks).Visit(expression);
 
 			var lambda = Expression.Lambda<Func<TResult>>(replaced);
 			return lambda.Compile().Invoke();

@@ -13,7 +13,7 @@ namespace Moq.Tests.Linq
 			[Fact]
 			public void WhenImplicitlyQueryingTrueOneOf_ThenSetsPropertyToTrue()
 			{
-				var target = Mocks.OneOf<IFoo>(x => x.IsValid);
+				var target = Mock.Of<IFoo>(x => x.IsValid);
 
 				Assert.True(target.IsValid);
 			}
@@ -45,7 +45,7 @@ namespace Moq.Tests.Linq
 			[Fact]
 			public void WhenExplicitlyQueryingTrueOneOf_ThenSetsPropertyToTrue()
 			{
-				var target = Mocks.OneOf<IFoo>(x => x.IsValid == true);
+				var target = Mock.Of<IFoo>(x => x.IsValid == true);
 
 				Assert.True(target.IsValid);
 			}
@@ -85,7 +85,7 @@ namespace Moq.Tests.Linq
 			[Fact]
 			public void WhenQueryingWithFalse_ThenSetsProperty()
 			{
-				var target = Mocks.OneOf<FooDefaultIsValid>(x => x.IsValid == false);
+				var target = Mock.Of<FooDefaultIsValid>(x => x.IsValid == false);
 
 				Assert.False(target.IsValid);
 			}
@@ -93,7 +93,7 @@ namespace Moq.Tests.Linq
 			[Fact]
 			public void WhenQueryingTrueEquals_ThenSetsProperty()
 			{
-				var target = Mocks.OneOf<IFoo>(x => true == x.IsValid);
+				var target = Mock.Of<IFoo>(x => true == x.IsValid);
 
 				Assert.True(target.IsValid);
 			}
@@ -101,7 +101,7 @@ namespace Moq.Tests.Linq
 			[Fact]
 			public void WhenQueryingFalseEquals_ThenSetsProperty()
 			{
-				var target = Mocks.OneOf<FooDefaultIsValid>(x => false == x.IsValid);
+				var target = Mock.Of<FooDefaultIsValid>(x => false == x.IsValid);
 
 				Assert.False(target.IsValid);
 			}
@@ -109,7 +109,7 @@ namespace Moq.Tests.Linq
 			[Fact]
 			public void WhenQueryingNegatedProperty_ThenSetsProperty()
 			{
-				var target = Mocks.OneOf<FooDefaultIsValid>(x => !x.IsValid);
+				var target = Mock.Of<FooDefaultIsValid>(x => !x.IsValid);
 
 				Assert.False(target.IsValid);
 			}
@@ -117,7 +117,7 @@ namespace Moq.Tests.Linq
 			[Fact]
 			public void WhenQueryingWithNoValue_ThenAlwaysHasPropertyStubBehavior()
 			{
-				var foo = Mocks.OneOf<IFoo>();
+				var foo = Mock.Of<IFoo>();
 
 				foo.IsValid = true;
 
@@ -178,7 +178,7 @@ namespace Moq.Tests.Linq
 			[Fact]
 			public void WhenCombiningQueryingWithImplicitBoolean_ThenSetsBothProperties()
 			{
-				var target = Mocks.OneOf<IFoo>(x => x.IsValid && x.Value == "foo");
+				var target = Mock.Of<IFoo>(x => x.IsValid && x.Value == "foo");
 
 				Assert.True(target.IsValid);
 				Assert.Equal("foo", target.Value);
@@ -187,7 +187,7 @@ namespace Moq.Tests.Linq
 			[Fact]
 			public void WhenCombiningQueryingWithExplicitBoolean_ThenSetsBothProperties()
 			{
-				var target = Mocks.OneOf<IFoo>(x => x.IsValid == true && x.Value == "foo");
+				var target = Mock.Of<IFoo>(x => x.IsValid == true && x.Value == "foo");
 
 				Assert.True(target.IsValid);
 				Assert.Equal("foo", target.Value);
@@ -205,7 +205,7 @@ namespace Moq.Tests.Linq
 			[Fact]
 			public void WhenUsingSpecificArgumentValue_ThenSetsReturnValue()
 			{
-				var foo = Mocks.OneOf<IFoo>(x => x.Do(5) == "foo");
+				var foo = Mock.Of<IFoo>(x => x.Do(5) == "foo");
 
 				Assert.Equal("foo", foo.Do(5));
 			}
@@ -213,7 +213,7 @@ namespace Moq.Tests.Linq
 			[Fact]
 			public void WhenUsingItIsAnyForArgument_ThenSetsReturnValue()
 			{
-				var foo = Mocks.OneOf<IFoo>(x => x.Do(It.IsAny<int>()) == "foo");
+				var foo = Mock.Of<IFoo>(x => x.Do(It.IsAny<int>()) == "foo");
 
 				Assert.Equal("foo", foo.Do(5));
 			}
@@ -221,7 +221,7 @@ namespace Moq.Tests.Linq
 			[Fact]
 			public void WhenUsingItIsForArgument_ThenSetsReturnValue()
 			{
-				var foo = Mocks.OneOf<IFoo>(x => x.Do(It.Is<int>(i => i > 0)) == "foo");
+				var foo = Mock.Of<IFoo>(x => x.Do(It.Is<int>(i => i > 0)) == "foo");
 
 				Assert.Equal("foo", foo.Do(5));
 				Assert.Equal(default(string), foo.Do(-5));
@@ -230,7 +230,7 @@ namespace Moq.Tests.Linq
 			[Fact]
 			public void WhenUsingCustomMatcherForArgument_ThenSetsReturnValue()
 			{
-				var foo = Mocks.OneOf<IFoo>(x => x.Do(Any<int>()) == "foo");
+				var foo = Mock.Of<IFoo>(x => x.Do(Any<int>()) == "foo");
 
 				Assert.Equal("foo", foo.Do(5));
 			}

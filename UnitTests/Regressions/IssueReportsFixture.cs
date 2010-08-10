@@ -381,8 +381,8 @@ namespace Moq.Tests.Regressions
 			[Fact]
 			public void superFooMockSetupAllProperties()
 			{
-				var fac = new MockFactory(MockBehavior.Default);
-				var superFooMock = fac.Create<SuperFoo>();
+				var repo = new MockRepository(MockBehavior.Default);
+				var superFooMock = repo.Create<SuperFoo>();
 				superFooMock.SetupAllProperties();
 
 				var superFoo = superFooMock.Object;

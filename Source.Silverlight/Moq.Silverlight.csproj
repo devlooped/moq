@@ -202,8 +202,14 @@
     <Compile Include="..\Source\Linq\FluentMockVisitor.cs">
       <Link>Linq\FluentMockVisitor.cs</Link>
     </Compile>
+    <Compile Include="..\Source\Linq\Mock.cs">
+      <Link>Linq\Mock.cs</Link>
+    </Compile>
     <Compile Include="..\Source\Linq\MockQuery.cs">
       <Link>Linq\MockQuery.cs</Link>
+    </Compile>
+    <Compile Include="..\Source\Linq\MockRepository.cs">
+      <Link>Linq\MockRepository.cs</Link>
     </Compile>
     <Compile Include="..\Source\Linq\Mocks.cs">
       <Link>Linq\Mocks.cs</Link>
@@ -283,8 +289,8 @@
     <Compile Include="..\Source\MockException.cs">
       <Link>MockException.cs</Link>
     </Compile>
-    <Compile Include="..\Source\MockFactory.cs">
-      <Link>MockFactory.cs</Link>
+    <Compile Include="..\Source\MockRepository.cs">
+      <Link>MockRepository.cs</Link>
     </Compile>
     <Compile Include="..\Source\MockSequence.cs">
       <Link>MockSequence.cs</Link>
@@ -300,6 +306,9 @@
     </Compile>
     <Compile Include="..\Source\Obsolete\MockExtensions.cs">
       <Link>Obsolete\MockExtensions.cs</Link>
+    </Compile>
+    <Compile Include="..\Source\Obsolete\MockFactory.cs">
+      <Link>Obsolete\MockFactory.cs</Link>
     </Compile>
     <Compile Include="..\Source\PexProtector.cs">
       <Link>PexProtector.cs</Link>

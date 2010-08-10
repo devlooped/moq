@@ -39,17 +39,15 @@
     <CodeAnalysisRuleSet>AllRules.ruleset</CodeAnalysisRuleSet>
   </PropertyGroup>
   <ItemGroup>
-		<Reference Condition="'$(TargetFrameworkVersion)' == 'v4.0'"
-							 Include="Castle.Core, Version=1.2.0.0, Culture=neutral, PublicKeyToken=407dd0808d44fbdc, processorArchitecture=MSIL">
-			<SpecificVersion>False</SpecificVersion>
-			<HintPath>..\Lib\Castle\bin-NET40\Castle.Core.dll</HintPath>
-		</Reference>
-		<Reference Condition="'$(TargetFrameworkVersion)' == 'v3.5'"
-							 Include="Castle.Core, Version=1.2.0.0, Culture=neutral, PublicKeyToken=407dd0808d44fbdc, processorArchitecture=MSIL">
-			<SpecificVersion>False</SpecificVersion>
-			<HintPath>..\Lib\Castle\bin-NET35\Castle.Core.dll</HintPath>
-		</Reference>
-		<Reference Include="EnvDTE, Version=8.0.0.0, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a">
+    <Reference Condition="'$(TargetFrameworkVersion)' == 'v4.0'" Include="Castle.Core, Version=1.2.0.0, Culture=neutral, PublicKeyToken=407dd0808d44fbdc, processorArchitecture=MSIL">
+      <SpecificVersion>False</SpecificVersion>
+      <HintPath>..\Lib\Castle\bin-NET40\Castle.Core.dll</HintPath>
+    </Reference>
+    <Reference Condition="'$(TargetFrameworkVersion)' == 'v3.5'" Include="Castle.Core, Version=1.2.0.0, Culture=neutral, PublicKeyToken=407dd0808d44fbdc, processorArchitecture=MSIL">
+      <SpecificVersion>False</SpecificVersion>
+      <HintPath>..\Lib\Castle\bin-NET35\Castle.Core.dll</HintPath>
+    </Reference>
+    <Reference Include="EnvDTE, Version=8.0.0.0, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a">
       <SpecificVersion>False</SpecificVersion>
       <EmbedInteropTypes>False</EmbedInteropTypes>
       <HintPath>c:\Program Files (x86)\Microsoft Visual Studio 10.0\Common7\IDE\PublicAssemblies\EnvDTE.dll</HintPath>
@@ -77,6 +75,7 @@
     <Compile Include="ConditionalSetupFixture.cs" />
     <Compile Include="CustomMatcherFixture.cs" />
     <Compile Include="ExtensionsFixture.cs" />
+    <Compile Include="Linq\MockRepositoryQuerying.cs" />
     <Compile Include="MockSequenceFixture.cs" />
     <Compile Include="Linq\SupportedQuerying.cs" />
     <Compile Include="Linq\UnsupportedQuerying.cs" />
@@ -96,7 +95,7 @@
     <Compile Include="MockDefaultValueProviderFixture.cs" />
     <Compile Include="MockedFixture.cs" />
     <Compile Include="MockedEventsFixture.cs" />
-    <Compile Include="MockFactoryFixture.cs" />
+    <Compile Include="MockRepositoryFixture.cs" />
     <Compile Include="MockFixture.cs" />
     <Compile Include="OccurrenceFixture.cs" />
     <Compile Include="OutRefFixture.cs" />

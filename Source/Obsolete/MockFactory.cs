@@ -132,7 +132,8 @@ namespace Moq
 	/// </code>
 	/// </example>
 	/// <seealso cref="MockBehavior"/>
-	public class MockFactory
+	[Obsolete("This class has been renamed to MockRepository. MockFactory will be retired in v5.", false)]
+	public partial class MockFactory
 	{
 		List<Mock> mocks = new List<Mock>();
 		MockBehavior defaultBehavior;

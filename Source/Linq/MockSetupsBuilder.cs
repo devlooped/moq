@@ -50,12 +50,16 @@ namespace Moq.Linq
 {
 	internal class MockSetupsBuilder : ExpressionVisitor
 	{
-		private static readonly MethodInfo createQueryableMethod = typeof(Mocks)
-			.GetMethod("CreateQueryable", BindingFlags.NonPublic | BindingFlags.Static);
 		private static readonly string[] queryableMethods = new[] { "First", "Where", "FirstOrDefault" };
 		private static readonly string[] unsupportedMethods = new[] { "All", "Any", "Last", "LastOrDefault", "Single", "SingleOrDefault" };
 
 		private int stackIndex;
+		private MethodCallExpression underlyingCreateMocks;
+
+		public MockSetupsBuilder(MethodCallExpression underlyingCreateMocks)
+		{
+			this.underlyingCreateMocks = underlyingCreateMocks;
+		}
 
 		protected override Expression VisitBinary(BinaryExpression node)
 		{
@@ -86,9 +90,10 @@ namespace Moq.Linq
 		{
 			if (node != null && node.Type.IsGenericType && node.Type.GetGenericTypeDefinition() == typeof(MockQueryable<>))
 			{
-				var asQueryableMethod = createQueryableMethod.MakeGenericMethod(node.Type.GetGenericArguments()[0]);
+				//var asQueryableMethod = createQueryableMethod.MakeGenericMethod(node.Type.GetGenericArguments()[0]);
 
-				return Expression.Call(null, asQueryableMethod);
+				//return Expression.Call(null, asQueryableMethod);
+				return this.underlyingCreateMocks;
 			}
 
 			return base.VisitConstant(node);

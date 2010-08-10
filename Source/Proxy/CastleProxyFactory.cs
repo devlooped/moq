@@ -44,6 +44,7 @@ using System.Security.Permissions;
 using Castle.DynamicProxy;
 using Castle.DynamicProxy.Generators;
 using Moq.Properties;
+using System.Diagnostics.CodeAnalysis;
 
 namespace Moq.Proxy
 {
@@ -51,6 +52,7 @@ namespace Moq.Proxy
 	{
 		private static readonly ProxyGenerator generator = CreateProxyGenerator();
 
+		[SuppressMessage("Microsoft.Performance", "CA1810:InitializeReferenceTypeStaticFieldsInline", Justification = "By Design")]
 		static CastleProxyFactory()
 		{
 #pragma warning disable 618

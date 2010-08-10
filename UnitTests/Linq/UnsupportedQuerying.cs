@@ -13,19 +13,19 @@ namespace Moq.Tests.Linq
 			[Fact]
 			public void WhenQueryingDirect_ThenThrowsNotSupportedException()
 			{
-				Assert.Throws<NotSupportedException>(() => Mocks.OneOf<Bar>(x => x.NonVirtualValue == "bar"));
+				Assert.Throws<NotSupportedException>(() => Mock.Of<Bar>(x => x.NonVirtualValue == "bar"));
 			}
 
 			[Fact]
 			public void WhenQueryingOnFluent_ThenThrowsNotSupportedException()
 			{
-				Assert.Throws<NotSupportedException>(() => Mocks.OneOf<Foo>(x => x.VirtualBar.NonVirtualValue == "bar"));
+				Assert.Throws<NotSupportedException>(() => Mock.Of<Foo>(x => x.VirtualBar.NonVirtualValue == "bar"));
 			}
 
 			[Fact]
 			public void WhenQueryingOnIntermediateFluentReadonly_ThenThrowsNotSupportedException()
 			{
-				Assert.Throws<NotSupportedException>(() => Mocks.OneOf<Foo>(x => x.NonVirtualBar.VirtualValue == "bar"));
+				Assert.Throws<NotSupportedException>(() => Mock.Of<Foo>(x => x.NonVirtualBar.VirtualValue == "bar"));
 			}
 
 			public class Bar
@@ -46,19 +46,19 @@ namespace Moq.Tests.Linq
 			[Fact]
 			public void WhenQueryingField_ThenThrowsNotSupportedException()
 			{
-				Assert.Throws<NotSupportedException>(() => Mocks.OneOf<Bar>(x => x.FieldValue == "bar"));
+				Assert.Throws<NotSupportedException>(() => Mock.Of<Bar>(x => x.FieldValue == "bar"));
 			}
 
 			[Fact]
 			public void WhenQueryingOnFluent_ThenThrowsNotSupportedException()
 			{
-				Assert.Throws<NotSupportedException>(() => Mocks.OneOf<Foo>(x => x.VirtualBar.FieldValue == "bar"));
+				Assert.Throws<NotSupportedException>(() => Mock.Of<Foo>(x => x.VirtualBar.FieldValue == "bar"));
 			}
 
 			[Fact]
 			public void WhenIntermediateFluentReadonly_ThenThrowsNotSupportedException()
 			{
-				Assert.Throws<NotSupportedException>(() => Mocks.OneOf<Foo>(x => x.Bar.VirtualValue == "bar"));
+				Assert.Throws<NotSupportedException>(() => Mock.Of<Foo>(x => x.Bar.VirtualValue == "bar"));
 			}
 
 			public class Bar
@@ -80,19 +80,19 @@ namespace Moq.Tests.Linq
 			[Fact]
 			public void WhenQueryingDirect_ThenThrowsNotSupportedException()
 			{
-				Assert.Throws<NotSupportedException>(() => Mocks.OneOf<Bar>(x => x.NonVirtual() == "foo"));
+				Assert.Throws<NotSupportedException>(() => Mock.Of<Bar>(x => x.NonVirtual() == "foo"));
 			}
 
 			[Fact]
 			public void WhenQueryingOnFluent_ThenThrowsNotSupportedException()
 			{
-				Assert.Throws<NotSupportedException>(() => Mocks.OneOf<Foo>(x => x.Virtual().NonVirtual() == "foo"));
+				Assert.Throws<NotSupportedException>(() => Mock.Of<Foo>(x => x.Virtual().NonVirtual() == "foo"));
 			}
 
 			[Fact]
 			public void WhenQueryingOnIntermediateFluentNonVirtual_ThenThrowsNotSupportedException()
 			{
-				Assert.Throws<NotSupportedException>(() => Mocks.OneOf<Foo>(x => x.NonVirtual().Virtual() == "foo"));
+				Assert.Throws<NotSupportedException>(() => Mock.Of<Foo>(x => x.NonVirtual().Virtual() == "foo"));
 			}
 
 			public class Bar
@@ -163,37 +163,37 @@ namespace Moq.Tests.Linq
 			[Fact]
 			public void WhenOperatorIsNotEqual_ThenThrowsNotSupportedException()
 			{
-				Assert.Throws<NotSupportedException>(() => Mocks.OneOf<IFoo>(x => x.Value != "foo"));
+				Assert.Throws<NotSupportedException>(() => Mock.Of<IFoo>(x => x.Value != "foo"));
 			}
 
 			[Fact]
 			public void WhenOperatorIsGreaterThan_ThenThrowsNotSupportedException()
 			{
-				Assert.Throws<NotSupportedException>(() => Mocks.OneOf<IFoo>(x => x.Count > 5));
+				Assert.Throws<NotSupportedException>(() => Mock.Of<IFoo>(x => x.Count > 5));
 			}
 
 			[Fact]
 			public void WhenOperatorIsGreaterThanOrEqual_ThenThrowsNotSupportedException()
 			{
-				Assert.Throws<NotSupportedException>(() => Mocks.OneOf<IFoo>(x => x.Count >= 5));
+				Assert.Throws<NotSupportedException>(() => Mock.Of<IFoo>(x => x.Count >= 5));
 			}
 
 			[Fact]
 			public void WhenOperatorIsLessThan_ThenThrowsNotSupportedException()
 			{
-				Assert.Throws<NotSupportedException>(() => Mocks.OneOf<IFoo>(x => x.Count < 5));
+				Assert.Throws<NotSupportedException>(() => Mock.Of<IFoo>(x => x.Count < 5));
 			}
 
 			[Fact]
 			public void WhenOperatorIsLessThanOrEqual_ThenThrowsNotSupportedException()
 			{
-				Assert.Throws<NotSupportedException>(() => Mocks.OneOf<IFoo>(x => x.Count <= 5));
+				Assert.Throws<NotSupportedException>(() => Mock.Of<IFoo>(x => x.Count <= 5));
 			}
 
 			[Fact]
 			public void WhenCombiningWithOrRatherThanLogicalAnd_ThenThrowsNotSupportedException()
 			{
-				Assert.Throws<NotSupportedException>(() => Mocks.OneOf<IFoo>(x => x.Count == 5 || x.Value == "foo"));
+				Assert.Throws<NotSupportedException>(() => Mock.Of<IFoo>(x => x.Count == 5 || x.Value == "foo"));
 			}
 
 			public interface IFoo
