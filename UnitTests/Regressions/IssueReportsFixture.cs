@@ -1523,7 +1523,6 @@ namespace Moq.Tests.Regressions
 
 		#region Silverlight excluded
 
-
 #if !SILVERLIGHT
 
 		#region #250
@@ -1540,6 +1539,22 @@ namespace Moq.Tests.Regressions
 
 				Assert.NotNull(target.Object);
 			}
+		}
+
+		#endregion
+
+		#region #250
+
+		public class _254
+		{
+			[Fact]
+			public void ShouldMockInteropDTE()
+			{
+				var dte = new Mock<EnvDTE.DTE>();
+
+				Assert.NotNull(dte.Object);
+			}
+
 		}
 
 		#endregion

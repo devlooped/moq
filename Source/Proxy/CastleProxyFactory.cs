@@ -51,6 +51,20 @@ namespace Moq.Proxy
 	{
 		private static readonly ProxyGenerator generator = CreateProxyGenerator();
 
+		static CastleProxyFactory()
+		{
+#pragma warning disable 618
+			AttributesToAvoidReplicating.Add<SecurityPermissionAttribute>();
+#pragma warning restore 618
+
+#if !SILVERLIGHT
+			AttributesToAvoidReplicating.Add<ReflectionPermissionAttribute>();
+			AttributesToAvoidReplicating.Add<PermissionSetAttribute>();
+			AttributesToAvoidReplicating.Add<System.Runtime.InteropServices.TypeIdentifierAttribute>();
+			AttributesToAvoidReplicating.Add<System.Runtime.InteropServices.MarshalAsAttribute>();
+#endif
+		}
+
 		public T CreateProxy<T>(ICallInterceptor interceptor, Type[] interfaces, object[] arguments)
 		{
 			var mockType = typeof(T);
@@ -76,15 +90,6 @@ namespace Moq.Proxy
 
 		private static ProxyGenerator CreateProxyGenerator()
 		{
-#pragma warning disable 618
-			AttributesToAvoidReplicating.Add<SecurityPermissionAttribute>();
-#pragma warning restore 618
-
-#if !SILVERLIGHT
-			AttributesToAvoidReplicating.Add<ReflectionPermissionAttribute>();
-			AttributesToAvoidReplicating.Add<PermissionSetAttribute>();
-#endif
-
 			return new ProxyGenerator();
 		}
 
