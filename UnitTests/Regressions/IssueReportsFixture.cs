@@ -1555,6 +1555,18 @@ namespace Moq.Tests.Regressions
 				Assert.NotNull(dte.Object);
 			}
 
+			[Fact]
+			public void ShouldRaiseEventOnInteropInterface()
+			{
+				var app = new Mock<Microsoft.Office.Interop.Word.Application>();
+				var count = 0;
+				app.Object.DocumentOpen += doc => count++;
+
+				app.Raise(x => x.DocumentOpen += null, new Mock<Microsoft.Office.Interop.Word.Document>().Object);
+
+				Assert.Equal(1, count);
+			}
+
 		}
 
 		#endregion
