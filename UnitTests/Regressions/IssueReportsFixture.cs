@@ -1476,10 +1476,10 @@ namespace Moq.Tests.Regressions
 				mock.Setup(c => c.HttpContext.Response.Write("stuff"));
 
 				mock.Object.HttpContext.Response.Write("stuff");
-				mock.Object.HttpContext.Response.ContentEncoding = Encoding.UTF8;
+				mock.Object.HttpContext.Response.ShouldEncode = true;
 
 				Assert.Throws<MockException>(() => mock.VerifySet(
-					c => c.HttpContext.Response.ContentEncoding = It.IsAny<Encoding>(),
+					c => c.HttpContext.Response.ShouldEncode = It.IsAny<bool>(),
 					Times.Never()));
 			}
 
@@ -1506,7 +1506,7 @@ namespace Moq.Tests.Regressions
 				{
 				}
 
-				public virtual Encoding ContentEncoding
+				public virtual bool ShouldEncode
 				{
 					get { throw new NotImplementedException(); }
 					set { throw new NotImplementedException(); }
