@@ -1555,6 +1555,7 @@ namespace Moq.Tests.Regressions
 				Assert.NotNull(dte.Object);
 			}
 
+#if !NET3x
 			[Fact]
 			public void ShouldRaiseEventOnInteropInterface()
 			{
@@ -1566,7 +1567,7 @@ namespace Moq.Tests.Regressions
 
 				Assert.Equal(1, count);
 			}
-
+#endif
 		}
 
 		#endregion
