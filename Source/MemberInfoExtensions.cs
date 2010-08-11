@@ -63,32 +63,32 @@ namespace Moq
 
 		public static bool IsEventAttach(this MethodBase method)
 		{
-			return method.IsSpecialName && method.Name.StartsWith("add_", StringComparison.Ordinal);
+			return method.Name.StartsWith("add_", StringComparison.Ordinal);
 		}
 
 		public static bool IsEventDetach(this MethodBase method)
 		{
-			return method.IsSpecialName && method.Name.StartsWith("remove_", StringComparison.Ordinal);
+			return method.Name.StartsWith("remove_", StringComparison.Ordinal);
 		}
 
 		public static bool IsPropertyGetter(this MethodBase method)
 		{
-			return method.IsSpecialName && method.Name.StartsWith("get_", StringComparison.Ordinal);
+			return method.Name.StartsWith("get_", StringComparison.Ordinal);
 		}
 
 		public static bool IsPropertyIndexerGetter(this MethodBase method)
 		{
-			return method.IsSpecialName && method.Name.StartsWith("get_Item", StringComparison.Ordinal);
+			return method.Name.StartsWith("get_Item", StringComparison.Ordinal);
 		}
 
 		public static bool IsPropertyIndexerSetter(this MethodBase method)
 		{
-			return method.IsSpecialName && method.Name.StartsWith("set_Item", StringComparison.Ordinal);
+			return method.Name.StartsWith("set_Item", StringComparison.Ordinal);
 		}
 
 		public static bool IsPropertySetter(this MethodBase method)
 		{
-			return method.IsSpecialName && method.Name.StartsWith("set_", StringComparison.Ordinal);
+			return method.Name.StartsWith("set_", StringComparison.Ordinal);
 		}
 
 		public static bool IsRefArgument(this ParameterInfo parameter)
