@@ -245,5 +245,23 @@ namespace Moq.Tests.Linq
 				string Do(int value);
 			}
 		}
+
+		public class GivenAClassWithNonVirtualProperties
+		{
+			[Fact]
+			public void WhenQueryingByProperties_ThenSetsThemDirectly()
+			{
+				var foo = Mock.Of<Foo>(x => x.Id == 1 && x.Value == "hello");
+
+				Assert.Equal(1, foo.Id);
+				Assert.Equal("hello", foo.Value);
+			}
+
+			public class Foo
+			{
+				public int Id { get; set; }
+				public string Value { get; set; }
+			}
+		}
 	}
 }

@@ -150,7 +150,7 @@ namespace Moq.Tests
 		{
 			var foo = new Mock<IFoo>();
 
-			Expression<Predicate<int>> isSix = (arg) => arg == 6;
+			Expression<Func<int, bool>> isSix = (arg) => arg == 6;
 
 			foo.Setup((f) => f.Echo(It.Is(isSix))).Returns(12);
 
