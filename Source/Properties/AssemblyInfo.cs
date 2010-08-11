@@ -5,12 +5,12 @@ using System.Runtime.CompilerServices;
 using System.Runtime.InteropServices;
 
 [assembly: AssemblyTitle("Moq")]
-[assembly: AssemblyDescription("Mocking library for .NET 3.5 and C# 3.0, heavily based on Linq")]
+[assembly: AssemblyDescription("Mocking library for .NET 3.5+ and C# 3.0+, heavily based on Linq")]
 [assembly: AssemblyCompany("Clarius Consulting, Manas Technology Solutions, InSTEDD")]
 [assembly: AssemblyProduct("Moq")]
 [assembly: AssemblyTrademark("")]
 [assembly: AssemblyCulture("")]
-[assembly: AssemblyVersion("4.0.10810.8")]
+[assembly: AssemblyVersion("4.0.10810.0")]
 [assembly: AssemblyFileVersion("4.0.0.0")]
 
 [assembly: ComVisible(false)]

@@ -1,0 +1,119 @@
+﻿<project schemaVersion="1.6.0.7">
+    <assemblies>
+        <assembly assemblyPath=".\Source\bin\Release\Moq.dll" xmlCommentsPath=".\Source\bin\Release\Moq.xml" commentsOnly="False" />
+    </assemblies>
+    <namespaceSummaries>
+        <namespaceSummaryItem name="" isDocumented="False" />
+        <namespaceSummaryItem name="Castle.Core" isDocumented="False" />
+        <namespaceSummaryItem name="Castle.Core.Configuration" isDocumented="False" />
+        <namespaceSummaryItem name="Castle.Core.Interceptor" isDocumented="False" />
+        <namespaceSummaryItem name="Castle.Core.Internal" isDocumented="False" />
+        <namespaceSummaryItem name="Castle.Core.Logging" isDocumented="False" />
+        <namespaceSummaryItem name="Castle.Core.Logging.Factories" isDocumented="False" />
+        <namespaceSummaryItem name="Castle.Core.Resource" isDocumented="False" />
+        <namespaceSummaryItem name="Castle.DynamicProxy" isDocumented="False" />
+        <namespaceSummaryItem name="Castle.DynamicProxy.Generators" isDocumented="False" />
+        <namespaceSummaryItem name="Castle.DynamicProxy.Generators.Emitters" isDocumented="False" />
+        <namespaceSummaryItem name="Castle.DynamicProxy.Generators.Emitters.CodeBuilders" isDocumented="False" />
+        <namespaceSummaryItem name="Castle.DynamicProxy.Generators.Emitters.SimpleAST" isDocumented="False" />
+        <namespaceSummaryItem name="Castle.DynamicProxy.Serialization" isDocumented="False" />
+        <namespaceSummaryItem name="Moq" isDocumented="True">Root namespace of Moq (pronounced "Mock-you" or just "Mock"), the only mocking library for .NET and Silverlight developed from scratch to take full advantage of .NET 3.5 (i.e. Linq expression trees) and C# 3.0 features (i.e. lambda expressions) that make it the most productive, simple and refactoring-friendly mocking library available.
+&lt;p&gt;
+See the &lt;a href="http://code.google.com/p/moq/wiki/QuickStart"&gt;online quickstarts&lt;/a&gt; for more examples than those available in this code documentation.
+&lt;/p&gt;
+&lt;p&gt;The Mock&amp;lt;T&amp;gt; class is the core of the library, so it's a good place to start.&lt;/p&gt;
+You can also read &lt;a href="http://blogsearch.google.com/blogsearch?q=moq+mock"&gt;blog entries&lt;/a&gt; from around the world about Moq.</namespaceSummaryItem>
+        <namespaceSummaryItem name="Moq.Language" isDocumented="True">This namespace defines the interfaces that contain the methods available in Moq fluent API, such as Setup, Callback, Returns, Throws, etc.
+&lt;p&gt;
+Review the documentation of the available methods on these interfaces for code examples. The way these interfaces are composed, grouped and made visible at different stages during an expectation (i.e. Verifiable is the last "verb" and can't be specified before the Returns) is internal but the API will naturally lead you to the proper way of using it, so don't worry too much about who (and where) exposes these language interfaces. They will show up in Intellisense when it's appropriate. 
+&lt;/p&gt;&lt;p&gt;
+Do use their documentation to learn about options (especially when there are several overloads available) that may be a better fit for a particular scenario.&lt;/p&gt;</namespaceSummaryItem>
+        <namespaceSummaryItem name="Moq.Language.Flow" isDocumented="False" />
+        <namespaceSummaryItem name="Moq.Mvc" isDocumented="False">Provides pre-built mocks for testing ASP.NET MVC applications.</namespaceSummaryItem>
+        <namespaceSummaryItem name="Moq.Properties" isDocumented="False" />
+        <namespaceSummaryItem name="Moq.Protected" isDocumented="True">Importing this namespace will enable the Protected() method on mocks, enabling expectations on protected members by specifying the member name as a string.</namespaceSummaryItem>
+        <namespaceSummaryItem name="Moq.Stub" isDocumented="False" />
+    </namespaceSummaries>
+    <componentConfigurations>
+        <component id="Code Block Component" enabled="True" configuration="&lt;component id=&quot;Code Block Component&quot; type=&quot;SandcastleBuilder.Components.CodeBlockComponent&quot; assembly=&quot;{@SHFBFolder}SandcastleBuilder.Components.dll&quot;&gt;&lt;!-- Base path for relative filenames in source attributes&#xD;&#xA;                 (optional) --&gt;&lt;basePath value=&quot;{@ProjectFolder}&quot; /&gt;&lt;!-- Connect to language filter (optional).  If omitted,&#xD;&#xA;                 language filtering is enabled by default. --&gt;&lt;languageFilter value=&quot;true&quot; /&gt;&lt;!-- Code colorizer options (required).&#xD;&#xA;                 Attributes:&#xD;&#xA;                    Language syntax configuration file (required)&#xD;&#xA;                    XSLT style file (required)&#xD;&#xA;                    &quot;Copy&quot; image file URL (required)&#xD;&#xA;                    Default language (optional)&#xD;&#xA;                    Enable line numbering (optional)&#xD;&#xA;                    Enable outlining (optional)&#xD;&#xA;                    Tab size override (optional, 0 = Use syntax file setting)&#xD;&#xA;                    Use language name as default title (optional) --&gt;&lt;colorizer syntaxFile=&quot;{@SHFBFolder}Colorizer\highlight.xml&quot; styleFile=&quot;{@SHFBFolder}Colorizer\highlight.xsl&quot; copyImageUrl=&quot;../icons/CopyCode.gif&quot; language=&quot;cs&quot; numberLines=&quot;false&quot; outlining=&quot;false&quot; tabSize=&quot;0&quot; defaultTitle=&quot;true&quot; /&gt;&lt;/component&gt;" />
+        <component id="Post-transform Component" enabled="True" configuration="&lt;component id=&quot;Post-transform Component&quot; type=&quot;SandcastleBuilder.Components.PostTransformComponent&quot; assembly=&quot;{@SHFBFolder}SandcastleBuilder.Components.dll&quot;&gt;&lt;!-- Code colorizer files (required).&#xD;&#xA;                 Attributes:&#xD;&#xA;                    Stylesheet file (required)&#xD;&#xA;                    Script file (required)&#xD;&#xA;                    &quot;Copy&quot; image file (required) --&gt;&lt;colorizer stylesheet=&quot;{@SHFBFolder}Colorizer\highlight.css&quot; scriptFile=&quot;{@SHFBFolder}Colorizer\highlight.js&quot; copyImage=&quot;{@SHFBFolder}Colorizer\CopyCode.gif&quot; /&gt;&lt;!-- Base output path for the files (required).  This should match&#xD;&#xA;                 the parent folder of the output path of the HTML files (see&#xD;&#xA;                 SaveComponent). --&gt;&lt;outputPath value=&quot;Output\&quot; /&gt;&lt;!-- Logo image file (optional).  Filename is required. The height,&#xD;&#xA;                 width, altText, placement, and alignment attributes are&#xD;&#xA;                 optional. --&gt;&lt;logoFile filename=&quot;&quot; height=&quot;0&quot; width=&quot;0&quot; altText=&quot;&quot; placement=&quot;left&quot; alignment=&quot;left&quot; /&gt;&lt;/component&gt;" />
+        <component id="Cached Framework Comments Index Data" enabled="True" configuration="&lt;component id=&quot;Cached Framework Comments Index Data&quot; type=&quot;SandcastleBuilder.Components.CachedCopyFromIndexComponent&quot; assembly=&quot;{@SHFBFolder}SandcastleBuilder.Components.dll&quot;&gt;&#xD;&#xA;&lt;index name=&quot;comments&quot; value=&quot;/doc/members/member&quot; key=&quot;@name&quot; cache=&quot;100&quot;&gt;&#xD;&#xA;{@CachedFrameworkCommentList}&#xD;&#xA;{@CommentFileList}&#xD;&#xA;            &lt;/index&gt;&#xD;&#xA;&lt;copy name=&quot;comments&quot; source=&quot;*&quot; target=&quot;/document/comments&quot; /&gt;&#xD;&#xA;&lt;/component&gt;" />
+        <component id="Cached MSDN URL References" enabled="True" configuration="&lt;component id=&quot;Cached MSDN URL References&quot; type=&quot;SandcastleBuilder.Components.CachedResolveReferenceLinksComponent&quot; assembly=&quot;{@SHFBFolder}SandcastleBuilder.Components.dll&quot;&gt;&#xD;&#xA;&lt;cache filename=&quot;{@AppDataFolder}Cache\MsdnUrl.cache&quot; /&gt;&#xD;&#xA;&lt;targets base=&quot;{@SandcastlePath}Data\Reflection&quot; recurse=&quot;true&quot; files=&quot;*.xml&quot; type=&quot;{@SDKLinks}&quot; /&gt;&#xD;&#xA;&lt;targets files=&quot;reflection.xml&quot; type=&quot;{@ProjectLinks}&quot; /&gt;&#xD;&#xA;&lt;/component&gt;" />
+        <component id="Cached Reflection Index Data" enabled="False" configuration="&lt;component id=&quot;Cached Reflection Index Data&quot; type=&quot;SandcastleBuilder.Components.CachedCopyFromIndexComponent&quot; assembly=&quot;{@SHFBFolder}SandcastleBuilder.Components.dll&quot;&gt;&#xD;&#xA;&lt;index name=&quot;reflection&quot; value=&quot;/reflection/apis/api&quot; key=&quot;@id&quot; cache=&quot;10&quot;&gt;&#xD;&#xA;  &lt;cache base=&quot;{@SandcastlePath}Data\Reflection&quot; recurse=&quot;true&quot; files=&quot;*.xml&quot; cacheFile=&quot;{@AppDataFolder}Cache\Reflection.cache&quot; /&gt;&#xD;&#xA;  &lt;data files=&quot;reflection.xml&quot; /&gt;&#xD;&#xA;&lt;/index&gt;&#xD;&#xA;&lt;copy name=&quot;reflection&quot; source=&quot;*&quot; target=&quot;/document/reference&quot; /&gt;&#xD;&#xA;&lt;/component&gt;" />
+    </componentConfigurations>
+    <apiFilter>
+        <filter entryType="Namespace" fullName="Castle.Core.Interceptor" isExposed="False" />
+        <filter entryType="Namespace" fullName="Castle.DynamicProxy" isExposed="False" />
+        <filter entryType="Namespace" fullName="Castle.DynamicProxy.Generators" isExposed="False" />
+        <filter entryType="Namespace" fullName="Moq" isExposed="True">
+            <filter entryType="Interface" fullName="Moq.IHideObjectMembers" filterName="IHideObjectMembers" isExposed="False" />
+            <filter entryType="Interface" fullName="Moq.IMocked" filterName="IMocked" isExposed="False" />
+            <filter entryType="Interface" fullName="Moq.IMocked`1" filterName="IMocked`1" isExposed="False" />
+            <filter entryType="Class" fullName="Moq.Match" filterName="Match" isExposed="False" />
+            <filter entryType="Class" fullName="Moq.MatcherAttribute" filterName="MatcherAttribute" isExposed="False" />
+            <filter entryType="Class" fullName="Moq.Mock" filterName="Mock" isExposed="True">
+                <filter entryType="Method" fullName="Moq.Mock.CreateEventHandler" filterName="CreateEventHandler" isExposed="False" />
+            </filter>
+            <filter entryType="Class" fullName="Moq.Mock`1" filterName="Mock`1" isExposed="True">
+                <filter entryType="Method" fullName="Moq.Mock`1.Expect" filterName="Expect" isExposed="False" />
+                <filter entryType="Method" fullName="Moq.Mock`1.ExpectGet" filterName="ExpectGet" isExposed="False" />
+                <filter entryType="Method" fullName="Moq.Mock`1.ExpectSet" filterName="ExpectSet" isExposed="False" />
+                <filter entryType="Method" fullName="Moq.Mock`1.GetObject" filterName="GetObject" isExposed="False" />
+            </filter>
+            <filter entryType="Class" fullName="Moq.MockedEvent" filterName="MockedEvent" isExposed="False" />
+            <filter entryType="Class" fullName="Moq.MockedEvent`1" filterName="MockedEvent`1" isExposed="False" />
+            <filter entryType="Class" fullName="Moq.MockFactory" filterName="MockFactory" isExposed="True">
+                <filter entryType="Method" fullName="Moq.MockFactory.CreateMock" filterName="CreateMock" isExposed="False" />
+                <filter entryType="Method" fullName="Moq.MockFactory.VerifyMocks" filterName="VerifyMocks" isExposed="False" />
+                <filter entryType="Property" fullName="Moq.MockFactory.Mocks" filterName="Mocks" isExposed="False" />
+            </filter>
+            <filter entryType="Class" fullName="Moq.MockLegacyExtensions" filterName="MockLegacyExtensions" isExposed="False" />
+        </filter>
+        <filter entryType="Namespace" fullName="Moq.Language" isExposed="True">
+            <filter entryType="Interface" fullName="Moq.Language.INever" filterName="INever" isExposed="False" />
+            <filter entryType="Interface" fullName="Moq.Language.IOccurrence" filterName="IOccurrence" isExposed="False" />
+        </filter>
+        <filter entryType="Namespace" fullName="Moq.Language.Flow" isExposed="False" />
+    </apiFilter>
+    <ProjectSummary />
+    <MissingTags>Summary, Parameter, AutoDocumentCtors, Namespace</MissingTags>
+    <VisibleItems>InheritedMembers, Protected, SealedProtected</VisibleItems>
+    <HtmlHelp1xCompilerPath path="..\build\HTML Help Workshop\" />
+    <HtmlHelp2xCompilerPath path="" />
+    <OutputPath>..\build\Help\</OutputPath>
+    <SandcastlePath path="..\build\Sandcastle\" />
+    <WorkingPath path="" />
+    <CleanIntermediates>True</CleanIntermediates>
+    <KeepLogFile>True</KeepLogFile>
+    <BuildLogFile path="" />
+    <HelpFileFormat>Help1xAndWebsite</HelpFileFormat>
+    <CppCommentsFixup>False</CppCommentsFixup>
+    <FrameworkVersion>4.0.30319</FrameworkVersion>
+    <IndentHtml>False</IndentHtml>
+    <Preliminary>False</Preliminary>
+    <RootNamespaceContainer>False</RootNamespaceContainer>
+    <RootNamespaceTitle />
+    <HelpTitle>Moq</HelpTitle>
+    <HtmlHelpName>Moq</HtmlHelpName>
+    <Language>en-US</Language>
+    <CopyrightHref />
+    <CopyrightText />
+    <FeedbackEMailAddress>moqdisc@googlegroups.com</FeedbackEMailAddress>
+    <FeedbackEMailLinkText />
+    <HeaderText />
+    <FooterText />
+    <ProjectLinkType>Local</ProjectLinkType>
+    <SdkLinkType>Msdn</SdkLinkType>
+    <SdkLinkTarget>Blank</SdkLinkTarget>
+    <PresentationStyle>vs2005</PresentationStyle>
+    <NamingMethod>HashedMemberName</NamingMethod>
+    <SyntaxFilters>CSharp</SyntaxFilters>
+    <ShowFeedbackControl>False</ShowFeedbackControl>
+    <BinaryTOC>True</BinaryTOC>
+    <IncludeFavorites>False</IncludeFavorites>
+    <CollectionTocStyle>Hierarchical</CollectionTocStyle>
+    <IncludeStopWordList>True</IncludeStopWordList>
+    <PlugInNamespaces>ms.vsipcc+, ms.vsexpresscc+</PlugInNamespaces>
+    <HelpFileVersion>1.0.0.0</HelpFileVersion>
+    <ContentPlacement>AboveNamespaces</ContentPlacement>
+</project>

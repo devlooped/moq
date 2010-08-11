@@ -13,8 +13,6 @@ namespace Moq
 #pragma warning disable 618
 	public partial class MockRepository
 	{
-		private static readonly MethodInfo createQueryableMethod = typeof(MockRepository)
-			.GetMethod("CreateQueryable", BindingFlags.NonPublic | BindingFlags.Instance);
 #pragma warning restore 618
 
 		/// <summary>
@@ -68,7 +66,9 @@ namespace Moq
 		/// </summary>
 		internal IQueryable<T> CreateMockQuery<T>() where T : class
 		{
-			return new MockQueryable<T>(Expression.Call(Expression.Constant(this), createQueryableMethod.MakeGenericMethod(typeof(T))));
+			return new MockQueryable<T>(Expression.Call(
+				Expression.Constant(this),
+				((Func<IQueryable<T>>)CreateQueryable<T>).Method));
 		}
 
 		/// <summary>

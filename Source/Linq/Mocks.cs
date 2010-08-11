@@ -63,9 +63,6 @@ namespace Moq
 	/// </devdoc>
 	public static class Mocks
 	{
-		private static readonly MethodInfo createQueryableMethod = typeof(Mocks)
-			.GetMethod("CreateQueryable", BindingFlags.NonPublic | BindingFlags.Static);
-
 		/// <summary>
 		/// Access the universe of mocks of the given type, to retrieve those 
 		/// that behave according to the LINQ query specification.
@@ -119,7 +116,8 @@ namespace Moq
 		/// </summary>
 		internal static IQueryable<T> CreateMockQuery<T>() where T : class
 		{
-			return new MockQueryable<T>(Expression.Call(null, createQueryableMethod.MakeGenericMethod(typeof(T))));
+			return new MockQueryable<T>(Expression.Call(null,
+				((Func<IQueryable<T>>)CreateQueryable<T>).Method));
 		}
 
 		/// <summary>
@@ -166,8 +164,7 @@ namespace Moq
 	/// <summary>
 	/// Helper extensions that are used by the query translator.
 	/// </summary>
-	[EditorBrowsable(EditorBrowsableState.Never)]
-	public static class QueryableMockExtensions
+	internal static class QueryableMockExtensions
 	{
 		/// <summary>
 		/// Retrieves a fluent mock from the given setup expression.

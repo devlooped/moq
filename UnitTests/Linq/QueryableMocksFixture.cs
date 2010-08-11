@@ -164,15 +164,6 @@ namespace Moq.Tests
 			Assert.Equal("foo", target.Value);
 		}
 
-		[Fact]
-		public void InvokeViaExpression()
-		{
-			var call = Expression.Call(Expression.Constant(this), this.GetType().GetMethod("Do"));
-
-			var lambda = Expression.Lambda<Action>(call);
-			lambda.Compile().Invoke();
-		}
-
 		public void Do()
 		{
 			Console.WriteLine("Done");
