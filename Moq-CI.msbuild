@@ -1,0 +1,9 @@
+<Project DefaultTargets="Build" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
+	<Target Name="Build">
+		<MSBuild
+			Projects="Moq.sln"
+			Targets="Build"
+			Properties="TrackFileAccess=False"/>
+		</MSBuild>
+	</Target>
+</Project>
