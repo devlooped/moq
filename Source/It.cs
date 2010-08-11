@@ -58,7 +58,7 @@ namespace Moq
 
 		/// <include file='It.xdoc' path='docs/doc[@for="It.Is"]/*'/>
 		[SuppressMessage("Microsoft.Design", "CA1006:DoNotNestGenericTypesInMemberSignatures")]
-		public static TValue Is<TValue>(Expression<Predicate<TValue>> match)
+		public static TValue Is<TValue>(Expression<Func<TValue, bool>> match)
 		{
 			return Match<TValue>.Create(
 				value => match.Compile().Invoke(value),
