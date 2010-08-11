@@ -1465,6 +1465,78 @@ namespace Moq.Tests.Regressions
 
 		#endregion
 
+		#region #267
+
+		public class _267
+		{
+			public interface IPerformOperation
+			{
+				string Operation(object input);
+			}
+
+			public class OperationUser
+			{
+				private readonly IPerformOperation m_OperationPerformer;
+
+				public OperationUser(IPerformOperation operationPerformer)
+				{
+					m_OperationPerformer = operationPerformer;
+				}
+
+				public string DoOperation(object input)
+				{
+					return m_OperationPerformer.Operation(input);
+				}
+			}
+
+			public class HelperSetup
+			{
+				private Mock<IPerformOperation> m_OperationStub;
+
+				public HelperSetup()
+				{
+					m_OperationStub = new Mock<IPerformOperation>();
+				}
+
+				[Fact]
+				public void InlineSetupTest()
+				{
+					m_OperationStub.Setup(m => m.Operation(It.IsAny<string>())).Returns<string>(value => "test");
+					m_OperationStub.Setup(m => m.Operation(It.IsAny<int>())).Returns<int>(value => "25");
+
+					var operationUser = new OperationUser(m_OperationStub.Object);
+
+					var intOperationResult = operationUser.DoOperation(9);
+					var stringOperationResult = operationUser.DoOperation("Hello");
+
+					Assert.Equal("25", intOperationResult);
+					Assert.Equal("test", stringOperationResult);
+				}
+
+				[Fact]
+				public void HelperSetupTest()
+				{
+					SetupOperationStub<string>(value => "test");
+					SetupOperationStub<int>(value => "25");
+
+					var operationUser = new OperationUser(m_OperationStub.Object);
+
+					var intOperationResult = operationUser.DoOperation(9);
+					var stringOperationResult = operationUser.DoOperation("Hello");
+
+					Assert.Equal("25", intOperationResult);
+					Assert.Equal("test", stringOperationResult);
+				}
+
+				private void SetupOperationStub<T>(Func<T, string> valueFunction)
+				{
+					m_OperationStub.Setup(m => m.Operation(It.IsAny<T>())).Returns<T>(valueFunction);
+				}
+			}
+		}
+
+		#endregion
+
 		#region Recursive issue
 
 		public class RecursiveFixture

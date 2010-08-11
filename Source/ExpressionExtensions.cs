@@ -221,12 +221,11 @@ namespace Moq
 
 		internal static string ToStringFixed(this Expression expression, bool useFullTypeName)
 		{
+			//return ExpressionStringBuilder.GetString(expression);
 			if (useFullTypeName)
-			{
-				return ExpressionStringBuilder.GetString(expression, method => method.GetFullName());
-			}
-
-			return ExpressionStringBuilder.GetString(expression, method => method.GetName());
+				return ExpressionStringBuilder.GetString(expression, type => type.FullName);
+			else
+				return ExpressionStringBuilder.GetString(expression, type => type.Name);
 		}
 
 		internal sealed class RemoveMatcherConvertVisitor : ExpressionVisitor
