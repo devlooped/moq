@@ -1537,6 +1537,29 @@ namespace Moq.Tests.Regressions
 
 		#endregion
 
+		#region #273
+
+		public class _273
+		{
+			[Fact]
+			public void WhenMockingAnExternalInterface_ThenItWorks()
+			{
+				Assert.NotNull(new Mock<ClassLibrary1.IFoo>().Object);
+				Assert.NotNull(Mock.Of<ClassLibrary1.IFoo>());
+				Assert.NotNull(new Mock<ClassLibrary1.Foo>().Object);
+				Assert.NotNull(new Mock<ClassLibrary2.IBar>().Object);
+				Assert.NotNull(Mock.Of<ClassLibrary2.IBar>());
+				Assert.NotNull(new Mock<ClassLibrary2.Bar>().Object);
+				Assert.NotNull(new Mock<Baz>().Object);
+			}
+
+			public class Baz : ClassLibrary2.Bar
+			{
+			}
+		}
+
+		#endregion
+
 		#region Recursive issue
 
 		public class RecursiveFixture

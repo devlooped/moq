@@ -47,6 +47,12 @@
       <SpecificVersion>False</SpecificVersion>
       <HintPath>..\Lib\Castle\bin-NET35\Castle.Core.dll</HintPath>
     </Reference>
+    <Reference Include="ClassLibrary1">
+      <HintPath>.\ClassLibrary1.dll</HintPath>
+    </Reference>
+    <Reference Include="ClassLibrary2">
+      <HintPath>.\ClassLibrary2.dll</HintPath>
+    </Reference>
     <Reference Include="EnvDTE, Version=8.0.0.0, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a">
       <SpecificVersion>False</SpecificVersion>
       <EmbedInteropTypes>False</EmbedInteropTypes>
