@@ -263,5 +263,21 @@ namespace Moq.Tests.Linq
 				public string Value { get; set; }
 			}
 		}
+
+		public class GivenAReadonlyProperty
+		{
+			[Fact]
+			public void WhenQueryingByProperties_ThenSetsThemDirectly()
+			{
+				var foo = Mock.Of<Foo>(x => x.Id == 1);
+
+				Assert.Equal(1, foo.Id);
+			}
+
+			public class Foo
+			{
+				public virtual int Id { get { return 0; } }
+			}
+		}
 	}
 }
