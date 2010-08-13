@@ -79,11 +79,19 @@
     <CodeAnalysisRuleSet>AllRules.ruleset</CodeAnalysisRuleSet>
   </PropertyGroup>
   <ItemGroup>
-    <Reference Include="Castle.Core, Version=1.2.0.0, Culture=neutral, PublicKeyToken=407dd0808d44fbdc, processorArchitecture=MSIL">
+    <!--<Reference Include="Castle.Core, Version=1.2.0.0, Culture=neutral, PublicKeyToken=407dd0808d44fbdc, processorArchitecture=MSIL">
       <SpecificVersion>False</SpecificVersion>
       <HintPath>..\Lib\Castle\bin-SL4\Castle.Core.dll</HintPath>
-    </Reference>
-    <Reference Include="mscorlib" />
+    </Reference>-->
+		<Reference Include="Castle.Core, Version=1.2.0.0, Culture=neutral, PublicKeyToken=407dd0808d44fbdc, processorArchitecture=MSIL">
+			<SpecificVersion>False</SpecificVersion>
+			<HintPath>..\Lib\Castle\sl-30\Castle.Core.dll</HintPath>
+		</Reference>
+		<Reference Include="Castle.DynamicProxy2, Version=1.2.0.0, Culture=neutral, PublicKeyToken=407dd0808d44fbdc, processorArchitecture=MSIL">
+			<SpecificVersion>False</SpecificVersion>
+			<HintPath>..\Lib\Castle\sl-30\Castle.DynamicProxy2.dll</HintPath>
+		</Reference>
+		<Reference Include="mscorlib" />
     <Reference Include="system" />
     <Reference Include="System.Core" />
   </ItemGroup>

@@ -364,7 +364,7 @@ namespace Moq
 						.Append(".")
 						.Append(node.Method.Name)
 						.Append("<")
-						.Append(string.Join(",", node.Method.GetGenericArguments().Select(s => this.getTypeName(s))))
+						.Append(string.Join(",", node.Method.GetGenericArguments().Select(s => this.getTypeName(s)).ToArray()))
 						.Append(">(");
 					AsCommaSeparatedValues(node.Arguments.Skip(paramFrom), ToString);
 					this.builder.Append(")");

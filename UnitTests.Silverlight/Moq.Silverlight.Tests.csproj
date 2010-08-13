@@ -80,6 +80,12 @@
     <CodeAnalysisRuleSet>AllRules.ruleset</CodeAnalysisRuleSet>
   </PropertyGroup>
   <ItemGroup>
+    <Reference Include="ClassLibrary1.Silverlight">
+      <HintPath>..\UnitTests\ClassLibrary1.Silverlight.dll</HintPath>
+    </Reference>
+    <Reference Include="ClassLibrary2.Silverlight">
+      <HintPath>..\UnitTests\ClassLibrary2.Silverlight.dll</HintPath>
+    </Reference>
     <Reference Include="Microsoft.Silverlight.Testing, Version=2.0.21103.1925, Culture=neutral, PublicKeyToken=31bf3856ad364e35, processorArchitecture=MSIL">
       <SpecificVersion>False</SpecificVersion>
       <HintPath>..\Lib\Microsoft\Microsoft.Silverlight.Testing.dll</HintPath>

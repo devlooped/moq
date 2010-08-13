@@ -756,6 +756,12 @@ namespace Moq.Tests
 			Assert.Equal(3, mock.Object.Generic<string>());
 		}
 
+		[Fact]
+		public void CanCreateMockOfInternalInterface()
+		{
+			Assert.NotNull(new Mock<ClassLibrary1.IFooInternal>().Object);
+		}
+
 		public class Foo
 		{
 			public Foo() : this(new Bar()) { }
