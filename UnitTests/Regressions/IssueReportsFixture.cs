@@ -1539,6 +1539,8 @@ namespace Moq.Tests.Regressions
 
 		#region #273
 
+#if !SILVERLIGHT
+
 		public class _273
 		{
 			[Fact]
@@ -1557,6 +1559,8 @@ namespace Moq.Tests.Regressions
 			{
 			}
 		}
+
+#endif
 
 		#endregion
 

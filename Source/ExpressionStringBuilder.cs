@@ -237,7 +237,7 @@ namespace Moq
 			}
 		}
 
-		private bool NeedEncloseInParen(Expression operand)
+		private static bool NeedEncloseInParen(Expression operand)
 		{
 			return operand.NodeType == ExpressionType.AndAlso || operand.NodeType == ExpressionType.OrElse;
 		}
