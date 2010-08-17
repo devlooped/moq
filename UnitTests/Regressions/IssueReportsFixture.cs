@@ -1654,7 +1654,7 @@ namespace Moq.Tests.Regressions
 				Assert.NotNull(dte.Object);
 			}
 
-#if !NET3x
+#if !NET3x && !SERVER
 			[Fact]
 			public void ShouldRaiseEventOnInteropInterface()
 			{

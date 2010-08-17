@@ -3,7 +3,9 @@ Microsoft Visual Studio Solution File, Format Version 11.00
 Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Solution Items", "Solution Items", "{A5A5B8C3-D43F-43C6-AEC7-6FA7C35B8BE9}"
 	ProjectSection(SolutionItems) = preProject
 		Changelog.txt = Changelog.txt
+		..\build\drop.cmd = ..\build\drop.cmd
 		License.txt = License.txt
+		Moq-CI.msbuild = Moq-CI.msbuild
 	EndProjectSection
 EndProject
 Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Silverlight", "Silverlight", "{48EC9EB4-F52B-4404-89D7-5804E17B24D0}"

@@ -3,6 +3,6 @@
 		<MSBuild
 			Projects="Moq.sln"
 			Targets="Build"
-			Properties="Configuration=Release;TrackFileAccess=False"/>
+			Properties="Configuration=Release;TrackFileAccess=False;DefineConstants=TRACE;CODE_ANALYSIS;SERVER"/>
 	</Target>
 </Project>

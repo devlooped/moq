@@ -22,7 +22,7 @@
     <Optimize>false</Optimize>
     <OutputPath>bin\Debug\</OutputPath>
     <DefineConstants>TRACE;DEBUG;DESKTOP</DefineConstants>
-    <DefineConstants Condition=" '$(TargetFrameworkVersion)' == 'v3.5' ">TRACE;DEBUG;DESKTOP;NET3x</DefineConstants>
+    <DefineConstants Condition=" '$(TargetFrameworkVersion)' == 'v3.5' ">$(DefineConstants);NET3x</DefineConstants>
     <ErrorReport>prompt</ErrorReport>
     <WarningLevel>4</WarningLevel>
     <CodeAnalysisRuleSet>AllRules.ruleset</CodeAnalysisRuleSet>
@@ -32,7 +32,7 @@
     <Optimize>true</Optimize>
     <OutputPath>bin\Release\</OutputPath>
     <DefineConstants>TRACE;DESKTOP</DefineConstants>
-    <DefineConstants Condition=" '$(TargetFrameworkVersion)' == 'v3.5' ">TRACE;DESKTOP;NET3x</DefineConstants>
+    <DefineConstants Condition=" '$(TargetFrameworkVersion)' == 'v3.5' ">$(DefineConstants);NET3x</DefineConstants>
     <ErrorReport>prompt</ErrorReport>
     <WarningLevel>4</WarningLevel>
     <DebugSymbols>true</DebugSymbols>
