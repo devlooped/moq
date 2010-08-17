@@ -45,7 +45,6 @@ using Castle.DynamicProxy;
 using Castle.DynamicProxy.Generators;
 using Moq.Properties;
 using System.Diagnostics.CodeAnalysis;
-using Castle.Core.Interceptor;
 
 namespace Moq.Proxy
 {

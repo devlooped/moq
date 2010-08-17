@@ -1,0 +1,3 @@
+Castle.DynamicProxy.IProxyTargetAccessor
+Castle.DynamicProxy.AbstractInvocation
+Castle.DynamicProxy.Generators.AttributesToAvoidReplicating
