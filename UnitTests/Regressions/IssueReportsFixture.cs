@@ -1261,7 +1261,7 @@ namespace Moq.Tests.Regressions
 		public class _230
 		{
 			[Fact]
-			public void Test()
+			public void ByteArrayCallbackArgumentShouldNotBeNull()
 			{
 				var data = new byte[] { 2, 1, 2 };
 				var stream = new Mock<Stream>();
