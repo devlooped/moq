@@ -79,7 +79,18 @@ namespace Moq
 		{
 			return RaisesImpl(eventExpression, args);
 		}
-	}
+
+
+
+        #region ISingleThread<TMock> Members
+
+        public ISetup<TMock> SingleThread()
+        {
+            throw new NotImplementedException();
+        }
+
+        #endregion
+    }
 
 	internal partial class MethodCall : IProxyCall, ICallbackResult, IVerifies, IThrowsResult
 	{

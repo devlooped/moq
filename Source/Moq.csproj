@@ -65,6 +65,7 @@
   </ItemGroup>
   <ItemGroup>
     <Compile Include="ConditionalContext.cs" />
+    <Compile Include="Language\ISingleThread.cs" />
     <Compile Include="Language\ICallback.cs" />
     <Compile Include="Language\ICallback.Generated.cs">
       <AutoGen>True</AutoGen>

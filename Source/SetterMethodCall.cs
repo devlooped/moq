@@ -69,5 +69,16 @@ namespace Moq
 			this.SetCallbackWithArguments(callback);
 			return this;
 		}
-	}
+
+
+
+        #region ISingleThreadSetter<TMock,TProperty> Members
+
+        public new ISetupSetter<TMock, TProperty> SingleThread()
+        {
+            throw new NotImplementedException();
+        }
+
+        #endregion
+    }
 }

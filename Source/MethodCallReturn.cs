@@ -163,5 +163,25 @@ namespace Moq
 			if (afterReturnCallback != null)
 				afterReturnCallback(call.Arguments);
 		}
-	}
+
+
+
+        #region ISingleThread<TMock,TResult> Members
+
+        public ISetup<TMock, TResult> SingleThread()
+        {
+            throw new NotImplementedException();
+        }
+
+        #endregion
+
+        #region ISingleThreadGetter<TMock,TResult> Members
+
+        ISetupGetter<TMock, TResult> ISingleThreadGetter<TMock, TResult>.SingleThread()
+        {
+            throw new NotImplementedException();
+        }
+
+        #endregion
+    }
 }
