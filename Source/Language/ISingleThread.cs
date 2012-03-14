@@ -13,9 +13,8 @@ namespace Moq.Language
     public partial interface ISingleThread<TMock> where TMock:class
     {
         /// <summary>
-        /// 
+        /// Expect the method to be call in the same thread of Setup()
         /// </summary>
-        /// <returns></returns>
         ISetup<TMock> SingleThread();
     }
 
@@ -27,33 +26,33 @@ namespace Moq.Language
     public partial interface ISingleThread<TMock, TResult> where TMock : class
     {
         /// <summary>
-        /// 
+        /// Expect the method to be call in the same thread of Setup()
         /// </summary>
         /// <returns></returns>
         ISetup<TMock,TResult> SingleThread();
     }
     /// <summary>
-    /// 
+    ///
     /// </summary>
     /// <typeparam name="TMock"></typeparam>
     /// <typeparam name="TProperty"></typeparam>
     public partial interface ISingleThreadGetter<TMock, TProperty> where TMock : class
     {
         /// <summary>
-        /// 
+        ///  Expect the proeprty getter to be call in the same thread of Setup()
         /// </summary>
         /// <returns></returns>
         ISetupGetter<TMock, TProperty> SingleThread();
     }
     /// <summary>
-    /// 
+    ///  
     /// </summary>
     /// <typeparam name="TMock"></typeparam>
     /// <typeparam name="TProperty"></typeparam>
     public partial interface ISingleThreadSetter<TMock, TProperty> where TMock : class
     {
         /// <summary>
-        /// 
+        /// Expect the proeprty getter to be call in the same thread of Setup()
         /// </summary>
         /// <returns></returns>
         ISetupSetter<TMock, TProperty> SingleThread();
