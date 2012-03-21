@@ -170,7 +170,8 @@ namespace Moq
 
         public ISetup<TMock, TResult> SingleThread()
         {
-            throw new NotImplementedException();
+            SetSingleThread();
+            return this;
         }
 
         #endregion
@@ -179,7 +180,8 @@ namespace Moq
 
         ISetupGetter<TMock, TResult> ISingleThreadGetter<TMock, TResult>.SingleThread()
         {
-            throw new NotImplementedException();
+            SetSingleThread();
+            return this;
         }
 
         #endregion

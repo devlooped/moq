@@ -76,7 +76,8 @@ namespace Moq
 
         public new ISetupSetter<TMock, TProperty> SingleThread()
         {
-            throw new NotImplementedException();
+            this.SetSingleThread();
+            return this;
         }
 
         #endregion

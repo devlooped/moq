@@ -85,6 +85,7 @@ namespace Moq
 			MoreThanOneCall,
 			MoreThanNCalls,
 			SetupNever,
+            SingleThread
 		}
 
 		private ExceptionReason reason;
