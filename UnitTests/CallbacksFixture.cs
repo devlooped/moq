@@ -11,9 +11,8 @@ namespace Moq.Tests
 			var mock = new Mock<IFoo>();
 			bool called = false;
 			mock.Setup(x => x.Submit())
-                .SingleThread()
                 .Callback(() => called = true);
-
+            
 			mock.Object.Submit();
 			Assert.True(called);
 		}
