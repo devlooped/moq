@@ -53,6 +53,7 @@ using Moq.Language.Flow;
 using Moq.Matchers;
 using Moq.Properties;
 using Moq.Proxy;
+using System.Threading;
 
 namespace Moq
 {
@@ -79,7 +80,19 @@ namespace Moq
 		{
 			return RaisesImpl(eventExpression, args);
 		}
-	}
+
+
+
+        #region ISingleThread<TMock> Members
+
+        public ISetup<TMock> SingleThread()
+        {
+            SetSingleThread();
+            return this;
+        }
+
+        #endregion
+    }
 
 	internal partial class MethodCall : IProxyCall, ICallbackResult, IVerifies, IThrowsResult
 	{
@@ -95,6 +108,10 @@ namespace Moq
 		private int? expectedCallCount = null;
 		protected Func<bool> condition;
 		private List<KeyValuePair<int, object>> outValues = new List<KeyValuePair<int, object>>();
+
+
+        bool singleThread;
+        int setupThreadId;
 
 		public MethodCall(Mock mock, Func<bool> condition, Expression originalExpression, MethodInfo method, params Expression[] arguments)
 		{
@@ -137,6 +154,12 @@ namespace Moq
 
 			this.SetFileInfo();
 		}
+
+        internal void SetSingleThread()
+        {
+            singleThread = true;
+            setupThreadId = Thread.CurrentThread.ManagedThreadId;
+        }
 
 		public string FailMessage { get; set; }
 
@@ -239,6 +262,9 @@ namespace Moq
 		{
 			this.Invoked = true;
 
+            if (singleThread)
+                CheckCalledOnSetupThread();
+
 			if (setupCallback != null)
 			{
 				setupCallback(call.Arguments);
@@ -285,6 +311,14 @@ namespace Moq
 				}
 			}
 		}
+
+        private void CheckCalledOnSetupThread()
+        {
+            if (Thread.CurrentThread.ManagedThreadId != setupThreadId)
+            {
+                throw new MockException(MockException.ExceptionReason.SingleThread,"Method "+this.Method.Name+" must not be called from multiple threads");
+            }
+        }
 
 		public IThrowsResult Throws(Exception exception)
 		{
