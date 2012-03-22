@@ -85,6 +85,7 @@
     </Compile>
     <Compile Include="Language\ISetupSequentialResult.cs" />
     <Compile Include="Language\ISetupConditionResult.cs" />
+    <Compile Include="Language\ISingleThread.cs" />
     <Compile Include="Linq\FluentMockVisitor.cs" />
     <Compile Include="Linq\Mock.cs" />
     <Compile Include="Linq\MockRepository.cs" />

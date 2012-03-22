@@ -118,6 +118,7 @@
     <Compile Include="StubExtensionsFixture.cs" />
     <Compile Include="ThreadSafety\ExpectToBeThreadSafe.cs" />
     <Compile Include="ThreadSafety\IExpectToBeThreadSafe.cs" />
+    <Compile Include="ThreadSafety\SingleThreadExpectations.cs" />
     <Compile Include="ThreadSafety\ThreadSafeMockDoesNotAllowRaceConditions.cs" />
     <Compile Include="TimesFixture.cs" />
     <Compile Include="VerifyFixture.cs" />
