@@ -39,6 +39,7 @@
 // http://www.opensource.org/licenses/bsd-license.php]
 
 using System;
+using System.Collections.Generic;
 using System.Globalization;
 using System.Linq;
 using System.Linq.Expressions;
@@ -226,6 +227,47 @@ namespace Moq
 				return ExpressionStringBuilder.GetString(expression, type => type.FullName);
 			else
 				return ExpressionStringBuilder.GetString(expression, type => type.Name);
+		}
+
+		/// <summary>
+		/// Extracts, into a common form, information from a <see cref="LambdaExpression" />
+		/// around either a <see cref="MethodCallExpression" /> (for a normal method call)
+		/// or a <see cref="InvocationExpression" /> (for a delegate invocation).
+		/// </summary>
+		internal static CallInfo GetCallInfo(this LambdaExpression expression, Mock mock)
+		{
+			Guard.NotNull(() => expression, expression);
+
+			if (mock.DelegateInterfaceMethod != null)
+			{
+				// We're a mock for a delegate, so this call can only
+				// possibly be the result of invoking the delegate.
+				// But the expression we have is for a call on the delegate, not our
+				// delegate interface proxy, so we need to map instead to the
+				// method on that interface, which is the property we've just tested for.
+				var invocation = (InvocationExpression)expression.Body;
+				return new CallInfo
+				{
+					Method = mock.DelegateInterfaceMethod,
+					Arguments = invocation.Arguments,
+					Object = invocation.Expression
+				};
+			}
+
+			var methodCall = expression.ToMethodCall();
+			return new CallInfo
+			{
+				Method = methodCall.Method,
+				Arguments = methodCall.Arguments,
+				Object = methodCall.Object
+			};
+		}
+
+		internal class CallInfo
+		{
+			public Expression Object { get; set; }
+			public MethodInfo Method { get; set; }
+			public IEnumerable<Expression> Arguments { get; set; }
 		}
 
 		internal sealed class RemoveMatcherConvertVisitor : ExpressionVisitor

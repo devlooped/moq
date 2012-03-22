@@ -160,6 +160,9 @@
     <Compile Include="..\UnitTests\MockDefaultValueProviderFixture.cs">
       <Link>MockDefaultValueProviderFixture.cs</Link>
     </Compile>
+    <Compile Include="..\UnitTests\MockedDelegatesFixture.cs">
+      <Link>MockedDelegatesFixture.cs</Link>
+    </Compile>
     <Compile Include="..\UnitTests\MockedEventsFixture.cs">
       <Link>MockedEventsFixture.cs</Link>
     </Compile>
