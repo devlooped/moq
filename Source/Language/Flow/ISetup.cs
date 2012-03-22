@@ -46,7 +46,7 @@ namespace Moq.Language.Flow
 	/// Implements the fluent API.
 	/// </summary>
 	[EditorBrowsable(EditorBrowsableState.Never)]
-	public interface ISetup<TMock> : ICallback, ICallbackResult, IRaise<TMock>, IVerifies, IHideObjectMembers
+	public interface ISetup<TMock> : ICallback, ICallbackResult, IRaise<TMock>, IVerifies, IHideObjectMembers,ISingleThread<TMock>
 		where TMock : class
 	{
 	}
@@ -55,7 +55,7 @@ namespace Moq.Language.Flow
 	/// Implements the fluent API.
 	/// </summary>
 	[EditorBrowsable(EditorBrowsableState.Never)]
-	public interface ISetup<TMock, TResult> : ICallback<TMock, TResult>, IReturnsThrows<TMock, TResult>, IVerifies, IHideObjectMembers
+	public interface ISetup<TMock, TResult> : ICallback<TMock, TResult>, IReturnsThrows<TMock, TResult>, IVerifies, IHideObjectMembers,ISingleThread<TMock,TResult>
 		where TMock : class
 	{
 	}
@@ -64,16 +64,17 @@ namespace Moq.Language.Flow
 	/// Implements the fluent API.
 	/// </summary>
 	[EditorBrowsable(EditorBrowsableState.Never)]
-	public interface ISetupGetter<TMock, TProperty> : ICallbackGetter<TMock, TProperty>, IReturnsThrowsGetter<TMock, TProperty>, IVerifies, IHideObjectMembers
+	public interface ISetupGetter<TMock, TProperty> : ICallbackGetter<TMock, TProperty>, IReturnsThrowsGetter<TMock, TProperty>, IVerifies, IHideObjectMembers,ISingleThreadGetter<TMock,TProperty>
 		where TMock : class
 	{
+
 	}
 
 	/// <summary>
 	/// Implements the fluent API.
 	/// </summary>
 	[EditorBrowsable(EditorBrowsableState.Never)]
-	public interface ISetupSetter<TMock, TProperty> : ICallbackSetter<TProperty>, ICallbackResult, IRaise<TMock>, IVerifies, IHideObjectMembers
+	public interface ISetupSetter<TMock, TProperty> : ICallbackSetter<TProperty>, ICallbackResult, IRaise<TMock>, IVerifies, IHideObjectMembers,ISingleThreadSetter<TMock,TProperty>
 		where TMock : class
 	{
 	}

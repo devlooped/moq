@@ -39,7 +39,7 @@
     <CodeAnalysisRuleSet>AllRules.ruleset</CodeAnalysisRuleSet>
   </PropertyGroup>
   <ItemGroup>
-		<!--<Reference Condition="'$(TargetFrameworkVersion)' == 'v4.0'" Include="Castle.Core, Version=1.2.0.0, Culture=neutral, PublicKeyToken=407dd0808d44fbdc, processorArchitecture=MSIL">
+    <!--<Reference Condition="'$(TargetFrameworkVersion)' == 'v4.0'" Include="Castle.Core, Version=1.2.0.0, Culture=neutral, PublicKeyToken=407dd0808d44fbdc, processorArchitecture=MSIL">
       <SpecificVersion>False</SpecificVersion>
       <HintPath>..\Lib\Castle\bin-NET40\Castle.Core.dll</HintPath>
     </Reference>
@@ -47,15 +47,11 @@
       <SpecificVersion>False</SpecificVersion>
       <HintPath>..\Lib\Castle\bin-NET35\Castle.Core.dll</HintPath>
     </Reference>-->
-		<Reference Include="Castle.Core, Version=1.2.0.0, Culture=neutral, PublicKeyToken=407dd0808d44fbdc, processorArchitecture=MSIL">
-			<SpecificVersion>False</SpecificVersion>
-			<HintPath>..\Lib\Castle\net-35\Castle.Core.dll</HintPath>
-		</Reference>
-		<Reference Include="Castle.DynamicProxy2, Version=1.2.0.0, Culture=neutral, PublicKeyToken=407dd0808d44fbdc, processorArchitecture=MSIL">
-			<SpecificVersion>False</SpecificVersion>
-			<HintPath>..\Lib\Castle\net-35\Castle.DynamicProxy2.dll</HintPath>
-		</Reference>
-		<Reference Include="ClassLibrary1">
+    <Reference Include="Castle.Core, Version=2.5.0.0, Culture=neutral, PublicKeyToken=407dd0808d44fbdc, processorArchitecture=MSIL">
+      <SpecificVersion>False</SpecificVersion>
+      <HintPath>..\Lib\Castle\bin-NET40\Castle.Core.dll</HintPath>
+    </Reference>
+    <Reference Include="ClassLibrary1">
       <HintPath>.\ClassLibrary1.dll</HintPath>
     </Reference>
     <Reference Include="ClassLibrary2">
@@ -120,6 +116,10 @@
     <Compile Include="SequenceExtensionsFixture.cs" />
     <Compile Include="ReturnsFixture.cs" />
     <Compile Include="StubExtensionsFixture.cs" />
+    <Compile Include="ThreadSafety\ExpectToBeThreadSafe.cs" />
+    <Compile Include="ThreadSafety\IExpectToBeThreadSafe.cs" />
+    <Compile Include="ThreadSafety\SingleThreadExpectations.cs" />
+    <Compile Include="ThreadSafety\ThreadSafeMockDoesNotAllowRaceConditions.cs" />
     <Compile Include="TimesFixture.cs" />
     <Compile Include="VerifyFixture.cs" />
   </ItemGroup>
@@ -163,6 +163,7 @@
       <EmbedInteropTypes>True</EmbedInteropTypes>
     </COMReference>
   </ItemGroup>
+  <ItemGroup />
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
   <UsingTask AssemblyFile="$(MSBuildProjectPath)..\Lib\xUnit\xunit.runner.msbuild.dll" TaskName="Xunit.Runner.MSBuild.xunit" />
   <Target Name="AfterBuild" Condition=" '$(Configuration)' == 'Release' ">
