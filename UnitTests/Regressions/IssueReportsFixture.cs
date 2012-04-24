@@ -1671,6 +1671,35 @@ namespace Moq.Tests.Regressions
 
 		#endregion
 
+#region 294
+
+        public class _294
+        {
+            [Fact]
+             public void MockBehaviourStrict()
+             {
+                var mockRepository = new MockRepository(MockBehavior.Loose);
+                var outer = mockRepository.Create<IOuter>();
+                outer.SetupGet(o => o.Inner.Id).Returns(Guid.NewGuid());
+
+                var idGot = outer.Object.Inner.Id;
+                mockRepository.VerifyAll();
+             }
+
+            public interface IInner
+            {
+                Guid Id { get; set; }
+                int Number { get; set; }
+            }
+
+            public interface IOuter
+            {
+                IInner Inner { get; set; }
+                object Object { get; set; }
+            }
+        }
+
+#endregion
 		// run "netsh http add urlacl url=http://+:7777/ user=[domain]\[user]"
 		// to avoid running the test as an admin
 		[Fact(Skip = "Doesn't work in Mono")]
