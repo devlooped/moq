@@ -1,0 +1,6 @@
+*_ReSharper*
+*/bin/Debug/
+*/bin/Release/
+obj/
+*.dotCover
+*.suo
