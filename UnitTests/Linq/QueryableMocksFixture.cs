@@ -125,6 +125,22 @@ namespace Moq.Tests
 			Assert.Equal("foo", target.Value);
 		}
 
+        [Fact]
+        public void ShouldSupportSettingDtoProtectedPropertyValue()
+        {
+            var target = Mock.Of<Dto>(x => x.ProtectedValue == "foo");
+
+            Assert.Equal("foo", target.ProtectedValue);
+        }
+
+        [Fact]
+        public void ShouldSupportSettingDtoProtectedVirtualPropertyValue()
+        {
+            var target = Mock.Of<Dto>(x => x.ProtectedVirtualValue == "foo");
+
+            Assert.Equal("foo", target.ProtectedVirtualValue);
+        }
+
 		[Fact]
 		public void ShouldOneOfCreateNewMock()
 		{
@@ -172,6 +188,8 @@ namespace Moq.Tests
 		public class Dto
 		{
 			public string Value { get; set; }
+			public string ProtectedValue { get; protected set; }
+			public virtual string ProtectedVirtualValue { get; protected set; }
 		}
 
 		public interface IFoo

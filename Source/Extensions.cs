@@ -186,8 +186,8 @@ namespace Moq
 		{
 			if (property.CanRead)
 			{
-				var getter = property.GetGetMethod();
-				return getter != null && getter.IsVirtual && !getter.IsFinal;
+				var getter = property.GetGetMethod(true);
+				return getter != null && getter.CanOverride();
 			}
 
 			return false;
@@ -197,8 +197,8 @@ namespace Moq
 		{
 			if (property.CanWrite)
 			{
-				var setter = property.GetSetMethod();
-				return setter != null && setter.IsVirtual && !setter.IsFinal;
+				var setter = property.GetSetMethod(true);
+				return setter != null && setter.CanOverride();
 			}
 
 			return false;
