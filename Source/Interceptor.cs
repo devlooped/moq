@@ -169,7 +169,7 @@ namespace Moq
 					// TODO: validate we can get the event?
 					var eventInfo = this.GetEventFromName(invocation.Method.Name.Substring(4));
 
-					if (this.Mock.CallBase)
+					if (this.Mock.CallBase && !eventInfo.DeclaringType.IsInterface)
 					{
 						invocation.InvokeBase();
 					}
@@ -186,7 +186,7 @@ namespace Moq
 					// TODO: validate we can get the event?
 					var eventInfo = this.GetEventFromName(invocation.Method.Name.Substring(7));
 
-					if (this.Mock.CallBase)
+					if (this.Mock.CallBase && !eventInfo.DeclaringType.IsInterface)
 					{
 						invocation.InvokeBase();
 					}
