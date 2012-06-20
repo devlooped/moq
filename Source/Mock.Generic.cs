@@ -281,6 +281,37 @@ namespace Moq
 
 		#endregion
 
+		#region Inspect call counts
+
+		/// <include file='Mock.Generic.xdoc' path='docs/doc[@for="Mock{T}.Verify(expression)"]/*'/>
+		[SuppressMessage("Microsoft.Design", "CA1006:DoNotNestGenericTypesInMemberSignatures", Justification = "By design")]
+		public int Count(Expression<Action<T>> expression)
+		{
+			return Mock.Count(this, expression);
+		}
+
+		/// <include file='Mock.Generic.xdoc' path='docs/doc[@for="Mock{T}.Verify{TResult}(expression)"]/*'/>
+		[SuppressMessage("Microsoft.Design", "CA1006:DoNotNestGenericTypesInMemberSignatures", Justification = "By design")]
+		public int Count<TResult>(Expression<Func<T, TResult>> expression)
+		{
+			return Mock.Count(this, expression);
+		}
+
+		/// <include file='Mock.Generic.xdoc' path='docs/doc[@for="Mock{T}.VerifyGet(expression)"]/*'/>
+		[SuppressMessage("Microsoft.Design", "CA1006:DoNotNestGenericTypesInMemberSignatures", Justification = "By design")]
+		public int CountGets<TProperty>(Expression<Func<T, TProperty>> expression)
+		{
+			return Mock.CountGets(this, expression);
+		}
+
+		/// <include file='Mock.Generic.xdoc' path='docs/doc[@for="Mock{T}.VerifySet(expression)"]/*'/>
+		public int CountSets(Action<T> setterExpression)
+		{
+			return Mock.CountSets<T>(this, setterExpression);
+		}
+
+		#endregion
+
 		#region Verify
 
 		/// <include file='Mock.Generic.xdoc' path='docs/doc[@for="Mock{T}.Verify(expression)"]/*'/>

@@ -199,6 +199,78 @@ namespace Moq
 		/// </summary>
 		internal List<Type> ImplementedInterfaces { get; private set; }
 
+		#region Inspect call counts
+
+		internal static int Count<T>(
+			Mock mock,
+			Expression<Action<T>> expression)
+		{
+			var methodCall = expression.GetCallInfo(mock);
+			var method = methodCall.Method;
+			ThrowIfVerifyNonVirtual(expression, method);
+			var args = methodCall.Arguments.ToArray();
+
+			var expected = new MethodCall(mock, null, expression, method, args);
+			return CountCalls(GetInterceptor(methodCall.Object, mock), expected);
+		}
+
+		internal static int Count<T, TResult>(
+			Mock mock,
+			Expression<Func<T, TResult>> expression)
+			where T : class
+		{
+			if (expression.IsProperty())
+			{
+				return CountGets<T, TResult>(mock, expression);
+			}
+			else
+			{
+				var methodCall = expression.GetCallInfo(mock);
+				var method = methodCall.Method;
+				ThrowIfVerifyNonVirtual(expression, method);
+				var args = methodCall.Arguments.ToArray();
+
+				var expected = new MethodCallReturn<T, TResult>(mock, null, expression, method, args);
+
+				return CountCalls(GetInterceptor(methodCall.Object, mock), expected);
+			}
+		}
+
+		internal static int CountGets<T, TProperty>(
+			Mock mock,
+			Expression<Func<T, TProperty>> expression)
+			where T : class
+		{
+			var method = expression.ToPropertyInfo().GetGetMethod(true);
+			ThrowIfVerifyNonVirtual(expression, method);
+
+			var expected = new MethodCallReturn<T, TProperty>(mock, null, expression, method, new Expression[0]);
+
+			return CountCalls(GetInterceptor(((MemberExpression)expression.Body).Expression, mock), expected);
+		}
+
+		internal static int CountSets<T>(
+			Mock<T> mock,
+			Action<T> setterExpression)
+			where T : class
+		{
+			Interceptor targetInterceptor = null;
+			var expected = SetupSetImpl<T, MethodCall<T>>(mock, setterExpression, (m, expr, method, value) =>
+			{
+				targetInterceptor = m.Interceptor;
+				return new MethodCall<T>(m, null, expr, method, value);
+			});
+
+		    return CountCalls(targetInterceptor, expected);
+		}
+
+		private static int CountCalls(Interceptor targetInterceptor, MethodCall expected)
+		{
+			return targetInterceptor.ActualCalls.Where(ac => expected.Matches(ac)).Count();
+		}
+
+		#endregion
+
 		#region Verify
 
 		/// <include file='Mock.xdoc' path='docs/doc[@for="Mock.Verify"]/*'/>
