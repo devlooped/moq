@@ -216,4 +216,38 @@ namespace Moq.Tests
 			bool HasElements(string key1);
 		}
 	}
+
+    public class Foo
+    {
+        protected Foo()
+        {
+        }
+
+        public virtual string Value { get; private set; }
+    }
+
+    public class FooFixture
+    {
+        [Fact]
+        public void Test()
+        {
+            var remote = Mock.Of<Foo>(rt => rt.Value == "foo");
+            Assert.Equal("foo", remote.Value);
+        }
+    }
+
+    public interface IBar
+    {
+        Foo Foo { get; set; }
+    }
+
+    public class BarFixture
+    {
+        [Fact]
+        public void Test()
+        {
+            var remote = Mock.Of<IBar>(rt => rt.Foo.Value == "foo");
+            Assert.Equal("foo", remote.Foo.Value);
+        }
+    }
 }
