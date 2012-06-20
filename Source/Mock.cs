@@ -231,10 +231,11 @@ namespace Moq
 		}
 
 		internal static void Verify<T>(
-			Mock mock,
+			Mock<T> mock,
 			Expression<Action<T>> expression,
 			Times times,
 			string failMessage)
+			where T : class
 		{
 			Guard.NotNull(() => times, times);
 
@@ -248,7 +249,7 @@ namespace Moq
 		}
 
 		internal static void Verify<T, TResult>(
-			Mock mock,
+			Mock<T> mock,
 			Expression<Func<T, TResult>> expression,
 			Times times,
 			string failMessage)
@@ -276,7 +277,7 @@ namespace Moq
 		}
 
 		internal static void VerifyGet<T, TProperty>(
-			Mock mock,
+			Mock<T> mock,
 			Expression<Func<T, TProperty>> expression,
 			Times times,
 			string failMessage)
@@ -393,7 +394,7 @@ namespace Moq
 
 		#region Setup
 
-		internal static MethodCall<T> Setup<T>(Mock mock, Expression<Action<T>> expression, Func<bool> condition)
+		internal static MethodCall<T> Setup<T>(Mock<T> mock, Expression<Action<T>> expression, Func<bool> condition)
 			where T : class
 		{
 			return PexProtector.Invoke(() =>
@@ -415,7 +416,7 @@ namespace Moq
 		}
 
 		internal static MethodCallReturn<T, TResult> Setup<T, TResult>(
-			Mock mock,
+			Mock<T> mock,
 			Expression<Func<T, TResult>> expression,
 			Func<bool> condition)
 			where T : class
@@ -444,7 +445,7 @@ namespace Moq
 		}
 
 		internal static MethodCallReturn<T, TProperty> SetupGet<T, TProperty>(
-			Mock mock,
+			Mock<T> mock,
 			Expression<Func<T, TProperty>> expression,
 			Func<bool> condition)
 			where T : class
@@ -511,7 +512,7 @@ namespace Moq
 		}
 
 		internal static SetterMethodCall<T, TProperty> SetupSet<T, TProperty>(
-			Mock mock,
+			Mock<T> mock,
 			Expression<Func<T, TProperty>> expression)
 			where T : class
 		{
