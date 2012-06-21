@@ -1564,6 +1564,55 @@ namespace Moq.Tests.Regressions
 
 		#endregion
 
+		#region #325
+
+		public class _325
+		{
+			[Fact]
+			public void SubscribingWorks()
+			{
+				var target = new Mock<Foo> { CallBase = true };
+				target.As<IBar>();
+
+				var bar = (IBar)target.Object;
+				var raised = false;
+				bar.SomeEvent += (sender, e) => raised = true;
+
+				target.As<IBar>().Raise(b => b.SomeEvent += null, EventArgs.Empty);
+
+				Assert.True(raised);
+			}
+
+			[Fact]
+			public void UnsubscribingWorks()
+			{
+				var target = new Mock<Foo> { CallBase = true };
+				target.As<IBar>();
+
+				var bar = (IBar)target.Object;
+				var raised = false;
+				EventHandler handler = (sender, e) => raised = true;
+				bar.SomeEvent += handler;
+				bar.SomeEvent -= handler;
+
+				target.As<IBar>().Raise(b => b.SomeEvent += null, EventArgs.Empty);
+
+				Assert.False(raised);
+			}
+
+			public class Foo
+			{
+			}
+
+			public interface IBar
+			{
+				event EventHandler SomeEvent;
+			}
+
+		}
+
+		#endregion
+
 		#region Recursive issue
 
 		public class RecursiveFixture
