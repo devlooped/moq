@@ -21,6 +21,12 @@ namespace Moq
 			this.expression = expression;
 		}
 
+		public ISetupSequentialResult<TResult> CallBase()
+		{
+			this.EndSetup(GetSetup().CallBase());
+			return this;
+		}
+
 		private ISetup<TMock, TResult> GetSetup()
 		{
 			var expectationStep = this.expectationsCount;
