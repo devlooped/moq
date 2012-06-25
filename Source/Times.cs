@@ -51,6 +51,7 @@ namespace Moq
 		private string messageFormat;
 		private int from;
 		private int to;
+        private Range kind; // TODO: is the Times a struct as an smallclass optimization? adding a field makes it bigger..
 
 		private Times(Func<int, bool> evaluator, int from, int to, string messageFormat)
 		{
@@ -58,9 +59,76 @@ namespace Moq
 			this.from = from;
 			this.to = to;
 			this.messageFormat = messageFormat;
+            this.kind = 0;
 		}
+        private Times(Func<int, bool> evaluator, int from, int to, string messageFormat, Range kind)
+        {
+            this.evaluator = evaluator;
+            this.from = from;
+            this.to = to;
+            this.messageFormat = messageFormat;
+            this.kind = kind;
+        }
 
-		/// <include file='Times.xdoc' path='docs/doc[@for="Times.AtLeast"]/*'/>
+        /// <include file='Times.xdoc' path='docs/doc[@for="Times.Add"]/*'/>
+        public Times Add(int by)
+        {
+            if (by < 0)
+                throw new ArgumentException("Subtracting expected invocaction counts makes no sense");
+
+            var newfrom = (int)Math.Max(0, Math.Min(int.MaxValue, (long)from + (long)by));
+            var newto = (int)Math.Max(0, Math.Min(int.MaxValue, (long)to + (long)by));
+
+            if (newto < to || newfrom < from)
+                throw new OverflowException();
+
+            if (to == int.MaxValue && from == 0) // was in mode: any
+                return Times.AcceptAny();
+
+            else if (to == int.MaxValue && from == int.MaxValue) // was in mode: none
+                return Times.AcceptNone();
+
+            else if (to == int.MaxValue) // was in mode: atleast
+                if (newfrom == 0)
+                    return Times.AcceptAny();
+                else if (newfrom == 1)
+                    return Times.AtLeastOnce();
+                else
+                    return Times.AtLeast(newfrom);
+
+            else if (from == 0) // was in mode: atmost
+                if (newto == int.MaxValue)
+                    return Times.AcceptAny();
+                else if (newto == 1)
+                    return Times.AtMostOnce();
+                else
+                    return Times.AtMost(newto);
+
+            else if (newfrom == newto)
+                if (newto == 0)
+                    return Times.Never();
+                else if (newto == 1)
+                    return Times.Once();
+                else
+                    return Times.Exactly(newto);
+
+            else
+                return Times.Between(newfrom, newto, kind);
+        }
+
+        /// <include file='Times.xdoc' path='docs/doc[@for="Times.AcceptAny"]/*'/>
+        public static Times AcceptAny()
+        {
+            return new Times(c => true, 0, int.MaxValue, "This case always succedes. You shouldn't be able to see this message."); // TODO: resourcize;
+        }
+
+        /// <include file='Times.xdoc' path='docs/doc[@for="Times.AcceptNone"]/*'/>
+        public static Times AcceptNone()
+        {
+            return new Times(c => false, int.MaxValue, int.MaxValue, "This case always fails"); // TODO: resourcize
+        }
+
+        /// <include file='Times.xdoc' path='docs/doc[@for="Times.AtLeast"]/*'/>
 		public static Times AtLeast(int callCount)
 		{
 			Guard.NotOutOfRangeInclusive(() => callCount, callCount, 1, int.MaxValue);
@@ -103,7 +171,8 @@ namespace Moq
 					c => c > callCountFrom && c < callCountTo,
 					callCountFrom,
 					callCountTo,
-					Resources.NoMatchingCallsBetweenExclusive);
+					Resources.NoMatchingCallsBetweenExclusive,
+                    rangeKind);
 			}
 
 			Guard.NotOutOfRangeInclusive(() => callCountFrom, callCountFrom, 0, callCountTo);
@@ -111,7 +180,8 @@ namespace Moq
 				c => c >= callCountFrom && c <= callCountTo,
 				callCountFrom,
 				callCountTo,
-				Resources.NoMatchingCallsBetweenInclusive);
+				Resources.NoMatchingCallsBetweenInclusive,
+                rangeKind);
 		}
 
 		/// <include file='Times.xdoc' path='docs/doc[@for="Times.Exactly"]/*'/>

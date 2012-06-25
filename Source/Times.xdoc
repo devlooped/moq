@@ -5,7 +5,26 @@
 			Defines the number of invocations allowed by a mocked method.
 		</summary>
 	</doc>
-	<doc for="Times.AtLeast">
+	<doc for="Times.Add">
+		<summary>
+			Calculates new Times structure with invocation count altered by <paramref name="by"/> times.
+		</summary>
+		<param name="by">The offset.</param>
+		<returns>An object defining the allowed number of invocations.</returns>
+	</doc>
+	<doc for="Times.AcceptAny">
+		<summary>
+			Specifies that a mocked method invocation count is irrelevant, and that the verification should succeed.
+		</summary>
+		<returns>An object defining the allowed number of invocations.</returns>
+	</doc>
+	<doc for="Times.AcceptNone">
+		<summary>
+			Specifies that a mocked method invocation is irrelevant, and that the verification should simply fail.
+		</summary>
+		<returns>An object defining the allowed number of invocations.</returns>
+	</doc>
+  <doc for="Times.AtLeast">
 		<summary>
 			Specifies that a mocked method should be invoked <paramref name="callCount"/> times as minimum.
 		</summary>

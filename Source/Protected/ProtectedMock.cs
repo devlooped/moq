@@ -1,4 +1,4 @@
-﻿//Copyright (c) 2007. Clarius Consulting, Manas Technology Solutions, InSTEDD
+//Copyright (c) 2007. Clarius Consulting, Manas Technology Solutions, InSTEDD
 //http://code.google.com/p/moq/
 //All rights reserved.
 
@@ -114,6 +114,69 @@ namespace Moq.Protected
 			property.ThrowIfNoSetter();
 
 			return Mock.SetupSet<T, TProperty>(mock, GetSetterExpression(property, ItExpr.IsAny<TProperty>()), null);
+		}
+
+		#endregion
+
+		#region Inspect call counts
+
+		public int Count(string methodName, Times times, object[] args)
+		{
+			Guard.NotNullOrEmpty(() => methodName, methodName);
+
+			var method = GetMethod(methodName, args);
+			ThrowIfMemberMissing(methodName, method);
+			ThrowIfPublicMethod(method);
+
+			return Mock.Count(mock, GetMethodCall(method, args));
+		}
+
+		public int Count<TResult>(string methodName, Times times, object[] args)
+		{
+			Guard.NotNullOrEmpty(() => methodName, methodName);
+
+			var property = GetProperty(methodName);
+			if (property != null)
+			{
+				ThrowIfPublicGetter(property);
+				// TODO should consider property indexers
+				return Mock.CountGets(mock, GetMemberAccess<TResult>(property));
+			}
+
+			var method = GetMethod(methodName, args);
+			ThrowIfMemberMissing(methodName, method);
+			ThrowIfPublicMethod(method);
+
+			return Mock.Count(mock, GetMethodCall<TResult>(method, args));
+		}
+
+		// TODO should receive args to support indexers
+		public int CountGets<TProperty>(string propertyName, Times times)
+		{
+			Guard.NotNullOrEmpty(() => propertyName, propertyName);
+
+			var property = GetProperty(propertyName);
+			ThrowIfMemberMissing(propertyName, property);
+			ThrowIfPublicGetter(property);
+			property.ThrowIfNoGetter();
+
+			// TODO should consider property indexers
+			return Mock.CountGets(mock, GetMemberAccess<TProperty>(property));
+		}
+
+		// TODO should receive args to support indexers
+		public int CountSets<TProperty>(string propertyName, Times times, object value)
+		{
+			Guard.NotNullOrEmpty(() => propertyName, propertyName);
+
+			var property = GetProperty(propertyName);
+			ThrowIfMemberMissing(propertyName, property);
+			ThrowIfPublicSetter(property);
+			property.ThrowIfNoSetter();
+
+			// TODO should consider property indexers
+			// TODO should receive the parameter here
+			return Mock.CountSets(mock, GetSetterExpression(property, ItExpr.IsAny<TProperty>()));
 		}
 
 		#endregion
