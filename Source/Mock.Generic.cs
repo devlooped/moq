@@ -39,6 +39,7 @@
 // http://www.opensource.org/licenses/bsd-license.php]
 
 using System;
+using System.Collections.Generic;
 using System.Diagnostics.CodeAnalysis;
 using System.Linq.Expressions;
 using Moq.Language.Flow;
@@ -285,110 +286,110 @@ namespace Moq
 
 		/// <include file='Mock.Generic.xdoc' path='docs/doc[@for="Mock{T}.Verify(expression)"]/*'/>
 		[SuppressMessage("Microsoft.Design", "CA1006:DoNotNestGenericTypesInMemberSignatures", Justification = "By design")]
-		public void Verify(Expression<Action<T>> expression)
+		public List<IRecordedCall> Verify(Expression<Action<T>> expression)
 		{
-			Mock.Verify(this, expression, Times.AtLeastOnce(), null);
+			return Mock.Verify(this, expression, Times.AtLeastOnce(), null);
 		}
 
 		/// <include file='Mock.Generic.xdoc' path='docs/doc[@for="Mock{T}.Verify(expression,times)"]/*'/>
 		[SuppressMessage("Microsoft.Design", "CA1006:DoNotNestGenericTypesInMemberSignatures", Justification = "By design")]
-		public void Verify(Expression<Action<T>> expression, Times times)
+		public List<IRecordedCall> Verify(Expression<Action<T>> expression, Times times)
 		{
-			Mock.Verify(this, expression, times, null);
+			return Mock.Verify(this, expression, times, null);
 		}
 
 		/// <include file='Mock.Generic.xdoc' path='docs/doc[@for="Mock{T}.Verify(expression,failMessage)"]/*'/>
 		[SuppressMessage("Microsoft.Design", "CA1006:DoNotNestGenericTypesInMemberSignatures", Justification = "By design")]
-		public void Verify(Expression<Action<T>> expression, string failMessage)
+		public List<IRecordedCall> Verify(Expression<Action<T>> expression, string failMessage)
 		{
-			Mock.Verify(this, expression, Times.AtLeastOnce(), failMessage);
+			return Mock.Verify(this, expression, Times.AtLeastOnce(), failMessage);
 		}
 
 		/// <include file='Mock.Generic.xdoc' path='docs/doc[@for="Mock{T}.Verify(expression,times,failMessage)"]/*'/>
 		[SuppressMessage("Microsoft.Design", "CA1006:DoNotNestGenericTypesInMemberSignatures", Justification = "By design")]
-		public void Verify(Expression<Action<T>> expression, Times times, string failMessage)
+		public List<IRecordedCall> Verify(Expression<Action<T>> expression, Times times, string failMessage)
 		{
-			Mock.Verify(this, expression, times, failMessage);
+			return Mock.Verify(this, expression, times, failMessage);
 		}
 
 		/// <include file='Mock.Generic.xdoc' path='docs/doc[@for="Mock{T}.Verify{TResult}(expression)"]/*'/>
 		[SuppressMessage("Microsoft.Design", "CA1006:DoNotNestGenericTypesInMemberSignatures", Justification = "By design")]
-		public void Verify<TResult>(Expression<Func<T, TResult>> expression)
+		public List<IRecordedCall> Verify<TResult>(Expression<Func<T, TResult>> expression)
 		{
-			Mock.Verify(this, expression, Times.AtLeastOnce(), null);
+			return Mock.Verify(this, expression, Times.AtLeastOnce(), null);
 		}
 
 		/// <include file='Mock.Generic.xdoc' path='docs/doc[@for="Mock{T}.Verify{TResult}(expression,times)"]/*'/>
 		[SuppressMessage("Microsoft.Design", "CA1006:DoNotNestGenericTypesInMemberSignatures", Justification = "By design")]
-		public void Verify<TResult>(Expression<Func<T, TResult>> expression, Times times)
+		public List<IRecordedCall> Verify<TResult>(Expression<Func<T, TResult>> expression, Times times)
 		{
-			Mock.Verify(this, expression, times, null);
+			return Mock.Verify(this, expression, times, null);
 		}
 
 		/// <include file='Mock.Generic.xdoc' path='docs/doc[@for="Mock{T}.Verify{TResult}(expression,failMessage)"]/*'/>
 		[SuppressMessage("Microsoft.Design", "CA1006:DoNotNestGenericTypesInMemberSignatures", Justification = "By design")]
-		public void Verify<TResult>(Expression<Func<T, TResult>> expression, string failMessage)
+		public List<IRecordedCall> Verify<TResult>(Expression<Func<T, TResult>> expression, string failMessage)
 		{
-			Mock.Verify(this, expression, Times.AtLeastOnce(), failMessage);
+			return Mock.Verify(this, expression, Times.AtLeastOnce(), failMessage);
 		}
 
 		/// <include file='Mock.Generic.xdoc' path='docs/doc[@for="Mock{T}.Verify{TResult}(expression,times,failMessage)"]/*'/>
 		[SuppressMessage("Microsoft.Design", "CA1006:DoNotNestGenericTypesInMemberSignatures", Justification = "By design")]
-		public void Verify<TResult>(Expression<Func<T, TResult>> expression, Times times, string failMessage)
+		public List<IRecordedCall> Verify<TResult>(Expression<Func<T, TResult>> expression, Times times, string failMessage)
 		{
-			Mock.Verify(this, expression, times, failMessage);
+			return Mock.Verify(this, expression, times, failMessage);
 		}
 
 		/// <include file='Mock.Generic.xdoc' path='docs/doc[@for="Mock{T}.VerifyGet(expression)"]/*'/>
 		[SuppressMessage("Microsoft.Design", "CA1006:DoNotNestGenericTypesInMemberSignatures", Justification = "By design")]
-		public void VerifyGet<TProperty>(Expression<Func<T, TProperty>> expression)
+		public List<IRecordedCall> VerifyGet<TProperty>(Expression<Func<T, TProperty>> expression)
 		{
-			Mock.VerifyGet(this, expression, Times.AtLeastOnce(), null);
+			return Mock.VerifyGet(this, expression, Times.AtLeastOnce(), null);
 		}
 
 		/// <include file='Mock.Generic.xdoc' path='docs/doc[@for="Mock{T}.VerifyGet(expression,times)"]/*'/>
 		[SuppressMessage("Microsoft.Design", "CA1006:DoNotNestGenericTypesInMemberSignatures", Justification = "By design")]
-		public void VerifyGet<TProperty>(Expression<Func<T, TProperty>> expression, Times times)
+		public List<IRecordedCall> VerifyGet<TProperty>(Expression<Func<T, TProperty>> expression, Times times)
 		{
-			Mock.VerifyGet(this, expression, times, null);
+			return Mock.VerifyGet(this, expression, times, null);
 		}
 
 		/// <include file='Mock.Generic.xdoc' path='docs/doc[@for="Mock{T}.VerifyGet(expression,failMessage)"]/*'/>
 		[SuppressMessage("Microsoft.Design", "CA1006:DoNotNestGenericTypesInMemberSignatures", Justification = "By design")]
-		public void VerifyGet<TProperty>(Expression<Func<T, TProperty>> expression, string failMessage)
+		public List<IRecordedCall> VerifyGet<TProperty>(Expression<Func<T, TProperty>> expression, string failMessage)
 		{
-			Mock.VerifyGet(this, expression, Times.AtLeastOnce(), failMessage);
+			return Mock.VerifyGet(this, expression, Times.AtLeastOnce(), failMessage);
 		}
 
 		/// <include file='Mock.Generic.xdoc' path='docs/doc[@for="Mock{T}.VerifyGet(expression,times,failMessage)"]/*'/>
 		[SuppressMessage("Microsoft.Design", "CA1006:DoNotNestGenericTypesInMemberSignatures", Justification = "By design")]
-		public void VerifyGet<TProperty>(Expression<Func<T, TProperty>> expression, Times times, string failMessage)
+		public List<IRecordedCall> VerifyGet<TProperty>(Expression<Func<T, TProperty>> expression, Times times, string failMessage)
 		{
-			Mock.VerifyGet(this, expression, times, failMessage);
+			return Mock.VerifyGet(this, expression, times, failMessage);
 		}
 
 		/// <include file='Mock.Generic.xdoc' path='docs/doc[@for="Mock{T}.VerifySet(expression)"]/*'/>
-		public void VerifySet(Action<T> setterExpression)
+		public List<IRecordedCall> VerifySet(Action<T> setterExpression)
 		{
-			Mock.VerifySet<T>(this, setterExpression, Times.AtLeastOnce(), null);
+			return Mock.VerifySet<T>(this, setterExpression, Times.AtLeastOnce(), null);
 		}
 
 		/// <include file='Mock.Generic.xdoc' path='docs/doc[@for="Mock{T}.VerifySet(expression,times)"]/*'/>
-		public void VerifySet(Action<T> setterExpression, Times times)
+		public List<IRecordedCall> VerifySet(Action<T> setterExpression, Times times)
 		{
-			Mock.VerifySet(this, setterExpression, times, null);
+			return Mock.VerifySet(this, setterExpression, times, null);
 		}
 
 		/// <include file='Mock.Generic.xdoc' path='docs/doc[@for="Mock{T}.VerifySet(expression,failMessage)"]/*'/>
-		public void VerifySet(Action<T> setterExpression, string failMessage)
+		public List<IRecordedCall> VerifySet(Action<T> setterExpression, string failMessage)
 		{
-			Mock.VerifySet(this, setterExpression, Times.AtLeastOnce(), failMessage);
+			return Mock.VerifySet(this, setterExpression, Times.AtLeastOnce(), failMessage);
 		}
 
 		/// <include file='Mock.Generic.xdoc' path='docs/doc[@for="Mock{T}.VerifySet(expression,times,failMessage)"]/*'/>
-		public void VerifySet(Action<T> setterExpression, Times times, string failMessage)
+		public List<IRecordedCall> VerifySet(Action<T> setterExpression, Times times, string failMessage)
 		{
-			Mock.VerifySet(this, setterExpression, times, failMessage);
+			return Mock.VerifySet(this, setterExpression, times, failMessage);
 		}
 
 		#endregion

@@ -203,7 +203,7 @@ namespace Moq
 
 		/// <include file='Mock.xdoc' path='docs/doc[@for="Mock.Verify"]/*'/>
 		[SuppressMessage("Microsoft.Usage", "CA2200:RethrowToPreserveStackDetails", Justification = "We want to explicitly reset the stack trace here.")]
-		public void Verify()
+		public List<IRecordedCall> Verify()
 		{
 			try
 			{
@@ -212,6 +212,7 @@ namespace Moq
 				{
 					inner.Verify();
 				}
+                return this.Interceptor.ActualCalls.Select(x => (IRecordedCall)new RecordedCall(x)).ToList();
 			}
 			catch (Exception ex)
 			{
@@ -226,7 +227,7 @@ namespace Moq
 
 		/// <include file='Mock.xdoc' path='docs/doc[@for="Mock.VerifyAll"]/*'/>		
 		[SuppressMessage("Microsoft.Usage", "CA2200:RethrowToPreserveStackDetails", Justification = "We want to explicitly reset the stack trace here.")]
-		public void VerifyAll()
+		public List<IRecordedCall> VerifyAll()
 		{
 			try
 			{
@@ -235,6 +236,7 @@ namespace Moq
 				{
 					inner.VerifyAll();
 				}
+                return this.Interceptor.ActualCalls.Select(x => (IRecordedCall)new RecordedCall(x)).ToList();
 			}
 			catch (Exception ex)
 			{
@@ -245,7 +247,7 @@ namespace Moq
 			}
 		}
 
-		internal static void Verify<T>(
+		internal static List<IRecordedCall> Verify<T>(
 			Mock<T> mock,
 			Expression<Action<T>> expression,
 			Times times,
@@ -260,10 +262,10 @@ namespace Moq
 			var args = methodCall.Arguments.ToArray();
 
 			var expected = new MethodCall(mock, null, expression, method, args) { FailMessage = failMessage };
-			VerifyCalls(GetInterceptor(methodCall.Object, mock), expected, expression, times);
+            return VerifyCalls(GetInterceptor(methodCall.Object, mock), expected, expression, times).Select(x => (IRecordedCall)new RecordedCall(x)).ToList();
 		}
 
-		internal static void Verify<T, TResult>(
+        internal static List<IRecordedCall> Verify<T, TResult>(
 			Mock<T> mock,
 			Expression<Func<T, TResult>> expression,
 			Times times,
@@ -274,7 +276,7 @@ namespace Moq
 
 			if (expression.IsProperty())
 			{
-				VerifyGet<T, TResult>(mock, expression, times, failMessage);
+				return VerifyGet<T, TResult>(mock, expression, times, failMessage);
 			}
 			else
 			{
@@ -287,11 +289,11 @@ namespace Moq
 				{
 					FailMessage = failMessage
 				};
-				VerifyCalls(GetInterceptor(methodCall.Object, mock), expected, expression, times);
+                return VerifyCalls(GetInterceptor(methodCall.Object, mock), expected, expression, times).Select(x => (IRecordedCall)new RecordedCall(x)).ToList();
 			}
 		}
 
-		internal static void VerifyGet<T, TProperty>(
+        internal static List<IRecordedCall> VerifyGet<T, TProperty>(
 			Mock<T> mock,
 			Expression<Func<T, TProperty>> expression,
 			Times times,
@@ -305,10 +307,10 @@ namespace Moq
 			{
 				FailMessage = failMessage
 			};
-			VerifyCalls(GetInterceptor(((MemberExpression)expression.Body).Expression, mock), expected, expression, times);
+            return VerifyCalls(GetInterceptor(((MemberExpression)expression.Body).Expression, mock), expected, expression, times).Select(x => (IRecordedCall)new RecordedCall(x)).ToList();
 		}
 
-		internal static void VerifySet<T>(
+        internal static List<IRecordedCall> VerifySet<T>(
 			Mock<T> mock,
 			Action<T> setterExpression,
 			Times times,
@@ -324,7 +326,7 @@ namespace Moq
 					return new MethodCall<T>(m, null, expr, method, value) { FailMessage = failMessage };
 				});
 
-			VerifyCalls(targetInterceptor, expected, expression, times);
+            return VerifyCalls(targetInterceptor, expected, expression, times).Select(x => (IRecordedCall)new RecordedCall(x)).ToList();
 		}
 
 		private static bool AreSameMethod(Expression left, Expression right)
@@ -340,18 +342,20 @@ namespace Moq
 			return false;
 		}
 
-		private static void VerifyCalls(
+		private static List<ICallContext> VerifyCalls(
 			Interceptor targetInterceptor,
 			MethodCall expected,
 			Expression expression,
 			Times times)
 		{
-			var callCount = targetInterceptor.ActualCalls.Where(ac => expected.Matches(ac)).Count();
+            var ret = targetInterceptor.ActualCalls.Where(ac => expected.Matches(ac)).ToList();
+			var callCount = ret.Count;
 			if (!times.Verify(callCount))
 			{
 				var setups = targetInterceptor.OrderedCalls.Where(oc => AreSameMethod(oc.SetupExpression, expression));
 				ThrowVerifyException(expected, setups, targetInterceptor.ActualCalls, expression, times, callCount);
 			}
+            return ret;
 		}
 
 		private static void ThrowVerifyException(

@@ -88,6 +88,7 @@
     <Compile Include="Linq\UnsupportedQuerying.cs" />
     <Compile Include="PropertiesFixture.cs" />
     <Compile Include="Linq\QueryableMocksFixture.cs" />
+    <Compile Include="RecordedCallFixture.cs" />
     <Compile Include="RecursiveMocksFixture.cs" />
     <Compile Include="CallbacksFixture.cs" />
     <Compile Include="EmptyDefaultValueProviderFixture.cs" />

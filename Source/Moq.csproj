@@ -55,7 +55,7 @@
     <Reference Condition="'$(TargetFrameworkVersion)' == 'v3.5'" Include="Castle.Core, Version=2.5.0.219, Culture=neutral, PublicKeyToken=407dd0808d44fbdc, processorArchitecture=MSIL">
       <SpecificVersion>False</SpecificVersion>
       <HintPath>..\Lib\Castle\bin-NET35\Castle.Core.dll</HintPath>
-			<Visible>False</Visible>
+      <Visible>False</Visible>
     </Reference>
     <Reference Include="System" />
     <Reference Include="System.Core" />
@@ -75,6 +75,7 @@
       <DesignTime>True</DesignTime>
       <DependentUpon>IRaise.tt</DependentUpon>
     </Compile>
+    <Compile Include="IRecordedCall.cs" />
     <Compile Include="Language\IReturns.cs" />
     <Compile Include="Language\IReturns.Generated.cs">
       <AutoGen>True</AutoGen>
