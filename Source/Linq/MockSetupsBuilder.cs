@@ -189,7 +189,7 @@ namespace Moq.Linq
 			// where Mock.Get(foo).SetupProperty(mock => mock.Name, "bar") != null
 
 			// if the property is readonly, we can only do a Setup(...) which is the same as a method setup.
-			if (!propertyInfo.CanWrite)
+			if (!propertyInfo.CanWrite || propertyInfo.GetSetMethod(true).IsPrivate)
 				return ConvertToSetup(targetObject, left, right);
 
 			// This will get up to and including the Mock.Get(foo).Setup(mock => mock.Name) call.

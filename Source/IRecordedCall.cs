@@ -7,7 +7,7 @@ using System.Reflection;
 using System.Text;
 using Moq.Proxy;
 
-namespace Moq.Language
+namespace Moq
 {
     /// <summary>
     /// This interface exposes information about one recorded method invocation.

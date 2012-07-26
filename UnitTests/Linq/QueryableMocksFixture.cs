@@ -125,6 +125,22 @@ namespace Moq.Tests
 			Assert.Equal("foo", target.Value);
 		}
 
+        [Fact]
+        public void ShouldSupportSettingDtoProtectedPropertyValue()
+        {
+            var target = Mock.Of<Dto>(x => x.ProtectedValue == "foo");
+
+            Assert.Equal("foo", target.ProtectedValue);
+        }
+
+        [Fact]
+        public void ShouldSupportSettingDtoProtectedVirtualPropertyValue()
+        {
+            var target = Mock.Of<Dto>(x => x.ProtectedVirtualValue == "foo");
+
+            Assert.Equal("foo", target.ProtectedVirtualValue);
+        }
+
 		[Fact]
 		public void ShouldOneOfCreateNewMock()
 		{
@@ -172,6 +188,8 @@ namespace Moq.Tests
 		public class Dto
 		{
 			public string Value { get; set; }
+			public string ProtectedValue { get; protected set; }
+			public virtual string ProtectedVirtualValue { get; protected set; }
 		}
 
 		public interface IFoo
@@ -198,4 +216,38 @@ namespace Moq.Tests
 			bool HasElements(string key1);
 		}
 	}
+
+    public class Foo
+    {
+        protected Foo()
+        {
+        }
+
+        public virtual string Value { get; private set; }
+    }
+
+    public class FooFixture
+    {
+        [Fact]
+        public void Test()
+        {
+            var remote = Mock.Of<Foo>(rt => rt.Value == "foo");
+            Assert.Equal("foo", remote.Value);
+        }
+    }
+
+    public interface IBar
+    {
+        Foo Foo { get; set; }
+    }
+
+    public class BarFixture
+    {
+        [Fact]
+        public void Test()
+        {
+            var remote = Mock.Of<IBar>(rt => rt.Foo.Value == "foo");
+            Assert.Equal("foo", remote.Foo.Value);
+        }
+    }
 }

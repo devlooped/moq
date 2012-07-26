@@ -21,6 +21,12 @@ namespace Moq
 			this.expression = expression;
 		}
 
+		public ISetupSequentialResult<TResult> CallBase()
+		{
+			this.EndSetup(GetSetup().CallBase());
+			return this;
+		}
+
 		private ISetup<TMock, TResult> GetSetup()
 		{
 			var expectationStep = this.expectationsCount;
@@ -44,7 +50,9 @@ namespace Moq
 
 		public void Throws(Exception exception)
 		{
-			this.GetSetup().Throws(exception);
+            var setup = this.GetSetup();
+            setup.Throws(exception);
+            setup.Callback(() => currentStep++);
 		}
 
 		public void Throws<TException>() where TException : Exception, new()
