@@ -83,6 +83,7 @@
       <DesignTime>True</DesignTime>
       <DependentUpon>IRaise.tt</DependentUpon>
     </Compile>
+    <Compile Include="Language\IRecordedCall.cs" />
     <Compile Include="Language\IReturns.cs" />
     <Compile Include="Language\IReturns.Generated.cs">
       <AutoGen>True</AutoGen>

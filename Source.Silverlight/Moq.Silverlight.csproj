@@ -168,6 +168,9 @@
     <Compile Include="..\Source\Language\IRaise.Generated.cs">
       <Link>Language\IRaise.Generated.cs</Link>
     </Compile>
+	<Compile Include="..\Source\Language\IRecordedCall.cs">
+      <Link>Language\IRecordedCall.cs</Link>
+    </Compile>
     <Compile Include="..\Source\Language\IReturns.Generated.cs">
       <Link>Language\IReturns.Generated.cs</Link>
     </Compile>
