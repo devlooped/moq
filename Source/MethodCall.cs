@@ -377,7 +377,7 @@ namespace Moq
 			{
 				if (!this.Method.Name.Equals(call.Method.Name, StringComparison.Ordinal) ||
 					this.Method.ReturnType != call.Method.ReturnType ||
-                    !call.Method.IsGenericMethod && this.Method.IsGenericMethod &&
+                    !this.Method.IsGenericMethod &&
 					!call.Method.GetParameterTypes().SequenceEqual(this.Method.GetParameterTypes()))
 				{
 					return false;
