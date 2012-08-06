@@ -81,7 +81,20 @@ namespace Moq
 		}
 	}
 
-	internal partial class MethodCall : IProxyCall, ICallbackResult, IVerifies, IThrowsResult
+    internal class TypeEqualityComaprer : IEqualityComparer<Type>
+    {
+        public bool Equals(Type x, Type y)
+        {
+            return y.IsAssignableFrom(x);
+        }
+
+        public int GetHashCode(Type obj)
+        {
+            return obj.GetHashCode();
+        }
+    }
+
+    internal partial class MethodCall : IProxyCall, ICallbackResult, IVerifies, IThrowsResult
 	{
 		// Internal for AsMockExtensions
 		private Expression originalExpression;
@@ -95,8 +108,9 @@ namespace Moq
 		private int? expectedCallCount = null;
 		protected Func<bool> condition;
 		private List<KeyValuePair<int, object>> outValues = new List<KeyValuePair<int, object>>();
+	    private static readonly IEqualityComparer<Type> typesComparer = new TypeEqualityComaprer();
 
-		public MethodCall(Mock mock, Func<bool> condition, Expression originalExpression, MethodInfo method, params Expression[] arguments)
+	    public MethodCall(Mock mock, Func<bool> condition, Expression originalExpression, MethodInfo method, params Expression[] arguments)
 		{
 			this.Mock = mock;
 			this.condition = condition;
@@ -363,12 +377,13 @@ namespace Moq
 			{
 				if (!this.Method.Name.Equals(call.Method.Name, StringComparison.Ordinal) ||
 					this.Method.ReturnType != call.Method.ReturnType ||
+                    !this.Method.IsGenericMethod &&
 					!call.Method.GetParameterTypes().SequenceEqual(this.Method.GetParameterTypes()))
 				{
 					return false;
 				}
 
-				if (Method.IsGenericMethod && !call.Method.GetGenericArguments().SequenceEqual(Method.GetGenericArguments()))
+				if (Method.IsGenericMethod && !call.Method.GetGenericArguments().SequenceEqual(Method.GetGenericArguments(),typesComparer))
 				{
 					return false;
 				}
