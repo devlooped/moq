@@ -81,7 +81,7 @@ namespace Moq
 		}
 	}
 
-    internal class TypeEqualityComaprer : IEqualityComparer<Type>
+    internal class TypeEqualityComparer : IEqualityComparer<Type>
     {
         public bool Equals(Type x, Type y)
         {
@@ -108,7 +108,7 @@ namespace Moq
 		private int? expectedCallCount = null;
 		protected Func<bool> condition;
 		private List<KeyValuePair<int, object>> outValues = new List<KeyValuePair<int, object>>();
-	    private static readonly IEqualityComparer<Type> typesComparer = new TypeEqualityComaprer();
+	    private static readonly IEqualityComparer<Type> typesComparer = new TypeEqualityComparer();
 
 	    public MethodCall(Mock mock, Func<bool> condition, Expression originalExpression, MethodInfo method, params Expression[] arguments)
 		{
