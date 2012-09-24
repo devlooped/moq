@@ -16,6 +16,7 @@ using Xunit;
 using System.ServiceModel;
 using System.ServiceModel.Web;
 using System.Web.UI.HtmlControls;
+using System.Threading;
 #endif
 
 #region #181
@@ -1380,9 +1381,72 @@ namespace Moq.Tests.Regressions
 
 		#endregion
 
-		#region #251
+        #region #249
 
-		public class _251
+#if !SILVERLIGHT
+        //helper class/interfaces for thread safety expectations
+        public interface IExpectToBeThreadSafe
+        {
+            void DoTheJob();
+            void RaceCondition();
+        }
+        public class ExpectToBeThreadSafe : IExpectToBeThreadSafe
+        {
+            #region IExpectToBeThreadSafe Members
+            int someVariable = 0;
+            public virtual void DoTheJob()
+            {
+                if (someVariable > 0)
+                    RaceCondition();
+                someVariable++;
+                Thread.Sleep(2);
+                someVariable--;
+            }
+
+            #endregion
+
+            #region IExpectToBeThreadSafe Members
+
+
+            public virtual void RaceCondition()
+            {
+
+            }
+
+            #endregion
+        }
+        public class _249
+        {
+            [Fact]
+            public void ExpectAvoidRaceConditions()
+            {
+                int concurrent = 8;
+                var v = new Mock<ExpectToBeThreadSafe>();
+
+                v.CallBase = true;
+                for (int i = 0; i < concurrent; ++i)
+                {
+                    ThreadPool.QueueUserWorkItem(
+                        (k) =>
+                        {
+                            v.Object.DoTheJob();
+                        }
+                        );
+                }
+
+                Thread.Sleep(200);
+                v.Verify(k => k.DoTheJob(), Times.Exactly(concurrent));
+                v.Verify(k => k.RaceCondition(), Times.Never());
+            }
+        }
+
+#endif
+        #endregion
+
+
+        #region #251
+
+        public class _251
 		{
 			[Fact]
 			public void Test()

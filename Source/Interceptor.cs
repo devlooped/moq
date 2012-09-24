@@ -143,111 +143,113 @@ namespace Moq
 			{
 				FluentMockContext.Current.Add(this.Mock, invocation);
 			}
+            lock (Mock) // this solves issue #249, but actually worsen method complexity :(
+            {
+                // TODO: too many ifs in this method.
+                // see how to refactor with strategies.
+                if (invocation.Method.DeclaringType.IsGenericType &&
+                  invocation.Method.DeclaringType.GetGenericTypeDefinition() == typeof(IMocked<>))
+                {
+                    // "Mixin" of IMocked<T>.Mock
+                    invocation.ReturnValue = this.Mock;
+                    return;
+                }
+                else if (invocation.Method.DeclaringType == typeof(IMocked))
+                {
+                    // "Mixin" of IMocked.Mock
+                    invocation.ReturnValue = this.Mock;
+                    return;
+                }
 
-			// TODO: too many ifs in this method.
-			// see how to refactor with strategies.
-			if (invocation.Method.DeclaringType.IsGenericType &&
-			  invocation.Method.DeclaringType.GetGenericTypeDefinition() == typeof(IMocked<>))
-			{
-				// "Mixin" of IMocked<T>.Mock
-				invocation.ReturnValue = this.Mock;
-				return;
-			}
-			else if (invocation.Method.DeclaringType == typeof(IMocked))
-			{
-				// "Mixin" of IMocked.Mock
-				invocation.ReturnValue = this.Mock;
-				return;
-			}
+                // Special case for events.
+                if (!FluentMockContext.IsActive)
+                {
+                    if (invocation.Method.IsEventAttach())
+                    {
+                        var delegateInstance = (Delegate)invocation.Arguments[0];
+                        // TODO: validate we can get the event?
+                        var eventInfo = this.GetEventFromName(invocation.Method.Name.Substring(4));
 
-			// Special case for events.
-			if (!FluentMockContext.IsActive)
-			{
-				if (invocation.Method.IsEventAttach())
-				{
-					var delegateInstance = (Delegate)invocation.Arguments[0];
-					// TODO: validate we can get the event?
-					var eventInfo = this.GetEventFromName(invocation.Method.Name.Substring(4));
+                        if (this.Mock.CallBase)
+                        {
+                            invocation.InvokeBase();
+                        }
+                        else if (delegateInstance != null)
+                        {
+                            this.AddEventHandler(eventInfo, (Delegate)invocation.Arguments[0]);
+                        }
 
-					if (this.Mock.CallBase)
-					{
-						invocation.InvokeBase();
-					}
-					else if (delegateInstance != null)
-					{
-						this.AddEventHandler(eventInfo, (Delegate)invocation.Arguments[0]);
-					}
+                        return;
+                    }
+                    else if (invocation.Method.IsEventDetach())
+                    {
+                        var delegateInstance = (Delegate)invocation.Arguments[0];
+                        // TODO: validate we can get the event?
+                        var eventInfo = this.GetEventFromName(invocation.Method.Name.Substring(7));
 
-					return;
-				}
-				else if (invocation.Method.IsEventDetach())
-				{
-					var delegateInstance = (Delegate)invocation.Arguments[0];
-					// TODO: validate we can get the event?
-					var eventInfo = this.GetEventFromName(invocation.Method.Name.Substring(7));
+                        if (this.Mock.CallBase)
+                        {
+                            invocation.InvokeBase();
+                        }
+                        else if (delegateInstance != null)
+                        {
+                            this.RemoveEventHandler(eventInfo, (Delegate)invocation.Arguments[0]);
+                        }
 
-					if (this.Mock.CallBase)
-					{
-						invocation.InvokeBase();
-					}
-					else if (delegateInstance != null)
-					{
-						this.RemoveEventHandler(eventInfo, (Delegate)invocation.Arguments[0]);
-					}
+                        return;
+                    }
 
-					return;
-				}
+                    // Save to support Verify[expression] pattern.
+                    // In a fluent invocation context, which is a recorder-like 
+                    // mode we use to evaluate delegates by actually running them, 
+                    // we don't want to count the invocation, or actually run 
+                    // previous setups.
+                    actualInvocations.Add(invocation);
+                }
 
-				// Save to support Verify[expression] pattern.
-				// In a fluent invocation context, which is a recorder-like 
-				// mode we use to evaluate delegates by actually running them, 
-				// we don't want to count the invocation, or actually run 
-				// previous setups.
-				actualInvocations.Add(invocation);
-			}
+                var call = FluentMockContext.IsActive ? (IProxyCall)null : orderedCalls.LastOrDefault(c => c.Matches(invocation));
+                if (call == null && !FluentMockContext.IsActive && behavior == MockBehavior.Strict)
+                {
+                    throw new MockException(MockException.ExceptionReason.NoSetup, behavior, invocation);
+                }
 
-			var call = FluentMockContext.IsActive ? (IProxyCall)null : orderedCalls.LastOrDefault(c => c.Matches(invocation));
-			if (call == null && !FluentMockContext.IsActive && behavior == MockBehavior.Strict)
-			{
-				throw new MockException(MockException.ExceptionReason.NoSetup, behavior, invocation);
-			}
+                if (call != null)
+                {
+                    call.SetOutParameters(invocation);
 
-			if (call != null)
-			{
-				call.SetOutParameters(invocation);
-
-				// We first execute, as there may be a Throws 
-				// and therefore we might never get to the 
-				// next line.
-				call.Execute(invocation);
-				ThrowIfReturnValueRequired(call, invocation);
-			}
-			else if (invocation.Method.DeclaringType == typeof(object))
-			{
-				// Invoke underlying implementation.
-				invocation.InvokeBase();
-			}
-			else if (invocation.Method.DeclaringType.IsClass && !invocation.Method.IsAbstract && this.Mock.CallBase)
-			{
-				// For mocked classes, if the target method was not abstract, 
-				// invoke directly.
-				// Will only get here for Loose behavior.
-				// TODO: we may want to provide a way to skip this by the user.
-				invocation.InvokeBase();
-			}
-			else if (invocation.Method != null && invocation.Method.ReturnType != null &&
-				invocation.Method.ReturnType != typeof(void))
-			{
-				Mock recursiveMock;
-				if (this.Mock.InnerMocks.TryGetValue(invocation.Method, out recursiveMock))
-				{
-					invocation.ReturnValue = recursiveMock.Object;
-				}
-				else
-				{
-					invocation.ReturnValue = this.Mock.DefaultValueProvider.ProvideDefault(invocation.Method);
-				}
-			}
+                    // We first execute, as there may be a Throws 
+                    // and therefore we might never get to the 
+                    // next line.
+                    call.Execute(invocation);
+                    ThrowIfReturnValueRequired(call, invocation);
+                }
+                else if (invocation.Method.DeclaringType == typeof(object))
+                {
+                    // Invoke underlying implementation.
+                    invocation.InvokeBase();
+                }
+                else if (invocation.Method.DeclaringType.IsClass && !invocation.Method.IsAbstract && this.Mock.CallBase)
+                {
+                    // For mocked classes, if the target method was not abstract, 
+                    // invoke directly.
+                    // Will only get here for Loose behavior.
+                    // TODO: we may want to provide a way to skip this by the user.
+                    invocation.InvokeBase();
+                }
+                else if (invocation.Method != null && invocation.Method.ReturnType != null &&
+                    invocation.Method.ReturnType != typeof(void))
+                {
+                    Mock recursiveMock;
+                    if (this.Mock.InnerMocks.TryGetValue(invocation.Method, out recursiveMock))
+                    {
+                        invocation.ReturnValue = recursiveMock.Object;
+                    }
+                    else
+                    {
+                        invocation.ReturnValue = this.Mock.DefaultValueProvider.ProvideDefault(invocation.Method);
+                    }
+                }
+            }
 		}
 
 		/// <summary>
