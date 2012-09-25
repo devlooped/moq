@@ -148,7 +148,7 @@ namespace Moq
 				// TODO: too many ifs in this method.
 				// see how to refactor with strategies.
 				if (invocation.Method.DeclaringType.IsGenericType &&
-				  invocation.Method.DeclaringType.GetGenericTypeDefinition() == typeof(IMocked<>))
+					invocation.Method.DeclaringType.GetGenericTypeDefinition() == typeof(IMocked<>))
 				{
 					// "Mixin" of IMocked<T>.Mock
 					invocation.ReturnValue = this.Mock;
