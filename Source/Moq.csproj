@@ -55,7 +55,7 @@
     <Reference Condition="'$(TargetFrameworkVersion)' == 'v3.5'" Include="Castle.Core, Version=1.2.0.0, Culture=neutral, PublicKeyToken=407dd0808d44fbdc, processorArchitecture=MSIL">
       <SpecificVersion>False</SpecificVersion>
       <HintPath>..\Lib\Castle\bin-NET35\Castle.Core.dll</HintPath>
-			<Visible>False</Visible>
+      <Visible>False</Visible>
     </Reference>
     <!--<Reference Include="Castle.Core, Version=1.2.0.0, Culture=neutral, PublicKeyToken=407dd0808d44fbdc, processorArchitecture=MSIL">
       <SpecificVersion>False</SpecificVersion>
