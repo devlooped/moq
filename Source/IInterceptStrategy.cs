@@ -6,6 +6,11 @@ using Moq.Proxy;
 
 namespace Moq
 {
+
+	internal enum InterceptionAction
+	{
+ 		Continue,Stop
+	}
 	internal interface IInterceptStrategy
 	{
 		/// <summary>
@@ -14,7 +19,7 @@ namespace Moq
 		/// <param name="invocation">the current invocation context</param>
 		/// <param name="ctx">shared data among the strategies during an interception</param>
 		/// <returns>true if further interception has to be processed, otherwise false</returns>
-		bool HandleIntercept(ICallContext invocation,InterceptStrategyContext ctx);
+		InterceptionAction HandleIntercept(ICallContext invocation, InterceptStrategyContext ctx);
 		
 	}
 
