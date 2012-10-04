@@ -9,7 +9,7 @@ namespace Moq
 {
 	internal class HandleMockRecursion : IInterceptStrategy
 	{
-		public bool HandleIntercept(ICallContext invocation, InterceptStrategyContext ctx)
+		public InterceptionAction HandleIntercept(ICallContext invocation, InterceptStrategyContext ctx)
 		{
 			if (invocation.Method != null && invocation.Method.ReturnType != null &&
 					invocation.Method.ReturnType != typeof(void))
@@ -23,15 +23,15 @@ namespace Moq
 				{
 					invocation.ReturnValue = ctx.Mock.DefaultValueProvider.ProvideDefault(invocation.Method);
 				}
-				return false;
+				return InterceptionAction.Stop;
 			}
-			return true;
+			return InterceptionAction.Continue;
 		}
 	}
 	
 	internal class InvokeBase : IInterceptStrategy
 	{
-		public bool HandleIntercept(ICallContext invocation, InterceptStrategyContext ctx)
+		public InterceptionAction HandleIntercept(ICallContext invocation, InterceptStrategyContext ctx)
 		{
 			if (invocation.Method.DeclaringType == typeof(object)
 				||
@@ -45,11 +45,11 @@ namespace Moq
 				// Will only get here for Loose behavior.
 				// TODO: we may want to provide a way to skip this by the user.
 				invocation.InvokeBase();
-				return false;
+				return InterceptionAction.Stop;
 			}
 			else
 			{
-				return true;
+				return InterceptionAction.Continue;
 			}
 		}
 	}
@@ -57,7 +57,7 @@ namespace Moq
 	internal class ExecuteCall : IInterceptStrategy
 	{
 		InterceptStrategyContext ctx;
-		public bool HandleIntercept(ICallContext invocation, InterceptStrategyContext ctx)
+		public InterceptionAction HandleIntercept(ICallContext invocation, InterceptStrategyContext ctx)
 		{
 			this.ctx = ctx;
 			if (ctx.CurrentCall != null)
@@ -69,11 +69,11 @@ namespace Moq
 				// next line.
 				ctx.CurrentCall.Execute(invocation);
 				ThrowIfReturnValueRequired(ctx.CurrentCall, invocation);
-				return false;
+				return InterceptionAction.Stop;
 			}
 			else
 			{
-				return true;
+				return InterceptionAction.Continue;
 			}
 		}
 		private void ThrowIfReturnValueRequired(IProxyCall call, ICallContext invocation)
@@ -98,14 +98,14 @@ namespace Moq
 	internal class ExtractProxyCall : IInterceptStrategy
 	{
 
-		public bool HandleIntercept(ICallContext invocation, InterceptStrategyContext ctx)
+		public InterceptionAction HandleIntercept(ICallContext invocation, InterceptStrategyContext ctx)
 		{
 			ctx.CurrentCall = FluentMockContext.IsActive ? (IProxyCall)null : ctx.OrderedCalls.LastOrDefault(c => c.Matches(invocation));
 			if (ctx.CurrentCall == null && !FluentMockContext.IsActive && ctx.Behavior == MockBehavior.Strict)
 			{
 				throw new MockException(MockException.ExceptionReason.NoSetup, ctx.Behavior, invocation);
 			}
-			return true;
+			return InterceptionAction.Continue;
 		}
 	}
 
@@ -116,22 +116,22 @@ namespace Moq
 		{
 			
 		}
-		public bool HandleIntercept(ICallContext invocation, InterceptStrategyContext ctx)
+		public InterceptionAction HandleIntercept(ICallContext invocation, InterceptStrategyContext ctx)
 		{
 			if (invocation.Method.DeclaringType.IsGenericType &&
 					invocation.Method.DeclaringType.GetGenericTypeDefinition() == typeof(IMocked<>))
 			{
 				// "Mixin" of IMocked<T>.Mock
 				invocation.ReturnValue = ctx.Mock;
-				return false;
+				return InterceptionAction.Stop;
 			}
 			else if (invocation.Method.DeclaringType == typeof(IMocked))
 			{
 				// "Mixin" of IMocked.Mock
 				invocation.ReturnValue = ctx.Mock;
-				return false;
+				return InterceptionAction.Stop;
 			}
-			return true;
+			return InterceptionAction.Continue;
 		}
 	}
 
@@ -142,29 +142,22 @@ namespace Moq
 		{
 			
 		}
-		public bool HandleIntercept(ICallContext invocation, InterceptStrategyContext ctx)
+		public InterceptionAction HandleIntercept(ICallContext invocation, InterceptStrategyContext ctx)
 		{
 			// Track current invocation if we're in "record" mode in a fluent invocation context.
 			if (FluentMockContext.IsActive)
 			{
 				FluentMockContext.Current.Add(ctx.Mock, invocation);
 			}
-			return true;
+			return InterceptionAction.Continue;
 		}
 	}
 
 	internal class HandleDestructor : IInterceptStrategy
 	{
-		public bool HandleIntercept(ICallContext invocation, InterceptStrategyContext ctx)
+		public InterceptionAction HandleIntercept(ICallContext invocation, InterceptStrategyContext ctx)
 		{
-			if (invocation.Method.IsDestructor())
-			{
-				return false;
-			}
-			else
-			{
-				return true;
-			}
+			return invocation.Method.IsDestructor()?InterceptionAction.Stop:InterceptionAction.Continue;
 		}
 	}
 
@@ -234,7 +227,7 @@ namespace Moq
 			}
 		}
 		InterceptStrategyContext ctx;
-		public bool HandleIntercept(ICallContext invocation, InterceptStrategyContext ctx)
+		public InterceptionAction HandleIntercept(ICallContext invocation, InterceptStrategyContext ctx)
 		{
 			this.ctx = ctx;
 			if (!FluentMockContext.IsActive)
@@ -255,7 +248,7 @@ namespace Moq
 						this.AddEventHandler(eventInfo, (Delegate)invocation.Arguments[0]);
 					}
 
-					return false;
+					return InterceptionAction.Stop;
 				}
 				else if (invocation.Method.IsEventDetach())
 				{
@@ -276,7 +269,7 @@ namespace Moq
 						}
 					}
 
-					return false;
+					return InterceptionAction.Stop;
 				}
 
 				// Save to support Verify[expression] pattern.
@@ -286,7 +279,7 @@ namespace Moq
 				// previous setups.
 				ctx.ActualInvocations.Add(invocation);
 			}
-			return true;
+			return InterceptionAction.Continue;
 		}
 	}
 }

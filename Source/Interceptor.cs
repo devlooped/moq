@@ -157,7 +157,7 @@ namespace Moq
 																	);
 				foreach (var strategy in InterceptionStrategies())
 				{
-					if (!strategy.HandleIntercept(invocation, interceptionContext))
+					if (InterceptionAction.Stop == strategy.HandleIntercept(invocation, interceptionContext))
 					{
 						break;
 					}
