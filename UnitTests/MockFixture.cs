@@ -6,6 +6,76 @@ namespace Moq.Tests
 {
 	public class MockFixture
 	{
+        [Fact]
+        public void CreatesLooseMockWithDefaultCtor()
+        {
+            var disposableMock = new Mock<IDisposable>();
+            Assert.DoesNotThrow(              
+                () =>
+                    {
+                        disposableMock.Object.Dispose();
+                    });
+        }
+
+        [Fact]
+        public void CreatesLooseMockWithLooseBehaviorInjectedInCtor()
+        {
+            var disposableMock = new Mock<IDisposable>(MockBehavior.Loose);
+            Assert.DoesNotThrow(
+                () =>
+                {
+                    disposableMock.Object.Dispose();
+                });
+        }
+
+        [Fact]
+        public void CreatesLooseMockWithLooseBehaviorInjectedInCtorAfterSettingStrictDefaultBehavior()
+        {
+            Mock.DefaultBehavior = MockBehavior.Strict;
+            var disposableMock = new Mock<IDisposable>(MockBehavior.Loose);            
+            Assert.DoesNotThrow(
+                () =>
+                {
+                    disposableMock.Object.Dispose();
+                });
+        }
+
+        [Fact]
+        public void CreatesStrictMockWithDefaultCtorAfterSettingStrictDefaultBehavior()
+        {
+            Mock.DefaultBehavior = MockBehavior.Strict;
+            var disposableMock = new Mock<IDisposable>();
+            Assert.Throws<MockException>(
+                () =>
+                {
+                    disposableMock.Object.Dispose();
+                });
+        }
+
+        [Fact]
+        public void CreatesStrictMockWithStrictBehaviorInjectedInCtorAfterSettingStrictDefaultBehavior()
+        {
+            Mock.DefaultBehavior = MockBehavior.Strict;
+            var disposableMock = new Mock<IDisposable>(MockBehavior.Strict);
+            Assert.Throws<MockException>(
+                () =>
+                {
+                    disposableMock.Object.Dispose();
+                });
+        }
+
+        [Fact]
+        public void CreatesStrictMockWithStrictBehaviorInjectedInCtorAfterSettingLooseDefaultBehavior()
+        {
+            Mock.DefaultBehavior = MockBehavior.Loose;
+            var disposableMock = new Mock<IDisposable>(MockBehavior.Strict);
+            Assert.Throws<MockException>(
+                () =>
+                {
+                    disposableMock.Object.Dispose();
+                });
+        }
+
 		[Fact]
 		public void CreatesMockAndExposesInterface()
 		{
