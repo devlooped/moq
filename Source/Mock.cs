@@ -65,6 +65,13 @@ namespace Moq
 			this.ImplementedInterfaces = new List<Type>();
 			this.InnerMocks = new Dictionary<MethodInfo, Mock>();
 		}
+        /// <summary>
+        /// Initializes the plumbing common for every instance of <see cref="Mock"/> or <see cref="Mock{T}"/>.
+        /// </summary>
+	    static Mock()
+	    {
+	        DefaultBehavior = MockBehavior.Default;    
+	    }
 
 		/// <include file='Mock.xdoc' path='docs/doc[@for="Mock.Get"]/*'/>
 		public static Mock<T> Get<T>(T mocked) where T : class
@@ -199,7 +206,15 @@ namespace Moq
 		/// </summary>
 		internal List<Type> ImplementedInterfaces { get; private set; }
 
-		#region Verify
+        /// <summary>
+        /// Exposes the default behavior for every subsequent mocks created without specifying the behavior explicitly.
+        /// </summary>
+        /// <remarks>
+        /// Default value is <see cref="MockBehavior.Default"/>.
+        /// </remarks>
+	    public static MockBehavior DefaultBehavior { get; set; }
+
+	    #region Verify
 
 		/// <include file='Mock.xdoc' path='docs/doc[@for="Mock.Verify"]/*'/>
 		[SuppressMessage("Microsoft.Usage", "CA2200:RethrowToPreserveStackDetails", Justification = "We want to explicitly reset the stack trace here.")]
