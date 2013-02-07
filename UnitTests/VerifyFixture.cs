@@ -1,6 +1,7 @@
 ﻿using System;
 using Moq;
 using Xunit;
+using System.Threading.Tasks;
 
 namespace Moq.Tests
 {
@@ -874,6 +875,17 @@ namespace Moq.Tests
             mock.Object.Call(new BazParam2());
 
             mock.Verify(foo => foo.Call(It.IsAny<IBazParam>()), Times.Exactly(2));
+        }
+
+        [Fact]
+        public void DoesNotThrowCollectionModifiedWhenMoreInvocationsInterceptedDuringVerfication()
+        {
+            var mock = new Mock<IFoo>();
+            Parallel.For(0, 100, (i) =>
+                {
+                    mock.Object.Submit();
+                    mock.Verify(foo => foo.Submit());
+                });
         }
 
 		public interface IBar
