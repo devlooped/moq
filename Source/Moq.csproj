@@ -116,6 +116,7 @@
       <DependentUpon>Delegates.tt</DependentUpon>
     </Compile>
     <Compile Include="Microsoft\ExpressionVisitor.cs" />
+    <Compile Include="MockExtensions.cs" />
     <Compile Include="MockSequence.cs" />
     <Compile Include="Obsolete\IOccurrence.cs" />
     <Compile Include="MatcherAttribute.cs" />
