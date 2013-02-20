@@ -5,6 +5,20 @@ namespace Moq.Tests
 {
 	public class OccurrenceFixture
 	{
+        [Fact]
+        public void OnceDoesNotThrowOnSecondCallIfCountWasResetBefore()
+        {
+            var mock = new Mock<IFoo>();
+            mock.Setup(foo => foo.Execute("ping"))
+                .Returns("ack")
+                .AtMostOnce();
+
+            Assert.Equal("ack", mock.Object.Execute("ping"));
+            mock.ResetCallCounts(o => o.Execute("ping"));
+            MockException mex = Assert.DoesNotThrow<MockException>(() => mock.Object.Execute("ping"));
+            Assert.Equal(MockException.ExceptionReason.MoreThanOneCall, mex.Reason);
+        }
+
 		[Fact]
 		[Obsolete]
 		public void OnceThrowsOnSecondCall()
