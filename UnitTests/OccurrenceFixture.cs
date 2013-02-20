@@ -15,8 +15,7 @@ namespace Moq.Tests
 
             Assert.Equal("ack", mock.Object.Execute("ping"));
             mock.ResetCallCounts(o => o.Execute("ping"));
-            MockException mex = Assert.DoesNotThrow<MockException>(() => mock.Object.Execute("ping"));
-            Assert.Equal(MockException.ExceptionReason.MoreThanOneCall, mex.Reason);
+            Assert.DoesNotThrow(() => mock.Object.Execute("ping"));          
         }
 
 		[Fact]
