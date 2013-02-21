@@ -14,7 +14,7 @@ namespace Moq.Tests
                 .AtMostOnce();
 
             Assert.Equal("ack", mock.Object.Execute("ping"));
-            mock.ResetCallCounts(o => o.Execute("ping"));
+            mock.ResetAllCallCounts();
             Assert.DoesNotThrow(() => mock.Object.Execute("ping"));          
         }
 
