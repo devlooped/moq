@@ -14,17 +14,18 @@ namespace Moq.Tests
 			Assert.False(typeof(int).IsMockeable());
 		}
 
-        public void OnceDoesNotThrowOnSecondCallIfCountWasResetBefore()
-        {
-            var mock = new Mock<IFooReset>();
-            mock.Setup(foo => foo.Execute("ping"))
-                .Returns("ack")
-                .AtMostOnce();
-
-            Assert.Equal("ack", mock.Object.Execute("ping"));
-            mock.ResetAllCalls();
-            Assert.DoesNotThrow(() => mock.Object.Execute("ping"));
-        }
+        // [Fact]
+        // public void OnceDoesNotThrowOnSecondCallIfCountWasResetBefore()
+        // {
+        //     var mock = new Mock<IFooReset>();
+        //     mock.Setup(foo => foo.Execute("ping"))
+        //         .Returns("ack")
+        //         .AtMostOnce();
+           
+        //     Assert.Equal("ack", mock.Object.Execute("ping"));
+        //     mock.ResetAllCalls();
+        //     Assert.DoesNotThrow(() => mock.Object.Execute("ping"));
+        // }
 	}
 
     public interface IFooReset
