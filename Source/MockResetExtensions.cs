@@ -22,7 +22,7 @@ namespace Moq
         /// Resets the current count of calls for the specified method.
         /// </summary>
         /// <param name="mock">The mock whose call need to be reset.</param>
-        public static void ResetAllCallCounts(this Mock mock) 
+        public static void ResetAllCalls(this Mock mock) 
         {
             var calls = (IList<ICallContext>)mock.Interceptor.ActualCalls;
             calls.Clear();
