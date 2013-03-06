@@ -136,11 +136,25 @@ namespace Moq
 			orderedCalls.Add(call);
 		}
 
+		private IEnumerable<IInterceptStrategy> InterceptionStrategies()
+		{
+			yield return new HandleDestructor();
+			yield return new HandleTracking();
+			yield return new CheckMockMixing();
+			yield return new AddActualInvocation();
+			yield return new ExtractProxyCall();
+			yield return new ExecuteCall();
+			yield return new InvokeBase();
+			yield return new HandleMockRecursion();
+		}
+
 		[SuppressMessage("Microsoft.Maintainability", "CA1502:AvoidExcessiveComplexity")]
 		public void Intercept(ICallContext invocation)
 		{
-			if (invocation.Method.IsDestructor())
+			
+			lock (Mock) // this solves issue #249
 			{
+<<<<<<< HEAD
 				return;
 			}
 
@@ -233,113 +247,25 @@ namespace Moq
 					ThrowIfReturnValueRequired(call, invocation);
 				}
 				else if (invocation.Method.DeclaringType == typeof(object))
+=======
+				var interceptionContext = new InterceptStrategyContext(Mock
+																	, targetType
+																	, invocationLists
+																	, actualInvocations
+																	, behavior
+																	, orderedCalls
+																	);
+				foreach (var strategy in InterceptionStrategies())
+>>>>>>> upstream/dev
 				{
-					// Invoke underlying implementation.
-					invocation.InvokeBase();
-				}
-				else if (invocation.Method.DeclaringType.IsClass && !invocation.Method.IsAbstract && this.Mock.CallBase)
-				{
-					// For mocked classes, if the target method was not abstract, 
-					// invoke directly.
-					// Will only get here for Loose behavior.
-					// TODO: we may want to provide a way to skip this by the user.
-					invocation.InvokeBase();
-				}
-				else if (invocation.Method != null && invocation.Method.ReturnType != null &&
-					invocation.Method.ReturnType != typeof(void))
-				{
-					Mock recursiveMock;
-					if (this.Mock.InnerMocks.TryGetValue(invocation.Method, out recursiveMock))
+					if (InterceptionAction.Stop == strategy.HandleIntercept(invocation, interceptionContext))
 					{
-						invocation.ReturnValue = recursiveMock.Object;
-					}
-					else
-					{
-						invocation.ReturnValue = this.Mock.DefaultValueProvider.ProvideDefault(invocation.Method);
+						break;
 					}
 				}
 			}
 		}
-
-		/// <summary>
-		/// Get an eventInfo for a given event name.  Search type ancestors depth first if necessary.
-		/// </summary>
-		/// <param name="eventName">Name of the event, with the set_ or get_ prefix already removed</param>
-		private EventInfo GetEventFromName(string eventName)
-		{
-			var depthFirstProgress = new Queue<Type>(this.Mock.ImplementedInterfaces.Skip(1));
-			depthFirstProgress.Enqueue(targetType);
-			while (depthFirstProgress.Count > 0)
-			{
-				var currentType = depthFirstProgress.Dequeue();
-				var eventInfo = currentType.GetEvent(eventName);
-				if (eventInfo != null)
-				{
-					return eventInfo;
-				}
-
-				foreach (var implementedType in GetAncestorTypes(currentType))
-				{
-					depthFirstProgress.Enqueue(implementedType);
-				}
-			}
-
-			return null;
-		}
-
-		/// <summary>
-		/// Given a type return all of its ancestors, both types and interfaces.
-		/// </summary>
-		/// <param name="initialType">The type to find immediate ancestors of</param>
-		private static IEnumerable<Type> GetAncestorTypes(Type initialType)
-		{
-			var baseType = initialType.BaseType;
-			if (baseType != null)
-			{
-				return new[] { baseType };
-			}
-
-			return initialType.GetInterfaces();
-		}
-
-		private void ThrowIfReturnValueRequired(IProxyCall call, ICallContext invocation)
-		{
-			if (behavior != MockBehavior.Loose &&
-				invocation.Method != null &&
-				invocation.Method.ReturnType != null &&
-				invocation.Method.ReturnType != typeof(void))
-			{
-				var methodCall = call as MethodCallReturn;
-				if (methodCall == null || !methodCall.HasReturnValue)
-				{
-					throw new MockException(
-						MockException.ExceptionReason.ReturnValueRequired,
-						behavior,
-						invocation);
-				}
-			}
-		}
-
-		internal void AddEventHandler(EventInfo ev, Delegate handler)
-		{
-			List<Delegate> handlers;
-			if (!this.invocationLists.TryGetValue(ev.Name, out handlers))
-			{
-				handlers = new List<Delegate>();
-				invocationLists.Add(ev.Name, handlers);
-			}
-
-			handlers.Add(handler);
-		}
-
-		internal void RemoveEventHandler(EventInfo ev, Delegate handler)
-		{
-			List<Delegate> handlers;
-			if (this.invocationLists.TryGetValue(ev.Name, out handlers))
-			{
-				handlers.Remove(handler);
-			}
-		}
+		
 
 		internal IEnumerable<Delegate> GetInvocationList(EventInfo ev)
 		{
