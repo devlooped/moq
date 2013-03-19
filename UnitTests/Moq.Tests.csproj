@@ -86,6 +86,7 @@
   </ItemGroup>
   <ItemGroup>
     <Compile Include="AsInterfaceFixture.cs" />
+    <Compile Include="MockExplicitEventForwardedToProtectedEventFixture.cs" />
     <Compile Include="ConditionalSetupFixture.cs" />
     <Compile Include="CustomMatcherFixture.cs" />
     <Compile Include="ExtensionsFixture.cs" />
