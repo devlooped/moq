@@ -190,9 +190,37 @@ namespace Moq
 					depthFirstProgress.Enqueue(implementedType);
 				}
 			}
+			return GetNonPublicEventFromName(eventName);
+		}
+
+		/// <summary>
+		/// Get an eventInfo for a given event name.  Search type ancestors depth first if necessary.
+		/// Searches also in non public events.
+		/// </summary>
+		/// <param name="eventName">Name of the event, with the set_ or get_ prefix already removed</param>
+		private EventInfo GetNonPublicEventFromName(string eventName)
+		{
+			var depthFirstProgress = new Queue<Type>(ctx.Mock.ImplementedInterfaces.Skip(1));
+			depthFirstProgress.Enqueue(ctx.TargetType);
+			while (depthFirstProgress.Count > 0)
+			{
+				var currentType = depthFirstProgress.Dequeue();
+				var eventInfo = currentType.GetEvent(eventName, BindingFlags.Instance | BindingFlags.NonPublic);
+				if (eventInfo != null)
+				{
+					return eventInfo;
+				}
+
+				foreach (var implementedType in GetAncestorTypes(currentType))
+				{
+					depthFirstProgress.Enqueue(implementedType);
+				}
+			}
 
 			return null;
 		}
+
+
 		/// <summary>
 		/// Given a type return all of its ancestors, both types and interfaces.
 		/// </summary>
