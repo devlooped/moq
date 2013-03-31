@@ -58,6 +58,17 @@ namespace Moq
 				() => It.IsAny<TValue>());
 		}
 
+      /// <summary>
+      /// Matches any value of the given type, not matching null.
+      /// </summary>
+      public static TValue IsAnyValue<TValue>()
+      {
+         return Match<TValue>.Create(
+            value => value != null && typeof(TValue).IsAssignableFrom(value.GetType()),
+            () => It.IsAnyValue<TValue>());
+      }
+
+
 		/// <include file='It.xdoc' path='docs/doc[@for="It.Is"]/*'/>
 		[SuppressMessage("Microsoft.Design", "CA1006:DoNotNestGenericTypesInMemberSignatures")]
 		public static TValue Is<TValue>(Expression<Func<TValue, bool>> match)
