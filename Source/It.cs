@@ -58,15 +58,13 @@ namespace Moq
 				() => It.IsAny<TValue>());
 		}
 
-      /// <summary>
-      /// Matches any value of the given type, not matching null.
-      /// </summary>
-      public static TValue IsAnyValue<TValue>()
-      {
-         return Match<TValue>.Create(
-            value => value != null && typeof(TValue).IsAssignableFrom(value.GetType()),
-            () => It.IsAnyValue<TValue>());
-      }
+		/// <include file='It.xdoc' path='docs/doc[@for="It.IsNotNull"]/*'/>
+		public static TValue IsNotNull<TValue>()
+		{
+			return Match<TValue>.Create(
+				value => value != null && typeof(TValue).IsAssignableFrom(value.GetType()),
+				() => It.IsNotNull<TValue>());
+		}
 
 
 		/// <include file='It.xdoc' path='docs/doc[@for="It.Is"]/*'/>
@@ -99,29 +97,29 @@ namespace Moq
 			() => It.IsInRange(from, to, rangeKind));
 		}
 
-        /// <include file='It.xdoc' path='docs/doc[@for="It.IsIn(enumerable)"]/*'/>
-        public static TValue IsIn<TValue>(IEnumerable<TValue> items)
-        {
-            return Match<TValue>.Create(value => items.Contains(value), () => It.IsIn(items)); 
-        }
+		  /// <include file='It.xdoc' path='docs/doc[@for="It.IsIn(enumerable)"]/*'/>
+		  public static TValue IsIn<TValue>(IEnumerable<TValue> items)
+		  {
+				return Match<TValue>.Create(value => items.Contains(value), () => It.IsIn(items)); 
+		  }
 
-        /// <include file='It.xdoc' path='docs/doc[@for="It.IsIn(params)"]/*'/>
-        public static TValue IsIn<TValue>(params TValue[] items)
-        {
-            return Match<TValue>.Create(value => items.Contains(value), () => It.IsIn(items)); 
-        }
+		  /// <include file='It.xdoc' path='docs/doc[@for="It.IsIn(params)"]/*'/>
+		  public static TValue IsIn<TValue>(params TValue[] items)
+		  {
+				return Match<TValue>.Create(value => items.Contains(value), () => It.IsIn(items)); 
+		  }
 
-        /// <include file='It.xdoc' path='docs/doc[@for="It.IsNotIn(enumerable)"]/*'/>
-        public static TValue IsNotIn<TValue>(IEnumerable<TValue> items)
-        {
-            return Match<TValue>.Create(value => !items.Contains(value), () => It.IsNotIn(items));
-        }
+		  /// <include file='It.xdoc' path='docs/doc[@for="It.IsNotIn(enumerable)"]/*'/>
+		  public static TValue IsNotIn<TValue>(IEnumerable<TValue> items)
+		  {
+				return Match<TValue>.Create(value => !items.Contains(value), () => It.IsNotIn(items));
+		  }
 
-        /// <include file='It.xdoc' path='docs/doc[@for="It.IsNotIn(params)"]/*'/>
-        public static TValue IsNotIn<TValue>(params TValue[] items)
-        {
-            return Match<TValue>.Create(value => !items.Contains(value), () => It.IsNotIn(items));
-        }
+		  /// <include file='It.xdoc' path='docs/doc[@for="It.IsNotIn(params)"]/*'/>
+		  public static TValue IsNotIn<TValue>(params TValue[] items)
+		  {
+				return Match<TValue>.Create(value => !items.Contains(value), () => It.IsNotIn(items));
+		  }
 
 		/// <include file='It.xdoc' path='docs/doc[@for="It.IsRegex(regex)"]/*'/>
 		public static string IsRegex(string regex)
