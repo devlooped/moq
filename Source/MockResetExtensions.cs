@@ -19,10 +19,10 @@ namespace Moq
     public static class MockResetExtensions
     {
         /// <summary>
-        /// Resets the current count of calls for the specified method.
+        /// Resets the calls previously made on the specified mock.
         /// </summary>
-        /// <param name="mock">The mock whose call need to be reset.</param>
-        public static void ResetAllCalls(this Mock mock) 
+        /// <param name="mock">The mock whose calls need to be reset.</param>
+        public static void ResetCalls(this Mock mock) 
         {
             var calls = (IList<ICallContext>)mock.Interceptor.ActualCalls;
             calls.Clear();

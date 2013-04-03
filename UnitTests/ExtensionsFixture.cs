@@ -23,7 +23,7 @@ namespace Moq.Tests
             mock.Setup(foo => foo.Execute("ping")).Returns("ack");
 
             mock.Object.Execute("ping");
-            mock.ResetAllCalls();
+            mock.ResetCalls();
             mock.Object.Execute("ping");
             mock.Verify(o => o.Execute("ping"), Times.Once());
         }
