@@ -118,13 +118,13 @@
       <DependentUpon>Delegates.tt</DependentUpon>
     </Compile>
     <Compile Include="Microsoft\ExpressionVisitor.cs" />
-    <Compile Include="MockResetExtensions.cs" />
+    <Compile Include="MockExtensions.cs" />
     <Compile Include="MockSequence.cs" />
     <Compile Include="Obsolete\IOccurrence.cs" />
     <Compile Include="MatcherAttribute.cs" />
     <Compile Include="Obsolete\Mock.Generic.Legacy.cs" />
     <Compile Include="Obsolete\Mock.Legacy.cs" />
-    <Compile Include="Obsolete\MockExtensions.cs" />
+    <Compile Include="Obsolete\ObsoleteMockExtensions.cs" />
     <Compile Include="Obsolete\MockFactory.cs" />
     <Compile Include="SequenceExtensions.cs" />
     <Compile Include="SetupKind.cs" />

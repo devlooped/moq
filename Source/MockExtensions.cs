@@ -16,7 +16,7 @@ namespace Moq
     /// <remarks>
     /// Those methods are useful for Testeroids support. 
     /// </remarks>
-    public static class MockResetExtensions
+    public static class MockExtensions
     {
         /// <summary>
         /// Resets the calls previously made on the specified mock.
