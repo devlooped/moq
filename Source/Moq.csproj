@@ -72,6 +72,7 @@
   <ItemGroup>
     <Compile Include="ConditionalContext.cs" />
     <Compile Include="IInterceptStrategy.cs" />
+    <Compile Include="IMock.cs" />
     <Compile Include="InterceptorStrategies.cs" />
     <Compile Include="Language\ICallback.cs" />
     <Compile Include="Language\ICallback.Generated.cs">
