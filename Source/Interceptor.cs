@@ -151,119 +151,24 @@ namespace Moq
 		[SuppressMessage("Microsoft.Maintainability", "CA1502:AvoidExcessiveComplexity")]
 		public void Intercept(ICallContext invocation)
 		{
-			
-			lock (Mock) // this solves issue #249
-			{
-<<<<<<< HEAD
-				return;
-			}
 
-			// Track current invocation if we're in "record" mode in a fluent invocation context.
-			if (FluentMockContext.IsActive)
-			{
-				FluentMockContext.Current.Add(this.Mock, invocation);
-			}
-			lock (Mock) // this solves issue #249, but actually worsen method complexity :(
-			{
-				// TODO: too many ifs in this method.
-				// see how to refactor with strategies.
-				if (invocation.Method.DeclaringType.IsGenericType &&
-					invocation.Method.DeclaringType.GetGenericTypeDefinition() == typeof(IMocked<>))
-				{
-					// "Mixin" of IMocked<T>.Mock
-					invocation.ReturnValue = this.Mock;
-					return;
-				}
-				else if (invocation.Method.DeclaringType == typeof(IMocked))
-				{
-					// "Mixin" of IMocked.Mock
-					invocation.ReturnValue = this.Mock;
-					return;
-				}
-
-				// Special case for events.
-				if (!FluentMockContext.IsActive)
-				{
-					if (invocation.Method.IsEventAttach())
-					{
-						var delegateInstance = (Delegate)invocation.Arguments[0];
-						// TODO: validate we can get the event?
-						var eventInfo = this.GetEventFromName(invocation.Method.Name.Substring(4));
-
-						if (this.Mock.CallBase)
-						{
-							invocation.InvokeBase();
-						}
-						else if (delegateInstance != null)
-						{
-							this.AddEventHandler(eventInfo, (Delegate)invocation.Arguments[0]);
-						}
-
-						return;
-					}
-					else if (invocation.Method.IsEventDetach())
-					{
-						var delegateInstance = (Delegate)invocation.Arguments[0];
-						// TODO: validate we can get the event?
-						var eventInfo = this.GetEventFromName(invocation.Method.Name.Substring(7));
-
-						if (this.Mock.CallBase)
-						{
-							invocation.InvokeBase();
-						}
-						else if (delegateInstance != null)
-						{
-							this.RemoveEventHandler(eventInfo, (Delegate)invocation.Arguments[0]);
-						}
-
-						return;
-					}
-
-					// Save to support Verify[expression] pattern.
-					// In a fluent invocation context, which is a recorder-like 
-					// mode we use to evaluate delegates by actually running them, 
-					// we don't want to count the invocation, or actually run 
-					// previous setups.
-				    lock (actualInvocations)
-				    {
-				        actualInvocations.Add(invocation);
-				    }
-				}
-
-				var call = FluentMockContext.IsActive ? (IProxyCall)null : orderedCalls.LastOrDefault(c => c.Matches(invocation));
-				if (call == null && !FluentMockContext.IsActive && behavior == MockBehavior.Strict)
-				{
-					throw new MockException(MockException.ExceptionReason.NoSetup, behavior, invocation);
-				}
-
-				if (call != null)
-				{
-					call.SetOutParameters(invocation);
-
-					// We first execute, as there may be a Throws 
-					// and therefore we might never get to the 
-					// next line.
-					call.Execute(invocation);
-					ThrowIfReturnValueRequired(call, invocation);
-				}
-				else if (invocation.Method.DeclaringType == typeof(object))
-=======
-				var interceptionContext = new InterceptStrategyContext(Mock
-																	, targetType
-																	, invocationLists
-																	, actualInvocations
-																	, behavior
-																	, orderedCalls
-																	);
-				foreach (var strategy in InterceptionStrategies())
->>>>>>> upstream/dev
-				{
-					if (InterceptionAction.Stop == strategy.HandleIntercept(invocation, interceptionContext))
-					{
-						break;
-					}
-				}
-			}
+            lock (Mock) // this solves issue #249
+            {
+                var interceptionContext = new InterceptStrategyContext(Mock
+                                                                    , targetType
+                                                                    , invocationLists
+                                                                    , actualInvocations
+                                                                    , behavior
+                                                                    , orderedCalls
+                                                                    );
+                foreach (var strategy in InterceptionStrategies())
+                {
+                    if (InterceptionAction.Stop == strategy.HandleIntercept(invocation, interceptionContext))
+                    {
+                        break;
+                    }
+                }
+            }
 		}
 		
 
