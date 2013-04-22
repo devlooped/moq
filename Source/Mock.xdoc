@@ -43,6 +43,16 @@
 			</code>
 		</example>		
 	</doc>
+  <doc for="Mock.Instance">
+		<summary>
+			Creates a mock object using the underlying instance to call into by default.
+		</summary>
+		<typeparam name="T">
+			The type of the mocked object
+		</typeparam>
+		<param name="instance">The underlying instance for the mock</param>
+		<returns>A mock object with the underlying instance</returns>	
+	</doc>
 	<doc for="Mock.Behavior">
 		<summary>
 			Behavior of the mock, according to the value set in the constructor.

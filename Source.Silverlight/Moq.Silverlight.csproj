@@ -294,6 +294,9 @@
     <Compile Include="..\Source\Mock.Generic.cs">
       <Link>Mock.Generic.cs</Link>
     </Compile>
+    <Compile Include="..\Source\Mock.Instance.cs">
+      <Link>Mock.Instance.cs</Link>
+    </Compile>
     <Compile Include="..\Source\MockBehavior.cs">
       <Link>MockBehavior.cs</Link>
     </Compile>
