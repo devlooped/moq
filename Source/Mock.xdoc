@@ -43,7 +43,7 @@
 			</code>
 		</example>		
 	</doc>
-  <doc for="Mock.Instance">
+	<doc for="Mock.Instance">
 		<summary>
 			Creates a mock object using the underlying instance to call into by default.
 		</summary>
