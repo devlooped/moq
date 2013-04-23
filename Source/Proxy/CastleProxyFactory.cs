@@ -92,6 +92,29 @@ namespace Moq.Proxy
 			}
 		}
 
+		public T CreateProxy<T>(ICallInterceptor interceptor, Type[] interfaces, object instance)
+		{
+			var mockType = typeof(T);
+
+			if (mockType.IsInterface)
+			{
+				return (T)generator.CreateInterfaceProxyWithTarget(mockType, interfaces, instance, new Interceptor(interceptor));
+			}
+
+			try
+			{
+				return (T)generator.CreateClassProxyWithTarget(mockType, interfaces, instance, new ProxyGenerationOptions(), new Interceptor(interceptor));
+			}
+			catch (TypeLoadException e)
+			{
+				throw new ArgumentException(Resources.InvalidMockClass, e);
+			}
+			catch (MissingMethodException e)
+			{
+				throw new ArgumentException(Resources.ConstructorNotFound, e);
+			}
+		}
+
 		private static ProxyGenerator CreateProxyGenerator()
 		{
 			return new ProxyGenerator();

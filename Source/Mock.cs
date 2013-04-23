@@ -114,6 +114,12 @@ namespace Moq
 			throw new ArgumentException(Resources.ObjectInstanceNotMock, "mocked");
 		}
 
+		/// <include file='Mock.xdoc' path='docs/doc[@for="Mock.Instance"]/*'/>
+		public static Mock<T> Instance<T>(T instance) where T : class
+		{
+			return new InstanceMock<T>(instance);
+		}
+
 		/// <include file='Mock.xdoc' path='docs/doc[@for="Mock.Behavior"]/*'/>
 		public virtual MockBehavior Behavior { get; internal set; }
 
