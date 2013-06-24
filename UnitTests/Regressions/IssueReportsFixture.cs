@@ -1628,6 +1628,20 @@ namespace Moq.Tests.Regressions
 
 		#endregion
 
+        #region #326
+
+        public class _326
+        {
+            [Fact]
+            public void ShouldSupportMockingWinFormsControl()
+            {
+                var foo = new Mock<System.Windows.Forms.Control>();
+                var bar = foo.Object;
+            }
+        }
+
+        #endregion
+
 		#region Recursive issue
 
 		public class RecursiveFixture
