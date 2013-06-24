@@ -63,6 +63,7 @@ namespace Moq.Proxy
 			AttributesToAvoidReplicating.Add<ReflectionPermissionAttribute>();
 			AttributesToAvoidReplicating.Add<PermissionSetAttribute>();
 			AttributesToAvoidReplicating.Add<System.Runtime.InteropServices.MarshalAsAttribute>();
+            AttributesToAvoidReplicating.Add<UIPermissionAttribute>();
 #if !NET3x
 			AttributesToAvoidReplicating.Add<System.Runtime.InteropServices.TypeIdentifierAttribute>();
 #endif
