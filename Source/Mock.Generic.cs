@@ -135,8 +135,7 @@ namespace Moq
 		{
 			PexProtector.Invoke(() =>
 			{
-                Castle.DynamicProxy.Generators.AttributesToAvoidReplicating.Add(typeof(System.Security.Permissions.UIPermissionAttribute));
-                this.instance = proxyFactory.CreateProxy<T>(
+				this.instance = proxyFactory.CreateProxy<T>(
 					this.Interceptor,
 					this.ImplementedInterfaces.ToArray(),
 					this.constructorArguments);
