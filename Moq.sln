@@ -18,6 +18,13 @@ Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Moq.Silverlight", "Source.S
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Moq.Silverlight.Tests", "UnitTests.Silverlight\Moq.Silverlight.Tests.csproj", "{02A2F6A6-D8CF-45EB-A424-BFD8C26034CE}"
 EndProject
+Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = ".nuget", ".nuget", "{88DD31B6-3822-4951-AD1A-0F0C45470F85}"
+	ProjectSection(SolutionItems) = preProject
+		.nuget\NuGet.Config = .nuget\NuGet.Config
+		.nuget\NuGet.exe = .nuget\NuGet.exe
+		.nuget\NuGet.targets = .nuget\NuGet.targets
+	EndProjectSection
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU

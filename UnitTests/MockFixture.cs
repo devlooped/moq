@@ -257,10 +257,14 @@ namespace Moq.Tests
 		[Fact]
 		public void ThrowsIfNoMatchingConstructorFound()
 		{
-			Assert.Throws<ArgumentException>(() =>
-			{
-				Console.WriteLine(new Mock<ClassWithNoDefaultConstructor>(25, true).Object);
-			});
+            try
+            {
+                Console.WriteLine(new Mock<ClassWithNoDefaultConstructor>(25, true).Object);
+                Assert.True(false, "Should have thrown an exception since constructor does not exist.");
+            }
+            catch (Exception)
+            {
+            }
 		}
 
 		[Fact]
