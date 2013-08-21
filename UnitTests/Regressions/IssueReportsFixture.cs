@@ -942,9 +942,7 @@ namespace Moq.Tests.Regressions
 			public void Test()
 			{
 				var mock = new Mock<IList<string>>();
-				Assert.Throws<NotSupportedException>(
-					Resources.SetupOnNonMemberMethod,
-					() => mock.Setup(l => l.FirstOrDefault()).Returns("Hello world"));
+				Assert.Throws<NotSupportedException>(() => mock.Setup(l => l.FirstOrDefault()).Returns("Hello world"));
 			}
 		}
 

@@ -33,3 +33,5 @@ _ReSharper*/
 *.userprefs
 *.swp
 *.DotSettings
+
+/packages

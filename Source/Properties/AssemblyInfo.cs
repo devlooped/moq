@@ -5,7 +5,6 @@ using System.Runtime.CompilerServices;
 using System.Runtime.InteropServices;
 
 [assembly: AssemblyTitle("Moq")]
-[assembly: AssemblyDescription("Mocking library for .NET 3.5+ and C# 3.0+, heavily based on Linq")]
 [assembly: AssemblyCompany("Clarius Consulting, Manas Technology Solutions, InSTEDD")]
 [assembly: AssemblyProduct("Moq")]
 [assembly: AssemblyTrademark("")]

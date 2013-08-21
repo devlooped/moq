@@ -77,9 +77,7 @@ namespace Moq.Tests
 		[Fact]
 		public void GetThrowsIfObjectIsNotMocked()
 		{
-			Assert.Throws<ArgumentException>(
-				"Object instance was not created by Moq.\r\nParameter name: mocked",
-				() => Mock.Get("foo"));
+			Assert.Throws<ArgumentException>(() => Mock.Get("foo"));
 		}
 
 		public class FooBase
