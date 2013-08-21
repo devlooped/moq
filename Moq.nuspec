@@ -1,0 +1,14 @@
+<?xml version="1.0"?>
+<package xmlns:xsd="http://www.w3.org/2001/XMLSchema" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance">
+  <metadata xmlns="http://schemas.microsoft.com/packaging/2010/07/nuspec.xsd">
+    <id>Moq</id>
+    <version>4.1</version>
+    <authors>Daniel Cazzulino</authors>
+    <owners>Daniel Cazzulino, Clarius Labs</owners>
+    <licenseUrl>http://www.opensource.org/licenses/bsd-license.php</licenseUrl>
+    <projectUrl>http://www.moqthis.com</projectUrl>
+    <requireLicenseAcceptance>false</requireLicenseAcceptance>
+    <description>The most popular and friendly mocking framework for .NET</description>
+    <tags>tdd mocking mocks unittesting agile</tags>
+  </metadata>
+</package>
