@@ -9,6 +9,7 @@
         <BuildRoot>$(MSBuildThisFileDirectory)</BuildRoot>
         <DropDirectory>$(BuildRoot)build\</DropDirectory>
         <NuGetExe>$(BuildRoot).nuget\NuGet.exe</NuGetExe>
+        <ReleaseNotes>$([System.IO.File]::ReadAllText('$(BuildRoot)ReleaseNotes.md'))</ReleaseNotes>
     </PropertyGroup>
 
     <Target Name="Build" DependsOnTargets="ReplaceCurrentVersions">
@@ -72,6 +73,12 @@
             <_VersionRegexTransform Include="Source\Properties\AssemblyInfo.cs">
                 <Find>AssemblyVersion\(".*?"\)</Find>
                 <ReplaceWith>AssemblyVersion("$(FileVersion)")</ReplaceWith>
+            </_VersionRegexTransform>
+            <_VersionRegexTransform Include="$(BuildRoot)**\*.nuspec"
+                            Condition="'$(ReleaseNotes)' != ''">
+                <Find><![CDATA[<releaseNotes />|<releaseNotes/>|<releaseNotes>.*</releaseNotes>]]></Find>
+                <ReplaceWith><![CDATA[<releaseNotes>$(ReleaseNotes)</releaseNotes>]]></ReplaceWith>
+                <Options>Singleline</Options>
             </_VersionRegexTransform>
         </ItemGroup>
 
