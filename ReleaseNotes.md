@@ -1,17 +1,4 @@
-<?xml version="1.0"?>
-<package xmlns:xsd="http://www.w3.org/2001/XMLSchema" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance">
-  <metadata xmlns="http://schemas.microsoft.com/packaging/2010/07/nuspec.xsd">
-    <id>Moq</id>
-    <version>4.1</version>
-    <title>Moq: an enjoyable mocking library</title>
-    <authors>Daniel Cazzulino</authors>
-    <owners>Daniel Cazzulino, Clarius Labs</owners>
-    <licenseUrl>http://www.opensource.org/licenses/bsd-license.php</licenseUrl>
-    <projectUrl>http://www.moqthis.com</projectUrl>
-    <requireLicenseAcceptance>false</requireLicenseAcceptance>
-    <description>The most popular and friendly mocking framework for .NET</description>
-    <tags>tdd mocking mocks unittesting agile</tags>
-    <releaseNotes>Version 4.1
+Version 4.1
 * Added covariant IMock{out T} interface to Mock{T}
 * Added It.IsNotNull{T}
 * Fix: 'NullReferenceException when subscribing to an event'
@@ -158,6 +145,4 @@ Version 1.1
 
 Version 1.0
 
-* Initial release, initial documentation process in place, etc. </releaseNotes>
-  </metadata>
-</package>
+* Initial release, initial documentation process in place, etc. 
