@@ -3,6 +3,7 @@
   <metadata xmlns="http://schemas.microsoft.com/packaging/2010/07/nuspec.xsd">
     <id>Moq</id>
     <version>4.1</version>
+    <title>Moq: an enjoyable mocking library</title>
     <authors>Daniel Cazzulino</authors>
     <owners>Daniel Cazzulino, Clarius Labs</owners>
     <licenseUrl>http://www.opensource.org/licenses/bsd-license.php</licenseUrl>
