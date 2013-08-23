@@ -2,6 +2,10 @@
 using Moq;
 using Xunit;
 
+#if !SILVERLIGHT
+using System.Threading.Tasks;
+#endif
+
 namespace Moq.Tests
 {
 	public class VerifyFixture
@@ -866,6 +870,28 @@ namespace Moq.Tests
 			Assert.Contains(Environment.NewLine + "No invocations performed.", mex.Message);
 		}
 
+        [Fact]
+        public void MatchesDerivedTypesForGenericTypes()
+        {
+            var mock = new Mock<IBaz>();
+            mock.Object.Call(new BazParam());
+            mock.Object.Call(new BazParam2());
+
+            mock.Verify(foo => foo.Call(It.IsAny<IBazParam>()), Times.Exactly(2));
+        }
+
+#if !SILVERLIGHT
+        [Fact]
+        public void DoesNotThrowCollectionModifiedWhenMoreInvocationsInterceptedDuringVerfication()
+        {
+            var mock = new Mock<IFoo>();
+            Parallel.For(0, 100, (i) =>
+            {
+                mock.Object.Submit();
+                mock.Verify(foo => foo.Submit());
+            });
+        }
+#endif
 
 		public interface IBar
 		{
@@ -882,6 +908,23 @@ namespace Moq.Tests
 			void Submit();
 			string Execute(string command);
 		}
+
+        public interface IBazParam
+        {
+        }
+
+        public interface IBaz
+        {
+            void Call<T>(T param) where T:IBazParam;
+        }
+
+        public class BazParam:IBazParam
+        {
+        }
+
+        public class BazParam2:BazParam
+        {
+        }
 	}
 }
 

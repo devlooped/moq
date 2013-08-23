@@ -28,6 +28,12 @@
 		</example>
 		<typeparam name="TValue">Type of the value.</typeparam>
 	</doc>
+   <doc for="It.IsNotNull">
+      <summary>
+         Matches any value of the given <typeparamref name="TValue"/> type, except null.
+      </summary>
+      <typeparam name="TValue">Type of the value.</typeparam>
+   </doc>
 	<doc for="It.Is">
 		<summary>
 			Matches any value that satisfies the given predicate.
@@ -70,6 +76,78 @@
 				mock.Setup(x =&gt; x.HasInventory(
 				It.IsAny&lt;string&gt;(),
 				It.IsInRange(0, 100, Range.Inclusive)))
+				.Returns(false);
+			</code>
+		</example>
+	</doc>
+	<doc for="It.IsIn(enumerable)">
+		<summary>
+			Matches any value that is present in the sequence specified.
+		</summary>
+		<typeparam name="TValue">Type of the argument to check.</typeparam>
+		<param name="items">The sequence of possible values.</param>
+		<example>
+			The following example shows how to expect a method call
+			with an integer argument with value from a list.
+			<code>
+				var values = new List&lt;int&gt; { 1, 2, 3 };
+			
+				mock.Setup(x =&gt; x.HasInventory(
+				It.IsAny&lt;string&gt;(),
+				It.IsIn(values)))
+				.Returns(false);
+			</code>
+		</example>
+	</doc>
+	<doc for="It.IsIn(params)">
+		<summary>
+			Matches any value that is present in the sequence specified.
+		</summary>
+		<typeparam name="TValue">Type of the argument to check.</typeparam>
+		<param name="items">The sequence of possible values.</param>
+		<example>
+			The following example shows how to expect a method call
+			with an integer argument with a value of 1, 2, or 3.
+			<code>
+				mock.Setup(x =&gt; x.HasInventory(
+				It.IsAny&lt;string&gt;(),
+				It.IsIn(1, 2, 3)))
+				.Returns(false);
+			</code>
+		</example>
+	</doc>
+    <doc for="It.IsNotIn(enumerable)">
+		<summary>
+			Matches any value that is not found in the sequence specified.
+		</summary>
+		<typeparam name="TValue">Type of the argument to check.</typeparam>
+		<param name="items">The sequence of disallowed values.</param>
+		<example>
+			The following example shows how to expect a method call
+			with an integer argument with value not found from a list.
+			<code>
+				var values = new List&lt;int&gt; { 1, 2, 3 };
+				
+				mock.Setup(x =&gt; x.HasInventory(
+				It.IsAny&lt;string&gt;(),
+				It.IsNotIn(values)))
+				.Returns(false);
+			</code>
+		</example>
+	</doc>
+	<doc for="It.IsNotIn(params)">
+		<summary>
+			Matches any value that is not found in the sequence specified.
+		</summary>
+		<typeparam name="TValue">Type of the argument to check.</typeparam>
+		<param name="items">The sequence of disallowed values.</param>
+		<example>
+			The following example shows how to expect a method call
+			with an integer argument of any value except 1, 2, or 3.
+			<code>
+				mock.Setup(x =&gt; x.HasInventory(
+				It.IsAny&lt;string&gt;(),
+				It.IsNotIn(1, 2, 3)))
 				.Returns(false);
 			</code>
 		</example>

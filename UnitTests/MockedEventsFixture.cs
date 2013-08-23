@@ -1,5 +1,6 @@
 ﻿using System;
 using System.ComponentModel;
+using System.Threading;
 using Xunit;
 
 namespace Moq.Tests
@@ -588,6 +589,15 @@ namespace Moq.Tests
 			Assert.Equal(5, value);
 		}
 
+		[Fact]
+		public void ShouldSuccessfullyAttachToEventForwaredToAProtectedEvent()
+		{
+			var mock = new Mock<FordawrdEventDoProtectedImplementation>();
+			INotifyPropertyChanged observable = mock.Object;
+			
+			Assert.DoesNotThrow(() => observable.PropertyChanged += (sender, args) => { });
+		}
+
 		public delegate void CustomEvent(string message, int value);
 
 		public interface IWithEvent
@@ -666,5 +676,35 @@ namespace Moq.Tests
 		public interface IDerived : IParent
 		{
 		}
+
+
+		public interface IInterfaceWithEvent
+		{
+			event EventHandler<EventArgs> JustAnEvent;
+		}
+
+		public class FordawrdEventDoProtectedImplementation : INotifyPropertyChanged
+		{
+			private PropertyChangedEventHandler eventHandler;
+
+			event PropertyChangedEventHandler INotifyPropertyChanged.PropertyChanged
+			{
+				add { this.PropertyChanged += value; }
+				remove { this.PropertyChanged -= value; }
+			}
+
+			protected virtual event PropertyChangedEventHandler PropertyChanged
+			{
+				add
+				{
+					this.eventHandler += value;
+				}
+				remove
+				{
+					this.eventHandler -= value;
+				}
+			}
+		}
+
 	}
 }

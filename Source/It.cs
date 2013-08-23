@@ -39,6 +39,8 @@
 // http://www.opensource.org/licenses/bsd-license.php]
 
 using System;
+using System.Collections.Generic;
+using System.Linq;
 using System.Linq.Expressions;
 using System.Text.RegularExpressions;
 using System.Diagnostics.CodeAnalysis;
@@ -55,6 +57,15 @@ namespace Moq
 				value => value == null || typeof(TValue).IsAssignableFrom(value.GetType()),
 				() => It.IsAny<TValue>());
 		}
+
+		/// <include file='It.xdoc' path='docs/doc[@for="It.IsNotNull"]/*'/>
+		public static TValue IsNotNull<TValue>()
+		{
+			return Match<TValue>.Create(
+				value => value != null && typeof(TValue).IsAssignableFrom(value.GetType()),
+				() => It.IsNotNull<TValue>());
+		}
+
 
 		/// <include file='It.xdoc' path='docs/doc[@for="It.Is"]/*'/>
 		[SuppressMessage("Microsoft.Design", "CA1006:DoNotNestGenericTypesInMemberSignatures")]
@@ -85,6 +96,30 @@ namespace Moq
 			},
 			() => It.IsInRange(from, to, rangeKind));
 		}
+
+		  /// <include file='It.xdoc' path='docs/doc[@for="It.IsIn(enumerable)"]/*'/>
+		  public static TValue IsIn<TValue>(IEnumerable<TValue> items)
+		  {
+				return Match<TValue>.Create(value => items.Contains(value), () => It.IsIn(items)); 
+		  }
+
+		  /// <include file='It.xdoc' path='docs/doc[@for="It.IsIn(params)"]/*'/>
+		  public static TValue IsIn<TValue>(params TValue[] items)
+		  {
+				return Match<TValue>.Create(value => items.Contains(value), () => It.IsIn(items)); 
+		  }
+
+		  /// <include file='It.xdoc' path='docs/doc[@for="It.IsNotIn(enumerable)"]/*'/>
+		  public static TValue IsNotIn<TValue>(IEnumerable<TValue> items)
+		  {
+				return Match<TValue>.Create(value => !items.Contains(value), () => It.IsNotIn(items));
+		  }
+
+		  /// <include file='It.xdoc' path='docs/doc[@for="It.IsNotIn(params)"]/*'/>
+		  public static TValue IsNotIn<TValue>(params TValue[] items)
+		  {
+				return Match<TValue>.Create(value => !items.Contains(value), () => It.IsNotIn(items));
+		  }
 
 		/// <include file='It.xdoc' path='docs/doc[@for="It.IsRegex(regex)"]/*'/>
 		public static string IsRegex(string regex)

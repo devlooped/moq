@@ -50,7 +50,7 @@ using System.Reflection;
 namespace Moq
 {
 	/// <include file='Mock.Generic.xdoc' path='docs/doc[@for="Mock{T}"]/*'/>
-	public partial class Mock<T> : Mock where T : class
+    public partial class Mock<T> : Mock, IMock<T> where T : class
 	{
 		private static IProxyFactory proxyFactory = new CastleProxyFactory();
 		private T instance;
@@ -297,6 +297,13 @@ namespace Moq
 			Mock.Verify(this, expression, times, null);
 		}
 
+		/// <include file='Mock.Generic.xdoc' path='docs/doc[@for="Mock{T}.Verify(expression,times)"]/*'/>
+		[SuppressMessage("Microsoft.Design", "CA1006:DoNotNestGenericTypesInMemberSignatures", Justification = "By design")]
+		public void Verify(Expression<Action<T>> expression, Func<Times> times)
+		{
+			Verify(expression, times());
+		}
+
 		/// <include file='Mock.Generic.xdoc' path='docs/doc[@for="Mock{T}.Verify(expression,failMessage)"]/*'/>
 		[SuppressMessage("Microsoft.Design", "CA1006:DoNotNestGenericTypesInMemberSignatures", Justification = "By design")]
 		public void Verify(Expression<Action<T>> expression, string failMessage)
@@ -311,6 +318,13 @@ namespace Moq
 			Mock.Verify(this, expression, times, failMessage);
 		}
 
+		/// <include file='Mock.Generic.xdoc' path='docs/doc[@for="Mock{T}.Verify(expression,times,failMessage)"]/*'/>
+		[SuppressMessage("Microsoft.Design", "CA1006:DoNotNestGenericTypesInMemberSignatures", Justification = "By design")]
+		public void Verify(Expression<Action<T>> expression, Func<Times> times, string failMessage)
+		{
+			Verify(this, expression, times(), failMessage);
+		}
+
 		/// <include file='Mock.Generic.xdoc' path='docs/doc[@for="Mock{T}.Verify{TResult}(expression)"]/*'/>
 		[SuppressMessage("Microsoft.Design", "CA1006:DoNotNestGenericTypesInMemberSignatures", Justification = "By design")]
 		public void Verify<TResult>(Expression<Func<T, TResult>> expression)
@@ -323,6 +337,13 @@ namespace Moq
 		public void Verify<TResult>(Expression<Func<T, TResult>> expression, Times times)
 		{
 			Mock.Verify(this, expression, times, null);
+		}
+
+		/// <include file='Mock.Generic.xdoc' path='docs/doc[@for="Mock{T}.Verify{TResult}(expression,times)"]/*'/>
+		[SuppressMessage("Microsoft.Design", "CA1006:DoNotNestGenericTypesInMemberSignatures", Justification = "By design")]
+		public void Verify<TResult>(Expression<Func<T, TResult>> expression, Func<Times> times)
+		{
+			Verify(this, expression, times(), null);
 		}
 
 		/// <include file='Mock.Generic.xdoc' path='docs/doc[@for="Mock{T}.Verify{TResult}(expression,failMessage)"]/*'/>
@@ -353,6 +374,13 @@ namespace Moq
 			Mock.VerifyGet(this, expression, times, null);
 		}
 
+		/// <include file='Mock.Generic.xdoc' path='docs/doc[@for="Mock{T}.VerifyGet(expression,times)"]/*'/>
+		[SuppressMessage("Microsoft.Design", "CA1006:DoNotNestGenericTypesInMemberSignatures", Justification = "By design")]
+		public void VerifyGet<TProperty>(Expression<Func<T, TProperty>> expression, Func<Times> times)
+		{
+			VerifyGet(this, expression, times(), null);
+		}
+
 		/// <include file='Mock.Generic.xdoc' path='docs/doc[@for="Mock{T}.VerifyGet(expression,failMessage)"]/*'/>
 		[SuppressMessage("Microsoft.Design", "CA1006:DoNotNestGenericTypesInMemberSignatures", Justification = "By design")]
 		public void VerifyGet<TProperty>(Expression<Func<T, TProperty>> expression, string failMessage)
@@ -367,6 +395,13 @@ namespace Moq
 			Mock.VerifyGet(this, expression, times, failMessage);
 		}
 
+		/// <include file='Mock.Generic.xdoc' path='docs/doc[@for="Mock{T}.VerifyGet(expression,times,failMessage)"]/*'/>
+		[SuppressMessage("Microsoft.Design", "CA1006:DoNotNestGenericTypesInMemberSignatures", Justification = "By design")]
+		public void VerifyGet<TProperty>(Expression<Func<T, TProperty>> expression, Func<Times> times, string failMessage)
+		{
+			VerifyGet(this, expression, times(), failMessage);
+		}
+
 		/// <include file='Mock.Generic.xdoc' path='docs/doc[@for="Mock{T}.VerifySet(expression)"]/*'/>
 		public void VerifySet(Action<T> setterExpression)
 		{
@@ -379,6 +414,12 @@ namespace Moq
 			Mock.VerifySet(this, setterExpression, times, null);
 		}
 
+		/// <include file='Mock.Generic.xdoc' path='docs/doc[@for="Mock{T}.VerifySet(expression,times)"]/*'/>
+		public void VerifySet(Action<T> setterExpression, Func<Times> times)
+		{
+			Mock.VerifySet(this, setterExpression, times(), null);
+		}
+
 		/// <include file='Mock.Generic.xdoc' path='docs/doc[@for="Mock{T}.VerifySet(expression,failMessage)"]/*'/>
 		public void VerifySet(Action<T> setterExpression, string failMessage)
 		{
@@ -389,6 +430,12 @@ namespace Moq
 		public void VerifySet(Action<T> setterExpression, Times times, string failMessage)
 		{
 			Mock.VerifySet(this, setterExpression, times, failMessage);
+		}
+
+		/// <include file='Mock.Generic.xdoc' path='docs/doc[@for="Mock{T}.VerifySet(expression,times,failMessage)"]/*'/>
+		public void VerifySet(Action<T> setterExpression, Func<Times> times, string failMessage)
+		{
+			Mock.VerifySet(this, setterExpression, times(), failMessage);
 		}
 
 		#endregion
