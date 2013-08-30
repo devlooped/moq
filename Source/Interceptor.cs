@@ -96,6 +96,11 @@ namespace Moq
 			VerifyOrThrow(call => !call.Invoked);
 		}
 
+	    internal void VerifyNothing()
+        {
+            VerifyOrThrow(call => call.CallCount > 0);
+        }
+
 		private void VerifyOrThrow(Func<IProxyCall, bool> match)
 		{
 			var failures = calls.Values.Where(match).ToArray();

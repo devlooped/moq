@@ -438,6 +438,13 @@ namespace Moq
 			Mock.VerifySet(this, setterExpression, times(), failMessage);
 		}
 
+        /// <include file='Mock.Generic.xdoc' path='docs/doc[@for="Mock{T}.VerifyNothing()"]/*'/>>
+        public void VerifyNothing()
+        {
+            Mock.VerifyNothing(this);
+        }
+
+
 		#endregion
 
 		#region Raise
