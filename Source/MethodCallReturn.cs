@@ -67,6 +67,7 @@ namespace Moq
 	{
 		private Delegate valueDel = (Func<TResult>)(() => default(TResult));
 		private Action<object[]> afterReturnCallback;
+		private bool callBase;
 
 		public MethodCallReturn(Mock mock, Func<bool> condition, Expression originalExpression, MethodInfo method, params Expression[] arguments)
 			: base(mock, condition, originalExpression, method, arguments)
@@ -98,6 +99,12 @@ namespace Moq
 		public IReturnsResult<TMock> Returns(TResult value)
 		{
 			Returns(() => value);
+			return this;
+		}
+
+		public IReturnsResult<TMock> CallBase()
+		{
+			callBase = true;
 			return this;
 		}
 
@@ -155,7 +162,9 @@ namespace Moq
 		{
 			base.Execute(call);
 
-			if (valueDel.Method.GetParameters().Length != 0)
+			if (callBase)
+				call.InvokeBase();
+			else if (valueDel.Method.GetParameters().Length != 0)
 				call.ReturnValue = valueDel.InvokePreserveStack(call.Arguments); //will throw if parameters mismatch
 			else
 				call.ReturnValue = valueDel.InvokePreserveStack(); //we need this, for the user to be able to use parameterless methods

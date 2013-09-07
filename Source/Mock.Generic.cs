@@ -45,11 +45,12 @@ using Moq.Language.Flow;
 using Moq.Proxy;
 using Moq.Language;
 using Moq.Properties;
+using System.Reflection;
 
 namespace Moq
 {
 	/// <include file='Mock.Generic.xdoc' path='docs/doc[@for="Mock{T}"]/*'/>
-	public partial class Mock<T> : Mock where T : class
+    public partial class Mock<T> : Mock, IMock<T> where T : class
 	{
 		private static IProxyFactory proxyFactory = new CastleProxyFactory();
 		private T instance;
@@ -113,9 +114,16 @@ namespace Moq
 		{
 			typeof(T).ThrowIfNotMockeable();
 
-			if (typeof(T).IsInterface && this.constructorArguments.Length > 0)
+			if (this.constructorArguments.Length > 0)
 			{
-				throw new ArgumentException(Resources.ConstructorArgsForInterface);
+				if (typeof(T).IsInterface)
+				{
+					throw new ArgumentException(Properties.Resources.ConstructorArgsForInterface);
+				}
+				if (typeof(T).IsDelegate())
+				{
+					throw new ArgumentException(Properties.Resources.ConstructorArgsForDelegate);
+				}
 			}
 		}
 
@@ -135,11 +143,48 @@ namespace Moq
 		{
 			PexProtector.Invoke(() =>
 			{
-				this.instance = proxyFactory.CreateProxy<T>(
-					this.Interceptor,
-					this.ImplementedInterfaces.ToArray(),
-					this.constructorArguments);
+				if (typeof(T).IsDelegate())
+				{
+					// We're mocking a delegate.
+					// Firstly, get/create an interface with a method whose signature
+					// matches that of the delegate.
+					var delegateInterfaceType = proxyFactory.GetDelegateProxyInterface(typeof(T), out delegateInterfaceMethod);
+
+					// Then create a proxy for that.
+					var delegateProxy = proxyFactory.CreateProxy(
+						delegateInterfaceType,
+						this.Interceptor,
+						this.ImplementedInterfaces.ToArray(),
+						this.constructorArguments);
+
+					// Then our instance is a delegate of the desired type, pointing at the
+					// appropriate method on that proxied interface instance.
+					this.instance = (T)(object)Delegate.CreateDelegate(typeof(T), delegateProxy, delegateInterfaceMethod);
+				}
+				else
+				{
+					this.instance = (T)proxyFactory.CreateProxy(
+						typeof(T),
+						this.Interceptor,
+						this.ImplementedInterfaces.ToArray(),
+						this.constructorArguments);
+				}
 			});
+		}
+
+		private MethodInfo delegateInterfaceMethod;
+
+		/// <inheritdoc />
+		internal override MethodInfo DelegateInterfaceMethod
+		{
+			get
+			{
+				// Ensure object is created, which causes the delegateInterfaceMethod
+				// to be initialised.
+				OnGetObject();
+
+				return delegateInterfaceMethod;
+			}
 		}
 
 		/// <summary>

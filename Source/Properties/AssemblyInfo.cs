@@ -1,17 +1,16 @@
-﻿using System;
+using System;
 using System.Reflection;
 using System.Resources;
 using System.Runtime.CompilerServices;
 using System.Runtime.InteropServices;
 
 [assembly: AssemblyTitle("Moq")]
-[assembly: AssemblyDescription("Mocking library for .NET 3.5+ and C# 3.0+, heavily based on Linq")]
 [assembly: AssemblyCompany("Clarius Consulting, Manas Technology Solutions, InSTEDD")]
 [assembly: AssemblyProduct("Moq")]
 [assembly: AssemblyTrademark("")]
 [assembly: AssemblyCulture("")]
-[assembly: AssemblyVersion("4.0.10818.0")]
-[assembly: AssemblyFileVersion("4.0.0.0")]
+[assembly: AssemblyVersion("4.1.1308.2321")]
+[assembly: AssemblyFileVersion("4.1.1308.2321")]
 
 [assembly: ComVisible(false)]
 [assembly: NeutralResourcesLanguage("en")]

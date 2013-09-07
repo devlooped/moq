@@ -1,4 +1,5 @@
 ﻿using System;
+
 using Xunit;
 using System.Collections.Generic;
 
@@ -211,6 +212,24 @@ namespace Moq.Tests
 			Assert.Equal(int.MinValue, mock.Object.Value);
 		}
 
+		[Fact]
+		public void ReturnsValueFromBaseMethod()
+		{
+			var mock = new Mock<Foo>();
+			mock.Setup(foo => foo.Execute()).CallBase();
+
+			Assert.Equal("Ok", mock.Object.Execute());
+		}
+
+		[Fact]
+		public void ReturnsValueFromBaseProperty()
+		{
+			var mock = new Mock<Foo>();
+			mock.SetupGet(foo => foo.StringProperty).CallBase();
+
+			Assert.Equal("Text", mock.Object.StringProperty);
+		}
+
 		public interface IFoo
 		{
 			void Execute();
@@ -226,6 +245,19 @@ namespace Moq.Tests
 			IList<int> ReturnIntList();
 
 			int Value { get; set; }
+		}
+
+		public class Foo
+		{
+			public virtual string Execute()
+			{
+				return "Ok";
+			}
+
+			public virtual string StringProperty
+			{
+				get { return "Text"; }
+			}
 		}
 	}
 }

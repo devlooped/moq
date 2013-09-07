@@ -137,6 +137,14 @@ namespace Moq
 			remoteStackTraceString.SetValue(exception, stackTrace);
 		}
 
+		/// <summary>
+		/// Tests if a type is a delegate type (subclasses <see cref="Delegate" />).
+		/// </summary>
+		public static bool IsDelegate(this Type t)
+		{
+			return t.IsSubclassOf(typeof(Delegate));
+		}
+
 		public static void ThrowIfNotMockeable(this Type typeToMock)
 		{
 			if (!IsMockeable(typeToMock))
@@ -174,7 +182,7 @@ namespace Moq
 		{
 			// A value type does not match any of these three 
 			// condition and therefore returns false.
-			return typeToMock.IsInterface || typeToMock.IsAbstract || (typeToMock.IsClass && !typeToMock.IsSealed);
+			return typeToMock.IsInterface || typeToMock.IsAbstract || typeToMock.IsDelegate() || (typeToMock.IsClass && !typeToMock.IsSealed);
 		}
 
 		public static bool CanOverride(this MethodBase method)
@@ -186,8 +194,8 @@ namespace Moq
 		{
 			if (property.CanRead)
 			{
-				var getter = property.GetGetMethod();
-				return getter != null && getter.IsVirtual && !getter.IsFinal;
+				var getter = property.GetGetMethod(true);
+				return getter != null && getter.CanOverride();
 			}
 
 			return false;
@@ -197,8 +205,8 @@ namespace Moq
 		{
 			if (property.CanWrite)
 			{
-				var setter = property.GetSetMethod();
-				return setter != null && setter.IsVirtual && !setter.IsFinal;
+				var setter = property.GetSetMethod(true);
+				return setter != null && setter.CanOverride();
 			}
 
 			return false;

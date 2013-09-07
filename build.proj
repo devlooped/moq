@@ -1,0 +1,88 @@
+<?xml version="1.0" encoding="utf-8"?>
+<Project ToolsVersion="4.0"
+         DefaultTargets="Build"
+         xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
+    <Import Project="$(MSBuildThisFileDirectory)Common\ClariusLabs.tasks" />
+
+    <PropertyGroup>
+        <Configuration Condition="'$(Configuration)' == ''">Release</Configuration>
+        <BuildRoot>$(MSBuildThisFileDirectory)</BuildRoot>
+        <DropDirectory>$(BuildRoot)build\</DropDirectory>
+        <NuGetExe>$(BuildRoot).nuget\NuGet.exe</NuGetExe>
+        <ReleaseNotes>$([System.IO.File]::ReadAllText('$(BuildRoot)ReleaseNotes.md'))</ReleaseNotes>
+    </PropertyGroup>
+
+    <Target Name="Build" DependsOnTargets="ReplaceCurrentVersions">
+        <MakeDir Directories="$(DropDirectory)" Condition="!Exists('$(DropDirectory)')" />
+        <Delete Files="$(DropDirectory)**\*.*" ContinueOnError="false" />
+
+        <MSBuild Projects="Source\Moq.csproj"
+                 Properties="NuGet=true;TargetFrameworkVersion=v3.5;Configuration=$(Configuration)"
+                 Targets="Rebuild" />
+        <Exec Command="xcopy &quot;Source\bin\Release\Moq.*&quot; &quot;$(DropDirectory)lib\net35\&quot; /Y" ContinueOnError="false" />
+
+        <MSBuild Projects="Source\Moq.csproj"
+                 Properties="NuGet=true;TargetFrameworkVersion=v4.0;Configuration=$(Configuration)"
+                 Targets="Rebuild" />
+        <Exec Command="xcopy &quot;Source\bin\Release\Moq.*&quot; &quot;$(DropDirectory)lib\net40\&quot; /Y" ContinueOnError="false" />
+
+        <MSBuild Projects="Source.Silverlight\Moq.Silverlight.csproj"
+                 Properties="Configuration=$(Configuration)"
+                 Targets="Rebuild" />
+        <Exec Command="xcopy &quot;Source.Silverlight\bin\Release\Moq.*&quot; &quot;$(DropDirectory)lib\sl4\&quot; /Y" ContinueOnError="false" />
+
+        <Copy SourceFiles="Moq.nuspec" DestinationFolder="$(DropDirectory)" />
+        <!-- Copy source for symbolsource integration -->
+        <ItemGroup>
+            <SymbolSource Include="Source\**\*.cs" />
+        </ItemGroup>
+        <Copy SourceFiles="@(SymbolSource)" DestinationFiles="@(SymbolSource->'$(DropDirectory)src\%(RecursiveDir)%(Filename)%(Extension)')" ContinueOnError="false" SkipUnchangedFiles="true" OverwriteReadOnlyFiles="true" />
+
+        <!-- Finally build the package -->
+        <Exec Command="$(NuGetExe) pack -NoPackageAnalysis $(DropDirectory)Moq.nuspec -Symbols -OutputDirectory $(DropDirectory) -Version $(PackageVersion)"
+              ContinueOnError="false" />
+    </Target>
+
+    <Target Name="ReplaceCurrentVersions">
+        <ReadAssemblyVersion File="Source\Properties\AssemblyInfo.cs">
+            <Output PropertyName="Major"
+                    TaskParameter="Major"/>
+            <Output PropertyName="Minor"
+                    TaskParameter="Minor"/>
+        </ReadAssemblyVersion>
+
+        <PropertyGroup Condition="'$(FileVersion)' == ''">
+            <!-- Build number is of the format (2 digit year)(2 digit month) -->
+            <Build>$([System.DateTime]::UtcNow.ToString("yyMM"))</Build>
+            <!-- Revision number is of the format (2 digit hour)(2 digit minutes) -->
+            <Revision>$([System.DateTime]::UtcNow.ToString("ddHH"))</Revision>
+            <FileVersion>$(Major).$(Minor).$(Build).$(Revision)</FileVersion>
+            <!-- TODO: maybe we should have two builds, one that builds the public simplified version
+                 and one with the full build/revision -->
+        </PropertyGroup>
+    
+        <PropertyGroup>
+            <PackageVersion>$(FileVersion)</PackageVersion>
+        </PropertyGroup>
+
+        <ItemGroup>
+            <_VersionRegexTransform Include="Source\Properties\AssemblyInfo.cs">
+                <Find>AssemblyFileVersion\(".*?"\)</Find>
+                <ReplaceWith>AssemblyFileVersion("$(FileVersion)")</ReplaceWith>
+            </_VersionRegexTransform>
+            <_VersionRegexTransform Include="Source\Properties\AssemblyInfo.cs">
+                <Find>AssemblyVersion\(".*?"\)</Find>
+                <ReplaceWith>AssemblyVersion("$(FileVersion)")</ReplaceWith>
+            </_VersionRegexTransform>
+            <_VersionRegexTransform Include="$(BuildRoot)**\*.nuspec"
+                            Condition="'$(ReleaseNotes)' != ''">
+                <Find><![CDATA[<releaseNotes />|<releaseNotes/>|<releaseNotes>.*</releaseNotes>]]></Find>
+                <ReplaceWith><![CDATA[<releaseNotes>$(ReleaseNotes)</releaseNotes>]]></ReplaceWith>
+                <Options>Singleline</Options>
+            </_VersionRegexTransform>
+        </ItemGroup>
+
+        <RegexTransform Items="@(_VersionRegexTransform)" />
+    </Target>
+
+</Project>

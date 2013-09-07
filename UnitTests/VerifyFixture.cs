@@ -2,6 +2,10 @@
 using Moq;
 using Xunit;
 
+#if !SILVERLIGHT
+using System.Threading.Tasks;
+#endif
+
 namespace Moq.Tests
 {
 	public class VerifyFixture
@@ -875,6 +879,19 @@ namespace Moq.Tests
 
             mock.Verify(foo => foo.Call(It.IsAny<IBazParam>()), Times.Exactly(2));
         }
+
+#if !SILVERLIGHT
+        [Fact]
+        public void DoesNotThrowCollectionModifiedWhenMoreInvocationsInterceptedDuringVerfication()
+        {
+            var mock = new Mock<IFoo>();
+            Parallel.For(0, 100, (i) =>
+            {
+                mock.Object.Submit();
+                mock.Verify(foo => foo.Submit());
+            });
+        }
+#endif
 
 		public interface IBar
 		{

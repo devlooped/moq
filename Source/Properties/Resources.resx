@@ -149,6 +149,9 @@
   <data name="ConstructorArgsForInterface" xml:space="preserve">
     <value>Constructor arguments cannot be passed for interface mocks.</value>
   </data>
+  <data name="ConstructorArgsForDelegate" xml:space="preserve">
+    <value>Constructor arguments cannot be passed for delegate mocks.</value>
+  </data>
   <data name="ConstructorNotFound" xml:space="preserve">
     <value>A matching constructor for the given arguments was not found on the mocked type.</value>
   </data>

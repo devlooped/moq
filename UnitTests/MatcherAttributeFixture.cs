@@ -138,9 +138,7 @@ namespace Moq.Tests
 		{
 			var mock = new Mock<IFoo>(MockBehavior.Strict);
 
-			Assert.Throws<MissingMethodException>(
-				"public static bool MatcherHookWithoutMatcherMethod(System.String) in class Moq.Tests.MatcherAttributeFixture.",
-				() => mock.Setup(x => x.Bar(MatcherHookWithoutMatcherMethod())));
+			Assert.Throws<MissingMethodException>(() => mock.Setup(x => x.Bar(MatcherHookWithoutMatcherMethod())));
 		}
 
 #pragma warning disable 618
@@ -156,9 +154,7 @@ namespace Moq.Tests
 		{
 			var mock = new Mock<IFoo>(MockBehavior.Strict);
 
-			Assert.Throws<MissingMethodException>(
-				"public static bool MatcherHook2WithoutMatcherMethod(System.String, System.Int32) in class Moq.Tests.MatcherAttributeFixture.",
-				() => mock.Setup(x => x.Bar(MatcherHook2WithoutMatcherMethod(6))));
+			Assert.Throws<MissingMethodException>(() => mock.Setup(x => x.Bar(MatcherHook2WithoutMatcherMethod(6))));
 		}
 
 #pragma warning disable 618
@@ -199,9 +195,7 @@ namespace Moq.Tests
 		{
 			var mock = new Mock<IFoo>(MockBehavior.Strict);
 
-			Assert.Throws<MissingMethodException>(
-				"public bool NonStaticMatcherHookWithoutMatcherMethod(System.String) in class Moq.Tests.MatcherAttributeFixture.",
-				() => mock.Setup(x => x.Bar(NonStaticMatcherHookWithoutMatcherMethod())));
+			Assert.Throws<MissingMethodException>(() => mock.Setup(x => x.Bar(NonStaticMatcherHookWithoutMatcherMethod())));
 		}
 
 #pragma warning disable 618

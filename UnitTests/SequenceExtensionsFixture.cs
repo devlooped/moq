@@ -36,10 +36,33 @@ namespace Moq.Tests
 			Assert.Throws<SystemException>(() => temp = mock.Object.Value);
 		}
 
+		[Fact]
+		public void PerformSequenceWithCallBase()
+		{
+			var mock = new Mock<Foo>();
+
+			mock.SetupSequence(x => x.Do())
+				.Returns("Good")
+				.CallBase()
+				.Throws<InvalidOperationException>();
+
+			Assert.Equal("Good", mock.Object.Do());
+			Assert.Equal("Ok", mock.Object.Do());
+			Assert.Throws<InvalidOperationException>(() => mock.Object.Do());
+		}
+
 		public interface IFoo
 		{
 			string Value { get; set; }
 			int Do();
+		}
+
+		public class Foo
+		{
+			public virtual string Do()
+			{
+				return "Ok";
+			}
 		}
 	}
 }

@@ -82,5 +82,11 @@ namespace Moq.Language
 		/// that moment.
 		/// </example>
 		IReturnsResult<TMock> Returns(Func<TProperty> valueFunction);
+
+		/// <summary>
+		/// Calls the real property of the object and returns its return value.
+		/// </summary>
+		/// <returns>The value calculated by the real property of the object.</returns>
+		IReturnsResult<TMock> CallBase();
 	}
 }

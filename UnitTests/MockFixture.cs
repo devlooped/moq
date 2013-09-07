@@ -257,10 +257,14 @@ namespace Moq.Tests
 		[Fact]
 		public void ThrowsIfNoMatchingConstructorFound()
 		{
-			Assert.Throws<ArgumentException>(() =>
-			{
-				Console.WriteLine(new Mock<ClassWithNoDefaultConstructor>(25, true).Object);
-			});
+            try
+            {
+                Console.WriteLine(new Mock<ClassWithNoDefaultConstructor>(25, true).Object);
+                Assert.True(false, "Should have thrown an exception since constructor does not exist.");
+            }
+            catch (Exception)
+            {
+            }
 		}
 
 		[Fact]
@@ -760,6 +764,25 @@ namespace Moq.Tests
 		public void CanCreateMockOfInternalInterface()
 		{
 			Assert.NotNull(new Mock<ClassLibrary1.IFooInternal>().Object);
+		}
+
+		/// <summary>
+		/// Mostly testing that these casts compile, but also that there are no runtime failures.
+		/// </summary>
+		[Fact]
+		public void CanBeCastToIMockWithCovariance()
+		{
+			var mock = new Mock<INewBar>();
+			mock.Setup(x => x.Value).Returns("bar");
+
+			var foo = MakeFoo(mock);
+			Assert.Equal("bar", foo.Bar.Value);
+			mock.Verify(x => x.Value, Times.Once());
+		}
+
+		private static Foo MakeFoo(IMock<IBar> barMock)
+		{
+			return new Foo(barMock.Object);
 		}
 
 		public class Foo

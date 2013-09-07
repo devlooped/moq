@@ -1,5 +1,6 @@
-# Ignore file for Visual Studio 2008/2010
-
+#ignore thumbnails created by windows
+Thumbs.db
+#Ignore files build by Visual Studio
 *.obj
 *.exe
 *.pdb
@@ -17,6 +18,8 @@
 *.cache
 *.ilk
 *.log
+[Bb]in
+[Dd]ebug*/
 *.lib
 *.sbr
 *.scc
@@ -28,8 +31,12 @@ obj/
 *resharper*
 _ReSharper*/
 [Tt]est[Rr]esult*
+[bB]uild/
 [Bb]uild[Ll]og.*
 *.[Pp]ublish.xml
+*.pidb
+*.userprefs
+*.swp
+*.DotSettings
 
-
-
+/packages

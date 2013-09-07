@@ -6,11 +6,12 @@ using Moq.Proxy;
 
 namespace Moq
 {
-
 	internal enum InterceptionAction
 	{
- 		Continue,Stop
+ 		Continue,
+        Stop
 	}
+
 	internal interface IInterceptStrategy
 	{
 		/// <summary>

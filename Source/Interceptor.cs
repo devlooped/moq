@@ -70,7 +70,13 @@ namespace Moq
 
 		internal IEnumerable<ICallContext> ActualCalls
 		{
-			get { return this.actualInvocations; }
+			get
+			{
+			    lock (actualInvocations)
+			    {
+                    return this.actualInvocations.ToList();
+			    }
+			}
 		}
 
 		internal Mock Mock { get; private set; }
@@ -145,24 +151,24 @@ namespace Moq
 		[SuppressMessage("Microsoft.Maintainability", "CA1502:AvoidExcessiveComplexity")]
 		public void Intercept(ICallContext invocation)
 		{
-			
-			lock (Mock) // this solves issue #249
-			{
-				var interceptionContext = new InterceptStrategyContext(Mock
-																	, targetType
-																	, invocationLists
-																	, actualInvocations
-																	, behavior
-																	, orderedCalls
-																	);
-				foreach (var strategy in InterceptionStrategies())
-				{
-					if (InterceptionAction.Stop == strategy.HandleIntercept(invocation, interceptionContext))
-					{
-						break;
-					}
-				}
-			}
+
+            lock (Mock) // this solves issue #249
+            {
+                var interceptionContext = new InterceptStrategyContext(Mock
+                                                                    , targetType
+                                                                    , invocationLists
+                                                                    , actualInvocations
+                                                                    , behavior
+                                                                    , orderedCalls
+                                                                    );
+                foreach (var strategy in InterceptionStrategies())
+                {
+                    if (InterceptionAction.Stop == strategy.HandleIntercept(invocation, interceptionContext))
+                    {
+                        break;
+                    }
+                }
+            }
 		}
 		
 

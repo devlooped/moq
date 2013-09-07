@@ -114,6 +114,14 @@ namespace Moq
 			get { return reason; }
 		}
 
+        /// <summary>
+        /// Indicates whether this exception is a verification fault raised by Verify()
+        /// </summary>
+        public bool IsVerificationError
+        {
+            get { return reason == ExceptionReason.VerificationFailed; }
+        }
+
 		private static string GetMessage(
 			MockBehavior behavior,
 			ICallContext invocation,
