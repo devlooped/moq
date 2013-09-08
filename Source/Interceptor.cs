@@ -74,7 +74,7 @@ namespace Moq
 			{
 			    lock (actualInvocations)
 			    {
-                    return this.actualInvocations.ToList();
+                    return this.actualInvocations;
 			    }
 			}
 		}
