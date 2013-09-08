@@ -346,7 +346,7 @@ namespace Moq
 			Expression expression,
 			Times times)
 		{
-			var callCount = targetInterceptor.ActualCalls.Where(ac => expected.Matches(ac)).Count();
+			var callCount = targetInterceptor.ActualCalls.ToList().Where(ac => expected.Matches(ac)).Count();
 			if (!times.Verify(callCount))
 			{
 				var setups = targetInterceptor.OrderedCalls.Where(oc => AreSameMethod(oc.SetupExpression, expression));
