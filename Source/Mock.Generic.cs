@@ -139,11 +139,16 @@ namespace Moq
 			get { return (T)base.Object; }
 		}
 
+        internal override bool IsDelegateMock
+        {
+            get { return typeof(T).IsDelegate(); }
+        }
+
 		private void InitializeInstance()
 		{
 			PexProtector.Invoke(() =>
 			{
-				if (typeof(T).IsDelegate())
+				if (this.IsDelegateMock)
 				{
 					// We're mocking a delegate.
 					// Firstly, get/create an interface with a method whose signature

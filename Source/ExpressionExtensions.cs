@@ -238,7 +238,7 @@ namespace Moq
 		{
 			Guard.NotNull(() => expression, expression);
 
-			if (mock.DelegateInterfaceMethod != null)
+			if (mock.IsDelegateMock)
 			{
 				// We're a mock for a delegate, so this call can only
 				// possibly be the result of invoking the delegate.
