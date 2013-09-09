@@ -12,8 +12,8 @@
     <description>The most popular and friendly mocking framework for .NET</description>
     <tags>tdd mocking mocks unittesting agile</tags>
     <releaseNotes>Version 4.1
-* Added covariant IMock{out T} interface to Mock{T}
-* Added It.IsNotNull{T}
+* Added covariant IMock&lt;out T&gt; interface to Mock&lt;T&gt;
+* Added It.IsNotNull&lt;T&gt;
 * Fix: 'NullReferenceException when subscribing to an event'
 * Added overloads to Verify to accept Times as a Method Group
 * Feature request: It.IsIn(..), It.IsNotIn(...)
@@ -42,11 +42,11 @@ Version 4.0
   *  200	Fluent mock does not honor parent mock CallBase setting.
   *  202	Mock.Protected().Expect() deprecated with no work-around
   *  204	Allow default return values to be specified (per-mock)
-  *  205	Error calling SetupAllProperties for Mock{IDataErrorInfo}
+  *  205	Error calling SetupAllProperties for Mock&lt;IDataErrorInfo&gt;
   *  206	Linq-to-Mocks Never Returns on Implicit Boolean Property
   *  207	NullReferenceException thrown when using Mocks.CreateQuery with implicit boolean expression
   *  208	Can't setup a mock for method that accept lambda expression as argument.
-  *  211	SetupAllProperties should return the Mock{T} instead of void. 
+  *  211	SetupAllProperties should return the Mock&lt;T&gt; instead of void. 
   *  223	When a method is defined to make the setup an asserts mock fails
   *  226	Can't raise events on mocked Interop interfaces
   *  229	CallBase is not working for virtual events
@@ -63,12 +63,12 @@ Version 4.0
 Version 3.0
 
 * Silverlight support! Finally integrated Jason's Silverlight contribution! Issue #73
-* Brand-new simplified event raising syntax (#130): mock.Raise(foo = foo.MyEvent += null, new MyArgs(...));
-* Support for custom event signatures (not compatible with EventHandler): mock.Raise(foo = foo.MyEvent += null, arg1, arg2, arg3);
-* Substantially improved property setter behavior: mock.VerifySet(foo = foo.Value = "foo");  //(also available for SetupSet
+* Brand-new simplified event raising syntax (#130): mock.Raise(foo =&gt; foo.MyEvent += null, new MyArgs(...));
+* Support for custom event signatures (not compatible with EventHandler): mock.Raise(foo =&gt; foo.MyEvent += null, arg1, arg2, arg3);
+* Substantially improved property setter behavior: mock.VerifySet(foo =&gt; foo.Value = "foo");  //(also available for SetupSet
 * Renamed Expect* with Setup*
-* Vastly simplified custom argument matchers: public int IsOdd() { return Match{int}.Create(v = i % 2 == 0); }
-* Added support for verifying how many times a member was invoked: mock.Verify(foo = foo.Do(), Times.Never());
+* Vastly simplified custom argument matchers: public int IsOdd() &lt; return Match&lt;int&gt;.Create(v =&gt; i % 2 == 0); &gt;
+* Added support for verifying how many times a member was invoked: mock.Verify(foo =&gt; foo.Do(), Times.Never());
 * Added simple sample app named StoreSample
 * Moved Stub functionality to the core API (SetupProperty and SetupAllProperties)
 * Fixed sample ASP.NET MVC app to work with latest version
@@ -79,7 +79,7 @@ Version 3.0
 * Implemented improvement #124 to render better error messages
 * Applied patch from David Kirkland for improvement #125 to improve matching of enumerable parameters
 * Implemented improvement #122 to provide custom errors for Verify
-* Implemented improvement #121 to provide null as default value for Nullable{T}
+* Implemented improvement #121 to provide null as default value for Nullable&lt;T&gt;
 * Fixed issue #112 which fixes passing a null argument to a mock constructor
 * Implemented improvement #111 to better support params arguments
 * Fixed bug #105 about improperly overwriting setups for property getter and setter
@@ -92,14 +92,14 @@ Version 3.0
 Version 2.6
 
 * Implemented Issue #55: We now provide a mock.DefaultValue = [DefaultValue.Empty | DefaultValue.Mock] which will provide the current behavior (default) or mocks for mockeable return types for loose mock invocations without expectations.
-* Added support for stubbing properties from moq-contrib: now you can do mock.Stub(m = m.Value) and add stub behavior to the property. mock.StubAll() is also provided. This integrates with the DefaultValue behavior too, so you can stub entire hierarchies :).
+* Added support for stubbing properties from moq-contrib: now you can do mock.Stub(m =&gt; m.Value) and add stub behavior to the property. mock.StubAll() is also provided. This integrates with the DefaultValue behavior too, so you can stub entire hierarchies :).
 * Added support for mocking methods with out and ref parameters (Issue #50)
 * Applied patch contributed by slava for Issue #72: add support to limit numbor of calls on mocked method (we now have mock.Expect(...).AtMost(5))
 * Implemented Issue #94: Easier setter verification: Now we support ExpectSet(m = m.Value, "foo") and VerifySet(m = m.Value, 5) (Thanks ASP.NET MVC Team!)
 * Implemented issue #96: Automatically chain mocks when setting expectations. It's now possible to specify expectations for an entire hierarchy of objects just starting from the root mock. THIS IS REALLY COOL!!!
 * Fixed Issue #89: Expects() does not always return last expectation
 * Implemented Issue 91: Expect a method/property to never be called (added Never() method to an expectation. Can be used on methods, property getters and setters)
-* Fixed Issue 86: IsAny{T} should check if the value is actually of type T
+* Fixed Issue 86: IsAny&lt;T&gt; should check if the value is actually of type T
 * Fixed Issue 88: Cannot mock protected internal virtual methods using Moq.Protected
 * Fixed Issue 90: Removing event handlers from mocked objects
 * Updated demo and added one more test for the dynamic addition of interfaces
@@ -112,17 +112,17 @@ Version 2.5
 * Added support for firing events from expectations
 * Removed usage of MBROs which caused inconsistencies in mocking features
 * Added ExpectGet and ExpectSet to better support properties, and provide better intellisense.
-* Added verification with expressions, which better supports Arrange-Act-Assert testing model (can do Verify(m = m.Do(...)))
-* Added Throws{TException}
+* Added verification with expressions, which better supports Arrange-Act-Assert testing model (can do Verify(m =&gt; m.Do(...)))
+* Added Throws&lt;TException&gt;
 * Added mock.CallBase property to specify whether the virtual members base implementation should be called
-* Added support for implementing and setting expectations and verifying additional interfaces in the mock, via the new mock.As{TInterface}() method (thanks Fernando Simonazzi!)
+* Added support for implementing and setting expectations and verifying additional interfaces in the mock, via the new mock.As&lt;TInterface&gt;() method (thanks Fernando Simonazzi!)
 * Improved argument type matching for Is/IsAny  (thanks Jeremy.Skinner!)
 
 
 Version 2.0
 
 * Refactored fluent API on mocks. This may cause some existing tests to fail, but the fix is trivial (just reorder the calls to Callback, Returns and Verifiable)
-* Added support for retrieving a Mock{T} from a T instance created by a mock.
+* Added support for retrieving a Mock&lt;T&gt; from a T instance created by a mock.
 * Added support for retrieving the invocation arguments from a Callback or Returns.
 * Implemented AtMostOnce() constraint 
 * Added support for creating MBROs with protected constructors
