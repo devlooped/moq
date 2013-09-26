@@ -99,19 +99,19 @@ namespace Moq
 				if (attr != null)
 				{
 					var matcher = attr.CreateMatcher();
-					matcher.Initialize(expression);
+					matcher.Initialize(originalExpression);
 					return matcher;
 				}
 				else if (staticMatcherMethodAttr != null)
 				{
 					var matcher = new MatcherAttributeMatcher();
-					matcher.Initialize(expression);
+					matcher.Initialize(originalExpression);
 					return matcher;
 				}
 				else
 				{
 					var matcher = new LazyEvalMatcher();
-					matcher.Initialize(expression);
+					matcher.Initialize(originalExpression);
 					return matcher;
 				}
 			}
