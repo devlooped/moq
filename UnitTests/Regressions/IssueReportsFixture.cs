@@ -1889,5 +1889,25 @@ namespace Moq.Tests.Regressions
 #endif
 
         #endregion
+
+        #region Matcher should work with Convert
+
+        public class MatcherConvertFixture
+        {
+            public interface IFoo
+            {
+                string M(long l);
+            }
+
+            [Fact]
+            public void MatcherDoesNotIgnoreConvert()
+            {
+                var mock = new Mock<IFoo>(MockBehavior.Strict);
+                mock.Setup(x => x.M(int.Parse("2"))).Returns("OK");
+                Assert.Equal("OK", mock.Object.M(2L));
+            }
+        }
+
+        #endregion
     }
 }
