@@ -12,6 +12,7 @@ namespace Moq
 		private int expectationsCount;
 		private Mock<TMock> mock;
 		private Expression<Func<TMock, TResult>> expression;
+		private readonly Action callbackAction;
 
 		public SetupSequentialContext(
 			Mock<TMock> mock,
@@ -19,6 +20,7 @@ namespace Moq
 		{
 			this.mock = mock;
 			this.expression = expression;
+			this.callbackAction = () => currentStep++;
 		}
 
 		public ISetupSequentialResult<TResult> CallBase()
@@ -39,7 +41,12 @@ namespace Moq
 
 		private void EndSetup(ICallback callback)
 		{
-			callback.Callback(() => currentStep++);
+			callback.Callback(callbackAction);
+		}
+
+		private void EndSetup(ICallback<TMock, TResult> callback)
+		{
+			callback.Callback(callbackAction);
 		}
 
 		public ISetupSequentialResult<TResult> Returns(TResult value)
@@ -48,16 +55,20 @@ namespace Moq
 			return this;
 		}
 
-		public void Throws(Exception exception)
+		public ISetupSequentialResult<TResult> Throws(Exception exception)
 		{
             var setup = this.GetSetup();
             setup.Throws(exception);
-            setup.Callback(() => currentStep++);
+			this.EndSetup(setup);
+			return this;
 		}
 
-		public void Throws<TException>() where TException : Exception, new()
+		public ISetupSequentialResult<TResult> Throws<TException>() where TException : Exception, new()
 		{
-			this.GetSetup().Throws<TException>();
+			var setup = this.GetSetup();
+			setup.Throws<TException>();
+			this.EndSetup(setup);
+			return this;
 		}
 	}
 }

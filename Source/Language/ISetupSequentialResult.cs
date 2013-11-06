@@ -19,13 +19,13 @@ namespace Moq.Language
 		/// <summary>
 		/// Throws an exception
 		/// </summary>
-		void Throws(Exception exception);
+		ISetupSequentialResult<TResult> Throws(Exception exception);
 
 		/// <summary>
 		/// Throws an exception
 		/// </summary>
 		[SuppressMessage("Microsoft.Design", "CA1004:GenericMethodsShouldProvideTypeParameter", Justification = "By Design")]
-		void Throws<TException>() where TException : Exception, new();
+		ISetupSequentialResult<TResult> Throws<TException>() where TException : Exception, new();
 
 		/// <summary>
 		/// Calls original method
