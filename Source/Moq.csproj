@@ -86,6 +86,7 @@
       <DesignTime>True</DesignTime>
       <DependentUpon>IReturns.tt</DependentUpon>
     </Compile>
+    <Compile Include="Language\IReturnsExtensions.cs" />
     <Compile Include="Language\ISetupSequentialResult.cs" />
     <Compile Include="Language\ISetupConditionResult.cs" />
     <Compile Include="Linq\FluentMockVisitor.cs" />
