@@ -59,7 +59,7 @@ namespace Moq
 	internal partial class MethodCall<TMock> : MethodCall, ISetup<TMock>
 		where TMock : class
 	{
-		public MethodCall(Mock mock, Func<bool> condition, Expression originalExpression, MethodInfo method,
+		public MethodCall(Mock mock, Condition condition, Expression originalExpression, MethodInfo method,
 			params Expression[] arguments)
 			: base(mock, condition, originalExpression, method, arguments)
 		{
@@ -81,20 +81,49 @@ namespace Moq
 		}
 	}
 
-    internal class TypeEqualityComparer : IEqualityComparer<Type>
-    {
-        public bool Equals(Type x, Type y)
-        {
-            return y.IsAssignableFrom(x);
-        }
+	internal class TypeEqualityComparer : IEqualityComparer<Type>
+	{
+		public bool Equals(Type x, Type y)
+		{
+			return y.IsAssignableFrom(x);
+		}
 
-        public int GetHashCode(Type obj)
-        {
-            return obj.GetHashCode();
-        }
-    }
+		public int GetHashCode(Type obj)
+		{
+			return obj.GetHashCode();
+		}
+	}
 
-    internal partial class MethodCall : IProxyCall, ICallbackResult, IVerifies, IThrowsResult
+	internal class Condition
+	{
+		private readonly Func<bool> mCondition;
+		private readonly Action mEvaluatedSuccessfully;
+
+		public Condition(Func<bool> condition, Action evaluatedSuccessfully = null)
+		{
+			mCondition = condition;
+			mEvaluatedSuccessfully = evaluatedSuccessfully;
+		}
+
+		public bool IsTrue
+		{
+			get
+			{
+				if (mCondition != null)
+					return mCondition();
+				else
+					return false;
+			}
+		}
+
+		public void EvaluatedSuccessfully()
+		{
+			if (mEvaluatedSuccessfully != null)
+				mEvaluatedSuccessfully();
+		}
+	}
+
+	internal partial class MethodCall : IProxyCall, ICallbackResult, IVerifies, IThrowsResult
 	{
 		// Internal for AsMockExtensions
 		private Expression originalExpression;
@@ -106,11 +135,11 @@ namespace Moq
 		private Delegate mockEventArgsFunc;
 		private object[] mockEventArgsParams;
 		private int? expectedCallCount = null;
-		protected Func<bool> condition;
+		protected Condition condition;
 		private List<KeyValuePair<int, object>> outValues = new List<KeyValuePair<int, object>>();
-	    private static readonly IEqualityComparer<Type> typesComparer = new TypeEqualityComparer();
+		private static readonly IEqualityComparer<Type> typesComparer = new TypeEqualityComparer();
 
-	    public MethodCall(Mock mock, Func<bool> condition, Expression originalExpression, MethodInfo method, params Expression[] arguments)
+		public MethodCall(Mock mock, Condition condition, Expression originalExpression, MethodInfo method, params Expression[] arguments)
 		{
 			this.Mock = mock;
 			this.condition = condition;
@@ -218,7 +247,7 @@ namespace Moq
 
 		public virtual bool Matches(ICallContext call)
 		{
-			if (condition != null && !condition())
+			if (condition != null && !condition.IsTrue)
 			{
 				return false;
 			}
@@ -243,6 +272,8 @@ namespace Moq
 					}
 				}
 
+				if (condition != null)
+					condition.EvaluatedSuccessfully();
 				return true;
 			}
 
@@ -377,13 +408,13 @@ namespace Moq
 			{
 				if (!this.Method.Name.Equals(call.Method.Name, StringComparison.Ordinal) ||
 					this.Method.ReturnType != call.Method.ReturnType ||
-                    !this.Method.IsGenericMethod &&
+					!this.Method.IsGenericMethod &&
 					!call.Method.GetParameterTypes().SequenceEqual(this.Method.GetParameterTypes()))
 				{
 					return false;
 				}
 
-				if (Method.IsGenericMethod && !call.Method.GetGenericArguments().SequenceEqual(Method.GetGenericArguments(),typesComparer))
+				if (Method.IsGenericMethod && !call.Method.GetGenericArguments().SequenceEqual(Method.GetGenericArguments(), typesComparer))
 				{
 					return false;
 				}

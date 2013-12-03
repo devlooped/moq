@@ -49,9 +49,9 @@ namespace Moq
 		where T : class
 	{
 		private Mock<T> mock;
-		private Func<bool> condition;
+		private Condition condition;
 
-		public ConditionalContext(Mock<T> mock, Func<bool> condition)
+		public ConditionalContext(Mock<T> mock, Condition condition)
 		{
 			this.mock = mock;
 			this.condition = condition;

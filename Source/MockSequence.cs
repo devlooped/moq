@@ -1,8 +1,4 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using Moq.Language;
+﻿using Moq.Language;
 
 namespace Moq
 {
@@ -40,18 +36,9 @@ namespace Moq
 		{
 			var expectationPosition = sequenceLength++;
 
-			// HACK assume condition is only
-			// evaluated once. issues to attach callback lately.
-			return mock.When(() =>
-			{
-				var c = expectationPosition == sequenceStep;
-				if (c)
-				{
-					this.NextStep();
-				}
-
-				return c;
-			});
+			return mock.When(new Condition(
+				condition: () => expectationPosition == sequenceStep,
+				evaluatedSuccessfully: NextStep));
 		}
 	}
 

@@ -59,7 +59,7 @@ namespace Moq
 		{
 		}
 
-		public SetterMethodCall(Mock mock, Func<bool> condition, Expression originalExpression, MethodInfo method, Expression value)
+		public SetterMethodCall(Mock mock, Condition condition, Expression originalExpression, MethodInfo method, Expression value)
 			: base(mock, condition, originalExpression, method, new[] { value })
 		{
 		}
