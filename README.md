@@ -40,7 +40,7 @@ Moq also is the first and only framework so far to provide Linq to Mocks, so tha
 
 You can think of Linq to Mocks as "from the universe of mocks, give me one whose behavior matches this expression".
 
-Checkout the [Quickstart](wiki/Quickstart) for more examples!
+Checkout the [Quickstart](https://github.com/Moq/moq4/wiki/Quickstart) for more examples!
 
 ## What?
 
