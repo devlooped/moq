@@ -24,8 +24,7 @@ namespace Moq
         /// <param name="mock">The mock whose calls need to be reset.</param>
         public static void ResetCalls(this Mock mock) 
         {
-            var calls = (IList<ICallContext>)mock.Interceptor.ActualCalls;
-            calls.Clear();
+			mock.Interceptor.InterceptionContext.ClearInvocations();
         } 
     }
 }

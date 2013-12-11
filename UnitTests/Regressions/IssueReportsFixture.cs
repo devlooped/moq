@@ -79,7 +79,49 @@ namespace Moq.Tests.Regressions
 
         #endregion
 
-        // Old @ Google Code
+		#region 47 & 62
+#if !SILVERLIGHT
+
+		public class Issue47ClassToMock
+		{
+			AutoResetEvent reset = new AutoResetEvent(false);
+			public virtual void M1()
+			{
+				//we're inside the interceptor's stack now
+
+				//kick off a new thread to a method on ourselves, which will also go through the interceptor
+				Thread th = new Thread(new ThreadStart(M2));
+				th.Start();
+				//ensure the thread has started
+				Thread.Sleep(500);
+				//release the thing the thread 'should' be waiting on
+				reset.Set();
+				//wait for the thread to finish
+				th.Join();
+			}
+
+			public virtual void M2()
+			{
+				//this method will get called on the thread, via the interceptor
+				//if the interceptor is locking then we won't get here until after the thread.Join above has
+				//finished, which is blocked waiting on us.
+				reset.WaitOne();
+			}
+		}
+
+		[Fact(Timeout = 2000)]
+		public void CallsToExternalCodeNotLockedInInterceptor()
+		{
+			var testMock = new Mock<Issue47ClassToMock> { CallBase = true };
+			testMock.Object.M1(); // <-- This will never return if the interceptor is locking!
+			testMock.Verify(x => x.M1());
+			testMock.Verify(x => x.M2());
+		}
+
+#endif
+		#endregion
+		
+		// Old @ Google Code
 
         #region #47
 
@@ -1419,69 +1461,6 @@ namespace Moq.Tests.Regressions
         }
 
         #endregion
-
-        #region #249
-
-#if !SILVERLIGHT
-        //helper class/interfaces for thread safety expectations
-        public interface IExpectToBeThreadSafe
-        {
-            void DoTheJob();
-            void RaceCondition();
-        }
-        public class ExpectToBeThreadSafe : IExpectToBeThreadSafe
-        {
-            #region IExpectToBeThreadSafe Members
-            int someVariable = 0;
-            public virtual void DoTheJob()
-            {
-                if (someVariable > 0)
-                    RaceCondition();
-                someVariable++;
-                Thread.Sleep(2);
-                someVariable--;
-            }
-
-            #endregion
-
-            #region IExpectToBeThreadSafe Members
-
-
-            public virtual void RaceCondition()
-            {
-
-            }
-
-            #endregion
-        }
-        public class _249
-        {
-            [Fact]
-            public void ExpectAvoidRaceConditions()
-            {
-                int concurrent = 8;
-                var v = new Mock<ExpectToBeThreadSafe>();
-
-                v.CallBase = true;
-                for (int i = 0; i < concurrent; ++i)
-                {
-                    ThreadPool.QueueUserWorkItem(
-                        (k) =>
-                        {
-                            v.Object.DoTheJob();
-                        }
-                        );
-                }
-
-                Thread.Sleep(200);
-                v.Verify(k => k.DoTheJob(), Times.Exactly(concurrent));
-                v.Verify(k => k.RaceCondition(), Times.Never());
-            }
-        }
-
-#endif
-        #endregion
-
 
         #region #251
 

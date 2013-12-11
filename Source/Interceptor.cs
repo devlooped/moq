@@ -54,37 +54,14 @@ namespace Moq
 	/// </summary>
 	internal class Interceptor : ICallInterceptor
 	{
-		private MockBehavior behavior;
-		private Type targetType;
 		private Dictionary<ExpressionKey, IProxyCall> calls = new Dictionary<ExpressionKey, IProxyCall>();
-		private Dictionary<string, List<Delegate>> invocationLists = new Dictionary<string, List<Delegate>>();
-		private List<IProxyCall> orderedCalls = new List<IProxyCall>();
-		private List<ICallContext> actualInvocations = new List<ICallContext>();
 
 		public Interceptor(MockBehavior behavior, Type targetType, Mock mock)
 		{
-			this.behavior = behavior;
-			this.targetType = targetType;
-			this.Mock = mock;
+			InterceptionContext = new InterceptStrategyContext(mock, targetType, behavior);
 		}
 
-		internal IEnumerable<ICallContext> ActualCalls
-		{
-			get
-			{
-			    lock (actualInvocations)
-			    {
-                    return this.actualInvocations;
-			    }
-			}
-		}
-
-		internal Mock Mock { get; private set; }
-
-		internal IEnumerable<IProxyCall> OrderedCalls
-		{
-			get { return this.orderedCalls; }
-		}
+		internal InterceptStrategyContext InterceptionContext { get; private set; }
 
 		internal void Verify()
 		{
@@ -127,13 +104,13 @@ namespace Moq
 				if (calls.ContainsKey(key))
 				{
 					// Remove previous from ordered calls
-					orderedCalls.Remove(calls[key]);
+					InterceptionContext.RemoveOrderedCall(calls[key]);
 				}
 
 				calls[key] = call;
 			}
 
-			orderedCalls.Add(call);
+			InterceptionContext.AddOrderedCall(call);
 		}
 
 		private IEnumerable<IInterceptStrategy> InterceptionStrategies()
@@ -151,38 +128,15 @@ namespace Moq
 		[SuppressMessage("Microsoft.Maintainability", "CA1502:AvoidExcessiveComplexity")]
 		public void Intercept(ICallContext invocation)
 		{
-
-            lock (Mock) // this solves issue #249
-            {
-                var interceptionContext = new InterceptStrategyContext(Mock
-                                                                    , targetType
-                                                                    , invocationLists
-                                                                    , actualInvocations
-                                                                    , behavior
-                                                                    , orderedCalls
-                                                                    );
-                foreach (var strategy in InterceptionStrategies())
-                {
-                    if (InterceptionAction.Stop == strategy.HandleIntercept(invocation, interceptionContext))
-                    {
-                        break;
-                    }
-                }
-            }
+			foreach (var strategy in InterceptionStrategies())
+			{
+				if (InterceptionAction.Stop == strategy.HandleIntercept(invocation, InterceptionContext))
+				{
+					break;
+				}
+			}
 		}
 		
-
-		internal IEnumerable<Delegate> GetInvocationList(EventInfo ev)
-		{
-			List<Delegate> handlers;
-			if (!this.invocationLists.TryGetValue(ev.Name, out handlers))
-			{
-				return new Delegate[0];
-			}
-
-			return handlers;
-		}
-
 		private class ExpressionKey
 		{
 			private string fixedString;
