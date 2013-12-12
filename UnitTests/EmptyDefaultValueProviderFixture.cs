@@ -1,7 +1,9 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Linq;
+#if !NET3x
 using System.Threading.Tasks;
+#endif
 using Xunit;
 
 namespace Moq.Tests
@@ -108,6 +110,7 @@ namespace Moq.Tests
 			Assert.Equal(0, ((IQueryable)value).Cast<object>().Count());
 		}
 
+#if !NET3x
 		[Fact]
 		public void ProvidesDefaultTask()
 		{
@@ -142,6 +145,7 @@ namespace Moq.Tests
 			Assert.True(((Task)value).IsCompleted);
 			Assert.Equal(default(int), ((Task<Task<int>>) value).Result.Result);
 		}
+#endif
 
 		public interface IFoo
 		{
@@ -156,9 +160,11 @@ namespace Moq.Tests
 			IBar[] Bars { get; set; }
 			IQueryable<int> Queryable { get; }
 			IQueryable QueryableObjects { get; }
+#if !NET3x
 			Task TaskValue { get; set; }
 			Task<int> GenericTaskValue { get; set; }
 			Task<Task<int>> TaskOfGenericTaskValue { get; set; }
+#endif
 		}
 
 		public interface IBar { }
