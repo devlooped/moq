@@ -59,7 +59,7 @@ namespace Moq
 	internal partial class MethodCall<TMock> : MethodCall, ISetup<TMock>
 		where TMock : class
 	{
-		public MethodCall(Mock mock, Func<bool> condition, Expression originalExpression, MethodInfo method,
+		public MethodCall(Mock mock, Condition condition, Expression originalExpression, MethodInfo method,
 			params Expression[] arguments)
 			: base(mock, condition, originalExpression, method, arguments)
 		{
