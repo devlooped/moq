@@ -1,7 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Linq;
-#if !NET3x
+#if !NET3x && !SILVERLIGHT
 using System.Threading.Tasks;
 #endif
 using Xunit;
@@ -110,7 +110,7 @@ namespace Moq.Tests
 			Assert.Equal(0, ((IQueryable)value).Cast<object>().Count());
 		}
 
-#if !NET3x
+#if !NET3x && !SILVERLIGHT
 		[Fact]
 		public void ProvidesDefaultTask()
 		{
@@ -160,7 +160,7 @@ namespace Moq.Tests
 			IBar[] Bars { get; set; }
 			IQueryable<int> Queryable { get; }
 			IQueryable QueryableObjects { get; }
-#if !NET3x
+#if !NET3x && !SILVERLIGHT
 			Task TaskValue { get; set; }
 			Task<int> GenericTaskValue { get; set; }
 			Task<Task<int>> TaskOfGenericTaskValue { get; set; }
