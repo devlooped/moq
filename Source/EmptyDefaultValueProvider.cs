@@ -43,7 +43,7 @@ using System.Collections;
 using System.Collections.Generic;
 using System.Linq;
 using System.Reflection;
-#if !NET3x
+#if !NET3x && !SILVERLIGHT
 using System.Threading.Tasks;
 #endif
 
@@ -89,7 +89,7 @@ namespace Moq
 			{
 				return new object[0].AsQueryable();
 			}
-#if !NET3x
+#if !NET3x && !SILVERLIGHT
 			else if (valueType == typeof(Task))
 			{
 				// Task<T> inherits from Task, so just return Task<bool>
@@ -111,7 +111,7 @@ namespace Moq
 					.MakeGenericMethod(genericType)
 					.Invoke(null, new[] { Activator.CreateInstance(genericListType) });
 			}
-#if !NET3x
+#if !NET3x && !SILVERLIGHT
 			else if (valueType.IsGenericType && valueType.GetGenericTypeDefinition() == typeof(Task<>))
 			{
 				var genericType = valueType.GetGenericArguments()[0];
@@ -135,7 +135,7 @@ namespace Moq
 			return Activator.CreateInstance(valueType);
 		}
 
-#if !NET3x
+#if !NET3x && !SILVERLIGHT
 		private static Task GetCompletedTaskWithResult(object result)
 		{
 			var type = result.GetType();
