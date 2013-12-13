@@ -43,6 +43,9 @@ using System.Collections;
 using System.Collections.Generic;
 using System.Linq;
 using System.Reflection;
+#if !NET3x
+using System.Threading.Tasks;
+#endif
 
 namespace Moq
 {
@@ -86,6 +89,13 @@ namespace Moq
 			{
 				return new object[0].AsQueryable();
 			}
+#if !NET3x
+			else if (valueType == typeof(Task))
+			{
+				// Task<T> inherits from Task, so just return Task<bool>
+				return GetCompletedTaskWithResult(false);
+			}
+#endif
 			else if (valueType.IsGenericType && valueType.GetGenericTypeDefinition() == typeof(IEnumerable<>))
 			{
 				var genericListType = typeof(List<>).MakeGenericType(valueType.GetGenericArguments()[0]);
@@ -101,6 +111,15 @@ namespace Moq
 					.MakeGenericMethod(genericType)
 					.Invoke(null, new[] { Activator.CreateInstance(genericListType) });
 			}
+#if !NET3x
+			else if (valueType.IsGenericType && valueType.GetGenericTypeDefinition() == typeof(Task<>))
+			{
+				var genericType = valueType.GetGenericArguments()[0];
+
+				return GetCompletedTaskWithResult(
+					genericType.IsValueType ? GetValueTypeDefault(genericType) : GetReferenceTypeDefault(genericType));
+			}
+#endif
 
 			return null;
 		}
@@ -115,5 +134,19 @@ namespace Moq
 
 			return Activator.CreateInstance(valueType);
 		}
+
+#if !NET3x
+		private static Task GetCompletedTaskWithResult(object result)
+		{
+			var type = result.GetType();
+			var tcs = Activator.CreateInstance(typeof (TaskCompletionSource<>).MakeGenericType(type));
+
+			var setResultMethod = tcs.GetType().GetMethod("SetResult");
+			var taskProperty = tcs.GetType().GetProperty("Task");
+
+			setResultMethod.Invoke(tcs, new[] {result});
+			return (Task) taskProperty.GetValue(tcs, null);
+		}
+#endif
 	}
 }
