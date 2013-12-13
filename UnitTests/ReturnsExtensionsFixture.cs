@@ -1,8 +1,6 @@
 ﻿using System;
 using System.Threading.Tasks;
-using Moq.Language.Flow;
 using Xunit;
-using System.Collections.Generic;
 
 namespace Moq.Tests
 {

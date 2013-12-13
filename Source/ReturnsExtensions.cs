@@ -1,16 +1,15 @@
 ﻿#if !NET3x && !SILVERLIGHT
 using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
 using System.Threading.Tasks;
+using Moq.Language;
+using Moq.Language.Flow;
 
-namespace Moq.Language.Flow
+namespace Moq
 {
     /// <summary>
     /// Defines async extension methods on IReturns.
     /// </summary>
-    public static class IReturnsExtensions
+    public static class ReturnsExtensions
     {
         /// <summary>
         /// Allows to specify the return value of an asynchronous method.
