@@ -42,7 +42,7 @@ namespace Moq
 
 			return mock.When(new Condition(
 				condition: () => expectationPosition == sequenceStep,
-				evaluatedSuccessfully: NextStep));
+				success: NextStep));
 		}
 	}
 

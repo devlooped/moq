@@ -45,7 +45,7 @@ using Moq.Language.Flow;
 
 namespace Moq
 {
-	internal class ConditionalContext<T> : ISetupConditionResult<T>	
+	internal class ConditionalContext<T> : ISetupConditionResult<T>
 		where T : class
 	{
 		private Mock<T> mock;

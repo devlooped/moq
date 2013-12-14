@@ -46,7 +46,8 @@ using Moq.Protected;
 
 namespace Moq
 {
-	internal class SetterMethodCall<TMock, TProperty> : MethodCall<TMock>, ISetupSetter<TMock, TProperty> where TMock : class
+	internal class SetterMethodCall<TMock, TProperty> : MethodCall<TMock>, ISetupSetter<TMock, TProperty>
+		where TMock : class
 	{
 		public SetterMethodCall(Mock mock, Expression originalExpression, MethodInfo method)
 			: base(mock, null, originalExpression, method, new[] { ItExpr.IsAny<TProperty>() })

@@ -77,8 +77,10 @@ namespace Moq.Tests
 			a.InSequence(sequence).Setup(x => x.Do(100)).Returns(101);
 			a.InSequence(sequence).Setup(x => x.Do(200)).Returns(201);
 
-			a.Object.Do(100);
-			a.Object.Do(200);
+			Assert.Equal(101, a.Object.Do(100));
+			Assert.Equal(201, a.Object.Do(200));
+			Assert.Throws<MockException>(() => a.Object.Do(100));
+			Assert.Throws<MockException>(() => a.Object.Do(200));
 		}
 
 		[Fact]
