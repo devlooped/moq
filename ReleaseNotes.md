@@ -1,6 +1,7 @@
 Version 4.2
 * Improved support for async APIs by making default value a completed task
 * Added support for async Returns and Throws
+* Improved mock invocation sequence testing
 
 Version 4.1
 * Added covariant IMock&lt;out T&gt; interface to Mock&lt;T&gt;
