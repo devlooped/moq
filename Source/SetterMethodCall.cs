@@ -38,11 +38,11 @@
 //[This is the BSD license, see
 // http://www.opensource.org/licenses/bsd-license.php]
 
+using Moq.Language.Flow;
+using Moq.Protected;
 using System;
 using System.Linq.Expressions;
 using System.Reflection;
-using Moq.Language.Flow;
-using Moq.Protected;
 
 namespace Moq
 {
@@ -59,7 +59,7 @@ namespace Moq
 		{
 		}
 
-		public SetterMethodCall(Mock mock, Func<bool> condition, Expression originalExpression, MethodInfo method, Expression value)
+		public SetterMethodCall(Mock mock, Condition condition, Expression originalExpression, MethodInfo method, Expression value)
 			: base(mock, condition, originalExpression, method, new[] { value })
 		{
 		}

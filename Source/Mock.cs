@@ -38,6 +38,8 @@
 //[This is the BSD license, see
 // http://www.opensource.org/licenses/bsd-license.php]
 
+using Moq.Properties;
+using Moq.Proxy;
 using System;
 using System.Collections.Generic;
 using System.Diagnostics.CodeAnalysis;
@@ -46,8 +48,6 @@ using System.Linq;
 using System.Linq.Expressions;
 using System.Reflection;
 using System.Runtime.CompilerServices;
-using Moq.Properties;
-using Moq.Proxy;
 
 namespace Moq
 {
@@ -231,7 +231,7 @@ namespace Moq
             }
         }
 
-        /// <include file='Mock.xdoc' path='docs/doc[@for="Mock.VerifyAll"]/*'/>		
+        /// <include file='Mock.xdoc' path='docs/doc[@for="Mock.VerifyAll"]/*'/>        
         [SuppressMessage("Microsoft.Usage", "CA2200:RethrowToPreserveStackDetails", Justification = "We want to explicitly reset the stack trace here.")]
         public void VerifyAll()
         {
@@ -419,7 +419,7 @@ namespace Moq
 
         #region Setup
 
-        internal static MethodCall<T> Setup<T>(Mock<T> mock, Expression<Action<T>> expression, Func<bool> condition)
+        internal static MethodCall<T> Setup<T>(Mock<T> mock, Expression<Action<T>> expression, Condition condition)
             where T : class
         {
             return PexProtector.Invoke(() =>
@@ -443,7 +443,7 @@ namespace Moq
         internal static MethodCallReturn<T, TResult> Setup<T, TResult>(
             Mock<T> mock,
             Expression<Func<T, TResult>> expression,
-            Func<bool> condition)
+            Condition condition)
             where T : class
         {
             return PexProtector.Invoke(() =>
@@ -472,7 +472,7 @@ namespace Moq
         internal static MethodCallReturn<T, TProperty> SetupGet<T, TProperty>(
             Mock<T> mock,
             Expression<Func<T, TProperty>> expression,
-            Func<bool> condition)
+            Condition condition)
             where T : class
         {
             return PexProtector.Invoke(() =>
@@ -502,7 +502,7 @@ namespace Moq
         internal static SetterMethodCall<T, TProperty> SetupSet<T, TProperty>(
             Mock<T> mock,
             Action<T> setterExpression,
-            Func<bool> condition)
+            Condition condition)
             where T : class
         {
             return PexProtector.Invoke(() =>
@@ -519,7 +519,7 @@ namespace Moq
             });
         }
 
-        internal static MethodCall<T> SetupSet<T>(Mock<T> mock, Action<T> setterExpression, Func<bool> condition)
+        internal static MethodCall<T> SetupSet<T>(Mock<T> mock, Action<T> setterExpression, Condition condition)
             where T : class
         {
             return PexProtector.Invoke(() =>

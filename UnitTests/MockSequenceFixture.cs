@@ -68,6 +68,33 @@ namespace Moq.Tests
 			Assert.Equal(201, b.Object.Do(200));
 		}
 
+		[Fact]
+		public void SameMockRightSequenceSuccess()
+		{
+			var a = new Mock<IFoo>(MockBehavior.Strict);
+
+			var sequence = new MockSequence();
+			a.InSequence(sequence).Setup(x => x.Do(100)).Returns(101);
+			a.InSequence(sequence).Setup(x => x.Do(200)).Returns(201);
+
+			Assert.Equal(101, a.Object.Do(100));
+			Assert.Equal(201, a.Object.Do(200));
+			Assert.Throws<MockException>(() => a.Object.Do(100));
+			Assert.Throws<MockException>(() => a.Object.Do(200));
+		}
+
+		[Fact]
+		public void SameMockInvalidSequenceFail()
+		{
+			var a = new Mock<IFoo>(MockBehavior.Strict);
+
+			var sequence = new MockSequence();
+			a.InSequence(sequence).Setup(x => x.Do(100)).Returns(101);
+			a.InSequence(sequence).Setup(x => x.Do(200)).Returns(201);
+
+			Assert.Throws<MockException>(() => a.Object.Do(200));
+		}
+
 		public interface IFoo
 		{
 			int Do(int arg);

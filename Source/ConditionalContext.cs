@@ -38,10 +38,10 @@
 //[This is the BSD license, see
 // http://www.opensource.org/licenses/bsd-license.php]
 
-using System;
-using System.Linq.Expressions;
 using Moq.Language;
 using Moq.Language.Flow;
+using System;
+using System.Linq.Expressions;
 
 namespace Moq
 {
@@ -49,9 +49,9 @@ namespace Moq
 		where T : class
 	{
 		private Mock<T> mock;
-		private Func<bool> condition;
+		private Condition condition;
 
-		public ConditionalContext(Mock<T> mock, Func<bool> condition)
+		public ConditionalContext(Mock<T> mock, Condition condition)
 		{
 			this.mock = mock;
 			this.condition = condition;
