@@ -38,12 +38,12 @@
 //[This is the BSD license, see
 // http://www.opensource.org/licenses/bsd-license.php]
 
-using System;
-using System.Linq.Expressions;
-using System.Reflection;
 using Moq.Language;
 using Moq.Language.Flow;
 using Moq.Proxy;
+using System;
+using System.Linq.Expressions;
+using System.Reflection;
 
 namespace Moq
 {
@@ -54,7 +54,7 @@ namespace Moq
 	/// </devdoc>
 	internal class MethodCallReturn : MethodCall
 	{
-		public MethodCallReturn(Mock mock, Func<bool> condition, Expression originalExpression, MethodInfo method, params Expression[] arguments)
+		public MethodCallReturn(Mock mock, Condition condition, Expression originalExpression, MethodInfo method, params Expression[] arguments)
 			: base(mock, condition, originalExpression, method, arguments)
 		{
 		}
@@ -69,7 +69,7 @@ namespace Moq
 		private Action<object[]> afterReturnCallback;
 		private bool callBase;
 
-		public MethodCallReturn(Mock mock, Func<bool> condition, Expression originalExpression, MethodInfo method, params Expression[] arguments)
+		public MethodCallReturn(Mock mock, Condition condition, Expression originalExpression, MethodInfo method, params Expression[] arguments)
 			: base(mock, condition, originalExpression, method, arguments)
 		{
 			this.HasReturnValue = false;
