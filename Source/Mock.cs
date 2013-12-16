@@ -353,13 +353,12 @@ namespace Moq
             Expression expression,
             Times times)
         {
-            // .Where does an enumeration, and calls to a mocked method concurrent to VerifyCalls might change the content of ActualCalls. therefore, it is necessary to take a snapshot, using ToList(), so that concurrent calls will not impact the ongoing verification.
-            var actualCalls = targetInterceptor.ActualCalls.ToList();
+			IEnumerable<ICallContext> actualCalls = targetInterceptor.InterceptionContext.ActualInvocations;
 
             var callCount = actualCalls.Where(ac => expected.Matches(ac)).Count();
             if (!times.Verify(callCount))
             {
-                var setups = targetInterceptor.OrderedCalls.Where(oc => AreSameMethod(oc.SetupExpression, expression));
+				var setups = targetInterceptor.InterceptionContext.OrderedCalls.Where(oc => AreSameMethod(oc.SetupExpression, expression));
                 ThrowVerifyException(expected, setups, actualCalls, expression, times, callCount);
             }
         }
@@ -913,7 +912,7 @@ namespace Moq
                 throw new InvalidOperationException(Resources.RaisedUnassociatedEvent);
             }
 
-            foreach (var del in this.Interceptor.GetInvocationList(ev).ToArray())
+            foreach (var del in this.Interceptor.InterceptionContext.GetInvocationList(ev).ToArray())
             {
                 del.InvokePreserveStack(this.Object, args);
             }
@@ -930,7 +929,7 @@ namespace Moq
                 throw new InvalidOperationException(Resources.RaisedUnassociatedEvent);
             }
 
-            foreach (var del in this.Interceptor.GetInvocationList(ev).ToArray())
+			foreach (var del in this.Interceptor.InterceptionContext.GetInvocationList(ev).ToArray())
             {
                 // Non EventHandler-compatible delegates get the straight 
                 // arguments, not the typical "sender, args" arguments.

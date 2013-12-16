@@ -233,26 +233,7 @@ namespace Moq
             }
 
             return initialType.GetInterfaces();
-        }
-        internal void AddEventHandler(EventInfo ev, Delegate handler)
-        {
-            List<Delegate> handlers;
-            if (!ctx.InvocationLists.TryGetValue(ev.Name, out handlers))
-            {
-                handlers = new List<Delegate>();
-                ctx.InvocationLists.Add(ev.Name, handlers);
-            }
-
-            handlers.Add(handler);
-        }
-        internal void RemoveEventHandler(EventInfo ev, Delegate handler)
-        {
-            List<Delegate> handlers;
-            if (ctx.InvocationLists.TryGetValue(ev.Name, out handlers))
-            {
-                handlers.Remove(handler);
-            }
-        }
+        }        
         InterceptStrategyContext ctx;
         public InterceptionAction HandleIntercept(ICallContext invocation, InterceptStrategyContext ctx)
         {
@@ -272,7 +253,7 @@ namespace Moq
                     }
                     else if (delegateInstance != null)
                     {
-                        this.AddEventHandler(eventInfo, (Delegate)invocation.Arguments[0]);
+                        ctx.AddEventHandler(eventInfo, (Delegate)invocation.Arguments[0]);
                     }
 
                     return InterceptionAction.Stop;
@@ -289,7 +270,7 @@ namespace Moq
                     }
                     else if (delegateInstance != null)
                     {
-                        this.RemoveEventHandler(eventInfo, (Delegate)invocation.Arguments[0]);
+                        ctx.RemoveEventHandler(eventInfo, (Delegate)invocation.Arguments[0]);
                     }
 
                     return InterceptionAction.Stop;
@@ -300,7 +281,7 @@ namespace Moq
                 // mode we use to evaluate delegates by actually running them, 
                 // we don't want to count the invocation, or actually run 
                 // previous setups.
-                ctx.ActualInvocations.Add(invocation);
+                ctx.AddInvocation(invocation);
             }
             return InterceptionAction.Continue;
         }
