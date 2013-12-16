@@ -3,6 +3,7 @@ Version 4.2
 * Added support for async Returns and Throws
 * Improved mock invocation sequence testing
 
+
 Version 4.1
 * Added covariant IMock&lt;out T&gt; interface to Mock&lt;T&gt;
 * Added It.IsNotNull&lt;T&gt;
