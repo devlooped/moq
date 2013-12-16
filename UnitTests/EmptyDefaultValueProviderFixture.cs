@@ -123,11 +123,11 @@ namespace Moq.Tests
 		}
 
 		[Fact]
-		public void ProvidesDefaultGenericTask()
+		public void ProvidesDefaultGenericTaskOfValueType()
 		{
 			var provider = new EmptyDefaultValueProvider();
 
-			var value = provider.ProvideDefault(typeof(IFoo).GetProperty("GenericTaskValue").GetGetMethod());
+			var value = provider.ProvideDefault(typeof(IFoo).GetProperty("GenericTaskOfValueType").GetGetMethod());
 
 			Assert.NotNull(value);
 			Assert.True(((Task)value).IsCompleted);
@@ -135,11 +135,23 @@ namespace Moq.Tests
 		}
 
 		[Fact]
+		public void ProvidesDefaultGenericTaskOfReferenceType()
+		{
+			var provider = new EmptyDefaultValueProvider();
+
+			var value = provider.ProvideDefault(typeof(IFoo).GetProperty("GenericTaskOfReferenceType").GetGetMethod());
+
+			Assert.NotNull(value);
+			Assert.True(((Task)value).IsCompleted);
+			Assert.Equal(default(string), ((Task<string>)value).Result);
+		}
+
+		[Fact]
 		public void ProvidesDefaultTaskOfGenericTask()
 		{
 			var provider = new EmptyDefaultValueProvider();
 
-			var value = provider.ProvideDefault(typeof(IFoo).GetProperty("TaskOfGenericTaskValue").GetGetMethod());
+			var value = provider.ProvideDefault(typeof(IFoo).GetProperty("TaskOfGenericTaskOfValueType").GetGetMethod());
 
 			Assert.NotNull(value);
 			Assert.True(((Task)value).IsCompleted);
@@ -162,8 +174,9 @@ namespace Moq.Tests
 			IQueryable QueryableObjects { get; }
 #if !NET3x && !SILVERLIGHT
 			Task TaskValue { get; set; }
-			Task<int> GenericTaskValue { get; set; }
-			Task<Task<int>> TaskOfGenericTaskValue { get; set; }
+			Task<int> GenericTaskOfValueType { get; set; }
+			Task<string> GenericTaskOfReferenceType { get; set; }
+			Task<Task<int>> TaskOfGenericTaskOfValueType { get; set; }
 #endif
 		}
 

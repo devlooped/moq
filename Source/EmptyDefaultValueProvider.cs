@@ -93,7 +93,7 @@ namespace Moq
 			else if (valueType == typeof(Task))
 			{
 				// Task<T> inherits from Task, so just return Task<bool>
-				return GetCompletedTaskWithResult(false);
+				return GetCompletedTaskForType(typeof (bool));
 			}
 #endif
 			else if (valueType.IsGenericType && valueType.GetGenericTypeDefinition() == typeof(IEnumerable<>))
@@ -115,9 +115,7 @@ namespace Moq
 			else if (valueType.IsGenericType && valueType.GetGenericTypeDefinition() == typeof(Task<>))
 			{
 				var genericType = valueType.GetGenericArguments()[0];
-
-				return GetCompletedTaskWithResult(
-					genericType.IsValueType ? GetValueTypeDefault(genericType) : GetReferenceTypeDefault(genericType));
+				return GetCompletedTaskForType(genericType);
 			}
 #endif
 
@@ -136,13 +134,14 @@ namespace Moq
 		}
 
 #if !NET3x && !SILVERLIGHT
-		private static Task GetCompletedTaskWithResult(object result)
+		private static Task GetCompletedTaskForType(Type type)
 		{
-			var type = result.GetType();
 			var tcs = Activator.CreateInstance(typeof (TaskCompletionSource<>).MakeGenericType(type));
 
 			var setResultMethod = tcs.GetType().GetMethod("SetResult");
 			var taskProperty = tcs.GetType().GetProperty("Task");
+
+			var result = type.IsValueType ? GetValueTypeDefault(type) : GetReferenceTypeDefault(type);
 
 			setResultMethod.Invoke(tcs, new[] {result});
 			return (Task) taskProperty.GetValue(tcs, null);
