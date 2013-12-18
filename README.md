@@ -85,12 +85,6 @@ Moq offers the following features:
   * Intuitive support for out/ref arguments
 
 
-### Need a commercial license or premium support?
-You don't need a commercial license just to use Moq, even if it is for a commercial product, unless your company just doesn't use "open source software", in which case, a commercial license means they are buying the product like they would any other piece of software for the company.
-
-If you still think you need a commercial license or just want premium support, contact [us](mailto://sales@clariusconsulting.net).
-
-
 
 We appreciate deeply any [feedback](http://moq.uservoice.com/) that you may have!
 
