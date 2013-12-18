@@ -17,6 +17,33 @@ namespace Moq.Tests
 		}
 
 		[Fact]
+		public void CanBeNamedForEasierDebugging()
+		{
+			var mock = new Mock<IComparable>();
+			mock.Name = "my mock";
+
+			Assert.Equal("my mock", mock.ToString());
+		}
+
+		[Fact]
+		public void HasADefaultNameThatIsUnique()
+		{
+			var mock = new Mock<IComparable>();
+			var mock2 = new Mock<IComparable>();
+
+			Assert.NotEqual(mock.ToString(), mock2.ToString());
+		}
+
+		[Fact]
+		public void HasADefaultNameThatIncludesItsTypeAndThatItsAMock()
+		{
+			var mock = new Mock<IComparable>();
+
+			Assert.Contains("IComparable", mock.ToString());
+			Assert.Contains("mock", mock.ToString().ToLower());
+		}
+
+		[Fact]
 		public void ThrowsIfNullExpectAction()
 		{
 			var mock = new Mock<IComparable>();

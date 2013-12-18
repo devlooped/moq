@@ -107,6 +107,16 @@
 			Exposes the mocked object instance.
 		</summary>
 	</doc>
+	<doc for="Mock{T}.Name">
+		<summary>
+			Allows naming of your mocks, so they can be easily identified in error messages (e.g. from failed assertions).
+		</summary>
+	</doc>
+	<doc for="Mock{T}.ToString">
+		<summary>
+			Returns the name of the mock
+		</summary>
+	</doc>
 	<doc for="Mock{T}.Setup">
 		<summary>
 			Specifies a setup on the mocked type for a call to
