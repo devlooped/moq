@@ -51,6 +51,18 @@ using System.Diagnostics.CodeAnalysis;
 
 namespace Moq.Proxy
 {
+	/// <summary>
+	/// The base for all our proxies overrides the default object ToString behavior, to route it via the
+	/// mock (unless overriden by a real implementation). 
+	/// </summary>
+	abstract class ProxyBase
+	{
+		public override string ToString()
+		{
+			return Mock.Get((IMocked) this).Object.Mock.ToString() + ".Object";
+		}
+	}
+
 	internal class CastleProxyFactory : IProxyFactory
 	{
 		private static readonly ProxyGenerator generator = CreateProxyGenerator();
@@ -76,9 +88,10 @@ namespace Moq.Proxy
 		/// <inheritdoc />
 		public object CreateProxy(Type mockType, ICallInterceptor interceptor, Type[] interfaces, object[] arguments)
 		{
-			if (mockType.IsInterface)
-			{
-				return generator.CreateInterfaceProxyWithoutTarget(mockType, interfaces, new Interceptor(interceptor));
+			if (mockType.IsInterface) {
+				var options = new ProxyGenerationOptions {BaseTypeForInterfaceProxy = typeof(ProxyBase)};
+
+				return generator.CreateInterfaceProxyWithoutTarget(mockType, interfaces, options, new Interceptor(interceptor));
 			}
 
 			try

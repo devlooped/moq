@@ -44,6 +44,29 @@ namespace Moq.Tests
 		}
 
 		[Fact]
+		public void PassesItsNameOnToTheResultingMockObject()
+		{
+			var mock = new Mock<IComparable>();
+			
+			Assert.Equal(mock.ToString() + ".Object", mock.Object.ToString());
+		}
+
+		public class ToStringOverrider
+		{
+			public override string ToString() {
+				return "correct value";
+			}
+		}
+
+		[Fact]
+		public void ReturnsDefaultValuesIfImplementationsHaveOverriddenToString() {
+			var mock = new Mock<ToStringOverrider>();
+
+			Assert.NotNull(mock.ToString());
+			Assert.Null(mock.Object.ToString());
+		}
+
+		[Fact]
 		public void ThrowsIfNullExpectAction()
 		{
 			var mock = new Mock<IComparable>();
@@ -175,7 +198,7 @@ namespace Moq.Tests
 		}
 
 		[Fact]
-		public void ToStringIsNullOrEmpty()
+		public void ToStringIsNotNullOrEmpty()
 		{
 			var mock = new Mock<IFoo>();
 			Assert.False(String.IsNullOrEmpty(mock.Object.ToString()));

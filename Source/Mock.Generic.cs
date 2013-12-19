@@ -108,6 +108,7 @@ namespace Moq
 			this.Interceptor = new Interceptor(behavior, typeof(T), this);
 			this.constructorArguments = args;
 			this.ImplementedInterfaces.Add(typeof(IMocked<T>));
+			this.ImplementedInterfaces.Add(typeof(IMocked));
 
 			this.CheckParameters();
 		}
@@ -115,7 +116,7 @@ namespace Moq
 		private string GenerateMockName()
 		{
 			var randomId = Guid.NewGuid().ToString("N").Substring(0, 4);
-			return "Mock<" + typeof(T).FullName + "> (" + randomId + ")";
+			return "Mock<" + typeof (T).FullName + ":" + randomId + ">";
 		}
 
 		private void CheckParameters()
@@ -151,7 +152,8 @@ namespace Moq
 		public string Name { get; set; }
 
 		/// <include file='Mock.Generic.xdoc' path='docs/doc[@for="Mock{T}.ToString"]/*'/>
-		public override string ToString() {
+		public override string ToString()
+		{
 			return this.Name;
 		}
 
