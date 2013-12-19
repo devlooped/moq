@@ -83,7 +83,7 @@ namespace Moq.Proxy
 
 			try
 			{
-				return generator.CreateClassProxy(mockType, interfaces, new ProxyGenerationOptions(), arguments, new Interceptor(interceptor));
+				return generator.CreateClassProxy(mockType, interfaces, ProxyGenerationOptions.Default, arguments, new Interceptor(interceptor));
 			}
 			catch (TypeLoadException e)
 			{
