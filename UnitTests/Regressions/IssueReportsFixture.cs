@@ -18,6 +18,9 @@ using System.ServiceModel.Web;
 using System.Web.UI.HtmlControls;
 using System.Threading;
 #endif
+#if !Net3x
+using System.Threading.Tasks;
+#endif
 
 #region #181
 
@@ -120,7 +123,58 @@ namespace Moq.Tests.Regressions
 
 #endif
 		#endregion
-		
+
+		#region #78
+#if !NET3x
+		public interface IIssue78Interface
+		{
+			Issue78TypeOne GetTypeOne();
+			Issue78TypeTwo GetTypeTwo();
+		}
+
+		public class Issue78TypeOne
+		{
+
+		}
+		public class Issue78TypeTwo
+		{
+
+		}
+
+		public class Issue78Sut
+		{
+			public void TestMethod(IIssue78Interface intOne)
+			{
+				Task<Issue78TypeOne> getTypeOneTask = Task<Issue78TypeOne>.Factory.StartNew(() => intOne.GetTypeOne());
+				Task<Issue78TypeTwo> getTypeTwoTask = Task<Issue78TypeTwo>.Factory.StartNew(() => intOne.GetTypeTwo());
+
+				Issue78TypeOne objOne = getTypeOneTask.Result;
+				Issue78TypeTwo objTwo = getTypeTwoTask.Result;
+			}
+		}
+
+		public class Issue78Tests
+		{
+			[Fact()]
+			public void DoTest()
+			{
+				Mock<IIssue78Interface> mock = new Mock<IIssue78Interface>();
+
+				Issue78TypeOne expectedResOne = new Issue78TypeOne();
+				Issue78TypeTwo expectedResTwo = new Issue78TypeTwo();
+
+				mock.Setup(it => it.GetTypeOne()).Returns(expectedResOne);
+				mock.Setup(it => it.GetTypeTwo()).Returns(expectedResTwo);
+
+				Issue78Sut sut = new Issue78Sut();
+				sut.TestMethod(mock.Object);
+
+				mock.VerifyAll();
+			}
+		}
+#endif
+		#endregion
+
 		// Old @ Google Code
 
         #region #47
