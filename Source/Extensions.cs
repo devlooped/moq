@@ -187,7 +187,7 @@ namespace Moq
 
 		public static bool CanOverride(this MethodBase method)
 		{
-			return method.IsVirtual && !method.IsFinal && !method.IsPrivate;
+			return method != null && method.IsVirtual && !method.IsFinal && !method.IsAssembly;
 		}
 
 		public static bool CanOverrideGet(this PropertyInfo property)

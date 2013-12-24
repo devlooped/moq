@@ -46,13 +46,20 @@ using Moq.Proxy;
 using Moq.Language;
 using Moq.Properties;
 using System.Reflection;
+#if !SILVERLIGHT
+using Moq.Proxy.Factory;
+#endif
 
 namespace Moq
 {
 	/// <include file='Mock.Generic.xdoc' path='docs/doc[@for="Mock{T}"]/*'/>
-    public partial class Mock<T> : Mock, IMock<T> where T : class
+	public partial class Mock<T> : Mock, IMock<T> where T : class
 	{
+#if SILVERLIGHT
 		private static IProxyFactory proxyFactory = new CastleProxyFactory();
+#else
+		private static IProxyFactory proxyFactory = new ProxyFactory();
+#endif
 		private T instance;
 		private object[] constructorArguments;
 
@@ -139,10 +146,10 @@ namespace Moq
 			get { return (T)base.Object; }
 		}
 
-        internal override bool IsDelegateMock
-        {
-            get { return typeof(T).IsDelegate(); }
-        }
+		internal override bool IsDelegateMock
+		{
+			get { return typeof(T).IsDelegate(); }
+		}
 
 		private void InitializeInstance()
 		{
