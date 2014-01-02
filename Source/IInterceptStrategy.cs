@@ -19,19 +19,20 @@ namespace Moq
 		/// Handle interception
 		/// </summary>
 		/// <param name="invocation">the current invocation context</param>
-		/// <param name="ctx">shared data among the strategies during an interception</param>
-		/// <returns>true if further interception has to be processed, otherwise false</returns>
-		InterceptionAction HandleIntercept(ICallContext invocation, InterceptStrategyContext ctx);
+		/// <param name="ctx">shared data for the interceptor as a whole</param>
+		/// <param name="localCtx">shared data among the strategies during a single interception</param>
+		/// <returns>InterceptionAction.Continue if further interception has to be processed, otherwise InterceptionAction.Stop</returns>
+		InterceptionAction HandleIntercept(ICallContext invocation, InterceptorContext ctx, CurrentInterceptContext localCtx);
 		
 	}
 
-	internal class InterceptStrategyContext
+	internal class InterceptorContext
 	{
 		private Dictionary<string, List<Delegate>> invocationLists = new Dictionary<string, List<Delegate>>();
 		private List<ICallContext> actualInvocations = new List<ICallContext>();
 		private List<IProxyCall> orderedCalls = new List<IProxyCall>();
 
-		public InterceptStrategyContext(Mock Mock, Type targetType, MockBehavior behavior)
+		public InterceptorContext(Mock Mock, Type targetType, MockBehavior behavior)
 		{
 			this.Behavior = behavior;
 			this.Mock = Mock;
@@ -40,7 +41,6 @@ namespace Moq
 		public Mock Mock { get; private set; }
 		public Type TargetType { get; private set; }
 		public MockBehavior Behavior { get; private set; }
-		public IProxyCall CurrentCall { get; set; }
 		
 		#region InvocationLists
 		internal IEnumerable<Delegate> GetInvocationList(EventInfo ev)
@@ -136,6 +136,10 @@ namespace Moq
 		}
 		#endregion
 
+    }
+	
+	internal class CurrentInterceptContext
+	{        
+		public IProxyCall Call {get; set; }
 	}
-
 }
