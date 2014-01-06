@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections;
+using System.Collections.Generic;
 using System.Linq.Expressions;
 using Xunit;
 
@@ -40,8 +41,16 @@ namespace Moq.Tests
 		{
 			var mock = new Mock<IComparable>();
 
-			Assert.Contains("IComparable", mock.ToString());
+			Assert.Contains("System.IComparable", mock.ToString());
 			Assert.Contains("mock", mock.ToString().ToLower());
+		}
+
+		[Fact]
+		public void HasADefaultNameThatIncludesItsGenericParameters()
+		{
+			var mock = new Mock<Dictionary<int, string>>();
+
+			Assert.Contains("System.Collections.Generic.Dictionary<int, string>", mock.ToString());
 		}
 
 		[Fact]
