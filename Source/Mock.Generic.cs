@@ -108,7 +108,6 @@ namespace Moq
 			this.Interceptor = new Interceptor(behavior, typeof(T), this);
 			this.constructorArguments = args;
 			this.ImplementedInterfaces.Add(typeof(IMocked<T>));
-			this.ImplementedInterfaces.Add(typeof(IMocked));
 
 			this.CheckParameters();
 		}

@@ -86,6 +86,7 @@
       <DesignTime>True</DesignTime>
       <DependentUpon>IReturns.tt</DependentUpon>
     </Compile>
+    <Compile Include="Proxy\ProxyGenerationHelpers.cs" />
     <Compile Include="ReturnsExtensions.cs" />
     <Compile Include="Language\ISetupSequentialResult.cs" />
     <Compile Include="Language\ISetupConditionResult.cs" />

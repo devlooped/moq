@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Collections;
 using System.Linq.Expressions;
 using Xunit;
 
@@ -44,26 +45,35 @@ namespace Moq.Tests
 		}
 
 		[Fact]
-		public void PassesItsNameOnToTheResultingMockObject()
+		public void PassesItsNameOnToTheResultingMockObjectWhenMockingInterfaces()
 		{
 			var mock = new Mock<IComparable>();
-			
+
+			Assert.Equal(mock.ToString() + ".Object", mock.Object.ToString());
+		}
+
+		[Fact]
+		public void PassesItsNameOnToTheResultingMockObjectWhenMockingClasses()
+		{
+			var mock = new Mock<ArrayList>();
+
 			Assert.Equal(mock.ToString() + ".Object", mock.Object.ToString());
 		}
 
 		public class ToStringOverrider
 		{
 			public override string ToString() {
-				return "correct value";
+				return "real value";
 			}
 		}
 
 		[Fact]
-		public void ReturnsDefaultValuesIfImplementationsHaveOverriddenToString() {
-			var mock = new Mock<ToStringOverrider>();
+		public void AllowsMockingAsNormalIfImplementationsHaveOverriddenToString() {
+			var partialMock = new Mock<ToStringOverrider>() { CallBase = true };
+			var fullMock = new Mock<ToStringOverrider>();
 
-			Assert.NotNull(mock.ToString());
-			Assert.Null(mock.Object.ToString());
+			Assert.Equal("real value", partialMock.Object.ToString());
+			Assert.Null(fullMock.Object.ToString());		
 		}
 
 		[Fact]

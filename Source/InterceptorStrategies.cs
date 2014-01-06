@@ -111,28 +111,24 @@ namespace Moq
 
     }
 
-    internal class CheckMockMixing : IInterceptStrategy
+    internal class InterceptIMockedMixinMethods : IInterceptStrategy
     {
-
-        public CheckMockMixing()
-        {
-
-        }
         public InterceptionAction HandleIntercept(ICallContext invocation, InterceptorContext ctx, CurrentInterceptContext localctx)
         {
-            if (invocation.Method.DeclaringType.IsGenericType &&
-                    invocation.Method.DeclaringType.GetGenericTypeDefinition() == typeof(IMocked<>))
+            var method = invocation.Method;
+
+            if (method.DeclaringType == typeof (Object) && method.Name == "ToString")
             {
-                // "Mixin" of IMocked<T>.Mock
+                invocation.ReturnValue = ctx.Mock.ToString() + ".Object";
+                return InterceptionAction.Stop;
+            }
+
+            if (typeof(IMocked).IsAssignableFrom(method.DeclaringType) && method.Name == "get_Mock")
+            {
                 invocation.ReturnValue = ctx.Mock;
                 return InterceptionAction.Stop;
             }
-            else if (invocation.Method.DeclaringType == typeof(IMocked))
-            {
-                // "Mixin" of IMocked.Mock
-                invocation.ReturnValue = ctx.Mock;
-                return InterceptionAction.Stop;
-            }
+
             return InterceptionAction.Continue;
         }
     }
@@ -140,10 +136,6 @@ namespace Moq
     internal class HandleTracking : IInterceptStrategy
     {
 
-        public HandleTracking()
-        {
-
-        }
         public InterceptionAction HandleIntercept(ICallContext invocation, InterceptorContext ctx, CurrentInterceptContext localctx)
         {
             // Track current invocation if we're in "record" mode in a fluent invocation context.
@@ -166,10 +158,6 @@ namespace Moq
     internal class AddActualInvocation : IInterceptStrategy
     {
 
-        public AddActualInvocation()
-        {
-
-        }
         /// <summary>
         /// Get an eventInfo for a given event name.  Search type ancestors depth first if necessary.
         /// </summary>
