@@ -77,12 +77,19 @@ namespace Moq.Tests
 		}
 
 		[Fact]
-		public void AllowsMockingAsNormalIfImplementationsHaveOverriddenToString() {
+		public void OverriddenToStringMethodsCallUnderlyingImplementationInPartialMocks()
+		{
 			var partialMock = new Mock<ToStringOverrider>() { CallBase = true };
-			var fullMock = new Mock<ToStringOverrider>();
 
 			Assert.Equal("real value", partialMock.Object.ToString());
-			Assert.Null(fullMock.Object.ToString());		
+		}
+
+		[Fact]
+		public void OverriddenToStringMethodsAreStubbedWithDefaultValuesInFullMocks()
+		{
+			var fullMock = new Mock<ToStringOverrider>();
+
+			Assert.Null(fullMock.Object.ToString());
 		}
 
 		[Fact]

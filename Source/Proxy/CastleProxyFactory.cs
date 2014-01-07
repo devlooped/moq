@@ -71,7 +71,7 @@ namespace Moq.Proxy
 			AttributesToAvoidReplicating.Add<System.Runtime.InteropServices.TypeIdentifierAttribute>();
 #endif
 #endif
-			proxyOptions = new ProxyGenerationOptions { Hook = new ProxyMethodHook(), BaseTypeForInterfaceProxy = typeof(ProxyBase) };
+			proxyOptions = new ProxyGenerationOptions { Hook = new ProxyMethodHook(), BaseTypeForInterfaceProxy = typeof(InterfaceProxy) };
 		}
 
 		/// <inheritdoc />

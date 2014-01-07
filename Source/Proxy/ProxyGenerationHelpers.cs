@@ -34,7 +34,7 @@ namespace Moq.Proxy
 	/// 
 	/// This is required to allow Moq to mock ToString on proxy *interface* implementations.
 	/// </summary>
-	internal abstract class ProxyBase
+	internal abstract class InterfaceProxy
 	{
 		public override string ToString()
 		{
