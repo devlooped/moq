@@ -111,21 +111,31 @@ namespace Moq
 
     }
 
-    internal class InterceptIMockedMixinMethods : IInterceptStrategy
+    internal class InterceptMockPropertyMixin : IInterceptStrategy
     {
         public InterceptionAction HandleIntercept(ICallContext invocation, InterceptorContext ctx, CurrentInterceptContext localctx)
         {
             var method = invocation.Method;
 
-            if (method.DeclaringType == typeof (Object) && method.Name == "ToString")
-            {
-                invocation.ReturnValue = ctx.Mock.ToString() + ".Object";
-                return InterceptionAction.Stop;
-            }
-
             if (typeof(IMocked).IsAssignableFrom(method.DeclaringType) && method.Name == "get_Mock")
             {
                 invocation.ReturnValue = ctx.Mock;
+                return InterceptionAction.Stop;
+            }
+
+            return InterceptionAction.Continue;
+        }
+    }
+
+    internal class InterceptToStringMixin : IInterceptStrategy
+    {
+        public InterceptionAction HandleIntercept(ICallContext invocation, InterceptorContext ctx, CurrentInterceptContext localctx)
+        {
+            var method = invocation.Method;
+
+            if (method.DeclaringType == typeof(Object) && method.Name == "ToString")
+            {
+                invocation.ReturnValue = ctx.Mock.ToString() + ".Object";
                 return InterceptionAction.Stop;
             }
 

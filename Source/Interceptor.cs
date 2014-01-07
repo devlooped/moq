@@ -117,7 +117,8 @@ namespace Moq
 		{
 			yield return new HandleDestructor();
 			yield return new HandleTracking();
-			yield return new InterceptIMockedMixinMethods();
+			yield return new InterceptMockPropertyMixin();
+			yield return new InterceptToStringMixin();
 			yield return new AddActualInvocation();
 			yield return new ExtractProxyCall();
 			yield return new ExecuteCall();
