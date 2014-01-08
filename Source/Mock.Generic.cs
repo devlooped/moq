@@ -39,8 +39,10 @@
 // http://www.opensource.org/licenses/bsd-license.php]
 
 using System;
+using System.CodeDom;
 using System.Diagnostics.CodeAnalysis;
 using System.Linq.Expressions;
+using Microsoft.CSharp;
 using Moq.Language.Flow;
 using Moq.Proxy;
 using Moq.Language;
@@ -102,12 +104,32 @@ namespace Moq
 				args = new object[] { null };
 			}
 
+			this.Name = GenerateMockName();
+
 			this.Behavior = behavior;
 			this.Interceptor = new Interceptor(behavior, typeof(T), this);
 			this.constructorArguments = args;
 			this.ImplementedInterfaces.Add(typeof(IMocked<T>));
 
 			this.CheckParameters();
+		}
+
+		private string GenerateMockName()
+		{
+			var randomId = Guid.NewGuid().ToString("N").Substring(0, 4);
+
+			var typeName = typeof (T).FullName;
+
+			if (typeof (T).IsGenericType)
+			{
+				using (var provider = new CSharpCodeProvider())
+				{
+					var typeRef = new CodeTypeReference(typeof(T));
+					typeName = provider.GetTypeOutput(typeRef);
+				}
+			}
+
+			return "Mock<" + typeName + ":" + randomId + ">";
 		}
 
 		private void CheckParameters()
@@ -139,7 +161,16 @@ namespace Moq
 			get { return (T)base.Object; }
 		}
 
-        internal override bool IsDelegateMock
+		/// <include file='Mock.Generic.xdoc' path='docs/doc[@for="Mock{T}.Name"]/*'/>
+		public string Name { get; set; }
+
+		/// <include file='Mock.Generic.xdoc' path='docs/doc[@for="Mock{T}.ToString"]/*'/>
+		public override string ToString()
+		{
+			return this.Name;
+		}
+
+		internal override bool IsDelegateMock
         {
             get { return typeof(T).IsDelegate(); }
         }

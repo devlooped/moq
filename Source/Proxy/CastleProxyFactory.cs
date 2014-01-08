@@ -66,24 +66,24 @@ namespace Moq.Proxy
 			AttributesToAvoidReplicating.Add<ReflectionPermissionAttribute>();
 			AttributesToAvoidReplicating.Add<PermissionSetAttribute>();
 			AttributesToAvoidReplicating.Add<System.Runtime.InteropServices.MarshalAsAttribute>();
-            AttributesToAvoidReplicating.Add<UIPermissionAttribute>();
+			AttributesToAvoidReplicating.Add<UIPermissionAttribute>();
 #if !NET3x
 			AttributesToAvoidReplicating.Add<System.Runtime.InteropServices.TypeIdentifierAttribute>();
 #endif
 #endif
+			proxyOptions = new ProxyGenerationOptions { Hook = new ProxyMethodHook(), BaseTypeForInterfaceProxy = typeof(InterfaceProxy) };
 		}
 
 		/// <inheritdoc />
 		public object CreateProxy(Type mockType, ICallInterceptor interceptor, Type[] interfaces, object[] arguments)
 		{
-			if (mockType.IsInterface)
-			{
-				return generator.CreateInterfaceProxyWithoutTarget(mockType, interfaces, new Interceptor(interceptor));
+			if (mockType.IsInterface) {
+				return generator.CreateInterfaceProxyWithoutTarget(mockType, interfaces, proxyOptions, new Interceptor(interceptor));
 			}
 
 			try
 			{
-				return generator.CreateClassProxy(mockType, interfaces, ProxyGenerationOptions.Default, arguments, new Interceptor(interceptor));
+				return generator.CreateClassProxy(mockType, interfaces, proxyOptions, arguments, new Interceptor(interceptor));
 			}
 			catch (TypeLoadException e)
 			{
@@ -96,6 +96,7 @@ namespace Moq.Proxy
 		}
 
 		private static readonly Dictionary<Type, Type> delegateInterfaceCache = new Dictionary<Type, Type>();
+		private static readonly ProxyGenerationOptions proxyOptions;
 		private static int delegateInterfaceSuffix;
 
 		/// <inheritdoc />

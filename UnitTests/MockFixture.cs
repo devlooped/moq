@@ -1,4 +1,6 @@
 ﻿using System;
+using System.Collections;
+using System.Collections.Generic;
 using System.Linq.Expressions;
 using Xunit;
 
@@ -14,6 +16,80 @@ namespace Moq.Tests
 			IComparable comparable = mock.Object;
 
 			Assert.NotNull(comparable);
+		}
+
+		[Fact]
+		public void CanBeNamedForEasierDebugging()
+		{
+			var mock = new Mock<IComparable>();
+			mock.Name = "my mock";
+
+			Assert.Equal("my mock", mock.ToString());
+		}
+
+		[Fact]
+		public void HasADefaultNameThatIsUnique()
+		{
+			var mock = new Mock<IComparable>();
+			var mock2 = new Mock<IComparable>();
+
+			Assert.NotEqual(mock.ToString(), mock2.ToString());
+		}
+
+		[Fact]
+		public void HasADefaultNameThatIncludesItsTypeAndThatItsAMock()
+		{
+			var mock = new Mock<IComparable>();
+
+			Assert.Contains("System.IComparable", mock.ToString());
+			Assert.Contains("mock", mock.ToString().ToLower());
+		}
+
+		[Fact]
+		public void HasADefaultNameThatIncludesItsGenericParameters()
+		{
+			var mock = new Mock<Dictionary<int, string>>();
+
+			Assert.Contains("System.Collections.Generic.Dictionary<int, string>", mock.ToString());
+		}
+
+		[Fact]
+		public void PassesItsNameOnToTheResultingMockObjectWhenMockingInterfaces()
+		{
+			var mock = new Mock<IComparable>();
+
+			Assert.Equal(mock.ToString() + ".Object", mock.Object.ToString());
+		}
+
+		[Fact]
+		public void PassesItsNameOnToTheResultingMockObjectWhenMockingClasses()
+		{
+			var mock = new Mock<ArrayList>();
+
+			Assert.Equal(mock.ToString() + ".Object", mock.Object.ToString());
+		}
+
+		public class ToStringOverrider
+		{
+			public override string ToString() {
+				return "real value";
+			}
+		}
+
+		[Fact]
+		public void OverriddenToStringMethodsCallUnderlyingImplementationInPartialMocks()
+		{
+			var partialMock = new Mock<ToStringOverrider>() { CallBase = true };
+
+			Assert.Equal("real value", partialMock.Object.ToString());
+		}
+
+		[Fact]
+		public void OverriddenToStringMethodsAreStubbedWithDefaultValuesInFullMocks()
+		{
+			var fullMock = new Mock<ToStringOverrider>();
+
+			Assert.Null(fullMock.Object.ToString());
 		}
 
 		[Fact]
@@ -148,7 +224,7 @@ namespace Moq.Tests
 		}
 
 		[Fact]
-		public void ToStringIsNullOrEmpty()
+		public void ToStringIsNotNullOrEmpty()
 		{
 			var mock = new Mock<IFoo>();
 			Assert.False(String.IsNullOrEmpty(mock.Object.ToString()));
