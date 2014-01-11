@@ -1,5 +1,4 @@
 ﻿using System;
-using System.Collections;
 using System.Collections.Generic;
 using System.Linq.Expressions;
 using Xunit;
@@ -45,6 +44,7 @@ namespace Moq.Tests
 			Assert.Contains("mock", mock.ToString().ToLower());
 		}
 
+#if !SILVERLIGHT
 		[Fact]
 		public void HasADefaultNameThatIncludesItsGenericParameters()
 		{
@@ -52,6 +52,7 @@ namespace Moq.Tests
 
 			Assert.Contains("System.Collections.Generic.Dictionary<int, string>", mock.ToString());
 		}
+#endif
 
 		[Fact]
 		public void PassesItsNameOnToTheResultingMockObjectWhenMockingInterfaces()
@@ -64,7 +65,7 @@ namespace Moq.Tests
 		[Fact]
 		public void PassesItsNameOnToTheResultingMockObjectWhenMockingClasses()
 		{
-			var mock = new Mock<ArrayList>();
+			var mock = new Mock<Foo>();
 
 			Assert.Equal(mock.ToString() + ".Object", mock.Object.ToString());
 		}

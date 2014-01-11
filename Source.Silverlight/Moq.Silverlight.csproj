@@ -358,6 +358,9 @@
     <Compile Include="..\Source\Proxy\IProxyFactory.cs">
       <Link>Poxy\IProxyFactory.cs</Link>
     </Compile>
+    <Compile Include="..\Source\Proxy\ProxyGenerationHelpers.cs">
+      <Link>Poxy\ProxyGenerationHelpers.cs</Link>
+    </Compile>
     <Compile Include="..\Source\Range.cs">
       <Link>Range.cs</Link>
     </Compile>
