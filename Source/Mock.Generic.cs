@@ -39,15 +39,17 @@
 // http://www.opensource.org/licenses/bsd-license.php]
 
 using System;
-using System.CodeDom;
 using System.Diagnostics.CodeAnalysis;
 using System.Linq.Expressions;
-using Microsoft.CSharp;
 using Moq.Language.Flow;
 using Moq.Proxy;
 using Moq.Language;
-using Moq.Properties;
 using System.Reflection;
+
+#if !SILVERLIGHT
+using System.CodeDom;
+using Microsoft.CSharp;
+#endif
 
 namespace Moq
 {
@@ -120,6 +122,7 @@ namespace Moq
 
 			var typeName = typeof (T).FullName;
 
+#if !SILVERLIGHT
 			if (typeof (T).IsGenericType)
 			{
 				using (var provider = new CSharpCodeProvider())
@@ -128,6 +131,7 @@ namespace Moq
 					typeName = provider.GetTypeOutput(typeRef);
 				}
 			}
+#endif
 
 			return "Mock<" + typeName + ":" + randomId + ">";
 		}
