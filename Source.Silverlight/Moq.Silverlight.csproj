@@ -347,19 +347,19 @@
       <DependentUpon>Resources.resx</DependentUpon>
     </Compile>
     <Compile Include="..\Source\Proxy\CastleProxyFactory.cs">
-      <Link>Poxy\CastleProxyFactory.cs</Link>
+      <Link>Proxy\CastleProxyFactory.cs</Link>
     </Compile>
     <Compile Include="..\Source\Proxy\ICallContext.cs">
-      <Link>Poxy\ICallContext.cs</Link>
+      <Link>Proxy\ICallContext.cs</Link>
     </Compile>
     <Compile Include="..\Source\Proxy\ICallInterceptor.cs">
-      <Link>Poxy\ICallInterceptor.cs</Link>
+      <Link>Proxy\ICallInterceptor.cs</Link>
     </Compile>
     <Compile Include="..\Source\Proxy\IProxyFactory.cs">
-      <Link>Poxy\IProxyFactory.cs</Link>
+      <Link>Proxy\IProxyFactory.cs</Link>
     </Compile>
     <Compile Include="..\Source\Proxy\ProxyGenerationHelpers.cs">
-      <Link>Poxy\ProxyGenerationHelpers.cs</Link>
+      <Link>Proxy\ProxyGenerationHelpers.cs</Link>
     </Compile>
     <Compile Include="..\Source\Range.cs">
       <Link>Range.cs</Link>
