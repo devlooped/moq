@@ -40,6 +40,7 @@
 
 using System;
 using System.Collections.Generic;
+using System.Diagnostics.Contracts;
 using System.Linq;
 using System.Text;
 using System.Linq.Expressions;
@@ -57,6 +58,7 @@ namespace Moq
 		/// <returns>The mocked object created.</returns>
 		public static T Of<T>() where T : class
 		{
+			Contract.Ensures(Contract.Result<T>() != null);
 			return Mocks.CreateMockQuery<T>().First<T>();
 		}
 
@@ -69,6 +71,8 @@ namespace Moq
 		[SuppressMessage("Microsoft.Design", "CA1006:DoNotNestGenericTypesInMemberSignatures", Justification = "By Design")]
 		public static T Of<T>(Expression<Func<T, bool>> predicate) where T : class
 		{
+			Contract.Ensures(Contract.Result<T>() != null);
+
 			return Mocks.CreateMockQuery<T>().First<T>(predicate);
 		}
 	}
