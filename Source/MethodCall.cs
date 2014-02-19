@@ -243,12 +243,16 @@ namespace Moq
 					}
 				}
 
-				if (condition != null)
-					condition.EvaluatedSuccessfully();
 				return true;
 			}
 
 			return false;
+		}
+
+		public void EvaluatedSuccessfully()
+		{
+			if (condition != null)
+				condition.EvaluatedSuccessfully();
 		}
 
 		public virtual void Execute(ICallContext call)

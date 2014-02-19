@@ -69,6 +69,23 @@ namespace Moq.Tests
 		}
 
 		[Fact]
+		public void SameMockRightSequenceConsecutiveInvocationsWithSameArguments()
+		{
+			var a = new Mock<IFoo>(MockBehavior.Strict);
+
+			var sequence = new MockSequence();
+			a.InSequence(sequence).Setup(x => x.Do(100)).Returns(101);
+			a.InSequence(sequence).Setup(x => x.Do(100)).Returns(102);
+			a.InSequence(sequence).Setup(x => x.Do(200)).Returns(201);
+			a.InSequence(sequence).Setup(x => x.Do(100)).Returns(103);
+
+			Assert.Equal(101, a.Object.Do(100));
+			Assert.Equal(102, a.Object.Do(100));
+			Assert.Equal(201, a.Object.Do(200));
+			Assert.Equal(103, a.Object.Do(100));
+		}
+
+		[Fact]
 		public void SameMockRightSequenceSuccess()
 		{
 			var a = new Mock<IFoo>(MockBehavior.Strict);
