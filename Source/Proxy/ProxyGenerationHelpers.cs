@@ -1,8 +1,6 @@
 ﻿using System;
-using System.Collections.Generic;
-using System.Linq;
+using System.ComponentModel;
 using System.Reflection;
-using System.Text;
 using Castle.DynamicProxy;
 
 namespace Moq.Proxy
@@ -28,14 +26,26 @@ namespace Moq.Proxy
 	}
 
 	/// <summary>
-	/// The base class used for all our interface-inheriting proxies, which overrides the default
+	/// <para>The base class used for all our interface-inheriting proxies, which overrides the default
 	/// Object.ToString() behavior, to route it via the mock by default, unless overriden by a
-	/// real implementation. 
+	/// real implementation.</para>
 	/// 
-	/// This is required to allow Moq to mock ToString on proxy *interface* implementations.
+	/// <para>This is required to allow Moq to mock ToString on proxy *interface* implementations.</para>
 	/// </summary>
-	internal abstract class InterfaceProxy
+	/// <remarks>
+	/// <para><strong>This is internal to Moq and should not be generally used.</strong></para>
+	/// 
+	/// <para>Unfortunately it must be public, due to cross-assembly visibility issues with reflection, 
+	/// see github.com/Moq/moq4/issues/98 for details.</para>
+	/// </remarks>
+	[EditorBrowsable(EditorBrowsableState.Never)]
+	public abstract class InterfaceProxy
 	{
+		/// <summary>
+		/// Overrides the default ToString implementation to instead find the mock for this mock.Object,
+		/// and return MockName + '.Object' as the mocked object's ToString, to make it easy to relate
+		/// mocks and mock object instances in error messages.
+		/// </summary>
 		public override string ToString()
 		{
 			return ((IMocked)this).Mock.ToString() + ".Object";
