@@ -59,12 +59,12 @@ namespace Moq
 
 		public ISetup<T> Setup(Expression<Action<T>> expression)
 		{
-			return Mock.Setup<T>(mock, expression, this.condition);
+			return Mock.Setup<T>(mock, expression, this.condition, false);
 		}
 
 		public ISetup<T, TResult> Setup<TResult>(Expression<Func<T, TResult>> expression)
 		{
-			return Mock.Setup<T, TResult>(mock, expression, this.condition);
+            return Mock.Setup<T, TResult>(mock, expression, this.condition, false);
 		}
 
 		public ISetupGetter<T, TProperty> SetupGet<TProperty>(Expression<Func<T, TProperty>> expression)

@@ -261,7 +261,8 @@ namespace Moq
             Mock<T> mock,
             Expression<Action<T>> expression,
             Times times,
-            string failMessage)
+            string failMessage,
+            bool ignoreArgs)
             where T : class
         {
             Guard.NotNull(() => times, times);
@@ -271,7 +272,7 @@ namespace Moq
             ThrowIfVerifyNonVirtual(expression, method);
             var args = methodCall.Arguments.ToArray();
 
-            var expected = new MethodCall(mock, null, expression, method, args) { FailMessage = failMessage };
+            var expected = new MethodCall(mock, null, expression, method, ignoreArgs, args) { FailMessage = failMessage };
             VerifyCalls(GetInterceptor(methodCall.Object, mock), expected, expression, times);
         }
 
@@ -279,7 +280,8 @@ namespace Moq
             Mock<T> mock,
             Expression<Func<T, TResult>> expression,
             Times times,
-            string failMessage)
+            string failMessage,
+            bool ignoreArgs)
             where T : class
         {
             Guard.NotNull(() => times, times);
@@ -295,7 +297,7 @@ namespace Moq
                 ThrowIfVerifyNonVirtual(expression, method);
                 var args = methodCall.Arguments.ToArray();
 
-                var expected = new MethodCallReturn<T, TResult>(mock, null, expression, method, args)
+                var expected = new MethodCallReturn<T, TResult>(mock, null, expression, method, ignoreArgs, args)
                 {
                     FailMessage = failMessage
                 };
@@ -313,7 +315,7 @@ namespace Moq
             var method = expression.ToPropertyInfo().GetGetMethod(true);
             ThrowIfVerifyNonVirtual(expression, method);
 
-            var expected = new MethodCallReturn<T, TProperty>(mock, null, expression, method, new Expression[0])
+            var expected = new MethodCallReturn<T, TProperty>(mock, null, expression, method, false, new Expression[0])
             {
                 FailMessage = failMessage
             };
@@ -423,7 +425,7 @@ namespace Moq
 
         #region Setup
 
-        internal static MethodCall<T> Setup<T>(Mock<T> mock, Expression<Action<T>> expression, Condition condition)
+        internal static MethodCall<T> Setup<T>(Mock<T> mock, Expression<Action<T>> expression, Condition condition, bool ignoreArgs)
             where T : class
         {
             return PexProtector.Invoke(() =>
@@ -434,7 +436,7 @@ namespace Moq
 
                 ThrowIfNotMember(expression, method);
                 ThrowIfCantOverride(expression, method);
-                var call = new MethodCall<T>(mock, condition, expression, method, args);
+                var call = new MethodCall<T>(mock, condition, expression, method, ignoreArgs, args);
 
                 var targetInterceptor = GetInterceptor(methodCall.Object, mock);
 
@@ -447,7 +449,8 @@ namespace Moq
         internal static MethodCallReturn<T, TResult> Setup<T, TResult>(
             Mock<T> mock,
             Expression<Func<T, TResult>> expression,
-            Condition condition)
+            Condition condition, 
+            bool ignoreArgs)
             where T : class
         {
             return PexProtector.Invoke(() =>
@@ -463,7 +466,7 @@ namespace Moq
 
                 ThrowIfNotMember(expression, method);
                 ThrowIfCantOverride(expression, method);
-                var call = new MethodCallReturn<T, TResult>(mock, condition, expression, method, args);
+                var call = new MethodCallReturn<T, TResult>(mock, condition, expression, method, ignoreArgs, args);
 
                 var targetInterceptor = GetInterceptor(methodCall.Object, mock);
 
@@ -484,7 +487,7 @@ namespace Moq
                 if (expression.IsPropertyIndexer())
                 {
                     // Treat indexers as regular method invocations.
-                    return Setup<T, TProperty>(mock, expression, condition);
+                    return Setup<T, TProperty>(mock, expression, condition, false);
                 }
 
                 var prop = expression.ToPropertyInfo();
@@ -493,7 +496,7 @@ namespace Moq
                 var propGet = prop.GetGetMethod(true);
                 ThrowIfCantOverride(expression, propGet);
 
-                var call = new MethodCallReturn<T, TProperty>(mock, condition, expression, propGet, new Expression[0]);
+                var call = new MethodCallReturn<T, TProperty>(mock, condition, expression, propGet, false, new Expression[0]);
                 // Directly casting to MemberExpression is fine as ToPropertyInfo would throw if it wasn't
                 var targetInterceptor = GetInterceptor(((MemberExpression)expression.Body).Expression, mock);
 

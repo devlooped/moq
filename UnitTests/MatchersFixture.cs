@@ -9,7 +9,21 @@ namespace Moq.Tests
 {
 	public class MatchersFixture
 	{
-		[Fact]
+        [Fact]
+        public void MatchesAnyParameterValueWithSetupAnyArg()
+        {
+            var mock = new Mock<IFoo>();
+
+            mock.SetupAnyArg(x => x.Echo(17)).Returns(5);
+            mock.SetupAnyArg(x => x.Execute(null)).Returns("foo");
+
+            Assert.Equal(5, mock.Object.Echo(5));
+            Assert.Equal(5, mock.Object.Echo(25));
+            Assert.Equal("foo", mock.Object.Execute("hello"));
+            Assert.Equal("foo", mock.Object.Execute((string)null));
+        }
+
+        [Fact]
 		public void MatchesAnyParameterValue()
 		{
 			var mock = new Mock<IFoo>();

@@ -69,7 +69,7 @@ namespace Moq.Protected
 			ThrowIfMemberMissing(methodName, method);
 			ThrowIfPublicMethod(method);
 
-			return Mock.Setup(mock, GetMethodCall(method, args), null);
+            return Mock.Setup(mock, GetMethodCall(method, args), null, false);
 		}
 
 		public ISetup<T, TResult> Setup<TResult>(string methodName, params object[] args)
@@ -89,7 +89,7 @@ namespace Moq.Protected
 			ThrowIfVoidMethod(method);
 			ThrowIfPublicMethod(method);
 
-			return Mock.Setup(mock, GetMethodCall<TResult>(method, args), null);
+            return Mock.Setup(mock, GetMethodCall<TResult>(method, args), null, false);
 		}
 
 		public ISetupGetter<T, TProperty> SetupGet<TProperty>(string propertyName)
@@ -128,7 +128,7 @@ namespace Moq.Protected
 			ThrowIfMemberMissing(methodName, method);
 			ThrowIfPublicMethod(method);
 
-			Mock.Verify(mock, GetMethodCall(method, args), times, null);
+			Mock.Verify(mock, GetMethodCall(method, args), times, null, false);
 		}
 
 		public void Verify<TResult>(string methodName, Times times, object[] args)
@@ -148,7 +148,7 @@ namespace Moq.Protected
 			ThrowIfMemberMissing(methodName, method);
 			ThrowIfPublicMethod(method);
 
-			Mock.Verify(mock, GetMethodCall<TResult>(method, args), times, null);
+			Mock.Verify(mock, GetMethodCall<TResult>(method, args), times, null, false);
 		}
 
 		// TODO should receive args to support indexers
