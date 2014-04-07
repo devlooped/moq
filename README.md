@@ -60,7 +60,7 @@ You can read more about the "why" and see some nice screenshots at [kzu's blog](
 
 ## Where?
 
-See our [Quickstart](https://github.com/Moq/moq4/wiki/Quickstart) examples to get a feeling of the extremely simple API and install from [nuget](http://nuget.org/packages/moq). Check out the API documentation at [NuDoq](http://www.nudoq.org/#/Projects/Moq).
+See our [Quickstart](https://github.com/Moq/moq4/wiki/Quickstart) examples to get a feeling of the extremely simple API and install from [nuget](http://nuget.org/packages/moq). Check out the API documentation at [NuDoq](http://www.nudoq.org/#!/Projects/Moq).
 
 Read about the announcement at [kzu's blog](http://www.clariusconsulting.net/blogs/kzu/archive/2007/12/18/46465.aspx). Get some background on [the state of mock libraries from Scott Hanselman](http://www.hanselman.com/blog/MoqLinqLambdasAndPredicatesAppliedToMockObjects.aspx). 
 
