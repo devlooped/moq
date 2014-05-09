@@ -18,7 +18,7 @@ using System.ServiceModel.Web;
 using System.Web.UI.HtmlControls;
 using System.Threading;
 #endif
-#if !Net3x
+#if !Net3x && !SILVERLIGHT
 using System.Threading.Tasks;
 #endif
 
@@ -125,7 +125,7 @@ namespace Moq.Tests.Regressions
 		#endregion
 
 		#region #78
-#if !NET3x
+#if !NET3x && !SILVERLIGHT
 		public interface IIssue78Interface
 		{
 			Issue78TypeOne GetTypeOne();
