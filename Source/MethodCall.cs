@@ -457,21 +457,21 @@ namespace Moq
 
 	internal class Condition
 	{
-		private readonly Func<bool> mCondition;
-		private readonly Action mSuccess;
+		private readonly Func<bool> condition;
+		private readonly Action success;
 
 		public Condition(Func<bool> condition, Action success = null)
 		{
-			mCondition = condition;
-			mSuccess = success;
+			this.condition = condition;
+			this.success = success;
 		}
 
 		public bool IsTrue
 		{
 			get
 			{
-				if (mCondition != null)
-					return mCondition();
+				if (condition != null)
+					return condition();
 				else
 					return false;
 			}
@@ -479,8 +479,8 @@ namespace Moq
 
 		public void EvaluatedSuccessfully()
 		{
-			if (mSuccess != null)
-				mSuccess();
+			if (success != null)
+				success();
 		}
 	}
 }
