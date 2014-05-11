@@ -20,5 +20,8 @@
 		<param name="member">
 			The member to provide a default	value for.
 		</param>
+		<param name="owner">
+			The owning <see cref="Mock" />.
+		</param>
 	</doc>
 </docs>

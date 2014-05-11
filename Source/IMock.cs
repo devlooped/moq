@@ -2,6 +2,8 @@ using System.Diagnostics.CodeAnalysis;
 
 namespace Moq
 {
+	using System;
+
 	/// <summary>
 	/// Covarient interface for Mock&lt;T&gt; such that casts between IMock&lt;Employee&gt; to IMock&lt;Person&gt;
 	/// are possible. Only covers the covariant members of Mock&lt;T&gt;.
@@ -20,6 +22,6 @@ namespace Moq
 		bool CallBase { get; set; }
 
 		/// <include file='Mock.xdoc' path='docs/doc[@for="Mock.DefaultValue"]/*'/>
-		DefaultValue DefaultValue { get; set; }
+		Func<IDefaultValueProvider> DefaultValue { get; set; }
 	}
 }

@@ -54,16 +54,18 @@ namespace Moq
 	/// for invocations that do not have setups or return values, with loose mocks.
 	/// This is the default behavior for a mock.
 	/// </summary>
-	internal class EmptyDefaultValueProvider : IDefaultValueProvider
+	public class EmptyDefaultValueProvider : IDefaultValueProvider
 	{
 		private Dictionary<Type, object> defaultValues = new Dictionary<Type, object>();
 
+		/// <include file='IDefaultValueProvider.xdoc' path='docs/doc[@for="IDefaultValueProvider.DefineDefault"]/*'/>
 		public virtual void DefineDefault<T>(T value)
 		{
 			this.defaultValues[typeof(T)] = value;
 		}
 
-		public virtual object ProvideDefault(MethodInfo member)
+		/// <include file='IDefaultValueProvider.xdoc' path='docs/doc[@for="IDefaultValueProvider.ProvideDefault"]/*'/>
+		public virtual object ProvideDefault(MethodInfo member, Mock owner)
 		{
 			var valueType = member.ReturnType;
 

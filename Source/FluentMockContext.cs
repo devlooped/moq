@@ -100,7 +100,7 @@ namespace Moq
 
 		internal class MockInvocation : IDisposable
 		{
-			private DefaultValue defaultValue;
+			private Func<IDefaultValueProvider> defaultValue;
 
 			public MockInvocation(Mock mock, ICallContext invocation, Match matcher)
 			{

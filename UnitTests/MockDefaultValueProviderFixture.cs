@@ -10,9 +10,9 @@ namespace Moq.Tests
 		public void ProvidesMockValue()
 		{
 			var mock = new Mock<IFoo>();
-			var provider = new MockDefaultValueProvider(mock);
+			var provider = new MockDefaultValueProvider();
 
-			var value = provider.ProvideDefault(typeof(IFoo).GetProperty("Bar").GetGetMethod());
+			var value = provider.ProvideDefault(typeof(IFoo).GetProperty("Bar").GetGetMethod(), mock);
 
 			Assert.NotNull(value);
 			Assert.True(value is IMocked);
@@ -22,10 +22,10 @@ namespace Moq.Tests
 		public void CachesProvidedValue()
 		{
 			var mock = new Mock<IFoo>();
-			var provider = new MockDefaultValueProvider(mock);
+			var provider = new MockDefaultValueProvider();
 
-			var value1 = provider.ProvideDefault(typeof(IFoo).GetProperty("Bar").GetGetMethod());
-			var value2 = provider.ProvideDefault(typeof(IFoo).GetProperty("Bar").GetGetMethod());
+			var value1 = provider.ProvideDefault(typeof(IFoo).GetProperty("Bar").GetGetMethod(), mock);
+			var value2 = provider.ProvideDefault(typeof(IFoo).GetProperty("Bar").GetGetMethod(), mock);
 
 			Assert.Same(value1, value2);
 		}
@@ -34,18 +34,18 @@ namespace Moq.Tests
 		public void ProvidesEmptyValueIfNotMockeable()
 		{
 			var mock = new Mock<IFoo>();
-			var provider = new MockDefaultValueProvider(mock);
+			var provider = new MockDefaultValueProvider();
 
-			var value = provider.ProvideDefault(typeof(IFoo).GetProperty("Value").GetGetMethod());
+			var value = provider.ProvideDefault(typeof(IFoo).GetProperty("Value").GetGetMethod(), mock);
 			Assert.Equal(default(string), value);
 
-			value = provider.ProvideDefault(typeof(IFoo).GetProperty("Value").GetGetMethod());
+			value = provider.ProvideDefault(typeof(IFoo).GetProperty("Value").GetGetMethod(), mock);
 			Assert.Equal(default(string), value);
 
-			value = provider.ProvideDefault(typeof(IFoo).GetProperty("Indexes").GetGetMethod());
+			value = provider.ProvideDefault(typeof(IFoo).GetProperty("Indexes").GetGetMethod(), mock);
 			Assert.True(value is IEnumerable<int> && ((IEnumerable<int>)value).Count() == 0);
 
-			value = provider.ProvideDefault(typeof(IFoo).GetProperty("Bars").GetGetMethod());
+			value = provider.ProvideDefault(typeof(IFoo).GetProperty("Bars").GetGetMethod(), mock);
 			Assert.True(value is IBar[] && ((IBar[])value).Length == 0);
 		}
 
@@ -53,9 +53,9 @@ namespace Moq.Tests
 		public void NewMocksHaveSameBehaviorAndDefaultValueAsOwner()
 		{
 			var mock = new Mock<IFoo>();
-			var provider = new MockDefaultValueProvider(mock);
+			var provider = new MockDefaultValueProvider();
 
-			var value = provider.ProvideDefault(typeof(IFoo).GetProperty("Bar").GetGetMethod());
+			var value = provider.ProvideDefault(typeof(IFoo).GetProperty("Bar").GetGetMethod(), mock);
 
 			var barMock = Mock.Get((IBar)value);
 
@@ -67,9 +67,9 @@ namespace Moq.Tests
 		public void NewMocksHaveSameCallBaseAsOwner()
 		{
 			var mock = new Mock<IFoo> { CallBase = true };
-			var provider = new MockDefaultValueProvider(mock);
+			var provider = new MockDefaultValueProvider();
 
-			var value = provider.ProvideDefault(typeof(IFoo).GetProperty("Bar").GetGetMethod());
+			var value = provider.ProvideDefault(typeof(IFoo).GetProperty("Bar").GetGetMethod(), mock);
 
 			var barMock = Mock.Get((IBar)value);
 
@@ -80,9 +80,9 @@ namespace Moq.Tests
 		public void CreatedMockIsVerifiedWithOwner()
 		{
 			var mock = new Mock<IFoo>();
-			var provider = new MockDefaultValueProvider(mock);
+			var provider = new MockDefaultValueProvider();
 
-			var value = provider.ProvideDefault(typeof(IFoo).GetProperty("Bar").GetGetMethod());
+			var value = provider.ProvideDefault(typeof(IFoo).GetProperty("Bar").GetGetMethod(), mock);
 
 			var barMock = Mock.Get((IBar)value);
 			barMock.Setup(b => b.Do()).Verifiable();
