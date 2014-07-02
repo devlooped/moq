@@ -8,16 +8,15 @@ The most popular and friendly mocking framework for .NET
 
   // WOW! No record/replay weirdness?! :)
   mock.Setup(framework => framework.DownloadExists("2.0.0.0"))
-      .Returns(true)
-      .AtMostOnce();
+      .Returns(true);
 
   // Hand mock.Object as a collaborator and exercise it, 
   // like calling methods on it...
   ILoveThisFramework lovable = mock.Object;
   bool download = lovable.DownloadExists("2.0.0.0");
 
-  // Verify that the given method was indeed called with the expected value
-  mock.Verify(framework => framework.DownloadExists("2.0.0.0"));
+  // Verify that the given method was indeed called with the expected value at most once
+  mock.Verify(framework => framework.DownloadExists("2.0.0.0"), Times.AtMostOnce());
 ```
 
 Moq also is the first and only framework so far to provide Linq to Mocks, so that the same behavior above can be achieved much more succintly:
