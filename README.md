@@ -76,7 +76,7 @@ Moq offers the following features:
   * Unsurpassed VS intellisense integration: everything supports full VS intellisense, from setting expectations, to specifying method call arguments, return values, etc.
   * No Record/Replay idioms to learn. Just construct your mock, set it up, use it and optionally verify calls to it (you may not verify mocks when they act as stubs only, or when you are doing more classic state-based testing by checking returned values from the object under test)
   * VERY low learning curve as a consequence of the previous three points. For the most part, you don't even need to ever read the documentation.
-  * Granular control over mock behavior with a simple [http://www.clariusconsulting.net/labs/moq/html/90760C57.htm MockBehavior] enumeration (no need to learn what's the theoretical difference between a mock, a stub, a fake, a dynamic mock, etc.)
+  * Granular control over mock behavior with a simple  [MockBehavior](http://www.nudoq.org/#!/Packages/Moq/Moq/MockBehavior)  enumeration (no need to learn what's the theoretical difference between a mock, a stub, a fake, a dynamic mock, etc.)
   * Mock both interfaces and classes
   * Override expectations: can set default expectations in a fixture setup, and override as needed on tests
   * Pass constructor arguments for mocked classes
