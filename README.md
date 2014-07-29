@@ -47,21 +47,21 @@ Moq (pronounced "Mock-you" or just "Mock") is the only mocking library for .NET 
 
 ## Why?
 
-The library was created mainly for developers who aren't currently using any mocking library (or are displeased with the complexities of some other implementation), and who are typically [manually writing their own mocks](http://www.clariusconsulting.net/blogs/kzu/archive/2007/12/21/47152.aspx) (with more or less "fanciness"). Most developers in this situation also happen to be [quite pragmatic and adhere to state](http://www.clariusconsulting.net/blogs/kzu/archive/2007/12/21/StateTestingvsInteractionTesting.aspx) (or classic) TDD. It's the result of feeling that the barrier of entry from other mocking libraries is a bit high, and a simpler, more lightweight and elegant approach is possible. Moq achieves all this by taking full advantage of the elegant and compact C# and VB language features collectively known as LINQ (they are not just for queries, as the acronym implies). 
+The library was created mainly for developers who aren't currently using any mocking library (or are displeased with the complexities of some other implementation), and who are typically [manually writing their own mocks](http://blogs.clariusconsulting.net/kzu/mocks-stubs-and-fakes-its-a-continuum/) (with more or less "fanciness"). Most developers in this situation also happen to be [quite pragmatic and adhere to state](http://blogs.clariusconsulting.net/kzu/state-testing-vs-interaction-testing/) (or classic) TDD. It's the result of feeling that the barrier of entry from other mocking libraries is a bit high, and a simpler, more lightweight and elegant approach is possible. Moq achieves all this by taking full advantage of the elegant and compact C# and VB language features collectively known as LINQ (they are not just for queries, as the acronym implies). 
 
 Moq is designed to be a very practical, unobtrusive and straight-forward way to quickly setup dependencies for your tests. Its API design helps even novice users to fall in the "pit of success" and avoid most common misuses/abuses of mocking. 
 
-When it was conceived, it was the only mocking library that went against the generalized and somewhat unintuitive (especially for novices) Record/Replay approach from all other frameworks (and [that might have been a good thing](http://www.clariusconsulting.net/blogs/kzu/archive/2007/12/26/48177.aspx) ;)). 
+When it was conceived, it was the only mocking library that went against the generalized and somewhat unintuitive (especially for novices) Record/Replay approach from all other frameworks (and [that might have been a good thing](http://blogs.clariusconsulting.net/kzu/whats-wrong-with-the-recordreplyverify-model-for-mocking-frameworks/) ;)). 
 
 Not using Record/Replay also means that it's straightforward to move common expectations to a fixture setup method and even override those expectations when needed in a specific unit test.
 
-You can read more about the "why" and see some nice screenshots at [kzu's blog](http://www.clariusconsulting.net/blogs/kzu/archive/2008/03/17/WhydoweneedyetanotherNETmockingframework.aspx).
+You can read more about the "why" and see some nice screenshots at [kzu's blog](http://blogs.clariusconsulting.net/kzu/why-do-we-need-yet-another-net-mocking-framework/).
 
 ## Where?
 
 See our [Quickstart](https://github.com/Moq/moq4/wiki/Quickstart) examples to get a feeling of the extremely simple API and install from [nuget](http://nuget.org/packages/moq). Check out the API documentation at [NuDoq](http://www.nudoq.org/#!/Projects/Moq).
 
-Read about the announcement at [kzu's blog](http://www.clariusconsulting.net/blogs/kzu/archive/2007/12/18/46465.aspx). Get some background on [the state of mock libraries from Scott Hanselman](http://www.hanselman.com/blog/MoqLinqLambdasAndPredicatesAppliedToMockObjects.aspx). 
+Read about the announcement at [kzu's blog](http://blogs.clariusconsulting.net/kzu/linq-to-mock-moq-is-born/). Get some background on [the state of mock libraries from Scott Hanselman](http://www.hanselman.com/blog/MoqLinqLambdasAndPredicatesAppliedToMockObjects.aspx). 
 
 
 ## Who?
