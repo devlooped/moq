@@ -44,6 +44,8 @@ using System.Reflection;
 
 namespace Moq
 {
+	using System.ComponentModel;
+
 	internal class AsInterface<TInterface> : Mock<TInterface>
 		where TInterface : class
 	{
@@ -55,7 +57,8 @@ namespace Moq
 			this.owner = owner;
 		}
 
-		internal override Dictionary<MethodInfo, Mock> InnerMocks
+		[EditorBrowsable(EditorBrowsableState.Never)]
+		public override Dictionary<MethodInfo, Mock> InnerMocks
 		{
 			get { return this.owner.InnerMocks; }
 		}
@@ -83,7 +86,7 @@ namespace Moq
 			set { this.owner.CallBase = value; }
 		}
 
-		public override DefaultValue DefaultValue
+		public override Func<IDefaultValueProvider> DefaultValue
 		{
 			get { return this.owner.DefaultValue; }
 			set { this.owner.DefaultValue = value; }

@@ -52,12 +52,14 @@ using System.Runtime.CompilerServices;
 
 namespace Moq
 {
+    using System.ComponentModel;
+
     /// <include file='Mock.xdoc' path='docs/doc[@for="Mock"]/*'/>
     public abstract partial class Mock : IHideObjectMembers
     {
         private bool isInitialized;
         private bool callBase;
-        private DefaultValue defaultValue = DefaultValue.Empty;
+        private Func<IDefaultValueProvider> defaultValueProviderFactory = Moq.DefaultValue.Empty;
         private IDefaultValueProvider defaultValueProvider = new EmptyDefaultValueProvider();
 
         /// <include file='Mock.xdoc' path='docs/doc[@for="Mock.ctor"]/*'/>
@@ -134,18 +136,16 @@ namespace Moq
         }
 
         /// <include file='Mock.xdoc' path='docs/doc[@for="Mock.DefaultValue"]/*'/>
-        public virtual DefaultValue DefaultValue
+        public virtual Func<IDefaultValueProvider> DefaultValue
         {
-            get { return this.defaultValue; }
+            get { return this.defaultValueProviderFactory; }
             set { this.SetDefaultValue(value); }
         }
 
-        private void SetDefaultValue(DefaultValue value)
+        private void SetDefaultValue(Func<IDefaultValueProvider> value)
         {
-            this.defaultValue = value;
-            this.defaultValueProvider = defaultValue == DefaultValue.Mock ?
-                new MockDefaultValueProvider(this) :
-                new EmptyDefaultValueProvider();
+            this.defaultValueProviderFactory = value ?? Moq.DefaultValue.Empty;
+            this.defaultValueProvider = this.defaultValueProviderFactory.Invoke();
         }
 
         /// <include file='Mock.xdoc' path='docs/doc[@for="Mock.Object"]/*'/>
@@ -153,11 +153,11 @@ namespace Moq
         [SuppressMessage("Microsoft.Naming", "CA1721:PropertyNamesShouldNotMatchGetMethods", Justification = "The public Object property is the only one visible to Moq consumers. The protected member is for internal use only.")]
         public object Object
         {
-	        get
-	        {
-				Contract.Ensures(Contract.Result<object>() != null);
-				return this.GetObject();
-	        }
+            get
+            {
+                Contract.Ensures(Contract.Result<object>() != null);
+                return this.GetObject();
+            }
         }
 
         private object GetObject()
@@ -169,7 +169,11 @@ namespace Moq
 
         internal virtual Interceptor Interceptor { get; set; }
 
-        internal virtual Dictionary<MethodInfo, Mock> InnerMocks { get; private set; }
+        /// <summary>
+        /// Contains a list of all dynamically created mocks when the DefaultValue is set to DefaultValue.Mock
+        /// </summary>
+        [EditorBrowsable(EditorBrowsableState.Never)]
+        public virtual Dictionary<MethodInfo, Mock> InnerMocks { get; private set; }
 
         /// <include file='Mock.xdoc' path='docs/doc[@for="Mock.OnGetObject"]/*'/>
         [SuppressMessage("Microsoft.Design", "CA1024:UsePropertiesWhereAppropriate", Justification = "This is actually the protected virtual implementation of the property Object.")]
@@ -679,7 +683,7 @@ namespace Moq
                 foreach (var property in properties)
                 {
                     var expression = GetPropertyExpression(mockType, property);
-                    var initialValue = mock.DefaultValueProvider.ProvideDefault(property.GetGetMethod());
+                    var initialValue = mock.DefaultValueProvider.ProvideDefault(property.GetGetMethod(), mock);
 
                     var mocked = initialValue as IMocked;
                     if (mocked != null)

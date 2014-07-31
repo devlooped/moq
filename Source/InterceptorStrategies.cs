@@ -21,7 +21,7 @@ namespace Moq
                 }
                 else
                 {
-                    invocation.ReturnValue = ctx.Mock.DefaultValueProvider.ProvideDefault(invocation.Method);
+                    invocation.ReturnValue = ctx.Mock.DefaultValueProvider.ProvideDefault(invocation.Method, ctx.Mock);
                 }
                 return InterceptionAction.Stop;
             }

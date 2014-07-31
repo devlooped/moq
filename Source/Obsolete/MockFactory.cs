@@ -160,7 +160,7 @@ namespace Moq
 		/// Specifies the behavior to use when returning default values for 
 		/// unexpected invocations on loose mocks.
 		/// </summary>
-		public DefaultValue DefaultValue { get; set; }
+		public Func<IDefaultValueProvider> DefaultValue { get; set; }
 
 		/// <summary>
 		/// Gets the mocks that have been created by this factory and 

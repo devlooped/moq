@@ -201,7 +201,7 @@ namespace Moq
 			Mock fluentMock;
 			if (!mock.InnerMocks.TryGetValue(info, out fluentMock))
 			{
-				fluentMock = ((IMocked)new MockDefaultValueProvider(mock).ProvideDefault(info)).Mock;
+				fluentMock = ((IMocked)new MockDefaultValueProvider().ProvideDefault(info, mock)).Mock;
 				Mock.SetupAllProperties(fluentMock);
 			}
 
