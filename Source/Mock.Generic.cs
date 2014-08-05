@@ -40,6 +40,7 @@
 
 using System;
 using System.Diagnostics.CodeAnalysis;
+using System.Linq;
 using System.Linq.Expressions;
 using Moq.Language.Flow;
 using Moq.Proxy;
@@ -111,7 +112,7 @@ namespace Moq
 			this.Behavior = behavior;
 			this.Interceptor = new Interceptor(behavior, typeof(T), this);
 			this.constructorArguments = args;
-			this.ImplementedInterfaces.AddRange(typeof(T).GetInterfaces());
+            this.ImplementedInterfaces.AddRange(typeof(T).GetInterfaces().Where(i => i.IsPublic));
 			this.ImplementedInterfaces.Add(typeof(IMocked<T>));
 
 			this.CheckParameters();
