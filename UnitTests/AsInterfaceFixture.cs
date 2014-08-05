@@ -184,58 +184,23 @@ namespace Moq.Tests
 
 		public abstract class FooBar : IFoo, IBag, IBar
 		{
+			public abstract void Execute();
 
-			public void Execute()
-			{
-				throw new NotImplementedException();
-			}
+			public abstract string Execute(string command);
 
-			public string Execute(string command)
-			{
-				throw new NotImplementedException();
-			}
+			public abstract string Execute(string arg1, string arg2);
 
-			public string Execute(string arg1, string arg2)
-			{
-				throw new NotImplementedException();
-			}
+			public abstract string Execute(string arg1, string arg2, string arg3);
 
-			public string Execute(string arg1, string arg2, string arg3)
-			{
-				throw new NotImplementedException();
-			}
+			public abstract string Execute(string arg1, string arg2, string arg3, string arg4);
 
-			public string Execute(string arg1, string arg2, string arg3, string arg4)
-			{
-				throw new NotImplementedException();
-			}
+			public abstract int Value { get; set; }
 
-			public int Value
-			{
-				get
-				{
-					throw new NotImplementedException();
-				}
-				set
-				{
-					throw new NotImplementedException();
-				}
-			}
+			public abstract void Add(string key, object o);
 
-			public void Add(string key, object o)
-			{
-				throw new NotImplementedException();
-			}
+			public abstract object Get(string key);
 
-			public object Get(string key)
-			{
-				throw new NotImplementedException();
-			}
-
-			public void Test()
-			{
-				throw new NotImplementedException();
-			}
+			public abstract void Test();
 		}
 	}
 }

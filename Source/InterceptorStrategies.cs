@@ -34,6 +34,7 @@ namespace Moq
         public InterceptionAction HandleIntercept(ICallContext invocation, InterceptorContext ctx, CurrentInterceptContext localctx)
         {
             if (invocation.Method.DeclaringType == typeof(object) ||
+                ctx.Mock.ImplementedInterfaces.Contains(invocation.Method.DeclaringType) && !invocation.Method.IsEventAttach() && !invocation.Method.IsEventDetach() && ctx.Mock.CallBase ||
                 invocation.Method.DeclaringType.IsClass && !invocation.Method.IsAbstract && ctx.Mock.CallBase
                 )
             {
