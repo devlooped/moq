@@ -1,1 +1,1 @@
-%WINDIR%\Microsoft.NET\Framework\v4.0.30319\msbuild %~dp0\build.proj /verbosity:normal /nr:false
+"C:\Program Files (x86)\MSBuild\12.0\Bin\msbuild.exe" %~dp0\build.proj /verbosity:normal /nr:false
