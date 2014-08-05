@@ -332,23 +332,68 @@ namespace Moq
 
 		protected virtual void SetCallbackWithArguments(Delegate callback)
 		{
+			this.ValidateCallbackWithArguments(callback);
+			this.setupCallback = delegate(object[] args) { callback.InvokePreserveStack(args); };
+		}
+
+		private void ValidateCallbackWithArguments(Delegate callback)
+		{
+			if (HasCompatibleParameterList(callback.Method))
+			{
+				// the backing method for the literal delegate is compatible, DynamicInvoke(...) will succeed
+				return;
+			}
+
+			// it's possible for the .Method property (backing method for a delegate) to have
+			// differing parameter types than the actual delegate signature. This occurs in C# when
+			// an instance delegate invocation is created for an extension method (bundled with a receiver)
+			// or at times for DLR code generation paths because the CLR is optimized for instance methods.
+			var invokeMethod = GetInvokeMethodFromUntypedDelegateCallback(callback);
+			if (invokeMethod != null && HasCompatibleParameterList(invokeMethod))
+			{
+				// the Invoke(...) method is compatible instead. DynamicInvoke(...) will succeed.
+				return;
+			}
+
+			// Neither the literal backing field of the delegate was compatible
+			// nor the delegate invoke signature.
 			var expectedParams = this.Method.GetParameters();
 			var actualParams = callback.Method.GetParameters();
+			ThrowParameterMismatch(expectedParams, actualParams);
+		}
 
-			if (expectedParams.Length == actualParams.Length)
+		private bool HasCompatibleParameterList(MethodInfo method)
+		{
+			var expectedParams = this.Method.GetParameters();
+			var actualParams = method.GetParameters();
+			if (expectedParams.Length != actualParams.Length)
 			{
-				for (int i = 0; i < expectedParams.Length; i++)
+				return false;
+			}
+
+			for (int i = 0; i < expectedParams.Length; i++)
+			{
+				if (!actualParams[i].ParameterType.IsAssignableFrom(expectedParams[i].ParameterType))
 				{
-					if (!actualParams[i].ParameterType.IsAssignableFrom(expectedParams[i].ParameterType))
-						ThrowParameterMismatch(expectedParams, actualParams);
+					return false;
 				}
 			}
-			else
-			{
-				ThrowParameterMismatch(expectedParams, actualParams);
-			}
 
-			this.setupCallback = delegate(object[] args) { callback.InvokePreserveStack(args); };
+			return true;
+		}
+
+		private static MethodInfo GetInvokeMethodFromUntypedDelegateCallback(Delegate callback)
+		{
+			// Section 8.9.3 of 4th Ed ECMA 335 CLI spec requires delegates to have an 'Invoke' method.
+			// However, there is not a requirement for 'public', or for it to be unambiguous.
+			try
+			{
+				return callback.GetType().GetMethod("Invoke", BindingFlags.Instance | BindingFlags.Public | BindingFlags.NonPublic);
+			}
+			catch (AmbiguousMatchException)
+			{
+				return null;
+			}
 		}
 
 		private static void ThrowParameterMismatch(ParameterInfo[] expected, ParameterInfo[] actual)

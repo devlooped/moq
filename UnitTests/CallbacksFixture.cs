@@ -403,6 +403,21 @@ namespace Moq.Tests
 			mock.Object.Method(new Derived());
 		}
 
+		[Fact]
+		public void CallbackCanBeImplementedByExtensionMethod()
+		{
+			var mock = new Mock<IFoo>();
+			string receivedArgument = null;
+			Action<string> innerCallback = param => { receivedArgument = param; };
+
+			// Delegate parameter currying can confuse Moq (used by extension delegates)
+			Action<string> callback = innerCallback.ExtensionCallbackHelper;
+			mock.Setup(x => x.Submit(It.IsAny<string>())).Callback(callback);
+
+			mock.Object.Submit("blah");
+			Assert.Equal("blah extended", receivedArgument);
+		}
+
 		public interface IInterface
 		{
 			void Method(Derived b);
@@ -441,6 +456,14 @@ namespace Moq.Tests
 			string Execute(string arg1, string arg2, string arg3, string arg4, string arg5, string arg6, string arg7, string arg8);
 
 			int Value { get; set; }
+		}
+	}
+
+	static class Extensions
+	{
+		public static void ExtensionCallbackHelper(this Action<string> inner, string param)
+		{
+			inner.Invoke(param + " extended");
 		}
 	}
 }
