@@ -152,6 +152,14 @@ namespace Moq.Tests
 			bag.As<IFoo>().Verify(f => f.Execute());
 		}
 
+		[Fact]
+		public void ShouldBeAbleToCastToImplementedInterface()
+		{
+			var fooBar = new Mock<FooBar>();
+			var obj = fooBar.Object;
+			Assert.DoesNotThrow(() => fooBar.As<IFoo>());
+		}
+
 		public interface IFoo
 		{
 			void Execute();
@@ -167,6 +175,67 @@ namespace Moq.Tests
 		{
 			void Add(string key, object o);
 			object Get(string key);
+		}
+
+		internal interface IBar
+		{
+			void Test();
+		}
+
+		public abstract class FooBar : IFoo, IBag, IBar
+		{
+
+			public void Execute()
+			{
+				throw new NotImplementedException();
+			}
+
+			public string Execute(string command)
+			{
+				throw new NotImplementedException();
+			}
+
+			public string Execute(string arg1, string arg2)
+			{
+				throw new NotImplementedException();
+			}
+
+			public string Execute(string arg1, string arg2, string arg3)
+			{
+				throw new NotImplementedException();
+			}
+
+			public string Execute(string arg1, string arg2, string arg3, string arg4)
+			{
+				throw new NotImplementedException();
+			}
+
+			public int Value
+			{
+				get
+				{
+					throw new NotImplementedException();
+				}
+				set
+				{
+					throw new NotImplementedException();
+				}
+			}
+
+			public void Add(string key, object o)
+			{
+				throw new NotImplementedException();
+			}
+
+			public object Get(string key)
+			{
+				throw new NotImplementedException();
+			}
+
+			public void Test()
+			{
+				throw new NotImplementedException();
+			}
 		}
 	}
 }
