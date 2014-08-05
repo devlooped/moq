@@ -40,7 +40,6 @@
 
 using System;
 using System.Diagnostics.CodeAnalysis;
-using System.Diagnostics.Contracts;
 using System.Linq.Expressions;
 using Moq.Language.Flow;
 using Moq.Proxy;
@@ -164,11 +163,7 @@ namespace Moq
 		[SuppressMessage("Microsoft.Naming", "CA1721:PropertyNamesShouldNotMatchGetMethods", Justification = "The public Object property is the only one visible to Moq consumers. The protected member is for internal use only.")]
 		public virtual new T Object
 		{
-			get
-			{
-				Contract.Ensures(Contract.Result<T>() != null);
-				return (T)base.Object;
-			}
+			get { return (T)base.Object; }
 		}
 
 		/// <include file='Mock.Generic.xdoc' path='docs/doc[@for="Mock{T}.Name"]/*'/>

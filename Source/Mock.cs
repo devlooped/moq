@@ -38,7 +38,6 @@
 //[This is the BSD license, see
 // http://www.opensource.org/licenses/bsd-license.php]
 
-using System.Diagnostics.Contracts;
 using Moq.Properties;
 using Moq.Proxy;
 using System;
@@ -153,11 +152,7 @@ namespace Moq
         [SuppressMessage("Microsoft.Naming", "CA1721:PropertyNamesShouldNotMatchGetMethods", Justification = "The public Object property is the only one visible to Moq consumers. The protected member is for internal use only.")]
         public object Object
         {
-	        get
-	        {
-				Contract.Ensures(Contract.Result<object>() != null);
-				return this.GetObject();
-	        }
+            get { return this.GetObject(); }
         }
 
         private object GetObject()
