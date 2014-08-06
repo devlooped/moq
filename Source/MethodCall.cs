@@ -339,27 +339,38 @@ namespace Moq
 		private void ValidateCallbackWithArguments(Delegate callback)
 		{
 			var expectedParams = this.Method.GetParameters();
-			if (HasCompatibleParameterList(expectedParams, callback.Method))
+
+			if (HasCompatibleParameterList(expectedParams, callback))
+			{
+				return;
+			}
+
+			var actualParams = callback.Method.GetParameters();
+			ThrowParameterMismatch(expectedParams, actualParams);
+		}
+
+		private static bool HasCompatibleParameterList(ParameterInfo[] expectedParams, Delegate function)
+		{
+			if (HasCompatibleParameterList(expectedParams, function.Method))
 			{
 				// the backing method for the literal delegate is compatible, DynamicInvoke(...) will succeed
-				return;
+				return true;
 			}
 
 			// it's possible for the .Method property (backing method for a delegate) to have
 			// differing parameter types than the actual delegate signature. This occurs in C# when
 			// an instance delegate invocation is created for an extension method (bundled with a receiver)
 			// or at times for DLR code generation paths because the CLR is optimized for instance methods.
-			var invokeMethod = GetInvokeMethodFromUntypedDelegateCallback(callback);
+			var invokeMethod = GetInvokeMethodFromUntypedDelegateCallback(function);
 			if (invokeMethod != null && HasCompatibleParameterList(expectedParams, invokeMethod))
 			{
 				// the Invoke(...) method is compatible instead. DynamicInvoke(...) will succeed.
-				return;
+				return true;
 			}
 
 			// Neither the literal backing field of the delegate was compatible
 			// nor the delegate invoke signature.
-			var actualParams = callback.Method.GetParameters();
-			ThrowParameterMismatch(expectedParams, actualParams);
+			return false;
 		}
 
 		private static bool HasCompatibleParameterList(ParameterInfo[] expectedParams, MethodInfo method)
