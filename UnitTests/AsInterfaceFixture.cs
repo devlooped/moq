@@ -152,6 +152,23 @@ namespace Moq.Tests
 			bag.As<IFoo>().Verify(f => f.Execute());
 		}
 
+		[Fact]
+		public void ShouldBeAbleToCastToImplementedInterface()
+		{
+			var fooBar = new Mock<FooBar>();
+			var obj = fooBar.Object;
+			Assert.DoesNotThrow(() => fooBar.As<IFoo>());
+		}
+
+		[Fact]
+		public void ShouldNotThrowIfCallExplicitlyImplementedInterfacesMethodWhenCallBaseIsTrue()
+		{
+			var fooBar = new Mock<FooBar>();
+			fooBar.CallBase = true;
+			var bag = (IBag)fooBar.Object;
+			Assert.DoesNotThrow(() => bag.Get("test"));
+		}
+
 		public interface IFoo
 		{
 			void Execute();
@@ -167,6 +184,37 @@ namespace Moq.Tests
 		{
 			void Add(string key, object o);
 			object Get(string key);
+		}
+
+		internal interface IBar
+		{
+			void Test();
+		}
+
+		public abstract class FooBar : IFoo, IBag, IBar
+		{
+			public abstract void Execute();
+
+			public abstract string Execute(string command);
+
+			public abstract string Execute(string arg1, string arg2);
+
+			public abstract string Execute(string arg1, string arg2, string arg3);
+
+			public abstract string Execute(string arg1, string arg2, string arg3, string arg4);
+
+			public abstract int Value { get; set; }
+
+			void IBag.Add(string key, object o)
+			{
+			}
+
+			object IBag.Get(string key)
+			{
+				return null;
+			}
+
+			public abstract void Test();
 		}
 	}
 }
