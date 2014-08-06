@@ -160,6 +160,15 @@ namespace Moq.Tests
 			Assert.DoesNotThrow(() => fooBar.As<IFoo>());
 		}
 
+		[Fact]
+		public void ShouldNotThrowIfCallExplicitlyImplementedInterfacesMethodWhenCallBaseIsTrue()
+		{
+			var fooBar = new Mock<FooBar>();
+			fooBar.CallBase = true;
+			var bag = (IBag)fooBar.Object;
+			Assert.DoesNotThrow(() => bag.Get("test"));
+		}
+
 		public interface IFoo
 		{
 			void Execute();
@@ -196,9 +205,14 @@ namespace Moq.Tests
 
 			public abstract int Value { get; set; }
 
-			public abstract void Add(string key, object o);
+			void IBag.Add(string key, object o)
+			{
+			}
 
-			public abstract object Get(string key);
+			object IBag.Get(string key)
+			{
+				return null;
+			}
 
 			public abstract void Test();
 		}
