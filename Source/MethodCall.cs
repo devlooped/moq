@@ -335,15 +335,7 @@ namespace Moq
 			var expectedParams = this.Method.GetParameters();
 			var actualParams = callback.Method.GetParameters();
 
-			if (expectedParams.Length == actualParams.Length)
-			{
-				for (int i = 0; i < expectedParams.Length; i++)
-				{
-					if (!actualParams[i].ParameterType.IsAssignableFrom(expectedParams[i].ParameterType))
-						ThrowParameterMismatch(expectedParams, actualParams);
-				}
-			}
-			else
+			if (!callback.HasCompatibleParameterList(expectedParams))
 			{
 				ThrowParameterMismatch(expectedParams, actualParams);
 			}

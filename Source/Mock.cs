@@ -582,9 +582,11 @@ namespace Moq
 
                 // No need to call ThrowIfCantOverride as non-overridable would have thrown above already.
 
-                var x = Expression.Parameter(last.Invocation.Method.DeclaringType,
-                    // Get the variable name as used in the actual delegate :)
-                    setterExpression.Method.GetParameters()[0].Name);
+                // Get the variable name as used in the actual delegate :)
+                // because of delegate currying, look at the last parameter for the Action's backing method, not the first
+                var setterExpressionParameters = setterExpression.Method.GetParameters();
+                var parameterName = setterExpressionParameters[setterExpressionParameters.Length - 1].Name;
+                var x = Expression.Parameter(last.Invocation.Method.DeclaringType, parameterName);
 
                 var arguments = last.Invocation.Arguments;
                 var parameters = setter.GetParameters();
