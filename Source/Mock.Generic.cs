@@ -112,7 +112,7 @@ namespace Moq
 			this.Behavior = behavior;
 			this.Interceptor = new Interceptor(behavior, typeof(T), this);
 			this.constructorArguments = args;
-			this.ImplementedInterfaces.AddRange(typeof(T).GetInterfaces().Where((i => i.IsPublic || i.IsNestedPublic) && !i.IsImport));
+			this.ImplementedInterfaces.AddRange(typeof(T).GetInterfaces().Where(i => (i.IsPublic || i.IsNestedPublic) && !i.IsImport));
 			this.ImplementedInterfaces.Add(typeof(IMocked<T>));
 
 			this.CheckParameters();
