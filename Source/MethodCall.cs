@@ -340,70 +340,13 @@ namespace Moq
 		{
 			var expectedParams = this.Method.GetParameters();
 
-			if (HasCompatibleParameterList(expectedParams, callback))
+			if (callback.HasCompatibleParameterList(expectedParams))
 			{
 				return;
 			}
 
 			var actualParams = callback.Method.GetParameters();
 			ThrowParameterMismatch(expectedParams, actualParams);
-		}
-
-		private static bool HasCompatibleParameterList(ParameterInfo[] expectedParams, Delegate function)
-		{
-			if (HasCompatibleParameterList(expectedParams, function.Method))
-			{
-				// the backing method for the literal delegate is compatible, DynamicInvoke(...) will succeed
-				return true;
-			}
-
-			// it's possible for the .Method property (backing method for a delegate) to have
-			// differing parameter types than the actual delegate signature. This occurs in C# when
-			// an instance delegate invocation is created for an extension method (bundled with a receiver)
-			// or at times for DLR code generation paths because the CLR is optimized for instance methods.
-			var invokeMethod = GetInvokeMethodFromUntypedDelegateCallback(function);
-			if (invokeMethod != null && HasCompatibleParameterList(expectedParams, invokeMethod))
-			{
-				// the Invoke(...) method is compatible instead. DynamicInvoke(...) will succeed.
-				return true;
-			}
-
-			// Neither the literal backing field of the delegate was compatible
-			// nor the delegate invoke signature.
-			return false;
-		}
-
-		private static bool HasCompatibleParameterList(ParameterInfo[] expectedParams, MethodInfo method)
-		{
-			var actualParams = method.GetParameters();
-			if (expectedParams.Length != actualParams.Length)
-			{
-				return false;
-			}
-
-			for (int i = 0; i < expectedParams.Length; i++)
-			{
-				if (!actualParams[i].ParameterType.IsAssignableFrom(expectedParams[i].ParameterType))
-				{
-					return false;
-				}
-			}
-
-			return true;
-		}
-
-		private static MethodInfo GetInvokeMethodFromUntypedDelegateCallback(Delegate callback)
-		{
-			// Section 8.9.3 of 4th Ed ECMA 335 CLI spec requires delegates to have an 'Invoke' method.
-			// However, there is not a requirement for 'public', or for it to be unambiguous.
-			try
-			{
-				return callback.GetType().GetMethod("Invoke", BindingFlags.Instance | BindingFlags.Public | BindingFlags.NonPublic);
-			}
-			catch (AmbiguousMatchException)
-			{
-				return null;
-			}
 		}
 
 		private static void ThrowParameterMismatch(ParameterInfo[] expected, ParameterInfo[] actual)
