@@ -1,3 +1,7 @@
+Version 4.3
+* Added support for Roslyn
+* Automatically add implemented interfaces to mock
+
 Version 4.2
 * Improved support for async APIs by making default value a completed task
 * Added support for async Returns and Throws
