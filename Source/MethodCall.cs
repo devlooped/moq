@@ -332,21 +332,15 @@ namespace Moq
 
 		protected virtual void SetCallbackWithArguments(Delegate callback)
 		{
-			this.ValidateCallbackWithArguments(callback);
-			this.setupCallback = delegate(object[] args) { callback.InvokePreserveStack(args); };
-		}
-
-		private void ValidateCallbackWithArguments(Delegate callback)
-		{
 			var expectedParams = this.Method.GetParameters();
+			var actualParams = callback.Method.GetParameters();
 
-			if (callback.HasCompatibleParameterList(expectedParams))
+			if (!callback.HasCompatibleParameterList(expectedParams))
 			{
-				return;
+				ThrowParameterMismatch(expectedParams, actualParams);
 			}
 
-			var actualParams = callback.Method.GetParameters();
-			ThrowParameterMismatch(expectedParams, actualParams);
+			this.setupCallback = delegate(object[] args) { callback.InvokePreserveStack(args); };
 		}
 
 		private static void ThrowParameterMismatch(ParameterInfo[] expected, ParameterInfo[] actual)
