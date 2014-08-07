@@ -4,13 +4,13 @@
     <id>Moq</id>
     <version>4.1</version>
     <title>Moq: an enjoyable mocking library</title>
-    <authors>Daniel Cazzulino</authors>
-    <owners>Daniel Cazzulino, Clarius Labs</owners>
+    <authors>Daniel Cazzulino, kzu</authors>
+    <owners>Daniel Cazzulino, Clarius Labs, kzu</owners>
     <licenseUrl>http://www.opensource.org/licenses/bsd-license.php</licenseUrl>
     <projectUrl>http://www.moqthis.com</projectUrl>
     <requireLicenseAcceptance>false</requireLicenseAcceptance>
     <description>The most popular and friendly mocking framework for .NET</description>
-    <tags>tdd mocking mocks unittesting agile</tags>
+    <tags>moq tdd mocking mocks unittesting agile unittest</tags>
     <releaseNotes>Version 4.1
 * Added covariant IMock&lt;out T&gt; interface to Mock&lt;T&gt;
 * Added It.IsNotNull&lt;T&gt;
