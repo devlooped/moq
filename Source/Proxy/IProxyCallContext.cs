@@ -46,17 +46,17 @@ namespace Moq.Proxy
   
   internal interface ICallMatchable
   {
-    bool Matches(ICallContext call);
+    bool Matches(IMinimalCallContext minimalCall);
   }
 
-  internal interface ICallContext
+  internal interface IMinimalCallContext
   {
     object[] Arguments { get; }
     MethodInfo Method { get; }
     object ReturnValue { get; set; }
   }
 
-  internal interface IProxyCallContext : ICallContext
+  internal interface ICallContext : IMinimalCallContext
 	{
 		void InvokeBase();
 

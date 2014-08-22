@@ -55,8 +55,8 @@ namespace Moq
 		MethodInfo Method { get; }
 		void EvaluatedSuccessfully();
 
-		void Execute(IProxyCallContext call);
-		void SetOutParameters(IProxyCallContext call);
+		void Execute(ICallContext call);
+		void SetOutParameters(ICallContext call);
 
 		// Where the setup was performed.
 		string FileName { get; }

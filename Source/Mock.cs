@@ -365,7 +365,7 @@ namespace Moq
             Expression expression,
             Times times)
         {
-			IEnumerable<IProxyCallContext> actualCalls = targetInterceptor.InterceptionContext.ActualInvocations;
+			IEnumerable<ICallContext> actualCalls = targetInterceptor.InterceptionContext.ActualInvocations;
 
             var callCount = actualCalls.Where(ac => expected.Matches(ac)).Count();
             if (!times.Verify(callCount))
@@ -378,7 +378,7 @@ namespace Moq
         private static void ThrowVerifyException(
             IProxyCall expected,
             IEnumerable<IProxyCall> setups,
-            IEnumerable<IProxyCallContext> actualCalls,
+            IEnumerable<ICallContext> actualCalls,
             Expression expression,
             Times times,
             int callCount)
@@ -389,7 +389,7 @@ namespace Moq
         private static void ThrowVerifyException(
             string failMessage,
             IEnumerable<IProxyCall> setups,
-            IEnumerable<IProxyCallContext> actualCalls,
+            IEnumerable<ICallContext> actualCalls,
             Expression expression,
             Times times,
             int callCount)
@@ -427,7 +427,7 @@ namespace Moq
             return string.Format(CultureInfo.CurrentCulture, "Times.Exactly({0})", callCount);
         }
 
-        private static string FormatInvocations(IEnumerable<IProxyCallContext> invocations)
+        private static string FormatInvocations(IEnumerable<ICallContext> invocations)
         {
             var formattedInvocations = invocations
                 .Select(i => i.Format())

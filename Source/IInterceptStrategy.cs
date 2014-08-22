@@ -22,14 +22,14 @@ namespace Moq
 		/// <param name="ctx">shared data for the interceptor as a whole</param>
 		/// <param name="localCtx">shared data among the strategies during a single interception</param>
 		/// <returns>InterceptionAction.Continue if further interception has to be processed, otherwise InterceptionAction.Stop</returns>
-		InterceptionAction HandleIntercept(IProxyCallContext invocation, InterceptorContext ctx, CurrentInterceptContext localCtx);
+		InterceptionAction HandleIntercept(ICallContext invocation, InterceptorContext ctx, CurrentInterceptContext localCtx);
 		
 	}
 
 	internal class InterceptorContext
 	{
 		private Dictionary<string, List<Delegate>> invocationLists = new Dictionary<string, List<Delegate>>();
-		private List<IProxyCallContext> actualInvocations = new List<IProxyCallContext>();
+		private List<ICallContext> actualInvocations = new List<ICallContext>();
 		private List<IProxyCall> orderedCalls = new List<IProxyCall>();
 
 		public InterceptorContext(Mock Mock, Type targetType, MockBehavior behavior)
@@ -85,7 +85,7 @@ namespace Moq
 		#endregion
 
 		#region ActualInvocations
-		internal void AddInvocation(IProxyCallContext invocation)
+		internal void AddInvocation(ICallContext invocation)
 		{
 			lock (actualInvocations)
 			{
@@ -97,7 +97,7 @@ namespace Moq
         Mock.CallSequence.Add(invocation, Mock);
       }
 		}
-		internal IEnumerable<IProxyCallContext> ActualInvocations
+		internal IEnumerable<ICallContext> ActualInvocations
 		{
 			get
 			{

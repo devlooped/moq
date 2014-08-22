@@ -7,10 +7,10 @@ namespace Moq.Sequencing
 {
   internal class RecordedCalls : IRecordedCalls
   {
-		private readonly List<Tuple<ICallContext, Mock>> callContexts = new List<Tuple<ICallContext, Mock>>();
+		private readonly List<Tuple<IMinimalCallContext, Mock>> callContexts = new List<Tuple<IMinimalCallContext, Mock>>();
 		private int currentItemIndex = 0;
 		
-		public void Add (ICallContext invocation, Mock target)
+		public void Add (IMinimalCallContext invocation, Mock target)
 		{
 			callContexts.Add(Tuple.Create(invocation, target));
 		}
@@ -86,7 +86,7 @@ namespace Moq.Sequencing
 		}
 	
 		
-		private bool IsThereAMatchBetweenContextAndExpectedCall(ICallContext currentContext, Mock currentTarget, ICallMatchable expected, Mock target)
+		private bool IsThereAMatchBetweenContextAndExpectedCall(IMinimalCallContext currentContext, Mock currentTarget, ICallMatchable expected, Mock target)
 		{
 			var result = expected.Matches(currentContext) && target == currentTarget;
 			return result;

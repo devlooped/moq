@@ -69,7 +69,7 @@ namespace Moq
 			}
 		}
 
-		public static string Format(this IProxyCallContext invocation)
+		public static string Format(this ICallContext invocation)
 		{
 			if (invocation.Method.IsPropertyGetter())
 			{

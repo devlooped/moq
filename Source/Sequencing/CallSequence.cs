@@ -90,7 +90,7 @@ namespace Moq.Sequencing
       recordedCalls.Rewind();
     }
 
-    internal void Add (IProxyCallContext invocation, Mock target)
+    internal void Add (ICallContext invocation, Mock target)
 		{
 			recordedCalls.Add(invocation, target);
 		}

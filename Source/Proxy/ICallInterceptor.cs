@@ -42,6 +42,6 @@ namespace Moq.Proxy
 {
 	internal interface ICallInterceptor
 	{
-		void Intercept(IProxyCallContext context);
+		void Intercept(ICallContext context);
 	}
 }

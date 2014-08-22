@@ -127,7 +127,7 @@ namespace Moq
 		}
 
 		[SuppressMessage("Microsoft.Maintainability", "CA1502:AvoidExcessiveComplexity")]
-		public void Intercept(IProxyCallContext invocation)
+		public void Intercept(ICallContext invocation)
 		{
             CurrentInterceptContext localCtx = new CurrentInterceptContext();
 			foreach (var strategy in InterceptionStrategies())

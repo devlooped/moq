@@ -206,7 +206,7 @@ namespace Moq
 			}
 		}
 
-		public void SetOutParameters(IProxyCallContext call)
+		public void SetOutParameters(ICallContext call)
 		{
 			foreach (var item in this.outValues)
 			{
@@ -216,24 +216,24 @@ namespace Moq
 			}
 		}
 
-		public virtual bool Matches(ICallContext call)
+		public virtual bool Matches(IMinimalCallContext minimalCall)
 		{
 			if (condition != null && !condition.IsTrue)
 			{
 				return false;
 			}
 
-			var parameters = call.Method.GetParameters();
+			var parameters = minimalCall.Method.GetParameters();
 			var args = new List<object>();
 			for (int i = 0; i < parameters.Length; i++)
 			{
 				if (!parameters[i].IsOutArgument())
 				{
-					args.Add(call.Arguments[i]);
+					args.Add(minimalCall.Arguments[i]);
 				}
 			}
 
-			if (argumentMatchers.Count == args.Count && this.IsEqualMethodOrOverride(call))
+			if (argumentMatchers.Count == args.Count && this.IsEqualMethodOrOverride(minimalCall))
 			{
 				for (int i = 0; i < argumentMatchers.Count; i++)
 				{
@@ -255,7 +255,7 @@ namespace Moq
 				condition.EvaluatedSuccessfully();
 		}
 
-		public virtual void Execute(IProxyCallContext call)
+		public virtual void Execute(ICallContext call)
 		{
 			this.Invoked = true;
 
@@ -364,24 +364,24 @@ namespace Moq
 			this.FailMessage = failMessage;
 		}
 
-		private bool IsEqualMethodOrOverride(ICallContext call)
+		private bool IsEqualMethodOrOverride(IMinimalCallContext minimalCall)
 		{
-			if (call.Method == this.Method)
+			if (minimalCall.Method == this.Method)
 			{
 				return true;
 			}
 
-			if (this.Method.DeclaringType.IsAssignableFrom(call.Method.DeclaringType))
+			if (this.Method.DeclaringType.IsAssignableFrom(minimalCall.Method.DeclaringType))
 			{
-				if (!this.Method.Name.Equals(call.Method.Name, StringComparison.Ordinal) ||
-					this.Method.ReturnType != call.Method.ReturnType ||
+				if (!this.Method.Name.Equals(minimalCall.Method.Name, StringComparison.Ordinal) ||
+					this.Method.ReturnType != minimalCall.Method.ReturnType ||
 					!this.Method.IsGenericMethod &&
-					!call.Method.GetParameterTypes().SequenceEqual(this.Method.GetParameterTypes()))
+					!minimalCall.Method.GetParameterTypes().SequenceEqual(this.Method.GetParameterTypes()))
 				{
 					return false;
 				}
 
-				if (Method.IsGenericMethod && !call.Method.GetGenericArguments().SequenceEqual(Method.GetGenericArguments(), typesComparer))
+				if (Method.IsGenericMethod && !minimalCall.Method.GetGenericArguments().SequenceEqual(Method.GetGenericArguments(), typesComparer))
 				{
 					return false;
 				}
