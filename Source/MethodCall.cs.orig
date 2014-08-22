@@ -206,7 +206,11 @@ namespace Moq
 			}
 		}
 
+<<<<<<< HEAD
+		public void SetOutParameters(ICallContext call)
+=======
 		public void SetOutParameters(IProxyCallContext call)
+>>>>>>> dev
 		{
 			foreach (var item in this.outValues)
 			{
@@ -255,7 +259,11 @@ namespace Moq
 				condition.EvaluatedSuccessfully();
 		}
 
+<<<<<<< HEAD
+		public virtual void Execute(ICallContext call)
+=======
 		public virtual void Execute(IProxyCallContext call)
+>>>>>>> dev
 		{
 			this.Invoked = true;
 

@@ -22,14 +22,22 @@ namespace Moq
 		/// <param name="ctx">shared data for the interceptor as a whole</param>
 		/// <param name="localCtx">shared data among the strategies during a single interception</param>
 		/// <returns>InterceptionAction.Continue if further interception has to be processed, otherwise InterceptionAction.Stop</returns>
+<<<<<<< HEAD
+		InterceptionAction HandleIntercept(ICallContext invocation, InterceptorContext ctx, CurrentInterceptContext localCtx);
+=======
 		InterceptionAction HandleIntercept(IProxyCallContext invocation, InterceptorContext ctx, CurrentInterceptContext localCtx);
+>>>>>>> dev
 		
 	}
 
 	internal class InterceptorContext
 	{
 		private Dictionary<string, List<Delegate>> invocationLists = new Dictionary<string, List<Delegate>>();
+<<<<<<< HEAD
+		private List<ICallContext> actualInvocations = new List<ICallContext>();
+=======
 		private List<IProxyCallContext> actualInvocations = new List<IProxyCallContext>();
+>>>>>>> dev
 		private List<IProxyCall> orderedCalls = new List<IProxyCall>();
 
 		public InterceptorContext(Mock Mock, Type targetType, MockBehavior behavior)
@@ -83,14 +91,23 @@ namespace Moq
 			}
 		}
 		#endregion
+<<<<<<< HEAD
+		#region ActualInvocations
+		internal void AddInvocation(ICallContext invocation)
+=======
 
 		#region ActualInvocations
 		internal void AddInvocation(IProxyCallContext invocation)
+>>>>>>> dev
 		{
 			lock (actualInvocations)
 			{
 				actualInvocations.Add(invocation);
 			}
+<<<<<<< HEAD
+		}
+		internal IEnumerable<ICallContext> ActualInvocations
+=======
 
       lock (Mock.CallSequence)
       {
@@ -98,6 +115,7 @@ namespace Moq
       }
 		}
 		internal IEnumerable<IProxyCallContext> ActualInvocations
+>>>>>>> dev
 		{
 			get
 			{
@@ -115,7 +133,10 @@ namespace Moq
 			}
 		}
 		#endregion
+<<<<<<< HEAD
+=======
 
+>>>>>>> dev
 		#region OrderedCalls
 		internal void AddOrderedCall(IProxyCall call)
 		{
@@ -131,7 +152,10 @@ namespace Moq
 				orderedCalls.Remove(call);
 			}
 		}
+<<<<<<< HEAD
+=======
 
+>>>>>>> dev
 		internal IEnumerable<IProxyCall> OrderedCalls
 		{
 			get

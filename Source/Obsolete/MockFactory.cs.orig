@@ -44,7 +44,10 @@ using System.Globalization;
 using System.Linq;
 using System.Text;
 using Moq.Properties;
+<<<<<<< HEAD
+=======
 using Moq.Sequencing;
+>>>>>>> dev
 
 namespace Moq
 {
@@ -138,7 +141,10 @@ namespace Moq
 	{
 		List<Mock> mocks = new List<Mock>();
 		MockBehavior defaultBehavior;
+<<<<<<< HEAD
+=======
     private CallSequence _callSequence = CallSequence.None();
+>>>>>>> dev
 
 		/// <summary>
 		/// Initializes the factory with the given <paramref name="defaultBehavior"/> 
@@ -152,6 +158,8 @@ namespace Moq
 			this.defaultBehavior = defaultBehavior;
 		}
 
+<<<<<<< HEAD
+=======
     /// <summary>
     /// Sequence where calls made on the mock are recorded for verification
     /// </summary>
@@ -162,6 +170,7 @@ namespace Moq
     }
 
 
+>>>>>>> dev
 		/// <summary>
 		/// Whether the base member virtual implementation will be called 
 		/// for mocked classes if no setup is matched. Defaults to <see langword="false"/>.
@@ -304,7 +313,10 @@ namespace Moq
 
 			mock.CallBase = this.CallBase;
 			mock.DefaultValue = this.DefaultValue;
+<<<<<<< HEAD
+=======
 		  mock.CallSequence = this.CallSequence;
+>>>>>>> dev
 
 			return mock;
 		}

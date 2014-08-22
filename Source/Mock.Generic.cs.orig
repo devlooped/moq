@@ -55,7 +55,11 @@ using Microsoft.CSharp;
 namespace Moq
 {
 	/// <include file='Mock.Generic.xdoc' path='docs/doc[@for="Mock{T}"]/*'/>
+<<<<<<< HEAD
     public partial class Mock<T> : Mock, IMock<T> where T : class
+=======
+  public partial class Mock<T> : Mock, IMock<T> where T : class
+>>>>>>> dev
 	{
 		private static IProxyFactory proxyFactory = new CastleProxyFactory();
 		private T instance;
@@ -216,7 +220,11 @@ namespace Moq
 
 		private MethodInfo delegateInterfaceMethod;
 
+<<<<<<< HEAD
 		/// <inheritdoc />
+=======
+	  /// <inheritdoc />
+>>>>>>> dev
 		internal override MethodInfo DelegateInterfaceMethod
 		{
 			get
@@ -539,6 +547,9 @@ namespace Moq
 		//    // TODO: doesn't work as expected but ONLY with interfaces :S
 		//    throw new NotImplementedException();
 		//}
+<<<<<<< HEAD
+	}
+=======
 
 
     [SuppressMessage("Microsoft.Design", "CA1006:DoNotNestGenericTypesInMemberSignatures", Justification = "By design")]
@@ -559,4 +570,5 @@ namespace Moq
       Mock.VerifySetInSequence<T>(this, CallSequence, setterExpression, null);
     }
   }
+>>>>>>> dev
 }

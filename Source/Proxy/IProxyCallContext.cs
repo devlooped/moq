@@ -41,38 +41,25 @@
 using System;
 using System.Reflection;
 
-namespace Moq
+namespace Moq.Proxy
 {
-	/// <summary>
-	/// A <see cref="IDefaultValueProvider"/> that returns an empty default value 
-	/// for non-mockeable types, and mocks for all other types (interfaces and 
-	/// non-sealed classes) that can be mocked.
-	/// </summary>
-	internal class MockDefaultValueProvider : EmptyDefaultValueProvider
+  
+  internal interface ICallMatchable
+  {
+    bool Matches(ICallContext call);
+  }
+
+  internal interface ICallContext
+  {
+    object[] Arguments { get; }
+    MethodInfo Method { get; }
+    object ReturnValue { get; set; }
+  }
+
+  internal interface IProxyCallContext : ICallContext
 	{
-		private Mock owner;
+		void InvokeBase();
 
-		public MockDefaultValueProvider(Mock owner)
-		{
-			this.owner = owner;
-		}
-
-		public override object ProvideDefault(MethodInfo member)
-		{
-			var value = base.ProvideDefault(member);
-
-			Mock mock = null;
-			if (value == null && member.ReturnType.IsMockeable() && !owner.InnerMocks.TryGetValue(member, out mock))
-			{
-				var mockType = typeof(Mock<>).MakeGenericType(member.ReturnType);
-				mock = (Mock)Activator.CreateInstance(mockType, owner.Behavior);
-				mock.DefaultValue = owner.DefaultValue;
-				mock.CallBase = owner.CallBase;
-			  mock.CallSequence = owner.CallSequence;
-				owner.InnerMocks.Add(member, mock);
-			}
-
-			return mock != null ? mock.Object : value;
-		}
+		void SetArgumentValue(int index, object value);
 	}
 }

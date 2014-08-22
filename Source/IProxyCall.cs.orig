@@ -38,41 +38,39 @@
 //[This is the BSD license, see
 // http://www.opensource.org/licenses/bsd-license.php]
 
-using System;
+using System.Linq.Expressions;
 using System.Reflection;
+using Moq.Proxy;
 
 namespace Moq
 {
-	/// <summary>
-	/// A <see cref="IDefaultValueProvider"/> that returns an empty default value 
-	/// for non-mockeable types, and mocks for all other types (interfaces and 
-	/// non-sealed classes) that can be mocked.
-	/// </summary>
-	internal class MockDefaultValueProvider : EmptyDefaultValueProvider
+<<<<<<< HEAD
+	internal interface IProxyCall
+=======
+	internal interface IProxyCall : ICallMatchable
+>>>>>>> dev
 	{
-		private Mock owner;
+		int CallCount { get; }
+		bool IsConditional { get; }
+		string FailMessage { get; set; }
+		bool Invoked { get; set; }
+		bool IsVerifiable { get; set; }
+		Expression SetupExpression { get; }
+		MethodInfo Method { get; }
+		void EvaluatedSuccessfully();
 
-		public MockDefaultValueProvider(Mock owner)
-		{
-			this.owner = owner;
-		}
+<<<<<<< HEAD
+		bool Matches(ICallContext call);
+		void Execute(ICallContext call);
+		void SetOutParameters(ICallContext call);
+=======
+		void Execute(IProxyCallContext call);
+		void SetOutParameters(IProxyCallContext call);
+>>>>>>> dev
 
-		public override object ProvideDefault(MethodInfo member)
-		{
-			var value = base.ProvideDefault(member);
-
-			Mock mock = null;
-			if (value == null && member.ReturnType.IsMockeable() && !owner.InnerMocks.TryGetValue(member, out mock))
-			{
-				var mockType = typeof(Mock<>).MakeGenericType(member.ReturnType);
-				mock = (Mock)Activator.CreateInstance(mockType, owner.Behavior);
-				mock.DefaultValue = owner.DefaultValue;
-				mock.CallBase = owner.CallBase;
-			  mock.CallSequence = owner.CallSequence;
-				owner.InnerMocks.Add(member, mock);
-			}
-
-			return mock != null ? mock.Object : value;
-		}
+		// Where the setup was performed.
+		string FileName { get; }
+		int FileLine { get; }
+		MethodBase TestMethod { get; }
 	}
 }

@@ -44,7 +44,7 @@ using Moq.Proxy;
 
 namespace Moq
 {
-	internal interface IProxyCall
+	internal interface IProxyCall : ICallMatchable
 	{
 		int CallCount { get; }
 		bool IsConditional { get; }
@@ -55,9 +55,8 @@ namespace Moq
 		MethodInfo Method { get; }
 		void EvaluatedSuccessfully();
 
-		bool Matches(ICallContext call);
-		void Execute(ICallContext call);
-		void SetOutParameters(ICallContext call);
+		void Execute(IProxyCallContext call);
+		void SetOutParameters(IProxyCallContext call);
 
 		// Where the setup was performed.
 		string FileName { get; }

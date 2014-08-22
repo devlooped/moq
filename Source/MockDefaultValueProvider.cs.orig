@@ -68,7 +68,10 @@ namespace Moq
 				mock = (Mock)Activator.CreateInstance(mockType, owner.Behavior);
 				mock.DefaultValue = owner.DefaultValue;
 				mock.CallBase = owner.CallBase;
+<<<<<<< HEAD
+=======
 			  mock.CallSequence = owner.CallSequence;
+>>>>>>> dev
 				owner.InnerMocks.Add(member, mock);
 			}
 

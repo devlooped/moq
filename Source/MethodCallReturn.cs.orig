@@ -158,7 +158,11 @@ namespace Moq
 			}
 		}
 
+<<<<<<< HEAD
+		public override void Execute(ICallContext call)
+=======
 		public override void Execute(IProxyCallContext call)
+>>>>>>> dev
 		{
 			base.Execute(call);
 

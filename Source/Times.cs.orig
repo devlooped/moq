@@ -41,8 +41,11 @@
 using System;
 using System.Globalization;
 using Moq.Properties;
+<<<<<<< HEAD
+=======
 using Moq.Sequencing;
 using Moq.Sequencing.Extensibility;
+>>>>>>> dev
 
 namespace Moq
 {

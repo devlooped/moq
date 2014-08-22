@@ -48,7 +48,10 @@ using System.Linq;
 using System.Linq.Expressions;
 using System.Reflection;
 using System.Runtime.CompilerServices;
+<<<<<<< HEAD
+=======
 using Moq.Sequencing;
+>>>>>>> dev
 
 namespace Moq
 {
@@ -59,6 +62,8 @@ namespace Moq
         private bool callBase;
         private DefaultValue defaultValue = DefaultValue.Empty;
         private IDefaultValueProvider defaultValueProvider = new EmptyDefaultValueProvider();
+<<<<<<< HEAD
+=======
         private CallSequence _callSequence = CallSequence.None();
 
         /// <summary>
@@ -70,6 +75,7 @@ namespace Moq
           set { _callSequence = value; }
         }
 
+>>>>>>> dev
 
         /// <include file='Mock.xdoc' path='docs/doc[@for="Mock.ctor"]/*'/>
         protected Mock()
@@ -365,7 +371,11 @@ namespace Moq
             Expression expression,
             Times times)
         {
+<<<<<<< HEAD
+			IEnumerable<ICallContext> actualCalls = targetInterceptor.InterceptionContext.ActualInvocations;
+=======
 			IEnumerable<IProxyCallContext> actualCalls = targetInterceptor.InterceptionContext.ActualInvocations;
+>>>>>>> dev
 
             var callCount = actualCalls.Where(ac => expected.Matches(ac)).Count();
             if (!times.Verify(callCount))
@@ -376,6 +386,11 @@ namespace Moq
         }
 
         private static void ThrowVerifyException(
+<<<<<<< HEAD
+            MethodCall expected,
+            IEnumerable<IProxyCall> setups,
+            IEnumerable<ICallContext> actualCalls,
+=======
             IProxyCall expected,
             IEnumerable<IProxyCall> setups,
             IEnumerable<IProxyCallContext> actualCalls,
@@ -383,24 +398,34 @@ namespace Moq
             Times times,
             int callCount)
         {
-          ThrowVerifyException(expected.FailMessage, setups, actualCalls, expression, times, callCount);
+            ThrowVerifyException(expected.FailMessage, setups, actualCalls, expression, times, callCount);
         }
 
         private static void ThrowVerifyException(
             string failMessage,
             IEnumerable<IProxyCall> setups,
             IEnumerable<IProxyCallContext> actualCalls,
+>>>>>>> dev
             Expression expression,
             Times times,
             int callCount)
         {
-          var message = times.GetExceptionMessage(failMessage, expression.ToStringFixed(), callCount) +
+<<<<<<< HEAD
+            var message = times.GetExceptionMessage(expected.FailMessage, expression.ToStringFixed(), callCount) +
                 Environment.NewLine + FormatSetupsInfo(setups) +
                 Environment.NewLine + FormatInvocations(actualCalls);
             throw new MockException(MockException.ExceptionReason.VerificationFailed, message);
         }
 
+=======
+          var message = times.GetExceptionMessage(failMessage, expression.ToStringFixed(), callCount) +
+              Environment.NewLine + FormatSetupsInfo(setups) +
+              Environment.NewLine + FormatInvocations(actualCalls);
+          throw new MockException(MockException.ExceptionReason.VerificationFailed, message);
+        }
 
+
+>>>>>>> dev
         private static string FormatSetupsInfo(IEnumerable<IProxyCall> setups)
         {
             var expressionSetups = setups
@@ -427,7 +452,11 @@ namespace Moq
             return string.Format(CultureInfo.CurrentCulture, "Times.Exactly({0})", callCount);
         }
 
+<<<<<<< HEAD
+        private static string FormatInvocations(IEnumerable<ICallContext> invocations)
+=======
         private static string FormatInvocations(IEnumerable<IProxyCallContext> invocations)
+>>>>>>> dev
         {
             var formattedInvocations = invocations
                 .Select(i => i.Format())
@@ -1002,6 +1031,8 @@ namespace Moq
 
         #endregion
 
+<<<<<<< HEAD
+=======
         internal static void VerifyInSequence<T>(
           Mock mock,
           CallSequence sequence,
@@ -1072,5 +1103,6 @@ namespace Moq
           }
         }
 
+>>>>>>> dev
     }
 }

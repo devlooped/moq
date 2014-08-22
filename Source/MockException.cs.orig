@@ -90,14 +90,22 @@ namespace Moq
 		private ExceptionReason reason;
 
 		internal MockException(ExceptionReason reason, MockBehavior behavior,
+<<<<<<< HEAD
+			ICallContext invocation)
+=======
 			IProxyCallContext invocation)
+>>>>>>> dev
 			: this(reason, behavior, invocation,
 				Properties.Resources.ResourceManager.GetString(reason.ToString()))
 		{
 		}
 
 		internal MockException(ExceptionReason reason, MockBehavior behavior,
+<<<<<<< HEAD
+			ICallContext invocation, string message)
+=======
 			IProxyCallContext invocation, string message)
+>>>>>>> dev
 			: base(GetMessage(behavior, invocation, message))
 		{
 			this.reason = reason;
@@ -124,7 +132,11 @@ namespace Moq
 
 		private static string GetMessage(
 			MockBehavior behavior,
+<<<<<<< HEAD
+			ICallContext invocation,
+=======
 			IProxyCallContext invocation,
+>>>>>>> dev
 			string message)
 		{
 			return string.Format(

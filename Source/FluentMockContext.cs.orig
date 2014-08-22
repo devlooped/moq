@@ -76,7 +76,11 @@ namespace Moq
 			current = this;
 		}
 
+<<<<<<< HEAD
+		public void Add(Mock mock, ICallContext invocation)
+=======
 		public void Add(Mock mock, IProxyCallContext invocation)
+>>>>>>> dev
 		{
 			invocations.Add(new MockInvocation(mock, invocation, LastMatch));
 		}
@@ -102,7 +106,11 @@ namespace Moq
 		{
 			private DefaultValue defaultValue;
 
+<<<<<<< HEAD
+			public MockInvocation(Mock mock, ICallContext invocation, Match matcher)
+=======
 			public MockInvocation(Mock mock, IProxyCallContext invocation, Match matcher)
+>>>>>>> dev
 			{
 				this.Mock = mock;
 				this.Invocation = invocation;
@@ -114,7 +122,11 @@ namespace Moq
 
 			public Mock Mock { get; private set; }
 
+<<<<<<< HEAD
+			public ICallContext Invocation { get; private set; }
+=======
 			public IProxyCallContext Invocation { get; private set; }
+>>>>>>> dev
 
 			public Match Match { get; private set; }
 
