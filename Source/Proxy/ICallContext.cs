@@ -43,20 +43,20 @@ using System.Reflection;
 
 namespace Moq.Proxy
 {
-  
-  internal interface ICallMatchable
-  {
-    bool Matches(IMinimalCallContext minimalCall);
-  }
+	
+	internal interface ICallMatchable
+	{
+		bool Matches(IMinimalCallContext call);
+	}
 
-  internal interface IMinimalCallContext
-  {
-    object[] Arguments { get; }
-    MethodInfo Method { get; }
-    object ReturnValue { get; set; }
-  }
+	internal interface IMinimalCallContext
+	{
+		object[] Arguments { get; }
+		MethodInfo Method { get; }
+		object ReturnValue { get; set; }
+	}
 
-  internal interface ICallContext : IMinimalCallContext
+	internal interface ICallContext : IMinimalCallContext
 	{
 		void InvokeBase();
 

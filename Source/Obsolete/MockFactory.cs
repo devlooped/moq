@@ -138,7 +138,7 @@ namespace Moq
 	{
 		List<Mock> mocks = new List<Mock>();
 		MockBehavior defaultBehavior;
-    private CallSequence _callSequence = CallSequence.None();
+		private CallSequence _callSequence = CallSequence.None();
 
 		/// <summary>
 		/// Initializes the factory with the given <paramref name="defaultBehavior"/> 
@@ -152,14 +152,14 @@ namespace Moq
 			this.defaultBehavior = defaultBehavior;
 		}
 
-    /// <summary>
-    /// Sequence where calls made on the mock are recorded for verification
-    /// </summary>
-    public CallSequence CallSequence
-    {
-      get { return _callSequence; }
-      set { _callSequence = value; }
-    }
+		/// <summary>
+		/// Sequence where calls made on the mock are recorded for verification
+		/// </summary>
+		public CallSequence CallSequence
+		{
+			get { return _callSequence; }
+			set { _callSequence = value; }
+		}
 
 
 		/// <summary>
@@ -304,7 +304,7 @@ namespace Moq
 
 			mock.CallBase = this.CallBase;
 			mock.DefaultValue = this.DefaultValue;
-		  mock.CallSequence = this.CallSequence;
+			mock.CallSequence = this.CallSequence;
 
 			return mock;
 		}

@@ -61,7 +61,7 @@ namespace Moq
 			InterceptionContext = new InterceptorContext(mock, targetType, behavior);
 		}
 
-    internal InterceptorContext InterceptionContext { get; private set; }
+		internal InterceptorContext InterceptionContext { get; private set; }
 
 		internal void Verify()
 		{
@@ -129,10 +129,10 @@ namespace Moq
 		[SuppressMessage("Microsoft.Maintainability", "CA1502:AvoidExcessiveComplexity")]
 		public void Intercept(ICallContext invocation)
 		{
-            CurrentInterceptContext localCtx = new CurrentInterceptContext();
+						CurrentInterceptContext localCtx = new CurrentInterceptContext();
 			foreach (var strategy in InterceptionStrategies())
 			{
-                if (InterceptionAction.Stop == strategy.HandleIntercept(invocation, InterceptionContext, localCtx))
+								if (InterceptionAction.Stop == strategy.HandleIntercept(invocation, InterceptionContext, localCtx))
 				{
 					break;
 				}

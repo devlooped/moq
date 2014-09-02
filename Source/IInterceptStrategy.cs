@@ -9,8 +9,8 @@ namespace Moq
 {
 	internal enum InterceptionAction
 	{
- 		Continue,
-        Stop
+		Continue,
+				Stop
 	}
 
 	internal interface IInterceptStrategy
@@ -92,10 +92,10 @@ namespace Moq
 				actualInvocations.Add(invocation);
 			}
 
-      lock (Mock.CallSequence)
-      {
-        Mock.CallSequence.Add(invocation, Mock);
-      }
+			lock (Mock.CallSequence)
+			{
+				Mock.CallSequence.Add(invocation, Mock);
+			}
 		}
 		internal IEnumerable<ICallContext> ActualInvocations
 		{
@@ -144,7 +144,7 @@ namespace Moq
 		}
 		#endregion
 
-    }
+		}
 	
 	internal class CurrentInterceptContext
 	{        

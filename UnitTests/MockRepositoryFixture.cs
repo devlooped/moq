@@ -1,7 +1,6 @@
 ﻿using System;
 using System.Linq.Expressions;
 using Moq.Sequencing;
-using Moq.Sequencing.NavigationStrategies;
 using Xunit;
 
 namespace Moq.Tests
@@ -148,34 +147,34 @@ namespace Moq.Tests
 			Assert.True(mock.Object.BaseCalled);
 		}
 
-    [Fact]
-    public void ShouldAssignNullCallSequenceToCreatedMocksByDefault()
-    {
-      var repository = new MockRepository(MockBehavior.Default);
+		[Fact]
+		public void ShouldAssignNullCallSequenceToCreatedMocksByDefault()
+		{
+			var repository = new MockRepository(MockBehavior.Default);
 
-      var mock = repository.Create<IFoo>();
+			var mock = repository.Create<IFoo>();
 
-      Assert.Throws<NoSequenceAssignedException>(
-        () => CallSequence.Verify(
-          mock.CallTo(m => m.Do()),
-          mock.CallTo(m => m.Undo())
-        )
-      );
-    }
+			Assert.Throws<NoSequenceAssignedException>(
+				() => CallSequence.Verify(
+					mock.CallTo(m => m.Do()),
+					mock.CallTo(m => m.Undo())
+				)
+			);
+		}
 
-    [Fact]
-    public void ShouldAssignTheSameCallSequenceToCreatedMocksThatWasAssignedToIt()
-    {
-      var callSequence = new CallSequence(MockBehavior.Strict);
-      var repository = new MockRepository(MockBehavior.Default)
-      {
-        CallSequence = callSequence
-      };
+		[Fact]
+		public void ShouldAssignTheSameCallSequenceToCreatedMocksThatWasAssignedToIt()
+		{
+			var callSequence = new CallSequence(MockBehavior.Strict);
+			var repository = new MockRepository(MockBehavior.Default)
+			{
+				CallSequence = callSequence
+			};
 
-      var mock = repository.Create<IFoo>();
+			var mock = repository.Create<IFoo>();
 
-      Assert.Equal(callSequence, mock.CallSequence);
-    }
+			Assert.Equal(callSequence, mock.CallSequence);
+		}
 
 
 		public interface IFoo

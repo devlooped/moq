@@ -41,8 +41,6 @@
 using System;
 using System.Globalization;
 using Moq.Properties;
-using Moq.Sequencing;
-using Moq.Sequencing.Extensibility;
 
 namespace Moq
 {

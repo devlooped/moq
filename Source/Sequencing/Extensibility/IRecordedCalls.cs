@@ -1,19 +1,19 @@
-﻿using System;
-using System.Collections.Generic;
-using Moq.Proxy;
+﻿using	System;
+using	System.Collections.Generic;
+using	Moq.Proxy;
 
-namespace Moq.Sequencing.Extensibility
+namespace	Moq.Sequencing.Extensibility
 {
-  internal interface IRecordedCalls
-  {
-    void Add (IMinimalCallContext invocation, Mock target);
-    bool CurrentCallMatches(ICallMatchable expected, Mock target);
-    bool NextCallMatches(ICallMatchable expected, Mock target);
-    void ForwardToNextCall();
-    bool AnyUncheckedCallsLeft();
-    bool NextCallExists();
-    void Rewind();
-    bool ContainsFurther(ICallMatchable expected, Mock target);
-    bool ForwardBeyondSubsequence(List<Tuple<ICallMatchable, Mock>> callsToVerify);
-  }
+	internal interface IRecordedCalls
+	{
+		void Add (IMinimalCallContext	invocation,	Mock target);
+		bool CurrentCallMatches(ICallMatchable expected, Mock	target);
+		bool NextCallMatches(ICallMatchable	expected,	Mock target);
+		void ForwardToNextCall();
+		bool AnyUncheckedCallsLeft();
+		bool NextCallExists();
+		void Rewind();
+		bool ContainsFurther(ICallMatchable	expected,	Mock target);
+		bool ForwardBeyondSubsequence(List<Tuple<ICallMatchable, Mock>>	callsToVerify);
+	}
 }

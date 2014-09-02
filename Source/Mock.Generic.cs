@@ -55,7 +55,7 @@ using Microsoft.CSharp;
 namespace Moq
 {
 	/// <include file='Mock.Generic.xdoc' path='docs/doc[@for="Mock{T}"]/*'/>
-    public partial class Mock<T> : Mock, IMock<T> where T : class
+		public partial class Mock<T> : Mock, IMock<T> where T : class
 	{
 		private static IProxyFactory proxyFactory = new CastleProxyFactory();
 		private T instance;
@@ -177,9 +177,9 @@ namespace Moq
 		}
 
 		internal override bool IsDelegateMock
-        {
-            get { return typeof(T).IsDelegate(); }
-        }
+				{
+						get { return typeof(T).IsDelegate(); }
+				}
 
 		private void InitializeInstance()
 		{
@@ -541,22 +541,22 @@ namespace Moq
 		//}
 
 
-    [SuppressMessage("Microsoft.Design", "CA1006:DoNotNestGenericTypesInMemberSignatures", Justification = "By design")]
-    internal void VerifyInSequence(Expression<Action<T>> expression)
-    {
-      Mock.VerifyInSequence(this, CallSequence, expression, null);
-    }
+		[SuppressMessage("Microsoft.Design", "CA1006:DoNotNestGenericTypesInMemberSignatures", Justification = "By design")]
+		internal void VerifyInSequence(Expression<Action<T>> expression)
+		{
+			Mock.VerifyInSequence(this, CallSequence, expression, null);
+		}
 
-    [SuppressMessage("Microsoft.Design", "CA1006:DoNotNestGenericTypesInMemberSignatures", Justification = "By design")]
-    internal void VerifyGetInSequence<TProperty>(Expression<Func<T, TProperty>> expression)
-    {
-      Mock.VerifyGetInSequence(this, CallSequence, expression, null);
-    }
+		[SuppressMessage("Microsoft.Design", "CA1006:DoNotNestGenericTypesInMemberSignatures", Justification = "By design")]
+		internal void VerifyGetInSequence<TProperty>(Expression<Func<T, TProperty>> expression)
+		{
+			Mock.VerifyGetInSequence(this, CallSequence, expression, null);
+		}
 
-    [SuppressMessage("Microsoft.Design", "CA1006:DoNotNestGenericTypesInMemberSignatures", Justification = "By design")]
-    internal void VerifySetInSequence(Action<T> setterExpression)
-    {
-      Mock.VerifySetInSequence<T>(this, CallSequence, setterExpression, null);
-    }
-  }
+		[SuppressMessage("Microsoft.Design", "CA1006:DoNotNestGenericTypesInMemberSignatures", Justification = "By design")]
+		internal void VerifySetInSequence(Action<T> setterExpression)
+		{
+			Mock.VerifySetInSequence<T>(this, CallSequence, setterExpression, null);
+		}
+	}
 }
