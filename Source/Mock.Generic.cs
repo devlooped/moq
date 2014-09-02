@@ -55,7 +55,7 @@ using Microsoft.CSharp;
 namespace Moq
 {
 	/// <include file='Mock.Generic.xdoc' path='docs/doc[@for="Mock{T}"]/*'/>
-		public partial class Mock<T> : Mock, IMock<T> where T : class
+	public partial class Mock<T> : Mock, IMock<T> where T : class
 	{
 		private static IProxyFactory proxyFactory = new CastleProxyFactory();
 		private T instance;
@@ -177,9 +177,9 @@ namespace Moq
 		}
 
 		internal override bool IsDelegateMock
-				{
-						get { return typeof(T).IsDelegate(); }
-				}
+		{
+			get { return typeof(T).IsDelegate(); }
+		}
 
 		private void InitializeInstance()
 		{
