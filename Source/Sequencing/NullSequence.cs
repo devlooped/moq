@@ -1,12 +1,13 @@
-using	Moq.Sequencing.NavigationStrategies;
+using Moq.Sequencing.NavigationStrategies;
 
-namespace	Moq.Sequencing
+namespace Moq.Sequencing
 {
-	internal class NullSequence	:	CallSequence
-	{
-		internal NullSequence()	:	base(new NullSequenceNavigation())
-		{
-		}
-	}
+  internal class NullSequence : CallSequence
+  {
+    internal NullSequence()
+      : base(new NullSequenceNavigation())
+    {
+    }
+  }
 
 }

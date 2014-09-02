@@ -1,9 +1,9 @@
-using	Moq.Proxy;
+using Moq.Proxy;
 
-namespace	Moq.Sequencing.Extensibility
+namespace Moq.Sequencing.Extensibility
 {
-	internal interface ICallSequenceNavigation
-	{
-		bool ForwardBeyondACallTo(ICallMatchable expected, Mock	target,	IRecordedCalls recordedCalls);
-	}
+  internal interface ICallSequenceNavigation
+  {
+    bool ForwardBeyondACallTo(ICallMatchable expected, Mock target, IRecordedCalls recordedCalls);
+  }
 }
