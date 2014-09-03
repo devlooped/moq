@@ -24,7 +24,7 @@ namespace Moq.Tests
       mock2.Object.Do();
 
       Assert.Throws<NoSequenceAssignedException>(
-        () => CallSequence.Verify(mock1.CallTo(m => m.Do())
+        () => sequence.Verify(mock1.CallTo(m => m.Do())
        ));
     }
 
@@ -37,7 +37,7 @@ namespace Moq.Tests
       mock1.Object.Anything = something;
 
       Assert.Throws<NoSequenceAssignedException>(() =>
-        CallSequence.Verify(mock1.CallToSet(m => m.Anything = something))
+        mock1.CallSequence.Verify(mock1.CallToSet(m => m.Anything = something))
       );
     }
 
@@ -49,7 +49,7 @@ namespace Moq.Tests
       var anything = mock1.Object.Anything;
 
       Assert.Throws<NoSequenceAssignedException>(
-        () => CallSequence.Verify(mock1.CallToGet(m => m.Anything))
+        () => mock1.CallSequence.Verify(mock1.CallToGet(m => m.Anything))
       );
     }
   }

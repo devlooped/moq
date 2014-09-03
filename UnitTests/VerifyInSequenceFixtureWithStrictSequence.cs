@@ -21,7 +21,7 @@ namespace Moq.Tests
       a.Object.Do(100);
       b.Object.Do(200);
 
-      CallSequence.Verify(
+      strictSequence.Verify(
         a.CallTo(x => x.Do(100)),
         b.CallTo(x => x.Do(200))
       );
@@ -45,9 +45,9 @@ namespace Moq.Tests
       b.Object.Do(200);
 
       Assert.Throws<MockException>(() =>
-                                   CallSequence.Verify(
+                                   strictSequence.Verify(
                                      a.CallTo(m => m.Do(100))
-                                     )
+                                   )
         );
     }
 
@@ -63,7 +63,7 @@ namespace Moq.Tests
       b.Object.Do(100);
 
       Assert.Throws<MockException>(() =>
-                                   CallSequence.Verify(
+                                   sequence.Verify(
                                      a.CallTo(m => m.Do(100)),
                                      b.CallTo(m => m.Do(200))
                                      )

@@ -12,20 +12,16 @@ namespace Moq.Sequencing.NavigationStrategies
   /// and we verify sequence: A,B,
   /// then the verification passes
   /// </summary>
-  internal class StrictSequenceNavigation : ICallSequenceNavigation
+  internal class StrictCallSequenceCursorStrategy : ICallSequenceCursorStrategy
   {
-    public bool ForwardBeyondACallTo(ICallMatchable expected, Mock target, IRecordedCalls recordedCalls)
+    public bool MovePast(ICallMatcher expected, Mock target, IRecordedCalls recordedCalls)
     {
-      var isCurrentCallMatched = false;
-      if (recordedCalls.AnyUncheckedCallsLeft())
+      if (recordedCalls.MoveToNext())
       {
-        if (recordedCalls.CurrentCallMatches(expected, target))
-        {
-          isCurrentCallMatched = true;
-        }
-        recordedCalls.ForwardToNextCall();
+        return recordedCalls.Current.Matches(expected, target);
       }
-      return isCurrentCallMatched;
+
+      return false;
     }
   }
 }

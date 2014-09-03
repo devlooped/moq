@@ -6,20 +6,20 @@ namespace Moq.Sequencing
 {
   internal class CallVerificationStep<T> : IVerificationStep where T : class
   {
-    readonly Mock<T> _mock;
-    readonly Expression<Action<T>> _action;
+    readonly Mock<T> mock;
+    readonly Expression<Action<T>> action;
 
     public CallVerificationStep(Mock<T> mock, Expression<Action<T>> action)
     {
-      _mock = mock;
-      _action = action;
+      this.mock = mock;
+      this.action = action;
     }
 
     public void Verify()
     {
-      _mock.VerifyInSequence(_action);
+      mock.VerifyInSequence(action);
     }
 
-    public CallSequence CallSequence { get { return _mock.CallSequence; } }
+    public CallSequence CallSequence { get { return mock.CallSequence; } }
   }
 }

@@ -138,7 +138,6 @@ namespace Moq
 	{
 		List<Mock> mocks = new List<Mock>();
 		MockBehavior defaultBehavior;
-		private CallSequence _callSequence = CallSequence.None();
 
 		/// <summary>
 		/// Initializes the factory with the given <paramref name="defaultBehavior"/> 
@@ -150,17 +149,13 @@ namespace Moq
 		public MockFactory(MockBehavior defaultBehavior)
 		{
 			this.defaultBehavior = defaultBehavior;
+		  this.CallSequence = CallSequence.None();
 		}
 
 		/// <summary>
 		/// Sequence where calls made on the mock are recorded for verification
 		/// </summary>
-		public CallSequence CallSequence
-		{
-			get { return _callSequence; }
-			set { _callSequence = value; }
-		}
-
+		public CallSequence CallSequence { get; set; }
 
 		/// <summary>
 		/// Whether the base member virtual implementation will be called 

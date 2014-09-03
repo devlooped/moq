@@ -11,11 +11,11 @@ namespace Moq.Sequencing
   public class CallSequence 
   {
     private readonly RecordedCalls recordedCalls = new RecordedCalls();
-    private readonly ICallSequenceNavigation callSequenceNavigation;
+    private readonly ICallSequenceCursorStrategy callSequenceCursorStrategy;
 
-    internal CallSequence(ICallSequenceNavigation callSequenceNavigation)
+    internal CallSequence(ICallSequenceCursorStrategy callSequenceCursorStrategy)
     {
-      this.callSequenceNavigation = callSequenceNavigation;
+      this.callSequenceCursorStrategy = callSequenceCursorStrategy;
     }
 
     ///<summary>
@@ -28,51 +28,30 @@ namespace Moq.Sequencing
     {
       if (behavior == MockBehavior.Loose)
       {
-        callSequenceNavigation = new LooseSequenceNavigation();
+        callSequenceCursorStrategy = new LooseCallSequenceCursorStrategy();
       }
       else
       {
-        callSequenceNavigation = new StrictSequenceNavigation();
+        callSequenceCursorStrategy = new StrictCallSequenceCursorStrategy();
       }
     }
 
-    internal bool ForwardBeyondACallTo(ICallMatchable expected, Mock target)
+    internal bool MovePast(ICallMatcher expected, Mock target)
     {
-      return callSequenceNavigation.ForwardBeyondACallTo(expected, target, recordedCalls);
+      return callSequenceCursorStrategy.MovePast(expected, target, recordedCalls);
     }
 
     ///<summary>
     ///Verifies the calls were received in the correct order
     ///</summary>
     ///<param name="steps">steps to verify in order of their verification</param>
-    public void VerifyCalls(params IVerificationStep[] steps)
+    public void Verify(params IVerificationStep[] steps)
     {
       foreach (var step in steps)
       {
         step.Verify();
       }
       recordedCalls.Rewind();
-    }
-
-    /// <summary>
-    /// Verifies the order of calls. This static version of verification requires 
-    /// that all mocks used in the verification have the same sequence assigned.
-    /// If this is not true, an exception is thrown.
-    /// </summary>
-    /// <param name="steps">Order of steps to verify</param>
-    public static void Verify(params IVerificationStep[] steps)
-    {
-      if (steps.Any())
-      {
-        if (AreNotRecordedByTheSameSequence(steps))
-        {
-          throw new MockException(MockException.ExceptionReason.VerificationFailed, "The calls being verified are not recorded by the same sequence");
-        }
-        else
-        {
-          steps.First().CallSequence.VerifyCalls(steps);
-        }
-      }
     }
 
     internal static CallSequence None()
@@ -83,11 +62,6 @@ namespace Moq.Sequencing
     private static bool AreNotRecordedByTheSameSequence(IEnumerable<IVerificationStep> steps)
     {
       return steps.Select(s => s.CallSequence).Distinct().ToArray().Length > 1;
-    }
-
-    internal void Rewind()
-    {
-      recordedCalls.Rewind();
     }
 
     internal void Add (ICallContext invocation, Mock target)

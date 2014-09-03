@@ -12,17 +12,17 @@ namespace Moq.Sequencing.NavigationStrategies
   /// and we verify sequence: B,C,
   /// then the verification passes
   /// </summary>
-  internal class StrictSequencePartNavigation : ICallSequenceNavigation
+  internal class StrictCallSequencePartCursorStrategy : ICallSequenceCursorStrategy
   {
-    private readonly List<Tuple<ICallMatchable, Mock>> callsToVerify = new List<Tuple<ICallMatchable, Mock>>();
+    private readonly List<Tuple<ICallMatcher, Mock>> callsToVerify = new List<Tuple<ICallMatcher, Mock>>();
 
-    public bool ForwardBeyondACallTo(ICallMatchable expected, Mock target, IRecordedCalls recordedCalls)
+    public bool MovePast(ICallMatcher expected, Mock target, IRecordedCalls recordedCalls)
     {
       var isWholeSequenceUpToNowMatched = false;
       callsToVerify.Add(Tuple.Create(expected, target));
       recordedCalls.Rewind();
 
-      isWholeSequenceUpToNowMatched = recordedCalls.ForwardBeyondSubsequence(callsToVerify);
+      isWholeSequenceUpToNowMatched = recordedCalls.MovePastSubsequence(callsToVerify);
       return isWholeSequenceUpToNowMatched;
     }
   }
@@ -39,7 +39,7 @@ namespace Moq.Sequencing.NavigationStrategies
     /// Creates a new instance
     /// </summary>
     public StrictSequenceStartingAnywhere()
-      : base(new StrictSequencePartNavigation())
+      : base(new StrictCallSequencePartCursorStrategy())
     {
     }
   }

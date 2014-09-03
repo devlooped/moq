@@ -10,9 +10,9 @@ namespace Moq
 	internal enum InterceptionAction
 	{
 		Continue,
-				Stop
+		Stop
 	}
-
+	
 	internal interface IInterceptStrategy
 	{
 		/// <summary>

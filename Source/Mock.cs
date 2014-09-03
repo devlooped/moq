@@ -59,23 +59,18 @@ namespace Moq
         private bool callBase;
         private DefaultValue defaultValue = DefaultValue.Empty;
         private IDefaultValueProvider defaultValueProvider = new EmptyDefaultValueProvider();
-        private CallSequence _callSequence = CallSequence.None();
-
+        
         /// <summary>
         /// Sequence where calls made on the mock are recorded for verification
         /// </summary>
-        public CallSequence CallSequence
-        {
-            get { return _callSequence; }
-            set { _callSequence = value; }
-        }
-
+        public CallSequence CallSequence { get; set; }
 
         /// <include file='Mock.xdoc' path='docs/doc[@for="Mock.ctor"]/*'/>
         protected Mock()
         {
             this.ImplementedInterfaces = new List<Type>();
             this.InnerMocks = new Dictionary<MethodInfo, Mock>();
+            this.CallSequence = CallSequence.None();
         }
 
         /// <include file='Mock.xdoc' path='docs/doc[@for="Mock.Get"]/*'/>
@@ -279,7 +274,7 @@ namespace Moq
             var args = methodCall.Arguments.ToArray();
 
             var expected = new MethodCall(mock, null, expression, method, args) { FailMessage = failMessage };
-            VerifyCalls(GetInterceptor(methodCall.Object, mock), expected, expression, times);
+            Verify(GetInterceptor(methodCall.Object, mock), expected, expression, times);
         }
 
         internal static void Verify<T, TResult>(
@@ -306,7 +301,7 @@ namespace Moq
                 {
                     FailMessage = failMessage
                 };
-                VerifyCalls(GetInterceptor(methodCall.Object, mock), expected, expression, times);
+                Verify(GetInterceptor(methodCall.Object, mock), expected, expression, times);
             }
         }
 
@@ -324,7 +319,7 @@ namespace Moq
             {
                 FailMessage = failMessage
             };
-            VerifyCalls(GetInterceptor(((MemberExpression)expression.Body).Expression, mock), expected, expression, times);
+            Verify(GetInterceptor(((MemberExpression)expression.Body).Expression, mock), expected, expression, times);
         }
 
         internal static void VerifySet<T>(
@@ -343,7 +338,7 @@ namespace Moq
                     return new MethodCall<T>(m, null, expr, method, value) { FailMessage = failMessage };
                 });
 
-            VerifyCalls(targetInterceptor, expected, expression, times);
+            Verify(targetInterceptor, expected, expression, times);
         }
 
         private static bool AreSameMethod(Expression left, Expression right)
@@ -359,18 +354,18 @@ namespace Moq
             return false;
         }
 
-        private static void VerifyCalls(
+        private static void Verify(
             Interceptor targetInterceptor,
             MethodCall expected,
             Expression expression,
             Times times)
         {
-			IEnumerable<ICallContext> actualCalls = targetInterceptor.InterceptionContext.ActualInvocations;
+            IEnumerable<ICallContext> actualCalls = targetInterceptor.InterceptionContext.ActualInvocations;
 
             var callCount = actualCalls.Where(ac => expected.Matches(ac)).Count();
             if (!times.Verify(callCount))
             {
-				var setups = targetInterceptor.InterceptionContext.OrderedCalls.Where(oc => AreSameMethod(oc.SetupExpression, expression));
+                var setups = targetInterceptor.InterceptionContext.OrderedCalls.Where(oc => AreSameMethod(oc.SetupExpression, expression));
                 ThrowVerifyException(expected, setups, actualCalls, expression, times, callCount);
             }
         }
@@ -1064,7 +1059,7 @@ namespace Moq
           Expression expression)
         {
 
-          var isCallMatched = sequence.ForwardBeyondACallTo(expected, targetInterceptor.InterceptionContext.Mock);
+          var isCallMatched = sequence.MovePast(expected, targetInterceptor.InterceptionContext.Mock);
           if (!isCallMatched)
           {
             var setups = targetInterceptor.InterceptionContext.OrderedCalls.Where(oc => AreSameMethod(oc.SetupExpression, expression));

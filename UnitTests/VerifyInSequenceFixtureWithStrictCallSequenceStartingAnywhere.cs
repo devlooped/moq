@@ -16,7 +16,7 @@ namespace Moq.Tests
       a.Object.Do(100);
       b.Object.Do(200);
 
-      CallSequence.Verify(
+      strictLaterSequence.Verify(
         a.CallTo(x => x.Do(100)),
         b.CallTo(x => x.Do(200))
       );
@@ -33,7 +33,7 @@ namespace Moq.Tests
       b.Object.Do(200);
 
       Assert.Throws<MockException>(() =>
-                                   CallSequence.Verify(
+                                   strictLaterSequence.Verify(
                                      a.CallTo(x => x.Do(100))
                                      )
         );
@@ -42,15 +42,15 @@ namespace Moq.Tests
     [Fact]
     public void ShouldNotSupportCyclicSequencing()
     {
-      var sequence = new StrictSequenceStartingAnywhere();
-      var a = new Mock<IFoo>() { CallSequence = sequence };
+      var strictLaterSequence = new StrictSequenceStartingAnywhere();
+      var a = new Mock<IFoo>() { CallSequence = strictLaterSequence };
       var b = new Mock<IFoo>() { CallSequence = a.CallSequence };
 
       a.Object.Do(200);
       b.Object.Do(100);
 
       Assert.Throws<MockException>(() =>
-                                   CallSequence.Verify(a.CallTo(m => m.Do(100)))
+                                   strictLaterSequence.Verify(a.CallTo(m => m.Do(100)))
         );
     }
 
@@ -68,7 +68,7 @@ namespace Moq.Tests
       c.Object.Do(2);
       d.Object.Do(3);
 
-      CallSequence.Verify(
+      sequence.Verify(
         b.CallTo(m => m.Do(1)),
         c.CallTo(m => m.Do(2))
         );
@@ -90,7 +90,7 @@ namespace Moq.Tests
 
       Assert.Throws<MockException>(
         () =>
-          CallSequence.Verify(
+          sequence.Verify(
             b.CallTo(m => m.Do(1)),
             c.CallTo(m => m.Do(2))
           )

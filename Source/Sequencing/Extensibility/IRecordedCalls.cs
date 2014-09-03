@@ -6,14 +6,9 @@ namespace Moq.Sequencing.Extensibility
 {
   internal interface IRecordedCalls
   {
-    void Add(IMinimalCallContext invocation, Mock target);
-    bool CurrentCallMatches(ICallMatchable expected, Mock target);
-    bool NextCallMatches(ICallMatchable expected, Mock target);
-    void ForwardToNextCall();
-    bool AnyUncheckedCallsLeft();
-    bool NextCallExists();
+    ISequencedCall Current { get; }
+    bool MoveToNext();
     void Rewind();
-    bool ContainsFurther(ICallMatchable expected, Mock target);
-    bool ForwardBeyondSubsequence(List<Tuple<ICallMatchable, Mock>> callsToVerify);
+    bool MovePastSubsequence(List<Tuple<ICallMatcher, Mock>> callsToVerify);
   }
 }

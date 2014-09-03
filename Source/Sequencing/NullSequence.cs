@@ -5,7 +5,7 @@ namespace Moq.Sequencing
   internal class NullSequence : CallSequence
   {
     internal NullSequence()
-      : base(new NullSequenceNavigation())
+      : base(new NullCallSequenceCursorStrategy())
     {
     }
   }

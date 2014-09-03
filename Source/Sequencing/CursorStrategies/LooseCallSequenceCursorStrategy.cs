@@ -9,19 +9,18 @@ namespace Moq.Sequencing.NavigationStrategies
   /// We're expecting the sequence: A(), B()
   /// And it can be matched by a sequence A(), C(), B()
   /// </summary>
-  internal class LooseSequenceNavigation : ICallSequenceNavigation
+  internal class LooseCallSequenceCursorStrategy : ICallSequenceCursorStrategy
   {
-    public bool ForwardBeyondACallTo(ICallMatchable expected, Mock target, IRecordedCalls recordedCalls)
+    public bool MovePast(ICallMatcher expected, Mock target, IRecordedCalls recordedCalls)
     {
       var isCurrentCallStillUnmatched = false;
 
-      while (recordedCalls.AnyUncheckedCallsLeft() && !isCurrentCallStillUnmatched)
+      while (!isCurrentCallStillUnmatched && recordedCalls.MoveToNext())
       {
-        if (recordedCalls.CurrentCallMatches(expected, target))
+        if (recordedCalls.Current.Matches(expected, target))
         {
           isCurrentCallStillUnmatched = true;
         }
-        recordedCalls.ForwardToNextCall();
       }
       return isCurrentCallStillUnmatched;
     }

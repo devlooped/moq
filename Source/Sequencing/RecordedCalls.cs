@@ -7,61 +7,37 @@ namespace Moq.Sequencing
 {
   internal class RecordedCalls : IRecordedCalls
   {
-    private readonly List<Tuple<IMinimalCallContext, Mock>> callContexts = new List<Tuple<IMinimalCallContext, Mock>>();
-    private int currentItemIndex = 0;
+    private const int PreBeginPosition = -1;
+    private readonly List<SequencedCall> callContexts = new List<SequencedCall>();
+    private int currentItemIndex = PreBeginPosition;
 
-    public void Add(IMinimalCallContext invocation, Mock target)
+
+    public ISequencedCall Current { get { return callContexts[currentItemIndex]; } }
+
+    public void Add(ICall invocation, Mock target)
     {
-      callContexts.Add(Tuple.Create(invocation, target));
+      callContexts.Add(new SequencedCall(invocation, target));
     }
 
-    public bool CurrentCallMatches(ICallMatchable expected, Mock target)
+    public bool MoveToNext()
     {
-      return CallMatches(currentItemIndex, expected, target);
-    }
-
-    public bool NextCallMatches(ICallMatchable expected, Mock target)
-    {
-      if (NextCallExists())
-      {
-        return CallMatches(currentItemIndex + 1, expected, target);
-      }
-      return false;
-    }
-
-    public void ForwardToNextCall()
-    {
+      if (EOF) return false;
+      
       currentItemIndex++;
+      return !EOF;
     }
 
-    public bool AnyUncheckedCallsLeft()
+    private bool EOF
     {
-      return currentItemIndex < callContexts.Count;
-    }
-
-    public bool NextCallExists()
-    {
-      return currentItemIndex + 1 < callContexts.Count;
+      get { return currentItemIndex >= callContexts.Count; }
     }
 
     public void Rewind()
     {
-      currentItemIndex = 0;
+      currentItemIndex = PreBeginPosition;
     }
 
-    public bool ContainsFurther(ICallMatchable expected, Mock target)
-    {
-      for (var i = currentItemIndex; i < callContexts.Count; ++i)
-      {
-        if (CallMatches(i, expected, target))
-        {
-          return true;
-        }
-      }
-      return false;
-    }
-
-    public bool ForwardBeyondSubsequence(List<Tuple<ICallMatchable, Mock>> callsToVerify)
+    public bool MovePastSubsequence(List<Tuple<ICallMatcher, Mock>> callsToVerify)
     {
       for (var i = 0; i < callContexts.Count; ++i)
       {
@@ -74,27 +50,10 @@ namespace Moq.Sequencing
       return false;
     }
 
-    private bool CallMatches(int index, ICallMatchable expected, Mock target)
-    {
-      var currentContext = callContexts[index].Item1;
-      var currentTarget = callContexts[index].Item2;
-
-      bool result =
-        IsThereAMatchBetweenContextAndExpectedCall(
-          currentContext, currentTarget, expected, target);
-      return result;
-    }
-
-
-    private bool IsThereAMatchBetweenContextAndExpectedCall(IMinimalCallContext currentContext, Mock currentTarget, ICallMatchable expected, Mock target)
-    {
-      var result = expected.Matches(currentContext) && target == currentTarget;
-      return result;
-    }
 
     private bool MatchSubsequenceStartingFrom(
       int subsequenceStartIndex,
-      List<Tuple<ICallMatchable, Mock>> callsToVerify)
+      List<Tuple<ICallMatcher, Mock>> callsToVerify)
     {
       if (callsToVerify.Count >
          callContexts.Count - subsequenceStartIndex)
@@ -104,17 +63,14 @@ namespace Moq.Sequencing
 
       for (var i = 0; i < callsToVerify.Count; ++i)
       {
-        var currentContextData = callContexts[i + subsequenceStartIndex];
-        var currentCallData = callsToVerify[i];
-        var currentContext = currentContextData.Item1;
-        var currentContextTarget = currentContextData.Item2;
-        var expectedCall = currentCallData.Item1;
-        var expectedTarget = currentCallData.Item2;
-        if (!IsThereAMatchBetweenContextAndExpectedCall(
-          currentContext,
-          currentContextTarget,
-          expectedCall,
-          expectedTarget))
+        var currentExpectedCall = callsToVerify[i];
+
+        var currentCall = callContexts[i + subsequenceStartIndex];
+        var expectedCall = currentExpectedCall.Item1;
+        var expectedTarget = currentExpectedCall.Item2;
+        var result = currentCall.Matches(expectedCall, expectedTarget);
+        
+        if (!result)
         {
           return false;
         }
@@ -123,6 +79,5 @@ namespace Moq.Sequencing
     }
 
   }
-
 }
 

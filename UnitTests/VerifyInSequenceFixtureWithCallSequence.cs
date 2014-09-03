@@ -15,7 +15,7 @@ namespace Moq.Tests
       mock1.Object.Do();
       mock2.Object.Do();
 
-      CallSequence.Verify(
+      sequence.Verify(
         mock1.CallTo(m => m.Do()),
         mock2.CallTo(m => m.Do())
         );
@@ -32,7 +32,7 @@ namespace Moq.Tests
       mock1.Object.Do();
 
       Assert.Throws<MockException>(() =>
-                                   CallSequence.Verify(
+                                   sequence.Verify(
                                      mock1.CallTo(m => m.Do()),
                                      mock2.CallTo(m => m.Do())
                                      )
@@ -51,7 +51,7 @@ namespace Moq.Tests
       mock3.Object.Do();
       mock2.Object.Do();
 
-      CallSequence.Verify(
+      sequence.Verify(
         mock1.CallTo(m => m.Do()),
         mock2.CallTo(m => m.Do())
         );
@@ -71,7 +71,7 @@ namespace Moq.Tests
 
 
       Assert.Throws<MockException>(() =>
-                                   CallSequence.Verify(
+                                   sequence.Verify(
                                      mock1.CallTo(m => m.Do()),
                                      mock2.CallTo(m => m.Do())
                                      )
@@ -90,7 +90,7 @@ namespace Moq.Tests
       mock3.Object.Do();
       mock2.Object.Do();
 
-      CallSequence.Verify(
+      sequence.Verify(
         mock1.CallTo(a => a.Do()),
         mock2.CallTo(b => b.Do())
         );
@@ -108,7 +108,7 @@ namespace Moq.Tests
       mock2.Object.Do(3);
 
       Assert.Throws<MockException>(() =>
-                                   CallSequence.Verify(
+                                   sequence.Verify(
                                      mock1.CallTo(m => m.Do(2)),
                                      mock2.CallTo(m => m.Do(1))
                                      )
@@ -126,13 +126,13 @@ namespace Moq.Tests
       mock1.Object.Do(2);
       mock1.Object.Do(3);
 
-      CallSequence.Verify(
+      sequence.Verify(
         mock1.CallTo(m => m.Do(2)),
         mock1.CallTo(m => m.Do(3))
         );
 
       Assert.Throws<MockException>(() =>
-                                   CallSequence.Verify(
+                                   sequence.Verify(
                                      mock1.CallTo(m => m.Do(2)),
                                      mock1.CallTo(m => m.Do(3)),
                                      mock1.CallTo(m => m.Do(1))
@@ -152,7 +152,7 @@ namespace Moq.Tests
 
       mock1.Object.Do().Do();
 
-      CallSequence.Verify(
+      sequence.Verify(
         mock1.CallTo(m => m.Do()),
         mock1.CallTo(m => m.Do().Do())
         );
@@ -170,12 +170,12 @@ namespace Moq.Tests
 
       mock1.Object.Do().Do();
 
-      CallSequence.Verify(
+      sequence.Verify(
         mock1.CallTo(m => m.Do().Do())
         );
 
       Assert.Throws<MockException>(() =>
-                                   CallSequence.Verify(
+                                   sequence.Verify(
                                      mock1.CallTo(m => m.Do().Do()),
                                      mock1.CallTo(m => m.Do())
                                      )
@@ -186,12 +186,13 @@ namespace Moq.Tests
     public void ShouldAllowVerifyingSettingPropertyInSequence()
     {
       var something = "something";
-      var mock1 = new Mock<RoleWithProperty> { CallSequence = new CallSequence() };
+      var sequence = new CallSequence();
+      var mock1 = new Mock<RoleWithProperty> { CallSequence = sequence };
 
       mock1.Object.Anything = something;
       mock1.Object.Anything = something + something;
 
-      CallSequence.Verify(
+      sequence.Verify(
         mock1.CallToSet(m => m.Anything = something),
         mock1.CallToSet(m => m.Anything = something + something)
         );
@@ -201,13 +202,14 @@ namespace Moq.Tests
     public void ShouldThrowExceptionWhenVerifiedPropertySetDoNotMatchActual()
     {
       var something = "something";
-      var mock1 = new Mock<RoleWithProperty> { CallSequence = new CallSequence() };
+      var sequence = new CallSequence();
+      var mock1 = new Mock<RoleWithProperty> { CallSequence = sequence };
 
       mock1.Object.Anything = something;
       mock1.Object.Anything = something + something;
 
       Assert.Throws<MockException>(() =>
-                                   CallSequence.Verify(
+                                   sequence.Verify(
                                      mock1.CallToSet(m => m.Anything = something + something),
                                      mock1.CallToSet(m => m.Anything = something)
                                      )
@@ -224,11 +226,11 @@ namespace Moq.Tests
       something = mock1.Object.Anything;
       something = mock1.Object.AnythingElse;
 
-      CallSequence.Verify(
+      sequence.Verify(
         mock1.CallToGet(m => m.Anything),
         mock1.CallToGet(m => m.AnythingElse));
 
-      CallSequence.Verify(
+      sequence.Verify(
         mock1.CallToGet(m => m.Anything),
         mock1.CallToGet(m => m.AnythingElse));
     }
@@ -237,13 +239,14 @@ namespace Moq.Tests
     public void ShouldThrowExceptionWhenVerifiedPropertyGetDoNotMatchActual()
     {
       string something;
-      var mock1 = new Mock<RoleWithProperty> { CallSequence = new CallSequence() };
+      var sequence = new CallSequence();
+      var mock1 = new Mock<RoleWithProperty> { CallSequence = sequence };
 
       something = mock1.Object.Anything;
       something = mock1.Object.AnythingElse;
 
       Assert.Throws<MockException>(() =>
-                                   CallSequence.Verify(
+                                   sequence.Verify(
                                      mock1.CallToGet(m => m.AnythingElse),
                                      mock1.CallToGet(m => m.Anything)
                                      )

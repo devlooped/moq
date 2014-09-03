@@ -44,22 +44,22 @@ using System.Reflection;
 namespace Moq.Proxy
 {
 	
-	internal interface ICallMatchable
+	internal interface ICallMatcher
 	{
-		bool Matches(IMinimalCallContext call);
+		bool Matches(ICall call);
 	}
 
-	internal interface IMinimalCallContext
+	internal interface ICall
 	{
 		object[] Arguments { get; }
 		MethodInfo Method { get; }
-		object ReturnValue { get; set; }
 	}
 
-	internal interface ICallContext : IMinimalCallContext
+	internal interface ICallContext : ICall
 	{
 		void InvokeBase();
 
 		void SetArgumentValue(int index, object value);
+	  object ReturnValue { get; set; }
 	}
 }

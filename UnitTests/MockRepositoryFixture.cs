@@ -155,7 +155,7 @@ namespace Moq.Tests
 			var mock = repository.Create<IFoo>();
 
 			Assert.Throws<NoSequenceAssignedException>(
-				() => CallSequence.Verify(
+				() => mock.CallSequence.Verify(
 					mock.CallTo(m => m.Do()),
 					mock.CallTo(m => m.Undo())
 				)

@@ -216,7 +216,7 @@ namespace Moq
 			}
 		}
 
-		public virtual bool Matches(IMinimalCallContext call)
+		public virtual bool Matches(ICall call)
 		{
 			if (condition != null && !condition.IsTrue)
 			{
@@ -364,7 +364,7 @@ namespace Moq
 			this.FailMessage = failMessage;
 		}
 
-		private bool IsEqualMethodOrOverride(IMinimalCallContext call)
+		private bool IsEqualMethodOrOverride(ICall call)
 		{
 			if (call.Method == this.Method)
 			{
