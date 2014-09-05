@@ -367,6 +367,57 @@
     <Compile Include="..\Source\SequenceExtensions.cs">
       <Link>SequenceExtensions.cs</Link>
     </Compile>
+    <Compile Include="..\Source\Sequencing\CallSequence.cs">
+      <Link>Sequencing\CallSequence.cs</Link>
+    </Compile>
+    <Compile Include="..\Source\Sequencing\CallVerificationStep.cs">
+      <Link>Sequencing\CallVerificationStep.cs</Link>
+    </Compile>
+    <Compile Include="..\Source\Sequencing\CursorStrategies\LooseCallSequenceCursorStrategy.cs">
+      <Link>Sequencing\CursorStrategies\LooseCallSequenceCursorStrategy.cs</Link>
+    </Compile>
+    <Compile Include="..\Source\Sequencing\CursorStrategies\NullCallSequenceCursorStrategy.cs">
+      <Link>Sequencing\CursorStrategies\NullCallSequenceCursorStrategy.cs</Link>
+    </Compile>
+    <Compile Include="..\Source\Sequencing\CursorStrategies\StrictCallSequenceCursorStrategy.cs">
+      <Link>Sequencing\CursorStrategies\StrictCallSequenceCursorStrategy.cs</Link>
+    </Compile>
+    <Compile Include="..\Source\Sequencing\CursorStrategies\StrictCallSequencePartCursorStrategy.cs">
+      <Link>Sequencing\CursorStrategies\StrictCallSequencePartCursorStrategy.cs</Link>
+    </Compile>
+    <Compile Include="..\Source\Sequencing\Extensibility\ICallSequenceCursorStrategy.cs">
+      <Link>Sequencing\Extensibility\ICallSequenceCursorStrategy.cs</Link>
+    </Compile>
+    <Compile Include="..\Source\Sequencing\Extensibility\IRecordedCalls.cs">
+      <Link>Sequencing\Extensibility\IRecordedCalls.cs</Link>
+    </Compile>
+    <Compile Include="..\Source\Sequencing\Extensibility\IVerificationStep.cs">
+      <Link>Sequencing\Extensibility\IVerificationStep.cs</Link>
+    </Compile>
+    <Compile Include="..\Source\Sequencing\GetVerificationStep.cs">
+      <Link>Sequencing\GetVerificationStep.cs</Link>
+    </Compile>
+    <Compile Include="..\Source\Sequencing\ISequencedCall.cs">
+      <Link>Sequencing\ISequencedCall.cs</Link>
+    </Compile>
+    <Compile Include="..\Source\Sequencing\NoSequenceAssignedException.cs">
+      <Link>Sequencing\NoSequenceAssignedException.cs</Link>
+    </Compile>
+    <Compile Include="..\Source\Sequencing\NullSequence.cs">
+      <Link>Sequencing\NullSequence.cs</Link>
+    </Compile>
+    <Compile Include="..\Source\Sequencing\RecordedCalls.cs">
+      <Link>Sequencing\RecordedCalls.cs</Link>
+    </Compile>
+    <Compile Include="..\Source\Sequencing\SequencedCall.cs">
+      <Link>Sequencing\SequencedCall.cs</Link>
+    </Compile>
+    <Compile Include="..\Source\Sequencing\SetVerificationStep.cs">
+      <Link>Sequencing\SetVerificationStep.cs</Link>
+    </Compile>
+    <Compile Include="..\Source\Sequencing\VerificationStepExtensions.cs">
+      <Link>Sequencing\VerificationStepExtensions.cs</Link>
+    </Compile>
     <Compile Include="..\Source\SetterMethodCall.cs">
       <Link>SetterMethodCall.cs</Link>
     </Compile>

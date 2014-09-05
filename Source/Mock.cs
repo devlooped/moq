@@ -1055,7 +1055,7 @@ namespace Moq
         static void VerifyInSequenceCalls(
           Interceptor targetInterceptor,
           CallSequence sequence,
-          MethodCall expected,
+          IProxyCall expected,
           Expression expression)
         {
 
