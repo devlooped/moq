@@ -1,14 +1,12 @@
-﻿using System;
-using System.Collections.Generic;
-using Moq.Proxy;
+﻿using System.Collections.Generic;
 
 namespace Moq.Sequencing.Extensibility
 {
   internal interface IRecordedCalls
   {
-    ISequencedCall Current { get; }
+    IRecordedCall Current { get; }
     bool MoveToNext();
     void Rewind();
-    bool MovePastSubsequence(List<Tuple<ICallMatcher, Mock>> callsToVerify);
+    bool ContainsStartingFromCurrentPosition(List<IExpectedCall> expectedCalls);
   }
 }

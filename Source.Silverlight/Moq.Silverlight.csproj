@@ -385,6 +385,15 @@
     <Compile Include="..\Source\Sequencing\CursorStrategies\StrictCallSequencePartCursorStrategy.cs">
       <Link>Sequencing\CursorStrategies\StrictCallSequencePartCursorStrategy.cs</Link>
     </Compile>
+    <Compile Include="..\Source\Sequencing\CursorStrategies\StrictSequenceStartingAnywhere.cs">
+      <Link>Sequencing\StrictSequenceStartingAnywhere.cs</Link>
+    </Compile>
+    <Compile Include="..\Source\Sequencing\ExpectedCall.cs">
+      <Link>Sequencing\ExpectedCall.cs</Link>
+    </Compile>
+    <Compile Include="..\Source\Sequencing\ExpectedCalls.cs">
+      <Link>Sequencing\ExpectedCalls.cs</Link>
+    </Compile>
     <Compile Include="..\Source\Sequencing\Extensibility\ICallSequenceCursorStrategy.cs">
       <Link>Sequencing\Extensibility\ICallSequenceCursorStrategy.cs</Link>
     </Compile>
@@ -397,8 +406,11 @@
     <Compile Include="..\Source\Sequencing\GetVerificationStep.cs">
       <Link>Sequencing\GetVerificationStep.cs</Link>
     </Compile>
-    <Compile Include="..\Source\Sequencing\ISequencedCall.cs">
-      <Link>Sequencing\ISequencedCall.cs</Link>
+    <Compile Include="..\Source\Sequencing\IExpectedCall.cs">
+      <Link>Sequencing\IExpectedCall.cs</Link>
+    </Compile>
+    <Compile Include="..\Source\Sequencing\IRecordedCall.cs">
+      <Link>Sequencing\IRecordedCall.cs</Link>
     </Compile>
     <Compile Include="..\Source\Sequencing\NoSequenceAssignedException.cs">
       <Link>Sequencing\NoSequenceAssignedException.cs</Link>
@@ -406,11 +418,11 @@
     <Compile Include="..\Source\Sequencing\NullSequence.cs">
       <Link>Sequencing\NullSequence.cs</Link>
     </Compile>
+    <Compile Include="..\Source\Sequencing\RecordedCall.cs">
+      <Link>Sequencing\RecordedCall.cs</Link>
+    </Compile>
     <Compile Include="..\Source\Sequencing\RecordedCalls.cs">
       <Link>Sequencing\RecordedCalls.cs</Link>
-    </Compile>
-    <Compile Include="..\Source\Sequencing\SequencedCall.cs">
-      <Link>Sequencing\SequencedCall.cs</Link>
     </Compile>
     <Compile Include="..\Source\Sequencing\SetVerificationStep.cs">
       <Link>Sequencing\SetVerificationStep.cs</Link>

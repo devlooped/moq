@@ -14,33 +14,16 @@ namespace Moq.Sequencing.NavigationStrategies
   /// </summary>
   internal class StrictCallSequencePartCursorStrategy : ICallSequenceCursorStrategy
   {
-    private readonly List<Tuple<ICallMatcher, Mock>> callsToVerify = new List<Tuple<ICallMatcher, Mock>>();
+    private readonly ExpectedCalls expectedCalls = new ExpectedCalls();
 
-    public bool MovePast(ICallMatcher expected, Mock target, IRecordedCalls recordedCalls)
+    public bool MovePast(IExpectedCall expectedCall, IRecordedCalls recordedCalls)
     {
+      expectedCalls.Add(expectedCall);
       var isWholeSequenceUpToNowMatched = false;
-      callsToVerify.Add(Tuple.Create(expected, target));
-      recordedCalls.Rewind();
 
-      isWholeSequenceUpToNowMatched = recordedCalls.MovePastSubsequence(callsToVerify);
+      isWholeSequenceUpToNowMatched = expectedCalls.IsSubsequenceOf(recordedCalls);
+      
       return isWholeSequenceUpToNowMatched;
-    }
-  }
-
-  /// <summary>
-  /// Works like a strict sequence with the exception
-  /// that it does not require the first verified call
-  /// to be the first recorded call (in other words, 
-  /// the strict sequence of calls can happen anytime)
-  /// </summary>
-  public class StrictSequenceStartingAnywhere : CallSequence
-  {
-    /// <summary>
-    /// Creates a new instance
-    /// </summary>
-    public StrictSequenceStartingAnywhere()
-      : base(new StrictCallSequencePartCursorStrategy())
-    {
     }
   }
 }
