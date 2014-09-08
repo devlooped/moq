@@ -14,11 +14,11 @@ namespace Moq.Sequencing.NavigationStrategies
   /// </summary>
   internal class StrictCallSequenceCursorStrategy : ICallSequenceCursorStrategy
   {
-    public bool MovePast(ICallMatcher expected, Mock target, IRecordedCalls recordedCalls)
+    public bool MovePast(IExpectedCall expectedCall, IRecordedCalls recordedCalls)
     {
       if (recordedCalls.MoveToNext())
       {
-        return recordedCalls.Current.Matches(expected, target);
+        return recordedCalls.Current.Matches(expectedCall);
       }
 
       return false;

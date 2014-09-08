@@ -19,7 +19,5 @@ namespace Moq.Sequencing
     {
       mock.VerifyInSequence(action);
     }
-
-    public CallSequence CallSequence { get { return mock.CallSequence; } }
   }
 }

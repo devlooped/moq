@@ -11,13 +11,13 @@ namespace Moq.Sequencing.NavigationStrategies
   /// </summary>
   internal class LooseCallSequenceCursorStrategy : ICallSequenceCursorStrategy
   {
-    public bool MovePast(ICallMatcher expected, Mock target, IRecordedCalls recordedCalls)
+    public bool MovePast(IExpectedCall expectedCall, IRecordedCalls recordedCalls)
     {
       var isCurrentCallStillUnmatched = false;
 
       while (!isCurrentCallStillUnmatched && recordedCalls.MoveToNext())
       {
-        if (recordedCalls.Current.Matches(expected, target))
+        if (recordedCalls.Current.Matches(expectedCall))
         {
           isCurrentCallStillUnmatched = true;
         }

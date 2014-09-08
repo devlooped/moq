@@ -1,5 +1,3 @@
-using System.Collections.Generic;
-using System.Linq;
 using Moq.Proxy;
 using Moq.Sequencing.Extensibility;
 using Moq.Sequencing.NavigationStrategies;
@@ -36,9 +34,9 @@ namespace Moq.Sequencing
       }
     }
 
-    internal bool MovePast(ICallMatcher expected, Mock target)
+    internal bool MovePast(IExpectedCall expectedCall)
     {
-      return callSequenceCursorStrategy.MovePast(expected, target, recordedCalls);
+      return callSequenceCursorStrategy.MovePast(expectedCall, recordedCalls);
     }
 
     ///<summary>
@@ -57,11 +55,6 @@ namespace Moq.Sequencing
     internal static CallSequence None()
     {
       return new NullSequence();
-    }
-
-    private static bool AreNotRecordedByTheSameSequence(IEnumerable<IVerificationStep> steps)
-    {
-      return steps.Select(s => s.CallSequence).Distinct().ToArray().Length > 1;
     }
 
     internal void Add (ICallContext invocation, Mock target)

@@ -1059,7 +1059,7 @@ namespace Moq
           Expression expression)
         {
 
-          var isCallMatched = sequence.MovePast(expected, targetInterceptor.InterceptionContext.Mock);
+          var isCallMatched = sequence.MovePast(new ExpectedCall(expected, targetInterceptor.InterceptionContext.Mock));
           if (!isCallMatched)
           {
             var setups = targetInterceptor.InterceptionContext.OrderedCalls.Where(oc => AreSameMethod(oc.SetupExpression, expression));
