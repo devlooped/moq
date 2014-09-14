@@ -7,6 +7,6 @@ namespace Moq.Sequencing.Extensibility
     IRecordedCall Current { get; }
     bool MoveToNext();
     void Rewind();
-    bool ContainsStartingFromCurrentPosition(List<IExpectedCall> expectedCalls);
+    List<IRecordedCall> RangeFromCurrentToEnd();
   }
 }

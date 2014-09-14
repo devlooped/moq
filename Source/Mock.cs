@@ -362,7 +362,7 @@ namespace Moq
         {
             IEnumerable<ICallContext> actualCalls = targetInterceptor.InterceptionContext.ActualInvocations;
 
-            var callCount = actualCalls.Where(ac => expected.Matches(ac)).Count();
+            var callCount = actualCalls.Where(currentCall => expected.Matches(currentCall)).Count();
             if (!times.Verify(callCount))
             {
                 var setups = targetInterceptor.InterceptionContext.OrderedCalls.Where(oc => AreSameMethod(oc.SetupExpression, expression));

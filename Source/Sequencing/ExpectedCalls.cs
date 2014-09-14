@@ -1,4 +1,5 @@
 ﻿using System.Collections.Generic;
+using System.Linq;
 using Moq.Sequencing.Extensibility;
 
 namespace Moq.Sequencing
@@ -17,7 +18,7 @@ namespace Moq.Sequencing
       var result = false;
       while (recordedCalls.MoveToNext())
       {
-        if (recordedCalls.ContainsStartingFromCurrentPosition(expectedCalls))
+        if (!SequenceEqual(expectedCalls, recordedCalls.RangeFromCurrentToEnd()))
         {
           result = true;
           break;
@@ -26,6 +27,12 @@ namespace Moq.Sequencing
       recordedCalls.Rewind();
       return result;
     }
+
+    private static bool SequenceEqual(IEnumerable<IExpectedCall> expectedCalls, IList<IRecordedCall> recordedCalls)
+    {
+      return expectedCalls.Where((currentExpectedCall, i) => !recordedCalls[i].Matches(currentExpectedCall)).Any();
+    }
+
 
   }
 }

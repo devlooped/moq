@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Linq;
 using Moq.Proxy;
 using Moq.Sequencing.Extensibility;
 
@@ -8,7 +9,7 @@ namespace Moq.Sequencing
   internal class RecordedCalls : IRecordedCalls
   {
     private const int PreBeginPosition = -1;
-    private readonly List<RecordedCall> recordedCalls = new List<RecordedCall>();
+    private readonly List<IRecordedCall> recordedCalls = new List<IRecordedCall>();
     private int currentItemIndex = PreBeginPosition;
 
     public IRecordedCall Current
@@ -39,27 +40,10 @@ namespace Moq.Sequencing
       currentItemIndex = PreBeginPosition;
     }
 
-
-    public bool ContainsStartingFromCurrentPosition(List<IExpectedCall> expectedCalls)
+    public List<IRecordedCall> RangeFromCurrentToEnd()
     {
-      if (expectedCalls.Count > recordedCalls.Count - currentItemIndex)
-      {
-        return false;
-      }
-
-      for (var i = 0; i < expectedCalls.Count; ++i)
-      {
-        var currentExpectedCall = expectedCalls[i];
-
-        var currentCall = recordedCalls[i + currentItemIndex];
-        var result = currentCall.Matches(currentExpectedCall);
-
-        if (!result)
-        {
-          return false;
-        }
-      }
-      return true;
+      var callsLeftTillTheEnd = recordedCalls.Count - currentItemIndex;
+      return recordedCalls.GetRange(currentItemIndex, callsLeftTillTheEnd);
     }
   }
 
