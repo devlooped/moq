@@ -356,6 +356,38 @@ namespace Moq.Tests.Regressions
 
 		#endregion 311
 
+		#region #135
+
+		public class Issue135
+		{
+			public interface IDoer
+			{
+				void Foo(Item x, Item y);
+			}
+
+			public class Item
+			{
+				public int Id { get; set; }
+			}
+
+			[Fact]
+			public void strict_mock_differenciates_multiple_setups_with_same_arguments_in_different_order()
+			{
+				var aMock = new Mock<IDoer>(MockBehavior.Strict);
+
+				var i1 = new Item { Id = 1 };
+				var i2 = new Item { Id = 2 };
+
+				aMock.Setup(m => m.Foo(i1, i2));
+				aMock.Setup(m => m.Foo(i2, i1));
+
+				Assert.DoesNotThrow(() => aMock.Object.Foo(i1, i2));
+				Assert.DoesNotThrow(() => aMock.Object.Foo(i2, i1));
+			}
+		}
+
+		#endregion // #135
+
 		// Old @ Google Code
 
 		#region #47
