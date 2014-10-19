@@ -665,13 +665,15 @@ namespace Moq
                 var properties = mockType.GetProperties()
                     .Concat(mockType.GetInterfaces().SelectMany(i => i.GetProperties()))
                     .Where(p =>
-                        p.CanRead && p.CanWrite &&
+                        p.CanRead && p.CanOverrideGet() &&
                         p.GetIndexParameters().Length == 0 &&
-                        p.CanOverrideGet() && p.CanOverrideSet())
+                        !(p.CanWrite ^ (p.CanWrite & p.CanOverrideSet())))
                     .Distinct();
 
-                var method = mock.GetType().GetMethods()
+                var setupPropertyMethod = mock.GetType().GetMethods()
                     .First(m => m.Name == "SetupProperty" && m.GetParameters().Length == 2);
+                var setupGetMethod = mock.GetType().GetMethods()
+                    .First(m => m.Name == "SetupGet" && m.GetParameters().Length == 1);
 
                 foreach (var property in properties)
                 {
@@ -684,8 +686,23 @@ namespace Moq
                         SetupAllProperties(mocked.Mock);
                     }
 
-                    method.MakeGenericMethod(property.PropertyType)
-                        .Invoke(mock, new[] { expression, initialValue });
+                    if (property.CanWrite)
+                    {
+                        setupPropertyMethod.MakeGenericMethod(property.PropertyType)
+                            .Invoke(mock, new[] { expression, initialValue });
+                    }
+                    else
+                    {
+                        var genericSetupGetMethod = setupGetMethod.MakeGenericMethod(property.PropertyType);
+                        var returnsMethod =
+                            genericSetupGetMethod
+                                .ReturnType
+                                .GetInterface("IReturnsGetter`2", ignoreCase: false)
+                                .GetMethod("Returns", new Type[] { property.PropertyType });
+
+                        var returnsGetter = genericSetupGetMethod.Invoke(mock, new[] { expression });
+                        returnsMethod.Invoke(returnsGetter, new[] { initialValue });
+                    }
                 }
             });
         }
