@@ -36,9 +36,15 @@ namespace Moq.Tests
 		[Fact]
 		public void StubsAllProperties()
 		{
-			var mock = new Mock<IFoo>();
+			var mock = new Mock<IFoo>(MockBehavior.Strict);
 
 			mock.SetupAllProperties();
+
+			// Verify defaults
+			Assert.Equal(default(int), mock.Object.ValueProperty);
+			Assert.Equal(null, mock.Object.Object);
+			Assert.Equal(null, mock.Object.Bar);
+			Assert.Equal(null, mock.Object.GetOnly);
 
 			mock.Object.ValueProperty = 5;
 			Assert.Equal(5, mock.Object.ValueProperty);
@@ -98,6 +104,7 @@ namespace Moq.Tests
 			int ValueProperty { get; set; }
 			object Object { get; set; }
 			IBar Bar { get; set; }
+			object GetOnly { get; }
 		}
 
 		public class Derived : Base
