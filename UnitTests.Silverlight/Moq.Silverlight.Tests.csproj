@@ -15,7 +15,7 @@
     <SilverlightVersion>$(TargetFrameworkVersion)</SilverlightVersion>
     <SilverlightApplication>true</SilverlightApplication>
     <XapOutputs>true</XapOutputs>
-    <GenerateSilverlightManifest>false</GenerateSilverlightManifest>
+    <GenerateSilverlightManifest>true</GenerateSilverlightManifest>
     <XapFilename>Moq.Tests.Silverlight.xap</XapFilename>
     <SilverlightManifestTemplate>Properties\AppManifest.xml</SilverlightManifestTemplate>
     <SilverlightAppEntry>Moq.Tests.Silverlight.App</SilverlightAppEntry>
