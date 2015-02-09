@@ -469,6 +469,40 @@ namespace Moq.Tests.Regressions
 
         #endregion
 
+        #region #128
+
+        public class Issue128
+        {
+            [Fact]
+            public void That_CallBase_on_interface_should_not_throw_exception()
+            {
+                var mock = new Mock<IDataServiceFactory>() 
+                { 
+                    DefaultValue = DefaultValue.Mock,
+                    CallBase = true
+                };
+
+                var service = mock.Object.GetDataService();
+
+                var data = service.GetData();
+                var result = data.Sum();
+                
+                Assert.Equal( 0, result );
+            }
+
+            public interface IDataServiceFactory
+            {
+                IDataService GetDataService();
+            }
+
+            public interface IDataService
+            {
+                IList<int> GetData();
+            }
+        }
+
+        #endregion
+
         #region #134
 
         public class Issue134
