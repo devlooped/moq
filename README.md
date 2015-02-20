@@ -3,6 +3,9 @@ moq
 
 The most popular and friendly mocking framework for .NET
 
+[![NuGet downloads](https://img.shields.io/nuget/dt/Moq.svg)](https://www.nuget.org/packages/Moq)
+[![Version](https://img.shields.io/nuget/v/Moq.svg)](https://www.nuget.org/packages/Moq)
+
 ```csharp
   var mock = new Mock<ILoveThisFramework>();
 
