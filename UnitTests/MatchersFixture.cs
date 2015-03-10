@@ -255,6 +255,17 @@ namespace Moq.Tests
 			Assert.Equal(0, mock.Object.DoAddition(new[] { 2, 4, 6, 8 }));
 		}
 
+		[Fact]
+		public void MatchingNonNullableValueTypeForNullableParameterDoesNotMatchNull()
+		{
+			var mock = new Mock<IFoo>();
+
+			mock.Setup(x => x.TakesNullableParameter(It.IsAny<int>())).Returns(5);
+
+			Assert.Equal(5, mock.Object.TakesNullableParameter(5));
+			Assert.Equal(0, mock.Object.TakesNullableParameter(null));
+		}
+
 		private int GetToRange()
 		{
 			return 5;
@@ -271,6 +282,7 @@ namespace Moq.Tests
 			bool DoTypeOverload(Baz baz);
 			int DoAddition(int[] numbers);
 			int[] Items { get; set; }
+			int TakesNullableParameter(int? value);
 		}
 	}
 }
