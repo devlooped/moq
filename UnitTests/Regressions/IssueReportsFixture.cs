@@ -7,6 +7,7 @@ using System.Linq;
 using System.Linq.Expressions;
 using System.Reflection;
 using System.Text;
+using System.Text.RegularExpressions;
 using Moq;
 using Moq.Properties;
 using Moq.Protected;
@@ -174,6 +175,35 @@ namespace Moq.Tests.Regressions
 		}
 #endif
 		#endregion
+
+		#region #176
+	    public class Issue176
+	    {
+		    public interface ISomeInterface
+		    {
+			    TResult DoSomething<TResult>(int anInt);
+		    }
+
+		    [Fact]
+		    public void when_a_mock_doesnt_match_generic_parameters_exception_indicates_generic_parameters()
+		    {
+			    var mock = new Mock<ISomeInterface>();
+			    mock.Setup(m => m.DoSomething<int>(0)).Returns(1);
+
+			    try
+			    {
+				    mock.Object.DoSomething<int>(0);
+			    }
+			    catch (MockException exception)
+			    {
+				    var genericTypesRE = new Regex(@"\<.*?\>");
+				    var match = genericTypesRE.Match(exception.Message);
+
+				    Assert.True(match.Success);
+			    }
+		    }
+	    }
+		#endregion // #176
 
 		// Old @ Google Code
 
