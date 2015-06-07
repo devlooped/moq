@@ -177,32 +177,61 @@ namespace Moq.Tests.Regressions
 		#endregion
 
 		#region #176
-	    public class Issue176
-	    {
-		    public interface ISomeInterface
-		    {
-			    TResult DoSomething<TResult>(int anInt);
-		    }
 
-		    [Fact]
-		    public void when_a_mock_doesnt_match_generic_parameters_exception_indicates_generic_parameters()
-		    {
-			    var mock = new Mock<ISomeInterface>();
-			    mock.Setup(m => m.DoSomething<int>(0)).Returns(1);
+		public class Issue176
+		{
+			public interface ISomeInterface
+			{
+				TResult DoSomething<TResult>(int anInt);
+				int DoSomethingElse(int anInt);
+			}
 
-			    try
-			    {
-				    mock.Object.DoSomething<int>(0);
-			    }
-			    catch (MockException exception)
-			    {
-				    var genericTypesRE = new Regex(@"\<.*?\>");
-				    var match = genericTypesRE.Match(exception.Message);
+			[Fact]
+			public void when_a_mock_doesnt_match_generic_parameters_exception_indicates_generic_parameters()
+			{
+				var mock = new Mock<ISomeInterface>(MockBehavior.Strict);
+				mock.Setup(m => m.DoSomething<int>(0)).Returns(1);
 
-				    Assert.True(match.Success);
-			    }
-		    }
-	    }
+				try
+				{
+					mock.Object.DoSomething<string>(0);
+				}
+				catch (MockException exception)
+				{
+					var genericTypesRE = new Regex(@"\<.*?\>");
+					var match = genericTypesRE.Match(exception.Message);
+
+					Assert.True(match.Success);
+					Assert.Equal("<string>", match.Captures[0].Value, StringComparer.OrdinalIgnoreCase);
+					return;
+				}
+
+				Assert.True(false, "No exception was thrown when one should have been");
+			}
+
+			[Fact]
+			public void when_a_method_doesnt_have_generic_parameters_exception_doesnt_include_brackets()
+			{
+				var mock = new Mock<ISomeInterface>(MockBehavior.Strict);
+				mock.Setup(m => m.DoSomething<int>(0)).Returns(1);
+
+				try
+				{
+					mock.Object.DoSomethingElse(0);
+				}
+				catch (MockException exception)
+				{
+					var genericTypesRE = new Regex(@"\<.*?\>");
+					var match = genericTypesRE.Match(exception.Message);
+
+					Assert.False(match.Success);
+					return;
+				}
+
+				Assert.True(false, "No exception was thrown when one should have been");
+			}
+		}
+
 		#endregion // #176
 
 		// Old @ Google Code
