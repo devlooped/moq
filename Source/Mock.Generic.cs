@@ -256,15 +256,29 @@ namespace Moq
 		[SuppressMessage("Microsoft.Design", "CA1006:DoNotNestGenericTypesInMemberSignatures", Justification = "By design")]
 		public ISetup<T> Setup(Expression<Action<T>> expression)
 		{
-			return Mock.Setup<T>(this, expression, null);
+			return Mock.Setup<T>(this, expression, null, false);
 		}
+
+        /// <include file='Mock.Generic.xdoc' path='docs/doc[@for="Mock{T}.Setup"]/*'/>
+        [SuppressMessage("Microsoft.Design", "CA1006:DoNotNestGenericTypesInMemberSignatures", Justification = "By design")]
+        public ISetup<T> SetupAnyArg(Expression<Action<T>> expression)
+        {
+            return Mock.Setup<T>(this, expression, null, true);
+        }
 
 		/// <include file='Mock.Generic.xdoc' path='docs/doc[@for="Mock{T}.Setup{TResult}"]/*'/>
 		[SuppressMessage("Microsoft.Design", "CA1006:DoNotNestGenericTypesInMemberSignatures", Justification = "By design")]
 		public ISetup<T, TResult> Setup<TResult>(Expression<Func<T, TResult>> expression)
 		{
-			return Mock.Setup(this, expression, null);
+            return Mock.Setup(this, expression, null, false);
 		}
+
+        /// <include file='Mock.Generic.xdoc' path='docs/doc[@for="Mock{T}.Setup{TResult}"]/*'/>
+        [SuppressMessage("Microsoft.Design", "CA1006:DoNotNestGenericTypesInMemberSignatures", Justification = "By design")]
+        public ISetup<T, TResult> SetupAnyArg<TResult>(Expression<Func<T, TResult>> expression)
+        {
+            return Mock.Setup(this, expression, null, true);
+        }
 
 		/// <include file='Mock.Generic.xdoc' path='docs/doc[@for="Mock{T}.SetupGet"]/*'/>
 		[SuppressMessage("Microsoft.Design", "CA1006:DoNotNestGenericTypesInMemberSignatures", Justification = "By design")]
@@ -334,15 +348,29 @@ namespace Moq
 		[SuppressMessage("Microsoft.Design", "CA1006:DoNotNestGenericTypesInMemberSignatures", Justification = "By design")]
 		public void Verify(Expression<Action<T>> expression)
 		{
-			Mock.Verify(this, expression, Times.AtLeastOnce(), null);
+            Mock.Verify(this, expression, Times.AtLeastOnce(), null, false);
 		}
+
+        /// <include file='Mock.Generic.xdoc' path='docs/doc[@for="Mock{T}.Verify(expression)"]/*'/>
+        [SuppressMessage("Microsoft.Design", "CA1006:DoNotNestGenericTypesInMemberSignatures", Justification = "By design")]
+        public void VerifyAnyArg(Expression<Action<T>> expression)
+        {
+            Mock.Verify(this, expression, Times.AtLeastOnce(), null, true);
+        }
 
 		/// <include file='Mock.Generic.xdoc' path='docs/doc[@for="Mock{T}.Verify(expression,times)"]/*'/>
 		[SuppressMessage("Microsoft.Design", "CA1006:DoNotNestGenericTypesInMemberSignatures", Justification = "By design")]
 		public void Verify(Expression<Action<T>> expression, Times times)
 		{
-			Mock.Verify(this, expression, times, null);
+			Mock.Verify(this, expression, times, null, false);
 		}
+
+        /// <include file='Mock.Generic.xdoc' path='docs/doc[@for="Mock{T}.Verify(expression,times)"]/*'/>
+        [SuppressMessage("Microsoft.Design", "CA1006:DoNotNestGenericTypesInMemberSignatures", Justification = "By design")]
+        public void VerifyAnyArg(Expression<Action<T>> expression, Times times)
+        {
+            Mock.Verify(this, expression, times, null, true);
+        }
 
 		/// <include file='Mock.Generic.xdoc' path='docs/doc[@for="Mock{T}.Verify(expression,times)"]/*'/>
 		[SuppressMessage("Microsoft.Design", "CA1006:DoNotNestGenericTypesInMemberSignatures", Justification = "By design")]
@@ -351,61 +379,126 @@ namespace Moq
 			Verify(expression, times());
 		}
 
+        /// <include file='Mock.Generic.xdoc' path='docs/doc[@for="Mock{T}.Verify(expression,times)"]/*'/>
+        [SuppressMessage("Microsoft.Design", "CA1006:DoNotNestGenericTypesInMemberSignatures", Justification = "By design")]
+        public void VerifyAnyArg(Expression<Action<T>> expression, Func<Times> times)
+        {
+            VerifyAnyArg(expression, times());
+        }
+
 		/// <include file='Mock.Generic.xdoc' path='docs/doc[@for="Mock{T}.Verify(expression,failMessage)"]/*'/>
 		[SuppressMessage("Microsoft.Design", "CA1006:DoNotNestGenericTypesInMemberSignatures", Justification = "By design")]
 		public void Verify(Expression<Action<T>> expression, string failMessage)
 		{
-			Mock.Verify(this, expression, Times.AtLeastOnce(), failMessage);
+			Mock.Verify(this, expression, Times.AtLeastOnce(), failMessage, false);
 		}
+
+        /// <include file='Mock.Generic.xdoc' path='docs/doc[@for="Mock{T}.Verify(expression,failMessage)"]/*'/>
+        [SuppressMessage("Microsoft.Design", "CA1006:DoNotNestGenericTypesInMemberSignatures", Justification = "By design")]
+        public void VerifyAnyArg(Expression<Action<T>> expression, string failMessage)
+        {
+            Mock.Verify(this, expression, Times.AtLeastOnce(), failMessage, true);
+        }
 
 		/// <include file='Mock.Generic.xdoc' path='docs/doc[@for="Mock{T}.Verify(expression,times,failMessage)"]/*'/>
 		[SuppressMessage("Microsoft.Design", "CA1006:DoNotNestGenericTypesInMemberSignatures", Justification = "By design")]
 		public void Verify(Expression<Action<T>> expression, Times times, string failMessage)
 		{
-			Mock.Verify(this, expression, times, failMessage);
+			Mock.Verify(this, expression, times, failMessage, false);
 		}
+
+        /// <include file='Mock.Generic.xdoc' path='docs/doc[@for="Mock{T}.Verify(expression,times,failMessage)"]/*'/>
+        [SuppressMessage("Microsoft.Design", "CA1006:DoNotNestGenericTypesInMemberSignatures", Justification = "By design")]
+        public void VerifyAnyArg(Expression<Action<T>> expression, Times times, string failMessage)
+        {
+            Mock.Verify(this, expression, times, failMessage, true);
+        }
 
 		/// <include file='Mock.Generic.xdoc' path='docs/doc[@for="Mock{T}.Verify(expression,times,failMessage)"]/*'/>
 		[SuppressMessage("Microsoft.Design", "CA1006:DoNotNestGenericTypesInMemberSignatures", Justification = "By design")]
 		public void Verify(Expression<Action<T>> expression, Func<Times> times, string failMessage)
 		{
-			Verify(this, expression, times(), failMessage);
+			Verify(this, expression, times(), failMessage, false);
 		}
 
-		/// <include file='Mock.Generic.xdoc' path='docs/doc[@for="Mock{T}.Verify{TResult}(expression)"]/*'/>
+
+        /// <include file='Mock.Generic.xdoc' path='docs/doc[@for="Mock{T}.Verify(expression,times,failMessage)"]/*'/>
+        [SuppressMessage("Microsoft.Design", "CA1006:DoNotNestGenericTypesInMemberSignatures", Justification = "By design")]
+        public void VerifyAnyArg(Expression<Action<T>> expression, Func<Times> times, string failMessage)
+        {
+            Verify(this, expression, times(), failMessage, true);
+        }
+
+        /// <include file='Mock.Generic.xdoc' path='docs/doc[@for="Mock{T}.Verify{TResult}(expression)"]/*'/>
 		[SuppressMessage("Microsoft.Design", "CA1006:DoNotNestGenericTypesInMemberSignatures", Justification = "By design")]
 		public void Verify<TResult>(Expression<Func<T, TResult>> expression)
 		{
-			Mock.Verify(this, expression, Times.AtLeastOnce(), null);
+			Mock.Verify(this, expression, Times.AtLeastOnce(), null, false);
 		}
+
+        /// <include file='Mock.Generic.xdoc' path='docs/doc[@for="Mock{T}.Verify{TResult}(expression)"]/*'/>
+        [SuppressMessage("Microsoft.Design", "CA1006:DoNotNestGenericTypesInMemberSignatures", Justification = "By design")]
+        public void VerifyAnyArg<TResult>(Expression<Func<T, TResult>> expression)
+        {
+            Mock.Verify(this, expression, Times.AtLeastOnce(), null, true);
+        }
 
 		/// <include file='Mock.Generic.xdoc' path='docs/doc[@for="Mock{T}.Verify{TResult}(expression,times)"]/*'/>
 		[SuppressMessage("Microsoft.Design", "CA1006:DoNotNestGenericTypesInMemberSignatures", Justification = "By design")]
 		public void Verify<TResult>(Expression<Func<T, TResult>> expression, Times times)
 		{
-			Mock.Verify(this, expression, times, null);
+			Mock.Verify(this, expression, times, null, false);
 		}
+
+        /// <include file='Mock.Generic.xdoc' path='docs/doc[@for="Mock{T}.Verify{TResult}(expression,times)"]/*'/>
+        [SuppressMessage("Microsoft.Design", "CA1006:DoNotNestGenericTypesInMemberSignatures", Justification = "By design")]
+        public void VerifyAnyArg<TResult>(Expression<Func<T, TResult>> expression, Times times)
+        {
+            Mock.Verify(this, expression, times, null, true);
+        }
 
 		/// <include file='Mock.Generic.xdoc' path='docs/doc[@for="Mock{T}.Verify{TResult}(expression,times)"]/*'/>
 		[SuppressMessage("Microsoft.Design", "CA1006:DoNotNestGenericTypesInMemberSignatures", Justification = "By design")]
 		public void Verify<TResult>(Expression<Func<T, TResult>> expression, Func<Times> times)
 		{
-			Verify(this, expression, times(), null);
+			Verify(this, expression, times(), null, false);
 		}
+
+        /// <include file='Mock.Generic.xdoc' path='docs/doc[@for="Mock{T}.Verify{TResult}(expression,times)"]/*'/>
+        [SuppressMessage("Microsoft.Design", "CA1006:DoNotNestGenericTypesInMemberSignatures", Justification = "By design")]
+        public void VerifyAnyArg<TResult>(Expression<Func<T, TResult>> expression, Func<Times> times)
+        {
+            Verify(this, expression, times(), null, true);
+        }
+
 
 		/// <include file='Mock.Generic.xdoc' path='docs/doc[@for="Mock{T}.Verify{TResult}(expression,failMessage)"]/*'/>
 		[SuppressMessage("Microsoft.Design", "CA1006:DoNotNestGenericTypesInMemberSignatures", Justification = "By design")]
 		public void Verify<TResult>(Expression<Func<T, TResult>> expression, string failMessage)
 		{
-			Mock.Verify(this, expression, Times.AtLeastOnce(), failMessage);
+			Mock.Verify(this, expression, Times.AtLeastOnce(), failMessage, false);
 		}
+
+        /// <include file='Mock.Generic.xdoc' path='docs/doc[@for="Mock{T}.Verify{TResult}(expression,failMessage)"]/*'/>
+        [SuppressMessage("Microsoft.Design", "CA1006:DoNotNestGenericTypesInMemberSignatures", Justification = "By design")]
+        public void VerifyAnyArg<TResult>(Expression<Func<T, TResult>> expression, string failMessage)
+        {
+            Mock.Verify(this, expression, Times.AtLeastOnce(), failMessage, true);
+        }
 
 		/// <include file='Mock.Generic.xdoc' path='docs/doc[@for="Mock{T}.Verify{TResult}(expression,times,failMessage)"]/*'/>
 		[SuppressMessage("Microsoft.Design", "CA1006:DoNotNestGenericTypesInMemberSignatures", Justification = "By design")]
 		public void Verify<TResult>(Expression<Func<T, TResult>> expression, Times times, string failMessage)
 		{
-			Mock.Verify(this, expression, times, failMessage);
+			Mock.Verify(this, expression, times, failMessage, false);
 		}
+
+        /// <include file='Mock.Generic.xdoc' path='docs/doc[@for="Mock{T}.Verify{TResult}(expression,times,failMessage)"]/*'/>
+        [SuppressMessage("Microsoft.Design", "CA1006:DoNotNestGenericTypesInMemberSignatures", Justification = "By design")]
+        public void VerifyAnyArg<TResult>(Expression<Func<T, TResult>> expression, Times times, string failMessage)
+        {
+            Mock.Verify(this, expression, times, failMessage, true);
+        }
 
 		/// <include file='Mock.Generic.xdoc' path='docs/doc[@for="Mock{T}.VerifyGet(expression)"]/*'/>
 		[SuppressMessage("Microsoft.Design", "CA1006:DoNotNestGenericTypesInMemberSignatures", Justification = "By design")]

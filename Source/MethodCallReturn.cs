@@ -54,8 +54,8 @@ namespace Moq
 	/// </devdoc>
 	internal class MethodCallReturn : MethodCall
 	{
-		public MethodCallReturn(Mock mock, Condition condition, Expression originalExpression, MethodInfo method, params Expression[] arguments)
-			: base(mock, condition, originalExpression, method, arguments)
+		public MethodCallReturn(Mock mock, Condition condition, Expression originalExpression, MethodInfo method, bool ignoreArgs, params Expression[] arguments)
+            : base(mock, condition, originalExpression, method, ignoreArgs, arguments)
 		{
 		}
 
@@ -69,8 +69,8 @@ namespace Moq
 		private Action<object[]> afterReturnCallback;
 		private bool callBase;
 
-		public MethodCallReturn(Mock mock, Condition condition, Expression originalExpression, MethodInfo method, params Expression[] arguments)
-			: base(mock, condition, originalExpression, method, arguments)
+		public MethodCallReturn(Mock mock, Condition condition, Expression originalExpression, MethodInfo method, bool ignoreArgs, params Expression[] arguments)
+            : base(mock, condition, originalExpression, method, ignoreArgs, arguments)
 		{
 			this.HasReturnValue = false;
 		}

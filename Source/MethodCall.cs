@@ -59,9 +59,15 @@ namespace Moq
 	internal partial class MethodCall<TMock> : MethodCall, ISetup<TMock>
 		where TMock : class
 	{
-		public MethodCall(Mock mock, Condition condition, Expression originalExpression, MethodInfo method,
-			params Expression[] arguments)
-			: base(mock, condition, originalExpression, method, arguments)
+        public MethodCall(Mock mock, Condition condition, Expression originalExpression, MethodInfo method,
+            params Expression[] arguments)
+            : this(mock, condition, originalExpression, method, false, arguments)
+        {
+        }
+
+        public MethodCall(Mock mock, Condition condition, Expression originalExpression, MethodInfo method,
+			bool ignoreArgs, params Expression[] arguments)
+            : base(mock, condition, originalExpression, method, ignoreArgs, arguments)
 		{
 		}
 
@@ -98,7 +104,8 @@ namespace Moq
 	{
 		// Internal for AsMockExtensions
 		private Expression originalExpression;
-		private Exception thrownException;
+	    private readonly bool ignoreArgs;
+	    private Exception thrownException;
 		private Action<object[]> setupCallback;
 		private List<IMatcher> argumentMatchers = new List<IMatcher>();
 		private bool isOnce;
@@ -110,12 +117,19 @@ namespace Moq
 		private List<KeyValuePair<int, object>> outValues = new List<KeyValuePair<int, object>>();
 		private static readonly IEqualityComparer<Type> typesComparer = new TypeEqualityComparer();
 
-		public MethodCall(Mock mock, Condition condition, Expression originalExpression, MethodInfo method, params Expression[] arguments)
+        public MethodCall(Mock mock, Condition condition, Expression originalExpression, MethodInfo method,
+                          params Expression[] arguments) : this(mock, condition, originalExpression, method, false, arguments)
+        {
+            
+        }
+
+        public MethodCall(Mock mock, Condition condition, Expression originalExpression, MethodInfo method, bool ignoreArgs, params Expression[] arguments)
 		{
 			this.Mock = mock;
 			this.condition = condition;
 			this.originalExpression = originalExpression;
-			this.Method = method;
+		    this.ignoreArgs = ignoreArgs;
+		    this.Method = method;
 
 			var parameters = method.GetParameters();
 			for (int index = 0; index < parameters.Length; index++)
@@ -222,6 +236,9 @@ namespace Moq
 			{
 				return false;
 			}
+
+		    if (ignoreArgs && this.IsEqualMethodOrOverride(call))
+		        return true;
 
 			var parameters = call.Method.GetParameters();
 			var args = new List<object>();

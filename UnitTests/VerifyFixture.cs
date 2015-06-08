@@ -880,6 +880,15 @@ namespace Moq.Tests
             mock.Verify(foo => foo.Call(It.IsAny<IBazParam>()), Times.Exactly(2));
         }
 
+        [Fact]
+        public void MatchesVerifyAnyArg()
+        {
+            var mock = new Mock<IBaz>();
+            mock.Object.Call(new BazParam());
+
+            mock.VerifyAnyArg(foo => foo.Call<BazParam>(null), Times.Once());
+        }
+
 #if !SILVERLIGHT
         /// <summary>
         /// Warning, this is a flaky test and doesn't fail when run as standalone. Running all tests at once will increase the chances of that test to fail.
