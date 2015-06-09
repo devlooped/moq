@@ -50,7 +50,7 @@
       <HintPath>..\packages\Castle.Core.3.2.0\lib\net35\Castle.Core.dll</HintPath>
       <Visible>False</Visible>
     </Reference>
-		<Reference Include="ClassLibrary1">
+    <Reference Include="ClassLibrary1">
       <HintPath>.\ClassLibrary1.dll</HintPath>
     </Reference>
     <Reference Include="ClassLibrary2">
@@ -119,6 +119,11 @@
     <Compile Include="StubExtensionsFixture.cs" />
     <Compile Include="TimesFixture.cs" />
     <Compile Include="VerifyFixture.cs" />
+    <Compile Include="VerifyInSequenceFixture.cs" />
+    <Compile Include="VerifyInSequenceFixtureWithCallSequence.cs" />
+    <Compile Include="VerifyInSequenceFixtureWithNullSequence.cs" />
+    <Compile Include="VerifyInSequenceFixtureWithStrictCallSequenceStartingAnywhere.cs" />
+    <Compile Include="VerifyInSequenceFixtureWithStrictSequence.cs" />
   </ItemGroup>
   <ItemGroup>
     <None Include="..\Moq.snk">

@@ -81,7 +81,7 @@ namespace Moq
 			{
 				FailMessage = failMessage
 			};
-			VerifyCalls(GetInterceptor(((MemberExpression)expression.Body).Expression, mock), expected, expression, times);
+			Verify(GetInterceptor(((MemberExpression)expression.Body).Expression, mock), expected, expression, times);
 		}
 
 		[Obsolete]
@@ -100,7 +100,7 @@ namespace Moq
 			{
 				FailMessage = failMessage
 			};
-			VerifyCalls(GetInterceptor(((MemberExpression)expression.Body).Expression, mock), expected, expression, times);
+			Verify(GetInterceptor(((MemberExpression)expression.Body).Expression, mock), expected, expression, times);
 		}
 	}
 }

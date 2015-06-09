@@ -48,6 +48,7 @@ using System.Linq;
 using System.Linq.Expressions;
 using System.Reflection;
 using System.Runtime.CompilerServices;
+using Moq.Sequencing;
 
 namespace Moq
 {
@@ -58,12 +59,18 @@ namespace Moq
         private bool callBase;
         private DefaultValue defaultValue = DefaultValue.Empty;
         private IDefaultValueProvider defaultValueProvider = new EmptyDefaultValueProvider();
+        
+        /// <summary>
+        /// Sequence where calls made on the mock are recorded for verification
+        /// </summary>
+        public CallSequence CallSequence { get; set; }
 
         /// <include file='Mock.xdoc' path='docs/doc[@for="Mock.ctor"]/*'/>
         protected Mock()
         {
             this.ImplementedInterfaces = new List<Type>();
             this.InnerMocks = new Dictionary<MethodInfo, Mock>();
+            this.CallSequence = CallSequence.None();
         }
 
         /// <include file='Mock.xdoc' path='docs/doc[@for="Mock.Get"]/*'/>
@@ -267,7 +274,7 @@ namespace Moq
             var args = methodCall.Arguments.ToArray();
 
             var expected = new MethodCall(mock, null, expression, method, args) { FailMessage = failMessage };
-            VerifyCalls(GetInterceptor(methodCall.Object, mock), expected, expression, times);
+            Verify(GetInterceptor(methodCall.Object, mock), expected, expression, times);
         }
 
         internal static void Verify<T, TResult>(
@@ -294,7 +301,7 @@ namespace Moq
                 {
                     FailMessage = failMessage
                 };
-                VerifyCalls(GetInterceptor(methodCall.Object, mock), expected, expression, times);
+                Verify(GetInterceptor(methodCall.Object, mock), expected, expression, times);
             }
         }
 
@@ -312,7 +319,7 @@ namespace Moq
             {
                 FailMessage = failMessage
             };
-            VerifyCalls(GetInterceptor(((MemberExpression)expression.Body).Expression, mock), expected, expression, times);
+            Verify(GetInterceptor(((MemberExpression)expression.Body).Expression, mock), expected, expression, times);
         }
 
         internal static void VerifySet<T>(
@@ -331,7 +338,7 @@ namespace Moq
                     return new MethodCall<T>(m, null, expr, method, value) { FailMessage = failMessage };
                 });
 
-            VerifyCalls(targetInterceptor, expected, expression, times);
+            Verify(targetInterceptor, expected, expression, times);
         }
 
         private static bool AreSameMethod(Expression left, Expression right)
@@ -347,35 +354,47 @@ namespace Moq
             return false;
         }
 
-        private static void VerifyCalls(
+        private static void Verify(
             Interceptor targetInterceptor,
             MethodCall expected,
             Expression expression,
             Times times)
         {
-			IEnumerable<ICallContext> actualCalls = targetInterceptor.InterceptionContext.ActualInvocations;
+            IEnumerable<ICallContext> actualCalls = targetInterceptor.InterceptionContext.ActualInvocations;
 
-            var callCount = actualCalls.Where(ac => expected.Matches(ac)).Count();
+            var callCount = actualCalls.Where(currentCall => expected.Matches(currentCall)).Count();
             if (!times.Verify(callCount))
             {
-				var setups = targetInterceptor.InterceptionContext.OrderedCalls.Where(oc => AreSameMethod(oc.SetupExpression, expression));
+                var setups = targetInterceptor.InterceptionContext.OrderedCalls.Where(oc => AreSameMethod(oc.SetupExpression, expression));
                 ThrowVerifyException(expected, setups, actualCalls, expression, times, callCount);
             }
         }
 
         private static void ThrowVerifyException(
-            MethodCall expected,
+            IProxyCall expected,
             IEnumerable<IProxyCall> setups,
             IEnumerable<ICallContext> actualCalls,
             Expression expression,
             Times times,
             int callCount)
         {
-            var message = times.GetExceptionMessage(expected.FailMessage, expression.ToStringFixed(), callCount) +
+          ThrowVerifyException(expected.FailMessage, setups, actualCalls, expression, times, callCount);
+        }
+
+        private static void ThrowVerifyException(
+            string failMessage,
+            IEnumerable<IProxyCall> setups,
+            IEnumerable<ICallContext> actualCalls,
+            Expression expression,
+            Times times,
+            int callCount)
+        {
+          var message = times.GetExceptionMessage(failMessage, expression.ToStringFixed(), callCount) +
                 Environment.NewLine + FormatSetupsInfo(setups) +
                 Environment.NewLine + FormatInvocations(actualCalls);
             throw new MockException(MockException.ExceptionReason.VerificationFailed, message);
         }
+
 
         private static string FormatSetupsInfo(IEnumerable<IProxyCall> setups)
         {
@@ -994,6 +1013,76 @@ namespace Moq
         }
 
         #endregion
+
+        internal static void VerifyInSequence<T>(
+          Mock mock,
+          CallSequence sequence,
+          Expression<Action<T>> expression,
+          string failMessage)
+        {
+          var methodCall = expression.ToMethodCall();
+          var method = methodCall.Method;
+          ThrowIfVerifyNonVirtual(expression, method);
+          var args = methodCall.Arguments.ToArray();
+
+          var expected = new MethodCall(mock, null, expression, method, args) { FailMessage = failMessage };
+          VerifyInSequenceCalls(GetInterceptor(methodCall.Object, mock), sequence, expected, expression);
+        }
+
+        internal static void VerifyGetInSequence<T, TProperty>(
+          Mock mock,
+          CallSequence sequence,
+          Expression<Func<T, TProperty>> expression,
+          string failMessage) where T : class
+        {
+          var method = expression.ToPropertyInfo().GetGetMethod(true);
+          ThrowIfVerifyNonVirtual(expression, method);
+
+          var expected = new MethodCallReturn<T, TProperty>(mock, null, expression, method, new Expression[0])
+          {
+            FailMessage = failMessage
+          };
+          VerifyInSequenceCalls(
+            GetInterceptor(((MemberExpression)expression.Body).Expression, mock),
+            sequence,
+            expected,
+            expression
+          );
+        }
+
+        internal static void VerifySetInSequence<T>(
+          Mock<T> mock,
+          CallSequence sequence,
+          Action<T> setterExpression,
+          string failMessage) where T : class
+        {
+          Interceptor targetInterceptor = null;
+          Expression expression = null;
+          var expected = SetupSetImpl<T, MethodCall<T>>(mock, setterExpression, (m, expr, method, value) =>
+          {
+            targetInterceptor = m.Interceptor;
+            expression = expr;
+            return new MethodCall<T>(m, null, expr, method, value) { FailMessage = failMessage };
+          });
+
+          VerifyInSequenceCalls(targetInterceptor, sequence, expected, expression);
+        }
+
+
+        static void VerifyInSequenceCalls(
+          Interceptor targetInterceptor,
+          CallSequence sequence,
+          IProxyCall expected,
+          Expression expression)
+        {
+
+          var isCallMatched = sequence.MovePast(new ExpectedCall(expected, targetInterceptor.InterceptionContext.Mock));
+          if (!isCallMatched)
+          {
+            var setups = targetInterceptor.InterceptionContext.OrderedCalls.Where(oc => AreSameMethod(oc.SetupExpression, expression));
+            ThrowVerifyException(expected, setups, targetInterceptor.InterceptionContext.ActualInvocations, expression, Times.Once(), 0);
+          }
+        }
 
     }
 }

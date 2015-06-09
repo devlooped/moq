@@ -44,7 +44,7 @@ using Moq.Proxy;
 
 namespace Moq
 {
-	internal interface IProxyCall
+	internal interface IProxyCall : ICallMatcher
 	{
 		int CallCount { get; }
 		bool IsConditional { get; }
@@ -55,7 +55,6 @@ namespace Moq
 		MethodInfo Method { get; }
 		void EvaluatedSuccessfully();
 
-		bool Matches(ICallContext call);
 		void Execute(ICallContext call);
 		void SetOutParameters(ICallContext call);
 

@@ -242,6 +242,7 @@ namespace Moq
             return initialType.GetInterfaces();
         }        
         InterceptorContext ctx;
+
         public InterceptionAction HandleIntercept(ICallContext invocation, InterceptorContext ctx, CurrentInterceptContext localctx)
         {
             this.ctx = ctx;

@@ -1,55 +1,55 @@
 ﻿<?xml version="1.0" encoding="utf-8"?>
 <Project ToolsVersion="4.0" DefaultTargets="Build" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
-    <PropertyGroup>
-        <Configuration Condition=" '$(Configuration)' == '' ">Debug</Configuration>
-        <Platform Condition=" '$(Platform)' == '' ">AnyCPU</Platform>
-        <ProductVersion>9.0.30729</ProductVersion>
-        <SchemaVersion>2.0</SchemaVersion>
-        <ProjectGuid>{1C91AC30-5977-4BE5-BA67-8EB186C03514}</ProjectGuid>
-        <OutputType>Library</OutputType>
-        <AppDesignerFolder>Properties</AppDesignerFolder>
-        <RootNamespace>Moq</RootNamespace>
-        <AssemblyName>Moq</AssemblyName>
-        <TargetFrameworkVersion>v4.0</TargetFrameworkVersion>
-        <FileAlignment>512</FileAlignment>
-        <SignAssembly>true</SignAssembly>
-        <AssemblyOriginatorKeyFile>..\Moq.snk</AssemblyOriginatorKeyFile>
-        <TargetFrameworkProfile />
-        <SolutionDir Condition="$(SolutionDir) == '' Or $(SolutionDir) == '*Undefined*'">..\</SolutionDir>
-        <RestorePackages>true</RestorePackages>
-    </PropertyGroup>
-    <PropertyGroup>
-        <OutputPath>bin\$(Configuration)\</OutputPath>
-        <DebugSymbols>true</DebugSymbols>
-        <DebugType>full</DebugType>
-        <DefineConstants Condition=" '$(TargetFrameworkVersion)' == 'v3.5' ">NET3x</DefineConstants>
-        <ErrorReport>prompt</ErrorReport>
-        <WarningLevel>4</WarningLevel>
-        <DocumentationFile>bin\$(Configuration)\$(AssemblyName).xml</DocumentationFile>
-        <TreatWarningsAsErrors>true</TreatWarningsAsErrors>
-        <CodeAnalysisRuleSet>AllRules.ruleset</CodeAnalysisRuleSet>
-    </PropertyGroup>
-    <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Debug|AnyCPU' ">
-        <Optimize>false</Optimize>
-        <DefineConstants>$(DefineConstants);TRACE;DEBUG;DESKTOP</DefineConstants>
-        <MergeReferences>false</MergeReferences>
-    </PropertyGroup>
-    <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Release|AnyCPU' ">
-        <Optimize>true</Optimize>
-        <DefineConstants>$(DefineConstants);TRACE;CODE_ANALYSIS</DefineConstants>
-        <RunCodeAnalysis>true</RunCodeAnalysis>
-        <MergeReferences>true</MergeReferences>
-    </PropertyGroup>
-    <ItemGroup>
-        <Reference Condition="'$(TargetFrameworkVersion)' == 'v4.0'" Include="Castle.Core, Version=3.2.0.0, Culture=neutral, PublicKeyToken=407dd0808d44fbdc, processorArchitecture=MSIL">
-            <SpecificVersion>False</SpecificVersion>
-            <HintPath>..\packages\Castle.Core.3.2.0\lib\net40-client\Castle.Core.dll</HintPath>
-        </Reference>
-        <Reference Condition="'$(TargetFrameworkVersion)' == 'v3.5'" Include="Castle.Core, Version=3.2.0.0, Culture=neutral, PublicKeyToken=407dd0808d44fbdc, processorArchitecture=MSIL">
-            <SpecificVersion>False</SpecificVersion>
-            <HintPath>..\packages\Castle.Core.3.2.0\lib\net35\Castle.Core.dll</HintPath>
-            <Visible>False</Visible>
-        </Reference>
+  <PropertyGroup>
+    <Configuration Condition=" '$(Configuration)' == '' ">Debug</Configuration>
+    <Platform Condition=" '$(Platform)' == '' ">AnyCPU</Platform>
+    <ProductVersion>9.0.30729</ProductVersion>
+    <SchemaVersion>2.0</SchemaVersion>
+    <ProjectGuid>{1C91AC30-5977-4BE5-BA67-8EB186C03514}</ProjectGuid>
+    <OutputType>Library</OutputType>
+    <AppDesignerFolder>Properties</AppDesignerFolder>
+    <RootNamespace>Moq</RootNamespace>
+    <AssemblyName>Moq</AssemblyName>
+    <TargetFrameworkVersion>v4.0</TargetFrameworkVersion>
+    <FileAlignment>512</FileAlignment>
+    <SignAssembly>true</SignAssembly>
+    <AssemblyOriginatorKeyFile>..\Moq.snk</AssemblyOriginatorKeyFile>
+    <TargetFrameworkProfile />
+    <SolutionDir Condition="$(SolutionDir) == '' Or $(SolutionDir) == '*Undefined*'">..\</SolutionDir>
+    <RestorePackages>true</RestorePackages>
+  </PropertyGroup>
+  <PropertyGroup>
+    <OutputPath>bin\$(Configuration)\</OutputPath>
+    <DebugSymbols>true</DebugSymbols>
+    <DebugType>full</DebugType>
+    <DefineConstants Condition=" '$(TargetFrameworkVersion)' == 'v3.5' ">NET3x</DefineConstants>
+    <ErrorReport>prompt</ErrorReport>
+    <WarningLevel>4</WarningLevel>
+    <DocumentationFile>bin\$(Configuration)\$(AssemblyName).xml</DocumentationFile>
+    <TreatWarningsAsErrors>true</TreatWarningsAsErrors>
+    <CodeAnalysisRuleSet>AllRules.ruleset</CodeAnalysisRuleSet>
+  </PropertyGroup>
+  <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Debug|AnyCPU' ">
+    <Optimize>false</Optimize>
+    <DefineConstants>$(DefineConstants);TRACE;DEBUG;DESKTOP</DefineConstants>
+    <MergeReferences>false</MergeReferences>
+  </PropertyGroup>
+  <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Release|AnyCPU' ">
+    <Optimize>true</Optimize>
+    <DefineConstants>$(DefineConstants);TRACE;CODE_ANALYSIS</DefineConstants>
+    <RunCodeAnalysis>true</RunCodeAnalysis>
+    <MergeReferences>true</MergeReferences>
+  </PropertyGroup>
+  <ItemGroup>
+    <Reference Condition="'$(TargetFrameworkVersion)' == 'v4.0'" Include="Castle.Core, Version=3.2.0.0, Culture=neutral, PublicKeyToken=407dd0808d44fbdc, processorArchitecture=MSIL">
+      <SpecificVersion>False</SpecificVersion>
+      <HintPath>..\packages\Castle.Core.3.2.0\lib\net40-client\Castle.Core.dll</HintPath>
+    </Reference>
+    <Reference Condition="'$(TargetFrameworkVersion)' == 'v3.5'" Include="Castle.Core, Version=3.2.0.0, Culture=neutral, PublicKeyToken=407dd0808d44fbdc, processorArchitecture=MSIL">
+      <SpecificVersion>False</SpecificVersion>
+      <HintPath>..\packages\Castle.Core.3.2.0\lib\net35\Castle.Core.dll</HintPath>
+      <Visible>False</Visible>
+    </Reference>
     <Reference Include="System" />
     <Reference Include="System.Core" />
     <Reference Include="System.Xml" />
@@ -115,6 +115,27 @@
     <Compile Include="Obsolete\ObsoleteMockExtensions.cs" />
     <Compile Include="Obsolete\MockFactory.cs" />
     <Compile Include="SequenceExtensions.cs" />
+    <Compile Include="Sequencing\CallSequence.cs" />
+    <Compile Include="Sequencing\CallVerificationStep.cs" />
+    <Compile Include="Sequencing\CursorStrategies\StrictSequenceStartingAnywhere.cs" />
+    <Compile Include="Sequencing\ExpectedCall.cs" />
+    <Compile Include="Sequencing\ExpectedCalls.cs" />
+    <Compile Include="Sequencing\GetVerificationStep.cs" />
+    <Compile Include="Sequencing\Extensibility\ICallSequenceCursorStrategy.cs" />
+    <Compile Include="Sequencing\Extensibility\IRecordedCalls.cs" />
+    <Compile Include="Sequencing\Extensibility\IVerificationStep.cs" />
+    <Compile Include="Sequencing\CursorStrategies\LooseCallSequenceCursorStrategy.cs" />
+    <Compile Include="Sequencing\IExpectedCall.cs" />
+    <Compile Include="Sequencing\IRecordedCall.cs" />
+    <Compile Include="Sequencing\NoSequenceAssignedException.cs" />
+    <Compile Include="Sequencing\NullSequence.cs" />
+    <Compile Include="Sequencing\CursorStrategies\NullCallSequenceCursorStrategy.cs" />
+    <Compile Include="Sequencing\RecordedCalls.cs" />
+    <Compile Include="Sequencing\RecordedCall.cs" />
+    <Compile Include="Sequencing\SetVerificationStep.cs" />
+    <Compile Include="Sequencing\CursorStrategies\StrictCallSequenceCursorStrategy.cs" />
+    <Compile Include="Sequencing\CursorStrategies\StrictCallSequencePartCursorStrategy.cs" />
+    <Compile Include="Sequencing\VerificationStepExtensions.cs" />
     <Compile Include="SetupKind.cs" />
     <Compile Include="Language\Flow\IReturnsResult.cs" />
     <Compile Include="ExpressionExtensions.cs" />
@@ -235,29 +256,29 @@
       <Generator>TextTemplatingFileGenerator</Generator>
       <LastGenOutput>MethodCall.Generated.cs</LastGenOutput>
     </None>
-        <None Include="packages.config" />
+    <None Include="packages.config" />
     <None Include="Times.xdoc">
       <DependentUpon>Times.cs</DependentUpon>
     </None>
   </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
-    <Target Name="AfterBuild" Condition=" '$(MergeReferences)' == 'true' ">
-        <GetReferenceAssemblyPaths BypassFrameworkInstallChecks="False" TargetFrameworkMoniker=".NETFramework,Version=v2.0">
-            <Output TaskParameter="FullFrameworkReferenceAssemblyPaths" PropertyName="FullFramework2ReferenceAssemblyPaths" />
-        </GetReferenceAssemblyPaths>
-        <GetReferenceAssemblyPaths BypassFrameworkInstallChecks="False" TargetFrameworkMoniker=".NETFramework,Version=v4.0">
-            <Output TaskParameter="FullFrameworkReferenceAssemblyPaths" PropertyName="FullFramework4ReferenceAssemblyPaths" />
-        </GetReferenceAssemblyPaths>
-        <CreateItem Include="@(ReferenceCopyLocalPaths)" Condition="'%(Extension)'=='.dll'">
-            <Output TaskParameter="Include" ItemName="ILMergeAssemblies" />
-        </CreateItem>
-        <Exec Command="&quot;$(MSBuildProjectPath)..\Tools\Ilmerge.exe&quot; /internalize:&quot;$(MSBuildProjectPath)ilmerge.exclude&quot; /ndebug /keyfile:$(AssemblyOriginatorKeyFile) /out:@(MainAssembly) /targetplatform:&quot;v2,$(FullFramework2ReferenceAssemblyPaths)\.&quot; &quot;@(IntermediateAssembly)&quot; @(ILMergeAssemblies->'&quot;%(FullPath)&quot;', ' ')" Condition=" '$(TargetFrameworkVersion)' == 'v3.5'" />
-        <Exec Command="&quot;$(MSBuildProjectPath)..\Tools\Ilmerge.exe&quot; /internalize:&quot;$(MSBuildProjectPath)ilmerge.exclude&quot; /ndebug /keyfile:$(AssemblyOriginatorKeyFile) /out:@(MainAssembly) /targetplatform:&quot;v4,$(FullFramework4ReferenceAssemblyPaths)\.&quot; &quot;@(IntermediateAssembly)&quot; @(ILMergeAssemblies->'&quot;%(FullPath)&quot;', ' ')" Condition=" '$(TargetFrameworkVersion)' == 'v4.0'" />
-        <Delete Files="@(ReferenceCopyLocalPaths->'$(OutDir)%(DestinationSubDirectory)%(Filename)%(Extension)')" />
-    </Target>
-    <Target Name="CleanAnalysisLogs" AfterTargets="Build">
-        <Delete Files="$(OutDir)Moq.dll.CodeAnalysisLog.xml" ContinueOnError="true" />
-        <Delete Files="$(OutDir)Moq.dll.lastcodeanalysissucceeded" ContinueOnError="true" />
-    </Target>
-    <Import Project="$(SolutionDir)\.nuget\NuGet.targets" Condition="Exists('$(SolutionDir)\.nuget\NuGet.targets')" />
+  <Target Name="AfterBuild" Condition=" '$(MergeReferences)' == 'true' ">
+    <GetReferenceAssemblyPaths BypassFrameworkInstallChecks="False" TargetFrameworkMoniker=".NETFramework,Version=v2.0">
+      <Output TaskParameter="FullFrameworkReferenceAssemblyPaths" PropertyName="FullFramework2ReferenceAssemblyPaths" />
+    </GetReferenceAssemblyPaths>
+    <GetReferenceAssemblyPaths BypassFrameworkInstallChecks="False" TargetFrameworkMoniker=".NETFramework,Version=v4.0">
+      <Output TaskParameter="FullFrameworkReferenceAssemblyPaths" PropertyName="FullFramework4ReferenceAssemblyPaths" />
+    </GetReferenceAssemblyPaths>
+    <CreateItem Include="@(ReferenceCopyLocalPaths)" Condition="'%(Extension)'=='.dll'">
+      <Output TaskParameter="Include" ItemName="ILMergeAssemblies" />
+    </CreateItem>
+    <Exec Command="&quot;$(MSBuildProjectPath)..\Tools\Ilmerge.exe&quot; /internalize:&quot;$(MSBuildProjectPath)ilmerge.exclude&quot; /ndebug /keyfile:$(AssemblyOriginatorKeyFile) /out:@(MainAssembly) /targetplatform:&quot;v2,$(FullFramework2ReferenceAssemblyPaths)\.&quot; &quot;@(IntermediateAssembly)&quot; @(ILMergeAssemblies->'&quot;%(FullPath)&quot;', ' ')" Condition=" '$(TargetFrameworkVersion)' == 'v3.5'" />
+    <Exec Command="&quot;$(MSBuildProjectPath)..\Tools\Ilmerge.exe&quot; /internalize:&quot;$(MSBuildProjectPath)ilmerge.exclude&quot; /ndebug /keyfile:$(AssemblyOriginatorKeyFile) /out:@(MainAssembly) /targetplatform:&quot;v4,$(FullFramework4ReferenceAssemblyPaths)\.&quot; &quot;@(IntermediateAssembly)&quot; @(ILMergeAssemblies->'&quot;%(FullPath)&quot;', ' ')" Condition=" '$(TargetFrameworkVersion)' == 'v4.0'" />
+    <Delete Files="@(ReferenceCopyLocalPaths->'$(OutDir)%(DestinationSubDirectory)%(Filename)%(Extension)')" />
+  </Target>
+  <Target Name="CleanAnalysisLogs" AfterTargets="Build">
+    <Delete Files="$(OutDir)Moq.dll.CodeAnalysisLog.xml" ContinueOnError="true" />
+    <Delete Files="$(OutDir)Moq.dll.lastcodeanalysissucceeded" ContinueOnError="true" />
+  </Target>
+  <Import Project="$(SolutionDir)\.nuget\NuGet.targets" Condition="Exists('$(SolutionDir)\.nuget\NuGet.targets')" />
 </Project>

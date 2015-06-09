@@ -44,6 +44,7 @@ using System.Globalization;
 using System.Linq;
 using System.Text;
 using Moq.Properties;
+using Moq.Sequencing;
 
 namespace Moq
 {
@@ -148,7 +149,13 @@ namespace Moq
 		public MockFactory(MockBehavior defaultBehavior)
 		{
 			this.defaultBehavior = defaultBehavior;
+		  this.CallSequence = CallSequence.None();
 		}
+
+		/// <summary>
+		/// Sequence where calls made on the mock are recorded for verification
+		/// </summary>
+		public CallSequence CallSequence { get; set; }
 
 		/// <summary>
 		/// Whether the base member virtual implementation will be called 
@@ -292,6 +299,7 @@ namespace Moq
 
 			mock.CallBase = this.CallBase;
 			mock.DefaultValue = this.DefaultValue;
+			mock.CallSequence = this.CallSequence;
 
 			return mock;
 		}
