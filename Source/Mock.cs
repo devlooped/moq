@@ -659,7 +659,8 @@ namespace Moq
 					.Where(p =>
 						p.CanRead && p.CanWrite &&
 						p.GetIndexParameters().Length == 0 &&
-						p.CanOverrideGet() && p.CanOverrideSet())
+						p.CanOverrideGet() && p.CanOverrideSet() &&
+                        p.PropertyType != mockType)
 					.Distinct();
 
 				var method = mock.GetType().GetMethods()
