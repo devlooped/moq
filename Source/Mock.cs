@@ -48,8 +48,6 @@ using System.Linq;
 using System.Linq.Expressions;
 using System.Reflection;
 using System.Runtime.CompilerServices;
-using Moq.Properties;
-using Moq.Proxy;
 
 namespace Moq
 {
@@ -356,7 +354,7 @@ namespace Moq
 			Times times)
 		{
             // .Where does an enumeration, and calls to a mocked method concurrent to VerifyCalls might change the content of ActualCalls. therefore, it is necessary to take a snapshot, using ToList(), so that concurrent calls will not impact the ongoing verification.
-		    var actualCalls = targetInterceptor.ActualCalls.ToList();
+		    var actualCalls = targetInterceptor.InterceptionContext.ActualInvocations.ToList();
 
             var callCount = actualCalls.Where(ac => expected.Matches(ac)).Count();
             if (!times.Verify(callCount))
