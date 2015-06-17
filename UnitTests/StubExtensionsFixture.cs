@@ -109,10 +109,6 @@ namespace Moq.Tests
 
 		private object GetValue() { return new object(); }
 
-        public interface IHierarchy
-	    {
-            IHierarchy Hierarchy { get; set; } 
-	    }
 		public interface IFoo
 		{
 			int ValueProperty { get; set; }
@@ -141,5 +137,10 @@ namespace Moq.Tests
 		{
 			string Name { get; set; }
 		}
+
+	    public interface IHierarchy
+	    {
+            IHierarchy Hierarchy { get; set; }
+	    }
 	}
 }
