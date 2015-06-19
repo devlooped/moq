@@ -83,7 +83,7 @@ namespace Moq
 			}
 			
 			var genericParameters = invocation.Method.IsGenericMethod
-				? "<" + string.Join(", ", invocation.Method.GetGenericArguments().Select(t => t.Name)) + ">"
+				? "<" + string.Join(", ", invocation.Method.GetGenericArguments().Select(t => t.Name).ToArray()) + ">"
 				: "";
 
 			return invocation.Method.DeclaringType.Name + "." + invocation.Method.Name + genericParameters + "(" +
