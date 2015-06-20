@@ -28,6 +28,16 @@ namespace Moq.Tests
             mock.Verify(o => o.Execute("ping"), Times.Once());
         }
 
+        [Fact]
+        public void SetupDoesNotApplyAfterMockWasReset()
+        {
+            var mock = new Mock<IFooReset>();
+            mock.Setup(foo => foo.Execute("ping")).Returns("ack");
+            mock.Reset();
+
+            var result = mock.Object.Execute("ping");
+            Assert.Null(result);
+        }
         #endregion
     }
 

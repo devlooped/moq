@@ -82,6 +82,13 @@ namespace Moq
 				}
 			}
 		}
+		internal void ClearEventHandlers()
+		{
+			lock (invocationLists)
+			{
+				invocationLists.Clear();
+			}
+		}
 		#endregion
 		#region ActualInvocations
 		internal void AddInvocation(ICallContext invocation)
@@ -122,6 +129,13 @@ namespace Moq
 			lock (orderedCalls)
 			{
 				orderedCalls.Remove(call);
+			}
+		}
+		internal void ClearOrderedCalls()
+		{
+			lock (orderedCalls)
+			{
+				orderedCalls.Clear();
 			}
 		}
 		internal IEnumerable<IProxyCall> OrderedCalls
