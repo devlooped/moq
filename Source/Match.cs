@@ -1,4 +1,4 @@
-﻿//Copyright (c) 2007. Clarius Consulting, Manas Technology Solutions, InSTEDD
+//Copyright (c) 2007. Clarius Consulting, Manas Technology Solutions, InSTEDD
 //http://code.google.com/p/moq/
 //All rights reserved.
 
@@ -128,7 +128,10 @@ namespace Moq
 			{
 				return false;
 			}
-			if (value == null && typeof(T).IsValueType)
+
+			var matchType = typeof(T);
+			if (value == null && matchType.IsValueType 
+				&& ( !matchType.IsGenericType || matchType.GetGenericTypeDefinition() != typeof(Nullable<>)))
 			{
 				// If this.Condition expects a value type and we've been passed null,
 				// it can't possibly match.

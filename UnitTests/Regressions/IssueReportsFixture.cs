@@ -1,4 +1,4 @@
-﻿using System;
+using System;
 using System.Collections;
 using System.Collections.Generic;
 using System.ComponentModel;
@@ -234,7 +234,28 @@ namespace Moq.Tests.Regressions
 
 		#endregion // #176
 
-		// Old @ Google Code
+        #region #184
+
+		public class Issue184
+		{
+			public interface ISimpleInterface
+			{
+				void Method(Guid? g);
+			}
+
+			[Fact]
+			public void strict_mock_accepts_null_as_nullable_guid_value()
+			{
+				var mock = new Mock<ISimpleInterface>(MockBehavior.Strict);
+				mock.Setup(x => x.Method(It.IsAny<Guid?>()));
+				mock.Object.Method(null);
+				mock.Verify();
+			}
+		}
+
+        #endregion // #184
+
+        // Old @ Google Code
 
         #region #47
 
