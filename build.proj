@@ -29,7 +29,7 @@
         <MSBuild Projects="Source.Silverlight\Moq.Silverlight.csproj"
                  Properties="Configuration=$(Configuration)"
                  Targets="Rebuild" />
-        <Exec Command="xcopy &quot;Source.Silverlight\bin\Release\Moq.*&quot; &quot;$(DropDirectory)lib\sl4\&quot; /Y" ContinueOnError="false" />
+        <Exec Command="xcopy &quot;Source.Silverlight\bin\Release\Moq.*&quot; &quot;$(DropDirectory)lib\sl5\&quot; /Y" ContinueOnError="false" />
 
         <Copy SourceFiles="Moq.nuspec" DestinationFolder="$(DropDirectory)" />
         <!-- Copy source for symbolsource integration -->
