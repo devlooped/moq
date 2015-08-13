@@ -1,4 +1,4 @@
-﻿#if !NET3x && !SILVERLIGHT
+﻿#if !NET3x
 using System;
 using System.Threading.Tasks;
 using Moq.Language;
