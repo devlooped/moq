@@ -321,6 +321,7 @@ namespace Moq.Protected
 				else if (expr.NodeType == ExpressionType.MemberAccess)
 				{
 					var member = (MemberExpression)expr;
+#if FEATURE_LEGACY_REFLECTION_API
 					switch (member.Member.MemberType)
 					{
 						case MemberTypes.Field:
@@ -335,6 +336,23 @@ namespace Moq.Protected
 								Resources.UnsupportedMember,
 								member.Member.Name));
 					}
+#else
+					if (member.Member is FieldInfo)
+					{
+						types[index] = ((FieldInfo)member.Member).FieldType;
+					}
+					else if (member.Member is PropertyInfo)
+					{
+						types[index] = ((PropertyInfo)member.Member).PropertyType;
+					}
+					else
+					{
+						throw new NotSupportedException(string.Format(
+							Resources.Culture,
+							Resources.UnsupportedMember,
+							member.Member.Name));
+					}
+#endif
 				}
 				else
 				{

@@ -209,7 +209,11 @@ namespace Moq
 
 					// Then our instance is a delegate of the desired type, pointing at the
 					// appropriate method on that proxied interface instance.
+#if FEATURE_LEGACY_REFLECTION_API
 					this.instance = (T)(object)Delegate.CreateDelegate(typeof(T), delegateProxy, delegateInterfaceMethod);
+#else
+					this.instance = (T)(object)delegateInterfaceMethod.CreateDelegate(typeof(T), delegateProxy);
+#endif
 				}
 				else
 				{

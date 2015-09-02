@@ -93,7 +93,7 @@ namespace Moq
 #if FEATURE_LEGACY_REFLECTION_API
 				var imockedType = mocked.GetType().GetInterface("IMocked`1", false);
 #else
-				var imockedType = mocked.GetType().GetTypeInfo().GetInterface("IMocked`1", false);
+				var imockedType = mocked.GetType().GetTypeInfo().ImplementedInterfaces.Single(i => i.Name.Equals("IMocked`1", StringComparison.Ordinal));
 #endif
 				var mockedType = imockedType.GetGenericArguments()[0];
 
@@ -587,10 +587,14 @@ namespace Moq
 
 				// No need to call ThrowIfCantOverride as non-overridable would have thrown above already.
 
-                // Get the variable name as used in the actual delegate :)
-                // because of delegate currying, look at the last parameter for the Action's backing method, not the first
-                var setterExpressionParameters = setterExpression.Method.GetParameters();
-                var parameterName = setterExpressionParameters[setterExpressionParameters.Length - 1].Name;
+				// Get the variable name as used in the actual delegate :)
+				// because of delegate currying, look at the last parameter for the Action's backing method, not the first
+#if FEATURE_LEGACY_REFLECTION_API
+				var setterExpressionParameters = setterExpression.Method.GetParameters();
+#else
+				var setterExpressionParameters = setterExpression.GetMethodInfo().GetParameters();
+#endif
+				var parameterName = setterExpressionParameters[setterExpressionParameters.Length - 1].Name;
                 var x = Expression.Parameter(last.Invocation.Method.DeclaringType, parameterName);
 
 				var arguments = last.Invocation.Arguments;

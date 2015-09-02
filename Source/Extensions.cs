@@ -258,7 +258,12 @@ namespace Moq
 
 		public static bool HasCompatibleParameterList(this Delegate function, ParameterInfo[] expectedParams)
 		{
-			if (HasCompatibleParameterList(expectedParams, function.Method))
+#if FEATURE_LEGACY_REFLECTION_API
+			var method = function.Method;
+#else
+			var method = function.GetMethodInfo();
+#endif
+			if (HasCompatibleParameterList(expectedParams, method))
 			{
 				// the backing method for the literal delegate is compatible, DynamicInvoke(...) will succeed
 				return true;
