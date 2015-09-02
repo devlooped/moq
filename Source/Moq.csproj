@@ -23,7 +23,7 @@
     <DebugSymbols>true</DebugSymbols>
     <DebugType>full</DebugType>
     <DefineConstants Condition=" '$(TargetFrameworkVersion)' == 'v3.5' ">NET3x</DefineConstants>
-    <DefineConstants>$(DefineConstants);FEATURE_SERIALIZATION</DefineConstants>
+    <DefineConstants>$(DefineConstants);FEATURE_LEGACY_REFLECTION_API;FEATURE_SERIALIZATION</DefineConstants>
     <ErrorReport>prompt</ErrorReport>
     <WarningLevel>4</WarningLevel>
     <DocumentationFile>bin\$(Configuration)\$(AssemblyName).xml</DocumentationFile>

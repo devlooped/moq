@@ -301,7 +301,11 @@ namespace Moq
 				else
 				{
 					var argsFuncType = mockEventArgsFunc.GetType();
+#if FEATURE_LEGACY_REFLECTION_API
 					if (argsFuncType.IsGenericType && argsFuncType.GetGenericArguments().Length == 1)
+#else
+					if (argsFuncType.GetTypeInfo().IsGenericType && argsFuncType.GetGenericArguments().Length == 1)
+#endif
 					{
 						this.Mock.DoRaise(this.mockEvent, (EventArgs)mockEventArgsFunc.InvokePreserveStack());
 					}

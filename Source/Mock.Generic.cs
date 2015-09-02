@@ -112,7 +112,11 @@ namespace Moq
 			this.Behavior = behavior;
 			this.Interceptor = new Interceptor(behavior, typeof(T), this);
 			this.constructorArguments = args;
+#if FEATURE_LEGACY_REFLECTION_API
 			this.ImplementedInterfaces.AddRange(typeof(T).GetInterfaces().Where(i => (i.IsPublic || i.IsNestedPublic) && !i.IsImport));
+#else
+			this.ImplementedInterfaces.AddRange(typeof(T).GetInterfaces().Where(i => (i.GetTypeInfo().IsPublic || i.GetTypeInfo().IsNestedPublic) && !i.GetTypeInfo().IsImport));
+#endif
 			this.ImplementedInterfaces.Add(typeof(IMocked<T>));
 
 			this.CheckParameters();
@@ -124,7 +128,7 @@ namespace Moq
 
 			var typeName = typeof (T).FullName;
 
-#if !SILVERLIGHT
+#if !SILVERLIGHT && !NETCORE
 			if (typeof (T).IsGenericType)
 			{
 				using (var provider = new CSharpCodeProvider())
@@ -144,7 +148,11 @@ namespace Moq
 
 			if (this.constructorArguments.Length > 0)
 			{
+#if FEATURE_LEGACY_REFLECTION_API
 				if (typeof(T).IsInterface)
+#else
+				if (typeof(T).GetTypeInfo().IsInterface)
+#endif
 				{
 					throw new ArgumentException(Properties.Resources.ConstructorArgsForInterface);
 				}

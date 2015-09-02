@@ -129,7 +129,11 @@ namespace Moq.Linq
 			// compiler-generated types as they are typically the 
 			// anonymous types generated to build up the query expressions.
 			if (node.Expression.NodeType == ExpressionType.Parameter &&
-				node.Expression.Type.GetCustomAttribute<CompilerGeneratedAttribute>(false) != null)
+#if FEATURE_LEGACY_REFLECTION_API
+			node.Expression.Type.GetCustomAttribute<CompilerGeneratedAttribute>(false) != null)
+#else
+			node.Expression.Type.GetTypeInfo().GetCustomAttribute<CompilerGeneratedAttribute>(false) != null)
+#endif
 			{
 				var memberType = ((PropertyInfo)node.Member).PropertyType;
 

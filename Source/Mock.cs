@@ -90,7 +90,11 @@ namespace Moq
 				// We may have received a T of an implemented 
 				// interface in the mock.
 				var mock = mockedPlain.Mock;
+#if FEATURE_LEGACY_REFLECTION_API
 				var imockedType = mocked.GetType().GetInterface("IMocked`1", false);
+#else
+				var imockedType = mocked.GetType().GetTypeInfo().GetInterface("IMocked`1", false);
+#endif
 				var mockedType = imockedType.GetGenericArguments()[0];
 
 				if (mock.ImplementedInterfaces.Contains(typeof(T)))
@@ -696,13 +700,22 @@ namespace Moq
                     else
                     {
                         var genericSetupGetMethod = setupGetMethod.MakeGenericMethod(property.PropertyType);
-                        var returnsMethod =
-                            genericSetupGetMethod
-                                .ReturnType
-                                .GetInterface("IReturnsGetter`2", ignoreCase: false)
-                                .GetMethod("Returns", new Type[] { property.PropertyType });
+						var returnsMethod =
+							genericSetupGetMethod
+								.ReturnType
+#if FEATURE_LEGACY_REFLECTION_API
+								.GetInterface("IReturnsGetter`2", ignoreCase: false)
+								.GetMethod("Returns", new Type[] { property.PropertyType });
+#else
+								.GetTypeInfo()
+								.ImplementedInterfaces
+								.SingleOrDefault(i => i.Name.Equals("IReturnsGetter`2", StringComparison.OrdinalIgnoreCase))
+								.GetTypeInfo()
+								.DeclaredMethods
+								.SingleOrDefault(m => m.Name == "Returns" && m.GetParameterTypes().Count() == 1 && m.GetParameterTypes().First() == property.PropertyType);
+#endif
 
-                        var returnsGetter = genericSetupGetMethod.Invoke(mock, new[] { expression });
+						var returnsGetter = genericSetupGetMethod.Invoke(mock, new[] { expression });
                         returnsMethod.Invoke(returnsGetter, new[] { initialValue });
                     }
                 }
@@ -866,7 +879,11 @@ namespace Moq
 				// compiler-generated types as they are typically the 
 				// anonymous types generated to build up the query expressions.
 				if (node.Expression.NodeType == ExpressionType.Parameter &&
+#if FEATURE_LEGACY_REFLECTION_API
 					node.Expression.Type.GetCustomAttribute<CompilerGeneratedAttribute>(false) != null)
+#else
+					node.Expression.Type.GetTypeInfo().GetCustomAttribute<CompilerGeneratedAttribute>(false) != null)
+#endif
 				{
 					var memberType = node.Member is FieldInfo ?
 						((FieldInfo)node.Member).FieldType :
@@ -972,7 +989,11 @@ namespace Moq
 				throw new InvalidOperationException(Resources.AlreadyInitialized);
 			}
 
+#if FEATURE_LEGACY_REFLECTION_API
 			if (!typeof(TInterface).IsInterface)
+#else
+			if (!typeof(TInterface).GetTypeInfo().IsInterface)
+#endif
 			{
 				throw new ArgumentException(Resources.AsMustBeInterface);
 			}

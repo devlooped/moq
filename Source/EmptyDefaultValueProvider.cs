@@ -72,7 +72,11 @@ namespace Moq
 				return this.defaultValues[valueType];
 			}
 
+#if FEATURE_LEGACY_REFLECTION_API
 			return valueType.IsValueType ? GetValueTypeDefault(valueType) : GetReferenceTypeDefault(valueType);
+#else
+			return valueType.GetTypeInfo().IsValueType ? GetValueTypeDefault(valueType) : GetReferenceTypeDefault(valueType);
+#endif
 		}
 
 		private static object GetReferenceTypeDefault(Type valueType)
@@ -93,15 +97,23 @@ namespace Moq
 			else if (valueType == typeof(Task))
 			{
 				// Task<T> inherits from Task, so just return Task<bool>
-				return GetCompletedTaskForType(typeof (bool));
+				return GetCompletedTaskForType(typeof(bool));
 			}
 #endif
+#if FEATURE_LEGACY_REFLECTION_API
 			else if (valueType.IsGenericType && valueType.GetGenericTypeDefinition() == typeof(IEnumerable<>))
+#else
+			else if (valueType.GetTypeInfo().IsGenericType && valueType.GetGenericTypeDefinition() == typeof(IEnumerable<>))
+#endif
 			{
 				var genericListType = typeof(List<>).MakeGenericType(valueType.GetGenericArguments()[0]);
 				return Activator.CreateInstance(genericListType);
 			}
+#if FEATURE_LEGACY_REFLECTION_API
 			else if (valueType.IsGenericType && valueType.GetGenericTypeDefinition() == typeof(IQueryable<>))
+#else
+			else if (valueType.GetTypeInfo().IsGenericType && valueType.GetGenericTypeDefinition() == typeof(IQueryable<>))
+#endif
 			{
 				var genericType = valueType.GetGenericArguments()[0];
 				var genericListType = typeof(List<>).MakeGenericType(genericType);
@@ -112,7 +124,11 @@ namespace Moq
 					.Invoke(null, new[] { Activator.CreateInstance(genericListType) });
 			}
 #if !NET3x
+#if FEATURE_LEGACY_REFLECTION_API
 			else if (valueType.IsGenericType && valueType.GetGenericTypeDefinition() == typeof(Task<>))
+#else
+			else if (valueType.GetTypeInfo().IsGenericType && valueType.GetGenericTypeDefinition() == typeof(Task<>))
+#endif
 			{
 				var genericType = valueType.GetGenericArguments()[0];
 				return GetCompletedTaskForType(genericType);
@@ -125,7 +141,11 @@ namespace Moq
 		private static object GetValueTypeDefault(Type valueType)
 		{
 			// For nullable value types, return null.
+#if FEATURE_LEGACY_REFLECTION_API
 			if (valueType.IsGenericType && valueType.GetGenericTypeDefinition() == typeof(Nullable<>))
+#else
+			if (valueType.GetTypeInfo().IsGenericType && valueType.GetGenericTypeDefinition() == typeof(Nullable<>))
+#endif
 			{
 				return null;
 			}
@@ -141,7 +161,11 @@ namespace Moq
 			var setResultMethod = tcs.GetType().GetMethod("SetResult");
 			var taskProperty = tcs.GetType().GetProperty("Task");
 
+#if FEATURE_LEGACY_REFLECTION_API
 			var result = type.IsValueType ? GetValueTypeDefault(type) : GetReferenceTypeDefault(type);
+#else
+			var result = type.GetTypeInfo().IsValueType ? GetValueTypeDefault(type) : GetReferenceTypeDefault(type);
+#endif
 
 			setResultMethod.Invoke(tcs, new[] {result});
 			return (Task) taskProperty.GetValue(tcs, null);

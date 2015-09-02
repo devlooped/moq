@@ -43,6 +43,8 @@ using System.Diagnostics.CodeAnalysis;
 using System.Linq.Expressions;
 using System.Text.RegularExpressions;
 using Moq.Matchers;
+using System.Reflection;
+using System.Linq;
 
 namespace Moq.Protected
 {
@@ -140,7 +142,11 @@ namespace Moq.Protected
 		public static Expression Is<TValue>(Expression<Func<TValue, bool>> match)
 		{
 			return Expression.Call(null,
+#if FEATURE_LEGACY_REFLECTION_API
 				typeof(It).GetMethod("Is").MakeGenericMethod(typeof(TValue)),
+#else
+				typeof(It).GetTypeInfo().DeclaredMethods.SingleOrDefault(m => m.Name == "Is")?.MakeGenericMethod(typeof(TValue)),
+#endif
 				match);
 		}
 

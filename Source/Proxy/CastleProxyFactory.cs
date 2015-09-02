@@ -77,7 +77,12 @@ namespace Moq.Proxy
 		/// <inheritdoc />
 		public object CreateProxy(Type mockType, ICallInterceptor interceptor, Type[] interfaces, object[] arguments)
 		{
+#if FEATURE_LEGACY_REFLECTION_API
 			if (mockType.IsInterface) {
+#else
+			if (mockType.GetTypeInfo().IsInterface)
+			{
+#endif
 				return generator.CreateInterfaceProxyWithoutTarget(mockType, interfaces, proxyOptions, new Interceptor(interceptor));
 			}
 

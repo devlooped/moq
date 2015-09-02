@@ -146,7 +146,11 @@ namespace Moq
 		/// </summary>
 		public static bool IsDelegate(this Type t)
 		{
+#if FEATURE_LEGACY_REFLECTION_API
 			return t.IsSubclassOf(typeof(Delegate));
+#else
+			return t.GetTypeInfo().IsSubclassOf(typeof(Delegate));
+#endif
 		}
 
 		public static void ThrowIfNotMockeable(this Type typeToMock)
@@ -186,7 +190,11 @@ namespace Moq
 		{
 			// A value type does not match any of these three 
 			// condition and therefore returns false.
+#if FEATURE_LEGACY_REFLECTION_API
 			return typeToMock.IsInterface || typeToMock.IsAbstract || typeToMock.IsDelegate() || (typeToMock.IsClass && !typeToMock.IsSealed);
+#else
+			return typeToMock.GetTypeInfo().IsInterface || typeToMock.GetTypeInfo().IsAbstract || typeToMock.IsDelegate() || (typeToMock.GetTypeInfo().IsClass && !typeToMock.GetTypeInfo().IsSealed);
+#endif
 		}
 
 		public static bool CanOverride(this MethodBase method)

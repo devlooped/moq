@@ -130,8 +130,13 @@ namespace Moq
 			}
 
 			var matchType = typeof(T);
+#if FEATURE_LEGACY_REFLECTION_API
 			if (value == null && matchType.IsValueType 
 				&& ( !matchType.IsGenericType || matchType.GetGenericTypeDefinition() != typeof(Nullable<>)))
+#else
+			if (value == null && matchType.GetTypeInfo().IsValueType
+				&& (!matchType.GetTypeInfo().IsGenericType || matchType.GetGenericTypeDefinition() != typeof(Nullable<>)))
+#endif
 			{
 				// If this.Condition expects a value type and we've been passed null,
 				// it can't possibly match.
