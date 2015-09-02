@@ -40,3 +40,5 @@ _ReSharper*/
 *.DotSettings
 
 /packages
+*.lock.json
+*.vs
