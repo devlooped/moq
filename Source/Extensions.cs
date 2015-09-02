@@ -54,6 +54,7 @@ namespace Moq
 		static readonly FieldInfo remoteStackTraceString = typeof(Exception).GetField("_remoteStackTraceString",
 										 BindingFlags.Instance | BindingFlags.NonPublic);
 
+#if FEATURE_LEGACY_REFLECTION_API
 		public static TAttribute GetCustomAttribute<TAttribute>(this ICustomAttributeProvider source, bool inherit)
 			where TAttribute : Attribute
 		{
@@ -68,6 +69,8 @@ namespace Moq
 				return (TAttribute)attrs[0];
 			}
 		}
+#else
+#endif
 
 		public static string Format(this ICallContext invocation)
 		{
@@ -254,6 +257,20 @@ namespace Moq
 			}
 
 			return ev;
+		}
+
+		public static bool HasMatchingParameterTypes(this MethodInfo method, Type[] paramTypes)
+		{
+			var types = method.GetParameterTypes().ToArray();
+			for (int i = 0; i < types.Length; i++)
+			{
+				if (types[i] != paramTypes[i])
+				{
+					return false;
+				}
+			}
+
+			return true;
 		}
 
 		public static bool HasCompatibleParameterList(this Delegate function, ParameterInfo[] expectedParams)

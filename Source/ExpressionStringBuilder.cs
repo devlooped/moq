@@ -323,7 +323,13 @@ namespace Moq
 				var paramFrom = 0;
 				var expression = node.Object;
 
-				if (Attribute.GetCustomAttribute(node.Method, typeof(ExtensionAttribute)) != null)
+#if FEATURE_LEGACY_REFLECTION_API
+				var hasExtensionAttribute = Attribute.GetCustomAttribute(node.Method, typeof(ExtensionAttribute)) != null;
+#else
+				var hasExtensionAttribute = node.Method.GetCustomAttribute<ExtensionAttribute>() != null;
+#endif
+
+				if (hasExtensionAttribute)
 				{
 					paramFrom = 1;
 					expression = node.Arguments[0];

@@ -190,12 +190,20 @@ namespace Moq.Protected
 
 		private static MethodInfo GetMethod(string methodName, params object[] args)
 		{
+#if FEATURE_LEGACY_REFLECTION_API
 			return typeof(T).GetMethod(
 				methodName,
 				BindingFlags.Instance | BindingFlags.NonPublic | BindingFlags.Public,
 				null,
 				ToArgTypes(args),
 				null);
+#else
+			return typeof(T).GetMethods(BindingFlags.Instance | BindingFlags.NonPublic | BindingFlags.Public)
+				.Single(m => m.Name == methodName && m.HasMatchingParameterTypes(m.GetParameterTypes().ToArray()));
+#endif
+#if FEATURE_LEGACY_REFLECTION_API
+#else
+#endif
 		}
 
 		private static Expression<Func<T, TResult>> GetMethodCall<TResult>(MethodInfo method, object[] args)
