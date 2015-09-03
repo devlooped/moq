@@ -134,7 +134,11 @@ namespace Moq.Proxy
 					                            CallingConventions.HasThis,
 					                            invokeMethodOnDelegate.ReturnType, delegateParameterTypes);
 
+#if FEATURE_LEGACY_REFLECTION_API
 					delegateInterfaceType = newTypeBuilder.CreateType();
+#else
+					delegateInterfaceType = newTypeBuilder.CreateTypeInfo().AsType();
+#endif
 					delegateInterfaceCache[delegateType] = delegateInterfaceType;
  				}
  			}
