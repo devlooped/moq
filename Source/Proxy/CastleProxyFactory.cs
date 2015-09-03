@@ -43,7 +43,9 @@ using System.Linq;
 using System.Collections.Generic;
 using System.Globalization;
 using System.Reflection;
+#if !NETCORE
 using System.Security.Permissions;
+#endif
 using Castle.DynamicProxy;
 using Castle.DynamicProxy.Generators;
 using Moq.Properties;
@@ -58,11 +60,13 @@ namespace Moq.Proxy
 		[SuppressMessage("Microsoft.Performance", "CA1810:InitializeReferenceTypeStaticFieldsInline", Justification = "By Design")]
 		static CastleProxyFactory()
 		{
+#if !NETCORE
 #pragma warning disable 618
 			AttributesToAvoidReplicating.Add<SecurityPermissionAttribute>();
 #pragma warning restore 618
+#endif
 
-#if !SILVERLIGHT
+#if !SILVERLIGHT && !NETCORE
 			AttributesToAvoidReplicating.Add<ReflectionPermissionAttribute>();
 			AttributesToAvoidReplicating.Add<PermissionSetAttribute>();
 			AttributesToAvoidReplicating.Add<System.Runtime.InteropServices.MarshalAsAttribute>();

@@ -184,13 +184,9 @@ namespace Moq
 		{
 			try
 			{
-#if FEATURE_LEGACY_REFLECTION_API
+#if !NETCORE
 				var thisMethod = MethodBase.GetCurrentMethod();
 				var mockAssembly = Assembly.GetExecutingAssembly();
-#else
-				var thisMethod = MethodBase.GetCurrentMethod();
-				var mockAssembly = typeof(MethodCall).GetTypeInfo().Assembly;
-#endif
 				// Move 'till we're at the entry point into Moq API
 #if !SILVERLIGHT
 				var frame = new StackTrace(true)
@@ -210,6 +206,7 @@ namespace Moq
 #endif
 					this.TestMethod = frame.GetMethod();
 				}
+#endif
 			}
 			catch
 			{
