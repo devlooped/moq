@@ -1,5 +1,8 @@
 ﻿using System.Collections.Generic;
 using System.Linq;
+#if !FEATURE_LEGACY_REFLECTION_API
+using System.Reflection;
+#endif
 using Xunit;
 
 namespace Moq.Tests

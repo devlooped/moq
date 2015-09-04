@@ -1789,7 +1789,7 @@ namespace Moq.Tests.Regressions
 
         #region #273
 
-#if !SILVERLIGHT
+#if !SILVERLIGHT && !NETCORE
 
         public class _273
         {
@@ -1865,7 +1865,7 @@ namespace Moq.Tests.Regressions
 
         #region #326
 
-#if !SILVERLIGHT
+#if !SILVERLIGHT && !NETCORE
 
         public class _326
         {
@@ -1939,7 +1939,7 @@ namespace Moq.Tests.Regressions
 
         #region Silverlight excluded
 
-#if !SILVERLIGHT
+#if !SILVERLIGHT && !NETCORE
 
         #region #250
 
