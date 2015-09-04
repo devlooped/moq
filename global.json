@@ -1,0 +1,13 @@
+{
+    "projects": [
+        "Source",
+        "UnitTests",
+        "Moq.NetCore.Tests/src",
+        "Moq.NetCore.Tests/wrapper"
+    ],
+    "sdk": {
+        "version": "1.0.0-beta5",
+        "runtime": "coreclr",
+        "architecture": "x86"
+    }
+}

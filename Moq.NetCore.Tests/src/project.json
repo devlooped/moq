@@ -1,0 +1,39 @@
+{
+  "version": "1.0.0-*",
+  "description": "Moq.NetCore.UnitTests Class Library",
+  "authors": [ "jeremymeng" ],
+  "tags": [ "" ],
+  "projectUrl": "",
+  "licenseUrl": "",
+
+  "compile": [
+    "../../UnitTests/**/*.cs"
+  ],
+  "exclude": [
+    "../../UnitTests/Library/**/*.cs",
+    "../../UnitTests/Pex/**/*.cs",
+    "../../UnitTests/Properties/**/*.cs"
+  ],
+
+  "dependencies": {
+    "System.Collections.Specialized": "4.0.0",
+    "System.ServiceModel": "1.0.0",
+    "System.ServiceModel.Web": "1.0.0",
+    "System.Threading": "4.0.0",
+    "System.Threading.Tasks.Parallel": "4.0.0",
+    "xunit": "2.1.0-beta2-build2981",
+    "xunit.runner.dnx": "2.1.0-beta3-build99"
+  },
+  "commands": {
+    "test": "xunit.runner.dnx"
+  },
+
+  "frameworks": {
+    "dnxcore50": {
+      "compilationOptions": { "define": [ "NETCORE" ] },
+      "dependencies": {
+        "Moq.NetCore": "4.2.1308-*"
+      }
+    }
+  }
+}
