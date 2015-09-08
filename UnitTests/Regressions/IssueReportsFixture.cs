@@ -15,8 +15,10 @@ using Xunit;
 
 #if !SILVERLIGHT
 using System.ServiceModel;
+#if !NETCORE
 using System.ServiceModel.Web;
 using System.Web.UI.HtmlControls;
+#endif
 using System.Threading;
 #endif
 #if !Net3x && !SILVERLIGHT
@@ -113,6 +115,7 @@ namespace Moq.Tests.Regressions
 			}
 		}
 
+#if !NETCORE
 		[Fact(Timeout = 2000)]
 		public void CallsToExternalCodeNotLockedInInterceptor()
 		{
@@ -121,9 +124,10 @@ namespace Moq.Tests.Regressions
 			testMock.Verify(x => x.M1());
 			testMock.Verify(x => x.M2());
 		}
+#endif
 
 #endif
-		#endregion
+#endregion
 
 		#region #78
 #if !NET3x && !SILVERLIGHT
@@ -1017,7 +1021,7 @@ namespace Moq.Tests.Regressions
 
         #region #160
 
-#if !SILVERLIGHT
+#if !SILVERLIGHT && !NETCORE
         public class _160
         {
             [Fact]
@@ -1418,7 +1422,7 @@ namespace Moq.Tests.Regressions
             [Fact]
             public void Test()
             {
-                Assert.DoesNotThrow(() => new Mock<IFoo>().SetupAllProperties());
+                new Mock<IFoo>().SetupAllProperties();
             }
 
             public interface IFoo
@@ -1523,7 +1527,7 @@ namespace Moq.Tests.Regressions
                     .Returns(data.Length);
 
                 var contents = new byte[stream.Object.Length];
-                Assert.DoesNotThrow(() => stream.Object.Read(contents, 0, (int)stream.Object.Length));
+                stream.Object.Read(contents, 0, (int)stream.Object.Length);
             }
         }
 
@@ -1619,7 +1623,7 @@ namespace Moq.Tests.Regressions
                 var mock = new Mock<ITest>();
 
                 ITest instance;
-                Assert.DoesNotThrow(() => instance = mock.Object);
+                instance = mock.Object;
             }
 
             public interface ITest
