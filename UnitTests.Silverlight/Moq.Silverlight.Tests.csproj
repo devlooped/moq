@@ -35,7 +35,7 @@
     <DebugType>full</DebugType>
     <Optimize>false</Optimize>
     <OutputPath>bin\Debug\</OutputPath>
-    <DefineConstants>DEBUG;TRACE;SILVERLIGHT</DefineConstants>
+    <DefineConstants>TRACE;DEBUG;SILVERLIGHT;FEATURE_LEGACY_REFLECTION_API</DefineConstants>
     <DefineConstants Condition=" '$(TargetFrameworkVersion)' == 'v3.0' ">DEBUG;TRACE;SILVERLIGHT;NET3x</DefineConstants>
     <NoStdLib>true</NoStdLib>
     <NoConfig>true</NoConfig>
