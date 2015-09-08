@@ -134,6 +134,9 @@
     <Compile Include="..\Source\Language\ICallback.cs">
       <Link>Language\ICallback.cs</Link>
     </Compile>
+    <Compile Include="..\Source\Language\ICallback.Generated.cs">
+      <Link>Language\ICallback.Generated.cs</Link>
+    </Compile>
     <Compile Include="..\Source\Language\ICallbackGetter.cs">
       <Link>Language\ICallbackGetter.cs</Link>
     </Compile>
@@ -143,8 +146,14 @@
     <Compile Include="..\Source\Language\IRaise.cs">
       <Link>Language\IRaise.cs</Link>
     </Compile>
+    <Compile Include="..\Source\Language\IRaise.Generated.cs">
+      <Link>Language\IRaise.Generated.cs</Link>
+    </Compile>
     <Compile Include="..\Source\Language\IReturns.cs">
       <Link>Language\IReturns.cs</Link>
+    </Compile>
+    <Compile Include="..\Source\Language\IReturns.Generated.cs">
+      <Link>Language\IReturns.Generated.cs</Link>
     </Compile>
     <Compile Include="..\Source\Language\IReturnsGetter.cs">
       <Link>Language\IReturnsGetter.cs</Link>
