@@ -5,12 +5,12 @@ VisualStudioVersion = 14.0.23107.0
 MinimumVisualStudioVersion = 10.0.40219.1
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Moq.NetCore", "Source.NetCore\Moq.NetCore.csproj", "{F04EAC58-919C-4CB5-9250-B38DE6FB5ED9}"
 EndProject
-Project("{8BB2217D-0F2D-49D1-97BC-3654ED321F3B}") = "Moq.NetCore.Tests", "Moq.NetCore.Tests\src\Moq.NetCore.Tests.xproj", "{78216B74-6479-48CB-AE0F-A13B0C632CC7}"
-EndProject
 Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Solution Items", "Solution Items", "{EFFD4CEA-0C67-4B36-B2FE-CDADBACE1C5C}"
 	ProjectSection(SolutionItems) = preProject
 		Moq.NetCore.Tests\global.json = Moq.NetCore.Tests\global.json
 	EndProjectSection
+EndProject
+Project("{8BB2217D-0F2D-49D1-97BC-3654ED321F3B}") = "Moq.NetCore.Tests", "Moq.NetCore.Tests\Moq.NetCore.Tests\Moq.NetCore.Tests.xproj", "{78216B74-6479-48CB-AE0F-A13B0C632CC7}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution

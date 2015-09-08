@@ -1,6 +1,6 @@
 {
     "projects": [
-        "src",
+        "Moq.NetCore.Tests",
         "wrapper"
     ],
     "sdk": {
