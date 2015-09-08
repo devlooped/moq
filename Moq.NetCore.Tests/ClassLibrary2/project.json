@@ -1,0 +1,18 @@
+{
+	"version": "2.0.0-*",
+
+	"compile": [
+		"../../UnitTests/Library/ClassLibrary2/*.cs"
+	],
+
+	"dependencies": {
+	},
+	"frameworks": {
+		"dnxcore50": {
+			"compilationOptions": { "define": [ "NETCORE" ] },
+			"dependencies": {
+				"ClassLibrary1": "1.0.0-*"
+			}
+		}
+	}
+}

@@ -1,5 +1,7 @@
 {
     "projects": [
+        "ClassLibrary1",
+        "ClassLibrary2",
         "Moq.NetCore.Tests",
         "wrapper"
     ],

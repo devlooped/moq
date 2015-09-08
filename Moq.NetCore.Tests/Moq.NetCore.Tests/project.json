@@ -9,6 +9,7 @@
 	"compile": [
 		"../../UnitTests/**/*.cs"
 	],
+
 	"exclude": [
 		"../../UnitTests/Library/**/*.cs",
 		"../../UnitTests/Pex/**/*.cs",
@@ -27,6 +28,9 @@
 		"dnxcore50": {
 			"compilationOptions": { "define": [ "NETCORE" ] },
 			"dependencies": {
+				"ClassLibrary1": "",
+				"ClassLibrary2": "",
+				"Moq.NetCore": "4.2.1308-*",
 				"System.Collections.Specialized": "4.0.0",
 				"System.ComponentModel": "4.0.0",
 				"System.ComponentModel.Primitives": "4.0.0",
@@ -34,8 +38,7 @@
 				"System.Linq.Queryable": "4.0.0",
 				"System.ServiceModel.Primitives": "4.0.0",
 				"System.Threading": "4.0.10",
-				"System.Threading.Tasks.Parallel": "4.0.0",
-				"Moq.NetCore": "4.2.1308-*"
+				"System.Threading.Tasks.Parallel": "4.0.0"
 			}
 		}
 	}
