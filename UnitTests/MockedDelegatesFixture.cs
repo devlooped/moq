@@ -9,7 +9,7 @@ namespace Moq.Tests
 		[Fact]
 		public void CanMockDelegate()
 		{
-			Assert.DoesNotThrow(() => new Mock<EventHandler>());
+			new Mock<EventHandler>();
 		}
 
 		[Fact]
