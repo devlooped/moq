@@ -37,7 +37,8 @@
     <WarningLevel>4</WarningLevel>
   </PropertyGroup>
   <PropertyGroup>
-    <SignAssembly>true</SignAssembly>
+    <SignAssembly Condition="$(DefineConstants.Contains('NETCORE'))">false</SignAssembly>
+    <SignAssembly Condition="!$(DefineConstants.Contains('NETCORE'))">true</SignAssembly>
   </PropertyGroup>
   <PropertyGroup>
     <AssemblyOriginatorKeyFile>Moq.snk</AssemblyOriginatorKeyFile>

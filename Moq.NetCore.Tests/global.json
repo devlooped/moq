@@ -1,6 +1,7 @@
 {
     "projects": [
-        "wrap"
+        "src",
+        "wrapper"
     ],
     "sdk": {
         "version": "1.0.0-beta5",
