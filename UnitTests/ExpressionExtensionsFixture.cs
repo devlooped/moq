@@ -1,5 +1,8 @@
 ﻿using System;
 using System.Linq.Expressions;
+#if !FEATURE_LEGACY_REFLECTION_API
+using System.Reflection;
+#endif
 using Xunit;
 
 namespace Moq.Tests
@@ -54,7 +57,11 @@ namespace Moq.Tests
 
 			var result = lambda.ToLambda();
 
+#if FEATURE_LEGACY_REFLECTION_API
 			Assert.Equal(typeof(int), result.Compile().Method.ReturnType);
+#else
+			Assert.Equal(typeof(int), result.Compile().GetMethodInfo().ReturnType);
+#endif
 		}
 
 		[Fact]
