@@ -32,9 +32,10 @@
     <DebugType>pdbonly</DebugType>
     <Optimize>true</Optimize>
     <OutputPath>bin\Release\</OutputPath>
-    <DefineConstants>TRACE</DefineConstants>
+    <DefineConstants>TRACE;NETCORE;</DefineConstants>
     <ErrorReport>prompt</ErrorReport>
     <WarningLevel>4</WarningLevel>
+    <DocumentationFile>bin\Release\Moq.NetCore.XML</DocumentationFile>
   </PropertyGroup>
   <PropertyGroup>
     <SignAssembly Condition="$(DefineConstants.Contains('NETCORE'))">false</SignAssembly>
@@ -352,18 +353,8 @@
     </Compile>
   </ItemGroup>
   <ItemGroup>
-    <Content Include="..\Source\Moq.csproj">
-      <Link>Moq.csproj</Link>
-    </Content>
-  </ItemGroup>
-  <ItemGroup>
-    <Reference Include="Castle.Core">
-      <HintPath>..\..\..\MattGal\Core\build\NetCore\NetCore-Release\bin\Castle.Core.dll</HintPath>
-    </Reference>
-  </ItemGroup>
-  <ItemGroup>
     <EmbeddedResource Include="..\Source\Properties\Resources.resx">
-      <Link>Properties\Resources.Designer.cs</Link>
+      <Link>Properties\Resources.resx</Link>
       <Generator>ResXFileCodeGenerator</Generator>
       <LastGenOutput>Resources.Designer.cs</LastGenOutput>
     </EmbeddedResource>

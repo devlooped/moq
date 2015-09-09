@@ -28,8 +28,6 @@
 		"dnxcore50": {
 			"compilationOptions": { "define": [ "NETCORE" ] },
 			"dependencies": {
-				"ClassLibrary1": "",
-				"ClassLibrary2": "",
 				"Moq.NetCore": "4.2.1308-*",
 				"System.Collections.Specialized": "4.0.0",
 				"System.ComponentModel": "4.0.0",

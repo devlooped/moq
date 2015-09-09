@@ -47,7 +47,7 @@
     <DebugType>pdbonly</DebugType>
     <Optimize>true</Optimize>
     <OutputPath>bin\Release\</OutputPath>
-    <DefineConstants>TRACE;SILVERLIGHT</DefineConstants>
+    <DefineConstants>TRACE;SILVERLIGHT;FEATURE_LEGACY_REFLECTION_API</DefineConstants>
     <DefineConstants Condition=" '$(TargetFrameworkVersion)' == 'v3.0' ">TRACE;SILVERLIGHT;NET3x</DefineConstants>
     <NoStdLib>true</NoStdLib>
     <NoConfig>true</NoConfig>
