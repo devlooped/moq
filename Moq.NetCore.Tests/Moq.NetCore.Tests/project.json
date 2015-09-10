@@ -28,7 +28,7 @@
 		"dnxcore50": {
 			"compilationOptions": { "define": [ "NETCORE" ] },
 			"dependencies": {
-				"Moq.NetCore": "4.2.1308-*",
+				"Moq": "4.3.0-*",
 				"System.Collections.Specialized": "4.0.0",
 				"System.ComponentModel": "4.0.0",
 				"System.ComponentModel.Primitives": "4.0.0",
