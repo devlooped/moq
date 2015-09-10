@@ -1,5 +1,8 @@
 {
   "version": "4.2.1308-*",
+  "dependencies": {
+    "castle.core": "3.3.3"
+  },
   "frameworks": {
     "dnxcore50": {
       "wrappedProject": "../../../Source.NetCore/Moq.NetCore.csproj",

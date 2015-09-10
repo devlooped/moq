@@ -1,9 +1,10 @@
-{
+﻿{
   "supports": {
-    "net46.app": { },
-    "dnxcore50.app": { }
+    "net46.app": {},
+    "dnxcore50.app": {}
   },
   "dependencies": {
+    "Castle.Core": "3.3.3",
     "Microsoft.NETCore": "5.0.0",
     "Microsoft.NETCore.Portable.Compatibility": "1.0.0",
     "System.Diagnostics.StackTrace": "4.0.0",
