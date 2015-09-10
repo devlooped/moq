@@ -47,7 +47,7 @@ namespace Moq.Tests
 			Assert.Contains("mock", mock.ToString().ToLower());
 		}
 
-#if !SILVERLIGHT
+#if !SILVERLIGHT && !NETCORE
 		[Fact]
 		public void HasADefaultNameThatIncludesItsGenericParameters()
 		{
