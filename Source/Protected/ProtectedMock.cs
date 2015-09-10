@@ -198,8 +198,9 @@ namespace Moq.Protected
 				ToArgTypes(args),
 				null);
 #else
+			var argTypes = ToArgTypes(args);
 			return typeof(T).GetMethods(BindingFlags.Instance | BindingFlags.NonPublic | BindingFlags.Public)
-				.Single(m => m.Name == methodName && m.HasMatchingParameterTypes(m.GetParameterTypes().ToArray()));
+				.SingleOrDefault(m => m.Name == methodName && m.HasMatchingParameterTypes(argTypes));
 #endif
 #if FEATURE_LEGACY_REFLECTION_API
 #else
