@@ -1,7 +1,7 @@
 {
   "version": "4.3.0-*",
   "dependencies": {
-    "castle.core": "3.3.3"
+    "castle.core": "3.3.4"
   },
   "frameworks": {
     "dnxcore50": {

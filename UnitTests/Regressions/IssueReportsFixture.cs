@@ -1793,7 +1793,7 @@ namespace Moq.Tests.Regressions
 
         #region #273
 
-#if !SILVERLIGHT && !NETCORE
+#if !SILVERLIGHT
 
         public class _273
         {
