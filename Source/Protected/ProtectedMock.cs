@@ -367,16 +367,16 @@ namespace Moq.Protected
 				return expression;
 			}
 
-            return Expression.Constant(arg, paramInfo.ParameterType);
-        }
+			return Expression.Constant(arg, paramInfo.ParameterType);
+		}
 
 		private static IEnumerable<Expression> ToExpressionArgs(MethodInfo method, object[] args)
 		{
-            ParameterInfo[] methodParams = method.GetParameters();
-            for (int i = 0; i < args.Length; i++)
-            {
-                yield return ToExpressionArg(methodParams[i], args[i]);
-            }
-        }
+			ParameterInfo[] methodParams = method.GetParameters();
+			for (int i = 0; i < args.Length; i++)
+			{
+				yield return ToExpressionArg(methodParams[i], args[i]);
+			}
+		}
 	}
 }
