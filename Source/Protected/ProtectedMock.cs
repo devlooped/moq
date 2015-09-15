@@ -198,13 +198,13 @@ namespace Moq.Protected
 		private static Expression<Func<T, TResult>> GetMethodCall<TResult>(MethodInfo method, object[] args)
 		{
 			var param = Expression.Parameter(typeof(T), "mock");
-			return Expression.Lambda<Func<T, TResult>>(Expression.Call(param, method, ToExpressionArgs(args)), param);
+			return Expression.Lambda<Func<T, TResult>>(Expression.Call(param, method, ToExpressionArgs(method, args)), param);
 		}
 
 		private static Expression<Action<T>> GetMethodCall(MethodInfo method, object[] args)
 		{
 			var param = Expression.Parameter(typeof(T), "mock");
-			return Expression.Lambda<Action<T>>(Expression.Call(param, method, ToExpressionArgs(args)), param);
+			return Expression.Lambda<Action<T>>(Expression.Call(param, method, ToExpressionArgs(method, args)), param);
 		}
 
 		// TODO should support arguments for property indexers
@@ -351,7 +351,7 @@ namespace Moq.Protected
 			return types;
 		}
 
-		private static Expression ToExpressionArg(object arg)
+		private static Expression ToExpressionArg(ParameterInfo paramInfo, object arg)
 		{
 			var lambda = arg as LambdaExpression;
 			if (lambda != null)
@@ -365,12 +365,16 @@ namespace Moq.Protected
 				return expression;
 			}
 
-			return Expression.Constant(arg);
+			return Expression.Constant(arg, paramInfo.ParameterType);
 		}
 
-		private static IEnumerable<Expression> ToExpressionArgs(object[] args)
+		private static IEnumerable<Expression> ToExpressionArgs(MethodInfo method, object[] args)
 		{
-			return args.Select(arg => ToExpressionArg(arg));
+			ParameterInfo[] methodParams = method.GetParameters();
+			for (int i = 0; i < args.Length; i++)
+			{
+				yield return ToExpressionArg(methodParams[i], args[i]);
+			}
 		}
 	}
 }
