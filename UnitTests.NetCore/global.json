@@ -6,7 +6,7 @@
         "wrapper"
     ],
     "sdk": {
-        "version": "1.0.0-beta5",
+        "version": "1.0.0-beta7",
         "runtime": "coreclr",
         "architecture": "x86"
     }
