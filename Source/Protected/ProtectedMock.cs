@@ -202,9 +202,6 @@ namespace Moq.Protected
 			return typeof(T).GetMethods(BindingFlags.Instance | BindingFlags.NonPublic | BindingFlags.Public)
 				.SingleOrDefault(m => m.Name == methodName && m.HasMatchingParameterTypes(argTypes));
 #endif
-#if FEATURE_LEGACY_REFLECTION_API
-#else
-#endif
 		}
 
 		private static Expression<Func<T, TResult>> GetMethodCall<TResult>(MethodInfo method, object[] args)

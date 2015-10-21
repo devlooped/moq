@@ -262,6 +262,11 @@ namespace Moq
 		public static bool HasMatchingParameterTypes(this MethodInfo method, Type[] paramTypes)
 		{
 			var types = method.GetParameterTypes().ToArray();
+			if (types.Length != paramTypes.Length)
+			{
+				return false;
+			}
+
 			for (int i = 0; i < types.Length; i++)
 			{
 				if (types[i] != paramTypes[i])
