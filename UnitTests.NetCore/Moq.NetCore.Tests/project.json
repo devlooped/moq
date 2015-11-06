@@ -17,8 +17,8 @@
 	],
 
 	"dependencies": {
-		"xunit": "2.1.0-rc2-*",
-		"xunit.runner.dnx": "2.1.0-beta5-*"
+		"xunit": "2.1.0",
+		"xunit.runner.dnx": "2.1.0-*"
 	},
 	"commands": {
 		"test": "xunit.runner.dnx"
@@ -27,19 +27,20 @@
 	"frameworks": {
 		"dnxcore50": {
 			"compilationOptions": { "define": [ "NETCORE" ] },
-			"dependencies": {
+      "dependencies": {
+        "Castle.Core": "3.3.4-wrapped",
         "ClassLibrary1": "",
         "ClassLibrary2": "",
-        "Moq": "4.3.0-*",
-				"System.Collections.Specialized": "4.0.0",
-				"System.ComponentModel": "4.0.0",
-				"System.ComponentModel.Primitives": "4.0.0",
-				"System.Linq": "4.0.0",
-				"System.Linq.Queryable": "4.0.0",
-				"System.ServiceModel.Primitives": "4.0.0",
-				"System.Threading": "4.0.10",
-				"System.Threading.Tasks.Parallel": "4.0.0"
-			}
+        "Moq": "4.3.0-wrapped",
+        "System.Collections.Specialized": "4.0.0",
+        "System.ComponentModel": "4.0.0",
+        "System.ComponentModel.Primitives": "4.0.0",
+        "System.Linq": "4.0.0",
+        "System.Linq.Queryable": "4.0.0",
+        "System.ServiceModel.Primitives": "4.0.0",
+        "System.Threading": "4.0.10",
+        "System.Threading.Tasks.Parallel": "4.0.0"
+      }
 		}
 	}
 }

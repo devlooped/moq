@@ -1,13 +1,14 @@
 {
-    "projects": [
-        "ClassLibrary1",
-        "ClassLibrary2",
-        "Moq.NetCore.Tests",
-        "wrapper"
-    ],
-    "sdk": {
-        "version": "1.0.0-beta7",
-        "runtime": "coreclr",
-        "architecture": "x86"
-    }
+  "projects": [
+    "ClassLibrary1",
+    "ClassLibrary2",
+    "Moq.NetCore.Tests",
+    "wrapper/Moq",
+    "wrapper/Castle.Core"
+  ],
+  "sdk": {
+    "version": "1.0.0-beta8",
+    "runtime": "coreclr",
+    "architecture": "x86"
+  }
 }
