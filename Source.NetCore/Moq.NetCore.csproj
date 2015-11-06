@@ -23,6 +23,7 @@
     <Optimize>false</Optimize>
     <OutputPath>bin\Debug\</OutputPath>
     <DefineConstants>TRACE;DEBUG;NETCORE;</DefineConstants>
+    <MergeReferences>false</MergeReferences>
     <ErrorReport>prompt</ErrorReport>
     <WarningLevel>4</WarningLevel>
     <TreatWarningsAsErrors>true</TreatWarningsAsErrors>
@@ -33,22 +34,19 @@
     <Optimize>true</Optimize>
     <OutputPath>bin\Release\</OutputPath>
     <DefineConstants>TRACE;NETCORE;</DefineConstants>
+    <MergeReferences>false</MergeReferences>
     <ErrorReport>prompt</ErrorReport>
     <WarningLevel>4</WarningLevel>
     <DocumentationFile>bin\Release\Moq.xml</DocumentationFile>
   </PropertyGroup>
   <PropertyGroup>
-    <SignAssembly Condition="$(DefineConstants.Contains('NETCORE'))">false</SignAssembly>
-    <SignAssembly Condition="!$(DefineConstants.Contains('NETCORE'))">true</SignAssembly>
-  </PropertyGroup>
-  <PropertyGroup>
-    <AssemblyOriginatorKeyFile>Moq.snk</AssemblyOriginatorKeyFile>
+    <AssemblyOriginatorKeyFile>..\Moq.snk</AssemblyOriginatorKeyFile>
   </PropertyGroup>
   <PropertyGroup>
     <SignAssembly>true</SignAssembly>
   </PropertyGroup>
   <ItemGroup>
-    <None Include="Moq.snk" />
+    <None Include="..\Moq.snk" />
     <None Include="project.json" />
     <!-- A reference to the entire .NET Framework is automatically included -->
   </ItemGroup>
@@ -371,7 +369,15 @@
        Other similar extension points exist, see Microsoft.Common.targets.
   <Target Name="BeforeBuild">
   </Target>
-  <Target Name="AfterBuild">
-  </Target>
   -->
+  <Target Name="AfterBuild" Condition=" '$(MergeReferences)' == 'true' ">
+    <GetReferenceAssemblyPaths BypassFrameworkInstallChecks="False" TargetFrameworkMoniker=".NETPortable,Version=v5.0">
+      <Output TaskParameter="FullFrameworkReferenceAssemblyPaths" PropertyName="FullFramework4ReferenceAssemblyPaths" />
+    </GetReferenceAssemblyPaths>
+    <CreateItem Include="@(ReferenceCopyLocalPaths)" Condition="'%(Extension)'=='.dll'">
+      <Output TaskParameter="Include" ItemName="ILMergeAssemblies" />
+    </CreateItem>
+    <Exec Command="&quot;$(MSBuildProjectPath)..\Tools\Ilmerge.exe&quot; /internalize:&quot;$(MSBuildProjectPath)..\Source\ilmerge.exclude&quot; /ndebug /keyfile:$(AssemblyOriginatorKeyFile) /out:@(MainAssembly) /targetplatform:&quot;v4,$(FullFramework4ReferenceAssemblyPaths)\.&quot; &quot;@(IntermediateAssembly)&quot; @(ILMergeAssemblies->'&quot;%(FullPath)&quot;', ' ')"/>
+    <Delete Files="@(ReferenceCopyLocalPaths->'$(OutDir)%(DestinationSubDirectory)%(Filename)%(Extension)')" />
+  </Target>
 </Project>
