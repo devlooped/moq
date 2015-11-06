@@ -26,7 +26,7 @@
 
 	"frameworks": {
 		"dnxcore50": {
-			"compilationOptions": { "define": [ "NETCORE" ] },
+			"compilationOptions": { "define": [ "NETCORE" ], "keyFile": "../../Moq.snk" },
       "dependencies": {
         "Castle.Core": "3.3.4-wrapped",
         "ClassLibrary1": "",
