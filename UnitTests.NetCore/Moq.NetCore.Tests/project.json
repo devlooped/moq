@@ -31,7 +31,7 @@
         "Castle.Core": "3.3.4-wrapped",
         "ClassLibrary1": "",
         "ClassLibrary2": "",
-        "Moq": "4.3.0-wrapped",
+        "Moq": "99.99.99-wrapped",
         "System.Collections.Specialized": "4.0.0",
         "System.ComponentModel": "4.0.0",
         "System.ComponentModel.Primitives": "4.0.0",
