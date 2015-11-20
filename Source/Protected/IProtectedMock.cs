@@ -96,7 +96,7 @@ namespace Moq.Protected
 
 		/// <summary>
 		/// Specifies a verify for a void method with the given <paramref name="methodName"/>,
-		/// optionally specifying arguments for the method call. Use in conjuntion with the default
+		/// optionally specifying arguments for the method call. Use in conjunction with the default
 		/// <see cref="MockBehavior.Loose"/>.
 		/// </summary>
 		/// <exception cref="MockException">The invocation was not call the times specified by
