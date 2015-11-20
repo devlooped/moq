@@ -42,3 +42,4 @@ _ReSharper*/
 /packages
 *.lock.json
 *.vs
+*.nuget.targets
