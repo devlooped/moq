@@ -1,0 +1,11 @@
+{
+  "version": "3.3.4-wrapped",
+  "frameworks": {
+    "dnxcore50": {
+      "bin": {
+        "assembly": "../../Lib/Castle/bin-dotnet/Castle.Core.dll",
+        "pdb": "../../Lib/Castle/bin-dotnet/Castle.Core.pdb"
+      }
+    }
+  }
+}
