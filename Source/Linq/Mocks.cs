@@ -116,11 +116,7 @@ namespace Moq
 		/// </summary>
 		internal static IQueryable<T> CreateMockQuery<T>() where T : class
 		{
-#if FEATURE_LEGACY_REFLECTION_API
-			var method = ((Func<IQueryable<T>>)CreateQueryable<T>).Method;
-#else
 			var method = ((Func<IQueryable<T>>)CreateQueryable<T>).GetMethodInfo();
-#endif
 			return new MockQueryable<T>(Expression.Call(null,
 				method));
 		}

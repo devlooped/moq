@@ -302,11 +302,7 @@ namespace Moq
 				else
 				{
 					var argsFuncType = mockEventArgsFunc.GetType();
-#if FEATURE_LEGACY_REFLECTION_API
-					if (argsFuncType.IsGenericType && argsFuncType.GetGenericArguments().Length == 1)
-#else
 					if (argsFuncType.GetTypeInfo().IsGenericType && argsFuncType.GetGenericArguments().Length == 1)
-#endif
 					{
 						this.Mock.DoRaise(this.mockEvent, (EventArgs)mockEventArgsFunc.InvokePreserveStack());
 					}
@@ -345,11 +341,7 @@ namespace Moq
 		protected virtual void SetCallbackWithArguments(Delegate callback)
 		{
 			var expectedParams = this.Method.GetParameters();
-#if FEATURE_LEGACY_REFLECTION_API
-			var actualParams = callback.Method.GetParameters();
-#else
 			var actualParams = callback.GetMethodInfo().GetParameters();
-#endif
 
 			if (!callback.HasCompatibleParameterList(expectedParams))
 			{

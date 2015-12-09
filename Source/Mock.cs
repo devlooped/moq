@@ -589,11 +589,7 @@ namespace Moq
 
 				// Get the variable name as used in the actual delegate :)
 				// because of delegate currying, look at the last parameter for the Action's backing method, not the first
-#if FEATURE_LEGACY_REFLECTION_API
-				var setterExpressionParameters = setterExpression.Method.GetParameters();
-#else
 				var setterExpressionParameters = setterExpression.GetMethodInfo().GetParameters();
-#endif
 				var parameterName = setterExpressionParameters[setterExpressionParameters.Length - 1].Name;
                 var x = Expression.Parameter(last.Invocation.Method.DeclaringType, parameterName);
 
@@ -704,12 +700,12 @@ namespace Moq
                     else
                     {
                         var genericSetupGetMethod = setupGetMethod.MakeGenericMethod(property.PropertyType);
-						var returnsMethod =
-							genericSetupGetMethod
-								.ReturnType
+                        var returnsMethod =
+                            genericSetupGetMethod
+                                .ReturnType
 #if FEATURE_LEGACY_REFLECTION_API
-								.GetInterface("IReturnsGetter`2", ignoreCase: false)
-								.GetMethod("Returns", new Type[] { property.PropertyType });
+                                .GetInterface("IReturnsGetter`2", ignoreCase: false)
+                                .GetMethod("Returns", new Type[] { property.PropertyType });
 #else
 								.GetTypeInfo()
 								.ImplementedInterfaces
@@ -719,7 +715,7 @@ namespace Moq
 								.SingleOrDefault(m => m.Name == "Returns" && m.GetParameterTypes().Count() == 1 && m.GetParameterTypes().First() == property.PropertyType);
 #endif
 
-						var returnsGetter = genericSetupGetMethod.Invoke(mock, new[] { expression });
+                        var returnsGetter = genericSetupGetMethod.Invoke(mock, new[] { expression });
                         returnsMethod.Invoke(returnsGetter, new[] { initialValue });
                     }
                 }
@@ -820,17 +816,10 @@ namespace Moq
 
 		private class FluentMockVisitor : ExpressionVisitor
 		{
-#if FEATURE_LEGACY_REFLECTION_API
-			static readonly MethodInfo FluentMockGenericMethod = ((Func<Mock<string>, Expression<Func<string, string>>, Mock<string>>)
-				QueryableMockExtensions.FluentMock<string, string>).Method.GetGenericMethodDefinition();
-			static readonly MethodInfo MockGetGenericMethod = ((Func<string, Mock<string>>)Moq.Mock.Get<string>)
-				.Method.GetGenericMethodDefinition();
-#else
 			static readonly MethodInfo FluentMockGenericMethod = ((Func<Mock<string>, Expression<Func<string, string>>, Mock<string>>)
 				QueryableMockExtensions.FluentMock<string, string>).GetMethodInfo().GetGenericMethodDefinition();
 			static readonly MethodInfo MockGetGenericMethod = ((Func<string, Mock<string>>)Moq.Mock.Get<string>)
 				.GetMethodInfo().GetGenericMethodDefinition();
-#endif
 
 			Expression expression;
 			Mock mock;
@@ -890,11 +879,7 @@ namespace Moq
 				// compiler-generated types as they are typically the 
 				// anonymous types generated to build up the query expressions.
 				if (node.Expression.NodeType == ExpressionType.Parameter &&
-#if FEATURE_LEGACY_REFLECTION_API
-					node.Expression.Type.GetCustomAttribute<CompilerGeneratedAttribute>(false) != null)
-#else
 					node.Expression.Type.GetTypeInfo().GetCustomAttribute<CompilerGeneratedAttribute>(false) != null)
-#endif
 				{
 					var memberType = node.Member is FieldInfo ?
 						((FieldInfo)node.Member).FieldType :
@@ -1000,11 +985,7 @@ namespace Moq
 				throw new InvalidOperationException(Resources.AlreadyInitialized);
 			}
 
-#if FEATURE_LEGACY_REFLECTION_API
-			if (!typeof(TInterface).IsInterface)
-#else
 			if (!typeof(TInterface).GetTypeInfo().IsInterface)
-#endif
 			{
 				throw new ArgumentException(Resources.AsMustBeInterface);
 			}

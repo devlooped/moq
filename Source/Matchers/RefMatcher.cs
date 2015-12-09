@@ -50,11 +50,7 @@ namespace Moq.Matchers
 
 		public RefMatcher(object reference)
 		{
-#if FEATURE_LEGACY_REFLECTION_API
-			if (reference != null && reference.GetType().IsValueType)
-#else
 			if (reference != null && reference.GetType().GetTypeInfo().IsValueType)
-#endif
 			{
 				equals = value => object.Equals(reference, value);
 			}

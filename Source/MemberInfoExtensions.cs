@@ -19,11 +19,7 @@ namespace Moq
 
 		public static string GetFullName(this Type type)
 		{
-#if FEATURE_LEGACY_REFLECTION_API
-			if (type.IsGenericType)
-#else
 			if (type.GetTypeInfo().IsGenericType)
-#endif
 			{
 				return type.FullName.Substring(0, type.FullName.IndexOf('`')) +
 					GetGenericArguments(type.GetGenericArguments(), t => GetFullName(t));
@@ -44,11 +40,7 @@ namespace Moq
 
 		public static string GetName(this Type type)
 		{
-#if FEATURE_LEGACY_REFLECTION_API
-			if (type.IsGenericType)
-#else
 			if (type.GetTypeInfo().IsGenericType)
-#endif
 			{
 				return type.Name.Substring(0, type.Name.IndexOf('`')) +
 					GetGenericArguments(type.GetGenericArguments(), t => GetName(t));

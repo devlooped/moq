@@ -54,24 +54,6 @@ namespace Moq
 		static readonly FieldInfo remoteStackTraceString = typeof(Exception).GetField("_remoteStackTraceString",
 										 BindingFlags.Instance | BindingFlags.NonPublic);
 
-#if FEATURE_LEGACY_REFLECTION_API
-		public static TAttribute GetCustomAttribute<TAttribute>(this ICustomAttributeProvider source, bool inherit)
-			where TAttribute : Attribute
-		{
-			object[] attrs = source.GetCustomAttributes(typeof(TAttribute), inherit);
-
-			if (attrs.Length == 0)
-			{
-				return default(TAttribute);
-			}
-			else
-			{
-				return (TAttribute)attrs[0];
-			}
-		}
-#else
-#endif
-
 		public static string Format(this ICallContext invocation)
 		{
 			if (invocation.Method.IsPropertyGetter())
@@ -149,11 +131,7 @@ namespace Moq
 		/// </summary>
 		public static bool IsDelegate(this Type t)
 		{
-#if FEATURE_LEGACY_REFLECTION_API
-			return t.IsSubclassOf(typeof(Delegate));
-#else
 			return t.GetTypeInfo().IsSubclassOf(typeof(Delegate));
-#endif
 		}
 
 		public static void ThrowIfNotMockeable(this Type typeToMock)
@@ -193,11 +171,7 @@ namespace Moq
 		{
 			// A value type does not match any of these three 
 			// condition and therefore returns false.
-#if FEATURE_LEGACY_REFLECTION_API
-			return typeToMock.IsInterface || typeToMock.IsAbstract || typeToMock.IsDelegate() || (typeToMock.IsClass && !typeToMock.IsSealed);
-#else
 			return typeToMock.GetTypeInfo().IsInterface || typeToMock.GetTypeInfo().IsAbstract || typeToMock.IsDelegate() || (typeToMock.GetTypeInfo().IsClass && !typeToMock.GetTypeInfo().IsSealed);
-#endif
 		}
 
 		public static bool CanOverride(this MethodBase method)
@@ -259,6 +233,38 @@ namespace Moq
 			return ev;
 		}
 
+#if FEATURE_LEGACY_REFLECTION_API
+		public static TAttribute GetCustomAttribute<TAttribute>(this ICustomAttributeProvider source, bool inherit)
+			where TAttribute : Attribute
+		{
+			object[] attrs = source.GetCustomAttributes(typeof(TAttribute), inherit);
+
+			if (attrs.Length == 0)
+			{
+				return default(TAttribute);
+			}
+			else
+			{
+				return (TAttribute)attrs[0];
+			}
+		}
+
+		/// <summary>
+		/// A pass through helper for platforms where GetTypeInfo() is not supported.
+		/// </summary>
+		/// <param name="type"></param>
+		/// <returns></returns>
+		public static Type GetTypeInfo(this Type type)
+		{
+			return type;
+		}
+
+		public static MethodInfo GetMethodInfo(this Delegate @delegate)
+		{
+			return @delegate.Method;
+		}
+#endif
+
 		public static bool HasMatchingParameterTypes(this MethodInfo method, Type[] paramTypes)
 		{
 			var types = method.GetParameterTypes().ToArray();
@@ -280,11 +286,7 @@ namespace Moq
 
 		public static bool HasCompatibleParameterList(this Delegate function, ParameterInfo[] expectedParams)
 		{
-#if FEATURE_LEGACY_REFLECTION_API
-			var method = function.Method;
-#else
 			var method = function.GetMethodInfo();
-#endif
 			if (HasCompatibleParameterList(expectedParams, method))
 			{
 				// the backing method for the literal delegate is compatible, DynamicInvoke(...) will succeed

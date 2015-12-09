@@ -262,11 +262,7 @@ namespace Moq
 					// Perhaps is better without nothing (at least for local variables)
 					//builder.Append("<value>");
 				}
-#if FEATURE_LEGACY_REFLECTION_API
-				else if (c.Type.IsEnum)
-#else
 				else if (c.Type.GetTypeInfo().IsEnum)
-#endif
 				{
 					builder.Append(c.Type.DisplayName(this.getTypeName)).Append(".").Append(value);
 				}
@@ -644,11 +640,7 @@ namespace Moq
 			}
 			var builder = new StringBuilder(100);
 			builder.Append(getName(source).Split('`').First());
-#if FEATURE_LEGACY_REFLECTION_API
-			if (source.IsGenericType)
-#else
 			if (source.GetTypeInfo().IsGenericType)
-#endif
 			{
 				builder.Append("<");
 				builder.Append(source.GetGenericArguments().Select(t => getName(t)).AsCommaSeparatedValues());

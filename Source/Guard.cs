@@ -116,11 +116,7 @@ namespace Moq
 		{
 			if (!targetType.IsAssignableFrom(typeToAssign))
 			{
-#if FEATURE_LEGACY_REFLECTION_API
-				if (targetType.IsInterface)
-#else
 				if (targetType.GetTypeInfo().IsInterface)
-#endif
 				{
 					throw new ArgumentException(string.Format(
 						CultureInfo.CurrentCulture,
