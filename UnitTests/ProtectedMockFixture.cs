@@ -732,9 +732,9 @@ namespace Moq.Tests
 				return a + b;
 			}
 
-            public void ExecuteSameFirstParameter(object a) { }
+			public void ExecuteSameFirstParameter(object a) { }
 
-            protected virtual void SameFirstParameter(object a) { }
+			protected virtual void SameFirstParameter(object a) { }
 
 			protected virtual void SameFirstParameter(object a, object b) { }
 		}

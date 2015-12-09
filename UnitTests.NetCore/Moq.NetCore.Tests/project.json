@@ -27,20 +27,20 @@
 	"frameworks": {
 		"dnxcore50": {
 			"compilationOptions": { "define": [ "NETCORE" ] },
-      "dependencies": {
-        "Castle.Core": "3.3.4-wrapped",
-        "ClassLibrary1": "",
-        "ClassLibrary2": "",
-        "Moq": "99.99.99-wrapped",
-        "System.Collections.Specialized": "4.0.0",
-        "System.ComponentModel": "4.0.0",
-        "System.ComponentModel.Primitives": "4.0.0",
-        "System.Linq": "4.0.0",
+			"dependencies": {
+				"Castle.Core": "3.3.4-wrapped",
+				"ClassLibrary1": "",
+				"ClassLibrary2": "",
+				"Moq": "99.99.99-wrapped",
+				"System.Collections.Specialized": "4.0.0",
+				"System.ComponentModel": "4.0.0",
+				"System.ComponentModel.Primitives": "4.0.0",
+				"System.Linq": "4.0.0",
 				"System.Linq.Queryable": "4.0.0",
 				"System.ServiceModel.Primitives": "4.0.0",
 				"System.Threading": "4.0.10",
 				"System.Threading.Tasks.Parallel": "4.0.0"
-      }
+			}
 		}
 	}
 }
