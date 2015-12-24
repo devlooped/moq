@@ -157,7 +157,7 @@ Mocking is used when you need to test your application's interaction with the da
 ## Explore Full Example
 ** Let's explore the following code as a whole and then we can break it down bit by bit **
 
-```
+```csharp
 using System;
 using Microsoft.VisualStudio.TestTools.UnitTesting;
 using My.Models;
@@ -226,7 +226,7 @@ namespace My.Tests.Models
 
 Let's take a look at the first part of the code you saw earlier:
 
-```
+```csharp
     [TestClass]
     public class RepositoryTests
     {
@@ -253,7 +253,7 @@ As a reminder, I have not Mocked anything at this point. I've merely created pri
 
 Let's take a look at this bit of code:
 
-```
+```csharp
         [TestInitialize]
         public void Initialize()
         {
@@ -286,7 +286,7 @@ In other words using `.Object` actually EXPOSES the context (in this case the Db
 
 This helper method is just going to free up resources after each test is run. In otherwords, each individual Test Method will interact with only data in our Mocked "Database" that I specify in each Test Method. Each Test Method works with Data independent of one another. 
 
-```
+```csharp
         [TestCleanup]
         public void Cleanup()
         {
@@ -305,7 +305,7 @@ Simple.. the `[TestCleanup]` tag specifies the Cleanup() Method is to be ran at 
 
 Let's take a look at this bit of code:
 
-``` 
+```csharp 
         private void ConnectMocksToDataStore(IEnumerable<MySet> data_store)
         {
             var data_source = data_store.AsQueryable();
@@ -348,7 +348,7 @@ So that clears that little bit up.. let's examine what the .Setup() and .Returns
 
 As you remember, an Interface requires us to implement the Signatures for Methods, Properties, Indexers, or Events it defines in the Interface, and that is why you see the following lines of code: 
 
-```
+```csharp
 .Setup(data => data.Provider).Returns(data_source.Provider);
 .Setup(data => data.Expression).Returns(data_source.Expression);
 .Setup(data => data.ElementType).Returns(data_source.ElementType);
@@ -374,7 +374,7 @@ So now we have made it to the meat and potatoes of all that work we have done. W
 
 Let's examine the following code:
 
-```
+```csharp
         [TestMethod]
         public void RepositoryTestsEnsureICanGetAllUsers()
         {
