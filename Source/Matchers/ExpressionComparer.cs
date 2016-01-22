@@ -162,7 +162,7 @@ namespace Moq.Matchers
 
 		private bool EqualsBinary(BinaryExpression x, BinaryExpression y)
 		{
-			return x.Method == x.Method && this.Equals(x.Left, y.Left) && this.Equals(x.Right, y.Right) &&
+			return x.Method == y.Method && this.Equals(x.Left, y.Left) && this.Equals(x.Right, y.Right) &&
 				this.Equals(x.Conversion, y.Conversion);
 		}
 
