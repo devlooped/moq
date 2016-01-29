@@ -26,7 +26,7 @@ namespace Moq
 
         public object ProvideDefault(MethodInfo member)
         {
-            return !member.ReflectedType.IsSerializable || member.ReflectedType.IsSerializableMockable()
+            return !member.ReturnType.IsSerializable || member.ReturnType.IsSerializableMockable()
                        ? decorated.ProvideDefault(member)
                        : emptyDefaultValueProvider.ProvideDefault(member);
         }
