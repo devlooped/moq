@@ -1,4 +1,4 @@
-//Copyright (c) 2007. Clarius Consulting, Manas Technology Solutions, InSTEDD
+﻿//Copyright (c) 2007. Clarius Consulting, Manas Technology Solutions, InSTEDD
 //http://code.google.com/p/moq/
 //All rights reserved.
 
@@ -56,6 +56,7 @@ namespace Moq
     public abstract partial class Mock : IHideObjectMembers
     {
         private bool isInitialized;
+        private bool callBase;
         private DefaultValue defaultValue = DefaultValue.Empty;
         private IDefaultValueProvider defaultValueProvider = new EmptyDefaultValueProvider();
 
@@ -126,7 +127,11 @@ namespace Moq
         public virtual MockBehavior Behavior { get; internal set; }
 
         /// <include file='Mock.xdoc' path='docs/doc[@for="Mock.CallBase"]/*'/>
-        public virtual bool CallBase { get; set; }
+        public virtual bool CallBase
+        {
+            get { return this.callBase; }
+            set { this.callBase = value; }
+        }
 
         /// <include file='Mock.xdoc' path='docs/doc[@for="Mock.DefaultValue"]/*'/>
         public virtual DefaultValue DefaultValue
@@ -658,74 +663,51 @@ namespace Moq
         {
             PexProtector.Invoke(() =>
             {
-                var mockedTypesStack = new Stack<Type>();
-                SetupAllProperties(mock, mockedTypesStack);
+                var mockType = mock.MockedType;
+                var properties = mockType.GetProperties()
+                    .Concat(mockType.GetInterfaces().SelectMany(i => i.GetProperties()))
+                    .Where(p =>
+                        p.CanRead && p.CanOverrideGet() &&
+                        p.GetIndexParameters().Length == 0 &&
+                                                p.PropertyType != mockType &&
+                        !(p.CanWrite ^ (p.CanWrite & p.CanOverrideSet())))
+                    .Distinct();
+
+                var setupPropertyMethod = mock.GetType().GetMethods()
+                    .First(m => m.Name == "SetupProperty" && m.GetParameters().Length == 2);
+                var setupGetMethod = mock.GetType().GetMethods()
+                    .First(m => m.Name == "SetupGet" && m.GetParameters().Length == 1);
+
+                foreach (var property in properties)
+                {
+                    var expression = GetPropertyExpression(mockType, property);
+                    var initialValue = mock.DefaultValueProvider.ProvideDefault(property.GetGetMethod());
+
+                    var mocked = initialValue as IMocked;
+                    if (mocked != null)
+                    {
+                        SetupAllProperties(mocked.Mock);
+                    }
+
+                    if (property.CanWrite)
+                    {
+                        setupPropertyMethod.MakeGenericMethod(property.PropertyType)
+                            .Invoke(mock, new[] { expression, initialValue });
+                    }
+                    else
+                    {
+                        var genericSetupGetMethod = setupGetMethod.MakeGenericMethod(property.PropertyType);
+                        var returnsMethod =
+                            genericSetupGetMethod
+                                .ReturnType
+                                .GetInterface("IReturnsGetter`2", ignoreCase: false)
+                                .GetMethod("Returns", new Type[] { property.PropertyType });
+
+                        var returnsGetter = genericSetupGetMethod.Invoke(mock, new[] { expression });
+                        returnsMethod.Invoke(returnsGetter, new[] { initialValue });
+                    }
+                }
             });
-        }
-
-        private static void SetupAllProperties(Mock mock, Stack<Type> mockedTypesStack)
-        {
-            var mockType = mock.MockedType;
-            mockedTypesStack.Push(mockType);
-            var properties = mockType.GetProperties()
-                .Concat(mockType.GetInterfaces().SelectMany(i => i.GetProperties()))
-                .Where(p =>
-                       p.CanRead && p.CanOverrideGet() &&
-                       p.GetIndexParameters().Length == 0 &&
-                       !(p.CanWrite ^ (p.CanWrite & p.CanOverrideSet())))
-                .Distinct();
-
-            var setupPropertyMethod = mock.GetType().GetMethods()
-                .First(m => m.Name == "SetupProperty" && m.GetParameters().Length == 2);
-            var setupGetMethod = mock.GetType().GetMethods()
-                .First(m => m.Name == "SetupGet" && m.GetParameters().Length == 1);
-
-            foreach (var property in properties)
-            {
-                var expression = GetPropertyExpression(mockType, property);
-                object initialValue = GetInitialValue(mock.DefaultValueProvider, mockedTypesStack, property);
-
-                var mocked = initialValue as IMocked;
-                if (mocked != null)
-                {
-                    SetupAllProperties(mocked.Mock, mockedTypesStack);
-                }
-
-                if (property.CanWrite)
-                {
-                    setupPropertyMethod.MakeGenericMethod(property.PropertyType)
-                        .Invoke(mock, new[] {expression, initialValue});
-                }
-                else
-                {
-                    var genericSetupGetMethod = setupGetMethod.MakeGenericMethod(property.PropertyType);
-                    var returnsMethod =
-                        genericSetupGetMethod
-                            .ReturnType
-                            .GetInterface("IReturnsGetter`2", ignoreCase: false)
-                            .GetMethod("Returns", new Type[] {property.PropertyType});
-
-                    var returnsGetter = genericSetupGetMethod.Invoke(mock, new[] {expression});
-                    returnsMethod.Invoke(returnsGetter, new[] {initialValue});
-                }
-            }
-        }
-
-        private static object GetInitialValue(IDefaultValueProvider valueProvider, Stack<Type> mockedTypesStack, PropertyInfo property)
-        {
-            if (mockedTypesStack.Contains(property.PropertyType))
-            {
-                // to deal with loops in the property graph
-                valueProvider = new EmptyDefaultValueProvider();
-            }
-            else
-            {
-                // to make sure that properties of types that don't impelemt ISerializable properly (Castle throws ArgumentException)
-                // are mocked with default value instead.
-                // It will only result in exception if the properties are accessed.
-                valueProvider = new SerializableTypesValueProvider(valueProvider);
-            }
-            return valueProvider.ProvideDefault(property.GetGetMethod());
         }
 
         private static Expression GetPropertyExpression(Type mockType, PropertyInfo property)
@@ -823,14 +805,14 @@ namespace Moq
         private class FluentMockVisitor : ExpressionVisitor
         {
             static readonly MethodInfo FluentMockGenericMethod = ((Func<Mock<string>, Expression<Func<string, string>>, Mock<string>>)
-                QueryableMockExtensions.FluentMock).Method.GetGenericMethodDefinition();
-            static readonly MethodInfo MockGetGenericMethod = ((Func<string, Mock<string>>)Get)
+                QueryableMockExtensions.FluentMock<string, string>).Method.GetGenericMethodDefinition();
+            static readonly MethodInfo MockGetGenericMethod = ((Func<string, Mock<string>>)Moq.Mock.Get<string>)
                 .Method.GetGenericMethodDefinition();
 
-            readonly Expression expression;
-            readonly Mock mock;
+            Expression expression;
+            Mock mock;
 
-            private FluentMockVisitor(Expression expression, Mock mock)
+            public FluentMockVisitor(Expression expression, Mock mock)
             {
                 this.expression = expression;
                 this.mock = mock;
@@ -841,7 +823,7 @@ namespace Moq
                 return new FluentMockVisitor(expression, mock).Accept();
             }
 
-            private Expression Accept()
+            public Expression Accept()
             {
                 return Visit(expression);
             }
