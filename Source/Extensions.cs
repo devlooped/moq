@@ -43,6 +43,8 @@ using System.Diagnostics.CodeAnalysis;
 using System.Globalization;
 using System.Linq;
 using System.Reflection;
+using System.Runtime.Serialization;
+
 using Moq.Proxy;
 using System.Linq.Expressions;
 using Moq.Properties;
@@ -189,7 +191,27 @@ namespace Moq
 			return typeToMock.IsInterface || typeToMock.IsAbstract || typeToMock.IsDelegate() || (typeToMock.IsClass && !typeToMock.IsSealed);
 		}
 
-		public static bool CanOverride(this MethodBase method)
+	    public static bool IsSerializableMockable(this Type typeToMock)
+	    {
+            return typeToMock.ContainsDeserializationConstructor() && typeToMock.IsGetObjectDataVirtual();
+	    }
+
+	    private static bool IsGetObjectDataVirtual(this Type typeToMock)
+	    {
+	        var getObjectDataMethod = typeToMock.GetInterfaceMap(typeof(ISerializable)).TargetMethods[0];
+	        return !getObjectDataMethod.IsPrivate && getObjectDataMethod.IsVirtual && !getObjectDataMethod.IsFinal;
+	    }
+
+	    private static bool ContainsDeserializationConstructor(this Type typeToMock)
+	    {
+	        return typeToMock.GetConstructor(
+	            BindingFlags.Instance | BindingFlags.Public | BindingFlags.NonPublic,
+	            null,
+	            new[] {typeof (SerializationInfo), typeof (StreamingContext)},
+	            null) != null;
+	    }
+
+	    public static bool CanOverride(this MethodBase method)
 		{
 			return method.IsVirtual && !method.IsFinal && !method.IsPrivate;
 		}
