@@ -112,7 +112,7 @@ namespace Moq
 		}
 
 		/// <summary>
-		/// Creates the mock query with the underlying queriable implementation.
+        /// Creates the mock query with the underlying queryable implementation.
 		/// </summary>
 		internal static IQueryable<T> CreateMockQuery<T>() where T : class
 		{
@@ -120,13 +120,33 @@ namespace Moq
 				((Func<IQueryable<T>>)CreateQueryable<T>).Method));
 		}
 
-		/// <summary>
+        /// <summary>
+        /// Creates the mock query with the underlying queryable implementation.
+        /// </summary>
+        internal static IQueryable<T> CreateMockQuery<T>(MockBehavior behavior) where T : class
+        {
+            var underlyingCreateMocks = Expression.Call(
+                null,
+                ((Func<MockBehavior, IQueryable<T>>) CreateQueryable<T>).Method,
+                Expression.Constant(behavior));
+            return new MockQueryable<T>(underlyingCreateMocks);
+        }
+
+	    /// <summary>
 		/// Wraps the enumerator inside a queryable.
 		/// </summary>
 		internal static IQueryable<T> CreateQueryable<T>() where T : class
 		{
 			return CreateMocks<T>().AsQueryable();
 		}
+
+        /// <summary>
+        /// Wraps the enumerator inside a queryable.
+        /// </summary>
+        internal static IQueryable<T> CreateQueryable<T>(MockBehavior behavior) where T : class
+        {
+            return CreateMocks<T>(behavior).AsQueryable();
+        }
 
 		/// <summary>
 		/// Method that is turned into the actual call from .Query{T}, to 
@@ -145,17 +165,39 @@ namespace Moq
 			while (true);
 		}
 
+        /// <summary>
+        /// Method that is turned into the actual call from .Query{T}, to 
+        /// transform the queryable query into a normal enumerable query.
+        /// This method is never used directly by consumers.
+        /// </summary>
+        private static IEnumerable<T> CreateMocks<T>(MockBehavior behavior) where T : class
+        {
+            do
+            {
+                var mock = new Mock<T>(behavior);
+                yield return mock.Object;
+            }
+            while (true);
+        }
+
 		/// <summary>
 		/// Extension method used to support Linq-like setup properties that are not virtual but do have 
 		/// a getter and a setter, thereby allowing the use of Linq to Mocks to quickly initialize Dtos too :)
 		/// </summary>
-		internal static bool SetPropery<T, TResult>(Mock<T> target, Expression<Func<T, TResult>> propertyReference, TResult value)
+		internal static bool SetProperty<T, TResult>(Mock<T> target, Expression<Func<T, TResult>> propertyReference, TResult value)
 			where T : class
 		{
-			var memberExpr = (MemberExpression)propertyReference.Body;
-			var member = (PropertyInfo)memberExpr.Member;
-
-			member.SetValue(target.Object, value, null);
+		    if (typeof(T).IsInterface)
+		    {
+		        target.SetupGet(propertyReference)
+		              .Returns(value);
+		    }
+		    else
+		    {
+                var memberExpr = (MemberExpression)propertyReference.Body;
+                var member = (PropertyInfo)memberExpr.Member;
+                member.SetValue(target.Object, value, null);
+		    }
 
 			return true;
 		}

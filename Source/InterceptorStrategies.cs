@@ -99,7 +99,6 @@ namespace Moq
 
     internal class ExtractProxyCall : IInterceptStrategy
     {
-
         public InterceptionAction HandleIntercept(ICallContext invocation, InterceptorContext ctx, CurrentInterceptContext localctx)
         {
             localctx.Call = FluentMockContext.IsActive ? (IProxyCall)null : ctx.OrderedCalls.LastOrDefault(c => c.Matches(invocation));

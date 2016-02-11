@@ -48,28 +48,54 @@ using Moq.Linq;
 
 namespace Moq
 {
-	public partial class Mock
-	{
-		/// <summary>
-		/// Creates an mock object of the indicated type.
-		/// </summary>
-		/// <typeparam name="T">The type of the mocked object.</typeparam>
-		/// <returns>The mocked object created.</returns>
-		public static T Of<T>() where T : class
-		{
-			return Mocks.CreateMockQuery<T>().First<T>();
-		}
+    public partial class Mock
+    {
+        /// <summary>
+        /// Creates an mock object of the indicated type.
+        /// </summary>
+        /// <typeparam name="T">The type of the mocked object.</typeparam>
+        /// <returns>The mocked object created.</returns>
+        public static T Of<T>() where T : class
+        {
+            return Mocks.CreateMockQuery<T>().First<T>();
+        }
 
-		/// <summary>
-		/// Creates an mock object of the indicated type.
-		/// </summary>
-		/// <param name="predicate">The predicate with the specification of how the mocked object should behave.</param>
-		/// <typeparam name="T">The type of the mocked object.</typeparam>
-		/// <returns>The mocked object created.</returns>
-		[SuppressMessage("Microsoft.Design", "CA1006:DoNotNestGenericTypesInMemberSignatures", Justification = "By Design")]
-		public static T Of<T>(Expression<Func<T, bool>> predicate) where T : class
-		{
-			return Mocks.CreateMockQuery<T>().First<T>(predicate);
-		}
-	}
+        /// <summary>
+        /// Creates an mock object of the indicated type.
+        /// </summary>
+        /// <param name="predicate">The predicate with the specification of how the mocked object should behave.</param>
+        /// <typeparam name="T">The type of the mocked object.</typeparam>
+        /// <returns>The mocked object created.</returns>
+        [SuppressMessage("Microsoft.Design", "CA1006:DoNotNestGenericTypesInMemberSignatures", Justification = "By Design")]
+        public static T Of<T>(Expression<Func<T, bool>> predicate) where T : class
+        {
+            return Mocks.CreateMockQuery<T>().First<T>(predicate);
+        }
+
+        /// <summary>
+        /// Creates an mock object of the indicated type.
+        /// </summary>
+        /// <param name="predicate">The predicate with the specification of how the mocked object should behave.</param>
+        /// <param name="behavior">Behavior of the mock.</param>
+        /// <typeparam name="T">The type of the mocked object.</typeparam>
+        /// <returns>The mocked object created.</returns>
+        public static T Of<T>(Expression<Func<T, bool>> predicate, MockBehavior behavior) where T : class
+        {
+            var mockQuery = Mocks.CreateMockQuery<T>(behavior);
+            var mocked = mockQuery.First(predicate);
+            return mocked;
+        }
+
+        /// <summary>
+        /// Creates an mock object of the indicated type.
+        /// </summary>
+        /// <param name="behavior">Behavior of the mock.</param>
+        /// <typeparam name="T">The type of the mocked object.</typeparam>
+        /// <returns>The mocked object created.</returns>
+        public static T Of<T>(MockBehavior behavior) where T : class
+        {
+            var mock = new Mock<T>(behavior);
+            return mock.Object;
+        }
+    }
 }
