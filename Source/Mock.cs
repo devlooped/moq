@@ -38,6 +38,7 @@
 //[This is the BSD license, see
 // http://www.opensource.org/licenses/bsd-license.php]
 
+using System.Collections.Concurrent;
 using Moq.Properties;
 using Moq.Proxy;
 using System;
@@ -63,7 +64,7 @@ namespace Moq
 		protected Mock()
 		{
 			this.ImplementedInterfaces = new List<Type>();
-			this.InnerMocks = new Dictionary<MethodInfo, Mock>();
+			this.InnerMocks = new ConcurrentDictionary<MethodInfo, Mock>();
 		}
 
 		/// <include file='Mock.xdoc' path='docs/doc[@for="Mock.Get"]/*'/>
@@ -164,7 +165,7 @@ namespace Moq
 
 		internal virtual Interceptor Interceptor { get; set; }
 
-		internal virtual Dictionary<MethodInfo, Mock> InnerMocks { get; private set; }
+		internal virtual ConcurrentDictionary<MethodInfo, Mock> InnerMocks { get; private set; }
 
 		/// <include file='Mock.xdoc' path='docs/doc[@for="Mock.OnGetObject"]/*'/>
 		[SuppressMessage("Microsoft.Design", "CA1024:UsePropertiesWhereAppropriate", Justification = "This is actually the protected virtual implementation of the property Object.")]
