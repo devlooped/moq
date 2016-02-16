@@ -115,21 +115,7 @@ namespace Moq.Tests
 			Assert.Equal(5, mock.Object.DoProtectedInt());
 		}
 
-        [Fact]
-        public void SetupAllowsProtectedMethodWithNullableParameters()
-        {
-            int? input = 5;
-            int expectedOutput = 6;
-
-            var mock = new Mock<FooBase>();
-            mock.Protected()
-                .Setup<int>("ProtectedWithNullableIntParam", input)
-                .Returns(expectedOutput);
-
-            Assert.Equal(expectedOutput, mock.Object.DoProtectedWithNullableIntParam(input));
-        }
-
-        [Fact]
+		[Fact]
 		public void ThrowsIfSetupVoidMethodIsProperty()
 		{
 			Assert.Throws<ArgumentException>(() => new Mock<FooBase>().Protected().Setup("ProtectedValue"));
@@ -773,12 +759,7 @@ namespace Moq.Tests
 				return this.ProtectedInt();
 			}
 
-            public int DoProtectedWithNullableIntParam(int? value)
-            {
-                return this.ProtectedWithNullableIntParam(value);
-            }
-
-            public string DoStringArg(string arg)
+			public string DoStringArg(string arg)
 			{
 				return this.StringArg(arg);
 			}
@@ -825,12 +806,7 @@ namespace Moq.Tests
 				return 2;
 			}
 
-            protected virtual int ProtectedWithNullableIntParam(int? value)
-            {
-                return value ?? 0;
-            }
-
-            protected void NonVirtual()
+			protected void NonVirtual()
 			{
 			}
 
