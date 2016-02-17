@@ -254,9 +254,65 @@ namespace Moq.Tests
 
 			Assert.False(mock.Object.Check("foo"));
 			Assert.True(mock.Object.Check("bar"));
-		}
+        }
 
-		[Fact]
+        [Fact]
+        public void CanSetupToString()
+        {
+            var mock = new Mock<Foo>();
+            mock.Setup(x => x.ToString()).Returns("This is me");
+
+            Assert.Equal("This is me", mock.Object.ToString());
+        }
+
+        [Fact]
+        public void CanSetupToStringForInterface()
+        {
+            var mock = new Mock<IFoo>();
+            mock.Setup(x => x.ToString()).Returns("This is me");
+
+            Assert.Equal("This is me", mock.Object.ToString());
+        }
+
+        [Fact]
+        public void CanSetupGetHashCode()
+        {
+            var mock = new Mock<Foo>();
+            mock.Setup(x => x.GetHashCode()).Returns(527);
+
+            Assert.Equal(527, mock.Object.GetHashCode());
+        }
+
+        [Fact]
+        public void CanSetupGetHashCodeForInterface()
+        {
+            var mock = new Mock<IFoo>();
+            mock.Setup(x => x.GetHashCode()).Returns(527);
+
+            Assert.Equal(527, mock.Object.GetHashCode());
+        }
+
+        [Fact]
+        public void CanSetupObjectEquals()
+        {
+            var mock = new Mock<Foo>();
+            mock.Setup(x => x.Equals(It.IsAny<object>())).Returns<object>((obj) => false);
+            var foo = mock.Object;
+
+            Assert.True(!foo.Equals(foo));
+        }
+
+        [Fact]
+        public void CanSetupObjectEqualsForInterface()
+        {
+            var mock = new Mock<IFoo>();
+            mock.Setup(x => x.Equals(It.IsAny<object>())).Returns<object>((obj) => false);
+            var foo = mock.Object;
+
+            Assert.True(!foo.Equals(foo));
+        }
+
+        [Fact]
 		public void CallsUnderlyingClassEquals()
 		{
 			var mock = new Mock<FooOverrideEquals>();

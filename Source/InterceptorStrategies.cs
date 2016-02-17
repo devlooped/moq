@@ -139,13 +139,24 @@ namespace Moq
         {
             var method = invocation.Method;
 
-            if (method.DeclaringType == typeof(Object) && method.Name == "ToString")
+            // Only if there is no corresponding setup
+            if (IsObjectToStringMethod(method) && !ctx.OrderedCalls.Select(c => IsObjectToStringMethod(c.Method)).Any())
             {
                 invocation.ReturnValue = ctx.Mock.ToString() + ".Object";
                 return InterceptionAction.Stop;
             }
 
             return InterceptionAction.Continue;
+        }
+
+        protected bool IsObjectToStringMethod(MethodInfo method)
+        {
+            if (method.DeclaringType == typeof(object) && method.Name == "ToString")
+            {
+                return true;
+            }
+
+            return false;
         }
     }
 
