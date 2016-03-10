@@ -1,7 +1,7 @@
 {
   "version": "99.99.99-wrapped",
   "dependencies": {
-        "Castle.Core": "3.3.4-wrapped"
+        "Castle.Core": "3.3.4-dev"
   },
   "frameworks": {
     "dnxcore50": {
