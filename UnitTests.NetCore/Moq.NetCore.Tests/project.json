@@ -17,30 +17,41 @@
 	],
 
 	"dependencies": {
-		"xunit": "2.1.0",
-		"xunit.runner.dnx": "2.1.0-rc1-build204"
+		"xunit": "2.1.0"
 	},
 	"commands": {
 		"test": "xunit.runner.dnx"
 	},
 
 	"frameworks": {
-		"dnxcore50": {
+		"netstandardapp1.5": {
 			"compilationOptions": { "define": [ "NETCORE" ], "keyFile": "../../Moq.snk" },
-			"dependencies": {
-				"Castle.Core": "3.3.4-dev",
-				"ClassLibrary1": "",
-				"ClassLibrary2": "",
-				"Moq": "99.99.99-wrapped",
-				"System.Collections.Specialized": "4.0.0",
-				"System.ComponentModel": "4.0.0",
-				"System.ComponentModel.Primitives": "4.0.0",
-				"System.Linq": "4.0.0",
-				"System.Linq.Queryable": "4.0.0",
-				"System.ServiceModel.Primitives": "4.0.0",
-				"System.Threading": "4.0.10",
-				"System.Threading.Tasks.Parallel": "4.0.0"
-			}
+      "dependencies": {
+        "Castle.Core": "4.0.0-alpha",
+        "ClassLibrary1": {
+          "target": "project",
+          "version": "1.0.0-*"
+        },
+        "ClassLibrary2": {
+          "target": "project",
+          "version": "2.0.0-*"
+        },
+        "Moq": {
+          "target": "project",
+          "version": "99.99.99-wrapped"
+        },
+        "NETStandard.Library": "1.5.0-rc2-23928",
+        "System.Collections.Specialized": "4.0.1-rc2-23928",
+        "System.ComponentModel": "4.0.1-rc2-23928",
+        "System.ComponentModel.Primitives": "4.0.1-rc2-23928",
+        "System.Linq": "4.1.0-rc2-23928",
+        "System.Linq.Queryable": "4.0.1-rc2-23928",
+        "System.ServiceModel.Primitives": "4.1.0-rc2-23928",
+        "System.Threading": "4.0.11-rc2-23928",
+        "System.Threading.Tasks.Parallel": "4.0.1-rc2-23928",
+        "xunit.runner.dnx": "2.1.0-rc1-build204"
+      },
+      "imports": [ "dnxcore50", "portable-net451+win81" ]
 		}
 	}
 }

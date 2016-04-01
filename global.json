@@ -1,11 +1,5 @@
 {
-	"projects": [
-		"wrap/Castle.Core",
-		"wrap/Moq"
-	],
-	"sdk": {
-		"version": "1.0.0-rc1-update1",
-		"runtime": "coreclr",
-		"architecture": "x86"
-	}
+  "projects": [
+    "wrap/Moq"
+  ]
 }

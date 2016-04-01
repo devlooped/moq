@@ -8,10 +8,10 @@
 	"dependencies": {
 	},
 	"frameworks": {
-		"dnxcore50": {
+		"netstandard1.3": {
 			"compilationOptions": { "define": [ "NETCORE" ] },
 			"dependencies": {
-				"ClassLibrary1": "1.0.0-*"
+        "ClassLibrary1": { "target": "project", "version": "1.0.0-*" }
 			}
 		}
 	}

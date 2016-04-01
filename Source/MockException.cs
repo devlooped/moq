@@ -42,7 +42,9 @@ using System;
 using System.Diagnostics.CodeAnalysis;
 using System.Globalization;
 using System.Linq;
+#if FEATURE_SERIALIZATION
 using System.Runtime.Serialization;
+#endif
 using System.Security;
 using Moq.Properties;
 using Moq.Proxy;
