@@ -9,7 +9,7 @@
   },
   "frameworks": {
     "netstandard1.3": {
-      "compilationOptions": { "define": [ "NETCORE" ] },
+      "compilationOptions": { "define": [ "NETCORE" ], "keyFile": "../../UnitTests/Library/ClassLibrary1/Foo.snk" },
       "dependencies": {
         "System.Linq.Queryable": "4.0.1-rc2-23928"
       }

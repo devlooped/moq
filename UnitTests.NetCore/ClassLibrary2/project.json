@@ -9,7 +9,7 @@
 	},
 	"frameworks": {
 		"netstandard1.3": {
-			"compilationOptions": { "define": [ "NETCORE" ] },
+			"compilationOptions": { "define": [ "NETCORE" ], "keyFile": "../../UnitTests/Library/ClassLibrary2/Bar.snk" },
 			"dependencies": {
         "ClassLibrary1": { "target": "project", "version": "1.0.0-*" }
 			}
