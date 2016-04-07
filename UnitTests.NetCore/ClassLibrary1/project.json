@@ -9,7 +9,7 @@
 	},
 	"frameworks": {
 		"dnxcore50": {
-			"compilationOptions": { "define": [ "NETCORE" ] },
+			"compilationOptions": { "define": [ "NETCORE" ], "keyFile": "../../UnitTests/Library/ClassLibrary1/Foo.snk" },
 			"dependencies": {
 				"System.Linq.Queryable": "4.0.0"
 			}

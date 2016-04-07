@@ -9,7 +9,7 @@
 	},
 	"frameworks": {
 		"dnxcore50": {
-			"compilationOptions": { "define": [ "NETCORE" ] },
+			"compilationOptions": { "define": [ "NETCORE" ], "keyFile": "../../UnitTests/Library/ClassLibrary2/Bar.snk" },
 			"dependencies": {
 				"ClassLibrary1": "1.0.0-*"
 			}
