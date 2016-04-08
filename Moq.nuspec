@@ -173,7 +173,7 @@ Version 1.0
 </releaseNotes>
     <dependencies>
       <group targetFramework="dotnet">
-        <dependency id="Castle.Core" version="3.3.4-dev" />
+        <dependency id="Castle.Core" version="4.0.0-alpha001" />
         <dependency id="System.Collections" version="4.0.10" />
         <dependency id="System.Diagnostics.Debug" version="4.0.10" />
         <dependency id="System.Diagnostics.Tools" version="4.0.0" />
