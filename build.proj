@@ -26,6 +26,12 @@
                  Targets="Rebuild" />
         <Exec Command="xcopy &quot;Source\bin\Release\Moq.*&quot; &quot;$(DropDirectory)lib\net40\&quot; /Y" ContinueOnError="false" />
 
+        <Exec Command="$(NuGetExe) restore Source.NetCore\project.json" />
+        <MSBuild Projects="Source.NetCore\Moq.NetCore.csproj"
+                 Properties="Configuration=$(Configuration)"
+                 Targets="Rebuild" />
+        <Exec Command="xcopy &quot;Source.NetCore\bin\Release\Moq.*&quot; &quot;$(DropDirectory)lib\netstandard1.3\&quot; /Y" ContinueOnError="false" />
+
         <MSBuild Projects="Source.Silverlight\Moq.Silverlight.csproj"
                  Properties="Configuration=$(Configuration)"
                  Targets="Rebuild" />
@@ -62,7 +68,7 @@
         </PropertyGroup>
     
         <PropertyGroup>
-            <PackageVersion>$(FileVersion)</PackageVersion>
+            <PackageVersion>$(FileVersion)-alpha</PackageVersion>
         </PropertyGroup>
 
         <ItemGroup>

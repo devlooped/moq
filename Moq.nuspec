@@ -1,8 +1,8 @@
-﻿<?xml version="1.0" encoding="utf-8"?>
+<?xml version="1.0" encoding="utf-8"?>
 <package xmlns="http://schemas.microsoft.com/packaging/2011/08/nuspec.xsd">
   <metadata>
     <id>Moq</id>
-    <version>4.1</version>
+    <version>4.4</version>
     <title>Moq: an enjoyable mocking library</title>
     <authors>Daniel Cazzulino, kzu</authors>
     <owners>Daniel Cazzulino, Clarius Labs, kzu</owners>
@@ -172,8 +172,8 @@ Version 1.0
 * Initial release, initial documentation process in place, etc. 
 </releaseNotes>
     <dependencies>
-      <group targetFramework="dotnet">
-        <dependency id="Castle.Core" version="3.3.4-dev" />
+      <group targetFramework=".NETStandard1.3">
+        <dependency id="Castle.Core" version="4.0.0-alpha003" />
         <dependency id="System.Collections" version="4.0.10" />
         <dependency id="System.Diagnostics.Debug" version="4.0.10" />
         <dependency id="System.Diagnostics.Tools" version="4.0.0" />
