@@ -40,9 +40,12 @@
           "target": "project",
           "version": "99.99.99-wrapped"
         },
-        "Microsoft.NETCore.App": "1.0.0-rc2-24018",
+        "Microsoft.NETCore.App": {
+          "type": "platform",
+          "version": "1.0.0-rc2-24018"
+        },
         "System.Collections.Specialized": "4.0.1-rc2-24018",
-        "System.ComponentModel": "4.0.1-rc2-24018",
+          "System.ComponentModel": "4.0.1-rc2-24018",
         "System.ComponentModel.Primitives": "4.0.1-rc2-24018",
         "System.Linq": "4.1.0-rc2-24018",
         "System.Linq.Queryable": "4.0.1-rc2-24018",
