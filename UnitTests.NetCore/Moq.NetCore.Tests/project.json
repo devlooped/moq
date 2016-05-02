@@ -2,9 +2,11 @@
 	"version": "1.0.0-*",
 	"description": "Moq.NetCore.UnitTests Class Library",
 	"authors": [ "" ],
-	"tags": [ "" ],
-	"projectUrl": "",
-	"licenseUrl": "",
+  "packOptions": {
+    "tags": [ "" ],
+    "projectUrl": "",
+    "licenseUrl": ""
+  },
 
 	"compile": [
 		"../../UnitTests/**/*.cs"
@@ -22,7 +24,7 @@
 	"testRunner": "xunit",
   "frameworks": {
     "netcoreapp1.0": {
-      "compilationOptions": {
+      "buildOptions": {
         "define": [ "NETCORE" ],
         "keyFile": "../../Moq.snk"
       },
