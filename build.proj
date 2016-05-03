@@ -29,7 +29,7 @@
         <MSBuild Projects="Source.Silverlight\Moq.Silverlight.csproj"
                  Properties="Configuration=$(Configuration)"
                  Targets="Rebuild" />
-        <Exec Command="xcopy &quot;Source.Silverlight\bin\Release\Moq.*&quot; &quot;$(DropDirectory)lib\sl4\&quot; /Y" ContinueOnError="false" />
+        <Exec Command="xcopy &quot;Source.Silverlight\bin\Release\Moq.*&quot; &quot;$(DropDirectory)lib\sl5\&quot; /Y" ContinueOnError="false" />
 
         <Copy SourceFiles="Moq.nuspec" DestinationFolder="$(DropDirectory)" />
         <!-- Copy source for symbolsource integration -->
@@ -55,7 +55,7 @@
             <!-- Build number is of the format (2 digit year)(2 digit month) -->
             <Build>$([System.DateTime]::UtcNow.ToString("yyMM"))</Build>
             <!-- Revision number is of the format (2 digit hour)(2 digit minutes) -->
-            <Revision>$([System.DateTime]::UtcNow.ToString("ddHH"))</Revision>
+            <Revision>$([System.DateTime]::UtcNow.ToString("ddHH").TrimStart('0'))</Revision>
             <FileVersion>$(Major).$(Minor).$(Build).$(Revision)</FileVersion>
             <!-- TODO: maybe we should have two builds, one that builds the public simplified version
                  and one with the full build/revision -->

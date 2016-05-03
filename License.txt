@@ -1,5 +1,5 @@
 Copyright (c) 2007. Clarius Consulting, Manas Technology Solutions, InSTEDD
-http://code.google.com/p/moq/
+http://www.moqthis.com/
 All rights reserved.
 
 Redistribution and use in source and binary forms, 
@@ -36,4 +36,4 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF
 SUCH DAMAGE.
 
 [This is the BSD license, see
- http://www.opensource.org/licenses/bsd-license.php]
+ http://opensource.org/licenses/BSD-3-Clause]

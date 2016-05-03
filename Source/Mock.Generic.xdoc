@@ -285,7 +285,7 @@
 	<doc for="Mock{T}.Verify(expression)">
 		<summary>
 			Verifies that a specific invocation matching the given expression was performed on the mock. Use
-			in conjuntion with the default <see cref="MockBehavior.Loose"/>.
+			in conjunction with the default <see cref="MockBehavior.Loose"/>.
 		</summary>
 		<example group="verification">
 			This example assumes that the mock has been used, and later we want to verify that a given
@@ -304,7 +304,7 @@
 	<doc for="Mock{T}.Verify(expression,times)">
 		<summary>
 			Verifies that a specific invocation matching the given expression was performed on the mock. Use
-			in conjuntion with the default <see cref="MockBehavior.Loose"/>.
+			in conjunction with the default <see cref="MockBehavior.Loose"/>.
 		</summary>
 		<exception cref="MockException">
 			The invocation was not call the times specified by
@@ -316,7 +316,7 @@
 	<doc for="Mock{T}.Verify(expression,failMessage)">
 		<summary>
 			Verifies that a specific invocation matching the given expression was performed on the mock,
-			specifying a failure error message. Use in conjuntion with the default
+			specifying a failure error message. Use in conjunction with the default
 			<see cref="MockBehavior.Loose"/>.
 		</summary>
 		<example group="verification">
@@ -337,7 +337,7 @@
 	<doc for="Mock{T}.Verify(expression,times,failMessage)">
 		<summary>
 			Verifies that a specific invocation matching the given expression was performed on the mock,
-			specifying a failure error message. Use in conjuntion with the default
+			specifying a failure error message. Use in conjunction with the default
 			<see cref="MockBehavior.Loose"/>.
 		</summary>
 		<exception cref="MockException">
@@ -351,7 +351,7 @@
 	<doc for="Mock{T}.Verify{TResult}(expression)">
 		<summary>
 			Verifies that a specific invocation matching the given expression was performed on the mock. Use
-			in conjuntion with the default <see cref="MockBehavior.Loose"/>.
+			in conjunction with the default <see cref="MockBehavior.Loose"/>.
 		</summary>
 		<example group="verification">
 			This example assumes that the mock has been used, and later we want to verify that a given
@@ -371,7 +371,7 @@
 	<doc for="Mock{T}.Verify{TResult}(expression,times)">
 		<summary>
 			Verifies that a specific invocation matching the given
-			expression was performed on the mock. Use in conjuntion
+			expression was performed on the mock. Use in conjunction
 			with the default <see cref="MockBehavior.Loose"/>.
 		</summary>
 		<exception cref="MockException">
