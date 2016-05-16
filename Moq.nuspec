@@ -172,8 +172,17 @@ Version 1.0
 * Initial release, initial documentation process in place, etc. 
 </releaseNotes>
     <dependencies>
+      <group targetFramework=".NETFramework3.5">
+        <dependency id="Castle.Core" version="[4.0.0-alpha001, )" />
+      </group>
+      <group targetFramework=".NETFramework4.0">
+        <dependency id="Castle.Core" version="[4.0.0-alpha001, )" />
+      </group>
+      <group targetFramework="sl5">
+        <dependency id="Castle.Core" version="3.3.3" />
+      </group>
       <group targetFramework=".NETStandard1.3">
-        <dependency id="Castle.Core" version="4.0.0-alpha003" />
+        <dependency id="Castle.Core" version="4.0.0-alpha001" />
         <dependency id="System.Collections" version="4.0.10" />
         <dependency id="System.Diagnostics.Debug" version="4.0.10" />
         <dependency id="System.Diagnostics.Tools" version="4.0.0" />
