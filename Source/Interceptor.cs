@@ -54,11 +54,11 @@ namespace Moq
 	/// </summary>
 	internal class Interceptor : ICallInterceptor
 	{
-		private Dictionary<ExpressionKey, IProxyCall> calls = new Dictionary<ExpressionKey, IProxyCall>();
+		private readonly Dictionary<ExpressionKey, IProxyCall> calls = new Dictionary<ExpressionKey, IProxyCall>();
 
-		public Interceptor(MockBehavior behavior, Type targetType, Mock mock)
+		public Interceptor(Type targetType, Mock mock)
 		{
-			InterceptionContext = new InterceptorContext(mock, targetType, behavior);
+			InterceptionContext = new InterceptorContext(mock, targetType);
 		}
 
         internal InterceptorContext InterceptionContext { get; private set; }

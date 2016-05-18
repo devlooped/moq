@@ -50,7 +50,7 @@
       <HintPath>..\packages\Castle.Core.3.3.3\lib\net35\Castle.Core.dll</HintPath>
       <Visible>False</Visible>
     </Reference>
-		<Reference Include="ClassLibrary1">
+    <Reference Include="ClassLibrary1">
       <HintPath>.\ClassLibrary1.dll</HintPath>
     </Reference>
     <Reference Include="ClassLibrary2">
@@ -84,6 +84,7 @@
     <Compile Include="ConditionalSetupFixture.cs" />
     <Compile Include="CustomMatcherFixture.cs" />
     <Compile Include="ExtensionsFixture.cs" />
+    <Compile Include="Linq\BehaviorFixture.cs" />
     <Compile Include="ReturnsExtensionsFixture.cs" />
     <Compile Include="Linq\MockRepositoryQuerying.cs" />
     <Compile Include="MockedDelegatesFixture.cs" />

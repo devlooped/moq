@@ -1,11 +1,9 @@
 ﻿using System;
+using System.Collections.Generic;
 using System.Linq;
 using Xunit;
-using System.Collections.Generic;
-using System.Linq.Expressions;
-using System.Reflection;
 
-namespace Moq.Tests
+namespace Moq.Tests.Linq
 {
 	public class QueryableMocksFixture
 	{

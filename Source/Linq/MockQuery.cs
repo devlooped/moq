@@ -52,7 +52,7 @@ namespace Moq.Linq
 	/// </summary>
 	internal class MockQueryable<T> : IQueryable<T>, IQueryProvider
 	{
-		private MethodCallExpression underlyingCreateMocks;
+		private readonly MethodCallExpression underlyingCreateMocks;
 
 		/// <summary>
 		/// The <paramref name="underlyingCreateMocks"/> is a 
