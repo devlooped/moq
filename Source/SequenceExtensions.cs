@@ -1,11 +1,8 @@
 ﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Linq.Expressions;
-using Moq.Language.Flow;
-using Moq.Language;
 using System.Diagnostics.CodeAnalysis;
+using System.Linq.Expressions;
+using System.Threading.Tasks;
+using Moq.Language;
 
 namespace Moq
 {
@@ -24,6 +21,28 @@ namespace Moq
 			where TMock : class
 		{
 			return new SetupSequentialContext<TMock, TResult>(mock, expression);
+		}
+
+		/// <summary>
+		/// Return a sequence of tasks, once per call.
+		/// </summary>
+		public static ISetupSequentialResult<Task<TResult>> ReturnsAsync<TResult>(this ISetupSequentialResult<Task<TResult>> setup, TResult value)
+		{
+			var tcs = new TaskCompletionSource<TResult>();
+			tcs.SetResult(value);
+
+			return setup.Returns(tcs.Task);
+		}
+
+		/// <summary>
+		/// Throws a sequence of exceptions, once per call.
+		/// </summary>
+		public static ISetupSequentialResult<Task<TResult>> ThrowsAsync<TResult>(this ISetupSequentialResult<Task<TResult>> setup, Exception exception)
+		{
+			var tcs = new TaskCompletionSource<TResult>();
+			tcs.SetException(exception);
+
+			return setup.Returns(tcs.Task);
 		}
 	}
 }
