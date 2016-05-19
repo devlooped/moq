@@ -168,7 +168,7 @@ namespace Moq
 				var index = 0;
 				while (eq && index < this.values.Count)
 				{
-					eq |= this.values[index] == key.values[index];
+					eq &= this.values[index] == key.values[index];
 					index++;
 				}
 
@@ -177,17 +177,20 @@ namespace Moq
 
 			public override int GetHashCode()
 			{
-				var hash = fixedString.GetHashCode();
-
-				foreach (var value in values)
+				unchecked
 				{
-					if (value != null)
-					{
-						hash ^= value.GetHashCode();
-					}
-				}
+					var hash = fixedString.GetHashCode();
 
-				return hash;
+					foreach (var value in values)
+					{
+						if (value != null)
+						{
+							hash = (hash * 397) ^ value.GetHashCode();
+						}
+					}
+	
+					return hash;
+				}
 			}
 		}
 
