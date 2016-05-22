@@ -113,7 +113,7 @@ namespace Moq.Tests.Regressions
 			}
 		}
 
-		[Fact(Timeout = 2000)]
+		[Fact]
 		public void CallsToExternalCodeNotLockedInInterceptor()
 		{
 			var testMock = new Mock<Issue47ClassToMock> { CallBase = true };
@@ -1418,7 +1418,7 @@ namespace Moq.Tests.Regressions
             [Fact]
             public void Test()
             {
-                Assert.DoesNotThrow(() => new Mock<IFoo>().SetupAllProperties());
+                new Mock<IFoo>().SetupAllProperties();
             }
 
             public interface IFoo
@@ -1523,7 +1523,7 @@ namespace Moq.Tests.Regressions
                     .Returns(data.Length);
 
                 var contents = new byte[stream.Object.Length];
-                Assert.DoesNotThrow(() => stream.Object.Read(contents, 0, (int)stream.Object.Length));
+                stream.Object.Read(contents, 0, (int)stream.Object.Length);
             }
         }
 
@@ -1619,7 +1619,7 @@ namespace Moq.Tests.Regressions
                 var mock = new Mock<ITest>();
 
                 ITest instance;
-                Assert.DoesNotThrow(() => instance = mock.Object);
+                instance = mock.Object;
             }
 
             public interface ITest

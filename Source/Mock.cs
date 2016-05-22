@@ -53,7 +53,7 @@ using System.Runtime.CompilerServices;
 namespace Moq
 {
 	/// <include file='Mock.xdoc' path='docs/doc[@for="Mock"]/*'/>
-	public abstract partial class Mock : IHideObjectMembers
+	public abstract partial class Mock : IFluentInterface
 	{
 		private bool isInitialized;
 		private bool callBase;

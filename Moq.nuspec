@@ -11,7 +11,11 @@
     <requireLicenseAcceptance>false</requireLicenseAcceptance>
     <description>Moq is the most popular and friendly mocking framework for .NET</description>
     <tags>moq tdd mocking mocks unittesting agile unittest</tags>
-    <releaseNotes>Version 4.3
+    <releaseNotes>Version 4.5
+* Dropped support for .NET &lt; 4.5 and Silverlight
+* Add support for .NET Core
+
+Version 4.3
 * Added support for Roslyn
 * Automatically add implemented interfaces to mock
 
@@ -172,4 +176,9 @@ Version 1.0
 * Initial release, initial documentation process in place, etc. 
 </releaseNotes>
   </metadata>
+  <files>
+		<file src="Source\bin\$configuration$\v4.5\Moq.dll" target="lib\net45" />
+		<file src="Source\bin\$configuration$\v4.5\Moq.pdb" target="lib\net45" />
+		<file src="Source\bin\$configuration$\v4.5\Moq.xml" target="lib\net45" />    
+  </files>
 </package>
