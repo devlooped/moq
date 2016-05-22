@@ -86,6 +86,78 @@ namespace Moq.Tests
 			Assert.Same(mock1.DelegateInterfaceMethod, mock2.DelegateInterfaceMethod);
 		}
 
+		[Fact]
+		public void CanHandleOutParameterOfActionAsSameAsVoidMethod()
+		{
+			var out1 = 42;
+			var methMock = new Mock<TypeOutAction<int>>();
+			methMock.Setup(t => t.Invoke(out out1));
+			var dlgtMock = new Mock<DelegateOutAction<int>>();
+			dlgtMock.Setup(f => f(out out1));
+
+			var methOut1 = default(int);
+			methMock.Object.Invoke(out methOut1);
+			var dlgtOut1 = default(int);
+			dlgtMock.Object(out dlgtOut1);
+
+			Assert.Equal(methOut1, dlgtOut1);
+		}
+
+		[Fact]
+		public void CanHandleRefParameterOfActionAsSameAsVoidMethod()
+		{
+			var ref1 = 42;
+			var methMock = new Mock<TypeRefAction<int>>(MockBehavior.Strict);
+			methMock.Setup(t => t.Invoke(ref ref1));
+			var dlgtMock = new Mock<DelegateRefAction<int>>(MockBehavior.Strict);
+			dlgtMock.Setup(f => f(ref ref1));
+
+			var methRef1 = 42;
+			methMock.Object.Invoke(ref methRef1);
+			var dlgtRef1 = 42;
+			dlgtMock.Object(ref dlgtRef1);
+
+			methMock.VerifyAll();
+			dlgtMock.VerifyAll();
+		}
+
+		[Fact]
+		public void CanHandleOutParameterOfFuncAsSameAsReturnableMethod()
+		{
+			var out1 = 42;
+			var methMock = new Mock<TypeOutFunc<int, int>>();
+			methMock.Setup(t => t.Invoke(out out1)).Returns(114514);
+			var dlgtMock = new Mock<DelegateOutFunc<int, int>>();
+			dlgtMock.Setup(f => f(out out1)).Returns(114514);
+
+			var methOut1 = default(int);
+			var methResult = methMock.Object.Invoke(out methOut1);
+			var dlgtOut1 = default(int);
+			var dlgtResult = dlgtMock.Object(out dlgtOut1);
+
+			Assert.Equal(methOut1, dlgtOut1);
+			Assert.Equal(methResult, dlgtResult);
+		}
+
+		[Fact]
+		public void CanHandleRefParameterOfFuncAsSameAsReturnableMethod()
+		{
+			var ref1 = 42;
+			var methMock = new Mock<TypeRefFunc<int, int>>(MockBehavior.Strict);
+			methMock.Setup(t => t.Invoke(ref ref1)).Returns(114514);
+			var dlgtMock = new Mock<DelegateRefFunc<int, int>>(MockBehavior.Strict);
+			dlgtMock.Setup(f => f(ref ref1)).Returns(114514);
+
+			var methRef1 = 42;
+			var methResult = methMock.Object.Invoke(ref methRef1);
+			var dlgtRef1 = 42;
+			var dlgtResult = dlgtMock.Object(ref dlgtRef1);
+
+			methMock.VerifyAll();
+			dlgtMock.VerifyAll();
+			Assert.Equal(methResult, dlgtResult);
+		}
+
 		private static void Use(Action<int> action, int valueToPass)
 		{
 			action(valueToPass);
@@ -115,5 +187,14 @@ namespace Moq.Tests
 				}
 			}
 		}
+
+		public interface TypeOutAction<TOut1> { void Invoke(out TOut1 out1); }
+		public delegate void DelegateOutAction<TOut1>(out TOut1 out1);
+		public interface TypeRefAction<TRef1> { void Invoke(ref TRef1 ref1); }
+		public delegate void DelegateRefAction<TRef1>(ref TRef1 ref1);
+		public interface TypeOutFunc<TOut1, TResult> { TResult Invoke(out TOut1 out1); }
+		public delegate TResult DelegateOutFunc<TOut1, TResult>(out TOut1 out1);
+		public interface TypeRefFunc<TRef1, TResult> { TResult Invoke(ref TRef1 ref1); }
+		public delegate TResult DelegateRefFunc<TRef1, TResult>(ref TRef1 ref1);
 	}
 }

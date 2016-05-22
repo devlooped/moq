@@ -125,10 +125,15 @@ namespace Moq.Proxy
 					var delegateParameterTypes = invokeMethodOnDelegate.GetParameters().Select(p => p.ParameterType).ToArray();
 
 					// Create a method on the interface with the same signature as the delegate.
-					newTypeBuilder.DefineMethod("Invoke",
-					                            MethodAttributes.Public | MethodAttributes.Virtual | MethodAttributes.Abstract,
-					                            CallingConventions.HasThis,
-					                            invokeMethodOnDelegate.ReturnType, delegateParameterTypes);
+					var newMethBuilder = newTypeBuilder.DefineMethod("Invoke",
+					                                                 MethodAttributes.Public | MethodAttributes.Virtual | MethodAttributes.Abstract,
+					                                                 CallingConventions.HasThis,
+					                                                 invokeMethodOnDelegate.ReturnType, delegateParameterTypes);
+
+					foreach (var param in invokeMethodOnDelegate.GetParameters())
+					{
+						newMethBuilder.DefineParameter(param.Position + 1, param.Attributes, param.Name);
+					}
 
 #if FEATURE_LEGACY_REFLECTION_API
 					delegateInterfaceType = newTypeBuilder.CreateType();

@@ -39,6 +39,7 @@
 // http://www.opensource.org/licenses/bsd-license.php]
 
 using System;
+using System.Collections.Concurrent;
 using System.Collections.Generic;
 using System.Reflection;
 
@@ -55,7 +56,7 @@ namespace Moq
 			this.owner = owner;
 		}
 
-		internal override Dictionary<MethodInfo, Mock> InnerMocks
+		internal override ConcurrentDictionary<MethodInfo, Mock> InnerMocks
 		{
 			get { return this.owner.InnerMocks; }
 		}

@@ -1,5 +1,5 @@
 ﻿<?xml version="1.0" encoding="utf-8"?>
-<Project ToolsVersion="4.0" DefaultTargets="Build" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
+<Project ToolsVersion="12.0" DefaultTargets="Build" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
   <PropertyGroup>
     <Configuration Condition=" '$(Configuration)' == '' ">Debug</Configuration>
     <Platform Condition=" '$(Platform)' == '' ">AnyCPU</Platform>
@@ -10,25 +10,22 @@
     <AppDesignerFolder>Properties</AppDesignerFolder>
     <RootNamespace>Moq</RootNamespace>
     <AssemblyName>Moq</AssemblyName>
-    <TargetFrameworkVersion>v4.0</TargetFrameworkVersion>
+    <TargetFrameworkVersion Condition=" '$(TargetFrameworkVersion)' == '' ">v4.5</TargetFrameworkVersion>
     <FileAlignment>512</FileAlignment>
-    <SignAssembly>true</SignAssembly>
-    <AssemblyOriginatorKeyFile>..\Moq.snk</AssemblyOriginatorKeyFile>
-    <TargetFrameworkProfile />
-    <SolutionDir Condition="$(SolutionDir) == '' Or $(SolutionDir) == '*Undefined*'">..\</SolutionDir>
-    <RestorePackages>true</RestorePackages>
   </PropertyGroup>
   <PropertyGroup>
+    <GitIgnoreTagVersion>true</GitIgnoreTagVersion>
+    <GitIgnoreBranchVersion>true</GitIgnoreBranchVersion>
     <OutputPath>bin\$(Configuration)\</OutputPath>
     <DebugSymbols>true</DebugSymbols>
     <DebugType>full</DebugType>
-    <DefineConstants Condition=" '$(TargetFrameworkVersion)' == 'v3.5' ">NET3x</DefineConstants>
-    <DefineConstants>$(DefineConstants);FEATURE_LEGACY_REFLECTION_API;FEATURE_SERIALIZATION</DefineConstants>
     <ErrorReport>prompt</ErrorReport>
     <WarningLevel>4</WarningLevel>
     <DocumentationFile>bin\$(Configuration)\$(AssemblyName).xml</DocumentationFile>
     <TreatWarningsAsErrors>true</TreatWarningsAsErrors>
     <CodeAnalysisRuleSet>AllRules.ruleset</CodeAnalysisRuleSet>
+    <SignAssembly>true</SignAssembly>
+    <AssemblyOriginatorKeyFile>..\Moq.snk</AssemblyOriginatorKeyFile>
   </PropertyGroup>
   <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Debug|AnyCPU' ">
     <Optimize>false</Optimize>
@@ -42,14 +39,6 @@
     <MergeReferences>true</MergeReferences>
   </PropertyGroup>
   <ItemGroup>
-    <Reference Condition=" '$(TargetFrameworkVersion)' == 'v4.0' " Include="Castle.Core, Version=4.0.0.0, Culture=neutral, PublicKeyToken=407dd0808d44fbdc, processorArchitecture=MSIL">
-      <SpecificVersion>False</SpecificVersion>
-      <HintPath>..\packages\Castle.Core.4.0.0-alpha001\lib\net40-client\Castle.Core.dll</HintPath>
-    </Reference>
-    <Reference Condition=" '$(TargetFrameworkVersion)' == 'v3.5' " Include="Castle.Core, Version=4.0.0.0, Culture=neutral, PublicKeyToken=407dd0808d44fbdc, processorArchitecture=MSIL">
-      <SpecificVersion>False</SpecificVersion>
-      <HintPath>..\packages\Castle.Core.4.0.0-alpha001\lib\net35\Castle.Core.dll</HintPath>
-    </Reference>
     <Reference Include="System" />
     <Reference Include="System.Core" />
     <Reference Include="System.Xml" />
@@ -121,7 +110,6 @@
     <Compile Include="Extensions.cs" />
     <Compile Include="Evaluator.cs" />
     <Compile Include="Guard.cs" />
-    <Compile Include="IHideObjectMembers.cs" />
     <Compile Include="Language\IReturnsGetter.cs" />
     <Compile Include="Language\ICallbackGetter.cs" />
     <Compile Include="Language\Flow\IThrowsResult.cs" />
@@ -235,7 +223,7 @@
       <Generator>TextTemplatingFileGenerator</Generator>
       <LastGenOutput>MethodCall.Generated.cs</LastGenOutput>
     </None>
-    <None Include="packages.config" />
+    <None Include="project.json" />
     <None Include="Times.xdoc">
       <DependentUpon>Times.cs</DependentUpon>
     </None>
@@ -244,9 +232,18 @@
     <Service Include="{508349B6-6B84-4DF5-91F0-309BEEBAD82D}" />
   </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
+  <Target Name="AfterBuild" Condition=" '$(MergeReferences)' == 'true' ">
+    <GetReferenceAssemblyPaths BypassFrameworkInstallChecks="False" TargetFrameworkMoniker=".NETFramework,Version=$(TargetFrameworkVersion)">
+      <Output TaskParameter="FullFrameworkReferenceAssemblyPaths" PropertyName="FullFrameworkReferenceAssemblyPaths" />
+    </GetReferenceAssemblyPaths>
+    <CreateItem Include="@(ReferenceCopyLocalPaths)" Condition="'%(Extension)'=='.dll'">
+      <Output TaskParameter="Include" ItemName="ILMergeAssemblies" />
+    </CreateItem>
+    <Exec Command="&quot;$(MSBuildProjectPath)..\Tools\Ilmerge.exe&quot; /internalize:&quot;$(MSBuildProjectPath)ilmerge.exclude&quot; /ndebug /keyfile:$(AssemblyOriginatorKeyFile) /out:@(MainAssembly) /targetplatform:&quot;v4,$(FullFrameworkReferenceAssemblyPaths)\.&quot; &quot;@(IntermediateAssembly)&quot; @(ILMergeAssemblies->'&quot;%(FullPath)&quot;', ' ')" />
+    <Delete Files="@(ReferenceCopyLocalPaths->'$(OutDir)%(DestinationSubDirectory)%(Filename)%(Extension)')" />
+  </Target>
   <Target Name="CleanAnalysisLogs" AfterTargets="Build">
     <Delete Files="$(OutDir)Moq.dll.CodeAnalysisLog.xml" ContinueOnError="true" />
     <Delete Files="$(OutDir)Moq.dll.lastcodeanalysissucceeded" ContinueOnError="true" />
   </Target>
-  <Import Project="$(SolutionDir)\.nuget\NuGet.targets" Condition="Exists('$(SolutionDir)\.nuget\NuGet.targets')" />
 </Project>

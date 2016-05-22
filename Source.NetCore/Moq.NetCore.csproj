@@ -13,37 +13,30 @@
     <DefaultLanguage>en-US</DefaultLanguage>
     <FileAlignment>512</FileAlignment>
     <ProjectTypeGuids>{786C830F-07A1-408B-BD7F-6EE04809D6DB};{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}</ProjectTypeGuids>
-    <TargetFrameworkProfile>
-    </TargetFrameworkProfile>
     <TargetFrameworkVersion>v5.0</TargetFrameworkVersion>
   </PropertyGroup>
-  <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Debug|AnyCPU' ">
+  <PropertyGroup>
+    <GitIgnoreTagVersion>true</GitIgnoreTagVersion>
+    <GitIgnoreBranchVersion>true</GitIgnoreBranchVersion>
+    <OutputPath>bin\$(Configuration)\</OutputPath>
     <DebugSymbols>true</DebugSymbols>
     <DebugType>full</DebugType>
-    <Optimize>false</Optimize>
-    <OutputPath>bin\Debug\</OutputPath>
-    <DefineConstants>TRACE;DEBUG;NETCORE;</DefineConstants>
-    <MergeReferences>false</MergeReferences>
     <ErrorReport>prompt</ErrorReport>
     <WarningLevel>4</WarningLevel>
+    <DocumentationFile>bin\$(Configuration)\$(AssemblyName).xml</DocumentationFile>
     <TreatWarningsAsErrors>true</TreatWarningsAsErrors>
-    <DocumentationFile>bin\Debug\Moq.xml</DocumentationFile>
-  </PropertyGroup>
-  <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Release|AnyCPU' ">
-    <DebugType>pdbonly</DebugType>
-    <Optimize>true</Optimize>
-    <OutputPath>bin\Release\</OutputPath>
-    <DefineConstants>TRACE;NETCORE;</DefineConstants>
-    <MergeReferences>false</MergeReferences>
-    <ErrorReport>prompt</ErrorReport>
-    <WarningLevel>4</WarningLevel>
-    <DocumentationFile>bin\Release\Moq.xml</DocumentationFile>
-  </PropertyGroup>
-  <PropertyGroup>
+    <SignAssembly>true</SignAssembly>
     <AssemblyOriginatorKeyFile>..\Moq.snk</AssemblyOriginatorKeyFile>
   </PropertyGroup>
-  <PropertyGroup>
-    <SignAssembly>true</SignAssembly>
+  <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Debug|AnyCPU' ">
+    <Optimize>false</Optimize>
+    <DefineConstants>$(DefineConstants);TRACE;DEBUG;NETCORE;</DefineConstants>
+    <MergeReferences>false</MergeReferences>
+  </PropertyGroup>
+  <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Release|AnyCPU' ">
+    <Optimize>true</Optimize>
+    <DefineConstants>$(DefineConstants);TRACE;NETCORE;</DefineConstants>
+    <MergeReferences>true</MergeReferences>
   </PropertyGroup>
   <ItemGroup>
     <None Include="..\Moq.snk" />
@@ -89,9 +82,6 @@
     </Compile>
     <Compile Include="..\Source\IDefaultValueProvider.cs">
       <Link>IDefaultValueProvider.cs</Link>
-    </Compile>
-    <Compile Include="..\Source\IHideObjectMembers.cs">
-      <Link>IHideObjectMembers.cs</Link>
     </Compile>
     <Compile Include="..\Source\IInterceptStrategy.cs">
       <Link>IInterceptStrategy.cs</Link>
@@ -360,19 +350,14 @@
     </EmbeddedResource>
   </ItemGroup>
   <Import Project="$(MSBuildExtensionsPath32)\Microsoft\Portable\$(TargetFrameworkVersion)\Microsoft.Portable.CSharp.targets" />
-  <!-- To modify your build process, add your task inside one of the targets below and uncomment it. 
-       Other similar extension points exist, see Microsoft.Common.targets.
-  <Target Name="BeforeBuild">
-  </Target>
-  -->
   <Target Name="AfterBuild" Condition=" '$(MergeReferences)' == 'true' ">
     <GetReferenceAssemblyPaths BypassFrameworkInstallChecks="False" TargetFrameworkMoniker=".NETPortable,Version=v5.0">
-      <Output TaskParameter="FullFrameworkReferenceAssemblyPaths" PropertyName="FullFramework4ReferenceAssemblyPaths" />
+      <Output TaskParameter="FullFrameworkReferenceAssemblyPaths" PropertyName="FullFrameworkReferenceAssemblyPaths" />
     </GetReferenceAssemblyPaths>
     <CreateItem Include="@(ReferenceCopyLocalPaths)" Condition="'%(Extension)'=='.dll'">
       <Output TaskParameter="Include" ItemName="ILMergeAssemblies" />
     </CreateItem>
-    <Exec Command="&quot;$(MSBuildProjectPath)..\Tools\Ilmerge.exe&quot; /internalize:&quot;$(MSBuildProjectPath)..\Source\ilmerge.exclude&quot; /ndebug /keyfile:$(AssemblyOriginatorKeyFile) /out:@(MainAssembly) /targetplatform:&quot;v4,$(FullFramework4ReferenceAssemblyPaths)\.&quot; &quot;@(IntermediateAssembly)&quot; @(ILMergeAssemblies->'&quot;%(FullPath)&quot;', ' ')" />
+    <Exec Command="&quot;$(MSBuildProjectPath)..\Tools\Ilmerge.exe&quot; /internalize:&quot;$(MSBuildProjectPath)..\Source\ilmerge.exclude&quot; /ndebug /keyfile:$(AssemblyOriginatorKeyFile) /out:@(MainAssembly) /targetplatform:&quot;v4,$(FullFrameworkReferenceAssemblyPaths)\.&quot; &quot;@(IntermediateAssembly)&quot; @(ILMergeAssemblies->'&quot;%(FullPath)&quot;', ' ')" />
     <Delete Files="@(ReferenceCopyLocalPaths->'$(OutDir)%(DestinationSubDirectory)%(Filename)%(Extension)')" />
   </Target>
   <PropertyGroup>
