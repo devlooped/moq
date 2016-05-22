@@ -49,7 +49,7 @@ namespace Moq.Language
 	/// Defines the <c>Throws</c> verb.
 	/// </summary>
 	[EditorBrowsable(EditorBrowsableState.Never)]
-	public interface IThrows : IHideObjectMembers
+	public interface IThrows : IFluentInterface
 	{
 		/// <summary>
 		/// Specifies the exception to throw when the method is invoked.
