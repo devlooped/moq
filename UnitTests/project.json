@@ -5,7 +5,7 @@
     "xunit.runner.visualstudio": "2.1.0"
   },
   "frameworks": {
-    "net452": {}
+    "net45": {}
   },
   "runtimes": {
     "win": {}
