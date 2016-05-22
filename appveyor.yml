@@ -5,7 +5,7 @@ init:
 
 build_script:
   - cmd: >-
-      build.cmd /logger:"C:\Program Files\AppVeyor\BuildAgent\Appveyor.MSBuildLogger.dll"
+      build.cmd /v:diag /logger:"C:\Program Files\AppVeyor\BuildAgent\Appveyor.MSBuildLogger.dll"
 
 # we run the tests ourselves in build.cmd for coverage
 test: off
