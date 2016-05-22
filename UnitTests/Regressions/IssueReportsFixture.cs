@@ -249,6 +249,36 @@ namespace Moq.Tests.Regressions
 
         #endregion // #184
 
+        #region #252
+
+        public class Issue252
+        {
+            [Fact]
+            public void SetupsWithSameArgumentsInDifferentOrderShouldNotOverwriteEachOther()
+            {
+                var mock = new Mock<ISimpleInterface>();
+
+                var a = new MyClass();
+                var b = new MyClass();
+                
+                mock.Setup(m => m.Method(a, b)).Returns(1);
+                mock.Setup(m => m.Method(b, a)).Returns(2);
+
+                Assert.Equal(1, mock.Object.Method(a, b));
+                Assert.Equal(2, mock.Object.Method(b, a));
+            }
+
+            public interface ISimpleInterface
+            {
+                int Method(MyClass a, MyClass b);
+            }
+
+            public class MyClass { }
+        }
+
+        #endregion // #252
+
+
         // Old @ Google Code
 
         #region #47
