@@ -14,7 +14,6 @@ using System.Runtime.InteropServices;
 [assembly: AssemblyInformationalVersion (ThisAssembly.Git.SemVer.Major + "." + ThisAssembly.Git.SemVer.Minor + "." + ThisAssembly.Git.SemVer.Patch + "-" + ThisAssembly.Git.Branch + "+" + ThisAssembly.Git.Commit)]
 
 [assembly: ComVisible(false)]
-[assembly: NeutralResourcesLanguage("en")]
 
 #if DEBUG
 [assembly: AssemblyConfiguration ("DEBUG")]
