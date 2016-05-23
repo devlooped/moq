@@ -36,7 +36,7 @@
   <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Release|AnyCPU' ">
     <Optimize>true</Optimize>
     <DefineConstants>$(DefineConstants);TRACE;NETCORE;</DefineConstants>
-    <MergeReferences>true</MergeReferences>
+    <MergeReferences>false</MergeReferences>
   </PropertyGroup>
   <ItemGroup>
     <None Include="..\Moq.snk" />
