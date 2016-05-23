@@ -43,7 +43,7 @@ using System.Globalization;
 using System.Linq.Expressions;
 using Moq.Properties;
 using Moq.Matchers;
-#if !FEATURE_LEGACY_REFLECTION_API
+#if NETCORE
 using System.Reflection;
 #endif
 

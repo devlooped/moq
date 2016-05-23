@@ -190,18 +190,9 @@ namespace Moq.Protected
 
 		private static MethodInfo GetMethod(string methodName, params object[] args)
 		{
-#if FEATURE_LEGACY_REFLECTION_API
-			return typeof(T).GetMethod(
-				methodName,
-				BindingFlags.Instance | BindingFlags.NonPublic | BindingFlags.Public,
-				null,
-				ToArgTypes(args),
-				null);
-#else
 			var argTypes = ToArgTypes(args);
 			return typeof(T).GetMethods(BindingFlags.Instance | BindingFlags.NonPublic | BindingFlags.Public)
 				.SingleOrDefault(m => m.Name == methodName && m.HasMatchingParameterTypes(argTypes));
-#endif
 		}
 
 		private static Expression<Func<T, TResult>> GetMethodCall<TResult>(MethodInfo method, object[] args)
@@ -327,22 +318,6 @@ namespace Moq.Protected
 				else if (expr.NodeType == ExpressionType.MemberAccess)
 				{
 					var member = (MemberExpression)expr;
-#if FEATURE_LEGACY_REFLECTION_API
-					switch (member.Member.MemberType)
-					{
-						case MemberTypes.Field:
-							types[index] = ((FieldInfo)member.Member).FieldType;
-							break;
-						case MemberTypes.Property:
-							types[index] = ((PropertyInfo)member.Member).PropertyType;
-							break;
-						default:
-							throw new NotSupportedException(string.Format(
-								Resources.Culture,
-								Resources.UnsupportedMember,
-								member.Member.Name));
-					}
-#else
 					if ((member.Member as FieldInfo) != null)
 					{
 						types[index] = ((FieldInfo)member.Member).FieldType;
@@ -358,7 +333,6 @@ namespace Moq.Protected
 							Resources.UnsupportedMember,
 							member.Member.Name));
 					}
-#endif
 				}
 				else
 				{

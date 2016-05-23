@@ -1,7 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Linq;
-#if !FEATURE_LEGACY_REFLECTION_API
+#if NETCORE
 using System.Reflection;
 #endif
 #if !NET3x

@@ -55,11 +55,7 @@ namespace Moq
 			var prop = expression.ToPropertyInfo();
 			ThrowIfPropertyNotWritable(prop);
 
-#if FEATURE_LEGACY_REFLECTION_API
-			var setter = prop.GetSetMethod();
-#else
 			var setter = prop.SetMethod;
-#endif
 			ThrowIfCantOverride(expression, setter);
 
 			var call = new SetterMethodCall<T, TProperty>(mock, expression, setter, value);
@@ -78,11 +74,7 @@ namespace Moq
 			string failMessage)
 			where T : class
 		{
-#if FEATURE_LEGACY_REFLECTION_API
-			var method = expression.ToPropertyInfo().GetSetMethod();
-#else
 			var method = expression.ToPropertyInfo().SetMethod;
-#endif
 			ThrowIfVerifyNonVirtual(expression, method);
 
 			var expected = new SetterMethodCall<T, TProperty>(mock, expression, method)
@@ -101,11 +93,7 @@ namespace Moq
 			string failMessage)
 			where T : class
 		{
-#if FEATURE_LEGACY_REFLECTION_API
-			var method = expression.ToPropertyInfo().GetSetMethod();
-#else
 			var method = expression.ToPropertyInfo().SetMethod;
-#endif
 			ThrowIfVerifyNonVirtual(expression, method);
 
 			var expected = new SetterMethodCall<T, TProperty>(mock, expression, method, value)

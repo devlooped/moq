@@ -10,10 +10,8 @@
 
 namespace Moq.Properties {
     using System;
-#if !FEATURE_LEGACY_REFLECTION_API
     using System.Reflection;
-#endif
-    
+
     /// <summary>
     ///   A strongly-typed resource class, for looking up localized strings, etc.
     /// </summary>

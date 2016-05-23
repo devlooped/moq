@@ -1,7 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Linq.Expressions;
-#if !FEATURE_LEGACY_REFLECTION_API
+#if NETCORE
 using System.Reflection;
 #endif
 using Xunit;

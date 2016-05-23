@@ -91,11 +91,7 @@ namespace Moq
 				// We may have received a T of an implemented 
 				// interface in the mock.
 				var mock = mockedPlain.Mock;
-#if FEATURE_LEGACY_REFLECTION_API
-				var imockedType = mocked.GetType().GetInterface("IMocked`1", false);
-#else
 				var imockedType = mocked.GetType().GetTypeInfo().ImplementedInterfaces.Single(i => i.Name.Equals("IMocked`1", StringComparison.Ordinal));
-#endif
 				var mockedType = imockedType.GetGenericArguments()[0];
 
 				if (mock.ImplementedInterfaces.Contains(typeof(T)))
@@ -704,17 +700,12 @@ namespace Moq
                         var returnsMethod =
                             genericSetupGetMethod
                                 .ReturnType
-#if FEATURE_LEGACY_REFLECTION_API
-                                .GetInterface("IReturnsGetter`2", ignoreCase: false)
-                                .GetMethod("Returns", new Type[] { property.PropertyType });
-#else
 								.GetTypeInfo()
 								.ImplementedInterfaces
 								.SingleOrDefault(i => i.Name.Equals("IReturnsGetter`2", StringComparison.OrdinalIgnoreCase))
 								.GetTypeInfo()
 								.DeclaredMethods
 								.SingleOrDefault(m => m.Name == "Returns" && m.GetParameterTypes().Count() == 1 && m.GetParameterTypes().First() == property.PropertyType);
-#endif
 
                         var returnsGetter = genericSetupGetMethod.Invoke(mock, new[] { expression });
                         returnsMethod.Invoke(returnsGetter, new[] { initialValue });

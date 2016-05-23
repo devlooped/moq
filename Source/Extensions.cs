@@ -233,7 +233,7 @@ namespace Moq
 			return ev;
 		}
 
-#if FEATURE_LEGACY_REFLECTION_API
+#if !NETCORE
 		public static TAttribute GetCustomAttribute<TAttribute>(this ICustomAttributeProvider source, bool inherit)
 			where TAttribute : Attribute
 		{
@@ -247,21 +247,6 @@ namespace Moq
 			{
 				return (TAttribute)attrs[0];
 			}
-		}
-
-		/// <summary>
-		/// A pass through helper for platforms where GetTypeInfo() is not supported.
-		/// </summary>
-		/// <param name="type"></param>
-		/// <returns></returns>
-		public static Type GetTypeInfo(this Type type)
-		{
-			return type;
-		}
-
-		public static MethodInfo GetMethodInfo(this Delegate @delegate)
-		{
-			return @delegate.Method;
 		}
 #endif
 
