@@ -13,7 +13,9 @@ using Moq.Properties;
 using Moq.Protected;
 using Xunit;
 
+#if !NETCORE
 using System.Web.UI.HtmlControls;
+#endif
 using System.Threading;
 using System.Threading.Tasks;
 
