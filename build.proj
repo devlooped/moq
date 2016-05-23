@@ -32,7 +32,7 @@
 		<MSBuild Projects="@(Solution)" Properties="$(CommonBuildProperties)" />
 
 
-		<Exec Command="xcopy &quot;Source.NetCore\bin\Release\Moq.*&quot; &quot;$(DropDirectory)lib\netstandard1.3\&quot; /Y" ContinueOnError="false" />
+		<Exec Command="xcopy &quot;Source.NetCore\bin\$(Configuration)\Moq.*&quot; &quot;$(DropDirectory)lib\netstandard1.3\&quot; /Y" ContinueOnError="false" />
 
 		<Exec Command="$(PackagesPath)\gitlink\lib\net45\GitLink.exe . -f &quot;$([System.String]::new('%(Solution.FullPath)').Replace('$(MSBuildProjectDirectory)', '').TrimStart('\'))&quot; -skipverify -u https://github.com/moq/moq4 -b $(GitBranch) -c $(Configuration)" />
 	</Target>
