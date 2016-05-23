@@ -7,7 +7,7 @@ namespace Moq.Tests
 {
 	public class ReturnsFixture
 	{
-#if !SILVERLIGHT && !NETCORE
+#if !NETCORE
 		[Fact]
 		public void ReturnsValue()
 		{

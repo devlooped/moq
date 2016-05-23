@@ -188,11 +188,7 @@ namespace Moq
 				var thisMethod = MethodBase.GetCurrentMethod();
 				var mockAssembly = Assembly.GetExecutingAssembly();
 				// Move 'till we're at the entry point into Moq API
-#if !SILVERLIGHT
 				var frame = new StackTrace(true)
-#else
-				var frame = new StackTrace()
-#endif
 					.GetFrames()
 					.SkipWhile(f => f.GetMethod() != thisMethod)
 					.SkipWhile(f => f.GetMethod().DeclaringType == null || f.GetMethod().DeclaringType.Assembly == mockAssembly)
@@ -201,9 +197,7 @@ namespace Moq
 				if (frame != null)
 				{
 					this.FileLine = frame.GetFileLineNumber();
-#if !SILVERLIGHT
 					this.FileName = Path.GetFileName(frame.GetFileName());
-#endif
 					this.TestMethod = frame.GetMethod();
 				}
 #endif

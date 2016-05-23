@@ -47,7 +47,7 @@ using Moq.Proxy;
 using Moq.Language;
 using System.Reflection;
 
-#if !SILVERLIGHT
+#if !NETCORE
 using System.CodeDom;
 using Microsoft.CSharp;
 #endif
@@ -61,7 +61,7 @@ namespace Moq
 		private T instance;
 		private object[] constructorArguments;
 
-		#region Ctors
+#region Ctors
 
 		/// <summary>
 		/// Ctor invoked by AsTInterface exclusively.
@@ -126,7 +126,7 @@ namespace Moq
 
 			var typeName = typeof (T).FullName;
 
-#if !SILVERLIGHT && !NETCORE
+#if !NETCORE
 			if (typeof (T).IsGenericType)
 			{
 				using (var provider = new CSharpCodeProvider())
@@ -157,9 +157,9 @@ namespace Moq
 			}
 		}
 
-		#endregion
+#endregion
 
-		#region Properties
+#region Properties
 
 		/// <include file='Mock.Generic.xdoc' path='docs/doc[@for="Mock{T}.Object"]/*'/>
 		[SuppressMessage("Microsoft.Naming", "CA1716:IdentifiersShouldNotMatchKeywords", MessageId = "Object", Justification = "Exposes the mocked object instance, so it's appropriate.")]
@@ -250,9 +250,9 @@ namespace Moq
 			get { return typeof(T); }
 		}
 
-		#endregion
+#endregion
 
-		#region Setup
+#region Setup
 
 		/// <include file='Mock.Generic.xdoc' path='docs/doc[@for="Mock{T}.Setup"]/*'/>
 		[SuppressMessage("Microsoft.Design", "CA1006:DoNotNestGenericTypesInMemberSignatures", Justification = "By design")]
@@ -313,9 +313,9 @@ namespace Moq
 			return this;
 		}
 
-		#endregion
+#endregion
 
-		#region When
+#region When
 
 		/// <include file='Mock.Generic.xdoc' path='docs/doc[@for="Mock{T}.When"]/*'/>
 		public ISetupConditionResult<T> When(Func<bool> condition)
@@ -328,9 +328,9 @@ namespace Moq
 			return new ConditionalContext<T>(this, condition);
 		}
 
-		#endregion
+#endregion
 
-		#region Verify
+#region Verify
 
 		/// <include file='Mock.Generic.xdoc' path='docs/doc[@for="Mock{T}.Verify(expression)"]/*'/>
 		[SuppressMessage("Microsoft.Design", "CA1006:DoNotNestGenericTypesInMemberSignatures", Justification = "By design")]
@@ -487,9 +487,9 @@ namespace Moq
 			Mock.VerifySet(this, setterExpression, times(), failMessage);
 		}
 
-		#endregion
+#endregion
 
-		#region Raise
+#region Raise
 
 		/// <include file='Mock.Generic.xdoc' path='docs/doc[@for="Mock{T}.Raise"]/*'/>
 		[SuppressMessage("Microsoft.Design", "CA1030:UseEventsWhereAppropriate", Justification = "Raises the event, rather than being one.")]
@@ -527,7 +527,7 @@ namespace Moq
 			}
 		}
 
-		#endregion
+#endregion
 
 		// NOTE: known issue. See https://connect.microsoft.com/VisualStudio/feedback/ViewFeedback.aspx?FeedbackID=318122
 		//public static implicit operator TInterface(Mock<T> mock)

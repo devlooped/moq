@@ -66,7 +66,7 @@ namespace Moq.Proxy
 #pragma warning restore 618
 #endif
 
-#if !SILVERLIGHT && !NETCORE
+#if !NETCORE
 			AttributesToAvoidReplicating.Add<ReflectionPermissionAttribute>();
 			AttributesToAvoidReplicating.Add<PermissionSetAttribute>();
 			AttributesToAvoidReplicating.Add<System.Runtime.InteropServices.MarshalAsAttribute>();
