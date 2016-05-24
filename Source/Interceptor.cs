@@ -175,21 +175,26 @@ namespace Moq
 				return eq;
 			}
 
-			public override int GetHashCode()
-			{
-				var hash = fixedString.GetHashCode();
+            public override int GetHashCode()
+            {
+                var hash = fixedString.GetHashCode();
 
-				foreach (var value in values)
-				{
-					if (value != null)
-					{
-						hash ^= value.GetHashCode();
-					}
-				}
+                var factor = 1;
+                foreach (var value in values)
+                {
+                    if (value != null)
+                    {
+                        // we use a factor that increases with each following value (argument)
+                        // so that if the values are in a different order, we get a different hash code
+                        // see GitHub issue #252
+                        hash ^= value.GetHashCode() / factor;
+                    }
+                    factor *= 3;
+                }
 
-				return hash;
-			}
-		}
+                return hash;
+            }
+        }
 
 		private class ConstantsVisitor : ExpressionVisitor
 		{

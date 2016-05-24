@@ -12,8 +12,8 @@
     <description>Moq is the most popular and friendly mocking framework for .NET</description>
     <tags>moq tdd mocking mocks unittesting agile unittest</tags>
     <releaseNotes>Version 4.5
+* Updated to .NET 4.5
 * Dropped support for .NET &lt; 4.5 and Silverlight
-* Add support for .NET Core
 
 Version 4.3
 * Added support for Roslyn
