@@ -1,3 +1,8 @@
+Version 4.6
+* Updated to .NET 4.5
+* Dropped support for .NET &lt; 4.5 and Silverlight
+* Remove ILMerge. Depend on Castle NuGet package instead.
+
 Version 4.3
 * Added support for Roslyn
 * Automatically add implemented interfaces to mock
