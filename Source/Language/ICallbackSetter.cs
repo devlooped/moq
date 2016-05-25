@@ -49,7 +49,7 @@ namespace Moq.Language
 	/// </summary>
 	/// <typeparam name="TProperty">Type of the property.</typeparam>
 	[EditorBrowsable(EditorBrowsableState.Never)]
-	public interface ICallbackSetter<TProperty> : IHideObjectMembers
+	public interface ICallbackSetter<TProperty> : IFluentInterface
 	{ 
 		/// <summary>
 		/// Specifies a callback to invoke when the property is set that receives the 

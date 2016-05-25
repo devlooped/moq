@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Threading.Tasks;
 using Xunit;
 
 namespace Moq.Tests
@@ -18,6 +19,29 @@ namespace Moq.Tests
 			Assert.Equal(2, mock.Object.Do());
 			Assert.Equal(3, mock.Object.Do());
 			Assert.Throws<InvalidOperationException>(() => mock.Object.Do());
+		}
+
+		[Fact]
+		public void PerformSequenceAsync()
+		{
+			var mock = new Mock<IFoo>();
+
+			mock.SetupSequence(x => x.DoAsync())
+				.ReturnsAsync(2)
+				.ReturnsAsync(3)
+				.ThrowsAsync(new InvalidOperationException());
+
+			Assert.Equal(2, mock.Object.DoAsync().Result);
+			Assert.Equal(3, mock.Object.DoAsync().Result);
+
+			try
+			{
+				var x = mock.Object.DoAsync().Result;
+			}
+			catch (AggregateException ex)
+			{
+				Assert.IsType<InvalidOperationException>(ex.GetBaseException());
+			}
 		}
 
 		[Fact]
@@ -67,7 +91,10 @@ namespace Moq.Tests
 		public interface IFoo
 		{
 			string Value { get; set; }
+
 			int Do();
+
+			Task<int> DoAsync();
 		}
 
 		public class Foo
@@ -75,6 +102,13 @@ namespace Moq.Tests
 			public virtual string Do()
 			{
 				return "Ok";
+			}
+
+			public virtual Task<string> DoAsync()
+			{
+				var tcs = new TaskCompletionSource<string>();
+				tcs.SetResult("Ok");
+				return tcs.Task;
 			}
 		}
 	}

@@ -47,7 +47,7 @@ namespace Moq.Language
 	/// Defines occurrence members to constraint setups.
 	/// </summary>
 	[EditorBrowsable(EditorBrowsableState.Never)]
-	public interface IOccurrence : IHideObjectMembers
+	public interface IOccurrence : IFluentInterface
 	{
 		/// <summary>
 		/// The expected invocation can happen at most once.

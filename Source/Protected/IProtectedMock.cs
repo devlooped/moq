@@ -48,7 +48,7 @@ namespace Moq.Protected
 	/// name as a string, rather than strong-typing them which is not possible 
 	/// due to their visibility.
 	/// </summary>
-	public interface IProtectedMock<TMock> : IHideObjectMembers
+	public interface IProtectedMock<TMock> : IFluentInterface
 		where TMock : class
 	{
 		#region Setup

@@ -13,15 +13,9 @@ using Moq.Properties;
 using Moq.Protected;
 using Xunit;
 
-#if !SILVERLIGHT
-using System.ServiceModel;
-using System.ServiceModel.Web;
 using System.Web.UI.HtmlControls;
 using System.Threading;
-#endif
-#if !Net3x && !SILVERLIGHT
 using System.Threading.Tasks;
-#endif
 
 #region #181
 
@@ -113,7 +107,7 @@ namespace Moq.Tests.Regressions
 			}
 		}
 
-		[Fact(Timeout = 2000)]
+		[Fact]
 		public void CallsToExternalCodeNotLockedInInterceptor()
 		{
 			var testMock = new Mock<Issue47ClassToMock> { CallBase = true };
@@ -254,6 +248,36 @@ namespace Moq.Tests.Regressions
 		}
 
         #endregion // #184
+
+        #region #252
+
+        public class Issue252
+        {
+            [Fact]
+            public void SetupsWithSameArgumentsInDifferentOrderShouldNotOverwriteEachOther()
+            {
+                var mock = new Mock<ISimpleInterface>();
+
+                var a = new MyClass();
+                var b = new MyClass();
+                
+                mock.Setup(m => m.Method(a, b)).Returns(1);
+                mock.Setup(m => m.Method(b, a)).Returns(2);
+
+                Assert.Equal(1, mock.Object.Method(a, b));
+                Assert.Equal(2, mock.Object.Method(b, a));
+            }
+
+            public interface ISimpleInterface
+            {
+                int Method(MyClass a, MyClass b);
+            }
+
+            public class MyClass { }
+        }
+
+        #endregion // #252
+
 
         // Old @ Google Code
 
@@ -1418,7 +1442,7 @@ namespace Moq.Tests.Regressions
             [Fact]
             public void Test()
             {
-                Assert.DoesNotThrow(() => new Mock<IFoo>().SetupAllProperties());
+                new Mock<IFoo>().SetupAllProperties();
             }
 
             public interface IFoo
@@ -1523,7 +1547,7 @@ namespace Moq.Tests.Regressions
                     .Returns(data.Length);
 
                 var contents = new byte[stream.Object.Length];
-                Assert.DoesNotThrow(() => stream.Object.Read(contents, 0, (int)stream.Object.Length));
+                stream.Object.Read(contents, 0, (int)stream.Object.Length);
             }
         }
 
@@ -1619,7 +1643,7 @@ namespace Moq.Tests.Regressions
                 var mock = new Mock<ITest>();
 
                 ITest instance;
-                Assert.DoesNotThrow(() => instance = mock.Object);
+                instance = mock.Object;
             }
 
             public interface ITest
@@ -1937,10 +1961,6 @@ namespace Moq.Tests.Regressions
 
         #endregion
 
-        #region Silverlight excluded
-
-#if !SILVERLIGHT
-
         #region #250
 
         /// <summary>
@@ -1956,84 +1976,6 @@ namespace Moq.Tests.Regressions
                 Assert.NotNull(target.Object);
             }
         }
-
-        #endregion
-
-        #region #250
-
-        public class _254
-        {
-            [Fact]
-            public void ShouldMockInteropDTE()
-            {
-                var dte = new Mock<EnvDTE.DTE>();
-
-                Assert.NotNull(dte.Object);
-            }
-
-#if !NET3x && !SERVER && HAVEOFFICE
-			[Fact]
-			public void ShouldRaiseEventOnInteropInterface()
-			{
-				var app = new Mock<Microsoft.Office.Interop.Word.Application>();
-				var count = 0;
-				app.Object.DocumentOpen += doc => count++;
-
-				app.Raise(x => x.DocumentOpen += null, new Mock<Microsoft.Office.Interop.Word.Document>().Object);
-
-				Assert.Equal(1, count);
-			}
-#endif
-        }
-
-        #endregion
-
-        // run "netsh http add urlacl url=http://+:7777/ user=[domain]\[user]"
-        // to avoid running the test as an admin
-        [Fact(Skip = "Doesn't work in Mono")]
-        public void ProxiesAndHostsWCF()
-        {
-#if DEBUG
-            // On release mode, castle is ILMerged into Moq.dll and this won't compile
-            var generator = new Castle.DynamicProxy.ProxyGenerator();
-            var proxy = generator.CreateClassProxy<ServiceImplementation>();
-            using (var host = new WebServiceHost(proxy, new Uri("http://localhost:7777")))
-            {
-                host.Open();
-            }
-#endif
-        }
-
-        // run "netsh http add urlacl url=http://+:7777/ user=[domain]\[user]"
-        // to avoid running the test as an admin
-        [Fact(Skip = "Doesn't work in Mono")]
-        public void ProxiesAndHostsWCFMock()
-        {
-            //var generator = new Castle.DynamicProxy.ProxyGenerator();
-            var proxy = new Mock<ServiceImplementation>();
-            using (var host = new WebServiceHost(proxy.Object, new Uri("http://localhost:7777")))
-            {
-                host.Open();
-            }
-        }
-
-        [ServiceBehavior(InstanceContextMode = InstanceContextMode.Single)]
-        public class ServiceImplementation : IServiceContract
-        {
-            public void Do()
-            {
-                throw new NotImplementedException();
-            }
-        }
-
-        [ServiceContract]
-        public interface IServiceContract
-        {
-            [OperationContract]
-            void Do();
-        }
-
-#endif
 
         #endregion
 

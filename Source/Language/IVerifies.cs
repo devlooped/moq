@@ -46,7 +46,7 @@ namespace Moq.Language
 	/// Defines the <c>Verifiable</c> verb.
 	/// </summary>
 	[EditorBrowsable(EditorBrowsableState.Never)]
-	public interface IVerifies : IHideObjectMembers
+	public interface IVerifies : IFluentInterface
 	{ 
 		/// <summary>
 		/// Marks the expectation as verifiable, meaning that a call 
