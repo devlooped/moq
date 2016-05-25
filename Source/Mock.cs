@@ -122,6 +122,24 @@ namespace Moq
 
 			throw new ArgumentException(Resources.ObjectInstanceNotMock, "mocked");
 		}
+		
+		/// <include file='Mock.xdoc' path='docs/doc[@for="Mock.Verify"]/*'/>
+		public static void Verify(params Mock[] mocks)
+        	{
+            		foreach (var mock in mocks)
+            		{
+                		mock.Verify();
+            		}
+        	}
+		
+		/// <include file='Mock.xdoc' path='docs/doc[@for="Mock.VerifyAll"]/*'/>
+		public static void VerifyAll(params Mock[] mocks)
+        	{
+            		foreach (var mock in mocks)
+            		{
+                		mock.VerifyAll();
+            		}
+        	}
 
 		/// <include file='Mock.xdoc' path='docs/doc[@for="Mock.Behavior"]/*'/>
 		public virtual MockBehavior Behavior { get; internal set; }
