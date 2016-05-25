@@ -9,7 +9,8 @@
       "bin": {
         "assembly": "../../Source.NetCore/bin/{configuration}/Moq.dll",
         "pdb": "../../Source.NetCore/bin/{configuration}/Moq.pdb"
-      }
+      },
+      "imports": [ "dotnet5.4" ]
     }
   }
 }
