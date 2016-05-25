@@ -17,7 +17,7 @@
         <namespaceSummaryItem name="Castle.DynamicProxy.Generators.Emitters.CodeBuilders" isDocumented="False" />
         <namespaceSummaryItem name="Castle.DynamicProxy.Generators.Emitters.SimpleAST" isDocumented="False" />
         <namespaceSummaryItem name="Castle.DynamicProxy.Serialization" isDocumented="False" />
-        <namespaceSummaryItem name="Moq" isDocumented="True">Root namespace of Moq (pronounced "Mock-you" or just "Mock"), the only mocking library for .NET and Silverlight developed from scratch to take full advantage of .NET 3.5 (i.e. Linq expression trees) and C# 3.0 features (i.e. lambda expressions) that make it the most productive, simple and refactoring-friendly mocking library available.
+        <namespaceSummaryItem name="Moq" isDocumented="True">Root namespace of Moq (pronounced "Mock-you" or just "Mock"), the only mocking library for .NET developed from scratch to take full advantage of .NET 3.5 (i.e. Linq expression trees) and C# 3.0 features (i.e. lambda expressions) that make it the most productive, simple and refactoring-friendly mocking library available.
 &lt;p&gt;
 See the &lt;a href="http://code.google.com/p/moq/wiki/QuickStart"&gt;online quickstarts&lt;/a&gt; for more examples than those available in this code documentation.
 &lt;/p&gt;
