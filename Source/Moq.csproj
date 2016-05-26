@@ -12,6 +12,8 @@
     <AssemblyName>Moq</AssemblyName>
     <TargetFrameworkVersion Condition=" '$(TargetFrameworkVersion)' == '' ">v4.5</TargetFrameworkVersion>
     <FileAlignment>512</FileAlignment>
+    <SignAssembly>true</SignAssembly>
+    <AssemblyOriginatorKeyFile>..\Moq.snk</AssemblyOriginatorKeyFile>
   </PropertyGroup>
   <PropertyGroup>
     <GitIgnoreTagVersion>true</GitIgnoreTagVersion>
@@ -24,15 +26,13 @@
     <DocumentationFile>bin\$(Configuration)\$(AssemblyName).xml</DocumentationFile>
     <TreatWarningsAsErrors>true</TreatWarningsAsErrors>
     <CodeAnalysisRuleSet>AllRules.ruleset</CodeAnalysisRuleSet>
-    <SignAssembly>true</SignAssembly>
-    <AssemblyOriginatorKeyFile>..\Moq.snk</AssemblyOriginatorKeyFile>
+    <NoWarn>0419</NoWarn>
+    <Optimize>false</Optimize>
   </PropertyGroup>
   <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Debug|AnyCPU' ">
-    <Optimize>false</Optimize>
     <DefineConstants>$(DefineConstants);TRACE;DEBUG;DESKTOP;FEATURE_SERIALIZATION</DefineConstants>
   </PropertyGroup>
   <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Release|AnyCPU' ">
-    <Optimize>true</Optimize>
     <DefineConstants>$(DefineConstants);TRACE;CODE_ANALYSIS;FEATURE_SERIALIZATION</DefineConstants>
     <RunCodeAnalysis>true</RunCodeAnalysis>
   </PropertyGroup>
@@ -224,9 +224,6 @@
     <None Include="Times.xdoc">
       <DependentUpon>Times.cs</DependentUpon>
     </None>
-  </ItemGroup>
-  <ItemGroup>
-    <Service Include="{508349B6-6B84-4DF5-91F0-309BEEBAD82D}" />
   </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
   <Target Name="CleanAnalysisLogs" AfterTargets="Build">

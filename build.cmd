@@ -34,7 +34,7 @@ IF NOT EXIST packages.config goto run
 .nuget\NuGet.exe install packages.config -OutputDirectory .nuget\packages -ExcludeVersion
 
 :run
-"%msb%" build.proj /t:build,test,package /v:normal %1 %2 %3 %4 %5 %6 %7 %8 %9
+"%msb%" build.proj /v:normal %1 %2 %3 %4 %5 %6 %7 %8 %9
 
 POPD >NUL
 ENDLOCAL
