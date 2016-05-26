@@ -1,8 +1,8 @@
 ﻿{
   "dependencies": {
-    "Castle.Core": "4.0.0-alpha001",
+    "Castle.Core": "3.3.3",
     "IFluentInterface": "2.0.0",
-    "GitInfo": "1.1.14"
+    "GitInfo": "1.1.15"
   },
   "frameworks": {
     "net45": { }
