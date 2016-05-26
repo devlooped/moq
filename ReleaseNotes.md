@@ -1,4 +1,4 @@
-Version 4.6
+Version 4.5
 * Updated to .NET 4.5
 * Dropped support for .NET &lt; 4.5 and Silverlight
 * Remove ILMerge. Depend on Castle NuGet package instead.
