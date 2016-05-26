@@ -18,7 +18,7 @@
   <PropertyGroup>
     <GitIgnoreTagVersion>true</GitIgnoreTagVersion>
     <GitIgnoreBranchVersion>true</GitIgnoreBranchVersion>
-    <OutputPath>bin\$(Configuration)\$(TargetFrameworkVersion)\</OutputPath>
+    <OutputPath>bin\$(Configuration)\</OutputPath>
     <DebugSymbols>true</DebugSymbols>
     <DebugType>full</DebugType>
     <ErrorReport>prompt</ErrorReport>

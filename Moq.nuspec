@@ -183,8 +183,9 @@ Version 1.0
 	</dependencies>
   </metadata>
   <files>
-    <file src="Source\bin\$configuration$\v4.5\Moq.dll" target="lib\net45" />
-    <file src="Source\bin\$configuration$\v4.5\Moq.pdb" target="lib\net45" />
-    <file src="Source\bin\$configuration$\v4.5\Moq.xml" target="lib\net45" />    
+    <file src="Source\bin\$configuration$\Moq.dll" target="lib\net45" />
+    <!-- Could not verify that  GitLink works, so disabling pdbs for now -->
+    <!--<file src="Source\bin\$configuration$\Moq.pdb" target="lib\net45" />-->
+    <file src="Source\bin\$configuration$\Moq.xml" target="lib\net45" />    
   </files>
 </package>
