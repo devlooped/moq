@@ -848,6 +848,7 @@ namespace Moq.Tests
 			mock.Object.Execute("ping");
 			mock.Object.Echo(42);
 			mock.Object.Submit();
+            mock.Object.Save(new object[] {1, 2, "hello"});
 
 			var mex = Assert.Throws<MockException>(() => mock.Verify(f => f.Execute("pong")));
 
@@ -856,7 +857,8 @@ namespace Moq.Tests
 				"Performed invocations:" + Environment.NewLine +
 				"IFoo.Execute(\"ping\")" + Environment.NewLine +
 				"IFoo.Echo(42)" + Environment.NewLine +
-				"IFoo.Submit()",
+				"IFoo.Submit()" + Environment.NewLine +
+                "IFoo.Save([1, 2, \"hello\"])",
 				mex.Message);
 		}
 
@@ -910,6 +912,7 @@ namespace Moq.Tests
 			int Echo(int value);
 			void Submit();
 			string Execute(string command);
+		    void Save(object o);
 		}
 
         public interface IBazParam
