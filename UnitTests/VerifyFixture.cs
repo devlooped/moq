@@ -862,6 +862,27 @@ namespace Moq.Tests
 				mex.Message);
 		}
 
+        [Fact]
+	    public void IncludesActualValuesFromVerifyNotVariableNames()
+        {
+            var expectedArg = "lorem,ipsum";
+            var mock = new Moq.Mock<IFoo>();
+
+            var mex = Assert.Throws<MockException>(() => mock.Verify(f => f.Execute(expectedArg.Substring(0, 5))));
+            Assert.Contains("f.Execute(\"lorem\")", mex.Message);
+        }
+
+	    [Fact]
+	    public void IncludesActualValuesFromSetups()
+        {
+            var expectedArg = "lorem,ipsum";
+            var mock = new Moq.Mock<IFoo>();
+	        mock.Setup(f => f.Save(expectedArg.Substring(0, 5)));
+
+	        var mex = Assert.Throws<MockException>(() => mock.Verify(foo => foo.Save("never")));
+            Assert.Contains("f.Save(\"lorem\")", mex.Message);
+	    }
+
 		[Fact]
 		public void IncludesMessageAboutNoActualCallsInFailureMessage()
 		{
@@ -870,6 +891,16 @@ namespace Moq.Tests
 			MockException mex = Assert.Throws<MockException>(() => mock.Verify(f => f.Execute("pong")));
 
 			Assert.Contains(Environment.NewLine + "No invocations performed.", mex.Message);
+		}
+
+		[Fact]
+		public void IncludesMessageAboutNoSetupCallsInFailureMessage()
+		{
+			var mock = new Moq.Mock<IFoo>();
+
+			MockException mex = Assert.Throws<MockException>(() => mock.Verify(f => f.Execute("pong")));
+
+			Assert.Contains(Environment.NewLine + "No setups configured.", mex.Message);
 		}
 
         [Fact]
