@@ -27,16 +27,13 @@ namespace Moq.Tests
     {
       var strictLaterSequence = new StrictSequenceStartingAnywhere();
 
-      var a = new Mock<IFoo> { CallSequence = strictLaterSequence };
-      var b = new Mock<IFoo> { CallSequence = a.CallSequence };
+      var a = new Mock<IFoo> {CallSequence = strictLaterSequence};
+      var b = new Mock<IFoo> {CallSequence = a.CallSequence};
 
       b.Object.Do(200);
 
-      Assert.Throws<MockException>(() =>
-                                   strictLaterSequence.Verify(
-                                     a.CallTo(x => x.Do(100))
-                                     )
-        );
+      Assert.Throws<MockException>(
+        () => strictLaterSequence.Verify(a.CallTo(x => x.Do(100))));
     }
 
     [Fact]
@@ -49,9 +46,8 @@ namespace Moq.Tests
       a.Object.Do(200);
       b.Object.Do(100);
 
-      Assert.Throws<MockException>(() =>
-                                   strictLaterSequence.Verify(a.CallTo(m => m.Do(100)))
-        );
+      Assert.Throws<MockException>(
+        () => strictLaterSequence.Verify(a.CallTo(m => m.Do(100))));
     }
 
     [Fact]

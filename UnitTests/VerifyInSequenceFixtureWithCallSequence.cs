@@ -18,7 +18,7 @@ namespace Moq.Tests
       sequence.Verify(
         mock1.CallTo(m => m.Do()),
         mock2.CallTo(m => m.Do())
-        );
+      );
     }
 
     [Fact]
@@ -31,12 +31,12 @@ namespace Moq.Tests
       mock2.Object.Do();
       mock1.Object.Do();
 
-      Assert.Throws<MockException>(() =>
-                                   sequence.Verify(
-                                     mock1.CallTo(m => m.Do()),
-                                     mock2.CallTo(m => m.Do())
-                                     )
-        );
+      Assert.Throws<MockException>(() => 
+        sequence.Verify(
+          mock1.CallTo(m => m.Do()),
+          mock2.CallTo(m => m.Do())
+        )
+      );
     }
 
     [Fact]
@@ -54,7 +54,7 @@ namespace Moq.Tests
       sequence.Verify(
         mock1.CallTo(m => m.Do()),
         mock2.CallTo(m => m.Do())
-        );
+      );
     }
 
     [Fact]
@@ -70,12 +70,12 @@ namespace Moq.Tests
       mock1.Object.Do();
 
 
-      Assert.Throws<MockException>(() =>
-                                   sequence.Verify(
-                                     mock1.CallTo(m => m.Do()),
-                                     mock2.CallTo(m => m.Do())
-                                     )
-        );
+      Assert.Throws<MockException>(() => 
+        sequence.Verify(
+          mock1.CallTo(m => m.Do()), 
+          mock2.CallTo(m => m.Do())
+        )
+      );
     }
 
     [Fact]
@@ -93,25 +93,25 @@ namespace Moq.Tests
       sequence.Verify(
         mock1.CallTo(a => a.Do()),
         mock2.CallTo(b => b.Do())
-        );
+      );
     }
 
     [Fact]
     public void ShouldProperlyRecognizeNonMatchingArgumentsInSequentialVerification()
     {
       var sequence = new CallSequence();
-      var mock1 = new Mock<RoleWithArgumentAndReturnValue> { CallSequence = sequence };
-      var mock2 = new Mock<RoleWithArgumentAndReturnValue> { CallSequence = sequence };
+      var mock1 = new Mock<RoleWithArgumentAndReturnValue> {CallSequence = sequence};
+      var mock2 = new Mock<RoleWithArgumentAndReturnValue> {CallSequence = sequence};
 
       mock2.Object.Do(1);
       mock1.Object.Do(2);
       mock2.Object.Do(3);
 
       Assert.Throws<MockException>(() =>
-                                   sequence.Verify(
-                                     mock1.CallTo(m => m.Do(2)),
-                                     mock2.CallTo(m => m.Do(1))
-                                     )
+        sequence.Verify(
+          mock1.CallTo(m => m.Do(2)),
+          mock2.CallTo(m => m.Do(1))
+          )
         );
 
     }
@@ -120,7 +120,7 @@ namespace Moq.Tests
     public void ShouldRecognizeSequenceOfCallsMadeOnTheSameMock()
     {
       var sequence = new CallSequence();
-      var mock1 = new Mock<RoleWithArgumentAndReturnValue> { CallSequence = sequence };
+      var mock1 = new Mock<RoleWithArgumentAndReturnValue> {CallSequence = sequence};
 
       mock1.Object.Do(1);
       mock1.Object.Do(2);
@@ -131,12 +131,12 @@ namespace Moq.Tests
         mock1.CallTo(m => m.Do(3))
         );
 
-      Assert.Throws<MockException>(() =>
-                                   sequence.Verify(
-                                     mock1.CallTo(m => m.Do(2)),
-                                     mock1.CallTo(m => m.Do(3)),
-                                     mock1.CallTo(m => m.Do(1))
-                                     )
+      Assert.Throws<MockException>(
+        () => sequence.Verify(
+          mock1.CallTo(m => m.Do(2)),
+          mock1.CallTo(m => m.Do(3)),
+          mock1.CallTo(m => m.Do(1))
+          )
         );
     }
 
@@ -174,11 +174,11 @@ namespace Moq.Tests
         mock1.CallTo(m => m.Do().Do())
         );
 
-      Assert.Throws<MockException>(() =>
-                                   sequence.Verify(
-                                     mock1.CallTo(m => m.Do().Do()),
-                                     mock1.CallTo(m => m.Do())
-                                     )
+      Assert.Throws<MockException>(
+        () => sequence.Verify(
+          mock1.CallTo(m => m.Do().Do()),
+          mock1.CallTo(m => m.Do())
+          )
         );
     }
 
@@ -208,11 +208,11 @@ namespace Moq.Tests
       mock1.Object.Anything = something;
       mock1.Object.Anything = something + something;
 
-      Assert.Throws<MockException>(() =>
-                                   sequence.Verify(
-                                     mock1.CallToSet(m => m.Anything = something + something),
-                                     mock1.CallToSet(m => m.Anything = something)
-                                     )
+      Assert.Throws<MockException>(
+        () => sequence.Verify(
+          mock1.CallToSet(m => m.Anything = something + something),
+          mock1.CallToSet(m => m.Anything = something)
+          )
         );
     }
 
@@ -245,12 +245,12 @@ namespace Moq.Tests
       something = mock1.Object.Anything;
       something = mock1.Object.AnythingElse;
 
-      Assert.Throws<MockException>(() =>
-                                   sequence.Verify(
-                                     mock1.CallToGet(m => m.AnythingElse),
-                                     mock1.CallToGet(m => m.Anything)
-                                     )
-        );
+      Assert.Throws<MockException>(
+        () => sequence.Verify(
+          mock1.CallToGet(m => m.AnythingElse),
+          mock1.CallToGet(m => m.Anything)
+        )
+      );
     }
 
 
