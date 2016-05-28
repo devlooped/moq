@@ -81,8 +81,12 @@ namespace Moq
 				return invocation.Method.DeclaringType.Name + "." +
 					invocation.Method.Name.Substring(4) + " = " + GetValue(invocation.Arguments.First());
 			}
+			
+			var genericParameters = invocation.Method.IsGenericMethod
+				? "<" + string.Join(", ", invocation.Method.GetGenericArguments().Select(t => t.Name).ToArray()) + ">"
+				: "";
 
-			return invocation.Method.DeclaringType.Name + "." + invocation.Method.Name + "(" +
+			return invocation.Method.DeclaringType.Name + "." + invocation.Method.Name + genericParameters + "(" +
 				string.Join(", ", invocation.Arguments.Select(a => GetValue(a)).ToArray()) + ")";
 		}
 

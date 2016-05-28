@@ -11,7 +11,18 @@
     <requireLicenseAcceptance>false</requireLicenseAcceptance>
     <description>Moq is the most popular and friendly mocking framework for .NET</description>
     <tags>moq tdd mocking mocks unittesting agile unittest</tags>
-    <releaseNotes>Version 4.1
+    <releaseNotes>Version 4.3
+* Added support for Roslyn
+* Automatically add implemented interfaces to mock
+
+Version 4.2
+* Improved support for async APIs by making default value a completed task
+* Added support for async Returns and Throws
+* Improved mock invocation sequence testing
+* Improved support for multi-threaded tests
+* Added support for named mocks
+
+Version 4.1
 * Added covariant IMock&lt;out T&gt; interface to Mock&lt;T&gt;
 * Added It.IsNotNull&lt;T&gt;
 * Fix: 'NullReferenceException when subscribing to an event'
@@ -158,6 +169,7 @@ Version 1.1
 
 Version 1.0
 
-* Initial release, initial documentation process in place, etc. </releaseNotes>
+* Initial release, initial documentation process in place, etc. 
+</releaseNotes>
   </metadata>
 </package>

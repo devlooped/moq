@@ -1,4 +1,4 @@
-﻿//Copyright (c) 2007. Clarius Consulting, Manas Technology Solutions, InSTEDD
+//Copyright (c) 2007. Clarius Consulting, Manas Technology Solutions, InSTEDD
 //http://code.google.com/p/moq/
 //All rights reserved.
 
@@ -129,6 +129,20 @@ namespace Moq
 				return false;
 			}
 
+			var matchType = typeof(T);
+			if (value == null && matchType.IsValueType 
+				&& ( !matchType.IsGenericType || matchType.GetGenericTypeDefinition() != typeof(Nullable<>)))
+			{
+				// If this.Condition expects a value type and we've been passed null,
+				// it can't possibly match.
+				// This tends to happen when you are trying to match a parameter of type int?
+				// with IsAny<int> but then pass null into the mock.
+				// We have to return early from here because you can't cast null to T
+				// when T is a value type.
+				//
+				// See Github issue #90: https://github.com/Moq/moq4/issues/90
+				return false;
+			}
 			return this.Condition((T)value);
 		}
 	}

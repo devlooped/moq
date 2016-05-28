@@ -82,6 +82,13 @@ namespace Moq
 				}
 			}
 		}
+		internal void ClearEventHandlers()
+		{
+			lock (invocationLists)
+			{
+				invocationLists.Clear();
+			}
+		}
 		#endregion
 
 		#region ActualInvocations
@@ -129,6 +136,13 @@ namespace Moq
 			lock (orderedCalls)
 			{
 				orderedCalls.Remove(call);
+			}
+		}
+		internal void ClearOrderedCalls()
+		{
+			lock (orderedCalls)
+			{
+				orderedCalls.Clear();
 			}
 		}
 

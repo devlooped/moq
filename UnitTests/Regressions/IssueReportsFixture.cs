@@ -1,4 +1,4 @@
-﻿using System;
+using System;
 using System.Collections;
 using System.Collections.Generic;
 using System.ComponentModel;
@@ -7,6 +7,7 @@ using System.Linq;
 using System.Linq.Expressions;
 using System.Reflection;
 using System.Text;
+using System.Text.RegularExpressions;
 using Moq;
 using Moq.Properties;
 using Moq.Protected;
@@ -175,7 +176,86 @@ namespace Moq.Tests.Regressions
 #endif
 		#endregion
 
-		// Old @ Google Code
+		#region #176
+
+		public class Issue176
+		{
+			public interface ISomeInterface
+			{
+				TResult DoSomething<TResult>(int anInt);
+				int DoSomethingElse(int anInt);
+			}
+
+			[Fact]
+			public void when_a_mock_doesnt_match_generic_parameters_exception_indicates_generic_parameters()
+			{
+				var mock = new Mock<ISomeInterface>(MockBehavior.Strict);
+				mock.Setup(m => m.DoSomething<int>(0)).Returns(1);
+
+				try
+				{
+					mock.Object.DoSomething<string>(0);
+				}
+				catch (MockException exception)
+				{
+					var genericTypesRE = new Regex(@"\<.*?\>");
+					var match = genericTypesRE.Match(exception.Message);
+
+					Assert.True(match.Success);
+					Assert.Equal("<string>", match.Captures[0].Value, StringComparer.OrdinalIgnoreCase);
+					return;
+				}
+
+				Assert.True(false, "No exception was thrown when one should have been");
+			}
+
+			[Fact]
+			public void when_a_method_doesnt_have_generic_parameters_exception_doesnt_include_brackets()
+			{
+				var mock = new Mock<ISomeInterface>(MockBehavior.Strict);
+				mock.Setup(m => m.DoSomething<int>(0)).Returns(1);
+
+				try
+				{
+					mock.Object.DoSomethingElse(0);
+				}
+				catch (MockException exception)
+				{
+					var genericTypesRE = new Regex(@"\<.*?\>");
+					var match = genericTypesRE.Match(exception.Message);
+
+					Assert.False(match.Success);
+					return;
+				}
+
+				Assert.True(false, "No exception was thrown when one should have been");
+			}
+		}
+
+		#endregion // #176
+
+        #region #184
+
+		public class Issue184
+		{
+			public interface ISimpleInterface
+			{
+				void Method(Guid? g);
+			}
+
+			[Fact]
+			public void strict_mock_accepts_null_as_nullable_guid_value()
+			{
+				var mock = new Mock<ISimpleInterface>(MockBehavior.Strict);
+				mock.Setup(x => x.Method(It.IsAny<Guid?>()));
+				mock.Object.Method(null);
+				mock.Verify();
+			}
+		}
+
+        #endregion // #184
+
+        // Old @ Google Code
 
         #region #47
 
@@ -464,6 +544,40 @@ namespace Moq.Tests.Regressions
             public interface ISample
             {
                 string Get(int i);
+            }
+        }
+
+        #endregion
+
+        #region #128
+
+        public class Issue128
+        {
+            [Fact]
+            public void That_CallBase_on_interface_should_not_throw_exception()
+            {
+                var mock = new Mock<IDataServiceFactory>() 
+                { 
+                    DefaultValue = DefaultValue.Mock,
+                    CallBase = true
+                };
+
+                var service = mock.Object.GetDataService();
+
+                var data = service.GetData();
+                var result = data.Sum();
+                
+                Assert.Equal( 0, result );
+            }
+
+            public interface IDataServiceFactory
+            {
+                IDataService GetDataService();
+            }
+
+            public interface IDataService
+            {
+                IList<int> GetData();
             }
         }
 
