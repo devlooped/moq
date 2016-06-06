@@ -55,7 +55,7 @@ namespace Moq
 			var prop = expression.ToPropertyInfo();
 			ThrowIfPropertyNotWritable(prop);
 
-			var setter = prop.GetSetMethod();
+			var setter = prop.SetMethod;
 			ThrowIfCantOverride(expression, setter);
 
 			var call = new SetterMethodCall<T, TProperty>(mock, expression, setter, value);
@@ -74,7 +74,7 @@ namespace Moq
 			string failMessage)
 			where T : class
 		{
-			var method = expression.ToPropertyInfo().GetSetMethod();
+			var method = expression.ToPropertyInfo().SetMethod;
 			ThrowIfVerifyNonVirtual(expression, method);
 
 			var expected = new SetterMethodCall<T, TProperty>(mock, expression, method)
@@ -93,7 +93,7 @@ namespace Moq
 			string failMessage)
 			where T : class
 		{
-			var method = expression.ToPropertyInfo().GetSetMethod();
+			var method = expression.ToPropertyInfo().SetMethod;
 			ThrowIfVerifyNonVirtual(expression, method);
 
 			var expected = new SetterMethodCall<T, TProperty>(mock, expression, method, value)

@@ -43,7 +43,9 @@ using System.Linq;
 using System.Collections.Generic;
 using System.Globalization;
 using System.Reflection;
+#if !NETCORE
 using System.Security.Permissions;
+#endif
 using Castle.DynamicProxy;
 using Castle.DynamicProxy.Generators;
 using Moq.Properties;
@@ -58,11 +60,13 @@ namespace Moq.Proxy
 		[SuppressMessage("Microsoft.Performance", "CA1810:InitializeReferenceTypeStaticFieldsInline", Justification = "By Design")]
 		static CastleProxyFactory()
 		{
+#if !NETCORE
 #pragma warning disable 618
 			AttributesToAvoidReplicating.Add<SecurityPermissionAttribute>();
 #pragma warning restore 618
+#endif
 
-#if !SILVERLIGHT
+#if !NETCORE
 			AttributesToAvoidReplicating.Add<ReflectionPermissionAttribute>();
 			AttributesToAvoidReplicating.Add<PermissionSetAttribute>();
 			AttributesToAvoidReplicating.Add<System.Runtime.InteropServices.MarshalAsAttribute>();
@@ -77,7 +81,8 @@ namespace Moq.Proxy
 		/// <inheritdoc />
 		public object CreateProxy(Type mockType, ICallInterceptor interceptor, Type[] interfaces, object[] arguments)
 		{
-			if (mockType.IsInterface) {
+			if (mockType.GetTypeInfo().IsInterface)
+			{
 				return generator.CreateInterfaceProxyWithoutTarget(mockType, interfaces, proxyOptions, new Interceptor(interceptor));
 			}
 
@@ -130,7 +135,7 @@ namespace Moq.Proxy
 						newMethBuilder.DefineParameter(param.Position + 1, param.Attributes, param.Name);
 					}
 
-					delegateInterfaceType = newTypeBuilder.CreateType();
+					delegateInterfaceType = newTypeBuilder.CreateTypeInfo().AsType();
 					delegateInterfaceCache[delegateType] = delegateInterfaceType;
  				}
  			}

@@ -30,7 +30,10 @@
 	
 	<Target Name="Build" DependsOnTargets="GitVersion">
 		<MSBuild Projects="@(Solution)" Properties="$(CommonBuildProperties)" />
-		
+
+
+		<Exec Command="xcopy &quot;Source.NetCore\bin\$(Configuration)\Moq.*&quot; &quot;$(DropDirectory)lib\netstandard1.3\&quot; /Y" ContinueOnError="false" />
+
 		<Exec Command="$(PackagesPath)\gitlink\lib\net45\GitLink.exe . -f &quot;$([System.String]::new('%(Solution.FullPath)').Replace('$(MSBuildProjectDirectory)', '').TrimStart('\'))&quot; -skipverify -u https://github.com/moq/moq4 -b $(GitBranch) -c $(Configuration)" />
 	</Target>
 
@@ -57,6 +60,15 @@
 			   ParallelizeAssemblies="true"
 			   ParallelizeTestCollections="true"
 			   ContinueOnError="ErrorAndContinue" />
+
+		<Exec ContinueOnError="True" Command="dotnet --info">
+			<Output TaskParameter="ExitCode" PropertyName="DotNetErrorCode"/>
+		</Exec>
+		<Warning Condition="'$(DotNetErrorCode)' != '0'" Text="Error in executing dotnet. Skipping .NET Core tests." />
+		<Exec Condition="'$(DotNetErrorCode)' == '0'"
+			Command="dotnet restore" ContinueOnError="false" />
+		<Exec Condition="'$(DotNetErrorCode)' == '0'"
+			Command="dotnet test UnitTests.NetCore\Moq.NetCore.Tests\project.json -c release -xml $(Out)\test.dotnet.xml" ContinueOnError="false" />
 
 		<!-- This isn't collecting any data right now, so make Coverage == '' by default so it won't run with this condition -->
 		<Exec Command="$(CoverageConsole) $(CoverageOptions) -target:$(XunitConsole) -targetargs:&quot;@(TestAssembly, ' ') $(XunitOptions)&quot;"

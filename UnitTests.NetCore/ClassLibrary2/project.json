@@ -1,0 +1,26 @@
+{
+  "version": "2.0.0-*",
+
+  "buildOptions": {
+    "keyFile": "../../UnitTests/Library/ClassLibrary2/Bar.snk",
+    "compile": {
+      "include": [
+        "../../UnitTests/Library/ClassLibrary2/*.cs"
+      ]
+    }
+  },
+
+  "frameworks": {
+    "netstandard1.3": {
+      "buildOptions": {
+        "define": [ "NETCORE" ]
+      },
+      "dependencies": {
+        "ClassLibrary1": {
+          "target": "project",
+          "version": "1.0.0-*"
+        }
+      }
+    }
+  }
+}

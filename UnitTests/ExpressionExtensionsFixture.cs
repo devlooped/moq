@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Linq.Expressions;
+using System.Reflection;
 using Xunit;
 
 namespace Moq.Tests
@@ -54,7 +55,7 @@ namespace Moq.Tests
 
 			var result = lambda.ToLambda();
 
-			Assert.Equal(typeof(int), result.Compile().Method.ReturnType);
+			Assert.Equal(typeof(int), result.Compile().GetMethodInfo().ReturnType);
 		}
 
 		[Fact]

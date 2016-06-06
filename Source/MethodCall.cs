@@ -184,15 +184,11 @@ namespace Moq
 		{
 			try
 			{
+#if !NETCORE
 				var thisMethod = MethodBase.GetCurrentMethod();
 				var mockAssembly = Assembly.GetExecutingAssembly();
-
 				// Move 'till we're at the entry point into Moq API
-#if !SILVERLIGHT
 				var frame = new StackTrace(true)
-#else
-				var frame = new StackTrace()
-#endif
 					.GetFrames()
 					.SkipWhile(f => f.GetMethod() != thisMethod)
 					.SkipWhile(f => f.GetMethod().DeclaringType == null || f.GetMethod().DeclaringType.Assembly == mockAssembly)
@@ -201,11 +197,10 @@ namespace Moq
 				if (frame != null)
 				{
 					this.FileLine = frame.GetFileLineNumber();
-#if !SILVERLIGHT
 					this.FileName = Path.GetFileName(frame.GetFileName());
-#endif
 					this.TestMethod = frame.GetMethod();
 				}
+#endif
 			}
 			catch
 			{
@@ -301,7 +296,7 @@ namespace Moq
 				else
 				{
 					var argsFuncType = mockEventArgsFunc.GetType();
-					if (argsFuncType.IsGenericType && argsFuncType.GetGenericArguments().Length == 1)
+					if (argsFuncType.GetTypeInfo().IsGenericType && argsFuncType.GetGenericArguments().Length == 1)
 					{
 						this.Mock.DoRaise(this.mockEvent, (EventArgs)mockEventArgsFunc.InvokePreserveStack());
 					}
@@ -340,7 +335,7 @@ namespace Moq
 		protected virtual void SetCallbackWithArguments(Delegate callback)
 		{
 			var expectedParams = this.Method.GetParameters();
-			var actualParams = callback.Method.GetParameters();
+			var actualParams = callback.GetMethodInfo().GetParameters();
 
 			if (!callback.HasCompatibleParameterList(expectedParams))
 			{

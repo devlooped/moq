@@ -2,9 +2,7 @@
 using Moq;
 using Xunit;
 
-#if !SILVERLIGHT
 using System.Threading.Tasks;
-#endif
 
 namespace Moq.Tests
 {
@@ -880,7 +878,6 @@ namespace Moq.Tests
             mock.Verify(foo => foo.Call(It.IsAny<IBazParam>()), Times.Exactly(2));
         }
 
-#if !SILVERLIGHT
         /// <summary>
         /// Warning, this is a flaky test and doesn't fail when run as standalone. Running all tests at once will increase the chances of that test to fail.
         /// </summary>
@@ -894,7 +891,6 @@ namespace Moq.Tests
                 mock.Verify(foo => foo.Submit());
             });
         }
-#endif
 
 		public interface IBar
 		{

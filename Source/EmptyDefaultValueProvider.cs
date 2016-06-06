@@ -72,7 +72,7 @@ namespace Moq
 				return this.defaultValues[valueType];
 			}
 
-			return valueType.IsValueType ? GetValueTypeDefault(valueType) : GetReferenceTypeDefault(valueType);
+			return valueType.GetTypeInfo().IsValueType ? GetValueTypeDefault(valueType) : GetReferenceTypeDefault(valueType);
 		}
 
 		private static object GetReferenceTypeDefault(Type valueType)
@@ -93,15 +93,15 @@ namespace Moq
 			else if (valueType == typeof(Task))
 			{
 				// Task<T> inherits from Task, so just return Task<bool>
-				return GetCompletedTaskForType(typeof (bool));
+				return GetCompletedTaskForType(typeof(bool));
 			}
 #endif
-			else if (valueType.IsGenericType && valueType.GetGenericTypeDefinition() == typeof(IEnumerable<>))
+			else if (valueType.GetTypeInfo().IsGenericType && valueType.GetGenericTypeDefinition() == typeof(IEnumerable<>))
 			{
 				var genericListType = typeof(List<>).MakeGenericType(valueType.GetGenericArguments()[0]);
 				return Activator.CreateInstance(genericListType);
 			}
-			else if (valueType.IsGenericType && valueType.GetGenericTypeDefinition() == typeof(IQueryable<>))
+			else if (valueType.GetTypeInfo().IsGenericType && valueType.GetGenericTypeDefinition() == typeof(IQueryable<>))
 			{
 				var genericType = valueType.GetGenericArguments()[0];
 				var genericListType = typeof(List<>).MakeGenericType(genericType);
@@ -112,7 +112,7 @@ namespace Moq
 					.Invoke(null, new[] { Activator.CreateInstance(genericListType) });
 			}
 #if !NET3x
-			else if (valueType.IsGenericType && valueType.GetGenericTypeDefinition() == typeof(Task<>))
+			else if (valueType.GetTypeInfo().IsGenericType && valueType.GetGenericTypeDefinition() == typeof(Task<>))
 			{
 				var genericType = valueType.GetGenericArguments()[0];
 				return GetCompletedTaskForType(genericType);
@@ -125,7 +125,7 @@ namespace Moq
 		private static object GetValueTypeDefault(Type valueType)
 		{
 			// For nullable value types, return null.
-			if (valueType.IsGenericType && valueType.GetGenericTypeDefinition() == typeof(Nullable<>))
+			if (valueType.GetTypeInfo().IsGenericType && valueType.GetGenericTypeDefinition() == typeof(Nullable<>))
 			{
 				return null;
 			}
@@ -141,7 +141,7 @@ namespace Moq
 			var setResultMethod = tcs.GetType().GetMethod("SetResult");
 			var taskProperty = tcs.GetType().GetProperty("Task");
 
-			var result = type.IsValueType ? GetValueTypeDefault(type) : GetReferenceTypeDefault(type);
+			var result = type.GetTypeInfo().IsValueType ? GetValueTypeDefault(type) : GetReferenceTypeDefault(type);
 
 			setResultMethod.Invoke(tcs, new[] {result});
 			return (Task) taskProperty.GetValue(tcs, null);

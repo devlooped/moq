@@ -3,6 +3,7 @@ out
 build
 bin
 obj
+lib
 packages
 *.nuget.targets
 *.nuget.props

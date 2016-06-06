@@ -1,8 +1,8 @@
-<?xml version="1.0"?>
-<package xmlns:xsd="http://www.w3.org/2001/XMLSchema" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance">
-  <metadata xmlns="http://schemas.microsoft.com/packaging/2010/07/nuspec.xsd">
+﻿<?xml version="1.0" encoding="utf-8"?>
+<package xmlns="http://schemas.microsoft.com/packaging/2011/08/nuspec.xsd">
+  <metadata>
     <id>Moq</id>
-    <version>4.1</version>
+    <version>4.6</version>
     <title>Moq: an enjoyable mocking library</title>
     <authors>Daniel Cazzulino, kzu</authors>
     <owners>Daniel Cazzulino, Clarius Labs, kzu</owners>
@@ -176,16 +176,43 @@ Version 1.0
 
 * Initial release, initial documentation process in place, etc. 
 </releaseNotes>
-	<dependencies>
+    <dependencies>
       <group targetFramework=".NETFramework4.5">
-        <dependency id="Castle.Core" version="3.3.3" />
+        <dependency id="Castle.Core" version="4.0.0-alpha001" />
       </group>
-	</dependencies>
+      <group targetFramework=".NETStandard1.3">
+        <dependency id="Castle.Core" version="4.0.0-alpha001" />
+        <dependency id="System.Collections" version="4.0.11-rc2-24027" />
+        <dependency id="System.Collections.Concurrent" version="4.0.12-rc2-24027" />
+        <dependency id="System.Diagnostics.Debug" version="4.0.11-rc2-24027" />
+        <dependency id="System.Diagnostics.Tools" version="4.0.1-rc2-24027" />
+        <dependency id="System.Globalization" version="4.0.11-rc2-24027" />
+        <dependency id="System.Linq" version="4.1.0-rc2-24027" />
+        <dependency id="System.Linq.Expressions" version="4.0.11-rc2-24027" />
+        <dependency id="System.Linq.Queryable" version="4.0.1-rc2-24027" />
+        <dependency id="System.Reflection" version="4.1.0-rc2-24027" />
+        <dependency id="System.Reflection.Emit" version="4.0.1-rc2-24027" />
+        <dependency id="System.Reflection.Emit.ILGeneration" version="4.0.1-rc2-24027" />
+        <dependency id="System.Reflection.Extensions" version="4.0.1-rc2-24027" />
+        <dependency id="System.Reflection.Primitives" version="4.0.1-rc2-24027" />
+        <dependency id="System.Reflection.TypeExtensions" version="4.1.0-rc2-24027" />
+        <dependency id="System.Resources.ResourceManager" version="4.0.1-rc2-24027" />
+        <dependency id="System.Runtime" version="4.1.0-rc2-24027" />
+        <dependency id="System.Runtime.Extensions" version="4.1.0-rc2-24027" />
+        <dependency id="System.Text.RegularExpressions" version="4.0.12-rc2-24027" />
+        <dependency id="System.Threading" version="4.0.11-rc2-24027" />
+        <dependency id="System.Threading.Tasks" version="4.0.11-rc2-24027" />
+      </group>
+    </dependencies>
   </metadata>
   <files>
-    <file src="Source\bin\$configuration$\Moq.dll" target="lib\net45" />
-    <!-- Could not verify that  GitLink works, so disabling pdbs for now -->
-    <!--<file src="Source\bin\$configuration$\Moq.pdb" target="lib\net45" />-->
-    <file src="Source\bin\$configuration$\Moq.xml" target="lib\net45" />    
+		<file src="Source\bin\$configuration$\Moq.dll" target="lib\net45" />
+		<!-- Could not verify that  GitLink works, so disabling pdbs for now -->
+		<!--<file src="Source\bin\$configuration$\Moq.pdb" target="lib\net45" />-->
+		<file src="Source\bin\$configuration$\Moq.xml" target="lib\net45" />
+		<file src="Source.NetCore\bin\$configuration$\Moq.dll" target="lib\netstandard1.3" />
+		<!-- Could not verify that  GitLink works, so disabling pdbs for now -->
+		<!--<file src="Source.NetCore\bin\$configuration$\Moq.pdb" target="lib\netstandard1.3" />-->
+		<file src="Source.NetCore\bin\$configuration$\Moq.xml" target="lib\netstandard1.3" />
   </files>
 </package>
