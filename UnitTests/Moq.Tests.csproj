@@ -55,9 +55,11 @@
   </ItemGroup>
   <ItemGroup>
     <Compile Include="AsInterfaceFixture.cs" />
+    <Compile Include="CaptureFixture.cs" />
     <Compile Include="ConditionalSetupFixture.cs" />
     <Compile Include="CustomMatcherFixture.cs" />
     <Compile Include="ExtensionsFixture.cs" />
+    <Compile Include="CaptureMatchFixture.cs" />
     <Compile Include="ReturnsExtensionsFixture.cs" />
     <Compile Include="Linq\MockRepositoryQuerying.cs" />
     <Compile Include="MockedDelegatesFixture.cs" />

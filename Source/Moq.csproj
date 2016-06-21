@@ -42,6 +42,8 @@
     <Reference Include="System.Xml" />
   </ItemGroup>
   <ItemGroup>
+    <Compile Include="Capture.cs" />
+    <Compile Include="CaptureMatch.cs" />
     <Compile Include="ConditionalContext.cs" />
     <Compile Include="IInterceptStrategy.cs" />
     <Compile Include="IMock.cs" />
