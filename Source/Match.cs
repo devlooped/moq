@@ -65,17 +65,21 @@ namespace Moq
 		/// <include file='Match.xdoc' path='docs/doc[@for="Match.Create{T}(condition)"]/*'/>
 		public static T Create<T>(Predicate<T> condition)
 		{
-			SetLastMatch(new Match<T>(condition));
-			return default(T);
+			return Create(new Match<T>(condition));
 		}
 
 		/// <include file='Match.xdoc' path='docs/doc[@for="Match.Create{T}(condition,renderExpression"]/*'/>
 		[SuppressMessage("Microsoft.Design", "CA1006:DoNotNestGenericTypesInMemberSignatures")]
 		public static T Create<T>(Predicate<T> condition, Expression<Func<T>> renderExpression)
 		{
-			SetLastMatch(new Match<T>(condition, renderExpression));
-			return default(T);
+			return Create(new Match<T>(condition, renderExpression));
 		}
+
+	    internal static T Create<T>(Match<T> match)
+	    {
+            SetLastMatch(match);
+            return default(T);
+        }
 
 		/// <devdoc>
 		/// This method is used to set an expression as the last matcher invoked, 
@@ -98,7 +102,7 @@ namespace Moq
 
 			return match;
 		}
-	}
+    }
 
 	/// <include file='Match.xdoc' path='docs/doc[@for="Match{T}"]/*'/>
 	public class Match<T> : Match
