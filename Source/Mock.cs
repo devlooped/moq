@@ -391,7 +391,7 @@ namespace Moq
 			Times times,
 			int callCount)
 		{
-			var message = times.GetExceptionMessage(expected.FailMessage, expression.ToStringFixed(), callCount) +
+			var message = times.GetExceptionMessage(expected.FailMessage, expression.PartialMatcherAwareEval().ToLambda().ToStringFixed(), callCount) +
 				Environment.NewLine + FormatSetupsInfo(setups) +
 				Environment.NewLine + FormatInvocations(actualCalls);
 			throw new MockException(MockException.ExceptionReason.VerificationFailed, message);
@@ -400,7 +400,7 @@ namespace Moq
 		private static string FormatSetupsInfo(IEnumerable<IProxyCall> setups)
 		{
 			var expressionSetups = setups
-				.Select(s => s.SetupExpression.ToStringFixed() + ", " + FormatCallCount(s.CallCount))
+				.Select(s => s.SetupExpression.PartialMatcherAwareEval().ToLambda().ToStringFixed() + ", " + FormatCallCount(s.CallCount))
 				.ToArray();
 
 			return expressionSetups.Length == 0 ?
