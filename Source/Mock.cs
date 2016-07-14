@@ -121,6 +121,24 @@ namespace Moq
 
 			throw new ArgumentException(Resources.ObjectInstanceNotMock, "mocked");
 		}
+		
+		/// <include file='Mock.xdoc' path='docs/doc[@for="Mock.Verify"]/*'/>
+		public static void Verify(params Mock[] mocks)
+        	{
+            		foreach (var mock in mocks)
+            		{
+                		mock.Verify();
+            		}
+        	}
+		
+		/// <include file='Mock.xdoc' path='docs/doc[@for="Mock.VerifyAll"]/*'/>
+		public static void VerifyAll(params Mock[] mocks)
+        	{
+            		foreach (var mock in mocks)
+            		{
+                		mock.VerifyAll();
+            		}
+        	}
 
 		/// <include file='Mock.xdoc' path='docs/doc[@for="Mock.Behavior"]/*'/>
 		public virtual MockBehavior Behavior { get; internal set; }
@@ -368,7 +386,7 @@ namespace Moq
 			Times times,
 			int callCount)
 		{
-			var message = times.GetExceptionMessage(expected.FailMessage, expression.ToStringFixed(), callCount) +
+			var message = times.GetExceptionMessage(expected.FailMessage, expression.PartialMatcherAwareEval().ToLambda().ToStringFixed(), callCount) +
 				Environment.NewLine + FormatSetupsInfo(setups) +
 				Environment.NewLine + FormatInvocations(actualCalls);
 			throw new MockException(MockException.ExceptionReason.VerificationFailed, message);
@@ -377,7 +395,7 @@ namespace Moq
 		private static string FormatSetupsInfo(IEnumerable<IProxyCall> setups)
 		{
 			var expressionSetups = setups
-				.Select(s => s.SetupExpression.ToStringFixed() + ", " + FormatCallCount(s.CallCount))
+				.Select(s => s.SetupExpression.PartialMatcherAwareEval().ToLambda().ToStringFixed() + ", " + FormatCallCount(s.CallCount))
 				.ToArray();
 
 			return expressionSetups.Length == 0 ?

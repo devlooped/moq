@@ -41,7 +41,7 @@
     <Prefer32Bit>false</Prefer32Bit>
   </PropertyGroup>
   <ItemGroup>
-		<Reference Include="ClassLibrary1">
+    <Reference Include="ClassLibrary1">
       <HintPath>.\ClassLibrary1.dll</HintPath>
     </Reference>
     <Reference Include="ClassLibrary2">
@@ -55,9 +55,11 @@
   </ItemGroup>
   <ItemGroup>
     <Compile Include="AsInterfaceFixture.cs" />
+    <Compile Include="CaptureFixture.cs" />
     <Compile Include="ConditionalSetupFixture.cs" />
     <Compile Include="CustomMatcherFixture.cs" />
     <Compile Include="ExtensionsFixture.cs" />
+    <Compile Include="CaptureMatchFixture.cs" />
     <Compile Include="Regressions\FluentMockIssues.cs" />
     <Compile Include="ReturnsExtensionsFixture.cs" />
     <Compile Include="Linq\MockRepositoryQuerying.cs" />
@@ -106,6 +108,9 @@
       <Project>{1C91AC30-5977-4BE5-BA67-8EB186C03514}</Project>
       <Name>Moq</Name>
     </ProjectReference>
+  </ItemGroup>
+  <ItemGroup>
+    <Service Include="{82A7F48D-3B50-4B1E-B82E-3ADA8210C358}" />
   </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
 </Project>

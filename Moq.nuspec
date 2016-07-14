@@ -14,6 +14,7 @@
     <releaseNotes>Version 4.5
 * Updated to .NET 4.5
 * Dropped support for .NET &lt; 4.5 and Silverlight
+* Remove ILMerge. Depend on Castle NuGet package instead.
 
 Version 4.3
 * Added support for Roslyn
@@ -175,10 +176,16 @@ Version 1.0
 
 * Initial release, initial documentation process in place, etc. 
 </releaseNotes>
+	<dependencies>
+      <group targetFramework=".NETFramework4.5">
+        <dependency id="Castle.Core" version="3.3.3" />
+      </group>
+	</dependencies>
   </metadata>
   <files>
-		<file src="Source\bin\$configuration$\v4.5\Moq.dll" target="lib\net45" />
-		<file src="Source\bin\$configuration$\v4.5\Moq.pdb" target="lib\net45" />
-		<file src="Source\bin\$configuration$\v4.5\Moq.xml" target="lib\net45" />    
+    <file src="Source\bin\$configuration$\Moq.dll" target="lib\net45" />
+    <!-- Could not verify that  GitLink works, so disabling pdbs for now -->
+    <!--<file src="Source\bin\$configuration$\Moq.pdb" target="lib\net45" />-->
+    <file src="Source\bin\$configuration$\Moq.xml" target="lib\net45" />    
   </files>
 </package>
