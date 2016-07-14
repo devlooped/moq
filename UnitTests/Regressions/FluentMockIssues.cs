@@ -24,7 +24,7 @@ namespace Moq.Tests.Regressions
             string SomeString { get; }
         }
 
-        [Fact(Timeout = 5000)]
+        [Fact]
         public void CyclesInThePropertyGraphAreHandled()
         {
             var foo = new Mock<IOne> {DefaultValue = DefaultValue.Mock};
