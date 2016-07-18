@@ -166,7 +166,7 @@ namespace Moq.Tests
 			var fooBar = new Mock<FooBar>();
 			fooBar.CallBase = true;
 			var bag = (IBag)fooBar.Object;
-            bag.Get ("test");
+			bag.Get("test");
 		}
 
 		public interface IFoo

@@ -19,7 +19,7 @@ namespace Moq
 
 		public static string GetFullName(this Type type)
 		{
-			if (type.IsGenericType)
+			if (type.GetTypeInfo().IsGenericType)
 			{
 				return type.FullName.Substring(0, type.FullName.IndexOf('`')) +
 					GetGenericArguments(type.GetGenericArguments(), t => GetFullName(t));
@@ -40,7 +40,7 @@ namespace Moq
 
 		public static string GetName(this Type type)
 		{
-			if (type.IsGenericType)
+			if (type.GetTypeInfo().IsGenericType)
 			{
 				return type.Name.Substring(0, type.Name.IndexOf('`')) +
 					GetGenericArguments(type.GetGenericArguments(), t => GetName(t));

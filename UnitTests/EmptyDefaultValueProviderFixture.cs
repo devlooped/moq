@@ -1,6 +1,9 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Linq;
+#if NETCORE
+using System.Reflection;
+#endif
 #if !NET3x
 using System.Threading.Tasks;
 #endif
@@ -50,6 +53,7 @@ namespace Moq.Tests
 			Assert.Equal(default(bool), value);
 		}
 
+#if !NETCORE
 		[Fact]
 		public void ProvidesDefaultEnum()
 		{
@@ -59,6 +63,7 @@ namespace Moq.Tests
 
 			Assert.Equal(default(PlatformID), value);
 		}
+#endif
 
 		[Fact]
 		public void ProvidesEmptyEnumerable()
@@ -167,7 +172,9 @@ namespace Moq.Tests
 			int IntValue { get; set; }
 			bool BoolValue { get; set; }
 			int? NullableIntValue { get; set; }
+#if !NETCORE
 			PlatformID Platform { get; set; }
+#endif
 			IEnumerable<int> Indexes { get; set; }
 			IBar[] Bars { get; set; }
 			IQueryable<int> Queryable { get; }

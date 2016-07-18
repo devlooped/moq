@@ -13,7 +13,9 @@ using Moq.Properties;
 using Moq.Protected;
 using Xunit;
 
+#if !NETCORE
 using System.Web.UI.HtmlControls;
+#endif
 using System.Threading;
 using System.Threading.Tasks;
 
@@ -78,7 +80,6 @@ namespace Moq.Tests.Regressions
         #endregion
 
 		#region 47 & 62
-#if !SILVERLIGHT
 
 		public class Issue47ClassToMock
 		{
@@ -116,11 +117,10 @@ namespace Moq.Tests.Regressions
 			testMock.Verify(x => x.M2());
 		}
 
-#endif
-		#endregion
+#endregion
 
 		#region #78
-#if !NET3x && !SILVERLIGHT
+#if !NET3x
 		public interface IIssue78Interface
 		{
 			Issue78TypeOne GetTypeOne();
@@ -1041,7 +1041,7 @@ namespace Moq.Tests.Regressions
 
         #region #160
 
-#if !SILVERLIGHT
+#if !NETCORE
         public class _160
         {
             [Fact]
@@ -1813,8 +1813,6 @@ namespace Moq.Tests.Regressions
 
         #region #273
 
-#if !SILVERLIGHT
-
         public class _273
         {
             [Fact]
@@ -1833,8 +1831,6 @@ namespace Moq.Tests.Regressions
             {
             }
         }
-
-#endif
 
         #endregion
 
@@ -1889,7 +1885,7 @@ namespace Moq.Tests.Regressions
 
         #region #326
 
-#if !SILVERLIGHT
+#if !NETCORE
 
         public class _326
         {
@@ -1963,9 +1959,6 @@ namespace Moq.Tests.Regressions
 
         #region #250
 
-        /// <summary>
-        /// Silverlight MethodInfo protected constructor is internal, unlike desktop .NET
-        /// </summary>
         public class _250
         {
             [Fact]

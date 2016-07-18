@@ -34,8 +34,8 @@ namespace Moq
         public InterceptionAction HandleIntercept(ICallContext invocation, InterceptorContext ctx, CurrentInterceptContext localctx)
         {
             if (invocation.Method.DeclaringType == typeof(object) || // interface proxy
-                ctx.Mock.ImplementedInterfaces.Contains(invocation.Method.DeclaringType) && !invocation.Method.IsEventAttach() && !invocation.Method.IsEventDetach() && ctx.Mock.CallBase && !ctx.Mock.MockedType.IsInterface || // class proxy with explicitly implemented interfaces. The method's declaring type is the interface and the method couldn't be abstract
-                invocation.Method.DeclaringType.IsClass && !invocation.Method.IsAbstract && ctx.Mock.CallBase // class proxy
+                ctx.Mock.ImplementedInterfaces.Contains(invocation.Method.DeclaringType) && !invocation.Method.IsEventAttach() && !invocation.Method.IsEventDetach() && ctx.Mock.CallBase && !ctx.Mock.MockedType.GetTypeInfo().IsInterface || // class proxy with explicitly implemented interfaces. The method's declaring type is the interface and the method couldn't be abstract
+                invocation.Method.DeclaringType.GetTypeInfo().IsClass && !invocation.Method.IsAbstract && ctx.Mock.CallBase // class proxy
                 )
             {
                 // Invoke underlying implementation.
@@ -233,7 +233,7 @@ namespace Moq
         /// <param name="initialType">The type to find immediate ancestors of</param>
         private static IEnumerable<Type> GetAncestorTypes(Type initialType)
         {
-            var baseType = initialType.BaseType;
+            var baseType = initialType.GetTypeInfo().BaseType;
             if (baseType != null)
             {
                 return new[] { baseType };
@@ -254,7 +254,7 @@ namespace Moq
                     // TODO: validate we can get the event?
                     var eventInfo = this.GetEventFromName(invocation.Method.Name.Substring(4));
 
-                    if (ctx.Mock.CallBase && !eventInfo.DeclaringType.IsInterface)
+                    if (ctx.Mock.CallBase && !eventInfo.DeclaringType.GetTypeInfo().IsInterface)
                     {
                         invocation.InvokeBase();
                     }
@@ -271,7 +271,7 @@ namespace Moq
                     // TODO: validate we can get the event?
                     var eventInfo = this.GetEventFromName(invocation.Method.Name.Substring(7));
 
-                    if (ctx.Mock.CallBase && !eventInfo.DeclaringType.IsInterface)
+                    if (ctx.Mock.CallBase && !eventInfo.DeclaringType.GetTypeInfo().IsInterface)
                     {
                         invocation.InvokeBase();
                     }

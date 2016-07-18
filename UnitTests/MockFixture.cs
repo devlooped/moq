@@ -1,6 +1,9 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Linq.Expressions;
+#if NETCORE
+using System.Reflection;
+#endif
 using Xunit;
 
 namespace Moq.Tests
@@ -44,7 +47,7 @@ namespace Moq.Tests
 			Assert.Contains("mock", mock.ToString().ToLower());
 		}
 
-#if !SILVERLIGHT
+#if !NETCORE
 		[Fact]
 		public void HasADefaultNameThatIncludesItsGenericParameters()
 		{

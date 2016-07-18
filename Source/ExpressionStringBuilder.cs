@@ -262,7 +262,7 @@ namespace Moq
 					// Perhaps is better without nothing (at least for local variables)
 					//builder.Append("<value>");
 				}
-				else if (c.Type.IsEnum)
+				else if (c.Type.GetTypeInfo().IsEnum)
 				{
 					builder.Append(c.Type.DisplayName(this.getTypeName)).Append(".").Append(value);
 				}
@@ -319,7 +319,9 @@ namespace Moq
 				var paramFrom = 0;
 				var expression = node.Object;
 
-				if (Attribute.GetCustomAttribute(node.Method, typeof(ExtensionAttribute)) != null)
+				var hasExtensionAttribute = node.Method.GetCustomAttribute<ExtensionAttribute>() != null;
+
+				if (hasExtensionAttribute)
 				{
 					paramFrom = 1;
 					expression = node.Arguments[0];
@@ -634,7 +636,7 @@ namespace Moq
 			}
 			var builder = new StringBuilder(100);
 			builder.Append(getName(source).Split('`').First());
-			if (source.IsGenericType)
+			if (source.GetTypeInfo().IsGenericType)
 			{
 				builder.Append("<");
 				builder.Append(source.GetGenericArguments().Select(t => getName(t)).AsCommaSeparatedValues());

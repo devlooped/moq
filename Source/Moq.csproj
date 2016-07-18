@@ -30,10 +30,10 @@
     <Optimize>false</Optimize>
   </PropertyGroup>
   <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Debug|AnyCPU' ">
-    <DefineConstants>$(DefineConstants);TRACE;DEBUG;DESKTOP</DefineConstants>
+    <DefineConstants>$(DefineConstants);TRACE;DEBUG;DESKTOP;FEATURE_SERIALIZATION</DefineConstants>
   </PropertyGroup>
   <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Release|AnyCPU' ">
-    <DefineConstants>$(DefineConstants);TRACE;CODE_ANALYSIS</DefineConstants>
+    <DefineConstants>$(DefineConstants);TRACE;CODE_ANALYSIS;FEATURE_SERIALIZATION</DefineConstants>
     <RunCodeAnalysis>true</RunCodeAnalysis>
   </PropertyGroup>
   <ItemGroup>

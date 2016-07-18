@@ -134,8 +134,8 @@ namespace Moq
 			}
 
 			var matchType = typeof(T);
-			if (value == null && matchType.IsValueType 
-				&& ( !matchType.IsGenericType || matchType.GetGenericTypeDefinition() != typeof(Nullable<>)))
+			if (value == null && matchType.GetTypeInfo().IsValueType
+				&& (!matchType.GetTypeInfo().IsGenericType || matchType.GetGenericTypeDefinition() != typeof(Nullable<>)))
 			{
 				// If this.Condition expects a value type and we've been passed null,
 				// it can't possibly match.

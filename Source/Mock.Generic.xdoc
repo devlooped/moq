@@ -1,4 +1,4 @@
-﻿<?xml version="1.0" encoding="utf-8" ?>
+<?xml version="1.0" encoding="utf-8" ?>
 <docs xml:space="preserve">
 	<doc for="Mock{T}">
 		<summary>
@@ -67,7 +67,7 @@
 	<doc for="Mock{T}.ctor(object[])">
 		<summary>
 			Initializes an instance of the mock with <see cref="MockBehavior.Default">default behavior</see> and with
-			the given constructor arguments for the class. (Only valid when <typeparamref name="T"/> is a class)
+			the given constructor arguments for the class. (Only valid when T is a class)
 		</summary>
 		<remarks>
 			The mock will try to find the best match constructor given the constructor arguments, and invoke that

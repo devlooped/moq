@@ -335,6 +335,16 @@ namespace Moq.Tests
 		}
 
 		[Fact]
+		public void ResolveOverloadsSameFirstParameterType()
+		{
+			var mock = new Mock<MethodOverloads>();
+			mock.Protected().Setup("SameFirstParameter", new object(), new object()).Verifiable();
+			mock.Protected().Setup("SameFirstParameter", new object()).Verifiable();
+
+			mock.Object.ExecuteSameFirstParameter(new object());
+		}
+
+		[Fact]
 		public void ThrowsIfSetReturnsForVoidMethod()
 		{
 			Assert.Throws<ArgumentException>(
@@ -721,6 +731,12 @@ namespace Moq.Tests
 			{
 				return a + b;
 			}
+
+			public void ExecuteSameFirstParameter(object a) { }
+
+			protected virtual void SameFirstParameter(object a) { }
+
+			protected virtual void SameFirstParameter(object a, object b) { }
 		}
 
 		public class FooBase

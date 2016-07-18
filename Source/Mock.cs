@@ -91,7 +91,7 @@ namespace Moq
 				// We may have received a T of an implemented 
 				// interface in the mock.
 				var mock = mockedPlain.Mock;
-				var imockedType = mocked.GetType().GetInterface("IMocked`1", false);
+				var imockedType = mocked.GetType().GetTypeInfo().ImplementedInterfaces.Single(i => i.Name.Equals("IMocked`1", StringComparison.Ordinal));
 				var mockedType = imockedType.GetGenericArguments()[0];
 
 				if (mock.ImplementedInterfaces.Contains(typeof(T)))
@@ -602,10 +602,10 @@ namespace Moq
 
 				// No need to call ThrowIfCantOverride as non-overridable would have thrown above already.
 
-                // Get the variable name as used in the actual delegate :)
-                // because of delegate currying, look at the last parameter for the Action's backing method, not the first
-                var setterExpressionParameters = setterExpression.Method.GetParameters();
-                var parameterName = setterExpressionParameters[setterExpressionParameters.Length - 1].Name;
+				// Get the variable name as used in the actual delegate :)
+				// because of delegate currying, look at the last parameter for the Action's backing method, not the first
+				var setterExpressionParameters = setterExpression.GetMethodInfo().GetParameters();
+				var parameterName = setterExpressionParameters[setterExpressionParameters.Length - 1].Name;
                 var x = Expression.Parameter(last.Invocation.Method.DeclaringType, parameterName);
 
 				var arguments = last.Invocation.Arguments;
@@ -718,8 +718,12 @@ namespace Moq
                         var returnsMethod =
                             genericSetupGetMethod
                                 .ReturnType
-                                .GetInterface("IReturnsGetter`2", ignoreCase: false)
-                                .GetMethod("Returns", new Type[] { property.PropertyType });
+								.GetTypeInfo()
+								.ImplementedInterfaces
+								.SingleOrDefault(i => i.Name.Equals("IReturnsGetter`2", StringComparison.OrdinalIgnoreCase))
+								.GetTypeInfo()
+								.DeclaredMethods
+								.SingleOrDefault(m => m.Name == "Returns" && m.GetParameterTypes().Count() == 1 && m.GetParameterTypes().First() == property.PropertyType);
 
                         var returnsGetter = genericSetupGetMethod.Invoke(mock, new[] { expression });
                         returnsMethod.Invoke(returnsGetter, new[] { initialValue });
@@ -823,9 +827,9 @@ namespace Moq
 		private class FluentMockVisitor : ExpressionVisitor
 		{
 			static readonly MethodInfo FluentMockGenericMethod = ((Func<Mock<string>, Expression<Func<string, string>>, Mock<string>>)
-				QueryableMockExtensions.FluentMock<string, string>).Method.GetGenericMethodDefinition();
+				QueryableMockExtensions.FluentMock<string, string>).GetMethodInfo().GetGenericMethodDefinition();
 			static readonly MethodInfo MockGetGenericMethod = ((Func<string, Mock<string>>)Moq.Mock.Get<string>)
-				.Method.GetGenericMethodDefinition();
+				.GetMethodInfo().GetGenericMethodDefinition();
 
 			Expression expression;
 			Mock mock;
@@ -885,7 +889,7 @@ namespace Moq
 				// compiler-generated types as they are typically the 
 				// anonymous types generated to build up the query expressions.
 				if (node.Expression.NodeType == ExpressionType.Parameter &&
-					node.Expression.Type.GetCustomAttribute<CompilerGeneratedAttribute>(false) != null)
+					node.Expression.Type.GetTypeInfo().GetCustomAttribute<CompilerGeneratedAttribute>(false) != null)
 				{
 					var memberType = node.Member is FieldInfo ?
 						((FieldInfo)node.Member).FieldType :
@@ -991,7 +995,7 @@ namespace Moq
 				throw new InvalidOperationException(Resources.AlreadyInitialized);
 			}
 
-			if (!typeof(TInterface).IsInterface)
+			if (!typeof(TInterface).GetTypeInfo().IsInterface)
 			{
 				throw new ArgumentException(Resources.AsMustBeInterface);
 			}

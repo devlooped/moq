@@ -40,6 +40,7 @@
 
 using System;
 using System.Linq.Expressions;
+using System.Reflection;
 
 namespace Moq.Matchers
 {
@@ -49,7 +50,7 @@ namespace Moq.Matchers
 
 		public RefMatcher(object reference)
 		{
-			if (reference != null && reference.GetType().IsValueType)
+			if (reference != null && reference.GetType().GetTypeInfo().IsValueType)
 			{
 				equals = value => object.Equals(reference, value);
 			}

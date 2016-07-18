@@ -88,7 +88,7 @@ namespace Moq.Linq
 
 		protected override Expression VisitConstant(ConstantExpression node)
 		{
-			if (node != null && node.Type.IsGenericType && node.Type.GetGenericTypeDefinition() == typeof(MockQueryable<>))
+			if (node != null && node.Type.GetTypeInfo().IsGenericType && node.Type.GetGenericTypeDefinition() == typeof(MockQueryable<>))
 			{
 				//var asQueryableMethod = createQueryableMethod.MakeGenericMethod(node.Type.GetGenericArguments()[0]);
 

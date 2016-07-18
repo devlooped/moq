@@ -42,7 +42,9 @@ using System;
 using System.Diagnostics.CodeAnalysis;
 using System.Globalization;
 using System.Linq;
+#if FEATURE_SERIALIZATION
 using System.Runtime.Serialization;
+#endif
 using System.Security;
 using Moq.Properties;
 using Moq.Proxy;
@@ -67,7 +69,7 @@ namespace Moq
 	/// </para>
 	/// </remarks>
 	[SuppressMessage("Microsoft.Design", "CA1032:ImplementStandardExceptionConstructors", Justification = "It's only initialized internally.")]
-#if !SILVERLIGHT
+#if FEATURE_SERIALIZATION
 	[Serializable]
 #endif
 	public class ObsoleteMockException : Exception
@@ -128,7 +130,7 @@ namespace Moq
 			);
 		}
 
-#if !SILVERLIGHT
+#if FEATURE_SERIALIZATION
 		/// <summary>
 		/// Supports the serialization infrastructure.
 		/// </summary>
@@ -161,7 +163,7 @@ namespace Moq
 	/// Used by the mock factory to accumulate verification 
 	/// failures.
 	/// </devdoc>
-#if !SILVERLIGHT
+#if FEATURE_SERIALIZATION
 	[Serializable]
 #endif
 	internal class ObsoleteMockVerificationException : ObsoleteMockException
@@ -219,7 +221,7 @@ namespace Moq
 			return GetRawSetups(failedSetups);
 		}
 
-#if !SILVERLIGHT
+#if FEATURE_SERIALIZATION
 		/// <summary>
 		/// Supports the serialization infrastructure.
 		/// </summary>

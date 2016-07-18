@@ -67,7 +67,7 @@ namespace Moq.Protected
 
 			var method = GetMethod(methodName, args);
 			ThrowIfMemberMissing(methodName, method);
-			ThrowIfPublicMethod(method);
+			ThrowIfPublicMethod(method, typeof(T).Name);
 
 			return Mock.Setup(mock, GetMethodCall(method, args), null);
 		}
@@ -79,7 +79,7 @@ namespace Moq.Protected
 			var property = GetProperty(methodName);
 			if (property != null)
 			{
-				ThrowIfPublicGetter(property);
+				ThrowIfPublicGetter(property, typeof(T).Name);
 				// TODO should consider property indexers
 				return Mock.SetupGet(mock, GetMemberAccess<TResult>(property), null);
 			}
@@ -87,7 +87,7 @@ namespace Moq.Protected
 			var method = GetMethod(methodName, args);
 			ThrowIfMemberMissing(methodName, method);
 			ThrowIfVoidMethod(method);
-			ThrowIfPublicMethod(method);
+			ThrowIfPublicMethod(method, typeof(T).Name);
 
 			return Mock.Setup(mock, GetMethodCall<TResult>(method, args), null);
 		}
@@ -98,7 +98,7 @@ namespace Moq.Protected
 
 			var property = GetProperty(propertyName);
 			ThrowIfMemberMissing(propertyName, property);
-			ThrowIfPublicGetter(property);
+			ThrowIfPublicGetter(property, typeof(T).Name);
 			property.ThrowIfNoGetter();
 
 			return Mock.SetupGet(mock, GetMemberAccess<TProperty>(property), null);
@@ -110,7 +110,7 @@ namespace Moq.Protected
 
 			var property = GetProperty(propertyName);
 			ThrowIfMemberMissing(propertyName, property);
-			ThrowIfPublicSetter(property);
+			ThrowIfPublicSetter(property, typeof(T).Name);
 			property.ThrowIfNoSetter();
 
 			return Mock.SetupSet<T, TProperty>(mock, GetSetterExpression(property, ItExpr.IsAny<TProperty>()), null);
@@ -126,7 +126,7 @@ namespace Moq.Protected
 
 			var method = GetMethod(methodName, args);
 			ThrowIfMemberMissing(methodName, method);
-			ThrowIfPublicMethod(method);
+			ThrowIfPublicMethod(method, typeof(T).Name);
 
 			Mock.Verify(mock, GetMethodCall(method, args), times, null);
 		}
@@ -138,7 +138,7 @@ namespace Moq.Protected
 			var property = GetProperty(methodName);
 			if (property != null)
 			{
-				ThrowIfPublicGetter(property);
+				ThrowIfPublicGetter(property, typeof(T).Name);
 				// TODO should consider property indexers
 				Mock.VerifyGet(mock, GetMemberAccess<TResult>(property), times, null);
 				return;
@@ -146,7 +146,7 @@ namespace Moq.Protected
 
 			var method = GetMethod(methodName, args);
 			ThrowIfMemberMissing(methodName, method);
-			ThrowIfPublicMethod(method);
+			ThrowIfPublicMethod(method, typeof(T).Name);
 
 			Mock.Verify(mock, GetMethodCall<TResult>(method, args), times, null);
 		}
@@ -158,7 +158,7 @@ namespace Moq.Protected
 
 			var property = GetProperty(propertyName);
 			ThrowIfMemberMissing(propertyName, property);
-			ThrowIfPublicGetter(property);
+			ThrowIfPublicGetter(property, typeof(T).Name);
 			property.ThrowIfNoGetter();
 
 			// TODO should consider property indexers
@@ -172,7 +172,7 @@ namespace Moq.Protected
 
 			var property = GetProperty(propertyName);
 			ThrowIfMemberMissing(propertyName, property);
-			ThrowIfPublicSetter(property);
+			ThrowIfPublicSetter(property, typeof(T).Name);
 			property.ThrowIfNoSetter();
 
 			// TODO should consider property indexers
@@ -190,12 +190,9 @@ namespace Moq.Protected
 
 		private static MethodInfo GetMethod(string methodName, params object[] args)
 		{
-			return typeof(T).GetMethod(
-				methodName,
-				BindingFlags.Instance | BindingFlags.NonPublic | BindingFlags.Public,
-				null,
-				ToArgTypes(args),
-				null);
+			var argTypes = ToArgTypes(args);
+			return typeof(T).GetMethods(BindingFlags.Instance | BindingFlags.NonPublic | BindingFlags.Public)
+				.SingleOrDefault(m => m.Name == methodName && m.HasMatchingParameterTypes(argTypes));
 		}
 
 		private static Expression<Func<T, TResult>> GetMethodCall<TResult>(MethodInfo method, object[] args)
@@ -227,14 +224,14 @@ namespace Moq.Protected
 				param).Compile();
 		}
 
-		private static void ThrowIfNonVirtual(MethodInfo method)
+		private static void ThrowIfNonVirtual(MethodInfo method, string reflectedTypeName)
 		{
 			if (method.IsAssembly || method.IsFamilyAndAssembly)
 			{
 				throw new ArgumentException(string.Format(
 					CultureInfo.CurrentCulture,
 					Resources.VerifyOnNonVirtualMember,
-					method.ReflectedType.Name + "." + method.Name));
+					reflectedTypeName + "." + method.Name));
 			}
 		}
 
@@ -250,38 +247,38 @@ namespace Moq.Protected
 			}
 		}
 
-		private static void ThrowIfPublicMethod(MethodInfo method)
+		private static void ThrowIfPublicMethod(MethodInfo method, string reflectedTypeName)
 		{
 			if (method.IsPublic)
 			{
 				throw new ArgumentException(string.Format(
 					CultureInfo.CurrentCulture,
 					Resources.MethodIsPublic,
-					method.ReflectedType.Name,
+					reflectedTypeName,
 					method.Name));
 			}
 		}
 
-		private static void ThrowIfPublicGetter(PropertyInfo property)
+		private static void ThrowIfPublicGetter(PropertyInfo property, string reflectedTypeName)
 		{
 			if (property.CanRead && property.GetGetMethod() != null)
 			{
 				throw new ArgumentException(string.Format(
 					CultureInfo.CurrentCulture,
 					Resources.UnexpectedPublicProperty,
-					property.ReflectedType.Name,
+					reflectedTypeName,
 					property.Name));
 			}
 		}
 
-		private static void ThrowIfPublicSetter(PropertyInfo property)
+		private static void ThrowIfPublicSetter(PropertyInfo property, string reflectedTypeName)
 		{
 			if (property.CanWrite && property.GetSetMethod() != null)
 			{
 				throw new ArgumentException(string.Format(
 					CultureInfo.CurrentCulture,
 					Resources.UnexpectedPublicProperty,
-					property.ReflectedType.Name,
+					reflectedTypeName,
 					property.Name));
 			}
 		}
@@ -321,19 +318,20 @@ namespace Moq.Protected
 				else if (expr.NodeType == ExpressionType.MemberAccess)
 				{
 					var member = (MemberExpression)expr;
-					switch (member.Member.MemberType)
+					if ((member.Member as FieldInfo) != null)
 					{
-						case MemberTypes.Field:
-							types[index] = ((FieldInfo)member.Member).FieldType;
-							break;
-						case MemberTypes.Property:
-							types[index] = ((PropertyInfo)member.Member).PropertyType;
-							break;
-						default:
-							throw new NotSupportedException(string.Format(
-								Resources.Culture,
-								Resources.UnsupportedMember,
-								member.Member.Name));
+						types[index] = ((FieldInfo)member.Member).FieldType;
+					}
+					else if ((member.Member as PropertyInfo) != null)
+					{
+						types[index] = ((PropertyInfo)member.Member).PropertyType;
+					}
+					else
+					{
+						throw new NotSupportedException(string.Format(
+							Resources.Culture,
+							Resources.UnsupportedMember,
+							member.Member.Name));
 					}
 				}
 				else

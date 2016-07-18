@@ -43,6 +43,9 @@ using System.Globalization;
 using System.Linq.Expressions;
 using Moq.Properties;
 using Moq.Matchers;
+#if NETCORE
+using System.Reflection;
+#endif
 
 namespace Moq
 {

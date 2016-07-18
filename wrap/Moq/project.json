@@ -1,0 +1,15 @@
+{
+  "version": "99.99.99-wrapped",
+  "dependencies": {
+        "Castle.Core": "4.0.0-beta001"
+  },
+  "frameworks": {
+    "netstandard1.3": {
+      "wrappedProject": "../../Source.NetCore/Moq.NetCore.csproj",
+      "bin": {
+        "assembly": "../../Source.NetCore/bin/{configuration}/Moq.dll",
+        "pdb": "../../Source.NetCore/bin/{configuration}/Moq.pdb"
+      }
+    }
+  }
+}

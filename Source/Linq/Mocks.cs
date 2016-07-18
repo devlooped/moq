@@ -116,8 +116,9 @@ namespace Moq
 		/// </summary>
 		internal static IQueryable<T> CreateMockQuery<T>() where T : class
 		{
+			var method = ((Func<IQueryable<T>>)CreateQueryable<T>).GetMethodInfo();
 			return new MockQueryable<T>(Expression.Call(null,
-				((Func<IQueryable<T>>)CreateQueryable<T>).Method));
+				method));
 		}
 
 		/// <summary>
