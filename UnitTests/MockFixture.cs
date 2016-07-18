@@ -72,7 +72,8 @@ namespace Moq.Tests
 
 		public class ToStringOverrider
 		{
-			public override string ToString() {
+			public override string ToString()
+			{
 				return "real value";
 			}
 		}
@@ -254,65 +255,65 @@ namespace Moq.Tests
 
 			Assert.False(mock.Object.Check("foo"));
 			Assert.True(mock.Object.Check("bar"));
-        }
+		}
 
-        [Fact]
-        public void CanSetupToString()
-        {
-            var mock = new Mock<Foo>();
-            mock.Setup(x => x.ToString()).Returns("This is me");
+		[Fact]
+		public void CanSetupToString()
+		{
+			var mock = new Mock<Foo>();
+			mock.Setup(x => x.ToString()).Returns("This is me");
 
-            Assert.Equal("This is me", mock.Object.ToString());
-        }
+			Assert.Equal("This is me", mock.Object.ToString());
+		}
 
-        [Fact]
-        public void CanSetupToStringForInterface()
-        {
-            var mock = new Mock<IFoo>();
-            mock.Setup(x => x.ToString()).Returns("This is me");
+		[Fact]
+		public void CanSetupToStringForInterface()
+		{
+			var mock = new Mock<IFoo>();
+			mock.Setup(x => x.ToString()).Returns("This is me");
 
-            Assert.Equal("This is me", mock.Object.ToString());
-        }
+			Assert.Equal("This is me", mock.Object.ToString());
+		}
 
-        [Fact]
-        public void CanSetupGetHashCode()
-        {
-            var mock = new Mock<Foo>();
-            mock.Setup(x => x.GetHashCode()).Returns(527);
+		[Fact]
+		public void CanSetupGetHashCode()
+		{
+			var mock = new Mock<Foo>();
+			mock.Setup(x => x.GetHashCode()).Returns(527);
 
-            Assert.Equal(527, mock.Object.GetHashCode());
-        }
+			Assert.Equal(527, mock.Object.GetHashCode());
+		}
 
-        [Fact]
-        public void CanSetupGetHashCodeForInterface()
-        {
-            var mock = new Mock<IFoo>();
-            mock.Setup(x => x.GetHashCode()).Returns(527);
+		[Fact]
+		public void CanSetupGetHashCodeForInterface()
+		{
+			var mock = new Mock<IFoo>();
+			mock.Setup(x => x.GetHashCode()).Returns(527);
 
-            Assert.Equal(527, mock.Object.GetHashCode());
-        }
+			Assert.Equal(527, mock.Object.GetHashCode());
+		}
 
-        [Fact]
-        public void CanSetupObjectEquals()
-        {
-            var mock = new Mock<Foo>();
-            mock.Setup(x => x.Equals(It.IsAny<object>())).Returns<object>((obj) => false);
-            var foo = mock.Object;
+		[Fact]
+		public void CanSetupObjectEquals()
+		{
+			var mock = new Mock<Foo>();
+			mock.Setup(x => x.Equals(It.IsAny<object>())).Returns<object>((obj) => false);
+			var foo = mock.Object;
 
-            Assert.True(!foo.Equals(foo));
-        }
+			Assert.True(!foo.Equals(foo));
+		}
 
-        [Fact]
-        public void CanSetupObjectEqualsForInterface()
-        {
-            var mock = new Mock<IFoo>();
-            mock.Setup(x => x.Equals(It.IsAny<object>())).Returns<object>((obj) => false);
-            var foo = mock.Object;
+		[Fact]
+		public void CanSetupObjectEqualsForInterface()
+		{
+			var mock = new Mock<IFoo>();
+			mock.Setup(x => x.Equals(It.IsAny<object>())).Returns<object>((obj) => false);
+			var foo = mock.Object;
 
-            Assert.True(!foo.Equals(foo));
-        }
+			Assert.True(!foo.Equals(foo));
+		}
 
-        [Fact]
+		[Fact]
 		public void CallsUnderlyingClassEquals()
 		{
 			var mock = new Mock<FooOverrideEquals>();
@@ -390,14 +391,14 @@ namespace Moq.Tests
 		[Fact]
 		public void ThrowsIfNoMatchingConstructorFound()
 		{
-            try
-            {
-                Console.WriteLine(new Mock<ClassWithNoDefaultConstructor>(25, true).Object);
-                Assert.True(false, "Should have thrown an exception since constructor does not exist.");
-            }
-            catch (Exception)
-            {
-            }
+			try
+			{
+				Console.WriteLine(new Mock<ClassWithNoDefaultConstructor>(25, true).Object);
+				Assert.True(false, "Should have thrown an exception since constructor does not exist.");
+			}
+			catch (Exception)
+			{
+			}
 		}
 
 		[Fact]

@@ -78,13 +78,13 @@ namespace Moq.Proxy
 		public object CreateProxy(Type mockType, ICallInterceptor interceptor, Type[] interfaces, object[] arguments)
 		{
 			if (mockType.IsInterface)
-            {
-                // Add type to additional interfaces and mock System.Object instead.
-                // This way it is also possible to mock System.Object methods.
-                Array.Resize(ref interfaces, interfaces.Length + 1);
-                interfaces[interfaces.Length - 1] = mockType;
-                mockType = typeof(object);
-            }
+			{
+				// Add type to additional interfaces and mock System.Object instead.
+				// This way it is also possible to mock System.Object methods.
+				Array.Resize(ref interfaces, interfaces.Length + 1);
+				interfaces[interfaces.Length - 1] = mockType;
+				mockType = typeof(object);
+			}
 
 			try
 			{
@@ -112,23 +112,23 @@ namespace Moq.Proxy
 			lock (this)
 			{
 				if (!delegateInterfaceCache.TryGetValue(delegateType, out delegateInterfaceType))
- 				{
+				{
 					var interfaceName = String.Format(CultureInfo.InvariantCulture, "DelegateInterface_{0}_{1}",
-					                                  delegateType.Name, delegateInterfaceSuffix++);
+													  delegateType.Name, delegateInterfaceSuffix++);
 
 					var moduleBuilder = generator.ProxyBuilder.ModuleScope.ObtainDynamicModule(true);
 					var newTypeBuilder = moduleBuilder.DefineType(interfaceName,
-					                                              TypeAttributes.Public | TypeAttributes.Interface |
-					                                              TypeAttributes.Abstract);
+																  TypeAttributes.Public | TypeAttributes.Interface |
+																  TypeAttributes.Abstract);
 
 					var invokeMethodOnDelegate = delegateType.GetMethod("Invoke");
 					var delegateParameterTypes = invokeMethodOnDelegate.GetParameters().Select(p => p.ParameterType).ToArray();
 
 					// Create a method on the interface with the same signature as the delegate.
 					var newMethBuilder = newTypeBuilder.DefineMethod("Invoke",
-					                                                 MethodAttributes.Public | MethodAttributes.Virtual | MethodAttributes.Abstract,
-					                                                 CallingConventions.HasThis,
-					                                                 invokeMethodOnDelegate.ReturnType, delegateParameterTypes);
+																	 MethodAttributes.Public | MethodAttributes.Virtual | MethodAttributes.Abstract,
+																	 CallingConventions.HasThis,
+																	 invokeMethodOnDelegate.ReturnType, delegateParameterTypes);
 
 					foreach (var param in invokeMethodOnDelegate.GetParameters())
 					{
@@ -137,12 +137,12 @@ namespace Moq.Proxy
 
 					delegateInterfaceType = newTypeBuilder.CreateType();
 					delegateInterfaceCache[delegateType] = delegateInterfaceType;
- 				}
- 			}
+				}
+			}
 
 			delegateInterfaceMethod = delegateInterfaceType.GetMethod("Invoke");
 			return delegateInterfaceType;
- 		}
+		}
 
 		private static ProxyGenerator CreateProxyGenerator()
 		{
