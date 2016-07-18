@@ -39,6 +39,7 @@
 // http://www.opensource.org/licenses/bsd-license.php]
 
 using System;
+using System.Collections;
 using System.Diagnostics.CodeAnalysis;
 using System.Globalization;
 using System.Linq;
@@ -87,7 +88,10 @@ namespace Moq
 			{
 				return "\"" + typedValue + "\"";
 			}
-
+		    if (value is IEnumerable)
+		    {
+		        return "[" + string.Join(", ", ((IEnumerable) value).OfType<object>().Select(GetValue)) + "]";
+		    }
 			return value.ToString();
 		}
 
