@@ -33,7 +33,7 @@
         "define": [ "NETCORE" ]
       },
       "dependencies": {
-        "Castle.Core": "4.0.0-alpha001",
+        "Castle.Core": "4.0.0-beta001",
         "ClassLibrary1": {
           "target": "project",
           "version": "1.0.0-*"
@@ -56,7 +56,7 @@
         "System.ServiceModel.Primitives": "4.1.0",
         "dotnet-test-xunit": "2.2.0-preview2-build1029"
       },
-      "imports": [ "dotnet5.4", "dnxcore50", "portable-net451+win81" ]
+      "imports": [ "dnxcore50", "portable-net451+win81" ]
     }
   }
 }

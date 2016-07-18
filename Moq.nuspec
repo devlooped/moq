@@ -178,10 +178,10 @@ Version 1.0
 </releaseNotes>
     <dependencies>
       <group targetFramework=".NETFramework4.5">
-        <dependency id="Castle.Core" version="4.0.0-alpha001" />
+        <dependency id="Castle.Core" version="4.0.0-beta001" />
       </group>
       <group targetFramework=".NETStandard1.3">
-        <dependency id="Castle.Core" version="4.0.0-alpha001" />
+        <dependency id="Castle.Core" version="4.0.0-beta001" />
         <dependency id="System.Collections" version="4.0.11" />
         <dependency id="System.Collections.Concurrent" version="4.0.12" />
         <dependency id="System.Diagnostics.Debug" version="4.0.11" />
