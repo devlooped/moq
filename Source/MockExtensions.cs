@@ -35,6 +35,7 @@ namespace Moq
         {
             mock.Interceptor.InterceptionContext.ClearOrderedCalls();
             mock.Interceptor.InterceptionContext.ClearEventHandlers();
+            mock.Interceptor.ClearCalls();
             mock.ResetCalls();
         } 
     }
