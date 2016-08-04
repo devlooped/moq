@@ -164,12 +164,17 @@ namespace Moq
 				}
 
 				var eq = key.fixedString == this.fixedString && key.values.Count == this.values.Count;
+                if(!eq)
+                {
+                    return false;
+                }
 
-				var index = 0;
-				while (eq && index < this.values.Count)
+				for(int index=0; index < values.Count; index++)
 				{
-					eq |= this.values[index] == key.values[index];
-					index++;
+                    if (this.values[index] != key.values[index])
+                    {
+                        return false;
+                    }
 				}
 
 				return eq;
