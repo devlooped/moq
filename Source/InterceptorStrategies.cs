@@ -133,25 +133,42 @@ namespace Moq
 		}
 	}
 
-	internal class InterceptToStringMixin : IInterceptStrategy
+	/// <summary>
+	/// Intercept strategy that handles `System.Object` methods.
+	/// </summary>
+	internal class InterceptObjectMethodsMixin : IInterceptStrategy
 	{
 		public InterceptionAction HandleIntercept(ICallContext invocation, InterceptorContext ctx, CurrentInterceptContext localctx)
 		{
 			var method = invocation.Method;
 
-			// Only if there is no corresponding setup
-			if (IsObjectToStringMethod(method) && !ctx.OrderedCalls.Select(c => IsObjectToStringMethod(c.Method)).Any())
+			// Only if there is no corresponding setup for `ToString()`
+			if (IsObjectMethod(method, "ToString") && !ctx.OrderedCalls.Select(c => IsObjectMethod(c.Method, "ToString")).Any())
 			{
 				invocation.ReturnValue = ctx.Mock.ToString() + ".Object";
+				return InterceptionAction.Stop;
+			}
+
+			// Only if there is no corresponding setup for `GetHashCode()`
+			if (IsObjectMethod(method, "GetHashCode") && !ctx.OrderedCalls.Select(c => IsObjectMethod(c.Method, "GetHashCode")).Any())
+			{
+				invocation.ReturnValue = ctx.Mock.GetHashCode();
+				return InterceptionAction.Stop;
+			}
+
+			// Only if there is no corresponding setup for `Equals()`
+			if (IsObjectMethod(method, "Equals") && !ctx.OrderedCalls.Select(c => IsObjectMethod(c.Method, "Equals")).Any())
+			{
+				invocation.ReturnValue = ReferenceEquals(invocation.Arguments.First(), ctx.Mock.Object);
 				return InterceptionAction.Stop;
 			}
 
 			return InterceptionAction.Continue;
 		}
 
-		protected bool IsObjectToStringMethod(MethodInfo method)
+		protected bool IsObjectMethod(MethodInfo method, string name)
 		{
-			if (method.DeclaringType == typeof(object) && method.Name == "ToString")
+			if (method.DeclaringType == typeof(object) && method.Name == name)
 			{
 				return true;
 			}
