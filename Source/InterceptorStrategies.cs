@@ -143,21 +143,21 @@ namespace Moq
 			var method = invocation.Method;
 
 			// Only if there is no corresponding setup for `ToString()`
-			if (IsObjectMethod(method, "ToString") && !ctx.OrderedCalls.Select(c => IsObjectMethod(c.Method, "ToString")).Any())
+			if (IsObjectMethod(method, "ToString") && !ctx.OrderedCalls.Any(c => IsObjectMethod(c.Method, "ToString")))
 			{
 				invocation.ReturnValue = ctx.Mock.ToString() + ".Object";
 				return InterceptionAction.Stop;
 			}
 
 			// Only if there is no corresponding setup for `GetHashCode()`
-			if (IsObjectMethod(method, "GetHashCode") && !ctx.OrderedCalls.Select(c => IsObjectMethod(c.Method, "GetHashCode")).Any())
+			if (IsObjectMethod(method, "GetHashCode") && !ctx.OrderedCalls.Any(c => IsObjectMethod(c.Method, "GetHashCode")))
 			{
 				invocation.ReturnValue = ctx.Mock.GetHashCode();
 				return InterceptionAction.Stop;
 			}
 
 			// Only if there is no corresponding setup for `Equals()`
-			if (IsObjectMethod(method, "Equals") && !ctx.OrderedCalls.Select(c => IsObjectMethod(c.Method, "Equals")).Any())
+			if (IsObjectMethod(method, "Equals") && !ctx.OrderedCalls.Any(c => IsObjectMethod(c.Method, "Equals")))
 			{
 				invocation.ReturnValue = ReferenceEquals(invocation.Arguments.First(), ctx.Mock.Object);
 				return InterceptionAction.Stop;

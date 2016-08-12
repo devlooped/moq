@@ -285,16 +285,19 @@ namespace Moq.Tests.Regressions
 			[Fact]
 			public void SystemObjectMethodsShouldWorkInStrictMocks()
 			{
-				var mockObject = new Mock<IMyInterface>(MockBehavior.Strict).Object;
+				var mock = new Mock<IMyInterface>(MockBehavior.Strict);
 
-				Assert.IsType(typeof(int), mockObject.GetHashCode());
-				Assert.IsType(typeof(string), mockObject.ToString());
-				Assert.False(mockObject.Equals("ImNotTheObject"));
-				Assert.True(mockObject.Equals(mockObject));
+				mock.Setup(x => x.Test()).Returns(true);
+
+				Assert.IsType(typeof(int), mock.Object.GetHashCode());
+				Assert.IsType(typeof(string), mock.Object.ToString());
+				Assert.False(mock.Object.Equals("ImNotTheObject"));
+				Assert.True(mock.Object.Equals(mock.Object));
 			}
 
 			public interface IMyInterface
 			{
+				bool Test();
 			}
 		}
 
