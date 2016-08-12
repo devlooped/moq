@@ -113,6 +113,11 @@ namespace Moq
 			InterceptionContext.AddOrderedCall(call);
 		}
 
+	    internal void ClearCalls()
+	    {
+	        calls.Clear();
+	    }
+
 		private IEnumerable<IInterceptStrategy> InterceptionStrategies()
 		{
 			yield return new HandleDestructor();

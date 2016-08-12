@@ -38,6 +38,56 @@ namespace Moq.Tests
             var result = mock.Object.Execute("ping");
             Assert.Null(result);
         }
+
+        [Fact]
+       
+        public void Loose()
+        {
+            var myMock = new Mock<IEnumerable<int>>(MockBehavior.Loose);
+            myMock
+                .Setup(a => a.ToString())
+                .Returns("Hello");
+            myMock.Reset();
+            Assert.NotEqual("Hello", myMock.Object.ToString());
+            myMock.VerifyAll();
+        }
+
+        [Fact]
+       
+        public void Strict()
+        {
+            var myMock = new Mock<IEnumerable<int>>(MockBehavior.Strict);
+            myMock
+                .Setup(a => a.ToString())
+                .Returns("Hello");
+            myMock.Reset();
+            Assert.NotEqual("Hello", myMock.Object.ToString());
+            myMock.VerifyAll();
+        }
+
+        [Fact]
+       
+        public void LooseNoCall()
+        {
+            var myMock = new Mock<IEnumerable<int>>(MockBehavior.Loose);
+            myMock
+                .Setup(a => a.ToString())
+                .Returns("Hello");
+            myMock.Reset();
+            myMock.VerifyAll();
+        }
+
+        [Fact]
+       
+        public void StrictNoCall()
+        {
+            var myMock = new Mock<IEnumerable<int>>(MockBehavior.Strict);
+            myMock
+                .Setup(a => a.ToString())
+                .Returns("Hello");
+            myMock.Reset();
+            myMock.VerifyAll();
+        }
         #endregion
     }
 
