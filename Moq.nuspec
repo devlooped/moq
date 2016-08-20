@@ -178,7 +178,7 @@ Version 1.0
 </releaseNotes>
     <dependencies>
       <group targetFramework=".NETFramework4.5">
-        <dependency id="Castle.Core" version="4.0.0-beta001" />
+        <dependency id="Castle.Core" version="3.3.3" />
       </group>
       <group targetFramework=".NETStandard1.3">
         <dependency id="Castle.Core" version="4.0.0-beta001" />
