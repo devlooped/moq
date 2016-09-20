@@ -1523,6 +1523,59 @@ namespace Moq.Tests.Regressions
 
 		#endregion
 
+		#region #228
+
+		public class _228
+		{
+			[Fact]
+			public void Test()
+			{
+				var mock = new Mock<FooBar>() { CallBase = true };
+				IFoo foo = mock.Object;
+				IBar bar = mock.Object;
+
+				bool fooRaised = false;
+				bool barRaised = false;
+				foo.Foo += (s, e) => fooRaised = true;
+				bar.Bar += (s, e) => barRaised = true;
+
+				mock.Object.RaiseMyEvents();
+
+				Assert.True(fooRaised);
+				Assert.True(barRaised);
+			}
+
+			public interface IFoo
+			{
+				event EventHandler Foo;
+			}
+
+			public interface IBar
+			{
+				event EventHandler Bar;
+			}
+
+			public class FooBar : IFoo, IBar
+			{
+				public event EventHandler Foo;
+				public event EventHandler Bar;
+
+				public void RaiseMyEvents()
+				{
+					if (this.Foo != null)
+					{
+						this.Foo(this, EventArgs.Empty);
+					}
+					if (this.Bar != null)
+					{
+						this.Bar(this, EventArgs.Empty);
+					}
+				}
+			}
+		}
+
+		#endregion
+
 		#region #229
 
 		public class _229
