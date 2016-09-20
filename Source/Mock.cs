@@ -108,8 +108,8 @@ namespace Moq
 				var types = string.Join(
 					", ",
 					new[] {mockedType}
-						// Skip first interface which is always our internal IMocked<T>
-						.Concat(mock.ImplementedInterfaces.Skip(1))
+						// Ignore internally defined IMocked<T>
+						.Concat(mock.ImplementedInterfaces.Where(t => t != imockedType))
 						.Select(t => t.Name)
 						.ToArray());
 
@@ -223,6 +223,12 @@ namespace Moq
 		/// Exposes the list of extra interfaces implemented by the mock.
 		/// </summary>
 		internal List<Type> ImplementedInterfaces { get; private set; }
+
+		/// <summary>
+		/// Indicates the number of interfaces in <see cref="ImplementedInterfaces"/> that were
+		/// defined internally, rather than through calls to <see cref="As{TInterface}"/>.
+		/// </summary>
+		internal protected int InternallyImplementedInterfaceCount { get; protected set; }
 
 		#region Verify
 
