@@ -104,6 +104,7 @@
     <Compile Include="Obsolete\ObsoleteMockExtensions.cs" />
     <Compile Include="Obsolete\MockFactory.cs" />
     <Compile Include="SequenceExtensions.cs" />
+    <Compile Include="SerializableTypesValueProvider.cs" />
     <Compile Include="SetupKind.cs" />
     <Compile Include="Language\Flow\IReturnsResult.cs" />
     <Compile Include="ExpressionExtensions.cs" />
