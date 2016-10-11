@@ -1,0 +1,13 @@
+﻿{
+  "dependencies": {
+    "Castle.Core": "3.3.3",
+    "xunit": "2.1.0",
+    "xunit.runner.visualstudio": "2.1.0"
+  },
+  "frameworks": {
+    "net45": {}
+  },
+  "runtimes": {
+    "win": {}
+  }
+}
