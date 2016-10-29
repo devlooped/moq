@@ -16,10 +16,7 @@ namespace Moq
         /// </summary>
         public static IReturnsResult<TMock> ReturnsAsync<TMock, TResult>(this IReturns<TMock, Task<TResult>> mock, TResult value) where TMock : class
         {
-            var tcs = new TaskCompletionSource<TResult>();
-            tcs.SetResult(value);
-
-            return mock.Returns(tcs.Task);
+			return mock.Returns(Task.FromResult(value));
         }
 
 		/// <summary>
@@ -27,12 +24,7 @@ namespace Moq
 		/// </summary>
 		public static IReturnsResult<TMock> ReturnsAsync<TMock, TResult>(this IReturns<TMock, Task<TResult>> mock, Func<TResult> value) where TMock : class
 		{
-			return mock.Returns(() =>
-			{
-				var tcs = new TaskCompletionSource<TResult>();
-				tcs.SetResult(value());
-				return tcs.Task;
-			});
+			return mock.ReturnsAsync(value());
 		}
 
 		/// <summary>
