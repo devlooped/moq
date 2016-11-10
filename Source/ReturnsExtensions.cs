@@ -16,16 +16,21 @@ namespace Moq
         /// </summary>
         public static IReturnsResult<TMock> ReturnsAsync<TMock, TResult>(this IReturns<TMock, Task<TResult>> mock, TResult value) where TMock : class
         {
-            var tcs = new TaskCompletionSource<TResult>();
-            tcs.SetResult(value);
-
-            return mock.Returns(tcs.Task);
+			return mock.Returns(Task.FromResult(value));
         }
 
-        /// <summary>
-        /// Allows to specify the exception thrown by an asynchronous method.
-        /// </summary>
-        public static IReturnsResult<TMock> ThrowsAsync<TMock, TResult>(this IReturns<TMock, Task<TResult>> mock, Exception exception) where TMock : class
+		/// <summary>
+		/// Allows to specify the return value of an asynchronous method.
+		/// </summary>
+		public static IReturnsResult<TMock> ReturnsAsync<TMock, TResult>(this IReturns<TMock, Task<TResult>> mock, Func<TResult> value) where TMock : class
+		{
+			return mock.ReturnsAsync(value());
+		}
+
+		/// <summary>
+		/// Allows to specify the exception thrown by an asynchronous method.
+		/// </summary>
+		public static IReturnsResult<TMock> ThrowsAsync<TMock, TResult>(this IReturns<TMock, Task<TResult>> mock, Exception exception) where TMock : class
         {
             var tcs = new TaskCompletionSource<TResult>();
             tcs.SetException(exception);

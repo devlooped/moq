@@ -93,7 +93,79 @@ namespace Moq.Tests
             Assert.Equal(37, task.Result);
         }
 
-        [Fact]
+		[Fact]
+		public void ReturnsAsyncFunc_on_NoParametersRefReturnType()
+		{
+			var mock = new Mock<IAsyncInterface>();
+			mock.Setup(x => x.NoParametersRefReturnType()).ReturnsAsync(() => "TestString");
+
+			var task = mock.Object.NoParametersRefReturnType();
+
+			Assert.True(task.IsCompleted);
+			Assert.Equal("TestString", task.Result);
+		}
+
+		[Fact]
+		public void ReturnsAsyncFunc_on_NoParametersValueReturnType()
+		{
+			var mock = new Mock<IAsyncInterface>();
+			mock.Setup(x => x.NoParametersValueReturnType()).ReturnsAsync(() => 36);
+
+			var task = mock.Object.NoParametersValueReturnType();
+
+			Assert.True(task.IsCompleted);
+			Assert.Equal(36, task.Result);
+		}
+
+		[Fact]
+		public void ReturnsAsyncFunc_on_RefParameterRefReturnType()
+		{
+			var mock = new Mock<IAsyncInterface>();
+			mock.Setup(x => x.RefParameterRefReturnType("Param1")).ReturnsAsync(() => "TestString");
+
+			var task = mock.Object.RefParameterRefReturnType("Param1");
+
+			Assert.True(task.IsCompleted);
+			Assert.Equal("TestString", task.Result);
+		}
+
+		[Fact]
+		public void ReturnsAsyncFunc_on_RefParameterValueReturnType()
+		{
+			var mock = new Mock<IAsyncInterface>();
+			mock.Setup(x => x.RefParameterValueReturnType("Param1")).ReturnsAsync(() => 36);
+
+			var task = mock.Object.RefParameterValueReturnType("Param1");
+
+			Assert.True(task.IsCompleted);
+			Assert.Equal(36, task.Result);
+		}
+
+		[Fact]
+		public void ReturnsAsyncFunc_on_ValueParameterRefReturnType()
+		{
+			var mock = new Mock<IAsyncInterface>();
+			mock.Setup(x => x.ValueParameterRefReturnType(36)).ReturnsAsync(() => "TestString");
+
+			var task = mock.Object.ValueParameterRefReturnType(36);
+
+			Assert.True(task.IsCompleted);
+			Assert.Equal("TestString", task.Result);
+		}
+
+		[Fact]
+		public void ReturnsAsyncFunc_on_ValueParameterValueReturnType()
+		{
+			var mock = new Mock<IAsyncInterface>();
+			mock.Setup(x => x.ValueParameterValueReturnType(36)).ReturnsAsync(() => 37);
+
+			var task = mock.Object.ValueParameterValueReturnType(36);
+
+			Assert.True(task.IsCompleted);
+			Assert.Equal(37, task.Result);
+		}
+
+		[Fact]
         public void ThrowsAsync_on_NoParametersRefReturnType()
         {
             var mock = new Mock<IAsyncInterface>();
