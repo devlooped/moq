@@ -253,6 +253,11 @@ namespace Moq
 			}
 		}
 
+        internal static void VerifyNothing<T>(Mock<T> mock) where T : class
+        {
+            mock.Interceptor.VerifyNothing();
+        }
+
 		internal static void Verify<T>(
 			Mock<T> mock,
 			Expression<Action<T>> expression,
@@ -997,6 +1002,5 @@ namespace Moq
 		}
 
 		#endregion
-
 	}
 }
