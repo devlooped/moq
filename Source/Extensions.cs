@@ -83,15 +83,15 @@ namespace Moq
 			if (invocation.Method.IsPropertySetter())
 			{
 				return invocation.Method.DeclaringType.Name + "." +
-				       invocation.Method.Name.Substring(4) + " = " + GetValue(invocation.Arguments.First());
+					   invocation.Method.Name.Substring(4) + " = " + GetValue(invocation.Arguments.First());
 			}
 
 			var genericParameters = invocation.Method.IsGenericMethod
-				                        ? "<" + string.Join(", ", invocation.Method.GetGenericArguments().Select(t => t.Name).ToArray()) + ">"
-				                        : "";
+										? "<" + string.Join(", ", invocation.Method.GetGenericArguments().Select(t => t.Name).ToArray()) + ">"
+										: "";
 
 			return invocation.Method.DeclaringType.Name + "." + invocation.Method.Name + genericParameters + "(" +
-			       string.Join(", ", invocation.Arguments.Select(a => GetValue(a)).ToArray()) + ")";
+				   string.Join(", ", invocation.Arguments.Select(a => GetValue(a)).ToArray()) + ")";
 		}
 
 		public static string GetValue(object value)
@@ -108,9 +108,22 @@ namespace Moq
 			}
 			if (value is IEnumerable)
 			{
-				return "[" + string.Join(", ", ((IEnumerable) value).OfType<object>().Select(GetValue)) + "]";
+				return "[" + string.Join(", ", ((IEnumerable)value).OfType<object>().Select(GetValue)) + "]";
 			}
-			return value.ToString();
+
+			if (value.GetType().IsValueType) return value.ToString();
+
+			var propertyInfos = value.GetType().GetProperties();
+			var valueString = value.GetType().Name + "{" + Environment.NewLine;
+
+			foreach (var info in propertyInfos)
+			{
+				var val = info.GetValue(value, null) ?? "null";
+				valueString += info.Name + ": " + GetValue(val) + "," + Environment.NewLine;
+			}
+			valueString += "}";
+
+			return valueString;
 		}
 
 		public static object InvokePreserveStack(this Delegate del, params object[] args)
