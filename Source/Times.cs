@@ -127,7 +127,7 @@ namespace Moq
 		{
 			Guard.NotOutOfRangeInclusive(() => num, num, 0, int.MaxValue);
 
-			return new Times(c => c % num == 0, num, callCount, num.NoMatchingCallsExactly);
+			return new Times(c => c % num == 0, num, num, num.NoMatchingCallsExactly);
 		}
 
 		/// <include file='Times.xdoc' path='docs/doc[@for="Times.Never"]/*'/>
