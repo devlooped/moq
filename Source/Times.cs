@@ -121,6 +121,13 @@ namespace Moq
 
 			return new Times(c => c == callCount, callCount, callCount, Resources.NoMatchingCallsExactly);
 		}
+		
+		public static Times MultiplyOf(int num)
+		{
+			Guard.NotOutOfRangeInclusive(() => num, num, 0, int.MaxValue);
+
+			return new Times(c => (c % num) == 0, num, num, Resources.NoMatchingCallsExactly);
+		}
 
 		/// <include file='Times.xdoc' path='docs/doc[@for="Times.Never"]/*'/>
 		public static Times Never()
