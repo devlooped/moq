@@ -78,12 +78,16 @@ namespace Moq.Tests
         [Fact]
         public void ReturnsAsync_onParams_LazyEvaluationOfTheResult()
         {
+            DateTime comparedDateTime = DateTime.MinValue;
             var mock = new Mock<IAsyncInterface>();
             mock.Setup(x => x.WithParamsAsync(It.IsAny<DateTime[]>()))
-                .ReturnsAsync((DateTime[] dateTimes) => dateTimes.Max());
-            
-            DateTime firstEvaluationResult = mock.Object.WithParamsAsync(DateTime.MinValue, DateTime.Now).Result;
-            DateTime secondEvaluationResult = mock.Object.WithParamsAsync(DateTime.MinValue, DateTime.Now).Result;
+                .ReturnsAsync((DateTime[] dateTimes) => dateTimes.Concat(new[] { comparedDateTime }).Max());
+
+            DateTime now = DateTime.Now;
+            DateTime firstEvaluationResult = mock.Object.WithParamsAsync(DateTime.MinValue, now).Result;
+
+            comparedDateTime = DateTime.MaxValue;
+            DateTime secondEvaluationResult = mock.Object.WithParamsAsync(DateTime.MinValue, now).Result;
 
             Assert.NotEqual(firstEvaluationResult, secondEvaluationResult);
         }
