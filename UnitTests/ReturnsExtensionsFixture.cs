@@ -19,6 +19,8 @@ namespace Moq.Tests
             Task<string> ValueParameterRefReturnType(int value);
          
             Task<int> ValueParameterValueReturnType(int value);
+
+            Task<Guid> NewGuidAsync();
         }
 
         [Fact]
@@ -165,7 +167,31 @@ namespace Moq.Tests
 			Assert.Equal(37, task.Result);
 		}
 
-		[Fact]
+        [Fact]
+        public void ReturnsAsyncFunc_onEachInvocation_ValueReturnTypeLazyEvaluation()
+        {
+            var mock = new Mock<IAsyncInterface>();
+            mock.Setup(x => x.NewGuidAsync()).ReturnsAsync(Guid.NewGuid);
+
+            Guid firstEvaluationResult = mock.Object.NewGuidAsync().Result;
+            Guid secondEvaluationResult = mock.Object.NewGuidAsync().Result;
+
+            Assert.NotEqual(firstEvaluationResult, secondEvaluationResult);
+        }
+
+        [Fact]
+        public void ReturnsAsyncFunc_onEachInvocation_RefReturnTypeLazyEvaluation()
+        {
+            var mock = new Mock<IAsyncInterface>();
+            mock.Setup(x => x.ValueParameterRefReturnType(36)).ReturnsAsync(() => new string(new[] { 'M', 'o', 'q', '4' }));
+
+            string firstEvaluationResult = mock.Object.ValueParameterRefReturnType(36).Result;
+            string secondEvaluationResult = mock.Object.ValueParameterRefReturnType(36).Result;
+
+            Assert.NotSame(firstEvaluationResult, secondEvaluationResult);
+        }
+
+        [Fact]
         public void ThrowsAsync_on_NoParametersRefReturnType()
         {
             var mock = new Mock<IAsyncInterface>();
