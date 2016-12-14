@@ -182,6 +182,7 @@ namespace Moq
             else
             {
                 this.defaultValue = DefaultValue.Custom;
+                this.defaultValueProvider = value;
             }
         }
 

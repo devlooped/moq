@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Linq.Expressions;
+using System.Reflection;
 using Xunit;
 
 namespace Moq.Tests
@@ -974,6 +975,20 @@ namespace Moq.Tests
                 sut.DefaultValue = DefaultValue.Custom);
         }
 
+        [Fact]
+        public void MockWithCustomDefaultValueProviderCorrectlyBehaves()
+        {
+            var sut = new Mock<IFoo>
+            {
+                DefaultValueProvider = new CustomDefaultValueProvider()
+            };
+            int expected = 123;
+
+            object actual = sut.Object.Object;
+
+            Assert.Equal(expected, actual);
+        }
+
         private static Foo MakeFoo(IMock<IBar> barMock)
 		{
 			return new Foo(barMock.Object);
@@ -983,6 +998,19 @@ namespace Moq.Tests
         {
             public CustomMockDefaultValueProvider(Mock owner) : base(owner)
             {
+            }
+        }
+
+        private class CustomDefaultValueProvider : IDefaultValueProvider
+        {
+            public void DefineDefault<T>(T value)
+            {
+                throw new NotImplementedException();
+            }
+
+            public object ProvideDefault(MethodInfo member)
+            {
+                return 123;
             }
         }
 
