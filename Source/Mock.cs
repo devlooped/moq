@@ -148,7 +148,7 @@ namespace Moq
 		public virtual bool CallBase { get; set; }
 
 		/// <include file='Mock.xdoc' path='docs/doc[@for="Mock.DefaultValue"]/*'/>
-		[Obsolete("Use the DefaultValueProvider property instead. This will be deleted on the next major version.")]
+		[Obsolete("Replaced with DefaultValueProvider.")]
 		public virtual DefaultValue DefaultValue
 		{
 			get { return this.defaultValue; }
