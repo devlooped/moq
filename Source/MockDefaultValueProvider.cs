@@ -74,7 +74,7 @@ namespace Moq
                     // Create a new mock to be placed to InnerMocks dictionary if it's missing there
                     var mockType = typeof(Mock<>).MakeGenericType(info.ReturnType);
                     Mock newMock = (Mock)Activator.CreateInstance(mockType, owner.Behavior);
-                    newMock.DefaultValue = owner.DefaultValue;
+                    newMock.DefaultValueProvider = owner.DefaultValueProvider;
                     newMock.CallBase = owner.CallBase;
                     return newMock;
                 });

@@ -966,6 +966,14 @@ namespace Moq.Tests
             Assert.Equal(DefaultValue.Custom, actual);
         }
 
+        [Fact]
+        public void DefaultValueSetWithCustomThrows()
+        {
+            var sut = new Mock<object>();
+            Assert.Throws<ArgumentException>(() =>
+                sut.DefaultValue = DefaultValue.Custom);
+        }
+
         private static Foo MakeFoo(IMock<IBar> barMock)
 		{
 			return new Foo(barMock.Object);
