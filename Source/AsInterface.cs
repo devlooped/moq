@@ -84,7 +84,7 @@ namespace Moq
 			set { this.owner.CallBase = value; }
 		}
 
-        [Obsolete]
+		[Obsolete]
 		public override DefaultValue DefaultValue
 		{
 			get { return this.owner.DefaultValue; }

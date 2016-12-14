@@ -52,16 +52,16 @@ namespace Moq
 	{
 		private Mock owner;
 
-        /// <summary>
-        /// Initializes an instance of the mock default value provider.
-        /// </summary>
-        /// <param name="owner">An owner of this provider</param>
+		/// <summary>
+		/// Initializes an instance of the mock default value provider.
+		/// </summary>
+		/// <param name="owner">An owner of this provider</param>
 		public MockDefaultValueProvider(Mock owner)
 		{
 			this.owner = owner;
 		}
 
-        /// <inheritdoc />
+		/// <inheritdoc />
 		public override object ProvideDefault(MethodInfo member)
 		{
 			var value = base.ProvideDefault(member);

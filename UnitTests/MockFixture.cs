@@ -915,106 +915,106 @@ namespace Moq.Tests
 			mock.Verify(x => x.Value, Times.Once());
 		}
 
-        [Fact]
-        public void DefaultValueProviderSetWithNullValueThrows()
-        {
-            var sut = new Mock<object>();
-            Assert.Throws<ArgumentNullException>(() =>
-                sut.DefaultValueProvider = null);
-        }
+		[Fact]
+		public void DefaultValueProviderSetWithNullValueThrows()
+		{
+			var sut = new Mock<object>();
+			Assert.Throws<ArgumentNullException>(() =>
+				sut.DefaultValueProvider = null);
+		}
 
-        [Fact]
-        public void DefaultValueReturnsCustomWhenDefaultValueProviderIsCustomized()
-        {
-            var sut = new Mock<object>();
-            sut.DefaultValueProvider = Mock.Of<IDefaultValueProvider>();
+		[Fact]
+		public void DefaultValueReturnsCustomWhenDefaultValueProviderIsCustomized()
+		{
+			var sut = new Mock<object>();
+			sut.DefaultValueProvider = Mock.Of<IDefaultValueProvider>();
 
-            DefaultValue actual = sut.DefaultValue;
+			DefaultValue actual = sut.DefaultValue;
 
-            Assert.Equal(DefaultValue.Custom, actual);
-        }
+			Assert.Equal(DefaultValue.Custom, actual);
+		}
 
-        [Fact]
-        public void DefaultValueReturnsEmptyWhenDefaultValueProviderIsSetWithEmpty()
-        {
-            var sut = new Mock<object>();
-            sut.DefaultValueProvider = new EmptyDefaultValueProvider();
+		[Fact]
+		public void DefaultValueReturnsEmptyWhenDefaultValueProviderIsSetWithEmpty()
+		{
+			var sut = new Mock<object>();
+			sut.DefaultValueProvider = new EmptyDefaultValueProvider();
 
-            DefaultValue actual = sut.DefaultValue;
+			DefaultValue actual = sut.DefaultValue;
 
-            Assert.Equal(DefaultValue.Empty, actual);
-        }
+			Assert.Equal(DefaultValue.Empty, actual);
+		}
 
-        [Fact]
-        public void DefaultValueReturnsMockWhenDefaultValueProviderIsSetWithMock()
-        {
-            var sut = new Mock<object>();
-            sut.DefaultValueProvider = new MockDefaultValueProvider(sut);
+		[Fact]
+		public void DefaultValueReturnsMockWhenDefaultValueProviderIsSetWithMock()
+		{
+			var sut = new Mock<object>();
+			sut.DefaultValueProvider = new MockDefaultValueProvider(sut);
 
-            DefaultValue actual = sut.DefaultValue;
+			DefaultValue actual = sut.DefaultValue;
 
-            Assert.Equal(DefaultValue.Mock, actual);
-        }
+			Assert.Equal(DefaultValue.Mock, actual);
+		}
 
-        [Fact]
-        public void DefaultValueReturnsCustomWhenDefaultValueProviderIsSetWithMockSubType()
-        {
-            var sut = new Mock<object>();
-            sut.DefaultValueProvider = new CustomMockDefaultValueProvider(sut);
+		[Fact]
+		public void DefaultValueReturnsCustomWhenDefaultValueProviderIsSetWithMockSubType()
+		{
+			var sut = new Mock<object>();
+			sut.DefaultValueProvider = new CustomMockDefaultValueProvider(sut);
 
-            DefaultValue actual = sut.DefaultValue;
+			DefaultValue actual = sut.DefaultValue;
 
-            Assert.Equal(DefaultValue.Custom, actual);
-        }
+			Assert.Equal(DefaultValue.Custom, actual);
+		}
 
-        [Fact]
-        public void DefaultValueSetWithCustomThrows()
-        {
-            var sut = new Mock<object>();
-            Assert.Throws<ArgumentException>(() =>
-                sut.DefaultValue = DefaultValue.Custom);
-        }
+		[Fact]
+		public void DefaultValueSetWithCustomThrows()
+		{
+			var sut = new Mock<object>();
+			Assert.Throws<ArgumentException>(() =>
+				sut.DefaultValue = DefaultValue.Custom);
+		}
 
-        [Fact]
-        public void MockWithCustomDefaultValueProviderCorrectlyBehaves()
-        {
-            var sut = new Mock<IFoo>
-            {
-                DefaultValueProvider = new CustomDefaultValueProvider()
-            };
-            int expected = 123;
+		[Fact]
+		public void MockWithCustomDefaultValueProviderCorrectlyBehaves()
+		{
+			var sut = new Mock<IFoo>
+			{
+				DefaultValueProvider = new CustomDefaultValueProvider()
+			};
+			int expected = 123;
 
-            object actual = sut.Object.Object;
+			object actual = sut.Object.Object;
 
-            Assert.Equal(expected, actual);
-        }
+			Assert.Equal(expected, actual);
+		}
 
-        private static Foo MakeFoo(IMock<IBar> barMock)
+		private static Foo MakeFoo(IMock<IBar> barMock)
 		{
 			return new Foo(barMock.Object);
 		}
 
-        private class CustomMockDefaultValueProvider : MockDefaultValueProvider
-        {
-            public CustomMockDefaultValueProvider(Mock owner) : base(owner)
-            {
-            }
-        }
+		private class CustomMockDefaultValueProvider : MockDefaultValueProvider
+		{
+			public CustomMockDefaultValueProvider(Mock owner) : base(owner)
+			{
+			}
+		}
 
-        private class CustomDefaultValueProvider : IDefaultValueProvider
-        {
-            public void DefineDefault<T>(T value)
-            {
-                throw new NotImplementedException();
-            }
+		private class CustomDefaultValueProvider : IDefaultValueProvider
+		{
+			public void DefineDefault<T>(T value)
+			{
+				throw new NotImplementedException();
+			}
 
-            public object ProvideDefault(MethodInfo member)
-            {
-                return 123;
-            }
-        }
+			public object ProvideDefault(MethodInfo member)
+			{
+				return 123;
+			}
+		}
 
-        public class Foo
+		public class Foo
 		{
 			public Foo() : this(new Bar()) { }
 
