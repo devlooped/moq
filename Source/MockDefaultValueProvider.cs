@@ -48,15 +48,20 @@ namespace Moq
 	/// for non-mockeable types, and mocks for all other types (interfaces and 
 	/// non-sealed classes) that can be mocked.
 	/// </summary>
-	internal class MockDefaultValueProvider : EmptyDefaultValueProvider
+	public class MockDefaultValueProvider : EmptyDefaultValueProvider
 	{
 		private Mock owner;
 
+		/// <summary>
+		/// Initializes an instance of the mock default value provider.
+		/// </summary>
+		/// <param name="owner">An owner of this provider</param>
 		public MockDefaultValueProvider(Mock owner)
 		{
 			this.owner = owner;
 		}
 
+		/// <inheritdoc />
 		public override object ProvideDefault(MethodInfo member)
 		{
 			var value = base.ProvideDefault(member);
@@ -69,7 +74,7 @@ namespace Moq
                     // Create a new mock to be placed to InnerMocks dictionary if it's missing there
                     var mockType = typeof(Mock<>).MakeGenericType(info.ReturnType);
                     Mock newMock = (Mock)Activator.CreateInstance(mockType, owner.Behavior);
-                    newMock.DefaultValue = owner.DefaultValue;
+                    newMock.DefaultValueProvider = owner.DefaultValueProvider;
                     newMock.CallBase = owner.CallBase;
                     return newMock;
                 });
