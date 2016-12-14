@@ -914,12 +914,71 @@ namespace Moq.Tests
 			mock.Verify(x => x.Value, Times.Once());
 		}
 
-		private static Foo MakeFoo(IMock<IBar> barMock)
+        [Fact]
+        public void DefaultValueProviderSetWithNullValueThrows()
+        {
+            var sut = new Mock<object>();
+            Assert.Throws<ArgumentNullException>(() =>
+                sut.DefaultValueProvider = null);
+        }
+
+        [Fact]
+        public void DefaultValueReturnsCustomWhenDefaultValueProviderIsCustomized()
+        {
+            var sut = new Mock<object>();
+            sut.DefaultValueProvider = Mock.Of<IDefaultValueProvider>();
+
+            DefaultValue actual = sut.DefaultValue;
+
+            Assert.Equal(DefaultValue.Custom, actual);
+        }
+
+        [Fact]
+        public void DefaultValueReturnsEmptyWhenDefaultValueProviderIsSetWithEmpty()
+        {
+            var sut = new Mock<object>();
+            sut.DefaultValueProvider = new EmptyDefaultValueProvider();
+
+            DefaultValue actual = sut.DefaultValue;
+
+            Assert.Equal(DefaultValue.Empty, actual);
+        }
+
+        [Fact]
+        public void DefaultValueReturnsMockWhenDefaultValueProviderIsSetWithMock()
+        {
+            var sut = new Mock<object>();
+            sut.DefaultValueProvider = new MockDefaultValueProvider(sut);
+
+            DefaultValue actual = sut.DefaultValue;
+
+            Assert.Equal(DefaultValue.Mock, actual);
+        }
+
+        [Fact]
+        public void DefaultValueReturnsCustomWhenDefaultValueProviderIsSetWithMockSubType()
+        {
+            var sut = new Mock<object>();
+            sut.DefaultValueProvider = new CustomMockDefaultValueProvider(sut);
+
+            DefaultValue actual = sut.DefaultValue;
+
+            Assert.Equal(DefaultValue.Custom, actual);
+        }
+
+        private static Foo MakeFoo(IMock<IBar> barMock)
 		{
 			return new Foo(barMock.Object);
 		}
 
-		public class Foo
+        private class CustomMockDefaultValueProvider : MockDefaultValueProvider
+        {
+            public CustomMockDefaultValueProvider(Mock owner) : base(owner)
+            {
+            }
+        }
+
+        public class Foo
 		{
 			public Foo() : this(new Bar()) { }
 

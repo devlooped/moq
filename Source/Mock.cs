@@ -154,7 +154,37 @@ namespace Moq
 			set { this.SetDefaultValue(value); }
 		}
 
-		private void SetDefaultValue(DefaultValue value)
+		/// <summary>
+		/// Specifies the class that will determine the default 
+		/// value to return when invocations are made that 
+		/// have no setups and need to return a default 
+		/// value (for loose mocks).
+		/// </summary>
+		public IDefaultValueProvider DefaultValueProvider
+		{
+			get { return this.defaultValueProvider; }
+            set { this.SetDefaultValueProvider(value); }
+        }
+
+        private void SetDefaultValueProvider(IDefaultValueProvider value)
+        {
+            Guard.NotNull(() => value, value);
+
+            if (value.GetType() == typeof(EmptyDefaultValueProvider))
+            {
+                this.defaultValue = DefaultValue.Empty;
+            }
+            else if (value.GetType() == typeof(MockDefaultValueProvider))
+            {
+                this.defaultValue = DefaultValue.Mock;
+            }
+            else
+            {
+                this.defaultValue = DefaultValue.Custom;
+            }
+        }
+
+        private void SetDefaultValue(DefaultValue value)
 		{
 			this.defaultValue = value;
 			this.defaultValueProvider = defaultValue == DefaultValue.Mock
@@ -207,17 +237,6 @@ namespace Moq
 		/// the mock instance, which breaks As{T}.
 		/// </summary>
 		internal abstract bool IsDelegateMock { get; }
-
-		/// <summary>
-		/// Specifies the class that will determine the default 
-		/// value to return when invocations are made that 
-		/// have no setups and need to return a default 
-		/// value (for loose mocks).
-		/// </summary>
-		internal IDefaultValueProvider DefaultValueProvider
-		{
-			get { return this.defaultValueProvider; }
-		}
 
 		/// <summary>
 		/// Exposes the list of extra interfaces implemented by the mock.
