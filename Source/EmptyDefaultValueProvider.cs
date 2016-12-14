@@ -77,6 +77,12 @@ namespace Moq
 			return valueType.GetTypeInfo().IsValueType ? GetValueTypeDefault(valueType) : GetReferenceTypeDefault(valueType);
 		}
 
+		/// <inheritdoc />
+		public IDefaultValueProvider ProvideInnerValueProvider(Mock innerMock)
+		{
+			return new EmptyDefaultValueProvider();
+		}
+
 		private static object GetReferenceTypeDefault(Type valueType)
 		{
 			if (valueType.IsArray)

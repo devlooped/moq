@@ -48,9 +48,10 @@ namespace Moq
 	/// for non-mockeable types, and mocks for all other types (interfaces and 
 	/// non-sealed classes) that can be mocked.
 	/// </summary>
-	public class MockDefaultValueProvider : EmptyDefaultValueProvider
+	public class MockDefaultValueProvider : IDefaultValueProvider
 	{
-		private Mock owner;
+		private readonly EmptyDefaultValueProvider defaultValueProvider =
+			new EmptyDefaultValueProvider();
 
 		/// <summary>
 		/// Initializes an instance of the mock default value provider.
@@ -58,29 +59,51 @@ namespace Moq
 		/// <param name="owner">An owner of this provider</param>
 		public MockDefaultValueProvider(Mock owner)
 		{
-			this.owner = owner;
+			if (owner == null)
+			{
+				throw new ArgumentNullException(nameof(owner));
+			}
+
+			this.Owner = owner;
+		}
+
+		/// <summary>
+		/// Gets the owner of this provider passed through the constructor.
+		/// </summary>
+		public Mock Owner { get; }
+
+		/// <inheritdoc />
+		public void DefineDefault<T>(T value)
+		{
+			defaultValueProvider.DefineDefault(value);
 		}
 
 		/// <inheritdoc />
-		public override object ProvideDefault(MethodInfo member)
+		public object ProvideDefault(MethodInfo member)
 		{
-			var value = base.ProvideDefault(member);
+			var value = defaultValueProvider.ProvideDefault(member);
 
 			Mock mock = null;
 			if (value == null && member.ReturnType.IsMockeable())
 			{
-                mock = owner.InnerMocks.GetOrAdd(member, info =>
+                mock = Owner.InnerMocks.GetOrAdd(member, info =>
                 {
                     // Create a new mock to be placed to InnerMocks dictionary if it's missing there
                     var mockType = typeof(Mock<>).MakeGenericType(info.ReturnType);
-                    Mock newMock = (Mock)Activator.CreateInstance(mockType, owner.Behavior);
-                    newMock.DefaultValueProvider = owner.DefaultValueProvider;
-                    newMock.CallBase = owner.CallBase;
+                    Mock newMock = (Mock)Activator.CreateInstance(mockType, Owner.Behavior);
+                    newMock.DefaultValueProvider = Owner.DefaultValueProvider.ProvideInnerValueProvider(newMock);
+                    newMock.CallBase = Owner.CallBase;
                     return newMock;
                 });
 			}
 
 			return mock != null ? mock.Object : value;
+		}
+
+		/// <inheritdoc />
+		public IDefaultValueProvider ProvideInnerValueProvider(Mock innerMock)
+		{
+			return new MockDefaultValueProvider(innerMock);
 		}
 	}
 }

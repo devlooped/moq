@@ -147,7 +147,7 @@ namespace Moq
 		public virtual bool CallBase { get; set; }
 
 		/// <include file='Mock.xdoc' path='docs/doc[@for="Mock.DefaultValue"]/*'/>
-		[Obsolete("Use the DefaultValueProvider property instead. This will be deleted on the next major version.")]
+		[Obsolete("Replaced with DefaultValueProvider.")]
 		public virtual DefaultValue DefaultValue
 		{
 			get { return this.defaultValue; }
@@ -172,17 +172,18 @@ namespace Moq
 
 			if (value.GetType() == typeof(EmptyDefaultValueProvider))
 			{
-				this.SetDefaultValue(DefaultValue.Empty);
+				this.defaultValue = DefaultValue.Empty;
 			}
 			else if (value.GetType() == typeof(MockDefaultValueProvider))
 			{
-				this.SetDefaultValue(DefaultValue.Mock);
+				this.defaultValue = DefaultValue.Mock;
 			}
 			else
 			{
 				this.defaultValue = DefaultValue.Custom;
-				this.defaultValueProvider = value;
 			}
+
+			this.defaultValueProvider = value;
 		}
 
 		private void SetDefaultValue(DefaultValue value)
@@ -194,7 +195,7 @@ namespace Moq
 
 			this.defaultValue = value;
 			this.defaultValueProvider = defaultValue == DefaultValue.Mock ?
-				new MockDefaultValueProvider(this) :
+				(IDefaultValueProvider)new MockDefaultValueProvider(this) :
 				new EmptyDefaultValueProvider();
 		}
 
