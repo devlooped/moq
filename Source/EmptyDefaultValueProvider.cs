@@ -77,6 +77,17 @@ namespace Moq
 			return valueType.IsValueType ? GetValueTypeDefault(valueType) : GetReferenceTypeDefault(valueType);
 		}
 
+		/// <inheritdoc />
+		public IDefaultValueProvider ProvideDefaultValueProvider(Mock innerMock)
+		{
+			if (innerMock == null)
+			{
+				throw new ArgumentNullException(nameof(innerMock));
+			}
+
+			return new EmptyDefaultValueProvider();
+		}
+
 		private static object GetReferenceTypeDefault(Type valueType)
 		{
 			if (valueType.IsArray)
@@ -149,11 +160,5 @@ namespace Moq
 			return (Task) taskProperty.GetValue(tcs, null);
 		}
 #endif
-
-		/// <inheritdoc />
-		public IDefaultValueProvider ProvideDefaultValueProvider(Mock innerMock)
-		{
-			throw new NotImplementedException();
-		}
 	}
 }
