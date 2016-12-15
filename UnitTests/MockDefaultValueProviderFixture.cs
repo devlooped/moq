@@ -1,4 +1,5 @@
-﻿using System.Collections.Generic;
+﻿using System;
+using System.Collections.Generic;
 using System.Linq;
 using Xunit;
 
@@ -6,6 +7,24 @@ namespace Moq.Tests
 {
 	public class MockDefaultValueProviderFixture
 	{
+		[Fact]
+		public void ConstructorWithNullMockThrows()
+		{
+			Assert.Throws<ArgumentNullException>(() =>
+				new MockDefaultValueProvider(null));
+		}
+
+		[Fact]
+		public void MockIsCorrect()
+		{
+			var owner = new Mock<IFoo>();
+			var sut = new MockDefaultValueProvider(owner);
+
+			var acutal = sut.Owner;
+
+			Assert.Equal(owner, acutal);
+		}
+
 		[Fact]
 		public void ProvidesMockValue()
 		{
@@ -88,6 +107,27 @@ namespace Moq.Tests
 			barMock.Setup(b => b.Do()).Verifiable();
 
 			Assert.Throws<MockVerificationException>(() => mock.Verify());
+		}
+
+		[Fact]
+		public void ProvideDefaultValueProviderWithNullInnerMockThrows()
+		{
+			var owner = new Mock<IFoo>();
+			var sut = new MockDefaultValueProvider(owner);
+			Assert.Throws<ArgumentNullException>(() => sut.ProvideDefaultValueProvider(null));
+		}
+
+		[Fact]
+		public void ProvideDefaultValueProviderReturnsNewEmptyDefaultValueProvider()
+		{
+			var owner = new Mock<IFoo>();
+			var sut = new MockDefaultValueProvider(owner);
+
+			var actual = sut.ProvideDefaultValueProvider(owner);
+
+			var provider = Assert.IsType<MockDefaultValueProvider>(actual);
+			Assert.Equal(owner, provider.Owner);
+			Assert.NotEqual(sut, actual);
 		}
 
 		public interface IFoo

@@ -50,7 +50,6 @@ namespace Moq
 	/// </summary>
 	public class MockDefaultValueProvider : IDefaultValueProvider
 	{
-		private Mock owner;
 		private readonly EmptyDefaultValueProvider defaultValueProvider =
 			new EmptyDefaultValueProvider();
 
@@ -60,8 +59,18 @@ namespace Moq
 		/// <param name="owner">An owner of this provider</param>
 		public MockDefaultValueProvider(Mock owner)
 		{
-			this.owner = owner;
+			if (owner == null)
+			{
+				throw new ArgumentNullException(nameof(owner));
+			}
+
+			this.Owner = owner;
 		}
+
+		/// <summary>
+		/// Gets the owner of this provider passed through the constructor.
+		/// </summary>
+		public Mock Owner { get; }
 
 		/// <inheritdoc />
 		public void DefineDefault<T>(T value)
@@ -77,13 +86,13 @@ namespace Moq
 			Mock mock = null;
 			if (value == null && member.ReturnType.IsMockeable())
 			{
-                mock = owner.InnerMocks.GetOrAdd(member, info =>
+                mock = Owner.InnerMocks.GetOrAdd(member, info =>
                 {
                     // Create a new mock to be placed to InnerMocks dictionary if it's missing there
                     var mockType = typeof(Mock<>).MakeGenericType(info.ReturnType);
-                    Mock newMock = (Mock)Activator.CreateInstance(mockType, owner.Behavior);
-                    newMock.DefaultValueProvider = owner.DefaultValueProvider;
-                    newMock.CallBase = owner.CallBase;
+                    Mock newMock = (Mock)Activator.CreateInstance(mockType, Owner.Behavior);
+                    newMock.DefaultValueProvider = Owner.DefaultValueProvider;
+                    newMock.CallBase = Owner.CallBase;
                     return newMock;
                 });
 			}
@@ -94,7 +103,12 @@ namespace Moq
 		/// <inheritdoc />
 		public IDefaultValueProvider ProvideDefaultValueProvider(Mock innerMock)
 		{
-			throw new NotImplementedException();
+			if (innerMock == null)
+			{
+				throw new ArgumentNullException(nameof(innerMock));
+			}
+
+			return new MockDefaultValueProvider(innerMock);
 		}
 	}
 }
