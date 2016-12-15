@@ -173,17 +173,18 @@ namespace Moq
 
 			if (value.GetType() == typeof(EmptyDefaultValueProvider))
 			{
-				this.SetDefaultValue(DefaultValue.Empty);
+				this.defaultValue = DefaultValue.Empty;
 			}
 			else if (value.GetType() == typeof(MockDefaultValueProvider))
 			{
-				this.SetDefaultValue(DefaultValue.Mock);
+				this.defaultValue = DefaultValue.Mock;
 			}
 			else
 			{
 				this.defaultValue = DefaultValue.Custom;
-				this.defaultValueProvider = value;
 			}
+
+			this.defaultValueProvider = value;
 		}
 
 		private void SetDefaultValue(DefaultValue value)

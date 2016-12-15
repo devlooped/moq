@@ -130,6 +130,33 @@ namespace Moq.Tests
 			Assert.NotEqual(sut, actual);
 		}
 
+		[Fact]
+		public void ProvideDefaultValueProvidesMockWithCorrectDefaultValueProvider()
+		{
+			var owner = new Mock<IFoo>();
+			var sut = new MockDefaultValueProvider(owner);
+
+			var actual = sut.ProvideDefault(typeof(IFoo).GetProperty("Bar").GetGetMethod());
+
+			var mock = Assert.IsType<Mock<IBar>>(Mock.Get((IBar)actual));
+			Assert.IsType<EmptyDefaultValueProvider>(mock.DefaultValueProvider);
+			Assert.NotEqual(owner.DefaultValueProvider, mock.DefaultValueProvider);
+		}
+
+		[Fact]
+		public void ProvideDefaultValueProvidesCorrectInnerMock()
+		{
+			var owner = new Mock<IFoo>();
+			var sut = new MockDefaultValueProvider(owner);
+			owner.DefaultValueProvider = sut;
+
+			var actual = sut.ProvideDefault(typeof(IFoo).GetProperty("Bar").GetGetMethod());
+
+			var mock = Assert.IsType<Mock<IBar>>(Mock.Get((IBar)actual));
+			var provider = Assert.IsType<MockDefaultValueProvider>(mock.DefaultValueProvider);
+			Assert.Equal(mock, provider.Owner);
+		}
+
 		public interface IFoo
 		{
 			IBar Bar { get; set; }

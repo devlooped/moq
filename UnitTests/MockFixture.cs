@@ -955,18 +955,7 @@ namespace Moq.Tests
 
 			Assert.Equal(DefaultValue.Mock, actual);
 		}
-
-		[Fact]
-		public void DefaultValueReturnsCustomWhenDefaultValueProviderIsSetWithMockSubType()
-		{
-			var sut = new Mock<object>();
-			sut.DefaultValueProvider = new CustomMockDefaultValueProvider(sut);
-
-			DefaultValue actual = sut.DefaultValue;
-
-			Assert.Equal(DefaultValue.Custom, actual);
-		}
-
+		
 		[Fact]
 		public void DefaultValueSetWithCustomThrows()
 		{
@@ -988,19 +977,30 @@ namespace Moq.Tests
 
 			Assert.Equal(expected, actual);
 		}
+		
+		[Fact]
+		public void DefaultValueProviderIsSameValueWithSetting()
+		{
+			var sut = new Mock<IFoo>();
+
+			var empty = new EmptyDefaultValueProvider();
+			sut.DefaultValueProvider = empty;
+			Assert.Equal(empty, sut.DefaultValueProvider);
+
+			var mock = new MockDefaultValueProvider(sut);
+			sut.DefaultValueProvider = mock;
+			Assert.Equal(mock, sut.DefaultValueProvider);
+
+			var custom = new CustomDefaultValueProvider();
+			sut.DefaultValueProvider = custom;
+			Assert.Equal(custom, sut.DefaultValueProvider);
+		}
 
 		private static Foo MakeFoo(IMock<IBar> barMock)
 		{
 			return new Foo(barMock.Object);
 		}
-
-		private class CustomMockDefaultValueProvider : MockDefaultValueProvider
-		{
-			public CustomMockDefaultValueProvider(Mock owner) : base(owner)
-			{
-			}
-		}
-
+		
 		private class CustomDefaultValueProvider : IDefaultValueProvider
 		{
 			public void DefineDefault<T>(T value)
