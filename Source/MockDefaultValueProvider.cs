@@ -92,7 +92,7 @@ namespace Moq
                     var mockType = typeof(Mock<>).MakeGenericType(info.ReturnType);
                     Mock newMock = (Mock)Activator.CreateInstance(mockType, Owner.Behavior);
 					newMock.DefaultValueProvider =
-						Owner.DefaultValueProvider.ProvideDefaultValueProvider(newMock);
+						Owner.DefaultValueProvider.ProvideInnerValueProvider(newMock);
                     newMock.CallBase = Owner.CallBase;
                     return newMock;
                 });
@@ -102,7 +102,7 @@ namespace Moq
 		}
 
 		/// <inheritdoc />
-		public IDefaultValueProvider ProvideDefaultValueProvider(Mock innerMock)
+		public IDefaultValueProvider ProvideInnerValueProvider(Mock innerMock)
 		{
 			if (innerMock == null)
 			{

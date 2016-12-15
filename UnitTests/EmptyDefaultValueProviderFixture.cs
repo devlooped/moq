@@ -114,7 +114,7 @@ namespace Moq.Tests
 		public void ProvideDefaultValueProviderWithNullInnerMockThrows()
 		{
 			var sut = new EmptyDefaultValueProvider();
-			Assert.Throws<ArgumentNullException>(() => sut.ProvideDefaultValueProvider(null));
+			Assert.Throws<ArgumentNullException>(() => sut.ProvideInnerValueProvider(null));
 		}
 
 		[Fact]
@@ -122,7 +122,7 @@ namespace Moq.Tests
 		{
 			var sut = new EmptyDefaultValueProvider();
 
-			var actual = sut.ProvideDefaultValueProvider(new Mock<IDisposable>());
+			var actual = sut.ProvideInnerValueProvider(new Mock<IDisposable>());
 
 			Assert.IsType<EmptyDefaultValueProvider>(actual);
 			Assert.NotEqual(sut, actual);

@@ -21,7 +21,7 @@
 			The member to provide a default	value for.
 		</param>
 	</doc>
-    <doc for="IDefaultValueProvider.ProvideDefaultValueProvider">
+    <doc for="IDefaultValueProvider.ProvideInnerValueProvider">
         <summary>
             Provides a default value provider for the given inner mock.
         </summary>

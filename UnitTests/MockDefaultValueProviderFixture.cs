@@ -114,7 +114,7 @@ namespace Moq.Tests
 		{
 			var owner = new Mock<IFoo>();
 			var sut = new MockDefaultValueProvider(owner);
-			Assert.Throws<ArgumentNullException>(() => sut.ProvideDefaultValueProvider(null));
+			Assert.Throws<ArgumentNullException>(() => sut.ProvideInnerValueProvider(null));
 		}
 
 		[Fact]
@@ -123,7 +123,7 @@ namespace Moq.Tests
 			var owner = new Mock<IFoo>();
 			var sut = new MockDefaultValueProvider(owner);
 
-			var actual = sut.ProvideDefaultValueProvider(owner);
+			var actual = sut.ProvideInnerValueProvider(owner);
 
 			var provider = Assert.IsType<MockDefaultValueProvider>(actual);
 			Assert.Equal(owner, provider.Owner);

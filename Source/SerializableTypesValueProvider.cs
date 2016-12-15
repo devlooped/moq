@@ -33,7 +33,7 @@ namespace Moq
 		}
 
 		/// <inheritdoc />
-		public IDefaultValueProvider ProvideDefaultValueProvider(Mock innerMock)
+		public IDefaultValueProvider ProvideInnerValueProvider(Mock innerMock)
 		{
 			throw new NotImplementedException();
 		}
