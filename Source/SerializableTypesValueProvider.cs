@@ -35,7 +35,7 @@ namespace Moq
 		/// <inheritdoc />
 		public IDefaultValueProvider ProvideInnerValueProvider(Mock innerMock)
 		{
-			throw new NotImplementedException();
+			return new SerializableTypesValueProvider(decorated);
 		}
 	}
 }
