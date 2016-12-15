@@ -52,5 +52,8 @@ namespace Moq
 
 		/// <include file='IDefaultValueProvider.xdoc' path='docs/doc[@for="IDefaultValueProvider.ProvideDefault"]/*'/>
 		object ProvideDefault(MethodInfo member);
+
+		/// <include file='IDefaultValueProvider.xdoc' path='docs/doc[@for="IDefaultValueProvider.ProvideDefaultValueProvider"]/*'/>
+		IDefaultValueProvider ProvideDefaultValueProvider(Mock innerMock);
 	}
 }

@@ -90,5 +90,11 @@ namespace Moq
 
 			return mock != null ? mock.Object : value;
 		}
+
+		/// <inheritdoc />
+		public IDefaultValueProvider ProvideDefaultValueProvider(Mock innerMock)
+		{
+			throw new NotImplementedException();
+		}
 	}
 }

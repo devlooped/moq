@@ -1,4 +1,5 @@
-﻿using System.Reflection;
+﻿using System;
+using System.Reflection;
 using System.Runtime.Serialization;
 
 
@@ -29,6 +30,12 @@ namespace Moq
 			return !member.ReturnType.IsSerializable || member.ReturnType.IsSerializableMockable()
 				       ? decorated.ProvideDefault(member)
 				       : emptyDefaultValueProvider.ProvideDefault(member);
+		}
+
+		/// <inheritdoc />
+		public IDefaultValueProvider ProvideDefaultValueProvider(Mock innerMock)
+		{
+			throw new NotImplementedException();
 		}
 	}
 }

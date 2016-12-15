@@ -149,5 +149,11 @@ namespace Moq
 			return (Task) taskProperty.GetValue(tcs, null);
 		}
 #endif
+
+		/// <inheritdoc />
+		public IDefaultValueProvider ProvideDefaultValueProvider(Mock innerMock)
+		{
+			throw new NotImplementedException();
+		}
 	}
 }
