@@ -195,8 +195,8 @@ namespace Moq
 
 			this.defaultValue = value;
 			this.defaultValueProvider = defaultValue == DefaultValue.Mock
-				                            ? new MockDefaultValueProvider(this)
-				                            : new EmptyDefaultValueProvider();
+				? (IDefaultValueProvider)new MockDefaultValueProvider(this)
+				: new EmptyDefaultValueProvider();
 		}
 
 		/// <include file='Mock.xdoc' path='docs/doc[@for="Mock.Object"]/*'/>

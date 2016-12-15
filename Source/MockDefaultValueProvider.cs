@@ -48,9 +48,11 @@ namespace Moq
 	/// for non-mockeable types, and mocks for all other types (interfaces and 
 	/// non-sealed classes) that can be mocked.
 	/// </summary>
-	public class MockDefaultValueProvider : EmptyDefaultValueProvider
+	public class MockDefaultValueProvider : IDefaultValueProvider
 	{
 		private Mock owner;
+		private readonly EmptyDefaultValueProvider defaultValueProvider =
+			new EmptyDefaultValueProvider();
 
 		/// <summary>
 		/// Initializes an instance of the mock default value provider.
@@ -62,9 +64,15 @@ namespace Moq
 		}
 
 		/// <inheritdoc />
-		public override object ProvideDefault(MethodInfo member)
+		public void DefineDefault<T>(T value)
 		{
-			var value = base.ProvideDefault(member);
+			defaultValueProvider.DefineDefault(value);
+		}
+
+		/// <inheritdoc />
+		public object ProvideDefault(MethodInfo member)
+		{
+			var value = defaultValueProvider.ProvideDefault(member);
 
 			Mock mock = null;
 			if (value == null && member.ReturnType.IsMockeable())
