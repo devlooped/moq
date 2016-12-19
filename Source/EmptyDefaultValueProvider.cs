@@ -80,11 +80,6 @@ namespace Moq
 		/// <inheritdoc />
 		public IDefaultValueProvider ProvideInnerValueProvider(Mock innerMock)
 		{
-			if (innerMock == null)
-			{
-				throw new ArgumentNullException(nameof(innerMock));
-			}
-
 			return new EmptyDefaultValueProvider();
 		}
 

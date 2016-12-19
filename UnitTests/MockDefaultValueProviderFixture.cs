@@ -110,14 +110,6 @@ namespace Moq.Tests
 		}
 
 		[Fact]
-		public void ProvideDefaultValueProviderWithNullInnerMockThrows()
-		{
-			var owner = new Mock<IFoo>();
-			var sut = new MockDefaultValueProvider(owner);
-			Assert.Throws<ArgumentNullException>(() => sut.ProvideInnerValueProvider(null));
-		}
-
-		[Fact]
 		public void ProvideDefaultValueProviderReturnsNewEmptyDefaultValueProvider()
 		{
 			var owner = new Mock<IFoo>();
