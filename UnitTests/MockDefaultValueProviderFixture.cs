@@ -110,7 +110,7 @@ namespace Moq.Tests
 		}
 
 		[Fact]
-		public void ProvideDefaultValueProviderReturnsNewEmptyDefaultValueProvider()
+		public void ProvideInnerValueProviderReturnsNewEmptyDefaultValueProvider()
 		{
 			var owner = new Mock<IFoo>();
 			var sut = new MockDefaultValueProvider(owner);
@@ -123,7 +123,7 @@ namespace Moq.Tests
 		}
 
 		[Fact]
-		public void ProvideDefaultValueProvidesMockWithCorrectDefaultValueProvider()
+		public void ProvideDefaultProvidesMockWithCorrectDefaultValueProvider()
 		{
 			var owner = new Mock<IFoo>();
 			var sut = new MockDefaultValueProvider(owner);
@@ -136,7 +136,7 @@ namespace Moq.Tests
 		}
 
 		[Fact]
-		public void ProvideDefaultValueProvidesCorrectInnerMock()
+		public void ProvideDefaultProvidesCorrectInnerMock()
 		{
 			var owner = new Mock<IFoo>();
 			var sut = new MockDefaultValueProvider(owner);
