@@ -266,7 +266,20 @@ namespace Moq.Tests
 			Assert.Equal(0, mock.Object.TakesNullableParameter(null));
 		}
 
-		private int GetToRange()
+        [Fact]
+        public void MultipleMatchingSetupsWithMultiplValueTypeArgumentsReplaceEachOtherForVerify()
+        {
+            var mock = new Mock<IFoo>();
+
+            mock.Setup(x => x.TakesTwoValueTypes(1, 2)).Verifiable();
+            mock.Setup(x => x.TakesTwoValueTypes(1, 2)).Verifiable();
+
+            mock.Object.TakesTwoValueTypes(1, 2);
+
+            mock.Verify();
+        }
+        
+        private int GetToRange()
 		{
 			return 5;
 		}
@@ -283,6 +296,7 @@ namespace Moq.Tests
 			int DoAddition(int[] numbers);
 			int[] Items { get; set; }
 			int TakesNullableParameter(int? value);
-		}
+            void TakesTwoValueTypes(int a, int b);
+        }
 	}
 }
