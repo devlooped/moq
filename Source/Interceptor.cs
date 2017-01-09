@@ -169,20 +169,20 @@ namespace Moq
 				}
 
 				var eq = key.fixedString == this.fixedString && key.values.Count == this.values.Count;
-                if(!eq)
+
+                //the code below is broken as it uses an OR when checking the arguments, this means that if any pair of arguments match 
+                //the result is a match.
+                //This is only going to hit some edge cases as for the most part the fixed string above spots arguments correctly.
+                //Fixing this really needs a reworking of the GetHashCode, and also some sorting out of how to compare value types that have been
+                //boxed correctly (another problem this code has)
+                var index = 0;
+                while (eq && index < this.values.Count)
                 {
-                    return false;
+                    eq |= this.values[index] == key.values[index];
+                    index++;
                 }
 
-				for(int index=0; index < values.Count; index++)
-				{
-                    if (this.values[index] != key.values[index])
-                    {
-                        return false;
-                    }
-				}
-
-				return eq;
+                return eq;
 			}
 
             public override int GetHashCode()
