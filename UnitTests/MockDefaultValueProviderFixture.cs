@@ -1,4 +1,5 @@
-﻿using System.Collections.Generic;
+﻿using System;
+using System.Collections.Generic;
 using System.Linq;
 using Xunit;
 
@@ -6,6 +7,24 @@ namespace Moq.Tests
 {
 	public class MockDefaultValueProviderFixture
 	{
+		[Fact]
+		public void ConstructorWithNullMockThrows()
+		{
+			Assert.Throws<ArgumentNullException>(() =>
+				new MockDefaultValueProvider(null));
+		}
+
+		[Fact]
+		public void MockIsCorrect()
+		{
+			var owner = new Mock<IFoo>();
+			var sut = new MockDefaultValueProvider(owner);
+
+			var acutal = sut.Owner;
+
+			Assert.Equal(owner, acutal);
+		}
+
 		[Fact]
 		public void ProvidesMockValue()
 		{
@@ -88,6 +107,46 @@ namespace Moq.Tests
 			barMock.Setup(b => b.Do()).Verifiable();
 
 			Assert.Throws<MockVerificationException>(() => mock.Verify());
+		}
+
+		[Fact]
+		public void ProvideInnerValueProviderReturnsNewEmptyDefaultValueProvider()
+		{
+			var owner = new Mock<IFoo>();
+			var sut = new MockDefaultValueProvider(owner);
+
+			var actual = sut.ProvideInnerValueProvider(owner);
+
+			var provider = Assert.IsType<MockDefaultValueProvider>(actual);
+			Assert.Equal(owner, provider.Owner);
+			Assert.NotEqual(sut, actual);
+		}
+
+		[Fact]
+		public void ProvideDefaultProvidesMockWithCorrectDefaultValueProvider()
+		{
+			var owner = new Mock<IFoo>();
+			var sut = new MockDefaultValueProvider(owner);
+
+			var actual = sut.ProvideDefault(typeof(IFoo).GetProperty("Bar").GetGetMethod());
+
+			var mock = Assert.IsType<Mock<IBar>>(Mock.Get((IBar)actual));
+			Assert.IsType<EmptyDefaultValueProvider>(mock.DefaultValueProvider);
+			Assert.NotEqual(owner.DefaultValueProvider, mock.DefaultValueProvider);
+		}
+
+		[Fact]
+		public void ProvideDefaultProvidesCorrectInnerMock()
+		{
+			var owner = new Mock<IFoo>();
+			var sut = new MockDefaultValueProvider(owner);
+			owner.DefaultValueProvider = sut;
+
+			var actual = sut.ProvideDefault(typeof(IFoo).GetProperty("Bar").GetGetMethod());
+
+			var mock = Assert.IsType<Mock<IBar>>(Mock.Get((IBar)actual));
+			var provider = Assert.IsType<MockDefaultValueProvider>(mock.DefaultValueProvider);
+			Assert.Equal(mock, provider.Owner);
 		}
 
 		public interface IFoo

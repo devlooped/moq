@@ -109,6 +109,17 @@ namespace Moq.Tests
 			Assert.IsAssignableFrom<IQueryable>(value);
 			Assert.Equal(0, ((IQueryable)value).Cast<object>().Count());
 		}
+		
+		[Fact]
+		public void ProvideDefaultValueProviderReturnsNewEmptyDefaultValueProvider()
+		{
+			var sut = new EmptyDefaultValueProvider();
+
+			var actual = sut.ProvideInnerValueProvider(new Mock<IDisposable>());
+
+			Assert.IsType<EmptyDefaultValueProvider>(actual);
+			Assert.NotEqual(sut, actual);
+		}
 
 #if !NET3x
 		[Fact]

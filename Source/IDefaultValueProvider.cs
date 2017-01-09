@@ -45,12 +45,15 @@ namespace Moq
 {
 	/// <include file='IDefaultValueProvider.xdoc' path='docs/doc[@for="IDefaultValueProvider"]/*'/>
 	[EditorBrowsable(EditorBrowsableState.Advanced)]
-	internal interface IDefaultValueProvider
+	public interface IDefaultValueProvider
 	{
 		/// <include file='IDefaultValueProvider.xdoc' path='docs/doc[@for="IDefaultValueProvider.DefineDefault"]/*'/>
 		void DefineDefault<T>(T value);
 
 		/// <include file='IDefaultValueProvider.xdoc' path='docs/doc[@for="IDefaultValueProvider.ProvideDefault"]/*'/>
 		object ProvideDefault(MethodInfo member);
+
+		/// <include file='IDefaultValueProvider.xdoc' path='docs/doc[@for="IDefaultValueProvider.ProvideInnerValueProvider"]/*'/>
+		IDefaultValueProvider ProvideInnerValueProvider(Mock innerMock);
 	}
 }
