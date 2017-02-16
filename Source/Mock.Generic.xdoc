@@ -119,7 +119,7 @@
 	</doc>
 	<doc for="Mock{T}.Setup">
 		<summary>
-			Specifies a setup on the mocked type for a call to
+			Specifies a setup on the mocked type for a call
 			to a void method.
 		</summary>
 		<remarks>
