@@ -1,6 +1,6 @@
 ﻿{
   "dependencies": {
-    "Castle.Core": "4.0.0-beta001",
+    "Castle.Core": "4.0.0",
     "IFluentInterface": "2.0.0",
     "GitInfo": "1.1.14",
     "Microsoft.CSharp": "4.0.1",

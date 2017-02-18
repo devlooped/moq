@@ -33,7 +33,7 @@
         "define": [ "NETCORE" ]
       },
       "dependencies": {
-        "Castle.Core": "4.0.0-beta001",
+        "Castle.Core": "4.0.0",
         "ClassLibrary1": {
           "target": "project",
           "version": "1.0.0-*"

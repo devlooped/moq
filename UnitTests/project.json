@@ -1,6 +1,6 @@
 ﻿{
   "dependencies": {
-    "Castle.Core": "3.3.3",
+    "Castle.Core": "4.0.0",
     "xunit": "2.1.0",
     "xunit.runner.visualstudio": "2.1.0"
   },
