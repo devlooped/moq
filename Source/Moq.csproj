@@ -103,7 +103,13 @@
     <Compile Include="Obsolete\Mock.Legacy.cs" />
     <Compile Include="Obsolete\ObsoleteMockExtensions.cs" />
     <Compile Include="Obsolete\MockFactory.cs" />
+    <Compile Include="ReturnsExtensions.Generated.cs">
+      <AutoGen>True</AutoGen>
+      <DesignTime>True</DesignTime>
+      <DependentUpon>ReturnsExtensions.tt</DependentUpon>
+    </Compile>
     <Compile Include="SequenceExtensions.cs" />
+    <Compile Include="SerializableTypesValueProvider.cs" />
     <Compile Include="SetupKind.cs" />
     <Compile Include="Language\Flow\IReturnsResult.cs" />
     <Compile Include="ExpressionExtensions.cs" />
@@ -226,6 +232,15 @@
     <None Include="Times.xdoc">
       <DependentUpon>Times.cs</DependentUpon>
     </None>
+  </ItemGroup>
+  <ItemGroup>
+    <None Include="ReturnsExtensions.tt">
+      <Generator>TextTemplatingFileGenerator</Generator>
+      <LastGenOutput>ReturnsExtensions.Generated.cs</LastGenOutput>
+    </None>
+  </ItemGroup>
+  <ItemGroup>
+    <Service Include="{508349B6-6B84-4DF5-91F0-309BEEBAD82D}" />
   </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
   <Target Name="CleanAnalysisLogs" AfterTargets="Build">

@@ -325,6 +325,9 @@
     <Compile Include="..\Source\SequenceExtensions.cs">
       <Link>SequenceExtensions.cs</Link>
     </Compile>
+    <Compile Include="..\Source\SerializableTypesValueProvider.cs">
+      <Link>SerializableTypesValueProvider.cs</Link>
+    </Compile>
     <Compile Include="..\Source\SetterMethodCall.cs">
       <Link>SetterMethodCall.cs</Link>
     </Compile>

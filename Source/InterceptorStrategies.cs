@@ -133,21 +133,49 @@ namespace Moq
         }
     }
 
-    internal class InterceptToStringMixin : IInterceptStrategy
-    {
-        public InterceptionAction HandleIntercept(ICallContext invocation, InterceptorContext ctx, CurrentInterceptContext localctx)
-        {
-            var method = invocation.Method;
+	/// <summary>
+	/// Intercept strategy that handles `System.Object` methods.
+	/// </summary>
+	internal class InterceptObjectMethodsMixin : IInterceptStrategy
+	{
+		public InterceptionAction HandleIntercept(ICallContext invocation, InterceptorContext ctx, CurrentInterceptContext localctx)
+		{
+			var method = invocation.Method;
 
-            if (method.DeclaringType == typeof(Object) && method.Name == "ToString")
-            {
-                invocation.ReturnValue = ctx.Mock.ToString() + ".Object";
-                return InterceptionAction.Stop;
-            }
+			// Only if there is no corresponding setup for `ToString()`
+			if (IsObjectMethod(method, "ToString") && !ctx.OrderedCalls.Any(c => IsObjectMethod(c.Method, "ToString")))
+			{
+				invocation.ReturnValue = ctx.Mock.ToString() + ".Object";
+				return InterceptionAction.Stop;
+			}
 
-            return InterceptionAction.Continue;
-        }
-    }
+			// Only if there is no corresponding setup for `GetHashCode()`
+			if (IsObjectMethod(method, "GetHashCode") && !ctx.OrderedCalls.Any(c => IsObjectMethod(c.Method, "GetHashCode")))
+			{
+				invocation.ReturnValue = ctx.Mock.GetHashCode();
+				return InterceptionAction.Stop;
+			}
+
+			// Only if there is no corresponding setup for `Equals()`
+			if (IsObjectMethod(method, "Equals") && !ctx.OrderedCalls.Any(c => IsObjectMethod(c.Method, "Equals")))
+			{
+				invocation.ReturnValue = ReferenceEquals(invocation.Arguments.First(), ctx.Mock.Object);
+				return InterceptionAction.Stop;
+			}
+
+			return InterceptionAction.Continue;
+		}
+
+		protected bool IsObjectMethod(MethodInfo method, string name)
+		{
+			if (method.DeclaringType == typeof(object) && method.Name == name)
+			{
+				return true;
+			}
+
+			return false;
+		}
+	}
 
     internal class HandleTracking : IInterceptStrategy
     {
@@ -174,48 +202,35 @@ namespace Moq
     internal class AddActualInvocation : IInterceptStrategy
     {
 
-        /// <summary>
-        /// Get an eventInfo for a given event name.  Search type ancestors depth first if necessary.
-        /// </summary>
-        /// <param name="eventName">Name of the event, with the set_ or get_ prefix already removed</param>
-        private EventInfo GetEventFromName(string eventName)
-        {
-            var depthFirstProgress = new Queue<Type>(ctx.Mock.ImplementedInterfaces.Skip(1));
-            depthFirstProgress.Enqueue(ctx.TargetType);
-            while (depthFirstProgress.Count > 0)
-            {
-                var currentType = depthFirstProgress.Dequeue();
-                var eventInfo = currentType.GetEvent(eventName);
-                if (eventInfo != null)
-                {
-                    return eventInfo;
-                }
+		/// <summary>
+		/// Get an eventInfo for a given event name.  Search type ancestors depth first if necessary.
+		/// </summary>
+		/// <param name="eventName">Name of the event, with the set_ or get_ prefix already removed</param>
+		private EventInfo GetEventFromName(string eventName)
+		{
+			return GetEventFromName(eventName, BindingFlags.Instance | BindingFlags.Static | BindingFlags.Public) ??
+				GetEventFromName(eventName, BindingFlags.Instance | BindingFlags.NonPublic);
+		}
 
-                foreach (var implementedType in GetAncestorTypes(currentType))
-                {
-                    depthFirstProgress.Enqueue(implementedType);
-                }
-            }
-            return GetNonPublicEventFromName(eventName);
-        }
-
-        /// <summary>
-        /// Get an eventInfo for a given event name.  Search type ancestors depth first if necessary.
-        /// Searches also in non public events.
-        /// </summary>
-        /// <param name="eventName">Name of the event, with the set_ or get_ prefix already removed</param>
-        private EventInfo GetNonPublicEventFromName(string eventName)
-        {
-            var depthFirstProgress = new Queue<Type>(ctx.Mock.ImplementedInterfaces.Skip(1));
-            depthFirstProgress.Enqueue(ctx.TargetType);
-            while (depthFirstProgress.Count > 0)
-            {
-                var currentType = depthFirstProgress.Dequeue();
-                var eventInfo = currentType.GetEvent(eventName, BindingFlags.Instance | BindingFlags.NonPublic);
-                if (eventInfo != null)
-                {
-                    return eventInfo;
-                }
+		/// <summary>
+		/// Get an eventInfo for a given event name.  Search type ancestors depth first if necessary.
+		/// Searches events using the specified binding constraints.
+		/// </summary>
+		/// <param name="eventName">Name of the event, with the set_ or get_ prefix already removed</param>
+		/// <param name="bindingAttr">Specifies how the search for events is conducted</param>
+		private EventInfo GetEventFromName(string eventName, BindingFlags bindingAttr)
+		{
+			// Ignore internally implemented interfaces
+			var depthFirstProgress = new Queue<Type>(ctx.Mock.ImplementedInterfaces.Skip(ctx.Mock.InternallyImplementedInterfaceCount));
+			depthFirstProgress.Enqueue(ctx.TargetType);
+			while (depthFirstProgress.Count > 0)
+			{
+				var currentType = depthFirstProgress.Dequeue();
+				var eventInfo = currentType.GetEvent(eventName, bindingAttr);
+				if (eventInfo != null)
+				{
+					return eventInfo;
+				}
 
                 foreach (var implementedType in GetAncestorTypes(currentType))
                 {

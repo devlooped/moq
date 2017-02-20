@@ -345,15 +345,19 @@ namespace Moq
 				else if (node.Method.IsPropertyIndexerSetter())
 				{
 					this.builder.Append("[");
-					AsCommaSeparatedValues(node.Arguments
-						.Skip(paramFrom)
-						.Take(node.Arguments.Count - paramFrom), ToString);
+					AsCommaSeparatedValues(node.Arguments.Skip(paramFrom), ToString);
 					this.builder.Append("] = ");
 					ToString(node.Arguments.Last());
 				}
 				else if (node.Method.IsPropertyGetter())
 				{
-					this.builder.Append(".").Append(node.Method.Name.Substring(4));
+                    this.builder.Append(".").Append(node.Method.Name.Substring(4));
+                    if (node.Arguments.Count > paramFrom)
+                    {
+                        this.builder.Append("[");
+                        AsCommaSeparatedValues(node.Arguments.Skip(paramFrom), ToString);
+                        this.builder.Append("]");
+                    }					
 				}
 				else if (node.Method.IsPropertySetter())
 				{

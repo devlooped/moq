@@ -116,6 +116,7 @@ namespace Moq
 			this.constructorArguments = args;
 			this.ImplementedInterfaces.AddRange(typeof(T).GetInterfaces().Where(i => (i.GetTypeInfo().IsPublic || i.GetTypeInfo().IsNestedPublic) && !i.GetTypeInfo().IsImport));
 			this.ImplementedInterfaces.Add(typeof(IMocked<T>));
+			this.InternallyImplementedInterfaceCount = this.ImplementedInterfaces.Count;
 
 			this.CheckParameters();
 		}
