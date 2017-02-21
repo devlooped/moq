@@ -75,7 +75,7 @@ namespace Moq.Proxy
 			AttributesToAvoidReplicating.Add<System.Runtime.InteropServices.TypeIdentifierAttribute>();
 #endif
 #endif
-			proxyOptions = new ProxyGenerationOptions { Hook = new ProxyMethodHook(), BaseTypeForInterfaceProxy = typeof(InterfaceProxy) };
+			proxyOptions = new ProxyGenerationOptions { Hook = new ProxyMethodHook() };
 		}
 
 		/// <inheritdoc />
@@ -83,7 +83,11 @@ namespace Moq.Proxy
 		{
 			if (mockType.GetTypeInfo().IsInterface)
 			{
-				return generator.CreateInterfaceProxyWithoutTarget(mockType, interfaces, proxyOptions, new Interceptor(interceptor));
+				// Add type to additional interfaces and mock System.Object instead.
+				// This way it is also possible to mock System.Object methods.
+				Array.Resize(ref interfaces, interfaces.Length + 1);
+				interfaces[interfaces.Length - 1] = mockType;
+				mockType = typeof(object);
 			}
 
 			try

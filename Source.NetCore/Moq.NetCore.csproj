@@ -322,8 +322,14 @@
     <Compile Include="..\Source\ReturnsExtensions.cs">
       <Link>ReturnsExtensions.cs</Link>
     </Compile>
+    <Compile Include="..\Source\ReturnsExtensions.Generated.cs">
+      <Link>ReturnsExtensions.Generated.cs</Link>
+    </Compile>
     <Compile Include="..\Source\SequenceExtensions.cs">
       <Link>SequenceExtensions.cs</Link>
+    </Compile>
+    <Compile Include="..\Source\SerializableTypesValueProvider.cs">
+      <Link>SerializableTypesValueProvider.cs</Link>
     </Compile>
     <Compile Include="..\Source\SetterMethodCall.cs">
       <Link>SetterMethodCall.cs</Link>

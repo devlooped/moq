@@ -113,12 +113,17 @@ namespace Moq
 			InterceptionContext.AddOrderedCall(call);
 		}
 
+	    internal void ClearCalls()
+	    {
+	        calls.Clear();
+	    }
+
 		private IEnumerable<IInterceptStrategy> InterceptionStrategies()
 		{
 			yield return new HandleDestructor();
 			yield return new HandleTracking();
 			yield return new InterceptMockPropertyMixin();
-			yield return new InterceptToStringMixin();
+			yield return new InterceptObjectMethodsMixin();
 			yield return new AddActualInvocation();
 			yield return new ExtractProxyCall();
 			yield return new ExecuteCall();
@@ -165,14 +170,19 @@ namespace Moq
 
 				var eq = key.fixedString == this.fixedString && key.values.Count == this.values.Count;
 
-				var index = 0;
-				while (eq && index < this.values.Count)
-				{
-					eq |= this.values[index] == key.values[index];
-					index++;
-				}
+                //the code below is broken as it uses an OR when checking the arguments, this means that if any pair of arguments match 
+                //the result is a match.
+                //This is only going to hit some edge cases as for the most part the fixed string above spots arguments correctly.
+                //Fixing this really needs a reworking of the GetHashCode, and also some sorting out of how to compare value types that have been
+                //boxed correctly (another problem this code has)
+                var index = 0;
+                while (eq && index < this.values.Count)
+                {
+                    eq |= this.values[index] == key.values[index];
+                    index++;
+                }
 
-				return eq;
+                return eq;
 			}
 
             public override int GetHashCode()

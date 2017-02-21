@@ -56,7 +56,6 @@ namespace Moq
 	public abstract partial class Mock : IFluentInterface
 	{
 		private bool isInitialized;
-		private bool callBase;
 		private DefaultValue defaultValue = DefaultValue.Empty;
 		private IDefaultValueProvider defaultValueProvider = new EmptyDefaultValueProvider();
 
@@ -107,9 +106,9 @@ namespace Moq
 				// the generic parameters.
 				var types = string.Join(
 					", ",
-					new[] { mockedType }
-					// Skip first interface which is always our internal IMocked<T>
-						.Concat(mock.ImplementedInterfaces.Skip(1))
+					new[] {mockedType}
+						// Ignore internally defined IMocked<T>
+						.Concat(mock.ImplementedInterfaces.Where(t => t != imockedType))
 						.Select(t => t.Name)
 						.ToArray());
 
@@ -145,11 +144,7 @@ namespace Moq
 		public virtual MockBehavior Behavior { get; internal set; }
 
 		/// <include file='Mock.xdoc' path='docs/doc[@for="Mock.CallBase"]/*'/>
-		public virtual bool CallBase
-		{
-			get { return this.callBase; }
-			set { this.callBase = value; }
-		}
+		public virtual bool CallBase { get; set; }
 
 		/// <include file='Mock.xdoc' path='docs/doc[@for="Mock.DefaultValue"]/*'/>
 		public virtual DefaultValue DefaultValue
@@ -224,6 +219,12 @@ namespace Moq
 		/// Exposes the list of extra interfaces implemented by the mock.
 		/// </summary>
 		internal List<Type> ImplementedInterfaces { get; private set; }
+
+		/// <summary>
+		/// Indicates the number of interfaces in <see cref="ImplementedInterfaces"/> that were
+		/// defined internally, rather than through calls to <see cref="As{TInterface}"/>.
+		/// </summary>
+		internal protected int InternallyImplementedInterfaceCount { get; protected set; }
 
 		#region Verify
 
@@ -677,35 +678,42 @@ namespace Moq
 			return Expression.Convert(Expression.Constant(value), type);
 		}
 
-        internal static void SetupAllProperties(Mock mock)
-        {
-            PexProtector.Invoke(() =>
-            {
-                var mockType = mock.MockedType;
-                var properties = mockType.GetProperties()
-                    .Concat(mockType.GetInterfaces().SelectMany(i => i.GetProperties()))
-                    .Where(p =>
-                        p.CanRead && p.CanOverrideGet() &&
-                        p.GetIndexParameters().Length == 0 &&
-												p.PropertyType != mockType &&
-                        !(p.CanWrite ^ (p.CanWrite & p.CanOverrideSet())))
-                    .Distinct();
+		internal static void SetupAllProperties(Mock mock)
+		{
+			PexProtector.Invoke(() =>
+			{
+				var mockedTypesStack = new Stack<Type>();
+				SetupAllProperties(mock, mockedTypesStack);
+			});
+		}
+
+		private static void SetupAllProperties(Mock mock, Stack<Type> mockedTypesStack)
+		{
+			var mockType = mock.MockedType;
+			mockedTypesStack.Push(mockType);
+			var properties = mockType.GetProperties()
+				.Concat(mockType.GetInterfaces().SelectMany(i => i.GetProperties()))
+				.Where(p =>
+				       p.CanRead && p.CanOverrideGet() &&
+				       p.GetIndexParameters().Length == 0 &&
+				       !(p.CanWrite ^ (p.CanWrite & p.CanOverrideSet())))
+				.Distinct();
 
                 var setupPropertyMethod = mock.GetType().GetMethods()
                     .First(m => m.Name == "SetupProperty" && m.GetParameters().Length == 2);
                 var setupGetMethod = mock.GetType().GetMethods()
                     .First(m => m.Name == "SetupGet" && m.GetParameters().Length == 1);
 
-				foreach (var property in properties)
-				{
-					var expression = GetPropertyExpression(mockType, property);
-					var initialValue = mock.DefaultValueProvider.ProvideDefault(property.GetGetMethod());
+			foreach (var property in properties)
+			{
+				var expression = GetPropertyExpression(mockType, property);
+				object initialValue = GetInitialValue(mock.DefaultValueProvider, mockedTypesStack, property);
 
-					var mocked = initialValue as IMocked;
-					if (mocked != null)
-					{
-						SetupAllProperties(mocked.Mock);
-					}
+				var mocked = initialValue as IMocked;
+				if (mocked != null)
+				{
+					SetupAllProperties(mocked.Mock, mockedTypesStack);
+				}
 
                     if (property.CanWrite)
                     {
@@ -725,12 +733,28 @@ namespace Moq
 								.DeclaredMethods
 								.SingleOrDefault(m => m.Name == "Returns" && m.GetParameterTypes().Count() == 1 && m.GetParameterTypes().First() == property.PropertyType);
 
-                        var returnsGetter = genericSetupGetMethod.Invoke(mock, new[] { expression });
-                        returnsMethod.Invoke(returnsGetter, new[] { initialValue });
-                    }
-                }
-            });
-        }
+					var returnsGetter = genericSetupGetMethod.Invoke(mock, new[] {expression});
+					returnsMethod.Invoke(returnsGetter, new[] {initialValue});
+				}
+			}
+		}
+
+		private static object GetInitialValue(IDefaultValueProvider valueProvider, Stack<Type> mockedTypesStack, PropertyInfo property)
+		{
+			if (mockedTypesStack.Contains(property.PropertyType))
+			{
+				// to deal with loops in the property graph
+				valueProvider = new EmptyDefaultValueProvider();
+			}
+			else
+			{
+				// to make sure that properties of types that don't impelemt ISerializable properly (Castle throws ArgumentException)
+				// are mocked with default value instead.
+				// It will only result in exception if the properties are accessed.
+				valueProvider = new SerializableTypesValueProvider(valueProvider);
+			}
+			return valueProvider.ProvideDefault(property.GetGetMethod());
+		}
 
 		private static Expression GetPropertyExpression(Type mockType, PropertyInfo property)
 		{
