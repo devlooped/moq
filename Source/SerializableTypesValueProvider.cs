@@ -5,11 +5,19 @@ using System.Runtime.Serialization;
 
 namespace Moq
 {
+#if !NETCORE
 	/// <summary>
 	/// A <see cref="IDefaultValueProvider"/> that returns an empty default value 
 	/// for serializable types that do not implement <see cref="ISerializable"/> properly, 
 	/// and returns the value provided by the decorated provider otherwise.
 	/// </summary>
+#else
+	/// <summary>
+	/// A <see cref="IDefaultValueProvider"/> that returns an empty default value 
+	/// for serializable types that do not implement ISerializable properly, 
+	/// and returns the value provided by the decorated provider otherwise.
+	/// </summary>
+#endif
 	internal class SerializableTypesValueProvider : IDefaultValueProvider
 	{
 		private readonly IDefaultValueProvider decorated;
