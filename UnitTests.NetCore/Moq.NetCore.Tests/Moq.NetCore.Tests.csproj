@@ -35,7 +35,7 @@
   </ItemGroup>
 
   <ItemGroup>
-    <ProjectReference Include="..\..\Source.NetCore\Moq.NetCore.csproj" />
+    <ProjectReference Include="..\..\Source\Moq.NetCore.csproj" />
     <ProjectReference Include="..\ClassLibrary1\ClassLibrary1.csproj" />
     <ProjectReference Include="..\ClassLibrary2\ClassLibrary2.csproj" />
   </ItemGroup>

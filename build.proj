@@ -16,8 +16,9 @@
 		<Solution Include="Moq.sln"/>
 		<NuSpec Include="Moq.nuspec" />
 		<TestProject Include="UnitTests\Moq.Tests.csproj" />
-		<NetCoreTestProject Include="UnitTests.NetCore\Moq.NetCore.Tests\Moq.NetCore.Tests.csproj" />
 		<Source Include="Source\Moq.csproj" />
+		<NetCoreSolution Include="Moq.NetCore.sln" />
+		<NetCoreTestProject Include="UnitTests.NetCore\Moq.NetCore.Tests\Moq.NetCore.Tests.csproj" />
 	</ItemGroup>
 	
 	<Target Name="Clean">
@@ -32,7 +33,9 @@
 	<Target Name="Build" DependsOnTargets="GitVersion">
 		<MSBuild Projects="@(Solution)" Properties="$(CommonBuildProperties)" />
 
-		<Exec Command="xcopy &quot;Source.NetCore\bin\$(Configuration)\Moq.*&quot; &quot;$(DropDirectory)lib\netstandard1.3\&quot; /Y" ContinueOnError="false" />
+		<MSBuild Projects="@(NetCoreSolution)" BuildInParallel="false" Targets="Restore;Build" Properties="$(CommonBuildProperties)" />
+
+		<Exec Command="xcopy &quot;Source\bin\$(Configuration)\netstandard1.3\Moq.*&quot; &quot;$(DropDirectory)lib\netstandard1.3\&quot; /Y" ContinueOnError="false" />
 
 		<Exec Command="$(PackagesPath)\gitlink\lib\net45\GitLink.exe . -f &quot;$([System.String]::new('%(Solution.FullPath)').Replace('$(MSBuildProjectDirectory)', '').TrimStart('\'))&quot; -skipverify -u https://github.com/moq/moq4 -b $(GitBranch) -c $(Configuration)" />
 	</Target>
@@ -45,8 +48,6 @@
 		<ItemGroup>
 			<TestAssembly Include="@(_TestAssembly)" Condition=" Exists('%(_TestAssembly.FullPath)') " />
 		</ItemGroup>
-
-		<MSBuild Projects="@(NetCoreTestProject)" BuildInParallel="false" Targets="Restore;Build" Properties="$(CommonBuildProperties)" />
 
 		<PropertyGroup>
 			<XunitConsole>$(PackagesPath)\xunit.runner.console\tools\xunit.console.exe</XunitConsole>
