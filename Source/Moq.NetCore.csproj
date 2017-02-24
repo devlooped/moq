@@ -2,11 +2,12 @@
 
   <PropertyGroup>
     <TargetFramework>netstandard1.3</TargetFramework>
-      <AssemblyOriginatorKeyFile>../Moq.snk</AssemblyOriginatorKeyFile>
-      <SignAssembly>true</SignAssembly>
-      <PublicSign Condition="'$(OS)' != 'Windows_NT'">true</PublicSign>
-      <AssemblyName>Moq</AssemblyName>
-      <RootNamespace>Moq</RootNamespace>
+    <AssemblyOriginatorKeyFile>../Moq.snk</AssemblyOriginatorKeyFile>
+    <SignAssembly>true</SignAssembly>
+    <PublicSign Condition="'$(OS)' != 'Windows_NT'">true</PublicSign>
+    <AssemblyName>Moq</AssemblyName>
+    <RootNamespace>Moq</RootNamespace>
+    <GenerateAssemblyInfo>false</GenerateAssemblyInfo>
   </PropertyGroup>
 
   <PropertyGroup Condition=" '$(TargetFramework)' == 'netstandard1.3' ">
