@@ -18,7 +18,7 @@
 		<TestProject Include="UnitTests\Moq.Tests.csproj" />
 		<Source Include="Source\Moq.csproj" />
 		<NetCoreSolution Include="Moq.NetCore.sln" />
-		<NetCoreTestProject Include="UnitTests.NetCore\Moq.NetCore.Tests\Moq.NetCore.Tests.csproj" />
+		<NetCoreTestProject Include="UnitTests\Moq.NetCore.Tests.csproj" />
 	</ItemGroup>
 	
 	<Target Name="Clean">

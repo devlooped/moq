@@ -4,7 +4,7 @@
     <Description>Moq.NetCore.UnitTests Class Library</Description>
     <TargetFramework>netcoreapp1.0</TargetFramework>
     <AssemblyName>Moq.NetCore.Tests</AssemblyName>
-    <AssemblyOriginatorKeyFile>../../Moq.snk</AssemblyOriginatorKeyFile>
+    <AssemblyOriginatorKeyFile>../Moq.snk</AssemblyOriginatorKeyFile>
     <SignAssembly>true</SignAssembly>
     <PublicSign Condition=" '$(OS)' != 'Windows_NT' ">true</PublicSign>
     <PackageId>Moq.NetCore.Tests</PackageId>
@@ -12,8 +12,7 @@
   </PropertyGroup>
 
   <ItemGroup>
-    <Compile Remove="..\..\UnitTests\Library\**\*.cs;..\..\UnitTests\Pex\**\*.cs;..\..\UnitTests\Properties\**\*.cs" />
-    <Compile Include="..\..\UnitTests\**\*.cs" Exclude="..\..\UnitTests\Library\**\*.cs;..\..\UnitTests\Pex\**\*.cs;..\..\UnitTests\Properties\**\*.cs;bin\**;obj\**;**\*.xproj;packages\**" />
+    <Compile Remove="Library\**\*.cs;Pex\**\*.cs;Properties\**\*.cs" />
   </ItemGroup>
 
   <ItemGroup Condition="$(TargetFramework.StartsWith('netcoreapp'))">
@@ -35,9 +34,9 @@
   </ItemGroup>
 
   <ItemGroup>
-    <ProjectReference Include="..\..\Source\Moq.NetCore.csproj" />
-    <ProjectReference Include="..\ClassLibrary1\ClassLibrary1.csproj" />
-    <ProjectReference Include="..\ClassLibrary2\ClassLibrary2.csproj" />
+    <ProjectReference Include="..\Source\Moq.NetCore.csproj" />
+    <ProjectReference Include="Library\ClassLibrary1\ClassLibrary1.NetCore.csproj" />
+    <ProjectReference Include="Library\ClassLibrary2\ClassLibrary2.NetCore.csproj" />
   </ItemGroup>
 
   <ItemGroup>
