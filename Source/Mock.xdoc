@@ -80,7 +80,7 @@
 			to ensure the method in the setup was invoked:
 			<code>
 				var mock = new Mock&lt;IWarehouse&gt;();
-				this.Setup(x =&gt; x.HasInventory(TALISKER, 50)).Verifiable().Returns(true);
+				this.Setup(x =&gt; x.HasInventory(TALISKER, 50)).Returns(true).Verifiable();
 				...
 				// other test code
 				...
