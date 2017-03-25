@@ -192,7 +192,7 @@ namespace Moq.Protected
 		{
 			var argTypes = ToArgTypes(args);
 			return typeof(T).GetMethods(BindingFlags.Instance | BindingFlags.NonPublic | BindingFlags.Public)
-				.SingleOrDefault(m => m.Name == methodName && m.HasMatchingParameterTypes(argTypes));
+				.SingleOrDefault(m => m.Name == methodName && m.HasCompatibleParameterTypes(argTypes));
 		}
 
 		private static Expression<Func<T, TResult>> GetMethodCall<TResult>(MethodInfo method, object[] args)
