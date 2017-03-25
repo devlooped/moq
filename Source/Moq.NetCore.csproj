@@ -35,4 +35,31 @@
     <PackageReference Include="System.Reflection.TypeExtensions" Version="4.1.0" />
   </ItemGroup>
 
+  <ItemGroup>
+    <None Update="Includes\GenericTypeParameters.tt">
+      <Generator>TextTemplatingFileGenerator</Generator>
+    </None>
+    <None Update="Language\ICallback.tt">
+      <Generator>TextTemplatingFileGenerator</Generator>
+    </None>
+    <None Update="Language\IRaise.tt">
+      <Generator>TextTemplatingFileGenerator</Generator>
+    </None>
+    <None Update="Language\IReturns.tt">
+      <Generator>TextTemplatingFileGenerator</Generator>
+    </None>
+    <None Update="MethodCall.tt">
+      <Generator>TextTemplatingFileGenerator</Generator>
+    </None>
+    <None Update="MethodCallReturn.tt">
+      <Generator>TextTemplatingFileGenerator</Generator>
+    </None>
+    <None Update="Microsoft\Delegates.tt">
+      <Generator>TextTemplatingFileGenerator</Generator>
+    </None>
+    <None Update="ReturnsExtensions.tt">
+      <Generator>TextTemplatingFileGenerator</Generator>
+    </None>
+  </ItemGroup>
+
 </Project>
