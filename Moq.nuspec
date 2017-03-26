@@ -6,7 +6,7 @@
     <title>Moq: an enjoyable mocking library</title>
     <authors>Daniel Cazzulino, kzu</authors>
     <owners>Daniel Cazzulino, Clarius Labs, kzu</owners>
-    <licenseUrl>http://www.opensource.org/licenses/bsd-license.php</licenseUrl>
+    <licenseUrl>https://raw.githubusercontent.com/moq/moq4/master/License.txt</licenseUrl>
     <projectUrl>http://www.moqthis.com</projectUrl>
     <requireLicenseAcceptance>false</requireLicenseAcceptance>
     <description>Moq is the most popular and friendly mocking framework for .NET</description>
