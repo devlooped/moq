@@ -82,6 +82,19 @@ namespace Moq.Tests
 		}
 
 		[Fact]
+		public void PerformSequenceWithThrowsFirst()
+		{
+			var mock = new Mock<IFoo>();
+
+			mock.SetupSequence(x => x.Do())
+				.Throws<Exception>()
+				.Returns(1);
+
+			Assert.Throws<Exception>(() => mock.Object.Do());
+			Assert.Equal(1, mock.Object.Do());
+		}
+
+		[Fact]
 		public void PerformSequenceWithCallBase()
 		{
 			var mock = new Mock<Foo>();
