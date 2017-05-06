@@ -7,7 +7,7 @@
     <authors>Daniel Cazzulino, kzu</authors>
     <owners>Daniel Cazzulino, Clarius Labs, kzu</owners>
     <licenseUrl>https://raw.githubusercontent.com/moq/moq4/master/License.txt</licenseUrl>
-    <projectUrl>http://www.moqthis.com</projectUrl>
+    <projectUrl>https://github.com/moq/moq4</projectUrl>
     <requireLicenseAcceptance>false</requireLicenseAcceptance>
     <description>Moq is the most popular and friendly mocking framework for .NET</description>
     <tags>moq tdd mocking mocks unittesting agile unittest</tags>
