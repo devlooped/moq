@@ -269,7 +269,7 @@ namespace Moq
 		}
 #endif
 
-		public static bool HasCompatibleParameterTypes(this MethodInfo method, Type[] paramTypes)
+		public static bool HasCompatibleParameterTypes(this MethodInfo method, Type[] paramTypes, bool exactParameterMatch)
 		{
 			var types = method.GetParameterTypes().ToArray();
 			if (types.Length != paramTypes.Length)
@@ -283,6 +283,10 @@ namespace Moq
 				if (parameterType == typeof(object))
 				{
 					continue;
+				}
+				else if (exactParameterMatch && types[i] != parameterType)
+				{
+					return false;
 				}
 				else if (!types[i].IsAssignableFrom(parameterType))
 				{
