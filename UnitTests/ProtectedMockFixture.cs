@@ -377,6 +377,26 @@ namespace Moq.Tests
 		}
 
 		[Fact]
+		public void SetupResultDefaulTwoOverloadsWithDerivedClassThrowsInvalidOperationException()
+		{
+			var mock = new Mock<MethodOverloads>();
+			Assert.Throws<InvalidOperationException>(() => mock.Protected()
+				.Setup<FooBase>("OverloadWithDerived", ItExpr.IsAny<MyDerived>())
+				.Returns(new FooBase()));
+
+		}
+
+		[Fact]
+		public void SetupResultExactParameterMatchTwoOverloadsWithDerivedClassShouldNotThrow()
+		{
+			var mock = new Mock<MethodOverloads>();
+			var fooBase = new FooBase();
+			mock.Protected()
+				.Setup<FooBase>("OverloadWithDerived", true, ItExpr.IsAny<MyDerived>())
+				.Returns(fooBase);
+		}
+
+		[Fact]
 		public void ThrowsIfVerifyNullVoidMethodName()
 		{
 			Assert.Throws<ArgumentNullException>(() => new Mock<FooBase>().Protected().Verify(null, Times.Once()));
@@ -751,6 +771,16 @@ namespace Moq.Tests
 			protected virtual void SameFirstParameter(object a) { }
 
 			protected virtual void SameFirstParameter(object a, object b) { }
+
+			protected virtual FooBase OverloadWithDerived(MyBase myBase)
+			{
+				return null;
+			}
+
+			protected virtual FooBase OverloadWithDerived(MyDerived myBase)
+			{
+				return null;
+			}
 		}
 
 		public class FooBase
@@ -869,5 +899,9 @@ namespace Moq.Tests
 		public class FooDerived : FooBase
 		{
 		}
+
+		public class MyBase { }
+
+		public class MyDerived : MyBase { }
 	}
 }
