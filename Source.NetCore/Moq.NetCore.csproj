@@ -313,6 +313,9 @@
     <Compile Include="..\Source\Proxy\IProxyFactory.cs">
       <Link>Proxy\IProxyFactory.cs</Link>
     </Compile>
+    <Compile Include="..\Source\Proxy\IPublicCallContext.cs">
+      <Link>Proxy\IPublicCallContext.cs</Link>
+    </Compile>
     <Compile Include="..\Source\Proxy\ProxyGenerationHelpers.cs">
       <Link>Proxy\ProxyGenerationHelpers.cs</Link>
     </Compile>
