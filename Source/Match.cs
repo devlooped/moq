@@ -171,7 +171,7 @@ namespace Moq
 			if (type == typeof(It.AnyType))
 				return new It.AnyTypeImplementation();
 
-			if(type.IsInterface)
+			if(type.GetTypeInfo().IsInterface)
 				throw new InvalidOperationException(
 					"You can only use concrete classes with default constructors for custom OpenGeneric AnyType implementations. " +
 					$"Either use '{typeof(It.AnyType).Name}' or ensure {type} is a class with a default constructor!");
