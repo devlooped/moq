@@ -150,9 +150,18 @@ namespace Moq
 			}
 
 			if (matchType.IsAnyType())
-				return this.Condition((T)(object)new It.AnyTypeImplementation(value));
+				return this.Condition(CreateAnyType(value));
 
 			return this.Condition((T)value);
+		}
+
+		private static T CreateAnyType(object value)
+		{
+			var anyType =  (It.AnyType)Activator.CreateInstance(typeof(T));
+
+			anyType.Object = value;
+
+			return (T) anyType;
 		}
 	}
 }
