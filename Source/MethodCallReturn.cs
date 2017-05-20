@@ -66,6 +66,7 @@ namespace Moq
 		where TMock : class
 	{
 		private Delegate valueDel = (Func<TResult>)(() => default(TResult));
+		private Delegate valueDelCallContext = null;
 		private Action<object[]> afterReturnCallback;
 		private bool callBase;
 
@@ -88,6 +89,12 @@ namespace Moq
 		public IVerifies Raises(Action<TMock> eventExpression, params object[] args)
 		{
 			return this.RaisesImpl(eventExpression, args);
+		}
+
+		public IReturnsResult<TMock> Returns(Func<IPublicCallContext, object> valueFunction)
+		{
+			valueDelCallContext = valueFunction;
+			return this;
 		}
 
 		public IReturnsResult<TMock> Returns(Func<TResult> valueExpression)
@@ -164,10 +171,16 @@ namespace Moq
 
 			if (callBase)
 				call.InvokeBase();
+			else if (valueDelCallContext != null)
+				call.ReturnValue = valueDelCallContext.InvokePreserveStack(call);
 			else if (valueDel.HasCompatibleParameterList(new ParameterInfo[] { }))
 				call.ReturnValue = valueDel.InvokePreserveStack();   //we need this, for the user to be able to use parameterless methods
 			else
 				call.ReturnValue = valueDel.InvokePreserveStack(call.Arguments); //will throw if parameters mismatch
+
+			if(call.ReturnValue != null && !call.Method.ReturnType.IsInstanceOfType(call.ReturnValue))
+				throw new MockException(MockException.ExceptionReason.ReturnValueRequired, MockBehavior.Default, call,
+					$"Return Value must be of type {call.Method.ReturnType} but found {call.ReturnValue.GetType()}");
 
 			if (afterReturnCallback != null)
 				afterReturnCallback(call.Arguments);

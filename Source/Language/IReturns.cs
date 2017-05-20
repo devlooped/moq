@@ -41,6 +41,7 @@
 using System;
 using System.ComponentModel;
 using Moq.Language.Flow;
+using Moq.Proxy;
 
 namespace Moq.Language
 {
@@ -65,6 +66,26 @@ namespace Moq.Language
 		/// </code>
 		/// </example>
 		IReturnsResult<TMock> Returns(TResult value);
+
+		/// <summary>
+		/// Specifies a function that will calculate the value to return from an open generic method.
+		/// </summary>
+		/// <param name="valueFunction">
+		/// The function that will calculate the return value.
+		/// IPublicCallContext contains the closed generic method as well as the arguments passed in.
+		/// </param>
+		/// <example group="returns">
+		/// Return a calculated value when the method is called:
+		/// <code>
+		/// mock.Setup(x => x.Execute&lt;It.IsAnyType>())
+		///     .Returns(context => returnValues[0]);
+		/// </code>
+		/// The lambda expression to retrieve the return value is lazy-executed, 
+		/// meaning that its value may change depending on the moment the method 
+		/// is executed and the value the <c>returnValues</c> array has at 
+		/// that moment.
+		/// </example>
+		IReturnsResult<TMock> Returns(Func<IPublicCallContext, object> valueFunction);
 
 		/// <summary>
 		/// Specifies a function that will calculate the value to return from the method.

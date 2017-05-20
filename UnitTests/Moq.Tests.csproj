@@ -95,6 +95,7 @@
 		<Compile Include="StubExtensionsFixture.cs" />
 		<Compile Include="TimesFixture.cs" />
 		<Compile Include="VerifyFixture.cs" />
+	    <Compile Include="MockOpenGenericSetupFixture.cs" />
 	</ItemGroup>
 	<ItemGroup>
 		<None Include="..\Moq.snk">

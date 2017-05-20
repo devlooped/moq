@@ -128,12 +128,13 @@ namespace Moq
 
 		internal override bool Matches(object value)
 		{
-			if (value != null && !(value is T))
+			var matchType = typeof(T);
+			
+			if (value != null && !(value is T) && !matchType.IsAnyType())
 			{
 				return false;
 			}
 
-			var matchType = typeof(T);
 			if (value == null && matchType.GetTypeInfo().IsValueType
 				&& (!matchType.GetTypeInfo().IsGenericType || matchType.GetGenericTypeDefinition() != typeof(Nullable<>)))
 			{
@@ -147,6 +148,10 @@ namespace Moq
 				// See Github issue #90: https://github.com/moq/moq4/issues/90
 				return false;
 			}
+
+			if (matchType.IsAnyType())
+				return this.Condition((T)(object)new It.AnyTypeImplementation(value));
+
 			return this.Condition((T)value);
 		}
 	}

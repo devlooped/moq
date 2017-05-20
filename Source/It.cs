@@ -60,9 +60,9 @@ namespace Moq
 			return Match<TValue>.Create(
 #if !NETCORE
 				value => value == null || (IsComObject(value) ? value is TValue
-				                                              : typeof(TValue).IsAssignableFrom(value.GetType())),
+				                                              : typeof(TValue).IsAssignableFrom(value.GetType()) || typeof(TValue).IsAnyType()),
 #else
-				value => value == null || typeof(TValue).IsAssignableFrom(value.GetType()),
+				value => value == null || typeof(TValue).IsAssignableFrom(value.GetType()) || typeof(TValue).IsAnyType(),
 #endif
 				() => It.IsAny<TValue>());
 		}
@@ -73,9 +73,9 @@ namespace Moq
 			return Match<TValue>.Create(
 #if !NETCORE
 				value => value != null && (IsComObject(value) ? value is TValue
-				                                              : typeof(TValue).IsAssignableFrom(value.GetType())),
+				                                              : typeof(TValue).IsAssignableFrom(value.GetType()) || typeof(TValue).IsAnyType()),
 #else
-				value => value != null && typeof(TValue).IsAssignableFrom(value.GetType()),
+				value => value != null && typeof(TValue).IsAssignableFrom(value.GetType()) || typeof(TValue).IsAnyType(),
 #endif
 				() => It.IsNotNull<TValue>());
 		}
@@ -153,6 +153,41 @@ namespace Moq
 
 			// But evaluated every time :)
 			return Match<string>.Create(value => re.IsMatch(value), () => It.IsRegex(regex, options));
+		}
+
+		/// <summary>
+		/// Allows for setting up open generic methods on Mock Fixtures
+		/// </summary>
+		public interface AnyType
+		{
+			/// <summary>
+			/// Will contain the specific object being compared inside an open generic method.
+			/// Used for checking inside It.Is&lt;It.AnyType&gt;(x => ((int)x.Object) == 2)
+			/// </summary>
+			object Object { get; }
+		}
+
+		internal class AnyTypeImplementation : AnyType
+		{
+			public AnyTypeImplementation(object o)
+			{
+				Object = o;
+			}
+
+			public object Object { get; }
+		}
+	}
+
+	internal static class IsAnyTypeExtensions
+	{
+		public static bool IsAnyType(this Type type)
+		{
+			return typeof(It.AnyType).IsAssignableFrom(type);
+		}
+
+		public static bool IsAnyType<T>(this T type)
+		{
+			return typeof(It.AnyType).IsAssignableFrom(typeof(T));
 		}
 	}
 }
