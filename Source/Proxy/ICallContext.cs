@@ -39,16 +39,11 @@
 // http://www.opensource.org/licenses/bsd-license.php]
 
 using System;
-using System.Reflection;
 
 namespace Moq.Proxy
 {
-	internal interface ICallContext
+	internal interface ICallContext : IPublicCallContext
 	{
-		object[] Arguments { get; }
-
-		MethodInfo Method { get; }
-
 		object ReturnValue { get; set; }
 
 		void InvokeBase();

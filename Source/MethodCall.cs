@@ -85,7 +85,7 @@ namespace Moq
 	{
 		public bool Equals(Type x, Type y)
 		{
-			return y.IsAssignableFrom(x);
+			return y.IsAssignableFrom(x) || y.IsAnyType();
 		}
 
 		public int GetHashCode(Type obj)
@@ -376,9 +376,9 @@ namespace Moq
 			if (this.Method.DeclaringType.IsAssignableFrom(call.Method.DeclaringType))
 			{
 				if (!this.Method.Name.Equals(call.Method.Name, StringComparison.Ordinal) ||
-					this.Method.ReturnType != call.Method.ReturnType ||
+					!IsMethodReturnTypeEqual(call) ||
 					!this.Method.IsGenericMethod &&
-					!call.Method.GetParameterTypes().SequenceEqual(this.Method.GetParameterTypes()))
+					!IsMethodParameterTypesEqual(call))
 				{
 					return false;
 				}
@@ -392,6 +392,16 @@ namespace Moq
 			}
 
 			return false;
+		}
+
+		private bool IsMethodParameterTypesEqual(ICallContext call)
+		{
+			return call.Method.GetParameterTypes().SequenceEqual(this.Method.GetParameterTypes());
+		}
+
+		private bool IsMethodReturnTypeEqual(ICallContext call)
+		{
+			return this.Method.ReturnType == call.Method.ReturnType || Method.ReturnType.IsAnyType();
 		}
 
 		public IVerifies AtMostOnce()
