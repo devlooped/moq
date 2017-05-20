@@ -157,11 +157,26 @@ namespace Moq
 
 		private static T CreateAnyType(object value)
 		{
-			var anyType =  (It.AnyType)Activator.CreateInstance(typeof(T));
+			var anyType = CreateAnyType();
 
 			anyType.Object = value;
 
 			return (T) anyType;
+		}
+
+		private static It.AnyType CreateAnyType()
+		{
+			var type = typeof(T);
+
+			if (type == typeof(It.AnyType))
+				return new It.AnyTypeImplementation();
+
+			if(type.IsInterface)
+				throw new InvalidOperationException(
+					"You can only use concrete classes with default constructors for custom OpenGeneric AnyType implementations. " +
+					$"Either use '{typeof(It.AnyType).Name}' or ensure {type} is a class with a default constructor!");
+
+			return (It.AnyType) Activator.CreateInstance(type);
 		}
 	}
 }
