@@ -381,7 +381,7 @@ namespace Moq.Tests
 		{
 			var mock = new Mock<MethodOverloads>();
 			Assert.Throws<InvalidOperationException>(() => mock.Protected()
-				.Setup<FooBase>("OverloadWithDerived", ItExpr.IsAny<MyDerived>())
+				.Setup<FooBase>("Overloaded", ItExpr.IsAny<MyDerived>())
 				.Returns(new FooBase()));
 
 		}
@@ -392,7 +392,7 @@ namespace Moq.Tests
 			var mock = new Mock<MethodOverloads>();
 			var fooBase = new FooBase();
 			mock.Protected()
-				.Setup<FooBase>("OverloadWithDerived", true, ItExpr.IsAny<MyDerived>())
+				.Setup<FooBase>("Overloaded", true, ItExpr.IsAny<MyDerived>())
 				.Returns(fooBase);
 		}
 
@@ -772,12 +772,12 @@ namespace Moq.Tests
 
 			protected virtual void SameFirstParameter(object a, object b) { }
 
-			protected virtual FooBase OverloadWithDerived(MyBase myBase)
+			protected virtual FooBase Overloaded(MyBase myBase)
 			{
 				return null;
 			}
 
-			protected virtual FooBase OverloadWithDerived(MyDerived myBase)
+			protected virtual FooBase Overloaded(MyDerived myBase)
 			{
 				return null;
 			}
