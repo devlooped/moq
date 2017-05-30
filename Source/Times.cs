@@ -47,17 +47,11 @@ namespace Moq
 	/// <include file='Times.xdoc' path='docs/doc[@for="Times"]/*'/>
 	public struct Times
 	{
-		private Func<int, bool> evaluator;
-		private string messageFormat;
-		private int from;
-		private int to;
+		private TimesEvaluator evaluator;
 
-		private Times(Func<int, bool> evaluator, int from, int to, string messageFormat)
+		private Times(TimesEvaluator evaluator)
 		{
 			this.evaluator = evaluator;
-			this.from = from;
-			this.to = to;
-			this.messageFormat = messageFormat;
 		}
 
 		/// <include file='Times.xdoc' path='docs/doc[@for="Times.AtLeast"]/*'/>
@@ -65,13 +59,15 @@ namespace Moq
 		{
 			Guard.NotOutOfRangeInclusive(() => callCount, callCount, 1, int.MaxValue);
 
-			return new Times(c => c >= callCount, callCount, int.MaxValue, Resources.NoMatchingCallsAtLeast);
+			var evaluator = new RangeInclusiveBasedTimesEvaluator(callCount, int.MaxValue, Resources.NoMatchingCallsAtLeast);
+			return new Times(evaluator);
 		}
 
 		/// <include file='Times.xdoc' path='docs/doc[@for="Times.AtLeastOnce"]/*'/>
 		public static Times AtLeastOnce()
 		{
-			return new Times(c => c >= 1, 1, int.MaxValue, Resources.NoMatchingCallsAtLeastOnce);
+			var evaluator = new RangeInclusiveBasedTimesEvaluator(1, int.MaxValue, Resources.NoMatchingCallsAtLeastOnce);
+			return new Times(evaluator);
 		}
 
 		/// <include file='Times.xdoc' path='docs/doc[@for="Times.AtMost"]/*'/>
@@ -79,13 +75,15 @@ namespace Moq
 		{
 			Guard.NotOutOfRangeInclusive(() => callCount, callCount, 0, int.MaxValue);
 
-			return new Times(c => c >= 0 && c <= callCount, 0, callCount, Resources.NoMatchingCallsAtMost);
+			var evaluator = new RangeInclusiveBasedTimesEvaluator(0, callCount, Resources.NoMatchingCallsAtMost);
+			return new Times(evaluator);
 		}
 
 		/// <include file='Times.xdoc' path='docs/doc[@for="Times.AtMostOnce"]/*'/>
 		public static Times AtMostOnce()
 		{
-			return new Times(c => c >= 0 && c <= 1, 0, 1, Resources.NoMatchingCallsAtMostOnce);
+			var evaluator = new RangeInclusiveBasedTimesEvaluator(0, 1, Resources.NoMatchingCallsAtMostOnce);
+			return new Times(evaluator);
 		}
 
 		/// <include file='Times.xdoc' path='docs/doc[@for="Times.Between"]/*'/>
@@ -99,19 +97,16 @@ namespace Moq
 					throw new ArgumentOutOfRangeException("callCountTo");
 				}
 
-				return new Times(
-					c => c > callCountFrom && c < callCountTo,
-					callCountFrom,
-					callCountTo,
-					Resources.NoMatchingCallsBetweenExclusive);
+				var evaluator = new RangeExclusiveBasedTimesEvaluator(callCountFrom, callCountTo, Resources.NoMatchingCallsBetweenExclusive);
+				return new Times(evaluator);
 			}
+			else
+			{
+				Guard.NotOutOfRangeInclusive(() => callCountFrom, callCountFrom, 0, callCountTo);
 
-			Guard.NotOutOfRangeInclusive(() => callCountFrom, callCountFrom, 0, callCountTo);
-			return new Times(
-				c => c >= callCountFrom && c <= callCountTo,
-				callCountFrom,
-				callCountTo,
-				Resources.NoMatchingCallsBetweenInclusive);
+				var evaluator = new RangeInclusiveBasedTimesEvaluator(callCountFrom, callCountTo, Resources.NoMatchingCallsBetweenInclusive);
+				return new Times(evaluator);
+			}
 		}
 
 		/// <include file='Times.xdoc' path='docs/doc[@for="Times.Exactly"]/*'/>
@@ -119,19 +114,30 @@ namespace Moq
 		{
 			Guard.NotOutOfRangeInclusive(() => callCount, callCount, 0, int.MaxValue);
 
-			return new Times(c => c == callCount, callCount, callCount, Resources.NoMatchingCallsExactly);
+			var evaluator = new RangeInclusiveBasedTimesEvaluator(callCount, callCount, Resources.NoMatchingCallsExactly);
+			return new Times(evaluator);
+		}
+
+		/// <include file='Times.xdoc' path='docs/doc[@for="Times.Matching"]/*'/>
+		public static Times Matching(TimesEvaluator	evaluator)
+		{
+			Guard.NotNull(() => evaluator, evaluator);
+
+			return new Times(evaluator);
 		}
 
 		/// <include file='Times.xdoc' path='docs/doc[@for="Times.Never"]/*'/>
 		public static Times Never()
 		{
-			return new Times(c => c == 0, 0, 0, Resources.NoMatchingCallsNever);
+			var evaluator = new RangeInclusiveBasedTimesEvaluator(0, 0, Resources.NoMatchingCallsNever);
+			return new Times(evaluator);
 		}
 
 		/// <include file='Times.xdoc' path='docs/doc[@for="Times.Once"]/*'/>
 		public static Times Once()
 		{
-			return new Times(c => c == 1, 1, 1, Resources.NoMatchingCallsOnce);
+			var evaluator = new RangeInclusiveBasedTimesEvaluator(1, 1, Resources.NoMatchingCallsOnce);
+			return new Times(evaluator);
 		}
 
 		/// <include file='Times.xdoc' path='docs/doc[@for="Times.Equals"]/*'/>
@@ -140,7 +146,7 @@ namespace Moq
 			if (obj is Times)
 			{
 				var other = (Times)obj;
-				return this.from == other.from && this.to == other.to;
+				return this.evaluator.Equals(other.evaluator);
 			}
 
 			return false;
@@ -149,7 +155,7 @@ namespace Moq
 		/// <include file='Times.xdoc' path='docs/doc[@for="Times.GetHashCode"]/*'/>
 		public override int GetHashCode()
 		{
-			return this.from.GetHashCode() ^ this.to.GetHashCode();
+			return this.evaluator.GetHashCode();
 		}
 
 		/// <include file='Times.xdoc' path='docs/doc[@for="Times.op_Equality"]/*'/>
@@ -168,17 +174,83 @@ namespace Moq
 		{
 			return string.Format(
 				CultureInfo.CurrentCulture,
-				this.messageFormat,
+				Resources.NoMatchingCalls,
 				failMessage,
-				expression,
-				this.from,
-				this.to,
-				callCount);
+				this.evaluator.GetExceptionMessage(callCount),
+				expression);
 		}
 
 		internal bool Verify(int callCount)
 		{
-			return this.evaluator(callCount);
+			return this.evaluator.Verify(callCount);
+		}
+
+		private sealed class RangeExclusiveBasedTimesEvaluator : TimesEvaluator
+		{
+			private int from;
+			private int to;
+			private string messageFormat;
+
+			public RangeExclusiveBasedTimesEvaluator(int from, int to, string messageFormat)
+			{
+				this.from = from;
+				this.to = to;
+				this.messageFormat = messageFormat;
+			}
+
+			public override bool Equals(TimesEvaluator other)
+			{
+				return other is RangeExclusiveBasedTimesEvaluator rbe && this.from == rbe.from && this.to == rbe.to;
+			}
+
+			public override string GetExceptionMessage(int callCount)
+			{
+				return string.Format(
+					CultureInfo.CurrentCulture,
+					this.messageFormat,
+					this.from,
+					this.to,
+					callCount);
+			}
+
+			public override bool Verify(int callCount)
+			{
+				return callCount > this.from && callCount < this.to;
+			}
+		}
+
+		private sealed class RangeInclusiveBasedTimesEvaluator : TimesEvaluator
+		{
+			private int from;
+			private int to;
+			private string messageFormat;
+
+			public RangeInclusiveBasedTimesEvaluator(int from, int to, string messageFormat)
+			{
+				this.from = from;
+				this.to = to;
+				this.messageFormat = messageFormat;
+			}
+
+			public override bool Equals(TimesEvaluator other)
+			{
+				return other is RangeInclusiveBasedTimesEvaluator rbe && this.from == rbe.from && this.to == rbe.to;
+			}
+
+			public override string GetExceptionMessage(int callCount)
+			{
+				return string.Format(
+					CultureInfo.CurrentCulture,
+					this.messageFormat,
+					this.from,
+					this.to,
+					callCount);
+			}
+
+			public override bool Verify(int callCount)
+			{
+				return callCount >= this.from && callCount <= this.to;
+			}
 		}
 	}
 }

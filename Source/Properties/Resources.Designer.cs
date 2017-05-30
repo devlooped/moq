@@ -238,7 +238,16 @@ namespace Moq.Properties {
         
         /// <summary>
         ///   Looks up a localized string similar to {0}
-        ///Expected invocation on the mock at least {2} times, but was {4} times: {1}.
+        ///{1}: {2}.
+        /// </summary>
+        internal static string NoMatchingCalls {
+            get {
+                return ResourceManager.GetString("NoMatchingCalls", resourceCulture);
+            }
+        }
+
+        /// <summary>
+        ///   Looks up a localized string similar to Expected invocation on the mock at least {0} times, but was {2} times.
         /// </summary>
         internal static string NoMatchingCallsAtLeast {
             get {
@@ -247,8 +256,7 @@ namespace Moq.Properties {
         }
         
         /// <summary>
-        ///   Looks up a localized string similar to {0}
-        ///Expected invocation on the mock at least once, but was never performed: {1}.
+        ///   Looks up a localized string similar to Expected invocation on the mock at least once, but was never performed.
         /// </summary>
         internal static string NoMatchingCallsAtLeastOnce {
             get {
@@ -257,8 +265,7 @@ namespace Moq.Properties {
         }
         
         /// <summary>
-        ///   Looks up a localized string similar to {0}
-        ///Expected invocation on the mock at most {3} times, but was {4} times: {1}.
+        ///   Looks up a localized string similar to Expected invocation on the mock at most {1} times, but was {2} times.
         /// </summary>
         internal static string NoMatchingCallsAtMost {
             get {
@@ -267,8 +274,7 @@ namespace Moq.Properties {
         }
         
         /// <summary>
-        ///   Looks up a localized string similar to {0}
-        ///Expected invocation on the mock at most once, but was {4} times: {1}.
+        ///   Looks up a localized string similar to Expected invocation on the mock at most once, but was {2} times.
         /// </summary>
         internal static string NoMatchingCallsAtMostOnce {
             get {
@@ -277,8 +283,7 @@ namespace Moq.Properties {
         }
         
         /// <summary>
-        ///   Looks up a localized string similar to {0}
-        ///Expected invocation on the mock between {2} and {3} times (Exclusive), but was {4} times: {1}.
+        ///   Looks up a localized string similar to Expected invocation on the mock between {0} and {1} times (Exclusive), but was {2} times.
         /// </summary>
         internal static string NoMatchingCallsBetweenExclusive {
             get {
@@ -287,8 +292,7 @@ namespace Moq.Properties {
         }
         
         /// <summary>
-        ///   Looks up a localized string similar to {0}
-        ///Expected invocation on the mock between {2} and {3} times (Inclusive), but was {4} times: {1}.
+        ///   Looks up a localized string similar to Expected invocation on the mock between {0} and {1} times (Inclusive), but was {2} times.
         /// </summary>
         internal static string NoMatchingCallsBetweenInclusive {
             get {
@@ -297,8 +301,7 @@ namespace Moq.Properties {
         }
         
         /// <summary>
-        ///   Looks up a localized string similar to {0}
-        ///Expected invocation on the mock exactly {2} times, but was {4} times: {1}.
+        ///   Looks up a localized string similar to Expected invocation on the mock exactly {0} times, but was {2} times.
         /// </summary>
         internal static string NoMatchingCallsExactly {
             get {
@@ -307,8 +310,7 @@ namespace Moq.Properties {
         }
         
         /// <summary>
-        ///   Looks up a localized string similar to {0}
-        ///Expected invocation on the mock should never have been performed, but was {4} times: {1}.
+        ///   Looks up a localized string similar to Expected invocation on the mock should never have been performed, but was {2} times.
         /// </summary>
         internal static string NoMatchingCallsNever {
             get {
@@ -317,8 +319,7 @@ namespace Moq.Properties {
         }
         
         /// <summary>
-        ///   Looks up a localized string similar to {0}
-        ///Expected invocation on the mock once, but was {4} times: {1}.
+        ///   Looks up a localized string similar to Expected invocation on the mock once, but was {2} times.
         /// </summary>
         internal static string NoMatchingCallsOnce {
             get {

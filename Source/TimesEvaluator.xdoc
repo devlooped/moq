@@ -1,0 +1,47 @@
+<?xml version="1.0" encoding="utf-8" ?>
+<docs xml:space="preserve">
+	<doc for="TimesEvaluator">
+		<summary>
+			Types derived from this abstract base class verify an invocation call count against some criterion.
+		</summary>
+	</doc>
+	<doc for="TimesEvaluator.Verify">
+		<summary>
+			Checks whether the specified call count meets the criterion represented by this evaluator.
+		</summary>
+		<param name="callCount">The invocation call count to verify.</param>
+		<returns><c>true</c> if the specified call count meets the criterion; otherwise, <c>false</c>.</returns>
+	</doc>
+	<doc for="TimesEvaluator.GetExceptionMessage">
+		<summary>
+			Gets an exception message describing why the specified call count did not meet the
+            criterion represented by this evaluator. The standard message format is:
+            <c>"Expected invocation on the mock …, but was {callCount} times."</c>
+		</summary>
+		<param name="callCount">The call count for which to produce an exception message.</param>
+		<returns>
+			An exception message describing why the specified call count did not meet
+			the criterion represented by this evaluator.
+		</returns>
+	</doc>
+	<doc for="Times.Equals(TimesEvaluator)">
+		<summary>
+			Determines whether the specified <see cref="TimesEvaluator"/> is equal (by value) to this evaluator.
+		</summary>
+		<param name="other">The <see cref="TimesEvaluator"/> to compare with this evaluator.</param>
+		<returns><c>true</c> if the specified evaluator is equal to this evaluator; otherwise, <c>false</c>.</returns>
+	</doc>
+	<doc for="Times.Equals(object)">
+		<summary>
+			Determines whether the specified object is equal (by value) to this evaluator.
+		</summary>
+		<param name="obj">The object to compare with this evaluator.</param>
+		<returns><c>true</c> if the specified object is equal to this evaluator; otherwise, <c>false</c>.</returns>
+	</doc>
+	<doc for="Times.GetHashCode">
+		<summary>
+			Computes an an approximate hash based on this evaluator's runtime type.
+		</summary>
+		<returns>The type-based hash code for this evaluator.</returns>
+	</doc>
+</docs>

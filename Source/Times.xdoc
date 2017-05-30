@@ -50,6 +50,13 @@
 		<param name="callCount">The times that a method or property can be called.</param>
 		<returns>An object defining the allowed number of invocations.</returns>
 	</doc>
+	<doc for="Times.Matching">
+		<summary>
+			Specifies that a mocked method should be invoked as defined by the given evaluator.
+		</summary>
+		<param name="evaluator">A <see cref="TimesEvaluator"/> object that will verify the expected number of invocations.</param>
+		<returns>An object defining the allowed number of invocations.</returns>
+	</doc>
 	<doc for="Times.Never">
 		<summary>
 			Specifies that a mocked method should not be invoked.
