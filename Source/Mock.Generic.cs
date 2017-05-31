@@ -46,6 +46,7 @@ using Moq.Language.Flow;
 using Moq.Proxy;
 using Moq.Language;
 using System.Reflection;
+using System.Threading;
 
 #if !NETCORE
 using System.CodeDom;
@@ -58,6 +59,7 @@ namespace Moq
     public partial class Mock<T> : Mock, IMock<T> where T : class
 	{
 		private static IProxyFactory proxyFactory = new CastleProxyFactory();
+		private static int serialNumberCounter = 0;
 		private T instance;
 		private object[] constructorArguments;
 
@@ -123,7 +125,7 @@ namespace Moq
 
 		private string GenerateMockName()
 		{
-			var randomId = Guid.NewGuid().ToString("N").Substring(0, 4);
+			var serialNumber = Interlocked.Increment(ref serialNumberCounter).ToString("x8");
 
 			var typeName = typeof (T).FullName;
 
@@ -138,7 +140,7 @@ namespace Moq
 			}
 #endif
 
-			return "Mock<" + typeName + ":" + randomId + ">";
+			return "Mock<" + typeName + ":" + serialNumber + ">";
 		}
 
 		private void CheckParameters()
