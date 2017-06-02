@@ -432,12 +432,13 @@ namespace Moq.Tests
 
             Action setup = () =>
             {
+                var anyException = new Exception();
                 var minDelay = TimeSpan.FromMilliseconds(1);
                 var maxDelay = TimeSpan.FromMilliseconds(2);
 
                 mock
                     .Setup(x => x.RefParameterValueReturnType("test"))
-                    .ThrowsAsync(new InternalBufferOverflowException(), minDelay, maxDelay, null);
+                    .ThrowsAsync(anyException, minDelay, maxDelay, null);
             };
 
             var paramName = Assert.Throws<ArgumentNullException>(setup).ParamName;
