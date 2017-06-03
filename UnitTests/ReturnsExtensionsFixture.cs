@@ -9,6 +9,8 @@ namespace Moq.Tests
     {
         public interface IAsyncInterface
         {
+            Task NoParametersNonGenericTaskReturnType();
+
             Task<string> NoParametersRefReturnType();
             
             Task<int> NoParametersValueReturnType();
@@ -190,6 +192,19 @@ namespace Moq.Tests
             string secondEvaluationResult = mock.Object.ValueParameterRefReturnType(36).Result;
 
             Assert.NotSame(firstEvaluationResult, secondEvaluationResult);
+        }
+
+        [Fact]
+        public void ThrowsAsync_on_NoParametersNonGenericTaskReturnType()
+        {
+            var mock = new Mock<IAsyncInterface>();
+            var exception = new InvalidOperationException();
+            mock.Setup(x => x.NoParametersNonGenericTaskReturnType()).ThrowsAsync(exception);
+
+            var task = mock.Object.NoParametersNonGenericTaskReturnType();
+
+            Assert.True(task.IsFaulted);
+            Assert.Equal(exception, task.Exception.InnerException);
         }
 
         [Fact]
