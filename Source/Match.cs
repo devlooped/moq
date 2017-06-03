@@ -128,7 +128,12 @@ namespace Moq
 
 		internal override bool Matches(object value)
 		{
-			if (value != null && !(value is T))
+			if (value == null)
+			{
+				return true;
+			}
+
+			if (!(value is T))
 			{
 				return false;
 			}
