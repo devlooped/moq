@@ -58,13 +58,8 @@ namespace Moq.Matchers
 
 		public bool Matches(object value)
 		{
-			var valueExpression = value as Expression;
-			if (value == null)
-			{
-				return false;
-			}
-
-			return ExpressionComparer.Default.Equals(this.expression, valueExpression);
+			return value is Expression valueExpression
+				&& ExpressionComparer.Default.Equals(this.expression, valueExpression);
 		}
 	}
 }
