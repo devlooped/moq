@@ -303,6 +303,60 @@ namespace Moq.Tests.Regressions
 
 		#endregion // #252
 
+        #region 311
+
+        public sealed class Issue311
+        {
+            [Fact]
+            public void Can_still_provide_default_value_for_vector()
+            {
+                var mocked = Mock.Of<ITypeWithVector>();
+
+                var vector = mocked.Vector;
+                Assert.NotNull(vector);
+                Assert.True(vector.GetType().IsArray);
+                Assert.Equal(1, vector.GetType().GetArrayRank());
+            }
+
+            [Fact]
+            public void Can_provide_default_value_for_twodimensional_array_property()
+            {
+                var mocked = Mock.Of<ITypeWithTwoDimensionalArray>();
+
+                var twoDimensionalArray = mocked.TwoDimensionalArray;
+                Assert.NotNull(twoDimensionalArray);
+                Assert.True(twoDimensionalArray.GetType().IsArray);
+                Assert.Equal(2, twoDimensionalArray.GetType().GetArrayRank());
+            }
+
+            [Fact]
+            public void Can_provide_default_value_for_threedimensional_arrays()
+            {
+                var mocked = Mock.Of<ITypeWithThreeDimensionalArray>();
+
+                var threeDimensionalArray = mocked.ThreeDimensionalArray;
+                Assert.NotNull(threeDimensionalArray);
+                Assert.True(threeDimensionalArray.GetType().IsArray);
+                Assert.Equal(3, threeDimensionalArray.GetType().GetArrayRank());
+            }
+
+            public interface ITypeWithVector
+            {
+                int[] Vector { get; }
+            }
+
+            public interface ITypeWithTwoDimensionalArray
+            {
+                int[,] TwoDimensionalArray { get; }
+            }
+
+            public interface ITypeWithThreeDimensionalArray
+            {
+                int[,,] ThreeDimensionalArray { get; }
+            }
+        }
+
+        #endregion 311
 
         // Old @ Google Code
 
