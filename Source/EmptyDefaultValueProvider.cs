@@ -79,7 +79,9 @@ namespace Moq
 		{
 			if (valueType.IsArray)
 			{
-				return Activator.CreateInstance(valueType, 0);
+				var elementType = valueType.GetElementType();
+				var lengths = new int[valueType.GetArrayRank()];
+				return Array.CreateInstance(elementType, lengths);
 			}
 			else if (valueType == typeof(IEnumerable))
 			{
