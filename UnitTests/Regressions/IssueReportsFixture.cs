@@ -381,8 +381,11 @@ namespace Moq.Tests.Regressions
 				aMock.Setup(m => m.Foo(i1, i2));
 				aMock.Setup(m => m.Foo(i2, i1));
 
-				Assert.DoesNotThrow(() => aMock.Object.Foo(i1, i2));
-				Assert.DoesNotThrow(() => aMock.Object.Foo(i2, i1));
+				aMock.Object.Foo(i1, i2);
+				aMock.Object.Foo(i2, i1);
+
+				aMock.Verify(m => m.Foo(i1, i2), Times.Once());
+				aMock.Verify(m => m.Foo(i2, i1), Times.Once());
 			}
 		}
 

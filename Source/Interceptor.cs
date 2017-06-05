@@ -173,7 +173,9 @@ namespace Moq
 				var index = 0;
 				while (eq && index < this.values.Count)
 				{
-					eq &= this.values[index] == key.values[index];
+					// using `object.Equals` instead of == ensures that we get the correct
+					// comparison result for boxed value types:
+					eq &= object.Equals(this.values[index], key.values[index]);
 					index++;
 				}
 
@@ -182,20 +184,17 @@ namespace Moq
 
 			public override int GetHashCode()
 			{
-				unchecked
+				var hash = fixedString.GetHashCode();
+
+				foreach (var value in values)
 				{
-					var hash = fixedString.GetHashCode();
-
-					foreach (var value in values)
+					if (value != null)
 					{
-						if (value != null)
-						{
-							hash = (hash * 397) ^ value.GetHashCode();
-						}
+						hash = unchecked((hash * 397) ^ value.GetHashCode());
 					}
-
-					return hash;
 				}
+
+				return hash;
 			}
 		}
 
