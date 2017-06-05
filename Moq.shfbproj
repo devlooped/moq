@@ -115,7 +115,7 @@
       <NamespaceSummaryItem name="Castle.DynamicProxy.Serialization" isDocumented="False" xmlns="" />
       <NamespaceSummaryItem name="Moq" isDocumented="True" xmlns="">Root namespace of Moq (pronounced "Mock-you" or just "Mock"), the only mocking library for .NET developed from scratch to take full advantage of .NET 3.5 (i.e. Linq expression trees) and C# 3.0 features (i.e. lambda expressions) that make it the most productive, simple and refactoring-friendly mocking library available.
 &lt;p&gt;
-See the &lt;a href="http://code.google.com/p/moq/wiki/QuickStart"&gt;online quickstarts&lt;/a&gt; for more examples than those available in this code documentation.
+See the &lt;a href="https://github.com/moq/moq4/wiki/Quickstart"&gt;online quickstarts&lt;/a&gt; for more examples than those available in this code documentation.
 &lt;/p&gt;
 &lt;p&gt;The Mock&amp;lt;T&amp;gt; class is the core of the library, so it's a good place to start.&lt;/p&gt;
 You can also read &lt;a href="http://blogsearch.google.com/blogsearch?q=moq+mock"&gt;blog entries&lt;/a&gt; from around the world about Moq.</NamespaceSummaryItem>
