@@ -147,17 +147,55 @@ namespace Moq
 		public virtual bool CallBase { get; set; }
 
 		/// <include file='Mock.xdoc' path='docs/doc[@for="Mock.DefaultValue"]/*'/>
+		[Obsolete("Replaced with DefaultValueProvider.")]
 		public virtual DefaultValue DefaultValue
 		{
 			get { return this.defaultValue; }
 			set { this.SetDefaultValue(value); }
 		}
 
+		/// <summary>
+		/// Specifies the class that will determine the default
+		/// value to return when invocations are made that
+		/// have no setups and need to return a default
+		/// value (for loose mocks).
+		/// </summary>
+		public IDefaultValueProvider DefaultValueProvider
+		{
+			get { return this.defaultValueProvider; }
+			set { this.SetDefaultValueProvider(value); }
+		}
+
+		private void SetDefaultValueProvider(IDefaultValueProvider value)
+		{
+			Guard.NotNull(() => value, value);
+
+			if (value.GetType() == typeof(EmptyDefaultValueProvider))
+			{
+				this.defaultValue = DefaultValue.Empty;
+			}
+			else if (value.GetType() == typeof(MockDefaultValueProvider))
+			{
+				this.defaultValue = DefaultValue.Mock;
+			}
+			else
+			{
+				this.defaultValue = DefaultValue.Custom;
+			}
+
+			this.defaultValueProvider = value;
+		}
+
 		private void SetDefaultValue(DefaultValue value)
 		{
+			if (value == DefaultValue.Custom)
+			{
+				throw new ArgumentException("It's impossible that the Custom value is set directly. If you want to use custom default value provider, set the DefaultValueProvider property instead.");
+			}
+
 			this.defaultValue = value;
 			this.defaultValueProvider = defaultValue == DefaultValue.Mock ?
-				new MockDefaultValueProvider(this) :
+				(IDefaultValueProvider)new MockDefaultValueProvider(this) :
 				new EmptyDefaultValueProvider();
 		}
 
@@ -203,17 +241,6 @@ namespace Moq
         /// the mock instance, which breaks As{T}.
         /// </summary>
         internal abstract bool IsDelegateMock { get; }
-
-        /// <summary>
-        /// Specifies the class that will determine the default 
-        /// value to return when invocations are made that 
-        /// have no setups and need to return a default 
-        /// value (for loose mocks).
-        /// </summary>
-        internal IDefaultValueProvider DefaultValueProvider
-        {
-            get { return this.defaultValueProvider; }
-        }
 
 		/// <summary>
 		/// Exposes the list of extra interfaces implemented by the mock.

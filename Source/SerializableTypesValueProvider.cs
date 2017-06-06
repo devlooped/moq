@@ -1,4 +1,5 @@
-﻿using System.Reflection;
+using System;
+using System.Reflection;
 #if !NETCORE
 using System.Runtime.Serialization;
 #endif
@@ -38,6 +39,12 @@ namespace Moq
 			return !member.ReturnType.GetTypeInfo().IsSerializable || member.ReturnType.IsSerializableMockable()
 				       ? decorated.ProvideDefault(member)
 				       : emptyDefaultValueProvider.ProvideDefault(member);
+		}
+
+		/// <inheritdoc />
+		public IDefaultValueProvider ProvideInnerValueProvider(Mock innerMock)
+		{
+			return new SerializableTypesValueProvider(decorated);
 		}
 	}
 }
