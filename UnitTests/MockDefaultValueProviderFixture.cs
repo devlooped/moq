@@ -10,6 +10,14 @@ namespace Moq.Tests
 	public class MockDefaultValueProviderFixture
 	{
 		[Fact]
+		public void Factory_has_proper_type()
+		{
+			var _ = new Mock<IFoo>();
+			var defaultValueProvider = new MockDefaultValueProvider(_);
+			Assert.IsType<MockDefaultValueProviderFactory>(defaultValueProvider.Factory);
+		}
+
+		[Fact]
 		public void ProvidesMockValue()
 		{
 			var mock = new Mock<IFoo>();
@@ -53,7 +61,7 @@ namespace Moq.Tests
 		}
 
 		[Fact]
-		public void NewMocksHaveSameBehaviorAndDefaultValueAsOwner()
+		public void NewMocksHaveSameBehaviorAndDefaultValueProviderTypeAsOwner()
 		{
 			var mock = new Mock<IFoo>();
 			var provider = new MockDefaultValueProvider(mock);
@@ -63,7 +71,7 @@ namespace Moq.Tests
 			var barMock = Mock.Get((IBar)value);
 
 			Assert.Equal(mock.Behavior, barMock.Behavior);
-			Assert.Equal(mock.DefaultValue, barMock.DefaultValue);
+			Assert.Equal(mock.DefaultValueProvider.GetType(), barMock.DefaultValueProvider.GetType());
 		}
 
 		[Fact]

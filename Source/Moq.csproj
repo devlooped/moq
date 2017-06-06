@@ -45,6 +45,8 @@
 		<Compile Include="Capture.cs" />
 		<Compile Include="CaptureMatch.cs" />
 		<Compile Include="ConditionalContext.cs" />
+		<Compile Include="EmptyDefaultValueProviderFactory.cs" />
+		<Compile Include="IDefaultValueProviderFactory.cs" />
 		<Compile Include="IInterceptStrategy.cs" />
 		<Compile Include="IMock.cs" />
 		<Compile Include="InterceptorStrategies.cs" />
@@ -66,6 +68,7 @@
 			<DesignTime>True</DesignTime>
 			<DependentUpon>IReturns.tt</DependentUpon>
 		</Compile>
+		<Compile Include="MockDefaultValueProviderFactory.cs" />
 		<Compile Include="Proxy\ProxyGenerationHelpers.cs" />
 		<Compile Include="ReturnsExtensions.cs" />
 		<Compile Include="Language\ISetupSequentialResult.cs" />

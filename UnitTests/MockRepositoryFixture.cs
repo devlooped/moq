@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Linq.Expressions;
+using System.Reflection;
 using Xunit;
 
 namespace Moq.Tests
@@ -146,6 +147,87 @@ namespace Moq.Tests
 			Assert.True(mock.Object.BaseCalled);
 		}
 
+		[Fact]
+		public void DefaultValueProviderFactory_must_not_be_null()
+		{
+			var repository = new MockRepository(MockBehavior.Loose);
+			Assert.Throws<ArgumentNullException>(() => repository.DefaultValueProviderFactory = null);
+		}
+
+		[Fact]
+		public void When_DefaultProviderValueFactory_is_EmptyDefaultValueProvider_it_creates_mocks_with_the_right_provider()
+		{
+			var repository = new MockRepository(MockBehavior.Loose);
+			repository.DefaultValueProviderFactory = EmptyDefaultValueProviderFactory.Instance;
+			var mock = repository.Create<IFoo>();
+			Assert.IsType<EmptyDefaultValueProvider>(mock.DefaultValueProvider);
+		}
+
+		[Fact]
+		public void When_DefaultProviderValueFactory_is_EmptyDefaultValueProviderFactory_then_DefaultValue_is_Empty()
+		{
+			var repository = new MockRepository(MockBehavior.Loose);
+			repository.DefaultValueProviderFactory = EmptyDefaultValueProviderFactory.Instance;
+			Assert.Equal(DefaultValue.Empty, repository.DefaultValue);
+		}
+
+		[Fact]
+		public void When_DefaultValue_is_Empty_then_DefaultValueProviderFactory_is_EmptyDefaultValueProviderFactory()
+		{
+			var repository = new MockRepository(MockBehavior.Loose);
+			repository.DefaultValue = DefaultValue.Empty;
+			Assert.IsType<EmptyDefaultValueProviderFactory>(repository.DefaultValueProviderFactory);
+		}
+
+		[Fact]
+		public void When_DefaultProviderValueFactory_is_MockDefaultValueProvider_it_creates_mocks_with_the_right_provider()
+		{
+			var repository = new MockRepository(MockBehavior.Loose);
+			repository.DefaultValueProviderFactory = MockDefaultValueProviderFactory.Instance;
+			var mock = repository.Create<IFoo>();
+			Assert.IsType<MockDefaultValueProvider>(mock.DefaultValueProvider);
+		}
+
+		[Fact]
+		public void When_DefaultProviderValueFactory_is_MockDefaultValueProviderFactory_then_DefaultValue_is_Mock()
+		{
+			var repository = new MockRepository(MockBehavior.Loose);
+			repository.DefaultValueProviderFactory = MockDefaultValueProviderFactory.Instance;
+			Assert.Equal(DefaultValue.Mock, repository.DefaultValue);
+		}
+
+		[Fact]
+		public void When_DefaultValue_is_Mock_then_DefaultValueProviderFactory_is_MockDefaultValueProviderFactory()
+		{
+			var repository = new MockRepository(MockBehavior.Loose);
+			repository.DefaultValue = DefaultValue.Mock;
+			Assert.IsType<MockDefaultValueProviderFactory>(repository.DefaultValueProviderFactory);
+		}
+
+		[Fact]
+		public void When_DefaultProviderValueFactory_is_custom_DefaultValueProvider_it_creates_mocks_with_the_right_provider()
+		{
+			var repository = new MockRepository(MockBehavior.Loose);
+			repository.DefaultValueProviderFactory = QuuxDefaultValueProviderFactory.Instance;
+			var mock = repository.Create<IFoo>();
+			Assert.IsType<QuuxDefaultValueProvider>(mock.DefaultValueProvider);
+		}
+
+		[Fact]
+		public void When_DefaultValueProviderFactory_is_custom_factory_then_DefaultValue_is_Custom()
+		{
+			var repository = new MockRepository(MockBehavior.Loose);
+			repository.DefaultValueProviderFactory = QuuxDefaultValueProviderFactory.Instance;
+			Assert.Equal(DefaultValue.Custom, repository.DefaultValue);
+		}
+
+		[Fact]
+		public void DefaultValue_cannot_be_set_to_Custom()
+		{
+			var repository = new MockRepository(MockBehavior.Loose);
+			Assert.Throws<ArgumentException>(() => repository.DefaultValue = DefaultValue.Custom);
+		}
+
 		public interface IFoo
 		{
 			void Do();
@@ -174,6 +256,27 @@ namespace Moq.Tests
 			{
 				BaseCalled = true;
 			}
+		}
+
+		private sealed class QuuxDefaultValueProviderFactory : IDefaultValueProviderFactory
+		{
+			public static IDefaultValueProviderFactory Instance => new QuuxDefaultValueProviderFactory();
+
+			private QuuxDefaultValueProviderFactory() { }
+
+			public IDefaultValueProvider CreateProviderFor(Mock owner)
+			{
+				return new QuuxDefaultValueProvider();
+			}
+		}
+
+		private sealed class QuuxDefaultValueProvider : IDefaultValueProvider
+		{
+			public IDefaultValueProviderFactory Factory => QuuxDefaultValueProviderFactory.Instance;
+
+			public void DefineDefault<T>(T value) => throw new NotImplementedException();
+
+			public object ProvideDefault(MethodInfo member) => throw new NotImplementedException();
 		}
 	}
 }

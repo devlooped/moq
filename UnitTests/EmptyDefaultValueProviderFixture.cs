@@ -14,6 +14,13 @@ namespace Moq.Tests
 	public class EmptyDefaultValueProviderFixture
 	{
 		[Fact]
+		public void Factory_has_proper_type()
+		{
+			var defaultValueProvider = new EmptyDefaultValueProvider();
+			Assert.IsType<EmptyDefaultValueProviderFactory>(defaultValueProvider.Factory);
+		}
+
+		[Fact]
 		public void ProvidesNullString()
 		{
 			var provider = new EmptyDefaultValueProvider();

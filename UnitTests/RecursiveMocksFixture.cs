@@ -27,7 +27,7 @@ namespace Moq.Tests
 		}
 
 		[Fact]
-		public void NewMocksHaveSameBehaviorAndDefaultValueAsOwner()
+		public void NewMocksHaveSameBehaviorAndDefaultValueProviderTypeAsOwner()
 		{
 			var mock = new Mock<IFoo>();
 
@@ -36,7 +36,7 @@ namespace Moq.Tests
 			var barMock = Mock.Get(mock.Object.Bar);
 
 			Assert.Equal(mock.Behavior, barMock.Behavior);
-			Assert.Equal(mock.DefaultValue, barMock.DefaultValue);
+			Assert.Equal(mock.DefaultValueProvider.GetType(), barMock.DefaultValueProvider.GetType());
 		}
 
 

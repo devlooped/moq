@@ -1,3 +1,4 @@
+using System;
 using System.Diagnostics.CodeAnalysis;
 
 namespace Moq
@@ -21,5 +22,8 @@ namespace Moq
 
 		/// <include file='Mock.xdoc' path='docs/doc[@for="Mock.DefaultValue"]/*'/>
 		DefaultValue DefaultValue { get; set; }
+
+		/// <include file='Mock.xdoc' path='docs/doc[@for="Mock.DefaultValueProvider"]/*'/>
+		IDefaultValueProvider DefaultValueProvider { get; set; }
 	}
 }

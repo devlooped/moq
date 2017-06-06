@@ -90,6 +90,12 @@ namespace Moq
 			set { this.owner.DefaultValue = value; }
 		}
 
+		public override IDefaultValueProvider DefaultValueProvider
+		{
+			get => this.owner.DefaultValueProvider;
+			set => this.owner.DefaultValueProvider = value;
+		}
+
 		public override TInterface Object
 		{
 			get { return this.owner.Object as TInterface; }

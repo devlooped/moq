@@ -56,14 +56,14 @@ namespace Moq
 	public abstract partial class Mock : IFluentInterface
 	{
 		private bool isInitialized;
-		private DefaultValue defaultValue = DefaultValue.Empty;
-		private IDefaultValueProvider defaultValueProvider = new EmptyDefaultValueProvider();
+		private IDefaultValueProvider defaultValueProvider;
 
 		/// <include file='Mock.xdoc' path='docs/doc[@for="Mock.ctor"]/*'/>
 		protected Mock()
 		{
 			this.ImplementedInterfaces = new List<Type>();
 			this.InnerMocks = new ConcurrentDictionary<MethodInfo, Mock>();
+			this.defaultValueProvider = new EmptyDefaultValueProvider();
 		}
 
 		/// <include file='Mock.xdoc' path='docs/doc[@for="Mock.Get"]/*'/>
@@ -149,16 +149,37 @@ namespace Moq
 		/// <include file='Mock.xdoc' path='docs/doc[@for="Mock.DefaultValue"]/*'/>
 		public virtual DefaultValue DefaultValue
 		{
-			get { return this.defaultValue; }
-			set { this.SetDefaultValue(value); }
-		}
-
-		private void SetDefaultValue(DefaultValue value)
-		{
-			this.defaultValue = value;
-			this.defaultValueProvider = defaultValue == DefaultValue.Mock ?
-				new MockDefaultValueProvider(this) :
-				new EmptyDefaultValueProvider();
+			get
+			{
+				if (this.defaultValueProvider is EmptyDefaultValueProvider)
+				{
+					return DefaultValue.Empty;
+				}
+				else if (this.defaultValueProvider is MockDefaultValueProvider)
+				{
+					return DefaultValue.Mock;
+				}
+				else
+				{
+					return DefaultValue.Custom;
+				}
+			}
+			set
+			{
+				switch (value)
+				{
+					case DefaultValue.Empty:
+						this.defaultValueProvider = new EmptyDefaultValueProvider();
+						break;
+					case DefaultValue.Mock:
+						this.defaultValueProvider = new MockDefaultValueProvider(this);
+						break;
+					case DefaultValue.Custom:
+						throw new ArgumentException("A custom default value provider must be installed by setting the DefaultValueProvider property.");
+					default:
+						throw new ArgumentOutOfRangeException(nameof(value));
+				}
+			}
 		}
 
 		/// <include file='Mock.xdoc' path='docs/doc[@for="Mock.Object"]/*'/>
@@ -210,9 +231,14 @@ namespace Moq
 		/// have no setups and need to return a default
 		/// value (for loose mocks).
 		/// </summary>
-		internal IDefaultValueProvider DefaultValueProvider
+		public virtual IDefaultValueProvider DefaultValueProvider
 		{
-			get { return this.defaultValueProvider; }
+			get => this.defaultValueProvider;
+			set
+			{
+				Guard.NotNull(() => value, value);
+				this.defaultValueProvider = value;
+			}
 		}
 
 		/// <summary>

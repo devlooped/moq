@@ -44,6 +44,7 @@ using System.Globalization;
 using System.Linq;
 using System.Text;
 using Moq.Properties;
+using System.ComponentModel;
 
 namespace Moq
 {
@@ -137,6 +138,7 @@ namespace Moq
 	{
 		List<Mock> mocks = new List<Mock>();
 		MockBehavior defaultBehavior;
+		private IDefaultValueProviderFactory defaultValueProviderFactory;
 
 		/// <summary>
 		/// Initializes the factory with the given <paramref name="defaultBehavior"/> 
@@ -148,6 +150,7 @@ namespace Moq
 		public MockFactory(MockBehavior defaultBehavior)
 		{
 			this.defaultBehavior = defaultBehavior;
+			this.defaultValueProviderFactory = EmptyDefaultValueProviderFactory.Instance;
 		}
 
 		/// <summary>
@@ -160,7 +163,53 @@ namespace Moq
 		/// Specifies the behavior to use when returning default values for 
 		/// unexpected invocations on loose mocks.
 		/// </summary>
-		public DefaultValue DefaultValue { get; set; }
+		public DefaultValue DefaultValue
+		{
+			get
+			{
+				if (this.DefaultValueProviderFactory is EmptyDefaultValueProviderFactory)
+				{
+					return DefaultValue.Empty;
+				}
+				else if (this.DefaultValueProviderFactory is MockDefaultValueProviderFactory)
+				{
+					return DefaultValue.Mock;
+				}
+				else
+				{
+					return DefaultValue.Custom;
+				}
+			}
+			set
+			{
+				switch (value)
+				{
+					case DefaultValue.Empty:
+						this.DefaultValueProviderFactory = EmptyDefaultValueProviderFactory.Instance;
+						break;
+					case DefaultValue.Mock:
+						this.DefaultValueProviderFactory = MockDefaultValueProviderFactory.Instance;
+						break;
+					case DefaultValue.Custom:
+						throw new ArgumentException("A custom default value provider must be installed by setting the DefaultValueProviderFactory property.");
+					default:
+						throw new ArgumentOutOfRangeException(nameof(value));
+				}
+			}
+		}
+
+		/// <summary>
+		/// Gets or sets the factory to use for producing a default value provider.
+		/// </summary>
+		public IDefaultValueProviderFactory DefaultValueProviderFactory
+		{
+			get => this.defaultValueProviderFactory;
+			set
+			{
+				Guard.NotNull(() => value, value);
+				this.defaultValueProviderFactory = value;
+			}
+		}
 
 		/// <summary>
 		/// Gets the mocks that have been created by this factory and 
@@ -291,7 +340,7 @@ namespace Moq
 			mocks.Add(mock);
 
 			mock.CallBase = this.CallBase;
-			mock.DefaultValue = this.DefaultValue;
+			mock.DefaultValueProvider = this.DefaultValueProviderFactory.CreateProviderFor(mock);
 
 			return mock;
 		}
