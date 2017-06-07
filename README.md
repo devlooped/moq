@@ -88,8 +88,6 @@ Moq offers the following features:
   * Intercept and raise events on mocks
   * Intuitive support for out/ref arguments
 
-
-
 We appreciate deeply any [feedback](http://moq.uservoice.com/) that you may have!
 
 ![OhLoh](http://www.ohloh.net/p/moq/widgets/project_thin_badge.gif)

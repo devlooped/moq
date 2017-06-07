@@ -28,12 +28,12 @@
 		</example>
 		<typeparam name="TValue">Type of the value.</typeparam>
 	</doc>
-   <doc for="It.IsNotNull">
-      <summary>
-         Matches any value of the given <typeparamref name="TValue"/> type, except null.
-      </summary>
-      <typeparam name="TValue">Type of the value.</typeparam>
-   </doc>
+	<doc for="It.IsNotNull">
+		<summary>
+			Matches any value of the given <typeparamref name="TValue"/> type, except null.
+		</summary>
+		<typeparam name="TValue">Type of the value.</typeparam>
+	</doc>
 	<doc for="It.Is">
 		<summary>
 			Matches any value that satisfies the given predicate.
@@ -116,7 +116,7 @@
 			</code>
 		</example>
 	</doc>
-    <doc for="It.IsNotIn(enumerable)">
+	<doc for="It.IsNotIn(enumerable)">
 		<summary>
 			Matches any value that is not found in the sequence specified.
 		</summary>

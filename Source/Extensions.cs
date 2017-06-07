@@ -91,10 +91,10 @@ namespace Moq
 			{
 				return "\"" + typedValue + "\"";
 			}
-		    if (value is IEnumerable)
-		    {
-		        return "[" + string.Join(", ", ((IEnumerable) value).OfType<object>().Select(GetValue)) + "]";
-		    }
+			if (value is IEnumerable)
+			{
+				return "[" + string.Join(", ", ((IEnumerable) value).OfType<object>().Select(GetValue)) + "]";
+			}
 			return value.ToString();
 		}
 

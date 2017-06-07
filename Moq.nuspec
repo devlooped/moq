@@ -1,17 +1,17 @@
 ﻿<?xml version="1.0" encoding="utf-8"?>
 <package xmlns="http://schemas.microsoft.com/packaging/2011/08/nuspec.xsd">
-  <metadata>
-    <id>Moq</id>
-    <version>4.6</version>
-    <title>Moq: an enjoyable mocking library</title>
-    <authors>Daniel Cazzulino, kzu</authors>
-    <owners>Daniel Cazzulino, Clarius Labs, kzu</owners>
-    <licenseUrl>https://raw.githubusercontent.com/moq/moq4/master/License.txt</licenseUrl>
-    <projectUrl>https://github.com/moq/moq4</projectUrl>
-    <requireLicenseAcceptance>false</requireLicenseAcceptance>
-    <description>Moq is the most popular and friendly mocking framework for .NET</description>
-    <tags>moq tdd mocking mocks unittesting agile unittest</tags>
-    <releaseNotes>Version 4.5
+	<metadata>
+		<id>Moq</id>
+		<version>4.6</version>
+		<title>Moq: an enjoyable mocking library</title>
+		<authors>Daniel Cazzulino, kzu</authors>
+		<owners>Daniel Cazzulino, Clarius Labs, kzu</owners>
+		<licenseUrl>https://raw.githubusercontent.com/moq/moq4/master/License.txt</licenseUrl>
+		<projectUrl>https://github.com/moq/moq4</projectUrl>
+		<requireLicenseAcceptance>false</requireLicenseAcceptance>
+		<description>Moq is the most popular and friendly mocking framework for .NET</description>
+		<tags>moq tdd mocking mocks unittesting agile unittest</tags>
+		<releaseNotes>Version 4.5
 * Updated to .NET 4.5
 * Dropped support for .NET &lt; 4.5 and Silverlight
 * Remove ILMerge. Depend on Castle NuGet package instead.
@@ -35,8 +35,7 @@ Version 4.1
 * Feature request: It.IsIn(..), It.IsNotIn(...)
 * Corrected Verify method behavior for generic methods calls
 * Differentiate verification error from mock crash
-* Fix: Adding (and removing) handlers for events declared on interfaces works
-when CallBase = true.
+* Fix: Adding (and removing) handlers for events declared on interfaces works when CallBase = true.
 * Update to latest Castle
 * Fix: Mock.Of (Functional Syntax) doesn't work on properties with non-public setters
 * Fix: Allow to use CallBase instead of Returns
@@ -103,7 +102,6 @@ Version 3.0
 * Fixed issue #97 on not being able to use SetupSet/VerifySet if property did not have a getter
 * Better integration with Pex (http://research.microsoft.com/en-us/projects/Pex/)
 * Various other minor fixes (#134, #135, #137, #138, #140, etc.)
-    
 
 Version 2.6
 
@@ -160,8 +158,8 @@ Version 1.4
 
 Version 1.3
 
- * Added support for overriding expectations set previously on a Mock. Now adding a second expectation for the same method/property call will override the existing one. This facilitates setting up default expectations in a fixture setup and overriding when necessary in a specific test.
- * Added support for mock verification. Both Verify and VerifyAll are provided for more flexibility (the former only verifies methods marked Verifiable) 
+* Added support for overriding expectations set previously on a Mock. Now adding a second expectation for the same method/property call will override the existing one. This facilitates setting up default expectations in a fixture setup and overriding when necessary in a specific test.
+* Added support for mock verification. Both Verify and VerifyAll are provided for more flexibility (the former only verifies methods marked Verifiable)
 
 Version 1.2
 
@@ -175,44 +173,44 @@ Version 1.1
 Version 1.0
 
 * Initial release, initial documentation process in place, etc. 
-</releaseNotes>
-    <dependencies>
-      <group targetFramework=".NETFramework4.5">
-        <dependency id="Castle.Core" version="4.0.0" />
-      </group>
-      <group targetFramework=".NETStandard1.3">
-        <dependency id="Castle.Core" version="4.0.0" />
-        <dependency id="System.Collections" version="4.0.11" />
-        <dependency id="System.Collections.Concurrent" version="4.0.12" />
-        <dependency id="System.Diagnostics.Debug" version="4.0.11" />
-        <dependency id="System.Diagnostics.Tools" version="4.0.1" />
-        <dependency id="System.Globalization" version="4.0.11" />
-        <dependency id="System.Linq" version="4.1.0" />
-        <dependency id="System.Linq.Expressions" version="4.1.0" />
-        <dependency id="System.Linq.Queryable" version="4.0.1" />
-        <dependency id="System.Reflection" version="4.1.0" />
-        <dependency id="System.Reflection.Emit" version="4.0.1" />
-        <dependency id="System.Reflection.Emit.ILGeneration" version="4.0.1" />
-        <dependency id="System.Reflection.Extensions" version="4.0.1" />
-        <dependency id="System.Reflection.Primitives" version="4.0.1" />
-        <dependency id="System.Reflection.TypeExtensions" version="4.1.0" />
-        <dependency id="System.Resources.ResourceManager" version="4.0.1" />
-        <dependency id="System.Runtime" version="4.1.0" />
-        <dependency id="System.Runtime.Extensions" version="4.1.0" />
-        <dependency id="System.Text.RegularExpressions" version="4.1.0" />
-        <dependency id="System.Threading" version="4.0.11" />
-        <dependency id="System.Threading.Tasks" version="4.0.11" />
-      </group>
-    </dependencies>
-  </metadata>
-  <files>
-    <file src="Source\bin\$configuration$\Moq.dll" target="lib\net45" />
-    <!-- Could not verify that  GitLink works, so disabling pdbs for now -->
-    <!--<file src="Source\bin\$configuration$\Moq.pdb" target="lib\net45" />-->
-    <file src="Source\bin\$configuration$\Moq.xml" target="lib\net45" />
-    <file src="Source\bin\$configuration$\netstandard1.3\Moq.dll" target="lib\netstandard1.3" />
-    <!-- Could not verify that  GitLink works, so disabling pdbs for now -->
-    <!--<file src="Source\bin\$configuration$\netstandard1.3\Moq.pdb" target="lib\netstandard1.3" />-->
-    <file src="Source\bin\$configuration$\netstandard1.3\Moq.xml" target="lib\netstandard1.3" />
-  </files>
+		</releaseNotes>
+		<dependencies>
+			<group targetFramework=".NETFramework4.5">
+				<dependency id="Castle.Core" version="4.0.0" />
+			</group>
+			<group targetFramework=".NETStandard1.3">
+				<dependency id="Castle.Core" version="4.0.0" />
+				<dependency id="System.Collections" version="4.0.11" />
+				<dependency id="System.Collections.Concurrent" version="4.0.12" />
+				<dependency id="System.Diagnostics.Debug" version="4.0.11" />
+				<dependency id="System.Diagnostics.Tools" version="4.0.1" />
+				<dependency id="System.Globalization" version="4.0.11" />
+				<dependency id="System.Linq" version="4.1.0" />
+				<dependency id="System.Linq.Expressions" version="4.1.0" />
+				<dependency id="System.Linq.Queryable" version="4.0.1" />
+				<dependency id="System.Reflection" version="4.1.0" />
+				<dependency id="System.Reflection.Emit" version="4.0.1" />
+				<dependency id="System.Reflection.Emit.ILGeneration" version="4.0.1" />
+				<dependency id="System.Reflection.Extensions" version="4.0.1" />
+				<dependency id="System.Reflection.Primitives" version="4.0.1" />
+				<dependency id="System.Reflection.TypeExtensions" version="4.1.0" />
+				<dependency id="System.Resources.ResourceManager" version="4.0.1" />
+				<dependency id="System.Runtime" version="4.1.0" />
+				<dependency id="System.Runtime.Extensions" version="4.1.0" />
+				<dependency id="System.Text.RegularExpressions" version="4.1.0" />
+				<dependency id="System.Threading" version="4.0.11" />
+				<dependency id="System.Threading.Tasks" version="4.0.11" />
+			</group>
+		</dependencies>
+	</metadata>
+	<files>
+		<file src="Source\bin\$configuration$\Moq.dll" target="lib\net45" />
+		<!-- Could not verify that GitLink works, so disabling pdbs for now -->
+		<!--<file src="Source\bin\$configuration$\Moq.pdb" target="lib\net45" />-->
+		<file src="Source\bin\$configuration$\Moq.xml" target="lib\net45" />
+		<file src="Source\bin\$configuration$\netstandard1.3\Moq.dll" target="lib\netstandard1.3" />
+		<!-- Could not verify that GitLink works, so disabling pdbs for now -->
+		<!--<file src="Source\bin\$configuration$\netstandard1.3\Moq.pdb" target="lib\netstandard1.3" />-->
+		<file src="Source\bin\$configuration$\netstandard1.3\Moq.xml" target="lib\netstandard1.3" />
+	</files>
 </package>

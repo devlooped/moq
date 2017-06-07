@@ -98,29 +98,29 @@ namespace Moq
 			() => It.IsInRange(from, to, rangeKind));
 		}
 
-		  /// <include file='It.xdoc' path='docs/doc[@for="It.IsIn(enumerable)"]/*'/>
-		  public static TValue IsIn<TValue>(IEnumerable<TValue> items)
-		  {
-				return Match<TValue>.Create(value => items.Contains(value), () => It.IsIn(items)); 
-		  }
+		/// <include file='It.xdoc' path='docs/doc[@for="It.IsIn(enumerable)"]/*'/>
+		public static TValue IsIn<TValue>(IEnumerable<TValue> items)
+		{
+			return Match<TValue>.Create(value => items.Contains(value), () => It.IsIn(items));
+		}
 
-		  /// <include file='It.xdoc' path='docs/doc[@for="It.IsIn(params)"]/*'/>
-		  public static TValue IsIn<TValue>(params TValue[] items)
-		  {
-				return Match<TValue>.Create(value => items.Contains(value), () => It.IsIn(items)); 
-		  }
+		/// <include file='It.xdoc' path='docs/doc[@for="It.IsIn(params)"]/*'/>
+		public static TValue IsIn<TValue>(params TValue[] items)
+		{
+			return Match<TValue>.Create(value => items.Contains(value), () => It.IsIn(items));
+		}
 
-		  /// <include file='It.xdoc' path='docs/doc[@for="It.IsNotIn(enumerable)"]/*'/>
-		  public static TValue IsNotIn<TValue>(IEnumerable<TValue> items)
-		  {
-				return Match<TValue>.Create(value => !items.Contains(value), () => It.IsNotIn(items));
-		  }
+		/// <include file='It.xdoc' path='docs/doc[@for="It.IsNotIn(enumerable)"]/*'/>
+		public static TValue IsNotIn<TValue>(IEnumerable<TValue> items)
+		{
+			return Match<TValue>.Create(value => !items.Contains(value), () => It.IsNotIn(items));
+		}
 
-		  /// <include file='It.xdoc' path='docs/doc[@for="It.IsNotIn(params)"]/*'/>
-		  public static TValue IsNotIn<TValue>(params TValue[] items)
-		  {
-				return Match<TValue>.Create(value => !items.Contains(value), () => It.IsNotIn(items));
-		  }
+		/// <include file='It.xdoc' path='docs/doc[@for="It.IsNotIn(params)"]/*'/>
+		public static TValue IsNotIn<TValue>(params TValue[] items)
+		{
+			return Match<TValue>.Create(value => !items.Contains(value), () => It.IsNotIn(items));
+		}
 
 		/// <include file='It.xdoc' path='docs/doc[@for="It.IsRegex(regex)"]/*'/>
 		public static string IsRegex(string regex)

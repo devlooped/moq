@@ -60,20 +60,20 @@ namespace Moq.Tests
 		//[Fact]
 		//public void SetterMatcherRendersNicely()
 		//{
-		//    var mock = new Mock<IOrderRepository>();
+		//	var mock = new Mock<IOrderRepository>();
 
-		//    try
-		//    {
-		//        mock.VerifySet(repo => repo.Value = It.IsAny<int>());
-		//    }
-		//    catch (MockException me)
-		//    {
-		//        Console.WriteLine(me.Message);
-		//    }
+		//	try
+		//	{
+		//		mock.VerifySet(repo => repo.Value = It.IsAny<int>());
+		//	}
+		//	catch (MockException me)
+		//	{
+		//		Console.WriteLine(me.Message);
+		//	}
 
-		//    mock.Object.Value = 25;
+		//	mock.Object.Value = 25;
 
-		//    mock.VerifySet(repo => repo.Value = It.IsInRange(10, 25, Range.Inclusive));
+		//	mock.VerifySet(repo => repo.Value = It.IsInRange(10, 25, Range.Inclusive));
 		//}
 	}
 

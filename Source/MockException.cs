@@ -116,13 +116,13 @@ namespace Moq
 			get { return reason; }
 		}
 
-        /// <summary>
-        /// Indicates whether this exception is a verification fault raised by Verify()
-        /// </summary>
-        public bool IsVerificationError
-        {
-            get { return reason == ExceptionReason.VerificationFailed; }
-        }
+		/// <summary>
+		/// Indicates whether this exception is a verification fault raised by Verify()
+		/// </summary>
+		public bool IsVerificationError
+		{
+			get { return reason == ExceptionReason.VerificationFailed; }
+		}
 
 		private static string GetMessage(
 			MockBehavior behavior,
@@ -199,26 +199,26 @@ namespace Moq
 			//var message = new StringBuilder();
 			//foreach (var setup in failedSetups)
 			//{
-			//   if (setup.FailMessage != null)
-			//   {
-			//      message.Append(setup.FailMessage).Append(": ");
-			//   }
+			//	if (setup.FailMessage != null)
+			//	{
+			//	message.Append(setup.FailMessage).Append(": ");
+			//	}
 
-			//   var lambda = setup.SetupExpression.PartialMatcherAwareEval().ToLambda();
-			//   var targetTypeName = lambda.Parameters[0].Type.Name;
+			//	var lambda = setup.SetupExpression.PartialMatcherAwareEval().ToLambda();
+			//	var targetTypeName = lambda.Parameters[0].Type.Name;
 
-			//   message.Append(targetTypeName).Append(" ").Append(lambda.ToStringFixed());
+			//	message.Append(targetTypeName).Append(" ").Append(lambda.ToStringFixed());
 
-			//   if (setup.TestMethod != null)
-			//   {
-			//      message.AppendFormat(
-			//         " ({0}() in {1}: line {2})",
-			//         setup.TestMethod.Name,
-			//         setup.FileName,
-			//         setup.FileLine);
-			//   }
+			//	if (setup.TestMethod != null)
+			//	{
+			//		message.AppendFormat(
+			//			" ({0}() in {1}: line {2})",
+			//			setup.TestMethod.Name,
+			//			setup.FileName,
+			//			setup.FileLine);
+			//	}
 
-			//   message.AppendLine();
+			//	message.AppendLine();
 			//}
 
 			//return message.ToString();

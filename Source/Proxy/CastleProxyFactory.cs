@@ -116,7 +116,7 @@ namespace Moq.Proxy
 			lock (this)
 			{
 				if (!delegateInterfaceCache.TryGetValue(delegateType, out delegateInterfaceType))
- 				{
+				{
 					var interfaceName = String.Format(CultureInfo.InvariantCulture, "DelegateInterface_{0}_{1}",
 					                                  delegateType.Name, delegateInterfaceSuffix++);
 
@@ -141,8 +141,8 @@ namespace Moq.Proxy
 
 					delegateInterfaceType = newTypeBuilder.CreateTypeInfo().AsType();
 					delegateInterfaceCache[delegateType] = delegateInterfaceType;
- 				}
- 			}
+				}
+			}
 
 			delegateInterfaceMethod = delegateInterfaceType.GetMethod("Invoke");
 			return delegateInterfaceType;

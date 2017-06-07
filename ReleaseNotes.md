@@ -1,13 +1,16 @@
 Version 4.5
+
 * Updated to .NET 4.5
 * Dropped support for .NET &lt; 4.5 and Silverlight
 * Remove ILMerge. Depend on Castle NuGet package instead.
 
 Version 4.3
+
 * Added support for Roslyn
 * Automatically add implemented interfaces to mock
 
 Version 4.2
+
 * Improved support for async APIs by making default value a completed task
 * Added support for async Returns and Throws
 * Improved mock invocation sequence testing
@@ -15,6 +18,7 @@ Version 4.2
 * Added support for named mocks
 
 Version 4.1
+
 * Added covariant IMock&lt;out T&gt; interface to Mock&lt;T&gt;
 * Added It.IsNotNull&lt;T&gt;
 * Fix: 'NullReferenceException when subscribing to an event'
@@ -22,8 +26,7 @@ Version 4.1
 * Feature request: It.IsIn(..), It.IsNotIn(...)
 * Corrected Verify method behavior for generic methods calls
 * Differentiate verification error from mock crash
-* Fix: Adding (and removing) handlers for events declared on interfaces works
-when CallBase = true.
+* Fix: Adding (and removing) handlers for events declared on interfaces works when CallBase = true.
 * Update to latest Castle
 * Fix: Mock.Of (Functional Syntax) doesn't work on properties with non-public setters
 * Fix: Allow to use CallBase instead of Returns
@@ -31,6 +34,7 @@ when CallBase = true.
 * Capability of mocking delegates (event handlers)
 
 Version 4.0
+
 * Linq to Mocks: Mock.Of&lt;T&gt;(x =&gt; x.Id == 23 &amp;&amp; x.Title == "Rocks!")
 * Fixed issues:
   *  87	BadImageFormatException when using a mock with a Visual Studio generated Accessor object
@@ -90,7 +94,6 @@ Version 3.0
 * Fixed issue #97 on not being able to use SetupSet/VerifySet if property did not have a getter
 * Better integration with Pex (http://research.microsoft.com/en-us/projects/Pex/)
 * Various other minor fixes (#134, #135, #137, #138, #140, etc.)
-    
 
 Version 2.6
 
@@ -121,7 +124,6 @@ Version 2.5
 * Added support for implementing and setting expectations and verifying additional interfaces in the mock, via the new mock.As&lt;TInterface&gt;() method (thanks Fernando Simonazzi!)
 * Improved argument type matching for Is/IsAny  (thanks Jeremy.Skinner!)
 
-
 Version 2.0
 
 * Refactored fluent API on mocks. This may cause some existing tests to fail, but the fix is trivial (just reorder the calls to Callback, Returns and Verifiable)
@@ -130,7 +132,6 @@ Version 2.0
 * Implemented AtMostOnce() constraint 
 * Added support for creating MBROs with protected constructors
 * Loose mocks now return default empty arrays and IEnumerables instead of nulls
-
 
 Version 1.5.1
 
@@ -157,8 +158,8 @@ Version 1.2
 Version 1.1
 
 * Merged branch for dynamic types. Now Moq is based on Castle DynamicProxy2 to support a wider range of mock targets.
-* Added ILMerge so that Castle libraries are merged into Moq assembly (no need for external references and avoid conflicts) 
+* Added ILMerge so that Castle libraries are merged into Moq assembly (no need for external references and avoid conflicts)
 
 Version 1.0
 
-* Initial release, initial documentation process in place, etc. 
+* Initial release, initial documentation process in place, etc.
