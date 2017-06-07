@@ -57,8 +57,8 @@ namespace Moq
 
 		public ISetupSequentialResult<TResult> Throws(Exception exception)
 		{
-            var setup = this.GetSetup();
-            setup.Throws(exception);
+			var setup = this.GetSetup();
+			setup.Throws(exception);
 			this.EndSetup(setup);
 			return this;
 		}

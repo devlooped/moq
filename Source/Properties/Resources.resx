@@ -1,310 +1,310 @@
 ﻿<?xml version="1.0" encoding="utf-8"?>
 <root>
-  <!-- 
-    Microsoft ResX Schema 
-    
-    Version 2.0
-    
-    The primary goals of this format is to allow a simple XML format 
-    that is mostly human readable. The generation and parsing of the 
-    various data types are done through the TypeConverter classes 
-    associated with the data types.
-    
-    Example:
-    
-    ... ado.net/XML headers & schema ...
-    <resheader name="resmimetype">text/microsoft-resx</resheader>
-    <resheader name="version">2.0</resheader>
-    <resheader name="reader">System.Resources.ResXResourceReader, System.Windows.Forms, ...</resheader>
-    <resheader name="writer">System.Resources.ResXResourceWriter, System.Windows.Forms, ...</resheader>
-    <data name="Name1"><value>this is my long string</value><comment>this is a comment</comment></data>
-    <data name="Color1" type="System.Drawing.Color, System.Drawing">Blue</data>
-    <data name="Bitmap1" mimetype="application/x-microsoft.net.object.binary.base64">
-        <value>[base64 mime encoded serialized .NET Framework object]</value>
-    </data>
-    <data name="Icon1" type="System.Drawing.Icon, System.Drawing" mimetype="application/x-microsoft.net.object.bytearray.base64">
-        <value>[base64 mime encoded string representing a byte array form of the .NET Framework object]</value>
-        <comment>This is a comment</comment>
-    </data>
-                
-    There are any number of "resheader" rows that contain simple 
-    name/value pairs.
-    
-    Each data row contains a name, and value. The row also contains a 
-    type or mimetype. Type corresponds to a .NET class that support 
-    text/value conversion through the TypeConverter architecture. 
-    Classes that don't support this are serialized and stored with the 
-    mimetype set.
-    
-    The mimetype is used for serialized objects, and tells the 
-    ResXResourceReader how to depersist the object. This is currently not 
-    extensible. For a given mimetype the value must be set accordingly:
-    
-    Note - application/x-microsoft.net.object.binary.base64 is the format 
-    that the ResXResourceWriter will generate, however the reader can 
-    read any of the formats listed below.
-    
-    mimetype: application/x-microsoft.net.object.binary.base64
-    value   : The object must be serialized with 
-            : System.Runtime.Serialization.Formatters.Binary.BinaryFormatter
-            : and then encoded with base64 encoding.
-    
-    mimetype: application/x-microsoft.net.object.soap.base64
-    value   : The object must be serialized with 
-            : System.Runtime.Serialization.Formatters.Soap.SoapFormatter
-            : and then encoded with base64 encoding.
+	<!-- 
+		Microsoft ResX Schema 
+		
+		Version 2.0
+		
+		The primary goals of this format is to allow a simple XML format 
+		that is mostly human readable. The generation and parsing of the 
+		various data types are done through the TypeConverter classes 
+		associated with the data types.
+		
+		Example:
+		
+		... ado.net/XML headers & schema ...
+		<resheader name="resmimetype">text/microsoft-resx</resheader>
+		<resheader name="version">2.0</resheader>
+		<resheader name="reader">System.Resources.ResXResourceReader, System.Windows.Forms, ...</resheader>
+		<resheader name="writer">System.Resources.ResXResourceWriter, System.Windows.Forms, ...</resheader>
+		<data name="Name1"><value>this is my long string</value><comment>this is a comment</comment></data>
+		<data name="Color1" type="System.Drawing.Color, System.Drawing">Blue</data>
+		<data name="Bitmap1" mimetype="application/x-microsoft.net.object.binary.base64">
+				<value>[base64 mime encoded serialized .NET Framework object]</value>
+		</data>
+		<data name="Icon1" type="System.Drawing.Icon, System.Drawing" mimetype="application/x-microsoft.net.object.bytearray.base64">
+				<value>[base64 mime encoded string representing a byte array form of the .NET Framework object]</value>
+				<comment>This is a comment</comment>
+		</data>
+								
+		There are any number of "resheader" rows that contain simple 
+		name/value pairs.
+		
+		Each data row contains a name, and value. The row also contains a 
+		type or mimetype. Type corresponds to a .NET class that support 
+		text/value conversion through the TypeConverter architecture. 
+		Classes that don't support this are serialized and stored with the 
+		mimetype set.
+		
+		The mimetype is used for serialized objects, and tells the 
+		ResXResourceReader how to depersist the object. This is currently not 
+		extensible. For a given mimetype the value must be set accordingly:
+		
+		Note - application/x-microsoft.net.object.binary.base64 is the format 
+		that the ResXResourceWriter will generate, however the reader can 
+		read any of the formats listed below.
+		
+		mimetype: application/x-microsoft.net.object.binary.base64
+		value   : The object must be serialized with 
+						: System.Runtime.Serialization.Formatters.Binary.BinaryFormatter
+						: and then encoded with base64 encoding.
+		
+		mimetype: application/x-microsoft.net.object.soap.base64
+		value   : The object must be serialized with 
+						: System.Runtime.Serialization.Formatters.Soap.SoapFormatter
+						: and then encoded with base64 encoding.
 
-    mimetype: application/x-microsoft.net.object.bytearray.base64
-    value   : The object must be serialized into a byte array 
-            : using a System.ComponentModel.TypeConverter
-            : and then encoded with base64 encoding.
-    -->
-  <xsd:schema id="root" xmlns="" xmlns:xsd="http://www.w3.org/2001/XMLSchema" xmlns:msdata="urn:schemas-microsoft-com:xml-msdata">
-    <xsd:import namespace="http://www.w3.org/XML/1998/namespace" />
-    <xsd:element name="root" msdata:IsDataSet="true">
-      <xsd:complexType>
-        <xsd:choice maxOccurs="unbounded">
-          <xsd:element name="metadata">
-            <xsd:complexType>
-              <xsd:sequence>
-                <xsd:element name="value" type="xsd:string" minOccurs="0" />
-              </xsd:sequence>
-              <xsd:attribute name="name" use="required" type="xsd:string" />
-              <xsd:attribute name="type" type="xsd:string" />
-              <xsd:attribute name="mimetype" type="xsd:string" />
-              <xsd:attribute ref="xml:space" />
-            </xsd:complexType>
-          </xsd:element>
-          <xsd:element name="assembly">
-            <xsd:complexType>
-              <xsd:attribute name="alias" type="xsd:string" />
-              <xsd:attribute name="name" type="xsd:string" />
-            </xsd:complexType>
-          </xsd:element>
-          <xsd:element name="data">
-            <xsd:complexType>
-              <xsd:sequence>
-                <xsd:element name="value" type="xsd:string" minOccurs="0" msdata:Ordinal="1" />
-                <xsd:element name="comment" type="xsd:string" minOccurs="0" msdata:Ordinal="2" />
-              </xsd:sequence>
-              <xsd:attribute name="name" type="xsd:string" use="required" msdata:Ordinal="1" />
-              <xsd:attribute name="type" type="xsd:string" msdata:Ordinal="3" />
-              <xsd:attribute name="mimetype" type="xsd:string" msdata:Ordinal="4" />
-              <xsd:attribute ref="xml:space" />
-            </xsd:complexType>
-          </xsd:element>
-          <xsd:element name="resheader">
-            <xsd:complexType>
-              <xsd:sequence>
-                <xsd:element name="value" type="xsd:string" minOccurs="0" msdata:Ordinal="1" />
-              </xsd:sequence>
-              <xsd:attribute name="name" type="xsd:string" use="required" />
-            </xsd:complexType>
-          </xsd:element>
-        </xsd:choice>
-      </xsd:complexType>
-    </xsd:element>
-  </xsd:schema>
-  <resheader name="resmimetype">
-    <value>text/microsoft-resx</value>
-  </resheader>
-  <resheader name="version">
-    <value>2.0</value>
-  </resheader>
-  <resheader name="reader">
-    <value>System.Resources.ResXResourceReader, System.Windows.Forms, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089</value>
-  </resheader>
-  <resheader name="writer">
-    <value>System.Resources.ResXResourceWriter, System.Windows.Forms, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089</value>
-  </resheader>
-  <data name="FieldsNotSupported" xml:space="preserve">
-    <value>Expression {0} involves a field access, which is not supported. Use properties instead.</value>
-  </data>
-  <data name="InvalidMockClass" xml:space="preserve">
-    <value>Type to mock must be an interface or an abstract or non-sealed class. </value>
-  </data>
-  <data name="MockExceptionMessage" xml:space="preserve">
-    <value>{0} invocation failed with mock behavior {1}.
+		mimetype: application/x-microsoft.net.object.bytearray.base64
+		value   : The object must be serialized into a byte array 
+						: using a System.ComponentModel.TypeConverter
+						: and then encoded with base64 encoding.
+		-->
+	<xsd:schema id="root" xmlns="" xmlns:xsd="http://www.w3.org/2001/XMLSchema" xmlns:msdata="urn:schemas-microsoft-com:xml-msdata">
+		<xsd:import namespace="http://www.w3.org/XML/1998/namespace" />
+		<xsd:element name="root" msdata:IsDataSet="true">
+			<xsd:complexType>
+				<xsd:choice maxOccurs="unbounded">
+					<xsd:element name="metadata">
+						<xsd:complexType>
+							<xsd:sequence>
+								<xsd:element name="value" type="xsd:string" minOccurs="0" />
+							</xsd:sequence>
+							<xsd:attribute name="name" use="required" type="xsd:string" />
+							<xsd:attribute name="type" type="xsd:string" />
+							<xsd:attribute name="mimetype" type="xsd:string" />
+							<xsd:attribute ref="xml:space" />
+						</xsd:complexType>
+					</xsd:element>
+					<xsd:element name="assembly">
+						<xsd:complexType>
+							<xsd:attribute name="alias" type="xsd:string" />
+							<xsd:attribute name="name" type="xsd:string" />
+						</xsd:complexType>
+					</xsd:element>
+					<xsd:element name="data">
+						<xsd:complexType>
+							<xsd:sequence>
+								<xsd:element name="value" type="xsd:string" minOccurs="0" msdata:Ordinal="1" />
+								<xsd:element name="comment" type="xsd:string" minOccurs="0" msdata:Ordinal="2" />
+							</xsd:sequence>
+							<xsd:attribute name="name" type="xsd:string" use="required" msdata:Ordinal="1" />
+							<xsd:attribute name="type" type="xsd:string" msdata:Ordinal="3" />
+							<xsd:attribute name="mimetype" type="xsd:string" msdata:Ordinal="4" />
+							<xsd:attribute ref="xml:space" />
+						</xsd:complexType>
+					</xsd:element>
+					<xsd:element name="resheader">
+						<xsd:complexType>
+							<xsd:sequence>
+								<xsd:element name="value" type="xsd:string" minOccurs="0" msdata:Ordinal="1" />
+							</xsd:sequence>
+							<xsd:attribute name="name" type="xsd:string" use="required" />
+						</xsd:complexType>
+					</xsd:element>
+				</xsd:choice>
+			</xsd:complexType>
+		</xsd:element>
+	</xsd:schema>
+	<resheader name="resmimetype">
+		<value>text/microsoft-resx</value>
+	</resheader>
+	<resheader name="version">
+		<value>2.0</value>
+	</resheader>
+	<resheader name="reader">
+		<value>System.Resources.ResXResourceReader, System.Windows.Forms, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089</value>
+	</resheader>
+	<resheader name="writer">
+		<value>System.Resources.ResXResourceWriter, System.Windows.Forms, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089</value>
+	</resheader>
+	<data name="FieldsNotSupported" xml:space="preserve">
+		<value>Expression {0} involves a field access, which is not supported. Use properties instead.</value>
+	</data>
+	<data name="InvalidMockClass" xml:space="preserve">
+		<value>Type to mock must be an interface or an abstract or non-sealed class. </value>
+	</data>
+	<data name="MockExceptionMessage" xml:space="preserve">
+		<value>{0} invocation failed with mock behavior {1}.
 {2}</value>
-  </data>
-  <data name="PropertyNotReadable" xml:space="preserve">
-    <value>Property {0}.{1} is write-only.</value>
-  </data>
-  <data name="UnsupportedExpression" xml:space="preserve">
-    <value>Unsupported expression: {0}</value>
-  </data>
-  <data name="NoSetup" xml:space="preserve">
-    <value>All invocations on the mock must have a corresponding setup.</value>
-  </data>
-  <data name="ReturnValueRequired" xml:space="preserve">
-    <value>Invocation needs to return a value and therefore must have a corresponding setup that provides it.</value>
-  </data>
-  <data name="VerficationFailed" xml:space="preserve">
-    <value>The following setups were not matched:
+	</data>
+	<data name="PropertyNotReadable" xml:space="preserve">
+		<value>Property {0}.{1} is write-only.</value>
+	</data>
+	<data name="UnsupportedExpression" xml:space="preserve">
+		<value>Unsupported expression: {0}</value>
+	</data>
+	<data name="NoSetup" xml:space="preserve">
+		<value>All invocations on the mock must have a corresponding setup.</value>
+	</data>
+	<data name="ReturnValueRequired" xml:space="preserve">
+		<value>Invocation needs to return a value and therefore must have a corresponding setup that provides it.</value>
+	</data>
+	<data name="VerficationFailed" xml:space="preserve">
+		<value>The following setups were not matched:
 {0}</value>
-  </data>
-  <data name="SetupOnNonOverridableMember" xml:space="preserve">
-    <value>Invalid setup on a non-virtual (overridable in VB) member: {0}</value>
-  </data>
-  <data name="ConstructorArgsForInterface" xml:space="preserve">
-    <value>Constructor arguments cannot be passed for interface mocks.</value>
-  </data>
-  <data name="ConstructorArgsForDelegate" xml:space="preserve">
-    <value>Constructor arguments cannot be passed for delegate mocks.</value>
-  </data>
-  <data name="ConstructorNotFound" xml:space="preserve">
-    <value>A matching constructor for the given arguments was not found on the mocked type.</value>
-  </data>
-  <data name="MoreThanOneCall" xml:space="preserve">
-    <value>Expected only one call to {0}.</value>
-  </data>
-  <data name="ObjectInstanceNotMock" xml:space="preserve">
-    <value>Object instance was not created by Moq.</value>
-  </data>
-  <data name="PropertyNotWritable" xml:space="preserve">
-    <value>Property {0}.{1} is read-only.</value>
-  </data>
-  <data name="SetupNotProperty" xml:space="preserve">
-    <value>Expression is not a property access: {0}</value>
-  </data>
-  <data name="SetupLambda" xml:space="preserve">
-    <value>A lambda expression is expected as the argument to It.Is&lt;T&gt;.</value>
-  </data>
-  <data name="MethodIsPublic" xml:space="preserve">
-    <value>Method {0}.{1} is public. Use strong-typed Expect overload instead:
+	</data>
+	<data name="SetupOnNonOverridableMember" xml:space="preserve">
+		<value>Invalid setup on a non-virtual (overridable in VB) member: {0}</value>
+	</data>
+	<data name="ConstructorArgsForInterface" xml:space="preserve">
+		<value>Constructor arguments cannot be passed for interface mocks.</value>
+	</data>
+	<data name="ConstructorArgsForDelegate" xml:space="preserve">
+		<value>Constructor arguments cannot be passed for delegate mocks.</value>
+	</data>
+	<data name="ConstructorNotFound" xml:space="preserve">
+		<value>A matching constructor for the given arguments was not found on the mocked type.</value>
+	</data>
+	<data name="MoreThanOneCall" xml:space="preserve">
+		<value>Expected only one call to {0}.</value>
+	</data>
+	<data name="ObjectInstanceNotMock" xml:space="preserve">
+		<value>Object instance was not created by Moq.</value>
+	</data>
+	<data name="PropertyNotWritable" xml:space="preserve">
+		<value>Property {0}.{1} is read-only.</value>
+	</data>
+	<data name="SetupNotProperty" xml:space="preserve">
+		<value>Expression is not a property access: {0}</value>
+	</data>
+	<data name="SetupLambda" xml:space="preserve">
+		<value>A lambda expression is expected as the argument to It.Is&lt;T&gt;.</value>
+	</data>
+	<data name="MethodIsPublic" xml:space="preserve">
+		<value>Method {0}.{1} is public. Use strong-typed Expect overload instead:
 mock.Setup(x =&gt; x.{1}());
 </value>
-  </data>
-  <data name="MemberMissing" xml:space="preserve">
-    <value>Member {0}.{1} does not exist.</value>
-  </data>
-  <data name="UnexpectedPublicProperty" xml:space="preserve">
-    <value>To specify a setup for public property {0}.{1}, use the typed overloads, such as:
+	</data>
+	<data name="MemberMissing" xml:space="preserve">
+		<value>Member {0}.{1} does not exist.</value>
+	</data>
+	<data name="UnexpectedPublicProperty" xml:space="preserve">
+		<value>To specify a setup for public property {0}.{1}, use the typed overloads, such as:
 mock.Setup(x =&gt; x.{1}).Returns(value);
 mock.SetupGet(x =&gt; x.{1}).Returns(value); //equivalent to previous one
 mock.SetupSet(x =&gt; x.{1}).Callback(callbackDelegate);
 </value>
-  </data>
-  <data name="PropertyMissing" xml:space="preserve">
-    <value>Property {0}.{1} does not exist.</value>
-  </data>
-  <data name="CantSetReturnValueForVoid" xml:space="preserve">
-    <value>Can't set return value for void method {0}.</value>
-  </data>
-  <data name="UnsupportedMember" xml:space="preserve">
-    <value>Member {0} is not supported for protected mocking.</value>
-  </data>
-  <data name="RaisedUnassociatedEvent" xml:space="preserve">
-    <value>Cannot raise a mocked event unless it has been associated (attached) to a concrete event in a mocked object.</value>
-  </data>
-  <data name="SetupNotMethod" xml:space="preserve">
-    <value>Expression is not a method invocation: {0}</value>
-  </data>
-  <data name="NoMatchingCallsAtLeastOnce" xml:space="preserve">
-    <value>{0}
+	</data>
+	<data name="PropertyMissing" xml:space="preserve">
+		<value>Property {0}.{1} does not exist.</value>
+	</data>
+	<data name="CantSetReturnValueForVoid" xml:space="preserve">
+		<value>Can't set return value for void method {0}.</value>
+	</data>
+	<data name="UnsupportedMember" xml:space="preserve">
+		<value>Member {0} is not supported for protected mocking.</value>
+	</data>
+	<data name="RaisedUnassociatedEvent" xml:space="preserve">
+		<value>Cannot raise a mocked event unless it has been associated (attached) to a concrete event in a mocked object.</value>
+	</data>
+	<data name="SetupNotMethod" xml:space="preserve">
+		<value>Expression is not a method invocation: {0}</value>
+	</data>
+	<data name="NoMatchingCallsAtLeastOnce" xml:space="preserve">
+		<value>{0}
 Expected invocation on the mock at least once, but was never performed: {1}</value>
-  </data>
-  <data name="AlreadyInitialized" xml:space="preserve">
-    <value>Mock type has already been initialized by accessing its Object property. Adding interfaces must be done before that.</value>
-  </data>
-  <data name="AsMustBeInterface" xml:space="preserve">
-    <value>Can only add interfaces to the mock.</value>
-  </data>
-  <data name="InvalidMockGetType" xml:space="preserve">
-    <value>Cannot retrieve a mock with the given object type {0} as it's not the main type of the mock or any of its additional interfaces.
+	</data>
+	<data name="AlreadyInitialized" xml:space="preserve">
+		<value>Mock type has already been initialized by accessing its Object property. Adding interfaces must be done before that.</value>
+	</data>
+	<data name="AsMustBeInterface" xml:space="preserve">
+		<value>Can only add interfaces to the mock.</value>
+	</data>
+	<data name="InvalidMockGetType" xml:space="preserve">
+		<value>Cannot retrieve a mock with the given object type {0} as it's not the main type of the mock or any of its additional interfaces.
 Please cast the argument to one of the supported types: {1}.
 Remember that there's no generics covariance in the CLR, so your object must be one of these types in order for the call to succeed.</value>
-  </data>
-  <data name="SetupNever" xml:space="preserve">
-    <value>Invocation {0} should not have been made.</value>
-  </data>
-  <data name="UnsupportedIntermediateExpression" xml:space="preserve">
-    <value>Only property accesses are supported in intermediate invocations on a setup. Unsupported expression {0}.</value>
-  </data>
-  <data name="UnsupportedIntermediateType" xml:space="preserve">
-    <value>Expression contains intermediate property access {0}.{1} which is of type {2} and cannot be mocked. Unsupported expression {3}.</value>
-  </data>
-  <data name="MoreThanNCalls" xml:space="preserve">
-    <value>Expected only {0} calls to {1}.</value>
-  </data>
-  <data name="SetupNotSetter" xml:space="preserve">
-    <value>Expression is not a property setter invocation.</value>
-  </data>
-  <data name="UnsupportedMatcherParamsForSetter" xml:space="preserve">
-    <value>Setter expression cannot use argument matchers that receive parameters.</value>
-  </data>
-  <data name="UnsupportedNonStaticMatcherForSetter" xml:space="preserve">
-    <value>Setter expression can only use static custom matchers.</value>
-  </data>
-  <data name="ArgumentCannotBeEmpty" xml:space="preserve">
-    <value>Value cannot be an empty string.</value>
-  </data>
-  <data name="TypeNotImplementInterface" xml:space="preserve">
-    <value>Type {0} does not implement required interface {1}</value>
-  </data>
-  <data name="TypeNotInheritFromType" xml:space="preserve">
-    <value>Type {0} does not from required type {1}</value>
-  </data>
-  <data name="NoMatchingCallsAtLeast" xml:space="preserve">
-    <value>{0}
+	</data>
+	<data name="SetupNever" xml:space="preserve">
+		<value>Invocation {0} should not have been made.</value>
+	</data>
+	<data name="UnsupportedIntermediateExpression" xml:space="preserve">
+		<value>Only property accesses are supported in intermediate invocations on a setup. Unsupported expression {0}.</value>
+	</data>
+	<data name="UnsupportedIntermediateType" xml:space="preserve">
+		<value>Expression contains intermediate property access {0}.{1} which is of type {2} and cannot be mocked. Unsupported expression {3}.</value>
+	</data>
+	<data name="MoreThanNCalls" xml:space="preserve">
+		<value>Expected only {0} calls to {1}.</value>
+	</data>
+	<data name="SetupNotSetter" xml:space="preserve">
+		<value>Expression is not a property setter invocation.</value>
+	</data>
+	<data name="UnsupportedMatcherParamsForSetter" xml:space="preserve">
+		<value>Setter expression cannot use argument matchers that receive parameters.</value>
+	</data>
+	<data name="UnsupportedNonStaticMatcherForSetter" xml:space="preserve">
+		<value>Setter expression can only use static custom matchers.</value>
+	</data>
+	<data name="ArgumentCannotBeEmpty" xml:space="preserve">
+		<value>Value cannot be an empty string.</value>
+	</data>
+	<data name="TypeNotImplementInterface" xml:space="preserve">
+		<value>Type {0} does not implement required interface {1}</value>
+	</data>
+	<data name="TypeNotInheritFromType" xml:space="preserve">
+		<value>Type {0} does not from required type {1}</value>
+	</data>
+	<data name="NoMatchingCallsAtLeast" xml:space="preserve">
+		<value>{0}
 Expected invocation on the mock at least {2} times, but was {4} times: {1}</value>
-  </data>
-  <data name="NoMatchingCallsAtMost" xml:space="preserve">
-    <value>{0}
+	</data>
+	<data name="NoMatchingCallsAtMost" xml:space="preserve">
+		<value>{0}
 Expected invocation on the mock at most {3} times, but was {4} times: {1}</value>
-  </data>
-  <data name="NoMatchingCallsAtMostOnce" xml:space="preserve">
-    <value>{0}
+	</data>
+	<data name="NoMatchingCallsAtMostOnce" xml:space="preserve">
+		<value>{0}
 Expected invocation on the mock at most once, but was {4} times: {1}</value>
-  </data>
-  <data name="NoMatchingCallsBetweenInclusive" xml:space="preserve">
-    <value>{0}
+	</data>
+	<data name="NoMatchingCallsBetweenInclusive" xml:space="preserve">
+		<value>{0}
 Expected invocation on the mock between {2} and {3} times (Inclusive), but was {4} times: {1}</value>
-  </data>
-  <data name="NoMatchingCallsExactly" xml:space="preserve">
-    <value>{0}
+	</data>
+	<data name="NoMatchingCallsExactly" xml:space="preserve">
+		<value>{0}
 Expected invocation on the mock exactly {2} times, but was {4} times: {1}</value>
-  </data>
-  <data name="NoMatchingCallsNever" xml:space="preserve">
-    <value>{0}
+	</data>
+	<data name="NoMatchingCallsNever" xml:space="preserve">
+		<value>{0}
 Expected invocation on the mock should never have been performed, but was {4} times: {1}</value>
-  </data>
-  <data name="NoMatchingCallsBetweenExclusive" xml:space="preserve">
-    <value>{0}
+	</data>
+	<data name="NoMatchingCallsBetweenExclusive" xml:space="preserve">
+		<value>{0}
 Expected invocation on the mock between {2} and {3} times (Exclusive), but was {4} times: {1}</value>
-  </data>
-  <data name="NoMatchingCallsOnce" xml:space="preserve">
-    <value>{0}
+	</data>
+	<data name="NoMatchingCallsOnce" xml:space="preserve">
+		<value>{0}
 Expected invocation on the mock once, but was {4} times: {1}</value>
-  </data>
-  <data name="SetupOnNonMemberMethod" xml:space="preserve">
-    <value>Expression references a method that does not belong to the mocked object: {0}</value>
-  </data>
-  <data name="VerifyOnNonVirtualMember" xml:space="preserve">
-    <value>Invalid verify on a non-virtual (overridable in VB) member: {0}</value>
-  </data>
-  <data name="OutExpressionMustBeConstantValue" xml:space="preserve">
-    <value>Out expression must evaluate to a constant value.</value>
-  </data>
-  <data name="RefExpressionMustBeConstantValue" xml:space="preserve">
-    <value>Ref expression must evaluate to a constant value.</value>
-  </data>
-  <data name="LinqMethodNotSupported" xml:space="preserve">
-    <value>LINQ method '{0}' not supported.</value>
-  </data>
-  <data name="EventNofFound" xml:space="preserve">
-    <value>Could not locate event for attach or detach method {0}.</value>
-  </data>
-  <data name="LinqBinaryOperatorNotSupported" xml:space="preserve">
-    <value>The equals ("==" or "=" in VB) and the conditional 'and' ("&amp;&amp;" or "AndAlso" in VB) operators are the only ones supported in the query specification expression. Unsupported expression: {0}</value>
-  </data>
-  <data name="LinqMethodNotVirtual" xml:space="preserve">
-    <value>Expression contains a call to a method which is not virtual (overridable in VB) or abstract. Unsupported expression: {0}</value>
-  </data>
-  <data name="PropertySetNotFound" xml:space="preserve">
-    <value>Property {0}.{1} does not have a setter.</value>
-  </data>
-  <data name="PropertyGetNotFound" xml:space="preserve">
-    <value>Property {0}.{1} does not have a getter.</value>
-  </data>
+	</data>
+	<data name="SetupOnNonMemberMethod" xml:space="preserve">
+		<value>Expression references a method that does not belong to the mocked object: {0}</value>
+	</data>
+	<data name="VerifyOnNonVirtualMember" xml:space="preserve">
+		<value>Invalid verify on a non-virtual (overridable in VB) member: {0}</value>
+	</data>
+	<data name="OutExpressionMustBeConstantValue" xml:space="preserve">
+		<value>Out expression must evaluate to a constant value.</value>
+	</data>
+	<data name="RefExpressionMustBeConstantValue" xml:space="preserve">
+		<value>Ref expression must evaluate to a constant value.</value>
+	</data>
+	<data name="LinqMethodNotSupported" xml:space="preserve">
+		<value>LINQ method '{0}' not supported.</value>
+	</data>
+	<data name="EventNofFound" xml:space="preserve">
+		<value>Could not locate event for attach or detach method {0}.</value>
+	</data>
+	<data name="LinqBinaryOperatorNotSupported" xml:space="preserve">
+		<value>The equals ("==" or "=" in VB) and the conditional 'and' ("&amp;&amp;" or "AndAlso" in VB) operators are the only ones supported in the query specification expression. Unsupported expression: {0}</value>
+	</data>
+	<data name="LinqMethodNotVirtual" xml:space="preserve">
+		<value>Expression contains a call to a method which is not virtual (overridable in VB) or abstract. Unsupported expression: {0}</value>
+	</data>
+	<data name="PropertySetNotFound" xml:space="preserve">
+		<value>Property {0}.{1} does not have a setter.</value>
+	</data>
+	<data name="PropertyGetNotFound" xml:space="preserve">
+		<value>Property {0}.{1} does not have a getter.</value>
+	</data>
 </root>

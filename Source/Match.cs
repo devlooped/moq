@@ -75,11 +75,11 @@ namespace Moq
 			return Create(new Match<T>(condition, renderExpression));
 		}
 
-	    internal static T Create<T>(Match<T> match)
-	    {
-            SetLastMatch(match);
-            return default(T);
-        }
+		internal static T Create<T>(Match<T> match)
+		{
+			SetLastMatch(match);
+			return default(T);
+		}
 
 		/// <devdoc>
 		/// This method is used to set an expression as the last matcher invoked, 
@@ -102,7 +102,7 @@ namespace Moq
 
 			return match;
 		}
-    }
+	}
 
 	/// <include file='Match.xdoc' path='docs/doc[@for="Match{T}"]/*'/>
 	public class Match<T> : Match

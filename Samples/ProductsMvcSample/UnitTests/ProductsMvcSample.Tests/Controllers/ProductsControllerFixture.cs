@@ -68,10 +68,10 @@ namespace ProductsMvcSample.Tests.Controllers
 			catalogService.Setup(c => c
 				.GetProducts(2))
 				.Returns(new List<Product>
-		        {
-		            new Product { Id = 4 , Name = "Foo"},
-		            new Product { Id = 7 , Name = "Bar"}
-		        });
+				{
+					new Product { Id = 4 , Name = "Foo" },
+					new Product { Id = 7 , Name = "Bar" }
+				});
 
 			// Target object
 			var controller = new ProductsController(catalogService.Object);

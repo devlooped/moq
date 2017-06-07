@@ -846,7 +846,7 @@ namespace Moq.Tests
 			mock.Object.Execute("ping");
 			mock.Object.Echo(42);
 			mock.Object.Submit();
-            mock.Object.Save(new object[] {1, 2, "hello"});
+			mock.Object.Save(new object[] {1, 2, "hello"});
 
 			var mex = Assert.Throws<MockException>(() => mock.Verify(f => f.Execute("pong")));
 
@@ -856,30 +856,30 @@ namespace Moq.Tests
 				"IFoo.Execute(\"ping\")" + Environment.NewLine +
 				"IFoo.Echo(42)" + Environment.NewLine +
 				"IFoo.Submit()" + Environment.NewLine +
-                "IFoo.Save([1, 2, \"hello\"])",
+				"IFoo.Save([1, 2, \"hello\"])",
 				mex.Message);
 		}
 
-        [Fact]
-	    public void IncludesActualValuesFromVerifyNotVariableNames()
-        {
-            var expectedArg = "lorem,ipsum";
-            var mock = new Moq.Mock<IFoo>();
+		[Fact]
+		public void IncludesActualValuesFromVerifyNotVariableNames()
+		{
+			var expectedArg = "lorem,ipsum";
+			var mock = new Moq.Mock<IFoo>();
 
-            var mex = Assert.Throws<MockException>(() => mock.Verify(f => f.Execute(expectedArg.Substring(0, 5))));
-            Assert.Contains("f.Execute(\"lorem\")", mex.Message);
-        }
+			var mex = Assert.Throws<MockException>(() => mock.Verify(f => f.Execute(expectedArg.Substring(0, 5))));
+			Assert.Contains("f.Execute(\"lorem\")", mex.Message);
+		}
 
-	    [Fact]
-	    public void IncludesActualValuesFromSetups()
-        {
-            var expectedArg = "lorem,ipsum";
-            var mock = new Moq.Mock<IFoo>();
-	        mock.Setup(f => f.Save(expectedArg.Substring(0, 5)));
+		[Fact]
+		public void IncludesActualValuesFromSetups()
+		{
+			var expectedArg = "lorem,ipsum";
+			var mock = new Moq.Mock<IFoo>();
+			mock.Setup(f => f.Save(expectedArg.Substring(0, 5)));
 
-	        var mex = Assert.Throws<MockException>(() => mock.Verify(foo => foo.Save("never")));
-            Assert.Contains("f.Save(\"lorem\")", mex.Message);
-	    }
+			var mex = Assert.Throws<MockException>(() => mock.Verify(foo => foo.Save("never")));
+			Assert.Contains("f.Save(\"lorem\")", mex.Message);
+		}
 
 		[Fact]
 		public void IncludesMessageAboutNoActualCallsInFailureMessage()
@@ -901,29 +901,29 @@ namespace Moq.Tests
 			Assert.Contains(Environment.NewLine + "No setups configured.", mex.Message);
 		}
 
-        [Fact]
-        public void MatchesDerivedTypesForGenericTypes()
-        {
-            var mock = new Mock<IBaz>();
-            mock.Object.Call(new BazParam());
-            mock.Object.Call(new BazParam2());
+		[Fact]
+		public void MatchesDerivedTypesForGenericTypes()
+		{
+			var mock = new Mock<IBaz>();
+			mock.Object.Call(new BazParam());
+			mock.Object.Call(new BazParam2());
 
-            mock.Verify(foo => foo.Call(It.IsAny<IBazParam>()), Times.Exactly(2));
-        }
+			mock.Verify(foo => foo.Call(It.IsAny<IBazParam>()), Times.Exactly(2));
+		}
 
-        /// <summary>
-        /// Warning, this is a flaky test and doesn't fail when run as standalone. Running all tests at once will increase the chances of that test to fail.
-        /// </summary>
-        [Fact]
-        public void DoesNotThrowCollectionModifiedWhenMoreInvocationsInterceptedDuringVerfication()
-        {
-            var mock = new Mock<IFoo>();
-            Parallel.For(0, 100, (i) =>
-            {
-                mock.Object.Submit();
-                mock.Verify(foo => foo.Submit());
-            });
-        }
+		/// <summary>
+		/// Warning, this is a flaky test and doesn't fail when run as standalone. Running all tests at once will increase the chances of that test to fail.
+		/// </summary>
+		[Fact]
+		public void DoesNotThrowCollectionModifiedWhenMoreInvocationsInterceptedDuringVerfication()
+		{
+			var mock = new Mock<IFoo>();
+			Parallel.For(0, 100, (i) =>
+			{
+				mock.Object.Submit();
+				mock.Verify(foo => foo.Submit());
+			});
+		}
 
 		public interface IBar
 		{
@@ -939,25 +939,25 @@ namespace Moq.Tests
 			int Echo(int value);
 			void Submit();
 			string Execute(string command);
-		    void Save(object o);
+			void Save(object o);
 		}
 
-        public interface IBazParam
-        {
-        }
+		public interface IBazParam
+		{
+		}
 
-        public interface IBaz
-        {
-            void Call<T>(T param) where T:IBazParam;
-        }
+		public interface IBaz
+		{
+			void Call<T>(T param) where T:IBazParam;
+		}
 
-        public class BazParam:IBazParam
-        {
-        }
+		public class BazParam:IBazParam
+		{
+		}
 
-        public class BazParam2:BazParam
-        {
-        }
+		public class BazParam2:BazParam
+		{
+		}
 	}
 }
 

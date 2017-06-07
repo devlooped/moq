@@ -16,21 +16,21 @@ using Microsoft.Pex.Framework.Choices;
 
 namespace Mock.Tests
 {
-    [TestClass]
-    [PexClass(Suite = "checkin")]
-    public partial class ShouldExpectReturnPropertyValue
-    {
-        public interface IFoo
-        {
-            int ValueProperty { get; }
-        }
+	[TestClass]
+	[PexClass(Suite = "checkin")]
+	public partial class ShouldExpectReturnPropertyValue
+	{
+		public interface IFoo
+		{
+			int ValueProperty { get; }
+		}
 
-        [PexMethod(MaxBranches = int.MaxValue)]
-        public void Moq()
-        {
-            var mock = new Mock<IFoo>();
-            mock.Setup(x => x.ValueProperty).Returns(25);
-            Assert.AreEqual(25, mock.Object.ValueProperty);
-        }
-    }
+		[PexMethod(MaxBranches = int.MaxValue)]
+		public void Moq()
+		{
+			var mock = new Mock<IFoo>();
+			mock.Setup(x => x.ValueProperty).Returns(25);
+			Assert.AreEqual(25, mock.Object.ValueProperty);
+		}
+	}
 }

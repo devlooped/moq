@@ -704,6 +704,5 @@ namespace Moq.Tests
 				}
 			}
 		}
-
 	}
 }
