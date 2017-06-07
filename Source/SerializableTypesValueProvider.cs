@@ -1,4 +1,5 @@
-﻿using System.Reflection;
+﻿using System;
+using System.Reflection;
 #if !NETCORE
 using System.Runtime.Serialization;
 #endif
@@ -20,23 +21,45 @@ namespace Moq
 #endif
 	internal class SerializableTypesValueProvider : IDefaultValueProvider
 	{
-		private readonly IDefaultValueProvider decorated;
-		private readonly EmptyDefaultValueProvider emptyDefaultValueProvider = new EmptyDefaultValueProvider();
+		private sealed class Factory : IDefaultValueProviderFactory
+		{
+			public Factory(IDefaultValueProvider decorated)
+			{
+				this.Decorated = decorated;
+			}
+
+			public IDefaultValueProvider Decorated { get; }
+
+			public IDefaultValueProvider CreateProviderFor(Mock owner)
+			{
+				return new SerializableTypesValueProvider(this);
+			}
+		}
+
+		private Factory factory;
+		private readonly IDefaultValueProvider emptyDefaultValueProvider = new EmptyDefaultValueProvider();
 
 		public SerializableTypesValueProvider(IDefaultValueProvider decorated)
 		{
-			this.decorated = decorated;
+			this.factory = new Factory(decorated);
 		}
+
+		private SerializableTypesValueProvider(Factory factory)
+		{
+			this.factory = factory;
+		}
+
+		IDefaultValueProviderFactory IDefaultValueProvider.Factory => this.factory;
 
 		public void DefineDefault<T>(T value)
 		{
-			decorated.DefineDefault(value);
+			this.factory.Decorated.DefineDefault(value);
 		}
 
 		public object ProvideDefault(MethodInfo member)
 		{
 			return !member.ReturnType.GetTypeInfo().IsSerializable || member.ReturnType.IsSerializableMockable()
-				? decorated.ProvideDefault(member)
+				? this.factory.Decorated.ProvideDefault(member)
 				: emptyDefaultValueProvider.ProvideDefault(member);
 		}
 	}

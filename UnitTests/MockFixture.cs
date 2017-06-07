@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Linq.Expressions;
+using System.Reflection;
 #if NETCORE
 using System.Reflection;
 #endif
@@ -917,6 +918,60 @@ namespace Moq.Tests
 			mock.Verify(x => x.Value, Times.Once());
 		}
 
+		[Fact]
+		public void DefaultValueProvider_cannot_be_set_to_null()
+		{
+			var mock = new Mock<IFoo>();
+			Assert.Throws<ArgumentNullException>(() => mock.DefaultValueProvider = null);
+		}
+
+		[Fact]
+		public void When_DefaultValueProvider_is_EmptyDefaultValueProvider_then_DefaultValue_is_Empty()
+		{
+			var mock = new Mock<IFoo>();
+			mock.DefaultValueProvider = new EmptyDefaultValueProvider();
+			Assert.Equal(DefaultValue.Empty, mock.DefaultValue);
+		}
+
+		[Fact]
+		public void When_DefaultValue_is_Empty_then_DefaultValueProvider_is_EmptyDefaultValueProvider()
+		{
+			var mock = new Mock<IFoo>();
+			mock.DefaultValue = DefaultValue.Empty;
+			Assert.IsType<EmptyDefaultValueProvider>(mock.DefaultValueProvider);
+		}
+
+		[Fact]
+		public void When_DefaultValueProvider_is_MockDefaultValueProvider_then_DefaultValue_is_Mock()
+		{
+			var mock = new Mock<IFoo>();
+			mock.DefaultValueProvider = new MockDefaultValueProvider(mock);
+			Assert.Equal(DefaultValue.Mock, mock.DefaultValue);
+		}
+
+		[Fact]
+		public void When_DefaultValue_is_Mock_then_DefaultValueProvider_is_MockDefaultValueProvider()
+		{
+			var mock = new Mock<IFoo>();
+			mock.DefaultValue = DefaultValue.Mock;
+			Assert.IsType<MockDefaultValueProvider>(mock.DefaultValueProvider);
+		}
+
+		[Fact]
+		public void When_DefaultValueProvider_is_custom_DefaultValueProvider_then_DefaultValue_is_Custom()
+		{
+			var mock = new Mock<IFoo>();
+			mock.DefaultValueProvider = new UnimplementedDefaultValueProvider();
+			Assert.Equal(DefaultValue.Custom, mock.DefaultValue);
+		}
+
+		[Fact]
+		public void DefaultValue_cannot_be_set_to_Custom()
+		{
+			var mock = new Mock<IFoo>();
+			Assert.Throws<ArgumentException>(() => mock.DefaultValue = DefaultValue.Custom);
+		}
+
 		private static Foo MakeFoo(IMock<IBar> barMock)
 		{
 			return new Foo(barMock.Object);
@@ -1083,6 +1138,13 @@ namespace Moq.Tests
 
 		public interface INewBar : IBar
 		{
+		}
+
+		private sealed class UnimplementedDefaultValueProvider : IDefaultValueProvider
+		{
+			public IDefaultValueProviderFactory Factory => throw new NotImplementedException();
+			public void DefineDefault<T>(T value) => throw new NotImplementedException();
+			public object ProvideDefault(MethodInfo member) => throw new NotImplementedException();
 		}
 	}
 }

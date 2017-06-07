@@ -48,18 +48,31 @@ namespace Moq
 	/// for non-mockeable types, and mocks for all other types (interfaces and 
 	/// non-sealed classes) that can be mocked.
 	/// </summary>
-	internal class MockDefaultValueProvider : EmptyDefaultValueProvider
+	public sealed class MockDefaultValueProvider : IDefaultValueProvider
 	{
 		private Mock owner;
+		private IDefaultValueProvider emptyDefaultValueProvider;
 
+		/// <inheritdoc/>
 		public MockDefaultValueProvider(Mock owner)
 		{
 			this.owner = owner;
+			this.emptyDefaultValueProvider = new EmptyDefaultValueProvider();
 		}
 
-		public override object ProvideDefault(MethodInfo member)
+		/// <inheritdoc/>
+		public IDefaultValueProviderFactory Factory => MockDefaultValueProviderFactory.Instance;
+
+		/// <inheritdoc/>
+		public void DefineDefault<T>(T value)
 		{
-			var value = base.ProvideDefault(member);
+			this.emptyDefaultValueProvider.DefineDefault<T>(value);
+		}
+
+		/// <inheritdoc/>
+		public object ProvideDefault(MethodInfo member)
+		{
+			var value = this.emptyDefaultValueProvider.ProvideDefault(member);
 
 			Mock mock = null;
 			if (value == null && member.ReturnType.IsMockeable())
@@ -68,8 +81,8 @@ namespace Moq
 				{
 					// Create a new mock to be placed to InnerMocks dictionary if it's missing there
 					var mockType = typeof(Mock<>).MakeGenericType(info.ReturnType);
-					Mock newMock = (Mock)Activator.CreateInstance(mockType, owner.Behavior);
-					newMock.DefaultValue = owner.DefaultValue;
+					Mock newMock = (Mock)Activator.CreateInstance(mockType, this.owner.Behavior);
+					newMock.DefaultValueProvider = this.owner.DefaultValueProvider.Factory.CreateProviderFor(newMock);
 					newMock.CallBase = owner.CallBase;
 					return newMock;
 				});

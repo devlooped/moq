@@ -38,15 +38,18 @@
 //[This is the BSD license, see
 // http://www.opensource.org/licenses/bsd-license.php]
 
-using System.ComponentModel;
 using System.Reflection;
 
 namespace Moq
 {
 	/// <include file='IDefaultValueProvider.xdoc' path='docs/doc[@for="IDefaultValueProvider"]/*'/>
-	[EditorBrowsable(EditorBrowsableState.Advanced)]
-	internal interface IDefaultValueProvider
+	public interface IDefaultValueProvider
 	{
+		/// <summary>
+		/// Gets a factory that creates providers of the same type as the current instance.
+		/// </summary>
+		IDefaultValueProviderFactory Factory { get; }
+
 		/// <include file='IDefaultValueProvider.xdoc' path='docs/doc[@for="IDefaultValueProvider.DefineDefault"]/*'/>
 		void DefineDefault<T>(T value);
 

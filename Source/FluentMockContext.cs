@@ -100,16 +100,16 @@ namespace Moq
 
 		internal class MockInvocation : IDisposable
 		{
-			private DefaultValue defaultValue;
+			private IDefaultValueProvider defaultValueProvider;
 
 			public MockInvocation(Mock mock, ICallContext invocation, Match matcher)
 			{
 				this.Mock = mock;
 				this.Invocation = invocation;
 				this.Match = matcher;
-				defaultValue = mock.DefaultValue;
+				this.defaultValueProvider = mock.DefaultValueProvider;
 				// Temporarily set mock default value to Mock so that recursion works.
-				mock.DefaultValue = DefaultValue.Mock;
+				mock.DefaultValueProvider = new MockDefaultValueProvider(mock);
 			}
 
 			public Mock Mock { get; private set; }
@@ -120,7 +120,7 @@ namespace Moq
 
 			public void Dispose()
 			{
-				Mock.DefaultValue = defaultValue;
+				Mock.DefaultValueProvider = this.defaultValueProvider;
 			}
 		}
 	}

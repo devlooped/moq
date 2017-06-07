@@ -206,6 +206,7 @@ namespace Moq.Tests
 		public void ReturnsDefaultGuidOnLooseWithMockDefaultValueWithMockDefaultValue()
 		{
 			var mock = new Mock<IFoo>(MockBehavior.Loose) { DefaultValue = DefaultValue.Mock };
+
 			Assert.Equal(default(Guid), mock.Object.GetGuid());
 		}
 
