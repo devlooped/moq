@@ -40,6 +40,9 @@
 
 using System;
 using System.Reflection;
+#if !NET3x
+using System.Threading.Tasks;
+#endif
 
 namespace Moq
 {
@@ -59,10 +62,27 @@ namespace Moq
 
 		public override object ProvideDefault(MethodInfo member)
 		{
+			Type returnType = member.ReturnType;
+
+#if !NET3x
+			// if member returns a Task<T>, check whether T is a mockable type.
+			//  - if it is, return a completed Task containing a Mock<T> as result.
+			//  - if it is not, fall through and let the empty default value provider
+			//    produce a completed Task containing as result default(T).
+			if (returnType.GetTypeInfo().IsGenericType && returnType.GetGenericTypeDefinition() == typeof(Task<>))
+			{
+				var taskTypeArg = returnType.GetGenericArguments()[0];
+				if (taskTypeArg.IsMockeable())
+				{
+					return GetCompletedTaskForMockType(member, taskTypeArg);
+				}
+			}
+#endif
+
 			var value = base.ProvideDefault(member);
 
 			Mock mock = null;
-			if (value == null && member.ReturnType.IsMockeable())
+			if (value == null && returnType.IsMockeable())
 			{
 				mock = owner.InnerMocks.GetOrAdd(member, info =>
 				{
@@ -77,5 +97,27 @@ namespace Moq
 
 			return mock != null ? mock.Object : value;
 		}
+
+#if !NET3x
+		private object GetCompletedTaskForMockType(MethodInfo member, Type taskTypeArg)
+		{
+			var mock = owner.InnerMocks.GetOrAdd(member, _ =>
+			{
+				var mockType = typeof(Mock<>).MakeGenericType(taskTypeArg);
+				var newMock = (Mock)Activator.CreateInstance(mockType, owner.Behavior);
+				newMock.DefaultValue = owner.DefaultValue;
+				newMock.CallBase = owner.CallBase;
+				return newMock;
+			});
+
+			var tcs = Activator.CreateInstance(typeof(TaskCompletionSource<>).MakeGenericType(taskTypeArg));
+
+			var setResultMethod = tcs.GetType().GetMethod("SetResult");
+			setResultMethod.Invoke(tcs, new[] { mock.Object });
+
+			var taskProperty = tcs.GetType().GetProperty("Task");
+			return taskProperty.GetValue(tcs, null);
+		}
+#endif
 	}
 }
