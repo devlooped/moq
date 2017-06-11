@@ -746,13 +746,15 @@ namespace Moq
 				// to deal with loops in the property graph
 				valueProvider = new EmptyDefaultValueProvider();
 			}
+#if !NETCORE
 			else
 			{
-				// to make sure that properties of types that don't impelemt ISerializable properly (Castle throws ArgumentException)
+				// to make sure that properties of types that don't implement ISerializable properly (Castle throws ArgumentException)
 				// are mocked with default value instead.
 				// It will only result in exception if the properties are accessed.
 				valueProvider = new SerializableTypesValueProvider(valueProvider);
 			}
+#endif
 			return valueProvider.ProvideDefault(property.GetGetMethod());
 		}
 

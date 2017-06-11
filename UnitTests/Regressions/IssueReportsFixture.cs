@@ -173,7 +173,7 @@ namespace Moq.Tests.Regressions
 		#region 163
 
 #if !NETCORE
-		public class Issue163
+		public class Issue163  // see also issue 340 below
 		{
 			[Fact]
 			public void WhenMoqEncountersTypeThatDynamicProxyCannotHandleFallbackToEmptyDefaultValue()
@@ -633,6 +633,51 @@ namespace Moq.Tests.Regressions
 		}
 
 		#endregion // #328
+
+		#region 340
+
+#if !NETCORE
+		/// <summary>
+		/// These tests check whether the presence of a deserialization ctor and/or a GetObjectData
+		/// method alone can fool Moq into assuming that a type is ISerializable, or implements
+		/// it incompletely when it isn't ISerializable at all.
+		/// </summary>
+		public class Issue340  // see also issue 163 above
+		{
+			[Fact]
+			public void ClaimsPrincipal_has_ISerializable_contract_but_is_not_ISerializable()
+			{
+				var ex = Record.Exception(() => Mock.Of<Repro1>());
+				Assert.Null(ex);
+			}
+
+			public abstract class Repro1
+			{
+				public abstract System.Security.Claims.ClaimsPrincipal Principal { get; }
+			}
+
+			[Fact]
+			public void Foo_has_incomplete_ISerializable_contract_but_is_not_ISerializable()
+			{
+				var ex = Record.Exception(() => Mock.Of<Repro2>());
+				Assert.Null(ex);
+			}
+
+			public abstract class Repro2
+			{
+				public abstract Foo FooProperty { get; }
+			}
+
+			[Serializable]
+			public class Foo
+			{
+				public Foo() { }
+				protected Foo(SerializationInfo info, StreamingContext context) { }
+			}
+		}
+#endif
+
+#endregion
 
 		// Old @ Google Code
 
