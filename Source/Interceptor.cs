@@ -170,15 +170,12 @@ namespace Moq
 
 				var eq = key.fixedString == this.fixedString && key.values.Count == this.values.Count;
 
-				//the code below is broken as it uses an OR when checking the arguments, this means that if any pair of arguments match 
-				//the result is a match.
-				//This is only going to hit some edge cases as for the most part the fixed string above spots arguments correctly.
-				//Fixing this really needs a reworking of the GetHashCode, and also some sorting out of how to compare value types that have been
-				//boxed correctly (another problem this code has)
 				var index = 0;
 				while (eq && index < this.values.Count)
 				{
-					eq |= this.values[index] == key.values[index];
+					// using `object.Equals` instead of == ensures that we get the correct
+					// comparison result for boxed value types:
+					eq &= object.Equals(this.values[index], key.values[index]);
 					index++;
 				}
 
@@ -189,17 +186,12 @@ namespace Moq
 			{
 				var hash = fixedString.GetHashCode();
 
-				var factor = 1;
 				foreach (var value in values)
 				{
 					if (value != null)
 					{
-						// we use a factor that increases with each following value (argument)
-						// so that if the values are in a different order, we get a different hash code
-						// see GitHub issue #252
-						hash ^= value.GetHashCode() / factor;
+						hash = unchecked((hash * 397) ^ value.GetHashCode());
 					}
-					factor *= 3;
 				}
 
 				return hash;

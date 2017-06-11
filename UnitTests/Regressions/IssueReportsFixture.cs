@@ -356,6 +356,128 @@ namespace Moq.Tests.Regressions
 
 		#endregion 311
 
+		#region #135
+
+		public class Issue135
+		{
+			public interface IDoer
+			{
+				void Foo(Item x, Item y);
+			}
+
+			public class Item
+			{
+				public int Id { get; set; }
+			}
+
+			[Fact]
+			public void strict_mock_differenciates_multiple_setups_with_same_arguments_in_different_order()
+			{
+				var aMock = new Mock<IDoer>(MockBehavior.Strict);
+
+				var i1 = new Item { Id = 1 };
+				var i2 = new Item { Id = 2 };
+
+				aMock.Setup(m => m.Foo(i1, i2));
+				aMock.Setup(m => m.Foo(i2, i1));
+
+				aMock.Object.Foo(i1, i2);
+				aMock.Object.Foo(i2, i1);
+
+				aMock.Verify(m => m.Foo(i1, i2), Times.Once());
+				aMock.Verify(m => m.Foo(i2, i1), Times.Once());
+			}
+		}
+
+		#endregion // #135
+
+		#region 328
+
+		public class Issue328
+		{
+			public struct BadlyHashed<T> : IEquatable<BadlyHashed<T>>
+			{
+				public static implicit operator BadlyHashed<T>(T value)
+				{
+					return new BadlyHashed<T>(value);
+				}
+
+				private T value;
+
+				public BadlyHashed(T value)
+				{
+					this.value = value;
+				}
+
+				public bool Equals(BadlyHashed<T> other)
+				{
+					return this.value.Equals(other.value);
+				}
+
+				public override bool Equals(object obj)
+				{
+					return obj is BadlyHashed<T> other && this.Equals(other);
+				}
+
+				public override int GetHashCode()
+				{
+					// This is legal: Equal objects must have equal hashcodes,
+					// but objects with equal hashcodes are not necessarily equal.
+					// We are essentially rendering GetHashCode useless for equality
+					// comparison, so whoever compares instances of this type will
+					// (or should!) end up using the more precise Equals.
+					return 0;
+				}
+			}
+
+			[Fact]
+			public void Two_BadlyHashed_instances_with_equal_values_are_equal()
+			{
+				BadlyHashed<string> a1 = "a", a2 = "a";
+				Assert.Equal(a1, a2);
+				Assert.Equal(a2, a1);
+			}
+
+			[Fact]
+			public void Two_BadlyHashed_instances_with_nonequal_values_are_not_equal()
+			{
+				BadlyHashed<string> a = "a", b = "b";
+				Assert.NotEqual(a, b);
+				Assert.NotEqual(b, a);
+			}
+
+			public interface IMockableService
+			{
+				void Use(BadlyHashed<string> wrappedString);
+			}
+
+			[Fact]
+			public void Strict_mock_expecting_calls_with_nonequal_BadlyHashed_values_should_verify_when_called_properly()
+			{
+				// The above test has already established that `a` and `b` are not equal.
+				BadlyHashed<string> a = "a", b = "b";
+
+				// We are setting up two calls in Strict mode, i.e. both calls must happen.
+				var mock = new Mock<IMockableService>(MockBehavior.Strict);
+				{
+					mock.Setup(service => service.Use(a));
+					mock.Setup(service => service.Use(b));
+				}
+
+				// And they do happen!
+				{
+					var service = mock.Object;
+					service.Use(a);
+					service.Use(b);
+				}
+
+				// So the following verification should succeed.
+				mock.VerifyAll();
+			}
+		}
+
+		#endregion // #328
+
 		// Old @ Google Code
 
 		#region #47
