@@ -45,6 +45,9 @@ using System.Linq.Expressions;
 using System.Text.RegularExpressions;
 using System.Diagnostics.CodeAnalysis;
 using System.Reflection;
+#if !NETCORE
+using static System.Runtime.InteropServices.Marshal;
+#endif
 
 namespace Moq
 {
@@ -55,7 +58,12 @@ namespace Moq
 		public static TValue IsAny<TValue>()
 		{
 			return Match<TValue>.Create(
+#if !NETCORE
+				value => value == null || (IsComObject(value) ? value is TValue
+				                                              : typeof(TValue).IsAssignableFrom(value.GetType())),
+#else
 				value => value == null || typeof(TValue).IsAssignableFrom(value.GetType()),
+#endif
 				() => It.IsAny<TValue>());
 		}
 
@@ -63,7 +71,12 @@ namespace Moq
 		public static TValue IsNotNull<TValue>()
 		{
 			return Match<TValue>.Create(
+#if !NETCORE
+				value => value != null && (IsComObject(value) ? value is TValue
+				                                              : typeof(TValue).IsAssignableFrom(value.GetType())),
+#else
 				value => value != null && typeof(TValue).IsAssignableFrom(value.GetType()),
+#endif
 				() => It.IsNotNull<TValue>());
 		}
 
