@@ -88,10 +88,10 @@ namespace Moq
 			return y.IsAssignableFrom(x) || y.IsAnyType();
 		}
 
-		public int GetHashCode(Type obj)
-		{
-			return obj.GetHashCode();
-		}
+		public int GetHashCode(Type obj) => 
+			throw new NotSupportedException("This TypeEqualityComparer is only used for comparing Generic Type Argument between 2 arguments, " +
+			                                "which is deemed equal if the setup method type is assignable to the method call type," +
+			                                $"or if setup method type is assignable to '{nameof(It)}.{nameof(It.AnyType)}'");
 	}
 
 	internal partial class MethodCall : IProxyCall, ICallbackResult, IVerifies, IThrowsResult
