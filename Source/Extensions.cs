@@ -165,34 +165,6 @@ namespace Moq
 			return typeToMock.GetTypeInfo().IsInterface || typeToMock.GetTypeInfo().IsAbstract || typeToMock.IsDelegate() || (typeToMock.GetTypeInfo().IsClass && !typeToMock.GetTypeInfo().IsSealed);
 		}
 
-		public static bool IsSerializableMockable(this Type typeToMock)
-		{
-			return typeToMock.ContainsDeserializationConstructor() && typeToMock.IsGetObjectDataVirtual();
-		}
-
-		private static bool IsGetObjectDataVirtual(this Type typeToMock)
-		{
-#if NETCORE
-			return false;
-#else
-			var getObjectDataMethod = typeToMock.GetInterfaceMap(typeof (ISerializable)).TargetMethods[0];
-			return !getObjectDataMethod.IsPrivate && getObjectDataMethod.IsVirtual && !getObjectDataMethod.IsFinal;
-#endif
-		}
-
-		private static bool ContainsDeserializationConstructor(this Type typeToMock)
-		{
-#if NETCORE
-			return false;
-#else
-			return typeToMock.GetConstructor(
-				BindingFlags.Instance | BindingFlags.Public | BindingFlags.NonPublic,
-				null,
-				new[] {typeof (SerializationInfo), typeof (StreamingContext)},
-				null) != null;
-#endif
-		}
-
 		public static bool CanOverride(this MethodBase method)
 		{
 			return method.IsVirtual && !method.IsFinal && !method.IsPrivate;

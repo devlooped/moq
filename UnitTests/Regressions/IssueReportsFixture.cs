@@ -8,6 +8,7 @@ using System.Linq.Expressions;
 using System.Reflection;
 using System.Text;
 using System.Text.RegularExpressions;
+using Castle.DynamicProxy;
 using Moq;
 using Moq.Properties;
 using Moq.Protected;
@@ -15,6 +16,7 @@ using Xunit;
 
 #if !NETCORE
 using System.Web.UI.HtmlControls;
+using System.Runtime.Serialization;
 #endif
 using System.Threading;
 using System.Threading.Tasks;
@@ -166,6 +168,160 @@ namespace Moq.Tests.Regressions
 			}
 		}
 #endif
+		#endregion
+
+		#region 163
+
+#if !NETCORE
+		public class Issue163  // see also issue 340 below
+		{
+			[Fact]
+			public void WhenMoqEncountersTypeThatDynamicProxyCannotHandleFallbackToEmptyDefaultValue()
+			{
+				// First, establish that we're looking at situation involving a type that DynamicProxy
+				// cannot handle:
+				var proxyGenerator = new ProxyGenerator();
+				Assert.Throws<ArgumentException>(() => proxyGenerator.CreateClassProxy<NoDeserializationCtor>());
+
+				// With such a type, Moq should fall back to the empty default value provider:
+				var foo = Mock.Of<Foo>();
+				Assert.Null(foo.SomeSerializableObject);
+			}
+
+			public abstract class Foo
+			{
+				public abstract NoDeserializationCtor SomeSerializableObject { get; }
+			}
+
+			[Serializable]
+			public abstract class NoDeserializationCtor : ISerializable
+			{
+				public virtual void GetObjectData(SerializationInfo info, StreamingContext context) { }
+			}
+
+			/// <summary>
+			/// The tests in this class document some of Moq's assumptions about
+			/// how Castle DynamicProxy handles various correct and incorrect
+			/// implementations of `ISerializable`. If any one these tests start
+			/// failing, this is a signal that DynamicProxy has changed, and that
+			/// Moq might have to be adjusted accordingly.
+			/// </summary>
+			public class AssumptionsAboutDynamicProxy
+			{
+				[Theory]
+				[InlineData(typeof(CorrectImplementation))]
+				public void CanCreateProxyForCorrectImplementaiton(Type classToProxy)
+				{
+					var proxyGenerator = new ProxyGenerator();
+					var proxy = proxyGenerator.CreateClassProxy(classToProxy);
+					Assert.NotNull(proxy);
+				}
+
+				[Theory]
+				[InlineData(typeof(NoSerializableAttribute))]
+				[InlineData(typeof(NoSerializableAttributeAndNoDeserializationCtor))]
+				[InlineData(typeof(NoSerializableAttributeAndGetObjectDataNotVirtual))]
+				public void DoesNotMindPossibleErrorsIfNoSerializableAttribute(Type classToProxy)
+				{
+					var proxyGenerator = new ProxyGenerator();
+					var proxy = proxyGenerator.CreateClassProxy(classToProxy);
+					Assert.NotNull(proxy);
+				}
+
+				[Theory]
+				[InlineData(typeof(NotISerializable))]
+				[InlineData(typeof(NotISerializableAndNoDeserializationCtor))]
+				[InlineData(typeof(NotISerializableAndGetObjectDataNotVirtual))]
+				public void DoesNotMindPossibleErrorsIfNotISerializable(Type classToProxy)
+				{
+					var proxyGenerator = new ProxyGenerator();
+					var proxy = proxyGenerator.CreateClassProxy(classToProxy);
+					Assert.NotNull(proxy);
+				}
+
+
+				[Theory]
+				[InlineData(typeof(NoDeserializationCtor))]
+				public void DoesMindMissingDeserializationCtor(Type classToProxy)
+				{
+					var proxyGenerator = new ProxyGenerator();
+					Assert.Throws<ArgumentException>(() => proxyGenerator.CreateClassProxy(classToProxy));
+				}
+
+				[Theory]
+				[InlineData(typeof(GetObjectDataNotVirtual))]
+				public void DoesMindNonVirtualGetObjectData(Type classToProxy)
+				{
+					var proxyGenerator = new ProxyGenerator();
+					Assert.Throws<ArgumentException>(() => proxyGenerator.CreateClassProxy(classToProxy));
+				}
+
+				public abstract class NoSerializableAttribute : ISerializable
+				{
+					protected NoSerializableAttribute() { }
+					protected NoSerializableAttribute(SerializationInfo info, StreamingContext context) { }
+					public void GetObjectData(SerializationInfo info, StreamingContext context) { }
+				}
+
+				public abstract class NoSerializableAttributeAndNoDeserializationCtor : ISerializable
+				{
+					public void GetObjectData(SerializationInfo info, StreamingContext context) { }
+				}
+
+				public abstract class NoSerializableAttributeAndGetObjectDataNotVirtual : ISerializable
+				{
+					protected NoSerializableAttributeAndGetObjectDataNotVirtual() { }
+					protected NoSerializableAttributeAndGetObjectDataNotVirtual(SerializationInfo info, StreamingContext context) { }
+					public virtual void GetObjectData(SerializationInfo info, StreamingContext context) { }
+				}
+
+				[Serializable]
+				public abstract class CorrectImplementation : ISerializable
+				{
+					protected CorrectImplementation() { }
+					protected CorrectImplementation(SerializationInfo info, StreamingContext context) { }
+					public virtual void GetObjectData(SerializationInfo info, StreamingContext context) { }
+				}
+
+				[Serializable]
+				public abstract class NotISerializable
+				{
+					protected NotISerializable() { }
+					protected NotISerializable(SerializationInfo info, StreamingContext context) { }
+					public void GetObjectData(SerializationInfo info, StreamingContext context) { }
+				}
+
+				[Serializable]
+				public abstract class NotISerializableAndNoDeserializationCtor
+				{
+					public virtual void GetObjectData(SerializationInfo info, StreamingContext context) { }
+				}
+
+				[Serializable]
+				public abstract class NotISerializableAndGetObjectDataNotVirtual
+				{
+					protected NotISerializableAndGetObjectDataNotVirtual() { }
+					protected NotISerializableAndGetObjectDataNotVirtual(SerializationInfo info, StreamingContext context) { }
+					public virtual void GetObjectData(SerializationInfo info, StreamingContext context) { }
+				}
+
+				[Serializable]
+				public abstract class NoDeserializationCtor : ISerializable
+				{
+					public virtual void GetObjectData(SerializationInfo info, StreamingContext context) { }
+				}
+
+				[Serializable]
+				public abstract class GetObjectDataNotVirtual : ISerializable
+				{
+					protected GetObjectDataNotVirtual() { }
+					protected GetObjectDataNotVirtual(SerializationInfo info, StreamingContext context) { }
+					public void GetObjectData(SerializationInfo info, StreamingContext context) { }
+				}
+			}
+		}
+#endif
+
 		#endregion
 
 		#region #176
@@ -477,6 +633,51 @@ namespace Moq.Tests.Regressions
 		}
 
 		#endregion // #328
+
+		#region 340
+
+#if !NETCORE
+		/// <summary>
+		/// These tests check whether the presence of a deserialization ctor and/or a GetObjectData
+		/// method alone can fool Moq into assuming that a type is ISerializable, or implements
+		/// it incompletely when it isn't ISerializable at all.
+		/// </summary>
+		public class Issue340  // see also issue 163 above
+		{
+			[Fact]
+			public void ClaimsPrincipal_has_ISerializable_contract_but_is_not_ISerializable()
+			{
+				var ex = Record.Exception(() => Mock.Of<Repro1>());
+				Assert.Null(ex);
+			}
+
+			public abstract class Repro1
+			{
+				public abstract System.Security.Claims.ClaimsPrincipal Principal { get; }
+			}
+
+			[Fact]
+			public void Foo_has_incomplete_ISerializable_contract_but_is_not_ISerializable()
+			{
+				var ex = Record.Exception(() => Mock.Of<Repro2>());
+				Assert.Null(ex);
+			}
+
+			public abstract class Repro2
+			{
+				public abstract Foo FooProperty { get; }
+			}
+
+			[Serializable]
+			public class Foo
+			{
+				public Foo() { }
+				protected Foo(SerializationInfo info, StreamingContext context) { }
+			}
+		}
+#endif
+
+#endregion
 
 		// Old @ Google Code
 
