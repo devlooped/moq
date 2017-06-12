@@ -39,7 +39,10 @@ namespace Moq.Tests
 
 			int callCount = 0;
 
-			mock.Setup(x => x.Get<It.AnyType, It.AnyType, It.AnyType>(It.Is<It.AnyType>(type => type.Object as string == "TestInput")))
+			mock.Setup(x => x.Get<It.AnyType, It.AnyType, It.AnyType>(
+				// Conditional input argument similar to any other It.Is<Type>(x => x == y)
+				It.Is<It.AnyType>(type => type.Object as string == "TestInput")) 
+			)
 				.Returns(context =>
 				{
 					callCount++;
