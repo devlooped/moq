@@ -1,4 +1,5 @@
 ﻿using System;
+using System.IO;
 using System.Threading.Tasks;
 using Xunit;
 
@@ -268,5 +269,180 @@ namespace Moq.Tests
             Assert.True(task.IsFaulted);
             Assert.Equal(exception, task.Exception.InnerException);
         }
+
+        // The test below is dependent on the timings (too much of a 'works-on-my-machine' smell)
+        //[Theory]
+        //[InlineData(true)]
+        //[InlineData(false)]
+        //public async Task ReturnsAsyncWithDelayTriggersRealAsyncBehaviour(bool useDelay)
+        //{
+        //    var mock = new Mock<IAsyncInterface>();
+
+        //    var setup = mock.Setup(x => x.RefParameterValueReturnType("test"));
+
+        //    if (useDelay)
+        //        setup.ReturnsAsync(5, TimeSpan.FromMilliseconds(1));
+        //    else
+        //        setup.ReturnsAsync(5);
+
+        //    var thread1 = Thread.CurrentThread;
+        //    await mock.Object.RefParameterValueReturnType("test");
+        //    var thread2 = Thread.CurrentThread;
+
+        //    if (useDelay)
+        //        Assert.NotEqual(thread1, thread2);
+        //    else
+        //        Assert.Equal(thread1, thread2);
+        //}
+
+        [Fact]
+        public void ReturnsAsyncWithDelayDoesNotImmediatelyComplete()
+        {
+            var longEnoughForAnyBuildServer = TimeSpan.FromSeconds(5);
+
+            var mock = new Mock<IAsyncInterface>();
+            mock.Setup(x => x.RefParameterValueReturnType("test")).ReturnsAsync(5, longEnoughForAnyBuildServer);
+
+            var task = mock.Object.RefParameterValueReturnType("test");
+
+            Assert.False(task.IsCompleted);
+        }
+
+        [Theory]
+        [InlineData(-1, true)]
+        [InlineData(0, true)]
+        [InlineData(1, false)]
+        public void DelayMustBePositive(int ticks, bool mustThrow)
+        {
+            var mock = new Mock<IAsyncInterface>();
+
+            Action setup = () => mock
+                .Setup(x => x.RefParameterValueReturnType("test"))
+                .ReturnsAsync(5, TimeSpan.FromTicks(ticks));
+
+            if (mustThrow)
+                Assert.Throws<ArgumentException>(setup);
+            else
+                setup();
+        }
+
+
+        [Fact]
+        public async Task ReturnsAsyncWithDelayReturnsValue()
+        {
+            var mock = new Mock<IAsyncInterface>();
+            mock.Setup(x => x.RefParameterValueReturnType("test")).ReturnsAsync(5, TimeSpan.FromMilliseconds(1));
+
+            var value = await mock.Object.RefParameterValueReturnType("test");
+
+            Assert.Equal(5, value);
+        }
+
+        [Fact]
+        public async Task ReturnsAsyncWithMinAndMaxDelayReturnsValue()
+        {
+            var mock = new Mock<IAsyncInterface>();
+            mock.Setup(x => x.RefParameterValueReturnType("test")).ReturnsAsync(5, TimeSpan.FromMilliseconds(1), TimeSpan.FromMilliseconds(2));
+
+            var value = await mock.Object.RefParameterValueReturnType("test");
+
+            Assert.Equal(5, value);
+        }
+
+        [Fact]
+        public async Task ReturnsAsyncWithMinAndMaxDelayAndOwnRandomGeneratorReturnsValue()
+        {
+            var mock = new Mock<IAsyncInterface>();
+            mock.Setup(x => x.RefParameterValueReturnType("test")).ReturnsAsync(5, TimeSpan.FromMilliseconds(1), TimeSpan.FromMilliseconds(2), new Random());
+
+            var value = await mock.Object.RefParameterValueReturnType("test");
+
+            Assert.Equal(5, value);
+        }
+
+        [Fact]
+        public async Task ReturnsAsyncWithNullRandomGenerator()
+        {
+            var mock = new Mock<IAsyncInterface>();
+
+            Action setup = () => mock
+                .Setup(x => x.RefParameterValueReturnType("test"))
+                .ReturnsAsync(5, TimeSpan.FromMilliseconds(1), TimeSpan.FromMilliseconds(2), null);
+
+            var paramName = Assert.Throws<ArgumentNullException>(setup).ParamName;
+            Assert.Equal("random", paramName);
+        }
+
+        [Fact]
+        public async Task ThrowsWithDelay()
+        {
+            var mock = new Mock<IAsyncInterface>();
+
+            mock
+                .Setup(x => x.RefParameterValueReturnType("test"))
+                .ThrowsAsync(new ArithmeticException("yikes"), TimeSpan.FromMilliseconds(1));
+
+            Func<Task<int>> test = () => mock.Object.RefParameterValueReturnType("test");
+
+            var exception = await Assert.ThrowsAsync<ArithmeticException>(test);
+            Assert.Equal("yikes", exception.Message);
+        }
+
+        [Fact]
+        public async Task ThrowsWithRandomDelay()
+        {
+            var mock = new Mock<IAsyncInterface>();
+
+            var minDelay = TimeSpan.FromMilliseconds(1);
+            var maxDelay = TimeSpan.FromMilliseconds(2);
+
+            mock
+                .Setup(x => x.RefParameterValueReturnType("test"))
+                .ThrowsAsync(new ArithmeticException("yikes"), minDelay, maxDelay);
+
+            Func<Task<int>> test = () => mock.Object.RefParameterValueReturnType("test");
+
+            var exception = await Assert.ThrowsAsync<ArithmeticException>(test);
+            Assert.Equal("yikes", exception.Message);
+        }
+
+        [Fact]
+        public async Task ThrowsWithRandomDelayAndOwnRandomGenerator()
+        {
+            var mock = new Mock<IAsyncInterface>();
+
+            var minDelay = TimeSpan.FromMilliseconds(1);
+            var maxDelay = TimeSpan.FromMilliseconds(2);
+
+            mock
+                .Setup(x => x.RefParameterValueReturnType("test"))
+                .ThrowsAsync(new ArithmeticException("yikes"), minDelay, maxDelay, new Random());
+
+            Func<Task<int>> test = () => mock.Object.RefParameterValueReturnType("test");
+
+            var exception = await Assert.ThrowsAsync<ArithmeticException>(test);
+            Assert.Equal("yikes", exception.Message);
+        }
+
+
+        [Fact]
+        public async Task ThrowsAsyncWithNullRandomGenerator()
+        {
+            var mock = new Mock<IAsyncInterface>();
+
+            Action setup = () =>
+            {
+                var minDelay = TimeSpan.FromMilliseconds(1);
+                var maxDelay = TimeSpan.FromMilliseconds(2);
+
+                mock
+                    .Setup(x => x.RefParameterValueReturnType("test"))
+                    .ThrowsAsync(new InternalBufferOverflowException(), minDelay, maxDelay, null);
+            };
+
+            var paramName = Assert.Throws<ArgumentNullException>(setup).ParamName;
+            Assert.Equal("random", paramName);
+        }
+
     }
 }

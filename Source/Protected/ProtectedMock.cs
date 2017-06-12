@@ -76,6 +76,13 @@ namespace Moq.Protected
 		{
 			Guard.NotNullOrEmpty(() => methodName, methodName);
 
+			return Setup<TResult>(methodName, false, args);
+		}
+
+		public ISetup<T, TResult> Setup<TResult>(string methodName, bool exactParameterMatch, params object[] args)
+		{
+			Guard.NotNullOrEmpty(() => methodName, methodName);
+
 			var property = GetProperty(methodName);
 			if (property != null)
 			{
@@ -84,7 +91,7 @@ namespace Moq.Protected
 				return Mock.SetupGet(mock, GetMemberAccess<TResult>(property), null);
 			}
 
-			var method = GetMethod(methodName, args);
+			var method = GetMethod(methodName, exactParameterMatch, args);
 			ThrowIfMemberMissing(methodName, method);
 			ThrowIfVoidMethod(method);
 			ThrowIfPublicMethod(method, typeof(T).Name);
@@ -190,9 +197,14 @@ namespace Moq.Protected
 
 		private static MethodInfo GetMethod(string methodName, params object[] args)
 		{
+			return GetMethod(methodName, false, args);
+		}
+
+		private static MethodInfo GetMethod(string methodName, bool exactParameterMatch, params object[] args)
+		{
 			var argTypes = ToArgTypes(args);
 			return typeof(T).GetMethods(BindingFlags.Instance | BindingFlags.NonPublic | BindingFlags.Public)
-				.SingleOrDefault(m => m.Name == methodName && m.HasCompatibleParameterTypes(argTypes));
+				.SingleOrDefault(m => m.Name == methodName && m.HasCompatibleParameterTypes(argTypes, exactParameterMatch));
 		}
 
 		private static Expression<Func<T, TResult>> GetMethodCall<TResult>(MethodInfo method, object[] args)

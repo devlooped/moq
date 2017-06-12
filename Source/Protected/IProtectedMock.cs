@@ -73,6 +73,17 @@ namespace Moq.Protected
 		ISetup<TMock, TResult> Setup<TResult>(string methodOrPropertyName, params object[] args);
 
 		/// <summary>
+		/// Specifies a setup for an invocation on a property or a non void method with the given 
+		/// <paramref name="methodOrPropertyName"/>, optionally specifying arguments for the method call.
+		/// </summary>
+		/// <param name="methodOrPropertyName">The name of the method or property to be invoked.</param>
+		/// <param name="args">The optional arguments for the invocation. If argument matchers are used, 
+		/// remember to use <see cref="ItExpr"/> rather than <see cref="It"/>.</param>
+		/// <param name="exactParameterMatch">Should the parameter types match exactly types that were provided</param>
+		/// <typeparam name="TResult">The return type of the method or property.</typeparam>
+		ISetup<TMock, TResult> Setup<TResult>(string methodOrPropertyName, bool exactParameterMatch, params object[] args);
+
+		/// <summary>
 		/// Specifies a setup for an invocation on a property getter with the given 
 		/// <paramref name="propertyName"/>.
 		/// </summary>
