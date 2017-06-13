@@ -66,6 +66,7 @@
       <DesignTime>True</DesignTime>
       <DependentUpon>IReturns.tt</DependentUpon>
     </Compile>
+    <Compile Include="Language\IReturnsAnyType.cs" />
     <Compile Include="Proxy\IPublicCallContext.cs" />
     <Compile Include="Proxy\ProxyGenerationHelpers.cs" />
     <Compile Include="ReturnsExtensions.cs" />

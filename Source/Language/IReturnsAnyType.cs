@@ -41,6 +41,7 @@
 using System;
 using System.ComponentModel;
 using Moq.Language.Flow;
+using Moq.Proxy;
 
 namespace Moq.Language
 {
@@ -50,64 +51,26 @@ namespace Moq.Language
 	/// <typeparam name="TMock">Mocked type.</typeparam>
 	/// <typeparam name="TResult">Type of the return value from the expression.</typeparam>
 	[EditorBrowsable(EditorBrowsableState.Never)]
-	public partial interface IReturns<TMock, TResult> : IFluentInterface
-		where TMock : class
+	public interface IReturnsAnyType<TMock, TResult> : IFluentInterface
 	{
 		/// <summary>
-		/// Specifies the value to return.
+		/// Specifies a function that will calculate the value to return from an open generic method.
 		/// </summary>
-		/// <param name="value">The value to return, or <see langword="null"/>.</param>
-		/// <example>
-		/// Return a <c>true</c> value from the method call:
-		/// <code>
-		/// mock.Setup(x => x.Execute("ping"))
-		///     .Returns(true);
-		/// </code>
-		/// </example>
-		IReturnsResult<TMock> Returns(TResult value);
-
-		/// <summary>
-		/// Specifies a function that will calculate the value to return from the method.
-		/// </summary>
-		/// <param name="valueFunction">The function that will calculate the return value.</param>
+		/// <param name="valueFunction">
+		/// The function that will calculate the return value.
+		/// IPublicCallContext contains the closed generic method as well as the arguments passed in.
+		/// </param>
 		/// <example group="returns">
 		/// Return a calculated value when the method is called:
 		/// <code>
-		/// mock.Setup(x => x.Execute("ping"))
-		///     .Returns(() => returnValues[0]);
+		/// mock.Setup(x => x.Execute&lt;It.IsAnyType>())
+		///     .Returns(context => returnValues[0]);
 		/// </code>
 		/// The lambda expression to retrieve the return value is lazy-executed, 
 		/// meaning that its value may change depending on the moment the method 
 		/// is executed and the value the <c>returnValues</c> array has at 
 		/// that moment.
 		/// </example>
-		IReturnsResult<TMock> Returns(Func<TResult> valueFunction);
-
-		/// <summary>
-		/// Specifies a function that will calculate the value to return from the method, 
-		/// retrieving the arguments for the invocation.
-		/// </summary>
-		/// <typeparam name="T">The type of the argument of the invoked method.</typeparam>
-		/// <param name="valueFunction">The function that will calculate the return value.</param>
-		/// <example group="returns">
-		/// Return a calculated value which is evaluated lazily at the time of the invocation.
-		/// <para>
-		/// The lookup list can change between invocations and the setup 
-		/// will return different values accordingly. Also, notice how the specific 
-		/// string argument is retrieved by simply declaring it as part of the lambda 
-		/// expression:
-		/// </para>
-		/// <code>
-		/// mock.Setup(x => x.Execute(It.IsAny&lt;string&gt;()))
-		///     .Returns((string command) => returnValues[command]);
-		/// </code>
-		/// </example>
-		IReturnsResult<TMock> Returns<T>(Func<T, TResult> valueFunction);
-
-		/// <summary>
-		/// Calls the real method of the object and returns its return value.
-		/// </summary>
-		/// <returns>The value calculated by the real method of the object.</returns>
-		IReturnsResult<TMock> CallBase();
+		IReturnsResult<TMock> Returns(Func<IPublicCallContext, object> valueFunction);
 	}
 }

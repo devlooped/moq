@@ -102,7 +102,7 @@ namespace Moq.Tests
 			int callCount = 0;
 			IPublicCallContext callContext = null;
 
-			mock.Setup(x => x.GetWhere<ItAnySomeBaseClass, ItAnySomeBaseClass, ItAnySomeBaseClass>(It.IsAny<ItAnySomeBaseClass>()))
+			mock.Setup((Expression<Func<IHasOpenGeneric, It.AnyType>>)(x => x.GetWhere<ItAnySomeBaseClass, ItAnySomeBaseClass, ItAnySomeBaseClass>(It.IsAny<ItAnySomeBaseClass>())))
 				.Returns(context =>
 				{
 					callContext = context;
