@@ -49,9 +49,8 @@ namespace Moq.Language
 	/// Defines the <c>Returns</c> verb.
 	/// </summary>
 	/// <typeparam name="TMock">Mocked type.</typeparam>
-	/// <typeparam name="TResult">Type of the return value from the expression.</typeparam>
 	[EditorBrowsable(EditorBrowsableState.Never)]
-	public interface IReturnsAnyType<TMock, TResult> : IFluentInterface
+	public interface IReturnsAnyType<TMock> : IFluentInterface
 	{
 		/// <summary>
 		/// Specifies a function that will calculate the value to return from an open generic method.
