@@ -34,7 +34,7 @@ namespace Moq
 		public InterceptionAction HandleIntercept(ICallContext invocation, InterceptorContext ctx, CurrentInterceptContext localctx)
 		{
 			if (invocation.Method.DeclaringType == typeof(object) || // interface proxy
-				ctx.Mock.ImplementedInterfaces.Contains(invocation.Method.DeclaringType) && !invocation.Method.IsEventAttach() && !invocation.Method.IsEventDetach() && ctx.Mock.CallBase && !ctx.Mock.MockedType.GetTypeInfo().IsInterface || // class proxy with explicitly implemented interfaces. The method's declaring type is the interface and the method couldn't be abstract
+				ctx.Mock.ImplementedInterfaces.Contains(invocation.Method.DeclaringType) && !invocation.Method.LooksLikeEventAttach() && !invocation.Method.LooksLikeEventDetach() && ctx.Mock.CallBase && !ctx.Mock.MockedType.GetTypeInfo().IsInterface || // class proxy with explicitly implemented interfaces. The method's declaring type is the interface and the method couldn't be abstract
 				invocation.Method.DeclaringType.GetTypeInfo().IsClass && !invocation.Method.IsAbstract && ctx.Mock.CallBase // class proxy
 				)
 			{
@@ -263,39 +263,51 @@ namespace Moq
 			if (!FluentMockContext.IsActive)
 			{
 				//Special case for events
-				if (invocation.Method.IsEventAttach())
+				if (invocation.Method.LooksLikeEventAttach())
 				{
-					var delegateInstance = (Delegate)invocation.Arguments[0];
-					// TODO: validate we can get the event?
-					var eventInfo = this.GetEventFromName(invocation.Method.Name.Substring(4));
-
-					if (ctx.Mock.CallBase && !eventInfo.DeclaringType.GetTypeInfo().IsInterface)
+					var eventInfo = this.GetEventFromName(invocation.Method.Name.Substring("add_".Length));
+					if (eventInfo != null)
 					{
-						invocation.InvokeBase();
-					}
-					else if (delegateInstance != null)
-					{
-						ctx.AddEventHandler(eventInfo, (Delegate)invocation.Arguments[0]);
+						// TODO: We could compare `invocation.Method` and `eventInfo.GetAddMethod()` here.
+						// If they are equal, then `invocation.Method` is definitely an event `add` accessor.
+						// Not sure whether this would work with F# and COM; see commit 44070a9.
+						if (ctx.Mock.CallBase && !eventInfo.DeclaringType.GetTypeInfo().IsInterface)
+						{
+							invocation.InvokeBase();
+							return InterceptionAction.Stop;
+						}
+						else if (invocation.Arguments.Length > 0 && invocation.Arguments[0] is Delegate delegateInstance)
+						{
+							ctx.AddEventHandler(eventInfo, delegateInstance);
+							return InterceptionAction.Stop;
+						}
 					}
 
-					return InterceptionAction.Stop;
+					// wasn't an event attach accessor after all
+					return InterceptionAction.Continue;
 				}
-				else if (invocation.Method.IsEventDetach())
+				else if (invocation.Method.LooksLikeEventDetach())
 				{
-					var delegateInstance = (Delegate)invocation.Arguments[0];
-					// TODO: validate we can get the event?
-					var eventInfo = this.GetEventFromName(invocation.Method.Name.Substring(7));
-
-					if (ctx.Mock.CallBase && !eventInfo.DeclaringType.GetTypeInfo().IsInterface)
+					var eventInfo = this.GetEventFromName(invocation.Method.Name.Substring("remove_".Length));
+					if (eventInfo != null)
 					{
-						invocation.InvokeBase();
-					}
-					else if (delegateInstance != null)
-					{
-						ctx.RemoveEventHandler(eventInfo, (Delegate)invocation.Arguments[0]);
+						// TODO: We could compare `invocation.Method` and `eventInfo.GetRemoveMethod()` here.
+						// If they are equal, then `invocation.Method` is definitely an event `remove` accessor.
+						// Not sure whether this would work with F# and COM; see commit 44070a9.
+						if (ctx.Mock.CallBase && !eventInfo.DeclaringType.GetTypeInfo().IsInterface)
+						{
+							invocation.InvokeBase();
+							return InterceptionAction.Stop;
+						}
+						else if (invocation.Arguments.Length > 0 && invocation.Arguments[0] is Delegate delegateInstance)
+						{
+							ctx.RemoveEventHandler(eventInfo, delegateInstance);
+							return InterceptionAction.Stop;
+						}
 					}
 
-					return InterceptionAction.Stop;
+					// wasn't an event detach accessor after all
+					return InterceptionAction.Continue;
 				}
 
 				// Save to support Verify[expression] pattern.
