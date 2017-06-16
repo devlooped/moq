@@ -170,6 +170,44 @@ namespace Moq.Tests.Regressions
 #endif
 		#endregion
 
+		#region 82
+
+		public class Issue82
+		{
+			public interface ILogger
+			{
+				event Action info;
+				void add_info(string info);
+				void Add_info(string info);
+				void remove_info(string info);
+				void Remove_info(string info);
+			}
+
+			[Fact]
+			public void MethodWithAddUnderscoreNamePrefixDoesNotGetMisrecognizedAsEventAccessor()
+			{
+				var mock = new Mock<ILogger>();
+				mock.Setup(x => x.add_info(It.IsAny<string>()));
+				mock.Setup(x => x.Add_info(It.IsAny<string>()));
+
+				mock.Object.add_info(string.Empty);
+				mock.Object.Add_info(string.Empty);
+			}
+
+			[Fact]
+			public void MethodWithRemoveUnderscoreNamePrefixDoesNotGetMisrecognizedAsEventAccessor()
+			{
+				var mock = new Mock<ILogger>();
+				mock.Setup(x => x.remove_info(It.IsAny<string>()));
+				mock.Setup(x => x.Remove_info(It.IsAny<string>()));
+
+				mock.Object.remove_info(string.Empty);
+				mock.Object.Remove_info(string.Empty);
+			}
+		}
+
+		#endregion
+
 		#region 163
 
 #if !NETCORE
