@@ -1,5 +1,5 @@
 ﻿//Copyright (c) 2007. Clarius Consulting, Manas Technology Solutions, InSTEDD
-//http://code.google.com/p/moq/
+//https://github.com/moq/moq4
 //All rights reserved.
 
 //Redistribution and use in source and binary forms, 
@@ -124,21 +124,21 @@ namespace Moq
 		
 		/// <include file='Mock.xdoc' path='docs/doc[@for="Mock.Verify"]/*'/>
 		public static void Verify(params Mock[] mocks)
-        	{
-            		foreach (var mock in mocks)
-            		{
-                		mock.Verify();
-            		}
-        	}
+		{
+			foreach (var mock in mocks)
+			{
+				mock.Verify();
+			}
+		}
 		
 		/// <include file='Mock.xdoc' path='docs/doc[@for="Mock.VerifyAll"]/*'/>
 		public static void VerifyAll(params Mock[] mocks)
-        	{
-            		foreach (var mock in mocks)
-            		{
-                		mock.VerifyAll();
-            		}
-        	}
+		{
+			foreach (var mock in mocks)
+			{
+				mock.VerifyAll();
+			}
+		}
 
 		/// <include file='Mock.xdoc' path='docs/doc[@for="Mock.Behavior"]/*'/>
 		public virtual MockBehavior Behavior { get; internal set; }
@@ -197,23 +197,23 @@ namespace Moq
 		/// </summary>
 		internal abstract MethodInfo DelegateInterfaceMethod { get; }
 
-        /// <summary>
-        /// Allows to check whether expression conversion to the <see cref="DelegateInterfaceMethod"/> 
-        /// must be performed on the mock, without causing unnecessarily early initialization of 
-        /// the mock instance, which breaks As{T}.
-        /// </summary>
-        internal abstract bool IsDelegateMock { get; }
+		/// <summary>
+		/// Allows to check whether expression conversion to the <see cref="DelegateInterfaceMethod"/>
+		/// must be performed on the mock, without causing unnecessarily early initialization of
+		/// the mock instance, which breaks As{T}.
+		/// </summary>
+		internal abstract bool IsDelegateMock { get; }
 
-        /// <summary>
-        /// Specifies the class that will determine the default 
-        /// value to return when invocations are made that 
-        /// have no setups and need to return a default 
-        /// value (for loose mocks).
-        /// </summary>
-        internal IDefaultValueProvider DefaultValueProvider
-        {
-            get { return this.defaultValueProvider; }
-        }
+		/// <summary>
+		/// Specifies the class that will determine the default
+		/// value to return when invocations are made that
+		/// have no setups and need to return a default
+		/// value (for loose mocks).
+		/// </summary>
+		internal IDefaultValueProvider DefaultValueProvider
+		{
+			get { return this.defaultValueProvider; }
+		}
 
 		/// <summary>
 		/// Exposes the list of extra interfaces implemented by the mock.
@@ -373,14 +373,14 @@ namespace Moq
 			Expression expression,
 			Times times)
 		{
-            // .Where does an enumeration, and calls to a mocked method concurrent to VerifyCalls might change the content of ActualCalls. therefore, it is necessary to take a snapshot, using ToList(), so that concurrent calls will not impact the ongoing verification.
-		    var actualCalls = targetInterceptor.InterceptionContext.ActualInvocations.ToList();
+			// .Where does an enumeration, and calls to a mocked method concurrent to VerifyCalls might change the content of ActualCalls. therefore, it is necessary to take a snapshot, using ToList(), so that concurrent calls will not impact the ongoing verification.
+			var actualCalls = targetInterceptor.InterceptionContext.ActualInvocations.ToList();
 
-            var callCount = actualCalls.Where(ac => expected.Matches(ac)).Count();
-            if (!times.Verify(callCount))
-            {
+			var callCount = actualCalls.Where(ac => expected.Matches(ac)).Count();
+			if (!times.Verify(callCount))
+			{
 				var setups = targetInterceptor.InterceptionContext.OrderedCalls.Where(oc => AreSameMethod(oc.SetupExpression, expression));
-                ThrowVerifyException(expected, setups, actualCalls, expression, times, callCount);
+				ThrowVerifyException(expected, setups, actualCalls, expression, times, callCount);
 			}
 		}
 
@@ -439,14 +439,14 @@ namespace Moq
 
 		#region Setup
 
-        internal static MethodCall<T> Setup<T>(Mock<T> mock, Expression<Action<T>> expression, Condition condition)
-            where T : class
-        {
-            return PexProtector.Invoke(() =>
-            {
-                var methodCall = expression.GetCallInfo(mock);
-                var method = methodCall.Method;
-                var args = methodCall.Arguments.ToArray();
+		internal static MethodCall<T> Setup<T>(Mock<T> mock, Expression<Action<T>> expression, Condition condition)
+			where T : class
+		{
+			return PexProtector.Invoke(() =>
+			{
+				var methodCall = expression.GetCallInfo(mock);
+				var method = methodCall.Method;
+				var args = methodCall.Arguments.ToArray();
 
 				ThrowIfNotMember(expression, method);
 				ThrowIfCantOverride(expression, method);
@@ -460,18 +460,18 @@ namespace Moq
 			});
 		}
 
-        internal static MethodCallReturn<T, TResult> Setup<T, TResult>(
-            Mock<T> mock,
-            Expression<Func<T, TResult>> expression,
-            Condition condition)
-            where T : class
-        {
-            return PexProtector.Invoke(() =>
-            {
-                if (expression.IsProperty())
-                {
-                    return SetupGet(mock, expression, condition);
-                }
+		internal static MethodCallReturn<T, TResult> Setup<T, TResult>(
+			Mock<T> mock,
+			Expression<Func<T, TResult>> expression,
+			Condition condition)
+			where T : class
+		{
+			return PexProtector.Invoke(() =>
+			{
+				if (expression.IsProperty())
+				{
+					return SetupGet(mock, expression, condition);
+				}
 
 				var methodCall = expression.GetCallInfo(mock);
 				var method = methodCall.Method;
@@ -489,19 +489,19 @@ namespace Moq
 			});
 		}
 
-        internal static MethodCallReturn<T, TProperty> SetupGet<T, TProperty>(
-            Mock<T> mock,
-            Expression<Func<T, TProperty>> expression,
-            Condition condition)
-            where T : class
-        {
-            return PexProtector.Invoke(() =>
-            {
-                if (expression.IsPropertyIndexer())
-                {
-                    // Treat indexers as regular method invocations.
-                    return Setup<T, TProperty>(mock, expression, condition);
-                }
+		internal static MethodCallReturn<T, TProperty> SetupGet<T, TProperty>(
+			Mock<T> mock,
+			Expression<Func<T, TProperty>> expression,
+			Condition condition)
+			where T : class
+		{
+			return PexProtector.Invoke(() =>
+			{
+				if (expression.IsPropertyIndexer())
+				{
+					// Treat indexers as regular method invocations.
+					return Setup<T, TProperty>(mock, expression, condition);
+				}
 
 				var prop = expression.ToPropertyInfo();
 				ThrowIfPropertyNotReadable(prop);
@@ -519,42 +519,42 @@ namespace Moq
 			});
 		}
 
-        internal static SetterMethodCall<T, TProperty> SetupSet<T, TProperty>(
-            Mock<T> mock,
-            Action<T> setterExpression,
-            Condition condition)
-            where T : class
-        {
-            return PexProtector.Invoke(() =>
-            {
-                return SetupSetImpl<T, SetterMethodCall<T, TProperty>>(
-                    mock,
-                    setterExpression,
-                    (m, expr, method, value) =>
-                    {
-                        var call = new SetterMethodCall<T, TProperty>(m, condition, expr, method, value[0]);
-                        m.Interceptor.AddCall(call, SetupKind.PropertySet);
-                        return call;
-                    });
-            });
-        }
+		internal static SetterMethodCall<T, TProperty> SetupSet<T, TProperty>(
+			Mock<T> mock,
+			Action<T> setterExpression,
+			Condition condition)
+			where T : class
+		{
+			return PexProtector.Invoke(() =>
+			{
+				return SetupSetImpl<T, SetterMethodCall<T, TProperty>>(
+					mock,
+					setterExpression,
+					(m, expr, method, value) =>
+					{
+						var call = new SetterMethodCall<T, TProperty>(m, condition, expr, method, value[0]);
+						m.Interceptor.AddCall(call, SetupKind.PropertySet);
+						return call;
+					});
+			});
+		}
 
-        internal static MethodCall<T> SetupSet<T>(Mock<T> mock, Action<T> setterExpression, Condition condition)
-            where T : class
-        {
-            return PexProtector.Invoke(() =>
-            {
-                return SetupSetImpl<T, MethodCall<T>>(
-                    mock,
-                    setterExpression,
-                    (m, expr, method, values) =>
-                    {
-                        var call = new MethodCall<T>(m, condition, expr, method, values);
-                        m.Interceptor.AddCall(call, SetupKind.PropertySet);
-                        return call;
-                    });
-            });
-        }
+		internal static MethodCall<T> SetupSet<T>(Mock<T> mock, Action<T> setterExpression, Condition condition)
+			where T : class
+		{
+			return PexProtector.Invoke(() =>
+			{
+				return SetupSetImpl<T, MethodCall<T>>(
+					mock,
+					setterExpression,
+					(m, expr, method, values) =>
+					{
+						var call = new MethodCall<T>(m, condition, expr, method, values);
+						m.Interceptor.AddCall(call, SetupKind.PropertySet);
+						return call;
+					});
+			});
+		}
 
 		internal static SetterMethodCall<T, TProperty> SetupSet<T, TProperty>(
 			Mock<T> mock,
@@ -607,7 +607,7 @@ namespace Moq
 				// because of delegate currying, look at the last parameter for the Action's backing method, not the first
 				var setterExpressionParameters = setterExpression.GetMethodInfo().GetParameters();
 				var parameterName = setterExpressionParameters[setterExpressionParameters.Length - 1].Name;
-                var x = Expression.Parameter(last.Invocation.Method.DeclaringType, parameterName);
+				var x = Expression.Parameter(last.Invocation.Method.DeclaringType, parameterName);
 
 				var arguments = last.Invocation.Arguments;
 				var parameters = setter.GetParameters();
@@ -694,15 +694,15 @@ namespace Moq
 			var properties = mockType.GetProperties()
 				.Concat(mockType.GetInterfaces().SelectMany(i => i.GetProperties()))
 				.Where(p =>
-				       p.CanRead && p.CanOverrideGet() &&
-				       p.GetIndexParameters().Length == 0 &&
-				       !(p.CanWrite ^ (p.CanWrite & p.CanOverrideSet())))
+					   p.CanRead && p.CanOverrideGet() &&
+					   p.GetIndexParameters().Length == 0 &&
+					   !(p.CanWrite ^ (p.CanWrite & p.CanOverrideSet())))
 				.Distinct();
 
-                var setupPropertyMethod = mock.GetType().GetMethods()
-                    .First(m => m.Name == "SetupProperty" && m.GetParameters().Length == 2);
-                var setupGetMethod = mock.GetType().GetMethods()
-                    .First(m => m.Name == "SetupGet" && m.GetParameters().Length == 1);
+			var setupPropertyMethod = mock.GetType().GetMethods()
+				.First(m => m.Name == "SetupProperty" && m.GetParameters().Length == 2);
+			var setupGetMethod = mock.GetType().GetMethods()
+				.First(m => m.Name == "SetupGet" && m.GetParameters().Length == 1);
 
 			foreach (var property in properties)
 			{
@@ -715,23 +715,23 @@ namespace Moq
 					SetupAllProperties(mocked.Mock, mockedTypesStack);
 				}
 
-                    if (property.CanWrite)
-                    {
-                        setupPropertyMethod.MakeGenericMethod(property.PropertyType)
-                            .Invoke(mock, new[] { expression, initialValue });
-                    }
-                    else
-                    {
-                        var genericSetupGetMethod = setupGetMethod.MakeGenericMethod(property.PropertyType);
-                        var returnsMethod =
-                            genericSetupGetMethod
-                                .ReturnType
-								.GetTypeInfo()
-								.ImplementedInterfaces
-								.SingleOrDefault(i => i.Name.Equals("IReturnsGetter`2", StringComparison.OrdinalIgnoreCase))
-								.GetTypeInfo()
-								.DeclaredMethods
-								.SingleOrDefault(m => m.Name == "Returns" && m.GetParameterTypes().Count() == 1 && m.GetParameterTypes().First() == property.PropertyType);
+				if (property.CanWrite)
+				{
+					setupPropertyMethod.MakeGenericMethod(property.PropertyType)
+						.Invoke(mock, new[] { expression, initialValue });
+				}
+				else
+				{
+					var genericSetupGetMethod = setupGetMethod.MakeGenericMethod(property.PropertyType);
+					var returnsMethod =
+						genericSetupGetMethod
+							.ReturnType
+							.GetTypeInfo()
+							.ImplementedInterfaces
+							.SingleOrDefault(i => i.Name.Equals("IReturnsGetter`2", StringComparison.OrdinalIgnoreCase))
+							.GetTypeInfo()
+							.DeclaredMethods
+							.SingleOrDefault(m => m.Name == "Returns" && m.GetParameterTypes().Count() == 1 && m.GetParameterTypes().First() == property.PropertyType);
 
 					var returnsGetter = genericSetupGetMethod.Invoke(mock, new[] {expression});
 					returnsMethod.Invoke(returnsGetter, new[] {initialValue});
@@ -746,13 +746,15 @@ namespace Moq
 				// to deal with loops in the property graph
 				valueProvider = new EmptyDefaultValueProvider();
 			}
+#if FEATURE_SERIALIZATION
 			else
 			{
-				// to make sure that properties of types that don't impelemt ISerializable properly (Castle throws ArgumentException)
+				// to make sure that properties of types that don't implement ISerializable properly (Castle throws ArgumentException)
 				// are mocked with default value instead.
 				// It will only result in exception if the properties are accessed.
 				valueProvider = new SerializableTypesValueProvider(valueProvider);
 			}
+#endif
 			return valueProvider.ProvideDefault(property.GetGetMethod());
 		}
 
@@ -980,14 +982,14 @@ namespace Moq
 				throw new InvalidOperationException(Resources.RaisedUnassociatedEvent);
 			}
 
-            foreach (var del in this.Interceptor.InterceptionContext.GetInvocationList(ev).ToArray())
-            {
-                del.InvokePreserveStack(this.Object, args);
-            }
-        }
+			foreach (var del in this.Interceptor.InterceptionContext.GetInvocationList(ev).ToArray())
+			{
+				del.InvokePreserveStack(this.Object, args);
+			}
+		}
 
 		/// <summary>
-		/// Raises the associated event with the given 
+		/// Raises the associated event with the given
 		/// event argument data.
 		/// </summary>
 		internal void DoRaise(EventInfo ev, params object[] args)
@@ -998,12 +1000,12 @@ namespace Moq
 			}
 
 			foreach (var del in this.Interceptor.InterceptionContext.GetInvocationList(ev).ToArray())
-            {
-                // Non EventHandler-compatible delegates get the straight 
-                // arguments, not the typical "sender, args" arguments.
-                del.InvokePreserveStack(args);
-            }
-        }
+			{
+				// Non EventHandler-compatible delegates get the straight
+				// arguments, not the typical "sender, args" arguments.
+				del.InvokePreserveStack(args);
+			}
+		}
 
 		#endregion
 

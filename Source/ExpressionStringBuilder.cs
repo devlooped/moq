@@ -351,13 +351,13 @@ namespace Moq
 				}
 				else if (node.Method.IsPropertyGetter())
 				{
-                    this.builder.Append(".").Append(node.Method.Name.Substring(4));
-                    if (node.Arguments.Count > paramFrom)
-                    {
-                        this.builder.Append("[");
-                        AsCommaSeparatedValues(node.Arguments.Skip(paramFrom), ToString);
-                        this.builder.Append("]");
-                    }					
+					this.builder.Append(".").Append(node.Method.Name.Substring(4));
+					if (node.Arguments.Count > paramFrom)
+					{
+						this.builder.Append("[");
+						AsCommaSeparatedValues(node.Arguments.Skip(paramFrom), ToString);
+						this.builder.Append("]");
+					}
 				}
 				else if (node.Method.IsPropertySetter())
 				{

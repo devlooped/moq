@@ -8,7 +8,7 @@
 <ul>
 <% foreach (var product in ViewData.Model.Products)
    { %>
-	<li><%= product.Name %></li>	   
+	<li><%= product.Name %></li>
 <% } %>
 </ul>
 

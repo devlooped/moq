@@ -2,40 +2,40 @@
 
 namespace Moq.Tests
 {
-    public class CaptureMatchFixture
-    {
-        [Fact]
-        public void CanRunCaptureCallback()
-        {
-            var capturedValue = string.Empty;
-            var captureMatch = new CaptureMatch<string>(s => capturedValue = s);
+	public class CaptureMatchFixture
+	{
+		[Fact]
+		public void CanRunCaptureCallback()
+		{
+			var capturedValue = string.Empty;
+			var captureMatch = new CaptureMatch<string>(s => capturedValue = s);
 
-            var mock = new Mock<IFoo>();
-            mock.Setup(x => x.DoSomething(Capture.With(captureMatch)));
+			var mock = new Mock<IFoo>();
+			mock.Setup(x => x.DoSomething(Capture.With(captureMatch)));
 
-            mock.Object.DoSomething("Hello!");
-            
-            Assert.Equal("Hello!", capturedValue);
-        }
+			mock.Object.DoSomething("Hello!");
 
-        [Fact]
-        public void CanRunCaptureCallbackWithPredicate()
-        {
-            var capturedValue = string.Empty;
-            var captureMatch = new CaptureMatch<string>(s => capturedValue += s, s => s.StartsWith("W"));
+			Assert.Equal("Hello!", capturedValue);
+		}
 
-            var mock = new Mock<IFoo>();
-            mock.Setup(x => x.DoSomething(Capture.With(captureMatch)));
+		[Fact]
+		public void CanRunCaptureCallbackWithPredicate()
+		{
+			var capturedValue = string.Empty;
+			var captureMatch = new CaptureMatch<string>(s => capturedValue += s, s => s.StartsWith("W"));
 
-            mock.Object.DoSomething("Hello!");
-            mock.Object.DoSomething("World!");
+			var mock = new Mock<IFoo>();
+			mock.Setup(x => x.DoSomething(Capture.With(captureMatch)));
 
-            Assert.Equal("World!", capturedValue);
-        }
+			mock.Object.DoSomething("Hello!");
+			mock.Object.DoSomething("World!");
 
-        public interface IFoo
-        {
-            void DoSomething(string item);
-        }
-    }
+			Assert.Equal("World!", capturedValue);
+		}
+
+		public interface IFoo
+		{
+			void DoSomething(string item);
+		}
+	}
 }

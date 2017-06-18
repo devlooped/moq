@@ -1,5 +1,5 @@
 ﻿//Copyright (c) 2007. Clarius Consulting, Manas Technology Solutions, InSTEDD
-//http://code.google.com/p/moq/
+//https://github.com/moq/moq4
 //All rights reserved.
 
 //Redistribution and use in source and binary forms, 
@@ -9,12 +9,12 @@
 //    * Redistributions of source code must retain the 
 //    above copyright notice, this list of conditions and 
 //    the following disclaimer.
-    
+
 //    * Redistributions in binary form must reproduce 
 //    the above copyright notice, this list of conditions 
 //    and the following disclaimer in the documentation 
 //    and/or other materials provided with the distribution.
-    
+
 //    * Neither the name of Clarius Consulting, Manas Technology Solutions or InSTEDD nor the 
 //    names of its contributors may be used to endorse 
 //    or promote products derived from this software 
@@ -51,6 +51,7 @@ namespace Moq
 		/// <c>from</c> values.
 		/// </summary>
 		Inclusive,
+
 		/// <summary>
 		/// The range does not include the <c>to</c> and 
 		/// <c>from</c> values.

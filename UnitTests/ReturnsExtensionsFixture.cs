@@ -5,96 +5,98 @@ using Xunit;
 
 namespace Moq.Tests
 {
-    public class ReturnsExtensionsFixture
-    {
-        public interface IAsyncInterface
-        {
-            Task<string> NoParametersRefReturnType();
-            
-            Task<int> NoParametersValueReturnType();
+	public class ReturnsExtensionsFixture
+	{
+		public interface IAsyncInterface
+		{
+			Task NoParametersNonGenericTaskReturnType();
 
-            Task<string> RefParameterRefReturnType(string value);
-            
-            Task<int> RefParameterValueReturnType(string value);
+			Task<string> NoParametersRefReturnType();
 
-            Task<string> ValueParameterRefReturnType(int value);
-         
-            Task<int> ValueParameterValueReturnType(int value);
+			Task<int> NoParametersValueReturnType();
 
-            Task<Guid> NewGuidAsync();
-        }
+			Task<string> RefParameterRefReturnType(string value);
 
-        [Fact]
-        public void ReturnsAsync_on_NoParametersRefReturnType()
-        {
-            var mock = new Mock<IAsyncInterface>();
-            mock.Setup(x => x.NoParametersRefReturnType()).ReturnsAsync("TestString");
+			Task<int> RefParameterValueReturnType(string value);
 
-            var task = mock.Object.NoParametersRefReturnType();
+			Task<string> ValueParameterRefReturnType(int value);
 
-            Assert.True(task.IsCompleted);
-            Assert.Equal("TestString", task.Result);
-        }
+			Task<int> ValueParameterValueReturnType(int value);
 
-        [Fact]
-        public void ReturnsAsync_on_NoParametersValueReturnType()
-        {
-            var mock = new Mock<IAsyncInterface>();
-            mock.Setup(x => x.NoParametersValueReturnType()).ReturnsAsync(36);
+			Task<Guid> NewGuidAsync();
+		}
 
-            var task = mock.Object.NoParametersValueReturnType();
+		[Fact]
+		public void ReturnsAsync_on_NoParametersRefReturnType()
+		{
+			var mock = new Mock<IAsyncInterface>();
+			mock.Setup(x => x.NoParametersRefReturnType()).ReturnsAsync("TestString");
 
-            Assert.True(task.IsCompleted);
-            Assert.Equal(36, task.Result);
-        }
+			var task = mock.Object.NoParametersRefReturnType();
 
-        [Fact]
-        public void ReturnsAsync_on_RefParameterRefReturnType()
-        {
-            var mock = new Mock<IAsyncInterface>();
-            mock.Setup(x => x.RefParameterRefReturnType("Param1")).ReturnsAsync("TestString");
+			Assert.True(task.IsCompleted);
+			Assert.Equal("TestString", task.Result);
+		}
 
-            var task = mock.Object.RefParameterRefReturnType("Param1");
+		[Fact]
+		public void ReturnsAsync_on_NoParametersValueReturnType()
+		{
+			var mock = new Mock<IAsyncInterface>();
+			mock.Setup(x => x.NoParametersValueReturnType()).ReturnsAsync(36);
 
-            Assert.True(task.IsCompleted);
-            Assert.Equal("TestString", task.Result);
-        }
+			var task = mock.Object.NoParametersValueReturnType();
 
-        [Fact]
-        public void ReturnsAsync_on_RefParameterValueReturnType()
-        {
-            var mock = new Mock<IAsyncInterface>();
-            mock.Setup(x => x.RefParameterValueReturnType("Param1")).ReturnsAsync(36);
+			Assert.True(task.IsCompleted);
+			Assert.Equal(36, task.Result);
+		}
 
-            var task = mock.Object.RefParameterValueReturnType("Param1");
+		[Fact]
+		public void ReturnsAsync_on_RefParameterRefReturnType()
+		{
+			var mock = new Mock<IAsyncInterface>();
+			mock.Setup(x => x.RefParameterRefReturnType("Param1")).ReturnsAsync("TestString");
 
-            Assert.True(task.IsCompleted);
-            Assert.Equal(36, task.Result);
-        }
+			var task = mock.Object.RefParameterRefReturnType("Param1");
 
-        [Fact]
-        public void ReturnsAsync_on_ValueParameterRefReturnType()
-        {
-            var mock = new Mock<IAsyncInterface>();
-            mock.Setup(x => x.ValueParameterRefReturnType(36)).ReturnsAsync("TestString");
+			Assert.True(task.IsCompleted);
+			Assert.Equal("TestString", task.Result);
+		}
 
-            var task = mock.Object.ValueParameterRefReturnType(36);
+		[Fact]
+		public void ReturnsAsync_on_RefParameterValueReturnType()
+		{
+			var mock = new Mock<IAsyncInterface>();
+			mock.Setup(x => x.RefParameterValueReturnType("Param1")).ReturnsAsync(36);
 
-            Assert.True(task.IsCompleted);
-            Assert.Equal("TestString", task.Result);
-        }
+			var task = mock.Object.RefParameterValueReturnType("Param1");
 
-        [Fact]
-        public void ReturnsAsync_on_ValueParameterValueReturnType()
-        {
-            var mock = new Mock<IAsyncInterface>();
-            mock.Setup(x => x.ValueParameterValueReturnType(36)).ReturnsAsync(37);
+			Assert.True(task.IsCompleted);
+			Assert.Equal(36, task.Result);
+		}
 
-            var task = mock.Object.ValueParameterValueReturnType(36);
+		[Fact]
+		public void ReturnsAsync_on_ValueParameterRefReturnType()
+		{
+			var mock = new Mock<IAsyncInterface>();
+			mock.Setup(x => x.ValueParameterRefReturnType(36)).ReturnsAsync("TestString");
 
-            Assert.True(task.IsCompleted);
-            Assert.Equal(37, task.Result);
-        }
+			var task = mock.Object.ValueParameterRefReturnType(36);
+
+			Assert.True(task.IsCompleted);
+			Assert.Equal("TestString", task.Result);
+		}
+
+		[Fact]
+		public void ReturnsAsync_on_ValueParameterValueReturnType()
+		{
+			var mock = new Mock<IAsyncInterface>();
+			mock.Setup(x => x.ValueParameterValueReturnType(36)).ReturnsAsync(37);
+
+			var task = mock.Object.ValueParameterValueReturnType(36);
+
+			Assert.True(task.IsCompleted);
+			Assert.Equal(37, task.Result);
+		}
 
 		[Fact]
 		public void ReturnsAsyncFunc_on_NoParametersRefReturnType()
@@ -168,282 +170,295 @@ namespace Moq.Tests
 			Assert.Equal(37, task.Result);
 		}
 
-        [Fact]
-        public void ReturnsAsyncFunc_onEachInvocation_ValueReturnTypeLazyEvaluation()
-        {
-            var mock = new Mock<IAsyncInterface>();
-            mock.Setup(x => x.NewGuidAsync()).ReturnsAsync(Guid.NewGuid);
-
-            Guid firstEvaluationResult = mock.Object.NewGuidAsync().Result;
-            Guid secondEvaluationResult = mock.Object.NewGuidAsync().Result;
-
-            Assert.NotEqual(firstEvaluationResult, secondEvaluationResult);
-        }
-
-        [Fact]
-        public void ReturnsAsyncFunc_onEachInvocation_RefReturnTypeLazyEvaluation()
-        {
-            var mock = new Mock<IAsyncInterface>();
-            mock.Setup(x => x.ValueParameterRefReturnType(36)).ReturnsAsync(() => new string(new[] { 'M', 'o', 'q', '4' }));
-
-            string firstEvaluationResult = mock.Object.ValueParameterRefReturnType(36).Result;
-            string secondEvaluationResult = mock.Object.ValueParameterRefReturnType(36).Result;
-
-            Assert.NotSame(firstEvaluationResult, secondEvaluationResult);
-        }
-
-        [Fact]
-        public void ThrowsAsync_on_NoParametersRefReturnType()
-        {
-            var mock = new Mock<IAsyncInterface>();
-            var exception = new InvalidOperationException();
-            mock.Setup(x => x.NoParametersRefReturnType()).ThrowsAsync(exception);
-
-            var task = mock.Object.NoParametersRefReturnType();
-
-            Assert.True(task.IsFaulted);
-            Assert.Equal(exception, task.Exception.InnerException);
-        }
-
-        [Fact]
-        public void ThrowsAsync_on_NoParametersValueReturnType()
-        {
-            var mock = new Mock<IAsyncInterface>();
-            var exception = new InvalidOperationException();
-            mock.Setup(x => x.NoParametersValueReturnType()).ThrowsAsync(exception);
-
-            var task = mock.Object.NoParametersValueReturnType();
-
-            Assert.True(task.IsFaulted);
-            Assert.Equal(exception, task.Exception.InnerException);
-        }
-
-        [Fact]
-        public void ThrowsAsync_on_RefParameterRefReturnType()
-        {
-            var mock = new Mock<IAsyncInterface>();
-            var exception = new InvalidOperationException();
-            mock.Setup(x => x.RefParameterRefReturnType("Param1")).ThrowsAsync(exception);
-
-            var task = mock.Object.RefParameterRefReturnType("Param1");
-
-            Assert.True(task.IsFaulted);
-            Assert.Equal(exception, task.Exception.InnerException);
-        }
-
-        [Fact]
-        public void ThrowsAsync_on_RefParameterValueReturnType()
-        {
-            var mock = new Mock<IAsyncInterface>();
-            var exception = new InvalidOperationException();
-            mock.Setup(x => x.RefParameterValueReturnType("Param1")).ThrowsAsync(exception);
-
-            var task = mock.Object.RefParameterValueReturnType("Param1");
-
-            Assert.True(task.IsFaulted);
-            Assert.Equal(exception, task.Exception.InnerException);
-        }
-
-        [Fact]
-        public void ThrowsAsync_on_ValueParameterRefReturnType()
-        {
-            var mock = new Mock<IAsyncInterface>();
-            var exception = new InvalidOperationException();
-            mock.Setup(x => x.ValueParameterRefReturnType(36)).ThrowsAsync(exception);
-
-            var task = mock.Object.ValueParameterRefReturnType(36);
-
-            Assert.True(task.IsFaulted);
-            Assert.Equal(exception, task.Exception.InnerException);
-        }
-
-        [Fact]
-        public void ThrowsAsync_on_ValueParameterValueReturnType()
-        {
-            var mock = new Mock<IAsyncInterface>();
-            var exception = new InvalidOperationException();
-            mock.Setup(x => x.ValueParameterValueReturnType(36)).ThrowsAsync(exception);
-
-            var task = mock.Object.ValueParameterValueReturnType(36);
-
-            Assert.True(task.IsFaulted);
-            Assert.Equal(exception, task.Exception.InnerException);
-        }
-
-        // The test below is dependent on the timings (too much of a 'works-on-my-machine' smell)
-        //[Theory]
-        //[InlineData(true)]
-        //[InlineData(false)]
-        //public async Task ReturnsAsyncWithDelayTriggersRealAsyncBehaviour(bool useDelay)
-        //{
-        //    var mock = new Mock<IAsyncInterface>();
-
-        //    var setup = mock.Setup(x => x.RefParameterValueReturnType("test"));
-
-        //    if (useDelay)
-        //        setup.ReturnsAsync(5, TimeSpan.FromMilliseconds(1));
-        //    else
-        //        setup.ReturnsAsync(5);
+		[Fact]
+		public void ReturnsAsyncFunc_onEachInvocation_ValueReturnTypeLazyEvaluation()
+		{
+			var mock = new Mock<IAsyncInterface>();
+			mock.Setup(x => x.NewGuidAsync()).ReturnsAsync(Guid.NewGuid);
+
+			Guid firstEvaluationResult = mock.Object.NewGuidAsync().Result;
+			Guid secondEvaluationResult = mock.Object.NewGuidAsync().Result;
+
+			Assert.NotEqual(firstEvaluationResult, secondEvaluationResult);
+		}
+
+		[Fact]
+		public void ReturnsAsyncFunc_onEachInvocation_RefReturnTypeLazyEvaluation()
+		{
+			var mock = new Mock<IAsyncInterface>();
+			mock.Setup(x => x.ValueParameterRefReturnType(36)).ReturnsAsync(() => new string(new[] { 'M', 'o', 'q', '4' }));
+
+			string firstEvaluationResult = mock.Object.ValueParameterRefReturnType(36).Result;
+			string secondEvaluationResult = mock.Object.ValueParameterRefReturnType(36).Result;
+
+			Assert.NotSame(firstEvaluationResult, secondEvaluationResult);
+		}
+
+		[Fact]
+		public void ThrowsAsync_on_NoParametersNonGenericTaskReturnType()
+		{
+			var mock = new Mock<IAsyncInterface>();
+			var exception = new InvalidOperationException();
+			mock.Setup(x => x.NoParametersNonGenericTaskReturnType()).ThrowsAsync(exception);
+
+			var task = mock.Object.NoParametersNonGenericTaskReturnType();
+
+			Assert.True(task.IsFaulted);
+			Assert.Equal(exception, task.Exception.InnerException);
+		}
+
+		[Fact]
+		public void ThrowsAsync_on_NoParametersRefReturnType()
+		{
+			var mock = new Mock<IAsyncInterface>();
+			var exception = new InvalidOperationException();
+			mock.Setup(x => x.NoParametersRefReturnType()).ThrowsAsync(exception);
+
+			var task = mock.Object.NoParametersRefReturnType();
+
+			Assert.True(task.IsFaulted);
+			Assert.Equal(exception, task.Exception.InnerException);
+		}
+
+		[Fact]
+		public void ThrowsAsync_on_NoParametersValueReturnType()
+		{
+			var mock = new Mock<IAsyncInterface>();
+			var exception = new InvalidOperationException();
+			mock.Setup(x => x.NoParametersValueReturnType()).ThrowsAsync(exception);
+
+			var task = mock.Object.NoParametersValueReturnType();
+
+			Assert.True(task.IsFaulted);
+			Assert.Equal(exception, task.Exception.InnerException);
+		}
+
+		[Fact]
+		public void ThrowsAsync_on_RefParameterRefReturnType()
+		{
+			var mock = new Mock<IAsyncInterface>();
+			var exception = new InvalidOperationException();
+			mock.Setup(x => x.RefParameterRefReturnType("Param1")).ThrowsAsync(exception);
+
+			var task = mock.Object.RefParameterRefReturnType("Param1");
+
+			Assert.True(task.IsFaulted);
+			Assert.Equal(exception, task.Exception.InnerException);
+		}
+
+		[Fact]
+		public void ThrowsAsync_on_RefParameterValueReturnType()
+		{
+			var mock = new Mock<IAsyncInterface>();
+			var exception = new InvalidOperationException();
+			mock.Setup(x => x.RefParameterValueReturnType("Param1")).ThrowsAsync(exception);
+
+			var task = mock.Object.RefParameterValueReturnType("Param1");
+
+			Assert.True(task.IsFaulted);
+			Assert.Equal(exception, task.Exception.InnerException);
+		}
+
+		[Fact]
+		public void ThrowsAsync_on_ValueParameterRefReturnType()
+		{
+			var mock = new Mock<IAsyncInterface>();
+			var exception = new InvalidOperationException();
+			mock.Setup(x => x.ValueParameterRefReturnType(36)).ThrowsAsync(exception);
+
+			var task = mock.Object.ValueParameterRefReturnType(36);
+
+			Assert.True(task.IsFaulted);
+			Assert.Equal(exception, task.Exception.InnerException);
+		}
+
+		[Fact]
+		public void ThrowsAsync_on_ValueParameterValueReturnType()
+		{
+			var mock = new Mock<IAsyncInterface>();
+			var exception = new InvalidOperationException();
+			mock.Setup(x => x.ValueParameterValueReturnType(36)).ThrowsAsync(exception);
+
+			var task = mock.Object.ValueParameterValueReturnType(36);
+
+			Assert.True(task.IsFaulted);
+			Assert.Equal(exception, task.Exception.InnerException);
+		}
+
+		// The test below is dependent on the timings (too much of a 'works-on-my-machine' smell)
+		//[Theory]
+		//[InlineData(true)]
+		//[InlineData(false)]
+		//public async Task ReturnsAsyncWithDelayTriggersRealAsyncBehaviour(bool useDelay)
+		//{
+		//    var mock = new Mock<IAsyncInterface>();
+
+		//    var setup = mock.Setup(x => x.RefParameterValueReturnType("test"));
+
+		//    if (useDelay)
+		//        setup.ReturnsAsync(5, TimeSpan.FromMilliseconds(1));
+		//    else
+		//        setup.ReturnsAsync(5);
+
+		//    var thread1 = Thread.CurrentThread;
+		//    await mock.Object.RefParameterValueReturnType("test");
+		//    var thread2 = Thread.CurrentThread;
+
+		//    if (useDelay)
+		//        Assert.NotEqual(thread1, thread2);
+		//    else
+		//        Assert.Equal(thread1, thread2);
+		//}
+
+		[Fact]
+		public void ReturnsAsyncWithDelayDoesNotImmediatelyComplete()
+		{
+			var longEnoughForAnyBuildServer = TimeSpan.FromSeconds(5);
+
+			var mock = new Mock<IAsyncInterface>();
+			mock.Setup(x => x.RefParameterValueReturnType("test")).ReturnsAsync(5, longEnoughForAnyBuildServer);
 
-        //    var thread1 = Thread.CurrentThread;
-        //    await mock.Object.RefParameterValueReturnType("test");
-        //    var thread2 = Thread.CurrentThread;
+			var task = mock.Object.RefParameterValueReturnType("test");
+
+			Assert.False(task.IsCompleted);
+		}
 
-        //    if (useDelay)
-        //        Assert.NotEqual(thread1, thread2);
-        //    else
-        //        Assert.Equal(thread1, thread2);
-        //}
-
-        [Fact]
-        public void ReturnsAsyncWithDelayDoesNotImmediatelyComplete()
-        {
-            var longEnoughForAnyBuildServer = TimeSpan.FromSeconds(5);
-
-            var mock = new Mock<IAsyncInterface>();
-            mock.Setup(x => x.RefParameterValueReturnType("test")).ReturnsAsync(5, longEnoughForAnyBuildServer);
+		[Theory]
+		[InlineData(-1, true)]
+		[InlineData(0, true)]
+		[InlineData(1, false)]
+		public void DelayMustBePositive(int ticks, bool mustThrow)
+		{
+			var mock = new Mock<IAsyncInterface>();
 
-            var task = mock.Object.RefParameterValueReturnType("test");
+			Action setup = () => mock
+				.Setup(x => x.RefParameterValueReturnType("test"))
+				.ReturnsAsync(5, TimeSpan.FromTicks(ticks));
 
-            Assert.False(task.IsCompleted);
-        }
+			if (mustThrow)
+				Assert.Throws<ArgumentException>(setup);
+			else
+				setup();
+		}
 
-        [Theory]
-        [InlineData(-1, true)]
-        [InlineData(0, true)]
-        [InlineData(1, false)]
-        public void DelayMustBePositive(int ticks, bool mustThrow)
-        {
-            var mock = new Mock<IAsyncInterface>();
 
-            Action setup = () => mock
-                .Setup(x => x.RefParameterValueReturnType("test"))
-                .ReturnsAsync(5, TimeSpan.FromTicks(ticks));
+		[Fact]
+		public async Task ReturnsAsyncWithDelayReturnsValue()
+		{
+			var mock = new Mock<IAsyncInterface>();
+			mock.Setup(x => x.RefParameterValueReturnType("test")).ReturnsAsync(5, TimeSpan.FromMilliseconds(1));
 
-            if (mustThrow)
-                Assert.Throws<ArgumentException>(setup);
-            else
-                setup();
-        }
+			var value = await mock.Object.RefParameterValueReturnType("test");
 
+			Assert.Equal(5, value);
+		}
 
-        [Fact]
-        public async Task ReturnsAsyncWithDelayReturnsValue()
-        {
-            var mock = new Mock<IAsyncInterface>();
-            mock.Setup(x => x.RefParameterValueReturnType("test")).ReturnsAsync(5, TimeSpan.FromMilliseconds(1));
+		[Fact]
+		public async Task ReturnsAsyncWithMinAndMaxDelayReturnsValue()
+		{
+			var mock = new Mock<IAsyncInterface>();
+			mock.Setup(x => x.RefParameterValueReturnType("test")).ReturnsAsync(5, TimeSpan.FromMilliseconds(1), TimeSpan.FromMilliseconds(2));
 
-            var value = await mock.Object.RefParameterValueReturnType("test");
+			var value = await mock.Object.RefParameterValueReturnType("test");
 
-            Assert.Equal(5, value);
-        }
+			Assert.Equal(5, value);
+		}
 
-        [Fact]
-        public async Task ReturnsAsyncWithMinAndMaxDelayReturnsValue()
-        {
-            var mock = new Mock<IAsyncInterface>();
-            mock.Setup(x => x.RefParameterValueReturnType("test")).ReturnsAsync(5, TimeSpan.FromMilliseconds(1), TimeSpan.FromMilliseconds(2));
+		[Fact]
+		public async Task ReturnsAsyncWithMinAndMaxDelayAndOwnRandomGeneratorReturnsValue()
+		{
+			var mock = new Mock<IAsyncInterface>();
+			mock.Setup(x => x.RefParameterValueReturnType("test")).ReturnsAsync(5, TimeSpan.FromMilliseconds(1), TimeSpan.FromMilliseconds(2), new Random());
 
-            var value = await mock.Object.RefParameterValueReturnType("test");
+			var value = await mock.Object.RefParameterValueReturnType("test");
 
-            Assert.Equal(5, value);
-        }
+			Assert.Equal(5, value);
+		}
 
-        [Fact]
-        public async Task ReturnsAsyncWithMinAndMaxDelayAndOwnRandomGeneratorReturnsValue()
-        {
-            var mock = new Mock<IAsyncInterface>();
-            mock.Setup(x => x.RefParameterValueReturnType("test")).ReturnsAsync(5, TimeSpan.FromMilliseconds(1), TimeSpan.FromMilliseconds(2), new Random());
+		[Fact]
+		public void ReturnsAsyncWithNullRandomGenerator()
+		{
+			var mock = new Mock<IAsyncInterface>();
 
-            var value = await mock.Object.RefParameterValueReturnType("test");
+			Action setup = () => mock
+				.Setup(x => x.RefParameterValueReturnType("test"))
+				.ReturnsAsync(5, TimeSpan.FromMilliseconds(1), TimeSpan.FromMilliseconds(2), null);
 
-            Assert.Equal(5, value);
-        }
+			var paramName = Assert.Throws<ArgumentNullException>(setup).ParamName;
+			Assert.Equal("random", paramName);
+		}
 
-        [Fact]
-        public async Task ReturnsAsyncWithNullRandomGenerator()
-        {
-            var mock = new Mock<IAsyncInterface>();
+		[Fact]
+		public async Task ThrowsWithDelay()
+		{
+			var mock = new Mock<IAsyncInterface>();
 
-            Action setup = () => mock
-                .Setup(x => x.RefParameterValueReturnType("test"))
-                .ReturnsAsync(5, TimeSpan.FromMilliseconds(1), TimeSpan.FromMilliseconds(2), null);
+			mock
+				.Setup(x => x.RefParameterValueReturnType("test"))
+				.ThrowsAsync(new ArithmeticException("yikes"), TimeSpan.FromMilliseconds(1));
 
-            var paramName = Assert.Throws<ArgumentNullException>(setup).ParamName;
-            Assert.Equal("random", paramName);
-        }
+			Func<Task<int>> test = () => mock.Object.RefParameterValueReturnType("test");
 
-        [Fact]
-        public async Task ThrowsWithDelay()
-        {
-            var mock = new Mock<IAsyncInterface>();
+			var exception = await Assert.ThrowsAsync<ArithmeticException>(test);
+			Assert.Equal("yikes", exception.Message);
+		}
 
-            mock
-                .Setup(x => x.RefParameterValueReturnType("test"))
-                .ThrowsAsync(new ArithmeticException("yikes"), TimeSpan.FromMilliseconds(1));
+		[Fact]
+		public async Task ThrowsWithRandomDelay()
+		{
+			var mock = new Mock<IAsyncInterface>();
 
-            Func<Task<int>> test = () => mock.Object.RefParameterValueReturnType("test");
+			var minDelay = TimeSpan.FromMilliseconds(1);
+			var maxDelay = TimeSpan.FromMilliseconds(2);
 
-            var exception = await Assert.ThrowsAsync<ArithmeticException>(test);
-            Assert.Equal("yikes", exception.Message);
-        }
+			mock
+				.Setup(x => x.RefParameterValueReturnType("test"))
+				.ThrowsAsync(new ArithmeticException("yikes"), minDelay, maxDelay);
 
-        [Fact]
-        public async Task ThrowsWithRandomDelay()
-        {
-            var mock = new Mock<IAsyncInterface>();
+			Func<Task<int>> test = () => mock.Object.RefParameterValueReturnType("test");
 
-            var minDelay = TimeSpan.FromMilliseconds(1);
-            var maxDelay = TimeSpan.FromMilliseconds(2);
+			var exception = await Assert.ThrowsAsync<ArithmeticException>(test);
+			Assert.Equal("yikes", exception.Message);
+		}
 
-            mock
-                .Setup(x => x.RefParameterValueReturnType("test"))
-                .ThrowsAsync(new ArithmeticException("yikes"), minDelay, maxDelay);
+		[Fact]
+		public async Task ThrowsWithRandomDelayAndOwnRandomGenerator()
+		{
+			var mock = new Mock<IAsyncInterface>();
 
-            Func<Task<int>> test = () => mock.Object.RefParameterValueReturnType("test");
+			var minDelay = TimeSpan.FromMilliseconds(1);
+			var maxDelay = TimeSpan.FromMilliseconds(2);
 
-            var exception = await Assert.ThrowsAsync<ArithmeticException>(test);
-            Assert.Equal("yikes", exception.Message);
-        }
+			mock
+				.Setup(x => x.RefParameterValueReturnType("test"))
+				.ThrowsAsync(new ArithmeticException("yikes"), minDelay, maxDelay, new Random());
 
-        [Fact]
-        public async Task ThrowsWithRandomDelayAndOwnRandomGenerator()
-        {
-            var mock = new Mock<IAsyncInterface>();
+			Func<Task<int>> test = () => mock.Object.RefParameterValueReturnType("test");
 
-            var minDelay = TimeSpan.FromMilliseconds(1);
-            var maxDelay = TimeSpan.FromMilliseconds(2);
+			var exception = await Assert.ThrowsAsync<ArithmeticException>(test);
+			Assert.Equal("yikes", exception.Message);
+		}
 
-            mock
-                .Setup(x => x.RefParameterValueReturnType("test"))
-                .ThrowsAsync(new ArithmeticException("yikes"), minDelay, maxDelay, new Random());
 
-            Func<Task<int>> test = () => mock.Object.RefParameterValueReturnType("test");
+		[Fact]
+		public void ThrowsAsyncWithNullRandomGenerator()
+		{
+			var mock = new Mock<IAsyncInterface>();
 
-            var exception = await Assert.ThrowsAsync<ArithmeticException>(test);
-            Assert.Equal("yikes", exception.Message);
-        }
+			Action setup = () =>
+			{
+				var anyException = new Exception();
+				var minDelay = TimeSpan.FromMilliseconds(1);
+				var maxDelay = TimeSpan.FromMilliseconds(2);
 
+				mock
+					.Setup(x => x.RefParameterValueReturnType("test"))
+					.ThrowsAsync(anyException, minDelay, maxDelay, null);
+			};
 
-        [Fact]
-        public async Task ThrowsAsyncWithNullRandomGenerator()
-        {
-            var mock = new Mock<IAsyncInterface>();
+			var paramName = Assert.Throws<ArgumentNullException>(setup).ParamName;
+			Assert.Equal("random", paramName);
+		}
 
-            Action setup = () =>
-            {
-                var anyException = new Exception();
-                var minDelay = TimeSpan.FromMilliseconds(1);
-                var maxDelay = TimeSpan.FromMilliseconds(2);
-
-                mock
-                    .Setup(x => x.RefParameterValueReturnType("test"))
-                    .ThrowsAsync(anyException, minDelay, maxDelay, null);
-            };
-
-            var paramName = Assert.Throws<ArgumentNullException>(setup).ParamName;
-            Assert.Equal("random", paramName);
-        }
-
-    }
+	}
 }

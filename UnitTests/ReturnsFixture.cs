@@ -7,18 +7,16 @@ namespace Moq.Tests
 {
 	public class ReturnsFixture
 	{
-#if !NETCORE
 		[Fact]
 		public void ReturnsValue()
 		{
-			var mock = new Mock<ICloneable>();
+			var mock = new Mock<IBar>();
 			var clone = new object();
 
 			mock.Setup(x => x.Clone()).Returns(clone);
 
 			Assert.Equal(clone, mock.Object.Clone());
 		}
-#endif
 
 		[Fact]
 		public void ReturnsNullValueIfSpecified()
@@ -258,6 +256,11 @@ namespace Moq.Tests
 			{
 				get { return "Text"; }
 			}
+		}
+
+		public interface IBar
+		{
+			object Clone();
 		}
 	}
 }

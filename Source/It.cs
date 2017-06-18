@@ -1,5 +1,5 @@
 ﻿//Copyright (c) 2007. Clarius Consulting, Manas Technology Solutions, InSTEDD
-//http://code.google.com/p/moq/
+//https://github.com/moq/moq4
 //All rights reserved.
 
 //Redistribution and use in source and binary forms, 
@@ -45,6 +45,9 @@ using System.Linq.Expressions;
 using System.Text.RegularExpressions;
 using System.Diagnostics.CodeAnalysis;
 using System.Reflection;
+#if FEATURE_COM
+using static System.Runtime.InteropServices.Marshal;
+#endif
 
 namespace Moq
 {
@@ -55,7 +58,12 @@ namespace Moq
 		public static TValue IsAny<TValue>()
 		{
 			return Match<TValue>.Create(
+#if FEATURE_COM
+				value => value == null || (IsComObject(value) ? value is TValue
+				                                              : typeof(TValue).IsAssignableFrom(value.GetType())),
+#else
 				value => value == null || typeof(TValue).IsAssignableFrom(value.GetType()),
+#endif
 				() => It.IsAny<TValue>());
 		}
 
@@ -63,7 +71,12 @@ namespace Moq
 		public static TValue IsNotNull<TValue>()
 		{
 			return Match<TValue>.Create(
+#if FEATURE_COM
+				value => value != null && (IsComObject(value) ? value is TValue
+				                                              : typeof(TValue).IsAssignableFrom(value.GetType())),
+#else
 				value => value != null && typeof(TValue).IsAssignableFrom(value.GetType()),
+#endif
 				() => It.IsNotNull<TValue>());
 		}
 
@@ -98,29 +111,29 @@ namespace Moq
 			() => It.IsInRange(from, to, rangeKind));
 		}
 
-		  /// <include file='It.xdoc' path='docs/doc[@for="It.IsIn(enumerable)"]/*'/>
-		  public static TValue IsIn<TValue>(IEnumerable<TValue> items)
-		  {
-				return Match<TValue>.Create(value => items.Contains(value), () => It.IsIn(items)); 
-		  }
+		/// <include file='It.xdoc' path='docs/doc[@for="It.IsIn(enumerable)"]/*'/>
+		public static TValue IsIn<TValue>(IEnumerable<TValue> items)
+		{
+			return Match<TValue>.Create(value => items.Contains(value), () => It.IsIn(items));
+		}
 
-		  /// <include file='It.xdoc' path='docs/doc[@for="It.IsIn(params)"]/*'/>
-		  public static TValue IsIn<TValue>(params TValue[] items)
-		  {
-				return Match<TValue>.Create(value => items.Contains(value), () => It.IsIn(items)); 
-		  }
+		/// <include file='It.xdoc' path='docs/doc[@for="It.IsIn(params)"]/*'/>
+		public static TValue IsIn<TValue>(params TValue[] items)
+		{
+			return Match<TValue>.Create(value => items.Contains(value), () => It.IsIn(items));
+		}
 
-		  /// <include file='It.xdoc' path='docs/doc[@for="It.IsNotIn(enumerable)"]/*'/>
-		  public static TValue IsNotIn<TValue>(IEnumerable<TValue> items)
-		  {
-				return Match<TValue>.Create(value => !items.Contains(value), () => It.IsNotIn(items));
-		  }
+		/// <include file='It.xdoc' path='docs/doc[@for="It.IsNotIn(enumerable)"]/*'/>
+		public static TValue IsNotIn<TValue>(IEnumerable<TValue> items)
+		{
+			return Match<TValue>.Create(value => !items.Contains(value), () => It.IsNotIn(items));
+		}
 
-		  /// <include file='It.xdoc' path='docs/doc[@for="It.IsNotIn(params)"]/*'/>
-		  public static TValue IsNotIn<TValue>(params TValue[] items)
-		  {
-				return Match<TValue>.Create(value => !items.Contains(value), () => It.IsNotIn(items));
-		  }
+		/// <include file='It.xdoc' path='docs/doc[@for="It.IsNotIn(params)"]/*'/>
+		public static TValue IsNotIn<TValue>(params TValue[] items)
+		{
+			return Match<TValue>.Create(value => !items.Contains(value), () => It.IsNotIn(items));
+		}
 
 		/// <include file='It.xdoc' path='docs/doc[@for="It.IsRegex(regex)"]/*'/>
 		public static string IsRegex(string regex)

@@ -2,11 +2,11 @@
 
 namespace Moq.Visualizer
 {
-    public partial class MockVisualizerView : UserControl
-    {
-        public MockVisualizerView()
-        {
-            this.InitializeComponent();
-        }
-    }
+	public partial class MockVisualizerView : UserControl
+	{
+		public MockVisualizerView()
+		{
+			this.InitializeComponent();
+		}
+	}
 }

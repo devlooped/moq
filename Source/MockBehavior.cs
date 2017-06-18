@@ -1,5 +1,5 @@
 ﻿//Copyright (c) 2007. Clarius Consulting, Manas Technology Solutions, InSTEDD
-//http://code.google.com/p/moq/
+//https://github.com/moq/moq4
 //All rights reserved.
 
 //Redistribution and use in source and binary forms, 
@@ -37,7 +37,6 @@
 
 //[This is the BSD license, see
 // http://www.opensource.org/licenses/bsd-license.php]
-
 
 namespace Moq
 {

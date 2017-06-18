@@ -10,7 +10,7 @@ namespace Moq
 	internal enum InterceptionAction
 	{
  		Continue,
-        Stop
+		Stop
 	}
 
 	internal interface IInterceptStrategy
@@ -150,10 +150,10 @@ namespace Moq
 		}
 		#endregion
 
-    }
+	}
 	
 	internal class CurrentInterceptContext
-	{        
+	{
 		public IProxyCall Call {get; set; }
 	}
 }

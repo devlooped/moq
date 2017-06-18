@@ -1,5 +1,5 @@
 //Copyright (c) 2007. Clarius Consulting, Manas Technology Solutions, InSTEDD
-//http://code.google.com/p/moq/
+//https://github.com/moq/moq4
 //All rights reserved.
 
 //Redistribution and use in source and binary forms, 
@@ -75,11 +75,11 @@ namespace Moq
 			return Create(new Match<T>(condition, renderExpression));
 		}
 
-	    internal static T Create<T>(Match<T> match)
-	    {
-            SetLastMatch(match);
-            return default(T);
-        }
+		internal static T Create<T>(Match<T> match)
+		{
+			SetLastMatch(match);
+			return default(T);
+		}
 
 		/// <devdoc>
 		/// This method is used to set an expression as the last matcher invoked, 
@@ -102,7 +102,7 @@ namespace Moq
 
 			return match;
 		}
-    }
+	}
 
 	/// <include file='Match.xdoc' path='docs/doc[@for="Match{T}"]/*'/>
 	public class Match<T> : Match
@@ -144,7 +144,7 @@ namespace Moq
 				// We have to return early from here because you can't cast null to T
 				// when T is a value type.
 				//
-				// See Github issue #90: https://github.com/Moq/moq4/issues/90
+				// See Github issue #90: https://github.com/moq/moq4/issues/90
 				return false;
 			}
 			return this.Condition((T)value);

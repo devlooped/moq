@@ -1,5 +1,5 @@
 ﻿//Copyright (c) 2007. Clarius Consulting, Manas Technology Solutions, InSTEDD
-//http://code.google.com/p/moq/
+//https://github.com/moq/moq4
 //All rights reserved.
 
 //Redistribution and use in source and binary forms, 
@@ -44,9 +44,6 @@ using System.Diagnostics.CodeAnalysis;
 using System.Globalization;
 using System.Linq;
 using System.Reflection;
-#if !NETCORE
-using System.Runtime.Serialization;
-#endif
 using Moq.Proxy;
 using System.Linq.Expressions;
 using Moq.Properties;
@@ -91,10 +88,10 @@ namespace Moq
 			{
 				return "\"" + typedValue + "\"";
 			}
-		    if (value is IEnumerable)
-		    {
-		        return "[" + string.Join(", ", ((IEnumerable) value).OfType<object>().Select(GetValue)) + "]";
-		    }
+			if (value is IEnumerable)
+			{
+				return "[" + string.Join(", ", ((IEnumerable) value).OfType<object>().Select(GetValue)) + "]";
+			}
 			return value.ToString();
 		}
 
@@ -163,34 +160,6 @@ namespace Moq
 			// A value type does not match any of these three 
 			// condition and therefore returns false.
 			return typeToMock.GetTypeInfo().IsInterface || typeToMock.GetTypeInfo().IsAbstract || typeToMock.IsDelegate() || (typeToMock.GetTypeInfo().IsClass && !typeToMock.GetTypeInfo().IsSealed);
-		}
-
-		public static bool IsSerializableMockable(this Type typeToMock)
-		{
-			return typeToMock.ContainsDeserializationConstructor() && typeToMock.IsGetObjectDataVirtual();
-		}
-
-		private static bool IsGetObjectDataVirtual(this Type typeToMock)
-		{
-#if NETCORE
-			return false;
-#else
-			var getObjectDataMethod = typeToMock.GetInterfaceMap(typeof (ISerializable)).TargetMethods[0];
-			return !getObjectDataMethod.IsPrivate && getObjectDataMethod.IsVirtual && !getObjectDataMethod.IsFinal;
-#endif
-		}
-
-		private static bool ContainsDeserializationConstructor(this Type typeToMock)
-		{
-#if NETCORE
-			return false;
-#else
-			return typeToMock.GetConstructor(
-				BindingFlags.Instance | BindingFlags.Public | BindingFlags.NonPublic,
-				null,
-				new[] {typeof (SerializationInfo), typeof (StreamingContext)},
-				null) != null;
-#endif
 		}
 
 		public static bool CanOverride(this MethodBase method)

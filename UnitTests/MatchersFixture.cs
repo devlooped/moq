@@ -58,69 +58,69 @@ namespace Moq.Tests
 			Assert.Equal(2, mock.Object.Echo(9));
 		}
 
-        [Fact]
-        public void MatchesIsInEnumerable()
-        {
-            var mock = new Mock<IFoo>();
+		[Fact]
+		public void MatchesIsInEnumerable()
+		{
+			var mock = new Mock<IFoo>();
 
-            mock.Setup(x => x.Echo(It.IsIn(Enumerable.Range(1, 5)))).Returns(1);
-            mock.Setup(x => x.Echo(It.IsIn(Enumerable.Range(6, 10)))).Returns(2);
+			mock.Setup(x => x.Echo(It.IsIn(Enumerable.Range(1, 5)))).Returns(1);
+			mock.Setup(x => x.Echo(It.IsIn(Enumerable.Range(6, 10)))).Returns(2);
 
-            Assert.Equal(1, mock.Object.Echo(1));
-            Assert.Equal(1, mock.Object.Echo(2));
-            Assert.Equal(1, mock.Object.Echo(5));
+			Assert.Equal(1, mock.Object.Echo(1));
+			Assert.Equal(1, mock.Object.Echo(2));
+			Assert.Equal(1, mock.Object.Echo(5));
 
-            Assert.Equal(2, mock.Object.Echo(7));
-            Assert.Equal(2, mock.Object.Echo(9));
-        }
+			Assert.Equal(2, mock.Object.Echo(7));
+			Assert.Equal(2, mock.Object.Echo(9));
+		}
 
-        [Fact]
-        public void MatchesIsInVariadicParameters()
-        {
-            var mock = new Mock<IFoo>();
+		[Fact]
+		public void MatchesIsInVariadicParameters()
+		{
+			var mock = new Mock<IFoo>();
 
-            mock.Setup(x => x.Echo(It.IsIn(1, 2, 3, 4, 5))).Returns(1);
-            mock.Setup(x => x.Echo(It.IsIn(6, 7, 8, 9, 10))).Returns(2);
+			mock.Setup(x => x.Echo(It.IsIn(1, 2, 3, 4, 5))).Returns(1);
+			mock.Setup(x => x.Echo(It.IsIn(6, 7, 8, 9, 10))).Returns(2);
 
-            Assert.Equal(1, mock.Object.Echo(1));
-            Assert.Equal(1, mock.Object.Echo(2));
-            Assert.Equal(1, mock.Object.Echo(5));
+			Assert.Equal(1, mock.Object.Echo(1));
+			Assert.Equal(1, mock.Object.Echo(2));
+			Assert.Equal(1, mock.Object.Echo(5));
 
-            Assert.Equal(2, mock.Object.Echo(7));
-            Assert.Equal(2, mock.Object.Echo(9));
-        }
+			Assert.Equal(2, mock.Object.Echo(7));
+			Assert.Equal(2, mock.Object.Echo(9));
+		}
 
-        [Fact]
-        public void MatchesIsNotInEnumerable()
-        {
-            var mock = new Mock<IFoo>();
+		[Fact]
+		public void MatchesIsNotInEnumerable()
+		{
+			var mock = new Mock<IFoo>();
 
-            mock.Setup(x => x.Echo(It.IsNotIn(Enumerable.Range(1, 5)))).Returns(1);
-            mock.Setup(x => x.Echo(It.IsNotIn(Enumerable.Range(6, 10)))).Returns(2);
+			mock.Setup(x => x.Echo(It.IsNotIn(Enumerable.Range(1, 5)))).Returns(1);
+			mock.Setup(x => x.Echo(It.IsNotIn(Enumerable.Range(6, 10)))).Returns(2);
 
-            Assert.Equal(2, mock.Object.Echo(1));
-            Assert.Equal(2, mock.Object.Echo(2));
-            Assert.Equal(2, mock.Object.Echo(5));
+			Assert.Equal(2, mock.Object.Echo(1));
+			Assert.Equal(2, mock.Object.Echo(2));
+			Assert.Equal(2, mock.Object.Echo(5));
 
-            Assert.Equal(1, mock.Object.Echo(7));
-            Assert.Equal(1, mock.Object.Echo(9));
-        }
+			Assert.Equal(1, mock.Object.Echo(7));
+			Assert.Equal(1, mock.Object.Echo(9));
+		}
 
-        [Fact]
-        public void MatchesIsNotInVariadicParameters()
-        {
-            var mock = new Mock<IFoo>();
+		[Fact]
+		public void MatchesIsNotInVariadicParameters()
+		{
+			var mock = new Mock<IFoo>();
 
-            mock.Setup(x => x.Echo(It.IsNotIn(1, 2, 3, 4, 5))).Returns(1);
-            mock.Setup(x => x.Echo(It.IsNotIn(6, 7, 8, 9, 10))).Returns(2);
+			mock.Setup(x => x.Echo(It.IsNotIn(1, 2, 3, 4, 5))).Returns(1);
+			mock.Setup(x => x.Echo(It.IsNotIn(6, 7, 8, 9, 10))).Returns(2);
 
-            Assert.Equal(2, mock.Object.Echo(1));
-            Assert.Equal(2, mock.Object.Echo(2));
-            Assert.Equal(2, mock.Object.Echo(5));
+			Assert.Equal(2, mock.Object.Echo(1));
+			Assert.Equal(2, mock.Object.Echo(2));
+			Assert.Equal(2, mock.Object.Echo(5));
 
-            Assert.Equal(1, mock.Object.Echo(7));
-            Assert.Equal(1, mock.Object.Echo(9));
-        }
+			Assert.Equal(1, mock.Object.Echo(7));
+			Assert.Equal(1, mock.Object.Echo(9));
+		}
 
 		[Fact]
 		public void DoesNotMatchOutOfRange()
@@ -266,20 +266,20 @@ namespace Moq.Tests
 			Assert.Equal(0, mock.Object.TakesNullableParameter(null));
 		}
 
-        [Fact]
-        public void MultipleMatchingSetupsWithMultiplValueTypeArgumentsReplaceEachOtherForVerify()
-        {
-            var mock = new Mock<IFoo>();
+		[Fact]
+		public void MultipleMatchingSetupsWithMultiplValueTypeArgumentsReplaceEachOtherForVerify()
+		{
+			var mock = new Mock<IFoo>();
 
-            mock.Setup(x => x.TakesTwoValueTypes(1, 2)).Verifiable();
-            mock.Setup(x => x.TakesTwoValueTypes(1, 2)).Verifiable();
+			mock.Setup(x => x.TakesTwoValueTypes(1, 2)).Verifiable();
+			mock.Setup(x => x.TakesTwoValueTypes(1, 2)).Verifiable();
 
-            mock.Object.TakesTwoValueTypes(1, 2);
+			mock.Object.TakesTwoValueTypes(1, 2);
 
-            mock.Verify();
-        }
-        
-        private int GetToRange()
+			mock.Verify();
+		}
+
+		private int GetToRange()
 		{
 			return 5;
 		}
@@ -296,7 +296,7 @@ namespace Moq.Tests
 			int DoAddition(int[] numbers);
 			int[] Items { get; set; }
 			int TakesNullableParameter(int? value);
-            void TakesTwoValueTypes(int a, int b);
-        }
+			void TakesTwoValueTypes(int a, int b);
+		}
 	}
 }
