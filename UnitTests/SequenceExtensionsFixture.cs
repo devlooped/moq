@@ -52,20 +52,12 @@ namespace Moq.Tests
 			mock.SetupSequence(x => x.Value)
 				.Returns("foo")
 				.Returns("bar")
-#if !NETCORE
-				.Throws<SystemException>();
-#else
-				.Throws<FormatException>();
-#endif
+				.Throws<InvalidOperationException>();
 
 			string temp;
 			Assert.Equal("foo", mock.Object.Value);
 			Assert.Equal("bar", mock.Object.Value);
-#if !NETCORE
-			Assert.Throws<SystemException>(() => temp = mock.Object.Value);
-#else
-			Assert.Throws<FormatException>(() => temp = mock.Object.Value);
-#endif
+			Assert.Throws<InvalidOperationException>(() => temp = mock.Object.Value);
 		}
 
 		[Fact]

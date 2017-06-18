@@ -16,6 +16,8 @@ using Xunit;
 
 #if !NETCORE
 using System.Web.UI.HtmlControls;
+#endif
+#if FEATURE_SERIALIZATION
 using System.Runtime.Serialization;
 #endif
 using System.Threading;
@@ -122,7 +124,7 @@ namespace Moq.Tests.Regressions
 #endregion
 
 		#region #78
-#if !NET3x
+
 		public interface IIssue78Interface
 		{
 			Issue78TypeOne GetTypeOne();
@@ -167,7 +169,7 @@ namespace Moq.Tests.Regressions
 				mock.VerifyAll();
 			}
 		}
-#endif
+
 		#endregion
 
 		#region 82
@@ -210,7 +212,7 @@ namespace Moq.Tests.Regressions
 
 		#region 163
 
-#if !NETCORE
+#if FEATURE_SERIALIZATION
 		public class Issue163  // see also issue 340 below
 		{
 			[Fact]
@@ -674,7 +676,7 @@ namespace Moq.Tests.Regressions
 
 		#region 340
 
-#if !NETCORE
+#if FEATURE_SERIALIZATION
 		/// <summary>
 		/// These tests check whether the presence of a deserialization ctor and/or a GetObjectData
 		/// method alone can fool Moq into assuming that a type is ISerializable, or implements

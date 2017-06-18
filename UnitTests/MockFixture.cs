@@ -47,7 +47,7 @@ namespace Moq.Tests
 			Assert.Contains("mock", mock.ToString().ToLower());
 		}
 
-#if !NETCORE
+#if FEATURE_CODEDOM
 		[Fact]
 		public void HasADefaultNameThatIncludesItsGenericParameters()
 		{

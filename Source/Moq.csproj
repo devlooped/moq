@@ -30,10 +30,10 @@
 		<Optimize>false</Optimize>
 	</PropertyGroup>
 	<PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Debug|AnyCPU' ">
-		<DefineConstants>$(DefineConstants);TRACE;DEBUG;DESKTOP;FEATURE_SERIALIZATION</DefineConstants>
+		<DefineConstants>$(DefineConstants);TRACE;DEBUG;DESKTOP;FEATURE_CAS;FEATURE_CODEDOM;FEATURE_COM;FEATURE_SERIALIZATION</DefineConstants>
 	</PropertyGroup>
 	<PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Release|AnyCPU' ">
-		<DefineConstants>$(DefineConstants);TRACE;CODE_ANALYSIS;FEATURE_SERIALIZATION</DefineConstants>
+		<DefineConstants>$(DefineConstants);TRACE;CODE_ANALYSIS;FEATURE_CAS;FEATURE_CODEDOM;FEATURE_COM;FEATURE_SERIALIZATION</DefineConstants>
 		<RunCodeAnalysis>true</RunCodeAnalysis>
 	</PropertyGroup>
 	<ItemGroup>
@@ -89,12 +89,6 @@
 			<DesignTime>True</DesignTime>
 			<DependentUpon>MethodCallReturn.tt</DependentUpon>
 		</Compile>
-		<Compile Include="Microsoft\Delegates.cs">
-			<AutoGen>True</AutoGen>
-			<DesignTime>True</DesignTime>
-			<DependentUpon>Delegates.tt</DependentUpon>
-		</Compile>
-		<Compile Include="Microsoft\ExpressionVisitor.cs" />
 		<Compile Include="MockExtensions.cs" />
 		<Compile Include="MockSequence.cs" />
 		<Compile Include="Obsolete\IOccurrence.cs" />
@@ -189,10 +183,6 @@
 		<None Include="MethodCallReturn.tt">
 			<Generator>TextTemplatingFileGenerator</Generator>
 			<LastGenOutput>MethodCallReturn.Generated.cs</LastGenOutput>
-		</None>
-		<None Include="Microsoft\Delegates.tt">
-			<Generator>TextTemplatingFileGenerator</Generator>
-			<LastGenOutput>Delegates.cs</LastGenOutput>
 		</None>
 		<None Include="Mock.Generic.xdoc">
 			<DependentUpon>Mock.Generic.cs</DependentUpon>

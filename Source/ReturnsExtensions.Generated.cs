@@ -1,5 +1,4 @@
-﻿#if !NET3x
-using System;
+﻿using System;
 using System.Threading.Tasks;
 using Moq.Language;
 using Moq.Language.Flow;
@@ -165,4 +164,3 @@ namespace Moq
 		}
 	}
 }
-#endif

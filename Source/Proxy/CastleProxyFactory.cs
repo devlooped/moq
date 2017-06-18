@@ -43,8 +43,11 @@ using System.Linq;
 using System.Collections.Generic;
 using System.Globalization;
 using System.Reflection;
-#if !NETCORE
+#if FEATURE_CAS
 using System.Security.Permissions;
+#endif
+#if FEATURE_COM
+using System.Runtime.InteropServices;
 #endif
 using Castle.DynamicProxy;
 using Castle.DynamicProxy.Generators;
@@ -60,21 +63,18 @@ namespace Moq.Proxy
 		[SuppressMessage("Microsoft.Performance", "CA1810:InitializeReferenceTypeStaticFieldsInline", Justification = "By Design")]
 		static CastleProxyFactory()
 		{
-#if !NETCORE
-#pragma warning disable 618
+#if FEATURE_CAS
 			AttributesToAvoidReplicating.Add<SecurityPermissionAttribute>();
-#pragma warning restore 618
-#endif
-
-#if !NETCORE
 			AttributesToAvoidReplicating.Add<ReflectionPermissionAttribute>();
 			AttributesToAvoidReplicating.Add<PermissionSetAttribute>();
-			AttributesToAvoidReplicating.Add<System.Runtime.InteropServices.MarshalAsAttribute>();
 			AttributesToAvoidReplicating.Add<UIPermissionAttribute>();
-#if !NET3x
-			AttributesToAvoidReplicating.Add<System.Runtime.InteropServices.TypeIdentifierAttribute>();
 #endif
+
+#if FEATURE_COM
+			AttributesToAvoidReplicating.Add<MarshalAsAttribute>();
+			AttributesToAvoidReplicating.Add<TypeIdentifierAttribute>();
 #endif
+
 			proxyOptions = new ProxyGenerationOptions { Hook = new ProxyMethodHook() };
 		}
 
