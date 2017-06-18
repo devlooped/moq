@@ -1,4 +1,4 @@
-﻿#if !NETCORE
+﻿#if FEATURE_SERIALIZATION
 
 using System;
 using System.Reflection;

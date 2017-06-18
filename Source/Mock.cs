@@ -746,7 +746,7 @@ namespace Moq
 				// to deal with loops in the property graph
 				valueProvider = new EmptyDefaultValueProvider();
 			}
-#if !NETCORE
+#if FEATURE_SERIALIZATION
 			else
 			{
 				// to make sure that properties of types that don't implement ISerializable properly (Castle throws ArgumentException)

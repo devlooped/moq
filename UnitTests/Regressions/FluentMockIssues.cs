@@ -1,5 +1,5 @@
 ﻿using System;
-#if !NETCORE
+#if FEATURE_SERIALIZATION
 using System.Runtime.Serialization;
 #endif
 using Xunit;
@@ -36,7 +36,7 @@ namespace Moq.Tests.Regressions
 			Assert.NotNull(foo.Object.Two.Three.LoopBack);
 		}
 
-#if !NETCORE
+#if FEATURE_SERIALIZATION
 		[Fact]
 		public void SerializableTypesNotImplementingISerializableProperlyNotMockable()
 		{
