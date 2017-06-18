@@ -911,6 +911,75 @@ namespace Moq.Tests
 			mock.Verify(foo => foo.Call(It.IsAny<IBazParam>()), Times.Exactly(2));
 		}
 
+		[Fact]
+		public void NullArrayValuesForActualInvocationArePrintedAsNullInMockExeptionMessage()
+		{
+			var strings = new string[] { "1", null, "3" };
+			var mock = new Mock<IArrays>();
+			mock.Object.Method(strings);
+			var mex = Assert.Throws<MockException>(() => mock.Verify(_ => _.Method(null)));
+			Assert.Contains(
+				@"Performed invocations:" + Environment.NewLine +
+				@"IArrays.Method([""1"", null, ""3""])",
+				mex.Message);
+		}
+
+		[Fact]
+		public void LargeEnumerablesInActualInvocationAreNotCutOffFor10Elements()
+		{
+			var strings = new string[] { "1", null, "3", "4", "5", "6", "7", "8", "9", "10" };
+			var mock = new Mock<IArrays>();
+			mock.Object.Method(strings);
+			var mex = Assert.Throws<MockException>(() => mock.Verify(_ => _.Method(null)));
+			Assert.Contains(
+				@"Performed invocations:" + Environment.NewLine +
+				@"IArrays.Method([""1"", null, ""3"", ""4"", ""5"", ""6"", ""7"", ""8"", ""9"", ""10""])",
+				mex.Message);
+		}
+
+		[Fact]
+		public void LargeEnumerablesInActualInvocationAreCutOffAfter10Elements()
+		{
+			var strings = new string[] { "1", null, "3", "4", "5", "6", "7", "8", "9", "10", "11" };
+			var mock = new Mock<IArrays>();
+			mock.Object.Method(strings);
+			var mex = Assert.Throws<MockException>(() => mock.Verify(_ => _.Method(null)));
+			Assert.Contains(
+				@"Performed invocations:" + Environment.NewLine +
+				@"IArrays.Method([""1"", null, ""3"", ""4"", ""5"", ""6"", ""7"", ""8"", ""9"", ""10"", ...])",
+				mex.Message);
+		}
+
+		[Fact]
+		public void NullArrayValuesForExpectedInvocationArePrintedAsNullInMockExeptionMessage()
+		{
+			var strings = new string[] { "1", null, "3" };
+			var mock = new Mock<IArrays>();
+			mock.Object.Method(null);
+			var mex = Assert.Throws<MockException>(() => mock.Verify(_ => _.Method(strings)));
+			Assert.Contains(@"Expected invocation on the mock at least once, but was never performed: _ => _.Method([""1"", null, ""3""])", mex.Message);
+		}
+
+		[Fact]
+		public void LargeEnumerablesInExpectedInvocationAreNotCutOffFor10Elements()
+		{
+			var strings = new string[] { "1", null, "3", "4", "5", "6", "7", "8", "9", "10" };
+			var mock = new Mock<IArrays>();
+			mock.Object.Method(null);
+			var mex = Assert.Throws<MockException>(() => mock.Verify(_ => _.Method(strings)));
+			Assert.Contains(@"Expected invocation on the mock at least once, but was never performed: _ => _.Method([""1"", null, ""3"", ""4"", ""5"", ""6"", ""7"", ""8"", ""9"", ""10""])", mex.Message);
+		}
+
+		[Fact]
+		public void LargeEnumerablesInExpectedInvocationAreCutOffAfter10Elements()
+		{
+			var strings = new string[] { "1", null, "3", "4", "5", "6", "7", "8", "9", "10", "11" };
+			var mock = new Mock<IArrays>();
+			mock.Object.Method(null);
+			var mex = Assert.Throws<MockException>(() => mock.Verify(_ => _.Method(strings)));
+			Assert.Contains(@"Expected invocation on the mock at least once, but was never performed: _ => _.Method([""1"", null, ""3"", ""4"", ""5"", ""6"", ""7"", ""8"", ""9"", ""10"", ...])", mex.Message);
+		}
+
 		/// <summary>
 		/// Warning, this is a flaky test and doesn't fail when run as standalone. Running all tests at once will increase the chances of that test to fail.
 		/// </summary>
@@ -957,6 +1026,11 @@ namespace Moq.Tests
 
 		public class BazParam2:BazParam
 		{
+		}
+
+		public interface IArrays
+		{
+			void Method(string[] strings);
 		}
 	}
 }
