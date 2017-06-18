@@ -89,9 +89,12 @@ namespace Moq
 			{
 				return "\"" + typedValue + "\"";
 			}
-			if (value is IEnumerable)
+			if (value is IEnumerable enumerable)
 			{
-				return "[" + string.Join(", ", ((IEnumerable) value).OfType<object>().Select(GetValue)) + "]";
+				const int maxCount = 10;
+				var objs = enumerable.Cast<object>().Take(maxCount + 1);
+				var more = objs.Count() > maxCount ? ", ..." : string.Empty;
+				return "[" + string.Join(", ", objs.Take(maxCount).Select(GetValue)) + more + "]";
 			}
 			return value.ToString();
 		}
