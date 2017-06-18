@@ -181,6 +181,7 @@ Version 1.0
 			<group targetFramework=".NETStandard1.3">
 				<dependency id="NETStandard.Library" version="1.6.1" />
 				<dependency id="System.Linq.Queryable" version="4.3.0" />
+				<dependency id="System.Reflection.TypeExtensions" version="4.3.0" />
 				<dependency id="Castle.Core" version="4.1.0" />
 			</group>
 		</dependencies>
