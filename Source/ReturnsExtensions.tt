@@ -2,7 +2,6 @@
 <#@ output extension=".Generated.cs" #>
 <#@ Assembly Name="System.Core" #>
 <#@ Import Namespace="System.Linq" #>
-#if !NET3x
 using System;
 using System.Threading.Tasks;
 using Moq.Language;
@@ -61,4 +60,3 @@ namespace Moq
 		#>
 	}
 }
-#endif

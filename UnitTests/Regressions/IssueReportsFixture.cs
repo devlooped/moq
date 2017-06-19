@@ -16,6 +16,8 @@ using Xunit;
 
 #if !NETCORE
 using System.Web.UI.HtmlControls;
+#endif
+#if FEATURE_SERIALIZATION
 using System.Runtime.Serialization;
 #endif
 using System.Threading;
@@ -122,7 +124,7 @@ namespace Moq.Tests.Regressions
 #endregion
 
 		#region #78
-#if !NET3x
+
 		public interface IIssue78Interface
 		{
 			Issue78TypeOne GetTypeOne();
@@ -167,12 +169,50 @@ namespace Moq.Tests.Regressions
 				mock.VerifyAll();
 			}
 		}
-#endif
+
+		#endregion
+
+		#region 82
+
+		public class Issue82
+		{
+			public interface ILogger
+			{
+				event Action info;
+				void add_info(string info);
+				void Add_info(string info);
+				void remove_info(string info);
+				void Remove_info(string info);
+			}
+
+			[Fact]
+			public void MethodWithAddUnderscoreNamePrefixDoesNotGetMisrecognizedAsEventAccessor()
+			{
+				var mock = new Mock<ILogger>();
+				mock.Setup(x => x.add_info(It.IsAny<string>()));
+				mock.Setup(x => x.Add_info(It.IsAny<string>()));
+
+				mock.Object.add_info(string.Empty);
+				mock.Object.Add_info(string.Empty);
+			}
+
+			[Fact]
+			public void MethodWithRemoveUnderscoreNamePrefixDoesNotGetMisrecognizedAsEventAccessor()
+			{
+				var mock = new Mock<ILogger>();
+				mock.Setup(x => x.remove_info(It.IsAny<string>()));
+				mock.Setup(x => x.Remove_info(It.IsAny<string>()));
+
+				mock.Object.remove_info(string.Empty);
+				mock.Object.Remove_info(string.Empty);
+			}
+		}
+
 		#endregion
 
 		#region 163
 
-#if !NETCORE
+#if FEATURE_SERIALIZATION
 		public class Issue163  // see also issue 340 below
 		{
 			[Fact]
@@ -636,7 +676,7 @@ namespace Moq.Tests.Regressions
 
 		#region 340
 
-#if !NETCORE
+#if FEATURE_SERIALIZATION
 		/// <summary>
 		/// These tests check whether the presence of a deserialization ctor and/or a GetObjectData
 		/// method alone can fool Moq into assuming that a type is ISerializable, or implements

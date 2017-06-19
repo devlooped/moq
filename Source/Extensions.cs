@@ -44,9 +44,6 @@ using System.Diagnostics.CodeAnalysis;
 using System.Globalization;
 using System.Linq;
 using System.Reflection;
-#if !NETCORE
-using System.Runtime.Serialization;
-#endif
 using Moq.Proxy;
 using System.Linq.Expressions;
 using Moq.Properties;

@@ -61,12 +61,12 @@ namespace Moq
 		}
 
 
-		public static bool IsEventAttach(this MethodBase method)
+		public static bool LooksLikeEventAttach(this MethodBase method)
 		{
 			return method.Name.StartsWith("add_", StringComparison.Ordinal);
 		}
 
-		public static bool IsEventDetach(this MethodBase method)
+		public static bool LooksLikeEventDetach(this MethodBase method)
 		{
 			return method.Name.StartsWith("remove_", StringComparison.Ordinal);
 		}

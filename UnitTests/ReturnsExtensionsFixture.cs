@@ -376,7 +376,7 @@ namespace Moq.Tests
 		}
 
 		[Fact]
-		public async Task ReturnsAsyncWithNullRandomGenerator()
+		public void ReturnsAsyncWithNullRandomGenerator()
 		{
 			var mock = new Mock<IAsyncInterface>();
 
@@ -441,7 +441,7 @@ namespace Moq.Tests
 
 
 		[Fact]
-		public async Task ThrowsAsyncWithNullRandomGenerator()
+		public void ThrowsAsyncWithNullRandomGenerator()
 		{
 			var mock = new Mock<IAsyncInterface>();
 

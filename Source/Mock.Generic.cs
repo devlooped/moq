@@ -48,7 +48,7 @@ using Moq.Language;
 using System.Reflection;
 using System.Threading;
 
-#if !NETCORE
+#if FEATURE_CODEDOM
 using System.CodeDom;
 using Microsoft.CSharp;
 #endif
@@ -129,7 +129,7 @@ namespace Moq
 
 			var typeName = typeof (T).FullName;
 
-#if !NETCORE
+#if FEATURE_CODEDOM
 			if (typeof (T).IsGenericType)
 			{
 				using (var provider = new CSharpCodeProvider())
