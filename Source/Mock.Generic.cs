@@ -213,7 +213,7 @@ namespace Moq
 					this.instance = (T)proxyFactory.CreateProxy(
 						typeof(T),
 						this.Interceptor,
-						this.ImplementedInterfaces.ToArray(),
+						this.ImplementedInterfaces.Skip(this.InternallyImplementedInterfaceCount - 1).ToArray(),
 						this.constructorArguments);
 				}
 			});
