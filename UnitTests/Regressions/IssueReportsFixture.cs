@@ -210,6 +210,68 @@ namespace Moq.Tests.Regressions
 
 		#endregion
 
+		#region 156
+
+		public class Issue156
+		{
+			[Fact]
+			public void Test()
+			{
+				var mock = new Mock<A>(MockBehavior.Strict);
+
+				var actualViaObject = mock.Object.Foo();
+				var actualViaInterface = ((IA)mock.Object).Foo();
+
+				Assert.Equal(42, actualViaObject);
+				Assert.Equal(42, actualViaInterface);
+			}
+
+			public class A : IA
+			{
+				public int Foo()
+				{
+					return 42;
+				}
+			}
+
+			public interface IA
+			{
+				int Foo();
+			}
+		}
+
+		#endregion
+
+		#region 157
+
+		public class Issue157
+		{
+			[Fact]
+			public void Test()
+			{
+				var streamMock = new Mock<Stream>();
+
+				using (var stream = streamMock.Object) { }
+
+				// non-mocked Dispose methods calls Close which is virtual and can thus be verified
+				streamMock.Verify(x => x.Close());
+			}
+
+			public class Stream : IDisposable
+			{
+				public void Dispose()
+				{
+					Close();
+				}
+
+				public virtual void Close()
+				{
+				}
+			}
+		}
+
+		#endregion
+
 		#region 163
 
 #if FEATURE_SERIALIZATION
@@ -361,6 +423,127 @@ namespace Moq.Tests.Regressions
 			}
 		}
 #endif
+
+		#endregion
+
+		#region 175
+
+		public class Issue175
+		{
+			[Fact]
+			public void MoqErrors()
+			{
+				Mock<ExtendingTypeBase> fake = new Mock<ExtendingTypeBase>(42);
+				ExtendingTypeBase realFake = fake.Object;
+
+				// Make sure we're telling the truth that the value is mocked prior to our frobbing
+				Assert.Equal(42, realFake.ExtendedValue);
+
+				Frobber frobber = new Frobber(realFake);
+
+				Assert.True(frobber.WasExtendedType);
+				// BUGBUG: Seems to have been set back to the default for this type (Moq type is by default LOOSE)
+				Assert.Equal(42, frobber.ExtendedTypeValue);  // "BUGBUG: Moq Lost the value and set back to default."
+			}
+
+			[Fact(Skip = "Not relevant right now.")]
+			public void CSharpIsCoolWithIt()
+			{
+				ExtendingTypeBase real = new ExtendedConcreteType(42);
+
+				// Make sure we're telling the truth that the value is mocked prior to our frobbing
+				Assert.Equal(42, real.ExtendedValue);
+
+				Frobber frobber = new Frobber(real);
+
+				Assert.True(frobber.WasExtendedType);
+				Assert.Equal(42, frobber.ExtendedTypeValue);
+			}
+
+			[Fact]
+			public void MoqErrorsTwo()
+			{
+				var rootMock = new Mock<ExtendingTypeBase>(42);
+				ExtendingTypeBase realObject = rootMock.Object;
+				IExtendedType realObjectInterfaceType = rootMock.Object;
+				Assert.Equal(42, realObject.ExtendedValue);
+				// BUGBUG: Seems to have been set back to the default for this type (Moq type is by default LOOSE)
+				Assert.Equal(42, realObjectInterfaceType.ExtendedValue);
+			}
+
+			[Fact]
+			public void MoqErrorsThree()
+			{
+				var rootMock = new Mock<ExtendingTypeBase>(42);
+				ExtendingTypeBase realObject = rootMock.Object;
+				IExtendedType realObjectInterfaceType = rootMock.As<IExtendedType>().Object;
+				Assert.Equal(42, realObject.ExtendedValue);
+				// BUGBUG: Seems to have been set back to the default for this type (Moq type is by default LOOSE)
+				Assert.Equal(42, realObjectInterfaceType.ExtendedValue);
+			}
+
+			public class Frobber
+			{
+				List<ISharedType> internalStore;
+
+				public Frobber(params ISharedType[] inputs)
+				{
+					// Save the Internal Store
+					this.internalStore = new List<ISharedType>(inputs);
+				}
+
+				public bool WasExtendedType
+				{
+					get
+					{
+						return this.internalStore.First() is IExtendedType;
+					}
+				}
+
+				public int ExtendedTypeValue
+				{
+					get
+					{
+						return ((IExtendedType)this.internalStore.First()).ExtendedValue;
+					}
+				}
+			}
+
+			public class ExtendedConcreteType : ExtendingTypeBase
+			{
+				public ExtendedConcreteType(int extendedValue) :
+					base(extendedValue)
+				{
+				}
+
+				public override int CommonValue
+				{
+					get;
+					set;
+				}
+			}
+
+			public interface ISharedType
+			{
+				int CommonValue { get; set; }
+			}
+
+			public interface IExtendedType
+			{
+				int ExtendedValue { get; set; }
+			}
+
+			public abstract class ExtendingTypeBase : ISharedType, IExtendedType
+			{
+				public ExtendingTypeBase(int extendedValue)
+				{
+					this.ExtendedValue = extendedValue;
+				}
+
+				public abstract int CommonValue { get; set; }
+				public int ExtendedValue { get; set; }
+			}
+		}
 
 		#endregion
 
@@ -673,6 +856,32 @@ namespace Moq.Tests.Regressions
 		}
 
 		#endregion // #328
+
+		#region 331
+
+		public class Issue331
+		{
+			[Fact]
+			public void Test()
+			{
+				var mock = new Mock<Foo>();
+				IFoo i = mock.Object;
+				i.Property = true;
+				Assert.True(i.Property);
+			}
+
+			public interface IFoo
+			{
+				bool Property { get; set; }
+			}
+
+			public class Foo : IFoo
+			{
+				public bool Property { get; set; }
+			}
+		}
+
+		#endregion
 
 		#region 340
 
