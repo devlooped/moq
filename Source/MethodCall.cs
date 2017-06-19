@@ -208,7 +208,7 @@ namespace Moq
 			}
 		}
 
-		public void SetOutParameters(ICallContext call)
+		public void SetOutParameters(IExtendedCallContext call)
 		{
 			foreach (var item in this.outValues)
 			{
@@ -218,7 +218,7 @@ namespace Moq
 			}
 		}
 
-		public virtual bool Matches(ICallContext call)
+		public virtual bool Matches(IExtendedCallContext call)
 		{
 			if (condition != null && !condition.IsTrue)
 			{
@@ -257,7 +257,7 @@ namespace Moq
 				condition.EvaluatedSuccessfully();
 		}
 
-		public virtual void Execute(ICallContext call)
+		public virtual void Execute(IExtendedCallContext call)
 		{
 			this.Invoked = true;
 
@@ -366,7 +366,7 @@ namespace Moq
 			this.FailMessage = failMessage;
 		}
 
-		private bool IsEqualMethodOrOverride(ICallContext call)
+		private bool IsEqualMethodOrOverride(IExtendedCallContext call)
 		{
 			if (call.Method == this.Method)
 			{
@@ -394,12 +394,12 @@ namespace Moq
 			return false;
 		}
 
-		private bool IsMethodParameterTypesEqual(ICallContext call)
+		private bool IsMethodParameterTypesEqual(IExtendedCallContext call)
 		{
 			return call.Method.GetParameterTypes().SequenceEqual(this.Method.GetParameterTypes());
 		}
 
-		private bool IsMethodReturnTypeEqual(ICallContext call)
+		private bool IsMethodReturnTypeEqual(IExtendedCallContext call)
 		{
 			return this.Method.ReturnType == call.Method.ReturnType || Method.ReturnType.IsAnyType();
 		}

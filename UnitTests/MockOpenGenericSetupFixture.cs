@@ -64,7 +64,7 @@ namespace Moq.Tests
 			var mock = new Mock<IHasOpenGeneric>();
 
 			int callCount = 0;
-			IPublicCallContext callContext = null;
+			ICallContext callContext = null;
 
 			mock.Setup(x => x.Get<It.AnyType, It.AnyType, It.AnyType>(It.IsAny<It.AnyType>()))
 				.Returns(context =>
@@ -100,7 +100,7 @@ namespace Moq.Tests
 			var mock = new Mock<IHasOpenGeneric>();
 
 			int callCount = 0;
-			IPublicCallContext callContext = null;
+			ICallContext callContext = null;
 
 			mock.Setup((Expression<Func<IHasOpenGeneric, It.AnyType>>)(x => x.GetWhere<ItAnySomeBaseClass, ItAnySomeBaseClass, ItAnySomeBaseClass>(It.IsAny<ItAnySomeBaseClass>())))
 				.Returns(context =>

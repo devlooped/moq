@@ -91,7 +91,7 @@ namespace Moq
 			return this.RaisesImpl(eventExpression, args);
 		}
 
-		public IReturnsResult<TMock> Returns(Func<IPublicCallContext, object> valueFunction)
+		public IReturnsResult<TMock> Returns(Func<ICallContext, object> valueFunction)
 		{
 			valueDelCallContext = valueFunction;
 			return this;
@@ -165,7 +165,7 @@ namespace Moq
 			}
 		}
 
-		public override void Execute(ICallContext call)
+		public override void Execute(IExtendedCallContext call)
 		{
 			base.Execute(call);
 

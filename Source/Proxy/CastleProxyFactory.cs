@@ -168,7 +168,7 @@ namespace Moq.Proxy
 			}
 		}
 
-		private class CallContext : ICallContext
+		private class CallContext : IExtendedCallContext
 		{
 			private IInvocation invocation;
 

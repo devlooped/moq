@@ -92,14 +92,14 @@ namespace Moq
 		private ExceptionReason reason;
 
 		internal MockException(ExceptionReason reason, MockBehavior behavior,
-			ICallContext invocation)
+			IExtendedCallContext invocation)
 			: this(reason, behavior, invocation,
 				Properties.Resources.ResourceManager.GetString(reason.ToString()))
 		{
 		}
 
 		internal MockException(ExceptionReason reason, MockBehavior behavior,
-			ICallContext invocation, string message)
+			IExtendedCallContext invocation, string message)
 			: base(GetMessage(behavior, invocation, message))
 		{
 			this.reason = reason;
@@ -126,7 +126,7 @@ namespace Moq
 
 		private static string GetMessage(
 			MockBehavior behavior,
-			ICallContext invocation,
+			IExtendedCallContext invocation,
 			string message)
 		{
 			return string.Format(

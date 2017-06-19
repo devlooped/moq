@@ -55,9 +55,9 @@ namespace Moq
 		MethodInfo Method { get; }
 		void EvaluatedSuccessfully();
 
-		bool Matches(ICallContext call);
-		void Execute(ICallContext call);
-		void SetOutParameters(ICallContext call);
+		bool Matches(IExtendedCallContext call);
+		void Execute(IExtendedCallContext call);
+		void SetOutParameters(IExtendedCallContext call);
 
 		// Where the setup was performed.
 		string FileName { get; }

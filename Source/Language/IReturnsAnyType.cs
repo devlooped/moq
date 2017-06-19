@@ -70,6 +70,6 @@ namespace Moq.Language
 		/// is executed and the value the <c>returnValues</c> array has at 
 		/// that moment.
 		/// </example>
-		IReturnsResult<TMock> Returns(Func<IPublicCallContext, object> valueFunction);
+		IReturnsResult<TMock> Returns(Func<ICallContext, object> valueFunction);
 	}
 }

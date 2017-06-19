@@ -1,5 +1,5 @@
-﻿//Copyright (c) 2007. Clarius Consulting, Manas Technology Solutions, InSTEDD
-//https://github.com/moq/moq4
+//Copyright (c) 2007. Clarius Consulting, Manas Technology Solutions, InSTEDD
+//http://code.google.com/p/moq/
 //All rights reserved.
 
 //Redistribution and use in source and binary forms, 
@@ -38,16 +38,24 @@
 //[This is the BSD license, see
 // http://www.opensource.org/licenses/bsd-license.php]
 
-using System;
+using System.Reflection;
 
-namespace Moq.Proxy
+namespace Moq
 {
-	internal interface ICallContext : IPublicCallContext
+	/// <summary>
+	/// Class that represents the method call currently being executed. 
+	/// Allows for custom interception for open generic methods
+	/// </summary>
+	public interface ICallContext
 	{
-		object ReturnValue { get; set; }
+		/// <summary>
+		/// Arguments passed into the method
+		/// </summary>
+		object[] Arguments { get; }
 
-		void InvokeBase();
-
-		void SetArgumentValue(int index, object value);
+		/// <summary>
+		/// Closed generic method currently being executed.
+		/// </summary>
+		MethodInfo Method { get; }
 	}
 }

@@ -387,7 +387,7 @@ namespace Moq
 		private static void ThrowVerifyException(
 			MethodCall expected,
 			IEnumerable<IProxyCall> setups,
-			IEnumerable<ICallContext> actualCalls,
+			IEnumerable<IExtendedCallContext> actualCalls,
 			Expression expression,
 			Times times,
 			int callCount)
@@ -424,7 +424,7 @@ namespace Moq
 			return string.Format(CultureInfo.CurrentCulture, "Times.Exactly({0})", callCount);
 		}
 
-		private static string FormatInvocations(IEnumerable<ICallContext> invocations)
+		private static string FormatInvocations(IEnumerable<IExtendedCallContext> invocations)
 		{
 			var formattedInvocations = invocations
 				.Select(i => i.Format())

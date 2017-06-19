@@ -58,7 +58,7 @@ namespace Moq
 		private static readonly FieldInfo remoteStackTraceString = typeof (Exception).GetField("_remoteStackTraceString",
 			BindingFlags.Instance | BindingFlags.NonPublic);
 
-		public static string Format(this ICallContext invocation)
+		public static string Format(this IExtendedCallContext invocation)
 		{
 			if (invocation.Method.IsPropertyGetter())
 			{

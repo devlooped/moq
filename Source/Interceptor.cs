@@ -132,7 +132,7 @@ namespace Moq
 		}
 
 		[SuppressMessage("Microsoft.Maintainability", "CA1502:AvoidExcessiveComplexity")]
-		public void Intercept(ICallContext invocation)
+		public void Intercept(IExtendedCallContext invocation)
 		{
 			CurrentInterceptContext localCtx = new CurrentInterceptContext();
 			foreach (var strategy in InterceptionStrategies())
