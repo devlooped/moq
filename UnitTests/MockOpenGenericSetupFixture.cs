@@ -1,62 +1,11 @@
 ﻿using System;
-using System.Collections.Generic;
 using System.Linq.Expressions;
-using Moq.Proxy;
 using Xunit;
 
 namespace Moq.Tests
 {
 	public class MockOpenGenericSetupFixture
 	{
-		[Fact]
-		public void SetupReturns_ConditionalAnyType_UnmetCondition_DoesNotCallMockedReturn()
-		{
-			// Arrange
-			var mock = new Mock<IHasOpenGeneric>();
-
-			int callCount = 0;
-
-			mock.Setup(x => x.Get<It.AnyType, It.AnyType, It.AnyType>(It.Is<It.AnyType>(type => type.Object as string == "TestInput")))
-				.Returns(context =>
-				{
-					callCount++;
-					return "TestOutput";
-				});
-
-			// Act
-			var res = mock.Object.Get<int, decimal, string>(2);
-		
-			// Assert
-			Assert.Equal(0, callCount);
-			Assert.Null(res);
-		}
-
-		[Fact]
-		public void SetupReturns_ConditionalAnyType_MetCondition_CallsMockedReturn()
-		{
-			// Arrange
-			var mock = new Mock<IHasOpenGeneric>();
-
-			int callCount = 0;
-
-			mock.Setup(x => x.Get<It.AnyType, It.AnyType, It.AnyType>(
-				// Conditional input argument similar to any other It.Is<Type>(x => x == y)
-				It.Is<It.AnyType>(type => type.Object as string == "TestInput")) 
-			)
-				.Returns(context =>
-				{
-					callCount++;
-					return "TestOutput";
-				});
-
-			// Act
-			var res = mock.Object.Get<string, decimal, string>("TestInput");
-		
-			// Assert
-			Assert.Equal(1, callCount);
-			Assert.Equal(res, "TestOutput");
-		}
-
 		[Fact]
 		public void SetupReturns_OpenGenericReturnArgument_And_Param()
 		{

@@ -159,8 +159,6 @@ namespace Moq
 		{
 			var anyType = CreateAnyType();
 
-			anyType.Object = value;
-
 			return (T) anyType;
 		}
 

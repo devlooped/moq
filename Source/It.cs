@@ -160,11 +160,6 @@ namespace Moq
 		/// </summary>
 		public interface AnyType
 		{
-			/// <summary>
-			/// Will contain the specific object being compared inside an open generic method.
-			/// Used for checking inside It.Is&lt;It.AnyType&gt;(x => ((int)x.Object) == 2)
-			/// </summary>
-			object Object { get; set; }
 		}
 
 		internal class AnyTypeImplementation : AnyType
