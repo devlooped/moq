@@ -66,8 +66,6 @@
       <DesignTime>True</DesignTime>
       <DependentUpon>IReturns.tt</DependentUpon>
     </Compile>
-    <Compile Include="Language\IReturnsAnyType.cs" />
-    <Compile Include="ICallContext.cs" />
     <Compile Include="Proxy\ProxyGenerationHelpers.cs" />
     <Compile Include="ReturnsExtensions.cs" />
     <Compile Include="Language\ISetupSequentialResult.cs" />
@@ -218,7 +216,7 @@
     <Compile Include="MockDefaultValueProvider.cs" />
     <Compile Include="Linq\Mocks.cs" />
     <Compile Include="PexProtector.cs" />
-    <Compile Include="Proxy\IExtendedCallContext.cs" />
+    <Compile Include="Proxy\ICallContext.cs" />
     <Compile Include="Proxy\CastleProxyFactory.cs" />
     <Compile Include="Proxy\ICallInterceptor.cs" />
     <Compile Include="Proxy\IProxyFactory.cs" />

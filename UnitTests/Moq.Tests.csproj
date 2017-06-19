@@ -59,8 +59,6 @@
     <Compile Include="ExtensionsFixture.cs" />
     <Compile Include="CaptureMatchFixture.cs" />
     <Compile Include="GeneratedReturnsExtensionsFixture.cs" />
-    <Compile Include="Matchers\AnyMatcherFixture.cs" />
-    <Compile Include="MockOpenGenericSetupFixture.cs" />
     <Compile Include="Regressions\FluentMockIssues.cs" />
     <Compile Include="ReturnsExtensionsFixture.cs" />
     <Compile Include="Linq\MockRepositoryQuerying.cs" />
@@ -79,6 +77,7 @@
     <Compile Include="ExtensibilityFixture.cs" />
     <Compile Include="AdvancedMatcherAttributeFixture.cs" />
     <Compile Include="MatchersFixture.cs" />
+    <Compile Include="Matchers\AnyMatcherFixture.cs" />
     <Compile Include="MockBehaviorFixture.cs" />
     <Compile Include="MockDefaultValueProviderFixture.cs" />
     <Compile Include="MockedFixture.cs" />
