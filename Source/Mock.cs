@@ -691,12 +691,21 @@ namespace Moq
 		{
 			var mockType = mock.MockedType;
 			mockedTypesStack.Push(mockType);
-			var properties = mockType.GetProperties()
-				.Concat(mockType.GetInterfaces().SelectMany(i => i.GetProperties()))
+
+			var properties =
+				mockType
+				.GetAllPropertiesInDepthFirstOrder()
+				// ^ Depth-first traversal is important because properties in derived interfaces
+				//   that shadow properties in base interfaces should be set up last. This
+				//   enables the use case where a getter-only property is redeclared in a derived
+				//   interface as a getter-and-setter property.
 				.Where(p =>
 					   p.CanRead && p.CanOverrideGet() &&
 					   p.GetIndexParameters().Length == 0 &&
-					   !(p.CanWrite ^ (p.CanWrite & p.CanOverrideSet())))
+					   p.CanWrite == p.CanOverrideSet())
+					   // ^ The last condition will be true for two kinds of properties:
+					   //    (a) those that are read-only; and
+					   //    (b) those that are writable and whose setter can be overridden.
 				.Distinct();
 
 			var setupPropertyMethod = mock.GetType().GetMethods()

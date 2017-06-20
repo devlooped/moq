@@ -1,4 +1,5 @@
 using System;
+using System.Collections;
 using System.Collections.Generic;
 using System.Globalization;
 using System.Linq;
@@ -256,6 +257,29 @@ namespace Moq
 				if (value is string)
 				{
 					builder.Append("\"").Append(value).Append("\"");
+				}
+				else if (value is IEnumerable enumerable)
+				{
+					builder.Append("[");
+					bool addComma = false;
+					const int maxCount = 10;
+					int count = 0;
+					foreach (var obj in enumerable.Cast<object>())
+					{
+						if (addComma)
+						{
+							builder.Append(", ");
+						}
+						if (count >= maxCount)
+						{
+							builder.Append("...");
+							break;
+						}
+						ToStringConstant(Expression.Constant(obj));
+						addComma = true;
+						++count;
+					}
+					builder.Append("]");
 				}
 				else if (value.ToString() == value.GetType().ToString())
 				{

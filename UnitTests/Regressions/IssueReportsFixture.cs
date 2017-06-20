@@ -210,6 +210,120 @@ namespace Moq.Tests.Regressions
 
 		#endregion
 
+		#region 141
+
+		public class Issue141
+		{
+			[Fact]
+			public void MockingDoesNotChangeVirtualnessAndFinalnessOfInheritedInterfaceMethod()
+			{
+				var actualTypeMethod = typeof(ConcreteClass).GetMethod("Method");
+				Assert.True(actualTypeMethod.IsVirtual && actualTypeMethod.IsFinal);
+
+				var mockedTypeMethod = new Mock<ConcreteClass>().Object.GetType().GetMethod("Method");
+				Assert.True(mockedTypeMethod.IsVirtual && mockedTypeMethod.IsFinal);
+			}
+
+			public interface ISomeInterface
+			{
+				void Method();
+			}
+
+			public class ConcreteClass : ISomeInterface
+			{
+				public void Method() { }
+			}
+		}
+
+		#endregion
+
+		#region 156
+
+		public class Issue156
+		{
+			[Fact]
+			public void Test()
+			{
+				var mock = new Mock<A>(MockBehavior.Strict);
+
+				var actualViaObject = mock.Object.Foo();
+				var actualViaInterface = ((IA)mock.Object).Foo();
+
+				Assert.Equal(42, actualViaObject);
+				Assert.Equal(42, actualViaInterface);
+			}
+
+			public class A : IA
+			{
+				public int Foo()
+				{
+					return 42;
+				}
+			}
+
+			public interface IA
+			{
+				int Foo();
+			}
+		}
+
+		#endregion
+
+		#region 157
+
+		public class Issue157
+		{
+			[Fact]
+			public void Test()
+			{
+				var streamMock = new Mock<Stream>();
+
+				using (var stream = streamMock.Object) { }
+
+				// non-mocked Dispose methods calls Close which is virtual and can thus be verified
+				streamMock.Verify(x => x.Close());
+			}
+
+			public class Stream : IDisposable
+			{
+				public void Dispose()
+				{
+					Close();
+				}
+
+				public virtual void Close()
+				{
+				}
+			}
+		}
+
+		#endregion
+
+		#region 162
+
+		public class Issue162
+		{
+			[Fact]
+			public void GetSetPropertyThatOverridesGetPropertyRetainsValueSetUpWithMockOf()
+			{
+				const decimal expectedValue = .14M;
+				var i = Mock.Of<B>(b => b.Value == expectedValue);
+				Assert.Equal(expectedValue, actual: i.Value);
+			}
+
+			public interface A
+			{
+				decimal? Value { get; }
+			}
+
+			public interface B : A
+			{
+				new decimal? Value { get; set; }
+			}
+		}
+
+		#endregion
+
 		#region 163
 
 #if FEATURE_SERIALIZATION
@@ -364,6 +478,170 @@ namespace Moq.Tests.Regressions
 
 		#endregion
 
+		#region 164
+
+		public class Issue164
+		{
+			[Fact]
+			public void PropertyFails()
+			{
+				var mock = new Mock<LogWrapper>();
+				mock.Setup(o => o.IsDebugEnabled).Returns(false).Verifiable();
+				Checker(mock.Object);
+				mock.Verify(log => log.IsDebugEnabled, Times.Exactly(1));
+			}
+
+			private static void Checker(ILogger log)
+			{
+				log.Debug("some message");
+			}
+
+			public interface ILogger
+			{
+				bool IsDebugEnabled { get; }
+
+				void Debug(object message);
+			}
+
+			public class LogWrapper : ILogger
+			{
+				public virtual bool IsDebugEnabled
+				{
+					get { return true; }
+				}
+
+				public void Debug(object message)
+				{
+					if (IsDebugEnabled)
+					{
+						Console.WriteLine(message);
+					}
+				}
+			}
+		}
+
+		#endregion
+
+		#region 175
+
+		public class Issue175
+		{
+			[Fact]
+			public void MoqErrors()
+			{
+				Mock<ExtendingTypeBase> fake = new Mock<ExtendingTypeBase>(42);
+				ExtendingTypeBase realFake = fake.Object;
+
+				// Make sure we're telling the truth that the value is mocked prior to our frobbing
+				Assert.Equal(42, realFake.ExtendedValue);
+
+				Frobber frobber = new Frobber(realFake);
+
+				Assert.True(frobber.WasExtendedType);
+				// BUGBUG: Seems to have been set back to the default for this type (Moq type is by default LOOSE)
+				Assert.Equal(42, frobber.ExtendedTypeValue);  // "BUGBUG: Moq Lost the value and set back to default."
+			}
+
+			public void CSharpIsCoolWithIt()
+			{
+				ExtendingTypeBase real = new ExtendedConcreteType(42);
+
+				// Make sure we're telling the truth that the value is mocked prior to our frobbing
+				Assert.Equal(42, real.ExtendedValue);
+
+				Frobber frobber = new Frobber(real);
+
+				Assert.True(frobber.WasExtendedType);
+				Assert.Equal(42, frobber.ExtendedTypeValue);
+			}
+
+			[Fact]
+			public void MoqErrorsTwo()
+			{
+				var rootMock = new Mock<ExtendingTypeBase>(42);
+				ExtendingTypeBase realObject = rootMock.Object;
+				IExtendedType realObjectInterfaceType = rootMock.Object;
+				Assert.Equal(42, realObject.ExtendedValue);
+				// BUGBUG: Seems to have been set back to the default for this type (Moq type is by default LOOSE)
+				Assert.Equal(42, realObjectInterfaceType.ExtendedValue);
+			}
+
+			[Fact]
+			public void MoqErrorsThree()
+			{
+				var rootMock = new Mock<ExtendingTypeBase>(42);
+				ExtendingTypeBase realObject = rootMock.Object;
+				IExtendedType realObjectInterfaceType = rootMock.As<IExtendedType>().Object;
+				Assert.Equal(42, realObject.ExtendedValue);
+				// BUGBUG: Seems to have been set back to the default for this type (Moq type is by default LOOSE)
+				Assert.Equal(42, realObjectInterfaceType.ExtendedValue);
+			}
+
+			public class Frobber
+			{
+				List<ISharedType> internalStore;
+
+				public Frobber(params ISharedType[] inputs)
+				{
+					// Save the Internal Store
+					this.internalStore = new List<ISharedType>(inputs);
+				}
+
+				public bool WasExtendedType
+				{
+					get
+					{
+						return this.internalStore.First() is IExtendedType;
+					}
+				}
+
+				public int ExtendedTypeValue
+				{
+					get
+					{
+						return ((IExtendedType)this.internalStore.First()).ExtendedValue;
+					}
+				}
+			}
+
+			public class ExtendedConcreteType : ExtendingTypeBase
+			{
+				public ExtendedConcreteType(int extendedValue) :
+					base(extendedValue)
+				{
+				}
+
+				public override int CommonValue
+				{
+					get;
+					set;
+				}
+			}
+
+			public interface ISharedType
+			{
+				int CommonValue { get; set; }
+			}
+
+			public interface IExtendedType
+			{
+				int ExtendedValue { get; set; }
+			}
+
+			public abstract class ExtendingTypeBase : ISharedType, IExtendedType
+			{
+				public ExtendingTypeBase(int extendedValue)
+				{
+					this.ExtendedValue = extendedValue;
+				}
+
+				public abstract int CommonValue { get; set; }
+				public int ExtendedValue { get; set; }
+			}
+		}
+
+		#endregion
+
 		#region #176
 
 		public class Issue176
@@ -443,6 +721,50 @@ namespace Moq.Tests.Regressions
 
 		#endregion // #184
 
+		#region 239
+
+		public class Issue239
+		{
+			[Fact]
+			public void PropertyInBaseInterfaceRetainsValueSetUpWitMockOf()
+			{
+				var i1 = Mock.Of<Interface1>(i => i.ABoolean == true);
+				Assert.True(i1.ABoolean);
+			}
+			[Fact]
+			public void RedeclaredPropertyInDerivedInterfaceRetainsValueSetUpWithNewMockAndSetupReturns()
+			{
+				var i2 = new Mock<Interface2>();
+				i2.Setup(i => i.ABoolean).Returns(true);
+				Assert.True(i2.Object.ABoolean);
+			}
+			[Fact]
+			public void RedeclaredPropertyInDerivedInterfaceRetainsValueSetUpWithMockOf()
+			{
+				var i2 = Mock.Of<Interface2>(i => i.ABoolean == true);
+				Assert.True(i2.ABoolean);
+			}
+			[Fact]
+			public void RedeclaredPropertyInDerivedInterfaceRetainsValueSetUpWitSetupAllPropertiesAndSetter()
+			{
+				var i2 = new Mock<Interface2>();
+				i2.SetupAllProperties();
+				i2.Object.ABoolean = true;
+				Assert.True(i2.Object.ABoolean);
+			}
+
+			public interface Interface1
+			{
+				bool ABoolean { get; }
+			}
+			public interface Interface2 : Interface1
+			{
+				new bool ABoolean { get; set; }
+			}
+		}
+
+		#endregion
+
 		#region #252
 
 		public class Issue252
@@ -496,6 +818,87 @@ namespace Moq.Tests.Regressions
 		}
 
 		#endregion // #252
+
+		#region 275
+
+		public class Issue275
+		{
+			private const int EXPECTED = int.MaxValue;
+
+			[Fact]
+			public void Root1Test()
+			{
+				var mock = Mock.Of<IRoot1>(c => c.Value == EXPECTED);
+				Assert.Equal(EXPECTED, mock.Value);
+			}
+
+			[Fact]
+			public void Derived1Test()
+			{
+				var mock = Mock.Of<IDerived1>(c => c.Value == EXPECTED);
+				Assert.Equal(EXPECTED, mock.Value);
+			}
+
+			[Fact]
+			public void Implementation1Test()
+			{
+				var mock = Mock.Of<Implementation1>(c => c.Value == EXPECTED);
+				Assert.Equal(EXPECTED, mock.Value);
+			}
+
+			[Fact]
+			public void Root2Test()
+			{
+				var mock = Mock.Of<IRoot2>(c => c.Value == EXPECTED);
+				Assert.Equal(EXPECTED, mock.Value);
+			}
+
+			[Fact]
+			public void Derived2Test()
+			{
+				var mock = Mock.Of<IDerived2>(c => c.Value == EXPECTED);
+				Assert.Equal(EXPECTED, mock.Value);
+			}
+
+			[Fact]
+			public void Implementation2Test()
+			{
+				var mock = Mock.Of<Implementation2>(c => c.Value == EXPECTED);
+				Assert.Equal(EXPECTED, mock.Value);
+			}
+
+			public interface IRoot1
+			{
+				int Value { get; }
+			}
+
+			public interface IRoot2
+			{
+				int Value { get; set; }
+			}
+
+			public interface IDerived1 : IRoot1
+			{
+				new int Value { get; set; }
+			}
+
+			public interface IDerived2 : IRoot2
+			{
+				new int Value { get; set; }
+			}
+
+			public class Implementation1 : IDerived1
+			{
+				public int Value { get; set; }
+			}
+
+			public class Implementation2 : IDerived1
+			{
+				public int Value { get; set; }
+			}
+		}
+
+		#endregion
 
 		#region 311
 
@@ -673,6 +1076,32 @@ namespace Moq.Tests.Regressions
 		}
 
 		#endregion // #328
+
+		#region 331
+
+		public class Issue331
+		{
+			[Fact]
+			public void Test()
+			{
+				var mock = new Mock<Foo>();
+				IFoo i = mock.Object;
+				i.Property = true;
+				Assert.True(i.Property);
+			}
+
+			public interface IFoo
+			{
+				bool Property { get; set; }
+			}
+
+			public class Foo : IFoo
+			{
+				public bool Property { get; set; }
+			}
+		}
+
+		#endregion
 
 		#region 340
 

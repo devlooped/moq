@@ -40,6 +40,7 @@
 
 using System;
 using System.Collections;
+using System.Collections.Generic;
 using System.Diagnostics.CodeAnalysis;
 using System.Globalization;
 using System.Linq;
@@ -88,9 +89,12 @@ namespace Moq
 			{
 				return "\"" + typedValue + "\"";
 			}
-			if (value is IEnumerable)
+			if (value is IEnumerable enumerable)
 			{
-				return "[" + string.Join(", ", ((IEnumerable) value).OfType<object>().Select(GetValue)) + "]";
+				const int maxCount = 10;
+				var objs = enumerable.Cast<object>().Take(maxCount + 1);
+				var more = objs.Count() > maxCount ? ", ..." : string.Empty;
+				return "[" + string.Join(", ", objs.Take(maxCount).Select(GetValue)) + more + "]";
 			}
 			return value.ToString();
 		}
@@ -321,6 +325,56 @@ namespace Moq
 			catch (AmbiguousMatchException)
 			{
 				return null;
+			}
+		}
+
+		/// <summary>
+		/// Gets all properties of the specified type in depth-first order.
+		/// That is, properties of the furthest ancestors are returned first,
+		/// and the type's own properties are returned last.
+		/// </summary>
+		/// <param name="type">The type whose properties are to be returned.</param>
+		internal static List<PropertyInfo> GetAllPropertiesInDepthFirstOrder(this Type type)
+		{
+			var properties = new List<PropertyInfo>();
+			var none = new HashSet<Type>();
+
+			type.AddPropertiesInDepthFirstOrderTo(properties, typesAlreadyVisited: none);
+
+			return properties;
+		}
+
+		/// <summary>
+		/// This is a helper method supporting <see cref="GetAllPropertiesInDepthFirstOrder(Type)"/>
+		/// and is not supposed to be called directly.
+		/// </summary>
+		private static void AddPropertiesInDepthFirstOrderTo(this Type type, List<PropertyInfo> properties, HashSet<Type> typesAlreadyVisited)
+		{
+			if (!typesAlreadyVisited.Contains(type))
+			{
+				// make sure we do not process properties of the current type twice:
+				typesAlreadyVisited.Add(type);
+
+				//// follow down axis 1: add properties of base class. note that this is currently
+				//// disabled, since it wasn't done previously and this can only result in changed
+				//// behavior.
+				//if (type.GetTypeInfo().BaseType != null)
+				//{
+				//	type.GetTypeInfo().BaseType.AddPropertiesInDepthFirstOrderTo(properties, typesAlreadyVisited);
+				//}
+
+				// follow down axis 2: add properties of inherited / implemented interfaces:
+				var superInterfaceTypes = type.GetInterfaces();
+				foreach (var superInterfaceType in superInterfaceTypes)
+				{
+					superInterfaceType.AddPropertiesInDepthFirstOrderTo(properties, typesAlreadyVisited);
+				}
+
+				// add own properties:
+				foreach (var property in type.GetProperties())
+				{
+					properties.Add(property);
+				}
 			}
 		}
 	}
