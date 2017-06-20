@@ -299,6 +299,31 @@ namespace Moq.Tests.Regressions
 
 		#endregion
 
+		#region 162
+
+		public class Issue162
+		{
+			[Fact]
+			public void GetSetPropertyThatOverridesGetPropertyRetainsValueSetUpWithMockOf()
+			{
+				const decimal expectedValue = .14M;
+				var i = Mock.Of<B>(b => b.Value == expectedValue);
+				Assert.Equal(expectedValue, actual: i.Value);
+			}
+
+			public interface A
+			{
+				decimal? Value { get; }
+			}
+
+			public interface B : A
+			{
+				new decimal? Value { get; set; }
+			}
+		}
+
+		#endregion
+
 		#region 163
 
 #if FEATURE_SERIALIZATION
@@ -696,6 +721,50 @@ namespace Moq.Tests.Regressions
 
 		#endregion // #184
 
+		#region 239
+
+		public class Issue239
+		{
+			[Fact]
+			public void PropertyInBaseInterfaceRetainsValueSetUpWitMockOf()
+			{
+				var i1 = Mock.Of<Interface1>(i => i.ABoolean == true);
+				Assert.True(i1.ABoolean);
+			}
+			[Fact]
+			public void RedeclaredPropertyInDerivedInterfaceRetainsValueSetUpWithNewMockAndSetupReturns()
+			{
+				var i2 = new Mock<Interface2>();
+				i2.Setup(i => i.ABoolean).Returns(true);
+				Assert.True(i2.Object.ABoolean);
+			}
+			[Fact]
+			public void RedeclaredPropertyInDerivedInterfaceRetainsValueSetUpWithMockOf()
+			{
+				var i2 = Mock.Of<Interface2>(i => i.ABoolean == true);
+				Assert.True(i2.ABoolean);
+			}
+			[Fact]
+			public void RedeclaredPropertyInDerivedInterfaceRetainsValueSetUpWitSetupAllPropertiesAndSetter()
+			{
+				var i2 = new Mock<Interface2>();
+				i2.SetupAllProperties();
+				i2.Object.ABoolean = true;
+				Assert.True(i2.Object.ABoolean);
+			}
+
+			public interface Interface1
+			{
+				bool ABoolean { get; }
+			}
+			public interface Interface2 : Interface1
+			{
+				new bool ABoolean { get; set; }
+			}
+		}
+
+		#endregion
+
 		#region #252
 
 		public class Issue252
@@ -749,6 +818,87 @@ namespace Moq.Tests.Regressions
 		}
 
 		#endregion // #252
+
+		#region 275
+
+		public class Issue275
+		{
+			private const int EXPECTED = int.MaxValue;
+
+			[Fact]
+			public void Root1Test()
+			{
+				var mock = Mock.Of<IRoot1>(c => c.Value == EXPECTED);
+				Assert.Equal(EXPECTED, mock.Value);
+			}
+
+			[Fact]
+			public void Derived1Test()
+			{
+				var mock = Mock.Of<IDerived1>(c => c.Value == EXPECTED);
+				Assert.Equal(EXPECTED, mock.Value);
+			}
+
+			[Fact]
+			public void Implementation1Test()
+			{
+				var mock = Mock.Of<Implementation1>(c => c.Value == EXPECTED);
+				Assert.Equal(EXPECTED, mock.Value);
+			}
+
+			[Fact]
+			public void Root2Test()
+			{
+				var mock = Mock.Of<IRoot2>(c => c.Value == EXPECTED);
+				Assert.Equal(EXPECTED, mock.Value);
+			}
+
+			[Fact]
+			public void Derived2Test()
+			{
+				var mock = Mock.Of<IDerived2>(c => c.Value == EXPECTED);
+				Assert.Equal(EXPECTED, mock.Value);
+			}
+
+			[Fact]
+			public void Implementation2Test()
+			{
+				var mock = Mock.Of<Implementation2>(c => c.Value == EXPECTED);
+				Assert.Equal(EXPECTED, mock.Value);
+			}
+
+			public interface IRoot1
+			{
+				int Value { get; }
+			}
+
+			public interface IRoot2
+			{
+				int Value { get; set; }
+			}
+
+			public interface IDerived1 : IRoot1
+			{
+				new int Value { get; set; }
+			}
+
+			public interface IDerived2 : IRoot2
+			{
+				new int Value { get; set; }
+			}
+
+			public class Implementation1 : IDerived1
+			{
+				public int Value { get; set; }
+			}
+
+			public class Implementation2 : IDerived1
+			{
+				public int Value { get; set; }
+			}
+		}
+
+		#endregion
 
 		#region 311
 
