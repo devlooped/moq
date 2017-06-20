@@ -210,6 +210,33 @@ namespace Moq.Tests.Regressions
 
 		#endregion
 
+		#region 141
+
+		public class Issue141
+		{
+			[Fact]
+			public void MockingDoesNotChangeVirtualnessAndFinalnessOfInheritedInterfaceMethod()
+			{
+				var actualTypeMethod = typeof(ConcreteClass).GetMethod("Method");
+				Assert.True(actualTypeMethod.IsVirtual && actualTypeMethod.IsFinal);
+
+				var mockedTypeMethod = new Mock<ConcreteClass>().Object.GetType().GetMethod("Method");
+				Assert.True(mockedTypeMethod.IsVirtual && mockedTypeMethod.IsFinal);
+			}
+
+			public interface ISomeInterface
+			{
+				void Method();
+			}
+
+			public class ConcreteClass : ISomeInterface
+			{
+				public void Method() { }
+			}
+		}
+
+		#endregion
+
 		#region 156
 
 		public class Issue156
@@ -426,6 +453,50 @@ namespace Moq.Tests.Regressions
 
 		#endregion
 
+		#region 164
+
+		public class Issue164
+		{
+			[Fact]
+			public void PropertyFails()
+			{
+				var mock = new Mock<LogWrapper>();
+				mock.Setup(o => o.IsDebugEnabled).Returns(false).Verifiable();
+				Checker(mock.Object);
+				mock.Verify(log => log.IsDebugEnabled, Times.Exactly(1));
+			}
+
+			private static void Checker(ILogger log)
+			{
+				log.Debug("some message");
+			}
+
+			public interface ILogger
+			{
+				bool IsDebugEnabled { get; }
+
+				void Debug(object message);
+			}
+
+			public class LogWrapper : ILogger
+			{
+				public virtual bool IsDebugEnabled
+				{
+					get { return true; }
+				}
+
+				public void Debug(object message)
+				{
+					if (IsDebugEnabled)
+					{
+						Console.WriteLine(message);
+					}
+				}
+			}
+		}
+
+		#endregion
+
 		#region 175
 
 		public class Issue175
@@ -446,7 +517,6 @@ namespace Moq.Tests.Regressions
 				Assert.Equal(42, frobber.ExtendedTypeValue);  // "BUGBUG: Moq Lost the value and set back to default."
 			}
 
-			[Fact(Skip = "Not relevant right now.")]
 			public void CSharpIsCoolWithIt()
 			{
 				ExtendingTypeBase real = new ExtendedConcreteType(42);
