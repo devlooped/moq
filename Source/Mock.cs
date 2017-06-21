@@ -1025,7 +1025,10 @@ namespace Moq
 		public virtual Mock<TInterface> As<TInterface>()
 			where TInterface : class
 		{
-			if (this.isInitialized && !this.ImplementedInterfaces.Contains(typeof(TInterface)))
+			var index = this.ImplementedInterfaces.LastIndexOf(typeof(TInterface));
+
+			var isImplemented = index >= 0;
+			if (this.isInitialized && !isImplemented)
 			{
 				throw new InvalidOperationException(Resources.AlreadyInitialized);
 			}
@@ -1035,8 +1038,28 @@ namespace Moq
 				throw new ArgumentException(Resources.AsMustBeInterface);
 			}
 
-			if (!this.ImplementedInterfaces.Contains(typeof(TInterface)))
+			var isNotOrInternallyImplemented = index < this.InternallyImplementedInterfaceCount - 1; // - 1 because of IMocked<>
+			if (isNotOrInternallyImplemented)
 			{
+				// We get here for either of two reasons:
+				//
+				// 1. We are being asked to implement an interface that the mocked type does *not* itself
+				//    inherit or implement. We need to hand this interface type to DynamicProxy's
+				//    `CreateClassProxy` method as an additional interface to be implemented. Therefore we
+				//    add it at the end of this list, after the "internally implemented" interfaces
+				//    (i.e. those that the mocked type inherits or implements itself, plus `IMocked<>`).
+				//    In this case, `index == -1`.
+				//
+				// 2. The user is possibly going to create a setup through an interface type that the
+				//    mocked type *does* implement. Since the mocked type might implement that interface's
+				//    methods non-virtually, we can only intercept those if DynamicProxy reimplements the
+				//    interface in the generated proxy type. Therefore we do the same as for (1). Note
+				//    that this might lead to the interface type being contained twice in the list, once
+				//    as an "internally implemented" type, and once as an "additional" type. That should
+				//    not matter apart from slightly higher memory consumption, but it has the benefit
+				//    that we don't need to perform a non-atomic removal of the "internally implemented"
+				//    item.
+				//    In this case, `index >= 0 && index < this.InternallyImplementedInterfaceCount - 1`.
 				this.ImplementedInterfaces.Add(typeof(TInterface));
 			}
 

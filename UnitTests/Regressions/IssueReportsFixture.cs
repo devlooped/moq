@@ -1148,6 +1148,44 @@ namespace Moq.Tests.Regressions
 
 #endregion
 
+		#region 383
+
+		public class Issue383
+		{
+			[Fact]
+			public void AsInterface_CanSetupMethodOfInterfaceThatClassDoesNotImplement()
+			{
+				var mock = new Mock<DoesNotImplementI>();
+				mock.As<I>().Setup(x => x.Foo()).Returns(42);
+				Assert.Equal(42, (mock.Object as I).Foo());
+			}
+
+			[Fact]
+			public void AsInterface_CanSetupMethodOfInterfaceThatClassImplementsAsNonVirtual()
+			{
+				var mock = new Mock<ImplementsI>();
+				mock.As<I>().Setup(x => x.Foo()).Returns(42);
+				Assert.Equal(42, (mock.Object as I).Foo());
+			}
+
+			public class DoesNotImplementI
+			{
+				public int Foo() => 13;
+			}
+
+			public interface I
+			{
+				int Foo();
+			}
+
+			public class ImplementsI : I
+			{
+				public int Foo() => 13;
+			}
+		}
+
+		#endregion
+
 		// Old @ Google Code
 
 		#region #47
