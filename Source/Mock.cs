@@ -1037,7 +1037,27 @@ namespace Moq
 
 			if (!this.ImplementedInterfaces.Contains(typeof(TInterface)))
 			{
+				// We're being asked to set up an interface that the mocked type does not implement / inherit.
+				// Putting it into `ImplementedInterfaces` means that DynamicProxy will be asked to implement it
+				// in addition to the types that the mocked type implements / inherits itself.
 				this.ImplementedInterfaces.Add(typeof(TInterface));
+			}
+			else
+			{
+				// We're being asked to set up an interface that the mocked type does implement / inherit.
+				// In order to allow mocking of interface methods that the mocked type might implement non-
+				// virtually, we need to ensure that DynamicProxy reimplements the interface on the generated
+				// proxy so that it can be intercepted. The following code makes sure that the interface type
+				// is in that segment of `ImplementedInterfaces` that will be handed over to DynamicProxy.
+				var index = this.ImplementedInterfaces.LastIndexOf(typeof(TInterface));
+				var isInternallyImplemented = index < this.InternallyImplementedInterfaceCount - 1;
+				if (isInternallyImplemented)
+				{
+					this.ImplementedInterfaces.Add(typeof(TInterface));
+					--this.InternallyImplementedInterfaceCount;
+					this.ImplementedInterfaces.RemoveAt(index);
+					// ideally, the above would be an atomic operation.
+				}
 			}
 
 			return new AsInterface<TInterface>(this);
