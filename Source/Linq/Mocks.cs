@@ -150,7 +150,7 @@ namespace Moq
 		/// Extension method used to support Linq-like setup properties that are not virtual but do have 
 		/// a getter and a setter, thereby allowing the use of Linq to Mocks to quickly initialize Dtos too :)
 		/// </summary>
-		internal static bool SetPropery<T, TResult>(Mock<T> target, Expression<Func<T, TResult>> propertyReference, TResult value)
+		internal static bool SetProperty<T, TResult>(Mock<T> target, Expression<Func<T, TResult>> propertyReference, TResult value)
 			where T : class
 		{
 			var memberExpr = (MemberExpression)propertyReference.Body;

@@ -208,7 +208,7 @@ namespace Moq.Linq
 			// which also allows the use of this querying capability against plain DTO even 
 			// if their properties are not virtual.
 			var setPropertyMethod = typeof(Mocks)
-				.GetMethod("SetPropery", BindingFlags.Static | BindingFlags.NonPublic)
+				.GetMethod("SetProperty", BindingFlags.Static | BindingFlags.NonPublic)
 				.MakeGenericMethod(mockExpression.Type.GetGenericArguments().First(), propertyInfo.PropertyType);
 
 			return Expression.Equal(
