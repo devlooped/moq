@@ -138,21 +138,25 @@ namespace Moq
 		/// <include file='It.xdoc' path='docs/doc[@for="It.IsRegex(regex)"]/*'/>
 		public static string IsRegex(string regex)
 		{
+			Guard.NotNull(() => regex, regex);
+
 			// The regex is constructed only once.
 			var re = new Regex(regex);
 
 			// But evaluated every time :)
-			return Match<string>.Create(value => re.IsMatch(value), () => It.IsRegex(regex));
+			return Match<string>.Create(value => value != null && re.IsMatch(value), () => It.IsRegex(regex));
 		}
 
 		/// <include file='It.xdoc' path='docs/doc[@for="It.IsRegex(regex,options)"]/*'/>
 		public static string IsRegex(string regex, RegexOptions options)
 		{
+			Guard.NotNull(() => regex, regex);
+
 			// The regex is constructed only once.
 			var re = new Regex(regex, options);
 
 			// But evaluated every time :)
-			return Match<string>.Create(value => re.IsMatch(value), () => It.IsRegex(regex, options));
+			return Match<string>.Create(value => value != null && re.IsMatch(value), () => It.IsRegex(regex, options));
 		}
 	}
 }
