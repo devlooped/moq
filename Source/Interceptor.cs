@@ -75,10 +75,13 @@ namespace Moq
 
 		private void VerifyOrThrow(Func<IProxyCall, bool> match)
 		{
-			var failures = calls.Values.Where(match).ToArray();
-			if (failures.Length > 0)
+			lock (calls)
 			{
-				throw new MockVerificationException(failures);
+				var failures = calls.Values.Where(match);
+				if (failures.Any())
+				{
+					throw new MockVerificationException(failures.ToArray());
+				}
 			}
 		}
 
@@ -96,18 +99,21 @@ namespace Moq
 
 			if (!call.IsConditional)
 			{
-				// if it's not a conditional call, we do
-				// all the override setups.
-				// TODO maybe add the conditionals to other
-				// record like calls to be user friendly and display
-				// somethig like: non of this calls were performed.
-				if (calls.ContainsKey(key))
+				lock (calls)
 				{
-					// Remove previous from ordered calls
-					InterceptionContext.RemoveOrderedCall(calls[key]);
-				}
+					// if it's not a conditional call, we do
+					// all the override setups.
+					// TODO maybe add the conditionals to other
+					// record like calls to be user friendly and display
+					// somethig like: non of this calls were performed.
+					if (calls.ContainsKey(key))
+					{
+						// Remove previous from ordered calls
+						InterceptionContext.RemoveOrderedCall(calls[key]);
+					}
 
-				calls[key] = call;
+					calls[key] = call;
+				}
 			}
 
 			InterceptionContext.AddOrderedCall(call);
@@ -115,7 +121,10 @@ namespace Moq
 
 		internal void ClearCalls()
 		{
-			calls.Clear();
+			lock (calls)
+			{
+				calls.Clear();
+			}
 		}
 
 		private IEnumerable<IInterceptStrategy> InterceptionStrategies()
