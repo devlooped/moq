@@ -900,6 +900,33 @@ namespace Moq.Tests.Regressions
 
 		#endregion
 
+		#region 296
+
+		public class Issue296
+		{
+			[Fact]
+			public void Can_subscribe_to_and_raise_abstract_class_event_when_CallBase_true()
+			{
+				var mock = new Mock<Foo>() { CallBase = true };
+
+				var eventHandlerWasCalled = false;
+				mock.Object.SomethingChanged += (object sender, EventArgs e) =>
+				{
+					eventHandlerWasCalled = true;
+				};
+
+				mock.Raise(foo => foo.SomethingChanged += null, EventArgs.Empty);
+				Assert.True(eventHandlerWasCalled);
+			}
+
+			public abstract class Foo
+			{
+				public abstract event EventHandler SomethingChanged;
+			}
+		}
+
+		#endregion
+
 		#region 311
 
 		public sealed class Issue311
