@@ -1130,6 +1130,33 @@ namespace Moq.Tests.Regressions
 
 		#endregion
 
+		#region 337
+
+		public class Issue337
+		{
+			[Fact]
+			public void Mock_Of_can_setup_null_return_value()
+			{
+				// The following mock setup might appear redundant; after all, `null` is
+				// the default value returned for most reference types. However, this test
+				// becomes relevant once Moq starts supporting custom implementations of
+				// `IDefaultValueProvider`. Then it might no longer be a given that `null`
+				// is the default return value that noone would want to explicitly set up.
+				var userProvider = Mock.Of<IUserProvider>(p => p.GetUserByEmail("alice@example.com") == null);
+				var user = userProvider.GetUserByEmail("alice@example.com");
+				Assert.Null(user);
+			}
+
+			public class User { }
+
+			public interface IUserProvider
+			{
+				User GetUserByEmail(string email);
+			}
+		}
+
+		#endregion
+
 		#region 340
 
 #if FEATURE_SERIALIZATION
