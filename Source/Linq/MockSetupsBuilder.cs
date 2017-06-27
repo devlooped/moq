@@ -226,6 +226,11 @@ namespace Moq.Linq
 				.MakeGenericType(sourceType, returnType)
 				.GetMethod("Returns", new[] { returnType });
 
+			if (right is ConstantExpression constExpr && constExpr.Value == null)
+			{
+				right = Expression.Constant(null, left.Type);
+			}
+
 			return Expression.NotEqual(
 				Expression.Call(FluentMockVisitor.Accept(left), returnsMethod, right),
 				Expression.Constant(null));
