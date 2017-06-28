@@ -471,23 +471,32 @@ namespace Moq.Properties {
 		}
 		
 		/// <summary>
-		///   Looks up a localized string similar to Expression references a method that does not belong to the mocked object: {0}.
+		///   Looks up a localized string similar to Invalid setup on an extension method: {0}.
 		/// </summary>
-		internal static string SetupOnNonMemberMethod {
+		internal static string SetupOnExtensionMethod {
 			get {
-				return ResourceManager.GetString("SetupOnNonMemberMethod", resourceCulture);
+				return ResourceManager.GetString("SetupOnExtensionMethod", resourceCulture);
 			}
 		}
 		
 		/// <summary>
 		///   Looks up a localized string similar to Invalid setup on a non-virtual (overridable in VB) member: {0}.
 		/// </summary>
-		internal static string SetupOnNonOverridableMember {
+		internal static string SetupOnNonVirtualMember {
 			get {
-				return ResourceManager.GetString("SetupOnNonOverridableMember", resourceCulture);
+				return ResourceManager.GetString("SetupOnNonVirtualMember", resourceCulture);
 			}
 		}
 		
+		/// <summary>
+		///   Looks up a localized string similar to Invalid setup on a static member: {0}.
+		/// </summary>
+		internal static string SetupOnStaticMember {
+			get {
+				return ResourceManager.GetString("SetupOnStaticMember", resourceCulture);
+			}
+		}
+
 		/// <summary>
 		///   Looks up a localized string similar to Type {0} does not implement required interface {1}.
 		/// </summary>
@@ -584,11 +593,29 @@ namespace Moq.Properties {
 		}
 		
 		/// <summary>
+		///   Looks up a localized string similar to Invalid verify on an extension method: {0}.
+		/// </summary>
+		internal static string VerifyOnExtensionMethod {
+			get {
+				return ResourceManager.GetString("VerifyOnExtensionMethod", resourceCulture);
+			}
+		}
+
+		/// <summary>
 		///   Looks up a localized string similar to Invalid verify on a non-virtual (overridable in VB) member: {0}.
 		/// </summary>
 		internal static string VerifyOnNonVirtualMember {
 			get {
 				return ResourceManager.GetString("VerifyOnNonVirtualMember", resourceCulture);
+			}
+		}
+
+		/// <summary>
+		///   Looks up a localized string similar to Invalid verify on a static member: {0}.
+		/// </summary>
+		internal static string VerifyOnStaticMember {
+			get {
+				return ResourceManager.GetString("VerifyOnStaticMember", resourceCulture);
 			}
 		}
 	}
