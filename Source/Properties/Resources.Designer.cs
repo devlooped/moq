@@ -584,6 +584,15 @@ namespace Moq.Properties {
 		}
 		
 		/// <summary>
+		///   Looks up a localized string similar to Expression references a method that does not belong to the mocked object: {0}.
+		/// </summary>
+		internal static string VerifyOnNonMemberMethod {
+			get {
+				return ResourceManager.GetString("VerifyOnNonMemberMethod", resourceCulture);
+			}
+		}
+
+		/// <summary>
 		///   Looks up a localized string similar to Invalid verify on a non-virtual (overridable in VB) member: {0}.
 		/// </summary>
 		internal static string VerifyOnNonVirtualMember {

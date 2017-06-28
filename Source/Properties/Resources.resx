@@ -307,4 +307,7 @@ Expected invocation on the mock once, but was {4} times: {1}</value>
 	<data name="PropertyGetNotFound" xml:space="preserve">
 		<value>Property {0}.{1} does not have a getter.</value>
 	</data>
+	<data name="VerifyOnNonMemberMethod" xml:space="preserve">
+		<value>Expression references a method that does not belong to the mocked object: {0}</value>
+	</data>
 </root>

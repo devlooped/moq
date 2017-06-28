@@ -283,6 +283,7 @@ namespace Moq
 
 			var methodCall = expression.GetCallInfo(mock);
 			var method = methodCall.Method;
+			ThrowIfVerifyNotMember(expression, method);
 			ThrowIfVerifyNonVirtual(expression, method);
 			var args = methodCall.Arguments.ToArray();
 
@@ -307,6 +308,7 @@ namespace Moq
 			{
 				var methodCall = expression.GetCallInfo(mock);
 				var method = methodCall.Method;
+				ThrowIfVerifyNotMember(expression, method);
 				ThrowIfVerifyNonVirtual(expression, method);
 				var args = methodCall.Arguments.ToArray();
 
@@ -833,6 +835,17 @@ namespace Moq
 				throw new NotSupportedException(string.Format(
 					CultureInfo.CurrentCulture,
 					Resources.VerifyOnNonVirtualMember,
+					verify.ToStringFixed()));
+			}
+		}
+
+		private static void ThrowIfVerifyNotMember(Expression verify, MethodInfo method)
+		{
+			if (method.IsStatic)
+			{
+				throw new NotSupportedException(string.Format(
+					CultureInfo.CurrentCulture,
+					Resources.VerifyOnNonMemberMethod,
 					verify.ToStringFixed()));
 			}
 		}
