@@ -503,7 +503,7 @@ namespace Moq
 
 			try
 			{
-				this.DoRaise(ev, args);
+				ev.Target.DoRaise(ev.MemberInfo, args);
 			}
 			catch (Exception e)
 			{
@@ -521,7 +521,7 @@ namespace Moq
 
 			try
 			{
-				this.DoRaise(ev, args);
+				ev.Target.DoRaise(ev.MemberInfo, args);
 			}
 			catch (Exception e)
 			{
