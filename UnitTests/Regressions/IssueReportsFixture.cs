@@ -2059,21 +2059,21 @@ namespace Moq.Tests.Regressions
 					Bar();
 				}
 
-				protected virtual void Bar()
+				public virtual void Bar()
 				{
 				}
 			}
 
-#pragma warning disable 618
-			[Fact(Skip = "This setup doesn't make sense, and xUnit does not provide this message checking capability.")]
 			public void ShouldRenderCustomMessage()
 			{
 				var foo = new Mock<Foo> { CallBase = true };
-				foo.Protected().Setup("Bar").AtMostOnce().Verifiable("Hello");
+				foo.Setup(_ => _.Bar()).Verifiable("Hello");
 				foo.Object.Boo();
-				//Assert.Throws<MockException>("Hello", () => foo.Object.Boo());
+				var ex = Record.Exception(() => foo.Object.Boo());
+				Assert.NotNull(ex);
+				Assert.Contains("Hello", ex.Message); // has custom verification error message
+				Assert.Contains("once, but was", ex.Message); // has Moq's default message
 			}
-#pragma warning restore 618
 		}
 
 		#endregion
@@ -2114,34 +2114,6 @@ namespace Moq.Tests.Regressions
 
 				dependency.Verify(x => x.DoThis(foo, foo1));
 				dependency.Verify(x => x.DoThis(foo1, foo), Times.Never());
-			}
-
-			[Fact(Skip = "Wrong Equals implemention in the report. Won't Fix")]
-			public void ExampleFailingTest()
-			{
-				var foo1 = new Foo();
-				var foo = new Foo();
-
-				var sut = new Perfectly_fine_yet_failing_test();
-				var dependency = new Mock<IDependency>();
-
-				dependency.Setup(x => x.DoThis(foo, foo1))
-				  .Returns(new Foo());
-
-				sut.Do(dependency.Object, foo, foo1);
-
-				dependency.Verify(x => x.DoThis(foo, foo1));
-				dependency.Verify(x => x.DoThis(foo1, foo), Times.Never());
-			}
-
-			public class Perfectly_fine_yet_failing_test
-			{
-				public void Do(IDependency dependency, Foo foo, Foo foo1)
-				{
-					var foo2 = dependency.DoThis(foo, foo1);
-					if (foo2 == null)
-						foo2 = dependency.DoThis(foo1, foo);
-				}
 			}
 
 			public interface IDependency
