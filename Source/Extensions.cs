@@ -193,12 +193,14 @@ namespace Moq
 			return false;
 		}
 
-		public static EventInfo GetEvent<TMock>(this Action<TMock> eventExpression, TMock mock)
+		public static MemberInfoWithTarget<EventInfo, Mock> GetEvent<TMock>(this Action<TMock> eventExpression, TMock mock)
 			where TMock : class
 		{
 			Guard.NotNull(() => eventExpression, eventExpression);
 
-			MethodBase addRemove = null;
+			MethodBase addRemove;
+			Mock target;
+
 			using (var context = new FluentMockContext())
 			{
 				eventExpression(mock);
@@ -209,6 +211,7 @@ namespace Moq
 				}
 
 				addRemove = context.LastInvocation.Invocation.Method;
+				target = context.LastInvocation.Mock;
 			}
 
 			var ev = addRemove.DeclaringType.GetEvent(
@@ -222,7 +225,7 @@ namespace Moq
 					addRemove));
 			}
 
-			return ev;
+			return new MemberInfoWithTarget<EventInfo, Mock>(ev, target);
 		}
 
 #if !NETCORE

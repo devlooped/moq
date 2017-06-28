@@ -522,6 +522,84 @@ namespace Moq.Tests.Regressions
 
 		#endregion
 
+		#region 166
+
+		public class Issue166
+		{
+			[Fact]
+			public void Events_with_same_name_in_object_graph_can_both_be_raised()
+			{
+				var mock = new Mock<IFoo> { DefaultValue = DefaultValue.Mock };
+
+				var fooEventRaiseCount = 0;
+				mock.Object.Event += (s, e) => ++fooEventRaiseCount;
+
+				var barEventRaiseCount = 0;
+				mock.Object.Bar.Event += (s, e) => ++barEventRaiseCount;
+
+				mock.Raise(x => x.Event += null, EventArgs.Empty);
+				mock.Raise(x => x.Bar.Event += null, EventArgs.Empty);
+
+				Assert.Equal(1, fooEventRaiseCount);
+				Assert.Equal(1, barEventRaiseCount);
+			}
+
+			[Fact]
+			public void Events_with_different_names_in_object_graph_can_both_be_raised()
+			{
+				var mock = new Mock<IFoo> { DefaultValue = DefaultValue.Mock };
+
+				var fooEventRaiseCount = 0;
+				mock.Object.Event += (s, e) => ++fooEventRaiseCount;
+
+				var barAnotherEventRaiseCount = 0;
+				mock.Object.Bar.AnotherEvent += (s, e) => ++barAnotherEventRaiseCount;
+
+				mock.Raise(x => x.Event += null, EventArgs.Empty);
+				mock.Raise(x => x.Bar.AnotherEvent += null, EventArgs.Empty);
+
+				Assert.Equal(1, fooEventRaiseCount);
+				Assert.Equal(1, barAnotherEventRaiseCount);
+			}
+
+			[Fact]
+			public void Event_in_child_mock_can_be_raised_if_parent_object_has_no_events()
+			{
+				var mock = new Mock<IQux>() { DefaultValue = DefaultValue.Mock };
+
+				var quuxEventRaiseCount = 0;
+				mock.Object.Quux.Event += (s, e) => ++quuxEventRaiseCount;
+
+				mock.Raise(x => x.Quux.Event += null, EventArgs.Empty);
+
+				Assert.Equal(1, quuxEventRaiseCount);
+			}
+
+			public interface IFoo
+			{
+				IBar Bar { get; }
+				event EventHandler Event;
+			}
+
+			public interface IBar
+			{
+				event EventHandler Event;
+				event EventHandler AnotherEvent;
+			}
+
+			public interface IQux
+			{
+				IQuux Quux { get; }
+			}
+
+			public interface IQuux : IQux
+			{
+				event EventHandler Event;
+			}
+		}
+
+		#endregion
+
 		#region 175
 
 		public class Issue175
