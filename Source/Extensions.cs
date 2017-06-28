@@ -45,6 +45,7 @@ using System.Diagnostics.CodeAnalysis;
 using System.Globalization;
 using System.Linq;
 using System.Reflection;
+using System.Runtime.CompilerServices;
 using Moq.Proxy;
 using System.Linq.Expressions;
 using Moq.Properties;
@@ -329,6 +330,14 @@ namespace Moq
 			{
 				return null;
 			}
+		}
+
+		public static bool IsExtensionMethod(this MethodInfo method)
+		{
+			return method.IsStatic && method.IsDefined(typeof(ExtensionAttribute));
+			// The above check is perhaps "good enough for now", but admittedly incomplete:
+			// We should also check whether the method is defined in a non-nested static
+			// class, and whether it has at least one parameter.
 		}
 
 		/// <summary>
