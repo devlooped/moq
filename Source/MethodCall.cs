@@ -159,7 +159,7 @@ namespace Moq
 			get { return condition != null; }
 		}
 
-		public bool IsVerifiable { get; set; }
+		public Times? VerifiableTimes { get; set; }
 
 		public bool Invoked { get; set; }
 
@@ -357,12 +357,23 @@ namespace Moq
 
 		public void Verifiable()
 		{
-			this.IsVerifiable = true;
+			this.VerifiableTimes = Times.AtLeastOnce();
+		}
+
+		public void Verifiable(Times times)
+		{
+			this.VerifiableTimes = times;
 		}
 
 		public void Verifiable(string failMessage)
 		{
-			this.IsVerifiable = true;
+			this.VerifiableTimes = Times.AtLeastOnce();
+			this.FailMessage = failMessage;
+		}
+
+		public void Verifiable(Times times, string failMessage)
+		{
+			this.VerifiableTimes = times;
 			this.FailMessage = failMessage;
 		}
 

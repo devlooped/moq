@@ -65,12 +65,12 @@ namespace Moq
 
 		internal void Verify()
 		{
-			VerifyOrThrow(call => call.IsVerifiable && !call.Invoked);
+			VerifyOrThrow(call => !(call.VerifiableTimes?.Verify(call.CallCount) ?? true));
 		}
 
 		internal void VerifyAll()
 		{
-			VerifyOrThrow(call => !call.Invoked);
+			VerifyOrThrow(call => !(call.VerifiableTimes?.Verify(call.CallCount) ?? call.Invoked));
 		}
 
 		private void VerifyOrThrow(Func<IProxyCall, bool> match)

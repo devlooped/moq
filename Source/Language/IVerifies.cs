@@ -66,6 +66,22 @@ namespace Moq.Language
 		/// <summary>
 		/// Marks the expectation as verifiable, meaning that a call 
 		/// to <see cref="Mock.Verify()"/> will check if this particular 
+		/// expectation was met by the expected number of invocataions.
+		/// </summary>
+		/// <example>
+		/// The following example marks the expectation as verifiable
+		/// and requiring at least one call:
+		/// <code>
+		/// mock.Expect(x => x.Execute("ping"))
+		///     .Returns(true)
+		///     .Verifiable(Times.AtLeastOnce());
+		/// </code>
+		/// </example>
+		void Verifiable(Times times);
+
+		/// <summary>
+		/// Marks the expectation as verifiable, meaning that a call 
+		/// to <see cref="Mock.Verify()"/> will check if this particular 
 		/// expectation was met, and specifies a message for failures.
 		/// </summary>
 		/// <example>
@@ -77,5 +93,22 @@ namespace Moq.Language
 		/// </code>
 		/// </example>
 		void Verifiable(string failMessage);
+
+		/// <summary>
+		/// Marks the expectation as verifiable, meaning that a call 
+		/// to <see cref="Mock.Verify()"/> will check if this particular 
+		/// expectation was metby the expected number of invocataions,
+		/// and specifies a message for failures.
+		/// </summary>
+		/// <example>
+		/// The following example marks the expectation as verifiable
+		/// and requiring at least one call:
+		/// <code>
+		/// mock.Expect(x => x.Execute("ping"))
+		///     .Returns(true)
+		///     .Verifiable(Times.AtLeastOnce(), "Ping should be executed always!");
+		/// </code>
+		/// </example>
+		void Verifiable(Times times, string failMessage);
 	}
 }
