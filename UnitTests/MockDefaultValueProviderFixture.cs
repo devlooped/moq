@@ -1,5 +1,6 @@
 ﻿using System.Collections.Generic;
 using System.Linq;
+using System.Threading.Tasks;
 #if NETCORE
 using System.Reflection;
 #endif
@@ -93,6 +94,19 @@ namespace Moq.Tests
 			Assert.Throws<MockVerificationException>(() => mock.Verify());
 		}
 
+		[Fact]
+		public async Task CanCreateCompletedTaskHoldingMockedObject()
+		{
+			var mock = new Mock<IWithGetFooAsync>();
+			var provider = new MockDefaultValueProvider(mock);
+
+			var task = provider.ProvideDefault(typeof(IWithGetFooAsync).GetMethod(nameof(IWithGetFooAsync.GetFooAsync))) as Task<IFoo>;
+			Assert.NotNull(task);
+			var value = await task;
+			Assert.NotNull(value);
+			Assert.True(value is IFoo);
+		}
+
 		public interface IFoo
 		{
 			IBar Bar { get; set; }
@@ -102,5 +116,10 @@ namespace Moq.Tests
 		}
 
 		public interface IBar { void Do(); }
+
+		public interface IWithGetFooAsync
+		{
+			Task<IFoo> GetFooAsync();
+		}
 	}
 }
