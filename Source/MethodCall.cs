@@ -349,7 +349,7 @@ namespace Moq
 		{
 			throw new ArgumentException(string.Format(
 				CultureInfo.CurrentCulture,
-				"Invalid callback. Setup on method with parameters ({0}) cannot invoke callback with parameters ({1}).",
+				Resources.InvalidCallbackParameterMismatch,
 				string.Join(",", expected.Select(p => p.ParameterType.Name).ToArray()),
 				string.Join(",", actual.Select(p => p.ParameterType.Name).ToArray())
 			));

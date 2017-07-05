@@ -194,7 +194,7 @@ namespace Moq
 			}
 			else
 			{
-				throw new NotSupportedException("Unsupported expression: " + setup.ToStringFixed());
+				throw new NotSupportedException(string.Format(Resources.UnsupportedExpression, setup.ToStringFixed()));
 			}
 
 			info.ReturnType.ThrowIfNotMockeable();

@@ -208,7 +208,7 @@ namespace Moq
 
 				if (context.LastInvocation == null)
 				{
-					throw new ArgumentException("Expression is not an event attach or detach, or the event is declared in a class but not marked virtual.");
+					throw new ArgumentException(Resources.ExpressionIsNotEventAttachOrDetachOrIsNotVirtual);
 				}
 
 				addRemove = context.LastInvocation.Invocation.Method;
