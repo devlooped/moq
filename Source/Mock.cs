@@ -405,8 +405,8 @@ namespace Moq
 				.ToArray();
 
 			return expressionSetups.Length == 0 ?
-				"No setups configured." :
-				Environment.NewLine + "Configured setups:" + Environment.NewLine + string.Join(Environment.NewLine, expressionSetups);
+				Resources.NoSetupsConfigured :
+				Environment.NewLine + string.Format(Resources.ConfiguredSetups, Environment.NewLine + string.Join(Environment.NewLine, expressionSetups));
 		}
 
 		private static string FormatCallCount(int callCount)
@@ -431,8 +431,8 @@ namespace Moq
 				.ToArray();
 
 			return formattedInvocations.Length == 0 ?
-				"No invocations performed." :
-				Environment.NewLine + "Performed invocations:" + Environment.NewLine + string.Join(Environment.NewLine, formattedInvocations);
+				Resources.NoInvocationsPerformed :
+				Environment.NewLine + string.Format(Resources.PerformedInvocations, Environment.NewLine + string.Join(Environment.NewLine, formattedInvocations));
 		}
 
 		#endregion

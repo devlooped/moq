@@ -197,7 +197,7 @@ namespace Moq.Linq
 			// We need to go back one level, to the target expression of the Setup call, 
 			// which would be the Mock.Get(foo), where we will actually invoke SetupProperty instead.
 			if (propertySetup.NodeType != ExpressionType.Call)
-				throw new NotSupportedException("Unexpected translation of a member access: " + propertySetup.ToStringFixed());
+				throw new NotSupportedException(string.Format(Resources.UnexpectedTranslationOfMemberAccess, propertySetup.ToStringFixed()));
 
 			var propertyCall = (MethodCallExpression)propertySetup;
 			var mockExpression = propertyCall.Object;

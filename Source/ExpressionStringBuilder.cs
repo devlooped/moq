@@ -8,6 +8,7 @@ using System.Reflection;
 using System.Runtime.CompilerServices;
 using System.Text;
 using System.Collections.ObjectModel;
+using Moq.Properties;
 
 namespace Moq
 {
@@ -127,7 +128,7 @@ namespace Moq
 					ToStringListInit((ListInitExpression)exp);
 					return;
 				default:
-					throw new Exception(string.Format("Unhandled expression type: '{0}'", exp.NodeType));
+					throw new Exception(string.Format(Resources.UnhandledExpressionType, exp.NodeType));
 			}
 		}
 
@@ -145,7 +146,7 @@ namespace Moq
 					ToStringMemberListBinding((MemberListBinding)binding);
 					return;
 				default:
-					throw new Exception(string.Format("Unhandled binding type '{0}'", binding.BindingType));
+					throw new Exception(string.Format(Resources.UnhandledBindingType, binding.BindingType));
 			}
 		}
 
