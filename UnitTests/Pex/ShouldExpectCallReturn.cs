@@ -16,21 +16,21 @@ using Microsoft.Pex.Framework.Choices;
 
 namespace Mock.Tests
 {
-    [TestClass]
-    [PexClass(Suite = "checkin")]
-    public partial class ShouldExpectCallReturn
-    {
-        [TestMethod]
-        [PexMethod(MaxBranches = int.MaxValue)]
-        public void Moq()
-        {
-            // ShouldExpectCallReturn
-            var mock = new Mock<ICloneable>();
-            var clone = new object();
+	[TestClass]
+	[PexClass(Suite = "checkin")]
+	public partial class ShouldExpectCallReturn
+	{
+		[TestMethod]
+		[PexMethod(MaxBranches = int.MaxValue)]
+		public void Moq()
+		{
+			// ShouldExpectCallReturn
+			var mock = new Mock<ICloneable>();
+			var clone = new object();
 
-            mock.Setup(x => x.Clone()).Returns(clone);
+			mock.Setup(x => x.Clone()).Returns(clone);
 
-            Assert.AreSame(clone, mock.Object.Clone());
-        }
-    }
+			Assert.AreSame(clone, mock.Object.Clone());
+		}
+	}
 }

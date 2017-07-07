@@ -52,12 +52,12 @@ namespace Moq.Tests
 			mock.SetupSequence(x => x.Value)
 				.Returns("foo")
 				.Returns("bar")
-				.Throws<SystemException>();
+				.Throws<InvalidOperationException>();
 
 			string temp;
 			Assert.Equal("foo", mock.Object.Value);
 			Assert.Equal("bar", mock.Object.Value);
-			Assert.Throws<SystemException>(() => temp = mock.Object.Value);
+			Assert.Throws<InvalidOperationException>(() => temp = mock.Object.Value);
 		}
 
 		[Fact]

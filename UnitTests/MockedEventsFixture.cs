@@ -35,8 +35,7 @@ namespace Moq.Tests
 
 			Assert.False(presenter.Canceled);
 
-			view.Raise(v => v.Canceled += null, EventArgs.Empty);
-
+			view.Raise(v => v.Canceled += null, EventArgs.Empty);         
 			Assert.True(presenter.Canceled);
 		}
 
@@ -705,6 +704,5 @@ namespace Moq.Tests
 				}
 			}
 		}
-
 	}
 }

@@ -63,8 +63,5 @@
 
 		private System.Windows.Forms.Integration.ElementHost visualizerHost;
 		private MockVisualizerView mockVisualizerView;
-
-
-
 	}
 }

@@ -1,9 +1,10 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Linq;
-#if !NET3x
-using System.Threading.Tasks;
+#if NETCORE
+using System.Reflection;
 #endif
+using System.Threading.Tasks;
 using Xunit;
 
 namespace Moq.Tests
@@ -55,9 +56,9 @@ namespace Moq.Tests
 		{
 			var provider = new EmptyDefaultValueProvider();
 
-			var value = provider.ProvideDefault(typeof(IFoo).GetProperty("Platform").GetGetMethod());
+			var value = provider.ProvideDefault(typeof(IFoo).GetProperty("UriKind").GetGetMethod());
 
-			Assert.Equal(default(PlatformID), value);
+			Assert.Equal(default(UriKind), value);
 		}
 
 		[Fact]
@@ -110,7 +111,6 @@ namespace Moq.Tests
 			Assert.Equal(0, ((IQueryable)value).Cast<object>().Count());
 		}
 
-#if !NET3x
 		[Fact]
 		public void ProvidesDefaultTask()
 		{
@@ -157,7 +157,6 @@ namespace Moq.Tests
 			Assert.True(((Task)value).IsCompleted);
 			Assert.Equal(default(int), ((Task<Task<int>>) value).Result.Result);
 		}
-#endif
 
 		public interface IFoo
 		{
@@ -167,17 +166,15 @@ namespace Moq.Tests
 			int IntValue { get; set; }
 			bool BoolValue { get; set; }
 			int? NullableIntValue { get; set; }
-			PlatformID Platform { get; set; }
+			UriKind UriKind { get; set; }
 			IEnumerable<int> Indexes { get; set; }
 			IBar[] Bars { get; set; }
 			IQueryable<int> Queryable { get; }
 			IQueryable QueryableObjects { get; }
-#if !NET3x
 			Task TaskValue { get; set; }
 			Task<int> GenericTaskOfValueType { get; set; }
 			Task<string> GenericTaskOfReferenceType { get; set; }
 			Task<Task<int>> TaskOfGenericTaskOfValueType { get; set; }
-#endif
 		}
 
 		public interface IBar { }

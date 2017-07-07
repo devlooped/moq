@@ -116,6 +116,20 @@ namespace Moq.Tests
 		}
 
 		[Fact]
+		public void SetupAllowsProtectedMethodWithNullableParameters()
+		{
+			int? input = 5;
+			int expectedOutput = 6;
+
+			var mock = new Mock<FooBase>();
+			mock.Protected()
+				.Setup<int>("ProtectedWithNullableIntParam", input)
+				.Returns(expectedOutput);
+
+			Assert.Equal(expectedOutput, mock.Object.DoProtectedWithNullableIntParam(input));
+		}
+
+		[Fact]
 		public void ThrowsIfSetupVoidMethodIsProperty()
 		{
 			Assert.Throws<ArgumentException>(() => new Mock<FooBase>().Protected().Setup("ProtectedValue"));
@@ -335,6 +349,16 @@ namespace Moq.Tests
 		}
 
 		[Fact]
+		public void ResolveOverloadsSameFirstParameterType()
+		{
+			var mock = new Mock<MethodOverloads>();
+			mock.Protected().Setup("SameFirstParameter", new object(), new object()).Verifiable();
+			mock.Protected().Setup("SameFirstParameter", new object()).Verifiable();
+
+			mock.Object.ExecuteSameFirstParameter(new object());
+		}
+
+		[Fact]
 		public void ThrowsIfSetReturnsForVoidMethod()
 		{
 			Assert.Throws<ArgumentException>(
@@ -350,6 +374,26 @@ namespace Moq.Tests
 				.Returns(5);
 
 			Assert.Equal(5, mock.Object.DoProtectedInt());
+		}
+
+		[Fact]
+		public void SetupResultDefaulTwoOverloadsWithDerivedClassThrowsInvalidOperationException()
+		{
+			var mock = new Mock<MethodOverloads>();
+			Assert.Throws<InvalidOperationException>(() => mock.Protected()
+				.Setup<FooBase>("Overloaded", ItExpr.IsAny<MyDerived>())
+				.Returns(new FooBase()));
+
+		}
+
+		[Fact]
+		public void SetupResultExactParameterMatchTwoOverloadsWithDerivedClassShouldNotThrow()
+		{
+			var mock = new Mock<MethodOverloads>();
+			var fooBase = new FooBase();
+			mock.Protected()
+				.Setup<FooBase>("Overloaded", true, ItExpr.IsAny<MyDerived>())
+				.Returns(fooBase);
 		}
 
 		[Fact]
@@ -721,6 +765,22 @@ namespace Moq.Tests
 			{
 				return a + b;
 			}
+
+			public void ExecuteSameFirstParameter(object a) { }
+
+			protected virtual void SameFirstParameter(object a) { }
+
+			protected virtual void SameFirstParameter(object a, object b) { }
+
+			protected virtual FooBase Overloaded(MyBase myBase)
+			{
+				return null;
+			}
+
+			protected virtual FooBase Overloaded(MyDerived myBase)
+			{
+				return null;
+			}
 		}
 
 		public class FooBase
@@ -757,6 +817,11 @@ namespace Moq.Tests
 			public int DoProtectedInt()
 			{
 				return this.ProtectedInt();
+			}
+
+			public int DoProtectedWithNullableIntParam(int? value)
+			{
+				return this.ProtectedWithNullableIntParam(value);
 			}
 
 			public string DoStringArg(string arg)
@@ -806,6 +871,11 @@ namespace Moq.Tests
 				return 2;
 			}
 
+			protected virtual int ProtectedWithNullableIntParam(int? value)
+			{
+				return value ?? 0;
+			}
+
 			protected void NonVirtual()
 			{
 			}
@@ -829,5 +899,9 @@ namespace Moq.Tests
 		public class FooDerived : FooBase
 		{
 		}
+
+		public class MyBase { }
+
+		public class MyDerived : MyBase { }
 	}
 }
