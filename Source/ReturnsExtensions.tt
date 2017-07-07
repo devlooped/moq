@@ -1,0 +1,62 @@
+﻿<#@ template debug="false" hostspecific="false" language="C#" #>
+<#@ output extension=".Generated.cs" #>
+<#@ Assembly Name="System.Core" #>
+<#@ Import Namespace="System.Linq" #>
+using System;
+using System.Threading.Tasks;
+using Moq.Language;
+using Moq.Language.Flow;
+
+namespace Moq
+{
+	/// <summary>
+	/// Defines async extension methods on IReturns.
+	/// </summary>
+	public static class GeneratedReturnsExtensions
+	{
+		/// <summary>
+		/// Specifies a function that will calculate the value to return from the asynchronous method.
+		/// </summary>
+		/// <typeparam name="T">Type of the function parameter.</typeparam>
+		/// <typeparam name="TMock">Mocked type.</typeparam>
+		/// <typeparam name="TResult">Type of the return value.</typeparam>
+		/// <param name="mock">Returns verb which represents the mocked type and the task of return type</param>
+		/// <param name="valueFunction">The function that will calculate the return value.</param>
+		public static IReturnsResult<TMock> ReturnsAsync<T, TMock, TResult>(this IReturns<TMock, Task<TResult>> mock, Func<T, TResult> valueFunction) where TMock : class
+		{
+			return mock.Returns((T t) => Task.FromResult(valueFunction(t)));
+		}	
+		<# 
+		for (var argumentCount = 2; argumentCount <= 15; ++argumentCount)
+		{ #> 
+		/// <summary>
+		/// Specifies a function that will calculate the value to return from the asynchronous method.
+		/// </summary>
+		/// <param name="mock">Returns verb which represents the mocked type and the task of return type</param>
+		/// <param name="valueFunction">The function that will calculate the return value.</param>
+		public static IReturnsResult<TMock> ReturnsAsync<<#
+			for (var i = 1; i <= argumentCount; ++i)
+			{
+				#>T<#=i#>, <#
+			}#>TMock, TResult>(this IReturns<TMock, Task<TResult>> mock, Func<<#
+			for (var i = 1; i <= argumentCount; ++i)
+			{
+				#>T<#=i#>, <#
+			}#>TResult> valueFunction) where TMock : class
+		{
+			return mock.Returns((<#
+			for (var i = 1; i <= argumentCount; ++i)
+			{ #>T<#=i#> t<#=i#><#
+				if(i != argumentCount) {#>, <#}#><#
+			}#>) => Task.FromResult(valueFunction(<#
+			for (var i = 1; i <= argumentCount; ++i)
+			{
+				#>t<#=i#><#
+				if (i != argumentCount) { #>, <#}#><#
+			}#>)));
+		}
+<#
+		}
+		#>
+	}
+}

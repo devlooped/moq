@@ -17,6 +17,8 @@
 		<NuSpec Include="Moq.nuspec" />
 		<TestProject Include="UnitTests\Moq.Tests.csproj" />
 		<Source Include="Source\Moq.csproj" />
+		<NetCoreSolution Include="Moq.NetCore.sln" />
+		<NetCoreTestProject Include="UnitTests\Moq.NetCore.Tests.csproj" />
 	</ItemGroup>
 	
 	<Target Name="Clean">
@@ -30,7 +32,11 @@
 	
 	<Target Name="Build" DependsOnTargets="GitVersion">
 		<MSBuild Projects="@(Solution)" Properties="$(CommonBuildProperties)" />
-		
+
+		<MSBuild Projects="@(NetCoreSolution)" BuildInParallel="false" Targets="Restore;Build" Properties="$(CommonBuildProperties)" />
+
+		<Exec Command="xcopy &quot;Source\bin\$(Configuration)\netstandard1.3\Moq.*&quot; &quot;$(DropDirectory)lib\netstandard1.3\&quot; /Y" ContinueOnError="false" />
+
 		<Exec Command="$(PackagesPath)\gitlink\lib\net45\GitLink.exe . -f &quot;$([System.String]::new('%(Solution.FullPath)').Replace('$(MSBuildProjectDirectory)', '').TrimStart('\'))&quot; -skipverify -u https://github.com/moq/moq4 -b $(GitBranch) -c $(Configuration)" />
 	</Target>
 
@@ -58,11 +64,17 @@
 			   ParallelizeTestCollections="true"
 			   ContinueOnError="ErrorAndContinue" />
 
+		<Exec ContinueOnError="True" Command="dotnet --info">
+			<Output TaskParameter="ExitCode" PropertyName="DotNetErrorCode"/>
+		</Exec>
+		<Warning Condition="'$(DotNetErrorCode)' != '0'" Text="Error in executing dotnet. Skipping .NET Core tests." />
+		<Exec Command="dotnet test &quot;@(NetCoreTestProject, ' ')&quot; --no-build -c $(Configuration) --logger:trx;LogFileName=$(Out)\test.dotnet.trx" ContinueOnError="false" />
+
 		<!-- This isn't collecting any data right now, so make Coverage == '' by default so it won't run with this condition -->
 		<Exec Command="$(CoverageConsole) $(CoverageOptions) -target:$(XunitConsole) -targetargs:&quot;@(TestAssembly, ' ') $(XunitOptions)&quot;"
-			  Condition=" '$(Coverage)' == 'true' "
-			  ConsoleToMSBuild="true"
-			  ContinueOnError="ErrorAndContinue" />
+		      Condition=" '$(Coverage)' == 'true' "
+		      ConsoleToMSBuild="true"
+		      ContinueOnError="ErrorAndContinue" />
 	</Target>
 
 	<Target Name="Package" DependsOnTargets="Build">
@@ -72,8 +84,8 @@
 
 	<Target Name="Publish" DependsOnTargets="Package">
 		<Exec Command='$(NuGet) Push "$(Out)\%(NuSpec.Filename).$(Version).nupkg" $(NuGetPushArgs)'
-						StandardErrorImportance="high"
-						StandardOutputImportance="normal" />
+		      StandardErrorImportance="high"
+		      StandardOutputImportance="normal" />
 
 		<Message Text="Published new package: Id=%(NuSpec.Filename), Version=$(Version)"
 				 Importance="high" />
@@ -97,16 +109,16 @@
 
 		<!-- Errors if nuget packages were restored during the build -->
 		<Error Text="Required build-time NuGet packages were missing and were just restored. Please run the build again."
-			   Condition=" '$(PendingRestore)' == 'true' And '$(target)' != 'configure' "/>
+		       Condition=" '$(PendingRestore)' == 'true' And '$(target)' != 'configure' "/>
 
 		<PropertyGroup>
 			<Version>$(GitSemVerMajor).$(GitSemVerMinor).$(GitSemVerPatch)$(GitSemVerDashLabel)</Version>
 		</PropertyGroup>
-        
-        <!-- Update AppVeyor build # to match the actual one being used -->
-        <Exec Command="appveyor UpdateBuild -Version $(Version)" Condition=" '$(APPVEYOR)' == 'true' "
-              ConsoleToMSBuild="true"
-              ContinueOnError="WarnAndContinue" />
+
+		<!-- Update AppVeyor build # to match the actual one being used -->
+		<Exec Command="appveyor UpdateBuild -Version $(Version)" Condition=" '$(APPVEYOR)' == 'true' "
+		      ConsoleToMSBuild="true"
+		      ContinueOnError="WarnAndContinue" />
 
 		<MakeDir Directories="$(Out)" Condition=" !Exists('$(Out)') " />
 	</Target>

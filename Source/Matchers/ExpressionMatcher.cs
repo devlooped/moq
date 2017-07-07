@@ -1,5 +1,5 @@
 ﻿//Copyright (c) 2007. Clarius Consulting, Manas Technology Solutions, InSTEDD
-//http://code.google.com/p/moq/
+//https://github.com/moq/moq4
 //All rights reserved.
 
 //Redistribution and use in source and binary forms, 
@@ -58,13 +58,8 @@ namespace Moq.Matchers
 
 		public bool Matches(object value)
 		{
-			var valueExpression = value as Expression;
-			if (value == null)
-			{
-				return false;
-			}
-
-			return ExpressionComparer.Default.Equals(this.expression, valueExpression);
+			return value is Expression valueExpression
+				&& ExpressionComparer.Default.Equals(this.expression, valueExpression);
 		}
 	}
 }

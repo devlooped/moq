@@ -1,5 +1,5 @@
 ﻿//Copyright (c) 2007. Clarius Consulting, Manas Technology Solutions, InSTEDD
-//http://code.google.com/p/moq/
+//https://github.com/moq/moq4
 //All rights reserved.
 
 //Redistribution and use in source and binary forms, 
@@ -52,10 +52,10 @@ namespace Moq.Linq
 	internal class FluentMockVisitor : ExpressionVisitor
 	{
 		private static readonly MethodInfo fluentMockGenericMethod = ((Func<Mock<string>, Expression<Func<string, string>>, Mock<string>>)
-			QueryableMockExtensions.FluentMock<string, string>).Method.GetGenericMethodDefinition();
+			QueryableMockExtensions.FluentMock<string, string>).GetMethodInfo().GetGenericMethodDefinition();
 
 		private static readonly MethodInfo mockGetGenericMethod = ((Func<string, Mock<string>>)Mock.Get<string>)
-			.Method.GetGenericMethodDefinition();
+			.GetMethodInfo().GetGenericMethodDefinition();
 
 		private Expression expression;
 
@@ -129,7 +129,7 @@ namespace Moq.Linq
 			// compiler-generated types as they are typically the 
 			// anonymous types generated to build up the query expressions.
 			if (node.Expression.NodeType == ExpressionType.Parameter &&
-				node.Expression.Type.GetCustomAttribute<CompilerGeneratedAttribute>(false) != null)
+				node.Expression.Type.GetTypeInfo().GetCustomAttribute<CompilerGeneratedAttribute>(false) != null)
 			{
 				var memberType = ((PropertyInfo)node.Member).PropertyType;
 

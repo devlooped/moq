@@ -1,13 +1,13 @@
 ﻿{
-  "dependencies": {
-    "Castle.Core": "3.3.3",
-    "IFluentInterface": "2.0.0",
-    "GitInfo": "1.1.15"
-  },
-  "frameworks": {
-    "net45": { }
-  },
-  "runtimes": {
-    "win": {}
-  }
+	"dependencies": {
+		"Castle.Core": "4.1.0",
+		"IFluentInterface": "2.0.0",
+		"GitInfo": "1.1.15"
+	},
+	"frameworks": {
+		"net45": { }
+	},
+	"runtimes": {
+		"win": {}
+	}
 }

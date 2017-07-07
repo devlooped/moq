@@ -1,5 +1,5 @@
 ﻿//Copyright (c) 2007. Clarius Consulting, Manas Technology Solutions, InSTEDD
-//http://code.google.com/p/moq/
+//https://github.com/moq/moq4
 //All rights reserved.
 
 //Redistribution and use in source and binary forms, 
@@ -40,6 +40,7 @@
 
 using System;
 using System.Linq.Expressions;
+using System.Reflection;
 
 namespace Moq.Matchers
 {
@@ -49,7 +50,7 @@ namespace Moq.Matchers
 
 		public RefMatcher(object reference)
 		{
-			if (reference != null && reference.GetType().IsValueType)
+			if (reference != null && reference.GetType().GetTypeInfo().IsValueType)
 			{
 				equals = value => object.Equals(reference, value);
 			}

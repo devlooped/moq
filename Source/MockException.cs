@@ -1,5 +1,5 @@
 ﻿//Copyright (c) 2007. Clarius Consulting, Manas Technology Solutions, InSTEDD
-//http://code.google.com/p/moq/
+//https://github.com/moq/moq4
 //All rights reserved.
 
 //Redistribution and use in source and binary forms, 
@@ -42,7 +42,9 @@ using System;
 using System.Diagnostics.CodeAnalysis;
 using System.Globalization;
 using System.Linq;
+#if FEATURE_SERIALIZATION
 using System.Runtime.Serialization;
+#endif
 using System.Security;
 using Moq.Properties;
 using Moq.Proxy;
@@ -67,7 +69,7 @@ namespace Moq
 	/// </para>
 	/// </remarks>
 	[SuppressMessage("Microsoft.Design", "CA1032:ImplementStandardExceptionConstructors", Justification = "It's only initialized internally.")]
-#if !SILVERLIGHT
+#if FEATURE_SERIALIZATION
 	[Serializable]
 #endif
 	public class MockException : Exception
@@ -114,13 +116,13 @@ namespace Moq
 			get { return reason; }
 		}
 
-        /// <summary>
-        /// Indicates whether this exception is a verification fault raised by Verify()
-        /// </summary>
-        public bool IsVerificationError
-        {
-            get { return reason == ExceptionReason.VerificationFailed; }
-        }
+		/// <summary>
+		/// Indicates whether this exception is a verification fault raised by Verify()
+		/// </summary>
+		public bool IsVerificationError
+		{
+			get { return reason == ExceptionReason.VerificationFailed; }
+		}
 
 		private static string GetMessage(
 			MockBehavior behavior,
@@ -136,7 +138,7 @@ namespace Moq
 			);
 		}
 
-#if !SILVERLIGHT
+#if FEATURE_SERIALIZATION
 		/// <summary>
 		/// Supports the serialization infrastructure.
 		/// </summary>
@@ -169,7 +171,7 @@ namespace Moq
 	/// Used by the mock factory to accumulate verification 
 	/// failures.
 	/// </devdoc>
-#if !SILVERLIGHT
+#if FEATURE_SERIALIZATION
 	[Serializable]
 #endif
 	internal class MockVerificationException : MockException
@@ -197,26 +199,26 @@ namespace Moq
 			//var message = new StringBuilder();
 			//foreach (var setup in failedSetups)
 			//{
-			//   if (setup.FailMessage != null)
-			//   {
-			//      message.Append(setup.FailMessage).Append(": ");
-			//   }
+			//	if (setup.FailMessage != null)
+			//	{
+			//	message.Append(setup.FailMessage).Append(": ");
+			//	}
 
-			//   var lambda = setup.SetupExpression.PartialMatcherAwareEval().ToLambda();
-			//   var targetTypeName = lambda.Parameters[0].Type.Name;
+			//	var lambda = setup.SetupExpression.PartialMatcherAwareEval().ToLambda();
+			//	var targetTypeName = lambda.Parameters[0].Type.Name;
 
-			//   message.Append(targetTypeName).Append(" ").Append(lambda.ToStringFixed());
+			//	message.Append(targetTypeName).Append(" ").Append(lambda.ToStringFixed());
 
-			//   if (setup.TestMethod != null)
-			//   {
-			//      message.AppendFormat(
-			//         " ({0}() in {1}: line {2})",
-			//         setup.TestMethod.Name,
-			//         setup.FileName,
-			//         setup.FileLine);
-			//   }
+			//	if (setup.TestMethod != null)
+			//	{
+			//		message.AppendFormat(
+			//			" ({0}() in {1}: line {2})",
+			//			setup.TestMethod.Name,
+			//			setup.FileName,
+			//			setup.FileLine);
+			//	}
 
-			//   message.AppendLine();
+			//	message.AppendLine();
 			//}
 
 			//return message.ToString();
@@ -227,7 +229,7 @@ namespace Moq
 			return GetRawSetups(failedSetups);
 		}
 
-#if !SILVERLIGHT
+#if FEATURE_SERIALIZATION
 		/// <summary>
 		/// Supports the serialization infrastructure.
 		/// </summary>

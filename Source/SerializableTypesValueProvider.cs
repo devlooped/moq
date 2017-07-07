@@ -1,6 +1,8 @@
-﻿using System.Reflection;
-using System.Runtime.Serialization;
+﻿#if FEATURE_SERIALIZATION
 
+using System;
+using System.Reflection;
+using System.Runtime.Serialization;
 
 namespace Moq
 {
@@ -26,9 +28,33 @@ namespace Moq
 
 		public object ProvideDefault(MethodInfo member)
 		{
-			return !member.ReturnType.IsSerializable || member.ReturnType.IsSerializableMockable()
-				       ? decorated.ProvideDefault(member)
-				       : emptyDefaultValueProvider.ProvideDefault(member);
+			return IsSerializableWithIncorrectImplementationForISerializable(member.ReturnType)
+				? emptyDefaultValueProvider.ProvideDefault(member)
+				: decorated.ProvideDefault(member);
+		}
+
+		private static bool IsSerializableWithIncorrectImplementationForISerializable(Type typeToMock)
+		{
+			return typeToMock.IsSerializable
+				&& typeof(ISerializable).IsAssignableFrom(typeToMock)
+				&& !(ContainsDeserializationConstructor(typeToMock) && IsGetObjectDataVirtual(typeToMock));
+		}
+
+		private static bool ContainsDeserializationConstructor(Type typeToMock)
+		{
+			return typeToMock.GetConstructor(
+				BindingFlags.Instance | BindingFlags.Public | BindingFlags.NonPublic,
+				null,
+				new[] { typeof(SerializationInfo), typeof(StreamingContext) },
+				null) != null;
+		}
+
+		private static bool IsGetObjectDataVirtual(Type typeToMock)
+		{
+			var getObjectDataMethod = typeToMock.GetInterfaceMap(typeof(ISerializable)).TargetMethods[0];
+			return !getObjectDataMethod.IsPrivate && getObjectDataMethod.IsVirtual && !getObjectDataMethod.IsFinal;
 		}
 	}
 }
+
+#endif

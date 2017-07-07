@@ -37,8 +37,8 @@ namespace Moq
 			var expectationPosition = sequenceLength++;
 
 			return mock.When(new Condition(
-			   condition: () => expectationPosition == sequenceStep,
-			   success: NextStep));
+				condition: () => expectationPosition == sequenceStep,
+				success: NextStep));
 		}
 	}
 

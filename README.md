@@ -4,6 +4,7 @@ moq
 The most popular and friendly mocking framework for .NET
 
 [![Version](https://img.shields.io/nuget/v/Moq.svg)](https://www.nuget.org/packages/Moq)
+[![Downloads](https://img.shields.io/nuget/dt/Moq.svg)](https://www.nuget.org/packages/Moq)
 [![Join the chat at https://gitter.im/Moq](https://badges.gitter.im/Join%20Chat.svg)](https://gitter.im/Moq?utm_source=badge&utm_medium=badge&utm_campaign=pr-badge&utm_content=badge)
 
 
@@ -86,8 +87,6 @@ Moq offers the following features:
   * Pass constructor arguments for mocked classes
   * Intercept and raise events on mocks
   * Intuitive support for out/ref arguments
-
-
 
 We appreciate deeply any [feedback](http://moq.uservoice.com/) that you may have!
 

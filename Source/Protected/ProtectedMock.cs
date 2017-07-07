@@ -1,5 +1,5 @@
 ﻿//Copyright (c) 2007. Clarius Consulting, Manas Technology Solutions, InSTEDD
-//http://code.google.com/p/moq/
+//https://github.com/moq/moq4
 //All rights reserved.
 
 //Redistribution and use in source and binary forms, 
@@ -67,7 +67,7 @@ namespace Moq.Protected
 
 			var method = GetMethod(methodName, args);
 			ThrowIfMemberMissing(methodName, method);
-			ThrowIfPublicMethod(method);
+			ThrowIfPublicMethod(method, typeof(T).Name);
 
 			return Mock.Setup(mock, GetMethodCall(method, args), null);
 		}
@@ -76,18 +76,25 @@ namespace Moq.Protected
 		{
 			Guard.NotNullOrEmpty(() => methodName, methodName);
 
+			return Setup<TResult>(methodName, false, args);
+		}
+
+		public ISetup<T, TResult> Setup<TResult>(string methodName, bool exactParameterMatch, params object[] args)
+		{
+			Guard.NotNullOrEmpty(() => methodName, methodName);
+
 			var property = GetProperty(methodName);
 			if (property != null)
 			{
-				ThrowIfPublicGetter(property);
+				ThrowIfPublicGetter(property, typeof(T).Name);
 				// TODO should consider property indexers
 				return Mock.SetupGet(mock, GetMemberAccess<TResult>(property), null);
 			}
 
-			var method = GetMethod(methodName, args);
+			var method = GetMethod(methodName, exactParameterMatch, args);
 			ThrowIfMemberMissing(methodName, method);
 			ThrowIfVoidMethod(method);
-			ThrowIfPublicMethod(method);
+			ThrowIfPublicMethod(method, typeof(T).Name);
 
 			return Mock.Setup(mock, GetMethodCall<TResult>(method, args), null);
 		}
@@ -98,7 +105,7 @@ namespace Moq.Protected
 
 			var property = GetProperty(propertyName);
 			ThrowIfMemberMissing(propertyName, property);
-			ThrowIfPublicGetter(property);
+			ThrowIfPublicGetter(property, typeof(T).Name);
 			property.ThrowIfNoGetter();
 
 			return Mock.SetupGet(mock, GetMemberAccess<TProperty>(property), null);
@@ -110,7 +117,7 @@ namespace Moq.Protected
 
 			var property = GetProperty(propertyName);
 			ThrowIfMemberMissing(propertyName, property);
-			ThrowIfPublicSetter(property);
+			ThrowIfPublicSetter(property, typeof(T).Name);
 			property.ThrowIfNoSetter();
 
 			return Mock.SetupSet<T, TProperty>(mock, GetSetterExpression(property, ItExpr.IsAny<TProperty>()), null);
@@ -126,7 +133,7 @@ namespace Moq.Protected
 
 			var method = GetMethod(methodName, args);
 			ThrowIfMemberMissing(methodName, method);
-			ThrowIfPublicMethod(method);
+			ThrowIfPublicMethod(method, typeof(T).Name);
 
 			Mock.Verify(mock, GetMethodCall(method, args), times, null);
 		}
@@ -138,7 +145,7 @@ namespace Moq.Protected
 			var property = GetProperty(methodName);
 			if (property != null)
 			{
-				ThrowIfPublicGetter(property);
+				ThrowIfPublicGetter(property, typeof(T).Name);
 				// TODO should consider property indexers
 				Mock.VerifyGet(mock, GetMemberAccess<TResult>(property), times, null);
 				return;
@@ -146,7 +153,7 @@ namespace Moq.Protected
 
 			var method = GetMethod(methodName, args);
 			ThrowIfMemberMissing(methodName, method);
-			ThrowIfPublicMethod(method);
+			ThrowIfPublicMethod(method, typeof(T).Name);
 
 			Mock.Verify(mock, GetMethodCall<TResult>(method, args), times, null);
 		}
@@ -158,7 +165,7 @@ namespace Moq.Protected
 
 			var property = GetProperty(propertyName);
 			ThrowIfMemberMissing(propertyName, property);
-			ThrowIfPublicGetter(property);
+			ThrowIfPublicGetter(property, typeof(T).Name);
 			property.ThrowIfNoGetter();
 
 			// TODO should consider property indexers
@@ -172,7 +179,7 @@ namespace Moq.Protected
 
 			var property = GetProperty(propertyName);
 			ThrowIfMemberMissing(propertyName, property);
-			ThrowIfPublicSetter(property);
+			ThrowIfPublicSetter(property, typeof(T).Name);
 			property.ThrowIfNoSetter();
 
 			// TODO should consider property indexers
@@ -190,24 +197,26 @@ namespace Moq.Protected
 
 		private static MethodInfo GetMethod(string methodName, params object[] args)
 		{
-			return typeof(T).GetMethod(
-				methodName,
-				BindingFlags.Instance | BindingFlags.NonPublic | BindingFlags.Public,
-				null,
-				ToArgTypes(args),
-				null);
+			return GetMethod(methodName, false, args);
+		}
+
+		private static MethodInfo GetMethod(string methodName, bool exactParameterMatch, params object[] args)
+		{
+			var argTypes = ToArgTypes(args);
+			return typeof(T).GetMethods(BindingFlags.Instance | BindingFlags.NonPublic | BindingFlags.Public)
+				.SingleOrDefault(m => m.Name == methodName && m.HasCompatibleParameterTypes(argTypes, exactParameterMatch));
 		}
 
 		private static Expression<Func<T, TResult>> GetMethodCall<TResult>(MethodInfo method, object[] args)
 		{
 			var param = Expression.Parameter(typeof(T), "mock");
-			return Expression.Lambda<Func<T, TResult>>(Expression.Call(param, method, ToExpressionArgs(args)), param);
+			return Expression.Lambda<Func<T, TResult>>(Expression.Call(param, method, ToExpressionArgs(method, args)), param);
 		}
 
 		private static Expression<Action<T>> GetMethodCall(MethodInfo method, object[] args)
 		{
 			var param = Expression.Parameter(typeof(T), "mock");
-			return Expression.Lambda<Action<T>>(Expression.Call(param, method, ToExpressionArgs(args)), param);
+			return Expression.Lambda<Action<T>>(Expression.Call(param, method, ToExpressionArgs(method, args)), param);
 		}
 
 		// TODO should support arguments for property indexers
@@ -227,14 +236,14 @@ namespace Moq.Protected
 				param).Compile();
 		}
 
-		private static void ThrowIfNonVirtual(MethodInfo method)
+		private static void ThrowIfNonVirtual(MethodInfo method, string reflectedTypeName)
 		{
 			if (method.IsAssembly || method.IsFamilyAndAssembly)
 			{
 				throw new ArgumentException(string.Format(
 					CultureInfo.CurrentCulture,
 					Resources.VerifyOnNonVirtualMember,
-					method.ReflectedType.Name + "." + method.Name));
+					reflectedTypeName + "." + method.Name));
 			}
 		}
 
@@ -250,38 +259,38 @@ namespace Moq.Protected
 			}
 		}
 
-		private static void ThrowIfPublicMethod(MethodInfo method)
+		private static void ThrowIfPublicMethod(MethodInfo method, string reflectedTypeName)
 		{
 			if (method.IsPublic)
 			{
 				throw new ArgumentException(string.Format(
 					CultureInfo.CurrentCulture,
 					Resources.MethodIsPublic,
-					method.ReflectedType.Name,
+					reflectedTypeName,
 					method.Name));
 			}
 		}
 
-		private static void ThrowIfPublicGetter(PropertyInfo property)
+		private static void ThrowIfPublicGetter(PropertyInfo property, string reflectedTypeName)
 		{
 			if (property.CanRead && property.GetGetMethod() != null)
 			{
 				throw new ArgumentException(string.Format(
 					CultureInfo.CurrentCulture,
 					Resources.UnexpectedPublicProperty,
-					property.ReflectedType.Name,
+					reflectedTypeName,
 					property.Name));
 			}
 		}
 
-		private static void ThrowIfPublicSetter(PropertyInfo property)
+		private static void ThrowIfPublicSetter(PropertyInfo property, string reflectedTypeName)
 		{
 			if (property.CanWrite && property.GetSetMethod() != null)
 			{
 				throw new ArgumentException(string.Format(
 					CultureInfo.CurrentCulture,
 					Resources.UnexpectedPublicProperty,
-					property.ReflectedType.Name,
+					reflectedTypeName,
 					property.Name));
 			}
 		}
@@ -321,19 +330,20 @@ namespace Moq.Protected
 				else if (expr.NodeType == ExpressionType.MemberAccess)
 				{
 					var member = (MemberExpression)expr;
-					switch (member.Member.MemberType)
+					if ((member.Member as FieldInfo) != null)
 					{
-						case MemberTypes.Field:
-							types[index] = ((FieldInfo)member.Member).FieldType;
-							break;
-						case MemberTypes.Property:
-							types[index] = ((PropertyInfo)member.Member).PropertyType;
-							break;
-						default:
-							throw new NotSupportedException(string.Format(
-								Resources.Culture,
-								Resources.UnsupportedMember,
-								member.Member.Name));
+						types[index] = ((FieldInfo)member.Member).FieldType;
+					}
+					else if ((member.Member as PropertyInfo) != null)
+					{
+						types[index] = ((PropertyInfo)member.Member).PropertyType;
+					}
+					else
+					{
+						throw new NotSupportedException(string.Format(
+							Resources.Culture,
+							Resources.UnsupportedMember,
+							member.Member.Name));
 					}
 				}
 				else
@@ -353,7 +363,7 @@ namespace Moq.Protected
 			return types;
 		}
 
-		private static Expression ToExpressionArg(object arg)
+		private static Expression ToExpressionArg(ParameterInfo paramInfo, object arg)
 		{
 			var lambda = arg as LambdaExpression;
 			if (lambda != null)
@@ -367,12 +377,16 @@ namespace Moq.Protected
 				return expression;
 			}
 
-			return Expression.Constant(arg);
+			return Expression.Constant(arg, paramInfo.ParameterType);
 		}
 
-		private static IEnumerable<Expression> ToExpressionArgs(object[] args)
+		private static IEnumerable<Expression> ToExpressionArgs(MethodInfo method, object[] args)
 		{
-			return args.Select(arg => ToExpressionArg(arg));
+			ParameterInfo[] methodParams = method.GetParameters();
+			for (int i = 0; i < args.Length; i++)
+			{
+				yield return ToExpressionArg(methodParams[i], args[i]);
+			}
 		}
 	}
 }

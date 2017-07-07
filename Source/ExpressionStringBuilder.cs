@@ -1,4 +1,5 @@
 using System;
+using System.Collections;
 using System.Collections.Generic;
 using System.Globalization;
 using System.Linq;
@@ -257,12 +258,35 @@ namespace Moq
 				{
 					builder.Append("\"").Append(value).Append("\"");
 				}
+				else if (value is IEnumerable enumerable)
+				{
+					builder.Append("[");
+					bool addComma = false;
+					const int maxCount = 10;
+					int count = 0;
+					foreach (var obj in enumerable.Cast<object>())
+					{
+						if (addComma)
+						{
+							builder.Append(", ");
+						}
+						if (count >= maxCount)
+						{
+							builder.Append("...");
+							break;
+						}
+						ToStringConstant(Expression.Constant(obj));
+						addComma = true;
+						++count;
+					}
+					builder.Append("]");
+				}
 				else if (value.ToString() == value.GetType().ToString())
 				{
 					// Perhaps is better without nothing (at least for local variables)
 					//builder.Append("<value>");
 				}
-				else if (c.Type.IsEnum)
+				else if (c.Type.GetTypeInfo().IsEnum)
 				{
 					builder.Append(c.Type.DisplayName(this.getTypeName)).Append(".").Append(value);
 				}
@@ -319,7 +343,9 @@ namespace Moq
 				var paramFrom = 0;
 				var expression = node.Object;
 
-				if (Attribute.GetCustomAttribute(node.Method, typeof(ExtensionAttribute)) != null)
+				var hasExtensionAttribute = node.Method.GetCustomAttribute<ExtensionAttribute>() != null;
+
+				if (hasExtensionAttribute)
 				{
 					paramFrom = 1;
 					expression = node.Arguments[0];
@@ -343,15 +369,19 @@ namespace Moq
 				else if (node.Method.IsPropertyIndexerSetter())
 				{
 					this.builder.Append("[");
-					AsCommaSeparatedValues(node.Arguments
-						.Skip(paramFrom)
-						.Take(node.Arguments.Count - paramFrom), ToString);
+					AsCommaSeparatedValues(node.Arguments.Skip(paramFrom), ToString);
 					this.builder.Append("] = ");
 					ToString(node.Arguments.Last());
 				}
 				else if (node.Method.IsPropertyGetter())
 				{
 					this.builder.Append(".").Append(node.Method.Name.Substring(4));
+					if (node.Arguments.Count > paramFrom)
+					{
+						this.builder.Append("[");
+						AsCommaSeparatedValues(node.Arguments.Skip(paramFrom), ToString);
+						this.builder.Append("]");
+					}
 				}
 				else if (node.Method.IsPropertySetter())
 				{
@@ -634,7 +664,7 @@ namespace Moq
 			}
 			var builder = new StringBuilder(100);
 			builder.Append(getName(source).Split('`').First());
-			if (source.IsGenericType)
+			if (source.GetTypeInfo().IsGenericType)
 			{
 				builder.Append("<");
 				builder.Append(source.GetGenericArguments().Select(t => getName(t)).AsCommaSeparatedValues());

@@ -1,5 +1,5 @@
 ﻿//Copyright (c) 2007. Clarius Consulting, Manas Technology Solutions, InSTEDD
-//http://code.google.com/p/moq/
+//https://github.com/moq/moq4
 //All rights reserved.
 
 //Redistribution and use in source and binary forms, 
@@ -43,6 +43,8 @@ using System.Diagnostics.CodeAnalysis;
 using System.Linq.Expressions;
 using System.Text.RegularExpressions;
 using Moq.Matchers;
+using System.Reflection;
+using System.Linq;
 
 namespace Moq.Protected
 {
@@ -140,7 +142,7 @@ namespace Moq.Protected
 		public static Expression Is<TValue>(Expression<Func<TValue, bool>> match)
 		{
 			return Expression.Call(null,
-				typeof(It).GetMethod("Is").MakeGenericMethod(typeof(TValue)),
+				typeof(It).GetTypeInfo().DeclaredMethods.SingleOrDefault(m => m.Name == "Is")?.MakeGenericMethod(typeof(TValue)),
 				match);
 		}
 

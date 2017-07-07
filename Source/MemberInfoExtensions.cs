@@ -19,7 +19,7 @@ namespace Moq
 
 		public static string GetFullName(this Type type)
 		{
-			if (type.IsGenericType)
+			if (type.GetTypeInfo().IsGenericType)
 			{
 				return type.FullName.Substring(0, type.FullName.IndexOf('`')) +
 					GetGenericArguments(type.GetGenericArguments(), t => GetFullName(t));
@@ -40,7 +40,7 @@ namespace Moq
 
 		public static string GetName(this Type type)
 		{
-			if (type.IsGenericType)
+			if (type.GetTypeInfo().IsGenericType)
 			{
 				return type.Name.Substring(0, type.Name.IndexOf('`')) +
 					GetGenericArguments(type.GetGenericArguments(), t => GetName(t));
@@ -61,12 +61,12 @@ namespace Moq
 		}
 
 
-		public static bool IsEventAttach(this MethodBase method)
+		public static bool LooksLikeEventAttach(this MethodBase method)
 		{
 			return method.Name.StartsWith("add_", StringComparison.Ordinal);
 		}
 
-		public static bool IsEventDetach(this MethodBase method)
+		public static bool LooksLikeEventDetach(this MethodBase method)
 		{
 			return method.Name.StartsWith("remove_", StringComparison.Ordinal);
 		}

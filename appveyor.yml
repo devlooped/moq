@@ -1,4 +1,4 @@
-os: Visual Studio 2015
+image: Visual Studio 2017
 
 init:
   - git config --global core.autocrlf input
@@ -20,8 +20,7 @@ deploy:
 
 nuget:
   project_feed: true
-  disable_publish_on_pr: true
-  
+
 artifacts:
   - path: out\*.nupkg
     name: Package

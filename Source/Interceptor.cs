@@ -1,5 +1,5 @@
 ﻿//Copyright (c) 2007. Clarius Consulting, Manas Technology Solutions, InSTEDD
-//http://code.google.com/p/moq/
+//https://github.com/moq/moq4
 //All rights reserved.
 
 //Redistribution and use in source and binary forms, 
@@ -61,7 +61,7 @@ namespace Moq
 			InterceptionContext = new InterceptorContext(mock, targetType, behavior);
 		}
 
-        internal InterceptorContext InterceptionContext { get; private set; }
+		internal InterceptorContext InterceptionContext { get; private set; }
 
 		internal void Verify()
 		{
@@ -113,12 +113,17 @@ namespace Moq
 			InterceptionContext.AddOrderedCall(call);
 		}
 
+		internal void ClearCalls()
+		{
+			calls.Clear();
+		}
+
 		private IEnumerable<IInterceptStrategy> InterceptionStrategies()
 		{
 			yield return new HandleDestructor();
 			yield return new HandleTracking();
 			yield return new InterceptMockPropertyMixin();
-			yield return new InterceptToStringMixin();
+			yield return new InterceptObjectMethodsMixin();
 			yield return new AddActualInvocation();
 			yield return new ExtractProxyCall();
 			yield return new ExecuteCall();
@@ -129,10 +134,10 @@ namespace Moq
 		[SuppressMessage("Microsoft.Maintainability", "CA1502:AvoidExcessiveComplexity")]
 		public void Intercept(ICallContext invocation)
 		{
-            CurrentInterceptContext localCtx = new CurrentInterceptContext();
+			CurrentInterceptContext localCtx = new CurrentInterceptContext();
 			foreach (var strategy in InterceptionStrategies())
 			{
-                if (InterceptionAction.Stop == strategy.HandleIntercept(invocation, InterceptionContext, localCtx))
+				if (InterceptionAction.Stop == strategy.HandleIntercept(invocation, InterceptionContext, localCtx))
 				{
 					break;
 				}
@@ -168,33 +173,30 @@ namespace Moq
 				var index = 0;
 				while (eq && index < this.values.Count)
 				{
-					eq |= this.values[index] == key.values[index];
+					// using `object.Equals` instead of == ensures that we get the correct
+					// comparison result for boxed value types:
+					eq &= object.Equals(this.values[index], key.values[index]);
 					index++;
 				}
 
 				return eq;
 			}
 
-            public override int GetHashCode()
-            {
-                var hash = fixedString.GetHashCode();
+			public override int GetHashCode()
+			{
+				var hash = fixedString.GetHashCode();
 
-                var factor = 1;
-                foreach (var value in values)
-                {
-                    if (value != null)
-                    {
-                        // we use a factor that increases with each following value (argument)
-                        // so that if the values are in a different order, we get a different hash code
-                        // see GitHub issue #252
-                        hash ^= value.GetHashCode() / factor;
-                    }
-                    factor *= 3;
-                }
+				foreach (var value in values)
+				{
+					if (value != null)
+					{
+						hash = unchecked((hash * 397) ^ value.GetHashCode());
+					}
+				}
 
-                return hash;
-            }
-        }
+				return hash;
+			}
+		}
 
 		private class ConstantsVisitor : ExpressionVisitor
 		{
