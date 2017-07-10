@@ -90,6 +90,7 @@ namespace Moq
 
 		public void Dispose()
 		{
+			invocations.Reverse();
 			foreach (var invocation in invocations)
 			{
 				invocation.Dispose();
