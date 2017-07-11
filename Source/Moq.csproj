@@ -45,6 +45,7 @@
 		<Compile Include="Capture.cs" />
 		<Compile Include="CaptureMatch.cs" />
 		<Compile Include="ConditionalContext.cs" />
+		<Compile Include="MemberInfoWithTarget.cs" />
 		<Compile Include="IInterceptStrategy.cs" />
 		<Compile Include="IMock.cs" />
 		<Compile Include="InterceptorStrategies.cs" />

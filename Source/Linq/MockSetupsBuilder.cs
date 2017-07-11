@@ -197,7 +197,7 @@ namespace Moq.Linq
 			// We need to go back one level, to the target expression of the Setup call, 
 			// which would be the Mock.Get(foo), where we will actually invoke SetupProperty instead.
 			if (propertySetup.NodeType != ExpressionType.Call)
-				throw new NotSupportedException("Unexpected translation of a member access: " + propertySetup.ToStringFixed());
+				throw new NotSupportedException(string.Format(Resources.UnexpectedTranslationOfMemberAccess, propertySetup.ToStringFixed()));
 
 			var propertyCall = (MethodCallExpression)propertySetup;
 			var mockExpression = propertyCall.Object;
@@ -208,7 +208,7 @@ namespace Moq.Linq
 			// which also allows the use of this querying capability against plain DTO even 
 			// if their properties are not virtual.
 			var setPropertyMethod = typeof(Mocks)
-				.GetMethod("SetPropery", BindingFlags.Static | BindingFlags.NonPublic)
+				.GetMethod("SetProperty", BindingFlags.Static | BindingFlags.NonPublic)
 				.MakeGenericMethod(mockExpression.Type.GetGenericArguments().First(), propertyInfo.PropertyType);
 
 			return Expression.Equal(
@@ -225,6 +225,11 @@ namespace Moq.Linq
 			var returnsMethod = typeof(IReturns<,>)
 				.MakeGenericType(sourceType, returnType)
 				.GetMethod("Returns", new[] { returnType });
+
+			if (right is ConstantExpression constExpr && constExpr.Value == null)
+			{
+				right = Expression.Constant(null, left.Type);
+			}
 
 			return Expression.NotEqual(
 				Expression.Call(FluentMockVisitor.Accept(left), returnsMethod, right),

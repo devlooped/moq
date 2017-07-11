@@ -852,7 +852,7 @@ namespace Moq.Tests
 
 			Assert.Contains(
 				Environment.NewLine +
-				"Performed invocations:" + Environment.NewLine +
+				"Performed invocations: " + Environment.NewLine +
 				"IFoo.Execute(\"ping\")" + Environment.NewLine +
 				"IFoo.Echo(42)" + Environment.NewLine +
 				"IFoo.Submit()" + Environment.NewLine +
@@ -919,7 +919,7 @@ namespace Moq.Tests
 			mock.Object.Method(strings);
 			var mex = Assert.Throws<MockException>(() => mock.Verify(_ => _.Method(null)));
 			Assert.Contains(
-				@"Performed invocations:" + Environment.NewLine +
+				@"Performed invocations: " + Environment.NewLine +
 				@"IArrays.Method([""1"", null, ""3""])",
 				mex.Message);
 		}
@@ -932,7 +932,7 @@ namespace Moq.Tests
 			mock.Object.Method(strings);
 			var mex = Assert.Throws<MockException>(() => mock.Verify(_ => _.Method(null)));
 			Assert.Contains(
-				@"Performed invocations:" + Environment.NewLine +
+				@"Performed invocations: " + Environment.NewLine +
 				@"IArrays.Method([""1"", null, ""3"", ""4"", ""5"", ""6"", ""7"", ""8"", ""9"", ""10""])",
 				mex.Message);
 		}
@@ -945,7 +945,7 @@ namespace Moq.Tests
 			mock.Object.Method(strings);
 			var mex = Assert.Throws<MockException>(() => mock.Verify(_ => _.Method(null)));
 			Assert.Contains(
-				@"Performed invocations:" + Environment.NewLine +
+				@"Performed invocations: " + Environment.NewLine +
 				@"IArrays.Method([""1"", null, ""3"", ""4"", ""5"", ""6"", ""7"", ""8"", ""9"", ""10"", ...])",
 				mex.Message);
 		}

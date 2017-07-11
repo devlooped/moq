@@ -97,6 +97,15 @@ namespace Moq.Properties {
 		}
 		
 		/// <summary>
+		///   Looks up a localized string similar to Configured setups: {0}.
+		/// </summary>
+		internal static string ConfiguredSetups {
+			get {
+				return ResourceManager.GetString("ConfiguredSetups", resourceCulture);
+			}
+		}
+
+		/// <summary>
 		///   Looks up a localized string similar to Constructor arguments cannot be passed for delegate mocks..
 		/// </summary>
 		internal static string ConstructorArgsForDelegate {
@@ -124,6 +133,15 @@ namespace Moq.Properties {
 		}
 		
 		/// <summary>
+		///   Looks up a localized string similar to Delays have to be greater than zero to ensure an async callback is used..
+		/// </summary>
+		internal static string DelaysMustBeGreaterThanZero {
+			get {
+				return ResourceManager.GetString("DelaysMustBeGreaterThanZero", resourceCulture);
+			}
+		}
+
+		/// <summary>
 		///   Looks up a localized string similar to Could not locate event for attach or detach method {0}..
 		/// </summary>
 		internal static string EventNofFound {
@@ -133,6 +151,15 @@ namespace Moq.Properties {
 		}
 		
 		/// <summary>
+		///   Looks up a localized string similar to Expression is not an event attach or detach, or the event is declared in a class but not marked virtual..
+		/// </summary>
+		internal static string ExpressionIsNotEventAttachOrDetachOrIsNotVirtual {
+			get {
+				return ResourceManager.GetString("ExpressionIsNotEventAttachOrDetachOrIsNotVirtual", resourceCulture);
+			}
+		}
+
+		/// <summary>
 		///   Looks up a localized string similar to Expression {0} involves a field access, which is not supported. Use properties instead..
 		/// </summary>
 		internal static string FieldsNotSupported {
@@ -141,6 +168,15 @@ namespace Moq.Properties {
 			}
 		}
 		
+		/// <summary>
+		///   Looks up a localized string similar to Invalid callback. Setup on method with parameters ({0}) cannot invoke callback with parameters ({1})..
+		/// </summary>
+		internal static string InvalidCallbackParameterMismatch {
+			get {
+				return ResourceManager.GetString("InvalidCallbackParameterMismatch", resourceCulture);
+			}
+		}
+
 		/// <summary>
 		///   Looks up a localized string similar to Type to mock must be an interface or an abstract or non-sealed class. .
 		/// </summary>
@@ -209,6 +245,15 @@ namespace Moq.Properties {
 		}
 		
 		/// <summary>
+		///   Looks up a localized string similar to Mininum delay has to be lower than maximum delay..
+		/// </summary>
+		internal static string MinDelayMustBeLessThanMaxDelay {
+			get {
+				return ResourceManager.GetString("MinDelayMustBeLessThanMaxDelay", resourceCulture);
+			}
+		}
+
+		/// <summary>
 		///   Looks up a localized string similar to {0} invocation failed with mock behavior {1}.
 		///{2}.
 		/// </summary>
@@ -236,6 +281,15 @@ namespace Moq.Properties {
 			}
 		}
 		
+		/// <summary>
+		///   Looks up a localized string similar to No invocations performed..
+		/// </summary>
+		internal static string NoInvocationsPerformed {
+			get {
+				return ResourceManager.GetString("NoInvocationsPerformed", resourceCulture);
+			}
+		}
+
 		/// <summary>
 		///   Looks up a localized string similar to {0}
 		///Expected invocation on the mock at least {2} times, but was {4} times: {1}.
@@ -336,6 +390,15 @@ namespace Moq.Properties {
 		}
 		
 		/// <summary>
+		///   Looks up a localized string similar to No setups configured..
+		/// </summary>
+		internal static string NoSetupsConfigured {
+			get {
+				return ResourceManager.GetString("NoSetupsConfigured", resourceCulture);
+			}
+		}
+
+		/// <summary>
 		///   Looks up a localized string similar to Object instance was not created by Moq..
 		/// </summary>
 		internal static string ObjectInstanceNotMock {
@@ -353,6 +416,15 @@ namespace Moq.Properties {
 			}
 		}
 		
+		/// <summary>
+		///   Looks up a localized string similar to Performed invocations: {0}.
+		/// </summary>
+		internal static string PerformedInvocations {
+			get {
+				return ResourceManager.GetString("PerformedInvocations", resourceCulture);
+			}
+		}
+
 		/// <summary>
 		///   Looks up a localized string similar to Property {0}.{1} does not have a getter..
 		/// </summary>
@@ -471,23 +543,32 @@ namespace Moq.Properties {
 		}
 		
 		/// <summary>
-		///   Looks up a localized string similar to Expression references a method that does not belong to the mocked object: {0}.
+		///   Looks up a localized string similar to Invalid setup on an extension method: {0}.
 		/// </summary>
-		internal static string SetupOnNonMemberMethod {
+		internal static string SetupOnExtensionMethod {
 			get {
-				return ResourceManager.GetString("SetupOnNonMemberMethod", resourceCulture);
+				return ResourceManager.GetString("SetupOnExtensionMethod", resourceCulture);
 			}
 		}
 		
 		/// <summary>
 		///   Looks up a localized string similar to Invalid setup on a non-virtual (overridable in VB) member: {0}.
 		/// </summary>
-		internal static string SetupOnNonOverridableMember {
+		internal static string SetupOnNonVirtualMember {
 			get {
-				return ResourceManager.GetString("SetupOnNonOverridableMember", resourceCulture);
+				return ResourceManager.GetString("SetupOnNonVirtualMember", resourceCulture);
 			}
 		}
 		
+		/// <summary>
+		///   Looks up a localized string similar to Invalid setup on a static member: {0}.
+		/// </summary>
+		internal static string SetupOnStaticMember {
+			get {
+				return ResourceManager.GetString("SetupOnStaticMember", resourceCulture);
+			}
+		}
+
 		/// <summary>
 		///   Looks up a localized string similar to Type {0} does not implement required interface {1}.
 		/// </summary>
@@ -519,6 +600,33 @@ namespace Moq.Properties {
 			}
 		}
 		
+		/// <summary>
+		///   Looks up a localized string similar to Unexpected translation of a member access: {0}.
+		/// </summary>
+		internal static string UnexpectedTranslationOfMemberAccess {
+			get {
+				return ResourceManager.GetString("UnexpectedTranslationOfMemberAccess", resourceCulture);
+			}
+		}
+
+		/// <summary>
+		///   Looks up a localized string similar to Unhandled binding type: {0}.
+		/// </summary>
+		internal static string UnhandledBindingType {
+			get {
+				return ResourceManager.GetString("UnhandledBindingType", resourceCulture);
+			}
+		}
+
+		/// <summary>
+		///   Looks up a localized string similar to Unhandled expression type: {0}.
+		/// </summary>
+		internal static string UnhandledExpressionType {
+			get {
+				return ResourceManager.GetString("UnhandledExpressionType", resourceCulture);
+			}
+		}
+
 		/// <summary>
 		///   Looks up a localized string similar to Unsupported expression: {0}.
 		/// </summary>
@@ -574,6 +682,15 @@ namespace Moq.Properties {
 		}
 		
 		/// <summary>
+		///   Looks up a localized string similar to Use ItExpr.IsNull&lt;TValue&gt; rather than a null argument value, as it prevents proper method lookup..
+		/// </summary>
+		internal static string UseItExprIsNullRatherThanNullArgumentValue {
+			get {
+				return ResourceManager.GetString("UseItExprIsNullRatherThanNullArgumentValue", resourceCulture);
+			}
+		}
+
+		/// <summary>
 		///   Looks up a localized string similar to The following setups were not matched:
 		///{0}.
 		/// </summary>
@@ -584,11 +701,29 @@ namespace Moq.Properties {
 		}
 		
 		/// <summary>
+		///   Looks up a localized string similar to Invalid verify on an extension method: {0}.
+		/// </summary>
+		internal static string VerifyOnExtensionMethod {
+			get {
+				return ResourceManager.GetString("VerifyOnExtensionMethod", resourceCulture);
+			}
+		}
+
+		/// <summary>
 		///   Looks up a localized string similar to Invalid verify on a non-virtual (overridable in VB) member: {0}.
 		/// </summary>
 		internal static string VerifyOnNonVirtualMember {
 			get {
 				return ResourceManager.GetString("VerifyOnNonVirtualMember", resourceCulture);
+			}
+		}
+
+		/// <summary>
+		///   Looks up a localized string similar to Invalid verify on a static member: {0}.
+		/// </summary>
+		internal static string VerifyOnStaticMember {
+			get {
+				return ResourceManager.GetString("VerifyOnStaticMember", resourceCulture);
 			}
 		}
 	}

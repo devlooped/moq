@@ -235,7 +235,7 @@ namespace Moq.Tests
 			Assert.False(String.IsNullOrEmpty(mock.Object.ToString()));
 		}
 
-		[Fact(Skip = "Castle.DynamicProxy2 doesn't seem to call interceptors for ToString, GetHashCode & Equals")]
+		[Fact]
 		public void OverridesObjectMethods()
 		{
 			var mock = new Mock<IFoo>();

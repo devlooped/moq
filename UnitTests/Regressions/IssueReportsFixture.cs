@@ -522,6 +522,84 @@ namespace Moq.Tests.Regressions
 
 		#endregion
 
+		#region 166
+
+		public class Issue166
+		{
+			[Fact]
+			public void Events_with_same_name_in_object_graph_can_both_be_raised()
+			{
+				var mock = new Mock<IFoo> { DefaultValue = DefaultValue.Mock };
+
+				var fooEventRaiseCount = 0;
+				mock.Object.Event += (s, e) => ++fooEventRaiseCount;
+
+				var barEventRaiseCount = 0;
+				mock.Object.Bar.Event += (s, e) => ++barEventRaiseCount;
+
+				mock.Raise(x => x.Event += null, EventArgs.Empty);
+				mock.Raise(x => x.Bar.Event += null, EventArgs.Empty);
+
+				Assert.Equal(1, fooEventRaiseCount);
+				Assert.Equal(1, barEventRaiseCount);
+			}
+
+			[Fact]
+			public void Events_with_different_names_in_object_graph_can_both_be_raised()
+			{
+				var mock = new Mock<IFoo> { DefaultValue = DefaultValue.Mock };
+
+				var fooEventRaiseCount = 0;
+				mock.Object.Event += (s, e) => ++fooEventRaiseCount;
+
+				var barAnotherEventRaiseCount = 0;
+				mock.Object.Bar.AnotherEvent += (s, e) => ++barAnotherEventRaiseCount;
+
+				mock.Raise(x => x.Event += null, EventArgs.Empty);
+				mock.Raise(x => x.Bar.AnotherEvent += null, EventArgs.Empty);
+
+				Assert.Equal(1, fooEventRaiseCount);
+				Assert.Equal(1, barAnotherEventRaiseCount);
+			}
+
+			[Fact]
+			public void Event_in_child_mock_can_be_raised_if_parent_object_has_no_events()
+			{
+				var mock = new Mock<IQux>() { DefaultValue = DefaultValue.Mock };
+
+				var quuxEventRaiseCount = 0;
+				mock.Object.Quux.Event += (s, e) => ++quuxEventRaiseCount;
+
+				mock.Raise(x => x.Quux.Event += null, EventArgs.Empty);
+
+				Assert.Equal(1, quuxEventRaiseCount);
+			}
+
+			public interface IFoo
+			{
+				IBar Bar { get; }
+				event EventHandler Event;
+			}
+
+			public interface IBar
+			{
+				event EventHandler Event;
+				event EventHandler AnotherEvent;
+			}
+
+			public interface IQux
+			{
+				IQuux Quux { get; }
+			}
+
+			public interface IQuux : IQux
+			{
+				event EventHandler Event;
+			}
+		}
+
+		#endregion
+
 		#region 175
 
 		public class Issue175
@@ -900,6 +978,33 @@ namespace Moq.Tests.Regressions
 
 		#endregion
 
+		#region 296
+
+		public class Issue296
+		{
+			[Fact]
+			public void Can_subscribe_to_and_raise_abstract_class_event_when_CallBase_true()
+			{
+				var mock = new Mock<Foo>() { CallBase = true };
+
+				var eventHandlerWasCalled = false;
+				mock.Object.SomethingChanged += (object sender, EventArgs e) =>
+				{
+					eventHandlerWasCalled = true;
+				};
+
+				mock.Raise(foo => foo.SomethingChanged += null, EventArgs.Empty);
+				Assert.True(eventHandlerWasCalled);
+			}
+
+			public abstract class Foo
+			{
+				public abstract event EventHandler SomethingChanged;
+			}
+		}
+
+		#endregion
+
 		#region 311
 
 		public sealed class Issue311
@@ -1098,6 +1203,33 @@ namespace Moq.Tests.Regressions
 			public class Foo : IFoo
 			{
 				public bool Property { get; set; }
+			}
+		}
+
+		#endregion
+
+		#region 337
+
+		public class Issue337
+		{
+			[Fact]
+			public void Mock_Of_can_setup_null_return_value()
+			{
+				// The following mock setup might appear redundant; after all, `null` is
+				// the default value returned for most reference types. However, this test
+				// becomes relevant once Moq starts supporting custom implementations of
+				// `IDefaultValueProvider`. Then it might no longer be a given that `null`
+				// is the default return value that noone would want to explicitly set up.
+				var userProvider = Mock.Of<IUserProvider>(p => p.GetUserByEmail("alice@example.com") == null);
+				var user = userProvider.GetUserByEmail("alice@example.com");
+				Assert.Null(user);
+			}
+
+			public class User { }
+
+			public interface IUserProvider
+			{
+				User GetUserByEmail(string email);
 			}
 		}
 
@@ -1927,21 +2059,21 @@ namespace Moq.Tests.Regressions
 					Bar();
 				}
 
-				protected virtual void Bar()
+				public virtual void Bar()
 				{
 				}
 			}
 
-#pragma warning disable 618
-			[Fact(Skip = "This setup doesn't make sense, and xUnit does not provide this message checking capability.")]
 			public void ShouldRenderCustomMessage()
 			{
 				var foo = new Mock<Foo> { CallBase = true };
-				foo.Protected().Setup("Bar").AtMostOnce().Verifiable("Hello");
+				foo.Setup(_ => _.Bar()).Verifiable("Hello");
 				foo.Object.Boo();
-				//Assert.Throws<MockException>("Hello", () => foo.Object.Boo());
+				var ex = Record.Exception(() => foo.Object.Boo());
+				Assert.NotNull(ex);
+				Assert.Contains("Hello", ex.Message); // has custom verification error message
+				Assert.Contains("once, but was", ex.Message); // has Moq's default message
 			}
-#pragma warning restore 618
 		}
 
 		#endregion
@@ -1982,34 +2114,6 @@ namespace Moq.Tests.Regressions
 
 				dependency.Verify(x => x.DoThis(foo, foo1));
 				dependency.Verify(x => x.DoThis(foo1, foo), Times.Never());
-			}
-
-			[Fact(Skip = "Wrong Equals implemention in the report. Won't Fix")]
-			public void ExampleFailingTest()
-			{
-				var foo1 = new Foo();
-				var foo = new Foo();
-
-				var sut = new Perfectly_fine_yet_failing_test();
-				var dependency = new Mock<IDependency>();
-
-				dependency.Setup(x => x.DoThis(foo, foo1))
-				  .Returns(new Foo());
-
-				sut.Do(dependency.Object, foo, foo1);
-
-				dependency.Verify(x => x.DoThis(foo, foo1));
-				dependency.Verify(x => x.DoThis(foo1, foo), Times.Never());
-			}
-
-			public class Perfectly_fine_yet_failing_test
-			{
-				public void Do(IDependency dependency, Foo foo, Foo foo1)
-				{
-					var foo2 = dependency.DoThis(foo, foo1);
-					if (foo2 == null)
-						foo2 = dependency.DoThis(foo1, foo);
-				}
 			}
 
 			public interface IDependency
@@ -2187,9 +2291,9 @@ namespace Moq.Tests.Regressions
 
 				var e = Assert.Throws<MockException>(() => mock.Verify(m => m.Execute(0)));
 				Assert.Contains(
-					"\r\nConfigured setups:" +
-					"\r\nm => m.Execute(1), Times.Never" +
-					"\r\nm => m.Execute(It.IsInRange<Int32>(2, 20, Range.Exclusive)), Times.Exactly(3)",
+					Environment.NewLine + "Configured setups: " +
+					Environment.NewLine + "m => m.Execute(1), Times.Never" +
+					Environment.NewLine + "m => m.Execute(It.IsInRange<Int32>(2, 20, Range.Exclusive)), Times.Exactly(3)",
 					e.Message);
 			}
 
@@ -2204,7 +2308,8 @@ namespace Moq.Tests.Regressions
 
 				var e = Assert.Throws<MockException>(() => mock.Verify(m => m.Execute<int>(1, 1)));
 				Assert.Contains(
-					"\r\nConfigured setups:\r\nm => m.Execute<Int32>(1, 10), Times.Once",
+					Environment.NewLine + "Configured setups: " +
+					Environment.NewLine + "m => m.Execute<Int32>(1, 10), Times.Once",
 					e.Message);
 			}
 
@@ -2214,7 +2319,9 @@ namespace Moq.Tests.Regressions
 				var mock = new Mock<IFoo>();
 
 				var e = Assert.Throws<MockException>(() => mock.Verify(m => m.Execute(1)));
-				Assert.Contains("\r\nNo setups configured.", e.Message);
+				Assert.Contains(
+					Environment.NewLine + "No setups configured.",
+					e.Message);
 
 			}
 

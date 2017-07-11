@@ -349,7 +349,7 @@ namespace Moq
 		{
 			throw new ArgumentException(string.Format(
 				CultureInfo.CurrentCulture,
-				"Invalid callback. Setup on method with parameters ({0}) cannot invoke callback with parameters ({1}).",
+				Resources.InvalidCallbackParameterMismatch,
 				string.Join(",", expected.Select(p => p.ParameterType.Name).ToArray()),
 				string.Join(",", actual.Select(p => p.ParameterType.Name).ToArray())
 			));
@@ -409,7 +409,8 @@ namespace Moq
 		protected IVerifies RaisesImpl<TMock>(Action<TMock> eventExpression, Delegate func)
 			where TMock : class
 		{
-			this.mockEvent = eventExpression.GetEvent((TMock)Mock.Object);
+			var ev = eventExpression.GetEvent((TMock)Mock.Object);
+			this.mockEvent = ev.MemberInfo;
 			this.mockEventArgsFunc = func;
 			return this;
 		}
@@ -417,7 +418,8 @@ namespace Moq
 		protected IVerifies RaisesImpl<TMock>(Action<TMock> eventExpression, params object[] args)
 			where TMock : class
 		{
-			this.mockEvent = eventExpression.GetEvent((TMock)Mock.Object);
+			var ev = eventExpression.GetEvent((TMock)Mock.Object);
+			this.mockEvent = ev.MemberInfo;
 			this.mockEventArgsParams = args;
 			return this;
 		}
