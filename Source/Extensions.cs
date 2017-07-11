@@ -90,8 +90,11 @@ namespace Moq
 			{
 				return "\"" + typedValue + "\"";
 			}
-			if (value is IEnumerable enumerable)
-			{
+			if (value is IEnumerable enumerable && enumerable.GetEnumerator() != null)
+			{                                   // ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+				// This second check ensures that we have a usable implementation of IEnumerable.
+				// If value is a mocked object, its IEnumerable implementation might very well
+				// not work correctly.
 				const int maxCount = 10;
 				var objs = enumerable.Cast<object>().Take(maxCount + 1);
 				var more = objs.Count() > maxCount ? ", ..." : string.Empty;
