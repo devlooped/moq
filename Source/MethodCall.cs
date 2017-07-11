@@ -220,11 +220,6 @@ namespace Moq
 
 		public virtual bool Matches(ICallContext call)
 		{
-			if (condition != null && !condition.IsTrue)
-			{
-				return false;
-			}
-
 			var parameters = call.Method.GetParameters();
 			var args = new List<object>();
 			for (int i = 0; i < parameters.Length; i++)
@@ -245,7 +240,7 @@ namespace Moq
 					}
 				}
 
-				return true;
+				return condition == null || condition.IsTrue;
 			}
 
 			return false;
