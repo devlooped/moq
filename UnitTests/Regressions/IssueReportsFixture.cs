@@ -978,6 +978,54 @@ namespace Moq.Tests.Regressions
 
 		#endregion
 
+		#region 292
+
+		public class Issue292
+		{
+			// This test is somewhat dangerous, since xUnit cannot catch a StackOverflowException.
+			// So if this test fails, and does produce a stack overflow, the whole test run will
+			// abort abruptly.
+			[Fact]
+			public void Conditional_setup_where_condition_involves_own_mock_does_not_cause_stack_overflow()
+			{
+				var dbResultFound = new Mock<IDataReader>();
+				dbResultFound.Setup(_ => _.Read()).Returns(true);
+				var dbResultNotFound = new Mock<IDataReader>();
+				dbResultNotFound.Setup(_ => _.Read()).Returns(false);
+
+				var command = new Mock<IDbCommand>();
+				command.SetupProperty(_ => _.CommandText);
+				command.When(() => command.Object.CommandText == "SELECT * FROM TABLE WHERE ID=1")
+					   .Setup(_ => _.ExecuteReader())
+					   .Returns(dbResultFound.Object);
+				command.When(() => command.Object.CommandText == "SELECT * FROM TABLE WHERE ID=2")
+					   .Setup(_ => _.ExecuteReader())
+					   .Returns(dbResultNotFound.Object);
+
+				command.Object.CommandText = "SELECT * FROM TABLE WHERE ID=1";
+				Assert.True(command.Object.ExecuteReader().Read());
+
+				command.Object.CommandText = "SELECT * FROM TABLE WHERE ID=2";
+				Assert.False(command.Object.ExecuteReader().Read());
+			}
+
+			// We redeclare the following two types from System.Data so we
+			// don't need the additional assembly reference (read, "dependency"):
+
+			public interface IDataReader
+			{
+				bool Read();
+			}
+
+			public interface IDbCommand
+			{
+				string CommandText { get; set; }
+				IDataReader ExecuteReader();
+			}
+		}
+
+		#endregion
+
 		#region 296
 
 		public class Issue296
