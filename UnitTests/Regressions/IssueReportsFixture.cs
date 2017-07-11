@@ -600,6 +600,54 @@ namespace Moq.Tests.Regressions
 
 		#endregion
 
+		#region 169
+
+		public class Issue169
+		{
+			[Fact]
+			public void Mocks_that_implement_IEnumerable_which_is_not_set_up_can_be_used_without_NullReferenceException()
+			{
+				// This test makes sure that a mock is usable when it implements IEnumerable,
+				// but that interface isn't set up to correctly work. (Moq will attempt to use
+				// IEnumerable to generate an ExpressionKey, for example.)
+
+				var mocks = new MockRepository(MockBehavior.Loose);
+				var service = mocks.Create<IDependency>();
+
+				var input = mocks.OneOf<IInput>();
+				service.Setup(x => x.Run(input)).Returns(1);
+
+				var foo = new Foo(service.Object);
+				foo.Calculate(input);
+			}
+
+			public interface IDependency
+			{
+				decimal Run(IInput input);
+			}
+
+			public interface IInput : IEnumerable<int>
+			{
+			}
+
+			public class Foo
+			{
+				private readonly IDependency dependency;
+
+				public Foo(IDependency dependency)
+				{
+					this.dependency = dependency;
+				}
+
+				public void Calculate(IInput input)
+				{
+					this.dependency.Run(input);
+				}
+			}
+		}
+
+		#endregion
+
 		#region 175
 
 		public class Issue175
