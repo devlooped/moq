@@ -2,7 +2,6 @@
 using System.Threading.Tasks;
 using Moq.Language;
 using Moq.Language.Flow;
-using Moq.Properties;
 
 namespace Moq
 {
@@ -139,7 +138,7 @@ namespace Moq
 		private static TimeSpan GetDelay(TimeSpan minDelay, TimeSpan maxDelay, Random random)
 		{
 			if (!(minDelay < maxDelay))
-				throw new ArgumentException(Resources.MinDelayMustBeLessThanMaxDelay);
+				throw new ArgumentException("Mininum delay has to be lower than maximum delay.");
 
 			var min = (int)minDelay.Ticks;
 			var max = (int)maxDelay.Ticks;
@@ -150,7 +149,7 @@ namespace Moq
 		private static void GuardPositiveDelay(TimeSpan delay)
 		{
 			if (!(delay > TimeSpan.Zero))
-				throw new ArgumentException(Resources.DelaysMustBeGreaterThanZero);
+				throw new ArgumentException("Delays have to be greater than zero to ensure an async callback is used.");
 		}
 
 		private static IReturnsResult<TMock> DelayedResult<TMock, TResult>(IReturns<TMock, Task<TResult>> mock,

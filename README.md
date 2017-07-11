@@ -24,7 +24,7 @@ The most popular and friendly mocking framework for .NET
   mock.Verify(framework => framework.DownloadExists("2.0.0.0"), Times.AtMostOnce());
 ```
 
-Moq also is the first and only framework so far to provide Linq to Mocks, so that the same behavior above can be achieved much more succinctly:
+Moq also is the first and only framework so far to provide Linq to Mocks, so that the same behavior above can be achieved much more succintly:
 
 ```csharp
   ILoveThisFramework lovable = Mock.Of<ILoveThisFramework>(l =>

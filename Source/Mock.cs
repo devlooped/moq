@@ -283,7 +283,7 @@ namespace Moq
 
 			var methodCall = expression.GetCallInfo(mock);
 			var method = methodCall.Method;
-			ThrowIfVerifyExpressionInvolvesUnsupportedMember(expression, method);
+			ThrowIfVerifyNonVirtual(expression, method);
 			var args = methodCall.Arguments.ToArray();
 
 			var expected = new MethodCall(mock, null, expression, method, args) { FailMessage = failMessage };
@@ -307,7 +307,7 @@ namespace Moq
 			{
 				var methodCall = expression.GetCallInfo(mock);
 				var method = methodCall.Method;
-				ThrowIfVerifyExpressionInvolvesUnsupportedMember(expression, method);
+				ThrowIfVerifyNonVirtual(expression, method);
 				var args = methodCall.Arguments.ToArray();
 
 				var expected = new MethodCallReturn<T, TResult>(mock, null, expression, method, args)
@@ -326,7 +326,7 @@ namespace Moq
 			where T : class
 		{
 			var method = expression.ToPropertyInfo().GetGetMethod(true);
-			ThrowIfVerifyExpressionInvolvesUnsupportedMember(expression, method);
+			ThrowIfVerifyNonVirtual(expression, method);
 
 			var expected = new MethodCallReturn<T, TProperty>(mock, null, expression, method, new Expression[0])
 			{
@@ -405,8 +405,8 @@ namespace Moq
 				.ToArray();
 
 			return expressionSetups.Length == 0 ?
-				Resources.NoSetupsConfigured :
-				Environment.NewLine + string.Format(Resources.ConfiguredSetups, Environment.NewLine + string.Join(Environment.NewLine, expressionSetups));
+				"No setups configured." :
+				Environment.NewLine + "Configured setups:" + Environment.NewLine + string.Join(Environment.NewLine, expressionSetups);
 		}
 
 		private static string FormatCallCount(int callCount)
@@ -431,8 +431,8 @@ namespace Moq
 				.ToArray();
 
 			return formattedInvocations.Length == 0 ?
-				Resources.NoInvocationsPerformed :
-				Environment.NewLine + string.Format(Resources.PerformedInvocations, Environment.NewLine + string.Join(Environment.NewLine, formattedInvocations));
+				"No invocations performed." :
+				Environment.NewLine + "Performed invocations:" + Environment.NewLine + string.Join(Environment.NewLine, formattedInvocations);
 		}
 
 		#endregion
@@ -448,7 +448,8 @@ namespace Moq
 				var method = methodCall.Method;
 				var args = methodCall.Arguments.ToArray();
 
-				ThrowIfSetupExpressionInvolvesUnsupportedMember(expression, method);
+				ThrowIfNotMember(expression, method);
+				ThrowIfCantOverride(expression, method);
 				var call = new MethodCall<T>(mock, condition, expression, method, args);
 
 				var targetInterceptor = GetInterceptor(methodCall.Object, mock);
@@ -476,7 +477,8 @@ namespace Moq
 				var method = methodCall.Method;
 				var args = methodCall.Arguments.ToArray();
 
-				ThrowIfSetupExpressionInvolvesUnsupportedMember(expression, method);
+				ThrowIfNotMember(expression, method);
+				ThrowIfCantOverride(expression, method);
 				var call = new MethodCallReturn<T, TResult>(mock, condition, expression, method, args);
 
 				var targetInterceptor = GetInterceptor(methodCall.Object, mock);
@@ -505,7 +507,7 @@ namespace Moq
 				ThrowIfPropertyNotReadable(prop);
 
 				var propGet = prop.GetGetMethod(true);
-				ThrowIfSetupExpressionInvolvesUnsupportedMember(expression, propGet);
+				ThrowIfCantOverride(expression, propGet);
 
 				var call = new MethodCallReturn<T, TProperty>(mock, condition, expression, propGet, new Expression[0]);
 				// Directly casting to MemberExpression is fine as ToPropertyInfo would throw if it wasn't
@@ -563,7 +565,7 @@ namespace Moq
 			ThrowIfPropertyNotWritable(prop);
 
 			var propSet = prop.GetSetMethod(true);
-			ThrowIfSetupExpressionInvolvesUnsupportedMember(expression, propSet);
+			ThrowIfCantOverride(expression, propSet);
 
 			var call = new SetterMethodCall<T, TProperty>(mock, expression, propSet);
 			var targetInterceptor = GetInterceptor(((MemberExpression)expression.Body).Expression, mock);
@@ -589,7 +591,7 @@ namespace Moq
 				{
 					throw new ArgumentException(string.Format(
 						CultureInfo.InvariantCulture,
-						Resources.SetupOnNonVirtualMember,
+						Resources.SetupOnNonOverridableMember,
 						string.Empty));
 				}
 
@@ -813,39 +815,47 @@ namespace Moq
 			}
 		}
 
-		private static void ThrowIfSetupExpressionInvolvesUnsupportedMember(Expression setup, MethodInfo method)
+		private static void ThrowIfCantOverride(Expression setup, MethodInfo method)
 		{
-			if (method.IsStatic)
+			if (!method.CanOverride())
 			{
 				throw new NotSupportedException(string.Format(
 					CultureInfo.CurrentCulture,
-					method.IsExtensionMethod() ? Resources.SetupOnExtensionMethod : Resources.SetupOnStaticMember,
-					setup.ToStringFixed()));
-			}
-			else if (!method.CanOverride())
-			{
-				throw new NotSupportedException(string.Format(
-					CultureInfo.CurrentCulture,
-					Resources.SetupOnNonVirtualMember,
+					Resources.SetupOnNonOverridableMember,
 					setup.ToStringFixed()));
 			}
 		}
 
-		private static void ThrowIfVerifyExpressionInvolvesUnsupportedMember(Expression verify, MethodInfo method)
+		private static void ThrowIfVerifyNonVirtual(Expression verify, MethodInfo method)
 		{
-			if (method.IsStatic)
-			{
-				throw new NotSupportedException(string.Format(
-					CultureInfo.CurrentCulture,
-					method.IsExtensionMethod() ? Resources.VerifyOnExtensionMethod : Resources.VerifyOnStaticMember,
-					verify.ToStringFixed()));
-			}
-			else if (!method.CanOverride())
+			if (!method.CanOverride())
 			{
 				throw new NotSupportedException(string.Format(
 					CultureInfo.CurrentCulture,
 					Resources.VerifyOnNonVirtualMember,
 					verify.ToStringFixed()));
+			}
+		}
+
+		private static void ThrowIfNotMember(Expression setup, MethodInfo method)
+		{
+			if (method.IsStatic)
+			{
+				throw new NotSupportedException(string.Format(
+					CultureInfo.CurrentCulture,
+					Resources.SetupOnNonMemberMethod,
+					setup.ToStringFixed()));
+			}
+		}
+
+		private static void ThrowIfCantOverride<T>(MethodBase setter) where T : class
+		{
+			if (!setter.CanOverride())
+			{
+				throw new NotSupportedException(string.Format(
+					CultureInfo.CurrentCulture,
+					Resources.SetupOnNonOverridableMember,
+					typeof(T).Name + "." + setter.Name.Substring(4)));
 			}
 		}
 

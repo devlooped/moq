@@ -271,8 +271,7 @@ namespace Moq
 						// TODO: We could compare `invocation.Method` and `eventInfo.GetAddMethod()` here.
 						// If they are equal, then `invocation.Method` is definitely an event `add` accessor.
 						// Not sure whether this would work with F# and COM; see commit 44070a9.
-
-						if (ctx.Mock.CallBase && !invocation.Method.IsAbstract)
+						if (ctx.Mock.CallBase && !eventInfo.DeclaringType.GetTypeInfo().IsInterface)
 						{
 							invocation.InvokeBase();
 							return InterceptionAction.Stop;
@@ -295,8 +294,7 @@ namespace Moq
 						// TODO: We could compare `invocation.Method` and `eventInfo.GetRemoveMethod()` here.
 						// If they are equal, then `invocation.Method` is definitely an event `remove` accessor.
 						// Not sure whether this would work with F# and COM; see commit 44070a9.
-
-						if (ctx.Mock.CallBase && !invocation.Method.IsAbstract)
+						if (ctx.Mock.CallBase && !eventInfo.DeclaringType.GetTypeInfo().IsInterface)
 						{
 							invocation.InvokeBase();
 							return InterceptionAction.Stop;

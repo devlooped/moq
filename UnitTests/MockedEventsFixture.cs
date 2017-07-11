@@ -341,7 +341,7 @@ namespace Moq.Tests
 		}
 
 		[Fact]
-		public void CanRaiseEventOnSubObject()
+		public void DoesNotRaiseEventOnSubObject()
 		{
 			var mock = new Mock<IParent> { DefaultValue = DefaultValue.Mock };
 
@@ -352,7 +352,7 @@ namespace Moq.Tests
 
 			mock.Raise(p => p.Adder.Added += null, EventArgs.Empty);
 
-			Assert.True(raised);
+			Assert.False(raised);
 		}
 
 		[Fact]

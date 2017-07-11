@@ -143,6 +143,9 @@
 		<value>The following setups were not matched:
 {0}</value>
 	</data>
+	<data name="SetupOnNonOverridableMember" xml:space="preserve">
+		<value>Invalid setup on a non-virtual (overridable in VB) member: {0}</value>
+	</data>
 	<data name="ConstructorArgsForInterface" xml:space="preserve">
 		<value>Constructor arguments cannot be passed for interface mocks.</value>
 	</data>
@@ -274,6 +277,12 @@ Expected invocation on the mock between {2} and {3} times (Exclusive), but was {
 		<value>{0}
 Expected invocation on the mock once, but was {4} times: {1}</value>
 	</data>
+	<data name="SetupOnNonMemberMethod" xml:space="preserve">
+		<value>Expression references a method that does not belong to the mocked object: {0}</value>
+	</data>
+	<data name="VerifyOnNonVirtualMember" xml:space="preserve">
+		<value>Invalid verify on a non-virtual (overridable in VB) member: {0}</value>
+	</data>
 	<data name="OutExpressionMustBeConstantValue" xml:space="preserve">
 		<value>Out expression must evaluate to a constant value.</value>
 	</data>
@@ -297,59 +306,5 @@ Expected invocation on the mock once, but was {4} times: {1}</value>
 	</data>
 	<data name="PropertyGetNotFound" xml:space="preserve">
 		<value>Property {0}.{1} does not have a getter.</value>
-	</data>
-	<data name="SetupOnNonVirtualMember" xml:space="preserve">
-		<value>Invalid setup on a non-virtual (overridable in VB) member: {0}</value>
-	</data>
-	<data name="VerifyOnNonVirtualMember" xml:space="preserve">
-		<value>Invalid verify on a non-virtual (overridable in VB) member: {0}</value>
-	</data>
-	<data name="SetupOnStaticMember" xml:space="preserve">
-		<value>Invalid setup on a static member: {0}</value>
-	</data>
-	<data name="VerifyOnStaticMember" xml:space="preserve">
-		<value>Invalid verify on a static member: {0}</value>
-	</data>
-	<data name="SetupOnExtensionMethod" xml:space="preserve">
-		<value>Invalid setup on an extension method: {0}</value>
-	</data>
-	<data name="VerifyOnExtensionMethod" xml:space="preserve">
-		<value>Invalid verify on an extension method: {0}</value>
-	</data>
-	<data name="UnhandledBindingType" xml:space="preserve">
-		<value>Unhandled binding type: {0}</value>
-	</data>
-	<data name="UnhandledExpressionType" xml:space="preserve">
-		<value>Unhandled expression type: {0}</value>
-	</data>
-	<data name="ConfiguredSetups" xml:space="preserve">
-		<value>Configured setups: {0}</value>
-	</data>
-	<data name="DelaysMustBeGreaterThanZero" xml:space="preserve">
-		<value>Delays have to be greater than zero to ensure an async callback is used.</value>
-	</data>
-	<data name="ExpressionIsNotEventAttachOrDetachOrIsNotVirtual" xml:space="preserve">
-		<value>Expression is not an event attach or detach, or the event is declared in a class but not marked virtual.</value>
-	</data>
-	<data name="InvalidCallbackParameterMismatch" xml:space="preserve">
-		<value>Invalid callback. Setup on method with parameters ({0}) cannot invoke callback with parameters ({1}).</value>
-	</data>
-	<data name="MinDelayMustBeLessThanMaxDelay" xml:space="preserve">
-		<value>Mininum delay has to be lower than maximum delay.</value>
-	</data>
-	<data name="NoInvocationsPerformed" xml:space="preserve">
-		<value>No invocations performed.</value>
-	</data>
-	<data name="NoSetupsConfigured" xml:space="preserve">
-		<value>No setups configured.</value>
-	</data>
-	<data name="PerformedInvocations" xml:space="preserve">
-		<value>Performed invocations: {0}</value>
-	</data>
-	<data name="UnexpectedTranslationOfMemberAccess" xml:space="preserve">
-		<value>Unexpected translation of a member access: {0}</value>
-	</data>
-	<data name="UseItExprIsNullRatherThanNullArgumentValue" xml:space="preserve">
-		<value>Use ItExpr.IsNull&lt;TValue&gt; rather than a null argument value, as it prevents proper method lookup.</value>
 	</data>
 </root>
