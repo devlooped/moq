@@ -210,6 +210,46 @@ namespace Moq.Tests.Regressions
 
 		#endregion
 
+		#region 131
+
+		public class Issue131
+		{
+			[Fact]
+			public void Order_of_setups_should_not_matter_when_setting_up_methods_in_a_hierarchy_of_interfaces()
+			{
+				var mock = new Mock<Derived>();
+
+				mock.Setup(x => x.Method())
+					.Returns("Derived");
+				mock.As<BaseA>().Setup(x => x.Method())
+					.Returns("BaseA");
+				mock.As<BaseB>().Setup(x => x.Method())
+					.Returns("BaseB");
+
+				var derived = mock.Object;
+				Assert.Equal("Derived", derived.Method());
+				Assert.Equal("BaseA", (derived as BaseA).Method());
+				Assert.Equal("BaseB", (derived as BaseB).Method());
+			}
+
+			public interface BaseA
+			{
+				string Method();
+			}
+
+			public interface BaseB
+			{
+				string Method();
+			}
+
+			public interface Derived : BaseA, BaseB
+			{
+				new string Method();
+			}
+		}
+
+		#endregion
+
 		#region 141
 
 		public class Issue141
