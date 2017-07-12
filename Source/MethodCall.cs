@@ -151,7 +151,6 @@ namespace Moq
 
 			this.SetFileInfo();
 		}
-		public bool IsOpenGeneric { get; internal set; }
 
 		public string FailMessage { get; set; }
 
@@ -167,6 +166,7 @@ namespace Moq
 		// Where the setup was performed.
 		public MethodInfo Method { get; private set; }
 		public MethodInfo GenericMethod { get; internal set; }
+		public bool IsOpenGeneric { get; internal set; }
 		public string FileName { get; private set; }
 		public int FileLine { get; private set; }
 		public MethodBase TestMethod { get; private set; }

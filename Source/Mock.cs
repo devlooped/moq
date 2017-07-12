@@ -497,24 +497,11 @@ namespace Moq
 		{
 			return PexProtector.Invoke(() =>
 			{
-				var methodCall = expression.GetCallInfo(mock);
+				var call = Setup(mock, expression, condition);
 
-
-				var method = methodCall.Method;
-				var args = methodCall.Arguments.ToArray();
-
-				ThrowIfNotMember(expression, method);
-				ThrowIfCantOverride(expression, method);
-				var call = new MethodCallReturn<T, TResult>(mock, condition, expression, method, args)
-				{
-					IsOpenGeneric = true,
-					GenericMethod = method.GetGenericMethodDefinition(),
-				};
-
-				var targetInterceptor = GetInterceptor(methodCall.Object, mock);
-
-				targetInterceptor.AddCall(call, SetupKind.Other);
-
+				call.IsOpenGeneric = true;
+				call.GenericMethod = call.Method.GetGenericMethodDefinition();
+				
 				return call;
 			});
 		}

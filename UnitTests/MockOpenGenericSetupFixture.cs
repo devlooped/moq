@@ -1,6 +1,4 @@
-﻿using System;
-using System.Linq.Expressions;
-using Xunit;
+﻿using Xunit;
 
 namespace Moq.Tests
 {
@@ -12,12 +10,6 @@ namespace Moq.Tests
 
 		public class SomeBaseClass
 		{
-		}
-
-		public class ItAnySomeBaseClass : SomeBaseClass, It.AnyType
-		{
-			// Have 2 separate Interfaces, one that is empty and is generic arg definition and the other for parameter matching?
-			public object Object { get; set; }
 		}
 
 		public interface IHasOpenGeneric
@@ -32,46 +24,6 @@ namespace Moq.Tests
 
 		[Fact]
 		public void SetupReturns_OpenGenericArgumentWithWhereClause()
-		{
-			// Arrange
-			var mock = new Mock<IHasOpenGeneric>();
-
-			var callCount = 0;
-			ICallContext callContext = null;
-
-			mock.Setup((Expression<Func<IHasOpenGeneric, It.AnyType>>) (x => x
-					.GetWhere<ItAnySomeBaseClass, ItAnySomeBaseClass, ItAnySomeBaseClass>(It.IsAny<ItAnySomeBaseClass>())))
-				.Returns(context =>
-				{
-					callContext = context;
-					callCount++;
-					return new SomeImplementationClass();
-				});
-
-			Assert.Equal(0, callCount);
-
-			var input = new SomeImplementationClass();
-
-			// Act
-
-			var res = mock.Object.GetWhere<SomeImplementationClass, SomeImplementationClass, SomeImplementationClass>(input);
-
-			// Assert
-			Assert.Equal(1, callCount);
-
-			Assert.IsType<SomeImplementationClass>(res);
-
-			Assert.NotNull(callContext);
-			Assert.Equal(1, callContext.Arguments.Length);
-
-			Assert.NotNull(callContext.Arguments[0]);
-			Assert.Equal(typeof(SomeImplementationClass), callContext.Arguments[0].GetType());
-			Assert.Equal(input, (SomeImplementationClass) callContext.Arguments[0]);
-			Assert.Equal(typeof(SomeImplementationClass), callContext.Method.ReturnType);
-		}
-
-		[Fact]
-		public void SetupReturns_OpenGenericArgumentWithWhereClauseRefactored()
 		{
 			// Arrange
 			var mock = new Mock<IHasOpenGeneric>();
