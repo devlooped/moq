@@ -1,6 +1,6 @@
 ﻿{
 	"dependencies": {
-		"Castle.Core": "4.1.0",
+		"Castle.Core": "4.1.1",
 		"IFluentInterface": "2.0.0",
 		"GitInfo": "1.1.15"
 	},

@@ -16,7 +16,7 @@
 	</ItemGroup>
 
 	<ItemGroup Condition="$(TargetFramework.StartsWith('netcoreapp'))">
-		<PackageReference Include="Castle.Core" Version="4.1.0" />
+		<PackageReference Include="Castle.Core" Version="4.1.1" />
 		<PackageReference Include="System.Collections.Specialized" Version="4.3.0" />
 		<PackageReference Include="System.ComponentModel.Primitives" Version="4.3.0" />
 		<PackageReference Include="System.Diagnostics.TraceSource" Version="4.3.0" />
