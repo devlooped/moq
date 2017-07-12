@@ -102,7 +102,28 @@ namespace Moq
 
 		public InterceptionAction HandleIntercept(ICallContext invocation, InterceptorContext ctx, CurrentInterceptContext localctx)
 		{
-			localctx.Call = FluentMockContext.IsActive ? (IProxyCall)null : ctx.OrderedCalls.LastOrDefault(c => c.Matches(invocation));
+			if (FluentMockContext.IsActive)
+			{
+				localctx.Call = null;
+			}
+			else
+			{
+				IProxyCall lastMatchingSetup = null;
+				IProxyCall lastMatchingSetupForSameMethod = null;
+				foreach (var setup in ctx.OrderedCalls)
+				{
+					if (setup.Matches(invocation))
+					{
+						lastMatchingSetup = setup;
+						if (setup.Method == invocation.Method)
+						{
+							lastMatchingSetupForSameMethod = setup;
+						}
+					}
+				}
+				localctx.Call = lastMatchingSetupForSameMethod ?? lastMatchingSetup;
+			}
+
 			if (localctx.Call != null)
 			{
 				localctx.Call.EvaluatedSuccessfully();
