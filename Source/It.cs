@@ -44,7 +44,7 @@ using System.Linq;
 using System.Linq.Expressions;
 using System.Text.RegularExpressions;
 using System.Diagnostics.CodeAnalysis;
-using System.Reflection;
+using Moq.Matchers;
 #if FEATURE_COM
 using static System.Runtime.InteropServices.Marshal;
 #endif
@@ -103,12 +103,12 @@ namespace Moq
 
 				if (rangeKind == Range.Exclusive)
 				{
-					return value.CompareTo(from) > 0 && value.CompareTo(to) < 0;
+					return value.CompareTo(@from) > 0 && value.CompareTo(to) < 0;
 				}
 
-				return value.CompareTo(from) >= 0 && value.CompareTo(to) <= 0;
+				return value.CompareTo(@from) >= 0 && value.CompareTo(to) <= 0;
 			},
-			() => It.IsInRange(from, to, rangeKind));
+			() => It.IsInRange(@from, to, rangeKind));
 		}
 
 		/// <include file='It.xdoc' path='docs/doc[@for="It.IsIn(enumerable)"]/*'/>
@@ -160,6 +160,32 @@ namespace Moq
 		/// </summary>
 		public interface AnyType
 		{
+		}
+
+		/// <summary>
+		/// Allows for setting up open generic methods which have where restrictions on Mock Fixtures
+		/// </summary>
+		/// <typeparam name="T">Base class/interface that should be inherited from</typeparam>
+		/// <returns>null</returns>
+		[AdvancedMatcher(typeof(AnySubTypeMatcher))]
+		public static T IsAnySubTypeOf<T>() where T : class
+		{
+			return new AnySubTypeOf<T>();
+		}
+
+		internal interface IAnySubTypeOf
+		{
+			Type SubType { get; }
+		}
+
+		internal class AnySubTypeOf<T> : AnyType, IAnySubTypeOf where T : class
+		{
+			public static implicit operator T(AnySubTypeOf<T> t)
+			{
+				return null;
+			}
+
+			public Type SubType => typeof(T);
 		}
 
 		internal class AnyTypeImplementation : AnyType

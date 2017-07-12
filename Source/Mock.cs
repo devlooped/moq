@@ -489,6 +489,36 @@ namespace Moq
 			});
 		}
 
+		internal static MethodCallReturn<T, TResult> SetupGeneric<T, TResult>(
+			Mock<T> mock,
+			Expression<Func<T, TResult>> expression,
+			Condition condition)
+			where T : class
+		{
+			return PexProtector.Invoke(() =>
+			{
+				var methodCall = expression.GetCallInfo(mock);
+
+
+				var method = methodCall.Method;
+				var args = methodCall.Arguments.ToArray();
+
+				ThrowIfNotMember(expression, method);
+				ThrowIfCantOverride(expression, method);
+				var call = new MethodCallReturn<T, TResult>(mock, condition, expression, method, args)
+				{
+					IsOpenGeneric = true,
+					GenericMethod = method.GetGenericMethodDefinition(),
+				};
+
+				var targetInterceptor = GetInterceptor(methodCall.Object, mock);
+
+				targetInterceptor.AddCall(call, SetupKind.Other);
+
+				return call;
+			});
+		}
+
 		internal static MethodCallReturn<T, TProperty> SetupGet<T, TProperty>(
 			Mock<T> mock,
 			Expression<Func<T, TProperty>> expression,

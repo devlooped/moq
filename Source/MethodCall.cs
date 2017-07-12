@@ -151,6 +151,7 @@ namespace Moq
 
 			this.SetFileInfo();
 		}
+		public bool IsOpenGeneric { get; internal set; }
 
 		public string FailMessage { get; set; }
 
@@ -165,6 +166,7 @@ namespace Moq
 
 		// Where the setup was performed.
 		public MethodInfo Method { get; private set; }
+		public MethodInfo GenericMethod { get; internal set; }
 		public string FileName { get; private set; }
 		public int FileLine { get; private set; }
 		public MethodBase TestMethod { get; private set; }
@@ -235,11 +237,24 @@ namespace Moq
 				}
 			}
 
+
 			if (argumentMatchers.Count == args.Count && this.IsEqualMethodOrOverride(call))
 			{
 				for (int i = 0; i < argumentMatchers.Count; i++)
 				{
-					if (!argumentMatchers[i].Matches(args[i]))
+					var matcher = argumentMatchers[i];
+
+					var anySubTypeMatcher = matcher as AnySubTypeMatcher;
+					var methParams = new Lazy<ParameterInfo[]>(() => call.Method.GetParameters());
+
+					if (anySubTypeMatcher != null)
+					{
+						var paramType = methParams.Value[i].ParameterType;
+
+						if (!anySubTypeMatcher.Matches(args[i], paramType))
+							return false;
+					}
+					else if (!matcher.Matches(args[i]))
 					{
 						return false;
 					}
@@ -375,13 +390,14 @@ namespace Moq
 
 			if (this.Method.DeclaringType.IsAssignableFrom(call.Method.DeclaringType))
 			{
-				if (!this.Method.Name.Equals(call.Method.Name, StringComparison.Ordinal) ||
-					!IsMethodReturnTypeEqual(call) ||
-					!this.Method.IsGenericMethod &&
-					!IsMethodParameterTypesEqual(call))
-				{
+				if(!this.Method.Name.Equals(call.Method.Name, StringComparison.Ordinal))
 					return false;
-				}
+
+				if (!IsMethodReturnTypeEqual(call))
+					return false;
+
+				if (!this.Method.IsGenericMethod && !IsMethodParameterTypesEqual(call))
+					return false;
 
 				if (Method.IsGenericMethod && !call.Method.GetGenericArguments().SequenceEqual(Method.GetGenericArguments(), typesComparer))
 				{
@@ -396,12 +412,54 @@ namespace Moq
 
 		private bool IsMethodParameterTypesEqual(IExtendedCallContext call)
 		{
-			return call.Method.GetParameterTypes().SequenceEqual(this.Method.GetParameterTypes());
+			var callParamTypes = call.Method.GetParameterTypes().ToArray();
+			var setupParamTypes = this.Method.GetParameterTypes().ToArray();
+			var genericParamTypes = this.GenericMethod?.GetParameterTypes().ToArray();
+
+			if (callParamTypes.Length != setupParamTypes.Length)
+				return false;
+
+			if (callParamTypes.Length == 0)
+				return true;
+
+			for (int i = 0; i < callParamTypes.Count(); i++)
+			{
+				var callParamType = callParamTypes[i];
+				var setupParamType = setupParamTypes[i];
+
+				var genericParamType = genericParamTypes?[i];
+
+				if (!IsMethodParameterTypeEqual(callParamType, setupParamType, genericParamType))
+					return false;
+			}
+
+			return true;
+		}
+
+		private bool IsMethodParameterTypeEqual(Type callParamType, Type setupParamType, Type genericParamType)
+		{
+			if (setupParamType.IsAnyType())
+				return true;
+
+			if (!IsOpenGeneric)
+				return callParamType == setupParamType;
+
+			if(genericParamType?.IsGenericParameter != true)
+				return false;
+
+			if (genericParamType.BaseType?.IsAssignableFrom(callParamType) == true)
+				return true;
+
+			return false;
 		}
 
 		private bool IsMethodReturnTypeEqual(IExtendedCallContext call)
 		{
-			return this.Method.ReturnType == call.Method.ReturnType || Method.ReturnType.IsAnyType();
+			var callReturnType = call.Method.ReturnType;
+			var methReturnType = Method.ReturnType;
+			var genericReturnType = GenericMethod?.ReturnType;
+
+			return IsMethodParameterTypeEqual(callReturnType, methReturnType, genericReturnType);
 		}
 
 		public IVerifies AtMostOnce()

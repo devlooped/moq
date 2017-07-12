@@ -68,6 +68,7 @@
       <DependentUpon>IReturns.tt</DependentUpon>
     </Compile>
     <Compile Include="Language\IReturnsAnyType.cs" />
+    <Compile Include="Matchers\AnySubTypeMatcher.cs" />
     <Compile Include="Proxy\IExtendedCallContext.cs" />
     <Compile Include="Proxy\ProxyGenerationHelpers.cs" />
     <Compile Include="ReturnsExtensions.cs" />

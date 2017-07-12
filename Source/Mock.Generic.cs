@@ -322,6 +322,13 @@ namespace Moq
 		{
 			return Mock.Setup(this, expression, null);
 		}
+		
+		// TODO: Find out about this (.xdoc?)
+		/// <include file='Mock.Generic.xdoc' path='docs/doc[@for="Mock{T}.Setup{}"]/*'/>
+		public ISetupAnyType<T, TResult> SetupGeneric<TResult>(Expression<Func<T, TResult>> expression)
+		{
+			return Mock.SetupGeneric(this, expression, null);
+		}
 
 #endregion
 
