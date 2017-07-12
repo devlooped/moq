@@ -384,56 +384,29 @@ namespace Moq
 		private bool IsEqualMethodOrOverride(IExtendedCallContext call)
 		{
 			if (call.Method == this.Method)
-			{
 				return true;
-			}
 
-			if (this.Method.DeclaringType.IsAssignableFrom(call.Method.DeclaringType))
-			{
-				if(!this.Method.Name.Equals(call.Method.Name, StringComparison.Ordinal))
-					return false;
+			if (Method.DeclaringType == null || !Method.DeclaringType.IsAssignableFrom(call.Method.DeclaringType)) 
+				return false;
 
-				if (!IsMethodReturnTypeEqual(call))
-					return false;
+			if(!Method.Name.Equals(call.Method.Name, StringComparison.Ordinal))
+				return false;
 
-				if (!this.Method.IsGenericMethod && !IsMethodParameterTypesEqual(call))
-					return false;
+			if (!IsMethodReturnTypeEqual(call))
+				return false;
 
-				if (Method.IsGenericMethod && !call.Method.GetGenericArguments().SequenceEqual(Method.GetGenericArguments(), typesComparer))
-				{
-					return false;
-				}
+			if (!this.Method.IsGenericMethod && !IsMethodParameterTypesEqual(call))
+				return false;
 
-				return true;
-			}
+			if (Method.IsGenericMethod && !call.Method.GetGenericArguments().SequenceEqual(Method.GetGenericArguments(), typesComparer))
+				return false;
 
-			return false;
+			return true;
 		}
 
 		private bool IsMethodParameterTypesEqual(IExtendedCallContext call)
 		{
-			var callParamTypes = call.Method.GetParameterTypes().ToArray();
-			var setupParamTypes = this.Method.GetParameterTypes().ToArray();
-			var genericParamTypes = this.GenericMethod?.GetParameterTypes().ToArray();
-
-			if (callParamTypes.Length != setupParamTypes.Length)
-				return false;
-
-			if (callParamTypes.Length == 0)
-				return true;
-
-			for (int i = 0; i < callParamTypes.Count(); i++)
-			{
-				var callParamType = callParamTypes[i];
-				var setupParamType = setupParamTypes[i];
-
-				var genericParamType = genericParamTypes?[i];
-
-				if (!IsMethodParameterTypeEqual(callParamType, setupParamType, genericParamType))
-					return false;
-			}
-
-			return true;
+			return call.Method.GetParameterTypes().SequenceEqual(this.Method.GetParameterTypes());
 		}
 
 		private bool IsMethodParameterTypeEqual(Type callParamType, Type setupParamType, Type genericParamType)
