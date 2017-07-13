@@ -401,27 +401,12 @@ namespace Moq
 		private static string FormatSetupsInfo(IEnumerable<IProxyCall> setups)
 		{
 			var expressionSetups = setups
-				.Select(s => s.SetupExpression.PartialMatcherAwareEval().ToLambda().ToStringFixed() + ", " + FormatCallCount(s.CallCount))
+				.Select(s => s.Format())
 				.ToArray();
 
 			return expressionSetups.Length == 0 ?
 				Resources.NoSetupsConfigured :
 				Environment.NewLine + string.Format(Resources.ConfiguredSetups, Environment.NewLine + string.Join(Environment.NewLine, expressionSetups));
-		}
-
-		private static string FormatCallCount(int callCount)
-		{
-			if (callCount == 0)
-			{
-				return "Times.Never";
-			}
-
-			if (callCount == 1)
-			{
-				return "Times.Once";
-			}
-
-			return string.Format(CultureInfo.CurrentCulture, "Times.Exactly({0})", callCount);
 		}
 
 		private static string FormatInvocations(IEnumerable<ICallContext> invocations)

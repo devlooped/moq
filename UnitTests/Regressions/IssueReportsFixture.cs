@@ -2428,8 +2428,8 @@ namespace Moq.Tests.Regressions
 				var e = Assert.Throws<MockException>(() => mock.Verify(m => m.Execute(0)));
 				Assert.Contains(
 					Environment.NewLine + "Configured setups: " +
-					Environment.NewLine + "m => m.Execute(1), Times.Never" +
-					Environment.NewLine + "m => m.Execute(It.IsInRange<Int32>(2, 20, Range.Exclusive)), Times.Exactly(3)",
+					Environment.NewLine + "m => m.Execute(1)" +
+					Environment.NewLine + "m => m.Execute(It.IsInRange<Int32>(2, 20, Range.Exclusive))",
 					e.Message);
 			}
 
@@ -2445,7 +2445,7 @@ namespace Moq.Tests.Regressions
 				var e = Assert.Throws<MockException>(() => mock.Verify(m => m.Execute<int>(1, 1)));
 				Assert.Contains(
 					Environment.NewLine + "Configured setups: " +
-					Environment.NewLine + "m => m.Execute<Int32>(1, 10), Times.Once",
+					Environment.NewLine + "m => m.Execute<Int32>(1, 10)",
 					e.Message);
 			}
 
