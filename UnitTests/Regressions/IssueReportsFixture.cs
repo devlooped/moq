@@ -1454,6 +1454,25 @@ namespace Moq.Tests.Regressions
 
 		#endregion
 
+		#region 421
+
+		public class Issue421
+		{
+			[Fact]
+			public void SetupShouldAcceptMockedIEnumerableInMethodCall()
+			{
+				var mock = new Mock<IFoo>();
+				var values = new Mock<IEnumerable>().Object;
+				mock.Setup(m => m.Bar(values));
+			}
+			public interface IFoo
+			{
+				void Bar(IEnumerable values);
+			}
+		}
+
+		#endregion
+
 		// Old @ Google Code
 
 		#region #47
