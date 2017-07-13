@@ -101,11 +101,10 @@ namespace Moq
 		private Exception thrownException;
 		private Action<object[]> setupCallback;
 		private List<IMatcher> argumentMatchers = new List<IMatcher>();
-		private bool isOnce;
 		private EventInfo mockEvent;
 		private Delegate mockEventArgsFunc;
 		private object[] mockEventArgsParams;
-		private int? expectedCallCount = null;
+		private int? expectedMaxCallCount;
 		protected Condition condition;
 		private List<KeyValuePair<int, object>> outValues = new List<KeyValuePair<int, object>>();
 		private static readonly IEqualityComparer<Type> typesComparer = new TypeEqualityComparer();
@@ -268,18 +267,20 @@ namespace Moq
 
 			this.CallCount++;
 
-			if (this.isOnce && this.CallCount > 1)
+			if (expectedMaxCallCount.HasValue && this.CallCount > expectedMaxCallCount)
 			{
-				throw new MockException(
-					MockException.ExceptionReason.MoreThanOneCall,
-					Times.Once().GetExceptionMessage(FailMessage, SetupExpression.ToStringFixed(), this.CallCount));
-			}
-
-			if (expectedCallCount.HasValue && this.CallCount > expectedCallCount)
-			{
-				throw new MockException(
-					MockException.ExceptionReason.MoreThanNCalls,
-					Times.AtMost(expectedCallCount.Value).GetExceptionMessage(FailMessage, SetupExpression.ToStringFixed(), CallCount));
+				if (expectedMaxCallCount == 1)
+				{
+					throw new MockException(
+						MockException.ExceptionReason.MoreThanOneCall,
+						Times.AtMostOnce().GetExceptionMessage(FailMessage, SetupExpression.ToStringFixed(), this.CallCount));
+				}
+				else
+				{
+					throw new MockException(
+						MockException.ExceptionReason.MoreThanNCalls,
+						Times.AtMost(expectedMaxCallCount.Value).GetExceptionMessage(FailMessage, SetupExpression.ToStringFixed(), this.CallCount));
+				}
 			}
 
 			if (this.mockEvent != null)
@@ -389,15 +390,11 @@ namespace Moq
 			return false;
 		}
 
-		public IVerifies AtMostOnce()
-		{
-			this.isOnce = true;
-			return this;
-		}
+		public IVerifies AtMostOnce() => this.AtMost(1);
 
 		public IVerifies AtMost(int callCount)
 		{
-			this.expectedCallCount = callCount;
+			this.expectedMaxCallCount = callCount;
 			return this;
 		}
 
@@ -443,6 +440,28 @@ namespace Moq
 			}
 
 			return message.ToString().Trim();
+		}
+
+		public string Format()
+		{
+			var builder = new StringBuilder();
+			builder.Append(this.SetupExpression.PartialMatcherAwareEval().ToLambda().ToStringFixed());
+
+			if (this.expectedMaxCallCount != null)
+			{
+				if (this.expectedMaxCallCount == 1)
+				{
+					builder.Append(", Times.AtMostOnce()");
+				}
+				else
+				{
+					builder.Append(", Times.AtMost(");
+					builder.Append(this.expectedMaxCallCount.Value);
+					builder.Append(")");
+				}
+			}
+
+			return builder.ToString();
 		}
 	}
 
