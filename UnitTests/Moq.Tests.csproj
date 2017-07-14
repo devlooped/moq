@@ -64,6 +64,7 @@
 		<Compile Include="Linq\MockRepositoryQuerying.cs" />
 		<Compile Include="MockedDelegatesFixture.cs" />
 		<Compile Include="MockSequenceFixture.cs" />
+		<Compile Include="Linq\BehaviorFixture.cs" />
 		<Compile Include="Linq\SupportedQuerying.cs" />
 		<Compile Include="Linq\UnsupportedQuerying.cs" />
 		<Compile Include="PropertiesFixture.cs" />

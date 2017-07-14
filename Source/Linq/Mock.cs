@@ -63,6 +63,17 @@ namespace Moq
 		/// <summary>
 		/// Creates an mock object of the indicated type.
 		/// </summary>
+		/// <typeparam name="T">The type of the mocked object.</typeparam>
+		/// <param name="behavior">Behavior of the mock.</param>
+		/// <returns>The mocked object created.</returns>
+		public static T Of<T>(MockBehavior behavior) where T : class
+		{
+			return new Mock<T>(behavior).Object;
+		}
+
+		/// <summary>
+		/// Creates an mock object of the indicated type.
+		/// </summary>
 		/// <param name="predicate">The predicate with the specification of how the mocked object should behave.</param>
 		/// <typeparam name="T">The type of the mocked object.</typeparam>
 		/// <returns>The mocked object created.</returns>
