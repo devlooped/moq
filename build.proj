@@ -15,10 +15,7 @@
 	<ItemGroup>
 		<Solution Include="Moq.sln"/>
 		<NuSpec Include="Moq.nuspec" />
-		<TestProject Include="UnitTests\Moq.Tests.csproj" />
 		<Source Include="Source\Moq.csproj" />
-		<NetCoreSolution Include="Moq.NetCore.sln" />
-		<NetCoreTestProject Include="UnitTests\Moq.NetCore.Tests.csproj" />
 	</ItemGroup>
 	
 	<Target Name="Clean">
@@ -33,8 +30,6 @@
 	<Target Name="Build" DependsOnTargets="GitVersion">
 		<MSBuild Projects="@(Solution)" Properties="$(CommonBuildProperties)" />
 
-		<MSBuild Projects="@(NetCoreSolution)" BuildInParallel="false" Targets="Restore;Build" Properties="$(CommonBuildProperties)" />
-
 		<Exec Command="xcopy &quot;Source\bin\$(Configuration)\net45\Moq.*&quot; &quot;$(DropDirectory)lib\net45\&quot; /Y" ContinueOnError="false" />
 		<Exec Command="xcopy &quot;Source\bin\$(Configuration)\netstandard1.3\Moq.*&quot; &quot;$(DropDirectory)lib\netstandard1.3\&quot; /Y" ContinueOnError="false" />
 
@@ -42,34 +37,25 @@
 	</Target>
 
 	<Target Name="Test" DependsOnTargets="Build">
-		<MSBuild Projects="@(TestProject)" BuildInParallel="false" Targets="GetTargetPath" Properties="$(CommonBuildProperties)">
-			<Output TaskParameter="TargetOutputs" ItemName="_TestAssembly" />
-		</MSBuild>
 
-		<ItemGroup>
-			<TestAssembly Include="@(_TestAssembly)" Condition=" Exists('%(_TestAssembly.FullPath)') " />
-		</ItemGroup>
-
-		<PropertyGroup>
-			<XunitConsole>$(PackagesPath)\xunit.runner.console\tools\xunit.console.exe</XunitConsole>
-			<XunitOptions>$(XunitOptions) -html $(Out)\test.html -xml $(Out)\test.xml -parallel all -noshadow</XunitOptions>
-
-			<CoverageConsole>$(PackagesPath)\OpenCover\tools\OpenCover.Console.exe</CoverageConsole>
-			<CoverageOptions>$(CoverageOptions) -output:$(Out)\coverage.xml -returntargetcode -register:user -filter:"+[Moq.*]* -[xunit*]* -[*.Tests]* -[*]*ThisAssembly* -[*]*IFluentInterface*" -excludebyattribute:*ExcludeFromCodeCoverage*;*CompilerGenerated* -skipautoprops -showunvisited -mergebyhash -hideskipped:All</CoverageOptions>
-		</PropertyGroup>
-
-		<xunit Assemblies="@(TestAssembly)"
-			   Html="$(Out)\test.html"
-			   Xml="$(Out)\test.xml"
-			   ParallelizeAssemblies="true"
-			   ParallelizeTestCollections="true"
-			   ContinueOnError="ErrorAndContinue" />
-
+		<!-- See if dotnet CLI is available: -->
 		<Exec ContinueOnError="True" Command="dotnet --info">
 			<Output TaskParameter="ExitCode" PropertyName="DotNetErrorCode"/>
 		</Exec>
-		<Warning Condition="'$(DotNetErrorCode)' != '0'" Text="Error in executing dotnet. Skipping .NET Core tests." />
-		<Exec Command="dotnet test &quot;@(NetCoreTestProject, ' ')&quot; --no-build -c $(Configuration) --logger:trx;LogFileName=$(Out)\test.dotnet.trx" ContinueOnError="false" />
+		<Warning Condition="'$(DotNetErrorCode)' != '0'" Text="Error in executing dotnet." />
+
+		<!-- Test runner report files will be written to the `out\` directory,
+		     so create it if it doesn't exist yet. -->
+		<MakeDir Directories="$(Out)" Condition=" !Exists('$(Out)') " />
+
+		<Exec Command="dotnet xunit -nobuild -configuration $(Configuration) -noshadow -appveyor -html ..\$(Out)\test.html -xml ..\$(Out)\test.xml"
+		      WorkingDirectory="UnitTests"
+			  ContinueOnError="false" />
+
+		<PropertyGroup>
+			<CoverageConsole>$(PackagesPath)\OpenCover\tools\OpenCover.Console.exe</CoverageConsole>
+			<CoverageOptions>$(CoverageOptions) -output:$(Out)\coverage.xml -returntargetcode -register:user -filter:"+[Moq.*]* -[xunit*]* -[*.Tests]* -[*]*ThisAssembly* -[*]*IFluentInterface*" -excludebyattribute:*ExcludeFromCodeCoverage*;*CompilerGenerated* -skipautoprops -showunvisited -mergebyhash -hideskipped:All</CoverageOptions>
+		</PropertyGroup>
 
 		<!-- This isn't collecting any data right now, so make Coverage == '' by default so it won't run with this condition -->
 		<Exec Command="$(CoverageConsole) $(CoverageOptions) -target:$(XunitConsole) -targetargs:&quot;@(TestAssembly, ' ') $(XunitOptions)&quot;"
@@ -97,12 +83,10 @@
 	<PropertyGroup>
 		<GitInfoTargets>$(PackagesPath)\GitInfo\build\GitInfo.targets</GitInfoTargets>
 		<PendingRestore Condition=" !Exists('$(GitInfoTargets)') ">true</PendingRestore>
-		<XunitProps>$(PackagesPath)\xunit.runner.msbuild\build\portable-net45+win8+wp8+wpa81\xunit.runner.msbuild.props</XunitProps>
 	</PropertyGroup>
 
 	<Target Name="GitVersion" /><!-- Gets overriden by the $(GitInfoTargets) if it exists -->
 	<Import Project="$(GitInfoTargets)" Condition=" Exists('$(GitInfoTargets)') " />
-	<Import Project="$(XunitProps)" Condition=" Exists('$(XunitProps)') " />
 
 	<Target Name="Configure" DependsOnTargets="_GetNuGet;GitInfoReport">
 		<!-- We always run NuGet Install since it already checks for already-installed packages and skips them -->
