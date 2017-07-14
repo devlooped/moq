@@ -19,7 +19,7 @@ Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "ClassLibrary2.NetCore", "Un
 EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Moq.NetCore.Tests", "UnitTests\Moq.NetCore.Tests.csproj", "{193B5DD4-77B8-4B36-8E62-C0E6BD733FAA}"
 EndProject
-Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Moq.NetCore", "Source\Moq.NetCore.csproj", "{4BA03097-04CA-4B7C-B618-5AAD1B27B4B5}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Moq", "Source\Moq.csproj", "{4BA03097-04CA-4B7C-B618-5AAD1B27B4B5}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
