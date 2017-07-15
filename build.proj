@@ -6,7 +6,7 @@
 		<IntermediateOutputPath>.nuget\</IntermediateOutputPath>
 		<PackagesPath>$(IntermediateOutputPath)packages</PackagesPath>
 		<Out Condition=" '$(Out)' == '' ">out</Out>
-		<CommonBuildProperties>WarningLevel=0;NoWarn=1591;RunCodeAnalysis=false;Configuration=$(Configuration)</CommonBuildProperties>
+		<CommonBuildProperties>WarningLevel=0;NoWarn=1591;RunCodeAnalysis=false;Configuration=$(Configuration);SourceLinkCreate=true</CommonBuildProperties>
 		<GitInfoReportImportance>high</GitInfoReportImportance>
 		<GitIgnoreTagVersion>true</GitIgnoreTagVersion>
 		<GitIgnoreBranchVersion>true</GitIgnoreBranchVersion>
@@ -32,8 +32,6 @@
 
 		<Exec Command="xcopy &quot;Source\bin\$(Configuration)\net45\Moq.*&quot; &quot;$(DropDirectory)lib\net45\&quot; /Y" ContinueOnError="false" />
 		<Exec Command="xcopy &quot;Source\bin\$(Configuration)\netstandard1.3\Moq.*&quot; &quot;$(DropDirectory)lib\netstandard1.3\&quot; /Y" ContinueOnError="false" />
-
-		<Exec Command="$(PackagesPath)\gitlink\lib\net45\GitLink.exe . -f &quot;$([System.String]::new('%(Solution.FullPath)').Replace('$(MSBuildProjectDirectory)', '').TrimStart('\'))&quot; -skipverify -u https://github.com/moq/moq4 -b $(GitBranch) -c $(Configuration)" />
 	</Target>
 
 	<Target Name="Test" DependsOnTargets="Build">
@@ -67,6 +65,17 @@
 	<Target Name="Package" DependsOnTargets="Build">
 		<MakeDir Directories="$(Out)" Condition=" !Exists('$(Out)') " />
 		<Exec Command='"$(NuGet)" Pack "%(NuSpec.Identity)" $(Args) -Version $(Version) -Properties Id=%(NuSpec.Filename);Configuration=$(Configuration);Version=$(Version) -OutputDirectory $(Out)' />
+
+		<!-- See if dotnet CLI is available: -->
+		<Exec ContinueOnError="True" Command="dotnet --info">
+			<Output TaskParameter="ExitCode" PropertyName="DotNetErrorCode"/>
+		</Exec>
+		<Warning Condition="'$(DotNetErrorCode)' != '0'" Text="Error in executing dotnet." />
+
+		<!-- Verify that created NuGet package is correctly source-linked to the GitHub repository -->
+		<Exec Command="dotnet sourcelink test ..\$(Out)\%(NuSpec.Filename).$(Version).nupkg"
+		      WorkingDirectory="Source"
+		      ContinueOnError="false" />
 	</Target>
 
 	<Target Name="Publish" DependsOnTargets="Package">

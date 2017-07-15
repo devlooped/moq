@@ -4,8 +4,8 @@
 		<TargetFrameworks>net452;netcoreapp1.0</TargetFrameworks>
 		<AssemblyName>Moq.Tests</AssemblyName>
 		<AssemblyOriginatorKeyFile>../Moq.snk</AssemblyOriginatorKeyFile>
-		<DebugSymbols>true</DebugSymbols>
-		<DebugType>full</DebugType>
+		<DebugSymbols>True</DebugSymbols>
+		<DebugType>portable</DebugType>
 		<GenerateRuntimeConfigurationFiles>true</GenerateRuntimeConfigurationFiles>
 		<PublicSign Condition=" '$(OS)' != 'Windows_NT' ">true</PublicSign>
 		<SignAssembly>true</SignAssembly>

@@ -188,12 +188,10 @@ Version 1.0
 	</metadata>
 	<files>
 		<file src="Source\bin\$configuration$\net45\Moq.dll" target="lib\net45" />
-		<!-- Could not verify that GitLink works, so disabling pdbs for now -->
-		<!--<file src="Source\bin\$configuration$\net45\Moq.pdb" target="lib\net45" />-->
+		<file src="Source\bin\$configuration$\net45\Moq.pdb" target="lib\net45" />
 		<file src="Source\bin\$configuration$\net45\Moq.xml" target="lib\net45" />
 		<file src="Source\bin\$configuration$\netstandard1.3\Moq.dll" target="lib\netstandard1.3" />
-		<!-- Could not verify that GitLink works, so disabling pdbs for now -->
-		<!--<file src="Source\bin\$configuration$\netstandard1.3\Moq.pdb" target="lib\netstandard1.3" />-->
+		<file src="Source\bin\$configuration$\netstandard1.3\Moq.pdb" target="lib\netstandard1.3" />
 		<file src="Source\bin\$configuration$\netstandard1.3\Moq.xml" target="lib\netstandard1.3" />
 	</files>
 </package>
