@@ -708,6 +708,7 @@ namespace Moq.Tests.Regressions
 				Assert.Equal(42, frobber.ExtendedTypeValue);  // "BUGBUG: Moq Lost the value and set back to default."
 			}
 
+			[Fact]
 			public void CSharpIsCoolWithIt()
 			{
 				ExtendingTypeBase real = new ExtendedConcreteType(42);
@@ -971,8 +972,8 @@ namespace Moq.Tests.Regressions
 
 				mock.Setup(x => x.Test()).Returns(true);
 
-				Assert.IsType(typeof(int), mock.Object.GetHashCode());
-				Assert.IsType(typeof(string), mock.Object.ToString());
+				Assert.IsType<int>(mock.Object.GetHashCode());
+				Assert.IsType<string>(mock.Object.ToString());
 				Assert.False(mock.Object.Equals("ImNotTheObject"));
 				Assert.True(mock.Object.Equals(mock.Object));
 			}
@@ -2501,7 +2502,7 @@ namespace Moq.Tests.Regressions
 				mock.Setup(m => m.OnExecute());
 
 				var e = Assert.Throws<NotSupportedException>(() => mock.Verify(m => m.Execute()));
-				Assert.True(e.Message.StartsWith("Invalid verify"));
+				Assert.StartsWith("Invalid verify", e.Message);
 			}
 
 			public class Foo
@@ -2630,14 +2631,9 @@ namespace Moq.Tests.Regressions
 			[Fact]
 			public void TestSetup()
 			{
-				this.TestSetupHelper<Foo>();
-			}
-
-			public void TestSetupHelper<T>() where T : class, IFoo<int>
-			{
 				var expected = 2;
 
-				var target = new Mock<T>();
+				var target = new Mock<Foo>();
 				target.Setup(p => p.DoInt32(0)).Returns(expected);
 				target.Setup(p => p.DoGeneric(0)).Returns(expected);
 
