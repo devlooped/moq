@@ -1,5 +1,6 @@
 ﻿using System;
 using System.ComponentModel;
+using System.Diagnostics.CodeAnalysis;
 using System.Threading;
 using Xunit;
 
@@ -181,6 +182,7 @@ namespace Moq.Tests
 		}
 
 		[Fact]
+		[SuppressMessage("Assertions", "xUnit2004")]
 		public void ShouldRaiseEventWithFuncThreeArgs()
 		{
 			var mock = new Mock<IAdder<string>>();
@@ -205,6 +207,7 @@ namespace Moq.Tests
 		}
 
 		[Fact]
+		[SuppressMessage("Assertions", "xUnit2004")]
 		public void ShouldRaiseEventWithFuncFourArgs()
 		{
 			var mock = new Mock<IAdder<string>>();

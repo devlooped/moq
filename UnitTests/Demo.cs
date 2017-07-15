@@ -26,6 +26,7 @@ namespace Moq.Tests
 			mock.VerifyAll();
 		}
 
+		[Fact]
 		public void FillingDoesNotRemoveIfNotEnoughInStock()
 		{
 			//setup - data
@@ -43,6 +44,7 @@ namespace Moq.Tests
 			Assert.False(order.IsFilled);
 		}
 
+		[Fact]
 		public void TestPresenterSelection()
 		{
 			var mockView = new Mock<IOrdersView>();
@@ -140,43 +142,5 @@ namespace Moq.Tests
 		{
 			bool ShouldDownload(Version version);
 		}
-
-		public void When_user_forgot_password_should_save_user()
-		{
-			var userRepository = new Mock<IUserRepository>();
-			var smsSender = new Mock<ISmsSender>();
-
-			var theUser = new User { HashedPassword = "this is not hashed password" };
-
-			userRepository.Setup(x => x.GetUserByName("ayende")).Returns(theUser);
-
-			var controllerUnderTest = new LoginController(userRepository.Object, smsSender.Object);
-
-			controllerUnderTest.ForgotMyPassword("ayende");
-
-			userRepository.Verify(x => x.Save(theUser));
-		}
-
-		public interface ISmsSender { }
-		public interface IUserRepository
-		{
-			void Save(User user);
-			User GetUserByName(string username);
-		}
-
-		public class User
-		{
-			public string HashedPassword { get; set; }
-		}
-
-		public class LoginController
-		{
-			public LoginController(IUserRepository repo, ISmsSender sender)
-			{
-			}
-
-			public void ForgotMyPassword(string username) { }
-		}
-
 	}
 }
