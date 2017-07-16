@@ -11,7 +11,7 @@
 		<requireLicenseAcceptance>false</requireLicenseAcceptance>
 		<description>Moq is the most popular and friendly mocking framework for .NET</description>
 		<tags>moq tdd mocking mocks unittesting agile unittest</tags>
-		<releaseNotes>Release notes are available at https://github.com/moq/moq4/blob/master/ReleaseNotes.md.</releaseNotes>
+		<releaseNotes>A changelog is available at https://github.com/moq/moq4/blob/master/CHANGELOG.md.</releaseNotes>
 		<dependencies>
 			<group targetFramework=".NETFramework4.5">
 				<dependency id="Castle.Core" version="4.1.1" />
