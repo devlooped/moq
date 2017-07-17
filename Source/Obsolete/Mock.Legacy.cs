@@ -56,7 +56,7 @@ namespace Moq
 			ThrowIfPropertyNotWritable(prop);
 
 			var setter = prop.SetMethod;
-			ThrowIfCantOverride(expression, setter);
+			ThrowIfSetupExpressionInvolvesUnsupportedMember(expression, setter);
 
 			var call = new SetterMethodCall<T, TProperty>(mock, expression, setter, value);
 			var targetInterceptor = GetInterceptor(((MemberExpression)expression.Body).Expression, mock);
@@ -75,7 +75,7 @@ namespace Moq
 			where T : class
 		{
 			var method = expression.ToPropertyInfo().SetMethod;
-			ThrowIfVerifyNonVirtual(expression, method);
+			ThrowIfVerifyExpressionInvolvesUnsupportedMember(expression, method);
 
 			var expected = new SetterMethodCall<T, TProperty>(mock, expression, method)
 			{
@@ -94,7 +94,7 @@ namespace Moq
 			where T : class
 		{
 			var method = expression.ToPropertyInfo().SetMethod;
-			ThrowIfVerifyNonVirtual(expression, method);
+			ThrowIfVerifyExpressionInvolvesUnsupportedMember(expression, method);
 
 			var expected = new SetterMethodCall<T, TProperty>(mock, expression, method, value)
 			{

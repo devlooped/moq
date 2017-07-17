@@ -1,240 +1,142 @@
-﻿<?xml version="1.0" encoding="utf-8"?>
-<Project ToolsVersion="12.0" DefaultTargets="Build" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
+﻿<Project Sdk="Microsoft.NET.Sdk">
+
 	<PropertyGroup>
-		<Configuration Condition=" '$(Configuration)' == '' ">Debug</Configuration>
-		<Platform Condition=" '$(Platform)' == '' ">AnyCPU</Platform>
-		<ProductVersion>9.0.30729</ProductVersion>
-		<SchemaVersion>2.0</SchemaVersion>
-		<ProjectGuid>{1C91AC30-5977-4BE5-BA67-8EB186C03514}</ProjectGuid>
-		<OutputType>Library</OutputType>
-		<AppDesignerFolder>Properties</AppDesignerFolder>
-		<RootNamespace>Moq</RootNamespace>
+		<TargetFrameworks>net45;netstandard1.3</TargetFrameworks>
 		<AssemblyName>Moq</AssemblyName>
-		<TargetFrameworkVersion Condition=" '$(TargetFrameworkVersion)' == '' ">v4.5</TargetFrameworkVersion>
-		<FileAlignment>512</FileAlignment>
-		<SignAssembly>true</SignAssembly>
-		<AssemblyOriginatorKeyFile>..\Moq.snk</AssemblyOriginatorKeyFile>
-	</PropertyGroup>
-	<PropertyGroup>
+		<AssemblyOriginatorKeyFile>../Moq.snk</AssemblyOriginatorKeyFile>
+		<DebugSymbols>True</DebugSymbols>
+		<DebugType>portable</DebugType>
+		<DocumentationFile>bin\$(Configuration)\$(TargetFramework)\$(AssemblyName).xml</DocumentationFile> 
+		<GenerateAssemblyInfo>false</GenerateAssemblyInfo>
+		<GenerateDocumentation>true</GenerateDocumentation>
 		<GitIgnoreTagVersion>true</GitIgnoreTagVersion>
 		<GitIgnoreBranchVersion>true</GitIgnoreBranchVersion>
-		<OutputPath>bin\$(Configuration)\</OutputPath>
-		<DebugSymbols>true</DebugSymbols>
-		<DebugType>full</DebugType>
-		<ErrorReport>prompt</ErrorReport>
-		<WarningLevel>4</WarningLevel>
-		<DocumentationFile>bin\$(Configuration)\$(AssemblyName).xml</DocumentationFile>
-		<TreatWarningsAsErrors>true</TreatWarningsAsErrors>
-		<CodeAnalysisRuleSet>AllRules.ruleset</CodeAnalysisRuleSet>
 		<NoWarn>0419</NoWarn>
-		<Optimize>false</Optimize>
+		<PublicSign Condition="'$(OS)' != 'Windows_NT'">true</PublicSign>
+		<RootNamespace>Moq</RootNamespace>
+		<SignAssembly>true</SignAssembly>
+		<TreatWarningsAsErrors>true</TreatWarningsAsErrors>
+		<WarningLevel>4</WarningLevel>
 	</PropertyGroup>
-	<PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Debug|AnyCPU' ">
-		<DefineConstants>$(DefineConstants);TRACE;DEBUG;DESKTOP;FEATURE_CAS;FEATURE_CODEDOM;FEATURE_COM;FEATURE_SERIALIZATION</DefineConstants>
+
+	<PropertyGroup Condition=" '$(TargetFramework)' == 'net45' ">
+		<DefineConstants>$(DefineConstants);DESKTOP;FEATURE_CAS;FEATURE_CODEDOM;FEATURE_COM;FEATURE_SERIALIZATION</DefineConstants>
 	</PropertyGroup>
-	<PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Release|AnyCPU' ">
-		<DefineConstants>$(DefineConstants);TRACE;CODE_ANALYSIS;FEATURE_CAS;FEATURE_CODEDOM;FEATURE_COM;FEATURE_SERIALIZATION</DefineConstants>
-		<RunCodeAnalysis>true</RunCodeAnalysis>
+	<PropertyGroup Condition=" '$(TargetFramework)' == 'netstandard1.3' ">
+		<DefineConstants>$(DefineConstants);NETCORE</DefineConstants>
 	</PropertyGroup>
+
 	<ItemGroup>
+		<PackageReference Include="Castle.Core" Version="4.1.1" />
+		<PackageReference Include="GitInfo" Version="1.1.14" />
+		<PackageReference Include="IFluentInterface" Version="2.0.0" />
+		<PackageReference Include="SourceLink.Create.CommandLine" Version="2.1.2" PrivateAssets="All" />
+		<DotNetCliToolReference Include="dotnet-sourcelink" Version="2.1.2" />
+	</ItemGroup>
+	<ItemGroup Condition=" '$(TargetFramework)' == 'net45' ">
 		<Reference Include="System" />
 		<Reference Include="System.Core" />
 		<Reference Include="System.Xml" />
 	</ItemGroup>
-	<ItemGroup>
-		<Compile Include="Capture.cs" />
-		<Compile Include="CaptureMatch.cs" />
-		<Compile Include="ConditionalContext.cs" />
-		<Compile Include="IInterceptStrategy.cs" />
-		<Compile Include="IMock.cs" />
-		<Compile Include="InterceptorStrategies.cs" />
-		<Compile Include="Language\ICallback.cs" />
-		<Compile Include="Language\ICallback.Generated.cs">
-			<AutoGen>True</AutoGen>
-			<DesignTime>True</DesignTime>
-			<DependentUpon>ICallback.tt</DependentUpon>
-		</Compile>
-		<Compile Include="Language\IRaise.cs" />
-		<Compile Include="Language\IRaise.Generated.cs">
-			<AutoGen>True</AutoGen>
-			<DesignTime>True</DesignTime>
-			<DependentUpon>IRaise.tt</DependentUpon>
-		</Compile>
-		<Compile Include="Language\IReturns.cs" />
-		<Compile Include="Language\IReturns.Generated.cs">
-			<AutoGen>True</AutoGen>
-			<DesignTime>True</DesignTime>
-			<DependentUpon>IReturns.tt</DependentUpon>
-		</Compile>
-		<Compile Include="Proxy\ProxyGenerationHelpers.cs" />
-		<Compile Include="ReturnsExtensions.cs" />
-		<Compile Include="Language\ISetupSequentialResult.cs" />
-		<Compile Include="Language\ISetupConditionResult.cs" />
-		<Compile Include="Linq\FluentMockVisitor.cs" />
-		<Compile Include="Linq\Mock.cs" />
-		<Compile Include="Linq\MockRepository.cs" />
-		<Compile Include="Linq\MockSetupsBuilder.cs" />
-		<Compile Include="Matchers\ExpressionComparer.cs" />
-		<Compile Include="Matchers\ExpressionMatcher.cs" />
-		<Compile Include="MatchExpression.cs" />
-		<Compile Include="EmptyDefaultValueProvider.cs" />
-		<Compile Include="ExpressionStringBuilder.cs" />
-		<Compile Include="MethodCall.Generated.cs">
-			<AutoGen>True</AutoGen>
-			<DesignTime>True</DesignTime>
-			<DependentUpon>MethodCall.tt</DependentUpon>
-		</Compile>
-		<Compile Include="MethodCallReturn.Generated.cs">
-			<AutoGen>True</AutoGen>
-			<DesignTime>True</DesignTime>
-			<DependentUpon>MethodCallReturn.tt</DependentUpon>
-		</Compile>
-		<Compile Include="MockExtensions.cs" />
-		<Compile Include="MockSequence.cs" />
-		<Compile Include="Obsolete\IOccurrence.cs" />
-		<Compile Include="MatcherAttribute.cs" />
-		<Compile Include="Obsolete\Mock.Generic.Legacy.cs" />
-		<Compile Include="Obsolete\Mock.Legacy.cs" />
-		<Compile Include="Obsolete\ObsoleteMockExtensions.cs" />
-		<Compile Include="Obsolete\MockFactory.cs" />
-		<Compile Include="ReturnsExtensions.Generated.cs">
-			<AutoGen>True</AutoGen>
-			<DesignTime>True</DesignTime>
-			<DependentUpon>ReturnsExtensions.tt</DependentUpon>
-		</Compile>
-		<Compile Include="SequenceExtensions.cs" />
-		<Compile Include="SerializableTypesValueProvider.cs" />
-		<Compile Include="SetupKind.cs" />
-		<Compile Include="Language\Flow\IReturnsResult.cs" />
-		<Compile Include="ExpressionExtensions.cs" />
-		<Compile Include="Extensions.cs" />
-		<Compile Include="Evaluator.cs" />
-		<Compile Include="Guard.cs" />
-		<Compile Include="Language\IReturnsGetter.cs" />
-		<Compile Include="Language\ICallbackGetter.cs" />
-		<Compile Include="Language\Flow\IThrowsResult.cs" />
-		<Compile Include="Language\Flow\IReturnsThrows.cs" />
-		<Compile Include="Language\Flow\ICallbackResult.cs" />
-		<Compile Include="IMatcher.cs" />
-		<Compile Include="IMocked.cs" />
-		<Compile Include="Interceptor.cs" />
-		<Compile Include="IProxyCall.cs" />
-		<Compile Include="Language\Flow\ISetup.cs" />
-		<Compile Include="Language\ICallbackSetter.cs" />
-		<Compile Include="It.cs" />
-		<Compile Include="Language\IThrows.cs" />
-		<Compile Include="Language\IVerifies.cs" />
-		<Compile Include="AdvancedMatcherAttribute.cs" />
-		<Compile Include="MatcherFactory.cs" />
-		<Compile Include="Matchers\ConstantMatcher.cs" />
-		<Compile Include="Matchers\MatcherAttributeMatcher.cs" />
-		<Compile Include="Matchers\LazyEvalMatcher.cs" />
-		<Compile Include="Matchers\PredicateMatcher.cs" />
-		<Compile Include="MethodCall.cs" />
-		<Compile Include="MethodCallReturn.cs" />
-		<Compile Include="Mock.cs" />
-		<Compile Include="MockBehavior.cs" />
-		<Compile Include="MockException.cs" />
-		<Compile Include="MockRepository.cs" />
-		<Compile Include="Properties\Resources.Designer.cs">
-			<AutoGen>True</AutoGen>
-			<DesignTime>True</DesignTime>
-			<DependentUpon>Resources.resx</DependentUpon>
-		</Compile>
-		<Compile Include="Protected\IProtectedMock.cs" />
-		<Compile Include="Protected\ItExpr.cs" />
-		<Compile Include="Protected\ProtectedExtension.cs" />
-		<Compile Include="Protected\ProtectedMock.cs" />
-		<Compile Include="Properties\AssemblyInfo.cs" />
-		<Compile Include="Range.cs" />
+	<ItemGroup Condition=" '$(TargetFramework)' == 'netstandard1.3' ">
+		<PackageReference Include="System.Linq.Queryable" Version="4.3.0" />
+		<PackageReference Include="System.Reflection.TypeExtensions" Version="4.3.0" />
 	</ItemGroup>
+
 	<ItemGroup>
-		<EmbeddedResource Include="Properties\Resources.resx">
+		<EmbeddedResource Update="Properties\Resources.resx">
 			<Generator>ResXFileCodeGenerator</Generator>
 			<SubType>Designer</SubType>
 			<LastGenOutput>Resources.Designer.cs</LastGenOutput>
 		</EmbeddedResource>
-	</ItemGroup>
-	<ItemGroup>
-		<None Include="..\Moq.snk">
-			<Link>Moq.snk</Link>
+		<Compile Update="Properties\Resources.Designer.cs">
+			<AutoGen>True</AutoGen>
+			<DesignTime>True</DesignTime>
+			<DependentUpon>Resources.resx</DependentUpon>
+		</Compile>
+
+		<None Update="Includes\GenericTypeParameters.tt">
+			<Generator>TextTemplatingFileGenerator</Generator>
 		</None>
-		<None Include="IDefaultValueProvider.xdoc">
+
+		<None Update="Language\ICallback.tt">
+			<Generator>TextTemplatingFileGenerator</Generator>
+		</None>
+		<Compile Update="Language\ICallback.Generated.cs">
+			<AutoGen>True</AutoGen>
+			<DesignTime>True</DesignTime>
+			<DependentUpon>ICallback.tt</DependentUpon>
+		</Compile>
+
+		<None Update="Language\IRaise.tt">
+			<Generator>TextTemplatingFileGenerator</Generator>
+		</None>
+		<Compile Update="Language\IRaise.Generated.cs">
+			<AutoGen>True</AutoGen>
+			<DesignTime>True</DesignTime>
+			<DependentUpon>IRaise.tt</DependentUpon>
+		</Compile>
+
+		<None Update="Language\IReturns.tt">
+			<Generator>TextTemplatingFileGenerator</Generator>
+		</None>
+		<Compile Update="Language\IReturns.Generated.cs">
+			<AutoGen>True</AutoGen>
+			<DesignTime>True</DesignTime>
+			<DependentUpon>IReturns.tt</DependentUpon>
+		</Compile>
+
+		<None Update="IDefaultValueProvider.xdoc">
 			<DependentUpon>IDefaultValueProvider.cs</DependentUpon>
 		</None>
-		<None Include="It.xdoc">
+
+		<None Update="It.xdoc">
 			<DependentUpon>It.cs</DependentUpon>
 		</None>
-		<None Include="Language\ICallback.tt">
+
+		<None Update="MethodCall.tt">
 			<Generator>TextTemplatingFileGenerator</Generator>
-			<LastGenOutput>ICallback.Generated.cs</LastGenOutput>
 		</None>
-		<None Include="Language\IRaise.tt">
+		<Compile Update="MethodCall.Generated.cs">
+			<AutoGen>True</AutoGen>
+			<DesignTime>True</DesignTime>
+			<DependentUpon>MethodCall.tt</DependentUpon>
+		</Compile>
+
+		<None Update="MethodCallReturn.tt">
 			<Generator>TextTemplatingFileGenerator</Generator>
-			<LastGenOutput>IRaise.Generated.cs</LastGenOutput>
 		</None>
-		<None Include="Language\IReturns.tt">
-			<Generator>TextTemplatingFileGenerator</Generator>
-			<LastGenOutput>IReturns.Generated.cs</LastGenOutput>
-		</None>
-		<None Include="Match.xdoc">
+		<Compile Update="MethodCallReturn.Generated.cs">
+			<AutoGen>True</AutoGen>
+			<DesignTime>True</DesignTime>
+			<DependentUpon>MethodCallReturn.tt</DependentUpon>
+		</Compile>
+
+		<None Update="Match.xdoc">
 			<DependentUpon>Match.cs</DependentUpon>
 		</None>
-		<None Include="MethodCallReturn.tt">
-			<Generator>TextTemplatingFileGenerator</Generator>
-			<LastGenOutput>MethodCallReturn.Generated.cs</LastGenOutput>
-		</None>
-		<None Include="Mock.Generic.xdoc">
+
+		<None Update="Mock.Generic.xdoc">
 			<DependentUpon>Mock.Generic.cs</DependentUpon>
 			<SubType>Designer</SubType>
 		</None>
-		<None Include="Mock.xdoc">
+
+		<None Update="Mock.xdoc">
 			<DependentUpon>Mock.cs</DependentUpon>
 		</None>
-		<Compile Include="AsInterface.cs" />
-		<Compile Include="DefaultValue.cs" />
-		<Compile Include="GlobalSuppressions.cs" />
-		<Compile Include="IDefaultValueProvider.cs" />
-		<Compile Include="Linq\MockQuery.cs" />
-		<Compile Include="Match.cs" />
-		<Compile Include="Matchers\Matcher.cs" />
-		<Compile Include="Matchers\ParamArrayMatcher.cs" />
-		<Compile Include="Matchers\RefMatcher.cs" />
-		<Compile Include="MemberInfoExtensions.cs" />
-		<Compile Include="Mock.Generic.cs" />
-		<Compile Include="FluentMockContext.cs" />
-		<Compile Include="MockDefaultValueProvider.cs" />
-		<Compile Include="Linq\Mocks.cs" />
-		<Compile Include="PexProtector.cs" />
-		<Compile Include="Proxy\ICallContext.cs" />
-		<Compile Include="Proxy\CastleProxyFactory.cs" />
-		<Compile Include="Proxy\ICallInterceptor.cs" />
-		<Compile Include="Proxy\IProxyFactory.cs" />
-		<Compile Include="SetterMethodCall.cs" />
-		<Compile Include="SetupSequentialContext.cs" />
-		<Compile Include="Times.cs" />
-		<None Include="Includes\GenericTypeParameters.tt" />
-		<None Include="MethodCall.tt">
+
+		<None Update="ReturnsExtensions.tt">
 			<Generator>TextTemplatingFileGenerator</Generator>
-			<LastGenOutput>MethodCall.Generated.cs</LastGenOutput>
 		</None>
-		<None Include="project.json" />
-		<None Include="Times.xdoc">
+		<Compile Update="ReturnsExtensions.Generated.cs">
+			<AutoGen>True</AutoGen>
+			<DesignTime>True</DesignTime>
+			<DependentUpon>ReturnsExtensions.tt</DependentUpon>
+		</Compile>
+
+		<None Update="Times.xdoc">
 			<DependentUpon>Times.cs</DependentUpon>
 		</None>
 	</ItemGroup>
-	<ItemGroup>
-		<None Include="ReturnsExtensions.tt">
-			<Generator>TextTemplatingFileGenerator</Generator>
-			<LastGenOutput>ReturnsExtensions.Generated.cs</LastGenOutput>
-		</None>
-	</ItemGroup>
-	<ItemGroup>
-		<Service Include="{508349B6-6B84-4DF5-91F0-309BEEBAD82D}" />
-	</ItemGroup>
-	<Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
-	<Target Name="CleanAnalysisLogs" AfterTargets="Build">
-		<Delete Files="$(OutDir)Moq.dll.CodeAnalysisLog.xml" ContinueOnError="true" />
-		<Delete Files="$(OutDir)Moq.dll.lastcodeanalysissucceeded" ContinueOnError="true" />
-	</Target>
+
 </Project>

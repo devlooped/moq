@@ -102,7 +102,28 @@ namespace Moq
 
 		public InterceptionAction HandleIntercept(ICallContext invocation, InterceptorContext ctx, CurrentInterceptContext localctx)
 		{
-			localctx.Call = FluentMockContext.IsActive ? (IProxyCall)null : ctx.OrderedCalls.LastOrDefault(c => c.Matches(invocation));
+			if (FluentMockContext.IsActive)
+			{
+				localctx.Call = null;
+			}
+			else
+			{
+				IProxyCall lastMatchingSetup = null;
+				IProxyCall lastMatchingSetupForSameMethod = null;
+				foreach (var setup in ctx.OrderedCalls)
+				{
+					if (setup.Matches(invocation))
+					{
+						lastMatchingSetup = setup;
+						if (setup.Method == invocation.Method)
+						{
+							lastMatchingSetupForSameMethod = setup;
+						}
+					}
+				}
+				localctx.Call = lastMatchingSetupForSameMethod ?? lastMatchingSetup;
+			}
+
 			if (localctx.Call != null)
 			{
 				localctx.Call.EvaluatedSuccessfully();
@@ -271,7 +292,8 @@ namespace Moq
 						// TODO: We could compare `invocation.Method` and `eventInfo.GetAddMethod()` here.
 						// If they are equal, then `invocation.Method` is definitely an event `add` accessor.
 						// Not sure whether this would work with F# and COM; see commit 44070a9.
-						if (ctx.Mock.CallBase && !eventInfo.DeclaringType.GetTypeInfo().IsInterface)
+
+						if (ctx.Mock.CallBase && !invocation.Method.IsAbstract)
 						{
 							invocation.InvokeBase();
 							return InterceptionAction.Stop;
@@ -294,7 +316,8 @@ namespace Moq
 						// TODO: We could compare `invocation.Method` and `eventInfo.GetRemoveMethod()` here.
 						// If they are equal, then `invocation.Method` is definitely an event `remove` accessor.
 						// Not sure whether this would work with F# and COM; see commit 44070a9.
-						if (ctx.Mock.CallBase && !eventInfo.DeclaringType.GetTypeInfo().IsInterface)
+
+						if (ctx.Mock.CallBase && !invocation.Method.IsAbstract)
 						{
 							invocation.InvokeBase();
 							return InterceptionAction.Stop;

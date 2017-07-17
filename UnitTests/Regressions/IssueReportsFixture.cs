@@ -210,6 +210,46 @@ namespace Moq.Tests.Regressions
 
 		#endregion
 
+		#region 131
+
+		public class Issue131
+		{
+			[Fact]
+			public void Order_of_setups_should_not_matter_when_setting_up_methods_in_a_hierarchy_of_interfaces()
+			{
+				var mock = new Mock<Derived>();
+
+				mock.Setup(x => x.Method())
+					.Returns("Derived");
+				mock.As<BaseA>().Setup(x => x.Method())
+					.Returns("BaseA");
+				mock.As<BaseB>().Setup(x => x.Method())
+					.Returns("BaseB");
+
+				var derived = mock.Object;
+				Assert.Equal("Derived", derived.Method());
+				Assert.Equal("BaseA", (derived as BaseA).Method());
+				Assert.Equal("BaseB", (derived as BaseB).Method());
+			}
+
+			public interface BaseA
+			{
+				string Method();
+			}
+
+			public interface BaseB
+			{
+				string Method();
+			}
+
+			public interface Derived : BaseA, BaseB
+			{
+				new string Method();
+			}
+		}
+
+		#endregion
+
 		#region 141
 
 		public class Issue141
@@ -522,6 +562,132 @@ namespace Moq.Tests.Regressions
 
 		#endregion
 
+		#region 166
+
+		public class Issue166
+		{
+			[Fact]
+			public void Events_with_same_name_in_object_graph_can_both_be_raised()
+			{
+				var mock = new Mock<IFoo> { DefaultValue = DefaultValue.Mock };
+
+				var fooEventRaiseCount = 0;
+				mock.Object.Event += (s, e) => ++fooEventRaiseCount;
+
+				var barEventRaiseCount = 0;
+				mock.Object.Bar.Event += (s, e) => ++barEventRaiseCount;
+
+				mock.Raise(x => x.Event += null, EventArgs.Empty);
+				mock.Raise(x => x.Bar.Event += null, EventArgs.Empty);
+
+				Assert.Equal(1, fooEventRaiseCount);
+				Assert.Equal(1, barEventRaiseCount);
+			}
+
+			[Fact]
+			public void Events_with_different_names_in_object_graph_can_both_be_raised()
+			{
+				var mock = new Mock<IFoo> { DefaultValue = DefaultValue.Mock };
+
+				var fooEventRaiseCount = 0;
+				mock.Object.Event += (s, e) => ++fooEventRaiseCount;
+
+				var barAnotherEventRaiseCount = 0;
+				mock.Object.Bar.AnotherEvent += (s, e) => ++barAnotherEventRaiseCount;
+
+				mock.Raise(x => x.Event += null, EventArgs.Empty);
+				mock.Raise(x => x.Bar.AnotherEvent += null, EventArgs.Empty);
+
+				Assert.Equal(1, fooEventRaiseCount);
+				Assert.Equal(1, barAnotherEventRaiseCount);
+			}
+
+			[Fact]
+			public void Event_in_child_mock_can_be_raised_if_parent_object_has_no_events()
+			{
+				var mock = new Mock<IQux>() { DefaultValue = DefaultValue.Mock };
+
+				var quuxEventRaiseCount = 0;
+				mock.Object.Quux.Event += (s, e) => ++quuxEventRaiseCount;
+
+				mock.Raise(x => x.Quux.Event += null, EventArgs.Empty);
+
+				Assert.Equal(1, quuxEventRaiseCount);
+			}
+
+			public interface IFoo
+			{
+				IBar Bar { get; }
+				event EventHandler Event;
+			}
+
+			public interface IBar
+			{
+				event EventHandler Event;
+				event EventHandler AnotherEvent;
+			}
+
+			public interface IQux
+			{
+				IQuux Quux { get; }
+			}
+
+			public interface IQuux : IQux
+			{
+				event EventHandler Event;
+			}
+		}
+
+		#endregion
+
+		#region 169
+
+		public class Issue169
+		{
+			[Fact]
+			public void Mocks_that_implement_IEnumerable_which_is_not_set_up_can_be_used_without_NullReferenceException()
+			{
+				// This test makes sure that a mock is usable when it implements IEnumerable,
+				// but that interface isn't set up to correctly work. (Moq will attempt to use
+				// IEnumerable to generate an ExpressionKey, for example.)
+
+				var mocks = new MockRepository(MockBehavior.Loose);
+				var service = mocks.Create<IDependency>();
+
+				var input = mocks.OneOf<IInput>();
+				service.Setup(x => x.Run(input)).Returns(1);
+
+				var foo = new Foo(service.Object);
+				foo.Calculate(input);
+			}
+
+			public interface IDependency
+			{
+				decimal Run(IInput input);
+			}
+
+			public interface IInput : IEnumerable<int>
+			{
+			}
+
+			public class Foo
+			{
+				private readonly IDependency dependency;
+
+				public Foo(IDependency dependency)
+				{
+					this.dependency = dependency;
+				}
+
+				public void Calculate(IInput input)
+				{
+					this.dependency.Run(input);
+				}
+			}
+		}
+
+		#endregion
+
 		#region 175
 
 		public class Issue175
@@ -542,6 +708,7 @@ namespace Moq.Tests.Regressions
 				Assert.Equal(42, frobber.ExtendedTypeValue);  // "BUGBUG: Moq Lost the value and set back to default."
 			}
 
+			[Fact]
 			public void CSharpIsCoolWithIt()
 			{
 				ExtendingTypeBase real = new ExtendedConcreteType(42);
@@ -805,8 +972,8 @@ namespace Moq.Tests.Regressions
 
 				mock.Setup(x => x.Test()).Returns(true);
 
-				Assert.IsType(typeof(int), mock.Object.GetHashCode());
-				Assert.IsType(typeof(string), mock.Object.ToString());
+				Assert.IsType<int>(mock.Object.GetHashCode());
+				Assert.IsType<string>(mock.Object.ToString());
 				Assert.False(mock.Object.Equals("ImNotTheObject"));
 				Assert.True(mock.Object.Equals(mock.Object));
 			}
@@ -895,6 +1062,81 @@ namespace Moq.Tests.Regressions
 			public class Implementation2 : IDerived1
 			{
 				public int Value { get; set; }
+			}
+		}
+
+		#endregion
+
+		#region 292
+
+		public class Issue292
+		{
+			// This test is somewhat dangerous, since xUnit cannot catch a StackOverflowException.
+			// So if this test fails, and does produce a stack overflow, the whole test run will
+			// abort abruptly.
+			[Fact]
+			public void Conditional_setup_where_condition_involves_own_mock_does_not_cause_stack_overflow()
+			{
+				var dbResultFound = new Mock<IDataReader>();
+				dbResultFound.Setup(_ => _.Read()).Returns(true);
+				var dbResultNotFound = new Mock<IDataReader>();
+				dbResultNotFound.Setup(_ => _.Read()).Returns(false);
+
+				var command = new Mock<IDbCommand>();
+				command.SetupProperty(_ => _.CommandText);
+				command.When(() => command.Object.CommandText == "SELECT * FROM TABLE WHERE ID=1")
+					   .Setup(_ => _.ExecuteReader())
+					   .Returns(dbResultFound.Object);
+				command.When(() => command.Object.CommandText == "SELECT * FROM TABLE WHERE ID=2")
+					   .Setup(_ => _.ExecuteReader())
+					   .Returns(dbResultNotFound.Object);
+
+				command.Object.CommandText = "SELECT * FROM TABLE WHERE ID=1";
+				Assert.True(command.Object.ExecuteReader().Read());
+
+				command.Object.CommandText = "SELECT * FROM TABLE WHERE ID=2";
+				Assert.False(command.Object.ExecuteReader().Read());
+			}
+
+			// We redeclare the following two types from System.Data so we
+			// don't need the additional assembly reference (read, "dependency"):
+
+			public interface IDataReader
+			{
+				bool Read();
+			}
+
+			public interface IDbCommand
+			{
+				string CommandText { get; set; }
+				IDataReader ExecuteReader();
+			}
+		}
+
+		#endregion
+
+		#region 296
+
+		public class Issue296
+		{
+			[Fact]
+			public void Can_subscribe_to_and_raise_abstract_class_event_when_CallBase_true()
+			{
+				var mock = new Mock<Foo>() { CallBase = true };
+
+				var eventHandlerWasCalled = false;
+				mock.Object.SomethingChanged += (object sender, EventArgs e) =>
+				{
+					eventHandlerWasCalled = true;
+				};
+
+				mock.Raise(foo => foo.SomethingChanged += null, EventArgs.Empty);
+				Assert.True(eventHandlerWasCalled);
+			}
+
+			public abstract class Foo
+			{
+				public abstract event EventHandler SomethingChanged;
 			}
 		}
 
@@ -1103,6 +1345,33 @@ namespace Moq.Tests.Regressions
 
 		#endregion
 
+		#region 337
+
+		public class Issue337
+		{
+			[Fact]
+			public void Mock_Of_can_setup_null_return_value()
+			{
+				// The following mock setup might appear redundant; after all, `null` is
+				// the default value returned for most reference types. However, this test
+				// becomes relevant once Moq starts supporting custom implementations of
+				// `IDefaultValueProvider`. Then it might no longer be a given that `null`
+				// is the default return value that noone would want to explicitly set up.
+				var userProvider = Mock.Of<IUserProvider>(p => p.GetUserByEmail("alice@example.com") == null);
+				var user = userProvider.GetUserByEmail("alice@example.com");
+				Assert.Null(user);
+			}
+
+			public class User { }
+
+			public interface IUserProvider
+			{
+				User GetUserByEmail(string email);
+			}
+		}
+
+		#endregion
+
 		#region 340
 
 #if FEATURE_SERIALIZATION
@@ -1181,6 +1450,25 @@ namespace Moq.Tests.Regressions
 			public class ImplementsI : I
 			{
 				public int Foo() => 13;
+			}
+		}
+
+		#endregion
+
+		#region 421
+
+		public class Issue421
+		{
+			[Fact]
+			public void SetupShouldAcceptMockedIEnumerableInMethodCall()
+			{
+				var mock = new Mock<IFoo>();
+				var values = new Mock<IEnumerable>().Object;
+				mock.Setup(m => m.Bar(values));
+			}
+			public interface IFoo
+			{
+				void Bar(IEnumerable values);
 			}
 		}
 
@@ -1927,21 +2215,21 @@ namespace Moq.Tests.Regressions
 					Bar();
 				}
 
-				protected virtual void Bar()
+				public virtual void Bar()
 				{
 				}
 			}
 
-#pragma warning disable 618
-			[Fact(Skip = "This setup doesn't make sense, and xUnit does not provide this message checking capability.")]
 			public void ShouldRenderCustomMessage()
 			{
 				var foo = new Mock<Foo> { CallBase = true };
-				foo.Protected().Setup("Bar").AtMostOnce().Verifiable("Hello");
+				foo.Setup(_ => _.Bar()).Verifiable("Hello");
 				foo.Object.Boo();
-				//Assert.Throws<MockException>("Hello", () => foo.Object.Boo());
+				var ex = Record.Exception(() => foo.Object.Boo());
+				Assert.NotNull(ex);
+				Assert.Contains("Hello", ex.Message); // has custom verification error message
+				Assert.Contains("once, but was", ex.Message); // has Moq's default message
 			}
-#pragma warning restore 618
 		}
 
 		#endregion
@@ -1982,34 +2270,6 @@ namespace Moq.Tests.Regressions
 
 				dependency.Verify(x => x.DoThis(foo, foo1));
 				dependency.Verify(x => x.DoThis(foo1, foo), Times.Never());
-			}
-
-			[Fact(Skip = "Wrong Equals implemention in the report. Won't Fix")]
-			public void ExampleFailingTest()
-			{
-				var foo1 = new Foo();
-				var foo = new Foo();
-
-				var sut = new Perfectly_fine_yet_failing_test();
-				var dependency = new Mock<IDependency>();
-
-				dependency.Setup(x => x.DoThis(foo, foo1))
-				  .Returns(new Foo());
-
-				sut.Do(dependency.Object, foo, foo1);
-
-				dependency.Verify(x => x.DoThis(foo, foo1));
-				dependency.Verify(x => x.DoThis(foo1, foo), Times.Never());
-			}
-
-			public class Perfectly_fine_yet_failing_test
-			{
-				public void Do(IDependency dependency, Foo foo, Foo foo1)
-				{
-					var foo2 = dependency.DoThis(foo, foo1);
-					if (foo2 == null)
-						foo2 = dependency.DoThis(foo1, foo);
-				}
 			}
 
 			public interface IDependency
@@ -2187,9 +2447,9 @@ namespace Moq.Tests.Regressions
 
 				var e = Assert.Throws<MockException>(() => mock.Verify(m => m.Execute(0)));
 				Assert.Contains(
-					"\r\nConfigured setups:" +
-					"\r\nm => m.Execute(1), Times.Never" +
-					"\r\nm => m.Execute(It.IsInRange<Int32>(2, 20, Range.Exclusive)), Times.Exactly(3)",
+					Environment.NewLine + "Configured setups: " +
+					Environment.NewLine + "m => m.Execute(1)" +
+					Environment.NewLine + "m => m.Execute(It.IsInRange<Int32>(2, 20, Range.Exclusive))",
 					e.Message);
 			}
 
@@ -2204,7 +2464,8 @@ namespace Moq.Tests.Regressions
 
 				var e = Assert.Throws<MockException>(() => mock.Verify(m => m.Execute<int>(1, 1)));
 				Assert.Contains(
-					"\r\nConfigured setups:\r\nm => m.Execute<Int32>(1, 10), Times.Once",
+					Environment.NewLine + "Configured setups: " +
+					Environment.NewLine + "m => m.Execute<Int32>(1, 10)",
 					e.Message);
 			}
 
@@ -2214,7 +2475,9 @@ namespace Moq.Tests.Regressions
 				var mock = new Mock<IFoo>();
 
 				var e = Assert.Throws<MockException>(() => mock.Verify(m => m.Execute(1)));
-				Assert.Contains("\r\nNo setups configured.", e.Message);
+				Assert.Contains(
+					Environment.NewLine + "No setups configured.",
+					e.Message);
 
 			}
 
@@ -2239,7 +2502,7 @@ namespace Moq.Tests.Regressions
 				mock.Setup(m => m.OnExecute());
 
 				var e = Assert.Throws<NotSupportedException>(() => mock.Verify(m => m.Execute()));
-				Assert.True(e.Message.StartsWith("Invalid verify"));
+				Assert.StartsWith("Invalid verify", e.Message);
 			}
 
 			public class Foo
@@ -2368,14 +2631,9 @@ namespace Moq.Tests.Regressions
 			[Fact]
 			public void TestSetup()
 			{
-				this.TestSetupHelper<Foo>();
-			}
-
-			public void TestSetupHelper<T>() where T : class, IFoo<int>
-			{
 				var expected = 2;
 
-				var target = new Mock<T>();
+				var target = new Mock<Foo>();
 				target.Setup(p => p.DoInt32(0)).Returns(expected);
 				target.Setup(p => p.DoGeneric(0)).Returns(expected);
 

@@ -8,6 +8,7 @@ using System.Reflection;
 using System.Runtime.CompilerServices;
 using System.Text;
 using System.Collections.ObjectModel;
+using Moq.Properties;
 
 namespace Moq
 {
@@ -127,7 +128,7 @@ namespace Moq
 					ToStringListInit((ListInitExpression)exp);
 					return;
 				default:
-					throw new Exception(string.Format("Unhandled expression type: '{0}'", exp.NodeType));
+					throw new Exception(string.Format(Resources.UnhandledExpressionType, exp.NodeType));
 			}
 		}
 
@@ -145,7 +146,7 @@ namespace Moq
 					ToStringMemberListBinding((MemberListBinding)binding);
 					return;
 				default:
-					throw new Exception(string.Format("Unhandled binding type '{0}'", binding.BindingType));
+					throw new Exception(string.Format(Resources.UnhandledBindingType, binding.BindingType));
 			}
 		}
 
@@ -258,8 +259,11 @@ namespace Moq
 				{
 					builder.Append("\"").Append(value).Append("\"");
 				}
-				else if (value is IEnumerable enumerable)
-				{
+				else if (value is IEnumerable enumerable && enumerable.GetEnumerator() != null)
+				{                                        // ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+					// This second check ensures that we have a usable implementation of IEnumerable.
+					// If value is a mocked object, its IEnumerable implementation might very well
+					// not work correctly.
 					builder.Append("[");
 					bool addComma = false;
 					const int maxCount = 10;

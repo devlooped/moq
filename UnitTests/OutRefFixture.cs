@@ -70,7 +70,7 @@ namespace Moq.Tests
 
 			mock.Setup(m => m.GuidMethod(ref expected)).Returns(true);
 
-			Assert.Equal(true, mock.Object.GuidMethod(ref expected));
+			Assert.True(mock.Object.GuidMethod(ref expected));
 		}
 
 		[Fact]
@@ -81,7 +81,7 @@ namespace Moq.Tests
 
 			mock.Setup(m => m.IntMethod(ref expected)).Returns(true);
 
-			Assert.Equal(true, mock.Object.IntMethod(ref expected));
+			Assert.True(mock.Object.IntMethod(ref expected));
 		}
 
 		// ThrowsIfOutIsNotConstant

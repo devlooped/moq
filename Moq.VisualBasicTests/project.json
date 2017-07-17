@@ -1,8 +1,8 @@
 ﻿{
 	"dependencies": {
-		"Castle.Core": "4.1.0",
-		"xunit": "2.1.0",
-		"xunit.runner.visualstudio": "2.1.0"
+		"Castle.Core": "4.1.1",
+		"xunit": "2.3.0-beta3-build3705",
+		"xunit.runner.visualstudio": "2.3.0-beta3-build3705"
 	},
 	"frameworks": {
 		"net45": {}

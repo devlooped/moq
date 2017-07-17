@@ -63,5 +63,7 @@ namespace Moq
 		string FileName { get; }
 		int FileLine { get; }
 		MethodBase TestMethod { get; }
+
+		string Format();
 	}
 }

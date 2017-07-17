@@ -42,9 +42,9 @@ namespace Moq.Tests
 
 			// Verify defaults
 			Assert.Equal(default(int), mock.Object.ValueProperty);
-			Assert.Equal(null, mock.Object.Object);
-			Assert.Equal(null, mock.Object.Bar);
-			Assert.Equal(null, mock.Object.GetOnly);
+			Assert.Null(mock.Object.Object);
+			Assert.Null(mock.Object.Bar);
+			Assert.Null(mock.Object.GetOnly);
 
 			mock.Object.ValueProperty = 5;
 			Assert.Equal(5, mock.Object.ValueProperty);

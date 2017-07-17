@@ -189,7 +189,7 @@ namespace Moq.Tests
 			var mock = new Mock<IFoo>();
 			mock.SetReturnsDefault(true);
 
-			Assert.Equal(true, mock.Object.ReturnBool());
+			Assert.True(mock.Object.ReturnBool());
 		}
 
 		[Fact]

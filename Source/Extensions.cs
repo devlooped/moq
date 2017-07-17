@@ -45,6 +45,7 @@ using System.Diagnostics.CodeAnalysis;
 using System.Globalization;
 using System.Linq;
 using System.Reflection;
+using System.Runtime.CompilerServices;
 using Moq.Proxy;
 using System.Linq.Expressions;
 using Moq.Properties;
@@ -89,8 +90,11 @@ namespace Moq
 			{
 				return "\"" + typedValue + "\"";
 			}
-			if (value is IEnumerable enumerable)
-			{
+			if (value is IEnumerable enumerable && enumerable.GetEnumerator() != null)
+			{                                   // ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+				// This second check ensures that we have a usable implementation of IEnumerable.
+				// If value is a mocked object, its IEnumerable implementation might very well
+				// not work correctly.
 				const int maxCount = 10;
 				var objs = enumerable.Cast<object>().Take(maxCount + 1);
 				var more = objs.Count() > maxCount ? ", ..." : string.Empty;
@@ -193,22 +197,25 @@ namespace Moq
 			return false;
 		}
 
-		public static EventInfo GetEvent<TMock>(this Action<TMock> eventExpression, TMock mock)
+		public static MemberInfoWithTarget<EventInfo, Mock> GetEvent<TMock>(this Action<TMock> eventExpression, TMock mock)
 			where TMock : class
 		{
 			Guard.NotNull(() => eventExpression, eventExpression);
 
-			MethodBase addRemove = null;
+			MethodBase addRemove;
+			Mock target;
+
 			using (var context = new FluentMockContext())
 			{
 				eventExpression(mock);
 
 				if (context.LastInvocation == null)
 				{
-					throw new ArgumentException("Expression is not an event attach or detach, or the event is declared in a class but not marked virtual.");
+					throw new ArgumentException(Resources.ExpressionIsNotEventAttachOrDetachOrIsNotVirtual);
 				}
 
 				addRemove = context.LastInvocation.Invocation.Method;
+				target = context.LastInvocation.Mock;
 			}
 
 			var ev = addRemove.DeclaringType.GetEvent(
@@ -222,7 +229,7 @@ namespace Moq
 					addRemove));
 			}
 
-			return ev;
+			return new MemberInfoWithTarget<EventInfo, Mock>(ev, target);
 		}
 
 #if !NETCORE
@@ -326,6 +333,14 @@ namespace Moq
 			{
 				return null;
 			}
+		}
+
+		public static bool IsExtensionMethod(this MethodInfo method)
+		{
+			return method.IsStatic && method.IsDefined(typeof(ExtensionAttribute));
+			// The above check is perhaps "good enough for now", but admittedly incomplete:
+			// We should also check whether the method is defined in a non-nested static
+			// class, and whether it has at least one parameter.
 		}
 
 		/// <summary>

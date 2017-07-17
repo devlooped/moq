@@ -69,7 +69,7 @@ namespace Moq.Tests
 			{
 				Assert.Equal(MockException.ExceptionReason.VerificationFailed, mex.Reason);
 				Expression<Action<IFoo>> doExpr = foo => foo.Do();
-				Assert.False(mex.Message.Contains(doExpr.ToString()));
+				Assert.DoesNotContain(doExpr.ToString(), mex.Message);
 			}
 		}
 
@@ -90,10 +90,10 @@ namespace Moq.Tests
 			catch (MockException mex)
 			{
 				Expression<Action<IFoo>> fooExpect = f => f.Do();
-				Assert.True(mex.Message.Contains(fooExpect.ToString()));
+				Assert.Contains(fooExpect.ToString(), mex.Message);
 
 				Expression<Action<IBar>> barExpect = b => b.Redo();
-				Assert.True(mex.Message.Contains(barExpect.ToString()));
+				Assert.Contains(barExpect.ToString(), mex.Message);
 			}
 		}
 

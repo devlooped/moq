@@ -1,5 +1,6 @@
 ﻿using System;
 using System.ComponentModel;
+using System.Diagnostics.CodeAnalysis;
 using System.Threading;
 using Xunit;
 
@@ -181,6 +182,7 @@ namespace Moq.Tests
 		}
 
 		[Fact]
+		[SuppressMessage("Assertions", "xUnit2004")]
 		public void ShouldRaiseEventWithFuncThreeArgs()
 		{
 			var mock = new Mock<IAdder<string>>();
@@ -205,6 +207,7 @@ namespace Moq.Tests
 		}
 
 		[Fact]
+		[SuppressMessage("Assertions", "xUnit2004")]
 		public void ShouldRaiseEventWithFuncFourArgs()
 		{
 			var mock = new Mock<IAdder<string>>();
@@ -341,7 +344,7 @@ namespace Moq.Tests
 		}
 
 		[Fact]
-		public void DoesNotRaiseEventOnSubObject()
+		public void CanRaiseEventOnSubObject()
 		{
 			var mock = new Mock<IParent> { DefaultValue = DefaultValue.Mock };
 
@@ -352,7 +355,7 @@ namespace Moq.Tests
 
 			mock.Raise(p => p.Adder.Added += null, EventArgs.Empty);
 
-			Assert.False(raised);
+			Assert.True(raised);
 		}
 
 		[Fact]

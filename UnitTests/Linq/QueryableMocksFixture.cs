@@ -21,9 +21,9 @@ namespace Moq.Tests
 						  select new { Foo = foo, Bar = bar })
 						  .First();
 
-			Assert.Equal(target.Foo.Name, "Foo");
-			Assert.Equal(target.Foo.Find("1").Baz("hello").Value, 1);
-			Assert.Equal(target.Bar.Id, "A");
+			Assert.Equal("Foo", target.Foo.Name);
+			Assert.Equal(1, target.Foo.Find("1").Baz("hello").Value);
+			Assert.Equal("A", target.Bar.Id);
 		}
 
 		[Fact]
@@ -40,12 +40,12 @@ namespace Moq.Tests
 						  select f)
 						  .First();
 
-			Assert.Equal(target.Name, "Foo");
-			Assert.Equal(target.Find("1").Baz("asdf").Value, 99);
-			Assert.Equal(target.Bar.Id, "25");
-			Assert.Equal(target.Bar.Ping("blah"), "ack");
-			Assert.Equal(target.Bar.Ping("error"), "error");
-			Assert.Equal(target.Bar.Baz("foo").Value, 5);
+			Assert.Equal("Foo", target.Name);
+			Assert.Equal(99, target.Find("1").Baz("asdf").Value);
+			Assert.Equal("25", target.Bar.Id);
+			Assert.Equal("ack", target.Bar.Ping("blah"));
+			Assert.Equal("error", target.Bar.Ping("error"));
+			Assert.Equal(5, target.Bar.Baz("foo").Value);
 		}
 
 		[Fact]
@@ -178,11 +178,6 @@ namespace Moq.Tests
 
 			Assert.NotNull(Mock.Get(target));
 			Assert.Equal("foo", target.Value);
-		}
-
-		public void Do()
-		{
-			Console.WriteLine("Done");
 		}
 
 		public class Dto

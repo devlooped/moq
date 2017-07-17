@@ -307,7 +307,7 @@ namespace Moq.Protected
 		{
 			if (args == null)
 			{
-				throw new ArgumentException("Use ItExpr.IsNull<TValue> rather than a null argument value, as it prevents proper method lookup.");
+				throw new ArgumentException(Resources.UseItExprIsNullRatherThanNullArgumentValue);
 			}
 
 			var types = new Type[args.Length];
@@ -315,7 +315,7 @@ namespace Moq.Protected
 			{
 				if (args[index] == null)
 				{
-					throw new ArgumentException("Use ItExpr.IsNull<TValue> rather than a null argument value, as it prevents proper method lookup.");
+					throw new ArgumentException(Resources.UseItExprIsNullRatherThanNullArgumentValue);
 				}
 
 				var expr = args[index] as Expression;
