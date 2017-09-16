@@ -5,6 +5,13 @@ All notable changes to this project will be documented in this file.
 The format is loosely based on [Keep a Changelog](http://keepachangelog.com/en/1.0.0/).
 
 
+## Unreleased
+
+#### Fixed
+
+* Make `SetupAllProperties` work correctly for same-typed sibling properties (@stakx, #442)
+
+
 ## 4.7.99 (2017-07-17)
 
 #### Added
