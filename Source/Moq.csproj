@@ -30,8 +30,8 @@
 		<PackageReference Include="Castle.Core" Version="4.1.1" />
 		<PackageReference Include="GitInfo" Version="1.1.14" />
 		<PackageReference Include="IFluentInterface" Version="2.0.0" />
-		<PackageReference Include="SourceLink.Create.CommandLine" Version="2.1.2" PrivateAssets="All" />
-		<DotNetCliToolReference Include="dotnet-sourcelink" Version="2.1.2" />
+		<PackageReference Include="SourceLink.Create.CommandLine" Version="2.2.1" PrivateAssets="All" />
+		<DotNetCliToolReference Include="dotnet-sourcelink" Version="2.2.1" />
 	</ItemGroup>
 	<ItemGroup Condition=" '$(TargetFramework)' == 'net45' ">
 		<Reference Include="System" />
