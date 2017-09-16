@@ -5,7 +5,7 @@
 		<AssemblyName>Moq</AssemblyName>
 		<AssemblyOriginatorKeyFile>../Moq.snk</AssemblyOriginatorKeyFile>
 		<DebugSymbols>True</DebugSymbols>
-		<DebugType>portable</DebugType>
+		<DebugType>full</DebugType>
 		<DocumentationFile>bin\$(Configuration)\$(TargetFramework)\$(AssemblyName).xml</DocumentationFile> 
 		<GenerateAssemblyInfo>false</GenerateAssemblyInfo>
 		<GenerateDocumentation>true</GenerateDocumentation>
