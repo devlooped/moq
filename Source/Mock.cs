@@ -729,6 +729,8 @@ namespace Moq
 					returnsMethod.Invoke(returnsGetter, new[] {initialValue});
 				}
 			}
+
+			mockedTypesStack.Pop();
 		}
 
 		private static object GetInitialValue(IDefaultValueProvider valueProvider, Stack<Type> mockedTypesStack, PropertyInfo property)
