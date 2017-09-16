@@ -1501,6 +1501,38 @@ namespace Moq.Tests.Regressions
 			{
 				string Name { get; set; }
 			}
+
+			[Fact]
+			public void SetupAllPropertiesCanDealWithSelfReferencingTypes()
+			{
+				var mock = new Mock<INode>() { DefaultValue = DefaultValue.Mock };
+				mock.SetupAllProperties();
+				Assert.Null(mock.Object.Parent);
+			}
+
+			public interface INode
+			{
+				INode Parent { get; }
+			}
+
+			[Fact]
+			public void SetupAllPropertiesCanDealWithMutuallyReferencingTypes()
+			{
+				var mock = new Mock<IPing>() { DefaultValue = DefaultValue.Mock };
+				mock.SetupAllProperties();
+				Assert.NotNull(mock.Object.Pong);
+				Assert.Null(mock.Object.Pong.Ping);
+			}
+
+			public interface IPing
+			{
+				IPong Pong { get; }
+			}
+
+			public interface IPong
+			{
+				IPing Ping { get; }
+			}
 		}
 
 		#endregion
