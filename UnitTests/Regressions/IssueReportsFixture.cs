@@ -1474,6 +1474,37 @@ namespace Moq.Tests.Regressions
 
 		#endregion
 
+		#region 438
+
+		public class Issue438
+		{
+			[Fact]
+			public void SetupAllPropertiesCanSetupSeveralSiblingPropertiesOfTheSameType()
+			{
+				var resultMock = new Mock<IResult> { DefaultValue = DefaultValue.Mock };
+				resultMock.SetupAllProperties();
+				var result = resultMock.Object;
+				result.Part1.Name = "Foo";
+				result.Part2.Name = "Bar";
+
+				Assert.Equal("Foo", result.Part1.Name);
+				Assert.Equal("Bar", result.Part2.Name);
+			}
+
+			public interface IResult
+			{
+				ISubResult Part1 { get; }
+				ISubResult Part2 { get; }
+			}
+
+			public interface ISubResult
+			{
+				string Name { get; set; }
+			}
+		}
+
+		#endregion
+
 		// Old @ Google Code
 
 		#region #47
