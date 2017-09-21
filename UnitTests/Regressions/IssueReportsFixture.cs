@@ -1537,6 +1537,46 @@ namespace Moq.Tests.Regressions
 
 		#endregion
 
+		#region 448
+
+		public class Issue448
+		{
+			// A strict mock requires `SetupGet` to provide a return value.
+			// If none is provided, a strict mock is expected to throw during the Act stage.
+			[Fact]
+			public void SetupGet_StrictMockThrowsIfSetupDoesNotProvideAReturnValue()
+			{
+				var mock = new Mock<Foo>(MockBehavior.Strict);
+				mock.SetupGet(f => f.BooleanProperty);
+				Assert.Throws<MockException>(() => mock.Object.BooleanProperty);
+			}
+
+			// Case 1: Providing a return value directly, via `.Returns(...)`:
+			[Fact]
+			public void SetupGet_StrictMockIdentifiesReturnsAsProvidingAReturnValue()
+			{
+				var mock = new Mock<Foo>(MockBehavior.Strict);
+				mock.SetupGet(f => f.BooleanProperty).Returns(true);
+				Assert.True(mock.Object.BooleanProperty);
+			}
+
+			// Case 2: Providing a return value indirectly, via `.CallBase()`:
+			[Fact]
+			public void SetupGet_StrictMockIdentifiesCallBaseAsProvidingAReturnValue()
+			{
+				var mock = new Mock<Foo>(MockBehavior.Strict);
+				mock.SetupGet(f => f.BooleanProperty).CallBase();
+				Assert.True(mock.Object.BooleanProperty);
+			}
+
+			public class Foo
+			{
+				public virtual bool BooleanProperty => true;
+			}
+		}
+
+		#endregion
+
 		// Old @ Google Code
 
 		#region #47
