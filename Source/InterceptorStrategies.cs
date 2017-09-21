@@ -85,8 +85,7 @@ namespace Moq
 				invocation.Method.ReturnType != null &&
 				invocation.Method.ReturnType != typeof(void))
 			{
-				var methodCall = call as MethodCallReturn;
-				if (methodCall == null || !methodCall.HasReturnValue)
+				if (!(call is IMethodCallReturn methodCallReturn && methodCallReturn.ProvidesReturnValue()))
 				{
 					throw new MockException(
 						MockException.ExceptionReason.ReturnValueRequired,

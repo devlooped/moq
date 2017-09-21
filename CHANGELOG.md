@@ -11,6 +11,7 @@ The format is loosely based on [Keep a Changelog](http://keepachangelog.com/en/1
 
 * Make `SetupAllProperties` work correctly for same-typed sibling properties (@stakx, #442)
 * Switch back from portable PDBs to classic PDBs for better compatibility of SourceLink with older .NET tools (@stakx, #443)
+* Make strict mocks recognize that `.CallBase()` can set up a return value, too (@stakx, #450)
 
 
 ## 4.7.99 (2017-07-17)
