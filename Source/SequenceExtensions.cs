@@ -24,6 +24,17 @@ namespace Moq
 		}
 
 		/// <summary>
+		/// Performs a sequence of actions, one per call.
+		/// </summary>
+		public static ISetupSequentialVoidResult SetupSequence<TMock>(
+			this Mock<TMock> mock,
+			Expression<Action<TMock>> expression)
+			where TMock : class
+		{
+			return new SetupSequentialVoidContext<TMock>(mock, expression);
+		}
+
+		/// <summary>
 		/// Return a sequence of tasks, once per call.
 		/// </summary>
 		public static ISetupSequentialResult<Task<TResult>> ReturnsAsync<TResult>(this ISetupSequentialResult<Task<TResult>> setup, TResult value)
