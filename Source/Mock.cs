@@ -55,6 +55,8 @@ namespace Moq
 	/// <include file='Mock.xdoc' path='docs/doc[@for="Mock"]/*'/>
 	public abstract partial class Mock : IFluentInterface
 	{
+		internal static IProxyFactory ProxyFactory => CastleProxyFactory.Instance;
+
 		private bool isInitialized;
 		private DefaultValue defaultValue = DefaultValue.Empty;
 		private IDefaultValueProvider defaultValueProvider = new EmptyDefaultValueProvider();

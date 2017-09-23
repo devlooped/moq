@@ -58,6 +58,8 @@ namespace Moq.Proxy
 {
 	internal class CastleProxyFactory : IProxyFactory
 	{
+		public static CastleProxyFactory Instance { get; } = new CastleProxyFactory();
+
 		private static readonly ProxyGenerator generator = CreateProxyGenerator();
 
 		[SuppressMessage("Microsoft.Performance", "CA1810:InitializeReferenceTypeStaticFieldsInline", Justification = "By Design")]
