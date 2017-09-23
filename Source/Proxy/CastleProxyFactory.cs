@@ -106,6 +106,11 @@ namespace Moq.Proxy
 			}
 		}
 
+		public bool IsMethodVisible(MethodInfo method, out string messageIfNotVisible)
+		{
+			return ProxyUtil.IsAccessible(method, out messageIfNotVisible);
+		}
+
 		private static readonly Dictionary<Type, Type> delegateInterfaceCache = new Dictionary<Type, Type>();
 		private static readonly ProxyGenerationOptions proxyOptions;
 		private static int delegateInterfaceSuffix;
