@@ -1084,5 +1084,46 @@ namespace Moq.Tests
 		public interface INewBar : IBar
 		{
 		}
+
+		// Note that this test requires that there be no [assembly: InternalsVisibleTo("DynamicProxyGenAssembly2")]
+		// or similar defined in this test assembly. If some other test requires that internals be made
+		// visible to DynamicProxy, then this test must be disabled.
+		[Fact]
+		public void SetupOnInaccessibleMethodThrowsException()
+		{
+			var mock = new Mock<Accessibility.ClassWithAccessibleAndInaccessibleMethod>();
+
+			var error = Record.Exception(() =>
+			{
+				mock.Setup(m => m.Internal());
+			});
+
+			Assert.NotNull(error);
+			Assert.IsType<ArgumentException>(error);
+			Assert.Contains("accessible", error.Message);
+			Assert.Contains("proxy generator", error.Message);
+		}
+
+		[Fact]
+		public void SetupOnAccessibleMethodDoesNotThrowException()
+		{
+			var mock = new Mock<Accessibility.ClassWithAccessibleAndInaccessibleMethod>();
+
+			var error = Record.Exception(() =>
+			{
+				mock.Setup(m => m.Public());
+			});
+
+			Assert.Null(error);
+		}
+
+		public class Accessibility
+		{
+			public class ClassWithAccessibleAndInaccessibleMethod
+			{
+				public virtual void Public() => throw new InvalidOperationException("Public");
+				internal virtual void Internal() => throw new InvalidOperationException("Internal");
+			}
+		}
 	}
 }
