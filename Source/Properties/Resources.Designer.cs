@@ -19,7 +19,7 @@ namespace Moq.Properties {
 	// class via a tool like ResGen or Visual Studio.
 	// To add or remove a member, edit your .ResX file then rerun ResGen
 	// with the /str option, or rebuild your VS project.
-	[global::System.CodeDom.Compiler.GeneratedCodeAttribute("System.Resources.Tools.StronglyTypedResourceBuilder", "4.0.0.0")]
+	[global::System.CodeDom.Compiler.GeneratedCodeAttribute("System.Resources.Tools.StronglyTypedResourceBuilder", "15.0.0.0")]
 	[global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
 	[global::System.Runtime.CompilerServices.CompilerGeneratedAttribute()]
 	internal class Resources {
@@ -243,7 +243,17 @@ namespace Moq.Properties {
 				return ResourceManager.GetString("MethodIsPublic", resourceCulture);
 			}
 		}
-		
+
+		/// <summary>
+		///   Looks up a localized string similar to Cannot set up {0}.{1} because it is not accessible to the proxy generator used by Moq:
+		///{2}.
+		/// </summary>
+		internal static string MethodNotVisibleToProxyFactory {
+			get {
+				return ResourceManager.GetString("MethodNotVisibleToProxyFactory", resourceCulture);
+			}
+		}
+
 		/// <summary>
 		///   Looks up a localized string similar to Mininum delay has to be lower than maximum delay..
 		/// </summary>

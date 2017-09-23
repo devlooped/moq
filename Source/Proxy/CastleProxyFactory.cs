@@ -58,6 +58,8 @@ namespace Moq.Proxy
 {
 	internal class CastleProxyFactory : IProxyFactory
 	{
+		public static CastleProxyFactory Instance { get; } = new CastleProxyFactory();
+
 		private static readonly ProxyGenerator generator = CreateProxyGenerator();
 
 		[SuppressMessage("Microsoft.Performance", "CA1810:InitializeReferenceTypeStaticFieldsInline", Justification = "By Design")]
@@ -102,6 +104,11 @@ namespace Moq.Proxy
 			{
 				throw new ArgumentException(Resources.ConstructorNotFound, e);
 			}
+		}
+
+		public bool IsMethodVisible(MethodInfo method, out string messageIfNotVisible)
+		{
+			return ProxyUtil.IsAccessible(method, out messageIfNotVisible);
 		}
 
 		private static readonly Dictionary<Type, Type> delegateInterfaceCache = new Dictionary<Type, Type>();
