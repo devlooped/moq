@@ -530,18 +530,5 @@ namespace Moq
 		}
 
 #endregion
-
-		// NOTE: known issue. See https://connect.microsoft.com/VisualStudio/feedback/ViewFeedback.aspx?FeedbackID=318122
-		//public static implicit operator TInterface(Mock<T> mock)
-		//{
-		//    // TODO: doesn't work as expected but ONLY with interfaces :S
-		//    return mock.Object;
-		//}
-
-		//public static explicit operator TInterface(Mock<T> mock)
-		//{
-		//    // TODO: doesn't work as expected but ONLY with interfaces :S
-		//    throw new NotImplementedException();
-		//}
 	}
 }

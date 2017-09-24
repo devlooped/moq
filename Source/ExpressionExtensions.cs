@@ -222,7 +222,6 @@ namespace Moq
 
 		internal static string ToStringFixed(this Expression expression, bool useFullTypeName)
 		{
-			//return ExpressionStringBuilder.GetString(expression);
 			if (useFullTypeName)
 				return ExpressionStringBuilder.GetString(expression, type => type.FullName);
 			else
