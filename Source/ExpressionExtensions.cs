@@ -202,15 +202,6 @@ namespace Moq
 			return true;
 		}
 
-		/// <summary>
-		/// Creates an expression that casts the given expression to the <typeparamref name="T"/> 
-		/// type.
-		/// </summary>
-		public static Expression CastTo<T>(this Expression expression)
-		{
-			return Expression.Convert(expression, typeof(T));
-		}
-
 		/// <devdoc>
 		/// TODO: remove this code when https://connect.microsoft.com/VisualStudio/feedback/ViewFeedback.aspx?FeedbackID=331583 
 		/// is fixed.

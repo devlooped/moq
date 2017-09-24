@@ -11,6 +11,10 @@ The format is loosely based on [Keep a Changelog](http://keepachangelog.com/en/1
 
 * Make setups for inaccessible internal members fail fast by throwing an exception (@stakx, #455)
 
+#### Removed
+
+* The redundant type `ObsoleteMockException` has been removed (@stakx)
+
 #### Fixed
 
 * Make `SetupAllProperties` work correctly for same-typed sibling properties (@stakx, #442)
