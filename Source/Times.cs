@@ -63,7 +63,7 @@ namespace Moq
 		/// <include file='Times.xdoc' path='docs/doc[@for="Times.AtLeast"]/*'/>
 		public static Times AtLeast(int callCount)
 		{
-			Guard.NotOutOfRangeInclusive(() => callCount, callCount, 1, int.MaxValue);
+			Guard.NotOutOfRangeInclusive(callCount, 1, int.MaxValue, nameof(callCount));
 
 			return new Times(c => c >= callCount, callCount, int.MaxValue, Resources.NoMatchingCallsAtLeast);
 		}
@@ -77,7 +77,7 @@ namespace Moq
 		/// <include file='Times.xdoc' path='docs/doc[@for="Times.AtMost"]/*'/>
 		public static Times AtMost(int callCount)
 		{
-			Guard.NotOutOfRangeInclusive(() => callCount, callCount, 0, int.MaxValue);
+			Guard.NotOutOfRangeInclusive(callCount, 0, int.MaxValue, nameof(callCount));
 
 			return new Times(c => c >= 0 && c <= callCount, 0, callCount, Resources.NoMatchingCallsAtMost);
 		}
@@ -93,7 +93,7 @@ namespace Moq
 		{
 			if (rangeKind == Range.Exclusive)
 			{
-				Guard.NotOutOfRangeExclusive(() => callCountFrom, callCountFrom, 0, callCountTo);
+				Guard.NotOutOfRangeExclusive(callCountFrom, 0, callCountTo, nameof(callCountFrom));
 				if (callCountTo - callCountFrom == 1)
 				{
 					throw new ArgumentOutOfRangeException("callCountTo");
@@ -106,7 +106,7 @@ namespace Moq
 					Resources.NoMatchingCallsBetweenExclusive);
 			}
 
-			Guard.NotOutOfRangeInclusive(() => callCountFrom, callCountFrom, 0, callCountTo);
+			Guard.NotOutOfRangeInclusive(callCountFrom, 0, callCountTo, nameof(callCountFrom));
 			return new Times(
 				c => c >= callCountFrom && c <= callCountTo,
 				callCountFrom,
@@ -117,7 +117,7 @@ namespace Moq
 		/// <include file='Times.xdoc' path='docs/doc[@for="Times.Exactly"]/*'/>
 		public static Times Exactly(int callCount)
 		{
-			Guard.NotOutOfRangeInclusive(() => callCount, callCount, 0, int.MaxValue);
+			Guard.NotOutOfRangeInclusive(callCount, 0, int.MaxValue, nameof(callCount));
 
 			return new Times(c => c == callCount, callCount, callCount, Resources.NoMatchingCallsExactly);
 		}

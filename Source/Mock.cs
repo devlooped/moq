@@ -55,6 +55,8 @@ namespace Moq
 	/// <include file='Mock.xdoc' path='docs/doc[@for="Mock"]/*'/>
 	public abstract partial class Mock : IFluentInterface
 	{
+		internal static IProxyFactory ProxyFactory => CastleProxyFactory.Instance;
+
 		private bool isInitialized;
 		private DefaultValue defaultValue = DefaultValue.Empty;
 		private IDefaultValueProvider defaultValueProvider = new EmptyDefaultValueProvider();
@@ -279,7 +281,7 @@ namespace Moq
 			string failMessage)
 			where T : class
 		{
-			Guard.NotNull(() => times, times);
+			Guard.NotNull(times, nameof(times));
 
 			var methodCall = expression.GetCallInfo(mock);
 			var method = methodCall.Method;
@@ -297,7 +299,7 @@ namespace Moq
 			string failMessage)
 			where T : class
 		{
-			Guard.NotNull(() => times, times);
+			Guard.NotNull(times, nameof(times));
 
 			if (expression.IsProperty())
 			{
@@ -434,6 +436,7 @@ namespace Moq
 				var args = methodCall.Arguments.ToArray();
 
 				ThrowIfSetupExpressionInvolvesUnsupportedMember(expression, method);
+				ThrowIfSetupMethodNotVisibleToProxyFactory(method);
 				var call = new MethodCall<T>(mock, condition, expression, method, args);
 
 				var targetInterceptor = GetInterceptor(methodCall.Object, mock);
@@ -462,6 +465,7 @@ namespace Moq
 				var args = methodCall.Arguments.ToArray();
 
 				ThrowIfSetupExpressionInvolvesUnsupportedMember(expression, method);
+				ThrowIfSetupMethodNotVisibleToProxyFactory(method);
 				var call = new MethodCallReturn<T, TResult>(mock, condition, expression, method, args);
 
 				var targetInterceptor = GetInterceptor(methodCall.Object, mock);
@@ -491,6 +495,7 @@ namespace Moq
 
 				var propGet = prop.GetGetMethod(true);
 				ThrowIfSetupExpressionInvolvesUnsupportedMember(expression, propGet);
+				ThrowIfSetupMethodNotVisibleToProxyFactory(propGet);
 
 				var call = new MethodCallReturn<T, TProperty>(mock, condition, expression, propGet, new Expression[0]);
 				// Directly casting to MemberExpression is fine as ToPropertyInfo would throw if it wasn't
@@ -549,6 +554,7 @@ namespace Moq
 
 			var propSet = prop.GetSetMethod(true);
 			ThrowIfSetupExpressionInvolvesUnsupportedMember(expression, propSet);
+			ThrowIfSetupMethodNotVisibleToProxyFactory(propSet);
 
 			var call = new SetterMethodCall<T, TProperty>(mock, expression, propSet);
 			var targetInterceptor = GetInterceptor(((MemberExpression)expression.Body).Expression, mock);
@@ -729,6 +735,8 @@ namespace Moq
 					returnsMethod.Invoke(returnsGetter, new[] {initialValue});
 				}
 			}
+
+			mockedTypesStack.Pop();
 		}
 
 		private static object GetInitialValue(IDefaultValueProvider valueProvider, Stack<Type> mockedTypesStack, PropertyInfo property)
@@ -795,6 +803,19 @@ namespace Moq
 					Resources.PropertyNotReadable,
 					prop.DeclaringType.Name,
 					prop.Name));
+			}
+		}
+
+		private static void ThrowIfSetupMethodNotVisibleToProxyFactory(MethodInfo method)
+		{
+			if (Mock.ProxyFactory.IsMethodVisible(method, out string messageIfNotVisible) == false)
+			{
+				throw new ArgumentException(string.Format(
+					CultureInfo.CurrentCulture,
+					Resources.MethodNotVisibleToProxyFactory,
+					method.DeclaringType.Name,
+					method.Name,
+					messageIfNotVisible));
 			}
 		}
 

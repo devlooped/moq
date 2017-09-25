@@ -200,7 +200,7 @@ namespace Moq
 		public static MemberInfoWithTarget<EventInfo, Mock> GetEvent<TMock>(this Action<TMock> eventExpression, TMock mock)
 			where TMock : class
 		{
-			Guard.NotNull(() => eventExpression, eventExpression);
+			Guard.NotNull(eventExpression, nameof(eventExpression));
 
 			MethodBase addRemove;
 			Mock target;

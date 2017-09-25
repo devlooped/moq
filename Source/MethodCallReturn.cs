@@ -47,33 +47,34 @@ using System.Reflection;
 
 namespace Moq
 {
-	/// <devdoc>
-	/// We need this non-generics base class so that 
-	/// we can use <see cref="HasReturnValue"/> from 
-	/// generic code.
-	/// </devdoc>
-	internal class MethodCallReturn : MethodCall
+	internal interface IMethodCallReturn
 	{
-		public MethodCallReturn(Mock mock, Condition condition, Expression originalExpression, MethodInfo method, params Expression[] arguments)
-			: base(mock, condition, originalExpression, method, arguments)
-		{
-		}
-
-		public bool HasReturnValue { get; protected set; }
+		bool ProvidesReturnValue();
 	}
 
-	internal sealed partial class MethodCallReturn<TMock, TResult> : MethodCallReturn, ISetup<TMock, TResult>, ISetupGetter<TMock, TResult>, IReturnsResult<TMock>
+	internal sealed partial class MethodCallReturn<TMock, TResult> : MethodCall, IMethodCallReturn, ISetup<TMock, TResult>, ISetupGetter<TMock, TResult>, IReturnsResult<TMock>
 		where TMock : class
 	{
+		// This enum exists for reasons of optimizing memory usage.
+		// Previously this class had two `bool` fields, `hasReturnValue` and `callBase`.
+		// Using an enum allows us to combine them into a single field.
+		private enum ReturnValueKind : byte
+		{
+			None = 0,
+			Explicit,
+			CallBase,
+		}
+
 		private Delegate valueDel = (Func<TResult>)(() => default(TResult));
 		private Action<object[]> afterReturnCallback;
-		private bool callBase;
+		private ReturnValueKind returnValueKind;
 
 		public MethodCallReturn(Mock mock, Condition condition, Expression originalExpression, MethodInfo method, params Expression[] arguments)
 			: base(mock, condition, originalExpression, method, arguments)
 		{
-			this.HasReturnValue = false;
 		}
+
+		public bool ProvidesReturnValue() => this.returnValueKind != ReturnValueKind.None;
 
 		public IVerifies Raises(Action<TMock> eventExpression, EventArgs args)
 		{
@@ -104,7 +105,7 @@ namespace Moq
 
 		public IReturnsResult<TMock> CallBase()
 		{
-			callBase = true;
+			this.returnValueKind = ReturnValueKind.CallBase;
 			return this;
 		}
 
@@ -131,12 +132,12 @@ namespace Moq
 				this.valueDel = value;
 			}
 
-			this.HasReturnValue = true;
+			this.returnValueKind = ReturnValueKind.Explicit;
 		}
 
 		protected override void SetCallbackWithoutArguments(Action callback)
 		{
-			if (this.HasReturnValue)
+			if (this.ProvidesReturnValue())
 			{
 				this.afterReturnCallback = delegate { callback(); };
 			}
@@ -148,7 +149,7 @@ namespace Moq
 
 		protected override void SetCallbackWithArguments(Delegate callback)
 		{
-			if (this.HasReturnValue)
+			if (this.ProvidesReturnValue())
 			{
 				this.afterReturnCallback = delegate(object[] args) { callback.InvokePreserveStack(args); };
 			}
@@ -162,15 +163,18 @@ namespace Moq
 		{
 			base.Execute(call);
 
-			if (callBase)
+			if (this.returnValueKind == ReturnValueKind.CallBase)
+			{
 				call.InvokeBase();
-			else if (valueDel.HasCompatibleParameterList(new ParameterInfo[] { }))
-				call.ReturnValue = valueDel.InvokePreserveStack();   //we need this, for the user to be able to use parameterless methods
+			}
 			else
-				call.ReturnValue = valueDel.InvokePreserveStack(call.Arguments); //will throw if parameters mismatch
+			{
+				call.ReturnValue = this.valueDel.HasCompatibleParameterList(new ParameterInfo[0])
+					? valueDel.InvokePreserveStack()                //we need this, for the user to be able to use parameterless methods
+					: valueDel.InvokePreserveStack(call.Arguments); //will throw if parameters mismatch
+			}
 
-			if (afterReturnCallback != null)
-				afterReturnCallback(call.Arguments);
+			this.afterReturnCallback?.Invoke(call.Arguments);
 		}
 	}
 }

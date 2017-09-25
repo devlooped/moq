@@ -195,33 +195,6 @@ namespace Moq
 		private static string GetRawSetups(IProxyCall[] failedSetups)
 		{
 			return failedSetups.Aggregate(string.Empty, (s, call) => s + call.ToString() + Environment.NewLine);
-
-			//var message = new StringBuilder();
-			//foreach (var setup in failedSetups)
-			//{
-			//	if (setup.FailMessage != null)
-			//	{
-			//	message.Append(setup.FailMessage).Append(": ");
-			//	}
-
-			//	var lambda = setup.SetupExpression.PartialMatcherAwareEval().ToLambda();
-			//	var targetTypeName = lambda.Parameters[0].Type.Name;
-
-			//	message.Append(targetTypeName).Append(" ").Append(lambda.ToStringFixed());
-
-			//	if (setup.TestMethod != null)
-			//	{
-			//		message.AppendFormat(
-			//			" ({0}() in {1}: line {2})",
-			//			setup.TestMethod.Name,
-			//			setup.FileName,
-			//			setup.FileLine);
-			//	}
-
-			//	message.AppendLine();
-			//}
-
-			//return message.ToString();
 		}
 
 		internal string GetRawSetups()

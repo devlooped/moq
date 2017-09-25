@@ -5,6 +5,23 @@ All notable changes to this project will be documented in this file.
 The format is loosely based on [Keep a Changelog](http://keepachangelog.com/en/1.0.0/).
 
 
+## 4.7.127 (2017-09-26)
+
+#### Changed
+
+* Make setups for inaccessible internal members fail fast by throwing an exception (@stakx, #455)
+
+#### Removed
+
+* The redundant type `ObsoleteMockException` has been removed (@stakx)
+
+#### Fixed
+
+* Make `SetupAllProperties` work correctly for same-typed sibling properties (@stakx, #442)
+* Switch back from portable PDBs to classic PDBs for better compatibility of SourceLink with older .NET tools (@stakx, #443)
+* Make strict mocks recognize that `.CallBase()` can set up a return value, too (@stakx, #450)
+
+
 ## 4.7.99 (2017-07-17)
 
 #### Added

@@ -58,7 +58,6 @@ namespace Moq
 	/// <include file='Mock.Generic.xdoc' path='docs/doc[@for="Mock{T}"]/*'/>
     public partial class Mock<T> : Mock, IMock<T> where T : class
 	{
-		private static IProxyFactory proxyFactory = new CastleProxyFactory();
 		private static int serialNumberCounter = 0;
 		private T instance;
 		private object[] constructorArguments;
@@ -195,10 +194,10 @@ namespace Moq
 					// We're mocking a delegate.
 					// Firstly, get/create an interface with a method whose signature
 					// matches that of the delegate.
-					var delegateInterfaceType = proxyFactory.GetDelegateProxyInterface(typeof(T), out delegateInterfaceMethod);
+					var delegateInterfaceType = Mock.ProxyFactory.GetDelegateProxyInterface(typeof(T), out delegateInterfaceMethod);
 
 					// Then create a proxy for that.
-					var delegateProxy = proxyFactory.CreateProxy(
+					var delegateProxy = Mock.ProxyFactory.CreateProxy(
 						delegateInterfaceType,
 						this.Interceptor,
 						this.ImplementedInterfaces.ToArray(),
@@ -210,7 +209,7 @@ namespace Moq
 				}
 				else
 				{
-					this.instance = (T)proxyFactory.CreateProxy(
+					this.instance = (T)Mock.ProxyFactory.CreateProxy(
 						typeof(T),
 						this.Interceptor,
 						this.ImplementedInterfaces.Skip(this.InternallyImplementedInterfaceCount - 1).ToArray(),
@@ -531,18 +530,5 @@ namespace Moq
 		}
 
 #endregion
-
-		// NOTE: known issue. See https://connect.microsoft.com/VisualStudio/feedback/ViewFeedback.aspx?FeedbackID=318122
-		//public static implicit operator TInterface(Mock<T> mock)
-		//{
-		//    // TODO: doesn't work as expected but ONLY with interfaces :S
-		//    return mock.Object;
-		//}
-
-		//public static explicit operator TInterface(Mock<T> mock)
-		//{
-		//    // TODO: doesn't work as expected but ONLY with interfaces :S
-		//    throw new NotImplementedException();
-		//}
 	}
 }

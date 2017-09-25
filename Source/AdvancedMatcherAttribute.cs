@@ -48,8 +48,8 @@ namespace Moq
 	{
 		public AdvancedMatcherAttribute(Type matcherType)
 		{
-			Guard.NotNull(() => matcherType, matcherType);
-			Guard.CanBeAssigned(() => matcherType, matcherType, typeof(IMatcher));
+			Guard.NotNull(matcherType, nameof(matcherType));
+			Guard.CanBeAssigned(matcherType, typeof(IMatcher), nameof(matcherType));
 
 			this.MatcherType = matcherType;
 		}

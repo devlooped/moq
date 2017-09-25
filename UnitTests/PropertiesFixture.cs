@@ -72,24 +72,24 @@ namespace Moq.Tests
 			foo.Object[0] = "foo";
 		}
 
-		[Fact(Skip = "Not supported for now")]
-		public void ShouldSetIndexerWithIndexMatcher()
-		{
-			var foo = new Mock<IIndexedFoo>(MockBehavior.Strict);
+		//[Fact(Skip = "Not supported for now")]
+		//public void ShouldSetIndexerWithIndexMatcher()
+		//{
+		//	var foo = new Mock<IIndexedFoo>(MockBehavior.Strict);
+		//
+		//	foo.SetupSet(f => f[It.IsAny<int>()] = "foo");
+		//
+		//	foo.Object[18] = "foo";
+		//}
 
-			foo.SetupSet(f => f[It.IsAny<int>()] = "foo");
-
-			foo.Object[18] = "foo";
-		}
-
-		[Fact(Skip = "Not supported for now")]
-		public void ShouldSetIndexerWithBothMatcher()
-		{
-			var foo = new Mock<IIndexedFoo>(MockBehavior.Strict);
-
-			foo.SetupSet(f => f[It.IsAny<int>()] = It.IsAny<string>());
-
-			foo.Object[18] = "foo";
-		}
+		//[Fact(Skip = "Not supported for now")]
+		//public void ShouldSetIndexerWithBothMatcher()
+		//{
+		//	var foo = new Mock<IIndexedFoo>(MockBehavior.Strict);
+		//
+		//	foo.SetupSet(f => f[It.IsAny<int>()] = It.IsAny<string>());
+		//
+		//	foo.Object[18] = "foo";
+		//}
 	}
 }

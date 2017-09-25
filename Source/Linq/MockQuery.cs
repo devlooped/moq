@@ -61,7 +61,7 @@ namespace Moq.Linq
 		/// </summary>
 		public MockQueryable(MethodCallExpression underlyingCreateMocks)
 		{
-			Guard.NotNull(() => underlyingCreateMocks, underlyingCreateMocks);
+			Guard.NotNull(underlyingCreateMocks, nameof(underlyingCreateMocks));
 
 			this.Expression = Expression.Constant(this);
 			this.underlyingCreateMocks = underlyingCreateMocks;
@@ -69,9 +69,9 @@ namespace Moq.Linq
 
 		public MockQueryable(MethodCallExpression underlyingCreateMocks, Expression expression)
 		{
-			Guard.NotNull(() => underlyingCreateMocks, underlyingCreateMocks);
-			Guard.NotNull(() => expression, expression);
-			Guard.CanBeAssigned(() => expression, expression.Type, typeof(IQueryable<T>));
+			Guard.NotNull(underlyingCreateMocks, nameof(underlyingCreateMocks));
+			Guard.NotNull(expression, nameof(expression));
+			Guard.CanBeAssigned(expression.Type, typeof(IQueryable<T>), nameof(expression));
 
 			this.underlyingCreateMocks = underlyingCreateMocks;
 			this.Expression = expression;

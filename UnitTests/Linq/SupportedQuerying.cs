@@ -159,13 +159,13 @@ namespace Moq.Tests.Linq
 				Assert.Equal(AttributeTargets.Class, target.Targets);
 			}
 
-			[Fact(Skip = "Not implemented yet. Need to refactor old matcher stuff to the new one, require the MatcherAttribute on matchers, and verify it.")]
-			public void WhenQueryingWithItIsAny_ThenThrowsNotSupportedException()
-			{
-				var target = Mocks.Of<IFoo>().First(f => f.Targets == It.IsAny<AttributeTargets>());
-
-				Assert.Equal(AttributeTargets.Class, target.Targets);
-			}
+			//[Fact(Skip = "Not implemented yet. Need to refactor old matcher stuff to the new one, require the MatcherAttribute on matchers, and verify it.")]
+			//public void WhenQueryingWithItIsAny_ThenThrowsNotSupportedException()
+			//{
+			//	var target = Mocks.Of<IFoo>().First(f => f.Targets == It.IsAny<AttributeTargets>());
+			//
+			//	Assert.Equal(AttributeTargets.Class, target.Targets);
+			//}
 
 			public interface IFoo
 			{

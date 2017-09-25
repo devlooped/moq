@@ -352,4 +352,8 @@ Expected invocation on the mock once, but was {4} times: {1}</value>
 	<data name="UseItExprIsNullRatherThanNullArgumentValue" xml:space="preserve">
 		<value>Use ItExpr.IsNull&lt;TValue&gt; rather than a null argument value, as it prevents proper method lookup.</value>
 	</data>
+	<data name="MethodNotVisibleToProxyFactory" xml:space="preserve">
+		<value>Cannot set up {0}.{1} because it is not accessible to the proxy generator used by Moq:
+{2}</value>
+	</data>
 </root>

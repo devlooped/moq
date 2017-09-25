@@ -328,7 +328,7 @@ namespace Moq
 		/// each mock.</param>
 		protected virtual void VerifyMocks(Action<Mock> verifyAction)
 		{
-			Guard.NotNull(() => verifyAction, verifyAction);
+			Guard.NotNull(verifyAction, nameof(verifyAction));
 
 			var message = new StringBuilder();
 

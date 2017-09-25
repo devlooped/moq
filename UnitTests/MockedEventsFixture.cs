@@ -397,19 +397,19 @@ namespace Moq.Tests
 				() => mock.SetupSet(m => m.Value = It.IsAny<int>()).Raises(m => m.ClassEvent += null, EventArgs.Empty));
 		}
 
-		[Fact(Skip = "Events on non-virtual events not supported yet")]
-		public void EventRaisingFailsOnNonVirtualEvent()
-		{
-			var mock = new Mock<WithEvent>();
-
-			var raised = false;
-			mock.Object.ClassEvent += delegate { raised = true; };
-
-			// TODO: fix!!! We should go the GetInvocationList route here...
-			mock.Raise(x => x.ClassEvent += null, EventArgs.Empty);
-
-			Assert.True(raised);
-		}
+		//[Fact(Skip = "Events on non-virtual events not supported yet")]
+		//public void EventRaisingFailsOnNonVirtualEvent()
+		//{
+		//	var mock = new Mock<WithEvent>();
+		//
+		//	var raised = false;
+		//	mock.Object.ClassEvent += delegate { raised = true; };
+		//
+		//	// TODO: fix!!! We should go the GetInvocationList route here...
+		//	mock.Raise(x => x.ClassEvent += null, EventArgs.Empty);
+		//
+		//	Assert.True(raised);
+		//}
 
 		[Fact]
 		public void EventRaisingSucceedsOnVirtualEvent()

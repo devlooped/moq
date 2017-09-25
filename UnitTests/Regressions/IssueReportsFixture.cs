@@ -1474,6 +1474,109 @@ namespace Moq.Tests.Regressions
 
 		#endregion
 
+		#region 438
+
+		public class Issue438
+		{
+			[Fact]
+			public void SetupAllPropertiesCanSetupSeveralSiblingPropertiesOfTheSameType()
+			{
+				var resultMock = new Mock<IResult> { DefaultValue = DefaultValue.Mock };
+				resultMock.SetupAllProperties();
+				var result = resultMock.Object;
+				result.Part1.Name = "Foo";
+				result.Part2.Name = "Bar";
+
+				Assert.Equal("Foo", result.Part1.Name);
+				Assert.Equal("Bar", result.Part2.Name);
+			}
+
+			public interface IResult
+			{
+				ISubResult Part1 { get; }
+				ISubResult Part2 { get; }
+			}
+
+			public interface ISubResult
+			{
+				string Name { get; set; }
+			}
+
+			[Fact]
+			public void SetupAllPropertiesCanDealWithSelfReferencingTypes()
+			{
+				var mock = new Mock<INode>() { DefaultValue = DefaultValue.Mock };
+				mock.SetupAllProperties();
+				Assert.Null(mock.Object.Parent);
+			}
+
+			public interface INode
+			{
+				INode Parent { get; }
+			}
+
+			[Fact]
+			public void SetupAllPropertiesCanDealWithMutuallyReferencingTypes()
+			{
+				var mock = new Mock<IPing>() { DefaultValue = DefaultValue.Mock };
+				mock.SetupAllProperties();
+				Assert.NotNull(mock.Object.Pong);
+				Assert.Null(mock.Object.Pong.Ping);
+			}
+
+			public interface IPing
+			{
+				IPong Pong { get; }
+			}
+
+			public interface IPong
+			{
+				IPing Ping { get; }
+			}
+		}
+
+		#endregion
+
+		#region 448
+
+		public class Issue448
+		{
+			// A strict mock requires `SetupGet` to provide a return value.
+			// If none is provided, a strict mock is expected to throw during the Act stage.
+			[Fact]
+			public void SetupGet_StrictMockThrowsIfSetupDoesNotProvideAReturnValue()
+			{
+				var mock = new Mock<Foo>(MockBehavior.Strict);
+				mock.SetupGet(f => f.BooleanProperty);
+				Assert.Throws<MockException>(() => mock.Object.BooleanProperty);
+			}
+
+			// Case 1: Providing a return value directly, via `.Returns(...)`:
+			[Fact]
+			public void SetupGet_StrictMockIdentifiesReturnsAsProvidingAReturnValue()
+			{
+				var mock = new Mock<Foo>(MockBehavior.Strict);
+				mock.SetupGet(f => f.BooleanProperty).Returns(true);
+				Assert.True(mock.Object.BooleanProperty);
+			}
+
+			// Case 2: Providing a return value indirectly, via `.CallBase()`:
+			[Fact]
+			public void SetupGet_StrictMockIdentifiesCallBaseAsProvidingAReturnValue()
+			{
+				var mock = new Mock<Foo>(MockBehavior.Strict);
+				mock.SetupGet(f => f.BooleanProperty).CallBase();
+				Assert.True(mock.Object.BooleanProperty);
+			}
+
+			public class Foo
+			{
+				public virtual bool BooleanProperty => true;
+			}
+		}
+
+		#endregion
+
 		// Old @ Google Code
 
 		#region #47
