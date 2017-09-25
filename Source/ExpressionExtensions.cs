@@ -56,7 +56,7 @@ namespace Moq
 		/// </summary>
 		public static LambdaExpression ToLambda(this Expression expression)
 		{
-			Guard.NotNull(() => expression, expression);
+			Guard.NotNull(expression, nameof(expression));
 
 			LambdaExpression lambda = expression as LambdaExpression;
 			if (lambda == null)
@@ -80,7 +80,7 @@ namespace Moq
 		/// <exception cref="ArgumentException">If the body is not a method call.</exception>
 		public static MethodCallExpression ToMethodCall(this LambdaExpression expression)
 		{
-			Guard.NotNull(() => expression, expression);
+			Guard.NotNull(expression, nameof(expression));
 
 			var methodCall = expression.Body as MethodCallExpression;
 			if (methodCall == null)
@@ -120,7 +120,7 @@ namespace Moq
 		/// </summary>
 		public static bool IsProperty(this LambdaExpression expression)
 		{
-			Guard.NotNull(() => expression, expression);
+			Guard.NotNull(expression, nameof(expression));
 
 			return IsProperty(expression.Body);
 		}
@@ -130,7 +130,7 @@ namespace Moq
 		/// </summary>
 		public static bool IsProperty(this Expression expression)
 		{
-			Guard.NotNull(() => expression, expression);
+			Guard.NotNull(expression, nameof(expression));
 
 			var prop = expression as MemberExpression;
 
@@ -145,7 +145,7 @@ namespace Moq
 		/// </summary>
 		public static bool IsPropertyIndexer(this LambdaExpression expression)
 		{
-			Guard.NotNull(() => expression, expression);
+			Guard.NotNull(expression, nameof(expression));
 
 			return IsPropertyIndexer(expression.Body);
 		}
@@ -158,7 +158,7 @@ namespace Moq
 		/// </summary>
 		public static bool IsPropertyIndexer(this Expression expression)
 		{
-			Guard.NotNull(() => expression, expression);
+			Guard.NotNull(expression, nameof(expression));
 
 			var call = expression as MethodCallExpression;
 
@@ -226,7 +226,7 @@ namespace Moq
 		/// </summary>
 		internal static CallInfo GetCallInfo(this LambdaExpression expression, Mock mock)
 		{
-			Guard.NotNull(() => expression, expression);
+			Guard.NotNull(expression, nameof(expression));
 
 			if (mock.IsDelegateMock)
 			{

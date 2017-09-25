@@ -138,7 +138,7 @@ namespace Moq
 		/// <include file='It.xdoc' path='docs/doc[@for="It.IsRegex(regex)"]/*'/>
 		public static string IsRegex(string regex)
 		{
-			Guard.NotNull(() => regex, regex);
+			Guard.NotNull(regex, nameof(regex));
 
 			// The regex is constructed only once.
 			var re = new Regex(regex);
@@ -150,7 +150,7 @@ namespace Moq
 		/// <include file='It.xdoc' path='docs/doc[@for="It.IsRegex(regex,options)"]/*'/>
 		public static string IsRegex(string regex, RegexOptions options)
 		{
-			Guard.NotNull(() => regex, regex);
+			Guard.NotNull(regex, nameof(regex));
 
 			// The regex is constructed only once.
 			var re = new Regex(regex, options);

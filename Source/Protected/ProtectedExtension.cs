@@ -57,7 +57,7 @@ namespace Moq.Protected
 		public static IProtectedMock<T> Protected<T>(this Mock<T> mock)
 			where T : class
 		{
-			Guard.NotNull(() => mock, mock);
+			Guard.NotNull(mock, nameof(mock));
 
 			return new ProtectedMock<T>(mock);
 		}

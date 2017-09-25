@@ -55,7 +55,7 @@ namespace Moq
 			MockSequence sequence)
 			where TMock : class
 		{
-			Guard.NotNull(() => sequence, sequence);
+			Guard.NotNull(sequence, nameof(sequence));
 
 			return sequence.For(mock);
 		}

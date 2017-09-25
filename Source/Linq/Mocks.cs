@@ -176,8 +176,8 @@ namespace Moq
 			where T : class
 			where TResult : class
 		{
-			Guard.NotNull(() => mock, mock);
-			Guard.NotNull(() => setup, setup);
+			Guard.NotNull(mock, nameof(mock));
+			Guard.NotNull(setup, nameof(setup));
 			typeof(TResult).ThrowIfNotMockeable();
 
 			MethodInfo info;

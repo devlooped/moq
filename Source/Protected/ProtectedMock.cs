@@ -63,7 +63,7 @@ namespace Moq.Protected
 
 		public ISetup<T> Setup(string methodName, params object[] args)
 		{
-			Guard.NotNullOrEmpty(() => methodName, methodName);
+			Guard.NotNullOrEmpty(methodName, nameof(methodName));
 
 			var method = GetMethod(methodName, args);
 			ThrowIfMemberMissing(methodName, method);
@@ -74,14 +74,14 @@ namespace Moq.Protected
 
 		public ISetup<T, TResult> Setup<TResult>(string methodName, params object[] args)
 		{
-			Guard.NotNullOrEmpty(() => methodName, methodName);
+			Guard.NotNullOrEmpty(methodName, nameof(methodName));
 
 			return Setup<TResult>(methodName, false, args);
 		}
 
 		public ISetup<T, TResult> Setup<TResult>(string methodName, bool exactParameterMatch, params object[] args)
 		{
-			Guard.NotNullOrEmpty(() => methodName, methodName);
+			Guard.NotNullOrEmpty(methodName, nameof(methodName));
 
 			var property = GetProperty(methodName);
 			if (property != null)
@@ -101,7 +101,7 @@ namespace Moq.Protected
 
 		public ISetupGetter<T, TProperty> SetupGet<TProperty>(string propertyName)
 		{
-			Guard.NotNullOrEmpty(() => propertyName, propertyName);
+			Guard.NotNullOrEmpty(propertyName, nameof(propertyName));
 
 			var property = GetProperty(propertyName);
 			ThrowIfMemberMissing(propertyName, property);
@@ -113,7 +113,7 @@ namespace Moq.Protected
 
 		public ISetupSetter<T, TProperty> SetupSet<TProperty>(string propertyName, object value)
 		{
-			Guard.NotNullOrEmpty(() => propertyName, propertyName);
+			Guard.NotNullOrEmpty(propertyName, nameof(propertyName));
 
 			var property = GetProperty(propertyName);
 			ThrowIfMemberMissing(propertyName, property);
@@ -129,7 +129,7 @@ namespace Moq.Protected
 
 		public void Verify(string methodName, Times times, object[] args)
 		{
-			Guard.NotNullOrEmpty(() => methodName, methodName);
+			Guard.NotNullOrEmpty(methodName, nameof(methodName));
 
 			var method = GetMethod(methodName, args);
 			ThrowIfMemberMissing(methodName, method);
@@ -140,7 +140,7 @@ namespace Moq.Protected
 
 		public void Verify<TResult>(string methodName, Times times, object[] args)
 		{
-			Guard.NotNullOrEmpty(() => methodName, methodName);
+			Guard.NotNullOrEmpty(methodName, nameof(methodName));
 
 			var property = GetProperty(methodName);
 			if (property != null)
@@ -161,7 +161,7 @@ namespace Moq.Protected
 		// TODO should receive args to support indexers
 		public void VerifyGet<TProperty>(string propertyName, Times times)
 		{
-			Guard.NotNullOrEmpty(() => propertyName, propertyName);
+			Guard.NotNullOrEmpty(propertyName, nameof(propertyName));
 
 			var property = GetProperty(propertyName);
 			ThrowIfMemberMissing(propertyName, property);
@@ -175,7 +175,7 @@ namespace Moq.Protected
 		// TODO should receive args to support indexers
 		public void VerifySet<TProperty>(string propertyName, Times times, object value)
 		{
-			Guard.NotNullOrEmpty(() => propertyName, propertyName);
+			Guard.NotNullOrEmpty(propertyName, nameof(propertyName));
 
 			var property = GetProperty(propertyName);
 			ThrowIfMemberMissing(propertyName, property);

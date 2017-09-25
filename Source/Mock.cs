@@ -281,7 +281,7 @@ namespace Moq
 			string failMessage)
 			where T : class
 		{
-			Guard.NotNull(() => times, times);
+			Guard.NotNull(times, nameof(times));
 
 			var methodCall = expression.GetCallInfo(mock);
 			var method = methodCall.Method;
@@ -299,7 +299,7 @@ namespace Moq
 			string failMessage)
 			where T : class
 		{
-			Guard.NotNull(() => times, times);
+			Guard.NotNull(times, nameof(times));
 
 			if (expression.IsProperty())
 			{
