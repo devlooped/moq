@@ -9,6 +9,8 @@ namespace Moq
 {
 	internal class HandleMockRecursion : IInterceptStrategy
 	{
+		public static HandleMockRecursion Instance { get; } = new HandleMockRecursion();
+
 		public InterceptionAction HandleIntercept(ICallContext invocation, InterceptorContext ctx, CurrentInterceptContext localctx)
 		{
 			if (invocation.Method != null && invocation.Method.ReturnType != null &&
@@ -31,6 +33,8 @@ namespace Moq
 
 	internal class InvokeBase : IInterceptStrategy
 	{
+		public static InvokeBase Instance { get; } = new InvokeBase();
+
 		public InterceptionAction HandleIntercept(ICallContext invocation, InterceptorContext ctx, CurrentInterceptContext localctx)
 		{
 			if (invocation.Method.DeclaringType == typeof(object) || // interface proxy
@@ -56,10 +60,10 @@ namespace Moq
 
 	internal class ExecuteCall : IInterceptStrategy
 	{
-		InterceptorContext ctx;
+		public static ExecuteCall Instance { get; } = new ExecuteCall();
+
 		public InterceptionAction HandleIntercept(ICallContext invocation, InterceptorContext ctx, CurrentInterceptContext localctx)
 		{
-			this.ctx = ctx;
 			IProxyCall currentCall = localctx.Call;
 
 			if (currentCall != null)
@@ -70,7 +74,7 @@ namespace Moq
 				// and therefore we might never get to the 
 				// next line.
 				currentCall.Execute(invocation);
-				ThrowIfReturnValueRequired(currentCall, invocation);
+				ThrowIfReturnValueRequired(currentCall, invocation, ctx);
 				return InterceptionAction.Stop;
 			}
 			else
@@ -78,7 +82,8 @@ namespace Moq
 				return InterceptionAction.Continue;
 			}
 		}
-		private void ThrowIfReturnValueRequired(IProxyCall call, ICallContext invocation)
+
+		private static void ThrowIfReturnValueRequired(IProxyCall call, ICallContext invocation, InterceptorContext ctx)
 		{
 			if (ctx.Behavior != MockBehavior.Loose &&
 				invocation.Method != null &&
@@ -98,6 +103,7 @@ namespace Moq
 
 	internal class ExtractProxyCall : IInterceptStrategy
 	{
+		public static ExtractProxyCall Instance { get; } = new ExtractProxyCall();
 
 		public InterceptionAction HandleIntercept(ICallContext invocation, InterceptorContext ctx, CurrentInterceptContext localctx)
 		{
@@ -134,11 +140,12 @@ namespace Moq
 
 			return InterceptionAction.Continue;
 		}
-
 	}
 
 	internal class InterceptMockPropertyMixin : IInterceptStrategy
 	{
+		public static InterceptMockPropertyMixin Instance { get; } = new InterceptMockPropertyMixin();
+
 		public InterceptionAction HandleIntercept(ICallContext invocation, InterceptorContext ctx, CurrentInterceptContext localctx)
 		{
 			var method = invocation.Method;
@@ -158,6 +165,8 @@ namespace Moq
 	/// </summary>
 	internal class InterceptObjectMethodsMixin : IInterceptStrategy
 	{
+		public static InterceptObjectMethodsMixin Instance { get; } = new InterceptObjectMethodsMixin();
+
 		public InterceptionAction HandleIntercept(ICallContext invocation, InterceptorContext ctx, CurrentInterceptContext localctx)
 		{
 			var method = invocation.Method;
@@ -186,19 +195,15 @@ namespace Moq
 			return InterceptionAction.Continue;
 		}
 
-		protected bool IsObjectMethod(MethodInfo method, string name)
+		private static bool IsObjectMethod(MethodInfo method, string name)
 		{
-			if (method.DeclaringType == typeof(object) && method.Name == name)
-			{
-				return true;
-			}
-
-			return false;
+			return method.DeclaringType == typeof(object) && method.Name == name;
 		}
 	}
 
 	internal class HandleTracking : IInterceptStrategy
 	{
+		public static HandleTracking Instance { get; } = new HandleTracking();
 
 		public InterceptionAction HandleIntercept(ICallContext invocation, InterceptorContext ctx, CurrentInterceptContext localctx)
 		{
@@ -213,6 +218,8 @@ namespace Moq
 
 	internal class HandleDestructor : IInterceptStrategy
 	{
+		public static HandleDestructor Instance { get; } = new HandleDestructor();
+
 		public InterceptionAction HandleIntercept(ICallContext invocation, InterceptorContext ctx, CurrentInterceptContext localctx)
 		{
 			return invocation.Method.IsDestructor() ? InterceptionAction.Stop : InterceptionAction.Continue;
@@ -221,71 +228,16 @@ namespace Moq
 
 	internal class AddActualInvocation : IInterceptStrategy
 	{
+		public static AddActualInvocation Instance { get; } = new AddActualInvocation();
 
-		/// <summary>
-		/// Get an eventInfo for a given event name.  Search type ancestors depth first if necessary.
-		/// </summary>
-		/// <param name="eventName">Name of the event, with the set_ or get_ prefix already removed</param>
-		private EventInfo GetEventFromName(string eventName)
-		{
-			return GetEventFromName(eventName, BindingFlags.Instance | BindingFlags.Static | BindingFlags.Public) ??
-				GetEventFromName(eventName, BindingFlags.Instance | BindingFlags.NonPublic);
-		}
-
-		/// <summary>
-		/// Get an eventInfo for a given event name.  Search type ancestors depth first if necessary.
-		/// Searches events using the specified binding constraints.
-		/// </summary>
-		/// <param name="eventName">Name of the event, with the set_ or get_ prefix already removed</param>
-		/// <param name="bindingAttr">Specifies how the search for events is conducted</param>
-		private EventInfo GetEventFromName(string eventName, BindingFlags bindingAttr)
-		{
-			// Ignore internally implemented interfaces
-			var depthFirstProgress = new Queue<Type>(ctx.Mock.ImplementedInterfaces.Skip(ctx.Mock.InternallyImplementedInterfaceCount));
-			depthFirstProgress.Enqueue(ctx.TargetType);
-			while (depthFirstProgress.Count > 0)
-			{
-				var currentType = depthFirstProgress.Dequeue();
-				var eventInfo = currentType.GetEvent(eventName, bindingAttr);
-				if (eventInfo != null)
-				{
-					return eventInfo;
-				}
-
-				foreach (var implementedType in GetAncestorTypes(currentType))
-				{
-					depthFirstProgress.Enqueue(implementedType);
-				}
-			}
-
-			return null;
-		}
-
-
-		/// <summary>
-		/// Given a type return all of its ancestors, both types and interfaces.
-		/// </summary>
-		/// <param name="initialType">The type to find immediate ancestors of</param>
-		private static IEnumerable<Type> GetAncestorTypes(Type initialType)
-		{
-			var baseType = initialType.GetTypeInfo().BaseType;
-			if (baseType != null)
-			{
-				return new[] { baseType };
-			}
-
-			return initialType.GetInterfaces();
-		}
-		InterceptorContext ctx;
 		public InterceptionAction HandleIntercept(ICallContext invocation, InterceptorContext ctx, CurrentInterceptContext localctx)
 		{
-			this.ctx = ctx;
 			if (!FluentMockContext.IsActive)
 			{
 				//Special case for events
 				if (invocation.Method.LooksLikeEventAttach())
 				{
-					var eventInfo = this.GetEventFromName(invocation.Method.Name.Substring("add_".Length));
+					var eventInfo = GetEventFromName(invocation.Method.Name.Substring("add_".Length), ctx);
 					if (eventInfo != null)
 					{
 						// TODO: We could compare `invocation.Method` and `eventInfo.GetAddMethod()` here.
@@ -309,7 +261,7 @@ namespace Moq
 				}
 				else if (invocation.Method.LooksLikeEventDetach())
 				{
-					var eventInfo = this.GetEventFromName(invocation.Method.Name.Substring("remove_".Length));
+					var eventInfo = GetEventFromName(invocation.Method.Name.Substring("remove_".Length), ctx);
 					if (eventInfo != null)
 					{
 						// TODO: We could compare `invocation.Method` and `eventInfo.GetRemoveMethod()` here.
@@ -340,6 +292,62 @@ namespace Moq
 				ctx.AddInvocation(invocation);
 			}
 			return InterceptionAction.Continue;
+		}
+
+		/// <summary>
+		/// Get an eventInfo for a given event name.  Search type ancestors depth first if necessary.
+		/// </summary>
+		/// <param name="eventName">Name of the event, with the set_ or get_ prefix already removed</param>
+		/// <param name="ctx"/>
+		private static EventInfo GetEventFromName(string eventName, InterceptorContext ctx)
+		{
+			return GetEventFromName(eventName, BindingFlags.Instance | BindingFlags.Static | BindingFlags.Public, ctx)
+				?? GetEventFromName(eventName, BindingFlags.Instance | BindingFlags.NonPublic, ctx);
+		}
+
+		/// <summary>
+		/// Get an eventInfo for a given event name.  Search type ancestors depth first if necessary.
+		/// Searches events using the specified binding constraints.
+		/// </summary>
+		/// <param name="eventName">Name of the event, with the set_ or get_ prefix already removed</param>
+		/// <param name="bindingAttr">Specifies how the search for events is conducted</param>
+		/// <param name="ctx"/>
+		private static EventInfo GetEventFromName(string eventName, BindingFlags bindingAttr, InterceptorContext ctx)
+		{
+			// Ignore internally implemented interfaces
+			var depthFirstProgress = new Queue<Type>(ctx.Mock.ImplementedInterfaces.Skip(ctx.Mock.InternallyImplementedInterfaceCount));
+			depthFirstProgress.Enqueue(ctx.TargetType);
+			while (depthFirstProgress.Count > 0)
+			{
+				var currentType = depthFirstProgress.Dequeue();
+				var eventInfo = currentType.GetEvent(eventName, bindingAttr);
+				if (eventInfo != null)
+				{
+					return eventInfo;
+				}
+
+				foreach (var implementedType in GetAncestorTypes(currentType))
+				{
+					depthFirstProgress.Enqueue(implementedType);
+				}
+			}
+
+			return null;
+		}
+
+		/// <summary>
+		/// Given a type return all of its ancestors, both types and interfaces.
+		/// </summary>
+		/// <param name="initialType">The type to find immediate ancestors of</param>
+		private static IEnumerable<Type> GetAncestorTypes(Type initialType)
+		{
+			var baseType = initialType.GetTypeInfo().BaseType;
+			if (baseType != null)
+			{
+				return new[] { baseType };
+			}
+
+			return initialType.GetInterfaces();
 		}
 	}
 }

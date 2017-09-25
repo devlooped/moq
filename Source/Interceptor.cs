@@ -127,24 +127,28 @@ namespace Moq
 			}
 		}
 
-		private IEnumerable<IInterceptStrategy> InterceptionStrategies()
-		{
-			yield return new HandleDestructor();
-			yield return new HandleTracking();
-			yield return new InterceptMockPropertyMixin();
-			yield return new InterceptObjectMethodsMixin();
-			yield return new AddActualInvocation();
-			yield return new ExtractProxyCall();
-			yield return new ExecuteCall();
-			yield return new InvokeBase();
-			yield return new HandleMockRecursion();
-		}
+		private static Lazy<IInterceptStrategy[]> interceptionStrategies =
+			new Lazy<IInterceptStrategy[]>(
+				() => new IInterceptStrategy[]
+				{
+					HandleDestructor.Instance,
+					HandleTracking.Instance,
+					InterceptMockPropertyMixin.Instance,
+					InterceptObjectMethodsMixin.Instance,
+					AddActualInvocation.Instance,
+					ExtractProxyCall.Instance,
+					ExecuteCall.Instance,
+					InvokeBase.Instance,
+					HandleMockRecursion.Instance,
+				});
+
+		private static IInterceptStrategy[] InterceptionStrategies => interceptionStrategies.Value;
 
 		[SuppressMessage("Microsoft.Maintainability", "CA1502:AvoidExcessiveComplexity")]
 		public void Intercept(ICallContext invocation)
 		{
 			CurrentInterceptContext localCtx = new CurrentInterceptContext();
-			foreach (var strategy in InterceptionStrategies())
+			foreach (var strategy in InterceptionStrategies)
 			{
 				if (InterceptionAction.Stop == strategy.HandleIntercept(invocation, InterceptionContext, localCtx))
 				{
