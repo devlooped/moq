@@ -56,7 +56,7 @@ using System.Diagnostics.CodeAnalysis;
 
 namespace Moq.Proxy
 {
-	internal class CastleProxyFactory : IProxyFactory
+	internal sealed class CastleProxyFactory : IProxyFactory
 	{
 		public static CastleProxyFactory Instance { get; } = new CastleProxyFactory();
 
@@ -77,7 +77,7 @@ namespace Moq.Proxy
 			AttributesToAvoidReplicating.Add<TypeIdentifierAttribute>();
 #endif
 
-			proxyOptions = new ProxyGenerationOptions { Hook = new ProxyMethodHook() };
+			proxyOptions = new ProxyGenerationOptions { Hook = new IncludeObjectMethodsHook() };
 		}
 
 		/// <inheritdoc />
@@ -208,6 +208,26 @@ namespace Moq.Proxy
 			public void SetArgumentValue(int index, object value)
 			{
 				this.invocation.SetArgumentValue(index, value);
+			}
+		}
+
+		/// <summary>
+		/// This hook tells Castle DynamicProxy to proxy the default methods it suggests,
+		/// plus some of the methods defined by <see cref="object"/>, e.g. so we can intercept
+		/// <see cref="object.ToString()"/> and give mocks useful default names.
+		/// </summary>
+		private sealed class IncludeObjectMethodsHook : AllMethodsHook
+		{
+			public override bool ShouldInterceptMethod(Type type, MethodInfo method)
+			{
+				return base.ShouldInterceptMethod(type, method) || IsRelevantObjectMethod(method);
+			}
+
+			private static bool IsRelevantObjectMethod(MethodInfo method)
+			{
+				return method.DeclaringType == typeof(object) && (method.Name == nameof(object.ToString)
+				                                              ||  method.Name == nameof(object.Equals)
+				                                              ||  method.Name == nameof(object.GetHashCode));
 			}
 		}
 	}
