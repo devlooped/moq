@@ -49,14 +49,12 @@ using System.Runtime.CompilerServices;
 using Moq.Proxy;
 using System.Linq.Expressions;
 using Moq.Properties;
+using System.Runtime.ExceptionServices;
 
 namespace Moq
 {
 	internal static class Extensions
 	{
-		private static readonly FieldInfo remoteStackTraceString = typeof (Exception).GetField("_remoteStackTraceString",
-			BindingFlags.Instance | BindingFlags.NonPublic);
-
 		public static string Format(this ICallContext invocation)
 		{
 			if (invocation.Method.IsPropertyGetter())
@@ -111,15 +109,9 @@ namespace Moq
 			}
 			catch (TargetInvocationException ex)
 			{
-				remoteStackTraceString.SetValue(ex.InnerException, ex.InnerException.StackTrace);
-				ex.InnerException.SetStackTrace(ex.InnerException.StackTrace);
-				throw ex.InnerException;
+				ExceptionDispatchInfo.Capture(ex.InnerException).Throw();
+				throw;
 			}
-		}
-
-		public static void SetStackTrace(this Exception exception, string stackTrace)
-		{
-			remoteStackTraceString.SetValue(exception, stackTrace);
 		}
 
 		/// <summary>
