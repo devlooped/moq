@@ -236,17 +236,6 @@ namespace Moq.Protected
 				param).Compile();
 		}
 
-		private static void ThrowIfNonVirtual(MethodInfo method, string reflectedTypeName)
-		{
-			if (method.IsAssembly || method.IsFamilyAndAssembly)
-			{
-				throw new ArgumentException(string.Format(
-					CultureInfo.CurrentCulture,
-					Resources.VerifyOnNonVirtualMember,
-					reflectedTypeName + "." + method.Name));
-			}
-		}
-
 		private static void ThrowIfMemberMissing(string memberName, MemberInfo member)
 		{
 			if (member == null)

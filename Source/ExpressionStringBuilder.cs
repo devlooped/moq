@@ -631,11 +631,6 @@ namespace Moq
 
 	internal static class StringExtensions
 	{
-		public static string[] Lines(this string source)
-		{
-			return source.Split(new[] { Environment.NewLine }, StringSplitOptions.None);
-		}
-
 		public static string AsCommaSeparatedValues(this IEnumerable<string> source)
 		{
 			if (source == null)

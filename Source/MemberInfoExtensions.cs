@@ -7,48 +7,6 @@ namespace Moq
 {
 	internal static class MemberInfoExtensions
 	{
-		public static string GetFullName(this MethodBase method)
-		{
-			if (method.IsGenericMethod)
-			{
-				return method.Name + GetGenericArguments(method.GetGenericArguments(), t => GetFullName(t));
-			}
-
-			return method.Name;
-		}
-
-		public static string GetFullName(this Type type)
-		{
-			if (type.GetTypeInfo().IsGenericType)
-			{
-				return type.FullName.Substring(0, type.FullName.IndexOf('`')) +
-					GetGenericArguments(type.GetGenericArguments(), t => GetFullName(t));
-			}
-
-			return type.FullName;
-		}
-
-		public static string GetName(this MethodBase method)
-		{
-			if (method.IsGenericMethod)
-			{
-				return method.Name + GetGenericArguments(method.GetGenericArguments(), t => GetName(t));
-			}
-
-			return method.Name;
-		}
-
-		public static string GetName(this Type type)
-		{
-			if (type.GetTypeInfo().IsGenericType)
-			{
-				return type.Name.Substring(0, type.Name.IndexOf('`')) +
-					GetGenericArguments(type.GetGenericArguments(), t => GetName(t));
-			}
-
-			return type.Name;
-		}
-
 		public static IEnumerable<Type> GetParameterTypes(this MethodBase method)
 		{
 			return method.GetParameters().Select(parameter => parameter.ParameterType);
@@ -99,11 +57,6 @@ namespace Moq
 		public static bool IsOutArgument(this ParameterInfo parameter)
 		{
 			return parameter.ParameterType.IsByRef && (parameter.Attributes & ParameterAttributes.Out) == ParameterAttributes.Out;
-		}
-
-		private static string GetGenericArguments(IEnumerable<Type> types, Func<Type, string> typeGetter)
-		{
-			return "<" + string.Join(",", types.Select(typeGetter).ToArray()) + ">";
 		}
 	}
 }
