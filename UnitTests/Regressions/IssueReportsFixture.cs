@@ -1577,6 +1577,28 @@ namespace Moq.Tests.Regressions
 
 		#endregion
 
+		#region 458
+
+		public class Issue458
+		{
+			[Fact]
+			public void Mock_Object_always_returns_same_object_even_when_first_instantiated_through_AsInterface_cast()
+			{
+				Mock<IFoo> mock = new Mock<Foo>().As<IFoo>();
+
+				object o1 = ((Mock)mock).Object;
+				object o2 = mock.Object;
+
+				Assert.Same(o1, o2);
+			}
+
+			public interface IFoo { }
+
+			public class Foo : IFoo { }
+		}
+
+		#endregion
+
 		// Old @ Google Code
 
 		#region #47
