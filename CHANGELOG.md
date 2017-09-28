@@ -11,6 +11,10 @@ The format is loosely based on [Keep a Changelog](http://keepachangelog.com/en/1
 
 * Update package reference to `Castle.Core` (DynamicProxy) from version 4.1.1 to 4.2.0, which uses a new assembly versioning scheme that should eventually reduce assembly version conflicts and the need for assembly binding redirects (@stakx, #459)
 
+#### Fixed
+
+* `mock.Object` should always return the exact same proxy object, regardless of whether the mock has been cast to an interface via `.As<T>()` or not (@stakx, #460)
+
 
 ## 4.7.127 (2017-09-26)
 
