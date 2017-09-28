@@ -2,7 +2,7 @@
 <package xmlns="http://schemas.microsoft.com/packaging/2011/08/nuspec.xsd">
 	<metadata>
 		<id>Moq</id>
-		<version>4.7</version>
+		<version>4.8.0-rc1</version>
 		<title>Moq: an enjoyable mocking library</title>
 		<authors>Daniel Cazzulino, kzu</authors>
 		<owners>Daniel Cazzulino, Clarius Labs, kzu</owners>
@@ -11,7 +11,7 @@
 		<requireLicenseAcceptance>false</requireLicenseAcceptance>
 		<description>Moq is the most popular and friendly mocking framework for .NET</description>
 		<tags>moq tdd mocking mocks unittesting agile unittest</tags>
-		<releaseNotes>A changelog is available at https://github.com/moq/moq4/blob/master/CHANGELOG.md.</releaseNotes>
+		<releaseNotes>A changelog is available at https://github.com/moq/moq4/blob/v4.8.0-rc1/CHANGELOG.md.</releaseNotes>
 		<dependencies>
 			<group targetFramework=".NETFramework4.5">
 				<dependency id="Castle.Core" version="4.2.1" />
