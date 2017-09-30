@@ -99,5 +99,10 @@ namespace Moq
 		{
 			return this.owner.As<TNewInterface>();
 		}
+
+		protected override object OnGetObject()
+		{
+			return this.owner.Object;
+		}
 	}
 }

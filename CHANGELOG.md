@@ -5,6 +5,17 @@ All notable changes to this project will be documented in this file.
 The format is loosely based on [Keep a Changelog](http://keepachangelog.com/en/1.0.0/).
 
 
+## 4.7.137 (2017-09-30)
+
+#### Changed
+
+* Update package reference to `Castle.Core` (DynamicProxy) from version 4.1.1 to 4.2.0, which uses a new assembly versioning scheme that should eventually reduce assembly version conflicts and the need for assembly binding redirects (@stakx, #459)
+
+#### Fixed
+
+* `mock.Object` should always return the exact same proxy object, regardless of whether the mock has been cast to an interface via `.As<T>()` or not (@stakx, #460)
+
+
 ## 4.7.127 (2017-09-26)
 
 #### Changed
@@ -32,7 +43,7 @@ The format is loosely based on [Keep a Changelog](http://keepachangelog.com/en/1
 #### Changed
 
 * Move all hardcoded message strings to `Resources.resx` (@stakx, #403)
-* Update package `Castle.Core` (DynamicProxy) from version 4.1.0 to 4.1.1 (@stakx, #416)
+* Update package reference to `Castle.Core` (DynamicProxy) from version 4.1.0 to 4.1.1 (@stakx, #416)
 * Clean up and simplify the build process by merging separate .NET Framework and .NET Standard projects (@stakx, #417)
 * Replace outdated `ReleaseNotes.md` with new `CHANGELOG.md` (@stakx, #423)
 
@@ -85,7 +96,7 @@ The format is loosely based on [Keep a Changelog](http://keepachangelog.com/en/1
 #### Changed
 
 * Extend `EmptyDefaultValueProvider` so it understands multidimensional arrays (return empty multidimensional arrays instead of `null`) (@stakx, #360)
-* Update package `Castle.Core` (DynamicProxy) from version 4.0.0 to 4.1.0, update `System` and `Microsoft` packages from versions 4.0.1 to 4.3.0 (@stakx, #369)
+* Update package reference to `Castle.Core` (DynamicProxy) from version 4.0.0 to 4.1.0, update `System` and `Microsoft` packages from versions 4.0.1 to 4.3.0 (@stakx, #369)
 * Clean up and reduce usage of conditional compilation (`#if`) (@stakx, #378)
 
 #### Fixed
@@ -269,7 +280,7 @@ Minor change only (add `.editorconfig` file)
 #### Changed
 
 * Reference Castle.Core as a NuGet package dependency instead of ILMerge-ing it into Moq's own assembly. (@kzu)
-* Update package GitInfo from version 1.1.14 to 1.1.15 to fix versioning issue with cached Git info (@kzu)
+* Update package reference to `GitInfo` from version 1.1.14 to 1.1.15 to fix versioning issue with cached Git info (@kzu)
 
 #### Removed
 
@@ -313,7 +324,7 @@ This version is the predecessor of 4.5.0.
 #### Changed
 
 * Migrate to .NET 4.5 and NuGet 3 (@kzu)
-* Update package GitInfo from version 1.1.13 to 1.1.14 (@kzu)
+* Update package reference to `GitInfo` from version 1.1.13 to 1.1.14 (@kzu)
 
 ### Removed
 

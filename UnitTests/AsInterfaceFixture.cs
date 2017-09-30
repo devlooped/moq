@@ -169,6 +169,8 @@ namespace Moq.Tests
 			bag.Get("test");
 		}
 
+		// see also test fixture `Issue458` in `IssueReportsFixture`
+
 		public interface IFoo
 		{
 			void Execute();
