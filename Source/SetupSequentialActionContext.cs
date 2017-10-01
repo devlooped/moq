@@ -5,7 +5,7 @@ using Moq.Language.Flow;
 
 namespace Moq
 {
-	internal class SetupSequentialVoidContext<TMock> : ISetupSequentialAction
+	internal class SetupSequentialActionContext<TMock> : ISetupSequentialAction
 		where TMock : class
 	{
 		private int currentStep;
@@ -14,7 +14,7 @@ namespace Moq
 		private Expression<Action<TMock>> expression;
 		private readonly Action callbackAction;
 
-		public SetupSequentialVoidContext(
+		public SetupSequentialActionContext(
 			Mock<TMock> mock,
 			Expression<Action<TMock>> expression)
 		{

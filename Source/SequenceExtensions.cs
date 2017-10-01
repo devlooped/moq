@@ -31,7 +31,7 @@ namespace Moq
 			Expression<Action<TMock>> expression)
 			where TMock : class
 		{
-			return new SetupSequentialVoidContext<TMock>(mock, expression);
+			return new SetupSequentialActionContext<TMock>(mock, expression);
 		}
 
 		/// <summary>
