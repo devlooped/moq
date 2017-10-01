@@ -5,7 +5,7 @@ using Moq.Language.Flow;
 
 namespace Moq
 {
-	internal class SetupSequentialActionContext<TMock> : ISetupSequentialAction
+	internal sealed class SetupSequentialActionContext<TMock> : ISetupSequentialAction
 		where TMock : class
 	{
 		private int currentStep;
