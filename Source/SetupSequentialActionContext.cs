@@ -31,7 +31,7 @@ namespace Moq
 			return this;
 		}
 
-		private void DoNothing() { }
+		private static void DoNothing() { }
 
 		public ISetupSequentialAction Throws<TException>() where TException : Exception, new()
 		{
