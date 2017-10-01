@@ -5,7 +5,7 @@ using Moq.Language.Flow;
 
 namespace Moq
 {
-	internal class SetupSequentialVoidContext<TMock> : ISetupSequentialVoidResult
+	internal class SetupSequentialVoidContext<TMock> : ISetupSequentialAction
 		where TMock : class
 	{
 		private int currentStep;
@@ -23,7 +23,7 @@ namespace Moq
 			this.callbackAction = () => currentStep++;
 		}
 
-		public ISetupSequentialVoidResult Pass()
+		public ISetupSequentialAction Pass()
 		{
 			var setup = this.GetSetup();
 			setup.Callback(DoNothing);
@@ -33,7 +33,7 @@ namespace Moq
 
 		private void DoNothing() { }
 
-		public ISetupSequentialVoidResult Throws<TException>() where TException : Exception, new()
+		public ISetupSequentialAction Throws<TException>() where TException : Exception, new()
 		{
 			var setup = this.GetSetup();
 			setup.Throws<TException>();
@@ -41,7 +41,7 @@ namespace Moq
 			return this;
 		}
 
-		public ISetupSequentialVoidResult Throws(Exception exception)
+		public ISetupSequentialAction Throws(Exception exception)
 		{
 			var setup = this.GetSetup();
 			setup.Throws(exception);

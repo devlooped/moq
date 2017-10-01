@@ -5,21 +5,21 @@ namespace Moq.Language
 	/// <summary>
 	/// Language for ReturnSequence
 	/// </summary>
-	public interface ISetupSequentialVoidResult
+	public interface ISetupSequentialAction
 	{
 		/// <summary>
 		/// Does nothing
 		/// </summary>
-		ISetupSequentialVoidResult Pass();
+		ISetupSequentialAction Pass();
 
 		/// <summary>
 		/// Throws an exception
 		/// </summary>
-		ISetupSequentialVoidResult Throws<TException>() where TException : Exception, new();
+		ISetupSequentialAction Throws<TException>() where TException : Exception, new();
 
 		/// <summary>
 		/// Throws an exception
 		/// </summary>
-		ISetupSequentialVoidResult Throws(Exception exception);
+		ISetupSequentialAction Throws(Exception exception);
 	}
 }

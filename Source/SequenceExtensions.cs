@@ -26,7 +26,7 @@ namespace Moq
 		/// <summary>
 		/// Performs a sequence of actions, one per call.
 		/// </summary>
-		public static ISetupSequentialVoidResult SetupSequence<TMock>(
+		public static ISetupSequentialAction SetupSequence<TMock>(
 			this Mock<TMock> mock,
 			Expression<Action<TMock>> expression)
 			where TMock : class
