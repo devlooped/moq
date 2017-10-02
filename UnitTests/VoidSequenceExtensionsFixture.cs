@@ -1,5 +1,4 @@
 ﻿using System;
-using System.Threading.Tasks;
 using Xunit;
 
 namespace Moq.Tests
@@ -20,7 +19,7 @@ namespace Moq.Tests
 			Assert.Throws<InvalidOperationException>(() => mock.Object.Do());
 			Assert.Throws<ArgumentException>(() => mock.Object.Do());
 		}
-		
+
 		[Fact]
 		public void PerformSequenceWithThrowFirst()
 		{
@@ -39,8 +38,6 @@ namespace Moq.Tests
 		public interface IFoo
 		{
 			void Do();
-
-			Task DoAsync();
 		}
 	}
 }
