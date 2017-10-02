@@ -356,4 +356,7 @@ Expected invocation on the mock once, but was {4} times: {1}</value>
 		<value>Cannot set up {0}.{1} because it is not accessible to the proxy generator used by Moq:
 {2}</value>
 	</data>
+	<data name="InvalidCallbackNotADelegateWithReturnTypeVoid" xml:space="preserve">
+		<value>Invalid callback. This overload of the "Callback" method only accepts "void" (C#) or "Sub" (VB.NET) delegates with parameter types matching those of the set up method.</value>
+	</data>
 </root>

@@ -322,6 +322,23 @@ namespace Moq
 			return this;
 		}
 
+		public ICallbackResult Callback<TActionDelegate>(TActionDelegate callback)
+		{
+			if (callback == null)
+			{
+				throw new ArgumentNullException(nameof(callback));
+			}
+
+			var callbackDelegate = callback as Delegate;
+			if (callbackDelegate == null || callbackDelegate.GetMethodInfo().ReturnType != typeof(void))
+			{
+				throw new ArgumentException(Resources.InvalidCallbackNotADelegateWithReturnTypeVoid, nameof(callback));
+			}
+
+			this.SetCallbackWithArguments(callbackDelegate);
+			return this;
+		}
+
 		protected virtual void SetCallbackWithoutArguments(Action callback)
 		{
 			this.setupCallback = delegate { callback(); };

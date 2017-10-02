@@ -51,6 +51,27 @@ namespace Moq.Language
 	public partial interface ICallback : IFluentInterface
 	{
 		/// <summary>
+		/// Specifies a callback of any delegate type to invoke when the method is called.
+		/// This overload specifically allows you to define callbacks for methods with by-ref parameters.
+		/// </summary>
+		/// <typeparam name="TActionDelegate">
+		/// Delegate type of which <paramref name="callback"/> is an instance.
+		/// Must have return type <c>void</c> (C#) or be a <c>Sub</c> (VB.NET).
+		/// </typeparam>
+		/// <param name="callback">The callback method to invoke.</param>
+		/// <example>
+		/// Invokes the given callback with the concrete invocation argument value. You can modify
+		/// by-ref parameters inside the callback.
+		/// <code>
+		/// delegate void ExecuteHandler(ref Command command);
+		///
+		/// mock.Setup(x => x.Execute(ref command))
+		///     .Callback&lt;ExecuteHandler&gt;((ref Command _) => Console.WriteLine("Executing command..."));
+		/// </code>
+		/// </example>
+		ICallbackResult Callback<TActionDelegate>(TActionDelegate callback);
+
+		/// <summary>
 		/// Specifies a callback to invoke when the method is called.
 		/// </summary>
 		/// <param name="action">The callback method to invoke.</param>
@@ -93,6 +114,27 @@ namespace Moq.Language
 	public partial interface ICallback<TMock, TResult> : IFluentInterface
 		where TMock : class
 	{
+		/// <summary>
+		/// Specifies a callback of any delegate type to invoke when the method is called.
+		/// This overload specifically allows you to define callbacks for methods with by-ref parameters.
+		/// </summary>
+		/// <typeparam name="TActionDelegate">
+		/// Delegate type of which <paramref name="callback"/> is an instance.
+		/// Must have return type <c>void</c> (C#) or be a <c>Sub</c> (VB.NET).
+		/// </typeparam>
+		/// <param name="callback">The callback method to invoke.</param>
+		/// <example>
+		/// Invokes the given callback with the concrete invocation argument value. You can modify
+		/// by-ref parameters inside the callback.
+		/// <code>
+		/// delegate void ExecuteHandler(ref Command command);
+		///
+		/// mock.Setup(x => x.Execute(ref command))
+		///     .Callback&lt;ExecuteHandler&gt;((ref Command _) => Console.WriteLine("Executing command..."));
+		/// </code>
+		/// </example>
+		IReturnsThrows<TMock, TResult> Callback<TActionDelegate>(TActionDelegate callback);
+
 		/// <summary>
 		/// Specifies a callback to invoke when the method is called.
 		/// </summary>

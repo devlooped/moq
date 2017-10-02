@@ -40,6 +40,7 @@
 
 using Moq.Language;
 using Moq.Language.Flow;
+using Moq.Properties;
 using Moq.Proxy;
 using System;
 using System.Linq.Expressions;
@@ -106,6 +107,12 @@ namespace Moq
 		public IReturnsResult<TMock> CallBase()
 		{
 			this.returnValueKind = ReturnValueKind.CallBase;
+			return this;
+		}
+
+		IReturnsThrows<TMock, TResult> ICallback<TMock, TResult>.Callback<TActionDelegate>(TActionDelegate callback)
+		{
+			base.Callback<TActionDelegate>(callback);
 			return this;
 		}
 

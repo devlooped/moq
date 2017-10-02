@@ -169,6 +169,15 @@ namespace Moq.Properties {
 		}
 		
 		/// <summary>
+		///   Looks up a localized string similar to Invalid callback. This overload of the &quot;Callback&quot; method only accepts &quot;void&quot; (C#) or &quot;Sub&quot; (VB.NET) delegates with parameter types matching those of the set up method..
+		/// </summary>
+		internal static string InvalidCallbackNotADelegateWithReturnTypeVoid {
+			get {
+				return ResourceManager.GetString("InvalidCallbackNotADelegateWithReturnTypeVoid", resourceCulture);
+			}
+		}
+
+		/// <summary>
 		///   Looks up a localized string similar to Invalid callback. Setup on method with parameters ({0}) cannot invoke callback with parameters ({1})..
 		/// </summary>
 		internal static string InvalidCallbackParameterMismatch {
