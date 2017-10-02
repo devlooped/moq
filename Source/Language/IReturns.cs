@@ -69,6 +69,25 @@ namespace Moq.Language
 		/// <summary>
 		/// Specifies a function that will calculate the value to return from the method.
 		/// </summary>
+		/// <typeparam name="TFuncDelegate">
+		/// The delegate type of which <paramref name="valueFunction"/> is an instance.
+		/// Its return type must match that of the set up method.
+		/// </typeparam>
+		/// <param name="valueFunction">The function that will calculate the return value.</param>
+		/// <example group="returns">
+		/// Return a calculated value when the method is called:
+		/// <code>
+		/// delegate bool ExecuteHandler(ref Command command);
+		///
+		/// mock.Setup(x => x.Execute(ref command))
+		///     .Returns&lt;ExecuteHandler&gt;((ref Command command) => command.IsExecutable);
+		/// </code>
+		/// </example>
+		IReturnsResult<TMock> Returns<TFuncDelegate>(TFuncDelegate valueFunction);
+
+		/// <summary>
+		/// Specifies a function that will calculate the value to return from the method.
+		/// </summary>
 		/// <param name="valueFunction">The function that will calculate the return value.</param>
 		/// <example group="returns">
 		/// Return a calculated value when the method is called:

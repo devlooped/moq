@@ -92,6 +92,23 @@ namespace Moq
 			return this.RaisesImpl(eventExpression, args);
 		}
 
+		public IReturnsResult<TMock> Returns<TFuncDelegate>(TFuncDelegate valueFunction)
+		{
+			if (valueFunction == null)
+			{
+				throw new ArgumentNullException(nameof(valueFunction));
+			}
+
+			var valueDelegate = valueFunction as Delegate;
+			if (valueDelegate == null || valueDelegate.GetMethodInfo().ReturnType == typeof(void))
+			{
+				throw new ArgumentException(Resources.InvalidReturnsCallbackNotADelegateWithReturnType, nameof(valueFunction));
+			}
+
+			SetReturnDelegate(valueDelegate);
+			return this;
+		}
+
 		public IReturnsResult<TMock> Returns(Func<TResult> valueExpression)
 		{
 			SetReturnDelegate(valueExpression);

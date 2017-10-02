@@ -207,6 +207,15 @@ namespace Moq.Properties {
 		}
 		
 		/// <summary>
+		///   Looks up a localized string similar to Invalid callback. This overload of the &quot;Returns&quot; method only accepts non-&quot;void&quot; (C#) or &quot;Function&quot; (VB.NET) delegates with parameter types matching those of the set up method..
+		/// </summary>
+		internal static string InvalidReturnsCallbackNotADelegateWithReturnType {
+			get {
+				return ResourceManager.GetString("InvalidReturnsCallbackNotADelegateWithReturnType", resourceCulture);
+			}
+		}
+
+		/// <summary>
 		///   Looks up a localized string similar to The equals (&quot;==&quot; or &quot;=&quot; in VB) and the conditional &apos;and&apos; (&quot;&amp;&amp;&quot; or &quot;AndAlso&quot; in VB) operators are the only ones supported in the query specification expression. Unsupported expression: {0}.
 		/// </summary>
 		internal static string LinqBinaryOperatorNotSupported {

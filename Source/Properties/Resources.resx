@@ -359,4 +359,7 @@ Expected invocation on the mock once, but was {4} times: {1}</value>
 	<data name="InvalidCallbackNotADelegateWithReturnTypeVoid" xml:space="preserve">
 		<value>Invalid callback. This overload of the "Callback" method only accepts "void" (C#) or "Sub" (VB.NET) delegates with parameter types matching those of the set up method.</value>
 	</data>
+	<data name="InvalidReturnsCallbackNotADelegateWithReturnType" xml:space="preserve">
+		<value>Invalid callback. This overload of the "Returns" method only accepts non-"void" (C#) or "Function" (VB.NET) delegates with parameter types matching those of the set up method.</value>
+	</data>
 </root>
