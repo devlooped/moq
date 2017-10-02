@@ -52,7 +52,7 @@ namespace Moq.Language
 		/// Configures the next call in the sequence to do nothing.
 		/// </summary>
 		/// <example>
-		/// The following code configures the first call to <c>Exuecute()</c>
+		/// The following code configures the first call to <c>Execute()</c>
 		/// to do nothing, and the second call to throw an exception.
 		/// <code>
 		/// mock.SetupSequence(m => m.Execute())
@@ -66,7 +66,7 @@ namespace Moq.Language
 		/// Configures the next call in the sequence to throw an exception.
 		/// </summary>
 		/// <example>
-		/// The following code configures the first call to <c>Exuecute()</c>
+		/// The following code configures the first call to <c>Execute()</c>
 		/// to do nothing, and the second call to throw an exception.
 		/// <code>
 		/// mock.SetupSequence(m => m.Execute())
@@ -81,7 +81,7 @@ namespace Moq.Language
 		/// Configures the next call in the sequence to throw an exception.
 		/// </summary>
 		/// <example>
-		/// The following code configures the first call to <c>Exuecute()</c>
+		/// The following code configures the first call to <c>Execute()</c>
 		/// to do nothing, and the second call to throw an exception.
 		/// <code>
 		/// mock.SetupSequence(m => m.Execute())
