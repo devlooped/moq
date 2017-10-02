@@ -4,6 +4,12 @@ All notable changes to this project will be documented in this file.
 
 The format is loosely based on [Keep a Changelog](http://keepachangelog.com/en/1.0.0/).
 
+## Unreleased
+
+#### Added
+
+* Support for sequential setup of `void` methods (@alexbestul, #451)
+
 
 ## 4.7.137 (2017-09-30)
 
