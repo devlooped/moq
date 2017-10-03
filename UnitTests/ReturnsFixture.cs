@@ -228,6 +228,99 @@ namespace Moq.Tests
 			Assert.Equal("Text", mock.Object.StringProperty);
 		}
 
+		[Fact]
+		public void ReturnsWithRefParameterReceivesArguments()
+		{
+			var input = "input";
+			var received = default(string);
+
+			var mock = new Mock<IFoo>();
+			mock.Setup(f => f.Execute(ref input))
+				.Returns(new ExecuteRHandler((ref string arg1) =>
+				{
+					received = arg1;
+					return default(string);
+				}));
+
+			mock.Object.Execute(ref input);
+			Assert.Equal("input", input);
+			Assert.Equal(input, received);
+		}
+
+		[Fact]
+		public void ReturnsWithRefParameterProducesReturnValue()
+		{
+			var input = default(string);
+
+			var mock = new Mock<IFoo>();
+			mock.Setup(f => f.Execute(ref input))
+				.Returns(new ExecuteRHandler((ref string arg1) =>
+				{
+					return "result";
+				}));
+
+			var returnValue = mock.Object.Execute(ref input);
+			Assert.Equal("result", returnValue);
+		}
+
+		[Fact]
+		public void ReturnsWithRefParameterCanModifyRefParameter()
+		{
+			var value = "input";
+
+			var mock = new Mock<IFoo>();
+			mock.Setup(f => f.Execute(ref value))
+				.Returns(new ExecuteRHandler((ref string arg1) =>
+				{
+					arg1 = "output";
+					return default(string);
+				}));
+
+			Assert.Equal("input", value);
+			mock.Object.Execute(ref value);
+			Assert.Equal("output", value);
+		}
+
+		[Fact]
+		public void ReturnsWithRefParameterCannotModifyNonRefParameter()
+		{
+			var _ = default(string);
+			var value = "input";
+
+			var mock = new Mock<IFoo>();
+			mock.Setup(f => f.Execute(ref _, value))
+				.Returns(new ExecuteRVHandler((ref string arg1, string arg2) =>
+				{
+					arg2 = "output";
+					return default(string);
+				}));
+
+			Assert.Equal("input", value);
+			mock.Object.Execute(ref _, value);
+			Assert.Equal("input", value);
+		}
+
+		[Fact]
+		public void Method_returning_a_Delegate_can_be_set_up_to_return_null()
+		{
+			var mock = new Mock<IFoo>();
+			mock.Setup(_ => _.ReturnDelegate()).Returns((Delegate)null);
+			Assert.Null(mock.Object.ReturnDelegate());
+		}
+
+		[Fact]
+		public void Setting_up_method_returning_a_Delegate_to_return_a_Delegate_does_not_invoke_that_Delegate()
+		{
+			Delegate expectedResult = new Func<Delegate>(() => null);
+			var mock = new Mock<IFoo>();
+			mock.Setup(_ => _.ReturnDelegate()).Returns(expectedResult);
+
+			var actualResult = mock.Object.ReturnDelegate();
+
+			Assert.NotNull(actualResult); // would be null if invoked
+			Assert.Same(expectedResult, actualResult); // should be returned by method as is
+		}
+
 		public interface IFoo
 		{
 			void Execute();
@@ -239,11 +332,20 @@ namespace Moq.Tests
 			string Execute(string arg1, string arg2, string arg3, string arg4, string arg5, string arg6);
 			string Execute(string arg1, string arg2, string arg3, string arg4, string arg5, string arg6, string arg7);
 			string Execute(string arg1, string arg2, string arg3, string arg4, string arg5, string arg6, string arg7, string arg8);
+
+			string Execute(ref string arg1);
+			string Execute(ref string arg1, string arg2);
+
 			bool ReturnBool();
 			IList<int> ReturnIntList();
+			Delegate ReturnDelegate();
 
 			int Value { get; set; }
 		}
+
+		public delegate string ExecuteRHandler(ref string arg1);
+		public delegate string ExecuteRVHandler(ref string arg1, string arg2);
+		public delegate Delegate ReturnDelegateHandler();
 
 		public class Foo
 		{
