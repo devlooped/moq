@@ -92,8 +92,17 @@ namespace Moq
 			return this.RaisesImpl(eventExpression, args);
 		}
 
-		public IReturnsResult<TMock> Returns<TFuncDelegate>(TFuncDelegate valueFunction)
+		public IReturnsResult<TMock> Returns(Delegate valueFunction)
 		{
+			// If `TResult` is `Delegate`, that is someone is setting up the return value of a method
+			// that returns a `Delegate`, then we have arrived here because C# picked the wrong overload:
+			// We don't want to invoke the passed delegate to get a return value; the passed delegate
+			// already is the return value.
+			if (typeof(TResult) == typeof(Delegate))
+			{
+				return this.Returns(() => (TResult)(object)valueFunction);
+			}
+
 			if (valueFunction == null)
 			{
 				throw new ArgumentNullException(nameof(valueFunction));
