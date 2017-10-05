@@ -40,6 +40,7 @@
 
 using Moq.Language;
 using Moq.Language.Flow;
+using Moq.Properties;
 using Moq.Proxy;
 using System;
 using System.Linq.Expressions;
@@ -91,6 +92,33 @@ namespace Moq
 			return this.RaisesImpl(eventExpression, args);
 		}
 
+		public IReturnsResult<TMock> Returns(Delegate valueFunction)
+		{
+			// If `TResult` is `Delegate`, that is someone is setting up the return value of a method
+			// that returns a `Delegate`, then we have arrived here because C# picked the wrong overload:
+			// We don't want to invoke the passed delegate to get a return value; the passed delegate
+			// already is the return value.
+			if (typeof(TResult) == typeof(Delegate))
+			{
+				return this.Returns(() => (TResult)(object)valueFunction);
+			}
+
+			// The following may seem overly cautious, but we don't throw an `ArgumentNullException`
+			// here because Moq has been very forgiving with incorrect `Returns` in the past.
+			if (valueFunction == null)
+			{
+				return this.Returns(() => default(TResult));
+			}
+
+			if (valueFunction.GetMethodInfo().ReturnType == typeof(void))
+			{
+				throw new ArgumentException(Resources.InvalidReturnsCallbackNotADelegateWithReturnType, nameof(valueFunction));
+			}
+
+			SetReturnDelegate(valueFunction);
+			return this;
+		}
+
 		public IReturnsResult<TMock> Returns(Func<TResult> valueExpression)
 		{
 			SetReturnDelegate(valueExpression);
@@ -106,6 +134,12 @@ namespace Moq
 		public IReturnsResult<TMock> CallBase()
 		{
 			this.returnValueKind = ReturnValueKind.CallBase;
+			return this;
+		}
+
+		IReturnsThrows<TMock, TResult> ICallback<TMock, TResult>.Callback(Delegate callback)
+		{
+			base.Callback(callback);
 			return this;
 		}
 

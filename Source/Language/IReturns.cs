@@ -68,6 +68,25 @@ namespace Moq.Language
 
 		/// <summary>
 		/// Specifies a function that will calculate the value to return from the method.
+		/// This overload specifically allows you to specify a function with by-ref parameters.
+		/// Those by-ref parameters can be assigned to (though you should probably do that from
+		/// a <c>Callback</c> instead).
+		/// </summary>
+		/// <param name="valueFunction">The function that will calculate the return value.</param>
+		/// <example group="returns">
+		/// Return a calculated value when the method is called:
+		/// <code>
+		/// delegate bool ExecuteFunc(ref Command command);
+		///
+		/// Command c = ...;
+		/// mock.Setup(x => x.Execute(ref c))
+		///     .Returns(new ExecuteFunc((ref Command command) => command.IsExecutable));
+		/// </code>
+		/// </example>
+		IReturnsResult<TMock> Returns(Delegate valueFunction);
+
+		/// <summary>
+		/// Specifies a function that will calculate the value to return from the method.
 		/// </summary>
 		/// <param name="valueFunction">The function that will calculate the return value.</param>
 		/// <example group="returns">

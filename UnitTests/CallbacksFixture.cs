@@ -418,6 +418,59 @@ namespace Moq.Tests
 			Assert.Equal("blah extended", receivedArgument);
 		}
 
+		[Fact]
+		public void CallbackWithRefParameterReceivesArguments()
+		{
+			var input = "input";
+			var received = default(string);
+
+			var mock = new Mock<IFoo>();
+			mock.Setup(f => f.Execute(ref input))
+				.Callback(new ExecuteRHandler((ref string arg1) =>
+				{
+					received = arg1;
+				}));
+
+			mock.Object.Execute(ref input);
+			Assert.Equal("input", input);
+			Assert.Equal(input, received);
+		}
+
+		[Fact]
+		public void CallbackWithRefParameterCanModifyRefParameter()
+		{
+			var value = "input";
+
+			var mock = new Mock<IFoo>();
+			mock.Setup(f => f.Execute(ref value))
+				.Callback(new ExecuteRHandler((ref string arg1) =>
+				{
+					arg1 = "output";
+				}));
+
+			Assert.Equal("input", value);
+			mock.Object.Execute(ref value);
+			Assert.Equal("output", value);
+		}
+
+		[Fact]
+		public void CallbackWithRefParameterCannotModifyNonRefParameter()
+		{
+			var _ = default(string);
+			var value = "input";
+
+			var mock = new Mock<IFoo>();
+			mock.Setup(f => f.Execute(ref _, value))
+				.Callback(new ExecuteRVHandler((ref string arg1, string arg2) =>
+				{
+					arg2 = "output";
+				}));
+
+			Assert.Equal("input", value);
+			mock.Object.Execute(ref _, value);
+			Assert.Equal("input", value);
+		}
+
 		public interface IInterface
 		{
 			void Method(Derived b);
@@ -455,8 +508,14 @@ namespace Moq.Tests
 			string Execute(string arg1, string arg2, string arg3, string arg4, string arg5, string arg6, string arg7);
 			string Execute(string arg1, string arg2, string arg3, string arg4, string arg5, string arg6, string arg7, string arg8);
 
+			string Execute(ref string arg1);
+			string Execute(ref string arg1, string arg2);
+
 			int Value { get; set; }
 		}
+
+		public delegate void ExecuteRHandler(ref string arg1);
+		public delegate void ExecuteRVHandler(ref string arg1, string arg2);
 	}
 
 	static class Extensions
