@@ -45,6 +45,24 @@ namespace Moq.Tests
 			Assert.Equal(calls, repeat);
 		}
 
+		[Fact]
+		[Obsolete]
+		public void CallsThatThrowExceptionStillCountAsCalls()
+		{
+			var mock = new Mock<IFoo>();
+			mock.Setup(f => f.Submit()).Throws<InvalidOperationException>().AtMostOnce();
+
+			var firstException = Record.Exception(() => mock.Object.Submit());
+			var secondException = Record.Exception(() => mock.Object.Submit());
+
+			// The first call should trigger the exception specified in the setup:
+			Assert.IsType<InvalidOperationException>(firstException);
+
+			// The second call should trigger a MockException since the max call count
+			// was exceeded:
+			Assert.IsType<MockException>(secondException);
+		}
+
 		public interface IFoo
 		{
 			int Value { get; set; }
