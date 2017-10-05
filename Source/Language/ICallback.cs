@@ -53,23 +53,21 @@ namespace Moq.Language
 		/// <summary>
 		/// Specifies a callback of any delegate type to invoke when the method is called.
 		/// This overload specifically allows you to define callbacks for methods with by-ref parameters.
+		/// By-ref parameters can be assigned to.
 		/// </summary>
-		/// <typeparam name="TActionDelegate">
-		/// Delegate type of which <paramref name="callback"/> is an instance.
-		/// Must have return type <c>void</c> (C#) or be a <c>Sub</c> (VB.NET).
-		/// </typeparam>
-		/// <param name="callback">The callback method to invoke.</param>
+		/// <param name="callback">The callback method to invoke. Must have return type <c>void</c> (C#) or be a <c>Sub</c> (VB.NET).</param>
 		/// <example>
 		/// Invokes the given callback with the concrete invocation argument value. You can modify
 		/// by-ref parameters inside the callback.
 		/// <code>
-		/// delegate void ExecuteHandler(ref Command command);
+		/// delegate void ExecuteAction(ref Command command);
 		///
-		/// mock.Setup(x => x.Execute(ref command))
-		///     .Callback&lt;ExecuteHandler&gt;((ref Command _) => Console.WriteLine("Executing command..."));
+		/// Command c = ...;
+		/// mock.Setup(x => x.Execute(ref c))
+		///     .Callback(new ExecuteAction((ref Command command) => Console.WriteLine("Executing command...")));
 		/// </code>
 		/// </example>
-		ICallbackResult Callback<TActionDelegate>(TActionDelegate callback);
+		ICallbackResult Callback(Delegate callback);
 
 		/// <summary>
 		/// Specifies a callback to invoke when the method is called.
@@ -117,23 +115,21 @@ namespace Moq.Language
 		/// <summary>
 		/// Specifies a callback of any delegate type to invoke when the method is called.
 		/// This overload specifically allows you to define callbacks for methods with by-ref parameters.
+		/// By-ref parameters can be assigned to.
 		/// </summary>
-		/// <typeparam name="TActionDelegate">
-		/// Delegate type of which <paramref name="callback"/> is an instance.
-		/// Must have return type <c>void</c> (C#) or be a <c>Sub</c> (VB.NET).
-		/// </typeparam>
-		/// <param name="callback">The callback method to invoke.</param>
+		/// <param name="callback">The callback method to invoke. Must have return type <c>void</c> (C#) or be a <c>Sub</c> (VB.NET).</param>
 		/// <example>
 		/// Invokes the given callback with the concrete invocation argument value. You can modify
 		/// by-ref parameters inside the callback.
 		/// <code>
-		/// delegate void ExecuteHandler(ref Command command);
+		/// delegate void ExecuteAction(ref Command command);
 		///
-		/// mock.Setup(x => x.Execute(ref command))
-		///     .Callback&lt;ExecuteHandler&gt;((ref Command _) => Console.WriteLine("Executing command..."));
+		/// Command c = ...;
+		/// mock.Setup(x => x.Execute(ref c))
+		///     .Callback(new ExecuteAction((ref Command command) => Console.WriteLine("Executing command...")));
 		/// </code>
 		/// </example>
-		IReturnsThrows<TMock, TResult> Callback<TActionDelegate>(TActionDelegate callback);
+		IReturnsThrows<TMock, TResult> Callback(Delegate callback);
 
 		/// <summary>
 		/// Specifies a callback to invoke when the method is called.
