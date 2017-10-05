@@ -11,6 +11,10 @@ The format is loosely based on [Keep a Changelog](http://keepachangelog.com/en/1
 
 * Support for sequential setup of `void` methods (@alexbestul, #463)
 
+#### Fixed
+
+* Update a method's invocation count correctly, even when it is set up to throw an exception (@stakx, #473)
+
 
 ## 4.7.137 (2017-09-30)
 
