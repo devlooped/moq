@@ -254,17 +254,6 @@ namespace Moq
 		public virtual void Execute(ICallContext call)
 		{
 			this.Invoked = true;
-
-			if (setupCallback != null)
-			{
-				setupCallback(call.Arguments);
-			}
-
-			if (thrownException != null)
-			{
-				throw thrownException;
-			}
-
 			this.CallCount++;
 
 			if (expectedMaxCallCount.HasValue && this.CallCount > expectedMaxCallCount)
@@ -281,6 +270,16 @@ namespace Moq
 						MockException.ExceptionReason.MoreThanNCalls,
 						Times.AtMost(expectedMaxCallCount.Value).GetExceptionMessage(FailMessage, SetupExpression.ToStringFixed(), this.CallCount));
 				}
+			}
+
+			if (setupCallback != null)
+			{
+				setupCallback(call.Arguments);
+			}
+
+			if (thrownException != null)
+			{
+				throw thrownException;
 			}
 
 			if (this.mockEvent != null)
