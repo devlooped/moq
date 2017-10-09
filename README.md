@@ -73,7 +73,7 @@ Read about the announcement at [kzu's blog](http://blogs.clariusconsulting.net/k
 
 Moq was originally developed by [Clarius](http://www.clariusconsulting.net), [Manas](http://www.manas.com.ar) and [InSTEDD](http://www.instedd.org).
 
-Moq uses [Castle DynamicProxy](http://www.castleproject.org/projects/dynamicproxy/) internally as the interception mechanism to enable mocking. It's merged into Moq binaries, so you don't need to do anything other than referencing Moq.dll, though.
+Moq uses [Castle DynamicProxy](http://www.castleproject.org/projects/dynamicproxy/) internally as the interception mechanism to enable mocking.
 
 ## Features at a glance
 Moq offers the following features:
