@@ -1603,8 +1603,7 @@ namespace Moq.Tests.Regressions
 
 		public class Issue469
 		{
-			[Fact(Skip =
-				"Temporarily disabled due to a regression in Castle Core, see https://github.com/castleproject/Core/issues/309.")]
+			[Fact]
 			public void Mock_Object_should_be_able_to_mock_interface_with_overloaded_generic_methods_with_generic_parameters()
 			{
 				object dummy = new Mock<IHaveOverloadedGenericMethod>().Object;
