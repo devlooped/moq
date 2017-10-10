@@ -5,6 +5,17 @@ All notable changes to this project will be documented in this file.
 The format is loosely based on [Keep a Changelog](http://keepachangelog.com/en/1.0.0/).
 
 
+## Unreleased
+
+#### Changed
+
+* Update package reference to `Castle.Core` (DynamicProxy) from version 4.2.0 to 4.2.1 due to a regression; see castleproject/Core#309 for details (@stakx, #482)
+
+#### Fixed
+
+* `TypeLoadException`s ("Method does not have an implementation") caused by the regression above, see e.g. #469 (@stakx, #482)
+
+
 ## 4.7.137 (2017-09-30)
 
 #### Changed
