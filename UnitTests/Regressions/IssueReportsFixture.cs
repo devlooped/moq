@@ -1599,6 +1599,37 @@ namespace Moq.Tests.Regressions
 
 		#endregion
 
+		#region 469
+
+		public class Issue469
+		{
+			[Fact]
+			public void Mock_Object_should_be_able_to_mock_interface_with_overloaded_generic_methods_with_generic_parameters()
+			{
+				object dummy = new Mock<IHaveOverloadedGenericMethod>().Object;
+			}
+
+			public interface IHaveOverloadedGenericMethod
+			{
+				void GenericMethod<T>(GenericClass1<T> a);
+				void GenericMethod<T>(GenericClass2<T> a);
+			}
+
+			public abstract class BaseType<T>
+			{
+			}
+
+			public class GenericClass1<T> : BaseType<T>
+			{
+			}
+
+			public class GenericClass2<T> : BaseType<T>
+			{
+			}
+		}
+
+		#endregion
+
 		// Old @ Google Code
 
 		#region #47
