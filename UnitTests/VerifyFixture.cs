@@ -3,6 +3,7 @@ using Moq;
 using Xunit;
 
 using System.Threading.Tasks;
+using System.Text;
 
 namespace Moq.Tests
 {
@@ -67,7 +68,7 @@ namespace Moq.Tests
 
 			mock.Verify();
 		}
-
+		
 		[Fact]
 		public void ThrowsIfVerifyAllNotMet()
 		{
@@ -104,6 +105,95 @@ namespace Moq.Tests
 
 			var mex = Assert.Throws<MockException>(() => mock.Verify(f => f.Execute("ping")));
 			Assert.Equal(MockException.ExceptionReason.VerificationFailed, mex.Reason);
+		}
+
+		[Fact]
+		public void ThrowsWithExpressionIfVerifiableTimesOnceNotCalled()
+		{
+			var mock = new Mock<IFoo>();
+
+			mock.Setup(x => x.Execute(It.Is<string>(s => string.IsNullOrEmpty(s))))
+				.Returns("ack")
+				.Verifiable(Times.Once());
+
+			var mex = Assert.Throws<MockVerificationException>(() => mock.Verify());
+			Assert.Equal(MockException.ExceptionReason.VerificationFailed, mex.Reason);
+			Assert.Contains(@".Execute(It.Is<String>(s => String.IsNullOrEmpty(s)))", mex.Message);
+		}
+
+		[Fact]
+		public void ThrowsWithExpressionIfVerifiableTimesOnceCalledMore()
+		{
+			var mock = new Mock<IFoo>();
+
+			mock.Setup(x => x.Execute(It.Is<string>(s => string.IsNullOrEmpty(s))))
+				.Returns("ack")
+				.Verifiable(Times.Once());
+
+			mock.Object.Execute("");
+			mock.Object.Execute("");
+
+			var mex = Assert.Throws<MockVerificationException>(() => mock.Verify());
+			Assert.Equal(MockException.ExceptionReason.VerificationFailed, mex.Reason);
+			Assert.Contains(@".Execute(It.Is<String>(s => String.IsNullOrEmpty(s)))", mex.Message);
+		}
+
+		[Fact]
+		public void VerifiesIfVerifiableTimesOnceCalledOnce()
+		{
+			var mock = new Mock<IFoo>();
+
+			mock.Setup(x => x.Execute(It.Is<string>(s => string.IsNullOrEmpty(s))))
+				.Returns("ack")
+				.Verifiable(Times.Once());
+
+			mock.Object.Execute("");
+
+			mock.Verify();
+		}
+
+		[Fact]
+		public void ThrowsWithExpressionIfVerifiableTimesNeverCalled()
+		{
+			var mock = new Mock<IFoo>();
+
+			mock.Setup(x => x.Execute(It.Is<string>(s => string.IsNullOrEmpty(s))))
+				.Returns("ack")
+				.Verifiable(Times.Never());
+
+			mock.Object.Execute("");
+
+			var mex = Assert.Throws<MockVerificationException>(() => mock.Verify());
+			Assert.Equal(MockException.ExceptionReason.VerificationFailed, mex.Reason);
+			Assert.Contains(@".Execute(It.Is<String>(s => String.IsNullOrEmpty(s)))", mex.Message);
+		}
+
+		[Fact]
+		public void VerifiesIfVerifiableTimesNeverNotCalled()
+		{
+			var mock = new Mock<IFoo>();
+
+			mock.Setup(x => x.Execute(It.Is<string>(s => string.IsNullOrEmpty(s))))
+				.Returns("ack")
+				.Verifiable(Times.Never());
+
+			mock.Verify();
+		}
+
+		[Fact]
+		public void ThrowsWithExpressionAndMessageIfVerifiableTimesNeverCalled()
+		{
+			var mock = new Mock<IFoo>();
+
+			mock.Setup(x => x.Execute(It.Is<string>(s => string.IsNullOrEmpty(s))))
+				.Returns("ack")
+				.Verifiable(Times.Never(), "Should never be called");
+
+			mock.Object.Execute("");
+
+			var mex = Assert.Throws<MockVerificationException>(() => mock.Verify());
+			Assert.Equal(MockException.ExceptionReason.VerificationFailed, mex.Reason);
+			Assert.Contains("Should never be called", mex.Message);
 		}
 
 		[Fact]
@@ -979,6 +1069,67 @@ namespace Moq.Tests
 				mock.Object.Submit();
 				mock.Verify(foo => foo.Submit());
 			});
+		}
+
+		[Fact]
+		public void CannotPostVerifyCallsByExpressionForModifiedReferenceTypeArgument()
+		{
+			// Any reference type
+			var sb = new StringBuilder();
+			sb.Append("call 1");
+
+			var mock = new Mock<IFoo>();
+
+			var rtm = new ReferenceTypeModifier(mock.Object);
+			rtm.Work(sb);
+
+			mock.Verify(m => m.Save(It.IsAny<StringBuilder>()), Times.Exactly(2)); // Pass
+			mock.Verify(m => m.Save(It.Is<StringBuilder>(s => s.ToString() == "call 2"))); // Pass
+
+			var mex = Assert.Throws<MockException>(() => mock.Verify(m => m.Save(It.Is<StringBuilder>(s => s.ToString() == "call 1")))); // Fail due to reference change
+			Assert.Equal(MockException.ExceptionReason.VerificationFailed, mex.Reason);
+			Assert.Contains(@".Save(It.Is<StringBuilder>(s => s.ToString() == ""call 1""))", mex.Message);
+		}
+
+		[Fact]
+		public void CanPreVerifyExactCallsByExpressionForModifiedReferenceTypeArgument()
+		{
+			// Any reference type
+			var sb = new StringBuilder();
+			sb.Append("call 1");
+
+			var mock = new Mock<IFoo>();
+			mock.Setup(m => m.Save(It.Is<StringBuilder>(s => s.ToString() == "call 1")))
+				.Verifiable(Times.Once());
+			mock.Setup(m => m.Save(It.Is<StringBuilder>(s => s.ToString() == "call 2")))
+				.Verifiable(Times.Once());
+			mock.Setup(m => m.Save(It.Is<StringBuilder>(s => s.ToString() != "call 1" && s.ToString() != "call 2")))
+				.Verifiable(Times.Never());
+
+			var rtm = new ReferenceTypeModifier(mock.Object);
+			rtm.Work(sb);
+
+			mock.Verify();
+		}
+
+		public class ReferenceTypeModifier
+		{
+			private readonly IFoo _dep;
+
+			public ReferenceTypeModifier(IFoo dep)
+			{
+				_dep = dep;
+			}
+
+			public void Work(StringBuilder sb)
+			{
+				_dep.Save(sb);
+
+				sb.Clear();
+				sb.Append("call 2");
+
+				_dep.Save(sb);
+			}
 		}
 
 		public interface IBar

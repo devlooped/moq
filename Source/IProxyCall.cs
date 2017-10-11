@@ -50,7 +50,7 @@ namespace Moq
 		bool IsConditional { get; }
 		string FailMessage { get; set; }
 		bool Invoked { get; set; }
-		bool IsVerifiable { get; set; }
+		Times? VerifiableTimes { get; set; }
 		Expression SetupExpression { get; }
 		MethodInfo Method { get; }
 		void EvaluatedSuccessfully();
