@@ -15,7 +15,7 @@ The most popular and friendly mocking framework for .NET
   mock.Setup(framework => framework.DownloadExists("2.0.0.0"))
       .Returns(true);
 
-  // Hand mock.Object as a collaborator and exercise it, 
+  // Use mock.Object as a collaborator and exercise it, 
   // like calling methods on it...
   ILoveThisFramework lovable = mock.Object;
   bool download = lovable.DownloadExists("2.0.0.0");
@@ -30,7 +30,7 @@ Moq also is the first and only framework so far to provide Linq to Mocks, so tha
   ILoveThisFramework lovable = Mock.Of<ILoveThisFramework>(l =>
     l.DownloadExists("2.0.0.0") == true);
 
-  // Hand the instance as a collaborator and exercise it, 
+  // Use the instance as a collaborator and exercise it, 
   // like calling methods on it...
   bool download = lovable.DownloadExists("2.0.0.0");
 
