@@ -38,7 +38,7 @@
 	</ItemGroup>
 
 	<ItemGroup>
-		<Compile Remove="Pex\**\*.cs;Properties\**\*.cs" />
+		<Compile Remove="Properties\**\*.cs" />
 	</ItemGroup>
 
 	<ItemGroup>
