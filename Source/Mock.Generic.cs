@@ -187,35 +187,32 @@ namespace Moq
 
 		private void InitializeInstance()
 		{
-			PexProtector.Invoke(() =>
+			if (this.IsDelegateMock)
 			{
-				if (this.IsDelegateMock)
-				{
-					// We're mocking a delegate.
-					// Firstly, get/create an interface with a method whose signature
-					// matches that of the delegate.
-					var delegateInterfaceType = Mock.ProxyFactory.GetDelegateProxyInterface(typeof(T), out delegateInterfaceMethod);
+				// We're mocking a delegate.
+				// Firstly, get/create an interface with a method whose signature
+				// matches that of the delegate.
+				var delegateInterfaceType = Mock.ProxyFactory.GetDelegateProxyInterface(typeof(T), out delegateInterfaceMethod);
 
-					// Then create a proxy for that.
-					var delegateProxy = Mock.ProxyFactory.CreateProxy(
-						delegateInterfaceType,
-						this.Interceptor,
-						this.ImplementedInterfaces.ToArray(),
-						this.constructorArguments);
+				// Then create a proxy for that.
+				var delegateProxy = Mock.ProxyFactory.CreateProxy(
+					delegateInterfaceType,
+					this.Interceptor,
+					this.ImplementedInterfaces.ToArray(),
+					this.constructorArguments);
 
-					// Then our instance is a delegate of the desired type, pointing at the
-					// appropriate method on that proxied interface instance.
-					this.instance = (T)(object)delegateInterfaceMethod.CreateDelegate(typeof(T), delegateProxy);
-				}
-				else
-				{
-					this.instance = (T)Mock.ProxyFactory.CreateProxy(
-						typeof(T),
-						this.Interceptor,
-						this.ImplementedInterfaces.Skip(this.InternallyImplementedInterfaceCount - 1).ToArray(),
-						this.constructorArguments);
-				}
-			});
+				// Then our instance is a delegate of the desired type, pointing at the
+				// appropriate method on that proxied interface instance.
+				this.instance = (T)(object)delegateInterfaceMethod.CreateDelegate(typeof(T), delegateProxy);
+			}
+			else
+			{
+				this.instance = (T)Mock.ProxyFactory.CreateProxy(
+					typeof(T),
+					this.Interceptor,
+					this.ImplementedInterfaces.Skip(this.InternallyImplementedInterfaceCount - 1).ToArray(),
+					this.constructorArguments);
+			}
 		}
 
 		private MethodInfo delegateInterfaceMethod;

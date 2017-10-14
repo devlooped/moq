@@ -429,22 +429,19 @@ namespace Moq
 		internal static MethodCall<T> Setup<T>(Mock<T> mock, Expression<Action<T>> expression, Condition condition)
 			where T : class
 		{
-			return PexProtector.Invoke(() =>
-			{
-				var methodCall = expression.GetCallInfo(mock);
-				var method = methodCall.Method;
-				var args = methodCall.Arguments.ToArray();
+			var methodCall = expression.GetCallInfo(mock);
+			var method = methodCall.Method;
+			var args = methodCall.Arguments.ToArray();
 
-				ThrowIfSetupExpressionInvolvesUnsupportedMember(expression, method);
-				ThrowIfSetupMethodNotVisibleToProxyFactory(method);
-				var call = new MethodCall<T>(mock, condition, expression, method, args);
+			ThrowIfSetupExpressionInvolvesUnsupportedMember(expression, method);
+			ThrowIfSetupMethodNotVisibleToProxyFactory(method);
+			var call = new MethodCall<T>(mock, condition, expression, method, args);
 
-				var targetInterceptor = GetInterceptor(methodCall.Object, mock);
+			var targetInterceptor = GetInterceptor(methodCall.Object, mock);
 
-				targetInterceptor.AddCall(call, SetupKind.Other);
+			targetInterceptor.AddCall(call, SetupKind.Other);
 
-				return call;
-			});
+			return call;
 		}
 
 		internal static MethodCallReturn<T, TResult> Setup<T, TResult>(
@@ -453,27 +450,24 @@ namespace Moq
 			Condition condition)
 			where T : class
 		{
-			return PexProtector.Invoke(() =>
+			if (expression.IsProperty())
 			{
-				if (expression.IsProperty())
-				{
-					return SetupGet(mock, expression, condition);
-				}
+				return SetupGet(mock, expression, condition);
+			}
 
-				var methodCall = expression.GetCallInfo(mock);
-				var method = methodCall.Method;
-				var args = methodCall.Arguments.ToArray();
+			var methodCall = expression.GetCallInfo(mock);
+			var method = methodCall.Method;
+			var args = methodCall.Arguments.ToArray();
 
-				ThrowIfSetupExpressionInvolvesUnsupportedMember(expression, method);
-				ThrowIfSetupMethodNotVisibleToProxyFactory(method);
-				var call = new MethodCallReturn<T, TResult>(mock, condition, expression, method, args);
+			ThrowIfSetupExpressionInvolvesUnsupportedMember(expression, method);
+			ThrowIfSetupMethodNotVisibleToProxyFactory(method);
+			var call = new MethodCallReturn<T, TResult>(mock, condition, expression, method, args);
 
-				var targetInterceptor = GetInterceptor(methodCall.Object, mock);
+			var targetInterceptor = GetInterceptor(methodCall.Object, mock);
 
-				targetInterceptor.AddCall(call, SetupKind.Other);
+			targetInterceptor.AddCall(call, SetupKind.Other);
 
-				return call;
-			});
+			return call;
 		}
 
 		internal static MethodCallReturn<T, TProperty> SetupGet<T, TProperty>(
@@ -482,29 +476,26 @@ namespace Moq
 			Condition condition)
 			where T : class
 		{
-			return PexProtector.Invoke(() =>
+			if (expression.IsPropertyIndexer())
 			{
-				if (expression.IsPropertyIndexer())
-				{
-					// Treat indexers as regular method invocations.
-					return Setup<T, TProperty>(mock, expression, condition);
-				}
+				// Treat indexers as regular method invocations.
+				return Setup<T, TProperty>(mock, expression, condition);
+			}
 
-				var prop = expression.ToPropertyInfo();
-				ThrowIfPropertyNotReadable(prop);
+			var prop = expression.ToPropertyInfo();
+			ThrowIfPropertyNotReadable(prop);
 
-				var propGet = prop.GetGetMethod(true);
-				ThrowIfSetupExpressionInvolvesUnsupportedMember(expression, propGet);
-				ThrowIfSetupMethodNotVisibleToProxyFactory(propGet);
+			var propGet = prop.GetGetMethod(true);
+			ThrowIfSetupExpressionInvolvesUnsupportedMember(expression, propGet);
+			ThrowIfSetupMethodNotVisibleToProxyFactory(propGet);
 
-				var call = new MethodCallReturn<T, TProperty>(mock, condition, expression, propGet, new Expression[0]);
-				// Directly casting to MemberExpression is fine as ToPropertyInfo would throw if it wasn't
-				var targetInterceptor = GetInterceptor(((MemberExpression)expression.Body).Expression, mock);
+			var call = new MethodCallReturn<T, TProperty>(mock, condition, expression, propGet, new Expression[0]);
+			// Directly casting to MemberExpression is fine as ToPropertyInfo would throw if it wasn't
+			var targetInterceptor = GetInterceptor(((MemberExpression)expression.Body).Expression, mock);
 
-				targetInterceptor.AddCall(call, SetupKind.Other);
+			targetInterceptor.AddCall(call, SetupKind.Other);
 
-				return call;
-			});
+			return call;
 		}
 
 		internal static SetterMethodCall<T, TProperty> SetupSet<T, TProperty>(
@@ -513,35 +504,29 @@ namespace Moq
 			Condition condition)
 			where T : class
 		{
-			return PexProtector.Invoke(() =>
-			{
-				return SetupSetImpl<T, SetterMethodCall<T, TProperty>>(
-					mock,
-					setterExpression,
-					(m, expr, method, value) =>
-					{
-						var call = new SetterMethodCall<T, TProperty>(m, condition, expr, method, value[0]);
-						m.Interceptor.AddCall(call, SetupKind.PropertySet);
-						return call;
-					});
-			});
+			return SetupSetImpl<T, SetterMethodCall<T, TProperty>>(
+				mock,
+				setterExpression,
+				(m, expr, method, value) =>
+				{
+					var call = new SetterMethodCall<T, TProperty>(m, condition, expr, method, value[0]);
+					m.Interceptor.AddCall(call, SetupKind.PropertySet);
+					return call;
+				});
 		}
 
 		internal static MethodCall<T> SetupSet<T>(Mock<T> mock, Action<T> setterExpression, Condition condition)
 			where T : class
 		{
-			return PexProtector.Invoke(() =>
-			{
-				return SetupSetImpl<T, MethodCall<T>>(
-					mock,
-					setterExpression,
-					(m, expr, method, values) =>
-					{
-						var call = new MethodCall<T>(m, condition, expr, method, values);
-						m.Interceptor.AddCall(call, SetupKind.PropertySet);
-						return call;
-					});
-			});
+			return SetupSetImpl<T, MethodCall<T>>(
+				mock,
+				setterExpression,
+				(m, expr, method, values) =>
+				{
+					var call = new MethodCall<T>(m, condition, expr, method, values);
+					m.Interceptor.AddCall(call, SetupKind.PropertySet);
+					return call;
+				});
 		}
 
 		internal static SetterMethodCall<T, TProperty> SetupSet<T, TProperty>(
@@ -669,11 +654,8 @@ namespace Moq
 
 		internal static void SetupAllProperties(Mock mock)
 		{
-			PexProtector.Invoke(() =>
-			{
-				var mockedTypesStack = new Stack<Type>();
-				SetupAllProperties(mock, mockedTypesStack);
-			});
+			var mockedTypesStack = new Stack<Type>();
+			SetupAllProperties(mock, mockedTypesStack);
 		}
 
 		private static void SetupAllProperties(Mock mock, Stack<Type> mockedTypesStack)
