@@ -1,7 +1,7 @@
 ﻿<Project Sdk="Microsoft.NET.Sdk">
 
 	<PropertyGroup>
-		<TargetFrameworks>net452;netcoreapp1.0</TargetFrameworks>
+		<TargetFrameworks>net46;netcoreapp2.0</TargetFrameworks>
 		<AssemblyName>Moq.Tests</AssemblyName>
 		<AssemblyOriginatorKeyFile>../Moq.snk</AssemblyOriginatorKeyFile>
 		<DebugSymbols>True</DebugSymbols>
@@ -11,28 +11,28 @@
 		<SignAssembly>true</SignAssembly>
 	</PropertyGroup>
 
-	<PropertyGroup Condition=" '$(TargetFramework)' == 'net452' ">
+	<PropertyGroup Condition=" '$(TargetFramework)' == 'net46' ">
 		<DefineConstants>$(DefineConstants);DESKTOP;FEATURE_CAS;FEATURE_CODEDOM;FEATURE_COM;FEATURE_SERIALIZATION</DefineConstants>
 	</PropertyGroup>
-	<PropertyGroup Condition=" '$(TargetFramework)' == 'netcoreapp1.0' ">
+	<PropertyGroup Condition=" '$(TargetFramework)' == 'netcoreapp2.0' ">
 		<DefineConstants>$(DefineConstants);NETCORE</DefineConstants>
 	</PropertyGroup>
 
 	<ItemGroup>
 		<PackageReference Include="Castle.Core" Version="4.2.1" />
 		<PackageReference Include="Microsoft.NET.Test.Sdk" Version="15.0.0" />
-		<PackageReference Include="xunit" Version="2.3.0-beta3-build3705" />
-		<PackageReference Include="xunit.runner.visualstudio" Version="2.3.0-beta3-build3705" />
+		<PackageReference Include="xunit" Version="2.3.0" />
+		<PackageReference Include="xunit.runner.visualstudio" Version="2.3.0" />
 		<ProjectReference Include="..\Source\Moq.csproj" />
 		<ProjectReference Include="Library\ClassLibrary1\ClassLibrary1.csproj" />
 		<ProjectReference Include="Library\ClassLibrary2\ClassLibrary2.csproj" />
-		<DotNetCliToolReference Include="dotnet-xunit" Version="2.3.0-beta3-build3705" />
+		<DotNetCliToolReference Include="dotnet-xunit" Version="2.3.0" />
 	</ItemGroup>
-	<ItemGroup Condition=" '$(TargetFramework)' == 'net452' ">
+	<ItemGroup Condition=" '$(TargetFramework)' == 'net46' ">
 		<Reference Include="System.Web" />
 		<Reference Include="System.Windows.Forms" />
 	</ItemGroup>
-	<ItemGroup Condition=" '$(TargetFramework)' == 'netstandard1.3' ">
+	<ItemGroup Condition=" '$(TargetFramework)' == 'netcoreapp2.0' ">
 		<PackageReference Include="System.Collections.Specialized" Version="4.3.0" />
 		<PackageReference Include="System.ComponentModel.Primitives" Version="4.3.0" />
 		<PackageReference Include="System.Diagnostics.TraceSource" Version="4.3.0" />

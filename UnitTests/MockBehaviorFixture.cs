@@ -47,7 +47,7 @@ namespace Moq.Tests
 			var mock = new Mock<IFoo>(MockBehavior.Loose);
 
 			Assert.NotNull(mock.Object.GetArray());
-			Assert.Equal(0, mock.Object.GetArray().Length);
+			Assert.Empty(mock.Object.GetArray());
 		}
 
 		[Fact]
@@ -56,7 +56,7 @@ namespace Moq.Tests
 			var mock = new Mock<IFoo>(MockBehavior.Loose);
 
 			Assert.NotNull(mock.Object.GetArrayTwoDimensions());
-			Assert.Equal(0, mock.Object.GetArrayTwoDimensions().Length);
+			Assert.Empty(mock.Object.GetArrayTwoDimensions());
 		}
 
 		[Fact]
@@ -73,7 +73,7 @@ namespace Moq.Tests
 			var mock = new Mock<IFoo>(MockBehavior.Loose);
 
 			Assert.NotNull(mock.Object.GetEnumerable());
-			Assert.Equal(0, mock.Object.GetEnumerable().Count());
+			Assert.Empty(mock.Object.GetEnumerable());
 		}
 
 		[Fact]
@@ -82,7 +82,7 @@ namespace Moq.Tests
 			var mock = new Mock<IFoo>(MockBehavior.Loose);
 
 			Assert.NotNull(mock.Object.GetEnumerableObjects());
-			Assert.Equal(0, mock.Object.GetEnumerableObjects().Cast<object>().Count());
+			Assert.Empty(mock.Object.GetEnumerableObjects().Cast<object>());
 		}
 
 		[Fact]
@@ -140,7 +140,7 @@ namespace Moq.Tests
 			var mock = new Mock<IFoo>(MockBehavior.Loose) { DefaultValue = DefaultValue.Mock };
 
 			Assert.NotNull(mock.Object.GetArray());
-			Assert.Equal(0, mock.Object.GetArray().Length);
+			Assert.Empty(mock.Object.GetArray());
 		}
 
 		[Fact]
@@ -149,7 +149,7 @@ namespace Moq.Tests
 			var mock = new Mock<IFoo>(MockBehavior.Loose) { DefaultValue = DefaultValue.Mock };
 
 			Assert.NotNull(mock.Object.GetArrayTwoDimensions());
-			Assert.Equal(0, mock.Object.GetArrayTwoDimensions().Length);
+			Assert.Empty(mock.Object.GetArrayTwoDimensions());
 		}
 
 		[Fact]
@@ -172,7 +172,7 @@ namespace Moq.Tests
 			var mock = new Mock<IFoo>(MockBehavior.Loose) { DefaultValue = DefaultValue.Mock };
 
 			Assert.NotNull(mock.Object.GetEnumerable());
-			Assert.Equal(0, mock.Object.GetEnumerable().Count());
+			Assert.Empty(mock.Object.GetEnumerable());
 		}
 
 		[Fact]
@@ -190,7 +190,7 @@ namespace Moq.Tests
 			var mock = new Mock<IFoo>(MockBehavior.Loose) { DefaultValue = DefaultValue.Mock };
 
 			Assert.NotNull(mock.Object.GetEnumerableObjects());
-			Assert.Equal(0, mock.Object.GetEnumerableObjects().Cast<object>().Count());
+			Assert.Empty(mock.Object.GetEnumerableObjects().Cast<object>());
 		}
 
 		[Fact]
