@@ -16,11 +16,11 @@ Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Solution Items", "Solution 
 EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Moq", "Source\Moq.csproj", "{1C91AC30-5977-4BE5-BA67-8EB186C03514}"
 EndProject
-Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Moq.Tests", "UnitTests\Moq.Tests.csproj", "{81BBC911-4916-4E10-A955-752AE47CB2B9}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Moq.Tests", "Moq.Tests\Moq.Tests.csproj", "{81BBC911-4916-4E10-A955-752AE47CB2B9}"
 EndProject
-Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "ClassLibrary1", "UnitTests\Library\ClassLibrary1\ClassLibrary1.csproj", "{A417D76E-32C9-45B7-81C7-299032CE8E77}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "ClassLibrary1", "Moq.Tests\Library\ClassLibrary1\ClassLibrary1.csproj", "{A417D76E-32C9-45B7-81C7-299032CE8E77}"
 EndProject
-Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "ClassLibrary2", "UnitTests\Library\ClassLibrary2\ClassLibrary2.csproj", "{D1099DEF-1A3F-4F94-A871-449DAAB2D890}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "ClassLibrary2", "Moq.Tests\Library\ClassLibrary2\ClassLibrary2.csproj", "{D1099DEF-1A3F-4F94-A871-449DAAB2D890}"
 EndProject
 Project("{F184B08F-C81C-45F6-A57F-5ABD9991F28F}") = "Moq.Tests.VisualBasic", "Moq.Tests.VisualBasic\Moq.Tests.VisualBasic.vbproj", "{840A8B2E-3D4B-4521-A61A-0291562CDC8B}"
 EndProject

@@ -47,7 +47,11 @@
 		<MakeDir Directories="$(Out)" Condition=" !Exists('$(Out)') " />
 
 		<Exec Command="dotnet xunit -nobuild -configuration $(Configuration) -noshadow -appveyor -html ..\$(Out)\test.html -xml ..\$(Out)\test.xml"
-		      WorkingDirectory="UnitTests"
+		      WorkingDirectory="Moq.Tests"
+			  ContinueOnError="false" />
+
+		<Exec Command="dotnet xunit -nobuild -configuration $(Configuration) -noshadow -appveyor -html ..\$(Out)\test-vb.html -xml ..\$(Out)\test-vb.xml"
+		      WorkingDirectory="Moq.Tests.VisualBasic"
 			  ContinueOnError="false" />
 
 		<PropertyGroup>
