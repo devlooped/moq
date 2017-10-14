@@ -22,16 +22,12 @@
 		<MSBuild Projects="@(Solution)" Properties="$(CommonBuildProperties)" Targets="Clean" />
 		<Exec Command="rmdir $(Out) /S /Q" ContinueOnError="true" />
 		<Exec Command="rmdir $(PackagesPath) /S /Q" ContinueOnError="true" />
-		<Exec Command="rmdir src\packages /S /Q" ContinueOnError="true" />
 	</Target>
 
 	<Target Name="Rebuild" DependsOnTargets="Clean;Build" />
 	
 	<Target Name="Build" DependsOnTargets="GitVersion">
 		<MSBuild Projects="@(Solution)" Properties="$(CommonBuildProperties)" />
-
-		<Exec Command="xcopy &quot;Source\bin\$(Configuration)\net45\Moq.*&quot; &quot;$(DropDirectory)lib\net45\&quot; /Y" ContinueOnError="false" />
-		<Exec Command="xcopy &quot;Source\bin\$(Configuration)\netstandard1.3\Moq.*&quot; &quot;$(DropDirectory)lib\netstandard1.3\&quot; /Y" ContinueOnError="false" />
 	</Target>
 
 	<Target Name="Test" DependsOnTargets="Build">
