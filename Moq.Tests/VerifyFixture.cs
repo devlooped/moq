@@ -981,6 +981,22 @@ namespace Moq.Tests
 			});
 		}
 
+		[Fact]
+		public void CanVerifyMethodThatIsNamedLikeEventAddAccessor()
+		{
+			var mock = new Mock<IHaveMethodsNamedLikeEventAccessors>();
+			mock.Object.add_Something();
+			mock.Verify(m => m.add_Something(), Times.Once);
+		}
+
+		[Fact]
+		public void CanVerifyMethodThatIsNamedLikeEventRemoveAccessor()
+		{
+			var mock = new Mock<IHaveMethodsNamedLikeEventAccessors>();
+			mock.Object.remove_Something();
+			mock.Verify(m => m.remove_Something(), Times.Once);
+		}
+
 		public interface IBar
 		{
 			int? Value { get; set; }
@@ -1018,6 +1034,12 @@ namespace Moq.Tests
 		public interface IArrays
 		{
 			void Method(string[] strings);
+		}
+
+		public interface IHaveMethodsNamedLikeEventAccessors
+		{
+			void add_Something();
+			void remove_Something();
 		}
 	}
 }
