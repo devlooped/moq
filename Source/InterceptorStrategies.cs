@@ -255,9 +255,6 @@ namespace Moq
 							return InterceptionAction.Stop;
 						}
 					}
-
-					// wasn't an event attach accessor after all
-					return InterceptionAction.Continue;
 				}
 				else if (invocation.Method.LooksLikeEventDetach())
 				{
@@ -279,9 +276,6 @@ namespace Moq
 							return InterceptionAction.Stop;
 						}
 					}
-
-					// wasn't an event detach accessor after all
-					return InterceptionAction.Continue;
 				}
 
 				// Save to support Verify[expression] pattern.
