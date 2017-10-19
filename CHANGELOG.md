@@ -13,11 +13,15 @@ The format is loosely based on [Keep a Changelog](http://keepachangelog.com/en/1
 * Support for sequential setups (`SetupSequence`) of protected members (@stakx, #493)
 * Support for callbacks for methods having `ref` or `out` parameters via two new overloads of `Callback` and `Returns` (@stakx, #468)
 
+#### Changed
+
+* **Breaking change:** `SetupSequence` now overrides pre-existing setups like all other `Setup` methods do. This means that exhausted sequences no longer fall back to previous setups to produce a "default" action or return value. (@stakx, #476)
+
 #### Fixed
 
 * Update a method's invocation count correctly, even when it is set up to throw an exception (@stakx, #473)
+* Sequences set up with `SetupSequence` are now thread-safe (@stakx, #476)
 * Record calls to methods that are named like event accessors (`add_X`, `remove_X`) so they can be verified (@stakx, #488)
-
 
 ## 4.7.142 (2017-10-11)
 
