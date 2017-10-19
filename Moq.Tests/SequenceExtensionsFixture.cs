@@ -89,7 +89,7 @@ namespace Moq.Tests
 		}
 
 		[Fact]
-		public void When_sequence_exhausted_and_there_was_a_previous_setup_return_value_is_determined_by_that_one()
+		public void Setting_up_a_sequence_overrides_any_preexisting_setup()
 		{
 			const string valueFromPreviousSetup = "value from previous setup";
 
@@ -102,8 +102,9 @@ namespace Moq.Tests
 			// Act: ask sequence for value when it is exhausted
 			var actual = mock.Object.Value;
 
-			// Assert: should have got the value configured by the previous setup
-			Assert.Equal(valueFromPreviousSetup, actual);
+			// Assert: should have got the default value, not the one configured by the overridden setup
+			Assert.Equal(default(string), actual);
+			Assert.NotEqual(valueFromPreviousSetup, actual);
 		}
 
 		[Fact]
