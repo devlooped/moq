@@ -66,7 +66,7 @@ namespace Moq
 			CallBase,
 		}
 
-		private Delegate valueDel = (Func<TResult>)(() => default(TResult));
+		private Delegate valueDel;
 		private Action<object[]> afterReturnCallback;
 		private ReturnValueKind returnValueKind;
 
@@ -157,15 +157,7 @@ namespace Moq
 
 		private void SetReturnDelegate(Delegate value)
 		{
-			if (value == null)
-			{
-				this.valueDel = (Func<TResult>)(() => default(TResult));
-			}
-			else
-			{
-				this.valueDel = value;
-			}
-
+			this.valueDel = value;
 			this.returnValueKind = ReturnValueKind.Explicit;
 		}
 
@@ -201,11 +193,15 @@ namespace Moq
 			{
 				call.InvokeBase();
 			}
-			else
+			else if (this.valueDel != null)
 			{
 				call.ReturnValue = this.valueDel.HasCompatibleParameterList(new ParameterInfo[0])
 					? valueDel.InvokePreserveStack()                //we need this, for the user to be able to use parameterless methods
 					: valueDel.InvokePreserveStack(call.Arguments); //will throw if parameters mismatch
+			}
+			else
+			{
+				call.ReturnValue = default(TResult);
 			}
 
 			this.afterReturnCallback?.Invoke(call.Arguments);

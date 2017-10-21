@@ -46,24 +46,17 @@ namespace Moq
 {
 	internal interface IProxyCall
 	{
-		int CallCount { get; }
 		bool IsConditional { get; }
 		string FailMessage { get; set; }
-		bool Invoked { get; set; }
-		bool IsVerifiable { get; set; }
+		bool Invoked { get; }
+		bool IsVerifiable { get; }
 		Expression SetupExpression { get; }
 		MethodInfo Method { get; }
+
 		void EvaluatedSuccessfully();
-
-		bool Matches(ICallContext call);
 		void Execute(ICallContext call);
-		void SetOutParameters(ICallContext call);
-
-		// Where the setup was performed.
-		string FileName { get; }
-		int FileLine { get; }
-		MethodBase TestMethod { get; }
-
 		string Format();
+		bool Matches(ICallContext call);
+		void SetOutParameters(ICallContext call);
 	}
 }
