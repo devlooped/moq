@@ -44,6 +44,8 @@ using System.Globalization;
 using System.Linq;
 using System.Linq.Expressions;
 using System.Reflection;
+
+using Moq.Language;
 using Moq.Language.Flow;
 using Moq.Properties;
 
@@ -121,6 +123,47 @@ namespace Moq.Protected
 			property.ThrowIfNoSetter();
 
 			return Mock.SetupSet<T, TProperty>(mock, GetSetterExpression(property, ItExpr.IsAny<TProperty>()), null);
+		}
+
+		public ISetupSequentialAction SetupSequence(string methodOrPropertyName, params object[] args)
+		{
+			return this.SetupSequence(methodOrPropertyName, false, args);
+		}
+
+		public ISetupSequentialAction SetupSequence(string methodOrPropertyName, bool exactParameterMatch, params object[] args)
+		{
+			Guard.NotNullOrEmpty(methodOrPropertyName, nameof(methodOrPropertyName));
+
+			var method = GetMethod(methodOrPropertyName, exactParameterMatch, args);
+			ThrowIfMemberMissing(methodOrPropertyName, method);
+			ThrowIfPublicMethod(method, typeof(T).Name);
+
+			return new SetupSequentialActionContext<T>(mock, GetMethodCall(method, args));
+		}
+
+		public ISetupSequentialResult<TResult> SetupSequence<TResult>(string methodOrPropertyName, params object[] args)
+		{
+			return this.SetupSequence<TResult>(methodOrPropertyName, false, args);
+		}
+
+		public ISetupSequentialResult<TResult> SetupSequence<TResult>(string methodOrPropertyName, bool exactParameterMatch, params object[] args)
+		{
+			Guard.NotNullOrEmpty(methodOrPropertyName, nameof(methodOrPropertyName));
+
+			var property = GetProperty(methodOrPropertyName);
+			if (property != null)
+			{
+				ThrowIfPublicGetter(property, typeof(T).Name);
+				// TODO should consider property indexers
+				return new SetupSequentialContext<T, TResult>(mock, GetMemberAccess<TResult>(property));
+			}
+
+			var method = GetMethod(methodOrPropertyName, exactParameterMatch, args);
+			ThrowIfMemberMissing(methodOrPropertyName, method);
+			ThrowIfVoidMethod(method);
+			ThrowIfPublicMethod(method, typeof(T).Name);
+
+			return new SetupSequentialContext<T, TResult>(mock, GetMethodCall<TResult>(method, args));
 		}
 
 		#endregion

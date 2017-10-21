@@ -39,6 +39,8 @@
 // http://www.opensource.org/licenses/bsd-license.php]
 
 using System.Diagnostics.CodeAnalysis;
+
+using Moq.Language;
 using Moq.Language.Flow;
 
 namespace Moq.Protected
@@ -100,6 +102,42 @@ namespace Moq.Protected
 		/// remember to use <see cref="ItExpr"/> rather than <see cref="It"/>.</param>
 		/// <typeparam name="TProperty">The type of the property.</typeparam>
 		ISetupSetter<TMock, TProperty> SetupSet<TProperty>(string propertyName, object value);
+
+		/// <summary>
+		/// Performs a sequence of actions, one per call.
+		/// </summary>
+		/// <param name="methodOrPropertyName">Name of the method or property being set up.</param>
+		/// <param name="args">The optional arguments for the invocation. If argument matchers are used,
+		/// remember to use <see cref="ItExpr"/> rather than <see cref="It"/>.</param>
+		ISetupSequentialAction SetupSequence(string methodOrPropertyName, params object[] args);
+
+		/// <summary>
+		/// Performs a sequence of actions, one per call.
+		/// </summary>
+		/// <param name="methodOrPropertyName">Name of the method or property being set up.</param>
+		/// <param name="exactParameterMatch">Determines whether the parameter types should exactly match the types provided.</param>
+		/// <param name="args">The optional arguments for the invocation. If argument matchers are used,
+		/// remember to use <see cref="ItExpr"/> rather than <see cref="It"/>.</param>
+		ISetupSequentialAction SetupSequence(string methodOrPropertyName, bool exactParameterMatch, params object[] args);
+
+		/// <summary>
+		/// Return a sequence of values, once per call.
+		/// </summary>
+		/// <param name="methodOrPropertyName">Name of the method or property being set up.</param>
+		/// <param name="args">The optional arguments for the invocation. If argument matchers are used,
+		/// remember to use <see cref="ItExpr"/> rather than <see cref="It"/>.</param>
+		/// <typeparam name="TResult">Return type of the method or property being set up.</typeparam>
+		ISetupSequentialResult<TResult> SetupSequence<TResult>(string methodOrPropertyName, params object[] args);
+
+		/// <summary>
+		/// Return a sequence of values, once per call.
+		/// </summary>
+		/// <param name="methodOrPropertyName">Name of the method or property being set up.</param>
+		/// <param name="exactParameterMatch">Determines whether the parameter types should exactly match the types provided.</param>
+		/// <param name="args">The optional arguments for the invocation. If argument matchers are used,
+		/// remember to use <see cref="ItExpr"/> rather than <see cref="It"/>.</param>
+		/// <typeparam name="TResult">Return type of the method or property being set up.</typeparam>
+		ISetupSequentialResult<TResult> SetupSequence<TResult>(string methodOrPropertyName, bool exactParameterMatch, params object[] args);
 
 		#endregion
 
