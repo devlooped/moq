@@ -205,13 +205,19 @@ namespace Moq
 		}
 	}
 
-	internal class HandleDestructor : IInterceptStrategy
+	internal class HandleFinalizer : IInterceptStrategy
 	{
-		public static HandleDestructor Instance { get; } = new HandleDestructor();
+		public static HandleFinalizer Instance { get; } = new HandleFinalizer();
 
 		public InterceptionAction HandleIntercept(ICallContext invocation, InterceptorContext ctx)
 		{
-			return invocation.Method.IsDestructor() ? InterceptionAction.Stop : InterceptionAction.Continue;
+			return IsFinalizer(invocation.Method) ? InterceptionAction.Stop : InterceptionAction.Continue;
+		}
+
+		private static bool IsFinalizer(MethodInfo method)
+		{
+			return method.Name == "Finalize"
+			    && method.GetBaseDefinition() == typeof(object).GetMethod("Finalize", BindingFlags.NonPublic | BindingFlags.Instance);
 		}
 	}
 
