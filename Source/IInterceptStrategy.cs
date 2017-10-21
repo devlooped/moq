@@ -20,10 +20,8 @@ namespace Moq
 		/// </summary>
 		/// <param name="invocation">the current invocation context</param>
 		/// <param name="ctx">shared data for the interceptor as a whole</param>
-		/// <param name="localCtx">shared data among the strategies during a single interception</param>
 		/// <returns>InterceptionAction.Continue if further interception has to be processed, otherwise InterceptionAction.Stop</returns>
-		InterceptionAction HandleIntercept(ICallContext invocation, InterceptorContext ctx, CurrentInterceptContext localCtx);
-		
+		InterceptionAction HandleIntercept(ICallContext invocation, InterceptorContext ctx);
 	}
 
 	internal class InterceptorContext
@@ -150,10 +148,5 @@ namespace Moq
 		}
 		#endregion
 
-	}
-	
-	internal class CurrentInterceptContext
-	{
-		public IProxyCall Call {get; set; }
 	}
 }
