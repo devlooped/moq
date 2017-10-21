@@ -81,19 +81,6 @@ namespace Moq
 		}
 	}
 
-	internal class TypeEqualityComparer : IEqualityComparer<Type>
-	{
-		public bool Equals(Type x, Type y)
-		{
-			return y.IsAssignableFrom(x);
-		}
-
-		public int GetHashCode(Type obj)
-		{
-			return obj.GetHashCode();
-		}
-	}
-
 	internal partial class MethodCall : IProxyCall, ICallbackResult, IVerifies, IThrowsResult
 	{
 		// Internal for AsMockExtensions
@@ -107,7 +94,6 @@ namespace Moq
 		private int? expectedMaxCallCount;
 		protected Condition condition;
 		private List<KeyValuePair<int, object>> outValues = new List<KeyValuePair<int, object>>();
-		private static readonly IEqualityComparer<Type> typesComparer = new TypeEqualityComparer();
 
 		public MethodCall(Mock mock, Condition condition, Expression originalExpression, MethodInfo method, params Expression[] arguments)
 		{
@@ -394,7 +380,7 @@ namespace Moq
 					return false;
 				}
 
-				if (Method.IsGenericMethod && !call.Method.GetGenericArguments().SequenceEqual(Method.GetGenericArguments(), typesComparer))
+				if (Method.IsGenericMethod && !call.Method.GetGenericArguments().SequenceEqual(Method.GetGenericArguments(), AssignmentCompatibilityTypeComparer.Instance))
 				{
 					return false;
 				}
@@ -478,34 +464,18 @@ namespace Moq
 
 			return builder.ToString();
 		}
-	}
 
-	internal class Condition
-	{
-		private readonly Func<bool> condition;
-		private readonly Action success;
-
-		public Condition(Func<bool> condition, Action success = null)
+		private sealed class AssignmentCompatibilityTypeComparer : IEqualityComparer<Type>
 		{
-			this.condition = condition;
-			this.success = success;
-		}
+			public static AssignmentCompatibilityTypeComparer Instance { get; } = new AssignmentCompatibilityTypeComparer();
 
-		public bool IsTrue
-		{
-			get
+			public bool Equals(Type x, Type y)
 			{
-				if (condition != null)
-					return condition();
-				else
-					return false;
+				return y.IsAssignableFrom(x);
 			}
-		}
 
-		public void EvaluatedSuccessfully()
-		{
-			if (success != null)
-				success();
+			int IEqualityComparer<Type>.GetHashCode(Type obj) => throw new NotSupportedException();
 		}
 	}
+
 }
