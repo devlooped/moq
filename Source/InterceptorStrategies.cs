@@ -154,22 +154,29 @@ namespace Moq
 		{
 			var method = invocation.Method;
 
+			if (!IsObjectMethod(method))
+			{
+				return InterceptionAction.Continue;
+			}
+
+			var orderedCalls = ctx.OrderedCalls;
+
 			// Only if there is no corresponding setup for `ToString()`
-			if (IsObjectMethod(method, "ToString") && !ctx.OrderedCalls.Any(c => IsObjectMethod(c.Method, "ToString")))
+			if (method.Name == "ToString" && !orderedCalls.Any(c => IsObjectMethod(c.Method, "ToString")))
 			{
 				invocation.ReturnValue = ctx.Mock.ToString() + ".Object";
 				return InterceptionAction.Stop;
 			}
 
 			// Only if there is no corresponding setup for `GetHashCode()`
-			if (IsObjectMethod(method, "GetHashCode") && !ctx.OrderedCalls.Any(c => IsObjectMethod(c.Method, "GetHashCode")))
+			if (method.Name == "GetHashCode" && !orderedCalls.Any(c => IsObjectMethod(c.Method, "GetHashCode")))
 			{
 				invocation.ReturnValue = ctx.Mock.GetHashCode();
 				return InterceptionAction.Stop;
 			}
 
 			// Only if there is no corresponding setup for `Equals()`
-			if (IsObjectMethod(method, "Equals") && !ctx.OrderedCalls.Any(c => IsObjectMethod(c.Method, "Equals")))
+			if (method.Name == "Equals" && !orderedCalls.Any(c => IsObjectMethod(c.Method, "Equals")))
 			{
 				invocation.ReturnValue = ReferenceEquals(invocation.Arguments.First(), ctx.Mock.Object);
 				return InterceptionAction.Stop;
@@ -178,10 +185,9 @@ namespace Moq
 			return InterceptionAction.Continue;
 		}
 
-		private static bool IsObjectMethod(MethodInfo method, string name)
-		{
-			return method.DeclaringType == typeof(object) && method.Name == name;
-		}
+		private static bool IsObjectMethod(MethodInfo method) => method.DeclaringType == typeof(object);
+
+		private static bool IsObjectMethod(MethodInfo method, string name) => IsObjectMethod(method) && method.Name == name;
 	}
 
 	internal class HandleTracking : IInterceptStrategy
