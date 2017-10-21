@@ -39,37 +39,67 @@
 // http://www.opensource.org/licenses/bsd-license.php]
 
 using System;
-using System.Threading.Tasks;
 
-using Moq.Language;
-
-namespace Moq
+namespace Moq.Language.Flow
 {
-	/// <summary>
-	/// Helper for sequencing return values in the same method.
-	/// </summary>
-	public static partial class SequenceExtensions
+	// keeping the fluent API separate from `SequenceMethodCall` saves us from having to
+	// define a generic variant `SequenceMethodCallReturn<TResult>`, which would be much more
+	// work that having a generic fluent API counterpart `SequenceMethodCall<TResult>`.
+	internal sealed class SetupSequencePhrase : ISetupSequentialAction
 	{
-		/// <summary>
-		/// Return a sequence of tasks, once per call.
-		/// </summary>
-		public static ISetupSequentialResult<Task<TResult>> ReturnsAsync<TResult>(this ISetupSequentialResult<Task<TResult>> setup, TResult value)
-		{
-			var tcs = new TaskCompletionSource<TResult>();
-			tcs.SetResult(value);
+		private SequenceMethodCall setup;
 
-			return setup.Returns(tcs.Task);
+		public SetupSequencePhrase(SequenceMethodCall setup)
+		{
+			this.setup = setup;
 		}
 
-		/// <summary>
-		/// Throws a sequence of exceptions, once per call.
-		/// </summary>
-		public static ISetupSequentialResult<Task<TResult>> ThrowsAsync<TResult>(this ISetupSequentialResult<Task<TResult>> setup, Exception exception)
+		public ISetupSequentialAction Pass()
 		{
-			var tcs = new TaskCompletionSource<TResult>();
-			tcs.SetException(exception);
-
-			return setup.Returns(tcs.Task);
+			this.setup.AddPass();
+			return this;
 		}
+
+		public ISetupSequentialAction Throws<TException>()
+			where TException : Exception, new()
+			=> this.Throws(new TException());
+
+		public ISetupSequentialAction Throws(Exception exception)
+		{
+			this.setup.AddThrows(exception);
+			return this;
+		}
+	}
+
+	internal sealed class SetupSequencePhrase<TResult> : ISetupSequentialResult<TResult>
+	{
+		private SequenceMethodCall setup;
+
+		public SetupSequencePhrase(SequenceMethodCall setup)
+		{
+			this.setup = setup;
+		}
+
+		public ISetupSequentialResult<TResult> CallBase()
+		{
+			this.setup.AddCallBase();
+			return this;
+		}
+
+		public ISetupSequentialResult<TResult> Returns(TResult value)
+		{
+			this.setup.AddReturns(value);
+			return this;
+		}
+
+		public ISetupSequentialResult<TResult> Throws(Exception exception)
+		{
+			this.setup.AddThrows(exception);
+			return this;
+		}
+
+		public ISetupSequentialResult<TResult> Throws<TException>()
+			where TException : Exception, new()
+			=> this.Throws(new TException());
 	}
 }

@@ -1630,6 +1630,60 @@ namespace Moq.Tests.Regressions
 
 		#endregion
 
+		#region 467
+
+		public class Issue467
+		{
+			public interface ITest
+			{
+				int Method();
+			}
+
+			[Fact]
+			public async Task SetupSequence_is_thread_safe_ie_concurrent_invocations_dont_observe_same_response()
+			{
+				const int length = 20;
+
+				var m = new Mock<ITest>();
+
+				// Setups the mock to return a sequence of results.
+				var seqSetup = m.SetupSequence(x => x.Method());
+				for (int i = 1; i <= length; i++)
+				{
+					seqSetup = seqSetup.Returns(i);
+				}
+
+				// Queue to store the invocations of the mock.
+				var invocationsQueue = new System.Collections.Concurrent.ConcurrentQueue<int>();
+
+				// We will invoke the mock from two different tasks.
+				var t1 = Task.Run(() => RegisterInvocations(m, invocationsQueue));
+				var t2 = Task.Run(() => RegisterInvocations(m, invocationsQueue));
+				await Task.WhenAll(t1, t2);
+
+				var orderedInvocations = invocationsQueue.OrderBy(x => x).ToArray();
+
+				// The assertion prints the real invocations, you will see duplicates there!
+				Assert.Equal(Enumerable.Range(1, length).ToArray(), orderedInvocations);
+			}
+
+			// Calls the mock until it returns default(int)
+			private static void RegisterInvocations(IMock<ITest> m, System.Collections.Concurrent.ConcurrentQueue<int> invocationsQueue)
+			{
+				int result;
+				do
+				{
+					result = m.Object.Method();
+					if (result != default(int))
+					{
+						invocationsQueue.Enqueue(result);
+					}
+				} while (result != default(int));
+			}
+		}
+
+		#endregion
+
 		// Old @ Google Code
 
 		#region #47

@@ -38,10 +38,8 @@
 //[This is the BSD license, see
 // http://www.opensource.org/licenses/bsd-license.php]
 
-using System.Collections.Concurrent;
-using Moq.Properties;
-using Moq.Proxy;
 using System;
+using System.Collections.Concurrent;
 using System.Collections.Generic;
 using System.Diagnostics.CodeAnalysis;
 using System.Globalization;
@@ -49,6 +47,10 @@ using System.Linq;
 using System.Linq.Expressions;
 using System.Reflection;
 using System.Runtime.CompilerServices;
+
+using Moq.Language.Flow;
+using Moq.Properties;
+using Moq.Proxy;
 
 namespace Moq
 {
@@ -665,6 +667,41 @@ namespace Moq
 
 			// Add a cast if values do not match exactly (i.e. for Nullable<T>)
 			return Expression.Convert(Expression.Constant(value), type);
+		}
+
+		internal static SetupSequencePhrase<TResult> SetupSequence<TResult>(Mock mock, LambdaExpression expression)
+		{
+			if (expression.IsProperty())
+			{
+				var prop = expression.ToPropertyInfo();
+				ThrowIfPropertyNotReadable(prop);
+
+				var propGet = prop.GetGetMethod(true);
+				ThrowIfSetupExpressionInvolvesUnsupportedMember(expression, propGet);
+				ThrowIfSetupMethodNotVisibleToProxyFactory(propGet);
+
+				var setup = new SequenceMethodCall(mock, expression, propGet, new Expression[0]);
+				var targetInterceptor = GetInterceptor(((MemberExpression)expression.Body).Expression, mock);
+				targetInterceptor.AddCall(setup, SetupKind.Other);
+				return new SetupSequencePhrase<TResult>(setup);
+			}
+			else
+			{
+				var methodCall = expression.GetCallInfo(mock);
+				var targetInterceptor = GetInterceptor(methodCall.Object, mock);
+				var setup = new SequenceMethodCall(mock, expression, methodCall.Method, methodCall.Arguments.ToArray());
+				targetInterceptor.AddCall(setup, SetupKind.Other);
+				return new SetupSequencePhrase<TResult>(setup);
+			}
+		}
+
+		internal static SetupSequencePhrase SetupSequence(Mock mock, LambdaExpression expression)
+		{
+			var methodCall = expression.GetCallInfo(mock);
+			var targetInterceptor = GetInterceptor(methodCall.Object, mock);
+			var setup = new SequenceMethodCall(mock, expression, methodCall.Method, methodCall.Arguments.ToArray());
+			targetInterceptor.AddCall(setup, SetupKind.Other);
+			return new SetupSequencePhrase(setup);
 		}
 
 		internal static void SetupAllProperties(Mock mock)

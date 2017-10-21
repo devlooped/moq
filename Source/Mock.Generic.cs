@@ -315,6 +315,24 @@ namespace Moq
 			return this;
 		}
 
+		/// <summary>
+		/// Return a sequence of values, once per call.
+		/// </summary>
+		[SuppressMessage("Microsoft.Design", "CA1006:DoNotNestGenericTypesInMemberSignatures", Justification = "By Design")]
+		public ISetupSequentialResult<TResult> SetupSequence<TResult>(Expression<Func<T, TResult>> expression)
+		{
+			return Mock.SetupSequence<TResult>(this, expression);
+		}
+
+		/// <summary>
+		/// Performs a sequence of actions, one per call.
+		/// </summary>
+		[SuppressMessage("Microsoft.Design", "CA1006:DoNotNestGenericTypesInMemberSignatures", Justification = "By Design")]
+		public ISetupSequentialAction SetupSequence(Expression<Action<T>> expression)
+		{
+			return Mock.SetupSequence(this, expression);
+		}
+
 #endregion
 
 #region When

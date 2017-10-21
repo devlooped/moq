@@ -88,6 +88,71 @@ namespace Moq.Tests
 			Assert.Throws<InvalidOperationException>(() => mock.Object.Do());
 		}
 
+		[Fact]
+		public void Setting_up_a_sequence_overrides_any_preexisting_setup()
+		{
+			const string valueFromPreviousSetup = "value from previous setup";
+
+			// Arrange: set up a sequence as the second setup and consume it
+			var mock = new Mock<IFoo>();
+			mock.Setup(m => m.Value).Returns(valueFromPreviousSetup);
+			mock.SetupSequence(m => m.Value).Returns("1");
+			var _ = mock.Object.Value;
+
+			// Act: ask sequence for value when it is exhausted
+			var actual = mock.Object.Value;
+
+			// Assert: should have got the default value, not the one configured by the overridden setup
+			Assert.Equal(default(string), actual);
+			Assert.NotEqual(valueFromPreviousSetup, actual);
+		}
+
+		[Fact]
+		public void When_sequence_exhausted_and_there_was_no_previous_setup_return_value_is_default()
+		{
+			// Arrange: set up a sequence as the only setup and consume it
+			var mock = new Mock<IFoo>();
+			mock.SetupSequence(m => m.Value)
+				.Returns("1");
+			var _ = mock.Object.Value;
+
+			// Act: ask sequence for value when it is exhausted
+			string actual = mock.Object.Value;
+
+			// Assert: should have got the default value
+			Assert.Equal(default(string), actual);
+		}
+
+		[Fact]
+		public void When_sequence_overexhausted_and_new_responses_are_configured_those_are_used_on_next_invocation()
+		{
+			// Arrange: set up a sequence and overexhaust it, then set up more responses
+			var mock = new Mock<IFoo>();
+			var sequenceSetup = mock.SetupSequence(m => m.Value).Returns("1"); // configure 1st response
+			var _ = mock.Object.Value; // 1st invocation
+			_ = mock.Object.Value; // 2nd invocation
+			sequenceSetup.Returns("2"); // configure 2nd response
+			sequenceSetup.Returns("3"); // configure 3nd response
+
+			// Act: 3rd invocation. will we get back the 2nd configured response, or the 3rd (since we're on the 3rd invocation)?
+			string actual = mock.Object.Value;
+
+			// Assert: no configured response should be skipped, therefore we should get the 2nd one
+			Assert.Equal("2", actual);
+		}
+
+		[Fact]
+		public void Verify_can_verify_invocation_count_for_sequences()
+		{
+			var mock = new Mock<IFoo>();
+			mock.SetupSequence(m => m.Do());
+
+			mock.Object.Do();
+			mock.Object.Do();
+
+			mock.Verify(m => m.Do(), Times.Exactly(2));
+		}
+
 		public interface IFoo
 		{
 			string Value { get; set; }
