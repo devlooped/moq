@@ -259,31 +259,5 @@ namespace Moq
 			public MethodInfo Method { get; set; }
 			public IEnumerable<Expression> Arguments { get; set; }
 		}
-
-		internal sealed class RemoveMatcherConvertVisitor : ExpressionVisitor
-		{
-			public RemoveMatcherConvertVisitor(Expression expression)
-			{
-				this.Expression = this.Visit(expression);
-			}
-
-			protected override Expression VisitUnary(UnaryExpression expression)
-			{
-				if (expression != null)
-				{
-					if (expression.NodeType == ExpressionType.Convert &&
-						expression.Operand.NodeType == ExpressionType.Call &&
-						typeof(Match).IsAssignableFrom(((MethodCallExpression)expression.Operand).Method.ReturnType))
-					{
-						// Remove the cast.
-						return expression.Operand;
-					}
-				}
-
-				return base.VisitUnary(expression);
-			}
-
-			public Expression Expression { get; private set; }
-		}
 	}
 }

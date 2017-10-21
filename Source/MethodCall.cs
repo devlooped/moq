@@ -81,42 +81,36 @@ namespace Moq
 		}
 	}
 
-	internal class TypeEqualityComparer : IEqualityComparer<Type>
-	{
-		public bool Equals(Type x, Type y)
-		{
-			return y.IsAssignableFrom(x);
-		}
-
-		public int GetHashCode(Type obj)
-		{
-			return obj.GetHashCode();
-		}
-	}
-
 	internal partial class MethodCall : IProxyCall, ICallbackResult, IVerifies, IThrowsResult
 	{
-		// Internal for AsMockExtensions
-		private Expression originalExpression;
-		private Exception thrownException;
-		private Action<object[]> setupCallback;
-		private List<IMatcher> argumentMatchers = new List<IMatcher>();
-		private EventInfo mockEvent;
-		private Delegate mockEventArgsFunc;
-		private object[] mockEventArgsParams;
+		private List<IMatcher> argumentMatchers;
+		private Action<object[]> callbackResponse;
+		private int callCount;
+		private Condition condition;
 		private int? expectedMaxCallCount;
-		protected Condition condition;
-		private List<KeyValuePair<int, object>> outValues = new List<KeyValuePair<int, object>>();
-		private static readonly IEqualityComparer<Type> typesComparer = new TypeEqualityComparer();
+		private string failMessage;
+		private MethodInfo method;
+		private Mock mock;
+#if !NETCORE
+		private string originalCallerFilePath;
+		private int originalCallerLineNumber;
+		private MethodBase originalCallerMember;
+#endif
+		private Expression originalExpression;
+		private List<KeyValuePair<int, object>> outValues;
+		private RaiseEventResponse raiseEventResponse;
+		private Exception throwExceptionResponse;
+		private bool verifiable;
 
 		public MethodCall(Mock mock, Condition condition, Expression originalExpression, MethodInfo method, params Expression[] arguments)
 		{
-			this.Mock = mock;
+			this.mock = mock;
 			this.condition = condition;
 			this.originalExpression = originalExpression;
-			this.Method = method;
+			this.method = method;
 
 			var parameters = method.GetParameters();
+			this.argumentMatchers = new List<IMatcher>(capacity: parameters.Length);
 			for (int index = 0; index < parameters.Length; index++)
 			{
 				var parameter = parameters[index];
@@ -127,6 +121,11 @@ namespace Moq
 					if (constant == null)
 					{
 						throw new NotSupportedException(Resources.OutExpressionMustBeConstantValue);
+					}
+
+					if (outValues == null)
+					{
+						outValues = new List<KeyValuePair<int, object>>();
 					}
 
 					outValues.Add(new KeyValuePair<int, object>(index, constant.Value));
@@ -151,39 +150,29 @@ namespace Moq
 			this.SetFileInfo();
 		}
 
-		public string FailMessage { get; set; }
-
-		public bool IsConditional
+		public string FailMessage
 		{
-			get { return condition != null; }
+			get => this.failMessage;
+			set => this.failMessage = value;
 		}
 
-		public bool IsVerifiable { get; set; }
+		bool IProxyCall.IsConditional => this.condition != null;
 
-		public bool Invoked { get; set; }
+		bool IProxyCall.IsVerifiable => this.verifiable;
 
-		// Where the setup was performed.
-		public MethodInfo Method { get; private set; }
-		public string FileName { get; private set; }
-		public int FileLine { get; private set; }
-		public MethodBase TestMethod { get; private set; }
+		bool IProxyCall.Invoked => this.callCount > 0;
 
-		public Expression SetupExpression
-		{
-			get { return this.originalExpression; }
-		}
+		MethodInfo IProxyCall.Method => this.method;
 
-		public int CallCount { get; private set; }
-
-		protected internal Mock Mock { get; private set; }
+		Expression IProxyCall.SetupExpression => this.originalExpression;
 
 		[Conditional("DESKTOP")]
 		[SuppressMessage("Microsoft.Design", "CA1031:DoNotCatchGeneralExceptionTypes")]
 		private void SetFileInfo()
 		{
+#if !NETCORE
 			try
 			{
-#if !NETCORE
 				var thisMethod = MethodBase.GetCurrentMethod();
 				var mockAssembly = Assembly.GetExecutingAssembly();
 				// Move 'till we're at the entry point into Moq API
@@ -195,24 +184,27 @@ namespace Moq
 
 				if (frame != null)
 				{
-					this.FileLine = frame.GetFileLineNumber();
-					this.FileName = Path.GetFileName(frame.GetFileName());
-					this.TestMethod = frame.GetMethod();
+					this.originalCallerLineNumber = frame.GetFileLineNumber();
+					this.originalCallerFilePath = Path.GetFileName(frame.GetFileName());
+					this.originalCallerMember = frame.GetMethod();
 				}
-#endif
 			}
 			catch
 			{
 				// Must NEVER fail, as this is a nice-to-have feature only.
 			}
+#endif
 		}
 
 		public void SetOutParameters(ICallContext call)
 		{
+			if (this.outValues == null)
+			{
+				return;
+			}
+
 			foreach (var item in this.outValues)
 			{
-				// it's already evaluated here
-				// TODO: refactor so that we 
 				call.SetArgumentValue(item.Key, item.Value);
 			}
 		}
@@ -253,67 +245,44 @@ namespace Moq
 
 		public virtual void Execute(ICallContext call)
 		{
-			this.Invoked = true;
-			this.CallCount++;
+			++this.callCount;
 
-			if (expectedMaxCallCount.HasValue && this.CallCount > expectedMaxCallCount)
+			if (expectedMaxCallCount.HasValue && this.callCount > expectedMaxCallCount)
 			{
 				if (expectedMaxCallCount == 1)
 				{
 					throw new MockException(
 						MockException.ExceptionReason.MoreThanOneCall,
-						Times.AtMostOnce().GetExceptionMessage(FailMessage, SetupExpression.ToStringFixed(), this.CallCount));
+						Times.AtMostOnce().GetExceptionMessage(this.failMessage, this.originalExpression.ToStringFixed(), this.callCount));
 				}
 				else
 				{
 					throw new MockException(
 						MockException.ExceptionReason.MoreThanNCalls,
-						Times.AtMost(expectedMaxCallCount.Value).GetExceptionMessage(FailMessage, SetupExpression.ToStringFixed(), this.CallCount));
+						Times.AtMost(expectedMaxCallCount.Value).GetExceptionMessage(this.failMessage, this.originalExpression.ToStringFixed(), this.callCount));
 				}
 			}
 
-			if (setupCallback != null)
-			{
-				setupCallback(call.Arguments);
-			}
+			this.callbackResponse?.Invoke(call.Arguments);
 
-			if (thrownException != null)
-			{
-				throw thrownException;
-			}
+			this.raiseEventResponse?.RespondTo(call);
 
-			if (this.mockEvent != null)
+			if (this.throwExceptionResponse != null)
 			{
-				if (mockEventArgsParams != null)
-				{
-					this.Mock.DoRaise(this.mockEvent, mockEventArgsParams);
-				}
-				else
-				{
-					var argsFuncType = mockEventArgsFunc.GetType();
-					if (argsFuncType.GetTypeInfo().IsGenericType && argsFuncType.GetGenericArguments().Length == 1)
-					{
-						this.Mock.DoRaise(this.mockEvent, (EventArgs)mockEventArgsFunc.InvokePreserveStack());
-					}
-					else
-					{
-						this.Mock.DoRaise(this.mockEvent, (EventArgs)mockEventArgsFunc.InvokePreserveStack(call.Arguments));
-					}
-				}
+				throw this.throwExceptionResponse;
 			}
 		}
 
 		public IThrowsResult Throws(Exception exception)
 		{
-			this.thrownException = exception;
+			this.throwExceptionResponse = exception;
 			return this;
 		}
 
 		public IThrowsResult Throws<TException>()
 			where TException : Exception, new()
 		{
-			this.thrownException = new TException();
-			return this;
+			return this.Throws(new TException());
 		}
 
 		public ICallbackResult Callback(Action callback)
@@ -340,12 +309,12 @@ namespace Moq
 
 		protected virtual void SetCallbackWithoutArguments(Action callback)
 		{
-			this.setupCallback = delegate { callback(); };
+			this.callbackResponse = (object[] args) => callback();
 		}
 
 		protected virtual void SetCallbackWithArguments(Delegate callback)
 		{
-			var expectedParams = this.Method.GetParameters();
+			var expectedParams = this.method.GetParameters();
 			var actualParams = callback.GetMethodInfo().GetParameters();
 
 			if (!callback.HasCompatibleParameterList(expectedParams))
@@ -353,7 +322,7 @@ namespace Moq
 				ThrowParameterMismatch(expectedParams, actualParams);
 			}
 
-			this.setupCallback = delegate(object[] args) { callback.InvokePreserveStack(args); };
+			this.callbackResponse = (object[] args) => callback.InvokePreserveStack(args);
 		}
 
 		private static void ThrowParameterMismatch(ParameterInfo[] expected, ParameterInfo[] actual)
@@ -368,33 +337,33 @@ namespace Moq
 
 		public void Verifiable()
 		{
-			this.IsVerifiable = true;
+			this.verifiable = true;
 		}
 
 		public void Verifiable(string failMessage)
 		{
-			this.IsVerifiable = true;
-			this.FailMessage = failMessage;
+			this.verifiable = true;
+			this.failMessage = failMessage;
 		}
 
 		private bool IsEqualMethodOrOverride(ICallContext call)
 		{
-			if (call.Method == this.Method)
+			if (call.Method == this.method)
 			{
 				return true;
 			}
 
-			if (this.Method.DeclaringType.IsAssignableFrom(call.Method.DeclaringType))
+			if (this.method.DeclaringType.IsAssignableFrom(call.Method.DeclaringType))
 			{
-				if (!this.Method.Name.Equals(call.Method.Name, StringComparison.Ordinal) ||
-					this.Method.ReturnType != call.Method.ReturnType ||
-					!this.Method.IsGenericMethod &&
-					!call.Method.GetParameterTypes().SequenceEqual(this.Method.GetParameterTypes()))
+				if (!this.method.Name.Equals(call.Method.Name, StringComparison.Ordinal) ||
+					this.method.ReturnType != call.Method.ReturnType ||
+					!this.method.IsGenericMethod &&
+					!call.Method.GetParameterTypes().SequenceEqual(this.method.GetParameterTypes()))
 				{
 					return false;
 				}
 
-				if (Method.IsGenericMethod && !call.Method.GetGenericArguments().SequenceEqual(Method.GetGenericArguments(), typesComparer))
+				if (this.method.IsGenericMethod && !call.Method.GetGenericArguments().SequenceEqual(this.method.GetGenericArguments(), AssignmentCompatibilityTypeComparer.Instance))
 				{
 					return false;
 				}
@@ -416,18 +385,32 @@ namespace Moq
 		protected IVerifies RaisesImpl<TMock>(Action<TMock> eventExpression, Delegate func)
 			where TMock : class
 		{
-			var ev = eventExpression.GetEvent((TMock)Mock.Object);
-			this.mockEvent = ev.MemberInfo;
-			this.mockEventArgsFunc = func;
+			var ev = eventExpression.GetEvent((TMock)mock.Object).MemberInfo;
+			if (ev != null)
+			{
+				this.raiseEventResponse = new RaiseEventResponse(this.mock, ev, func, null);
+			}
+			else
+			{
+				this.raiseEventResponse = null;
+			}
+
 			return this;
 		}
 
 		protected IVerifies RaisesImpl<TMock>(Action<TMock> eventExpression, params object[] args)
 			where TMock : class
 		{
-			var ev = eventExpression.GetEvent((TMock)Mock.Object);
-			this.mockEvent = ev.MemberInfo;
-			this.mockEventArgsParams = args;
+			var ev = eventExpression.GetEvent((TMock)mock.Object).MemberInfo;
+			if (ev != null)
+			{
+				this.raiseEventResponse = new RaiseEventResponse(this.mock, ev, null, args);
+			}
+			else
+			{
+				this.raiseEventResponse = null;
+			}
+
 			return this;
 		}
 
@@ -435,24 +418,26 @@ namespace Moq
 		{
 			var message = new StringBuilder();
 
-			if (this.FailMessage != null)
+			if (this.failMessage != null)
 			{
-				message.Append(this.FailMessage).Append(": ");
+				message.Append(this.failMessage).Append(": ");
 			}
 
-			var lambda = SetupExpression.PartialMatcherAwareEval().ToLambda();
+			var lambda = this.originalExpression.PartialMatcherAwareEval().ToLambda();
 			var targetTypeName = lambda.Parameters[0].Type.Name;
 
 			message.Append(targetTypeName).Append(" ").Append(lambda.ToStringFixed());
 
-			if (TestMethod != null && FileName != null && FileLine != 0)
+#if !NETCORE
+			if (this.originalCallerMember != null && this.originalCallerFilePath != null && this.originalCallerLineNumber != 0)
 			{
 				message.AppendFormat(
 					" ({0}() in {1}: line {2})",
-					TestMethod.Name,
-					FileName,
-					FileLine);
+					this.originalCallerMember.Name,
+					this.originalCallerFilePath,
+					this.originalCallerLineNumber);
 			}
+#endif
 
 			return message.ToString().Trim();
 		}
@@ -460,7 +445,7 @@ namespace Moq
 		public string Format()
 		{
 			var builder = new StringBuilder();
-			builder.Append(this.SetupExpression.PartialMatcherAwareEval().ToLambda().ToStringFixed());
+			builder.Append(this.originalExpression.PartialMatcherAwareEval().ToLambda().ToStringFixed());
 
 			if (this.expectedMaxCallCount != null)
 			{
@@ -478,34 +463,57 @@ namespace Moq
 
 			return builder.ToString();
 		}
-	}
 
-	internal class Condition
-	{
-		private readonly Func<bool> condition;
-		private readonly Action success;
-
-		public Condition(Func<bool> condition, Action success = null)
+		private sealed class AssignmentCompatibilityTypeComparer : IEqualityComparer<Type>
 		{
-			this.condition = condition;
-			this.success = success;
-		}
+			public static AssignmentCompatibilityTypeComparer Instance { get; } = new AssignmentCompatibilityTypeComparer();
 
-		public bool IsTrue
-		{
-			get
+			public bool Equals(Type x, Type y)
 			{
-				if (condition != null)
-					return condition();
-				else
-					return false;
+				return y.IsAssignableFrom(x);
 			}
+
+			int IEqualityComparer<Type>.GetHashCode(Type obj) => throw new NotSupportedException();
 		}
 
-		public void EvaluatedSuccessfully()
+		private sealed class RaiseEventResponse
 		{
-			if (success != null)
-				success();
+			private Mock mock;
+			private EventInfo @event;
+			private Delegate eventArgsFunc;
+			private object[] eventArgsParams;
+
+			public RaiseEventResponse(Mock mock, EventInfo @event, Delegate eventArgsFunc, object[] eventArgsParams)
+			{
+				Debug.Assert(mock != null);
+				Debug.Assert(@event != null);
+				Debug.Assert(eventArgsFunc != null ^ eventArgsParams != null);
+
+				this.mock = mock;
+				this.@event = @event;
+				this.eventArgsFunc = eventArgsFunc;
+				this.eventArgsParams = eventArgsParams;
+			}
+
+			public void RespondTo(ICallContext invocation)
+			{
+				if (this.eventArgsParams != null)
+				{
+					this.mock.DoRaise(this.@event, this.eventArgsParams);
+				}
+				else
+				{
+					var argsFuncType = this.eventArgsFunc.GetType();
+					if (argsFuncType.GetTypeInfo().IsGenericType && argsFuncType.GetGenericArguments().Length == 1)
+					{
+						this.mock.DoRaise(this.@event, (EventArgs)this.eventArgsFunc.InvokePreserveStack());
+					}
+					else
+					{
+						this.mock.DoRaise(this.@event, (EventArgs)this.eventArgsFunc.InvokePreserveStack(invocation.Arguments));
+					}
+				}
+			}
 		}
 	}
 }

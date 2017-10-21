@@ -38,25 +38,23 @@
 //[This is the BSD license, see
 // http://www.opensource.org/licenses/bsd-license.php]
 
-using System.Linq.Expressions;
-using System.Reflection;
-using Moq.Proxy;
+using System;
 
 namespace Moq
 {
-	internal interface IProxyCall
+	internal sealed class Condition
 	{
-		bool IsConditional { get; }
-		string FailMessage { get; set; }
-		bool Invoked { get; }
-		bool IsVerifiable { get; }
-		Expression SetupExpression { get; }
-		MethodInfo Method { get; }
+		private Func<bool> condition;
+		private Action success;
 
-		void EvaluatedSuccessfully();
-		void Execute(ICallContext call);
-		string Format();
-		bool Matches(ICallContext call);
-		void SetOutParameters(ICallContext call);
+		public Condition(Func<bool> condition, Action success = null)
+		{
+			this.condition = condition;
+			this.success = success;
+		}
+
+		public bool IsTrue => this.condition?.Invoke() == true;
+
+		public void EvaluatedSuccessfully() => this.success?.Invoke();
 	}
 }

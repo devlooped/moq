@@ -131,13 +131,12 @@ namespace Moq
 			new Lazy<IInterceptStrategy[]>(
 				() => new IInterceptStrategy[]
 				{
-					HandleDestructor.Instance,
+					HandleFinalizer.Instance,
 					HandleTracking.Instance,
 					InterceptMockPropertyMixin.Instance,
 					InterceptObjectMethodsMixin.Instance,
 					AddActualInvocation.Instance,
-					ExtractProxyCall.Instance,
-					ExecuteCall.Instance,
+					ExtractAndExecuteProxyCall.Instance,
 					InvokeBase.Instance,
 					HandleMockRecursion.Instance,
 				});
@@ -147,10 +146,9 @@ namespace Moq
 		[SuppressMessage("Microsoft.Maintainability", "CA1502:AvoidExcessiveComplexity")]
 		public void Intercept(ICallContext invocation)
 		{
-			CurrentInterceptContext localCtx = new CurrentInterceptContext();
 			foreach (var strategy in InterceptionStrategies)
 			{
-				if (InterceptionAction.Stop == strategy.HandleIntercept(invocation, InterceptionContext, localCtx))
+				if (InterceptionAction.Stop == strategy.HandleIntercept(invocation, InterceptionContext))
 				{
 					break;
 				}
