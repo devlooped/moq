@@ -61,6 +61,12 @@ namespace Moq.Protected
 			this.mock = mock;
 		}
 
+		public IProtectedAsMock<T, TDuck> As<TDuck>()
+			where TDuck : class
+		{
+			return new ProtectedAsMock<T, TDuck>(this.mock);
+		}
+
 		#region Setup
 
 		public ISetup<T> Setup(string methodName, params object[] args)

@@ -53,6 +53,15 @@ namespace Moq.Protected
 	public interface IProtectedMock<TMock> : IFluentInterface
 		where TMock : class
 	{
+		/// <summary>
+		/// Set up protected members (methods and properties) seen through another type with identical member signatures.
+		/// </summary>
+		/// <typeparam name="TDuck">
+		/// Any type with members whose signatures are identical to the mock's protected members (except for their accessibility level).
+		/// </typeparam>
+		IProtectedAsMock<TMock, TDuck> As<TDuck>()
+			where TDuck : class;
+
 		#region Setup
 
 		/// <summary>
