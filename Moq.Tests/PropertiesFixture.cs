@@ -91,5 +91,98 @@ namespace Moq.Tests
 		//
 		//	foo.Object[18] = "foo";
 		//}
+
+		[Fact]
+		public void Can_Setup_virtual_property()
+		{
+			// verify our assumptions that A is indeed virtual (and non-sealed):
+			var propertyGetter = typeof(Foo).GetProperty("A").GetGetMethod();
+			Assert.True(propertyGetter.IsVirtual);
+			Assert.False(propertyGetter.IsFinal);
+
+			var mock = new Mock<Foo>();
+			mock.Setup(m => m.A).Returns("mocked A");
+
+			var a = mock.Object.A;
+
+			Assert.Equal("mocked A", a);
+		}
+
+		[Fact]
+		public void Can_Setup_virtual_property_that_implicitly_implements_a_property_from_inaccessible_interface()
+		{
+			// verify our assumptions that C is indeed virtual (and non-sealed):
+			var propertyGetter = typeof(Foo).GetProperty("C").GetGetMethod();
+			Assert.True(propertyGetter.IsVirtual);
+			Assert.False(propertyGetter.IsFinal);
+
+			var mock = new Mock<Foo>();
+			mock.Setup(m => m.C).Returns("mocked C");
+
+			var c = mock.Object.C;
+
+			Assert.Equal("mocked C", c);
+		}
+
+		[Fact]
+		public void Cannot_Setup_virtual_but_sealed_property()
+		{
+			// verify our assumptions that B is indeed virtual and sealed:
+			var propertyGetter = typeof(Foo).GetProperty("B").GetGetMethod();
+			Assert.True(propertyGetter.IsVirtual);
+			Assert.True(propertyGetter.IsFinal);
+
+			var mock = new Mock<Foo>();
+
+			var exception = Record.Exception(() =>
+			{
+				mock.Setup(m => m.B).Returns("mocked B");
+			});
+			var b = mock.Object.B;
+
+			Assert.NotEqual("mocked B", b); // it simply shouldn't be possible for Moq to intercept a sealed property;
+			Assert.NotNull(exception);      // and Moq should tell us by throwing an exception.
+		}
+
+
+		[Fact]
+		public void Cannot_Setup_virtual_but_sealed_property_that_implicitly_implements_a_property_from_inaccessible_interface()
+		{
+			// verify our assumptions that D is indeed virtual and sealed:
+			var propertyGetter = typeof(Foo).GetProperty("D").GetGetMethod();
+			Assert.True(propertyGetter.IsVirtual);
+			Assert.True(propertyGetter.IsFinal);
+
+			var mock = new Mock<Foo>();
+
+			var exception = Record.Exception(() =>
+			{
+				mock.Setup(m => m.D).Returns("mocked D");
+			});
+			var d = mock.Object.D;
+
+			Assert.NotEqual("mocked D", d); // it simply shouldn't be possible for Moq to intercept a sealed property;
+			Assert.NotNull(exception);      // and Moq should tell us by throwing an exception.
+		}
+
+		public abstract class FooBase
+		{
+			public abstract object A { get; }
+			public abstract object B { get; }
+		}
+
+		internal interface IFooInternals
+		{
+			object C { get; }
+			object D { get; }
+		}
+
+		public abstract class Foo : FooBase, IFooInternals
+		{
+			public override object A => "A";
+			public sealed override object B => "B";
+			public virtual object C => "C";
+			public object D => "D";
+		}
 	}
 }

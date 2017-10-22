@@ -99,12 +99,24 @@ namespace Moq
 		/// </summary>
 		public static PropertyInfo ToPropertyInfo(this LambdaExpression expression)
 		{
-			var prop = expression.Body as MemberExpression;
-			if (prop != null)
+			if (expression.Body is MemberExpression prop)
 			{
-				var info = prop.Member as PropertyInfo;
-				if (info != null)
+				if (prop.Member is PropertyInfo info)
 				{
+					// the following block is required because .NET compilers put the wrong PropertyInfo into MemberExpression
+					// for properties originally declared in base classes; they will put the base class' PropertyInfo into
+					// the expression. we attempt to correct this here by checking whether the type of the accessed object
+					// has a property by the same name whose base definition equals the property in the expression; if so,
+					// we "upgrade" to the derived property.
+					if (info.DeclaringType != prop.Expression.Type && info.CanRead)
+					{
+						var propertyInLeft = prop.Expression.Type.GetProperty(info.Name, BindingFlags.Public | BindingFlags.NonPublic | BindingFlags.Instance);
+						if (propertyInLeft != null && propertyInLeft.GetMethod.GetBaseDefinition() == info.GetMethod)
+						{
+							info = propertyInLeft;
+						}
+					}
+
 					return info;
 				}
 			}
