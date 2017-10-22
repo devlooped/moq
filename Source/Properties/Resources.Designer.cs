@@ -11,7 +11,7 @@
 namespace Moq.Properties {
 	using System;
 	using System.Reflection;
-
+	
 	/// <summary>
 	///   A strongly-typed resource class, for looking up localized strings, etc.
 	/// </summary>
@@ -104,7 +104,7 @@ namespace Moq.Properties {
 				return ResourceManager.GetString("ConfiguredSetups", resourceCulture);
 			}
 		}
-
+		
 		/// <summary>
 		///   Looks up a localized string similar to Constructor arguments cannot be passed for delegate mocks..
 		/// </summary>
@@ -140,7 +140,7 @@ namespace Moq.Properties {
 				return ResourceManager.GetString("DelaysMustBeGreaterThanZero", resourceCulture);
 			}
 		}
-
+		
 		/// <summary>
 		///   Looks up a localized string similar to Could not locate event for attach or detach method {0}..
 		/// </summary>
@@ -158,7 +158,7 @@ namespace Moq.Properties {
 				return ResourceManager.GetString("ExpressionIsNotEventAttachOrDetachOrIsNotVirtual", resourceCulture);
 			}
 		}
-
+		
 		/// <summary>
 		///   Looks up a localized string similar to Expression {0} involves a field access, which is not supported. Use properties instead..
 		/// </summary>
@@ -176,7 +176,7 @@ namespace Moq.Properties {
 				return ResourceManager.GetString("InvalidCallbackNotADelegateWithReturnTypeVoid", resourceCulture);
 			}
 		}
-
+		
 		/// <summary>
 		///   Looks up a localized string similar to Invalid callback. Setup on method with parameters ({0}) cannot invoke callback with parameters ({1})..
 		/// </summary>
@@ -185,7 +185,7 @@ namespace Moq.Properties {
 				return ResourceManager.GetString("InvalidCallbackParameterMismatch", resourceCulture);
 			}
 		}
-
+		
 		/// <summary>
 		///   Looks up a localized string similar to Type to mock must be an interface or an abstract or non-sealed class. .
 		/// </summary>
@@ -214,7 +214,7 @@ namespace Moq.Properties {
 				return ResourceManager.GetString("InvalidReturnsCallbackNotADelegateWithReturnType", resourceCulture);
 			}
 		}
-
+		
 		/// <summary>
 		///   Looks up a localized string similar to The equals (&quot;==&quot; or &quot;=&quot; in VB) and the conditional &apos;and&apos; (&quot;&amp;&amp;&quot; or &quot;AndAlso&quot; in VB) operators are the only ones supported in the query specification expression. Unsupported expression: {0}.
 		/// </summary>
@@ -261,7 +261,7 @@ namespace Moq.Properties {
 				return ResourceManager.GetString("MethodIsPublic", resourceCulture);
 			}
 		}
-
+		
 		/// <summary>
 		///   Looks up a localized string similar to Cannot set up {0}.{1} because it is not accessible to the proxy generator used by Moq:
 		///{2}.
@@ -271,7 +271,7 @@ namespace Moq.Properties {
 				return ResourceManager.GetString("MethodNotVisibleToProxyFactory", resourceCulture);
 			}
 		}
-
+		
 		/// <summary>
 		///   Looks up a localized string similar to Mininum delay has to be lower than maximum delay..
 		/// </summary>
@@ -280,7 +280,7 @@ namespace Moq.Properties {
 				return ResourceManager.GetString("MinDelayMustBeLessThanMaxDelay", resourceCulture);
 			}
 		}
-
+		
 		/// <summary>
 		///   Looks up a localized string similar to {0} invocation failed with mock behavior {1}.
 		///{2}.
@@ -317,7 +317,7 @@ namespace Moq.Properties {
 				return ResourceManager.GetString("NoInvocationsPerformed", resourceCulture);
 			}
 		}
-
+		
 		/// <summary>
 		///   Looks up a localized string similar to {0}
 		///Expected invocation on the mock at least {2} times, but was {4} times: {1}.
@@ -425,7 +425,7 @@ namespace Moq.Properties {
 				return ResourceManager.GetString("NoSetupsConfigured", resourceCulture);
 			}
 		}
-
+		
 		/// <summary>
 		///   Looks up a localized string similar to Object instance was not created by Moq..
 		/// </summary>
@@ -452,7 +452,7 @@ namespace Moq.Properties {
 				return ResourceManager.GetString("PerformedInvocations", resourceCulture);
 			}
 		}
-
+		
 		/// <summary>
 		///   Looks up a localized string similar to Property {0}.{1} does not have a getter..
 		/// </summary>
@@ -495,6 +495,15 @@ namespace Moq.Properties {
 		internal static string PropertySetNotFound {
 			get {
 				return ResourceManager.GetString("PropertySetNotFound", resourceCulture);
+			}
+		}
+		
+		/// <summary>
+		///   Looks up a localized string similar to Type {0} does not have matching protected member: {1}.
+		/// </summary>
+		internal static string ProtectedMemberNotFound {
+			get {
+				return ResourceManager.GetString("ProtectedMemberNotFound", resourceCulture);
 			}
 		}
 		
@@ -596,7 +605,7 @@ namespace Moq.Properties {
 				return ResourceManager.GetString("SetupOnStaticMember", resourceCulture);
 			}
 		}
-
+		
 		/// <summary>
 		///   Looks up a localized string similar to Type {0} does not implement required interface {1}.
 		/// </summary>
@@ -636,7 +645,7 @@ namespace Moq.Properties {
 				return ResourceManager.GetString("UnexpectedTranslationOfMemberAccess", resourceCulture);
 			}
 		}
-
+		
 		/// <summary>
 		///   Looks up a localized string similar to Unhandled binding type: {0}.
 		/// </summary>
@@ -645,7 +654,7 @@ namespace Moq.Properties {
 				return ResourceManager.GetString("UnhandledBindingType", resourceCulture);
 			}
 		}
-
+		
 		/// <summary>
 		///   Looks up a localized string similar to Unhandled expression type: {0}.
 		/// </summary>
@@ -654,7 +663,7 @@ namespace Moq.Properties {
 				return ResourceManager.GetString("UnhandledExpressionType", resourceCulture);
 			}
 		}
-
+		
 		/// <summary>
 		///   Looks up a localized string similar to Unsupported expression: {0}.
 		/// </summary>
@@ -717,7 +726,7 @@ namespace Moq.Properties {
 				return ResourceManager.GetString("UseItExprIsNullRatherThanNullArgumentValue", resourceCulture);
 			}
 		}
-
+		
 		/// <summary>
 		///   Looks up a localized string similar to The following setups were not matched:
 		///{0}.
@@ -736,7 +745,7 @@ namespace Moq.Properties {
 				return ResourceManager.GetString("VerifyOnExtensionMethod", resourceCulture);
 			}
 		}
-
+		
 		/// <summary>
 		///   Looks up a localized string similar to Invalid verify on a non-virtual (overridable in VB) member: {0}.
 		/// </summary>
@@ -745,7 +754,7 @@ namespace Moq.Properties {
 				return ResourceManager.GetString("VerifyOnNonVirtualMember", resourceCulture);
 			}
 		}
-
+		
 		/// <summary>
 		///   Looks up a localized string similar to Invalid verify on a static member: {0}.
 		/// </summary>

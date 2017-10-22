@@ -45,6 +45,7 @@ using System.Linq.Expressions;
 using System.Reflection;
 
 using Moq.Language.Flow;
+using Moq.Properties;
 
 namespace Moq.Protected
 {
@@ -58,21 +59,49 @@ namespace Moq.Protected
 
 		public ProtectedAsMock(Mock<T> mock)
 		{
+			Debug.Assert(mock != null);
+
 			this.mock = mock;
 		}
 
 		public ISetup<T> Setup(Expression<Action<TDuck>> expression)
 		{
-			return Mock.Setup(this.mock, (Expression<Action<T>>)ReplaceDuck(expression), null);
+			Guard.NotNull(expression, nameof(expression));
+
+			Expression<Action<T>> rewrittenExpression;
+			try
+			{
+				rewrittenExpression = (Expression<Action<T>>)ReplaceDuck(expression);
+			}
+			catch (ArgumentException ex)
+			{
+				throw new ArgumentException(ex.Message, nameof(expression));
+			}
+
+			return Mock.Setup(this.mock, rewrittenExpression, null);
 		}
 
 		public ISetup<T, TResult> Setup<TResult>(Expression<Func<TDuck, TResult>> expression)
 		{
-			return Mock.Setup(this.mock, (Expression<Func<T, TResult>>)ReplaceDuck(expression), null);
+			Guard.NotNull(expression, nameof(expression));
+
+			Expression<Func<T, TResult>> rewrittenException;
+			try
+			{
+				rewrittenException = (Expression<Func<T, TResult>>)ReplaceDuck(expression);
+			}
+			catch (ArgumentException ex)
+			{
+				throw new ArgumentException(ex.Message, nameof(expression));
+			}
+
+			return Mock.Setup(this.mock, rewrittenException, null);
 		}
 
 		private static LambdaExpression ReplaceDuck(LambdaExpression expression)
 		{
+			Debug.Assert(expression.Parameters.Count == 1);
+
 			var targetParameter = Expression.Parameter(typeof(T), expression.Parameters[0].Name);
 			return Expression.Lambda(DuckReplacerInstance.Visit(expression.Body), targetParameter);
 		}
@@ -95,7 +124,7 @@ namespace Moq.Protected
 			{
 				if (node.Object is ParameterExpression left && left.Type == this.duckType)
 				{
-					var targetParameter = Expression.Parameter(typeof(T), left.Name);
+					var targetParameter = Expression.Parameter(this.targetType, left.Name);
 					return Expression.Call(targetParameter, FindCorrespondingMethod(node.Method), node.Arguments);
 				}
 				else
@@ -108,7 +137,7 @@ namespace Moq.Protected
 			{
 				if (node.Expression is ParameterExpression left && left.Type == this.duckType)
 				{
-					var targetParameter = Expression.Parameter(typeof(T), left.Name);
+					var targetParameter = Expression.Parameter(this.targetType, left.Name);
 					return Expression.MakeMemberAccess(targetParameter, FindCorrespondingMember(node.Member));
 				}
 				else
@@ -136,11 +165,19 @@ namespace Moq.Protected
 			private MethodInfo FindCorrespondingMethod(MethodInfo duckMethod)
 			{
 				var candidateTargetMethods =
-					this.targetType
+				    this.targetType
 				    .GetMethods(BindingFlags.NonPublic | BindingFlags.Instance)
-				    .Where(ctm => IsCorrespondingMethod(duckMethod, ctm));
+				    .Where(ctm => IsCorrespondingMethod(duckMethod, ctm))
+				    .ToArray();
 
-				var targetMethod = candidateTargetMethods.Single();
+				if (candidateTargetMethods.Length == 0)
+				{
+					throw new ArgumentException(string.Format(Resources.ProtectedMemberNotFound, this.targetType, duckMethod));
+				}
+
+				Debug.Assert(candidateTargetMethods.Length == 1);
+
+				var targetMethod = candidateTargetMethods[0];
 
 				if (targetMethod.IsGenericMethodDefinition)
 				{
@@ -154,11 +191,19 @@ namespace Moq.Protected
 			private PropertyInfo FindCorrespondingProperty(PropertyInfo duckProperty)
 			{
 				var candidateTargetProperties =
-					this.targetType
-					.GetProperties(BindingFlags.NonPublic | BindingFlags.Instance)
-					.Where(ctp => IsCorrespondingProperty(duckProperty, ctp));
+				    this.targetType
+				    .GetProperties(BindingFlags.NonPublic | BindingFlags.Instance)
+				    .Where(ctp => IsCorrespondingProperty(duckProperty, ctp))
+				    .ToArray();
 
-				return candidateTargetProperties.Single();
+				if (candidateTargetProperties.Length == 0)
+				{
+					throw new ArgumentException(string.Format(Resources.ProtectedMemberNotFound, this.targetType, duckProperty));
+				}
+
+				Debug.Assert(candidateTargetProperties.Length == 1);
+
+				return candidateTargetProperties[0];
 			}
 
 			private static bool IsCorrespondingMethod(MethodInfo duckMethod, MethodInfo candidateTargetMethod)
