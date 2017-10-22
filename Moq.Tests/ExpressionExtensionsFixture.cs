@@ -114,10 +114,51 @@ namespace Moq.Tests
 			Assert.Equal(typeof(IFoo).GetMethod("Do"), expr.ToMethodCall().Method);
 		}
 
+		// this doesn't test Moq, but documents a peculiarity of the C# compiler.
+		// once this test starts failing, verify whether the PropertyInfo "correction" applied
+		// in the `expression.ToPropertyInfo()` extension method is still required.
 		[Fact]
-		public void ToPropertyInfoConvertsExpression()
+		public void Compilers_put_wrong_PropertyInfo_into_MemberExpression_for_overridden_properties()
 		{
-			
+			Expression<Func<Derived, object>> expression = derived => derived.Property;
+
+			var expected = typeof(Base).GetProperty(nameof(Base.Property));
+			var actual = (expression.Body as MemberExpression).Member as PropertyInfo;
+
+			Assert.Same(expected, actual);
+		}
+
+		[Fact]
+		public void ToPropertyInfo_corrects_wrong_DeclaringType_for_overridden_properties()
+		{
+			Expression<Func<Derived, object>> expression = derived => derived.Property;
+
+			var expected = typeof(Derived).GetProperty(nameof(Derived.Property));
+			var actual = expression.ToPropertyInfo();
+
+			Assert.Same(expected, actual);
+		}
+
+		[Fact]
+		public void ToPropertyInfo_does_not_correct_DeclaringType_for_upcast_overridden_properties()
+		{
+			Expression<Func<Derived, object>> expression = derived => ((Base)derived).Property;
+
+			var expected = typeof(Base).GetProperty(nameof(Base.Property));
+			var actual = expression.ToPropertyInfo();
+
+			Assert.Same(expected, actual);
+		}
+
+		[Fact]
+		public void ToPropertyInfo_does_not_correct_DeclaringType_for_base_properties()
+		{
+			Expression<Func<Base, object>> expression = @base => @base.Property;
+
+			var expected = typeof(Base).GetProperty(nameof(Base.Property));
+			var actual = expression.ToPropertyInfo();
+
+			Assert.Same(expected, actual);
 		}
 
 		private Expression ToExpression<T>(Expression<Func<T>> expression)
@@ -145,6 +186,16 @@ namespace Moq.Tests
 			int Value { get; set; }
 			void Do();
 			object this[int index] { get; set; }
+		}
+
+		public abstract class Base
+		{
+			public abstract object Property { get; }
+		}
+
+		public class Derived : Base
+		{
+			public override sealed object Property => null;
 		}
 	}
 }
