@@ -165,6 +165,19 @@ namespace Moq.Tests
 			Assert.NotNull(exception);      // and Moq should tell us by throwing an exception.
 		}
 
+		[Fact]
+		public void SetupAllProperties_does_not_throw_when_it_encounters_properties_that_cannot_be_setup()
+		{
+			var mock = new Mock<Foo>();
+
+			var exception = Record.Exception(() =>
+			{
+				mock.SetupAllProperties();
+			});
+
+			Assert.Null(exception);
+		}
+
 		public abstract class FooBase
 		{
 			public abstract object A { get; }

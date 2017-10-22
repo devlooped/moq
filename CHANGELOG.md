@@ -23,6 +23,7 @@ The format is loosely based on [Keep a Changelog](http://keepachangelog.com/en/1
 * Sequences set up with `SetupSequence` are now thread-safe (@stakx, #476)
 * Record calls to methods that are named like event accessors (`add_X`, `remove_X`) so they can be verified (@stakx, #488)
 * Improve recognition logic for sealed methods so that `Setup` throws when an attempt is made to set one up (@stakx, #497)
+* Let `SetupAllProperties` skip inaccessible methods (@stakx, #499)
 
 ## 4.7.142 (2017-10-11)
 

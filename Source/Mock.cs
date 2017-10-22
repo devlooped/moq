@@ -727,11 +727,12 @@ namespace Moq
 				//   interface as a getter-and-setter property.
 				.Where(p =>
 					   p.CanRead && p.CanOverrideGet() &&
-					   p.GetIndexParameters().Length == 0 &&
-					   p.CanWrite == p.CanOverrideSet())
-					   // ^ The last condition will be true for two kinds of properties:
+					   p.CanWrite == p.CanOverrideSet() &&
+					   // ^ This condition will be true for two kinds of properties:
 					   //    (a) those that are read-only; and
 					   //    (b) those that are writable and whose setter can be overridden.
+					   p.GetIndexParameters().Length == 0 &&
+					   ProxyFactory.IsMethodVisible(p.GetGetMethod(), out _))
 				.Distinct();
 
 			var setupPropertyMethod = mock.GetType().GetMethods()
