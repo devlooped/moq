@@ -1,5 +1,8 @@
-﻿using Moq.Protected;
-using System;
+﻿using System;
+using System.Collections.Generic;
+
+using Moq.Protected;
+
 using Xunit;
 
 namespace Moq.Tests
@@ -105,10 +108,101 @@ namespace Moq.Tests
 			Assert.True(doSomethingImplInvoked);
 		}
 
+		[Fact]
+		public void SetupGet_can_setup_readonly_property()
+		{
+			this.protectedMock.SetupGet(m => m.ReadOnlyPropertyImpl).Returns(42);
+
+			var actual = this.mock.Object.ReadOnlyProperty;
+
+			Assert.Equal(42, actual);
+		}
+
+		[Fact]
+		public void SetupGet_can_setup_readwrite_property()
+		{
+			this.protectedMock.SetupGet(m => m.ReadWritePropertyImpl).Returns(42);
+
+			var actual = this.mock.Object.ReadWriteProperty;
+
+			Assert.Equal(42, actual);
+		}
+
+		[Fact]
+		public void SetupProperty_can_setup_readwrite_property()
+		{
+			this.protectedMock.SetupProperty(m => m.ReadWritePropertyImpl, 42);
+
+			var actualBeforeSetting = this.mock.Object.ReadWriteProperty;
+			this.mock.Object.ReadWriteProperty = 17;
+			var actualAfterSetting = this.mock.Object.ReadWriteProperty;
+
+			Assert.Equal(42, actualBeforeSetting);
+			Assert.Equal(17, actualAfterSetting);
+		}
+
+		[Fact]
+		public void SetupProperty_cannot_setup_readonly_property()
+		{
+			var exception = Record.Exception(() =>
+			{
+				this.protectedMock.SetupProperty(m => m.ReadOnlyPropertyImpl);
+			});
+
+			Assert.NotNull(exception);
+		}
+
+		[Fact]
+		public void SetupSequence_TResult_can_setup_property()
+		{
+			this.protectedMock.SetupSequence(m => m.ReadOnlyPropertyImpl)
+				.Returns(1)
+				.Throws(new InvalidOperationException())
+				.Returns(3);
+
+			var actual = new List<int>();
+			actual.Add(this.mock.Object.ReadOnlyProperty);
+			var exception = Record.Exception(() =>
+			{
+				actual.Add(this.mock.Object.ReadOnlyProperty);
+			});
+			actual.Add(this.mock.Object.ReadOnlyProperty);
+
+			Assert.Equal(new[] { 1, 3 }, actual);
+			Assert.IsType<InvalidOperationException>(exception);
+		}
+
+		[Fact]
+		public void SetupSequence_can_setup_actions()
+		{
+			this.protectedMock.SetupSequence(m => m.DoSomethingImpl())
+				.Pass()
+				.Pass().
+				Throws(new InvalidOperationException());
+
+			this.mock.Object.DoSomething();
+			this.mock.Object.DoSomething();
+			var exception = Record.Exception(() =>
+			{
+				this.mock.Object.DoSomething();
+			});
+			this.mock.Object.DoSomething();
+
+			Assert.IsType<InvalidOperationException>(exception);
+		}
+
 		public abstract class Foo
 		{
 			protected Foo()
 			{
+			}
+
+			public int ReadOnlyProperty => this.ReadOnlyPropertyImpl;
+
+			public int ReadWriteProperty
+			{
+				get => this.ReadWritePropertyImpl;
+				set => this.ReadWritePropertyImpl = value;
 			}
 
 			public void DoSomething()
@@ -126,6 +220,10 @@ namespace Moq.Tests
 				return this.GetSomethingImpl();
 			}
 
+			protected abstract int ReadOnlyPropertyImpl { get; }
+
+			protected abstract int ReadWritePropertyImpl { get; set; }
+
 			protected abstract void DoSomethingImpl();
 
 			protected abstract void DoSomethingImpl(int arg);
@@ -135,6 +233,8 @@ namespace Moq.Tests
 
 		public interface Fooish
 		{
+			int ReadOnlyPropertyImpl { get; }
+			int ReadWritePropertyImpl { get; set; }
 			int NonExistentProperty { get; }
 			void DoSomethingImpl();
 			void DoSomethingImpl(int arg);

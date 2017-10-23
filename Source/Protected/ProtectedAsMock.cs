@@ -44,6 +44,7 @@ using System.Linq;
 using System.Linq.Expressions;
 using System.Reflection;
 
+using Moq.Language;
 using Moq.Language.Flow;
 using Moq.Properties;
 
@@ -85,17 +86,85 @@ namespace Moq.Protected
 		{
 			Guard.NotNull(expression, nameof(expression));
 
-			Expression<Func<T, TResult>> rewrittenException;
+			Expression<Func<T, TResult>> rewrittenExpression;
 			try
 			{
-				rewrittenException = (Expression<Func<T, TResult>>)ReplaceDuck(expression);
+				rewrittenExpression = (Expression<Func<T, TResult>>)ReplaceDuck(expression);
 			}
 			catch (ArgumentException ex)
 			{
 				throw new ArgumentException(ex.Message, nameof(expression));
 			}
 
-			return Mock.Setup(this.mock, rewrittenException, null);
+			return Mock.Setup(this.mock, rewrittenExpression, null);
+		}
+
+		public ISetupGetter<T, TProperty> SetupGet<TProperty>(Expression<Func<TDuck, TProperty>> expression)
+		{
+			Guard.NotNull(expression, nameof(expression));
+
+			Expression<Func<T, TProperty>> rewrittenExpression;
+			try
+			{
+				rewrittenExpression = (Expression<Func<T, TProperty>>)ReplaceDuck(expression);
+			}
+			catch (ArgumentException ex)
+			{
+				throw new ArgumentException(ex.Message, nameof(expression));
+			}
+
+			return Mock.SetupGet(this.mock, rewrittenExpression, null);
+		}
+
+		public Mock<T> SetupProperty<TProperty>(Expression<Func<TDuck, TProperty>> expression, TProperty initialValue = default(TProperty))
+		{
+			Guard.NotNull(expression, nameof(expression));
+
+			Expression<Func<T, TProperty>> rewrittenExpression;
+			try
+			{
+				rewrittenExpression = (Expression<Func<T, TProperty>>)ReplaceDuck(expression);
+			}
+			catch (ArgumentException ex)
+			{
+				throw new ArgumentException(ex.Message, nameof(expression));
+			}
+
+			return this.mock.SetupProperty<TProperty>(rewrittenExpression, initialValue);
+		}
+
+		public ISetupSequentialResult<TResult> SetupSequence<TResult>(Expression<Func<TDuck, TResult>> expression)
+		{
+			Guard.NotNull(expression, nameof(expression));
+
+			Expression<Func<T, TResult>> rewrittenExpression;
+			try
+			{
+				rewrittenExpression = (Expression<Func<T, TResult>>)ReplaceDuck(expression);
+			}
+			catch (ArgumentException ex)
+			{
+				throw new ArgumentException(ex.Message, nameof(expression));
+			}
+
+			return Mock.SetupSequence<TResult>(this.mock, rewrittenExpression);
+		}
+
+		public ISetupSequentialAction SetupSequence(Expression<Action<TDuck>> expression)
+		{
+			Guard.NotNull(expression, nameof(expression));
+
+			Expression<Action<T>> rewrittenExpression;
+			try
+			{
+				rewrittenExpression = (Expression<Action<T>>)ReplaceDuck(expression);
+			}
+			catch (ArgumentException ex)
+			{
+				throw new ArgumentException(ex.Message, nameof(expression));
+			}
+
+			return Mock.SetupSequence(this.mock, rewrittenExpression);
 		}
 
 		private static LambdaExpression ReplaceDuck(LambdaExpression expression)

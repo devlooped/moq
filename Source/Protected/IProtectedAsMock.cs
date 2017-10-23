@@ -41,6 +41,7 @@
 using System;
 using System.Linq.Expressions;
 
+using Moq.Language;
 using Moq.Language.Flow;
 
 namespace Moq.Protected
@@ -72,5 +73,35 @@ namespace Moq.Protected
 		/// <param name="expression">Lambda expression that specifies the expected method invocation.</param>
 		/// <seealso cref="Mock{T}.Setup{TResult}(Expression{Func{T, TResult}})"/>
 		ISetup<T, TResult> Setup<TResult>(Expression<Func<TDuck, TResult>> expression);
+
+		/// <summary>
+		/// Specifies a setup on the mocked type for a call to a property getter.
+		/// </summary>
+		/// <typeparam name="TProperty">Type of the property. Typically omitted as it can be inferred from the expression.</typeparam>
+		/// <param name="expression">Lambda expression that specifies the property getter.</param>
+		ISetupGetter<T, TProperty> SetupGet<TProperty>(Expression<Func<TDuck, TProperty>> expression);
+
+		/// <summary>
+		/// Specifies that the given property should have "property behavior",
+		/// meaning that setting its value will cause it to be saved and later returned when the property is requested.
+		/// (This is also known as "stubbing".)
+		/// </summary>
+		/// <typeparam name="TProperty">Type of the property. Typically omitted as it can be inferred from the expression.</typeparam>
+		/// <param name="expression">Lambda expression that specifies the property.</param>
+		/// <param name="initialValue">Initial value for the property.</param>
+		Mock<T> SetupProperty<TProperty>(Expression<Func<TDuck, TProperty>> expression, TProperty initialValue = default(TProperty));
+
+		/// <summary>
+		/// Return a sequence of values, once per call.
+		/// </summary>
+		/// <typeparam name="TResult">Type of the return value. Typically omitted as it can be inferred from the expression.</typeparam>
+		/// <param name="expression">Lambda expression that specifies the expected method invocation.</param>
+		ISetupSequentialResult<TResult> SetupSequence<TResult>(Expression<Func<TDuck, TResult>> expression);
+
+		/// <summary>
+		/// Performs a sequence of actions, one per call.
+		/// </summary>
+		/// <param name="expression">Lambda expression that specifeid the expected method invocation.</param>
+		ISetupSequentialAction SetupSequence(Expression<Action<TDuck>> expression);
 	}
 }
