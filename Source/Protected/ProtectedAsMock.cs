@@ -338,8 +338,36 @@ namespace Moq.Protected
 					return false;
 				}
 
-				var candidateParameters = candidateTargetMethod.GetParameters();
+				if (candidateTargetMethod.IsGenericMethodDefinition)
+				{
+					// when both methods are generic, then the candidate method should be an open generic method
+					// while the duck-type method should be a closed one. in this case, we close the former
+					// over the same generic type arguments that the latter uses.
+
+					Debug.Assert(!duckMethod.IsGenericMethodDefinition);
+
+					var candidateGenericArgs = candidateTargetMethod.GetGenericArguments();
+					var duckGenericArgs = duckMethod.GetGenericArguments();
+
+					if (candidateGenericArgs.Length != duckGenericArgs.Length)
+					{
+						return false;
+					}
+
+					// this could perhaps go wrong due to generic type parameter constraints; if it does
+					// go wrong, then obviously the duck-type method doesn't correspond to the candidate.
+					try
+					{
+						candidateTargetMethod = candidateTargetMethod.MakeGenericMethod(duckGenericArgs);
+					}
+					catch
+					{
+						return false;
+					}
+				}
+
 				var duckParameters = duckMethod.GetParameters();
+				var candidateParameters = candidateTargetMethod.GetParameters();
 
 				if (candidateParameters.Length != duckParameters.Length)
 				{
@@ -351,31 +379,6 @@ namespace Moq.Protected
 					if (candidateParameters[i].ParameterType != duckParameters[i].ParameterType)
 					{
 						return false;
-					}
-				}
-
-				if (candidateTargetMethod.IsGenericMethod)
-				{
-					var candidateGenericArgs = candidateTargetMethod.GetGenericArguments();
-					var duckGenericArgs = duckMethod.GetGenericArguments();
-
-					if (candidateGenericArgs.Length != duckGenericArgs.Length)
-					{
-						return false;
-					}
-
-					for (int i = 0, n = candidateGenericArgs.Length; i < n; ++i)
-					{
-						Debug.Assert(candidateGenericArgs[i].IsGenericParameter);
-
-						var candidateGenericConstraints = candidateGenericArgs[i].GetTypeInfo().GetGenericParameterConstraints();
-						foreach (var candidateGenericConstraint in candidateGenericConstraints)
-						{
-							if (!candidateGenericConstraint.IsAssignableFrom(duckGenericArgs[i]))
-							{
-								return false;
-							}
-						}
 					}
 				}
 

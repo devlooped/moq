@@ -109,6 +109,25 @@ namespace Moq.Tests
 		}
 
 		[Fact]
+		public void Setup_can_setup_generic_method()
+		{
+			var handledMessages = new List<string>();
+
+			var mock = new Mock<MessageHandlerBase>();
+			mock.Protected().As<MessageHandlerBaseish>()
+				.Setup(m => m.HandleImpl(It.IsAny<string>()))
+				.Callback((string message) =>
+				{
+					handledMessages.Add(message);
+				});
+
+			mock.Object.Handle("Hello world.", 3);
+
+			Assert.Contains("Hello world.", handledMessages);
+			Assert.Equal(3, handledMessages.Count);
+		}
+
+		[Fact]
 		public void SetupGet_can_setup_readonly_property()
 		{
 			this.protectedMock.SetupGet(m => m.ReadOnlyPropertyImpl).Returns(42);
@@ -236,6 +255,16 @@ namespace Moq.Tests
 		}
 
 		[Fact]
+		public void Verify_can_verify_generic_method()
+		{
+			var mock = new Mock<MessageHandlerBase>();
+
+			mock.Object.Handle("Hello world.", 3);
+
+			mock.Protected().As<MessageHandlerBaseish>().Verify(m => m.HandleImpl("Hello world."), Times.Exactly(3));
+		}
+
+		[Fact]
 		public void VerifyGet_can_verify_properties()
 		{
 			var _ = this.mock.Object.ReadOnlyProperty;
@@ -316,5 +345,23 @@ namespace Moq.Tests
 			int GetSomethingImpl();
 			void NonExistentMethod();
 		}
-    }
+
+		public abstract class MessageHandlerBase
+		{
+			public void Handle<TMessage>(TMessage message, int count)
+			{
+				for (int i = 0; i < count; ++i)
+				{
+					this.HandleImpl(message);
+				}
+			}
+
+			protected abstract void HandleImpl<TMessage>(TMessage message);
+		}
+
+		public interface MessageHandlerBaseish
+		{
+			void HandleImpl<TMessage>(TMessage message);
+		}
+	}
 }
