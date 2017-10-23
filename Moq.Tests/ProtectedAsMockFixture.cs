@@ -191,6 +191,81 @@ namespace Moq.Tests
 			Assert.IsType<InvalidOperationException>(exception);
 		}
 
+		[Fact]
+		public void Verify_can_verify_method_invocations()
+		{
+			this.mock.Object.DoSomething();
+
+			this.protectedMock.Verify(m => m.DoSomethingImpl());
+		}
+
+		[Fact]
+		public void Verify_throws_if_invocation_not_occurred()
+		{
+			var exception = Record.Exception(() =>
+			{
+				this.protectedMock.Verify(m => m.DoSomethingImpl());
+			});
+
+			Assert.IsType<MockException>(exception);
+		}
+
+		[Fact]
+		public void Verify_can_verify_method_invocations_times()
+		{
+			this.mock.Object.DoSomething();
+			this.mock.Object.DoSomething();
+			this.mock.Object.DoSomething();
+
+			this.protectedMock.Verify(m => m.DoSomethingImpl(), Times.Exactly(3));
+		}
+
+		[Fact]
+		public void Verify_includes_failure_message_in_exception()
+		{
+			this.mock.Object.DoSomething();
+			this.mock.Object.DoSomething();
+
+			var exception = Record.Exception(() =>
+			{
+				this.protectedMock.Verify(m => m.DoSomethingImpl(), Times.Exactly(3), "Wasn't called three times.");
+			});
+
+			Assert.IsType<MockException>(exception);
+			Assert.Contains("Wasn't called three times.", exception.Message);
+		}
+
+		[Fact]
+		public void VerifyGet_can_verify_properties()
+		{
+			var _ = this.mock.Object.ReadOnlyProperty;
+
+			this.protectedMock.VerifyGet(m => m.ReadOnlyPropertyImpl);
+		}
+
+		[Fact]
+		public void VerifyGet_throws_if_property_query_not_occurred()
+		{
+			var _ = this.mock.Object.ReadOnlyProperty;
+
+			var exception = Record.Exception(() =>
+			{
+				this.protectedMock.VerifyGet(m => m.ReadOnlyPropertyImpl, Times.AtLeast(2));
+			});
+		}
+
+		[Fact]
+		public void VerifyGet_includes_failure_message_in_exception()
+		{
+			var exception = Record.Exception(() =>
+			{
+				this.protectedMock.VerifyGet(m => m.ReadOnlyPropertyImpl, Times.Once(), "Was not queried.");
+			});
+
+			Assert.IsType<MockException>(exception);
+			Assert.Contains("Was not queried.", exception.Message);
+		}
+
 		public abstract class Foo
 		{
 			protected Foo()

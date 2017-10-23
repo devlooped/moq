@@ -39,6 +39,7 @@
 // http://www.opensource.org/licenses/bsd-license.php]
 
 using System;
+using System.ComponentModel;
 using System.Linq.Expressions;
 
 using Moq.Language;
@@ -101,7 +102,47 @@ namespace Moq.Protected
 		/// <summary>
 		/// Performs a sequence of actions, one per call.
 		/// </summary>
-		/// <param name="expression">Lambda expression that specifeid the expected method invocation.</param>
+		/// <param name="expression">Lambda expression that specifies the expected method invocation.</param>
 		ISetupSequentialAction SetupSequence(Expression<Action<TDuck>> expression);
+
+		/// <summary>
+		/// Verifies that a specific invocation matching the given expression was performed on the mock.
+		/// Use in conjunction with the default <see cref="MockBehavior.Loose"/>.
+		/// </summary>
+		/// <param name="expression">Lambda expression that specifies the method invocation.</param>
+		/// <param name="times">
+		/// Number of times that the invocation is expected to have occurred.
+		/// If omitted, assumed to be <see cref="Times.AtLeastOnce"/>.
+		/// </param>
+		/// <param name="failMessage">Message to include in the thrown <see cref="MockException"/> if verification fails.</param>
+		/// <exception cref="MockException">The specified invocation did not occur (or did not occur the specified number of times).</exception>
+		void Verify(Expression<Action<TDuck>> expression, Times? times = null, string failMessage = null);
+
+		/// <summary>
+		/// Verifies that a specific invocation matching the given expression was performed on the mock.
+		/// Use in conjunction with the default <see cref="MockBehavior.Loose"/>.
+		/// </summary>
+		/// <typeparam name="TResult">Type of the return value. Typically omitted as it can be inferred from the expression.</typeparam>
+		/// <param name="expression">Lambda expression that specifies the method invocation.</param>
+		/// <param name="times">
+		/// Number of times that the invocation is expected to have occurred.
+		/// If omitted, assumed to be <see cref="Times.AtLeastOnce"/>.
+		/// </param>
+		/// <param name="failMessage">Message to include in the thrown <see cref="MockException"/> if verification fails.</param>
+		/// <exception cref="MockException">The specified invocation did not occur (or did not occur the specified number of times).</exception>
+		void Verify<TResult>(Expression<Func<TDuck, TResult>> expression, Times? times = null, string failMessage = null);
+
+		/// <summary>
+		/// Verifies that a property was read on the mock.
+		/// </summary>
+		/// <typeparam name="TProperty">Type of the property. Typically omitted as it can be inferred from the expression.</typeparam>
+		/// <param name="expression">Lambda expression that specifies the method invocation.</param>
+		/// <param name="times">
+		/// Number of times that the invocation is expected to have occurred.
+		/// If omitted, assumed to be <see cref="Times.AtLeastOnce"/>.
+		/// </param>
+		/// <param name="failMessage">Message to include in the thrown <see cref="MockException"/> if verification fails.</param>
+		/// <exception cref="MockException">The specified invocation did not occur (or did not occur the specified number of times).</exception>
+		void VerifyGet<TProperty>(Expression<Func<TDuck, TProperty>> expression, Times? times = null, string failMessage = null);
 	}
 }

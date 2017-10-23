@@ -167,6 +167,57 @@ namespace Moq.Protected
 			return Mock.SetupSequence(this.mock, rewrittenExpression);
 		}
 
+		public void Verify(Expression<Action<TDuck>> expression, Times? times = null, string failMessage = null)
+		{
+			Guard.NotNull(expression, nameof(expression));
+
+			Expression<Action<T>> rewrittenExpression;
+			try
+			{
+				rewrittenExpression = (Expression<Action<T>>)ReplaceDuck(expression);
+			}
+			catch (ArgumentException ex)
+			{
+				throw new ArgumentException(ex.Message, nameof(expression));
+			}
+
+			Mock.Verify(this.mock, rewrittenExpression, times ?? Times.AtLeastOnce(), failMessage);
+		}
+
+		public void Verify<TResult>(Expression<Func<TDuck, TResult>> expression, Times? times = null, string failMessage = null)
+		{
+			Guard.NotNull(expression, nameof(expression));
+
+			Expression<Func<T, TResult>> rewrittenExpression;
+			try
+			{
+				rewrittenExpression = (Expression<Func<T, TResult>>)ReplaceDuck(expression);
+			}
+			catch (ArgumentException ex)
+			{
+				throw new ArgumentException(ex.Message, nameof(expression));
+			}
+
+			Mock.Verify(this.mock, rewrittenExpression, times ?? Times.AtLeastOnce(), failMessage);
+		}
+
+		public void VerifyGet<TProperty>(Expression<Func<TDuck, TProperty>> expression, Times? times = null, string failMessage = null)
+		{
+			Guard.NotNull(expression, nameof(expression));
+
+			Expression<Func<T, TProperty>> rewrittenExpression;
+			try
+			{
+				rewrittenExpression = (Expression<Func<T, TProperty>>)ReplaceDuck(expression);
+			}
+			catch (ArgumentException ex)
+			{
+				throw new ArgumentException(ex.Message, nameof(expression));
+			}
+
+			Mock.VerifyGet(this.mock, rewrittenExpression, times ?? Times.AtLeastOnce(), failMessage);
+		}
+
 		private static LambdaExpression ReplaceDuck(LambdaExpression expression)
 		{
 			Debug.Assert(expression.Parameters.Count == 1);
