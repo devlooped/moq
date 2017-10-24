@@ -12,7 +12,7 @@ namespace Moq
 	/// <summary>
 	/// Defines async extension methods on IReturns.
 	/// </summary>
-	public static class GeneratedReturnsExtensions
+	static partial class ReturnsExtensions
 	{
 		/// <summary>
 		/// Specifies a function that will calculate the value to return from the asynchronous method.

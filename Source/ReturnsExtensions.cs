@@ -1,4 +1,5 @@
 ﻿using System;
+using System.ComponentModel;
 using System.Threading.Tasks;
 using Moq.Language;
 using Moq.Language.Flow;
@@ -9,7 +10,8 @@ namespace Moq
 	/// <summary>
 	/// Defines async extension methods on IReturns.
 	/// </summary>
-	public static class ReturnsExtensions
+	[EditorBrowsable(EditorBrowsableState.Never)]
+	public static partial class ReturnsExtensions
 	{
 		/// <summary>
 		/// Specifies the value to return from an asynchronous method.
