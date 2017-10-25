@@ -62,6 +62,7 @@
 
 		<None Update="Language\ICallback.tt">
 			<Generator>TextTemplatingFileGenerator</Generator>
+			<LastGenOutput>ICallback.Generated.cs</LastGenOutput>
 		</None>
 		<Compile Update="Language\ICallback.Generated.cs">
 			<AutoGen>True</AutoGen>
@@ -71,6 +72,7 @@
 
 		<None Update="Language\IRaise.tt">
 			<Generator>TextTemplatingFileGenerator</Generator>
+			<LastGenOutput>IRaise.Generated.cs</LastGenOutput>
 		</None>
 		<Compile Update="Language\IRaise.Generated.cs">
 			<AutoGen>True</AutoGen>
@@ -80,6 +82,7 @@
 
 		<None Update="Language\IReturns.tt">
 			<Generator>TextTemplatingFileGenerator</Generator>
+			<LastGenOutput>IReturns.Generated.cs</LastGenOutput>
 		</None>
 		<Compile Update="Language\IReturns.Generated.cs">
 			<AutoGen>True</AutoGen>
@@ -97,6 +100,7 @@
 
 		<None Update="MethodCall.tt">
 			<Generator>TextTemplatingFileGenerator</Generator>
+			<LastGenOutput>MethodCall.Generated.cs</LastGenOutput>
 		</None>
 		<Compile Update="MethodCall.Generated.cs">
 			<AutoGen>True</AutoGen>
@@ -106,6 +110,7 @@
 
 		<None Update="MethodCallReturn.tt">
 			<Generator>TextTemplatingFileGenerator</Generator>
+			<LastGenOutput>MethodCallReturn.Generated.cs</LastGenOutput>
 		</None>
 		<Compile Update="MethodCallReturn.Generated.cs">
 			<AutoGen>True</AutoGen>
@@ -128,6 +133,7 @@
 
 		<None Update="ReturnsExtensions.tt">
 			<Generator>TextTemplatingFileGenerator</Generator>
+			<LastGenOutput>ReturnsExtensions.Generated.cs</LastGenOutput>
 		</None>
 		<Compile Update="ReturnsExtensions.Generated.cs">
 			<AutoGen>True</AutoGen>
