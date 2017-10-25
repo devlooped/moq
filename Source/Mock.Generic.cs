@@ -39,12 +39,10 @@
 // http://www.opensource.org/licenses/bsd-license.php]
 
 using System;
+using System.Diagnostics;
 using System.Diagnostics.CodeAnalysis;
 using System.Linq;
 using System.Linq.Expressions;
-using Moq.Language.Flow;
-using Moq.Proxy;
-using Moq.Language;
 using System.Reflection;
 using System.Threading;
 
@@ -52,6 +50,10 @@ using System.Threading;
 using System.CodeDom;
 using Microsoft.CSharp;
 #endif
+
+using Moq.Language;
+using Moq.Language.Flow;
+using Moq.Proxy;
 
 namespace Moq
 {
@@ -185,37 +187,40 @@ namespace Moq
             get { return typeof(T).IsDelegate(); }
         }
 
+		[DebuggerStepThrough]
 		private void InitializeInstance()
 		{
-			PexProtector.Invoke(() =>
+			PexProtector.Invoke(InitializeInstancePexProtected);
+		}
+
+		private void InitializeInstancePexProtected()
+		{
+			if (this.IsDelegateMock)
 			{
-				if (this.IsDelegateMock)
-				{
-					// We're mocking a delegate.
-					// Firstly, get/create an interface with a method whose signature
-					// matches that of the delegate.
-					var delegateInterfaceType = Mock.ProxyFactory.GetDelegateProxyInterface(typeof(T), out delegateInterfaceMethod);
+				// We're mocking a delegate.
+				// Firstly, get/create an interface with a method whose signature
+				// matches that of the delegate.
+				var delegateInterfaceType = Mock.ProxyFactory.GetDelegateProxyInterface(typeof(T), out delegateInterfaceMethod);
 
-					// Then create a proxy for that.
-					var delegateProxy = Mock.ProxyFactory.CreateProxy(
-						delegateInterfaceType,
-						this.Interceptor,
-						this.ImplementedInterfaces.ToArray(),
-						this.constructorArguments);
+				// Then create a proxy for that.
+				var delegateProxy = Mock.ProxyFactory.CreateProxy(
+					delegateInterfaceType,
+					this.Interceptor,
+					this.ImplementedInterfaces.ToArray(),
+					this.constructorArguments);
 
-					// Then our instance is a delegate of the desired type, pointing at the
-					// appropriate method on that proxied interface instance.
-					this.instance = (T)(object)delegateInterfaceMethod.CreateDelegate(typeof(T), delegateProxy);
-				}
-				else
-				{
-					this.instance = (T)Mock.ProxyFactory.CreateProxy(
-						typeof(T),
-						this.Interceptor,
-						this.ImplementedInterfaces.Skip(this.InternallyImplementedInterfaceCount - 1).ToArray(),
-						this.constructorArguments);
-				}
-			});
+				// Then our instance is a delegate of the desired type, pointing at the
+				// appropriate method on that proxied interface instance.
+				this.instance = (T)(object)delegateInterfaceMethod.CreateDelegate(typeof(T), delegateProxy);
+			}
+			else
+			{
+				this.instance = (T)Mock.ProxyFactory.CreateProxy(
+					typeof(T),
+					this.Interceptor,
+					this.ImplementedInterfaces.Skip(this.InternallyImplementedInterfaceCount - 1).ToArray(),
+					this.constructorArguments);
+			}
 		}
 
 		private MethodInfo delegateInterfaceMethod;

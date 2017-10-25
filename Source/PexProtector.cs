@@ -51,14 +51,22 @@ namespace Moq
 	[DebuggerStepThrough]
 	internal static class PexProtector
 	{
+		[DebuggerHidden]
 		public static void Invoke(Action action)
 		{
 			action();
 		}
 
-		public static T Invoke<T>(Func<T> function)
+		[DebuggerHidden]
+		public static void Invoke<T1>(Action<T1> action, T1 arg1)
 		{
-			return function();
+			action(arg1);
+		}
+
+		[DebuggerHidden]
+		public static TResult Invoke<T1, T2, T3, TResult>(Func<T1, T2, T3, TResult> function, T1 arg1, T2 arg2, T3 arg3)
+		{
+			return function(arg1, arg2, arg3);
 		}
 	}
 }
