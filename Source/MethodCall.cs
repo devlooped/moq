@@ -38,11 +38,6 @@
 //[This is the BSD license, see
 // http://www.opensource.org/licenses/bsd-license.php]
 
-using Moq.Language;
-using Moq.Language.Flow;
-using Moq.Matchers;
-using Moq.Properties;
-using Moq.Proxy;
 using System;
 using System.Collections.Generic;
 using System.Diagnostics;
@@ -53,6 +48,12 @@ using System.Linq;
 using System.Linq.Expressions;
 using System.Reflection;
 using System.Text;
+
+using Moq.Language;
+using Moq.Language.Flow;
+using Moq.Matchers;
+using Moq.Properties;
+using Moq.Proxy;
 
 namespace Moq
 {

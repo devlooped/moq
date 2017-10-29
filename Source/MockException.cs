@@ -39,6 +39,7 @@
 // http://www.opensource.org/licenses/bsd-license.php]
 
 using System;
+using System.Collections.Generic;
 using System.Diagnostics.CodeAnalysis;
 using System.Globalization;
 using System.Linq;
@@ -46,6 +47,7 @@ using System.Linq;
 using System.Runtime.Serialization;
 #endif
 using System.Security;
+
 using Moq.Properties;
 using Moq.Proxy;
 
@@ -176,15 +178,15 @@ namespace Moq
 #endif
 	internal class MockVerificationException : MockException
 	{
-		IProxyCall[] failedSetups;
+		IEnumerable<IProxyCall> failedSetups;
 
-		public MockVerificationException(IProxyCall[] failedSetups)
+		public MockVerificationException(IEnumerable<IProxyCall> failedSetups)
 			: base(ExceptionReason.VerificationFailed, GetMessage(failedSetups))
 		{
 			this.failedSetups = failedSetups;
 		}
 
-		private static string GetMessage(IProxyCall[] failedSetups)
+		private static string GetMessage(IEnumerable<IProxyCall> failedSetups)
 		{
 			return string.Format(
 				CultureInfo.CurrentCulture,
@@ -192,7 +194,7 @@ namespace Moq
 				GetRawSetups(failedSetups));
 		}
 
-		private static string GetRawSetups(IProxyCall[] failedSetups)
+		private static string GetRawSetups(IEnumerable<IProxyCall> failedSetups)
 		{
 			return failedSetups.Aggregate(string.Empty, (s, call) => s + call.ToString() + Environment.NewLine);
 		}

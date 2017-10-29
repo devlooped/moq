@@ -61,7 +61,7 @@ namespace Moq
 			var call = new SetterMethodCall<T, TProperty>(mock, expression, setter, value);
 			var targetInterceptor = GetInterceptor(((MemberExpression)expression.Body).Expression, mock);
 
-			targetInterceptor.AddCall(call, SetupKind.PropertySet);
+			targetInterceptor.AddCall(call);
 
 			return call;
 		}

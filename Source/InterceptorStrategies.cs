@@ -69,21 +69,25 @@ namespace Moq
 				return InterceptionAction.Continue;
 			}
 
-			IProxyCall lastMatchingSetup = null;
-			IProxyCall lastMatchingSetupForSameMethod = null;
+			IProxyCall matchedSetup = null;
 			foreach (var setup in ctx.OrderedCalls)
 			{
-				if (setup.Matches(invocation))
+				// the following conditions are repetitive, but were written that way to avoid
+				// unnecessary expensive calls to `setup.Matches`; cheap tests are run first.
+				if (matchedSetup == null && setup.Matches(invocation))
 				{
-					lastMatchingSetup = setup;
+					matchedSetup = setup;
 					if (setup.Method == invocation.Method)
 					{
-						lastMatchingSetupForSameMethod = setup;
+						break;
 					}
 				}
+				else if (setup.Method == invocation.Method && setup.Matches(invocation))
+				{
+					matchedSetup = setup;
+					break;
+				}
 			}
-
-			IProxyCall matchedSetup = lastMatchingSetupForSameMethod ?? lastMatchingSetup;
 
 			if (matchedSetup != null)
 			{

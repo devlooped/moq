@@ -1,9 +1,9 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Linq;
-using System.Text;
-using Moq.Proxy;
 using System.Reflection;
+
+using Moq.Proxy;
 
 namespace Moq
 {
@@ -28,7 +28,10 @@ namespace Moq
 	{
 		private Dictionary<string, List<Delegate>> invocationLists = new Dictionary<string, List<Delegate>>();
 		private List<ICallContext> actualInvocations = new List<ICallContext>();
-		private List<IProxyCall> orderedCalls = new List<IProxyCall>();
+
+		// Using a stack has the advantage that enumeration returns the items in reverse order (last added to first added).
+		// This helps in implementing the rule that "given two matching setups, the last one wins."
+		private Stack<IProxyCall> orderedCalls = new Stack<IProxyCall>();
 
 		public InterceptorContext(Mock Mock, Type targetType, MockBehavior behavior)
 		{
@@ -119,14 +122,7 @@ namespace Moq
 		{
 			lock (orderedCalls)
 			{
-				orderedCalls.Add(call);
-			}
-		}
-		internal void RemoveOrderedCall(IProxyCall call)
-		{
-			lock (orderedCalls)
-			{
-				orderedCalls.Remove(call);
+				orderedCalls.Push(call);
 			}
 		}
 		internal void ClearOrderedCalls()
@@ -142,7 +138,7 @@ namespace Moq
 			{
 				lock (orderedCalls)
 				{
-					return orderedCalls.ToList();
+					return orderedCalls.ToArray();
 				}
 			}
 		}

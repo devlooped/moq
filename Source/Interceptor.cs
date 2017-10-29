@@ -44,6 +44,7 @@ using System.Diagnostics.CodeAnalysis;
 using System.Linq;
 using System.Linq.Expressions;
 using System.Reflection;
+
 using Moq.Proxy;
 
 namespace Moq
@@ -54,8 +55,6 @@ namespace Moq
 	/// </summary>
 	internal class Interceptor : ICallInterceptor
 	{
-		private Dictionary<ExpressionKey, IProxyCall> calls = new Dictionary<ExpressionKey, IProxyCall>();
-
 		public Interceptor(MockBehavior behavior, Type targetType, Mock mock)
 		{
 			InterceptionContext = new InterceptorContext(mock, targetType, behavior);
@@ -75,56 +74,50 @@ namespace Moq
 
 		private void VerifyOrThrow(Func<IProxyCall, bool> match)
 		{
-			lock (calls)
+			var failures = new List<IProxyCall>();
+
+			// The following verification logic will remember each processed setup so that duplicate setups
+			// (that is, setups overridden by later setups with an equivalent expression) can be detected.
+			// To speed up duplicate detection, they are partitioned according to the method they target.
+			var verifiedSetupsPerMethod = new Dictionary<MethodInfo, List<Expression>>();
+
+			foreach (var setup in this.InterceptionContext.OrderedCalls)
 			{
-				var failures = calls.Values.Where(match);
-				if (failures.Any())
+				if (setup.IsConditional)
 				{
-					throw new MockVerificationException(failures.ToArray());
+					continue;
 				}
+
+				List<Expression> verifiedSetupsForMethod;
+				if (!verifiedSetupsPerMethod.TryGetValue(setup.Method, out verifiedSetupsForMethod))
+				{
+					verifiedSetupsForMethod = new List<Expression>();
+					verifiedSetupsPerMethod.Add(setup.Method, verifiedSetupsForMethod);
+				}
+
+				var expr = setup.SetupExpression.PartialMatcherAwareEval();
+				if (verifiedSetupsForMethod.Any(vc => ExpressionComparer.Default.Equals(vc, expr)))
+				{
+					continue;
+				}
+
+				if (match(setup))
+				{
+					failures.Add(setup);
+				}
+
+				verifiedSetupsForMethod.Add(expr);
+			}
+
+			if (failures.Any())
+			{
+				throw new MockVerificationException(failures);
 			}
 		}
 
-		public void AddCall(IProxyCall call, SetupKind kind)
+		public void AddCall(IProxyCall call)
 		{
-			var expr = call.SetupExpression.PartialMatcherAwareEval();
-			var keyText = call.Method.DeclaringType.FullName + "::" + expr.ToStringFixed(true);
-			if (kind == SetupKind.PropertySet)
-			{
-				keyText = "set::" + keyText;
-			}
-
-			var constants = new ConstantsVisitor(expr).Values;
-			var key = new ExpressionKey(keyText, constants);
-
-			if (!call.IsConditional)
-			{
-				lock (calls)
-				{
-					// if it's not a conditional call, we do
-					// all the override setups.
-					// TODO maybe add the conditionals to other
-					// record like calls to be user friendly and display
-					// somethig like: non of this calls were performed.
-					if (calls.ContainsKey(key))
-					{
-						// Remove previous from ordered calls
-						InterceptionContext.RemoveOrderedCall(calls[key]);
-					}
-
-					calls[key] = call;
-				}
-			}
-
 			InterceptionContext.AddOrderedCall(call);
-		}
-
-		internal void ClearCalls()
-		{
-			lock (calls)
-			{
-				calls.Clear();
-			}
 		}
 
 		private static Lazy<IInterceptStrategy[]> interceptionStrategies =
@@ -152,81 +145,6 @@ namespace Moq
 				{
 					break;
 				}
-			}
-		}
-		
-		private class ExpressionKey
-		{
-			private string fixedString;
-			private List<object> values;
-
-			public ExpressionKey(string fixedString, List<object> values)
-			{
-				this.fixedString = fixedString;
-				this.values = values;
-			}
-
-			public override bool Equals(object obj)
-			{
-				if (object.ReferenceEquals(this, obj))
-				{
-					return true;
-				}
-
-				var key = obj as ExpressionKey;
-				if (key == null)
-				{
-					return false;
-				}
-
-				var eq = key.fixedString == this.fixedString && key.values.Count == this.values.Count;
-
-				var index = 0;
-				while (eq && index < this.values.Count)
-				{
-					// using `object.Equals` instead of == ensures that we get the correct
-					// comparison result for boxed value types:
-					eq &= object.Equals(this.values[index], key.values[index]);
-					index++;
-				}
-
-				return eq;
-			}
-
-			public override int GetHashCode()
-			{
-				var hash = fixedString.GetHashCode();
-
-				foreach (var value in values)
-				{
-					if (value != null)
-					{
-						hash = unchecked((hash * 397) ^ value.GetHashCode());
-					}
-				}
-
-				return hash;
-			}
-		}
-
-		private class ConstantsVisitor : ExpressionVisitor
-		{
-			public ConstantsVisitor(Expression expression)
-			{
-				this.Values = new List<object>();
-				base.Visit(expression);
-			}
-
-			public List<object> Values { get; set; }
-
-			protected override Expression VisitConstant(ConstantExpression c)
-			{
-				if (c != null)
-				{
-					Values.Add(c.Value);
-				}
-
-				return base.VisitConstant(c);
 			}
 		}
 	}
