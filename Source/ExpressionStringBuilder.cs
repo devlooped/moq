@@ -258,8 +258,8 @@ namespace Moq
 				{
 					builder.Append("\"").Append(value).Append("\"");
 				}
-				else if (value is IEnumerable enumerable && enumerable.GetEnumerator() != null)
-				{                                        // ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+				else if (value is IEnumerable enumerable && !(value is IMocked))
+				{                                        // ^^^^^^^^^^^^^^^^^^^
 					// This second check ensures that we have a usable implementation of IEnumerable.
 					// If value is a mocked object, its IEnumerable implementation might very well
 					// not work correctly.
