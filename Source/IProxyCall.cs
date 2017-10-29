@@ -46,6 +46,7 @@ namespace Moq
 {
 	internal interface IProxyCall
 	{
+		SetupKind Kind { get; }
 		bool IsConditional { get; }
 		string FailMessage { get; set; }
 		bool Invoked { get; }

@@ -64,6 +64,8 @@ namespace Moq
 		{
 		}
 
+		public override SetupKind Kind => SetupKind.PropertySet;
+
 		public ICallbackResult Callback(Action<TProperty> callback)
 		{
 			this.SetCallbackWithArguments(callback);

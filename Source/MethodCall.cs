@@ -150,6 +150,8 @@ namespace Moq
 			this.SetFileInfo();
 		}
 
+		public virtual SetupKind Kind => SetupKind.Other;
+
 		public string FailMessage
 		{
 			get => this.failMessage;

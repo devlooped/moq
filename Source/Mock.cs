@@ -406,6 +406,7 @@ namespace Moq
 		private static string FormatSetupsInfo(IEnumerable<IProxyCall> setups)
 		{
 			var expressionSetups = setups
+				.Reverse()
 				.Select(s => s.Format())
 				.ToArray();
 

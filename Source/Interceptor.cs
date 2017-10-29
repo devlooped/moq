@@ -54,8 +54,6 @@ namespace Moq
 	/// </summary>
 	internal class Interceptor : ICallInterceptor
 	{
-		private Dictionary<ExpressionKey, IProxyCall> calls = new Dictionary<ExpressionKey, IProxyCall>();
-
 		public Interceptor(MockBehavior behavior, Type targetType, Mock mock)
 		{
 			InterceptionContext = new InterceptorContext(mock, targetType, behavior);
@@ -75,56 +73,48 @@ namespace Moq
 
 		private void VerifyOrThrow(Func<IProxyCall, bool> match)
 		{
-			lock (calls)
+			var orderedCalls = this.InterceptionContext.OrderedCalls;
+
+			var verifiedCalls = new HashSet<ExpressionKey>();
+			var failures = new List<IProxyCall>();
+
+			foreach (var call in orderedCalls)
 			{
-				var failures = calls.Values.Where(match);
-				if (failures.Any())
+				if (call.IsConditional)
 				{
-					throw new MockVerificationException(failures.ToArray());
+					continue;
 				}
+
+				var expr = call.SetupExpression.PartialMatcherAwareEval();
+				var keyText = call.Method.DeclaringType.FullName + "::" + expr.ToStringFixed(true);
+				if (call.Kind == SetupKind.PropertySet)
+				{
+					keyText = "set::" + keyText;
+				}
+				var constants = new ConstantsVisitor(expr).Values;
+				var key = new ExpressionKey(keyText, constants);
+
+				if (verifiedCalls.Contains(key))
+				{
+					continue;
+				}
+
+				verifiedCalls.Add(key);
+				if (match(call))
+				{
+					failures.Add(call);
+				}
+			}
+
+			if (failures.Any())
+			{
+				throw new MockVerificationException(failures);
 			}
 		}
 
 		public void AddCall(IProxyCall call, SetupKind kind)
 		{
-			var expr = call.SetupExpression.PartialMatcherAwareEval();
-			var keyText = call.Method.DeclaringType.FullName + "::" + expr.ToStringFixed(true);
-			if (kind == SetupKind.PropertySet)
-			{
-				keyText = "set::" + keyText;
-			}
-
-			var constants = new ConstantsVisitor(expr).Values;
-			var key = new ExpressionKey(keyText, constants);
-
-			if (!call.IsConditional)
-			{
-				lock (calls)
-				{
-					// if it's not a conditional call, we do
-					// all the override setups.
-					// TODO maybe add the conditionals to other
-					// record like calls to be user friendly and display
-					// somethig like: non of this calls were performed.
-					if (calls.ContainsKey(key))
-					{
-						// Remove previous from ordered calls
-						InterceptionContext.RemoveOrderedCall(calls[key]);
-					}
-
-					calls[key] = call;
-				}
-			}
-
 			InterceptionContext.AddOrderedCall(call);
-		}
-
-		internal void ClearCalls()
-		{
-			lock (calls)
-			{
-				calls.Clear();
-			}
 		}
 
 		private static Lazy<IInterceptStrategy[]> interceptionStrategies =
