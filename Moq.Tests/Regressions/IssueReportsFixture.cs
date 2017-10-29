@@ -1,6 +1,9 @@
 using System;
 using System.Collections;
 using System.Collections.Generic;
+#if DESKTOP
+using System.Data.Entity;
+#endif
 using System.ComponentModel;
 using System.IO;
 using System.Linq;
@@ -1596,6 +1599,40 @@ namespace Moq.Tests.Regressions
 
 			public class Foo : IFoo { }
 		}
+
+		#endregion
+
+		#region 464
+
+		#if DESKTOP
+		public class Issue464
+		{
+			[Fact]
+			public void Test()
+			{
+				Mock<MyDbContext> mockDbContext = new Mock<MyDbContext>();
+				Mock<DbSet<MyEntity>> mockDbSet = new Mock<DbSet<MyEntity>>();
+				mockDbContext.Setup(m => m.Set<MyEntity>()).Returns(mockDbSet.Object);
+
+				var triggerObjectCreation = mockDbContext.Object;
+
+				var exception = Record.Exception(() =>
+				{
+					mockDbContext.Verify(m => m.SaveChanges(), Times.Once);
+				});
+
+				//Should have thrown verify exception because no calls were made
+				Assert.IsType<MockException>(exception);
+			}
+
+			public partial class MyDbContext : DbContext
+			{
+				public virtual DbSet<MyEntity> MyEntity { get; set; }
+			}
+
+			public class MyEntity { }
+		}
+		#endif
 
 		#endregion
 

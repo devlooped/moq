@@ -27,6 +27,7 @@
 		<DotNetCliToolReference Include="dotnet-xunit" Version="2.3.0" />
 	</ItemGroup>
 	<ItemGroup Condition=" '$(TargetFramework)' == 'net46' ">
+		<PackageReference Include="EntityFramework" Version="6.2.0" />
 		<Reference Include="System.Web" />
 		<Reference Include="System.Windows.Forms" />
 	</ItemGroup>
