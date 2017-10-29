@@ -40,14 +40,12 @@
 
 using System;
 using System.Collections.Generic;
-using System.Linq.Expressions;
 using System.Collections.ObjectModel;
-using System.Reflection;
-using System.Linq;
+using System.Linq.Expressions;
 
-namespace Moq.Matchers
+namespace Moq
 {
-	internal class ExpressionComparer : IEqualityComparer<Expression>
+	internal sealed class ExpressionComparer : IEqualityComparer<Expression>
 	{
 		public static readonly ExpressionComparer Default = new ExpressionComparer();
 
