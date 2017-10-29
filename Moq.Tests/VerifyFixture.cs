@@ -997,6 +997,34 @@ namespace Moq.Tests
 			mock.Verify(m => m.remove_Something(), Times.Once);
 		}
 
+		[Fact]
+		public void Verify_ignores_conditional_setups()
+		{
+			var mock = new Mock<IFoo>();
+			mock.When(() => true).Setup(m => m.Submit()).Verifiable();
+
+			var exception = Record.Exception(() =>
+			{
+				mock.Verify();
+			});
+
+			Assert.Null(exception);
+		}
+
+		[Fact]
+		public void VerifyAll_ignores_conditional_setups()
+		{
+			var mock = new Mock<IFoo>();
+			mock.When(() => true).Setup(m => m.Submit());
+
+			var exception = Record.Exception(() =>
+			{
+				mock.VerifyAll();
+			});
+
+			Assert.Null(exception);
+		}
+
 		public interface IBar
 		{
 			int? Value { get; set; }
