@@ -450,7 +450,7 @@ namespace Moq
 
 			var targetInterceptor = GetInterceptor(methodCall.Object, mock);
 
-			targetInterceptor.AddCall(call, SetupKind.Other);
+			targetInterceptor.AddCall(call);
 
 			return call;
 		}
@@ -486,7 +486,7 @@ namespace Moq
 
 			var targetInterceptor = GetInterceptor(methodCall.Object, mock);
 
-			targetInterceptor.AddCall(call, SetupKind.Other);
+			targetInterceptor.AddCall(call);
 
 			return call;
 		}
@@ -524,7 +524,7 @@ namespace Moq
 			// Directly casting to MemberExpression is fine as ToPropertyInfo would throw if it wasn't
 			var targetInterceptor = GetInterceptor(((MemberExpression)expression.Body).Expression, mock);
 
-			targetInterceptor.AddCall(call, SetupKind.Other);
+			targetInterceptor.AddCall(call);
 
 			return call;
 		}
@@ -551,7 +551,7 @@ namespace Moq
 				(m, expr, method, value) =>
 				{
 					var call = new SetterMethodCall<T, TProperty>(m, condition, expr, method, value[0]);
-					m.Interceptor.AddCall(call, SetupKind.PropertySet);
+					m.Interceptor.AddCall(call);
 					return call;
 				});
 		}
@@ -572,7 +572,7 @@ namespace Moq
 				(m, expr, method, values) =>
 				{
 					var call = new MethodCall<T>(m, condition, expr, method, values);
-					m.Interceptor.AddCall(call, SetupKind.PropertySet);
+					m.Interceptor.AddCall(call);
 					return call;
 				});
 		}
@@ -592,7 +592,7 @@ namespace Moq
 			var call = new SetterMethodCall<T, TProperty>(mock, expression, propSet);
 			var targetInterceptor = GetInterceptor(((MemberExpression)expression.Body).Expression, mock);
 
-			targetInterceptor.AddCall(call, SetupKind.PropertySet);
+			targetInterceptor.AddCall(call);
 
 			return call;
 		}
@@ -713,7 +713,7 @@ namespace Moq
 
 				var setup = new SequenceMethodCall(mock, expression, propGet, new Expression[0]);
 				var targetInterceptor = GetInterceptor(((MemberExpression)expression.Body).Expression, mock);
-				targetInterceptor.AddCall(setup, SetupKind.Other);
+				targetInterceptor.AddCall(setup);
 				return new SetupSequencePhrase<TResult>(setup);
 			}
 			else
@@ -721,7 +721,7 @@ namespace Moq
 				var methodCall = expression.GetCallInfo(mock);
 				var targetInterceptor = GetInterceptor(methodCall.Object, mock);
 				var setup = new SequenceMethodCall(mock, expression, methodCall.Method, methodCall.Arguments.ToArray());
-				targetInterceptor.AddCall(setup, SetupKind.Other);
+				targetInterceptor.AddCall(setup);
 				return new SetupSequencePhrase<TResult>(setup);
 			}
 		}
@@ -731,7 +731,7 @@ namespace Moq
 			var methodCall = expression.GetCallInfo(mock);
 			var targetInterceptor = GetInterceptor(methodCall.Object, mock);
 			var setup = new SequenceMethodCall(mock, expression, methodCall.Method, methodCall.Arguments.ToArray());
-			targetInterceptor.AddCall(setup, SetupKind.Other);
+			targetInterceptor.AddCall(setup);
 			return new SetupSequencePhrase(setup);
 		}
 

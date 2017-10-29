@@ -115,7 +115,7 @@ namespace Moq
 			}
 		}
 
-		public void AddCall(IProxyCall call, SetupKind kind)
+		public void AddCall(IProxyCall call)
 		{
 			InterceptionContext.AddOrderedCall(call);
 		}
