@@ -70,7 +70,7 @@ namespace Moq
 			}
 
 			IProxyCall matchedSetup = null;
-			foreach (var setup in ctx.OrderedCalls)
+			foreach (var setup in ctx.GetOrderedCalls())
 			{
 				// the following conditions are repetitive, but were written that way to avoid
 				// unnecessary expensive calls to `setup.Matches`; cheap tests are run first.
@@ -163,7 +163,7 @@ namespace Moq
 				return InterceptionAction.Continue;
 			}
 
-			var orderedCalls = ctx.OrderedCalls;
+			var orderedCalls = ctx.GetOrderedCalls();
 
 			// Only if there is no corresponding setup for `ToString()`
 			if (method.Name == "ToString" && !orderedCalls.Any(c => IsObjectMethod(c.Method, "ToString")))

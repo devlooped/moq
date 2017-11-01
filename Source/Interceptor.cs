@@ -81,7 +81,7 @@ namespace Moq
 			// To speed up duplicate detection, they are partitioned according to the method they target.
 			var verifiedSetupsPerMethod = new Dictionary<MethodInfo, List<Expression>>();
 
-			foreach (var setup in this.InterceptionContext.OrderedCalls)
+			foreach (var setup in this.InterceptionContext.GetOrderedCalls())
 			{
 				if (setup.IsConditional)
 				{

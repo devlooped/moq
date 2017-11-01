@@ -378,13 +378,12 @@ namespace Moq
 			Expression expression,
 			Times times)
 		{
-			// .Where does an enumeration, and calls to a mocked method concurrent to VerifyCalls might change the content of ActualCalls. therefore, it is necessary to take a snapshot, using ToList(), so that concurrent calls will not impact the ongoing verification.
-			var actualCalls = targetInterceptor.InterceptionContext.ActualInvocations.ToList();
+			var actualCalls = targetInterceptor.InterceptionContext.GetActualInvocations();
 
-			var callCount = actualCalls.Where(ac => expected.Matches(ac)).Count();
+			var callCount = actualCalls.Count(expected.Matches);
 			if (!times.Verify(callCount))
 			{
-				var setups = targetInterceptor.InterceptionContext.OrderedCalls.Where(oc => AreSameMethod(oc.SetupExpression, expression));
+				var setups = targetInterceptor.InterceptionContext.GetOrderedCalls().Where(oc => AreSameMethod(oc.SetupExpression, expression));
 				ThrowVerifyException(expected, setups, actualCalls, expression, times, callCount);
 			}
 		}

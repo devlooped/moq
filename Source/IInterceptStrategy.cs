@@ -99,14 +99,11 @@ namespace Moq
 				actualInvocations.Add(invocation);
 			}
 		}
-		internal IEnumerable<ICallContext> ActualInvocations
+		internal IEnumerable<ICallContext> GetActualInvocations()
 		{
-			get
+			lock (actualInvocations)
 			{
-				lock (actualInvocations)
-				{
-					return actualInvocations.ToList();
-				}
+				return actualInvocations.ToArray();
 			}
 		}
 		internal void ClearInvocations()
@@ -132,14 +129,11 @@ namespace Moq
 				orderedCalls.Clear();
 			}
 		}
-		internal IEnumerable<IProxyCall> OrderedCalls
+		internal IEnumerable<IProxyCall> GetOrderedCalls()
 		{
-			get
+			lock (orderedCalls)
 			{
-				lock (orderedCalls)
-				{
-					return orderedCalls.ToArray();
-				}
+				return orderedCalls.ToArray();
 			}
 		}
 		#endregion
