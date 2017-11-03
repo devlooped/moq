@@ -63,17 +63,17 @@ namespace Moq
 
 		internal InterceptorContext InterceptionContext { get; private set; }
 
-		internal void Verify()
+		internal bool TryVerify(out UnmatchedSetups error)
 		{
-			VerifyOrThrow(call => call.IsVerifiable && !call.Invoked);
+			return this.TryVerifyOrThrow(call => call.IsVerifiable && !call.Invoked, out error);
 		}
 
-		internal void VerifyAll()
+		internal bool TryVerifyAll(out UnmatchedSetups error)
 		{
-			VerifyOrThrow(call => !call.Invoked);
+			return this.TryVerifyOrThrow(call => !call.Invoked, out error);
 		}
 
-		private void VerifyOrThrow(Func<IProxyCall, bool> match)
+		private bool TryVerifyOrThrow(Func<IProxyCall, bool> match, out UnmatchedSetups error)
 		{
 			var failures = new Stack<IProxyCall>();
 
@@ -112,7 +112,13 @@ namespace Moq
 
 			if (failures.Any())
 			{
-				throw new UnmatchedSetups(failures).AsMockException();
+				error = new UnmatchedSetups(failures);
+				return false;
+			}
+			else
+			{
+				error = null;
+				return true;
 			}
 		}
 

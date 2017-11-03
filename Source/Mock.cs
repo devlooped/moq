@@ -49,6 +49,7 @@ using System.Linq.Expressions;
 using System.Reflection;
 using System.Runtime.CompilerServices;
 
+using Moq.Diagnostics.Errors;
 using Moq.Language.Flow;
 using Moq.Properties;
 using Moq.Proxy;
@@ -234,47 +235,59 @@ namespace Moq
 		#region Verify
 
 		/// <include file='Mock.xdoc' path='docs/doc[@for="Mock.Verify"]/*'/>
-		[SuppressMessage("Microsoft.Usage", "CA2200:RethrowToPreserveStackDetails", Justification = "We want to explicitly reset the stack trace here.")]
 		public void Verify()
 		{
-			try
+			if (!this.TryVerify(out UnmatchedSetups error))
 			{
-				this.Interceptor.Verify();
-				foreach (var inner in this.InnerMocks.Values)
-				{
-					inner.Verify();
-				}
-			}
-			catch (Exception ex)
-			{
-				// Rethrow resetting the call-stack so that 
-				// callers see the exception as happening at 
-				// this call site.
-				// TODO: see how to mangle the stacktrace so 
-				// that the mock doesn't even show up there.
-				throw ex;
+				throw error.AsMockException();
 			}
 		}
 
-		/// <include file='Mock.xdoc' path='docs/doc[@for="Mock.VerifyAll"]/*'/>		
-		[SuppressMessage("Microsoft.Usage", "CA2200:RethrowToPreserveStackDetails", Justification = "We want to explicitly reset the stack trace here.")]
-		public void VerifyAll()
+		private bool TryVerify(out UnmatchedSetups error)
 		{
-			try
+			if (!this.Interceptor.TryVerify(out error))
 			{
-				this.Interceptor.VerifyAll();
-				foreach (var inner in this.InnerMocks.Values)
+				return false;
+			}
+
+			foreach (var inner in this.InnerMocks.Values)
+			{
+				if (!inner.TryVerify(out error))
 				{
-					inner.VerifyAll();
+					return false;
 				}
 			}
-			catch (Exception ex)
+
+			error = null;
+			return true;
+		}
+
+		/// <include file='Mock.xdoc' path='docs/doc[@for="Mock.VerifyAll"]/*'/>		
+		public void VerifyAll()
+		{
+			if (!this.TryVerifyAll(out UnmatchedSetups error))
 			{
-				// Rethrow resetting the call-stack so that 
-				// callers see the exception as happening at 
-				// this call site.
-				throw ex;
+				throw error.AsMockException();
 			}
+		}
+
+		private bool TryVerifyAll(out UnmatchedSetups error)
+		{
+			if (!this.Interceptor.TryVerifyAll(out error))
+			{
+				return false;
+			}
+
+			foreach (var inner in this.InnerMocks.Values)
+			{
+				if (!inner.TryVerifyAll(out error))
+				{
+					return false;
+				}
+			}
+
+			error = null;
+			return true;
 		}
 
 		internal static void Verify<T>(
