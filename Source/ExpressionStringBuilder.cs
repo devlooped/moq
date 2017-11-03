@@ -1,13 +1,14 @@
 using System;
 using System.Collections;
 using System.Collections.Generic;
-using System.Globalization;
+using System.Collections.ObjectModel;
+using System.Diagnostics;
 using System.Linq;
 using System.Linq.Expressions;
 using System.Reflection;
 using System.Runtime.CompilerServices;
 using System.Text;
-using System.Collections.ObjectModel;
+
 using Moq.Properties;
 
 namespace Moq
@@ -629,45 +630,38 @@ namespace Moq
 		}
 	}
 
-	internal static class StringExtensions
-	{
-		public static string AsCommaSeparatedValues(this IEnumerable<string> source)
-		{
-			if (source == null)
-			{
-				return string.Empty;
-			}
-			var result = new StringBuilder(100);
-			bool appendComma = false;
-			foreach (var value in source)
-			{
-				if (appendComma)
-				{
-					result.Append(", ");
-				}
-				result.Append(value);
-				appendComma = true;
-			}
-			return result.ToString();
-		}
-	}
-
 	internal static class StringBuilderExtensions
 	{
 		public static StringBuilder AppendDisplayName(this StringBuilder builder, Type source, Func<Type, string> getName)
 		{
-			if (source == null)
+			Debug.Assert(source != null);
+
+			var name = getName(source);
+			var backtickIndex = name.IndexOf('`');
+			if (backtickIndex >= 0)
 			{
-				throw new ArgumentNullException("source");
+				builder.Append(name, 0, backtickIndex);
+			}
+			else
+			{
+				builder.Append(name);
 			}
 
-			builder.Append(getName(source).Split('`').First());
 			if (source.GetTypeInfo().IsGenericType)
 			{
+				var genericArguments = source.GetGenericArguments();
 				builder.Append('<');
-				builder.Append(source.GetGenericArguments().Select(t => getName(t)).AsCommaSeparatedValues());
+				for (int i = 0, n = genericArguments.Length; i < n; ++i)
+				{
+					if (i > 0)
+					{
+						builder.Append(", ");
+					}
+					builder.Append(getName(genericArguments[i]));
+				}
 				builder.Append('>');
 			}
+
 			return builder;
 		}
 	}
