@@ -321,7 +321,7 @@ namespace Moq
 		/// <summary>
 		/// Invokes <paramref name="verifyAction"/> for each mock 
 		/// in <see cref="Mocks"/>, and accumulates the resulting 
-		/// <see cref="MockVerificationException"/> that might be 
+		/// verification exceptions that might be
 		/// thrown from the action.
 		/// </summary>
 		/// <param name="verifyAction">The action to execute against 
@@ -338,7 +338,7 @@ namespace Moq
 				{
 					verifyAction(mock);
 				}
-				catch (MockVerificationException mve)
+				catch (MockException mve) when (mve.FailedSetups != null)
 				{
 					message.AppendLine(mve.GetRawSetups());
 				}

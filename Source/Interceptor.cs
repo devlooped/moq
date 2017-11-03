@@ -111,7 +111,7 @@ namespace Moq
 
 			if (failures.Any())
 			{
-				throw new MockVerificationException(failures);
+				throw new MockException(failures);
 			}
 		}
 

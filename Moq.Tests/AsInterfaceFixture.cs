@@ -85,15 +85,10 @@ namespace Moq.Tests
 			bag.Setup(b => b.Add("foo", "bar")).Verifiable();
 			foo.Setup(f => f.Execute()).Verifiable();
 
-			try
-			{
-				bag.Verify();
-			}
-			catch (MockVerificationException me)
-			{
-				Assert.Contains(typeof(IFoo).Name, me.Message);
-				Assert.Contains(typeof(IBag).Name, me.Message);
-			}
+			var me = Assert.Throws<MockException>(() => bag.Verify());
+			Assert.True(me.IsVerificationError);
+			Assert.Contains(typeof(IFoo).Name, me.Message);
+			Assert.Contains(typeof(IBag).Name, me.Message);
 		}
 
 		[Fact]
@@ -130,8 +125,12 @@ namespace Moq.Tests
 
 			foo.Setup(f => f.Execute()).Verifiable();
 
-			Assert.Throws<MockVerificationException>(() => foo.Verify());
-			Assert.Throws<MockVerificationException>(() => foo.VerifyAll());
+			var ex = Assert.Throws<MockException>(() => foo.Verify());
+			Assert.True(ex.IsVerificationError);
+
+			ex = Assert.Throws<MockException>(() => foo.VerifyAll());
+			Assert.True(ex.IsVerificationError);
+
 			Assert.Throws<MockException>(() => foo.Verify(f => f.Execute()));
 
 			foo.Object.Execute();

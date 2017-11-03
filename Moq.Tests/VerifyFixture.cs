@@ -15,8 +15,8 @@ namespace Moq.Tests
 
 			mock.Setup(x => x.Submit()).Verifiable();
 
-			var mex = Assert.Throws<MockVerificationException>(() => mock.Verify());
-			Assert.Equal(MockException.ExceptionReason.VerificationFailed, mex.Reason);
+			var mex = Assert.Throws<MockException>(() => mock.Verify());
+			Assert.True(mex.IsVerificationError);
 		}
 
 		[Fact]
@@ -26,9 +26,9 @@ namespace Moq.Tests
 
 			mock.Setup(x => x.Submit()).Verifiable("Kaboom!");
 
-			var mex = Assert.Throws<MockVerificationException>(() => mock.Verify());
+			var mex = Assert.Throws<MockException>(() => mock.Verify());
+			Assert.True(mex.IsVerificationError);
 			Assert.Contains("Kaboom!", mex.Message);
-			Assert.Equal(MockException.ExceptionReason.VerificationFailed, mex.Reason);
 		}
 
 		[Fact]
@@ -41,8 +41,8 @@ namespace Moq.Tests
 				.Returns("ack")
 				.Verifiable();
 
-			var mex = Assert.Throws<MockVerificationException>(() => mock.Verify());
-			Assert.Equal(MockException.ExceptionReason.VerificationFailed, mex.Reason);
+			var mex = Assert.Throws<MockException>(() => mock.Verify());
+			Assert.True(mex.IsVerificationError);
 			Assert.True(mex.Message.Contains(@".Execute(""lorem"")"), "Contains evaluated expected argument.");
 		}
 
@@ -55,8 +55,8 @@ namespace Moq.Tests
 				.Returns("ack")
 				.Verifiable();
 
-			var mex = Assert.Throws<MockVerificationException>(() => mock.Verify());
-			Assert.Equal(MockException.ExceptionReason.VerificationFailed, mex.Reason);
+			var mex = Assert.Throws<MockException>(() => mock.Verify());
+			Assert.True(mex.IsVerificationError);
 			Assert.Contains(@".Execute(It.Is<String>(s => String.IsNullOrEmpty(s)))", mex.Message);
 		}
 
@@ -75,8 +75,8 @@ namespace Moq.Tests
 
 			mock.Setup(x => x.Submit());
 
-			var mex = Assert.Throws<MockVerificationException>(() => mock.VerifyAll());
-			Assert.Equal(MockException.ExceptionReason.VerificationFailed, mex.Reason);
+			var mex = Assert.Throws<MockException>(() => mock.VerifyAll());
+			Assert.True(mex.IsVerificationError);
 		}
 
 		[Fact]
@@ -1121,7 +1121,8 @@ namespace SomeNamespace
 			mock.Setup(x => x.Echo(1));
 			mock.Setup(x => x.Execute("ping"));
 
-			var ex = Assert.Throws<MockVerificationException>(() => mock.VerifyAll());
+			var ex = Assert.Throws<MockException>(() => mock.VerifyAll());
+			Assert.True(ex.IsVerificationError);
 			Assert.Contains("x => x.Submit()", ex.Message);
 			Assert.Contains("x => x.Echo(1)", ex.Message);
 			Assert.Contains("x => x.Execute(\"ping\")", ex.Message);

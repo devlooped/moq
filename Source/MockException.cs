@@ -91,6 +91,11 @@ namespace Moq
 			SetupNever,
 		}
 
+#if FEATURE_SERIALIZATION
+		[NonSerialized]
+#endif
+		IEnumerable<IProxyCall> failedSetups;
+
 		private ExceptionReason reason;
 
 		internal MockException(ExceptionReason reason, MockBehavior behavior,
@@ -112,6 +117,15 @@ namespace Moq
 		{
 			this.reason = reason;
 		}
+
+		internal MockException(IEnumerable<IProxyCall> failedSetups)
+			: base(GetFailedSetupsMessage(failedSetups))
+		{
+			this.failedSetups = failedSetups;
+			this.reason = ExceptionReason.VerificationFailed;
+		}
+
+		internal IEnumerable<IProxyCall> FailedSetups => this.failedSetups;
 
 		internal ExceptionReason Reason
 		{
@@ -140,6 +154,24 @@ namespace Moq
 			);
 		}
 
+		private static string GetFailedSetupsMessage(IEnumerable<IProxyCall> failedSetups)
+		{
+			return string.Format(
+				CultureInfo.CurrentCulture,
+				Resources.VerficationFailed,
+				GetRawSetups(failedSetups));
+		}
+
+		private static string GetRawSetups(IEnumerable<IProxyCall> failedSetups)
+		{
+			return failedSetups.Aggregate(string.Empty, (s, call) => s + call.ToString() + Environment.NewLine);
+		}
+
+		internal string GetRawSetups()
+		{
+			return GetRawSetups(failedSetups);
+		}
+
 #if FEATURE_SERIALIZATION
 		/// <summary>
 		/// Supports the serialization infrastructure.
@@ -165,54 +197,6 @@ namespace Moq
 		{
 			base.GetObjectData(info, context);
 			info.AddValue("reason", reason);
-		}
-#endif
-	}
-
-	/// <devdoc>
-	/// Used by the mock factory to accumulate verification 
-	/// failures.
-	/// </devdoc>
-#if FEATURE_SERIALIZATION
-	[Serializable]
-#endif
-	internal class MockVerificationException : MockException
-	{
-		IEnumerable<IProxyCall> failedSetups;
-
-		public MockVerificationException(IEnumerable<IProxyCall> failedSetups)
-			: base(ExceptionReason.VerificationFailed, GetMessage(failedSetups))
-		{
-			this.failedSetups = failedSetups;
-		}
-
-		private static string GetMessage(IEnumerable<IProxyCall> failedSetups)
-		{
-			return string.Format(
-				CultureInfo.CurrentCulture,
-				Resources.VerficationFailed,
-				GetRawSetups(failedSetups));
-		}
-
-		private static string GetRawSetups(IEnumerable<IProxyCall> failedSetups)
-		{
-			return failedSetups.Aggregate(string.Empty, (s, call) => s + call.ToString() + Environment.NewLine);
-		}
-
-		internal string GetRawSetups()
-		{
-			return GetRawSetups(failedSetups);
-		}
-
-#if FEATURE_SERIALIZATION
-		/// <summary>
-		/// Supports the serialization infrastructure.
-		/// </summary>
-		protected MockVerificationException(
-		  System.Runtime.Serialization.SerializationInfo info,
-		  System.Runtime.Serialization.StreamingContext context)
-			: base(info, context)
-		{
 		}
 #endif
 	}
