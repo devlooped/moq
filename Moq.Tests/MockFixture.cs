@@ -487,11 +487,13 @@ namespace Moq.Tests
 
 			mock.SetupSet(foo => foo.Count = 5);
 
-			Assert.Throws<MockVerificationException>(() => mock.VerifyAll());
+			var ex = Assert.Throws<MockException>(() => mock.VerifyAll());
+			Assert.True(ex.IsVerificationError);
 
 			mock.Object.Count = 6;
 
-			Assert.Throws<MockVerificationException>(() => mock.VerifyAll());
+			ex = Assert.Throws<MockException>(() => mock.VerifyAll());
+			Assert.True(ex.IsVerificationError);
 
 			mock.Object.Count = 5;
 
@@ -525,7 +527,8 @@ namespace Moq.Tests
 
 			mock.SetupSet(foo => foo.Count = It.IsAny<int>());
 
-			Assert.Throws<MockVerificationException>(() => mock.VerifyAll());
+			var ex = Assert.Throws<MockException>(() => mock.VerifyAll());
+			Assert.True(ex.IsVerificationError);
 
 			mock.Object.Count = 6;
 
@@ -539,11 +542,13 @@ namespace Moq.Tests
 
 			mock.SetupSet(foo => foo.Count = It.IsInRange(1, 5, Range.Inclusive));
 
-			Assert.Throws<MockVerificationException>(() => mock.VerifyAll());
+			var ex = Assert.Throws<MockException>(() => mock.VerifyAll());
+			Assert.True(ex.IsVerificationError);
 
 			mock.Object.Count = 6;
 
-			Assert.Throws<MockVerificationException>(() => mock.VerifyAll());
+			ex = Assert.Throws<MockException>(() => mock.VerifyAll());
+			Assert.True(ex.IsVerificationError);
 
 			mock.Object.Count = 5;
 
@@ -557,11 +562,13 @@ namespace Moq.Tests
 
 			mock.SetupSet(foo => foo.Count = It.Is<int>(v => v % 2 == 0));
 
-			Assert.Throws<MockVerificationException>(() => mock.VerifyAll());
+			var ex = Assert.Throws<MockException>(() => mock.VerifyAll());
+			Assert.True(ex.IsVerificationError);
 
 			mock.Object.Count = 7;
 
-			Assert.Throws<MockVerificationException>(() => mock.VerifyAll());
+			ex = Assert.Throws<MockException>(() => mock.VerifyAll());
+			Assert.True(ex.IsVerificationError);
 
 			mock.Object.Count = 4;
 
@@ -589,7 +596,8 @@ namespace Moq.Tests
 
 			mock.SetupSet(foo => foo.Count = 5);
 
-			Assert.Throws<MockVerificationException>(() => mock.VerifyAll());
+			var ex = Assert.Throws<MockException>(() => mock.VerifyAll());
+			Assert.True(ex.IsVerificationError);
 
 			mock.Object.Count = 5;
 			mock.VerifyAll();
@@ -655,11 +663,13 @@ namespace Moq.Tests
 
 			mock.SetupSet(foo => foo.Value = 5);
 
-			Assert.Throws<MockVerificationException>(() => mock.VerifyAll());
+			var ex = Assert.Throws<MockException>(() => mock.VerifyAll());
+			Assert.True(ex.IsVerificationError);
 
 			mock.Object.Value = 6;
 
-			Assert.Throws<MockVerificationException>(() => mock.VerifyAll());
+			ex = Assert.Throws<MockException>(() => mock.VerifyAll());
+			Assert.True(ex.IsVerificationError);
 
 			mock.Object.Value = 5;
 
@@ -674,11 +684,13 @@ namespace Moq.Tests
 
 			mock.SetupSet(foo => foo.Object = obj);
 
-			Assert.Throws<MockVerificationException>(() => mock.VerifyAll());
+			var ex = Assert.Throws<MockException>(() => mock.VerifyAll());
+			Assert.True(ex.IsVerificationError);
 
 			mock.Object.Object = new object();
 
-			Assert.Throws<MockVerificationException>(() => mock.VerifyAll());
+			ex = Assert.Throws<MockException>(() => mock.VerifyAll());
+			Assert.True(ex.IsVerificationError);
 
 			mock.Object.Object = obj;
 
@@ -692,7 +704,8 @@ namespace Moq.Tests
 
 			mock.SetupSet<string>(foo => foo.Bar.Value = "bar");
 
-			Assert.Throws<MockVerificationException>(() => mock.VerifyAll());
+			var ex = Assert.Throws<MockException>(() => mock.VerifyAll());
+			Assert.True(ex.IsVerificationError);
 
 			mock.Object.Bar.Value = "bar";
 
@@ -706,7 +719,9 @@ namespace Moq.Tests
 			mock.SetupSet(m => m.Value = null);
 
 			Assert.Throws<MockException>(() => { mock.Object.Value = 5; });
-			Assert.Throws<MockVerificationException>(() => mock.VerifyAll());
+
+			var ex = Assert.Throws<MockException>(() => mock.VerifyAll());
+			Assert.True(ex.IsVerificationError);
 
 			mock.Object.Value = null;
 

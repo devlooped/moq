@@ -27,6 +27,8 @@ The format is loosely based on [Keep a Changelog](http://keepachangelog.com/en/1
 * Improve recognition logic for sealed methods so that `Setup` throws when an attempt is made to set one up (@stakx, #497)
 * Let `SetupAllProperties` skip inaccessible methods (@stakx, #499)
 * Prevent Moq from relying on a mock's implementation of `IEnumerable<T>` (@stakx, #510)
+* Verification leaked internal `MockVerificationException` type; remove it (@stakx, #511)
+
 
 ## 4.7.142 (2017-10-11)
 

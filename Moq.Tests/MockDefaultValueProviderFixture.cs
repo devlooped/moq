@@ -90,7 +90,8 @@ namespace Moq.Tests
 			var barMock = Mock.Get((IBar)value);
 			barMock.Setup(b => b.Do()).Verifiable();
 
-			Assert.Throws<MockVerificationException>(() => mock.Verify());
+			var ex = Assert.Throws<MockException>(() => mock.Verify());
+			Assert.True(ex.IsVerificationError);
 		}
 
 		[Fact]

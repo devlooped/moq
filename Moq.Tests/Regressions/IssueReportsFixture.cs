@@ -2059,7 +2059,8 @@ namespace Moq.Tests.Regressions
 				var target = new Mock<IFoo>();
 				target.Setup(t => t.Submit(It.IsAny<string>(), It.IsAny<string>(), It.IsAny<int>()));
 
-				var e = Assert.Throws<MockVerificationException>(() => target.VerifyAll());
+				var e = Assert.Throws<MockException>(() => target.VerifyAll());
+				Assert.True(e.IsVerificationError);
 
 				Assert.Contains(
 					"IFoo t => t.Submit(It.IsAny<String>(), It.IsAny<String>(), new[] { It.IsAny<Int32>() })",

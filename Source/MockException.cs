@@ -39,15 +39,15 @@
 // http://www.opensource.org/licenses/bsd-license.php]
 
 using System;
-using System.Collections.Generic;
+using System.Diagnostics;
 using System.Diagnostics.CodeAnalysis;
 using System.Globalization;
-using System.Linq;
 #if FEATURE_SERIALIZATION
 using System.Runtime.Serialization;
 #endif
 using System.Security;
 
+using Moq.Diagnostics.Errors;
 using Moq.Properties;
 using Moq.Proxy;
 
@@ -91,6 +91,11 @@ namespace Moq
 			SetupNever,
 		}
 
+#if FEATURE_SERIALIZATION
+		[NonSerialized]
+#endif
+		private IError error;
+
 		private ExceptionReason reason;
 
 		internal MockException(ExceptionReason reason, MockBehavior behavior,
@@ -112,6 +117,17 @@ namespace Moq
 		{
 			this.reason = reason;
 		}
+
+		internal MockException(ExceptionReason reason, IError error)
+			: base(error.Message)
+		{
+			Debug.Assert(error != null);
+
+			this.error = error;
+			this.reason = reason;
+		}
+
+		internal IError Error => this.error;
 
 		internal ExceptionReason Reason
 		{
@@ -165,54 +181,6 @@ namespace Moq
 		{
 			base.GetObjectData(info, context);
 			info.AddValue("reason", reason);
-		}
-#endif
-	}
-
-	/// <devdoc>
-	/// Used by the mock factory to accumulate verification 
-	/// failures.
-	/// </devdoc>
-#if FEATURE_SERIALIZATION
-	[Serializable]
-#endif
-	internal class MockVerificationException : MockException
-	{
-		IEnumerable<IProxyCall> failedSetups;
-
-		public MockVerificationException(IEnumerable<IProxyCall> failedSetups)
-			: base(ExceptionReason.VerificationFailed, GetMessage(failedSetups))
-		{
-			this.failedSetups = failedSetups;
-		}
-
-		private static string GetMessage(IEnumerable<IProxyCall> failedSetups)
-		{
-			return string.Format(
-				CultureInfo.CurrentCulture,
-				Resources.VerficationFailed,
-				GetRawSetups(failedSetups));
-		}
-
-		private static string GetRawSetups(IEnumerable<IProxyCall> failedSetups)
-		{
-			return failedSetups.Aggregate(string.Empty, (s, call) => s + call.ToString() + Environment.NewLine);
-		}
-
-		internal string GetRawSetups()
-		{
-			return GetRawSetups(failedSetups);
-		}
-
-#if FEATURE_SERIALIZATION
-		/// <summary>
-		/// Supports the serialization infrastructure.
-		/// </summary>
-		protected MockVerificationException(
-		  System.Runtime.Serialization.SerializationInfo info,
-		  System.Runtime.Serialization.StreamingContext context)
-			: base(info, context)
-		{
 		}
 #endif
 	}

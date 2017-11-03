@@ -78,7 +78,8 @@ namespace Moq.Tests
 			mock.SetupSet(m => m.Bar.Value = 5);
 
 			Assert.NotNull(mock.Object.Bar);
-			Assert.Throws<MockVerificationException>(() => mock.VerifyAll());
+			var ex = Assert.Throws<MockException>(() => mock.VerifyAll());
+			Assert.True(ex.IsVerificationError);
 
 			mock.Object.Bar.Value = 5;
 
@@ -93,7 +94,8 @@ namespace Moq.Tests
 			mock.SetupSet(m => m.Bar.Value = It.IsAny<int>());
 
 			Assert.NotNull(mock.Object.Bar);
-			Assert.Throws<MockVerificationException>(() => mock.VerifyAll());
+			var ex = Assert.Throws<MockException>(() => mock.VerifyAll());
+			Assert.True(ex.IsVerificationError);
 
 			mock.Object.Bar.Value = 5;
 
@@ -111,7 +113,8 @@ namespace Moq.Tests
 			mock.Object.Do("ping");
 			var bar = mock.Object.Bar;
 
-			Assert.Throws<MockVerificationException>(() => mock.VerifyAll());
+			var ex = Assert.Throws<MockException>(() => mock.VerifyAll());
+			Assert.True(ex.IsVerificationError);
 		}
 
 		[Fact]
@@ -125,7 +128,8 @@ namespace Moq.Tests
 			mock.Object.Do("ping");
 			var bar = mock.Object.Bar;
 
-			Assert.Throws<MockVerificationException>(() => mock.Verify());
+			var ex = Assert.Throws<MockException>(() => mock.Verify());
+			Assert.True(ex.IsVerificationError);
 		}
 
 		[Fact]

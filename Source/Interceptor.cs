@@ -45,6 +45,7 @@ using System.Linq;
 using System.Linq.Expressions;
 using System.Reflection;
 
+using Moq.Diagnostics.Errors;
 using Moq.Proxy;
 
 namespace Moq
@@ -62,19 +63,19 @@ namespace Moq
 
 		internal InterceptorContext InterceptionContext { get; private set; }
 
-		internal void Verify()
+		internal bool TryVerify(out UnmatchedSetups error)
 		{
-			VerifyOrThrow(call => call.IsVerifiable && !call.Invoked);
+			return this.TryVerifyOrThrow(call => call.IsVerifiable && !call.Invoked, out error);
 		}
 
-		internal void VerifyAll()
+		internal bool TryVerifyAll(out UnmatchedSetups error)
 		{
-			VerifyOrThrow(call => !call.Invoked);
+			return this.TryVerifyOrThrow(call => !call.Invoked, out error);
 		}
 
-		private void VerifyOrThrow(Func<IProxyCall, bool> match)
+		private bool TryVerifyOrThrow(Func<IProxyCall, bool> match, out UnmatchedSetups error)
 		{
-			var failures = new List<IProxyCall>();
+			var failures = new Stack<IProxyCall>();
 
 			// The following verification logic will remember each processed setup so that duplicate setups
 			// (that is, setups overridden by later setups with an equivalent expression) can be detected.
@@ -103,7 +104,7 @@ namespace Moq
 
 				if (match(setup))
 				{
-					failures.Add(setup);
+					failures.Push(setup);
 				}
 
 				verifiedSetupsForMethod.Add(expr);
@@ -111,7 +112,13 @@ namespace Moq
 
 			if (failures.Any())
 			{
-				throw new MockVerificationException(failures);
+				error = new UnmatchedSetups(failures);
+				return false;
+			}
+			else
+			{
+				error = null;
+				return true;
 			}
 		}
 
