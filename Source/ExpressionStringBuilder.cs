@@ -164,7 +164,7 @@ namespace Moq
 			{
 				case ExpressionType.Convert:
 				case ExpressionType.ConvertChecked:
-					builder.Append("(").Append(this.getTypeName(u.Type)).Append(")");
+					builder.Append('(').Append(this.getTypeName(u.Type)).Append(')');
 					ToString(u.Operand);
 					return;
 
@@ -175,14 +175,14 @@ namespace Moq
 
 				case ExpressionType.Negate:
 				case ExpressionType.NegateChecked:
-					builder.Append("-");
+					builder.Append('-');
 					ToString(u.Operand);
 					return;
 
 				case ExpressionType.Not:
 					builder.Append("!(");
 					ToString(u.Operand);
-					builder.Append(")");
+					builder.Append(')');
 					return;
 
 				case ExpressionType.Quote:
@@ -190,11 +190,11 @@ namespace Moq
 					return;
 
 				case ExpressionType.TypeAs:
-					builder.Append("(");
+					builder.Append('(');
 					ToString(u.Operand);
 					builder.Append(" as ");
 					builder.Append(u.Type.DisplayName(this.getTypeName));
-					builder.Append(")");
+					builder.Append(')');
 					return;
 			}
 			return;
@@ -205,31 +205,31 @@ namespace Moq
 			if (b.NodeType == ExpressionType.ArrayIndex)
 			{
 				ToString(b.Left);
-				builder.Append("[");
+				builder.Append('[');
 				ToString(b.Right);
-				builder.Append("]");
+				builder.Append(']');
 			}
 			else
 			{
 				string @operator = ToStringOperator(b.NodeType);
 				if (NeedEncloseInParen(b.Left))
 				{
-					builder.Append("(");
+					builder.Append('(');
 					ToString(b.Left);
-					builder.Append(")");
+					builder.Append(')');
 				}
 				else
 				{
 					ToString(b.Left);
 				}
-				builder.Append(" ");
+				builder.Append(' ');
 				builder.Append(@operator);
-				builder.Append(" ");
+				builder.Append(' ');
 				if (NeedEncloseInParen(b.Right))
 				{
-					builder.Append("(");
+					builder.Append('(');
 					ToString(b.Right);
-					builder.Append(")");
+					builder.Append(')');
 				}
 				else
 				{
@@ -256,14 +256,14 @@ namespace Moq
 			{
 				if (value is string)
 				{
-					builder.Append("\"").Append(value).Append("\"");
+					builder.Append('"').Append(value).Append('"');
 				}
 				else if (value is IEnumerable enumerable && !(value is IMocked))
 				{                                        // ^^^^^^^^^^^^^^^^^^^
 					// This second check ensures that we have a usable implementation of IEnumerable.
 					// If value is a mocked object, its IEnumerable implementation might very well
 					// not work correctly.
-					builder.Append("[");
+					builder.Append('[');
 					bool addComma = false;
 					const int maxCount = 10;
 					int count = 0;
@@ -282,7 +282,7 @@ namespace Moq
 						addComma = true;
 						++count;
 					}
-					builder.Append("]");
+					builder.Append(']');
 				}
 				else if (value.ToString() == value.GetType().ToString())
 				{
@@ -291,7 +291,7 @@ namespace Moq
 				}
 				else if (c.Type.GetTypeInfo().IsEnum)
 				{
-					builder.Append(c.Type.DisplayName(this.getTypeName)).Append(".").Append(value);
+					builder.Append(c.Type.DisplayName(this.getTypeName)).Append('.').Append(value);
 				}
 				else
 				{
@@ -334,7 +334,7 @@ namespace Moq
 			{
 				builder.Append(m.Member.DeclaringType.DisplayName(this.getTypeName));
 			}
-			builder.Append(".");
+			builder.Append('.');
 			builder.Append(m.Member.Name);
 			return;
 		}
@@ -365,51 +365,51 @@ namespace Moq
 
 				if (node.Method.IsPropertyIndexerGetter())
 				{
-					this.builder.Append("[");
+					this.builder.Append('[');
 					AsCommaSeparatedValues(node.Arguments.Skip(paramFrom), ToString);
-					this.builder.Append("]");
+					this.builder.Append(']');
 				}
 				else if (node.Method.IsPropertyIndexerSetter())
 				{
-					this.builder.Append("[");
+					this.builder.Append('[');
 					AsCommaSeparatedValues(node.Arguments.Skip(paramFrom), ToString);
 					this.builder.Append("] = ");
 					ToString(node.Arguments.Last());
 				}
 				else if (node.Method.IsPropertyGetter())
 				{
-					this.builder.Append(".").Append(node.Method.Name.Substring(4));
+					this.builder.Append('.').Append(node.Method.Name.Substring(4));
 					if (node.Arguments.Count > paramFrom)
 					{
-						this.builder.Append("[");
+						this.builder.Append('[');
 						AsCommaSeparatedValues(node.Arguments.Skip(paramFrom), ToString);
-						this.builder.Append("]");
+						this.builder.Append(']');
 					}
 				}
 				else if (node.Method.IsPropertySetter())
 				{
-					this.builder.Append(".").Append(node.Method.Name.Substring(4)).Append(" = ");
+					this.builder.Append('.').Append(node.Method.Name.Substring(4)).Append(" = ");
 					ToString(node.Arguments.Last());
 				}
 				else if (node.Method.IsGenericMethod)
 				{
 					this.builder
-						.Append(".")
+						.Append('.')
 						.Append(node.Method.Name)
-						.Append("<")
+						.Append('<')
 						.Append(string.Join(",", node.Method.GetGenericArguments().Select(s => this.getTypeName(s)).ToArray()))
 						.Append(">(");
 					AsCommaSeparatedValues(node.Arguments.Skip(paramFrom), ToString);
-					this.builder.Append(")");
+					this.builder.Append(')');
 				}
 				else
 				{
 					this.builder
-						.Append(".")
+						.Append('.')
 						.Append(node.Method.Name)
-						.Append("(");
+						.Append('(');
 					AsCommaSeparatedValues(node.Arguments.Skip(paramFrom), ToString);
-					this.builder.Append(")");
+					this.builder.Append(')');
 				}
 			}
 		}
@@ -472,9 +472,9 @@ namespace Moq
 			}
 			else
 			{
-				builder.Append("(");
+				builder.Append('(');
 				AsCommaSeparatedValues(lambda.Parameters, ToStringParameter);
-				builder.Append(")");
+				builder.Append(')');
 			}
 			builder.Append(" => ");
 			ToString(lambda.Body);
@@ -486,9 +486,9 @@ namespace Moq
 			Type type = (nex.Constructor == null) ? nex.Type : nex.Constructor.DeclaringType;
 			builder.Append("new ");
 			builder.Append(type.DisplayName(this.getTypeName));
-			builder.Append("(");
+			builder.Append('(');
 			AsCommaSeparatedValues(nex.Arguments, ToString);
-			builder.Append(")");
+			builder.Append(')');
 			return;
 		}
 
@@ -531,9 +531,9 @@ namespace Moq
 				case ExpressionType.NewArrayBounds:
 					builder.Append("new ");
 					builder.Append(na.Type.GetElementType().DisplayName(this.getTypeName));
-					builder.Append("[");
+					builder.Append('[');
 					AsCommaSeparatedValues(na.Expressions, ToString);
-					builder.Append("]");
+					builder.Append(']');
 					return;
 			}
 		}
@@ -664,9 +664,9 @@ namespace Moq
 			builder.Append(getName(source).Split('`').First());
 			if (source.GetTypeInfo().IsGenericType)
 			{
-				builder.Append("<");
+				builder.Append('<');
 				builder.Append(source.GetGenericArguments().Select(t => getName(t)).AsCommaSeparatedValues());
-				builder.Append(">");
+				builder.Append('>');
 			}
 			return builder.ToString();
 		}
