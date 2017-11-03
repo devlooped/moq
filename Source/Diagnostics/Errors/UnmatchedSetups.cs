@@ -64,7 +64,7 @@ namespace Moq.Diagnostics.Errors
 			string.Format(
 				CultureInfo.CurrentCulture,
 				Resources.VerficationFailed,
-				this.setups.Reverse().Aggregate(new StringBuilder(), (builder, setup) => builder.AppendLine(setup.ToString())).ToString());
+				this.setups.Aggregate(new StringBuilder(), (builder, setup) => builder.AppendLine(setup.ToString())).ToString());
 
 		public IEnumerable<IProxyCall> Setups => this.setups;
 

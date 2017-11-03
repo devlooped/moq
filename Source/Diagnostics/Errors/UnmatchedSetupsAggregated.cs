@@ -67,7 +67,7 @@ namespace Moq.Diagnostics.Errors
 				Resources.VerficationFailed,
 				string.Join(
 					Environment.NewLine,
-					this.errors.Select(error => error.Setups.Reverse().Aggregate(new StringBuilder(), (builder, setup) => builder.AppendLine(setup.ToString())))));
+					this.errors.Select(error => error.Setups.Aggregate(new StringBuilder(), (builder, setup) => builder.AppendLine(setup.ToString())))));
 
 		public MockException AsMockException() => new MockException(MockException.ExceptionReason.VerificationFailed, this);
 	}

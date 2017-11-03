@@ -75,7 +75,7 @@ namespace Moq
 
 		private void VerifyOrThrow(Func<IProxyCall, bool> match)
 		{
-			var failures = new List<IProxyCall>();
+			var failures = new Stack<IProxyCall>();
 
 			// The following verification logic will remember each processed setup so that duplicate setups
 			// (that is, setups overridden by later setups with an equivalent expression) can be detected.
@@ -104,7 +104,7 @@ namespace Moq
 
 				if (match(setup))
 				{
-					failures.Add(setup);
+					failures.Push(setup);
 				}
 
 				verifiedSetupsForMethod.Add(expr);
