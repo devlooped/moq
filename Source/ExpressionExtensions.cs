@@ -218,17 +218,9 @@ namespace Moq
 		/// TODO: remove this code when https://connect.microsoft.com/VisualStudio/feedback/ViewFeedback.aspx?FeedbackID=331583 
 		/// is fixed.
 		/// </devdoc>
-		public static string ToStringFixed(this Expression expression)
+		public static string ToStringFixed(this Expression expression, bool useFullTypeName = false)
 		{
-			return ExpressionStringBuilder.GetString(expression);
-		}
-
-		internal static string ToStringFixed(this Expression expression, bool useFullTypeName)
-		{
-			if (useFullTypeName)
-				return ExpressionStringBuilder.GetString(expression, type => type.FullName);
-			else
-				return ExpressionStringBuilder.GetString(expression, type => type.Name);
+			return ExpressionStringBuilder.GetString(expression, useFullTypeName);
 		}
 
 		/// <summary>
