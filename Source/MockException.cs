@@ -39,15 +39,15 @@
 // http://www.opensource.org/licenses/bsd-license.php]
 
 using System;
-using System.Collections.Generic;
+using System.Diagnostics;
 using System.Diagnostics.CodeAnalysis;
 using System.Globalization;
-using System.Linq;
 #if FEATURE_SERIALIZATION
 using System.Runtime.Serialization;
 #endif
 using System.Security;
 
+using Moq.Diagnostics.Errors;
 using Moq.Properties;
 using Moq.Proxy;
 
@@ -94,7 +94,7 @@ namespace Moq
 #if FEATURE_SERIALIZATION
 		[NonSerialized]
 #endif
-		IEnumerable<IProxyCall> failedSetups;
+		private IError error;
 
 		private ExceptionReason reason;
 
@@ -118,14 +118,16 @@ namespace Moq
 			this.reason = reason;
 		}
 
-		internal MockException(IEnumerable<IProxyCall> failedSetups)
-			: base(GetFailedSetupsMessage(failedSetups))
+		internal MockException(ExceptionReason reason, IError error)
+			: base(error.Message)
 		{
-			this.failedSetups = failedSetups;
-			this.reason = ExceptionReason.VerificationFailed;
+			Debug.Assert(error != null);
+
+			this.error = error;
+			this.reason = reason;
 		}
 
-		internal IEnumerable<IProxyCall> FailedSetups => this.failedSetups;
+		internal IError Error => this.error;
 
 		internal ExceptionReason Reason
 		{
@@ -152,24 +154,6 @@ namespace Moq
 				behavior,
 				message
 			);
-		}
-
-		private static string GetFailedSetupsMessage(IEnumerable<IProxyCall> failedSetups)
-		{
-			return string.Format(
-				CultureInfo.CurrentCulture,
-				Resources.VerficationFailed,
-				GetRawSetups(failedSetups));
-		}
-
-		private static string GetRawSetups(IEnumerable<IProxyCall> failedSetups)
-		{
-			return failedSetups.Aggregate(string.Empty, (s, call) => s + call.ToString() + Environment.NewLine);
-		}
-
-		internal string GetRawSetups()
-		{
-			return GetRawSetups(failedSetups);
 		}
 
 #if FEATURE_SERIALIZATION

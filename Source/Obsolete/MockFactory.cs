@@ -40,10 +40,9 @@
 
 using System;
 using System.Collections.Generic;
-using System.Globalization;
 using System.Linq;
-using System.Text;
-using Moq.Properties;
+
+using Moq.Diagnostics.Errors;
 
 namespace Moq
 {
@@ -330,7 +329,7 @@ namespace Moq
 		{
 			Guard.NotNull(verifyAction, nameof(verifyAction));
 
-			var message = new StringBuilder();
+			var errors = new List<UnmatchedSetups>();
 
 			foreach (var mock in mocks)
 			{
@@ -338,17 +337,15 @@ namespace Moq
 				{
 					verifyAction(mock);
 				}
-				catch (MockException mve) when (mve.FailedSetups != null)
+				catch (MockException mve) when (mve.Error is UnmatchedSetups error)
 				{
-					message.AppendLine(mve.GetRawSetups());
+					errors.Add(error);
 				}
 			}
 
-			if (message.ToString().Length > 0)
+			if (errors.Count > 0)
 			{
-				throw new MockException(
-					MockException.ExceptionReason.VerificationFailed,
-					string.Format(CultureInfo.CurrentCulture, Resources.VerficationFailed, message));
+				throw new UnmatchedSetupsAggregated(errors).AsMockException();
 			}
 		}
 	}

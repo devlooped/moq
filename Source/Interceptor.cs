@@ -45,6 +45,7 @@ using System.Linq;
 using System.Linq.Expressions;
 using System.Reflection;
 
+using Moq.Diagnostics.Errors;
 using Moq.Proxy;
 
 namespace Moq
@@ -111,7 +112,7 @@ namespace Moq
 
 			if (failures.Any())
 			{
-				throw new MockException(failures);
+				throw new UnmatchedSetups(failures).AsMockException();
 			}
 		}
 
