@@ -193,7 +193,7 @@ namespace Moq
 					builder.Append('(');
 					ToString(u.Operand);
 					builder.Append(" as ");
-					builder.Append(u.Type.DisplayName(this.getTypeName));
+					builder.AppendDisplayName(u.Type, this.getTypeName);
 					builder.Append(')');
 					return;
 			}
@@ -291,7 +291,7 @@ namespace Moq
 				}
 				else if (c.Type.GetTypeInfo().IsEnum)
 				{
-					builder.Append(c.Type.DisplayName(this.getTypeName)).Append('.').Append(value);
+					builder.AppendDisplayName(c.Type, this.getTypeName).Append('.').Append(value);
 				}
 				else
 				{
@@ -332,7 +332,7 @@ namespace Moq
 			}
 			else
 			{
-				builder.Append(m.Member.DeclaringType.DisplayName(this.getTypeName));
+				builder.AppendDisplayName(m.Member.DeclaringType, this.getTypeName);
 			}
 			builder.Append('.');
 			builder.Append(m.Member.Name);
@@ -485,7 +485,7 @@ namespace Moq
 		{
 			Type type = (nex.Constructor == null) ? nex.Type : nex.Constructor.DeclaringType;
 			builder.Append("new ");
-			builder.Append(type.DisplayName(this.getTypeName));
+			builder.AppendDisplayName(type, this.getTypeName);
 			builder.Append('(');
 			AsCommaSeparatedValues(nex.Arguments, ToString);
 			builder.Append(')');
@@ -530,7 +530,7 @@ namespace Moq
 					return;
 				case ExpressionType.NewArrayBounds:
 					builder.Append("new ");
-					builder.Append(na.Type.GetElementType().DisplayName(this.getTypeName));
+					builder.AppendDisplayName(na.Type.GetElementType(), this.getTypeName);
 					builder.Append('[');
 					AsCommaSeparatedValues(na.Expressions, ToString);
 					builder.Append(']');
@@ -652,15 +652,15 @@ namespace Moq
 		}
 	}
 
-	internal static class TypeExtensions
+	internal static class StringBuilderExtensions
 	{
-		public static string DisplayName(this Type source, Func<Type, string> getName)
+		public static StringBuilder AppendDisplayName(this StringBuilder builder, Type source, Func<Type, string> getName)
 		{
 			if (source == null)
 			{
 				throw new ArgumentNullException("source");
 			}
-			var builder = new StringBuilder(100);
+
 			builder.Append(getName(source).Split('`').First());
 			if (source.GetTypeInfo().IsGenericType)
 			{
@@ -668,7 +668,7 @@ namespace Moq
 				builder.Append(source.GetGenericArguments().Select(t => getName(t)).AsCommaSeparatedValues());
 				builder.Append('>');
 			}
-			return builder.ToString();
+			return builder;
 		}
 	}
 }
