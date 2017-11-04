@@ -191,8 +191,8 @@ namespace Moq.Linq
 		{
 			return typeof(Mock<>)
 				.MakeGenericType(objectType)
-				.GetMethods()
-				.First(mi => mi.Name == "Setup" && mi.IsGenericMethod)
+				.GetMethods("Setup")
+				.First(mi => mi.IsGenericMethod)
 				.MakeGenericMethod(returnType);
 		}
 	}

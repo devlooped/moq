@@ -781,10 +781,10 @@ namespace Moq
 					   ProxyFactory.IsMethodVisible(p.GetGetMethod(), out _))
 				.Distinct();
 
-			var setupPropertyMethod = mock.GetType().GetMethods()
-				.First(m => m.Name == "SetupProperty" && m.GetParameters().Length == 2);
-			var setupGetMethod = mock.GetType().GetMethods()
-				.First(m => m.Name == "SetupGet" && m.GetParameters().Length == 1);
+			var setupPropertyMethod = mock.GetType().GetMethods("SetupProperty")
+				.First(m => m.GetParameters().Length == 2);
+			var setupGetMethod = mock.GetType().GetMethods("SetupGet")
+				.First(m => m.GetParameters().Length == 1);
 
 			foreach (var property in properties)
 			{
