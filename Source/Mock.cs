@@ -854,6 +854,13 @@ namespace Moq
 		/// </summary>
 		private static Interceptor GetInterceptor(Expression fluentExpression, Mock mock)
 		{
+			if (fluentExpression is ParameterExpression)
+			{
+				// fast path for single-dot setup expressions;
+				// no need for expensive lambda compilation.
+				return mock.Interceptor;
+			}
+
 			var targetExpression = FluentMockVisitor.Accept(fluentExpression, mock);
 			var targetLambda = Expression.Lambda<Func<Mock>>(Expression.Convert(targetExpression, typeof(Mock)));
 
