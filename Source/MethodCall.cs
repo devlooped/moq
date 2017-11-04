@@ -143,7 +143,7 @@ namespace Moq
 				}
 				else
 				{
-					var isParamArray = parameter.GetCustomAttribute<ParamArrayAttribute>(true) != null;
+					var isParamArray = parameter.IsDefined(typeof(ParamArrayAttribute), true);
 					argumentMatchers.Add(MatcherFactory.CreateMatcher(argument, isParamArray));
 				}
 			}

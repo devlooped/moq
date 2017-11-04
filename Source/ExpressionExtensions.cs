@@ -202,7 +202,7 @@ namespace Moq
 
 		private static bool ReturnsMatch(MethodCallExpression expression)
 		{
-			if (expression.Method.GetCustomAttribute<AdvancedMatcherAttribute>(true) == null)
+			if (!expression.Method.IsDefined(typeof(AdvancedMatcherAttribute), true))
 			{
 				using (var context = new FluentMockContext())
 				{
