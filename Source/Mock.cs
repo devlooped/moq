@@ -781,10 +781,10 @@ namespace Moq
 					   ProxyFactory.IsMethodVisible(p.GetGetMethod(), out _))
 				.Distinct();
 
-			var setupPropertyMethod = mock.GetType().GetMethods()
-				.First(m => m.Name == "SetupProperty" && m.GetParameters().Length == 2);
-			var setupGetMethod = mock.GetType().GetMethods()
-				.First(m => m.Name == "SetupGet" && m.GetParameters().Length == 1);
+			var setupPropertyMethod = mock.GetType().GetMethods("SetupProperty")
+				.First(m => m.GetParameters().Length == 2);
+			var setupGetMethod = mock.GetType().GetMethods("SetupGet")
+				.First(m => m.GetParameters().Length == 1);
 
 			foreach (var property in properties)
 			{
@@ -854,6 +854,13 @@ namespace Moq
 		/// </summary>
 		private static Interceptor GetInterceptor(Expression fluentExpression, Mock mock)
 		{
+			if (fluentExpression is ParameterExpression)
+			{
+				// fast path for single-dot setup expressions;
+				// no need for expensive lambda compilation.
+				return mock.Interceptor;
+			}
+
 			var targetExpression = FluentMockVisitor.Accept(fluentExpression, mock);
 			var targetLambda = Expression.Lambda<Func<Mock>>(Expression.Convert(targetExpression, typeof(Mock)));
 
@@ -1004,7 +1011,7 @@ namespace Moq
 				// compiler-generated types as they are typically the 
 				// anonymous types generated to build up the query expressions.
 				if (node.Expression.NodeType == ExpressionType.Parameter &&
-					node.Expression.Type.GetTypeInfo().GetCustomAttribute<CompilerGeneratedAttribute>(false) != null)
+					node.Expression.Type.GetTypeInfo().IsDefined(typeof(CompilerGeneratedAttribute), false))
 				{
 					var memberType = node.Member is FieldInfo ?
 						((FieldInfo)node.Member).FieldType :

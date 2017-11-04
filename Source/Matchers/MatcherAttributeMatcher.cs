@@ -89,9 +89,8 @@ namespace Moq.Matchers
 				// passing generic type arguments for the query.
 				var genericArgs = call.Method.GetGenericArguments();
 
-				method = call.Method.DeclaringType.GetMethods()
+				method = call.Method.DeclaringType.GetMethods(call.Method.Name)
 					.Where(m =>
-						m.Name == call.Method.Name &&
 						m.IsGenericMethodDefinition &&
 						m.GetGenericArguments().Length ==
 							call.Method.GetGenericMethodDefinition().GetGenericArguments().Length &&

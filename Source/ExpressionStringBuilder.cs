@@ -342,7 +342,7 @@ namespace Moq
 				var paramFrom = 0;
 				var expression = node.Object;
 
-				var hasExtensionAttribute = node.Method.GetCustomAttribute<ExtensionAttribute>() != null;
+				var hasExtensionAttribute = node.Method.IsDefined(typeof(ExtensionAttribute));
 
 				if (hasExtensionAttribute)
 				{

@@ -241,6 +241,11 @@ namespace Moq
 		}
 #endif
 
+		public static IEnumerable<MethodInfo> GetMethods(this Type type, string name)
+		{
+			return type.GetMember(name).OfType<MethodInfo>();
+		}
+
 		public static bool HasCompatibleParameterTypes(this MethodInfo method, Type[] paramTypes, bool exactParameterMatch)
 		{
 			var types = method.GetParameterTypes().ToArray();
