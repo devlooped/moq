@@ -202,16 +202,11 @@ namespace Moq
 
 		private static bool ReturnsMatch(MethodCallExpression expression)
 		{
-			if (!expression.Method.IsDefined(typeof(AdvancedMatcherAttribute), true))
+			using (var context = new FluentMockContext())
 			{
-				using (var context = new FluentMockContext())
-				{
-					Expression.Lambda<Action>(expression).Compile().Invoke();
-					return context.LastMatch != null;
-				}
+				Expression.Lambda<Action>(expression).Compile().Invoke();
+				return context.LastMatch != null;
 			}
-
-			return true;
 		}
 
 		/// <devdoc>

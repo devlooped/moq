@@ -94,16 +94,8 @@ namespace Moq
 					}
 				}
 
-				var attr = call.Method.GetCustomAttribute<AdvancedMatcherAttribute>(true);
-
-				if (attr != null)
-				{
-					var matcher = attr.CreateMatcher();
-					matcher.Initialize(originalExpression);
-					return matcher;
-				}
 #pragma warning disable 618
-				else if (call.Method.IsDefined(typeof(MatcherAttribute), true))
+				if (call.Method.IsDefined(typeof(MatcherAttribute), true))
 				{
 					var matcher = new MatcherAttributeMatcher();
 					matcher.Initialize(originalExpression);
