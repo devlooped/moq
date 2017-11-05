@@ -53,6 +53,11 @@ namespace Moq
 	{
 		public static IMatcher CreateMatcher(Expression expression, bool isParams)
 		{
+			if (isParams && (expression.NodeType == ExpressionType.NewArrayInit || !expression.Type.IsArray))
+			{
+				return new ParamArrayMatcher((NewArrayExpression)expression);
+			}
+
 			// Type inference on the call might 
 			// do automatic conversion to the desired 
 			// method argument type, and a Convert expression type 
@@ -61,11 +66,6 @@ namespace Moq
 			// the values are ints, but if the method to call 
 			// expects, say, a double, a Convert node will be on 
 			// the expression.
-			if (isParams && (expression.NodeType == ExpressionType.NewArrayInit || !expression.Type.IsArray))
-			{
-				return new ParamArrayMatcher((NewArrayExpression)expression);
-			}
-
 			var originalExpression = expression;
 			if (expression.NodeType == ExpressionType.Convert)
 			{
