@@ -95,9 +95,6 @@ namespace Moq
 				}
 
 				var attr = call.Method.GetCustomAttribute<AdvancedMatcherAttribute>(true);
-#pragma warning disable 618
-				var staticMatcherMethodAttr = call.Method.GetCustomAttribute<MatcherAttribute>(true);
-#pragma warning restore 618
 
 				if (attr != null)
 				{
@@ -105,12 +102,14 @@ namespace Moq
 					matcher.Initialize(originalExpression);
 					return matcher;
 				}
-				else if (staticMatcherMethodAttr != null)
+#pragma warning disable 618
+				else if (call.Method.IsDefined(typeof(MatcherAttribute), true))
 				{
 					var matcher = new MatcherAttributeMatcher();
 					matcher.Initialize(originalExpression);
 					return matcher;
 				}
+#pragma warning restore 618
 				else
 				{
 					var matcher = new LazyEvalMatcher();
