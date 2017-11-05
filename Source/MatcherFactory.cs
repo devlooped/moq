@@ -97,16 +97,12 @@ namespace Moq
 #pragma warning disable 618
 				if (call.Method.IsDefined(typeof(MatcherAttribute), true))
 				{
-					var matcher = new MatcherAttributeMatcher();
-					matcher.Initialize(originalExpression);
-					return matcher;
+					return new MatcherAttributeMatcher(call);
 				}
 #pragma warning restore 618
 				else
 				{
-					var matcher = new LazyEvalMatcher();
-					matcher.Initialize(originalExpression);
-					return matcher;
+					return new LazyEvalMatcher(originalExpression);
 				}
 			}
 			else if (expression.NodeType == ExpressionType.MemberAccess)

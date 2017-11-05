@@ -51,10 +51,6 @@ namespace Moq.Matchers
 			this.match = match;
 		}
 
-		public void Initialize(Expression matcherExpression)
-		{
-		}
-
 		public bool Matches(object value)
 		{
 			return match.Matches(value);

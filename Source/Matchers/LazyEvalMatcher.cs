@@ -47,9 +47,9 @@ namespace Moq.Matchers
 	{
 		private Expression expression;
 
-		public void Initialize(Expression matcherExpression)
+		public LazyEvalMatcher(Expression expression)
 		{
-			this.expression = matcherExpression;
+			this.expression = expression;
 		}
 
 		public bool Matches(object value)

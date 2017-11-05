@@ -47,13 +47,9 @@ namespace Moq.Matchers
 	{
 		private Expression expression;
 
-		public ExpressionMatcher(Expression matcherExpression)
+		public ExpressionMatcher(Expression expression)
 		{
-			this.expression = matcherExpression;
-		}
-
-		void IMatcher.Initialize(Expression matcherExpression)
-		{
+			this.expression = expression;
 		}
 
 		public bool Matches(object value)
