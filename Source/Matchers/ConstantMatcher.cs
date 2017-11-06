@@ -38,12 +38,9 @@
 //[This is the BSD license, see
 // http://www.opensource.org/licenses/bsd-license.php]
 
-using System;
 using System.Collections;
-using System.Linq.Expressions;
-using System.Globalization;
 using System.Linq;
-using System.Collections.Generic;
+using System.Linq.Expressions;
 
 namespace Moq.Matchers
 {
@@ -54,11 +51,6 @@ namespace Moq.Matchers
 		public ConstantMatcher(object constantValue)
 		{
 			this.constantValue = constantValue;
-		}
-
-		public void Initialize(Expression matcherExpression)
-		{
-			this.constantValue = ((ConstantExpression)matcherExpression).Value;
 		}
 
 		public bool Matches(object value)

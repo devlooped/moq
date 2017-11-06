@@ -39,7 +39,6 @@
 // http://www.opensource.org/licenses/bsd-license.php]
 
 using System;
-using System.ComponentModel;
 using System.Diagnostics.CodeAnalysis;
 using System.Linq.Expressions;
 using System.Reflection;
@@ -47,7 +46,7 @@ using System.Reflection;
 namespace Moq
 {
 	/// <include file='Match.xdoc' path='docs/doc[@for="Match"]/*'/>
-	public abstract class Match
+	public abstract class Match : IMatcher
 	{
 		/// <devdoc>
 		/// Provided for the sole purpose of rendering the delegate passed to the 
@@ -59,6 +58,8 @@ namespace Moq
 		}
 
 		internal abstract bool Matches(object value);
+
+		bool IMatcher.Matches(object value) => this.Matches(value);
 
 		internal Expression RenderExpression { get; set; }
 

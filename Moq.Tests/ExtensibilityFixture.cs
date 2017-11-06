@@ -107,26 +107,9 @@ namespace Moq.Tests
 
 	public static class OrderIs
 	{
-		[AdvancedMatcher(typeof(BigOrderMatcher))]
 		public static Order Big()
 		{
-			return null;
-		}
-
-		public class BigOrderMatcher : IMatcher
-		{
-			public void Initialize(System.Linq.Expressions.Expression matcherExpression)
-			{
-			}
-
-			public bool Matches(object value)
-			{
-				if (value is Order &&
-					((Order)value).Amount >= 1000)
-					return true;
-
-				return false;
-			}
+			return Match.Create<Order>(o => o.Amount >= 1000);
 		}
 	}
 

@@ -64,9 +64,5 @@ namespace Moq.Matchers
 		{
 			return equals(value);
 		}
-
-		public void Initialize(Expression matcherExpression)
-		{
-		}
 	}
 }

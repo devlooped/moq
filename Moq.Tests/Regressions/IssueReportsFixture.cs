@@ -1868,6 +1868,9 @@ namespace Moq.Tests.Regressions
 		#region #49
 
 		[Fact]
+#pragma warning disable 618
+		[Obsolete("This test is related to `" + nameof(MatcherAttribute) + "`, which is obsolete.")]
+#pragma warning restore 618
 		public void UsesCustomMatchersWithGenerics()
 		{
 			var mock = new Mock<IEvaluateLatest>();
@@ -1879,28 +1882,25 @@ namespace Moq.Tests.Regressions
 			Assert.Equal(2, mock.Object.Method(6));
 		}
 
+		[Obsolete("This class contains matchers using `" + nameof(MatcherAttribute) + "`, which is obsolete.")]
 		public static class IsEqual
 		{
-#pragma warning disable 618
 			[Matcher]
 			public static T To<T>(T value)
 			{
 				return value;
 			}
-#pragma warning restore 618
 
 			public static bool To<T>(T left, T right)
 			{
 				return left.Equals(right);
 			}
 
-#pragma warning disable 618
 			[Matcher]
 			public static T To<T, U>(T value, U value2)
 			{
 				return value;
 			}
-#pragma warning restore 618
 
 			public static bool To<T, U>(T left, T right, U value)
 			{

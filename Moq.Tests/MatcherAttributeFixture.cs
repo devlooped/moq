@@ -3,6 +3,7 @@ using Xunit;
 
 namespace Moq.Tests
 {
+	[Obsolete("This fixture contains tests related to `" + nameof(MatcherAttribute) + "`, which is obsolete.")]
 	public class MatcherAttributeFixture
 	{
 		public interface IFoo
@@ -20,14 +21,11 @@ namespace Moq.Tests
 			foo.Verify(f => f.Bar(Any<string>()));
 		}
 
-#pragma warning disable 618
 		[Matcher]
 		public T Any<T>()
 		{
 			return default(T);
 		}
-
-#pragma warning restore 618
 
 		public bool Any<T>(T value)
 		{
@@ -44,13 +42,11 @@ namespace Moq.Tests
 			Assert.Throws<MissingMethodException>(() => foo.Verify(f => f.Bar(OddLength())));
 		}
 
-#pragma warning disable 618
 		[Matcher]
 		private static string OddLength()
 		{
 			return default(string);
 		}
-#pragma warning restore 618
 
 		private static bool OddLength(string value)
 		{
@@ -90,13 +86,11 @@ namespace Moq.Tests
 
 		private static bool IsMagicStringCalled;
 
-#pragma warning disable 618
 		[Matcher]
 		public static string IsMagicString()
 		{
 			return null;
 		}
-#pragma warning restore 618
 
 		public static bool IsMagicString(string arg)
 		{
@@ -120,13 +114,11 @@ namespace Moq.Tests
 			Assert.Throws<MockException>(() => mock.Object.Bar("no-magic"));
 		}
 
-#pragma warning disable 618
 		[Matcher]
 		public static string StartsWith(string prefix)
 		{
 			return null;
 		}
-#pragma warning restore 618
 
 		public static bool StartsWith(string arg, string prefix)
 		{
@@ -141,13 +133,11 @@ namespace Moq.Tests
 			Assert.Throws<MissingMethodException>(() => mock.Setup(x => x.Bar(MatcherHookWithoutMatcherMethod())));
 		}
 
-#pragma warning disable 618
 		[Matcher]
 		public static string MatcherHookWithoutMatcherMethod()
 		{
 			return null;
 		}
-#pragma warning restore 618
 
 		[Fact]
 		public void ExpectMissingMatcherWithArgsMethod()
@@ -157,13 +147,11 @@ namespace Moq.Tests
 			Assert.Throws<MissingMethodException>(() => mock.Setup(x => x.Bar(MatcherHook2WithoutMatcherMethod(6))));
 		}
 
-#pragma warning disable 618
 		[Matcher]
 		public static string MatcherHook2WithoutMatcherMethod(int a)
 		{
 			return null;
 		}
-#pragma warning restore 618
 
 		[Fact]
 		public void UseCurrentInstanceAsContext()
@@ -175,13 +163,11 @@ namespace Moq.Tests
 			mock.Object.Bar("Do It");
 		}
 
-#pragma warning disable 618
 		[Matcher]
 		public string NonStaticMatcherHook()
 		{
 			return null;
 		}
-#pragma warning restore 618
 
 		public bool NonStaticMatcherHook(string arg)
 		{
@@ -198,13 +184,11 @@ namespace Moq.Tests
 			Assert.Throws<MissingMethodException>(() => mock.Setup(x => x.Bar(NonStaticMatcherHookWithoutMatcherMethod())));
 		}
 
-#pragma warning disable 618
 		[Matcher]
 		public string NonStaticMatcherHookWithoutMatcherMethod()
 		{
 			return null;
 		}
-#pragma warning restore 618
 
 		[Fact]
 		public void AllowStaticMethodsInHelperClassAsMatcherHook()
@@ -216,13 +200,11 @@ namespace Moq.Tests
 
 		public static class A
 		{
-#pragma warning disable 618
 			[Matcher]
 			public static string NotNull()
 			{
 				return null;
 			}
-#pragma warning restore 618
 
 			public static bool NotNull(string arg)
 			{
@@ -241,13 +223,11 @@ namespace Moq.Tests
 
 		public class B
 		{
-#pragma warning disable 618
 			[Matcher]
 			public string NotNull()
 			{
 				return null;
 			}
-#pragma warning restore 618
 
 			public bool NotNull(string arg)
 			{

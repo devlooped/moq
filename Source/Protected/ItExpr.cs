@@ -137,7 +137,6 @@ namespace Moq.Protected
 		///     .Throws(new ArgumentException());
 		/// </code>
 		/// </example>
-		[AdvancedMatcher(typeof(PredicateMatcher))]
 		[SuppressMessage("Microsoft.Design", "CA1006:DoNotNestGenericTypesInMemberSignatures")]
 		public static Expression Is<TValue>(Expression<Func<TValue, bool>> match)
 		{

@@ -630,32 +630,6 @@ namespace Moq.Tests
 			return Match.Create<int>(i => i % value == 0);
 		}
 
-#pragma warning disable 618
-		[Matcher]
-		private static int OddInt()
-		{
-			return 0;
-		}
-#pragma warning restore 618
-
-		private static bool OddInt(int value)
-		{
-			return value % 2 == 0;
-		}
-
-#pragma warning disable 618
-		[Matcher]
-		private int BigInt()
-		{
-			return 0;
-		}
-#pragma warning restore 618
-
-		private bool BigInt(int value)
-		{
-			return value > 2;
-		}
-
 		[Fact]
 		public void ExpectsPropertySetterLambdaCoercesNullable()
 		{
