@@ -981,6 +981,36 @@ namespace Moq.Tests
 			});
 		}
 
+#if !NETCORE
+		[Fact]
+		public void Enabling_diagnostic_file_info_leads_to_that_information_in_verification_error_messages()
+		{
+			var repository = new MockRepository(MockBehavior.Default);
+			repository.Switches |= Switches.CollectDiagnosticFileInfoForSetups;
+
+			var mock = repository.Create<IFoo>();
+			mock.Setup(m => m.Submit());
+
+			var ex = Assert.Throws<MockException>(() => repository.VerifyAll());
+			Assert.Contains("in ", ex.Message);
+			Assert.Contains("VerifyFixture.cs: line ", ex.Message);
+		}
+#endif
+
+		[Fact]
+		public void Disabling_diagnostic_file_info_leads_to_that_information_missing_in_verification_error_messages()
+		{
+			var repository = new MockRepository(MockBehavior.Default);
+			repository.Switches &= ~Switches.CollectDiagnosticFileInfoForSetups;
+
+			var mock = repository.Create<IFoo>();
+			mock.Setup(m => m.Submit());
+
+			var ex = Assert.Throws<MockException>(() => repository.VerifyAll());
+			Assert.DoesNotContain("in ", ex.Message);
+			Assert.DoesNotContain("VerifyFixture.cs: line ", ex.Message);
+		}
+
 		[Fact]
 		public void CanVerifyMethodThatIsNamedLikeEventAddAccessor()
 		{

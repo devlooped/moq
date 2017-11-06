@@ -136,6 +136,7 @@ namespace Moq
 	{
 		List<Mock> mocks = new List<Mock>();
 		MockBehavior defaultBehavior;
+		private Switches switches;
 
 		/// <summary>
 		/// Initializes the factory with the given <paramref name="defaultBehavior"/> 
@@ -147,6 +148,7 @@ namespace Moq
 		public MockFactory(MockBehavior defaultBehavior)
 		{
 			this.defaultBehavior = defaultBehavior;
+			this.switches = Switches.Default;
 		}
 
 		/// <summary>
@@ -166,6 +168,16 @@ namespace Moq
 		/// that will get verified together.
 		/// </summary>
 		protected internal IEnumerable<Mock> Mocks { get { return mocks; } }
+
+		/// <summary>
+		/// A set of switches that influence how mocks created by this factory will operate.
+		/// You can opt in or out of certain features via this property.
+		/// </summary>
+		public Switches Switches
+		{
+			get => this.switches;
+			set => this.switches = value;
+		}
 
 		/// <summary>
 		/// Creates a new mock with the default <see cref="MockBehavior"/> 
@@ -291,6 +303,7 @@ namespace Moq
 
 			mock.CallBase = this.CallBase;
 			mock.DefaultValue = this.DefaultValue;
+			mock.Switches = this.switches;
 
 			return mock;
 		}

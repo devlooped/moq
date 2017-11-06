@@ -172,6 +172,11 @@ namespace Moq
 		private void SetFileInfo()
 		{
 #if !NETCORE
+			if ((this.mock.Switches & Switches.CollectDiagnosticFileInfoForSetups) == 0)
+			{
+				return;
+			}
+
 			try
 			{
 				var thisMethod = MethodBase.GetCurrentMethod();

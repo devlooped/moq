@@ -103,6 +103,17 @@ namespace Moq.Tests
 			Assert.Equal(DefaultValue.Empty, mockBar.DefaultValue);
 		}
 
+		[Fact]
+		public void Inner_mocks_inherit_switches_of_parent_mock()
+		{
+			const Switches expectedSwitches = Switches.CollectDiagnosticFileInfoForSetups;
+
+			var parentMock = new Mock<IFoo>() { DefaultValue = DefaultValue.Mock, Switches = expectedSwitches };
+			var innerMock = Mock.Get(parentMock.Object.Bar);
+
+			Assert.Equal(expectedSwitches, actual: innerMock.Switches);
+		}
+
 		public interface IFoo
 		{
 			IBar Bar { get; set; }

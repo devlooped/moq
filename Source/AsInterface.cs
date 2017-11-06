@@ -95,6 +95,12 @@ namespace Moq
 			get { return this.owner.Object as TInterface; }
 		}
 
+		public override Switches Switches
+		{
+			get => this.owner.Switches;
+			set => this.owner.Switches = value;
+		}
+
 		public override Mock<TNewInterface> As<TNewInterface>()
 		{
 			return this.owner.As<TNewInterface>();
