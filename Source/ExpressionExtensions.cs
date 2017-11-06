@@ -196,11 +196,26 @@ namespace Moq
 		{
 			return Evaluator.PartialEval(
 				expression,
-				e => e.NodeType != ExpressionType.Parameter &&
-					(e.NodeType != ExpressionType.Call || !ReturnsMatch((MethodCallExpression)e)));
+				PartialMatcherAwareEval_ShouldEvaluate);
 		}
 
-		private static bool ReturnsMatch(MethodCallExpression expression)
+		private static bool PartialMatcherAwareEval_ShouldEvaluate(Expression expression)
+		{
+			switch (expression.NodeType)
+			{
+				case ExpressionType.Parameter:
+					return false;
+
+				case ExpressionType.Call:
+				case ExpressionType.MemberAccess:
+					return ReturnsMatch(expression) == false;
+
+				default:
+					return true;
+			}
+		}
+
+		private static bool ReturnsMatch(Expression expression)
 		{
 			using (var context = new FluentMockContext())
 			{
