@@ -76,7 +76,7 @@ namespace Moq
 			var matchExpression = expression as MatchExpression;
 			if (matchExpression != null)
 			{
-				return new Matcher(matchExpression.Match);
+				return matchExpression.Match;
 			}
 
 			if (expression.NodeType == ExpressionType.Call)
@@ -90,7 +90,7 @@ namespace Moq
 
 					if (context.LastMatch != null)
 					{
-						return new Matcher(context.LastMatch);
+						return context.LastMatch;
 					}
 				}
 
@@ -113,7 +113,7 @@ namespace Moq
 					Expression.Lambda<Action>((MemberExpression)expression).Compile().Invoke();
 					if (context.LastMatch != null)
 					{
-						return new Matcher(context.LastMatch);
+						return context.LastMatch;
 					}
 				}
 			}
