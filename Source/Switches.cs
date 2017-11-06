@@ -39,44 +39,25 @@
 // http://www.opensource.org/licenses/bsd-license.php]
 
 using System;
-using System.Reflection;
 
 namespace Moq
 {
 	/// <summary>
-	/// A <see cref="IDefaultValueProvider"/> that returns an empty default value 
-	/// for non-mockeable types, and mocks for all other types (interfaces and 
-	/// non-sealed classes) that can be mocked.
+	/// Represents a switch, or a combination of switches, that can be either enabled or disabled.
+	/// When set via <see cref="Mock.Switches"/> or <see cref="MockFactory.Switches"/>, they determine how a mock will operate.
 	/// </summary>
-	internal class MockDefaultValueProvider : EmptyDefaultValueProvider
+	[Flags]
+	public enum Switches
 	{
-		private Mock owner;
+		/// <summary>
+		/// The default set of switches. The switches covered by this enumeration value may change between different versions of Moq.
+		/// </summary>
+		Default = 0,
 
-		public MockDefaultValueProvider(Mock owner)
-		{
-			this.owner = owner;
-		}
-
-		public override object ProvideDefault(MethodInfo member)
-		{
-			var value = base.ProvideDefault(member);
-
-			Mock mock = null;
-			if (value == null && member.ReturnType.IsMockeable())
-			{
-				mock = owner.InnerMocks.GetOrAdd(member, info =>
-				{
-					// Create a new mock to be placed to InnerMocks dictionary if it's missing there
-					var mockType = typeof(Mock<>).MakeGenericType(info.ReturnType);
-					Mock newMock = (Mock)Activator.CreateInstance(mockType, owner.Behavior);
-					newMock.DefaultValue = owner.DefaultValue;
-					newMock.CallBase = owner.CallBase;
-					newMock.Switches = owner.Switches;
-					return newMock;
-				});
-			}
-
-			return mock != null ? mock.Object : value;
-		}
+		/// <summary>
+		/// When enabled, specifies that source file information should be collected for each setup.
+		/// This results in more helpful error messages, but may affect performance.
+		/// </summary>
+		CollectDiagnosticFileInfoForSetups = 1 << 0,
 	}
 }
