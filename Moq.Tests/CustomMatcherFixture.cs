@@ -60,5 +60,42 @@ namespace Moq.Tests
 			bool Do(string value);
 			bool Do(int value);
 		}
+
+
+		[Fact]
+		public void Custom_matcher_property_appears_by_name_in_verification_error_message()
+		{
+			var child = new Mock<IChild>();
+			child.Setup(c => c.PlayWith(Toy.IsRed)).Verifiable();
+
+			var ex = Assert.Throws<MockException>(() => child.Verify());
+
+			Assert.Contains(".PlayWith(Toy.IsRed)", ex.Message);
+		}
+
+		[Fact]
+		public void Custom_matcher_method_appears_by_name_in_verification_error_message()
+		{
+			var child = new Mock<IChild>();
+			child.Setup(c => c.PlayWith(Toy.IsGreen())).Verifiable();
+
+			var ex = Assert.Throws<MockException>(() => child.Verify());
+
+			Assert.Contains(".PlayWith(Toy.IsGreen())", ex.Message);
+		}
+
+		public class Toy
+		{
+			public static Toy IsRed => Match.Create((Toy toy) => toy.Color == "red");
+
+			public static Toy IsGreen() => Match.Create((Toy toy) => toy.Color == "green");
+
+			public string Color { get; set; }
+		}
+
+		public interface IChild
+		{
+			void PlayWith(Toy toy);
+		}
 	}
 }
