@@ -146,6 +146,25 @@ namespace Moq.Tests
 			Assert.True(mock.Object.BaseCalled);
 		}
 
+		[Fact]
+		public void Repository_initially_uses_default_switches()
+		{
+			var repository = new MockRepository(MockBehavior.Default);
+
+			Assert.Equal(Switches.Default, actual: repository.Switches);
+		}
+
+		[Fact]
+		public void Mock_inherits_switches_from_repository()
+		{
+			const Switches expectedSwitches = Switches.CollectDiagnosticFileInfoForSetups;
+
+			var repository = new MockRepository(MockBehavior.Default) { Switches = expectedSwitches };
+			var mock = repository.Create<IFoo>();
+
+			Assert.Equal(expectedSwitches, actual: mock.Switches);
+		}
+
 		public interface IFoo
 		{
 			void Do();

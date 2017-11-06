@@ -60,12 +60,14 @@ namespace Moq
 		private bool isInitialized;
 		private DefaultValue defaultValue = DefaultValue.Empty;
 		private IDefaultValueProvider defaultValueProvider = new EmptyDefaultValueProvider();
+		private Switches switches;
 
 		/// <include file='Mock.xdoc' path='docs/doc[@for="Mock.ctor"]/*'/>
 		protected Mock()
 		{
 			this.ImplementedInterfaces = new List<Type>();
 			this.InnerMocks = new ConcurrentDictionary<MethodInfo, Mock>();
+			this.switches = Switches.Default;
 		}
 
 		/// <include file='Mock.xdoc' path='docs/doc[@for="Mock.Get"]/*'/>
@@ -227,6 +229,16 @@ namespace Moq
 		/// defined internally, rather than through calls to <see cref="As{TInterface}"/>.
 		/// </summary>
 		internal protected int InternallyImplementedInterfaceCount { get; protected set; }
+
+		/// <summary>
+		/// A set of switches that influence how this mock will operate.
+		/// You can opt in or out of certain features via this property.
+		/// </summary>
+		public virtual Switches Switches
+		{
+			get => this.switches;
+			set => this.switches = value;
+		}
 
 		#region Verify
 

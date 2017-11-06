@@ -5,6 +5,17 @@ All notable changes to this project will be documented in this file.
 The format is loosely based on [Keep a Changelog](http://keepachangelog.com/en/1.0.0/).
 
 
+## 4.7.145 (2017-11-06)
+
+#### Changed
+
+* Moq no longer collects source file information for verification error messages by default. A current .NET Framework regression (https://github.com/Microsoft/dotnet/issues/529) makes this extremely costly, so this is now an opt-in feature; see `Switches.CollectSourceFileInfoForSetups` (@stakx, #515)
+
+#### Added
+
+* `Mock.Switches` and `MockRepository.Switches`, which allow opting in and out of certain features (@stakx, #515)
+
+
 ## 4.7.142 (2017-10-11)
 
 #### Changed

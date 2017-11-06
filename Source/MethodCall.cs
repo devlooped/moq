@@ -181,9 +181,14 @@ namespace Moq
 		[SuppressMessage("Microsoft.Design", "CA1031:DoNotCatchGeneralExceptionTypes")]
 		private void SetFileInfo()
 		{
+#if !NETCORE
+			if ((this.Mock.Switches & Switches.CollectDiagnosticFileInfoForSetups) == 0)
+			{
+				return;
+			}
+
 			try
 			{
-#if !NETCORE
 				var thisMethod = MethodBase.GetCurrentMethod();
 				var mockAssembly = Assembly.GetExecutingAssembly();
 				// Move 'till we're at the entry point into Moq API
@@ -199,12 +204,12 @@ namespace Moq
 					this.FileName = Path.GetFileName(frame.GetFileName());
 					this.TestMethod = frame.GetMethod();
 				}
-#endif
 			}
 			catch
 			{
 				// Must NEVER fail, as this is a nice-to-have feature only.
 			}
+#endif
 		}
 
 		public void SetOutParameters(ICallContext call)

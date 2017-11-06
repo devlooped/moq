@@ -922,6 +922,14 @@ namespace Moq.Tests
 			return new Foo(barMock.Object);
 		}
 
+		[Fact]
+		public void Mock_initially_uses_default_switches()
+		{
+			var mock = new Mock<IFoo>();
+
+			Assert.Equal(Switches.Default, actual: mock.Switches);
+		}
+
 		public class Foo
 		{
 			public Foo() : this(new Bar()) { }
