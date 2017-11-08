@@ -187,6 +187,15 @@ namespace Moq.Properties {
 		}
 		
 		/// <summary>
+		///   Looks up a localized string similar to Invalid callback. Setup on method with return type {0} cannot invoke callback with return type {1}..
+		/// </summary>
+		internal static string InvalidCallbackReturnTypeMismatch {
+			get {
+				return ResourceManager.GetString("InvalidCallbackReturnTypeMismatch", resourceCulture);
+			}
+		}
+		
+		/// <summary>
 		///   Looks up a localized string similar to Type to mock must be an interface or an abstract or non-sealed class. .
 		/// </summary>
 		internal static string InvalidMockClass {

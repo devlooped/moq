@@ -38,13 +38,16 @@
 //[This is the BSD license, see
 // http://www.opensource.org/licenses/bsd-license.php]
 
+using System;
+using System.Globalization;
+using System.Linq;
+using System.Linq.Expressions;
+using System.Reflection;
+
 using Moq.Language;
 using Moq.Language.Flow;
 using Moq.Properties;
 using Moq.Proxy;
-using System;
-using System.Linq.Expressions;
-using System.Reflection;
 
 namespace Moq
 {
@@ -157,8 +160,42 @@ namespace Moq
 
 		private void SetReturnDelegate(Delegate value)
 		{
+			if (value != null && (this.Mock.Switches & Switches.ValidateReturnsDelegateSignatures) != 0)
+			{
+				SetReturnDelegate_ValidateSignature(value);
+			}
+
 			this.valueDel = value;
 			this.returnValueKind = ReturnValueKind.Explicit;
+		}
+
+		private void SetReturnDelegate_ValidateSignature(Delegate value)
+		{
+			var valueMethod = value.GetMethodInfo();
+
+			var valueMethodParameters = valueMethod.GetParameters();
+			if (valueMethodParameters.Length > 0)
+			{
+				var expectedParameters = this.Method.GetParameters();
+				if (!value.HasCompatibleParameterList(expectedParameters))
+				{
+					var actualParameters = value.GetMethodInfo().GetParameters();
+					throw new ArgumentException(string.Format(
+						CultureInfo.CurrentCulture,
+						Resources.InvalidCallbackParameterMismatch,
+						string.Join(", ", expectedParameters.Select(p => p.ParameterType.Name)),
+						string.Join(", ", actualParameters.Select(p => p.ParameterType.Name))));
+				}
+			}
+
+			if (!this.Method.ReturnType.IsAssignableFrom(valueMethod.ReturnType))
+			{
+				throw new ArgumentException(string.Format(
+					CultureInfo.CurrentCulture,
+					Resources.InvalidCallbackReturnTypeMismatch,
+					this.Method.ReturnType.Name,
+					valueMethod.ReturnType.Name));
+			}
 		}
 
 		protected override void SetCallbackWithoutArguments(Action callback)

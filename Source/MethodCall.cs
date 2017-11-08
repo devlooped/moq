@@ -163,7 +163,9 @@ namespace Moq
 
 		bool IProxyCall.Invoked => this.callCount > 0;
 
-		MethodInfo IProxyCall.Method => this.method;
+		public MethodInfo Method => this.method;
+
+		public Mock Mock => this.mock;
 
 		Expression IProxyCall.SetupExpression => this.originalExpression;
 

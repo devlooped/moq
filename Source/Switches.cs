@@ -59,5 +59,10 @@ namespace Moq
 		/// This results in more helpful error messages, but may affect performance.
 		/// </summary>
 		CollectDiagnosticFileInfoForSetups = 1 << 0,
+
+		/// <summary>
+		/// When enabled, specifies that delegates passed to `Returns` must have a signature matching that of the method being set up.
+		/// </summary>
+		ValidateReturnsDelegateSignatures = 1 << 1,
 	}
 }
