@@ -364,5 +364,78 @@ namespace Moq.Tests
 		{
 			object Clone();
 		}
+
+		public interface IQux
+		{
+			IQux Method(IQux arg);
+		}
+
+		public interface IQuux : IQux
+		{
+		}
+
+		[Fact]
+		public void Returns_delegate_with_assignment_compatible_return_type_does_not_throw_if_validation_switch_set()
+		{
+			var mock = new Mock<IQux>();
+			mock.Switches |= Switches.ValidateReturnsDelegateSignatures;
+
+			var quux = new Mock<IQuux>().Object;
+
+			mock.Setup(m => m.Method(It.IsAny<IQux>())).Returns(() => quux);
+		}
+
+		[Fact]
+		public void Returns_delegate_with_assignment_incompatible_return_type_throws_if_validation_switch_set()
+		{
+			var mock = new Mock<IQux>();
+			mock.Switches |= Switches.ValidateReturnsDelegateSignatures;
+
+			var quux = new Mock<IQuux>().Object;
+
+			var ex = Record.Exception(() =>
+			{
+				mock.Setup(m => m.Method(It.IsAny<IQux>())).Returns(new Func<string>(() => ""));
+			});
+
+			Assert.IsType<ArgumentException>(ex);
+		}
+
+		[Fact]
+		public void Returns_delegate_with_assignment_compatible_parameter_type_does_not_throw_if_validation_switch_set()
+		{
+			var mock = new Mock<IQux>();
+			mock.Switches |= Switches.ValidateReturnsDelegateSignatures;
+
+			mock.Setup(m => m.Method(It.IsAny<IQux>())).Returns((object argWithAssignmentCompatibleType) => null);
+		}
+
+		[Fact]
+		public void Returns_delegate_with_wrong_parameter_type_throws_if_validation_switch_set()
+		{
+			var mock = new Mock<IQux>();
+			mock.Switches |= Switches.ValidateReturnsDelegateSignatures;
+
+			var ex = Record.Exception(() =>
+			{
+				mock.Setup(m => m.Method(It.IsAny<IQux>())).Returns((int argWithWrongType) => null);
+			});
+
+			Assert.IsType<ArgumentException>(ex);
+		}
+
+		[Fact]
+		public void Returns_delegate_with_too_many_parameters_throws_if_validation_switch_set()
+		{
+			var mock = new Mock<IQux>();
+			mock.Switches |= Switches.ValidateReturnsDelegateSignatures;
+
+			var ex = Record.Exception(() =>
+			{
+				mock.Setup(m => m.Method(It.IsAny<IQux>())).Returns((IQux arg, IQux superfluousArg) => null);
+			});
+
+			Assert.IsType<ArgumentException>(ex);
+		}
 	}
 }
