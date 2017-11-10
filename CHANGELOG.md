@@ -18,6 +18,7 @@ The format is loosely based on [Keep a Changelog](http://keepachangelog.com/en/1
 #### Changed
 
 * **Breaking change:** `SetupSequence` now overrides pre-existing setups like all other `Setup` methods do. This means that exhausted sequences no longer fall back to previous setups to produce a "default" action or return value. (@stakx, #476)
+* Delegates passed to `Returns` are validated a little more strictly than before (return type and parameter count must match with method being set up) (@stakx, #520)
 
 #### Fixed
 
