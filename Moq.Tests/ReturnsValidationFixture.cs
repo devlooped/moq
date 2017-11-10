@@ -59,17 +59,16 @@ namespace Moq.Tests
 		}
 
 		[Fact]
-		public void Returns_accepts_delegate_with_wrong_parameter_count_but_setup_invocation_will_fail()
+		public void Returns_does_not_accept_delegate_with_wrong_parameter_count()
 		{
 			Func<object, object, IType> delegateWithWrongParameterCount = (arg1, arg2) => default(IType);
-			this.setup.Returns(delegateWithWrongParameterCount);
 
 			var ex = Record.Exception(() =>
 			{
-				this.mock.Object.Method(42);
+				this.setup.Returns(delegateWithWrongParameterCount);
 			});
 
-			Assert.IsType<TargetParameterCountException>(ex);
+			Assert.IsType<ArgumentException>(ex);
 		}
 
 		[Fact]

@@ -368,4 +368,7 @@ Expected invocation on the mock once, but was {4} times: {1}</value>
 	<data name="InvalidCallbackReturnTypeMismatch" xml:space="preserve">
 		<value>Invalid callback. Setup on method with return type ({0}) cannot invoke callback with return type ({1}).</value>
 	</data>
+	<data name="InvalidCallbackParameterCountMismatch" xml:space="preserve">
+		<value>Invalid callback. Setup on method with {0} parameter(s) cannot invoke callback with different number of parameters ({1}).</value>
+	</data>
 </root>

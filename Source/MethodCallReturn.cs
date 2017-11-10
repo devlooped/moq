@@ -171,6 +171,21 @@ namespace Moq
 		{
 			var callbackMethod = callback.GetMethodInfo();
 
+			var actualParameters = callbackMethod.GetParameters();
+			if (actualParameters.Length > 0)
+			{
+				var expectedParameters = this.Method.GetParameters();
+				if (actualParameters.Length != expectedParameters.Length)
+				{
+					throw new ArgumentException(
+						string.Format(
+							CultureInfo.CurrentCulture,
+							Resources.InvalidCallbackParameterCountMismatch,
+							expectedParameters.Length,
+							actualParameters.Length));
+				}
+			}
+
 			var expectedReturnType = this.Method.ReturnType;
 			var actualReturnType = callbackMethod.ReturnType;
 
