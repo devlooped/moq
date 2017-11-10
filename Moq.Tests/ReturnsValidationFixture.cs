@@ -83,6 +83,20 @@ namespace Moq.Tests
 			});
 
 			Assert.IsType<ArgumentException>(ex);
+
+			// In case you're wondering why this use case isn't "fixed" by properly validating delegates
+			// passed to `Returns`... it's entirely possible that some people might do this:
+			//
+			// mock.Setup(m => m.Method(It.IsAny<int>()).Returns<int>(obj => ...);
+			// mock.Setup(m => m.Method(It.IsAny<string>()).Returns<string>(obj => ...);
+			//
+			// where `Method` has a parameter of type `object`. That is, people might rely on a matcher
+			// to ensure that the return callback delegate invocation (and the cast to `object` that has to
+			// happen) will always succeed. See also the next test, as well as old Google Code issue 267
+			// in `IssueReportsFixture.cs`.
+			//
+			// While not the cleanest of techniques, it might be useful to some people and probably
+			// shouldn't be broken by eagerly validating everything.
 		}
 
 		[Fact]
