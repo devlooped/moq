@@ -32,31 +32,16 @@ namespace Moq.Tests
 		}
 
 		[Fact]
-		public void Returns_accepts_delegate_with_wrong_return_type_but_setup_invocation_will_fail()
+		public void Returns_does_not_accept_delegate_with_wrong_return_type()
 		{
 			Func<string> delegateWithWrongReturnType = () => "42";
-			this.setup.Returns(delegateWithWrongReturnType);
 
 			var ex = Record.Exception(() =>
 			{
-				this.mock.Object.Method(42);
+				this.setup.Returns(delegateWithWrongReturnType);
 			});
 
-			Assert.IsType<InvalidCastException>(ex);
-		}
-
-		[Fact]
-		public void Returns_accepts_delegate_with_wrong_return_type_and_setup_invocation_will_succeed_if_retval_convertible()
-		{
-			Func<string> delegateWithWrongReturnType = () => null;
-			this.setup.Returns(delegateWithWrongReturnType);
-
-			var ex = Record.Exception(() =>
-			{
-				this.mock.Object.Method(42);
-			});
-
-			Assert.Null(ex);
+			Assert.IsType<ArgumentException>(ex);
 		}
 
 		[Fact]

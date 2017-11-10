@@ -157,13 +157,13 @@ namespace Moq
 			set => this.failMessage = value;
 		}
 
+		public MethodInfo Method => this.method;
+
 		bool IProxyCall.IsConditional => this.condition != null;
 
 		bool IProxyCall.IsVerifiable => this.verifiable;
 
 		bool IProxyCall.Invoked => this.callCount > 0;
-
-		MethodInfo IProxyCall.Method => this.method;
 
 		Expression IProxyCall.SetupExpression => this.originalExpression;
 
