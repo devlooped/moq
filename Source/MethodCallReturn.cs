@@ -43,6 +43,7 @@ using Moq.Language.Flow;
 using Moq.Properties;
 using Moq.Proxy;
 using System;
+using System.Globalization;
 using System.Linq.Expressions;
 using System.Reflection;
 
@@ -157,8 +158,46 @@ namespace Moq
 
 		private void SetReturnDelegate(Delegate value)
 		{
+			if (value != null)
+			{
+				ValidateReturnDelegate(value);
+			}
+
 			this.valueDel = value;
 			this.returnValueKind = ReturnValueKind.Explicit;
+		}
+
+		private void ValidateReturnDelegate(Delegate callback)
+		{
+			var callbackMethod = callback.GetMethodInfo();
+
+			var actualParameters = callbackMethod.GetParameters();
+			if (actualParameters.Length > 0)
+			{
+				var expectedParameters = this.Method.GetParameters();
+				if (actualParameters.Length != expectedParameters.Length)
+				{
+					throw new ArgumentException(
+						string.Format(
+							CultureInfo.CurrentCulture,
+							Resources.InvalidCallbackParameterCountMismatch,
+							expectedParameters.Length,
+							actualParameters.Length));
+				}
+			}
+
+			var expectedReturnType = this.Method.ReturnType;
+			var actualReturnType = callbackMethod.ReturnType;
+
+			if (!expectedReturnType.IsAssignableFrom(actualReturnType))
+			{
+				throw new ArgumentException(
+					string.Format(
+						CultureInfo.CurrentCulture,
+						Resources.InvalidCallbackReturnTypeMismatch,
+						expectedReturnType,
+						actualReturnType));
+			}
 		}
 
 		protected override void SetCallbackWithoutArguments(Action callback)

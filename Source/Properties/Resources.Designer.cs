@@ -178,11 +178,29 @@ namespace Moq.Properties {
 		}
 		
 		/// <summary>
+		///   Looks up a localized string similar to Invalid callback. Setup on method with {0} parameter(s) cannot invoke callback with different number of parameters ({1})..
+		/// </summary>
+		internal static string InvalidCallbackParameterCountMismatch {
+			get {
+				return ResourceManager.GetString("InvalidCallbackParameterCountMismatch", resourceCulture);
+			}
+		}
+		
+		/// <summary>
 		///   Looks up a localized string similar to Invalid callback. Setup on method with parameters ({0}) cannot invoke callback with parameters ({1})..
 		/// </summary>
 		internal static string InvalidCallbackParameterMismatch {
 			get {
 				return ResourceManager.GetString("InvalidCallbackParameterMismatch", resourceCulture);
+			}
+		}
+		
+		/// <summary>
+		///   Looks up a localized string similar to Invalid callback. Setup on method with return type ({0}) cannot invoke callback with return type ({1})..
+		/// </summary>
+		internal static string InvalidCallbackReturnTypeMismatch {
+			get {
+				return ResourceManager.GetString("InvalidCallbackReturnTypeMismatch", resourceCulture);
 			}
 		}
 		
