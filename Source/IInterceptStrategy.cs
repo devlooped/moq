@@ -129,6 +129,36 @@ namespace Moq
 				orderedCalls.Clear();
 			}
 		}
+
+		internal IProxyCall GetOrderedCallFor(ICallContext invocation)
+		{
+			IProxyCall matchingSetup = null;
+
+			lock (this.orderedCalls)
+			{
+				foreach (var setup in this.orderedCalls)
+				{
+					// the following conditions are repetitive, but were written that way to avoid
+					// unnecessary expensive calls to `setup.Matches`; cheap tests are run first.
+					if (matchingSetup == null && setup.Matches(invocation))
+					{
+						matchingSetup = setup;
+						if (setup.Method == invocation.Method)
+						{
+							break;
+						}
+					}
+					else if (setup.Method == invocation.Method && setup.Matches(invocation))
+					{
+						matchingSetup = setup;
+						break;
+					}
+				}
+			}
+
+			return matchingSetup;
+		}
+
 		internal IEnumerable<IProxyCall> GetOrderedCalls()
 		{
 			lock (orderedCalls)
