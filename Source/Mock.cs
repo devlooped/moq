@@ -64,6 +64,7 @@ namespace Moq
 		private bool isInitialized;
 		private DefaultValue defaultValue = DefaultValue.Empty;
 		private IDefaultValueProvider defaultValueProvider = new EmptyDefaultValueProvider();
+		private InvocationCollection invocations;
 		private Switches switches;
 
 		/// <include file='Mock.xdoc' path='docs/doc[@for="Mock.ctor"]/*'/>
@@ -71,6 +72,7 @@ namespace Moq
 		{
 			this.ImplementedInterfaces = new List<Type>();
 			this.InnerMocks = new ConcurrentDictionary<MethodInfo, Mock>();
+			this.invocations = new InvocationCollection();
 			this.switches = Switches.Default;
 		}
 
@@ -187,6 +189,8 @@ namespace Moq
 		internal virtual Interceptor Interceptor { get; set; }
 
 		internal virtual ConcurrentDictionary<MethodInfo, Mock> InnerMocks { get; private set; }
+
+		internal virtual InvocationCollection Invocations => this.invocations;
 
 		/// <include file='Mock.xdoc' path='docs/doc[@for="Mock.OnGetObject"]/*'/>
 		[SuppressMessage("Microsoft.Design", "CA1024:UsePropertiesWhereAppropriate", Justification = "This is actually the protected virtual implementation of the property Object.")]
@@ -403,7 +407,7 @@ namespace Moq
 			Expression expression,
 			Times times)
 		{
-			var actualCalls = targetInterceptor.InterceptionContext.GetActualInvocations();
+			var actualCalls = targetInterceptor.InterceptionContext.Mock.Invocations.ToArray();
 
 			var callCount = actualCalls.Count(expected.Matches);
 			if (!times.Verify(callCount))

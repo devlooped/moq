@@ -27,7 +27,6 @@ namespace Moq
 	internal class InterceptorContext
 	{
 		private Dictionary<string, List<Delegate>> invocationLists = new Dictionary<string, List<Delegate>>();
-		private List<ICallContext> actualInvocations = new List<ICallContext>();
 
 		// Using a stack has the advantage that enumeration returns the items in reverse order (last added to first added).
 		// This helps in implementing the rule that "given two matching setups, the last one wins."
@@ -88,29 +87,6 @@ namespace Moq
 			lock (invocationLists)
 			{
 				invocationLists.Clear();
-			}
-		}
-		#endregion
-		#region ActualInvocations
-		internal void AddInvocation(ICallContext invocation)
-		{
-			lock (actualInvocations)
-			{
-				actualInvocations.Add(invocation);
-			}
-		}
-		internal IEnumerable<ICallContext> GetActualInvocations()
-		{
-			lock (actualInvocations)
-			{
-				return actualInvocations.ToArray();
-			}
-		}
-		internal void ClearInvocations()
-		{
-			lock (actualInvocations)
-			{
-				actualInvocations.Clear();
 			}
 		}
 		#endregion

@@ -325,7 +325,7 @@ namespace Moq
 			}
 
 			// Save to support Verify[expression] pattern.
-			ctx.AddInvocation(invocation);
+			ctx.Mock.Invocations.Add(invocation);
 			return InterceptionAction.Continue;
 		}
 

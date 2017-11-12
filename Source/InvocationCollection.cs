@@ -38,79 +38,42 @@
 //[This is the BSD license, see
 // http://www.opensource.org/licenses/bsd-license.php]
 
-using System;
-using System.Collections.Concurrent;
+using Moq.Proxy;
 using System.Collections.Generic;
-using System.Reflection;
 
 namespace Moq
 {
-	internal class AsInterface<TInterface> : Mock<TInterface>
-		where TInterface : class
+	internal sealed class InvocationCollection
 	{
-		private Mock owner;
+		private List<ICallContext> invocations;
 
-		public AsInterface(Mock owner)
-			: base(true)
+		public InvocationCollection()
 		{
-			this.owner = owner;
+			this.invocations = new List<ICallContext>();
 		}
 
-		internal override ConcurrentDictionary<MethodInfo, Mock> InnerMocks
+		public void Add(ICallContext invocation)
 		{
-			get { return this.owner.InnerMocks; }
+			lock (this.invocations)
+			{
+				this.invocations.Add(invocation);
+			}
 		}
 
-		internal override Interceptor Interceptor
+		public void Clear()
 		{
-			get { return this.owner.Interceptor; }
-			set { this.owner.Interceptor = value; }
+			lock (this.invocations)
+			{
+				this.invocations.Clear();
+			}
 		}
 
-		internal override InvocationCollection Invocations => this.owner.Invocations;
-
-		internal override Type MockedType
+		public ICallContext[] ToArray()
 		{
-			get { return typeof(TInterface); }
-		}
-
-		public override MockBehavior Behavior
-		{
-			get { return this.owner.Behavior; }
-			internal set { this.owner.Behavior = value; }
-		}
-
-		public override bool CallBase
-		{
-			get { return this.owner.CallBase; }
-			set { this.owner.CallBase = value; }
-		}
-
-		public override DefaultValue DefaultValue
-		{
-			get { return this.owner.DefaultValue; }
-			set { this.owner.DefaultValue = value; }
-		}
-
-		public override TInterface Object
-		{
-			get { return this.owner.Object as TInterface; }
-		}
-
-		public override Switches Switches
-		{
-			get => this.owner.Switches;
-			set => this.owner.Switches = value;
-		}
-
-		public override Mock<TNewInterface> As<TNewInterface>()
-		{
-			return this.owner.As<TNewInterface>();
-		}
-
-		protected override object OnGetObject()
-		{
-			return this.owner.Object;
+			lock (this.invocations)
+			{
+				return this.invocations.ToArray();
+			}
 		}
 	}
 }
