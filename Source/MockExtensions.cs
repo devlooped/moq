@@ -34,7 +34,7 @@ namespace Moq
 		public static void Reset(this Mock mock)
 		{
 			mock.Setups.Clear();
-			mock.Interceptor.InterceptionContext.ClearEventHandlers();
+			mock.EventHandlers.Clear();
 			mock.ResetCalls();
 		}
 	}

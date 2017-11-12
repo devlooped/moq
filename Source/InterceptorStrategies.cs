@@ -296,7 +296,7 @@ namespace Moq
 						}
 						else if (invocation.Arguments.Length > 0 && invocation.Arguments[0] is Delegate delegateInstance)
 						{
-							ctx.AddEventHandler(eventInfo, delegateInstance);
+							ctx.Mock.EventHandlers.Add(eventInfo.Name, delegateInstance);
 							return InterceptionAction.Stop;
 						}
 					}
@@ -317,7 +317,7 @@ namespace Moq
 						}
 						else if (invocation.Arguments.Length > 0 && invocation.Arguments[0] is Delegate delegateInstance)
 						{
-							ctx.RemoveEventHandler(eventInfo, delegateInstance);
+							ctx.Mock.EventHandlers.Remove(eventInfo.Name, delegateInstance);
 							return InterceptionAction.Stop;
 						}
 					}

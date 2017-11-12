@@ -39,82 +39,69 @@
 // http://www.opensource.org/licenses/bsd-license.php]
 
 using System;
-using System.Collections.Concurrent;
 using System.Collections.Generic;
-using System.Reflection;
+using System.Linq;
+using System.Text;
+using System.Threading.Tasks;
 
 namespace Moq
 {
-	internal class AsInterface<TInterface> : Mock<TInterface>
-		where TInterface : class
+	internal sealed class EventHandlerCollection
 	{
-		private Mock owner;
+		private Dictionary<string, List<Delegate>> eventHandlers;
 
-		public AsInterface(Mock owner)
-			: base(true)
+		public EventHandlerCollection()
 		{
-			this.owner = owner;
+			this.eventHandlers = new Dictionary<string, List<Delegate>>();
 		}
 
-		internal override ConcurrentDictionary<MethodInfo, Mock> InnerMocks
+		public void Add(string eventName, Delegate eventHandler)
 		{
-			get { return this.owner.InnerMocks; }
+			lock (this.eventHandlers)
+			{
+				List<Delegate> handlers;
+				if (!this.eventHandlers.TryGetValue(eventName, out handlers))
+				{
+					handlers = new List<Delegate>();
+					this.eventHandlers.Add(eventName, handlers);
+				}
+
+				handlers.Add(eventHandler);
+			}
 		}
 
-		internal override Interceptor Interceptor
+		public void Clear()
 		{
-			get { return this.owner.Interceptor; }
-			set { this.owner.Interceptor = value; }
+			lock (this.eventHandlers)
+			{
+				this.eventHandlers.Clear();
+			}
 		}
 
-		internal override InvocationCollection Invocations => this.owner.Invocations;
-
-		internal override Type MockedType
+		public void Remove(string eventName, Delegate eventHandler)
 		{
-			get { return typeof(TInterface); }
+			lock (this.eventHandlers)
+			{
+				List<Delegate> handlers;
+				if (this.eventHandlers.TryGetValue(eventName, out handlers))
+				{
+					handlers.Remove(eventHandler);
+				}
+			}
 		}
 
-		public override MockBehavior Behavior
+		public Delegate[] ToArray(string eventName)
 		{
-			get { return this.owner.Behavior; }
-			internal set { this.owner.Behavior = value; }
-		}
+			lock (this.eventHandlers)
+			{
+				List<Delegate> handlers;
+				if (!this.eventHandlers.TryGetValue(eventName, out handlers))
+				{
+					return new Delegate[0];
+				}
 
-		public override bool CallBase
-		{
-			get { return this.owner.CallBase; }
-			set { this.owner.CallBase = value; }
-		}
-
-		public override DefaultValue DefaultValue
-		{
-			get { return this.owner.DefaultValue; }
-			set { this.owner.DefaultValue = value; }
-		}
-
-		internal override EventHandlerCollection EventHandlers => this.owner.EventHandlers;
-
-		public override TInterface Object
-		{
-			get { return this.owner.Object as TInterface; }
-		}
-
-		internal override SetupCollection Setups => this.owner.Setups;
-
-		public override Switches Switches
-		{
-			get => this.owner.Switches;
-			set => this.owner.Switches = value;
-		}
-
-		public override Mock<TNewInterface> As<TNewInterface>()
-		{
-			return this.owner.As<TNewInterface>();
-		}
-
-		protected override object OnGetObject()
-		{
-			return this.owner.Object;
+				return handlers.ToArray();
+			}
 		}
 	}
 }

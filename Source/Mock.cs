@@ -64,6 +64,7 @@ namespace Moq
 		private bool isInitialized;
 		private DefaultValue defaultValue = DefaultValue.Empty;
 		private IDefaultValueProvider defaultValueProvider = new EmptyDefaultValueProvider();
+		private EventHandlerCollection eventHandlers;
 		private InvocationCollection invocations;
 		private SetupCollection setups;
 		private Switches switches;
@@ -71,6 +72,7 @@ namespace Moq
 		/// <include file='Mock.xdoc' path='docs/doc[@for="Mock.ctor"]/*'/>
 		protected Mock()
 		{
+			this.eventHandlers = new EventHandlerCollection();
 			this.ImplementedInterfaces = new List<Type>();
 			this.InnerMocks = new ConcurrentDictionary<MethodInfo, Mock>();
 			this.invocations = new InvocationCollection();
@@ -172,6 +174,8 @@ namespace Moq
 				new MockDefaultValueProvider(this) :
 				new EmptyDefaultValueProvider();
 		}
+
+		internal virtual EventHandlerCollection EventHandlers => this.eventHandlers;
 
 		/// <include file='Mock.xdoc' path='docs/doc[@for="Mock.Object"]/*'/>
 		[SuppressMessage("Microsoft.Naming", "CA1716:IdentifiersShouldNotMatchKeywords", MessageId = "Object", Justification = "Exposes the mocked object instance, so it's appropriate.")]
@@ -1098,7 +1102,7 @@ namespace Moq
 				throw new InvalidOperationException(Resources.RaisedUnassociatedEvent);
 			}
 
-			foreach (var del in this.Interceptor.InterceptionContext.GetInvocationList(ev).ToArray())
+			foreach (var del in this.EventHandlers.ToArray(ev.Name))
 			{
 				del.InvokePreserveStack(this.Object, args);
 			}
@@ -1115,7 +1119,7 @@ namespace Moq
 				throw new InvalidOperationException(Resources.RaisedUnassociatedEvent);
 			}
 
-			foreach (var del in this.Interceptor.InterceptionContext.GetInvocationList(ev).ToArray())
+			foreach (var del in this.EventHandlers.ToArray(ev.Name))
 			{
 				// Non EventHandler-compatible delegates get the straight
 				// arguments, not the typical "sender, args" arguments.

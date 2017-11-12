@@ -26,7 +26,6 @@ namespace Moq
 
 	internal class InterceptorContext
 	{
-		private Dictionary<string, List<Delegate>> invocationLists = new Dictionary<string, List<Delegate>>();
 
 		public InterceptorContext(Mock Mock, Type targetType, MockBehavior behavior)
 		{
@@ -37,54 +36,5 @@ namespace Moq
 		public Mock Mock { get; private set; }
 		public Type TargetType { get; private set; }
 		public MockBehavior Behavior { get; private set; }
-		
-		#region InvocationLists
-		internal IEnumerable<Delegate> GetInvocationList(EventInfo ev)
-		{
-			lock (invocationLists)
-			{
-				List<Delegate> handlers;
-				if (!invocationLists.TryGetValue(ev.Name, out handlers))
-				{
-					return new Delegate[0];
-				}
-
-				return handlers.ToList();
-			}
-		}
-
-		internal void AddEventHandler(EventInfo ev, Delegate handler)
-		{
-			lock (invocationLists)
-			{
-				List<Delegate> handlers;
-				if (!invocationLists.TryGetValue(ev.Name, out handlers))
-				{
-					handlers = new List<Delegate>();
-					invocationLists.Add(ev.Name, handlers);
-				}
-
-				handlers.Add(handler);
-			}
-		}
-		internal void RemoveEventHandler(EventInfo ev, Delegate handler)
-		{
-			lock (invocationLists)
-			{
-				List<Delegate> handlers;
-				if (invocationLists.TryGetValue(ev.Name, out handlers))
-				{
-					handlers.Remove(handler);
-				}
-			}
-		}
-		internal void ClearEventHandlers()
-		{
-			lock (invocationLists)
-			{
-				invocationLists.Clear();
-			}
-		}
-		#endregion
 	}
 }
