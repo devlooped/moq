@@ -40,6 +40,7 @@
 
 using System;
 using System.Collections.Generic;
+using System.Diagnostics;
 using System.Linq;
 using System.Reflection;
 
@@ -147,8 +148,10 @@ namespace Moq
 
 		public InterceptionAction HandleIntercept(ICallContext invocation, Mock mock)
 		{
-			if (invocation.Method != null && invocation.Method.ReturnType != null &&
-					invocation.Method.ReturnType != typeof(void))
+			Debug.Assert(invocation.Method != null);
+			Debug.Assert(invocation.Method.ReturnType != null);
+
+			if (invocation.Method.ReturnType != typeof(void))
 			{
 				Mock recursiveMock;
 				if (mock.InnerMocks.TryGetValue(invocation.Method, out recursiveMock))

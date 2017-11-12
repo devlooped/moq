@@ -38,11 +38,9 @@
 //[This is the BSD license, see
 // http://www.opensource.org/licenses/bsd-license.php]
 
-using System;
-using System.Diagnostics.CodeAnalysis;
+using System.Diagnostics;
 
 using Moq.Proxy;
-using System.Diagnostics;
 
 namespace Moq
 {
@@ -61,24 +59,19 @@ namespace Moq
 			this.mock = mock;
 		}
 
-		private static Lazy<IInterceptStrategy[]> interceptionStrategies =
-			new Lazy<IInterceptStrategy[]>(
-				() => new IInterceptStrategy[]
-				{
-					HandleTracking.Instance,
-					HandleWellKnownMethods.Instance,
-					AddActualInvocation.Instance,
-					ExtractAndExecuteProxyCall.Instance,
-					InvokeBase.Instance,
-					HandleMockRecursion.Instance,
-				});
+		private static IInterceptStrategy[] Strategies { get; } = new IInterceptStrategy[]
+		{
+			HandleTracking.Instance,
+			HandleWellKnownMethods.Instance,
+			AddActualInvocation.Instance,
+			ExtractAndExecuteProxyCall.Instance,
+			InvokeBase.Instance,
+			HandleMockRecursion.Instance,
+		};
 
-		private static IInterceptStrategy[] InterceptionStrategies => interceptionStrategies.Value;
-
-		[SuppressMessage("Microsoft.Maintainability", "CA1502:AvoidExcessiveComplexity")]
 		public void Intercept(ICallContext invocation)
 		{
-			foreach (var strategy in InterceptionStrategies)
+			foreach (var strategy in Strategies)
 			{
 				if (InterceptionAction.Stop == strategy.HandleIntercept(invocation, this.mock))
 				{
