@@ -131,10 +131,8 @@ namespace Moq
 			new Lazy<IInterceptStrategy[]>(
 				() => new IInterceptStrategy[]
 				{
-					HandleFinalizer.Instance,
 					HandleTracking.Instance,
-					InterceptMockPropertyMixin.Instance,
-					InterceptObjectMethodsMixin.Instance,
+					HandleWellKnownMethods.Instance,
 					AddActualInvocation.Instance,
 					ExtractAndExecuteProxyCall.Instance,
 					InvokeBase.Instance,

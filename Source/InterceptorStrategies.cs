@@ -1,12 +1,146 @@
-﻿using System;
+﻿//Copyright (c) 2007. Clarius Consulting, Manas Technology Solutions, InSTEDD
+//https://github.com/moq/moq4
+//All rights reserved.
+
+//Redistribution and use in source and binary forms, 
+//with or without modification, are permitted provided 
+//that the following conditions are met:
+
+//    * Redistributions of source code must retain the 
+//    above copyright notice, this list of conditions and 
+//    the following disclaimer.
+
+//    * Redistributions in binary form must reproduce 
+//    the above copyright notice, this list of conditions 
+//    and the following disclaimer in the documentation 
+//    and/or other materials provided with the distribution.
+
+//    * Neither the name of Clarius Consulting, Manas Technology Solutions or InSTEDD nor the 
+//    names of its contributors may be used to endorse 
+//    or promote products derived from this software 
+//    without specific prior written permission.
+
+//THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND 
+//CONTRIBUTORS "AS IS" AND ANY EXPRESS OR IMPLIED WARRANTIES, 
+//INCLUDING, BUT NOT LIMITED TO, THE IMPLIED WARRANTIES OF 
+//MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE ARE 
+//DISCLAIMED. IN NO EVENT SHALL THE COPYRIGHT OWNER OR 
+//CONTRIBUTORS BE LIABLE FOR ANY DIRECT, INDIRECT, INCIDENTAL, 
+//SPECIAL, EXEMPLARY, OR CONSEQUENTIAL DAMAGES (INCLUDING, 
+//BUT NOT LIMITED TO, PROCUREMENT OF SUBSTITUTE GOODS OR 
+//SERVICES; LOSS OF USE, DATA, OR PROFITS; OR BUSINESS 
+//INTERRUPTION) HOWEVER CAUSED AND ON ANY THEORY OF LIABILITY, 
+//WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT (INCLUDING 
+//NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE 
+//OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF 
+//SUCH DAMAGE.
+
+//[This is the BSD license, see
+// http://www.opensource.org/licenses/bsd-license.php]
+
+using System;
 using System.Collections.Generic;
 using System.Linq;
-using System.Text;
-using Moq.Proxy;
 using System.Reflection;
+
+using Moq.Proxy;
 
 namespace Moq
 {
+	internal class HandleWellKnownMethods : IInterceptStrategy
+	{
+		public static HandleWellKnownMethods Instance { get; } = new HandleWellKnownMethods();
+
+		private static Dictionary<string, Func<ICallContext, InterceptorContext, InterceptionAction>> specialMethods = new Dictionary<string, Func<ICallContext, InterceptorContext, InterceptionAction>>()
+		{
+			["Equals"] = HandleEquals,
+			["Finalize"] = HandleFinalize,
+			["GetHashCode"] = HandleGetHashCode,
+			["get_" + nameof(IMocked.Mock)] = HandleMockGetter,
+			["ToString"] = HandleToString,
+		};
+
+		public InterceptionAction HandleIntercept(ICallContext invocation, InterceptorContext ctx)
+		{
+			if (specialMethods.TryGetValue(invocation.Method.Name, out Func<ICallContext, InterceptorContext, InterceptionAction> handler))
+			{
+				return handler.Invoke(invocation, ctx);
+			}
+			else
+			{
+				return InterceptionAction.Continue;
+			}
+		}
+
+		private static InterceptionAction HandleEquals(ICallContext invocation, InterceptorContext ctx)
+		{
+			if (IsObjectMethod(invocation.Method) && !ctx.GetOrderedCalls().Any(c => IsObjectMethod(c.Method, "Equals")))
+			{
+				invocation.ReturnValue = ReferenceEquals(invocation.Arguments.First(), ctx.Mock.Object);
+				return InterceptionAction.Stop;
+			}
+			else
+			{
+				return InterceptionAction.Continue;
+			}
+		}
+
+		private static InterceptionAction HandleFinalize(ICallContext invocation, InterceptorContext ctx)
+		{
+			return IsFinalizer(invocation.Method) ? InterceptionAction.Stop : InterceptionAction.Continue;
+		}
+
+		private static InterceptionAction HandleGetHashCode(ICallContext invocation, InterceptorContext ctx)
+		{
+			// Only if there is no corresponding setup for `GetHashCode()`
+			if (IsObjectMethod(invocation.Method) && !ctx.GetOrderedCalls().Any(c => IsObjectMethod(c.Method, "GetHashCode")))
+			{
+				invocation.ReturnValue = ctx.Mock.GetHashCode();
+				return InterceptionAction.Stop;
+			}
+			else
+			{
+				return InterceptionAction.Continue;
+			}
+		}
+
+		private static InterceptionAction HandleToString(ICallContext invocation, InterceptorContext ctx)
+		{
+			// Only if there is no corresponding setup for `ToString()`
+			if (IsObjectMethod(invocation.Method) && !ctx.GetOrderedCalls().Any(c => IsObjectMethod(c.Method, "ToString")))
+			{
+				invocation.ReturnValue = ctx.Mock.ToString() + ".Object";
+				return InterceptionAction.Stop;
+			}
+			else
+			{
+				return InterceptionAction.Continue;
+			}
+		}
+
+		private static InterceptionAction HandleMockGetter(ICallContext invocation, InterceptorContext ctx)
+		{
+			if (typeof(IMocked).IsAssignableFrom(invocation.Method.DeclaringType))
+			{
+				invocation.ReturnValue = ctx.Mock;
+				return InterceptionAction.Stop;
+			}
+			else
+			{
+				return InterceptionAction.Continue;
+			}
+		}
+
+		private static bool IsFinalizer(MethodInfo method)
+		{
+			return method.GetBaseDefinition() == typeof(object).GetMethod("Finalize", BindingFlags.NonPublic | BindingFlags.Instance);
+		}
+
+		private static bool IsObjectMethod(MethodInfo method) => method.DeclaringType == typeof(object);
+
+		private static bool IsObjectMethod(MethodInfo method, string name) => IsObjectMethod(method) && method.Name == name;
+	}
+
 	internal class HandleMockRecursion : IInterceptStrategy
 	{
 		public static HandleMockRecursion Instance { get; } = new HandleMockRecursion();
@@ -110,71 +244,6 @@ namespace Moq
 		}
 	}
 
-	internal class InterceptMockPropertyMixin : IInterceptStrategy
-	{
-		public static InterceptMockPropertyMixin Instance { get; } = new InterceptMockPropertyMixin();
-
-		public InterceptionAction HandleIntercept(ICallContext invocation, InterceptorContext ctx)
-		{
-			var method = invocation.Method;
-
-			if (typeof(IMocked).IsAssignableFrom(method.DeclaringType) && method.Name == "get_Mock")
-			{
-				invocation.ReturnValue = ctx.Mock;
-				return InterceptionAction.Stop;
-			}
-
-			return InterceptionAction.Continue;
-		}
-	}
-
-	/// <summary>
-	/// Intercept strategy that handles `System.Object` methods.
-	/// </summary>
-	internal class InterceptObjectMethodsMixin : IInterceptStrategy
-	{
-		public static InterceptObjectMethodsMixin Instance { get; } = new InterceptObjectMethodsMixin();
-
-		public InterceptionAction HandleIntercept(ICallContext invocation, InterceptorContext ctx)
-		{
-			var method = invocation.Method;
-
-			if (!IsObjectMethod(method))
-			{
-				return InterceptionAction.Continue;
-			}
-
-			var orderedCalls = ctx.GetOrderedCalls();
-
-			// Only if there is no corresponding setup for `ToString()`
-			if (method.Name == "ToString" && !orderedCalls.Any(c => IsObjectMethod(c.Method, "ToString")))
-			{
-				invocation.ReturnValue = ctx.Mock.ToString() + ".Object";
-				return InterceptionAction.Stop;
-			}
-
-			// Only if there is no corresponding setup for `GetHashCode()`
-			if (method.Name == "GetHashCode" && !orderedCalls.Any(c => IsObjectMethod(c.Method, "GetHashCode")))
-			{
-				invocation.ReturnValue = ctx.Mock.GetHashCode();
-				return InterceptionAction.Stop;
-			}
-
-			// Only if there is no corresponding setup for `Equals()`
-			if (method.Name == "Equals" && !orderedCalls.Any(c => IsObjectMethod(c.Method, "Equals")))
-			{
-				invocation.ReturnValue = ReferenceEquals(invocation.Arguments.First(), ctx.Mock.Object);
-				return InterceptionAction.Stop;
-			}
-
-			return InterceptionAction.Continue;
-		}
-
-		private static bool IsObjectMethod(MethodInfo method) => method.DeclaringType == typeof(object);
-
-		private static bool IsObjectMethod(MethodInfo method, string name) => IsObjectMethod(method) && method.Name == name;
-	}
-
 	internal class HandleTracking : IInterceptStrategy
 	{
 		public static HandleTracking Instance { get; } = new HandleTracking();
@@ -187,22 +256,6 @@ namespace Moq
 				FluentMockContext.Current.Add(ctx.Mock, invocation);
 			}
 			return InterceptionAction.Continue;
-		}
-	}
-
-	internal class HandleFinalizer : IInterceptStrategy
-	{
-		public static HandleFinalizer Instance { get; } = new HandleFinalizer();
-
-		public InterceptionAction HandleIntercept(ICallContext invocation, InterceptorContext ctx)
-		{
-			return IsFinalizer(invocation.Method) ? InterceptionAction.Stop : InterceptionAction.Continue;
-		}
-
-		private static bool IsFinalizer(MethodInfo method)
-		{
-			return method.Name == "Finalize"
-			    && method.GetBaseDefinition() == typeof(object).GetMethod("Finalize", BindingFlags.NonPublic | BindingFlags.Instance);
 		}
 	}
 
