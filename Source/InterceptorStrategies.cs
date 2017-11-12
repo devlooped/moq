@@ -212,10 +212,22 @@ namespace Moq
 
 		public InterceptionAction HandleIntercept(ICallContext invocation, InterceptorContext ctx)
 		{
-			if (!FluentMockContext.IsActive)
+			if (FluentMockContext.IsActive)
 			{
-				//Special case for events
-				if (invocation.Method.LooksLikeEventAttach())
+				// In a fluent invocation context, which is a recorder-like
+				// mode we use to evaluate delegates by actually running them,
+				// we don't want to count the invocation, or actually run
+				// previous setups.
+				return InterceptionAction.Continue;
+			}
+
+			var methodName = invocation.Method.Name;
+
+			// Special case for event accessors. The following, seemingly random character checks are guards against
+			// more expensive checks (for the common case where the invoked method is *not* an event accessor).
+			if (methodName.Length > 4)
+			{
+				if (methodName[0] == 'a' && methodName[3] == '_' && invocation.Method.LooksLikeEventAttach())
 				{
 					var eventInfo = GetEventFromName(invocation.Method.Name.Substring("add_".Length), ctx);
 					if (eventInfo != null)
@@ -236,7 +248,7 @@ namespace Moq
 						}
 					}
 				}
-				else if (invocation.Method.LooksLikeEventDetach())
+				else if (methodName[0] == 'r' && methodName.Length > 7 && methodName[6] == '_' && invocation.Method.LooksLikeEventDetach())
 				{
 					var eventInfo = GetEventFromName(invocation.Method.Name.Substring("remove_".Length), ctx);
 					if (eventInfo != null)
@@ -257,14 +269,10 @@ namespace Moq
 						}
 					}
 				}
-
-				// Save to support Verify[expression] pattern.
-				// In a fluent invocation context, which is a recorder-like
-				// mode we use to evaluate delegates by actually running them,
-				// we don't want to count the invocation, or actually run
-				// previous setups.
-				ctx.AddInvocation(invocation);
 			}
+
+			// Save to support Verify[expression] pattern.
+			ctx.AddInvocation(invocation);
 			return InterceptionAction.Continue;
 		}
 
