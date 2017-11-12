@@ -192,8 +192,6 @@ namespace Moq
 			return value;
 		}
 
-		internal virtual Interceptor Interceptor { get; set; }
-
 		internal virtual ConcurrentDictionary<MethodInfo, Mock> InnerMocks { get; private set; }
 
 		internal virtual InvocationCollection Invocations => this.invocations;
@@ -255,6 +253,8 @@ namespace Moq
 			get => this.switches;
 			set => this.switches = value;
 		}
+
+		internal abstract Type TargetType { get; }
 
 		#region Verify
 

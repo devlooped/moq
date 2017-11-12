@@ -39,14 +39,10 @@
 // http://www.opensource.org/licenses/bsd-license.php]
 
 using System;
-using System.Collections.Generic;
 using System.Diagnostics.CodeAnalysis;
-using System.Linq;
-using System.Linq.Expressions;
-using System.Reflection;
 
-using Moq.Diagnostics.Errors;
 using Moq.Proxy;
+using System.Diagnostics;
 
 namespace Moq
 {
@@ -56,12 +52,14 @@ namespace Moq
 	/// </summary>
 	internal class Interceptor : ICallInterceptor
 	{
-		public Interceptor(MockBehavior behavior, Type targetType, Mock mock)
-		{
-			InterceptionContext = new InterceptorContext(mock, targetType, behavior);
-		}
+		private Mock mock;
 
-		internal InterceptorContext InterceptionContext { get; private set; }
+		public Interceptor(Mock mock)
+		{
+			Debug.Assert(mock != null);
+
+			this.mock = mock;
+		}
 
 		private static Lazy<IInterceptStrategy[]> interceptionStrategies =
 			new Lazy<IInterceptStrategy[]>(
@@ -82,7 +80,7 @@ namespace Moq
 		{
 			foreach (var strategy in InterceptionStrategies)
 			{
-				if (InterceptionAction.Stop == strategy.HandleIntercept(invocation, InterceptionContext))
+				if (InterceptionAction.Stop == strategy.HandleIntercept(invocation, this.mock))
 				{
 					break;
 				}

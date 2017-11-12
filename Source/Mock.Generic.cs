@@ -115,7 +115,6 @@ namespace Moq
 			this.Name = GenerateMockName();
 
 			this.Behavior = behavior;
-			this.Interceptor = new Interceptor(behavior, typeof(T), this);
 			this.constructorArguments = args;
 			this.ImplementedInterfaces.AddRange(typeof(T).GetInterfaces().Where(i => (i.GetTypeInfo().IsPublic || i.GetTypeInfo().IsNestedPublic) && !i.GetTypeInfo().IsImport));
 			this.ImplementedInterfaces.Add(typeof(IMocked<T>));
@@ -205,7 +204,7 @@ namespace Moq
 				// Then create a proxy for that.
 				var delegateProxy = Mock.ProxyFactory.CreateProxy(
 					delegateInterfaceType,
-					this.Interceptor,
+					new Interceptor(this),
 					this.ImplementedInterfaces.ToArray(),
 					this.constructorArguments);
 
@@ -217,7 +216,7 @@ namespace Moq
 			{
 				this.instance = (T)Mock.ProxyFactory.CreateProxy(
 					typeof(T),
-					this.Interceptor,
+					new Interceptor(this),
 					this.ImplementedInterfaces.Skip(this.InternallyImplementedInterfaceCount - 1).ToArray(),
 					this.constructorArguments);
 			}
@@ -256,6 +255,8 @@ namespace Moq
 		{
 			get { return typeof(T); }
 		}
+
+		internal override Type TargetType => typeof(T);
 
 #endregion
 

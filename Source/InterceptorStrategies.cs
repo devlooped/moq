@@ -51,7 +51,7 @@ namespace Moq
 	{
 		public static HandleWellKnownMethods Instance { get; } = new HandleWellKnownMethods();
 
-		private static Dictionary<string, Func<ICallContext, InterceptorContext, InterceptionAction>> specialMethods = new Dictionary<string, Func<ICallContext, InterceptorContext, InterceptionAction>>()
+		private static Dictionary<string, Func<ICallContext, Mock, InterceptionAction>> specialMethods = new Dictionary<string, Func<ICallContext, Mock, InterceptionAction>>()
 		{
 			["Equals"] = HandleEquals,
 			["Finalize"] = HandleFinalize,
@@ -60,11 +60,11 @@ namespace Moq
 			["ToString"] = HandleToString,
 		};
 
-		public InterceptionAction HandleIntercept(ICallContext invocation, InterceptorContext ctx)
+		public InterceptionAction HandleIntercept(ICallContext invocation, Mock mock)
 		{
-			if (specialMethods.TryGetValue(invocation.Method.Name, out Func<ICallContext, InterceptorContext, InterceptionAction> handler))
+			if (specialMethods.TryGetValue(invocation.Method.Name, out Func<ICallContext, Mock, InterceptionAction> handler))
 			{
-				return handler.Invoke(invocation, ctx);
+				return handler.Invoke(invocation, mock);
 			}
 			else
 			{
@@ -72,11 +72,11 @@ namespace Moq
 			}
 		}
 
-		private static InterceptionAction HandleEquals(ICallContext invocation, InterceptorContext ctx)
+		private static InterceptionAction HandleEquals(ICallContext invocation, Mock mock)
 		{
-			if (IsObjectMethod(invocation.Method) && !ctx.Mock.Setups.Any(c => IsObjectMethod(c.Method, "Equals")))
+			if (IsObjectMethod(invocation.Method) && !mock.Setups.Any(c => IsObjectMethod(c.Method, "Equals")))
 			{
-				invocation.ReturnValue = ReferenceEquals(invocation.Arguments.First(), ctx.Mock.Object);
+				invocation.ReturnValue = ReferenceEquals(invocation.Arguments.First(), mock.Object);
 				return InterceptionAction.Stop;
 			}
 			else
@@ -85,17 +85,17 @@ namespace Moq
 			}
 		}
 
-		private static InterceptionAction HandleFinalize(ICallContext invocation, InterceptorContext ctx)
+		private static InterceptionAction HandleFinalize(ICallContext invocation, Mock mock)
 		{
 			return IsFinalizer(invocation.Method) ? InterceptionAction.Stop : InterceptionAction.Continue;
 		}
 
-		private static InterceptionAction HandleGetHashCode(ICallContext invocation, InterceptorContext ctx)
+		private static InterceptionAction HandleGetHashCode(ICallContext invocation, Mock mock)
 		{
 			// Only if there is no corresponding setup for `GetHashCode()`
-			if (IsObjectMethod(invocation.Method) && !ctx.Mock.Setups.Any(c => IsObjectMethod(c.Method, "GetHashCode")))
+			if (IsObjectMethod(invocation.Method) && !mock.Setups.Any(c => IsObjectMethod(c.Method, "GetHashCode")))
 			{
-				invocation.ReturnValue = ctx.Mock.GetHashCode();
+				invocation.ReturnValue = mock.GetHashCode();
 				return InterceptionAction.Stop;
 			}
 			else
@@ -104,12 +104,12 @@ namespace Moq
 			}
 		}
 
-		private static InterceptionAction HandleToString(ICallContext invocation, InterceptorContext ctx)
+		private static InterceptionAction HandleToString(ICallContext invocation, Mock mock)
 		{
 			// Only if there is no corresponding setup for `ToString()`
-			if (IsObjectMethod(invocation.Method) && !ctx.Mock.Setups.Any(c => IsObjectMethod(c.Method, "ToString")))
+			if (IsObjectMethod(invocation.Method) && !mock.Setups.Any(c => IsObjectMethod(c.Method, "ToString")))
 			{
-				invocation.ReturnValue = ctx.Mock.ToString() + ".Object";
+				invocation.ReturnValue = mock.ToString() + ".Object";
 				return InterceptionAction.Stop;
 			}
 			else
@@ -118,11 +118,11 @@ namespace Moq
 			}
 		}
 
-		private static InterceptionAction HandleMockGetter(ICallContext invocation, InterceptorContext ctx)
+		private static InterceptionAction HandleMockGetter(ICallContext invocation, Mock mock)
 		{
 			if (typeof(IMocked).IsAssignableFrom(invocation.Method.DeclaringType))
 			{
-				invocation.ReturnValue = ctx.Mock;
+				invocation.ReturnValue = mock;
 				return InterceptionAction.Stop;
 			}
 			else
@@ -145,19 +145,19 @@ namespace Moq
 	{
 		public static HandleMockRecursion Instance { get; } = new HandleMockRecursion();
 
-		public InterceptionAction HandleIntercept(ICallContext invocation, InterceptorContext ctx)
+		public InterceptionAction HandleIntercept(ICallContext invocation, Mock mock)
 		{
 			if (invocation.Method != null && invocation.Method.ReturnType != null &&
 					invocation.Method.ReturnType != typeof(void))
 			{
 				Mock recursiveMock;
-				if (ctx.Mock.InnerMocks.TryGetValue(invocation.Method, out recursiveMock))
+				if (mock.InnerMocks.TryGetValue(invocation.Method, out recursiveMock))
 				{
 					invocation.ReturnValue = recursiveMock.Object;
 				}
 				else
 				{
-					invocation.ReturnValue = ctx.Mock.DefaultValueProvider.ProvideDefault(invocation.Method);
+					invocation.ReturnValue = mock.DefaultValueProvider.ProvideDefault(invocation.Method);
 				}
 				return InterceptionAction.Stop;
 			}
@@ -169,11 +169,11 @@ namespace Moq
 	{
 		public static InvokeBase Instance { get; } = new InvokeBase();
 
-		public InterceptionAction HandleIntercept(ICallContext invocation, InterceptorContext ctx)
+		public InterceptionAction HandleIntercept(ICallContext invocation, Mock mock)
 		{
 			if (invocation.Method.DeclaringType == typeof(object) || // interface proxy
-				ctx.Mock.ImplementedInterfaces.Contains(invocation.Method.DeclaringType) && !invocation.Method.LooksLikeEventAttach() && !invocation.Method.LooksLikeEventDetach() && ctx.Mock.CallBase && !ctx.Mock.MockedType.GetTypeInfo().IsInterface || // class proxy with explicitly implemented interfaces. The method's declaring type is the interface and the method couldn't be abstract
-				invocation.Method.DeclaringType.GetTypeInfo().IsClass && !invocation.Method.IsAbstract && ctx.Mock.CallBase // class proxy
+				mock.ImplementedInterfaces.Contains(invocation.Method.DeclaringType) && !invocation.Method.LooksLikeEventAttach() && !invocation.Method.LooksLikeEventDetach() && mock.CallBase && !mock.MockedType.GetTypeInfo().IsInterface || // class proxy with explicitly implemented interfaces. The method's declaring type is the interface and the method couldn't be abstract
+				invocation.Method.DeclaringType.GetTypeInfo().IsClass && !invocation.Method.IsAbstract && mock.CallBase // class proxy
 				)
 			{
 				// Invoke underlying implementation.
@@ -196,14 +196,14 @@ namespace Moq
 	{
 		public static ExtractAndExecuteProxyCall Instance { get; } = new ExtractAndExecuteProxyCall();
 
-		public InterceptionAction HandleIntercept(ICallContext invocation, InterceptorContext ctx)
+		public InterceptionAction HandleIntercept(ICallContext invocation, Mock mock)
 		{
 			if (FluentMockContext.IsActive)
 			{
 				return InterceptionAction.Continue;
 			}
 
-			var matchedSetup = ctx.Mock.Setups.FindMatchFor(invocation);
+			var matchedSetup = mock.Setups.FindMatchFor(invocation);
 			if (matchedSetup != null)
 			{
 				matchedSetup.EvaluatedSuccessfully();
@@ -213,12 +213,12 @@ namespace Moq
 				// and therefore we might never get to the 
 				// next line.
 				matchedSetup.Execute(invocation);
-				ThrowIfReturnValueRequired(matchedSetup, invocation, ctx);
+				ThrowIfReturnValueRequired(matchedSetup, invocation, mock);
 				return InterceptionAction.Stop;
 			}
-			else if (ctx.Behavior == MockBehavior.Strict)
+			else if (mock.Behavior == MockBehavior.Strict)
 			{
-				throw new MockException(MockException.ExceptionReason.NoSetup, ctx.Behavior, invocation);
+				throw new MockException(MockException.ExceptionReason.NoSetup, MockBehavior.Strict, invocation);
 			}
 			else
 			{
@@ -226,9 +226,9 @@ namespace Moq
 			}
 		}
 
-		private static void ThrowIfReturnValueRequired(IProxyCall call, ICallContext invocation, InterceptorContext ctx)
+		private static void ThrowIfReturnValueRequired(IProxyCall call, ICallContext invocation, Mock mock)
 		{
-			if (ctx.Behavior != MockBehavior.Loose &&
+			if (mock.Behavior != MockBehavior.Loose &&
 				invocation.Method != null &&
 				invocation.Method.ReturnType != null &&
 				invocation.Method.ReturnType != typeof(void))
@@ -237,7 +237,7 @@ namespace Moq
 				{
 					throw new MockException(
 						MockException.ExceptionReason.ReturnValueRequired,
-						ctx.Behavior,
+						mock.Behavior,
 						invocation);
 				}
 			}
@@ -248,12 +248,12 @@ namespace Moq
 	{
 		public static HandleTracking Instance { get; } = new HandleTracking();
 
-		public InterceptionAction HandleIntercept(ICallContext invocation, InterceptorContext ctx)
+		public InterceptionAction HandleIntercept(ICallContext invocation, Mock mock)
 		{
 			// Track current invocation if we're in "record" mode in a fluent invocation context.
 			if (FluentMockContext.IsActive)
 			{
-				FluentMockContext.Current.Add(ctx.Mock, invocation);
+				FluentMockContext.Current.Add(mock, invocation);
 			}
 			return InterceptionAction.Continue;
 		}
@@ -263,7 +263,7 @@ namespace Moq
 	{
 		public static AddActualInvocation Instance { get; } = new AddActualInvocation();
 
-		public InterceptionAction HandleIntercept(ICallContext invocation, InterceptorContext ctx)
+		public InterceptionAction HandleIntercept(ICallContext invocation, Mock mock)
 		{
 			if (FluentMockContext.IsActive)
 			{
@@ -282,42 +282,42 @@ namespace Moq
 			{
 				if (methodName[0] == 'a' && methodName[3] == '_' && invocation.Method.LooksLikeEventAttach())
 				{
-					var eventInfo = GetEventFromName(invocation.Method.Name.Substring("add_".Length), ctx);
+					var eventInfo = GetEventFromName(invocation.Method.Name.Substring("add_".Length), mock);
 					if (eventInfo != null)
 					{
 						// TODO: We could compare `invocation.Method` and `eventInfo.GetAddMethod()` here.
 						// If they are equal, then `invocation.Method` is definitely an event `add` accessor.
 						// Not sure whether this would work with F# and COM; see commit 44070a9.
 
-						if (ctx.Mock.CallBase && !invocation.Method.IsAbstract)
+						if (mock.CallBase && !invocation.Method.IsAbstract)
 						{
 							invocation.InvokeBase();
 							return InterceptionAction.Stop;
 						}
 						else if (invocation.Arguments.Length > 0 && invocation.Arguments[0] is Delegate delegateInstance)
 						{
-							ctx.Mock.EventHandlers.Add(eventInfo.Name, delegateInstance);
+							mock.EventHandlers.Add(eventInfo.Name, delegateInstance);
 							return InterceptionAction.Stop;
 						}
 					}
 				}
 				else if (methodName[0] == 'r' && methodName.Length > 7 && methodName[6] == '_' && invocation.Method.LooksLikeEventDetach())
 				{
-					var eventInfo = GetEventFromName(invocation.Method.Name.Substring("remove_".Length), ctx);
+					var eventInfo = GetEventFromName(invocation.Method.Name.Substring("remove_".Length), mock);
 					if (eventInfo != null)
 					{
 						// TODO: We could compare `invocation.Method` and `eventInfo.GetRemoveMethod()` here.
 						// If they are equal, then `invocation.Method` is definitely an event `remove` accessor.
 						// Not sure whether this would work with F# and COM; see commit 44070a9.
 
-						if (ctx.Mock.CallBase && !invocation.Method.IsAbstract)
+						if (mock.CallBase && !invocation.Method.IsAbstract)
 						{
 							invocation.InvokeBase();
 							return InterceptionAction.Stop;
 						}
 						else if (invocation.Arguments.Length > 0 && invocation.Arguments[0] is Delegate delegateInstance)
 						{
-							ctx.Mock.EventHandlers.Remove(eventInfo.Name, delegateInstance);
+							mock.EventHandlers.Remove(eventInfo.Name, delegateInstance);
 							return InterceptionAction.Stop;
 						}
 					}
@@ -325,7 +325,7 @@ namespace Moq
 			}
 
 			// Save to support Verify[expression] pattern.
-			ctx.Mock.Invocations.Add(invocation);
+			mock.Invocations.Add(invocation);
 			return InterceptionAction.Continue;
 		}
 
@@ -333,11 +333,11 @@ namespace Moq
 		/// Get an eventInfo for a given event name.  Search type ancestors depth first if necessary.
 		/// </summary>
 		/// <param name="eventName">Name of the event, with the set_ or get_ prefix already removed</param>
-		/// <param name="ctx"/>
-		private static EventInfo GetEventFromName(string eventName, InterceptorContext ctx)
+		/// <param name="mock"/>
+		private static EventInfo GetEventFromName(string eventName, Mock mock)
 		{
-			return GetEventFromName(eventName, BindingFlags.Instance | BindingFlags.Static | BindingFlags.Public, ctx)
-				?? GetEventFromName(eventName, BindingFlags.Instance | BindingFlags.NonPublic, ctx);
+			return GetEventFromName(eventName, BindingFlags.Instance | BindingFlags.Static | BindingFlags.Public, mock)
+				?? GetEventFromName(eventName, BindingFlags.Instance | BindingFlags.NonPublic, mock);
 		}
 
 		/// <summary>
@@ -346,12 +346,12 @@ namespace Moq
 		/// </summary>
 		/// <param name="eventName">Name of the event, with the set_ or get_ prefix already removed</param>
 		/// <param name="bindingAttr">Specifies how the search for events is conducted</param>
-		/// <param name="ctx"/>
-		private static EventInfo GetEventFromName(string eventName, BindingFlags bindingAttr, InterceptorContext ctx)
+		/// <param name="mock"/>
+		private static EventInfo GetEventFromName(string eventName, BindingFlags bindingAttr, Mock mock)
 		{
 			// Ignore internally implemented interfaces
-			var depthFirstProgress = new Queue<Type>(ctx.Mock.ImplementedInterfaces.Skip(ctx.Mock.InternallyImplementedInterfaceCount));
-			depthFirstProgress.Enqueue(ctx.TargetType);
+			var depthFirstProgress = new Queue<Type>(mock.ImplementedInterfaces.Skip(mock.InternallyImplementedInterfaceCount));
+			depthFirstProgress.Enqueue(mock.TargetType);
 			while (depthFirstProgress.Count > 0)
 			{
 				var currentType = depthFirstProgress.Dequeue();
