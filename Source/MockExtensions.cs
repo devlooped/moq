@@ -33,7 +33,7 @@ namespace Moq
 		/// <param name="mock">The mock that needs to be reset.</param>
 		public static void Reset(this Mock mock)
 		{
-			mock.Interceptor.InterceptionContext.ClearOrderedCalls();
+			mock.Setups.Clear();
 			mock.Interceptor.InterceptionContext.ClearEventHandlers();
 			mock.ResetCalls();
 		}

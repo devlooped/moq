@@ -74,7 +74,7 @@ namespace Moq
 
 		private static InterceptionAction HandleEquals(ICallContext invocation, InterceptorContext ctx)
 		{
-			if (IsObjectMethod(invocation.Method) && !ctx.GetOrderedCalls().Any(c => IsObjectMethod(c.Method, "Equals")))
+			if (IsObjectMethod(invocation.Method) && !ctx.Mock.Setups.Any(c => IsObjectMethod(c.Method, "Equals")))
 			{
 				invocation.ReturnValue = ReferenceEquals(invocation.Arguments.First(), ctx.Mock.Object);
 				return InterceptionAction.Stop;
@@ -93,7 +93,7 @@ namespace Moq
 		private static InterceptionAction HandleGetHashCode(ICallContext invocation, InterceptorContext ctx)
 		{
 			// Only if there is no corresponding setup for `GetHashCode()`
-			if (IsObjectMethod(invocation.Method) && !ctx.GetOrderedCalls().Any(c => IsObjectMethod(c.Method, "GetHashCode")))
+			if (IsObjectMethod(invocation.Method) && !ctx.Mock.Setups.Any(c => IsObjectMethod(c.Method, "GetHashCode")))
 			{
 				invocation.ReturnValue = ctx.Mock.GetHashCode();
 				return InterceptionAction.Stop;
@@ -107,7 +107,7 @@ namespace Moq
 		private static InterceptionAction HandleToString(ICallContext invocation, InterceptorContext ctx)
 		{
 			// Only if there is no corresponding setup for `ToString()`
-			if (IsObjectMethod(invocation.Method) && !ctx.GetOrderedCalls().Any(c => IsObjectMethod(c.Method, "ToString")))
+			if (IsObjectMethod(invocation.Method) && !ctx.Mock.Setups.Any(c => IsObjectMethod(c.Method, "ToString")))
 			{
 				invocation.ReturnValue = ctx.Mock.ToString() + ".Object";
 				return InterceptionAction.Stop;
@@ -203,7 +203,7 @@ namespace Moq
 				return InterceptionAction.Continue;
 			}
 
-			var matchedSetup = ctx.GetOrderedCallFor(invocation);
+			var matchedSetup = ctx.Mock.Setups.FindMatchFor(invocation);
 			if (matchedSetup != null)
 			{
 				matchedSetup.EvaluatedSuccessfully();

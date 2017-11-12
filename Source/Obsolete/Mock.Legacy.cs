@@ -58,12 +58,11 @@ namespace Moq
 			var setter = prop.SetMethod;
 			ThrowIfSetupExpressionInvolvesUnsupportedMember(expression, setter);
 
-			var call = new SetterMethodCall<T, TProperty>(mock, expression, setter, value);
-			var targetInterceptor = GetInterceptor(((MemberExpression)expression.Body).Expression, mock);
+			var setup = new SetterMethodCall<T, TProperty>(mock, expression, setter, value);
+			var targetMock = GetTargetMock(((MemberExpression)expression.Body).Expression, mock);
+			targetMock.Setups.Add(setup);
 
-			targetInterceptor.AddCall(call);
-
-			return call;
+			return setup;
 		}
 
 		[Obsolete]
@@ -81,7 +80,7 @@ namespace Moq
 			{
 				FailMessage = failMessage
 			};
-			VerifyCalls(GetInterceptor(((MemberExpression)expression.Body).Expression, mock), expected, expression, times);
+			VerifyCalls(GetTargetMock(((MemberExpression)expression.Body).Expression, mock), expected, expression, times);
 		}
 
 		[Obsolete]
@@ -100,7 +99,7 @@ namespace Moq
 			{
 				FailMessage = failMessage
 			};
-			VerifyCalls(GetInterceptor(((MemberExpression)expression.Body).Expression, mock), expected, expression, times);
+			VerifyCalls(GetTargetMock(((MemberExpression)expression.Body).Expression, mock), expected, expression, times);
 		}
 	}
 }

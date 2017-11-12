@@ -65,6 +65,7 @@ namespace Moq
 		private DefaultValue defaultValue = DefaultValue.Empty;
 		private IDefaultValueProvider defaultValueProvider = new EmptyDefaultValueProvider();
 		private InvocationCollection invocations;
+		private SetupCollection setups;
 		private Switches switches;
 
 		/// <include file='Mock.xdoc' path='docs/doc[@for="Mock.ctor"]/*'/>
@@ -73,6 +74,7 @@ namespace Moq
 			this.ImplementedInterfaces = new List<Type>();
 			this.InnerMocks = new ConcurrentDictionary<MethodInfo, Mock>();
 			this.invocations = new InvocationCollection();
+			this.setups = new SetupCollection();
 			this.switches = Switches.Default;
 		}
 
@@ -238,6 +240,8 @@ namespace Moq
 		/// </summary>
 		internal protected int InternallyImplementedInterfaceCount { get; protected set; }
 
+		internal virtual SetupCollection Setups => this.setups;
+
 		/// <summary>
 		/// A set of switches that influence how this mock will operate.
 		/// You can opt in or out of certain features via this property.
@@ -261,8 +265,10 @@ namespace Moq
 
 		private bool TryVerify(out UnmatchedSetups error)
 		{
-			if (!this.Interceptor.TryVerify(out error))
+			var uninvokedVerifiableSetups = this.Setups.ToArrayLive(setup => setup.IsVerifiable && !setup.Invoked);
+			if (uninvokedVerifiableSetups.Length > 0)
 			{
+				error = new UnmatchedSetups(uninvokedVerifiableSetups);
 				return false;
 			}
 
@@ -289,8 +295,10 @@ namespace Moq
 
 		private bool TryVerifyAll(out UnmatchedSetups error)
 		{
-			if (!this.Interceptor.TryVerifyAll(out error))
+			var uninvokedSetups = this.Setups.ToArrayLive(setup => !setup.Invoked);
+			if (uninvokedSetups.Length > 0)
 			{
+				error = new UnmatchedSetups(uninvokedSetups);
 				return false;
 			}
 
@@ -321,7 +329,7 @@ namespace Moq
 			var args = methodCall.Arguments.ToArray();
 
 			var expected = new MethodCall(mock, null, expression, method, args) { FailMessage = failMessage };
-			VerifyCalls(GetInterceptor(methodCall.Object, mock), expected, expression, times);
+			VerifyCalls(GetTargetMock(methodCall.Object, mock), expected, expression, times);
 		}
 
 		internal static void Verify<T, TResult>(
@@ -348,7 +356,7 @@ namespace Moq
 				{
 					FailMessage = failMessage
 				};
-				VerifyCalls(GetInterceptor(methodCall.Object, mock), expected, expression, times);
+				VerifyCalls(GetTargetMock(methodCall.Object, mock), expected, expression, times);
 			}
 		}
 
@@ -366,7 +374,7 @@ namespace Moq
 			{
 				FailMessage = failMessage
 			};
-			VerifyCalls(GetInterceptor(((MemberExpression)expression.Body).Expression, mock), expected, expression, times);
+			VerifyCalls(GetTargetMock(((MemberExpression)expression.Body).Expression, mock), expected, expression, times);
 		}
 
 		internal static void VerifySet<T>(
@@ -376,16 +384,16 @@ namespace Moq
 			string failMessage)
 			where T : class
 		{
-			Interceptor targetInterceptor = null;
+			Mock targetMock = null;
 			Expression expression = null;
 			var expected = SetupSetImpl<T, MethodCall<T>>(mock, setterExpression, (m, expr, method, value) =>
 				{
-					targetInterceptor = m.Interceptor;
+					targetMock = m;
 					expression = expr;
 					return new MethodCall<T>(m, null, expr, method, value) { FailMessage = failMessage };
 				});
 
-			VerifyCalls(targetInterceptor, expected, expression, times);
+			VerifyCalls(targetMock, expected, expression, times);
 		}
 
 		private static bool AreSameMethod(Expression left, Expression right)
@@ -402,17 +410,17 @@ namespace Moq
 		}
 
 		private static void VerifyCalls(
-			Interceptor targetInterceptor,
+			Mock targetMock,
 			MethodCall expected,
 			Expression expression,
 			Times times)
 		{
-			var actualCalls = targetInterceptor.InterceptionContext.Mock.Invocations.ToArray();
+			var actualCalls = targetMock.Invocations.ToArray();
 
 			var callCount = actualCalls.Count(expected.Matches);
 			if (!times.Verify(callCount))
 			{
-				var setups = targetInterceptor.InterceptionContext.GetOrderedCalls().Where(oc => AreSameMethod(oc.SetupExpression, expression));
+				var setups = targetMock.Setups.ToArrayLive(oc => AreSameMethod(oc.SetupExpression, expression));
 				ThrowVerifyException(expected, setups, actualCalls, expression, times, callCount);
 			}
 		}
@@ -434,7 +442,6 @@ namespace Moq
 		private static string FormatSetupsInfo(IEnumerable<IProxyCall> setups)
 		{
 			var expressionSetups = setups
-				.Reverse()
 				.Select(s => s.Format())
 				.ToArray();
 
@@ -474,13 +481,12 @@ namespace Moq
 
 			ThrowIfSetupExpressionInvolvesUnsupportedMember(expression, method);
 			ThrowIfSetupMethodNotVisibleToProxyFactory(method);
-			var call = new MethodCall<T>(mock, condition, expression, method, args);
+			var setup = new MethodCall<T>(mock, condition, expression, method, args);
 
-			var targetInterceptor = GetInterceptor(methodCall.Object, mock);
+			var targetMock = GetTargetMock(methodCall.Object, mock);
+			targetMock.Setups.Add(setup);
 
-			targetInterceptor.AddCall(call);
-
-			return call;
+			return setup;
 		}
 
 		[DebuggerStepThrough]
@@ -510,13 +516,12 @@ namespace Moq
 
 			ThrowIfSetupExpressionInvolvesUnsupportedMember(expression, method);
 			ThrowIfSetupMethodNotVisibleToProxyFactory(method);
-			var call = new MethodCallReturn<T, TResult>(mock, condition, expression, method, args);
+			var setup = new MethodCallReturn<T, TResult>(mock, condition, expression, method, args);
 
-			var targetInterceptor = GetInterceptor(methodCall.Object, mock);
+			var targetMock = GetTargetMock(methodCall.Object, mock);
+			targetMock.Setups.Add(setup);
 
-			targetInterceptor.AddCall(call);
-
-			return call;
+			return setup;
 		}
 
 		[DebuggerStepThrough]
@@ -548,13 +553,12 @@ namespace Moq
 			ThrowIfSetupExpressionInvolvesUnsupportedMember(expression, propGet);
 			ThrowIfSetupMethodNotVisibleToProxyFactory(propGet);
 
-			var call = new MethodCallReturn<T, TProperty>(mock, condition, expression, propGet, new Expression[0]);
+			var setup = new MethodCallReturn<T, TProperty>(mock, condition, expression, propGet, new Expression[0]);
 			// Directly casting to MemberExpression is fine as ToPropertyInfo would throw if it wasn't
-			var targetInterceptor = GetInterceptor(((MemberExpression)expression.Body).Expression, mock);
+			var targetMock = GetTargetMock(((MemberExpression)expression.Body).Expression, mock);
+			targetMock.Setups.Add(setup);
 
-			targetInterceptor.AddCall(call);
-
-			return call;
+			return setup;
 		}
 
 		[DebuggerStepThrough]
@@ -578,9 +582,9 @@ namespace Moq
 				setterExpression,
 				(m, expr, method, value) =>
 				{
-					var call = new SetterMethodCall<T, TProperty>(m, condition, expr, method, value[0]);
-					m.Interceptor.AddCall(call);
-					return call;
+					var setup = new SetterMethodCall<T, TProperty>(m, condition, expr, method, value[0]);
+					m.Setups.Add(setup);
+					return setup;
 				});
 		}
 
@@ -599,9 +603,9 @@ namespace Moq
 				setterExpression,
 				(m, expr, method, values) =>
 				{
-					var call = new MethodCall<T>(m, condition, expr, method, values);
-					m.Interceptor.AddCall(call);
-					return call;
+					var setup = new MethodCall<T>(m, condition, expr, method, values);
+					m.Setups.Add(setup);
+					return setup;
 				});
 		}
 
@@ -617,12 +621,12 @@ namespace Moq
 			ThrowIfSetupExpressionInvolvesUnsupportedMember(expression, propSet);
 			ThrowIfSetupMethodNotVisibleToProxyFactory(propSet);
 
-			var call = new SetterMethodCall<T, TProperty>(mock, expression, propSet);
-			var targetInterceptor = GetInterceptor(((MemberExpression)expression.Body).Expression, mock);
+			var setup = new SetterMethodCall<T, TProperty>(mock, expression, propSet);
+			var targetMock = GetTargetMock(((MemberExpression)expression.Body).Expression, mock);
 
-			targetInterceptor.AddCall(call);
+			targetMock.Setups.Add(setup);
 
-			return call;
+			return setup;
 		}
 
 		private static TCall SetupSetImpl<T, TCall>(
@@ -740,16 +744,16 @@ namespace Moq
 				ThrowIfSetupMethodNotVisibleToProxyFactory(propGet);
 
 				var setup = new SequenceMethodCall(mock, expression, propGet, new Expression[0]);
-				var targetInterceptor = GetInterceptor(((MemberExpression)expression.Body).Expression, mock);
-				targetInterceptor.AddCall(setup);
+				var targetMock = GetTargetMock(((MemberExpression)expression.Body).Expression, mock);
+				targetMock.Setups.Add(setup);
 				return new SetupSequencePhrase<TResult>(setup);
 			}
 			else
 			{
 				var methodCall = expression.GetCallInfo(mock);
-				var targetInterceptor = GetInterceptor(methodCall.Object, mock);
 				var setup = new SequenceMethodCall(mock, expression, methodCall.Method, methodCall.Arguments.ToArray());
-				targetInterceptor.AddCall(setup);
+				var targetMock = GetTargetMock(methodCall.Object, mock);
+				targetMock.Setups.Add(setup);
 				return new SetupSequencePhrase<TResult>(setup);
 			}
 		}
@@ -757,9 +761,9 @@ namespace Moq
 		internal static SetupSequencePhrase SetupSequence(Mock mock, LambdaExpression expression)
 		{
 			var methodCall = expression.GetCallInfo(mock);
-			var targetInterceptor = GetInterceptor(methodCall.Object, mock);
 			var setup = new SequenceMethodCall(mock, expression, methodCall.Method, methodCall.Arguments.ToArray());
-			targetInterceptor.AddCall(setup);
+			var targetMock = GetTargetMock(methodCall.Object, mock);
+			targetMock.Setups.Add(setup);
 			return new SetupSequencePhrase(setup);
 		}
 
@@ -868,20 +872,20 @@ namespace Moq
 		/// Gets the interceptor target for the given expression and root mock, 
 		/// building the intermediate hierarchy of mock objects if necessary.
 		/// </summary>
-		private static Interceptor GetInterceptor(Expression fluentExpression, Mock mock)
+		private static Mock GetTargetMock(Expression fluentExpression, Mock mock)
 		{
 			if (fluentExpression is ParameterExpression)
 			{
 				// fast path for single-dot setup expressions;
 				// no need for expensive lambda compilation.
-				return mock.Interceptor;
+				return mock;
 			}
 
 			var targetExpression = FluentMockVisitor.Accept(fluentExpression, mock);
 			var targetLambda = Expression.Lambda<Func<Mock>>(Expression.Convert(targetExpression, typeof(Mock)));
 
 			var targetObject = targetLambda.Compile()();
-			return targetObject.Interceptor;
+			return targetObject;
 		}
 
 		[SuppressMessage("Microsoft.Usage", "CA2208:InstantiateArgumentExceptionsCorrectly", Justification = "This is a helper method for the one receiving the expression.")]

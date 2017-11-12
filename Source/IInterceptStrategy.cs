@@ -28,10 +28,6 @@ namespace Moq
 	{
 		private Dictionary<string, List<Delegate>> invocationLists = new Dictionary<string, List<Delegate>>();
 
-		// Using a stack has the advantage that enumeration returns the items in reverse order (last added to first added).
-		// This helps in implementing the rule that "given two matching setups, the last one wins."
-		private Stack<IProxyCall> orderedCalls = new Stack<IProxyCall>();
-
 		public InterceptorContext(Mock Mock, Type targetType, MockBehavior behavior)
 		{
 			this.Behavior = behavior;
@@ -90,59 +86,5 @@ namespace Moq
 			}
 		}
 		#endregion
-		#region OrderedCalls
-		internal void AddOrderedCall(IProxyCall call)
-		{
-			lock (orderedCalls)
-			{
-				orderedCalls.Push(call);
-			}
-		}
-		internal void ClearOrderedCalls()
-		{
-			lock (orderedCalls)
-			{
-				orderedCalls.Clear();
-			}
-		}
-
-		internal IProxyCall GetOrderedCallFor(ICallContext invocation)
-		{
-			IProxyCall matchingSetup = null;
-
-			lock (this.orderedCalls)
-			{
-				foreach (var setup in this.orderedCalls)
-				{
-					// the following conditions are repetitive, but were written that way to avoid
-					// unnecessary expensive calls to `setup.Matches`; cheap tests are run first.
-					if (matchingSetup == null && setup.Matches(invocation))
-					{
-						matchingSetup = setup;
-						if (setup.Method == invocation.Method)
-						{
-							break;
-						}
-					}
-					else if (setup.Method == invocation.Method && setup.Matches(invocation))
-					{
-						matchingSetup = setup;
-						break;
-					}
-				}
-			}
-
-			return matchingSetup;
-		}
-
-		internal IEnumerable<IProxyCall> GetOrderedCalls()
-		{
-			lock (orderedCalls)
-			{
-				return orderedCalls.ToArray();
-			}
-		}
-		#endregion
-
 	}
 }
