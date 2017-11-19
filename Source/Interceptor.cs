@@ -38,14 +38,8 @@
 //[This is the BSD license, see
 // http://www.opensource.org/licenses/bsd-license.php]
 
-using System;
-using System.Collections.Generic;
-using System.Diagnostics.CodeAnalysis;
-using System.Linq;
-using System.Linq.Expressions;
-using System.Reflection;
+using System.Diagnostics;
 
-using Moq.Diagnostics.Errors;
 using Moq.Proxy;
 
 namespace Moq
@@ -56,99 +50,30 @@ namespace Moq
 	/// </summary>
 	internal class Interceptor : ICallInterceptor
 	{
-		public Interceptor(MockBehavior behavior, Type targetType, Mock mock)
+		private Mock mock;
+
+		public Interceptor(Mock mock)
 		{
-			InterceptionContext = new InterceptorContext(mock, targetType, behavior);
+			Debug.Assert(mock != null);
+
+			this.mock = mock;
 		}
 
-		internal InterceptorContext InterceptionContext { get; private set; }
-
-		internal bool TryVerify(out UnmatchedSetups error)
+		private static IInterceptStrategy[] Strategies { get; } = new IInterceptStrategy[]
 		{
-			return this.TryVerifyOrThrow(call => call.IsVerifiable && !call.Invoked, out error);
-		}
+			HandleTracking.Instance,
+			HandleWellKnownMethods.Instance,
+			AddActualInvocation.Instance,
+			ExtractAndExecuteProxyCall.Instance,
+			InvokeBase.Instance,
+			HandleMockRecursion.Instance,
+		};
 
-		internal bool TryVerifyAll(out UnmatchedSetups error)
-		{
-			return this.TryVerifyOrThrow(call => !call.Invoked, out error);
-		}
-
-		private bool TryVerifyOrThrow(Func<IProxyCall, bool> match, out UnmatchedSetups error)
-		{
-			var failures = new Stack<IProxyCall>();
-
-			// The following verification logic will remember each processed setup so that duplicate setups
-			// (that is, setups overridden by later setups with an equivalent expression) can be detected.
-			// To speed up duplicate detection, they are partitioned according to the method they target.
-			var verifiedSetupsPerMethod = new Dictionary<MethodInfo, List<Expression>>();
-
-			foreach (var setup in this.InterceptionContext.GetOrderedCalls())
-			{
-				if (setup.IsConditional)
-				{
-					continue;
-				}
-
-				List<Expression> verifiedSetupsForMethod;
-				if (!verifiedSetupsPerMethod.TryGetValue(setup.Method, out verifiedSetupsForMethod))
-				{
-					verifiedSetupsForMethod = new List<Expression>();
-					verifiedSetupsPerMethod.Add(setup.Method, verifiedSetupsForMethod);
-				}
-
-				var expr = setup.SetupExpression.PartialMatcherAwareEval();
-				if (verifiedSetupsForMethod.Any(vc => ExpressionComparer.Default.Equals(vc, expr)))
-				{
-					continue;
-				}
-
-				if (match(setup))
-				{
-					failures.Push(setup);
-				}
-
-				verifiedSetupsForMethod.Add(expr);
-			}
-
-			if (failures.Any())
-			{
-				error = new UnmatchedSetups(failures);
-				return false;
-			}
-			else
-			{
-				error = null;
-				return true;
-			}
-		}
-
-		public void AddCall(IProxyCall call)
-		{
-			InterceptionContext.AddOrderedCall(call);
-		}
-
-		private static Lazy<IInterceptStrategy[]> interceptionStrategies =
-			new Lazy<IInterceptStrategy[]>(
-				() => new IInterceptStrategy[]
-				{
-					HandleFinalizer.Instance,
-					HandleTracking.Instance,
-					InterceptMockPropertyMixin.Instance,
-					InterceptObjectMethodsMixin.Instance,
-					AddActualInvocation.Instance,
-					ExtractAndExecuteProxyCall.Instance,
-					InvokeBase.Instance,
-					HandleMockRecursion.Instance,
-				});
-
-		private static IInterceptStrategy[] InterceptionStrategies => interceptionStrategies.Value;
-
-		[SuppressMessage("Microsoft.Maintainability", "CA1502:AvoidExcessiveComplexity")]
 		public void Intercept(ICallContext invocation)
 		{
-			foreach (var strategy in InterceptionStrategies)
+			foreach (var strategy in Strategies)
 			{
-				if (InterceptionAction.Stop == strategy.HandleIntercept(invocation, InterceptionContext))
+				if (InterceptionAction.Stop == strategy.HandleIntercept(invocation, this.mock))
 				{
 					break;
 				}

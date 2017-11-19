@@ -38,68 +38,42 @@
 //[This is the BSD license, see
 // http://www.opensource.org/licenses/bsd-license.php]
 
-using System;
-using System.Linq.Expressions;
+using Moq.Proxy;
+using System.Collections.Generic;
 
 namespace Moq
 {
-	// Keeps legacy implementations.
-	public partial class Mock
+	internal sealed class InvocationCollection
 	{
-		[Obsolete]
-		internal static SetterMethodCall<T, TProperty> SetupSet<T, TProperty>(
-			Mock mock,
-			Expression<Func<T, TProperty>> expression, TProperty value)
-			where T : class
+		private List<ICallContext> invocations;
+
+		public InvocationCollection()
 		{
-			var prop = expression.ToPropertyInfo();
-			ThrowIfPropertyNotWritable(prop);
-
-			var setter = prop.SetMethod;
-			ThrowIfSetupExpressionInvolvesUnsupportedMember(expression, setter);
-
-			var setup = new SetterMethodCall<T, TProperty>(mock, expression, setter, value);
-			var targetMock = GetTargetMock(((MemberExpression)expression.Body).Expression, mock);
-			targetMock.Setups.Add(setup);
-
-			return setup;
+			this.invocations = new List<ICallContext>();
 		}
 
-		[Obsolete]
-		internal static void VerifySet<T, TProperty>(
-			Mock mock,
-			Expression<Func<T, TProperty>> expression,
-			Times times,
-			string failMessage)
-			where T : class
+		public void Add(ICallContext invocation)
 		{
-			var method = expression.ToPropertyInfo().SetMethod;
-			ThrowIfVerifyExpressionInvolvesUnsupportedMember(expression, method);
-
-			var expected = new SetterMethodCall<T, TProperty>(mock, expression, method)
+			lock (this.invocations)
 			{
-				FailMessage = failMessage
-			};
-			VerifyCalls(GetTargetMock(((MemberExpression)expression.Body).Expression, mock), expected, expression, times);
+				this.invocations.Add(invocation);
+			}
 		}
 
-		[Obsolete]
-		internal static void VerifySet<T, TProperty>(
-			Mock mock,
-			Expression<Func<T, TProperty>> expression,
-			TProperty value,
-			Times times,
-			string failMessage)
-			where T : class
+		public void Clear()
 		{
-			var method = expression.ToPropertyInfo().SetMethod;
-			ThrowIfVerifyExpressionInvolvesUnsupportedMember(expression, method);
-
-			var expected = new SetterMethodCall<T, TProperty>(mock, expression, method, value)
+			lock (this.invocations)
 			{
-				FailMessage = failMessage
-			};
-			VerifyCalls(GetTargetMock(((MemberExpression)expression.Body).Expression, mock), expected, expression, times);
+				this.invocations.Clear();
+			}
+		}
+
+		public ICallContext[] ToArray()
+		{
+			lock (this.invocations)
+			{
+				return this.invocations.ToArray();
+			}
 		}
 	}
 }

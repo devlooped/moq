@@ -39,67 +39,69 @@
 // http://www.opensource.org/licenses/bsd-license.php]
 
 using System;
-using System.Linq.Expressions;
+using System.Collections.Generic;
+using System.Linq;
+using System.Text;
+using System.Threading.Tasks;
 
 namespace Moq
 {
-	// Keeps legacy implementations.
-	public partial class Mock
+	internal sealed class EventHandlerCollection
 	{
-		[Obsolete]
-		internal static SetterMethodCall<T, TProperty> SetupSet<T, TProperty>(
-			Mock mock,
-			Expression<Func<T, TProperty>> expression, TProperty value)
-			where T : class
+		private Dictionary<string, List<Delegate>> eventHandlers;
+
+		public EventHandlerCollection()
 		{
-			var prop = expression.ToPropertyInfo();
-			ThrowIfPropertyNotWritable(prop);
-
-			var setter = prop.SetMethod;
-			ThrowIfSetupExpressionInvolvesUnsupportedMember(expression, setter);
-
-			var setup = new SetterMethodCall<T, TProperty>(mock, expression, setter, value);
-			var targetMock = GetTargetMock(((MemberExpression)expression.Body).Expression, mock);
-			targetMock.Setups.Add(setup);
-
-			return setup;
+			this.eventHandlers = new Dictionary<string, List<Delegate>>();
 		}
 
-		[Obsolete]
-		internal static void VerifySet<T, TProperty>(
-			Mock mock,
-			Expression<Func<T, TProperty>> expression,
-			Times times,
-			string failMessage)
-			where T : class
+		public void Add(string eventName, Delegate eventHandler)
 		{
-			var method = expression.ToPropertyInfo().SetMethod;
-			ThrowIfVerifyExpressionInvolvesUnsupportedMember(expression, method);
-
-			var expected = new SetterMethodCall<T, TProperty>(mock, expression, method)
+			lock (this.eventHandlers)
 			{
-				FailMessage = failMessage
-			};
-			VerifyCalls(GetTargetMock(((MemberExpression)expression.Body).Expression, mock), expected, expression, times);
+				List<Delegate> handlers;
+				if (!this.eventHandlers.TryGetValue(eventName, out handlers))
+				{
+					handlers = new List<Delegate>();
+					this.eventHandlers.Add(eventName, handlers);
+				}
+
+				handlers.Add(eventHandler);
+			}
 		}
 
-		[Obsolete]
-		internal static void VerifySet<T, TProperty>(
-			Mock mock,
-			Expression<Func<T, TProperty>> expression,
-			TProperty value,
-			Times times,
-			string failMessage)
-			where T : class
+		public void Clear()
 		{
-			var method = expression.ToPropertyInfo().SetMethod;
-			ThrowIfVerifyExpressionInvolvesUnsupportedMember(expression, method);
-
-			var expected = new SetterMethodCall<T, TProperty>(mock, expression, method, value)
+			lock (this.eventHandlers)
 			{
-				FailMessage = failMessage
-			};
-			VerifyCalls(GetTargetMock(((MemberExpression)expression.Body).Expression, mock), expected, expression, times);
+				this.eventHandlers.Clear();
+			}
+		}
+
+		public void Remove(string eventName, Delegate eventHandler)
+		{
+			lock (this.eventHandlers)
+			{
+				List<Delegate> handlers;
+				if (this.eventHandlers.TryGetValue(eventName, out handlers))
+				{
+					handlers.Remove(eventHandler);
+				}
+			}
+		}
+
+		public Delegate[] ToArray(string eventName)
+		{
+			lock (this.eventHandlers)
+			{
+				List<Delegate> handlers;
+				if (!this.eventHandlers.TryGetValue(eventName, out handlers))
+				{
+					return new Delegate[0];
+				}
+
+				return handlers.ToArray();
+			}
 		}
 	}
 }

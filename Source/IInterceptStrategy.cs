@@ -1,7 +1,42 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Reflection;
+﻿//Copyright (c) 2007. Clarius Consulting, Manas Technology Solutions, InSTEDD
+//https://github.com/moq/moq4
+//All rights reserved.
+
+//Redistribution and use in source and binary forms, 
+//with or without modification, are permitted provided 
+//that the following conditions are met:
+
+//    * Redistributions of source code must retain the 
+//    above copyright notice, this list of conditions and 
+//    the following disclaimer.
+
+//    * Redistributions in binary form must reproduce 
+//    the above copyright notice, this list of conditions 
+//    and the following disclaimer in the documentation 
+//    and/or other materials provided with the distribution.
+
+//    * Neither the name of Clarius Consulting, Manas Technology Solutions or InSTEDD nor the 
+//    names of its contributors may be used to endorse 
+//    or promote products derived from this software 
+//    without specific prior written permission.
+
+//THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND 
+//CONTRIBUTORS "AS IS" AND ANY EXPRESS OR IMPLIED WARRANTIES, 
+//INCLUDING, BUT NOT LIMITED TO, THE IMPLIED WARRANTIES OF 
+//MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE ARE 
+//DISCLAIMED. IN NO EVENT SHALL THE COPYRIGHT OWNER OR 
+//CONTRIBUTORS BE LIABLE FOR ANY DIRECT, INDIRECT, INCIDENTAL, 
+//SPECIAL, EXEMPLARY, OR CONSEQUENTIAL DAMAGES (INCLUDING, 
+//BUT NOT LIMITED TO, PROCUREMENT OF SUBSTITUTE GOODS OR 
+//SERVICES; LOSS OF USE, DATA, OR PROFITS; OR BUSINESS 
+//INTERRUPTION) HOWEVER CAUSED AND ON ANY THEORY OF LIABILITY, 
+//WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT (INCLUDING 
+//NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE 
+//OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF 
+//SUCH DAMAGE.
+
+//[This is the BSD license, see
+// http://www.opensource.org/licenses/bsd-license.php]
 
 using Moq.Proxy;
 
@@ -19,124 +54,8 @@ namespace Moq
 		/// Handle interception
 		/// </summary>
 		/// <param name="invocation">the current invocation context</param>
-		/// <param name="ctx">shared data for the interceptor as a whole</param>
+		/// <param name="mock">The mock on which the current invocation is occurring.</param>
 		/// <returns>InterceptionAction.Continue if further interception has to be processed, otherwise InterceptionAction.Stop</returns>
-		InterceptionAction HandleIntercept(ICallContext invocation, InterceptorContext ctx);
-	}
-
-	internal class InterceptorContext
-	{
-		private Dictionary<string, List<Delegate>> invocationLists = new Dictionary<string, List<Delegate>>();
-		private List<ICallContext> actualInvocations = new List<ICallContext>();
-
-		// Using a stack has the advantage that enumeration returns the items in reverse order (last added to first added).
-		// This helps in implementing the rule that "given two matching setups, the last one wins."
-		private Stack<IProxyCall> orderedCalls = new Stack<IProxyCall>();
-
-		public InterceptorContext(Mock Mock, Type targetType, MockBehavior behavior)
-		{
-			this.Behavior = behavior;
-			this.Mock = Mock;
-			this.TargetType = targetType;
-		}
-		public Mock Mock { get; private set; }
-		public Type TargetType { get; private set; }
-		public MockBehavior Behavior { get; private set; }
-		
-		#region InvocationLists
-		internal IEnumerable<Delegate> GetInvocationList(EventInfo ev)
-		{
-			lock (invocationLists)
-			{
-				List<Delegate> handlers;
-				if (!invocationLists.TryGetValue(ev.Name, out handlers))
-				{
-					return new Delegate[0];
-				}
-
-				return handlers.ToList();
-			}
-		}
-
-		internal void AddEventHandler(EventInfo ev, Delegate handler)
-		{
-			lock (invocationLists)
-			{
-				List<Delegate> handlers;
-				if (!invocationLists.TryGetValue(ev.Name, out handlers))
-				{
-					handlers = new List<Delegate>();
-					invocationLists.Add(ev.Name, handlers);
-				}
-
-				handlers.Add(handler);
-			}
-		}
-		internal void RemoveEventHandler(EventInfo ev, Delegate handler)
-		{
-			lock (invocationLists)
-			{
-				List<Delegate> handlers;
-				if (invocationLists.TryGetValue(ev.Name, out handlers))
-				{
-					handlers.Remove(handler);
-				}
-			}
-		}
-		internal void ClearEventHandlers()
-		{
-			lock (invocationLists)
-			{
-				invocationLists.Clear();
-			}
-		}
-		#endregion
-		#region ActualInvocations
-		internal void AddInvocation(ICallContext invocation)
-		{
-			lock (actualInvocations)
-			{
-				actualInvocations.Add(invocation);
-			}
-		}
-		internal IEnumerable<ICallContext> GetActualInvocations()
-		{
-			lock (actualInvocations)
-			{
-				return actualInvocations.ToArray();
-			}
-		}
-		internal void ClearInvocations()
-		{
-			lock (actualInvocations)
-			{
-				actualInvocations.Clear();
-			}
-		}
-		#endregion
-		#region OrderedCalls
-		internal void AddOrderedCall(IProxyCall call)
-		{
-			lock (orderedCalls)
-			{
-				orderedCalls.Push(call);
-			}
-		}
-		internal void ClearOrderedCalls()
-		{
-			lock (orderedCalls)
-			{
-				orderedCalls.Clear();
-			}
-		}
-		internal IEnumerable<IProxyCall> GetOrderedCalls()
-		{
-			lock (orderedCalls)
-			{
-				return orderedCalls.ToArray();
-			}
-		}
-		#endregion
-
+		InterceptionAction HandleIntercept(ICallContext invocation, Mock mock);
 	}
 }

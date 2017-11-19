@@ -61,11 +61,7 @@ namespace Moq
 			get { return this.owner.InnerMocks; }
 		}
 
-		internal override Interceptor Interceptor
-		{
-			get { return this.owner.Interceptor; }
-			set { this.owner.Interceptor = value; }
-		}
+		internal override InvocationCollection Invocations => this.owner.Invocations;
 
 		internal override Type MockedType
 		{
@@ -90,16 +86,22 @@ namespace Moq
 			set { this.owner.DefaultValue = value; }
 		}
 
+		internal override EventHandlerCollection EventHandlers => this.owner.EventHandlers;
+
 		public override TInterface Object
 		{
 			get { return this.owner.Object as TInterface; }
 		}
+
+		internal override SetupCollection Setups => this.owner.Setups;
 
 		public override Switches Switches
 		{
 			get => this.owner.Switches;
 			set => this.owner.Switches = value;
 		}
+
+		internal override Type TargetType => this.owner.TargetType;
 
 		public override Mock<TNewInterface> As<TNewInterface>()
 		{
