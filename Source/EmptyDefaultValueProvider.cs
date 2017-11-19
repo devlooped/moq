@@ -56,6 +56,17 @@ namespace Moq
 	{
 		private Dictionary<Type, object> defaultValues = new Dictionary<Type, object>();
 
+		private static Dictionary<Type, Func<Type, object>> factories = new Dictionary<Type, Func<Type, object>>()
+		{
+			[typeof(Array)] = CreateArray,
+			[typeof(IEnumerable)] = CreateEnumerable,
+			[typeof(IEnumerable<>)] = CreateEnumerableOf,
+			[typeof(IQueryable)] = CreateQueryable,
+			[typeof(IQueryable<>)] = CreateQueryableOf,
+			[typeof(Task)] = CreateTask,
+			[typeof(Task<>)] = CreateTaskOf,
+		};
+
 		public virtual void DefineDefault<T>(T value)
 		{
 			this.defaultValues[typeof(T)] = value;
@@ -73,49 +84,74 @@ namespace Moq
 			return valueType.GetTypeInfo().IsValueType ? GetValueTypeDefault(valueType) : GetReferenceTypeDefault(valueType);
 		}
 
-		private static object GetReferenceTypeDefault(Type valueType)
+		private static object GetReferenceTypeDefault(Type type)
 		{
-			if (valueType.IsArray)
-			{
-				var elementType = valueType.GetElementType();
-				var lengths = new int[valueType.GetArrayRank()];
-				return Array.CreateInstance(elementType, lengths);
-			}
-			else if (valueType == typeof(IEnumerable))
-			{
-				return new object[0];
-			}
-			else if (valueType == typeof(IQueryable))
-			{
-				return new object[0].AsQueryable();
-			}
-			else if (valueType == typeof(Task))
-			{
-				// Task<T> inherits from Task, so just return Task<bool>
-				return GetCompletedTaskForType(typeof(bool));
-			}
-			else if (valueType.GetTypeInfo().IsGenericType && valueType.GetGenericTypeDefinition() == typeof(IEnumerable<>))
-			{
-				var genericListType = typeof(List<>).MakeGenericType(valueType.GetGenericArguments()[0]);
-				return Activator.CreateInstance(genericListType);
-			}
-			else if (valueType.GetTypeInfo().IsGenericType && valueType.GetGenericTypeDefinition() == typeof(IQueryable<>))
-			{
-				var genericType = valueType.GetGenericArguments()[0];
-				var genericListType = typeof(List<>).MakeGenericType(genericType);
+			Type factoryKey;
 
-				return typeof(Queryable).GetMethods("AsQueryable")
-					.Single(x => x.IsGenericMethod)
-					.MakeGenericMethod(genericType)
-					.Invoke(null, new[] { Activator.CreateInstance(genericListType) });
-			}
-			else if (valueType.GetTypeInfo().IsGenericType && valueType.GetGenericTypeDefinition() == typeof(Task<>))
+			if (type.IsArray)
 			{
-				var genericType = valueType.GetGenericArguments()[0];
-				return GetCompletedTaskForType(genericType);
+				factoryKey = typeof(Array);
+			}
+			else if (type.GetTypeInfo().IsGenericType)
+			{
+				factoryKey = type.GetGenericTypeDefinition();
+			}
+			else
+			{
+				factoryKey = type;
 			}
 
-			return null;
+			return factories.TryGetValue(factoryKey, out Func<Type, object> factory) ? factory.Invoke(type) : null;
+		}
+
+		private static object CreateArray(Type type)
+		{
+			var elementType = type.GetElementType();
+			var lengths = new int[type.GetArrayRank()];
+			return Array.CreateInstance(elementType, lengths);
+		}
+
+		private static object CreateEnumerable(Type type)
+		{
+			return new object[0];
+		}
+
+		private static object CreateEnumerableOf(Type type)
+		{
+			var elementType = type.GetGenericArguments()[0];
+			return Array.CreateInstance(elementType, 0);
+		}
+
+		private static object CreateQueryable(Type type)
+		{
+			return new object[0].AsQueryable();
+		}
+
+		private static object CreateQueryableOf(Type type)
+		{
+			var elementType = type.GetGenericArguments()[0];
+			var array = Array.CreateInstance(elementType, 0);
+
+			return typeof(Queryable).GetMethods("AsQueryable")
+				.Single(x => x.IsGenericMethod)
+				.MakeGenericMethod(elementType)
+				.Invoke(null, new[] { array });
+		}
+
+		private static object CreateTask(Type type)
+		{
+			return Task.FromResult(false);
+		}
+
+		private static object CreateTaskOf(Type type)
+		{
+			var resultType = type.GetGenericArguments()[0];
+			var result = resultType.GetTypeInfo().IsValueType ? GetValueTypeDefault(resultType) : GetReferenceTypeDefault(resultType);
+
+			var tcsType = typeof(TaskCompletionSource<>).MakeGenericType(resultType);
+			var tcs = Activator.CreateInstance(tcsType);
+			tcsType.GetMethod("SetResult").Invoke(tcs, new[] { result });
+			return tcsType.GetProperty("Task").GetValue(tcs, null);
 		}
 
 		private static object GetValueTypeDefault(Type valueType)
@@ -127,19 +163,6 @@ namespace Moq
 			}
 
 			return Activator.CreateInstance(valueType);
-		}
-
-		private static Task GetCompletedTaskForType(Type type)
-		{
-			var tcs = Activator.CreateInstance(typeof (TaskCompletionSource<>).MakeGenericType(type));
-
-			var setResultMethod = tcs.GetType().GetMethod("SetResult");
-			var taskProperty = tcs.GetType().GetProperty("Task");
-
-			var result = type.GetTypeInfo().IsValueType ? GetValueTypeDefault(type) : GetReferenceTypeDefault(type);
-
-			setResultMethod.Invoke(tcs, new[] {result});
-			return (Task) taskProperty.GetValue(tcs, null);
 		}
 	}
 }
