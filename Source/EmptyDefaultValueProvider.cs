@@ -156,12 +156,6 @@ namespace Moq
 
 		private static object GetValueTypeDefault(Type valueType)
 		{
-			// For nullable value types, return null.
-			if (valueType.GetTypeInfo().IsGenericType && valueType.GetGenericTypeDefinition() == typeof(Nullable<>))
-			{
-				return null;
-			}
-
 			return Activator.CreateInstance(valueType);
 		}
 	}
