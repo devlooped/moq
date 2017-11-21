@@ -891,6 +891,27 @@ namespace Moq.Tests.Regressions
 
 		#endregion // #184
 
+		#region 224
+
+		public class Issue224
+		{
+			[Fact]
+			public void Delegate_invocation_in_Mock_Of_does_not_cause_infinite_loop()
+			{
+				var infiniteLoopTimeout = TimeSpan.FromSeconds(5);
+
+				var timedOut = !Task.Run(() =>
+				{
+					var fn = Mock.Of<Func<int>>(f => f() == 42);
+					Assert.Equal(42, fn());
+				}).Wait(infiniteLoopTimeout);
+
+				Assert.False(timedOut);
+			}
+		}
+
+		#endregion
+
 		#region 239
 
 		public class Issue239
