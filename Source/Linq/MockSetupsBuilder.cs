@@ -169,12 +169,63 @@ namespace Moq.Linq
 
 					return ConvertToSetup(method.Object, method, right);
 
+				case ExpressionType.Invoke:
+					var invocation = (InvocationExpression)left;
+					if (invocation.Expression is ParameterExpression && typeof(Delegate).IsAssignableFrom(invocation.Expression.Type))
+					{
+						return ConvertToSetup(invocation, right);
+					}
+					else
+					{
+						break;
+					}
+
 				case ExpressionType.Convert:
 					var left1 = (UnaryExpression)left;
 					return ConvertToSetup(left1.Operand, Expression.Convert(right, left1.Operand.Type));
 			}
 
 			return null;
+		}
+
+		private static Expression ConvertToSetup(InvocationExpression invocation, Expression right)
+		{
+			// transforms a delegate invocation expression such as `f(...) == x` (where `invocation` := `f(...)` and `right` := `x`)
+			// to `Mock.Get(f).Setup(f' => f'(...)).Returns(x) != null` (which in turn will get incorporated into a query
+			// `CreateMocks().First(f => ...)`.
+
+			var delegateParameter = invocation.Expression;
+
+			var mockGetMethod =
+				typeof(Mock)
+				.GetMethod("Get", BindingFlags.Public | BindingFlags.Static)
+				.MakeGenericMethod(delegateParameter.Type);
+
+			var mockGetCall = Expression.Call(mockGetMethod, delegateParameter);
+
+			var setupMethod =
+				typeof(Mock<>)
+				.MakeGenericType(delegateParameter.Type)
+				.GetMethods("Setup")
+				.Single(m => m.IsGenericMethod)
+				.MakeGenericMethod(right.Type);
+
+			var setupCall = Expression.Call(
+				mockGetCall,
+				setupMethod,
+				Expression.Lambda(invocation, invocation.Expression as ParameterExpression));
+
+			var returnsMethod =
+				typeof(IReturns<,>)
+				.MakeGenericType(delegateParameter.Type, right.Type)
+				.GetMethod("Returns", new[] { right.Type });
+
+			var returnsCall = Expression.Call(
+				setupCall,
+				returnsMethod,
+				right);
+
+			return Expression.NotEqual(returnsCall, Expression.Constant(null));
 		}
 
 		private static Expression ConvertToSetupProperty(Expression targetObject, Expression left, Expression right)
