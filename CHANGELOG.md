@@ -30,6 +30,7 @@ The format is loosely based on [Keep a Changelog](http://keepachangelog.com/en/1
 * Prevent Moq from relying on a mock's implementation of `IEnumerable<T>` (@stakx, #510)
 * Verification leaked internal `MockVerificationException` type; remove it (@stakx, #511)
 * Custom matcher properties not printed correctly in error messages (@stakx, #517)
+* Infinite loop when invoking delegate in `Mock.Of` setup expression (@stakx, #528) 
 
 #### Obsoleted
 
