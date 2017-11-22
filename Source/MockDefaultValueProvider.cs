@@ -39,6 +39,7 @@
 // http://www.opensource.org/licenses/bsd-license.php]
 
 using System;
+using System.Diagnostics;
 using System.Reflection;
 
 namespace Moq
@@ -59,12 +60,14 @@ namespace Moq
 
 		public override object ProvideDefault(MethodInfo member)
 		{
-			var value = base.ProvideDefault(member);
-
-			Mock mock = null;
-			if (value == null && member.ReturnType.IsMockeable())
+			var emptyValue = base.ProvideDefault(member);
+			if (emptyValue != null)
 			{
-				mock = owner.InnerMocks.GetOrAdd(member, info =>
+				return emptyValue;
+			}
+			else if (member.ReturnType.IsMockeable())
+			{
+				var mock = owner.InnerMocks.GetOrAdd(member, info =>
 				{
 					// Create a new mock to be placed to InnerMocks dictionary if it's missing there
 					var mockType = typeof(Mock<>).MakeGenericType(info.ReturnType);
@@ -74,9 +77,14 @@ namespace Moq
 					newMock.Switches = owner.Switches;
 					return newMock;
 				});
-			}
 
-			return mock != null ? mock.Object : value;
+				Debug.Assert(mock != null);
+				return mock.Object;
+			}
+			else
+			{
+				return null;
+			}
 		}
 	}
 }
