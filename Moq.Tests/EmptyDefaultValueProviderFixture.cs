@@ -158,6 +158,57 @@ namespace Moq.Tests
 			Assert.Equal(default(int), ((Task<Task<int>>) value).Result.Result);
 		}
 
+		[Fact]
+		public void ProvidesDefaultValueTaskOfValueType()
+		{
+			var provider = new EmptyDefaultValueProvider();
+
+			var value = provider.ProvideDefault(typeof(IFoo).GetProperty(nameof(IFoo.ValueTaskOfValueType)).GetGetMethod());
+
+			var result = (ValueTask<int>)value;
+			Assert.True(result.IsCompleted);
+			Assert.Equal(default(int), result.Result);
+		}
+
+		[Fact]
+		public void ProvidesDefaultValueTaskOfValueTypeArray()
+		{
+			var provider = new EmptyDefaultValueProvider();
+
+			var value = provider.ProvideDefault(typeof(IFoo).GetProperty(nameof(IFoo.ValueTaskOfValueTypeArray)).GetGetMethod());
+
+			var result = (ValueTask<int[]>)value;
+			Assert.True(result.IsCompleted);
+			Assert.NotNull(result.Result);
+			Assert.Empty(result.Result);
+		}
+
+		[Fact]
+		public void ProvidesDefaultValueTaskOfReferenceType()
+		{
+			var provider = new EmptyDefaultValueProvider();
+
+			var value = provider.ProvideDefault(typeof(IFoo).GetProperty(nameof(IFoo.ValueTaskOfReferenceType)).GetGetMethod());
+
+			var result = (ValueTask<string>)value;
+			Assert.True(result.IsCompleted);
+			Assert.Equal(default(string), result.Result);
+		}
+
+		[Fact]
+		public void ProvidesDefaultValueTaskOfTaskOfValueType()
+		{
+			var provider = new EmptyDefaultValueProvider();
+
+			var value = provider.ProvideDefault(typeof(IFoo).GetProperty(nameof(IFoo.ValueTaskOfTaskOfValueType)).GetGetMethod());
+
+			var result = (ValueTask<Task<int>>)value;
+			Assert.True(result.IsCompleted);
+			Assert.NotNull(result.Result);
+			Assert.True(result.Result.IsCompleted);
+			Assert.Equal(default(int), result.Result.Result);
+		}
+
 		public interface IFoo
 		{
 			object Object { get; set; }
@@ -175,6 +226,10 @@ namespace Moq.Tests
 			Task<int> GenericTaskOfValueType { get; set; }
 			Task<string> GenericTaskOfReferenceType { get; set; }
 			Task<Task<int>> TaskOfGenericTaskOfValueType { get; set; }
+			ValueTask<int> ValueTaskOfValueType { get; set; }
+			ValueTask<int[]> ValueTaskOfValueTypeArray { get; set; }
+			ValueTask<string> ValueTaskOfReferenceType { get; set; }
+			ValueTask<Task<int>> ValueTaskOfTaskOfValueType { get; set; }
 		}
 
 		public interface IBar { }
