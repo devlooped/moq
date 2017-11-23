@@ -13,5 +13,8 @@
 		<param name="member">
 			The member to provide a default	value for.
 		</param>
+		<param name="mock">
+			The mock for which a default value is to be provided.
+		</param>
 	</doc>
 </docs>

@@ -51,35 +51,28 @@ namespace Moq
 	/// </summary>
 	internal class MockDefaultValueProvider : EmptyDefaultValueProvider
 	{
-		private Mock owner;
-
-		public MockDefaultValueProvider(Mock owner)
+		public override object ProvideDefault(MethodInfo member, Mock mock)
 		{
-			this.owner = owner;
-		}
-
-		public override object ProvideDefault(MethodInfo member)
-		{
-			var emptyValue = base.ProvideDefault(member);
+			var emptyValue = base.ProvideDefault(member, mock);
 			if (emptyValue != null)
 			{
 				return emptyValue;
 			}
 			else if (member.ReturnType.IsMockeable())
 			{
-				var mock = owner.InnerMocks.GetOrAdd(member, info =>
+				var innerMock = mock.InnerMocks.GetOrAdd(member, info =>
 				{
 					// Create a new mock to be placed to InnerMocks dictionary if it's missing there
 					var mockType = typeof(Mock<>).MakeGenericType(info.ReturnType);
-					Mock newMock = (Mock)Activator.CreateInstance(mockType, owner.Behavior);
-					newMock.DefaultValue = owner.DefaultValue;
-					newMock.CallBase = owner.CallBase;
-					newMock.Switches = owner.Switches;
+					Mock newMock = (Mock)Activator.CreateInstance(mockType, mock.Behavior);
+					newMock.DefaultValue = mock.DefaultValue;
+					newMock.CallBase = mock.CallBase;
+					newMock.Switches = mock.Switches;
 					return newMock;
 				});
 
-				Debug.Assert(mock != null);
-				return mock.Object;
+				Debug.Assert(innerMock != null);
+				return innerMock.Object;
 			}
 			else
 			{

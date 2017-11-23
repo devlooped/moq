@@ -66,7 +66,7 @@ namespace Moq
 			[typeof(ValueTask<>)] = CreateValueTaskOf,
 		};
 
-		public virtual object ProvideDefault(MethodInfo member)
+		public virtual object ProvideDefault(MethodInfo member, Mock mock)
 		{
 			return GetDefaultValue(member.ReturnType);
 		}

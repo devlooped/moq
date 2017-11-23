@@ -173,7 +173,7 @@ namespace Moq
 		{
 			this.defaultValue = value;
 			this.defaultValueProvider = defaultValue == DefaultValue.Mock ?
-				new MockDefaultValueProvider(this) :
+				new MockDefaultValueProvider() :
 				new EmptyDefaultValueProvider();
 		}
 
@@ -1200,7 +1200,7 @@ namespace Moq
 				return configuredDefaultValue;
 			}
 
-			return (useAlternateProvider ?? this.DefaultValueProvider).ProvideDefault(method);
+			return (useAlternateProvider ?? this.DefaultValueProvider).ProvideDefault(method, this);
 		}
 
 		#endregion

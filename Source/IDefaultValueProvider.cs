@@ -48,6 +48,6 @@ namespace Moq
 	internal interface IDefaultValueProvider
 	{
 		/// <include file='IDefaultValueProvider.xdoc' path='docs/doc[@for="IDefaultValueProvider.ProvideDefault"]/*'/>
-		object ProvideDefault(MethodInfo member);
+		object ProvideDefault(MethodInfo member, Mock mock);
 	}
 }
