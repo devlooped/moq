@@ -14,6 +14,7 @@ The format is loosely based on [Keep a Changelog](http://keepachangelog.com/en/1
 * Support for callbacks for methods having `ref` or `out` parameters via two new overloads of `Callback` and `Returns` (@stakx, #468)
 * Improved support for setting up and verifying protected members (including generic methods and methods having by-ref parameters) via the new duck-typing `mock.Protected().As<TDuck>()` interface (@stakx, #495, #501)
 * Support for `ValueTask<TResult>` when using the `ReturnsAsync` extension methods, similar to `Task<TResult>` (@AdamDotNet, #506)
+* Special handling for `ValueTask<TResult>` with `DefaultValue.Empty` (@stakx, #529)
 
 #### Changed
 

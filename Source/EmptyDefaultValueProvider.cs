@@ -65,6 +65,7 @@ namespace Moq
 			[typeof(IQueryable<>)] = CreateQueryableOf,
 			[typeof(Task)] = CreateTask,
 			[typeof(Task<>)] = CreateTaskOf,
+			[typeof(ValueTask<>)] = CreateValueTaskOf,
 		};
 
 		public virtual void DefineDefault<T>(T value)
@@ -154,9 +155,31 @@ namespace Moq
 			return tcsType.GetProperty("Task").GetValue(tcs, null);
 		}
 
-		private static object GetValueTypeDefault(Type valueType)
+		private static object CreateValueTaskOf(Type type)
 		{
-			return Activator.CreateInstance(valueType);
+			var resultType = type.GetGenericArguments()[0];
+			var result = resultType.GetTypeInfo().IsValueType ? GetValueTypeDefault(resultType) : GetReferenceTypeDefault(resultType);
+
+			// `Activator.CreateInstance` could throw an `AmbiguousMatchException` in this use case,
+			// so we're explicitly selecting and calling the constructor we want to use:
+			var valueTaskCtor = type.GetConstructor(new[] { resultType });
+			return valueTaskCtor.Invoke(new object[] { result });
+		}
+
+		private static object GetValueTypeDefault(Type type)
+		{
+			Type factoryKey;
+
+			if (type.GetTypeInfo().IsGenericType)
+			{
+				factoryKey = type.GetGenericTypeDefinition();
+			}
+			else
+			{
+				factoryKey = type;
+			}
+
+			return factories.TryGetValue(factoryKey, out Func<Type, object> factory) ? factory.Invoke(type) : Activator.CreateInstance(type);
 		}
 	}
 }
