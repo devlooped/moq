@@ -82,10 +82,10 @@ namespace Moq
 			set { this.owner.CallBase = value; }
 		}
 
-		public override DefaultValue DefaultValue
+		internal override IDefaultValueProvider DefaultValueProvider
 		{
-			get { return this.owner.DefaultValue; }
-			set { this.owner.DefaultValue = value; }
+			get => this.owner.DefaultValueProvider;
+			set => this.owner.DefaultValueProvider = value;
 		}
 
 		internal override EventHandlerCollection EventHandlers => this.owner.EventHandlers;

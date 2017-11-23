@@ -63,6 +63,7 @@ namespace Moq
 		private static int serialNumberCounter = 0;
 		private T instance;
 		private object[] constructorArguments;
+		private IDefaultValueProvider defaultValueProvider;
 
 #region Ctors
 
@@ -116,6 +117,7 @@ namespace Moq
 
 			this.Behavior = behavior;
 			this.constructorArguments = args;
+			this.defaultValueProvider = EmptyDefaultValueProvider.Instance;
 			this.ImplementedInterfaces.AddRange(typeof(T).GetInterfaces().Where(i => (i.GetTypeInfo().IsPublic || i.GetTypeInfo().IsNestedPublic) && !i.GetTypeInfo().IsImport));
 			this.ImplementedInterfaces.Add(typeof(IMocked<T>));
 			this.InternallyImplementedInterfaceCount = this.ImplementedInterfaces.Count;
@@ -163,6 +165,12 @@ namespace Moq
 #endregion
 
 #region Properties
+
+		internal override IDefaultValueProvider DefaultValueProvider
+		{
+			get => this.defaultValueProvider;
+			set => this.defaultValueProvider = value ?? throw new ArgumentNullException(nameof(value));
+		}
 
 		/// <include file='Mock.Generic.xdoc' path='docs/doc[@for="Mock{T}.Object"]/*'/>
 		[SuppressMessage("Microsoft.Naming", "CA1716:IdentifiersShouldNotMatchKeywords", MessageId = "Object", Justification = "Exposes the mocked object instance, so it's appropriate.")]

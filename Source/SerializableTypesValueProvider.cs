@@ -20,6 +20,8 @@ namespace Moq
 			this.decorated = decorated;
 		}
 
+		DefaultValue IDefaultValueProvider.Kind => this.decorated.Kind;
+
 		public object ProvideDefault(MethodInfo member, Mock mock)
 		{
 			return IsSerializableWithIncorrectImplementationForISerializable(member.ReturnType)

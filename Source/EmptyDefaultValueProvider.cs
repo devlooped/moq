@@ -66,6 +66,8 @@ namespace Moq
 			[typeof(ValueTask<>)] = CreateValueTaskOf,
 		};
 
+		DefaultValue IDefaultValueProvider.Kind => DefaultValue.Empty;
+
 		public static EmptyDefaultValueProvider Instance { get; } = new EmptyDefaultValueProvider();
 
 		private EmptyDefaultValueProvider()

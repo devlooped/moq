@@ -57,6 +57,8 @@ namespace Moq
 		{
 		}
 
+		DefaultValue IDefaultValueProvider.Kind => DefaultValue.Mock;
+
 		public object ProvideDefault(MethodInfo member, Mock mock)
 		{
 			var emptyValue = EmptyDefaultValueProvider.Instance.ProvideDefault(member, mock);

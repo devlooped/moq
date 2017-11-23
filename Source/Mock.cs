@@ -63,8 +63,6 @@ namespace Moq
 
 		private bool isInitialized;
 		private Dictionary<Type, object> configuredDefaultValues;
-		private DefaultValue defaultValue = DefaultValue.Empty;
-		private IDefaultValueProvider defaultValueProvider = EmptyDefaultValueProvider.Instance;
 		private EventHandlerCollection eventHandlers;
 		private InvocationCollection invocations;
 		private SetupCollection setups;
@@ -163,18 +161,28 @@ namespace Moq
 		public virtual bool CallBase { get; set; }
 
 		/// <include file='Mock.xdoc' path='docs/doc[@for="Mock.DefaultValue"]/*'/>
-		public virtual DefaultValue DefaultValue
+		public DefaultValue DefaultValue
 		{
-			get { return this.defaultValue; }
-			set { this.SetDefaultValue(value); }
-		}
+			get
+			{
+				return this.DefaultValueProvider.Kind;
+			}
+			set
+			{
+				switch (value)
+				{
+					case DefaultValue.Empty:
+						this.DefaultValueProvider = EmptyDefaultValueProvider.Instance;
+						return;
 
-		private void SetDefaultValue(DefaultValue value)
-		{
-			this.defaultValue = value;
-			this.defaultValueProvider = defaultValue == DefaultValue.Mock ? (IDefaultValueProvider)
-				MockDefaultValueProvider.Instance :
-				EmptyDefaultValueProvider.Instance;
+					case DefaultValue.Mock:
+						this.DefaultValueProvider = MockDefaultValueProvider.Instance;
+						return;
+
+					default:
+						throw new ArgumentOutOfRangeException(nameof(value));
+				}
+			}
 		}
 
 		internal virtual EventHandlerCollection EventHandlers => this.eventHandlers;
@@ -228,10 +236,7 @@ namespace Moq
 		/// have no setups and need to return a default
 		/// value (for loose mocks).
 		/// </summary>
-		internal IDefaultValueProvider DefaultValueProvider
-		{
-			get { return this.defaultValueProvider; }
-		}
+		internal abstract IDefaultValueProvider DefaultValueProvider { get; set; }
 
 		/// <summary>
 		/// Exposes the list of extra interfaces implemented by the mock.

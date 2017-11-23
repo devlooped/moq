@@ -47,6 +47,11 @@ namespace Moq
 	[EditorBrowsable(EditorBrowsableState.Advanced)]
 	internal interface IDefaultValueProvider
 	{
+		/// <summary>
+		/// Gets the <see cref="DefaultValue"/> enumeration value that corresponds to this implementation of <see cref="IDefaultValueProvider"/>.
+		/// </summary>
+		DefaultValue Kind { get; }
+
 		/// <include file='IDefaultValueProvider.xdoc' path='docs/doc[@for="IDefaultValueProvider.ProvideDefault"]/*'/>
 		object ProvideDefault(MethodInfo member, Mock mock);
 	}
