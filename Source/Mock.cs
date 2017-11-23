@@ -64,7 +64,7 @@ namespace Moq
 		private bool isInitialized;
 		private Dictionary<Type, object> configuredDefaultValues;
 		private DefaultValue defaultValue = DefaultValue.Empty;
-		private IDefaultValueProvider defaultValueProvider = new EmptyDefaultValueProvider();
+		private IDefaultValueProvider defaultValueProvider = EmptyDefaultValueProvider.Instance;
 		private EventHandlerCollection eventHandlers;
 		private InvocationCollection invocations;
 		private SetupCollection setups;
@@ -172,9 +172,9 @@ namespace Moq
 		private void SetDefaultValue(DefaultValue value)
 		{
 			this.defaultValue = value;
-			this.defaultValueProvider = defaultValue == DefaultValue.Mock ?
-				new MockDefaultValueProvider() :
-				new EmptyDefaultValueProvider();
+			this.defaultValueProvider = defaultValue == DefaultValue.Mock ? (IDefaultValueProvider)
+				MockDefaultValueProvider.Instance :
+				EmptyDefaultValueProvider.Instance;
 		}
 
 		internal virtual EventHandlerCollection EventHandlers => this.eventHandlers;
@@ -856,7 +856,7 @@ namespace Moq
 			if (mockedTypesStack.Contains(property.PropertyType))
 			{
 				// to deal with loops in the property graph
-				valueProvider = new EmptyDefaultValueProvider();
+				valueProvider = EmptyDefaultValueProvider.Instance;
 			}
 #if FEATURE_SERIALIZATION
 			else

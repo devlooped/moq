@@ -107,9 +107,8 @@ namespace Moq.Tests
 
 		private static object GetDefaultValueForProperty(string propertyName, Mock<IFoo> mock)
 		{
-			var provider = new MockDefaultValueProvider();
 			var propertyGetter = typeof(IFoo).GetProperty(propertyName).GetGetMethod();
-			return provider.ProvideDefault(propertyGetter, mock);
+			return MockDefaultValueProvider.Instance.ProvideDefault(propertyGetter, mock);
 		}
 
 		public interface IFoo

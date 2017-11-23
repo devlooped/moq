@@ -52,7 +52,7 @@ namespace Moq
 	/// for invocations that do not have setups or return values, with loose mocks.
 	/// This is the default behavior for a mock.
 	/// </summary>
-	internal class EmptyDefaultValueProvider : IDefaultValueProvider
+	internal sealed class EmptyDefaultValueProvider : IDefaultValueProvider
 	{
 		private static Dictionary<Type, Func<Type, object>> factories = new Dictionary<Type, Func<Type, object>>()
 		{
@@ -66,7 +66,13 @@ namespace Moq
 			[typeof(ValueTask<>)] = CreateValueTaskOf,
 		};
 
-		public virtual object ProvideDefault(MethodInfo member, Mock mock)
+		public static EmptyDefaultValueProvider Instance { get; } = new EmptyDefaultValueProvider();
+
+		private EmptyDefaultValueProvider()
+		{
+		}
+
+		public object ProvideDefault(MethodInfo member, Mock mock)
 		{
 			return GetDefaultValue(member.ReturnType);
 		}

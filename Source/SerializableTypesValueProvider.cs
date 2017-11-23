@@ -14,7 +14,6 @@ namespace Moq
 	internal class SerializableTypesValueProvider : IDefaultValueProvider
 	{
 		private readonly IDefaultValueProvider decorated;
-		private readonly EmptyDefaultValueProvider emptyDefaultValueProvider = new EmptyDefaultValueProvider();
 
 		public SerializableTypesValueProvider(IDefaultValueProvider decorated)
 		{
@@ -24,7 +23,7 @@ namespace Moq
 		public object ProvideDefault(MethodInfo member, Mock mock)
 		{
 			return IsSerializableWithIncorrectImplementationForISerializable(member.ReturnType)
-				? emptyDefaultValueProvider.ProvideDefault(member, mock)
+				? EmptyDefaultValueProvider.Instance.ProvideDefault(member, mock)
 				: decorated.ProvideDefault(member, mock);
 		}
 
