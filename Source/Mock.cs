@@ -813,7 +813,7 @@ namespace Moq
 			foreach (var property in properties)
 			{
 				var expression = GetPropertyExpression(mockType, property);
-				object initialValue = GetInitialValue(mock.DefaultValueProvider, mockedTypesStack, property);
+				object initialValue = GetInitialValue(mock, mockedTypesStack, property);
 
 				var mocked = initialValue as IMocked;
 				if (mocked != null)
@@ -847,8 +847,10 @@ namespace Moq
 			mockedTypesStack.Pop();
 		}
 
-		private static object GetInitialValue(IDefaultValueProvider valueProvider, Stack<Type> mockedTypesStack, PropertyInfo property)
+		private static object GetInitialValue(Mock mock, Stack<Type> mockedTypesStack, PropertyInfo property)
 		{
+			var valueProvider = mock.DefaultValueProvider;
+
 			if (mockedTypesStack.Contains(property.PropertyType))
 			{
 				// to deal with loops in the property graph
@@ -863,7 +865,7 @@ namespace Moq
 				valueProvider = new SerializableTypesValueProvider(valueProvider);
 			}
 #endif
-			return valueProvider.ProvideDefault(property.GetGetMethod());
+			return mock.GetDefaultValue(property.GetGetMethod(), useAlternateProvider: valueProvider);
 		}
 
 		private static Expression GetPropertyExpression(Type mockType, PropertyInfo property)
@@ -1185,6 +1187,11 @@ namespace Moq
 		public void SetReturnsDefault<TReturn>(TReturn value)
 		{
 			this.DefaultValueProvider.DefineDefault(value);
+		}
+
+		internal object GetDefaultValue(MethodInfo method, IDefaultValueProvider useAlternateProvider = null)
+		{
+			return (useAlternateProvider ?? this.DefaultValueProvider).ProvideDefault(method);
 		}
 
 		#endregion

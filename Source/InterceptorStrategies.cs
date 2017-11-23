@@ -160,7 +160,7 @@ namespace Moq
 				}
 				else
 				{
-					invocation.ReturnValue = mock.DefaultValueProvider.ProvideDefault(invocation.Method);
+					invocation.ReturnValue = mock.GetDefaultValue(invocation.Method);
 				}
 				return InterceptionAction.Stop;
 			}
