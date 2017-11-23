@@ -68,8 +68,12 @@ namespace Moq
 
 		public virtual object ProvideDefault(MethodInfo member)
 		{
-			var valueType = member.ReturnType;
-			return valueType.GetTypeInfo().IsValueType ? GetValueTypeDefault(valueType) : GetReferenceTypeDefault(valueType);
+			return GetDefaultValue(member.ReturnType);
+		}
+
+		private static object GetDefaultValue(Type type)
+		{
+			return type.GetTypeInfo().IsValueType ? GetValueTypeDefault(type) : GetReferenceTypeDefault(type);
 		}
 
 		private static object GetReferenceTypeDefault(Type type)
@@ -134,7 +138,7 @@ namespace Moq
 		private static object CreateTaskOf(Type type)
 		{
 			var resultType = type.GetGenericArguments()[0];
-			var result = resultType.GetTypeInfo().IsValueType ? GetValueTypeDefault(resultType) : GetReferenceTypeDefault(resultType);
+			var result = GetDefaultValue(resultType);
 
 			var tcsType = typeof(TaskCompletionSource<>).MakeGenericType(resultType);
 			var tcs = Activator.CreateInstance(tcsType);
@@ -145,7 +149,7 @@ namespace Moq
 		private static object CreateValueTaskOf(Type type)
 		{
 			var resultType = type.GetGenericArguments()[0];
-			var result = resultType.GetTypeInfo().IsValueType ? GetValueTypeDefault(resultType) : GetReferenceTypeDefault(resultType);
+			var result = GetDefaultValue(resultType);
 
 			// `Activator.CreateInstance` could throw an `AmbiguousMatchException` in this use case,
 			// so we're explicitly selecting and calling the constructor we want to use:
