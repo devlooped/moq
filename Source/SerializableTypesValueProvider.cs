@@ -21,11 +21,6 @@ namespace Moq
 			this.decorated = decorated;
 		}
 
-		public void DefineDefault<T>(T value)
-		{
-			decorated.DefineDefault(value);
-		}
-
 		public object ProvideDefault(MethodInfo member)
 		{
 			return IsSerializableWithIncorrectImplementationForISerializable(member.ReturnType)

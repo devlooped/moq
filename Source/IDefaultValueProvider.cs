@@ -47,9 +47,6 @@ namespace Moq
 	[EditorBrowsable(EditorBrowsableState.Advanced)]
 	internal interface IDefaultValueProvider
 	{
-		/// <include file='IDefaultValueProvider.xdoc' path='docs/doc[@for="IDefaultValueProvider.DefineDefault"]/*'/>
-		void DefineDefault<T>(T value);
-
 		/// <include file='IDefaultValueProvider.xdoc' path='docs/doc[@for="IDefaultValueProvider.ProvideDefault"]/*'/>
 		object ProvideDefault(MethodInfo member);
 	}

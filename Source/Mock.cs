@@ -62,6 +62,7 @@ namespace Moq
 		internal static IProxyFactory ProxyFactory => CastleProxyFactory.Instance;
 
 		private bool isInitialized;
+		private Dictionary<Type, object> configuredDefaultValues;
 		private DefaultValue defaultValue = DefaultValue.Empty;
 		private IDefaultValueProvider defaultValueProvider = new EmptyDefaultValueProvider();
 		private EventHandlerCollection eventHandlers;
@@ -72,6 +73,7 @@ namespace Moq
 		/// <include file='Mock.xdoc' path='docs/doc[@for="Mock.ctor"]/*'/>
 		protected Mock()
 		{
+			this.configuredDefaultValues = new Dictionary<Type, object>();
 			this.eventHandlers = new EventHandlerCollection();
 			this.ImplementedInterfaces = new List<Type>();
 			this.InnerMocks = new ConcurrentDictionary<MethodInfo, Mock>();
@@ -1183,18 +1185,24 @@ namespace Moq
 
 		#region Default Values
 
+		internal virtual Dictionary<Type, object> ConfiguredDefaultValues => this.configuredDefaultValues;
+
 		/// <include file='Mock.Generic.xdoc' path='docs/doc[@for="Mock.SetReturnDefault{TReturn}"]/*'/>
 		public void SetReturnsDefault<TReturn>(TReturn value)
 		{
-			this.DefaultValueProvider.DefineDefault(value);
+			this.ConfiguredDefaultValues[typeof(TReturn)] = value;
 		}
 
 		internal object GetDefaultValue(MethodInfo method, IDefaultValueProvider useAlternateProvider = null)
 		{
+			if (this.ConfiguredDefaultValues.TryGetValue(method.ReturnType, out object configuredDefaultValue))
+			{
+				return configuredDefaultValue;
+			}
+
 			return (useAlternateProvider ?? this.DefaultValueProvider).ProvideDefault(method);
 		}
 
 		#endregion
-
 	}
 }

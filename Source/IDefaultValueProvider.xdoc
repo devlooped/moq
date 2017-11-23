@@ -6,13 +6,6 @@
 			default value of non-expected invocations.
 		</summary>
 	</doc>
-	<doc for="IDefaultValueProvider.DefineDefault">
-		<summary>
-			Defines the default value to return in all the methods returning <typeparamref name="T"/>.
-		</summary>
-		<typeparam name="T">The type of the return value.</typeparam>
-		<param name="value">The value to set as default.</param>
-	</doc>
 	<doc for="IDefaultValueProvider.ProvideDefault">
 		<summary>
 			Provides a value for the given member and arguments.

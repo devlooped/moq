@@ -54,8 +54,6 @@ namespace Moq
 	/// </summary>
 	internal class EmptyDefaultValueProvider : IDefaultValueProvider
 	{
-		private Dictionary<Type, object> defaultValues = new Dictionary<Type, object>();
-
 		private static Dictionary<Type, Func<Type, object>> factories = new Dictionary<Type, Func<Type, object>>()
 		{
 			[typeof(Array)] = CreateArray,
@@ -68,20 +66,9 @@ namespace Moq
 			[typeof(ValueTask<>)] = CreateValueTaskOf,
 		};
 
-		public virtual void DefineDefault<T>(T value)
-		{
-			this.defaultValues[typeof(T)] = value;
-		}
-
 		public virtual object ProvideDefault(MethodInfo member)
 		{
 			var valueType = member.ReturnType;
-
-			if (this.defaultValues.ContainsKey(valueType))
-			{
-				return this.defaultValues[valueType];
-			}
-
 			return valueType.GetTypeInfo().IsValueType ? GetValueTypeDefault(valueType) : GetReferenceTypeDefault(valueType);
 		}
 
