@@ -74,9 +74,9 @@ namespace Moq
 		{
 		}
 
-		public object ProvideDefault(MethodInfo member, Mock mock)
+		public object ProvideDefault(Type type, Mock mock)
 		{
-			return GetDefaultValue(member.ReturnType);
+			return GetDefaultValue(type);
 		}
 
 		private static object GetDefaultValue(Type type)

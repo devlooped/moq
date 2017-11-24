@@ -38,8 +38,8 @@
 //[This is the BSD license, see
 // http://www.opensource.org/licenses/bsd-license.php]
 
+using System;
 using System.ComponentModel;
-using System.Reflection;
 
 namespace Moq
 {
@@ -53,6 +53,6 @@ namespace Moq
 		DefaultValue Kind { get; }
 
 		/// <include file='IDefaultValueProvider.xdoc' path='docs/doc[@for="IDefaultValueProvider.ProvideDefault"]/*'/>
-		object ProvideDefault(MethodInfo member, Mock mock);
+		object ProvideDefault(Type type, Mock mock);
 	}
 }

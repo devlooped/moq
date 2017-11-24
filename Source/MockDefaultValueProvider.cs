@@ -59,17 +59,17 @@ namespace Moq
 
 		DefaultValue IDefaultValueProvider.Kind => DefaultValue.Mock;
 
-		public object ProvideDefault(MethodInfo member, Mock mock)
+		public object ProvideDefault(Type type, Mock mock)
 		{
-			var emptyValue = EmptyDefaultValueProvider.Instance.ProvideDefault(member, mock);
+			var emptyValue = EmptyDefaultValueProvider.Instance.ProvideDefault(type, mock);
 			if (emptyValue != null)
 			{
 				return emptyValue;
 			}
-			else if (member.ReturnType.IsMockeable())
+			else if (type.IsMockeable())
 			{
 				// Create a new mock to be placed to InnerMocks dictionary if it's missing there
-				var mockType = typeof(Mock<>).MakeGenericType(member.ReturnType);
+				var mockType = typeof(Mock<>).MakeGenericType(type);
 				Mock newMock = (Mock)Activator.CreateInstance(mockType, mock.Behavior);
 				newMock.DefaultValue = mock.DefaultValue;
 				newMock.CallBase = mock.CallBase;

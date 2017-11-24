@@ -22,11 +22,11 @@ namespace Moq
 
 		DefaultValue IDefaultValueProvider.Kind => this.decorated.Kind;
 
-		public object ProvideDefault(MethodInfo member, Mock mock)
+		public object ProvideDefault(Type type, Mock mock)
 		{
-			return IsSerializableWithIncorrectImplementationForISerializable(member.ReturnType)
-				? EmptyDefaultValueProvider.Instance.ProvideDefault(member, mock)
-				: decorated.ProvideDefault(member, mock);
+			return IsSerializableWithIncorrectImplementationForISerializable(type)
+				? EmptyDefaultValueProvider.Instance.ProvideDefault(type, mock)
+				: decorated.ProvideDefault(type, mock);
 		}
 
 		private static bool IsSerializableWithIncorrectImplementationForISerializable(Type typeToMock)

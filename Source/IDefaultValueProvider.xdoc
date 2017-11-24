@@ -8,10 +8,10 @@
 	</doc>
 	<doc for="IDefaultValueProvider.ProvideDefault">
 		<summary>
-			Provides a value for the given member and arguments.
+			Provides a value for the given type and mock.
 		</summary>
-		<param name="member">
-			The member to provide a default	value for.
+		<param name="type">
+			The type of which an instance is to be provided.
 		</param>
 		<param name="mock">
 			The mock for which a default value is to be provided.

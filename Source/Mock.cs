@@ -1205,7 +1205,7 @@ namespace Moq
 				return configuredDefaultValue;
 			}
 
-			var result = (useAlternateProvider ?? this.DefaultValueProvider).ProvideDefault(method, this);
+			var result = (useAlternateProvider ?? this.DefaultValueProvider).ProvideDefault(method.ReturnType, this);
 
 			if (result is IMocked mockedResult)
 			{
