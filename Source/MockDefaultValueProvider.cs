@@ -68,19 +68,13 @@ namespace Moq
 			}
 			else if (member.ReturnType.IsMockeable())
 			{
-				var innerMock = mock.InnerMocks.GetOrAdd(member, info =>
-				{
-					// Create a new mock to be placed to InnerMocks dictionary if it's missing there
-					var mockType = typeof(Mock<>).MakeGenericType(info.ReturnType);
-					Mock newMock = (Mock)Activator.CreateInstance(mockType, mock.Behavior);
-					newMock.DefaultValue = mock.DefaultValue;
-					newMock.CallBase = mock.CallBase;
-					newMock.Switches = mock.Switches;
-					return newMock;
-				});
-
-				Debug.Assert(innerMock != null);
-				return innerMock.Object;
+				// Create a new mock to be placed to InnerMocks dictionary if it's missing there
+				var mockType = typeof(Mock<>).MakeGenericType(member.ReturnType);
+				Mock newMock = (Mock)Activator.CreateInstance(mockType, mock.Behavior);
+				newMock.DefaultValue = mock.DefaultValue;
+				newMock.CallBase = mock.CallBase;
+				newMock.Switches = mock.Switches;
+				return newMock.Object;
 			}
 			else
 			{

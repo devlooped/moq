@@ -1205,7 +1205,22 @@ namespace Moq
 				return configuredDefaultValue;
 			}
 
-			return (useAlternateProvider ?? this.DefaultValueProvider).ProvideDefault(method, this);
+			var result = (useAlternateProvider ?? this.DefaultValueProvider).ProvideDefault(method, this);
+
+			if (result is IMocked mockedResult)
+			{
+				// TODO: Perhaps the following `InnerMocks` update isn't in quite the right place yet.
+				// There are two main places in Moq where `InnerMocks` are used: `Mock<T>.FluentMock` and
+				// the `HandleMockRecursion` interception strategy. Both places first query `InnerMocks`,
+				// and if no value for a given member is present, the default value provider get invoked
+				// via the present method. Querying and updating `InnerMocks` is thus spread over two
+				// code locations and therefore non-atomic. It would be good if those could be combined
+				// (`InnerMocks.GetOrAdd`), but that might not be easily possible since `InnerMocks` is
+				// only mocks while default value providers can also return plain, unmocked values.
+				this.InnerMocks.TryAdd(method, mockedResult.Mock);
+			}
+
+			return result;
 		}
 
 		#endregion

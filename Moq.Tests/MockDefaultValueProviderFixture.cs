@@ -23,10 +23,10 @@ namespace Moq.Tests
 		[Fact]
 		public void CachesProvidedValue()
 		{
-			var mock = new Mock<IFoo>();
+			var mock = new Mock<IFoo>() { DefaultValue = DefaultValue.Mock };
 
-			var value1 = GetDefaultValueForProperty(nameof(IFoo.Bar), mock);
-			var value2 = GetDefaultValueForProperty(nameof(IFoo.Bar), mock);
+			var value1 = mock.Object.Bar;
+			var value2 = mock.Object.Bar;
 
 			Assert.Same(value1, value2);
 		}
@@ -74,11 +74,10 @@ namespace Moq.Tests
 		[Fact]
 		public void CreatedMockIsVerifiedWithOwner()
 		{
-			var mock = new Mock<IFoo>();
+			var mock = new Mock<IFoo>() { DefaultValue = DefaultValue.Mock };
 
-			var value = GetDefaultValueForProperty(nameof(IFoo.Bar), mock);
-
-			var barMock = Mock.Get((IBar)value);
+			var bar = mock.Object.Bar;
+			var barMock = Mock.Get(bar);
 			barMock.Setup(b => b.Do()).Verifiable();
 
 			var ex = Assert.Throws<MockException>(() => mock.Verify());
