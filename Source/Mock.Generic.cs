@@ -529,6 +529,15 @@ namespace Moq
 			Mock.VerifySet(this, setterExpression, times(), failMessage);
 		}
 
+		/// <summary>
+		/// Verifies that there were no calls other than those already verified.
+		/// </summary>
+		/// <exception cref="MockException">There was at least one invocation not previously verified.</exception>
+		public void VerifyNoOtherCalls()
+		{
+			Mock.VerifyNoOtherCalls(this);
+		}
+
 #endregion
 
 #region Raise

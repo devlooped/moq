@@ -44,12 +44,18 @@ namespace Moq
 {
 	internal abstract class Invocation
 	{
+		private bool verified;
+
 		public abstract MethodInfo Method { get; }
 
 		public abstract object[] Arguments { get; }
 
 		public abstract object ReturnValue { get; set; }
 
+		public bool Verified => this.verified;
+
 		public abstract void InvokeBase();
+
+		public void MarkAsVerified() => this.verified = true;
 	}
 }
