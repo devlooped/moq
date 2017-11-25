@@ -56,6 +56,8 @@ namespace Moq
 			this.owner = owner;
 		}
 
+		internal override Dictionary<Type, object> ConfiguredDefaultValues => this.owner.ConfiguredDefaultValues;
+
 		internal override ConcurrentDictionary<MethodInfo, Mock> InnerMocks
 		{
 			get { return this.owner.InnerMocks; }
@@ -80,10 +82,10 @@ namespace Moq
 			set { this.owner.CallBase = value; }
 		}
 
-		public override DefaultValue DefaultValue
+		public override DefaultValueProvider DefaultValueProvider
 		{
-			get { return this.owner.DefaultValue; }
-			set { this.owner.DefaultValue = value; }
+			get => this.owner.DefaultValueProvider;
+			set => this.owner.DefaultValueProvider = value;
 		}
 
 		internal override EventHandlerCollection EventHandlers => this.owner.EventHandlers;

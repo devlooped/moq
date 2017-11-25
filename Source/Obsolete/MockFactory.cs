@@ -136,6 +136,7 @@ namespace Moq
 	{
 		List<Mock> mocks = new List<Mock>();
 		MockBehavior defaultBehavior;
+		DefaultValueProvider defaultValueProvider;
 		private Switches switches;
 
 		/// <summary>
@@ -148,6 +149,7 @@ namespace Moq
 		public MockFactory(MockBehavior defaultBehavior)
 		{
 			this.defaultBehavior = defaultBehavior;
+			this.defaultValueProvider = EmptyDefaultValueProvider.Instance;
 			this.switches = Switches.Default;
 		}
 
@@ -161,7 +163,39 @@ namespace Moq
 		/// Specifies the behavior to use when returning default values for 
 		/// unexpected invocations on loose mocks.
 		/// </summary>
-		public DefaultValue DefaultValue { get; set; }
+		public DefaultValue DefaultValue
+		{
+			get
+			{
+				return this.DefaultValueProvider.Kind;
+			}
+			set
+			{
+				switch (value)
+				{
+					case DefaultValue.Empty:
+						this.DefaultValueProvider = EmptyDefaultValueProvider.Instance;
+						return;
+
+					case DefaultValue.Mock:
+						this.DefaultValueProvider = MockDefaultValueProvider.Instance;
+						return;
+
+					default:
+						throw new ArgumentOutOfRangeException(nameof(value));
+				}
+			}
+		}
+
+		/// <summary>
+		/// Gets or sets the <see cref="DefaultValueProvider"/> instance that will be used
+		/// e. g. to produce default return values for unexpected invocations.
+		/// </summary>
+		public DefaultValueProvider DefaultValueProvider
+		{
+			get => this.defaultValueProvider;
+			set => this.defaultValueProvider = value ?? throw new ArgumentNullException(nameof(value));
+		}
 
 		/// <summary>
 		/// Gets the mocks that have been created by this factory and 
@@ -302,7 +336,7 @@ namespace Moq
 			mocks.Add(mock);
 
 			mock.CallBase = this.CallBase;
-			mock.DefaultValue = this.DefaultValue;
+			mock.DefaultValueProvider = this.DefaultValueProvider;
 			mock.Switches = this.switches;
 
 			return mock;

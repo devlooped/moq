@@ -62,8 +62,6 @@ namespace Moq
 		internal static IProxyFactory ProxyFactory => CastleProxyFactory.Instance;
 
 		private bool isInitialized;
-		private DefaultValue defaultValue = DefaultValue.Empty;
-		private IDefaultValueProvider defaultValueProvider = new EmptyDefaultValueProvider();
 		private EventHandlerCollection eventHandlers;
 		private InvocationCollection invocations;
 		private SetupCollection setups;
@@ -161,18 +159,28 @@ namespace Moq
 		public virtual bool CallBase { get; set; }
 
 		/// <include file='Mock.xdoc' path='docs/doc[@for="Mock.DefaultValue"]/*'/>
-		public virtual DefaultValue DefaultValue
+		public DefaultValue DefaultValue
 		{
-			get { return this.defaultValue; }
-			set { this.SetDefaultValue(value); }
-		}
+			get
+			{
+				return this.DefaultValueProvider.Kind;
+			}
+			set
+			{
+				switch (value)
+				{
+					case DefaultValue.Empty:
+						this.DefaultValueProvider = EmptyDefaultValueProvider.Instance;
+						return;
 
-		private void SetDefaultValue(DefaultValue value)
-		{
-			this.defaultValue = value;
-			this.defaultValueProvider = defaultValue == DefaultValue.Mock ?
-				new MockDefaultValueProvider(this) :
-				new EmptyDefaultValueProvider();
+					case DefaultValue.Mock:
+						this.DefaultValueProvider = MockDefaultValueProvider.Instance;
+						return;
+
+					default:
+						throw new ArgumentOutOfRangeException(nameof(value));
+				}
+			}
 		}
 
 		internal virtual EventHandlerCollection EventHandlers => this.eventHandlers;
@@ -221,15 +229,10 @@ namespace Moq
 		internal abstract bool IsDelegateMock { get; }
 
 		/// <summary>
-		/// Specifies the class that will determine the default
-		/// value to return when invocations are made that
-		/// have no setups and need to return a default
-		/// value (for loose mocks).
+		/// Gets or sets the <see cref="DefaultValueProvider"/> instance that will be used
+		/// e. g. to produce default return values for unexpected invocations.
 		/// </summary>
-		internal IDefaultValueProvider DefaultValueProvider
-		{
-			get { return this.defaultValueProvider; }
-		}
+		public abstract DefaultValueProvider DefaultValueProvider { get; set; }
 
 		/// <summary>
 		/// Exposes the list of extra interfaces implemented by the mock.
@@ -813,7 +816,7 @@ namespace Moq
 			foreach (var property in properties)
 			{
 				var expression = GetPropertyExpression(mockType, property);
-				object initialValue = GetInitialValue(mock.DefaultValueProvider, mockedTypesStack, property);
+				object initialValue = GetInitialValue(mock, mockedTypesStack, property);
 
 				var mocked = initialValue as IMocked;
 				if (mocked != null)
@@ -847,12 +850,14 @@ namespace Moq
 			mockedTypesStack.Pop();
 		}
 
-		private static object GetInitialValue(IDefaultValueProvider valueProvider, Stack<Type> mockedTypesStack, PropertyInfo property)
+		private static object GetInitialValue(Mock mock, Stack<Type> mockedTypesStack, PropertyInfo property)
 		{
+			var valueProvider = mock.DefaultValueProvider;
+
 			if (mockedTypesStack.Contains(property.PropertyType))
 			{
 				// to deal with loops in the property graph
-				valueProvider = new EmptyDefaultValueProvider();
+				valueProvider = EmptyDefaultValueProvider.Instance;
 			}
 #if FEATURE_SERIALIZATION
 			else
@@ -863,7 +868,7 @@ namespace Moq
 				valueProvider = new SerializableTypesValueProvider(valueProvider);
 			}
 #endif
-			return valueProvider.ProvideDefault(property.GetGetMethod());
+			return mock.GetDefaultValue(property.GetGetMethod(), useAlternateProvider: valueProvider);
 		}
 
 		private static Expression GetPropertyExpression(Type mockType, PropertyInfo property)
@@ -1181,13 +1186,43 @@ namespace Moq
 
 		#region Default Values
 
+		internal abstract Dictionary<Type, object> ConfiguredDefaultValues { get; }
+
 		/// <include file='Mock.Generic.xdoc' path='docs/doc[@for="Mock.SetReturnDefault{TReturn}"]/*'/>
 		public void SetReturnsDefault<TReturn>(TReturn value)
 		{
-			this.DefaultValueProvider.DefineDefault(value);
+			this.ConfiguredDefaultValues[typeof(TReturn)] = value;
+		}
+
+		internal object GetDefaultValue(MethodInfo method, DefaultValueProvider useAlternateProvider = null)
+		{
+			Debug.Assert(method != null);
+			Debug.Assert(method.ReturnType != null);
+			Debug.Assert(method.ReturnType != typeof(void));
+
+			if (this.ConfiguredDefaultValues.TryGetValue(method.ReturnType, out object configuredDefaultValue))
+			{
+				return configuredDefaultValue;
+			}
+
+			var result = (useAlternateProvider ?? this.DefaultValueProvider).GetDefaultReturnValue(method, this);
+
+			if (result is IMocked mockedResult)
+			{
+				// TODO: Perhaps the following `InnerMocks` update isn't in quite the right place yet.
+				// There are two main places in Moq where `InnerMocks` are used: `Mock<T>.FluentMock` and
+				// the `HandleMockRecursion` interception strategy. Both places first query `InnerMocks`,
+				// and if no value for a given member is present, the default value provider get invoked
+				// via the present method. Querying and updating `InnerMocks` is thus spread over two
+				// code locations and therefore non-atomic. It would be good if those could be combined
+				// (`InnerMocks.GetOrAdd`), but that might not be easily possible since `InnerMocks` is
+				// only mocks while default value providers can also return plain, unmocked values.
+				this.InnerMocks.TryAdd(method, mockedResult.Mock);
+			}
+
+			return result;
 		}
 
 		#endregion
-
 	}
 }

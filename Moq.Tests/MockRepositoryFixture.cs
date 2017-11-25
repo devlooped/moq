@@ -147,6 +147,50 @@ namespace Moq.Tests
 		}
 
 		[Fact]
+		public void DefaultValue_can_be_set_to_Empty()
+		{
+			var mockRepository = new MockRepository(MockBehavior.Default);
+
+			mockRepository.DefaultValue = DefaultValue.Empty;
+
+			Assert.Equal(DefaultValue.Empty, mockRepository.DefaultValue);
+		}
+
+		[Fact]
+		public void DefaultValue_can_be_set_to_Mock()
+		{
+			var mockRepository = new MockRepository(MockBehavior.Default);
+
+			mockRepository.DefaultValue = DefaultValue.Mock;
+
+			Assert.Equal(DefaultValue.Mock, mockRepository.DefaultValue);
+		}
+
+		[Theory]
+		[InlineData(DefaultValue.Custom)]
+		[InlineData((DefaultValue)(-1))]
+		public void DefaultValue_cannot_be_set_to_anything_other_than_Empty_or_Mock(DefaultValue defaultValue)
+		{
+			var mockRepository = new MockRepository(MockBehavior.Default);
+
+			Assert.Throws<ArgumentOutOfRangeException>(() =>
+			{
+				mockRepository.DefaultValue = defaultValue;
+			});
+		}
+
+		[Fact]
+		public void DefaultValueProvider_cannot_be_set_to_null()
+		{
+			var mockRepository = new MockRepository(MockBehavior.Default);
+
+			Assert.Throws<ArgumentNullException>(() =>
+			{
+				mockRepository.DefaultValueProvider = null;
+			});
+		}
+
+		[Fact]
 		public void Repository_initially_uses_default_switches()
 		{
 			var repository = new MockRepository(MockBehavior.Default);

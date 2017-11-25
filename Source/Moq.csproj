@@ -90,10 +90,6 @@
 			<DependentUpon>IReturns.tt</DependentUpon>
 		</Compile>
 
-		<None Update="IDefaultValueProvider.xdoc">
-			<DependentUpon>IDefaultValueProvider.cs</DependentUpon>
-		</None>
-
 		<None Update="It.xdoc">
 			<DependentUpon>It.cs</DependentUpon>
 		</None>

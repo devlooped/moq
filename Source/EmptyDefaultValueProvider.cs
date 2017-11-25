@@ -41,6 +41,7 @@
 using System;
 using System.Collections;
 using System.Collections.Generic;
+using System.Diagnostics;
 using System.Linq;
 using System.Reflection;
 using System.Threading.Tasks;
@@ -48,14 +49,12 @@ using System.Threading.Tasks;
 namespace Moq
 {
 	/// <summary>
-	/// A <see cref="IDefaultValueProvider"/> that returns an empty default value 
+	/// A <see cref="DefaultValueProvider"/> that returns an empty default value 
 	/// for invocations that do not have setups or return values, with loose mocks.
 	/// This is the default behavior for a mock.
 	/// </summary>
-	internal class EmptyDefaultValueProvider : IDefaultValueProvider
+	internal sealed class EmptyDefaultValueProvider : DefaultValueProvider
 	{
-		private Dictionary<Type, object> defaultValues = new Dictionary<Type, object>();
-
 		private static Dictionary<Type, Func<Type, object>> factories = new Dictionary<Type, Func<Type, object>>()
 		{
 			[typeof(Array)] = CreateArray,
@@ -68,21 +67,26 @@ namespace Moq
 			[typeof(ValueTask<>)] = CreateValueTaskOf,
 		};
 
-		public virtual void DefineDefault<T>(T value)
+		internal override DefaultValue Kind => DefaultValue.Empty;
+
+		public static EmptyDefaultValueProvider Instance { get; } = new EmptyDefaultValueProvider();
+
+		private EmptyDefaultValueProvider()
 		{
-			this.defaultValues[typeof(T)] = value;
 		}
 
-		public virtual object ProvideDefault(MethodInfo member)
+		protected internal override object GetDefaultValue(Type type, Mock mock)
 		{
-			var valueType = member.ReturnType;
+			Debug.Assert(type != null);
+			Debug.Assert(type != typeof(void));
+			Debug.Assert(mock != null);
 
-			if (this.defaultValues.ContainsKey(valueType))
-			{
-				return this.defaultValues[valueType];
-			}
+			return GetDefaultValue(type);
+		}
 
-			return valueType.GetTypeInfo().IsValueType ? GetValueTypeDefault(valueType) : GetReferenceTypeDefault(valueType);
+		private static object GetDefaultValue(Type type)
+		{
+			return type.GetTypeInfo().IsValueType ? GetValueTypeDefault(type) : GetReferenceTypeDefault(type);
 		}
 
 		private static object GetReferenceTypeDefault(Type type)
@@ -147,7 +151,7 @@ namespace Moq
 		private static object CreateTaskOf(Type type)
 		{
 			var resultType = type.GetGenericArguments()[0];
-			var result = resultType.GetTypeInfo().IsValueType ? GetValueTypeDefault(resultType) : GetReferenceTypeDefault(resultType);
+			var result = GetDefaultValue(resultType);
 
 			var tcsType = typeof(TaskCompletionSource<>).MakeGenericType(resultType);
 			var tcs = Activator.CreateInstance(tcsType);
@@ -158,7 +162,7 @@ namespace Moq
 		private static object CreateValueTaskOf(Type type)
 		{
 			var resultType = type.GetGenericArguments()[0];
-			var result = resultType.GetTypeInfo().IsValueType ? GetValueTypeDefault(resultType) : GetReferenceTypeDefault(resultType);
+			var result = GetDefaultValue(resultType);
 
 			// `Activator.CreateInstance` could throw an `AmbiguousMatchException` in this use case,
 			// so we're explicitly selecting and calling the constructor we want to use:

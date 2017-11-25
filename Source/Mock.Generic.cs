@@ -39,6 +39,7 @@
 // http://www.opensource.org/licenses/bsd-license.php]
 
 using System;
+using System.Collections.Generic;
 using System.Diagnostics;
 using System.Diagnostics.CodeAnalysis;
 using System.Linq;
@@ -62,7 +63,9 @@ namespace Moq
 	{
 		private static int serialNumberCounter = 0;
 		private T instance;
+		private Dictionary<Type, object> configuredDefaultValues;
 		private object[] constructorArguments;
+		private DefaultValueProvider defaultValueProvider;
 
 #region Ctors
 
@@ -115,7 +118,9 @@ namespace Moq
 			this.Name = GenerateMockName();
 
 			this.Behavior = behavior;
+			this.configuredDefaultValues = new Dictionary<Type, object>();
 			this.constructorArguments = args;
+			this.defaultValueProvider = EmptyDefaultValueProvider.Instance;
 			this.ImplementedInterfaces.AddRange(typeof(T).GetInterfaces().Where(i => (i.GetTypeInfo().IsPublic || i.GetTypeInfo().IsNestedPublic) && !i.GetTypeInfo().IsImport));
 			this.ImplementedInterfaces.Add(typeof(IMocked<T>));
 			this.InternallyImplementedInterfaceCount = this.ImplementedInterfaces.Count;
@@ -163,6 +168,18 @@ namespace Moq
 #endregion
 
 #region Properties
+
+		internal override Dictionary<Type, object> ConfiguredDefaultValues => this.configuredDefaultValues;
+
+		/// <summary>
+		/// Gets or sets the <see cref="DefaultValueProvider"/> instance that will be used
+		/// e. g. to produce default return values for unexpected invocations.
+		/// </summary>
+		public override DefaultValueProvider DefaultValueProvider
+		{
+			get => this.defaultValueProvider;
+			set => this.defaultValueProvider = value ?? throw new ArgumentNullException(nameof(value));
+		}
 
 		/// <include file='Mock.Generic.xdoc' path='docs/doc[@for="Mock{T}.Object"]/*'/>
 		[SuppressMessage("Microsoft.Naming", "CA1716:IdentifiersShouldNotMatchKeywords", MessageId = "Object", Justification = "Exposes the mocked object instance, so it's appropriate.")]

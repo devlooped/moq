@@ -98,6 +98,81 @@ namespace Moq.Tests
 		}
 
 		[Fact]
+		public void DefaultValue_can_be_set_to_Empty()
+		{
+			var mock = new Mock<object>();
+
+			mock.DefaultValue = DefaultValue.Empty;
+
+			Assert.Equal(DefaultValue.Empty, mock.DefaultValue);
+		}
+
+		[Fact]
+		public void DefaultValue_can_be_set_to_Mock()
+		{
+			var mock = new Mock<object>();
+
+			mock.DefaultValue = DefaultValue.Mock;
+
+			Assert.Equal(DefaultValue.Mock, mock.DefaultValue);
+		}
+
+		[Theory]
+		[InlineData(DefaultValue.Custom)]
+		[InlineData((DefaultValue)(-1))]
+		public void DefaultValue_cannot_be_set_to_anything_other_than_Empty_or_Mock(DefaultValue defaultValue)
+		{
+			var mock = new Mock<object>();
+
+			Assert.Throws<ArgumentOutOfRangeException>(() =>
+			{
+				mock.DefaultValue = defaultValue;
+			});
+		}
+
+		[Fact]
+		public void DefaultValue_when_Empty_then_DefaultValueProvider_has_Kind_Empty()
+		{
+			var mock = new Mock<object>();
+
+			mock.DefaultValue = DefaultValue.Empty;
+
+			Assert.Equal(DefaultValue.Empty, mock.DefaultValueProvider.Kind);
+		}
+
+		[Fact]
+		public void DefaultValue_when_Mock_then_DefaultValueProvider_has_Kind_Mock()
+		{
+			var mock = new Mock<object>();
+
+			mock.DefaultValue = DefaultValue.Mock;
+
+			Assert.Equal(DefaultValue.Mock, mock.DefaultValueProvider.Kind);
+		}
+
+		[Fact]
+		public void DefaultValueProvider_cannot_be_set_to_null()
+		{
+			var mock = new Mock<object>();
+
+			Assert.Throws<ArgumentNullException>(() =>
+			{
+				mock.DefaultValueProvider = null;
+			});
+		}
+
+		[Fact]
+		public void DefaultValueProvider_when_custom_provider_then_DefaultValue_is_Custom()
+		{
+			var mock = new Mock<object>();
+			var customDefaultValueProvider = new Mock<DefaultValueProvider>() { CallBase = true }.Object;
+
+			mock.DefaultValueProvider = customDefaultValueProvider;
+
+			Assert.Equal(DefaultValue.Custom, mock.DefaultValue);
+		}
+
+		[Fact]
 		public void ThrowsIfNullExpectAction()
 		{
 			var mock = new Mock<IComparable>();
