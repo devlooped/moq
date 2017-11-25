@@ -63,7 +63,7 @@ namespace Moq
 		private static int serialNumberCounter = 0;
 		private T instance;
 		private object[] constructorArguments;
-		private IDefaultValueProvider defaultValueProvider;
+		private DefaultValueProvider defaultValueProvider;
 
 #region Ctors
 
@@ -166,7 +166,7 @@ namespace Moq
 
 #region Properties
 
-		internal override IDefaultValueProvider DefaultValueProvider
+		internal override DefaultValueProvider DefaultValueProvider
 		{
 			get => this.defaultValueProvider;
 			set => this.defaultValueProvider = value ?? throw new ArgumentNullException(nameof(value));

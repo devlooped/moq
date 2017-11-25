@@ -48,11 +48,11 @@ using System.Threading.Tasks;
 namespace Moq
 {
 	/// <summary>
-	/// A <see cref="IDefaultValueProvider"/> that returns an empty default value 
+	/// A <see cref="DefaultValueProvider"/> that returns an empty default value 
 	/// for invocations that do not have setups or return values, with loose mocks.
 	/// This is the default behavior for a mock.
 	/// </summary>
-	internal sealed class EmptyDefaultValueProvider : IDefaultValueProvider
+	internal sealed class EmptyDefaultValueProvider : DefaultValueProvider
 	{
 		private static Dictionary<Type, Func<Type, object>> factories = new Dictionary<Type, Func<Type, object>>()
 		{
@@ -66,7 +66,7 @@ namespace Moq
 			[typeof(ValueTask<>)] = CreateValueTaskOf,
 		};
 
-		DefaultValue IDefaultValueProvider.Kind => DefaultValue.Empty;
+		public override DefaultValue Kind => DefaultValue.Empty;
 
 		public static EmptyDefaultValueProvider Instance { get; } = new EmptyDefaultValueProvider();
 
@@ -74,7 +74,7 @@ namespace Moq
 		{
 		}
 
-		public object ProvideDefault(Type type, Mock mock)
+		protected internal override object GetDefaultValueImpl(Type type, Mock mock)
 		{
 			return GetDefaultValue(type);
 		}

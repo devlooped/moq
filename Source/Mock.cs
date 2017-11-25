@@ -236,7 +236,7 @@ namespace Moq
 		/// have no setups and need to return a default
 		/// value (for loose mocks).
 		/// </summary>
-		internal abstract IDefaultValueProvider DefaultValueProvider { get; set; }
+		internal abstract DefaultValueProvider DefaultValueProvider { get; set; }
 
 		/// <summary>
 		/// Exposes the list of extra interfaces implemented by the mock.
@@ -1198,14 +1198,14 @@ namespace Moq
 			this.ConfiguredDefaultValues[typeof(TReturn)] = value;
 		}
 
-		internal object GetDefaultValue(MethodInfo method, IDefaultValueProvider useAlternateProvider = null)
+		internal object GetDefaultValue(MethodInfo method, DefaultValueProvider useAlternateProvider = null)
 		{
 			if (this.ConfiguredDefaultValues.TryGetValue(method.ReturnType, out object configuredDefaultValue))
 			{
 				return configuredDefaultValue;
 			}
 
-			var result = (useAlternateProvider ?? this.DefaultValueProvider).ProvideDefault(method.ReturnType, this);
+			var result = (useAlternateProvider ?? this.DefaultValueProvider).GetDefaultReturnValueImpl(method, this);
 
 			if (result is IMocked mockedResult)
 			{

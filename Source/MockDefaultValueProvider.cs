@@ -45,11 +45,11 @@ using System.Reflection;
 namespace Moq
 {
 	/// <summary>
-	/// A <see cref="IDefaultValueProvider"/> that returns an empty default value 
+	/// A <see cref="DefaultValueProvider"/> that returns an empty default value 
 	/// for non-mockeable types, and mocks for all other types (interfaces and 
 	/// non-sealed classes) that can be mocked.
 	/// </summary>
-	internal sealed class MockDefaultValueProvider : IDefaultValueProvider
+	internal sealed class MockDefaultValueProvider : DefaultValueProvider
 	{
 		public static MockDefaultValueProvider Instance { get; } = new MockDefaultValueProvider();
 
@@ -57,11 +57,11 @@ namespace Moq
 		{
 		}
 
-		DefaultValue IDefaultValueProvider.Kind => DefaultValue.Mock;
+		public override DefaultValue Kind => DefaultValue.Mock;
 
-		public object ProvideDefault(Type type, Mock mock)
+		protected internal override object GetDefaultValueImpl(Type type, Mock mock)
 		{
-			var emptyValue = EmptyDefaultValueProvider.Instance.ProvideDefault(type, mock);
+			var emptyValue = EmptyDefaultValueProvider.Instance.GetDefaultValueImpl(type, mock);
 			if (emptyValue != null)
 			{
 				return emptyValue;
