@@ -51,7 +51,7 @@ namespace Moq
 	/// Moq asks the mock's default value provider to produce a return value.
 	/// </summary>
 	public abstract class DefaultValueProvider
-    {
+	{
 		/// <summary>
 		/// Initializes a new instance of the <see cref="DefaultValueProvider"/> class.
 		/// </summary>
@@ -121,5 +121,5 @@ namespace Moq
 
 			return this.GetDefaultValue(method.ReturnType, mock);
 		}
-    }
+	}
 }

@@ -39,6 +39,7 @@
 // http://www.opensource.org/licenses/bsd-license.php]
 
 using System;
+using System.Collections.Generic;
 using System.Diagnostics;
 using System.Diagnostics.CodeAnalysis;
 using System.Linq;
@@ -62,6 +63,7 @@ namespace Moq
 	{
 		private static int serialNumberCounter = 0;
 		private T instance;
+		private Dictionary<Type, object> configuredDefaultValues;
 		private object[] constructorArguments;
 		private DefaultValueProvider defaultValueProvider;
 
@@ -116,6 +118,7 @@ namespace Moq
 			this.Name = GenerateMockName();
 
 			this.Behavior = behavior;
+			this.configuredDefaultValues = new Dictionary<Type, object>();
 			this.constructorArguments = args;
 			this.defaultValueProvider = EmptyDefaultValueProvider.Instance;
 			this.ImplementedInterfaces.AddRange(typeof(T).GetInterfaces().Where(i => (i.GetTypeInfo().IsPublic || i.GetTypeInfo().IsNestedPublic) && !i.GetTypeInfo().IsImport));
@@ -165,6 +168,8 @@ namespace Moq
 #endregion
 
 #region Properties
+
+		internal override Dictionary<Type, object> ConfiguredDefaultValues => this.configuredDefaultValues;
 
 		/// <summary>
 		/// Gets or sets the <see cref="DefaultValueProvider"/> instance that will be used

@@ -62,7 +62,6 @@ namespace Moq
 		internal static IProxyFactory ProxyFactory => CastleProxyFactory.Instance;
 
 		private bool isInitialized;
-		private Dictionary<Type, object> configuredDefaultValues;
 		private EventHandlerCollection eventHandlers;
 		private InvocationCollection invocations;
 		private SetupCollection setups;
@@ -71,7 +70,6 @@ namespace Moq
 		/// <include file='Mock.xdoc' path='docs/doc[@for="Mock.ctor"]/*'/>
 		protected Mock()
 		{
-			this.configuredDefaultValues = new Dictionary<Type, object>();
 			this.eventHandlers = new EventHandlerCollection();
 			this.ImplementedInterfaces = new List<Type>();
 			this.InnerMocks = new ConcurrentDictionary<MethodInfo, Mock>();
@@ -1188,7 +1186,7 @@ namespace Moq
 
 		#region Default Values
 
-		internal virtual Dictionary<Type, object> ConfiguredDefaultValues => this.configuredDefaultValues;
+		internal abstract Dictionary<Type, object> ConfiguredDefaultValues { get; }
 
 		/// <include file='Mock.Generic.xdoc' path='docs/doc[@for="Mock.SetReturnDefault{TReturn}"]/*'/>
 		public void SetReturnsDefault<TReturn>(TReturn value)
