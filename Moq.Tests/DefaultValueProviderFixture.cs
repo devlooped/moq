@@ -156,8 +156,6 @@ namespace Moq.Tests
 
 		private sealed class DefaultValueProviderStub : DefaultValueProvider
 		{
-			public override DefaultValue Kind => throw new NotImplementedException();
-
 			protected internal override object GetDefaultValueImpl(Type type, Mock mock)
 			{
 				return 42;

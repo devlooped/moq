@@ -20,7 +20,7 @@ namespace Moq
 			this.decorated = decorated;
 		}
 
-		public override DefaultValue Kind => this.decorated.Kind;
+		internal override DefaultValue Kind => this.decorated.Kind;
 
 		protected internal override object GetDefaultParameterValueImpl(ParameterInfo parameter, Mock mock)
 		{

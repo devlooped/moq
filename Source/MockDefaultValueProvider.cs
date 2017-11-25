@@ -57,7 +57,7 @@ namespace Moq
 		{
 		}
 
-		public override DefaultValue Kind => DefaultValue.Mock;
+		internal override DefaultValue Kind => DefaultValue.Mock;
 
 		protected internal override object GetDefaultValueImpl(Type type, Mock mock)
 		{

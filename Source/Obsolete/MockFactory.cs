@@ -187,7 +187,11 @@ namespace Moq
 			}
 		}
 
-		internal DefaultValueProvider DefaultValueProvider
+		/// <summary>
+		/// Gets or sets the <see cref="DefaultValueProvider"/> instance that will be used
+		/// e. g. to produce default return values for unexpected invocations.
+		/// </summary>
+		public DefaultValueProvider DefaultValueProvider
 		{
 			get => this.defaultValueProvider;
 			set => this.defaultValueProvider = value ?? throw new ArgumentNullException(nameof(value));

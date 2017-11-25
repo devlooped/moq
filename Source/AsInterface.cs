@@ -82,7 +82,7 @@ namespace Moq
 			set { this.owner.CallBase = value; }
 		}
 
-		internal override DefaultValueProvider DefaultValueProvider
+		public override DefaultValueProvider DefaultValueProvider
 		{
 			get => this.owner.DefaultValueProvider;
 			set => this.owner.DefaultValueProvider = value;

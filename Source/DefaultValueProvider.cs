@@ -50,7 +50,7 @@ namespace Moq
 	/// In other words, whenever there is no setup that would determine the return value for a particular invocation,
 	/// Moq asks the mock's default value provider to produce a return value.
 	/// </summary>
-	internal abstract class DefaultValueProvider
+	public abstract class DefaultValueProvider
     {
 		/// <summary>
 		/// Initializes a new instance of the <see cref="DefaultValueProvider"/> class.
@@ -61,9 +61,9 @@ namespace Moq
 
 		/// <summary>
 		/// Gets the <see cref="DefaultValue"/> enumeration value that corresponds to this default value provider.
-		/// Must be overridden in derived classes.
+		/// Must be overridden by Moq's internal providers that have their own corresponding <see cref="DefaultValue"/>.
 		/// </summary>
-		public abstract DefaultValue Kind { get; }
+		internal virtual DefaultValue Kind => DefaultValue.Custom;
 
 		/// <summary>
 		/// Produces a default value of the specified type.

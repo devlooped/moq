@@ -231,12 +231,10 @@ namespace Moq
 		internal abstract bool IsDelegateMock { get; }
 
 		/// <summary>
-		/// Specifies the class that will determine the default
-		/// value to return when invocations are made that
-		/// have no setups and need to return a default
-		/// value (for loose mocks).
+		/// Gets or sets the <see cref="DefaultValueProvider"/> instance that will be used
+		/// e. g. to produce default return values for unexpected invocations.
 		/// </summary>
-		internal abstract DefaultValueProvider DefaultValueProvider { get; set; }
+		public abstract DefaultValueProvider DefaultValueProvider { get; set; }
 
 		/// <summary>
 		/// Exposes the list of extra interfaces implemented by the mock.
