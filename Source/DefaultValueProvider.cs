@@ -67,133 +67,59 @@ namespace Moq
 
 		/// <summary>
 		/// Produces a default value of the specified type.
-		/// </summary>
-		/// <param name="type">The <see cref="Type"/> of the requested default value.</param>
-		/// <param name="mock">The <see cref="Mock"/> on which an unexpected invocation has occurred.</param>
-		public object GetDefaultValue(Type type, Mock mock)
-		{
-			if (type == null)
-			{
-				throw new ArgumentNullException(nameof(type));
-			}
-
-			if (type == typeof(void))
-			{
-				throw new ArgumentOutOfRangeException(nameof(type));
-			}
-
-			if (mock == null)
-			{
-				throw new ArgumentNullException(nameof(mock));
-			}
-
-			return this.GetDefaultValueImpl(type, mock);
-		}
-
-		/// <summary>
-		/// Produces a default argument value for the specified method parameter.
-		/// </summary>
-		/// <param name="parameter">The <see cref="ParameterInfo"/> describing the method parameter for which a default argument value should be produced.</param>
-		/// <param name="mock">The <see cref="Mock"/> on which an unexpected invocation has occurred.</param>
-		public object GetDefaultParameterValue(ParameterInfo parameter, Mock mock)
-		{
-			if (parameter == null)
-			{
-				throw new ArgumentNullException(nameof(parameter));
-			}
-
-			Debug.Assert(parameter.ParameterType != null);
-
-			if (parameter.ParameterType == typeof(void))
-			{
-				throw new ArgumentOutOfRangeException(nameof(parameter));
-			}
-
-			if (mock == null)
-			{
-				throw new ArgumentNullException(nameof(mock));
-			}
-
-			return this.GetDefaultParameterValueImpl(parameter, mock);
-		}
-
-		/// <summary>
-		/// Produces a default return value for the specified method.
-		/// </summary>
-		/// <param name="method">The <see cref="MethodInfo"/> describing the method for which a default return value should be produced.</param>
-		/// <param name="mock">The <see cref="Mock"/> on which an unexpected invocation has occurred.</param>
-		public object GetDefaultReturnValue(MethodInfo method, Mock mock)
-		{
-			if (method == null)
-			{
-				throw new ArgumentNullException(nameof(method));
-			}
-
-			Debug.Assert(method.ReturnType != null);
-
-			if (method.ReturnType == typeof(void))
-			{
-				throw new ArgumentOutOfRangeException(nameof(method));
-			}
-
-			if (mock == null)
-			{
-				throw new ArgumentNullException(nameof(mock));
-			}
-
-			return this.GetDefaultReturnValueImpl(method, mock);
-		}
-
-		/// <summary>
-		/// Produces a default value of the specified type.
 		/// Must be overridden in derived classes.
 		/// </summary>
 		/// <param name="type">The <see cref="Type"/> of the requested default value.</param>
 		/// <param name="mock">The <see cref="Mock"/> on which an unexpected invocation has occurred.</param>
 		/// <remarks>
-		/// This method gets called e. g. by <see cref="GetDefaultValue"/> after all parameters have been validated.
-		/// All parameters may be assumed to have valid, non-<see langword="null"/>, non-<see langword="void"/> values.
+		/// Implementations may assume that all parameters have valid, non-<see langword="null"/>, non-<see langword="void"/> values.
 		/// </remarks>
-		protected internal abstract object GetDefaultValueImpl(Type type, Mock mock);
+		protected internal abstract object GetDefaultValue(Type type, Mock mock);
 
 		/// <summary>
-		/// Produces a default argument value for the specified method parameter.
-		/// May be overridden in derived classes.
-		/// By default, this method will delegate to <see cref="GetDefaultValueImpl"/>.
+		///   <para>
+		///     Produces a default argument value for the specified method parameter.
+		///     May be overridden in derived classes.
+		///   </para>
+		///   <para>
+		///     By default, this method will delegate to <see cref="GetDefaultValue"/>.
+		///   </para>
 		/// </summary>
 		/// <param name="parameter">The <see cref="ParameterInfo"/> describing the method parameter for which a default argument value should be produced.</param>
 		/// <param name="mock">The <see cref="Mock"/> on which an unexpected invocation has occurred.</param>
 		/// <remarks>
-		/// This method gets called e. g. by <see cref="GetDefaultParameterValue"/> after all parameters have been validated.
-		/// All parameters may be assumed to have valid, non-<see langword="null"/>, non-<see langword="void"/> values.
+		/// Implementations may assume that all parameters have valid, non-<see langword="null"/>, non-<see langword="void"/> values.
 		/// </remarks>
-		protected internal virtual object GetDefaultParameterValueImpl(ParameterInfo parameter, Mock mock)
+		protected internal virtual object GetDefaultParameterValue(ParameterInfo parameter, Mock mock)
 		{
 			Debug.Assert(parameter != null);
 			Debug.Assert(parameter.ParameterType != typeof(void));
 			Debug.Assert(mock != null);
 
-			return this.GetDefaultValueImpl(parameter.ParameterType, mock);
+			return this.GetDefaultValue(parameter.ParameterType, mock);
 		}
 
 		/// <summary>
-		/// Produces a default return value for the specified method.
-		/// May be overridden in derived classes.
-		/// By default, this method will delegate to <see cref="GetDefaultValueImpl"/>.
+		///   <para>
+		///     Produces a default return value for the specified method.
+		///     May be overridden in derived classes.
+		///   </para>
+		///   <para>
+		///     By default, this method will delegate to <see cref="GetDefaultValue"/>.
+		///   </para>
 		/// </summary>
 		/// <param name="method">The <see cref="MethodInfo"/> describing the method for which a default return value should be produced.</param>
 		/// <param name="mock">The <see cref="Mock"/> on which an unexpected invocation has occurred.</param>
 		/// <remarks>
-		/// This method gets called e. g. by <see cref="GetDefaultReturnValue"/> after all parameters have been validated.
-		/// All parameters may be assumed to have valid, non-<see langword="null"/>, non-<see langword="void"/> values.
+		/// Implementations may assume that all parameters have valid, non-<see langword="null"/>, non-<see langword="void"/> values.
 		/// </remarks>
-		protected internal virtual object GetDefaultReturnValueImpl(MethodInfo method, Mock mock)
+		protected internal virtual object GetDefaultReturnValue(MethodInfo method, Mock mock)
 		{
 			Debug.Assert(method != null);
 			Debug.Assert(method.ReturnType != typeof(void));
 			Debug.Assert(mock != null);
 
-			return this.GetDefaultValueImpl(method.ReturnType, mock);
+			return this.GetDefaultValue(method.ReturnType, mock);
 		}
     }
 }

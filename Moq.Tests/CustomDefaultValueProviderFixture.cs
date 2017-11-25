@@ -105,7 +105,7 @@ namespace Moq.Tests
 				this.value = value;
 			}
 
-			protected internal override object GetDefaultValueImpl(Type type, Mock mock)
+			protected internal override object GetDefaultValue(Type type, Mock mock)
 			{
 				return this.value;
 			}

@@ -1198,12 +1198,16 @@ namespace Moq
 
 		internal object GetDefaultValue(MethodInfo method, DefaultValueProvider useAlternateProvider = null)
 		{
+			Debug.Assert(method != null);
+			Debug.Assert(method.ReturnType != null);
+			Debug.Assert(method.ReturnType != typeof(void));
+
 			if (this.ConfiguredDefaultValues.TryGetValue(method.ReturnType, out object configuredDefaultValue))
 			{
 				return configuredDefaultValue;
 			}
 
-			var result = (useAlternateProvider ?? this.DefaultValueProvider).GetDefaultReturnValueImpl(method, this);
+			var result = (useAlternateProvider ?? this.DefaultValueProvider).GetDefaultReturnValue(method, this);
 
 			if (result is IMocked mockedResult)
 			{

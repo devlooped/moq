@@ -1,6 +1,7 @@
 ﻿#if FEATURE_SERIALIZATION
 
 using System;
+using System.Diagnostics;
 using System.Reflection;
 using System.Runtime.Serialization;
 
@@ -22,25 +23,39 @@ namespace Moq
 
 		internal override DefaultValue Kind => this.decorated.Kind;
 
-		protected internal override object GetDefaultParameterValueImpl(ParameterInfo parameter, Mock mock)
+		protected internal override object GetDefaultParameterValue(ParameterInfo parameter, Mock mock)
 		{
+			Debug.Assert(parameter != null);
+			Debug.Assert(parameter.ParameterType != null);
+			Debug.Assert(parameter.ParameterType != typeof(void));
+			Debug.Assert(mock != null);
+
 			return IsSerializableWithIncorrectImplementationForISerializable(parameter.ParameterType)
-				? EmptyDefaultValueProvider.Instance.GetDefaultParameterValueImpl(parameter, mock)
-				: decorated.GetDefaultParameterValueImpl(parameter, mock);
+				? EmptyDefaultValueProvider.Instance.GetDefaultParameterValue(parameter, mock)
+				: decorated.GetDefaultParameterValue(parameter, mock);
 		}
 
-		protected internal override object GetDefaultReturnValueImpl(MethodInfo method, Mock mock)
+		protected internal override object GetDefaultReturnValue(MethodInfo method, Mock mock)
 		{
+			Debug.Assert(method != null);
+			Debug.Assert(method.ReturnType != null);
+			Debug.Assert(method.ReturnType != typeof(void));
+			Debug.Assert(mock != null);
+
 			return IsSerializableWithIncorrectImplementationForISerializable(method.ReturnType)
-				? EmptyDefaultValueProvider.Instance.GetDefaultReturnValueImpl(method, mock)
-				: decorated.GetDefaultReturnValueImpl(method, mock);
+				? EmptyDefaultValueProvider.Instance.GetDefaultReturnValue(method, mock)
+				: decorated.GetDefaultReturnValue(method, mock);
 		}
 
-		protected internal override object GetDefaultValueImpl(Type type, Mock mock)
+		protected internal override object GetDefaultValue(Type type, Mock mock)
 		{
+			Debug.Assert(type != null);
+			Debug.Assert(type != typeof(void));
+			Debug.Assert(mock != null);
+
 			return IsSerializableWithIncorrectImplementationForISerializable(type)
-				? EmptyDefaultValueProvider.Instance.GetDefaultValueImpl(type, mock)
-				: decorated.GetDefaultValueImpl(type, mock);
+				? EmptyDefaultValueProvider.Instance.GetDefaultValue(type, mock)
+				: decorated.GetDefaultValue(type, mock);
 		}
 
 		private static bool IsSerializableWithIncorrectImplementationForISerializable(Type typeToMock)

@@ -59,9 +59,13 @@ namespace Moq
 
 		internal override DefaultValue Kind => DefaultValue.Mock;
 
-		protected internal override object GetDefaultValueImpl(Type type, Mock mock)
+		protected internal override object GetDefaultValue(Type type, Mock mock)
 		{
-			var emptyValue = EmptyDefaultValueProvider.Instance.GetDefaultValueImpl(type, mock);
+			Debug.Assert(type != null);
+			Debug.Assert(type != typeof(void));
+			Debug.Assert(mock != null);
+
+			var emptyValue = EmptyDefaultValueProvider.Instance.GetDefaultValue(type, mock);
 			if (emptyValue != null)
 			{
 				return emptyValue;

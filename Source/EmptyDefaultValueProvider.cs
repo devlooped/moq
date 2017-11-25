@@ -41,6 +41,7 @@
 using System;
 using System.Collections;
 using System.Collections.Generic;
+using System.Diagnostics;
 using System.Linq;
 using System.Reflection;
 using System.Threading.Tasks;
@@ -74,8 +75,12 @@ namespace Moq
 		{
 		}
 
-		protected internal override object GetDefaultValueImpl(Type type, Mock mock)
+		protected internal override object GetDefaultValue(Type type, Mock mock)
 		{
+			Debug.Assert(type != null);
+			Debug.Assert(type != typeof(void));
+			Debug.Assert(mock != null);
+
 			return GetDefaultValue(type);
 		}
 
