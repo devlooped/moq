@@ -38,81 +38,36 @@
 //[This is the BSD license, see
 // http://www.opensource.org/licenses/bsd-license.php]
 
-using System;
-using System.Collections.Concurrent;
-using System.Collections.Generic;
-using System.Reflection;
+using System.Threading.Tasks;
 
 namespace Moq
 {
-	internal class AsInterface<TInterface> : Mock<TInterface>
-		where TInterface : class
+	/// <summary>
+	///   <para>
+	///     Helper type required for <see cref="MockDefaultValueProvider"/> to efficiently support <see cref="Task{TResult}"/> and
+	///     <see cref="ValueTask{TResult}"/>.
+	///   </para>
+	/// </summary>
+	/// <remarks>
+	///   <para>
+	///     Mocking a type, then wrapping it in a task inside <see cref="MockDefaultValueProvider"/>, then unwrapping the task
+	///     to get at the mock so it can be stored in <see cref="Mock.InnerMocks"/>, then wrapping it again each time a return
+	///     value is created (e. g. in <see cref="HandleMockRecursion"/>) is a lot of work.
+	///   </para>
+	///   <para>
+	///     What we do instead is to hold the actual mock and the "wrapped" mocked object (used for return values) side by side
+	///     to avoid the repeated wrapping and unwrapping.
+	///   </para>
+	/// </remarks>
+	internal struct MockWithWrappedMockObject
 	{
-		private Mock owner;
+		public Mock Mock;
+		public object WrappedMockObject;
 
-		public AsInterface(Mock owner)
-			: base(true)
+		public MockWithWrappedMockObject(Mock mock, object wrappedMockObject)
 		{
-			this.owner = owner;
-		}
-
-		internal override Dictionary<Type, object> ConfiguredDefaultValues => this.owner.ConfiguredDefaultValues;
-
-		internal override ConcurrentDictionary<MethodInfo, MockWithWrappedMockObject> InnerMocks
-		{
-			get { return this.owner.InnerMocks; }
-		}
-
-		internal override InvocationCollection Invocations => this.owner.Invocations;
-
-		internal override Type MockedType
-		{
-			get { return typeof(TInterface); }
-		}
-
-		public override MockBehavior Behavior
-		{
-			get { return this.owner.Behavior; }
-			internal set { this.owner.Behavior = value; }
-		}
-
-		public override bool CallBase
-		{
-			get { return this.owner.CallBase; }
-			set { this.owner.CallBase = value; }
-		}
-
-		public override DefaultValueProvider DefaultValueProvider
-		{
-			get => this.owner.DefaultValueProvider;
-			set => this.owner.DefaultValueProvider = value;
-		}
-
-		internal override EventHandlerCollection EventHandlers => this.owner.EventHandlers;
-
-		public override TInterface Object
-		{
-			get { return this.owner.Object as TInterface; }
-		}
-
-		internal override SetupCollection Setups => this.owner.Setups;
-
-		public override Switches Switches
-		{
-			get => this.owner.Switches;
-			set => this.owner.Switches = value;
-		}
-
-		internal override Type TargetType => this.owner.TargetType;
-
-		public override Mock<TNewInterface> As<TNewInterface>()
-		{
-			return this.owner.As<TNewInterface>();
-		}
-
-		protected override object OnGetObject()
-		{
-			return this.owner.Object;
+			this.Mock = mock;
+			this.WrappedMockObject = wrappedMockObject;
 		}
 	}
 }

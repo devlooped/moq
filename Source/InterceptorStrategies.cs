@@ -153,10 +153,10 @@ namespace Moq
 
 			if (invocation.Method.ReturnType != typeof(void))
 			{
-				Mock recursiveMock;
+				MockWithWrappedMockObject recursiveMock;
 				if (mock.InnerMocks.TryGetValue(invocation.Method, out recursiveMock))
 				{
-					invocation.ReturnValue = recursiveMock.Object;
+					invocation.ReturnValue = recursiveMock.WrappedMockObject;
 				}
 				else
 				{

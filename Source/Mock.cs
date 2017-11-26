@@ -48,6 +48,7 @@ using System.Linq;
 using System.Linq.Expressions;
 using System.Reflection;
 using System.Runtime.CompilerServices;
+using System.Threading.Tasks;
 
 using Moq.Diagnostics.Errors;
 using Moq.Language.Flow;
@@ -72,7 +73,7 @@ namespace Moq
 		{
 			this.eventHandlers = new EventHandlerCollection();
 			this.ImplementedInterfaces = new List<Type>();
-			this.InnerMocks = new ConcurrentDictionary<MethodInfo, Mock>();
+			this.InnerMocks = new ConcurrentDictionary<MethodInfo, MockWithWrappedMockObject>();
 			this.invocations = new InvocationCollection();
 			this.setups = new SetupCollection();
 			this.switches = Switches.Default;
@@ -200,7 +201,7 @@ namespace Moq
 			return value;
 		}
 
-		internal virtual ConcurrentDictionary<MethodInfo, Mock> InnerMocks { get; private set; }
+		internal virtual ConcurrentDictionary<MethodInfo, MockWithWrappedMockObject> InnerMocks { get; private set; }
 
 		internal virtual InvocationCollection Invocations => this.invocations;
 
@@ -281,7 +282,7 @@ namespace Moq
 
 			foreach (var inner in this.InnerMocks.Values)
 			{
-				if (!inner.TryVerify(out error))
+				if (!inner.Mock.TryVerify(out error))
 				{
 					return false;
 				}
@@ -311,7 +312,7 @@ namespace Moq
 
 			foreach (var inner in this.InnerMocks.Values)
 			{
-				if (!inner.TryVerifyAll(out error))
+				if (!inner.Mock.TryVerifyAll(out error))
 				{
 					return false;
 				}
@@ -1206,8 +1207,9 @@ namespace Moq
 			}
 
 			var result = (useAlternateProvider ?? this.DefaultValueProvider).GetDefaultReturnValue(method, this);
+			var unwrappedResult = TryUnwrapResultFromCompletedTaskRecursively(result);
 
-			if (result is IMocked mockedResult)
+			if (unwrappedResult is IMocked unwrappedMockedResult)
 			{
 				// TODO: Perhaps the following `InnerMocks` update isn't in quite the right place yet.
 				// There are two main places in Moq where `InnerMocks` are used: `Mock<T>.FluentMock` and
@@ -1217,10 +1219,38 @@ namespace Moq
 				// code locations and therefore non-atomic. It would be good if those could be combined
 				// (`InnerMocks.GetOrAdd`), but that might not be easily possible since `InnerMocks` is
 				// only mocks while default value providers can also return plain, unmocked values.
-				this.InnerMocks.TryAdd(method, mockedResult.Mock);
+				this.InnerMocks.TryAdd(method, new MockWithWrappedMockObject(unwrappedMockedResult.Mock, result));
 			}
 
 			return result;
+		}
+
+		/// <summary>
+		/// Recursively unwraps the result from completed <see cref="Task{TResult}"/> or <see cref="ValueTask{TResult}"/> instances.
+		/// If the given value is not a task, the value itself is returned.
+		/// </summary>
+		/// <param name="obj">The value to be unwrapped.</param>
+		private static object TryUnwrapResultFromCompletedTaskRecursively(object obj)
+		{
+			if (obj != null)
+			{
+				var objType = obj.GetType();
+				if (objType.GetTypeInfo().IsGenericType)
+				{
+					var genericTypeDefinition = objType.GetGenericTypeDefinition();
+					if (genericTypeDefinition == typeof(Task<>) || genericTypeDefinition == typeof(ValueTask<>))
+					{
+						var isCompleted = (bool)objType.GetProperty("IsCompleted").GetValue(obj, null);
+						if (isCompleted)
+						{
+							var innerObj = objType.GetProperty("Result").GetValue(obj, null);
+							return TryUnwrapResultFromCompletedTaskRecursively(innerObj);
+						}
+					}
+				}
+			}
+
+			return obj;
 		}
 
 		#endregion
