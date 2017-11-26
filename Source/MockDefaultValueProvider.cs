@@ -39,8 +39,10 @@
 // http://www.opensource.org/licenses/bsd-license.php]
 
 using System;
+using System.Collections.Generic;
 using System.Diagnostics;
 using System.Reflection;
+using System.Threading.Tasks;
 
 namespace Moq
 {
@@ -53,8 +55,15 @@ namespace Moq
 	{
 		public static MockDefaultValueProvider Instance { get; } = new MockDefaultValueProvider();
 
+		private Dictionary<Type, Func<Type, Mock, object>> factories;
+
 		private MockDefaultValueProvider()
 		{
+			this.factories = new Dictionary<Type, Func<Type, Mock, object>>()
+			{
+				[typeof(Task<>)] = CreateTaskOf,
+				[typeof(ValueTask<>)] = CreateValueTaskOf,
+			};
 		}
 
 		internal override DefaultValue Kind => DefaultValue.Mock;
@@ -64,6 +73,14 @@ namespace Moq
 			Debug.Assert(type != null);
 			Debug.Assert(type != typeof(void));
 			Debug.Assert(mock != null);
+
+			Type factoryKey = type.GetTypeInfo().IsGenericType ? type.GetGenericTypeDefinition()
+			                : type;
+
+			if (factories.TryGetValue(factoryKey, out Func<Type, Mock, object> factory))
+			{
+				return factory.Invoke(type, mock);
+			}
 
 			var emptyValue = EmptyDefaultValueProvider.Instance.GetDefaultValue(type, mock);
 			if (emptyValue != null)
@@ -84,6 +101,28 @@ namespace Moq
 			{
 				return null;
 			}
+		}
+
+		private object CreateTaskOf(Type type, Mock mock)
+		{
+			var resultType = type.GetGenericArguments()[0];
+			var result = this.GetDefaultValue(resultType, mock);
+
+			var tcsType = typeof(TaskCompletionSource<>).MakeGenericType(resultType);
+			var tcs = Activator.CreateInstance(tcsType);
+			tcsType.GetMethod("SetResult").Invoke(tcs, new[] { result });
+			return tcsType.GetProperty("Task").GetValue(tcs, null);
+		}
+
+		private object CreateValueTaskOf(Type type, Mock mock)
+		{
+			var resultType = type.GetGenericArguments()[0];
+			var result = this.GetDefaultValue(resultType, mock);
+
+			// `Activator.CreateInstance` could throw an `AmbiguousMatchException` in this use case,
+			// so we're explicitly selecting and calling the constructor we want to use:
+			var valueTaskCtor = type.GetConstructor(new[] { resultType });
+			return valueTaskCtor.Invoke(new object[] { result });
 		}
 	}
 }
