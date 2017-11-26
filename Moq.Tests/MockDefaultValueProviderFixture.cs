@@ -217,6 +217,32 @@ namespace Moq.Tests
 			Assert.True(task.Result.Result is IMocked);
 		}
 
+		[Fact]
+		public async Task Mock_wrapped_in_completed_Task_gets_included_in_verification_of_outer_mock()
+		{
+			var mock = new Mock<IFoo>() { DefaultValue = DefaultValue.Mock };
+
+			var bar = await mock.Object.TaskOfMockableType;
+			var barMock = Mock.Get(bar);
+			barMock.Setup(b => b.Do()).Verifiable();
+
+			var ex = Assert.Throws<MockException>(() => mock.Verify());
+			Assert.True(ex.IsVerificationError);
+		}
+
+		[Fact]
+		public async Task Mock_wrapped_in_completed_ValueTask_gets_included_in_verification_of_outer_mock()
+		{
+			var mock = new Mock<IFoo>() { DefaultValue = DefaultValue.Mock };
+
+			var bar = await mock.Object.ValueTaskOfMockableType;
+			var barMock = Mock.Get(bar);
+			barMock.Setup(b => b.Do()).Verifiable();
+
+			var ex = Assert.Throws<MockException>(() => mock.Verify());
+			Assert.True(ex.IsVerificationError);
+		}
+
 		private static object GetDefaultValueForProperty(string propertyName, Mock<IFoo> mock)
 		{
 			var propertyGetter = typeof(IFoo).GetProperty(propertyName).GetGetMethod();
