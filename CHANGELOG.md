@@ -16,6 +16,7 @@ The format is loosely based on [Keep a Changelog](http://keepachangelog.com/en/1
 * Support for `ValueTask<TResult>` when using the `ReturnsAsync` extension methods, similar to `Task<TResult>` (@AdamDotNet, #506)
 * Special handling for `ValueTask<TResult>` with `DefaultValue.Empty` (@stakx, #529)
 * Support for custom default value generators (besides `DefaultValue.Empty` and `DefaultValue.Mock`): subclass the new `DefaultValueProvider` and set up via `Mock[Repository].DefaultValueProvider` (@stakx, #533)
+* Allow `DefaultValue.Mock` to mock `Task<TMockable>` and `ValueTask<TMockable>` (@stakx, #502)
 
 #### Changed
 
