@@ -53,6 +53,18 @@ namespace Moq
 	public abstract class DefaultValueProvider
 	{
 		/// <summary>
+		/// Gets the <see cref="DefaultValueProvider"/> corresponding to <see cref="DefaultValue.Empty"/>;
+		/// that is, a default value provider returning "empty" values e. g. for collection types.
+		/// </summary>
+		public static DefaultValueProvider Empty { get; } = new EmptyDefaultValueProvider();
+
+		/// <summary>
+		/// Gets the <see cref="DefaultValueProvider"/> corresponding to <see cref="DefaultValue.Mock"/>;
+		/// that is, a default value provider returning mocked objects or "empty" values for unmockable types.
+		/// </summary>
+		public static DefaultValueProvider Mock { get; } = new MockDefaultValueProvider();
+
+		/// <summary>
 		/// Initializes a new instance of the <see cref="DefaultValueProvider"/> class.
 		/// </summary>
 		protected DefaultValueProvider()
@@ -70,7 +82,7 @@ namespace Moq
 		/// Must be overridden in derived classes.
 		/// </summary>
 		/// <param name="type">The <see cref="Type"/> of the requested default value.</param>
-		/// <param name="mock">The <see cref="Mock"/> on which an unexpected invocation has occurred.</param>
+		/// <param name="mock">The <see cref="Moq.Mock"/> on which an unexpected invocation has occurred.</param>
 		/// <remarks>
 		/// Implementations may assume that all parameters have valid, non-<see langword="null"/>, non-<see langword="void"/> values.
 		/// </remarks>
@@ -86,7 +98,7 @@ namespace Moq
 		///   </para>
 		/// </summary>
 		/// <param name="parameter">The <see cref="ParameterInfo"/> describing the method parameter for which a default argument value should be produced.</param>
-		/// <param name="mock">The <see cref="Mock"/> on which an unexpected invocation has occurred.</param>
+		/// <param name="mock">The <see cref="Moq.Mock"/> on which an unexpected invocation has occurred.</param>
 		/// <remarks>
 		/// Implementations may assume that all parameters have valid, non-<see langword="null"/>, non-<see langword="void"/> values.
 		/// </remarks>
@@ -109,7 +121,7 @@ namespace Moq
 		///   </para>
 		/// </summary>
 		/// <param name="method">The <see cref="MethodInfo"/> describing the method for which a default return value should be produced.</param>
-		/// <param name="mock">The <see cref="Mock"/> on which an unexpected invocation has occurred.</param>
+		/// <param name="mock">The <see cref="Moq.Mock"/> on which an unexpected invocation has occurred.</param>
 		/// <remarks>
 		/// Implementations may assume that all parameters have valid, non-<see langword="null"/>, non-<see langword="void"/> values.
 		/// </remarks>

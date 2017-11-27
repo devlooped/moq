@@ -207,7 +207,7 @@ namespace Moq
 			}
 			else
 			{
-				fluentMock = ((IMocked)mock.GetDefaultValue(info, useAlternateProvider: MockDefaultValueProvider.Instance)).Mock;
+				fluentMock = ((IMocked)mock.GetDefaultValue(info, useAlternateProvider: DefaultValueProvider.Mock)).Mock;
 				Mock.SetupAllProperties(fluentMock);
 
 				innerMock = new MockWithWrappedMockObject(fluentMock, fluentMock.Object);

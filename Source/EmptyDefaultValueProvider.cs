@@ -67,13 +67,11 @@ namespace Moq
 			[typeof(ValueTask<>)] = CreateValueTaskOf,
 		};
 
-		internal override DefaultValue Kind => DefaultValue.Empty;
-
-		public static EmptyDefaultValueProvider Instance { get; } = new EmptyDefaultValueProvider();
-
-		private EmptyDefaultValueProvider()
+		internal EmptyDefaultValueProvider()
 		{
 		}
+
+		internal override DefaultValue Kind => DefaultValue.Empty;
 
 		protected internal override object GetDefaultValue(Type type, Mock mock)
 		{
