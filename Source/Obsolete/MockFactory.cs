@@ -149,7 +149,7 @@ namespace Moq
 		public MockFactory(MockBehavior defaultBehavior)
 		{
 			this.defaultBehavior = defaultBehavior;
-			this.defaultValueProvider = EmptyDefaultValueProvider.Instance;
+			this.defaultValueProvider = DefaultValueProvider.Empty;
 			this.switches = Switches.Default;
 		}
 
@@ -174,11 +174,11 @@ namespace Moq
 				switch (value)
 				{
 					case DefaultValue.Empty:
-						this.DefaultValueProvider = EmptyDefaultValueProvider.Instance;
+						this.DefaultValueProvider = DefaultValueProvider.Empty;
 						return;
 
 					case DefaultValue.Mock:
-						this.DefaultValueProvider = MockDefaultValueProvider.Instance;
+						this.DefaultValueProvider = DefaultValueProvider.Mock;
 						return;
 
 					default:

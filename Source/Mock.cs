@@ -171,11 +171,11 @@ namespace Moq
 				switch (value)
 				{
 					case DefaultValue.Empty:
-						this.DefaultValueProvider = EmptyDefaultValueProvider.Instance;
+						this.DefaultValueProvider = DefaultValueProvider.Empty;
 						return;
 
 					case DefaultValue.Mock:
-						this.DefaultValueProvider = MockDefaultValueProvider.Instance;
+						this.DefaultValueProvider = DefaultValueProvider.Mock;
 						return;
 
 					default:
@@ -858,7 +858,7 @@ namespace Moq
 			if (mockedTypesStack.Contains(property.PropertyType))
 			{
 				// to deal with loops in the property graph
-				valueProvider = EmptyDefaultValueProvider.Instance;
+				valueProvider = DefaultValueProvider.Empty;
 			}
 #if FEATURE_SERIALIZATION
 			else

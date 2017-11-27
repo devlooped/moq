@@ -120,7 +120,7 @@ namespace Moq
 			this.Behavior = behavior;
 			this.configuredDefaultValues = new Dictionary<Type, object>();
 			this.constructorArguments = args;
-			this.defaultValueProvider = EmptyDefaultValueProvider.Instance;
+			this.defaultValueProvider = DefaultValueProvider.Empty;
 			this.ImplementedInterfaces.AddRange(typeof(T).GetInterfaces().Where(i => (i.GetTypeInfo().IsPublic || i.GetTypeInfo().IsNestedPublic) && !i.GetTypeInfo().IsImport));
 			this.ImplementedInterfaces.Add(typeof(IMocked<T>));
 			this.InternallyImplementedInterfaceCount = this.ImplementedInterfaces.Count;

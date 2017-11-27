@@ -53,11 +53,9 @@ namespace Moq
 	/// </summary>
 	internal sealed class MockDefaultValueProvider : DefaultValueProvider
 	{
-		public static MockDefaultValueProvider Instance { get; } = new MockDefaultValueProvider();
-
 		private Dictionary<Type, Func<Type, Mock, object>> factories;
 
-		private MockDefaultValueProvider()
+		internal MockDefaultValueProvider()
 		{
 			this.factories = new Dictionary<Type, Func<Type, Mock, object>>()
 			{
@@ -82,7 +80,7 @@ namespace Moq
 				return factory.Invoke(type, mock);
 			}
 
-			var emptyValue = EmptyDefaultValueProvider.Instance.GetDefaultValue(type, mock);
+			var emptyValue = DefaultValueProvider.Empty.GetDefaultValue(type, mock);
 			if (emptyValue != null)
 			{
 				return emptyValue;

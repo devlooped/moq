@@ -31,7 +31,7 @@ namespace Moq
 			Debug.Assert(mock != null);
 
 			return IsSerializableWithIncorrectImplementationForISerializable(parameter.ParameterType)
-				? EmptyDefaultValueProvider.Instance.GetDefaultParameterValue(parameter, mock)
+				? DefaultValueProvider.Empty.GetDefaultParameterValue(parameter, mock)
 				: decorated.GetDefaultParameterValue(parameter, mock);
 		}
 
@@ -43,7 +43,7 @@ namespace Moq
 			Debug.Assert(mock != null);
 
 			return IsSerializableWithIncorrectImplementationForISerializable(method.ReturnType)
-				? EmptyDefaultValueProvider.Instance.GetDefaultReturnValue(method, mock)
+				? DefaultValueProvider.Empty.GetDefaultReturnValue(method, mock)
 				: decorated.GetDefaultReturnValue(method, mock);
 		}
 
@@ -54,7 +54,7 @@ namespace Moq
 			Debug.Assert(mock != null);
 
 			return IsSerializableWithIncorrectImplementationForISerializable(type)
-				? EmptyDefaultValueProvider.Instance.GetDefaultValue(type, mock)
+				? DefaultValueProvider.Empty.GetDefaultValue(type, mock)
 				: decorated.GetDefaultValue(type, mock);
 		}
 
