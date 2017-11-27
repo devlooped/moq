@@ -84,27 +84,15 @@ namespace Moq
 
 		private static object GetDefaultValue(Type type)
 		{
-			return type.GetTypeInfo().IsValueType ? GetValueTypeDefault(type) : GetReferenceTypeDefault(type);
-		}
+			var typeInfo = type.GetTypeInfo();
 
-		private static object GetReferenceTypeDefault(Type type)
-		{
-			Type factoryKey;
+			Type factoryKey = typeInfo.IsGenericType ? type.GetGenericTypeDefinition()
+			                : type.IsArray ? typeof(Array)
+			                : type;
 
-			if (type.IsArray)
-			{
-				factoryKey = typeof(Array);
-			}
-			else if (type.GetTypeInfo().IsGenericType)
-			{
-				factoryKey = type.GetGenericTypeDefinition();
-			}
-			else
-			{
-				factoryKey = type;
-			}
-
-			return factories.TryGetValue(factoryKey, out Func<Type, object> factory) ? factory.Invoke(type) : null;
+			return factories.TryGetValue(factoryKey, out Func<Type, object> factory) ? factory.Invoke(type)
+			     : typeInfo.IsValueType ? Activator.CreateInstance(type)
+			     : null;
 		}
 
 		private static object CreateArray(Type type)
@@ -166,22 +154,6 @@ namespace Moq
 			// so we're explicitly selecting and calling the constructor we want to use:
 			var valueTaskCtor = type.GetConstructor(new[] { resultType });
 			return valueTaskCtor.Invoke(new object[] { result });
-		}
-
-		private static object GetValueTypeDefault(Type type)
-		{
-			Type factoryKey;
-
-			if (type.GetTypeInfo().IsGenericType)
-			{
-				factoryKey = type.GetGenericTypeDefinition();
-			}
-			else
-			{
-				factoryKey = type;
-			}
-
-			return factories.TryGetValue(factoryKey, out Func<Type, object> factory) ? factory.Invoke(type) : Activator.CreateInstance(type);
 		}
 	}
 }
