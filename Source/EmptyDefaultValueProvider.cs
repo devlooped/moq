@@ -41,10 +41,8 @@
 using System;
 using System.Collections;
 using System.Collections.Generic;
-using System.Diagnostics;
 using System.Linq;
 using System.Reflection;
-using System.Threading.Tasks;
 
 namespace Moq
 {
@@ -53,72 +51,43 @@ namespace Moq
 	/// for invocations that do not have setups or return values, with loose mocks.
 	/// This is the default behavior for a mock.
 	/// </summary>
-	internal sealed class EmptyDefaultValueProvider : DefaultValueProvider
+	internal sealed class EmptyDefaultValueProvider : LookupOrFallbackDefaultValueProvider
 	{
-		private static Dictionary<Type, Func<Type, object>> factories = new Dictionary<Type, Func<Type, object>>()
-		{
-			[typeof(Array)] = CreateArray,
-			[typeof(IEnumerable)] = CreateEnumerable,
-			[typeof(IEnumerable<>)] = CreateEnumerableOf,
-			[typeof(IQueryable)] = CreateQueryable,
-			[typeof(IQueryable<>)] = CreateQueryableOf,
-			[typeof(Task)] = CreateTask,
-			[typeof(Task<>)] = CreateTaskOf,
-			[typeof(ValueTask<>)] = CreateValueTaskOf,
-		};
-
 		internal EmptyDefaultValueProvider()
 		{
+			base.Register(typeof(Array), CreateArray);
+			base.Register(typeof(IEnumerable), CreateEnumerable);
+			base.Register(typeof(IEnumerable<>), CreateEnumerableOf);
+			base.Register(typeof(IQueryable), CreateQueryable);
+			base.Register(typeof(IQueryable<>), CreateQueryableOf);
 		}
 
 		internal override DefaultValue Kind => DefaultValue.Empty;
 
-		protected internal override object GetDefaultValue(Type type, Mock mock)
-		{
-			Debug.Assert(type != null);
-			Debug.Assert(type != typeof(void));
-			Debug.Assert(mock != null);
-
-			return GetDefaultValue(type);
-		}
-
-		private static object GetDefaultValue(Type type)
-		{
-			var typeInfo = type.GetTypeInfo();
-
-			Type factoryKey = typeInfo.IsGenericType ? type.GetGenericTypeDefinition()
-			                : type.IsArray ? typeof(Array)
-			                : type;
-
-			return factories.TryGetValue(factoryKey, out Func<Type, object> factory) ? factory.Invoke(type)
-			     : typeInfo.IsValueType ? Activator.CreateInstance(type)
-			     : null;
-		}
-
-		private static object CreateArray(Type type)
+		private static object CreateArray(Type type, Mock mock)
 		{
 			var elementType = type.GetElementType();
 			var lengths = new int[type.GetArrayRank()];
 			return Array.CreateInstance(elementType, lengths);
 		}
 
-		private static object CreateEnumerable(Type type)
+		private static object CreateEnumerable(Type type, Mock mock)
 		{
 			return new object[0];
 		}
 
-		private static object CreateEnumerableOf(Type type)
+		private static object CreateEnumerableOf(Type type, Mock mock)
 		{
 			var elementType = type.GetGenericArguments()[0];
 			return Array.CreateInstance(elementType, 0);
 		}
 
-		private static object CreateQueryable(Type type)
+		private static object CreateQueryable(Type type, Mock mock)
 		{
 			return new object[0].AsQueryable();
 		}
 
-		private static object CreateQueryableOf(Type type)
+		private static object CreateQueryableOf(Type type, Mock mock)
 		{
 			var elementType = type.GetGenericArguments()[0];
 			var array = Array.CreateInstance(elementType, 0);
@@ -127,33 +96,6 @@ namespace Moq
 				.Single(x => x.IsGenericMethod)
 				.MakeGenericMethod(elementType)
 				.Invoke(null, new[] { array });
-		}
-
-		private static object CreateTask(Type type)
-		{
-			return Task.FromResult(false);
-		}
-
-		private static object CreateTaskOf(Type type)
-		{
-			var resultType = type.GetGenericArguments()[0];
-			var result = GetDefaultValue(resultType);
-
-			var tcsType = typeof(TaskCompletionSource<>).MakeGenericType(resultType);
-			var tcs = Activator.CreateInstance(tcsType);
-			tcsType.GetMethod("SetResult").Invoke(tcs, new[] { result });
-			return tcsType.GetProperty("Task").GetValue(tcs, null);
-		}
-
-		private static object CreateValueTaskOf(Type type)
-		{
-			var resultType = type.GetGenericArguments()[0];
-			var result = GetDefaultValue(resultType);
-
-			// `Activator.CreateInstance` could throw an `AmbiguousMatchException` in this use case,
-			// so we're explicitly selecting and calling the constructor we want to use:
-			var valueTaskCtor = type.GetConstructor(new[] { resultType });
-			return valueTaskCtor.Invoke(new object[] { result });
 		}
 	}
 }
