@@ -54,6 +54,18 @@ namespace Moq
 	/// <include file='It.xdoc' path='docs/doc[@for="It"]/*'/>
 	public static class It
 	{
+		/// <summary>
+		/// Contains matchers for <see langword="ref"/> (C#) / <see langword="ByRef"/> (VB.NET) parameters of type <typeparamref name="TValue"/>.
+		/// </summary>
+		/// <typeparam name="TValue">The parameter type.</typeparam>
+		public static class Ref<TValue>
+		{
+			/// <summary>
+			/// Matches any value that is assignment-compatible with type <typeparamref name="TValue"/>.
+			/// </summary>
+			public static TValue IsAny;
+		}
+
 		/// <include file='It.xdoc' path='docs/doc[@for="It.IsAny"]/*'/>
 		public static TValue IsAny<TValue>()
 		{

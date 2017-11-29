@@ -2,7 +2,10 @@
 using System.Linq;
 using System.Linq.Expressions;
 using System.Text.RegularExpressions;
+
 using Moq.Matchers;
+using Moq.Protected;
+
 using Xunit;
 
 namespace Moq.Tests
@@ -307,6 +310,54 @@ namespace Moq.Tests
 			mock.Verify();
 		}
 
+		[Fact]
+		public void Can_use_IsAny_for_ref_parameters_in_Setup_to_match_any_argument_value()
+		{
+			var setupInvocationCount = 0;
+
+			var mock = new Mock<IFoo>();
+			mock.Setup(m => m.Do(ref It.Ref<int>.IsAny)).Callback(() => ++setupInvocationCount);
+
+			var anyValue = new Random().Next();
+			var anyDifferentValue = unchecked(anyValue + 1);
+
+			mock.Object.Do(ref anyValue);
+			mock.Object.Do(ref anyDifferentValue);
+
+			Assert.Equal(2, setupInvocationCount);
+		}
+
+		[Fact]
+		public void Can_use_IsAny_for_ref_parameters_in_Verify_to_match_any_argument_value()
+		{
+			var mock = new Mock<IFoo>();
+
+			var anyValue = new Random().Next();
+			var anyDifferentValue = unchecked(anyValue + 1);
+
+			mock.Object.Do(ref anyValue);
+			mock.Object.Do(ref anyDifferentValue);
+
+			mock.Verify(m => m.Do(ref It.Ref<int>.IsAny), Times.Exactly(2));
+		}
+
+		[Fact]
+		public void Can_use_IsAny_for_ref_parameters_in_Protected_Setup_to_match_any_argument_value()
+		{
+			var setupInvocationCount = 0;
+
+			var mock = new Mock<HasProtectedMethods>();
+			mock.Protected().Setup("DoImpl", ItExpr.Ref<int>.IsAny).Callback(() => ++setupInvocationCount);
+
+			var anyValue = new Random().Next();
+			var anyDifferentValue = unchecked(anyValue + 1);
+
+			mock.Object.Do(ref anyValue);
+			mock.Object.Do(ref anyDifferentValue);
+
+			Assert.Equal(2, setupInvocationCount);
+		}
+
 		private int GetToRange()
 		{
 			return 5;
@@ -325,6 +376,17 @@ namespace Moq.Tests
 			int[] Items { get; set; }
 			int TakesNullableParameter(int? value);
 			void TakesTwoValueTypes(int a, int b);
+			void Do(ref int arg);
+		}
+
+		public abstract class HasProtectedMethods
+		{
+			public void Do(ref int arg)
+			{
+				this.DoImpl(ref arg);
+			}
+
+			protected abstract void DoImpl(ref int arg);
 		}
 	}
 }
