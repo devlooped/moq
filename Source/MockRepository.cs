@@ -38,13 +38,6 @@
 //[This is the BSD license, see
 // http://www.opensource.org/licenses/bsd-license.php]
 
-using System;
-using System.Collections.Generic;
-using System.Globalization;
-using System.Linq;
-using System.Text;
-using Moq.Properties;
-
 namespace Moq
 {
 	/// <summary>
@@ -61,7 +54,7 @@ namespace Moq
 	/// <para>
 	/// This repository class helps in that scenario by providing a 
 	/// simplified creation of multiple mocks with a default 
-	/// <see cref="MockBehavior"/> (unless overriden by calling 
+	/// <see cref="MockBehavior"/> (unless overridden by calling
 	/// <see cref="MockFactory.Create{T}(MockBehavior)"/>) and posterior verification.
 	/// </para>
 	/// </remarks>
@@ -140,7 +133,7 @@ namespace Moq
 		/// for newly created mocks from the repository.
 		/// </summary>
 		/// <param name="defaultBehavior">The behavior to use for mocks created 
-		/// using the <see cref="MockFactory.Create{T}()"/> repository method if not overriden 
+		/// using the <see cref="MockFactory.Create{T}()"/> repository method if not overridden
 		/// by using the <see cref="MockFactory.Create{T}(MockBehavior)"/> overload.</param>
 		public MockRepository(MockBehavior defaultBehavior)
 			: base(defaultBehavior)

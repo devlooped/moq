@@ -96,7 +96,7 @@
 		<PendingRestore Condition=" !Exists('$(GitInfoTargets)') ">true</PendingRestore>
 	</PropertyGroup>
 
-	<Target Name="GitVersion" /><!-- Gets overriden by the $(GitInfoTargets) if it exists -->
+	<Target Name="GitVersion" /><!-- Gets overridden by the $(GitInfoTargets) if it exists -->
 	<Import Project="$(GitInfoTargets)" Condition=" Exists('$(GitInfoTargets)') " />
 
 	<Target Name="Configure" DependsOnTargets="_GetNuGet;GitInfoReport">

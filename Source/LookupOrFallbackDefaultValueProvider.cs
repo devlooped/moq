@@ -54,7 +54,7 @@ namespace Moq
 	/// </summary>
 	/// <remarks>
 	///   <para>
-	///     Inherited classes can register and deregister factory functions with <see cref="Register"/> and <see cref="Deregister"/>,
+	///     Derived classes can register and deregister factory functions with <see cref="Register"/> and <see cref="Deregister"/>,
 	///     respectively.
 	///   </para>
 	///   <para>

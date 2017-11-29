@@ -61,7 +61,7 @@ namespace Moq
 	/// <para>
 	/// This factory class helps in that scenario by providing a 
 	/// simplified creation of multiple mocks with a default 
-	/// <see cref="MockBehavior"/> (unless overriden by calling 
+	/// <see cref="MockBehavior"/> (unless overridden by calling
 	/// <see cref="Create{T}(MockBehavior)"/>) and posterior verification.
 	/// </para>
 	/// </remarks>
@@ -146,7 +146,7 @@ namespace Moq
 		/// for newly created mocks from the factory.
 		/// </summary>
 		/// <param name="defaultBehavior">The behavior to use for mocks created 
-		/// using the <see cref="Create{T}()"/> factory method if not overriden 
+		/// using the <see cref="Create{T}()"/> factory method if not overridden
 		/// by using the <see cref="Create{T}(MockBehavior)"/> overload.</param>
 		public MockFactory(MockBehavior defaultBehavior)
 		{
@@ -190,7 +190,7 @@ namespace Moq
 		}
 
 		/// <summary>
-		/// Gets or sets the <see cref="DefaultValueProvider"/> instance that will be used
+		/// Gets or sets the <see cref="Moq.DefaultValueProvider"/> instance that will be used
 		/// e. g. to produce default return values for unexpected invocations.
 		/// </summary>
 		public DefaultValueProvider DefaultValueProvider
@@ -345,22 +345,20 @@ namespace Moq
 		}
 
 		/// <summary>
-		/// Verifies all verifiable expectations on all mocks created 
-		/// by this factory.
+		/// Verifies all verifiable setups on all mocks created by this factory.
 		/// </summary>
 		/// <seealso cref="Mock.Verify()"/>
-		/// <exception cref="MockException">One or more mocks had expectations that were not satisfied.</exception>
+		/// <exception cref="MockException">One or more mocks had setups that were not satisfied.</exception>
 		public virtual void Verify()
 		{
 			VerifyMocks(verifiable => verifiable.Verify());
 		}
 
 		/// <summary>
-		/// Verifies all verifiable expectations on all mocks created 
-		/// by this factory.
+		/// Verifies all setups on all mocks created by this factory.
 		/// </summary>
 		/// <seealso cref="Mock.Verify()"/>
-		/// <exception cref="MockException">One or more mocks had expectations that were not satisfied.</exception>
+		/// <exception cref="MockException">One or more mocks had setups that were not satisfied.</exception>
 		public virtual void VerifyAll()
 		{
 			VerifyMocks(verifiable => verifiable.VerifyAll());

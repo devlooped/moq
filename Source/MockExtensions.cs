@@ -6,25 +6,22 @@ namespace Moq
 	/// <summary>
 	/// Provides additional methods on mocks.
 	/// </summary>
-	/// <remarks>
-	/// Those methods are useful for Testeroids support.
-	/// </remarks>
 	[EditorBrowsable(EditorBrowsableState.Never)]
 	public static class MockExtensions
 	{
 		/// <summary>
-		/// Resets the calls previously made on the specified mock.
+		/// Resets all invocations recorded for this mock.
 		/// </summary>
-		/// <param name="mock">The mock whose calls need to be reset.</param>
+		/// <param name="mock">The mock whose recorded invocations should be reset.</param>
 		public static void ResetCalls(this Mock mock)
 		{
 			mock.Invocations.Clear();
 		}
 
 		/// <summary>
-		/// Resets mock state, including setups and any previously made calls.
+		/// Resets this mock's state. This includes its setups, registered event handlers, and all recorded invocations.
 		/// </summary>
-		/// <param name="mock">The mock that needs to be reset.</param>
+		/// <param name="mock">The mock whose state should be reset.</param>
 		public static void Reset(this Mock mock)
 		{
 			mock.Setups.Clear();

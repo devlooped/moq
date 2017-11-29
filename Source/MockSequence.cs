@@ -45,7 +45,7 @@ namespace Moq
 	}
 
 	/// <summary>
-	/// define nice api
+	/// Contains extension methods that are related to <see cref="MockSequence"/>.
 	/// </summary>
 	[EditorBrowsable(EditorBrowsableState.Never)]
 	public static class MockSequenceHelper

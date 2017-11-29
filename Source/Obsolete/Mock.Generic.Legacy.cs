@@ -106,9 +106,8 @@ namespace Moq
 	}
 
 	/// <summary>
-	/// Provides legacy API members as extensions so that 
-	/// existing code continues to compile, but new code 
-	/// doesn't see then.
+	/// Contains obsolete API members as extension methods so that existing code continues to compile,
+	/// but new code doesn't see them.
 	/// </summary>
 	[EditorBrowsable(EditorBrowsableState.Never)]
 	public static class MockLegacyExtensions

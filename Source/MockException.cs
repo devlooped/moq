@@ -54,19 +54,19 @@ using Moq.Proxy;
 namespace Moq
 {
 	/// <summary>
-	/// Exception thrown by mocks when setups are not matched, 
-	/// the mock is not properly setup, etc.
+	/// Exception thrown by mocks when they are not properly set up,
+	/// when setups are not matched, when verification fails, etc.
 	/// </summary>
 	/// <remarks>
-	/// A distinct exception type is provided so that exceptions 
-	/// thrown by the mock can be differentiated in tests that 
-	/// expect other exceptions to be thrown (i.e. ArgumentException).
+	/// A distinct exception type is provided so that exceptions
+	/// thrown by a mock can be distinguished from other exceptions
+	/// that might be thrown in tests.
 	/// <para>
-	/// Richer exception hierarchy/types are not provided as 
-	/// tests typically should <b>not</b> catch or expect exceptions 
-	/// from the mocks. These are typically the result of changes 
-	/// in the tested class or its collaborators implementation, and 
-	/// result in fixes in the mock setup so that they dissapear and 
+	/// Moq does not provide a richer hierarchy of exception types, as
+	/// tests typically should <em>not</em> catch or expect exceptions
+	/// from mocks. These are typically the result of changes
+	/// in the tested class or its collaborators' implementation, and
+	/// result in fixes in the mock setup so that they disappear and
 	/// allow the test to pass.
 	/// </para>
 	/// </remarks>
@@ -76,11 +76,7 @@ namespace Moq
 #endif
 	public class MockException : Exception
 	{
-		/// <summary>
-		/// Made internal as it's of no use for 
-		/// consumers, but it's important for 
-		/// our own tests.
-		/// </summary>
+		// Made internal as it's of no use for consumers, but it's important for our own tests.
 		internal enum ExceptionReason
 		{
 			NoSetup,
