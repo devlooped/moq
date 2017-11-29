@@ -61,10 +61,10 @@ namespace Moq.Protected
 			this.mock = mock;
 		}
 
-		public IProtectedAsMock<T, TDuck> As<TDuck>()
-			where TDuck : class
+		public IProtectedAsMock<T, TAnalog> As<TAnalog>()
+			where TAnalog : class
 		{
-			return new ProtectedAsMock<T, TDuck>(this.mock);
+			return new ProtectedAsMock<T, TAnalog>(this.mock);
 		}
 
 		#region Setup

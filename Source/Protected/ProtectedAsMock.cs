@@ -50,13 +50,13 @@ using Moq.Properties;
 
 namespace Moq.Protected
 {
-	internal sealed class ProtectedAsMock<T, TDuck> : IProtectedAsMock<T, TDuck>
+	internal sealed class ProtectedAsMock<T, TAnalog> : IProtectedAsMock<T, TAnalog>
 		where T : class
-		where TDuck : class
+		where TAnalog : class
     {
 		private Mock<T> mock;
 
-		private static DuckReplacer DuckReplacerInstance = new DuckReplacer(typeof(TDuck), typeof(T));
+		private static DuckReplacer DuckReplacerInstance = new DuckReplacer(typeof(TAnalog), typeof(T));
 
 		public ProtectedAsMock(Mock<T> mock)
 		{
@@ -65,7 +65,7 @@ namespace Moq.Protected
 			this.mock = mock;
 		}
 
-		public ISetup<T> Setup(Expression<Action<TDuck>> expression)
+		public ISetup<T> Setup(Expression<Action<TAnalog>> expression)
 		{
 			Guard.NotNull(expression, nameof(expression));
 
@@ -82,7 +82,7 @@ namespace Moq.Protected
 			return Mock.Setup(this.mock, rewrittenExpression, null);
 		}
 
-		public ISetup<T, TResult> Setup<TResult>(Expression<Func<TDuck, TResult>> expression)
+		public ISetup<T, TResult> Setup<TResult>(Expression<Func<TAnalog, TResult>> expression)
 		{
 			Guard.NotNull(expression, nameof(expression));
 
@@ -99,7 +99,7 @@ namespace Moq.Protected
 			return Mock.Setup(this.mock, rewrittenExpression, null);
 		}
 
-		public ISetupGetter<T, TProperty> SetupGet<TProperty>(Expression<Func<TDuck, TProperty>> expression)
+		public ISetupGetter<T, TProperty> SetupGet<TProperty>(Expression<Func<TAnalog, TProperty>> expression)
 		{
 			Guard.NotNull(expression, nameof(expression));
 
@@ -116,7 +116,7 @@ namespace Moq.Protected
 			return Mock.SetupGet(this.mock, rewrittenExpression, null);
 		}
 
-		public Mock<T> SetupProperty<TProperty>(Expression<Func<TDuck, TProperty>> expression, TProperty initialValue = default(TProperty))
+		public Mock<T> SetupProperty<TProperty>(Expression<Func<TAnalog, TProperty>> expression, TProperty initialValue = default(TProperty))
 		{
 			Guard.NotNull(expression, nameof(expression));
 
@@ -133,7 +133,7 @@ namespace Moq.Protected
 			return this.mock.SetupProperty<TProperty>(rewrittenExpression, initialValue);
 		}
 
-		public ISetupSequentialResult<TResult> SetupSequence<TResult>(Expression<Func<TDuck, TResult>> expression)
+		public ISetupSequentialResult<TResult> SetupSequence<TResult>(Expression<Func<TAnalog, TResult>> expression)
 		{
 			Guard.NotNull(expression, nameof(expression));
 
@@ -150,7 +150,7 @@ namespace Moq.Protected
 			return Mock.SetupSequence<TResult>(this.mock, rewrittenExpression);
 		}
 
-		public ISetupSequentialAction SetupSequence(Expression<Action<TDuck>> expression)
+		public ISetupSequentialAction SetupSequence(Expression<Action<TAnalog>> expression)
 		{
 			Guard.NotNull(expression, nameof(expression));
 
@@ -167,7 +167,7 @@ namespace Moq.Protected
 			return Mock.SetupSequence(this.mock, rewrittenExpression);
 		}
 
-		public void Verify(Expression<Action<TDuck>> expression, Times? times = null, string failMessage = null)
+		public void Verify(Expression<Action<TAnalog>> expression, Times? times = null, string failMessage = null)
 		{
 			Guard.NotNull(expression, nameof(expression));
 
@@ -184,7 +184,7 @@ namespace Moq.Protected
 			Mock.Verify(this.mock, rewrittenExpression, times ?? Times.AtLeastOnce(), failMessage);
 		}
 
-		public void Verify<TResult>(Expression<Func<TDuck, TResult>> expression, Times? times = null, string failMessage = null)
+		public void Verify<TResult>(Expression<Func<TAnalog, TResult>> expression, Times? times = null, string failMessage = null)
 		{
 			Guard.NotNull(expression, nameof(expression));
 
@@ -201,7 +201,7 @@ namespace Moq.Protected
 			Mock.Verify(this.mock, rewrittenExpression, times ?? Times.AtLeastOnce(), failMessage);
 		}
 
-		public void VerifyGet<TProperty>(Expression<Func<TDuck, TProperty>> expression, Times? times = null, string failMessage = null)
+		public void VerifyGet<TProperty>(Expression<Func<TAnalog, TProperty>> expression, Times? times = null, string failMessage = null)
 		{
 			Guard.NotNull(expression, nameof(expression));
 
@@ -227,7 +227,7 @@ namespace Moq.Protected
 		}
 
 		/// <summary>
-		/// <see cref="ExpressionVisitor"/> used to replace occurrences of `TDuck.Member` sub-expressions with `T.Member`.
+		/// <see cref="ExpressionVisitor"/> used to replace occurrences of `TAnalog.Member` sub-expressions with `T.Member`.
 		/// </summary>
 		private sealed class DuckReplacer : ExpressionVisitor
 		{
