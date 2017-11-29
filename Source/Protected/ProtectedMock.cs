@@ -368,9 +368,24 @@ namespace Moq.Protected
 				else if (expr.NodeType == ExpressionType.MemberAccess)
 				{
 					var member = (MemberExpression)expr;
-					if ((member.Member as FieldInfo) != null)
+					if (member.Member is FieldInfo field)
 					{
-						types[index] = ((FieldInfo)member.Member).FieldType;
+						// Test for special case: `It.Ref<TValue>.IsAny`
+						if (field.Name == nameof(It.Ref<object>.IsAny))
+						{
+							var fieldDeclaringType = field.DeclaringType;
+							if (fieldDeclaringType.GetTypeInfo().IsGenericType)
+							{
+								var fieldDeclaringTypeDefinition = fieldDeclaringType.GetGenericTypeDefinition();
+								if (fieldDeclaringTypeDefinition == typeof(It.Ref<>))
+								{
+									types[index] = field.FieldType.MakeByRefType();
+									continue;
+								}
+							}
+						}
+
+						types[index] = field.FieldType;
 					}
 					else if ((member.Member as PropertyInfo) != null)
 					{
