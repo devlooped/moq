@@ -38,6 +38,7 @@
 //[This is the BSD license, see
 // http://www.opensource.org/licenses/bsd-license.php]
 
+using System.ComponentModel;
 
 namespace Moq.Protected
 {
@@ -47,6 +48,7 @@ namespace Moq.Protected
 	/// name as a string, rather than strong-typing them which is not possible 
 	/// due to their visibility.
 	/// </summary>
+	[EditorBrowsable(EditorBrowsableState.Never)]
 	public static class ProtectedExtension
 	{
 		/// <summary>

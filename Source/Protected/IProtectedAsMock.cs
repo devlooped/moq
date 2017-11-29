@@ -56,6 +56,7 @@ namespace Moq.Protected
 	/// <typeparam name="TAnalog">
 	/// Any type with members whose signatures are identical to the mock's protected members (except for their accessibility level).
 	/// </typeparam>
+	[EditorBrowsable(EditorBrowsableState.Never)]
 	public interface IProtectedAsMock<T, TAnalog> : IFluentInterface
 		where T : class
 		where TAnalog : class

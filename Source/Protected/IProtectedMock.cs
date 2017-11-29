@@ -38,6 +38,7 @@
 //[This is the BSD license, see
 // http://www.opensource.org/licenses/bsd-license.php]
 
+using System.ComponentModel;
 using System.Diagnostics.CodeAnalysis;
 
 using Moq.Language;
@@ -50,6 +51,7 @@ namespace Moq.Protected
 	/// name as a string, rather than strong-typing them which is not possible 
 	/// due to their visibility.
 	/// </summary>
+	[EditorBrowsable(EditorBrowsableState.Never)]
 	public interface IProtectedMock<TMock> : IFluentInterface
 		where TMock : class
 	{

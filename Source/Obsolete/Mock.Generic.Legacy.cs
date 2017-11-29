@@ -41,6 +41,7 @@
 using System;
 using System.ComponentModel;
 using System.Linq.Expressions;
+
 using Moq.Language.Flow;
 
 namespace Moq
@@ -109,6 +110,7 @@ namespace Moq
 	/// existing code continues to compile, but new code 
 	/// doesn't see then.
 	/// </summary>
+	[EditorBrowsable(EditorBrowsableState.Never)]
 	public static class MockLegacyExtensions
 	{
 		/// <summary>

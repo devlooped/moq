@@ -1,14 +1,7 @@
-﻿using Moq.Linq;
-using System;
-using System.Collections;
-using System.Collections.Generic;
-using System.Linq;
-using System.Linq.Expressions;
-using System.Text;
+﻿using System.ComponentModel;
 
 namespace Moq
 {
-	using Moq.Proxy;
 
 	/// <summary>
 	/// Provides additional methods on mocks.
@@ -16,6 +9,7 @@ namespace Moq
 	/// <remarks>
 	/// Those methods are useful for Testeroids support.
 	/// </remarks>
+	[EditorBrowsable(EditorBrowsableState.Never)]
 	public static class MockExtensions
 	{
 		/// <summary>

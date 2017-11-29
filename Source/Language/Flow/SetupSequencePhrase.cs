@@ -39,12 +39,14 @@
 // http://www.opensource.org/licenses/bsd-license.php]
 
 using System;
+using System.ComponentModel;
 
 namespace Moq.Language.Flow
 {
 	// keeping the fluent API separate from `SequenceMethodCall` saves us from having to
 	// define a generic variant `SequenceMethodCallReturn<TResult>`, which would be much more
 	// work that having a generic fluent API counterpart `SequenceMethodCall<TResult>`.
+	[EditorBrowsable(EditorBrowsableState.Never)]
 	internal sealed class SetupSequencePhrase : ISetupSequentialAction
 	{
 		private SequenceMethodCall setup;

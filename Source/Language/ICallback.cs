@@ -109,6 +109,7 @@ namespace Moq.Language
 	/// </summary>
 	/// <typeparam name="TMock">Mocked type.</typeparam>
 	/// <typeparam name="TResult">Type of the return value of the setup.</typeparam>
+	[EditorBrowsable(EditorBrowsableState.Never)]
 	public partial interface ICallback<TMock, TResult> : IFluentInterface
 		where TMock : class
 	{

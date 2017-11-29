@@ -1,4 +1,6 @@
-﻿using Moq.Language;
+﻿using System.ComponentModel;
+
+using Moq.Language;
 
 namespace Moq
 {
@@ -45,6 +47,7 @@ namespace Moq
 	/// <summary>
 	/// define nice api
 	/// </summary>
+	[EditorBrowsable(EditorBrowsableState.Never)]
 	public static class MockSequenceHelper
 	{
 		/// <summary>

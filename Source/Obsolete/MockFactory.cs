@@ -40,6 +40,7 @@
 
 using System;
 using System.Collections.Generic;
+using System.ComponentModel;
 using System.Linq;
 
 using Moq.Diagnostics.Errors;
@@ -131,6 +132,7 @@ namespace Moq
 	/// </code>
 	/// </example>
 	/// <seealso cref="MockBehavior"/>
+	[EditorBrowsable(EditorBrowsableState.Never)]
 	[Obsolete("This class has been renamed to MockRepository. MockFactory will be retired in v5.", false)]
 	public partial class MockFactory
 	{

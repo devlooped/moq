@@ -1,4 +1,5 @@
 ﻿using System;
+using System.ComponentModel;
 using System.Diagnostics.CodeAnalysis;
 
 namespace Moq.Language
@@ -6,6 +7,7 @@ namespace Moq.Language
 	/// <summary>
 	/// Language for ReturnSequence
 	/// </summary>
+	[EditorBrowsable(EditorBrowsableState.Never)]
 	public interface ISetupSequentialResult<TResult>
 	{
 		// would be nice to Mixin somehow the IReturn and IThrows with

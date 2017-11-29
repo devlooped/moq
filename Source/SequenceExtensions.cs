@@ -39,6 +39,7 @@
 // http://www.opensource.org/licenses/bsd-license.php]
 
 using System;
+using System.ComponentModel;
 using System.Threading.Tasks;
 
 using Moq.Language;
@@ -48,6 +49,7 @@ namespace Moq
 	/// <summary>
 	/// Helper for sequencing return values in the same method.
 	/// </summary>
+	[EditorBrowsable(EditorBrowsableState.Never)]
 	public static partial class SequenceExtensions
 	{
 		/// <summary>
