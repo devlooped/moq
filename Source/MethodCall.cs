@@ -133,6 +133,25 @@ namespace Moq
 				}
 				else if (parameter.IsRefArgument())
 				{
+					// Test for special case: `It.Ref<TValue>.IsAny`
+					if (argument is MemberExpression memberExpression)
+					{
+						var member = memberExpression.Member;
+						if (member.Name == nameof(It.Ref<object>.IsAny))
+						{
+							var memberDeclaringType = member.DeclaringType;
+							if (memberDeclaringType.GetTypeInfo().IsGenericType)
+							{
+								var memberDeclaringTypeDefinition = memberDeclaringType.GetGenericTypeDefinition();
+								if (memberDeclaringTypeDefinition == typeof(It.Ref<>))
+								{
+									this.argumentMatchers.Add(AnyMatcher.Instance);
+									continue;
+								}
+							}
+						}
+					}
+
 					var constant = argument.PartialEval() as ConstantExpression;
 					if (constant == null)
 					{
