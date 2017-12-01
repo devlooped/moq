@@ -436,7 +436,7 @@ namespace Moq
 		private static void ThrowVerifyException(
 			MethodCall expected,
 			IEnumerable<IProxyCall> setups,
-			IEnumerable<ICallContext> actualCalls,
+			IEnumerable<Invocation> actualCalls,
 			Expression expression,
 			Times times,
 			int callCount)
@@ -458,7 +458,7 @@ namespace Moq
 				Environment.NewLine + string.Format(Resources.ConfiguredSetups, Environment.NewLine + string.Join(Environment.NewLine, expressionSetups));
 		}
 
-		private static string FormatInvocations(IEnumerable<ICallContext> invocations)
+		private static string FormatInvocations(IEnumerable<Invocation> invocations)
 		{
 			var formattedInvocations = invocations
 				.Select(i => i.Format())

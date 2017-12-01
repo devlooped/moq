@@ -69,7 +69,7 @@ namespace Moq
 			HandleMockRecursion.Instance,
 		};
 
-		public void Intercept(ICallContext invocation)
+		public void Intercept(Invocation invocation)
 		{
 			foreach (var strategy in Strategies)
 			{

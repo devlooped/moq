@@ -45,14 +45,14 @@ namespace Moq
 {
 	internal sealed class InvocationCollection
 	{
-		private List<ICallContext> invocations;
+		private List<Invocation> invocations;
 
 		public InvocationCollection()
 		{
-			this.invocations = new List<ICallContext>();
+			this.invocations = new List<Invocation>();
 		}
 
-		public void Add(ICallContext invocation)
+		public void Add(Invocation invocation)
 		{
 			lock (this.invocations)
 			{
@@ -68,7 +68,7 @@ namespace Moq
 			}
 		}
 
-		public ICallContext[] ToArray()
+		public Invocation[] ToArray()
 		{
 			lock (this.invocations)
 			{

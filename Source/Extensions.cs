@@ -55,7 +55,7 @@ namespace Moq
 {
 	internal static class Extensions
 	{
-		public static string Format(this ICallContext invocation)
+		public static string Format(this Invocation invocation)
 		{
 			if (invocation.Method.IsPropertyGetter())
 			{

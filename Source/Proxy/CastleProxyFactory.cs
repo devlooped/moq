@@ -171,44 +171,30 @@ namespace Moq.Proxy
 
 			public void Intercept(IInvocation invocation)
 			{
-				this.interceptor.Intercept(new CallContext(invocation));
+				this.interceptor.Intercept(new Invocation(underlying: invocation));
 			}
 		}
 
-		private class CallContext : ICallContext
+		private sealed class Invocation : Moq.Invocation
 		{
-			private IInvocation invocation;
+			private IInvocation underlying;
 
-			internal CallContext(IInvocation invocation)
+			internal Invocation(IInvocation underlying)
 			{
-				this.invocation = invocation;
+				this.underlying = underlying;
 			}
 
-			public object[] Arguments
+			public override object[] Arguments => this.underlying.Arguments;
+
+			public override MethodInfo Method => this.underlying.Method;
+
+			public override object ReturnValue
 			{
-				get { return this.invocation.Arguments; }
+				get => this.underlying.ReturnValue;
+				set => this.underlying.ReturnValue = value;
 			}
 
-			public MethodInfo Method
-			{
-				get { return this.invocation.Method; }
-			}
-
-			public object ReturnValue
-			{
-				get { return this.invocation.ReturnValue; }
-				set { this.invocation.ReturnValue = value; }
-			}
-
-			public void InvokeBase()
-			{
-				this.invocation.Proceed();
-			}
-
-			public void SetArgumentValue(int index, object value)
-			{
-				this.invocation.SetArgumentValue(index, value);
-			}
+			public override void InvokeBase() => this.underlying.Proceed();
 		}
 
 		/// <summary>

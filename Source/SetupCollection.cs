@@ -83,7 +83,7 @@ namespace Moq
 			}
 		}
 
-		public IProxyCall FindMatchFor(ICallContext invocation)
+		public IProxyCall FindMatchFor(Invocation invocation)
 		{
 			IProxyCall matchingSetup = null;
 

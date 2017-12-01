@@ -55,9 +55,9 @@ namespace Moq
 		MethodInfo Method { get; }
 
 		void EvaluatedSuccessfully();
-		void Execute(ICallContext call);
+		void Execute(Invocation invocation);
 		string Format();
-		bool Matches(ICallContext call);
-		void SetOutParameters(ICallContext call);
+		bool Matches(Invocation invocation);
+		void SetOutParameters(Invocation invocation);
 	}
 }

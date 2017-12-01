@@ -79,9 +79,9 @@ namespace Moq
 			this.responses.Enqueue(Tuple.Create(ResponseKind.Throws, (object)exception));
 		}
 
-		public override void Execute(ICallContext call)
+		public override void Execute(Invocation invocation)
 		{
-			base.Execute(call);
+			base.Execute(invocation);
 
 			if (this.responses.TryDequeue(out Tuple<ResponseKind, object> response))
 			{
@@ -91,11 +91,11 @@ namespace Moq
 						break;
 
 					case ResponseKind.CallBase:
-						call.InvokeBase();
+						invocation.InvokeBase();
 						break;
 
 					case ResponseKind.Returns:
-						call.ReturnValue = response.Item2;
+						invocation.ReturnValue = response.Item2;
 						break;
 
 					case ResponseKind.Throws:
@@ -108,13 +108,13 @@ namespace Moq
 				// if the setup method does not have a return value, we don't need to do anything;
 				// if it does have a return value, we produce the default value.
 
-				var returnType = call.Method.ReturnType;
+				var returnType = invocation.Method.ReturnType;
 				if (returnType == typeof(void))
 				{
 				}
 				else
 				{
-					call.ReturnValue = returnType.GetTypeInfo().IsValueType ? Activator.CreateInstance(returnType)
+					invocation.ReturnValue = returnType.GetTypeInfo().IsValueType ? Activator.CreateInstance(returnType)
 					                                                        : null;
 				}
 			}

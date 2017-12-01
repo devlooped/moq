@@ -224,26 +224,26 @@ namespace Moq
 			}
 		}
 
-		public override void Execute(ICallContext call)
+		public override void Execute(Invocation invocation)
 		{
-			base.Execute(call);
+			base.Execute(invocation);
 
 			if (this.returnValueKind == ReturnValueKind.CallBase)
 			{
-				call.InvokeBase();
+				invocation.InvokeBase();
 			}
 			else if (this.valueDel != null)
 			{
-				call.ReturnValue = this.valueDel.HasCompatibleParameterList(new ParameterInfo[0])
+				invocation.ReturnValue = this.valueDel.HasCompatibleParameterList(new ParameterInfo[0])
 					? valueDel.InvokePreserveStack()                //we need this, for the user to be able to use parameterless methods
-					: valueDel.InvokePreserveStack(call.Arguments); //will throw if parameters mismatch
+					: valueDel.InvokePreserveStack(invocation.Arguments); //will throw if parameters mismatch
 			}
 			else
 			{
-				call.ReturnValue = default(TResult);
+				invocation.ReturnValue = default(TResult);
 			}
 
-			this.afterReturnCallback?.Invoke(call.Arguments);
+			this.afterReturnCallback?.Invoke(invocation.Arguments);
 		}
 	}
 }

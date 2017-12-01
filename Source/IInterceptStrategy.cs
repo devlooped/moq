@@ -53,9 +53,9 @@ namespace Moq
 		/// <summary>
 		/// Handle interception
 		/// </summary>
-		/// <param name="invocation">the current invocation context</param>
+		/// <param name="invocation">The current invocation.</param>
 		/// <param name="mock">The mock on which the current invocation is occurring.</param>
 		/// <returns>InterceptionAction.Continue if further interception has to be processed, otherwise InterceptionAction.Stop</returns>
-		InterceptionAction HandleIntercept(ICallContext invocation, Mock mock);
+		InterceptionAction HandleIntercept(Invocation invocation, Mock mock);
 	}
 }
