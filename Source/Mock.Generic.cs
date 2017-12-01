@@ -54,12 +54,11 @@ using Microsoft.CSharp;
 
 using Moq.Language;
 using Moq.Language.Flow;
-using Moq.Proxy;
 
 namespace Moq
 {
 	/// <include file='Mock.Generic.xdoc' path='docs/doc[@for="Mock{T}"]/*'/>
-    public partial class Mock<T> : Mock, IMock<T> where T : class
+	public partial class Mock<T> : Mock, IMock<T> where T : class
 	{
 		private static int serialNumberCounter = 0;
 		private T instance;

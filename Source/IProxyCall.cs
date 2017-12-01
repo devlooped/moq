@@ -41,8 +41,6 @@
 using System.Linq.Expressions;
 using System.Reflection;
 
-using Moq.Proxy;
-
 namespace Moq
 {
 	internal interface IProxyCall

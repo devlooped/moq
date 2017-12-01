@@ -49,7 +49,6 @@ using System.Security;
 
 using Moq.Diagnostics.Errors;
 using Moq.Properties;
-using Moq.Proxy;
 
 namespace Moq
 {

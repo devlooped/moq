@@ -38,7 +38,6 @@
 //[This is the BSD license, see
 // http://www.opensource.org/licenses/bsd-license.php]
 
-using Moq.Proxy;
 using System.Collections.Generic;
 
 namespace Moq

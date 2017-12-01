@@ -43,8 +43,6 @@ using System.Collections.Concurrent;
 using System.Linq.Expressions;
 using System.Reflection;
 
-using Moq.Proxy;
-
 namespace Moq
 {
 	// this corresponds to a setup created by `mock.SetupSequence`

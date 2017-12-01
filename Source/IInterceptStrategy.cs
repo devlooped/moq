@@ -38,8 +38,6 @@
 //[This is the BSD license, see
 // http://www.opensource.org/licenses/bsd-license.php]
 
-using Moq.Proxy;
-
 namespace Moq
 {
 	internal enum InterceptionAction

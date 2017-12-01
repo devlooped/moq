@@ -44,8 +44,6 @@ using System.Diagnostics;
 using System.Linq;
 using System.Reflection;
 
-using Moq.Proxy;
-
 namespace Moq
 {
 	internal class HandleWellKnownMethods : IInterceptStrategy
