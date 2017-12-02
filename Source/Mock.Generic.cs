@@ -220,7 +220,7 @@ namespace Moq
 				// Then create a proxy for that.
 				var delegateProxy = Mock.ProxyFactory.CreateProxy(
 					delegateInterfaceType,
-					new Interceptor(this),
+					this,
 					this.ImplementedInterfaces.ToArray(),
 					this.constructorArguments);
 
@@ -232,7 +232,7 @@ namespace Moq
 			{
 				this.instance = (T)Mock.ProxyFactory.CreateProxy(
 					typeof(T),
-					new Interceptor(this),
+					this,
 					this.ImplementedInterfaces.Skip(this.InternallyImplementedInterfaceCount - 1).ToArray(),
 					this.constructorArguments);
 			}

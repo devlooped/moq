@@ -45,7 +45,7 @@ namespace Moq.Proxy
 {
 	internal interface IProxyFactory
 	{
-		object CreateProxy(Type mockType, ICallInterceptor interceptor, Type[] interfaces, object[] arguments);
+		object CreateProxy(Type mockType, IInterceptor interceptor, Type[] interfaces, object[] arguments);
 
 		bool IsMethodVisible(MethodInfo method, out string messageIfNotVisible);
 

@@ -38,10 +38,29 @@
 //[This is the BSD license, see
 // http://www.opensource.org/licenses/bsd-license.php]
 
-namespace Moq.Proxy
+namespace Moq
 {
-	internal interface ICallInterceptor
+	partial class Mock : IInterceptor
 	{
-		void Intercept(Invocation invocation);
+		private static IInterceptStrategy[] Strategies { get; } = new IInterceptStrategy[]
+		{
+			HandleTracking.Instance,
+			HandleWellKnownMethods.Instance,
+			AddActualInvocation.Instance,
+			ExtractAndExecuteProxyCall.Instance,
+			InvokeBase.Instance,
+			HandleMockRecursion.Instance,
+		};
+
+		void IInterceptor.Intercept(Invocation invocation)
+		{
+			foreach (var strategy in Strategies)
+			{
+				if (InterceptionAction.Stop == strategy.HandleIntercept(invocation, this))
+				{
+					break;
+				}
+			}
+		}
 	}
 }

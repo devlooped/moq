@@ -38,46 +38,13 @@
 //[This is the BSD license, see
 // http://www.opensource.org/licenses/bsd-license.php]
 
-using System.Diagnostics;
-
-using Moq.Proxy;
-
 namespace Moq
 {
 	/// <summary>
-	/// Implements the actual interception and method invocation for 
-	/// all mocks.
+	/// This role interface represents a <see cref="Mock"/>'s ability to intercept method invocations for its <see cref="Mock.Object"/>.
 	/// </summary>
-	internal class Interceptor : ICallInterceptor
+	internal interface IInterceptor
 	{
-		private Mock mock;
-
-		public Interceptor(Mock mock)
-		{
-			Debug.Assert(mock != null);
-
-			this.mock = mock;
-		}
-
-		private static IInterceptStrategy[] Strategies { get; } = new IInterceptStrategy[]
-		{
-			HandleTracking.Instance,
-			HandleWellKnownMethods.Instance,
-			AddActualInvocation.Instance,
-			ExtractAndExecuteProxyCall.Instance,
-			InvokeBase.Instance,
-			HandleMockRecursion.Instance,
-		};
-
-		public void Intercept(Invocation invocation)
-		{
-			foreach (var strategy in Strategies)
-			{
-				if (InterceptionAction.Stop == strategy.HandleIntercept(invocation, this.mock))
-				{
-					break;
-				}
-			}
-		}
+		void Intercept(Invocation invocation);
 	}
 }

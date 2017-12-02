@@ -81,7 +81,7 @@ namespace Moq.Proxy
 		}
 
 		/// <inheritdoc />
-		public object CreateProxy(Type mockType, ICallInterceptor interceptor, Type[] interfaces, object[] arguments)
+		public object CreateProxy(Type mockType, Moq.IInterceptor interceptor, Type[] interfaces, object[] arguments)
 		{
 			if (mockType.GetTypeInfo().IsInterface)
 			{
@@ -160,18 +160,18 @@ namespace Moq.Proxy
 			return new ProxyGenerator();
 		}
 
-		private class Interceptor : IInterceptor
+		private sealed class Interceptor : Castle.DynamicProxy.IInterceptor
 		{
-			private ICallInterceptor interceptor;
+			private Moq.IInterceptor underlying;
 
-			internal Interceptor(ICallInterceptor interceptor)
+			internal Interceptor(Moq.IInterceptor underlying)
 			{
-				this.interceptor = interceptor;
+				this.underlying = underlying;
 			}
 
 			public void Intercept(IInvocation invocation)
 			{
-				this.interceptor.Intercept(new Invocation(underlying: invocation));
+				this.underlying.Intercept(new Invocation(underlying: invocation));
 			}
 		}
 
