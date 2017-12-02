@@ -478,13 +478,8 @@ namespace Moq
 
 		private static string FormatInvocations(IEnumerable<Invocation> invocations)
 		{
-			var formattedInvocations = invocations
-				.Select(i => i.Format())
-				.ToArray();
-
-			return formattedInvocations.Length == 0 ?
-				Resources.NoInvocationsPerformed :
-				Environment.NewLine + string.Format(Resources.PerformedInvocations, Environment.NewLine + string.Join(Environment.NewLine, formattedInvocations));
+			return invocations.Any() ? Environment.NewLine + string.Format(Resources.PerformedInvocations, Environment.NewLine + string.Join<Invocation>(Environment.NewLine, invocations))
+			                         : Resources.NoInvocationsPerformed;
 		}
 
 		#endregion
