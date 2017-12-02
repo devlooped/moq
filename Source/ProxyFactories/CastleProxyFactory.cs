@@ -39,49 +39,60 @@
 // http://www.opensource.org/licenses/bsd-license.php]
 
 using System;
-using System.Linq;
 using System.Collections.Generic;
 using System.Globalization;
+using System.Linq;
 using System.Reflection;
+
+using Castle.DynamicProxy;
+
+using Moq.Properties;
+
 #if FEATURE_CAS
 using System.Security.Permissions;
+using Castle.DynamicProxy.Generators;
 #endif
+
 #if FEATURE_COM
 using System.Runtime.InteropServices;
 #endif
-using Castle.DynamicProxy;
-using Castle.DynamicProxy.Generators;
-using Moq.Properties;
-using System.Diagnostics.CodeAnalysis;
 
-namespace Moq.Proxy
+namespace Moq
 {
-	internal sealed class CastleProxyFactory : IProxyFactory
+	/// <summary>
+	/// An implementation of <see cref="ProxyFactory"/> that is based on Castle DynamicProxy.
+	/// </summary>
+	internal sealed class CastleProxyFactory : ProxyFactory
 	{
-		public static CastleProxyFactory Instance { get; } = new CastleProxyFactory();
+		private Dictionary<Type, Type> delegateInterfaceCache;
+		private int delegateInterfaceSuffix;
+		private ProxyGenerationOptions generationOptions;
+		private ProxyGenerator generator;
 
-		private static readonly ProxyGenerator generator = CreateProxyGenerator();
-
-		[SuppressMessage("Microsoft.Performance", "CA1810:InitializeReferenceTypeStaticFieldsInline", Justification = "By Design")]
 		static CastleProxyFactory()
 		{
-#if FEATURE_CAS
+			#if FEATURE_CAS
 			AttributesToAvoidReplicating.Add<SecurityPermissionAttribute>();
 			AttributesToAvoidReplicating.Add<ReflectionPermissionAttribute>();
 			AttributesToAvoidReplicating.Add<PermissionSetAttribute>();
 			AttributesToAvoidReplicating.Add<UIPermissionAttribute>();
-#endif
+			#endif
 
-#if FEATURE_COM
+			#if FEATURE_COM
 			AttributesToAvoidReplicating.Add<MarshalAsAttribute>();
 			AttributesToAvoidReplicating.Add<TypeIdentifierAttribute>();
-#endif
+			#endif
+		}
 
-			proxyOptions = new ProxyGenerationOptions { Hook = new IncludeObjectMethodsHook() };
+		public CastleProxyFactory()
+		{
+			this.delegateInterfaceCache = new Dictionary<Type, Type>();
+			this.generationOptions = new ProxyGenerationOptions { Hook = new IncludeObjectMethodsHook() };
+			this.generator = new ProxyGenerator();
 		}
 
 		/// <inheritdoc />
-		public object CreateProxy(Type mockType, ICallInterceptor interceptor, Type[] interfaces, object[] arguments)
+		public override object CreateProxy(Type mockType, Moq.IInterceptor interceptor, Type[] interfaces, object[] arguments)
 		{
 			if (mockType.GetTypeInfo().IsInterface)
 			{
@@ -94,7 +105,7 @@ namespace Moq.Proxy
 
 			try
 			{
-				return generator.CreateClassProxy(mockType, interfaces, proxyOptions, arguments, new Interceptor(interceptor));
+				return generator.CreateClassProxy(mockType, interfaces, this.generationOptions, arguments, new Interceptor(interceptor));
 			}
 			catch (TypeLoadException e)
 			{
@@ -106,17 +117,13 @@ namespace Moq.Proxy
 			}
 		}
 
-		public bool IsMethodVisible(MethodInfo method, out string messageIfNotVisible)
+		public override bool IsMethodVisible(MethodInfo method, out string messageIfNotVisible)
 		{
 			return ProxyUtil.IsAccessible(method, out messageIfNotVisible);
 		}
 
-		private static readonly Dictionary<Type, Type> delegateInterfaceCache = new Dictionary<Type, Type>();
-		private static readonly ProxyGenerationOptions proxyOptions;
-		private static int delegateInterfaceSuffix;
-
 		/// <inheritdoc />
-		public Type GetDelegateProxyInterface(Type delegateType, out MethodInfo delegateInterfaceMethod)
+		public override Type GetDelegateProxyInterface(Type delegateType, out MethodInfo delegateInterfaceMethod)
 		{
 			Type delegateInterfaceType;
 
@@ -155,60 +162,41 @@ namespace Moq.Proxy
 			return delegateInterfaceType;
  		}
 
-		private static ProxyGenerator CreateProxyGenerator()
+		private sealed class Interceptor : Castle.DynamicProxy.IInterceptor
 		{
-			return new ProxyGenerator();
-		}
+			private Moq.IInterceptor underlying;
 
-		private class Interceptor : IInterceptor
-		{
-			private ICallInterceptor interceptor;
-
-			internal Interceptor(ICallInterceptor interceptor)
+			internal Interceptor(Moq.IInterceptor underlying)
 			{
-				this.interceptor = interceptor;
+				this.underlying = underlying;
 			}
 
 			public void Intercept(IInvocation invocation)
 			{
-				this.interceptor.Intercept(new CallContext(invocation));
+				this.underlying.Intercept(new Invocation(underlying: invocation));
 			}
 		}
 
-		private class CallContext : ICallContext
+		private sealed class Invocation : Moq.Invocation
 		{
-			private IInvocation invocation;
+			private IInvocation underlying;
 
-			internal CallContext(IInvocation invocation)
+			internal Invocation(IInvocation underlying)
 			{
-				this.invocation = invocation;
+				this.underlying = underlying;
 			}
 
-			public object[] Arguments
+			public override object[] Arguments => this.underlying.Arguments;
+
+			public override MethodInfo Method => this.underlying.Method;
+
+			public override object ReturnValue
 			{
-				get { return this.invocation.Arguments; }
+				get => this.underlying.ReturnValue;
+				set => this.underlying.ReturnValue = value;
 			}
 
-			public MethodInfo Method
-			{
-				get { return this.invocation.Method; }
-			}
-
-			public object ReturnValue
-			{
-				get { return this.invocation.ReturnValue; }
-				set { this.invocation.ReturnValue = value; }
-			}
-
-			public void InvokeBase()
-			{
-				this.invocation.Proceed();
-			}
-
-			public void SetArgumentValue(int index, object value)
-			{
-				this.invocation.SetArgumentValue(index, value);
-			}
+			public override void InvokeBase() => this.underlying.Proceed();
 		}
 
 		/// <summary>

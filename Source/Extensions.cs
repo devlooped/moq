@@ -41,21 +41,20 @@
 using System;
 using System.Collections;
 using System.Collections.Generic;
-using System.Diagnostics.CodeAnalysis;
 using System.Globalization;
 using System.Linq;
+using System.Linq.Expressions;
 using System.Reflection;
 using System.Runtime.CompilerServices;
-using Moq.Proxy;
-using System.Linq.Expressions;
-using Moq.Properties;
 using System.Runtime.ExceptionServices;
+
+using Moq.Properties;
 
 namespace Moq
 {
 	internal static class Extensions
 	{
-		public static string Format(this ICallContext invocation)
+		public static string Format(this Invocation invocation)
 		{
 			if (invocation.Method.IsPropertyGetter())
 			{

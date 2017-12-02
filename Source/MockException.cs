@@ -49,7 +49,6 @@ using System.Security;
 
 using Moq.Diagnostics.Errors;
 using Moq.Properties;
-using Moq.Proxy;
 
 namespace Moq
 {
@@ -94,15 +93,12 @@ namespace Moq
 
 		private ExceptionReason reason;
 
-		internal MockException(ExceptionReason reason, MockBehavior behavior,
-			ICallContext invocation)
-			: this(reason, behavior, invocation,
-				Properties.Resources.ResourceManager.GetString(reason.ToString()))
+		internal MockException(ExceptionReason reason, MockBehavior behavior, Invocation invocation)
+			: this(reason, behavior, invocation, Resources.ResourceManager.GetString(reason.ToString()))
 		{
 		}
 
-		internal MockException(ExceptionReason reason, MockBehavior behavior,
-			ICallContext invocation, string message)
+		internal MockException(ExceptionReason reason, MockBehavior behavior, Invocation invocation, string message)
 			: base(GetMessage(behavior, invocation, message))
 		{
 			this.reason = reason;
@@ -138,10 +134,7 @@ namespace Moq
 			get { return reason == ExceptionReason.VerificationFailed; }
 		}
 
-		private static string GetMessage(
-			MockBehavior behavior,
-			ICallContext invocation,
-			string message)
+		private static string GetMessage(MockBehavior behavior, Invocation invocation, string message)
 		{
 			return string.Format(
 				CultureInfo.CurrentCulture,

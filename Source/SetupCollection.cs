@@ -44,8 +44,6 @@ using System.Linq;
 using System.Linq.Expressions;
 using System.Reflection;
 
-using Moq.Proxy;
-
 namespace Moq
 {
 	internal sealed class SetupCollection
@@ -83,7 +81,7 @@ namespace Moq
 			}
 		}
 
-		public IProxyCall FindMatchFor(ICallContext invocation)
+		public IProxyCall FindMatchFor(Invocation invocation)
 		{
 			IProxyCall matchingSetup = null;
 

@@ -38,10 +38,29 @@
 //[This is the BSD license, see
 // http://www.opensource.org/licenses/bsd-license.php]
 
-namespace Moq.Proxy
+namespace Moq
 {
-	internal interface ICallInterceptor
+	internal enum InterceptionAction
 	{
-		void Intercept(ICallContext context);
+ 		Continue,
+		Stop
+	}
+
+	/// <summary>
+	/// Abstract base class representing a specific aspect of mock method interception.
+	/// </summary>
+	internal abstract class InterceptionAspect
+	{
+		protected InterceptionAspect()
+		{
+		}
+
+		/// <summary>
+		/// Handle interception
+		/// </summary>
+		/// <param name="invocation">The current invocation.</param>
+		/// <param name="mock">The mock on which the current invocation is occurring.</param>
+		/// <returns>InterceptionAction.Continue if further interception has to be processed, otherwise InterceptionAction.Stop</returns>
+		public abstract InterceptionAction Handle(Invocation invocation, Mock mock);
 	}
 }

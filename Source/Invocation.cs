@@ -38,21 +38,18 @@
 //[This is the BSD license, see
 // http://www.opensource.org/licenses/bsd-license.php]
 
-using System;
 using System.Reflection;
 
-namespace Moq.Proxy
+namespace Moq
 {
-	internal interface ICallContext
+	internal abstract class Invocation
 	{
-		object[] Arguments { get; }
+		public abstract MethodInfo Method { get; }
 
-		MethodInfo Method { get; }
+		public abstract object[] Arguments { get; }
 
-		object ReturnValue { get; set; }
+		public abstract object ReturnValue { get; set; }
 
-		void InvokeBase();
-
-		void SetArgumentValue(int index, object value);
+		public abstract void InvokeBase();
 	}
 }

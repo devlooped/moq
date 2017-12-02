@@ -53,7 +53,6 @@ using Moq.Language;
 using Moq.Language.Flow;
 using Moq.Matchers;
 using Moq.Properties;
-using Moq.Proxy;
 
 namespace Moq
 {
@@ -221,7 +220,7 @@ namespace Moq
 #endif
 		}
 
-		public void SetOutParameters(ICallContext call)
+		public void SetOutParameters(Invocation invocation)
 		{
 			if (this.outValues == null)
 			{
@@ -230,23 +229,23 @@ namespace Moq
 
 			foreach (var item in this.outValues)
 			{
-				call.SetArgumentValue(item.Key, item.Value);
+				invocation.Arguments[item.Key] = item.Value;
 			}
 		}
 
-		public virtual bool Matches(ICallContext call)
+		public virtual bool Matches(Invocation invocation)
 		{
-			var parameters = call.Method.GetParameters();
+			var parameters = invocation.Method.GetParameters();
 			var args = new List<object>();
 			for (int i = 0; i < parameters.Length; i++)
 			{
 				if (!parameters[i].IsOutArgument())
 				{
-					args.Add(call.Arguments[i]);
+					args.Add(invocation.Arguments[i]);
 				}
 			}
 
-			if (argumentMatchers.Count == args.Count && this.IsEqualMethodOrOverride(call))
+			if (argumentMatchers.Count == args.Count && this.IsEqualMethodOrOverride(invocation))
 			{
 				for (int i = 0; i < argumentMatchers.Count; i++)
 				{
@@ -268,7 +267,7 @@ namespace Moq
 				condition.EvaluatedSuccessfully();
 		}
 
-		public virtual void Execute(ICallContext call)
+		public virtual void Execute(Invocation invocation)
 		{
 			++this.callCount;
 
@@ -288,9 +287,9 @@ namespace Moq
 				}
 			}
 
-			this.callbackResponse?.Invoke(call.Arguments);
+			this.callbackResponse?.Invoke(invocation.Arguments);
 
-			this.raiseEventResponse?.RespondTo(call);
+			this.raiseEventResponse?.RespondTo(invocation);
 
 			if (this.throwExceptionResponse != null)
 			{
@@ -371,24 +370,24 @@ namespace Moq
 			this.failMessage = failMessage;
 		}
 
-		private bool IsEqualMethodOrOverride(ICallContext call)
+		private bool IsEqualMethodOrOverride(Invocation invocation)
 		{
-			if (call.Method == this.method)
+			if (invocation.Method == this.method)
 			{
 				return true;
 			}
 
-			if (this.method.DeclaringType.IsAssignableFrom(call.Method.DeclaringType))
+			if (this.method.DeclaringType.IsAssignableFrom(invocation.Method.DeclaringType))
 			{
-				if (!this.method.Name.Equals(call.Method.Name, StringComparison.Ordinal) ||
-					this.method.ReturnType != call.Method.ReturnType ||
+				if (!this.method.Name.Equals(invocation.Method.Name, StringComparison.Ordinal) ||
+					this.method.ReturnType != invocation.Method.ReturnType ||
 					!this.method.IsGenericMethod &&
-					!call.Method.GetParameterTypes().SequenceEqual(this.method.GetParameterTypes()))
+					!invocation.Method.GetParameterTypes().SequenceEqual(this.method.GetParameterTypes()))
 				{
 					return false;
 				}
 
-				if (this.method.IsGenericMethod && !call.Method.GetGenericArguments().SequenceEqual(this.method.GetGenericArguments(), AssignmentCompatibilityTypeComparer.Instance))
+				if (this.method.IsGenericMethod && !invocation.Method.GetGenericArguments().SequenceEqual(this.method.GetGenericArguments(), AssignmentCompatibilityTypeComparer.Instance))
 				{
 					return false;
 				}
@@ -520,7 +519,7 @@ namespace Moq
 				this.eventArgsParams = eventArgsParams;
 			}
 
-			public void RespondTo(ICallContext invocation)
+			public void RespondTo(Invocation invocation)
 			{
 				if (this.eventArgsParams != null)
 				{

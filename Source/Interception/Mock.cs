@@ -38,24 +38,29 @@
 //[This is the BSD license, see
 // http://www.opensource.org/licenses/bsd-license.php]
 
-using Moq.Proxy;
-
 namespace Moq
 {
-	internal enum InterceptionAction
+	partial class Mock : IInterceptor
 	{
- 		Continue,
-		Stop
-	}
+		private static InterceptionAspect[] aspects = new InterceptionAspect[]
+		{
+			HandleTracking.Instance,
+			HandleWellKnownMethods.Instance,
+			RecordInvocation.Instance,
+			FindAndExecuteMatchingSetup.Instance,
+			InvokeBase.Instance,
+			ProduceDefaultReturnValue.Instance,
+		};
 
-	internal interface IInterceptStrategy
-	{
-		/// <summary>
-		/// Handle interception
-		/// </summary>
-		/// <param name="invocation">the current invocation context</param>
-		/// <param name="mock">The mock on which the current invocation is occurring.</param>
-		/// <returns>InterceptionAction.Continue if further interception has to be processed, otherwise InterceptionAction.Stop</returns>
-		InterceptionAction HandleIntercept(ICallContext invocation, Mock mock);
+		void IInterceptor.Intercept(Invocation invocation)
+		{
+			foreach (var aspect in aspects)
+			{
+				if (aspect.Handle(invocation, this) == InterceptionAction.Stop)
+				{
+					break;
+				}
+			}
+		}
 	}
 }

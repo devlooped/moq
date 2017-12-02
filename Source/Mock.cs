@@ -53,15 +53,12 @@ using System.Threading.Tasks;
 using Moq.Diagnostics.Errors;
 using Moq.Language.Flow;
 using Moq.Properties;
-using Moq.Proxy;
 
 namespace Moq
 {
 	/// <include file='Mock.xdoc' path='docs/doc[@for="Mock"]/*'/>
 	public abstract partial class Mock : IFluentInterface
 	{
-		internal static IProxyFactory ProxyFactory => CastleProxyFactory.Instance;
-
 		private bool isInitialized;
 		private EventHandlerCollection eventHandlers;
 		private InvocationCollection invocations;
@@ -436,7 +433,7 @@ namespace Moq
 		private static void ThrowVerifyException(
 			MethodCall expected,
 			IEnumerable<IProxyCall> setups,
-			IEnumerable<ICallContext> actualCalls,
+			IEnumerable<Invocation> actualCalls,
 			Expression expression,
 			Times times,
 			int callCount)
@@ -458,7 +455,7 @@ namespace Moq
 				Environment.NewLine + string.Format(Resources.ConfiguredSetups, Environment.NewLine + string.Join(Environment.NewLine, expressionSetups));
 		}
 
-		private static string FormatInvocations(IEnumerable<ICallContext> invocations)
+		private static string FormatInvocations(IEnumerable<Invocation> invocations)
 		{
 			var formattedInvocations = invocations
 				.Select(i => i.Format())
@@ -806,7 +803,7 @@ namespace Moq
 					   //    (a) those that are read-only; and
 					   //    (b) those that are writable and whose setter can be overridden.
 					   p.GetIndexParameters().Length == 0 &&
-					   ProxyFactory.IsMethodVisible(p.GetGetMethod(), out _))
+					   ProxyFactory.Instance.IsMethodVisible(p.GetGetMethod(), out _))
 				.Distinct();
 
 			var setupPropertyMethod = mock.GetType().GetMethods("SetupProperty")
@@ -929,7 +926,7 @@ namespace Moq
 
 		private static void ThrowIfSetupMethodNotVisibleToProxyFactory(MethodInfo method)
 		{
-			if (Mock.ProxyFactory.IsMethodVisible(method, out string messageIfNotVisible) == false)
+			if (ProxyFactory.Instance.IsMethodVisible(method, out string messageIfNotVisible) == false)
 			{
 				throw new ArgumentException(string.Format(
 					CultureInfo.CurrentCulture,

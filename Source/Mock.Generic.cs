@@ -54,12 +54,11 @@ using Microsoft.CSharp;
 
 using Moq.Language;
 using Moq.Language.Flow;
-using Moq.Proxy;
 
 namespace Moq
 {
 	/// <include file='Mock.Generic.xdoc' path='docs/doc[@for="Mock{T}"]/*'/>
-    public partial class Mock<T> : Mock, IMock<T> where T : class
+	public partial class Mock<T> : Mock, IMock<T> where T : class
 	{
 		private static int serialNumberCounter = 0;
 		private T instance;
@@ -216,12 +215,12 @@ namespace Moq
 				// We're mocking a delegate.
 				// Firstly, get/create an interface with a method whose signature
 				// matches that of the delegate.
-				var delegateInterfaceType = Mock.ProxyFactory.GetDelegateProxyInterface(typeof(T), out delegateInterfaceMethod);
+				var delegateInterfaceType = ProxyFactory.Instance.GetDelegateProxyInterface(typeof(T), out delegateInterfaceMethod);
 
 				// Then create a proxy for that.
-				var delegateProxy = Mock.ProxyFactory.CreateProxy(
+				var delegateProxy = ProxyFactory.Instance.CreateProxy(
 					delegateInterfaceType,
-					new Interceptor(this),
+					this,
 					this.ImplementedInterfaces.ToArray(),
 					this.constructorArguments);
 
@@ -231,9 +230,9 @@ namespace Moq
 			}
 			else
 			{
-				this.instance = (T)Mock.ProxyFactory.CreateProxy(
+				this.instance = (T)ProxyFactory.Instance.CreateProxy(
 					typeof(T),
-					new Interceptor(this),
+					this,
 					this.ImplementedInterfaces.Skip(this.InternallyImplementedInterfaceCount - 1).ToArray(),
 					this.constructorArguments);
 			}
