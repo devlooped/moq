@@ -139,7 +139,7 @@ namespace Moq
 			return string.Format(
 				CultureInfo.CurrentCulture,
 				Resources.MockExceptionMessage,
-				invocation.Format(),
+				invocation.ToString(),
 				behavior,
 				message
 			);

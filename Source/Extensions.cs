@@ -54,27 +54,6 @@ namespace Moq
 {
 	internal static class Extensions
 	{
-		public static string Format(this Invocation invocation)
-		{
-			if (invocation.Method.IsPropertyGetter())
-			{
-				return invocation.Method.DeclaringType.Name + "." + invocation.Method.Name.Substring(4);
-			}
-
-			if (invocation.Method.IsPropertySetter())
-			{
-				return invocation.Method.DeclaringType.Name + "." +
-					invocation.Method.Name.Substring(4) + " = " + GetValue(invocation.Arguments.First());
-			}
-			
-			var genericParameters = invocation.Method.IsGenericMethod
-				? "<" + string.Join(", ", invocation.Method.GetGenericArguments().Select(t => t.Name).ToArray()) + ">"
-				: "";
-
-			return invocation.Method.DeclaringType.Name + "." + invocation.Method.Name + genericParameters + "(" +
-				string.Join(", ", invocation.Arguments.Select(a => GetValue(a)).ToArray()) + ")";
-		}
-
 		public static string GetValue(object value)
 		{
 			if (value == null)

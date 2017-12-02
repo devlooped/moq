@@ -20,6 +20,7 @@ The format is loosely based on [Keep a Changelog](http://keepachangelog.com/en/1
   install them by setting `Mock[Repository].DefaultValueProvider` (@stakx, #533, #536)
 * Allow `DefaultValue.Mock` to mock `Task<TMockable>` and `ValueTask<TMockable>` (@stakx, #502)
 * Match any value for `ref` parameters with `It.Ref<T>.IsAny` (or `ItExpr.Ref<T>.IsAny` for protected methods) as you would with `It.IsAny<T>()` for regular parameters (@stakx, #537) 
+* `Mock.VerifyNoOtherCalls()` to check whether all expected invocations have been verified -- can be used as an alternative to `MockBehavior.Strict` (@stakx, #539)
 
 #### Changed
 

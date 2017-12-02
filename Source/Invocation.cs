@@ -38,18 +38,83 @@
 //[This is the BSD license, see
 // http://www.opensource.org/licenses/bsd-license.php]
 
+using System.Collections;
+using System.Linq;
 using System.Reflection;
+using System.Text;
 
 namespace Moq
 {
 	internal abstract class Invocation
 	{
+		private bool verified;
+
 		public abstract MethodInfo Method { get; }
 
 		public abstract object[] Arguments { get; }
 
 		public abstract object ReturnValue { get; set; }
 
+		public bool Verified => this.verified;
+
 		public abstract void InvokeBase();
+
+		public void MarkAsVerified() => this.verified = true;
+
+		public override string ToString()
+		{
+			var method = this.Method;
+
+			var builder = new StringBuilder();
+			builder.Append(method.DeclaringType.Name);
+			builder.Append('.');
+
+			if (method.IsPropertyGetter())
+			{
+				builder.Append(method.Name, 4, method.Name.Length - 4);
+			}
+			else if (method.IsPropertySetter())
+			{
+				builder.Append(method.Name, 4, method.Name.Length - 4);
+				builder.Append(" = ");
+				builder.Append(Extensions.GetValue(this.Arguments.First()));
+			}
+			else
+			{
+				builder.Append(method.Name);
+
+				// append generic argument list:
+				if (method.IsGenericMethod)
+				{
+					builder.Append('<');
+					var genericArguments = method.GetGenericArguments();
+					for (int i = 0, n = genericArguments.Length; i < n; ++i)
+					{
+						if (i > 0)
+						{
+							builder.Append(", ");
+						}
+						builder.Append(genericArguments[i].Name);
+					}
+
+					builder.Append('>');
+				}
+
+				// append argument list:
+				builder.Append('(');
+				for (int i = 0, n = this.Arguments.Length; i < n; ++i)
+				{
+					if (i > 0)
+					{
+						builder.Append(", ");
+					}
+					builder.Append(Extensions.GetValue(this.Arguments[i]));
+				}
+
+				builder.Append(')');
+			}
+
+			return builder.ToString();
+		}
 	}
 }

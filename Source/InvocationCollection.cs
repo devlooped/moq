@@ -38,7 +38,9 @@
 //[This is the BSD license, see
 // http://www.opensource.org/licenses/bsd-license.php]
 
+using System;
 using System.Collections.Generic;
+using System.Linq;
 
 namespace Moq
 {
@@ -72,6 +74,14 @@ namespace Moq
 			lock (this.invocations)
 			{
 				return this.invocations.ToArray();
+			}
+		}
+
+		public Invocation[] ToArray(Func<Invocation, bool> predicate)
+		{
+			lock (this.invocations)
+			{
+				return this.invocations.Where(predicate).ToArray();
 			}
 		}
 	}

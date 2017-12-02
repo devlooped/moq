@@ -414,19 +414,40 @@ namespace Moq
 			return false;
 		}
 
+		internal static void VerifyNoOtherCalls(Mock mock)
+		{
+			var unverifiedInvocations = mock.invocations.ToArray(invocation => !invocation.Verified);
+			if (unverifiedInvocations.Any())
+			{
+				throw new MockException(
+					MockException.ExceptionReason.VerificationFailed,
+					string.Format(
+						CultureInfo.CurrentCulture,
+						Resources.UnverifiedInvocations,
+						string.Join<Invocation>(Environment.NewLine, unverifiedInvocations)));
+			}
+		}
+
 		private static void VerifyCalls(
 			Mock targetMock,
 			MethodCall expected,
 			Expression expression,
 			Times times)
 		{
-			var actualCalls = targetMock.Invocations.ToArray();
-
-			var callCount = actualCalls.Count(expected.Matches);
-			if (!times.Verify(callCount))
+			var allInvocations = targetMock.Invocations.ToArray();
+			var matchingInvocations = allInvocations.Where(expected.Matches).ToArray();
+			var matchingInvocationCount = matchingInvocations.Length;
+			if (!times.Verify(matchingInvocationCount))
 			{
 				var setups = targetMock.Setups.ToArrayLive(oc => AreSameMethod(oc.SetupExpression, expression));
-				ThrowVerifyException(expected, setups, actualCalls, expression, times, callCount);
+				ThrowVerifyException(expected, setups, allInvocations, expression, times, matchingInvocationCount);
+			}
+			else
+			{
+				foreach (var matchingInvocation in matchingInvocations)
+				{
+					matchingInvocation.MarkAsVerified();
+				}
 			}
 		}
 
@@ -457,13 +478,8 @@ namespace Moq
 
 		private static string FormatInvocations(IEnumerable<Invocation> invocations)
 		{
-			var formattedInvocations = invocations
-				.Select(i => i.Format())
-				.ToArray();
-
-			return formattedInvocations.Length == 0 ?
-				Resources.NoInvocationsPerformed :
-				Environment.NewLine + string.Format(Resources.PerformedInvocations, Environment.NewLine + string.Join(Environment.NewLine, formattedInvocations));
+			return invocations.Any() ? Environment.NewLine + string.Format(Resources.PerformedInvocations, Environment.NewLine + string.Join<Invocation>(Environment.NewLine, invocations))
+			                         : Resources.NoInvocationsPerformed;
 		}
 
 		#endregion

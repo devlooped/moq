@@ -737,6 +737,16 @@ namespace Moq.Properties {
 		}
 		
 		/// <summary>
+		///   Looks up a localized string similar to The following invocations were not verified:
+		///{0}.
+		/// </summary>
+		internal static string UnverifiedInvocations {
+			get {
+				return ResourceManager.GetString("UnverifiedInvocations", resourceCulture);
+			}
+		}
+		
+		/// <summary>
 		///   Looks up a localized string similar to Use ItExpr.IsNull&lt;TValue&gt; rather than a null argument value, as it prevents proper method lookup..
 		/// </summary>
 		internal static string UseItExprIsNullRatherThanNullArgumentValue {

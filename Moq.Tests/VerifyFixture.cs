@@ -1091,6 +1091,117 @@ namespace Moq.Tests
 			Assert.Contains("setup for getter:", exception.Message);
 		}
 
+		[Fact]
+		public void Verify_if_successful_marks_matched_invocation_as_verified()
+		{
+			var mock = new Mock<IFoo>();
+			mock.Object.Submit();
+
+			var invocation = mock.Invocations.ToArray()[0];
+			Assert.False(invocation.Verified);
+
+			mock.Verify(m => m.Submit());
+			Assert.True(invocation.Verified);
+		}
+
+		[Fact]
+		public void Verify_if_successful_marks_only_matched_invocations_as_verified()
+		{
+			var mock = new Mock<IFoo>();
+			mock.Object.Echo(1);
+			mock.Object.Echo(2);
+			mock.Object.Echo(3);
+
+			var invocations = mock.Invocations.ToArray();
+			Assert.False(invocations[0].Verified);
+			Assert.False(invocations[1].Verified);
+			Assert.False(invocations[2].Verified);
+
+			mock.Verify(m => m.Echo(It.Is<int>(i => i != 2)));
+			Assert.True(invocations[0].Verified);
+			Assert.False(invocations[1].Verified);
+			Assert.True(invocations[2].Verified);
+		}
+
+		[Fact]
+		public void Verify_if_unsuccessful_marks_no_matched_invocations_as_verified()
+		{
+			var mock = new Mock<IFoo>();
+			mock.Object.Echo(1);
+			mock.Object.Echo(2);
+			mock.Object.Echo(3);
+
+			var invocations = mock.Invocations.ToArray();
+			Assert.False(invocations[0].Verified);
+			Assert.False(invocations[1].Verified);
+			Assert.False(invocations[2].Verified);
+
+			Assert.Throws<MockException>(() => mock.Verify(m => m.Echo(It.Is<int>(i => i != 2)), Times.Exactly(1)));
+			Assert.False(invocations[0].Verified);
+			Assert.False(invocations[1].Verified);
+			Assert.False(invocations[2].Verified);
+		}
+
+		[Fact]
+		public void VerifyNoOtherCalls_succeeds_if_no_calls_were_made()
+		{
+			var mock = new Mock<IFoo>();
+			mock.VerifyNoOtherCalls();
+		}
+
+		[Fact]
+		public void VerifyNoOtherCalls_fails_if_an_unverified_call_was_made()
+		{
+			var mock = new Mock<IFoo>();
+			mock.Object.Echo(1);
+			Assert.Throws<MockException>(() => mock.VerifyNoOtherCalls());
+		}
+
+		[Fact]
+		public void VerifyNoOtherCalls_includes_unverified_calls_in_exception_message()
+		{
+			var mock = new Mock<IFoo>();
+			mock.Object.Echo(1);
+			var ex = Assert.Throws<MockException>(() => mock.VerifyNoOtherCalls());
+			Assert.Contains(".Echo(1)", ex.Message);
+		}
+
+		[Fact]
+		public void VerifyNoOtherCalls_succeeds_if_a_verified_call_was_made()
+		{
+			var mock = new Mock<IFoo>();
+			mock.Object.Echo(1);
+			mock.Verify(m => m.Echo(1));
+			mock.VerifyNoOtherCalls();
+		}
+
+		[Fact]
+		public void VerifyNoOtherCalls_succeeds_if_several_verified_call_were_made()
+		{
+			var mock = new Mock<IFoo>();
+			mock.Object.Echo(1);
+			mock.Object.Echo(2);
+			mock.Object.Echo(3);
+			mock.Object.Submit();
+			mock.Verify(m => m.Echo(It.IsAny<int>()));
+			mock.Verify(m => m.Submit());
+			mock.VerifyNoOtherCalls();
+		}
+
+		[Fact]
+		public void VerifyNoOtherCalls_fails_if_several_verified_calls_and_several_unverified_call_were_made()
+		{
+			var mock = new Mock<IFoo>();
+			mock.Object.Echo(1);
+			mock.Object.Echo(2);
+			mock.Object.Echo(3);
+			mock.Object.Submit();
+			mock.Verify(m => m.Echo(It.Is<int>(i => i > 1)));
+			var ex = Assert.Throws<MockException>(() => mock.VerifyNoOtherCalls());
+			Assert.Contains(".Echo(1)", ex.Message);
+			Assert.Contains(".Submit()", ex.Message);
+		}
+
 		public interface IBar
 		{
 			int? Value { get; set; }
