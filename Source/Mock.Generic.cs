@@ -215,10 +215,10 @@ namespace Moq
 				// We're mocking a delegate.
 				// Firstly, get/create an interface with a method whose signature
 				// matches that of the delegate.
-				var delegateInterfaceType = Mock.ProxyFactory.GetDelegateProxyInterface(typeof(T), out delegateInterfaceMethod);
+				var delegateInterfaceType = ProxyFactory.Instance.GetDelegateProxyInterface(typeof(T), out delegateInterfaceMethod);
 
 				// Then create a proxy for that.
-				var delegateProxy = Mock.ProxyFactory.CreateProxy(
+				var delegateProxy = ProxyFactory.Instance.CreateProxy(
 					delegateInterfaceType,
 					this,
 					this.ImplementedInterfaces.ToArray(),
@@ -230,7 +230,7 @@ namespace Moq
 			}
 			else
 			{
-				this.instance = (T)Mock.ProxyFactory.CreateProxy(
+				this.instance = (T)ProxyFactory.Instance.CreateProxy(
 					typeof(T),
 					this,
 					this.ImplementedInterfaces.Skip(this.InternallyImplementedInterfaceCount - 1).ToArray(),
