@@ -46,7 +46,7 @@ using System.Reflection;
 
 namespace Moq
 {
-	internal class HandleWellKnownMethods : IInterceptStrategy
+	internal sealed class HandleWellKnownMethods : InterceptionAspect
 	{
 		public static HandleWellKnownMethods Instance { get; } = new HandleWellKnownMethods();
 
@@ -59,7 +59,7 @@ namespace Moq
 			["ToString"] = HandleToString,
 		};
 
-		public InterceptionAction HandleIntercept(Invocation invocation, Mock mock)
+		public override InterceptionAction Handle(Invocation invocation, Mock mock)
 		{
 			if (specialMethods.TryGetValue(invocation.Method.Name, out Func<Invocation, Mock, InterceptionAction> handler))
 			{
@@ -140,11 +140,11 @@ namespace Moq
 		private static bool IsObjectMethod(MethodInfo method, string name) => IsObjectMethod(method) && method.Name == name;
 	}
 
-	internal class HandleMockRecursion : IInterceptStrategy
+	internal sealed class ProduceDefaultReturnValue : InterceptionAspect
 	{
-		public static HandleMockRecursion Instance { get; } = new HandleMockRecursion();
+		public static ProduceDefaultReturnValue Instance { get; } = new ProduceDefaultReturnValue();
 
-		public InterceptionAction HandleIntercept(Invocation invocation, Mock mock)
+		public override InterceptionAction Handle(Invocation invocation, Mock mock)
 		{
 			Debug.Assert(invocation.Method != null);
 			Debug.Assert(invocation.Method.ReturnType != null);
@@ -166,11 +166,11 @@ namespace Moq
 		}
 	}
 
-	internal class InvokeBase : IInterceptStrategy
+	internal sealed class InvokeBase : InterceptionAspect
 	{
 		public static InvokeBase Instance { get; } = new InvokeBase();
 
-		public InterceptionAction HandleIntercept(Invocation invocation, Mock mock)
+		public override InterceptionAction Handle(Invocation invocation, Mock mock)
 		{
 			if (invocation.Method.DeclaringType == typeof(object) || // interface proxy
 				mock.ImplementedInterfaces.Contains(invocation.Method.DeclaringType) && !invocation.Method.LooksLikeEventAttach() && !invocation.Method.LooksLikeEventDetach() && mock.CallBase && !mock.MockedType.GetTypeInfo().IsInterface || // class proxy with explicitly implemented interfaces. The method's declaring type is the interface and the method couldn't be abstract
@@ -193,11 +193,11 @@ namespace Moq
 		}
 	}
 
-	internal class ExtractAndExecuteProxyCall : IInterceptStrategy
+	internal sealed class FindAndExecuteMatchingSetup : InterceptionAspect
 	{
-		public static ExtractAndExecuteProxyCall Instance { get; } = new ExtractAndExecuteProxyCall();
+		public static FindAndExecuteMatchingSetup Instance { get; } = new FindAndExecuteMatchingSetup();
 
-		public InterceptionAction HandleIntercept(Invocation invocation, Mock mock)
+		public override InterceptionAction Handle(Invocation invocation, Mock mock)
 		{
 			if (FluentMockContext.IsActive)
 			{
@@ -245,11 +245,11 @@ namespace Moq
 		}
 	}
 
-	internal class HandleTracking : IInterceptStrategy
+	internal sealed class HandleTracking : InterceptionAspect
 	{
 		public static HandleTracking Instance { get; } = new HandleTracking();
 
-		public InterceptionAction HandleIntercept(Invocation invocation, Mock mock)
+		public override InterceptionAction Handle(Invocation invocation, Mock mock)
 		{
 			// Track current invocation if we're in "record" mode in a fluent invocation context.
 			if (FluentMockContext.IsActive)
@@ -260,11 +260,11 @@ namespace Moq
 		}
 	}
 
-	internal class AddActualInvocation : IInterceptStrategy
+	internal sealed class RecordInvocation : InterceptionAspect
 	{
-		public static AddActualInvocation Instance { get; } = new AddActualInvocation();
+		public static RecordInvocation Instance { get; } = new RecordInvocation();
 
-		public InterceptionAction HandleIntercept(Invocation invocation, Mock mock)
+		public override InterceptionAction Handle(Invocation invocation, Mock mock)
 		{
 			if (FluentMockContext.IsActive)
 			{

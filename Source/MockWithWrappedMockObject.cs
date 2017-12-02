@@ -52,7 +52,7 @@ namespace Moq
 	///   <para>
 	///     Mocking a type, then wrapping it in a task inside <see cref="MockDefaultValueProvider"/>, then unwrapping the task
 	///     to get at the mock so it can be stored in <see cref="Mock.InnerMocks"/>, then wrapping it again each time a return
-	///     value is created (e. g. in <see cref="HandleMockRecursion"/>) is a lot of work.
+	///     value is created (e. g. in <see cref="ProduceDefaultReturnValue"/>) is a lot of work.
 	///   </para>
 	///   <para>
 	///     What we do instead is to hold the actual mock and the "wrapped" mocked object (used for return values) side by side

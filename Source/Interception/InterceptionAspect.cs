@@ -40,27 +40,27 @@
 
 namespace Moq
 {
-	partial class Mock : IInterceptor
+	internal enum InterceptionAction
 	{
-		private static IInterceptStrategy[] Strategies { get; } = new IInterceptStrategy[]
-		{
-			HandleTracking.Instance,
-			HandleWellKnownMethods.Instance,
-			AddActualInvocation.Instance,
-			ExtractAndExecuteProxyCall.Instance,
-			InvokeBase.Instance,
-			HandleMockRecursion.Instance,
-		};
+ 		Continue,
+		Stop
+	}
 
-		void IInterceptor.Intercept(Invocation invocation)
+	/// <summary>
+	/// Abstract base class representing a specific aspect of mock method interception.
+	/// </summary>
+	internal abstract class InterceptionAspect
+	{
+		protected InterceptionAspect()
 		{
-			foreach (var strategy in Strategies)
-			{
-				if (InterceptionAction.Stop == strategy.HandleIntercept(invocation, this))
-				{
-					break;
-				}
-			}
 		}
+
+		/// <summary>
+		/// Handle interception
+		/// </summary>
+		/// <param name="invocation">The current invocation.</param>
+		/// <param name="mock">The mock on which the current invocation is occurring.</param>
+		/// <returns>InterceptionAction.Continue if further interception has to be processed, otherwise InterceptionAction.Stop</returns>
+		public abstract InterceptionAction Handle(Invocation invocation, Mock mock);
 	}
 }
