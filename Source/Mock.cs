@@ -63,7 +63,6 @@ namespace Moq
 		private EventHandlerCollection eventHandlers;
 		private InvocationCollection invocations;
 		private SetupCollection setups;
-		private Switches switches;
 
 		/// <include file='Mock.xdoc' path='docs/doc[@for="Mock.ctor"]/*'/>
 		protected Mock()
@@ -73,7 +72,6 @@ namespace Moq
 			this.InnerMocks = new ConcurrentDictionary<MethodInfo, MockWithWrappedMockObject>();
 			this.invocations = new InvocationCollection();
 			this.setups = new SetupCollection();
-			this.switches = Switches.Default;
 		}
 
 		/// <include file='Mock.xdoc' path='docs/doc[@for="Mock.Get"]/*'/>
@@ -131,7 +129,7 @@ namespace Moq
 
 			throw new ArgumentException(Resources.ObjectInstanceNotMock, "mocked");
 		}
-		
+
 		/// <include file='Mock.xdoc' path='docs/doc[@for="Mock.Verify"]/*'/>
 		public static void Verify(params Mock[] mocks)
 		{
@@ -140,7 +138,7 @@ namespace Moq
 				mock.Verify();
 			}
 		}
-		
+
 		/// <include file='Mock.xdoc' path='docs/doc[@for="Mock.VerifyAll"]/*'/>
 		public static void VerifyAll(params Mock[] mocks)
 		{
@@ -249,11 +247,7 @@ namespace Moq
 		/// A set of switches that influence how this mock will operate.
 		/// You can opt in or out of certain features via this property.
 		/// </summary>
-		public virtual Switches Switches
-		{
-			get => this.switches;
-			set => this.switches = value;
-		}
+		public abstract Switches Switches { get; set; }
 
 		internal abstract Type TargetType { get; }
 

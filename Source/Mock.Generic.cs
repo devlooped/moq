@@ -65,6 +65,7 @@ namespace Moq
 		private Dictionary<Type, object> configuredDefaultValues;
 		private object[] constructorArguments;
 		private DefaultValueProvider defaultValueProvider;
+		private Switches switches;
 
 #region Ctors
 
@@ -123,6 +124,7 @@ namespace Moq
 			this.ImplementedInterfaces.AddRange(typeof(T).GetInterfaces().Where(i => (i.GetTypeInfo().IsPublic || i.GetTypeInfo().IsNestedPublic) && !i.GetTypeInfo().IsImport));
 			this.ImplementedInterfaces.Add(typeof(IMocked<T>));
 			this.InternallyImplementedInterfaceCount = this.ImplementedInterfaces.Count;
+			this.switches = Switches.Default;
 
 			this.CheckParameters();
 		}
@@ -273,6 +275,16 @@ namespace Moq
 		}
 
 		internal override Type TargetType => typeof(T);
+
+		/// <summary>
+		/// A set of switches that influence how this mock will operate.
+		/// You can opt in or out of certain features via this property.
+		/// </summary>
+		public override Switches Switches
+		{
+			get => this.switches;
+			set => this.switches = value;
+		}
 
 #endregion
 
