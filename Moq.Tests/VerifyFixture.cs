@@ -1229,9 +1229,40 @@ namespace Moq.Tests
 			Assert.Contains(".Submit()", ex.Message);
 		}
 
+		[Fact]
+		public void VerifyNoOtherCalls_succeeds_with_DefaultValue_Mock_and_multi_dot_Verify_expression()
+		{
+			var mock = new Mock<IFoo>() { DefaultValue = DefaultValue.Mock };
+			mock.Object.Bar.Poke();
+
+			mock.Verify(m => m.Bar.Poke());
+			mock.VerifyNoOtherCalls();
+		}
+
+		[Fact]
+		public void VerifyNoOtherCalls_succeeds_with_DefaultValue_Mock_and_multi_dot_VerifyGet_expression()
+		{
+			var mock = new Mock<IFoo>() { DefaultValue = DefaultValue.Mock };
+			var value = mock.Object.Bar.Value;
+
+			mock.VerifyGet(m => m.Bar.Value);
+			mock.VerifyNoOtherCalls();
+		}
+
+		[Fact]
+		public void VerifyNoOtherCalls_succeeds_with_DefaultValue_Mock_and_multi_dot_VerifySet_expression()
+		{
+			var mock = new Mock<IFoo>() { DefaultValue = DefaultValue.Mock };
+			mock.Object.Bar.Value = 42;
+
+			mock.VerifySet(m => m.Bar.Value = 42);
+			mock.VerifyNoOtherCalls();
+		}
+
 		public interface IBar
 		{
 			int? Value { get; set; }
+			void Poke();
 		}
 
 		public interface IFoo
