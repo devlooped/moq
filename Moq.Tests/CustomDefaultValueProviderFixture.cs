@@ -89,8 +89,24 @@ namespace Moq.Tests
 			Assert.Equal(expectedReturnValue, actualReturnValue);
 		}
 
+		[Fact]
+		public void FluentMockContext_properly_restores_custom_default_value_provider()
+		{
+			var customDefaultValueProvider = new ConstantDefaultValueProvider(42);
+			var mock = new Mock<IFoo>() { DefaultValueProvider = customDefaultValueProvider };
+
+			mock.VerifySet(m => m.Inner.Value = 1, Times.Never);
+			//             ^^^^^^^^^^^^^^^^^^^^^^
+			// Moq has to execute this action to analyse what is being set. Because this is a multi-dot expression,
+			// it temporarily switches to DefaultValue.Mock. Once it's done, it should switch back to the one we
+			// set up above.
+
+			Assert.Same(customDefaultValueProvider, mock.DefaultValueProvider);
+		}
+
 		public interface IFoo
 		{
+			int Value { get; set; }
 			int GetValue();
 			int[] GetValues();
 			IFoo Inner { get; }
