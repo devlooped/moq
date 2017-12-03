@@ -1202,7 +1202,11 @@ namespace Moq
 
 		internal abstract Dictionary<Type, object> ConfiguredDefaultValues { get; }
 
-		/// <include file='Mock.Generic.xdoc' path='docs/doc[@for="Mock.SetReturnDefault{TReturn}"]/*'/>
+		/// <summary>
+		/// Defines the default return value for all mocked methods or properties with return type <typeparamref name= "TReturn" />.
+		/// </summary>
+		/// <typeparam name="TReturn">The return type for which to define a default value.</typeparam>
+		/// <param name="value">The default return value.</param>
 		public void SetReturnsDefault<TReturn>(TReturn value)
 		{
 			this.ConfiguredDefaultValues[typeof(TReturn)] = value;
