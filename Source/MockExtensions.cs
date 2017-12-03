@@ -19,11 +19,12 @@ namespace Moq
 		}
 
 		/// <summary>
-		/// Resets this mock's state. This includes its setups, registered event handlers, and all recorded invocations.
+		/// Resets this mock's state. This includes its setups, configured default return values, registered event handlers, and all recorded invocations.
 		/// </summary>
 		/// <param name="mock">The mock whose state should be reset.</param>
 		public static void Reset(this Mock mock)
 		{
+			mock.ConfiguredDefaultValues.Clear();
 			mock.Setups.Clear();
 			mock.EventHandlers.Clear();
 			mock.ResetCalls();
