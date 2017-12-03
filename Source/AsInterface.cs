@@ -56,6 +56,8 @@ namespace Moq
 			this.owner = owner;
 		}
 
+		internal override List<Type> AdditionalInterfaces => this.owner.AdditionalInterfaces;
+
 		internal override Dictionary<Type, object> ConfiguredDefaultValues => this.owner.ConfiguredDefaultValues;
 
 		internal override ConcurrentDictionary<MethodInfo, MockWithWrappedMockObject> InnerMocks
@@ -88,9 +90,7 @@ namespace Moq
 
 		internal override EventHandlerCollection EventHandlers => this.owner.EventHandlers;
 
-		internal override List<Type> ImplementedInterfaces => this.owner.ImplementedInterfaces;
-
-		internal override int InternallyImplementedInterfaceCount => this.owner.InternallyImplementedInterfaceCount;
+		internal override Type[] InheritedInterfaces => this.owner.InheritedInterfaces;
 
 		public override TInterface Object
 		{
