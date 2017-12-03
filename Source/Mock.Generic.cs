@@ -72,6 +72,7 @@ namespace Moq
 		private int internallyImplementedInterfaceCount;
 		private ConcurrentDictionary<MethodInfo, MockWithWrappedMockObject> innerMocks;
 		private InvocationCollection invocations;
+		private string name;
 		private SetupCollection setups;
 
 		private MockBehavior behavior;
@@ -126,8 +127,6 @@ namespace Moq
 				args = new object[] { null };
 			}
 
-			this.Name = GenerateMockName();
-
 			this.behavior = behavior;
 			this.configuredDefaultValues = new Dictionary<Type, object>();
 			this.constructorArguments = args;
@@ -139,17 +138,18 @@ namespace Moq
 			this.internallyImplementedInterfaceCount = this.ImplementedInterfaces.Count;
 			this.innerMocks = new ConcurrentDictionary<MethodInfo, MockWithWrappedMockObject>();
 			this.invocations = new InvocationCollection();
+			this.name = CreateUniqueDefaultMockName();
 			this.setups = new SetupCollection();
 			this.switches = Switches.Default;
 
 			this.CheckParameters();
 		}
 
-		private string GenerateMockName()
+		private static string CreateUniqueDefaultMockName()
 		{
 			var serialNumber = Interlocked.Increment(ref serialNumberCounter).ToString("x8");
 
-			var typeName = typeof (T).FullName;
+			string typeName = typeof (T).FullName;
 
 #if FEATURE_CODEDOM
 			if (typeof (T).IsGenericType)
@@ -229,7 +229,11 @@ namespace Moq
 		}
 
 		/// <include file='Mock.Generic.xdoc' path='docs/doc[@for="Mock{T}.Name"]/*'/>
-		public string Name { get; set; }
+		public string Name
+		{
+			get => this.name;
+			set => this.name = value;
+		}
 
 		/// <include file='Mock.Generic.xdoc' path='docs/doc[@for="Mock{T}.ToString"]/*'/>
 		public override string ToString()
