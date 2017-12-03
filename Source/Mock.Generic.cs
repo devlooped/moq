@@ -39,6 +39,7 @@
 // http://www.opensource.org/licenses/bsd-license.php]
 
 using System;
+using System.Collections.Concurrent;
 using System.Collections.Generic;
 using System.Diagnostics;
 using System.Diagnostics.CodeAnalysis;
@@ -66,6 +67,7 @@ namespace Moq
 		private object[] constructorArguments;
 		private DefaultValueProvider defaultValueProvider;
 		private EventHandlerCollection eventHandlers;
+		private ConcurrentDictionary<MethodInfo, MockWithWrappedMockObject> innerMocks;
 		private InvocationCollection invocations;
 		private SetupCollection setups;
 		private Switches switches;
@@ -128,6 +130,7 @@ namespace Moq
 			this.ImplementedInterfaces.AddRange(typeof(T).GetInterfaces().Where(i => (i.GetTypeInfo().IsPublic || i.GetTypeInfo().IsNestedPublic) && !i.GetTypeInfo().IsImport));
 			this.ImplementedInterfaces.Add(typeof(IMocked<T>));
 			this.InternallyImplementedInterfaceCount = this.ImplementedInterfaces.Count;
+			this.innerMocks = new ConcurrentDictionary<MethodInfo, MockWithWrappedMockObject>();
 			this.invocations = new InvocationCollection();
 			this.setups = new SetupCollection();
 			this.switches = Switches.Default;
@@ -189,6 +192,8 @@ namespace Moq
 		}
 
 		internal override EventHandlerCollection EventHandlers => this.eventHandlers;
+
+		internal override ConcurrentDictionary<MethodInfo, MockWithWrappedMockObject> InnerMocks => this.innerMocks;
 
 		internal override InvocationCollection Invocations => this.invocations;
 

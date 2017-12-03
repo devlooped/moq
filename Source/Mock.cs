@@ -63,7 +63,6 @@ namespace Moq
 		protected Mock()
 		{
 			this.ImplementedInterfaces = new List<Type>();
-			this.InnerMocks = new ConcurrentDictionary<MethodInfo, MockWithWrappedMockObject>();
 		}
 
 		/// <include file='Mock.xdoc' path='docs/doc[@for="Mock.Get"]/*'/>
@@ -178,7 +177,7 @@ namespace Moq
 		[SuppressMessage("Microsoft.Naming", "CA1721:PropertyNamesShouldNotMatchGetMethods", Justification = "The public Object property is the only one visible to Moq consumers. The protected member is for internal use only.")]
 		public object Object => this.OnGetObject();
 
-		internal virtual ConcurrentDictionary<MethodInfo, MockWithWrappedMockObject> InnerMocks { get; private set; }
+		internal abstract ConcurrentDictionary<MethodInfo, MockWithWrappedMockObject> InnerMocks { get; }
 
 		internal abstract bool IsObjectInitialized { get; }
 
