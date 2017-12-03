@@ -59,8 +59,6 @@ namespace Moq
 	/// <include file='Mock.xdoc' path='docs/doc[@for="Mock"]/*'/>
 	public abstract partial class Mock : IFluentInterface
 	{
-		private bool isInitialized;
-
 		/// <include file='Mock.xdoc' path='docs/doc[@for="Mock.ctor"]/*'/>
 		protected Mock()
 		{
@@ -178,19 +176,11 @@ namespace Moq
 		/// <include file='Mock.xdoc' path='docs/doc[@for="Mock.Object"]/*'/>
 		[SuppressMessage("Microsoft.Naming", "CA1716:IdentifiersShouldNotMatchKeywords", MessageId = "Object", Justification = "Exposes the mocked object instance, so it's appropriate.")]
 		[SuppressMessage("Microsoft.Naming", "CA1721:PropertyNamesShouldNotMatchGetMethods", Justification = "The public Object property is the only one visible to Moq consumers. The protected member is for internal use only.")]
-		public object Object
-		{
-			get { return this.GetObject(); }
-		}
-
-		private object GetObject()
-		{
-			var value = this.OnGetObject();
-			this.isInitialized = true;
-			return value;
-		}
+		public object Object => this.OnGetObject();
 
 		internal virtual ConcurrentDictionary<MethodInfo, MockWithWrappedMockObject> InnerMocks { get; private set; }
+
+		internal abstract bool IsObjectInitialized { get; }
 
 		internal abstract InvocationCollection Invocations { get; }
 
@@ -1146,7 +1136,7 @@ namespace Moq
 			var index = this.ImplementedInterfaces.LastIndexOf(typeof(TInterface));
 
 			var isImplemented = index >= 0;
-			if (this.isInitialized && !isImplemented)
+			if (this.IsObjectInitialized && !isImplemented)
 			{
 				throw new InvalidOperationException(Resources.AlreadyInitialized);
 			}

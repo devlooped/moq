@@ -65,6 +65,8 @@ namespace Moq
 
 		internal override InvocationCollection Invocations => this.owner.Invocations;
 
+		internal override bool IsObjectInitialized => this.owner.IsObjectInitialized;
+
 		internal override Type MockedType
 		{
 			get { return typeof(TInterface); }
