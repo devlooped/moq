@@ -65,16 +65,14 @@ namespace Moq
 
 		internal override InvocationCollection Invocations => this.owner.Invocations;
 
+		internal override bool IsObjectInitialized => this.owner.IsObjectInitialized;
+
 		internal override Type MockedType
 		{
 			get { return typeof(TInterface); }
 		}
 
-		public override MockBehavior Behavior
-		{
-			get { return this.owner.Behavior; }
-			internal set { this.owner.Behavior = value; }
-		}
+		public override MockBehavior Behavior => this.owner.Behavior;
 
 		public override bool CallBase
 		{
@@ -89,6 +87,10 @@ namespace Moq
 		}
 
 		internal override EventHandlerCollection EventHandlers => this.owner.EventHandlers;
+
+		internal override List<Type> ImplementedInterfaces => this.owner.ImplementedInterfaces;
+
+		internal override int InternallyImplementedInterfaceCount => this.owner.InternallyImplementedInterfaceCount;
 
 		public override TInterface Object
 		{

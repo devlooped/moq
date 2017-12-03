@@ -59,21 +59,9 @@ namespace Moq
 	/// <include file='Mock.xdoc' path='docs/doc[@for="Mock"]/*'/>
 	public abstract partial class Mock : IFluentInterface
 	{
-		private bool isInitialized;
-		private EventHandlerCollection eventHandlers;
-		private InvocationCollection invocations;
-		private SetupCollection setups;
-		private Switches switches;
-
 		/// <include file='Mock.xdoc' path='docs/doc[@for="Mock.ctor"]/*'/>
 		protected Mock()
 		{
-			this.eventHandlers = new EventHandlerCollection();
-			this.ImplementedInterfaces = new List<Type>();
-			this.InnerMocks = new ConcurrentDictionary<MethodInfo, MockWithWrappedMockObject>();
-			this.invocations = new InvocationCollection();
-			this.setups = new SetupCollection();
-			this.switches = Switches.Default;
 		}
 
 		/// <include file='Mock.xdoc' path='docs/doc[@for="Mock.Get"]/*'/>
@@ -131,7 +119,7 @@ namespace Moq
 
 			throw new ArgumentException(Resources.ObjectInstanceNotMock, "mocked");
 		}
-		
+
 		/// <include file='Mock.xdoc' path='docs/doc[@for="Mock.Verify"]/*'/>
 		public static void Verify(params Mock[] mocks)
 		{
@@ -140,7 +128,7 @@ namespace Moq
 				mock.Verify();
 			}
 		}
-		
+
 		/// <include file='Mock.xdoc' path='docs/doc[@for="Mock.VerifyAll"]/*'/>
 		public static void VerifyAll(params Mock[] mocks)
 		{
@@ -151,10 +139,10 @@ namespace Moq
 		}
 
 		/// <include file='Mock.xdoc' path='docs/doc[@for="Mock.Behavior"]/*'/>
-		public virtual MockBehavior Behavior { get; internal set; }
+		public abstract MockBehavior Behavior { get; }
 
 		/// <include file='Mock.xdoc' path='docs/doc[@for="Mock.CallBase"]/*'/>
-		public virtual bool CallBase { get; set; }
+		public abstract bool CallBase { get; set; }
 
 		/// <include file='Mock.xdoc' path='docs/doc[@for="Mock.DefaultValue"]/*'/>
 		public DefaultValue DefaultValue
@@ -181,26 +169,18 @@ namespace Moq
 			}
 		}
 
-		internal virtual EventHandlerCollection EventHandlers => this.eventHandlers;
+		internal abstract EventHandlerCollection EventHandlers { get; }
 
 		/// <include file='Mock.xdoc' path='docs/doc[@for="Mock.Object"]/*'/>
 		[SuppressMessage("Microsoft.Naming", "CA1716:IdentifiersShouldNotMatchKeywords", MessageId = "Object", Justification = "Exposes the mocked object instance, so it's appropriate.")]
 		[SuppressMessage("Microsoft.Naming", "CA1721:PropertyNamesShouldNotMatchGetMethods", Justification = "The public Object property is the only one visible to Moq consumers. The protected member is for internal use only.")]
-		public object Object
-		{
-			get { return this.GetObject(); }
-		}
+		public object Object => this.OnGetObject();
 
-		private object GetObject()
-		{
-			var value = this.OnGetObject();
-			this.isInitialized = true;
-			return value;
-		}
+		internal abstract ConcurrentDictionary<MethodInfo, MockWithWrappedMockObject> InnerMocks { get; }
 
-		internal virtual ConcurrentDictionary<MethodInfo, MockWithWrappedMockObject> InnerMocks { get; private set; }
+		internal abstract bool IsObjectInitialized { get; }
 
-		internal virtual InvocationCollection Invocations => this.invocations;
+		internal abstract InvocationCollection Invocations { get; }
 
 		/// <include file='Mock.xdoc' path='docs/doc[@for="Mock.OnGetObject"]/*'/>
 		[SuppressMessage("Microsoft.Design", "CA1024:UsePropertiesWhereAppropriate", Justification = "This is actually the protected virtual implementation of the property Object.")]
@@ -235,25 +215,21 @@ namespace Moq
 		/// <summary>
 		/// Exposes the list of extra interfaces implemented by the mock.
 		/// </summary>
-		internal List<Type> ImplementedInterfaces { get; private set; }
+		internal abstract List<Type> ImplementedInterfaces { get; }
 
 		/// <summary>
 		/// Indicates the number of interfaces in <see cref="ImplementedInterfaces"/> that were
 		/// defined internally, rather than through calls to <see cref="As{TInterface}"/>.
 		/// </summary>
-		internal protected int InternallyImplementedInterfaceCount { get; protected set; }
+		internal abstract int InternallyImplementedInterfaceCount { get; }
 
-		internal virtual SetupCollection Setups => this.setups;
+		internal abstract SetupCollection Setups { get; }
 
 		/// <summary>
 		/// A set of switches that influence how this mock will operate.
 		/// You can opt in or out of certain features via this property.
 		/// </summary>
-		public virtual Switches Switches
-		{
-			get => this.switches;
-			set => this.switches = value;
-		}
+		public abstract Switches Switches { get; set; }
 
 		internal abstract Type TargetType { get; }
 
@@ -416,7 +392,7 @@ namespace Moq
 
 		internal static void VerifyNoOtherCalls(Mock mock)
 		{
-			var unverifiedInvocations = mock.invocations.ToArray(invocation => !invocation.Verified);
+			var unverifiedInvocations = mock.Invocations.ToArray(invocation => !invocation.Verified);
 			if (unverifiedInvocations.Any())
 			{
 				throw new MockException(
@@ -1158,7 +1134,7 @@ namespace Moq
 			var index = this.ImplementedInterfaces.LastIndexOf(typeof(TInterface));
 
 			var isImplemented = index >= 0;
-			if (this.isInitialized && !isImplemented)
+			if (this.IsObjectInitialized && !isImplemented)
 			{
 				throw new InvalidOperationException(Resources.AlreadyInitialized);
 			}

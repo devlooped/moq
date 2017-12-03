@@ -39,6 +39,7 @@
 // http://www.opensource.org/licenses/bsd-license.php]
 
 using System;
+using System.Collections.Concurrent;
 using System.Collections.Generic;
 using System.Diagnostics;
 using System.Diagnostics.CodeAnalysis;
@@ -61,10 +62,22 @@ namespace Moq
 	public partial class Mock<T> : Mock, IMock<T> where T : class
 	{
 		private static int serialNumberCounter = 0;
+
 		private T instance;
 		private Dictionary<Type, object> configuredDefaultValues;
 		private object[] constructorArguments;
 		private DefaultValueProvider defaultValueProvider;
+		private EventHandlerCollection eventHandlers;
+		private List<Type> implementedInterfaces;
+		private int internallyImplementedInterfaceCount;
+		private ConcurrentDictionary<MethodInfo, MockWithWrappedMockObject> innerMocks;
+		private InvocationCollection invocations;
+		private string name;
+		private SetupCollection setups;
+
+		private MockBehavior behavior;
+		private bool callBase;
+		private Switches switches;
 
 #region Ctors
 
@@ -114,24 +127,29 @@ namespace Moq
 				args = new object[] { null };
 			}
 
-			this.Name = GenerateMockName();
-
-			this.Behavior = behavior;
+			this.behavior = behavior;
 			this.configuredDefaultValues = new Dictionary<Type, object>();
 			this.constructorArguments = args;
 			this.defaultValueProvider = DefaultValueProvider.Empty;
-			this.ImplementedInterfaces.AddRange(typeof(T).GetInterfaces().Where(i => (i.GetTypeInfo().IsPublic || i.GetTypeInfo().IsNestedPublic) && !i.GetTypeInfo().IsImport));
-			this.ImplementedInterfaces.Add(typeof(IMocked<T>));
-			this.InternallyImplementedInterfaceCount = this.ImplementedInterfaces.Count;
+			this.eventHandlers = new EventHandlerCollection();
+			this.implementedInterfaces = new List<Type>();
+			this.implementedInterfaces.AddRange(typeof(T).GetInterfaces().Where(i => (i.GetTypeInfo().IsPublic || i.GetTypeInfo().IsNestedPublic) && !i.GetTypeInfo().IsImport));
+			this.implementedInterfaces.Add(typeof(IMocked<T>));
+			this.internallyImplementedInterfaceCount = this.ImplementedInterfaces.Count;
+			this.innerMocks = new ConcurrentDictionary<MethodInfo, MockWithWrappedMockObject>();
+			this.invocations = new InvocationCollection();
+			this.name = CreateUniqueDefaultMockName();
+			this.setups = new SetupCollection();
+			this.switches = Switches.Default;
 
 			this.CheckParameters();
 		}
 
-		private string GenerateMockName()
+		private static string CreateUniqueDefaultMockName()
 		{
 			var serialNumber = Interlocked.Increment(ref serialNumberCounter).ToString("x8");
 
-			var typeName = typeof (T).FullName;
+			string typeName = typeof (T).FullName;
 
 #if FEATURE_CODEDOM
 			if (typeof (T).IsGenericType)
@@ -168,6 +186,16 @@ namespace Moq
 
 #region Properties
 
+		/// <include file='Mock.xdoc' path='docs/doc[@for="Mock.Behavior"]/*'/>
+		public override MockBehavior Behavior => this.behavior;
+
+		/// <include file='Mock.xdoc' path='docs/doc[@for="Mock.CallBase"]/*'/>
+		public override bool CallBase
+		{
+			get => this.callBase;
+			set => this.callBase = value;
+		}
+
 		internal override Dictionary<Type, object> ConfiguredDefaultValues => this.configuredDefaultValues;
 
 		/// <summary>
@@ -180,6 +208,18 @@ namespace Moq
 			set => this.defaultValueProvider = value ?? throw new ArgumentNullException(nameof(value));
 		}
 
+		internal override EventHandlerCollection EventHandlers => this.eventHandlers;
+
+		internal override ConcurrentDictionary<MethodInfo, MockWithWrappedMockObject> InnerMocks => this.innerMocks;
+
+		internal override List<Type> ImplementedInterfaces => this.implementedInterfaces;
+
+		internal override int InternallyImplementedInterfaceCount => this.internallyImplementedInterfaceCount;
+
+		internal override InvocationCollection Invocations => this.invocations;
+
+		internal override bool IsObjectInitialized => this.instance != null;
+
 		/// <include file='Mock.Generic.xdoc' path='docs/doc[@for="Mock{T}.Object"]/*'/>
 		[SuppressMessage("Microsoft.Naming", "CA1716:IdentifiersShouldNotMatchKeywords", MessageId = "Object", Justification = "Exposes the mocked object instance, so it's appropriate.")]
 		[SuppressMessage("Microsoft.Naming", "CA1721:PropertyNamesShouldNotMatchGetMethods", Justification = "The public Object property is the only one visible to Moq consumers. The protected member is for internal use only.")]
@@ -189,7 +229,11 @@ namespace Moq
 		}
 
 		/// <include file='Mock.Generic.xdoc' path='docs/doc[@for="Mock{T}.Name"]/*'/>
-		public string Name { get; set; }
+		public string Name
+		{
+			get => this.name;
+			set => this.name = value;
+		}
 
 		/// <include file='Mock.Generic.xdoc' path='docs/doc[@for="Mock{T}.ToString"]/*'/>
 		public override string ToString()
@@ -272,7 +316,19 @@ namespace Moq
 			get { return typeof(T); }
 		}
 
+		internal override SetupCollection Setups => this.setups;
+
 		internal override Type TargetType => typeof(T);
+
+		/// <summary>
+		/// A set of switches that influence how this mock will operate.
+		/// You can opt in or out of certain features via this property.
+		/// </summary>
+		public override Switches Switches
+		{
+			get => this.switches;
+			set => this.switches = value;
+		}
 
 #endregion
 
