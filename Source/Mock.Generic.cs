@@ -65,6 +65,9 @@ namespace Moq
 		private Dictionary<Type, object> configuredDefaultValues;
 		private object[] constructorArguments;
 		private DefaultValueProvider defaultValueProvider;
+		private EventHandlerCollection eventHandlers;
+		private InvocationCollection invocations;
+		private SetupCollection setups;
 		private Switches switches;
 
 #region Ctors
@@ -121,9 +124,12 @@ namespace Moq
 			this.configuredDefaultValues = new Dictionary<Type, object>();
 			this.constructorArguments = args;
 			this.defaultValueProvider = DefaultValueProvider.Empty;
+			this.eventHandlers = new EventHandlerCollection();
 			this.ImplementedInterfaces.AddRange(typeof(T).GetInterfaces().Where(i => (i.GetTypeInfo().IsPublic || i.GetTypeInfo().IsNestedPublic) && !i.GetTypeInfo().IsImport));
 			this.ImplementedInterfaces.Add(typeof(IMocked<T>));
 			this.InternallyImplementedInterfaceCount = this.ImplementedInterfaces.Count;
+			this.invocations = new InvocationCollection();
+			this.setups = new SetupCollection();
 			this.switches = Switches.Default;
 
 			this.CheckParameters();
@@ -181,6 +187,10 @@ namespace Moq
 			get => this.defaultValueProvider;
 			set => this.defaultValueProvider = value ?? throw new ArgumentNullException(nameof(value));
 		}
+
+		internal override EventHandlerCollection EventHandlers => this.eventHandlers;
+
+		internal override InvocationCollection Invocations => this.invocations;
 
 		/// <include file='Mock.Generic.xdoc' path='docs/doc[@for="Mock{T}.Object"]/*'/>
 		[SuppressMessage("Microsoft.Naming", "CA1716:IdentifiersShouldNotMatchKeywords", MessageId = "Object", Justification = "Exposes the mocked object instance, so it's appropriate.")]
@@ -273,6 +283,8 @@ namespace Moq
 		{
 			get { return typeof(T); }
 		}
+
+		internal override SetupCollection Setups => this.setups;
 
 		internal override Type TargetType => typeof(T);
 
