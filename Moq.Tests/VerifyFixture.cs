@@ -1150,6 +1150,33 @@ namespace Moq.Tests
 		}
 
 		[Fact]
+		public void VerifyNoOtherCalls_succeeds_if_no_calls_were_made_on_mock_created_by_Mock_Of()
+		{
+			var mocked = Mock.Of<IFoo>();
+			var mock = Mock.Get(mocked);
+
+			mock.VerifyNoOtherCalls();
+		}
+
+		[Fact]
+		public void VerifyNoOtherCalls_succeeds_if_no_calls_were_made_on_mock_created_by_Mock_Of_with_single_dot_predicate()
+		{
+			var mocked = Mock.Of<IFoo>(m => m.Value == 1);
+			var mock = Mock.Get(mocked);
+
+			mock.VerifyNoOtherCalls();
+		}
+
+		[Fact]
+		public void VerifyNoOtherCalls_succeeds_if_no_calls_were_made_on_mock_created_by_Mock_Of_with_multi_dot_predicate()
+		{
+			var mocked = Mock.Of<IFoo>(m => m.Bar.Value == 1);
+			var mock = Mock.Get(mocked);
+
+			mock.VerifyNoOtherCalls();
+		}
+
+		[Fact]
 		public void VerifyNoOtherCalls_fails_if_an_unverified_call_was_made()
 		{
 			var mock = new Mock<IFoo>();
@@ -1209,6 +1236,7 @@ namespace Moq.Tests
 
 		public interface IFoo
 		{
+			IBar Bar { get; }
 			int WriteOnly { set; }
 			int? Value { get; set; }
 			void EchoRef<T>(ref T value);
