@@ -94,7 +94,7 @@ namespace Moq
 		[Obsolete("Moved to Mock.Of<T>, as it's a single one, so no reason to be on Mocks.", true)]
 		public static T OneOf<T>() where T : class
 		{
-			return CreateMockQuery<T>().First<T>();
+			return Mock.Of<T>();
 		}
 
 		/// <summary>
@@ -108,7 +108,7 @@ namespace Moq
 		[Obsolete("Moved to Mock.Of<T>, as it's a single one, so no reason to be on Mocks.", true)]
 		public static T OneOf<T>(Expression<Func<T, bool>> specification) where T : class
 		{
-			return CreateMockQuery<T>().First<T>(specification);
+			return Mock.Of<T>(specification);
 		}
 
 		/// <summary>
