@@ -173,7 +173,7 @@ namespace Moq
 		public override InterceptionAction Handle(Invocation invocation, Mock mock)
 		{
 			if (invocation.Method.DeclaringType == typeof(object) || // interface proxy
-				mock.ImplementedInterfaces.Contains(invocation.Method.DeclaringType) && !invocation.Method.LooksLikeEventAttach() && !invocation.Method.LooksLikeEventDetach() && mock.CallBase && !mock.MockedType.GetTypeInfo().IsInterface || // class proxy with explicitly implemented interfaces. The method's declaring type is the interface and the method couldn't be abstract
+				mock.ImplementsInterface(invocation.Method.DeclaringType) && !invocation.Method.LooksLikeEventAttach() && !invocation.Method.LooksLikeEventDetach() && mock.CallBase && !mock.MockedType.GetTypeInfo().IsInterface || // class proxy with explicitly implemented interfaces. The method's declaring type is the interface and the method couldn't be abstract
 				invocation.Method.DeclaringType.GetTypeInfo().IsClass && !invocation.Method.IsAbstract && mock.CallBase // class proxy
 				)
 			{
@@ -350,8 +350,8 @@ namespace Moq
 		/// <param name="mock"/>
 		private static EventInfo GetEventFromName(string eventName, BindingFlags bindingAttr, Mock mock)
 		{
-			// Ignore internally implemented interfaces
-			var depthFirstProgress = new Queue<Type>(mock.ImplementedInterfaces.Skip(mock.InternallyImplementedInterfaceCount));
+			// Ignore inherited interfaces and internally defined IMocked<T>
+			var depthFirstProgress = new Queue<Type>(mock.AdditionalInterfaces);
 			depthFirstProgress.Enqueue(mock.TargetType);
 			while (depthFirstProgress.Count > 0)
 			{

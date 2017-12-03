@@ -61,15 +61,26 @@ namespace Moq
 	/// <include file='Mock.Generic.xdoc' path='docs/doc[@for="Mock{T}"]/*'/>
 	public partial class Mock<T> : Mock, IMock<T> where T : class
 	{
-		private static int serialNumberCounter = 0;
+		private static Type[] inheritedInterfaces;
+		private static int serialNumberCounter;
+
+		static Mock()
+		{
+			inheritedInterfaces =
+				typeof(T)
+				.GetInterfaces()
+				.Where(i => { var it = i.GetTypeInfo(); return it.IsPublic || it.IsNestedPublic && !it.IsImport; })
+				.ToArray();
+
+			serialNumberCounter = 0;
+		}
 
 		private T instance;
+		private List<Type> additionalInterfaces;
 		private Dictionary<Type, object> configuredDefaultValues;
 		private object[] constructorArguments;
 		private DefaultValueProvider defaultValueProvider;
 		private EventHandlerCollection eventHandlers;
-		private List<Type> implementedInterfaces;
-		private int internallyImplementedInterfaceCount;
 		private ConcurrentDictionary<MethodInfo, MockWithWrappedMockObject> innerMocks;
 		private InvocationCollection invocations;
 		private string name;
@@ -127,15 +138,12 @@ namespace Moq
 				args = new object[] { null };
 			}
 
+			this.additionalInterfaces = new List<Type>();
 			this.behavior = behavior;
 			this.configuredDefaultValues = new Dictionary<Type, object>();
 			this.constructorArguments = args;
 			this.defaultValueProvider = DefaultValueProvider.Empty;
 			this.eventHandlers = new EventHandlerCollection();
-			this.implementedInterfaces = new List<Type>();
-			this.implementedInterfaces.AddRange(typeof(T).GetInterfaces().Where(i => (i.GetTypeInfo().IsPublic || i.GetTypeInfo().IsNestedPublic) && !i.GetTypeInfo().IsImport));
-			this.implementedInterfaces.Add(typeof(IMocked<T>));
-			this.internallyImplementedInterfaceCount = this.ImplementedInterfaces.Count;
 			this.innerMocks = new ConcurrentDictionary<MethodInfo, MockWithWrappedMockObject>();
 			this.invocations = new InvocationCollection();
 			this.name = CreateUniqueDefaultMockName();
@@ -212,9 +220,7 @@ namespace Moq
 
 		internal override ConcurrentDictionary<MethodInfo, MockWithWrappedMockObject> InnerMocks => this.innerMocks;
 
-		internal override List<Type> ImplementedInterfaces => this.implementedInterfaces;
-
-		internal override int InternallyImplementedInterfaceCount => this.internallyImplementedInterfaceCount;
+		internal override List<Type> AdditionalInterfaces => this.additionalInterfaces;
 
 		internal override InvocationCollection Invocations => this.invocations;
 
@@ -254,6 +260,12 @@ namespace Moq
 
 		private void InitializeInstancePexProtected()
 		{
+			// Determine the set of interfaces that the proxy object should additionally implement.
+			var additionalInterfaceCount = this.AdditionalInterfaces.Count;
+			var interfaces = new Type[1 + additionalInterfaceCount];
+			interfaces[0] = typeof(IMocked<T>);
+			this.AdditionalInterfaces.CopyTo(0, interfaces, 1, additionalInterfaceCount);
+
 			if (this.IsDelegateMock)
 			{
 				// We're mocking a delegate.
@@ -265,7 +277,7 @@ namespace Moq
 				var delegateProxy = ProxyFactory.Instance.CreateProxy(
 					delegateInterfaceType,
 					this,
-					this.ImplementedInterfaces.ToArray(),
+					interfaces,
 					this.constructorArguments);
 
 				// Then our instance is a delegate of the desired type, pointing at the
@@ -277,7 +289,7 @@ namespace Moq
 				this.instance = (T)ProxyFactory.Instance.CreateProxy(
 					typeof(T),
 					this,
-					this.ImplementedInterfaces.Skip(this.InternallyImplementedInterfaceCount - 1).ToArray(),
+					interfaces,
 					this.constructorArguments);
 			}
 		}
@@ -319,6 +331,8 @@ namespace Moq
 		internal override SetupCollection Setups => this.setups;
 
 		internal override Type TargetType => typeof(T);
+
+		internal override Type[] InheritedInterfaces => Mock<T>.inheritedInterfaces;
 
 		/// <summary>
 		/// A set of switches that influence how this mock will operate.

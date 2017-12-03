@@ -88,10 +88,7 @@ namespace Moq
 				// We may have received a T of an implemented 
 				// interface in the mock.
 				var mock = mockedPlain.Mock;
-				var imockedType = mocked.GetType().GetTypeInfo().ImplementedInterfaces.Single(i => i.Name.Equals("IMocked`1", StringComparison.Ordinal));
-				var mockedType = imockedType.GetGenericArguments()[0];
-
-				if (mock.ImplementedInterfaces.Contains(typeof(T)))
+				if (mock.ImplementsInterface(typeof(T)))
 				{
 					return mock.As<T>();
 				}
@@ -102,11 +99,14 @@ namespace Moq
 				// This is not valid as generic types 
 				// do not support covariance on 
 				// the generic parameters.
+				var imockedType = mocked.GetType().GetTypeInfo().ImplementedInterfaces.Single(i => i.Name.Equals("IMocked`1", StringComparison.Ordinal));
+				var mockedType = imockedType.GetGenericArguments()[0];
 				var types = string.Join(
 					", ",
 					new[] {mockedType}
 						// Ignore internally defined IMocked<T>
-						.Concat(mock.ImplementedInterfaces.Where(t => t != imockedType))
+						.Concat(mock.InheritedInterfaces)
+						.Concat(mock.AdditionalInterfaces)
 						.Select(t => t.Name)
 						.ToArray());
 
@@ -137,6 +137,14 @@ namespace Moq
 				mock.VerifyAll();
 			}
 		}
+
+		/// <summary>
+		/// Gets the interfaces additionally implemented by the mock object.
+		/// </summary>
+		/// <remarks>
+		/// This list may be modified by calls to <see cref="As{TInterface}"/> up until the first call to <see cref="Object"/>.
+		/// </remarks>
+		internal abstract List<Type> AdditionalInterfaces { get; }
 
 		/// <include file='Mock.xdoc' path='docs/doc[@for="Mock.Behavior"]/*'/>
 		public abstract MockBehavior Behavior { get; }
@@ -176,6 +184,11 @@ namespace Moq
 		[SuppressMessage("Microsoft.Naming", "CA1721:PropertyNamesShouldNotMatchGetMethods", Justification = "The public Object property is the only one visible to Moq consumers. The protected member is for internal use only.")]
 		public object Object => this.OnGetObject();
 
+		/// <summary>
+		/// Gets the interfaces directly inherited from the mocked type (<see cref="TargetType"/>).
+		/// </summary>
+		internal abstract Type[] InheritedInterfaces { get; }
+
 		internal abstract ConcurrentDictionary<MethodInfo, MockWithWrappedMockObject> InnerMocks { get; }
 
 		internal abstract bool IsObjectInitialized { get; }
@@ -211,17 +224,6 @@ namespace Moq
 		/// e. g. to produce default return values for unexpected invocations.
 		/// </summary>
 		public abstract DefaultValueProvider DefaultValueProvider { get; set; }
-
-		/// <summary>
-		/// Exposes the list of extra interfaces implemented by the mock.
-		/// </summary>
-		internal abstract List<Type> ImplementedInterfaces { get; }
-
-		/// <summary>
-		/// Indicates the number of interfaces in <see cref="ImplementedInterfaces"/> that were
-		/// defined internally, rather than through calls to <see cref="As{TInterface}"/>.
-		/// </summary>
-		internal abstract int InternallyImplementedInterfaceCount { get; }
 
 		internal abstract SetupCollection Setups { get; }
 
@@ -1131,45 +1133,40 @@ namespace Moq
 		public virtual Mock<TInterface> As<TInterface>()
 			where TInterface : class
 		{
-			var index = this.ImplementedInterfaces.LastIndexOf(typeof(TInterface));
+			var interfaceType = typeof(TInterface);
 
-			var isImplemented = index >= 0;
-			if (this.IsObjectInitialized && !isImplemented)
-			{
-				throw new InvalidOperationException(Resources.AlreadyInitialized);
-			}
-
-			if (!typeof(TInterface).GetTypeInfo().IsInterface)
+			if (!interfaceType.GetTypeInfo().IsInterface)
 			{
 				throw new ArgumentException(Resources.AsMustBeInterface);
 			}
 
-			var isNotOrInternallyImplemented = index < this.InternallyImplementedInterfaceCount - 1; // - 1 because of IMocked<>
-			if (isNotOrInternallyImplemented)
+			if (this.IsObjectInitialized && this.ImplementsInterface(interfaceType) == false)
+			{
+				throw new InvalidOperationException(Resources.AlreadyInitialized);
+			}
+
+			if (this.AdditionalInterfaces.Contains(interfaceType) == false)
 			{
 				// We get here for either of two reasons:
 				//
 				// 1. We are being asked to implement an interface that the mocked type does *not* itself
 				//    inherit or implement. We need to hand this interface type to DynamicProxy's
-				//    `CreateClassProxy` method as an additional interface to be implemented. Therefore we
-				//    add it at the end of this list, after the "internally implemented" interfaces
-				//    (i.e. those that the mocked type inherits or implements itself, plus `IMocked<>`).
-				//    In this case, `index == -1`.
+				//    `CreateClassProxy` method as an additional interface to be implemented.
 				//
 				// 2. The user is possibly going to create a setup through an interface type that the
 				//    mocked type *does* implement. Since the mocked type might implement that interface's
 				//    methods non-virtually, we can only intercept those if DynamicProxy reimplements the
-				//    interface in the generated proxy type. Therefore we do the same as for (1). Note
-				//    that this might lead to the interface type being contained twice in the list, once
-				//    as an "internally implemented" type, and once as an "additional" type. That should
-				//    not matter apart from slightly higher memory consumption, but it has the benefit
-				//    that we don't need to perform a non-atomic removal of the "internally implemented"
-				//    item.
-				//    In this case, `index >= 0 && index < this.InternallyImplementedInterfaceCount - 1`.
-				this.ImplementedInterfaces.Add(typeof(TInterface));
+				//    interface in the generated proxy type. Therefore we do the same as for (1).
+				this.AdditionalInterfaces.Add(interfaceType);
 			}
 
 			return new AsInterface<TInterface>(this);
+		}
+
+		internal bool ImplementsInterface(Type interfaceType)
+		{
+			return this.InheritedInterfaces.Contains(interfaceType)
+				|| this.AdditionalInterfaces.Contains(interfaceType);
 		}
 
 		#endregion
