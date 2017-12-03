@@ -62,11 +62,14 @@ namespace Moq
 	public partial class Mock<T> : Mock, IMock<T> where T : class
 	{
 		private static int serialNumberCounter = 0;
+
 		private T instance;
 		private Dictionary<Type, object> configuredDefaultValues;
 		private object[] constructorArguments;
 		private DefaultValueProvider defaultValueProvider;
 		private EventHandlerCollection eventHandlers;
+		private List<Type> implementedInterfaces;
+		private int internallyImplementedInterfaceCount;
 		private ConcurrentDictionary<MethodInfo, MockWithWrappedMockObject> innerMocks;
 		private InvocationCollection invocations;
 		private SetupCollection setups;
@@ -127,9 +130,10 @@ namespace Moq
 			this.constructorArguments = args;
 			this.defaultValueProvider = DefaultValueProvider.Empty;
 			this.eventHandlers = new EventHandlerCollection();
-			this.ImplementedInterfaces.AddRange(typeof(T).GetInterfaces().Where(i => (i.GetTypeInfo().IsPublic || i.GetTypeInfo().IsNestedPublic) && !i.GetTypeInfo().IsImport));
-			this.ImplementedInterfaces.Add(typeof(IMocked<T>));
-			this.InternallyImplementedInterfaceCount = this.ImplementedInterfaces.Count;
+			this.implementedInterfaces = new List<Type>();
+			this.implementedInterfaces.AddRange(typeof(T).GetInterfaces().Where(i => (i.GetTypeInfo().IsPublic || i.GetTypeInfo().IsNestedPublic) && !i.GetTypeInfo().IsImport));
+			this.implementedInterfaces.Add(typeof(IMocked<T>));
+			this.internallyImplementedInterfaceCount = this.ImplementedInterfaces.Count;
 			this.innerMocks = new ConcurrentDictionary<MethodInfo, MockWithWrappedMockObject>();
 			this.invocations = new InvocationCollection();
 			this.setups = new SetupCollection();
@@ -194,6 +198,10 @@ namespace Moq
 		internal override EventHandlerCollection EventHandlers => this.eventHandlers;
 
 		internal override ConcurrentDictionary<MethodInfo, MockWithWrappedMockObject> InnerMocks => this.innerMocks;
+
+		internal override List<Type> ImplementedInterfaces => this.implementedInterfaces;
+
+		internal override int InternallyImplementedInterfaceCount => this.internallyImplementedInterfaceCount;
 
 		internal override InvocationCollection Invocations => this.invocations;
 

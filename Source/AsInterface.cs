@@ -92,6 +92,10 @@ namespace Moq
 
 		internal override EventHandlerCollection EventHandlers => this.owner.EventHandlers;
 
+		internal override List<Type> ImplementedInterfaces => this.owner.ImplementedInterfaces;
+
+		internal override int InternallyImplementedInterfaceCount => this.owner.InternallyImplementedInterfaceCount;
+
 		public override TInterface Object
 		{
 			get { return this.owner.Object as TInterface; }

@@ -62,7 +62,6 @@ namespace Moq
 		/// <include file='Mock.xdoc' path='docs/doc[@for="Mock.ctor"]/*'/>
 		protected Mock()
 		{
-			this.ImplementedInterfaces = new List<Type>();
 		}
 
 		/// <include file='Mock.xdoc' path='docs/doc[@for="Mock.Get"]/*'/>
@@ -216,13 +215,13 @@ namespace Moq
 		/// <summary>
 		/// Exposes the list of extra interfaces implemented by the mock.
 		/// </summary>
-		internal List<Type> ImplementedInterfaces { get; private set; }
+		internal abstract List<Type> ImplementedInterfaces { get; }
 
 		/// <summary>
 		/// Indicates the number of interfaces in <see cref="ImplementedInterfaces"/> that were
 		/// defined internally, rather than through calls to <see cref="As{TInterface}"/>.
 		/// </summary>
-		internal protected int InternallyImplementedInterfaceCount { get; protected set; }
+		internal abstract int InternallyImplementedInterfaceCount { get; }
 
 		internal abstract SetupCollection Setups { get; }
 
