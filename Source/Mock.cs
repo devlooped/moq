@@ -142,7 +142,7 @@ namespace Moq
 		public abstract MockBehavior Behavior { get; }
 
 		/// <include file='Mock.xdoc' path='docs/doc[@for="Mock.CallBase"]/*'/>
-		public virtual bool CallBase { get; set; }
+		public abstract bool CallBase { get; set; }
 
 		/// <include file='Mock.xdoc' path='docs/doc[@for="Mock.DefaultValue"]/*'/>
 		public DefaultValue DefaultValue

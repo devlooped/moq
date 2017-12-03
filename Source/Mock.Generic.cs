@@ -75,6 +75,7 @@ namespace Moq
 		private SetupCollection setups;
 
 		private MockBehavior behavior;
+		private bool callBase;
 		private Switches switches;
 
 #region Ctors
@@ -187,6 +188,13 @@ namespace Moq
 
 		/// <include file='Mock.xdoc' path='docs/doc[@for="Mock.Behavior"]/*'/>
 		public override MockBehavior Behavior => this.behavior;
+
+		/// <include file='Mock.xdoc' path='docs/doc[@for="Mock.CallBase"]/*'/>
+		public override bool CallBase
+		{
+			get => this.callBase;
+			set => this.callBase = value;
+		}
 
 		internal override Dictionary<Type, object> ConfiguredDefaultValues => this.configuredDefaultValues;
 
