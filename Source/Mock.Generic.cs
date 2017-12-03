@@ -73,6 +73,8 @@ namespace Moq
 		private ConcurrentDictionary<MethodInfo, MockWithWrappedMockObject> innerMocks;
 		private InvocationCollection invocations;
 		private SetupCollection setups;
+
+		private MockBehavior behavior;
 		private Switches switches;
 
 #region Ctors
@@ -125,7 +127,7 @@ namespace Moq
 
 			this.Name = GenerateMockName();
 
-			this.Behavior = behavior;
+			this.behavior = behavior;
 			this.configuredDefaultValues = new Dictionary<Type, object>();
 			this.constructorArguments = args;
 			this.defaultValueProvider = DefaultValueProvider.Empty;
@@ -182,6 +184,9 @@ namespace Moq
 #endregion
 
 #region Properties
+
+		/// <include file='Mock.xdoc' path='docs/doc[@for="Mock.Behavior"]/*'/>
+		public override MockBehavior Behavior => this.behavior;
 
 		internal override Dictionary<Type, object> ConfiguredDefaultValues => this.configuredDefaultValues;
 

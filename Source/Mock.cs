@@ -139,7 +139,7 @@ namespace Moq
 		}
 
 		/// <include file='Mock.xdoc' path='docs/doc[@for="Mock.Behavior"]/*'/>
-		public virtual MockBehavior Behavior { get; internal set; }
+		public abstract MockBehavior Behavior { get; }
 
 		/// <include file='Mock.xdoc' path='docs/doc[@for="Mock.CallBase"]/*'/>
 		public virtual bool CallBase { get; set; }

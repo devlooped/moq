@@ -72,11 +72,7 @@ namespace Moq
 			get { return typeof(TInterface); }
 		}
 
-		public override MockBehavior Behavior
-		{
-			get { return this.owner.Behavior; }
-			internal set { this.owner.Behavior = value; }
-		}
+		public override MockBehavior Behavior => this.owner.Behavior;
 
 		public override bool CallBase
 		{
