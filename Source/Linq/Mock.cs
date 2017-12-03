@@ -69,7 +69,21 @@ namespace Moq
 		[SuppressMessage("Microsoft.Design", "CA1006:DoNotNestGenericTypesInMemberSignatures", Justification = "By Design")]
 		public static T Of<T>(Expression<Func<T, bool>> predicate) where T : class
 		{
-			return Mocks.CreateMockQuery<T>().First<T>(predicate);
+			var mocked = Mocks.CreateMockQuery<T>().First<T>(predicate);
+
+			// The current implementation of LINQ to Mocks creates mocks that already have recorded invocations.
+			// Because this interferes with `VerifyNoOtherCalls`, we recursively clear all invocations before
+			// anyone ever gets to see the new created mock.
+			//
+			// TODO: Make LINQ to Mocks set up mocks without causing invocations of its own, then remove this hack.
+			var mock = Mock.Get(mocked);
+			mock.ResetCalls();
+			foreach (var inner in mock.InnerMocks.Values)
+			{
+				inner.Mock.ResetCalls();
+			}
+
+			return mocked;
 		}
 	}
 }
