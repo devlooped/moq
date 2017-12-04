@@ -1229,9 +1229,90 @@ namespace Moq.Tests
 			Assert.Contains(".Submit()", ex.Message);
 		}
 
+		[Fact]
+		public void VerifyNoOtherCalls_succeeds_with_DefaultValue_Mock_and_multi_dot_Verify_expression()
+		{
+			var mock = new Mock<IFoo>() { DefaultValue = DefaultValue.Mock };
+			mock.Object.Bar.Poke();
+
+			mock.Verify(m => m.Bar.Poke());
+			mock.VerifyNoOtherCalls();
+		}
+
+		[Fact]
+		public void VerifyNoOtherCalls_succeeds_with_DefaultValue_Mock_and_multi_dot_VerifyGet_expression()
+		{
+			var mock = new Mock<IFoo>() { DefaultValue = DefaultValue.Mock };
+			var value = mock.Object.Bar.Value;
+
+			mock.VerifyGet(m => m.Bar.Value);
+			mock.VerifyNoOtherCalls();
+		}
+
+		[Fact]
+		public void VerifyNoOtherCalls_succeeds_with_DefaultValue_Mock_and_multi_dot_VerifySet_expression()
+		{
+			var mock = new Mock<IFoo>() { DefaultValue = DefaultValue.Mock };
+			mock.Object.Bar.Value = 42;
+
+			mock.VerifySet(m => m.Bar.Value = 42);
+			mock.VerifyNoOtherCalls();
+		}
+
+		[Fact]
+		public void VerifyNoOtherCalls_performs_recursive_verification()
+		{
+			var mock = new Mock<IFoo>() { DefaultValue = DefaultValue.Mock };
+			mock.Object.Bar.Poke();
+
+			mock.VerifyGet(m => m.Bar);
+			Assert.Throws<MockException>(() => mock.VerifyNoOtherCalls()); // should fail due to the unverified call to `Poke`
+		}
+
+		[Fact]
+		public void VerifyNoOtherCalls_requires_explicit_verification_of_automocked_properties_that_are_not_used_transitively()
+		{
+			var mock = new Mock<IFoo>() { DefaultValue = DefaultValue.Mock };
+
+			var _ = mock.Object.Bar;
+
+			// Even though `Bar` is mockable and will be automatically mocked, it isn't used "transitively",
+			// i.e. in a way to get at one of its members. Therefore, it ought to be verified explicitly.
+			// Because we don't verify it, a verification exception should be thrown:
+			Assert.Throws<MockException>(() => mock.VerifyNoOtherCalls());
+		}
+
+		[Fact(Skip = "Not yet implemented.")]
+		public void VerifyNoOtherCalls_can_tell_apart_transitive_and_nontransitive_usages_of_automocked_properties()
+		{
+			var mock = new Mock<IFoo>() { DefaultValue = DefaultValue.Mock };
+
+			object _;
+			_ = mock.Object.Bar;
+			_ = mock.Object.Bar.Value;
+
+			mock.Verify(m => m.Bar.Value);
+
+			// `Bar` was used both in a "transitive" and non-transitive way. We would expect that the former
+			// doesn't have to be explicitly verified (as it's implied by the verifiation of `Bar.Value`).
+			// However, the non-transitive call ought to be explicitly verified. Because we don't, a verific-
+			// ation exception is expected: (THIS DOES NOT WORK YET.)
+			Assert.Throws<MockException>(() => mock.VerifyNoOtherCalls());
+
+			// HINT TO IMPLEMENTERS: One relatively easy way to implement this, given the way Moq is currently
+			// build, would be to record all invocations with a globally unique, steadily increasing sequence
+			// number. This would make it possible to say, for any two invocations (regardless of the mock on
+			// which they occurred), which one happened earlier. Let's look at two calls of method X. The
+			// earlier invocation happens at "time" t0, the later invocation happens at "time" t1 (t0 < t1).
+			// If X returns a mock object, and that object has no invocations happening between t0 and t1,
+			// then the first invocation of X was non-transitive. Likewise, the very last invocation of method
+			// X is non-transitive if there are no invocations on the sub-object that occur later.
+		}
+
 		public interface IBar
 		{
 			int? Value { get; set; }
+			void Poke();
 		}
 
 		public interface IFoo

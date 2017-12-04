@@ -395,14 +395,48 @@ namespace Moq
 		internal static void VerifyNoOtherCalls(Mock mock)
 		{
 			var unverifiedInvocations = mock.Invocations.ToArray(invocation => !invocation.Verified);
+
 			if (unverifiedInvocations.Any())
 			{
-				throw new MockException(
-					MockException.ExceptionReason.VerificationFailed,
-					string.Format(
-						CultureInfo.CurrentCulture,
-						Resources.UnverifiedInvocations,
-						string.Join<Invocation>(Environment.NewLine, unverifiedInvocations)));
+				// There are some invocations that shouldn't require explicit verification by the user.
+				// The intent behind a `Verify` call for a call expression like `m.A.B.C.X` is probably
+				// to verify `X`. If that succeeds, it's reasonable to expect that `m.A`, `m.A.B`, and
+				// `m.A.B.C` have implicitly been verified as well. Below, invocations such as those to
+				// the left of `X` are referred to as "transitive" (for lack of a better word).
+				if (mock.InnerMocks.Any())
+				{
+					for (int i = 0, n = unverifiedInvocations.Length; i < n; ++i)
+					{
+						// In order for an invocation to be "transitive", its return value has to be a
+						// sub-object (inner mock); and that sub-object has to have received at least
+						// one call:
+						var wasTransitiveInvocation = mock.InnerMocks.TryGetValue(unverifiedInvocations[i].Method, out MockWithWrappedMockObject inner)
+						                              && inner.Mock.Invocations.Any();
+						if (wasTransitiveInvocation)
+						{
+							unverifiedInvocations[i] = null;
+						}
+					}
+				}
+
+				// "Transitive" invocations have been nulled out. Let's see what's left:
+				var remainingUnverifiedInvocations = unverifiedInvocations.Where(i => i != null);
+				if (remainingUnverifiedInvocations.Any())
+				{
+					throw new MockException(
+						MockException.ExceptionReason.VerificationFailed,
+						string.Format(
+							CultureInfo.CurrentCulture,
+							Resources.UnverifiedInvocations,
+							string.Join<Invocation>(Environment.NewLine, remainingUnverifiedInvocations)));
+				}
+			}
+
+			// Perform verification for all automatically created sub-objects (that is, those
+			// created by "transitive" invocations):
+			foreach (var inner in mock.InnerMocks.Values)
+			{
+				VerifyNoOtherCalls(inner.Mock);
 			}
 		}
 
