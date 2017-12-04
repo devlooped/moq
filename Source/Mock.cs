@@ -431,6 +431,13 @@ namespace Moq
 							string.Join<Invocation>(Environment.NewLine, remainingUnverifiedInvocations)));
 				}
 			}
+
+			// Perform verification for all automatically created sub-objects (that is, those
+			// created by "transitive" invocations):
+			foreach (var inner in mock.InnerMocks.Values)
+			{
+				VerifyNoOtherCalls(inner.Mock);
+			}
 		}
 
 		private static void VerifyCalls(
