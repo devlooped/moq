@@ -1259,6 +1259,16 @@ namespace Moq.Tests
 			mock.VerifyNoOtherCalls();
 		}
 
+		[Fact]
+		public void VerifyNoOtherCalls_performs_recursive_verification()
+		{
+			var mock = new Mock<IFoo>() { DefaultValue = DefaultValue.Mock };
+			mock.Object.Bar.Poke();
+
+			mock.VerifyGet(m => m.Bar);
+			Assert.Throws<MockException>(() => mock.VerifyNoOtherCalls()); // should fail due to the unverified call to `Poke`
+		}
+
 		public interface IBar
 		{
 			int? Value { get; set; }
