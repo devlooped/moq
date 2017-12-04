@@ -61,6 +61,11 @@ namespace Moq
 			}
 		}
 
+		public bool Any()
+		{
+			return this.invocations.Count > 0;
+		}
+
 		public void Clear()
 		{
 			lock (this.invocations)
