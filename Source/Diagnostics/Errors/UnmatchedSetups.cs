@@ -50,9 +50,9 @@ namespace Moq.Diagnostics.Errors
 {
 	internal sealed class UnmatchedSetups : IError
 	{
-		private IEnumerable<IProxyCall> setups;
+		private IEnumerable<MethodCall> setups;
 
-		public UnmatchedSetups(IEnumerable<IProxyCall> setups)
+		public UnmatchedSetups(IEnumerable<MethodCall> setups)
 		{
 			Debug.Assert(setups != null);
 			Debug.Assert(setups.Any());
@@ -66,7 +66,7 @@ namespace Moq.Diagnostics.Errors
 				Resources.VerficationFailed,
 				this.setups.Aggregate(new StringBuilder(), (builder, setup) => builder.AppendLine(setup.ToString())).ToString());
 
-		public IEnumerable<IProxyCall> Setups => this.setups;
+		public IEnumerable<MethodCall> Setups => this.setups;
 
 		public MockException AsMockException() => new MockException(MockException.ExceptionReason.VerificationFailed, this);
 	}

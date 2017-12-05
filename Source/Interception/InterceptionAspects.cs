@@ -227,7 +227,7 @@ namespace Moq
 			}
 		}
 
-		private static void ThrowIfReturnValueRequired(IProxyCall call, Invocation invocation, Mock mock)
+		private static void ThrowIfReturnValueRequired(MethodCall call, Invocation invocation, Mock mock)
 		{
 			if (mock.Behavior != MockBehavior.Loose &&
 				invocation.Method != null &&

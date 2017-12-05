@@ -81,7 +81,7 @@ namespace Moq
 		}
 	}
 
-	internal partial class MethodCall : IProxyCall, ICallbackResult, IVerifies, IThrowsResult
+	internal partial class MethodCall : ICallbackResult, IVerifies, IThrowsResult
 	{
 		private List<IMatcher> argumentMatchers;
 		private Action<object[]> callbackResponse;
@@ -177,13 +177,13 @@ namespace Moq
 
 		public MethodInfo Method => this.method;
 
-		bool IProxyCall.IsConditional => this.condition != null;
+		public bool IsConditional => this.condition != null;
 
-		bool IProxyCall.IsVerifiable => this.verifiable;
+		public bool IsVerifiable => this.verifiable;
 
-		bool IProxyCall.Invoked => this.callCount > 0;
+		public bool Invoked => this.callCount > 0;
 
-		Expression IProxyCall.SetupExpression => this.originalExpression;
+		public Expression SetupExpression => this.originalExpression;
 
 		[Conditional("DESKTOP")]
 		[SuppressMessage("Microsoft.Design", "CA1031:DoNotCatchGeneralExceptionTypes")]
