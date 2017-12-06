@@ -50,14 +50,14 @@ namespace Moq
 	{
 		// Using a stack has the advantage that enumeration returns the items in reverse order (last added to first added).
 		// This helps in implementing the rule that "given two matching setups, the last one wins."
-		private Stack<IProxyCall> setups;
+		private Stack<MethodCall> setups;
 
 		public SetupCollection()
 		{
-			this.setups = new Stack<IProxyCall>();
+			this.setups = new Stack<MethodCall>();
 		}
 
-		public void Add(IProxyCall setup)
+		public void Add(MethodCall setup)
 		{
 			lock (this.setups)
 			{
@@ -65,7 +65,7 @@ namespace Moq
 			}
 		}
 
-		public bool Any(Func<IProxyCall, bool> predicate)
+		public bool Any(Func<MethodCall, bool> predicate)
 		{
 			lock (this.setups)
 			{
@@ -81,9 +81,15 @@ namespace Moq
 			}
 		}
 
-		public IProxyCall FindMatchFor(Invocation invocation)
+		public MethodCall FindMatchFor(Invocation invocation)
 		{
-			IProxyCall matchingSetup = null;
+			// Fast path (no `lock`) when there are no setups:
+			if (this.setups.Count == 0)
+			{
+				return null;
+			}
+
+			MethodCall matchingSetup = null;
 
 			lock (this.setups)
 			{
@@ -110,7 +116,7 @@ namespace Moq
 			return matchingSetup;
 		}
 
-		public IProxyCall[] ToArray()
+		public MethodCall[] ToArray()
 		{
 			lock (this.setups)
 			{
@@ -118,9 +124,9 @@ namespace Moq
 			}
 		}
 
-		public IProxyCall[] ToArrayLive(Func<IProxyCall, bool> predicate)
+		public MethodCall[] ToArrayLive(Func<MethodCall, bool> predicate)
 		{
-			var matchingSetups = new Stack<IProxyCall>();
+			var matchingSetups = new Stack<MethodCall>();
 
 			// The following verification logic will remember each processed setup so that duplicate setups
 			// (that is, setups overridden by later setups with an equivalent expression) can be detected.

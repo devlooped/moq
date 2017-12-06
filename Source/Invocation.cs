@@ -38,7 +38,7 @@
 //[This is the BSD license, see
 // http://www.opensource.org/licenses/bsd-license.php]
 
-using System.Collections;
+using System.Diagnostics;
 using System.Linq;
 using System.Reflection;
 using System.Text;
@@ -47,20 +47,79 @@ namespace Moq
 {
 	internal abstract class Invocation
 	{
+		private object[] arguments;
+		private MethodInfo method;
 		private bool verified;
 
-		public abstract MethodInfo Method { get; }
+		/// <summary>
+		/// Initializes a new instance of the <see cref="Invocation"/> class.
+		/// </summary>
+		/// <param name="method">The method being invoked.</param>
+		/// <param name="arguments">The arguments with which the specified <paramref name="method"/> is being invoked.</param>
+		protected Invocation(MethodInfo method, params object[] arguments)
+		{
+			Debug.Assert(arguments != null);
+			Debug.Assert(method != null);
 
-		public abstract object[] Arguments { get; }
+			this.arguments = arguments;
+			this.method = method;
+		}
 
-		public abstract object ReturnValue { get; set; }
+		/// <summary>
+		/// Gets the method of the invocation.
+		/// </summary>
+		public MethodInfo Method => this.method;
 
-		public bool Verified => this.verified;
+		/// <summary>
+		/// Gets the arguments of the invocation.
+		/// </summary>
+		/// <remarks>
+		/// Arguments may be modified. Derived classes must ensure that by-reference parameters are written back
+		/// when the invocation is ended by a call to any of the three <c>Returns</c> methods.
+		/// </remarks>
+		public object[] Arguments => this.arguments;
 
-		public abstract void InvokeBase();
+		internal bool Verified => this.verified;
 
-		public void MarkAsVerified() => this.verified = true;
+		/// <summary>
+		/// Ends the invocation as if a <see langword="return"/> statement occurred.
+		/// </summary>
+		/// <remarks>
+		/// Implementations may assume that this method is only called for a <see langword="void"/> method,
+		/// and that no more calls to any of the three <c>Return</c> methods will be made.
+		/// <para>
+		/// Implementations must ensure that any by-reference parameters are written back from <see cref="Arguments"/>.
+		/// </para>
+		/// </remarks>
+		public abstract void Return();
 
+		/// <summary>
+		/// Ends the invocation as if a tail call to the base method were made.
+		/// </summary>
+		/// <remarks>
+		/// Implementations may assume that this method is only called for a method having a callable (non-<see langword="abstract"/>) base method,
+		/// and that no more calls to any of the three <c>Return</c> methods will be made.
+		/// <para>
+		/// Implementations must ensure that any by-reference parameters are written back from <see cref="Arguments"/>.
+		/// </para>
+		/// </remarks>
+		public abstract void ReturnBase();
+
+		/// <summary>
+		/// Ends the invocation as if a <see langword="return"/> statement with the specified return value occurred.
+		/// </summary>
+		/// <remarks>
+		/// Implementations may assume that this method is only called for a non-<see langword="void"/> method,
+		/// and that no more calls to any of the three <c>Return</c> methods will be made.
+		/// <para>
+		/// Implementations must ensure that any by-reference parameters are written back from <see cref="Arguments"/>.
+		/// </para>
+		/// </remarks>
+		public abstract void Return(object value);
+
+		internal void MarkAsVerified() => this.verified = true;
+
+		/// <inheritdoc/>
 		public override string ToString()
 		{
 			var method = this.Method;

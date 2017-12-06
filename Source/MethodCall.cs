@@ -81,9 +81,9 @@ namespace Moq
 		}
 	}
 
-	internal partial class MethodCall : IProxyCall, ICallbackResult, IVerifies, IThrowsResult
+	internal partial class MethodCall : ICallbackResult, IVerifies, IThrowsResult
 	{
-		private List<IMatcher> argumentMatchers;
+		private IMatcher[] argumentMatchers;
 		private Action<object[]> callbackResponse;
 		private int callCount;
 		private Condition condition;
@@ -110,7 +110,7 @@ namespace Moq
 			this.method = method;
 
 			var parameters = method.GetParameters();
-			this.argumentMatchers = new List<IMatcher>(capacity: parameters.Length);
+			this.argumentMatchers = new IMatcher[parameters.Length];
 			for (int index = 0; index < parameters.Length; index++)
 			{
 				var parameter = parameters[index];
@@ -129,6 +129,7 @@ namespace Moq
 					}
 
 					outValues.Add(new KeyValuePair<int, object>(index, constant.Value));
+					this.argumentMatchers[index] = AnyMatcher.Instance;
 				}
 				else if (parameter.IsRefArgument())
 				{
@@ -144,7 +145,7 @@ namespace Moq
 								var memberDeclaringTypeDefinition = memberDeclaringType.GetGenericTypeDefinition();
 								if (memberDeclaringTypeDefinition == typeof(It.Ref<>))
 								{
-									this.argumentMatchers.Add(AnyMatcher.Instance);
+									this.argumentMatchers[index] = AnyMatcher.Instance;
 									continue;
 								}
 							}
@@ -157,12 +158,12 @@ namespace Moq
 						throw new NotSupportedException(Resources.RefExpressionMustBeConstantValue);
 					}
 
-					argumentMatchers.Add(new RefMatcher(constant.Value));
+					this.argumentMatchers[index] = new RefMatcher(constant.Value);
 				}
 				else
 				{
 					var isParamArray = parameter.IsDefined(typeof(ParamArrayAttribute), true);
-					argumentMatchers.Add(MatcherFactory.CreateMatcher(argument, isParamArray));
+					this.argumentMatchers[index] = MatcherFactory.CreateMatcher(argument, isParamArray);
 				}
 			}
 
@@ -177,13 +178,15 @@ namespace Moq
 
 		public MethodInfo Method => this.method;
 
-		bool IProxyCall.IsConditional => this.condition != null;
+		public Mock Mock => this.mock;
 
-		bool IProxyCall.IsVerifiable => this.verifiable;
+		public bool IsConditional => this.condition != null;
 
-		bool IProxyCall.Invoked => this.callCount > 0;
+		public bool IsVerifiable => this.verifiable;
 
-		Expression IProxyCall.SetupExpression => this.originalExpression;
+		public bool Invoked => this.callCount > 0;
+
+		public Expression SetupExpression => this.originalExpression;
 
 		[Conditional("DESKTOP")]
 		[SuppressMessage("Microsoft.Design", "CA1031:DoNotCatchGeneralExceptionTypes")]
@@ -233,23 +236,19 @@ namespace Moq
 			}
 		}
 
-		public virtual bool Matches(Invocation invocation)
+		public bool Matches(Invocation invocation)
 		{
-			var parameters = invocation.Method.GetParameters();
-			var args = new List<object>();
-			for (int i = 0; i < parameters.Length; i++)
+			var arguments = invocation.Arguments;
+			if  (this.argumentMatchers.Length != arguments.Length)
 			{
-				if (!parameters[i].IsOutArgument())
-				{
-					args.Add(invocation.Arguments[i]);
-				}
+				return false;
 			}
 
-			if (argumentMatchers.Count == args.Count && this.IsEqualMethodOrOverride(invocation))
+			if (this.IsEqualMethodOrOverride(invocation.Method))
 			{
-				for (int i = 0; i < argumentMatchers.Count; i++)
+				for (int i = 0, n = this.argumentMatchers.Length; i < n; ++i)
 				{
-					if (!argumentMatchers[i].Matches(args[i]))
+					if (this.argumentMatchers[i].Matches(arguments[i]) == false)
 					{
 						return false;
 					}
@@ -370,24 +369,26 @@ namespace Moq
 			this.failMessage = failMessage;
 		}
 
-		private bool IsEqualMethodOrOverride(Invocation invocation)
+		private bool IsEqualMethodOrOverride(MethodInfo invocationMethod)
 		{
-			if (invocation.Method == this.method)
+			var method = this.method;
+
+			if (invocationMethod == method)
 			{
 				return true;
 			}
 
-			if (this.method.DeclaringType.IsAssignableFrom(invocation.Method.DeclaringType))
+			if (method.DeclaringType.IsAssignableFrom(invocationMethod.DeclaringType))
 			{
-				if (!this.method.Name.Equals(invocation.Method.Name, StringComparison.Ordinal) ||
-					this.method.ReturnType != invocation.Method.ReturnType ||
-					!this.method.IsGenericMethod &&
-					!invocation.Method.GetParameterTypes().SequenceEqual(this.method.GetParameterTypes()))
+				if (!method.Name.Equals(invocationMethod.Name, StringComparison.Ordinal) ||
+					method.ReturnType != invocationMethod.ReturnType ||
+					!method.IsGenericMethod &&
+					!invocationMethod.GetParameterTypes().SequenceEqual(method.GetParameterTypes()))
 				{
 					return false;
 				}
 
-				if (this.method.IsGenericMethod && !invocation.Method.GetGenericArguments().SequenceEqual(this.method.GetGenericArguments(), AssignmentCompatibilityTypeComparer.Instance))
+				if (method.IsGenericMethod && !invocationMethod.GetGenericArguments().SequenceEqual(method.GetGenericArguments(), AssignmentCompatibilityTypeComparer.Instance))
 				{
 					return false;
 				}

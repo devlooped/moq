@@ -48,8 +48,7 @@ namespace Moq
 			HandleWellKnownMethods.Instance,
 			RecordInvocation.Instance,
 			FindAndExecuteMatchingSetup.Instance,
-			InvokeBase.Instance,
-			ProduceDefaultReturnValue.Instance,
+			Return.Instance,
 		};
 
 		void IInterceptor.Intercept(Invocation invocation)

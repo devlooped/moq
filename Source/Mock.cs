@@ -465,7 +465,7 @@ namespace Moq
 
 		private static void ThrowVerifyException(
 			MethodCall expected,
-			IEnumerable<IProxyCall> setups,
+			IEnumerable<MethodCall> setups,
 			IEnumerable<Invocation> actualCalls,
 			Expression expression,
 			Times times,
@@ -477,7 +477,7 @@ namespace Moq
 			throw new MockException(MockException.ExceptionReason.VerificationFailed, message);
 		}
 
-		private static string FormatSetupsInfo(IEnumerable<IProxyCall> setups)
+		private static string FormatSetupsInfo(IEnumerable<MethodCall> setups)
 		{
 			var expressionSetups = setups
 				.Select(s => s.Format())
