@@ -49,12 +49,7 @@ using Moq.Properties;
 
 namespace Moq
 {
-	internal interface IMethodCallReturn
-	{
-		bool ProvidesReturnValue();
-	}
-
-	internal sealed partial class MethodCallReturn<TMock, TResult> : MethodCall, IMethodCallReturn, ISetup<TMock, TResult>, ISetupGetter<TMock, TResult>, IReturnsResult<TMock>
+	internal sealed partial class MethodCallReturn<TMock, TResult> : MethodCall, ISetup<TMock, TResult>, ISetupGetter<TMock, TResult>, IReturnsResult<TMock>
 		where TMock : class
 	{
 		// This enum exists for reasons of optimizing memory usage.
@@ -237,6 +232,10 @@ namespace Moq
 				invocation.Return(this.valueDel.HasCompatibleParameterList(new ParameterInfo[0])
 					? valueDel.InvokePreserveStack()                //we need this, for the user to be able to use parameterless methods
 					: valueDel.InvokePreserveStack(invocation.Arguments)); //will throw if parameters mismatch
+			}
+			else if (this.Mock.Behavior == MockBehavior.Strict)
+			{
+				throw new MockException(MockException.ExceptionReason.ReturnValueRequired, MockBehavior.Strict, invocation);
 			}
 			else
 			{

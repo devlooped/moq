@@ -161,7 +161,6 @@ namespace Moq
 				// and therefore we might never get to the 
 				// next line.
 				matchedSetup.Execute(invocation);
-				ThrowIfReturnValueRequired(matchedSetup, invocation, mock);
 				return InterceptionAction.Stop;
 			}
 			else if (mock.Behavior == MockBehavior.Strict)
@@ -171,23 +170,6 @@ namespace Moq
 			else
 			{
 				return InterceptionAction.Continue;
-			}
-		}
-
-		private static void ThrowIfReturnValueRequired(MethodCall call, Invocation invocation, Mock mock)
-		{
-			if (mock.Behavior != MockBehavior.Loose &&
-				invocation.Method != null &&
-				invocation.Method.ReturnType != null &&
-				invocation.Method.ReturnType != typeof(void))
-			{
-				if (!(call is IMethodCallReturn methodCallReturn && methodCallReturn.ProvidesReturnValue()))
-				{
-					throw new MockException(
-						MockException.ExceptionReason.ReturnValueRequired,
-						mock.Behavior,
-						invocation);
-				}
 			}
 		}
 	}

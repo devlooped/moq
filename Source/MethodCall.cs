@@ -178,6 +178,8 @@ namespace Moq
 
 		public MethodInfo Method => this.method;
 
+		public Mock Mock => this.mock;
+
 		public bool IsConditional => this.condition != null;
 
 		public bool IsVerifiable => this.verifiable;
