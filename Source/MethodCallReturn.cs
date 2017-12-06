@@ -230,17 +230,17 @@ namespace Moq
 
 			if (this.returnValueKind == ReturnValueKind.CallBase)
 			{
-				invocation.InvokeBase();
+				invocation.ReturnBase();
 			}
 			else if (this.valueDel != null)
 			{
-				invocation.ReturnValue = this.valueDel.HasCompatibleParameterList(new ParameterInfo[0])
+				invocation.Return(this.valueDel.HasCompatibleParameterList(new ParameterInfo[0])
 					? valueDel.InvokePreserveStack()                //we need this, for the user to be able to use parameterless methods
-					: valueDel.InvokePreserveStack(invocation.Arguments); //will throw if parameters mismatch
+					: valueDel.InvokePreserveStack(invocation.Arguments)); //will throw if parameters mismatch
 			}
 			else
 			{
-				invocation.ReturnValue = default(TResult);
+				invocation.Return(default(TResult));
 			}
 
 			this.afterReturnCallback?.Invoke(invocation.Arguments);

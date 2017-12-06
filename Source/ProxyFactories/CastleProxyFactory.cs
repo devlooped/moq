@@ -40,6 +40,7 @@
 
 using System;
 using System.Collections.Generic;
+using System.Diagnostics;
 using System.Globalization;
 using System.Linq;
 using System.Reflection;
@@ -181,22 +182,35 @@ namespace Moq
 		{
 			private IInvocation underlying;
 
-			internal Invocation(IInvocation underlying)
+			internal Invocation(IInvocation underlying) : base(underlying.Method, underlying.Arguments)
 			{
 				this.underlying = underlying;
 			}
 
-			public override object[] Arguments => this.underlying.Arguments;
-
-			public override MethodInfo Method => this.underlying.Method;
-
-			public override object ReturnValue
+			public override void Return()
 			{
-				get => this.underlying.ReturnValue;
-				set => this.underlying.ReturnValue = value;
+				Debug.Assert(this.underlying != null);
+				Debug.Assert(this.underlying.Method.ReturnType == typeof(void));
+
+				this.underlying = null;
 			}
 
-			public override void InvokeBase() => this.underlying.Proceed();
+			public override void ReturnBase()
+			{
+				Debug.Assert(this.underlying != null);
+
+				this.underlying.Proceed();
+				this.underlying = null;
+			}
+
+			public override void Return(object value)
+			{
+				Debug.Assert(this.underlying != null);
+				Debug.Assert(this.underlying.Method.ReturnType != typeof(void));
+
+				this.underlying.ReturnValue = value;
+				this.underlying = null;
+			}
 		}
 
 		/// <summary>

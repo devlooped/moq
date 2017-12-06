@@ -86,14 +86,15 @@ namespace Moq
 				switch (response.Item1)
 				{
 					case ResponseKind.Pass:
+						invocation.Return();
 						break;
 
 					case ResponseKind.CallBase:
-						invocation.InvokeBase();
+						invocation.ReturnBase();
 						break;
 
 					case ResponseKind.Returns:
-						invocation.ReturnValue = response.Item2;
+						invocation.Return(response.Item2);
 						break;
 
 					case ResponseKind.Throws:
@@ -112,8 +113,8 @@ namespace Moq
 				}
 				else
 				{
-					invocation.ReturnValue = returnType.GetTypeInfo().IsValueType ? Activator.CreateInstance(returnType)
-					                                                        : null;
+					invocation.Return(returnType.GetTypeInfo().IsValueType ? Activator.CreateInstance(returnType)
+					                                                       : null);
 				}
 			}
 		}

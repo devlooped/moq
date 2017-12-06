@@ -75,7 +75,7 @@ namespace Moq
 		{
 			if (IsObjectMethod(invocation.Method) && !mock.Setups.Any(c => IsObjectMethod(c.Method, "Equals")))
 			{
-				invocation.ReturnValue = ReferenceEquals(invocation.Arguments.First(), mock.Object);
+				invocation.Return(ReferenceEquals(invocation.Arguments.First(), mock.Object));
 				return InterceptionAction.Stop;
 			}
 			else
@@ -94,7 +94,7 @@ namespace Moq
 			// Only if there is no corresponding setup for `GetHashCode()`
 			if (IsObjectMethod(invocation.Method) && !mock.Setups.Any(c => IsObjectMethod(c.Method, "GetHashCode")))
 			{
-				invocation.ReturnValue = mock.GetHashCode();
+				invocation.Return(mock.GetHashCode());
 				return InterceptionAction.Stop;
 			}
 			else
@@ -108,7 +108,7 @@ namespace Moq
 			// Only if there is no corresponding setup for `ToString()`
 			if (IsObjectMethod(invocation.Method) && !mock.Setups.Any(c => IsObjectMethod(c.Method, "ToString")))
 			{
-				invocation.ReturnValue = mock.ToString() + ".Object";
+				invocation.Return(mock.ToString() + ".Object");
 				return InterceptionAction.Stop;
 			}
 			else
@@ -121,7 +121,7 @@ namespace Moq
 		{
 			if (typeof(IMocked).IsAssignableFrom(invocation.Method.DeclaringType))
 			{
-				invocation.ReturnValue = mock;
+				invocation.Return(mock);
 				return InterceptionAction.Stop;
 			}
 			else
@@ -154,11 +154,11 @@ namespace Moq
 				MockWithWrappedMockObject recursiveMock;
 				if (mock.InnerMocks.TryGetValue(invocation.Method, out recursiveMock))
 				{
-					invocation.ReturnValue = recursiveMock.WrappedMockObject;
+					invocation.Return(recursiveMock.WrappedMockObject);
 				}
 				else
 				{
-					invocation.ReturnValue = mock.GetDefaultValue(invocation.Method);
+					invocation.Return(mock.GetDefaultValue(invocation.Method));
 				}
 				return InterceptionAction.Stop;
 			}
@@ -183,7 +183,7 @@ namespace Moq
 				// invoke directly.
 				// Will only get here for Loose behavior.
 				// TODO: we may want to provide a way to skip this by the user.
-				invocation.InvokeBase();
+				invocation.ReturnBase();
 				return InterceptionAction.Stop;
 			}
 			else
@@ -292,12 +292,13 @@ namespace Moq
 
 						if (mock.CallBase && !invocation.Method.IsAbstract)
 						{
-							invocation.InvokeBase();
+							invocation.ReturnBase();
 							return InterceptionAction.Stop;
 						}
 						else if (invocation.Arguments.Length > 0 && invocation.Arguments[0] is Delegate delegateInstance)
 						{
 							mock.EventHandlers.Add(eventInfo.Name, delegateInstance);
+							invocation.Return();
 							return InterceptionAction.Stop;
 						}
 					}
@@ -313,12 +314,13 @@ namespace Moq
 
 						if (mock.CallBase && !invocation.Method.IsAbstract)
 						{
-							invocation.InvokeBase();
+							invocation.ReturnBase();
 							return InterceptionAction.Stop;
 						}
 						else if (invocation.Arguments.Length > 0 && invocation.Arguments[0] is Delegate delegateInstance)
 						{
 							mock.EventHandlers.Remove(eventInfo.Name, delegateInstance);
+							invocation.Return();
 							return InterceptionAction.Stop;
 						}
 					}
