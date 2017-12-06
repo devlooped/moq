@@ -140,50 +140,6 @@ namespace Moq
 		private static bool IsObjectMethod(MethodInfo method, string name) => IsObjectMethod(method) && method.Name == name;
 	}
 
-	internal sealed class ProduceDefaultReturnValue : InterceptionAspect
-	{
-		public static ProduceDefaultReturnValue Instance { get; } = new ProduceDefaultReturnValue();
-
-		public override InterceptionAction Handle(Invocation invocation, Mock mock)
-		{
-			Debug.Assert(invocation.Method != null);
-			Debug.Assert(invocation.Method.ReturnType != null);
-
-			if (invocation.Method.ReturnType != typeof(void))
-			{
-				MockWithWrappedMockObject recursiveMock;
-				if (mock.InnerMocks.TryGetValue(invocation.Method, out recursiveMock))
-				{
-					invocation.Return(recursiveMock.WrappedMockObject);
-				}
-				else
-				{
-					invocation.Return(mock.GetDefaultValue(invocation.Method));
-				}
-				return InterceptionAction.Stop;
-			}
-			return InterceptionAction.Continue;
-		}
-	}
-
-	internal sealed class InvokeBase : InterceptionAspect
-	{
-		public static InvokeBase Instance { get; } = new InvokeBase();
-
-		public override InterceptionAction Handle(Invocation invocation, Mock mock)
-		{
-			if (mock.CallBase && !invocation.Method.IsAbstract)
-			{
-				invocation.ReturnBase();
-				return InterceptionAction.Stop;
-			}
-			else
-			{
-				return InterceptionAction.Continue;
-			}
-		}
-	}
-
 	internal sealed class FindAndExecuteMatchingSetup : InterceptionAspect
 	{
 		public static FindAndExecuteMatchingSetup Instance { get; } = new FindAndExecuteMatchingSetup();
@@ -377,6 +333,38 @@ namespace Moq
 			}
 
 			return initialType.GetInterfaces();
+		}
+	}
+
+	internal sealed class Return : InterceptionAspect
+	{
+		public static Return Instance { get; } = new Return();
+
+		public override InterceptionAction Handle(Invocation invocation, Mock mock)
+		{
+			Debug.Assert(invocation.Method != null);
+			Debug.Assert(invocation.Method.ReturnType != null);
+
+			var method = invocation.Method;
+
+			if (mock.CallBase && !method.IsAbstract)
+			{
+				invocation.ReturnBase();
+			}
+			else if (method.ReturnType == typeof(void))
+			{
+				invocation.Return();
+			}
+			else if (mock.InnerMocks.TryGetValue(method, out var inner))
+			{
+				invocation.Return(inner.WrappedMockObject);
+			}
+			else
+			{
+				invocation.Return(mock.GetDefaultValue(method));
+			}
+
+			return InterceptionAction.Stop;
 		}
 	}
 }
