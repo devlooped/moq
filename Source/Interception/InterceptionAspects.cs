@@ -172,17 +172,8 @@ namespace Moq
 
 		public override InterceptionAction Handle(Invocation invocation, Mock mock)
 		{
-			if (invocation.Method.DeclaringType == typeof(object) || // interface proxy
-				mock.ImplementsInterface(invocation.Method.DeclaringType) && !invocation.Method.LooksLikeEventAttach() && !invocation.Method.LooksLikeEventDetach() && mock.CallBase && !mock.MockedType.GetTypeInfo().IsInterface || // class proxy with explicitly implemented interfaces. The method's declaring type is the interface and the method couldn't be abstract
-				invocation.Method.DeclaringType.GetTypeInfo().IsClass && !invocation.Method.IsAbstract && mock.CallBase // class proxy
-				)
+			if (mock.CallBase && !invocation.Method.IsAbstract)
 			{
-				// Invoke underlying implementation.
-
-				// For mocked classes, if the target method was not abstract, 
-				// invoke directly.
-				// Will only get here for Loose behavior.
-				// TODO: we may want to provide a way to skip this by the user.
 				invocation.ReturnBase();
 				return InterceptionAction.Stop;
 			}

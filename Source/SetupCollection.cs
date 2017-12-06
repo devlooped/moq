@@ -83,6 +83,12 @@ namespace Moq
 
 		public MethodCall FindMatchFor(Invocation invocation)
 		{
+			// Fast path (no `lock`) when there are no setups:
+			if (this.setups.Count == 0)
+			{
+				return null;
+			}
+
 			MethodCall matchingSetup = null;
 
 			lock (this.setups)
