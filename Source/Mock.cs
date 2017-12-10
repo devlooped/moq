@@ -852,33 +852,22 @@ namespace Moq
 
 		private void SetupProperty(PropertyInfo property, object initialValue)
 		{
+			// Because this method takes a few shortcuts when compared to `SetupGet` or `SetupProperty`,
+			// we need to trust that the caller has already established certain preconditions:
+			Debug.Assert(property.GetIndexParameters().Length == 0);
+			Debug.Assert(property.CanRead && property.CanOverrideGet());
+			Debug.Assert(property.CanWrite == property.CanOverrideSet());
+
+			// This variable will act as the backing field for the property. It is captured by the getter and setter closures below.
+			var value = initialValue;
+
 			var expression = GetPropertyExpression(this.MockedType, property);
 
-			var setupPropertyMethod = this.GetType().GetMethods("SetupProperty")
-				.First(m => m.GetParameters().Length == 2);
-			var setupGetMethod = this.GetType().GetMethods("SetupGet")
-				.First(m => m.GetParameters().Length == 1);
+			this.Setups.Add(new PropertyGetterMethodCall(this, expression, property.GetGetMethod(true), getter: () => value));
 
 			if (property.CanWrite)
 			{
-				setupPropertyMethod.MakeGenericMethod(property.PropertyType)
-					.Invoke(this, new[] { expression, initialValue });
-			}
-			else
-			{
-				var genericSetupGetMethod = setupGetMethod.MakeGenericMethod(property.PropertyType);
-				var returnsMethod =
-					genericSetupGetMethod
-						.ReturnType
-						.GetTypeInfo()
-						.ImplementedInterfaces
-						.SingleOrDefault(i => i.Name.Equals("IReturnsGetter`2", StringComparison.OrdinalIgnoreCase))
-						.GetTypeInfo()
-						.DeclaredMethods
-						.SingleOrDefault(m => m.Name == "Returns" && m.GetParameterTypes().Count() == 1 && m.GetParameterTypes().First() == property.PropertyType);
-
-				var returnsGetter = genericSetupGetMethod.Invoke(this, new[] { expression });
-				returnsMethod.Invoke(returnsGetter, new[] { initialValue });
+				this.Setups.Add(new PropertySetterMethodCall(this, expression, property.GetSetMethod(true), setter: (newValue) => value = newValue));
 			}
 		}
 
