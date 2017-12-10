@@ -102,6 +102,19 @@ namespace Moq
 		private Exception throwExceptionResponse;
 		private bool verifiable;
 
+		/// <remarks>
+		///   Only use this constructor when you know that the specified <paramref name="method"/> has no `out` parameters,
+		///   and when you want to avoid the <see cref="MatcherFactory"/>-related overhead of the other constructor overload.
+		/// </remarks>
+		public MethodCall(Mock mock, Condition condition, Expression originalExpression, MethodInfo method, IMatcher[] argumentMatchers)
+		{
+			this.argumentMatchers = argumentMatchers;
+			this.condition = condition;
+			this.method = method;
+			this.mock = mock;
+			this.originalExpression = originalExpression;
+		}
+
 		public MethodCall(Mock mock, Condition condition, Expression originalExpression, MethodInfo method, params Expression[] arguments)
 		{
 			this.mock = mock;
