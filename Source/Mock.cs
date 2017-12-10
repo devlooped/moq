@@ -834,14 +834,8 @@ namespace Moq
 					   ProxyFactory.Instance.IsMethodVisible(p.GetGetMethod(), out _))
 				.Distinct();
 
-			var setupPropertyMethod = mock.GetType().GetMethods("SetupProperty")
-				.First(m => m.GetParameters().Length == 2);
-			var setupGetMethod = mock.GetType().GetMethods("SetupGet")
-				.First(m => m.GetParameters().Length == 1);
-
 			foreach (var property in properties)
 			{
-				var expression = GetPropertyExpression(mockType, property);
 				object initialValue = GetInitialValue(mock, mockedTypesStack, property);
 
 				var mocked = initialValue as IMocked;
@@ -850,30 +844,42 @@ namespace Moq
 					SetupAllProperties(mocked.Mock, mockedTypesStack);
 				}
 
-				if (property.CanWrite)
-				{
-					setupPropertyMethod.MakeGenericMethod(property.PropertyType)
-						.Invoke(mock, new[] { expression, initialValue });
-				}
-				else
-				{
-					var genericSetupGetMethod = setupGetMethod.MakeGenericMethod(property.PropertyType);
-					var returnsMethod =
-						genericSetupGetMethod
-							.ReturnType
-							.GetTypeInfo()
-							.ImplementedInterfaces
-							.SingleOrDefault(i => i.Name.Equals("IReturnsGetter`2", StringComparison.OrdinalIgnoreCase))
-							.GetTypeInfo()
-							.DeclaredMethods
-							.SingleOrDefault(m => m.Name == "Returns" && m.GetParameterTypes().Count() == 1 && m.GetParameterTypes().First() == property.PropertyType);
-
-					var returnsGetter = genericSetupGetMethod.Invoke(mock, new[] {expression});
-					returnsMethod.Invoke(returnsGetter, new[] {initialValue});
-				}
+				mock.SetupProperty(property, initialValue);
 			}
 
 			mockedTypesStack.Pop();
+		}
+
+		private void SetupProperty(PropertyInfo property, object initialValue)
+		{
+			var expression = GetPropertyExpression(this.MockedType, property);
+
+			var setupPropertyMethod = this.GetType().GetMethods("SetupProperty")
+				.First(m => m.GetParameters().Length == 2);
+			var setupGetMethod = this.GetType().GetMethods("SetupGet")
+				.First(m => m.GetParameters().Length == 1);
+
+			if (property.CanWrite)
+			{
+				setupPropertyMethod.MakeGenericMethod(property.PropertyType)
+					.Invoke(this, new[] { expression, initialValue });
+			}
+			else
+			{
+				var genericSetupGetMethod = setupGetMethod.MakeGenericMethod(property.PropertyType);
+				var returnsMethod =
+					genericSetupGetMethod
+						.ReturnType
+						.GetTypeInfo()
+						.ImplementedInterfaces
+						.SingleOrDefault(i => i.Name.Equals("IReturnsGetter`2", StringComparison.OrdinalIgnoreCase))
+						.GetTypeInfo()
+						.DeclaredMethods
+						.SingleOrDefault(m => m.Name == "Returns" && m.GetParameterTypes().Count() == 1 && m.GetParameterTypes().First() == property.PropertyType);
+
+				var returnsGetter = genericSetupGetMethod.Invoke(this, new[] { expression });
+				returnsMethod.Invoke(returnsGetter, new[] { initialValue });
+			}
 		}
 
 		private static object GetInitialValue(Mock mock, Stack<Type> mockedTypesStack, PropertyInfo property)
