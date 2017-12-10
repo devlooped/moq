@@ -837,7 +837,8 @@ namespace Moq
 			foreach (var property in properties)
 			{
 				var expression = GetPropertyExpression(mockType, property);
-				object value = GetInitialValue(mock, mockedTypesStack, property);
+				var getter = property.GetGetMethod(true);
+				object value = SetupAllProperties_GetInitialValue(mock, mockedTypesStack, getter);
 
 				var mocked = value as IMocked;
 				if (mocked != null)
@@ -845,7 +846,7 @@ namespace Moq
 					SetupAllProperties(mocked.Mock, mockedTypesStack);
 				}
 
-				mock.Setups.Add(new PropertyGetterMethodCall(mock, expression, property.GetGetMethod(true), () => value));
+				mock.Setups.Add(new PropertyGetterMethodCall(mock, expression, getter, () => value));
 
 				if (property.CanWrite)
 				{
@@ -856,25 +857,25 @@ namespace Moq
 			mockedTypesStack.Pop();
 		}
 
-		private static object GetInitialValue(Mock mock, Stack<Type> mockedTypesStack, PropertyInfo property)
+		private static object SetupAllProperties_GetInitialValue(Mock mock, Stack<Type> mockedTypesStack, MethodInfo getter)
 		{
-			var valueProvider = mock.DefaultValueProvider;
-
-			if (mockedTypesStack.Contains(property.PropertyType))
+			if (mockedTypesStack.Contains(getter.ReturnType))
 			{
 				// to deal with loops in the property graph
-				valueProvider = DefaultValueProvider.Empty;
+				return mock.GetDefaultValue(getter, useAlternateProvider: DefaultValueProvider.Empty);
 			}
-#if FEATURE_SERIALIZATION
-			else
+
+			try
 			{
-				// to make sure that properties of types that don't implement ISerializable properly (Castle throws ArgumentException)
-				// are mocked with default value instead.
-				// It will only result in exception if the properties are accessed.
-				valueProvider = new SerializableTypesValueProvider(valueProvider);
+				return mock.GetDefaultValue(getter);
 			}
-#endif
-			return mock.GetDefaultValue(property.GetGetMethod(), useAlternateProvider: valueProvider);
+			catch
+			{
+				// Since this method is called from `SetupAllProperties`, which performs a batch operation,
+				// a single failure of the default value provider should not cause the operation as a whole
+				// to fail. The empty default value provider is a safe fallback because it does not throw.
+				return mock.GetDefaultValue(getter, useAlternateProvider: DefaultValueProvider.Empty);
+			}
 		}
 
 		private static Expression GetPropertyExpression(Type mockType, PropertyInfo property)

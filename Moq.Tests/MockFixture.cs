@@ -6,6 +6,10 @@ using System.Reflection;
 #endif
 using Xunit;
 
+#if FEATURE_SERIALIZATION
+using System.Runtime.Serialization;
+#endif
+
 namespace Moq.Tests
 {
 	public class MockFixture
@@ -1220,5 +1224,39 @@ namespace Moq.Tests
 
 			Assert.Empty(mock.ConfiguredDefaultValues);
 		}
+
+#if FEATURE_SERIALIZATION
+		[Serializable]
+		public class BadSerializable : ISerializable
+		{
+			public void GetObjectData(SerializationInfo info, StreamingContext context)
+			{
+			}
+		}
+
+		public interface IHaveBadSerializableProperty
+		{
+			int A { get; }
+			BadSerializable BadSerializable { get; }
+			string C { get; }
+		}
+
+		[Fact]
+		public void Accessing_property_of_bad_serializable_type_throws()
+		{
+			var mock = new Mock<IHaveBadSerializableProperty>() { DefaultValue = DefaultValue.Mock };
+
+			Assert.ThrowsAny<Exception>(() => mock.Object.BadSerializable);
+		}
+
+		[Fact]
+		public void Setting_up_property_of_bad_serializable_type_with_SetupAllProperties_does_not_throw()
+		{
+			var mock = new Mock<IHaveBadSerializableProperty>() { DefaultValue = DefaultValue.Mock };
+			mock.SetupAllProperties();
+
+			Assert.Null(mock.Object.BadSerializable);
+		}
+#endif
 	}
 }
