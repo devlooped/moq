@@ -803,19 +803,18 @@ namespace Moq
 		[DebuggerStepThrough]
 		internal static void SetupAllProperties(Mock mock)
 		{
-			PexProtector.Invoke(SetupAllPropertiesPexProtected, mock);
+			PexProtector.Invoke(SetupAllPropertiesPexProtected, mock, mock.DefaultValueProvider);
+			//                                                        ^^^^^^^^^^^^^^^^^^^^^^^^^
+			// `SetupAllProperties` no longer performs eager recursive property setup like in previous versions.
+			// If `mock` uses `DefaultValue.Mock`, mocked sub-objects are now only constructed when queried for
+			// the first time. In order for `SetupAllProperties`'s new mode of operation to be indistinguishable
+			// from how it worked previously, it's important to capture the default value provider at this precise
+			// moment, since it might be changed later (before queries to properties of a mockable type).
 		}
 
-		private static void SetupAllPropertiesPexProtected(Mock mock)
-		{
-			var mockedTypesStack = new Stack<Type>();
-			SetupAllProperties(mock, mockedTypesStack);
-		}
-
-		private static void SetupAllProperties(Mock mock, Stack<Type> mockedTypesStack)
+		private static void SetupAllPropertiesPexProtected(Mock mock, DefaultValueProvider defaultValueProvider)
 		{
 			var mockType = mock.MockedType;
-			mockedTypesStack.Push(mockType);
 
 			var properties =
 				mockType
@@ -838,43 +837,46 @@ namespace Moq
 			{
 				var expression = GetPropertyExpression(mockType, property);
 				var getter = property.GetGetMethod(true);
-				object value = SetupAllProperties_GetInitialValue(mock, mockedTypesStack, getter);
 
-				var mocked = value as IMocked;
-				if (mocked != null)
+				object value = null;
+				bool valueNotSet = true;
+
+				mock.Setups.Add(new PropertyGetterMethodCall(mock, expression, getter, () =>
 				{
-					SetupAllProperties(mocked.Mock, mockedTypesStack);
-				}
+					if (valueNotSet)
+					{
+						object initialValue;
+						try
+						{
+							initialValue = mock.GetDefaultValue(getter, useAlternateProvider: defaultValueProvider);
+						}
+						catch
+						{
+							// Since this method performs a batch operation, a single failure of the default value
+							// provider should not tear down the whole operation. The empty default value provider
+							// is a safe fallback because it does not throw.
+							initialValue = mock.GetDefaultValue(getter, useAlternateProvider: DefaultValueProvider.Empty);
+						}
 
-				mock.Setups.Add(new PropertyGetterMethodCall(mock, expression, getter, () => value));
+						if (initialValue is IMocked mocked)
+						{
+							SetupAllPropertiesPexProtected(mocked.Mock, defaultValueProvider);
+						}
+
+						value = initialValue;
+						valueNotSet = false;
+					}
+					return value;
+				}));
 
 				if (property.CanWrite)
 				{
-					mock.Setups.Add(new PropertySetterMethodCall(mock, expression, property.GetSetMethod(true), (newValue) => value = newValue));
+					mock.Setups.Add(new PropertySetterMethodCall(mock, expression, property.GetSetMethod(true), (newValue) =>
+					{
+						value = newValue;
+						valueNotSet = false;
+					}));
 				}
-			}
-
-			mockedTypesStack.Pop();
-		}
-
-		private static object SetupAllProperties_GetInitialValue(Mock mock, Stack<Type> mockedTypesStack, MethodInfo getter)
-		{
-			if (mockedTypesStack.Contains(getter.ReturnType))
-			{
-				// to deal with loops in the property graph
-				return mock.GetDefaultValue(getter, useAlternateProvider: DefaultValueProvider.Empty);
-			}
-
-			try
-			{
-				return mock.GetDefaultValue(getter);
-			}
-			catch
-			{
-				// Since this method is called from `SetupAllProperties`, which performs a batch operation,
-				// a single failure of the default value provider should not cause the operation as a whole
-				// to fail. The empty default value provider is a safe fallback because it does not throw.
-				return mock.GetDefaultValue(getter, useAlternateProvider: DefaultValueProvider.Empty);
 			}
 		}
 
