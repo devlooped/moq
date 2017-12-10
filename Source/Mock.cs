@@ -806,19 +806,16 @@ namespace Moq
 			PexProtector.Invoke(SetupAllPropertiesPexProtected, mock);
 		}
 
+		[DebuggerStepThrough]
 		private static void SetupAllPropertiesPexProtected(Mock mock)
 		{
-			var mockedTypesStack = new Stack<Type>();
-			SetupAllProperties(mock, mockedTypesStack);
+			SetupAllProperties(mock, mock.DefaultValueProvider);
 		}
 
-		private static void SetupAllProperties(Mock mock, Stack<Type> mockedTypesStack)
+		private static void SetupAllProperties(Mock mock, DefaultValueProvider defaultValueProvider)
 		{
-			var mockType = mock.MockedType;
-			mockedTypesStack.Push(mockType);
-
 			var properties =
-				mockType
+				mock.MockedType
 				.GetAllPropertiesInDepthFirstOrder()
 				// ^ Depth-first traversal is important because properties in derived interfaces
 				//   that shadow properties in base interfaces should be set up last. This
@@ -834,67 +831,66 @@ namespace Moq
 					   ProxyFactory.Instance.IsMethodVisible(p.GetGetMethod(), out _))
 				.Distinct();
 
-			var setupPropertyMethod = mock.GetType().GetMethods("SetupProperty")
-				.First(m => m.GetParameters().Length == 2);
-			var setupGetMethod = mock.GetType().GetMethods("SetupGet")
-				.First(m => m.GetParameters().Length == 1);
-
 			foreach (var property in properties)
 			{
-				var expression = GetPropertyExpression(mockType, property);
-				object initialValue = GetInitialValue(mock, mockedTypesStack, property);
-
-				var mocked = initialValue as IMocked;
-				if (mocked != null)
-				{
-					SetupAllProperties(mocked.Mock, mockedTypesStack);
-				}
-
-				if (property.CanWrite)
-				{
-					setupPropertyMethod.MakeGenericMethod(property.PropertyType)
-						.Invoke(mock, new[] { expression, initialValue });
-				}
-				else
-				{
-					var genericSetupGetMethod = setupGetMethod.MakeGenericMethod(property.PropertyType);
-					var returnsMethod =
-						genericSetupGetMethod
-							.ReturnType
-							.GetTypeInfo()
-							.ImplementedInterfaces
-							.SingleOrDefault(i => i.Name.Equals("IReturnsGetter`2", StringComparison.OrdinalIgnoreCase))
-							.GetTypeInfo()
-							.DeclaredMethods
-							.SingleOrDefault(m => m.Name == "Returns" && m.GetParameterTypes().Count() == 1 && m.GetParameterTypes().First() == property.PropertyType);
-
-					var returnsGetter = genericSetupGetMethod.Invoke(mock, new[] {expression});
-					returnsMethod.Invoke(returnsGetter, new[] {initialValue});
-				}
+				mock.SetupProperty(property, defaultValueProvider);
 			}
-
-			mockedTypesStack.Pop();
 		}
 
-		private static object GetInitialValue(Mock mock, Stack<Type> mockedTypesStack, PropertyInfo property)
+		private void SetupProperty(PropertyInfo property, DefaultValueProvider defaultValueProvider)
 		{
-			var valueProvider = mock.DefaultValueProvider;
+			// Because this method takes a few shortcuts when compared to `SetupGet` or `SetupProperty`,
+			// we need to trust that the caller has already established certain preconditions:
+			Debug.Assert(property.GetIndexParameters().Length == 0);
+			Debug.Assert(property.CanRead && property.CanOverrideGet());
+			Debug.Assert(property.CanWrite == property.CanOverrideSet());
 
-			if (mockedTypesStack.Contains(property.PropertyType))
+			// This variable will act as the backing field for the property. It is captured by the getter and setter closures below.
+			object value = null;
+			bool set = false;
+
+			var expression = GetPropertyExpression(this.MockedType, property);
+
+			this.Setups.Add(new PropertyGetterMethodCall(this, expression, property.GetGetMethod(true),
+				getter: () =>
+				{
+					if (!set)
+					{
+						object initialValue;
+						try
+						{
+							initialValue = defaultValueProvider.GetDefaultValue(property.PropertyType, this);
+						}
+						catch
+						{
+							// Why are we catching errors by the default value provider and falling back to `DefaultValue.Empty`?
+							// Because this method is called from `SetupAllProperties`, which is a batch operation. Failing to
+							// determine a single property's initial value shouldn't lead to overall failure. (The rationale for
+							// doing this goes back to a DynamicProxy-specific issue: It cannot create proxy types for types that
+							// implement `ISerializable` incorrectly. We used to protect against that specific issue, and we'd
+							// we'd fall back to a default empty value whenever it occurred. We're now doing the same thing here,
+							// albeit in a more general fashion (not specific to DynamicProxy).
+							initialValue = DefaultValueProvider.Empty.GetDefaultValue(property.PropertyType, this);
+						}
+						if (initialValue is IMocked mocked)
+						{
+							SetupAllProperties(mocked.Mock, defaultValueProvider);
+						}
+						value = initialValue;
+						set = true;
+					}
+					return value;
+				}));
+
+			if (property.CanWrite)
 			{
-				// to deal with loops in the property graph
-				valueProvider = DefaultValueProvider.Empty;
+				this.Setups.Add(new PropertySetterMethodCall(this, expression, property.GetSetMethod(true),
+					setter: (newValue) =>
+					{
+						value = newValue;
+						set = true;
+					}));
 			}
-#if FEATURE_SERIALIZATION
-			else
-			{
-				// to make sure that properties of types that don't implement ISerializable properly (Castle throws ArgumentException)
-				// are mocked with default value instead.
-				// It will only result in exception if the properties are accessed.
-				valueProvider = new SerializableTypesValueProvider(valueProvider);
-			}
-#endif
-			return mock.GetDefaultValue(property.GetGetMethod(), useAlternateProvider: valueProvider);
 		}
 
 		private static Expression GetPropertyExpression(Type mockType, PropertyInfo property)

@@ -102,6 +102,21 @@ namespace Moq
 		private Exception throwExceptionResponse;
 		private bool verifiable;
 
+		public MethodCall(Mock mock, Condition condition, Expression originalExpression, MethodInfo method, IMatcher[] argumentMatchers)
+		{
+			this.argumentMatchers = argumentMatchers;
+			this.condition = condition;
+			this.method = method;
+			this.mock = mock;
+			this.originalExpression = originalExpression;
+
+			// NOTE: This constructor overlaod does not capture `out` parameters' values for later application to invocations.
+			// It should only be used when it is known in advance that `method` does not have `out` parameters, and when you
+			// want to avoid the matcher building overhead of the regular ctor.
+
+			SetFileInfo();
+		}
+
 		public MethodCall(Mock mock, Condition condition, Expression originalExpression, MethodInfo method, params Expression[] arguments)
 		{
 			this.mock = mock;
