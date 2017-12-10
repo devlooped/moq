@@ -64,6 +64,12 @@ namespace Moq
 		}
 
 		[DebuggerHidden]
+		public static void Invoke<T1, T2>(Action<T1, T2> action, T1 arg1, T2 arg2)
+		{
+			action(arg1, arg2);
+		}
+
+		[DebuggerHidden]
 		public static TResult Invoke<T1, T2, T3, TResult>(Func<T1, T2, T3, TResult> function, T1 arg1, T2 arg2, T3 arg3)
 		{
 			return function(arg1, arg2, arg3);

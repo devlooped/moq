@@ -30,10 +30,9 @@ namespace Moq.Tests.Regressions
 			var foo = new Mock<IOne> {DefaultValue = DefaultValue.Mock};
 			foo.SetupGet(m => m.Two.Three.SomeString).Returns("blah");
 
-			// the default value of the loopback property is not mocked
-			Assert.Null(foo.Object.Two.Three.LoopBack);
-			foo.SetupGet(m => m.Two.Three.LoopBack).Returns(Mock.Of<ITwo>());
+			// the default value of the loopback property is mocked
 			Assert.NotNull(foo.Object.Two.Three.LoopBack);
+			Assert.NotSame(foo.Object.Two, foo.Object.Two.Three.LoopBack);
 		}
 
 #if FEATURE_SERIALIZATION

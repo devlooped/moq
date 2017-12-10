@@ -1531,7 +1531,7 @@ namespace Moq.Tests.Regressions
 			{
 				var mock = new Mock<INode>() { DefaultValue = DefaultValue.Mock };
 				mock.SetupAllProperties();
-				Assert.Null(mock.Object.Parent);
+				Assert.NotNull(mock.Object.Parent);
 			}
 
 			public interface INode
@@ -1544,8 +1544,14 @@ namespace Moq.Tests.Regressions
 			{
 				var mock = new Mock<IPing>() { DefaultValue = DefaultValue.Mock };
 				mock.SetupAllProperties();
+
 				Assert.NotNull(mock.Object.Pong);
-				Assert.Null(mock.Object.Pong.Ping);
+
+				Assert.NotNull(mock.Object.Pong.Ping);
+				Assert.NotSame(mock.Object, mock.Object.Pong.Ping);
+
+				Assert.NotNull(mock.Object.Pong.Ping.Pong);
+				Assert.NotSame(mock.Object.Pong, mock.Object.Pong.Ping.Pong);
 			}
 
 			public interface IPing
