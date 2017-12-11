@@ -47,6 +47,7 @@ using System.Reflection;
 
 using Castle.DynamicProxy;
 
+using Moq.Internals;
 using Moq.Properties;
 
 #if FEATURE_CAS
@@ -88,7 +89,7 @@ namespace Moq
 		public CastleProxyFactory()
 		{
 			this.delegateInterfaceCache = new Dictionary<Type, Type>();
-			this.generationOptions = new ProxyGenerationOptions { Hook = new IncludeObjectMethodsHook() };
+			this.generationOptions = new ProxyGenerationOptions { Hook = new IncludeObjectMethodsHook(), BaseTypeForInterfaceProxy = typeof(InterfaceProxy) };
 			this.generator = new ProxyGenerator();
 		}
 
@@ -97,11 +98,9 @@ namespace Moq
 		{
 			if (mockType.GetTypeInfo().IsInterface)
 			{
-				// Add type to additional interfaces and mock System.Object instead.
-				// This way it is also possible to mock System.Object methods.
-				Array.Resize(ref interfaces, interfaces.Length + 1);
-				interfaces[interfaces.Length - 1] = mockType;
-				mockType = typeof(object);
+				// While `CreateClassProxy` could also be used for interface types,
+				// `CreateInterfaceProxyWithoutTarget` is much faster (about twice as fast):
+				return generator.CreateInterfaceProxyWithoutTarget(mockType, interfaces, this.generationOptions, new Interceptor(interceptor));
 			}
 
 			try
