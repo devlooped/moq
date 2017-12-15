@@ -12,6 +12,10 @@
     <DotNetCliToolReference Include="dotnet-xunit" Version="2.3.0" />
   </ItemGroup>
 
+  <PropertyGroup Condition=" '$(TargetFramework)' == 'netcoreapp2.0' ">
+    <RuntimeFrameworkVersion>2.0.3</RuntimeFrameworkVersion>
+  </PropertyGroup>
+
   <ItemGroup>
     <ProjectReference Include="..\Source\Moq.csproj" />
   </ItemGroup>
