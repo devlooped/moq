@@ -38,6 +38,8 @@
 //[This is the BSD license, see
 // http://www.opensource.org/licenses/bsd-license.php]
 
+using System.ComponentModel;
+
 namespace Moq
 {
 	/// <summary>
@@ -61,6 +63,22 @@ namespace Moq
 		/// <remarks>
 		/// For sealed classes, a null value will be generated.
 		/// </remarks>
-		Mock
+		Mock,
+
+		/// <summary>
+		///   <para>
+		///     All default value generation strategies other than <see cref="Empty"/> or <see cref="Mock"/>
+		///     are represented by this enumeration value.
+		///   </para>
+		///   <para>
+		///     Do not set <see cref="Mock.DefaultValue"/> (nor <see cref="MockFactory.DefaultValue"/>) to this value.
+		///     If you want to set up a custom default value generation strategy, set <see cref="Mock.DefaultValueProvider"/>
+		///     or <see cref="MockFactory.DefaultValueProvider"/> instead.
+		///   </para>
+		/// </summary>
+		/// <remarks>
+		/// </remarks>
+		[EditorBrowsable(EditorBrowsableState.Advanced)]
+		Custom
 	}
 }

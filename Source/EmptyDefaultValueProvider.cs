@@ -43,103 +43,59 @@ using System.Collections;
 using System.Collections.Generic;
 using System.Linq;
 using System.Reflection;
-using System.Threading.Tasks;
 
 namespace Moq
 {
 	/// <summary>
-	/// A <see cref="IDefaultValueProvider"/> that returns an empty default value 
+	/// A <see cref="DefaultValueProvider"/> that returns an empty default value 
 	/// for invocations that do not have setups or return values, with loose mocks.
 	/// This is the default behavior for a mock.
 	/// </summary>
-	internal class EmptyDefaultValueProvider : IDefaultValueProvider
+	internal sealed class EmptyDefaultValueProvider : LookupOrFallbackDefaultValueProvider
 	{
-		private Dictionary<Type, object> defaultValues = new Dictionary<Type, object>();
-
-		public virtual void DefineDefault<T>(T value)
+		internal EmptyDefaultValueProvider()
 		{
-			this.defaultValues[typeof(T)] = value;
+			base.Register(typeof(Array), CreateArray);
+			base.Register(typeof(IEnumerable), CreateEnumerable);
+			base.Register(typeof(IEnumerable<>), CreateEnumerableOf);
+			base.Register(typeof(IQueryable), CreateQueryable);
+			base.Register(typeof(IQueryable<>), CreateQueryableOf);
 		}
 
-		public virtual object ProvideDefault(MethodInfo member)
+		internal override DefaultValue Kind => DefaultValue.Empty;
+
+		private static object CreateArray(Type type, Mock mock)
 		{
-			var valueType = member.ReturnType;
-
-			if (this.defaultValues.ContainsKey(valueType))
-			{
-				return this.defaultValues[valueType];
-			}
-
-			return valueType.GetTypeInfo().IsValueType ? GetValueTypeDefault(valueType) : GetReferenceTypeDefault(valueType);
+			var elementType = type.GetElementType();
+			var lengths = new int[type.GetArrayRank()];
+			return Array.CreateInstance(elementType, lengths);
 		}
 
-		private static object GetReferenceTypeDefault(Type valueType)
+		private static object CreateEnumerable(Type type, Mock mock)
 		{
-			if (valueType.IsArray)
-			{
-				var elementType = valueType.GetElementType();
-				var lengths = new int[valueType.GetArrayRank()];
-				return Array.CreateInstance(elementType, lengths);
-			}
-			else if (valueType == typeof(IEnumerable))
-			{
-				return new object[0];
-			}
-			else if (valueType == typeof(IQueryable))
-			{
-				return new object[0].AsQueryable();
-			}
-			else if (valueType == typeof(Task))
-			{
-				// Task<T> inherits from Task, so just return Task<bool>
-				return GetCompletedTaskForType(typeof(bool));
-			}
-			else if (valueType.GetTypeInfo().IsGenericType && valueType.GetGenericTypeDefinition() == typeof(IEnumerable<>))
-			{
-				var genericListType = typeof(List<>).MakeGenericType(valueType.GetGenericArguments()[0]);
-				return Activator.CreateInstance(genericListType);
-			}
-			else if (valueType.GetTypeInfo().IsGenericType && valueType.GetGenericTypeDefinition() == typeof(IQueryable<>))
-			{
-				var genericType = valueType.GetGenericArguments()[0];
-				var genericListType = typeof(List<>).MakeGenericType(genericType);
-
-				return typeof(Queryable).GetMethods()
-					.Single(x => x.Name == "AsQueryable" && x.IsGenericMethod)
-					.MakeGenericMethod(genericType)
-					.Invoke(null, new[] { Activator.CreateInstance(genericListType) });
-			}
-			else if (valueType.GetTypeInfo().IsGenericType && valueType.GetGenericTypeDefinition() == typeof(Task<>))
-			{
-				var genericType = valueType.GetGenericArguments()[0];
-				return GetCompletedTaskForType(genericType);
-			}
-
-			return null;
+			return new object[0];
 		}
 
-		private static object GetValueTypeDefault(Type valueType)
+		private static object CreateEnumerableOf(Type type, Mock mock)
 		{
-			// For nullable value types, return null.
-			if (valueType.GetTypeInfo().IsGenericType && valueType.GetGenericTypeDefinition() == typeof(Nullable<>))
-			{
-				return null;
-			}
-
-			return Activator.CreateInstance(valueType);
+			var elementType = type.GetGenericArguments()[0];
+			return Array.CreateInstance(elementType, 0);
 		}
 
-		private static Task GetCompletedTaskForType(Type type)
+		private static object CreateQueryable(Type type, Mock mock)
 		{
-			var tcs = Activator.CreateInstance(typeof (TaskCompletionSource<>).MakeGenericType(type));
+			return new object[0].AsQueryable();
+		}
 
-			var setResultMethod = tcs.GetType().GetMethod("SetResult");
-			var taskProperty = tcs.GetType().GetProperty("Task");
+		private static object CreateQueryableOf(Type type, Mock mock)
+		{
+			var elementType = type.GetGenericArguments()[0];
+			var array = Array.CreateInstance(elementType, 0);
 
-			var result = type.GetTypeInfo().IsValueType ? GetValueTypeDefault(type) : GetReferenceTypeDefault(type);
-
-			setResultMethod.Invoke(tcs, new[] {result});
-			return (Task) taskProperty.GetValue(tcs, null);
+			return typeof(Queryable).GetMethods("AsQueryable")
+				.Single(x => x.IsGenericMethod)
+				.MakeGenericMethod(elementType)
+				.Invoke(null, new[] { array });
 		}
 	}
 }

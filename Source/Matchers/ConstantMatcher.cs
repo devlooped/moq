@@ -38,12 +38,9 @@
 //[This is the BSD license, see
 // http://www.opensource.org/licenses/bsd-license.php]
 
-using System;
 using System.Collections;
-using System.Linq.Expressions;
-using System.Globalization;
 using System.Linq;
-using System.Collections.Generic;
+using System.Linq.Expressions;
 
 namespace Moq.Matchers
 {
@@ -56,11 +53,6 @@ namespace Moq.Matchers
 			this.constantValue = constantValue;
 		}
 
-		public void Initialize(Expression matcherExpression)
-		{
-			this.constantValue = ((ConstantExpression)matcherExpression).Value;
-		}
-
 		public bool Matches(object value)
 		{
 			if (object.Equals(constantValue, value))
@@ -68,23 +60,22 @@ namespace Moq.Matchers
 				return true;
 			}
 
-			if (this.constantValue is IEnumerable constantEnumerable && value is IEnumerable enumerable &&
-				constantEnumerable.GetEnumerator() != null && enumerable.GetEnumerator() != null)
+			if (this.constantValue is IEnumerable && value is IEnumerable enumerable &&
+				!(this.constantValue is IMocked) && !(value is IMocked))
 				// the above checks on the second line are necessary to ensure we have usable
 				// implementations of IEnumerable, which might very well not be the case for
 				// mocked objects.
 			{
-				return this.MatchesEnumerable(value);
+				return this.MatchesEnumerable(enumerable);
 			}
 
 			return false;
 		}
 
-		private bool MatchesEnumerable(object value)
+		private bool MatchesEnumerable(IEnumerable enumerable)
 		{
 			var constValues = (IEnumerable)constantValue;
-			var values = (IEnumerable)value;
-			return constValues.Cast<object>().SequenceEqual(values.Cast<object>());
+			return constValues.Cast<object>().SequenceEqual(enumerable.Cast<object>());
 		}
 	}
 }

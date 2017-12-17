@@ -39,12 +39,12 @@
 // http://www.opensource.org/licenses/bsd-license.php]
 
 using System;
+using System.Collections.Concurrent;
+using System.Collections.Generic;
+using System.Diagnostics;
 using System.Diagnostics.CodeAnalysis;
 using System.Linq;
 using System.Linq.Expressions;
-using Moq.Language.Flow;
-using Moq.Proxy;
-using Moq.Language;
 using System.Reflection;
 using System.Threading;
 
@@ -53,14 +53,42 @@ using System.CodeDom;
 using Microsoft.CSharp;
 #endif
 
+using Moq.Language;
+using Moq.Language.Flow;
+
 namespace Moq
 {
 	/// <include file='Mock.Generic.xdoc' path='docs/doc[@for="Mock{T}"]/*'/>
-    public partial class Mock<T> : Mock, IMock<T> where T : class
+	public partial class Mock<T> : Mock, IMock<T> where T : class
 	{
-		private static int serialNumberCounter = 0;
+		private static Type[] inheritedInterfaces;
+		private static int serialNumberCounter;
+
+		static Mock()
+		{
+			inheritedInterfaces =
+				typeof(T)
+				.GetInterfaces()
+				.Where(i => { var it = i.GetTypeInfo(); return it.IsPublic || it.IsNestedPublic && !it.IsImport; })
+				.ToArray();
+
+			serialNumberCounter = 0;
+		}
+
 		private T instance;
+		private List<Type> additionalInterfaces;
+		private Dictionary<Type, object> configuredDefaultValues;
 		private object[] constructorArguments;
+		private DefaultValueProvider defaultValueProvider;
+		private EventHandlerCollection eventHandlers;
+		private ConcurrentDictionary<MethodInfo, MockWithWrappedMockObject> innerMocks;
+		private InvocationCollection invocations;
+		private string name;
+		private SetupCollection setups;
+
+		private MockBehavior behavior;
+		private bool callBase;
+		private Switches switches;
 
 #region Ctors
 
@@ -110,23 +138,26 @@ namespace Moq
 				args = new object[] { null };
 			}
 
-			this.Name = GenerateMockName();
-
-			this.Behavior = behavior;
-			this.Interceptor = new Interceptor(behavior, typeof(T), this);
+			this.additionalInterfaces = new List<Type>();
+			this.behavior = behavior;
+			this.configuredDefaultValues = new Dictionary<Type, object>();
 			this.constructorArguments = args;
-			this.ImplementedInterfaces.AddRange(typeof(T).GetInterfaces().Where(i => (i.GetTypeInfo().IsPublic || i.GetTypeInfo().IsNestedPublic) && !i.GetTypeInfo().IsImport));
-			this.ImplementedInterfaces.Add(typeof(IMocked<T>));
-			this.InternallyImplementedInterfaceCount = this.ImplementedInterfaces.Count;
+			this.defaultValueProvider = DefaultValueProvider.Empty;
+			this.eventHandlers = new EventHandlerCollection();
+			this.innerMocks = new ConcurrentDictionary<MethodInfo, MockWithWrappedMockObject>();
+			this.invocations = new InvocationCollection();
+			this.name = CreateUniqueDefaultMockName();
+			this.setups = new SetupCollection();
+			this.switches = Switches.Default;
 
 			this.CheckParameters();
 		}
 
-		private string GenerateMockName()
+		private static string CreateUniqueDefaultMockName()
 		{
 			var serialNumber = Interlocked.Increment(ref serialNumberCounter).ToString("x8");
 
-			var typeName = typeof (T).FullName;
+			string typeName = typeof (T).FullName;
 
 #if FEATURE_CODEDOM
 			if (typeof (T).IsGenericType)
@@ -163,6 +194,38 @@ namespace Moq
 
 #region Properties
 
+		/// <include file='Mock.xdoc' path='docs/doc[@for="Mock.Behavior"]/*'/>
+		public override MockBehavior Behavior => this.behavior;
+
+		/// <include file='Mock.xdoc' path='docs/doc[@for="Mock.CallBase"]/*'/>
+		public override bool CallBase
+		{
+			get => this.callBase;
+			set => this.callBase = value;
+		}
+
+		internal override Dictionary<Type, object> ConfiguredDefaultValues => this.configuredDefaultValues;
+
+		/// <summary>
+		/// Gets or sets the <see cref="DefaultValueProvider"/> instance that will be used
+		/// e. g. to produce default return values for unexpected invocations.
+		/// </summary>
+		public override DefaultValueProvider DefaultValueProvider
+		{
+			get => this.defaultValueProvider;
+			set => this.defaultValueProvider = value ?? throw new ArgumentNullException(nameof(value));
+		}
+
+		internal override EventHandlerCollection EventHandlers => this.eventHandlers;
+
+		internal override ConcurrentDictionary<MethodInfo, MockWithWrappedMockObject> InnerMocks => this.innerMocks;
+
+		internal override List<Type> AdditionalInterfaces => this.additionalInterfaces;
+
+		internal override InvocationCollection Invocations => this.invocations;
+
+		internal override bool IsObjectInitialized => this.instance != null;
+
 		/// <include file='Mock.Generic.xdoc' path='docs/doc[@for="Mock{T}.Object"]/*'/>
 		[SuppressMessage("Microsoft.Naming", "CA1716:IdentifiersShouldNotMatchKeywords", MessageId = "Object", Justification = "Exposes the mocked object instance, so it's appropriate.")]
 		[SuppressMessage("Microsoft.Naming", "CA1721:PropertyNamesShouldNotMatchGetMethods", Justification = "The public Object property is the only one visible to Moq consumers. The protected member is for internal use only.")]
@@ -172,7 +235,11 @@ namespace Moq
 		}
 
 		/// <include file='Mock.Generic.xdoc' path='docs/doc[@for="Mock{T}.Name"]/*'/>
-		public string Name { get; set; }
+		public string Name
+		{
+			get => this.name;
+			set => this.name = value;
+		}
 
 		/// <include file='Mock.Generic.xdoc' path='docs/doc[@for="Mock{T}.ToString"]/*'/>
 		public override string ToString()
@@ -185,37 +252,46 @@ namespace Moq
             get { return typeof(T).IsDelegate(); }
         }
 
+		[DebuggerStepThrough]
 		private void InitializeInstance()
 		{
-			PexProtector.Invoke(() =>
+			PexProtector.Invoke(InitializeInstancePexProtected);
+		}
+
+		private void InitializeInstancePexProtected()
+		{
+			// Determine the set of interfaces that the proxy object should additionally implement.
+			var additionalInterfaceCount = this.AdditionalInterfaces.Count;
+			var interfaces = new Type[1 + additionalInterfaceCount];
+			interfaces[0] = typeof(IMocked<T>);
+			this.AdditionalInterfaces.CopyTo(0, interfaces, 1, additionalInterfaceCount);
+
+			if (this.IsDelegateMock)
 			{
-				if (this.IsDelegateMock)
-				{
-					// We're mocking a delegate.
-					// Firstly, get/create an interface with a method whose signature
-					// matches that of the delegate.
-					var delegateInterfaceType = Mock.ProxyFactory.GetDelegateProxyInterface(typeof(T), out delegateInterfaceMethod);
+				// We're mocking a delegate.
+				// Firstly, get/create an interface with a method whose signature
+				// matches that of the delegate.
+				var delegateInterfaceType = ProxyFactory.Instance.GetDelegateProxyInterface(typeof(T), out delegateInterfaceMethod);
 
-					// Then create a proxy for that.
-					var delegateProxy = Mock.ProxyFactory.CreateProxy(
-						delegateInterfaceType,
-						this.Interceptor,
-						this.ImplementedInterfaces.ToArray(),
-						this.constructorArguments);
+				// Then create a proxy for that.
+				var delegateProxy = ProxyFactory.Instance.CreateProxy(
+					delegateInterfaceType,
+					this,
+					interfaces,
+					this.constructorArguments);
 
-					// Then our instance is a delegate of the desired type, pointing at the
-					// appropriate method on that proxied interface instance.
-					this.instance = (T)(object)delegateInterfaceMethod.CreateDelegate(typeof(T), delegateProxy);
-				}
-				else
-				{
-					this.instance = (T)Mock.ProxyFactory.CreateProxy(
-						typeof(T),
-						this.Interceptor,
-						this.ImplementedInterfaces.Skip(this.InternallyImplementedInterfaceCount - 1).ToArray(),
-						this.constructorArguments);
-				}
-			});
+				// Then our instance is a delegate of the desired type, pointing at the
+				// appropriate method on that proxied interface instance.
+				this.instance = (T)(object)delegateInterfaceMethod.CreateDelegate(typeof(T), delegateProxy);
+			}
+			else
+			{
+				this.instance = (T)ProxyFactory.Instance.CreateProxy(
+					typeof(T),
+					this,
+					interfaces,
+					this.constructorArguments);
+			}
 		}
 
 		private MethodInfo delegateInterfaceMethod;
@@ -250,6 +326,22 @@ namespace Moq
 		internal override Type MockedType
 		{
 			get { return typeof(T); }
+		}
+
+		internal override SetupCollection Setups => this.setups;
+
+		internal override Type TargetType => typeof(T);
+
+		internal override Type[] InheritedInterfaces => Mock<T>.inheritedInterfaces;
+
+		/// <summary>
+		/// A set of switches that influence how this mock will operate.
+		/// You can opt in or out of certain features via this property.
+		/// </summary>
+		public override Switches Switches
+		{
+			get => this.switches;
+			set => this.switches = value;
 		}
 
 #endregion
@@ -313,6 +405,24 @@ namespace Moq
 		{
 			SetupAllProperties(this);
 			return this;
+		}
+
+		/// <summary>
+		/// Return a sequence of values, once per call.
+		/// </summary>
+		[SuppressMessage("Microsoft.Design", "CA1006:DoNotNestGenericTypesInMemberSignatures", Justification = "By Design")]
+		public ISetupSequentialResult<TResult> SetupSequence<TResult>(Expression<Func<T, TResult>> expression)
+		{
+			return Mock.SetupSequence<TResult>(this, expression);
+		}
+
+		/// <summary>
+		/// Performs a sequence of actions, one per call.
+		/// </summary>
+		[SuppressMessage("Microsoft.Design", "CA1006:DoNotNestGenericTypesInMemberSignatures", Justification = "By Design")]
+		public ISetupSequentialAction SetupSequence(Expression<Action<T>> expression)
+		{
+			return Mock.SetupSequence(this, expression);
 		}
 
 #endregion
@@ -487,6 +597,15 @@ namespace Moq
 		public void VerifySet(Action<T> setterExpression, Func<Times> times, string failMessage)
 		{
 			Mock.VerifySet(this, setterExpression, times(), failMessage);
+		}
+
+		/// <summary>
+		/// Verifies that there were no calls other than those already verified.
+		/// </summary>
+		/// <exception cref="MockException">There was at least one invocation not previously verified.</exception>
+		public void VerifyNoOtherCalls()
+		{
+			Mock.VerifyNoOtherCalls(this);
 		}
 
 #endregion

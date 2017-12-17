@@ -53,6 +53,11 @@ namespace Moq
 	{
 		public static IMatcher CreateMatcher(Expression expression, bool isParams)
 		{
+			if (isParams && (expression.NodeType == ExpressionType.NewArrayInit || !expression.Type.IsArray))
+			{
+				return new ParamArrayMatcher((NewArrayExpression)expression);
+			}
+
 			// Type inference on the call might 
 			// do automatic conversion to the desired 
 			// method argument type, and a Convert expression type 
@@ -61,11 +66,6 @@ namespace Moq
 			// the values are ints, but if the method to call 
 			// expects, say, a double, a Convert node will be on 
 			// the expression.
-			if (isParams && (expression.NodeType == ExpressionType.NewArrayInit || !expression.Type.IsArray))
-			{
-				return new ParamArrayMatcher((NewArrayExpression)expression);
-			}
-
 			var originalExpression = expression;
 			if (expression.NodeType == ExpressionType.Convert)
 			{
@@ -76,7 +76,7 @@ namespace Moq
 			var matchExpression = expression as MatchExpression;
 			if (matchExpression != null)
 			{
-				return new Matcher(matchExpression.Match);
+				return matchExpression.Match;
 			}
 
 			if (expression.NodeType == ExpressionType.Call)
@@ -90,32 +90,19 @@ namespace Moq
 
 					if (context.LastMatch != null)
 					{
-						return new Matcher(context.LastMatch);
+						return context.LastMatch;
 					}
 				}
 
-				var attr = call.Method.GetCustomAttribute<AdvancedMatcherAttribute>(true);
 #pragma warning disable 618
-				var staticMatcherMethodAttr = call.Method.GetCustomAttribute<MatcherAttribute>(true);
+				if (call.Method.IsDefined(typeof(MatcherAttribute), true))
+				{
+					return new MatcherAttributeMatcher(call);
+				}
 #pragma warning restore 618
-
-				if (attr != null)
-				{
-					var matcher = attr.CreateMatcher();
-					matcher.Initialize(originalExpression);
-					return matcher;
-				}
-				else if (staticMatcherMethodAttr != null)
-				{
-					var matcher = new MatcherAttributeMatcher();
-					matcher.Initialize(originalExpression);
-					return matcher;
-				}
 				else
 				{
-					var matcher = new LazyEvalMatcher();
-					matcher.Initialize(originalExpression);
-					return matcher;
+					return new LazyEvalMatcher(originalExpression);
 				}
 			}
 			else if (expression.NodeType == ExpressionType.MemberAccess)
@@ -126,7 +113,7 @@ namespace Moq
 					Expression.Lambda<Action>((MemberExpression)expression).Compile().Invoke();
 					if (context.LastMatch != null)
 					{
-						return new Matcher(context.LastMatch);
+						return context.LastMatch;
 					}
 				}
 			}

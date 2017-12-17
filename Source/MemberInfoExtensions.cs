@@ -12,13 +12,6 @@ namespace Moq
 			return method.GetParameters().Select(parameter => parameter.ParameterType);
 		}
 
-		public static bool IsDestructor(this MethodInfo method)
-		{
-			return method.Name == "Finalize" && !method.IsGenericMethod &&
-				method.ReturnType == typeof(void) && method.GetParameters().Length == 0;
-		}
-
-
 		public static bool LooksLikeEventAttach(this MethodBase method)
 		{
 			return method.Name.StartsWith("add_", StringComparison.Ordinal);

@@ -38,21 +38,18 @@
 //[This is the BSD license, see
 // http://www.opensource.org/licenses/bsd-license.php]
 
-using Moq.Language;
-using Moq.Language.Flow;
-using Moq.Proxy;
 using System;
+using System.Globalization;
 using System.Linq.Expressions;
 using System.Reflection;
 
+using Moq.Language;
+using Moq.Language.Flow;
+using Moq.Properties;
+
 namespace Moq
 {
-	internal interface IMethodCallReturn
-	{
-		bool ProvidesReturnValue();
-	}
-
-	internal sealed partial class MethodCallReturn<TMock, TResult> : MethodCall, IMethodCallReturn, ISetup<TMock, TResult>, ISetupGetter<TMock, TResult>, IReturnsResult<TMock>
+	internal sealed partial class MethodCallReturn<TMock, TResult> : MethodCall, ISetup<TMock, TResult>, ISetupGetter<TMock, TResult>, IReturnsResult<TMock>
 		where TMock : class
 	{
 		// This enum exists for reasons of optimizing memory usage.
@@ -65,7 +62,7 @@ namespace Moq
 			CallBase,
 		}
 
-		private Delegate valueDel = (Func<TResult>)(() => default(TResult));
+		private Delegate valueDel;
 		private Action<object[]> afterReturnCallback;
 		private ReturnValueKind returnValueKind;
 
@@ -91,6 +88,33 @@ namespace Moq
 			return this.RaisesImpl(eventExpression, args);
 		}
 
+		public IReturnsResult<TMock> Returns(Delegate valueFunction)
+		{
+			// If `TResult` is `Delegate`, that is someone is setting up the return value of a method
+			// that returns a `Delegate`, then we have arrived here because C# picked the wrong overload:
+			// We don't want to invoke the passed delegate to get a return value; the passed delegate
+			// already is the return value.
+			if (typeof(TResult) == typeof(Delegate))
+			{
+				return this.Returns(() => (TResult)(object)valueFunction);
+			}
+
+			// The following may seem overly cautious, but we don't throw an `ArgumentNullException`
+			// here because Moq has been very forgiving with incorrect `Returns` in the past.
+			if (valueFunction == null)
+			{
+				return this.Returns(() => default(TResult));
+			}
+
+			if (valueFunction.GetMethodInfo().ReturnType == typeof(void))
+			{
+				throw new ArgumentException(Resources.InvalidReturnsCallbackNotADelegateWithReturnType, nameof(valueFunction));
+			}
+
+			SetReturnDelegate(valueFunction);
+			return this;
+		}
+
 		public IReturnsResult<TMock> Returns(Func<TResult> valueExpression)
 		{
 			SetReturnDelegate(valueExpression);
@@ -109,6 +133,12 @@ namespace Moq
 			return this;
 		}
 
+		IReturnsThrows<TMock, TResult> ICallback<TMock, TResult>.Callback(Delegate callback)
+		{
+			base.Callback(callback);
+			return this;
+		}
+
 		IReturnsThrowsGetter<TMock, TResult> ICallbackGetter<TMock, TResult>.Callback(Action callback)
 		{
 			base.Callback(callback);
@@ -123,16 +153,46 @@ namespace Moq
 
 		private void SetReturnDelegate(Delegate value)
 		{
-			if (value == null)
+			if (value != null)
 			{
-				this.valueDel = (Func<TResult>)(() => default(TResult));
-			}
-			else
-			{
-				this.valueDel = value;
+				ValidateReturnDelegate(value);
 			}
 
+			this.valueDel = value;
 			this.returnValueKind = ReturnValueKind.Explicit;
+		}
+
+		private void ValidateReturnDelegate(Delegate callback)
+		{
+			var callbackMethod = callback.GetMethodInfo();
+
+			var actualParameters = callbackMethod.GetParameters();
+			if (actualParameters.Length > 0)
+			{
+				var expectedParameters = this.Method.GetParameters();
+				if (actualParameters.Length != expectedParameters.Length)
+				{
+					throw new ArgumentException(
+						string.Format(
+							CultureInfo.CurrentCulture,
+							Resources.InvalidCallbackParameterCountMismatch,
+							expectedParameters.Length,
+							actualParameters.Length));
+				}
+			}
+
+			var expectedReturnType = this.Method.ReturnType;
+			var actualReturnType = callbackMethod.ReturnType;
+
+			if (!expectedReturnType.IsAssignableFrom(actualReturnType))
+			{
+				throw new ArgumentException(
+					string.Format(
+						CultureInfo.CurrentCulture,
+						Resources.InvalidCallbackReturnTypeMismatch,
+						expectedReturnType,
+						actualReturnType));
+			}
 		}
 
 		protected override void SetCallbackWithoutArguments(Action callback)
@@ -159,22 +219,30 @@ namespace Moq
 			}
 		}
 
-		public override void Execute(ICallContext call)
+		public override void Execute(Invocation invocation)
 		{
-			base.Execute(call);
+			base.Execute(invocation);
 
 			if (this.returnValueKind == ReturnValueKind.CallBase)
 			{
-				call.InvokeBase();
+				invocation.ReturnBase();
+			}
+			else if (this.valueDel != null)
+			{
+				invocation.Return(this.valueDel.HasCompatibleParameterList(new ParameterInfo[0])
+					? valueDel.InvokePreserveStack()                //we need this, for the user to be able to use parameterless methods
+					: valueDel.InvokePreserveStack(invocation.Arguments)); //will throw if parameters mismatch
+			}
+			else if (this.Mock.Behavior == MockBehavior.Strict)
+			{
+				throw new MockException(MockException.ExceptionReason.ReturnValueRequired, MockBehavior.Strict, invocation);
 			}
 			else
 			{
-				call.ReturnValue = this.valueDel.HasCompatibleParameterList(new ParameterInfo[0])
-					? valueDel.InvokePreserveStack()                //we need this, for the user to be able to use parameterless methods
-					: valueDel.InvokePreserveStack(call.Arguments); //will throw if parameters mismatch
+				invocation.Return(default(TResult));
 			}
 
-			this.afterReturnCallback?.Invoke(call.Arguments);
+			this.afterReturnCallback?.Invoke(invocation.Arguments);
 		}
 	}
 }

@@ -39,32 +39,33 @@
 // http://www.opensource.org/licenses/bsd-license.php]
 
 using System;
+using System.Diagnostics;
 using System.Diagnostics.CodeAnalysis;
 using System.Globalization;
-using System.Linq;
 #if FEATURE_SERIALIZATION
 using System.Runtime.Serialization;
 #endif
 using System.Security;
+
+using Moq.Diagnostics.Errors;
 using Moq.Properties;
-using Moq.Proxy;
 
 namespace Moq
 {
 	/// <summary>
-	/// Exception thrown by mocks when setups are not matched, 
-	/// the mock is not properly setup, etc.
+	/// Exception thrown by mocks when they are not properly set up,
+	/// when setups are not matched, when verification fails, etc.
 	/// </summary>
 	/// <remarks>
-	/// A distinct exception type is provided so that exceptions 
-	/// thrown by the mock can be differentiated in tests that 
-	/// expect other exceptions to be thrown (i.e. ArgumentException).
+	/// A distinct exception type is provided so that exceptions
+	/// thrown by a mock can be distinguished from other exceptions
+	/// that might be thrown in tests.
 	/// <para>
-	/// Richer exception hierarchy/types are not provided as 
-	/// tests typically should <b>not</b> catch or expect exceptions 
-	/// from the mocks. These are typically the result of changes 
-	/// in the tested class or its collaborators implementation, and 
-	/// result in fixes in the mock setup so that they dissapear and 
+	/// Moq does not provide a richer hierarchy of exception types, as
+	/// tests typically should <em>not</em> catch or expect exceptions
+	/// from mocks. These are typically the result of changes
+	/// in the tested class or its collaborators' implementation, and
+	/// result in fixes in the mock setup so that they disappear and
 	/// allow the test to pass.
 	/// </para>
 	/// </remarks>
@@ -74,11 +75,7 @@ namespace Moq
 #endif
 	public class MockException : Exception
 	{
-		/// <summary>
-		/// Made internal as it's of no use for 
-		/// consumers, but it's important for 
-		/// our own tests.
-		/// </summary>
+		// Made internal as it's of no use for consumers, but it's important for our own tests.
 		internal enum ExceptionReason
 		{
 			NoSetup,
@@ -89,17 +86,19 @@ namespace Moq
 			SetupNever,
 		}
 
+#if FEATURE_SERIALIZATION
+		[NonSerialized]
+#endif
+		private IError error;
+
 		private ExceptionReason reason;
 
-		internal MockException(ExceptionReason reason, MockBehavior behavior,
-			ICallContext invocation)
-			: this(reason, behavior, invocation,
-				Properties.Resources.ResourceManager.GetString(reason.ToString()))
+		internal MockException(ExceptionReason reason, MockBehavior behavior, Invocation invocation)
+			: this(reason, behavior, invocation, Resources.ResourceManager.GetString(reason.ToString()))
 		{
 		}
 
-		internal MockException(ExceptionReason reason, MockBehavior behavior,
-			ICallContext invocation, string message)
+		internal MockException(ExceptionReason reason, MockBehavior behavior, Invocation invocation, string message)
 			: base(GetMessage(behavior, invocation, message))
 		{
 			this.reason = reason;
@@ -110,6 +109,17 @@ namespace Moq
 		{
 			this.reason = reason;
 		}
+
+		internal MockException(ExceptionReason reason, IError error)
+			: base(error.Message)
+		{
+			Debug.Assert(error != null);
+
+			this.error = error;
+			this.reason = reason;
+		}
+
+		internal IError Error => this.error;
 
 		internal ExceptionReason Reason
 		{
@@ -124,15 +134,12 @@ namespace Moq
 			get { return reason == ExceptionReason.VerificationFailed; }
 		}
 
-		private static string GetMessage(
-			MockBehavior behavior,
-			ICallContext invocation,
-			string message)
+		private static string GetMessage(MockBehavior behavior, Invocation invocation, string message)
 		{
 			return string.Format(
 				CultureInfo.CurrentCulture,
 				Resources.MockExceptionMessage,
-				invocation.Format(),
+				invocation.ToString(),
 				behavior,
 				message
 			);
@@ -163,54 +170,6 @@ namespace Moq
 		{
 			base.GetObjectData(info, context);
 			info.AddValue("reason", reason);
-		}
-#endif
-	}
-
-	/// <devdoc>
-	/// Used by the mock factory to accumulate verification 
-	/// failures.
-	/// </devdoc>
-#if FEATURE_SERIALIZATION
-	[Serializable]
-#endif
-	internal class MockVerificationException : MockException
-	{
-		IProxyCall[] failedSetups;
-
-		public MockVerificationException(IProxyCall[] failedSetups)
-			: base(ExceptionReason.VerificationFailed, GetMessage(failedSetups))
-		{
-			this.failedSetups = failedSetups;
-		}
-
-		private static string GetMessage(IProxyCall[] failedSetups)
-		{
-			return string.Format(
-				CultureInfo.CurrentCulture,
-				Resources.VerficationFailed,
-				GetRawSetups(failedSetups));
-		}
-
-		private static string GetRawSetups(IProxyCall[] failedSetups)
-		{
-			return failedSetups.Aggregate(string.Empty, (s, call) => s + call.ToString() + Environment.NewLine);
-		}
-
-		internal string GetRawSetups()
-		{
-			return GetRawSetups(failedSetups);
-		}
-
-#if FEATURE_SERIALIZATION
-		/// <summary>
-		/// Supports the serialization infrastructure.
-		/// </summary>
-		protected MockVerificationException(
-		  System.Runtime.Serialization.SerializationInfo info,
-		  System.Runtime.Serialization.StreamingContext context)
-			: base(info, context)
-		{
 		}
 #endif
 	}

@@ -1,0 +1,50 @@
+﻿<Project Sdk="Microsoft.NET.Sdk">
+
+	<PropertyGroup>
+		<TargetFrameworks>net46;netcoreapp2.0</TargetFrameworks>
+		<AssemblyName>Moq.Tests</AssemblyName>
+		<AssemblyOriginatorKeyFile>../Moq.snk</AssemblyOriginatorKeyFile>
+		<DebugSymbols>True</DebugSymbols>
+		<DebugType>portable</DebugType>
+		<GenerateRuntimeConfigurationFiles>true</GenerateRuntimeConfigurationFiles>
+		<PublicSign Condition=" '$(OS)' != 'Windows_NT' ">true</PublicSign>
+		<SignAssembly>true</SignAssembly>
+	</PropertyGroup>
+
+	<PropertyGroup Condition=" '$(TargetFramework)' == 'net46' ">
+		<DefineConstants>$(DefineConstants);DESKTOP;FEATURE_CAS;FEATURE_CODEDOM;FEATURE_COM;FEATURE_SERIALIZATION</DefineConstants>
+	</PropertyGroup>
+	<PropertyGroup Condition=" '$(TargetFramework)' == 'netcoreapp2.0' ">
+		<RuntimeFrameworkVersion>2.0.3</RuntimeFrameworkVersion>
+		<DefineConstants>$(DefineConstants);NETCORE</DefineConstants>
+	</PropertyGroup>
+
+	<ItemGroup>
+		<PackageReference Include="Castle.Core" Version="4.2.1" />
+		<PackageReference Include="Microsoft.NET.Test.Sdk" Version="15.3.0" />
+		<PackageReference Include="xunit" Version="2.3.0" />
+		<PackageReference Include="xunit.runner.visualstudio" Version="2.3.0" />
+		<ProjectReference Include="..\Source\Moq.csproj" />
+		<DotNetCliToolReference Include="dotnet-xunit" Version="2.3.0" />
+	</ItemGroup>
+	<ItemGroup Condition=" '$(TargetFramework)' == 'net46' ">
+		<PackageReference Include="EntityFramework" Version="6.2.0" />
+		<Reference Include="System.Web" />
+		<Reference Include="System.Windows.Forms" />
+	</ItemGroup>
+	<ItemGroup Condition=" '$(TargetFramework)' == 'netcoreapp2.0' ">
+		<PackageReference Include="System.Collections.Specialized" Version="4.3.0" />
+		<PackageReference Include="System.ComponentModel.Primitives" Version="4.3.0" />
+		<PackageReference Include="System.Diagnostics.TraceSource" Version="4.3.0" />
+		<PackageReference Include="System.ServiceModel.Primitives" Version="4.3.0" />
+	</ItemGroup>
+
+	<ItemGroup>
+		<Compile Remove="Pex\**\*.cs;Properties\**\*.cs" />
+	</ItemGroup>
+
+	<ItemGroup>
+		<Service Include="{82a7f48d-3b50-4b1e-b82e-3ada8210c358}" />
+	</ItemGroup>
+
+</Project>

@@ -31,6 +31,7 @@
 		<PackageReference Include="GitInfo" Version="1.1.14" />
 		<PackageReference Include="IFluentInterface" Version="2.0.0" />
 		<PackageReference Include="SourceLink.Create.CommandLine" Version="2.2.1" PrivateAssets="All" />
+		<PackageReference Include="System.Threading.Tasks.Extensions" Version="4.4.0" />
 		<DotNetCliToolReference Include="dotnet-sourcelink" Version="2.2.1" />
 	</ItemGroup>
 	<ItemGroup Condition=" '$(TargetFramework)' == 'net45' ">
@@ -61,6 +62,7 @@
 
 		<None Update="Language\ICallback.tt">
 			<Generator>TextTemplatingFileGenerator</Generator>
+			<LastGenOutput>ICallback.Generated.cs</LastGenOutput>
 		</None>
 		<Compile Update="Language\ICallback.Generated.cs">
 			<AutoGen>True</AutoGen>
@@ -70,6 +72,7 @@
 
 		<None Update="Language\IRaise.tt">
 			<Generator>TextTemplatingFileGenerator</Generator>
+			<LastGenOutput>IRaise.Generated.cs</LastGenOutput>
 		</None>
 		<Compile Update="Language\IRaise.Generated.cs">
 			<AutoGen>True</AutoGen>
@@ -79,6 +82,7 @@
 
 		<None Update="Language\IReturns.tt">
 			<Generator>TextTemplatingFileGenerator</Generator>
+			<LastGenOutput>IReturns.Generated.cs</LastGenOutput>
 		</None>
 		<Compile Update="Language\IReturns.Generated.cs">
 			<AutoGen>True</AutoGen>
@@ -86,16 +90,13 @@
 			<DependentUpon>IReturns.tt</DependentUpon>
 		</Compile>
 
-		<None Update="IDefaultValueProvider.xdoc">
-			<DependentUpon>IDefaultValueProvider.cs</DependentUpon>
-		</None>
-
 		<None Update="It.xdoc">
 			<DependentUpon>It.cs</DependentUpon>
 		</None>
 
 		<None Update="MethodCall.tt">
 			<Generator>TextTemplatingFileGenerator</Generator>
+			<LastGenOutput>MethodCall.Generated.cs</LastGenOutput>
 		</None>
 		<Compile Update="MethodCall.Generated.cs">
 			<AutoGen>True</AutoGen>
@@ -105,6 +106,7 @@
 
 		<None Update="MethodCallReturn.tt">
 			<Generator>TextTemplatingFileGenerator</Generator>
+			<LastGenOutput>MethodCallReturn.Generated.cs</LastGenOutput>
 		</None>
 		<Compile Update="MethodCallReturn.Generated.cs">
 			<AutoGen>True</AutoGen>
@@ -127,6 +129,7 @@
 
 		<None Update="ReturnsExtensions.tt">
 			<Generator>TextTemplatingFileGenerator</Generator>
+			<LastGenOutput>ReturnsExtensions.Generated.cs</LastGenOutput>
 		</None>
 		<Compile Update="ReturnsExtensions.Generated.cs">
 			<AutoGen>True</AutoGen>

@@ -3,8 +3,8 @@ using System.Diagnostics.CodeAnalysis;
 namespace Moq
 {
 	/// <summary>
-	/// Covarient interface for Mock&lt;T&gt; such that casts between IMock&lt;Employee&gt; to IMock&lt;Person&gt;
-	/// are possible. Only covers the covariant members of Mock&lt;T&gt;.
+	/// Covariant interface for <see cref="Mock{T}"/> such that casts between IMock&lt;Employee&gt; to IMock&lt;Person&gt;
+	/// are possible. Only covers the covariant members of <see cref="Mock{T}"/>.
 	/// </summary>
 	public interface IMock<out T> where T : class
 	{

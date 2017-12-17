@@ -39,44 +39,48 @@
 // http://www.opensource.org/licenses/bsd-license.php]
 
 using System;
-using System.Reflection;
+using System.Diagnostics;
 
 namespace Moq
 {
 	/// <summary>
-	/// A <see cref="IDefaultValueProvider"/> that returns an empty default value 
+	/// A <see cref="DefaultValueProvider"/> that returns an empty default value 
 	/// for non-mockeable types, and mocks for all other types (interfaces and 
 	/// non-sealed classes) that can be mocked.
 	/// </summary>
-	internal class MockDefaultValueProvider : EmptyDefaultValueProvider
+	internal sealed class MockDefaultValueProvider : LookupOrFallbackDefaultValueProvider
 	{
-		private Mock owner;
-
-		public MockDefaultValueProvider(Mock owner)
+		internal MockDefaultValueProvider()
 		{
-			this.owner = owner;
 		}
 
-		public override object ProvideDefault(MethodInfo member)
+		internal override DefaultValue Kind => DefaultValue.Mock;
+
+		protected override object GetFallbackDefaultValue(Type type, Mock mock)
 		{
-			var value = base.ProvideDefault(member);
+			Debug.Assert(type != null);
+			Debug.Assert(type != typeof(void));
+			Debug.Assert(mock != null);
 
-			Mock mock = null;
-			if (value == null && member.ReturnType.IsMockeable())
+			var emptyValue = DefaultValueProvider.Empty.GetDefaultValue(type, mock);
+			if (emptyValue != null)
 			{
-				mock = owner.InnerMocks.GetOrAdd(member, info =>
-				{
-					// Create a new mock to be placed to InnerMocks dictionary if it's missing there
-					var mockType = typeof(Mock<>).MakeGenericType(info.ReturnType);
-					Mock newMock = (Mock)Activator.CreateInstance(mockType, owner.Behavior);
-					newMock.DefaultValue = owner.DefaultValue;
-					newMock.CallBase = owner.CallBase;
-					newMock.Switches = owner.Switches;
-					return newMock;
-				});
+				return emptyValue;
 			}
-
-			return mock != null ? mock.Object : value;
+			else if (type.IsMockeable())
+			{
+				// Create a new mock to be placed to InnerMocks dictionary if it's missing there
+				var mockType = typeof(Mock<>).MakeGenericType(type);
+				Mock newMock = (Mock)Activator.CreateInstance(mockType, mock.Behavior);
+				newMock.DefaultValueProvider = mock.DefaultValueProvider;
+				newMock.CallBase = mock.CallBase;
+				newMock.Switches = mock.Switches;
+				return newMock.Object;
+			}
+			else
+			{
+				return null;
+			}
 		}
 	}
 }

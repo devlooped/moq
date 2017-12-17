@@ -356,4 +356,23 @@ Expected invocation on the mock once, but was {4} times: {1}</value>
 		<value>Cannot set up {0}.{1} because it is not accessible to the proxy generator used by Moq:
 {2}</value>
 	</data>
+	<data name="InvalidCallbackNotADelegateWithReturnTypeVoid" xml:space="preserve">
+		<value>Invalid callback. This overload of the "Callback" method only accepts "void" (C#) or "Sub" (VB.NET) delegates with parameter types matching those of the set up method.</value>
+	</data>
+	<data name="InvalidReturnsCallbackNotADelegateWithReturnType" xml:space="preserve">
+		<value>Invalid callback. This overload of the "Returns" method only accepts non-"void" (C#) or "Function" (VB.NET) delegates with parameter types matching those of the set up method.</value>
+	</data>
+	<data name="ProtectedMemberNotFound" xml:space="preserve">
+		<value>Type {0} does not have matching protected member: {1}</value>
+	</data>
+	<data name="InvalidCallbackReturnTypeMismatch" xml:space="preserve">
+		<value>Invalid callback. Setup on method with return type ({0}) cannot invoke callback with return type ({1}).</value>
+	</data>
+	<data name="InvalidCallbackParameterCountMismatch" xml:space="preserve">
+		<value>Invalid callback. Setup on method with {0} parameter(s) cannot invoke callback with different number of parameters ({1}).</value>
+	</data>
+	<data name="UnverifiedInvocations" xml:space="preserve">
+		<value>The following invocations were not verified:
+{0}</value>
+	</data>
 </root>

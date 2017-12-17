@@ -41,41 +41,19 @@
 using System;
 using System.Collections;
 using System.Collections.Generic;
-using System.Diagnostics.CodeAnalysis;
 using System.Globalization;
 using System.Linq;
+using System.Linq.Expressions;
 using System.Reflection;
 using System.Runtime.CompilerServices;
-using Moq.Proxy;
-using System.Linq.Expressions;
-using Moq.Properties;
 using System.Runtime.ExceptionServices;
+
+using Moq.Properties;
 
 namespace Moq
 {
 	internal static class Extensions
 	{
-		public static string Format(this ICallContext invocation)
-		{
-			if (invocation.Method.IsPropertyGetter())
-			{
-				return invocation.Method.DeclaringType.Name + "." + invocation.Method.Name.Substring(4);
-			}
-
-			if (invocation.Method.IsPropertySetter())
-			{
-				return invocation.Method.DeclaringType.Name + "." +
-					invocation.Method.Name.Substring(4) + " = " + GetValue(invocation.Arguments.First());
-			}
-			
-			var genericParameters = invocation.Method.IsGenericMethod
-				? "<" + string.Join(", ", invocation.Method.GetGenericArguments().Select(t => t.Name).ToArray()) + ">"
-				: "";
-
-			return invocation.Method.DeclaringType.Name + "." + invocation.Method.Name + genericParameters + "(" +
-				string.Join(", ", invocation.Arguments.Select(a => GetValue(a)).ToArray()) + ")";
-		}
-
 		public static string GetValue(object value)
 		{
 			if (value == null)
@@ -88,8 +66,8 @@ namespace Moq
 			{
 				return "\"" + typedValue + "\"";
 			}
-			if (value is IEnumerable enumerable && enumerable.GetEnumerator() != null)
-			{                                   // ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+			if (value is IEnumerable enumerable && !(value is IMocked))
+			{                                   // ^^^^^^^^^^^^^^^^^^^
 				// This second check ensures that we have a usable implementation of IEnumerable.
 				// If value is a mocked object, its IEnumerable implementation might very well
 				// not work correctly.
@@ -240,6 +218,11 @@ namespace Moq
 			}
 		}
 #endif
+
+		public static IEnumerable<MethodInfo> GetMethods(this Type type, string name)
+		{
+			return type.GetMember(name).OfType<MethodInfo>();
+		}
 
 		public static bool HasCompatibleParameterTypes(this MethodInfo method, Type[] paramTypes, bool exactParameterMatch)
 		{

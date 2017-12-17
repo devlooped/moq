@@ -56,27 +56,25 @@ namespace Moq
 			this.owner = owner;
 		}
 
-		internal override ConcurrentDictionary<MethodInfo, Mock> InnerMocks
+		internal override List<Type> AdditionalInterfaces => this.owner.AdditionalInterfaces;
+
+		internal override Dictionary<Type, object> ConfiguredDefaultValues => this.owner.ConfiguredDefaultValues;
+
+		internal override ConcurrentDictionary<MethodInfo, MockWithWrappedMockObject> InnerMocks
 		{
 			get { return this.owner.InnerMocks; }
 		}
 
-		internal override Interceptor Interceptor
-		{
-			get { return this.owner.Interceptor; }
-			set { this.owner.Interceptor = value; }
-		}
+		internal override InvocationCollection Invocations => this.owner.Invocations;
+
+		internal override bool IsObjectInitialized => this.owner.IsObjectInitialized;
 
 		internal override Type MockedType
 		{
 			get { return typeof(TInterface); }
 		}
 
-		public override MockBehavior Behavior
-		{
-			get { return this.owner.Behavior; }
-			internal set { this.owner.Behavior = value; }
-		}
+		public override MockBehavior Behavior => this.owner.Behavior;
 
 		public override bool CallBase
 		{
@@ -84,22 +82,30 @@ namespace Moq
 			set { this.owner.CallBase = value; }
 		}
 
-		public override DefaultValue DefaultValue
+		public override DefaultValueProvider DefaultValueProvider
 		{
-			get { return this.owner.DefaultValue; }
-			set { this.owner.DefaultValue = value; }
+			get => this.owner.DefaultValueProvider;
+			set => this.owner.DefaultValueProvider = value;
 		}
+
+		internal override EventHandlerCollection EventHandlers => this.owner.EventHandlers;
+
+		internal override Type[] InheritedInterfaces => this.owner.InheritedInterfaces;
 
 		public override TInterface Object
 		{
 			get { return this.owner.Object as TInterface; }
 		}
 
+		internal override SetupCollection Setups => this.owner.Setups;
+
 		public override Switches Switches
 		{
 			get => this.owner.Switches;
 			set => this.owner.Switches = value;
 		}
+
+		internal override Type TargetType => this.owner.TargetType;
 
 		public override Mock<TNewInterface> As<TNewInterface>()
 		{

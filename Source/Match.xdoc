@@ -2,7 +2,7 @@
 <docs xml:space="preserve">
 	<doc for="Match">
 		<summary>
-			Allows creation custom value matchers that can be used on setups and verification,
+			Allows creating custom value matchers that can be used on setups and verification,
 			completely replacing the built-in <see cref="It"/> class with your own argument
 			matching rules.
 		</summary>
@@ -12,7 +12,7 @@
 	</doc>
 	<doc for="Match{T}">
 		<summary>
-			Allows creation custom value matchers that can be used on setups and verification,
+			Allows creating custom value matchers that can be used on setups and verification,
 			completely replacing the built-in <see cref="It"/> class with your own argument
 			matching rules.
 		</summary>
@@ -70,7 +70,7 @@
 	</doc>
 	<doc for="Match.Create{T}(condition)">
 		<summary>
-			Initializes the match with the condition that
+			Initializes the matcher with the condition that
 			will be checked in order to match invocation
 			values.
 		</summary>
@@ -81,7 +81,7 @@
 	</doc>
 	<doc for="Match.Create{T}(condition,renderExpression)">
 		<summary>
-			Initializes the match with the condition that
+			Initializes the matcher with the condition that
 			will be checked in order to match invocation
 			values.
 		</summary>

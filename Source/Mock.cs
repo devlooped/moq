@@ -38,36 +38,30 @@
 //[This is the BSD license, see
 // http://www.opensource.org/licenses/bsd-license.php]
 
-using System.Collections.Concurrent;
-using Moq.Properties;
-using Moq.Proxy;
 using System;
+using System.Collections.Concurrent;
 using System.Collections.Generic;
+using System.Diagnostics;
 using System.Diagnostics.CodeAnalysis;
 using System.Globalization;
 using System.Linq;
 using System.Linq.Expressions;
 using System.Reflection;
 using System.Runtime.CompilerServices;
+using System.Threading.Tasks;
+
+using Moq.Diagnostics.Errors;
+using Moq.Language.Flow;
+using Moq.Properties;
 
 namespace Moq
 {
 	/// <include file='Mock.xdoc' path='docs/doc[@for="Mock"]/*'/>
 	public abstract partial class Mock : IFluentInterface
 	{
-		internal static IProxyFactory ProxyFactory => CastleProxyFactory.Instance;
-
-		private bool isInitialized;
-		private DefaultValue defaultValue = DefaultValue.Empty;
-		private IDefaultValueProvider defaultValueProvider = new EmptyDefaultValueProvider();
-		private Switches switches;
-
 		/// <include file='Mock.xdoc' path='docs/doc[@for="Mock.ctor"]/*'/>
 		protected Mock()
 		{
-			this.ImplementedInterfaces = new List<Type>();
-			this.InnerMocks = new ConcurrentDictionary<MethodInfo, Mock>();
-			this.switches = Switches.Default;
 		}
 
 		/// <include file='Mock.xdoc' path='docs/doc[@for="Mock.Get"]/*'/>
@@ -94,10 +88,7 @@ namespace Moq
 				// We may have received a T of an implemented 
 				// interface in the mock.
 				var mock = mockedPlain.Mock;
-				var imockedType = mocked.GetType().GetTypeInfo().ImplementedInterfaces.Single(i => i.Name.Equals("IMocked`1", StringComparison.Ordinal));
-				var mockedType = imockedType.GetGenericArguments()[0];
-
-				if (mock.ImplementedInterfaces.Contains(typeof(T)))
+				if (mock.ImplementsInterface(typeof(T)))
 				{
 					return mock.As<T>();
 				}
@@ -108,11 +99,14 @@ namespace Moq
 				// This is not valid as generic types 
 				// do not support covariance on 
 				// the generic parameters.
+				var imockedType = mocked.GetType().GetTypeInfo().ImplementedInterfaces.Single(i => i.Name.Equals("IMocked`1", StringComparison.Ordinal));
+				var mockedType = imockedType.GetGenericArguments()[0];
 				var types = string.Join(
 					", ",
 					new[] {mockedType}
 						// Ignore internally defined IMocked<T>
-						.Concat(mock.ImplementedInterfaces.Where(t => t != imockedType))
+						.Concat(mock.InheritedInterfaces)
+						.Concat(mock.AdditionalInterfaces)
 						.Select(t => t.Name)
 						.ToArray());
 
@@ -125,7 +119,7 @@ namespace Moq
 
 			throw new ArgumentException(Resources.ObjectInstanceNotMock, "mocked");
 		}
-		
+
 		/// <include file='Mock.xdoc' path='docs/doc[@for="Mock.Verify"]/*'/>
 		public static void Verify(params Mock[] mocks)
 		{
@@ -134,7 +128,7 @@ namespace Moq
 				mock.Verify();
 			}
 		}
-		
+
 		/// <include file='Mock.xdoc' path='docs/doc[@for="Mock.VerifyAll"]/*'/>
 		public static void VerifyAll(params Mock[] mocks)
 		{
@@ -144,45 +138,62 @@ namespace Moq
 			}
 		}
 
+		/// <summary>
+		/// Gets the interfaces additionally implemented by the mock object.
+		/// </summary>
+		/// <remarks>
+		/// This list may be modified by calls to <see cref="As{TInterface}"/> up until the first call to <see cref="Object"/>.
+		/// </remarks>
+		internal abstract List<Type> AdditionalInterfaces { get; }
+
 		/// <include file='Mock.xdoc' path='docs/doc[@for="Mock.Behavior"]/*'/>
-		public virtual MockBehavior Behavior { get; internal set; }
+		public abstract MockBehavior Behavior { get; }
 
 		/// <include file='Mock.xdoc' path='docs/doc[@for="Mock.CallBase"]/*'/>
-		public virtual bool CallBase { get; set; }
+		public abstract bool CallBase { get; set; }
 
 		/// <include file='Mock.xdoc' path='docs/doc[@for="Mock.DefaultValue"]/*'/>
-		public virtual DefaultValue DefaultValue
+		public DefaultValue DefaultValue
 		{
-			get { return this.defaultValue; }
-			set { this.SetDefaultValue(value); }
+			get
+			{
+				return this.DefaultValueProvider.Kind;
+			}
+			set
+			{
+				switch (value)
+				{
+					case DefaultValue.Empty:
+						this.DefaultValueProvider = DefaultValueProvider.Empty;
+						return;
+
+					case DefaultValue.Mock:
+						this.DefaultValueProvider = DefaultValueProvider.Mock;
+						return;
+
+					default:
+						throw new ArgumentOutOfRangeException(nameof(value));
+				}
+			}
 		}
 
-		private void SetDefaultValue(DefaultValue value)
-		{
-			this.defaultValue = value;
-			this.defaultValueProvider = defaultValue == DefaultValue.Mock ?
-				new MockDefaultValueProvider(this) :
-				new EmptyDefaultValueProvider();
-		}
+		internal abstract EventHandlerCollection EventHandlers { get; }
 
 		/// <include file='Mock.xdoc' path='docs/doc[@for="Mock.Object"]/*'/>
 		[SuppressMessage("Microsoft.Naming", "CA1716:IdentifiersShouldNotMatchKeywords", MessageId = "Object", Justification = "Exposes the mocked object instance, so it's appropriate.")]
 		[SuppressMessage("Microsoft.Naming", "CA1721:PropertyNamesShouldNotMatchGetMethods", Justification = "The public Object property is the only one visible to Moq consumers. The protected member is for internal use only.")]
-		public object Object
-		{
-			get { return this.GetObject(); }
-		}
+		public object Object => this.OnGetObject();
 
-		private object GetObject()
-		{
-			var value = this.OnGetObject();
-			this.isInitialized = true;
-			return value;
-		}
+		/// <summary>
+		/// Gets the interfaces directly inherited from the mocked type (<see cref="TargetType"/>).
+		/// </summary>
+		internal abstract Type[] InheritedInterfaces { get; }
 
-		internal virtual Interceptor Interceptor { get; set; }
+		internal abstract ConcurrentDictionary<MethodInfo, MockWithWrappedMockObject> InnerMocks { get; }
 
-		internal virtual ConcurrentDictionary<MethodInfo, Mock> InnerMocks { get; private set; }
+		internal abstract bool IsObjectInitialized { get; }
+
+		internal abstract InvocationCollection Invocations { get; }
 
 		/// <include file='Mock.xdoc' path='docs/doc[@for="Mock.OnGetObject"]/*'/>
 		[SuppressMessage("Microsoft.Design", "CA1024:UsePropertiesWhereAppropriate", Justification = "This is actually the protected virtual implementation of the property Object.")]
@@ -209,81 +220,81 @@ namespace Moq
 		internal abstract bool IsDelegateMock { get; }
 
 		/// <summary>
-		/// Specifies the class that will determine the default
-		/// value to return when invocations are made that
-		/// have no setups and need to return a default
-		/// value (for loose mocks).
+		/// Gets or sets the <see cref="DefaultValueProvider"/> instance that will be used
+		/// e. g. to produce default return values for unexpected invocations.
 		/// </summary>
-		internal IDefaultValueProvider DefaultValueProvider
-		{
-			get { return this.defaultValueProvider; }
-		}
+		public abstract DefaultValueProvider DefaultValueProvider { get; set; }
 
-		/// <summary>
-		/// Exposes the list of extra interfaces implemented by the mock.
-		/// </summary>
-		internal List<Type> ImplementedInterfaces { get; private set; }
-
-		/// <summary>
-		/// Indicates the number of interfaces in <see cref="ImplementedInterfaces"/> that were
-		/// defined internally, rather than through calls to <see cref="As{TInterface}"/>.
-		/// </summary>
-		internal protected int InternallyImplementedInterfaceCount { get; protected set; }
+		internal abstract SetupCollection Setups { get; }
 
 		/// <summary>
 		/// A set of switches that influence how this mock will operate.
 		/// You can opt in or out of certain features via this property.
 		/// </summary>
-		public virtual Switches Switches
-		{
-			get => this.switches;
-			set => this.switches = value;
-		}
+		public abstract Switches Switches { get; set; }
+
+		internal abstract Type TargetType { get; }
 
 		#region Verify
 
 		/// <include file='Mock.xdoc' path='docs/doc[@for="Mock.Verify"]/*'/>
-		[SuppressMessage("Microsoft.Usage", "CA2200:RethrowToPreserveStackDetails", Justification = "We want to explicitly reset the stack trace here.")]
 		public void Verify()
 		{
-			try
+			if (!this.TryVerify(out UnmatchedSetups error))
 			{
-				this.Interceptor.Verify();
-				foreach (var inner in this.InnerMocks.Values)
-				{
-					inner.Verify();
-				}
-			}
-			catch (Exception ex)
-			{
-				// Rethrow resetting the call-stack so that 
-				// callers see the exception as happening at 
-				// this call site.
-				// TODO: see how to mangle the stacktrace so 
-				// that the mock doesn't even show up there.
-				throw ex;
+				throw error.AsMockException();
 			}
 		}
 
-		/// <include file='Mock.xdoc' path='docs/doc[@for="Mock.VerifyAll"]/*'/>		
-		[SuppressMessage("Microsoft.Usage", "CA2200:RethrowToPreserveStackDetails", Justification = "We want to explicitly reset the stack trace here.")]
-		public void VerifyAll()
+		private bool TryVerify(out UnmatchedSetups error)
 		{
-			try
+			var uninvokedVerifiableSetups = this.Setups.ToArrayLive(setup => setup.IsVerifiable && !setup.Invoked);
+			if (uninvokedVerifiableSetups.Length > 0)
 			{
-				this.Interceptor.VerifyAll();
-				foreach (var inner in this.InnerMocks.Values)
+				error = new UnmatchedSetups(uninvokedVerifiableSetups);
+				return false;
+			}
+
+			foreach (var inner in this.InnerMocks.Values)
+			{
+				if (!inner.Mock.TryVerify(out error))
 				{
-					inner.VerifyAll();
+					return false;
 				}
 			}
-			catch (Exception ex)
+
+			error = null;
+			return true;
+		}
+
+		/// <include file='Mock.xdoc' path='docs/doc[@for="Mock.VerifyAll"]/*'/>		
+		public void VerifyAll()
+		{
+			if (!this.TryVerifyAll(out UnmatchedSetups error))
 			{
-				// Rethrow resetting the call-stack so that 
-				// callers see the exception as happening at 
-				// this call site.
-				throw ex;
+				throw error.AsMockException();
 			}
+		}
+
+		private bool TryVerifyAll(out UnmatchedSetups error)
+		{
+			var uninvokedSetups = this.Setups.ToArrayLive(setup => !setup.Invoked);
+			if (uninvokedSetups.Length > 0)
+			{
+				error = new UnmatchedSetups(uninvokedSetups);
+				return false;
+			}
+
+			foreach (var inner in this.InnerMocks.Values)
+			{
+				if (!inner.Mock.TryVerifyAll(out error))
+				{
+					return false;
+				}
+			}
+
+			error = null;
+			return true;
 		}
 
 		internal static void Verify<T>(
@@ -301,7 +312,7 @@ namespace Moq
 			var args = methodCall.Arguments.ToArray();
 
 			var expected = new MethodCall(mock, null, expression, method, args) { FailMessage = failMessage };
-			VerifyCalls(GetInterceptor(methodCall.Object, mock), expected, expression, times);
+			VerifyCalls(GetTargetMock(methodCall.Object, mock), expected, expression, times);
 		}
 
 		internal static void Verify<T, TResult>(
@@ -328,7 +339,7 @@ namespace Moq
 				{
 					FailMessage = failMessage
 				};
-				VerifyCalls(GetInterceptor(methodCall.Object, mock), expected, expression, times);
+				VerifyCalls(GetTargetMock(methodCall.Object, mock), expected, expression, times);
 			}
 		}
 
@@ -346,7 +357,7 @@ namespace Moq
 			{
 				FailMessage = failMessage
 			};
-			VerifyCalls(GetInterceptor(((MemberExpression)expression.Body).Expression, mock), expected, expression, times);
+			VerifyCalls(GetTargetMock(((MemberExpression)expression.Body).Expression, mock), expected, expression, times);
 		}
 
 		internal static void VerifySet<T>(
@@ -356,16 +367,16 @@ namespace Moq
 			string failMessage)
 			where T : class
 		{
-			Interceptor targetInterceptor = null;
+			Mock targetMock = null;
 			Expression expression = null;
 			var expected = SetupSetImpl<T, MethodCall<T>>(mock, setterExpression, (m, expr, method, value) =>
 				{
-					targetInterceptor = m.Interceptor;
+					targetMock = m;
 					expression = expr;
 					return new MethodCall<T>(m, null, expr, method, value) { FailMessage = failMessage };
 				});
 
-			VerifyCalls(targetInterceptor, expected, expression, times);
+			VerifyCalls(targetMock, expected, expression, times);
 		}
 
 		private static bool AreSameMethod(Expression left, Expression right)
@@ -381,27 +392,81 @@ namespace Moq
 			return false;
 		}
 
+		internal static void VerifyNoOtherCalls(Mock mock)
+		{
+			var unverifiedInvocations = mock.Invocations.ToArray(invocation => !invocation.Verified);
+
+			if (unverifiedInvocations.Any())
+			{
+				// There are some invocations that shouldn't require explicit verification by the user.
+				// The intent behind a `Verify` call for a call expression like `m.A.B.C.X` is probably
+				// to verify `X`. If that succeeds, it's reasonable to expect that `m.A`, `m.A.B`, and
+				// `m.A.B.C` have implicitly been verified as well. Below, invocations such as those to
+				// the left of `X` are referred to as "transitive" (for lack of a better word).
+				if (mock.InnerMocks.Any())
+				{
+					for (int i = 0, n = unverifiedInvocations.Length; i < n; ++i)
+					{
+						// In order for an invocation to be "transitive", its return value has to be a
+						// sub-object (inner mock); and that sub-object has to have received at least
+						// one call:
+						var wasTransitiveInvocation = mock.InnerMocks.TryGetValue(unverifiedInvocations[i].Method, out MockWithWrappedMockObject inner)
+						                              && inner.Mock.Invocations.Any();
+						if (wasTransitiveInvocation)
+						{
+							unverifiedInvocations[i] = null;
+						}
+					}
+				}
+
+				// "Transitive" invocations have been nulled out. Let's see what's left:
+				var remainingUnverifiedInvocations = unverifiedInvocations.Where(i => i != null);
+				if (remainingUnverifiedInvocations.Any())
+				{
+					throw new MockException(
+						MockException.ExceptionReason.VerificationFailed,
+						string.Format(
+							CultureInfo.CurrentCulture,
+							Resources.UnverifiedInvocations,
+							string.Join<Invocation>(Environment.NewLine, remainingUnverifiedInvocations)));
+				}
+			}
+
+			// Perform verification for all automatically created sub-objects (that is, those
+			// created by "transitive" invocations):
+			foreach (var inner in mock.InnerMocks.Values)
+			{
+				VerifyNoOtherCalls(inner.Mock);
+			}
+		}
+
 		private static void VerifyCalls(
-			Interceptor targetInterceptor,
+			Mock targetMock,
 			MethodCall expected,
 			Expression expression,
 			Times times)
 		{
-			// .Where does an enumeration, and calls to a mocked method concurrent to VerifyCalls might change the content of ActualCalls. therefore, it is necessary to take a snapshot, using ToList(), so that concurrent calls will not impact the ongoing verification.
-			var actualCalls = targetInterceptor.InterceptionContext.ActualInvocations.ToList();
-
-			var callCount = actualCalls.Where(ac => expected.Matches(ac)).Count();
-			if (!times.Verify(callCount))
+			var allInvocations = targetMock.Invocations.ToArray();
+			var matchingInvocations = allInvocations.Where(expected.Matches).ToArray();
+			var matchingInvocationCount = matchingInvocations.Length;
+			if (!times.Verify(matchingInvocationCount))
 			{
-				var setups = targetInterceptor.InterceptionContext.OrderedCalls.Where(oc => AreSameMethod(oc.SetupExpression, expression));
-				ThrowVerifyException(expected, setups, actualCalls, expression, times, callCount);
+				var setups = targetMock.Setups.ToArrayLive(oc => AreSameMethod(oc.SetupExpression, expression));
+				ThrowVerifyException(expected, setups, allInvocations, expression, times, matchingInvocationCount);
+			}
+			else
+			{
+				foreach (var matchingInvocation in matchingInvocations)
+				{
+					matchingInvocation.MarkAsVerified();
+				}
 			}
 		}
 
 		private static void ThrowVerifyException(
 			MethodCall expected,
-			IEnumerable<IProxyCall> setups,
-			IEnumerable<ICallContext> actualCalls,
+			IEnumerable<MethodCall> setups,
+			IEnumerable<Invocation> actualCalls,
 			Expression expression,
 			Times times,
 			int callCount)
@@ -412,7 +477,7 @@ namespace Moq
 			throw new MockException(MockException.ExceptionReason.VerificationFailed, message);
 		}
 
-		private static string FormatSetupsInfo(IEnumerable<IProxyCall> setups)
+		private static string FormatSetupsInfo(IEnumerable<MethodCall> setups)
 		{
 			var expressionSetups = setups
 				.Select(s => s.Format())
@@ -423,137 +488,158 @@ namespace Moq
 				Environment.NewLine + string.Format(Resources.ConfiguredSetups, Environment.NewLine + string.Join(Environment.NewLine, expressionSetups));
 		}
 
-		private static string FormatInvocations(IEnumerable<ICallContext> invocations)
+		private static string FormatInvocations(IEnumerable<Invocation> invocations)
 		{
-			var formattedInvocations = invocations
-				.Select(i => i.Format())
-				.ToArray();
-
-			return formattedInvocations.Length == 0 ?
-				Resources.NoInvocationsPerformed :
-				Environment.NewLine + string.Format(Resources.PerformedInvocations, Environment.NewLine + string.Join(Environment.NewLine, formattedInvocations));
+			return invocations.Any() ? Environment.NewLine + string.Format(Resources.PerformedInvocations, Environment.NewLine + string.Join<Invocation>(Environment.NewLine, invocations))
+			                         : Resources.NoInvocationsPerformed;
 		}
 
 		#endregion
 
 		#region Setup
 
+		[DebuggerStepThrough]
 		internal static MethodCall<T> Setup<T>(Mock<T> mock, Expression<Action<T>> expression, Condition condition)
 			where T : class
 		{
-			return PexProtector.Invoke(() =>
-			{
-				var methodCall = expression.GetCallInfo(mock);
-				var method = methodCall.Method;
-				var args = methodCall.Arguments.ToArray();
-
-				ThrowIfSetupExpressionInvolvesUnsupportedMember(expression, method);
-				ThrowIfSetupMethodNotVisibleToProxyFactory(method);
-				var call = new MethodCall<T>(mock, condition, expression, method, args);
-
-				var targetInterceptor = GetInterceptor(methodCall.Object, mock);
-
-				targetInterceptor.AddCall(call, SetupKind.Other);
-
-				return call;
-			});
+			return PexProtector.Invoke(SetupPexProtected, mock, expression, condition);
 		}
 
+		private static MethodCall<T> SetupPexProtected<T>(Mock<T> mock, Expression<Action<T>> expression, Condition condition)
+			where T : class
+		{
+			var methodCall = expression.GetCallInfo(mock);
+			var method = methodCall.Method;
+			var args = methodCall.Arguments.ToArray();
+
+			ThrowIfSetupExpressionInvolvesUnsupportedMember(expression, method);
+			ThrowIfSetupMethodNotVisibleToProxyFactory(method);
+			var setup = new MethodCall<T>(mock, condition, expression, method, args);
+
+			var targetMock = GetTargetMock(methodCall.Object, mock);
+			targetMock.Setups.Add(setup);
+
+			return setup;
+		}
+
+		[DebuggerStepThrough]
 		internal static MethodCallReturn<T, TResult> Setup<T, TResult>(
 			Mock<T> mock,
 			Expression<Func<T, TResult>> expression,
 			Condition condition)
 			where T : class
 		{
-			return PexProtector.Invoke(() =>
-			{
-				if (expression.IsProperty())
-				{
-					return SetupGet(mock, expression, condition);
-				}
-
-				var methodCall = expression.GetCallInfo(mock);
-				var method = methodCall.Method;
-				var args = methodCall.Arguments.ToArray();
-
-				ThrowIfSetupExpressionInvolvesUnsupportedMember(expression, method);
-				ThrowIfSetupMethodNotVisibleToProxyFactory(method);
-				var call = new MethodCallReturn<T, TResult>(mock, condition, expression, method, args);
-
-				var targetInterceptor = GetInterceptor(methodCall.Object, mock);
-
-				targetInterceptor.AddCall(call, SetupKind.Other);
-
-				return call;
-			});
+			return PexProtector.Invoke(SetupPexProtected, mock, expression, condition);
 		}
 
+		private static MethodCallReturn<T, TResult> SetupPexProtected<T, TResult>(
+			Mock<T> mock,
+			Expression<Func<T, TResult>> expression,
+			Condition condition)
+			where T : class
+		{
+			if (expression.IsProperty())
+			{
+				return SetupGet(mock, expression, condition);
+			}
+
+			var methodCall = expression.GetCallInfo(mock);
+			var method = methodCall.Method;
+			var args = methodCall.Arguments.ToArray();
+
+			ThrowIfSetupExpressionInvolvesUnsupportedMember(expression, method);
+			ThrowIfSetupMethodNotVisibleToProxyFactory(method);
+			var setup = new MethodCallReturn<T, TResult>(mock, condition, expression, method, args);
+
+			var targetMock = GetTargetMock(methodCall.Object, mock);
+			targetMock.Setups.Add(setup);
+
+			return setup;
+		}
+
+		[DebuggerStepThrough]
 		internal static MethodCallReturn<T, TProperty> SetupGet<T, TProperty>(
 			Mock<T> mock,
 			Expression<Func<T, TProperty>> expression,
 			Condition condition)
 			where T : class
 		{
-			return PexProtector.Invoke(() =>
-			{
-				if (expression.IsPropertyIndexer())
-				{
-					// Treat indexers as regular method invocations.
-					return Setup<T, TProperty>(mock, expression, condition);
-				}
-
-				var prop = expression.ToPropertyInfo();
-				ThrowIfPropertyNotReadable(prop);
-
-				var propGet = prop.GetGetMethod(true);
-				ThrowIfSetupExpressionInvolvesUnsupportedMember(expression, propGet);
-				ThrowIfSetupMethodNotVisibleToProxyFactory(propGet);
-
-				var call = new MethodCallReturn<T, TProperty>(mock, condition, expression, propGet, new Expression[0]);
-				// Directly casting to MemberExpression is fine as ToPropertyInfo would throw if it wasn't
-				var targetInterceptor = GetInterceptor(((MemberExpression)expression.Body).Expression, mock);
-
-				targetInterceptor.AddCall(call, SetupKind.Other);
-
-				return call;
-			});
+			return PexProtector.Invoke(SetupGetPexProtected, mock, expression, condition);
 		}
 
+		private static MethodCallReturn<T, TProperty> SetupGetPexProtected<T, TProperty>(
+			Mock<T> mock,
+			Expression<Func<T, TProperty>> expression,
+			Condition condition)
+			where T : class
+		{
+			if (expression.IsPropertyIndexer())
+			{
+				// Treat indexers as regular method invocations.
+				return Setup<T, TProperty>(mock, expression, condition);
+			}
+
+			var prop = expression.ToPropertyInfo();
+			ThrowIfPropertyNotReadable(prop);
+
+			var propGet = prop.GetGetMethod(true);
+			ThrowIfSetupExpressionInvolvesUnsupportedMember(expression, propGet);
+			ThrowIfSetupMethodNotVisibleToProxyFactory(propGet);
+
+			var setup = new MethodCallReturn<T, TProperty>(mock, condition, expression, propGet, new Expression[0]);
+			// Directly casting to MemberExpression is fine as ToPropertyInfo would throw if it wasn't
+			var targetMock = GetTargetMock(((MemberExpression)expression.Body).Expression, mock);
+			targetMock.Setups.Add(setup);
+
+			return setup;
+		}
+
+		[DebuggerStepThrough]
 		internal static SetterMethodCall<T, TProperty> SetupSet<T, TProperty>(
 			Mock<T> mock,
 			Action<T> setterExpression,
 			Condition condition)
 			where T : class
 		{
-			return PexProtector.Invoke(() =>
-			{
-				return SetupSetImpl<T, SetterMethodCall<T, TProperty>>(
-					mock,
-					setterExpression,
-					(m, expr, method, value) =>
-					{
-						var call = new SetterMethodCall<T, TProperty>(m, condition, expr, method, value[0]);
-						m.Interceptor.AddCall(call, SetupKind.PropertySet);
-						return call;
-					});
-			});
+			return PexProtector.Invoke(SetupSetPexProtected<T, TProperty>, mock, setterExpression, condition);
 		}
 
+		private static SetterMethodCall<T, TProperty> SetupSetPexProtected<T, TProperty>(
+			Mock<T> mock,
+			Action<T> setterExpression,
+			Condition condition)
+			where T : class
+		{
+			return SetupSetImpl<T, SetterMethodCall<T, TProperty>>(
+				mock,
+				setterExpression,
+				(m, expr, method, value) =>
+				{
+					var setup = new SetterMethodCall<T, TProperty>(m, condition, expr, method, value[0]);
+					m.Setups.Add(setup);
+					return setup;
+				});
+		}
+
+		[DebuggerStepThrough]
 		internal static MethodCall<T> SetupSet<T>(Mock<T> mock, Action<T> setterExpression, Condition condition)
 			where T : class
 		{
-			return PexProtector.Invoke(() =>
-			{
-				return SetupSetImpl<T, MethodCall<T>>(
-					mock,
-					setterExpression,
-					(m, expr, method, values) =>
-					{
-						var call = new MethodCall<T>(m, condition, expr, method, values);
-						m.Interceptor.AddCall(call, SetupKind.PropertySet);
-						return call;
-					});
-			});
+			return PexProtector.Invoke(SetupSetPexProtected, mock, setterExpression, condition);
+		}
+
+		private static MethodCall<T> SetupSetPexProtected<T>(Mock<T> mock, Action<T> setterExpression, Condition condition)
+			where T : class
+		{
+			return SetupSetImpl<T, MethodCall<T>>(
+				mock,
+				setterExpression,
+				(m, expr, method, values) =>
+				{
+					var setup = new MethodCall<T>(m, condition, expr, method, values);
+					m.Setups.Add(setup);
+					return setup;
+				});
 		}
 
 		internal static SetterMethodCall<T, TProperty> SetupSet<T, TProperty>(
@@ -568,12 +654,12 @@ namespace Moq
 			ThrowIfSetupExpressionInvolvesUnsupportedMember(expression, propSet);
 			ThrowIfSetupMethodNotVisibleToProxyFactory(propSet);
 
-			var call = new SetterMethodCall<T, TProperty>(mock, expression, propSet);
-			var targetInterceptor = GetInterceptor(((MemberExpression)expression.Body).Expression, mock);
+			var setup = new SetterMethodCall<T, TProperty>(mock, expression, propSet);
+			var targetMock = GetTargetMock(((MemberExpression)expression.Body).Expression, mock);
 
-			targetInterceptor.AddCall(call, SetupKind.PropertySet);
+			targetMock.Setups.Add(setup);
 
-			return call;
+			return setup;
 		}
 
 		private static TCall SetupSetImpl<T, TCall>(
@@ -679,19 +765,56 @@ namespace Moq
 			return Expression.Convert(Expression.Constant(value), type);
 		}
 
-		internal static void SetupAllProperties(Mock mock)
+		internal static SetupSequencePhrase<TResult> SetupSequence<TResult>(Mock mock, LambdaExpression expression)
 		{
-			PexProtector.Invoke(() =>
+			if (expression.IsProperty())
 			{
-				var mockedTypesStack = new Stack<Type>();
-				SetupAllProperties(mock, mockedTypesStack);
-			});
+				var prop = expression.ToPropertyInfo();
+				ThrowIfPropertyNotReadable(prop);
+
+				var propGet = prop.GetGetMethod(true);
+				ThrowIfSetupExpressionInvolvesUnsupportedMember(expression, propGet);
+				ThrowIfSetupMethodNotVisibleToProxyFactory(propGet);
+
+				var setup = new SequenceMethodCall(mock, expression, propGet, new Expression[0]);
+				var targetMock = GetTargetMock(((MemberExpression)expression.Body).Expression, mock);
+				targetMock.Setups.Add(setup);
+				return new SetupSequencePhrase<TResult>(setup);
+			}
+			else
+			{
+				var methodCall = expression.GetCallInfo(mock);
+				var setup = new SequenceMethodCall(mock, expression, methodCall.Method, methodCall.Arguments.ToArray());
+				var targetMock = GetTargetMock(methodCall.Object, mock);
+				targetMock.Setups.Add(setup);
+				return new SetupSequencePhrase<TResult>(setup);
+			}
 		}
 
-		private static void SetupAllProperties(Mock mock, Stack<Type> mockedTypesStack)
+		internal static SetupSequencePhrase SetupSequence(Mock mock, LambdaExpression expression)
+		{
+			var methodCall = expression.GetCallInfo(mock);
+			var setup = new SequenceMethodCall(mock, expression, methodCall.Method, methodCall.Arguments.ToArray());
+			var targetMock = GetTargetMock(methodCall.Object, mock);
+			targetMock.Setups.Add(setup);
+			return new SetupSequencePhrase(setup);
+		}
+
+		[DebuggerStepThrough]
+		internal static void SetupAllProperties(Mock mock)
+		{
+			PexProtector.Invoke(SetupAllPropertiesPexProtected, mock, mock.DefaultValueProvider);
+			//                                                        ^^^^^^^^^^^^^^^^^^^^^^^^^
+			// `SetupAllProperties` no longer performs eager recursive property setup like in previous versions.
+			// If `mock` uses `DefaultValue.Mock`, mocked sub-objects are now only constructed when queried for
+			// the first time. In order for `SetupAllProperties`'s new mode of operation to be indistinguishable
+			// from how it worked previously, it's important to capture the default value provider at this precise
+			// moment, since it might be changed later (before queries to properties of a mockable type).
+		}
+
+		private static void SetupAllPropertiesPexProtected(Mock mock, DefaultValueProvider defaultValueProvider)
 		{
 			var mockType = mock.MockedType;
-			mockedTypesStack.Push(mockType);
 
 			var properties =
 				mockType
@@ -702,72 +825,59 @@ namespace Moq
 				//   interface as a getter-and-setter property.
 				.Where(p =>
 					   p.CanRead && p.CanOverrideGet() &&
-					   p.GetIndexParameters().Length == 0 &&
-					   p.CanWrite == p.CanOverrideSet())
-					   // ^ The last condition will be true for two kinds of properties:
+					   p.CanWrite == p.CanOverrideSet() &&
+					   // ^ This condition will be true for two kinds of properties:
 					   //    (a) those that are read-only; and
 					   //    (b) those that are writable and whose setter can be overridden.
+					   p.GetIndexParameters().Length == 0 &&
+					   ProxyFactory.Instance.IsMethodVisible(p.GetGetMethod(), out _))
 				.Distinct();
-
-			var setupPropertyMethod = mock.GetType().GetMethods()
-				.First(m => m.Name == "SetupProperty" && m.GetParameters().Length == 2);
-			var setupGetMethod = mock.GetType().GetMethods()
-				.First(m => m.Name == "SetupGet" && m.GetParameters().Length == 1);
 
 			foreach (var property in properties)
 			{
 				var expression = GetPropertyExpression(mockType, property);
-				object initialValue = GetInitialValue(mock.DefaultValueProvider, mockedTypesStack, property);
+				var getter = property.GetGetMethod(true);
 
-				var mocked = initialValue as IMocked;
-				if (mocked != null)
+				object value = null;
+				bool valueNotSet = true;
+
+				mock.Setups.Add(new PropertyGetterMethodCall(mock, expression, getter, () =>
 				{
-					SetupAllProperties(mocked.Mock, mockedTypesStack);
-				}
+					if (valueNotSet)
+					{
+						object initialValue;
+						try
+						{
+							initialValue = mock.GetDefaultValue(getter, useAlternateProvider: defaultValueProvider);
+						}
+						catch
+						{
+							// Since this method performs a batch operation, a single failure of the default value
+							// provider should not tear down the whole operation. The empty default value provider
+							// is a safe fallback because it does not throw.
+							initialValue = mock.GetDefaultValue(getter, useAlternateProvider: DefaultValueProvider.Empty);
+						}
+
+						if (initialValue is IMocked mocked)
+						{
+							SetupAllPropertiesPexProtected(mocked.Mock, defaultValueProvider);
+						}
+
+						value = initialValue;
+						valueNotSet = false;
+					}
+					return value;
+				}));
 
 				if (property.CanWrite)
 				{
-					setupPropertyMethod.MakeGenericMethod(property.PropertyType)
-						.Invoke(mock, new[] { expression, initialValue });
-				}
-				else
-				{
-					var genericSetupGetMethod = setupGetMethod.MakeGenericMethod(property.PropertyType);
-					var returnsMethod =
-						genericSetupGetMethod
-							.ReturnType
-							.GetTypeInfo()
-							.ImplementedInterfaces
-							.SingleOrDefault(i => i.Name.Equals("IReturnsGetter`2", StringComparison.OrdinalIgnoreCase))
-							.GetTypeInfo()
-							.DeclaredMethods
-							.SingleOrDefault(m => m.Name == "Returns" && m.GetParameterTypes().Count() == 1 && m.GetParameterTypes().First() == property.PropertyType);
-
-					var returnsGetter = genericSetupGetMethod.Invoke(mock, new[] {expression});
-					returnsMethod.Invoke(returnsGetter, new[] {initialValue});
+					mock.Setups.Add(new PropertySetterMethodCall(mock, expression, property.GetSetMethod(true), (newValue) =>
+					{
+						value = newValue;
+						valueNotSet = false;
+					}));
 				}
 			}
-
-			mockedTypesStack.Pop();
-		}
-
-		private static object GetInitialValue(IDefaultValueProvider valueProvider, Stack<Type> mockedTypesStack, PropertyInfo property)
-		{
-			if (mockedTypesStack.Contains(property.PropertyType))
-			{
-				// to deal with loops in the property graph
-				valueProvider = new EmptyDefaultValueProvider();
-			}
-#if FEATURE_SERIALIZATION
-			else
-			{
-				// to make sure that properties of types that don't implement ISerializable properly (Castle throws ArgumentException)
-				// are mocked with default value instead.
-				// It will only result in exception if the properties are accessed.
-				valueProvider = new SerializableTypesValueProvider(valueProvider);
-			}
-#endif
-			return valueProvider.ProvideDefault(property.GetGetMethod());
 		}
 
 		private static Expression GetPropertyExpression(Type mockType, PropertyInfo property)
@@ -780,13 +890,20 @@ namespace Moq
 		/// Gets the interceptor target for the given expression and root mock, 
 		/// building the intermediate hierarchy of mock objects if necessary.
 		/// </summary>
-		private static Interceptor GetInterceptor(Expression fluentExpression, Mock mock)
+		private static Mock GetTargetMock(Expression fluentExpression, Mock mock)
 		{
+			if (fluentExpression is ParameterExpression)
+			{
+				// fast path for single-dot setup expressions;
+				// no need for expensive lambda compilation.
+				return mock;
+			}
+
 			var targetExpression = FluentMockVisitor.Accept(fluentExpression, mock);
 			var targetLambda = Expression.Lambda<Func<Mock>>(Expression.Convert(targetExpression, typeof(Mock)));
 
 			var targetObject = targetLambda.Compile()();
-			return targetObject.Interceptor;
+			return targetObject;
 		}
 
 		[SuppressMessage("Microsoft.Usage", "CA2208:InstantiateArgumentExceptionsCorrectly", Justification = "This is a helper method for the one receiving the expression.")]
@@ -820,7 +937,7 @@ namespace Moq
 
 		private static void ThrowIfSetupMethodNotVisibleToProxyFactory(MethodInfo method)
 		{
-			if (Mock.ProxyFactory.IsMethodVisible(method, out string messageIfNotVisible) == false)
+			if (ProxyFactory.Instance.IsMethodVisible(method, out string messageIfNotVisible) == false)
 			{
 				throw new ArgumentException(string.Format(
 					CultureInfo.CurrentCulture,
@@ -932,7 +1049,7 @@ namespace Moq
 				// compiler-generated types as they are typically the 
 				// anonymous types generated to build up the query expressions.
 				if (node.Expression.NodeType == ExpressionType.Parameter &&
-					node.Expression.Type.GetTypeInfo().GetCustomAttribute<CompilerGeneratedAttribute>(false) != null)
+					node.Expression.Type.GetTypeInfo().IsDefined(typeof(CompilerGeneratedAttribute), false))
 				{
 					var memberType = node.Member is FieldInfo ?
 						((FieldInfo)node.Member).FieldType :
@@ -999,7 +1116,7 @@ namespace Moq
 				throw new InvalidOperationException(Resources.RaisedUnassociatedEvent);
 			}
 
-			foreach (var del in this.Interceptor.InterceptionContext.GetInvocationList(ev).ToArray())
+			foreach (var del in this.EventHandlers.ToArray(ev.Name))
 			{
 				del.InvokePreserveStack(this.Object, args);
 			}
@@ -1016,7 +1133,7 @@ namespace Moq
 				throw new InvalidOperationException(Resources.RaisedUnassociatedEvent);
 			}
 
-			foreach (var del in this.Interceptor.InterceptionContext.GetInvocationList(ev).ToArray())
+			foreach (var del in this.EventHandlers.ToArray(ev.Name))
 			{
 				// Non EventHandler-compatible delegates get the straight
 				// arguments, not the typical "sender, args" arguments.
@@ -1033,58 +1150,116 @@ namespace Moq
 		public virtual Mock<TInterface> As<TInterface>()
 			where TInterface : class
 		{
-			var index = this.ImplementedInterfaces.LastIndexOf(typeof(TInterface));
+			var interfaceType = typeof(TInterface);
 
-			var isImplemented = index >= 0;
-			if (this.isInitialized && !isImplemented)
-			{
-				throw new InvalidOperationException(Resources.AlreadyInitialized);
-			}
-
-			if (!typeof(TInterface).GetTypeInfo().IsInterface)
+			if (!interfaceType.GetTypeInfo().IsInterface)
 			{
 				throw new ArgumentException(Resources.AsMustBeInterface);
 			}
 
-			var isNotOrInternallyImplemented = index < this.InternallyImplementedInterfaceCount - 1; // - 1 because of IMocked<>
-			if (isNotOrInternallyImplemented)
+			if (this.IsObjectInitialized && this.ImplementsInterface(interfaceType) == false)
+			{
+				throw new InvalidOperationException(Resources.AlreadyInitialized);
+			}
+
+			if (this.AdditionalInterfaces.Contains(interfaceType) == false)
 			{
 				// We get here for either of two reasons:
 				//
 				// 1. We are being asked to implement an interface that the mocked type does *not* itself
 				//    inherit or implement. We need to hand this interface type to DynamicProxy's
-				//    `CreateClassProxy` method as an additional interface to be implemented. Therefore we
-				//    add it at the end of this list, after the "internally implemented" interfaces
-				//    (i.e. those that the mocked type inherits or implements itself, plus `IMocked<>`).
-				//    In this case, `index == -1`.
+				//    `CreateClassProxy` method as an additional interface to be implemented.
 				//
 				// 2. The user is possibly going to create a setup through an interface type that the
 				//    mocked type *does* implement. Since the mocked type might implement that interface's
 				//    methods non-virtually, we can only intercept those if DynamicProxy reimplements the
-				//    interface in the generated proxy type. Therefore we do the same as for (1). Note
-				//    that this might lead to the interface type being contained twice in the list, once
-				//    as an "internally implemented" type, and once as an "additional" type. That should
-				//    not matter apart from slightly higher memory consumption, but it has the benefit
-				//    that we don't need to perform a non-atomic removal of the "internally implemented"
-				//    item.
-				//    In this case, `index >= 0 && index < this.InternallyImplementedInterfaceCount - 1`.
-				this.ImplementedInterfaces.Add(typeof(TInterface));
+				//    interface in the generated proxy type. Therefore we do the same as for (1).
+				this.AdditionalInterfaces.Add(interfaceType);
 			}
 
 			return new AsInterface<TInterface>(this);
+		}
+
+		internal bool ImplementsInterface(Type interfaceType)
+		{
+			return this.InheritedInterfaces.Contains(interfaceType)
+				|| this.AdditionalInterfaces.Contains(interfaceType);
 		}
 
 		#endregion
 
 		#region Default Values
 
-		/// <include file='Mock.Generic.xdoc' path='docs/doc[@for="Mock.SetReturnDefault{TReturn}"]/*'/>
+		internal abstract Dictionary<Type, object> ConfiguredDefaultValues { get; }
+
+		/// <summary>
+		/// Defines the default return value for all mocked methods or properties with return type <typeparamref name= "TReturn" />.
+		/// </summary>
+		/// <typeparam name="TReturn">The return type for which to define a default value.</typeparam>
+		/// <param name="value">The default return value.</param>
 		public void SetReturnsDefault<TReturn>(TReturn value)
 		{
-			this.DefaultValueProvider.DefineDefault(value);
+			this.ConfiguredDefaultValues[typeof(TReturn)] = value;
+		}
+
+		internal object GetDefaultValue(MethodInfo method, DefaultValueProvider useAlternateProvider = null)
+		{
+			Debug.Assert(method != null);
+			Debug.Assert(method.ReturnType != null);
+			Debug.Assert(method.ReturnType != typeof(void));
+
+			if (this.ConfiguredDefaultValues.TryGetValue(method.ReturnType, out object configuredDefaultValue))
+			{
+				return configuredDefaultValue;
+			}
+
+			var result = (useAlternateProvider ?? this.DefaultValueProvider).GetDefaultReturnValue(method, this);
+			var unwrappedResult = TryUnwrapResultFromCompletedTaskRecursively(result);
+
+			if (unwrappedResult is IMocked unwrappedMockedResult)
+			{
+				// TODO: Perhaps the following `InnerMocks` update isn't in quite the right place yet.
+				// There are two main places in Moq where `InnerMocks` are used: `Mock<T>.FluentMock` and
+				// the `HandleMockRecursion` interception strategy. Both places first query `InnerMocks`,
+				// and if no value for a given member is present, the default value provider get invoked
+				// via the present method. Querying and updating `InnerMocks` is thus spread over two
+				// code locations and therefore non-atomic. It would be good if those could be combined
+				// (`InnerMocks.GetOrAdd`), but that might not be easily possible since `InnerMocks` is
+				// only mocks while default value providers can also return plain, unmocked values.
+				this.InnerMocks.TryAdd(method, new MockWithWrappedMockObject(unwrappedMockedResult.Mock, result));
+			}
+
+			return result;
+		}
+
+		/// <summary>
+		/// Recursively unwraps the result from completed <see cref="Task{TResult}"/> or <see cref="ValueTask{TResult}"/> instances.
+		/// If the given value is not a task, the value itself is returned.
+		/// </summary>
+		/// <param name="obj">The value to be unwrapped.</param>
+		private static object TryUnwrapResultFromCompletedTaskRecursively(object obj)
+		{
+			if (obj != null)
+			{
+				var objType = obj.GetType();
+				if (objType.GetTypeInfo().IsGenericType)
+				{
+					var genericTypeDefinition = objType.GetGenericTypeDefinition();
+					if (genericTypeDefinition == typeof(Task<>) || genericTypeDefinition == typeof(ValueTask<>))
+					{
+						var isCompleted = (bool)objType.GetProperty("IsCompleted").GetValue(obj, null);
+						if (isCompleted)
+						{
+							var innerObj = objType.GetProperty("Result").GetValue(obj, null);
+							return TryUnwrapResultFromCompletedTaskRecursively(innerObj);
+						}
+					}
+				}
+			}
+
+			return obj;
 		}
 
 		#endregion
-
 	}
 }

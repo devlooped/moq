@@ -64,6 +64,26 @@ namespace Moq.Protected
 	public static class ItExpr
 	{
 		/// <summary>
+		/// Contains matchers for <see langword="ref"/> (C#) / <see langword="ByRef"/> (VB.NET) parameters of type <typeparamref name="TValue"/>.
+		/// </summary>
+		/// <typeparam name="TValue">The parameter type.</typeparam>
+		public static class Ref<TValue>
+		{
+			/// <summary>
+			/// Matches any value that is assignment-compatible with type <typeparamref name="TValue"/>.
+			/// </summary>
+			/// <returns></returns>
+			public static Expression IsAny
+			{
+				get
+				{
+					Expression<Func<TValue>> expr = () => It.Ref<TValue>.IsAny;
+					return expr.Body;
+				}
+			}
+		}
+
+		/// <summary>
 		/// Matches a null value of the given <typeparamref name="TValue"/> type.
 		/// </summary>
 		/// <remarks>
@@ -137,7 +157,6 @@ namespace Moq.Protected
 		///     .Throws(new ArgumentException());
 		/// </code>
 		/// </example>
-		[AdvancedMatcher(typeof(PredicateMatcher))]
 		[SuppressMessage("Microsoft.Design", "CA1006:DoNotNestGenericTypesInMemberSignatures")]
 		public static Expression Is<TValue>(Expression<Func<TValue, bool>> match)
 		{

@@ -15,8 +15,9 @@ The most popular and friendly mocking framework for .NET
   mock.Setup(framework => framework.DownloadExists("2.0.0.0"))
       .Returns(true);
 
-  // Hand mock.Object as a collaborator and exercise it, 
-  // like calling methods on it...
+  // Use the Object property on the mock to get a reference to the object
+  // implementing ILoveThisFramework, and then exercise it by calling
+  // methods on it
   ILoveThisFramework lovable = mock.Object;
   bool download = lovable.DownloadExists("2.0.0.0");
 
@@ -30,8 +31,7 @@ Moq also is the first and only framework so far to provide Linq to Mocks, so tha
   ILoveThisFramework lovable = Mock.Of<ILoveThisFramework>(l =>
     l.DownloadExists("2.0.0.0") == true);
 
-  // Hand the instance as a collaborator and exercise it, 
-  // like calling methods on it...
+  // Exercise the instance returned by Mock.Of by calling methods on it...
   bool download = lovable.DownloadExists("2.0.0.0");
 
   // Simply assert the returned state:
@@ -64,7 +64,7 @@ You can read more about the "why" and see some nice screenshots at [kzu's blog](
 
 ## Where?
 
-See our [Quickstart](https://github.com/Moq/moq4/wiki/Quickstart) examples to get a feeling of the extremely simple API and install from [nuget](http://nuget.org/packages/moq). Check out the API documentation at [NuDoq](http://www.nudoq.org/#!/Projects/Moq).
+See our [Quickstart](https://github.com/Moq/moq4/wiki/Quickstart) examples to get a feeling of the extremely simple API and install from [NuGet](http://nuget.org/packages/moq). Check out the API documentation at [NuDoq](http://www.nudoq.org/#!/Projects/Moq).
 
 Read about the announcement at [kzu's blog](http://blogs.clariusconsulting.net/kzu/linq-to-mock-moq-is-born/). Get some background on [the state of mock libraries from Scott Hanselman](http://www.hanselman.com/blog/MoqLinqLambdasAndPredicatesAppliedToMockObjects.aspx). 
 
@@ -73,20 +73,20 @@ Read about the announcement at [kzu's blog](http://blogs.clariusconsulting.net/k
 
 Moq was originally developed by [Clarius](http://www.clariusconsulting.net), [Manas](http://www.manas.com.ar) and [InSTEDD](http://www.instedd.org).
 
-Moq uses [Castle DynamicProxy](http://www.castleproject.org/projects/dynamicproxy/) internally as the interception mechanism to enable mocking. It's merged into Moq binaries, so you don't need to do anything other than referencing Moq.dll, though.
+Moq uses [Castle DynamicProxy](http://www.castleproject.org/projects/dynamicproxy/) internally as the interception mechanism to enable mocking.
 
 ## Features at a glance
 Moq offers the following features:
-  * Strong-typed: no strings for expectations, no object-typed return values or constraints
-  * Unsurpassed VS intellisense integration: everything supports full VS intellisense, from setting expectations, to specifying method call arguments, return values, etc.
-  * No Record/Replay idioms to learn. Just construct your mock, set it up, use it and optionally verify calls to it (you may not verify mocks when they act as stubs only, or when you are doing more classic state-based testing by checking returned values from the object under test)
-  * VERY low learning curve as a consequence of the previous three points. For the most part, you don't even need to ever read the documentation.
-  * Granular control over mock behavior with a simple  [MockBehavior](http://www.nudoq.org/#!/Packages/Moq/Moq/MockBehavior)  enumeration (no need to learn what's the theoretical difference between a mock, a stub, a fake, a dynamic mock, etc.)
-  * Mock both interfaces and classes
-  * Override expectations: can set default expectations in a fixture setup, and override as needed on tests
-  * Pass constructor arguments for mocked classes
-  * Intercept and raise events on mocks
-  * Intuitive support for out/ref arguments
+* Strong-typed: no strings for expectations, no object-typed return values or constraints
+* Unsurpassed VS IntelliSense integration: everything supports full VS IntelliSense, from setting expectations, to specifying method call arguments, return values, etc.
+* No Record/Replay idioms to learn. Just construct your mock, set it up, use it and optionally verify calls to it (you may not verify mocks when they act as stubs only, or when you are doing more classic state-based testing by checking returned values from the object under test)
+* VERY low learning curve as a consequence of the previous three points. For the most part, you don't even need to ever read the documentation.
+* Granular control over mock behavior with a simple  [MockBehavior](http://www.nudoq.org/#!/Packages/Moq/Moq/MockBehavior)  enumeration (no need to learn what's the theoretical difference between a mock, a stub, a fake, a dynamic mock, etc.)
+* Mock both interfaces and classes
+* Override expectations: can set default expectations in a fixture setup, and override as needed on tests
+* Pass constructor arguments for mocked classes
+* Intercept and raise events on mocks
+* Intuitive support for ```out/ref``` arguments
 
 We appreciate deeply any [feedback](http://moq.uservoice.com/) that you may have!
 

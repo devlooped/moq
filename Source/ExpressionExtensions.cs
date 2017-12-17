@@ -99,12 +99,24 @@ namespace Moq
 		/// </summary>
 		public static PropertyInfo ToPropertyInfo(this LambdaExpression expression)
 		{
-			var prop = expression.Body as MemberExpression;
-			if (prop != null)
+			if (expression.Body is MemberExpression prop)
 			{
-				var info = prop.Member as PropertyInfo;
-				if (info != null)
+				if (prop.Member is PropertyInfo info)
 				{
+					// the following block is required because .NET compilers put the wrong PropertyInfo into MemberExpression
+					// for properties originally declared in base classes; they will put the base class' PropertyInfo into
+					// the expression. we attempt to correct this here by checking whether the type of the accessed object
+					// has a property by the same name whose base definition equals the property in the expression; if so,
+					// we "upgrade" to the derived property.
+					if (info.DeclaringType != prop.Expression.Type && info.CanRead)
+					{
+						var propertyInLeft = prop.Expression.Type.GetProperty(info.Name, BindingFlags.Public | BindingFlags.NonPublic | BindingFlags.Instance);
+						if (propertyInLeft != null && propertyInLeft.GetMethod.GetBaseDefinition() == info.GetMethod)
+						{
+							info = propertyInLeft;
+						}
+					}
+
 					return info;
 				}
 			}
@@ -184,39 +196,41 @@ namespace Moq
 		{
 			return Evaluator.PartialEval(
 				expression,
-				e => e.NodeType != ExpressionType.Parameter &&
-					(e.NodeType != ExpressionType.Call || !ReturnsMatch((MethodCallExpression)e)));
+				PartialMatcherAwareEval_ShouldEvaluate);
 		}
 
-		private static bool ReturnsMatch(MethodCallExpression expression)
+		private static bool PartialMatcherAwareEval_ShouldEvaluate(Expression expression)
 		{
-			if (expression.Method.GetCustomAttribute<AdvancedMatcherAttribute>(true) == null)
+			switch (expression.NodeType)
 			{
-				using (var context = new FluentMockContext())
-				{
-					Expression.Lambda<Action>(expression).Compile().Invoke();
-					return context.LastMatch != null;
-				}
-			}
+				case ExpressionType.Parameter:
+					return false;
 
-			return true;
+				case ExpressionType.Call:
+				case ExpressionType.MemberAccess:
+					return ReturnsMatch(expression) == false;
+
+				default:
+					return true;
+			}
+		}
+
+		private static bool ReturnsMatch(Expression expression)
+		{
+			using (var context = new FluentMockContext())
+			{
+				Expression.Lambda<Action>(expression).Compile().Invoke();
+				return context.LastMatch != null;
+			}
 		}
 
 		/// <devdoc>
 		/// TODO: remove this code when https://connect.microsoft.com/VisualStudio/feedback/ViewFeedback.aspx?FeedbackID=331583 
 		/// is fixed.
 		/// </devdoc>
-		public static string ToStringFixed(this Expression expression)
+		public static string ToStringFixed(this Expression expression, bool useFullTypeName = false)
 		{
-			return ExpressionStringBuilder.GetString(expression);
-		}
-
-		internal static string ToStringFixed(this Expression expression, bool useFullTypeName)
-		{
-			if (useFullTypeName)
-				return ExpressionStringBuilder.GetString(expression, type => type.FullName);
-			else
-				return ExpressionStringBuilder.GetString(expression, type => type.Name);
+			return ExpressionStringBuilder.GetString(expression, useFullTypeName);
 		}
 
 		/// <summary>
@@ -258,32 +272,6 @@ namespace Moq
 			public Expression Object { get; set; }
 			public MethodInfo Method { get; set; }
 			public IEnumerable<Expression> Arguments { get; set; }
-		}
-
-		internal sealed class RemoveMatcherConvertVisitor : ExpressionVisitor
-		{
-			public RemoveMatcherConvertVisitor(Expression expression)
-			{
-				this.Expression = this.Visit(expression);
-			}
-
-			protected override Expression VisitUnary(UnaryExpression expression)
-			{
-				if (expression != null)
-				{
-					if (expression.NodeType == ExpressionType.Convert &&
-						expression.Operand.NodeType == ExpressionType.Call &&
-						typeof(Match).IsAssignableFrom(((MethodCallExpression)expression.Operand).Method.ReturnType))
-					{
-						// Remove the cast.
-						return expression.Operand;
-					}
-				}
-
-				return base.VisitUnary(expression);
-			}
-
-			public Expression Expression { get; private set; }
 		}
 	}
 }

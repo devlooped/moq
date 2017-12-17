@@ -5,6 +5,46 @@ All notable changes to this project will be documented in this file.
 The format is loosely based on [Keep a Changelog](http://keepachangelog.com/en/1.0.0/).
 
 
+## Unreleased
+
+#### Added
+
+* Support for sequential setup of `void` methods (@alexbestul, #463)
+* Support for sequential setups (`SetupSequence`) of protected members (@stakx, #493)
+* Support for callbacks for methods having `ref` or `out` parameters via two new overloads of `Callback` and `Returns` (@stakx, #468)
+* Improved support for setting up and verifying protected members (including generic methods and methods having by-ref parameters) via the new duck-typing `mock.Protected().As<TAnalog>()` interface (@stakx, #495, #501)
+* Support for `ValueTask<TResult>` when using the `ReturnsAsync` extension methods, similar to `Task<TResult>` (@AdamDotNet, #506)
+* Special handling for `ValueTask<TResult>` with `DefaultValue.Empty` (@stakx, #529)
+* Support for custom default value generation strategies besides `DefaultValue.Empty` and `DefaultValue.Mock`:
+  Implement custom providers by subclassing either `DefaultValueProvider` or `LookupOrFallbackDefaultValueProvider`,
+  install them by setting `Mock[Repository].DefaultValueProvider` (@stakx, #533, #536)
+* Allow `DefaultValue.Mock` to mock `Task<TMockable>` and `ValueTask<TMockable>` (@stakx, #502)
+* Match any value for `ref` parameters with `It.Ref<T>.IsAny` (or `ItExpr.Ref<T>.IsAny` for protected methods) as you would with `It.IsAny<T>()` for regular parameters (@stakx, #537) 
+* `Mock.VerifyNoOtherCalls()` to check whether all expected invocations have been verified -- can be used as an alternative to `MockBehavior.Strict` (@stakx, #539)
+
+#### Changed
+
+* **Breaking change:** `SetupSequence` now overrides pre-existing setups like all other `Setup` methods do. This means that exhausted sequences no longer fall back to previous setups to produce a "default" action or return value. (@stakx, #476)
+* Delegates passed to `Returns` are validated a little more strictly than before (return type and parameter count must match with method being set up) (@stakx, #520)
+* `SetupAllProperties` now fully supports property type recursion / loops in the object graph, thanks to deferred property initialization (@stakx, #550).
+
+#### Fixed
+
+* Update a method's invocation count correctly, even when it is set up to throw an exception (@stakx, #473)
+* Sequences set up with `SetupSequence` are now thread-safe (@stakx, #476)
+* Record calls to methods that are named like event accessors (`add_X`, `remove_X`) so they can be verified (@stakx, #488)
+* Improve recognition logic for sealed methods so that `Setup` throws when an attempt is made to set one up (@stakx, #497)
+* Let `SetupAllProperties` skip inaccessible methods (@stakx, #499)
+* Prevent Moq from relying on a mock's implementation of `IEnumerable<T>` (@stakx, #510)
+* Verification leaked internal `MockVerificationException` type; remove it (@stakx, #511)
+* Custom matcher properties not printed correctly in error messages (@stakx, #517)
+* Infinite loop when invoking delegate in `Mock.Of` setup expression (@stakx, #528) 
+
+#### Obsoleted
+
+* `[Matcher]` has been deprecated in favor of `Match.Create` (@stakx, #514)
+
+
 ## 4.7.145 (2017-11-06)
 
 #### Changed

@@ -129,7 +129,7 @@ namespace Moq.Linq
 			// compiler-generated types as they are typically the 
 			// anonymous types generated to build up the query expressions.
 			if (node.Expression.NodeType == ExpressionType.Parameter &&
-				node.Expression.Type.GetTypeInfo().GetCustomAttribute<CompilerGeneratedAttribute>(false) != null)
+				node.Expression.Type.GetTypeInfo().IsDefined(typeof(CompilerGeneratedAttribute), false))
 			{
 				var memberType = ((PropertyInfo)node.Member).PropertyType;
 
@@ -191,8 +191,8 @@ namespace Moq.Linq
 		{
 			return typeof(Mock<>)
 				.MakeGenericType(objectType)
-				.GetMethods()
-				.First(mi => mi.Name == "Setup" && mi.IsGenericMethod)
+				.GetMethods("Setup")
+				.First(mi => mi.IsGenericMethod)
 				.MakeGenericMethod(returnType);
 		}
 	}

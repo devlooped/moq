@@ -1,13 +1,14 @@
 using System;
 using System.Collections;
 using System.Collections.Generic;
-using System.Globalization;
+using System.Collections.ObjectModel;
+using System.Diagnostics;
 using System.Linq;
 using System.Linq.Expressions;
 using System.Reflection;
 using System.Runtime.CompilerServices;
 using System.Text;
-using System.Collections.ObjectModel;
+
 using Moq.Properties;
 
 namespace Moq
@@ -20,23 +21,18 @@ namespace Moq
 	{
 		private readonly Expression expression;
 		private StringBuilder builder;
-		private Func<Type, string> getTypeName;
+		private bool useFullName;
 
-		internal static string GetString(Expression expression)
+		internal static string GetString(Expression expression, bool useFullName = false)
 		{
-			return GetString(expression, type => type.Name);
-		}
-
-		internal static string GetString(Expression expression, Func<Type, string> getTypeName)
-		{
-			var builder = new ExpressionStringBuilder(getTypeName, expression);
+			var builder = new ExpressionStringBuilder(expression, useFullName);
 			return builder.ToString();
 		}
 
-		public ExpressionStringBuilder(Func<Type, string> getTypeName, Expression expression)
+		public ExpressionStringBuilder(Expression expression, bool useFullName)
 		{
-			this.getTypeName = getTypeName;
 			this.expression = expression;
+			this.useFullName = useFullName;
 		}
 
 		public override string ToString()
@@ -164,7 +160,7 @@ namespace Moq
 			{
 				case ExpressionType.Convert:
 				case ExpressionType.ConvertChecked:
-					builder.Append("(").Append(this.getTypeName(u.Type)).Append(")");
+					builder.Append('(').Append(this.useFullName ? u.Type.FullName : u.Type.Name).Append(')');
 					ToString(u.Operand);
 					return;
 
@@ -175,14 +171,14 @@ namespace Moq
 
 				case ExpressionType.Negate:
 				case ExpressionType.NegateChecked:
-					builder.Append("-");
+					builder.Append('-');
 					ToString(u.Operand);
 					return;
 
 				case ExpressionType.Not:
 					builder.Append("!(");
 					ToString(u.Operand);
-					builder.Append(")");
+					builder.Append(')');
 					return;
 
 				case ExpressionType.Quote:
@@ -190,11 +186,11 @@ namespace Moq
 					return;
 
 				case ExpressionType.TypeAs:
-					builder.Append("(");
+					builder.Append('(');
 					ToString(u.Operand);
 					builder.Append(" as ");
-					builder.Append(u.Type.DisplayName(this.getTypeName));
-					builder.Append(")");
+					builder.AppendDisplayName(u.Type, this.useFullName);
+					builder.Append(')');
 					return;
 			}
 			return;
@@ -205,31 +201,31 @@ namespace Moq
 			if (b.NodeType == ExpressionType.ArrayIndex)
 			{
 				ToString(b.Left);
-				builder.Append("[");
+				builder.Append('[');
 				ToString(b.Right);
-				builder.Append("]");
+				builder.Append(']');
 			}
 			else
 			{
 				string @operator = ToStringOperator(b.NodeType);
 				if (NeedEncloseInParen(b.Left))
 				{
-					builder.Append("(");
+					builder.Append('(');
 					ToString(b.Left);
-					builder.Append(")");
+					builder.Append(')');
 				}
 				else
 				{
 					ToString(b.Left);
 				}
-				builder.Append(" ");
+				builder.Append(' ');
 				builder.Append(@operator);
-				builder.Append(" ");
+				builder.Append(' ');
 				if (NeedEncloseInParen(b.Right))
 				{
-					builder.Append("(");
+					builder.Append('(');
 					ToString(b.Right);
-					builder.Append(")");
+					builder.Append(')');
 				}
 				else
 				{
@@ -256,14 +252,14 @@ namespace Moq
 			{
 				if (value is string)
 				{
-					builder.Append("\"").Append(value).Append("\"");
+					builder.Append('"').Append(value).Append('"');
 				}
-				else if (value is IEnumerable enumerable && enumerable.GetEnumerator() != null)
-				{                                        // ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+				else if (value is IEnumerable enumerable && !(value is IMocked))
+				{                                        // ^^^^^^^^^^^^^^^^^^^
 					// This second check ensures that we have a usable implementation of IEnumerable.
 					// If value is a mocked object, its IEnumerable implementation might very well
 					// not work correctly.
-					builder.Append("[");
+					builder.Append('[');
 					bool addComma = false;
 					const int maxCount = 10;
 					int count = 0;
@@ -282,7 +278,7 @@ namespace Moq
 						addComma = true;
 						++count;
 					}
-					builder.Append("]");
+					builder.Append(']');
 				}
 				else if (value.ToString() == value.GetType().ToString())
 				{
@@ -291,7 +287,7 @@ namespace Moq
 				}
 				else if (c.Type.GetTypeInfo().IsEnum)
 				{
-					builder.Append(c.Type.DisplayName(this.getTypeName)).Append(".").Append(value);
+					builder.AppendDisplayName(c.Type, this.useFullName).Append('.').Append(value);
 				}
 				else
 				{
@@ -332,9 +328,9 @@ namespace Moq
 			}
 			else
 			{
-				builder.Append(m.Member.DeclaringType.DisplayName(this.getTypeName));
+				builder.AppendDisplayName(m.Member.DeclaringType, this.useFullName);
 			}
-			builder.Append(".");
+			builder.Append('.');
 			builder.Append(m.Member.Name);
 			return;
 		}
@@ -346,7 +342,7 @@ namespace Moq
 				var paramFrom = 0;
 				var expression = node.Object;
 
-				var hasExtensionAttribute = node.Method.GetCustomAttribute<ExtensionAttribute>() != null;
+				var hasExtensionAttribute = node.Method.IsDefined(typeof(ExtensionAttribute));
 
 				if (hasExtensionAttribute)
 				{
@@ -360,56 +356,68 @@ namespace Moq
 				}
 				else // Method is static
 				{
-					this.builder.Append(this.getTypeName(node.Method.DeclaringType));
+					var nodeMethodDeclaringType = node.Method.DeclaringType;
+					this.builder.Append(this.useFullName ? nodeMethodDeclaringType.FullName : nodeMethodDeclaringType.Name);
 				}
 
 				if (node.Method.IsPropertyIndexerGetter())
 				{
-					this.builder.Append("[");
+					this.builder.Append('[');
 					AsCommaSeparatedValues(node.Arguments.Skip(paramFrom), ToString);
-					this.builder.Append("]");
+					this.builder.Append(']');
 				}
 				else if (node.Method.IsPropertyIndexerSetter())
 				{
-					this.builder.Append("[");
+					this.builder.Append('[');
 					AsCommaSeparatedValues(node.Arguments.Skip(paramFrom), ToString);
 					this.builder.Append("] = ");
 					ToString(node.Arguments.Last());
 				}
 				else if (node.Method.IsPropertyGetter())
 				{
-					this.builder.Append(".").Append(node.Method.Name.Substring(4));
+					this.builder.Append('.').Append(node.Method.Name.Substring(4));
 					if (node.Arguments.Count > paramFrom)
 					{
-						this.builder.Append("[");
+						this.builder.Append('[');
 						AsCommaSeparatedValues(node.Arguments.Skip(paramFrom), ToString);
-						this.builder.Append("]");
+						this.builder.Append(']');
 					}
 				}
 				else if (node.Method.IsPropertySetter())
 				{
-					this.builder.Append(".").Append(node.Method.Name.Substring(4)).Append(" = ");
+					this.builder.Append('.').Append(node.Method.Name.Substring(4)).Append(" = ");
 					ToString(node.Arguments.Last());
 				}
 				else if (node.Method.IsGenericMethod)
 				{
 					this.builder
-						.Append(".")
+						.Append('.')
 						.Append(node.Method.Name)
-						.Append("<")
-						.Append(string.Join(",", node.Method.GetGenericArguments().Select(s => this.getTypeName(s)).ToArray()))
+						.Append('<');
+
+					var nodeMethodGenericArguments = node.Method.GetGenericArguments();
+					for (int i = 0, n = nodeMethodGenericArguments.Length; i < n; ++i)
+					{
+						if (i > 0)
+						{
+							this.builder.Append(", ");
+						}
+						var name = this.builder.Append(this.useFullName ? nodeMethodGenericArguments[i].FullName : nodeMethodGenericArguments[i].Name);
+					}
+
+					this.builder
 						.Append(">(");
 					AsCommaSeparatedValues(node.Arguments.Skip(paramFrom), ToString);
-					this.builder.Append(")");
+					this.builder.Append(')');
 				}
 				else
 				{
 					this.builder
-						.Append(".")
+						.Append('.')
 						.Append(node.Method.Name)
-						.Append("(");
+						.Append('(');
 					AsCommaSeparatedValues(node.Arguments.Skip(paramFrom), ToString);
-					this.builder.Append(")");
+					this.builder.Append(')');
 				}
 			}
 		}
@@ -472,9 +480,9 @@ namespace Moq
 			}
 			else
 			{
-				builder.Append("(");
+				builder.Append('(');
 				AsCommaSeparatedValues(lambda.Parameters, ToStringParameter);
-				builder.Append(")");
+				builder.Append(')');
 			}
 			builder.Append(" => ");
 			ToString(lambda.Body);
@@ -485,10 +493,10 @@ namespace Moq
 		{
 			Type type = (nex.Constructor == null) ? nex.Type : nex.Constructor.DeclaringType;
 			builder.Append("new ");
-			builder.Append(type.DisplayName(this.getTypeName));
-			builder.Append("(");
+			builder.AppendDisplayName(type, this.useFullName);
+			builder.Append('(');
 			AsCommaSeparatedValues(nex.Arguments, ToString);
-			builder.Append(")");
+			builder.Append(')');
 			return;
 		}
 
@@ -530,10 +538,10 @@ namespace Moq
 					return;
 				case ExpressionType.NewArrayBounds:
 					builder.Append("new ");
-					builder.Append(na.Type.GetElementType().DisplayName(this.getTypeName));
-					builder.Append("[");
+					builder.AppendDisplayName(na.Type.GetElementType(), this.useFullName);
+					builder.Append('[');
 					AsCommaSeparatedValues(na.Expressions, ToString);
-					builder.Append("]");
+					builder.Append(']');
 					return;
 			}
 		}
@@ -629,46 +637,39 @@ namespace Moq
 		}
 	}
 
-	internal static class StringExtensions
+	internal static class StringBuilderExtensions
 	{
-		public static string AsCommaSeparatedValues(this IEnumerable<string> source)
+		public static StringBuilder AppendDisplayName(this StringBuilder builder, Type source, bool useFullName)
 		{
-			if (source == null)
-			{
-				return string.Empty;
-			}
-			var result = new StringBuilder(100);
-			bool appendComma = false;
-			foreach (var value in source)
-			{
-				if (appendComma)
-				{
-					result.Append(", ");
-				}
-				result.Append(value);
-				appendComma = true;
-			}
-			return result.ToString();
-		}
-	}
+			Debug.Assert(source != null);
 
-	internal static class TypeExtensions
-	{
-		public static string DisplayName(this Type source, Func<Type, string> getName)
-		{
-			if (source == null)
+			var name = useFullName ? source.FullName : source.Name;
+			var backtickIndex = name.IndexOf('`');
+			if (backtickIndex >= 0)
 			{
-				throw new ArgumentNullException("source");
+				builder.Append(name, 0, backtickIndex);
 			}
-			var builder = new StringBuilder(100);
-			builder.Append(getName(source).Split('`').First());
+			else
+			{
+				builder.Append(name);
+			}
+
 			if (source.GetTypeInfo().IsGenericType)
 			{
-				builder.Append("<");
-				builder.Append(source.GetGenericArguments().Select(t => getName(t)).AsCommaSeparatedValues());
-				builder.Append(">");
+				var genericArguments = source.GetGenericArguments();
+				builder.Append('<');
+				for (int i = 0, n = genericArguments.Length; i < n; ++i)
+				{
+					if (i > 0)
+					{
+						builder.Append(", ");
+					}
+					builder.Append(useFullName ? genericArguments[i].FullName : genericArguments[i].Name);
+				}
+				builder.Append('>');
 			}
-			return builder.ToString();
+
+			return builder;
 		}
 	}
 }

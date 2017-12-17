@@ -68,17 +68,16 @@ namespace Moq.Matchers
 	internal class MatcherAttributeMatcher : IMatcher
 	{
 		private MethodInfo validatorMethod;
-		private Expression matcherExpression;
+		private MethodCallExpression expression;
 
-		public void Initialize(Expression matchExpression)
+		public MatcherAttributeMatcher(MethodCallExpression expression)
 		{
-			this.validatorMethod = ResolveValidatorMethod(matchExpression);
-			this.matcherExpression = matchExpression;
+			this.validatorMethod = ResolveValidatorMethod(expression);
+			this.expression = expression;
 		}
 
-		private static MethodInfo ResolveValidatorMethod(Expression expression)
+		private static MethodInfo ResolveValidatorMethod(MethodCallExpression call)
 		{
-			var call = (MethodCallExpression)expression;
 			var expectedParametersTypes = new[] { call.Method.ReturnType }.Concat(call.Method.GetParameters().Select(p => p.ParameterType)).ToArray();
 
 			MethodInfo method = null;
@@ -89,9 +88,8 @@ namespace Moq.Matchers
 				// passing generic type arguments for the query.
 				var genericArgs = call.Method.GetGenericArguments();
 
-				method = call.Method.DeclaringType.GetMethods()
+				method = call.Method.DeclaringType.GetMethods(call.Method.Name)
 					.Where(m =>
-						m.Name == call.Method.Name &&
 						m.IsGenericMethodDefinition &&
 						m.GetGenericArguments().Length ==
 							call.Method.GetGenericMethodDefinition().GetGenericArguments().Length &&
@@ -121,11 +119,10 @@ namespace Moq.Matchers
 		public bool Matches(object value)
 		{
 			// use matcher Expression to get extra arguments
-			MethodCallExpression call = (MethodCallExpression)matcherExpression;
-			var extraArgs = call.Arguments.Select(ae => ((ConstantExpression)ae.PartialEval()).Value);
+			var extraArgs = this.expression.Arguments.Select(ae => ((ConstantExpression)ae.PartialEval()).Value);
 			var args = new[] { value }.Concat(extraArgs).ToArray();
 			// for static and non-static method
-			var instance = call.Object == null ? null : (call.Object.PartialEval() as ConstantExpression).Value;
+			var instance = this.expression.Object == null ? null : (this.expression.Object.PartialEval() as ConstantExpression).Value;
 			return (bool)validatorMethod.Invoke(instance, args);
 		}
 	}

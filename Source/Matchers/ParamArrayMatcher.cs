@@ -46,13 +46,19 @@ namespace Moq.Matchers
 {
 	internal class ParamArrayMatcher : IMatcher
 	{
-		private NewArrayExpression arrayInitExpression;
 		private IMatcher[] matchers;
 
-		internal ParamArrayMatcher(NewArrayExpression matcherExpression)
+		public ParamArrayMatcher(NewArrayExpression expression)
 		{
-			this.arrayInitExpression = matcherExpression;
-			this.Initialize();
+			if (expression != null)
+			{
+				this.matchers = expression.Expressions
+					.Select(e => MatcherFactory.CreateMatcher(e, false)).ToArray();
+			}
+			else
+			{
+				this.matchers = new IMatcher[0];
+			}
 		}
 
 		public bool Matches(object value)
@@ -72,25 +78,6 @@ namespace Moq.Matchers
 			}
 
 			return true;
-		}
-
-		void IMatcher.Initialize(Expression matcherExpression)
-		{
-			this.arrayInitExpression = matcherExpression as NewArrayExpression;
-			this.Initialize();
-		}
-
-		private void Initialize()
-		{
-			if (this.arrayInitExpression != null)
-			{
-				this.matchers = this.arrayInitExpression.Expressions
-					.Select(e => MatcherFactory.CreateMatcher(e, false)).ToArray();
-			}
-			else
-			{
-				this.matchers = new IMatcher[0];
-			}
 		}
 	}
 }

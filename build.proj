@@ -22,16 +22,12 @@
 		<MSBuild Projects="@(Solution)" Properties="$(CommonBuildProperties)" Targets="Clean" />
 		<Exec Command="rmdir $(Out) /S /Q" ContinueOnError="true" />
 		<Exec Command="rmdir $(PackagesPath) /S /Q" ContinueOnError="true" />
-		<Exec Command="rmdir src\packages /S /Q" ContinueOnError="true" />
 	</Target>
 
 	<Target Name="Rebuild" DependsOnTargets="Clean;Build" />
 	
 	<Target Name="Build" DependsOnTargets="GitVersion">
 		<MSBuild Projects="@(Solution)" Properties="$(CommonBuildProperties)" />
-
-		<Exec Command="xcopy &quot;Source\bin\$(Configuration)\net45\Moq.*&quot; &quot;$(DropDirectory)lib\net45\&quot; /Y" ContinueOnError="false" />
-		<Exec Command="xcopy &quot;Source\bin\$(Configuration)\netstandard1.3\Moq.*&quot; &quot;$(DropDirectory)lib\netstandard1.3\&quot; /Y" ContinueOnError="false" />
 	</Target>
 
 	<Target Name="Test" DependsOnTargets="Build">
@@ -47,7 +43,11 @@
 		<MakeDir Directories="$(Out)" Condition=" !Exists('$(Out)') " />
 
 		<Exec Command="dotnet xunit -nobuild -configuration $(Configuration) -noshadow -appveyor -html ..\$(Out)\test.html -xml ..\$(Out)\test.xml"
-		      WorkingDirectory="UnitTests"
+		      WorkingDirectory="Moq.Tests"
+			  ContinueOnError="false" />
+
+		<Exec Command="dotnet xunit -nobuild -configuration $(Configuration) -noshadow -appveyor -html ..\$(Out)\test-vb.html -xml ..\$(Out)\test-vb.xml"
+		      WorkingDirectory="Moq.Tests.VisualBasic"
 			  ContinueOnError="false" />
 
 		<PropertyGroup>
@@ -96,7 +96,7 @@
 		<PendingRestore Condition=" !Exists('$(GitInfoTargets)') ">true</PendingRestore>
 	</PropertyGroup>
 
-	<Target Name="GitVersion" /><!-- Gets overriden by the $(GitInfoTargets) if it exists -->
+	<Target Name="GitVersion" /><!-- Gets overridden by the $(GitInfoTargets) if it exists -->
 	<Import Project="$(GitInfoTargets)" Condition=" Exists('$(GitInfoTargets)') " />
 
 	<Target Name="Configure" DependsOnTargets="_GetNuGet;GitInfoReport">

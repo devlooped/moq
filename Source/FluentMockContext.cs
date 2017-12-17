@@ -41,7 +41,6 @@
 using System;
 using System.Collections.Generic;
 using System.Linq;
-using Moq.Proxy;
 
 namespace Moq
 {
@@ -76,7 +75,7 @@ namespace Moq
 			current = this;
 		}
 
-		public void Add(Mock mock, ICallContext invocation)
+		public void Add(Mock mock, Invocation invocation)
 		{
 			invocations.Add(new MockInvocation(mock, invocation, LastMatch));
 		}
@@ -101,27 +100,28 @@ namespace Moq
 
 		internal class MockInvocation : IDisposable
 		{
-			private DefaultValue defaultValue;
+			private DefaultValueProvider defaultValueProvider;
 
-			public MockInvocation(Mock mock, ICallContext invocation, Match matcher)
+			public MockInvocation(Mock mock, Invocation invocation, Match matcher)
 			{
 				this.Mock = mock;
 				this.Invocation = invocation;
 				this.Match = matcher;
-				defaultValue = mock.DefaultValue;
+				this.defaultValueProvider = mock.DefaultValueProvider;
+
 				// Temporarily set mock default value to Mock so that recursion works.
 				mock.DefaultValue = DefaultValue.Mock;
 			}
 
 			public Mock Mock { get; private set; }
 
-			public ICallContext Invocation { get; private set; }
+			public Invocation Invocation { get; private set; }
 
 			public Match Match { get; private set; }
 
 			public void Dispose()
 			{
-				Mock.DefaultValue = defaultValue;
+				this.Mock.DefaultValueProvider = this.defaultValueProvider;
 			}
 		}
 	}
