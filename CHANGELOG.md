@@ -5,7 +5,18 @@ All notable changes to this project will be documented in this file.
 The format is loosely based on [Keep a Changelog](http://keepachangelog.com/en/1.0.0/).
 
 
-## Unreleased
+## 4.8.0 (2017-12-24)
+
+Same as 4.8.0-rc1 (see below), plus some significant speed improvements.
+
+#### Changed
+
+* `SetupAllProperties` now fully supports property type recursion / loops in the object graph, thanks to deferred property initialization (@stakx, #550)
+
+
+## 4.8.0-rc1 (2017-12-08)
+
+This is a pre-release version.
 
 #### Added
 
@@ -26,7 +37,6 @@ The format is loosely based on [Keep a Changelog](http://keepachangelog.com/en/1
 
 * **Breaking change:** `SetupSequence` now overrides pre-existing setups like all other `Setup` methods do. This means that exhausted sequences no longer fall back to previous setups to produce a "default" action or return value. (@stakx, #476)
 * Delegates passed to `Returns` are validated a little more strictly than before (return type and parameter count must match with method being set up) (@stakx, #520)
-* `SetupAllProperties` now fully supports property type recursion / loops in the object graph, thanks to deferred property initialization (@stakx, #550).
 * Change assembly versioning scheme to `major.minor.0.0` to help prevent assembly version conflicts and to reduce the need for binding redirects (@stakx, #554)
 
 #### Fixed
