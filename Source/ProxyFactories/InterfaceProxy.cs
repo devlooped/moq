@@ -46,8 +46,10 @@ namespace Moq.Internals
 {
 	/// <summary>Do not use. (Moq requires this class so that <see langword="object"/> methods can be set up on interface mocks.)</summary>
 	// NOTE: This type is actually specific to our DynamicProxy implementation of `ProxyFactory`.
-	// It is public because it needs to be visible to the framework's types in `Reflection.Emit`.
-	// Not sure what `[assembly: InternalsVisibleTo(<some framework assembly>)]` would have to look like.
+	// This type needs to be accessible to the generated interface proxy types because they will inherit from it. If user code
+	// is not strong-named, then DynamicProxy will put at least some generated types inside a weak-named assembly. Strong-named
+	// assemblies such as Moq's cannot reference weak-named assemblies, so we cannot use `[assembly: InternalsVisibleTo]`
+	// to make this type accessible. Therefore we need to declare it as public.
 	[EditorBrowsable(EditorBrowsableState.Never)]
 	public abstract class InterfaceProxy
 	{
