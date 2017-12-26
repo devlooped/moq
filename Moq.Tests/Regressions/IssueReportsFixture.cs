@@ -1748,6 +1748,34 @@ namespace Moq.Tests.Regressions
 
 		#endregion
 
+		#region 557
+
+		public sealed class Issue557
+		{
+			[Fact]
+			public void CallBase_works_when_called_on_AsInterface_mock()
+			{
+				var mock = new Mock<MyClass>().As<IMyClass>();
+				mock.CallBase = true;
+				Assert.NotNull(mock.Object.DoSomething());
+			}
+
+			public interface IMyClass
+			{
+				object DoSomething();
+			}
+
+			public class MyClass : IMyClass
+			{
+				public object DoSomething()
+				{
+					return new object();
+				}
+			}
+		}
+
+		#endregion
+
 		// Old @ Google Code
 
 		#region #47
