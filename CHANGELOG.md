@@ -5,6 +5,13 @@ All notable changes to this project will be documented in this file.
 The format is loosely based on [Keep a Changelog](http://keepachangelog.com/en/1.0.0/).
 
 
+## Unreleased
+
+#### Fixed
+
+* `CallBase` regression with explicitly implemented interface methods (@stakx, #558)
+
+
 ## 4.8.0 (2017-12-24)
 
 Same as 4.8.0-rc1 (see below), plus some significant speed improvements.

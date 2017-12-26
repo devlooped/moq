@@ -329,11 +329,45 @@ namespace Moq
 
 			var method = invocation.Method;
 
-			if (mock.CallBase && !method.IsAbstract)
+			if (mock.CallBase)
 			{
-				invocation.ReturnBase();
+				var declaringType = method.DeclaringType;
+				if (declaringType.GetTypeInfo().IsInterface)
+				{
+					if (mock.TargetType.GetTypeInfo().IsInterface)
+					{
+						// Case 1: Interface method of an interface proxy.
+						// There is no base method to call, so fall through.
+					}
+					else
+					{
+						Debug.Assert(mock.TargetType.GetTypeInfo().IsClass);
+						Debug.Assert(mock.ImplementsInterface(declaringType));
+
+						// Case 2: Explicitly implemented interface method of a class proxy.
+						// Only call base method if it isn't an event accessor.
+						if (!method.LooksLikeEventAttach() && !method.LooksLikeEventDetach())
+						{
+							invocation.ReturnBase();
+							return InterceptionAction.Stop;
+						}
+					}
+				}
+				else
+				{
+					Debug.Assert(declaringType.GetTypeInfo().IsClass);
+
+					// Case 3: Non-interface method of a class proxy.
+					// Only call base method if it isn't abstract.
+					if (!method.IsAbstract)
+					{
+						invocation.ReturnBase();
+						return InterceptionAction.Stop;
+					}
+				}
 			}
-			else if (method.ReturnType == typeof(void))
+
+			if (method.ReturnType == typeof(void))
 			{
 				invocation.Return();
 			}
