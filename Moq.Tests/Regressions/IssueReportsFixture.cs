@@ -3,6 +3,7 @@ using System.Collections;
 using System.Collections.Generic;
 #if DESKTOP
 using System.Data.Entity;
+using System.Data.Entity.Core.EntityClient;
 #endif
 using System.ComponentModel;
 using System.IO;
@@ -1745,6 +1746,39 @@ namespace Moq.Tests.Regressions
 				} while (result != default(int));
 			}
 		}
+
+		#endregion
+
+
+		#region 526
+
+		#if DESKTOP
+		public sealed class Issue526
+		{
+			[Fact]
+			public void Given_EntityConnection_mock_created_with_new_Mock_SetupGet_can_setup_ConnectionString_property()
+			{
+				var mockConnection = new Mock<EntityConnection>();
+				var connection = mockConnection.Object;
+
+				mockConnection.SetupGet(c => c.ConnectionString).Returns("_");
+
+
+				Assert.Equal("_", connection.ConnectionString);
+			}
+
+			[Fact]
+			public void Given_EntityConnection_mock_created_with_Mock_Of_SetupGet_can_setup_ConnectionString_property()
+			{
+				var connection = Mock.Of<EntityConnection>();
+				var mockConnection = Mock.Get(connection);
+
+				mockConnection.SetupGet(c => c.ConnectionString).Returns("_");
+
+				Assert.Equal("_", connection.ConnectionString);
+			}
+		}
+		#endif
 
 		#endregion
 
