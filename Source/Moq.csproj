@@ -32,6 +32,7 @@
 		<PackageReference Include="IFluentInterface" Version="2.0.0" />
 		<PackageReference Include="SourceLink.Create.CommandLine" Version="2.2.1" PrivateAssets="All" />
 		<PackageReference Include="System.Threading.Tasks.Extensions" Version="4.4.0" />
+		<PackageReference Include="System.ValueTuple" Version="4.3.0" />
 		<DotNetCliToolReference Include="dotnet-sourcelink" Version="2.2.1" />
 	</ItemGroup>
 	<ItemGroup Condition=" '$(TargetFramework)' == 'net45' ">
