@@ -430,7 +430,7 @@ namespace Moq
 		protected IVerifies RaisesImpl<TMock>(Action<TMock> eventExpression, Delegate func)
 			where TMock : class
 		{
-			var ev = eventExpression.GetEvent((TMock)mock.Object).MemberInfo;
+			var (ev, _) = eventExpression.GetEventWithTarget((TMock)mock.Object);
 			if (ev != null)
 			{
 				this.raiseEventResponse = new RaiseEventResponse(this.mock, ev, func, null);
@@ -446,7 +446,7 @@ namespace Moq
 		protected IVerifies RaisesImpl<TMock>(Action<TMock> eventExpression, params object[] args)
 			where TMock : class
 		{
-			var ev = eventExpression.GetEvent((TMock)mock.Object).MemberInfo;
+			var (ev, _) = eventExpression.GetEventWithTarget((TMock)mock.Object);
 			if (ev != null)
 			{
 				this.raiseEventResponse = new RaiseEventResponse(this.mock, ev, null, args);

@@ -617,11 +617,11 @@ namespace Moq
 		[SuppressMessage("Microsoft.Usage", "CA2200:RethrowToPreserveStackDetails", Justification = "We want to reset the stack trace to avoid Moq noise in it.")]
 		public void Raise(Action<T> eventExpression, EventArgs args)
 		{
-			var ev = eventExpression.GetEvent(this.Object);
+			var (ev, target) = eventExpression.GetEventWithTarget(this.Object);
 
 			try
 			{
-				ev.Target.DoRaise(ev.MemberInfo, args);
+				target.DoRaise(ev, args);
 			}
 			catch (Exception e)
 			{
@@ -635,11 +635,11 @@ namespace Moq
 		[SuppressMessage("Microsoft.Usage", "CA2200:RethrowToPreserveStackDetails", Justification = "We want to reset the stack trace to avoid Moq noise in it.")]
 		public void Raise(Action<T> eventExpression, params object[] args)
 		{
-			var ev = eventExpression.GetEvent(this.Object);
+			var (ev, target) = eventExpression.GetEventWithTarget(this.Object);
 
 			try
 			{
-				ev.Target.DoRaise(ev.MemberInfo, args);
+				target.DoRaise(ev, args);
 			}
 			catch (Exception e)
 			{
