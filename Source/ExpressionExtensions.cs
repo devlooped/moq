@@ -208,7 +208,7 @@ namespace Moq
 		/// around either a <see cref="MethodCallExpression" /> (for a normal method call)
 		/// or a <see cref="InvocationExpression" /> (for a delegate invocation).
 		/// </summary>
-		internal static CallInfo GetCallInfo(this LambdaExpression expression, Mock mock)
+		internal static (Expression Object, MethodInfo Method, Expression[] Arguments) GetCallInfo(this LambdaExpression expression, Mock mock)
 		{
 			Guard.NotNull(expression, nameof(expression));
 
@@ -220,28 +220,11 @@ namespace Moq
 				// delegate interface proxy, so we need to map instead to the
 				// method on that interface, which is the property we've just tested for.
 				var invocation = (InvocationExpression)expression.Body;
-				return new CallInfo
-				{
-					Method = mock.DelegateInterfaceMethod,
-					Arguments = invocation.Arguments,
-					Object = invocation.Expression
-				};
+				return (Object: invocation.Expression, Method: mock.DelegateInterfaceMethod, Arguments: invocation.Arguments.ToArray());
 			}
 
 			var methodCall = expression.ToMethodCall();
-			return new CallInfo
-			{
-				Method = methodCall.Method,
-				Arguments = methodCall.Arguments,
-				Object = methodCall.Object
-			};
-		}
-
-		internal class CallInfo
-		{
-			public Expression Object { get; set; }
-			public MethodInfo Method { get; set; }
-			public IEnumerable<Expression> Arguments { get; set; }
+			return (Object: methodCall.Object, Method: methodCall.Method, Arguments: methodCall.Arguments.ToArray());
 		}
 	}
 }
