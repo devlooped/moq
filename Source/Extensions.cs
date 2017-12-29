@@ -39,13 +39,11 @@
 // http://www.opensource.org/licenses/bsd-license.php]
 
 using System;
-using System.Collections;
 using System.Collections.Generic;
 using System.Globalization;
 using System.Linq;
 using System.Linq.Expressions;
 using System.Reflection;
-using System.Runtime.CompilerServices;
 using System.Runtime.ExceptionServices;
 
 using Moq.Properties;
@@ -54,31 +52,6 @@ namespace Moq
 {
 	internal static class Extensions
 	{
-		public static string GetValue(object value)
-		{
-			if (value == null)
-			{
-				return "null";
-			}
-
-			var typedValue = value as string;
-			if (typedValue != null)
-			{
-				return "\"" + typedValue + "\"";
-			}
-			if (value is IEnumerable enumerable && !(value is IMocked))
-			{                                   // ^^^^^^^^^^^^^^^^^^^
-				// This second check ensures that we have a usable implementation of IEnumerable.
-				// If value is a mocked object, its IEnumerable implementation might very well
-				// not work correctly.
-				const int maxCount = 10;
-				var objs = enumerable.Cast<object>().Take(maxCount + 1);
-				var more = objs.Count() > maxCount ? ", ..." : string.Empty;
-				return "[" + string.Join(", ", objs.Take(maxCount).Select(GetValue)) + more + "]";
-			}
-			return value.ToString();
-		}
-
 		public static object InvokePreserveStack(this Delegate del, params object[] args)
 		{
 			try
@@ -92,18 +65,42 @@ namespace Moq
 			}
 		}
 
+		public static bool IsPropertyGetter(this MethodInfo method)
+		{
+			return method.Name.StartsWith("get_", StringComparison.Ordinal);
+		}
+
+		public static bool IsPropertyIndexerGetter(this MethodInfo method)
+		{
+			return method.Name.StartsWith("get_Item", StringComparison.Ordinal);
+		}
+
+		public static bool IsPropertyIndexerSetter(this MethodInfo method)
+		{
+			return method.Name.StartsWith("set_Item", StringComparison.Ordinal);
+		}
+
+		public static bool IsPropertySetter(this MethodInfo method)
+		{
+			return method.Name.StartsWith("set_", StringComparison.Ordinal);
+		}
+
+		public static bool LooksLikeEventAttach(this MethodInfo method)
+		{
+			return method.Name.StartsWith("add_", StringComparison.Ordinal);
+		}
+
+		public static bool LooksLikeEventDetach(this MethodInfo method)
+		{
+			return method.Name.StartsWith("remove_", StringComparison.Ordinal);
+		}
+
 		/// <summary>
 		/// Tests if a type is a delegate type (subclasses <see cref="Delegate" />).
 		/// </summary>
 		public static bool IsDelegate(this Type t)
 		{
 			return t.GetTypeInfo().IsSubclassOf(typeof(Delegate));
-		}
-
-		public static void ThrowIfNotMockeable(this Type typeToMock)
-		{
-			if (!IsMockeable(typeToMock))
-				throw new NotSupportedException(Properties.Resources.InvalidMockClass);
 		}
 
 		public static void ThrowIfNotMockeable(this MemberExpression memberAccess)
@@ -113,24 +110,6 @@ namespace Moq
 					CultureInfo.CurrentCulture,
 					Resources.FieldsNotSupported,
 					memberAccess.ToStringFixed()));
-		}
-
-		public static void ThrowIfNoGetter(this PropertyInfo property)
-		{
-			if (property.GetGetMethod(true) == null)
-				throw new ArgumentException(string.Format(
-					CultureInfo.CurrentCulture,
-					Resources.PropertyGetNotFound,
-					property.DeclaringType.Name, property.Name));
-		}
-
-		public static void ThrowIfNoSetter(this PropertyInfo property)
-		{
-			if (property.GetSetMethod(true) == null)
-				throw new ArgumentException(string.Format(
-					CultureInfo.CurrentCulture,
-					Resources.PropertySetNotFound,
-					property.DeclaringType.Name, property.Name));
 		}
 
 		public static bool IsMockeable(this Type typeToMock)
@@ -195,55 +174,45 @@ namespace Moq
 			{
 				throw new ArgumentException(string.Format(
 					CultureInfo.CurrentCulture,
-					Resources.EventNofFound,
+					Resources.EventNotFound,
 					addRemove));
 			}
 
 			return new MemberInfoWithTarget<EventInfo, Mock>(ev, target);
 		}
 
-#if !NETCORE
-		public static TAttribute GetCustomAttribute<TAttribute>(this ICustomAttributeProvider source, bool inherit)
-			where TAttribute : Attribute
-		{
-			object[] attrs = source.GetCustomAttributes(typeof(TAttribute), inherit);
-
-			if (attrs.Length == 0)
-			{
-				return default(TAttribute);
-			}
-			else
-			{
-				return (TAttribute)attrs[0];
-			}
-		}
-#endif
-
 		public static IEnumerable<MethodInfo> GetMethods(this Type type, string name)
 		{
 			return type.GetMember(name).OfType<MethodInfo>();
 		}
 
+		public static bool HasSameParameterTypesAs(this MethodInfo method, MethodInfo other)
+		{
+			return Enumerable.SequenceEqual(
+				method.GetParameters().Select(p => p.ParameterType),
+				other.GetParameters().Select(p => p.ParameterType));
+		}
+
 		public static bool HasCompatibleParameterTypes(this MethodInfo method, Type[] paramTypes, bool exactParameterMatch)
 		{
-			var types = method.GetParameterTypes().ToArray();
-			if (types.Length != paramTypes.Length)
+			var parameters = method.GetParameters();
+			if (parameters.Length != paramTypes.Length)
 			{
 				return false;
 			}
 
-			for (int i = 0; i < types.Length; i++)
+			for (int i = 0; i < parameters.Length; i++)
 			{
 				var parameterType = paramTypes[i];
 				if (parameterType == typeof(object))
 				{
 					continue;
 				}
-				else if (exactParameterMatch && types[i] != parameterType)
+				else if (exactParameterMatch && parameters[i].ParameterType != parameterType)
 				{
 					return false;
 				}
-				else if (!types[i].IsAssignableFrom(parameterType))
+				else if (!parameters[i].ParameterType.IsAssignableFrom(parameterType))
 				{
 					return false;
 				}
@@ -308,14 +277,6 @@ namespace Moq
 			{
 				return null;
 			}
-		}
-
-		public static bool IsExtensionMethod(this MethodInfo method)
-		{
-			return method.IsStatic && method.IsDefined(typeof(ExtensionAttribute));
-			// The above check is perhaps "good enough for now", but admittedly incomplete:
-			// We should also check whether the method is defined in a non-nested static
-			// class, and whether it has at least one parameter.
 		}
 
 		/// <summary>

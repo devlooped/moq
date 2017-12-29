@@ -114,7 +114,7 @@ namespace Moq.Protected
 			var property = GetProperty(propertyName);
 			ThrowIfMemberMissing(propertyName, property);
 			ThrowIfPublicGetter(property, typeof(T).Name);
-			property.ThrowIfNoGetter();
+			Guard.CanRead(property);
 
 			return Mock.SetupGet(mock, GetMemberAccess<TProperty>(property), null);
 		}
@@ -126,7 +126,7 @@ namespace Moq.Protected
 			var property = GetProperty(propertyName);
 			ThrowIfMemberMissing(propertyName, property);
 			ThrowIfPublicSetter(property, typeof(T).Name);
-			property.ThrowIfNoSetter();
+			Guard.CanWrite(property);
 
 			return Mock.SetupSet<T, TProperty>(mock, GetSetterExpression(property, ItExpr.IsAny<TProperty>()), null);
 		}
@@ -215,7 +215,7 @@ namespace Moq.Protected
 			var property = GetProperty(propertyName);
 			ThrowIfMemberMissing(propertyName, property);
 			ThrowIfPublicGetter(property, typeof(T).Name);
-			property.ThrowIfNoGetter();
+			Guard.CanRead(property);
 
 			// TODO should consider property indexers
 			Mock.VerifyGet(mock, GetMemberAccess<TProperty>(property), times, null);
@@ -229,7 +229,7 @@ namespace Moq.Protected
 			var property = GetProperty(propertyName);
 			ThrowIfMemberMissing(propertyName, property);
 			ThrowIfPublicSetter(property, typeof(T).Name);
-			property.ThrowIfNoSetter();
+			Guard.CanWrite(property);
 
 			// TODO should consider property indexers
 			// TODO should receive the parameter here

@@ -136,5 +136,43 @@ namespace Moq
 					targetType), paramName);
 			}
 		}
+
+		public static void Mockable(Type type)
+		{
+			if (!type.IsMockeable())
+			{
+				throw new NotSupportedException(Resources.InvalidMockClass);
+			}
+		}
+
+		public static void Positive(TimeSpan delay)
+		{
+			if (delay <= TimeSpan.Zero)
+			{
+				throw new ArgumentException(Resources.DelaysMustBeGreaterThanZero);
+			}
+		}
+
+		public static void CanRead(PropertyInfo property)
+		{
+			if (property.GetGetMethod(true) == null)
+			{
+				throw new ArgumentException(string.Format(
+					CultureInfo.CurrentCulture,
+					Resources.PropertyGetNotFound,
+					property.DeclaringType.Name, property.Name));
+			}
+		}
+
+		public static void CanWrite(PropertyInfo property)
+		{
+			if (property.GetSetMethod(true) == null)
+			{
+				throw new ArgumentException(string.Format(
+					CultureInfo.CurrentCulture,
+					Resources.PropertySetNotFound,
+					property.DeclaringType.Name, property.Name));
+			}
+		}
 	}
 }

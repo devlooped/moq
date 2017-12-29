@@ -38,8 +38,8 @@
 //[This is the BSD license, see
 // http://www.opensource.org/licenses/bsd-license.php]
 
+using System.Collections;
 using System.Diagnostics;
-using System.Linq;
 using System.Reflection;
 using System.Text;
 
@@ -136,28 +136,11 @@ namespace Moq
 			{
 				builder.Append(method.Name, 4, method.Name.Length - 4);
 				builder.Append(" = ");
-				builder.Append(Extensions.GetValue(this.Arguments.First()));
+				builder.AppendValueOf(this.Arguments[0]);
 			}
 			else
 			{
-				builder.Append(method.Name);
-
-				// append generic argument list:
-				if (method.IsGenericMethod)
-				{
-					builder.Append('<');
-					var genericArguments = method.GetGenericArguments();
-					for (int i = 0, n = genericArguments.Length; i < n; ++i)
-					{
-						if (i > 0)
-						{
-							builder.Append(", ");
-						}
-						builder.Append(genericArguments[i].Name);
-					}
-
-					builder.Append('>');
-				}
+				builder.AppendNameOf(method, includeGenericArgumentList: true);
 
 				// append argument list:
 				builder.Append('(');
@@ -167,7 +150,7 @@ namespace Moq
 					{
 						builder.Append(", ");
 					}
-					builder.Append(Extensions.GetValue(this.Arguments[i]));
+					builder.AppendValueOf(this.Arguments[i]);
 				}
 
 				builder.Append(')');

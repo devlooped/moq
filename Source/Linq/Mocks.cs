@@ -178,7 +178,7 @@ namespace Moq
 		{
 			Guard.NotNull(mock, nameof(mock));
 			Guard.NotNull(setup, nameof(setup));
-			typeof(TResult).ThrowIfNotMockeable();
+			Guard.Mockable(typeof(TResult));
 
 			MethodInfo info;
 			if (setup.Body.NodeType == ExpressionType.MemberAccess)
@@ -197,7 +197,7 @@ namespace Moq
 				throw new NotSupportedException(string.Format(Resources.UnsupportedExpression, setup.ToStringFixed()));
 			}
 
-			info.ReturnType.ThrowIfNotMockeable();
+			Guard.Mockable(info.ReturnType);
 
 			Mock fluentMock;
 			MockWithWrappedMockObject innerMock;

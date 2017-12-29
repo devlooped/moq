@@ -75,25 +75,9 @@ namespace Moq.Tests
 		}
 
 		[Fact]
-		public void IsPropertyExpressionTrue()
+		public void IsPropertyIndexerLambdaTrue()
 		{
-			var expr = ToExpression<IFoo, int>(f => f.Value).ToLambda().Body;
-
-			Assert.True(expr.IsProperty());
-		}
-
-		[Fact]
-		public void IsPropertyExpressionFalse()
-		{
-			var expr = ToExpression<IFoo>(f => f.Do()).ToLambda().Body;
-
-			Assert.False(expr.IsProperty());
-		}
-
-		[Fact]
-		public void IsPropertyIndexerExpressionTrue()
-		{
-			var expr = ToExpression<IFoo, object>(f => f[5]).ToLambda().Body;
+			var expr = ToExpression<IFoo, object>(f => f[5]).ToLambda();
 
 			Assert.True(expr.IsPropertyIndexer());
 		}

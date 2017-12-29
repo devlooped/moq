@@ -144,9 +144,9 @@ namespace Moq.Properties {
 		/// <summary>
 		///   Looks up a localized string similar to Could not locate event for attach or detach method {0}..
 		/// </summary>
-		internal static string EventNofFound {
+		internal static string EventNotFound {
 			get {
-				return ResourceManager.GetString("EventNofFound", resourceCulture);
+				return ResourceManager.GetString("EventNotFound", resourceCulture);
 			}
 		}
 		
@@ -481,15 +481,6 @@ namespace Moq.Properties {
 		}
 		
 		/// <summary>
-		///   Looks up a localized string similar to Property {0}.{1} does not exist..
-		/// </summary>
-		internal static string PropertyMissing {
-			get {
-				return ResourceManager.GetString("PropertyMissing", resourceCulture);
-			}
-		}
-		
-		/// <summary>
 		///   Looks up a localized string similar to Property {0}.{1} is write-only..
 		/// </summary>
 		internal static string PropertyNotReadable {
@@ -549,24 +540,6 @@ namespace Moq.Properties {
 		internal static string ReturnValueRequired {
 			get {
 				return ResourceManager.GetString("ReturnValueRequired", resourceCulture);
-			}
-		}
-		
-		/// <summary>
-		///   Looks up a localized string similar to A lambda expression is expected as the argument to It.Is&lt;T&gt;..
-		/// </summary>
-		internal static string SetupLambda {
-			get {
-				return ResourceManager.GetString("SetupLambda", resourceCulture);
-			}
-		}
-		
-		/// <summary>
-		///   Looks up a localized string similar to Invocation {0} should not have been made..
-		/// </summary>
-		internal static string SetupNever {
-			get {
-				return ResourceManager.GetString("SetupNever", resourceCulture);
 			}
 		}
 		
@@ -692,47 +665,11 @@ namespace Moq.Properties {
 		}
 		
 		/// <summary>
-		///   Looks up a localized string similar to Only property accesses are supported in intermediate invocations on a setup. Unsupported expression {0}..
-		/// </summary>
-		internal static string UnsupportedIntermediateExpression {
-			get {
-				return ResourceManager.GetString("UnsupportedIntermediateExpression", resourceCulture);
-			}
-		}
-		
-		/// <summary>
-		///   Looks up a localized string similar to Expression contains intermediate property access {0}.{1} which is of type {2} and cannot be mocked. Unsupported expression {3}..
-		/// </summary>
-		internal static string UnsupportedIntermediateType {
-			get {
-				return ResourceManager.GetString("UnsupportedIntermediateType", resourceCulture);
-			}
-		}
-		
-		/// <summary>
-		///   Looks up a localized string similar to Setter expression cannot use argument matchers that receive parameters..
-		/// </summary>
-		internal static string UnsupportedMatcherParamsForSetter {
-			get {
-				return ResourceManager.GetString("UnsupportedMatcherParamsForSetter", resourceCulture);
-			}
-		}
-		
-		/// <summary>
 		///   Looks up a localized string similar to Member {0} is not supported for protected mocking..
 		/// </summary>
 		internal static string UnsupportedMember {
 			get {
 				return ResourceManager.GetString("UnsupportedMember", resourceCulture);
-			}
-		}
-		
-		/// <summary>
-		///   Looks up a localized string similar to Setter expression can only use static custom matchers..
-		/// </summary>
-		internal static string UnsupportedNonStaticMatcherForSetter {
-			get {
-				return ResourceManager.GetString("UnsupportedNonStaticMatcherForSetter", resourceCulture);
 			}
 		}
 		
@@ -759,9 +696,9 @@ namespace Moq.Properties {
 		///   Looks up a localized string similar to The following setups were not matched:
 		///{0}.
 		/// </summary>
-		internal static string VerficationFailed {
+		internal static string VerificationFailed {
 			get {
-				return ResourceManager.GetString("VerficationFailed", resourceCulture);
+				return ResourceManager.GetString("VerificationFailed", resourceCulture);
 			}
 		}
 		

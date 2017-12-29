@@ -133,6 +133,8 @@ namespace Moq
 		[SuppressMessage("Microsoft.Usage", "CA2214:DoNotCallOverridableMethodsInConstructors")]
 		public Mock(MockBehavior behavior, params object[] args)
 		{
+			Guard.Mockable(typeof(T));
+
 			if (args == null)
 			{
 				args = new object[] { null };
@@ -175,8 +177,6 @@ namespace Moq
 
 		private void CheckParameters()
 		{
-			typeof(T).ThrowIfNotMockeable();
-
 			if (this.constructorArguments.Length > 0)
 			{
 				if (typeof(T).GetTypeInfo().IsInterface)

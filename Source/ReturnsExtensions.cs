@@ -258,17 +258,11 @@ namespace Moq
 			return new TimeSpan(random.Next(min, max));
 		}
 
-		private static void GuardPositiveDelay(TimeSpan delay)
-		{
-			if (!(delay > TimeSpan.Zero))
-				throw new ArgumentException(Resources.DelaysMustBeGreaterThanZero);
-		}
-
 		private static IReturnsResult<TMock> DelayedResult<TMock, TResult>(IReturns<TMock, Task<TResult>> mock,
 			TResult value, TimeSpan delay)
 			where TMock : class
 		{
-			GuardPositiveDelay(delay);
+			Guard.Positive(delay);
 
 			var tcs = new TaskCompletionSource<TResult>();
 			Task.Delay(delay).ContinueWith(t => tcs.SetResult(value));
@@ -280,7 +274,7 @@ namespace Moq
 			TResult value, TimeSpan delay)
 			where TMock : class
 		{
-			GuardPositiveDelay(delay);
+			Guard.Positive(delay);
 
 			var tcs = new TaskCompletionSource<TResult>();
 			Task.Delay(delay).ContinueWith(t => tcs.SetResult(value));
@@ -292,7 +286,7 @@ namespace Moq
 			Exception exception, TimeSpan delay)
 			where TMock : class
 		{
-			GuardPositiveDelay(delay);
+			Guard.Positive(delay);
 
 			var tcs = new TaskCompletionSource<TResult>();
 			Task.Delay(delay).ContinueWith(t => tcs.SetException(exception));
@@ -304,7 +298,7 @@ namespace Moq
 			Exception exception, TimeSpan delay)
 			where TMock : class
 		{
-			GuardPositiveDelay(delay);
+			Guard.Positive(delay);
 
 			var tcs = new TaskCompletionSource<TResult>();
 			Task.Delay(delay).ContinueWith(t => tcs.SetException(exception));

@@ -64,7 +64,7 @@ namespace Moq.Diagnostics.Errors
 		public string Message =>
 			string.Format(
 				CultureInfo.CurrentCulture,
-				Resources.VerficationFailed,
+				Resources.VerificationFailed,
 				string.Join(
 					Environment.NewLine,
 					this.errors.Select(error => error.Setups.Aggregate(new StringBuilder(), (builder, setup) => builder.AppendLine(setup.ToString())))));

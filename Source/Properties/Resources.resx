@@ -139,7 +139,7 @@
 	<data name="ReturnValueRequired" xml:space="preserve">
 		<value>Invocation needs to return a value and therefore must have a corresponding setup that provides it.</value>
 	</data>
-	<data name="VerficationFailed" xml:space="preserve">
+	<data name="VerificationFailed" xml:space="preserve">
 		<value>The following setups were not matched:
 {0}</value>
 	</data>
@@ -164,9 +164,6 @@
 	<data name="SetupNotProperty" xml:space="preserve">
 		<value>Expression is not a property access: {0}</value>
 	</data>
-	<data name="SetupLambda" xml:space="preserve">
-		<value>A lambda expression is expected as the argument to It.Is&lt;T&gt;.</value>
-	</data>
 	<data name="MethodIsPublic" xml:space="preserve">
 		<value>Method {0}.{1} is public. Use strong-typed Expect overload instead:
 mock.Setup(x =&gt; x.{1}());
@@ -181,9 +178,6 @@ mock.Setup(x =&gt; x.{1}).Returns(value);
 mock.SetupGet(x =&gt; x.{1}).Returns(value); //equivalent to previous one
 mock.SetupSet(x =&gt; x.{1}).Callback(callbackDelegate);
 </value>
-	</data>
-	<data name="PropertyMissing" xml:space="preserve">
-		<value>Property {0}.{1} does not exist.</value>
 	</data>
 	<data name="CantSetReturnValueForVoid" xml:space="preserve">
 		<value>Can't set return value for void method {0}.</value>
@@ -212,26 +206,11 @@ Expected invocation on the mock at least once, but was never performed: {1}</val
 Please cast the argument to one of the supported types: {1}.
 Remember that there's no generics covariance in the CLR, so your object must be one of these types in order for the call to succeed.</value>
 	</data>
-	<data name="SetupNever" xml:space="preserve">
-		<value>Invocation {0} should not have been made.</value>
-	</data>
-	<data name="UnsupportedIntermediateExpression" xml:space="preserve">
-		<value>Only property accesses are supported in intermediate invocations on a setup. Unsupported expression {0}.</value>
-	</data>
-	<data name="UnsupportedIntermediateType" xml:space="preserve">
-		<value>Expression contains intermediate property access {0}.{1} which is of type {2} and cannot be mocked. Unsupported expression {3}.</value>
-	</data>
 	<data name="MoreThanNCalls" xml:space="preserve">
 		<value>Expected only {0} calls to {1}.</value>
 	</data>
 	<data name="SetupNotSetter" xml:space="preserve">
 		<value>Expression is not a property setter invocation.</value>
-	</data>
-	<data name="UnsupportedMatcherParamsForSetter" xml:space="preserve">
-		<value>Setter expression cannot use argument matchers that receive parameters.</value>
-	</data>
-	<data name="UnsupportedNonStaticMatcherForSetter" xml:space="preserve">
-		<value>Setter expression can only use static custom matchers.</value>
 	</data>
 	<data name="ArgumentCannotBeEmpty" xml:space="preserve">
 		<value>Value cannot be an empty string.</value>
@@ -283,7 +262,7 @@ Expected invocation on the mock once, but was {4} times: {1}</value>
 	<data name="LinqMethodNotSupported" xml:space="preserve">
 		<value>LINQ method '{0}' not supported.</value>
 	</data>
-	<data name="EventNofFound" xml:space="preserve">
+	<data name="EventNotFound" xml:space="preserve">
 		<value>Could not locate event for attach or detach method {0}.</value>
 	</data>
 	<data name="LinqBinaryOperatorNotSupported" xml:space="preserve">

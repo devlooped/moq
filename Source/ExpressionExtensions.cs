@@ -44,6 +44,7 @@ using System.Globalization;
 using System.Linq;
 using System.Linq.Expressions;
 using System.Reflection;
+
 using Moq.Properties;
 
 namespace Moq
@@ -134,19 +135,7 @@ namespace Moq
 		{
 			Guard.NotNull(expression, nameof(expression));
 
-			return IsProperty(expression.Body);
-		}
-
-		/// <summary>
-		/// Checks whether the expression is a property access.
-		/// </summary>
-		public static bool IsProperty(this Expression expression)
-		{
-			Guard.NotNull(expression, nameof(expression));
-
-			var prop = expression as MemberExpression;
-
-			return prop != null && prop.Member is PropertyInfo;
+			return expression.Body is MemberExpression memberExpression && memberExpression.Member is PropertyInfo;
 		}
 
 		/// <summary>
@@ -159,22 +148,7 @@ namespace Moq
 		{
 			Guard.NotNull(expression, nameof(expression));
 
-			return IsPropertyIndexer(expression.Body);
-		}
-
-		/// <summary>
-		/// Checks whether the expression is a property indexer, which is true 
-		/// when the expression is an <see cref="MethodCallExpression"/> whose 
-		/// <see cref="MethodCallExpression.Method"/> has <see cref="MethodBase.IsSpecialName"/> 
-		/// equal to <see langword="true"/>.
-		/// </summary>
-		public static bool IsPropertyIndexer(this Expression expression)
-		{
-			Guard.NotNull(expression, nameof(expression));
-
-			var call = expression as MethodCallExpression;
-
-			return call != null && call.Method.IsSpecialName;
+			return expression.Body is MethodCallExpression methodCallExpression && methodCallExpression.Method.IsSpecialName;
 		}
 
 		public static Expression StripQuotes(this Expression expression)
@@ -208,19 +182,15 @@ namespace Moq
 
 				case ExpressionType.Call:
 				case ExpressionType.MemberAccess:
-					return ReturnsMatch(expression) == false;
+					// Evaluate everything but matchers:
+					using (var context = new FluentMockContext())
+					{
+						Expression.Lambda<Action>(expression).Compile().Invoke();
+						return context.LastMatch == null;
+					}
 
 				default:
 					return true;
-			}
-		}
-
-		private static bool ReturnsMatch(Expression expression)
-		{
-			using (var context = new FluentMockContext())
-			{
-				Expression.Lambda<Action>(expression).Compile().Invoke();
-				return context.LastMatch != null;
 			}
 		}
 
@@ -228,9 +198,9 @@ namespace Moq
 		/// TODO: remove this code when https://connect.microsoft.com/VisualStudio/feedback/ViewFeedback.aspx?FeedbackID=331583 
 		/// is fixed.
 		/// </devdoc>
-		public static string ToStringFixed(this Expression expression, bool useFullTypeName = false)
+		public static string ToStringFixed(this Expression expression)
 		{
-			return ExpressionStringBuilder.GetString(expression, useFullTypeName);
+			return new ExpressionStringBuilder().Append(expression).ToString();
 		}
 
 		/// <summary>

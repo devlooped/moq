@@ -128,50 +128,57 @@ namespace Moq
 			{
 				var parameter = parameters[index];
 				var argument = arguments[index];
-				if (parameter.IsOutArgument())
+				if (parameter.ParameterType.IsByRef)
 				{
-					var constant = argument.PartialEval() as ConstantExpression;
-					if (constant == null)
+					if ((parameter.Attributes & ParameterAttributes.Out) == ParameterAttributes.Out)
 					{
-						throw new NotSupportedException(Resources.OutExpressionMustBeConstantValue);
-					}
+						// `out` parameter
 
-					if (outValues == null)
-					{
-						outValues = new List<KeyValuePair<int, object>>();
-					}
-
-					outValues.Add(new KeyValuePair<int, object>(index, constant.Value));
-					this.argumentMatchers[index] = AnyMatcher.Instance;
-				}
-				else if (parameter.IsRefArgument())
-				{
-					// Test for special case: `It.Ref<TValue>.IsAny`
-					if (argument is MemberExpression memberExpression)
-					{
-						var member = memberExpression.Member;
-						if (member.Name == nameof(It.Ref<object>.IsAny))
+						var constant = argument.PartialEval() as ConstantExpression;
+						if (constant == null)
 						{
-							var memberDeclaringType = member.DeclaringType;
-							if (memberDeclaringType.GetTypeInfo().IsGenericType)
+							throw new NotSupportedException(Resources.OutExpressionMustBeConstantValue);
+						}
+
+						if (outValues == null)
+						{
+							outValues = new List<KeyValuePair<int, object>>();
+						}
+
+						outValues.Add(new KeyValuePair<int, object>(index, constant.Value));
+						this.argumentMatchers[index] = AnyMatcher.Instance;
+					}
+					else
+					{
+						// `ref` parameter
+
+						// Test for special case: `It.Ref<TValue>.IsAny`
+						if (argument is MemberExpression memberExpression)
+						{
+							var member = memberExpression.Member;
+							if (member.Name == nameof(It.Ref<object>.IsAny))
 							{
-								var memberDeclaringTypeDefinition = memberDeclaringType.GetGenericTypeDefinition();
-								if (memberDeclaringTypeDefinition == typeof(It.Ref<>))
+								var memberDeclaringType = member.DeclaringType;
+								if (memberDeclaringType.GetTypeInfo().IsGenericType)
 								{
-									this.argumentMatchers[index] = AnyMatcher.Instance;
-									continue;
+									var memberDeclaringTypeDefinition = memberDeclaringType.GetGenericTypeDefinition();
+									if (memberDeclaringTypeDefinition == typeof(It.Ref<>))
+									{
+										this.argumentMatchers[index] = AnyMatcher.Instance;
+										continue;
+									}
 								}
 							}
 						}
-					}
 
-					var constant = argument.PartialEval() as ConstantExpression;
-					if (constant == null)
-					{
-						throw new NotSupportedException(Resources.RefExpressionMustBeConstantValue);
-					}
+						var constant = argument.PartialEval() as ConstantExpression;
+						if (constant == null)
+						{
+							throw new NotSupportedException(Resources.RefExpressionMustBeConstantValue);
+						}
 
-					this.argumentMatchers[index] = new RefMatcher(constant.Value);
+						this.argumentMatchers[index] = new RefMatcher(constant.Value);
+					}
 				}
 				else
 				{
@@ -396,7 +403,7 @@ namespace Moq
 				if (!method.Name.Equals(invocationMethod.Name, StringComparison.Ordinal) ||
 					method.ReturnType != invocationMethod.ReturnType ||
 					!method.IsGenericMethod &&
-					!invocationMethod.GetParameterTypes().SequenceEqual(method.GetParameterTypes()))
+					!invocationMethod.HasSameParameterTypesAs(method))
 				{
 					return false;
 				}

@@ -954,7 +954,7 @@ namespace Moq
 			{
 				throw new NotSupportedException(string.Format(
 					CultureInfo.CurrentCulture,
-					method.IsExtensionMethod() ? Resources.SetupOnExtensionMethod : Resources.SetupOnStaticMember,
+					method.IsDefined(typeof(ExtensionAttribute)) ? Resources.SetupOnExtensionMethod : Resources.SetupOnStaticMember,
 					setup.ToStringFixed()));
 			}
 			else if (!method.CanOverride())
@@ -972,7 +972,7 @@ namespace Moq
 			{
 				throw new NotSupportedException(string.Format(
 					CultureInfo.CurrentCulture,
-					method.IsExtensionMethod() ? Resources.VerifyOnExtensionMethod : Resources.VerifyOnStaticMember,
+					method.IsDefined(typeof(ExtensionAttribute)) ? Resources.VerifyOnExtensionMethod : Resources.VerifyOnStaticMember,
 					verify.ToStringFixed()));
 			}
 			else if (!method.CanOverride())
@@ -1096,7 +1096,7 @@ namespace Moq
 
 			private static MethodInfo GetTargetMethod(Type objectType, Type returnType)
 			{
-				returnType.ThrowIfNotMockeable();
+				Guard.Mockable(returnType);
 				return FluentMockGenericMethod.MakeGenericMethod(objectType, returnType);
 			}
 		}

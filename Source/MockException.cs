@@ -83,7 +83,6 @@ namespace Moq
 			VerificationFailed,
 			MoreThanOneCall,
 			MoreThanNCalls,
-			SetupNever,
 		}
 
 #if FEATURE_SERIALIZATION
