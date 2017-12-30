@@ -146,7 +146,7 @@ namespace Moq
 			return false;
 		}
 
-		public static MemberInfoWithTarget<EventInfo, Mock> GetEvent<TMock>(this Action<TMock> eventExpression, TMock mock)
+		public static (EventInfo Event, Mock Target) GetEventWithTarget<TMock>(this Action<TMock> eventExpression, TMock mock)
 			where TMock : class
 		{
 			Guard.NotNull(eventExpression, nameof(eventExpression));
@@ -178,7 +178,7 @@ namespace Moq
 					addRemove));
 			}
 
-			return new MemberInfoWithTarget<EventInfo, Mock>(ev, target);
+			return (ev, target);
 		}
 
 		public static IEnumerable<MethodInfo> GetMethods(this Type type, string name)

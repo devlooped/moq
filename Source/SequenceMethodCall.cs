@@ -49,41 +49,42 @@ namespace Moq
 	internal sealed class SequenceMethodCall : MethodCall
 	{
 		// contains the responses set up with the `CallBase`, `Pass`, `Returns`, and `Throws` verbs
-		private ConcurrentQueue<Tuple<ResponseKind, object>> responses;
+		private ConcurrentQueue<(ResponseKind, object)> responses;
 
 		public SequenceMethodCall(Mock mock, Expression originalExpression, MethodInfo method, params Expression[] arguments)
 			: base(mock, null, originalExpression, method, arguments)
 		{
-			this.responses = new ConcurrentQueue<Tuple<ResponseKind, object>>();
+			this.responses = new ConcurrentQueue<(ResponseKind, object)>();
 		}
 
 		public void AddCallBase()
 		{
-			this.responses.Enqueue(Tuple.Create(ResponseKind.CallBase, (object)null));
+			this.responses.Enqueue((ResponseKind.CallBase, (object)null));
 		}
 
 		public void AddPass()
 		{
-			this.responses.Enqueue(Tuple.Create(ResponseKind.Pass, (object)null));
+			this.responses.Enqueue((ResponseKind.Pass, (object)null));
 		}
 
 		public void AddReturns(object value)
 		{
-			this.responses.Enqueue(Tuple.Create(ResponseKind.Returns, value));
+			this.responses.Enqueue((ResponseKind.Returns, value));
 		}
 
 		public void AddThrows(Exception exception)
 		{
-			this.responses.Enqueue(Tuple.Create(ResponseKind.Throws, (object)exception));
+			this.responses.Enqueue((ResponseKind.Throws, (object)exception));
 		}
 
 		public override void Execute(Invocation invocation)
 		{
 			base.Execute(invocation);
 
-			if (this.responses.TryDequeue(out Tuple<ResponseKind, object> response))
+			if (this.responses.TryDequeue(out var response))
 			{
-				switch (response.Item1)
+				var (kind, arg) = response;
+				switch (kind)
 				{
 					case ResponseKind.Pass:
 						invocation.Return();
@@ -94,11 +95,11 @@ namespace Moq
 						break;
 
 					case ResponseKind.Returns:
-						invocation.Return(response.Item2);
+						invocation.Return(arg);
 						break;
 
 					case ResponseKind.Throws:
-						throw (Exception)response.Item2;
+						throw (Exception)arg;
 				}
 			}
 			else

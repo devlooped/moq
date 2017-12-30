@@ -306,13 +306,11 @@ namespace Moq
 		{
 			Guard.NotNull(times, nameof(times));
 
-			var methodCall = expression.GetCallInfo(mock);
-			var method = methodCall.Method;
+			var (obj, method, args) = expression.GetCallInfo(mock);
 			ThrowIfVerifyExpressionInvolvesUnsupportedMember(expression, method);
-			var args = methodCall.Arguments.ToArray();
 
 			var expected = new MethodCall(mock, null, expression, method, args) { FailMessage = failMessage };
-			VerifyCalls(GetTargetMock(methodCall.Object, mock), expected, expression, times);
+			VerifyCalls(GetTargetMock(obj, mock), expected, expression, times);
 		}
 
 		internal static void Verify<T, TResult>(
@@ -330,16 +328,14 @@ namespace Moq
 			}
 			else
 			{
-				var methodCall = expression.GetCallInfo(mock);
-				var method = methodCall.Method;
+				var (obj, method, args) = expression.GetCallInfo(mock);
 				ThrowIfVerifyExpressionInvolvesUnsupportedMember(expression, method);
-				var args = methodCall.Arguments.ToArray();
 
 				var expected = new MethodCallReturn<T, TResult>(mock, null, expression, method, args)
 				{
 					FailMessage = failMessage
 				};
-				VerifyCalls(GetTargetMock(methodCall.Object, mock), expected, expression, times);
+				VerifyCalls(GetTargetMock(obj, mock), expected, expression, times);
 			}
 		}
 
@@ -508,15 +504,13 @@ namespace Moq
 		private static MethodCall<T> SetupPexProtected<T>(Mock<T> mock, Expression<Action<T>> expression, Condition condition)
 			where T : class
 		{
-			var methodCall = expression.GetCallInfo(mock);
-			var method = methodCall.Method;
-			var args = methodCall.Arguments.ToArray();
+			var (obj, method, args) = expression.GetCallInfo(mock);
 
 			ThrowIfSetupExpressionInvolvesUnsupportedMember(expression, method);
 			ThrowIfSetupMethodNotVisibleToProxyFactory(method);
 			var setup = new MethodCall<T>(mock, condition, expression, method, args);
 
-			var targetMock = GetTargetMock(methodCall.Object, mock);
+			var targetMock = GetTargetMock(obj, mock);
 			targetMock.Setups.Add(setup);
 
 			return setup;
@@ -543,15 +537,13 @@ namespace Moq
 				return SetupGet(mock, expression, condition);
 			}
 
-			var methodCall = expression.GetCallInfo(mock);
-			var method = methodCall.Method;
-			var args = methodCall.Arguments.ToArray();
+			var (obj, method, args) = expression.GetCallInfo(mock);
 
 			ThrowIfSetupExpressionInvolvesUnsupportedMember(expression, method);
 			ThrowIfSetupMethodNotVisibleToProxyFactory(method);
 			var setup = new MethodCallReturn<T, TResult>(mock, condition, expression, method, args);
 
-			var targetMock = GetTargetMock(methodCall.Object, mock);
+			var targetMock = GetTargetMock(obj, mock);
 			targetMock.Setups.Add(setup);
 
 			return setup;
@@ -783,9 +775,9 @@ namespace Moq
 			}
 			else
 			{
-				var methodCall = expression.GetCallInfo(mock);
-				var setup = new SequenceMethodCall(mock, expression, methodCall.Method, methodCall.Arguments.ToArray());
-				var targetMock = GetTargetMock(methodCall.Object, mock);
+				var (obj, method, args) = expression.GetCallInfo(mock);
+				var setup = new SequenceMethodCall(mock, expression, method, args);
+				var targetMock = GetTargetMock(obj, mock);
 				targetMock.Setups.Add(setup);
 				return new SetupSequencePhrase<TResult>(setup);
 			}
@@ -793,9 +785,9 @@ namespace Moq
 
 		internal static SetupSequencePhrase SetupSequence(Mock mock, LambdaExpression expression)
 		{
-			var methodCall = expression.GetCallInfo(mock);
-			var setup = new SequenceMethodCall(mock, expression, methodCall.Method, methodCall.Arguments.ToArray());
-			var targetMock = GetTargetMock(methodCall.Object, mock);
+			var (obj, method, args) = expression.GetCallInfo(mock);
+			var setup = new SequenceMethodCall(mock, expression, method, args);
+			var targetMock = GetTargetMock(obj, mock);
 			targetMock.Setups.Add(setup);
 			return new SetupSequencePhrase(setup);
 		}
