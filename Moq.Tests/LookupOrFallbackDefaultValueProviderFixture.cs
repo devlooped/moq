@@ -159,6 +159,39 @@ namespace Moq.Tests
 			Assert.NotEqual(unexpected, actual.Result);
 		}
 
+		[Fact]
+		public void Produces_2_tuple()
+		{
+			const int expectedIntResult = 42;
+			const string expectedStringResult = "*";
+			var provider = new Provider();
+			provider.Register(typeof(int), (_, __) => expectedIntResult);
+			provider.Register(typeof(string), (_, __) => expectedStringResult);
+
+			var actual = ((int, string))provider.GetDefaultValue(typeof(ValueTuple<int, string>));
+
+			Assert.Equal(expectedIntResult, actual.Item1);
+			Assert.Equal(expectedStringResult, actual.Item2);
+		}
+
+		[Fact]
+		public void Produces_3_tuple()
+		{
+			const int expectedIntResult = 42;
+			const float expectedFloatResult = 3.1415f;
+			const string expectedStringResult = "*";
+			var provider = new Provider();
+			provider.Register(typeof(int), (_, __) => expectedIntResult);
+			provider.Register(typeof(float), (_, __) => expectedFloatResult);
+			provider.Register(typeof(string), (_, __) => expectedStringResult);
+
+			var actual = ((int, float, string))provider.GetDefaultValue(typeof(ValueTuple<int, float, string>));
+
+			Assert.Equal(expectedIntResult, actual.Item1);
+			Assert.Equal(expectedFloatResult, actual.Item2);
+			Assert.Equal(expectedStringResult, actual.Item3);
+		}
+
 		/// <summary>
 		/// Subclass of <see cref="LookupOrFallbackDefaultValueProvider"/> used as a test surrogate.
 		/// </summary>

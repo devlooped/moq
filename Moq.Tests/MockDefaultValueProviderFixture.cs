@@ -218,6 +218,21 @@ namespace Moq.Tests
 		}
 
 		[Fact]
+		public void Provides_ValueTuple_of_empty_array_and_completed_task_of_mocked_type()
+		{
+			var mock = new Mock<IFoo>() { DefaultValue = DefaultValue.Mock };
+			var value = GetDefaultValueForProperty(nameof(IFoo.ValueTupleOfReferenceTypeArrayAndTaskOfReferenceType), mock);
+
+			var (bars, barTask) = ((IBar[], Task<IBar>))value;
+			Assert.NotNull(bars);
+			Assert.Empty(bars);
+			Assert.NotNull(barTask);
+			Assert.True(barTask.IsCompleted);
+			Assert.IsAssignableFrom<IBar>(barTask.Result);
+			Assert.True(barTask.Result is IMocked);
+		}
+
+		[Fact]
 		public async Task Mock_wrapped_in_completed_Task_gets_included_in_verification_of_outer_mock()
 		{
 			var mock = new Mock<IFoo>() { DefaultValue = DefaultValue.Mock };
@@ -265,6 +280,7 @@ namespace Moq.Tests
 			ValueTask<IndexOutOfRangeException> ValueTaskOfUnmockableReferenceType { get; set; }
 			ValueTask<IBar> ValueTaskOfMockableType { get; set; }
 			ValueTask<Task<IBar>> ValueTaskOfTaskOfMockableType { get; set; }
+			(IBar[], Task<IBar>) ValueTupleOfReferenceTypeArrayAndTaskOfReferenceType { get; }
 		}
 
 		public interface IBar { void Do(); }

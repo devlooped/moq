@@ -173,6 +173,19 @@ namespace Moq.Tests
 			Assert.Equal(default(int), result.Result.Result);
 		}
 
+		[Fact]
+		public void ProvidesDefaultValueTupleOfReferenceTypeArrayAndTaskOfReferenceType()
+		{
+			var value = GetDefaultValueForProperty(nameof(IFoo.ValueTupleOfReferenceTypeArrayAndTaskOfReferenceType));
+
+			var (bars, barTask) = ((IBar[], Task<IBar>))value;
+			Assert.NotNull(bars);
+			Assert.Empty(bars);
+			Assert.NotNull(barTask);
+			Assert.True(barTask.IsCompleted);
+			Assert.Equal(default(IBar), barTask.Result);
+		}
+
 		private static object GetDefaultValueForProperty(string propertyName)
 		{
 			var propertyGetter = typeof(IFoo).GetProperty(propertyName).GetGetMethod();
@@ -200,6 +213,7 @@ namespace Moq.Tests
 			ValueTask<int[]> ValueTaskOfValueTypeArray { get; set; }
 			ValueTask<string> ValueTaskOfReferenceType { get; set; }
 			ValueTask<Task<int>> ValueTaskOfTaskOfValueType { get; set; }
+			(IBar[], Task<IBar>) ValueTupleOfReferenceTypeArrayAndTaskOfReferenceType { get; }
 		}
 
 		public interface IBar { }
