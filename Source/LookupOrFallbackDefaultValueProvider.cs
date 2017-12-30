@@ -81,6 +81,14 @@ namespace Moq
 				[typeof(Task)] = CreateTask,
 				[typeof(Task<>)] = CreateTaskOf,
 				[typeof(ValueTask<>)] = CreateValueTaskOf,
+				[typeof(ValueTuple<>)] = CreateValueTupleOf,
+				[typeof(ValueTuple<,>)] = CreateValueTupleOf,
+				[typeof(ValueTuple<,,>)] = CreateValueTupleOf,
+				[typeof(ValueTuple<,,,>)] = CreateValueTupleOf,
+				[typeof(ValueTuple<,,,,>)] = CreateValueTupleOf,
+				[typeof(ValueTuple<,,,,,>)] = CreateValueTupleOf,
+				[typeof(ValueTuple<,,,,,,>)] = CreateValueTupleOf,
+				[typeof(ValueTuple<,,,,,,,>)] = CreateValueTupleOf,
 			};
 		}
 
@@ -196,6 +204,17 @@ namespace Moq
 			// so we're explicitly selecting and calling the constructor we want to use:
 			var valueTaskCtor = type.GetConstructor(new[] { resultType });
 			return valueTaskCtor.Invoke(new object[] { result });
+		}
+
+		private object CreateValueTupleOf(Type type, Mock mock)
+		{
+			var itemTypes = type.GetGenericArguments();
+			var items = new object[itemTypes.Length];
+			for (int i = 0, n = itemTypes.Length; i < n; ++i)
+			{
+				items[i] = this.GetDefaultValue(itemTypes[i], mock);
+			}
+			return Activator.CreateInstance(type, items);
 		}
 	}
 }
