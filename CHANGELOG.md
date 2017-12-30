@@ -7,6 +7,10 @@ The format is loosely based on [Keep a Changelog](http://keepachangelog.com/en/1
 
 ## Unreleased
 
+#### Added
+
+* C# 7 tuple support for `DefaultValue.Empty` and `DefaultValue.Mock` (@stakx, #563)
+
 #### Fixed
 
 * `CallBase` regression with explicitly implemented interface methods (@stakx, #558)
