@@ -21,8 +21,8 @@
 
 	<ItemGroup>
 		<PackageReference Include="Castle.Core" Version="4.2.1" />
-		<PackageReference Include="Microsoft.NET.Test.Sdk" Version="15.3.0" />
-		<PackageReference Include="System.ValueTuple" Version="4.3.0" />
+		<PackageReference Include="Microsoft.NET.Test.Sdk" Version="15.5.0" />
+		<PackageReference Include="System.ValueTuple" Version="4.4.0" />
 		<PackageReference Include="xunit" Version="2.3.1" />
 		<PackageReference Include="xunit.runner.visualstudio" Version="2.3.1" />
 		<ProjectReference Include="..\Source\Moq.csproj" />
@@ -37,7 +37,7 @@
 		<PackageReference Include="System.Collections.Specialized" Version="4.3.0" />
 		<PackageReference Include="System.ComponentModel.Primitives" Version="4.3.0" />
 		<PackageReference Include="System.Diagnostics.TraceSource" Version="4.3.0" />
-		<PackageReference Include="System.ServiceModel.Primitives" Version="4.3.0" />
+		<PackageReference Include="System.ServiceModel.Primitives" Version="4.4.0" />
 	</ItemGroup>
 
 	<ItemGroup>
