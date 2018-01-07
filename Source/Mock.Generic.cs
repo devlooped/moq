@@ -222,7 +222,7 @@ namespace Moq
 
 		internal override List<Type> AdditionalInterfaces => this.additionalInterfaces;
 
-		internal override InvocationCollection Invocations => this.invocations;
+		internal override InvocationCollection InvocationCollection => this.invocations;
 
 		internal override bool IsObjectInitialized => this.instance != null;
 

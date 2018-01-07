@@ -231,7 +231,7 @@ namespace Moq
 			{
 				invocation.Return(this.valueDel.HasCompatibleParameterList(new ParameterInfo[0])
 					? valueDel.InvokePreserveStack()                //we need this, for the user to be able to use parameterless methods
-					: valueDel.InvokePreserveStack(invocation.Arguments)); //will throw if parameters mismatch
+					: valueDel.InvokePreserveStack(invocation.ArgumentsArray)); //will throw if parameters mismatch
 			}
 			else if (this.Mock.Behavior == MockBehavior.Strict)
 			{
@@ -242,7 +242,7 @@ namespace Moq
 				invocation.Return(default(TResult));
 			}
 
-			this.afterReturnCallback?.Invoke(invocation.Arguments);
+			this.afterReturnCallback?.Invoke(invocation.ArgumentsArray);
 		}
 	}
 }

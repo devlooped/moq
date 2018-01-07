@@ -65,7 +65,7 @@ namespace Moq
 			get { return this.owner.InnerMocks; }
 		}
 
-		internal override InvocationCollection Invocations => this.owner.Invocations;
+		internal override InvocationCollection InvocationCollection => this.owner.InvocationCollection;
 
 		internal override bool IsObjectInitialized => this.owner.IsObjectInitialized;
 

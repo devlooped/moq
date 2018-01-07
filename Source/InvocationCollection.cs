@@ -74,7 +74,7 @@ namespace Moq
 			}
 		}
 
-		public Invocation[] ToArray()
+		public IReadOnlyList<Invocation> GetSnapshot()
 		{
 			lock (this.invocations)
 			{
@@ -82,7 +82,7 @@ namespace Moq
 			}
 		}
 
-		public Invocation[] ToArray(Func<Invocation, bool> predicate)
+		public IReadOnlyList<Invocation> GetSnapshot(Func<Invocation, bool> predicate)
 		{
 			lock (this.invocations)
 			{

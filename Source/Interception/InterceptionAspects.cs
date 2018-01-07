@@ -75,7 +75,7 @@ namespace Moq
 		{
 			if (IsObjectMethod(invocation.Method) && !mock.Setups.Any(c => IsObjectMethod(c.Method, "Equals")))
 			{
-				invocation.Return(ReferenceEquals(invocation.Arguments.First(), mock.Object));
+				invocation.Return(ReferenceEquals(invocation.ArgumentsArray.First(), mock.Object));
 				return InterceptionAction.Stop;
 			}
 			else
@@ -224,7 +224,7 @@ namespace Moq
 							invocation.ReturnBase();
 							return InterceptionAction.Stop;
 						}
-						else if (invocation.Arguments.Length > 0 && invocation.Arguments[0] is Delegate delegateInstance)
+						else if (invocation.ArgumentsArray.Length > 0 && invocation.ArgumentsArray[0] is Delegate delegateInstance)
 						{
 							mock.EventHandlers.Add(eventInfo.Name, delegateInstance);
 							invocation.Return();
@@ -246,7 +246,7 @@ namespace Moq
 							invocation.ReturnBase();
 							return InterceptionAction.Stop;
 						}
-						else if (invocation.Arguments.Length > 0 && invocation.Arguments[0] is Delegate delegateInstance)
+						else if (invocation.ArgumentsArray.Length > 0 && invocation.ArgumentsArray[0] is Delegate delegateInstance)
 						{
 							mock.EventHandlers.Remove(eventInfo.Name, delegateInstance);
 							invocation.Return();
@@ -257,7 +257,7 @@ namespace Moq
 			}
 
 			// Save to support Verify[expression] pattern.
-			mock.Invocations.Add(invocation);
+			mock.InvocationCollection.Add(invocation);
 			return InterceptionAction.Continue;
 		}
 

@@ -186,7 +186,7 @@ namespace Moq
 				this.underlying = underlying;
 			}
 
-			public override void Return()
+			internal override void Return()
 			{
 				Debug.Assert(this.underlying != null);
 				Debug.Assert(this.underlying.Method.ReturnType == typeof(void));
@@ -194,7 +194,7 @@ namespace Moq
 				this.underlying = null;
 			}
 
-			public override void ReturnBase()
+			internal override void ReturnBase()
 			{
 				Debug.Assert(this.underlying != null);
 
