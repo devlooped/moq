@@ -5,11 +5,15 @@ All notable changes to this project will be documented in this file.
 The format is loosely based on [Keep a Changelog](http://keepachangelog.com/en/1.0.0/).
 
 
-## Unreleased
+## 4.8.1 (2018-01-08)
 
 #### Added
 
 * C# 7 tuple support for `DefaultValue.Empty` and `DefaultValue.Mock` (@stakx, #563)
+
+#### Changed
+
+* Downgraded `System.Threading.Tasks.Extensions` and `System.ValueTuple` dependencies to versions 4.3.0 as suggested by @tothdavid in order to improve Moq compatibility with .NET 4.6.1 / help prevent `MissingMethodException` and similar (@stakx, #571)
 
 #### Fixed
 
