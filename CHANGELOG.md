@@ -5,7 +5,11 @@ All notable changes to this project will be documented in this file.
 The format is loosely based on [Keep a Changelog](http://keepachangelog.com/en/1.0.0/).
 
 
-## Unreleased
+## 4.8.1 (2017-01-08)
+
+#### Changed
+
+* Downgrade dependency on `System.Threading.Tasks.Extensions` package from version 4.4.0 to 4.3.0 as suggested by @tothdavid. This might resolve `MissingMethodException` (and similar) seen when using Moq on .NET 4.6.1 (see issue #566 and #567).
 
 #### Fixed
 
