@@ -194,12 +194,12 @@ namespace Moq.Tests
 
 	static class ReturnsValidationFixtureExtensions
 	{
-		public static ReturnsValidationFixture.IType ExtensionMethod(this ReturnsValidationFixture fixture, object arg1, object arg2)
+		internal static ReturnsValidationFixture.IType ExtensionMethod(this ReturnsValidationFixture fixture, object arg1, object arg2)
 		{
 			return default(ReturnsValidationFixture.IType);
 		}
 
-		public static ReturnsValidationFixture.IType ExtensionMethodNoArgs(this ReturnsValidationFixture fixture)
+		internal static ReturnsValidationFixture.IType ExtensionMethodNoArgs(this ReturnsValidationFixture fixture)
 		{
 			return default(ReturnsValidationFixture.IType);
 		}
