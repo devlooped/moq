@@ -5,6 +5,13 @@ All notable changes to this project will be documented in this file.
 The format is loosely based on [Keep a Changelog](http://keepachangelog.com/en/1.0.0/).
 
 
+## Unreleased
+
+#### Fixed
+
+* Wrong parameters count for extension methods in `Callback` and `Returns` (@Caraul, #575)
+
+
 ## 4.8.1 (2018-01-08)
 
 #### Added

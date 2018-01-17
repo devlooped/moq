@@ -43,6 +43,7 @@ using System.Globalization;
 using System.Linq.Expressions;
 using System.Reflection;
 using System.Runtime.CompilerServices;
+
 using Moq.Language;
 using Moq.Language.Flow;
 using Moq.Properties;
