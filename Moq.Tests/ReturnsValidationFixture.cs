@@ -11,11 +11,13 @@ namespace Moq.Tests
 	{
 		private Mock<IType> mock;
 		private ISetup<IType, IType> setup;
+		private ISetup<IType, IType> setupNoArgs;
 
 		public ReturnsValidationFixture()
 		{
 			this.mock = new Mock<IType>();
-			this.setup = this.mock.Setup(m => m.Method(It.IsAny<object>()));
+			this.setup = this.mock.Setup(m => m.Method(It.IsAny<object>(), It.IsAny<object>()));
+			this.setupNoArgs = this.mock.Setup(m => m.MethodNoArgs());
 		}
 
 		[Fact]
@@ -45,6 +47,20 @@ namespace Moq.Tests
 		}
 
 		[Fact]
+		public void Returns_accepts_parameterless_delegate_for_method_without_parameters()
+		{
+			Func<IType> delegateWithoutParameters = () => default(IType);
+			this.setupNoArgs.Returns(delegateWithoutParameters);
+
+			var ex = Record.Exception(() =>
+			{
+				this.mock.Object.MethodNoArgs();
+			});
+
+			Assert.Null(ex);
+		}
+
+		[Fact]
 		public void Returns_accepts_parameterless_delegate_even_for_method_having_parameters()
 		{
 			Func<IType> delegateWithoutParameters = () => default(IType);
@@ -52,7 +68,7 @@ namespace Moq.Tests
 
 			var ex = Record.Exception(() =>
 			{
-				this.mock.Object.Method(42);
+				this.mock.Object.Method(42, 3);
 			});
 
 			Assert.Null(ex);
@@ -61,7 +77,7 @@ namespace Moq.Tests
 		[Fact]
 		public void Returns_does_not_accept_delegate_with_wrong_parameter_count()
 		{
-			Func<object, object, IType> delegateWithWrongParameterCount = (arg1, arg2) => default(IType);
+			Func<object, object, object, IType> delegateWithWrongParameterCount = (arg1, arg2, arg3) => default(IType);
 
 			var ex = Record.Exception(() =>
 			{
@@ -74,12 +90,12 @@ namespace Moq.Tests
 		[Fact]
 		public void Returns_accepts_delegate_with_wrong_parameter_types_but_setup_invocation_will_fail()
 		{
-			Func<string, IType> delegateWithWrongParameterType = (arg) => default(IType);
+			Func<string, string, IType> delegateWithWrongParameterType = (arg1, arg2) => default(IType);
 			this.setup.Returns(delegateWithWrongParameterType);
 
 			var ex = Record.Exception(() =>
 			{
-				mock.Object.Method(42);
+				mock.Object.Method(42, 7);
 			});
 
 			Assert.IsType<ArgumentException>(ex);
@@ -102,12 +118,67 @@ namespace Moq.Tests
 		[Fact]
 		public void Returns_accepts_delegate_with_wrong_parameter_types_and_setup_invocation_will_succeed_if_args_convertible()
 		{
-			Func<string, IType> delegateWithWrongParameterType = (arg) => default(IType);
+			Func<string, string, IType> delegateWithWrongParameterType = (arg1, arg2) => default(IType);
 			this.setup.Returns(delegateWithWrongParameterType);
 
 			var ex = Record.Exception(() =>
 			{
-				mock.Object.Method(null);
+				mock.Object.Method(null, null);
+			});
+
+			Assert.Null(ex);
+		}
+
+		[Fact]
+		public void Returns_accepts_parameterless_extension_method_for_method_without_parameters()
+		{
+			Func<IType> delegateWithoutParameters = new ReturnsValidationFixture().ExtensionMethodNoArgs;
+			this.setupNoArgs.Returns(delegateWithoutParameters);
+
+			var ex = Record.Exception(() =>
+			{
+				this.mock.Object.MethodNoArgs();
+			});
+
+			Assert.Null(ex);
+		}
+
+		[Fact]
+		public void Returns_accepts_parameterless_extension_method_even_for_method_having_parameters()
+		{
+			Func<IType> delegateWithoutParameters = new ReturnsValidationFixture().ExtensionMethodNoArgs;
+			this.setup.Returns(delegateWithoutParameters);
+
+			var ex = Record.Exception(() =>
+			{
+				this.mock.Object.Method(42, 5);
+			});
+
+			Assert.Null(ex);
+		}
+
+		[Fact]
+		public void Returns_does_not_accept_extension_method_with_wrong_parameter_count()
+		{
+			Func<object, object, IType> delegateWithWrongParameterCount = new ReturnsValidationFixture().ExtensionMethod;
+
+			var ex = Record.Exception(() =>
+			{
+				this.setupNoArgs.Returns(delegateWithWrongParameterCount);
+			});
+
+			Assert.IsType<ArgumentException>(ex);
+		}
+
+		[Fact]
+		public void Returns_accepts_extension_method_with_correct_parameter_count()
+		{
+			Func<object, object, IType> delegateWithCorrectParameterCount = new ReturnsValidationFixture().ExtensionMethod;
+			this.setup.Returns(delegateWithCorrectParameterCount);
+
+			var ex = Record.Exception(() =>
+			{
+				this.mock.Object.Method(42, 5);
 			});
 
 			Assert.Null(ex);
@@ -115,7 +186,22 @@ namespace Moq.Tests
 
 		public interface IType
 		{
-			IType Method(object arg);
+			IType Method(object arg1, object arg2);
+
+			IType MethodNoArgs();
+		}
+	}
+
+	static class ReturnsValidationFixtureExtensions
+	{
+		internal static ReturnsValidationFixture.IType ExtensionMethod(this ReturnsValidationFixture fixture, object arg1, object arg2)
+		{
+			return default(ReturnsValidationFixture.IType);
+		}
+
+		internal static ReturnsValidationFixture.IType ExtensionMethodNoArgs(this ReturnsValidationFixture fixture)
+		{
+			return default(ReturnsValidationFixture.IType);
 		}
 	}
 }

@@ -42,6 +42,7 @@ using System;
 using System.Globalization;
 using System.Linq.Expressions;
 using System.Reflection;
+using System.Runtime.CompilerServices;
 
 using Moq.Language;
 using Moq.Language.Flow;
@@ -166,21 +167,36 @@ namespace Moq
 		{
 			var callbackMethod = callback.GetMethodInfo();
 
-			var actualParameters = callbackMethod.GetParameters();
-			if (actualParameters.Length > 0)
+			ValidateNumberOfCallbackParameters(callbackMethod);
+
+			ValidateCallbackReturnType(callbackMethod);
+		}
+
+		private void ValidateNumberOfCallbackParameters(MethodInfo callbackMethod)
+		{
+			var numberOfActualParameters = callbackMethod.GetParameters().Length;
+			if (IsExtensionMethod(callbackMethod))
 			{
-				var expectedParameters = this.Method.GetParameters();
-				if (actualParameters.Length != expectedParameters.Length)
+				numberOfActualParameters--;
+			}
+
+			if (numberOfActualParameters > 0)
+			{
+				var numberOfExpectedParameters = this.Method.GetParameters().Length;
+				if (numberOfActualParameters != numberOfExpectedParameters)
 				{
 					throw new ArgumentException(
 						string.Format(
 							CultureInfo.CurrentCulture,
 							Resources.InvalidCallbackParameterCountMismatch,
-							expectedParameters.Length,
-							actualParameters.Length));
+							numberOfExpectedParameters,
+							numberOfActualParameters));
 				}
 			}
+		}
 
+		private void ValidateCallbackReturnType(MethodInfo callbackMethod)
+		{
 			var expectedReturnType = this.Method.ReturnType;
 			var actualReturnType = callbackMethod.ReturnType;
 
@@ -193,6 +209,11 @@ namespace Moq
 						expectedReturnType,
 						actualReturnType));
 			}
+		}
+
+		private static bool IsExtensionMethod(MethodInfo callbackMethod)
+		{
+			return callbackMethod.IsStatic && callbackMethod.IsDefined(typeof(ExtensionAttribute));
 		}
 
 		protected override void SetCallbackWithoutArguments(Action callback)
