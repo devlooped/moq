@@ -345,11 +345,23 @@ namespace Moq
 						Debug.Assert(mock.ImplementsInterface(declaringType));
 
 						// Case 2: Explicitly implemented interface method of a class proxy.
-						// Only call base method if it isn't an event accessor.
-						if (!method.LooksLikeEventAttach() && !method.LooksLikeEventDetach())
+
+						if (mock.InheritedInterfaces.Contains(declaringType))
 						{
-							invocation.ReturnBase();
-							return InterceptionAction.Stop;
+							// Case 2a: Re-implemented interface.
+							// The base class has its own implementation. Only call base method if it isn't an event accessor.
+							if (!method.LooksLikeEventAttach() && !method.LooksLikeEventDetach())
+							{
+								invocation.ReturnBase();
+								return InterceptionAction.Stop;
+							}
+						}
+						else
+						{
+							Debug.Assert(mock.AdditionalInterfaces.Contains(declaringType));
+
+							// Case 2b: Additional interface.
+							// There is no base method to call, so fall through.
 						}
 					}
 				}
