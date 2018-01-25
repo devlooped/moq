@@ -10,6 +10,7 @@ The format is loosely based on [Keep a Changelog](http://keepachangelog.com/en/1
 #### Fixed
 
 * Wrong parameters count for extension methods in `Callback` and `Returns` (@Caraul, #575)
+* `CallBase` regression with members of additional interfaces (@stakx, #583)
 
 
 ## 4.8.1 (2018-01-08)
