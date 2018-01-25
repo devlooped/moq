@@ -1810,6 +1810,31 @@ namespace Moq.Tests.Regressions
 
 		#endregion
 
+		#region 582
+
+		public sealed class Issue582
+		{
+			public interface IFoo
+			{
+				void Method();
+			}
+
+			public class Bar
+			{
+			}
+
+			[Fact]
+			public void CallBase_has_no_effect_for_methods_of_additional_interfaces()
+			{
+				var bar = new Mock<Bar>() { CallBase = true };
+				var foo = bar.As<IFoo>().Object;
+
+				foo.Method();
+			}
+		}
+
+		#endregion
+
 		// Old @ Google Code
 
 		#region #47
