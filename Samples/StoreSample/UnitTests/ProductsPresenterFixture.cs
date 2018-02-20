@@ -6,7 +6,7 @@ using System;
 namespace Store.Tests
 {
 	[TestFixture]
-	public class ProductsPresenterFixturecs
+	public class ProductsPresenterFixture
 	{
 		[Test]
 		public void ShouldSetViewCategories()
