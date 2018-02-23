@@ -7,6 +7,10 @@ The format is loosely based on [Keep a Changelog](http://keepachangelog.com/en/1
 
 ## Unreleased
 
+#### Changed
+
+* Upgraded `System.ValueTuple` dependency to version 4.4.0 in order to reestablish Moq compatibility with .NET 4.7 (and later), which already include the `ValueTuple` types (@stakx, #591)
+
 #### Fixed
 
 * Wrong parameters count for extension methods in `Callback` and `Returns` (@Caraul, #575)
