@@ -14,10 +14,12 @@ namespace Moq.Tests
 			mock.SetupSequence(x => x.Do())
 				.Returns(2)
 				.Returns(3)
+				.Returns(() => 4)
 				.Throws<InvalidOperationException>();
 
 			Assert.Equal(2, mock.Object.Do());
 			Assert.Equal(3, mock.Object.Do());
+			Assert.Equal(4, mock.Object.Do());
 			Assert.Throws<InvalidOperationException>(() => mock.Object.Do());
 		}
 
@@ -153,6 +155,46 @@ namespace Moq.Tests
 			mock.Verify(m => m.Do(), Times.Exactly(2));
 		}
 
+		[Fact]
+		public void Func_are_invoked_deferred()
+		{
+			var mock = new Mock<IFoo>();
+			var i = 0;
+			mock.SetupSequence(m => m.Do())
+				.Returns(() => i);
+
+			i++;
+
+			Assert.Equal(i, mock.Object.Do());
+		}
+
+		[Fact]
+		public void Func_can_be_treated_as_return_value()
+		{
+			var mock = new Mock<IFoo>();
+			Func<int> func = () => 1;
+			mock.SetupSequence(m => m.GetFunc())
+				.Returns(func);
+
+			Assert.Equal(func, mock.Object.GetFunc());
+		}
+
+		[Fact]
+		public void Keep_Func_as_return_value_when_setup_method_returns_implicitly_casted_type()
+		{
+			var mock = new Mock<IFoo>();
+			Func<object> funcObj = () => 1;
+			Func<Delegate> funcDel = () => new Action(() => { });
+			Func<MulticastDelegate> funcMulticastDel = () => new Action(() => { });
+			mock.SetupSequence(m => m.GetObj()).Returns(funcObj);
+			mock.SetupSequence(m => m.GetDel()).Returns(funcDel);
+			mock.SetupSequence(m => m.GetMulticastDel()).Returns(funcMulticastDel);
+
+			Assert.Equal(funcObj, mock.Object.GetObj());
+			Assert.Equal(funcDel, mock.Object.GetDel());
+			Assert.Equal(funcMulticastDel, mock.Object.GetMulticastDel());
+		}
+
 		public interface IFoo
 		{
 			string Value { get; set; }
@@ -160,6 +202,14 @@ namespace Moq.Tests
 			int Do();
 
 			Task<int> DoAsync();
+
+			Func<int> GetFunc();
+
+			object GetObj();
+
+			Delegate GetDel();
+
+			MulticastDelegate GetMulticastDel();
 		}
 
 		public class Foo
