@@ -41,6 +41,7 @@
 using System;
 using System.ComponentModel;
 using System.Reflection;
+
 using Moq.Properties;
 
 namespace Moq.Language.Flow
@@ -92,38 +93,29 @@ namespace Moq.Language.Flow
 
 		public ISetupSequentialResult<TResult> Returns(TResult value)
 		{
+			// If `TResult` is `Func<>`, that is someone is setting up the return value of a method
+			// that returns a `Func<>`, then we need to make sure that the passed Func will be treated 
+			// as a return value. We don't want to invoke the passed Func to get a return value; the 
+			// passed func already is the return value. To do so we need to wrap up this func because 
+			// `SequenceMethodCall.Execute` will invoke every func it encounters
+			if (typeof(TResult).IsConstructedGenericType && typeof(TResult).GetGenericTypeDefinition() == typeof(Func<>))
+			{
+				return this.Returns(() => value);
+			}
+
 			this.setup.AddReturns(value);
-			return this;
-		}
-		public ISetupSequentialResult<TResult> Returns(Delegate valueFunction)
-		{
-			// If `TResult` is `Delegate`, that is someone is setting up the return value of a method
-			// that returns a `Delegate`, then we have arrived here because C# picked the wrong overload:
-			// We don't want to invoke the passed delegate to get a return value; the passed delegate
-			// already is the return value.
-			if (typeof(TResult) == typeof(Delegate))
-			{
-				return this.Returns(() => (TResult)(object)valueFunction);
-			}
-
-			// The following may seem overly cautious, but we don't throw an `ArgumentNullException`
-			// here because Moq has been very forgiving with incorrect `Returns` in the past.
-			if (valueFunction == null)
-			{
-				return this.Returns(() => default(TResult));
-			}
-
-			if (valueFunction.GetMethodInfo().ReturnType == typeof(void))
-			{
-				throw new ArgumentException(Resources.InvalidReturnsCallbackNotADelegateWithReturnType, nameof(valueFunction));
-			}
-
-			this.setup.AddReturns(valueFunction);
 			return this;
 		}
 
 		public ISetupSequentialResult<TResult> Returns(Func<TResult> valueExpression)
 		{
+			Guard.NotNull(valueExpression, nameof(valueExpression));
+
+			if (valueExpression.GetMethodInfo().ReturnType == typeof(void))
+			{
+				throw new ArgumentException(Resources.InvalidReturnsCallbackNotADelegateWithReturnType, nameof(valueExpression));
+			}
+
 			this.setup.AddReturns(valueExpression);
 			return this;
 		}
