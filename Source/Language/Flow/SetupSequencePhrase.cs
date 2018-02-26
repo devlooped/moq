@@ -93,30 +93,24 @@ namespace Moq.Language.Flow
 
 		public ISetupSequentialResult<TResult> Returns(TResult value)
 		{
-			// If `TResult` is `Func<>`, that is someone is setting up the return value of a method
-			// that returns a `Func<>`, then we need to make sure that the passed Func will be treated 
-			// as a return value. We don't want to invoke the passed Func to get a return value; the 
-			// passed func already is the return value. To prevent it we need to wrap up this func because 
-			// `SequenceMethodCall.Execute` invokes every func it encounters
-			if (typeof(TResult).IsConstructedGenericType && typeof(TResult).GetGenericTypeDefinition() == typeof(Func<>))
-			{
-				return this.Returns(() => value);
-			}
-
 			this.setup.AddReturns(value);
 			return this;
 		}
 
-		public ISetupSequentialResult<TResult> Returns(Func<TResult> valueExpression)
+		public ISetupSequentialResult<TResult> Returns(Func<TResult> valueFunction)
 		{
-			Guard.NotNull(valueExpression, nameof(valueExpression));
+			Guard.NotNull(valueFunction, nameof(valueFunction));
 
-			if (valueExpression.GetMethodInfo().ReturnType == typeof(void))
+			// If `valueFunction` is `TResult`, that is someone is setting up the return value of a method
+			// that returns a `TResult`, then we have arrived here because C# picked the wrong overload:
+			// We don't want to invoke the passed delegate to get a return value; the passed delegate
+			// already is the return value.
+			if (valueFunction is TResult)
 			{
-				throw new ArgumentException(Resources.InvalidReturnsCallbackNotADelegateWithReturnType, nameof(valueExpression));
+				return this.Returns((TResult)(object)valueFunction);
 			}
 
-			this.setup.AddReturns(valueExpression);
+			this.setup.AddReturns(() => valueFunction());
 			return this;
 		}
 

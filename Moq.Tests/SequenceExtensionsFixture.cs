@@ -179,6 +179,22 @@ namespace Moq.Tests
 			Assert.Equal(func, mock.Object.GetFunc());
 		}
 
+		[Fact]
+		public void Keep_Func_as_return_value_when_setup_method_returns_implicitly_casted_type()
+		{
+			var mock = new Mock<IFoo>();
+			Func<object> funcObj = () => 1;
+			Func<Delegate> funcDel = () => new Action(() => { });
+			Func<MulticastDelegate> funcMulticastDel = () => new Action(() => { });
+			mock.SetupSequence(m => m.GetObj()).Returns(funcObj);
+			mock.SetupSequence(m => m.GetDel()).Returns(funcDel);
+			mock.SetupSequence(m => m.GetMulticastDel()).Returns(funcMulticastDel);
+
+			Assert.Equal(funcObj, mock.Object.GetObj());
+			Assert.Equal(funcDel, mock.Object.GetDel());
+			Assert.Equal(funcMulticastDel, mock.Object.GetMulticastDel());
+		}
+
 		public interface IFoo
 		{
 			string Value { get; set; }
@@ -188,6 +204,12 @@ namespace Moq.Tests
 			Task<int> DoAsync();
 
 			Func<int> GetFunc();
+
+			object GetObj();
+
+			Delegate GetDel();
+
+			MulticastDelegate GetMulticastDel();
 		}
 
 		public class Foo

@@ -72,6 +72,11 @@ namespace Moq
 			this.responses.Enqueue((ResponseKind.Returns, value));
 		}
 
+		public void AddReturns(Func<object> valueFunction)
+		{
+			this.responses.Enqueue((ResponseKind.InvokeFunc, valueFunction));
+		}
+
 		public void AddThrows(Exception exception)
 		{
 			this.responses.Enqueue((ResponseKind.Throws, (object)exception));
@@ -95,18 +100,15 @@ namespace Moq
 						break;
 
 					case ResponseKind.Returns:
-						if (arg is Delegate func)
-						{
-							invocation.Return(func.DynamicInvoke());
-						}
-						else
-						{
-							invocation.Return(arg);
-						}
+						invocation.Return(arg);
 						break;
 
 					case ResponseKind.Throws:
 						throw (Exception)arg;
+
+					case ResponseKind.InvokeFunc:
+						invocation.Return(((Func<object>)arg)());
+						break;
 				}
 			}
 			else
@@ -133,6 +135,7 @@ namespace Moq
 			CallBase,
 			Returns,
 			Throws,
+			InvokeFunc
 		}
 	}
 }
