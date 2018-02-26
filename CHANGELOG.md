@@ -5,6 +5,12 @@ All notable changes to this project will be documented in this file.
 The format is loosely based on [Keep a Changelog](http://keepachangelog.com/en/1.0.0/).
 
 
+## Unreleased
+
+#### Added
+
+* Add `ISetupSequentialResult<TResult>.Returns` method overload that support delegate for deferred results (@snrnats, #594)
+
 ## 4.8.2 (2018-02-23)
 
 #### Changed
