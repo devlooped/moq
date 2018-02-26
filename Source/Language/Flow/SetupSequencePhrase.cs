@@ -96,8 +96,8 @@ namespace Moq.Language.Flow
 			// If `TResult` is `Func<>`, that is someone is setting up the return value of a method
 			// that returns a `Func<>`, then we need to make sure that the passed Func will be treated 
 			// as a return value. We don't want to invoke the passed Func to get a return value; the 
-			// passed func already is the return value. To do so we need to wrap up this func because 
-			// `SequenceMethodCall.Execute` will invoke every func it encounters
+			// passed func already is the return value. To prevent it we need to wrap up this func because 
+			// `SequenceMethodCall.Execute` invokes every func it encounters
 			if (typeof(TResult).IsConstructedGenericType && typeof(TResult).GetGenericTypeDefinition() == typeof(Func<>))
 			{
 				return this.Returns(() => value);
