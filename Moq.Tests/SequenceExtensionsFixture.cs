@@ -155,6 +155,30 @@ namespace Moq.Tests
 			mock.Verify(m => m.Do(), Times.Exactly(2));
 		}
 
+		[Fact]
+		public void Func_are_invoked_deferred()
+		{
+			var mock = new Mock<IFoo>();
+			var i = 0;
+			mock.SetupSequence(m => m.Do())
+				.Returns(() => i);
+
+			i++;
+
+			Assert.Equal(i, mock.Object.Do());
+		}
+
+		[Fact]
+		public void Func_can_be_treated_as_return_value()
+		{
+			var mock = new Mock<IFoo>();
+			Func<int> func = () => 1;
+			mock.SetupSequence(m => m.GetFunc())
+				.Returns(func);
+
+			Assert.Equal(func, mock.Object.GetFunc());
+		}
+
 		public interface IFoo
 		{
 			string Value { get; set; }
@@ -162,6 +186,8 @@ namespace Moq.Tests
 			int Do();
 
 			Task<int> DoAsync();
+
+			Func<int> GetFunc();
 		}
 
 		public class Foo
