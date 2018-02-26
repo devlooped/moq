@@ -19,6 +19,18 @@ namespace Moq.Language
 		ISetupSequentialResult<TResult> Returns(TResult value);
 
 		/// <summary>
+		/// Uses delegate to get return value
+		/// </summary>
+		/// <returns></returns>
+		ISetupSequentialResult<TResult> Returns(Delegate valueFunction);
+
+		/// <summary>
+		/// Uses delegate to get return value
+		/// </summary>
+		/// <returns></returns>
+		ISetupSequentialResult<TResult> Returns(Func<TResult> valueExpression);
+
+		/// <summary>
 		/// Throws an exception
 		/// </summary>
 		ISetupSequentialResult<TResult> Throws(Exception exception);

@@ -14,10 +14,12 @@ namespace Moq.Tests
 			mock.SetupSequence(x => x.Do())
 				.Returns(2)
 				.Returns(3)
+				.Returns(() => 4)
 				.Throws<InvalidOperationException>();
 
 			Assert.Equal(2, mock.Object.Do());
 			Assert.Equal(3, mock.Object.Do());
+			Assert.Equal(4, mock.Object.Do());
 			Assert.Throws<InvalidOperationException>(() => mock.Object.Do());
 		}
 

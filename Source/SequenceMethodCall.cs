@@ -95,7 +95,14 @@ namespace Moq
 						break;
 
 					case ResponseKind.Returns:
-						invocation.Return(arg);
+						if (arg is Delegate func)
+						{
+							invocation.Return(func.DynamicInvoke());
+						}
+						else
+						{
+							invocation.Return(arg);
+						}
 						break;
 
 					case ResponseKind.Throws:
