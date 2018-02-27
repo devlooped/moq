@@ -11,6 +11,10 @@ The format is loosely based on [Keep a Changelog](http://keepachangelog.com/en/1
 
 * Add `ISetupSequentialResult<TResult>.Returns` method overload that support delegate for deferred results (@snrnats, #594)
 
+#### Changed
+
+* **Breaking change:** `sequenceSetup.ReturnsAsync(...)`, `sequenceSetup.ThrowsAsync(...)`, `setup.ReturnsAsync(..., TimeSpan)`, `setup.ReturnsAsync(..., TimeSpan, TimeSpan)`, `setup.ReturnsAsync(..., TimeSpan, TimeSpan, Random)` and all overloads of `setup.ThrowsAsync(...)` now return a different `Task` on each invocation, which wasn't previously the case (@snrnats, #595) 
+
 #### Fixed
 
 *  Usage of ReturnsExtensions.ThrowsAsync() can cause UnobservedTaskException (@snrnats, #595)
