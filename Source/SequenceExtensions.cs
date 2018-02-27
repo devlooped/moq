@@ -68,10 +68,13 @@ namespace Moq
 		/// </summary>
 		public static ISetupSequentialResult<Task<TResult>> ThrowsAsync<TResult>(this ISetupSequentialResult<Task<TResult>> setup, Exception exception)
 		{
-			var tcs = new TaskCompletionSource<TResult>();
-			tcs.SetException(exception);
-
-			return setup.Returns(tcs.Task);
+			var task = new Lazy<Task<TResult>>(() =>
+			{
+				var tcs = new TaskCompletionSource<TResult>();
+				tcs.SetException(exception);
+				return tcs.Task;
+			});
+			return setup.Returns(() => task.Value);
 		}
 	}
 }

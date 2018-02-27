@@ -1856,6 +1856,7 @@ namespace Moq.Tests.Regressions
 			{
 				var mock = new Mock<IFoo>();
 				mock.Setup(a => a.Foo()).ThrowsAsync(new ArgumentException());
+				mock.SetupSequence(a => a.Boo()).ThrowsAsync(new ArgumentException());
 			}
 
 			public void Dispose()
