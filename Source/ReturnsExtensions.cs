@@ -299,12 +299,9 @@ namespace Moq
 
 			return mock.Returns(() =>
 			{
-				return Task.Delay(delay).ContinueWith((_) =>
-				{
-					var tcs = new TaskCompletionSource<TResult>();
-					tcs.TrySetException(exception);
-					return tcs.Task;
-				}).Unwrap();
+				var tcs = new TaskCompletionSource<TResult>();
+				Task.Delay(delay).ContinueWith(task => tcs.SetException(exception));
+				return tcs.Task;
 			});
 		}
 
