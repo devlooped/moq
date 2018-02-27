@@ -73,5 +73,18 @@ namespace Moq
 
 			return setup.Returns(tcs.Task);
 		}
+		
+		/// <summary>
+		/// Returns a sequence of items, once per call.
+		/// </summary>
+		public static ISetupSequentialResult<T> ReturnsSequence<T>(this ISetupSequentialResult<T> setup, IEnumerable<T> results)
+        {
+            foreach (var item in results)
+            {
+                setup.Returns(item);
+            }
+
+            return setup;
+        }
 	}
 }
