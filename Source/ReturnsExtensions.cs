@@ -69,13 +69,12 @@ namespace Moq
 		/// <param name="exception">Exception instance to throw.</param>
 		public static IReturnsResult<TMock> ThrowsAsync<TMock>(this IReturns<TMock, Task> mock, Exception exception) where TMock : class
 		{
-			var task = new Lazy<Task>(() =>
+			return mock.Returns(() =>
 			{
 				var tcs = new TaskCompletionSource<bool>();
 				tcs.SetException(exception);
 				return tcs.Task;
 			});
-			return mock.Returns(() => task.Value);
 		}
 
 		/// <summary>
@@ -87,13 +86,12 @@ namespace Moq
 		/// <param name="exception">Exception instance to throw.</param>
 		public static IReturnsResult<TMock> ThrowsAsync<TMock, TResult>(this IReturns<TMock, Task<TResult>> mock, Exception exception) where TMock : class
 		{
-			var task = new Lazy<Task<TResult>>(() =>
+			return mock.Returns(() =>
 			{
 				var tcs = new TaskCompletionSource<TResult>();
 				tcs.SetException(exception);
 				return tcs.Task;
 			});
-			return mock.Returns(() => task.Value);
 		}
 
 		/// <summary>
@@ -105,13 +103,12 @@ namespace Moq
 		/// <param name="exception">Exception instance to throw.</param>
 		public static IReturnsResult<TMock> ThrowsAsync<TMock, TResult>(this IReturns<TMock, ValueTask<TResult>> mock, Exception exception) where TMock : class
 		{
-			var task = new Lazy<ValueTask<TResult>>(() =>
+			return mock.Returns(() =>
 			{
 				var tcs = new TaskCompletionSource<TResult>();
 				tcs.SetException(exception);
 				return new ValueTask<TResult>(tcs.Task);
 			});
-			return mock.Returns(() => task.Value);
 		}
 
 		private static readonly Random Random = new Random();
