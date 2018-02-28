@@ -57,7 +57,12 @@ namespace Moq
 		/// <returns>The mocked object created.</returns>
 		public static T Of<T>() where T : class
 		{
-			return Mocks.CreateMockQuery<T>().First<T>();
+			//Disabled because of bad performance
+			//return Mocks.CreateMockQuery<T>().First<T>();
+			//and replaced by equivalent which is more than 10 times faster currently
+			var mock = new Mock<T>();
+			mock.SetupAllProperties();
+			return mock.Object;
 		}
 
 		/// <summary>
