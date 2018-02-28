@@ -11,6 +11,9 @@ The format is loosely based on [Keep a Changelog](http://keepachangelog.com/en/1
 
 * Add `ISetupSequentialResult<TResult>.Returns` method overload that support delegate for deferred results (@snrnats, #594)
 
+#### Changed
+
+* Changed Mock.Of<T> implementation to use much faster simple approach
 
 ## 4.8.2 (2018-02-23)
 
