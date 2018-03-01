@@ -11,6 +11,15 @@ The format is loosely based on [Keep a Changelog](http://keepachangelog.com/en/1
 
 * Add `ISetupSequentialResult<TResult>.Returns` method overload that support delegate for deferred results (@snrnats, #594)
 
+#### Changed
+
+* **Breaking change:** All ReturnsAsync and ThrowsAsync setup methods now consistently return a new Task on each invocation (@snrnats, #595) 
+
+#### Fixed
+
+*  Usage of ReturnsExtensions.ThrowsAsync() can cause UnobservedTaskException (@snrnats, #595)
+*  ReturnsAsync and ThrowsAsync with delay parameter starts timer at setup (@snrnats, #595)
+
 
 ## 4.8.2 (2018-02-23)
 

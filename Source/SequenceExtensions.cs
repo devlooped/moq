@@ -57,10 +57,7 @@ namespace Moq
 		/// </summary>
 		public static ISetupSequentialResult<Task<TResult>> ReturnsAsync<TResult>(this ISetupSequentialResult<Task<TResult>> setup, TResult value)
 		{
-			var tcs = new TaskCompletionSource<TResult>();
-			tcs.SetResult(value);
-
-			return setup.Returns(tcs.Task);
+			return setup.Returns(() => Task.FromResult(value));
 		}
 
 		/// <summary>
@@ -68,10 +65,12 @@ namespace Moq
 		/// </summary>
 		public static ISetupSequentialResult<Task<TResult>> ThrowsAsync<TResult>(this ISetupSequentialResult<Task<TResult>> setup, Exception exception)
 		{
-			var tcs = new TaskCompletionSource<TResult>();
-			tcs.SetException(exception);
-
-			return setup.Returns(tcs.Task);
+			return setup.Returns(() =>
+			{
+				var tcs = new TaskCompletionSource<TResult>();
+				tcs.SetException(exception);
+				return tcs.Task;
+			});
 		}
 	}
 }

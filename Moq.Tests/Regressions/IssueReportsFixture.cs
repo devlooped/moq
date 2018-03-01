@@ -1835,6 +1835,77 @@ namespace Moq.Tests.Regressions
 
 		#endregion
 
+		#region 592
+
+		public class Issue592 : IDisposable
+		{
+			private UnobservedTaskExceptionEventArgs _unobservedEventArgs;
+
+			public Issue592()
+			{
+				TaskScheduler.UnobservedTaskException += OnUnobservedTaskException;
+			}
+
+			private void OnUnobservedTaskException(object sender, UnobservedTaskExceptionEventArgs e)
+			{
+				_unobservedEventArgs = e;
+			}
+
+			[Fact]
+			public void ThrowsAsync_does_not_cause_UnobservedTaskException()
+			{
+				var mock = new Mock<IFoo>();
+				mock.Setup(a => a.Foo()).ThrowsAsync(new ArgumentException());
+				mock.SetupSequence(a => a.Boo()).ThrowsAsync(new ArgumentException());
+			}
+
+			public void Dispose()
+			{
+				GC.Collect();
+				GC.WaitForPendingFinalizers();
+				TaskScheduler.UnobservedTaskException -= OnUnobservedTaskException;
+				if (_unobservedEventArgs != null && !_unobservedEventArgs.Observed)
+				{
+					throw _unobservedEventArgs.Exception;
+				}
+			}
+
+			public interface IFoo
+			{
+				Task Foo();
+				Task<int> Boo();
+			}
+		}
+
+		#endregion
+
+		#region 593
+
+		public class Issue593
+		{
+			[Fact]
+			public async Task ReturnsAsync_ThrowsAsync_start_delay_timer_at_mock_invocation()
+			{
+				var mock = new Mock<IFoo>();
+				mock.Setup(a => a.Foo()).ThrowsAsync(new ArgumentException(), TimeSpan.FromMilliseconds(100));
+				mock.Setup(a => a.Boo()).ReturnsAsync(true, TimeSpan.FromMilliseconds(100));
+
+				//Wait for the delay greater then specified for Foo and Boo setup
+				await Task.Delay(200);
+
+				Assert.False(mock.Object.Foo().IsCompleted);
+				Assert.False(mock.Object.Boo().IsCompleted);
+			}
+
+			public interface IFoo
+			{
+				Task<bool> Foo();
+				Task<bool> Boo();
+			}
+		}
+
+		#endregion
+
 		// Old @ Google Code
 
 		#region #47
