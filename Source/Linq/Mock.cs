@@ -57,7 +57,15 @@ namespace Moq
 		/// <returns>The mocked object created.</returns>
 		public static T Of<T>() where T : class
 		{
-			return Mocks.CreateMockQuery<T>().First<T>();
+			// This method was originally implemented as follows:
+			//
+			// return Mocks.CreateMockQuery<T>().First<T>();
+			//
+			// which involved a lot of avoidable `IQueryable` query provider overhead and lambda compilation.
+			// What it really boils down to is this (much faster) code:
+			var mock = new Mock<T>();
+			mock.SetupAllProperties();
+			return mock.Object;
 		}
 
 		/// <summary>
