@@ -145,7 +145,7 @@ namespace Moq
 				// We have to return early from here because you can't cast null to T
 				// when T is a value type.
 				//
-				// See Github issue #90: https://github.com/moq/moq4/issues/90
+				// See GitHub issue #90: https://github.com/moq/moq4/issues/90
 				return false;
 			}
 			return this.Condition((T)value);

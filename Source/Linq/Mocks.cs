@@ -59,7 +59,7 @@ namespace Moq
 	/// This entry-point into Linq to Mocks is the only one in the root Moq 
 	/// namespace to ease discovery. But to get all the mocking extension 
 	/// methods on Object, a using of Moq.Linq must be done, so that the 
-	/// polluting of the intellisense for all objects is an explicit opt-in.
+	/// polluting of the IntelliSense for all objects is an explicit opt-in.
 	/// </devdoc>
 	public static class Mocks
 	{
@@ -112,7 +112,7 @@ namespace Moq
 		}
 
 		/// <summary>
-		/// Creates the mock query with the underlying queriable implementation.
+		/// Creates the mock query with the underlying queryable implementation.
 		/// </summary>
 		internal static IQueryable<T> CreateMockQuery<T>() where T : class
 		{
@@ -148,7 +148,7 @@ namespace Moq
 
 		/// <summary>
 		/// Extension method used to support Linq-like setup properties that are not virtual but do have 
-		/// a getter and a setter, thereby allowing the use of Linq to Mocks to quickly initialize Dtos too :)
+		/// a getter and a setter, thereby allowing the use of Linq to Mocks to quickly initialize DTOs too :)
 		/// </summary>
 		internal static bool SetProperty<T, TResult>(Mock<T> target, Expression<Func<T, TResult>> propertyReference, TResult value)
 			where T : class

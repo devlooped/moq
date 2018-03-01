@@ -314,7 +314,7 @@ Expected invocation on the mock once, but was {4} times: {1}</value>
 		<value>Invalid callback. Setup on method with parameters ({0}) cannot invoke callback with parameters ({1}).</value>
 	</data>
 	<data name="MinDelayMustBeLessThanMaxDelay" xml:space="preserve">
-		<value>Mininum delay has to be lower than maximum delay.</value>
+		<value>Minimum delay has to be lower than maximum delay.</value>
 	</data>
 	<data name="NoInvocationsPerformed" xml:space="preserve">
 		<value>No invocations performed.</value>

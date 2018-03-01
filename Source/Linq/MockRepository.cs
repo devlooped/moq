@@ -62,7 +62,7 @@ namespace Moq
 		}
 
 		/// <summary>
-		/// Creates the mock query with the underlying queriable implementation.
+		/// Creates the mock query with the underlying queryable implementation.
 		/// </summary>
 		internal IQueryable<T> CreateMockQuery<T>() where T : class
 		{

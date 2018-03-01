@@ -73,12 +73,12 @@ namespace Moq.Linq
 					// TODO: throw if a matcher is used on either side of the expression.
 					//ThrowIfMatcherIsUsed(
 
-					// Account for the inverted assignement/querying like "false == foo.IsValid" scenario
+					// Account for the inverted assignment/querying like "false == foo.IsValid" scenario
 					if (node.Left.NodeType == ExpressionType.Constant)
 						// Invert left & right nodes in this case.
 						return ConvertToSetup(node.Right, node.Left) ?? base.VisitBinary(node);
 					else
-						// Perform straight conversion where the right handside will be the setup return value.
+						// Perform straight conversion where the right-hand side will be the setup return value.
 						return ConvertToSetup(node.Left, node.Right) ?? base.VisitBinary(node);
 				}
 			}

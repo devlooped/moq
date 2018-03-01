@@ -291,7 +291,7 @@ namespace Moq.Properties {
 		}
 		
 		/// <summary>
-		///   Looks up a localized string similar to Mininum delay has to be lower than maximum delay..
+		///   Looks up a localized string similar to Minimum delay has to be lower than maximum delay..
 		/// </summary>
 		internal static string MinDelayMustBeLessThanMaxDelay {
 			get {

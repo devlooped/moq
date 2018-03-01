@@ -297,7 +297,7 @@ namespace Moq
 
 		/// <summary>
 		/// Creates a new mock with the given <paramref name="behavior"/> 
-		/// and with the the given constructor arguments for the class.
+		/// and with the given constructor arguments for the class.
 		/// </summary>
 		/// <remarks>
 		/// The mock will try to find the best match constructor given the 

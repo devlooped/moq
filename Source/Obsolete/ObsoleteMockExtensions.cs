@@ -84,7 +84,7 @@ namespace Moq
 		}
 
 		/// <summary>
-		/// Verifies that a property has been set on the mock, regarless of its value.
+		/// Verifies that a property has been set on the mock, regardless of its value.
 		/// </summary>
 		/// <example group="verification">
 		/// This example assumes that the mock has been used, 

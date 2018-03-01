@@ -114,7 +114,7 @@ namespace Moq
 		///   </para>
 		///   <para>
 		///     All array types are represented by <c><see langword="typeof"/>(<see cref="Array"/>)</c>.
-		///     Generic types are represented by their open generic type definiton, e. g. <c><see langword="typeof"/>(<see cref="IEnumerable"/>&lt;&gt;)</c>.
+		///     Generic types are represented by their open generic type definition, e. g. <c><see langword="typeof"/>(<see cref="IEnumerable"/>&lt;&gt;)</c>.
 		///   </para>
 		/// </param>
 		/// <param name="factory">The factory function responsible for producing values for the given type.</param>

@@ -28,7 +28,7 @@ namespace Moq.Tests
 		[Fact]
 		public void Default_values_from_custom_providers_are_not_cached()
 		{
-			// NOTE: This specification is not set in stone; it simply documents Moq's behaviour at the
+			// NOTE: This specification is not set in stone; it simply documents Moq's behavior at the
 			// time when custom default value providers became part of the public API. It might very well
 			// make sense to cache default return values. This could be achieved by turning the purpose-
 			// bound `Mock.InnerMocks` dictionary into a more generic `Mock.CachedDefaultValues`.
@@ -97,7 +97,7 @@ namespace Moq.Tests
 
 			mock.VerifySet(m => m.Inner.Value = 1, Times.Never);
 			//             ^^^^^^^^^^^^^^^^^^^^^^
-			// Moq has to execute this action to analyse what is being set. Because this is a multi-dot expression,
+			// Moq has to execute this action to analyze what is being set. Because this is a multi-dot expression,
 			// it temporarily switches to DefaultValue.Mock. Once it's done, it should switch back to the one we
 			// set up above.
 

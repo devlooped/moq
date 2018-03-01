@@ -1294,7 +1294,7 @@ namespace Moq.Tests
 			mock.Verify(m => m.Bar.Value);
 
 			// `Bar` was used both in a "transitive" and non-transitive way. We would expect that the former
-			// doesn't have to be explicitly verified (as it's implied by the verifiation of `Bar.Value`).
+			// doesn't have to be explicitly verified (as it's implied by the verification of `Bar.Value`).
 			// However, the non-transitive call ought to be explicitly verified. Because we don't, a verific-
 			// ation exception is expected: (THIS DOES NOT WORK YET.)
 			Assert.Throws<MockException>(() => mock.VerifyNoOtherCalls());

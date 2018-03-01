@@ -253,7 +253,7 @@ namespace Moq.Language
 		/// <typeparam name="T6">The type of the sixth argument of the invoked method.</typeparam>
 		/// <typeparam name="T7">The type of the seventh argument of the invoked method.</typeparam>
 		/// <typeparam name="T8">The type of the eighth argument of the invoked method.</typeparam>
-		/// <typeparam name="T9">The type of the nineth argument of the invoked method.</typeparam>
+		/// <typeparam name="T9">The type of the ninth argument of the invoked method.</typeparam>
 		/// <param name="action">The callback method to invoke.</param>
 		/// <returns>A reference to <see cref="ICallbackResult"/> interface.</returns>
 		/// <example>
@@ -289,7 +289,7 @@ namespace Moq.Language
 		/// <typeparam name="T6">The type of the sixth argument of the invoked method.</typeparam>
 		/// <typeparam name="T7">The type of the seventh argument of the invoked method.</typeparam>
 		/// <typeparam name="T8">The type of the eighth argument of the invoked method.</typeparam>
-		/// <typeparam name="T9">The type of the nineth argument of the invoked method.</typeparam>
+		/// <typeparam name="T9">The type of the ninth argument of the invoked method.</typeparam>
 		/// <typeparam name="T10">The type of the tenth argument of the invoked method.</typeparam>
 		/// <param name="action">The callback method to invoke.</param>
 		/// <returns>A reference to <see cref="ICallbackResult"/> interface.</returns>
@@ -327,7 +327,7 @@ namespace Moq.Language
 		/// <typeparam name="T6">The type of the sixth argument of the invoked method.</typeparam>
 		/// <typeparam name="T7">The type of the seventh argument of the invoked method.</typeparam>
 		/// <typeparam name="T8">The type of the eighth argument of the invoked method.</typeparam>
-		/// <typeparam name="T9">The type of the nineth argument of the invoked method.</typeparam>
+		/// <typeparam name="T9">The type of the ninth argument of the invoked method.</typeparam>
 		/// <typeparam name="T10">The type of the tenth argument of the invoked method.</typeparam>
 		/// <typeparam name="T11">The type of the eleventh argument of the invoked method.</typeparam>
 		/// <param name="action">The callback method to invoke.</param>
@@ -367,7 +367,7 @@ namespace Moq.Language
 		/// <typeparam name="T6">The type of the sixth argument of the invoked method.</typeparam>
 		/// <typeparam name="T7">The type of the seventh argument of the invoked method.</typeparam>
 		/// <typeparam name="T8">The type of the eighth argument of the invoked method.</typeparam>
-		/// <typeparam name="T9">The type of the nineth argument of the invoked method.</typeparam>
+		/// <typeparam name="T9">The type of the ninth argument of the invoked method.</typeparam>
 		/// <typeparam name="T10">The type of the tenth argument of the invoked method.</typeparam>
 		/// <typeparam name="T11">The type of the eleventh argument of the invoked method.</typeparam>
 		/// <typeparam name="T12">The type of the twelfth argument of the invoked method.</typeparam>
@@ -409,7 +409,7 @@ namespace Moq.Language
 		/// <typeparam name="T6">The type of the sixth argument of the invoked method.</typeparam>
 		/// <typeparam name="T7">The type of the seventh argument of the invoked method.</typeparam>
 		/// <typeparam name="T8">The type of the eighth argument of the invoked method.</typeparam>
-		/// <typeparam name="T9">The type of the nineth argument of the invoked method.</typeparam>
+		/// <typeparam name="T9">The type of the ninth argument of the invoked method.</typeparam>
 		/// <typeparam name="T10">The type of the tenth argument of the invoked method.</typeparam>
 		/// <typeparam name="T11">The type of the eleventh argument of the invoked method.</typeparam>
 		/// <typeparam name="T12">The type of the twelfth argument of the invoked method.</typeparam>
@@ -453,7 +453,7 @@ namespace Moq.Language
 		/// <typeparam name="T6">The type of the sixth argument of the invoked method.</typeparam>
 		/// <typeparam name="T7">The type of the seventh argument of the invoked method.</typeparam>
 		/// <typeparam name="T8">The type of the eighth argument of the invoked method.</typeparam>
-		/// <typeparam name="T9">The type of the nineth argument of the invoked method.</typeparam>
+		/// <typeparam name="T9">The type of the ninth argument of the invoked method.</typeparam>
 		/// <typeparam name="T10">The type of the tenth argument of the invoked method.</typeparam>
 		/// <typeparam name="T11">The type of the eleventh argument of the invoked method.</typeparam>
 		/// <typeparam name="T12">The type of the twelfth argument of the invoked method.</typeparam>
@@ -499,7 +499,7 @@ namespace Moq.Language
 		/// <typeparam name="T6">The type of the sixth argument of the invoked method.</typeparam>
 		/// <typeparam name="T7">The type of the seventh argument of the invoked method.</typeparam>
 		/// <typeparam name="T8">The type of the eighth argument of the invoked method.</typeparam>
-		/// <typeparam name="T9">The type of the nineth argument of the invoked method.</typeparam>
+		/// <typeparam name="T9">The type of the ninth argument of the invoked method.</typeparam>
 		/// <typeparam name="T10">The type of the tenth argument of the invoked method.</typeparam>
 		/// <typeparam name="T11">The type of the eleventh argument of the invoked method.</typeparam>
 		/// <typeparam name="T12">The type of the twelfth argument of the invoked method.</typeparam>
@@ -547,7 +547,7 @@ namespace Moq.Language
 		/// <typeparam name="T6">The type of the sixth argument of the invoked method.</typeparam>
 		/// <typeparam name="T7">The type of the seventh argument of the invoked method.</typeparam>
 		/// <typeparam name="T8">The type of the eighth argument of the invoked method.</typeparam>
-		/// <typeparam name="T9">The type of the nineth argument of the invoked method.</typeparam>
+		/// <typeparam name="T9">The type of the ninth argument of the invoked method.</typeparam>
 		/// <typeparam name="T10">The type of the tenth argument of the invoked method.</typeparam>
 		/// <typeparam name="T11">The type of the eleventh argument of the invoked method.</typeparam>
 		/// <typeparam name="T12">The type of the twelfth argument of the invoked method.</typeparam>
@@ -806,7 +806,7 @@ namespace Moq.Language
 		/// <typeparam name="T6">The type of the sixth argument of the invoked method.</typeparam>
 		/// <typeparam name="T7">The type of the seventh argument of the invoked method.</typeparam>
 		/// <typeparam name="T8">The type of the eighth argument of the invoked method.</typeparam>
-		/// <typeparam name="T9">The type of the nineth argument of the invoked method.</typeparam>
+		/// <typeparam name="T9">The type of the ninth argument of the invoked method.</typeparam>
 		/// <param name="action">The callback method to invoke.</param>
 		/// <returns>A reference to <see cref="IReturnsThrows{TMock, TResult}"/> interface.</returns>
 		/// <example>
@@ -843,7 +843,7 @@ namespace Moq.Language
 		/// <typeparam name="T6">The type of the sixth argument of the invoked method.</typeparam>
 		/// <typeparam name="T7">The type of the seventh argument of the invoked method.</typeparam>
 		/// <typeparam name="T8">The type of the eighth argument of the invoked method.</typeparam>
-		/// <typeparam name="T9">The type of the nineth argument of the invoked method.</typeparam>
+		/// <typeparam name="T9">The type of the ninth argument of the invoked method.</typeparam>
 		/// <typeparam name="T10">The type of the tenth argument of the invoked method.</typeparam>
 		/// <param name="action">The callback method to invoke.</param>
 		/// <returns>A reference to <see cref="IReturnsThrows{TMock, TResult}"/> interface.</returns>
@@ -882,7 +882,7 @@ namespace Moq.Language
 		/// <typeparam name="T6">The type of the sixth argument of the invoked method.</typeparam>
 		/// <typeparam name="T7">The type of the seventh argument of the invoked method.</typeparam>
 		/// <typeparam name="T8">The type of the eighth argument of the invoked method.</typeparam>
-		/// <typeparam name="T9">The type of the nineth argument of the invoked method.</typeparam>
+		/// <typeparam name="T9">The type of the ninth argument of the invoked method.</typeparam>
 		/// <typeparam name="T10">The type of the tenth argument of the invoked method.</typeparam>
 		/// <typeparam name="T11">The type of the eleventh argument of the invoked method.</typeparam>
 		/// <param name="action">The callback method to invoke.</param>
@@ -923,7 +923,7 @@ namespace Moq.Language
 		/// <typeparam name="T6">The type of the sixth argument of the invoked method.</typeparam>
 		/// <typeparam name="T7">The type of the seventh argument of the invoked method.</typeparam>
 		/// <typeparam name="T8">The type of the eighth argument of the invoked method.</typeparam>
-		/// <typeparam name="T9">The type of the nineth argument of the invoked method.</typeparam>
+		/// <typeparam name="T9">The type of the ninth argument of the invoked method.</typeparam>
 		/// <typeparam name="T10">The type of the tenth argument of the invoked method.</typeparam>
 		/// <typeparam name="T11">The type of the eleventh argument of the invoked method.</typeparam>
 		/// <typeparam name="T12">The type of the twelfth argument of the invoked method.</typeparam>
@@ -966,7 +966,7 @@ namespace Moq.Language
 		/// <typeparam name="T6">The type of the sixth argument of the invoked method.</typeparam>
 		/// <typeparam name="T7">The type of the seventh argument of the invoked method.</typeparam>
 		/// <typeparam name="T8">The type of the eighth argument of the invoked method.</typeparam>
-		/// <typeparam name="T9">The type of the nineth argument of the invoked method.</typeparam>
+		/// <typeparam name="T9">The type of the ninth argument of the invoked method.</typeparam>
 		/// <typeparam name="T10">The type of the tenth argument of the invoked method.</typeparam>
 		/// <typeparam name="T11">The type of the eleventh argument of the invoked method.</typeparam>
 		/// <typeparam name="T12">The type of the twelfth argument of the invoked method.</typeparam>
@@ -1011,7 +1011,7 @@ namespace Moq.Language
 		/// <typeparam name="T6">The type of the sixth argument of the invoked method.</typeparam>
 		/// <typeparam name="T7">The type of the seventh argument of the invoked method.</typeparam>
 		/// <typeparam name="T8">The type of the eighth argument of the invoked method.</typeparam>
-		/// <typeparam name="T9">The type of the nineth argument of the invoked method.</typeparam>
+		/// <typeparam name="T9">The type of the ninth argument of the invoked method.</typeparam>
 		/// <typeparam name="T10">The type of the tenth argument of the invoked method.</typeparam>
 		/// <typeparam name="T11">The type of the eleventh argument of the invoked method.</typeparam>
 		/// <typeparam name="T12">The type of the twelfth argument of the invoked method.</typeparam>
@@ -1058,7 +1058,7 @@ namespace Moq.Language
 		/// <typeparam name="T6">The type of the sixth argument of the invoked method.</typeparam>
 		/// <typeparam name="T7">The type of the seventh argument of the invoked method.</typeparam>
 		/// <typeparam name="T8">The type of the eighth argument of the invoked method.</typeparam>
-		/// <typeparam name="T9">The type of the nineth argument of the invoked method.</typeparam>
+		/// <typeparam name="T9">The type of the ninth argument of the invoked method.</typeparam>
 		/// <typeparam name="T10">The type of the tenth argument of the invoked method.</typeparam>
 		/// <typeparam name="T11">The type of the eleventh argument of the invoked method.</typeparam>
 		/// <typeparam name="T12">The type of the twelfth argument of the invoked method.</typeparam>
@@ -1107,7 +1107,7 @@ namespace Moq.Language
 		/// <typeparam name="T6">The type of the sixth argument of the invoked method.</typeparam>
 		/// <typeparam name="T7">The type of the seventh argument of the invoked method.</typeparam>
 		/// <typeparam name="T8">The type of the eighth argument of the invoked method.</typeparam>
-		/// <typeparam name="T9">The type of the nineth argument of the invoked method.</typeparam>
+		/// <typeparam name="T9">The type of the ninth argument of the invoked method.</typeparam>
 		/// <typeparam name="T10">The type of the tenth argument of the invoked method.</typeparam>
 		/// <typeparam name="T11">The type of the eleventh argument of the invoked method.</typeparam>
 		/// <typeparam name="T12">The type of the twelfth argument of the invoked method.</typeparam>

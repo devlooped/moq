@@ -1287,8 +1287,8 @@ namespace Moq.Tests.Regressions
 
 				public override int GetHashCode()
 				{
-					// This is legal: Equal objects must have equal hashcodes,
-					// but objects with equal hashcodes are not necessarily equal.
+					// This is legal: Equal objects must have equal hash codes,
+					// but objects with equal hash codes are not necessarily equal.
 					// We are essentially rendering GetHashCode useless for equality
 					// comparison, so whoever compares instances of this type will
 					// (or should!) end up using the more precise Equals.
@@ -1381,7 +1381,7 @@ namespace Moq.Tests.Regressions
 				// the default value returned for most reference types. However, this test
 				// becomes relevant once Moq starts supporting custom implementations of
 				// `IDefaultValueProvider`. Then it might no longer be a given that `null`
-				// is the default return value that noone would want to explicitly set up.
+				// is the default return value that no one would want to explicitly set up.
 				var userProvider = Mock.Of<IUserProvider>(p => p.GetUserByEmail("alice@example.com") == null);
 				var user = userProvider.GetUserByEmail("alice@example.com");
 				Assert.Null(user);

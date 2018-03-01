@@ -166,7 +166,7 @@ namespace Moq.Language
 		/// <typeparam name="T6">The type of the sixth argument received by the expected invocation.</typeparam>
 		/// <typeparam name="T7">The type of the seventh argument received by the expected invocation.</typeparam>
 		/// <typeparam name="T8">The type of the eighth argument received by the expected invocation.</typeparam>
-		/// <typeparam name="T9">The type of the nineth argument received by the expected invocation.</typeparam>
+		/// <typeparam name="T9">The type of the ninth argument received by the expected invocation.</typeparam>
 		/// <seealso cref="Raises(Action{T}, EventArgs)"/>
 		IVerifies Raises<T1, T2, T3, T4, T5, T6, T7, T8, T9>(Action<T> eventExpression, Func<T1, T2, T3, T4, T5, T6, T7, T8, T9, EventArgs> func);
 
@@ -184,7 +184,7 @@ namespace Moq.Language
 		/// <typeparam name="T6">The type of the sixth argument received by the expected invocation.</typeparam>
 		/// <typeparam name="T7">The type of the seventh argument received by the expected invocation.</typeparam>
 		/// <typeparam name="T8">The type of the eighth argument received by the expected invocation.</typeparam>
-		/// <typeparam name="T9">The type of the nineth argument received by the expected invocation.</typeparam>
+		/// <typeparam name="T9">The type of the ninth argument received by the expected invocation.</typeparam>
 		/// <typeparam name="T10">The type of the tenth argument received by the expected invocation.</typeparam>
 		/// <seealso cref="Raises(Action{T}, EventArgs)"/>
 		IVerifies Raises<T1, T2, T3, T4, T5, T6, T7, T8, T9, T10>(Action<T> eventExpression, Func<T1, T2, T3, T4, T5, T6, T7, T8, T9, T10, EventArgs> func);
@@ -203,7 +203,7 @@ namespace Moq.Language
 		/// <typeparam name="T6">The type of the sixth argument received by the expected invocation.</typeparam>
 		/// <typeparam name="T7">The type of the seventh argument received by the expected invocation.</typeparam>
 		/// <typeparam name="T8">The type of the eighth argument received by the expected invocation.</typeparam>
-		/// <typeparam name="T9">The type of the nineth argument received by the expected invocation.</typeparam>
+		/// <typeparam name="T9">The type of the ninth argument received by the expected invocation.</typeparam>
 		/// <typeparam name="T10">The type of the tenth argument received by the expected invocation.</typeparam>
 		/// <typeparam name="T11">The type of the eleventh argument received by the expected invocation.</typeparam>
 		/// <seealso cref="Raises(Action{T}, EventArgs)"/>
@@ -223,7 +223,7 @@ namespace Moq.Language
 		/// <typeparam name="T6">The type of the sixth argument received by the expected invocation.</typeparam>
 		/// <typeparam name="T7">The type of the seventh argument received by the expected invocation.</typeparam>
 		/// <typeparam name="T8">The type of the eighth argument received by the expected invocation.</typeparam>
-		/// <typeparam name="T9">The type of the nineth argument received by the expected invocation.</typeparam>
+		/// <typeparam name="T9">The type of the ninth argument received by the expected invocation.</typeparam>
 		/// <typeparam name="T10">The type of the tenth argument received by the expected invocation.</typeparam>
 		/// <typeparam name="T11">The type of the eleventh argument received by the expected invocation.</typeparam>
 		/// <typeparam name="T12">The type of the twelfth argument received by the expected invocation.</typeparam>
@@ -244,7 +244,7 @@ namespace Moq.Language
 		/// <typeparam name="T6">The type of the sixth argument received by the expected invocation.</typeparam>
 		/// <typeparam name="T7">The type of the seventh argument received by the expected invocation.</typeparam>
 		/// <typeparam name="T8">The type of the eighth argument received by the expected invocation.</typeparam>
-		/// <typeparam name="T9">The type of the nineth argument received by the expected invocation.</typeparam>
+		/// <typeparam name="T9">The type of the ninth argument received by the expected invocation.</typeparam>
 		/// <typeparam name="T10">The type of the tenth argument received by the expected invocation.</typeparam>
 		/// <typeparam name="T11">The type of the eleventh argument received by the expected invocation.</typeparam>
 		/// <typeparam name="T12">The type of the twelfth argument received by the expected invocation.</typeparam>
@@ -266,7 +266,7 @@ namespace Moq.Language
 		/// <typeparam name="T6">The type of the sixth argument received by the expected invocation.</typeparam>
 		/// <typeparam name="T7">The type of the seventh argument received by the expected invocation.</typeparam>
 		/// <typeparam name="T8">The type of the eighth argument received by the expected invocation.</typeparam>
-		/// <typeparam name="T9">The type of the nineth argument received by the expected invocation.</typeparam>
+		/// <typeparam name="T9">The type of the ninth argument received by the expected invocation.</typeparam>
 		/// <typeparam name="T10">The type of the tenth argument received by the expected invocation.</typeparam>
 		/// <typeparam name="T11">The type of the eleventh argument received by the expected invocation.</typeparam>
 		/// <typeparam name="T12">The type of the twelfth argument received by the expected invocation.</typeparam>
@@ -289,7 +289,7 @@ namespace Moq.Language
 		/// <typeparam name="T6">The type of the sixth argument received by the expected invocation.</typeparam>
 		/// <typeparam name="T7">The type of the seventh argument received by the expected invocation.</typeparam>
 		/// <typeparam name="T8">The type of the eighth argument received by the expected invocation.</typeparam>
-		/// <typeparam name="T9">The type of the nineth argument received by the expected invocation.</typeparam>
+		/// <typeparam name="T9">The type of the ninth argument received by the expected invocation.</typeparam>
 		/// <typeparam name="T10">The type of the tenth argument received by the expected invocation.</typeparam>
 		/// <typeparam name="T11">The type of the eleventh argument received by the expected invocation.</typeparam>
 		/// <typeparam name="T12">The type of the twelfth argument received by the expected invocation.</typeparam>
@@ -313,7 +313,7 @@ namespace Moq.Language
 		/// <typeparam name="T6">The type of the sixth argument received by the expected invocation.</typeparam>
 		/// <typeparam name="T7">The type of the seventh argument received by the expected invocation.</typeparam>
 		/// <typeparam name="T8">The type of the eighth argument received by the expected invocation.</typeparam>
-		/// <typeparam name="T9">The type of the nineth argument received by the expected invocation.</typeparam>
+		/// <typeparam name="T9">The type of the ninth argument received by the expected invocation.</typeparam>
 		/// <typeparam name="T10">The type of the tenth argument received by the expected invocation.</typeparam>
 		/// <typeparam name="T11">The type of the eleventh argument received by the expected invocation.</typeparam>
 		/// <typeparam name="T12">The type of the twelfth argument received by the expected invocation.</typeparam>

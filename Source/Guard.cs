@@ -86,8 +86,8 @@ namespace Moq
 		/// <typeparam name="T">Type of the argument to check, it must be an <see cref="IComparable"/> type.
 		/// </typeparam>
 		/// <param name="value">The argument value to check.</param>
-		/// <param name="from">The minimun allowed value for the argument.</param>
-		/// <param name="to">The maximun allowed value for the argument.</param>
+		/// <param name="from">The minimum allowed value for the argument.</param>
+		/// <param name="to">The maximum allowed value for the argument.</param>
 		/// <param name="paramName">The name of the parameter.</param>
 		public static void NotOutOfRangeInclusive<T>(T value, T from, T to, string paramName)
 				where T : IComparable
@@ -104,8 +104,8 @@ namespace Moq
 		/// <typeparam name="T">Type of the argument to check, it must be an <see cref="IComparable"/> type.
 		/// </typeparam>
 		/// <param name="value">The argument value to check.</param>
-		/// <param name="from">The minimun allowed value for the argument.</param>
-		/// <param name="to">The maximun allowed value for the argument.</param>
+		/// <param name="from">The minimum allowed value for the argument.</param>
+		/// <param name="to">The maximum allowed value for the argument.</param>
 		/// <param name="paramName">The name of the parameter.</param>
 		public static void NotOutOfRangeExclusive<T>(T value, T from, T to, string paramName)
 				where T : IComparable

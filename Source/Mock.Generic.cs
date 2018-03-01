@@ -302,7 +302,7 @@ namespace Moq
 			get
 			{
 				// Ensure object is created, which causes the delegateInterfaceMethod
-				// to be initialised.
+				// to be initialized.
 				OnGetObject();
 
 				return delegateInterfaceMethod;
@@ -625,7 +625,7 @@ namespace Moq
 			}
 			catch (Exception e)
 			{
-				// Reset stacktrace so user gets this call site only.
+				// Reset stack trace so user gets this call site only.
 				throw e;
 			}
 		}
@@ -643,7 +643,7 @@ namespace Moq
 			}
 			catch (Exception e)
 			{
-				// Reset stacktrace so user gets this call site only.
+				// Reset stack trace so user gets this call site only.
 				throw e;
 			}
 		}
