@@ -1878,6 +1878,7 @@ namespace Moq.Tests.Regressions
 		}
 
 		#endregion
+
 		#region 593
 
 		public class Issue593

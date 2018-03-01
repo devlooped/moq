@@ -13,7 +13,7 @@ The format is loosely based on [Keep a Changelog](http://keepachangelog.com/en/1
 
 #### Changed
 
-* **Breaking change:** `sequenceSetup.ReturnsAsync(...)`, `sequenceSetup.ThrowsAsync(...)`, `setup.ReturnsAsync(..., TimeSpan)`, `setup.ReturnsAsync(..., TimeSpan, TimeSpan)`, `setup.ReturnsAsync(..., TimeSpan, TimeSpan, Random)` and all overloads of `setup.ThrowsAsync(...)` now return a different `Task` on each invocation, which wasn't previously the case (@snrnats, #595) 
+* **Breaking change:** All ReturnsAsync and ThrowsAsync setup methods now consistently return a new Task on each invocation (@snrnats, #595) 
 
 #### Fixed
 
