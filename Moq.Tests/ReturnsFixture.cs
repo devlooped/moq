@@ -37,6 +37,42 @@ namespace Moq.Tests
 		}
 
 		[Fact]
+		public void ReturnsNullValueIfNullDelegate()
+		{
+			var mock = new Mock<IFoo>();
+			mock.Setup(foo => foo.Execute("Whatever")).Returns((Delegate)null);
+			Assert.Null(mock.Object.Execute("Whatever"));
+			mock.VerifyAll();
+		}
+
+		[Fact]
+		public void ReturnsNullValueIfSpecifiedForStrictMock()
+		{
+			var mock = new Mock<IFoo>(MockBehavior.Strict);
+			mock.Setup(foo => foo.Execute("Whatever")).Returns((string)null);
+			Assert.Null(mock.Object.Execute("Whatever"));
+			mock.VerifyAll();
+		}
+
+		[Fact]
+		public void ReturnsNullValueIfNullFuncForStrictMock()
+		{
+			var mock = new Mock<IFoo>(MockBehavior.Strict);
+			mock.Setup(foo => foo.Execute("Whatever")).Returns((Func<string>)null);
+			Assert.Null(mock.Object.Execute("Whatever"));
+			mock.VerifyAll();
+		}
+
+		[Fact]
+		public void ReturnsNullValueIfNullDelegateForStrictMock()
+		{
+			var mock = new Mock<IFoo>();
+			mock.Setup(foo => foo.Execute("Whatever")).Returns((Delegate)null);
+			Assert.Null(mock.Object.Execute("Whatever"));
+			mock.VerifyAll();
+		}
+
+		[Fact]
 		public void DifferentMethodCallsReturnDifferentValues()
 		{
 			var mock = new Mock<IFoo>();

@@ -100,14 +100,7 @@ namespace Moq
 				return this.Returns(() => (TResult)(object)valueFunction);
 			}
 
-			// The following may seem overly cautious, but we don't throw an `ArgumentNullException`
-			// here because Moq has been very forgiving with incorrect `Returns` in the past.
-			if (valueFunction == null)
-			{
-				return this.Returns(() => default(TResult));
-			}
-
-			if (valueFunction.GetMethodInfo().ReturnType == typeof(void))
+			if (valueFunction != null && valueFunction.GetMethodInfo().ReturnType == typeof(void))
 			{
 				throw new ArgumentException(Resources.InvalidReturnsCallbackNotADelegateWithReturnType, nameof(valueFunction));
 			}
@@ -154,12 +147,18 @@ namespace Moq
 
 		private void SetReturnDelegate(Delegate value)
 		{
-			if (value != null)
+			if (value == null)
+			{
+				// The following may seem overly cautious, but we don't throw an `ArgumentNullException`
+				// here because Moq has been very forgiving with incorrect `Returns` in the past.
+				this.valueDel = (Func<TResult>)(() => default(TResult));
+			}
+			else
 			{
 				ValidateReturnDelegate(value);
+				this.valueDel = value;
 			}
 
-			this.valueDel = value;
 			this.returnValueKind = ReturnValueKind.Explicit;
 		}
 
