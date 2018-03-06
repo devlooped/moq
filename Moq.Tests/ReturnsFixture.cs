@@ -66,7 +66,7 @@ namespace Moq.Tests
 		[Fact]
 		public void ReturnsNullValueIfNullDelegateForStrictMock()
 		{
-			var mock = new Mock<IFoo>();
+			var mock = new Mock<IFoo>(MockBehavior.Strict);
 			mock.Setup(foo => foo.Execute("Whatever")).Returns((Delegate)null);
 			Assert.Null(mock.Object.Execute("Whatever"));
 			mock.VerifyAll();
