@@ -149,8 +149,12 @@ namespace Moq
 		{
 			if (value == null)
 			{
-				// The following may seem overly cautious, but we don't throw an `ArgumentNullException`
-				// here because Moq has been very forgiving with incorrect `Returns` in the past.
+				// A `null` reference (instead of a valid delegate) is interpreted as the actual return value.
+				// This is necessary because the compiler might have picked the unexpected overload for calls like `Returns(null)`,
+				// or the user might have picked an overload like `Returns<T>(null)`,
+				// and instead of in `Returns(TResult)`, we ended up in `Returns(Delegate)` or `Returns(Func)`,
+				// which likely isn't what the user intended.
+				// So here we do what we would've done in `Returns(TResult)`:
 				this.valueDel = (Func<TResult>)(() => default(TResult));
 			}
 			else
