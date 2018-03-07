@@ -20,6 +20,7 @@ The format is loosely based on [Keep a Changelog](http://keepachangelog.com/en/1
 
 *  Usage of `ReturnsExtensions.ThrowsAsync()` can cause `UnobservedTaskException` (@snrnats, #595)
 *  `ReturnsAsync` and `ThrowsAsync` with delay parameter starts timer at setup (@snrnats, #595)
+*  `Returns` regression with null function callback (@Caraul, #602)
 
 
 ## 4.8.2 (2018-02-23)
