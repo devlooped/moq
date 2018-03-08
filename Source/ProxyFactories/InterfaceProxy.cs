@@ -105,14 +105,14 @@ namespace Moq.Internals
 
 			public object ReturnValue => this.returnValue;
 
-			public override void Return() { }
+			internal override void Return() { }
 
 			public override void Return(object value)
 			{
 				this.returnValue = value;
 			}
 
-			public override void ReturnBase() { }
+			internal override void ReturnBase() { }
 		}
 	}
 }

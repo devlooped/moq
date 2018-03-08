@@ -1097,7 +1097,7 @@ namespace Moq.Tests
 			var mock = new Mock<IFoo>();
 			mock.Object.Submit();
 
-			var invocation = mock.Invocations.ToArray()[0];
+			var invocation = mock.InvocationCollection.GetSnapshot()[0];
 			Assert.False(invocation.Verified);
 
 			mock.Verify(m => m.Submit());
@@ -1112,7 +1112,7 @@ namespace Moq.Tests
 			mock.Object.Echo(2);
 			mock.Object.Echo(3);
 
-			var invocations = mock.Invocations.ToArray();
+			var invocations = mock.InvocationCollection.GetSnapshot();
 			Assert.False(invocations[0].Verified);
 			Assert.False(invocations[1].Verified);
 			Assert.False(invocations[2].Verified);
@@ -1131,7 +1131,7 @@ namespace Moq.Tests
 			mock.Object.Echo(2);
 			mock.Object.Echo(3);
 
-			var invocations = mock.Invocations.ToArray();
+			var invocations = mock.InvocationCollection.GetSnapshot();
 			Assert.False(invocations[0].Verified);
 			Assert.False(invocations[1].Verified);
 			Assert.False(invocations[2].Verified);

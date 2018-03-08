@@ -39,13 +39,17 @@
 // http://www.opensource.org/licenses/bsd-license.php]
 
 using System.Collections;
+using System.Collections.Generic;
 using System.Diagnostics;
 using System.Reflection;
 using System.Text;
 
 namespace Moq
 {
-	internal abstract class Invocation
+	/// <summary>
+	/// Represents the invocation of a method.
+	/// </summary>
+	public abstract class Invocation
 	{
 		private object[] arguments;
 		private MethodInfo method;
@@ -73,11 +77,16 @@ namespace Moq
 		/// <summary>
 		/// Gets the arguments of the invocation.
 		/// </summary>
+		public IReadOnlyList<object> Arguments => this.ArgumentsArray;
+
+		/// <summary>
+		/// Gets the arguments of the invocation.
+		/// </summary>
 		/// <remarks>
 		/// Arguments may be modified. Derived classes must ensure that by-reference parameters are written back
 		/// when the invocation is ended by a call to any of the three <c>Returns</c> methods.
 		/// </remarks>
-		public object[] Arguments => this.arguments;
+		internal object[] ArgumentsArray => this.arguments;
 
 		internal bool Verified => this.verified;
 
@@ -88,10 +97,10 @@ namespace Moq
 		/// Implementations may assume that this method is only called for a <see langword="void"/> method,
 		/// and that no more calls to any of the three <c>Return</c> methods will be made.
 		/// <para>
-		/// Implementations must ensure that any by-reference parameters are written back from <see cref="Arguments"/>.
+		/// Implementations must ensure that any by-reference parameters are written back from <see cref="ArgumentsArray"/>.
 		/// </para>
 		/// </remarks>
-		public abstract void Return();
+		internal abstract void Return();
 
 		/// <summary>
 		/// Ends the invocation as if a tail call to the base method were made.
@@ -100,10 +109,10 @@ namespace Moq
 		/// Implementations may assume that this method is only called for a method having a callable (non-<see langword="abstract"/>) base method,
 		/// and that no more calls to any of the three <c>Return</c> methods will be made.
 		/// <para>
-		/// Implementations must ensure that any by-reference parameters are written back from <see cref="Arguments"/>.
+		/// Implementations must ensure that any by-reference parameters are written back from <see cref="ArgumentsArray"/>.
 		/// </para>
 		/// </remarks>
-		public abstract void ReturnBase();
+		internal abstract void ReturnBase();
 
 		/// <summary>
 		/// Ends the invocation as if a <see langword="return"/> statement with the specified return value occurred.
@@ -112,7 +121,7 @@ namespace Moq
 		/// Implementations may assume that this method is only called for a non-<see langword="void"/> method,
 		/// and that no more calls to any of the three <c>Return</c> methods will be made.
 		/// <para>
-		/// Implementations must ensure that any by-reference parameters are written back from <see cref="Arguments"/>.
+		/// Implementations must ensure that any by-reference parameters are written back from <see cref="ArgumentsArray"/>.
 		/// </para>
 		/// </remarks>
 		public abstract void Return(object value);
@@ -136,7 +145,7 @@ namespace Moq
 			{
 				builder.Append(method.Name, 4, method.Name.Length - 4);
 				builder.Append(" = ");
-				builder.AppendValueOf(this.Arguments[0]);
+				builder.AppendValueOf(this.ArgumentsArray[0]);
 			}
 			else
 			{
@@ -144,13 +153,13 @@ namespace Moq
 
 				// append argument list:
 				builder.Append('(');
-				for (int i = 0, n = this.Arguments.Length; i < n; ++i)
+				for (int i = 0, n = this.ArgumentsArray.Length; i < n; ++i)
 				{
 					if (i > 0)
 					{
 						builder.Append(", ");
 					}
-					builder.AppendValueOf(this.Arguments[i]);
+					builder.AppendValueOf(this.ArgumentsArray[i]);
 				}
 
 				builder.Append(')');

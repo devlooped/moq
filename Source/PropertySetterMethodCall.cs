@@ -63,7 +63,7 @@ namespace Moq
 		{
 			base.Execute(invocation);
 
-			this.setter.Invoke(invocation.Arguments[0]);
+			this.setter.Invoke(invocation.ArgumentsArray[0]);
 			invocation.Return();
 		}
 	}

@@ -252,13 +252,13 @@ namespace Moq
 
 			foreach (var item in this.outValues)
 			{
-				invocation.Arguments[item.Key] = item.Value;
+				invocation.ArgumentsArray[item.Key] = item.Value;
 			}
 		}
 
 		public bool Matches(Invocation invocation)
 		{
-			var arguments = invocation.Arguments;
+			var arguments = invocation.ArgumentsArray;
 			if  (this.argumentMatchers.Length != arguments.Length)
 			{
 				return false;
@@ -306,7 +306,7 @@ namespace Moq
 				}
 			}
 
-			this.callbackResponse?.Invoke(invocation.Arguments);
+			this.callbackResponse?.Invoke(invocation.ArgumentsArray);
 
 			this.raiseEventResponse?.RespondTo(invocation);
 
@@ -555,7 +555,7 @@ namespace Moq
 					}
 					else
 					{
-						this.mock.DoRaise(this.@event, (EventArgs)this.eventArgsFunc.InvokePreserveStack(invocation.Arguments));
+						this.mock.DoRaise(this.@event, (EventArgs)this.eventArgsFunc.InvokePreserveStack(invocation.ArgumentsArray));
 					}
 				}
 			}

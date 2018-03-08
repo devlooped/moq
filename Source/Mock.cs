@@ -193,7 +193,12 @@ namespace Moq
 
 		internal abstract bool IsObjectInitialized { get; }
 
-		internal abstract InvocationCollection Invocations { get; }
+		internal abstract InvocationCollection InvocationCollection { get; }
+
+		/// <summary>
+		/// Gets the list of invocations which have been performed on this mock.
+		/// </summary>
+		public IReadOnlyList<Invocation> Invocations => InvocationCollection.GetSnapshot();
 
 		/// <include file='Mock.xdoc' path='docs/doc[@for="Mock.OnGetObject"]/*'/>
 		[SuppressMessage("Microsoft.Design", "CA1024:UsePropertiesWhereAppropriate", Justification = "This is actually the protected virtual implementation of the property Object.")]
@@ -390,7 +395,7 @@ namespace Moq
 
 		internal static void VerifyNoOtherCalls(Mock mock)
 		{
-			var unverifiedInvocations = mock.Invocations.ToArray(invocation => !invocation.Verified);
+			var unverifiedInvocations = mock.InvocationCollection.GetSnapshot(invocation => !invocation.Verified).ToArray();
 
 			if (unverifiedInvocations.Any())
 			{
@@ -407,7 +412,7 @@ namespace Moq
 						// sub-object (inner mock); and that sub-object has to have received at least
 						// one call:
 						var wasTransitiveInvocation = mock.InnerMocks.TryGetValue(unverifiedInvocations[i].Method, out MockWithWrappedMockObject inner)
-						                              && inner.Mock.Invocations.Any();
+						                              && inner.Mock.InvocationCollection.Any();
 						if (wasTransitiveInvocation)
 						{
 							unverifiedInvocations[i] = null;
@@ -442,7 +447,7 @@ namespace Moq
 			Expression expression,
 			Times times)
 		{
-			var allInvocations = targetMock.Invocations.ToArray();
+			var allInvocations = targetMock.InvocationCollection.GetSnapshot();
 			var matchingInvocations = allInvocations.Where(expected.Matches).ToArray();
 			var matchingInvocationCount = matchingInvocations.Length;
 			if (!times.Verify(matchingInvocationCount))
@@ -688,7 +693,7 @@ namespace Moq
 				var parameterName = setterExpressionParameters[setterExpressionParameters.Length - 1].Name;
 				var x = Expression.Parameter(last.Invocation.Method.DeclaringType, parameterName);
 
-				var arguments = last.Invocation.Arguments;
+				var arguments = last.Invocation.ArgumentsArray;
 				var parameters = setter.GetParameters();
 				var values = new Expression[arguments.Length];
 
