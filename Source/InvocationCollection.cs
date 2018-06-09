@@ -39,18 +39,41 @@
 // http://www.opensource.org/licenses/bsd-license.php]
 
 using System;
+using System.Collections;
 using System.Collections.Generic;
 using System.Linq;
 
 namespace Moq
 {
-	internal sealed class InvocationCollection
+	internal sealed class InvocationCollection : IReadOnlyList<IReadOnlyInvocation>
 	{
 		private List<Invocation> invocations;
 
 		public InvocationCollection()
 		{
 			this.invocations = new List<Invocation>();
+		}
+
+		public int Count
+		{
+			get
+			{
+				lock (this.invocations)
+				{
+					return this.invocations.Count;
+				}
+			}
+		}
+
+		public IReadOnlyInvocation this[int index]
+		{
+			get
+			{
+				lock (this.invocations)
+				{
+					return this.invocations[index];
+				}
+			}
 		}
 
 		public void Add(Invocation invocation)
@@ -89,5 +112,15 @@ namespace Moq
 				return this.invocations.Where(predicate).ToArray();
 			}
 		}
+
+		public IEnumerator<IReadOnlyInvocation> GetEnumerator()
+		{
+			lock (this.invocations)
+			{
+				return this.invocations.ToList().GetEnumerator();
+			}
+		}
+
+		IEnumerator IEnumerable.GetEnumerator() => GetEnumerator();
 	}
 }
