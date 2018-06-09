@@ -193,7 +193,12 @@ namespace Moq
 
 		internal abstract bool IsObjectInitialized { get; }
 
-		internal abstract InvocationCollection Invocations { get; }
+		/// <summary>
+		/// Gets list of invocations which have been performed on this mock.
+		/// </summary>
+		public IReadOnlyList<IReadOnlyInvocation> Invocations => MutableInvocations;
+
+		internal abstract InvocationCollection MutableInvocations { get; }
 
 		/// <include file='Mock.xdoc' path='docs/doc[@for="Mock.OnGetObject"]/*'/>
 		[SuppressMessage("Microsoft.Design", "CA1024:UsePropertiesWhereAppropriate", Justification = "This is actually the protected virtual implementation of the property Object.")]
@@ -390,7 +395,7 @@ namespace Moq
 
 		internal static void VerifyNoOtherCalls(Mock mock)
 		{
-			var unverifiedInvocations = mock.Invocations.ToArray(invocation => !invocation.Verified);
+			var unverifiedInvocations = mock.MutableInvocations.ToArray(invocation => !invocation.Verified);
 
 			if (unverifiedInvocations.Any())
 			{
@@ -407,7 +412,7 @@ namespace Moq
 						// sub-object (inner mock); and that sub-object has to have received at least
 						// one call:
 						var wasTransitiveInvocation = mock.InnerMocks.TryGetValue(unverifiedInvocations[i].Method, out MockWithWrappedMockObject inner)
-						                              && inner.Mock.Invocations.Any();
+						                              && inner.Mock.MutableInvocations.Any();
 						if (wasTransitiveInvocation)
 						{
 							unverifiedInvocations[i] = null;
@@ -442,7 +447,7 @@ namespace Moq
 			Expression expression,
 			Times times)
 		{
-			var allInvocations = targetMock.Invocations.ToArray();
+			var allInvocations = targetMock.MutableInvocations.ToArray();
 			var matchingInvocations = allInvocations.Where(expected.Matches).ToArray();
 			var matchingInvocationCount = matchingInvocations.Length;
 			if (!times.Verify(matchingInvocationCount))
