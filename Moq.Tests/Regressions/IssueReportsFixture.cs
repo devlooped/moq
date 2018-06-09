@@ -1966,6 +1966,9 @@ namespace Moq.Tests.Regressions
 			public void Struct_ByRef_Delegate()
 			{
 				_ = Mock.Of<StructByRefDelegate>();
+
+				// Note: If this test suddenly starts failing, then the CLR / CoreCLR might have tightened
+				// is signature matching for delegates; see also the comment in `CastleProxyFactory`.
 			}
 		}
 

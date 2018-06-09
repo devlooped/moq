@@ -140,13 +140,44 @@ namespace Moq
 					                                              TypeAttributes.Abstract);
 
 					var invokeMethodOnDelegate = delegateType.GetMethod("Invoke");
-					var delegateParameterTypes = invokeMethodOnDelegate.GetParameters().Select(p => p.ParameterType).ToArray();
+
+					var delegateParameters = invokeMethodOnDelegate.GetParameters();
+					var delegateParameterTypes = delegateParameters.Select(p => p.ParameterType).ToArray();
+
+					var delegateReturnParameter = invokeMethodOnDelegate.ReturnParameter;
+					var delegateReturnType = delegateReturnParameter.ParameterType;
+
+					// Note: The following conditional compilation symbol is currently never defined.
+					// The CLR / CoreCLR do not currently perform a strict signature check for delegates
+					// (see e.g. https://github.com/dotnet/coreclr/issues/18401), so custom attribute
+					// replication is not required. This saves us from adding an additional
+					// 'netstandard1.5' (or later) TFM to Moq's NuGet package.
+					//
+					// However, if delegate mocking suddenly starts malfunctioning, it could be that CLR
+					// matches delegate signatures more strictly. In that case, ensure Moq has a
+					// 'netstandard1.5' (or later) TFM, and define the following compilation symbol:
+
+#if FEATURE_REFLECTION_EMIT_CMODS
+					Type[][] delegateParameterTypeModreqs = delegateParameters.Select(p => p.GetRequiredCustomModifiers()).ToArray();
+					Type[][] delegateParameterTypeModopts = delegateParameters.Select(p => p.GetOptionalCustomModifiers()).ToArray();
+
+					Type[] delegateReturnTypeModreqs = delegateReturnParameter.GetRequiredCustomModifiers();
+					Type[] delegateReturnTypeModopts = delegateReturnParameter.GetOptionalCustomModifiers();
+#else
+					Type[][] delegateParameterTypeModreqs = null;
+					Type[][] delegateParameterTypeModopts = null;
+
+					Type[] delegateReturnTypeModreqs = null;
+					Type[] delegateReturnTypeModopts = null;
+#endif
 
 					// Create a method on the interface with the same signature as the delegate.
-					var newMethBuilder = newTypeBuilder.DefineMethod("Invoke",
-					                                                 MethodAttributes.Public | MethodAttributes.Virtual | MethodAttributes.Abstract,
-					                                                 CallingConventions.HasThis,
-					                                                 invokeMethodOnDelegate.ReturnType, delegateParameterTypes);
+					var newMethBuilder = newTypeBuilder.DefineMethod(
+						"Invoke",
+						MethodAttributes.Public | MethodAttributes.Virtual | MethodAttributes.Abstract,
+						CallingConventions.HasThis,
+						delegateReturnType, delegateReturnTypeModreqs, delegateReturnTypeModopts,
+						delegateParameterTypes, delegateParameterTypeModreqs, delegateParameterTypeModopts);
 
 					foreach (var param in invokeMethodOnDelegate.GetParameters())
 					{
