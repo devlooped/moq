@@ -15,6 +15,7 @@ The format is loosely based on [Keep a Changelog](http://keepachangelog.com/en/1
 
 * **Breaking change:** All `ReturnsAsync` and `ThrowsAsync` setup methods now consistently return a new `Task` on each invocation (@snrnats, #595) 
 * Speed up `Mock.Of<T>()` by approx. one order of magnitude (@informatorius, #598)
+* Update package reference to `Castle.Core` (DynamicProxy) from version 4.2.1 to 4.3.0 (@stakx, #624)
 
 #### Fixed
 
