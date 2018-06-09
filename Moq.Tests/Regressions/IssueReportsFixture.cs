@@ -1906,6 +1906,71 @@ namespace Moq.Tests.Regressions
 
 		#endregion
 
+		#region 605
+
+		public class Issue605
+		{
+			// Taken from https://github.com/castleproject/Core/issues/339.
+
+			public readonly struct Struct
+			{
+			}
+
+			public interface IStructByRefConsumer
+			{
+				void Consume(in Struct message);
+			}
+
+			public interface IGenericStructByRefConsumer<T>
+			{
+				T Consume(in Struct message);
+			}
+
+			public interface IStructByValueConsumer
+			{
+				void Consume(Struct message);
+			}
+
+			[Fact]
+			public void Struct_ByRef_Moq_Test()
+			{
+				_ = Mock.Of<IStructByRefConsumer>();
+			}
+
+			[Fact(Skip = "Currently not supported due to a bug in the runtime, see https://github.com/dotnet/corefx/issues/29254.")]
+			public void Struct_ByRef_Generic_Moq_Test()
+			{
+				_ = Mock.Of<IGenericStructByRefConsumer<int>>();
+			}
+
+			[Fact]
+			public void Struct_ByValue_Moq_Test()
+			{
+				_ = Mock.Of<IStructByValueConsumer>();
+			}
+
+			// Moq performs its own System.Reflection.Emit-ting for mocking delegate types,
+			// so add some tests that target that:
+
+			public delegate void StructByValueDelegate(Struct message);
+
+			public delegate void StructByRefDelegate(in Struct message);
+
+			[Fact]
+			public void Struct_ByValue_Delegate()
+			{
+				_ = Mock.Of<StructByValueDelegate>();
+			}
+
+			[Fact]
+			public void Struct_ByRef_Delegate()
+			{
+				_ = Mock.Of<StructByRefDelegate>();
+			}
+		}
+
+		#endregion
+
 		// Old @ Google Code
 
 		#region #47
