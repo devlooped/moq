@@ -61,6 +61,14 @@ namespace Moq
 		}
 
 		/// <summary>
+		/// Return a sequence of tasks, once per call.
+		/// </summary>
+		public static ISetupSequentialResult<ValueTask<TResult>> ReturnsAsync<TResult>(this ISetupSequentialResult<ValueTask<TResult>> setup, TResult value)
+		{
+			return setup.Returns(() => new ValueTask<TResult>(value));
+		}
+
+		/// <summary>
 		/// Throws a sequence of exceptions, once per call.
 		/// </summary>
 		public static ISetupSequentialResult<Task<TResult>> ThrowsAsync<TResult>(this ISetupSequentialResult<Task<TResult>> setup, Exception exception)
@@ -70,6 +78,19 @@ namespace Moq
 				var tcs = new TaskCompletionSource<TResult>();
 				tcs.SetException(exception);
 				return tcs.Task;
+			});
+		}
+
+		/// <summary>
+		/// Throws a sequence of exceptions, once per call.
+		/// </summary>
+		public static ISetupSequentialResult<ValueTask<TResult>> ThrowsAsync<TResult>(this ISetupSequentialResult<ValueTask<TResult>> setup, Exception exception)
+		{
+			return setup.Returns(() =>
+			{
+				var tcs = new TaskCompletionSource<TResult>();
+				tcs.SetException(exception);
+				return new ValueTask<TResult>(tcs.Task);
 			});
 		}
 	}

@@ -11,6 +11,7 @@ The format is loosely based on [Keep a Changelog](http://keepachangelog.com/en/1
 
 * Add `ISetupSequentialResult<TResult>.Returns` method overload that support delegate for deferred results (@snrnats, #594)
 * Support for C# 7.2's `in` parameter modifier (@stakx, #624, #625)
+* Missing methods `ReturnsAsync` and `ThrowsAsync` for sequential setups of methods returning a `ValueTask` (@stakx, #626) 
 
 #### Changed
 
