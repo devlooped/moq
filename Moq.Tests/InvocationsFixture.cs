@@ -1,8 +1,4 @@
 ﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 using Xunit;
 
 namespace Moq.Tests
@@ -58,9 +54,31 @@ namespace Moq.Tests
 		    mock.Object.CompareTo(0);
 		    mock.Object.CompareTo(1);
 
-		    var count = mock.Invocations.Count();
+		    var count = 0;
 
-			Assert.Equal(mock.Invocations.Count, count);
+		    using (var enumerator = mock.Invocations.GetEnumerator())
+		    {
+			    while (enumerator.MoveNext())
+			    {
+				    Assert.NotNull(enumerator.Current);
+
+				    count++;
+			    }
+		    }
+
+			Assert.Equal(3, count);
+	    }
+
+	    [Fact]
+	    public void MockInvocationsCanBeCleared()
+	    {
+		    var mock = new Mock<IComparable>();
+
+		    mock.Object.CompareTo(new object());
+
+			mock.ResetCalls();
+
+		    Assert.Equal(0, mock.Invocations.Count);
 	    }
 	}
 }
