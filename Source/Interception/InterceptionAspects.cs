@@ -257,7 +257,7 @@ namespace Moq
 			}
 
 			// Save to support Verify[expression] pattern.
-			mock.Invocations.Add(invocation);
+			mock.MutableInvocations.Add(invocation);
 			return InterceptionAction.Continue;
 		}
 

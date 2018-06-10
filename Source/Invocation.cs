@@ -39,13 +39,14 @@
 // http://www.opensource.org/licenses/bsd-license.php]
 
 using System.Collections;
+using System.Collections.Generic;
 using System.Diagnostics;
 using System.Reflection;
 using System.Text;
 
 namespace Moq
 {
-	internal abstract class Invocation
+	internal abstract class Invocation : IReadOnlyInvocation
 	{
 		private object[] arguments;
 		private MethodInfo method;
@@ -78,6 +79,8 @@ namespace Moq
 		/// when the invocation is ended by a call to any of the three <c>Returns</c> methods.
 		/// </remarks>
 		public object[] Arguments => this.arguments;
+
+		IReadOnlyList<object> IReadOnlyInvocation.Arguments => this.arguments;
 
 		internal bool Verified => this.verified;
 

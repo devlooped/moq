@@ -15,7 +15,7 @@ namespace Moq
 		/// <param name="mock">The mock whose recorded invocations should be reset.</param>
 		public static void ResetCalls(this Mock mock)
 		{
-			mock.Invocations.Clear();
+			mock.MutableInvocations.Clear();
 		}
 
 		/// <summary>
