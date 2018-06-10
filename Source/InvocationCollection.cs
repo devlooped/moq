@@ -69,7 +69,6 @@ namespace Moq
 		{
 			get
 			{
-				// Test 
 				if (this.invocations == null)
 				{
 					throw new IndexOutOfRangeException();
@@ -95,14 +94,6 @@ namespace Moq
 
 				this.invocations[this.count] = invocation;
 				this.count++;
-			}
-		}
-
-		public bool Any()
-		{
-			lock (this.invocationsLock)
-			{
-				return this.count > 0;
 			}
 		}
 
