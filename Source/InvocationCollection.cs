@@ -133,25 +133,19 @@ namespace Moq
 				{
 					return new Invocation[0];
 				}
-
-				var result = new Invocation[this.count];
-				var resultIndex = 0;
-				var resultSize = 0;
+				
+				var result = new List<Invocation>(this.count);
 
 				for (var i = 0; i < this.count; i++)
 				{
 					var invocation = this.invocations[i];
 					if (predicate(invocation))
 					{
-						result[resultIndex] = invocation;
-						resultIndex++;
-						resultSize++;
+						result.Add(invocation);
 					}
 				}
 
-				Array.Resize(ref result, resultSize);
-
-				return result;
+				return result.ToArray();
 			}
 		}
 
