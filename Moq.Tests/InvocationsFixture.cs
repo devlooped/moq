@@ -48,5 +48,19 @@ namespace Moq.Tests
 
 			Assert.Equal(expectedArguments, invocation.Arguments);
 	    }
+
+	    [Fact]
+	    public void MockInvocationsCanBeEnumerated()
+	    {
+			var mock = new Mock<IComparable>();
+
+		    mock.Object.CompareTo(-1);
+		    mock.Object.CompareTo(0);
+		    mock.Object.CompareTo(1);
+
+		    var count = mock.Invocations.Count();
+
+			Assert.Equal(mock.Invocations.Count, count);
+	    }
 	}
 }
