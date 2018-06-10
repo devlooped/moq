@@ -47,20 +47,20 @@ namespace Moq
 {
 	internal sealed class InvocationCollection : IReadOnlyList<IReadOnlyInvocation>
 	{
-		private List<Invocation> invocations;
+		private Invocation[] invocations;
 
-		public InvocationCollection()
-		{
-			this.invocations = new List<Invocation>();
-		}
+		private int capacity = 0;
+		private int count = 0;
+
+		private readonly object invocationsLock = new object();
 
 		public int Count
 		{
 			get
 			{
-				lock (this.invocations)
+				lock (this.invocationsLock)
 				{
-					return this.invocations.Count;
+					return count;
 				}
 			}
 		}
@@ -69,8 +69,13 @@ namespace Moq
 		{
 			get
 			{
-				lock (this.invocations)
+				lock (this.invocationsLock)
 				{
+					if (this.count <= index || index < 0)
+					{
+						throw new IndexOutOfRangeException();
+					}
+
 					return this.invocations[index];
 				}
 			}
@@ -78,46 +83,87 @@ namespace Moq
 
 		public void Add(Invocation invocation)
 		{
-			lock (this.invocations)
+			lock (this.invocationsLock)
 			{
-				this.invocations.Add(invocation);
-			}
-		}
+				if (this.count == this.capacity)
+				{
+					var targetCapacity = this.capacity == 0 ? 4 : (this.capacity * 2);
+					Array.Resize(ref this.invocations, targetCapacity);
+					this.capacity = targetCapacity;
+				}
 
-		public bool Any()
-		{
-			return this.invocations.Count > 0;
+				this.invocations[this.count] = invocation;
+				this.count++;
+			}
 		}
 
 		public void Clear()
 		{
-			lock (this.invocations)
+			lock (this.invocationsLock)
 			{
-				this.invocations.Clear();
+				// Replace the collection so readers with a reference to the old collection aren't interrupted
+				this.invocations = null;
+				this.count = 0;
+				this.capacity = 0;
 			}
 		}
 
 		public Invocation[] ToArray()
 		{
-			lock (this.invocations)
+			lock (this.invocationsLock)
 			{
-				return this.invocations.ToArray();
+				if (this.count == 0)
+				{
+					return new Invocation[0];
+				}
+
+				var result = new Invocation[this.count];
+
+				Array.Copy(this.invocations, result, this.count);
+
+				return result;
 			}
 		}
 
 		public Invocation[] ToArray(Func<Invocation, bool> predicate)
 		{
-			lock (this.invocations)
+			lock (this.invocationsLock)
 			{
-				return this.invocations.Where(predicate).ToArray();
+				if (this.count == 0)
+				{
+					return new Invocation[0];
+				}
+				
+				var result = new List<Invocation>(this.count);
+
+				for (var i = 0; i < this.count; i++)
+				{
+					var invocation = this.invocations[i];
+					if (predicate(invocation))
+					{
+						result.Add(invocation);
+					}
+				}
+
+				return result.ToArray();
 			}
 		}
 
 		public IEnumerator<IReadOnlyInvocation> GetEnumerator()
 		{
-			lock (this.invocations)
+			// Take local copies of collection and count so they are isolated from changes by other threads.
+			Invocation[] collection;
+			int count;
+
+			lock (this.invocationsLock)
 			{
-				return this.invocations.ToList().GetEnumerator();
+				collection = this.invocations;
+				count = this.count;
+			}
+
+			for (var i = 0; i < count; i++)
+			{
+				yield return collection[i];
 			}
 		}
 
