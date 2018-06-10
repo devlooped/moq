@@ -71,7 +71,7 @@ namespace Moq
 			{
 				lock (this.invocationsLock)
 				{
-					if (this.count >= index || index < 0)
+					if (this.count <= index || index < 0)
 					{
 						throw new IndexOutOfRangeException();
 					}
