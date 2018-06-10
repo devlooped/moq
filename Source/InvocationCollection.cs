@@ -69,6 +69,12 @@ namespace Moq
 		{
 			get
 			{
+				// Test 
+				if (this.invocations == null)
+				{
+					throw new IndexOutOfRangeException();
+				}
+
 				lock (this.invocationsLock)
 				{
 					return this.invocations[index];

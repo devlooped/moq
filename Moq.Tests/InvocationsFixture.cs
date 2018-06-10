@@ -80,5 +80,29 @@ namespace Moq.Tests
 
 		    Assert.Equal(0, mock.Invocations.Count);
 	    }
+
+		[Fact]
+	    public void MockInvocationsCanBeRetrievedByIndex()
+	    {
+			var mock = new Mock<IComparable>();
+
+		    mock.Object.CompareTo(-1);
+		    mock.Object.CompareTo(0);
+		    mock.Object.CompareTo(1);
+
+		    var invocation = mock.Invocations[1];
+
+		    var arg = invocation.Arguments[0];
+
+			Assert.Equal(0, arg);
+	    }
+
+		[Fact]
+	    public void MockInvocationsIndexerThrowsIndexOutOfRangeWhenCollectionIsEmpty()
+	    {
+			var mock = new Mock<IComparable>();
+
+			Assert.Throws<IndexOutOfRangeException>(() => mock.Invocations[0]);
+	    }
 	}
 }
