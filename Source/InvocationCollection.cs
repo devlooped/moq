@@ -160,59 +160,22 @@ namespace Moq
 
 		public IEnumerator<IReadOnlyInvocation> GetEnumerator()
 		{
+			// Take local copies of collection and count so they are isolated from changes by other threads.
+			Invocation[] collection;
+			int count;
+
 			lock (this.invocationsLock)
 			{
-				return new Enumerator(this.invocations, this.count);
+				collection = this.invocations;
+				count = this.count;
+			}
+
+			for (var i = 0; i < count; i++)
+			{
+				yield return collection[i];
 			}
 		}
 
 		IEnumerator IEnumerable.GetEnumerator() => GetEnumerator();
-
-		/// <summary>
-		/// Custom enumerator which allows enumeration over the invocation collection, 
-		/// even when the underlying collection is modified.
-		/// </summary>
-		/// <remarks>
-		/// <para>The enumerator insulates the caller from seeing any changes to the collection by only providing
-		/// access to the range which was present when the enumerator was created. The invocation collection
-		/// only appends new items, never removing or modifying.</para>
-		/// </remarks>
-		private class Enumerator : IEnumerator<IReadOnlyInvocation>
-		{
-			private readonly int count;
-			private readonly Invocation[] collection;
-			private int index = 0;
-
-			public Enumerator(Invocation[] collection, int count)
-			{
-				this.collection = collection;
-				this.count = count;
-			}
-
-			public IReadOnlyInvocation Current { get; private set; }
-
-			object IEnumerator.Current => this.Current;
-
-			public bool MoveNext()
-			{
-				if (this.index < this.count)
-				{
-					this.Current = this.collection[this.index];
-					this.index++;
-					return true;
-				}
-
-				return false;
-			}
-
-			public void Reset()
-			{
-				this.index = 0;
-			}
-
-			public void Dispose()
-			{
-			}
-		}
 	}
 }
