@@ -51,16 +51,7 @@ namespace Moq
 {
 	internal static class ExpressionExtensions
 	{
-		/// <summary>
-		/// Casts the expression to a lambda expression, removing 
-		/// a cast if there's any.
-		/// </summary>
-		public static LambdaExpression ToLambda(this Expression expression)
-		{
-			return expression.AssertIsLambda().StripConversion();
-		}
-
-		private static LambdaExpression AssertIsLambda(this Expression expression)
+		public static LambdaExpression AssertIsLambda(this Expression expression)
 		{
 			Guard.NotNull(expression, nameof(expression));
 
@@ -72,7 +63,7 @@ namespace Moq
 			return lambda;
 		}
 
-		private static LambdaExpression StripConversion(this LambdaExpression lambda)
+		public static LambdaExpression StripConversion(this LambdaExpression lambda)
 		{
 			// Remove convert expressions which are passed-in by the MockProtectedExtensions.
 			// They are passed because LambdaExpression constructor checks the type of 

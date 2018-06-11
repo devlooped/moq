@@ -37,23 +37,23 @@ namespace Moq.Tests
 		}
 
 		[Fact]
-		public void ToLambdaThrowsIfNullExpression()
+		public void AssertIsLambdaThrowsIfNullExpression()
 		{
-			Assert.Throws<ArgumentNullException>(() => ExpressionExtensions.ToLambda(null));
+			Assert.Throws<ArgumentNullException>(() => ExpressionExtensions.AssertIsLambda(null));
 		}
 
 		[Fact]
-		public void ToLambdaThrowsIfExpressionNotLambda()
+		public void AssertIsLambdaThrowsIfExpressionNotLambda()
 		{
-			Assert.Throws<ArgumentException>(() => Expression.Constant(5).ToLambda());
+			Assert.Throws<ArgumentException>(() => Expression.Constant(5).AssertIsLambda());
 		}
 
 		[Fact]
-		public void ToLambdaRemovesConvert()
+		public void StripConversionLambdaRemovesConvert()
 		{
-			var lambda = ToExpression<object>(() => (object)5);
+			var lambda = ToExpression<object>(() => (object)5).AssertIsLambda();
 
-			var result = lambda.ToLambda();
+			var result = lambda.StripConversion();
 
 			Assert.Equal(typeof(int), result.Compile().GetMethodInfo().ReturnType);
 		}
@@ -61,7 +61,7 @@ namespace Moq.Tests
 		[Fact]
 		public void IsPropertyLambdaTrue()
 		{
-			var expr = ToExpression<IFoo, int>(f => f.Value).ToLambda();
+			var expr = ToExpression<IFoo, int>(f => f.Value).AssertIsLambda().StripConversion();
 
 			Assert.True(expr.IsProperty());
 		}
@@ -69,7 +69,7 @@ namespace Moq.Tests
 		[Fact]
 		public void IsPropertyLambdaFalse()
 		{
-			var expr = ToExpression<IFoo>(f => f.Do()).ToLambda();
+			var expr = ToExpression<IFoo>(f => f.Do()).AssertIsLambda().StripConversion();
 
 			Assert.False(expr.IsProperty());
 		}
@@ -77,7 +77,7 @@ namespace Moq.Tests
 		[Fact]
 		public void IsPropertyIndexerLambdaTrue()
 		{
-			var expr = ToExpression<IFoo, object>(f => f[5]).ToLambda();
+			var expr = ToExpression<IFoo, object>(f => f[5]).AssertIsLambda().StripConversion();
 
 			Assert.True(expr.IsPropertyIndexer());
 		}
@@ -85,7 +85,7 @@ namespace Moq.Tests
 		[Fact]
 		public void ToMethodCallThrowsIfNotMethodCall()
 		{
-			var expr = ToExpression<IFoo, object>(f => f.Value).ToLambda();
+			var expr = ToExpression<IFoo, object>(f => f.Value).AssertIsLambda().StripConversion();
 
 			Assert.Throws<ArgumentException>(() => expr.ToMethodCall());
 		}
@@ -93,7 +93,7 @@ namespace Moq.Tests
 		[Fact]
 		public void ToMethodCallConvertsLambda()
 		{
-			var expr = ToExpression<IFoo>(f => f.Do()).ToLambda();
+			var expr = ToExpression<IFoo>(f => f.Do()).AssertIsLambda().StripConversion();
 
 			Assert.Equal(typeof(IFoo).GetMethod("Do"), expr.ToMethodCall().Method);
 		}

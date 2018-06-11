@@ -382,8 +382,8 @@ namespace Moq
 
 		private static bool AreSameMethod(Expression left, Expression right)
 		{
-			var leftLambda = left.ToLambda();
-			var rightLambda = right.ToLambda();
+			var leftLambda = left.AssertIsLambda().StripConversion();
+			var rightLambda = right.AssertIsLambda().StripConversion();
 			if (leftLambda != null && rightLambda != null &&
 				leftLambda.Body is MethodCallExpression && rightLambda.Body is MethodCallExpression)
 			{
@@ -472,7 +472,7 @@ namespace Moq
 			Times times,
 			int callCount)
 		{
-			var message = times.GetExceptionMessage(expected.FailMessage, expression.PartialMatcherAwareEval().ToLambda().ToStringFixed(), callCount) +
+			var message = times.GetExceptionMessage(expected.FailMessage, expression.PartialMatcherAwareEval().AssertIsLambda().StripConversion().ToStringFixed(), callCount) +
 				Environment.NewLine + FormatSetupsInfo(setups) +
 				Environment.NewLine + FormatInvocations(actualCalls);
 			throw new MockException(MockException.ExceptionReason.VerificationFailed, message);
