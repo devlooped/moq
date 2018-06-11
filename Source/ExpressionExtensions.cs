@@ -167,9 +167,9 @@ namespace Moq
 			return Evaluator.PartialEval(expression);
 		}
 
-		public static Expression PartialMatcherAwareEval(this Expression expression)
+		public static LambdaExpression PartialMatcherAwareEval(this LambdaExpression expression)
 		{
-			return Evaluator.PartialEval(
+			return (LambdaExpression)Evaluator.PartialEval(
 				expression,
 				PartialMatcherAwareEval_ShouldEvaluate);
 		}

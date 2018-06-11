@@ -369,7 +369,7 @@ namespace Moq
 			where T : class
 		{
 			Mock targetMock = null;
-			Expression expression = null;
+			LambdaExpression expression = null;
 			var expected = SetupSetImpl<T, MethodCall<T>>(mock, setterExpression, (m, expr, method, value) =>
 				{
 					targetMock = m;
@@ -380,10 +380,13 @@ namespace Moq
 			VerifyCalls(targetMock, expected, expression, times);
 		}
 
-		private static bool AreSameMethod(Expression left, Expression right)
+		private static bool AreSameMethod(LambdaExpression left, LambdaExpression right)
 		{
-			var leftLambda = left.AssertIsLambda().StripConversion();
-			var rightLambda = right.AssertIsLambda().StripConversion();
+			Debug.Assert(left != null);
+			Debug.Assert(right != null);
+
+			var leftLambda = left.StripConversion();
+			var rightLambda = right.StripConversion();
 			if (leftLambda != null && rightLambda != null &&
 				leftLambda.Body is MethodCallExpression && rightLambda.Body is MethodCallExpression)
 			{
@@ -444,7 +447,7 @@ namespace Moq
 		private static void VerifyCalls(
 			Mock targetMock,
 			MethodCall expected,
-			Expression expression,
+			LambdaExpression expression,
 			Times times)
 		{
 			var allInvocations = targetMock.MutableInvocations.ToArray();
@@ -468,11 +471,11 @@ namespace Moq
 			MethodCall expected,
 			IEnumerable<MethodCall> setups,
 			IEnumerable<Invocation> actualCalls,
-			Expression expression,
+			LambdaExpression expression,
 			Times times,
 			int callCount)
 		{
-			var message = times.GetExceptionMessage(expected.FailMessage, expression.PartialMatcherAwareEval().AssertIsLambda().StripConversion().ToStringFixed(), callCount) +
+			var message = times.GetExceptionMessage(expected.FailMessage, expression.PartialMatcherAwareEval().StripConversion().ToStringFixed(), callCount) +
 				Environment.NewLine + FormatSetupsInfo(setups) +
 				Environment.NewLine + FormatInvocations(actualCalls);
 			throw new MockException(MockException.ExceptionReason.VerificationFailed, message);
@@ -662,7 +665,7 @@ namespace Moq
 		private static TCall SetupSetImpl<T, TCall>(
 			Mock<T> mock,
 			Action<T> setterExpression,
-			Func<Mock, Expression, MethodInfo, Expression[], TCall> callFactory)
+			Func<Mock, LambdaExpression, MethodInfo, Expression[], TCall> callFactory)
 			where T : class
 			where TCall : MethodCall
 		{
@@ -877,7 +880,7 @@ namespace Moq
 			}
 		}
 
-		private static Expression GetPropertyExpression(Type mockType, PropertyInfo property)
+		private static LambdaExpression GetPropertyExpression(Type mockType, PropertyInfo property)
 		{
 			var param = Expression.Parameter(mockType, "m");
 			return Expression.Lambda(Expression.MakeMemberAccess(param, property), param);

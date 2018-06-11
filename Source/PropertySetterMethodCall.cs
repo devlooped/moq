@@ -53,7 +53,7 @@ namespace Moq
 
 		private Action<object> setter;
 
-		public PropertySetterMethodCall(Mock mock, Expression originalExpression, MethodInfo method, Action<object> setter)
+		public PropertySetterMethodCall(Mock mock, LambdaExpression originalExpression, MethodInfo method, Action<object> setter)
 			: base(mock, null, originalExpression, method, anyMatcherForSingleArgument)
 		{
 			this.setter = setter;
