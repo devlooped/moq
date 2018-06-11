@@ -9,7 +9,7 @@ namespace Moq.Tests.Matchers
 		[Fact]
 		public void MatchesNull()
 		{
-			var expr = ToExpression<object>(() => It.IsAny<object>()).AssertIsLambda().StripConversion().Body;
+			var expr = ToExpression<object>(() => It.IsAny<object>()).StripConversion().Body;
 
 			var matcher = MatcherFactory.CreateMatcher(expr, false);
 
@@ -19,7 +19,7 @@ namespace Moq.Tests.Matchers
 		[Fact]
 		public void MatchesIfAssignableType()
 		{
-			var expr = ToExpression<object>(() => It.IsAny<object>()).AssertIsLambda().StripConversion().Body;
+			var expr = ToExpression<object>(() => It.IsAny<object>()).StripConversion().Body;
 
 			var matcher = MatcherFactory.CreateMatcher(expr, false);
 
@@ -29,7 +29,7 @@ namespace Moq.Tests.Matchers
 		[Fact]
 		public void MatchesIfAssignableInterface()
 		{
-			var expr = ToExpression<IDisposable>(() => It.IsAny<IDisposable>()).AssertIsLambda().StripConversion().Body;
+			var expr = ToExpression<IDisposable>(() => It.IsAny<IDisposable>()).StripConversion().Body;
 
 			var matcher = MatcherFactory.CreateMatcher(expr, false);
 
@@ -39,14 +39,14 @@ namespace Moq.Tests.Matchers
 		[Fact]
 		public void DoesntMatchIfNotAssignableType()
 		{
-			var expr = ToExpression<IFormatProvider>(() => It.IsAny<IFormatProvider>()).AssertIsLambda().StripConversion().Body;
+			var expr = ToExpression<IFormatProvider>(() => It.IsAny<IFormatProvider>()).StripConversion().Body;
 
 			var matcher = MatcherFactory.CreateMatcher(expr, false);
 
 			Assert.False(matcher.Matches("foo"));
 		}
 
-		private Expression ToExpression<TResult>(Expression<Func<TResult>> expr)
+		private LambdaExpression ToExpression<TResult>(Expression<Func<TResult>> expr)
 		{
 			return expr;
 		}

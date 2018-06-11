@@ -51,7 +51,7 @@ namespace Moq.Tests
 		[Fact]
 		public void StripConversionLambdaRemovesConvert()
 		{
-			var lambda = ToExpression<object>(() => (object)5).AssertIsLambda();
+			var lambda = ToExpression<object>(() => (object)5);
 
 			var result = lambda.StripConversion();
 
@@ -61,7 +61,7 @@ namespace Moq.Tests
 		[Fact]
 		public void IsPropertyLambdaTrue()
 		{
-			var expr = ToExpression<IFoo, int>(f => f.Value).AssertIsLambda().StripConversion();
+			var expr = ToExpression<IFoo, int>(f => f.Value).StripConversion();
 
 			Assert.True(expr.IsProperty());
 		}
@@ -69,7 +69,7 @@ namespace Moq.Tests
 		[Fact]
 		public void IsPropertyLambdaFalse()
 		{
-			var expr = ToExpression<IFoo>(f => f.Do()).AssertIsLambda().StripConversion();
+			var expr = ToExpression<IFoo>(f => f.Do()).StripConversion();
 
 			Assert.False(expr.IsProperty());
 		}
@@ -77,7 +77,7 @@ namespace Moq.Tests
 		[Fact]
 		public void IsPropertyIndexerLambdaTrue()
 		{
-			var expr = ToExpression<IFoo, object>(f => f[5]).AssertIsLambda().StripConversion();
+			var expr = ToExpression<IFoo, object>(f => f[5]).StripConversion();
 
 			Assert.True(expr.IsPropertyIndexer());
 		}
@@ -85,7 +85,7 @@ namespace Moq.Tests
 		[Fact]
 		public void ToMethodCallThrowsIfNotMethodCall()
 		{
-			var expr = ToExpression<IFoo, object>(f => f.Value).AssertIsLambda().StripConversion();
+			var expr = ToExpression<IFoo, object>(f => f.Value).StripConversion();
 
 			Assert.Throws<ArgumentException>(() => expr.ToMethodCall());
 		}
@@ -93,7 +93,7 @@ namespace Moq.Tests
 		[Fact]
 		public void ToMethodCallConvertsLambda()
 		{
-			var expr = ToExpression<IFoo>(f => f.Do()).AssertIsLambda().StripConversion();
+			var expr = ToExpression<IFoo>(f => f.Do()).StripConversion();
 
 			Assert.Equal(typeof(IFoo).GetMethod("Do"), expr.ToMethodCall().Method);
 		}
@@ -145,17 +145,17 @@ namespace Moq.Tests
 			Assert.Same(expected, actual);
 		}
 
-		private Expression ToExpression<T>(Expression<Func<T>> expression)
+		private LambdaExpression ToExpression<T>(Expression<Func<T>> expression)
 		{
 			return expression;
 		}
 
-		private Expression ToExpression<T>(Expression<Action<T>> expression)
+		private LambdaExpression ToExpression<T>(Expression<Action<T>> expression)
 		{
 			return expression;
 		}
 
-		private Expression ToExpression<T, TResult>(Expression<Func<T, TResult>> expression)
+		private LambdaExpression ToExpression<T, TResult>(Expression<Func<T, TResult>> expression)
 		{
 			return expression;
 		}
