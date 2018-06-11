@@ -57,6 +57,11 @@ namespace Moq
 		/// </summary>
 		public static LambdaExpression ToLambda(this Expression expression)
 		{
+			return expression.AssertIsLambda().StripConversion();
+		}
+
+		private static LambdaExpression AssertIsLambda(this Expression expression)
+		{
 			Guard.NotNull(expression, nameof(expression));
 
 			LambdaExpression lambda = expression as LambdaExpression;
@@ -64,6 +69,11 @@ namespace Moq
 				throw new ArgumentException(String.Format(CultureInfo.CurrentCulture,
 					Properties.Resources.UnsupportedExpression, expression));
 
+			return lambda;
+		}
+
+		private static LambdaExpression StripConversion(this LambdaExpression lambda)
+		{
 			// Remove convert expressions which are passed-in by the MockProtectedExtensions.
 			// They are passed because LambdaExpression constructor checks the type of 
 			// the returned values, even if the return type is Object and everything 
