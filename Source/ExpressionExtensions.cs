@@ -51,18 +51,6 @@ namespace Moq
 {
 	internal static class ExpressionExtensions
 	{
-		public static LambdaExpression AssertIsLambda(this Expression expression)
-		{
-			Guard.NotNull(expression, nameof(expression));
-
-			LambdaExpression lambda = expression as LambdaExpression;
-			if (lambda == null)
-				throw new ArgumentException(String.Format(CultureInfo.CurrentCulture,
-					Properties.Resources.UnsupportedExpression, expression));
-
-			return lambda;
-		}
-
 		public static LambdaExpression StripConversion(this LambdaExpression lambda)
 		{
 			// Remove convert expressions which are passed-in by the MockProtectedExtensions.

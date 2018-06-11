@@ -37,18 +37,6 @@ namespace Moq.Tests
 		}
 
 		[Fact]
-		public void AssertIsLambdaThrowsIfNullExpression()
-		{
-			Assert.Throws<ArgumentNullException>(() => ExpressionExtensions.AssertIsLambda(null));
-		}
-
-		[Fact]
-		public void AssertIsLambdaThrowsIfExpressionNotLambda()
-		{
-			Assert.Throws<ArgumentException>(() => Expression.Constant(5).AssertIsLambda());
-		}
-
-		[Fact]
 		public void StripConversionLambdaRemovesConvert()
 		{
 			var lambda = ToExpression<object>(() => (object)5);
