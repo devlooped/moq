@@ -49,7 +49,7 @@ namespace Moq.Tests
 		[Fact]
 		public void IsPropertyLambdaTrue()
 		{
-			var expr = ToExpression<IFoo, int>(f => f.Value).StripConversion();
+			var expr = ToExpression<IFoo, int>(f => f.Value);
 
 			Assert.True(expr.IsProperty());
 		}
@@ -57,7 +57,7 @@ namespace Moq.Tests
 		[Fact]
 		public void IsPropertyLambdaFalse()
 		{
-			var expr = ToExpression<IFoo>(f => f.Do()).StripConversion();
+			var expr = ToExpression<IFoo>(f => f.Do());
 
 			Assert.False(expr.IsProperty());
 		}
@@ -65,7 +65,7 @@ namespace Moq.Tests
 		[Fact]
 		public void IsPropertyIndexerLambdaTrue()
 		{
-			var expr = ToExpression<IFoo, object>(f => f[5]).StripConversion();
+			var expr = ToExpression<IFoo, object>(f => f[5]);
 
 			Assert.True(expr.IsPropertyIndexer());
 		}
@@ -73,7 +73,7 @@ namespace Moq.Tests
 		[Fact]
 		public void ToMethodCallThrowsIfNotMethodCall()
 		{
-			var expr = ToExpression<IFoo, object>(f => f.Value).StripConversion();
+			var expr = ToExpression<IFoo, object>(f => f.Value);
 
 			Assert.Throws<ArgumentException>(() => expr.ToMethodCall());
 		}
@@ -81,7 +81,7 @@ namespace Moq.Tests
 		[Fact]
 		public void ToMethodCallConvertsLambda()
 		{
-			var expr = ToExpression<IFoo>(f => f.Do()).StripConversion();
+			var expr = ToExpression<IFoo>(f => f.Do());
 
 			Assert.Equal(typeof(IFoo).GetMethod("Do"), expr.ToMethodCall().Method);
 		}

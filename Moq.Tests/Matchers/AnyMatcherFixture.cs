@@ -9,7 +9,7 @@ namespace Moq.Tests.Matchers
 		[Fact]
 		public void MatchesNull()
 		{
-			var expr = ToExpression<object>(() => It.IsAny<object>()).StripConversion().Body;
+			var expr = ToExpression<object>(() => It.IsAny<object>()).Body;
 
 			var matcher = MatcherFactory.CreateMatcher(expr, false);
 
@@ -19,7 +19,7 @@ namespace Moq.Tests.Matchers
 		[Fact]
 		public void MatchesIfAssignableType()
 		{
-			var expr = ToExpression<object>(() => It.IsAny<object>()).StripConversion().Body;
+			var expr = ToExpression<object>(() => It.IsAny<object>()).Body;
 
 			var matcher = MatcherFactory.CreateMatcher(expr, false);
 
@@ -29,7 +29,7 @@ namespace Moq.Tests.Matchers
 		[Fact]
 		public void MatchesIfAssignableInterface()
 		{
-			var expr = ToExpression<IDisposable>(() => It.IsAny<IDisposable>()).StripConversion().Body;
+			var expr = ToExpression<IDisposable>(() => It.IsAny<IDisposable>()).Body;
 
 			var matcher = MatcherFactory.CreateMatcher(expr, false);
 
@@ -39,7 +39,7 @@ namespace Moq.Tests.Matchers
 		[Fact]
 		public void DoesntMatchIfNotAssignableType()
 		{
-			var expr = ToExpression<IFormatProvider>(() => It.IsAny<IFormatProvider>()).StripConversion().Body;
+			var expr = ToExpression<IFormatProvider>(() => It.IsAny<IFormatProvider>()).Body;
 
 			var matcher = MatcherFactory.CreateMatcher(expr, false);
 
