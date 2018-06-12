@@ -51,7 +51,7 @@ namespace Moq
 
 		private Func<object> getter;
 
-		public PropertyGetterMethodCall(Mock mock, Expression originalExpression, MethodInfo method, Func<object> getter)
+		public PropertyGetterMethodCall(Mock mock, LambdaExpression originalExpression, MethodInfo method, Func<object> getter)
 			: base(mock, null, originalExpression, method, noArgumentMatchers)
 		{
 			this.getter = getter;

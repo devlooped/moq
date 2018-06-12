@@ -37,23 +37,11 @@ namespace Moq.Tests
 		}
 
 		[Fact]
-		public void ToLambdaThrowsIfNullExpression()
-		{
-			Assert.Throws<ArgumentNullException>(() => ExpressionExtensions.ToLambda(null));
-		}
-
-		[Fact]
-		public void ToLambdaThrowsIfExpressionNotLambda()
-		{
-			Assert.Throws<ArgumentException>(() => Expression.Constant(5).ToLambda());
-		}
-
-		[Fact]
-		public void ToLambdaRemovesConvert()
+		public void StripConversionLambdaRemovesConvert()
 		{
 			var lambda = ToExpression<object>(() => (object)5);
 
-			var result = lambda.ToLambda();
+			var result = lambda.StripConversion();
 
 			Assert.Equal(typeof(int), result.Compile().GetMethodInfo().ReturnType);
 		}
@@ -61,7 +49,7 @@ namespace Moq.Tests
 		[Fact]
 		public void IsPropertyLambdaTrue()
 		{
-			var expr = ToExpression<IFoo, int>(f => f.Value).ToLambda();
+			var expr = ToExpression<IFoo, int>(f => f.Value);
 
 			Assert.True(expr.IsProperty());
 		}
@@ -69,7 +57,7 @@ namespace Moq.Tests
 		[Fact]
 		public void IsPropertyLambdaFalse()
 		{
-			var expr = ToExpression<IFoo>(f => f.Do()).ToLambda();
+			var expr = ToExpression<IFoo>(f => f.Do());
 
 			Assert.False(expr.IsProperty());
 		}
@@ -77,7 +65,7 @@ namespace Moq.Tests
 		[Fact]
 		public void IsPropertyIndexerLambdaTrue()
 		{
-			var expr = ToExpression<IFoo, object>(f => f[5]).ToLambda();
+			var expr = ToExpression<IFoo, object>(f => f[5]);
 
 			Assert.True(expr.IsPropertyIndexer());
 		}
@@ -85,7 +73,7 @@ namespace Moq.Tests
 		[Fact]
 		public void ToMethodCallThrowsIfNotMethodCall()
 		{
-			var expr = ToExpression<IFoo, object>(f => f.Value).ToLambda();
+			var expr = ToExpression<IFoo, object>(f => f.Value);
 
 			Assert.Throws<ArgumentException>(() => expr.ToMethodCall());
 		}
@@ -93,7 +81,7 @@ namespace Moq.Tests
 		[Fact]
 		public void ToMethodCallConvertsLambda()
 		{
-			var expr = ToExpression<IFoo>(f => f.Do()).ToLambda();
+			var expr = ToExpression<IFoo>(f => f.Do());
 
 			Assert.Equal(typeof(IFoo).GetMethod("Do"), expr.ToMethodCall().Method);
 		}
@@ -145,17 +133,17 @@ namespace Moq.Tests
 			Assert.Same(expected, actual);
 		}
 
-		private Expression ToExpression<T>(Expression<Func<T>> expression)
+		private LambdaExpression ToExpression<T>(Expression<Func<T>> expression)
 		{
 			return expression;
 		}
 
-		private Expression ToExpression<T>(Expression<Action<T>> expression)
+		private LambdaExpression ToExpression<T>(Expression<Action<T>> expression)
 		{
 			return expression;
 		}
 
-		private Expression ToExpression<T, TResult>(Expression<Func<T, TResult>> expression)
+		private LambdaExpression ToExpression<T, TResult>(Expression<Func<T, TResult>> expression)
 		{
 			return expression;
 		}

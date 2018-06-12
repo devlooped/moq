@@ -59,7 +59,7 @@ namespace Moq
 	internal partial class MethodCall<TMock> : MethodCall, ISetup<TMock>
 		where TMock : class
 	{
-		public MethodCall(Mock mock, Condition condition, Expression originalExpression, MethodInfo method,
+		public MethodCall(Mock mock, Condition condition, LambdaExpression originalExpression, MethodInfo method,
 			params Expression[] arguments)
 			: base(mock, condition, originalExpression, method, arguments)
 		{
@@ -96,7 +96,7 @@ namespace Moq
 		private int originalCallerLineNumber;
 		private MethodBase originalCallerMember;
 #endif
-		private Expression originalExpression;
+		private LambdaExpression originalExpression;
 		private List<KeyValuePair<int, object>> outValues;
 		private RaiseEventResponse raiseEventResponse;
 		private Exception throwExceptionResponse;
@@ -106,7 +106,7 @@ namespace Moq
 		///   Only use this constructor when you know that the specified <paramref name="method"/> has no `out` parameters,
 		///   and when you want to avoid the <see cref="MatcherFactory"/>-related overhead of the other constructor overload.
 		/// </remarks>
-		public MethodCall(Mock mock, Condition condition, Expression originalExpression, MethodInfo method, IMatcher[] argumentMatchers)
+		public MethodCall(Mock mock, Condition condition, LambdaExpression originalExpression, MethodInfo method, IMatcher[] argumentMatchers)
 		{
 			this.argumentMatchers = argumentMatchers;
 			this.condition = condition;
@@ -115,7 +115,7 @@ namespace Moq
 			this.originalExpression = originalExpression;
 		}
 
-		public MethodCall(Mock mock, Condition condition, Expression originalExpression, MethodInfo method, params Expression[] arguments)
+		public MethodCall(Mock mock, Condition condition, LambdaExpression originalExpression, MethodInfo method, params Expression[] arguments)
 		{
 			this.mock = mock;
 			this.condition = condition;
@@ -206,7 +206,7 @@ namespace Moq
 
 		public bool Invoked => this.callCount > 0;
 
-		public Expression SetupExpression => this.originalExpression;
+		public LambdaExpression SetupExpression => this.originalExpression;
 
 		[Conditional("DESKTOP")]
 		[SuppressMessage("Microsoft.Design", "CA1031:DoNotCatchGeneralExceptionTypes")]
@@ -468,7 +468,7 @@ namespace Moq
 				message.Append(this.failMessage).Append(": ");
 			}
 
-			var lambda = this.originalExpression.PartialMatcherAwareEval().ToLambda();
+			var lambda = this.originalExpression.PartialMatcherAwareEval().StripConversion();
 			var targetTypeName = lambda.Parameters[0].Type.Name;
 
 			message.Append(targetTypeName).Append(" ").Append(lambda.ToStringFixed());
@@ -490,7 +490,7 @@ namespace Moq
 		public string Format()
 		{
 			var builder = new StringBuilder();
-			builder.Append(this.originalExpression.PartialMatcherAwareEval().ToLambda().ToStringFixed());
+			builder.Append(this.originalExpression.PartialMatcherAwareEval().StripConversion().ToStringFixed());
 
 			if (this.expectedMaxCallCount != null)
 			{

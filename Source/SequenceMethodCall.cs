@@ -51,7 +51,7 @@ namespace Moq
 		// contains the responses set up with the `CallBase`, `Pass`, `Returns`, and `Throws` verbs
 		private ConcurrentQueue<(ResponseKind, object)> responses;
 
-		public SequenceMethodCall(Mock mock, Expression originalExpression, MethodInfo method, params Expression[] arguments)
+		public SequenceMethodCall(Mock mock, LambdaExpression originalExpression, MethodInfo method, params Expression[] arguments)
 			: base(mock, null, originalExpression, method, arguments)
 		{
 			this.responses = new ConcurrentQueue<(ResponseKind, object)>();

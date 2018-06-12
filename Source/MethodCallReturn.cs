@@ -67,7 +67,7 @@ namespace Moq
 		private Action<object[]> afterReturnCallback;
 		private ReturnValueKind returnValueKind;
 
-		public MethodCallReturn(Mock mock, Condition condition, Expression originalExpression, MethodInfo method, params Expression[] arguments)
+		public MethodCallReturn(Mock mock, Condition condition, LambdaExpression originalExpression, MethodInfo method, params Expression[] arguments)
 			: base(mock, condition, originalExpression, method, arguments)
 		{
 		}

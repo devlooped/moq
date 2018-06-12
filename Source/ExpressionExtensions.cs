@@ -51,19 +51,8 @@ namespace Moq
 {
 	internal static class ExpressionExtensions
 	{
-		/// <summary>
-		/// Casts the expression to a lambda expression, removing 
-		/// a cast if there's any.
-		/// </summary>
-		public static LambdaExpression ToLambda(this Expression expression)
+		public static LambdaExpression StripConversion(this LambdaExpression lambda)
 		{
-			Guard.NotNull(expression, nameof(expression));
-
-			LambdaExpression lambda = expression as LambdaExpression;
-			if (lambda == null)
-				throw new ArgumentException(String.Format(CultureInfo.CurrentCulture,
-					Properties.Resources.UnsupportedExpression, expression));
-
 			// Remove convert expressions which are passed-in by the MockProtectedExtensions.
 			// They are passed because LambdaExpression constructor checks the type of 
 			// the returned values, even if the return type is Object and everything 
@@ -166,9 +155,9 @@ namespace Moq
 			return Evaluator.PartialEval(expression);
 		}
 
-		public static Expression PartialMatcherAwareEval(this Expression expression)
+		public static LambdaExpression PartialMatcherAwareEval(this LambdaExpression expression)
 		{
-			return Evaluator.PartialEval(
+			return (LambdaExpression)Evaluator.PartialEval(
 				expression,
 				PartialMatcherAwareEval_ShouldEvaluate);
 		}

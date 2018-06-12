@@ -49,17 +49,17 @@ namespace Moq
 	internal class SetterMethodCall<TMock, TProperty> : MethodCall<TMock>, ISetupSetter<TMock, TProperty>
 		where TMock : class
 	{
-		public SetterMethodCall(Mock mock, Expression originalExpression, MethodInfo method)
+		public SetterMethodCall(Mock mock, LambdaExpression originalExpression, MethodInfo method)
 			: base(mock, null, originalExpression, method, new[] { ItExpr.IsAny<TProperty>() })
 		{
 		}
 
-		public SetterMethodCall(Mock mock, Expression originalExpression, MethodInfo method, TProperty value)
+		public SetterMethodCall(Mock mock, LambdaExpression originalExpression, MethodInfo method, TProperty value)
 			: base(mock, null, originalExpression, method, new[] { ItExpr.Is<TProperty>(arg => Object.Equals(arg, value)) })
 		{
 		}
 
-		public SetterMethodCall(Mock mock, Condition condition, Expression originalExpression, MethodInfo method, Expression value)
+		public SetterMethodCall(Mock mock, Condition condition, LambdaExpression originalExpression, MethodInfo method, Expression value)
 			: base(mock, condition, originalExpression, method, new[] { value })
 		{
 		}
