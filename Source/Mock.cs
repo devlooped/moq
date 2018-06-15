@@ -475,7 +475,7 @@ namespace Moq
 			Times times,
 			int callCount)
 		{
-			var message = times.GetExceptionMessage(expected.FailMessage, expression.PartialMatcherAwareEval().StripConversion().ToStringFixed(), callCount) +
+			var message = times.GetExceptionMessage(expected.FailMessage, expression.PartialMatcherAwareEval().ToStringFixed(), callCount) +
 				Environment.NewLine + FormatSetupsInfo(setups) +
 				Environment.NewLine + FormatInvocations(actualCalls);
 			throw new MockException(MockException.ExceptionReason.VerificationFailed, message);

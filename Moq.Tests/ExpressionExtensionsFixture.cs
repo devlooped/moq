@@ -36,7 +36,6 @@ namespace Moq.Tests
 			Assert.Contains("ExpressionExtensionsFixture.DoStaticGeneric<Int32>(5)", value);
 		}
 
-		[Fact]
 		public void StripConversionLambdaRemovesConvert()
 		{
 			var lambda = ToExpression<object>(() => (object)5);
