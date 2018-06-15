@@ -45,7 +45,7 @@ using System.Linq;
 
 namespace Moq
 {
-	internal sealed class InvocationCollection : IReadOnlyList<IReadOnlyInvocation>
+	internal sealed class InvocationCollection : IInvocationList
 	{
 		private Invocation[] invocations;
 
@@ -65,7 +65,7 @@ namespace Moq
 			}
 		}
 
-		public IReadOnlyInvocation this[int index]
+		public IInvocation this[int index]
 		{
 			get
 			{
@@ -149,7 +149,7 @@ namespace Moq
 			}
 		}
 
-		public IEnumerator<IReadOnlyInvocation> GetEnumerator()
+		public IEnumerator<IInvocation> GetEnumerator()
 		{
 			// Take local copies of collection and count so they are isolated from changes by other threads.
 			Invocation[] collection;

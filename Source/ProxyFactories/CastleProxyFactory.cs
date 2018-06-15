@@ -202,7 +202,7 @@ namespace Moq
 				this.underlying = underlying;
 			}
 
-			public void Intercept(IInvocation invocation)
+			public void Intercept(Castle.DynamicProxy.IInvocation invocation)
 			{
 				this.underlying.Intercept(new Invocation(underlying: invocation));
 			}
@@ -210,9 +210,9 @@ namespace Moq
 
 		private sealed class Invocation : Moq.Invocation
 		{
-			private IInvocation underlying;
+			private Castle.DynamicProxy.IInvocation underlying;
 
-			internal Invocation(IInvocation underlying) : base(underlying.Method, underlying.Arguments)
+			internal Invocation(Castle.DynamicProxy.IInvocation underlying) : base(underlying.Method, underlying.Arguments)
 			{
 				this.underlying = underlying;
 			}

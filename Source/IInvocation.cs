@@ -6,7 +6,7 @@ namespace Moq
 	/// <summary>
 	/// Provides information about an invocation of a mock object.
 	/// </summary>
-	public interface IReadOnlyInvocation
+	public interface IInvocation
 	{
 		/// <summary>
 		/// Gets the method of the invocation.
