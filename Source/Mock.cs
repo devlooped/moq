@@ -380,22 +380,6 @@ namespace Moq
 			VerifyCalls(targetMock, expected, expression, times);
 		}
 
-		private static bool AreSameMethod(LambdaExpression left, LambdaExpression right)
-		{
-			Debug.Assert(left != null);
-			Debug.Assert(right != null);
-
-			var leftLambda = left.StripConversion();
-			var rightLambda = right.StripConversion();
-			if (leftLambda != null && rightLambda != null &&
-				leftLambda.Body is MethodCallExpression leftCall && rightLambda.Body is MethodCallExpression rightCall)
-			{
-				return leftCall.Method == rightCall.Method;
-			}
-
-			return false;
-		}
-
 		internal static void VerifyNoOtherCalls(Mock mock)
 		{
 			var unverifiedInvocations = mock.MutableInvocations.ToArray(invocation => !invocation.Verified);
@@ -465,6 +449,9 @@ namespace Moq
 					matchingInvocation.MarkAsVerified();
 				}
 			}
+
+			bool AreSameMethod(LambdaExpression l, LambdaExpression r) =>
+				l.Body is MethodCallExpression lc && r.Body is MethodCallExpression rc && lc.Method == rc.Method;
 		}
 
 		private static void ThrowVerifyException(
@@ -475,7 +462,7 @@ namespace Moq
 			Times times,
 			int callCount)
 		{
-			var message = times.GetExceptionMessage(expected.FailMessage, expression.PartialMatcherAwareEval().StripConversion().ToStringFixed(), callCount) +
+			var message = times.GetExceptionMessage(expected.FailMessage, expression.PartialMatcherAwareEval().ToStringFixed(), callCount) +
 				Environment.NewLine + FormatSetupsInfo(setups) +
 				Environment.NewLine + FormatInvocations(actualCalls);
 			throw new MockException(MockException.ExceptionReason.VerificationFailed, message);

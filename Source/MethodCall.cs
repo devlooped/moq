@@ -468,7 +468,7 @@ namespace Moq
 				message.Append(this.failMessage).Append(": ");
 			}
 
-			var lambda = this.originalExpression.PartialMatcherAwareEval().StripConversion();
+			var lambda = this.originalExpression.PartialMatcherAwareEval();
 			var targetTypeName = lambda.Parameters[0].Type.Name;
 
 			message.Append(targetTypeName).Append(" ").Append(lambda.ToStringFixed());
@@ -490,7 +490,7 @@ namespace Moq
 		public string Format()
 		{
 			var builder = new StringBuilder();
-			builder.Append(this.originalExpression.PartialMatcherAwareEval().StripConversion().ToStringFixed());
+			builder.Append(this.originalExpression.PartialMatcherAwareEval().ToStringFixed());
 
 			if (this.expectedMaxCallCount != null)
 			{

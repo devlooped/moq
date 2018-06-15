@@ -37,16 +37,6 @@ namespace Moq.Tests
 		}
 
 		[Fact]
-		public void StripConversionLambdaRemovesConvert()
-		{
-			var lambda = ToExpression<object>(() => (object)5);
-
-			var result = lambda.StripConversion();
-
-			Assert.Equal(typeof(int), result.Compile().GetMethodInfo().ReturnType);
-		}
-
-		[Fact]
 		public void IsPropertyLambdaTrue()
 		{
 			var expr = ToExpression<IFoo, int>(f => f.Value);
