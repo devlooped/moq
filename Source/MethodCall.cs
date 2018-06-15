@@ -60,7 +60,7 @@ namespace Moq
 		where TMock : class
 	{
 		public MethodCall(Mock mock, Condition condition, LambdaExpression originalExpression, MethodInfo method,
-			params Expression[] arguments)
+			IReadOnlyList<Expression> arguments)
 			: base(mock, condition, originalExpression, method, arguments)
 		{
 		}
@@ -115,7 +115,7 @@ namespace Moq
 			this.originalExpression = originalExpression;
 		}
 
-		public MethodCall(Mock mock, Condition condition, LambdaExpression originalExpression, MethodInfo method, params Expression[] arguments)
+		public MethodCall(Mock mock, Condition condition, LambdaExpression originalExpression, MethodInfo method, IReadOnlyList<Expression> arguments)
 		{
 			this.mock = mock;
 			this.condition = condition;

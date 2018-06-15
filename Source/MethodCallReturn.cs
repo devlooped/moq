@@ -39,6 +39,7 @@
 // http://www.opensource.org/licenses/bsd-license.php]
 
 using System;
+using System.Collections.Generic;
 using System.Globalization;
 using System.Linq.Expressions;
 using System.Reflection;
@@ -67,7 +68,7 @@ namespace Moq
 		private Action<object[]> afterReturnCallback;
 		private ReturnValueKind returnValueKind;
 
-		public MethodCallReturn(Mock mock, Condition condition, LambdaExpression originalExpression, MethodInfo method, params Expression[] arguments)
+		public MethodCallReturn(Mock mock, Condition condition, LambdaExpression originalExpression, MethodInfo method, IReadOnlyList<Expression> arguments)
 			: base(mock, condition, originalExpression, method, arguments)
 		{
 		}
