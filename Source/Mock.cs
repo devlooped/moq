@@ -196,7 +196,7 @@ namespace Moq
 		/// <summary>
 		/// Gets list of invocations which have been performed on this mock.
 		/// </summary>
-		public IReadOnlyList<IReadOnlyInvocation> Invocations => MutableInvocations;
+		public IInvocationList Invocations => MutableInvocations;
 
 		internal abstract InvocationCollection MutableInvocations { get; }
 

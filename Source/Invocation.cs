@@ -46,7 +46,7 @@ using System.Text;
 
 namespace Moq
 {
-	internal abstract class Invocation : IReadOnlyInvocation
+	internal abstract class Invocation : IInvocation
 	{
 		private object[] arguments;
 		private MethodInfo method;
@@ -80,7 +80,7 @@ namespace Moq
 		/// </remarks>
 		public object[] Arguments => this.arguments;
 
-		IReadOnlyList<object> IReadOnlyInvocation.Arguments => this.arguments;
+		IReadOnlyList<object> IInvocation.Arguments => this.arguments;
 
 		internal bool Verified => this.verified;
 

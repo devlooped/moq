@@ -76,7 +76,7 @@ namespace Moq.Tests
 
 		    mock.Object.CompareTo(new object());
 
-			mock.ResetCalls();
+			mock.Invocations.Clear();
 
 		    Assert.Equal(0, mock.Invocations.Count);
 	    }
