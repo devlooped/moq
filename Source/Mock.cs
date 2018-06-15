@@ -380,22 +380,6 @@ namespace Moq
 			VerifyCalls(targetMock, expected, expression, times);
 		}
 
-		private static bool AreSameMethod(LambdaExpression left, LambdaExpression right)
-		{
-			Debug.Assert(left != null);
-			Debug.Assert(right != null);
-
-			var leftLambda = left.StripConversion();
-			var rightLambda = right.StripConversion();
-			if (leftLambda != null && rightLambda != null &&
-				leftLambda.Body is MethodCallExpression leftCall && rightLambda.Body is MethodCallExpression rightCall)
-			{
-				return leftCall.Method == rightCall.Method;
-			}
-
-			return false;
-		}
-
 		internal static void VerifyNoOtherCalls(Mock mock)
 		{
 			var unverifiedInvocations = mock.MutableInvocations.ToArray(invocation => !invocation.Verified);
@@ -464,6 +448,22 @@ namespace Moq
 				{
 					matchingInvocation.MarkAsVerified();
 				}
+			}
+
+			bool AreSameMethod(LambdaExpression left, LambdaExpression right)
+			{
+				Debug.Assert(left != null);
+				Debug.Assert(right != null);
+
+				var leftLambda = left.StripConversion();
+				var rightLambda = right.StripConversion();
+				if (leftLambda != null && rightLambda != null &&
+					leftLambda.Body is MethodCallExpression leftCall && rightLambda.Body is MethodCallExpression rightCall)
+				{
+					return leftCall.Method == rightCall.Method;
+				}
+
+				return false;
 			}
 		}
 
