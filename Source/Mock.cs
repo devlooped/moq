@@ -455,8 +455,8 @@ namespace Moq
 				Debug.Assert(left != null);
 				Debug.Assert(right != null);
 
-				var leftLambda = left.StripConversion();
-				var rightLambda = right.StripConversion();
+				var leftLambda = left;
+				var rightLambda = right;
 				if (leftLambda != null && rightLambda != null &&
 					leftLambda.Body is MethodCallExpression leftCall && rightLambda.Body is MethodCallExpression rightCall)
 				{
