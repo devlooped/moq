@@ -450,21 +450,8 @@ namespace Moq
 				}
 			}
 
-			bool AreSameMethod(LambdaExpression left, LambdaExpression right)
-			{
-				Debug.Assert(left != null);
-				Debug.Assert(right != null);
-
-				var leftLambda = left;
-				var rightLambda = right;
-				if (leftLambda != null && rightLambda != null &&
-					leftLambda.Body is MethodCallExpression leftCall && rightLambda.Body is MethodCallExpression rightCall)
-				{
-					return leftCall.Method == rightCall.Method;
-				}
-
-				return false;
-			}
+			bool AreSameMethod(LambdaExpression l, LambdaExpression r) =>
+				l.Body is MethodCallExpression lc && r.Body is MethodCallExpression rc && lc.Method == rc.Method;
 		}
 
 		private static void ThrowVerifyException(
