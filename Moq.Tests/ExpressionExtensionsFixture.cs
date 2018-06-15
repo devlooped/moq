@@ -70,22 +70,6 @@ namespace Moq.Tests
 			Assert.True(expr.IsPropertyIndexer());
 		}
 
-		[Fact]
-		public void ToMethodCallThrowsIfNotMethodCall()
-		{
-			var expr = ToExpression<IFoo, object>(f => f.Value);
-
-			Assert.Throws<ArgumentException>(() => expr.ToMethodCall());
-		}
-
-		[Fact]
-		public void ToMethodCallConvertsLambda()
-		{
-			var expr = ToExpression<IFoo>(f => f.Do());
-
-			Assert.Equal(typeof(IFoo).GetMethod("Do"), expr.ToMethodCall().Method);
-		}
-
 		// this doesn't test Moq, but documents a peculiarity of the C# compiler.
 		// once this test starts failing, verify whether the PropertyInfo "correction" applied
 		// in the `expression.ToPropertyInfo()` extension method is still required.

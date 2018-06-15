@@ -65,26 +65,6 @@ namespace Moq
 		}
 
 		/// <summary>
-		/// Casts the body of the lambda expression to a <see cref="MethodCallExpression"/>.
-		/// </summary>
-		/// <exception cref="ArgumentException">If the body is not a method call.</exception>
-		public static MethodCallExpression ToMethodCall(this LambdaExpression expression)
-		{
-			Guard.NotNull(expression, nameof(expression));
-
-			var methodCall = expression.Body as MethodCallExpression;
-			if (methodCall == null)
-			{
-				throw new ArgumentException(string.Format(
-					CultureInfo.CurrentCulture,
-					Resources.SetupNotMethod,
-					expression.ToStringFixed()));
-			}
-
-			return methodCall;
-		}
-
-		/// <summary>
 		/// Converts the body of the lambda expression into the <see cref="PropertyInfo"/> referenced by it.
 		/// </summary>
 		public static PropertyInfo ToPropertyInfo(this LambdaExpression expression)
@@ -212,8 +192,15 @@ namespace Moq
 				return (Object: invocation.Expression, Method: mock.DelegateInterfaceMethod, Arguments: invocation.Arguments.ToArray());
 			}
 
-			var methodCall = expression.ToMethodCall();
-			return (Object: methodCall.Object, Method: methodCall.Method, Arguments: methodCall.Arguments.ToArray());
+			if (expression.Body is MethodCallExpression methodCall)
+			{
+				return (Object: methodCall.Object, Method: methodCall.Method, Arguments: methodCall.Arguments.ToArray());
+			}
+
+			throw new ArgumentException(string.Format(
+				CultureInfo.CurrentCulture,
+				Resources.SetupNotMethod,
+				expression.ToStringFixed()));
 		}
 	}
 }

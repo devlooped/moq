@@ -388,9 +388,9 @@ namespace Moq
 			var leftLambda = left.StripConversion();
 			var rightLambda = right.StripConversion();
 			if (leftLambda != null && rightLambda != null &&
-				leftLambda.Body is MethodCallExpression && rightLambda.Body is MethodCallExpression)
+				leftLambda.Body is MethodCallExpression leftCall && rightLambda.Body is MethodCallExpression rightCall)
 			{
-				return leftLambda.ToMethodCall().Method == rightLambda.ToMethodCall().Method;
+				return leftCall.Method == rightCall.Method;
 			}
 
 			return false;
