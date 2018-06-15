@@ -51,19 +51,6 @@ namespace Moq
 {
 	internal static class ExpressionExtensions
 	{
-		public static LambdaExpression StripConversion(this LambdaExpression lambda)
-		{
-			// Remove convert expressions which are passed-in by the MockProtectedExtensions.
-			// They are passed because LambdaExpression constructor checks the type of 
-			// the returned values, even if the return type is Object and everything 
-			// is able to convert to it. It forces you to be explicit about the conversion.
-			var convert = lambda.Body as UnaryExpression;
-			if (convert != null && convert.NodeType == ExpressionType.Convert)
-				lambda = Expression.Lambda(convert.Operand, lambda.Parameters.ToArray());
-
-			return lambda;
-		}
-
 		/// <summary>
 		/// Converts the body of the lambda expression into the <see cref="PropertyInfo"/> referenced by it.
 		/// </summary>
