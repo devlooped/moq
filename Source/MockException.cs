@@ -177,7 +177,7 @@ namespace Moq
 		}
 
 		/// <summary>
-		///   DOD
+		///   Returns the exception to be thrown when <see cref="MockFactory.Verify"/> finds several mocks with setups that have not been invoked.
 		/// </summary>
 		internal static MockException UnmatchedSetups(IEnumerable<MockException> errors)
 		{
@@ -234,17 +234,6 @@ namespace Moq
 						return false;
 				}
 			}
-		}
-
-		private static string GetMessage(MockBehavior behavior, Invocation invocation, string message)
-		{
-			return string.Format(
-				CultureInfo.CurrentCulture,
-				Resources.MockExceptionMessage,
-				invocation.ToString(),
-				behavior,
-				message
-			);
 		}
 
 #if FEATURE_SERIALIZATION
