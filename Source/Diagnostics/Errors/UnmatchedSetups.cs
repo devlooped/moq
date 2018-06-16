@@ -50,20 +50,24 @@ namespace Moq.Diagnostics.Errors
 {
 	internal sealed class UnmatchedSetups : IError
 	{
+		private Mock mock;
 		private IEnumerable<MethodCall> setups;
 
-		public UnmatchedSetups(IEnumerable<MethodCall> setups)
+		public UnmatchedSetups(Mock mock, IEnumerable<MethodCall> setups)
 		{
+			Debug.Assert(mock != null);
 			Debug.Assert(setups != null);
 			Debug.Assert(setups.Any());
 
+			this.mock = mock;
 			this.setups = setups;
 		}
 
 		public string Message =>
 			string.Format(
 				CultureInfo.CurrentCulture,
-				Resources.VerificationFailed,
+				Resources.UnmatchedSetups,
+				this.mock.ToString(),
 				this.setups.Aggregate(new StringBuilder(), (builder, setup) => builder.AppendLine(setup.ToString())).ToString());
 
 		public IEnumerable<MethodCall> Setups => this.setups;

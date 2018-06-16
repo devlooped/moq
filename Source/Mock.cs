@@ -256,7 +256,7 @@ namespace Moq
 			var uninvokedVerifiableSetups = this.Setups.ToArrayLive(setup => setup.IsVerifiable && !setup.Invoked);
 			if (uninvokedVerifiableSetups.Length > 0)
 			{
-				error = new UnmatchedSetups(uninvokedVerifiableSetups);
+				error = new UnmatchedSetups(this, uninvokedVerifiableSetups);
 				return false;
 			}
 
@@ -286,7 +286,7 @@ namespace Moq
 			var uninvokedSetups = this.Setups.ToArrayLive(setup => !setup.Invoked);
 			if (uninvokedSetups.Length > 0)
 			{
-				error = new UnmatchedSetups(uninvokedSetups);
+				error = new UnmatchedSetups(this, uninvokedSetups);
 				return false;
 			}
 
