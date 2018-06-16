@@ -48,7 +48,7 @@ namespace Moq.Tests
 			}
 			catch (MockException mex)
 			{
-				Assert.Equal(MockExceptionReason.VerificationFailed, mex.Reason);
+				Assert.Equal(MockExceptionReason.UnmatchedSetups, mex.Reason);
 			}
 		}
 
@@ -67,7 +67,7 @@ namespace Moq.Tests
 			}
 			catch (MockException mex)
 			{
-				Assert.Equal(MockExceptionReason.VerificationFailed, mex.Reason);
+				Assert.Equal(MockExceptionReason.UnmatchedSetups, mex.Reason);
 				Expression<Action<IFoo>> doExpr = foo => foo.Do();
 				Assert.DoesNotContain(doExpr.ToString(), mex.Message);
 			}

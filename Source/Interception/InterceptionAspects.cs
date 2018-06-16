@@ -165,7 +165,7 @@ namespace Moq
 			}
 			else if (mock.Behavior == MockBehavior.Strict)
 			{
-				throw new MockException(MockExceptionReason.NoSetup, MockBehavior.Strict, invocation);
+				throw MockException.NoSetup(invocation);
 			}
 			else
 			{

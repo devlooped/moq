@@ -42,10 +42,13 @@ namespace Moq
 {
 	internal enum MockExceptionReason
 	{
-		NoSetup,
-		ReturnValueRequired,
-		VerificationFailed,
+		Unknown = 0,
 		MoreThanOneCall,
 		MoreThanNCalls,
+		NoMatchingCalls,
+		NoSetup,
+		ReturnValueRequired,
+		UnmatchedSetups,
+		UnverifiedInvocations,
 	}
 }

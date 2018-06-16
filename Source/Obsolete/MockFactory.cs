@@ -43,8 +43,6 @@ using System.Collections.Generic;
 using System.ComponentModel;
 using System.Linq;
 
-using Moq.Diagnostics.Errors;
-
 namespace Moq
 {
 	/// <summary>
@@ -376,7 +374,7 @@ namespace Moq
 		{
 			Guard.NotNull(verifyAction, nameof(verifyAction));
 
-			var errors = new List<UnmatchedSetups>();
+			var errors = new List<MockException>();
 
 			foreach (var mock in mocks)
 			{
@@ -384,7 +382,7 @@ namespace Moq
 				{
 					verifyAction(mock);
 				}
-				catch (MockException mve) when (mve.Error is UnmatchedSetups error)
+				catch (MockException error) when (error.Reason == MockExceptionReason.UnmatchedSetups)
 				{
 					errors.Add(error);
 				}
@@ -392,7 +390,7 @@ namespace Moq
 
 			if (errors.Count > 0)
 			{
-				throw new UnmatchedSetupsAggregated(errors).AsMockException();
+				throw MockException.UnmatchedSetups(errors);
 			}
 		}
 	}
