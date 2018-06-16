@@ -294,15 +294,11 @@ namespace Moq
 			{
 				if (expectedMaxCallCount == 1)
 				{
-					throw new MockException(
-						MockException.ExceptionReason.MoreThanOneCall,
-						Times.AtMostOnce().GetExceptionMessage(this.failMessage, this.originalExpression.ToStringFixed(), this.callCount));
+					throw MockException.MoreThanOneCall(this, this.callCount);
 				}
 				else
 				{
-					throw new MockException(
-						MockException.ExceptionReason.MoreThanNCalls,
-						Times.AtMost(expectedMaxCallCount.Value).GetExceptionMessage(this.failMessage, this.originalExpression.ToStringFixed(), this.callCount));
+					throw MockException.MoreThanNCalls(this, this.expectedMaxCallCount.Value, this.callCount);
 				}
 			}
 

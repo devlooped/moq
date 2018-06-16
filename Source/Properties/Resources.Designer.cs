@@ -656,6 +656,16 @@ namespace Moq.Properties {
 		}
 		
 		/// <summary>
+		///   Looks up a localized string similar to The following setups on mock &apos;{0}&apos; were not matched:
+		///{1}.
+		/// </summary>
+		internal static string UnmatchedSetups {
+			get {
+				return ResourceManager.GetString("UnmatchedSetups", resourceCulture);
+			}
+		}
+		
+		/// <summary>
 		///   Looks up a localized string similar to Unsupported expression: {0}.
 		/// </summary>
 		internal static string UnsupportedExpression {
@@ -689,16 +699,6 @@ namespace Moq.Properties {
 		internal static string UseItExprIsNullRatherThanNullArgumentValue {
 			get {
 				return ResourceManager.GetString("UseItExprIsNullRatherThanNullArgumentValue", resourceCulture);
-			}
-		}
-		
-		/// <summary>
-		///   Looks up a localized string similar to The following setups were not matched:
-		///{0}.
-		/// </summary>
-		internal static string VerificationFailed {
-			get {
-				return ResourceManager.GetString("VerificationFailed", resourceCulture);
 			}
 		}
 		

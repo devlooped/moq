@@ -50,7 +50,6 @@ using System.Reflection;
 using System.Runtime.CompilerServices;
 using System.Threading.Tasks;
 
-using Moq.Diagnostics.Errors;
 using Moq.Language.Flow;
 using Moq.Properties;
 
@@ -245,18 +244,18 @@ namespace Moq
 		/// <include file='Mock.xdoc' path='docs/doc[@for="Mock.Verify"]/*'/>
 		public void Verify()
 		{
-			if (!this.TryVerify(out UnmatchedSetups error))
+			if (!this.TryVerify(out MockException error))
 			{
-				throw error.AsMockException();
+				throw error;
 			}
 		}
 
-		private bool TryVerify(out UnmatchedSetups error)
+		private bool TryVerify(out MockException error)
 		{
 			var uninvokedVerifiableSetups = this.Setups.ToArrayLive(setup => setup.IsVerifiable && !setup.Invoked);
 			if (uninvokedVerifiableSetups.Length > 0)
 			{
-				error = new UnmatchedSetups(uninvokedVerifiableSetups);
+				error = MockException.UnmatchedSetups(this, uninvokedVerifiableSetups);
 				return false;
 			}
 
@@ -275,18 +274,18 @@ namespace Moq
 		/// <include file='Mock.xdoc' path='docs/doc[@for="Mock.VerifyAll"]/*'/>		
 		public void VerifyAll()
 		{
-			if (!this.TryVerifyAll(out UnmatchedSetups error))
+			if (!this.TryVerifyAll(out MockException error))
 			{
-				throw error.AsMockException();
+				throw error;
 			}
 		}
 
-		private bool TryVerifyAll(out UnmatchedSetups error)
+		private bool TryVerifyAll(out MockException error)
 		{
 			var uninvokedSetups = this.Setups.ToArrayLive(setup => !setup.Invoked);
 			if (uninvokedSetups.Length > 0)
 			{
-				error = new UnmatchedSetups(uninvokedSetups);
+				error = MockException.UnmatchedSetups(this, uninvokedSetups);
 				return false;
 			}
 
@@ -411,12 +410,7 @@ namespace Moq
 				var remainingUnverifiedInvocations = unverifiedInvocations.Where(i => i != null);
 				if (remainingUnverifiedInvocations.Any())
 				{
-					throw new MockException(
-						MockException.ExceptionReason.VerificationFailed,
-						string.Format(
-							CultureInfo.CurrentCulture,
-							Resources.UnverifiedInvocations,
-							string.Join<Invocation>(Environment.NewLine, remainingUnverifiedInvocations)));
+					throw MockException.UnverifiedInvocations(remainingUnverifiedInvocations);
 				}
 			}
 
@@ -440,7 +434,7 @@ namespace Moq
 			if (!times.Verify(matchingInvocationCount))
 			{
 				var setups = targetMock.Setups.ToArrayLive(oc => AreSameMethod(oc.SetupExpression, expression));
-				ThrowVerifyException(expected, setups, allInvocations, expression, times, matchingInvocationCount);
+				throw MockException.NoMatchingCalls(expected, setups, allInvocations, expression, times, matchingInvocationCount);
 			}
 			else
 			{
@@ -452,37 +446,6 @@ namespace Moq
 
 			bool AreSameMethod(LambdaExpression l, LambdaExpression r) =>
 				l.Body is MethodCallExpression lc && r.Body is MethodCallExpression rc && lc.Method == rc.Method;
-		}
-
-		private static void ThrowVerifyException(
-			MethodCall expected,
-			IEnumerable<MethodCall> setups,
-			IEnumerable<Invocation> actualCalls,
-			LambdaExpression expression,
-			Times times,
-			int callCount)
-		{
-			var message = times.GetExceptionMessage(expected.FailMessage, expression.PartialMatcherAwareEval().ToStringFixed(), callCount) +
-				Environment.NewLine + FormatSetupsInfo(setups) +
-				Environment.NewLine + FormatInvocations(actualCalls);
-			throw new MockException(MockException.ExceptionReason.VerificationFailed, message);
-		}
-
-		private static string FormatSetupsInfo(IEnumerable<MethodCall> setups)
-		{
-			var expressionSetups = setups
-				.Select(s => s.Format())
-				.ToArray();
-
-			return expressionSetups.Length == 0 ?
-				Resources.NoSetupsConfigured :
-				Environment.NewLine + string.Format(Resources.ConfiguredSetups, Environment.NewLine + string.Join(Environment.NewLine, expressionSetups));
-		}
-
-		private static string FormatInvocations(IEnumerable<Invocation> invocations)
-		{
-			return invocations.Any() ? Environment.NewLine + string.Format(Resources.PerformedInvocations, Environment.NewLine + string.Join<Invocation>(Environment.NewLine, invocations))
-			                         : Resources.NoInvocationsPerformed;
 		}
 
 		#endregion

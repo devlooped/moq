@@ -139,9 +139,9 @@
 	<data name="ReturnValueRequired" xml:space="preserve">
 		<value>Invocation needs to return a value and therefore must have a corresponding setup that provides it.</value>
 	</data>
-	<data name="VerificationFailed" xml:space="preserve">
-		<value>The following setups were not matched:
-{0}</value>
+	<data name="UnmatchedSetups" xml:space="preserve">
+		<value>The following setups on mock '{0}' were not matched:
+{1}</value>
 	</data>
 	<data name="ConstructorArgsForInterface" xml:space="preserve">
 		<value>Constructor arguments cannot be passed for interface mocks.</value>
