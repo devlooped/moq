@@ -295,13 +295,13 @@ namespace Moq
 				if (expectedMaxCallCount == 1)
 				{
 					throw new MockException(
-						MockException.ExceptionReason.MoreThanOneCall,
+						MockExceptionReason.MoreThanOneCall,
 						Times.AtMostOnce().GetExceptionMessage(this.failMessage, this.originalExpression.ToStringFixed(), this.callCount));
 				}
 				else
 				{
 					throw new MockException(
-						MockException.ExceptionReason.MoreThanNCalls,
+						MockExceptionReason.MoreThanNCalls,
 						Times.AtMost(expectedMaxCallCount.Value).GetExceptionMessage(this.failMessage, this.originalExpression.ToStringFixed(), this.callCount));
 				}
 			}

@@ -72,6 +72,6 @@ namespace Moq.Diagnostics.Errors
 
 		public IEnumerable<MethodCall> Setups => this.setups;
 
-		public MockException AsMockException() => new MockException(MockException.ExceptionReason.VerificationFailed, this);
+		public MockException AsMockException() => new MockException(MockExceptionReason.VerificationFailed, this);
 	}
 }

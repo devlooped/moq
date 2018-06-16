@@ -66,6 +66,6 @@ namespace Moq.Diagnostics.Errors
 				Environment.NewLine,
 				this.errors.Select(error => error.Message));
 
-		public MockException AsMockException() => new MockException(MockException.ExceptionReason.VerificationFailed, this);
+		public MockException AsMockException() => new MockException(MockExceptionReason.VerificationFailed, this);
 	}
 }

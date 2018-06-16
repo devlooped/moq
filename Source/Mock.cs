@@ -412,7 +412,7 @@ namespace Moq
 				if (remainingUnverifiedInvocations.Any())
 				{
 					throw new MockException(
-						MockException.ExceptionReason.VerificationFailed,
+						MockExceptionReason.VerificationFailed,
 						string.Format(
 							CultureInfo.CurrentCulture,
 							Resources.UnverifiedInvocations,
@@ -465,7 +465,7 @@ namespace Moq
 			var message = times.GetExceptionMessage(expected.FailMessage, expression.PartialMatcherAwareEval().ToStringFixed(), callCount) +
 				Environment.NewLine + FormatSetupsInfo(setups) +
 				Environment.NewLine + FormatInvocations(actualCalls);
-			throw new MockException(MockException.ExceptionReason.VerificationFailed, message);
+			throw new MockException(MockExceptionReason.VerificationFailed, message);
 		}
 
 		private static string FormatSetupsInfo(IEnumerable<MethodCall> setups)

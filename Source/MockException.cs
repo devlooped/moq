@@ -75,41 +75,31 @@ namespace Moq
 #endif
 	public class MockException : Exception
 	{
-		// Made internal as it's of no use for consumers, but it's important for our own tests.
-		internal enum ExceptionReason
-		{
-			NoSetup,
-			ReturnValueRequired,
-			VerificationFailed,
-			MoreThanOneCall,
-			MoreThanNCalls,
-		}
-
 #if FEATURE_SERIALIZATION
 		[NonSerialized]
 #endif
 		private IError error;
 
-		private ExceptionReason reason;
+		private MockExceptionReason reason;
 
-		internal MockException(ExceptionReason reason, MockBehavior behavior, Invocation invocation)
+		internal MockException(MockExceptionReason reason, MockBehavior behavior, Invocation invocation)
 			: this(reason, behavior, invocation, Resources.ResourceManager.GetString(reason.ToString()))
 		{
 		}
 
-		internal MockException(ExceptionReason reason, MockBehavior behavior, Invocation invocation, string message)
+		internal MockException(MockExceptionReason reason, MockBehavior behavior, Invocation invocation, string message)
 			: base(GetMessage(behavior, invocation, message))
 		{
 			this.reason = reason;
 		}
 
-		internal MockException(ExceptionReason reason, string exceptionMessage)
+		internal MockException(MockExceptionReason reason, string exceptionMessage)
 			: base(exceptionMessage)
 		{
 			this.reason = reason;
 		}
 
-		internal MockException(ExceptionReason reason, IError error)
+		internal MockException(MockExceptionReason reason, IError error)
 			: base(error.Message)
 		{
 			Debug.Assert(error != null);
@@ -120,7 +110,7 @@ namespace Moq
 
 		internal IError Error => this.error;
 
-		internal ExceptionReason Reason
+		internal MockExceptionReason Reason
 		{
 			get { return reason; }
 		}
@@ -130,7 +120,7 @@ namespace Moq
 		/// </summary>
 		public bool IsVerificationError
 		{
-			get { return reason == ExceptionReason.VerificationFailed; }
+			get { return reason == MockExceptionReason.VerificationFailed; }
 		}
 
 		private static string GetMessage(MockBehavior behavior, Invocation invocation, string message)
@@ -155,7 +145,7 @@ namespace Moq
 		  System.Runtime.Serialization.StreamingContext context)
 			: base(info, context)
 		{
-			this.reason = (ExceptionReason)info.GetValue("reason", typeof(ExceptionReason));
+			this.reason = (MockExceptionReason)info.GetValue("reason", typeof(MockExceptionReason));
 		}
 
 		/// <summary>

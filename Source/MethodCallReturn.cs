@@ -260,7 +260,7 @@ namespace Moq
 			}
 			else if (this.Mock.Behavior == MockBehavior.Strict)
 			{
-				throw new MockException(MockException.ExceptionReason.ReturnValueRequired, MockBehavior.Strict, invocation);
+				throw new MockException(MockExceptionReason.ReturnValueRequired, MockBehavior.Strict, invocation);
 			}
 			else
 			{
