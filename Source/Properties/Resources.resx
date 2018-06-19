@@ -127,9 +127,6 @@
 		<value>{0} invocation failed with mock behavior {1}.
 {2}</value>
 	</data>
-	<data name="PropertyNotReadable" xml:space="preserve">
-		<value>Property {0}.{1} is write-only.</value>
-	</data>
 	<data name="UnsupportedExpression" xml:space="preserve">
 		<value>Unsupported expression: {0}</value>
 	</data>
@@ -157,9 +154,6 @@
 	</data>
 	<data name="ObjectInstanceNotMock" xml:space="preserve">
 		<value>Object instance was not created by Moq.</value>
-	</data>
-	<data name="PropertyNotWritable" xml:space="preserve">
-		<value>Property {0}.{1} is read-only.</value>
 	</data>
 	<data name="SetupNotProperty" xml:space="preserve">
 		<value>Expression is not a property access: {0}</value>

@@ -53,7 +53,7 @@ namespace Moq
 			where T : class
 		{
 			var prop = expression.ToPropertyInfo();
-			ThrowIfPropertyNotWritable(prop);
+			Guard.CanWrite(prop);
 
 			var setter = prop.SetMethod;
 			ThrowIfSetupExpressionInvolvesUnsupportedMember(expression, setter);

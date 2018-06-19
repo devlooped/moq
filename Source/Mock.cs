@@ -530,7 +530,7 @@ namespace Moq
 			}
 
 			var prop = expression.ToPropertyInfo();
-			ThrowIfPropertyNotReadable(prop);
+			Guard.CanRead(prop);
 
 			var propGet = prop.GetGetMethod(true);
 			ThrowIfSetupExpressionInvolvesUnsupportedMember(expression, propGet);
@@ -598,7 +598,7 @@ namespace Moq
 			where T : class
 		{
 			var prop = expression.ToPropertyInfo();
-			ThrowIfPropertyNotWritable(prop);
+			Guard.CanWrite(prop);
 
 			var propSet = prop.GetSetMethod(true);
 			ThrowIfSetupExpressionInvolvesUnsupportedMember(expression, propSet);
@@ -720,7 +720,7 @@ namespace Moq
 			if (expression.IsProperty())
 			{
 				var prop = expression.ToPropertyInfo();
-				ThrowIfPropertyNotReadable(prop);
+				Guard.CanRead(prop);
 
 				var propGet = prop.GetGetMethod(true);
 				ThrowIfSetupExpressionInvolvesUnsupportedMember(expression, propGet);
@@ -854,35 +854,6 @@ namespace Moq
 
 			var targetObject = targetLambda.Compile()();
 			return targetObject;
-		}
-
-		[SuppressMessage("Microsoft.Usage", "CA2208:InstantiateArgumentExceptionsCorrectly", Justification = "This is a helper method for the one receiving the expression.")]
-		private static void ThrowIfPropertyNotWritable(PropertyInfo prop)
-		{
-			if (!prop.CanWrite)
-			{
-				throw new ArgumentException(string.Format(
-					CultureInfo.CurrentCulture,
-					Resources.PropertyNotWritable,
-					prop.DeclaringType.Name,
-					prop.Name), "expression");
-			}
-		}
-
-		private static void ThrowIfPropertyNotReadable(PropertyInfo prop)
-		{
-			// If property is not readable, the compiler won't let 
-			// the user to specify it in the lambda :)
-			// This is just reassuring that in case they build the 
-			// expression tree manually?
-			if (!prop.CanRead)
-			{
-				throw new ArgumentException(string.Format(
-					CultureInfo.CurrentCulture,
-					Resources.PropertyNotReadable,
-					prop.DeclaringType.Name,
-					prop.Name));
-			}
 		}
 
 		private static void ThrowIfSetupMethodNotVisibleToProxyFactory(MethodInfo method)

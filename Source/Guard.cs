@@ -155,7 +155,7 @@ namespace Moq
 
 		public static void CanRead(PropertyInfo property)
 		{
-			if (property.GetGetMethod(true) == null)
+			if (!property.CanRead)
 			{
 				throw new ArgumentException(string.Format(
 					CultureInfo.CurrentCulture,
@@ -166,7 +166,7 @@ namespace Moq
 
 		public static void CanWrite(PropertyInfo property)
 		{
-			if (property.GetSetMethod(true) == null)
+			if (!property.CanWrite)
 			{
 				throw new ArgumentException(string.Format(
 					CultureInfo.CurrentCulture,

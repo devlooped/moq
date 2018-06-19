@@ -481,24 +481,6 @@ namespace Moq.Properties {
 		}
 		
 		/// <summary>
-		///   Looks up a localized string similar to Property {0}.{1} is write-only..
-		/// </summary>
-		internal static string PropertyNotReadable {
-			get {
-				return ResourceManager.GetString("PropertyNotReadable", resourceCulture);
-			}
-		}
-		
-		/// <summary>
-		///   Looks up a localized string similar to Property {0}.{1} is read-only..
-		/// </summary>
-		internal static string PropertyNotWritable {
-			get {
-				return ResourceManager.GetString("PropertyNotWritable", resourceCulture);
-			}
-		}
-		
-		/// <summary>
 		///   Looks up a localized string similar to Property {0}.{1} does not have a setter..
 		/// </summary>
 		internal static string PropertySetNotFound {
