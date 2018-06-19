@@ -179,7 +179,7 @@ namespace Moq
 		private void ValidateNumberOfCallbackParameters(MethodInfo callbackMethod)
 		{
 			var numberOfActualParameters = callbackMethod.GetParameters().Length;
-			if (IsExtensionMethod(callbackMethod))
+			if (callbackMethod.IsExtensionMethod())
 			{
 				numberOfActualParameters--;
 			}
@@ -213,11 +213,6 @@ namespace Moq
 						expectedReturnType,
 						actualReturnType));
 			}
-		}
-
-		private static bool IsExtensionMethod(MethodInfo callbackMethod)
-		{
-			return callbackMethod.IsStatic && callbackMethod.IsDefined(typeof(ExtensionAttribute));
 		}
 
 		protected override void SetCallbackWithoutArguments(Action callback)

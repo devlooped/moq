@@ -44,6 +44,7 @@ using System.Globalization;
 using System.Linq;
 using System.Linq.Expressions;
 using System.Reflection;
+using System.Runtime.CompilerServices;
 using System.Runtime.ExceptionServices;
 
 using Moq.Properties;
@@ -63,6 +64,11 @@ namespace Moq
 				ExceptionDispatchInfo.Capture(ex.InnerException).Throw();
 				throw;
 			}
+		}
+
+		public static bool IsExtensionMethod(this MethodInfo method)
+		{
+			return method.IsStatic && method.IsDefined(typeof(ExtensionAttribute));
 		}
 
 		public static bool IsPropertyGetter(this MethodInfo method)

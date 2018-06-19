@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Linq;
+using System.Reflection;
 using System.Text;
 using Xunit;
 
@@ -85,6 +86,22 @@ namespace Moq.Tests
 			myMock.VerifyAll();
 		}
 		#endregion
+
+		[Fact]
+		public void IsExtensionMethod_recognizes_extension_method_as_such()
+		{
+			var isExtensionMethodMethod = typeof(Moq.Extensions).GetMethod(nameof(Moq.Extensions.IsExtensionMethod));
+
+			Assert.True(isExtensionMethodMethod.IsExtensionMethod());
+		}
+
+		[Fact]
+		public void IsExtensionMethod_does_not_recognize_method_as_extension_method()
+		{
+			var thisMethod = (MethodInfo)MethodBase.GetCurrentMethod();
+
+			Assert.False(thisMethod.IsExtensionMethod());
+		}
 	}
 
 	public interface IFooReset

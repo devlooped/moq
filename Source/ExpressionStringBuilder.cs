@@ -285,9 +285,7 @@ namespace Moq
 				var paramFrom = 0;
 				var expression = node.Object;
 
-				var hasExtensionAttribute = node.Method.IsDefined(typeof(ExtensionAttribute));
-
-				if (hasExtensionAttribute)
+				if (node.Method.IsExtensionMethod())
 				{
 					paramFrom = 1;
 					expression = node.Arguments[0];
