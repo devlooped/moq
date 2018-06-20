@@ -10,6 +10,11 @@ The format is loosely based on [Keep a Changelog](http://keepachangelog.com/en/1
 
 * Add `Mock.Invocations` property to support inspection of invocations on a mock (@Tragedian, #560)
 
+#### Changed
+
+* Update package reference to `Castle.Core` (DynamicProxy) from version 4.3.0 to 4.3.1 (@stakx, #635)
+
+
 ## 4.8.3 (2018-06-09)
 
 #### Added
