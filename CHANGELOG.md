@@ -14,6 +14,10 @@ The format is loosely based on [Keep a Changelog](http://keepachangelog.com/en/1
 
 * Update package reference to `Castle.Core` (DynamicProxy) from version 4.3.0 to 4.3.1 (@stakx, #635)
 
+#### Obsoleted
+
+* `mock.ResetCalls()` has been deprecated in favor of `mock.Invocations.Clear()` (@stakx, #633)
+
 
 ## 4.8.3 (2018-06-09)
 
