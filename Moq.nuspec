@@ -14,7 +14,7 @@
 		<releaseNotes>A changelog is available at https://github.com/moq/moq4/blob/master/CHANGELOG.md.</releaseNotes>
 		<dependencies>
 			<group targetFramework=".NETFramework4.5">
-				<dependency id="Castle.Core" version="4.3.0" />
+				<dependency id="Castle.Core" version="4.3.1" />
 				<dependency id="System.Threading.Tasks.Extensions" version="4.3.0" />
 				<dependency id="System.ValueTuple" version="4.4.0" />
 			</group>
@@ -22,7 +22,7 @@
 				<dependency id="NETStandard.Library" version="1.6.1" />
 				<dependency id="System.Linq.Queryable" version="4.3.0" />
 				<dependency id="System.Reflection.TypeExtensions" version="4.3.0" />
-				<dependency id="Castle.Core" version="4.3.0" />
+				<dependency id="Castle.Core" version="4.3.1" />
 				<dependency id="System.Threading.Tasks.Extensions" version="4.3.0" />
 				<dependency id="System.ValueTuple" version="4.4.0" />
 			</group>
