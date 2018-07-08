@@ -114,6 +114,14 @@ namespace Moq
 			{
 				stringBuilder.Append('"').Append(str).Append('"');
 			}
+			else if (obj is float f)
+			{
+				stringBuilder.Append(f.ToString("G9"));
+			}
+			else if (obj is double d)
+			{
+				stringBuilder.Append(d.ToString("G17"));
+			}
 			else if (obj is IEnumerable enumerable && !(obj is IMocked))
 			{                                      // ^^^^^^^^^^^^^^^^^
 			                                       // This second check ensures that we have a usable implementation of IEnumerable.
