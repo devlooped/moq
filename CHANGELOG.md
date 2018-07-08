@@ -13,6 +13,8 @@ The format is loosely based on [Keep a Changelog](http://keepachangelog.com/en/1
 #### Changed
 
 * Update package reference to `Castle.Core` (DynamicProxy) from version 4.3.0 to 4.3.1 (@stakx, #635)
+* Floating point values are formatted with higher precision (satisfying round-tripping) in diagnostic messages (@stakx, #637)
+
 
 #### Obsoleted
 
