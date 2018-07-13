@@ -122,6 +122,11 @@ namespace Moq
 			return ProxyUtil.IsAccessible(method, out messageIfNotVisible);
 		}
 
+		public override bool IsTypeVisible(Type type)
+		{
+			return ProxyUtil.IsAccessible(type);
+		}
+
 		/// <inheritdoc />
 		public override Type GetDelegateProxyInterface(Type delegateType, out MethodInfo delegateInterfaceMethod)
 		{
