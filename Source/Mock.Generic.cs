@@ -69,7 +69,7 @@ namespace Moq
 			inheritedInterfaces =
 				typeof(T)
 				.GetInterfaces()
-				.Where(i => { var it = i.GetTypeInfo(); return it.IsPublic || it.IsNestedPublic && !it.IsImport; })
+				.Where(i => ProxyFactory.Instance.IsTypeVisible(i) && !i.GetTypeInfo().IsImport)
 				.ToArray();
 
 			serialNumberCounter = 0;
