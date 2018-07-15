@@ -88,8 +88,17 @@ Moq offers the following features:
 * Intercept and raise events on mocks
 * Intuitive support for ```out/ref``` arguments
 
-We appreciate deeply any [feedback](http://moq.uservoice.com/) that you may have!
+We appreciate deeply any feedback that you may have! Feel free to participate in the [chat], or report an issue in the [issue tracker].
 
 ![OhLoh](http://www.ohloh.net/p/moq/widgets/project_thin_badge.gif)
 
 ![ClariusLabs](http://download.codeplex.com/Project/Download/FileDownload.aspx?ProjectName=clarius&DownloadId=17830&Build=14806&boo.png)
+
+
+ [chat]:
+ https://gitter.im/moq/moq
+ "Moq chat room on Gitter"
+
+ [issue tracker]:
+ https://github.com/moq/moq4/issues
+ "Moq issue tracker on GitHub"
