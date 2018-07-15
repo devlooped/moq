@@ -92,8 +92,6 @@ We appreciate deeply any feedback that you may have! Feel free to participate in
 
 ![OhLoh](http://www.ohloh.net/p/moq/widgets/project_thin_badge.gif)
 
-![ClariusLabs](http://download.codeplex.com/Project/Download/FileDownload.aspx?ProjectName=clarius&DownloadId=17830&Build=14806&boo.png)
-
 
  [chat]:
  https://gitter.im/moq/moq
