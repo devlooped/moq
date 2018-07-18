@@ -130,7 +130,8 @@ namespace Moq
 				var argument = arguments[index];
 				if (parameter.ParameterType.IsByRef)
 				{
-					if ((parameter.Attributes & ParameterAttributes.Out) == ParameterAttributes.Out)
+					if ((parameter.Attributes & ParameterAttributes.Out) == ParameterAttributes.Out &&
+						(parameter.Attributes & ParameterAttributes.In) != ParameterAttributes.In)
 					{
 						// `out` parameter
 
