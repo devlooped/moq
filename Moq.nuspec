@@ -28,7 +28,7 @@
 				<dependency id="System.ValueTuple" version="4.4.0" />
 			</group>
 			<group targetFramework=".NETStandard2.0">
-				<dependency id="NETStandard.Library" version="2.0" />
+				<dependency id="NETStandard.Library" version="2.0.0" />
 				<dependency id="System.Linq.Queryable" version="4.3.0" />
 				<dependency id="System.Reflection.Emit" version="4.3.0" />
 				<dependency id="System.Reflection.TypeExtensions" version="4.3.0" />
