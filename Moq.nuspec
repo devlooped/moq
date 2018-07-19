@@ -27,6 +27,15 @@
 				<dependency id="System.Threading.Tasks.Extensions" version="4.3.0" />
 				<dependency id="System.ValueTuple" version="4.4.0" />
 			</group>
+			<group targetFramework=".NETStandard2.0">
+				<dependency id="NETStandard.Library" version="2.0" />
+				<dependency id="System.Linq.Queryable" version="4.3.0" />
+				<dependency id="System.Reflection.Emit" version="4.3.0" />
+				<dependency id="System.Reflection.TypeExtensions" version="4.3.0" />
+				<dependency id="Castle.Core" version="4.3.1" />
+				<dependency id="System.Threading.Tasks.Extensions" version="4.3.0" />
+				<dependency id="System.ValueTuple" version="4.4.0" />
+			</group>
 		</dependencies>
 	</metadata>
 	<files>
@@ -36,5 +45,8 @@
 		<file src="Source\bin\$configuration$\netstandard1.3\Moq.dll" target="lib\netstandard1.3" />
 		<file src="Source\bin\$configuration$\netstandard1.3\Moq.pdb" target="lib\netstandard1.3" />
 		<file src="Source\bin\$configuration$\netstandard1.3\Moq.xml" target="lib\netstandard1.3" />
+		<file src="Source\bin\$configuration$\netstandard2.0\Moq.dll" target="lib\netstandard2.0" />
+		<file src="Source\bin\$configuration$\netstandard2.0\Moq.pdb" target="lib\netstandard2.0" />
+		<file src="Source\bin\$configuration$\netstandard2.0\Moq.xml" target="lib\netstandard2.0" />
 	</files>
 </package>
