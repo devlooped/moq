@@ -282,7 +282,7 @@ namespace Moq.Protected
 
 			return Expression.Lambda<Action<T>>(
 				Expression.Call(param, property.GetSetMethod(true), value),
-				param).Compile();
+				param).CompileUsingExpressionCompiler();
 		}
 
 		private static void ThrowIfMemberMissing(string memberName, MemberInfo member)

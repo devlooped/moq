@@ -51,6 +51,20 @@ namespace Moq
 {
 	internal static class ExpressionExtensions
 	{
+		internal static Delegate CompileUsingExpressionCompiler(this LambdaExpression expression)
+		{
+			// Expression trees are not compiled directly.
+			// The indirection via an ExpressionCompiler allows users to plug a different expression compiler.
+			return ExpressionCompiler.Instance.Compile(expression);
+		}
+
+		internal static TDelegate CompileUsingExpressionCompiler<TDelegate>(this Expression<TDelegate> expression) where TDelegate : Delegate
+		{
+			// Expression trees are not compiled directly.
+			// The indirection via an ExpressionCompiler allows users to plug a different expression compiler.
+			return ExpressionCompiler.Instance.Compile(expression);
+		}
+
 		/// <summary>
 		/// Converts the body of the lambda expression into the <see cref="PropertyInfo"/> referenced by it.
 		/// </summary>
@@ -141,7 +155,7 @@ namespace Moq
 					// Evaluate everything but matchers:
 					using (var context = new FluentMockContext())
 					{
-						Expression.Lambda<Action>(expression).Compile().Invoke();
+						Expression.Lambda<Action>(expression).CompileUsingExpressionCompiler().Invoke();
 						return context.LastMatch == null;
 					}
 

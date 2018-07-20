@@ -98,7 +98,7 @@ namespace Moq
 		public static TValue Is<TValue>(Expression<Func<TValue, bool>> match)
 		{
 			return Match<TValue>.Create(
-				value => match.Compile().Invoke(value),
+				value => match.CompileUsingExpressionCompiler().Invoke(value),
 				() => It.Is<TValue>(match));
 		}
 

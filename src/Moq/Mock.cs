@@ -852,7 +852,7 @@ namespace Moq
 			var targetExpression = FluentMockVisitor.Accept(fluentExpression, mock);
 			var targetLambda = Expression.Lambda<Func<Mock>>(Expression.Convert(targetExpression, typeof(Mock)));
 
-			var targetObject = targetLambda.Compile()();
+			var targetObject = targetLambda.CompileUsingExpressionCompiler()();
 			return targetObject;
 		}
 

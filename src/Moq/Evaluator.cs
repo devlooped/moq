@@ -110,7 +110,7 @@ namespace Moq
 					return e;
 				}
 				LambdaExpression lambda = Expression.Lambda(e);
-				Delegate fn = lambda.Compile();
+				Delegate fn = lambda.CompileUsingExpressionCompiler();
 				return Expression.Constant(fn.DynamicInvoke(null), e.Type);
 			}
 		}

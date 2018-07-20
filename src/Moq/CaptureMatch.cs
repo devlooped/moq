@@ -79,7 +79,7 @@ namespace Moq
 
 		private static Predicate<T> CreatePredicate(Action<T> captureCallback, Expression<Func<T, bool>> predicate)
 		{
-			var predicateDelegate = predicate.Compile();
+			var predicateDelegate = predicate.CompileUsingExpressionCompiler();
 			return value =>
 			{
 				var matches = predicateDelegate.Invoke(value);
