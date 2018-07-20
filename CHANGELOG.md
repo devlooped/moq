@@ -5,6 +5,13 @@ All notable changes to this project will be documented in this file.
 The format is loosely based on [Keep a Changelog](http://keepachangelog.com/en/1.0.0/).
 
 
+## Unreleased
+
+#### Fixed
+
+* More precise `out` parameter detection for mocking COM interfaces with `[in,out]` parameters (@koutinho, #645)
+
+
 ## 4.9.0 (2018-07-13)
 
 #### Added
