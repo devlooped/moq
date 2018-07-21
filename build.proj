@@ -15,7 +15,7 @@
 	<ItemGroup>
 		<Solution Include="Moq.sln"/>
 		<NuSpec Include="Moq.nuspec" />
-		<Source Include="Source\Moq.csproj" />
+		<Source Include="src\Moq\Moq.csproj" />
 	</ItemGroup>
 	
 	<Target Name="Clean">
@@ -42,12 +42,12 @@
 		     so create it if it doesn't exist yet. -->
 		<MakeDir Directories="$(Out)" Condition=" !Exists('$(Out)') " />
 
-		<Exec Command="dotnet xunit -nobuild -configuration $(Configuration) -noshadow -appveyor -html ..\$(Out)\test.html -xml ..\$(Out)\test.xml"
-		      WorkingDirectory="Moq.Tests"
+		<Exec Command="dotnet xunit -nobuild -configuration $(Configuration) -noshadow -appveyor -html ..\..\$(Out)\test.html -xml ..\..\$(Out)\test.xml"
+		      WorkingDirectory="tests\Moq.Tests"
 			  ContinueOnError="false" />
 
-		<Exec Command="dotnet xunit -nobuild -configuration $(Configuration) -noshadow -appveyor -html ..\$(Out)\test-vb.html -xml ..\$(Out)\test-vb.xml"
-		      WorkingDirectory="Moq.Tests.VisualBasic"
+		<Exec Command="dotnet xunit -nobuild -configuration $(Configuration) -noshadow -appveyor -html ..\..\$(Out)\test-vb.html -xml ..\..\$(Out)\test-vb.xml"
+		      WorkingDirectory="tests\Moq.Tests.VisualBasic"
 			  ContinueOnError="false" />
 
 		<PropertyGroup>
@@ -74,8 +74,8 @@
 
 		<!-- Verify that created NuGet package is correctly source-linked to the GitHub repository -->
 		<!--
-		<Exec Command="dotnet sourcelink test ..\$(Out)\%(NuSpec.Filename).$(Version).nupkg"
-		      WorkingDirectory="Source"
+		<Exec Command="dotnet sourcelink test ..\..\$(Out)\%(NuSpec.Filename).$(Version).nupkg"
+		      WorkingDirectory="src\Moq"
 		      ContinueOnError="false" />
 		-->
 	</Target>

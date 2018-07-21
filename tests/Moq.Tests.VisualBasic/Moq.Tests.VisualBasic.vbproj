@@ -1,8 +1,8 @@
-<Project Sdk="Microsoft.NET.Sdk">
+﻿<Project Sdk="Microsoft.NET.Sdk">
 
   <PropertyGroup>
     <TargetFrameworks>net46;netcoreapp2.0</TargetFrameworks>
-		<AssemblyOriginatorKeyFile>../Moq.snk</AssemblyOriginatorKeyFile>
+		<AssemblyOriginatorKeyFile>..\..\Moq.snk</AssemblyOriginatorKeyFile>
 		<DebugSymbols>True</DebugSymbols>
 		<DebugType>full</DebugType>
   </PropertyGroup>
@@ -19,7 +19,7 @@
   </PropertyGroup>
 
   <ItemGroup>
-    <ProjectReference Include="..\Source\Moq.csproj" />
+    <ProjectReference Include="..\..\src\Moq\Moq.csproj" />
   </ItemGroup>
 
 </Project>

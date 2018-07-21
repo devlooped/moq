@@ -3,7 +3,7 @@ Microsoft Visual Studio Solution File, Format Version 10.00
 # Visual Studio 2008
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Moq.UnitTests.Pex", "Moq.UnitTests.Pex.csproj", "{662DD403-EFFD-4804-A29D-2E1F80D92835}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Moq", "..\..\Source\Moq.csproj", "{1C91AC30-5977-4BE5-BA67-8EB186C03514}"
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Moq", "..\..\..\src\Moq\Moq.csproj", "{1C91AC30-5977-4BE5-BA67-8EB186C03514}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution

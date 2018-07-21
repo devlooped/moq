@@ -14,11 +14,11 @@ Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Solution Items", "Solution 
 		README.md = README.md
 	EndProjectSection
 EndProject
-Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Moq", "Source\Moq.csproj", "{1C91AC30-5977-4BE5-BA67-8EB186C03514}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Moq", "src\Moq\Moq.csproj", "{1C91AC30-5977-4BE5-BA67-8EB186C03514}"
 EndProject
-Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Moq.Tests", "Moq.Tests\Moq.Tests.csproj", "{81BBC911-4916-4E10-A955-752AE47CB2B9}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Moq.Tests", "tests\Moq.Tests\Moq.Tests.csproj", "{81BBC911-4916-4E10-A955-752AE47CB2B9}"
 EndProject
-Project("{778DAE3C-4631-46EA-AA77-85C1314464D9}") = "Moq.Tests.VisualBasic", "Moq.Tests.VisualBasic\Moq.Tests.VisualBasic.vbproj", "{840A8B2E-3D4B-4521-A61A-0291562CDC8B}"
+Project("{778DAE3C-4631-46EA-AA77-85C1314464D9}") = "Moq.Tests.VisualBasic", "tests\Moq.Tests.VisualBasic\Moq.Tests.VisualBasic.vbproj", "{840A8B2E-3D4B-4521-A61A-0291562CDC8B}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution

@@ -49,7 +49,7 @@
 		<Compile Include="ShouldMatchPredicateArgument.cs" />
 	</ItemGroup>
 	<ItemGroup>
-		<ProjectReference Include="..\..\Source\Moq.csproj">
+		<ProjectReference Include="..\..\..\src\Moq\Moq.csproj">
 			<Project>{1C91AC30-5977-4BE5-BA67-8EB186C03514}</Project>
 			<Name>Moq</Name>
 		</ProjectReference>
