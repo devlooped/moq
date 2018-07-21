@@ -3,7 +3,7 @@
 	<PropertyGroup>
 		<TargetFrameworks>net46;netcoreapp2.0</TargetFrameworks>
 		<AssemblyName>Moq.Tests</AssemblyName>
-		<AssemblyOriginatorKeyFile>../Moq.snk</AssemblyOriginatorKeyFile>
+		<AssemblyOriginatorKeyFile>..\..\Moq.snk</AssemblyOriginatorKeyFile>
 		<DebugSymbols>True</DebugSymbols>
 		<DebugType>full</DebugType>
 		<GenerateRuntimeConfigurationFiles>true</GenerateRuntimeConfigurationFiles>
@@ -26,7 +26,7 @@
 		<PackageReference Include="System.ValueTuple" Version="4.4.0" />
 		<PackageReference Include="xunit" Version="2.3.1" />
 		<PackageReference Include="xunit.runner.visualstudio" Version="2.3.1" />
-		<ProjectReference Include="..\Source\Moq.csproj" />
+		<ProjectReference Include="..\..\src\Moq\Moq.csproj" />
 		<DotNetCliToolReference Include="dotnet-xunit" Version="2.3.1" />
 	</ItemGroup>
 	<ItemGroup Condition=" '$(TargetFramework)' == 'net46' ">

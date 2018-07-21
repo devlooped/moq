@@ -3,7 +3,7 @@
 	<PropertyGroup>
 		<TargetFrameworks>net45;netstandard1.3</TargetFrameworks>
 		<AssemblyName>Moq</AssemblyName>
-		<AssemblyOriginatorKeyFile>../Moq.snk</AssemblyOriginatorKeyFile>
+		<AssemblyOriginatorKeyFile>..\..\Moq.snk</AssemblyOriginatorKeyFile>
 		<DebugSymbols>True</DebugSymbols>
 		<DebugType>full</DebugType>
 		<DocumentationFile>bin\$(Configuration)\$(TargetFramework)\$(AssemblyName).xml</DocumentationFile> 
