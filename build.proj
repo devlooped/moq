@@ -3,8 +3,6 @@
 
 	<PropertyGroup>
 		<Configuration Condition=" '$(Configuration)' == '' ">Release</Configuration>
-		<IntermediateOutputPath>.nuget\</IntermediateOutputPath>
-		<PackagesPath>$(IntermediateOutputPath)packages</PackagesPath>
 		<Out Condition=" '$(Out)' == '' ">$(MSBuildThisFileDirectory)out\</Out>
 		<CommonBuildProperties>WarningLevel=0;NoWarn=1591;RunCodeAnalysis=false;Configuration=$(Configuration);SourceLinkCreate=true</CommonBuildProperties>
 	</PropertyGroup>
@@ -18,7 +16,6 @@
 	<Target Name="Clean">
 		<MSBuild Projects="@(Solution)" Properties="$(CommonBuildProperties)" Targets="Clean" />
 		<Exec Command="rmdir $(Out) /S /Q" ContinueOnError="true" />
-		<Exec Command="rmdir $(PackagesPath) /S /Q" ContinueOnError="true" />
 	</Target>
 
 	<Target Name="Rebuild" DependsOnTargets="Clean;Build" />
@@ -35,13 +32,7 @@
 		<MSBuild Projects="@(Source)" Targets="Pack" Properties="Out=$(Out);$(CommonBuildProperties)" BuildInParallel="False" />
 	</Target>
 
-	<!-- Configure and restore initial targets and packages -->
-	<Import Project="NuGet.Restore.targets" />
-
-	<Target Name="Configure" DependsOnTargets="_GetNuGet">
-		<!-- We always run NuGet Install since it already checks for already-installed packages and skips them -->
-		<Exec Command='"$(NuGet)" Install "$(MSBuildThisFileDirectory)packages.config" -OutputDirectory "$(PackagesPath)" -ExcludeVersion' />
-
+	<Target Name="Configure">
 		<MakeDir Directories="$(Out)" Condition=" !Exists('$(Out)') " />
 	</Target>
 </Project>

@@ -1,9 +1,7 @@
-.nuget
 out
 bin
 obj
 lib
-packages
 *.nuget.targets
 *.nuget.props
 *.lock.json
