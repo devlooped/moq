@@ -62,15 +62,6 @@
 		<Warning Condition="'$(DotNetErrorCode)' != '0'" Text="Error in executing dotnet." />
 	</Target>
 
-	<Target Name="Publish" DependsOnTargets="Package">
-		<Exec Command='$(NuGet) Push "$(Out)\%(NuSpec.Filename).$(Version).nupkg" $(NuGetPushArgs)'
-		      StandardErrorImportance="high"
-		      StandardOutputImportance="normal" />
-
-		<Message Text="Published new package: Id=%(NuSpec.Filename), Version=$(Version)"
-				 Importance="high" />
-	</Target>
-
 	<!-- Configure and restore initial targets and packages -->
 	<Import Project="NuGet.Restore.targets" />
 	<PropertyGroup>
