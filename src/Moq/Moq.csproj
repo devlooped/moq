@@ -1,6 +1,7 @@
 ﻿<Project Sdk="Microsoft.NET.Sdk">
 
 	<Import Project="$(BuildDirectory)GitInfo.props" />
+	<Import Project="$(BuildDirectory)SourceLink.props" />
 
 	<PropertyGroup>
 		<TargetFrameworks>net45;netstandard1.3</TargetFrameworks>
@@ -40,10 +41,8 @@
 	<ItemGroup>
 		<PackageReference Include="Castle.Core" Version="4.3.1" />
 		<PackageReference Include="IFluentInterface" Version="2.1.0" />
-		<PackageReference Include="SourceLink.Create.CommandLine" Version="2.7.3" PrivateAssets="All" />
 		<PackageReference Include="System.Threading.Tasks.Extensions" Version="4.3.0" />
 		<PackageReference Include="System.ValueTuple" Version="4.4.0" />
-		<DotNetCliToolReference Include="dotnet-sourcelink" Version="2.2.1" />
 	</ItemGroup>
 	<ItemGroup Condition=" '$(TargetFramework)' == 'net45' ">
 		<Reference Include="System" />
