@@ -20,6 +20,16 @@
 		<LangVersion>7.3</LangVersion>
 	</PropertyGroup>
 
+	<PropertyGroup>
+		<!-- Properties related to NuGet packaging: -->
+		<IncludeBuildOutput>False</IncludeBuildOutput>
+		<NoBuild>True</NoBuild>
+		<NoPackageAnalysis>True</NoPackageAnalysis>
+		<NuspecFile>Moq.nuspec</NuspecFile>
+		<NuspecBasePath>$(MSBuildThisFileDirectory)</NuspecBasePath>
+		<PackageOutputPath>$(Out)</PackageOutputPath>
+	</PropertyGroup>
+
 	<PropertyGroup Condition=" '$(TargetFramework)' == 'net45' ">
 		<DefineConstants>$(DefineConstants);DESKTOP;FEATURE_CAS;FEATURE_CODEDOM;FEATURE_COM;FEATURE_SERIALIZATION</DefineConstants>
 	</PropertyGroup>
@@ -145,14 +155,11 @@
 		</None>
 	</ItemGroup>
 
-	<Target Name="Package" DependsOnTargets="GitVersion">
+	<Target Name="SetNuspecProperties" BeforeTargets="GenerateNuspec" DependsOnTargets="GitVersion">
 		<PropertyGroup>
-			<Version>$(GitSemVerMajor).$(GitSemVerMinor).$(GitSemVerPatch)$(GitSemVerDashLabel)</Version>
+			<PackageVersion>$(GitSemVerMajor).$(GitSemVerMinor).$(GitSemVerPatch)$(GitSemVerDashLabel)</PackageVersion>
+			<NuspecProperties>configuration=$(Configuration);version=$(PackageVersion)</NuspecProperties>
 		</PropertyGroup>
-		<ItemGroup>
-			<NuSpec Include="Moq.nuspec" />
-		</ItemGroup>
-		<Exec Command="&quot;$(NuGet)&quot; Pack &quot;%(NuSpec.Identity)&quot; -Version $(Version) -Properties Id=%(NuSpec.Filename);Configuration=$(Configuration);Version=$(Version) -OutputDirectory $(Out)" />
 	</Target>
 
 </Project>
