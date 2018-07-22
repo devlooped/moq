@@ -38,10 +38,6 @@
 		</Exec>
 		<Warning Condition="'$(DotNetErrorCode)' != '0'" Text="Error in executing dotnet." />
 
-		<!-- Test runner report files will be written to the `out\` directory,
-		     so create it if it doesn't exist yet. -->
-		<MakeDir Directories="$(Out)" Condition=" !Exists('$(Out)') " />
-
 		<Exec Command="dotnet xunit -nobuild -configuration $(Configuration) -noshadow -appveyor -html ..\..\$(Out)\test.html -xml ..\..\$(Out)\test.xml"
 		      WorkingDirectory="tests\Moq.Tests"
 			  ContinueOnError="false" />
@@ -52,7 +48,6 @@
 	</Target>
 
 	<Target Name="Package" DependsOnTargets="Build">
-		<MakeDir Directories="$(Out)" Condition=" !Exists('$(Out)') " />
 		<Exec Command='"$(NuGet)" Pack "%(NuSpec.Identity)" $(Args) -Version $(Version) -Properties Id=%(NuSpec.Filename);Configuration=$(Configuration);Version=$(Version) -OutputDirectory $(Out)' />
 
 		<!-- See if dotnet CLI is available: -->
