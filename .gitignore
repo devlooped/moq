@@ -1,6 +1,5 @@
 .nuget
 out
-build
 bin
 obj
 lib

@@ -22,10 +22,15 @@ IF NOT EXIST %LocalAppData%\NuGet md %LocalAppData%\NuGet
 @powershell -NoProfile -ExecutionPolicy unrestricted -Command "$ProgressPreference = 'SilentlyContinue'; Invoke-WebRequest 'https://dist.nuget.org/win-x86-commandline/latest/nuget.exe' -OutFile '%CACHED_NUGET%'"
 
 :copynuget
-IF EXIST .nuget\nuget.exe goto restore
+IF EXIST .nuget\nuget.exe goto updateAppVeyorBuildVersion
 md .nuget
 copy %CACHED_NUGET% .nuget\nuget.exe > nul
 .nuget\nuget.exe update -self
+
+:updateAppVeyorBuildVersion
+IF /i +%APPVEYOR%+ NEQ +True+ GOTO :restore
+echo Running "%msb%" build\AppVeyor.proj /r /t:UpdateBuildVersion
+"%msb%" build\AppVeyor.proj /r /t:UpdateBuildVersion
 
 :restore
 :: Build script packages have no version in the path, so we install them to .nuget\packages to avoid conflicts with 

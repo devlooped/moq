@@ -1,0 +1,21 @@
+<Project Sdk="Microsoft.Build.NoTargets/1.0.39">
+
+  <PropertyGroup>
+    <TargetFramework>netstandard1.0</TargetFramework>
+  </PropertyGroup>
+
+  <ItemGroup>
+    <PackageReference Include="GitInfo" Version="2.0.11" PrivateAssets="All" />
+  </ItemGroup>
+
+  <Target Name="UpdateBuildVersion" DependsOnTargets="GitVersion" Condition="'$(APPVEYOR)' == 'True'">
+    <PropertyGroup>
+      <BuildVersion>$(GitBaseVersion)</BuildVersion>
+      <BuildVersion Condition="'$(GitCommits)' != '0'">$(BuildVersion).$(GitCommits)</BuildVersion>
+      <BuildVersion>$(BuildVersion)+sha.$(GitCommit)</BuildVersion>
+    </PropertyGroup>
+    <Exec Command="appveyor UpdateBuild -Version $(BuildVersion)"
+          ContinueOnError="WarnAndContinue" />
+  </Target>
+
+</Project>
