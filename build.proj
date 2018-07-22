@@ -7,14 +7,10 @@
 		<PackagesPath>$(IntermediateOutputPath)packages</PackagesPath>
 		<Out Condition=" '$(Out)' == '' ">$(MSBuildThisFileDirectory)out\</Out>
 		<CommonBuildProperties>WarningLevel=0;NoWarn=1591;RunCodeAnalysis=false;Configuration=$(Configuration);SourceLinkCreate=true</CommonBuildProperties>
-		<GitInfoReportImportance>high</GitInfoReportImportance>
-		<GitIgnoreTagVersion>true</GitIgnoreTagVersion>
-		<GitIgnoreBranchVersion>true</GitIgnoreBranchVersion>
 	</PropertyGroup>
 
 	<ItemGroup>
 		<Solution Include="Moq.sln"/>
-		<NuSpec Include="Moq.nuspec" />
 		<Source Include="src\Moq\Moq.csproj" />
 		<TestProjects Include="tests\**\*.*proj" />
 	</ItemGroup>
@@ -36,30 +32,15 @@
 	</Target>
 
 	<Target Name="Package" DependsOnTargets="Build">
-		<Exec Command='"$(NuGet)" Pack "%(NuSpec.Identity)" $(Args) -Version $(Version) -Properties Id=%(NuSpec.Filename);Configuration=$(Configuration);Version=$(Version) -OutputDirectory $(Out)' />
+		<MSBuild Projects="@(Source)" Targets="Package" Properties="Out=$(Out);NuGet=$(NuGet);$(CommonBuildProperties)" BuildInParallel="False" />
 	</Target>
 
 	<!-- Configure and restore initial targets and packages -->
 	<Import Project="NuGet.Restore.targets" />
-	<PropertyGroup>
-		<GitInfoTargets>$(PackagesPath)\GitInfo\build\GitInfo.targets</GitInfoTargets>
-		<PendingRestore Condition=" !Exists('$(GitInfoTargets)') ">true</PendingRestore>
-	</PropertyGroup>
 
-	<Target Name="GitVersion" /><!-- Gets overridden by the $(GitInfoTargets) if it exists -->
-	<Import Project="$(GitInfoTargets)" Condition=" Exists('$(GitInfoTargets)') " />
-
-	<Target Name="Configure" DependsOnTargets="_GetNuGet;GitInfoReport">
+	<Target Name="Configure" DependsOnTargets="_GetNuGet">
 		<!-- We always run NuGet Install since it already checks for already-installed packages and skips them -->
 		<Exec Command='"$(NuGet)" Install "$(MSBuildThisFileDirectory)packages.config" -OutputDirectory "$(PackagesPath)" -ExcludeVersion' />
-
-		<!-- Errors if nuget packages were restored during the build -->
-		<Error Text="Required build-time NuGet packages were missing and were just restored. Please run the build again."
-		       Condition=" '$(PendingRestore)' == 'true' And '$(target)' != 'configure' "/>
-
-		<PropertyGroup>
-			<Version>$(GitSemVerMajor).$(GitSemVerMinor).$(GitSemVerPatch)$(GitSemVerDashLabel)</Version>
-		</PropertyGroup>
 
 		<MakeDir Directories="$(Out)" Condition=" !Exists('$(Out)') " />
 	</Target>

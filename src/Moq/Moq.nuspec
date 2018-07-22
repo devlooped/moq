@@ -30,11 +30,11 @@
 		</dependencies>
 	</metadata>
 	<files>
-		<file src="src\Moq\bin\$configuration$\net45\Moq.dll" target="lib\net45" />
-		<file src="src\Moq\bin\$configuration$\net45\Moq.pdb" target="lib\net45" />
-		<file src="src\Moq\bin\$configuration$\net45\Moq.xml" target="lib\net45" />
-		<file src="src\Moq\bin\$configuration$\netstandard1.3\Moq.dll" target="lib\netstandard1.3" />
-		<file src="src\Moq\bin\$configuration$\netstandard1.3\Moq.pdb" target="lib\netstandard1.3" />
-		<file src="src\Moq\bin\$configuration$\netstandard1.3\Moq.xml" target="lib\netstandard1.3" />
+		<file src="bin\$configuration$\net45\Moq.dll" target="lib\net45" />
+		<file src="bin\$configuration$\net45\Moq.pdb" target="lib\net45" />
+		<file src="bin\$configuration$\net45\Moq.xml" target="lib\net45" />
+		<file src="bin\$configuration$\netstandard1.3\Moq.dll" target="lib\netstandard1.3" />
+		<file src="bin\$configuration$\netstandard1.3\Moq.pdb" target="lib\netstandard1.3" />
+		<file src="bin\$configuration$\netstandard1.3\Moq.xml" target="lib\netstandard1.3" />
 	</files>
 </package>

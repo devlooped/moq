@@ -145,4 +145,14 @@
 		</None>
 	</ItemGroup>
 
+	<Target Name="Package" DependsOnTargets="GitVersion">
+		<PropertyGroup>
+			<Version>$(GitSemVerMajor).$(GitSemVerMinor).$(GitSemVerPatch)$(GitSemVerDashLabel)</Version>
+		</PropertyGroup>
+		<ItemGroup>
+			<NuSpec Include="Moq.nuspec" />
+		</ItemGroup>
+		<Exec Command="&quot;$(NuGet)&quot; Pack &quot;%(NuSpec.Identity)&quot; -Version $(Version) -Properties Id=%(NuSpec.Filename);Configuration=$(Configuration);Version=$(Version) -OutputDirectory $(Out)" />
+	</Target>
+
 </Project>
