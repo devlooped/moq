@@ -1,21 +1,19 @@
 ﻿<Project Sdk="Microsoft.NET.Sdk">
 
 	<Import Project="$(BuildDirectory)GitInfo.props" />
+	<Import Project="$(BuildDirectory)SignAssembly.props" />
 	<Import Project="$(BuildDirectory)SourceLink.props" />
 
 	<PropertyGroup>
 		<TargetFrameworks>net45;netstandard1.3</TargetFrameworks>
 		<AssemblyName>Moq</AssemblyName>
-		<AssemblyOriginatorKeyFile>..\..\Moq.snk</AssemblyOriginatorKeyFile>
 		<DebugSymbols>True</DebugSymbols>
 		<DebugType>full</DebugType>
 		<DocumentationFile>bin\$(Configuration)\$(TargetFramework)\$(AssemblyName).xml</DocumentationFile> 
 		<GenerateAssemblyInfo>false</GenerateAssemblyInfo>
 		<GenerateDocumentation>true</GenerateDocumentation>
 		<NoWarn>0419</NoWarn>
-		<PublicSign Condition="'$(OS)' != 'Windows_NT'">true</PublicSign>
 		<RootNamespace>Moq</RootNamespace>
-		<SignAssembly>true</SignAssembly>
 		<TreatWarningsAsErrors>true</TreatWarningsAsErrors>
 		<WarningLevel>4</WarningLevel>
 		<LangVersion>7.3</LangVersion>

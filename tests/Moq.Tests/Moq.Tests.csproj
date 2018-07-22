@@ -1,16 +1,14 @@
 ﻿<Project Sdk="Microsoft.NET.Sdk">
 
+	<Import Project="$(BuildDirectory)SignAssembly.props" />
 	<Import Project="$(BuildDirectory)xUnit.props" />
 
 	<PropertyGroup>
 		<TargetFrameworks>net46;netcoreapp2.0</TargetFrameworks>
 		<AssemblyName>Moq.Tests</AssemblyName>
-		<AssemblyOriginatorKeyFile>..\..\Moq.snk</AssemblyOriginatorKeyFile>
 		<DebugSymbols>True</DebugSymbols>
 		<DebugType>full</DebugType>
 		<GenerateRuntimeConfigurationFiles>true</GenerateRuntimeConfigurationFiles>
-		<PublicSign Condition=" '$(OS)' != 'Windows_NT' ">true</PublicSign>
-		<SignAssembly>true</SignAssembly>
 		<LangVersion>7.2</LangVersion>
 	</PropertyGroup>
 
