@@ -1,5 +1,7 @@
 ﻿<Project Sdk="Microsoft.NET.Sdk">
 
+	<Import Project="$(BuildDirectory)xUnit.props" />
+
 	<PropertyGroup>
 		<TargetFrameworks>net46;netcoreapp2.0</TargetFrameworks>
 		<AssemblyName>Moq.Tests</AssemblyName>
@@ -16,18 +18,13 @@
 		<DefineConstants>$(DefineConstants);DESKTOP;FEATURE_CAS;FEATURE_CODEDOM;FEATURE_COM;FEATURE_SERIALIZATION</DefineConstants>
 	</PropertyGroup>
 	<PropertyGroup Condition=" '$(TargetFramework)' == 'netcoreapp2.0' ">
-		<RuntimeFrameworkVersion>2.0.3</RuntimeFrameworkVersion>
 		<DefineConstants>$(DefineConstants);NETCORE</DefineConstants>
 	</PropertyGroup>
 
 	<ItemGroup>
 		<PackageReference Include="Castle.Core" Version="4.3.1" />
-		<PackageReference Include="Microsoft.NET.Test.Sdk" Version="15.7.2" />
 		<PackageReference Include="System.ValueTuple" Version="4.4.0" />
-		<PackageReference Include="xunit" Version="2.3.1" />
-		<PackageReference Include="xunit.runner.visualstudio" Version="2.3.1" />
 		<ProjectReference Include="..\..\src\Moq\Moq.csproj" />
-		<DotNetCliToolReference Include="dotnet-xunit" Version="2.3.1" />
 	</ItemGroup>
 	<ItemGroup Condition=" '$(TargetFramework)' == 'net46' ">
 		<PackageReference Include="EntityFramework" Version="6.2.0" />
@@ -48,16 +45,5 @@
 	<ItemGroup>
 		<Service Include="{82a7f48d-3b50-4b1e-b82e-3ada8210c358}" />
 	</ItemGroup>
-
-	<Target Name="Test">
-		<!-- See if dotnet CLI is available: -->
-		<Exec ContinueOnError="True" Command="dotnet --info">
-			<Output TaskParameter="ExitCode" PropertyName="DotNetErrorCode"/>
-		</Exec>
-		<Warning Condition="'$(DotNetErrorCode)' != '0'" Text="Error in executing dotnet." />
-
-		<Exec Command="dotnet xunit -nobuild -configuration $(Configuration) -noshadow -appveyor -html &quot;$(Out)test.html&quot; -xml &quot;$(Out)test.xml&quot;"
-		      ContinueOnError="false" />
-	</Target>
 
 </Project>
