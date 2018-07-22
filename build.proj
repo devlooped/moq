@@ -49,17 +49,6 @@
 		<Exec Command="dotnet xunit -nobuild -configuration $(Configuration) -noshadow -appveyor -html ..\..\$(Out)\test-vb.html -xml ..\..\$(Out)\test-vb.xml"
 		      WorkingDirectory="tests\Moq.Tests.VisualBasic"
 			  ContinueOnError="false" />
-
-		<PropertyGroup>
-			<CoverageConsole>$(PackagesPath)\OpenCover\tools\OpenCover.Console.exe</CoverageConsole>
-			<CoverageOptions>$(CoverageOptions) -output:$(Out)\coverage.xml -returntargetcode -register:user -filter:"+[Moq.*]* -[xunit*]* -[*.Tests]* -[*]*ThisAssembly* -[*]*IFluentInterface*" -excludebyattribute:*ExcludeFromCodeCoverage*;*CompilerGenerated* -skipautoprops -showunvisited -mergebyhash -hideskipped:All</CoverageOptions>
-		</PropertyGroup>
-
-		<!-- This isn't collecting any data right now, so make Coverage == '' by default so it won't run with this condition -->
-		<Exec Command="$(CoverageConsole) $(CoverageOptions) -target:$(XunitConsole) -targetargs:&quot;@(TestAssembly, ' ') $(XunitOptions)&quot;"
-		      Condition=" '$(Coverage)' == 'true' "
-		      ConsoleToMSBuild="true"
-		      ContinueOnError="ErrorAndContinue" />
 	</Target>
 
 	<Target Name="Package" DependsOnTargets="Build">
