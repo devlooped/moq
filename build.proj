@@ -60,13 +60,6 @@
 			<Output TaskParameter="ExitCode" PropertyName="DotNetErrorCode"/>
 		</Exec>
 		<Warning Condition="'$(DotNetErrorCode)' != '0'" Text="Error in executing dotnet." />
-
-		<!-- Verify that created NuGet package is correctly source-linked to the GitHub repository -->
-		<!--
-		<Exec Command="dotnet sourcelink test ..\..\$(Out)\%(NuSpec.Filename).$(Version).nupkg"
-		      WorkingDirectory="src\Moq"
-		      ContinueOnError="false" />
-		-->
 	</Target>
 
 	<Target Name="Publish" DependsOnTargets="Package">
