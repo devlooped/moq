@@ -22,4 +22,15 @@
     <ProjectReference Include="..\..\src\Moq\Moq.csproj" />
   </ItemGroup>
 
+	<Target Name="Test">
+		<!-- See if dotnet CLI is available: -->
+		<Exec ContinueOnError="True" Command="dotnet --info">
+			<Output TaskParameter="ExitCode" PropertyName="DotNetErrorCode"/>
+		</Exec>
+		<Warning Condition="'$(DotNetErrorCode)' != '0'" Text="Error in executing dotnet." />
+
+		<Exec Command="dotnet xunit -nobuild -configuration $(Configuration) -noshadow -appveyor -html &quot;$(Out)test.html&quot; -xml &quot;$(Out)test.xml&quot;"
+		      ContinueOnError="false" />
+	</Target>
+
 </Project>

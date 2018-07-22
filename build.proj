@@ -5,7 +5,7 @@
 		<Configuration Condition=" '$(Configuration)' == '' ">Release</Configuration>
 		<IntermediateOutputPath>.nuget\</IntermediateOutputPath>
 		<PackagesPath>$(IntermediateOutputPath)packages</PackagesPath>
-		<Out Condition=" '$(Out)' == '' ">out</Out>
+		<Out Condition=" '$(Out)' == '' ">$(MSBuildThisFileDirectory)out\</Out>
 		<CommonBuildProperties>WarningLevel=0;NoWarn=1591;RunCodeAnalysis=false;Configuration=$(Configuration);SourceLinkCreate=true</CommonBuildProperties>
 		<GitInfoReportImportance>high</GitInfoReportImportance>
 		<GitIgnoreTagVersion>true</GitIgnoreTagVersion>
@@ -16,6 +16,7 @@
 		<Solution Include="Moq.sln"/>
 		<NuSpec Include="Moq.nuspec" />
 		<Source Include="src\Moq\Moq.csproj" />
+		<TestProjects Include="tests\**\*.*proj" />
 	</ItemGroup>
 	
 	<Target Name="Clean">
@@ -31,20 +32,7 @@
 	</Target>
 
 	<Target Name="Test" DependsOnTargets="Build">
-
-		<!-- See if dotnet CLI is available: -->
-		<Exec ContinueOnError="True" Command="dotnet --info">
-			<Output TaskParameter="ExitCode" PropertyName="DotNetErrorCode"/>
-		</Exec>
-		<Warning Condition="'$(DotNetErrorCode)' != '0'" Text="Error in executing dotnet." />
-
-		<Exec Command="dotnet xunit -nobuild -configuration $(Configuration) -noshadow -appveyor -html ..\..\$(Out)\test.html -xml ..\..\$(Out)\test.xml"
-		      WorkingDirectory="tests\Moq.Tests"
-			  ContinueOnError="false" />
-
-		<Exec Command="dotnet xunit -nobuild -configuration $(Configuration) -noshadow -appveyor -html ..\..\$(Out)\test-vb.html -xml ..\..\$(Out)\test-vb.xml"
-		      WorkingDirectory="tests\Moq.Tests.VisualBasic"
-			  ContinueOnError="false" />
+		<MSBuild Projects="@(TestProjects)" Targets="Test" Properties="Out=$(Out);$(CommonBuildProperties)" BuildInParallel="False" />
 	</Target>
 
 	<Target Name="Package" DependsOnTargets="Build">
