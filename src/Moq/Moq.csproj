@@ -1,5 +1,7 @@
 ﻿<Project Sdk="Microsoft.NET.Sdk">
 
+	<Import Project="$(BuildDirectory)GitInfo.props" />
+
 	<PropertyGroup>
 		<TargetFrameworks>net45;netstandard1.3</TargetFrameworks>
 		<AssemblyName>Moq</AssemblyName>
@@ -9,8 +11,6 @@
 		<DocumentationFile>bin\$(Configuration)\$(TargetFramework)\$(AssemblyName).xml</DocumentationFile> 
 		<GenerateAssemblyInfo>false</GenerateAssemblyInfo>
 		<GenerateDocumentation>true</GenerateDocumentation>
-		<GitIgnoreTagVersion>true</GitIgnoreTagVersion>
-		<GitIgnoreBranchVersion>true</GitIgnoreBranchVersion>
 		<NoWarn>0419</NoWarn>
 		<PublicSign Condition="'$(OS)' != 'Windows_NT'">true</PublicSign>
 		<RootNamespace>Moq</RootNamespace>
@@ -39,7 +39,6 @@
 
 	<ItemGroup>
 		<PackageReference Include="Castle.Core" Version="4.3.1" />
-		<PackageReference Include="GitInfo" Version="2.0.11" />
 		<PackageReference Include="IFluentInterface" Version="2.1.0" />
 		<PackageReference Include="SourceLink.Create.CommandLine" Version="2.7.3" PrivateAssets="All" />
 		<PackageReference Include="System.Threading.Tasks.Extensions" Version="4.3.0" />
