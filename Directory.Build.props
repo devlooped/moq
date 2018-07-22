@@ -3,6 +3,7 @@
   <PropertyGroup>
     <RootDirectory>$(MSBuildThisFileDirectory)</RootDirectory>
     <BuildDirectory>$(RootDirectory)build\</BuildDirectory>
+    <OutputDirectory>$(RootDirectory)out\</OutputDirectory>
   </PropertyGroup>
 
 </Project>

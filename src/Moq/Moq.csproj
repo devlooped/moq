@@ -26,7 +26,7 @@
 		<NoPackageAnalysis>True</NoPackageAnalysis>
 		<NuspecFile>Moq.nuspec</NuspecFile>
 		<NuspecBasePath>$(MSBuildThisFileDirectory)</NuspecBasePath>
-		<PackageOutputPath>$(Out)</PackageOutputPath>
+		<PackageOutputPath>$(OutputDirectory)</PackageOutputPath>
 	</PropertyGroup>
 
 	<PropertyGroup Condition=" '$(TargetFramework)' == 'net45' ">

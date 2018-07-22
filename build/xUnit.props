@@ -25,7 +25,7 @@
     </Exec>
     <Warning Condition="'$(DotnetErrorCode)' != '0'" Text="Error in executing dotnet." />
 
-    <Exec Command="dotnet xunit -nobuild -configuration $(Configuration) -noshadow -appveyor -html &quot;$(Out)$(TestReportFileName).html&quot; -xml &quot;$(Out)$(TestReportFileName).xml&quot;"
+    <Exec Command="dotnet xunit -nobuild -configuration $(Configuration) -noshadow -appveyor -html &quot;$(OutputDirectory)$(TestReportFileName).html&quot; -xml &quot;$(OutputDirectory)$(TestReportFileName).xml&quot;"
           ContinueOnError="false" />
   </Target>
 

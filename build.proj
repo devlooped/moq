@@ -1,9 +1,12 @@
 <?xml version="1.0" encoding="utf-8"?>
 <Project ToolsVersion="4.0" DefaultTargets="Build;Test;Pack" InitialTargets="Configure" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
 
+	<!-- Because this project does not reference any SDK,
+	     the following .props file is not auto-imported: -->
+	<Import Project="Directory.Build.Props" />
+
 	<PropertyGroup>
 		<Configuration Condition=" '$(Configuration)' == '' ">Release</Configuration>
-		<Out Condition=" '$(Out)' == '' ">$(MSBuildThisFileDirectory)out\</Out>
 		<CommonBuildProperties>WarningLevel=0;NoWarn=1591;RunCodeAnalysis=false;Configuration=$(Configuration)</CommonBuildProperties>
 	</PropertyGroup>
 
@@ -15,7 +18,7 @@
 	
 	<Target Name="Clean">
 		<MSBuild Projects="@(Solution)" Properties="$(CommonBuildProperties)" Targets="Clean" />
-		<Exec Command="rmdir $(Out) /S /Q" ContinueOnError="true" />
+		<Exec Command="rmdir $(OutputDirectory) /S /Q" ContinueOnError="true" />
 	</Target>
 
 	<Target Name="Rebuild" DependsOnTargets="Clean;Build" />
@@ -25,14 +28,14 @@
 	</Target>
 
 	<Target Name="Test" DependsOnTargets="Build">
-		<MSBuild Projects="@(TestProjects)" Targets="Test" Properties="Out=$(Out);$(CommonBuildProperties)" BuildInParallel="False" />
+		<MSBuild Projects="@(TestProjects)" Targets="Test" Properties="$(CommonBuildProperties)" BuildInParallel="False" />
 	</Target>
 
 	<Target Name="Pack" DependsOnTargets="Build">
-		<MSBuild Projects="@(Source)" Targets="Pack" Properties="Out=$(Out);$(CommonBuildProperties)" BuildInParallel="False" />
+		<MSBuild Projects="@(Source)" Targets="Pack" Properties="$(CommonBuildProperties)" BuildInParallel="False" />
 	</Target>
 
 	<Target Name="Configure">
-		<MakeDir Directories="$(Out)" Condition=" !Exists('$(Out)') " />
+		<MakeDir Directories="$(OutputDirectory)" Condition=" !Exists('$(OutputDirectory)') " />
 	</Target>
 </Project>
