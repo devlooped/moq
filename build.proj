@@ -1,41 +1,47 @@
-<?xml version="1.0" encoding="utf-8"?>
-<Project ToolsVersion="4.0" DefaultTargets="Build;Test;Pack" InitialTargets="Configure" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
+<Project DefaultTargets="Build;Test;Pack">
 
-	<!-- Because this project does not reference any SDK,
-	     the following .props file is not auto-imported: -->
-	<Import Project="Directory.Build.Props" />
+  <!-- Because this project does not reference any SDK,
+       the following .props file is not auto-imported: -->
+  <Import Project="Directory.Build.Props" />
 
-	<PropertyGroup>
-		<Configuration Condition=" '$(Configuration)' == '' ">Release</Configuration>
-		<CommonBuildProperties>WarningLevel=0;NoWarn=1591;RunCodeAnalysis=false;Configuration=$(Configuration)</CommonBuildProperties>
-	</PropertyGroup>
+  <PropertyGroup>
+    <Configuration Condition=" '$(Configuration)' == '' ">Release</Configuration>
+    <Properties>WarningLevel=0;NoWarn=1591;RunCodeAnalysis=false;Configuration=$(Configuration)</Properties>
+  </PropertyGroup>
 
-	<ItemGroup>
-		<Solution Include="Moq.sln"/>
-		<Source Include="src\Moq\Moq.csproj" />
-		<TestProjects Include="tests\**\*.*proj" />
-	</ItemGroup>
-	
-	<Target Name="Clean">
-		<MSBuild Projects="@(Solution)" Properties="$(CommonBuildProperties)" Targets="Clean" />
-		<Exec Command="rmdir $(OutputDirectory) /S /Q" ContinueOnError="true" />
-	</Target>
+  <ItemGroup>
+    <Solution Include="$(RootDirectory)Moq.sln"/>
+    <Source Include="$(RootDirectory)src\Moq\Moq.csproj" />
+    <TestProjects Include="$(RootDirectory)tests\**\*.*proj" />
+  </ItemGroup>
 
-	<Target Name="Rebuild" DependsOnTargets="Clean;Build" />
-	
-	<Target Name="Build">
-		<MSBuild Projects="@(Solution)" Properties="$(CommonBuildProperties)" />
-	</Target>
+  <Target Name="Build" DependsOnTargets="Configure">
+    <MSBuild Projects="@(Solution)" Targets="Build" Properties="$(Properties)" />
+  </Target>
 
-	<Target Name="Test" DependsOnTargets="Build">
-		<MSBuild Projects="@(TestProjects)" Targets="Test" Properties="$(CommonBuildProperties)" BuildInParallel="False" />
-	</Target>
+  <Target Name="Clean">
+    <MSBuild Projects="@(Solution)" Targets="Clean" Properties="$(Properties)" />
+    <Exec Command="rmdir $(OutputDirectory) /S /Q" Condition="Exists('$(OutputDirectory)')" ContinueOnError="true" />
+  </Target>
 
-	<Target Name="Pack" DependsOnTargets="Build">
-		<MSBuild Projects="@(Source)" Targets="Pack" Properties="$(CommonBuildProperties)" BuildInParallel="False" />
-	</Target>
+  <Target Name="Configure" DependsOnTargets="Restore">
+    <MSBuild Projects="$(BuildDirectory)AppVeyor.proj" Targets="UpdateBuildVersion" Properties="$(Properties);ignore=2" />
+    <MakeDir Directories="$(OutputDirectory)" Condition=" !Exists('$(OutputDirectory)') " />
+  </Target>
 
-	<Target Name="Configure">
-		<MakeDir Directories="$(OutputDirectory)" Condition=" !Exists('$(OutputDirectory)') " />
-	</Target>
+  <Target Name="Pack" DependsOnTargets="Build">
+    <MSBuild Projects="@(Source)" Targets="Pack" Properties="$(Properties)" />
+  </Target>
+
+  <Target Name="Rebuild" DependsOnTargets="Clean;Build" />
+
+  <Target Name="Restore">
+    <MSBuild Projects="$(RootDirectory)Moq.sln" Targets="Restore" Properties="$(Properties)" />
+    <MSBuild Projects="$(BuildDirectory)AppVeyor.proj" Targets="Restore" Properties="$(Properties);ignore=1" />
+  </Target>
+
+  <Target Name="Test" DependsOnTargets="Build">
+    <MSBuild Projects="@(TestProjects)" Targets="Test" Properties="$(Properties)" />
+  </Target>
+
 </Project>
