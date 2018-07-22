@@ -49,12 +49,6 @@
 
 	<Target Name="Package" DependsOnTargets="Build">
 		<Exec Command='"$(NuGet)" Pack "%(NuSpec.Identity)" $(Args) -Version $(Version) -Properties Id=%(NuSpec.Filename);Configuration=$(Configuration);Version=$(Version) -OutputDirectory $(Out)' />
-
-		<!-- See if dotnet CLI is available: -->
-		<Exec ContinueOnError="True" Command="dotnet --info">
-			<Output TaskParameter="ExitCode" PropertyName="DotNetErrorCode"/>
-		</Exec>
-		<Warning Condition="'$(DotNetErrorCode)' != '0'" Text="Error in executing dotnet." />
 	</Target>
 
 	<!-- Configure and restore initial targets and packages -->
