@@ -109,7 +109,7 @@ namespace Moq.Linq
 			var replaced = new MockSetupsBuilder(this.underlyingCreateMocks).Visit(expression);
 
 			var lambda = Expression.Lambda<Func<TResult>>(replaced);
-			return lambda.Compile().Invoke();
+			return lambda.CompileUsingExpressionCompiler().Invoke();
 		}
 
 		public IEnumerator<T> GetEnumerator()

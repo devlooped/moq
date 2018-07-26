@@ -86,7 +86,7 @@ namespace Moq
 				// Try to determine if invocation is to a matcher.
 				using (var context = new FluentMockContext())
 				{
-					Expression.Lambda<Action>(call).Compile().Invoke();
+					Expression.Lambda<Action>(call).CompileUsingExpressionCompiler().Invoke();
 
 					if (context.LastMatch != null)
 					{
@@ -110,7 +110,7 @@ namespace Moq
 				// Try to determine if invocation is to a matcher.
 				using (var context = new FluentMockContext())
 				{
-					Expression.Lambda<Action>((MemberExpression)expression).Compile().Invoke();
+					Expression.Lambda<Action>((MemberExpression)expression).CompileUsingExpressionCompiler().Invoke();
 					if (context.LastMatch != null)
 					{
 						return context.LastMatch;
