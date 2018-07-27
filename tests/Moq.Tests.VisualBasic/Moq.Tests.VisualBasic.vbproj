@@ -1,5 +1,6 @@
 ﻿<Project Sdk="Microsoft.NET.Sdk">
 
+	<Import Project="$(BuildDirectory)AssemblyInfo.props" />
 	<Import Project="$(BuildDirectory)SignAssembly.props" />
 	<Import Project="$(BuildDirectory)xUnit.props" />
 

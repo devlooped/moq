@@ -1,6 +1,6 @@
 <Project Sdk="Microsoft.Build.NoTargets/1.0.39">
 
-	<Import Project="$(BuildDirectory)GitInfo.props" />
+	<Import Project="$(BuildDirectory)GitVersion.props" />
 
 	<PropertyGroup>
 		<TargetFramework>netstandard1.0</TargetFramework>

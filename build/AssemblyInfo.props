@@ -1,0 +1,11 @@
+<Project>
+
+	<PropertyGroup>
+		<MSBuildAllProjects>$(MSBuildAllProjects);$(MSBuildThisFileFullPath)</MSBuildAllProjects>
+		<GenerateAssemblyInfo Condition="'$(GenerateAssemblyInfo)' == ''">True</GenerateAssemblyInfo>
+		<AssemblyTitle Condition="'$(AssemblyTitle)' == ''">$(MSBuildProjectName)</AssemblyTitle>
+		<Product Condition="'$(Product)' == ''">Moq</Product>
+		<Company Condition="'$(Company)' == ''">Clarius Consulting, Manas Technology Solutions, InSTEDD</Company>
+	</PropertyGroup>
+
+</Project>

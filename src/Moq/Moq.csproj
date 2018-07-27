@@ -1,6 +1,7 @@
 ﻿<Project Sdk="Microsoft.NET.Sdk">
 
-	<Import Project="$(BuildDirectory)GitInfo.props" />
+	<Import Project="$(BuildDirectory)AssemblyInfo.props" />
+	<Import Project="$(BuildDirectory)GitVersion.props" />
 	<Import Project="$(BuildDirectory)SignAssembly.props" />
 	<Import Project="$(BuildDirectory)SourceLink.props" />
 
@@ -10,7 +11,6 @@
 		<DebugSymbols>True</DebugSymbols>
 		<DebugType>full</DebugType>
 		<DocumentationFile>bin\$(Configuration)\$(TargetFramework)\$(AssemblyName).xml</DocumentationFile> 
-		<GenerateAssemblyInfo>false</GenerateAssemblyInfo>
 		<GenerateDocumentation>true</GenerateDocumentation>
 		<NoWarn>0419</NoWarn>
 		<RootNamespace>Moq</RootNamespace>
@@ -149,13 +149,6 @@
 			<DependentUpon>Times.cs</DependentUpon>
 		</None>
 	</ItemGroup>
-
-	<Target Name="SetNuspecProperties" BeforeTargets="GenerateNuspec" DependsOnTargets="GitVersion">
-		<PropertyGroup>
-			<PackageVersion>$(GitSemVerMajor).$(GitSemVerMinor).$(GitSemVerPatch)$(GitSemVerDashLabel)</PackageVersion>
-			<NuspecProperties>configuration=$(Configuration);version=$(PackageVersion)</NuspecProperties>
-		</PropertyGroup>
-	</Target>
 
 	<Target Name="Test" />
 
