@@ -3,15 +3,15 @@
 	<Import Project="$(BuildDirectory)SignAssembly.props" />
 	<Import Project="$(BuildDirectory)xUnit.props" />
 
-  <PropertyGroup>
-    <TargetFrameworks>net46;netcoreapp2.0</TargetFrameworks>
+	<PropertyGroup>
+		<TargetFrameworks>net46;netcoreapp2.0</TargetFrameworks>
 		<DebugSymbols>True</DebugSymbols>
 		<DebugType>full</DebugType>
 		<IsPackable>False</IsPackable>
-  </PropertyGroup>
+	</PropertyGroup>
 
-  <ItemGroup>
-    <ProjectReference Include="..\..\src\Moq\Moq.csproj" />
-  </ItemGroup>
+	<ItemGroup>
+		<ProjectReference Include="..\..\src\Moq\Moq.csproj" />
+	</ItemGroup>
 
 </Project>
