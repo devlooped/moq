@@ -1,13 +1,8 @@
 out
 bin
 obj
-lib
-*.nuget.targets
-*.nuget.props
-*.lock.json
 *.suo
 *.user
 *.cache
 .vs
 .*
-log.txt
