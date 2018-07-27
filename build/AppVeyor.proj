@@ -6,7 +6,7 @@
     <TargetFramework>netstandard1.0</TargetFramework>
   </PropertyGroup>
 
-  <Target Name="UpdateBuildVersion" DependsOnTargets="GitVersion" Condition="'$(APPVEYOR)' == 'True'">
+  <Target Name="UpdateBuildVersion" DependsOnTargets="GitVersion">
     <PropertyGroup>
       <BuildVersion>$(GitBaseVersion)</BuildVersion>
       <BuildVersion Condition="'$(GitCommits)' != '0'">$(BuildVersion).$(GitCommits)</BuildVersion>

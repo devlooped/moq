@@ -25,7 +25,6 @@
   </Target>
 
   <Target Name="Configure" DependsOnTargets="Restore">
-    <MSBuild Projects="$(BuildDirectory)AppVeyor.proj" Targets="UpdateBuildVersion" Properties="$(Properties);ignore=2" />
     <MakeDir Directories="$(OutputDirectory)" Condition=" !Exists('$(OutputDirectory)') " />
   </Target>
 
@@ -37,7 +36,6 @@
 
   <Target Name="Restore">
     <MSBuild Projects="$(RootDirectory)Moq.sln" Targets="Restore" Properties="$(Properties)" />
-    <MSBuild Projects="$(BuildDirectory)AppVeyor.proj" Targets="Restore" Properties="$(Properties);ignore=1" />
   </Target>
 
   <Target Name="Test" DependsOnTargets="Build">
