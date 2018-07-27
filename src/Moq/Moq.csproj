@@ -22,7 +22,6 @@
 	<PropertyGroup>
 		<!-- Properties related to NuGet packaging: -->
 		<IncludeBuildOutput>False</IncludeBuildOutput>
-		<NoBuild>True</NoBuild>
 		<NoPackageAnalysis>True</NoPackageAnalysis>
 		<NuspecFile>Moq.nuspec</NuspecFile>
 		<NuspecBasePath>$(MSBuildThisFileDirectory)</NuspecBasePath>
@@ -157,5 +156,7 @@
 			<NuspecProperties>configuration=$(Configuration);version=$(PackageVersion)</NuspecProperties>
 		</PropertyGroup>
 	</Target>
+
+	<Target Name="Test" />
 
 </Project>

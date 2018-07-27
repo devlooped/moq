@@ -10,7 +10,7 @@
     <PackageReference Include="xunit.runner.visualstudio" Version="2.4.0" PrivateAssets="All" />
   </ItemGroup>
 
-  <Target Name="Test">
+  <Target Name="Test" DependsOnTargets="Build">
     <Exec Command="dotnet test --no-build --configuration $(Configuration) &quot;$(MSBuildProjectFullPath)&quot;"
           ContinueOnError="False" />
   </Target>

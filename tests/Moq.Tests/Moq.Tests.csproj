@@ -10,6 +10,7 @@
 		<DebugType>full</DebugType>
 		<GenerateRuntimeConfigurationFiles>true</GenerateRuntimeConfigurationFiles>
 		<LangVersion>7.2</LangVersion>
+		<IsPackable>False</IsPackable>
 	</PropertyGroup>
 
 	<PropertyGroup Condition=" '$(TargetFramework)' == 'net46' ">

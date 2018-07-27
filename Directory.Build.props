@@ -4,6 +4,9 @@
     <RootDirectory>$(MSBuildThisFileDirectory)</RootDirectory>
     <BuildDirectory>$(RootDirectory)build\</BuildDirectory>
     <OutputDirectory>$(RootDirectory)out\</OutputDirectory>
+    <Configuration Condition="'$(Configuration)' == ''">Release</Configuration>
   </PropertyGroup>
+
+  <Target Name="Configure" DependsOnTargets="Restore" />
 
 </Project>

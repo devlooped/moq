@@ -1,0 +1,9 @@
+<Project>
+
+  <Import Project="Directory.Build.props" />
+
+  <Target Name="DeleteOutputDirectory" AfterTargets="Clean">
+    <RemoveDir Directories="$(OutputDirectory)" Condition="Exists('$(OutputDirectory)')" />
+  </Target>
+
+</Project>

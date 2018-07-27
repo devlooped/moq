@@ -8,9 +8,8 @@ environment:
 
 build_script:
   - msbuild build\AppVeyor.proj /r /t:UpdateBuildVersion /logger:"%MSBUILD_LOGGER%"
-  - msbuild build.proj /logger:"%MSBUILD_LOGGER%"
+  - msbuild Moq.sln /r /t:Build;Test;Pack /logger:"%MSBUILD_LOGGER%"
 
-# we run the tests ourselves in build.proj
 test: off
 
 deploy:
