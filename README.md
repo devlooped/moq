@@ -6,6 +6,7 @@ The most popular and friendly mocking framework for .NET
 [![Version](https://img.shields.io/nuget/v/Moq.svg)](https://www.nuget.org/packages/Moq)
 [![Downloads](https://img.shields.io/nuget/dt/Moq.svg)](https://www.nuget.org/packages/Moq)
 [![Join the chat at https://gitter.im/moq/moq](https://badges.gitter.im/Join%20Chat.svg)](https://gitter.im/moq/moq?utm_source=badge&utm_medium=badge&utm_campaign=pr-badge&utm_content=badge)
+[![CoreBuild Standard](https://img.shields.io/badge/√_corebuild-standard-blue.svg)](http://www.corebuild.io)
 
 
 ```csharp

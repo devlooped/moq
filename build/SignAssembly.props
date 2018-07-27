@@ -1,0 +1,11 @@
+<Project>
+
+	<PropertyGroup>
+		<MSBuildAllProjects>$(MSBuildAllProjects);$(MSBuildThisFileFullPath)</MSBuildAllProjects>
+		<SignAssembly>True</SignAssembly>
+		<DelaySign>False</DelaySign>
+		<PublicSign>False</PublicSign>
+		<AssemblyOriginatorKeyFile>$(RootDirectory)Moq.snk</AssemblyOriginatorKeyFile>
+	</PropertyGroup>
+
+</Project>

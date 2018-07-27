@@ -1,0 +1,12 @@
+<Project>
+
+	<PropertyGroup>
+		<MSBuildAllProjects>$(MSBuildAllProjects);$(MSBuildThisFileFullPath)</MSBuildAllProjects>
+		<SourceLinkCreate Condition="'$(BuildingInsideVisualStudio)' != 'True'">True</SourceLinkCreate>
+	</PropertyGroup>
+
+	<ItemGroup>
+		<PackageReference Include="SourceLink.Create.CommandLine" Version="2.7.3" PrivateAssets="All" />
+	</ItemGroup>
+
+</Project>

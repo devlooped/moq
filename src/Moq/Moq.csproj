@@ -1,23 +1,31 @@
 ﻿<Project Sdk="Microsoft.NET.Sdk">
 
+	<Import Project="$(BuildDirectory)AssemblyInfo.props" />
+	<Import Project="$(BuildDirectory)GitVersion.props" />
+	<Import Project="$(BuildDirectory)SignAssembly.props" />
+	<Import Project="$(BuildDirectory)SourceLink.props" />
+
 	<PropertyGroup>
 		<TargetFrameworks>net45;netstandard1.3</TargetFrameworks>
 		<AssemblyName>Moq</AssemblyName>
-		<AssemblyOriginatorKeyFile>..\..\Moq.snk</AssemblyOriginatorKeyFile>
 		<DebugSymbols>True</DebugSymbols>
 		<DebugType>full</DebugType>
 		<DocumentationFile>bin\$(Configuration)\$(TargetFramework)\$(AssemblyName).xml</DocumentationFile> 
-		<GenerateAssemblyInfo>false</GenerateAssemblyInfo>
 		<GenerateDocumentation>true</GenerateDocumentation>
-		<GitIgnoreTagVersion>true</GitIgnoreTagVersion>
-		<GitIgnoreBranchVersion>true</GitIgnoreBranchVersion>
 		<NoWarn>0419</NoWarn>
-		<PublicSign Condition="'$(OS)' != 'Windows_NT'">true</PublicSign>
 		<RootNamespace>Moq</RootNamespace>
-		<SignAssembly>true</SignAssembly>
 		<TreatWarningsAsErrors>true</TreatWarningsAsErrors>
 		<WarningLevel>4</WarningLevel>
 		<LangVersion>7.3</LangVersion>
+	</PropertyGroup>
+
+	<PropertyGroup>
+		<!-- Properties related to NuGet packaging: -->
+		<IncludeBuildOutput>False</IncludeBuildOutput>
+		<NoPackageAnalysis>True</NoPackageAnalysis>
+		<NuspecFile>Moq.nuspec</NuspecFile>
+		<NuspecBasePath>$(MSBuildThisFileDirectory)</NuspecBasePath>
+		<PackageOutputPath>$(OutputDirectory)</PackageOutputPath>
 	</PropertyGroup>
 
 	<PropertyGroup Condition=" '$(TargetFramework)' == 'net45' ">
@@ -29,12 +37,9 @@
 
 	<ItemGroup>
 		<PackageReference Include="Castle.Core" Version="4.3.1" />
-		<PackageReference Include="GitInfo" Version="2.0.11" />
 		<PackageReference Include="IFluentInterface" Version="2.1.0" />
-		<PackageReference Include="SourceLink.Create.CommandLine" Version="2.7.3" PrivateAssets="All" />
 		<PackageReference Include="System.Threading.Tasks.Extensions" Version="4.3.0" />
 		<PackageReference Include="System.ValueTuple" Version="4.4.0" />
-		<DotNetCliToolReference Include="dotnet-sourcelink" Version="2.2.1" />
 	</ItemGroup>
 	<ItemGroup Condition=" '$(TargetFramework)' == 'net45' ">
 		<Reference Include="System" />
@@ -144,5 +149,7 @@
 			<DependentUpon>Times.cs</DependentUpon>
 		</None>
 	</ItemGroup>
+
+	<Target Name="Test" />
 
 </Project>

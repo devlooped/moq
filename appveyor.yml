@@ -3,11 +3,13 @@ image: Visual Studio 2017
 init:
   - git config --global core.autocrlf input
 
-build_script:
-  - cmd: >-
-      build.cmd /logger:"C:\Program Files\AppVeyor\BuildAgent\Appveyor.MSBuildLogger.dll"
+environment:
+  MSBUILD_LOGGER: C:\Program Files\AppVeyor\BuildAgent\Appveyor.MSBuildLogger.dll
 
-# we run the tests ourselves in build.cmd for coverage
+build_script:
+  - msbuild build\AppVeyor.proj /r /t:UpdateBuildVersion /logger:"%MSBUILD_LOGGER%"
+  - msbuild Moq.sln /r /t:Build;Test;Pack /logger:"%MSBUILD_LOGGER%"
+
 test: off
 
 deploy:
