@@ -171,13 +171,8 @@ namespace Moq
 		{
 			var callbackMethod = callback.GetMethodInfo();
 
-			ValidateNumberOfCallbackParameters(callbackMethod);
+			// validate number of parameters:
 
-			ValidateCallbackReturnType(callbackMethod);
-		}
-
-		private void ValidateNumberOfCallbackParameters(MethodInfo callbackMethod)
-		{
 			var numberOfActualParameters = callbackMethod.GetParameters().Length;
 			if (callbackMethod.IsExtensionMethod())
 			{
@@ -197,10 +192,9 @@ namespace Moq
 							numberOfActualParameters));
 				}
 			}
-		}
 
-		private void ValidateCallbackReturnType(MethodInfo callbackMethod)
-		{
+			// validate return type:
+
 			var expectedReturnType = this.Method.ReturnType;
 			var actualReturnType = callbackMethod.ReturnType;
 
