@@ -1974,6 +1974,39 @@ namespace Moq.Tests.Regressions
 
 		#endregion
 
+		#region 652
+
+		public class Issue652
+		{
+			[Fact]
+			public void Callback_delegates_compiled_from_Expression_are_usable_despite_additional_hidden_Closure_parameter()
+			{
+				Mock<IMyInterface> mock = new Moq.Mock<IMyInterface>();
+				var setupAction = mock.Setup(my => my.MyAction(It.IsAny<int>()));
+				var setupFunc = mock.Setup(my => my.MyFunc(It.IsAny<int>()));
+
+				int a = 5;
+				Expression<Action<int>> callback = x => Console.WriteLine(a);
+				Action<int> callbackCompiled = callback.Compile();
+
+				int b = 4;
+				Expression<Func<int, int>> funcResult = x => b;
+				Func<int, int> funcResultCompiled = funcResult.Compile();
+
+				setupAction.Callback(callbackCompiled); // OK
+				setupFunc.Callback(callbackCompiled); // OK
+				setupFunc.Returns(funcResultCompiled); // Fail
+			}
+
+			public interface IMyInterface
+			{
+				void MyAction(int x);
+				int MyFunc(int x);
+			}
+		}
+
+		#endregion
+
 		// Old @ Google Code
 
 		#region #47
