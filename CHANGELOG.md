@@ -14,6 +14,7 @@ The format is loosely based on [Keep a Changelog](http://keepachangelog.com/en/1
 #### Fixed
 
 * More precise `out` parameter detection for mocking COM interfaces with `[in,out]` parameters (@koutinho, #645)
+* Prevent false 'Different number of parameters' error with `Returns` callback methods that have been compiled from `Expression`s (@stakx, #654)
 
 
 ## 4.9.0 (2018-07-13)
