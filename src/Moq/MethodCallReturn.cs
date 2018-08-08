@@ -174,9 +174,12 @@ namespace Moq
 			// validate number of parameters:
 
 			var numberOfActualParameters = callbackMethod.GetParameters().Length;
-			if (callbackMethod.IsExtensionMethod())
+			if (callbackMethod.IsStatic)
 			{
-				numberOfActualParameters--;
+				if (callbackMethod.IsExtensionMethod() || callback.Target != null)
+				{
+					numberOfActualParameters--;
+				}
 			}
 
 			if (numberOfActualParameters > 0)
