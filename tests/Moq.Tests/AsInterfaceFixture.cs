@@ -168,6 +168,33 @@ namespace Moq.Tests
 			bag.Get("test");
 		}
 
+		[Fact]
+		public void Setup_targets_method_implementing_interface_not_other_method_with_same_signature()
+		{
+			var mock = new Mock<Service>() { CallBase = true };
+			mock.As<IService>().Setup(m => m.GetValue()).Returns(3);
+
+			// The public method should have been left alone since it's not the one implementing `IService`:
+			var valueOfOtherMethod = mock.Object.GetValue();
+			Assert.Equal(1, valueOfOtherMethod);
+
+			// The method implementing the interface method should have be mocked:
+			var valueOfSetupMethod = ((IService)mock.Object).GetValue();
+			Assert.Equal(3, valueOfSetupMethod);
+		}
+
+		public class Service : IService
+		{
+			public virtual int GetValue() => 1;
+
+			int IService.GetValue() => 2;
+		}
+
+		public interface IService
+		{
+			int GetValue();
+		}
+
 		// see also test fixture `Issue458` in `IssueReportsFixture`
 
 		public interface IFoo
