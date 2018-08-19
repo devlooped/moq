@@ -394,7 +394,10 @@ namespace Moq
 				return true;
 			}
 
-			if (method.DeclaringType.IsAssignableFrom(invocationMethod.DeclaringType))
+			var methodDeclaringType = method.DeclaringType;
+			var invocationMethodDeclaringType = invocationMethod.DeclaringType;
+
+			if (methodDeclaringType.IsAssignableFrom(invocationMethodDeclaringType))
 			{
 				if (!method.Name.Equals(invocationMethod.Name, StringComparison.Ordinal) ||
 					method.ReturnType != invocationMethod.ReturnType ||
@@ -402,6 +405,27 @@ namespace Moq
 					!invocationMethod.HasSameParameterTypesAs(method))
 				{
 					return false;
+				}
+
+				// If a class method has been invoked, and the set up method is an interface method,
+				// we need to make sure that the former is actually the one implementing the latter.
+				//
+				// TODO: This is inefficient. It would be much better to map interface methods to class
+				// methods during setup (because that would only have to happen once, whereas matching
+				// here could potentially happen for every single mock invocation). Unfortunately,
+				// translating interface to class methods at setup time is not currently possible due to
+				// the way multi-dot setup expressions are processed; or, because `GetTargetMock` and
+				// `GetCallInfo` are currently two separate stages. Once setup logic has been refactored
+				// (see https://github.com/moq/moq4/issues/643), we can improve this code.
+				if (!invocationMethodDeclaringType.GetTypeInfo().IsInterface && methodDeclaringType.GetTypeInfo().IsInterface)
+				{
+					var map = invocationMethodDeclaringType.GetTypeInfo().GetRuntimeInterfaceMap(methodDeclaringType);
+					var interfaceMethodIndex = Array.IndexOf(map.InterfaceMethods, method);
+					var implementingMethod = map.TargetMethods[interfaceMethodIndex];
+					if (implementingMethod != invocationMethod)
+					{
+						return false;
+					}
 				}
 
 				if (method.IsGenericMethod && !invocationMethod.GetGenericArguments().SequenceEqual(method.GetGenericArguments(), AssignmentCompatibilityTypeComparer.Instance))
