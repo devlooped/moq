@@ -74,11 +74,6 @@ namespace Moq
 
 		public Type ReturnType => this.Method.ReturnType;
 
-		public void CallBase()
-		{
-			this.returnValueKind = ReturnValueKind.CallBase;
-		}
-
 		public override void SetCallbackResponse(Delegate callback)
 		{
 			if (this.ProvidesReturnValue())
@@ -96,6 +91,11 @@ namespace Moq
 			{
 				base.SetCallbackResponse(callback);
 			}
+		}
+
+		public override void SetCallBaseResponse()
+		{
+			this.returnValueKind = ReturnValueKind.CallBase;
 		}
 
 		public void SetReturnsResponse(Delegate value)

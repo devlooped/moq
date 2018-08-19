@@ -228,6 +228,11 @@ namespace Moq
 			}
 		}
 
+		public virtual void SetCallBaseResponse()
+		{
+			throw new NotImplementedException();
+		}
+
 		public virtual void SetCallbackResponse(Delegate callback)
 		{
 			if (callback == null)

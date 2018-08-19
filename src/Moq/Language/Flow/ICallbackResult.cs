@@ -46,7 +46,7 @@ namespace Moq.Language.Flow
 	/// Implements the fluent API.
 	/// </summary>
 	[EditorBrowsable(EditorBrowsableState.Never)]
-	public interface ICallbackResult : IThrows, IThrowsResult, IFluentInterface
+	public interface ICallbackResult : ICallBase, ICallBaseResult, IThrows, IThrowsResult, IFluentInterface
 	{
 	}
 }

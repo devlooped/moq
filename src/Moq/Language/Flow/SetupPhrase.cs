@@ -172,6 +172,12 @@ namespace Moq.Language.Flow
 			return this;
 		}
 
+		public ICallBaseResult CallBase()
+		{
+			this.setup.SetCallBaseResponse();
+			return this;
+		}
+
 		public IThrowsResult Throws(Exception exception)
 		{
 			this.setup.SetThrowExceptionResponse(exception);
