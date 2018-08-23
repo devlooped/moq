@@ -101,7 +101,7 @@ namespace Moq
 		[EditorBrowsable(EditorBrowsableState.Never)]
 		public ISetupSetter<T, TProperty> ExpectSet<TProperty>(Expression<Func<T, TProperty>> expression, TProperty value)
 		{
-			return Mock.SetupSet(this, expression, value);
+			throw new NotSupportedException();
 		}
 	}
 
@@ -120,7 +120,7 @@ namespace Moq
 		public static ISetupSetter<T, TProperty> SetupSet<T, TProperty>(this Mock<T> mock, Expression<Func<T, TProperty>> expression, TProperty value)
 			where T : class
 		{
-			return Mock.SetupSet(mock, expression, value);
+			throw new NotSupportedException();
 		}
 
 		/// <summary>
@@ -131,7 +131,7 @@ namespace Moq
 		public static void VerifySet<T, TProperty>(this Mock<T> mock, Expression<Func<T, TProperty>> expression, TProperty value)
 			where T : class
 		{
-			Mock.VerifySet(mock, expression, value, Times.AtLeastOnce(), null);
+			throw new NotSupportedException();
 		}
 
 		/// <summary>
@@ -142,7 +142,7 @@ namespace Moq
 		public static void VerifySet<T, TProperty>(this Mock<T> mock, Expression<Func<T, TProperty>> expression, TProperty value, string failMessage)
 			where T : class
 		{
-			Mock.VerifySet(mock, expression, value, Times.AtLeastOnce(), failMessage);
+			throw new NotSupportedException();
 		}
 	}
 }

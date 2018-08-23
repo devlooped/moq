@@ -47,25 +47,6 @@ namespace Moq
 	public partial class Mock
 	{
 		[Obsolete]
-		internal static SetterMethodCall<T, TProperty> SetupSet<T, TProperty>(
-			Mock mock,
-			Expression<Func<T, TProperty>> expression, TProperty value)
-			where T : class
-		{
-			var prop = expression.ToPropertyInfo();
-			Guard.CanWrite(prop);
-
-			var setter = prop.SetMethod;
-			ThrowIfSetupExpressionInvolvesUnsupportedMember(expression, setter);
-
-			var setup = new SetterMethodCall<T, TProperty>(mock, expression, setter, value);
-			var targetMock = GetTargetMock(((MemberExpression)expression.Body).Expression, mock);
-			targetMock.Setups.Add(setup);
-
-			return setup;
-		}
-
-		[Obsolete]
 		internal static void VerifySet<T, TProperty>(
 			Mock mock,
 			Expression<Func<T, TProperty>> expression,
@@ -77,25 +58,6 @@ namespace Moq
 			ThrowIfVerifyExpressionInvolvesUnsupportedMember(expression, method);
 
 			var expected = new SetterMethodCall<T, TProperty>(mock, expression, method)
-			{
-				FailMessage = failMessage
-			};
-			VerifyCalls(GetTargetMock(((MemberExpression)expression.Body).Expression, mock), expected, expression, times);
-		}
-
-		[Obsolete]
-		internal static void VerifySet<T, TProperty>(
-			Mock mock,
-			Expression<Func<T, TProperty>> expression,
-			TProperty value,
-			Times times,
-			string failMessage)
-			where T : class
-		{
-			var method = expression.ToPropertyInfo().SetMethod;
-			ThrowIfVerifyExpressionInvolvesUnsupportedMember(expression, method);
-
-			var expected = new SetterMethodCall<T, TProperty>(mock, expression, method, value)
 			{
 				FailMessage = failMessage
 			};

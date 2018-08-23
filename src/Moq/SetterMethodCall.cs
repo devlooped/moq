@@ -54,11 +54,6 @@ namespace Moq
 		{
 		}
 
-		public SetterMethodCall(Mock mock, LambdaExpression originalExpression, MethodInfo method, TProperty value)
-			: base(mock, null, originalExpression, method, new[] { ItExpr.Is<TProperty>(arg => Object.Equals(arg, value)) })
-		{
-		}
-
 		public SetterMethodCall(Mock mock, Condition condition, LambdaExpression originalExpression, MethodInfo method, Expression value)
 			: base(mock, condition, originalExpression, method, new[] { value })
 		{
