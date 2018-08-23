@@ -66,7 +66,7 @@ namespace Moq
 		/// <include file='Match.xdoc' path='docs/doc[@for="Match.Create{T}(condition)"]/*'/>
 		public static T Create<T>(Predicate<T> condition)
 		{
-			return Create(new Match<T>(condition));
+			return Create(new Match<T>(condition, () => Matcher<T>()));
 		}
 
 		/// <include file='Match.xdoc' path='docs/doc[@for="Match.Create{T}(condition,renderExpression"]/*'/>
@@ -108,23 +108,12 @@ namespace Moq
 	/// <include file='Match.xdoc' path='docs/doc[@for="Match{T}"]/*'/>
 	public class Match<T> : Match
 	{
-		private static readonly Expression<Func<T>> defaultRender = Expression.Lambda<Func<T>>(
-			Expression.Call(
-				typeof(Match)
-					.GetMethod("Matcher", BindingFlags.Static | BindingFlags.NonPublic)
-					.MakeGenericMethod(typeof(T))));
-
 		internal Predicate<T> Condition { get; set; }
 
 		internal Match(Predicate<T> condition, Expression<Func<T>> renderExpression)
 		{
 			this.Condition = condition;
 			this.RenderExpression = renderExpression.Body;
-		}
-
-		internal Match(Predicate<T> condition)
-			: this(condition, defaultRender)
-		{
 		}
 
 		internal override bool Matches(object value)
