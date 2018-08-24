@@ -57,10 +57,5 @@ namespace Moq
 			: base(mock, condition, originalExpression, method, new[] { value })
 		{
 		}
-
-		public void Callback(Action<TProperty> callback)
-		{
-			this.SetCallbackWithArguments(callback);
-		}
 	}
 }

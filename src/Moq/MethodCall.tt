@@ -29,28 +29,5 @@ for (var typeCount = 2; typeCount <= GenericTypeMax; typeCount++)
 }
 #>
 	}
-
-	internal partial class MethodCall
-	{
-		[SuppressMessage("Microsoft.Maintainability", "CA1500:VariableNamesShouldNotMatchFieldNames", MessageId = "callback")]
-		public void Callback<T>(Action<T> callback)
-		{
-			this.SetCallbackWithArguments(callback);
-		}
-<#
-for (var typeCount = 2; typeCount <= GenericTypeMax; typeCount++)
-{
-	var typeList = GetGenericList(typeCount, GenericTypeFormat);
-#>
-
-		[SuppressMessage("Microsoft.Maintainability", "CA1500:VariableNamesShouldNotMatchFieldNames", MessageId = "callback")]
-		public void Callback<<#= typeList #>>(Action<<#= typeList #>> callback)
-		{
-			this.SetCallbackWithArguments(callback);
-		}
-<#
-}
-#>
-	}
 }
 <#@ Include File="Includes\GenericTypeParameters.tt" #>

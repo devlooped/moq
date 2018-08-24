@@ -264,52 +264,44 @@ namespace Moq
 			this.Throws(new TException());
 		}
 
-		public void Callback(Action callback)
-		{
-			SetCallbackWithoutArguments(callback);
-		}
-
-		public void Callback(Delegate callback)
+		public virtual void SetCallbackResponse(Delegate callback)
 		{
 			if (callback == null)
 			{
 				throw new ArgumentNullException(nameof(callback));
 			}
 
-			if (callback.GetMethodInfo().ReturnType != typeof(void))
+			if (callback is Action callbackWithoutArguments)
 			{
-				throw new ArgumentException(Resources.InvalidCallbackNotADelegateWithReturnTypeVoid, nameof(callback));
+				this.callbackResponse = (object[] args) => callbackWithoutArguments();
+			}
+			else
+			{
+				var expectedParams = this.Method.GetParameters();
+				var actualParams = callback.GetMethodInfo().GetParameters();
+
+				if (!callback.HasCompatibleParameterList(expectedParams))
+				{
+					ThrowParameterMismatch(expectedParams, actualParams);
+				}
+
+				if (callback.GetMethodInfo().ReturnType != typeof(void))
+				{
+					throw new ArgumentException(Resources.InvalidCallbackNotADelegateWithReturnTypeVoid, nameof(callback));
+				}
+
+				this.callbackResponse = (object[] args) => callback.InvokePreserveStack(args);
 			}
 
-			this.SetCallbackWithArguments(callback);
-		}
-
-		protected virtual void SetCallbackWithoutArguments(Action callback)
-		{
-			this.callbackResponse = (object[] args) => callback();
-		}
-
-		protected virtual void SetCallbackWithArguments(Delegate callback)
-		{
-			var expectedParams = this.Method.GetParameters();
-			var actualParams = callback.GetMethodInfo().GetParameters();
-
-			if (!callback.HasCompatibleParameterList(expectedParams))
+			void ThrowParameterMismatch(ParameterInfo[] expected, ParameterInfo[] actual)
 			{
-				ThrowParameterMismatch(expectedParams, actualParams);
+				throw new ArgumentException(
+					string.Format(
+						CultureInfo.CurrentCulture,
+						Resources.InvalidCallbackParameterMismatch,
+						string.Join(",", expected.Select(p => p.ParameterType.Name).ToArray()),
+						string.Join(",", actual.Select(p => p.ParameterType.Name).ToArray())));
 			}
-
-			this.callbackResponse = (object[] args) => callback.InvokePreserveStack(args);
-		}
-
-		private static void ThrowParameterMismatch(ParameterInfo[] expected, ParameterInfo[] actual)
-		{
-			throw new ArgumentException(string.Format(
-				CultureInfo.CurrentCulture,
-				Resources.InvalidCallbackParameterMismatch,
-				string.Join(",", expected.Select(p => p.ParameterType.Name).ToArray()),
-				string.Join(",", actual.Select(p => p.ParameterType.Name).ToArray())
-			));
 		}
 
 		public void Verifiable()

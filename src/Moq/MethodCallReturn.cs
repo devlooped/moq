@@ -189,27 +189,22 @@ namespace Moq
 			}
 		}
 
-		protected override void SetCallbackWithoutArguments(Action callback)
+		public override void SetCallbackResponse(Delegate callback)
 		{
 			if (this.ProvidesReturnValue())
 			{
-				this.afterReturnCallback = delegate { callback(); };
+				if (callback is Action callbackWithoutArguments)
+				{
+					this.afterReturnCallback = delegate { callbackWithoutArguments(); };
+				}
+				else
+				{
+					this.afterReturnCallback = delegate (object[] args) { callback.InvokePreserveStack(args); };
+				}
 			}
 			else
 			{
-				base.SetCallbackWithoutArguments(callback);
-			}
-		}
-
-		protected override void SetCallbackWithArguments(Delegate callback)
-		{
-			if (this.ProvidesReturnValue())
-			{
-				this.afterReturnCallback = delegate(object[] args) { callback.InvokePreserveStack(args); };
-			}
-			else
-			{
-				base.SetCallbackWithArguments(callback);
+				base.SetCallbackResponse(callback);
 			}
 		}
 

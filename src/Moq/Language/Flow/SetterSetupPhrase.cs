@@ -50,7 +50,7 @@ namespace Moq.Language.Flow
 
 		public ICallbackResult Callback(Action<TProperty> callback)
 		{
-			((SetterMethodCall<T, TProperty>)this.Setup).Callback(callback);
+			this.Setup.SetCallbackResponse(callback);
 			return this;
 		}
 	}
