@@ -174,13 +174,13 @@ namespace Moq.Language.Flow
 
 		public IThrowsResult Throws(Exception exception)
 		{
-			this.setup.Throws(exception);
+			this.setup.SetThrowExceptionResponse(exception);
 			return this;
 		}
 
 		public IThrowsResult Throws<TException>() where TException : Exception, new()
 		{
-			this.setup.Throws<TException>();
+			this.setup.SetThrowExceptionResponse(new TException());
 			return this;
 		}
 

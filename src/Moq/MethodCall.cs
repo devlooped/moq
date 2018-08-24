@@ -238,17 +238,6 @@ namespace Moq
 			}
 		}
 
-		public void Throws(Exception exception)
-		{
-			this.throwExceptionResponse = exception;
-		}
-
-		public void Throws<TException>()
-			where TException : Exception, new()
-		{
-			this.Throws(new TException());
-		}
-
 		public virtual void SetCallbackResponse(Delegate callback)
 		{
 			if (callback == null)
@@ -315,6 +304,11 @@ namespace Moq
 			{
 				this.raiseEventResponse = null;
 			}
+		}
+
+		public void SetThrowExceptionResponse(Exception exception)
+		{
+			this.throwExceptionResponse = exception;
 		}
 
 		public void Verifiable()
