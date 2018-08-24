@@ -82,13 +82,12 @@ namespace Moq
 
 	internal partial class MethodCall : ICallbackResult, IVerifies, IThrowsResult
 	{
-		private IMatcher[] argumentMatchers;
 		private Action<object[]> callbackResponse;
 		private int callCount;
 		private Condition condition;
+		private InvocationShape expectation;
 		private int? expectedMaxCallCount;
 		private string failMessage;
-		private MethodInfo method;
 		private Mock mock;
 #if !NETCORE
 		private string originalCallerFilePath;
@@ -108,23 +107,20 @@ namespace Moq
 		public MethodCall(Mock mock, Condition condition, LambdaExpression originalExpression, MethodInfo method, IMatcher[] argumentMatchers)
 		{
 			this.condition = condition;
-			this.method = method;
+			this.expectation = new InvocationShape(method, argumentMatchers);
 			this.mock = mock;
 			this.originalExpression = originalExpression;
-
-			this.argumentMatchers = argumentMatchers;
 			this.outValues = null;
 		}
 
 		public MethodCall(Mock mock, Condition condition, LambdaExpression originalExpression, MethodInfo method, IReadOnlyList<Expression> arguments)
 		{
+			var parameters = method.GetParameters();
+
 			this.condition = condition;
-			this.method = method;
+			this.expectation = new InvocationShape(method, GetArgumentMatchers(arguments, parameters));
 			this.mock = mock;
 			this.originalExpression = originalExpression;
-
-			var parameters = method.GetParameters();
-			this.argumentMatchers = GetArgumentMatchers(arguments, parameters);
 			this.outValues = GetOutValues(arguments, parameters);
 
 			this.SetFileInfo();
@@ -179,7 +175,7 @@ namespace Moq
 			set => this.failMessage = value;
 		}
 
-		public MethodInfo Method => this.method;
+		public MethodInfo Method => this.expectation.Method;
 
 		public Mock Mock => this.mock;
 
@@ -241,26 +237,7 @@ namespace Moq
 
 		public bool Matches(Invocation invocation)
 		{
-			var arguments = invocation.Arguments;
-			if  (this.argumentMatchers.Length != arguments.Length)
-			{
-				return false;
-			}
-
-			if (this.IsEqualMethodOrOverride(invocation.Method))
-			{
-				for (int i = 0, n = this.argumentMatchers.Length; i < n; ++i)
-				{
-					if (this.argumentMatchers[i].Matches(arguments[i]) == false)
-					{
-						return false;
-					}
-				}
-
-				return condition == null || condition.IsTrue;
-			}
-
-			return false;
+			return this.expectation.IsMatch(invocation) && (condition == null || condition.IsTrue);
 		}
 
 		public void EvaluatedSuccessfully()
@@ -336,7 +313,7 @@ namespace Moq
 
 		protected virtual void SetCallbackWithArguments(Delegate callback)
 		{
-			var expectedParams = this.method.GetParameters();
+			var expectedParams = this.Method.GetParameters();
 			var actualParams = callback.GetMethodInfo().GetParameters();
 
 			if (!callback.HasCompatibleParameterList(expectedParams))
@@ -366,36 +343,6 @@ namespace Moq
 		{
 			this.verifiable = true;
 			this.failMessage = failMessage;
-		}
-
-		private bool IsEqualMethodOrOverride(MethodInfo invocationMethod)
-		{
-			var method = this.method;
-
-			if (invocationMethod == method)
-			{
-				return true;
-			}
-
-			if (method.DeclaringType.IsAssignableFrom(invocationMethod.DeclaringType))
-			{
-				if (!method.Name.Equals(invocationMethod.Name, StringComparison.Ordinal) ||
-					method.ReturnType != invocationMethod.ReturnType ||
-					!method.IsGenericMethod &&
-					!invocationMethod.HasSameParameterTypesAs(method))
-				{
-					return false;
-				}
-
-				if (method.IsGenericMethod && !invocationMethod.GetGenericArguments().SequenceEqual(method.GetGenericArguments(), AssignmentCompatibilityTypeComparer.Instance))
-				{
-					return false;
-				}
-
-				return true;
-			}
-
-			return false;
 		}
 
 		public IVerifies AtMostOnce() => this.AtMost(1);
@@ -486,18 +433,6 @@ namespace Moq
 			}
 
 			return builder.ToString();
-		}
-
-		private sealed class AssignmentCompatibilityTypeComparer : IEqualityComparer<Type>
-		{
-			public static AssignmentCompatibilityTypeComparer Instance { get; } = new AssignmentCompatibilityTypeComparer();
-
-			public bool Equals(Type x, Type y)
-			{
-				return y.IsAssignableFrom(x);
-			}
-
-			int IEqualityComparer<Type>.GetHashCode(Type obj) => throw new NotSupportedException();
 		}
 
 		private sealed class RaiseEventResponse
