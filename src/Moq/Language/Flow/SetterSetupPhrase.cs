@@ -44,7 +44,7 @@ namespace Moq.Language.Flow
 {
 	internal class SetterSetupPhrase<T, TProperty> : VoidSetupPhrase<T>, ISetupSetter<T, TProperty> where T : class
 	{
-		public SetterSetupPhrase(SetterMethodCall<T, TProperty> setup) : base(setup)
+		public SetterSetupPhrase(MethodCall<T> setup) : base(setup)
 		{
 		}
 

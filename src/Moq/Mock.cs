@@ -52,6 +52,7 @@ using System.Threading.Tasks;
 
 using Moq.Language.Flow;
 using Moq.Properties;
+using Moq.Protected;
 
 namespace Moq
 {
@@ -560,7 +561,8 @@ namespace Moq
 				setterExpression,
 				(m, expr, method, value) =>
 				{
-					var setup = new SetterMethodCall<T, TProperty>(m, condition, expr, method, value[0]);
+					Debug.Assert(value.Length == 1);
+					var setup = new MethodCall<T>(m, condition, expr, method, value);
 					m.Setups.Add(setup);
 					return new SetterSetupPhrase<T, TProperty>(setup);
 				});
@@ -599,7 +601,7 @@ namespace Moq
 			ThrowIfSetupExpressionInvolvesUnsupportedMember(expression, propSet);
 			ThrowIfSetupMethodNotVisibleToProxyFactory(propSet);
 
-			var setup = new SetterMethodCall<T, TProperty>(mock, expression, propSet);
+			var setup = new MethodCall<T>(mock, null, expression, propSet, new[] { ItExpr.IsAny<TProperty>() });
 			var targetMock = GetTargetMock(((MemberExpression)expression.Body).Expression, mock);
 
 			targetMock.Setups.Add(setup);
