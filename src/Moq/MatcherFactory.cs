@@ -89,20 +89,18 @@ namespace Moq
 					return new RefMatcher(constant.Value);
 				}
 			}
+			else if (parameter.IsDefined(typeof(ParamArrayAttribute), true) && (argument.NodeType == ExpressionType.NewArrayInit || !argument.Type.IsArray))
+			{
+				return new ParamArrayMatcher((NewArrayExpression)argument);
+			}
 			else
 			{
-				var isParamArray = parameter.IsDefined(typeof(ParamArrayAttribute), true);
-				return MatcherFactory.CreateMatcher(argument, isParamArray);
+				return MatcherFactory.CreateMatcher(argument);
 			}
 		}
 
-		public static IMatcher CreateMatcher(Expression expression, bool isParams)
+		public static IMatcher CreateMatcher(Expression expression)
 		{
-			if (isParams && (expression.NodeType == ExpressionType.NewArrayInit || !expression.Type.IsArray))
-			{
-				return new ParamArrayMatcher((NewArrayExpression)expression);
-			}
-
 			// Type inference on the call might 
 			// do automatic conversion to the desired 
 			// method argument type, and a Convert expression type 

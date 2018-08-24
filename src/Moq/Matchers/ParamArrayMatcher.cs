@@ -53,7 +53,7 @@ namespace Moq.Matchers
 			if (expression != null)
 			{
 				this.matchers = expression.Expressions
-					.Select(e => MatcherFactory.CreateMatcher(e, false)).ToArray();
+					.Select(e => MatcherFactory.CreateMatcher(e)).ToArray();
 			}
 			else
 			{
