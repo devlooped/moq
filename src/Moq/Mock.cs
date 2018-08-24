@@ -313,8 +313,8 @@ namespace Moq
 			var (obj, method, args) = expression.GetCallInfo(mock);
 			ThrowIfVerifyExpressionInvolvesUnsupportedMember(expression, method);
 
-			var expected = new MethodCall(mock, null, expression, method, args) { FailMessage = failMessage };
-			VerifyCalls(GetTargetMock(obj, mock), expected, expression, times);
+			var expectation = new InvocationShape(method, args);
+			VerifyCalls(GetTargetMock(obj, mock), expectation, expression, times, failMessage);
 		}
 
 		internal static void Verify<T, TResult>(
@@ -335,11 +335,8 @@ namespace Moq
 				var (obj, method, args) = expression.GetCallInfo(mock);
 				ThrowIfVerifyExpressionInvolvesUnsupportedMember(expression, method);
 
-				var expected = new MethodCallReturn<T, TResult>(mock, null, expression, method, args)
-				{
-					FailMessage = failMessage
-				};
-				VerifyCalls(GetTargetMock(obj, mock), expected, expression, times);
+				var expectation = new InvocationShape(method, args);
+				VerifyCalls(GetTargetMock(obj, mock), expectation, expression, times, failMessage);
 			}
 		}
 
@@ -353,11 +350,8 @@ namespace Moq
 			var method = expression.ToPropertyInfo().GetGetMethod(true);
 			ThrowIfVerifyExpressionInvolvesUnsupportedMember(expression, method);
 
-			var expected = new MethodCallReturn<T, TProperty>(mock, null, expression, method, new Expression[0])
-			{
-				FailMessage = failMessage
-			};
-			VerifyCalls(GetTargetMock(((MemberExpression)expression.Body).Expression, mock), expected, expression, times);
+			var expectation = new InvocationShape(method, new IMatcher[0]);
+			VerifyCalls(GetTargetMock(((MemberExpression)expression.Body).Expression, mock), expectation, expression, times, failMessage);
 		}
 
 		internal static void VerifySet<T>(
@@ -369,14 +363,14 @@ namespace Moq
 		{
 			Mock targetMock = null;
 			LambdaExpression expression = null;
-			var expected = SetupSetImpl<T, MethodCall<T>>(mock, setterExpression, (m, expr, method, value) =>
+			var expectation = SetupSetImpl(mock, setterExpression, (m, expr, method, value) =>
 				{
 					targetMock = m;
 					expression = expr;
-					return new MethodCall<T>(m, null, expr, method, value) { FailMessage = failMessage };
+					return new InvocationShape(method, value);
 				});
 
-			VerifyCalls(targetMock, expected, expression, times);
+			VerifyCalls(targetMock, expectation, expression, times, failMessage);
 		}
 
 		internal static void VerifyNoOtherCalls(Mock mock)
@@ -424,17 +418,18 @@ namespace Moq
 
 		private static void VerifyCalls(
 			Mock targetMock,
-			MethodCall expected,
+			InvocationShape expectation,
 			LambdaExpression expression,
-			Times times)
+			Times times,
+			string failMessage)
 		{
 			var allInvocations = targetMock.MutableInvocations.ToArray();
-			var matchingInvocations = allInvocations.Where(expected.Matches).ToArray();
+			var matchingInvocations = allInvocations.Where(expectation.IsMatch).ToArray();
 			var matchingInvocationCount = matchingInvocations.Length;
 			if (!times.Verify(matchingInvocationCount))
 			{
 				var setups = targetMock.Setups.ToArrayLive(oc => AreSameMethod(oc.SetupExpression, expression));
-				throw MockException.NoMatchingCalls(expected, setups, allInvocations, expression, times, matchingInvocationCount);
+				throw MockException.NoMatchingCalls(failMessage, setups, allInvocations, expression, times, matchingInvocationCount);
 			}
 			else
 			{
@@ -617,7 +612,6 @@ namespace Moq
 			Action<T> setterExpression,
 			Func<Mock, LambdaExpression, MethodInfo, Expression[], TCall> callFactory)
 			where T : class
-			where TCall : MethodCall
 		{
 			using (var context = new FluentMockContext())
 			{

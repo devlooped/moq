@@ -103,7 +103,7 @@ namespace Moq
 		///   Returns the exception to be thrown when <see cref="Mock.Verify"/> finds no invocations (or the wrong number of invocations) that match the specified expectation.
 		/// </summary>
 		internal static MockException NoMatchingCalls(
-			MethodCall expected,
+			string failMessage,
 			IEnumerable<MethodCall> setups,
 			IEnumerable<Invocation> invocations,
 			LambdaExpression expression,
@@ -112,7 +112,7 @@ namespace Moq
 		{
 			return new MockException(
 				MockExceptionReason.NoMatchingCalls,
-				times.GetExceptionMessage(expected.FailMessage, expression.PartialMatcherAwareEval().ToStringFixed(), callCount) +
+				times.GetExceptionMessage(failMessage, expression.PartialMatcherAwareEval().ToStringFixed(), callCount) +
 				Environment.NewLine + FormatSetupsInfo() +
 				Environment.NewLine + FormatInvocations());
 

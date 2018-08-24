@@ -41,6 +41,8 @@
 using System;
 using System.Linq.Expressions;
 
+using Moq.Matchers;
+
 namespace Moq
 {
 	// Keeps legacy implementations.
@@ -57,11 +59,8 @@ namespace Moq
 			var method = expression.ToPropertyInfo().SetMethod;
 			ThrowIfVerifyExpressionInvolvesUnsupportedMember(expression, method);
 
-			var expected = new SetterMethodCall<T, TProperty>(mock, expression, method)
-			{
-				FailMessage = failMessage
-			};
-			VerifyCalls(GetTargetMock(((MemberExpression)expression.Body).Expression, mock), expected, expression, times);
+			var expectation = new InvocationShape(method, new IMatcher[] { AnyMatcher.Instance });
+			VerifyCalls(GetTargetMock(((MemberExpression)expression.Body).Expression, mock), expectation, expression, times, failMessage);
 		}
 	}
 }
