@@ -51,7 +51,6 @@ using System.Text;
 
 using Moq.Language;
 using Moq.Language.Flow;
-using Moq.Matchers;
 using Moq.Properties;
 
 namespace Moq
@@ -126,52 +125,7 @@ namespace Moq
 			this.argumentMatchers = new IMatcher[parameters.Length];
 			for (int index = 0; index < parameters.Length; index++)
 			{
-				var parameter = parameters[index];
-				var argument = arguments[index];
-				if (parameter.ParameterType.IsByRef)
-				{
-					if ((parameter.Attributes & (ParameterAttributes.In | ParameterAttributes.Out)) == ParameterAttributes.Out)
-					{
-						// `out` parameter
-						this.argumentMatchers[index] = AnyMatcher.Instance;
-					}
-					else
-					{
-						// `ref` parameter
-
-						// Test for special case: `It.Ref<TValue>.IsAny`
-						if (argument is MemberExpression memberExpression)
-						{
-							var member = memberExpression.Member;
-							if (member.Name == nameof(It.Ref<object>.IsAny))
-							{
-								var memberDeclaringType = member.DeclaringType;
-								if (memberDeclaringType.GetTypeInfo().IsGenericType)
-								{
-									var memberDeclaringTypeDefinition = memberDeclaringType.GetGenericTypeDefinition();
-									if (memberDeclaringTypeDefinition == typeof(It.Ref<>))
-									{
-										this.argumentMatchers[index] = AnyMatcher.Instance;
-										continue;
-									}
-								}
-							}
-						}
-
-						var constant = argument.PartialEval() as ConstantExpression;
-						if (constant == null)
-						{
-							throw new NotSupportedException(Resources.RefExpressionMustBeConstantValue);
-						}
-
-						this.argumentMatchers[index] = new RefMatcher(constant.Value);
-					}
-				}
-				else
-				{
-					var isParamArray = parameter.IsDefined(typeof(ParamArrayAttribute), true);
-					this.argumentMatchers[index] = MatcherFactory.CreateMatcher(argument, isParamArray);
-				}
+				this.argumentMatchers[index] = MatcherFactory.CreateMatcher(arguments[index], parameters[index]);
 			}
 
 			for (int index = 0; index < parameters.Length; index++)
