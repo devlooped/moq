@@ -79,50 +79,57 @@ namespace Moq
 				return false;
 			}
 
-			if (this.IsEqualMethodOrOverride(invocation.Method))
+			if (invocation.Method != this.method && !this.IsOverride(invocation.Method))
 			{
-				for (int i = 0, n = this.argumentMatchers.Length; i < n; ++i)
-				{
-					if (this.argumentMatchers[i].Matches(arguments[i]) == false)
-					{
-						return false;
-					}
-				}
-
-				return true;
+				return false;
 			}
 
-			return false;
+			for (int i = 0, n = this.argumentMatchers.Length; i < n; ++i)
+			{
+				if (this.argumentMatchers[i].Matches(arguments[i]) == false)
+				{
+					return false;
+				}
+			}
+
+			return true;
 		}
 
-		private bool IsEqualMethodOrOverride(MethodInfo invocationMethod)
+		private bool IsOverride(MethodInfo invocationMethod)
 		{
 			var method = this.method;
 
-			if (invocationMethod == method)
+			if (!method.DeclaringType.IsAssignableFrom(invocationMethod.DeclaringType))
 			{
-				return true;
+				return false;
 			}
 
-			if (method.DeclaringType.IsAssignableFrom(invocationMethod.DeclaringType))
+			if (!method.Name.Equals(invocationMethod.Name, StringComparison.Ordinal))
 			{
-				if (!method.Name.Equals(invocationMethod.Name, StringComparison.Ordinal) ||
-					method.ReturnType != invocationMethod.ReturnType ||
-					!method.IsGenericMethod &&
-					!invocationMethod.HasSameParameterTypesAs(method))
+				return false;
+			}
+
+			if (method.ReturnType != invocationMethod.ReturnType)
+			{
+				return false;
+			}
+
+			if (method.IsGenericMethod)
+			{
+				if (!invocationMethod.GetGenericArguments().SequenceEqual(method.GetGenericArguments(), AssignmentCompatibilityTypeComparer.Instance))
 				{
 					return false;
 				}
-
-				if (method.IsGenericMethod && !invocationMethod.GetGenericArguments().SequenceEqual(method.GetGenericArguments(), AssignmentCompatibilityTypeComparer.Instance))
+			}
+			else
+			{
+				if (!invocationMethod.HasSameParameterTypesAs(method))
 				{
 					return false;
 				}
-
-				return true;
 			}
 
-			return false;
+			return true;
 		}
 
 		private static IMatcher[] GetArgumentMatchers(IReadOnlyList<Expression> arguments, ParameterInfo[] parameters)
