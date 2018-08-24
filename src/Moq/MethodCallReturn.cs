@@ -73,21 +73,6 @@ namespace Moq
 
 		public bool ProvidesReturnValue() => this.returnValueKind != ReturnValueKind.None;
 
-		public void Raises(Action<TMock> eventExpression, EventArgs args)
-		{
-			this.Raises(eventExpression, () => args);
-		}
-
-		public void Raises(Action<TMock> eventExpression, Func<EventArgs> func)
-		{
-			this.RaisesImpl(eventExpression, func);
-		}
-
-		public void Raises(Action<TMock> eventExpression, params object[] args)
-		{
-			this.RaisesImpl(eventExpression, args);
-		}
-
 		public void Returns(Delegate valueFunction)
 		{
 			// If `TResult` is `Delegate`, that is someone is setting up the return value of a method

@@ -102,16 +102,6 @@
 			<DependentUpon>It.cs</DependentUpon>
 		</None>
 
-		<None Update="MethodCall.tt">
-			<Generator>TextTemplatingFileGenerator</Generator>
-			<LastGenOutput>MethodCall.Generated.cs</LastGenOutput>
-		</None>
-		<Compile Update="MethodCall.Generated.cs">
-			<AutoGen>True</AutoGen>
-			<DesignTime>True</DesignTime>
-			<DependentUpon>MethodCall.tt</DependentUpon>
-		</Compile>
-
 		<None Update="MethodCallReturn.tt">
 			<Generator>TextTemplatingFileGenerator</Generator>
 			<LastGenOutput>MethodCallReturn.Generated.cs</LastGenOutput>

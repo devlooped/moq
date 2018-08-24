@@ -11,11 +11,6 @@ namespace Moq
 {
 	internal sealed partial class MethodCallReturn<TMock, TResult>
 	{
-		public void Raises<T>(Action<TMock> eventExpression, Func<T, EventArgs> func)
-		{
-			this.RaisesImpl(eventExpression, func);
-		}
-
 		public void Returns<T>(Func<T, TResult> valueExpression)
 		{
 			this.SetReturnDelegate(valueExpression);
@@ -25,11 +20,6 @@ for (var typeCount = 2; typeCount <= GenericTypeMax; typeCount++)
 {
 	var typeList = GetGenericList(typeCount, GenericTypeFormat);
 #>
-
-		public void Raises<<#= typeList #>>(Action<TMock> eventExpression, Func<<#= typeList #>, EventArgs> func)
-		{
-			this.RaisesImpl(eventExpression, func);
-		}
 
 		public void Returns<<#= typeList #>>(Func<<#= typeList #>, TResult> valueExpression)
 		{

@@ -61,21 +61,6 @@ namespace Moq
 			: base(mock, condition, originalExpression, method, arguments)
 		{
 		}
-
-		public void Raises(Action<TMock> eventExpression, EventArgs args)
-		{
-			Raises(eventExpression, () => args);
-		}
-
-		public void Raises(Action<TMock> eventExpression, Func<EventArgs> func)
-		{
-			RaisesImpl(eventExpression, func);
-		}
-
-		public void Raises(Action<TMock> eventExpression, params object[] args)
-		{
-			RaisesImpl(eventExpression, args);
-		}
 	}
 
 	internal partial class MethodCall
@@ -304,6 +289,34 @@ namespace Moq
 			}
 		}
 
+		public void SetRaiseEventResponse<TMock>(Action<TMock> eventExpression, Delegate func)
+			where TMock : class
+		{
+			var (ev, _) = eventExpression.GetEventWithTarget((TMock)mock.Object);
+			if (ev != null)
+			{
+				this.raiseEventResponse = new RaiseEventResponse(this.mock, ev, func, null);
+			}
+			else
+			{
+				this.raiseEventResponse = null;
+			}
+		}
+
+		public void SetRaiseEventResponse<TMock>(Action<TMock> eventExpression, params object[] args)
+			where TMock : class
+		{
+			var (ev, _) = eventExpression.GetEventWithTarget((TMock)mock.Object);
+			if (ev != null)
+			{
+				this.raiseEventResponse = new RaiseEventResponse(this.mock, ev, null, args);
+			}
+			else
+			{
+				this.raiseEventResponse = null;
+			}
+		}
+
 		public void Verifiable()
 		{
 			this.verifiable = true;
@@ -320,34 +333,6 @@ namespace Moq
 		public void AtMost(int callCount)
 		{
 			this.expectedMaxCallCount = callCount;
-		}
-
-		protected void RaisesImpl<TMock>(Action<TMock> eventExpression, Delegate func)
-			where TMock : class
-		{
-			var (ev, _) = eventExpression.GetEventWithTarget((TMock)mock.Object);
-			if (ev != null)
-			{
-				this.raiseEventResponse = new RaiseEventResponse(this.mock, ev, func, null);
-			}
-			else
-			{
-				this.raiseEventResponse = null;
-			}
-		}
-
-		protected void RaisesImpl<TMock>(Action<TMock> eventExpression, params object[] args)
-			where TMock : class
-		{
-			var (ev, _) = eventExpression.GetEventWithTarget((TMock)mock.Object);
-			if (ev != null)
-			{
-				this.raiseEventResponse = new RaiseEventResponse(this.mock, ev, null, args);
-			}
-			else
-			{
-				this.raiseEventResponse = null;
-			}
 		}
 
 		public override string ToString()
