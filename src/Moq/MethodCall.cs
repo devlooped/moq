@@ -107,35 +107,55 @@ namespace Moq
 		/// </remarks>
 		public MethodCall(Mock mock, Condition condition, LambdaExpression originalExpression, MethodInfo method, IMatcher[] argumentMatchers)
 		{
-			this.argumentMatchers = argumentMatchers;
 			this.condition = condition;
 			this.method = method;
 			this.mock = mock;
 			this.originalExpression = originalExpression;
+
+			this.argumentMatchers = argumentMatchers;
+			this.outValues = null;
 		}
 
 		public MethodCall(Mock mock, Condition condition, LambdaExpression originalExpression, MethodInfo method, IReadOnlyList<Expression> arguments)
 		{
-			this.mock = mock;
 			this.condition = condition;
-			this.originalExpression = originalExpression;
 			this.method = method;
+			this.mock = mock;
+			this.originalExpression = originalExpression;
 
 			var parameters = method.GetParameters();
-			this.argumentMatchers = new IMatcher[parameters.Length];
-			for (int index = 0; index < parameters.Length; index++)
-			{
-				this.argumentMatchers[index] = MatcherFactory.CreateMatcher(arguments[index], parameters[index]);
-			}
+			this.argumentMatchers = GetArgumentMatchers(arguments, parameters);
+			this.outValues = GetOutValues(arguments, parameters);
 
-			for (int index = 0; index < parameters.Length; index++)
+			this.SetFileInfo();
+		}
+
+		private static IMatcher[] GetArgumentMatchers(IReadOnlyList<Expression> arguments, ParameterInfo[] parameters)
+		{
+			Debug.Assert(arguments != null);
+			Debug.Assert(parameters != null);
+			Debug.Assert(arguments.Count == parameters.Length);
+
+			var n = parameters.Length;
+			var argumentMatchers = new IMatcher[n];
+			for (int i = 0; i < n; ++i)
 			{
-				var parameter = parameters[index];
+				argumentMatchers[i] = MatcherFactory.CreateMatcher(arguments[i], parameters[i]);
+			}
+			return argumentMatchers;
+		}
+
+		private static List<KeyValuePair<int, object>> GetOutValues(IReadOnlyList<Expression> arguments, ParameterInfo[] parameters)
+		{
+			List<KeyValuePair<int, object>> outValues = null;
+			for (int i = 0, n = parameters.Length; i < n; ++i)
+			{
+				var parameter = parameters[i];
 				if (parameter.ParameterType.IsByRef)
 				{
 					if ((parameter.Attributes & (ParameterAttributes.In | ParameterAttributes.Out)) == ParameterAttributes.Out)
 					{
-						var constant = arguments[index].PartialEval() as ConstantExpression;
+						var constant = arguments[i].PartialEval() as ConstantExpression;
 						if (constant == null)
 						{
 							throw new NotSupportedException(Resources.OutExpressionMustBeConstantValue);
@@ -146,12 +166,11 @@ namespace Moq
 							outValues = new List<KeyValuePair<int, object>>();
 						}
 
-						outValues.Add(new KeyValuePair<int, object>(index, constant.Value));
+						outValues.Add(new KeyValuePair<int, object>(i, constant.Value));
 					}
 				}
 			}
-
-			this.SetFileInfo();
+			return outValues;
 		}
 
 		public string FailMessage
