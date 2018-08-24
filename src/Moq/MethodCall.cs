@@ -133,19 +133,6 @@ namespace Moq
 					if ((parameter.Attributes & (ParameterAttributes.In | ParameterAttributes.Out)) == ParameterAttributes.Out)
 					{
 						// `out` parameter
-
-						var constant = argument.PartialEval() as ConstantExpression;
-						if (constant == null)
-						{
-							throw new NotSupportedException(Resources.OutExpressionMustBeConstantValue);
-						}
-
-						if (outValues == null)
-						{
-							outValues = new List<KeyValuePair<int, object>>();
-						}
-
-						outValues.Add(new KeyValuePair<int, object>(index, constant.Value));
 						this.argumentMatchers[index] = AnyMatcher.Instance;
 					}
 					else
@@ -184,6 +171,29 @@ namespace Moq
 				{
 					var isParamArray = parameter.IsDefined(typeof(ParamArrayAttribute), true);
 					this.argumentMatchers[index] = MatcherFactory.CreateMatcher(argument, isParamArray);
+				}
+			}
+
+			for (int index = 0; index < parameters.Length; index++)
+			{
+				var parameter = parameters[index];
+				if (parameter.ParameterType.IsByRef)
+				{
+					if ((parameter.Attributes & (ParameterAttributes.In | ParameterAttributes.Out)) == ParameterAttributes.Out)
+					{
+						var constant = arguments[index].PartialEval() as ConstantExpression;
+						if (constant == null)
+						{
+							throw new NotSupportedException(Resources.OutExpressionMustBeConstantValue);
+						}
+
+						if (outValues == null)
+						{
+							outValues = new List<KeyValuePair<int, object>>();
+						}
+
+						outValues.Add(new KeyValuePair<int, object>(index, constant.Value));
+					}
 				}
 			}
 
