@@ -102,16 +102,6 @@
 			<DependentUpon>It.cs</DependentUpon>
 		</None>
 
-		<None Update="MethodCallReturn.tt">
-			<Generator>TextTemplatingFileGenerator</Generator>
-			<LastGenOutput>MethodCallReturn.Generated.cs</LastGenOutput>
-		</None>
-		<Compile Update="MethodCallReturn.Generated.cs">
-			<AutoGen>True</AutoGen>
-			<DesignTime>True</DesignTime>
-			<DependentUpon>MethodCallReturn.tt</DependentUpon>
-		</Compile>
-
 		<None Update="Match.xdoc">
 			<DependentUpon>Match.cs</DependentUpon>
 		</None>

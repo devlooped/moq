@@ -73,105 +73,9 @@ namespace Moq
 
 		public bool ProvidesReturnValue() => this.returnValueKind != ReturnValueKind.None;
 
-		public void Returns(Delegate valueFunction)
-		{
-			// If `TResult` is `Delegate`, that is someone is setting up the return value of a method
-			// that returns a `Delegate`, then we have arrived here because C# picked the wrong overload:
-			// We don't want to invoke the passed delegate to get a return value; the passed delegate
-			// already is the return value.
-			if (typeof(TResult) == typeof(Delegate))
-			{
-				this.Returns(() => (TResult)(object)valueFunction);
-				return;
-			}
-
-			if (valueFunction != null && valueFunction.GetMethodInfo().ReturnType == typeof(void))
-			{
-				throw new ArgumentException(Resources.InvalidReturnsCallbackNotADelegateWithReturnType, nameof(valueFunction));
-			}
-
-			SetReturnDelegate(valueFunction);
-		}
-
-		public void Returns(Func<TResult> valueExpression)
-		{
-			SetReturnDelegate(valueExpression);
-		}
-
-		public void Returns(TResult value)
-		{
-			Returns(() => value);
-		}
-
 		public void CallBase()
 		{
 			this.returnValueKind = ReturnValueKind.CallBase;
-		}
-
-		private void SetReturnDelegate(Delegate value)
-		{
-			if (value == null)
-			{
-				// A `null` reference (instead of a valid delegate) is interpreted as the actual return value.
-				// This is necessary because the compiler might have picked the unexpected overload for calls like `Returns(null)`,
-				// or the user might have picked an overload like `Returns<T>(null)`,
-				// and instead of in `Returns(TResult)`, we ended up in `Returns(Delegate)` or `Returns(Func)`,
-				// which likely isn't what the user intended.
-				// So here we do what we would've done in `Returns(TResult)`:
-				this.valueDel = (Func<TResult>)(() => default(TResult));
-			}
-			else
-			{
-				ValidateReturnDelegate(value);
-				this.valueDel = value;
-			}
-
-			this.returnValueKind = ReturnValueKind.Explicit;
-		}
-
-		private void ValidateReturnDelegate(Delegate callback)
-		{
-			var callbackMethod = callback.GetMethodInfo();
-
-			// validate number of parameters:
-
-			var numberOfActualParameters = callbackMethod.GetParameters().Length;
-			if (callbackMethod.IsStatic)
-			{
-				if (callbackMethod.IsExtensionMethod() || callback.Target != null)
-				{
-					numberOfActualParameters--;
-				}
-			}
-
-			if (numberOfActualParameters > 0)
-			{
-				var numberOfExpectedParameters = this.Method.GetParameters().Length;
-				if (numberOfActualParameters != numberOfExpectedParameters)
-				{
-					throw new ArgumentException(
-						string.Format(
-							CultureInfo.CurrentCulture,
-							Resources.InvalidCallbackParameterCountMismatch,
-							numberOfExpectedParameters,
-							numberOfActualParameters));
-				}
-			}
-
-			// validate return type:
-
-			var expectedReturnType = this.Method.ReturnType;
-			var actualReturnType = callbackMethod.ReturnType;
-
-			if (!expectedReturnType.IsAssignableFrom(actualReturnType))
-			{
-				throw new ArgumentException(
-					string.Format(
-						CultureInfo.CurrentCulture,
-						Resources.InvalidCallbackReturnTypeMismatch,
-						expectedReturnType,
-						actualReturnType));
-			}
 		}
 
 		public override void SetCallbackResponse(Delegate callback)
@@ -190,6 +94,86 @@ namespace Moq
 			else
 			{
 				base.SetCallbackResponse(callback);
+			}
+		}
+
+		public void SetReturnsResponse(Delegate value)
+		{
+			if (value == null)
+			{
+				// A `null` reference (instead of a valid delegate) is interpreted as the actual return value.
+				// This is necessary because the compiler might have picked the unexpected overload for calls
+				// like `Returns(null)`, or the user might have picked an overload like `Returns<T>(null)`,
+				// and instead of in `Returns(TResult)`, we ended up in `Returns(Delegate)` or `Returns(Func)`,
+				// which likely isn't what the user intended.
+				// So here we do what we would've done in `Returns(TResult)`:
+				this.valueDel = (Func<TResult>)(() => default(TResult));
+			}
+			else if (typeof(TResult) == typeof(Delegate))
+			{
+				// If `TResult` is `Delegate`, that is someone is setting up the return value of a method
+				// that returns a `Delegate`, then we have arrived here because C# picked the wrong overload:
+				// We don't want to invoke the passed delegate to get a return value; the passed delegate
+				// already is the return value.
+				this.valueDel = (Func<TResult>)(() => (TResult)(object)value);
+			}
+			else
+			{
+				ValidateCallback(value);
+				this.valueDel = value;
+			}
+
+			this.returnValueKind = ReturnValueKind.Explicit;
+
+			void ValidateCallback(Delegate callback)
+			{
+				var callbackMethod = callback.GetMethodInfo();
+
+				// validate number of parameters:
+
+				var numberOfActualParameters = callbackMethod.GetParameters().Length;
+				if (callbackMethod.IsStatic)
+				{
+					if (callbackMethod.IsExtensionMethod() || callback.Target != null)
+					{
+						numberOfActualParameters--;
+					}
+				}
+
+				if (numberOfActualParameters > 0)
+				{
+					var numberOfExpectedParameters = this.Method.GetParameters().Length;
+					if (numberOfActualParameters != numberOfExpectedParameters)
+					{
+						throw new ArgumentException(
+							string.Format(
+								CultureInfo.CurrentCulture,
+								Resources.InvalidCallbackParameterCountMismatch,
+								numberOfExpectedParameters,
+								numberOfActualParameters));
+					}
+				}
+
+				// validate return type:
+
+				var actualReturnType = callbackMethod.ReturnType;
+
+				if (actualReturnType == typeof(void))
+				{
+					throw new ArgumentException(Resources.InvalidReturnsCallbackNotADelegateWithReturnType);
+				}
+
+				var expectedReturnType = this.Method.ReturnType;
+
+				if (!expectedReturnType.IsAssignableFrom(actualReturnType))
+				{
+					throw new ArgumentException(
+						string.Format(
+							CultureInfo.CurrentCulture,
+							Resources.InvalidCallbackReturnTypeMismatch,
+							expectedReturnType,
+							actualReturnType));
+				}
 			}
 		}
 
