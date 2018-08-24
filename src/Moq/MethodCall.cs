@@ -115,30 +115,13 @@ namespace Moq
 
 		public MethodCall(Mock mock, Condition condition, LambdaExpression originalExpression, MethodInfo method, IReadOnlyList<Expression> arguments)
 		{
-			var parameters = method.GetParameters();
-
 			this.condition = condition;
-			this.expectation = new InvocationShape(method, GetArgumentMatchers(arguments, parameters));
+			this.expectation = new InvocationShape(method, arguments);
 			this.mock = mock;
 			this.originalExpression = originalExpression;
-			this.outValues = GetOutValues(arguments, parameters);
+			this.outValues = GetOutValues(arguments, method.GetParameters());
 
 			this.SetFileInfo();
-		}
-
-		private static IMatcher[] GetArgumentMatchers(IReadOnlyList<Expression> arguments, ParameterInfo[] parameters)
-		{
-			Debug.Assert(arguments != null);
-			Debug.Assert(parameters != null);
-			Debug.Assert(arguments.Count == parameters.Length);
-
-			var n = parameters.Length;
-			var argumentMatchers = new IMatcher[n];
-			for (int i = 0; i < n; ++i)
-			{
-				argumentMatchers[i] = MatcherFactory.CreateMatcher(arguments[i], parameters[i]);
-			}
-			return argumentMatchers;
 		}
 
 		private static List<KeyValuePair<int, object>> GetOutValues(IReadOnlyList<Expression> arguments, ParameterInfo[] parameters)
