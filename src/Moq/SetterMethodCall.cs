@@ -38,7 +38,6 @@
 //[This is the BSD license, see
 // http://www.opensource.org/licenses/bsd-license.php]
 
-using Moq.Language.Flow;
 using Moq.Protected;
 using System;
 using System.Linq.Expressions;
@@ -46,7 +45,7 @@ using System.Reflection;
 
 namespace Moq
 {
-	internal class SetterMethodCall<TMock, TProperty> : MethodCall<TMock>, ISetupSetter<TMock, TProperty>
+	internal class SetterMethodCall<TMock, TProperty> : MethodCall<TMock>
 		where TMock : class
 	{
 		public SetterMethodCall(Mock mock, LambdaExpression originalExpression, MethodInfo method)
@@ -59,10 +58,9 @@ namespace Moq
 		{
 		}
 
-		public ICallbackResult Callback(Action<TProperty> callback)
+		public void Callback(Action<TProperty> callback)
 		{
 			this.SetCallbackWithArguments(callback);
-			return this;
 		}
 	}
 }

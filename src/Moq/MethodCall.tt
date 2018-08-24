@@ -11,9 +11,9 @@ namespace Moq
 {
 	internal partial class MethodCall<TMock>
 	{
-		public IVerifies Raises<T>(Action<TMock> eventExpression, Func<T, EventArgs> func)
+		public void Raises<T>(Action<TMock> eventExpression, Func<T, EventArgs> func)
 		{
-			return RaisesImpl(eventExpression, func);
+			RaisesImpl(eventExpression, func);
 		}
 <#
 for (var typeCount = 2; typeCount <= GenericTypeMax; typeCount++)
@@ -21,9 +21,9 @@ for (var typeCount = 2; typeCount <= GenericTypeMax; typeCount++)
 	var typeList = GetGenericList(typeCount, GenericTypeFormat);
 #>
 
-		public IVerifies Raises<<#= typeList #>>(Action<TMock> eventExpression, Func<<#= typeList #>, EventArgs> func)
+		public void Raises<<#= typeList #>>(Action<TMock> eventExpression, Func<<#= typeList #>, EventArgs> func)
 		{
-			return RaisesImpl(eventExpression, func);
+			RaisesImpl(eventExpression, func);
 		}
 <#
 }
@@ -33,10 +33,9 @@ for (var typeCount = 2; typeCount <= GenericTypeMax; typeCount++)
 	internal partial class MethodCall
 	{
 		[SuppressMessage("Microsoft.Maintainability", "CA1500:VariableNamesShouldNotMatchFieldNames", MessageId = "callback")]
-		public ICallbackResult Callback<T>(Action<T> callback)
+		public void Callback<T>(Action<T> callback)
 		{
 			this.SetCallbackWithArguments(callback);
-			return this;
 		}
 <#
 for (var typeCount = 2; typeCount <= GenericTypeMax; typeCount++)
@@ -45,10 +44,9 @@ for (var typeCount = 2; typeCount <= GenericTypeMax; typeCount++)
 #>
 
 		[SuppressMessage("Microsoft.Maintainability", "CA1500:VariableNamesShouldNotMatchFieldNames", MessageId = "callback")]
-		public ICallbackResult Callback<<#= typeList #>>(Action<<#= typeList #>> callback)
+		public void Callback<<#= typeList #>>(Action<<#= typeList #>> callback)
 		{
 			this.SetCallbackWithArguments(callback);
-			return this;
 		}
 <#
 }

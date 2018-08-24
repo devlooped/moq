@@ -45,13 +45,11 @@ using System.Linq.Expressions;
 using System.Reflection;
 using System.Runtime.CompilerServices;
 
-using Moq.Language;
-using Moq.Language.Flow;
 using Moq.Properties;
 
 namespace Moq
 {
-	internal sealed partial class MethodCallReturn<TMock, TResult> : MethodCall, ISetup<TMock, TResult>, ISetupGetter<TMock, TResult>, IReturnsResult<TMock>
+	internal sealed partial class MethodCallReturn<TMock, TResult> : MethodCall
 		where TMock : class
 	{
 		// This enum exists for reasons of optimizing memory usage.
@@ -75,22 +73,22 @@ namespace Moq
 
 		public bool ProvidesReturnValue() => this.returnValueKind != ReturnValueKind.None;
 
-		public IVerifies Raises(Action<TMock> eventExpression, EventArgs args)
+		public void Raises(Action<TMock> eventExpression, EventArgs args)
 		{
-			return this.Raises(eventExpression, () => args);
+			this.Raises(eventExpression, () => args);
 		}
 
-		public IVerifies Raises(Action<TMock> eventExpression, Func<EventArgs> func)
+		public void Raises(Action<TMock> eventExpression, Func<EventArgs> func)
 		{
-			return this.RaisesImpl(eventExpression, func);
+			this.RaisesImpl(eventExpression, func);
 		}
 
-		public IVerifies Raises(Action<TMock> eventExpression, params object[] args)
+		public void Raises(Action<TMock> eventExpression, params object[] args)
 		{
-			return this.RaisesImpl(eventExpression, args);
+			this.RaisesImpl(eventExpression, args);
 		}
 
-		public IReturnsResult<TMock> Returns(Delegate valueFunction)
+		public void Returns(Delegate valueFunction)
 		{
 			// If `TResult` is `Delegate`, that is someone is setting up the return value of a method
 			// that returns a `Delegate`, then we have arrived here because C# picked the wrong overload:
@@ -98,7 +96,8 @@ namespace Moq
 			// already is the return value.
 			if (typeof(TResult) == typeof(Delegate))
 			{
-				return this.Returns(() => (TResult)(object)valueFunction);
+				this.Returns(() => (TResult)(object)valueFunction);
+				return;
 			}
 
 			if (valueFunction != null && valueFunction.GetMethodInfo().ReturnType == typeof(void))
@@ -107,43 +106,21 @@ namespace Moq
 			}
 
 			SetReturnDelegate(valueFunction);
-			return this;
 		}
 
-		public IReturnsResult<TMock> Returns(Func<TResult> valueExpression)
+		public void Returns(Func<TResult> valueExpression)
 		{
 			SetReturnDelegate(valueExpression);
-			return this;
 		}
 
-		public IReturnsResult<TMock> Returns(TResult value)
+		public void Returns(TResult value)
 		{
 			Returns(() => value);
-			return this;
 		}
 
-		public IReturnsResult<TMock> CallBase()
+		public void CallBase()
 		{
 			this.returnValueKind = ReturnValueKind.CallBase;
-			return this;
-		}
-
-		IReturnsThrows<TMock, TResult> ICallback<TMock, TResult>.Callback(Delegate callback)
-		{
-			base.Callback(callback);
-			return this;
-		}
-
-		IReturnsThrowsGetter<TMock, TResult> ICallbackGetter<TMock, TResult>.Callback(Action callback)
-		{
-			base.Callback(callback);
-			return this;
-		}
-
-		public new IReturnsThrows<TMock, TResult> Callback(Action callback)
-		{
-			base.Callback(callback);
-			return this;
 		}
 
 		private void SetReturnDelegate(Delegate value)

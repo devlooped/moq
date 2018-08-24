@@ -49,13 +49,11 @@ using System.Linq.Expressions;
 using System.Reflection;
 using System.Text;
 
-using Moq.Language;
-using Moq.Language.Flow;
 using Moq.Properties;
 
 namespace Moq
 {
-	internal partial class MethodCall<TMock> : MethodCall, ISetup<TMock>
+	internal partial class MethodCall<TMock> : MethodCall
 		where TMock : class
 	{
 		public MethodCall(Mock mock, Condition condition, LambdaExpression originalExpression, MethodInfo method,
@@ -64,23 +62,23 @@ namespace Moq
 		{
 		}
 
-		public IVerifies Raises(Action<TMock> eventExpression, EventArgs args)
+		public void Raises(Action<TMock> eventExpression, EventArgs args)
 		{
-			return Raises(eventExpression, () => args);
+			Raises(eventExpression, () => args);
 		}
 
-		public IVerifies Raises(Action<TMock> eventExpression, Func<EventArgs> func)
+		public void Raises(Action<TMock> eventExpression, Func<EventArgs> func)
 		{
-			return RaisesImpl(eventExpression, func);
+			RaisesImpl(eventExpression, func);
 		}
 
-		public IVerifies Raises(Action<TMock> eventExpression, params object[] args)
+		public void Raises(Action<TMock> eventExpression, params object[] args)
 		{
-			return RaisesImpl(eventExpression, args);
+			RaisesImpl(eventExpression, args);
 		}
 	}
 
-	internal partial class MethodCall : ICallbackResult, IVerifies, IThrowsResult
+	internal partial class MethodCall
 	{
 		private Action<object[]> callbackResponse;
 		private int callCount;
@@ -255,25 +253,23 @@ namespace Moq
 			}
 		}
 
-		public IThrowsResult Throws(Exception exception)
+		public void Throws(Exception exception)
 		{
 			this.throwExceptionResponse = exception;
-			return this;
 		}
 
-		public IThrowsResult Throws<TException>()
+		public void Throws<TException>()
 			where TException : Exception, new()
 		{
-			return this.Throws(new TException());
+			this.Throws(new TException());
 		}
 
-		public ICallbackResult Callback(Action callback)
+		public void Callback(Action callback)
 		{
 			SetCallbackWithoutArguments(callback);
-			return this;
 		}
 
-		public ICallbackResult Callback(Delegate callback)
+		public void Callback(Delegate callback)
 		{
 			if (callback == null)
 			{
@@ -286,7 +282,6 @@ namespace Moq
 			}
 
 			this.SetCallbackWithArguments(callback);
-			return this;
 		}
 
 		protected virtual void SetCallbackWithoutArguments(Action callback)
@@ -328,15 +323,14 @@ namespace Moq
 			this.failMessage = failMessage;
 		}
 
-		public IVerifies AtMostOnce() => this.AtMost(1);
+		public void AtMostOnce() => this.AtMost(1);
 
-		public IVerifies AtMost(int callCount)
+		public void AtMost(int callCount)
 		{
 			this.expectedMaxCallCount = callCount;
-			return this;
 		}
 
-		protected IVerifies RaisesImpl<TMock>(Action<TMock> eventExpression, Delegate func)
+		protected void RaisesImpl<TMock>(Action<TMock> eventExpression, Delegate func)
 			where TMock : class
 		{
 			var (ev, _) = eventExpression.GetEventWithTarget((TMock)mock.Object);
@@ -348,11 +342,9 @@ namespace Moq
 			{
 				this.raiseEventResponse = null;
 			}
-
-			return this;
 		}
 
-		protected IVerifies RaisesImpl<TMock>(Action<TMock> eventExpression, params object[] args)
+		protected void RaisesImpl<TMock>(Action<TMock> eventExpression, params object[] args)
 			where TMock : class
 		{
 			var (ev, _) = eventExpression.GetEventWithTarget((TMock)mock.Object);
@@ -364,8 +356,6 @@ namespace Moq
 			{
 				this.raiseEventResponse = null;
 			}
-
-			return this;
 		}
 
 		public override string ToString()
