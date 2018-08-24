@@ -43,21 +43,64 @@ using System.Globalization;
 using System.Linq.Expressions;
 using Moq.Properties;
 using Moq.Matchers;
-#if NETCORE
 using System.Reflection;
-#endif
 
 namespace Moq
 {
 	internal static class MatcherFactory
 	{
-		public static IMatcher CreateMatcher(Expression expression, bool isParams)
+		public static IMatcher CreateMatcher(Expression argument, ParameterInfo parameter)
 		{
-			if (isParams && (expression.NodeType == ExpressionType.NewArrayInit || !expression.Type.IsArray))
+			if (parameter.ParameterType.IsByRef)
 			{
-				return new ParamArrayMatcher((NewArrayExpression)expression);
-			}
+				if ((parameter.Attributes & (ParameterAttributes.In | ParameterAttributes.Out)) == ParameterAttributes.Out)
+				{
+					// `out` parameter
+					return AnyMatcher.Instance;
+				}
+				else
+				{
+					// `ref` parameter
 
+					// Test for special case: `It.Ref<TValue>.IsAny`
+					if (argument is MemberExpression memberExpression)
+					{
+						var member = memberExpression.Member;
+						if (member.Name == nameof(It.Ref<object>.IsAny))
+						{
+							var memberDeclaringType = member.DeclaringType;
+							if (memberDeclaringType.GetTypeInfo().IsGenericType)
+							{
+								var memberDeclaringTypeDefinition = memberDeclaringType.GetGenericTypeDefinition();
+								if (memberDeclaringTypeDefinition == typeof(It.Ref<>))
+								{
+									return AnyMatcher.Instance;
+								}
+							}
+						}
+					}
+
+					var constant = argument.PartialEval() as ConstantExpression;
+					if (constant == null)
+					{
+						throw new NotSupportedException(Resources.RefExpressionMustBeConstantValue);
+					}
+
+					return new RefMatcher(constant.Value);
+				}
+			}
+			else if (parameter.IsDefined(typeof(ParamArrayAttribute), true) && (argument.NodeType == ExpressionType.NewArrayInit || !argument.Type.IsArray))
+			{
+				return new ParamArrayMatcher((NewArrayExpression)argument);
+			}
+			else
+			{
+				return MatcherFactory.CreateMatcher(argument);
+			}
+		}
+
+		public static IMatcher CreateMatcher(Expression expression)
+		{
 			// Type inference on the call might 
 			// do automatic conversion to the desired 
 			// method argument type, and a Convert expression type 

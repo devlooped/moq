@@ -51,7 +51,6 @@ using System.Text;
 
 using Moq.Language;
 using Moq.Language.Flow;
-using Moq.Matchers;
 using Moq.Properties;
 
 namespace Moq
@@ -108,33 +107,55 @@ namespace Moq
 		/// </remarks>
 		public MethodCall(Mock mock, Condition condition, LambdaExpression originalExpression, MethodInfo method, IMatcher[] argumentMatchers)
 		{
-			this.argumentMatchers = argumentMatchers;
 			this.condition = condition;
 			this.method = method;
 			this.mock = mock;
 			this.originalExpression = originalExpression;
+
+			this.argumentMatchers = argumentMatchers;
+			this.outValues = null;
 		}
 
 		public MethodCall(Mock mock, Condition condition, LambdaExpression originalExpression, MethodInfo method, IReadOnlyList<Expression> arguments)
 		{
-			this.mock = mock;
 			this.condition = condition;
-			this.originalExpression = originalExpression;
 			this.method = method;
+			this.mock = mock;
+			this.originalExpression = originalExpression;
 
 			var parameters = method.GetParameters();
-			this.argumentMatchers = new IMatcher[parameters.Length];
-			for (int index = 0; index < parameters.Length; index++)
+			this.argumentMatchers = GetArgumentMatchers(arguments, parameters);
+			this.outValues = GetOutValues(arguments, parameters);
+
+			this.SetFileInfo();
+		}
+
+		private static IMatcher[] GetArgumentMatchers(IReadOnlyList<Expression> arguments, ParameterInfo[] parameters)
+		{
+			Debug.Assert(arguments != null);
+			Debug.Assert(parameters != null);
+			Debug.Assert(arguments.Count == parameters.Length);
+
+			var n = parameters.Length;
+			var argumentMatchers = new IMatcher[n];
+			for (int i = 0; i < n; ++i)
 			{
-				var parameter = parameters[index];
-				var argument = arguments[index];
+				argumentMatchers[i] = MatcherFactory.CreateMatcher(arguments[i], parameters[i]);
+			}
+			return argumentMatchers;
+		}
+
+		private static List<KeyValuePair<int, object>> GetOutValues(IReadOnlyList<Expression> arguments, ParameterInfo[] parameters)
+		{
+			List<KeyValuePair<int, object>> outValues = null;
+			for (int i = 0, n = parameters.Length; i < n; ++i)
+			{
+				var parameter = parameters[i];
 				if (parameter.ParameterType.IsByRef)
 				{
 					if ((parameter.Attributes & (ParameterAttributes.In | ParameterAttributes.Out)) == ParameterAttributes.Out)
 					{
-						// `out` parameter
-
-						var constant = argument.PartialEval() as ConstantExpression;
+						var constant = arguments[i].PartialEval() as ConstantExpression;
 						if (constant == null)
 						{
 							throw new NotSupportedException(Resources.OutExpressionMustBeConstantValue);
@@ -145,49 +166,11 @@ namespace Moq
 							outValues = new List<KeyValuePair<int, object>>();
 						}
 
-						outValues.Add(new KeyValuePair<int, object>(index, constant.Value));
-						this.argumentMatchers[index] = AnyMatcher.Instance;
+						outValues.Add(new KeyValuePair<int, object>(i, constant.Value));
 					}
-					else
-					{
-						// `ref` parameter
-
-						// Test for special case: `It.Ref<TValue>.IsAny`
-						if (argument is MemberExpression memberExpression)
-						{
-							var member = memberExpression.Member;
-							if (member.Name == nameof(It.Ref<object>.IsAny))
-							{
-								var memberDeclaringType = member.DeclaringType;
-								if (memberDeclaringType.GetTypeInfo().IsGenericType)
-								{
-									var memberDeclaringTypeDefinition = memberDeclaringType.GetGenericTypeDefinition();
-									if (memberDeclaringTypeDefinition == typeof(It.Ref<>))
-									{
-										this.argumentMatchers[index] = AnyMatcher.Instance;
-										continue;
-									}
-								}
-							}
-						}
-
-						var constant = argument.PartialEval() as ConstantExpression;
-						if (constant == null)
-						{
-							throw new NotSupportedException(Resources.RefExpressionMustBeConstantValue);
-						}
-
-						this.argumentMatchers[index] = new RefMatcher(constant.Value);
-					}
-				}
-				else
-				{
-					var isParamArray = parameter.IsDefined(typeof(ParamArrayAttribute), true);
-					this.argumentMatchers[index] = MatcherFactory.CreateMatcher(argument, isParamArray);
 				}
 			}
-
-			this.SetFileInfo();
+			return outValues;
 		}
 
 		public string FailMessage
