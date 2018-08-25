@@ -42,9 +42,9 @@ using System;
 
 namespace Moq.Language.Flow
 {
-	internal class VoidSetupPhrase<T> : SetupPhrase<MethodCall<T>>, ISetup<T> where T : class
+	internal class VoidSetupPhrase<T> : SetupPhrase<MethodCall>, ISetup<T> where T : class
 	{
-		public VoidSetupPhrase(MethodCall<T> setup) : base(setup)
+		public VoidSetupPhrase(MethodCall setup) : base(setup)
 		{
 		}
 

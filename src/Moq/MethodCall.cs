@@ -53,16 +53,6 @@ using Moq.Properties;
 
 namespace Moq
 {
-	internal partial class MethodCall<TMock> : MethodCall
-		where TMock : class
-	{
-		public MethodCall(Mock mock, Condition condition, LambdaExpression originalExpression, MethodInfo method,
-			IReadOnlyList<Expression> arguments)
-			: base(mock, condition, originalExpression, method, arguments)
-		{
-		}
-	}
-
 	internal partial class MethodCall
 	{
 		private Action<object[]> callbackResponse;

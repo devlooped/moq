@@ -462,7 +462,7 @@ namespace Moq
 
 			ThrowIfSetupExpressionInvolvesUnsupportedMember(expression, method);
 			ThrowIfSetupMethodNotVisibleToProxyFactory(method);
-			var setup = new MethodCall<T>(mock, condition, expression, method, args);
+			var setup = new MethodCall(mock, condition, expression, method, args);
 
 			var targetMock = GetTargetMock(obj, mock);
 			targetMock.Setups.Add(setup);
@@ -562,7 +562,7 @@ namespace Moq
 				(m, expr, method, value) =>
 				{
 					Debug.Assert(value.Length == 1);
-					var setup = new MethodCall<T>(m, condition, expr, method, value);
+					var setup = new MethodCall(m, condition, expr, method, value);
 					m.Setups.Add(setup);
 					return new SetterSetupPhrase<T, TProperty>(setup);
 				});
@@ -583,7 +583,7 @@ namespace Moq
 				setterExpression,
 				(m, expr, method, values) =>
 				{
-					var setup = new MethodCall<T>(m, condition, expr, method, values);
+					var setup = new MethodCall(m, condition, expr, method, values);
 					m.Setups.Add(setup);
 					return new VoidSetupPhrase<T>(setup);
 				});
@@ -601,7 +601,7 @@ namespace Moq
 			ThrowIfSetupExpressionInvolvesUnsupportedMember(expression, propSet);
 			ThrowIfSetupMethodNotVisibleToProxyFactory(propSet);
 
-			var setup = new MethodCall<T>(mock, null, expression, propSet, new[] { ItExpr.IsAny<TProperty>() });
+			var setup = new MethodCall(mock, null, expression, propSet, new[] { ItExpr.IsAny<TProperty>() });
 			var targetMock = GetTargetMock(((MemberExpression)expression.Body).Expression, mock);
 
 			targetMock.Setups.Add(setup);
