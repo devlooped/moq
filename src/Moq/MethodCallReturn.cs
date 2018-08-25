@@ -49,8 +49,7 @@ using Moq.Properties;
 
 namespace Moq
 {
-	internal sealed partial class MethodCallReturn<TMock, TResult> : MethodCall
-		where TMock : class
+	internal sealed partial class MethodCallReturn : MethodCall
 	{
 		// This enum exists for reasons of optimizing memory usage.
 		// Previously this class had two `bool` fields, `hasReturnValue` and `callBase`.
@@ -72,6 +71,8 @@ namespace Moq
 		}
 
 		public bool ProvidesReturnValue() => this.returnValueKind != ReturnValueKind.None;
+
+		public Type ReturnType => this.Method.ReturnType;
 
 		public void CallBase()
 		{
@@ -107,15 +108,15 @@ namespace Moq
 				// and instead of in `Returns(TResult)`, we ended up in `Returns(Delegate)` or `Returns(Func)`,
 				// which likely isn't what the user intended.
 				// So here we do what we would've done in `Returns(TResult)`:
-				this.valueDel = (Func<TResult>)(() => default(TResult));
+				this.valueDel = new Func<object>(() => this.ReturnType.GetDefaultValue());
 			}
-			else if (typeof(TResult) == typeof(Delegate))
+			else if (this.ReturnType == typeof(Delegate))
 			{
 				// If `TResult` is `Delegate`, that is someone is setting up the return value of a method
 				// that returns a `Delegate`, then we have arrived here because C# picked the wrong overload:
 				// We don't want to invoke the passed delegate to get a return value; the passed delegate
 				// already is the return value.
-				this.valueDel = (Func<TResult>)(() => (TResult)(object)value);
+				this.valueDel = new Func<Delegate>(() => value);
 			}
 			else
 			{
@@ -197,7 +198,7 @@ namespace Moq
 			}
 			else
 			{
-				invocation.Return(default(TResult));
+				invocation.Return(this.ReturnType.GetDefaultValue());
 			}
 
 			this.afterReturnCallback?.Invoke(invocation.Arguments);

@@ -53,6 +53,14 @@ namespace Moq
 {
 	internal static class Extensions
 	{
+		/// <summary>
+		///   Gets the default value for the specified type. This is the Reflection counterpart of C#'s <see langword="default"/> operator.
+		/// </summary>
+		public static object GetDefaultValue(this Type type)
+		{
+			return type.GetTypeInfo().IsValueType ? Activator.CreateInstance(type) : null;
+		}
+
 		public static object InvokePreserveStack(this Delegate del, params object[] args)
 		{
 			try

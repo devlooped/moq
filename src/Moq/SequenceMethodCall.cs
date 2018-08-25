@@ -124,8 +124,7 @@ namespace Moq
 				}
 				else
 				{
-					invocation.Return(returnType.GetTypeInfo().IsValueType ? Activator.CreateInstance(returnType)
-					                                                       : null);
+					invocation.Return(returnType.GetDefaultValue());
 				}
 			}
 		}

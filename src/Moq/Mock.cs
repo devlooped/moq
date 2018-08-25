@@ -495,7 +495,7 @@ namespace Moq
 
 			ThrowIfSetupExpressionInvolvesUnsupportedMember(expression, method);
 			ThrowIfSetupMethodNotVisibleToProxyFactory(method);
-			var setup = new MethodCallReturn<T, TResult>(mock, condition, expression, method, args);
+			var setup = new MethodCallReturn(mock, condition, expression, method, args);
 
 			var targetMock = GetTargetMock(obj, mock);
 			targetMock.Setups.Add(setup);
@@ -532,7 +532,7 @@ namespace Moq
 			ThrowIfSetupExpressionInvolvesUnsupportedMember(expression, propGet);
 			ThrowIfSetupMethodNotVisibleToProxyFactory(propGet);
 
-			var setup = new MethodCallReturn<T, TProperty>(mock, condition, expression, propGet, new Expression[0]);
+			var setup = new MethodCallReturn(mock, condition, expression, propGet, new Expression[0]);
 			// Directly casting to MemberExpression is fine as ToPropertyInfo would throw if it wasn't
 			var targetMock = GetTargetMock(((MemberExpression)expression.Body).Expression, mock);
 			targetMock.Setups.Add(setup);

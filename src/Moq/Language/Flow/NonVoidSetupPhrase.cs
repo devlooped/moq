@@ -42,9 +42,9 @@ using System;
 
 namespace Moq.Language.Flow
 {
-	internal class NonVoidSetupPhrase<T, TResult> : SetupPhrase<MethodCallReturn<T, TResult>>, ISetup<T, TResult>, ISetupGetter<T, TResult>, IReturnsResult<T> where T : class
+	internal class NonVoidSetupPhrase<T, TResult> : SetupPhrase<MethodCallReturn>, ISetup<T, TResult>, ISetupGetter<T, TResult>, IReturnsResult<T> where T : class
 	{
-		public NonVoidSetupPhrase(MethodCallReturn<T, TResult> setup) : base(setup)
+		public NonVoidSetupPhrase(MethodCallReturn setup) : base(setup)
 		{
 		}
 
