@@ -175,8 +175,7 @@ namespace Moq
 			Debug.Assert(type != typeof(void));
 			Debug.Assert(mock != null);
 
-			return type.GetTypeInfo().IsValueType ? Activator.CreateInstance(type)
-			     : null;
+			return type.GetDefaultValue();
 		}
 
 		private static object CreateTask(Type type, Mock mock)

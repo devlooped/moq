@@ -52,6 +52,7 @@ using System.Threading.Tasks;
 
 using Moq.Language.Flow;
 using Moq.Properties;
+using Moq.Protected;
 
 namespace Moq
 {
@@ -448,29 +449,29 @@ namespace Moq
 		#region Setup
 
 		[DebuggerStepThrough]
-		internal static MethodCall<T> Setup<T>(Mock<T> mock, Expression<Action<T>> expression, Condition condition)
+		internal static VoidSetupPhrase<T> Setup<T>(Mock<T> mock, Expression<Action<T>> expression, Condition condition)
 			where T : class
 		{
 			return PexProtector.Invoke(SetupPexProtected, mock, expression, condition);
 		}
 
-		private static MethodCall<T> SetupPexProtected<T>(Mock<T> mock, Expression<Action<T>> expression, Condition condition)
+		private static VoidSetupPhrase<T> SetupPexProtected<T>(Mock<T> mock, Expression<Action<T>> expression, Condition condition)
 			where T : class
 		{
 			var (obj, method, args) = expression.GetCallInfo(mock);
 
 			ThrowIfSetupExpressionInvolvesUnsupportedMember(expression, method);
 			ThrowIfSetupMethodNotVisibleToProxyFactory(method);
-			var setup = new MethodCall<T>(mock, condition, expression, method, args);
+			var setup = new MethodCall(mock, condition, expression, method, args);
 
 			var targetMock = GetTargetMock(obj, mock);
 			targetMock.Setups.Add(setup);
 
-			return setup;
+			return new VoidSetupPhrase<T>(setup);
 		}
 
 		[DebuggerStepThrough]
-		internal static MethodCallReturn<T, TResult> Setup<T, TResult>(
+		internal static NonVoidSetupPhrase<T, TResult> Setup<T, TResult>(
 			Mock<T> mock,
 			Expression<Func<T, TResult>> expression,
 			Condition condition)
@@ -479,7 +480,7 @@ namespace Moq
 			return PexProtector.Invoke(SetupPexProtected, mock, expression, condition);
 		}
 
-		private static MethodCallReturn<T, TResult> SetupPexProtected<T, TResult>(
+		private static NonVoidSetupPhrase<T, TResult> SetupPexProtected<T, TResult>(
 			Mock<T> mock,
 			Expression<Func<T, TResult>> expression,
 			Condition condition)
@@ -494,16 +495,16 @@ namespace Moq
 
 			ThrowIfSetupExpressionInvolvesUnsupportedMember(expression, method);
 			ThrowIfSetupMethodNotVisibleToProxyFactory(method);
-			var setup = new MethodCallReturn<T, TResult>(mock, condition, expression, method, args);
+			var setup = new MethodCallReturn(mock, condition, expression, method, args);
 
 			var targetMock = GetTargetMock(obj, mock);
 			targetMock.Setups.Add(setup);
 
-			return setup;
+			return new NonVoidSetupPhrase<T, TResult>(setup);
 		}
 
 		[DebuggerStepThrough]
-		internal static MethodCallReturn<T, TProperty> SetupGet<T, TProperty>(
+		internal static NonVoidSetupPhrase<T, TProperty> SetupGet<T, TProperty>(
 			Mock<T> mock,
 			Expression<Func<T, TProperty>> expression,
 			Condition condition)
@@ -512,7 +513,7 @@ namespace Moq
 			return PexProtector.Invoke(SetupGetPexProtected, mock, expression, condition);
 		}
 
-		private static MethodCallReturn<T, TProperty> SetupGetPexProtected<T, TProperty>(
+		private static NonVoidSetupPhrase<T, TProperty> SetupGetPexProtected<T, TProperty>(
 			Mock<T> mock,
 			Expression<Func<T, TProperty>> expression,
 			Condition condition)
@@ -531,16 +532,16 @@ namespace Moq
 			ThrowIfSetupExpressionInvolvesUnsupportedMember(expression, propGet);
 			ThrowIfSetupMethodNotVisibleToProxyFactory(propGet);
 
-			var setup = new MethodCallReturn<T, TProperty>(mock, condition, expression, propGet, new Expression[0]);
+			var setup = new MethodCallReturn(mock, condition, expression, propGet, new Expression[0]);
 			// Directly casting to MemberExpression is fine as ToPropertyInfo would throw if it wasn't
 			var targetMock = GetTargetMock(((MemberExpression)expression.Body).Expression, mock);
 			targetMock.Setups.Add(setup);
 
-			return setup;
+			return new NonVoidSetupPhrase<T, TProperty>(setup);
 		}
 
 		[DebuggerStepThrough]
-		internal static SetterMethodCall<T, TProperty> SetupSet<T, TProperty>(
+		internal static SetterSetupPhrase<T, TProperty> SetupSet<T, TProperty>(
 			Mock<T> mock,
 			Action<T> setterExpression,
 			Condition condition)
@@ -549,45 +550,46 @@ namespace Moq
 			return PexProtector.Invoke(SetupSetPexProtected<T, TProperty>, mock, setterExpression, condition);
 		}
 
-		private static SetterMethodCall<T, TProperty> SetupSetPexProtected<T, TProperty>(
+		private static SetterSetupPhrase<T, TProperty> SetupSetPexProtected<T, TProperty>(
 			Mock<T> mock,
 			Action<T> setterExpression,
 			Condition condition)
 			where T : class
 		{
-			return SetupSetImpl<T, SetterMethodCall<T, TProperty>>(
+			return SetupSetImpl(
 				mock,
 				setterExpression,
 				(m, expr, method, value) =>
 				{
-					var setup = new SetterMethodCall<T, TProperty>(m, condition, expr, method, value[0]);
+					Debug.Assert(value.Length == 1);
+					var setup = new MethodCall(m, condition, expr, method, value);
 					m.Setups.Add(setup);
-					return setup;
+					return new SetterSetupPhrase<T, TProperty>(setup);
 				});
 		}
 
 		[DebuggerStepThrough]
-		internal static MethodCall<T> SetupSet<T>(Mock<T> mock, Action<T> setterExpression, Condition condition)
+		internal static VoidSetupPhrase<T> SetupSet<T>(Mock<T> mock, Action<T> setterExpression, Condition condition)
 			where T : class
 		{
 			return PexProtector.Invoke(SetupSetPexProtected, mock, setterExpression, condition);
 		}
 
-		private static MethodCall<T> SetupSetPexProtected<T>(Mock<T> mock, Action<T> setterExpression, Condition condition)
+		private static VoidSetupPhrase<T> SetupSetPexProtected<T>(Mock<T> mock, Action<T> setterExpression, Condition condition)
 			where T : class
 		{
-			return SetupSetImpl<T, MethodCall<T>>(
+			return SetupSetImpl(
 				mock,
 				setterExpression,
 				(m, expr, method, values) =>
 				{
-					var setup = new MethodCall<T>(m, condition, expr, method, values);
+					var setup = new MethodCall(m, condition, expr, method, values);
 					m.Setups.Add(setup);
-					return setup;
+					return new VoidSetupPhrase<T>(setup);
 				});
 		}
 
-		internal static SetterMethodCall<T, TProperty> SetupSet<T, TProperty>(
+		internal static SetterSetupPhrase<T, TProperty> SetupSet<T, TProperty>(
 			Mock<T> mock,
 			Expression<Func<T, TProperty>> expression)
 			where T : class
@@ -599,18 +601,18 @@ namespace Moq
 			ThrowIfSetupExpressionInvolvesUnsupportedMember(expression, propSet);
 			ThrowIfSetupMethodNotVisibleToProxyFactory(propSet);
 
-			var setup = new SetterMethodCall<T, TProperty>(mock, expression, propSet);
+			var setup = new MethodCall(mock, null, expression, propSet, new[] { ItExpr.IsAny<TProperty>() });
 			var targetMock = GetTargetMock(((MemberExpression)expression.Body).Expression, mock);
 
 			targetMock.Setups.Add(setup);
 
-			return setup;
+			return new SetterSetupPhrase<T, TProperty>(setup);
 		}
 
-		private static TCall SetupSetImpl<T, TCall>(
+		private static TSetupPhrase SetupSetImpl<T, TSetupPhrase>(
 			Mock<T> mock,
 			Action<T> setterExpression,
-			Func<Mock, LambdaExpression, MethodInfo, Expression[], TCall> callFactory)
+			Func<Mock, LambdaExpression, MethodInfo, Expression[], TSetupPhrase> callFactory)
 			where T : class
 		{
 			using (var context = new FluentMockContext())

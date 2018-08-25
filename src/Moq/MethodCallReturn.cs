@@ -45,14 +45,11 @@ using System.Linq.Expressions;
 using System.Reflection;
 using System.Runtime.CompilerServices;
 
-using Moq.Language;
-using Moq.Language.Flow;
 using Moq.Properties;
 
 namespace Moq
 {
-	internal sealed partial class MethodCallReturn<TMock, TResult> : MethodCall, ISetup<TMock, TResult>, ISetupGetter<TMock, TResult>, IReturnsResult<TMock>
-		where TMock : class
+	internal sealed partial class MethodCallReturn : MethodCall
 	{
 		// This enum exists for reasons of optimizing memory usage.
 		// Previously this class had two `bool` fields, `hasReturnValue` and `callBase`.
@@ -75,164 +72,109 @@ namespace Moq
 
 		public bool ProvidesReturnValue() => this.returnValueKind != ReturnValueKind.None;
 
-		public IVerifies Raises(Action<TMock> eventExpression, EventArgs args)
-		{
-			return this.Raises(eventExpression, () => args);
-		}
+		public Type ReturnType => this.Method.ReturnType;
 
-		public IVerifies Raises(Action<TMock> eventExpression, Func<EventArgs> func)
-		{
-			return this.RaisesImpl(eventExpression, func);
-		}
-
-		public IVerifies Raises(Action<TMock> eventExpression, params object[] args)
-		{
-			return this.RaisesImpl(eventExpression, args);
-		}
-
-		public IReturnsResult<TMock> Returns(Delegate valueFunction)
-		{
-			// If `TResult` is `Delegate`, that is someone is setting up the return value of a method
-			// that returns a `Delegate`, then we have arrived here because C# picked the wrong overload:
-			// We don't want to invoke the passed delegate to get a return value; the passed delegate
-			// already is the return value.
-			if (typeof(TResult) == typeof(Delegate))
-			{
-				return this.Returns(() => (TResult)(object)valueFunction);
-			}
-
-			if (valueFunction != null && valueFunction.GetMethodInfo().ReturnType == typeof(void))
-			{
-				throw new ArgumentException(Resources.InvalidReturnsCallbackNotADelegateWithReturnType, nameof(valueFunction));
-			}
-
-			SetReturnDelegate(valueFunction);
-			return this;
-		}
-
-		public IReturnsResult<TMock> Returns(Func<TResult> valueExpression)
-		{
-			SetReturnDelegate(valueExpression);
-			return this;
-		}
-
-		public IReturnsResult<TMock> Returns(TResult value)
-		{
-			Returns(() => value);
-			return this;
-		}
-
-		public IReturnsResult<TMock> CallBase()
+		public void CallBase()
 		{
 			this.returnValueKind = ReturnValueKind.CallBase;
-			return this;
 		}
 
-		IReturnsThrows<TMock, TResult> ICallback<TMock, TResult>.Callback(Delegate callback)
+		public override void SetCallbackResponse(Delegate callback)
 		{
-			base.Callback(callback);
-			return this;
+			if (this.ProvidesReturnValue())
+			{
+				if (callback is Action callbackWithoutArguments)
+				{
+					this.afterReturnCallback = delegate { callbackWithoutArguments(); };
+				}
+				else
+				{
+					this.afterReturnCallback = delegate (object[] args) { callback.InvokePreserveStack(args); };
+				}
+			}
+			else
+			{
+				base.SetCallbackResponse(callback);
+			}
 		}
 
-		IReturnsThrowsGetter<TMock, TResult> ICallbackGetter<TMock, TResult>.Callback(Action callback)
-		{
-			base.Callback(callback);
-			return this;
-		}
-
-		public new IReturnsThrows<TMock, TResult> Callback(Action callback)
-		{
-			base.Callback(callback);
-			return this;
-		}
-
-		private void SetReturnDelegate(Delegate value)
+		public void SetReturnsResponse(Delegate value)
 		{
 			if (value == null)
 			{
 				// A `null` reference (instead of a valid delegate) is interpreted as the actual return value.
-				// This is necessary because the compiler might have picked the unexpected overload for calls like `Returns(null)`,
-				// or the user might have picked an overload like `Returns<T>(null)`,
+				// This is necessary because the compiler might have picked the unexpected overload for calls
+				// like `Returns(null)`, or the user might have picked an overload like `Returns<T>(null)`,
 				// and instead of in `Returns(TResult)`, we ended up in `Returns(Delegate)` or `Returns(Func)`,
 				// which likely isn't what the user intended.
 				// So here we do what we would've done in `Returns(TResult)`:
-				this.valueDel = (Func<TResult>)(() => default(TResult));
+				this.valueDel = new Func<object>(() => this.ReturnType.GetDefaultValue());
+			}
+			else if (this.ReturnType == typeof(Delegate))
+			{
+				// If `TResult` is `Delegate`, that is someone is setting up the return value of a method
+				// that returns a `Delegate`, then we have arrived here because C# picked the wrong overload:
+				// We don't want to invoke the passed delegate to get a return value; the passed delegate
+				// already is the return value.
+				this.valueDel = new Func<Delegate>(() => value);
 			}
 			else
 			{
-				ValidateReturnDelegate(value);
+				ValidateCallback(value);
 				this.valueDel = value;
 			}
 
 			this.returnValueKind = ReturnValueKind.Explicit;
-		}
 
-		private void ValidateReturnDelegate(Delegate callback)
-		{
-			var callbackMethod = callback.GetMethodInfo();
-
-			// validate number of parameters:
-
-			var numberOfActualParameters = callbackMethod.GetParameters().Length;
-			if (callbackMethod.IsStatic)
+			void ValidateCallback(Delegate callback)
 			{
-				if (callbackMethod.IsExtensionMethod() || callback.Target != null)
+				var callbackMethod = callback.GetMethodInfo();
+
+				// validate number of parameters:
+
+				var numberOfActualParameters = callbackMethod.GetParameters().Length;
+				if (callbackMethod.IsStatic)
 				{
-					numberOfActualParameters--;
+					if (callbackMethod.IsExtensionMethod() || callback.Target != null)
+					{
+						numberOfActualParameters--;
+					}
 				}
-			}
 
-			if (numberOfActualParameters > 0)
-			{
-				var numberOfExpectedParameters = this.Method.GetParameters().Length;
-				if (numberOfActualParameters != numberOfExpectedParameters)
+				if (numberOfActualParameters > 0)
+				{
+					var numberOfExpectedParameters = this.Method.GetParameters().Length;
+					if (numberOfActualParameters != numberOfExpectedParameters)
+					{
+						throw new ArgumentException(
+							string.Format(
+								CultureInfo.CurrentCulture,
+								Resources.InvalidCallbackParameterCountMismatch,
+								numberOfExpectedParameters,
+								numberOfActualParameters));
+					}
+				}
+
+				// validate return type:
+
+				var actualReturnType = callbackMethod.ReturnType;
+
+				if (actualReturnType == typeof(void))
+				{
+					throw new ArgumentException(Resources.InvalidReturnsCallbackNotADelegateWithReturnType);
+				}
+
+				var expectedReturnType = this.Method.ReturnType;
+
+				if (!expectedReturnType.IsAssignableFrom(actualReturnType))
 				{
 					throw new ArgumentException(
 						string.Format(
 							CultureInfo.CurrentCulture,
-							Resources.InvalidCallbackParameterCountMismatch,
-							numberOfExpectedParameters,
-							numberOfActualParameters));
+							Resources.InvalidCallbackReturnTypeMismatch,
+							expectedReturnType,
+							actualReturnType));
 				}
-			}
-
-			// validate return type:
-
-			var expectedReturnType = this.Method.ReturnType;
-			var actualReturnType = callbackMethod.ReturnType;
-
-			if (!expectedReturnType.IsAssignableFrom(actualReturnType))
-			{
-				throw new ArgumentException(
-					string.Format(
-						CultureInfo.CurrentCulture,
-						Resources.InvalidCallbackReturnTypeMismatch,
-						expectedReturnType,
-						actualReturnType));
-			}
-		}
-
-		protected override void SetCallbackWithoutArguments(Action callback)
-		{
-			if (this.ProvidesReturnValue())
-			{
-				this.afterReturnCallback = delegate { callback(); };
-			}
-			else
-			{
-				base.SetCallbackWithoutArguments(callback);
-			}
-		}
-
-		protected override void SetCallbackWithArguments(Delegate callback)
-		{
-			if (this.ProvidesReturnValue())
-			{
-				this.afterReturnCallback = delegate(object[] args) { callback.InvokePreserveStack(args); };
-			}
-			else
-			{
-				base.SetCallbackWithArguments(callback);
 			}
 		}
 
@@ -256,7 +198,7 @@ namespace Moq
 			}
 			else
 			{
-				invocation.Return(default(TResult));
+				invocation.Return(this.ReturnType.GetDefaultValue());
 			}
 
 			this.afterReturnCallback?.Invoke(invocation.Arguments);

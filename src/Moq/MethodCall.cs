@@ -49,38 +49,11 @@ using System.Linq.Expressions;
 using System.Reflection;
 using System.Text;
 
-using Moq.Language;
-using Moq.Language.Flow;
 using Moq.Properties;
 
 namespace Moq
 {
-	internal partial class MethodCall<TMock> : MethodCall, ISetup<TMock>
-		where TMock : class
-	{
-		public MethodCall(Mock mock, Condition condition, LambdaExpression originalExpression, MethodInfo method,
-			IReadOnlyList<Expression> arguments)
-			: base(mock, condition, originalExpression, method, arguments)
-		{
-		}
-
-		public IVerifies Raises(Action<TMock> eventExpression, EventArgs args)
-		{
-			return Raises(eventExpression, () => args);
-		}
-
-		public IVerifies Raises(Action<TMock> eventExpression, Func<EventArgs> func)
-		{
-			return RaisesImpl(eventExpression, func);
-		}
-
-		public IVerifies Raises(Action<TMock> eventExpression, params object[] args)
-		{
-			return RaisesImpl(eventExpression, args);
-		}
-	}
-
-	internal partial class MethodCall : ICallbackResult, IVerifies, IThrowsResult
+	internal partial class MethodCall
 	{
 		private Action<object[]> callbackResponse;
 		private int callCount;
@@ -255,66 +228,77 @@ namespace Moq
 			}
 		}
 
-		public IThrowsResult Throws(Exception exception)
-		{
-			this.throwExceptionResponse = exception;
-			return this;
-		}
-
-		public IThrowsResult Throws<TException>()
-			where TException : Exception, new()
-		{
-			return this.Throws(new TException());
-		}
-
-		public ICallbackResult Callback(Action callback)
-		{
-			SetCallbackWithoutArguments(callback);
-			return this;
-		}
-
-		public ICallbackResult Callback(Delegate callback)
+		public virtual void SetCallbackResponse(Delegate callback)
 		{
 			if (callback == null)
 			{
 				throw new ArgumentNullException(nameof(callback));
 			}
 
-			if (callback.GetMethodInfo().ReturnType != typeof(void))
+			if (callback is Action callbackWithoutArguments)
 			{
-				throw new ArgumentException(Resources.InvalidCallbackNotADelegateWithReturnTypeVoid, nameof(callback));
+				this.callbackResponse = (object[] args) => callbackWithoutArguments();
+			}
+			else
+			{
+				var expectedParams = this.Method.GetParameters();
+				var actualParams = callback.GetMethodInfo().GetParameters();
+
+				if (!callback.HasCompatibleParameterList(expectedParams))
+				{
+					ThrowParameterMismatch(expectedParams, actualParams);
+				}
+
+				if (callback.GetMethodInfo().ReturnType != typeof(void))
+				{
+					throw new ArgumentException(Resources.InvalidCallbackNotADelegateWithReturnTypeVoid, nameof(callback));
+				}
+
+				this.callbackResponse = (object[] args) => callback.InvokePreserveStack(args);
 			}
 
-			this.SetCallbackWithArguments(callback);
-			return this;
-		}
-
-		protected virtual void SetCallbackWithoutArguments(Action callback)
-		{
-			this.callbackResponse = (object[] args) => callback();
-		}
-
-		protected virtual void SetCallbackWithArguments(Delegate callback)
-		{
-			var expectedParams = this.Method.GetParameters();
-			var actualParams = callback.GetMethodInfo().GetParameters();
-
-			if (!callback.HasCompatibleParameterList(expectedParams))
+			void ThrowParameterMismatch(ParameterInfo[] expected, ParameterInfo[] actual)
 			{
-				ThrowParameterMismatch(expectedParams, actualParams);
+				throw new ArgumentException(
+					string.Format(
+						CultureInfo.CurrentCulture,
+						Resources.InvalidCallbackParameterMismatch,
+						string.Join(",", expected.Select(p => p.ParameterType.Name).ToArray()),
+						string.Join(",", actual.Select(p => p.ParameterType.Name).ToArray())));
 			}
-
-			this.callbackResponse = (object[] args) => callback.InvokePreserveStack(args);
 		}
 
-		private static void ThrowParameterMismatch(ParameterInfo[] expected, ParameterInfo[] actual)
+		public void SetRaiseEventResponse<TMock>(Action<TMock> eventExpression, Delegate func)
+			where TMock : class
 		{
-			throw new ArgumentException(string.Format(
-				CultureInfo.CurrentCulture,
-				Resources.InvalidCallbackParameterMismatch,
-				string.Join(",", expected.Select(p => p.ParameterType.Name).ToArray()),
-				string.Join(",", actual.Select(p => p.ParameterType.Name).ToArray())
-			));
+			var (ev, _) = eventExpression.GetEventWithTarget((TMock)mock.Object);
+			if (ev != null)
+			{
+				this.raiseEventResponse = new RaiseEventResponse(this.mock, ev, func, null);
+			}
+			else
+			{
+				this.raiseEventResponse = null;
+			}
+		}
+
+		public void SetRaiseEventResponse<TMock>(Action<TMock> eventExpression, params object[] args)
+			where TMock : class
+		{
+			var (ev, _) = eventExpression.GetEventWithTarget((TMock)mock.Object);
+			if (ev != null)
+			{
+				this.raiseEventResponse = new RaiseEventResponse(this.mock, ev, null, args);
+			}
+			else
+			{
+				this.raiseEventResponse = null;
+			}
+		}
+
+		public void SetThrowExceptionResponse(Exception exception)
+		{
+			this.throwExceptionResponse = exception;
 		}
 
 		public void Verifiable()
@@ -328,44 +312,11 @@ namespace Moq
 			this.failMessage = failMessage;
 		}
 
-		public IVerifies AtMostOnce() => this.AtMost(1);
+		public void AtMostOnce() => this.AtMost(1);
 
-		public IVerifies AtMost(int callCount)
+		public void AtMost(int callCount)
 		{
 			this.expectedMaxCallCount = callCount;
-			return this;
-		}
-
-		protected IVerifies RaisesImpl<TMock>(Action<TMock> eventExpression, Delegate func)
-			where TMock : class
-		{
-			var (ev, _) = eventExpression.GetEventWithTarget((TMock)mock.Object);
-			if (ev != null)
-			{
-				this.raiseEventResponse = new RaiseEventResponse(this.mock, ev, func, null);
-			}
-			else
-			{
-				this.raiseEventResponse = null;
-			}
-
-			return this;
-		}
-
-		protected IVerifies RaisesImpl<TMock>(Action<TMock> eventExpression, params object[] args)
-			where TMock : class
-		{
-			var (ev, _) = eventExpression.GetEventWithTarget((TMock)mock.Object);
-			if (ev != null)
-			{
-				this.raiseEventResponse = new RaiseEventResponse(this.mock, ev, null, args);
-			}
-			else
-			{
-				this.raiseEventResponse = null;
-			}
-
-			return this;
 		}
 
 		public override string ToString()
