@@ -118,7 +118,7 @@ namespace Moq
 
 			string FormatSetupsInfo()
 			{
-				var expressionSetups = setups.Select(s => s.Format()).ToArray();
+				var expressionSetups = setups.Select(s => s.ToString()).ToArray();
 
 				return expressionSetups.Length == 0 ?
 					Resources.NoSetupsConfigured :

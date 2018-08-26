@@ -347,28 +347,6 @@ namespace Moq
 			return message.ToString().Trim();
 		}
 
-		public string Format()
-		{
-			var builder = new StringBuilder();
-			builder.Append(this.originalExpression.PartialMatcherAwareEval().ToStringFixed());
-
-			if (this.expectedMaxCallCount != null)
-			{
-				if (this.expectedMaxCallCount == 1)
-				{
-					builder.Append(", Times.AtMostOnce()");
-				}
-				else
-				{
-					builder.Append(", Times.AtMost(");
-					builder.Append(this.expectedMaxCallCount.Value);
-					builder.Append(")");
-				}
-			}
-
-			return builder.ToString();
-		}
-
 		private sealed class RaiseEventResponse
 		{
 			private Mock mock;
