@@ -56,6 +56,7 @@ namespace Moq
 	internal partial class MethodCall
 	{
 		private Action<object[]> callbackResponse;
+		private bool callBase;
 		private int callCount;
 		private Condition condition;
 		private InvocationShape expectation;
@@ -220,12 +221,22 @@ namespace Moq
 
 			this.callbackResponse?.Invoke(invocation.Arguments);
 
+			if (this.callBase)
+			{
+				invocation.ReturnBase();
+			}
+
 			this.raiseEventResponse?.RespondTo(invocation);
 
 			if (this.throwExceptionResponse != null)
 			{
 				throw this.throwExceptionResponse;
 			}
+		}
+
+		public virtual void SetCallBaseResponse()
+		{
+			this.callBase = true;
 		}
 
 		public virtual void SetCallbackResponse(Delegate callback)

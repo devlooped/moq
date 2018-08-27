@@ -162,9 +162,9 @@ namespace Moq.Language.Flow
 			return this;
 		}
 
-		public IReturnsResult<T> CallBase()
+		public new IReturnsResult<T> CallBase()
 		{
-			this.Setup.CallBase();
+			this.Setup.SetCallBaseResponse();
 			return this;
 		}
 
