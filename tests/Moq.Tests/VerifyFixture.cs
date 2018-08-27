@@ -1309,6 +1309,73 @@ namespace Moq.Tests
 			// X is non-transitive if there are no invocations on the sub-object that occur later.
 		}
 
+		// (This test is somewhat duplicate, but sets the stage for the test following right after it.)
+		[Fact]
+		public void VerifyNoOtherCalls_works_together_with_parameterized_Verify()
+		{
+			var cat = new Mock<ICat>();
+			cat.Setup(x => x.Purr(15)).Returns("happy");
+
+			var mood = cat.Object.Purr(15);
+
+			cat.Verify(x => x.Purr(15));
+			Assert.Equal("happy", mood);
+			cat.VerifyNoOtherCalls();
+		}
+
+		[Fact]
+		public void VerifyNoOtherCalls_works_together_with_parameterless_Verify()
+		{
+			var cat = new Mock<ICat>();
+			cat.Setup(x => x.Purr(15)).Returns("happy").Verifiable();
+
+			var mood = cat.Object.Purr(15);
+
+			cat.Verify();
+			Assert.Equal("happy", mood);
+			cat.VerifyNoOtherCalls();
+		}
+
+		[Fact]
+		public void VerifyNoOtherCalls_works_together_with_parameterless_VerifyAll()
+		{
+			var cat = new Mock<ICat>();
+			cat.Setup(x => x.Purr(15)).Returns("happy");
+
+			var mood = cat.Object.Purr(15);
+
+			cat.VerifyAll();
+			Assert.Equal("happy", mood);
+			cat.VerifyNoOtherCalls();
+		}
+
+		[Fact]
+		public void VerifyNoOtherCalls_still_complains_about_surplus_call_after_VerifyAll()
+		{
+			var cat = new Mock<ICat>();
+			cat.Setup(x => x.Purr(15)).Returns("happy");
+
+			var mood = cat.Object.Purr(15);
+			cat.Object.Hiss();
+
+			cat.VerifyAll();
+			Assert.Throws<MockException>(() => cat.VerifyNoOtherCalls());
+		}
+
+		[Fact]
+		public void VerifyNoOtherCalls_works_with_a_combination_of_parameterised_Verify_and_VerifyAll()
+		{
+			var cat = new Mock<ICat>();
+			cat.Setup(x => x.Purr(15)).Returns("happy");
+
+			var mood = cat.Object.Purr(15);
+			cat.Object.Hiss();
+
+			cat.VerifyAll();
+			cat.Verify(x => x.Hiss());
+			cat.VerifyNoOtherCalls();
+		}
+
 		public interface IBar
 		{
 			int? Value { get; set; }
@@ -1354,6 +1421,12 @@ namespace Moq.Tests
 		{
 			void add_Something();
 			void remove_Something();
+		}
+
+		public interface ICat
+		{
+			string Purr(int amount);
+			void Hiss();
 		}
 	}
 }

@@ -253,6 +253,11 @@ namespace Moq
 
 		private bool TryVerify(out MockException error)
 		{
+			foreach (Invocation invocation in this.MutableInvocations)
+			{
+				invocation.MarkAsVerifiedIfMatchedByVerifiableSetup();
+			}
+
 			var uninvokedVerifiableSetups = this.Setups.ToArrayLive(setup => setup.IsVerifiable && !setup.Invoked);
 			if (uninvokedVerifiableSetups.Length > 0)
 			{
@@ -283,6 +288,11 @@ namespace Moq
 
 		private bool TryVerifyAll(out MockException error)
 		{
+			foreach (Invocation invocation in this.MutableInvocations)
+			{
+				invocation.MarkAsVerifiedIfMatchedBySetup();
+			}
+
 			var uninvokedSetups = this.Setups.ToArrayLive(setup => !setup.Invoked);
 			if (uninvokedSetups.Length > 0)
 			{

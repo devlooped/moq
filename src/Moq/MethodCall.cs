@@ -207,6 +207,15 @@ namespace Moq
 		{
 			++this.callCount;
 
+			if (this.verifiable)
+			{
+				invocation.MarkAsMatchedByVerifiableSetup();
+			}
+			else
+			{
+				invocation.MarkAsMatchedBySetup();
+			}
+
 			if (expectedMaxCallCount.HasValue && this.callCount > expectedMaxCallCount)
 			{
 				if (expectedMaxCallCount == 1)
