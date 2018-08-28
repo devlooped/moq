@@ -2007,6 +2007,219 @@ namespace Moq.Tests.Regressions
 
 		#endregion
 
+		#region 665-667
+
+		public class Issues665to667
+		{
+			[Fact]
+			public void Callback_Returns_Callback_invokes_first_callback()
+			{
+				bool firstCallbackInvoked = false;
+
+				var mock = new Mock<Foo>();
+				mock.Setup(m => m.ToString())
+					.Callback(() => firstCallbackInvoked = true)
+					.Returns(() => default(string))
+					.Callback(() => { });
+
+				mock.Object.ToString();
+
+				Assert.True(firstCallbackInvoked);
+			}
+
+			[Fact]
+			public void Callback_Returns_Callback_sets_return_value()
+			{
+				var mock = new Mock<Foo>();
+				mock.Setup(m => m.ToString())
+					.Callback(() => { })
+					.Returns(() => "some string")
+					.Callback(() => { });
+
+				var returnValue = mock.Object.ToString();
+
+				Assert.Equal("some string", returnValue);
+			}
+
+			[Fact]
+			public void Callback_Returns_Callback_invokes_second_callback()
+			{
+				bool secondCallbackInvoked = false;
+
+				var mock = new Mock<Foo>();
+				mock.Setup(m => m.ToString())
+					.Callback(() => { })
+					.Returns(() => default(string))
+					.Callback(() => secondCallbackInvoked = true);
+
+				mock.Object.ToString();
+
+				Assert.True(secondCallbackInvoked);
+			}
+
+			[Fact]
+			public void Callback_CallBase_Callback_invokes_first_callback()
+			{
+				bool firstCallbackInvoked = false;
+
+				var mock = new Mock<Foo>();
+				mock.Setup(m => m.ToString())
+					.Callback(() => firstCallbackInvoked = true)
+					.CallBase()
+					.Callback(() => { });
+
+				mock.Object.ToString();
+
+				Assert.True(firstCallbackInvoked);
+			}
+
+			[Fact]
+			public void Callback_CallBase_Callback_sets_return_value()
+			{
+				var mock = new Mock<Foo>();
+				mock.Setup(m => m.ToString())
+					.Callback(() => { })
+					.CallBase()
+					.Callback(() => { });
+
+				var returnValue = mock.Object.ToString();
+
+				Assert.Equal("original", returnValue);
+			}
+
+			[Fact]
+			public void Callback_CallBase_Callback_invokes_second_callback()
+			{
+				bool secondCallbackInvoked = false;
+
+				var mock = new Mock<Foo>();
+				mock.Setup(m => m.ToString())
+					.Callback(() => { })
+					.CallBase()
+					.Callback(() => secondCallbackInvoked = true);
+
+				mock.Object.ToString();
+
+				Assert.True(secondCallbackInvoked);
+			}
+
+			[Fact]
+			public void Callback_Returns_Callback_Throws_invokes_first_callback()
+			{
+				bool firstCallbackInvoked = false;
+
+				var mock = new Mock<Foo>();
+				mock.Setup(m => m.ToString())
+					.Callback(() => firstCallbackInvoked = true)
+					.Returns(() => default(string))
+					.Callback(() => { })
+					.Throws<Exception>();
+
+				Assert.Throws<Exception>(() => mock.Object.ToString());
+
+				Assert.True(firstCallbackInvoked);
+			}
+
+			[Fact]
+			public void Callback_Returns_Callback_Throws_throws()
+			{
+				var mock = new Mock<Foo>();
+				mock.Setup(m => m.ToString())
+					.Callback(() => { })
+					.Returns(() => "some string")
+					.Callback(() => { })
+					.Throws<Exception>();
+
+				Assert.Throws<Exception>(() => mock.Object.ToString());
+			}
+
+			[Fact]
+			public void Callback_Returns_Callback_Throws_invokes_second_callback()
+			{
+				bool secondCallbackInvoked = false;
+
+				var mock = new Mock<Foo>();
+				mock.Setup(m => m.ToString())
+					.Callback(() => { })
+					.Returns(() => default(string))
+					.Callback(() => secondCallbackInvoked = true)
+					.Throws<Exception>();
+
+				Assert.Throws<Exception>(() => mock.Object.ToString());
+
+				Assert.True(secondCallbackInvoked);
+			}
+
+			[Fact]
+			public void Callback_CallBase_Callback_Throws_invokes_first_callback_and_throws()
+			{
+				bool firstCallbackInvoked = false;
+
+				var mock = new Mock<Foo>();
+				mock.Setup(m => m.ToString())
+					.Callback(() => firstCallbackInvoked = true)
+					.CallBase()
+					.Callback(() => { })
+					.Throws<Exception>();
+
+				Assert.Throws<Exception>(() => mock.Object.ToString());
+
+				Assert.True(firstCallbackInvoked);
+			}
+
+			[Fact]
+			public void Callback_CallBase_Callback_Throws_throws()
+			{
+				var mock = new Mock<Foo>();
+				mock.Setup(m => m.ToString())
+					.Callback(() => { })
+					.CallBase()
+					.Callback(() => { })
+					.Throws<Exception>();
+
+				Assert.Throws<Exception>(() => mock.Object.ToString());
+			}
+
+			[Fact]
+			public void Callback_CallBase_Callback_Throws_invokes_second_callback_and_throws()
+			{
+				bool secondCallbackInvoked = false;
+
+				var mock = new Mock<Foo>();
+				mock.Setup(m => m.ToString())
+					.Callback(() => { })
+					.CallBase()
+					.Callback(() => secondCallbackInvoked = true)
+					.Throws<Exception>();
+
+				Assert.Throws<Exception>(() => mock.Object.ToString());
+
+				Assert.True(secondCallbackInvoked);
+			}
+
+			[Fact]
+			public void Callback_Returns_Callback_CallBase_is_illogical_but_possible()
+			{
+				var mock = new Mock<Foo>();
+				mock.Setup(m => m.ToString())
+					.Callback(() => { })
+					.Returns(() => "changed")
+					.Callback(() => { })
+					.CallBase();
+
+				var returnValue = mock.Object.ToString();
+
+				Assert.Equal("original", returnValue);
+			}
+
+			public class Foo
+			{
+				public override string ToString() => "original";
+			}
+		}
+
+		#endregion
+
 		// Old @ Google Code
 
 		#region #47
