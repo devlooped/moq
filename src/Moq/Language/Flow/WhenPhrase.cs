@@ -38,20 +38,18 @@
 //[This is the BSD license, see
 // http://www.opensource.org/licenses/bsd-license.php]
 
-using Moq.Language;
-using Moq.Language.Flow;
 using System;
 using System.Linq.Expressions;
 
-namespace Moq
+namespace Moq.Language.Flow
 {
-	internal class ConditionalContext<T> : ISetupConditionResult<T>
+	internal sealed class WhenPhrase<T> : ISetupConditionResult<T>
 		where T : class
 	{
 		private Mock<T> mock;
 		private Condition condition;
 
-		public ConditionalContext(Mock<T> mock, Condition condition)
+		public WhenPhrase(Mock<T> mock, Condition condition)
 		{
 			this.mock = mock;
 			this.condition = condition;

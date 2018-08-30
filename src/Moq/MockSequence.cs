@@ -1,6 +1,7 @@
 ﻿using System.ComponentModel;
 
 using Moq.Language;
+using Moq.Language.Flow;
 
 namespace Moq
 {
@@ -38,7 +39,7 @@ namespace Moq
 		{
 			var expectationPosition = sequenceLength++;
 
-			return mock.When(new Condition(
+			return new WhenPhrase<TMock>(mock, new Condition(
 				condition: () => expectationPosition == sequenceStep,
 				success: NextStep));
 		}

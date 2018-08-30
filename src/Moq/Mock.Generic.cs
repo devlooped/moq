@@ -432,12 +432,7 @@ namespace Moq
 		/// <include file='Mock.Generic.xdoc' path='docs/doc[@for="Mock{T}.When"]/*'/>
 		public ISetupConditionResult<T> When(Func<bool> condition)
 		{
-			return When(new Condition(condition));
-		}
-
-		internal ISetupConditionResult<T> When(Condition condition)
-		{
-			return new ConditionalContext<T>(this, condition);
+			return new WhenPhrase<T>(this, new Condition(condition));
 		}
 
 #endregion
