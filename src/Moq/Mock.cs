@@ -797,7 +797,7 @@ namespace Moq
 				object value = null;
 				bool valueNotSet = true;
 
-				mock.Setups.Add(new PropertyGetterMethodCall(mock, expression, getter, () =>
+				mock.Setups.Add(new AutoImplementedPropertyGetterSetup(expression, getter, () =>
 				{
 					if (valueNotSet)
 					{
@@ -827,7 +827,7 @@ namespace Moq
 
 				if (property.CanWrite)
 				{
-					mock.Setups.Add(new PropertySetterMethodCall(mock, expression, property.GetSetMethod(true), (newValue) =>
+					mock.Setups.Add(new AutoImplementedPropertySetterSetup(expression, property.GetSetMethod(true), (newValue) =>
 					{
 						value = newValue;
 						valueNotSet = false;

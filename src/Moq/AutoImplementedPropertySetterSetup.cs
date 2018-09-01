@@ -43,25 +43,41 @@ using System.Diagnostics;
 using System.Linq.Expressions;
 using System.Reflection;
 
+using Moq.Matchers;
+
 namespace Moq
 {
-	internal sealed class PropertyGetterMethodCall : MethodCall
+	/// <summary>
+	///   Setup used by <see cref="Mock.SetupAllProperties(Mock)"/> for property setters.
+	/// </summary>
+	internal sealed class AutoImplementedPropertySetterSetup : Setup
 	{
-		private static IMatcher[] noArgumentMatchers = new IMatcher[0];
+		private static IMatcher[] anyMatcherForSingleArgument = new IMatcher[] { AnyMatcher.Instance };
 
-		private Func<object> getter;
+		private LambdaExpression expression;
+		private Action<object> setter;
+		private bool invoked;
 
-		public PropertyGetterMethodCall(Mock mock, LambdaExpression originalExpression, MethodInfo method, Func<object> getter)
-			: base(mock, null, originalExpression, method, noArgumentMatchers)
+		public AutoImplementedPropertySetterSetup(LambdaExpression originalExpression, MethodInfo method, Action<object> setter)
+			: base(new InvocationShape(method, anyMatcherForSingleArgument))
 		{
-			this.getter = getter;
+			this.expression = originalExpression;
+			this.setter = setter;
 		}
+
+		public override LambdaExpression Expression => this.expression;
 
 		public override void Execute(Invocation invocation)
 		{
-			base.Execute(invocation);
+			this.invoked = true;
 
-			invocation.Return(this.getter.Invoke());
+			this.setter.Invoke(invocation.Arguments[0]);
+			invocation.Return();
+		}
+
+		public override bool TryVerifyAll()
+		{
+			return this.invoked;
 		}
 	}
 }
