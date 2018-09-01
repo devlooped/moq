@@ -53,7 +53,7 @@ using Moq.Properties;
 
 namespace Moq
 {
-	internal partial class MethodCall : Setup
+	internal partial class MethodCall : SetupWithOutParameterSupport
 	{
 		private Action<object[]> callbackResponse;
 		private bool callBase;
@@ -67,47 +67,17 @@ namespace Moq
 		private int originalCallerLineNumber;
 		private MethodBase originalCallerMember;
 #endif
-		private List<KeyValuePair<int, object>> outValues;
 		private RaiseEventResponse raiseEventResponse;
 		private Exception throwExceptionResponse;
 		private bool verifiable;
 
 		public MethodCall(Mock mock, Condition condition, LambdaExpression originalExpression, MethodInfo method, IReadOnlyList<Expression> arguments)
-			: base(new InvocationShape(method, arguments), originalExpression)
+			: base(method, arguments, originalExpression)
 		{
 			this.condition = condition;
 			this.mock = mock;
-			this.outValues = GetOutValues(arguments, method.GetParameters());
 
 			this.SetFileInfo();
-		}
-
-		private static List<KeyValuePair<int, object>> GetOutValues(IReadOnlyList<Expression> arguments, ParameterInfo[] parameters)
-		{
-			List<KeyValuePair<int, object>> outValues = null;
-			for (int i = 0, n = parameters.Length; i < n; ++i)
-			{
-				var parameter = parameters[i];
-				if (parameter.ParameterType.IsByRef)
-				{
-					if ((parameter.Attributes & (ParameterAttributes.In | ParameterAttributes.Out)) == ParameterAttributes.Out)
-					{
-						var constant = arguments[i].PartialEval() as ConstantExpression;
-						if (constant == null)
-						{
-							throw new NotSupportedException(Resources.OutExpressionMustBeConstantValue);
-						}
-
-						if (outValues == null)
-						{
-							outValues = new List<KeyValuePair<int, object>>();
-						}
-
-						outValues.Add(new KeyValuePair<int, object>(i, constant.Value));
-					}
-				}
-			}
-			return outValues;
 		}
 
 		public string FailMessage
@@ -155,19 +125,6 @@ namespace Moq
 				// Must NEVER fail, as this is a nice-to-have feature only.
 			}
 #endif
-		}
-
-		public override void SetOutParameters(Invocation invocation)
-		{
-			if (this.outValues == null)
-			{
-				return;
-			}
-
-			foreach (var item in this.outValues)
-			{
-				invocation.Arguments[item.Key] = item.Value;
-			}
 		}
 
 		public override void Execute(Invocation invocation)
