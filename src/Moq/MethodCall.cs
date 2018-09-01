@@ -133,7 +133,7 @@ namespace Moq
 
 		public Mock Mock => this.mock;
 
-		public override LambdaExpression SetupExpression => this.originalExpression;
+		public override LambdaExpression Expression => this.originalExpression;
 
 		public override Condition Condition => this.condition;
 

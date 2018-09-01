@@ -149,7 +149,7 @@ namespace Moq
 						visitedSetupsPerMethod.Add(setup.Method, visitedSetupsForMethod);
 					}
 
-					var expr = setup.SetupExpression.PartialMatcherAwareEval();
+					var expr = setup.Expression.PartialMatcherAwareEval();
 					if (visitedSetupsForMethod.Any(vc => ExpressionComparer.Default.Equals(vc, expr)))
 					{
 						continue;

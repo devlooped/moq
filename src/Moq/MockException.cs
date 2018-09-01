@@ -86,7 +86,7 @@ namespace Moq
 		{
 			return new MockException(
 				MockExceptionReason.MoreThanOneCall,
-				Times.AtMostOnce().GetExceptionMessage(setup.FailMessage, setup.SetupExpression.ToStringFixed(), invocationCount));
+				Times.AtMostOnce().GetExceptionMessage(setup.FailMessage, setup.Expression.ToStringFixed(), invocationCount));
 		}
 
 		/// <summary>
@@ -96,7 +96,7 @@ namespace Moq
 		{
 			return new MockException(
 				MockExceptionReason.MoreThanNCalls,
-				Times.AtMost(maxInvocationCount).GetExceptionMessage(setup.FailMessage, setup.SetupExpression.ToStringFixed(), invocationCount));
+				Times.AtMost(maxInvocationCount).GetExceptionMessage(setup.FailMessage, setup.Expression.ToStringFixed(), invocationCount));
 		}
 
 		/// <summary>

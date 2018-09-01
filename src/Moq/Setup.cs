@@ -55,9 +55,9 @@ namespace Moq
 
 		public virtual Condition Condition => null;
 
-		public MethodInfo Method => this.expectation.Method;
+		public abstract LambdaExpression Expression { get; }
 
-		public abstract LambdaExpression SetupExpression { get; }
+		public MethodInfo Method => this.expectation.Method;
 
 		protected virtual bool IsVerifiable => false;
 
@@ -74,8 +74,8 @@ namespace Moq
 
 		public override string ToString()
 		{
-			var expression = this.SetupExpression.PartialMatcherAwareEval();
-			var mockedType = this.SetupExpression.Parameters[0].Type;
+			var expression = this.Expression.PartialMatcherAwareEval();
+			var mockedType = this.Expression.Parameters[0].Type;
 
 			var builder = new StringBuilder();
 			builder.AppendNameOf(mockedType)

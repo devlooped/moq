@@ -439,7 +439,7 @@ namespace Moq
 			var matchingInvocationCount = matchingInvocations.Length;
 			if (!times.Verify(matchingInvocationCount))
 			{
-				var setups = targetMock.Setups.ToArrayLive(oc => AreSameMethod(oc.SetupExpression, expression));
+				var setups = targetMock.Setups.ToArrayLive(oc => AreSameMethod(oc.Expression, expression));
 				throw MockException.NoMatchingCalls(failMessage, setups, allInvocations, expression, times, matchingInvocationCount);
 			}
 			else
