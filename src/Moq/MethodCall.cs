@@ -90,7 +90,7 @@ namespace Moq
 
 		public override Condition Condition => this.condition;
 
-		protected override bool IsVerifiable => this.verifiable;
+		public override bool IsVerifiable => this.verifiable;
 
 		[Conditional("DESKTOP")]
 		[SuppressMessage("Microsoft.Design", "CA1031:DoNotCatchGeneralExceptionTypes")]
@@ -130,15 +130,6 @@ namespace Moq
 		public override void Execute(Invocation invocation)
 		{
 			++this.callCount;
-
-			if (this.verifiable)
-			{
-				invocation.MarkAsMatchedByVerifiableSetup();
-			}
-			else
-			{
-				invocation.MarkAsMatchedBySetup();
-			}
 
 			if (expectedMaxCallCount.HasValue && this.callCount > expectedMaxCallCount)
 			{
