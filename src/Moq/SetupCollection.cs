@@ -137,7 +137,7 @@ namespace Moq
 			{
 				foreach (var setup in this.setups)
 				{
-					if (setup.IsConditional)
+					if (setup.Condition != null)
 					{
 						continue;
 					}

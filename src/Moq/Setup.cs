@@ -52,9 +52,7 @@ namespace Moq
 			this.expectation = expectation;
 		}
 
-		protected abstract Condition Condition { get; }
-
-		public bool IsConditional => this.Condition != null;
+		public abstract Condition Condition { get; }
 
 		public abstract bool IsVerifiable { get; }
 
@@ -64,13 +62,11 @@ namespace Moq
 
 		public abstract LambdaExpression SetupExpression { get; }
 
-		public abstract void EvaluatedSuccessfully();
-
 		public abstract void Execute(Invocation invocation);
 
 		public bool Matches(Invocation invocation)
 		{
-			return this.expectation.IsMatch(invocation) && (!this.IsConditional || this.Condition.IsTrue);
+			return this.expectation.IsMatch(invocation) && (this.Condition == null || this.Condition.IsTrue);
 		}
 
 		public abstract void SetOutParameters(Invocation invocation);

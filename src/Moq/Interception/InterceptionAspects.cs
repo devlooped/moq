@@ -154,7 +154,7 @@ namespace Moq
 			var matchedSetup = mock.Setups.FindMatchFor(invocation);
 			if (matchedSetup != null)
 			{
-				matchedSetup.EvaluatedSuccessfully();
+				matchedSetup.Condition?.EvaluatedSuccessfully();
 				matchedSetup.SetOutParameters(invocation);
 
 				// We first execute, as there may be a Throws 

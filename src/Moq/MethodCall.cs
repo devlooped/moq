@@ -139,7 +139,7 @@ namespace Moq
 
 		public override LambdaExpression SetupExpression => this.originalExpression;
 
-		protected override Condition Condition => this.condition;
+		public override Condition Condition => this.condition;
 
 		[Conditional("DESKTOP")]
 		[SuppressMessage("Microsoft.Design", "CA1031:DoNotCatchGeneralExceptionTypes")]
@@ -187,12 +187,6 @@ namespace Moq
 			{
 				invocation.Arguments[item.Key] = item.Value;
 			}
-		}
-
-		public override void EvaluatedSuccessfully()
-		{
-			if (condition != null)
-				condition.EvaluatedSuccessfully();
 		}
 
 		public override void Execute(Invocation invocation)
