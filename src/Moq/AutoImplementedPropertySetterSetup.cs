@@ -39,7 +39,6 @@
 // http://www.opensource.org/licenses/bsd-license.php]
 
 using System;
-using System.Diagnostics;
 using System.Linq.Expressions;
 using System.Reflection;
 
@@ -54,18 +53,14 @@ namespace Moq
 	{
 		private static IMatcher[] anyMatcherForSingleArgument = new IMatcher[] { AnyMatcher.Instance };
 
-		private LambdaExpression expression;
 		private Action<object> setter;
 		private bool invoked;
 
 		public AutoImplementedPropertySetterSetup(LambdaExpression originalExpression, MethodInfo method, Action<object> setter)
-			: base(new InvocationShape(method, anyMatcherForSingleArgument))
+			: base(new InvocationShape(method, anyMatcherForSingleArgument), originalExpression)
 		{
-			this.expression = originalExpression;
 			this.setter = setter;
 		}
-
-		public override LambdaExpression Expression => this.expression;
 
 		public override void Execute(Invocation invocation)
 		{

@@ -67,18 +67,16 @@ namespace Moq
 		private int originalCallerLineNumber;
 		private MethodBase originalCallerMember;
 #endif
-		private LambdaExpression originalExpression;
 		private List<KeyValuePair<int, object>> outValues;
 		private RaiseEventResponse raiseEventResponse;
 		private Exception throwExceptionResponse;
 		private bool verifiable;
 
 		public MethodCall(Mock mock, Condition condition, LambdaExpression originalExpression, MethodInfo method, IReadOnlyList<Expression> arguments)
-			: base(new InvocationShape(method, arguments))
+			: base(new InvocationShape(method, arguments), originalExpression)
 		{
 			this.condition = condition;
 			this.mock = mock;
-			this.originalExpression = originalExpression;
 			this.outValues = GetOutValues(arguments, method.GetParameters());
 
 			this.SetFileInfo();
@@ -119,8 +117,6 @@ namespace Moq
 		}
 
 		public Mock Mock => this.mock;
-
-		public override LambdaExpression Expression => this.originalExpression;
 
 		public override Condition Condition => this.condition;
 

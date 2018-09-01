@@ -51,18 +51,14 @@ namespace Moq
 	{
 		private static IMatcher[] noArgumentMatchers = new IMatcher[0];
 
-		private LambdaExpression expression;
 		private Func<object> getter;
 		private bool invoked;
 
 		public AutoImplementedPropertyGetterSetup(LambdaExpression originalExpression, MethodInfo method, Func<object> getter)
-			: base(new InvocationShape(method, noArgumentMatchers))
+			: base(new InvocationShape(method, noArgumentMatchers), originalExpression)
 		{
-			this.expression = originalExpression;
 			this.getter = getter;
 		}
-
-		public override LambdaExpression Expression => this.expression;
 
 		public override void Execute(Invocation invocation)
 		{
