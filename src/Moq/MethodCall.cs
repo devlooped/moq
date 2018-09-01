@@ -59,7 +59,6 @@ namespace Moq
 		private bool callBase;
 		private int callCount;
 		private Condition condition;
-		private InvocationShape expectation;
 		private int? expectedMaxCallCount;
 		private string failMessage;
 		private Mock mock;
@@ -79,18 +78,18 @@ namespace Moq
 		///   and when you want to avoid the <see cref="MatcherFactory"/>-related overhead of the other constructor overload.
 		/// </remarks>
 		public MethodCall(Mock mock, Condition condition, LambdaExpression originalExpression, MethodInfo method, IMatcher[] argumentMatchers)
+			: base(new InvocationShape(method, argumentMatchers))
 		{
 			this.condition = condition;
-			this.expectation = new InvocationShape(method, argumentMatchers);
 			this.mock = mock;
 			this.originalExpression = originalExpression;
 			this.outValues = null;
 		}
 
 		public MethodCall(Mock mock, Condition condition, LambdaExpression originalExpression, MethodInfo method, IReadOnlyList<Expression> arguments)
+			: base(new InvocationShape(method, arguments))
 		{
 			this.condition = condition;
-			this.expectation = new InvocationShape(method, arguments);
 			this.mock = mock;
 			this.originalExpression = originalExpression;
 			this.outValues = GetOutValues(arguments, method.GetParameters());
@@ -132,17 +131,15 @@ namespace Moq
 			set => this.failMessage = value;
 		}
 
-		public override MethodInfo Method => this.expectation.Method;
-
 		public Mock Mock => this.mock;
-
-		public override bool IsConditional => this.condition != null;
 
 		public override bool IsVerifiable => this.verifiable;
 
 		public override bool Invoked => this.callCount > 0;
 
 		public override LambdaExpression SetupExpression => this.originalExpression;
+
+		protected override Condition Condition => this.condition;
 
 		[Conditional("DESKTOP")]
 		[SuppressMessage("Microsoft.Design", "CA1031:DoNotCatchGeneralExceptionTypes")]
@@ -190,11 +187,6 @@ namespace Moq
 			{
 				invocation.Arguments[item.Key] = item.Value;
 			}
-		}
-
-		public override bool Matches(Invocation invocation)
-		{
-			return this.expectation.IsMatch(invocation) && (condition == null || condition.IsTrue);
 		}
 
 		public override void EvaluatedSuccessfully()

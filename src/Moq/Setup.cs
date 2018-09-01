@@ -45,17 +45,22 @@ namespace Moq
 {
 	internal abstract class Setup
 	{
-		protected Setup()
+		private readonly InvocationShape expectation;
+
+		protected Setup(InvocationShape expectation)
 		{
+			this.expectation = expectation;
 		}
 
-		public abstract bool IsConditional { get; }
+		protected abstract Condition Condition { get; }
+
+		public bool IsConditional => this.Condition != null;
 
 		public abstract bool IsVerifiable { get; }
 
 		public abstract bool Invoked { get; }
 
-		public abstract MethodInfo Method { get; }
+		public MethodInfo Method => this.expectation.Method;
 
 		public abstract LambdaExpression SetupExpression { get; }
 
@@ -63,7 +68,10 @@ namespace Moq
 
 		public abstract void Execute(Invocation invocation);
 
-		public abstract bool Matches(Invocation invocation);
+		public bool Matches(Invocation invocation)
+		{
+			return this.expectation.IsMatch(invocation) && (!this.IsConditional || this.Condition.IsTrue);
+		}
 
 		public abstract void SetOutParameters(Invocation invocation);
 
