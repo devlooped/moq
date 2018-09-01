@@ -104,7 +104,7 @@ namespace Moq
 		/// </summary>
 		internal static MockException NoMatchingCalls(
 			string failMessage,
-			IEnumerable<MethodCall> setups,
+			IEnumerable<Setup> setups,
 			IEnumerable<Invocation> invocations,
 			LambdaExpression expression,
 			Times times,
@@ -165,7 +165,7 @@ namespace Moq
 		/// <summary>
 		///   Returns the exception to be thrown when <see cref="Mock.Verify"/> or <see cref="MockFactory.Verify"/> find a setup that has not been invoked.
 		/// </summary>
-		internal static MockException UnmatchedSetups(Mock mock, IEnumerable<MethodCall> setups)
+		internal static MockException UnmatchedSetups(Mock mock, IEnumerable<Setup> setups)
 		{
 			return new MockException(
 				MockExceptionReason.UnmatchedSetups,

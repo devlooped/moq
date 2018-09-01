@@ -53,7 +53,7 @@ using Moq.Properties;
 
 namespace Moq
 {
-	internal partial class MethodCall
+	internal partial class MethodCall : Setup
 	{
 		private Action<object[]> callbackResponse;
 		private bool callBase;
@@ -132,17 +132,17 @@ namespace Moq
 			set => this.failMessage = value;
 		}
 
-		public MethodInfo Method => this.expectation.Method;
+		public override MethodInfo Method => this.expectation.Method;
 
 		public Mock Mock => this.mock;
 
-		public bool IsConditional => this.condition != null;
+		public override bool IsConditional => this.condition != null;
 
-		public bool IsVerifiable => this.verifiable;
+		public override bool IsVerifiable => this.verifiable;
 
-		public bool Invoked => this.callCount > 0;
+		public override bool Invoked => this.callCount > 0;
 
-		public LambdaExpression SetupExpression => this.originalExpression;
+		public override LambdaExpression SetupExpression => this.originalExpression;
 
 		[Conditional("DESKTOP")]
 		[SuppressMessage("Microsoft.Design", "CA1031:DoNotCatchGeneralExceptionTypes")]
@@ -179,7 +179,7 @@ namespace Moq
 #endif
 		}
 
-		public void SetOutParameters(Invocation invocation)
+		public override void SetOutParameters(Invocation invocation)
 		{
 			if (this.outValues == null)
 			{
@@ -192,18 +192,18 @@ namespace Moq
 			}
 		}
 
-		public bool Matches(Invocation invocation)
+		public override bool Matches(Invocation invocation)
 		{
 			return this.expectation.IsMatch(invocation) && (condition == null || condition.IsTrue);
 		}
 
-		public void EvaluatedSuccessfully()
+		public override void EvaluatedSuccessfully()
 		{
 			if (condition != null)
 				condition.EvaluatedSuccessfully();
 		}
 
-		public virtual void Execute(Invocation invocation)
+		public override void Execute(Invocation invocation)
 		{
 			++this.callCount;
 
