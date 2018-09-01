@@ -732,7 +732,7 @@ namespace Moq
 				ThrowIfSetupExpressionInvolvesUnsupportedMember(expression, propGet);
 				ThrowIfSetupMethodNotVisibleToProxyFactory(propGet);
 
-				var setup = new SequenceMethodCall(mock, expression, propGet, new Expression[0]);
+				var setup = new SequenceSetup(expression, propGet, new Expression[0]);
 				var targetMock = GetTargetMock(((MemberExpression)expression.Body).Expression, mock);
 				targetMock.Setups.Add(setup);
 				return new SetupSequencePhrase<TResult>(setup);
@@ -740,7 +740,7 @@ namespace Moq
 			else
 			{
 				var (obj, method, args) = expression.GetCallInfo(mock);
-				var setup = new SequenceMethodCall(mock, expression, method, args);
+				var setup = new SequenceSetup(expression, method, args);
 				var targetMock = GetTargetMock(obj, mock);
 				targetMock.Setups.Add(setup);
 				return new SetupSequencePhrase<TResult>(setup);
@@ -750,7 +750,7 @@ namespace Moq
 		internal static SetupSequencePhrase SetupSequence(Mock mock, LambdaExpression expression)
 		{
 			var (obj, method, args) = expression.GetCallInfo(mock);
-			var setup = new SequenceMethodCall(mock, expression, method, args);
+			var setup = new SequenceSetup(expression, method, args);
 			var targetMock = GetTargetMock(obj, mock);
 			targetMock.Setups.Add(setup);
 			return new SetupSequencePhrase(setup);

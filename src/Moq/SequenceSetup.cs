@@ -46,14 +46,17 @@ using System.Reflection;
 
 namespace Moq
 {
-	// this corresponds to a setup created by `mock.SetupSequence`
-	internal sealed class SequenceMethodCall : MethodCall
+	/// <summary>
+	///   Programmable setup used by <see cref="Mock.SetupSequence(Mock, LambdaExpression)"/> and <see cref="Mock.SetupSequence{TResult}(Mock, LambdaExpression)"/>.
+	/// </summary>
+	internal sealed class SequenceSetup : SetupWithOutParameterSupport
 	{
 		// contains the responses set up with the `CallBase`, `Pass`, `Returns`, and `Throws` verbs
 		private ConcurrentQueue<(ResponseKind, object)> responses;
+		private bool invoked;
 
-		public SequenceMethodCall(Mock mock, LambdaExpression originalExpression, MethodInfo method, IReadOnlyList<Expression> arguments)
-			: base(mock, null, originalExpression, method, arguments)
+		public SequenceSetup(LambdaExpression originalExpression, MethodInfo method, IReadOnlyList<Expression> arguments)
+			: base(method, arguments, originalExpression)
 		{
 			this.responses = new ConcurrentQueue<(ResponseKind, object)>();
 		}
@@ -85,7 +88,7 @@ namespace Moq
 
 		public override void Execute(Invocation invocation)
 		{
-			base.Execute(invocation);
+			this.invoked = true;
 
 			if (this.responses.TryDequeue(out var response))
 			{
@@ -127,6 +130,11 @@ namespace Moq
 					invocation.Return(returnType.GetDefaultValue());
 				}
 			}
+		}
+
+		public override bool TryVerifyAll()
+		{
+			return this.invoked;
 		}
 
 		private enum ResponseKind
