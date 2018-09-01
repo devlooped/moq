@@ -334,10 +334,7 @@ namespace Moq
 				message.Append(this.failMessage).Append(": ");
 			}
 
-			var lambda = this.originalExpression.PartialMatcherAwareEval();
-			var targetTypeName = lambda.Parameters[0].Type.Name;
-
-			message.Append(targetTypeName).Append(" ").Append(lambda.ToStringFixed());
+			message.Append(base.ToString());
 
 #if !NETCORE
 			if (this.originalCallerMember != null && this.originalCallerFilePath != null && this.originalCallerLineNumber != 0)

@@ -40,6 +40,7 @@
 
 using System.Linq.Expressions;
 using System.Reflection;
+using System.Text;
 
 namespace Moq
 {
@@ -52,9 +53,9 @@ namespace Moq
 			this.expectation = expectation;
 		}
 
-		public abstract Condition Condition { get; }
+		public virtual Condition Condition => null;
 
-		public abstract bool IsVerifiable { get; }
+		public virtual bool IsVerifiable => false;
 
 		public abstract bool Invoked { get; }
 
@@ -69,8 +70,21 @@ namespace Moq
 			return this.expectation.IsMatch(invocation) && (this.Condition == null || this.Condition.IsTrue);
 		}
 
-		public abstract void SetOutParameters(Invocation invocation);
+		public virtual void SetOutParameters(Invocation invocation)
+		{
+		}
 
-		public abstract override string ToString();
+		public override string ToString()
+		{
+			var expression = this.SetupExpression.PartialMatcherAwareEval();
+			var mockedType = this.SetupExpression.Parameters[0].Type;
+
+			var builder = new StringBuilder();
+			builder.AppendNameOf(mockedType)
+			       .Append(' ')
+			       .Append(expression.ToStringFixed());
+
+			return builder.ToString();
+		}
 	}
 }
