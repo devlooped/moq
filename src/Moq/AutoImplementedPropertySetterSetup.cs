@@ -39,7 +39,6 @@
 // http://www.opensource.org/licenses/bsd-license.php]
 
 using System;
-using System.Diagnostics;
 using System.Linq.Expressions;
 using System.Reflection;
 
@@ -47,24 +46,33 @@ using Moq.Matchers;
 
 namespace Moq
 {
-	internal sealed class PropertySetterMethodCall : MethodCall
+	/// <summary>
+	///   Setup used by <see cref="Mock.SetupAllProperties(Mock)"/> for property setters.
+	/// </summary>
+	internal sealed class AutoImplementedPropertySetterSetup : Setup
 	{
 		private static IMatcher[] anyMatcherForSingleArgument = new IMatcher[] { AnyMatcher.Instance };
 
 		private Action<object> setter;
+		private bool invoked;
 
-		public PropertySetterMethodCall(Mock mock, LambdaExpression originalExpression, MethodInfo method, Action<object> setter)
-			: base(mock, null, originalExpression, method, anyMatcherForSingleArgument)
+		public AutoImplementedPropertySetterSetup(LambdaExpression originalExpression, MethodInfo method, Action<object> setter)
+			: base(new InvocationShape(method, anyMatcherForSingleArgument), originalExpression)
 		{
 			this.setter = setter;
 		}
 
 		public override void Execute(Invocation invocation)
 		{
-			base.Execute(invocation);
+			this.invoked = true;
 
 			this.setter.Invoke(invocation.Arguments[0]);
 			invocation.Return();
+		}
+
+		public override bool TryVerifyAll()
+		{
+			return this.invoked;
 		}
 	}
 }

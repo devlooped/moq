@@ -258,7 +258,7 @@ namespace Moq
 				invocation.MarkAsVerifiedIfMatchedByVerifiableSetup();
 			}
 
-			var uninvokedVerifiableSetups = this.Setups.ToArrayLive(setup => setup.IsVerifiable && !setup.Invoked);
+			var uninvokedVerifiableSetups = this.Setups.ToArrayLive(setup => !setup.TryVerify());
 			if (uninvokedVerifiableSetups.Length > 0)
 			{
 				error = MockException.UnmatchedSetups(this, uninvokedVerifiableSetups);
@@ -293,7 +293,7 @@ namespace Moq
 				invocation.MarkAsVerifiedIfMatchedBySetup();
 			}
 
-			var uninvokedSetups = this.Setups.ToArrayLive(setup => !setup.Invoked);
+			var uninvokedSetups = this.Setups.ToArrayLive(setup => !setup.TryVerifyAll());
 			if (uninvokedSetups.Length > 0)
 			{
 				error = MockException.UnmatchedSetups(this, uninvokedSetups);
@@ -439,7 +439,7 @@ namespace Moq
 			var matchingInvocationCount = matchingInvocations.Length;
 			if (!times.Verify(matchingInvocationCount))
 			{
-				var setups = targetMock.Setups.ToArrayLive(oc => AreSameMethod(oc.SetupExpression, expression));
+				var setups = targetMock.Setups.ToArrayLive(oc => AreSameMethod(oc.Expression, expression));
 				throw MockException.NoMatchingCalls(failMessage, setups, allInvocations, expression, times, matchingInvocationCount);
 			}
 			else
@@ -732,7 +732,7 @@ namespace Moq
 				ThrowIfSetupExpressionInvolvesUnsupportedMember(expression, propGet);
 				ThrowIfSetupMethodNotVisibleToProxyFactory(propGet);
 
-				var setup = new SequenceMethodCall(mock, expression, propGet, new Expression[0]);
+				var setup = new SequenceSetup(expression, propGet, new Expression[0]);
 				var targetMock = GetTargetMock(((MemberExpression)expression.Body).Expression, mock);
 				targetMock.Setups.Add(setup);
 				return new SetupSequencePhrase<TResult>(setup);
@@ -740,7 +740,7 @@ namespace Moq
 			else
 			{
 				var (obj, method, args) = expression.GetCallInfo(mock);
-				var setup = new SequenceMethodCall(mock, expression, method, args);
+				var setup = new SequenceSetup(expression, method, args);
 				var targetMock = GetTargetMock(obj, mock);
 				targetMock.Setups.Add(setup);
 				return new SetupSequencePhrase<TResult>(setup);
@@ -750,7 +750,7 @@ namespace Moq
 		internal static SetupSequencePhrase SetupSequence(Mock mock, LambdaExpression expression)
 		{
 			var (obj, method, args) = expression.GetCallInfo(mock);
-			var setup = new SequenceMethodCall(mock, expression, method, args);
+			var setup = new SequenceSetup(expression, method, args);
 			var targetMock = GetTargetMock(obj, mock);
 			targetMock.Setups.Add(setup);
 			return new SetupSequencePhrase(setup);
@@ -797,7 +797,7 @@ namespace Moq
 				object value = null;
 				bool valueNotSet = true;
 
-				mock.Setups.Add(new PropertyGetterMethodCall(mock, expression, getter, () =>
+				mock.Setups.Add(new AutoImplementedPropertyGetterSetup(expression, getter, () =>
 				{
 					if (valueNotSet)
 					{
@@ -827,7 +827,7 @@ namespace Moq
 
 				if (property.CanWrite)
 				{
-					mock.Setups.Add(new PropertySetterMethodCall(mock, expression, property.GetSetMethod(true), (newValue) =>
+					mock.Setups.Add(new AutoImplementedPropertySetterSetup(expression, property.GetSetMethod(true), (newValue) =>
 					{
 						value = newValue;
 						valueNotSet = false;

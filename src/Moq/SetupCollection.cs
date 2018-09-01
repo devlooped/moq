@@ -50,14 +50,14 @@ namespace Moq
 	{
 		// Using a stack has the advantage that enumeration returns the items in reverse order (last added to first added).
 		// This helps in implementing the rule that "given two matching setups, the last one wins."
-		private Stack<MethodCall> setups;
+		private Stack<Setup> setups;
 
 		public SetupCollection()
 		{
-			this.setups = new Stack<MethodCall>();
+			this.setups = new Stack<Setup>();
 		}
 
-		public void Add(MethodCall setup)
+		public void Add(Setup setup)
 		{
 			lock (this.setups)
 			{
@@ -65,7 +65,7 @@ namespace Moq
 			}
 		}
 
-		public bool Any(Func<MethodCall, bool> predicate)
+		public bool Any(Func<Setup, bool> predicate)
 		{
 			lock (this.setups)
 			{
@@ -81,7 +81,7 @@ namespace Moq
 			}
 		}
 
-		public MethodCall FindMatchFor(Invocation invocation)
+		public Setup FindMatchFor(Invocation invocation)
 		{
 			// Fast path (no `lock`) when there are no setups:
 			if (this.setups.Count == 0)
@@ -89,7 +89,7 @@ namespace Moq
 				return null;
 			}
 
-			MethodCall matchingSetup = null;
+			Setup matchingSetup = null;
 
 			lock (this.setups)
 			{
@@ -116,7 +116,7 @@ namespace Moq
 			return matchingSetup;
 		}
 
-		public MethodCall[] ToArray()
+		public Setup[] ToArray()
 		{
 			lock (this.setups)
 			{
@@ -124,9 +124,9 @@ namespace Moq
 			}
 		}
 
-		public MethodCall[] ToArrayLive(Func<MethodCall, bool> predicate)
+		public Setup[] ToArrayLive(Func<Setup, bool> predicate)
 		{
-			var matchingSetups = new Stack<MethodCall>();
+			var matchingSetups = new Stack<Setup>();
 
 			// The following verification logic will remember each processed setup so that duplicate setups
 			// (that is, setups overridden by later setups with an equivalent expression) can be detected.
@@ -137,7 +137,7 @@ namespace Moq
 			{
 				foreach (var setup in this.setups)
 				{
-					if (setup.IsConditional)
+					if (setup.Condition != null)
 					{
 						continue;
 					}
@@ -149,7 +149,7 @@ namespace Moq
 						visitedSetupsPerMethod.Add(setup.Method, visitedSetupsForMethod);
 					}
 
-					var expr = setup.SetupExpression.PartialMatcherAwareEval();
+					var expr = setup.Expression.PartialMatcherAwareEval();
 					if (visitedSetupsForMethod.Any(vc => ExpressionComparer.Default.Equals(vc, expr)))
 					{
 						continue;

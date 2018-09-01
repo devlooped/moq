@@ -52,9 +52,9 @@ namespace Moq.Language.Flow
 	[EditorBrowsable(EditorBrowsableState.Never)]
 	internal sealed class SetupSequencePhrase : ISetupSequentialAction
 	{
-		private SequenceMethodCall setup;
+		private SequenceSetup setup;
 
-		public SetupSequencePhrase(SequenceMethodCall setup)
+		public SetupSequencePhrase(SequenceSetup setup)
 		{
 			this.setup = setup;
 		}
@@ -78,9 +78,9 @@ namespace Moq.Language.Flow
 
 	internal sealed class SetupSequencePhrase<TResult> : ISetupSequentialResult<TResult>
 	{
-		private SequenceMethodCall setup;
+		private SequenceSetup setup;
 
-		public SetupSequencePhrase(SequenceMethodCall setup)
+		public SetupSequencePhrase(SequenceSetup setup)
 		{
 			this.setup = setup;
 		}

@@ -84,6 +84,20 @@ namespace Moq.Tests
 			Assert.True(mock.Object.IntMethod(ref expected));
 		}
 
+		[Fact]
+		public void SetupSequence_setups_assign_out_parameters()
+		{
+			const string expected = "expected";
+
+			var valueForActual = expected;
+			var mock = new Mock<IFoo>();
+			mock.SetupSequence(m => m.Execute(It.IsAny<string>(), out valueForActual));
+
+			mock.Object.Execute(default, out var actual);
+
+			Assert.Equal(expected, actual);
+		}
+
 		// ThrowsIfOutIsNotConstant
 		// ThrowsIfRefIsNotConstant
 

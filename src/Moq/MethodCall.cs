@@ -53,13 +53,12 @@ using Moq.Properties;
 
 namespace Moq
 {
-	internal partial class MethodCall
+	internal partial class MethodCall : SetupWithOutParameterSupport
 	{
 		private Action<object[]> callbackResponse;
 		private bool callBase;
 		private int callCount;
 		private Condition condition;
-		private InvocationShape expectation;
 		private int? expectedMaxCallCount;
 		private string failMessage;
 		private Mock mock;
@@ -68,62 +67,17 @@ namespace Moq
 		private int originalCallerLineNumber;
 		private MethodBase originalCallerMember;
 #endif
-		private LambdaExpression originalExpression;
-		private List<KeyValuePair<int, object>> outValues;
 		private RaiseEventResponse raiseEventResponse;
 		private Exception throwExceptionResponse;
 		private bool verifiable;
 
-		/// <remarks>
-		///   Only use this constructor when you know that the specified <paramref name="method"/> has no `out` parameters,
-		///   and when you want to avoid the <see cref="MatcherFactory"/>-related overhead of the other constructor overload.
-		/// </remarks>
-		public MethodCall(Mock mock, Condition condition, LambdaExpression originalExpression, MethodInfo method, IMatcher[] argumentMatchers)
-		{
-			this.condition = condition;
-			this.expectation = new InvocationShape(method, argumentMatchers);
-			this.mock = mock;
-			this.originalExpression = originalExpression;
-			this.outValues = null;
-		}
-
 		public MethodCall(Mock mock, Condition condition, LambdaExpression originalExpression, MethodInfo method, IReadOnlyList<Expression> arguments)
+			: base(method, arguments, originalExpression)
 		{
 			this.condition = condition;
-			this.expectation = new InvocationShape(method, arguments);
 			this.mock = mock;
-			this.originalExpression = originalExpression;
-			this.outValues = GetOutValues(arguments, method.GetParameters());
 
 			this.SetFileInfo();
-		}
-
-		private static List<KeyValuePair<int, object>> GetOutValues(IReadOnlyList<Expression> arguments, ParameterInfo[] parameters)
-		{
-			List<KeyValuePair<int, object>> outValues = null;
-			for (int i = 0, n = parameters.Length; i < n; ++i)
-			{
-				var parameter = parameters[i];
-				if (parameter.ParameterType.IsByRef)
-				{
-					if ((parameter.Attributes & (ParameterAttributes.In | ParameterAttributes.Out)) == ParameterAttributes.Out)
-					{
-						var constant = arguments[i].PartialEval() as ConstantExpression;
-						if (constant == null)
-						{
-							throw new NotSupportedException(Resources.OutExpressionMustBeConstantValue);
-						}
-
-						if (outValues == null)
-						{
-							outValues = new List<KeyValuePair<int, object>>();
-						}
-
-						outValues.Add(new KeyValuePair<int, object>(i, constant.Value));
-					}
-				}
-			}
-			return outValues;
 		}
 
 		public string FailMessage
@@ -132,17 +86,11 @@ namespace Moq
 			set => this.failMessage = value;
 		}
 
-		public MethodInfo Method => this.expectation.Method;
-
 		public Mock Mock => this.mock;
 
-		public bool IsConditional => this.condition != null;
+		public override Condition Condition => this.condition;
 
-		public bool IsVerifiable => this.verifiable;
-
-		public bool Invoked => this.callCount > 0;
-
-		public LambdaExpression SetupExpression => this.originalExpression;
+		protected override bool IsVerifiable => this.verifiable;
 
 		[Conditional("DESKTOP")]
 		[SuppressMessage("Microsoft.Design", "CA1031:DoNotCatchGeneralExceptionTypes")]
@@ -179,31 +127,7 @@ namespace Moq
 #endif
 		}
 
-		public void SetOutParameters(Invocation invocation)
-		{
-			if (this.outValues == null)
-			{
-				return;
-			}
-
-			foreach (var item in this.outValues)
-			{
-				invocation.Arguments[item.Key] = item.Value;
-			}
-		}
-
-		public bool Matches(Invocation invocation)
-		{
-			return this.expectation.IsMatch(invocation) && (condition == null || condition.IsTrue);
-		}
-
-		public void EvaluatedSuccessfully()
-		{
-			if (condition != null)
-				condition.EvaluatedSuccessfully();
-		}
-
-		public virtual void Execute(Invocation invocation)
+		public override void Execute(Invocation invocation)
 		{
 			++this.callCount;
 
@@ -321,6 +245,11 @@ namespace Moq
 			this.throwExceptionResponse = exception;
 		}
 
+		public override bool TryVerifyAll()
+		{
+			return this.callCount > 0;
+		}
+
 		public void Verifiable()
 		{
 			this.verifiable = true;
@@ -348,10 +277,7 @@ namespace Moq
 				message.Append(this.failMessage).Append(": ");
 			}
 
-			var lambda = this.originalExpression.PartialMatcherAwareEval();
-			var targetTypeName = lambda.Parameters[0].Type.Name;
-
-			message.Append(targetTypeName).Append(" ").Append(lambda.ToStringFixed());
+			message.Append(base.ToString());
 
 #if !NETCORE
 			if (this.originalCallerMember != null && this.originalCallerFilePath != null && this.originalCallerLineNumber != 0)

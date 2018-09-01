@@ -39,29 +39,37 @@
 // http://www.opensource.org/licenses/bsd-license.php]
 
 using System;
-using System.Diagnostics;
 using System.Linq.Expressions;
 using System.Reflection;
 
 namespace Moq
 {
-	internal sealed class PropertyGetterMethodCall : MethodCall
+	/// <summary>
+	///   Setup used by <see cref="Mock.SetupAllProperties(Mock)"/> for property getters.
+	/// </summary>
+	internal sealed class AutoImplementedPropertyGetterSetup : Setup
 	{
 		private static IMatcher[] noArgumentMatchers = new IMatcher[0];
 
 		private Func<object> getter;
+		private bool invoked;
 
-		public PropertyGetterMethodCall(Mock mock, LambdaExpression originalExpression, MethodInfo method, Func<object> getter)
-			: base(mock, null, originalExpression, method, noArgumentMatchers)
+		public AutoImplementedPropertyGetterSetup(LambdaExpression originalExpression, MethodInfo method, Func<object> getter)
+			: base(new InvocationShape(method, noArgumentMatchers), originalExpression)
 		{
 			this.getter = getter;
 		}
 
 		public override void Execute(Invocation invocation)
 		{
-			base.Execute(invocation);
+			this.invoked = true;
 
 			invocation.Return(this.getter.Invoke());
+		}
+
+		public override bool TryVerifyAll()
+		{
+			return this.invoked;
 		}
 	}
 }
