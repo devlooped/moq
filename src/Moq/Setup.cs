@@ -55,13 +55,11 @@ namespace Moq
 
 		public virtual Condition Condition => null;
 
-		public virtual bool IsVerifiable => false;
-
-		public abstract bool Invoked { get; }
-
 		public MethodInfo Method => this.expectation.Method;
 
 		public abstract LambdaExpression SetupExpression { get; }
+
+		protected virtual bool IsVerifiable => false;
 
 		public abstract void Execute(Invocation invocation);
 
@@ -86,5 +84,12 @@ namespace Moq
 
 			return builder.ToString();
 		}
+
+		public bool TryVerify()
+		{
+			return !this.IsVerifiable || this.TryVerifyAll();
+		}
+
+		public abstract bool TryVerifyAll();
 	}
 }

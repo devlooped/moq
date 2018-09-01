@@ -133,13 +133,11 @@ namespace Moq
 
 		public Mock Mock => this.mock;
 
-		public override bool IsVerifiable => this.verifiable;
-
-		public override bool Invoked => this.callCount > 0;
-
 		public override LambdaExpression SetupExpression => this.originalExpression;
 
 		public override Condition Condition => this.condition;
+
+		protected override bool IsVerifiable => this.verifiable;
 
 		[Conditional("DESKTOP")]
 		[SuppressMessage("Microsoft.Design", "CA1031:DoNotCatchGeneralExceptionTypes")]
@@ -305,6 +303,11 @@ namespace Moq
 		public void SetThrowExceptionResponse(Exception exception)
 		{
 			this.throwExceptionResponse = exception;
+		}
+
+		public override bool TryVerifyAll()
+		{
+			return this.callCount > 0;
 		}
 
 		public void Verifiable()

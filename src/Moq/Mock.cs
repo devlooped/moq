@@ -258,7 +258,7 @@ namespace Moq
 				invocation.MarkAsVerifiedIfMatchedByVerifiableSetup();
 			}
 
-			var uninvokedVerifiableSetups = this.Setups.ToArrayLive(setup => setup.IsVerifiable && !setup.Invoked);
+			var uninvokedVerifiableSetups = this.Setups.ToArrayLive(setup => !setup.TryVerify());
 			if (uninvokedVerifiableSetups.Length > 0)
 			{
 				error = MockException.UnmatchedSetups(this, uninvokedVerifiableSetups);
@@ -293,7 +293,7 @@ namespace Moq
 				invocation.MarkAsVerifiedIfMatchedBySetup();
 			}
 
-			var uninvokedSetups = this.Setups.ToArrayLive(setup => !setup.Invoked);
+			var uninvokedSetups = this.Setups.ToArrayLive(setup => !setup.TryVerifyAll());
 			if (uninvokedSetups.Length > 0)
 			{
 				error = MockException.UnmatchedSetups(this, uninvokedSetups);
