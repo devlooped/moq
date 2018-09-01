@@ -155,6 +155,16 @@ namespace Moq
 			if (matchedSetup != null)
 			{
 				matchedSetup.Condition?.EvaluatedSuccessfully();
+
+				if (matchedSetup.IsVerifiable)
+				{
+					invocation.MarkAsMatchedByVerifiableSetup();
+				}
+				else
+				{
+					invocation.MarkAsMatchedBySetup();
+				}
+
 				matchedSetup.SetOutParameters(invocation);
 
 				// We first execute, as there may be a Throws 

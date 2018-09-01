@@ -62,9 +62,9 @@ namespace Moq
 
 		public LambdaExpression Expression => this.expression;
 
-		public MethodInfo Method => this.expectation.Method;
+		public virtual bool IsVerifiable => false;
 
-		protected virtual bool IsVerifiable => false;
+		public MethodInfo Method => this.expectation.Method;
 
 		public abstract void Execute(Invocation invocation);
 

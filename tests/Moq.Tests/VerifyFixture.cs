@@ -1376,6 +1376,18 @@ namespace Moq.Tests
 			cat.VerifyNoOtherCalls();
 		}
 
+		[Fact]
+		public void VerifyNoOtherCalls_works_together_with_parameterless_VerifyAll_for_sequence_setups()
+		{
+			var mock = new Mock<ICat>();
+			mock.SetupSequence(x => x.Hiss());
+
+			mock.Object.Hiss();
+
+			mock.VerifyAll();
+			mock.VerifyNoOtherCalls();
+		}
+
 		public interface IBar
 		{
 			int? Value { get; set; }
