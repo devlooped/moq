@@ -218,11 +218,7 @@ namespace Moq
 			for (int i = 0; i < parameters.Length; i++)
 			{
 				var parameterType = paramTypes[i];
-				if (parameterType == typeof(object))
-				{
-					continue;
-				}
-				else if (exactParameterMatch && parameters[i].ParameterType != parameterType)
+				if (exactParameterMatch && parameters[i].ParameterType != parameterType)
 				{
 					return false;
 				}
