@@ -188,7 +188,7 @@ namespace Moq
 			}
 			else if (this.valueDel != null)
 			{
-				invocation.Return(this.valueDel.HasCompatibleParameterList(new ParameterInfo[0])
+				invocation.Return(this.valueDel.CompareParameterTypesTo(Type.EmptyTypes)
 					? valueDel.InvokePreserveStack()                //we need this, for the user to be able to use parameterless methods
 					: valueDel.InvokePreserveStack(invocation.Arguments)); //will throw if parameters mismatch
 			}

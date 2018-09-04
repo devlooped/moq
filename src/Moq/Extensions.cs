@@ -240,12 +240,11 @@ namespace Moq
 			return new ParameterTypes(method.GetParameters());
 		}
 
-		public static bool HasCompatibleParameterList(this Delegate function, ParameterInfo[] expectedParams)
+		public static bool CompareParameterTypesTo<TOtherTypes>(this Delegate function, TOtherTypes otherTypes)
+			where TOtherTypes : IReadOnlyList<Type>
 		{
-			var expectedParamTypes = new ParameterTypes(expectedParams);
-
 			var method = function.GetMethodInfo();
-			if (method.GetParameterTypes().CompareTo(expectedParamTypes, exact: false))
+			if (method.GetParameterTypes().CompareTo(otherTypes, exact: false))
 			{
 				// the backing method for the literal delegate is compatible, DynamicInvoke(...) will succeed
 				return true;
@@ -256,7 +255,7 @@ namespace Moq
 			// an instance delegate invocation is created for an extension method (bundled with a receiver)
 			// or at times for DLR code generation paths because the CLR is optimized for instance methods.
 			var invokeMethod = GetInvokeMethodFromUntypedDelegateCallback(function);
-			if (invokeMethod != null && invokeMethod.GetParameterTypes().CompareTo(expectedParamTypes, exact: false))
+			if (invokeMethod != null && invokeMethod.GetParameterTypes().CompareTo(otherTypes, exact: false))
 			{
 				// the Invoke(...) method is compatible instead. DynamicInvoke(...) will succeed.
 				return true;

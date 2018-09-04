@@ -176,12 +176,16 @@ namespace Moq
 			}
 			else
 			{
-				var expectedParams = this.Method.GetParameters();
-				var actualParams = callback.GetMethodInfo().GetParameters();
-
-				if (!callback.HasCompatibleParameterList(expectedParams))
+				var expectedParamTypes = this.Method.GetParameterTypes();
+				if (!callback.CompareParameterTypesTo(expectedParamTypes))
 				{
-					ThrowParameterMismatch(expectedParams, actualParams);
+					var actualParams = callback.GetMethodInfo().GetParameters();
+					throw new ArgumentException(
+						string.Format(
+							CultureInfo.CurrentCulture,
+							Resources.InvalidCallbackParameterMismatch,
+							string.Join(",", expectedParamTypes.Select(p => p.Name).ToArray()),
+							string.Join(",", actualParams.Select(p => p.ParameterType.Name).ToArray())));
 				}
 
 				if (callback.GetMethodInfo().ReturnType != typeof(void))
@@ -190,16 +194,6 @@ namespace Moq
 				}
 
 				this.callbackResponse = (object[] args) => callback.InvokePreserveStack(args);
-			}
-
-			void ThrowParameterMismatch(ParameterInfo[] expected, ParameterInfo[] actual)
-			{
-				throw new ArgumentException(
-					string.Format(
-						CultureInfo.CurrentCulture,
-						Resources.InvalidCallbackParameterMismatch,
-						string.Join(",", expected.Select(p => p.ParameterType.Name).ToArray()),
-						string.Join(",", actual.Select(p => p.ParameterType.Name).ToArray())));
 			}
 		}
 
