@@ -21,6 +21,7 @@ The format is loosely based on [Keep a Changelog](http://keepachangelog.com/en/1
 * More precise `out` parameter detection for mocking COM interfaces with `[in,out]` parameters (@koutinho, #645)
 * Prevent false 'Different number of parameters' error with `Returns` callback methods that have been compiled from `Expression`s (@stakx, #654)
 * `Verify` exception should report configured setups for delegate mocks (@stakx, #679)
+* `Verify` exception should include complete call expression for delegate mocks (@stakx, #680)
 
 
 ## 4.9.0 (2018-07-13)
