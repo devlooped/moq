@@ -123,7 +123,7 @@ namespace Moq
 			}
 			else
 			{
-				if (!invocationMethod.HasSameParameterTypesAs(method))
+				if (!invocationMethod.GetParameterTypes().CompareTo(method.GetParameterTypes(), exact: true))
 				{
 					return false;
 				}

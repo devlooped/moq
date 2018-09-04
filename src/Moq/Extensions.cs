@@ -240,13 +240,6 @@ namespace Moq
 			return new ParameterTypes(method.GetParameters());
 		}
 
-		public static bool HasSameParameterTypesAs(this MethodInfo method, MethodInfo other)
-		{
-			return Enumerable.SequenceEqual(
-				method.GetParameters().Select(p => p.ParameterType),
-				other.GetParameters().Select(p => p.ParameterType));
-		}
-
 		public static bool HasCompatibleParameterTypes(this MethodInfo method, Type[] paramTypes, bool exactParameterMatch)
 		{
 			var parameters = method.GetParameters();
