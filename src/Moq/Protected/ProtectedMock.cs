@@ -249,11 +249,11 @@ namespace Moq.Protected
 			return GetMethod(methodName, false, args);
 		}
 
-		private static MethodInfo GetMethod(string methodName, bool exactParameterMatch, params object[] args)
+		private static MethodInfo GetMethod(string methodName, bool exact, params object[] args)
 		{
 			var argTypes = ToArgTypes(args);
 			return typeof(T).GetMethods(BindingFlags.Instance | BindingFlags.NonPublic | BindingFlags.Public)
-				.SingleOrDefault(m => m.Name == methodName && m.HasCompatibleParameterTypes(argTypes, exactParameterMatch));
+				.SingleOrDefault(m => m.Name == methodName && m.GetParameterTypes().CompareTo(argTypes, exact));
 		}
 
 		private static Expression<Func<T, TResult>> GetMethodCall<TResult>(MethodInfo method, object[] args)

@@ -116,14 +116,14 @@ namespace Moq
 
 			if (method.IsGenericMethod)
 			{
-				if (!invocationMethod.GetGenericArguments().SequenceEqual(method.GetGenericArguments(), AssignmentCompatibilityTypeComparer.Instance))
+				if (!method.GetGenericArguments().CompareTo(invocationMethod.GetGenericArguments(), exact: false))
 				{
 					return false;
 				}
 			}
 			else
 			{
-				if (!invocationMethod.HasSameParameterTypesAs(method))
+				if (!invocationMethod.GetParameterTypes().CompareTo(method.GetParameterTypes(), exact: true))
 				{
 					return false;
 				}
@@ -145,18 +145,6 @@ namespace Moq
 				argumentMatchers[i] = MatcherFactory.CreateMatcher(arguments[i], parameters[i]);
 			}
 			return argumentMatchers;
-		}
-
-		private sealed class AssignmentCompatibilityTypeComparer : IEqualityComparer<Type>
-		{
-			public static readonly AssignmentCompatibilityTypeComparer Instance = new AssignmentCompatibilityTypeComparer();
-
-			public bool Equals(Type x, Type y)
-			{
-				return y.IsAssignableFrom(x);
-			}
-
-			int IEqualityComparer<Type>.GetHashCode(Type obj) => throw new NotSupportedException();
 		}
 	}
 }
