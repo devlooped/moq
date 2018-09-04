@@ -200,6 +200,46 @@ namespace Moq
 			return type.GetMember(name).OfType<MethodInfo>();
 		}
 
+		public static bool CompareTo<TTypes, TOtherTypes>(this TTypes types, TOtherTypes otherTypes, bool exact)
+			where TTypes : IReadOnlyList<Type>
+			where TOtherTypes : IReadOnlyList<Type>
+		{
+			var count = otherTypes.Count;
+
+			if (types.Count != count)
+			{
+				return false;
+			}
+
+			if (exact)
+			{
+				for (int i = 0; i < count; ++i)
+				{
+					if (types[i] != otherTypes[i])
+					{
+						return false;
+					}
+				}
+			}
+			else
+			{
+				for (int i = 0; i < count; ++i)
+				{
+					if (types[i].IsAssignableFrom(otherTypes[i]) == false)
+					{
+						return false;
+					}
+				}
+			}
+
+			return true;
+		}
+
+		public static ParameterTypes GetParameterTypes(this MethodInfo method)
+		{
+			return new ParameterTypes(method.GetParameters());
+		}
+
 		public static bool HasSameParameterTypesAs(this MethodInfo method, MethodInfo other)
 		{
 			return Enumerable.SequenceEqual(
