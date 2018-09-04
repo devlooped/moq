@@ -1388,6 +1388,18 @@ namespace Moq.Tests
 			mock.VerifyNoOtherCalls();
 		}
 
+		[Fact]
+		public void Verification_error_message_contains_setup_for_delegate_mock()
+		{
+			var mock = new Mock<Action>();
+			mock.Setup(m => m());
+
+			var ex = Record.Exception(() => mock.Verify(m => m(), Times.Once()));
+
+			Assert.Contains("Configured setups:", ex.Message);
+			Assert.Contains("Action m =>", ex.Message);
+		}
+
 		public interface IBar
 		{
 			int? Value { get; set; }

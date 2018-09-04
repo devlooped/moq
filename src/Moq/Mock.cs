@@ -439,7 +439,17 @@ namespace Moq
 			var matchingInvocationCount = matchingInvocations.Length;
 			if (!times.Verify(matchingInvocationCount))
 			{
-				var setups = targetMock.Setups.ToArrayLive(oc => AreSameMethod(oc.Expression, expression));
+				Setup[] setups;
+				if (targetMock.IsDelegateMock)
+				{
+					// For delegate mocks, there's no need to compare methods as for regular mocks (below)
+					// since there's only one single method, so include all setups unconditionally.
+					setups = targetMock.Setups.ToArrayLive(s => true);
+				}
+				else
+				{
+					setups = targetMock.Setups.ToArrayLive(oc => AreSameMethod(oc.Expression, expression));
+				}
 				throw MockException.NoMatchingCalls(failMessage, setups, allInvocations, expression, times, matchingInvocationCount);
 			}
 			else
