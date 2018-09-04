@@ -242,8 +242,10 @@ namespace Moq
 
 		public static bool HasCompatibleParameterList(this Delegate function, ParameterInfo[] expectedParams)
 		{
+			var expectedParamTypes = new ParameterTypes(expectedParams);
+
 			var method = function.GetMethodInfo();
-			if (HasCompatibleParameterList(expectedParams, method))
+			if (method.GetParameterTypes().CompareTo(expectedParamTypes, exact: false))
 			{
 				// the backing method for the literal delegate is compatible, DynamicInvoke(...) will succeed
 				return true;
@@ -254,7 +256,7 @@ namespace Moq
 			// an instance delegate invocation is created for an extension method (bundled with a receiver)
 			// or at times for DLR code generation paths because the CLR is optimized for instance methods.
 			var invokeMethod = GetInvokeMethodFromUntypedDelegateCallback(function);
-			if (invokeMethod != null && HasCompatibleParameterList(expectedParams, invokeMethod))
+			if (invokeMethod != null && invokeMethod.GetParameterTypes().CompareTo(expectedParamTypes, exact: false))
 			{
 				// the Invoke(...) method is compatible instead. DynamicInvoke(...) will succeed.
 				return true;
@@ -263,25 +265,6 @@ namespace Moq
 			// Neither the literal backing field of the delegate was compatible
 			// nor the delegate invoke signature.
 			return false;
-		}
-
-		private static bool HasCompatibleParameterList(ParameterInfo[] expectedParams, MethodInfo method)
-		{
-			var actualParams = method.GetParameters();
-			if (expectedParams.Length != actualParams.Length)
-			{
-				return false;
-			}
-
-			for (int i = 0; i < expectedParams.Length; i++)
-			{
-				if (!actualParams[i].ParameterType.IsAssignableFrom(expectedParams[i].ParameterType))
-				{
-					return false;
-				}
-			}
-
-			return true;
 		}
 
 		private static MethodInfo GetInvokeMethodFromUntypedDelegateCallback(Delegate callback)
