@@ -77,5 +77,18 @@ namespace Moq.Language
 		/// </code>
 		/// </example>
 		void Verifiable(string failMessage);
+
+		/// <summary>
+		/// Marks the expectation as skip-able for <see cref="Mock.VerifyAll()"/>
+		/// </summary>
+		/// <example>
+		/// The following example marks the expectation as skip-able:
+		/// <code>
+		/// mock.Expect(x => x.Execute("ping"))
+		///     .Returns(true)
+		///     .SkipVerifyAll();
+		/// </code>
+		/// </example>
+		void SkipVerifyAll();
 	}
 }

@@ -70,6 +70,7 @@ namespace Moq
 		private RaiseEventResponse raiseEventResponse;
 		private Exception throwExceptionResponse;
 		private bool verifiable;
+		private bool skipVerifyAll;
 
 		public MethodCall(Mock mock, Condition condition, LambdaExpression originalExpression, MethodInfo method, IReadOnlyList<Expression> arguments)
 			: base(method, arguments, originalExpression)
@@ -238,7 +239,7 @@ namespace Moq
 
 		public override bool TryVerifyAll()
 		{
-			return this.callCount > 0;
+			return skipVerifyAll || callCount > 0;
 		}
 
 		public void Verifiable()
@@ -250,6 +251,11 @@ namespace Moq
 		{
 			this.verifiable = true;
 			this.failMessage = failMessage;
+		}
+
+		public void SkipVerifyAll()
+		{
+			skipVerifyAll = true;
 		}
 
 		public void AtMostOnce() => this.AtMost(1);

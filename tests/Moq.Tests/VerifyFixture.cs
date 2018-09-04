@@ -1388,6 +1388,28 @@ namespace Moq.Tests
 			mock.VerifyNoOtherCalls();
 		}
 
+		[Fact]
+		public void SkipVerifyAll_PreventsVerificationException_OnVerifyAll_WhenNotCalled()
+		{
+			var mock = new Mock<IFoo>();
+
+			mock.Setup(x => x.Submit()).SkipVerifyAll();
+
+			mock.VerifyAll();
+		}
+
+		[Fact]
+		public void SkipVerifyAll_PreventsVerificationException_OnVerifyAll_WhenCalled()
+		{
+			var mock = new Mock<IFoo>();
+
+			mock.Setup(x => x.Submit()).SkipVerifyAll();
+
+			mock.Object.Submit();
+
+			mock.VerifyAll();
+		}
+
 		public interface IBar
 		{
 			int? Value { get; set; }

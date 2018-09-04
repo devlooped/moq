@@ -199,5 +199,10 @@ namespace Moq.Language.Flow
 		{
 			this.setup.Verifiable(failMessage);
 		}
+
+		public void SkipVerifyAll()
+		{
+			this.setup.SkipVerifyAll();
+		}
 	}
 }
