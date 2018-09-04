@@ -1124,6 +1124,9 @@ namespace Moq
 		/// </summary>
 		/// <typeparam name="TReturn">The return type for which to define a default value.</typeparam>
 		/// <param name="value">The default return value.</param>
+		/// <remarks>
+		/// Default return value is respected only when there is no matching setup for a method call.
+		/// </remarks>
 		public void SetReturnsDefault<TReturn>(TReturn value)
 		{
 			this.ConfiguredDefaultValues[typeof(TReturn)] = value;
