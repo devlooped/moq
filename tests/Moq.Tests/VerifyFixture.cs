@@ -1397,7 +1397,41 @@ namespace Moq.Tests
 			var ex = Record.Exception(() => mock.Verify(m => m(), Times.Once()));
 
 			Assert.Contains("Configured setups:", ex.Message);
-			Assert.Contains("Action m =>", ex.Message);
+			Assert.Contains("Action m => m()", ex.Message);
+		}
+
+		[Fact]
+		public void Verification_error_message_contains_setup_for_delegate_mock_with_parameters()
+		{
+			var mock = new Mock<Action<int, int>>();
+			mock.Setup(m => m(1, It.IsAny<int>()));
+
+			var ex = Record.Exception(() => mock.Verify(m => m(1, 2), Times.Once()));
+
+			Assert.Contains("Configured setups:", ex.Message);
+			Assert.Contains("Action<Int32, Int32> m => m(1, It.IsAny<Int32>())", ex.Message);
+		}
+
+		[Fact]
+		public void Verification_error_message_contains_complete_call_expression_for_delegate_mock()
+		{
+			var mock = new Mock<Action>();
+			mock.Setup(m => m());
+
+			var ex = Record.Exception(() => mock.Verify(m => m(), Times.Once()));
+
+			Assert.Contains("but was 0 times: m => m()", ex.Message);
+		}
+
+		[Fact]
+		public void Verification_error_message_contains_complete_call_expression_for_delegate_mock_with_parameters()
+		{
+			var mock = new Mock<Action<int, int>>();
+			mock.Setup(m => m(1, It.IsAny<int>()));
+
+			var ex = Record.Exception(() => mock.Verify(m => m(1, 2), Times.Once()));
+
+			Assert.Contains("but was 0 times: m => m(1, 2)", ex.Message);
 		}
 
 		public interface IBar
