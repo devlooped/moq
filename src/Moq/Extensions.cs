@@ -240,30 +240,6 @@ namespace Moq
 			return new ParameterTypes(method.GetParameters());
 		}
 
-		public static bool HasCompatibleParameterTypes(this MethodInfo method, Type[] paramTypes, bool exactParameterMatch)
-		{
-			var parameters = method.GetParameters();
-			if (parameters.Length != paramTypes.Length)
-			{
-				return false;
-			}
-
-			for (int i = 0; i < parameters.Length; i++)
-			{
-				var parameterType = paramTypes[i];
-				if (exactParameterMatch && parameters[i].ParameterType != parameterType)
-				{
-					return false;
-				}
-				else if (!parameters[i].ParameterType.IsAssignableFrom(parameterType))
-				{
-					return false;
-				}
-			}
-
-			return true;
-		}
-
 		public static bool HasCompatibleParameterList(this Delegate function, ParameterInfo[] expectedParams)
 		{
 			var method = function.GetMethodInfo();
