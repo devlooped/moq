@@ -480,7 +480,10 @@ namespace Moq
 
 		private void ToStringInvocation(InvocationExpression iv)
 		{
+			ToString(iv.Expression);
+			builder.Append('(');
 			ToStringExpressionList(iv.Arguments);
+			builder.Append(')');
 			return;
 		}
 
