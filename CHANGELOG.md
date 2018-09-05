@@ -15,6 +15,7 @@ The format is loosely based on [Keep a Changelog](http://keepachangelog.com/en/1
 #### Changed
 
 * Make `VerifyNoOtherCalls` take into account previous calls to parameterless `Verify()` and `VerifyAll()` (@stakx, #659)
+* **Breaking change:** `VerifyAll` now succeeds after a call to `SetupAllProperties` even when not all property accessors were invoked (stakx, #684)
 
 #### Fixed
 
