@@ -54,7 +54,6 @@ namespace Moq
 		private static IMatcher[] anyMatcherForSingleArgument = new IMatcher[] { AnyMatcher.Instance };
 
 		private Action<object> setter;
-		private bool invoked;
 
 		public AutoImplementedPropertySetterSetup(LambdaExpression originalExpression, MethodInfo method, Action<object> setter)
 			: base(new InvocationShape(method, anyMatcherForSingleArgument), originalExpression)
@@ -64,15 +63,10 @@ namespace Moq
 
 		public override void Execute(Invocation invocation)
 		{
-			this.invoked = true;
-
 			this.setter.Invoke(invocation.Arguments[0]);
 			invocation.Return();
 		}
 
-		public override bool TryVerifyAll()
-		{
-			return this.invoked;
-		}
+		public override bool TryVerifyAll() => true;
 	}
 }

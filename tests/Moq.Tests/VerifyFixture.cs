@@ -1434,6 +1434,44 @@ namespace Moq.Tests
 			Assert.Contains("but was 0 times: m => m(1, 2)", ex.Message);
 		}
 
+		[Fact]
+		public void VerifyAll_ignores_setups_from_SetupAllProperties()
+		{
+			var mock = new Mock<IFoo>();
+			mock.SetupAllProperties();
+
+			// This shouldn't fail. The intent behind the call to `SetupAllProperties` is to conveniently
+			// auto-implement all properties such that they remember the values they're being set to.
+			// But despite the `Setup` in the method name, they shouldn't create observable setups that
+			// require verification. Otherwise, one would have to invoke each and every property accessor
+			// to make `VerifyAll` happy. (This problem is exacerbated by the fact that `Mock.Of<T>`
+			// performs a hidden call to `SetupAllProperties`, meaning that `VerifyAll` is quite useless
+			// for mocks created that way if one has to call each and every property accessor.)
+			mock.VerifyAll();
+		}
+
+		[Fact]
+		public void VerifyAll_ignores_setups_from_SetupAllProperties_but_not_other_property_setup()
+		{
+			var mock = new Mock<IFoo>();
+			mock.SetupAllProperties();
+			mock.Setup(m => m.Bar);
+
+			Assert.Throws<MockException>(() => mock.VerifyAll());
+		}
+
+		[Fact]
+		public void VerifyAll_ignores_setups_from_SetupAllProperties_but_not_other_property_setup_unless_matched()
+		{
+			var mock = new Mock<IFoo>();
+			mock.SetupAllProperties();
+			mock.Setup(m => m.Bar);
+
+			_ = mock.Object.Bar;
+
+			mock.VerifyAll();
+		}
+
 		public interface IBar
 		{
 			int? Value { get; set; }

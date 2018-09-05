@@ -52,7 +52,6 @@ namespace Moq
 		private static IMatcher[] noArgumentMatchers = new IMatcher[0];
 
 		private Func<object> getter;
-		private bool invoked;
 
 		public AutoImplementedPropertyGetterSetup(LambdaExpression originalExpression, MethodInfo method, Func<object> getter)
 			: base(new InvocationShape(method, noArgumentMatchers), originalExpression)
@@ -62,14 +61,9 @@ namespace Moq
 
 		public override void Execute(Invocation invocation)
 		{
-			this.invoked = true;
-
 			invocation.Return(this.getter.Invoke());
 		}
 
-		public override bool TryVerifyAll()
-		{
-			return this.invoked;
-		}
+		public override bool TryVerifyAll() => true;
 	}
 }
