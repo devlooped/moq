@@ -7,7 +7,6 @@ Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Solution Items", "Solution 
 		appveyor.yml = appveyor.yml
 		CHANGELOG.md = CHANGELOG.md
 		GitInfo.txt = GitInfo.txt
-		License.txt = License.txt
 		src\Moq\Moq.nuspec = src\Moq\Moq.nuspec
 		README.md = README.md
 	EndProjectSection
