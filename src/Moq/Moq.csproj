@@ -78,6 +78,16 @@
 			<DependentUpon>ICallback.tt</DependentUpon>
 		</Compile>
 
+		<None Update="Language\ICallbackAfter.tt">
+			<Generator>TextTemplatingFileGenerator</Generator>
+			<LastGenOutput>ICallbackAfter.Generated.cs</LastGenOutput>
+		</None>
+		<Compile Update="Language\ICallbackAfter.Generated.cs">
+			<AutoGen>True</AutoGen>
+			<DesignTime>True</DesignTime>
+			<DependentUpon>ICallbackAfter.tt</DependentUpon>
+		</Compile>
+
 		<None Update="Language\IRaise.tt">
 			<Generator>TextTemplatingFileGenerator</Generator>
 			<LastGenOutput>IRaise.Generated.cs</LastGenOutput>
