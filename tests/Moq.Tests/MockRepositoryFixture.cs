@@ -53,6 +53,61 @@ namespace Moq.Tests
 		}
 
 		[Fact]
+		public void ShouldVerifyNoOtherCalls()
+		{
+			var repository = new MockRepository(MockBehavior.Default);
+			repository.Create<IFoo>();
+
+			repository.VerifyNoOtherCalls();
+		}
+
+		[Fact]
+		public void ShouldVerifyNoOtherCalls_WhenUnmatched()
+		{
+			var repository = new MockRepository(MockBehavior.Default);
+			var mock = repository.Create<IFoo>();
+
+			mock.Object.Do();
+
+			var mex = Assert.Throws<MockException>(() => repository.VerifyNoOtherCalls());
+			Assert.Equal(MockExceptionReason.UnverifiedInvocations, mex.Reason);
+		}
+
+		[Fact]
+		public void ShouldVerifyNoOtherCalls_WhenVerified()
+		{
+			var repository = new MockRepository(MockBehavior.Default);
+			var mock = repository.Create<IFoo>();
+
+			mock.Object.Do();
+
+			mock.Verify(foo => foo.Do(), Times.Once);
+			repository.VerifyNoOtherCalls();
+		}
+
+		[Fact]
+		public void VerifyNoOtherCalls_should_correctly_aggregate_unmatched_calls_from_more_than_one_mock()
+		{
+			var repository = new MockRepository(MockBehavior.Default);
+			var fooMock = repository.Create<IFoo>();
+			var barMock = repository.Create<IBar>();
+
+			fooMock.Object.Do();
+			barMock.Object.Redo();
+
+			var ex = Record.Exception(() => repository.VerifyNoOtherCalls());
+
+			var expectedErrorMessage = $"The following invocations on mock \'{fooMock}\' were not verified:{Environment.NewLine}" +
+									   $"IFoo.Do(){Environment.NewLine}" +
+									   Environment.NewLine +
+									   $"The following invocations on mock \'{barMock}\' were not verified:{Environment.NewLine}" +
+									   $"IBar.Redo(){Environment.NewLine}";
+
+			Assert.NotNull(ex);
+			Assert.Equal(expectedErrorMessage, ex.Message);
+		}
+
+		[Fact]
 		public void ShouldVerifyVerifiables()
 		{
 			try
@@ -76,25 +131,23 @@ namespace Moq.Tests
 		[Fact]
 		public void ShouldAggregateFailures()
 		{
-			try
-			{
-				var repository = new MockRepository(MockBehavior.Loose);
-				var foo = repository.Create<IFoo>();
-				var bar = repository.Create<IBar>();
+			var repository = new MockRepository(MockBehavior.Loose);
+			var foo = repository.Create<IFoo>();
+			var bar = repository.Create<IBar>();
 
-				foo.Setup(f => f.Do());
-				bar.Setup(b => b.Redo());
+			foo.Setup(f => f.Do());
+			bar.Setup(b => b.Redo());
 
-				repository.VerifyAll();
-			}
-			catch (MockException mex)
-			{
-				Expression<Action<IFoo>> fooExpect = f => f.Do();
-				Assert.Contains(fooExpect.ToString(), mex.Message);
+			var ex = Record.Exception(() => repository.VerifyAll());
 
-				Expression<Action<IBar>> barExpect = b => b.Redo();
-				Assert.Contains(barExpect.ToString(), mex.Message);
-			}
+			var expectedErrorMessage = $"The following setups on mock \'{foo}\' were not matched:{Environment.NewLine}" +
+									   $"IFoo f => f.Do(){Environment.NewLine}" +
+									   Environment.NewLine +
+									   $"The following setups on mock \'{bar}\' were not matched:{Environment.NewLine}" +
+									   $"IBar b => b.Redo(){Environment.NewLine}";
+
+			Assert.NotNull(ex);
+			Assert.Equal(expectedErrorMessage, ex.Message);
 		}
 
 		[Fact]

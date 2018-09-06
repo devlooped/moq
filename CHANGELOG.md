@@ -11,6 +11,7 @@ The format is loosely based on [Keep a Changelog](http://keepachangelog.com/en/1
 
 * `ExpressionCompiler`: An extensibility point for setting up alternate LINQ expression tree compilation strategies (@stakx, #647)
 * `setup.CallBase()` for `void` methods (@stakx, #664)
+* `VerifyNoOtherCalls` for `MockRepository` (@BlythMeister, #682)
 
 #### Changed
 
