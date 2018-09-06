@@ -24,6 +24,10 @@ The format is loosely based on [Keep a Changelog](http://keepachangelog.com/en/1
 * `Verify` exception should report configured setups for delegate mocks (@stakx, #679)
 * `Verify` exception should include complete call expression for delegate mocks (@stakx, #680)
 
+#### Obsoleted
+
+* For non-`void` methods, the setup sequence `Returns`/`CallBase` &rarr; `Callback` &rarr; `Throws` has been deprecated because a method cannot return a value and throw an exception at the same time (@stakx, #686)
+
 
 ## 4.9.0 (2018-07-13)
 
