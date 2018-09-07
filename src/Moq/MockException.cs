@@ -193,14 +193,29 @@ namespace Moq
 		/// <summary>
 		///   Returns the exception to be thrown when <see cref="Mock.VerifyNoOtherCalls(Mock)"/> finds invocations that have not been verified.
 		/// </summary>
-		internal static MockException UnverifiedInvocations(IEnumerable<Invocation> invocations)
+		internal static MockException UnverifiedInvocations(Mock mock, IEnumerable<Invocation> invocations)
 		{
 			return new MockException(
 				MockExceptionReason.UnverifiedInvocations,
 				string.Format(
 					CultureInfo.CurrentCulture,
 					Resources.UnverifiedInvocations,
-					string.Join(Environment.NewLine, invocations)));
+					mock.ToString(),
+					invocations.Aggregate(new StringBuilder(), (builder, setup) => builder.AppendLine(setup.ToString())).ToString()));
+		}
+
+		/// <summary>
+		///   Returns the exception to be thrown when <see cref="MockFactory.VerifyNoOtherCalls()"/> finds invocations that have not been verified.
+		/// </summary>
+		public static Exception UnverifiedInvocations(List<MockException> errors)
+		{
+			Debug.Assert(errors.All(e => e.Reason == MockExceptionReason.UnverifiedInvocations));
+
+			return new MockException(
+				MockExceptionReason.UnverifiedInvocations,
+				string.Join(
+					Environment.NewLine,
+					errors.Select(error => error.Message)));
 		}
 
 		private MockExceptionReason reason;

@@ -363,8 +363,35 @@ namespace Moq
 		}
 
 		/// <summary>
-		/// Invokes <paramref name="verifyAction"/> for each mock 
-		/// in <see cref="Mocks"/>, and accumulates the resulting 
+		/// Calls <see cref="Mock{T}.VerifyNoOtherCalls()"/> on all mocks created by this factory.
+		/// </summary>
+		/// <seealso cref="Mock{T}.VerifyNoOtherCalls()"/>
+		/// <exception cref="MockException">One or more mocks had invocations that were not verified.</exception>
+		public void VerifyNoOtherCalls()
+		{
+			var errors = new List<MockException>();
+
+			foreach (var mock in mocks)
+			{
+				try
+				{
+					Mock.VerifyNoOtherCalls(mock);
+				}
+				catch (MockException error) when (error.Reason == MockExceptionReason.UnverifiedInvocations)
+				{
+					errors.Add(error);
+				}
+			}
+
+			if (errors.Count > 0)
+			{
+				throw MockException.UnverifiedInvocations(errors);
+			}
+		}
+
+		/// <summary>
+		/// Invokes <paramref name="verifyAction"/> for each mock
+		/// in <see cref="Mocks"/>, and accumulates the resulting
 		/// verification exceptions that might be
 		/// thrown from the action.
 		/// </summary>

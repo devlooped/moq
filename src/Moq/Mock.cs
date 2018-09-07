@@ -415,7 +415,7 @@ namespace Moq
 				var remainingUnverifiedInvocations = unverifiedInvocations.Where(i => i != null);
 				if (remainingUnverifiedInvocations.Any())
 				{
-					throw MockException.UnverifiedInvocations(remainingUnverifiedInvocations);
+					throw MockException.UnverifiedInvocations(mock, remainingUnverifiedInvocations);
 				}
 			}
 
