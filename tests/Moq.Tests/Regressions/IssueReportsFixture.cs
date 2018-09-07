@@ -2980,11 +2980,10 @@ namespace Moq.Tests.Regressions
 				mock.Object.Execute(5);
 
 				var e = Assert.Throws<MockException>(() => mock.Verify(m => m.Execute(0)));
-				Assert.Contains(
-					Environment.NewLine + "Configured setups: " +
-					Environment.NewLine + "IFoo m => m.Execute(1)" +
-					Environment.NewLine + "IFoo m => m.Execute(It.IsInRange<Int32>(2, 20, Range.Exclusive))",
-					e.Message);
+				Assert.True(e.Message.ContainsConsecutiveLines(
+					"Configured setups: ",
+					"IFoo m => m.Execute(1)",
+					"IFoo m => m.Execute(It.IsInRange<Int32>(2, 20, Range.Exclusive))"));
 			}
 
 			[Fact]
@@ -2997,10 +2996,9 @@ namespace Moq.Tests.Regressions
 				mock.Object.Execute(1, 10);
 
 				var e = Assert.Throws<MockException>(() => mock.Verify(m => m.Execute<int>(1, 1)));
-				Assert.Contains(
-					Environment.NewLine + "Configured setups: " +
-					Environment.NewLine + "IFoo m => m.Execute<Int32>(1, 10)",
-					e.Message);
+				Assert.True(e.Message.ContainsConsecutiveLines(
+					"Configured setups: ",
+					"IFoo m => m.Execute<Int32>(1, 10)"));
 			}
 
 			[Fact]
@@ -3009,9 +3007,7 @@ namespace Moq.Tests.Regressions
 				var mock = new Mock<IFoo>();
 
 				var e = Assert.Throws<MockException>(() => mock.Verify(m => m.Execute(1)));
-				Assert.Contains(
-					Environment.NewLine + "No setups configured.",
-					e.Message);
+				Assert.Contains("No setups configured.", e.Message);
 
 			}
 

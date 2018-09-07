@@ -837,14 +837,12 @@ namespace Moq.Tests
 
 			var mex = Assert.Throws<MockException>(() => mock.Verify(f => f.Execute("pong")));
 
-			Assert.Contains(
-				Environment.NewLine +
-				"Performed invocations: " + Environment.NewLine +
-				"IFoo.Execute(\"ping\")" + Environment.NewLine +
-				"IFoo.Echo(42)" + Environment.NewLine +
-				"IFoo.Submit()" + Environment.NewLine +
-				"IFoo.Save([1, 2, \"hello\"])",
-				mex.Message);
+			Assert.True(mex.Message.ContainsConsecutiveLines(
+				"Performed invocations: ",
+				"IFoo.Execute(\"ping\")",
+				"IFoo.Echo(42)",
+				"IFoo.Submit()",
+				"IFoo.Save([1, 2, \"hello\"])"));
 		}
 
 		[Fact]
@@ -875,7 +873,7 @@ namespace Moq.Tests
 
 			MockException mex = Assert.Throws<MockException>(() => mock.Verify(f => f.Execute("pong")));
 
-			Assert.Contains(Environment.NewLine + "No invocations performed.", mex.Message);
+			Assert.Contains("No invocations performed.", mex.Message);
 		}
 
 		[Fact]
@@ -885,7 +883,7 @@ namespace Moq.Tests
 
 			MockException mex = Assert.Throws<MockException>(() => mock.Verify(f => f.Execute("pong")));
 
-			Assert.Contains(Environment.NewLine + "No setups configured.", mex.Message);
+			Assert.Contains("No setups configured.", mex.Message);
 		}
 
 		[Fact]
@@ -905,10 +903,9 @@ namespace Moq.Tests
 			var mock = new Mock<IArrays>();
 			mock.Object.Method(strings);
 			var mex = Assert.Throws<MockException>(() => mock.Verify(_ => _.Method(null)));
-			Assert.Contains(
-				@"Performed invocations: " + Environment.NewLine +
-				@"IArrays.Method([""1"", null, ""3""])",
-				mex.Message);
+			Assert.True(mex.Message.ContainsConsecutiveLines(
+				@"Performed invocations: ",
+				@"IArrays.Method([""1"", null, ""3""])"));
 		}
 
 		[Fact]
@@ -918,10 +915,9 @@ namespace Moq.Tests
 			var mock = new Mock<IArrays>();
 			mock.Object.Method(strings);
 			var mex = Assert.Throws<MockException>(() => mock.Verify(_ => _.Method(null)));
-			Assert.Contains(
-				@"Performed invocations: " + Environment.NewLine +
-				@"IArrays.Method([""1"", null, ""3"", ""4"", ""5"", ""6"", ""7"", ""8"", ""9"", ""10""])",
-				mex.Message);
+			Assert.True(mex.Message.ContainsConsecutiveLines(
+				@"Performed invocations: ",
+				@"IArrays.Method([""1"", null, ""3"", ""4"", ""5"", ""6"", ""7"", ""8"", ""9"", ""10""])"));
 		}
 
 		[Fact]
@@ -931,10 +927,9 @@ namespace Moq.Tests
 			var mock = new Mock<IArrays>();
 			mock.Object.Method(strings);
 			var mex = Assert.Throws<MockException>(() => mock.Verify(_ => _.Method(null)));
-			Assert.Contains(
-				@"Performed invocations: " + Environment.NewLine +
-				@"IArrays.Method([""1"", null, ""3"", ""4"", ""5"", ""6"", ""7"", ""8"", ""9"", ""10"", ...])",
-				mex.Message);
+			Assert.True(mex.Message.ContainsConsecutiveLines(
+				@"Performed invocations: ",
+				@"IArrays.Method([""1"", null, ""3"", ""4"", ""5"", ""6"", ""7"", ""8"", ""9"", ""10"", ...])"));
 		}
 
 		[Fact]

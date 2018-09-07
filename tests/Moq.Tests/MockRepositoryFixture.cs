@@ -97,14 +97,13 @@ namespace Moq.Tests
 
 			var ex = Record.Exception(() => repository.VerifyNoOtherCalls());
 
-			var expectedErrorMessage = $"The following invocations on mock \'{fooMock}\' were not verified:{Environment.NewLine}" +
-									   $"IFoo.Do(){Environment.NewLine}" +
-									   Environment.NewLine +
-									   $"The following invocations on mock \'{barMock}\' were not verified:{Environment.NewLine}" +
-									   $"IBar.Redo(){Environment.NewLine}";
-
 			Assert.NotNull(ex);
-			Assert.Equal(expectedErrorMessage, ex.Message);
+			Assert.True(ex.Message.ContainsConsecutiveLines(
+				$"The following invocations on mock \'{fooMock}\' were not verified:",
+				$"IFoo.Do()",
+				$"",
+				$"The following invocations on mock \'{barMock}\' were not verified:",
+				$"IBar.Redo()"));
 		}
 
 		[Fact]
@@ -140,14 +139,13 @@ namespace Moq.Tests
 
 			var ex = Record.Exception(() => repository.VerifyAll());
 
-			var expectedErrorMessage = $"The following setups on mock \'{foo}\' were not matched:{Environment.NewLine}" +
-									   $"IFoo f => f.Do(){Environment.NewLine}" +
-									   Environment.NewLine +
-									   $"The following setups on mock \'{bar}\' were not matched:{Environment.NewLine}" +
-									   $"IBar b => b.Redo(){Environment.NewLine}";
-
 			Assert.NotNull(ex);
-			Assert.Equal(expectedErrorMessage, ex.Message);
+			Assert.True(ex.Message.ContainsConsecutiveLines(
+				$"The following setups on mock \'{foo}\' were not matched:",
+				$"IFoo f => f.Do()",
+				$"",
+				$"The following setups on mock \'{bar}\' were not matched:",
+				$"IBar b => b.Redo()"));
 		}
 
 		[Fact]
