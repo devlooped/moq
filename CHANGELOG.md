@@ -24,6 +24,8 @@ The format is loosely based on [Keep a Changelog](http://keepachangelog.com/en/1
 * Prevent false 'Different number of parameters' error with `Returns` callback methods that have been compiled from `Expression`s (@stakx, #654)
 * `Verify` exception should report configured setups for delegate mocks (@stakx, #679)
 * `Verify` exception should include complete call expression for delegate mocks (@stakx, #680)
+* Bug report #556: "Recursive setup expression creates ghost setups that make `VerifyAll` fail" (@stakx, #684)
+* Bug report #191: "Upgrade from 4.2.1409.1722 to 4.2.1507.0118 changed `VerifyAll` behavior" (@stakx, #684)
 
 
 ## 4.9.0 (2018-07-13)
