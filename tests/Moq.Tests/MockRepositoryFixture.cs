@@ -51,7 +51,7 @@ namespace Moq.Tests
 			}
 			catch (MockException mex)
 			{
-				Assert.Equal(MockExceptionReason.UnmatchedSetups, mex.Reason);
+				Assert.Equal(MockExceptionReasons.UnmatchedSetups, mex.Reasons);
 			}
 		}
 
@@ -73,7 +73,7 @@ namespace Moq.Tests
 			mock.Object.Do();
 
 			var mex = Assert.Throws<MockException>(() => repository.VerifyNoOtherCalls());
-			Assert.Equal(MockExceptionReason.UnverifiedInvocations, mex.Reason);
+			Assert.Equal(MockExceptionReasons.UnverifiedInvocations, mex.Reasons);
 		}
 
 		[Fact]
@@ -124,7 +124,7 @@ namespace Moq.Tests
 			}
 			catch (MockException mex)
 			{
-				Assert.Equal(MockExceptionReason.UnmatchedSetups, mex.Reason);
+				Assert.Equal(MockExceptionReasons.UnmatchedSetups, mex.Reasons);
 				Expression<Action<IFoo>> doExpr = foo => foo.Do();
 				Assert.DoesNotContain(doExpr.ToString(), mex.Message);
 			}

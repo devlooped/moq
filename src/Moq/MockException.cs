@@ -48,7 +48,7 @@ namespace Moq
 		internal static MockException MoreThanOneCall(MethodCall setup, int invocationCount)
 		{
 			return new MockException(
-				MockExceptionReason.MoreThanOneCall,
+				MockExceptionReasons.MoreThanOneCall,
 				Times.AtMostOnce().GetExceptionMessage(setup.FailMessage, setup.Expression.ToStringFixed(), invocationCount));
 		}
 
@@ -58,7 +58,7 @@ namespace Moq
 		internal static MockException MoreThanNCalls(MethodCall setup, int maxInvocationCount, int invocationCount)
 		{
 			return new MockException(
-				MockExceptionReason.MoreThanNCalls,
+				MockExceptionReasons.MoreThanNCalls,
 				Times.AtMost(maxInvocationCount).GetExceptionMessage(setup.FailMessage, setup.Expression.ToStringFixed(), invocationCount));
 		}
 
@@ -74,7 +74,7 @@ namespace Moq
 			int callCount)
 		{
 			return new MockException(
-				MockExceptionReason.NoMatchingCalls,
+				MockExceptionReasons.NoMatchingCalls,
 				times.GetExceptionMessage(failMessage, expression.PartialMatcherAwareEval().ToStringFixed(), callCount) +
 				Environment.NewLine + FormatSetupsInfo() +
 				Environment.NewLine + FormatInvocations());
@@ -101,7 +101,7 @@ namespace Moq
 		internal static MockException NoSetup(Invocation invocation)
 		{
 			return new MockException(
-				MockExceptionReason.NoSetup,
+				MockExceptionReasons.NoSetup,
 				string.Format(
 					CultureInfo.CurrentCulture,
 					Resources.MockExceptionMessage,
@@ -116,7 +116,7 @@ namespace Moq
 		internal static MockException ReturnValueRequired(Invocation invocation)
 		{
 			return new MockException(
-				MockExceptionReason.ReturnValueRequired,
+				MockExceptionReasons.ReturnValueRequired,
 				string.Format(
 					CultureInfo.CurrentCulture,
 					Resources.MockExceptionMessage,
@@ -131,7 +131,7 @@ namespace Moq
 		internal static MockException UnmatchedSetups(Mock mock, IEnumerable<Setup> setups)
 		{
 			return new MockException(
-				MockExceptionReason.UnmatchedSetups,
+				MockExceptionReasons.UnmatchedSetups,
 				string.Format(
 					CultureInfo.CurrentCulture,
 					Resources.UnmatchedSetups,
@@ -140,14 +140,17 @@ namespace Moq
 		}
 
 		/// <summary>
-		///   Returns the exception to be thrown when <see cref="MockFactory.Verify"/> finds several mocks with setups that have not been invoked.
+		///   Returns an exception whose message is the concatenation of the given <paramref name="errors"/>' messages
+		///   and whose reason(s) is the combination of the given <paramref name="errors"/>' reason(s).
+		///   Used by <see cref="MockFactory.VerifyMocks(Action{Mock})"/> when it finds one or more mocks with verification errors.
 		/// </summary>
-		internal static MockException UnmatchedSetups(IEnumerable<MockException> errors)
+		internal static MockException Combined(IEnumerable<MockException> errors)
 		{
-			Debug.Assert(errors.All(e => e.Reason == MockExceptionReason.UnmatchedSetups));
+			Debug.Assert(errors != null);
+			Debug.Assert(errors.Any());
 
 			return new MockException(
-				MockExceptionReason.UnmatchedSetups,
+				errors.Select(error => error.Reasons).Aggregate((a, r) => a | r),
 				string.Join(
 					Environment.NewLine,
 					errors.Select(error => error.Message)));
@@ -159,7 +162,7 @@ namespace Moq
 		internal static MockException UnverifiedInvocations(Mock mock, IEnumerable<Invocation> invocations)
 		{
 			return new MockException(
-				MockExceptionReason.UnverifiedInvocations,
+				MockExceptionReasons.UnverifiedInvocations,
 				string.Format(
 					CultureInfo.CurrentCulture,
 					Resources.UnverifiedInvocations,
@@ -172,27 +175,24 @@ namespace Moq
 		/// </summary>
 		public static Exception UnverifiedInvocations(List<MockException> errors)
 		{
-			Debug.Assert(errors.All(e => e.Reason == MockExceptionReason.UnverifiedInvocations));
+			Debug.Assert(errors.All(e => e.Reasons == MockExceptionReasons.UnverifiedInvocations));
 
 			return new MockException(
-				MockExceptionReason.UnverifiedInvocations,
+				MockExceptionReasons.UnverifiedInvocations,
 				string.Join(
 					Environment.NewLine,
 					errors.Select(error => error.Message)));
 		}
 
-		private MockExceptionReason reason;
+		private readonly MockExceptionReasons reasons;
 
-		private MockException(MockExceptionReason reason, string message)
+		private MockException(MockExceptionReasons reasons, string message)
 			: base(message)
 		{
-			this.reason = reason;
+			this.reasons = reasons;
 		}
 
-		internal MockExceptionReason Reason
-		{
-			get { return reason; }
-		}
+		internal MockExceptionReasons Reasons => this.reasons;
 
 		/// <summary>
 		/// Indicates whether this exception is a verification fault raised by Verify()
@@ -201,16 +201,10 @@ namespace Moq
 		{
 			get
 			{
-				switch (this.reason)
-				{
-					case MockExceptionReason.NoMatchingCalls:
-					case MockExceptionReason.UnmatchedSetups:
-					case MockExceptionReason.UnverifiedInvocations:
-						return true;
-
-					default:
-						return false;
-				}
+				const MockExceptionReasons verificationErrorMask = MockExceptionReasons.NoMatchingCalls
+				                                                 | MockExceptionReasons.UnmatchedSetups
+				                                                 | MockExceptionReasons.UnverifiedInvocations;
+				return (this.reasons & verificationErrorMask) != 0;
 			}
 		}
 
@@ -225,7 +219,7 @@ namespace Moq
 		  System.Runtime.Serialization.StreamingContext context)
 			: base(info, context)
 		{
-			this.reason = (MockExceptionReason)info.GetValue("reason", typeof(MockExceptionReason));
+			this.reasons = (MockExceptionReasons)info.GetValue(nameof(this.reasons), typeof(MockExceptionReasons));
 		}
 
 		/// <summary>
@@ -238,7 +232,7 @@ namespace Moq
 		public override void GetObjectData(SerializationInfo info, StreamingContext context)
 		{
 			base.GetObjectData(info, context);
-			info.AddValue("reason", reason);
+			info.AddValue(nameof(this.reasons), this.reasons);
 		}
 #endif
 	}

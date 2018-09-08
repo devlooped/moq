@@ -332,24 +332,7 @@ namespace Moq
 		/// <exception cref="MockException">One or more mocks had invocations that were not verified.</exception>
 		public void VerifyNoOtherCalls()
 		{
-			var errors = new List<MockException>();
-
-			foreach (var mock in mocks)
-			{
-				try
-				{
-					Mock.VerifyNoOtherCalls(mock);
-				}
-				catch (MockException error) when (error.Reason == MockExceptionReason.UnverifiedInvocations)
-				{
-					errors.Add(error);
-				}
-			}
-
-			if (errors.Count > 0)
-			{
-				throw MockException.UnverifiedInvocations(errors);
-			}
+			VerifyMocks(mock => Mock.VerifyNoOtherCalls(mock));
 		}
 
 		/// <summary>
@@ -372,7 +355,7 @@ namespace Moq
 				{
 					verifyAction(mock);
 				}
-				catch (MockException error) when (error.Reason == MockExceptionReason.UnmatchedSetups)
+				catch (MockException error) when (error.IsVerificationError)
 				{
 					errors.Add(error);
 				}
@@ -380,7 +363,7 @@ namespace Moq
 
 			if (errors.Count > 0)
 			{
-				throw MockException.UnmatchedSetups(errors);
+				throw MockException.Combined(errors);
 			}
 		}
 	}
