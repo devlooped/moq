@@ -170,20 +170,6 @@ namespace Moq
 					invocations.Aggregate(new StringBuilder(), (builder, setup) => builder.AppendLine(setup.ToString())).ToString()));
 		}
 
-		/// <summary>
-		///   Returns the exception to be thrown when <see cref="MockFactory.VerifyNoOtherCalls()"/> finds invocations that have not been verified.
-		/// </summary>
-		public static Exception UnverifiedInvocations(List<MockException> errors)
-		{
-			Debug.Assert(errors.All(e => e.Reasons == MockExceptionReasons.UnverifiedInvocations));
-
-			return new MockException(
-				MockExceptionReasons.UnverifiedInvocations,
-				string.Join(
-					Environment.NewLine,
-					errors.Select(error => error.Message)));
-		}
-
 		private readonly MockExceptionReasons reasons;
 
 		private MockException(MockExceptionReasons reasons, string message)

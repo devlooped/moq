@@ -79,14 +79,6 @@ namespace Moq
 			return matchingSetup;
 		}
 
-		public Setup[] ToArray()
-		{
-			lock (this.setups)
-			{
-				return this.setups.ToArray();
-			}
-		}
-
 		public Setup[] ToArrayLive(Func<Setup, bool> predicate)
 		{
 			var matchingSetups = new Stack<Setup>();
