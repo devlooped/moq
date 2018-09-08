@@ -140,14 +140,17 @@ namespace Moq
 		}
 
 		/// <summary>
-		///   Returns the exception to be thrown when <see cref="MockFactory.Verify"/> finds several mocks with setups that have not been invoked.
+		///   Returns an exception whose message is the concatenation of the given <paramref name="errors"/>' messages
+		///   and whose reason(s) is the combination of the given <paramref name="errors"/>' reason(s).
+		///   Used by <see cref="MockFactory.VerifyMocks(Action{Mock})"/> when it finds one or more mocks with verification errors.
 		/// </summary>
-		internal static MockException UnmatchedSetups(IEnumerable<MockException> errors)
+		internal static MockException Combined(IEnumerable<MockException> errors)
 		{
-			Debug.Assert(errors.All(e => e.Reasons == MockExceptionReasons.UnmatchedSetups));
+			Debug.Assert(errors != null);
+			Debug.Assert(errors.Any());
 
 			return new MockException(
-				MockExceptionReasons.UnmatchedSetups,
+				errors.Select(error => error.Reasons).Aggregate((a, r) => a | r),
 				string.Join(
 					Environment.NewLine,
 					errors.Select(error => error.Message)));

@@ -372,7 +372,7 @@ namespace Moq
 				{
 					verifyAction(mock);
 				}
-				catch (MockException error) when (error.Reasons == MockExceptionReasons.UnmatchedSetups)
+				catch (MockException error) when (error.IsVerificationError)
 				{
 					errors.Add(error);
 				}
@@ -380,7 +380,7 @@ namespace Moq
 
 			if (errors.Count > 0)
 			{
-				throw MockException.UnmatchedSetups(errors);
+				throw MockException.Combined(errors);
 			}
 		}
 	}
