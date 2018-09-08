@@ -506,7 +506,7 @@ namespace Moq.Tests
 			}
 			catch (MockException mex)
 			{
-				Assert.Equal(MockExceptionReason.ReturnValueRequired, mex.Reason);
+				Assert.Equal(MockExceptionReasons.ReturnValueRequired, mex.Reasons);
 			}
 		}
 

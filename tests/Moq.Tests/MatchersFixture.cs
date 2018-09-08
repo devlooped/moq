@@ -138,7 +138,7 @@ namespace Moq.Tests
 			Assert.Equal(1, mock.Object.Echo(2));
 
 			var mex = Assert.Throws<MockException>(() => mock.Object.Echo(1));
-			Assert.Equal(MockExceptionReason.NoSetup, mex.Reason);
+			Assert.Equal(MockExceptionReasons.NoSetup, mex.Reasons);
 		}
 
 		[Fact]

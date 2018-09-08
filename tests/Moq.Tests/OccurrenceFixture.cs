@@ -19,7 +19,7 @@ namespace Moq.Tests
 
 			Assert.Equal("ack", mock.Object.Execute("ping"));
 			MockException mex = Assert.Throws<MockException>(() => mock.Object.Execute("ping"));
-			Assert.Equal(MockExceptionReason.MoreThanOneCall, mex.Reason);
+			Assert.Equal(MockExceptionReasons.MoreThanOneCall, mex.Reasons);
 		}
 
 		[Fact]
@@ -44,7 +44,7 @@ namespace Moq.Tests
 				Assert.True(false, "should fail on two calls");
 			});
 
-			Assert.Equal(MockExceptionReason.MoreThanNCalls, mex.Reason);
+			Assert.Equal(MockExceptionReasons.MoreThanNCalls, mex.Reasons);
 			Assert.Equal(calls, repeat);
 		}
 

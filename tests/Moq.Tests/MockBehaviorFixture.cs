@@ -22,7 +22,7 @@ namespace Moq.Tests
 			}
 			catch (MockException mex)
 			{
-				Assert.Equal(MockExceptionReason.NoSetup, mex.Reason);
+				Assert.Equal(MockExceptionReasons.NoSetup, mex.Reasons);
 			}
 		}
 

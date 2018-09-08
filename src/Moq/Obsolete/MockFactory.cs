@@ -340,7 +340,7 @@ namespace Moq
 				{
 					Mock.VerifyNoOtherCalls(mock);
 				}
-				catch (MockException error) when (error.Reason == MockExceptionReason.UnverifiedInvocations)
+				catch (MockException error) when (error.Reasons == MockExceptionReasons.UnverifiedInvocations)
 				{
 					errors.Add(error);
 				}
@@ -372,7 +372,7 @@ namespace Moq
 				{
 					verifyAction(mock);
 				}
-				catch (MockException error) when (error.Reason == MockExceptionReason.UnmatchedSetups)
+				catch (MockException error) when (error.Reasons == MockExceptionReasons.UnmatchedSetups)
 				{
 					errors.Add(error);
 				}
