@@ -474,6 +474,105 @@ namespace Moq.Tests
 			Assert.Equal("input", value);
 		}
 
+		[Fact]
+		public void CallbackWithIndexerGetter()
+		{
+			int x = default(int);
+
+			var mock = new Mock<IFoo>();
+			mock.Setup(f => f[It.IsAny<int>()])
+				.Callback(new Action<int>(x_ => x = x_))
+				.Returns(32);
+
+			int result = mock.Object[17];
+			Assert.Equal(17, x);
+			Assert.Equal(32, result);
+		}
+
+		[Fact]
+		public void CallbackWithIndexerSetter()
+		{
+			int x = default(int);
+			int result = default(int);
+
+			var mock = new Mock<IFoo>();
+			mock.SetupSet(f => f[10] = It.IsAny<int>())
+				.Callback(new Action<int, int>((x_, result_) =>
+				{
+					x = x_;
+					result = result_;
+				}));
+
+			mock.Object[10] = 5;
+			Assert.Equal(10, x);
+			Assert.Equal(5, result);
+		}
+
+		[Fact]
+		public void CallbackWithMultipleArgumentIndexerGetter()
+		{
+			int x = default(int);
+			int y = default(int);
+
+			var mock = new Mock<IFoo>();
+			mock.Setup(f => f[It.IsAny<int>(), It.IsAny<int>()])
+				.Callback(new Action<int, int>((x_, y_) =>
+				{
+					x = x_;
+					y = y_;
+				}))
+				.Returns(14);
+
+			int result = mock.Object[20, 22];
+			Assert.Equal(20, x);
+			Assert.Equal(22, y);
+			Assert.Equal(14, result);
+		}
+
+		[Fact]
+		public void CallbackWithMultipleArgumentIndexerSetterWithoutAny()
+		{
+			int x = default(int);
+			int y = default(int);
+			int result = default(int);
+
+			var mock = new Mock<IFoo>();
+			mock.SetupSet(f => f[3, 13] = It.IsAny<int>())
+				.Callback(new Action<int, int, int>((x_, y_, result_) =>
+				{
+					x = x_;
+					y = y_;
+					result = result_;
+				}));
+
+			mock.Object[3, 13] = 2;
+			Assert.Equal(3, x);
+			Assert.Equal(13, y);
+			Assert.Equal(2, result);
+		}
+
+		[Fact]
+		public void CallbackWithMultipleArgumentIndexerSetterWithAny()
+		{
+			int x = default(int);
+			int y = default(int);
+			int result = default(int);
+
+			var mock = new Mock<IFoo>();
+			mock.SetupSetMethod<int, int, int>(setter => setter(It.IsAny<int>(), It.IsAny<int>(), It.IsAny<int>()))
+				.Callback(new Action<int, int, int>((x_, y_, result_) =>
+				{
+					x = x_;
+					y = y_;
+					result = result_;
+				}));
+
+			mock.Object[3, 13] = 2;
+			Assert.Equal(3, x);
+			Assert.Equal(13, y);
+			Assert.Equal(2, result);
+		}
+
 		public interface IInterface
 		{
 			void Method(Derived b);
@@ -490,7 +589,7 @@ namespace Moq.Tests
 		private void TraceMe(Base b)
 		{
 		}
-		
+
 		public interface IFoo
 		{
 			void Submit();
@@ -515,6 +614,10 @@ namespace Moq.Tests
 			string Execute(ref string arg1, string arg2);
 
 			int Value { get; set; }
+
+			int this[int x] { get; set; }
+
+			int this[int x, int y] { get; set; }
 		}
 
 		public delegate void ExecuteRHandler(ref string arg1);

@@ -664,13 +664,12 @@ namespace Moq
 
 					matchers[valueIndex] = new MatchExpression(last.Match);
 
-					if (arguments.Length == 2)
+					for (int i = 0; i < arguments.Length - 1; i++)
 					{
-						// TODO: what about multi-index setters?
 						// Add the index value for the property indexer
-						values[0] = GetValueExpression(arguments[0], parameters[0].ParameterType);
+						values[i] = GetValueExpression(arguments[i], parameters[i].ParameterType);
 						// TODO: No matcher supported now for the index
-						matchers[0] = values[0];
+						matchers[i] = values[i];
 					}
 
 					var lambda = Expression.Lambda(
@@ -681,6 +680,28 @@ namespace Moq
 					return callFactory(last.Mock, lambda, last.Invocation.Method, matchers);
 				}
 			}
+		}
+
+		internal static ISetup<T> SetupSetMethod<T, TProperty>(
+			Mock<T> mock,
+			Type[] argumentTypes,
+			LambdaExpression setter)
+			where T : class
+		{
+			Expression actionParameter = setter.Parameters.Single();
+			if (!(setter.Body is InvocationExpression call) || call.Expression != actionParameter)
+			{
+				throw new InvalidOperationException("Expected only call to the indexer method given in the lambda parameter");
+			}
+
+			PropertyInfo indexer = typeof(T).GetProperty("Item", typeof(TProperty), argumentTypes);
+			MethodInfo setterMethod = indexer.GetSetMethod();
+			ParameterExpression instanceLambdaArg = Expression.Parameter(typeof(T), "inst");
+			Expression<Action<T>> callSetter = Expression.Lambda<Action<T>>(
+				Expression.Call(instanceLambdaArg, setterMethod, call.Arguments),
+				instanceLambdaArg);
+
+			return Setup(mock, callSetter, condition: null);
 		}
 
 		private static Expression GetValueExpression(object value, Type type)
