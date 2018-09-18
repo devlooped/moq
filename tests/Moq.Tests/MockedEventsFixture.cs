@@ -595,6 +595,28 @@ namespace Moq.Tests
 		}
 
 		[Fact]
+		public void SetupSetOfEventAttach()
+		{
+			var mock = new Mock<IWithEvent>();
+			int attachAndDetachCount = 0;
+			string message = null;
+			int? value = null;
+			CustomEvent attachedHandler = null;
+			CustomEvent detachedHandler = null;
+			CustomEvent handler = (m, v) => { message = m; value = v; };
+
+			mock.SetupSet(w => w.CustomEvent += It.IsAny<CustomEvent>()).Callback(new Action<CustomEvent>(handler_ => { ++attachAndDetachCount; attachedHandler = handler_; }));
+			mock.SetupSet(w => w.CustomEvent -= It.IsAny<CustomEvent>()).Callback(new Action<CustomEvent>(handler_ => { ++attachAndDetachCount; detachedHandler = handler_; }));
+
+			mock.Object.CustomEvent += handler;
+			mock.Object.CustomEvent -= handler;
+
+			Assert.Equal(2, attachAndDetachCount);
+			Assert.Equal(handler, attachedHandler);
+			Assert.Equal(handler, detachedHandler);
+		}
+
+		[Fact]
 		public void ShouldSuccessfullyAttachToEventForwaredToAProtectedEvent()
 		{
 			var mock = new Mock<FordawrdEventDoProtectedImplementation>();

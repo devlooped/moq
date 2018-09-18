@@ -431,6 +431,8 @@ namespace Moq
 
 		#region Setup
 
+		internal bool HasEventSetup { get; private set; } = false;
+
 		[DebuggerStepThrough]
 		internal static VoidSetupPhrase<T> Setup<T>(Mock<T> mock, Expression<Action<T>> expression, Condition condition)
 			where T : class
@@ -612,7 +614,11 @@ namespace Moq
 				}
 
 				var setter = last.Invocation.Method;
-				if (!setter.IsPropertySetter())
+				if (setter.ProbablyEventAttachOrDetach())
+				{
+					mock.HasEventSetup = true;
+				}
+				else if (!setter.IsPropertySetter())
 				{
 					throw new ArgumentException(Resources.SetupNotSetter);
 				}

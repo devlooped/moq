@@ -136,7 +136,7 @@ namespace Moq
 				matchedSetup.Execute(invocation);
 				return InterceptionAction.Stop;
 			}
-			else if (mock.Behavior == MockBehavior.Strict)
+			else if (mock.Behavior == MockBehavior.Strict && !invocation.Method.ProbablyEventAttachOrDetach())
 			{
 				throw MockException.NoSetup(invocation);
 			}
@@ -178,6 +178,8 @@ namespace Moq
 			}
 
 			var methodName = invocation.Method.Name;
+			EventInfo eventInfo = null;
+			Action<string, Delegate> modifyEvent = null;
 
 			// Special case for event accessors. The following, seemingly random character checks are guards against
 			// more expensive checks (for the common case where the invoked method is *not* an event accessor).
@@ -185,46 +187,38 @@ namespace Moq
 			{
 				if (methodName[0] == 'a' && methodName[3] == '_' && invocation.Method.LooksLikeEventAttach())
 				{
-					var eventInfo = GetEventFromName(invocation.Method.Name.Substring("add_".Length), mock);
-					if (eventInfo != null)
-					{
-						// TODO: We could compare `invocation.Method` and `eventInfo.GetAddMethod()` here.
-						// If they are equal, then `invocation.Method` is definitely an event `add` accessor.
-						// Not sure whether this would work with F# and COM; see commit 44070a9.
-
-						if (mock.CallBase && !invocation.Method.IsAbstract)
-						{
-							invocation.ReturnBase();
-							return InterceptionAction.Stop;
-						}
-						else if (invocation.Arguments.Length > 0 && invocation.Arguments[0] is Delegate delegateInstance)
-						{
-							mock.EventHandlers.Add(eventInfo.Name, delegateInstance);
-							invocation.Return();
-							return InterceptionAction.Stop;
-						}
-					}
+					eventInfo = GetEventFromName(invocation.Method.Name.Substring("add_".Length), mock);
+					modifyEvent = mock.EventHandlers.Add;
 				}
 				else if (methodName[0] == 'r' && methodName.Length > 7 && methodName[6] == '_' && invocation.Method.LooksLikeEventDetach())
 				{
-					var eventInfo = GetEventFromName(invocation.Method.Name.Substring("remove_".Length), mock);
-					if (eventInfo != null)
-					{
-						// TODO: We could compare `invocation.Method` and `eventInfo.GetRemoveMethod()` here.
-						// If they are equal, then `invocation.Method` is definitely an event `remove` accessor.
-						// Not sure whether this would work with F# and COM; see commit 44070a9.
+					eventInfo = GetEventFromName(invocation.Method.Name.Substring("remove_".Length), mock);
+					modifyEvent = mock.EventHandlers.Remove;
+				}
+			}
 
-						if (mock.CallBase && !invocation.Method.IsAbstract)
-						{
-							invocation.ReturnBase();
-							return InterceptionAction.Stop;
-						}
-						else if (invocation.Arguments.Length > 0 && invocation.Arguments[0] is Delegate delegateInstance)
-						{
-							mock.EventHandlers.Remove(eventInfo.Name, delegateInstance);
-							invocation.Return();
-							return InterceptionAction.Stop;
-						}
+			if (eventInfo != null)
+			{
+				// TODO: We could compare `invocation.Method` and `eventInfo.GetRemoveMethod()` (or 
+				// `eventInfo.GetAddMethod()` here.
+				// If they are equal, then `invocation.Method` is definitely an event `remove` accessor.
+				// Not sure whether this would work with F# and COM; see commit 44070a9.
+
+				if (mock.CallBase && !invocation.Method.IsAbstract)
+				{
+					if (!mock.HasEventSetup)
+					{
+						invocation.ReturnBase();
+						return InterceptionAction.Stop;
+					}
+				}
+				else if (invocation.Arguments.Length > 0 && invocation.Arguments[0] is Delegate delegateInstance)
+				{
+					modifyEvent(eventInfo.Name, delegateInstance);
+					if (!mock.HasEventSetup)
+					{
+						invocation.Return();
+						return InterceptionAction.Stop;
 					}
 				}
 			}

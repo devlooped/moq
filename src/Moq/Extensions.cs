@@ -72,6 +72,11 @@ namespace Moq
 			return method.Name.StartsWith("remove_", StringComparison.Ordinal);
 		}
 
+		public static bool ProbablyEventAttachOrDetach(this MethodInfo method)
+		{
+			return method.IsSpecialName && (method.LooksLikeEventAttach() || method.LooksLikeEventDetach());
+		}
+
 		/// <summary>
 		/// Tests if a type is a delegate type (subclasses <see cref="Delegate" />).
 		/// </summary>
