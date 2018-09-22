@@ -130,6 +130,9 @@ namespace Moq
 	/// </summary>
 	internal static class QueryableMockExtensions
 	{
+		internal static readonly MethodInfo FluentMockMethod =
+			typeof(QueryableMockExtensions).GetMethod(nameof(FluentMock), BindingFlags.Public | BindingFlags.Static);
+
 		/// <summary>
 		/// Retrieves a fluent mock from the given setup expression.
 		/// </summary>

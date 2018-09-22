@@ -22,6 +22,9 @@ namespace Moq
 	/// <include file='Mock.xdoc' path='docs/doc[@for="Mock"]/*'/>
 	public abstract partial class Mock : IFluentInterface
 	{
+		internal static readonly MethodInfo GetMethod =
+			typeof(Mock).GetMethod(nameof(Get), BindingFlags.Public | BindingFlags.Static);
+
 		/// <include file='Mock.xdoc' path='docs/doc[@for="Mock.ctor"]/*'/>
 		protected Mock()
 		{
@@ -886,11 +889,6 @@ namespace Moq
 
 		private class FluentMockVisitor : ExpressionVisitor
 		{
-			static readonly MethodInfo FluentMockGenericMethod = ((Func<Mock<string>, Expression<Func<string, string>>, Mock<string>>)
-				QueryableMockExtensions.FluentMock<string, string>).GetMethodInfo().GetGenericMethodDefinition();
-			static readonly MethodInfo MockGetGenericMethod = ((Func<string, Mock<string>>)Moq.Mock.Get<string>)
-				.GetMethodInfo().GetGenericMethodDefinition();
-
 			Mock mock;
 
 			public FluentMockVisitor(Mock mock)
@@ -946,7 +944,7 @@ namespace Moq
 					// Generate a Mock.Get over the entire member access rather.
 					// <anonymous_type>.foo => Mock.Get(<anonymous_type>.foo)
 					return Expression.Call(null,
-						MockGetGenericMethod.MakeGenericMethod(memberType), node);
+						Mock.GetMethod.MakeGenericMethod(memberType), node);
 				}
 
 				// If member is not mock-able, actually, including being a sealed class, etc.?
@@ -985,7 +983,7 @@ namespace Moq
 			private static MethodInfo GetTargetMethod(Type objectType, Type returnType)
 			{
 				Guard.Mockable(returnType);
-				return FluentMockGenericMethod.MakeGenericMethod(objectType, returnType);
+				return QueryableMockExtensions.FluentMockMethod.MakeGenericMethod(objectType, returnType);
 			}
 		}
 
