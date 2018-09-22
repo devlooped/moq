@@ -889,20 +889,10 @@ namespace Moq
 
 		private class FluentMockVisitor : FluentMockVisitorBase
 		{
-			Mock mock;
-
 			public FluentMockVisitor(Mock mock)
-				: base(setupFirst: false)
+				: base(resolveRoot: p => Expression.Constant(mock),
+				       setupFirst: false)
 			{
-				this.mock = mock;
-			}
-
-			protected override Expression VisitParameter(ParameterExpression p)
-			{
-				// the actual first object being used in a fluent expression, 
-				// which will be against the actual mock rather than 
-				// the parameter.
-				return Expression.Constant(mock);
 			}
 		}
 

@@ -20,11 +20,13 @@ namespace Moq
 		/// than FluentMock.
 		/// </summary>
 		protected bool isFirst;
+		private readonly Func<ParameterExpression, Expression> resolveRoot;
 		private readonly bool setupFirst;
 
-		protected FluentMockVisitorBase(bool setupFirst)
+		protected FluentMockVisitorBase(Func<ParameterExpression, Expression> resolveRoot, bool setupFirst)
 		{
 			this.isFirst = true;
+			this.resolveRoot = resolveRoot;
 			this.setupFirst = setupFirst;
 		}
 
@@ -84,7 +86,15 @@ namespace Moq
 			return TranslateFluent(node.Object.Type, node.Method.ReturnType, targetMethod, this.Visit(node.Object), lambdaParam, lambdaBody);
 		}
 
-		protected override abstract Expression VisitParameter(ParameterExpression node);
+		protected override Expression VisitParameter(ParameterExpression node)
+		{
+			if (node == null)
+			{
+				return null;
+			}
+
+			return this.resolveRoot(node);
+		}
 
 		protected MethodInfo GetTargetMethod(Type objectType, Type returnType)
 		{

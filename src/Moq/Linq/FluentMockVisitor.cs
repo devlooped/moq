@@ -15,19 +15,9 @@ namespace Moq.Linq
 	internal class FluentMockVisitor : FluentMockVisitorBase
 	{
 		public FluentMockVisitor()
-			: base(setupFirst: true)
+			: base(resolveRoot: p => Expression.Call(null, Mock.GetMethod.MakeGenericMethod(p.Type), p),
+			       setupFirst: true)
 		{
-		}
-
-		protected override Expression VisitParameter(ParameterExpression node)
-		{
-			if (node == null)
-			{
-				return null;
-			}
-
-			// the actual first object being used in a fluent expression.
-			return Expression.Call(null, Mock.GetMethod.MakeGenericMethod(node.Type), node);
 		}
 	}
 }
