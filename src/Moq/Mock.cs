@@ -924,41 +924,7 @@ namespace Moq
 					lambdaBody);
 			}
 
-			protected override Expression VisitMember(MemberExpression node)
-			{
-				if (node == null)
-				{
-					return null;
-				}
-
-				// Translate differently member accesses over transparent
-				// compiler-generated types as they are typically the 
-				// anonymous types generated to build up the query expressions.
-				if (node.Expression.NodeType == ExpressionType.Parameter &&
-					node.Expression.Type.GetTypeInfo().IsDefined(typeof(CompilerGeneratedAttribute), false))
-				{
-					var memberType = node.Member is FieldInfo ?
-						((FieldInfo)node.Member).FieldType :
-						((PropertyInfo)node.Member).PropertyType;
-
-					// Generate a Mock.Get over the entire member access rather.
-					// <anonymous_type>.foo => Mock.Get(<anonymous_type>.foo)
-					return Expression.Call(null,
-						Mock.GetMethod.MakeGenericMethod(memberType), node);
-				}
-
-				// If member is not mock-able, actually, including being a sealed class, etc.?
-				if (node.Member is FieldInfo)
-					throw new NotSupportedException();
-
-				var lambdaParam = Expression.Parameter(node.Expression.Type, "mock");
-				Expression lambdaBody = Expression.MakeMemberAccess(lambdaParam, node.Member);
-				var targetMethod = GetTargetMethod(node.Expression.Type, ((PropertyInfo)node.Member).PropertyType);
-
-				return TranslateFluent(node.Expression.Type, ((PropertyInfo)node.Member).PropertyType, targetMethod, Visit(node.Expression), lambdaParam, lambdaBody);
-			}
-
-			private static Expression TranslateFluent(
+			protected override Expression TranslateFluent(
 				Type objectType,
 				Type returnType,
 				MethodInfo targetMethod,
@@ -980,7 +946,7 @@ namespace Moq
 				);
 			}
 
-			private static MethodInfo GetTargetMethod(Type objectType, Type returnType)
+			protected override MethodInfo GetTargetMethod(Type objectType, Type returnType)
 			{
 				Guard.Mockable(returnType);
 				return QueryableMockExtensions.FluentMockMethod.MakeGenericMethod(objectType, returnType);
