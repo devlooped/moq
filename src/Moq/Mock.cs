@@ -22,6 +22,9 @@ namespace Moq
 	/// <include file='Mock.xdoc' path='docs/doc[@for="Mock"]/*'/>
 	public abstract partial class Mock : IFluentInterface
 	{
+		internal static readonly MethodInfo GetMethod =
+			typeof(Mock).GetMethod(nameof(Get), BindingFlags.Public | BindingFlags.Static);
+
 		/// <include file='Mock.xdoc' path='docs/doc[@for="Mock.ctor"]/*'/>
 		protected Mock()
 		{
@@ -828,7 +831,7 @@ namespace Moq
 				return mock;
 			}
 
-			var targetExpression = FluentMockVisitor.Accept(fluentExpression, mock);
+			var targetExpression = VisitFluent(mock, fluentExpression);
 			var targetLambda = Expression.Lambda<Func<Mock>>(Expression.Convert(targetExpression, typeof(Mock)));
 
 			var targetObject = targetLambda.CompileUsingExpressionCompiler()();
@@ -884,121 +887,11 @@ namespace Moq
 			}
 		}
 
-		private class FluentMockVisitor : ExpressionVisitor
+		private static Expression VisitFluent(Mock mock, Expression expression)
 		{
-			static readonly MethodInfo FluentMockGenericMethod = ((Func<Mock<string>, Expression<Func<string, string>>, Mock<string>>)
-				QueryableMockExtensions.FluentMock<string, string>).GetMethodInfo().GetGenericMethodDefinition();
-			static readonly MethodInfo MockGetGenericMethod = ((Func<string, Mock<string>>)Moq.Mock.Get<string>)
-				.GetMethodInfo().GetGenericMethodDefinition();
-
-			Expression expression;
-			Mock mock;
-
-			public FluentMockVisitor(Expression expression, Mock mock)
-			{
-				this.expression = expression;
-				this.mock = mock;
-			}
-
-			public static Expression Accept(Expression expression, Mock mock)
-			{
-				return new FluentMockVisitor(expression, mock).Accept();
-			}
-
-			public Expression Accept()
-			{
-				return Visit(expression);
-			}
-
-			protected override Expression VisitParameter(ParameterExpression p)
-			{
-				// the actual first object being used in a fluent expression, 
-				// which will be against the actual mock rather than 
-				// the parameter.
-				return Expression.Constant(mock);
-			}
-
-			protected override Expression VisitMethodCall(MethodCallExpression node)
-			{
-				if (node == null)
-				{
-					return null;
-				}
-
-				var lambdaParam = Expression.Parameter(node.Object.Type, "mock");
-				Expression lambdaBody = Expression.Call(lambdaParam, node.Method, node.Arguments);
-				var targetMethod = GetTargetMethod(node.Object.Type, node.Method.ReturnType);
-
-				return TranslateFluent(
-					node.Object.Type,
-					node.Method.ReturnType,
-					targetMethod,
-					this.Visit(node.Object),
-					lambdaParam,
-					lambdaBody);
-			}
-
-			protected override Expression VisitMember(MemberExpression node)
-			{
-				if (node == null)
-				{
-					return null;
-				}
-
-				// Translate differently member accesses over transparent
-				// compiler-generated types as they are typically the 
-				// anonymous types generated to build up the query expressions.
-				if (node.Expression.NodeType == ExpressionType.Parameter &&
-					node.Expression.Type.GetTypeInfo().IsDefined(typeof(CompilerGeneratedAttribute), false))
-				{
-					var memberType = node.Member is FieldInfo ?
-						((FieldInfo)node.Member).FieldType :
-						((PropertyInfo)node.Member).PropertyType;
-
-					// Generate a Mock.Get over the entire member access rather.
-					// <anonymous_type>.foo => Mock.Get(<anonymous_type>.foo)
-					return Expression.Call(null,
-						MockGetGenericMethod.MakeGenericMethod(memberType), node);
-				}
-
-				// If member is not mock-able, actually, including being a sealed class, etc.?
-				if (node.Member is FieldInfo)
-					throw new NotSupportedException();
-
-				var lambdaParam = Expression.Parameter(node.Expression.Type, "mock");
-				Expression lambdaBody = Expression.MakeMemberAccess(lambdaParam, node.Member);
-				var targetMethod = GetTargetMethod(node.Expression.Type, ((PropertyInfo)node.Member).PropertyType);
-
-				return TranslateFluent(node.Expression.Type, ((PropertyInfo)node.Member).PropertyType, targetMethod, Visit(node.Expression), lambdaParam, lambdaBody);
-			}
-
-			private static Expression TranslateFluent(
-				Type objectType,
-				Type returnType,
-				MethodInfo targetMethod,
-				Expression instance,
-				ParameterExpression lambdaParam,
-				Expression lambdaBody)
-			{
-				var funcType = typeof(Func<,>).MakeGenericType(objectType, returnType);
-
-				// This is the fluent extension method one, so pass the instance as one more arg.
-				return Expression.Call(
-					targetMethod,
-					instance,
-					Expression.Lambda(
-						funcType,
-						lambdaBody,
-						lambdaParam
-					)
-				);
-			}
-
-			private static MethodInfo GetTargetMethod(Type objectType, Type returnType)
-			{
-				Guard.Mockable(returnType);
-				return FluentMockGenericMethod.MakeGenericMethod(objectType, returnType);
-			}
+			return new FluentMockVisitor(resolveRoot: p => Expression.Constant(mock),
+			                             setupRightmost: false)
+			       .Visit(expression);
 		}
 
 		#endregion

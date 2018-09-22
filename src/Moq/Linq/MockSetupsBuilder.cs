@@ -207,7 +207,7 @@ namespace Moq.Linq
 				return ConvertToSetup(targetObject, left, right);
 
 			// This will get up to and including the Mock.Get(foo).Setup(mock => mock.Name) call.
-			var propertySetup = FluentMockVisitor.Accept(left);
+			var propertySetup = VisitFluent(left);
 			// We need to go back one level, to the target expression of the Setup call, 
 			// which would be the Mock.Get(foo), where we will actually invoke SetupProperty instead.
 			if (propertySetup.NodeType != ExpressionType.Call)
@@ -246,8 +246,15 @@ namespace Moq.Linq
 			}
 
 			return Expression.NotEqual(
-				Expression.Call(FluentMockVisitor.Accept(left), returnsMethod, right),
+				Expression.Call(VisitFluent(left), returnsMethod, right),
 				Expression.Constant(null));
+		}
+
+		private static Expression VisitFluent(Expression expression)
+		{
+			return new FluentMockVisitor(resolveRoot: p => Expression.Call(null, Mock.GetMethod.MakeGenericMethod(p.Type), p),
+			                             setupRightmost: true)
+			       .Visit(expression);
 		}
 	}
 }
