@@ -20,8 +20,6 @@ namespace Moq.Linq
 		private static readonly MethodInfo mockGetGenericMethod = ((Func<string, Mock<string>>)Mock.Get<string>)
 			.GetMethodInfo().GetGenericMethodDefinition();
 
-		private Expression expression;
-
 		/// <summary>
 		/// The first method call or member access will be the 
 		/// last segment of the expression (depth-first traversal), 
@@ -30,21 +28,6 @@ namespace Moq.Linq
 		/// than FluentMock.
 		/// </summary>
 		private bool isFirst = true;
-
-		public FluentMockVisitor(Expression expression)
-		{
-			this.expression = expression;
-		}
-
-		public static Expression Accept(Expression expression)
-		{
-			return new FluentMockVisitor(expression).Accept();
-		}
-
-		public Expression Accept()
-		{
-			return this.Visit(expression);
-		}
 
 		protected override Expression VisitParameter(ParameterExpression node)
 		{

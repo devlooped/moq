@@ -828,7 +828,7 @@ namespace Moq
 				return mock;
 			}
 
-			var targetExpression = FluentMockVisitor.Accept(fluentExpression, mock);
+			var targetExpression = new FluentMockVisitor(mock).Visit(fluentExpression);
 			var targetLambda = Expression.Lambda<Func<Mock>>(Expression.Convert(targetExpression, typeof(Mock)));
 
 			var targetObject = targetLambda.CompileUsingExpressionCompiler()();
@@ -891,23 +891,11 @@ namespace Moq
 			static readonly MethodInfo MockGetGenericMethod = ((Func<string, Mock<string>>)Moq.Mock.Get<string>)
 				.GetMethodInfo().GetGenericMethodDefinition();
 
-			Expression expression;
 			Mock mock;
 
-			public FluentMockVisitor(Expression expression, Mock mock)
+			public FluentMockVisitor(Mock mock)
 			{
-				this.expression = expression;
 				this.mock = mock;
-			}
-
-			public static Expression Accept(Expression expression, Mock mock)
-			{
-				return new FluentMockVisitor(expression, mock).Accept();
-			}
-
-			public Expression Accept()
-			{
-				return Visit(expression);
 			}
 
 			protected override Expression VisitParameter(ParameterExpression p)
