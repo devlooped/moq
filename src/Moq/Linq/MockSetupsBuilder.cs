@@ -253,7 +253,7 @@ namespace Moq.Linq
 		private static Expression VisitFluent(Expression expression)
 		{
 			return new FluentMockVisitor(resolveRoot: p => Expression.Call(null, Mock.GetMethod.MakeGenericMethod(p.Type), p),
-			                             setupFirst: true)
+			                             setupRightmost: true)
 			       .Visit(expression);
 		}
 	}

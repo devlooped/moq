@@ -890,7 +890,7 @@ namespace Moq
 		private static Expression VisitFluent(Mock mock, Expression expression)
 		{
 			return new FluentMockVisitor(resolveRoot: p => Expression.Constant(mock),
-			                             setupFirst: false)
+			                             setupRightmost: false)
 			       .Visit(expression);
 		}
 

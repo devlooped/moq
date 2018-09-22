@@ -1,8 +1,8 @@
 // Copyright (c) 2007, Clarius Consulting, Manas Technology Solutions, InSTEDD.
 // All rights reserved. Licensed under the BSD 3-Clause License; see License.txt.
 
+using Moq.Properties;
 using System;
-using System.Diagnostics;
 using System.Linq;
 using System.Linq.Expressions;
 using System.Reflection;
@@ -10,24 +10,26 @@ using System.Runtime.CompilerServices;
 
 namespace Moq
 {
+	/// <summary>
+	///   This visitor translates multi-dot expressions such as `r.A.B.C` to an executable expression
+	///   `FluentMock(FluentMock(FluentMock(root, m => m.A), a => a.B), b => b.C)` that, when executed,
+	///   will cause all "inner mocks" towards the rightmost sub-expression to be automatically mocked.
+	///   The original expression can be added to the final, rightmost inner mock as a setup.
+	/// </summary>
 	internal sealed class FluentMockVisitor : ExpressionVisitor
 	{
-		/// <summary>
-		/// The first method call or member access will be the
-		/// last segment of the expression (depth-first traversal),
-		/// which is the one we have to Setup rather than FluentMock.
-		/// And the last one is the one we have to Mock.Get rather
-		/// than FluentMock.
-		/// </summary>
-		private bool isFirst;
-		private readonly Func<ParameterExpression, Expression> resolveRoot;
-		private readonly bool setupFirst;
+		internal static readonly MethodInfo FluentMockMethod =
+			typeof(FluentMockVisitor).GetMethod(nameof(FluentMock), BindingFlags.NonPublic | BindingFlags.Static);
 
-		public FluentMockVisitor(Func<ParameterExpression, Expression> resolveRoot, bool setupFirst)
+		private bool isAtRightmost;
+		private readonly Func<ParameterExpression, Expression> resolveRoot;
+		private readonly bool setupRightmost;
+
+		public FluentMockVisitor(Func<ParameterExpression, Expression> resolveRoot, bool setupRightmost)
 		{
-			this.isFirst = true;
+			this.isAtRightmost = true;
 			this.resolveRoot = resolveRoot;
-			this.setupFirst = setupFirst;
+			this.setupRightmost = setupRightmost;
 		}
 
 		protected override Expression VisitMember(MemberExpression node)
@@ -60,9 +62,9 @@ namespace Moq
 			var lambdaParam = Expression.Parameter(node.Expression.Type, "mock");
 			Expression lambdaBody = Expression.MakeMemberAccess(lambdaParam, node.Member);
 			var targetMethod = GetTargetMethod(node.Expression.Type, ((PropertyInfo)node.Member).PropertyType);
-			if (isFirst)
+			if (isAtRightmost)
 			{
-				isFirst = false;
+				isAtRightmost = false;
 			}
 
 			return TranslateFluent(node.Expression.Type, ((PropertyInfo)node.Member).PropertyType, targetMethod, Visit(node.Expression), lambdaParam, lambdaBody);
@@ -78,9 +80,9 @@ namespace Moq
 			var lambdaParam = Expression.Parameter(node.Object.Type, "mock");
 			var lambdaBody = Expression.Call(lambdaParam, node.Method, node.Arguments);
 			var targetMethod = GetTargetMethod(node.Object.Type, node.Method.ReturnType);
-			if (isFirst)
+			if (isAtRightmost)
 			{
-				isFirst = false;
+				isAtRightmost = false;
 			}
 
 			return TranslateFluent(node.Object.Type, node.Method.ReturnType, targetMethod, this.Visit(node.Object), lambdaParam, lambdaBody);
@@ -99,7 +101,7 @@ namespace Moq
 		private MethodInfo GetTargetMethod(Type objectType, Type returnType)
 		{
 			// dte.Solution =>
-			if (this.setupFirst && this.isFirst)
+			if (this.setupRightmost && this.isAtRightmost)
 			{
 				//.Setup(mock => mock.Solution)
 				return typeof(Mock<>)
@@ -112,7 +114,7 @@ namespace Moq
 			{
 				//.FluentMock(mock => mock.Solution)
 				Guard.Mockable(returnType);
-				return QueryableMockExtensions.FluentMockMethod.MakeGenericMethod(objectType, returnType);
+				return FluentMockMethod.MakeGenericMethod(objectType, returnType);
 			}
 		}
 
@@ -135,6 +137,63 @@ namespace Moq
 			{
 				return Expression.Call(instance, targetMethod, Expression.Lambda(funcType, lambdaBody, lambdaParam));
 			}
+		}
+
+		/// <summary>
+		/// Retrieves a fluent mock from the given setup expression.
+		/// </summary>
+		private static Mock<TResult> FluentMock<T, TResult>(Mock<T> mock, Expression<Func<T, TResult>> setup)
+			where T : class
+			where TResult : class
+		{
+			Guard.NotNull(mock, nameof(mock));
+			Guard.NotNull(setup, nameof(setup));
+			Guard.Mockable(typeof(TResult));
+
+			MethodInfo info;
+			if (setup.Body.NodeType == ExpressionType.MemberAccess)
+			{
+				var memberExpr = ((MemberExpression)setup.Body);
+				memberExpr.ThrowIfNotMockeable();
+
+				info = ((PropertyInfo)memberExpr.Member).GetGetMethod();
+			}
+			else if (setup.Body.NodeType == ExpressionType.Call)
+			{
+				info = ((MethodCallExpression)setup.Body).Method;
+			}
+			else
+			{
+				throw new NotSupportedException(string.Format(Resources.UnsupportedExpression, setup.ToStringFixed()));
+			}
+
+			Guard.Mockable(info.ReturnType);
+
+			Mock fluentMock;
+			MockWithWrappedMockObject innerMock;
+			if (mock.InnerMocks.TryGetValue(info, out innerMock))
+			{
+				fluentMock = innerMock.Mock;
+			}
+			else
+			{
+				fluentMock = ((IMocked)mock.GetDefaultValue(info, useAlternateProvider: DefaultValueProvider.Mock)).Mock;
+				Mock.SetupAllProperties(fluentMock);
+
+				innerMock = new MockWithWrappedMockObject(fluentMock, fluentMock.Object);
+				//                                                    ^^^^^^^^^^^^^^^^^
+				// NOTE: Above, we are assuming that a default value was returned that is neither a `Task<T>` nor a `ValueTask<T>`,
+				// i.e. nothing we'd need to first "unwrap" to get at the actual mocked object. This assumption would seem permissible
+				// since the present method gets called only for multi-dot expressions ("recursive mocking"), which do not allow
+				// `await` expressions. Therefore we don't need to deal with `Task<T>` nor `ValueTask<T>`, and we proceed as if the
+				// returned default value were already "unwrapped".
+			}
+
+			var result = (TResult)innerMock.WrappedMockObject;
+
+			mock.Setup(setup).Returns(result);
+
+			return (Mock<TResult>)fluentMock;
 		}
 	}
 }
