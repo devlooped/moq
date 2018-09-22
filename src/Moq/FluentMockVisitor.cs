@@ -1,12 +1,14 @@
 // Copyright (c) 2007, Clarius Consulting, Manas Technology Solutions, InSTEDD.
 // All rights reserved. Licensed under the BSD 3-Clause License; see License.txt.
 
-using Moq.Properties;
 using System;
+using System.Diagnostics;
 using System.Linq;
 using System.Linq.Expressions;
 using System.Reflection;
 using System.Runtime.CompilerServices;
+
+using Moq.Properties;
 
 namespace Moq
 {
@@ -27,6 +29,8 @@ namespace Moq
 
 		public FluentMockVisitor(Func<ParameterExpression, Expression> resolveRoot, bool setupRightmost)
 		{
+			Debug.Assert(resolveRoot != null);
+
 			this.isAtRightmost = true;
 			this.resolveRoot = resolveRoot;
 			this.setupRightmost = setupRightmost;
@@ -34,10 +38,7 @@ namespace Moq
 
 		protected override Expression VisitMember(MemberExpression node)
 		{
-			if (node == null)
-			{
-				return null;
-			}
+			Debug.Assert(node != null);
 
 			// Translate differently member accesses over transparent
 			// compiler-generated types as they are typically the
@@ -72,10 +73,7 @@ namespace Moq
 
 		protected override Expression VisitMethodCall(MethodCallExpression node)
 		{
-			if (node == null)
-			{
-				return null;
-			}
+			Debug.Assert(node != null);
 
 			var lambdaParam = Expression.Parameter(node.Object.Type, "mock");
 			var lambdaBody = Expression.Call(lambdaParam, node.Method, node.Arguments);
@@ -90,10 +88,7 @@ namespace Moq
 
 		protected override Expression VisitParameter(ParameterExpression node)
 		{
-			if (node == null)
-			{
-				return null;
-			}
+			Debug.Assert(node != null);
 
 			return this.resolveRoot(node);
 		}
