@@ -2,6 +2,7 @@
 // All rights reserved. Licensed under the BSD 3-Clause License; see License.txt.
 
 using System;
+using System.Diagnostics;
 using System.Linq;
 using System.Linq.Expressions;
 using System.Reflection;
@@ -69,13 +70,6 @@ namespace Moq
 
 		protected override abstract Expression VisitParameter(ParameterExpression node);
 
-		protected abstract Expression TranslateFluent(Type objectType,
-		                                              Type returnType,
-		                                              MethodInfo targetMethod,
-		                                              Expression instance,
-		                                              ParameterExpression lambdaParam,
-		                                              Expression lambdaBody);
-
 		protected MethodInfo GetTargetMethod(Type objectType, Type returnType)
 		{
 			// dte.Solution =>
@@ -93,6 +87,27 @@ namespace Moq
 				//.FluentMock(mock => mock.Solution)
 				Guard.Mockable(returnType);
 				return QueryableMockExtensions.FluentMockMethod.MakeGenericMethod(objectType, returnType);
+			}
+		}
+
+		// Args like: string IFoo (mock => mock.Value)
+		protected Expression TranslateFluent(Type objectType,
+		                                     Type returnType,
+		                                     MethodInfo targetMethod,
+		                                     Expression instance,
+		                                     ParameterExpression lambdaParam,
+		                                     Expression lambdaBody)
+		{
+			var funcType = typeof(Func<,>).MakeGenericType(objectType, returnType);
+
+			if (targetMethod.IsStatic)
+			{
+				// This is the fluent extension method one, so pass the instance as one more arg.
+				return Expression.Call(targetMethod, instance, Expression.Lambda(funcType, lambdaBody, lambdaParam));
+			}
+			else
+			{
+				return Expression.Call(instance, targetMethod, Expression.Lambda(funcType, lambdaBody, lambdaParam));
 			}
 		}
 	}

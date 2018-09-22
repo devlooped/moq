@@ -924,28 +924,6 @@ namespace Moq
 					lambdaParam,
 					lambdaBody);
 			}
-
-			protected override Expression TranslateFluent(
-				Type objectType,
-				Type returnType,
-				MethodInfo targetMethod,
-				Expression instance,
-				ParameterExpression lambdaParam,
-				Expression lambdaBody)
-			{
-				var funcType = typeof(Func<,>).MakeGenericType(objectType, returnType);
-
-				// This is the fluent extension method one, so pass the instance as one more arg.
-				return Expression.Call(
-					targetMethod,
-					instance,
-					Expression.Lambda(
-						funcType,
-						lambdaBody,
-						lambdaParam
-					)
-				);
-			}
 		}
 
 		#endregion

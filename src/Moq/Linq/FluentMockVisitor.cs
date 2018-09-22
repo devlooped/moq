@@ -47,25 +47,5 @@ namespace Moq.Linq
 
 			return TranslateFluent(node.Object.Type, node.Method.ReturnType, targetMethod, Visit(node.Object), lambdaParam, lambdaBody);
 		}
-
-		// Args like: string IFoo (mock => mock.Value)
-		protected override Expression TranslateFluent(
-			Type objectType,
-			Type returnType,
-			MethodInfo targetMethod,
-			Expression instance,
-			ParameterExpression lambdaParam,
-			Expression lambdaBody)
-		{
-			var funcType = typeof(Func<,>).MakeGenericType(objectType, returnType);
-
-			// This is the fluent extension method one, so pass the instance as one more arg.
-			if (targetMethod.IsStatic)
-			{
-				return Expression.Call(targetMethod, instance, Expression.Lambda(funcType, lambdaBody, lambdaParam));
-			}
-
-			return Expression.Call(instance, targetMethod, Expression.Lambda(funcType, lambdaBody, lambdaParam));
-		}
 	}
 }
