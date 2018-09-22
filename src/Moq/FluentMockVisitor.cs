@@ -10,7 +10,7 @@ using System.Runtime.CompilerServices;
 
 namespace Moq
 {
-	internal abstract class FluentMockVisitorBase : ExpressionVisitor
+	internal sealed class FluentMockVisitor : ExpressionVisitor
 	{
 		/// <summary>
 		/// The first method call or member access will be the
@@ -19,11 +19,11 @@ namespace Moq
 		/// And the last one is the one we have to Mock.Get rather
 		/// than FluentMock.
 		/// </summary>
-		protected bool isFirst;
+		private bool isFirst;
 		private readonly Func<ParameterExpression, Expression> resolveRoot;
 		private readonly bool setupFirst;
 
-		protected FluentMockVisitorBase(Func<ParameterExpression, Expression> resolveRoot, bool setupFirst)
+		public FluentMockVisitor(Func<ParameterExpression, Expression> resolveRoot, bool setupFirst)
 		{
 			this.isFirst = true;
 			this.resolveRoot = resolveRoot;
@@ -96,7 +96,7 @@ namespace Moq
 			return this.resolveRoot(node);
 		}
 
-		protected MethodInfo GetTargetMethod(Type objectType, Type returnType)
+		private MethodInfo GetTargetMethod(Type objectType, Type returnType)
 		{
 			// dte.Solution =>
 			if (this.setupFirst && this.isFirst)
@@ -117,12 +117,12 @@ namespace Moq
 		}
 
 		// Args like: string IFoo (mock => mock.Value)
-		protected Expression TranslateFluent(Type objectType,
-		                                     Type returnType,
-		                                     MethodInfo targetMethod,
-		                                     Expression instance,
-		                                     ParameterExpression lambdaParam,
-		                                     Expression lambdaBody)
+		private Expression TranslateFluent(Type objectType,
+		                                   Type returnType,
+		                                   MethodInfo targetMethod,
+		                                   Expression instance,
+		                                   ParameterExpression lambdaParam,
+		                                   Expression lambdaBody)
 		{
 			var funcType = typeof(Func<,>).MakeGenericType(objectType, returnType);
 

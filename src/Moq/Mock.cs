@@ -831,7 +831,7 @@ namespace Moq
 				return mock;
 			}
 
-			var targetExpression = new FluentMockVisitor(mock).Visit(fluentExpression);
+			var targetExpression = VisitFluent(mock, fluentExpression);
 			var targetLambda = Expression.Lambda<Func<Mock>>(Expression.Convert(targetExpression, typeof(Mock)));
 
 			var targetObject = targetLambda.CompileUsingExpressionCompiler()();
@@ -887,13 +887,11 @@ namespace Moq
 			}
 		}
 
-		private class FluentMockVisitor : FluentMockVisitorBase
+		private static Expression VisitFluent(Mock mock, Expression expression)
 		{
-			public FluentMockVisitor(Mock mock)
-				: base(resolveRoot: p => Expression.Constant(mock),
-				       setupFirst: false)
-			{
-			}
+			return new FluentMockVisitor(resolveRoot: p => Expression.Constant(mock),
+			                             setupFirst: false)
+			       .Visit(expression);
 		}
 
 		#endregion
