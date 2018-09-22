@@ -892,6 +892,7 @@ namespace Moq
 			Mock mock;
 
 			public FluentMockVisitor(Mock mock)
+				: base(setupFirst: false)
 			{
 				this.mock = mock;
 			}
@@ -944,12 +945,6 @@ namespace Moq
 						lambdaParam
 					)
 				);
-			}
-
-			protected override MethodInfo GetTargetMethod(Type objectType, Type returnType)
-			{
-				Guard.Mockable(returnType);
-				return QueryableMockExtensions.FluentMockMethod.MakeGenericMethod(objectType, returnType);
 			}
 		}
 

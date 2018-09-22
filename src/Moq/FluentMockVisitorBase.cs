@@ -2,6 +2,7 @@
 // All rights reserved. Licensed under the BSD 3-Clause License; see License.txt.
 
 using System;
+using System.Linq;
 using System.Linq.Expressions;
 using System.Reflection;
 using System.Runtime.CompilerServices;
@@ -18,10 +19,12 @@ namespace Moq
 		/// than FluentMock.
 		/// </summary>
 		protected bool isFirst;
+		private readonly bool setupFirst;
 
-		protected FluentMockVisitorBase()
+		protected FluentMockVisitorBase(bool setupFirst)
 		{
 			this.isFirst = true;
+			this.setupFirst = setupFirst;
 		}
 
 		protected override Expression VisitMember(MemberExpression node)
@@ -73,6 +76,24 @@ namespace Moq
 		                                              ParameterExpression lambdaParam,
 		                                              Expression lambdaBody);
 
-		protected abstract MethodInfo GetTargetMethod(Type objectType, Type returnType);
+		protected MethodInfo GetTargetMethod(Type objectType, Type returnType)
+		{
+			// dte.Solution =>
+			if (this.setupFirst && this.isFirst)
+			{
+				//.Setup(mock => mock.Solution)
+				return typeof(Mock<>)
+				       .MakeGenericType(objectType)
+				       .GetMethods("Setup")
+				       .First(m => m.IsGenericMethod)
+				       .MakeGenericMethod(returnType);
+			}
+			else
+			{
+				//.FluentMock(mock => mock.Solution)
+				Guard.Mockable(returnType);
+				return QueryableMockExtensions.FluentMockMethod.MakeGenericMethod(objectType, returnType);
+			}
+		}
 	}
 }

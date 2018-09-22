@@ -14,6 +14,11 @@ namespace Moq.Linq
 {
 	internal class FluentMockVisitor : FluentMockVisitorBase
 	{
+		public FluentMockVisitor()
+			: base(setupFirst: true)
+		{
+		}
+
 		protected override Expression VisitParameter(ParameterExpression node)
 		{
 			if (node == null)
@@ -61,33 +66,6 @@ namespace Moq.Linq
 			}
 
 			return Expression.Call(instance, targetMethod, Expression.Lambda(funcType, lambdaBody, lambdaParam));
-		}
-
-		protected override MethodInfo GetTargetMethod(Type objectType, Type returnType)
-		{
-			MethodInfo targetMethod;
-			// dte.Solution =>
-			if (isFirst)
-			{
-				//.Setup(mock => mock.Solution)
-				targetMethod = GetSetupMethod(objectType, returnType);
-			}
-			else
-			{
-				//.FluentMock(mock => mock.Solution)
-				targetMethod = QueryableMockExtensions.FluentMockMethod.MakeGenericMethod(objectType, returnType);
-			}
-
-			return targetMethod;
-		}
-
-		private static MethodInfo GetSetupMethod(Type objectType, Type returnType)
-		{
-			return typeof(Mock<>)
-				.MakeGenericType(objectType)
-				.GetMethods("Setup")
-				.First(mi => mi.IsGenericMethod)
-				.MakeGenericMethod(returnType);
 		}
 	}
 }
