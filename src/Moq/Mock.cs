@@ -904,26 +904,6 @@ namespace Moq
 				// the parameter.
 				return Expression.Constant(mock);
 			}
-
-			protected override Expression VisitMethodCall(MethodCallExpression node)
-			{
-				if (node == null)
-				{
-					return null;
-				}
-
-				var lambdaParam = Expression.Parameter(node.Object.Type, "mock");
-				Expression lambdaBody = Expression.Call(lambdaParam, node.Method, node.Arguments);
-				var targetMethod = GetTargetMethod(node.Object.Type, node.Method.ReturnType);
-
-				return TranslateFluent(
-					node.Object.Type,
-					node.Method.ReturnType,
-					targetMethod,
-					this.Visit(node.Object),
-					lambdaParam,
-					lambdaBody);
-			}
 		}
 
 		#endregion

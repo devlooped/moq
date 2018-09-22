@@ -66,7 +66,23 @@ namespace Moq
 			return TranslateFluent(node.Expression.Type, ((PropertyInfo)node.Member).PropertyType, targetMethod, Visit(node.Expression), lambdaParam, lambdaBody);
 		}
 
-		protected override abstract Expression VisitMethodCall(MethodCallExpression node);
+		protected override Expression VisitMethodCall(MethodCallExpression node)
+		{
+			if (node == null)
+			{
+				return null;
+			}
+
+			var lambdaParam = Expression.Parameter(node.Object.Type, "mock");
+			var lambdaBody = Expression.Call(lambdaParam, node.Method, node.Arguments);
+			var targetMethod = GetTargetMethod(node.Object.Type, node.Method.ReturnType);
+			if (isFirst)
+			{
+				isFirst = false;
+			}
+
+			return TranslateFluent(node.Object.Type, node.Method.ReturnType, targetMethod, this.Visit(node.Object), lambdaParam, lambdaBody);
+		}
 
 		protected override abstract Expression VisitParameter(ParameterExpression node);
 

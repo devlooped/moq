@@ -29,23 +29,5 @@ namespace Moq.Linq
 			// the actual first object being used in a fluent expression.
 			return Expression.Call(null, Mock.GetMethod.MakeGenericMethod(node.Type), node);
 		}
-
-		protected override Expression VisitMethodCall(MethodCallExpression node)
-		{
-			if (node == null)
-			{
-				return null;
-			}
-
-			var lambdaParam = Expression.Parameter(node.Object.Type, "mock");
-			var lambdaBody = Expression.Call(lambdaParam, node.Method, node.Arguments);
-			var targetMethod = GetTargetMethod(node.Object.Type, node.Method.ReturnType);
-			if (isFirst)
-			{
-				isFirst = false;
-			}
-
-			return TranslateFluent(node.Object.Type, node.Method.ReturnType, targetMethod, Visit(node.Object), lambdaParam, lambdaBody);
-		}
 	}
 }
