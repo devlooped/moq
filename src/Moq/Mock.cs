@@ -887,7 +887,7 @@ namespace Moq
 			}
 		}
 
-		private class FluentMockVisitor : ExpressionVisitor
+		private class FluentMockVisitor : FluentMockVisitorBase
 		{
 			Mock mock;
 

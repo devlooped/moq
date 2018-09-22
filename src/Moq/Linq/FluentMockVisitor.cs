@@ -12,7 +12,7 @@ using System.Diagnostics.CodeAnalysis;
 
 namespace Moq.Linq
 {
-	internal class FluentMockVisitor : ExpressionVisitor
+	internal class FluentMockVisitor : FluentMockVisitorBase
 	{
 		/// <summary>
 		/// The first method call or member access will be the 
