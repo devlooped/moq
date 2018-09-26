@@ -682,28 +682,6 @@ namespace Moq
 			}
 		}
 
-		internal static ISetup<T> SetupSetMethod<T, TProperty>(
-			Mock<T> mock,
-			Type[] argumentTypes,
-			LambdaExpression setter)
-			where T : class
-		{
-			Expression actionParameter = setter.Parameters.Single();
-			if (!(setter.Body is InvocationExpression call) || call.Expression != actionParameter)
-			{
-				throw new InvalidOperationException("Expected only call to the indexer method given in the lambda parameter");
-			}
-
-			PropertyInfo indexer = typeof(T).GetProperty("Item", typeof(TProperty), argumentTypes);
-			MethodInfo setterMethod = indexer.GetSetMethod();
-			ParameterExpression instanceLambdaArg = Expression.Parameter(typeof(T), "inst");
-			Expression<Action<T>> callSetter = Expression.Lambda<Action<T>>(
-				Expression.Call(instanceLambdaArg, setterMethod, call.Arguments),
-				instanceLambdaArg);
-
-			return Setup(mock, callSetter, condition: null);
-		}
-
 		private static Expression GetValueExpression(object value, Type type)
 		{
 			if (value != null && value.GetType() == type)

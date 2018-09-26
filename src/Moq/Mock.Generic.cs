@@ -344,12 +344,6 @@ namespace Moq
 			return Mock.SetupSet<T>(this, setterExpression, null);
 		}
 
-		/// <include file='Mock.Generic.xdoc' path='docs/doc[@for="Mock{T}.SetupIndexerSet"]/*'/>
-		public ISetup<T> SetupSetMethod<T1, T2, TProperty>(Expression<Action<Action<T1, T2, TProperty>>> setter)
-		{
-			return Mock.SetupSetMethod<T, TProperty>(this, new Type[] { typeof(T1), typeof(T2) }, setter);
-		}
-
 		/// <include file='Mock.Generic.xdoc' path='docs/doc[@for="Mock{T}.SetupProperty(property)"]/*'/>
 		[SuppressMessage("Microsoft.Design", "CA1006:DoNotNestGenericTypesInMemberSignatures", Justification = "By design")]
 		[SuppressMessage("Microsoft.Naming", "CA1716:IdentifiersShouldNotMatchKeywords", MessageId = "Property", Justification = "This sets properties, so it's appropriate.")]
