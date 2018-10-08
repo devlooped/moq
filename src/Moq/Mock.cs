@@ -667,13 +667,12 @@ namespace Moq
 
 					matchers[valueIndex] = new MatchExpression(last.Match);
 
-					if (arguments.Length == 2)
+					for (int i = 0; i < arguments.Length - 1; i++)
 					{
-						// TODO: what about multi-index setters?
 						// Add the index value for the property indexer
-						values[0] = GetValueExpression(arguments[0], parameters[0].ParameterType);
+						values[i] = GetValueExpression(arguments[i], parameters[i].ParameterType);
 						// TODO: No matcher supported now for the index
-						matchers[0] = values[0];
+						matchers[i] = values[i];
 					}
 
 					var lambda = Expression.Lambda(
