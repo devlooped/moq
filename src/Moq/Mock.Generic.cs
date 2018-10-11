@@ -229,7 +229,7 @@ namespace Moq
 				// We're mocking a delegate.
 				// Firstly, get/create an interface with a method whose signature
 				// matches that of the delegate.
-				var delegateInterfaceType = ProxyFactory.Instance.GetDelegateProxyInterface(typeof(T), out delegateInterfaceMethod);
+				var delegateInterfaceType = ProxyFactory.Instance.GetDelegateProxyInterface(typeof(T), out var delegateInterfaceMethod);
 
 				// Then create a proxy for that.
 				var delegateProxy = ProxyFactory.Instance.CreateProxy(
@@ -249,21 +249,6 @@ namespace Moq
 					this,
 					interfaces,
 					this.constructorArguments);
-			}
-		}
-
-		private MethodInfo delegateInterfaceMethod;
-
-		/// <inheritdoc />
-		internal override MethodInfo DelegateInterfaceMethod
-		{
-			get
-			{
-				// Ensure object is created, which causes the delegateInterfaceMethod
-				// to be initialized.
-				OnGetObject();
-
-				return delegateInterfaceMethod;
 			}
 		}
 
