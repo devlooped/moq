@@ -149,11 +149,13 @@ namespace Moq
 			{
 				// We're a mock for a delegate, so this call can only
 				// possibly be the result of invoking the delegate.
+				var invocation = (InvocationExpression)expression.Body;
+
 				// But the expression we have is for a call on the delegate, not our
 				// delegate interface proxy, so we need to map instead to the
 				// method on that interface, which is the property we've just tested for.
-				var invocation = (InvocationExpression)expression.Body;
-				return (Object: invocation.Expression, Method: mock.DelegateInterfaceMethod, Arguments: invocation.Arguments);
+				_ = ProxyFactory.Instance.GetDelegateProxyInterface(mock.TargetType, out var delegateInterfaceMethod);
+				return (Object: invocation.Expression, Method: delegateInterfaceMethod, Arguments: invocation.Arguments);
 			}
 
 			if (expression.Body is MethodCallExpression methodCall)
