@@ -188,7 +188,7 @@ namespace Moq
 		/// must be performed on the mock, without causing unnecessarily early initialization of
 		/// the mock instance, which breaks As{T}.
 		/// </summary>
-		internal abstract bool IsDelegateMock { get; }
+		internal bool IsDelegateMock => this.TargetType.IsDelegate();
 
 		/// <summary>
 		/// Gets or sets the <see cref="DefaultValueProvider"/> instance that will be used

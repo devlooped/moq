@@ -210,11 +210,6 @@ namespace Moq
 			return this.Name;
 		}
 
-		internal override bool IsDelegateMock
-        {
-            get { return typeof(T).IsDelegate(); }
-        }
-
 		[DebuggerStepThrough]
 		private void InitializeInstance()
 		{
