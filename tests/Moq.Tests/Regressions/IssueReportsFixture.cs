@@ -9,6 +9,7 @@ using System.Data.Entity;
 using System.Data.Entity.Core.EntityClient;
 #endif
 using System.ComponentModel;
+using System.Globalization;
 using System.IO;
 using System.Linq;
 using System.Linq.Expressions;
@@ -2005,6 +2006,51 @@ namespace Moq.Tests.Regressions
 			{
 				void MyAction(int x);
 				int MyFunc(int x);
+			}
+		}
+
+		#endregion
+
+		#region 706
+		
+		public class Issue706
+		{
+			[Fact]
+			public void CallBase_should_not_be_allowed_for_void_delegate_mocks()
+			{
+				Mock<Action> mock = new Mock<Action>();
+				Language.Flow.ISetup<Action> setup = mock.Setup(m => m());
+				
+				Exception ex = Assert.Throws<NotSupportedException>(() => setup.CallBase());
+				Assert.Equal(string.Format(CultureInfo.CurrentCulture, Resources.CallBaseCannotBeUsedWithDelegateMocks), ex.Message);
+			}
+			
+			[Fact]
+			public void CallBase_should_not_be_allowed_for_non_void_delegate_mocks()
+			{
+				Mock<Func<bool>> mock = new Mock<Func<bool>>();
+				Language.Flow.ISetup<Func<bool>, bool> setup = mock.Setup(m => m());
+
+				Exception ex = Assert.Throws<NotSupportedException>(() => setup.CallBase());
+				Assert.Equal(string.Format(CultureInfo.CurrentCulture, Resources.CallBaseCannotBeUsedWithDelegateMocks), ex.Message);
+			}
+
+			[Fact]
+			public void CallBase_property_should_not_be_allowed_true_for_delegate_mocks()
+			{
+				Mock<Action> mock = new Mock<Action>();
+
+				Exception ex = Assert.Throws<NotSupportedException>(() => mock.CallBase = true);
+				Assert.Equal(string.Format(CultureInfo.CurrentCulture, Resources.CallBaseCannotBeUsedWithDelegateMocks), ex.Message);
+			}
+
+			[Fact]
+			public void CallBase_property_should_be_allowed_false_for_delegate_mocks()
+			{
+				Mock<Action> mock = new Mock<Action>();
+				mock.CallBase = false;
+				
+				Assert.Equal(false, mock.CallBase);
 			}
 		}
 

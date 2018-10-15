@@ -6,6 +6,7 @@ using System.Collections.Concurrent;
 using System.Collections.Generic;
 using System.Diagnostics;
 using System.Diagnostics.CodeAnalysis;
+using System.Globalization;
 using System.Linq;
 using System.Linq.Expressions;
 using System.Reflection;
@@ -18,6 +19,7 @@ using Microsoft.CSharp;
 
 using Moq.Language;
 using Moq.Language.Flow;
+using Moq.Properties;
 
 namespace Moq
 {
@@ -164,7 +166,15 @@ namespace Moq
 		public override bool CallBase
 		{
 			get => this.callBase;
-			set => this.callBase = value;
+			set
+			{
+				if (value && this.MockedType.IsDelegate())
+				{
+					throw new NotSupportedException(string.Format(CultureInfo.CurrentCulture, Resources.CallBaseCannotBeUsedWithDelegateMocks));
+				}
+
+				this.callBase = value;
+			}
 		}
 
 		internal override Dictionary<Type, object> ConfiguredDefaultValues => this.configuredDefaultValues;

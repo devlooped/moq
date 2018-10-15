@@ -123,6 +123,11 @@ namespace Moq
 
 		public virtual void SetCallBaseResponse()
 		{
+			if (this.Mock.TargetType.IsDelegate())
+			{
+				throw new NotSupportedException(string.Format(CultureInfo.CurrentCulture, Resources.CallBaseCannotBeUsedWithDelegateMocks));
+			}
+			
 			this.callBase = true;
 		}
 

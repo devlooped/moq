@@ -10,6 +10,7 @@ The format is loosely based on [Keep a Changelog](http://keepachangelog.com/en/1
 #### Fixed
 
 * `NullReferenceException` when using `SetupSet` on indexers with multiple parameters (@idigra, #694)
+* `CallBase` should not be allowed for delegate mocks (@tehmantra, #706)
 
 
 ## 4.10.0 (2018-09-08)

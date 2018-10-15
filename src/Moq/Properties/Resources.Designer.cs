@@ -88,6 +88,15 @@ namespace Moq.Properties {
 		}
 		
 		/// <summary>
+		///   Looks up a localized string similar to CallBase cannot be used with Delegate mocks..
+		/// </summary>
+		internal static string CallBaseCannotBeUsedWithDelegateMocks {
+			get {
+				return ResourceManager.GetString("CallBaseCannotBeUsedWithDelegateMocks", resourceCulture);
+			}
+		}
+		
+		/// <summary>
 		///   Looks up a localized string similar to Can&apos;t set return value for void method {0}..
 		/// </summary>
 		internal static string CantSetReturnValueForVoid {
