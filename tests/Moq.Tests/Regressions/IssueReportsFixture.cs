@@ -2010,6 +2010,22 @@ namespace Moq.Tests.Regressions
 
 		#endregion
 
+		#region 706
+		public class Issue706
+		{
+			[Fact]
+			public void CallBase_should_not_be_allowed_for_delegate_mocks()
+			{
+				Mock<Action> mock = new Mock<Action>();
+				Language.Flow.ISetup<Action> setup = mock.Setup(m => m());
+				
+				Exception ex = Assert.Throws<NotSupportedException>(() => setup.CallBase());
+				Assert.Equal(ex.Message, "CallBase cannot be used to mock delegates.");
+			}
+		}
+
+		#endregion
+
 		// Old @ Google Code
 
 		#region #47
