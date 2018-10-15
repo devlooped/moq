@@ -348,7 +348,7 @@ Expected invocation on the mock once, but was {4} times: {1}</value>
 		<value>The following invocations on mock '{0}' were not verified:
 {1}</value>
 	</data>
-	<data name="CallBaseUsedOnDelegateException" xml:space="preserve">
+	<data name="CallBaseCannotBeUsedWithDelegateMocks" xml:space="preserve">
 		<value>CallBase cannot be used with Delegate mocks.</value>
 	</data>
 </root>
