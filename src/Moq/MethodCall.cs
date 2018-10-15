@@ -123,9 +123,9 @@ namespace Moq
 
 		public virtual void SetCallBaseResponse()
 		{
-			if (typeof(Delegate).IsAssignableFrom(this.Mock.TargetType))
+			if (this.Mock.TargetType.IsDelegate())
 			{
-				throw new NotSupportedException(string.Format(CultureInfo.CurrentCulture, Resources.CallBaseUsedOnDelegateException));
+				throw new NotSupportedException(string.Format(CultureInfo.CurrentCulture, Resources.CallBaseCannotBeUsedWithDelegateMocks));
 			}
 			
 			this.callBase = true;

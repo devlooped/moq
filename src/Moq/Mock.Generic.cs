@@ -168,9 +168,9 @@ namespace Moq
 			get => this.callBase;
 			set
 			{
-				if (typeof(Delegate).IsAssignableFrom(this.MockedType))
+				if (value && this.MockedType.IsDelegate())
 				{
-					throw new NotSupportedException(string.Format(CultureInfo.CurrentCulture, Resources.CallBaseUsedOnDelegateException));
+					throw new NotSupportedException(string.Format(CultureInfo.CurrentCulture, Resources.CallBaseCannotBeUsedWithDelegateMocks));
 				}
 
 				this.callBase = value;

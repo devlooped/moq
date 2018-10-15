@@ -2022,16 +2022,25 @@ namespace Moq.Tests.Regressions
 				Language.Flow.ISetup<Action> setup = mock.Setup(m => m());
 				
 				Exception ex = Assert.Throws<NotSupportedException>(() => setup.CallBase());
-				Assert.Equal(string.Format(CultureInfo.CurrentCulture, Resources.CallBaseUsedOnDelegateException), ex.Message);
+				Assert.Equal(string.Format(CultureInfo.CurrentCulture, Resources.CallBaseCannotBeUsedWithDelegateMocks), ex.Message);
 			}
 
 			[Fact]
-			public void CallBase_property_should_not_be_allowed_for_delegate_mocks()
+			public void CallBase_property_should_not_be_allowed_true_for_delegate_mocks()
 			{
 				Mock<Action> mock = new Mock<Action>();
 
 				Exception ex = Assert.Throws<NotSupportedException>(() => mock.CallBase = true);
-				Assert.Equal(string.Format(CultureInfo.CurrentCulture, Resources.CallBaseUsedOnDelegateException), ex.Message);
+				Assert.Equal(string.Format(CultureInfo.CurrentCulture, Resources.CallBaseCannotBeUsedWithDelegateMocks), ex.Message);
+			}
+
+			[Fact]
+			public void CallBase_property_should_be_allowed_false_for_delegate_mocks()
+			{
+				Mock<Action> mock = new Mock<Action>();
+				mock.CallBase = false;
+				
+				Assert.Equal(false, mock.CallBase);
 			}
 		}
 
