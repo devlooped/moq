@@ -9,6 +9,7 @@ using System.Data.Entity;
 using System.Data.Entity.Core.EntityClient;
 #endif
 using System.ComponentModel;
+using System.Globalization;
 using System.IO;
 using System.Linq;
 using System.Linq.Expressions;
@@ -2020,7 +2021,7 @@ namespace Moq.Tests.Regressions
 				Language.Flow.ISetup<Action> setup = mock.Setup(m => m());
 				
 				Exception ex = Assert.Throws<NotSupportedException>(() => setup.CallBase());
-				Assert.Equal(ex.Message, "CallBase cannot be used to mock delegates.");
+				Assert.Equal(string.Format(CultureInfo.CurrentCulture, Resources.CallBaseUsedOnDelegateException), ex.Message);
 			}
 		}
 
