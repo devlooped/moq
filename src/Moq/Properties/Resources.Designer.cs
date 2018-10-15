@@ -92,7 +92,7 @@ namespace Moq.Properties {
 		/// </summary>
 		internal static string CallBaseCannotBeUsedWithDelegateMocks {
 			get {
-				return ResourceManager.GetString("CallBaseUsedOnDelegateException", resourceCulture);
+				return ResourceManager.GetString("CallBaseCannotBeUsedWithDelegateMocks", resourceCulture);
 			}
 		}
 		
