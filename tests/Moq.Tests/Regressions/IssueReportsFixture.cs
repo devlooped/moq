@@ -2016,11 +2016,21 @@ namespace Moq.Tests.Regressions
 		public class Issue706
 		{
 			[Fact]
-			public void CallBase_should_not_be_allowed_for_delegate_mocks()
+			public void CallBase_should_not_be_allowed_for_void_delegate_mocks()
 			{
 				Mock<Action> mock = new Mock<Action>();
 				Language.Flow.ISetup<Action> setup = mock.Setup(m => m());
 				
+				Exception ex = Assert.Throws<NotSupportedException>(() => setup.CallBase());
+				Assert.Equal(string.Format(CultureInfo.CurrentCulture, Resources.CallBaseCannotBeUsedWithDelegateMocks), ex.Message);
+			}
+			
+			[Fact]
+			public void CallBase_should_not_be_allowed_for_non_void_delegate_mocks()
+			{
+				Mock<Func<bool>> mock = new Mock<Func<bool>>();
+				Language.Flow.ISetup<Func<bool>, bool> setup = mock.Setup(m => m());
+
 				Exception ex = Assert.Throws<NotSupportedException>(() => setup.CallBase());
 				Assert.Equal(string.Format(CultureInfo.CurrentCulture, Resources.CallBaseCannotBeUsedWithDelegateMocks), ex.Message);
 			}

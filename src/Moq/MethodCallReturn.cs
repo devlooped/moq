@@ -58,6 +58,11 @@ namespace Moq
 
 		public override void SetCallBaseResponse()
 		{
+			if (this.Mock.TargetType.IsDelegate())
+			{
+				throw new NotSupportedException(string.Format(CultureInfo.CurrentCulture, Resources.CallBaseCannotBeUsedWithDelegateMocks));
+			}
+
 			this.returnValueKind = ReturnValueKind.CallBase;
 		}
 
