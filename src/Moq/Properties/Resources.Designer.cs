@@ -88,7 +88,7 @@ namespace Moq.Properties {
 		}
 		
 		/// <summary>
-		///   Looks up a localized string similar to CallBase cannot be used to mock Delegate types..
+		///   Looks up a localized string similar to CallBase cannot be used with Delegate mocks..
 		/// </summary>
 		internal static string CallBaseCannotBeUsedWithDelegateMocks {
 			get {
