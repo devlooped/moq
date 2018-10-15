@@ -100,10 +100,10 @@ namespace Moq
 			{
 				//.Setup(mock => mock.Solution)
 				return typeof(Mock<>)
-				       .MakeGenericType(objectType)
-				       .GetMethods("Setup")
-				       .First(m => m.IsGenericMethod)
-				       .MakeGenericMethod(returnType);
+					   .MakeGenericType(objectType)
+					   .GetMethods("Setup")
+					   .First(m => m.IsGenericMethod)
+					   .MakeGenericMethod(returnType);
 			}
 			else
 			{
@@ -115,11 +115,11 @@ namespace Moq
 
 		// Args like: string IFoo (mock => mock.Value)
 		private Expression TranslateFluent(Type objectType,
-		                                   Type returnType,
-		                                   MethodInfo targetMethod,
-		                                   Expression instance,
-		                                   ParameterExpression lambdaParam,
-		                                   Expression lambdaBody)
+										   Type returnType,
+										   MethodInfo targetMethod,
+										   Expression instance,
+										   ParameterExpression lambdaParam,
+										   Expression lambdaBody)
 		{
 			var funcType = typeof(Func<,>).MakeGenericType(objectType, returnType);
 
@@ -166,7 +166,9 @@ namespace Moq
 
 			Mock fluentMock;
 			MockWithWrappedMockObject innerMock;
-			if (mock.InnerMocks.TryGetValue(info, out innerMock))
+
+			//When property is indexer, the method name is same, in this case i have return other instance of mock.
+			if (!info.IsPropertyIndexer() && mock.InnerMocks.TryGetValue(info, out innerMock))
 			{
 				fluentMock = innerMock.Mock;
 			}

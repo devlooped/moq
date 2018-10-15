@@ -57,6 +57,11 @@ namespace Moq
 			return method.Name.StartsWith("set_Item", StringComparison.Ordinal);
 		}
 
+		public static bool IsPropertyIndexer(this MethodInfo method)
+		{
+			return method.IsPropertyIndexerGetter() || method.IsPropertyIndexerSetter();
+		}
+
 		public static bool IsPropertySetter(this MethodInfo method)
 		{
 			return method.Name.StartsWith("set_", StringComparison.Ordinal);
@@ -91,7 +96,7 @@ namespace Moq
 
 		public static bool IsMockeable(this Type typeToMock)
 		{
-			// A value type does not match any of these three 
+			// A value type does not match any of these three
 			// condition and therefore returns false.
 			return typeToMock.GetTypeInfo().IsInterface || typeToMock.GetTypeInfo().IsAbstract || typeToMock.IsDelegate() || (typeToMock.GetTypeInfo().IsClass && !typeToMock.GetTypeInfo().IsSealed);
 		}
