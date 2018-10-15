@@ -2023,6 +2023,15 @@ namespace Moq.Tests.Regressions
 				Exception ex = Assert.Throws<NotSupportedException>(() => setup.CallBase());
 				Assert.Equal(string.Format(CultureInfo.CurrentCulture, Resources.CallBaseUsedOnDelegateException), ex.Message);
 			}
+
+			[Fact]
+			public void CallBase_property_should_not_be_allowed_for_delegate_mocks()
+			{
+				Mock<Action> mock = new Mock<Action>();
+
+				Exception ex = Assert.Throws<NotSupportedException>(() => mock.CallBase = true);
+				Assert.Equal(string.Format(CultureInfo.CurrentCulture, Resources.CallBaseUsedOnDelegateException), ex.Message);
+			}
 		}
 
 		#endregion
