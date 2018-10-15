@@ -2012,6 +2012,7 @@ namespace Moq.Tests.Regressions
 		#endregion
 
 		#region 706
+		
 		public class Issue706
 		{
 			[Fact]
