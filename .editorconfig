@@ -12,7 +12,7 @@ end_of_line = CRLF
 indent_style = tab
 indent_size = 4
 
-[*.{sln,proj,csproj,vbproj,props,targets,xml,xdoc,resx,config,nuspec}]
+[*.{sln,proj,csproj,fsproj,vbproj,props,targets,xml,xdoc,resx,config,nuspec}]
 indent_style = tab
 indent_size = 2
 
