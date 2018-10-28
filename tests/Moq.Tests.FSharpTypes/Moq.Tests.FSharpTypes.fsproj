@@ -1,0 +1,23 @@
+<Project Sdk="Microsoft.NET.Sdk">
+
+	<Import Project="$(BuildDirectory)AssemblyInfo.props" />
+	<Import Project="$(BuildDirectory)SignAssembly.props" />
+
+	<PropertyGroup>
+		<TargetFrameworks>net46;netcoreapp2.0</TargetFrameworks>
+		<DebugSymbols>True</DebugSymbols>
+		<DebugType>full</DebugType>
+		<IsPackable>False</IsPackable>
+	</PropertyGroup>
+
+	<ItemGroup>
+		<Compile Include="HasAbstractActionEvent.fs" />
+		<Compile Include="HasAbstractEventHandlerEvent.fs" />
+		<Compile Include="HasActionEvent.fs" />
+		<Compile Include="IHasActionEvent.fs" />
+		<Compile Include="IHasEventHandlerEvent.fs" />
+	</ItemGroup>
+
+	<Target Name="Test" DependsOnTargets="Build" />
+
+</Project>

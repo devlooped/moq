@@ -62,6 +62,20 @@ namespace Moq
 			return method.Name.StartsWith("set_", StringComparison.Ordinal);
 		}
 
+		// NOTE: The following two methods used to first check whether `method.IsSpecialName` was set
+		// as a quick guard against non-event accessor methods. This was removed in commit 44070a90
+		// to "increase compatibility with F# and COM". More specifically:
+		//
+		//  1. COM does not really have events. Some COM interop assemblies define events, but do not
+		//     mark those with the IL `specialname` flag. See:
+		//      - https://code.google.com/archive/p/moq/issues/226
+		//     - the `Microsoft.Office.Interop.Word.ApplicationEvents4_Event` interface in Office PIA
+		//
+		//  2. F# does not mark abstract events' accessors with the IL `specialname` flag. See:
+		//      - https://github.com/Microsoft/visualfsharp/issues/5834
+		//      - https://code.google.com/archive/p/moq/issues/238
+		//      - the unit tests in `FSharpCompatibilityFixture`
+
 		public static bool LooksLikeEventAttach(this MethodInfo method)
 		{
 			return method.Name.StartsWith("add_", StringComparison.Ordinal);
