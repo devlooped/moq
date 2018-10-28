@@ -2050,7 +2050,7 @@ namespace Moq.Tests.Regressions
 				Mock<Action> mock = new Mock<Action>();
 				mock.CallBase = false;
 				
-				Assert.Equal(false, mock.CallBase);
+				Assert.False(mock.CallBase);
 			}
 		}
 
