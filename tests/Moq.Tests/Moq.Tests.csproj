@@ -31,6 +31,9 @@
 		<PackageReference Include="EntityFramework" Version="6.2.0" />
 		<Reference Include="System.Web" />
 		<Reference Include="System.Windows.Forms" />
+		<Reference Include="Moq.Tests.ComTypes">
+			<HintPath>..\Moq.Tests.ComTypes\Moq.Tests.ComTypes.dll</HintPath>
+		</Reference>
 	</ItemGroup>
 	<ItemGroup Condition=" '$(TargetFramework)' == 'netcoreapp2.0' ">
 		<PackageReference Include="System.Collections.Specialized" Version="4.3.0" />
