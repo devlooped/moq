@@ -372,7 +372,8 @@ namespace Moq
 		[SuppressMessage("Microsoft.Design", "CA1006:DoNotNestGenericTypesInMemberSignatures", Justification = "By Design")]
 		public ISetupSequentialResult<TResult> SetupSequence<TResult>(Expression<Func<T, TResult>> expression)
 		{
-			return Mock.SetupSequence<TResult>(this, expression);
+			var setup = Mock.SetupNonVoidSequence(this, expression);
+			return new SetupSequencePhrase<TResult>(setup);
 		}
 
 		/// <summary>
@@ -381,7 +382,8 @@ namespace Moq
 		[SuppressMessage("Microsoft.Design", "CA1006:DoNotNestGenericTypesInMemberSignatures", Justification = "By Design")]
 		public ISetupSequentialAction SetupSequence(Expression<Action<T>> expression)
 		{
-			return Mock.SetupSequence(this, expression);
+			var setup = Mock.SetupVoidSequence(this, expression);
+			return new SetupSequencePhrase(setup);
 		}
 
 #endregion

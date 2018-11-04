@@ -113,7 +113,8 @@ namespace Moq.Protected
 				throw new ArgumentException(ex.Message, nameof(expression));
 			}
 
-			return Mock.SetupSequence<TResult>(this.mock, rewrittenExpression);
+			var setup = Mock.SetupNonVoidSequence(this.mock, rewrittenExpression);
+			return new SetupSequencePhrase<TResult>(setup);
 		}
 
 		public ISetupSequentialAction SetupSequence(Expression<Action<TAnalog>> expression)
@@ -130,7 +131,8 @@ namespace Moq.Protected
 				throw new ArgumentException(ex.Message, nameof(expression));
 			}
 
-			return Mock.SetupSequence(this.mock, rewrittenExpression);
+			var setup = Mock.SetupVoidSequence(this.mock, rewrittenExpression);
+			return new SetupSequencePhrase(setup);
 		}
 
 		public void Verify(Expression<Action<TAnalog>> expression, Times? times = null, string failMessage = null)
