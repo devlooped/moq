@@ -326,15 +326,8 @@ namespace Moq
 			string failMessage)
 			where T : class
 		{
-			Mock targetMock = null;
-			LambdaExpression expression = null;
-			var expectation = SetupSetImpl(mock, setterExpression, (m, expr, method, value) =>
-				{
-					targetMock = m;
-					expression = expr;
-					return new InvocationShape(method, value);
-				});
-
+			var (targetMock, expression, method, value) = SetupSetImpl(mock, setterExpression);
+			var expectation = new InvocationShape(method, value);
 			VerifyCalls(targetMock, expectation, expression, times, failMessage);
 		}
 
@@ -530,16 +523,11 @@ namespace Moq
 			Condition condition)
 			where T : class
 		{
-			return SetupSetImpl(
-				mock,
-				setterExpression,
-				(m, expr, method, value) =>
-				{
-					Debug.Assert(value.Length == 1);
-					var setup = new MethodCall(m, condition, expr, method, value);
-					m.Setups.Add(setup);
-					return new SetterSetupPhrase<T, TProperty>(setup);
-				});
+			var (m, expr, method, value) = SetupSetImpl(mock, setterExpression);
+			Debug.Assert(value.Length == 1);
+			var setup = new MethodCall(m, condition, expr, method, value);
+			m.Setups.Add(setup);
+			return new SetterSetupPhrase<T, TProperty>(setup);
 		}
 
 		[DebuggerStepThrough]
@@ -552,15 +540,10 @@ namespace Moq
 		private static VoidSetupPhrase<T> SetupSetPexProtected<T>(Mock<T> mock, Action<T> setterExpression, Condition condition)
 			where T : class
 		{
-			return SetupSetImpl(
-				mock,
-				setterExpression,
-				(m, expr, method, values) =>
-				{
-					var setup = new MethodCall(m, condition, expr, method, values);
-					m.Setups.Add(setup);
-					return new VoidSetupPhrase<T>(setup);
-				});
+			var (m, expr, method, values) = SetupSetImpl(mock, setterExpression);
+			var setup = new MethodCall(m, condition, expr, method, values);
+			m.Setups.Add(setup);
+			return new VoidSetupPhrase<T>(setup);
 		}
 
 		internal static SetterSetupPhrase<T, TProperty> SetupSet<T, TProperty>(
@@ -583,10 +566,9 @@ namespace Moq
 			return new SetterSetupPhrase<T, TProperty>(setup);
 		}
 
-		private static TSetupPhrase SetupSetImpl<T, TSetupPhrase>(
+		private static (Mock, LambdaExpression, MethodInfo, Expression[]) SetupSetImpl<T>(
 			Mock<T> mock,
-			Action<T> setterExpression,
-			Func<Mock, LambdaExpression, MethodInfo, Expression[], TSetupPhrase> callFactory)
+			Action<T> setterExpression)
 			where T : class
 		{
 			using (var context = new FluentMockContext())
@@ -633,7 +615,7 @@ namespace Moq
 						Expression.Call(x, last.Invocation.Method, values),
 						x);
 
-					return callFactory(last.Mock, lambda, last.Invocation.Method, values);
+					return (last.Mock, lambda, last.Invocation.Method, values);
 				}
 				else
 				{
@@ -668,7 +650,7 @@ namespace Moq
 						Expression.Call(x, last.Invocation.Method, values),
 						x);
 
-					return callFactory(last.Mock, lambda, last.Invocation.Method, matchers);
+					return (last.Mock, lambda, last.Invocation.Method, matchers);
 				}
 			}
 		}
