@@ -6,18 +6,18 @@ using System.Diagnostics;
 
 namespace Moq.Language.Flow
 {
-	internal abstract class SetupPhrase<TSetup> : ICallbackResult, IVerifies, IThrowsResult where TSetup : MethodCall
+	internal abstract class SetupPhrase : ICallbackResult, IVerifies, IThrowsResult
 	{
-		private TSetup setup;
+		private MethodCall setup;
 
-		protected SetupPhrase(TSetup setup)
+		protected SetupPhrase(MethodCall setup)
 		{
 			Debug.Assert(setup != null);
 
 			this.setup = setup;
 		}
 
-		public TSetup Setup => this.setup;
+		public MethodCall Setup => this.setup;
 
 		public IVerifies AtMost(int callCount)
 		{

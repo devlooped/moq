@@ -5,9 +5,9 @@ using System;
 
 namespace Moq.Language.Flow
 {
-	internal class NonVoidSetupPhrase<T, TResult> : SetupPhrase<MethodCallReturn>, ISetup<T, TResult>, ISetupGetter<T, TResult>, IReturnsResult<T> where T : class
+	internal class NonVoidSetupPhrase<T, TResult> : SetupPhrase, ISetup<T, TResult>, ISetupGetter<T, TResult>, IReturnsResult<T> where T : class
 	{
-		public NonVoidSetupPhrase(MethodCallReturn setup) : base(setup)
+		public NonVoidSetupPhrase(MethodCall setup) : base(setup)
 		{
 		}
 
@@ -247,7 +247,7 @@ namespace Moq.Language.Flow
 
 		public IReturnsResult<T> Returns(TResult value)
 		{
-			this.Setup.SetReturnsResponse(new Func<TResult>(() => value));
+			this.Setup.SetEagerReturnsResponse(value);
 			return this;
 		}
 

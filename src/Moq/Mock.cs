@@ -416,12 +416,12 @@ namespace Moq
 		}
 
 		[DebuggerStepThrough]
-		internal static MethodCallReturn SetupNonVoid(Mock mock, LambdaExpression expression, Condition condition)
+		internal static MethodCall SetupNonVoid(Mock mock, LambdaExpression expression, Condition condition)
 		{
 			return PexProtector.Invoke(SetupNonVoidPexProtected, mock, expression, condition);
 		}
 
-		private static MethodCallReturn SetupNonVoidPexProtected(Mock mock, LambdaExpression expression, Condition condition)
+		private static MethodCall SetupNonVoidPexProtected(Mock mock, LambdaExpression expression, Condition condition)
 		{
 			if (expression.IsProperty())
 			{
@@ -432,7 +432,7 @@ namespace Moq
 
 			ThrowIfSetupExpressionInvolvesUnsupportedMember(expression, method);
 			ThrowIfSetupMethodNotVisibleToProxyFactory(method);
-			var setup = new MethodCallReturn(mock, condition, expression, method, args);
+			var setup = new MethodCall(mock, condition, expression, method, args);
 
 			var targetMock = GetTargetMock(obj, mock);
 			targetMock.Setups.Add(setup);
@@ -441,12 +441,12 @@ namespace Moq
 		}
 
 		[DebuggerStepThrough]
-		internal static MethodCallReturn SetupGet(Mock mock, LambdaExpression expression, Condition condition)
+		internal static MethodCall SetupGet(Mock mock, LambdaExpression expression, Condition condition)
 		{
 			return PexProtector.Invoke(SetupGetPexProtected, mock, expression, condition);
 		}
 
-		private static MethodCallReturn SetupGetPexProtected(Mock mock, LambdaExpression expression, Condition condition)
+		private static MethodCall SetupGetPexProtected(Mock mock, LambdaExpression expression, Condition condition)
 		{
 			if (expression.IsPropertyIndexer())
 			{
@@ -461,7 +461,7 @@ namespace Moq
 			ThrowIfSetupExpressionInvolvesUnsupportedMember(expression, propGet);
 			ThrowIfSetupMethodNotVisibleToProxyFactory(propGet);
 
-			var setup = new MethodCallReturn(mock, condition, expression, propGet, new Expression[0]);
+			var setup = new MethodCall(mock, condition, expression, propGet, new Expression[0]);
 			// Directly casting to MemberExpression is fine as ToPropertyInfo would throw if it wasn't
 			var targetMock = GetTargetMock(((MemberExpression)expression.Body).Expression, mock);
 			targetMock.Setups.Add(setup);

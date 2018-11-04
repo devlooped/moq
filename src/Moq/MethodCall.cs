@@ -16,14 +16,15 @@ using Moq.Properties;
 
 namespace Moq
 {
-	internal partial class MethodCall : SetupWithOutParameterSupport
+	internal sealed partial class MethodCall : SetupWithOutParameterSupport
 	{
+		private Action<object[]> afterReturnCallback;
 		private Action<object[]> callbackResponse;
-		private bool callBase;
 		private int callCount;
 		private Condition condition;
 		private int? expectedMaxCallCount;
 		private string failMessage;
+		private Flags flags;
 		private Mock mock;
 #if !NETCORE
 		private string originalCallerFilePath;
@@ -31,13 +32,13 @@ namespace Moq
 		private MethodBase originalCallerMember;
 #endif
 		private RaiseEventResponse raiseEventResponse;
-		private Exception throwExceptionResponse;
-		private bool verifiable;
+		private Response returnOrThrowResponse;
 
 		public MethodCall(Mock mock, Condition condition, LambdaExpression originalExpression, MethodInfo method, IReadOnlyList<Expression> arguments)
 			: base(method, arguments, originalExpression)
 		{
 			this.condition = condition;
+			this.flags = method.ReturnType != typeof(void) ? Flags.MethodIsNonVoid : 0;
 			this.mock = mock;
 
 			this.SetFileInfo();
@@ -53,7 +54,7 @@ namespace Moq
 
 		public override Condition Condition => this.condition;
 
-		public override bool IsVerifiable => this.verifiable;
+		public override bool IsVerifiable => (this.flags & Flags.Verifiable) != 0;
 
 		[Conditional("DESKTOP")]
 		[SuppressMessage("Microsoft.Design", "CA1031:DoNotCatchGeneralExceptionTypes")]
@@ -108,31 +109,65 @@ namespace Moq
 
 			this.callbackResponse?.Invoke(invocation.Arguments);
 
-			if (this.callBase)
+			if ((this.flags & Flags.CallBase) != 0)
 			{
 				invocation.ReturnBase();
 			}
 
 			this.raiseEventResponse?.RespondTo(invocation);
 
-			if (this.throwExceptionResponse != null)
+			this.returnOrThrowResponse?.RespondTo(invocation);
+
+			if ((this.flags & Flags.MethodIsNonVoid) != 0)
 			{
-				throw this.throwExceptionResponse;
+				if (this.returnOrThrowResponse == null)
+				{
+					if (this.Mock.Behavior == MockBehavior.Strict)
+					{
+						throw MockException.ReturnValueRequired(invocation);
+					}
+					else
+					{
+						invocation.Return(this.Method.ReturnType.GetDefaultValue());
+					}
+				}
+
+				this.afterReturnCallback?.Invoke(invocation.Arguments);
 			}
 		}
 
-		public virtual void SetCallBaseResponse()
+		public void SetCallBaseResponse()
 		{
 			if (this.Mock.TargetType.IsDelegate())
 			{
 				throw new NotSupportedException(string.Format(CultureInfo.CurrentCulture, Resources.CallBaseCannotBeUsedWithDelegateMocks));
 			}
-			
-			this.callBase = true;
+
+			if ((this.flags & Flags.MethodIsNonVoid) != 0)
+			{
+				this.returnOrThrowResponse = ReturnBaseResponse.Instance;
+			}
+			else
+			{
+				this.flags |= Flags.CallBase;
+			}
 		}
 
-		public virtual void SetCallbackResponse(Delegate callback)
+		public void SetCallbackResponse(Delegate callback)
 		{
+			if (this.returnOrThrowResponse != null)
+			{
+				if (callback is Action afterReturnCallbackWithoutArguments)
+				{
+					this.afterReturnCallback = delegate { afterReturnCallbackWithoutArguments(); };
+				}
+				else
+				{
+					this.afterReturnCallback = delegate (object[] args) { callback.InvokePreserveStack(args); };
+				}
+				return;
+			}
+
 			if (callback == null)
 			{
 				throw new ArgumentNullException(nameof(callback));
@@ -193,9 +228,98 @@ namespace Moq
 			}
 		}
 
+		public void SetEagerReturnsResponse(object value)
+		{
+			Debug.Assert((this.flags & Flags.MethodIsNonVoid) != 0);
+			Debug.Assert(this.returnOrThrowResponse == null);
+
+			this.returnOrThrowResponse = new ReturnEagerValueResponse(value);
+		}
+
+		public void SetReturnsResponse(Delegate valueFactory)
+		{
+			Debug.Assert((this.flags & Flags.MethodIsNonVoid) != 0);
+			Debug.Assert(this.returnOrThrowResponse == null);
+
+			if (valueFactory == null)
+			{
+				// A `null` reference (instead of a valid delegate) is interpreted as the actual return value.
+				// This is necessary because the compiler might have picked the unexpected overload for calls
+				// like `Returns(null)`, or the user might have picked an overload like `Returns<T>(null)`,
+				// and instead of in `Returns(TResult)`, we ended up in `Returns(Delegate)` or `Returns(Func)`,
+				// which likely isn't what the user intended.
+				// So here we do what we would've done in `Returns(TResult)`:
+				this.returnOrThrowResponse = new ReturnEagerValueResponse(this.Method.ReturnType.GetDefaultValue());
+			}
+			else if (this.Method.ReturnType == typeof(Delegate))
+			{
+				// If `TResult` is `Delegate`, that is someone is setting up the return value of a method
+				// that returns a `Delegate`, then we have arrived here because C# picked the wrong overload:
+				// We don't want to invoke the passed delegate to get a return value; the passed delegate
+				// already is the return value.
+				this.returnOrThrowResponse = new ReturnEagerValueResponse(valueFactory);
+			}
+			else
+			{
+				ValidateCallback(valueFactory);
+				this.returnOrThrowResponse = new ReturnLazyValueResponse(valueFactory);
+			}
+
+			void ValidateCallback(Delegate callback)
+			{
+				var callbackMethod = callback.GetMethodInfo();
+
+				// validate number of parameters:
+
+				var numberOfActualParameters = callbackMethod.GetParameters().Length;
+				if (callbackMethod.IsStatic)
+				{
+					if (callbackMethod.IsExtensionMethod() || callback.Target != null)
+					{
+						numberOfActualParameters--;
+					}
+				}
+
+				if (numberOfActualParameters > 0)
+				{
+					var numberOfExpectedParameters = this.Method.GetParameters().Length;
+					if (numberOfActualParameters != numberOfExpectedParameters)
+					{
+						throw new ArgumentException(
+							string.Format(
+								CultureInfo.CurrentCulture,
+								Resources.InvalidCallbackParameterCountMismatch,
+								numberOfExpectedParameters,
+								numberOfActualParameters));
+					}
+				}
+
+				// validate return type:
+
+				var actualReturnType = callbackMethod.ReturnType;
+
+				if (actualReturnType == typeof(void))
+				{
+					throw new ArgumentException(Resources.InvalidReturnsCallbackNotADelegateWithReturnType);
+				}
+
+				var expectedReturnType = this.Method.ReturnType;
+
+				if (!expectedReturnType.IsAssignableFrom(actualReturnType))
+				{
+					throw new ArgumentException(
+						string.Format(
+							CultureInfo.CurrentCulture,
+							Resources.InvalidCallbackReturnTypeMismatch,
+							expectedReturnType,
+							actualReturnType));
+				}
+			}
+		}
+
 		public void SetThrowExceptionResponse(Exception exception)
 		{
-			this.throwExceptionResponse = exception;
+			this.returnOrThrowResponse = new ThrowExceptionResponse(exception);
 		}
 
 		public override bool TryVerifyAll()
@@ -205,16 +329,14 @@ namespace Moq
 
 		public void Verifiable()
 		{
-			this.verifiable = true;
+			this.flags |= Flags.Verifiable;
 		}
 
 		public void Verifiable(string failMessage)
 		{
-			this.verifiable = true;
+			this.flags |= Flags.Verifiable;
 			this.failMessage = failMessage;
 		}
-
-		public void AtMostOnce() => this.AtMost(1);
 
 		public void AtMost(int callCount)
 		{
@@ -244,6 +366,84 @@ namespace Moq
 #endif
 
 			return message.ToString().Trim();
+		}
+
+		[Flags]
+		private enum Flags : byte
+		{
+			CallBase = 1,
+			MethodIsNonVoid = 2,
+			Verifiable = 4,
+		}
+
+		private abstract class Response
+		{
+			protected Response()
+			{
+			}
+
+			public abstract void RespondTo(Invocation invocation);
+		}
+
+		private sealed class ReturnBaseResponse : Response
+		{
+			public static readonly ReturnBaseResponse Instance = new ReturnBaseResponse();
+
+			private ReturnBaseResponse()
+			{
+			}
+
+			public override void RespondTo(Invocation invocation)
+			{
+				invocation.ReturnBase();
+			}
+		}
+
+		private sealed class ReturnEagerValueResponse : Response
+		{
+			private readonly object value;
+
+			public ReturnEagerValueResponse(object value)
+			{
+				this.value = value;
+			}
+
+			public override void RespondTo(Invocation invocation)
+			{
+				invocation.Return(this.value);
+			}
+		}
+
+		private sealed class ReturnLazyValueResponse : Response
+		{
+			private readonly Delegate valueFactory;
+
+			public ReturnLazyValueResponse(Delegate valueFactory)
+			{
+				this.valueFactory = valueFactory;
+			}
+
+			public override void RespondTo(Invocation invocation)
+			{
+				invocation.Return(this.valueFactory.CompareParameterTypesTo(Type.EmptyTypes)
+					? valueFactory.InvokePreserveStack()                //we need this, for the user to be able to use parameterless methods
+					: valueFactory.InvokePreserveStack(invocation.Arguments)); //will throw if parameters mismatch
+			}
+		}
+
+		private sealed class ThrowExceptionResponse : Response
+		{
+			private readonly Exception exception;
+
+			public ThrowExceptionResponse(Exception exception)
+			{
+				this.exception = exception;
+			}
+
+			public override void RespondTo(Invocation invocation)
+			{
+				throw this.exception;
+			}
 		}
 
 		private sealed class RaiseEventResponse
