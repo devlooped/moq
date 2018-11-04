@@ -147,7 +147,7 @@ namespace Moq.Protected
 				throw new ArgumentException(ex.Message, nameof(expression));
 			}
 
-			Mock.Verify(this.mock, rewrittenExpression, times ?? Times.AtLeastOnce(), failMessage);
+			Mock.VerifyVoid(this.mock, rewrittenExpression, times ?? Times.AtLeastOnce(), failMessage);
 		}
 
 		public void Verify<TResult>(Expression<Func<TAnalog, TResult>> expression, Times? times = null, string failMessage = null)
@@ -164,7 +164,7 @@ namespace Moq.Protected
 				throw new ArgumentException(ex.Message, nameof(expression));
 			}
 
-			Mock.Verify(this.mock, rewrittenExpression, times ?? Times.AtLeastOnce(), failMessage);
+			Mock.VerifyNonVoid(this.mock, rewrittenExpression, times ?? Times.AtLeastOnce(), failMessage);
 		}
 
 		public void VerifyGet<TProperty>(Expression<Func<TAnalog, TProperty>> expression, Times? times = null, string failMessage = null)

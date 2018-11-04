@@ -266,12 +266,7 @@ namespace Moq
 			return true;
 		}
 
-		internal static void Verify<T>(
-			Mock<T> mock,
-			Expression<Action<T>> expression,
-			Times times,
-			string failMessage)
-			where T : class
+		internal static void VerifyVoid(Mock mock, LambdaExpression expression, Times times, string failMessage)
 		{
 			Guard.NotNull(times, nameof(times));
 
@@ -282,18 +277,13 @@ namespace Moq
 			VerifyCalls(GetTargetMock(obj, mock), expectation, expression, times, failMessage);
 		}
 
-		internal static void Verify<T, TResult>(
-			Mock<T> mock,
-			Expression<Func<T, TResult>> expression,
-			Times times,
-			string failMessage)
-			where T : class
+		internal static void VerifyNonVoid(Mock mock, LambdaExpression expression, Times times, string failMessage)
 		{
 			Guard.NotNull(times, nameof(times));
 
 			if (expression.IsProperty())
 			{
-				VerifyGet<T, TResult>(mock, expression, times, failMessage);
+				VerifyGet(mock, expression, times, failMessage);
 			}
 			else
 			{
@@ -305,12 +295,7 @@ namespace Moq
 			}
 		}
 
-		internal static void VerifyGet<T, TProperty>(
-			Mock<T> mock,
-			Expression<Func<T, TProperty>> expression,
-			Times times,
-			string failMessage)
-			where T : class
+		internal static void VerifyGet(Mock mock, LambdaExpression expression, Times times, string failMessage)
 		{
 			var method = expression.ToPropertyInfo().GetGetMethod(true);
 			ThrowIfVerifyExpressionInvolvesUnsupportedMember(expression, method);
