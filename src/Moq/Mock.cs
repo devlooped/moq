@@ -566,14 +566,11 @@ namespace Moq
 			return new SetterSetupPhrase<T, TProperty>(setup);
 		}
 
-		private static (Mock, LambdaExpression, MethodInfo, Expression[]) SetupSetImpl<T>(
-			Mock<T> mock,
-			Action<T> setterExpression)
-			where T : class
+		private static (Mock, LambdaExpression, MethodInfo, Expression[]) SetupSetImpl(Mock mock, Delegate setterExpression)
 		{
 			using (var context = new FluentMockContext())
 			{
-				setterExpression(mock.Object);
+				setterExpression.DynamicInvoke(mock.Object);
 
 				var last = context.LastInvocation;
 				if (last == null)
