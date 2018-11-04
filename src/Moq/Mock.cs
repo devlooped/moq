@@ -319,12 +319,7 @@ namespace Moq
 			VerifyCalls(GetTargetMock(((MemberExpression)expression.Body).Expression, mock), expectation, expression, times, failMessage);
 		}
 
-		internal static void VerifySet<T>(
-			Mock<T> mock,
-			Action<T> setterExpression,
-			Times times,
-			string failMessage)
-			where T : class
+		internal static void VerifySet(Mock mock, Delegate setterExpression, Times times, string failMessage)
 		{
 			var (targetMock, expression, method, value) = SetupSetImpl(mock, setterExpression);
 			var expectation = new InvocationShape(method, value);

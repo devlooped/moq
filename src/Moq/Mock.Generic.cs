@@ -517,7 +517,7 @@ namespace Moq
 		/// <include file='Mock.Generic.xdoc' path='docs/doc[@for="Mock{T}.VerifySet(expression)"]/*'/>
 		public void VerifySet(Action<T> setterExpression)
 		{
-			Mock.VerifySet<T>(this, setterExpression, Times.AtLeastOnce(), null);
+			Mock.VerifySet(this, setterExpression, Times.AtLeastOnce(), null);
 		}
 
 		/// <include file='Mock.Generic.xdoc' path='docs/doc[@for="Mock{T}.VerifySet(expression,times)"]/*'/>
