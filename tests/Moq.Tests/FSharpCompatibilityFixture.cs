@@ -77,5 +77,71 @@ namespace Moq.Tests
 
 			Assert.Equal(1, eventRaiseCount);
 		}
+
+		public static IEnumerable<object[]> FSharpIndexers
+		{
+			get
+			{
+				yield return new object[] { typeof(IHasIndexer).GetProperty("Item") };
+				yield return new object[] { typeof(HasAbstractIndexer).GetProperty("Item") };
+				yield return new object[] { typeof(HasIndexer).GetProperty("Item") };
+			}
+		}
+
+		[Theory]
+		[MemberData(nameof(FSharpIndexers))]
+		public void All_FSharp_indexers_have_accessors_marked_as_specialname(PropertyInfo indexer)
+		{
+			Assert.All(indexer.GetAccessors(), accessor => Assert.True(accessor.IsSpecialName, "Accessor not marked as `specialname`."));
+		}
+
+		[Theory]
+		[MemberData(nameof(FSharpIndexers))]
+		public void All_FSharp_indexer_getters_are_recognized_as_such(PropertyInfo indexer)
+		{
+			var getter = indexer.GetGetMethod(true);
+			Assert.True(getter.IsPropertyGetter());
+		}
+
+		[Theory]
+		[MemberData(nameof(FSharpIndexers))]
+		public void All_FSharp_indexer_setters_are_recognized_as_such(PropertyInfo indexer)
+		{
+			var setter = indexer.GetSetMethod(true);
+			Assert.True(setter.IsPropertySetter());
+		}
+
+		public static IEnumerable<object[]> FSharpProperties
+		{
+			get
+			{
+				yield return new object[] { typeof(IHasProperty).GetProperty(nameof(IHasProperty.Property)) };
+				yield return new object[] { typeof(HasAbstractProperty).GetProperty(nameof(HasAbstractProperty.Property)) };
+				yield return new object[] { typeof(HasProperty).GetProperty(nameof(HasProperty.Property)) };
+			}
+		}
+
+		[Theory]
+		[MemberData(nameof(FSharpProperties))]
+		public void All_FSharp_properties_have_accessors_marked_as_specialname(PropertyInfo property)
+		{
+			Assert.All(@property.GetAccessors(), accessor => Assert.True(accessor.IsSpecialName, "Accessor not marked as `specialname`."));
+		}
+
+		[Theory]
+		[MemberData(nameof(FSharpProperties))]
+		public void All_FSharp_property_getters_are_recognized_as_such(PropertyInfo property)
+		{
+			var getter = property.GetGetMethod(true);
+			Assert.True(getter.IsPropertyGetter());
+		}
+
+		[Theory]
+		[MemberData(nameof(FSharpProperties))]
+		public void All_FSharp_property_setters_are_recognized_as_such(PropertyInfo property)
+		{
+			var setter = property.GetSetMethod(true);
+			Assert.True(setter.IsPropertySetter());
+		}
 	}
 }

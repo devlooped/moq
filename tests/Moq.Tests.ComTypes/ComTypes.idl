@@ -32,4 +32,18 @@ library ComTypes
         [default] interface IButton;
         [default, source] interface IButtonEvents;
     }
+
+    [uuid("5ee16909-c4c7-49dc-8808-219078e5d3ba")]
+    interface IHasIndexer : IUnknown
+    {
+        [propget, bindable, defaultbind] HRESULT Item([in] long index, [out, retval] long *value);
+        [propput, bindable, defaultbind] HRESULT Item([in] long index, [in] long value);
+    }
+
+    [uuid("62a88a92-d8e5-45f7-bb7f-668a74c58749")]
+    interface IHasProperty : IUnknown
+    {
+        [propget] HRESULT Property([out, retval] long *value);
+        [propput] HRESULT Property([in] long value);
+    }
 }
