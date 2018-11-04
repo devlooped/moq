@@ -4,7 +4,9 @@
 using System;
 using System.ComponentModel;
 using System.Linq.Expressions;
+
 using Moq.Language.Flow;
+using Moq.Protected;
 
 namespace Moq
 {
@@ -43,7 +45,8 @@ namespace Moq
 		public static ISetupSetter<T, TProperty> SetupSet<T, TProperty>(this Mock<T> mock, Expression<Func<T, TProperty>> expression)
 			where T : class
 		{
-			return Mock.SetupSet<T, TProperty>(mock, expression);
+			var setup = Mock.SetupSet(mock, expression, ItExpr.IsAny<TProperty>());
+			return new SetterSetupPhrase<T, TProperty>(setup);
 		}
 
 		/// <summary>

@@ -20,6 +20,7 @@ using Microsoft.CSharp;
 using Moq.Language;
 using Moq.Language.Flow;
 using Moq.Properties;
+using Moq.Protected;
 
 namespace Moq
 {
@@ -351,7 +352,7 @@ namespace Moq
 		{
 			TProperty value = initialValue;
 			this.SetupGet(property).Returns(() => value);
-			SetupSet<T, TProperty>(this, property).Callback(p => value = p);
+			SetupSet(this, property, ItExpr.IsAny<TProperty>()).SetCallbackResponse(new Action<TProperty>(p => value = p));
 			return this;
 		}
 

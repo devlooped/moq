@@ -521,10 +521,7 @@ namespace Moq
 			return setup;
 		}
 
-		internal static SetterSetupPhrase<T, TProperty> SetupSet<T, TProperty>(
-			Mock<T> mock,
-			Expression<Func<T, TProperty>> expression)
-			where T : class
+		internal static MethodCall SetupSet(Mock mock, LambdaExpression expression, Expression valueExpression)
 		{
 			var prop = expression.ToPropertyInfo();
 			Guard.CanWrite(prop);
@@ -533,12 +530,12 @@ namespace Moq
 			ThrowIfSetupExpressionInvolvesUnsupportedMember(expression, propSet);
 			ThrowIfSetupMethodNotVisibleToProxyFactory(propSet);
 
-			var setup = new MethodCall(mock, null, expression, propSet, new[] { ItExpr.IsAny<TProperty>() });
+			var setup = new MethodCall(mock, null, expression, propSet, new[] { valueExpression });
 			var targetMock = GetTargetMock(((MemberExpression)expression.Body).Expression, mock);
 
 			targetMock.Setups.Add(setup);
 
-			return new SetterSetupPhrase<T, TProperty>(setup);
+			return setup;
 		}
 
 		private static (Mock, LambdaExpression, MethodInfo, Expression[]) SetupSetImpl(Mock mock, Delegate setterExpression)
