@@ -20,9 +20,8 @@ namespace Moq
 	{
 		private Action<object[]> afterReturnCallback;
 		private Action<object[]> callbackResponse;
-		private int callCount;
+		private LimitInvocationCountResponse limitInvocationCountResponse;
 		private Condition condition;
-		private int? expectedMaxCallCount;
 		private string failMessage;
 		private Flags flags;
 		private Mock mock;
@@ -93,19 +92,9 @@ namespace Moq
 
 		public override void Execute(Invocation invocation)
 		{
-			++this.callCount;
+			this.flags |= Flags.Invoked;
 
-			if (expectedMaxCallCount.HasValue && this.callCount > expectedMaxCallCount)
-			{
-				if (expectedMaxCallCount == 1)
-				{
-					throw MockException.MoreThanOneCall(this, this.callCount);
-				}
-				else
-				{
-					throw MockException.MoreThanNCalls(this, this.expectedMaxCallCount.Value, this.callCount);
-				}
-			}
+			this.limitInvocationCountResponse?.RespondTo(invocation);
 
 			this.callbackResponse?.Invoke(invocation.Arguments);
 
@@ -324,7 +313,7 @@ namespace Moq
 
 		public override bool TryVerifyAll()
 		{
-			return this.callCount > 0;
+			return (this.flags & Flags.Invoked) != 0;
 		}
 
 		public void Verifiable()
@@ -338,9 +327,9 @@ namespace Moq
 			this.failMessage = failMessage;
 		}
 
-		public void AtMost(int callCount)
+		public void AtMost(int count)
 		{
-			this.expectedMaxCallCount = callCount;
+			this.limitInvocationCountResponse = new LimitInvocationCountResponse(this, count);
 		}
 
 		public override string ToString()
@@ -372,8 +361,40 @@ namespace Moq
 		private enum Flags : byte
 		{
 			CallBase = 1,
-			MethodIsNonVoid = 2,
-			Verifiable = 4,
+			Invoked = 2,
+			MethodIsNonVoid = 4,
+			Verifiable = 8,
+		}
+
+		private sealed class LimitInvocationCountResponse
+		{
+			private readonly MethodCall setup;
+			private readonly int maxCount;
+			private int count;
+
+			public LimitInvocationCountResponse(MethodCall setup, int maxCount)
+			{
+				this.setup = setup;
+				this.maxCount = maxCount;
+				this.count = 0;
+			}
+
+			public void RespondTo(Invocation invocation)
+			{
+				++this.count;
+
+				if (this.count > this.maxCount)
+				{
+					if (this.maxCount == 1)
+					{
+						throw MockException.MoreThanOneCall(this.setup, this.count);
+					}
+					else
+					{
+						throw MockException.MoreThanNCalls(this.setup, this.maxCount, this.count);
+					}
+				}
+			}
 		}
 
 		private abstract class Response
