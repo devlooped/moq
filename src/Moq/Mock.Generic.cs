@@ -325,13 +325,15 @@ namespace Moq
 		/// <include file='Mock.Generic.xdoc' path='docs/doc[@for="Mock{T}.SetupSet{TProperty}"]/*'/>
 		public ISetupSetter<T, TProperty> SetupSet<TProperty>(Action<T> setterExpression)
 		{
-			return Mock.SetupSet<T, TProperty>(this, setterExpression, null);
+			var setup = Mock.SetupSet(this, setterExpression, null);
+			return new SetterSetupPhrase<T, TProperty>(setup);
 		}
 
 		/// <include file='Mock.Generic.xdoc' path='docs/doc[@for="Mock{T}.SetupSet"]/*'/>
 		public ISetup<T> SetupSet(Action<T> setterExpression)
 		{
-			return Mock.SetupSet<T>(this, setterExpression, null);
+			var setup = Mock.SetupSet(this, setterExpression, null);
+			return new VoidSetupPhrase<T>(setup);
 		}
 
 		/// <include file='Mock.Generic.xdoc' path='docs/doc[@for="Mock{T}.SetupProperty(property)"]/*'/>

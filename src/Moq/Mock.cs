@@ -508,42 +508,17 @@ namespace Moq
 		}
 
 		[DebuggerStepThrough]
-		internal static SetterSetupPhrase<T, TProperty> SetupSet<T, TProperty>(
-			Mock<T> mock,
-			Action<T> setterExpression,
-			Condition condition)
-			where T : class
-		{
-			return PexProtector.Invoke(SetupSetPexProtected<T, TProperty>, mock, setterExpression, condition);
-		}
-
-		private static SetterSetupPhrase<T, TProperty> SetupSetPexProtected<T, TProperty>(
-			Mock<T> mock,
-			Action<T> setterExpression,
-			Condition condition)
-			where T : class
-		{
-			var (m, expr, method, value) = SetupSetImpl(mock, setterExpression);
-			Debug.Assert(value.Length == 1);
-			var setup = new MethodCall(m, condition, expr, method, value);
-			m.Setups.Add(setup);
-			return new SetterSetupPhrase<T, TProperty>(setup);
-		}
-
-		[DebuggerStepThrough]
-		internal static VoidSetupPhrase<T> SetupSet<T>(Mock<T> mock, Action<T> setterExpression, Condition condition)
-			where T : class
+		internal static MethodCall SetupSet(Mock mock, Delegate setterExpression, Condition condition)
 		{
 			return PexProtector.Invoke(SetupSetPexProtected, mock, setterExpression, condition);
 		}
 
-		private static VoidSetupPhrase<T> SetupSetPexProtected<T>(Mock<T> mock, Action<T> setterExpression, Condition condition)
-			where T : class
+		private static MethodCall SetupSetPexProtected(Mock mock, Delegate setterExpression, Condition condition)
 		{
-			var (m, expr, method, values) = SetupSetImpl(mock, setterExpression);
-			var setup = new MethodCall(m, condition, expr, method, values);
+			var (m, expr, method, value) = SetupSetImpl(mock, setterExpression);
+			var setup = new MethodCall(m, condition, expr, method, value);
 			m.Setups.Add(setup);
-			return new VoidSetupPhrase<T>(setup);
+			return setup;
 		}
 
 		internal static SetterSetupPhrase<T, TProperty> SetupSet<T, TProperty>(

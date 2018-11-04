@@ -91,7 +91,8 @@ namespace Moq.Protected
 			ThrowIfPublicSetter(property, typeof(T).Name);
 			Guard.CanWrite(property);
 
-			return Mock.SetupSet<T, TProperty>(mock, GetSetterExpression(property, ItExpr.IsAny<TProperty>()), null);
+			var setup = Mock.SetupSet(mock, GetSetterExpression(property, ItExpr.IsAny<TProperty>()), null);
+			return new SetterSetupPhrase<T, TProperty>(setup);
 		}
 
 		public ISetupSequentialAction SetupSequence(string methodOrPropertyName, params object[] args)
