@@ -46,7 +46,6 @@ namespace Moq
 		public string FailMessage
 		{
 			get => this.failMessage;
-			set => this.failMessage = value;
 		}
 
 		public Mock Mock => this.mock;
