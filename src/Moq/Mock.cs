@@ -411,14 +411,12 @@ namespace Moq
 		#region Setup
 
 		[DebuggerStepThrough]
-		internal static VoidSetupPhrase<T> Setup<T>(Mock<T> mock, Expression<Action<T>> expression, Condition condition)
-			where T : class
+		internal static MethodCall SetupVoid(Mock mock, LambdaExpression expression, Condition condition)
 		{
-			return PexProtector.Invoke(SetupPexProtected, mock, expression, condition);
+			return PexProtector.Invoke(SetupVoidPexProtected, mock, expression, condition);
 		}
 
-		private static VoidSetupPhrase<T> SetupPexProtected<T>(Mock<T> mock, Expression<Action<T>> expression, Condition condition)
-			where T : class
+		private static MethodCall SetupVoidPexProtected(Mock mock, LambdaExpression expression, Condition condition)
 		{
 			var (obj, method, args) = expression.GetCallInfo(mock);
 
@@ -429,24 +427,16 @@ namespace Moq
 			var targetMock = GetTargetMock(obj, mock);
 			targetMock.Setups.Add(setup);
 
-			return new VoidSetupPhrase<T>(setup);
+			return setup;
 		}
 
 		[DebuggerStepThrough]
-		internal static NonVoidSetupPhrase<T, TResult> Setup<T, TResult>(
-			Mock<T> mock,
-			Expression<Func<T, TResult>> expression,
-			Condition condition)
-			where T : class
+		internal static MethodCallReturn SetupNonVoid(Mock mock, LambdaExpression expression, Condition condition)
 		{
-			return PexProtector.Invoke(SetupPexProtected, mock, expression, condition);
+			return PexProtector.Invoke(SetupNonVoidPexProtected, mock, expression, condition);
 		}
 
-		private static NonVoidSetupPhrase<T, TResult> SetupPexProtected<T, TResult>(
-			Mock<T> mock,
-			Expression<Func<T, TResult>> expression,
-			Condition condition)
-			where T : class
+		private static MethodCallReturn SetupNonVoidPexProtected(Mock mock, LambdaExpression expression, Condition condition)
 		{
 			if (expression.IsProperty())
 			{
@@ -462,29 +452,21 @@ namespace Moq
 			var targetMock = GetTargetMock(obj, mock);
 			targetMock.Setups.Add(setup);
 
-			return new NonVoidSetupPhrase<T, TResult>(setup);
+			return setup;
 		}
 
 		[DebuggerStepThrough]
-		internal static NonVoidSetupPhrase<T, TProperty> SetupGet<T, TProperty>(
-			Mock<T> mock,
-			Expression<Func<T, TProperty>> expression,
-			Condition condition)
-			where T : class
+		internal static MethodCallReturn SetupGet(Mock mock, LambdaExpression expression, Condition condition)
 		{
 			return PexProtector.Invoke(SetupGetPexProtected, mock, expression, condition);
 		}
 
-		private static NonVoidSetupPhrase<T, TProperty> SetupGetPexProtected<T, TProperty>(
-			Mock<T> mock,
-			Expression<Func<T, TProperty>> expression,
-			Condition condition)
-			where T : class
+		private static MethodCallReturn SetupGetPexProtected(Mock mock, LambdaExpression expression, Condition condition)
 		{
 			if (expression.IsPropertyIndexer())
 			{
 				// Treat indexers as regular method invocations.
-				return Setup<T, TProperty>(mock, expression, condition);
+				return SetupNonVoid(mock, expression, condition);
 			}
 
 			var prop = expression.ToPropertyInfo();
@@ -499,7 +481,7 @@ namespace Moq
 			var targetMock = GetTargetMock(((MemberExpression)expression.Body).Expression, mock);
 			targetMock.Setups.Add(setup);
 
-			return new NonVoidSetupPhrase<T, TProperty>(setup);
+			return setup;
 		}
 
 		[DebuggerStepThrough]

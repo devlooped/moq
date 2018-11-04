@@ -40,7 +40,8 @@ namespace Moq.Protected
 			ThrowIfMemberMissing(methodName, method);
 			ThrowIfPublicMethod(method, typeof(T).Name);
 
-			return Mock.Setup(mock, GetMethodCall(method, args), null);
+			var setup = Mock.SetupVoid(mock, GetMethodCall(method, args), null);
+			return new VoidSetupPhrase<T>(setup);
 		}
 
 		public ISetup<T, TResult> Setup<TResult>(string methodName, params object[] args)
@@ -59,7 +60,8 @@ namespace Moq.Protected
 			{
 				ThrowIfPublicGetter(property, typeof(T).Name);
 				// TODO should consider property indexers
-				return Mock.SetupGet(mock, GetMemberAccess<TResult>(property), null);
+				var getterSetup = Mock.SetupGet(mock, GetMemberAccess<TResult>(property), null);
+				return new NonVoidSetupPhrase<T, TResult>(getterSetup);
 			}
 
 			var method = GetMethod(methodName, exactParameterMatch, args);
@@ -67,7 +69,8 @@ namespace Moq.Protected
 			ThrowIfVoidMethod(method);
 			ThrowIfPublicMethod(method, typeof(T).Name);
 
-			return Mock.Setup(mock, GetMethodCall<TResult>(method, args), null);
+			var setup = Mock.SetupNonVoid(mock, GetMethodCall<TResult>(method, args), null);
+			return new NonVoidSetupPhrase<T, TResult>(setup);
 		}
 
 		public ISetupGetter<T, TProperty> SetupGet<TProperty>(string propertyName)
@@ -79,7 +82,8 @@ namespace Moq.Protected
 			ThrowIfPublicGetter(property, typeof(T).Name);
 			Guard.CanRead(property);
 
-			return Mock.SetupGet(mock, GetMemberAccess<TProperty>(property), null);
+			var setup = Mock.SetupGet(mock, GetMemberAccess<TProperty>(property), null);
+			return new NonVoidSetupPhrase<T, TProperty>(setup);
 		}
 
 		public ISetupSetter<T, TProperty> SetupSet<TProperty>(string propertyName, object value)
