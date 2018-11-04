@@ -42,7 +42,8 @@ namespace Moq.Protected
 				throw new ArgumentException(ex.Message, nameof(expression));
 			}
 
-			return Mock.Setup(this.mock, rewrittenExpression, null);
+			var setup = Mock.SetupVoid(this.mock, rewrittenExpression, null);
+			return new VoidSetupPhrase<T>(setup);
 		}
 
 		public ISetup<T, TResult> Setup<TResult>(Expression<Func<TAnalog, TResult>> expression)
@@ -59,7 +60,8 @@ namespace Moq.Protected
 				throw new ArgumentException(ex.Message, nameof(expression));
 			}
 
-			return Mock.Setup(this.mock, rewrittenExpression, null);
+			var setup = Mock.SetupNonVoid(this.mock, rewrittenExpression, null);
+			return new NonVoidSetupPhrase<T, TResult>(setup);
 		}
 
 		public ISetupGetter<T, TProperty> SetupGet<TProperty>(Expression<Func<TAnalog, TProperty>> expression)
@@ -76,7 +78,8 @@ namespace Moq.Protected
 				throw new ArgumentException(ex.Message, nameof(expression));
 			}
 
-			return Mock.SetupGet(this.mock, rewrittenExpression, null);
+			var setup = Mock.SetupGet(this.mock, rewrittenExpression, null);
+			return new NonVoidSetupPhrase<T, TProperty>(setup);
 		}
 
 		public Mock<T> SetupProperty<TProperty>(Expression<Func<TAnalog, TProperty>> expression, TProperty initialValue = default(TProperty))
@@ -110,7 +113,8 @@ namespace Moq.Protected
 				throw new ArgumentException(ex.Message, nameof(expression));
 			}
 
-			return Mock.SetupSequence<TResult>(this.mock, rewrittenExpression);
+			var setup = Mock.SetupSequence(this.mock, rewrittenExpression);
+			return new SetupSequencePhrase<TResult>(setup);
 		}
 
 		public ISetupSequentialAction SetupSequence(Expression<Action<TAnalog>> expression)
@@ -127,7 +131,8 @@ namespace Moq.Protected
 				throw new ArgumentException(ex.Message, nameof(expression));
 			}
 
-			return Mock.SetupSequence(this.mock, rewrittenExpression);
+			var setup = Mock.SetupSequence(this.mock, rewrittenExpression);
+			return new SetupSequencePhrase(setup);
 		}
 
 		public void Verify(Expression<Action<TAnalog>> expression, Times? times = null, string failMessage = null)
@@ -144,7 +149,7 @@ namespace Moq.Protected
 				throw new ArgumentException(ex.Message, nameof(expression));
 			}
 
-			Mock.Verify(this.mock, rewrittenExpression, times ?? Times.AtLeastOnce(), failMessage);
+			Mock.VerifyVoid(this.mock, rewrittenExpression, times ?? Times.AtLeastOnce(), failMessage);
 		}
 
 		public void Verify<TResult>(Expression<Func<TAnalog, TResult>> expression, Times? times = null, string failMessage = null)
@@ -161,7 +166,7 @@ namespace Moq.Protected
 				throw new ArgumentException(ex.Message, nameof(expression));
 			}
 
-			Mock.Verify(this.mock, rewrittenExpression, times ?? Times.AtLeastOnce(), failMessage);
+			Mock.VerifyNonVoid(this.mock, rewrittenExpression, times ?? Times.AtLeastOnce(), failMessage);
 		}
 
 		public void VerifyGet<TProperty>(Expression<Func<TAnalog, TProperty>> expression, Times? times = null, string failMessage = null)

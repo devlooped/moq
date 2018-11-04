@@ -12,12 +12,7 @@ namespace Moq
 	public partial class Mock
 	{
 		[Obsolete]
-		internal static void VerifySet<T, TProperty>(
-			Mock mock,
-			Expression<Func<T, TProperty>> expression,
-			Times times,
-			string failMessage)
-			where T : class
+		internal static void VerifySet(Mock mock, LambdaExpression expression, Times times, string failMessage)
 		{
 			var method = expression.ToPropertyInfo().SetMethod;
 			ThrowIfVerifyExpressionInvolvesUnsupportedMember(expression, method);

@@ -40,7 +40,8 @@ namespace Moq.Protected
 			ThrowIfMemberMissing(methodName, method);
 			ThrowIfPublicMethod(method, typeof(T).Name);
 
-			return Mock.Setup(mock, GetMethodCall(method, args), null);
+			var setup = Mock.SetupVoid(mock, GetMethodCall(method, args), null);
+			return new VoidSetupPhrase<T>(setup);
 		}
 
 		public ISetup<T, TResult> Setup<TResult>(string methodName, params object[] args)
@@ -59,7 +60,8 @@ namespace Moq.Protected
 			{
 				ThrowIfPublicGetter(property, typeof(T).Name);
 				// TODO should consider property indexers
-				return Mock.SetupGet(mock, GetMemberAccess<TResult>(property), null);
+				var getterSetup = Mock.SetupGet(mock, GetMemberAccess<TResult>(property), null);
+				return new NonVoidSetupPhrase<T, TResult>(getterSetup);
 			}
 
 			var method = GetMethod(methodName, exactParameterMatch, args);
@@ -67,7 +69,8 @@ namespace Moq.Protected
 			ThrowIfVoidMethod(method);
 			ThrowIfPublicMethod(method, typeof(T).Name);
 
-			return Mock.Setup(mock, GetMethodCall<TResult>(method, args), null);
+			var setup = Mock.SetupNonVoid(mock, GetMethodCall<TResult>(method, args), null);
+			return new NonVoidSetupPhrase<T, TResult>(setup);
 		}
 
 		public ISetupGetter<T, TProperty> SetupGet<TProperty>(string propertyName)
@@ -79,7 +82,8 @@ namespace Moq.Protected
 			ThrowIfPublicGetter(property, typeof(T).Name);
 			Guard.CanRead(property);
 
-			return Mock.SetupGet(mock, GetMemberAccess<TProperty>(property), null);
+			var setup = Mock.SetupGet(mock, GetMemberAccess<TProperty>(property), null);
+			return new NonVoidSetupPhrase<T, TProperty>(setup);
 		}
 
 		public ISetupSetter<T, TProperty> SetupSet<TProperty>(string propertyName, object value)
@@ -91,7 +95,8 @@ namespace Moq.Protected
 			ThrowIfPublicSetter(property, typeof(T).Name);
 			Guard.CanWrite(property);
 
-			return Mock.SetupSet<T, TProperty>(mock, GetSetterExpression(property, ItExpr.IsAny<TProperty>()), null);
+			var setup = Mock.SetupSet(mock, GetSetterExpression(property, ItExpr.IsAny<TProperty>()), null);
+			return new SetterSetupPhrase<T, TProperty>(setup);
 		}
 
 		public ISetupSequentialAction SetupSequence(string methodOrPropertyName, params object[] args)
@@ -107,7 +112,8 @@ namespace Moq.Protected
 			ThrowIfMemberMissing(methodOrPropertyName, method);
 			ThrowIfPublicMethod(method, typeof(T).Name);
 
-			return Mock.SetupSequence(mock, GetMethodCall(method, args));
+			var setup = Mock.SetupSequence(mock, GetMethodCall(method, args));
+			return new SetupSequencePhrase(setup);
 		}
 
 		public ISetupSequentialResult<TResult> SetupSequence<TResult>(string methodOrPropertyName, params object[] args)
@@ -124,7 +130,8 @@ namespace Moq.Protected
 			{
 				ThrowIfPublicGetter(property, typeof(T).Name);
 				// TODO should consider property indexers
-				return Mock.SetupSequence<TResult>(mock, GetMemberAccess<TResult>(property));
+				var getterSetup = Mock.SetupSequence(mock, GetMemberAccess<TResult>(property));
+				return new SetupSequencePhrase<TResult>(getterSetup);
 			}
 
 			var method = GetMethod(methodOrPropertyName, exactParameterMatch, args);
@@ -132,7 +139,8 @@ namespace Moq.Protected
 			ThrowIfVoidMethod(method);
 			ThrowIfPublicMethod(method, typeof(T).Name);
 
-			return Mock.SetupSequence<TResult>(mock, GetMethodCall<TResult>(method, args));
+			var setup = Mock.SetupSequence(mock, GetMethodCall<TResult>(method, args));
+			return new SetupSequencePhrase<TResult>(setup);
 		}
 
 		#endregion
@@ -147,7 +155,7 @@ namespace Moq.Protected
 			ThrowIfMemberMissing(methodName, method);
 			ThrowIfPublicMethod(method, typeof(T).Name);
 
-			Mock.Verify(mock, GetMethodCall(method, args), times, null);
+			Mock.VerifyVoid(mock, GetMethodCall(method, args), times, null);
 		}
 
 		public void Verify<TResult>(string methodName, Times times, object[] args)
@@ -167,7 +175,7 @@ namespace Moq.Protected
 			ThrowIfMemberMissing(methodName, method);
 			ThrowIfPublicMethod(method, typeof(T).Name);
 
-			Mock.Verify(mock, GetMethodCall<TResult>(method, args), times, null);
+			Mock.VerifyNonVoid(mock, GetMethodCall<TResult>(method, args), times, null);
 		}
 
 		// TODO should receive args to support indexers

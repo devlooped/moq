@@ -10,7 +10,7 @@ using System.Reflection;
 namespace Moq
 {
 	/// <summary>
-	///   Programmable setup used by <see cref="Mock.SetupSequence(Mock, LambdaExpression)"/> and <see cref="Mock.SetupSequence{TResult}(Mock, LambdaExpression)"/>.
+	///   Programmable setup used by <see cref="Mock.SetupSequence(Mock, LambdaExpression)"/>.
 	/// </summary>
 	internal sealed class SequenceSetup : SetupWithOutParameterSupport
 	{
