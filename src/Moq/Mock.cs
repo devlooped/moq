@@ -597,7 +597,7 @@ namespace Moq
 			return Expression.Convert(Expression.Constant(value), type);
 		}
 
-		internal static SequenceSetup SetupNonVoidSequence(Mock mock, LambdaExpression expression)
+		internal static SequenceSetup SetupSequence(Mock mock, LambdaExpression expression)
 		{
 			if (expression.IsProperty())
 			{
@@ -621,15 +621,6 @@ namespace Moq
 				targetMock.Setups.Add(setup);
 				return setup;
 			}
-		}
-
-		internal static SequenceSetup SetupVoidSequence(Mock mock, LambdaExpression expression)
-		{
-			var (obj, method, args) = expression.GetCallInfo(mock);
-			var setup = new SequenceSetup(expression, method, args);
-			var targetMock = GetTargetMock(obj, mock);
-			targetMock.Setups.Add(setup);
-			return setup;
 		}
 
 		[DebuggerStepThrough]

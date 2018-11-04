@@ -112,7 +112,7 @@ namespace Moq.Protected
 			ThrowIfMemberMissing(methodOrPropertyName, method);
 			ThrowIfPublicMethod(method, typeof(T).Name);
 
-			var setup = Mock.SetupVoidSequence(mock, GetMethodCall(method, args));
+			var setup = Mock.SetupSequence(mock, GetMethodCall(method, args));
 			return new SetupSequencePhrase(setup);
 		}
 
@@ -130,7 +130,7 @@ namespace Moq.Protected
 			{
 				ThrowIfPublicGetter(property, typeof(T).Name);
 				// TODO should consider property indexers
-				var getterSetup = Mock.SetupNonVoidSequence(mock, GetMemberAccess<TResult>(property));
+				var getterSetup = Mock.SetupSequence(mock, GetMemberAccess<TResult>(property));
 				return new SetupSequencePhrase<TResult>(getterSetup);
 			}
 
@@ -139,7 +139,7 @@ namespace Moq.Protected
 			ThrowIfVoidMethod(method);
 			ThrowIfPublicMethod(method, typeof(T).Name);
 
-			var setup = Mock.SetupNonVoidSequence(mock, GetMethodCall<TResult>(method, args));
+			var setup = Mock.SetupSequence(mock, GetMethodCall<TResult>(method, args));
 			return new SetupSequencePhrase<TResult>(setup);
 		}
 

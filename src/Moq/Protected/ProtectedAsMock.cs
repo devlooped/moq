@@ -113,7 +113,7 @@ namespace Moq.Protected
 				throw new ArgumentException(ex.Message, nameof(expression));
 			}
 
-			var setup = Mock.SetupNonVoidSequence(this.mock, rewrittenExpression);
+			var setup = Mock.SetupSequence(this.mock, rewrittenExpression);
 			return new SetupSequencePhrase<TResult>(setup);
 		}
 
@@ -131,7 +131,7 @@ namespace Moq.Protected
 				throw new ArgumentException(ex.Message, nameof(expression));
 			}
 
-			var setup = Mock.SetupVoidSequence(this.mock, rewrittenExpression);
+			var setup = Mock.SetupSequence(this.mock, rewrittenExpression);
 			return new SetupSequencePhrase(setup);
 		}
 
