@@ -44,22 +44,22 @@ namespace Moq
 
 		public static bool IsPropertyGetter(this MethodInfo method)
 		{
-			return method.Name.StartsWith("get_", StringComparison.Ordinal);
+			return method.IsSpecialName && method.Name.StartsWith("get_", StringComparison.Ordinal);
 		}
 
 		public static bool IsPropertyIndexerGetter(this MethodInfo method)
 		{
-			return method.Name.StartsWith("get_Item", StringComparison.Ordinal);
+			return method.IsSpecialName && method.Name.StartsWith("get_Item", StringComparison.Ordinal);
 		}
 
 		public static bool IsPropertyIndexerSetter(this MethodInfo method)
 		{
-			return method.Name.StartsWith("set_Item", StringComparison.Ordinal);
+			return method.IsSpecialName && method.Name.StartsWith("set_Item", StringComparison.Ordinal);
 		}
 
 		public static bool IsPropertySetter(this MethodInfo method)
 		{
-			return method.Name.StartsWith("set_", StringComparison.Ordinal);
+			return method.IsSpecialName && method.Name.StartsWith("set_", StringComparison.Ordinal);
 		}
 
 		// NOTE: The following two methods used to first check whether `method.IsSpecialName` was set

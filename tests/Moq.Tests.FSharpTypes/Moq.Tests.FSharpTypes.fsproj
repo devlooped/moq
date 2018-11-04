@@ -13,9 +13,15 @@
 	<ItemGroup>
 		<Compile Include="HasAbstractActionEvent.fs" />
 		<Compile Include="HasAbstractEventHandlerEvent.fs" />
+		<Compile Include="HasAbstractIndexer.fs" />
+		<Compile Include="HasAbstractProperty.fs" />
 		<Compile Include="HasActionEvent.fs" />
+		<Compile Include="HasIndexer.fs" />
+		<Compile Include="HasProperty.fs" />
 		<Compile Include="IHasActionEvent.fs" />
 		<Compile Include="IHasEventHandlerEvent.fs" />
+		<Compile Include="IHasIndexer.fs" />
+		<Compile Include="IHasProperty.fs" />
 	</ItemGroup>
 
 	<Target Name="Test" DependsOnTargets="Build" />

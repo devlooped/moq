@@ -56,6 +56,52 @@ namespace Moq.Tests
 
 			Assert.Equal(1, eventRaiseCount);
 		}
+
+		[Fact]
+		public void COM_interop_type_property_has_accessors_that_are_marked_as_specialname()
+		{
+			var property = typeof(IHasProperty).GetProperty(nameof(IHasProperty.Property));
+			Assert.All(property.GetAccessors(), accessor => Assert.True(accessor.IsSpecialName, "Accessor is not marked as `specialname`."));
+		}
+
+		[Fact]
+		public void COM_interop_type_property_getter_is_recognized_as_such()
+		{
+			var property = typeof(IHasProperty).GetProperty(nameof(IHasProperty.Property));
+			var getter = property.GetGetMethod(true);
+			Assert.True(getter.IsPropertyGetter());
+		}
+
+		[Fact]
+		public void COM_interop_type_property_setter_is_recognized_as_such()
+		{
+			var property = typeof(IHasProperty).GetProperty(nameof(IHasProperty.Property));
+			var setter = property.GetSetMethod(true);
+			Assert.True(setter.IsPropertySetter());
+		}
+
+		[Fact]
+		public void COM_interop_type_indexer_has_accessors_that_are_marked_as_specialname()
+		{
+			var indexer = typeof(IHasIndexer).GetProperty(nameof(IHasIndexer.Item));
+			Assert.All(indexer.GetAccessors(), accessor => Assert.True(accessor.IsSpecialName, "Accessor is not marked as `specialname`."));
+		}
+
+		[Fact]
+		public void COM_interop_type_indexer_getter_is_recognized_as_such()
+		{
+			var indexer = typeof(IHasIndexer).GetProperty(nameof(IHasIndexer.Item));
+			var getter = indexer.GetGetMethod(true);
+			Assert.True(getter.IsPropertyIndexerGetter());
+		}
+
+		[Fact]
+		public void COM_interop_type_indexer_setter_is_recognized_as_such()
+		{
+			var indexer = typeof(IHasIndexer).GetProperty(nameof(IHasIndexer.Item));
+			var setter = indexer.GetSetMethod(true);
+			Assert.True(setter.IsPropertyIndexerSetter());
+		}
 	}
 }
 
