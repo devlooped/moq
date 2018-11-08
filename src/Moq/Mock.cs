@@ -500,7 +500,7 @@ namespace Moq
 			return setup;
 		}
 
-		private static (Mock, LambdaExpression, MethodInfo, Expression[]) SetupSetImpl(Mock mock, Delegate setterExpression)
+		private static SetupSetImplResult SetupSetImpl(Mock mock, Delegate setterExpression)
 		{
 			using (var context = new FluentMockContext())
 			{
@@ -546,7 +546,7 @@ namespace Moq
 						Expression.Call(x, last.Invocation.Method, values),
 						x);
 
-					return (last.Mock, lambda, last.Invocation.Method, values);
+					return new SetupSetImplResult(last.Mock, lambda, last.Invocation.Method, values);
 				}
 				else
 				{
@@ -581,7 +581,7 @@ namespace Moq
 						Expression.Call(x, last.Invocation.Method, values),
 						x);
 
-					return (last.Mock, lambda, last.Invocation.Method, matchers);
+					return new SetupSetImplResult(last.Mock, lambda, last.Invocation.Method, matchers);
 				}
 			}
 		}
@@ -948,5 +948,29 @@ namespace Moq
 		}
 
 		#endregion
+
+		private readonly struct SetupSetImplResult
+		{
+			private readonly Mock mock;
+			private readonly LambdaExpression lambda;
+			private readonly MethodInfo method;
+			private readonly Expression[] arguments;
+
+			public SetupSetImplResult(Mock mock, LambdaExpression lambda, MethodInfo method, Expression[] arguments)
+			{
+				this.mock = mock;
+				this.lambda = lambda;
+				this.method = method;
+				this.arguments = arguments;
+			}
+
+			public void Deconstruct(out Mock mock, out LambdaExpression lambda, out MethodInfo method, out Expression[] arguments)
+			{
+				mock = this.mock;
+				lambda = this.lambda;
+				method = this.method;
+				arguments = this.arguments;
+			}
+		}
 	}
 }

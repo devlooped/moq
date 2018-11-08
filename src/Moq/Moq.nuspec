@@ -16,7 +16,6 @@
 			<group targetFramework=".NETFramework4.5">
 				<dependency id="Castle.Core" version="4.3.1" />
 				<dependency id="System.Threading.Tasks.Extensions" version="4.3.0" />
-				<dependency id="System.ValueTuple" version="4.4.0" />
 			</group>
 			<group targetFramework=".NETStandard1.3">
 				<dependency id="NETStandard.Library" version="1.6.1" />
@@ -25,7 +24,6 @@
 				<dependency id="System.Reflection.TypeExtensions" version="4.3.0" />
 				<dependency id="Castle.Core" version="4.3.1" />
 				<dependency id="System.Threading.Tasks.Extensions" version="4.3.0" />
-				<dependency id="System.ValueTuple" version="4.4.0" />
 			</group>
 		</dependencies>
 	</metadata>
