@@ -137,7 +137,7 @@ namespace Moq
 			return false;
 		}
 
-		public static (EventInfo Event, Mock Target) GetEventWithTarget<TMock>(this Action<TMock> eventExpression, TMock mock)
+		public static EventWithTarget GetEventWithTarget<TMock>(this Action<TMock> eventExpression, TMock mock)
 			where TMock : class
 		{
 			Guard.NotNull(eventExpression, nameof(eventExpression));
@@ -169,7 +169,7 @@ namespace Moq
 					addRemove));
 			}
 
-			return (ev, target);
+			return new EventWithTarget(ev, target);
 		}
 
 		public static IEnumerable<MethodInfo> GetMethods(this Type type, string name)
@@ -305,6 +305,24 @@ namespace Moq
 					properties.Add(property);
 				}
 			}
+		}
+	}
+
+	internal readonly struct EventWithTarget
+	{
+		private readonly EventInfo @event;
+		private readonly Mock target;
+
+		public EventWithTarget(EventInfo @event, Mock target)
+		{
+			this.@event = @event;
+			this.target = target;
+		}
+
+		public void Deconstruct(out EventInfo @event, out Mock target)
+		{
+			@event = this.@event;
+			target = this.target;
 		}
 	}
 }
