@@ -12,6 +12,10 @@ The format is loosely based on [Keep a Changelog](http://keepachangelog.com/en/1
 * `NullReferenceException` when using `SetupSet` on indexers with multiple parameters (@idigra, #694)
 * `CallBase` should not be allowed for delegate mocks (@tehmantra, #706)
 
+#### Changed
+
+* Dropped the dependency on the `System.ValueTuple` NuGet package, at no functional cost (i.e. value tuples are still supported just fine) (@stakx, #721)
+
 
 ## 4.10.0 (2018-09-08)
 
