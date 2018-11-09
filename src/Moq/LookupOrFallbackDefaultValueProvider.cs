@@ -65,6 +65,7 @@ namespace Moq
 			Debug.Assert(factoryKey != null);
 
 			this.factories.Remove(factoryKey);
+			this.factories.Remove(factoryKey.FullName);
 		}
 
 		/// <summary>
