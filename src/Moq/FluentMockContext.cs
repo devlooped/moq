@@ -17,20 +17,18 @@ namespace Moq
 
 		private List<MockInvocation> invocations = new List<MockInvocation>();
 
-		public static FluentMockContext Current
-		{
-			get { return current; }
-		}
-
 		/// <summary>
 		/// Having an active fluent mock context means that the invocation 
 		/// is being performed in "trial" mode, just to gather the 
 		/// target method and arguments that need to be matched later 
 		/// when the actual invocation is made.
 		/// </summary>
-		public static bool IsActive
+		public static bool IsActive(out FluentMockContext context)
 		{
-			get { return current != null; }
+			var current = FluentMockContext.current;
+
+			context = current;
+			return current != null;
 		}
 
 		public FluentMockContext()

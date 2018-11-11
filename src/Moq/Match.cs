@@ -59,9 +59,9 @@ namespace Moq
 		/// </devdoc>
 		private static Match<TValue> SetLastMatch<TValue>(Match<TValue> match)
 		{
-			if (FluentMockContext.IsActive)
+			if (FluentMockContext.IsActive(out var context))
 			{
-				FluentMockContext.Current.LastMatch = match;
+				context.LastMatch = match;
 			}
 
 			return match;
