@@ -502,11 +502,11 @@ namespace Moq
 
 		private static SetupSetImplResult SetupSetImpl(Mock mock, Delegate setterExpression)
 		{
-			using (var context = new FluentMockContext())
+			using (var observer = new AmbientObserver())
 			{
 				setterExpression.DynamicInvoke(mock.Object);
 
-				if (!context.LastObservationWasMockInvocation(out var lastMock, out var lastInvocation, out var lastMatches))
+				if (!observer.LastObservationWasMockInvocation(out var lastMock, out var lastInvocation, out var lastMatches))
 				{
 					throw new ArgumentException(string.Format(
 						CultureInfo.InvariantCulture,

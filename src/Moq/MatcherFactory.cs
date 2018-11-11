@@ -90,11 +90,11 @@ namespace Moq
 				var call = (MethodCallExpression)expression;
 
 				// Try to determine if invocation is to a matcher.
-				using (var context = new FluentMockContext())
+				using (var observer = new AmbientObserver())
 				{
 					Expression.Lambda<Action>(call).CompileUsingExpressionCompiler().Invoke();
 
-					if (context.LastObservationWasMatcher(out var match))
+					if (observer.LastObservationWasMatcher(out var match))
 					{
 						return match;
 					}
@@ -114,10 +114,10 @@ namespace Moq
 			else if (expression.NodeType == ExpressionType.MemberAccess)
 			{
 				// Try to determine if invocation is to a matcher.
-				using (var context = new FluentMockContext())
+				using (var observer = new AmbientObserver())
 				{
 					Expression.Lambda<Action>((MemberExpression)expression).CompileUsingExpressionCompiler().Invoke();
-					if (context.LastObservationWasMatcher(out var match))
+					if (observer.LastObservationWasMatcher(out var match))
 					{
 						return match;
 					}

@@ -59,9 +59,9 @@ namespace Moq
 		/// </devdoc>
 		private static void SetLastMatch(Match match)
 		{
-			if (FluentMockContext.IsActive(out var context))
+			if (AmbientObserver.IsActive(out var observer))
 			{
-				context.OnMatch(match);
+				observer.OnMatch(match);
 			}
 		}
 	}

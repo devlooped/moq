@@ -109,8 +109,11 @@ namespace Moq
 
 		public override InterceptionAction Handle(Invocation invocation, Mock mock)
 		{
-			if (FluentMockContext.IsActive(out _))
+			if (AmbientObserver.IsActive(out _))
 			{
+				// Having an active `AmbientObserver` means that the invocation is being performed
+				// in "trial" mode, just to gather the target method and arguments that need to be
+				// matched later, when the actual invocation will be made.
 				return InterceptionAction.Continue;
 			}
 
@@ -153,10 +156,10 @@ namespace Moq
 
 		public override InterceptionAction Handle(Invocation invocation, Mock mock)
 		{
-			// Track current invocation if we're in "record" mode in a fluent invocation context.
-			if (FluentMockContext.IsActive(out var context))
+			// If an ambient observer is active, notify it of the current mock invocation.
+			if (AmbientObserver.IsActive(out var observer))
 			{
-				context.OnInvocation(mock, invocation);
+				observer.OnInvocation(mock, invocation);
 			}
 			return InterceptionAction.Continue;
 		}
@@ -168,7 +171,7 @@ namespace Moq
 
 		public override InterceptionAction Handle(Invocation invocation, Mock mock)
 		{
-			if (FluentMockContext.IsActive(out _))
+			if (AmbientObserver.IsActive(out _))
 			{
 				// In a fluent invocation context, which is a recorder-like
 				// mode we use to evaluate delegates by actually running them,

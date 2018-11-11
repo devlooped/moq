@@ -3,35 +3,46 @@
 
 using System;
 using System.Collections.Generic;
-using System.Linq;
 
 namespace Moq
 {
 	/// <summary>
-	/// Tracks the current mock and interception context.
+	///   A per-thread observer that records invocations to mocks and matchers for later inspection.
 	/// </summary>
-	internal class FluentMockContext : IDisposable
+	/// <remarks>
+	///   <para>
+	///     This component requires the active cooperation of the respective subsystems.
+	///     That is, invoked matchers and mocks call into <see cref="OnMatch(Match)"/>
+	///     or <see cref="OnInvocation(Mock, Invocation)"/> if an ambient observer is
+	///     active on the current thread.
+	///   </para>
+	///   <para>
+	///     This gets used in Moq's API to work around certain limitations of what kind
+	///     of constructs the Roslyn compilers allow in in-source LINQ expression trees
+	///     (e.g., assignment and event (un-)subscription are forbidden). Instead of
+	///     letting user code provide a LINQ expression tree, Moq accepts a normal lambda.
+	///     While a lambda cannot be directly inspected like a LINQ expression tree, we
+	///     can instantiate an <see cref="AmbientObserver"/>, execute the lambda, and then
+	///     check with the observer what invocations happened; and from there, we can
+	///     "reverse-engineer" a LINQ expression tree (with some loss of accuracy).
+	///   </para>
+	/// </remarks>
+	internal sealed class AmbientObserver : IDisposable
 	{
 		[ThreadStatic]
-		private static FluentMockContext current;
+		private static AmbientObserver current;
 
-		/// <summary>
-		/// Having an active fluent mock context means that the invocation 
-		/// is being performed in "trial" mode, just to gather the 
-		/// target method and arguments that need to be matched later 
-		/// when the actual invocation is made.
-		/// </summary>
-		public static bool IsActive(out FluentMockContext context)
+		public static bool IsActive(out AmbientObserver observer)
 		{
-			var current = FluentMockContext.current;
+			var current = AmbientObserver.current;
 
-			context = current;
+			observer = current;
 			return current != null;
 		}
 
 		private List<Observation> observations;
 
-		public FluentMockContext()
+		public AmbientObserver()
 		{
 			current = this;
 		}
@@ -135,20 +146,20 @@ namespace Moq
 		/// </summary>
 		public readonly struct Matches
 		{
-			private readonly FluentMockContext context;
+			private readonly AmbientObserver observer;
 			private readonly int offset;
 			private readonly int count;
 
-			public Matches(FluentMockContext context, int offset, int count)
+			public Matches(AmbientObserver observer, int offset, int count)
 			{
-				this.context = context;
+				this.observer = observer;
 				this.offset = offset;
 				this.count = count;
 			}
 
 			public int Count => this.count;
 
-			public Match this[int index] => ((MatchObservation)this.context.observations[this.offset + index]).Match;
+			public Match this[int index] => ((MatchObservation)this.observer.observations[this.offset + index]).Match;
 		}
 
 		private abstract class Observation : IDisposable

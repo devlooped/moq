@@ -116,10 +116,10 @@ namespace Moq
 				case ExpressionType.Call:
 				case ExpressionType.MemberAccess:
 					// Evaluate everything but matchers:
-					using (var context = new FluentMockContext())
+					using (var observer = new AmbientObserver())
 					{
 						Expression.Lambda<Action>(expression).CompileUsingExpressionCompiler().Invoke();
-						return !context.LastObservationWasMatcher(out _);
+						return !observer.LastObservationWasMatcher(out _);
 					}
 
 				default:

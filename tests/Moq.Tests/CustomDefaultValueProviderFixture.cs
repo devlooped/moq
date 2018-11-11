@@ -93,7 +93,7 @@ namespace Moq.Tests
 		}
 
 		[Fact]
-		public void FluentMockContext_properly_restores_custom_default_value_provider()
+		public void AmbientObserver_properly_restores_custom_default_value_provider()
 		{
 			var customDefaultValueProvider = new ConstantDefaultValueProvider(42);
 			var mock = new Mock<IFoo>() { DefaultValueProvider = customDefaultValueProvider };
