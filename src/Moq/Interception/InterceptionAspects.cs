@@ -147,28 +147,15 @@ namespace Moq
 		}
 	}
 
-	internal sealed class HandleTracking : InterceptionAspect
-	{
-		public static HandleTracking Instance { get; } = new HandleTracking();
-
-		public override InterceptionAction Handle(Invocation invocation, Mock mock)
-		{
-			if (AmbientObserver.IsActive(out var observer))
-			{
-				observer.OnInvocation(mock, invocation);
-			}
-			return InterceptionAction.Continue;
-		}
-	}
-
 	internal sealed class RecordInvocation : InterceptionAspect
 	{
 		public static RecordInvocation Instance { get; } = new RecordInvocation();
 
 		public override InterceptionAction Handle(Invocation invocation, Mock mock)
 		{
-			if (AmbientObserver.IsActive(out _))
+			if (AmbientObserver.IsActive(out var observer))
 			{
+				observer.OnInvocation(mock, invocation);
 				return InterceptionAction.Continue;
 			}
 
