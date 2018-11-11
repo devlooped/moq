@@ -28,6 +28,15 @@ namespace Moq
 			return ExpressionCompiler.Instance.Compile(expression);
 		}
 
+		public static bool IsMatch(this Expression expression, out Match match)
+		{
+			using (var observer = AmbientObserver.Activate())
+			{
+				Expression.Lambda<Action>(expression).CompileUsingExpressionCompiler().Invoke();
+				return observer.LastIsMatch(out match);
+			}
+		}
+
 		/// <summary>
 		/// Converts the body of the lambda expression into the <see cref="PropertyInfo"/> referenced by it.
 		/// </summary>
@@ -115,12 +124,7 @@ namespace Moq
 
 				case ExpressionType.Call:
 				case ExpressionType.MemberAccess:
-					// Evaluate everything but matchers:
-					using (var context = new FluentMockContext())
-					{
-						Expression.Lambda<Action>(expression).CompileUsingExpressionCompiler().Invoke();
-						return context.LastMatch == null;
-					}
+					return !expression.IsMatch(out _);
 
 				default:
 					return true;

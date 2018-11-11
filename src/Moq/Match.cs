@@ -41,30 +41,23 @@ namespace Moq
 
 		internal static T Create<T>(Match<T> match)
 		{
-			SetLastMatch(match);
-			return default(T);
-		}
+			// This method is used to set an expression as the last matcher invoked,
+			// which is used in the SetupSet to allow matchers in the prop = value
+			// delegate expression. This delegate is executed in "fluent" mode in
+			// order to capture the value being set, and construct the corresponding
+			// methodcall.
+			// This is also used in the MatcherFactory for each argument expression.
+			// This method ensures that when we execute the delegate, we
+			// also track the matcher that was invoked, so that when we create the
+			// methodcall we build the expression using it, rather than the null/default
+			// value returned from the actual invocation.
 
-		/// <devdoc>
-		/// This method is used to set an expression as the last matcher invoked, 
-		/// which is used in the SetupSet to allow matchers in the prop = value 
-		/// delegate expression. This delegate is executed in "fluent" mode in 
-		/// order to capture the value being set, and construct the corresponding 
-		/// methodcall.
-		/// This is also used in the MatcherFactory for each argument expression.
-		/// This method ensures that when we execute the delegate, we 
-		/// also track the matcher that was invoked, so that when we create the 
-		/// methodcall we build the expression using it, rather than the null/default 
-		/// value returned from the actual invocation.
-		/// </devdoc>
-		private static Match<TValue> SetLastMatch<TValue>(Match<TValue> match)
-		{
-			if (FluentMockContext.IsActive)
+			if (AmbientObserver.IsActive(out var observer))
 			{
-				FluentMockContext.Current.LastMatch = match;
+				observer.OnMatch(match);
 			}
 
-			return match;
+			return default(T);
 		}
 	}
 

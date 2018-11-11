@@ -87,20 +87,13 @@ namespace Moq
 
 			if (expression.NodeType == ExpressionType.Call)
 			{
-				var call = (MethodCallExpression)expression;
-
-				// Try to determine if invocation is to a matcher.
-				using (var context = new FluentMockContext())
+				if (expression.IsMatch(out var match))
 				{
-					Expression.Lambda<Action>(call).CompileUsingExpressionCompiler().Invoke();
-
-					if (context.LastMatch != null)
-					{
-						return context.LastMatch;
-					}
+					return match;
 				}
 
 #pragma warning disable 618
+				var call = (MethodCallExpression)expression;
 				if (call.Method.IsDefined(typeof(MatcherAttribute), true))
 				{
 					return new MatcherAttributeMatcher(call);
@@ -113,14 +106,9 @@ namespace Moq
 			}
 			else if (expression.NodeType == ExpressionType.MemberAccess)
 			{
-				// Try to determine if invocation is to a matcher.
-				using (var context = new FluentMockContext())
+				if (expression.IsMatch(out var match))
 				{
-					Expression.Lambda<Action>((MemberExpression)expression).CompileUsingExpressionCompiler().Invoke();
-					if (context.LastMatch != null)
-					{
-						return context.LastMatch;
-					}
+					return match;
 				}
 			}
 

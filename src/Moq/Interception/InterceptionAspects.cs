@@ -109,7 +109,7 @@ namespace Moq
 
 		public override InterceptionAction Handle(Invocation invocation, Mock mock)
 		{
-			if (FluentMockContext.IsActive)
+			if (AmbientObserver.IsActive(out _))
 			{
 				return InterceptionAction.Continue;
 			}
@@ -153,10 +153,9 @@ namespace Moq
 
 		public override InterceptionAction Handle(Invocation invocation, Mock mock)
 		{
-			// Track current invocation if we're in "record" mode in a fluent invocation context.
-			if (FluentMockContext.IsActive)
+			if (AmbientObserver.IsActive(out var observer))
 			{
-				FluentMockContext.Current.Add(mock, invocation);
+				observer.OnInvocation(mock, invocation);
 			}
 			return InterceptionAction.Continue;
 		}
@@ -168,12 +167,8 @@ namespace Moq
 
 		public override InterceptionAction Handle(Invocation invocation, Mock mock)
 		{
-			if (FluentMockContext.IsActive)
+			if (AmbientObserver.IsActive(out _))
 			{
-				// In a fluent invocation context, which is a recorder-like
-				// mode we use to evaluate delegates by actually running them,
-				// we don't want to count the invocation, or actually run
-				// previous setups.
 				return InterceptionAction.Continue;
 			}
 
