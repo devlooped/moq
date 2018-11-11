@@ -119,7 +119,7 @@ namespace Moq
 					using (var context = new FluentMockContext())
 					{
 						Expression.Lambda<Action>(expression).CompileUsingExpressionCompiler().Invoke();
-						return context.LastMatch == null;
+						return !context.LastObservationWasMatcher(out _);
 					}
 
 				default:

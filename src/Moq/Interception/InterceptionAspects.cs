@@ -156,7 +156,7 @@ namespace Moq
 			// Track current invocation if we're in "record" mode in a fluent invocation context.
 			if (FluentMockContext.IsActive(out var context))
 			{
-				context.Add(mock, invocation);
+				context.OnInvocation(mock, invocation);
 			}
 			return InterceptionAction.Continue;
 		}

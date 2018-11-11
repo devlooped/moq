@@ -506,8 +506,7 @@ namespace Moq
 			{
 				setterExpression.DynamicInvoke(mock.Object);
 
-				var last = context.LastInvocation;
-				if (last == null)
+				if (!context.LastObservationWasMockInvocation(out var lastMock, out var lastInvocation, out var lastMatches))
 				{
 					throw new ArgumentException(string.Format(
 						CultureInfo.InvariantCulture,
@@ -515,7 +514,7 @@ namespace Moq
 						string.Empty));
 				}
 
-				var setter = last.Invocation.Method;
+				var setter = lastInvocation.Method;
 				if (!setter.IsPropertySetter())
 				{
 					throw new ArgumentException(Resources.SetupNotSetter);
@@ -527,13 +526,13 @@ namespace Moq
 				// because of delegate currying, look at the last parameter for the Action's backing method, not the first
 				var setterExpressionParameters = setterExpression.GetMethodInfo().GetParameters();
 				var parameterName = setterExpressionParameters[setterExpressionParameters.Length - 1].Name;
-				var x = Expression.Parameter(last.Invocation.Method.DeclaringType, parameterName);
+				var x = Expression.Parameter(lastInvocation.Method.DeclaringType, parameterName);
 
-				var arguments = last.Invocation.Arguments;
+				var arguments = lastInvocation.Arguments;
 				var parameters = setter.GetParameters();
 				var values = new Expression[arguments.Length];
 
-				if (last.Match == null)
+				if (lastMatches.Count == 0)
 				{
 					// Length == 1 || Length == 2 (Indexer property)
 					for (int i = 0; i < arguments.Length; i++)
@@ -543,13 +542,16 @@ namespace Moq
 
 					var lambda = Expression.Lambda(
 						typeof(Action<>).MakeGenericType(x.Type),
-						Expression.Call(x, last.Invocation.Method, values),
+						Expression.Call(x, lastInvocation.Method, values),
 						x);
 
-					return new SetupSetImplResult(last.Mock, lambda, last.Invocation.Method, values);
+					return new SetupSetImplResult(lastMock, lambda, lastInvocation.Method, values);
 				}
 				else
 				{
+					// TODO: Use all observed matchers, not just the last one!
+					var lastMatch = lastMatches[lastMatches.Count - 1];
+
 					var matchers = new Expression[arguments.Length];
 					var valueIndex = arguments.Length - 1;
 					var propertyType = setter.GetParameters()[valueIndex].ParameterType;
@@ -557,16 +559,16 @@ namespace Moq
 					// If the value matcher is not equal to the property 
 					// type (i.e. prop is int?, but you use It.IsAny<int>())
 					// add a cast.
-					if (last.Match.RenderExpression.Type != propertyType)
+					if (lastMatch.RenderExpression.Type != propertyType)
 					{
-						values[valueIndex] = Expression.Convert(last.Match.RenderExpression, propertyType);
+						values[valueIndex] = Expression.Convert(lastMatch.RenderExpression, propertyType);
 					}
 					else
 					{
-						values[valueIndex] = last.Match.RenderExpression;
+						values[valueIndex] = lastMatch.RenderExpression;
 					}
 
-					matchers[valueIndex] = new MatchExpression(last.Match);
+					matchers[valueIndex] = new MatchExpression(lastMatch);
 
 					for (int i = 0; i < arguments.Length - 1; i++)
 					{
@@ -578,10 +580,10 @@ namespace Moq
 
 					var lambda = Expression.Lambda(
 						typeof(Action<>).MakeGenericType(x.Type),
-						Expression.Call(x, last.Invocation.Method, values),
+						Expression.Call(x, lastInvocation.Method, values),
 						x);
 
-					return new SetupSetImplResult(last.Mock, lambda, last.Invocation.Method, matchers);
+					return new SetupSetImplResult(lastMock, lambda, lastInvocation.Method, matchers);
 				}
 			}
 		}

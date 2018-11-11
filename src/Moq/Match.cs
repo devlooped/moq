@@ -57,14 +57,12 @@ namespace Moq
 		/// methodcall we build the expression using it, rather than the null/default 
 		/// value returned from the actual invocation.
 		/// </devdoc>
-		private static Match<TValue> SetLastMatch<TValue>(Match<TValue> match)
+		private static void SetLastMatch(Match match)
 		{
 			if (FluentMockContext.IsActive(out var context))
 			{
-				context.LastMatch = match;
+				context.OnMatch(match);
 			}
-
-			return match;
 		}
 	}
 

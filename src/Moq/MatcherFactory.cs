@@ -94,9 +94,9 @@ namespace Moq
 				{
 					Expression.Lambda<Action>(call).CompileUsingExpressionCompiler().Invoke();
 
-					if (context.LastMatch != null)
+					if (context.LastObservationWasMatcher(out var match))
 					{
-						return context.LastMatch;
+						return match;
 					}
 				}
 
@@ -117,9 +117,9 @@ namespace Moq
 				using (var context = new FluentMockContext())
 				{
 					Expression.Lambda<Action>((MemberExpression)expression).CompileUsingExpressionCompiler().Invoke();
-					if (context.LastMatch != null)
+					if (context.LastObservationWasMatcher(out var match))
 					{
-						return context.LastMatch;
+						return match;
 					}
 				}
 			}

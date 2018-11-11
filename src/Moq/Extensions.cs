@@ -149,13 +149,12 @@ namespace Moq
 			{
 				eventExpression(mock);
 
-				if (context.LastInvocation == null)
+				if (!context.LastObservationWasMockInvocation(out target, out var lastInvocation, out _))
 				{
 					throw new ArgumentException(Resources.ExpressionIsNotEventAttachOrDetachOrIsNotVirtual);
 				}
 
-				addRemove = context.LastInvocation.Invocation.Method;
-				target = context.LastInvocation.Mock;
+				addRemove = lastInvocation.Method;
 			}
 
 			var ev = addRemove.DeclaringType.GetEvent(
