@@ -19,7 +19,7 @@ namespace Moq.Tests
 		[Fact]
 		public void IsActive_returns_true_when_AmbientObserver_instantiated()
 		{
-			using (var observer = new AmbientObserver())
+			using (var observer = AmbientObserver.Activate())
 			{
 				Assert.True(AmbientObserver.IsActive(out _));
 			}
@@ -28,7 +28,7 @@ namespace Moq.Tests
 		[Fact]
 		public void IsActive_returns_right_AmbientObserver_when_AmbientObserver_instantiated()
 		{
-			using (var observer = new AmbientObserver())
+			using (var observer = AmbientObserver.Activate())
 			{
 				Assert.True(AmbientObserver.IsActive(out var active));
 				Assert.Same(observer, active);
@@ -38,9 +38,9 @@ namespace Moq.Tests
 		[Fact]
 		public void LastObservationWasMatcher_returns_false_after_no_invocations()
 		{
-			using (var observer = new AmbientObserver())
+			using (var observer = AmbientObserver.Activate())
 			{
-				Assert.False(observer.LastObservationWasMatcher(out _));
+				Assert.False(observer.LastIsMatch(out _));
 			}
 		}
 
@@ -49,34 +49,34 @@ namespace Moq.Tests
 		{
 			var mock = Mock.Of<IMockable>();
 
-			using (var observer = new AmbientObserver())
+			using (var observer = AmbientObserver.Activate())
 			{
 				mock.Method(default, default);
 
-				Assert.False(observer.LastObservationWasMatcher(out _));
+				Assert.False(observer.LastIsMatch(out _));
 			}
 		}
 
 		[Fact]
 		public void LastObservationWasMatcher_returns_true_after_a_matcher_invocation()
 		{
-			using (var observer = new AmbientObserver())
+			using (var observer = AmbientObserver.Activate())
 			{
 				_ = It.IsAny<int>();
 
-				Assert.True(observer.LastObservationWasMatcher(out _));
+				Assert.True(observer.LastIsMatch(out _));
 			}
 		}
 
 		[Fact]
 		public void LastObservationWasMatcher_returns_right_matcher_after_several_matcher_invocations()
 		{
-			using (var observer = new AmbientObserver())
+			using (var observer = AmbientObserver.Activate())
 			{
 				_ = It.IsAny<int>();
 				_ = It.IsRegex(".*");
 
-				Assert.True(observer.LastObservationWasMatcher(out var last));
+				Assert.True(observer.LastIsMatch(out var last));
 				Assert.True(last.Matches("abc"));
 			}
 		}
@@ -84,9 +84,9 @@ namespace Moq.Tests
 		[Fact]
 		public void LastObservationWasMockInvocation_returns_false_after_no_invocations()
 		{
-			using (var observer = new AmbientObserver())
+			using (var observer = AmbientObserver.Activate())
 			{
-				Assert.False(observer.LastObservationWasMockInvocation(out _, out _, out _));
+				Assert.False(observer.LastIsInvocation(out _, out _, out _));
 			}
 		}
 
@@ -95,11 +95,11 @@ namespace Moq.Tests
 		{
 			var mock = Mock.Of<IMockable>();
 
-			using (var observer = new AmbientObserver())
+			using (var observer = AmbientObserver.Activate())
 			{
 				mock.Method(default, default);
 
-				Assert.True(observer.LastObservationWasMockInvocation(out _, out _, out _));
+				Assert.True(observer.LastIsInvocation(out _, out _, out _));
 			}
 		}
 
@@ -108,12 +108,12 @@ namespace Moq.Tests
 		{
 			var mock = Mock.Of<IMockable>();
 
-			using (var observer = new AmbientObserver())
+			using (var observer = AmbientObserver.Activate())
 			{
 				mock.Method(default, default);
 				mock.Method(42, "*");
 
-				Assert.True(observer.LastObservationWasMockInvocation(out _, out var last, out _));
+				Assert.True(observer.LastIsInvocation(out _, out var last, out _));
 				Assert.Equal(42, last.Arguments[0]);
 				Assert.Equal("*", last.Arguments[1]);
 			}
@@ -124,11 +124,11 @@ namespace Moq.Tests
 		{
 			var mock = Mock.Of<IMockable>();
 
-			using (var observer = new AmbientObserver())
+			using (var observer = AmbientObserver.Activate())
 			{
 				mock.Method(It.IsAny<int>(), It.IsRegex("abc"));
 
-				Assert.True(observer.LastObservationWasMockInvocation(out _, out var _, out var matches));
+				Assert.True(observer.LastIsInvocation(out _, out var _, out var matches));
 				Assert.Equal(2, matches.Count);
 				Assert.True(matches[0].Matches(42));
 				Assert.True(matches[1].Matches("abc"));
@@ -140,12 +140,12 @@ namespace Moq.Tests
 		{
 			var mock = Mock.Of<IMockable>();
 
-			using (var observer = new AmbientObserver())
+			using (var observer = AmbientObserver.Activate())
 			{
 				mock.Method(It.IsInRange(1, 10, Range.Inclusive), "*");
 				mock.Method(It.IsAny<int>(), It.IsRegex("abc"));
 
-				Assert.True(observer.LastObservationWasMockInvocation(out _, out var _, out var matches));
+				Assert.True(observer.LastIsInvocation(out _, out var _, out var matches));
 				Assert.Equal(2, matches.Count);
 				Assert.True(matches[0].Matches(42));
 				Assert.True(matches[1].Matches("abc"));

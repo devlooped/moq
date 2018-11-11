@@ -111,9 +111,6 @@ namespace Moq
 		{
 			if (AmbientObserver.IsActive(out _))
 			{
-				// Having an active `AmbientObserver` means that the invocation is being performed
-				// in "trial" mode, just to gather the target method and arguments that need to be
-				// matched later, when the actual invocation will be made.
 				return InterceptionAction.Continue;
 			}
 
@@ -156,7 +153,6 @@ namespace Moq
 
 		public override InterceptionAction Handle(Invocation invocation, Mock mock)
 		{
-			// If an ambient observer is active, notify it of the current mock invocation.
 			if (AmbientObserver.IsActive(out var observer))
 			{
 				observer.OnInvocation(mock, invocation);
@@ -173,10 +169,6 @@ namespace Moq
 		{
 			if (AmbientObserver.IsActive(out _))
 			{
-				// In a fluent invocation context, which is a recorder-like
-				// mode we use to evaluate delegates by actually running them,
-				// we don't want to count the invocation, or actually run
-				// previous setups.
 				return InterceptionAction.Continue;
 			}
 

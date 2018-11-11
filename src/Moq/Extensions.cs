@@ -145,16 +145,16 @@ namespace Moq
 			MethodBase addRemove;
 			Mock target;
 
-			using (var observer = new AmbientObserver())
+			using (var observer = AmbientObserver.Activate())
 			{
 				eventExpression(mock);
 
-				if (!observer.LastObservationWasMockInvocation(out target, out var lastInvocation, out _))
+				if (!observer.LastIsInvocation(out target, out var invocation, out _))
 				{
 					throw new ArgumentException(Resources.ExpressionIsNotEventAttachOrDetachOrIsNotVirtual);
 				}
 
-				addRemove = lastInvocation.Method;
+				addRemove = invocation.Method;
 			}
 
 			var ev = addRemove.DeclaringType.GetEvent(

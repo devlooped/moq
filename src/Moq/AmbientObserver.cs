@@ -3,6 +3,7 @@
 
 using System;
 using System.Collections.Generic;
+using System.Diagnostics;
 
 namespace Moq
 {
@@ -32,6 +33,13 @@ namespace Moq
 		[ThreadStatic]
 		private static AmbientObserver current;
 
+		public static AmbientObserver Activate()
+		{
+			Debug.Assert(current == null);
+
+			return current = new AmbientObserver();
+		}
+
 		public static bool IsActive(out AmbientObserver observer)
 		{
 			var current = AmbientObserver.current;
@@ -42,9 +50,8 @@ namespace Moq
 
 		private List<Observation> observations;
 
-		public AmbientObserver()
+		private AmbientObserver()
 		{
-			current = this;
 		}
 
 		public void Dispose()
@@ -93,7 +100,7 @@ namespace Moq
 		/// <param name="mock">The <see cref="Mock"/> on which an invocation was observed.</param>
 		/// <param name="invocation">The observed <see cref="Invocation"/>.</param>
 		/// <param name="matches">The <see cref="Match"/>es that were observed just before the invocation.</param>
-		public bool LastObservationWasMockInvocation(out Mock mock, out Invocation invocation, out Matches matches)
+		public bool LastIsInvocation(out Mock mock, out Invocation invocation, out Matches matches)
 		{
 			if (this.observations != null)
 			{
@@ -128,7 +135,7 @@ namespace Moq
 		///   If <see langword="true"/>, details about that matcher are provided via the <see langword="out"/> parameter.
 		/// </summary>
 		/// <param name="match">The observed <see cref="Match"/> matcher.</param>
-		public bool LastObservationWasMatcher(out Match match)
+		public bool LastIsMatch(out Match match)
 		{
 			if (this.observations != null && this.observations[this.observations.Count - 1] is MatchObservation matchRecord)
 			{

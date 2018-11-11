@@ -502,89 +502,93 @@ namespace Moq
 
 		private static SetupSetImplResult SetupSetImpl(Mock mock, Delegate setterExpression)
 		{
-			using (var observer = new AmbientObserver())
+			Mock target;
+			Invocation invocation;
+			AmbientObserver.Matches matches;
+
+			using (var observer = AmbientObserver.Activate())
 			{
 				setterExpression.DynamicInvoke(mock.Object);
 
-				if (!observer.LastObservationWasMockInvocation(out var lastMock, out var lastInvocation, out var lastMatches))
+				if (!observer.LastIsInvocation(out target, out invocation, out matches))
 				{
 					throw new ArgumentException(string.Format(
 						CultureInfo.InvariantCulture,
 						Resources.SetupOnNonVirtualMember,
 						string.Empty));
 				}
+			}
 
-				var setter = lastInvocation.Method;
-				if (!setter.IsPropertySetter())
+			var setter = invocation.Method;
+			if (!setter.IsPropertySetter())
+			{
+				throw new ArgumentException(Resources.SetupNotSetter);
+			}
+
+			// No need to call ThrowIfCantOverride as non-overridable would have thrown above already.
+
+			// Get the variable name as used in the actual delegate :)
+			// because of delegate currying, look at the last parameter for the Action's backing method, not the first
+			var setterExpressionParameters = setterExpression.GetMethodInfo().GetParameters();
+			var parameterName = setterExpressionParameters[setterExpressionParameters.Length - 1].Name;
+			var x = Expression.Parameter(invocation.Method.DeclaringType, parameterName);
+
+			var arguments = invocation.Arguments;
+			var parameters = setter.GetParameters();
+			var values = new Expression[arguments.Length];
+
+			if (matches.Count == 0)
+			{
+				// Length == 1 || Length == 2 (Indexer property)
+				for (int i = 0; i < arguments.Length; i++)
 				{
-					throw new ArgumentException(Resources.SetupNotSetter);
+					values[i] = GetValueExpression(arguments[i], parameters[i].ParameterType);
 				}
 
-				// No need to call ThrowIfCantOverride as non-overridable would have thrown above already.
+				var lambda = Expression.Lambda(
+					typeof(Action<>).MakeGenericType(x.Type),
+					Expression.Call(x, invocation.Method, values),
+					x);
 
-				// Get the variable name as used in the actual delegate :)
-				// because of delegate currying, look at the last parameter for the Action's backing method, not the first
-				var setterExpressionParameters = setterExpression.GetMethodInfo().GetParameters();
-				var parameterName = setterExpressionParameters[setterExpressionParameters.Length - 1].Name;
-				var x = Expression.Parameter(lastInvocation.Method.DeclaringType, parameterName);
+				return new SetupSetImplResult(target, lambda, invocation.Method, values);
+			}
+			else
+			{
+				// TODO: Use all observed matchers, not just the last one!
+				var lastMatch = matches[matches.Count - 1];
 
-				var arguments = lastInvocation.Arguments;
-				var parameters = setter.GetParameters();
-				var values = new Expression[arguments.Length];
+				var matchers = new Expression[arguments.Length];
+				var valueIndex = arguments.Length - 1;
+				var propertyType = setter.GetParameters()[valueIndex].ParameterType;
 
-				if (lastMatches.Count == 0)
+				// If the value matcher is not equal to the property 
+				// type (i.e. prop is int?, but you use It.IsAny<int>())
+				// add a cast.
+				if (lastMatch.RenderExpression.Type != propertyType)
 				{
-					// Length == 1 || Length == 2 (Indexer property)
-					for (int i = 0; i < arguments.Length; i++)
-					{
-						values[i] = GetValueExpression(arguments[i], parameters[i].ParameterType);
-					}
-
-					var lambda = Expression.Lambda(
-						typeof(Action<>).MakeGenericType(x.Type),
-						Expression.Call(x, lastInvocation.Method, values),
-						x);
-
-					return new SetupSetImplResult(lastMock, lambda, lastInvocation.Method, values);
+					values[valueIndex] = Expression.Convert(lastMatch.RenderExpression, propertyType);
 				}
 				else
 				{
-					// TODO: Use all observed matchers, not just the last one!
-					var lastMatch = lastMatches[lastMatches.Count - 1];
-
-					var matchers = new Expression[arguments.Length];
-					var valueIndex = arguments.Length - 1;
-					var propertyType = setter.GetParameters()[valueIndex].ParameterType;
-
-					// If the value matcher is not equal to the property 
-					// type (i.e. prop is int?, but you use It.IsAny<int>())
-					// add a cast.
-					if (lastMatch.RenderExpression.Type != propertyType)
-					{
-						values[valueIndex] = Expression.Convert(lastMatch.RenderExpression, propertyType);
-					}
-					else
-					{
-						values[valueIndex] = lastMatch.RenderExpression;
-					}
-
-					matchers[valueIndex] = new MatchExpression(lastMatch);
-
-					for (int i = 0; i < arguments.Length - 1; i++)
-					{
-						// Add the index value for the property indexer
-						values[i] = GetValueExpression(arguments[i], parameters[i].ParameterType);
-						// TODO: No matcher supported now for the index
-						matchers[i] = values[i];
-					}
-
-					var lambda = Expression.Lambda(
-						typeof(Action<>).MakeGenericType(x.Type),
-						Expression.Call(x, lastInvocation.Method, values),
-						x);
-
-					return new SetupSetImplResult(lastMock, lambda, lastInvocation.Method, matchers);
+					values[valueIndex] = lastMatch.RenderExpression;
 				}
+
+				matchers[valueIndex] = new MatchExpression(lastMatch);
+
+				for (int i = 0; i < arguments.Length - 1; i++)
+				{
+					// Add the index value for the property indexer
+					values[i] = GetValueExpression(arguments[i], parameters[i].ParameterType);
+					// TODO: No matcher supported now for the index
+					matchers[i] = values[i];
+				}
+
+				var lambda = Expression.Lambda(
+					typeof(Action<>).MakeGenericType(x.Type),
+					Expression.Call(x, invocation.Method, values),
+					x);
+
+				return new SetupSetImplResult(target, lambda, invocation.Method, matchers);
 			}
 		}
 
