@@ -7,7 +7,6 @@ namespace Moq
 	{
 		private static InterceptionAspect[] aspects = new InterceptionAspect[]
 		{
-			HandleTracking.Instance,
 			HandleWellKnownMethods.Instance,
 			RecordInvocation.Instance,
 			FindAndExecuteMatchingSetup.Instance,
