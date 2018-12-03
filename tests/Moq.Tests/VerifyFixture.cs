@@ -60,7 +60,7 @@ namespace Moq.Tests
 
 			var mex = Assert.Throws<MockException>(() => mock.Verify());
 			Assert.True(mex.IsVerificationError);
-			Assert.Contains(@".Execute(It.Is<String>(s => String.IsNullOrEmpty(s)))", mex.Message);
+			Assert.Contains(@".Execute(It.Is<string>(s => string.IsNullOrEmpty(s)))", mex.Message);
 		}
 
 		[Fact]
@@ -1407,7 +1407,7 @@ namespace Moq.Tests
 			var ex = Record.Exception(() => mock.Verify(m => m(1, 2), Times.Once()));
 
 			Assert.Contains("Configured setups:", ex.Message);
-			Assert.Contains("Action<Int32, Int32> m => m(1, It.IsAny<Int32>())", ex.Message);
+			Assert.Contains("Action<int, int> m => m(1, It.IsAny<int>())", ex.Message);
 		}
 
 		[Fact]

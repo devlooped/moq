@@ -36,7 +36,7 @@ namespace Moq.Tests
 
 			var value = expr.ToStringFixed();
 
-			Assert.Contains("ExpressionExtensionsFixture.DoStaticGeneric<Int32>(5)", value);
+			Assert.Contains("ExpressionExtensionsFixture.DoStaticGeneric<int>(5)", value);
 		}
 
 		[Fact]
