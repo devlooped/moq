@@ -38,11 +38,8 @@
 	<ItemGroup>
 		<PackageReference Include="Castle.Core" Version="4.3.1" />
 		<PackageReference Include="IFluentInterface" Version="2.1.0" />
-		<PackageReference Include="System.Threading.Tasks.Extensions" Version="4.3.0" />
-		<PackageReference Include="TypeNameFormatter.Sources" Version="1.0.0">
-		  <PrivateAssets>all</PrivateAssets>
-		  <IncludeAssets>runtime; build; native; contentfiles; analyzers</IncludeAssets>
-		</PackageReference>
+		<PackageReference Include="System.Threading.Tasks.Extensions" Version="4.5.1" />
+		<PackageReference Include="TypeNameFormatter.Sources" Version="1.0.0" PrivateAssets="All" />
 	</ItemGroup>
 	<ItemGroup Condition=" '$(TargetFramework)' == 'net45' ">
 		<Reference Include="System" />
@@ -52,7 +49,7 @@
 	<ItemGroup Condition=" '$(TargetFramework)' == 'netstandard1.3' ">
 		<PackageReference Include="System.Linq.Queryable" Version="4.3.0" />
 		<PackageReference Include="System.Reflection.Emit" Version="4.3.0" />
-		<PackageReference Include="System.Reflection.TypeExtensions" Version="4.4.0" />
+		<PackageReference Include="System.Reflection.TypeExtensions" Version="4.5.1" />
 	</ItemGroup>
 
 	<ItemGroup>
