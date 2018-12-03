@@ -23,7 +23,7 @@
 
 	<ItemGroup>
 		<PackageReference Include="Castle.Core" Version="4.3.1" />
-		<PackageReference Include="System.ValueTuple" Version="4.4.0" />
+		<PackageReference Include="System.ValueTuple" Version="4.5.0" />
 		<ProjectReference Include="..\..\src\Moq\Moq.csproj" />
 		<ProjectReference Include="..\Moq.Tests.FSharpTypes\Moq.Tests.FSharpTypes.fsproj" />
 	</ItemGroup>
@@ -39,7 +39,7 @@
 		<PackageReference Include="System.Collections.Specialized" Version="4.3.0" />
 		<PackageReference Include="System.ComponentModel.Primitives" Version="4.3.0" />
 		<PackageReference Include="System.Diagnostics.TraceSource" Version="4.3.0" />
-		<PackageReference Include="System.ServiceModel.Primitives" Version="4.4.0" />
+		<PackageReference Include="System.ServiceModel.Primitives" Version="4.5.3" />
 	</ItemGroup>
 
 	<ItemGroup>

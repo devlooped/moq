@@ -11,6 +11,11 @@
 	</PropertyGroup>
 
 	<ItemGroup>
+		<PackageReference Include="FSharp.Core" Version="4.5.4" />
+		<PackageReference Include="System.ValueTuple" Version="4.5.0" />
+	</ItemGroup>
+
+	<ItemGroup>
 		<Compile Include="HasAbstractActionEvent.fs" />
 		<Compile Include="HasAbstractEventHandlerEvent.fs" />
 		<Compile Include="HasAbstractIndexer.fs" />

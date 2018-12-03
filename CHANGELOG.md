@@ -17,6 +17,7 @@ The format is loosely based on [Keep a Changelog](http://keepachangelog.com/en/1
 
 * Dropped the dependency on the `System.ValueTuple` NuGet package, at no functional cost (i.e. value tuples are still supported just fine) (@stakx, #721)
 * Updated failure messages to show richer class names (@powerdude, #727)
+* Upgraded `System.Reflection.TypeExtensions` and `System.Threading.Tasks.Extensions` dependencies to versions 4.5.1 (@stakx, #729)
 
 
 ## 4.10.0 (2018-09-08)
