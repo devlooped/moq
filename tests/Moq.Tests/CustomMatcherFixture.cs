@@ -73,7 +73,7 @@ namespace Moq.Tests
 
 			var ex = Assert.Throws<MockException>(() => child.Verify());
 
-			Assert.Contains(".PlayWith(Toy.IsRed)", ex.Message);
+			Assert.Contains(".PlayWith(CustomMatcherFixture.Toy.IsRed)", ex.Message);
 		}
 
 		[Fact]
@@ -84,7 +84,7 @@ namespace Moq.Tests
 
 			var ex = Assert.Throws<MockException>(() => child.Verify());
 
-			Assert.Contains(".PlayWith(Toy.IsGreen())", ex.Message);
+			Assert.Contains(".PlayWith(CustomMatcherFixture.Toy.IsGreen())", ex.Message);
 		}
 
 		public class Toy

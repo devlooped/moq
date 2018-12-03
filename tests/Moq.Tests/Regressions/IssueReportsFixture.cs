@@ -2398,7 +2398,7 @@ namespace Moq.Tests.Regressions
 				Assert.True(e.IsVerificationError);
 
 				Assert.Contains(
-					"IFoo t => t.Submit(It.IsAny<String>(), It.IsAny<String>(), new[] { It.IsAny<Int32>() })",
+					"IFoo t => t.Submit(It.IsAny<string>(), It.IsAny<string>(), new[] { It.IsAny<int>() })",
 					e.Message);
 			}
 
@@ -3031,8 +3031,8 @@ namespace Moq.Tests.Regressions
 				var e = Assert.Throws<MockException>(() => mock.Verify(m => m.Execute(0)));
 				Assert.True(e.Message.ContainsConsecutiveLines(
 					"Configured setups: ",
-					"IFoo m => m.Execute(1)",
-					"IFoo m => m.Execute(It.IsInRange<Int32>(2, 20, Range.Exclusive))"));
+					"IssueReportsFixture._183.IFoo m => m.Execute(1)",
+					"IssueReportsFixture._183.IFoo m => m.Execute(It.IsInRange<int>(2, 20, Range.Exclusive))"));
 			}
 
 			[Fact]
@@ -3047,7 +3047,7 @@ namespace Moq.Tests.Regressions
 				var e = Assert.Throws<MockException>(() => mock.Verify(m => m.Execute<int>(1, 1)));
 				Assert.True(e.Message.ContainsConsecutiveLines(
 					"Configured setups: ",
-					"IFoo m => m.Execute<Int32>(1, 10)"));
+					"IssueReportsFixture._183.IFoo m => m.Execute<int>(1, 10)"));
 			}
 
 			[Fact]

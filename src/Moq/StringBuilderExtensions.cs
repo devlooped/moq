@@ -7,6 +7,8 @@ using System.Diagnostics;
 using System.Reflection;
 using System.Text;
 
+using TypeNameFormatter;
+
 namespace Moq
 {
 	internal static class StringBuilderExtensions
@@ -38,33 +40,7 @@ namespace Moq
 		{
 			Debug.Assert(type != null);
 
-			var name = type.Name;
-			var backtickIndex = name.IndexOf('`');
-			if (backtickIndex >= 0)
-			{
-				stringBuilder.Append(name, 0, backtickIndex);
-			}
-			else
-			{
-				stringBuilder.Append(name);
-			}
-
-			if (type.GetTypeInfo().IsGenericType)
-			{
-				var genericArguments = type.GetGenericArguments();
-				stringBuilder.Append('<');
-				for (int i = 0, n = genericArguments.Length; i < n; ++i)
-				{
-					if (i > 0)
-					{
-						stringBuilder.Append(", ");
-					}
-					stringBuilder.AppendNameOf(genericArguments[i]);
-				}
-				stringBuilder.Append('>');
-			}
-
-			return stringBuilder;
+			return stringBuilder.AppendFormattedName(type);
 		}
 
 		public static StringBuilder AppendValueOf(this StringBuilder stringBuilder, object obj)

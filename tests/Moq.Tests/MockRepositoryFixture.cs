@@ -145,10 +145,10 @@ namespace Moq.Tests
 			Assert.NotNull(ex);
 			Assert.True(ex.Message.ContainsConsecutiveLines(
 				$"The following setups on mock \'{foo}\' were not matched:",
-				$"IFoo f => f.Do()",
+				$"MockRepositoryFixture.IFoo f => f.Do()",
 				$"",
 				$"The following setups on mock \'{bar}\' were not matched:",
-				$"IBar b => b.Redo()"));
+				$"MockRepositoryFixture.IBar b => b.Redo()"));
 		}
 
 		[Fact]
