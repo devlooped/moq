@@ -92,13 +92,11 @@ namespace Moq
 					return match;
 				}
 
-#pragma warning disable 618
 				var call = (MethodCallExpression)expression;
 				if (call.Method.IsDefined(typeof(MatcherAttribute), true))
 				{
 					return new MatcherAttributeMatcher(call);
 				}
-#pragma warning restore 618
 				else
 				{
 					return new LazyEvalMatcher(originalExpression);

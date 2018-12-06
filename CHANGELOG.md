@@ -5,6 +5,13 @@ All notable changes to this project will be documented in this file.
 The format is loosely based on [Keep a Changelog](http://keepachangelog.com/en/1.0.0/).
 
 
+## Unreleased
+
+#### Unobsoleted
+
+* The `[Matcher]` attribute, which was deprecated in version 4.8.0-rc1, is being de-deprecated for performance and correctness reasons (@stakx, #732)
+
+
 ## 4.10.1 (2018-12-03)
 
 #### Fixed

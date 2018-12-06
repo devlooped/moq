@@ -2,7 +2,6 @@
 // All rights reserved. Licensed under the BSD 3-Clause License; see License.txt.
 
 using System;
-using System.ComponentModel;
 
 namespace Moq
 {
@@ -12,9 +11,6 @@ namespace Moq
 	/// matching rules.
 	/// </summary>
 	/// <remarks>
-	/// <b>This feature has been deprecated in favor of the new 
-	/// and simpler <see cref="Match{T}"/>.
-	/// </b>
 	/// <para>
 	/// The argument matching is used to determine whether a concrete 
 	/// invocation in the mock matches a given setup. This 
@@ -120,8 +116,6 @@ namespace Moq
 	/// </code>
 	/// </example>
 	[AttributeUsage(AttributeTargets.Method, Inherited = true)]
-	[EditorBrowsable(EditorBrowsableState.Never)]
-	[Obsolete("This feature has been deprecated in favor of `Match.Create`.")]
 	public sealed class MatcherAttribute : Attribute
 	{
 	}
