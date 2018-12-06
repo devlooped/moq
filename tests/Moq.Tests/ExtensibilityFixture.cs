@@ -4,6 +4,7 @@
 using System;
 using System.Collections.Generic;
 using System.Linq;
+
 using Xunit;
 
 namespace Moq.Tests
@@ -14,7 +15,7 @@ namespace Moq.Tests
 		public void ShouldExtendMatching()
 		{
 			var mock = new Mock<IOrderRepository>();
-			mock.Setup(repo => repo.Save(OrderIs.Big()))
+			mock.Setup(repo => repo.Save(Order.IsBig()))
 				.Throws(new InvalidOperationException());
 
 			try
@@ -46,7 +47,7 @@ namespace Moq.Tests
 		public void ShouldExtendWithPropertyMatchers()
 		{
 			var mock = new Mock<IOrderRepository>();
-			mock.Setup(repo => repo.Save(Orders.IsSmall))
+			mock.Setup(repo => repo.Save(Order.IsSmall))
 				.Throws(new InvalidOperationException());
 
 			try
@@ -60,24 +61,14 @@ namespace Moq.Tests
 			}
 		}
 
-		//[Fact]
-		//public void SetterMatcherRendersNicely()
-		//{
-		//	var mock = new Mock<IOrderRepository>();
+		[Fact]
+		public void SetterMatcherRendersNicely()
+		{
+			var mock = new Mock<IOrderRepository>();
 
-		//	try
-		//	{
-		//		mock.VerifySet(repo => repo.Value = It.IsAny<int>());
-		//	}
-		//	catch (MockException me)
-		//	{
-		//		Console.WriteLine(me.Message);
-		//	}
-
-		//	mock.Object.Value = 25;
-
-		//	mock.VerifySet(repo => repo.Value = It.IsInRange(10, 25, Range.Inclusive));
-		//}
+			var ex = Record.Exception(() => mock.VerifySet(repo => repo.Value = It.IsAny<int>()));
+			Assert.Contains("repo => repo.Value = It.IsAny<int>()", ex.Message);
+		}
 	}
 
 	public static class Orders
@@ -86,20 +77,6 @@ namespace Moq.Tests
 		public static IEnumerable<Order> Contains(Order order)
 		{
 			return Match.Create<IEnumerable<Order>>(orders => orders.Contains(order));
-		}
-
-		public static Order IsBig()
-		{
-			return Match.Create<Order>(o => o.Amount >= 1000);
-		}
-
-		[Matcher]
-		public static Order IsSmall
-		{
-			get
-			{
-				return Match.Create<Order>(o => o.Amount <= 1000);
-			}
 		}
 	}
 
@@ -110,17 +87,18 @@ namespace Moq.Tests
 		int Value { get; set; }
 	}
 
-	public static class OrderIs
-	{
-		[Matcher]
-		public static Order Big()
-		{
-			return Match.Create<Order>(o => o.Amount >= 1000);
-		}
-	}
-
 	public class Order
 	{
 		public int Amount { get; set; }
+
+		[Matcher]
+		public static Order IsBig()
+		{
+			return Match.Create<Order>(o => o.Amount >= 1000);
+		}
+
+
+		[Matcher]
+		public static Order IsSmall => Match.Create<Order>(o => o.Amount <= 1000);
 	}
 }
