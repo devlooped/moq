@@ -12,6 +12,10 @@ namespace Moq
 	/// </summary>
 	/// <remarks>
 	/// <para>
+	/// This attribute may be used in conjunction with <see cref="Match.Create{T}"/>,
+	/// or with the older mechanism described below.
+	/// </para>
+	/// <para>
 	/// The argument matching is used to determine whether a concrete 
 	/// invocation in the mock matches a given setup. This 
 	/// matching mechanism is fully extensible. 
@@ -115,7 +119,7 @@ namespace Moq
 	/// // use mock, invoke Save, and have the matcher filter.
 	/// </code>
 	/// </example>
-	[AttributeUsage(AttributeTargets.Method, Inherited = true)]
+	[AttributeUsage(AttributeTargets.Method | AttributeTargets.Property, Inherited = true)]
 	public sealed class MatcherAttribute : Attribute
 	{
 	}

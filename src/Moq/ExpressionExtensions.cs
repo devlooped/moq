@@ -123,8 +123,10 @@ namespace Moq
 					return false;
 
 				case ExpressionType.Call:
+					return !((MethodCallExpression)expression).Method.IsDefined(typeof(MatcherAttribute), true);
+
 				case ExpressionType.MemberAccess:
-					return !expression.IsMatch(out _);
+					return !((MemberExpression)expression).Member.IsDefined(typeof(MatcherAttribute), true);
 
 				default:
 					return true;

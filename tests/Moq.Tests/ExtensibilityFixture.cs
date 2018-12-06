@@ -82,6 +82,7 @@ namespace Moq.Tests
 
 	public static class Orders
 	{
+		[Matcher]
 		public static IEnumerable<Order> Contains(Order order)
 		{
 			return Match.Create<IEnumerable<Order>>(orders => orders.Contains(order));
@@ -92,6 +93,7 @@ namespace Moq.Tests
 			return Match.Create<Order>(o => o.Amount >= 1000);
 		}
 
+		[Matcher]
 		public static Order IsSmall
 		{
 			get
@@ -110,6 +112,7 @@ namespace Moq.Tests
 
 	public static class OrderIs
 	{
+		[Matcher]
 		public static Order Big()
 		{
 			return Match.Create<Order>(o => o.Amount >= 1000);
