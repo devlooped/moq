@@ -5,6 +5,17 @@ All notable changes to this project will be documented in this file.
 The format is loosely based on [Keep a Changelog](http://keepachangelog.com/en/1.0.0/).
 
 
+## Unreleased
+
+#### Changed
+
+* **Breaking change:** All custom argument matcher methods (including those using `Match.Create<T>`) must now be marked with the `[Matcher]` attribute. For this reason, `MatcherAttribute` is no longer marked obsolete (@stakx, #732)
+
+#### Fixed
+
+* `InvalidOperationException` when specifiying setup on mock with mock containing property of type `Nullable<T>` (@dav1dev, #725)
+
+
 ## 4.10.1 (2018-12-03)
 
 #### Fixed

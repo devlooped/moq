@@ -85,30 +85,28 @@ namespace Moq
 				return matchExpression.Match;
 			}
 
-			if (expression.NodeType == ExpressionType.Call)
+			if (expression is MethodCallExpression call)
 			{
-				if (expression.IsMatch(out var match))
-				{
-					return match;
-				}
-
-#pragma warning disable 618
-				var call = (MethodCallExpression)expression;
 				if (call.Method.IsDefined(typeof(MatcherAttribute), true))
 				{
+					if (expression.IsMatch(out var match))
+					{
+						return match;
+					}
+
 					return new MatcherAttributeMatcher(call);
 				}
-#pragma warning restore 618
-				else
-				{
-					return new LazyEvalMatcher(originalExpression);
-				}
+
+				return new LazyEvalMatcher(originalExpression);
 			}
-			else if (expression.NodeType == ExpressionType.MemberAccess)
+			else if (expression is MemberExpression memberAccess)
 			{
-				if (expression.IsMatch(out var match))
+				if (memberAccess.Member.IsDefined(typeof(MatcherAttribute), true))
 				{
-					return match;
+					if (expression.IsMatch(out var match))
+					{
+						return match;
+					}
 				}
 			}
 

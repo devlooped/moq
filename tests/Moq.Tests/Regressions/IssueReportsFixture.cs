@@ -2056,6 +2056,40 @@ namespace Moq.Tests.Regressions
 
 		#endregion
 
+		#region 725
+
+		public sealed class Issue725
+		{
+			public interface IUseGuid
+			{
+				void Use(Guid id);
+				void UseNullable(Guid? id);
+			}
+
+			public interface IHaveGuid
+			{
+				Guid? Id { get; }
+			}
+
+			[Fact]
+			public void Setup_Do_should_succeed()
+			{
+				var id = Guid.NewGuid();
+				var data = Mock.Of<IHaveGuid>(x => x.Id == id);
+				new Mock<IUseGuid>().Setup(x => x.Use(data.Id.Value));
+			}
+
+			[Fact]
+			public void Setup_DoNullable_should_succeed()
+			{
+				var id = Guid.NewGuid();
+				var data = Mock.Of<IHaveGuid>(x => x.Id == id);
+				new Mock<IUseGuid>().Setup(x => x.UseNullable(data.Id));
+			}
+		}
+
+		#endregion
+
 		// Old @ Google Code
 
 		#region #47
@@ -2203,9 +2237,6 @@ namespace Moq.Tests.Regressions
 		#region #49
 
 		[Fact]
-#pragma warning disable 618
-		[Obsolete("This test is related to `" + nameof(MatcherAttribute) + "`, which is obsolete.")]
-#pragma warning restore 618
 		public void UsesCustomMatchersWithGenerics()
 		{
 			var mock = new Mock<IEvaluateLatest>();
@@ -2217,7 +2248,6 @@ namespace Moq.Tests.Regressions
 			Assert.Equal(2, mock.Object.Method(6));
 		}
 
-		[Obsolete("This class contains matchers using `" + nameof(MatcherAttribute) + "`, which is obsolete.")]
 		public static class IsEqual
 		{
 			[Matcher]

@@ -4,6 +4,7 @@
 using System;
 using System.Collections.Generic;
 using System.Linq;
+
 using Xunit;
 
 namespace Moq.Tests
@@ -14,7 +15,7 @@ namespace Moq.Tests
 		public void ShouldExtendMatching()
 		{
 			var mock = new Mock<IOrderRepository>();
-			mock.Setup(repo => repo.Save(OrderIs.Big()))
+			mock.Setup(repo => repo.Save(Order.IsBig()))
 				.Throws(new InvalidOperationException());
 
 			try
@@ -46,7 +47,7 @@ namespace Moq.Tests
 		public void ShouldExtendWithPropertyMatchers()
 		{
 			var mock = new Mock<IOrderRepository>();
-			mock.Setup(repo => repo.Save(Orders.IsSmall))
+			mock.Setup(repo => repo.Save(Order.IsSmall))
 				.Throws(new InvalidOperationException());
 
 			try
@@ -60,44 +61,40 @@ namespace Moq.Tests
 			}
 		}
 
-		//[Fact]
-		//public void SetterMatcherRendersNicely()
-		//{
-		//	var mock = new Mock<IOrderRepository>();
+		[Fact]
+		public void Built_in_matcher_renders_nicely_when_using_delegate_based_setup_expression()
+		{
+			var mock = new Mock<IOrderRepository>();
 
-		//	try
-		//	{
-		//		mock.VerifySet(repo => repo.Value = It.IsAny<int>());
-		//	}
-		//	catch (MockException me)
-		//	{
-		//		Console.WriteLine(me.Message);
-		//	}
+			var ex = Record.Exception(() => mock.VerifySet(repo => repo.Value = It.IsAny<int>()));
+			Assert.Contains("repo => repo.Value = It.IsAny<int>()", ex.Message);
+		}
 
-		//	mock.Object.Value = 25;
+		[Fact]
+		public void Custom_matcher_with_render_expression_renders_nicely_when_using_delegate_based_setup_expression()
+		{
+			var mock = new Mock<IOrderRepository>();
 
-		//	mock.VerifySet(repo => repo.Value = It.IsInRange(10, 25, Range.Inclusive));
-		//}
+			var ex = Record.Exception(() => mock.VerifySet(repo => repo.OrderSavedLast = Order.IsBig()));
+			Assert.Contains("repo => repo.OrderSavedLast = Order.IsBig()", ex.Message);
+		}
+
+		[Fact]
+		public void Custom_matcher_without_render_expression_renders_semi_nicely_when_using_delegate_based_setup_expression()
+		{
+			var mock = new Mock<IOrderRepository>();
+
+			var ex = Record.Exception(() => mock.VerifySet(repo => repo.OrderSavedLast = Order.IsSmall));
+			Assert.Contains("repo => repo.OrderSavedLast = Match.Matcher<Order>()", ex.Message);
+		}
 	}
 
 	public static class Orders
 	{
+		[Matcher]
 		public static IEnumerable<Order> Contains(Order order)
 		{
 			return Match.Create<IEnumerable<Order>>(orders => orders.Contains(order));
-		}
-
-		public static Order IsBig()
-		{
-			return Match.Create<Order>(o => o.Amount >= 1000);
-		}
-
-		public static Order IsSmall
-		{
-			get
-			{
-				return Match.Create<Order>(o => o.Amount <= 1000);
-			}
 		}
 	}
 
@@ -105,19 +102,22 @@ namespace Moq.Tests
 	{
 		void Save(Order order);
 		void Save(IEnumerable<Order> orders);
+		Order OrderSavedLast { get; set; }
 		int Value { get; set; }
-	}
-
-	public static class OrderIs
-	{
-		public static Order Big()
-		{
-			return Match.Create<Order>(o => o.Amount >= 1000);
-		}
 	}
 
 	public class Order
 	{
 		public int Amount { get; set; }
+
+		[Matcher]
+		public static Order IsBig()
+		{
+			return Match.Create<Order>(o => o.Amount >= 1000, () => Order.IsBig());
+		}
+
+
+		[Matcher]
+		public static Order IsSmall => Match.Create<Order>(o => o.Amount <= 1000);
 	}
 }

@@ -6,7 +6,6 @@ using Xunit;
 
 namespace Moq.Tests
 {
-	[Obsolete("This fixture contains tests related to `" + nameof(MatcherAttribute) + "`, which is obsolete.")]
 	public class MatcherAttributeFixture
 	{
 		public interface IFoo
