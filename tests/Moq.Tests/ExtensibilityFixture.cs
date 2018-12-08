@@ -62,12 +62,30 @@ namespace Moq.Tests
 		}
 
 		[Fact]
-		public void SetterMatcherRendersNicely()
+		public void Built_in_matcher_renders_nicely_when_using_delegate_based_setup_expression()
 		{
 			var mock = new Mock<IOrderRepository>();
 
 			var ex = Record.Exception(() => mock.VerifySet(repo => repo.Value = It.IsAny<int>()));
 			Assert.Contains("repo => repo.Value = It.IsAny<int>()", ex.Message);
+		}
+
+		[Fact]
+		public void Custom_matcher_with_render_expression_renders_nicely_when_using_delegate_based_setup_expression()
+		{
+			var mock = new Mock<IOrderRepository>();
+
+			var ex = Record.Exception(() => mock.VerifySet(repo => repo.OrderSavedLast = Order.IsBig()));
+			Assert.Contains("repo => repo.OrderSavedLast = Order.IsBig()", ex.Message);
+		}
+
+		[Fact]
+		public void Custom_matcher_without_render_expression_renders_semi_nicely_when_using_delegate_based_setup_expression()
+		{
+			var mock = new Mock<IOrderRepository>();
+
+			var ex = Record.Exception(() => mock.VerifySet(repo => repo.OrderSavedLast = Order.IsSmall));
+			Assert.Contains("repo => repo.OrderSavedLast = Match.Matcher<Order>()", ex.Message);
 		}
 	}
 
@@ -84,6 +102,7 @@ namespace Moq.Tests
 	{
 		void Save(Order order);
 		void Save(IEnumerable<Order> orders);
+		Order OrderSavedLast { get; set; }
 		int Value { get; set; }
 	}
 
@@ -94,7 +113,7 @@ namespace Moq.Tests
 		[Matcher]
 		public static Order IsBig()
 		{
-			return Match.Create<Order>(o => o.Amount >= 1000);
+			return Match.Create<Order>(o => o.Amount >= 1000, () => Order.IsBig());
 		}
 
 

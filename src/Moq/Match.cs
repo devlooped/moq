@@ -15,6 +15,7 @@ namespace Moq
 		/// Provided for the sole purpose of rendering the delegate passed to the 
 		/// matcher constructor if no friendly render lambda is provided.
 		/// </devdoc>
+		[Matcher]
 		internal static TValue Matcher<TValue>()
 		{
 			return default(TValue);
