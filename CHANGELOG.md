@@ -7,17 +7,13 @@ The format is loosely based on [Keep a Changelog](http://keepachangelog.com/en/1
 
 ## Unreleased
 
-#### Unobsoleted
+#### Changed
 
-* The `[Matcher]` attribute, which was deprecated in version 4.8.0-rc1, is being de-deprecated for performance and correctness reasons; see first items under 'Fixed' and 'Changed' (below) (@stakx, #732)
+* **Breaking change:** All custom argument matcher methods (including those using `Match.Create<T>`) must now be marked with the `[Matcher]` attribute. For this reason, `MatcherAttribute` is no longer marked obsolete (@stakx, #732)
 
 #### Fixed
 
 * `InvalidOperationException` when specifiying setup on mock with mock containing property of type `Nullable<T>` (@dav1dev, #725)
-
-#### Changed
-
-* **Breaking change:** All custom matchers (including those created using `Match.Create<T>`) must now be marked as such with the `[Matcher]` attribute (@stakx, #732)
 
 
 ## 4.10.1 (2018-12-03)
