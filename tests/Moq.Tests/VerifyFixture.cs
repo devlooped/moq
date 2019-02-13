@@ -900,6 +900,20 @@ namespace Moq.Tests
 		}
 
 		[Fact]
+		public void MatchDerivedTypesForGenericParameters()
+		{
+			var mock = new Mock<IBaz>();
+
+			mock.Object.Subscribe<BazParam2>();
+			mock.Object.Subscribe<BazParam>();
+			mock.Object.Subscribe<IBazParam>();
+
+			mock.Verify(foo => foo.Subscribe<IBazParam>(), Times.Exactly(3));
+			mock.Verify(foo => foo.Subscribe<BazParam>(), Times.Exactly(2));
+			mock.Verify(foo => foo.Subscribe<BazParam2>(), Times.Once);
+		}
+
+		[Fact]
 		public void NullArrayValuesForActualInvocationArePrintedAsNullInMockExeptionMessage()
 		{
 			var strings = new string[] { "1", null, "3" };
@@ -1496,6 +1510,7 @@ namespace Moq.Tests
 		public interface IBaz
 		{
 			void Call<T>(T param) where T:IBazParam;
+			void Subscribe<T>() where T : IBazParam;
 		}
 
 		public class BazParam:IBazParam
