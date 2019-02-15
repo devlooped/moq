@@ -77,7 +77,7 @@ namespace Moq
 				return false;
 			}
 
-			if (method.IsGenericMethod)
+			if (method.IsGenericMethod || invocationMethod.IsGenericMethod)
 			{
 				if (!method.GetGenericArguments().CompareTo(invocationMethod.GetGenericArguments(), exact: false))
 				{

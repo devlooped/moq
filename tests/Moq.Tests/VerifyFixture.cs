@@ -900,17 +900,48 @@ namespace Moq.Tests
 		}
 
 		[Fact]
-		public void MatchDerivedTypesForGenericParameters()
+		public void Should_verify_derived_as_generic_parameters()
 		{
+			//Arrange
 			var mock = new Mock<IBaz>();
 
+			//Act
 			mock.Object.Subscribe<BazParam2>();
 			mock.Object.Subscribe<BazParam>();
 			mock.Object.Subscribe<IBazParam>();
 
+			//Assert
 			mock.Verify(foo => foo.Subscribe<IBazParam>(), Times.Exactly(3));
 			mock.Verify(foo => foo.Subscribe<BazParam>(), Times.Exactly(2));
 			mock.Verify(foo => foo.Subscribe<BazParam2>(), Times.Once);
+		}
+
+		[Fact]
+		public void Should_not_verify_nongeneric_when_generic_invoked()
+		{
+			//Arrange
+			var mock = new Mock<IBaz>();
+
+			//Act
+			mock.Object.Subscribe<IBazParam>();
+
+			//Assert
+			mock.Verify(foo => foo.Subscribe<IBazParam>(), Times.Once);
+			mock.Verify(foo => foo.Subscribe(), Times.Never);
+		}
+
+		[Fact]
+		public void Should_not_verify_generic_when_nongeneric_invoked()
+		{
+			//Arrange
+			var mock = new Mock<IBaz>();
+
+			//Act
+			mock.Object.Subscribe();
+
+			//Assert
+			mock.Verify(foo => foo.Subscribe<IBazParam>(), Times.Never);
+			mock.Verify(foo => foo.Subscribe(), Times.Once);
 		}
 
 		[Fact]
@@ -1511,6 +1542,7 @@ namespace Moq.Tests
 		{
 			void Call<T>(T param) where T:IBazParam;
 			void Subscribe<T>() where T : IBazParam;
+			void Subscribe();
 		}
 
 		public class BazParam:IBazParam
