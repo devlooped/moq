@@ -14,6 +14,7 @@ The format is loosely based on [Keep a Changelog](http://keepachangelog.com/en/1
 #### Fixed
 
 * `InvalidOperationException` when specifiying setup on mock with mock containing property of type `Nullable<T>` (@dav1dev, #725)
+* `Verify` gets confused between the same generic and non-generic signature (@lepijohnny, #749)
 
 
 ## 4.10.1 (2018-12-03)
