@@ -36,7 +36,14 @@ namespace Moq.Protected
 		{
 			Guard.NotNullOrEmpty(methodName, nameof(methodName));
 
-			var method = GetMethod(methodName, args);
+			return this.Setup(methodName, false, args);
+		}
+
+		public ISetup<T> Setup(string methodName, bool exactParameterMatch, params object[] args)
+		{
+			Guard.NotNullOrEmpty(methodName, nameof(methodName));
+
+			var method = GetMethod(methodName, exactParameterMatch, args);
 			ThrowIfMemberMissing(methodName, method);
 			ThrowIfPublicMethod(method, typeof(T).Name);
 
