@@ -2090,6 +2090,44 @@ namespace Moq.Tests.Regressions
 
 		#endregion
 
+		#region 735
+
+		public class Issue735
+		{
+			[Fact]
+			public void Protected_Setup_should_find_and_distinguish_between_two_method_overloads()
+			{
+				int which = 0;
+				var mockedRule = new Mock<MyAbstractClass>();
+				mockedRule.Protected().Setup("ApplyRule", true, ItExpr.IsAny<IDictionary<string, object>>()).Callback(() => which = 1);
+				mockedRule.Protected().Setup("ApplyRule", true, ItExpr.IsAny<object>()).Callback(() => which = 2);
+
+				mockedRule.Object.InvokeApplyRule(new object());
+				Assert.Equal(2, which);
+
+				mockedRule.Object.InvokeApplyRule(new Dictionary<string, object>());
+				Assert.Equal(1, which);
+			}
+
+			public abstract class MyAbstractClass
+			{
+				protected abstract void ApplyRule(IDictionary<string, object> tokens);
+				protected abstract void ApplyRule(object obj);
+
+				public void InvokeApplyRule(IDictionary<string, object> tokens)
+				{
+					this.ApplyRule(tokens);
+				}
+
+				public void InvokeApplyRule(object obj)
+				{
+					this.ApplyRule(obj);
+				}
+			}
+		}
+
+		#endregion
+
 		// Old @ Google Code
 
 		#region #47

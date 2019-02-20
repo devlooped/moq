@@ -39,6 +39,16 @@ namespace Moq.Protected
 		ISetup<TMock> Setup(string voidMethodName, params object[] args);
 
 		/// <summary>
+		/// Specifies a setup for a void method invocation with the given
+		/// <paramref name="voidMethodName"/>, optionally specifying arguments for the method call.
+		/// </summary>
+		/// <param name="voidMethodName">The name of the void method to be invoked.</param>
+		/// <param name="exactParameterMatch">Should the parameter types match exactly types that were provided</param>
+		/// <param name="args">The optional arguments for the invocation. If argument matchers are used,
+		/// remember to use <see cref="ItExpr"/> rather than <see cref="It"/>.</param>
+		ISetup<TMock> Setup(string voidMethodName, bool exactParameterMatch, params object[] args);
+
+		/// <summary>
 		/// Specifies a setup for an invocation on a property or a non void method with the given 
 		/// <paramref name="methodOrPropertyName"/>, optionally specifying arguments for the method call.
 		/// </summary>

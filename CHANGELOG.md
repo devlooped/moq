@@ -9,7 +9,14 @@ The format is loosely based on [Keep a Changelog](http://keepachangelog.com/en/1
 
 #### Changed
 
-* **Breaking change:** All custom argument matcher methods (including those using `Match.Create<T>`) must now be marked with the `[Matcher]` attribute. For this reason, `MatcherAttribute` is no longer marked obsolete (@stakx, #732)
+This release contains several **minor breaking changes**. Please review your code with respect to the following:
+
+* All custom argument matcher methods (including those using `Match.Create<T>`) must now be marked with the `[Matcher]` attribute. For this reason, `MatcherAttribute` is no longer marked obsolete (@stakx, #732)
+* Method overload resolution for `mock.Protected().Setup("VoidMethod", ...)` may change due to a new overload: If you set up a `void` method whose first argument is a `bool`, make sure that argument gets interpreted as part of `args`, not as `exactParameterMatch` (see also *Added* section below). (@stakx, #751)
+
+#### Added
+
+* New method overload `mock.Protected().Setup("VoidMethod", exactParameterMatch, args)` overload having a `bool exactParameterMatch` parameter. Due to method overload resolution, it was easy to think this already existed resolution when in fact it did not, leading to failing tests. (@stakx, #751)
 
 #### Fixed
 
