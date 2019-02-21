@@ -2,11 +2,8 @@
 // All rights reserved. Licensed under the BSD 3-Clause License; see License.txt.
 
 using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
+
 using Xunit;
-using System.Linq.Expressions;
 
 namespace Moq.Tests
 {
