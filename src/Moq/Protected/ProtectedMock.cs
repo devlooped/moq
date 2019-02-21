@@ -156,9 +156,14 @@ namespace Moq.Protected
 
 		public void Verify(string methodName, Times times, object[] args)
 		{
+			this.Verify(methodName, times, false, args);
+		}
+
+		public void Verify(string methodName, Times times, bool exactParameterMatch, object[] args)
+		{
 			Guard.NotNullOrEmpty(methodName, nameof(methodName));
 
-			var method = GetMethod(methodName, args);
+			var method = GetMethod(methodName, exactParameterMatch, args);
 			ThrowIfMemberMissing(methodName, method);
 			ThrowIfPublicMethod(method, typeof(T).Name);
 
@@ -166,6 +171,11 @@ namespace Moq.Protected
 		}
 
 		public void Verify<TResult>(string methodName, Times times, object[] args)
+		{
+			this.Verify<TResult>(methodName, times, false, args);
+		}
+
+		public void Verify<TResult>(string methodName, Times times, bool exactParameterMatch, object[] args)
 		{
 			Guard.NotNullOrEmpty(methodName, nameof(methodName));
 
@@ -178,7 +188,7 @@ namespace Moq.Protected
 				return;
 			}
 
-			var method = GetMethod(methodName, args);
+			var method = GetMethod(methodName, exactParameterMatch, args);
 			ThrowIfMemberMissing(methodName, method);
 			ThrowIfPublicMethod(method, typeof(T).Name);
 
