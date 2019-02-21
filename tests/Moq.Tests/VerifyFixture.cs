@@ -2,10 +2,11 @@
 // All rights reserved. Licensed under the BSD 3-Clause License; see License.txt.
 
 using System;
-using Moq;
-using Xunit;
-
 using System.Threading.Tasks;
+
+using Moq;
+
+using Xunit;
 
 namespace Moq.Tests
 {

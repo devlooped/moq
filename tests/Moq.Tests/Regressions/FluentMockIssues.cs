@@ -5,6 +5,7 @@ using System;
 #if FEATURE_SERIALIZATION
 using System.Runtime.Serialization;
 #endif
+
 using Xunit;
 
 namespace Moq.Tests.Regressions

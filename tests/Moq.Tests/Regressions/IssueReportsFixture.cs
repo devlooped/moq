@@ -14,12 +14,14 @@ using System.IO;
 using System.Linq;
 using System.Linq.Expressions;
 using System.Reflection;
-using System.Text;
 using System.Text.RegularExpressions;
+
 using Castle.DynamicProxy;
+
 using Moq;
 using Moq.Properties;
 using Moq.Protected;
+
 using Xunit;
 
 #if !NETCORE
