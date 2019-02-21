@@ -5,6 +5,7 @@ using System;
 using System.Threading.Tasks;
 
 using Moq;
+using Moq.Protected;
 
 using Xunit;
 
@@ -1516,6 +1517,17 @@ namespace Moq.Tests
 			mock.VerifyAll();
 		}
 
+		[Fact]
+		public void VerifyProtectedMethodOnChildClass()
+		{
+			var mock = new Mock<Child>();
+			mock.Protected().Setup("Populate", exactParameterMatch: true, ItExpr.Ref<ChildDto>.IsAny).CallBase().Verifiable();
+			ChildDto dto = new ChildDto();
+			_ = mock.Object.InvokePopulate(ref dto);
+
+			mock.Protected().Verify("Populate", Times.Once(), exactParameterMatch: true, ItExpr.Ref<ChildDto>.IsAny);
+		}
+
 		public interface IBar
 		{
 			int? Value { get; set; }
@@ -1569,6 +1581,31 @@ namespace Moq.Tests
 		{
 			string Purr(int amount);
 			void Hiss();
+		}
+
+		public class ParentDto { }
+
+		public class ChildDto : ParentDto { }
+
+		public class Parent
+		{
+			protected virtual bool Populate(ref ParentDto dto)
+			{
+				return true;
+			}
+		}
+
+		public class Child : Parent
+		{
+			protected virtual bool Populate(ref ChildDto dto)
+			{
+				return true;
+			}
+
+			public bool InvokePopulate(ref ChildDto dto)
+			{
+				return Populate(ref dto);
+			}
 		}
 	}
 }

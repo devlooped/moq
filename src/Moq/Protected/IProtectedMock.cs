@@ -141,6 +141,20 @@ namespace Moq.Protected
 		void Verify(string methodName, Times times, params object[] args);
 
 		/// <summary>
+		/// Specifies a verify for a void method with the given <paramref name="methodName"/>,
+		/// optionally specifying arguments for the method call. Use in conjunction with the default
+		/// <see cref="MockBehavior.Loose"/>.
+		/// </summary>
+		/// <exception cref="MockException">The invocation was not call the times specified by
+		/// <paramref name="times"/>.</exception>
+		/// <param name="methodName">The name of the void method to be verified.</param>
+		/// <param name="times">The number of times a method is allowed to be called.</param>
+		/// <param name="exactParameterMatch">Should the parameter types match exactly types that were provided</param>
+		/// <param name="args">The optional arguments for the invocation. If argument matchers are used, 
+		/// remember to use <see cref="ItExpr"/> rather than <see cref="It"/>.</param>
+		void Verify(string methodName, Times times, bool exactParameterMatch, params object[] args);
+
+		/// <summary>
 		/// Specifies a verify for an invocation on a property or a non void method with the given 
 		/// <paramref name="methodName"/>, optionally specifying arguments for the method call.
 		/// </summary>
@@ -153,6 +167,21 @@ namespace Moq.Protected
 		/// <typeparam name="TResult">The type of return value from the expression.</typeparam>
 		[SuppressMessage("Microsoft.Design", "CA1004:GenericMethodsShouldProvideTypeParameter")]
 		void Verify<TResult>(string methodName, Times times, params object[] args);
+
+		/// <summary>
+		/// Specifies a verify for an invocation on a property or a non void method with the given 
+		/// <paramref name="methodName"/>, optionally specifying arguments for the method call.
+		/// </summary>
+		/// <exception cref="MockException">The invocation was not call the times specified by 
+		/// <paramref name="times"/>.</exception>
+		/// <param name="methodName">The name of the method or property to be invoked.</param>
+		/// <param name="exactParameterMatch">Should the parameter types match exactly types that were provided</param>
+		/// <param name="args">The optional arguments for the invocation. If argument matchers are used, 
+		/// remember to use <see cref="ItExpr"/> rather than <see cref="It"/>.</param>
+		/// <param name="times">The number of times a method is allowed to be called.</param>
+		/// <typeparam name="TResult">The type of return value from the expression.</typeparam>
+		[SuppressMessage("Microsoft.Design", "CA1004:GenericMethodsShouldProvideTypeParameter")]
+		void Verify<TResult>(string methodName, Times times, bool exactParameterMatch, params object[] args);
 
 		/// <summary>
 		/// Specifies a verify for an invocation on a property getter with the given 
