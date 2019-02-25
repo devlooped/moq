@@ -344,7 +344,14 @@ namespace Moq
 			}
 			else
 			{
-				invocation.Return(mock.GetDefaultValue(method));
+				var returnValue = mock.GetDefaultValue(method);
+
+				if (Mock.TryGetFromReturnValue(returnValue, out var innerMock))
+				{
+					mock.InnerMocks.TryAdd(method, new MockWithWrappedMockObject(innerMock, returnValue));
+				}
+
+				invocation.Return(returnValue);
 			}
 
 			return InterceptionAction.Stop;

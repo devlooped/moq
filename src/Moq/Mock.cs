@@ -687,9 +687,10 @@ namespace Moq
 							initialValue = mock.GetDefaultValue(getter, useAlternateProvider: DefaultValueProvider.Empty);
 						}
 
-						if (initialValue is IMocked mocked)
+						if (Mock.TryGetFromReturnValue(initialValue, out var innerMock))
 						{
-							SetupAllPropertiesPexProtected(mocked.Mock, defaultValueProvider);
+							mock.InnerMocks.TryAdd(getter, new MockWithWrappedMockObject(innerMock, initialValue));
+							SetupAllPropertiesPexProtected(innerMock, defaultValueProvider);
 						}
 
 						value = initialValue;
@@ -901,64 +902,56 @@ namespace Moq
 			Debug.Assert(method.ReturnType != null);
 			Debug.Assert(method.ReturnType != typeof(void));
 
-			object result;
-
-			if (this.ConfiguredDefaultValues.TryGetValue(method.ReturnType, out object configuredDefaultValue))
+			if (this.ConfiguredDefaultValues.TryGetValue(method.ReturnType, out object defaultValue))
 			{
-				result = configuredDefaultValue;
+				return defaultValue;
 			}
 			else
 			{
-				result = (useAlternateProvider ?? this.DefaultValueProvider).GetDefaultReturnValue(method, this);
+				return (useAlternateProvider ?? this.DefaultValueProvider).GetDefaultReturnValue(method, this);
 			}
-
-			var unwrappedResult = TryUnwrapResultFromCompletedTaskRecursively(result);
-
-			if (unwrappedResult is IMocked unwrappedMockedResult)
-			{
-				// TODO: Perhaps the following `InnerMocks` update isn't in quite the right place yet.
-				// There are two main places in Moq where `InnerMocks` are used: `Mock<T>.FluentMock` and
-				// the `HandleMockRecursion` interception strategy. Both places first query `InnerMocks`,
-				// and if no value for a given member is present, the default value provider get invoked
-				// via the present method. Querying and updating `InnerMocks` is thus spread over two
-				// code locations and therefore non-atomic. It would be good if those could be combined
-				// (`InnerMocks.GetOrAdd`), but that might not be easily possible since `InnerMocks` is
-				// only mocks while default value providers can also return plain, unmocked values.
-				this.InnerMocks.TryAdd(method, new MockWithWrappedMockObject(unwrappedMockedResult.Mock, result));
-			}
-
-			return result;
-		}
-
-		/// <summary>
-		/// Recursively unwraps the result from completed <see cref="Task{TResult}"/> or <see cref="ValueTask{TResult}"/> instances.
-		/// If the given value is not a task, the value itself is returned.
-		/// </summary>
-		/// <param name="obj">The value to be unwrapped.</param>
-		private static object TryUnwrapResultFromCompletedTaskRecursively(object obj)
-		{
-			if (obj != null)
-			{
-				var objType = obj.GetType();
-				if (objType.GetTypeInfo().IsGenericType)
-				{
-					var genericTypeDefinition = objType.GetGenericTypeDefinition();
-					if (genericTypeDefinition == typeof(Task<>) || genericTypeDefinition == typeof(ValueTask<>))
-					{
-						var isCompleted = (bool)objType.GetProperty("IsCompleted").GetValue(obj, null);
-						if (isCompleted)
-						{
-							var innerObj = objType.GetProperty("Result").GetValue(obj, null);
-							return TryUnwrapResultFromCompletedTaskRecursively(innerObj);
-						}
-					}
-				}
-			}
-
-			return obj;
 		}
 
 		#endregion
+
+		internal static bool TryGetFromReturnValue(object returnValue, out Mock mock)
+		{
+			if (Unwrap(returnValue) is IMocked mocked)
+			{
+				mock = mocked.Mock;
+				return true;
+			}
+			else
+			{
+				mock = default;
+				return false;
+			}
+
+			// Recursively unwraps the `.Result` from completed `Task<TResult>` or `ValueTask<TResult>` instances.
+			// If the given value is not a task, the original value itself is returned.
+			object Unwrap(object obj)
+			{
+				if (obj != null)
+				{
+					var objType = obj.GetType();
+					if (objType.GetTypeInfo().IsGenericType)
+					{
+						var genericTypeDefinition = objType.GetGenericTypeDefinition();
+						if (genericTypeDefinition == typeof(Task<>) || genericTypeDefinition == typeof(ValueTask<>))
+						{
+							var isCompleted = (bool)objType.GetProperty("IsCompleted").GetValue(obj, null);
+							if (isCompleted)
+							{
+								var innerObj = objType.GetProperty("Result").GetValue(obj, null);
+								return Unwrap(innerObj);
+							}
+						}
+					}
+				}
+
+				return obj;
+			}
+		}
 
 		private readonly struct SetupSetImplResult
 		{
