@@ -901,12 +901,17 @@ namespace Moq
 			Debug.Assert(method.ReturnType != null);
 			Debug.Assert(method.ReturnType != typeof(void));
 
+			object result;
+
 			if (this.ConfiguredDefaultValues.TryGetValue(method.ReturnType, out object configuredDefaultValue))
 			{
-				return configuredDefaultValue;
+				result = configuredDefaultValue;
+			}
+			else
+			{
+				result = (useAlternateProvider ?? this.DefaultValueProvider).GetDefaultReturnValue(method, this);
 			}
 
-			var result = (useAlternateProvider ?? this.DefaultValueProvider).GetDefaultReturnValue(method, this);
 			var unwrappedResult = TryUnwrapResultFromCompletedTaskRecursively(result);
 
 			if (unwrappedResult is IMocked unwrappedMockedResult)

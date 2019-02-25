@@ -13,6 +13,7 @@ This release contains several **minor breaking changes**. Please review your cod
 
 * All custom argument matcher methods (including those using `Match.Create<T>`) must now be marked with the `[Matcher]` attribute. For this reason, `MatcherAttribute` is no longer marked obsolete (@stakx, #732)
 * Method overload resolution for `mock.Protected().Setup("VoidMethod", ...)`, `mock.Protected().Verify("VoidMethod", ...)` and `mock.Protected().Verify<TResult>("NonVoidMethod", ...)` may change due to a new overloads: If the first argument is a `bool`, make sure that argument gets interpreted as part of `args`, not as `exactParameterMatch` (see also *Added* section below). (@stakx & @Shereef, #751, #753)
+* If a member returns a mocked object due to `mock.SetReturnsDefault`, that mocked object will get included in a call to `mock.Verify[All]`. (@stakx, #759)
 
 #### Added
 
