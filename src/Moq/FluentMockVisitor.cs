@@ -166,17 +166,17 @@ namespace Moq
 
 			Mock fluentMock;
 			object result;
-			if (mock.TryGetInnerMock(info, out var inner))
+			if (mock.TryGetInnerMockSetup(info, out var inner))
 			{
-				fluentMock = inner.Mock;
-				result = inner.WrappedMockObject;
+				fluentMock = inner.GetInnerMock();
+				result = inner.ReturnValue;
 			}
 			else
 			{
 				result = mock.GetDefaultValue(info, out fluentMock, useAlternateProvider: DefaultValueProvider.Mock);
 				Debug.Assert(fluentMock != null);
 
-				mock.AddInnerMock(info, new MockWithWrappedMockObject(fluentMock, result));
+				mock.AddInnerMockSetup(info, new MockWithWrappedMockObject(fluentMock, result));
 				Mock.SetupAllProperties(fluentMock);
 			}
 

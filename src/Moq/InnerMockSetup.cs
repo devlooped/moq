@@ -10,7 +10,7 @@ using ExpressionFactory = System.Linq.Expressions.Expression;
 
 namespace Moq
 {
-	internal sealed class InnerMockSetup : Setup
+	internal sealed class InnerMockSetup : Setup, IDeterministicReturnValueSetup
 	{
 		private readonly MockWithWrappedMockObject inner;
 
@@ -19,6 +19,8 @@ namespace Moq
 		{
 			this.inner = inner;
 		}
+
+		public object ReturnValue => this.inner.WrappedMockObject;
 
 		public ref readonly MockWithWrappedMockObject Inner => ref this.inner;
 

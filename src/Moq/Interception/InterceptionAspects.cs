@@ -338,16 +338,16 @@ namespace Moq
 			{
 				invocation.Return();
 			}
-			else if (mock.TryGetInnerMock(method, out var inner))
+			else if (mock.TryGetInnerMockSetup(method, out var inner))
 			{
-				invocation.Return(inner.WrappedMockObject);
+				invocation.Return(inner.ReturnValue);
 			}
 			else
 			{
 				var returnValue = mock.GetDefaultValue(method, out var innerMock);
 				if (innerMock != null)
 				{
-					mock.AddInnerMock(method, new MockWithWrappedMockObject(innerMock, returnValue));
+					mock.AddInnerMockSetup(method, new MockWithWrappedMockObject(innerMock, returnValue));
 				}
 				invocation.Return(returnValue);
 			}
