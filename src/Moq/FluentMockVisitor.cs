@@ -166,20 +166,14 @@ namespace Moq
 
 			Mock innerMock;
 			object returnValue;
-			MockWithWrappedMockObject inner;
-			if (mock.InnerMocks.TryGetValue(info, out inner))
-			{
-				returnValue = inner.WrappedMockObject;
-				innerMock = inner.Mock;
-			}
-			else
+			if (!mock.TryGetInnerMock(info, out innerMock, out returnValue))
 			{
 				returnValue = mock.GetDefaultValue(info, useAlternateProvider: DefaultValueProvider.Mock);
 
 				if (Mock.TryGetFromReturnValue(returnValue, out innerMock))
 				{
 					Mock.SetupAllProperties(innerMock);
-					mock.InnerMocks.TryAdd(info, new MockWithWrappedMockObject(innerMock, returnValue));
+					mock.AddInnerMock(info, innerMock, returnValue);
 				}
 			}
 

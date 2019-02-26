@@ -219,9 +219,9 @@ namespace Moq
 				return false;
 			}
 
-			foreach (var inner in this.InnerMocks.Values)
+			foreach (var innerMock in this.GetInnerMocks())
 			{
-				if (!inner.Mock.TryVerify(out error))
+				if (!innerMock.TryVerify(out error))
 				{
 					return false;
 				}
@@ -254,9 +254,9 @@ namespace Moq
 				return false;
 			}
 
-			foreach (var inner in this.InnerMocks.Values)
+			foreach (var innerMock in this.GetInnerMocks())
 			{
-				if (!inner.Mock.TryVerifyAll(out error))
+				if (!innerMock.TryVerifyAll(out error))
 				{
 					return false;
 				}
@@ -322,15 +322,15 @@ namespace Moq
 				// to verify `X`. If that succeeds, it's reasonable to expect that `m.A`, `m.A.B`, and
 				// `m.A.B.C` have implicitly been verified as well. Below, invocations such as those to
 				// the left of `X` are referred to as "transitive" (for lack of a better word).
-				if (mock.InnerMocks.Any())
+				if (mock.HasAnyInnerMocks())
 				{
 					for (int i = 0, n = unverifiedInvocations.Length; i < n; ++i)
 					{
 						// In order for an invocation to be "transitive", its return value has to be a
 						// sub-object (inner mock); and that sub-object has to have received at least
 						// one call:
-						var wasTransitiveInvocation = mock.InnerMocks.TryGetValue(unverifiedInvocations[i].Method, out MockWithWrappedMockObject inner)
-						                              && inner.Mock.MutableInvocations.Any();
+						var wasTransitiveInvocation = mock.TryGetInnerMock(unverifiedInvocations[i].Method, out var innerMock, out _)
+						                              && innerMock.MutableInvocations.Any();
 						if (wasTransitiveInvocation)
 						{
 							unverifiedInvocations[i] = null;
@@ -348,9 +348,9 @@ namespace Moq
 
 			// Perform verification for all automatically created sub-objects (that is, those
 			// created by "transitive" invocations):
-			foreach (var inner in mock.InnerMocks.Values)
+			foreach (var innerMock in mock.GetInnerMocks())
 			{
-				VerifyNoOtherCalls(inner.Mock);
+				VerifyNoOtherCalls(innerMock);
 			}
 		}
 
@@ -389,6 +389,37 @@ namespace Moq
 
 			bool AreSameMethod(LambdaExpression l, LambdaExpression r) =>
 				l.Body is MethodCallExpression lc && r.Body is MethodCallExpression rc && lc.Method == rc.Method;
+		}
+
+		internal void AddInnerMock(MethodInfo method, Mock innerMock, object returnValue)
+		{
+			this.InnerMocks.TryAdd(method, new MockWithWrappedMockObject(innerMock, returnValue));
+		}
+
+		internal bool HasAnyInnerMocks()
+		{
+			return this.InnerMocks.Any();
+		}
+
+		internal IEnumerable<Mock> GetInnerMocks()
+		{
+			return this.InnerMocks.Values.Select(inner => inner.Mock);
+		}
+
+		internal bool TryGetInnerMock(MethodInfo method, out Mock innerMock, out object returnValue)
+		{
+			if (this.InnerMocks.TryGetValue(method, out var inner))
+			{
+				innerMock = inner.Mock;
+				returnValue = inner.WrappedMockObject;
+				return true;
+			}
+			else
+			{
+				innerMock = default;
+				returnValue = default;
+				return false;
+			}
 		}
 
 		#endregion
@@ -689,7 +720,7 @@ namespace Moq
 
 						if (Mock.TryGetFromReturnValue(initialValue, out var innerMock))
 						{
-							mock.InnerMocks.TryAdd(getter, new MockWithWrappedMockObject(innerMock, initialValue));
+							mock.AddInnerMock(getter, innerMock, initialValue);
 							SetupAllPropertiesPexProtected(innerMock, defaultValueProvider);
 						}
 

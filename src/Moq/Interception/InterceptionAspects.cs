@@ -334,21 +334,23 @@ namespace Moq
 				}
 			}
 
+			object returnValue;
+
 			if (method.ReturnType == typeof(void))
 			{
 				invocation.Return();
 			}
-			else if (mock.InnerMocks.TryGetValue(method, out var inner))
+			else if (mock.TryGetInnerMock(method, out _, out returnValue))
 			{
-				invocation.Return(inner.WrappedMockObject);
+				invocation.Return(returnValue);
 			}
 			else
 			{
-				var returnValue = mock.GetDefaultValue(method);
+				returnValue = mock.GetDefaultValue(method);
 
 				if (Mock.TryGetFromReturnValue(returnValue, out var innerMock))
 				{
-					mock.InnerMocks.TryAdd(method, new MockWithWrappedMockObject(innerMock, returnValue));
+					mock.AddInnerMock(method, innerMock, returnValue);
 				}
 
 				invocation.Return(returnValue);

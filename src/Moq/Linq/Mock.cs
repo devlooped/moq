@@ -49,9 +49,9 @@ namespace Moq
 			// TODO: Make LINQ to Mocks set up mocks without causing invocations of its own, then remove this hack.
 			var mock = Mock.Get(mocked);
 			mock.Invocations.Clear();
-			foreach (var inner in mock.InnerMocks.Values)
+			foreach (var innerMock in mock.GetInnerMocks())
 			{
-				inner.Mock.Invocations.Clear();
+				innerMock.Invocations.Clear();
 			}
 
 			return mocked;
