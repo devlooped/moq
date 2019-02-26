@@ -155,8 +155,6 @@ namespace Moq
 		/// </summary>
 		internal abstract Type[] InheritedInterfaces { get; }
 
-		internal abstract ConcurrentDictionary<MethodInfo, MockWithWrappedMockObject> InnerMocks { get; }
-
 		internal abstract bool IsObjectInitialized { get; }
 
 		/// <summary>
@@ -959,17 +957,23 @@ namespace Moq
 
 		internal void AddInnerMock(MethodInfo method, in MockWithWrappedMockObject inner)
 		{
-			this.InnerMocks.TryAdd(method, inner);
+			this.Setups.Add(new InnerMockSetup(method, in inner));
 		}
 
 		internal IEnumerable<MockWithWrappedMockObject> GetInnerMocks()
 		{
-			return this.InnerMocks.Values;
+			return this.Setups.ToArrayLive(s => s is InnerMockSetup)
+			                  .Cast<InnerMockSetup>()
+			                  .Select(setup => setup.Inner);
 		}
 
 		internal bool TryGetInnerMock(MethodInfo method, out MockWithWrappedMockObject inner)
 		{
-			return this.InnerMocks.TryGetValue(method, out inner);
+			var setup = this.Setups.ToArrayLive(s => s is InnerMockSetup && s.Method == method)
+			                       .Cast<InnerMockSetup>()
+			                       .FirstOrDefault();
+			inner = setup?.Inner ?? default;
+			return setup != null;
 		}
 
 		#endregion

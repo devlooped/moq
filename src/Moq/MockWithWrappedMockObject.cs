@@ -14,7 +14,7 @@ namespace Moq
 	/// <remarks>
 	///   <para>
 	///     Mocking a type, then wrapping it in a task inside <see cref="MockDefaultValueProvider"/>, then unwrapping the task
-	///     to get at the mock so it can be stored in <see cref="Mock.InnerMocks"/>, then wrapping it again each time a return
+	///     to get at the mock so it can be stored in <see cref="InnerMockSetup"/>s, then wrapping it again each time a return
 	///     value is created (e. g. in <see cref="Return"/>) is a lot of work.
 	///   </para>
 	///   <para>
