@@ -347,7 +347,7 @@ namespace Moq
 				var returnValue = mock.GetDefaultValue(method, out var innerMock);
 				if (innerMock != null)
 				{
-					mock.AddInnerMockSetup(method, new MockWithWrappedMockObject(innerMock, returnValue));
+					mock.AddInnerMockSetup(method, returnValue);
 				}
 				invocation.Return(returnValue);
 			}

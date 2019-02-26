@@ -917,9 +917,9 @@ namespace Moq
 
 		#region Inner mocks
 
-		internal void AddInnerMockSetup(MethodInfo method, in MockWithWrappedMockObject inner)
+		internal void AddInnerMockSetup(MethodInfo method, object returnValue)
 		{
-			this.Setups.Add(new InnerMockSetup(method, in inner));
+			this.Setups.Add(new InnerMockSetup(method, returnValue));
 		}
 
 		internal IEnumerable<IDeterministicReturnValueSetup> GetInnerMockSetups()

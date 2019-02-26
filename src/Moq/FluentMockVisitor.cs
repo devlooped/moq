@@ -176,7 +176,7 @@ namespace Moq
 				result = mock.GetDefaultValue(info, out fluentMock, useAlternateProvider: DefaultValueProvider.Mock);
 				Debug.Assert(fluentMock != null);
 
-				mock.AddInnerMockSetup(info, new MockWithWrappedMockObject(fluentMock, result));
+				mock.AddInnerMockSetup(info, result);
 				Mock.SetupAllProperties(fluentMock);
 			}
 

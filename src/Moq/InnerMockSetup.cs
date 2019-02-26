@@ -12,21 +12,19 @@ namespace Moq
 {
 	internal sealed class InnerMockSetup : Setup, IDeterministicReturnValueSetup
 	{
-		private readonly MockWithWrappedMockObject inner;
+		private readonly object returnValue;
 
-		public InnerMockSetup(MethodInfo method, in MockWithWrappedMockObject inner)
+		public InnerMockSetup(MethodInfo method, object returnValue)
 			: base(new InvocationShape(method, GetArgumentMatchers(method)), GetExpression(method))
 		{
-			this.inner = inner;
+			this.returnValue = returnValue;
 		}
 
-		public object ReturnValue => this.inner.WrappedMockObject;
-
-		public ref readonly MockWithWrappedMockObject Inner => ref this.inner;
+		public object ReturnValue => this.returnValue;
 
 		public override void Execute(Invocation invocation)
 		{
-			invocation.Return(inner.WrappedMockObject);
+			invocation.Return(this.returnValue);
 		}
 
 		public override bool TryVerifyAll()
