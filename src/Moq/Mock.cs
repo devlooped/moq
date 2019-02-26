@@ -924,6 +924,17 @@ namespace Moq
 
 		internal void AddInnerMockSetup(MethodInfo method, IReadOnlyList<Expression> arguments, LambdaExpression expression, object returnValue)
 		{
+			if (expression.IsProperty())
+			{
+				var property = expression.ToPropertyInfo();
+				Guard.CanRead(property);
+
+				Debug.Assert(method == property.GetGetMethod(true));
+			}
+
+			ThrowIfSetupExpressionInvolvesUnsupportedMember(expression, method);
+			ThrowIfSetupMethodNotVisibleToProxyFactory(method);
+
 			this.Setups.Add(new InnerMockSetup(method, arguments, expression, returnValue));
 		}
 
