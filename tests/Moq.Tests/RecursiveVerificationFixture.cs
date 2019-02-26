@@ -99,5 +99,21 @@ namespace Moq.Tests
 				Assert.Null(y);
 			}
 		}
+
+		public class Verifiability
+		{
+			[Fact]
+			public void Transitive_part_of_multi_dot_call_expression_is_invisible_to_VerifyAll()
+			{
+				var xMock = new Mock<IX>();
+
+				// This should obviously pass, since such a call never occurred:
+				xMock.Verify(x => x.Y.Method(), Times.Never);
+
+				// This should also pass, since from the user's perspective, there are no setups.
+				// But let's make sure, because Moq *might* have created a hidden, internal setup for `x.Y`:
+				xMock.VerifyAll();
+			}
+		}
 	}
 }
