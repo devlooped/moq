@@ -155,7 +155,7 @@ namespace Moq
 		/// </summary>
 		internal abstract Type[] InheritedInterfaces { get; }
 
-		internal abstract ConcurrentDictionary<MethodInfo, MockWithWrappedMockObject> InnerMocks { get; }
+		internal abstract ConcurrentDictionary<MethodInfo, object> InnerMocks { get; }
 
 		internal abstract bool IsObjectInitialized { get; }
 
@@ -391,9 +391,11 @@ namespace Moq
 				l.Body is MethodCallExpression lc && r.Body is MethodCallExpression rc && lc.Method == rc.Method;
 		}
 
-		internal void AddInnerMock(MethodInfo method, Mock innerMock, object returnValue)
+		internal void AddInnerMock(MethodInfo method, object returnValue)
 		{
-			this.InnerMocks.TryAdd(method, new MockWithWrappedMockObject(innerMock, returnValue));
+			Debug.Assert(Mock.TryGetFromReturnValue(returnValue, out _));
+
+			this.InnerMocks.TryAdd(method, returnValue);
 		}
 
 		internal bool HasAnyInnerMocks()
@@ -403,15 +405,18 @@ namespace Moq
 
 		internal IEnumerable<Mock> GetInnerMocks()
 		{
-			return this.InnerMocks.Values.Select(inner => inner.Mock);
+			foreach (var returnValue in this.InnerMocks.Values)
+			{
+				Mock.TryGetFromReturnValue(returnValue, out var innerMock);
+				yield return innerMock;
+			}
 		}
 
 		internal bool TryGetInnerMock(MethodInfo method, out Mock innerMock, out object returnValue)
 		{
-			if (this.InnerMocks.TryGetValue(method, out var inner))
+			if (this.InnerMocks.TryGetValue(method, out returnValue))
 			{
-				innerMock = inner.Mock;
-				returnValue = inner.WrappedMockObject;
+				Mock.TryGetFromReturnValue(returnValue, out innerMock);
 				return true;
 			}
 			else
@@ -720,7 +725,7 @@ namespace Moq
 
 						if (Mock.TryGetFromReturnValue(initialValue, out var innerMock))
 						{
-							mock.AddInnerMock(getter, innerMock, initialValue);
+							mock.AddInnerMock(getter, initialValue);
 							SetupAllPropertiesPexProtected(innerMock, defaultValueProvider);
 						}
 

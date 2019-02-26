@@ -47,7 +47,7 @@ namespace Moq
 		private object[] constructorArguments;
 		private DefaultValueProvider defaultValueProvider;
 		private EventHandlerCollection eventHandlers;
-		private ConcurrentDictionary<MethodInfo, MockWithWrappedMockObject> innerMocks;
+		private ConcurrentDictionary<MethodInfo, object> innerMocks;
 		private InvocationCollection invocations;
 		private string name;
 		private SetupCollection setups;
@@ -112,7 +112,7 @@ namespace Moq
 			this.constructorArguments = args;
 			this.defaultValueProvider = DefaultValueProvider.Empty;
 			this.eventHandlers = new EventHandlerCollection();
-			this.innerMocks = new ConcurrentDictionary<MethodInfo, MockWithWrappedMockObject>();
+			this.innerMocks = new ConcurrentDictionary<MethodInfo, object>();
 			this.invocations = new InvocationCollection();
 			this.name = CreateUniqueDefaultMockName();
 			this.setups = new SetupCollection();
@@ -192,7 +192,7 @@ namespace Moq
 
 		internal override EventHandlerCollection EventHandlers => this.eventHandlers;
 
-		internal override ConcurrentDictionary<MethodInfo, MockWithWrappedMockObject> InnerMocks => this.innerMocks;
+		internal override ConcurrentDictionary<MethodInfo, object> InnerMocks => this.innerMocks;
 
 		internal override List<Type> AdditionalInterfaces => this.additionalInterfaces;
 

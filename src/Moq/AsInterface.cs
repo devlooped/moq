@@ -23,7 +23,7 @@ namespace Moq
 
 		internal override Dictionary<Type, object> ConfiguredDefaultValues => this.owner.ConfiguredDefaultValues;
 
-		internal override ConcurrentDictionary<MethodInfo, MockWithWrappedMockObject> InnerMocks
+		internal override ConcurrentDictionary<MethodInfo, object> InnerMocks
 		{
 			get { return this.owner.InnerMocks; }
 		}
