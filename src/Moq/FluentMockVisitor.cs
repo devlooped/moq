@@ -2,6 +2,7 @@
 // All rights reserved. Licensed under the BSD 3-Clause License; see License.txt.
 
 using System;
+using System.Collections.Generic;
 using System.Diagnostics;
 using System.Linq;
 using System.Linq.Expressions;
@@ -146,16 +147,21 @@ namespace Moq
 			Guard.Mockable(typeof(TResult));
 
 			MethodInfo info;
+			IReadOnlyList<Expression> arguments;
 			if (setup.Body.NodeType == ExpressionType.MemberAccess)
 			{
 				var memberExpr = ((MemberExpression)setup.Body);
 				memberExpr.ThrowIfNotMockeable();
 
 				info = ((PropertyInfo)memberExpr.Member).GetGetMethod();
+				arguments = new Expression[0];
 			}
 			else if (setup.Body.NodeType == ExpressionType.Call)
 			{
-				info = ((MethodCallExpression)setup.Body).Method;
+				var callExpr = (MethodCallExpression)setup.Body;
+
+				info = callExpr.Method;
+				arguments = callExpr.Arguments;
 			}
 			else
 			{
@@ -176,11 +182,10 @@ namespace Moq
 				result = mock.GetDefaultValue(info, out fluentMock, useAlternateProvider: DefaultValueProvider.Mock);
 				Debug.Assert(fluentMock != null);
 
-				mock.AddInnerMockSetup(info, result);
 				Mock.SetupAllProperties(fluentMock);
 			}
 
-			mock.Setup(setup).Returns((TResult)result);
+			mock.AddInnerMockSetup(info, arguments, setup, result);
 
 			return (Mock<TResult>)fluentMock;
 		}

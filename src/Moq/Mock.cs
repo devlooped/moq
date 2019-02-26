@@ -922,6 +922,11 @@ namespace Moq
 			this.Setups.Add(new InnerMockSetup(method, returnValue));
 		}
 
+		internal void AddInnerMockSetup(MethodInfo method, IReadOnlyList<Expression> arguments, LambdaExpression expression, object returnValue)
+		{
+			this.Setups.Add(new InnerMockSetup(method, arguments, expression, returnValue));
+		}
+
 		internal IEnumerable<IDeterministicReturnValueSetup> GetInnerMockSetups()
 		{
 			return this.Setups.ToArrayLive(s => s is IDeterministicReturnValueSetup drvs && drvs.ReturnsInnerMock(out _))
