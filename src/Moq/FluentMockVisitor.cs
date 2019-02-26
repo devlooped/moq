@@ -172,7 +172,7 @@ namespace Moq
 
 			Mock fluentMock;
 			object result;
-			if (mock.TryGetInnerMockSetup(info, out var inner))
+			if (mock.GetInnerMockSetups().TryFind(info, out var inner))
 			{
 				fluentMock = inner.GetInnerMock();
 				result = inner.ReturnValue;

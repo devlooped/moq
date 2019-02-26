@@ -313,6 +313,8 @@ namespace Moq
 		{
 			var unverifiedInvocations = mock.MutableInvocations.ToArray(invocation => !invocation.Verified);
 
+			var innerMockSetups = mock.GetInnerMockSetups();
+
 			if (unverifiedInvocations.Any())
 			{
 				// There are some invocations that shouldn't require explicit verification by the user.
@@ -320,14 +322,14 @@ namespace Moq
 				// to verify `X`. If that succeeds, it's reasonable to expect that `m.A`, `m.A.B`, and
 				// `m.A.B.C` have implicitly been verified as well. Below, invocations such as those to
 				// the left of `X` are referred to as "transitive" (for lack of a better word).
-				if (mock.GetInnerMockSetups().Any())
+				if (innerMockSetups.Any())
 				{
 					for (int i = 0, n = unverifiedInvocations.Length; i < n; ++i)
 					{
 						// In order for an invocation to be "transitive", its return value has to be a
 						// sub-object (inner mock); and that sub-object has to have received at least
 						// one call:
-						var wasTransitiveInvocation = mock.TryGetInnerMockSetup(unverifiedInvocations[i].Method, out var inner)
+						var wasTransitiveInvocation = innerMockSetups.TryFind(unverifiedInvocations[i].Method, out var inner)
 						                              && inner.GetInnerMock().MutableInvocations.Any();
 						if (wasTransitiveInvocation)
 						{
@@ -346,7 +348,7 @@ namespace Moq
 
 			// Perform verification for all automatically created sub-objects (that is, those
 			// created by "transitive" invocations):
-			foreach (var inner in mock.GetInnerMockSetups())
+			foreach (var inner in innerMockSetups)
 			{
 				VerifyNoOtherCalls(inner.GetInnerMock());
 			}
@@ -942,14 +944,6 @@ namespace Moq
 		{
 			return this.Setups.ToArrayLive(s => s is IDeterministicReturnValueSetup drvs && drvs.ReturnsInnerMock(out _))
 			                  .Cast<IDeterministicReturnValueSetup>();
-		}
-
-		internal bool TryGetInnerMockSetup(MethodInfo method, out IDeterministicReturnValueSetup setup)
-		{
-			setup = this.Setups.ToArrayLive(s => s is IDeterministicReturnValueSetup drvs && drvs.ReturnsInnerMock(out _) && s.Method == method)
-			                   .Cast<IDeterministicReturnValueSetup>()
-			                   .FirstOrDefault();
-			return setup != null;
 		}
 
 		#endregion
