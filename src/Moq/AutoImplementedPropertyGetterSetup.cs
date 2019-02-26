@@ -10,7 +10,7 @@ namespace Moq
 	/// <summary>
 	///   Setup used by <see cref="Mock.SetupAllProperties(Mock)"/> for property getters.
 	/// </summary>
-	internal sealed class AutoImplementedPropertyGetterSetup : Setup
+	internal sealed class AutoImplementedPropertyGetterSetup : Setup, IReturnValueSetup
 	{
 		private static IMatcher[] noArgumentMatchers = new IMatcher[0];
 
@@ -21,6 +21,8 @@ namespace Moq
 		{
 			this.getter = getter;
 		}
+
+		public object ReturnValue => this.getter.Invoke();
 
 		public override void Execute(Invocation invocation)
 		{

@@ -10,7 +10,7 @@ namespace Moq
 	/// <summary>
 	///   A setup which returns a fixed return value.
 	/// </summary>
-	internal class FixedReturnValueSetup : SetupWithOutParameterSupport
+	internal class FixedReturnValueSetup : SetupWithOutParameterSupport, IReturnValueSetup
 	{
 		private readonly object returnValue;
 

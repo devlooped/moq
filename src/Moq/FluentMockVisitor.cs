@@ -173,7 +173,7 @@ namespace Moq
 				if (Mock.TryGetFromReturnValue(returnValue, out innerMock))
 				{
 					Mock.SetupAllProperties(innerMock);
-					mock.AddInnerMock(info, returnValue);
+					mock.AddFixedReturnValueSetup(info, returnValue);
 				}
 			}
 

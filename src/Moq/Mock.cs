@@ -389,7 +389,7 @@ namespace Moq
 				l.Body is MethodCallExpression lc && r.Body is MethodCallExpression rc && lc.Method == rc.Method;
 		}
 
-		internal void AddInnerMock(MethodInfo method, object returnValue)
+		internal void AddFixedReturnValueSetup(MethodInfo method, object returnValue)
 		{
 			Debug.Assert(Mock.TryGetFromReturnValue(returnValue, out _));
 
@@ -419,16 +419,18 @@ namespace Moq
 
 		internal IEnumerable<Mock> GetInnerMocks()
 		{
-			foreach (var setup in this.Setups.ToArrayLive(s => s is FixedReturnValueSetup).Cast<FixedReturnValueSetup>())
+			foreach (var setup in this.Setups.ToArrayLive(s => s is IReturnValueSetup).Cast<IReturnValueSetup>())
 			{
-				Mock.TryGetFromReturnValue(setup.ReturnValue, out var innerMock);
-				yield return innerMock;
+				if (Mock.TryGetFromReturnValue(setup.ReturnValue, out var innerMock))
+				{
+					yield return innerMock;
+				}
 			}
 		}
 
 		internal bool TryGetInnerMock(MethodInfo method, out Mock innerMock, out object returnValue)
 		{
-			foreach (var setup in this.Setups.ToArrayLive(s => s is FixedReturnValueSetup).Cast<FixedReturnValueSetup>())
+			foreach (var setup in this.Setups.ToArrayLive(s => s is IReturnValueSetup).Cast<IReturnValueSetup>())
 			{
 				if (setup.Method == method && Mock.TryGetFromReturnValue(setup.ReturnValue, out innerMock))
 				{
@@ -740,7 +742,6 @@ namespace Moq
 
 						if (Mock.TryGetFromReturnValue(initialValue, out var innerMock))
 						{
-							mock.AddInnerMock(getter, initialValue);
 							SetupAllPropertiesPexProtected(innerMock, defaultValueProvider);
 						}
 
