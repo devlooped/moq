@@ -155,8 +155,6 @@ namespace Moq
 		/// </summary>
 		internal abstract Type[] InheritedInterfaces { get; }
 
-		internal abstract ConcurrentDictionary<MethodInfo, object> InnerMocks { get; }
-
 		internal abstract bool IsObjectInitialized { get; }
 
 		/// <summary>
@@ -395,36 +393,53 @@ namespace Moq
 		{
 			Debug.Assert(Mock.TryGetFromReturnValue(returnValue, out _));
 
-			this.InnerMocks.TryAdd(method, returnValue);
+			var arguments = GetArguments(method);
+			var obj = Expression.Parameter(this.MockedType, "mock");
+			var expression = Expression.Lambda(Expression.Call(obj, method, arguments), obj);
+
+			this.Setups.Add(new FixedReturnValueSetup(method, arguments, expression, returnValue));
+
+			Expression[] GetArguments(MethodInfo m)
+			{
+				var itIsAnyMethod = typeof(It).GetMethod(nameof(It.IsAny), BindingFlags.Public | BindingFlags.Static);
+				var parameterTypes = m.GetParameterTypes();
+				var result = new Expression[parameterTypes.Count];
+				for (int i = 0, n = parameterTypes.Count; i < n; ++i)
+				{
+					result[i] = Expression.Call(itIsAnyMethod.MakeGenericMethod(parameterTypes[i]));
+				}
+				return result;
+			}
 		}
 
 		internal bool HasAnyInnerMocks()
 		{
-			return this.InnerMocks.Any();
+			return this.Setups.ToArrayLive(s => s is FixedReturnValueSetup).Any();
 		}
 
 		internal IEnumerable<Mock> GetInnerMocks()
 		{
-			foreach (var returnValue in this.InnerMocks.Values)
+			foreach (var setup in this.Setups.ToArrayLive(s => s is FixedReturnValueSetup).Cast<FixedReturnValueSetup>())
 			{
-				Mock.TryGetFromReturnValue(returnValue, out var innerMock);
+				Mock.TryGetFromReturnValue(setup.ReturnValue, out var innerMock);
 				yield return innerMock;
 			}
 		}
 
 		internal bool TryGetInnerMock(MethodInfo method, out Mock innerMock, out object returnValue)
 		{
-			if (this.InnerMocks.TryGetValue(method, out returnValue))
+			foreach (var setup in this.Setups.ToArrayLive(s => s is FixedReturnValueSetup).Cast<FixedReturnValueSetup>())
 			{
-				Mock.TryGetFromReturnValue(returnValue, out innerMock);
-				return true;
+				if (setup.Method == method && Mock.TryGetFromReturnValue(setup.ReturnValue, out innerMock))
+				{
+					returnValue = setup.ReturnValue;
+					return true;
+				}
 			}
-			else
-			{
-				innerMock = default;
-				returnValue = default;
-				return false;
-			}
+
+			innerMock = default;
+			returnValue = default;
+			return false;
 		}
 
 		#endregion
