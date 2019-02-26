@@ -407,24 +407,25 @@ namespace Moq
 			this.Setups.Add(new FixedReturnValueSetup(method, arguments, expression, returnValue));
 		}
 
-		internal void AddFixedReturnValueSetup(MethodInfo method, object returnValue)
+		internal void AddFixedReturnValueSetup(MethodInfo method, object[] arguments, object returnValue)
 		{
 			Debug.Assert(Mock.TryGetFromReturnValue(returnValue, out _));
 
-			var arguments = GetArguments(method);
 			var obj = Expression.Parameter(this.MockedType, "mock");
-			var expression = Expression.Lambda(Expression.Call(obj, method, arguments), obj);
+			var argumentExpressions = GetArgumentExpressions(arguments);
+			var expression = Expression.Lambda(Expression.Call(obj, method, argumentExpressions), obj);
 
-			this.Setups.Add(new FixedReturnValueSetup(method, arguments, expression, returnValue));
+			this.Setups.Add(new FixedReturnValueSetup(method, argumentExpressions, expression, returnValue));
 
-			Expression[] GetArguments(MethodInfo m)
+			Expression[] GetArgumentExpressions(object[] a)
 			{
-				var itIsAnyMethod = typeof(It).GetMethod(nameof(It.IsAny), BindingFlags.Public | BindingFlags.Static);
-				var parameterTypes = m.GetParameterTypes();
-				var result = new Expression[parameterTypes.Count];
-				for (int i = 0, n = parameterTypes.Count; i < n; ++i)
+				var result = new Expression[a.Length];
+				for (int i = 0, n = a.Length; i < n; ++i)
 				{
-					result[i] = Expression.Call(itIsAnyMethod.MakeGenericMethod(parameterTypes[i]));
+					// NOTE to future maintainer(s): The following is possibly too simplistic;
+					// we *might* have to coerce `a[i]` to the parameter type in certain edge cases
+					// like nullable values.
+					result[i] = Expression.Constant(a[i]);
 				}
 				return result;
 			}

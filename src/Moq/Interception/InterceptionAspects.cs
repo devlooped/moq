@@ -350,7 +350,7 @@ namespace Moq
 
 				if (Mock.TryGetFromReturnValue(returnValue, out _))
 				{
-					mock.AddFixedReturnValueSetup(method, returnValue);
+					mock.AddFixedReturnValueSetup(method, invocation.Arguments, returnValue);
 				}
 
 				invocation.Return(returnValue);
