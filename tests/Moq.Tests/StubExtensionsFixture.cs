@@ -109,6 +109,46 @@ namespace Moq.Tests
 			Assert.Equal(10, mock.Object.Value);
 		}
 
+		[Fact]
+		public void Property_stubbed_by_SetupAllProperties_during_DefaultValue_Mock_has_initial_value_included_in_verification()
+		{
+			var mock = new Mock<IFoo> { DefaultValue = DefaultValue.Mock };
+			mock.SetupAllProperties();
+
+			var inner = Mock.Get(mock.Object.Bar);
+			inner.SetupGet(m => m.Value).Verifiable();
+
+			Assert.Throws<MockException>(() => mock.Verify());
+		}
+
+		[Fact]
+		public void Property_stubbed_by_SetupAllProperties_during_DefaultValue_Mock_can_retain_new_values()
+		{
+			var mock = new Mock<IFoo> { DefaultValue = DefaultValue.Mock };
+			mock.SetupAllProperties();
+
+			mock.Object.Bar = new Bar { Value = 1 };
+			Assert.Equal(1, mock.Object.Bar.Value);
+
+			mock.Object.Bar = new Bar { Value = 2 };
+			Assert.Equal(2, mock.Object.Bar.Value);
+		}
+
+		[Fact]
+		public void Property_stubbed_by_SetupAllProperties_during_DefaultValue_Mock_can_retain_new_values_after_initial_value_queried()
+		{
+			var mock = new Mock<IFoo> { DefaultValue = DefaultValue.Mock };
+			mock.SetupAllProperties();
+
+			_ = mock.Object.Bar;  // this is the only difference between this test and the previous one
+
+			mock.Object.Bar = new Bar { Value = 1 };
+			Assert.Equal(1, mock.Object.Bar.Value);
+
+			mock.Object.Bar = new Bar { Value = 2 };
+			Assert.Equal(2, mock.Object.Bar.Value);
+		}
+
 		private object GetValue() { return new object(); }
 
 		public interface IFoo
@@ -133,6 +173,11 @@ namespace Moq.Tests
 		public interface IBar
 		{
 			int Value { get; set; }
+		}
+
+		class Bar : IBar
+		{
+			public int Value { get; set; }
 		}
 
 		public interface IBaz : IBar
