@@ -389,6 +389,24 @@ namespace Moq
 				l.Body is MethodCallExpression lc && r.Body is MethodCallExpression rc && lc.Method == rc.Method;
 		}
 
+		internal void AddFixedReturnValueSetup(MethodInfo method, IReadOnlyList<Expression> arguments, LambdaExpression expression, object returnValue)
+		{
+			Debug.Assert(Mock.TryGetFromReturnValue(returnValue, out _));
+
+			if (expression.IsProperty())
+			{
+				var property = expression.ToPropertyInfo();
+				Guard.CanRead(property);
+
+				Debug.Assert(method == property.GetGetMethod(true));
+			}
+
+			ThrowIfSetupExpressionInvolvesUnsupportedMember(expression, method);
+			ThrowIfSetupMethodNotVisibleToProxyFactory(method);
+
+			this.Setups.Add(new FixedReturnValueSetup(method, arguments, expression, returnValue));
+		}
+
 		internal void AddFixedReturnValueSetup(MethodInfo method, object returnValue)
 		{
 			Debug.Assert(Mock.TryGetFromReturnValue(returnValue, out _));
