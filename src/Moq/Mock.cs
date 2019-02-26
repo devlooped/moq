@@ -219,7 +219,7 @@ namespace Moq
 				return false;
 			}
 
-			foreach (var inner in this.InnerMocks.Values)
+			foreach (var inner in this.GetInnerMocks())
 			{
 				if (!inner.Mock.TryVerify(out error))
 				{
@@ -254,7 +254,7 @@ namespace Moq
 				return false;
 			}
 
-			foreach (var inner in this.InnerMocks.Values)
+			foreach (var inner in this.GetInnerMocks())
 			{
 				if (!inner.Mock.TryVerifyAll(out error))
 				{
@@ -322,14 +322,14 @@ namespace Moq
 				// to verify `X`. If that succeeds, it's reasonable to expect that `m.A`, `m.A.B`, and
 				// `m.A.B.C` have implicitly been verified as well. Below, invocations such as those to
 				// the left of `X` are referred to as "transitive" (for lack of a better word).
-				if (mock.InnerMocks.Any())
+				if (mock.GetInnerMocks().Any())
 				{
 					for (int i = 0, n = unverifiedInvocations.Length; i < n; ++i)
 					{
 						// In order for an invocation to be "transitive", its return value has to be a
 						// sub-object (inner mock); and that sub-object has to have received at least
 						// one call:
-						var wasTransitiveInvocation = mock.InnerMocks.TryGetValue(unverifiedInvocations[i].Method, out MockWithWrappedMockObject inner)
+						var wasTransitiveInvocation = mock.TryGetInnerMock(unverifiedInvocations[i].Method, out MockWithWrappedMockObject inner)
 						                              && inner.Mock.MutableInvocations.Any();
 						if (wasTransitiveInvocation)
 						{
@@ -348,7 +348,7 @@ namespace Moq
 
 			// Perform verification for all automatically created sub-objects (that is, those
 			// created by "transitive" invocations):
-			foreach (var inner in mock.InnerMocks.Values)
+			foreach (var inner in mock.GetInnerMocks())
 			{
 				VerifyNoOtherCalls(inner.Mock);
 			}
@@ -919,7 +919,7 @@ namespace Moq
 				// code locations and therefore non-atomic. It would be good if those could be combined
 				// (`InnerMocks.GetOrAdd`), but that might not be easily possible since `InnerMocks` is
 				// only mocks while default value providers can also return plain, unmocked values.
-				this.InnerMocks.TryAdd(method, new MockWithWrappedMockObject(unwrappedMockedResult.Mock, result));
+				this.AddInnerMock(method, new MockWithWrappedMockObject(unwrappedMockedResult.Mock, result));
 			}
 
 			return result;
@@ -951,6 +951,25 @@ namespace Moq
 			}
 
 			return obj;
+		}
+
+		#endregion
+
+		#region Inner mocks
+
+		internal void AddInnerMock(MethodInfo method, in MockWithWrappedMockObject inner)
+		{
+			this.InnerMocks.TryAdd(method, inner);
+		}
+
+		internal IEnumerable<MockWithWrappedMockObject> GetInnerMocks()
+		{
+			return this.InnerMocks.Values;
+		}
+
+		internal bool TryGetInnerMock(MethodInfo method, out MockWithWrappedMockObject inner)
+		{
+			return this.InnerMocks.TryGetValue(method, out inner);
 		}
 
 		#endregion

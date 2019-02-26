@@ -166,7 +166,7 @@ namespace Moq
 
 			Mock fluentMock;
 			MockWithWrappedMockObject innerMock;
-			if (mock.InnerMocks.TryGetValue(info, out innerMock))
+			if (mock.TryGetInnerMock(info, out innerMock))
 			{
 				fluentMock = innerMock.Mock;
 			}

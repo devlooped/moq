@@ -338,7 +338,7 @@ namespace Moq
 			{
 				invocation.Return();
 			}
-			else if (mock.InnerMocks.TryGetValue(method, out var inner))
+			else if (mock.TryGetInnerMock(method, out var inner))
 			{
 				invocation.Return(inner.WrappedMockObject);
 			}
