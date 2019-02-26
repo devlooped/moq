@@ -54,5 +54,25 @@ namespace Moq.Tests
 				Assert.Throws<MockException>(() => xMock.Verify());
 			}
 		}
+
+		public class StubbedProperties
+		{
+			[Fact]
+			public void Stubbed_property_can_retain_its_value_even_in_presence_of_a_inner_mock_registration()
+			{
+				var xMock = new Mock<IX> { DefaultValue = DefaultValue.Mock };
+				xMock.SetupAllProperties();
+
+				// The first query to a stubbed property should cause generation of a default value.
+				// Because we are using `DefaultValue.Mock`, this should trigger registration of an inner mock:
+				var y = xMock.Object.Y;
+				Assert.NotNull(y);
+
+				// We should (obviously) still be able to override that initial value:
+				xMock.Object.Y = null;
+				y = xMock.Object.Y;
+				Assert.Null(y);
+			}
+		}
 	}
 }
