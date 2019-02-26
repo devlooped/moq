@@ -165,28 +165,22 @@ namespace Moq
 			Guard.Mockable(info.ReturnType);
 
 			Mock fluentMock;
-			MockWithWrappedMockObject innerMock;
-			if (mock.TryGetInnerMock(info, out innerMock))
+			object result;
+			if (mock.TryGetInnerMock(info, out var inner))
 			{
-				fluentMock = innerMock.Mock;
+				fluentMock = inner.Mock;
+				result = inner.WrappedMockObject;
 			}
 			else
 			{
-				fluentMock = ((IMocked)mock.GetDefaultValue(info, useAlternateProvider: DefaultValueProvider.Mock)).Mock;
-				Mock.SetupAllProperties(fluentMock);
+				result = mock.GetDefaultValue(info, out fluentMock, useAlternateProvider: DefaultValueProvider.Mock);
+				Debug.Assert(fluentMock != null);
 
-				innerMock = new MockWithWrappedMockObject(fluentMock, fluentMock.Object);
-				//                                                    ^^^^^^^^^^^^^^^^^
-				// NOTE: Above, we are assuming that a default value was returned that is neither a `Task<T>` nor a `ValueTask<T>`,
-				// i.e. nothing we'd need to first "unwrap" to get at the actual mocked object. This assumption would seem permissible
-				// since the present method gets called only for multi-dot expressions ("recursive mocking"), which do not allow
-				// `await` expressions. Therefore we don't need to deal with `Task<T>` nor `ValueTask<T>`, and we proceed as if the
-				// returned default value were already "unwrapped".
+				mock.AddInnerMock(info, new MockWithWrappedMockObject(fluentMock, result));
+				Mock.SetupAllProperties(fluentMock);
 			}
 
-			var result = (TResult)innerMock.WrappedMockObject;
-
-			mock.Setup(setup).Returns(result);
+			mock.Setup(setup).Returns((TResult)result);
 
 			return (Mock<TResult>)fluentMock;
 		}

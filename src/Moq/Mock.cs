@@ -673,21 +673,23 @@ namespace Moq
 					if (valueNotSet)
 					{
 						object initialValue;
+						Mock innerMock;
 						try
 						{
-							initialValue = mock.GetDefaultValue(getter, useAlternateProvider: defaultValueProvider);
+							initialValue = mock.GetDefaultValue(getter, out innerMock, useAlternateProvider: defaultValueProvider);
 						}
 						catch
 						{
 							// Since this method performs a batch operation, a single failure of the default value
 							// provider should not tear down the whole operation. The empty default value provider
 							// is a safe fallback because it does not throw.
-							initialValue = mock.GetDefaultValue(getter, useAlternateProvider: DefaultValueProvider.Empty);
+							initialValue = mock.GetDefaultValue(getter, out innerMock, useAlternateProvider: DefaultValueProvider.Empty);
 						}
 
-						if (initialValue is IMocked mocked)
+						if (innerMock != null)
 						{
-							SetupAllPropertiesPexProtected(mocked.Mock, defaultValueProvider);
+							mock.AddInnerMock(getter, new MockWithWrappedMockObject(innerMock, initialValue));
+							SetupAllPropertiesPexProtected(innerMock, defaultValueProvider);
 						}
 
 						value = initialValue;
@@ -893,7 +895,7 @@ namespace Moq
 			this.ConfiguredDefaultValues[typeof(TReturn)] = value;
 		}
 
-		internal object GetDefaultValue(MethodInfo method, DefaultValueProvider useAlternateProvider = null)
+		internal object GetDefaultValue(MethodInfo method, out Mock candidateInnerMock, DefaultValueProvider useAlternateProvider = null)
 		{
 			Debug.Assert(method != null);
 			Debug.Assert(method.ReturnType != null);
@@ -901,25 +903,14 @@ namespace Moq
 
 			if (this.ConfiguredDefaultValues.TryGetValue(method.ReturnType, out object configuredDefaultValue))
 			{
+				candidateInnerMock = null;
 				return configuredDefaultValue;
 			}
 
 			var result = (useAlternateProvider ?? this.DefaultValueProvider).GetDefaultReturnValue(method, this);
 			var unwrappedResult = TryUnwrapResultFromCompletedTaskRecursively(result);
 
-			if (unwrappedResult is IMocked unwrappedMockedResult)
-			{
-				// TODO: Perhaps the following `InnerMocks` update isn't in quite the right place yet.
-				// There are two main places in Moq where `InnerMocks` are used: `Mock<T>.FluentMock` and
-				// the `HandleMockRecursion` interception strategy. Both places first query `InnerMocks`,
-				// and if no value for a given member is present, the default value provider get invoked
-				// via the present method. Querying and updating `InnerMocks` is thus spread over two
-				// code locations and therefore non-atomic. It would be good if those could be combined
-				// (`InnerMocks.GetOrAdd`), but that might not be easily possible since `InnerMocks` is
-				// only mocks while default value providers can also return plain, unmocked values.
-				this.AddInnerMock(method, new MockWithWrappedMockObject(unwrappedMockedResult.Mock, result));
-			}
-
+			candidateInnerMock = (unwrappedResult as IMocked)?.Mock;
 			return result;
 		}
 
