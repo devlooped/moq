@@ -20,6 +20,31 @@ namespace Moq.Tests
 			void Method();
 		}
 
+		public class Reachability
+		{
+			[Fact]
+			public void Inner_mock_that_becomes_unreachable_is_no_longer_included_in_verification()
+			{
+				var xMock = new Mock<IX>();
+				xMock.Setup(m => m.Y.Method()).Verifiable("1");
+				xMock.Setup(m => m.Y).Verifiable("2");
+				_ = xMock.Object.Y;
+
+				xMock.Verify();
+			}
+
+			[Fact]
+			public void Initial_value_of_stubbed_property_is_no_longer_included_in_verification_when_property_set()
+			{
+				var xMock = new Mock<IX> { DefaultValue = DefaultValue.Mock };
+				xMock.SetupAllProperties();
+				Mock.Get(xMock.Object.Y).Setup(m => m.Method()).Verifiable();
+				xMock.Object.Y = null;
+
+				xMock.Verify();
+			}
+		}
+
 		public class SetReturnsDefault
 		{
 			[Fact]
