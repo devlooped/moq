@@ -921,7 +921,26 @@ namespace Moq
 
 		internal void AddInnerMockSetup(MethodInfo method, object returnValue)
 		{
-			this.Setups.Add(new InnerMockSetup(method, returnValue));
+			var mock = Expression.Parameter(method.DeclaringType, "mock");
+			var arguments = GetArguments(method);
+			var expression = Expression.Lambda(Expression.Call(mock, method, arguments), mock);
+
+			this.Setups.Add(new InnerMockSetup(method, arguments, expression, returnValue));
+
+			Expression[] GetArguments(MethodInfo m)
+			{
+				var parameterTypes = m.GetParameterTypes();
+				var parameterCount = parameterTypes.Count;
+
+				var result = new Expression[parameterCount];
+				var itIsAnyMethod = typeof(It).GetMethod(nameof(It.IsAny), BindingFlags.Public | BindingFlags.Static);
+				for (int i = 0; i < parameterCount; ++i)
+				{
+					result[i] = Expression.Call(itIsAnyMethod.MakeGenericMethod(parameterTypes[i]));
+				}
+
+				return result;
+			}
 		}
 
 		internal void AddInnerMockSetup(MethodInfo method, IReadOnlyList<Expression> arguments, LambdaExpression expression, object returnValue)
