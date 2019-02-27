@@ -197,36 +197,51 @@ namespace Moq
 		/// <include file='Mock.xdoc' path='docs/doc[@for="Mock.Verify"]/*'/>
 		public void Verify()
 		{
+			var error = this.TryVerify();
+			if (error?.IsVerificationError == true)
+			{
+				throw error;
+			}
+		}
+
+		/// <include file='Mock.xdoc' path='docs/doc[@for="Mock.VerifyAll"]/*'/>
+		public void VerifyAll()
+		{
+			var error = this.TryVerifyAll();
+			if (error?.IsVerificationError == true)
+			{
+				throw error;
+			}
+		}
+
+		internal MockException TryVerify()
+		{
 			foreach (Invocation invocation in this.MutableInvocations)
 			{
 				invocation.MarkAsVerifiedIfMatchedByVerifiableSetup();
 			}
 
-			this.VerifySetups(setup => setup.Verify());
+			return this.TryVerifySetups(setup => setup.TryVerify());
 		}
 
-		/// <include file='Mock.xdoc' path='docs/doc[@for="Mock.VerifyAll"]/*'/>
-		public void VerifyAll()
+		internal MockException TryVerifyAll()
 		{
 			foreach (Invocation invocation in this.MutableInvocations)
 			{
 				invocation.MarkAsVerifiedIfMatchedBySetup();
 			}
 
-			this.VerifySetups(setup => setup.VerifyAll());
+			return this.TryVerifySetups(setup => setup.TryVerifyAll());
 		}
 
-		private void VerifySetups(Action<Setup> verifySetup)
+		private MockException TryVerifySetups(Func<Setup, MockException> verifySetup)
 		{
 			var errors = new List<MockException>();
 
 			foreach (var setup in this.Setups.ToArrayLive(_ => true))
 			{
-				try
-				{
-					verifySetup(setup);
-				}
-				catch (MockException error) when (error.IsVerificationError)
+				var error = verifySetup(setup);
+				if (error?.IsVerificationError == true)
 				{
 					errors.Add(error);
 				}
@@ -234,9 +249,13 @@ namespace Moq
 
 			if (errors.Count > 0)
 			{
-				throw MockException.Combined(
+				return MockException.Combined(
 					errors,
 					preamble: string.Format(CultureInfo.CurrentCulture, Resources.VerificationErrorsOfMock, this));
+			}
+			else
+			{
+				return null;
 			}
 		}
 

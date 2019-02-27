@@ -310,12 +310,9 @@ namespace Moq
 			this.returnOrThrowResponse = new ThrowExceptionResponse(exception);
 		}
 
-		public override void VerifyAll()
+		public override MockException TryVerifyAll()
 		{
-			if ((this.flags & Flags.Invoked) == 0)
-			{
-				throw MockException.UnmatchedSetup(this);
-			}
+			return (this.flags & Flags.Invoked) == 0 ? MockException.UnmatchedSetup(this) : null;
 		}
 
 		public void Verifiable()

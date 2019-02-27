@@ -30,8 +30,6 @@ namespace Moq
 			invocation.Return();
 		}
 
-		public override void VerifyAll()
-		{
-		}
+		public override MockException TryVerifyAll() => null;
 	}
 }

@@ -27,19 +27,18 @@ namespace Moq
 			return mock != null;
 		}
 
-		public static void VerifyInnerMock(this IDeterministicReturnValueSetup setup, Action<Mock> verify)
+		public static MockException TryVerifyInnerMock(this IDeterministicReturnValueSetup setup, Func<Mock, MockException> verify)
 		{
 			if (setup.ReturnsInnerMock(out var innerMock))
 			{
-				try
+				var error = verify(innerMock);
+				if (error?.IsVerificationError == true)
 				{
-					verify(innerMock);
-				}
-				catch (MockException error) when (error.IsVerificationError)
-				{
-					throw MockException.FromInnerMockOf(setup, error);
+					return MockException.FromInnerMockOf(setup, error);
 				}
 			}
+
+			return null;
 		}
 	}
 }
