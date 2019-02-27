@@ -694,6 +694,15 @@ namespace Moq.Properties {
 		}
 		
 		/// <summary>
+		///   Looks up a localized string similar to {0}:.
+		/// </summary>
+		internal static string VerificationErrorsOfInnerMock {
+			get {
+				return ResourceManager.GetString("VerificationErrorsOfInnerMock", resourceCulture);
+			}
+		}
+		
+		/// <summary>
 		///   Looks up a localized string similar to {0}:
 		///This mock failed verification due to the following:.
 		/// </summary>

@@ -202,7 +202,7 @@ namespace Moq
 				invocation.MarkAsVerifiedIfMatchedByVerifiableSetup();
 			}
 
-			this.VerifySetups(setup => setup.Verify(), innerMock => innerMock.Verify());
+			this.VerifySetups(setup => setup.Verify());
 		}
 
 		/// <include file='Mock.xdoc' path='docs/doc[@for="Mock.VerifyAll"]/*'/>
@@ -213,10 +213,10 @@ namespace Moq
 				invocation.MarkAsVerifiedIfMatchedBySetup();
 			}
 
-			this.VerifySetups(setup => setup.VerifyAll(), innerMock => innerMock.VerifyAll());
+			this.VerifySetups(setup => setup.VerifyAll());
 		}
 
-		private void VerifySetups(Action<Setup> verifySetup, Action<Mock> verifyInnerMock)
+		private void VerifySetups(Action<Setup> verifySetup)
 		{
 			var errors = new List<MockException>();
 
@@ -225,18 +225,6 @@ namespace Moq
 				try
 				{
 					verifySetup(setup);
-				}
-				catch (MockException error) when (error.IsVerificationError)
-				{
-					errors.Add(error);
-				}
-			}
-
-			foreach (var inner in this.GetInnerMockSetups())
-			{
-				try
-				{
-					verifyInnerMock(inner.GetInnerMock());
 				}
 				catch (MockException error) when (error.IsVerificationError)
 				{

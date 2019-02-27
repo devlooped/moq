@@ -358,4 +358,7 @@ This mock failed verification due to the following:</value>
 	<data name="VerificationErrorsOfMockRepository" xml:space="preserve">
 		<value>The mock repository failed verification due to the following:</value>
 	</data>
+	<data name="VerificationErrorsOfInnerMock" xml:space="preserve">
+		<value>{0}:</value>
+	</data>
 </root>

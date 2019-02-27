@@ -138,6 +138,18 @@ namespace Moq
 					setup));
 		}
 
+		internal static MockException FromInnerMockOf(IDeterministicReturnValueSetup setup, MockException error)
+		{
+			var message = new StringBuilder();
+
+			message.AppendLine(string.Format(CultureInfo.CurrentCulture, Resources.VerificationErrorsOfInnerMock, setup)).TrimEnd().AppendLine()
+			       .AppendLine();
+
+			message.AppendIndented(error.Message, count: 3);
+
+			return new MockException(error.Reasons, message.ToString());
+		}
+
 		/// <summary>
 		///   Returns an exception whose message is the concatenation of the given <paramref name="errors"/>' messages
 		///   and whose reason(s) is the combination of the given <paramref name="errors"/>' reason(s).
