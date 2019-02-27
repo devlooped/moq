@@ -1528,6 +1528,51 @@ namespace Moq.Tests
 			mock.Protected().Verify("Populate", Times.Once(), exactParameterMatch: true, ItExpr.Ref<ChildDto>.IsAny);
 		}
 
+		public class Exclusion_of_unreachable_inner_mocks
+		{
+			[Fact]
+			public void Failing_setup_detached_at_root_is_excluded_from_verification()
+			{
+				var xMock = new Mock<IX>();
+
+				// Set up a call that would fail verification:
+				xMock.Setup(x => x.Y.M()).Verifiable("M never called");
+
+				// Reset the root `.Y` of the above setup `.Y.M()` to something that'll pass verification:
+				xMock.Setup(x => x.Y).Verifiable();
+				_ = xMock.Object.Y;
+
+				// The first setup should be shadowed by the second, therefore verification should pass:
+				xMock.Verify();
+			}
+
+			[Fact]
+			public void Failing_setup_detached_by_resetting_stubbed_property_is_excluded_from_verification()
+			{
+				var xMock = new Mock<IX> { DefaultValue = DefaultValue.Mock };
+
+				// Setup an inner mock (as the initial value of a stubbed property) that would fail verification:
+				xMock.SetupAllProperties();
+				Mock.Get(xMock.Object.Y).Setup(y => y.M()).Verifiable("M never called");
+
+				// Reset the stubbed property to a different value:
+				xMock.Object.Y = null;
+
+				// Inner mock no longer reachable through `xMock`, verification should succeed:
+				xMock.Verify();
+			}
+
+			public interface IX
+			{
+				IY Y { get; set; }
+			}
+
+			public interface IY
+			{
+				void M();
+			}
+		}
+
 		public interface IBar
 		{
 			int? Value { get; set; }
