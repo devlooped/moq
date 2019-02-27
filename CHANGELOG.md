@@ -23,7 +23,7 @@ This release contains several **minor breaking changes**. Please review your cod
 
 * `InvalidOperationException` when specifiying setup on mock with mock containing property of type `Nullable<T>` (@dav1dev, #725)
 * `Verify` gets confused between the same generic and non-generic signature (@lepijohnny, #749)
-
+* Setup gets included in `Verify` despite being "unreachable" (@stakx, #703)
 
 ## 4.10.1 (2018-12-03)
 
