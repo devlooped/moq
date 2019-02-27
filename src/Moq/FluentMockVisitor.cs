@@ -2,6 +2,7 @@
 // All rights reserved. Licensed under the BSD 3-Clause License; see License.txt.
 
 using System;
+using System.Collections.Generic;
 using System.Diagnostics;
 using System.Linq;
 using System.Linq.Expressions;
@@ -146,16 +147,21 @@ namespace Moq
 			Guard.Mockable(typeof(TResult));
 
 			MethodInfo info;
+			IReadOnlyList<Expression> arguments;
 			if (setup.Body.NodeType == ExpressionType.MemberAccess)
 			{
 				var memberExpr = ((MemberExpression)setup.Body);
 				memberExpr.ThrowIfNotMockeable();
 
 				info = ((PropertyInfo)memberExpr.Member).GetGetMethod();
+				arguments = new Expression[0];
 			}
 			else if (setup.Body.NodeType == ExpressionType.Call)
 			{
-				info = ((MethodCallExpression)setup.Body).Method;
+				var callExpr = (MethodCallExpression)setup.Body;
+
+				info = callExpr.Method;
+				arguments = callExpr.Arguments;
 			}
 			else
 			{
@@ -165,28 +171,21 @@ namespace Moq
 			Guard.Mockable(info.ReturnType);
 
 			Mock fluentMock;
-			MockWithWrappedMockObject innerMock;
-			if (mock.InnerMocks.TryGetValue(info, out innerMock))
+			object result;
+			if (mock.GetInnerMockSetups().TryFind(info, out var inner))
 			{
-				fluentMock = innerMock.Mock;
+				fluentMock = inner.GetInnerMock();
+				result = inner.ReturnValue;
 			}
 			else
 			{
-				fluentMock = ((IMocked)mock.GetDefaultValue(info, useAlternateProvider: DefaultValueProvider.Mock)).Mock;
-				Mock.SetupAllProperties(fluentMock);
+				result = mock.GetDefaultValue(info, out fluentMock, useAlternateProvider: DefaultValueProvider.Mock);
+				Debug.Assert(fluentMock != null);
 
-				innerMock = new MockWithWrappedMockObject(fluentMock, fluentMock.Object);
-				//                                                    ^^^^^^^^^^^^^^^^^
-				// NOTE: Above, we are assuming that a default value was returned that is neither a `Task<T>` nor a `ValueTask<T>`,
-				// i.e. nothing we'd need to first "unwrap" to get at the actual mocked object. This assumption would seem permissible
-				// since the present method gets called only for multi-dot expressions ("recursive mocking"), which do not allow
-				// `await` expressions. Therefore we don't need to deal with `Task<T>` nor `ValueTask<T>`, and we proceed as if the
-				// returned default value were already "unwrapped".
+				Mock.SetupAllProperties(fluentMock);
 			}
 
-			var result = (TResult)innerMock.WrappedMockObject;
-
-			mock.Setup(setup).Returns(result);
+			mock.AddInnerMockSetup(info, arguments, setup, result);
 
 			return (Mock<TResult>)fluentMock;
 		}

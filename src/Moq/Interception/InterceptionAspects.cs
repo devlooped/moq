@@ -334,17 +334,33 @@ namespace Moq
 				}
 			}
 
+			var ambientObserverActive = AmbientObserver.IsActive(out _);
+
 			if (method.ReturnType == typeof(void))
 			{
 				invocation.Return();
 			}
-			else if (mock.InnerMocks.TryGetValue(method, out var inner))
-			{
-				invocation.Return(inner.WrappedMockObject);
+			else if (ambientObserverActive && mock.GetInnerMockSetups().TryFind(method, out var inner))
+			{   //   ^^^^^^^^^^^^^^^^^^^^^
+				// This guards `GetInnerMockSetups`, which is a fairly expensive operation at current.
+				// If the ambient observer were *not* active, `FindAndExecuteMatchingSetup` would have
+				// matched the invocation against the inner mock setup we're looking for now. We need to
+				// do this for the ambient observer as it skips over `FindAndExecuteMatchingSetup`
+				// (because setups can have arbitrary side effects). Deterministic return value setups
+				// are the only safe ones to execute.
+
+				invocation.Return(inner.ReturnValue);
 			}
 			else
 			{
-				invocation.Return(mock.GetDefaultValue(method));
+				Debug.Assert(!mock.GetInnerMockSetups().TryFind(method, out _));  // see comment above
+
+				var returnValue = mock.GetDefaultValue(method, out var innerMock);
+				if (innerMock != null)
+				{
+					mock.AddInnerMockSetup(method, returnValue);
+				}
+				invocation.Return(returnValue);
 			}
 
 			return InterceptionAction.Stop;

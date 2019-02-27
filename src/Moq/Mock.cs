@@ -155,8 +155,6 @@ namespace Moq
 		/// </summary>
 		internal abstract Type[] InheritedInterfaces { get; }
 
-		internal abstract ConcurrentDictionary<MethodInfo, MockWithWrappedMockObject> InnerMocks { get; }
-
 		internal abstract bool IsObjectInitialized { get; }
 
 		/// <summary>
@@ -219,9 +217,9 @@ namespace Moq
 				return false;
 			}
 
-			foreach (var inner in this.InnerMocks.Values)
+			foreach (var inner in this.GetInnerMockSetups())
 			{
-				if (!inner.Mock.TryVerify(out error))
+				if (!inner.GetInnerMock().TryVerify(out error))
 				{
 					return false;
 				}
@@ -254,9 +252,9 @@ namespace Moq
 				return false;
 			}
 
-			foreach (var inner in this.InnerMocks.Values)
+			foreach (var inner in this.GetInnerMockSetups())
 			{
-				if (!inner.Mock.TryVerifyAll(out error))
+				if (!inner.GetInnerMock().TryVerifyAll(out error))
 				{
 					return false;
 				}
@@ -315,6 +313,8 @@ namespace Moq
 		{
 			var unverifiedInvocations = mock.MutableInvocations.ToArray(invocation => !invocation.Verified);
 
+			var innerMockSetups = mock.GetInnerMockSetups();
+
 			if (unverifiedInvocations.Any())
 			{
 				// There are some invocations that shouldn't require explicit verification by the user.
@@ -322,15 +322,15 @@ namespace Moq
 				// to verify `X`. If that succeeds, it's reasonable to expect that `m.A`, `m.A.B`, and
 				// `m.A.B.C` have implicitly been verified as well. Below, invocations such as those to
 				// the left of `X` are referred to as "transitive" (for lack of a better word).
-				if (mock.InnerMocks.Any())
+				if (innerMockSetups.Any())
 				{
 					for (int i = 0, n = unverifiedInvocations.Length; i < n; ++i)
 					{
 						// In order for an invocation to be "transitive", its return value has to be a
 						// sub-object (inner mock); and that sub-object has to have received at least
 						// one call:
-						var wasTransitiveInvocation = mock.InnerMocks.TryGetValue(unverifiedInvocations[i].Method, out MockWithWrappedMockObject inner)
-						                              && inner.Mock.MutableInvocations.Any();
+						var wasTransitiveInvocation = innerMockSetups.TryFind(unverifiedInvocations[i].Method, out var inner)
+						                              && inner.GetInnerMock().MutableInvocations.Any();
 						if (wasTransitiveInvocation)
 						{
 							unverifiedInvocations[i] = null;
@@ -348,9 +348,9 @@ namespace Moq
 
 			// Perform verification for all automatically created sub-objects (that is, those
 			// created by "transitive" invocations):
-			foreach (var inner in mock.InnerMocks.Values)
+			foreach (var inner in innerMockSetups)
 			{
-				VerifyNoOtherCalls(inner.Mock);
+				VerifyNoOtherCalls(inner.GetInnerMock());
 			}
 		}
 
@@ -675,21 +675,22 @@ namespace Moq
 					if (valueNotSet)
 					{
 						object initialValue;
+						Mock innerMock;
 						try
 						{
-							initialValue = mock.GetDefaultValue(getter, useAlternateProvider: defaultValueProvider);
+							initialValue = mock.GetDefaultValue(getter, out innerMock, useAlternateProvider: defaultValueProvider);
 						}
 						catch
 						{
 							// Since this method performs a batch operation, a single failure of the default value
 							// provider should not tear down the whole operation. The empty default value provider
 							// is a safe fallback because it does not throw.
-							initialValue = mock.GetDefaultValue(getter, useAlternateProvider: DefaultValueProvider.Empty);
+							initialValue = mock.GetDefaultValue(getter, out innerMock, useAlternateProvider: DefaultValueProvider.Empty);
 						}
 
-						if (initialValue is IMocked mocked)
+						if (innerMock != null)
 						{
-							SetupAllPropertiesPexProtected(mocked.Mock, defaultValueProvider);
+							SetupAllPropertiesPexProtected(innerMock, defaultValueProvider);
 						}
 
 						value = initialValue;
@@ -895,7 +896,7 @@ namespace Moq
 			this.ConfiguredDefaultValues[typeof(TReturn)] = value;
 		}
 
-		internal object GetDefaultValue(MethodInfo method, DefaultValueProvider useAlternateProvider = null)
+		internal object GetDefaultValue(MethodInfo method, out Mock candidateInnerMock, DefaultValueProvider useAlternateProvider = null)
 		{
 			Debug.Assert(method != null);
 			Debug.Assert(method.ReturnType != null);
@@ -903,54 +904,65 @@ namespace Moq
 
 			if (this.ConfiguredDefaultValues.TryGetValue(method.ReturnType, out object configuredDefaultValue))
 			{
+				candidateInnerMock = null;
 				return configuredDefaultValue;
 			}
 
 			var result = (useAlternateProvider ?? this.DefaultValueProvider).GetDefaultReturnValue(method, this);
-			var unwrappedResult = TryUnwrapResultFromCompletedTaskRecursively(result);
+			var unwrappedResult = Unwrap.ResultIfCompletedTask(result);
 
-			if (unwrappedResult is IMocked unwrappedMockedResult)
-			{
-				// TODO: Perhaps the following `InnerMocks` update isn't in quite the right place yet.
-				// There are two main places in Moq where `InnerMocks` are used: `Mock<T>.FluentMock` and
-				// the `HandleMockRecursion` interception strategy. Both places first query `InnerMocks`,
-				// and if no value for a given member is present, the default value provider get invoked
-				// via the present method. Querying and updating `InnerMocks` is thus spread over two
-				// code locations and therefore non-atomic. It would be good if those could be combined
-				// (`InnerMocks.GetOrAdd`), but that might not be easily possible since `InnerMocks` is
-				// only mocks while default value providers can also return plain, unmocked values.
-				this.InnerMocks.TryAdd(method, new MockWithWrappedMockObject(unwrappedMockedResult.Mock, result));
-			}
-
+			candidateInnerMock = (unwrappedResult as IMocked)?.Mock;
 			return result;
 		}
 
-		/// <summary>
-		/// Recursively unwraps the result from completed <see cref="Task{TResult}"/> or <see cref="ValueTask{TResult}"/> instances.
-		/// If the given value is not a task, the value itself is returned.
-		/// </summary>
-		/// <param name="obj">The value to be unwrapped.</param>
-		private static object TryUnwrapResultFromCompletedTaskRecursively(object obj)
+		#endregion
+
+		#region Inner mocks
+
+		internal void AddInnerMockSetup(MethodInfo method, object returnValue)
 		{
-			if (obj != null)
+			var mock = Expression.Parameter(method.DeclaringType, "mock");
+			var arguments = GetArguments(method);
+			var expression = Expression.Lambda(Expression.Call(mock, method, arguments), mock);
+
+			this.Setups.Add(new InnerMockSetup(method, arguments, expression, returnValue));
+
+			Expression[] GetArguments(MethodInfo m)
 			{
-				var objType = obj.GetType();
-				if (objType.GetTypeInfo().IsGenericType)
+				var parameterTypes = m.GetParameterTypes();
+				var parameterCount = parameterTypes.Count;
+
+				var result = new Expression[parameterCount];
+				var itIsAnyMethod = typeof(It).GetMethod(nameof(It.IsAny), BindingFlags.Public | BindingFlags.Static);
+				for (int i = 0; i < parameterCount; ++i)
 				{
-					var genericTypeDefinition = objType.GetGenericTypeDefinition();
-					if (genericTypeDefinition == typeof(Task<>) || genericTypeDefinition == typeof(ValueTask<>))
-					{
-						var isCompleted = (bool)objType.GetProperty("IsCompleted").GetValue(obj, null);
-						if (isCompleted)
-						{
-							var innerObj = objType.GetProperty("Result").GetValue(obj, null);
-							return TryUnwrapResultFromCompletedTaskRecursively(innerObj);
-						}
-					}
+					result[i] = Expression.Call(itIsAnyMethod.MakeGenericMethod(parameterTypes[i]));
 				}
+
+				return result;
+			}
+		}
+
+		internal void AddInnerMockSetup(MethodInfo method, IReadOnlyList<Expression> arguments, LambdaExpression expression, object returnValue)
+		{
+			if (expression.IsProperty())
+			{
+				var property = expression.ToPropertyInfo();
+				Guard.CanRead(property);
+
+				Debug.Assert(method == property.GetGetMethod(true));
 			}
 
-			return obj;
+			ThrowIfSetupExpressionInvolvesUnsupportedMember(expression, method);
+			ThrowIfSetupMethodNotVisibleToProxyFactory(method);
+
+			this.Setups.Add(new InnerMockSetup(method, arguments, expression, returnValue));
+		}
+
+		internal IEnumerable<IDeterministicReturnValueSetup> GetInnerMockSetups()
+		{
+			return this.Setups.ToArrayLive(s => s is IDeterministicReturnValueSetup drvs && drvs.ReturnsInnerMock(out _))
+			                  .Cast<IDeterministicReturnValueSetup>();
 		}
 
 		#endregion

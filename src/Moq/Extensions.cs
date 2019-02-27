@@ -305,6 +305,21 @@ namespace Moq
 				}
 			}
 		}
+
+		public static bool TryFind(this IEnumerable<IDeterministicReturnValueSetup> setups, MethodInfo method, out IDeterministicReturnValueSetup setup)
+		{
+			foreach (Setup s in setups)
+			{
+				if (s.Method == method)
+				{
+					setup = (IDeterministicReturnValueSetup)s;
+					return true;
+				}
+			}
+
+			setup = default;
+			return false;
+		}
 	}
 
 	internal readonly struct EventWithTarget
