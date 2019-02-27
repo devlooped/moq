@@ -53,11 +53,14 @@ namespace Moq
 			return builder.ToString();
 		}
 
-		public bool TryVerify()
+		public virtual void Verify()
 		{
-			return !this.IsVerifiable || this.TryVerifyAll();
+			if (this.IsVerifiable)
+			{
+				this.VerifyAll();
+			}
 		}
 
-		public abstract bool TryVerifyAll();
+		public abstract void VerifyAll();
 	}
 }

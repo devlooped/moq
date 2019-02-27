@@ -6,6 +6,8 @@ using System.Collections.Generic;
 using System.ComponentModel;
 using System.Linq;
 
+using Moq.Properties;
+
 namespace Moq
 {
 	/// <summary>
@@ -363,7 +365,7 @@ namespace Moq
 
 			if (errors.Count > 0)
 			{
-				throw MockException.Combined(errors);
+				throw MockException.Combined(errors, preamble: Resources.VerificationErrorsOfMockRepository);
 			}
 		}
 	}

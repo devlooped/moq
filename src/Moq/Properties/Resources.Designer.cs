@@ -647,12 +647,12 @@ namespace Moq.Properties {
 		}
 		
 		/// <summary>
-		///   Looks up a localized string similar to The following setups on mock &apos;{0}&apos; were not matched:
-		///{1}.
+		///   Looks up a localized string similar to {0}:
+		///This setup was not matched..
 		/// </summary>
-		internal static string UnmatchedSetups {
+		internal static string UnmatchedSetup {
 			get {
-				return ResourceManager.GetString("UnmatchedSetups", resourceCulture);
+				return ResourceManager.GetString("UnmatchedSetup", resourceCulture);
 			}
 		}
 		
@@ -675,8 +675,8 @@ namespace Moq.Properties {
 		}
 		
 		/// <summary>
-		///   Looks up a localized string similar to The following invocations were not verified:
-		///{0}.
+		///   Looks up a localized string similar to {0}:
+		///This mock failed verification due to the following unverified invocations:.
 		/// </summary>
 		internal static string UnverifiedInvocations {
 			get {
@@ -690,6 +690,25 @@ namespace Moq.Properties {
 		internal static string UseItExprIsNullRatherThanNullArgumentValue {
 			get {
 				return ResourceManager.GetString("UseItExprIsNullRatherThanNullArgumentValue", resourceCulture);
+			}
+		}
+		
+		/// <summary>
+		///   Looks up a localized string similar to {0}:
+		///This mock failed verification due to the following:.
+		/// </summary>
+		internal static string VerificationErrorsOfMock {
+			get {
+				return ResourceManager.GetString("VerificationErrorsOfMock", resourceCulture);
+			}
+		}
+		
+		/// <summary>
+		///   Looks up a localized string similar to The mock repository failed verification due to the following:.
+		/// </summary>
+		internal static string VerificationErrorsOfMockRepository {
+			get {
+				return ResourceManager.GetString("VerificationErrorsOfMockRepository", resourceCulture);
 			}
 		}
 		

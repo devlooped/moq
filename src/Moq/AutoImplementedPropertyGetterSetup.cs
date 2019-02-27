@@ -29,6 +29,8 @@ namespace Moq
 			invocation.Return(this.getter.Invoke());
 		}
 
-		public override bool TryVerifyAll() => true;
+		public override void VerifyAll()
+		{
+		}
 	}
 }

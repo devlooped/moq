@@ -136,9 +136,9 @@
 	<data name="ReturnValueRequired" xml:space="preserve">
 		<value>Invocation needs to return a value and therefore must have a corresponding setup that provides it.</value>
 	</data>
-	<data name="UnmatchedSetups" xml:space="preserve">
-		<value>The following setups on mock '{0}' were not matched:
-{1}</value>
+	<data name="UnmatchedSetup" xml:space="preserve">
+		<value>{0}:
+This setup was not matched.</value>
 	</data>
 	<data name="ConstructorArgsForInterface" xml:space="preserve">
 		<value>Constructor arguments cannot be passed for interface mocks.</value>
@@ -345,10 +345,17 @@ Expected invocation on the mock once, but was {4} times: {1}</value>
 		<value>Invalid callback. Setup on method with {0} parameter(s) cannot invoke callback with different number of parameters ({1}).</value>
 	</data>
 	<data name="UnverifiedInvocations" xml:space="preserve">
-		<value>The following invocations on mock '{0}' were not verified:
-{1}</value>
+		<value>{0}:
+This mock failed verification due to the following unverified invocations:</value>
 	</data>
 	<data name="CallBaseCannotBeUsedWithDelegateMocks" xml:space="preserve">
 		<value>CallBase cannot be used with Delegate mocks.</value>
+	</data>
+	<data name="VerificationErrorsOfMock" xml:space="preserve">
+		<value>{0}:
+This mock failed verification due to the following:</value>
+	</data>
+	<data name="VerificationErrorsOfMockRepository" xml:space="preserve">
+		<value>The mock repository failed verification due to the following:</value>
 	</data>
 </root>

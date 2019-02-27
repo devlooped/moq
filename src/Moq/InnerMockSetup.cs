@@ -24,9 +24,8 @@ namespace Moq
 			invocation.Return(this.returnValue);
 		}
 
-		public override bool TryVerifyAll()
+		public override void VerifyAll()
 		{
-			return true;
 		}
 	}
 }

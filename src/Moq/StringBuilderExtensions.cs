@@ -13,6 +13,27 @@ namespace Moq
 {
 	internal static class StringBuilderExtensions
 	{
+		public static StringBuilder AppendIndented(this StringBuilder stringBuilder, string str, int count = 1, char indentChar = ' ')
+		{
+			var i = 0;
+			while (i < str.Length)
+			{
+				stringBuilder.Append(indentChar, count);
+				var j = str.IndexOf('\n', i + 1);
+				if (j > i)
+				{
+					stringBuilder.Append(str, i, j - i + 1);
+					i = j + 1;
+				}
+				else
+				{
+					break;
+				}
+			}
+			stringBuilder.Append(str, i, str.Length - i);
+			return stringBuilder;
+		}
+
 		public static StringBuilder AppendNameOf(this StringBuilder stringBuilder, MethodInfo method, bool includeGenericArgumentList)
 		{
 			stringBuilder.Append(method.Name);
@@ -99,6 +120,15 @@ namespace Moq
 				stringBuilder.Append(obj.ToString());
 			}
 
+			return stringBuilder;
+		}
+
+		public static StringBuilder TrimEnd(this StringBuilder stringBuilder)
+		{
+			while (char.IsWhiteSpace(stringBuilder[stringBuilder.Length - 1]))
+			{
+				--stringBuilder.Length;
+			}
 			return stringBuilder;
 		}
 	}

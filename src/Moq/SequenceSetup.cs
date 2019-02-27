@@ -95,9 +95,12 @@ namespace Moq
 			}
 		}
 
-		public override bool TryVerifyAll()
+		public override void VerifyAll()
 		{
-			return this.invoked;
+			if (!this.invoked)
+			{
+				throw MockException.UnmatchedSetup(this);
+			}
 		}
 
 		private readonly struct Response
