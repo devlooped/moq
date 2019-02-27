@@ -197,71 +197,66 @@ namespace Moq
 		/// <include file='Mock.xdoc' path='docs/doc[@for="Mock.Verify"]/*'/>
 		public void Verify()
 		{
-			if (!this.TryVerify(out MockException error))
+			var error = this.TryVerify();
+			if (error?.IsVerificationError == true)
 			{
 				throw error;
 			}
 		}
 
-		private bool TryVerify(out MockException error)
+		/// <include file='Mock.xdoc' path='docs/doc[@for="Mock.VerifyAll"]/*'/>
+		public void VerifyAll()
+		{
+			var error = this.TryVerifyAll();
+			if (error?.IsVerificationError == true)
+			{
+				throw error;
+			}
+		}
+
+		internal MockException TryVerify()
 		{
 			foreach (Invocation invocation in this.MutableInvocations)
 			{
 				invocation.MarkAsVerifiedIfMatchedByVerifiableSetup();
 			}
 
-			var uninvokedVerifiableSetups = this.Setups.ToArrayLive(setup => !setup.TryVerify());
-			if (uninvokedVerifiableSetups.Length > 0)
-			{
-				error = MockException.UnmatchedSetups(this, uninvokedVerifiableSetups);
-				return false;
-			}
-
-			foreach (var inner in this.GetInnerMockSetups())
-			{
-				if (!inner.GetInnerMock().TryVerify(out error))
-				{
-					return false;
-				}
-			}
-
-			error = null;
-			return true;
+			return this.TryVerifySetups(setup => setup.TryVerify());
 		}
 
-		/// <include file='Mock.xdoc' path='docs/doc[@for="Mock.VerifyAll"]/*'/>		
-		public void VerifyAll()
-		{
-			if (!this.TryVerifyAll(out MockException error))
-			{
-				throw error;
-			}
-		}
-
-		private bool TryVerifyAll(out MockException error)
+		internal MockException TryVerifyAll()
 		{
 			foreach (Invocation invocation in this.MutableInvocations)
 			{
 				invocation.MarkAsVerifiedIfMatchedBySetup();
 			}
 
-			var uninvokedSetups = this.Setups.ToArrayLive(setup => !setup.TryVerifyAll());
-			if (uninvokedSetups.Length > 0)
-			{
-				error = MockException.UnmatchedSetups(this, uninvokedSetups);
-				return false;
-			}
+			return this.TryVerifySetups(setup => setup.TryVerifyAll());
+		}
 
-			foreach (var inner in this.GetInnerMockSetups())
+		private MockException TryVerifySetups(Func<Setup, MockException> verifySetup)
+		{
+			var errors = new List<MockException>();
+
+			foreach (var setup in this.Setups.ToArrayLive(_ => true))
 			{
-				if (!inner.GetInnerMock().TryVerifyAll(out error))
+				var error = verifySetup(setup);
+				if (error?.IsVerificationError == true)
 				{
-					return false;
+					errors.Add(error);
 				}
 			}
 
-			error = null;
-			return true;
+			if (errors.Count > 0)
+			{
+				return MockException.Combined(
+					errors,
+					preamble: string.Format(CultureInfo.CurrentCulture, Resources.VerificationErrorsOfMock, this));
+			}
+			else
+			{
+				return null;
+			}
 		}
 
 		internal static void VerifyVoid(Mock mock, LambdaExpression expression, Times times, string failMessage)

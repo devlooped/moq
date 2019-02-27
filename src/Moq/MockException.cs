@@ -126,17 +126,28 @@ namespace Moq
 		}
 
 		/// <summary>
-		///   Returns the exception to be thrown when <see cref="Mock.Verify"/> or <see cref="MockFactory.Verify"/> find a setup that has not been invoked.
+		///   Returns the exception to be thrown when a setup has not been invoked.
 		/// </summary>
-		internal static MockException UnmatchedSetups(Mock mock, IEnumerable<Setup> setups)
+		internal static MockException UnmatchedSetup(Setup setup)
 		{
 			return new MockException(
-				MockExceptionReasons.UnmatchedSetups,
+				MockExceptionReasons.UnmatchedSetup,
 				string.Format(
 					CultureInfo.CurrentCulture,
-					Resources.UnmatchedSetups,
-					mock.ToString(),
-					setups.Aggregate(new StringBuilder(), (builder, setup) => builder.AppendLine(setup.ToString())).ToString()));
+					Resources.UnmatchedSetup,
+					setup));
+		}
+
+		internal static MockException FromInnerMockOf(IDeterministicReturnValueSetup setup, MockException error)
+		{
+			var message = new StringBuilder();
+
+			message.AppendLine(string.Format(CultureInfo.CurrentCulture, Resources.VerificationErrorsOfInnerMock, setup)).TrimEnd().AppendLine()
+			       .AppendLine();
+
+			message.AppendIndented(error.Message, count: 3);
+
+			return new MockException(error.Reasons, message.ToString());
 		}
 
 		/// <summary>
@@ -144,16 +155,28 @@ namespace Moq
 		///   and whose reason(s) is the combination of the given <paramref name="errors"/>' reason(s).
 		///   Used by <see cref="MockFactory.VerifyMocks(Action{Mock})"/> when it finds one or more mocks with verification errors.
 		/// </summary>
-		internal static MockException Combined(IEnumerable<MockException> errors)
+		internal static MockException Combined(IEnumerable<MockException> errors, string preamble)
 		{
 			Debug.Assert(errors != null);
 			Debug.Assert(errors.Any());
 
-			return new MockException(
-				errors.Select(error => error.Reasons).Aggregate((a, r) => a | r),
-				string.Join(
-					Environment.NewLine,
-					errors.Select(error => error.Message)));
+			var reasons = default(MockExceptionReasons);
+			var message = new StringBuilder();
+
+			if (preamble != null)
+			{
+				message.Append(preamble).TrimEnd().AppendLine()
+				       .AppendLine();
+			}
+
+			foreach (var error in errors)
+			{
+				reasons |= error.Reasons;
+				message.AppendIndented(error.Message, count: 3).TrimEnd().AppendLine()
+				       .AppendLine();
+			}
+
+			return new MockException(reasons, message.TrimEnd().ToString());
 		}
 
 		/// <summary>
@@ -161,13 +184,17 @@ namespace Moq
 		/// </summary>
 		internal static MockException UnverifiedInvocations(Mock mock, IEnumerable<Invocation> invocations)
 		{
-			return new MockException(
-				MockExceptionReasons.UnverifiedInvocations,
-				string.Format(
-					CultureInfo.CurrentCulture,
-					Resources.UnverifiedInvocations,
-					mock.ToString(),
-					invocations.Aggregate(new StringBuilder(), (builder, setup) => builder.AppendLine(setup.ToString())).ToString()));
+			var message = new StringBuilder();
+
+			message.AppendLine(string.Format(CultureInfo.CurrentCulture, Resources.UnverifiedInvocations, mock)).TrimEnd().AppendLine()
+			       .AppendLine();
+
+			foreach (var invocation in invocations)
+			{
+				message.AppendIndented(invocation.ToString(), count: 3).TrimEnd().AppendLine();
+			}
+
+			return new MockException(MockExceptionReasons.UnverifiedInvocations, message.TrimEnd().ToString());
 		}
 
 		private readonly MockExceptionReasons reasons;
@@ -188,7 +215,7 @@ namespace Moq
 			get
 			{
 				const MockExceptionReasons verificationErrorMask = MockExceptionReasons.NoMatchingCalls
-				                                                 | MockExceptionReasons.UnmatchedSetups
+				                                                 | MockExceptionReasons.UnmatchedSetup
 				                                                 | MockExceptionReasons.UnverifiedInvocations;
 				return (this.reasons & verificationErrorMask) != 0;
 			}

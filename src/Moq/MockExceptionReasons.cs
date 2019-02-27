@@ -13,7 +13,7 @@ namespace Moq
 		NoMatchingCalls = 4,
 		NoSetup = 8,
 		ReturnValueRequired = 16,
-		UnmatchedSetups = 32,
+		UnmatchedSetup = 32,
 		UnverifiedInvocations = 64,
 	}
 }

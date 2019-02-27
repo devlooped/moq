@@ -52,7 +52,7 @@ namespace Moq.Tests
 			}
 			catch (MockException mex)
 			{
-				Assert.Equal(MockExceptionReasons.UnmatchedSetups, mex.Reasons);
+				Assert.Equal(MockExceptionReasons.UnmatchedSetup, mex.Reasons);
 			}
 		}
 
@@ -103,11 +103,16 @@ namespace Moq.Tests
 
 			Assert.NotNull(ex);
 			Assert.True(ex.Message.ContainsConsecutiveLines(
-				$"The following invocations on mock \'{fooMock}\' were not verified:",
-				$"IFoo.Do()",
-				$"",
-				$"The following invocations on mock \'{barMock}\' were not verified:",
-				$"IBar.Redo()"));
+				$"   {fooMock}:",
+				$"   This mock failed verification due to the following unverified invocations:",
+				$"   ",
+				$"      IFoo.Do()"));
+
+			Assert.True(ex.Message.ContainsConsecutiveLines(
+				$"   {barMock}:",
+				$"   This mock failed verification due to the following unverified invocations:",
+				$"   ",
+				$"      IBar.Redo()"));
 		}
 
 		[Fact]
@@ -125,7 +130,7 @@ namespace Moq.Tests
 			}
 			catch (MockException mex)
 			{
-				Assert.Equal(MockExceptionReasons.UnmatchedSetups, mex.Reasons);
+				Assert.Equal(MockExceptionReasons.UnmatchedSetup, mex.Reasons);
 				Expression<Action<IFoo>> doExpr = foo => foo.Do();
 				Assert.DoesNotContain(doExpr.ToString(), mex.Message);
 			}
@@ -145,11 +150,16 @@ namespace Moq.Tests
 
 			Assert.NotNull(ex);
 			Assert.True(ex.Message.ContainsConsecutiveLines(
-				$"The following setups on mock \'{foo}\' were not matched:",
-				$"MockRepositoryFixture.IFoo f => f.Do()",
-				$"",
-				$"The following setups on mock \'{bar}\' were not matched:",
-				$"MockRepositoryFixture.IBar b => b.Redo()"));
+				$"   {foo}:",
+				$"   This mock failed verification due to the following:",
+				$"   ",
+				$"      MockRepositoryFixture.IFoo f => f.Do():"));
+
+			Assert.True(ex.Message.ContainsConsecutiveLines(
+				$"   {bar}:",
+				$"   This mock failed verification due to the following:",
+				$"   ",
+				$"      MockRepositoryFixture.IBar b => b.Redo()"));
 		}
 
 		[Fact]

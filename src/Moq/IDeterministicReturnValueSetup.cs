@@ -26,5 +26,19 @@ namespace Moq
 			mock = (Unwrap.ResultIfCompletedTask(setup.ReturnValue) as IMocked)?.Mock;
 			return mock != null;
 		}
+
+		public static MockException TryVerifyInnerMock(this IDeterministicReturnValueSetup setup, Func<Mock, MockException> verify)
+		{
+			if (setup.ReturnsInnerMock(out var innerMock))
+			{
+				var error = verify(innerMock);
+				if (error?.IsVerificationError == true)
+				{
+					return MockException.FromInnerMockOf(setup, error);
+				}
+			}
+
+			return null;
+		}
 	}
 }
