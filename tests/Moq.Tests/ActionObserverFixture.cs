@@ -121,6 +121,31 @@ namespace Moq.Tests
 					 x => x.GetY(It.Is<int>(i => i % 2 == 0)).Z.VoidWithIntInt(It.IsAny<int>(), 2));
 			}
 
+			[Fact]
+			public void Assignment()
+			{
+				AssertReconstructable(
+					"x => x.GetY().Z.Property = \"value\"",
+					 x => x.GetY().Z.Property =  "value" );
+			}
+
+			[Fact]
+			public void Assignment_with_captured_var_on_rhs()
+			{
+				var arg = "value";
+				AssertReconstructable(
+					"x => x.GetY().Z.Property = \"value\"",
+					 x => x.GetY().Z.Property = arg);
+			}
+
+			[Fact]
+			public void Assignment_with_matcher_on_rhs()
+			{
+				AssertReconstructable(
+					"x => x.GetY().Z.Property = It.IsAny<string>()",
+					 x => x.GetY().Z.Property = It.IsAny<string>());
+			}
+
 			private void AssertReconstructable(string expected, Action<IX> action)
 			{
 				var expression = ActionObserver.Instance.ReconstructExpression(action);
@@ -150,6 +175,7 @@ namespace Moq.Tests
 
 			public interface IZ
 			{
+				object Property { get; set; }
 				void Void();
 				void VoidWithIntInt(int arg1, int arg2);
 			}
@@ -177,12 +203,18 @@ namespace Moq.Tests
 
 			public interface IX
 			{
+				IY Y { get; }
 				SealedY SealedY { get; }
 			}
 
 			public class X
 			{
 				public void NonVirtual() { }
+			}
+
+			public interface IY
+			{
+				void Method(int arg1, int arg2);
 			}
 
 			public sealed class SealedY

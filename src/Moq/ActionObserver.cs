@@ -101,8 +101,9 @@ namespace Moq
 				{
 					expressions[i] = Expression.Constant(invocation.Arguments[i], parameterTypes[i]);
 
-					// Add a `Convert` node (like the C# compiler does) in places where type coercion happens:
-					if (invocation.Arguments[i] != null && invocation.Arguments[i].GetType() != parameterTypes[i])
+					// Add a `Convert` node (like the C# compiler does) in places where nullable type coercion happens:
+					var argumentValue = invocation.Arguments[i];
+					if (argumentValue != null && Nullable.GetUnderlyingType(parameterTypes[i]) == argumentValue.GetType())
 					{
 						expressions[i] = Expression.Convert(expressions[i], parameterTypes[i]);
 					}
@@ -278,6 +279,13 @@ namespace Moq
 					var property = node.Method.DeclaringType.GetProperty(propertyName, BindingFlags.Public | BindingFlags.NonPublic | BindingFlags.Instance);
 					return Expression.MakeMemberAccess(obj, property);
 				}
+				else if (node.Method.IsPropertySetter())
+				{
+					var propertyName = node.Method.Name.Substring(4);
+					var property = node.Method.DeclaringType.GetProperty(propertyName, BindingFlags.Public | BindingFlags.NonPublic | BindingFlags.Instance);
+					return Expression.Assign(Expression.MakeMemberAccess(obj, property), node.Arguments[0]);
+				}
+				// TODO: add support for indexers
 				else
 				{
 					var args = VisitArguments(node.Arguments);
