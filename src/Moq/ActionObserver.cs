@@ -115,7 +115,7 @@ namespace Moq
 					int matchIndex = 0;
 					for (int argumentIndex = 0; matchIndex < matches.Length && argumentIndex < expressions.Length; ++argumentIndex)
 					{
-						if (!object.Equals(invocation.Arguments[argumentIndex], parameterTypes[argumentIndex].GetDefaultValue()))
+						if (!object.Equals(invocation.Arguments[argumentIndex], matches[matchIndex].RenderExpression.Type.GetDefaultValue()))
 						{
 							// This parameter has a non-`default` value.  We therefore assume that it isn't
 							// a value that was originally produced by a matcher, since they usually return `default`.
@@ -162,6 +162,15 @@ namespace Moq
 							}
 						}
 						return false;
+					}
+				}
+
+				// Finally box all values that need to be boxed:
+				for (int i = 0; i < expressions.Length; ++i)
+				{
+					if (expressions[i].Type.GetTypeInfo().IsValueType && !parameterTypes[i].GetTypeInfo().IsValueType)
+					{
+						expressions[i] = Expression.Convert(expressions[i], parameterTypes[i]);
 					}
 				}
 

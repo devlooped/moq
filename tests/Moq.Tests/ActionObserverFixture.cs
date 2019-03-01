@@ -90,6 +90,14 @@ namespace Moq.Tests
 			}
 
 			[Fact]
+			public void Void_method_call_with_matcher_of_assignment_compatible_type()
+			{
+				AssertReconstructable(
+					x => x.VoidWithObject(It.IsAny<int>()),
+					x => x.VoidWithObject(It.IsAny<int>()));
+			}
+
+			[Fact]
 			public void Void_method_call_with_matcher_in_first_of_three_invocations()
 			{
 				AssertReconstructable(
@@ -220,6 +228,7 @@ namespace Moq.Tests
 				void VoidWithLong(long arg);
 				void VoidWithNullableInt(int? arg);
 				void VoidWithIntString(int arg1, string arg2);
+				void VoidWithObject(object arg);
 			}
 
 			public interface IY
