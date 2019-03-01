@@ -361,4 +361,14 @@ This mock failed verification due to the following:</value>
 	<data name="VerificationErrorsOfInnerMock" xml:space="preserve">
 		<value>{0}:</value>
 	</data>
+	<data name="UnsupportedExpressionWithHint" xml:space="preserve">
+		<value>Unsupported expression: {0}
+{1}</value>
+	</data>
+	<data name="LastMemberHasNonInterceptableReturnType" xml:space="preserve">
+		<value>The return type of the last member shown above is not mockable.</value>
+	</data>
+	<data name="NextMemberNonInterceptable" xml:space="preserve">
+		<value>The next member after the last one shown above is non-virtual, sealed, or not visible to the proxy factory.</value>
+	</data>
 </root>
