@@ -103,6 +103,9 @@ namespace Moq
 				case ExpressionType.Call:
 					ToStringMethodCall((MethodCallExpression)exp);
 					return;
+				case ExpressionType.Index:
+					ToStringIndex((IndexExpression)exp);
+					return;
 				case ExpressionType.Lambda:
 					ToStringLambda((LambdaExpression)exp);
 					return;
@@ -353,7 +356,15 @@ namespace Moq
 			}
 		}
 
-		private void ToStringExpressionList(ReadOnlyCollection<Expression> original)
+		private void ToStringIndex(IndexExpression expression)
+		{
+			ToString(expression.Object);
+			this.builder.Append('[');
+			ToStringExpressionList(expression.Arguments);
+			this.builder.Append(']');
+		}
+
+		private void ToStringExpressionList(IEnumerable<Expression> original)
 		{
 			AsCommaSeparatedValues(original, ToString);
 			return;

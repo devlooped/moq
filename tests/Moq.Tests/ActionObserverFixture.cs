@@ -122,6 +122,17 @@ namespace Moq.Tests
 			}
 
 			[Fact]
+			public void Method_with_matchers_after_default_arg()
+			{
+				// This demonstrates that even though the first argument has a default value,
+				// the matcher isn't placed there, because it has a type (string) that won't fit (int).
+
+				AssertReconstructable(
+					x => x.VoidWithIntString(0, It.IsAny<string>()),
+					x => x.VoidWithIntString(0, It.IsAny<string>()));
+			}
+
+			[Fact]
 			public void Assignment()
 			{
 				AssertReconstructable(
@@ -146,6 +157,46 @@ namespace Moq.Tests
 					 x => x.GetY().Z.Property = It.IsAny<string>());
 			}
 
+			[Fact]
+			public void Indexer_assignment_with_arg()
+			{
+				AssertReconstructable(
+					"x => x[1] = null",
+					 x => x[1] = null);
+			}
+
+			[Fact]
+			public void Indexer_assignment_with_matcher_on_lhs_1()
+			{
+				AssertReconstructable(
+					"x => x[It.IsAny<int>()] = null",
+					 x => x[It.IsAny<int>()] = null);
+			}
+
+			[Fact]
+			public void Indexer_assignment_with_matcher_on_lhs_2()
+			{
+				AssertReconstructable(
+					"x => x[1, It.IsAny<int>()] = 0",
+					 x => x[1, It.IsAny<int>()] = 0);
+			}
+
+			[Fact]
+			public void Indexer_assignment_with_matcher_on_rhs()
+			{
+				AssertReconstructable(
+					"x => x[1] = It.IsAny<ActionObserverFixture.Reconstructibility.IY>()",
+					 x => x[1] = It.IsAny<ActionObserverFixture.Reconstructibility.IY>());
+			}
+
+			[Fact]
+			public void Indexer_assignment_with_matchers_everywhere()
+			{
+				AssertReconstructable(
+					"x => x[It.Is<int>(i => i == 0), It.Is<int>(i => i == 2)] = It.Is<int>(i => i == 3)",
+					 x => x[It.Is<int>(i => i == 0), It.Is<int>(i => i == 2)] = It.Is<int>(i => i == 3));
+			}
+
 			private void AssertReconstructable(string expected, Action<IX> action)
 			{
 				var expression = ActionObserver.Instance.ReconstructExpression(action);
@@ -160,12 +211,15 @@ namespace Moq.Tests
 
 			public interface IX
 			{
+				IY this[int index] { get; set; }
+				int this[int index1, int index2] { get; set; }
 				IY GetY();
 				IY GetY(int arg);
 				void Void();
 				void VoidWithInt(int arg);
 				void VoidWithLong(long arg);
 				void VoidWithNullableInt(int? arg);
+				void VoidWithIntString(int arg1, string arg2);
 			}
 
 			public interface IY
@@ -220,6 +274,47 @@ namespace Moq.Tests
 			public sealed class SealedY
 			{
 				public void Method() { }
+			}
+		}
+
+		// These tests document limitations of the current implementation.
+		public class Limitations
+		{
+			[Fact]
+			public void Method_with_matchers_after_default_arg()
+			{
+				// This is because parameters with default values are filled from left to right.
+
+				AssertIncorrectlyReconstructsAs(
+					x => x.Method(It.IsAny<int>(), 0              ),
+					x => x.Method(0              , It.IsAny<int>()));
+			}
+
+			[Fact]
+			public void Indexer_with_default_value_on_lfs_and_matcher_on_rhs_both_having_same_types()
+			{
+				// Same as above, since LHS and RHS are actually both part of a single parameter list of a method call `get_Item(...lhs, rhs).
+				AssertIncorrectlyReconstructsAs(
+					"x => x[It.IsAny<int>()] = 0",
+					 x => x[0              ] = It.IsAny<int>());
+			}
+
+			private void AssertIncorrectlyReconstructsAs(string expected, Action<IX> action)
+			{
+				var expression = ActionObserver.Instance.ReconstructExpression(action);
+				Assert.Equal(expected, expression.ToStringFixed());
+			}
+
+			private void AssertIncorrectlyReconstructsAs(Expression<Action<IX>> expected, Action<IX> action)
+			{
+				var actual = ActionObserver.Instance.ReconstructExpression(action);
+				Assert.Equal(expected, actual, ExpressionComparer.Default);
+			}
+
+			public interface IX
+			{
+				int this[int index] { get; set; }
+				void Method(int arg1, int arg2);
 			}
 		}
 	}

@@ -282,10 +282,23 @@ namespace Moq
 				else if (node.Method.IsPropertySetter())
 				{
 					var propertyName = node.Method.Name.Substring(4);
-					var property = node.Method.DeclaringType.GetProperty(propertyName, BindingFlags.Public | BindingFlags.NonPublic | BindingFlags.Instance);
-					return Expression.Assign(Expression.MakeMemberAccess(obj, property), node.Arguments[0]);
+					var argumentCount = node.Arguments.Count;
+					if (argumentCount == 1)
+					{
+						// setter
+						var property = node.Method.DeclaringType.GetProperty(propertyName, BindingFlags.Public | BindingFlags.NonPublic | BindingFlags.Instance);
+						return Expression.Assign(Expression.MakeMemberAccess(obj, property), this.Visit(node.Arguments[0]));
+					}
+					else
+					{
+						// indexer
+						var parameterTypes = node.Method.GetParameterTypes();
+						var indexTypes = parameterTypes.Take(parameterTypes.Count - 1).ToArray();
+						var indexer = node.Method.DeclaringType.GetProperty(propertyName, parameterTypes.Last(), indexTypes);
+						var args = VisitArguments(node.Arguments);
+						return Expression.Assign(Expression.MakeIndex(obj, indexer, args.Take(argumentCount - 1)), this.Visit(args.Last()));
+					}
 				}
-				// TODO: add support for indexers
 				else
 				{
 					var args = VisitArguments(node.Arguments);
