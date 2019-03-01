@@ -81,7 +81,47 @@ namespace Moq.Tests
 					x => x.GetY(1).Z.VoidWithIntInt(2, 3));
 			}
 
-			private void AssertCanReconstruct(string expected, Action<IX> action)
+			[Fact]
+			public void Void_method_call_with_matcher()
+			{
+				AssertReconstructable(
+					x => x.VoidWithInt(It.IsAny<int>()),
+					x => x.VoidWithInt(It.IsAny<int>()));
+			}
+
+			[Fact]
+			public void Void_method_call_with_matcher_in_first_of_three_invocations()
+			{
+				AssertReconstructable(
+					x => x.GetY(It.IsAny<int>()).Z.VoidWithIntInt(0, 0),
+					x => x.GetY(It.IsAny<int>()).Z.VoidWithIntInt(0, 0));
+			}
+
+			[Fact]
+			public void Void_method_call_with_matcher_in_third_of_three_invocations_1()
+			{
+				AssertReconstructable(
+					x => x.GetY(0).Z.VoidWithIntInt(1, It.IsAny<int>()),
+					x => x.GetY(0).Z.VoidWithIntInt(1, It.IsAny<int>()));
+			}
+
+			[Fact]
+			public void Void_method_call_with_matcher_in_third_of_three_invocations_2()
+			{
+				AssertReconstructable(
+					x => x.GetY(0).Z.VoidWithIntInt(It.IsAny<int>(), 2),
+					x => x.GetY(0).Z.VoidWithIntInt(It.IsAny<int>(), 2));
+			}
+
+			[Fact]
+			public void Void_method_call_with_matcher_in_first_and_third_of_three_invocations()
+			{
+				AssertReconstructable(
+					"x => x.GetY(It.Is<int>(i => i % 2 == 0)).Z.VoidWithIntInt(It.IsAny<int>(), 2)",
+					 x => x.GetY(It.Is<int>(i => i % 2 == 0)).Z.VoidWithIntInt(It.IsAny<int>(), 2));
+			}
+
+			private void AssertReconstructable(string expected, Action<IX> action)
 			{
 				var expression = ActionObserver.Instance.ReconstructExpression(action);
 				Assert.Equal(expected, expression.ToStringFixed());
