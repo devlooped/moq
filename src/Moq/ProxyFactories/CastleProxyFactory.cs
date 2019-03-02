@@ -59,16 +59,21 @@ namespace Moq
 		/// <inheritdoc />
 		public override object CreateProxy(Type mockType, Moq.IInterceptor interceptor, Type[] interfaces, object[] arguments)
 		{
+			// All generated proxies need to implement `IProxy`:
+			var additionalInterfaces = new Type[1 + interfaces.Length];
+			additionalInterfaces[0] = typeof(IProxy);
+			Array.Copy(interfaces, 0, additionalInterfaces, 1, interfaces.Length);
+
 			if (mockType.GetTypeInfo().IsInterface)
 			{
 				// While `CreateClassProxy` could also be used for interface types,
 				// `CreateInterfaceProxyWithoutTarget` is much faster (about twice as fast):
-				return generator.CreateInterfaceProxyWithoutTarget(mockType, interfaces, this.generationOptions, new Interceptor(interceptor));
+				return generator.CreateInterfaceProxyWithoutTarget(mockType, additionalInterfaces, this.generationOptions, new Interceptor(interceptor));
 			}
 
 			try
 			{
-				return generator.CreateClassProxy(mockType, interfaces, this.generationOptions, arguments, new Interceptor(interceptor));
+				return generator.CreateClassProxy(mockType, additionalInterfaces, this.generationOptions, arguments, new Interceptor(interceptor));
 			}
 			catch (TypeLoadException e)
 			{
@@ -163,6 +168,8 @@ namespace Moq
 
 		private sealed class Interceptor : Castle.DynamicProxy.IInterceptor
 		{
+			private static readonly MethodInfo proxyInterceptorGetter = typeof(IProxy).GetProperty(nameof(IProxy.Interceptor)).GetMethod;
+
 			private Moq.IInterceptor underlying;
 
 			internal Interceptor(Moq.IInterceptor underlying)
@@ -172,6 +179,13 @@ namespace Moq
 
 			public void Intercept(Castle.DynamicProxy.IInvocation invocation)
 			{
+				// This implements the `IProxy.Interceptor` property:
+				if (invocation.Method == proxyInterceptorGetter)
+				{
+					invocation.ReturnValue = this.underlying;
+					return;
+				}
+
 				this.underlying.Intercept(new Invocation(underlying: invocation));
 			}
 		}
