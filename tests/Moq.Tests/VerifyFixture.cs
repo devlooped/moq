@@ -1573,6 +1573,52 @@ namespace Moq.Tests
 			}
 		}
 
+		public class Verify_forbidden_side_effects
+		{
+			[Fact]
+			public void Does_not_create_setups_seen_by_VerifyAll()
+			{
+				var mock = new Mock<IX>();
+				mock.Verify(m => m.X.X, Times.Never);
+				mock.VerifyAll();
+			}
+
+			[Fact]
+			public void Does_not_counteract_MockBehavior_Strict()
+			{
+				var mock = new Mock<IX>(MockBehavior.Strict);
+				mock.Verify(m => m.X.X, Times.Never);
+				Assert.Throws<MockException>(() => mock.Object.X);
+			}
+
+			[Fact]
+			public void Does_not_create_inner_mocks()
+			{
+				var mock = new Mock<IX>();
+				mock.Verify(m => m.X.X, Times.Never);
+				Assert.Throws<NullReferenceException>(() => _ = mock.Object.X.X);
+			}
+
+			[Fact]
+			public void Does_not_override_existing_setups()
+			{
+				var mock = new Mock<IX>();
+				var nested = new Mock<IX>();
+				nested.Setup(m => m.Count).Returns(5);
+				mock.Setup(m => m.X).Returns(nested.Object);
+
+				mock.Verify(m => m.X.X, Times.Never);
+				int c = mock.Object.X.Count;
+				Assert.Equal(5, c);
+			}
+
+			public interface IX
+			{
+				IX X { get; }
+				int Count { get; }
+			}
+		}
+
 		public interface IBar
 		{
 			int? Value { get; set; }
