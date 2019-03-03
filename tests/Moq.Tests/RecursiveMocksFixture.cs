@@ -139,7 +139,7 @@ namespace Moq.Tests
 		[Fact]
 		public void VerifiesHierarchyMethodWithExpression()
 		{
-			var mock = new Mock<IFoo>();
+			var mock = new Mock<IFoo>() { DefaultValue = DefaultValue.Mock };
 
 			Assert.Throws<MockException>(() => mock.Verify(m => m.Bar.Do("ping")));
 
@@ -150,7 +150,7 @@ namespace Moq.Tests
 		[Fact]
 		public void VerifiesHierarchyPropertyGetWithExpression()
 		{
-			var mock = new Mock<IFoo>();
+			var mock = new Mock<IFoo>() { DefaultValue = DefaultValue.Mock };
 
 			Assert.Throws<MockException>(() => mock.VerifyGet(m => m.Bar.Value));
 
