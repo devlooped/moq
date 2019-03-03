@@ -353,59 +353,5 @@ namespace Moq
 		{
 			return new ExpressionStringBuilder().Append(expression).ToString();
 		}
-
-		/// <summary>
-		/// Extracts, into a common form, information from a <see cref="LambdaExpression" />
-		/// around either a <see cref="MethodCallExpression" /> (for a normal method call)
-		/// or a <see cref="InvocationExpression" /> (for a delegate invocation).
-		/// </summary>
-		internal static CallInfo GetCallInfo(this LambdaExpression expression, Mock mock)
-		{
-			Guard.NotNull(expression, nameof(expression));
-
-			if (mock.IsDelegateMock)
-			{
-				// We're a mock for a delegate, so this call can only
-				// possibly be the result of invoking the delegate.
-				var invocation = (InvocationExpression)expression.Body;
-
-				// But the expression we have is for a call on the delegate, not our
-				// delegate interface proxy, so we need to map instead to the
-				// method on that interface, which is the property we've just tested for.
-				_ = ProxyFactory.Instance.GetDelegateProxyInterface(mock.TargetType, out var delegateInterfaceMethod);
-				return new CallInfo(invocation.Expression, delegateInterfaceMethod, invocation.Arguments);
-			}
-
-			if (expression.Body is MethodCallExpression methodCall)
-			{
-				return new CallInfo(methodCall.Object, methodCall.Method, methodCall.Arguments);
-			}
-
-			throw new ArgumentException(string.Format(
-				CultureInfo.CurrentCulture,
-				Resources.SetupNotMethod,
-				expression.ToStringFixed()));
-		}
-	}
-
-	internal readonly struct CallInfo
-	{
-		private readonly Expression expression;
-		private readonly MethodInfo method;
-		private readonly IReadOnlyList<Expression> arguments;
-
-		public CallInfo(Expression expression, MethodInfo method, IReadOnlyList<Expression> arguments)
-		{
-			this.expression = expression;
-			this.method = method;
-			this.arguments = arguments;
-		}
-
-		public void Deconstruct(out Expression expression, out MethodInfo method, out IReadOnlyList<Expression> arguments)
-		{
-			expression = this.expression;
-			method = this.method;
-			arguments = this.arguments;
-		}
 	}
 }
