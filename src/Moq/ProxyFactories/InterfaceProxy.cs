@@ -26,7 +26,7 @@ namespace Moq.Internals
 		{
 			// Forward this call to the interceptor, so that `object.Equals` can be set up.
 			var invocation = new Invocation(equalsMethod, obj);
-			((IProxy)this).Interceptor.Intercept(invocation);
+			((IInterceptor)((IProxy)this).Interceptor).Intercept(invocation);
 			return (bool)invocation.ReturnValue;
 		}
 
@@ -36,7 +36,7 @@ namespace Moq.Internals
 		{
 			// Forward this call to the interceptor, so that `object.GetHashCode` can be set up.
 			var invocation = new Invocation(getHashCodeMethod);
-			((IProxy)this).Interceptor.Intercept(invocation);
+			((IInterceptor)((IProxy)this).Interceptor).Intercept(invocation);
 			return (int)invocation.ReturnValue;
 		}
 
@@ -46,7 +46,7 @@ namespace Moq.Internals
 		{
 			// Forward this call to the interceptor, so that `object.ToString` can be set up.
 			var invocation = new Invocation(toStringMethod);
-			((IProxy)this).Interceptor.Intercept(invocation);
+			((IInterceptor)((IProxy)this).Interceptor).Intercept(invocation);
 			return (string)invocation.ReturnValue;
 		}
 
