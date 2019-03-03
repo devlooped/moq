@@ -139,7 +139,7 @@ namespace Moq.Tests
 		[Fact]
 		public void VerifiesHierarchyMethodWithExpression()
 		{
-			var mock = new Mock<IFoo>();
+			var mock = new Mock<IFoo>() { DefaultValue = DefaultValue.Mock };
 
 			Assert.Throws<MockException>(() => mock.Verify(m => m.Bar.Do("ping")));
 
@@ -150,7 +150,7 @@ namespace Moq.Tests
 		[Fact]
 		public void VerifiesHierarchyPropertyGetWithExpression()
 		{
-			var mock = new Mock<IFoo>();
+			var mock = new Mock<IFoo>() { DefaultValue = DefaultValue.Mock };
 
 			Assert.Throws<MockException>(() => mock.VerifyGet(m => m.Bar.Value));
 
@@ -263,7 +263,7 @@ namespace Moq.Tests
 		{
 			var mock = new Mock<Foo>();
 
-			Assert.Throws<NotSupportedException>(() => mock.Setup(m => m.BarField.Do("ping")));
+			Assert.Throws<ArgumentException>(() => mock.Setup(m => m.BarField.Do("ping")));
 		}
 
 		[Fact]
@@ -271,7 +271,7 @@ namespace Moq.Tests
 		{
 			var mock = new Mock<IFoo>();
 
-			Assert.Throws<NotSupportedException>(() => mock.Setup(m => m.Bar.Value.ToString()));
+			Assert.Throws<ArgumentException>(() => mock.Setup(m => m.Bar.Value.ToString()));
 		}
 
 		[Fact]

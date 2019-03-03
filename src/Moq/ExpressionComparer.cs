@@ -44,6 +44,7 @@ namespace Moq
 						return this.EqualsUnary((UnaryExpression)x, (UnaryExpression)y);
 					case ExpressionType.Add:
 					case ExpressionType.AddChecked:
+					case ExpressionType.Assign:
 					case ExpressionType.Subtract:
 					case ExpressionType.SubtractChecked:
 					case ExpressionType.Multiply:
@@ -86,6 +87,8 @@ namespace Moq
 					case ExpressionType.NewArrayInit:
 					case ExpressionType.NewArrayBounds:
 						return this.EqualsNewArray((NewArrayExpression)x, (NewArrayExpression)y);
+					case ExpressionType.Index:
+						return this.EqualsIndex((IndexExpression)x, (IndexExpression)y);
 					case ExpressionType.Invoke:
 						return this.EqualsInvocation((InvocationExpression)x, (InvocationExpression)y);
 					case ExpressionType.MemberInit:
@@ -140,6 +143,13 @@ namespace Moq
 		private bool EqualsElementInit(ElementInit x, ElementInit y)
 		{
 			return x.AddMethod == y.AddMethod && Equals(x.Arguments, y.Arguments, this.Equals);
+		}
+
+		private bool EqualsIndex(IndexExpression x, IndexExpression y)
+		{
+			return this.Equals(x.Object, y.Object)
+			    && Equals(x.Indexer, y.Indexer)
+			    && Equals(x.Arguments, y.Arguments, this.Equals);
 		}
 
 		private bool EqualsInvocation(InvocationExpression x, InvocationExpression y)

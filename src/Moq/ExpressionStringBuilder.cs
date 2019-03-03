@@ -59,8 +59,11 @@ namespace Moq
 					return;
 				case ExpressionType.Add:
 				case ExpressionType.AddChecked:
+				case ExpressionType.AddAssign:
+				case ExpressionType.Assign:
 				case ExpressionType.Subtract:
 				case ExpressionType.SubtractChecked:
+				case ExpressionType.SubtractAssign:
 				case ExpressionType.Multiply:
 				case ExpressionType.MultiplyChecked:
 				case ExpressionType.Divide:
@@ -498,6 +501,12 @@ namespace Moq
 				case ExpressionType.AddChecked:
 					return "+";
 
+				case ExpressionType.AddAssign:
+					return "+=";
+
+				case ExpressionType.Assign:
+					return "=";
+
 				case ExpressionType.And:
 					return "&";
 
@@ -556,6 +565,9 @@ namespace Moq
 				case ExpressionType.Subtract:
 				case ExpressionType.SubtractChecked:
 					return "-";
+
+				case ExpressionType.SubtractAssign:
+					return "-=";
 			}
 			return nodeType.ToString();
 		}

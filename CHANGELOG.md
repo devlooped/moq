@@ -14,6 +14,7 @@ This release contains several **minor breaking changes**. Please review your cod
 * All custom argument matcher methods (including those using `Match.Create<T>`) must now be marked with the `[Matcher]` attribute. For this reason, `MatcherAttribute` is no longer marked obsolete (@stakx, #732)
 * Method overload resolution for `mock.Protected().Setup("VoidMethod", ...)`, `mock.Protected().Verify("VoidMethod", ...)` and `mock.Protected().Verify<TResult>("NonVoidMethod", ...)` may change due to a new overloads: If the first argument is a `bool`, make sure that argument gets interpreted as part of `args`, not as `exactParameterMatch` (see also *Added* section below). (@stakx & @Shereef, #751, #753)
 * `mock.Verify[All]` now performs a more thorough error aggregation. Error messages of inner/recursive mocks are included in the error message using indentation to show the relationship between mocks. (@stakx, #762)
+* `mock.Verify` no longer creates setups, nor will it override existing setups, as a side-effect of using a recursive expression. (@stakx, #765)
 
 #### Added
 
@@ -25,6 +26,7 @@ This release contains several **minor breaking changes**. Please review your cod
 * `InvalidOperationException` when specifiying setup on mock with mock containing property of type `Nullable<T>` (@dav1dev, #725)
 * `Verify` gets confused between the same generic and non-generic signature (@lepijohnny, #749)
 * Setup gets included in `Verify` despite being "unreachable" (@stakx, #703)
+* `Verify` can create setups that cause subsequent `VerifyAll` to fail (@stakx & @lepijohnny, #699)
 
 ## 4.10.1 (2018-12-03)
 
