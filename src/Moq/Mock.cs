@@ -390,78 +390,41 @@ namespace Moq
 
 		#region Setup
 
-		[DebuggerStepThrough]
-		internal static MethodCall SetupVoid(Mock mock, LambdaExpression expression, Condition condition)
+		internal static MethodCall Setup(Mock mock, LambdaExpression expression, Condition condition)
 		{
-			return PexProtector.Invoke(SetupVoidPexProtected, mock, expression, condition);
-		}
+			Guard.NotNull(expression, nameof(expression));
 
-		private static MethodCall SetupVoidPexProtected(Mock mock, LambdaExpression expression, Condition condition)
-		{
-			var (obj, method, args) = expression.GetCallInfo(mock);
-
-			ThrowIfSetupExpressionInvolvesUnsupportedMember(expression, method);
-			ThrowIfSetupMethodNotVisibleToProxyFactory(method);
-			var setup = new MethodCall(mock, condition, expression, method, args);
-
-			var targetMock = GetTargetMock(obj, mock);
-			targetMock.Setups.Add(setup);
-
-			return setup;
-		}
-
-		[DebuggerStepThrough]
-		internal static MethodCall SetupNonVoid(Mock mock, LambdaExpression expression, Condition condition)
-		{
-			return PexProtector.Invoke(SetupNonVoidPexProtected, mock, expression, condition);
-		}
-
-		private static MethodCall SetupNonVoidPexProtected(Mock mock, LambdaExpression expression, Condition condition)
-		{
-			if (expression.IsProperty())
+			return Mock.SetupRecursive(mock, expression, setupLast: (part, targetMock) =>
 			{
-				return SetupGet(mock, expression, condition);
-			}
-
-			var (obj, method, args) = expression.GetCallInfo(mock);
-
-			ThrowIfSetupExpressionInvolvesUnsupportedMember(expression, method);
-			ThrowIfSetupMethodNotVisibleToProxyFactory(method);
-			var setup = new MethodCall(mock, condition, expression, method, args);
-
-			var targetMock = GetTargetMock(obj, mock);
-			targetMock.Setups.Add(setup);
-
-			return setup;
+				var setup = new MethodCall(targetMock, condition, part.Expression, part.Method, part.Arguments);
+				targetMock.Setups.Add(setup);
+				return setup;
+			});
 		}
 
-		[DebuggerStepThrough]
 		internal static MethodCall SetupGet(Mock mock, LambdaExpression expression, Condition condition)
 		{
-			return PexProtector.Invoke(SetupGetPexProtected, mock, expression, condition);
-		}
+			Guard.NotNull(expression, nameof(expression));
 
-		private static MethodCall SetupGetPexProtected(Mock mock, LambdaExpression expression, Condition condition)
-		{
-			if (expression.IsPropertyIndexer())
+			if (!expression.IsPropertyIndexer())  // guard because `.ToPropertyInfo()` doesn't (yet) work for indexers
 			{
-				// Treat indexers as regular method invocations.
-				return SetupNonVoid(mock, expression, condition);
+				var property = expression.ToPropertyInfo();
+				Guard.CanRead(property);
 			}
 
-			var prop = expression.ToPropertyInfo();
-			Guard.CanRead(prop);
+			return Mock.Setup(mock, expression, condition);
+		}
 
-			var propGet = prop.GetGetMethod(true);
-			ThrowIfSetupExpressionInvolvesUnsupportedMember(expression, propGet);
-			ThrowIfSetupMethodNotVisibleToProxyFactory(propGet);
+		internal static SequenceSetup SetupSequence(Mock mock, LambdaExpression expression)
+		{
+			Guard.NotNull(expression, nameof(expression));
 
-			var setup = new MethodCall(mock, condition, expression, propGet, new Expression[0]);
-			// Directly casting to MemberExpression is fine as ToPropertyInfo would throw if it wasn't
-			var targetMock = GetTargetMock(((MemberExpression)expression.Body).Expression, mock);
-			targetMock.Setups.Add(setup);
-
-			return setup;
+			return Mock.SetupRecursive(mock, expression, setupLast: (part, targetMock) =>
+			{
+				var setup = new SequenceSetup(part.Expression, part.Method, part.Arguments);
+				targetMock.Setups.Add(setup);
+				return setup;
+			});
 		}
 
 		[DebuggerStepThrough]
@@ -598,29 +561,58 @@ namespace Moq
 			return Expression.Convert(Expression.Constant(value), type);
 		}
 
-		internal static SequenceSetup SetupSequence(Mock mock, LambdaExpression expression)
+		[DebuggerStepThrough]
+		private static TSetup SetupRecursive<TSetup>(Mock mock, LambdaExpression expression, Func<LambdaExpressionPart, Mock, TSetup> setupLast)
 		{
-			if (expression.IsProperty())
+			Debug.Assert(mock != null);
+			Debug.Assert(expression != null);
+			Debug.Assert(setupLast != null);
+
+			var parts = expression.Split();
+			return PexProtector.Invoke(SetupRecursivePexProtected, mock, expression, parts, setupLast);
+		}
+
+		private static TSetup SetupRecursivePexProtected<TSetup>(Mock mock, LambdaExpression expression, Stack<LambdaExpressionPart> parts, Func<LambdaExpressionPart, Mock, TSetup> setupLast)
+		{
+			var (expr, method, arguments) = parts.Pop();
+
+			if (mock.IsDelegateMock)
 			{
-				var prop = expression.ToPropertyInfo();
-				Guard.CanRead(prop);
+				// The expression we have is for a call on the delegate, not our
+				// delegate interface proxy, so we need to map instead to the
+				// method on that interface.
+				_ = ProxyFactory.Instance.GetDelegateProxyInterface(mock.TargetType, out method);
+			}
 
-				var propGet = prop.GetGetMethod(true);
-				ThrowIfSetupExpressionInvolvesUnsupportedMember(expression, propGet);
-				ThrowIfSetupMethodNotVisibleToProxyFactory(propGet);
+			ThrowIfSetupExpressionInvolvesUnsupportedMember(expr, method);
+			ThrowIfSetupMethodNotVisibleToProxyFactory(method);
 
-				var setup = new SequenceSetup(expression, propGet, new Expression[0]);
-				var targetMock = GetTargetMock(((MemberExpression)expression.Body).Expression, mock);
-				targetMock.Setups.Add(setup);
-				return setup;
+			if (parts.Count == 0)
+			{
+				return setupLast(new LambdaExpressionPart(expr, method, arguments), mock);
+				//                                              ^^^^^^
+				// We rebuild a new part here because `method` may have been modified.
 			}
 			else
 			{
-				var (obj, method, args) = expression.GetCallInfo(mock);
-				var setup = new SequenceSetup(expression, method, args);
-				var targetMock = GetTargetMock(obj, mock);
-				targetMock.Setups.Add(setup);
-				return setup;
+				Mock innerMock;
+				if (!(mock.GetInnerMockSetups().TryFind(method, out var setup) && setup.ReturnsInnerMock(out innerMock)))
+				{
+					var returnValue = mock.GetDefaultValue(method, out innerMock, useAlternateProvider: DefaultValueProvider.Mock);
+					if (innerMock == null)
+					{
+						throw new ArgumentException(
+							string.Format(
+								CultureInfo.CurrentCulture,
+								Resources.UnsupportedExpression,
+								expr.ToStringFixed() + " in " + expression.ToStringFixed() + ":\n" + Resources.InvalidMockClass));
+					}
+					setup = new InnerMockSetup(method, arguments, expr, returnValue);
+					mock.Setups.Add((Setup)setup);
+				}
+				Debug.Assert(innerMock != null);
+
+				return Mock.SetupRecursivePexProtected(innerMock, expression, parts, setupLast);
 			}
 		}
 

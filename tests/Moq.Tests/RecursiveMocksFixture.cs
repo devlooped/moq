@@ -263,7 +263,7 @@ namespace Moq.Tests
 		{
 			var mock = new Mock<Foo>();
 
-			Assert.Throws<NotSupportedException>(() => mock.Setup(m => m.BarField.Do("ping")));
+			Assert.Throws<ArgumentException>(() => mock.Setup(m => m.BarField.Do("ping")));
 		}
 
 		[Fact]
@@ -271,7 +271,7 @@ namespace Moq.Tests
 		{
 			var mock = new Mock<IFoo>();
 
-			Assert.Throws<NotSupportedException>(() => mock.Setup(m => m.Bar.Value.ToString()));
+			Assert.Throws<ArgumentException>(() => mock.Setup(m => m.Bar.Value.ToString()));
 		}
 
 		[Fact]

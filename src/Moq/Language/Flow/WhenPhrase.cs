@@ -20,13 +20,13 @@ namespace Moq.Language.Flow
 
 		public ISetup<T> Setup(Expression<Action<T>> expression)
 		{
-			var setup = Mock.SetupVoid(mock, expression, this.condition);
+			var setup = Mock.Setup(mock, expression, this.condition);
 			return new VoidSetupPhrase<T>(setup);
 		}
 
 		public ISetup<T, TResult> Setup<TResult>(Expression<Func<T, TResult>> expression)
 		{
-			var setup = Mock.SetupNonVoid(mock, expression, this.condition);
+			var setup = Mock.Setup(mock, expression, this.condition);
 			return new NonVoidSetupPhrase<T, TResult>(setup);
 		}
 

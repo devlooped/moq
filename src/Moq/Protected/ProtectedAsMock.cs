@@ -42,7 +42,7 @@ namespace Moq.Protected
 				throw new ArgumentException(ex.Message, nameof(expression));
 			}
 
-			var setup = Mock.SetupVoid(this.mock, rewrittenExpression, null);
+			var setup = Mock.Setup(this.mock, rewrittenExpression, null);
 			return new VoidSetupPhrase<T>(setup);
 		}
 
@@ -60,7 +60,7 @@ namespace Moq.Protected
 				throw new ArgumentException(ex.Message, nameof(expression));
 			}
 
-			var setup = Mock.SetupNonVoid(this.mock, rewrittenExpression, null);
+			var setup = Mock.Setup(this.mock, rewrittenExpression, null);
 			return new NonVoidSetupPhrase<T, TResult>(setup);
 		}
 

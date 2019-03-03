@@ -302,7 +302,7 @@ namespace Moq
 		[SuppressMessage("Microsoft.Design", "CA1006:DoNotNestGenericTypesInMemberSignatures", Justification = "By design")]
 		public ISetup<T> Setup(Expression<Action<T>> expression)
 		{
-			var setup = Mock.SetupVoid(this, expression, null);
+			var setup = Mock.Setup(this, expression, null);
 			return new VoidSetupPhrase<T>(setup);
 		}
 
@@ -310,7 +310,7 @@ namespace Moq
 		[SuppressMessage("Microsoft.Design", "CA1006:DoNotNestGenericTypesInMemberSignatures", Justification = "By design")]
 		public ISetup<T, TResult> Setup<TResult>(Expression<Func<T, TResult>> expression)
 		{
-			var setup = Mock.SetupNonVoid(this, expression, null);
+			var setup = Mock.Setup(this, expression, null);
 			return new NonVoidSetupPhrase<T, TResult>(setup);
 		}
 

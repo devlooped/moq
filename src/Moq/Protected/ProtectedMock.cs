@@ -47,7 +47,7 @@ namespace Moq.Protected
 			ThrowIfMemberMissing(methodName, method);
 			ThrowIfPublicMethod(method, typeof(T).Name);
 
-			var setup = Mock.SetupVoid(mock, GetMethodCall(method, args), null);
+			var setup = Mock.Setup(mock, GetMethodCall(method, args), null);
 			return new VoidSetupPhrase<T>(setup);
 		}
 
@@ -76,7 +76,7 @@ namespace Moq.Protected
 			ThrowIfVoidMethod(method);
 			ThrowIfPublicMethod(method, typeof(T).Name);
 
-			var setup = Mock.SetupNonVoid(mock, GetMethodCall<TResult>(method, args), null);
+			var setup = Mock.Setup(mock, GetMethodCall<TResult>(method, args), null);
 			return new NonVoidSetupPhrase<T, TResult>(setup);
 		}
 
