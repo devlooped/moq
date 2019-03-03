@@ -44,8 +44,8 @@ namespace Moq.Tests
 			public void Void_method_call_with_coerced_nullable_arg()
 			{
 				AssertReconstructable(
-					x => x.VoidWithNullableInt(42),
-					x => x.VoidWithNullableInt(42));
+					"x => x.VoidWithNullableInt(42)",
+					 x => x.VoidWithNullableInt(42));
 			}
 
 			[Fact]
@@ -207,13 +207,16 @@ namespace Moq.Tests
 
 			private void AssertReconstructable(string expected, Action<IX> action)
 			{
-				var expression = ActionObserver.Instance.ReconstructExpression(action);
-				Assert.Equal(expected, expression.ToStringFixed());
+				Expression actual = ActionObserver.Instance.ReconstructExpression(action);
+				actual = PrepareForComparison.Instance.Visit(actual);
+				Assert.Equal(expected, actual.ToStringFixed());
 			}
 
 			private void AssertReconstructable(Expression<Action<IX>> expected, Action<IX> action)
 			{
-				var actual = ActionObserver.Instance.ReconstructExpression(action);
+				Expression actual = ActionObserver.Instance.ReconstructExpression(action);
+				expected = (Expression<Action<IX>>)PrepareForComparison.Instance.Visit(expected);
+				actual = PrepareForComparison.Instance.Visit(actual);
 				Assert.Equal(expected, actual, ExpressionComparer.Default);
 			}
 
@@ -310,13 +313,16 @@ namespace Moq.Tests
 
 			private void AssertIncorrectlyReconstructsAs(string expected, Action<IX> action)
 			{
-				var expression = ActionObserver.Instance.ReconstructExpression(action);
-				Assert.Equal(expected, expression.ToStringFixed());
+				Expression actual = ActionObserver.Instance.ReconstructExpression(action);
+				actual = PrepareForComparison.Instance.Visit(actual);
+				Assert.Equal(expected, actual.ToStringFixed());
 			}
 
 			private void AssertIncorrectlyReconstructsAs(Expression<Action<IX>> expected, Action<IX> action)
 			{
-				var actual = ActionObserver.Instance.ReconstructExpression(action);
+				Expression actual = ActionObserver.Instance.ReconstructExpression(action);
+				expected = (Expression<Action<IX>>)PrepareForComparison.Instance.Visit(expected);
+				actual = PrepareForComparison.Instance.Visit(actual);
 				Assert.Equal(expected, actual, ExpressionComparer.Default);
 			}
 
@@ -324,6 +330,30 @@ namespace Moq.Tests
 			{
 				int this[int index] { get; set; }
 				void Method(int arg1, int arg2);
+			}
+		}
+
+		// The expression trees reconstructed by `ActionObserver` may differ from those
+		// produced by the Roslyn compilers in some minor regards that shouldn't actually
+		// matter to program execution; however `ExpressionComparer` will notice the
+		// differences, making above tests fail. Because of this, we try to "equalize"
+		// expressions created by the Roslyn compilers (`expected`) and those produced
+		// by `ActionObserver` (`actual`) using this expression visitor:
+		private sealed class PrepareForComparison : ExpressionVisitor
+		{
+			public static readonly PrepareForComparison Instance = new PrepareForComparison();
+
+			protected override Expression VisitExtension(Expression node)
+			{
+				if (node is MatchExpression me)
+				{
+					// Resolve `MatchExpression`s to their matcher's `RenderExpression`:
+					return me.Match.RenderExpression;
+				}
+				else
+				{
+					return base.VisitExtension(node);
+				}
 			}
 		}
 	}

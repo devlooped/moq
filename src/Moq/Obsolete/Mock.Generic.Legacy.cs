@@ -55,8 +55,7 @@ namespace Moq
 		[EditorBrowsable(EditorBrowsableState.Never)]
 		public ISetupSetter<T, TProperty> ExpectSet<TProperty>(Expression<Func<T, TProperty>> expression)
 		{
-			var setup = Mock.SetupSet(this, expression, ItExpr.IsAny<TProperty>());
-			return new SetterSetupPhrase<T, TProperty>(setup);
+			return this.SetupSet(expression);
 		}
 
 		/// <summary>

@@ -102,7 +102,9 @@ namespace Moq.Protected
 			ThrowIfPublicSetter(property, typeof(T).Name);
 			Guard.CanWrite(property);
 
-			var setup = Mock.SetupSet(mock, GetSetterExpression(property, ItExpr.IsAny<TProperty>()), null);
+			var expression = GetSetterExpression(property, ItExpr.IsAny<TProperty>());
+
+			var setup = Mock.SetupSet(mock, expression, condition: null);
 			return new SetterSetupPhrase<T, TProperty>(setup);
 		}
 
@@ -219,9 +221,10 @@ namespace Moq.Protected
 			ThrowIfPublicSetter(property, typeof(T).Name);
 			Guard.CanWrite(property);
 
+			var expression = GetSetterExpression(property, ItExpr.IsAny<TProperty>());
 			// TODO should consider property indexers
 			// TODO should receive the parameter here
-			Mock.VerifySet(mock, GetSetterExpression(property, ItExpr.IsAny<TProperty>()), times, null);
+			Mock.VerifySet(mock, expression, times, null);
 		}
 
 		#endregion
@@ -264,13 +267,13 @@ namespace Moq.Protected
 				BindingFlags.Instance | BindingFlags.NonPublic | BindingFlags.Public);
 		}
 
-		private static Action<T> GetSetterExpression(PropertyInfo property, Expression value)
+		private static Expression<Action<T>> GetSetterExpression(PropertyInfo property, Expression value)
 		{
 			var param = Expression.Parameter(typeof(T), "mock");
 
 			return Expression.Lambda<Action<T>>(
 				Expression.Call(param, property.GetSetMethod(true), value),
-				param).CompileUsingExpressionCompiler();
+				param);
 		}
 
 		private static void ThrowIfMemberMissing(string memberName, MemberInfo member)

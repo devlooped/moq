@@ -45,7 +45,9 @@ namespace Moq
 		public static ISetupSetter<T, TProperty> SetupSet<T, TProperty>(this Mock<T> mock, Expression<Func<T, TProperty>> expression)
 			where T : class
 		{
-			var setup = Mock.SetupSet(mock, expression, ItExpr.IsAny<TProperty>());
+			Guard.NotNull(expression, nameof(expression));
+
+			var setup = Mock.SetupSet(mock, expression.AssignItIsAny(), condition: null);
 			return new SetterSetupPhrase<T, TProperty>(setup);
 		}
 
@@ -74,7 +76,9 @@ namespace Moq
 		public static void VerifySet<T, TProperty>(this Mock<T> mock, Expression<Func<T, TProperty>> expression)
 			where T : class
 		{
-			Mock.VerifySet(mock, expression, Times.AtLeastOnce(), null);
+			Guard.NotNull(expression, nameof(expression));
+
+			Mock.VerifySet(mock, expression.AssignItIsAny(), Times.AtLeastOnce(), null);
 		}
 
 		/// <summary>

@@ -273,13 +273,21 @@ namespace Moq
 
 		internal static void VerifyGet(Mock mock, LambdaExpression expression, Times times, string failMessage)
 		{
-			Guard.NotNull(times, nameof(times));
+			Guard.NotNull(expression, nameof(expression));
 
 			if (!expression.IsPropertyIndexer())  // guard because `.ToPropertyInfo()` doesn't (yet) work for indexers
 			{
 				var property = expression.ToPropertyInfo();
 				Guard.CanRead(property);
 			}
+
+			Mock.Verify(mock, expression, times, failMessage);
+		}
+
+		internal static void VerifySet(Mock mock, LambdaExpression expression, Times times, string failMessage)
+		{
+			Guard.NotNull(expression, nameof(expression));
+			Guard.IsAssignmentToPropertyOrIndexer(expression, nameof(expression));
 
 			Mock.Verify(mock, expression, times, failMessage);
 		}
@@ -325,13 +333,6 @@ namespace Moq
 						l.Body is MethodCallExpression lc && r.Body is MethodCallExpression rc && lc.Method == rc.Method;
 				}
 			}
-		}
-
-		internal static void VerifySet(Mock mock, Delegate setterExpression, Times times, string failMessage)
-		{
-			var (targetMock, expression, method, value) = SetupSetImpl(mock, setterExpression);
-			var expectation = new InvocationShape(method, value);
-			VerifyCalls(targetMock, expectation, expression, times, failMessage);
 		}
 
 		internal static void VerifyNoOtherCalls(Mock mock)
@@ -445,6 +446,14 @@ namespace Moq
 			return Mock.Setup(mock, expression, condition);
 		}
 
+		internal static MethodCall SetupSet(Mock mock, LambdaExpression expression, Condition condition)
+		{
+			Guard.NotNull(expression, nameof(expression));
+			Guard.IsAssignmentToPropertyOrIndexer(expression, nameof(expression));
+
+			return Mock.Setup(mock, expression, condition);
+		}
+
 		internal static SequenceSetup SetupSequence(Mock mock, LambdaExpression expression)
 		{
 			Guard.NotNull(expression, nameof(expression));
@@ -455,37 +464,6 @@ namespace Moq
 				targetMock.Setups.Add(setup);
 				return setup;
 			});
-		}
-
-		[DebuggerStepThrough]
-		internal static MethodCall SetupSet(Mock mock, Delegate setterExpression, Condition condition)
-		{
-			return PexProtector.Invoke(SetupSetPexProtected, mock, setterExpression, condition);
-		}
-
-		private static MethodCall SetupSetPexProtected(Mock mock, Delegate setterExpression, Condition condition)
-		{
-			var (m, expr, method, value) = SetupSetImpl(mock, setterExpression);
-			var setup = new MethodCall(m, condition, expr, method, value);
-			m.Setups.Add(setup);
-			return setup;
-		}
-
-		internal static MethodCall SetupSet(Mock mock, LambdaExpression expression, Expression valueExpression)
-		{
-			var prop = expression.ToPropertyInfo();
-			Guard.CanWrite(prop);
-
-			var propSet = prop.GetSetMethod(true);
-			ThrowIfSetupExpressionInvolvesUnsupportedMember(expression, propSet);
-			ThrowIfSetupMethodNotVisibleToProxyFactory(propSet);
-
-			var setup = new MethodCall(mock, null, expression, propSet, new[] { valueExpression });
-			var targetMock = GetTargetMock(((MemberExpression)expression.Body).Expression, mock);
-
-			targetMock.Setups.Add(setup);
-
-			return setup;
 		}
 
 		private static SetupSetImplResult SetupSetImpl(Mock mock, Delegate setterExpression)

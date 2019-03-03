@@ -100,13 +100,6 @@ namespace Moq
 				for (int i = 0; i < parameterCount; ++i)
 				{
 					expressions[i] = Expression.Constant(invocation.Arguments[i], parameterTypes[i]);
-
-					// Add a `Convert` node (like the C# compiler does) in places where nullable type coercion happens:
-					var argumentValue = invocation.Arguments[i];
-					if (argumentValue != null && Nullable.GetUnderlyingType(parameterTypes[i]) == argumentValue.GetType())
-					{
-						expressions[i] = Expression.Convert(expressions[i], parameterTypes[i]);
-					}
 				}
 
 				// Now let's override the above constant expressions with argument matchers, if available:
@@ -139,7 +132,7 @@ namespace Moq
 
 							// The remaining matchers can be distributed over the remaining parameters,
 							// so we can use up this matcher:
-							expressions[argumentIndex] = matches[matchIndex].RenderExpression;
+							expressions[argumentIndex] = new MatchExpression(matches[matchIndex]);
 							++matchIndex;
 						}
 					}
@@ -165,12 +158,23 @@ namespace Moq
 					}
 				}
 
-				// Finally box all values that need to be boxed:
+				// Finally, add explicit type casts (aka `Convert` nodes) where necessary:
 				for (int i = 0; i < expressions.Length; ++i)
 				{
-					if (expressions[i].Type.GetTypeInfo().IsValueType && !parameterTypes[i].GetTypeInfo().IsValueType)
+					var argument = expressions[i];
+					var parameterType = parameterTypes[i];
+
+					// nullable type coercion:
+					var argumentValue = invocation.Arguments[i];
+					if (Nullable.GetUnderlyingType(parameterType) != null && Nullable.GetUnderlyingType(argument.Type) == null)
 					{
-						expressions[i] = Expression.Convert(expressions[i], parameterTypes[i]);
+						expressions[i] = Expression.Convert(argument, parameterType);
+					}
+
+					// boxing of value types (i.e. where a value-typed value is assigned to a reference-typed parameter):
+					if (argument.Type.GetTypeInfo().IsValueType && !parameterType.GetTypeInfo().IsValueType)
+					{
+						expressions[i] = Expression.Convert(argument, parameterType);
 					}
 				}
 

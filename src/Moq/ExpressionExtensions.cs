@@ -11,6 +11,7 @@ using System.Reflection;
 using System.Runtime.CompilerServices;
 
 using Moq.Properties;
+using Moq.Protected;
 
 namespace Moq
 {
@@ -235,11 +236,19 @@ namespace Moq
 						r = memberAccessExpression.Expression;
 						var parameter = Expression.Parameter(r.Type, r is ParameterExpression ope ? ope.Name : ParameterName);
 						var property = memberAccessExpression.GetReboundProperty();
+						var method = property.CanRead ? property.GetGetMethod(true) : property.GetSetMethod(true);
+						//                    ^^^^^^^                               ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+						// We're in the switch case block for property read access, therefore we prefer the
+						// getter. When a read-write property is being assigned to, we end up here, too, and
+						// select the wrong accessor. However, that doesn't matter because it will be over-
+						// ridden in the above `Assign` case. Finally, if a write-only property is being
+						// assigned to, we fall back to the setter here in order to not end up without a
+						// method at all.
 						p = new LambdaExpressionPart(
 									expression: Expression.Lambda(
 										Expression.MakeMemberAccess(parameter, property),
 										parameter),
-									method: property.GetGetMethod(true));
+									method);
 						return;
 					}
 
@@ -300,16 +309,14 @@ namespace Moq
 		}
 
 		/// <summary>
-		/// Checks whether the body of the lambda expression is a property indexer, which is true 
-		/// when the expression is an <see cref="MethodCallExpression"/> whose 
-		/// <see cref="MethodCallExpression.Method"/> has <see cref="MethodBase.IsSpecialName"/> 
-		/// equal to <see langword="true"/>.
+		///   Checks whether the body of the lambda expression is a indexer access.
 		/// </summary>
 		public static bool IsPropertyIndexer(this LambdaExpression expression)
 		{
 			Guard.NotNull(expression, nameof(expression));
 
-			return expression.Body is MethodCallExpression methodCallExpression && methodCallExpression.Method.IsSpecialName;
+			return expression.Body is IndexExpression
+				|| expression.Body is MethodCallExpression methodCallExpression && methodCallExpression.Method.IsSpecialName;
 		}
 
 		public static Expression StripQuotes(this Expression expression)
@@ -320,6 +327,18 @@ namespace Moq
 			}
 
 			return expression;
+		}
+
+		public static Expression<Action<TMock>> AssignItIsAny<TMock, T>(this Expression<Func<TMock, T>> expression)
+		{
+			Debug.Assert(expression != null);
+			Debug.Assert(expression.Body is MemberExpression || expression.Body is IndexExpression);
+
+			return Expression.Lambda<Action<TMock>>(
+					Expression.Assign(
+							expression.Body,
+							ItExpr.IsAny<T>()),
+					expression.Parameters[0]);
 		}
 
 		public static Expression PartialEval(this Expression expression)

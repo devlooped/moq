@@ -38,13 +38,19 @@ namespace Moq.Language.Flow
 
 		public ISetupSetter<T, TProperty> SetupSet<TProperty>(Action<T> setterExpression)
 		{
-			var setup = Mock.SetupSet(mock, setterExpression, this.condition);
+			Guard.NotNull(setterExpression, nameof(setterExpression));
+			var expression = ExpressionReconstructor.Instance.ReconstructExpression(setterExpression);
+
+			var setup = Mock.SetupSet(mock, expression, this.condition);
 			return new SetterSetupPhrase<T, TProperty>(setup);
 		}
 
 		public ISetup<T> SetupSet(Action<T> setterExpression)
 		{
-			var setup = Mock.SetupSet(mock, setterExpression, this.condition);
+			Guard.NotNull(setterExpression, nameof(setterExpression));
+			var expression = ExpressionReconstructor.Instance.ReconstructExpression(setterExpression);
+
+			var setup = Mock.SetupSet(mock, expression, this.condition);
 			return new VoidSetupPhrase<T>(setup);
 		}
 	}
