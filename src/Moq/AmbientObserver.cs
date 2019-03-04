@@ -31,21 +31,36 @@ namespace Moq
 	internal sealed class AmbientObserver : IDisposable
 	{
 		[ThreadStatic]
-		private static AmbientObserver current;
+		private static Stack<AmbientObserver> activations;
 
 		public static AmbientObserver Activate()
 		{
-			Debug.Assert(current == null);
+			var activation = new AmbientObserver();
 
-			return current = new AmbientObserver();
+			var activations = AmbientObserver.activations;
+			if (activations == null)
+			{
+				AmbientObserver.activations = activations = new Stack<AmbientObserver>();
+			}
+			activations.Push(activation);
+
+			return activation;
 		}
 
 		public static bool IsActive(out AmbientObserver observer)
 		{
-			var current = AmbientObserver.current;
+			var activations = AmbientObserver.activations;
 
-			observer = current;
-			return current != null;
+			if (activations != null && activations.Count > 0)
+			{
+				observer = activations.Peek();
+				return true;
+			}
+			else
+			{
+				observer = null;
+				return false;
+			}
 		}
 
 		private List<Observation> observations;
@@ -64,7 +79,9 @@ namespace Moq
 				}
 			}
 
-			current = null;
+			var activations = AmbientObserver.activations;
+			Debug.Assert(activations != null && activations.Count > 0);
+			activations.Pop();
 		}
 
 		/// <summary>

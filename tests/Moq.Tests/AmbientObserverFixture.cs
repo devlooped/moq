@@ -8,6 +8,63 @@ namespace Moq.Tests
 	public class AmbientObserverFixture
 	{
 		[Fact]
+		public void Activations_can_be_nested()
+		{
+			Assert.False(AmbientObserver.IsActive(out var active));
+			using (var outer = AmbientObserver.Activate())
+			{
+				Assert.True(AmbientObserver.IsActive(out active));
+				Assert.Same(outer, active);
+				using (var inner = AmbientObserver.Activate())
+				{
+					Assert.True(AmbientObserver.IsActive(out active));
+					Assert.Same(inner, active);
+				}
+				Assert.True(AmbientObserver.IsActive(out active));
+				Assert.Same(outer, active);
+			}
+			Assert.False(AmbientObserver.IsActive(out active));
+		}
+
+		[Fact]
+		public void Nested_observers_do_not_share_their_observations()
+		{
+			using (var outer = AmbientObserver.Activate())
+			{
+				_ = CreateMatch();
+				Assert.True(outer.LastIsMatch(out var outerLastMatchBeforeInner));
+				using (var inner = AmbientObserver.Activate())
+				{
+					// The inner observer should not see the outer observer's match:
+					Assert.False(inner.LastIsMatch(out _));
+					_ = CreateMatch();
+				}
+				// And the outer observer should not see the (disposed) inner observer's match.
+				// Instead, it should still see the same match as the last one as before `inner`:
+				Assert.True(outer.LastIsMatch(out var outerLastMatchAfterInnerDisposed));
+				Assert.Same(outerLastMatchBeforeInner, outerLastMatchAfterInnerDisposed);
+			}
+		}
+
+		[Fact]
+		public void Nested_observers_when_disposed_dont_interrupt_outer_observers()
+		{
+			using (var outer = AmbientObserver.Activate())
+			{
+				using (var inner = AmbientObserver.Activate())
+				{
+				}
+				_ = CreateMatch();
+				Assert.True(outer.LastIsMatch(out var match));
+			}
+		}
+
+		private int CreateMatch()
+		{
+			return Match.Create<int>(i => i != 0, () => It.Is<int>(i => i != 0));
+		}
+
+		[Fact]
 		public void IsActive_returns_false_when_no_AmbientObserver_instantiated()
 		{
 			Assert.False(AmbientObserver.IsActive(out _));
