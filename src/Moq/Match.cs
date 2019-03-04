@@ -63,14 +63,14 @@ namespace Moq
 	}
 
 	/// <include file='Match.xdoc' path='docs/doc[@for="Match{T}"]/*'/>
-	public class Match<T> : Match
+	public class Match<T> : Match, IEquatable<Match<T>>
 	{
 		internal Predicate<T> Condition { get; set; }
 
 		internal Match(Predicate<T> condition, Expression<Func<T>> renderExpression)
 		{
 			this.Condition = condition;
-			this.RenderExpression = renderExpression.Body;
+			this.RenderExpression = renderExpression.Body.EvaluateCapturedVariables();
 		}
 
 		internal override bool Matches(object value)
@@ -96,5 +96,38 @@ namespace Moq
 			}
 			return this.Condition((T)value);
 		}
+
+		/// <inheritdoc/>
+		public override bool Equals(object obj)
+		{
+			return obj is Match<T> other && this.Equals(other);
+		}
+
+		/// <inheritdoc/>
+		public bool Equals(Match<T> other)
+		{
+			if (this.Condition == other.Condition)
+			{
+				return true;
+			}
+			else if (this.Condition.GetMethodInfo() != other.Condition.GetMethodInfo())
+			{
+				return false;
+			}
+			else if (!(this.RenderExpression is MethodCallExpression ce && ce.Method.DeclaringType == typeof(Match)))
+			{
+				return ExpressionComparer.Default.Equals(this.RenderExpression, other.RenderExpression);
+			}
+			else
+			{
+				return false;  // The test documented in `MatchFixture.Equality_ambiguity` is caused by this.
+				               // Returning true would break equality even worse. The only way to resolve the
+				               // ambiguity is to either add a render expression to your custom matcher, or
+				               // to test both `Condition.Target` objects for structural equality.
+			}
+		}
+
+		/// <inheritdoc/>
+		public override int GetHashCode() => 0;
 	}
 }

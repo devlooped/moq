@@ -8,6 +8,7 @@ using System.Globalization;
 using System.Linq;
 using System.Linq.Expressions;
 using System.Reflection;
+using System.Runtime.CompilerServices;
 
 using Moq.Properties;
 
@@ -31,6 +32,12 @@ namespace Moq
 
 		public static bool IsMatch(this Expression expression, out Match match)
 		{
+			if (expression is MatchExpression matchExpression)
+			{
+				match = matchExpression.Match;
+				return true;
+			}
+
 			using (var observer = AmbientObserver.Activate())
 			{
 				Expression.Lambda<Action>(expression).CompileUsingExpressionCompiler().Invoke();
@@ -355,6 +362,36 @@ namespace Moq
 		public static string ToStringFixed(this Expression expression)
 		{
 			return new ExpressionStringBuilder().Append(expression).ToString();
+		}
+
+		public static Expression EvaluateCapturedVariables(this Expression expression)
+		{
+			return CapturedVariablesEvaluator.Instance.Visit(expression);
+		}
+
+		/// This is a more limited but much cheaper variant of `Evaluator`. It only evaluates
+		/// captured variables in lambdas to remove weird field accesses on "display class" instances.
+		private sealed class CapturedVariablesEvaluator : ExpressionVisitor
+		{
+			public static readonly CapturedVariablesEvaluator Instance = new CapturedVariablesEvaluator();
+
+			private CapturedVariablesEvaluator()
+			{
+			}
+
+			protected override Expression VisitMember(MemberExpression node)
+			{
+				if (node.Member is FieldInfo fi
+					&& node.Expression is ConstantExpression ce
+					&& node.Member.DeclaringType.GetTypeInfo().IsDefined(typeof(CompilerGeneratedAttribute)))
+				{
+					return Expression.Constant(fi.GetValue(ce.Value), node.Type);
+				}
+				else
+				{
+					return base.VisitMember(node);
+				}
+			}
 		}
 	}
 }

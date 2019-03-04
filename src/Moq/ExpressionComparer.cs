@@ -4,6 +4,7 @@
 using System;
 using System.Collections.Generic;
 using System.Collections.ObjectModel;
+using System.Diagnostics;
 using System.Linq.Expressions;
 
 namespace Moq
@@ -18,7 +19,7 @@ namespace Moq
 
 		public bool Equals(Expression x, Expression y)
 		{
-			if (x == null && y == null)
+			if (object.ReferenceEquals(x, y))
 			{
 				return true;
 			}
@@ -96,6 +97,11 @@ namespace Moq
 					case ExpressionType.ListInit:
 						return this.EqualsListInit((ListInitExpression)x, (ListInitExpression)y);
 				}
+			}
+
+			if (x.NodeType == ExpressionType.Extension || y.NodeType == ExpressionType.Extension)
+			{
+				return this.EqualsExtension(x, y);
 			}
 
 			return false;
@@ -242,6 +248,15 @@ namespace Moq
 		private bool EqualsUnary(UnaryExpression x, UnaryExpression y)
 		{
 			return x.Method == y.Method && this.Equals(x.Operand, y.Operand);
+		}
+
+		private bool EqualsExtension(Expression x, Expression y)
+		{
+			// For now, we only care about our own `MatchExpression` extension;
+			// if we wanted to be more thorough, we'd try to reduce `x` and `y`,
+			// then compare the reduced nodes.
+
+			return x.IsMatch(out var xm) && y.IsMatch(out var ym) && object.Equals(xm, ym);
 		}
 	}
 }

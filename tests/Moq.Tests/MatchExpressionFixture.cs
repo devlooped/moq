@@ -5,6 +5,8 @@ using System;
 using System.Diagnostics;
 using System.Linq.Expressions;
 
+using Moq.Protected;
+
 using Xunit;
 
 namespace Moq.Tests
@@ -56,6 +58,38 @@ namespace Moq.Tests
 		}
 
 		[Fact]
+		public void Can_be_compared_by_ExpressionComparer()
+		{
+			var left = GetExpression();
+			var right = GetExpression();
+			Assert.Equal(left, right, ExpressionComparer.Default);
+		}
+
+		[Fact]
+		public void Can_be_compared_by_ExpressionComparer_2()
+		{
+			var left = GetItIsAnyExpression();
+			var right = GetItIsAnyExpression();
+			Assert.Equal(left, right, ExpressionComparer.Default);
+		}
+
+		[Fact]
+		public void Can_be_compared_by_ExpressionComparer_3()
+		{
+			var left = GetItIsAnyExpression();
+			var right = GetItIsAnyMatchExpression();
+			Assert.Equal(left, right, ExpressionComparer.Default);
+		}
+
+		[Fact]
+		public void Can_be_compared_by_ExpressionComparer_4()
+		{
+			var left = GetItIsAnyMatchExpression();
+			var right = GetItIsAnyExpression();
+			Assert.Equal(left, right, ExpressionComparer.Default);
+		}
+
+		[Fact]
 		public void Is_correctly_handled_by_MatcherFactory()
 		{
 			var expression = GetExpression();
@@ -86,6 +120,35 @@ namespace Moq.Tests
 					typeof(IX).GetMethod(nameof(IX.M)),
 					new MatchExpression(
 						new Match<int>(arg => arg == 5, () => It.Is<int>(arg => arg == 5)))),
+				x);
+		}
+
+		private Expression<Action<IX>> GetItIsAnyExpression()
+		{
+			var x = Expression.Parameter(typeof(IX), "x");
+			return Expression.Lambda<Action<IX>>(
+				Expression.Call(
+					x,
+					typeof(IX).GetMethod(nameof(IX.M)),
+					ItExpr.IsAny<int>()),
+				x);
+		}
+
+		private Expression<Action<IX>> GetItIsAnyMatchExpression()
+		{
+			Match itIsAnyMatch;
+			using (var observer = AmbientObserver.Activate())
+			{
+				_ = It.IsAny<int>();
+				_ = observer.LastIsMatch(out itIsAnyMatch);
+			}
+
+			var x = Expression.Parameter(typeof(IX), "x");
+			return Expression.Lambda<Action<IX>>(
+				Expression.Call(
+					x,
+					typeof(IX).GetMethod(nameof(IX.M)),
+					new MatchExpression(itIsAnyMatch)),
 				x);
 		}
 
