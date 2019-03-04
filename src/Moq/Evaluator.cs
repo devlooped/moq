@@ -33,7 +33,7 @@ namespace Moq
 		/// <returns>A new tree with sub-trees evaluated and replaced.</returns>
 		public static Expression PartialEval(Expression expression)
 		{
-			return PartialEval(expression, e => e.NodeType != ExpressionType.Parameter);
+			return PartialEval(expression, e => e.NodeType != ExpressionType.Parameter && !(e is MatchExpression));
 		}
 
 		/// <summary>

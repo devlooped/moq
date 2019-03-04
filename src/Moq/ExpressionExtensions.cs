@@ -334,6 +334,9 @@ namespace Moq
 				case ExpressionType.Parameter:
 					return false;
 
+				case ExpressionType.Extension:
+					return !(expression is MatchExpression);
+
 				case ExpressionType.Call:
 					return !((MethodCallExpression)expression).Method.IsDefined(typeof(MatcherAttribute), true);
 

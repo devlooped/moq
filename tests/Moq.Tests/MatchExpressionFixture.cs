@@ -2,6 +2,7 @@
 // All rights reserved. Licensed under the BSD 3-Clause License; see License.txt.
 
 using System;
+using System.Diagnostics;
 using System.Linq.Expressions;
 
 using Xunit;
@@ -34,6 +35,26 @@ namespace Moq.Tests
 				GetExpression().ToStringFixed());
 		}
 
+		[Fact]
+		public void Is_not_evaluated_by_PartialEval()
+		{
+			var expression = GetExpression();
+			var matchExpression = FindMatchExpression(expression);
+			Assert.NotNull(matchExpression);
+			var evaluatedExpression = expression.PartialEval();
+			Assert.Same(matchExpression, FindMatchExpression(evaluatedExpression));
+		}
+
+		[Fact]
+		public void Is_not_evaluated_by_PartialMatcherAwareEval()
+		{
+			var expression = GetExpression();
+			var matchExpression = FindMatchExpression(expression);
+			Debug.Assert(matchExpression != null);
+			var evaluatedExpression = expression.PartialMatcherAwareEval();
+			Assert.Same(matchExpression, FindMatchExpression(evaluatedExpression));
+		}
+
 		private Expression<Action<IX>> GetExpression()
 		{
 			var x = Expression.Parameter(typeof(IX), "x");
@@ -44,6 +65,24 @@ namespace Moq.Tests
 					new MatchExpression(
 						new Match<int>(arg => arg == 5, () => It.Is<int>(arg => arg == 5)))),
 				x);
+		}
+
+		private static MatchExpression FindMatchExpression(Expression expression)
+		{
+			switch (expression.NodeType)
+			{
+				case ExpressionType.Lambda:
+					return FindMatchExpression(((LambdaExpression)expression).Body);
+
+				case ExpressionType.Call:
+					return FindMatchExpression(((MethodCallExpression)expression).Arguments[0]);
+
+				case ExpressionType.Extension:
+					return expression as MatchExpression;
+
+				default:
+					return null;
+			}
 		}
 
 		public interface IX
