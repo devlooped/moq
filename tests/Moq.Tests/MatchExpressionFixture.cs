@@ -55,6 +55,28 @@ namespace Moq.Tests
 			Assert.Same(matchExpression, FindMatchExpression(evaluatedExpression));
 		}
 
+		[Fact]
+		public void Is_correctly_handled_by_MatcherFactory()
+		{
+			var expression = GetExpression();
+			var matchExpression = FindMatchExpression(expression);
+			Debug.Assert(matchExpression != null);
+			var matcher = MatcherFactory.CreateMatcher(matchExpression);
+			Assert.IsType<Match<int>>(matcher);
+		}
+
+		[Fact]
+		public void Is_handled_correctly_in_setup_and_verification()
+		{
+			var mock = new Mock<IX>();
+			mock.Setup(GetExpression()).Verifiable();
+			Assert.Throws<MockException>(() => mock.Verify());
+			mock.Object.M(1);
+			Assert.Throws<MockException>(() => mock.Verify());
+			mock.Object.M(5);
+			mock.Verify();
+		}
+
 		private Expression<Action<IX>> GetExpression()
 		{
 			var x = Expression.Parameter(typeof(IX), "x");
