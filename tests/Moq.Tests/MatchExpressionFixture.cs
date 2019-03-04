@@ -26,6 +26,14 @@ namespace Moq.Tests
 				GetExpression().ToString());
 		}
 
+		[Fact]
+		public void Can_be_rendered_using_ToStringFixed()
+		{
+			Assert.Equal(
+				"x => x.M(It.Is<int>(arg => arg == 5))",
+				GetExpression().ToStringFixed());
+		}
+
 		private Expression<Action<IX>> GetExpression()
 		{
 			var x = Expression.Parameter(typeof(IX), "x");
