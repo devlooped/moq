@@ -122,6 +122,13 @@ namespace Moq
 				case ExpressionType.ListInit:
 					ToStringListInit((ListInitExpression)exp);
 					return;
+				case ExpressionType.Extension:
+					if (exp is MatchExpression me)
+					{
+						ToStringMatch(me);
+						return;
+					}
+					goto default;
 				default:
 					throw new Exception(string.Format(Resources.UnhandledExpressionType, exp.NodeType));
 			}
@@ -468,6 +475,12 @@ namespace Moq
 					builder.Append(']');
 					return;
 			}
+		}
+
+		private void ToStringMatch(MatchExpression node)
+		{
+			ToString(node.Match.RenderExpression);
+			return;
 		}
 
 		private void AsCommaSeparatedValues<T>(IEnumerable<T> source, Action<T> toStringAction) where T : Expression
