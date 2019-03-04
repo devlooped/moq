@@ -466,109 +466,6 @@ namespace Moq
 			});
 		}
 
-		private static SetupSetImplResult SetupSetImpl(Mock mock, Delegate setterExpression)
-		{
-			Mock target;
-			Invocation invocation;
-			AmbientObserver.Matches matches;
-
-			using (var observer = AmbientObserver.Activate())
-			{
-				setterExpression.DynamicInvoke(mock.Object);
-
-				if (!observer.LastIsInvocation(out target, out invocation, out matches))
-				{
-					throw new ArgumentException(string.Format(
-						CultureInfo.InvariantCulture,
-						Resources.SetupOnNonVirtualMember,
-						string.Empty));
-				}
-			}
-
-			var setter = invocation.Method;
-			if (!setter.IsPropertySetter())
-			{
-				throw new ArgumentException(Resources.SetupNotSetter);
-			}
-
-			// No need to call ThrowIfCantOverride as non-overridable would have thrown above already.
-
-			// Get the variable name as used in the actual delegate :)
-			// because of delegate currying, look at the last parameter for the Action's backing method, not the first
-			var setterExpressionParameters = setterExpression.GetMethodInfo().GetParameters();
-			var parameterName = setterExpressionParameters[setterExpressionParameters.Length - 1].Name;
-			var x = Expression.Parameter(invocation.Method.DeclaringType, parameterName);
-
-			var arguments = invocation.Arguments;
-			var parameters = setter.GetParameters();
-			var values = new Expression[arguments.Length];
-
-			if (matches.Count == 0)
-			{
-				// Length == 1 || Length == 2 (Indexer property)
-				for (int i = 0; i < arguments.Length; i++)
-				{
-					values[i] = GetValueExpression(arguments[i], parameters[i].ParameterType);
-				}
-
-				var lambda = Expression.Lambda(
-					typeof(Action<>).MakeGenericType(x.Type),
-					Expression.Call(x, invocation.Method, values),
-					x);
-
-				return new SetupSetImplResult(target, lambda, invocation.Method, values);
-			}
-			else
-			{
-				// TODO: Use all observed matchers, not just the last one!
-				var lastMatch = matches[matches.Count - 1];
-
-				var matchers = new Expression[arguments.Length];
-				var valueIndex = arguments.Length - 1;
-				var propertyType = setter.GetParameters()[valueIndex].ParameterType;
-
-				// If the value matcher is not equal to the property 
-				// type (i.e. prop is int?, but you use It.IsAny<int>())
-				// add a cast.
-				if (lastMatch.RenderExpression.Type != propertyType)
-				{
-					values[valueIndex] = Expression.Convert(lastMatch.RenderExpression, propertyType);
-				}
-				else
-				{
-					values[valueIndex] = lastMatch.RenderExpression;
-				}
-
-				matchers[valueIndex] = new MatchExpression(lastMatch);
-
-				for (int i = 0; i < arguments.Length - 1; i++)
-				{
-					// Add the index value for the property indexer
-					values[i] = GetValueExpression(arguments[i], parameters[i].ParameterType);
-					// TODO: No matcher supported now for the index
-					matchers[i] = values[i];
-				}
-
-				var lambda = Expression.Lambda(
-					typeof(Action<>).MakeGenericType(x.Type),
-					Expression.Call(x, invocation.Method, values),
-					x);
-
-				return new SetupSetImplResult(target, lambda, invocation.Method, matchers);
-			}
-		}
-
-		private static Expression GetValueExpression(object value, Type type)
-		{
-			if (value != null && value.GetType() == type)
-			{
-				return Expression.Constant(value);
-			}
-
-			// Add a cast if values do not match exactly (i.e. for Nullable<T>)
-			return Expression.Convert(Expression.Constant(value), type);
-		}
-
 		[DebuggerStepThrough]
 		private static TSetup SetupRecursive<TSetup>(Mock mock, LambdaExpression expression, Func<LambdaExpressionPart, Mock, TSetup> setupLast)
 		{
@@ -711,26 +608,6 @@ namespace Moq
 			return Expression.Lambda(Expression.MakeMemberAccess(param, property), param);
 		}
 
-		/// <summary>
-		/// Gets the interceptor target for the given expression and root mock, 
-		/// building the intermediate hierarchy of mock objects if necessary.
-		/// </summary>
-		private static Mock GetTargetMock(Expression fluentExpression, Mock mock)
-		{
-			if (fluentExpression is ParameterExpression)
-			{
-				// fast path for single-dot setup expressions;
-				// no need for expensive lambda compilation.
-				return mock;
-			}
-
-			var targetExpression = VisitFluent(mock, fluentExpression);
-			var targetLambda = Expression.Lambda<Func<Mock>>(Expression.Convert(targetExpression, typeof(Mock)));
-
-			var targetObject = targetLambda.CompileUsingExpressionCompiler()();
-			return targetObject;
-		}
-
 		private static void ThrowIfSetupMethodNotVisibleToProxyFactory(MethodInfo method)
 		{
 			if (ProxyFactory.Instance.IsMethodVisible(method, out string messageIfNotVisible) == false)
@@ -778,13 +655,6 @@ namespace Moq
 					Resources.VerifyOnNonVirtualMember,
 					verify.ToStringFixed()));
 			}
-		}
-
-		private static Expression VisitFluent(Mock mock, Expression expression)
-		{
-			return new FluentMockVisitor(resolveRoot: p => Expression.Constant(mock),
-			                             setupRightmost: false)
-			       .Visit(expression);
 		}
 
 		#endregion
@@ -961,29 +831,5 @@ namespace Moq
 		}
 
 		#endregion
-
-		private readonly struct SetupSetImplResult
-		{
-			private readonly Mock mock;
-			private readonly LambdaExpression lambda;
-			private readonly MethodInfo method;
-			private readonly Expression[] arguments;
-
-			public SetupSetImplResult(Mock mock, LambdaExpression lambda, MethodInfo method, Expression[] arguments)
-			{
-				this.mock = mock;
-				this.lambda = lambda;
-				this.method = method;
-				this.arguments = arguments;
-			}
-
-			public void Deconstruct(out Mock mock, out LambdaExpression lambda, out MethodInfo method, out Expression[] arguments)
-			{
-				mock = this.mock;
-				lambda = this.lambda;
-				method = this.method;
-				arguments = this.arguments;
-			}
-		}
 	}
 }
