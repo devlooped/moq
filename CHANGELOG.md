@@ -27,6 +27,8 @@ This release contains several **minor breaking changes**. Please review your cod
 * `Verify` gets confused between the same generic and non-generic signature (@lepijohnny, #749)
 * Setup gets included in `Verify` despite being "unreachable" (@stakx, #703)
 * `Verify` can create setups that cause subsequent `VerifyAll` to fail (@stakx & @lepijohnny, #699)
+* Incomplete stack trace when raising an event with `mock.Raise` throws (@MutatedTomato, #738)
+
 
 ## 4.10.1 (2018-12-03)
 

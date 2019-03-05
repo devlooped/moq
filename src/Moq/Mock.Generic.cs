@@ -566,38 +566,18 @@ namespace Moq
 
 		/// <include file='Mock.Generic.xdoc' path='docs/doc[@for="Mock{T}.Raise"]/*'/>
 		[SuppressMessage("Microsoft.Design", "CA1030:UseEventsWhereAppropriate", Justification = "Raises the event, rather than being one.")]
-		[SuppressMessage("Microsoft.Usage", "CA2200:RethrowToPreserveStackDetails", Justification = "We want to reset the stack trace to avoid Moq noise in it.")]
 		public void Raise(Action<T> eventExpression, EventArgs args)
 		{
 			var (ev, target) = eventExpression.GetEventWithTarget(this.Object);
-
-			try
-			{
-				target.DoRaise(ev, args);
-			}
-			catch (Exception e)
-			{
-				// Reset stack trace so user gets this call site only.
-				throw e;
-			}
+			target.DoRaise(ev, args);
 		}
 
 		/// <include file='Mock.Generic.xdoc' path='docs/doc[@for="Mock{T}.Raise(args)"]/*'/>
 		[SuppressMessage("Microsoft.Design", "CA1030:UseEventsWhereAppropriate", Justification = "Raises the event, rather than being one.")]
-		[SuppressMessage("Microsoft.Usage", "CA2200:RethrowToPreserveStackDetails", Justification = "We want to reset the stack trace to avoid Moq noise in it.")]
 		public void Raise(Action<T> eventExpression, params object[] args)
 		{
 			var (ev, target) = eventExpression.GetEventWithTarget(this.Object);
-
-			try
-			{
-				target.DoRaise(ev, args);
-			}
-			catch (Exception e)
-			{
-				// Reset stack trace so user gets this call site only.
-				throw e;
-			}
+			target.DoRaise(ev, args);
 		}
 
 #endregion
