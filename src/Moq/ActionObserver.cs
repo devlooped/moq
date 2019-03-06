@@ -10,6 +10,7 @@ using System.Linq;
 using System.Linq.Expressions;
 using System.Reflection;
 
+using Moq.Expressions.Visitors;
 using Moq.Internals;
 using Moq.Properties;
 
@@ -78,7 +79,7 @@ namespace Moq
 				// diagnostic purposes:
 				if (error == null)
 				{
-					return Expression.Lambda<Action<T>>(Prettifier.Instance.Visit(body), rootExpression);
+					return Expression.Lambda<Action<T>>(body.Apply(UpgradePropertyAccessorMethods.Rewriter), rootExpression);
 				}
 				else
 				{
@@ -256,80 +257,6 @@ namespace Moq
 				{
 					invocation.Return();
 				}
-			}
-		}
-
-		// Post-processes a reconstructed expression to...
-		//  * convert property accessor method calls into property member accesses (`.get_X()` -> `.X`)
-		//  * evaluate captured variables in lambdas to their value
-		private sealed class Prettifier : ExpressionVisitor
-		{
-			public static readonly Prettifier Instance = new Prettifier();
-
-			private Prettifier()
-			{
-			}
-
-			protected override Expression VisitMember(MemberExpression node)
-			{
-				if (node.Member is FieldInfo field && node.Expression is ConstantExpression constant)
-				{
-					return Expression.Constant(field.GetValue(constant.Value));
-				}
-				else
-				{
-					return node;
-				}
-			}
-
-			protected override Expression VisitMethodCall(MethodCallExpression node)
-			{
-				var obj = this.Visit(node.Object);
-
-				if (node.Method.IsPropertyGetter())
-				{
-					var propertyName = node.Method.Name.Substring(4);
-					var property = node.Method.DeclaringType.GetProperty(propertyName, BindingFlags.Public | BindingFlags.NonPublic | BindingFlags.Instance);
-					return Expression.MakeMemberAccess(obj, property);
-				}
-				else if (node.Method.IsPropertySetter())
-				{
-					var propertyName = node.Method.Name.Substring(4);
-					var argumentCount = node.Arguments.Count;
-					if (argumentCount == 1)
-					{
-						// setter
-						var property = node.Method.DeclaringType.GetProperty(propertyName, BindingFlags.Public | BindingFlags.NonPublic | BindingFlags.Instance);
-						return Expression.Assign(Expression.MakeMemberAccess(obj, property), this.Visit(node.Arguments[0]));
-					}
-					else
-					{
-						// indexer
-						var parameterTypes = node.Method.GetParameterTypes();
-						var indexTypes = parameterTypes.Take(parameterTypes.Count - 1).ToArray();
-						var indexer = node.Method.DeclaringType.GetProperty(propertyName, parameterTypes.Last(), indexTypes);
-						var args = VisitArguments(node.Arguments);
-						return Expression.Assign(Expression.MakeIndex(obj, indexer, args.Take(argumentCount - 1)), this.Visit(args.Last()));
-					}
-				}
-				else
-				{
-					var args = VisitArguments(node.Arguments);
-					return obj != node.Object || args != node.Arguments ? Expression.Call(obj, node.Method, args)
-					                                                    : node;
-				}
-			}
-
-			private ReadOnlyCollection<Expression> VisitArguments(ReadOnlyCollection<Expression> arguments)
-			{
-				var result = new Expression[arguments.Count];
-				var atLeastOneChanged = false;
-				for (int i = 0; i < result.Length; ++i)
-				{
-					result[i] = this.Visit(arguments[i]);
-					atLeastOneChanged |= result[i] != arguments[i];
-				}
-				return atLeastOneChanged ? new ReadOnlyCollection<Expression>(result) : arguments;
 			}
 		}
 	}

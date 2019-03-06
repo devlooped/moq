@@ -6,6 +6,8 @@ using System.Diagnostics.CodeAnalysis;
 using System.Linq.Expressions;
 using System.Reflection;
 
+using Moq.Expressions.Visitors;
+
 namespace Moq
 {
 	/// <include file='Match.xdoc' path='docs/doc[@for="Match"]/*'/>
@@ -70,7 +72,7 @@ namespace Moq
 		internal Match(Predicate<T> condition, Expression<Func<T>> renderExpression)
 		{
 			this.Condition = condition;
-			this.RenderExpression = renderExpression.Body.EvaluateCapturedVariables();
+			this.RenderExpression = renderExpression.Body.Apply(EvaluateCaptures.Rewriter);
 		}
 
 		internal override bool Matches(object value)
