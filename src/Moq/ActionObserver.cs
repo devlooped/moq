@@ -3,7 +3,6 @@
 
 using System;
 using System.Collections.Generic;
-using System.Collections.ObjectModel;
 using System.Diagnostics;
 using System.Globalization;
 using System.Linq;
@@ -13,6 +12,8 @@ using System.Reflection;
 using Moq.Expressions.Visitors;
 using Moq.Internals;
 using Moq.Properties;
+
+using TypeNameFormatter;
 
 namespace Moq
 {
@@ -109,14 +110,28 @@ namespace Moq
 					int matchIndex = 0;
 					for (int argumentIndex = 0; matchIndex < matches.Length && argumentIndex < expressions.Length; ++argumentIndex)
 					{
-						if (!object.Equals(invocation.Arguments[argumentIndex], matches[matchIndex].RenderExpression.Type.GetDefaultValue()))
+						// We are assuming that by default matchers return `default(T)`. If a matcher was used,
+						// it will have left behind a `default(T)` argument, possibly coerced to the parameter type.
+						// Therefore, we attempt to reproduce such coercions using `Convert.ChangeType`:
+						Type defaultValueType = matches[matchIndex].RenderExpression.Type;
+						object defaultValue = defaultValueType.GetDefaultValue();
+						try
+						{
+							defaultValue = Convert.ChangeType(defaultValue, parameterTypes[argumentIndex]);
+						}
+						catch
+						{
+							// Never mind, we tried.
+						}
+
+						if (!object.Equals(invocation.Arguments[argumentIndex], defaultValue))
 						{
 							// This parameter has a non-`default` value.  We therefore assume that it isn't
-							// a value that was originally produced by a matcher, since they usually return `default`.
+							// a value that was produced by a matcher. (See explanation in comment above.)
 							continue;
 						}
 
-						if (parameterTypes[argumentIndex].IsAssignableFrom(matches[matchIndex].RenderExpression.Type))
+						if (parameterTypes[argumentIndex].IsAssignableFrom(defaultValue?.GetType() ?? defaultValueType))
 						{
 							// We found a potential match. (Matcher type is assignment-compatible to parameter type.)
 
@@ -140,7 +155,16 @@ namespace Moq
 
 					if (matchIndex < matches.Length)
 					{
-						throw new ArgumentException("Superfluous matchers, possibly due to nested expressions!?");
+						// If we get here, we can be almost certain that matchers weren't distributed properly
+						// across the invocation's parameters. We could hope for the best and just leave it
+						// at that; however, it's probably better to let client code know, so it can be either
+						// adjusted or reported to Moq.
+						throw new ArgumentException(
+							string.Format(
+								CultureInfo.CurrentCulture,
+								Resources.MatcherAssignmentFailedDuringExpressionReconstruction,
+								matches.Length,
+								$"{invocation.Method.DeclaringType.GetFormattedName()}.{invocation.Method.Name}"));
 					}
 
 					bool CanDistribute(int msi, int asi)
@@ -165,15 +189,20 @@ namespace Moq
 					var argument = expressions[i];
 					var parameterType = parameterTypes[i];
 
+					if (argument.Type == parameterType) continue;
+
 					// nullable type coercion:
-					var argumentValue = invocation.Arguments[i];
 					if (Nullable.GetUnderlyingType(parameterType) != null && Nullable.GetUnderlyingType(argument.Type) == null)
 					{
 						expressions[i] = Expression.Convert(argument, parameterType);
 					}
-
 					// boxing of value types (i.e. where a value-typed value is assigned to a reference-typed parameter):
-					if (argument.Type.GetTypeInfo().IsValueType && !parameterType.GetTypeInfo().IsValueType)
+					else if (argument.Type.GetTypeInfo().IsValueType && !parameterType.GetTypeInfo().IsValueType)
+					{
+						expressions[i] = Expression.Convert(argument, parameterType);
+					}
+					// if types don't match exactly and aren't assignment compatible:
+					else if (argument.Type != parameterType && !parameterType.IsAssignableFrom(argument.Type))
 					{
 						expressions[i] = Expression.Convert(argument, parameterType);
 					}

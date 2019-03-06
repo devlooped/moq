@@ -371,4 +371,8 @@ This mock failed verification due to the following:</value>
 	<data name="NextMemberNonInterceptable" xml:space="preserve">
 		<value>The next member after the last one shown above is non-virtual, sealed, or not visible to the proxy factory.</value>
 	</data>
+	<data name="MatcherAssignmentFailedDuringExpressionReconstruction" xml:space="preserve">
+		<value>Could not determine the correct positions for all argument matchers ({0} in total) used in a call to this method: {1}.
+This could be caused by an unrecognized type conversion, coercion, narrowing, or widening, and is most likely a bug in Moq. Please report your use case to the Moq team.</value>
+	</data>
 </root>

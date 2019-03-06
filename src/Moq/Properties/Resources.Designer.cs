@@ -279,6 +279,16 @@ namespace Moq.Properties {
 		}
 		
 		/// <summary>
+		///   Looks up a localized string similar to Could not determine the correct positions for all argument matchers ({0} in total) used in a call to this method: {1}.
+		///This could be caused by an unrecognized type conversion, coercion, narrowing, or widening, and is most likely a bug in Moq. Please report your use case to the Moq team..
+		/// </summary>
+		internal static string MatcherAssignmentFailedDuringExpressionReconstruction {
+			get {
+				return ResourceManager.GetString("MatcherAssignmentFailedDuringExpressionReconstruction", resourceCulture);
+			}
+		}
+		
+		/// <summary>
 		///   Looks up a localized string similar to Member {0}.{1} does not exist..
 		/// </summary>
 		internal static string MemberMissing {

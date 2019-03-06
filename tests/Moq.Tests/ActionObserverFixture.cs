@@ -205,6 +205,52 @@ namespace Moq.Tests
 					 x => x[It.Is<int>(i => i == 0), It.Is<int>(i => i == 2)] = It.Is<int>(i => i == 3));
 			}
 
+			[Fact]
+			public void Widening_and_narrowing_and_enum_convertions()
+			{
+				ushort arg = 123;
+				AssertReconstructable(
+					"x => x.VoidWithShort(123)",
+					 x => x.VoidWithShort((short)arg));
+				AssertReconstructable(
+					"x => x.VoidWithInt(123)",
+					 x => x.VoidWithInt(arg));
+				AssertReconstructable(
+					"x => x.VoidWithLong(123)",
+					 x => x.VoidWithLong(arg));
+
+				long longArg = 654L;
+				AssertReconstructable(
+					"x => x.VoidWithShort(654)",
+					 x => x.VoidWithShort((short)longArg));
+
+				AssertReconstructable(
+					"x => x.VoidWithObject(ActionObserverFixture.Reconstructibility.Color.Green)",
+					 x => x.VoidWithObject(Color.Green));
+				AssertReconstructable(
+					"x => x.VoidWithEnum(ActionObserverFixture.Reconstructibility.Color.Green)",
+					 x => x.VoidWithEnum(Color.Green));
+				AssertReconstructable(
+					"x => x.VoidWithNullableEnum(ActionObserverFixture.Reconstructibility.Color.Green)",
+					 x => x.VoidWithNullableEnum(Color.Green));
+			}
+
+			[Fact]
+			public void It_IsAny_enum_converted_and_assigned_to_int_parameter()
+			{
+				AssertReconstructable(
+					x => x.VoidWithInt((int)It.IsAny<Color>()),
+					x => x.VoidWithInt((int)It.IsAny<Color>()));
+			}
+
+			[Fact]
+			public void It_IsAny_short_widened_to_int_parameter()
+			{
+				AssertReconstructable(
+					x => x.VoidWithInt(It.IsAny<short>()),
+					x => x.VoidWithInt(It.IsAny<short>()));
+			}
+
 			private void AssertReconstructable(string expected, Action<IX> action)
 			{
 				Expression actual = ActionObserver.Instance.ReconstructExpression(action);
@@ -227,11 +273,14 @@ namespace Moq.Tests
 				IY GetY();
 				IY GetY(int arg);
 				void Void();
+				void VoidWithShort(short arg);
 				void VoidWithInt(int arg);
 				void VoidWithLong(long arg);
 				void VoidWithNullableInt(int? arg);
 				void VoidWithIntString(int arg1, string arg2);
 				void VoidWithObject(object arg);
+				void VoidWithEnum(Color arg);
+				void VoidWithNullableEnum(Color? arg);
 			}
 
 			public interface IY
@@ -245,6 +294,14 @@ namespace Moq.Tests
 				void Void();
 				void VoidWithIntInt(int arg1, int arg2);
 			}
+
+			public enum Color
+			{
+				Red,
+				Green,
+				Blue,
+				Yellow,
+			}
 		}
 
 		public class Error_detection
@@ -253,6 +310,12 @@ namespace Moq.Tests
 			public void Stops_before_non_interceptable_method()
 			{
 				AssertFailsAfter<X>("x => x...", x => x.NonVirtual());
+			}
+
+			[Fact]
+			public void Stops_before_non_interceptable_property()
+			{
+				AssertFailsAfter<X>("x => x...", x => x.NonVirtualProperty = It.IsAny<IY>());
 			}
 
 			[Fact]
@@ -275,6 +338,7 @@ namespace Moq.Tests
 
 			public class X
 			{
+				public IY NonVirtualProperty { get; set; }
 				public void NonVirtual() { }
 			}
 
