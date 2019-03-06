@@ -243,6 +243,15 @@ namespace Moq.Properties {
 		}
 		
 		/// <summary>
+		///   Looks up a localized string similar to The return type of the last member shown above is not mockable..
+		/// </summary>
+		internal static string LastMemberHasNonInterceptableReturnType {
+			get {
+				return ResourceManager.GetString("LastMemberHasNonInterceptableReturnType", resourceCulture);
+			}
+		}
+		
+		/// <summary>
 		///   Looks up a localized string similar to The equals (&quot;==&quot; or &quot;=&quot; in VB) and the conditional &apos;and&apos; (&quot;&amp;&amp;&quot; or &quot;AndAlso&quot; in VB) operators are the only ones supported in the query specification expression. Unsupported expression: {0}.
 		/// </summary>
 		internal static string LinqBinaryOperatorNotSupported {
@@ -266,6 +275,16 @@ namespace Moq.Properties {
 		internal static string LinqMethodNotVirtual {
 			get {
 				return ResourceManager.GetString("LinqMethodNotVirtual", resourceCulture);
+			}
+		}
+		
+		/// <summary>
+		///   Looks up a localized string similar to Could not determine the correct positions for all argument matchers ({0} in total) used in a call to this method: {1}.
+		///This could be caused by an unrecognized type conversion, coercion, narrowing, or widening, and is most likely a bug in Moq. Please report your use case to the Moq team..
+		/// </summary>
+		internal static string MatcherAssignmentFailedDuringExpressionReconstruction {
+			get {
+				return ResourceManager.GetString("MatcherAssignmentFailedDuringExpressionReconstruction", resourceCulture);
 			}
 		}
 		
@@ -333,6 +352,15 @@ namespace Moq.Properties {
 		internal static string MoreThanOneCall {
 			get {
 				return ResourceManager.GetString("MoreThanOneCall", resourceCulture);
+			}
+		}
+		
+		/// <summary>
+		///   Looks up a localized string similar to The next member after the last one shown above is non-virtual, sealed, or not visible to the proxy factory..
+		/// </summary>
+		internal static string NextMemberNonInterceptable {
+			get {
+				return ResourceManager.GetString("NextMemberNonInterceptable", resourceCulture);
 			}
 		}
 		
@@ -662,6 +690,16 @@ namespace Moq.Properties {
 		internal static string UnsupportedExpression {
 			get {
 				return ResourceManager.GetString("UnsupportedExpression", resourceCulture);
+			}
+		}
+		
+		/// <summary>
+		///   Looks up a localized string similar to Unsupported expression: {0}
+		///{1}.
+		/// </summary>
+		internal static string UnsupportedExpressionWithHint {
+			get {
+				return ResourceManager.GetString("UnsupportedExpressionWithHint", resourceCulture);
 			}
 		}
 		

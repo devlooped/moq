@@ -15,6 +15,7 @@ This release contains several **minor breaking changes**. Please review your cod
 * Method overload resolution for `mock.Protected().Setup("VoidMethod", ...)`, `mock.Protected().Verify("VoidMethod", ...)` and `mock.Protected().Verify<TResult>("NonVoidMethod", ...)` may change due to a new overloads: If the first argument is a `bool`, make sure that argument gets interpreted as part of `args`, not as `exactParameterMatch` (see also *Added* section below). (@stakx & @Shereef, #751, #753)
 * `mock.Verify[All]` now performs a more thorough error aggregation. Error messages of inner/recursive mocks are included in the error message using indentation to show the relationship between mocks. (@stakx, #762)
 * `mock.Verify` no longer creates setups, nor will it override existing setups, as a side-effect of using a recursive expression. (@stakx, #765)
+* More accurate detection of argument matchers with `SetupSet` and `VerifySet`, especially when used in fluent setup expressions or with indexers (@stakx, #767)
 
 #### Added
 

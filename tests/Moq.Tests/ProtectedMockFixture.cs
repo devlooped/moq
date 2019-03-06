@@ -246,7 +246,7 @@ namespace Moq.Tests
 		[Fact]
 		public void ThrowsIfSetupSetNonVirtualProperty()
 		{
-			Assert.Throws<ArgumentException>(
+			Assert.Throws<NotSupportedException>(
 				() => new Mock<FooBase>().Protected().SetupSet<string>("NonVirtualValue", ItExpr.IsAny<string>()));
 		}
 
@@ -688,7 +688,7 @@ namespace Moq.Tests
 		[Fact]
 		public void ThrowsIfVerifySetNonVirtualPropertySet()
 		{
-			Assert.Throws<ArgumentException>(
+			Assert.Throws<NotSupportedException>(
 				() => new Mock<FooBase>().Protected().VerifySet<string>("NonVirtualValue", Times.Once(), ItExpr.IsAny<string>()));
 		}
 

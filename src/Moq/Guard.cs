@@ -13,6 +13,31 @@ namespace Moq
 	[DebuggerStepThrough]
 	internal static class Guard
 	{
+		public static void IsAssignmentToPropertyOrIndexer(LambdaExpression expression, string paramName)
+		{
+			Debug.Assert(expression != null);
+
+			switch (expression.Body.NodeType)
+			{
+				case ExpressionType.Assign:
+					var assignment = (BinaryExpression)expression.Body;
+					if (assignment.Left is MemberExpression || assignment.Left is IndexExpression) return;
+					break;
+
+				case ExpressionType.Call:
+					var call = (MethodCallExpression)expression.Body;
+					if (call.Method.IsPropertySetter() || call.Method.IsPropertyIndexerSetter()) return;
+					break;
+			}
+
+			throw new ArgumentException(
+				string.Format(
+					CultureInfo.CurrentCulture,
+					Resources.SetupNotProperty,
+					expression.ToStringFixed()),
+				paramName);
+		}
+
 		/// <summary>
 		/// Ensures the given <paramref name="value"/> is not null.
 		/// Throws <see cref="ArgumentNullException"/> otherwise.

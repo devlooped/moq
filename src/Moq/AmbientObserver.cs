@@ -4,6 +4,7 @@
 using System;
 using System.Collections.Generic;
 using System.Diagnostics;
+using System.Linq;
 
 namespace Moq
 {
@@ -63,6 +64,7 @@ namespace Moq
 			}
 		}
 
+		private int timestamp;
 		private List<Observation> observations;
 
 		private AmbientObserver()
@@ -85,6 +87,15 @@ namespace Moq
 		}
 
 		/// <summary>
+		///   Returns the current timestamp. The next call will return a timestamp greater than this one,
+		///   allowing you to order invocations and matcher observations.
+		/// </summary>
+		public int GetNextTimestamp()
+		{
+			return ++this.timestamp;
+		}
+
+		/// <summary>
 		///   Adds the specified mock invocation as an observation.
 		/// </summary>
 		public void OnInvocation(Mock mock, Invocation invocation)
@@ -94,7 +105,7 @@ namespace Moq
 				this.observations = new List<Observation>();
 			}
 
-			observations.Add(new InvocationObservation(mock, invocation));
+			observations.Add(new InvocationObservation(this.GetNextTimestamp(), mock, invocation));
 		}
 
 		/// <summary>
@@ -107,7 +118,7 @@ namespace Moq
 				this.observations = new List<Observation>();
 			}
 
-			this.observations.Add(new MatchObservation(match));
+			this.observations.Add(new MatchObservation(this.GetNextTimestamp(), match));
 		}
 
 		/// <summary>
@@ -164,6 +175,21 @@ namespace Moq
 			return false;
 		}
 
+		public IEnumerable<Match> GetMatchesBetween(int fromTimestampInclusive, int toTimestampExclusive)
+		{
+			if (this.observations != null)
+			{
+				return this.observations
+				           .OfType<MatchObservation>()
+				           .Where(o => fromTimestampInclusive <= o.Timestamp && o.Timestamp < toTimestampExclusive)
+				           .Select(o => o.Match);
+			}
+			else
+			{
+				return Enumerable.Empty<Match>();
+			}
+		}
+
 		/// <summary>
 		///   Allocation-free pseudo-collection (think `ReadOnlySpan&lt;Match&gt;`)
 		///   used to access all <see cref="Match"/>es associated with a recorded invocation.
@@ -199,13 +225,15 @@ namespace Moq
 
 		private sealed class InvocationObservation : Observation
 		{
+			public readonly int Timestamp;
 			public readonly Mock Mock;
 			public readonly Invocation Invocation;
 
 			private DefaultValueProvider defaultValueProvider;
 
-			public InvocationObservation(Mock mock, Invocation invocation)
+			public InvocationObservation(int timestamp, Mock mock, Invocation invocation)
 			{
+				this.Timestamp = timestamp;
 				this.Mock = mock;
 				this.Invocation = invocation;
 
@@ -221,10 +249,12 @@ namespace Moq
 
 		private sealed class MatchObservation : Observation
 		{
+			public readonly int Timestamp;
 			public readonly Match Match;
 
-			public MatchObservation(Match match)
+			public MatchObservation(int timestamp, Match match)
 			{
+				this.Timestamp = timestamp;
 				this.Match = match;
 			}
 		}

@@ -161,7 +161,7 @@ namespace Moq.Tests
 		[Fact]
 		public void VerifiesHierarchyPropertySetWithExpression()
 		{
-			var mock = new Mock<IFoo>();
+			var mock = new Mock<IFoo>() { DefaultValue = DefaultValue.Mock };
 
 			Assert.Throws<MockException>(() => mock.VerifySet(m => m.Bar.Value = It.IsAny<int>()));
 

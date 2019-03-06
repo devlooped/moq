@@ -325,14 +325,20 @@ namespace Moq
 		/// <include file='Mock.Generic.xdoc' path='docs/doc[@for="Mock{T}.SetupSet{TProperty}"]/*'/>
 		public ISetupSetter<T, TProperty> SetupSet<TProperty>(Action<T> setterExpression)
 		{
-			var setup = Mock.SetupSet(this, setterExpression, null);
+			Guard.NotNull(setterExpression, nameof(setterExpression));
+			var expression = ExpressionReconstructor.Instance.ReconstructExpression(setterExpression);
+
+			var setup = Mock.SetupSet(this, expression, condition: null);
 			return new SetterSetupPhrase<T, TProperty>(setup);
 		}
 
 		/// <include file='Mock.Generic.xdoc' path='docs/doc[@for="Mock{T}.SetupSet"]/*'/>
 		public ISetup<T> SetupSet(Action<T> setterExpression)
 		{
-			var setup = Mock.SetupSet(this, setterExpression, null);
+			Guard.NotNull(setterExpression, nameof(setterExpression));
+			var expression = ExpressionReconstructor.Instance.ReconstructExpression(setterExpression);
+
+			var setup = Mock.SetupSet(this, expression, condition: null);
 			return new VoidSetupPhrase<T>(setup);
 		}
 
@@ -349,9 +355,11 @@ namespace Moq
 		[SuppressMessage("Microsoft.Naming", "CA1716:IdentifiersShouldNotMatchKeywords", MessageId = "Property", Justification = "We're setting up a property, so it's appropriate.")]
 		public Mock<T> SetupProperty<TProperty>(Expression<Func<T, TProperty>> property, TProperty initialValue)
 		{
+			Guard.NotNull(property, nameof(property));
+
 			TProperty value = initialValue;
 			this.SetupGet(property).Returns(() => value);
-			SetupSet(this, property, ItExpr.IsAny<TProperty>()).SetCallbackResponse(new Action<TProperty>(p => value = p));
+			Mock.SetupSet(this, property.AssignItIsAny(), condition: null).SetCallbackResponse(new Action<TProperty>(p => value = p));
 			return this;
 		}
 
@@ -518,37 +526,55 @@ namespace Moq
 		/// <include file='Mock.Generic.xdoc' path='docs/doc[@for="Mock{T}.VerifySet(expression)"]/*'/>
 		public void VerifySet(Action<T> setterExpression)
 		{
-			Mock.VerifySet(this, setterExpression, Times.AtLeastOnce(), null);
+			Guard.NotNull(setterExpression, nameof(setterExpression));
+
+			var expression = ExpressionReconstructor.Instance.ReconstructExpression(setterExpression);
+			Mock.VerifySet(this, expression, Times.AtLeastOnce(), null);
 		}
 
 		/// <include file='Mock.Generic.xdoc' path='docs/doc[@for="Mock{T}.VerifySet(expression,times)"]/*'/>
 		public void VerifySet(Action<T> setterExpression, Times times)
 		{
-			Mock.VerifySet(this, setterExpression, times, null);
+			Guard.NotNull(setterExpression, nameof(setterExpression));
+
+			var expression = ExpressionReconstructor.Instance.ReconstructExpression(setterExpression);
+			Mock.VerifySet(this, expression, times, null);
 		}
 
 		/// <include file='Mock.Generic.xdoc' path='docs/doc[@for="Mock{T}.VerifySet(expression,times)"]/*'/>
 		public void VerifySet(Action<T> setterExpression, Func<Times> times)
 		{
-			Mock.VerifySet(this, setterExpression, times(), null);
+			Guard.NotNull(setterExpression, nameof(setterExpression));
+
+			var expression = ExpressionReconstructor.Instance.ReconstructExpression(setterExpression);
+			Mock.VerifySet(this, expression, times(), null);
 		}
 
 		/// <include file='Mock.Generic.xdoc' path='docs/doc[@for="Mock{T}.VerifySet(expression,failMessage)"]/*'/>
 		public void VerifySet(Action<T> setterExpression, string failMessage)
 		{
-			Mock.VerifySet(this, setterExpression, Times.AtLeastOnce(), failMessage);
+			Guard.NotNull(setterExpression, nameof(setterExpression));
+
+			var expression = ExpressionReconstructor.Instance.ReconstructExpression(setterExpression);
+			Mock.VerifySet(this, expression, Times.AtLeastOnce(), failMessage);
 		}
 
 		/// <include file='Mock.Generic.xdoc' path='docs/doc[@for="Mock{T}.VerifySet(expression,times,failMessage)"]/*'/>
 		public void VerifySet(Action<T> setterExpression, Times times, string failMessage)
 		{
-			Mock.VerifySet(this, setterExpression, times, failMessage);
+			Guard.NotNull(setterExpression, nameof(setterExpression));
+
+			var expression = ExpressionReconstructor.Instance.ReconstructExpression(setterExpression);
+			Mock.VerifySet(this, expression, times, failMessage);
 		}
 
 		/// <include file='Mock.Generic.xdoc' path='docs/doc[@for="Mock{T}.VerifySet(expression,times,failMessage)"]/*'/>
 		public void VerifySet(Action<T> setterExpression, Func<Times> times, string failMessage)
 		{
-			Mock.VerifySet(this, setterExpression, times(), failMessage);
+			Guard.NotNull(setterExpression, nameof(setterExpression));
+
+			var expression = ExpressionReconstructor.Instance.ReconstructExpression(setterExpression);
+			Mock.VerifySet(this, expression , times(), failMessage);
 		}
 
 		/// <summary>
