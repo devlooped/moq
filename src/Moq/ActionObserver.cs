@@ -28,10 +28,10 @@ namespace Moq
 	{
 		public override Expression<Action<T>> ReconstructExpression<T>(Action<T> action)
 		{
-			using (var ambientObserver = AmbientObserver.Activate())
+			using (var matcherObserver = MatcherObserver.Activate())
 			{
 				// Create the root recording proxy:
-				var root = (T)CreateProxy(typeof(T), ambientObserver, out var rootRecorder);
+				var root = (T)CreateProxy(typeof(T), matcherObserver, out var rootRecorder);
 
 				Exception error = null;
 				try
@@ -213,9 +213,9 @@ namespace Moq
 		}
 
 		// Creates a proxy (way more light-weight than a `Mock<T>`!) with an invocation `Recorder` attached to it.
-		private static IProxy CreateProxy(Type type, AmbientObserver ambientObserver, out Recorder recorder)
+		private static IProxy CreateProxy(Type type, MatcherObserver matcherObserver, out Recorder recorder)
 		{
-			recorder = new Recorder(ambientObserver);
+			recorder = new Recorder(matcherObserver);
 			return (IProxy)ProxyFactory.Instance.CreateProxy(type, recorder, Type.EmptyTypes, new object[0]);
 		}
 
@@ -223,18 +223,18 @@ namespace Moq
 		// This record represents the basis for reconstructing an expression tree.
 		private sealed class Recorder : IInterceptor
 		{
-			private readonly AmbientObserver ambientObserver;
+			private readonly MatcherObserver matcherObserver;
 			private int creationTimestamp;
 			private Invocation invocation;
 			private int invocationTimestamp;
 			private IProxy returnValue;
 
-			public Recorder(AmbientObserver ambientObserver)
+			public Recorder(MatcherObserver matcherObserver)
 			{
-				Debug.Assert(ambientObserver != null);
+				Debug.Assert(matcherObserver != null);
 
-				this.ambientObserver = ambientObserver;
-				this.creationTimestamp = this.ambientObserver.GetNextTimestamp();
+				this.matcherObserver = matcherObserver;
+				this.creationTimestamp = this.matcherObserver.GetNextTimestamp();
 			}
 
 			public Invocation Invocation => this.invocation;
@@ -244,7 +244,7 @@ namespace Moq
 				get
 				{
 					Debug.Assert(this.invocationTimestamp != default);
-					return this.ambientObserver.GetMatchesBetween(this.creationTimestamp, this.invocationTimestamp);
+					return this.matcherObserver.GetMatchesBetween(this.creationTimestamp, this.invocationTimestamp);
 				}
 			}
 
@@ -262,7 +262,7 @@ namespace Moq
 #endif
 				{
 					this.invocation = invocation;
-					this.invocationTimestamp = this.ambientObserver.GetNextTimestamp();
+					this.invocationTimestamp = this.matcherObserver.GetNextTimestamp();
 
 					if (returnType == typeof(void))
 					{
@@ -270,7 +270,7 @@ namespace Moq
 					}
 					else if (returnType.IsMockeable())
 					{
-						this.returnValue = CreateProxy(returnType, this.ambientObserver, out _);
+						this.returnValue = CreateProxy(returnType, this.matcherObserver, out _);
 					}
 					else
 					{

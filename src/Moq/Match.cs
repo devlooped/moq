@@ -55,7 +55,7 @@ namespace Moq
 			// methodcall we build the expression using it, rather than the null/default
 			// value returned from the actual invocation.
 
-			if (AmbientObserver.IsActive(out var observer))
+			if (MatcherObserver.IsActive(out var observer))
 			{
 				observer.OnMatch(match);
 			}

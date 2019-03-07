@@ -39,10 +39,10 @@ namespace Moq
 				return true;
 			}
 
-			using (var observer = AmbientObserver.Activate())
+			using (var observer = MatcherObserver.Activate())
 			{
 				Expression.Lambda<Action>(expression).CompileUsingExpressionCompiler().Invoke();
-				return observer.LastIsMatch(out match);
+				return observer.TryGetLastMatch(out match);
 			}
 		}
 
