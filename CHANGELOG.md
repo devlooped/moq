@@ -21,6 +21,7 @@ This release contains several **minor breaking changes**. Please review your cod
 
 * New method overload `mock.Protected().Setup("VoidMethod", exactParameterMatch, args)` overload having a `bool exactParameterMatch` parameter. Due to method overload resolution, it was easy to think this already existed resolution when in fact it did not, leading to failing tests. (@stakx, #751)
 * New method overloads `mock.Protected().Verify("VoidMethod", times, exactParameterMatch, args)` and `mock.Protected().Verify<TResult>("NonVoidMethod", times, exactParameterMatch, args)` overloads having a `bool exactParameterMatch` parameter. (@Shereef, #753)
+* Ability in `mock.Raise` and `setup.Raises` to raise events on sub-objects (inner mocks) (@stakx, #772)
 
 #### Fixed
 
@@ -29,6 +30,7 @@ This release contains several **minor breaking changes**. Please review your cod
 * Setup gets included in `Verify` despite being "unreachable" (@stakx, #703)
 * `Verify` can create setups that cause subsequent `VerifyAll` to fail (@stakx & @lepijohnny, #699)
 * Incomplete stack trace when raising an event with `mock.Raise` throws (@MutatedTomato, #738)
+* `Mock.Raise` only raises events on root object (@hallipr, #166)
 
 
 ## 4.10.1 (2018-12-03)

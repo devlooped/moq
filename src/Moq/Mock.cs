@@ -661,39 +661,48 @@ namespace Moq
 
 		#region Raise
 
-		/// <summary>
-		/// Raises the associated event with the given 
-		/// event argument data.
-		/// </summary>
-		internal void DoRaise(EventInfo ev, EventArgs args)
+		internal static void RaiseEvent<T>(Mock mock, Action<T> action, object[] arguments)
 		{
-			if (ev == null)
-			{
-				throw new InvalidOperationException(Resources.RaisedUnassociatedEvent);
-			}
+			Guard.NotNull(action, nameof(action));
 
-			foreach (var del in this.EventHandlers.ToArray(ev.Name))
-			{
-				del.InvokePreserveStack(this.Object, args);
-			}
+			var expression = ExpressionReconstructor.Instance.ReconstructExpression(action);
+			var parts = expression.Split();
+			Mock.RaiseEvent(mock, expression, parts, arguments);
 		}
 
-		/// <summary>
-		/// Raises the associated event with the given
-		/// event argument data.
-		/// </summary>
-		internal void DoRaise(EventInfo ev, params object[] args)
+		internal static void RaiseEvent(Mock mock, LambdaExpression expression, Stack<LambdaExpressionPart> parts, object[] arguments)
 		{
-			if (ev == null)
-			{
-				throw new InvalidOperationException(Resources.RaisedUnassociatedEvent);
-			}
+			var (_, method, _) = parts.Pop();
 
-			foreach (var del in this.EventHandlers.ToArray(ev.Name))
+			if (parts.Count == 0)
 			{
-				// Non EventHandler-compatible delegates get the straight
-				// arguments, not the typical "sender, args" arguments.
-				del.InvokePreserveStack(args);
+				string eventName;
+				if (method.Name.StartsWith("add_", StringComparison.Ordinal))
+				{
+					eventName = method.Name.Substring(4);
+				}
+				else if (method.Name.StartsWith("remove_", StringComparison.Ordinal))
+				{
+					eventName = method.Name.Substring(7);
+				}
+				else
+				{
+					throw new ArgumentException(
+						string.Format(
+							CultureInfo.CurrentCulture,
+							Resources.UnsupportedExpression,
+							expression));
+				}
+
+				foreach (var eventHandler in mock.EventHandlers.ToArray(eventName))
+				{
+					eventHandler.InvokePreserveStack(arguments);
+				}
+
+			}
+			else if (mock.GetInnerMockSetups().TryFind(method, out var innerMockSetup) && innerMockSetup.ReturnsInnerMock(out var innerMock))
+			{
+				Mock.RaiseEvent(innerMock, expression, parts, arguments);
 			}
 		}
 

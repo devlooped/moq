@@ -191,29 +191,25 @@ namespace Moq
 		public void SetRaiseEventResponse<TMock>(Action<TMock> eventExpression, Delegate func)
 			where TMock : class
 		{
-			var (ev, _) = eventExpression.GetEventWithTarget((TMock)mock.Object);
-			if (ev != null)
-			{
-				this.raiseEventResponse = new RaiseEventResponse(this.mock, ev, func, null);
-			}
-			else
-			{
-				this.raiseEventResponse = null;
-			}
+			Guard.NotNull(eventExpression, nameof(eventExpression));
+
+			var expression = ExpressionReconstructor.Instance.ReconstructExpression(eventExpression);
+
+			// TODO: validate that expression is for event subscription or unsubscription
+
+			this.raiseEventResponse = new RaiseEventResponse(this.mock, expression, func, null);
 		}
 
 		public void SetRaiseEventResponse<TMock>(Action<TMock> eventExpression, params object[] args)
 			where TMock : class
 		{
-			var (ev, _) = eventExpression.GetEventWithTarget((TMock)mock.Object);
-			if (ev != null)
-			{
-				this.raiseEventResponse = new RaiseEventResponse(this.mock, ev, null, args);
-			}
-			else
-			{
-				this.raiseEventResponse = null;
-			}
+			Guard.NotNull(eventExpression, nameof(eventExpression));
+
+			var expression = ExpressionReconstructor.Instance.ReconstructExpression(eventExpression);
+
+			// TODO: validate that expression is for event subscription or unsubscription
+
+			this.raiseEventResponse = new RaiseEventResponse(this.mock, expression, null, args);
 		}
 
 		public void SetEagerReturnsResponse(object value)
@@ -469,40 +465,44 @@ namespace Moq
 		private sealed class RaiseEventResponse
 		{
 			private Mock mock;
-			private EventInfo @event;
+			private LambdaExpression expression;
 			private Delegate eventArgsFunc;
 			private object[] eventArgsParams;
 
-			public RaiseEventResponse(Mock mock, EventInfo @event, Delegate eventArgsFunc, object[] eventArgsParams)
+			public RaiseEventResponse(Mock mock, LambdaExpression expression, Delegate eventArgsFunc, object[] eventArgsParams)
 			{
 				Debug.Assert(mock != null);
-				Debug.Assert(@event != null);
+				Debug.Assert(expression != null);
 				Debug.Assert(eventArgsFunc != null ^ eventArgsParams != null);
 
 				this.mock = mock;
-				this.@event = @event;
+				this.expression = expression;
 				this.eventArgsFunc = eventArgsFunc;
 				this.eventArgsParams = eventArgsParams;
 			}
 
 			public void RespondTo(Invocation invocation)
 			{
+				object[] args;
+
 				if (this.eventArgsParams != null)
 				{
-					this.mock.DoRaise(this.@event, this.eventArgsParams);
+					args = this.eventArgsParams;
 				}
 				else
 				{
 					var argsFuncType = this.eventArgsFunc.GetType();
 					if (argsFuncType.GetTypeInfo().IsGenericType && argsFuncType.GetGenericArguments().Length == 1)
 					{
-						this.mock.DoRaise(this.@event, (EventArgs)this.eventArgsFunc.InvokePreserveStack());
+						args = new object[] { this.mock.Object, this.eventArgsFunc.InvokePreserveStack() };
 					}
 					else
 					{
-						this.mock.DoRaise(this.@event, (EventArgs)this.eventArgsFunc.InvokePreserveStack(invocation.Arguments));
+						args = new object[] { this.mock.Object, this.eventArgsFunc.InvokePreserveStack(invocation.Arguments) };
 					}
 				}
+
+				Mock.RaiseEvent(this.mock, this.expression, this.expression.Split(), args);
 			}
 		}
 	}

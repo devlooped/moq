@@ -594,16 +594,14 @@ namespace Moq
 		[SuppressMessage("Microsoft.Design", "CA1030:UseEventsWhereAppropriate", Justification = "Raises the event, rather than being one.")]
 		public void Raise(Action<T> eventExpression, EventArgs args)
 		{
-			var (ev, target) = eventExpression.GetEventWithTarget(this.Object);
-			target.DoRaise(ev, args);
+			Mock.RaiseEvent(this, eventExpression, new object[] { this.Object, args });
 		}
 
 		/// <include file='Mock.Generic.xdoc' path='docs/doc[@for="Mock{T}.Raise(args)"]/*'/>
 		[SuppressMessage("Microsoft.Design", "CA1030:UseEventsWhereAppropriate", Justification = "Raises the event, rather than being one.")]
 		public void Raise(Action<T> eventExpression, params object[] args)
 		{
-			var (ev, target) = eventExpression.GetEventWithTarget(this.Object);
-			target.DoRaise(ev, args);
+			Mock.RaiseEvent(this, eventExpression, args);
 		}
 
 #endregion

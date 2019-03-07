@@ -155,7 +155,6 @@ namespace Moq
 		{
 			if (AmbientObserver.IsActive(out var observer))
 			{
-				observer.OnInvocation(mock, invocation);
 				return InterceptionAction.Continue;
 			}
 
