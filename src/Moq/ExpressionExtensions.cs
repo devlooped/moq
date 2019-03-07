@@ -94,6 +94,8 @@ namespace Moq
 				switch (e.NodeType)
 				{
 					case ExpressionType.Assign:
+					case ExpressionType.AddAssign:
+					case ExpressionType.SubtractAssign:
 					{
 						var assignmentExpression = (BinaryExpression)e;
 						return CanSplit(assignmentExpression.Left);
@@ -131,7 +133,9 @@ namespace Moq
 
 				switch (e.NodeType)
 				{
-					case ExpressionType.Assign:  // assignment to a property or indexer
+					case ExpressionType.Assign:          // assignment to a property or indexer
+					case ExpressionType.AddAssign:       // subscription of event handler to event
+					case ExpressionType.SubtractAssign:  // unsubscription of event handler from event
 					{
 						var assignmentExpression = (BinaryExpression)e;
 						Split(assignmentExpression.Left, out r, out var lhs);
@@ -155,7 +159,7 @@ namespace Moq
 						arguments[arguments.Length - 1] = assignmentExpression.Right;
 						p = new LambdaExpressionPart(
 							expression: Expression.Lambda(
-								Expression.Assign(lhs.Expression.Body, assignmentExpression.Right),
+								Expression.MakeBinary(e.NodeType, lhs.Expression.Body, assignmentExpression.Right),
 								parameter),
 							method: property.GetSetMethod(true),
 							arguments);

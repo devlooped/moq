@@ -661,6 +661,51 @@ namespace Moq
 
 		#region Raise
 
+		internal static void RaiseEvent<T>(Mock mock, Action<T> action, object[] arguments)
+		{
+			Guard.NotNull(action, nameof(action));
+
+			var expression = ExpressionReconstructor.Instance.ReconstructExpression(action);
+			var parts = expression.Split();
+			Mock.RaiseEvent(mock, expression, parts, arguments);
+		}
+
+		internal static void RaiseEvent(Mock mock, LambdaExpression expression, Stack<LambdaExpressionPart> parts, object[] arguments)
+		{
+			var (_, method, _) = parts.Pop();
+
+			if (parts.Count == 0)
+			{
+				string eventName;
+				if (method.Name.StartsWith("add_", StringComparison.Ordinal))
+				{
+					eventName = method.Name.Substring(4);
+				}
+				else if (method.Name.StartsWith("remove_", StringComparison.Ordinal))
+				{
+					eventName = method.Name.Substring(7);
+				}
+				else
+				{
+					throw new ArgumentException(
+						string.Format(
+							CultureInfo.CurrentCulture,
+							Resources.UnsupportedExpression,
+							expression));
+				}
+
+				foreach (var eventHandler in mock.EventHandlers.ToArray(eventName))
+				{
+					eventHandler.InvokePreserveStack(arguments);
+				}
+
+			}
+			else if (mock.GetInnerMockSetups().TryFind(method, out var innerMockSetup) && innerMockSetup.ReturnsInnerMock(out var innerMock))
+			{
+				Mock.RaiseEvent(innerMock, expression, parts, arguments);
+			}
+		}
+
 		/// <summary>
 		/// Raises the associated event with the given 
 		/// event argument data.
