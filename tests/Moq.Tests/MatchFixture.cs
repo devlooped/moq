@@ -196,10 +196,10 @@ namespace Moq.Tests
 
 		private static Match GetMatch<T>(Func<T> func)
 		{
-			using (var observer = AmbientObserver.Activate())
+			using (var observer = MatcherObserver.Activate())
 			{
 				_ = func();
-				return observer.LastIsMatch(out var match) ? match as Match<T> : null;
+				return observer.TryGetLastMatch(out var match) ? match as Match<T> : null;
 			}
 		}
 

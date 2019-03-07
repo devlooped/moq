@@ -137,10 +137,10 @@ namespace Moq.Tests
 		private Expression<Action<IX>> GetItIsAnyMatchExpression()
 		{
 			Match itIsAnyMatch;
-			using (var observer = AmbientObserver.Activate())
+			using (var observer = MatcherObserver.Activate())
 			{
 				_ = It.IsAny<int>();
-				_ = observer.LastIsMatch(out itIsAnyMatch);
+				_ = observer.TryGetLastMatch(out itIsAnyMatch);
 			}
 
 			var x = Expression.Parameter(typeof(IX), "x");
