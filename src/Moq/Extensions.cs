@@ -138,40 +138,6 @@ namespace Moq
 			return false;
 		}
 
-		public static EventWithTarget GetEventWithTarget<TMock>(this Action<TMock> eventExpression, TMock mock)
-			where TMock : class
-		{
-			Guard.NotNull(eventExpression, nameof(eventExpression));
-
-			MethodBase addRemove;
-			Mock target;
-
-			using (var observer = AmbientObserver.Activate())
-			{
-				eventExpression(mock);
-
-				if (!observer.LastIsInvocation(out target, out var invocation, out _))
-				{
-					throw new ArgumentException(Resources.ExpressionIsNotEventAttachOrDetachOrIsNotVirtual);
-				}
-
-				addRemove = invocation.Method;
-			}
-
-			var ev = addRemove.DeclaringType.GetEvent(
-				addRemove.Name.Replace("add_", string.Empty).Replace("remove_", string.Empty));
-
-			if (ev == null)
-			{
-				throw new ArgumentException(string.Format(
-					CultureInfo.CurrentCulture,
-					Resources.EventNotFound,
-					addRemove));
-			}
-
-			return new EventWithTarget(ev, target);
-		}
-
 		public static IEnumerable<MethodInfo> GetMethods(this Type type, string name)
 		{
 			return type.GetMember(name).OfType<MethodInfo>();
@@ -320,24 +286,6 @@ namespace Moq
 
 			setup = default;
 			return false;
-		}
-	}
-
-	internal readonly struct EventWithTarget
-	{
-		private readonly EventInfo @event;
-		private readonly Mock target;
-
-		public EventWithTarget(EventInfo @event, Mock target)
-		{
-			this.@event = @event;
-			this.target = target;
-		}
-
-		public void Deconstruct(out EventInfo @event, out Mock target)
-		{
-			@event = this.@event;
-			target = this.target;
 		}
 	}
 }

@@ -14,9 +14,8 @@ namespace Moq
 	/// <remarks>
 	///   <para>
 	///     This component requires the active cooperation of the respective subsystems.
-	///     That is, invoked matchers and mocks call into <see cref="OnMatch(Match)"/>
-	///     or <see cref="OnInvocation(Mock, Invocation)"/> if an ambient observer is
-	///     active on the current thread.
+	///     That is, invoked matchers call into <see cref="OnMatch(Match)"/> if an ambient
+	///     observer is active on the current thread.
 	///   </para>
 	///   <para>
 	///     This gets used in Moq's API to work around certain limitations of what kind
@@ -96,19 +95,6 @@ namespace Moq
 		}
 
 		/// <summary>
-		///   Adds the specified mock invocation as an observation.
-		/// </summary>
-		public void OnInvocation(Mock mock, Invocation invocation)
-		{
-			if (this.observations == null)
-			{
-				this.observations = new List<Observation>();
-			}
-
-			observations.Add(new InvocationObservation(this.GetNextTimestamp(), mock, invocation));
-		}
-
-		/// <summary>
 		///   Adds the specified <see cref="Match"/> as an observation.
 		/// </summary>
 		public void OnMatch(Match match)
@@ -119,43 +105,6 @@ namespace Moq
 			}
 
 			this.observations.Add(new MatchObservation(this.GetNextTimestamp(), match));
-		}
-
-		/// <summary>
-		///   Checks whether the last observed thing was a mock invocation.
-		///   If <see langword="true"/>, details about that mock invocation are provided via the <see langword="out"/> parameters.
-		/// </summary>
-		/// <param name="mock">The <see cref="Mock"/> on which an invocation was observed.</param>
-		/// <param name="invocation">The observed <see cref="Invocation"/>.</param>
-		/// <param name="matches">The <see cref="Match"/>es that were observed just before the invocation.</param>
-		public bool LastIsInvocation(out Mock mock, out Invocation invocation, out Matches matches)
-		{
-			if (this.observations != null)
-			{
-				var lastIndex = this.observations.Count - 1;
-
-				if (this.observations[lastIndex] is InvocationObservation invocationRecord)
-				{
-					// Determine the first index of all recorded matches that immediately precede
-					// the last invocation; up to the previous recorded invocation or the beginning
-					// of the recording (whichever comes first):
-					int offset = lastIndex;
-					while (offset > 0 && this.observations[offset - 1] is MatchObservation)
-					{
-						--offset;
-					}
-
-					mock = invocationRecord.Mock;
-					invocation = invocationRecord.Invocation;
-					matches = new Matches(this, offset, lastIndex - offset);
-					return true;
-				}
-			}
-
-			mock = default;
-			invocation = default;
-			matches = default;
-			return false;
 		}
 
 		/// <summary>
@@ -220,30 +169,6 @@ namespace Moq
 
 			public virtual void Dispose()
 			{
-			}
-		}
-
-		private sealed class InvocationObservation : Observation
-		{
-			public readonly int Timestamp;
-			public readonly Mock Mock;
-			public readonly Invocation Invocation;
-
-			private DefaultValueProvider defaultValueProvider;
-
-			public InvocationObservation(int timestamp, Mock mock, Invocation invocation)
-			{
-				this.Timestamp = timestamp;
-				this.Mock = mock;
-				this.Invocation = invocation;
-
-				this.defaultValueProvider = mock.DefaultValueProvider;
-				mock.DefaultValueProvider = DefaultValueProvider.Mock;
-			}
-
-			public override void Dispose()
-			{
-				this.Mock.DefaultValueProvider = this.defaultValueProvider;
 			}
 		}
 

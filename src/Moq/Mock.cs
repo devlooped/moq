@@ -706,42 +706,6 @@ namespace Moq
 			}
 		}
 
-		/// <summary>
-		/// Raises the associated event with the given 
-		/// event argument data.
-		/// </summary>
-		internal void DoRaise(EventInfo ev, EventArgs args)
-		{
-			if (ev == null)
-			{
-				throw new InvalidOperationException(Resources.RaisedUnassociatedEvent);
-			}
-
-			foreach (var del in this.EventHandlers.ToArray(ev.Name))
-			{
-				del.InvokePreserveStack(this.Object, args);
-			}
-		}
-
-		/// <summary>
-		/// Raises the associated event with the given
-		/// event argument data.
-		/// </summary>
-		internal void DoRaise(EventInfo ev, params object[] args)
-		{
-			if (ev == null)
-			{
-				throw new InvalidOperationException(Resources.RaisedUnassociatedEvent);
-			}
-
-			foreach (var del in this.EventHandlers.ToArray(ev.Name))
-			{
-				// Non EventHandler-compatible delegates get the straight
-				// arguments, not the typical "sender, args" arguments.
-				del.InvokePreserveStack(args);
-			}
-		}
-
 		#endregion
 
 		#region As<TInterface>
