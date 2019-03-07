@@ -603,6 +603,57 @@ namespace Moq.Tests
 			observable.PropertyChanged += (sender, args) => { };
 		}
 
+		[Fact]
+		public void Can_raise_event_on_inner_mock()
+		{
+			var raised = false;
+			var parentMock = new Mock<IParent> { DefaultValue = DefaultValue.Mock };
+			parentMock.Object.Adder.Done += (_, __) => raised = true;
+
+			parentMock.Raise(m => m.Adder.Done += null, default(DoneArgs));
+
+			Assert.True(raised);
+		}
+
+		[Fact]
+		public void When_raising_event_on_inner_mock_event_of_same_name_on_root_mock_will_not_be_raised()
+		{
+			bool raisedOnRootMock = false, raisedOnInnerMock = false;
+			var parentMock = new Mock<IParent> { DefaultValue = DefaultValue.Mock };
+			parentMock.Object.Done += (_, __) => raisedOnRootMock = true;
+			parentMock.Object.Adder.Done += (_, __) => raisedOnInnerMock = true;
+
+			parentMock.Raise(m => m.Adder.Done += null, default(DoneArgs));
+
+			Assert.False(raisedOnRootMock);
+			Assert.True(raisedOnInnerMock);
+		}
+
+		[Fact]
+		public void When_raising_event_on_inner_mock_args_arrive_in_handler()
+		{
+			object received = null;
+			var parentMock = new Mock<IParent> { DefaultValue = DefaultValue.Mock };
+			parentMock.Object.Adder.Done += (_, actual) => received = actual;
+
+			var sent = new DoneArgs();
+			parentMock.Raise(m => m.Adder.Done += null, sent);
+
+			Assert.Same(sent, received);
+		}
+
+		[Fact]
+		public void When_raising_event_on_inner_mock_sender_will_be_root_mock()
+		{
+			object sender = null;
+			var parentMock = new Mock<IParent> { DefaultValue = DefaultValue.Mock };
+			parentMock.Object.Adder.Done += (s, _) => sender = s;
+
+			parentMock.Raise(m => m.Adder.Done += null, default(DoneArgs));
+
+			Assert.Same(parentMock.Object, sender);
+		}
+
 		public delegate void CustomEvent(string message, int value);
 
 		public interface IWithEvent
@@ -676,6 +727,7 @@ namespace Moq.Tests
 		{
 			event EventHandler<EventArgs> Event;
 			IAdder<int> Adder { get; set; }
+			event EventHandler<DoneArgs> Done;
 		}
 
 		public interface IDerived : IParent
