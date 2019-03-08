@@ -261,8 +261,7 @@ namespace Moq
 			var parts = expression.Split();
 			Mock.VerifyRecursive(mock, expression, parts, times, failMessage, verifyLast: (part, targetMock) =>
 			{
-				var expectation = new InvocationShape(part.Expression, part.Method, part.Arguments);
-				VerifyCalls(targetMock, expectation, expression, times, failMessage);
+				VerifyCalls(targetMock, expectation: part, expression, times, failMessage);
 			});
 		}
 
@@ -301,11 +300,12 @@ namespace Moq
 
 			ThrowIfVerifyExpressionInvolvesUnsupportedMember(expr, method);
 
+			// Rebuild a new part here, as `method` may have been modified:
+			var part = new InvocationShape(expr, method, arguments);
+
 			if (parts.Count == 0)
 			{
-				verifyLast(new InvocationShape(expr, method, arguments), mock);
-				//                                   ^^^^^^
-				// We rebuild a new part here because `method` may have been modified.
+				verifyLast(part, mock);
 			}
 			else
 			{
@@ -422,7 +422,7 @@ namespace Moq
 
 			return Mock.SetupRecursive(mock, expression, setupLast: (part, targetMock) =>
 			{
-				var setup = new MethodCall(targetMock, condition, new InvocationShape(part.Expression, part.Method, part.Arguments));
+				var setup = new MethodCall(targetMock, condition, expectation: part);
 				targetMock.Setups.Add(setup);
 				return setup;
 			});
@@ -455,7 +455,7 @@ namespace Moq
 
 			return Mock.SetupRecursive(mock, expression, setupLast: (part, targetMock) =>
 			{
-				var setup = new SequenceSetup(new InvocationShape(part.Expression, part.Method, part.Arguments));
+				var setup = new SequenceSetup(expectation: part);
 				targetMock.Setups.Add(setup);
 				return setup;
 			});
@@ -487,11 +487,12 @@ namespace Moq
 			ThrowIfSetupExpressionInvolvesUnsupportedMember(expr, method);
 			ThrowIfSetupMethodNotVisibleToProxyFactory(method);
 
+			// Rebuild a new part here, as `method` may have been modified:
+			var part = new InvocationShape(expr, method, arguments);
+
 			if (parts.Count == 0)
 			{
-				return setupLast(new InvocationShape(expr, method, arguments), mock);
-				//                                         ^^^^^^
-				// We rebuild a new part here because `method` may have been modified.
+				return setupLast(part, mock);
 			}
 			else
 			{
@@ -507,7 +508,7 @@ namespace Moq
 								Resources.UnsupportedExpression,
 								expr.ToStringFixed() + " in " + expression.ToStringFixed() + ":\n" + Resources.InvalidMockClass));
 					}
-					setup = new InnerMockSetup(new InvocationShape(expr, method, arguments), returnValue);
+					setup = new InnerMockSetup(expectation: part, returnValue);
 					mock.Setups.Add((Setup)setup);
 				}
 				Debug.Assert(innerMock != null);
