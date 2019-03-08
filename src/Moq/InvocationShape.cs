@@ -13,19 +13,23 @@ namespace Moq
 	/// </summary>
 	internal readonly struct InvocationShape
 	{
+		private static readonly IReadOnlyList<Expression> noArguments = new Expression[0];
+		private static readonly IMatcher[] noArgumentMatchers = new IMatcher[0];
+
 		public readonly LambdaExpression Expression;
 		public readonly MethodInfo Method;
 		public readonly IReadOnlyList<Expression> Arguments;
 
 		private readonly IMatcher[] argumentMatchers;
 
-		public InvocationShape(LambdaExpression expression, MethodInfo method, IReadOnlyList<Expression> arguments)
+		public InvocationShape(LambdaExpression expression, MethodInfo method, IReadOnlyList<Expression> arguments = null)
 		{
 			this.Expression = expression;
 			this.Method = method;
-			this.Arguments = arguments;
+			this.Arguments = arguments ?? noArguments;
 
-			this.argumentMatchers = MatcherFactory.CreateMatchers(arguments, method.GetParameters());
+			this.argumentMatchers = arguments != null ? MatcherFactory.CreateMatchers(arguments, method.GetParameters())
+			                                          : noArgumentMatchers;
 		}
 
 		public void Deconstruct(out LambdaExpression expression, out MethodInfo method, out IReadOnlyList<Expression> arguments)
