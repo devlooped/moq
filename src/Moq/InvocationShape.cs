@@ -4,7 +4,6 @@
 using System;
 using System.Collections.Generic;
 using System.Diagnostics;
-using System.Linq;
 using System.Linq.Expressions;
 using System.Reflection;
 
@@ -12,27 +11,43 @@ namespace Moq
 {
 	/// <summary>
 	///   Describes the "shape" of an invocation against which concrete <see cref="Invocation"/>s can be matched.
+	///   <para>
+	///     This shape is described by <see cref="InvocationShape.Expression"/> which has the general form
+	///     `mock => mock.Method(...arguments)`. Because the method and arguments are frequently needed,
+	///     they are cached in <see cref="InvocationShape.Method"/> and <see cref="InvocationShape.Arguments"/>
+	///     for faster access.
+	///   </para>
 	/// </summary>
-	internal readonly struct InvocationShape
+	internal sealed class InvocationShape
 	{
-		private readonly MethodInfo method;
+		private static readonly IReadOnlyList<Expression> noArguments = new Expression[0];
+		private static readonly IMatcher[] noArgumentMatchers = new IMatcher[0];
+
+		public readonly LambdaExpression Expression;
+		public readonly MethodInfo Method;
+		public readonly IReadOnlyList<Expression> Arguments;
+
 		private readonly IMatcher[] argumentMatchers;
 
-		public InvocationShape(MethodInfo method, IReadOnlyList<Expression> arguments)
+		public InvocationShape(LambdaExpression expression, MethodInfo method, IReadOnlyList<Expression> arguments = null)
 		{
-			this.method = method;
-			this.argumentMatchers = GetArgumentMatchers(arguments, method.GetParameters());
+			Debug.Assert(expression != null);
+			Debug.Assert(method != null);
+
+			this.Expression = expression;
+			this.Method = method;
+			this.Arguments = arguments ?? noArguments;
+
+			this.argumentMatchers = arguments != null ? MatcherFactory.CreateMatchers(arguments, method.GetParameters())
+			                                          : noArgumentMatchers;
 		}
 
-		public InvocationShape(MethodInfo method, IMatcher[] argumentMatchers)
+		public void Deconstruct(out LambdaExpression expression, out MethodInfo method, out IReadOnlyList<Expression> arguments)
 		{
-			this.method = method;
-			this.argumentMatchers = argumentMatchers;
+			expression = this.Expression;
+			method = this.Method;
+			arguments = this.Arguments;
 		}
-
-		public IReadOnlyList<IMatcher> ArgumentMatchers => this.argumentMatchers;
-
-		public MethodInfo Method => this.method;
 
 		public bool IsMatch(Invocation invocation)
 		{
@@ -42,7 +57,7 @@ namespace Moq
 				return false;
 			}
 
-			if (invocation.Method != this.method && !this.IsOverride(invocation.Method))
+			if (invocation.Method != this.Method && !this.IsOverride(invocation.Method))
 			{
 				return false;
 			}
@@ -60,7 +75,7 @@ namespace Moq
 
 		private bool IsOverride(MethodInfo invocationMethod)
 		{
-			var method = this.method;
+			var method = this.Method;
 
 			if (!method.DeclaringType.IsAssignableFrom(invocationMethod.DeclaringType))
 			{
@@ -93,21 +108,6 @@ namespace Moq
 			}
 
 			return true;
-		}
-
-		private static IMatcher[] GetArgumentMatchers(IReadOnlyList<Expression> arguments, ParameterInfo[] parameters)
-		{
-			Debug.Assert(arguments != null);
-			Debug.Assert(parameters != null);
-			Debug.Assert(arguments.Count == parameters.Length);
-
-			var n = parameters.Length;
-			var argumentMatchers = new IMatcher[n];
-			for (int i = 0; i < n; ++i)
-			{
-				argumentMatchers[i] = MatcherFactory.CreateMatcher(arguments[i], parameters[i]);
-			}
-			return argumentMatchers;
 		}
 	}
 }

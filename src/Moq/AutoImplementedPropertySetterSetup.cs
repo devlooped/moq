@@ -2,10 +2,9 @@
 // All rights reserved. Licensed under the BSD 3-Clause License; see License.txt.
 
 using System;
+using System.Linq;
 using System.Linq.Expressions;
 using System.Reflection;
-
-using Moq.Matchers;
 
 namespace Moq
 {
@@ -14,12 +13,10 @@ namespace Moq
 	/// </summary>
 	internal sealed class AutoImplementedPropertySetterSetup : Setup
 	{
-		private static IMatcher[] anyMatcherForSingleArgument = new IMatcher[] { AnyMatcher.Instance };
-
 		private Action<object> setter;
 
 		public AutoImplementedPropertySetterSetup(LambdaExpression originalExpression, MethodInfo method, Action<object> setter)
-			: base(new InvocationShape(method, anyMatcherForSingleArgument), originalExpression)
+			: base(new InvocationShape(originalExpression, method, new Expression[] { It.IsAny(method.GetParameterTypes().Last()) }))
 		{
 			this.setter = setter;
 		}

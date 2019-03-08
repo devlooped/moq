@@ -63,11 +63,11 @@ namespace Moq
 		/// <exception cref="ArgumentException">
 		///   It was not possible to completely split up the expression.
 		/// </exception>
-		internal static Stack<LambdaExpressionPart> Split(this LambdaExpression expression)
+		internal static Stack<InvocationShape> Split(this LambdaExpression expression)
 		{
 			Debug.Assert(expression != null);
 
-			var parts = new Stack<LambdaExpressionPart>();
+			var parts = new Stack<InvocationShape>();
 
 			Expression remainder = expression.Body;
 			while (CanSplit(remainder))
@@ -127,7 +127,7 @@ namespace Moq
 				}
 			}
 
-			void Split(Expression e, out Expression r /* remainder */, out LambdaExpressionPart p /* part */)
+			void Split(Expression e, out Expression r /* remainder */, out InvocationShape p /* part */)
 			{
 				const string ParameterName = "...";
 
@@ -157,7 +157,7 @@ namespace Moq
 							arguments[ai] = lhs.Arguments[ai];
 						}
 						arguments[arguments.Length - 1] = assignmentExpression.Right;
-						p = new LambdaExpressionPart(
+						p = new InvocationShape(
 							expression: Expression.Lambda(
 								Expression.MakeBinary(e.NodeType, lhs.Expression.Body, assignmentExpression.Right),
 								parameter),
@@ -175,7 +175,7 @@ namespace Moq
 							var parameter = Expression.Parameter(r.Type, r is ParameterExpression ope ? ope.Name : ParameterName);
 							var method = methodCallExpression.Method;
 							var arguments = methodCallExpression.Arguments;
-							p = new LambdaExpressionPart(
+							p = new InvocationShape(
 										expression: Expression.Lambda(
 											Expression.Call(parameter, method, arguments),
 											parameter),
@@ -191,7 +191,7 @@ namespace Moq
 							var method = methodCallExpression.Method;
 							var arguments = methodCallExpression.Arguments.ToArray();
 							arguments[0] = parameter;
-							p = new LambdaExpressionPart(
+							p = new InvocationShape(
 										expression: Expression.Lambda(
 											Expression.Call(method, arguments),
 											parameter),
@@ -208,7 +208,7 @@ namespace Moq
 						var parameter = Expression.Parameter(r.Type, r is ParameterExpression ope ? ope.Name : ParameterName);
 						var indexer = indexExpression.Indexer;
 						var arguments = indexExpression.Arguments;
-						p = new LambdaExpressionPart(
+						p = new InvocationShape(
 									expression: Expression.Lambda(
 										Expression.MakeIndex(parameter, indexer, arguments),
 										parameter),
@@ -224,7 +224,7 @@ namespace Moq
 						r = invocationExpression.Expression;
 						var parameter = Expression.Parameter(r.Type, r is ParameterExpression ope ? ope.Name : ParameterName);
 						var arguments = invocationExpression.Arguments;
-						p = new LambdaExpressionPart(
+						p = new InvocationShape(
 									expression: Expression.Lambda(
 										Expression.Invoke(parameter, arguments),
 										parameter),
@@ -248,7 +248,7 @@ namespace Moq
 						// ridden in the above `Assign` case. Finally, if a write-only property is being
 						// assigned to, we fall back to the setter here in order to not end up without a
 						// method at all.
-						p = new LambdaExpressionPart(
+						p = new InvocationShape(
 									expression: Expression.Lambda(
 										Expression.MakeMemberAccess(parameter, property),
 										parameter),

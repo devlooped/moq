@@ -2,16 +2,34 @@
 // All rights reserved. Licensed under the BSD 3-Clause License; see License.txt.
 
 using System;
+using System.Collections.Generic;
+using System.Diagnostics;
 using System.Globalization;
 using System.Linq.Expressions;
-using Moq.Properties;
-using Moq.Matchers;
 using System.Reflection;
+
+using Moq.Matchers;
+using Moq.Properties;
 
 namespace Moq
 {
 	internal static class MatcherFactory
 	{
+		public static IMatcher[] CreateMatchers(IReadOnlyList<Expression> arguments, ParameterInfo[] parameters)
+		{
+			Debug.Assert(arguments != null);
+			Debug.Assert(parameters != null);
+			Debug.Assert(arguments.Count == parameters.Length);
+
+			var n = parameters.Length;
+			var argumentMatchers = new IMatcher[n];
+			for (int i = 0; i < n; ++i)
+			{
+				argumentMatchers[i] = MatcherFactory.CreateMatcher(arguments[i], parameters[i]);
+			}
+			return argumentMatchers;
+		}
+
 		public static IMatcher CreateMatcher(Expression argument, ParameterInfo parameter)
 		{
 			if (parameter.ParameterType.IsByRef)

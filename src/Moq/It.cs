@@ -45,6 +45,13 @@ namespace Moq
 				() => It.IsAny<TValue>());
 		}
 
+		private static readonly MethodInfo isAnyMethod = typeof(It).GetMethod(nameof(It.IsAny), BindingFlags.Public | BindingFlags.Static);
+
+		internal static MethodCallExpression IsAny(Type genericArgument)
+		{
+			return Expression.Call(It.isAnyMethod.MakeGenericMethod(genericArgument));
+		}
+
 		/// <include file='It.xdoc' path='docs/doc[@for="It.IsNotNull"]/*'/>
 		[Matcher]
 		public static TValue IsNotNull<TValue>()
