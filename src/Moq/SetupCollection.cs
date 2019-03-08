@@ -86,7 +86,7 @@ namespace Moq
 			// The following verification logic will remember each processed setup so that duplicate setups
 			// (that is, setups overridden by later setups with an equivalent expression) can be detected.
 			// To speed up duplicate detection, they are partitioned according to the method they target.
-			var visitedSetupsPerMethod = new Dictionary<MethodInfo, List<Expression>>();
+			var visitedSetupsPerMethod = new Dictionary<MethodInfo, List<InvocationShape>>();
 
 			lock (this.setups)
 			{
@@ -97,15 +97,14 @@ namespace Moq
 						continue;
 					}
 
-					List<Expression> visitedSetupsForMethod;
+					List<InvocationShape> visitedSetupsForMethod;
 					if (!visitedSetupsPerMethod.TryGetValue(setup.Method, out visitedSetupsForMethod))
 					{
-						visitedSetupsForMethod = new List<Expression>();
+						visitedSetupsForMethod = new List<InvocationShape>();
 						visitedSetupsPerMethod.Add(setup.Method, visitedSetupsForMethod);
 					}
 
-					var expr = setup.Expression.PartialMatcherAwareEval();
-					if (visitedSetupsForMethod.Any(vc => ExpressionComparer.Default.Equals(vc, expr)))
+					if (visitedSetupsForMethod.Contains(setup.Expectation))
 					{
 						continue;
 					}
@@ -115,7 +114,7 @@ namespace Moq
 						matchingSetups.Push(setup);
 					}
 
-					visitedSetupsForMethod.Add(expr);
+					visitedSetupsForMethod.Add(setup.Expectation);
 				}
 			}
 

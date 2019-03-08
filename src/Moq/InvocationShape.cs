@@ -18,9 +18,9 @@ namespace Moq
 	///     for faster access.
 	///   </para>
 	/// </summary>
-	internal sealed class InvocationShape
+	internal sealed class InvocationShape : IEquatable<InvocationShape>
 	{
-		private static readonly IReadOnlyList<Expression> noArguments = new Expression[0];
+		private static readonly Expression[] noArguments = new Expression[0];
 		private static readonly IMatcher[] noArgumentMatchers = new IMatcher[0];
 
 		public readonly LambdaExpression Expression;
@@ -28,6 +28,7 @@ namespace Moq
 		public readonly IReadOnlyList<Expression> Arguments;
 
 		private readonly IMatcher[] argumentMatchers;
+		private Expression[] partiallyEvaluatedArguments;
 
 		public InvocationShape(LambdaExpression expression, MethodInfo method, IReadOnlyList<Expression> arguments = null)
 		{
@@ -108,6 +109,72 @@ namespace Moq
 			}
 
 			return true;
+		}
+
+		public bool Equals(InvocationShape other)
+		{
+			if (this.Method != other.Method)
+			{
+				return false;
+			}
+
+			if (this.Arguments.Count != other.Arguments.Count)
+			{
+				return false;
+			}
+
+			if (this.partiallyEvaluatedArguments == null)
+			{
+				this.partiallyEvaluatedArguments = PartiallyEvaluateArguments(this.Arguments);
+			}
+
+			if (other.partiallyEvaluatedArguments == null)
+			{
+				other.partiallyEvaluatedArguments = PartiallyEvaluateArguments(other.Arguments);
+			}
+
+			for (int i = 0, n = this.partiallyEvaluatedArguments.Length; i < n; ++i)
+			{
+				if (!ExpressionComparer.Default.Equals(this.partiallyEvaluatedArguments[i], other.partiallyEvaluatedArguments[i]))
+				{
+					return false;
+				}
+			}
+
+			return true;
+		}
+
+		private static Expression[] PartiallyEvaluateArguments(IReadOnlyList<Expression> arguments)
+		{
+			Debug.Assert(arguments != null);
+
+			if (arguments.Count == 0)
+			{
+				return noArguments;
+			}
+
+			var partiallyEvaluatedArguments = new Expression[arguments.Count];
+			for (int i = 0, n = arguments.Count; i < n; ++i)
+			{
+				partiallyEvaluatedArguments[i] = arguments[i].PartialMatcherAwareEval();
+			}
+
+			return partiallyEvaluatedArguments;
+		}
+
+		public override bool Equals(object obj)
+		{
+			return obj is InvocationShape other && this.Equals(other);
+		}
+
+		public override int GetHashCode()
+		{
+			return this.Method.GetHashCode();
+		}
+
+		public override string ToString()
+		{
+			return this.Expression.ToStringFixed();
 		}
 	}
 }
