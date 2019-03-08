@@ -266,7 +266,7 @@ namespace Moq
 			var parts = expression.Split();
 			Mock.VerifyRecursive(mock, expression, parts, times, failMessage, verifyLast: (part, targetMock) =>
 			{
-				var expectation = new InvocationShape(part.Method, part.Arguments);
+				var expectation = new InvocationShape(part.Expression, part.Method, part.Arguments);
 				VerifyCalls(targetMock, expectation, expression, times, failMessage);
 			});
 		}

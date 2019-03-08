@@ -13,13 +13,15 @@ namespace Moq
 	/// </summary>
 	internal readonly struct InvocationShape
 	{
+		public readonly LambdaExpression Expression;
 		public readonly MethodInfo Method;
 		public readonly IReadOnlyList<Expression> Arguments;
 
 		private readonly IMatcher[] argumentMatchers;
 
-		public InvocationShape(MethodInfo method, IReadOnlyList<Expression> arguments)
+		public InvocationShape(LambdaExpression expression, MethodInfo method, IReadOnlyList<Expression> arguments)
 		{
+			this.Expression = expression;
 			this.Method = method;
 			this.Arguments = arguments;
 

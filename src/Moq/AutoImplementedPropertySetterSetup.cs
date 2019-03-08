@@ -16,7 +16,7 @@ namespace Moq
 		private Action<object> setter;
 
 		public AutoImplementedPropertySetterSetup(LambdaExpression originalExpression, MethodInfo method, Action<object> setter)
-			: base(new InvocationShape(method, new Expression[] { It.IsAny(method.GetParameterTypes().Last()) }), originalExpression)
+			: base(new InvocationShape(originalExpression, method, new Expression[] { It.IsAny(method.GetParameterTypes().Last()) }), originalExpression)
 		{
 			this.setter = setter;
 		}
