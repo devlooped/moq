@@ -288,7 +288,8 @@ namespace Moq
 
 		private static void VerifyRecursive(Mock mock, LambdaExpression expression, Stack<InvocationShape> parts, Times times, string failMessage, Action<InvocationShape, Mock> verifyLast)
 		{
-			var (expr, method, arguments) = parts.Pop();
+			var part = parts.Pop();
+			var (expr, method, arguments) = part;
 
 			if (mock.IsDelegateMock)
 			{
@@ -296,12 +297,10 @@ namespace Moq
 				// delegate interface proxy, so we need to map instead to the
 				// method on that interface.
 				_ = ProxyFactory.Instance.GetDelegateProxyInterface(mock.TargetType, out method);
+				part = new InvocationShape(expr, method, arguments);
 			}
 
 			ThrowIfVerifyExpressionInvolvesUnsupportedMember(expr, method);
-
-			// Rebuild a new part here, as `method` may have been modified:
-			var part = new InvocationShape(expr, method, arguments);
 
 			if (parts.Count == 0)
 			{
@@ -474,7 +473,8 @@ namespace Moq
 
 		private static TSetup SetupRecursivePexProtected<TSetup>(Mock mock, LambdaExpression expression, Stack<InvocationShape> parts, Func<InvocationShape, Mock, TSetup> setupLast)
 		{
-			var (expr, method, arguments) = parts.Pop();
+			var part = parts.Pop();
+			var (expr, method, arguments) = part;
 
 			if (mock.IsDelegateMock)
 			{
@@ -482,13 +482,11 @@ namespace Moq
 				// delegate interface proxy, so we need to map instead to the
 				// method on that interface.
 				_ = ProxyFactory.Instance.GetDelegateProxyInterface(mock.TargetType, out method);
+				part = new InvocationShape(expr, method, arguments);
 			}
 
 			ThrowIfSetupExpressionInvolvesUnsupportedMember(expr, method);
 			ThrowIfSetupMethodNotVisibleToProxyFactory(method);
-
-			// Rebuild a new part here, as `method` may have been modified:
-			var part = new InvocationShape(expr, method, arguments);
 
 			if (parts.Count == 0)
 			{
