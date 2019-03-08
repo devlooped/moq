@@ -24,13 +24,6 @@ namespace Moq
 			this.argumentMatchers = MatcherFactory.CreateMatchers(arguments, method.GetParameters());
 		}
 
-		public InvocationShape(MethodInfo method, IMatcher[] argumentMatchers)
-		{
-			this.Method = method;
-
-			this.argumentMatchers = argumentMatchers;
-		}
-
 		public IReadOnlyList<IMatcher> ArgumentMatchers => this.argumentMatchers;
 
 		public bool IsMatch(Invocation invocation)

@@ -12,12 +12,12 @@ namespace Moq
 	/// </summary>
 	internal sealed class AutoImplementedPropertyGetterSetup : Setup, IDeterministicReturnValueSetup
 	{
-		private static IMatcher[] noArgumentMatchers = new IMatcher[0];
+		private static Expression[] noArguments = new Expression[0];
 
 		private Func<object> getter;
 
 		public AutoImplementedPropertyGetterSetup(LambdaExpression originalExpression, MethodInfo method, Func<object> getter)
-			: base(new InvocationShape(method, noArgumentMatchers), originalExpression)
+			: base(new InvocationShape(method, noArguments), originalExpression)
 		{
 			this.getter = getter;
 		}
