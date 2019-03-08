@@ -14,17 +14,17 @@ namespace Moq
 	internal readonly struct InvocationShape
 	{
 		public readonly MethodInfo Method;
+		public readonly IReadOnlyList<Expression> Arguments;
 
 		private readonly IMatcher[] argumentMatchers;
 
 		public InvocationShape(MethodInfo method, IReadOnlyList<Expression> arguments)
 		{
 			this.Method = method;
+			this.Arguments = arguments;
 
 			this.argumentMatchers = MatcherFactory.CreateMatchers(arguments, method.GetParameters());
 		}
-
-		public IReadOnlyList<IMatcher> ArgumentMatchers => this.argumentMatchers;
 
 		public bool IsMatch(Invocation invocation)
 		{
