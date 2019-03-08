@@ -28,6 +28,13 @@ namespace Moq
 			this.argumentMatchers = MatcherFactory.CreateMatchers(arguments, method.GetParameters());
 		}
 
+		public void Deconstruct(out LambdaExpression expression, out MethodInfo method, out IReadOnlyList<Expression> arguments)
+		{
+			expression = this.Expression;
+			method = this.Method;
+			arguments = this.Arguments;
+		}
+
 		public bool IsMatch(Invocation invocation)
 		{
 			var arguments = invocation.Arguments;
