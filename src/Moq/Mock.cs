@@ -287,7 +287,7 @@ namespace Moq
 			Mock.Verify(mock, expression, times, failMessage);
 		}
 
-		private static void VerifyRecursive(Mock mock, LambdaExpression expression, Stack<LambdaExpressionPart> parts, Times times, string failMessage, Action<LambdaExpressionPart, Mock> verifyLast)
+		private static void VerifyRecursive(Mock mock, LambdaExpression expression, Stack<InvocationShape> parts, Times times, string failMessage, Action<InvocationShape, Mock> verifyLast)
 		{
 			var (expr, method, arguments) = parts.Pop();
 
@@ -303,8 +303,8 @@ namespace Moq
 
 			if (parts.Count == 0)
 			{
-				verifyLast(new LambdaExpressionPart(expr, method, arguments), mock);
-				//                                        ^^^^^^
+				verifyLast(new InvocationShape(expr, method, arguments), mock);
+				//                                   ^^^^^^
 				// We rebuild a new part here because `method` may have been modified.
 			}
 			else
@@ -462,7 +462,7 @@ namespace Moq
 		}
 
 		[DebuggerStepThrough]
-		private static TSetup SetupRecursive<TSetup>(Mock mock, LambdaExpression expression, Func<LambdaExpressionPart, Mock, TSetup> setupLast)
+		private static TSetup SetupRecursive<TSetup>(Mock mock, LambdaExpression expression, Func<InvocationShape, Mock, TSetup> setupLast)
 		{
 			Debug.Assert(mock != null);
 			Debug.Assert(expression != null);
@@ -472,7 +472,7 @@ namespace Moq
 			return PexProtector.Invoke(SetupRecursivePexProtected, mock, expression, parts, setupLast);
 		}
 
-		private static TSetup SetupRecursivePexProtected<TSetup>(Mock mock, LambdaExpression expression, Stack<LambdaExpressionPart> parts, Func<LambdaExpressionPart, Mock, TSetup> setupLast)
+		private static TSetup SetupRecursivePexProtected<TSetup>(Mock mock, LambdaExpression expression, Stack<InvocationShape> parts, Func<InvocationShape, Mock, TSetup> setupLast)
 		{
 			var (expr, method, arguments) = parts.Pop();
 
@@ -489,8 +489,8 @@ namespace Moq
 
 			if (parts.Count == 0)
 			{
-				return setupLast(new LambdaExpressionPart(expr, method, arguments), mock);
-				//                                              ^^^^^^
+				return setupLast(new InvocationShape(expr, method, arguments), mock);
+				//                                         ^^^^^^
 				// We rebuild a new part here because `method` may have been modified.
 			}
 			else
@@ -665,7 +665,7 @@ namespace Moq
 			Mock.RaiseEvent(mock, expression, parts, arguments);
 		}
 
-		internal static void RaiseEvent(Mock mock, LambdaExpression expression, Stack<LambdaExpressionPart> parts, object[] arguments)
+		internal static void RaiseEvent(Mock mock, LambdaExpression expression, Stack<InvocationShape> parts, object[] arguments)
 		{
 			var (_, method, _) = parts.Pop();
 
