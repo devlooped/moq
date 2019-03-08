@@ -3,6 +3,7 @@
 
 using System;
 using System.Collections.Generic;
+using System.Diagnostics;
 using System.Linq.Expressions;
 using System.Reflection;
 
@@ -17,6 +18,8 @@ namespace Moq
 		protected SetupWithOutParameterSupport(InvocationShape expectation)
 			: base(expectation)
 		{
+			Debug.Assert(expectation != null);
+
 			this.outValues = GetOutValues(expectation.Arguments, expectation.Method.GetParameters());
 		}
 

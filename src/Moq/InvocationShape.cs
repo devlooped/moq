@@ -3,6 +3,7 @@
 
 using System;
 using System.Collections.Generic;
+using System.Diagnostics;
 using System.Linq.Expressions;
 using System.Reflection;
 
@@ -11,7 +12,7 @@ namespace Moq
 	/// <summary>
 	///   Describes the "shape" of an invocation against which concrete <see cref="Invocation"/>s can be matched.
 	/// </summary>
-	internal readonly struct InvocationShape
+	internal sealed class InvocationShape
 	{
 		private static readonly IReadOnlyList<Expression> noArguments = new Expression[0];
 		private static readonly IMatcher[] noArgumentMatchers = new IMatcher[0];
@@ -24,6 +25,9 @@ namespace Moq
 
 		public InvocationShape(LambdaExpression expression, MethodInfo method, IReadOnlyList<Expression> arguments = null)
 		{
+			Debug.Assert(expression != null);
+			Debug.Assert(method != null);
+
 			this.Expression = expression;
 			this.Method = method;
 			this.Arguments = arguments ?? noArguments;
