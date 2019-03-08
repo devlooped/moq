@@ -3,8 +3,6 @@
 
 using System;
 using System.Collections.Generic;
-using System.Diagnostics;
-using System.Linq;
 using System.Linq.Expressions;
 using System.Reflection;
 
@@ -21,7 +19,7 @@ namespace Moq
 		public InvocationShape(MethodInfo method, IReadOnlyList<Expression> arguments)
 		{
 			this.method = method;
-			this.argumentMatchers = GetArgumentMatchers(arguments, method.GetParameters());
+			this.argumentMatchers = MatcherFactory.CreateMatchers(arguments, method.GetParameters());
 		}
 
 		public InvocationShape(MethodInfo method, IMatcher[] argumentMatchers)
@@ -93,21 +91,6 @@ namespace Moq
 			}
 
 			return true;
-		}
-
-		private static IMatcher[] GetArgumentMatchers(IReadOnlyList<Expression> arguments, ParameterInfo[] parameters)
-		{
-			Debug.Assert(arguments != null);
-			Debug.Assert(parameters != null);
-			Debug.Assert(arguments.Count == parameters.Length);
-
-			var n = parameters.Length;
-			var argumentMatchers = new IMatcher[n];
-			for (int i = 0; i < n; ++i)
-			{
-				argumentMatchers[i] = MatcherFactory.CreateMatcher(arguments[i], parameters[i]);
-			}
-			return argumentMatchers;
 		}
 	}
 }
