@@ -21,6 +21,8 @@ namespace Moq
 
 		public virtual Condition Condition => null;
 
+		public InvocationShape Expectation => this.expectation;
+
 		public LambdaExpression Expression => this.expectation.Expression;
 
 		public virtual bool IsVerifiable => false;
