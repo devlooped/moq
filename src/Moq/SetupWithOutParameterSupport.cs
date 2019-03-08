@@ -16,7 +16,7 @@ namespace Moq
 		private readonly List<KeyValuePair<int, object>> outValues;
 
 		protected SetupWithOutParameterSupport(MethodInfo method, IReadOnlyList<Expression> arguments, LambdaExpression expression)
-			: base(new InvocationShape(expression, method, arguments), expression)
+			: base(new InvocationShape(expression, method, arguments))
 		{
 			Debug.Assert(arguments != null);
 

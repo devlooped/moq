@@ -1,7 +1,6 @@
 // Copyright (c) 2007, Clarius Consulting, Manas Technology Solutions, InSTEDD.
 // All rights reserved. Licensed under the BSD 3-Clause License; see License.txt.
 
-using System.Diagnostics;
 using System.Linq.Expressions;
 using System.Reflection;
 using System.Text;
@@ -11,19 +10,15 @@ namespace Moq
 	internal abstract class Setup
 	{
 		private readonly InvocationShape expectation;
-		private readonly LambdaExpression expression;
 
-		protected Setup(InvocationShape expectation, LambdaExpression expression)
+		protected Setup(InvocationShape expectation)
 		{
-			Debug.Assert(expression != null);
-
 			this.expectation = expectation;
-			this.expression = expression;
 		}
 
 		public virtual Condition Condition => null;
 
-		public LambdaExpression Expression => this.expression;
+		public LambdaExpression Expression => this.expectation.Expression;
 
 		public virtual bool IsVerifiable => false;
 
@@ -42,13 +37,13 @@ namespace Moq
 
 		public override string ToString()
 		{
-			var expression = this.expression.PartialMatcherAwareEval();
-			var mockedType = this.expression.Parameters[0].Type;
+			var expression = this.expectation.Expression;
+			var mockedType = expression.Parameters[0].Type;
 
 			var builder = new StringBuilder();
 			builder.AppendNameOf(mockedType)
 			       .Append(' ')
-			       .Append(expression.ToStringFixed());
+			       .Append(expression.PartialMatcherAwareEval().ToStringFixed());
 
 			return builder.ToString();
 		}
