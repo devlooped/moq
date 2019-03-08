@@ -13,24 +13,25 @@ namespace Moq
 	/// </summary>
 	internal readonly struct InvocationShape
 	{
-		private readonly MethodInfo method;
+		public readonly MethodInfo Method;
+
 		private readonly IMatcher[] argumentMatchers;
 
 		public InvocationShape(MethodInfo method, IReadOnlyList<Expression> arguments)
 		{
-			this.method = method;
+			this.Method = method;
+
 			this.argumentMatchers = MatcherFactory.CreateMatchers(arguments, method.GetParameters());
 		}
 
 		public InvocationShape(MethodInfo method, IMatcher[] argumentMatchers)
 		{
-			this.method = method;
+			this.Method = method;
+
 			this.argumentMatchers = argumentMatchers;
 		}
 
 		public IReadOnlyList<IMatcher> ArgumentMatchers => this.argumentMatchers;
-
-		public MethodInfo Method => this.method;
 
 		public bool IsMatch(Invocation invocation)
 		{
@@ -40,7 +41,7 @@ namespace Moq
 				return false;
 			}
 
-			if (invocation.Method != this.method && !this.IsOverride(invocation.Method))
+			if (invocation.Method != this.Method && !this.IsOverride(invocation.Method))
 			{
 				return false;
 			}
@@ -58,7 +59,7 @@ namespace Moq
 
 		private bool IsOverride(MethodInfo invocationMethod)
 		{
-			var method = this.method;
+			var method = this.Method;
 
 			if (!method.DeclaringType.IsAssignableFrom(invocationMethod.DeclaringType))
 			{
