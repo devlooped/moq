@@ -3,9 +3,7 @@
 
 using System;
 using System.Collections.Concurrent;
-using System.Collections.Generic;
 using System.Linq.Expressions;
-using System.Reflection;
 
 namespace Moq
 {
@@ -18,8 +16,8 @@ namespace Moq
 		private ConcurrentQueue<Response> responses;
 		private bool invoked;
 
-		public SequenceSetup(LambdaExpression originalExpression, MethodInfo method, IReadOnlyList<Expression> arguments)
-			: base(method, arguments, originalExpression)
+		public SequenceSetup(InvocationShape expectation)
+			: base(expectation)
 		{
 			this.responses = new ConcurrentQueue<Response>();
 		}

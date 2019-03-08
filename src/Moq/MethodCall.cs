@@ -2,7 +2,6 @@
 // All rights reserved. Licensed under the BSD 3-Clause License; see License.txt.
 
 using System;
-using System.Collections.Generic;
 using System.Diagnostics;
 using System.Diagnostics.CodeAnalysis;
 using System.Globalization;
@@ -33,11 +32,11 @@ namespace Moq
 		private RaiseEventResponse raiseEventResponse;
 		private Response returnOrThrowResponse;
 
-		public MethodCall(Mock mock, Condition condition, LambdaExpression originalExpression, MethodInfo method, IReadOnlyList<Expression> arguments)
-			: base(method, arguments, originalExpression)
+		public MethodCall(Mock mock, Condition condition, InvocationShape expectation)
+			: base(expectation)
 		{
 			this.condition = condition;
-			this.flags = method.ReturnType != typeof(void) ? Flags.MethodIsNonVoid : 0;
+			this.flags = expectation.Method.ReturnType != typeof(void) ? Flags.MethodIsNonVoid : 0;
 			this.mock = mock;
 
 			this.SetFileInfo();

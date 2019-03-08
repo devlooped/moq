@@ -2,7 +2,6 @@
 // All rights reserved. Licensed under the BSD 3-Clause License; see License.txt.
 
 using System;
-using System.Collections.Concurrent;
 using System.Collections.Generic;
 using System.Diagnostics;
 using System.Diagnostics.CodeAnalysis;
@@ -10,12 +9,8 @@ using System.Globalization;
 using System.Linq;
 using System.Linq.Expressions;
 using System.Reflection;
-using System.Runtime.CompilerServices;
-using System.Threading.Tasks;
 
-using Moq.Language.Flow;
 using Moq.Properties;
-using Moq.Protected;
 
 namespace Moq
 {
@@ -427,7 +422,7 @@ namespace Moq
 
 			return Mock.SetupRecursive(mock, expression, setupLast: (part, targetMock) =>
 			{
-				var setup = new MethodCall(targetMock, condition, part.Expression, part.Method, part.Arguments);
+				var setup = new MethodCall(targetMock, condition, new InvocationShape(part.Expression, part.Method, part.Arguments));
 				targetMock.Setups.Add(setup);
 				return setup;
 			});
@@ -460,7 +455,7 @@ namespace Moq
 
 			return Mock.SetupRecursive(mock, expression, setupLast: (part, targetMock) =>
 			{
-				var setup = new SequenceSetup(part.Expression, part.Method, part.Arguments);
+				var setup = new SequenceSetup(new InvocationShape(part.Expression, part.Method, part.Arguments));
 				targetMock.Setups.Add(setup);
 				return setup;
 			});
@@ -512,7 +507,7 @@ namespace Moq
 								Resources.UnsupportedExpression,
 								expr.ToStringFixed() + " in " + expression.ToStringFixed() + ":\n" + Resources.InvalidMockClass));
 					}
-					setup = new InnerMockSetup(method, arguments, expr, returnValue);
+					setup = new InnerMockSetup(new InvocationShape(expr, method, arguments), returnValue);
 					mock.Setups.Add((Setup)setup);
 				}
 				Debug.Assert(innerMock != null);
@@ -799,7 +794,7 @@ namespace Moq
 			var arguments = GetArguments(method);
 			var expression = Expression.Lambda(Expression.Call(mock, method, arguments), mock);
 
-			this.Setups.Add(new InnerMockSetup(method, arguments, expression, returnValue));
+			this.Setups.Add(new InnerMockSetup(new InvocationShape(expression, method, arguments), returnValue));
 
 			Expression[] GetArguments(MethodInfo m)
 			{
@@ -830,7 +825,7 @@ namespace Moq
 			ThrowIfSetupExpressionInvolvesUnsupportedMember(expression, method);
 			ThrowIfSetupMethodNotVisibleToProxyFactory(method);
 
-			this.Setups.Add(new InnerMockSetup(method, arguments, expression, returnValue));
+			this.Setups.Add(new InnerMockSetup(new InvocationShape(expression, method, arguments), returnValue));
 		}
 
 		internal IEnumerable<IDeterministicReturnValueSetup> GetInnerMockSetups()

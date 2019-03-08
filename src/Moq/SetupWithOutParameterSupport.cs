@@ -3,7 +3,6 @@
 
 using System;
 using System.Collections.Generic;
-using System.Diagnostics;
 using System.Linq.Expressions;
 using System.Reflection;
 
@@ -15,12 +14,10 @@ namespace Moq
 	{
 		private readonly List<KeyValuePair<int, object>> outValues;
 
-		protected SetupWithOutParameterSupport(MethodInfo method, IReadOnlyList<Expression> arguments, LambdaExpression expression)
-			: base(new InvocationShape(expression, method, arguments))
+		protected SetupWithOutParameterSupport(InvocationShape expectation)
+			: base(expectation)
 		{
-			Debug.Assert(arguments != null);
-
-			this.outValues = GetOutValues(arguments, method.GetParameters());
+			this.outValues = GetOutValues(expectation.Arguments, expectation.Method.GetParameters());
 		}
 
 		public sealed override void SetOutParameters(Invocation invocation)
