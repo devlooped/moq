@@ -300,8 +300,6 @@ namespace Moq
 				part = new InvocationShape(expr, method, arguments);
 			}
 
-			Guard.IsOverridable(method, expression);
-
 			if (parts.Count == 0)
 			{
 				verifyLast(part, mock);
@@ -484,9 +482,6 @@ namespace Moq
 				_ = ProxyFactory.Instance.GetDelegateProxyInterface(mock.TargetType, out method);
 				part = new InvocationShape(expr, method, arguments);
 			}
-
-			Guard.IsOverridable(method, expression);
-			Guard.IsVisibleToProxyFactory(method);
 
 			if (parts.Count == 0)
 			{
@@ -771,9 +766,6 @@ namespace Moq
 
 				Debug.Assert(method == property.GetGetMethod(true));
 			}
-
-			Guard.IsOverridable(method, expression);
-			Guard.IsVisibleToProxyFactory(method);
 
 			this.Setups.Add(new InnerMockSetup(new InvocationShape(expression, method, arguments), returnValue));
 		}
