@@ -316,6 +316,64 @@ namespace Moq.Tests
 			Assert.Equal(5, fooMock.Object.Bar.GetBaz("foo").Value);
 		}
 
+		public class Verify_can_tell_apart_different_arguments_in_intermediate_part_of_fluent_expressions
+		{
+			[Fact]
+			public void When_set_up_by_DefaultValue_Mock_1()
+			{
+				var mock = new Mock<IBar> { DefaultValue = DefaultValue.Mock };
+				mock.Object.GetBaz("actual").Do();
+				mock.Verify(m => m.GetBaz("something else").Do(), Times.Never);
+			}
+
+			[Fact]
+			public void When_manually_set_up_1()
+			{
+				var mock = new Mock<IBar>();
+				mock.Setup(m => m.GetBaz(It.IsAny<string>()).Do());
+				mock.Object.GetBaz("actual").Do();
+				mock.Verify(m => m.GetBaz("something else").Do(), Times.Never);
+			}
+
+			[Fact]
+			public void When_set_up_by_DefaultValue_Mock_2()
+			{
+				var mock = new Mock<IBar> { DefaultValue = DefaultValue.Mock };
+				mock.Object.GetBaz("first").Do();
+				mock.Object.GetBaz("second").Do();
+				mock.Verify(m => m.GetBaz("first").Do(), Times.Once);
+				mock.Verify(m => m.GetBaz("second").Do(), Times.Once);
+			}
+
+			[Fact]
+			public void When_manually_set_up_2()
+			{
+				var mock = new Mock<IBar> { DefaultValue = DefaultValue.Mock };
+				mock.Object.GetBaz("first").Do();
+				mock.Object.GetBaz("second").Do();
+				mock.Verify(m => m.GetBaz("first").Do(), Times.Once);
+				mock.Verify(m => m.GetBaz("second").Do(), Times.Once);
+			}
+
+			[Fact]
+			public void When_set_up_by_DefaultValue_Mock_3()
+			{
+				var mock = new Mock<IBar> { DefaultValue = DefaultValue.Mock };
+				mock.Object.GetBaz("first").Do();
+				mock.Object.GetBaz("second").Do();
+				mock.Verify(m => m.GetBaz(It.IsAny<string>()).Do(), Times.Exactly(2));
+			}
+
+			[Fact]
+			public void When_manually_set_up_3()
+			{
+				var mock = new Mock<IBar> { DefaultValue = DefaultValue.Mock };
+				mock.Object.GetBaz("first").Do();
+				mock.Object.GetBaz("second").Do();
+				mock.Verify(m => m.GetBaz(It.IsAny<string>()).Do(), Times.Exactly(2));
+			}
+		}
+
 		public class Foo : IFoo
 		{
 
