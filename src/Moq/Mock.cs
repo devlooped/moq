@@ -307,7 +307,7 @@ namespace Moq
 			else
 			{
 				Mock innerMock;
-				if (mock.GetInnerMockSetups().TryFind(method, out var setup) && setup.ReturnsInnerMock(out innerMock))
+				if (mock.GetInnerMockSetups().TryFind(part, out var setup) && setup.ReturnsInnerMock(out innerMock))
 				{
 					Mock.VerifyRecursive(innerMock, expression, parts, times, failMessage, verifyLast);
 				}
@@ -347,7 +347,7 @@ namespace Moq
 						// In order for an invocation to be "transitive", its return value has to be a
 						// sub-object (inner mock); and that sub-object has to have received at least
 						// one call:
-						var wasTransitiveInvocation = innerMockSetups.TryFind(unverifiedInvocations[i].Method, out var inner)
+						var wasTransitiveInvocation = innerMockSetups.TryFind(unverifiedInvocations[i], out var inner)
 						                              && inner.GetInnerMock().MutableInvocations.Any();
 						if (wasTransitiveInvocation)
 						{
@@ -490,7 +490,7 @@ namespace Moq
 			else
 			{
 				Mock innerMock;
-				if (!(mock.GetInnerMockSetups().TryFind(method, out var setup) && setup.ReturnsInnerMock(out innerMock)))
+				if (!(mock.GetInnerMockSetups().TryFind(part, out var setup) && setup.ReturnsInnerMock(out innerMock)))
 				{
 					var returnValue = mock.GetDefaultValue(method, out innerMock, useAlternateProvider: DefaultValueProvider.Mock);
 					if (innerMock == null)
@@ -612,7 +612,8 @@ namespace Moq
 
 		internal static void RaiseEvent(Mock mock, LambdaExpression expression, Stack<InvocationShape> parts, object[] arguments)
 		{
-			var (_, method, _) = parts.Pop();
+			var part = parts.Pop();
+			var method = part.Method;
 
 			if (parts.Count == 0)
 			{
@@ -640,7 +641,7 @@ namespace Moq
 				}
 
 			}
-			else if (mock.GetInnerMockSetups().TryFind(method, out var innerMockSetup) && innerMockSetup.ReturnsInnerMock(out var innerMock))
+			else if (mock.GetInnerMockSetups().TryFind(part, out var innerMockSetup) && innerMockSetup.ReturnsInnerMock(out var innerMock))
 			{
 				Mock.RaiseEvent(innerMock, expression, parts, arguments);
 			}
