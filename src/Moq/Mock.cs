@@ -734,28 +734,28 @@ namespace Moq
 
 		#region Inner mocks
 
-		internal void AddInnerMockSetup(MethodInfo method, object returnValue)
+		internal void AddInnerMockSetup(Invocation invocation, object returnValue)
 		{
-			var mock = Expression.Parameter(method.DeclaringType, "mock");
-			var arguments = GetArguments(method);
-			var expression = Expression.Lambda(Expression.Call(mock, method, arguments), mock);
+			var method = invocation.Method;
 
-			this.Setups.Add(new InnerMockSetup(new InvocationShape(expression, method, arguments), returnValue));
-
-			Expression[] GetArguments(MethodInfo m)
+			Expression[] arguments;
 			{
-				var parameterTypes = m.GetParameterTypes();
-				var parameterCount = parameterTypes.Count;
-
-				var result = new Expression[parameterCount];
-				var itIsAnyMethod = typeof(It).GetMethod(nameof(It.IsAny), BindingFlags.Public | BindingFlags.Static);
-				for (int i = 0; i < parameterCount; ++i)
+				var parameterTypes = method.GetParameterTypes();
+				var n = parameterTypes.Count;
+				arguments = new Expression[n];
+				for (int i = 0; i < n; ++i)
 				{
-					result[i] = Expression.Call(itIsAnyMethod.MakeGenericMethod(parameterTypes[i]));
+					arguments[i] = Expression.Constant(invocation.Arguments[i], parameterTypes[i]);
 				}
-
-				return result;
 			}
+
+			LambdaExpression expression;
+			{
+				var mock = Expression.Parameter(method.DeclaringType, "mock");
+				expression = Expression.Lambda(Expression.Call(mock, method, arguments), mock);
+			}
+
+			this.AddInnerMockSetup(invocation.Method, arguments, expression, returnValue);
 		}
 
 		internal void AddInnerMockSetup(MethodInfo method, IReadOnlyList<Expression> arguments, LambdaExpression expression, object returnValue)
