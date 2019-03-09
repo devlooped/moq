@@ -300,8 +300,6 @@ namespace Moq
 				part = new InvocationShape(expr, method, arguments);
 			}
 
-			ThrowIfVerifyExpressionInvolvesUnsupportedMember(expr, method);
-
 			if (parts.Count == 0)
 			{
 				verifyLast(part, mock);
@@ -485,9 +483,6 @@ namespace Moq
 				part = new InvocationShape(expr, method, arguments);
 			}
 
-			ThrowIfSetupExpressionInvolvesUnsupportedMember(expr, method);
-			ThrowIfSetupMethodNotVisibleToProxyFactory(method);
-
 			if (parts.Count == 0)
 			{
 				return setupLast(part, mock);
@@ -600,55 +595,6 @@ namespace Moq
 		{
 			var param = Expression.Parameter(mockType, "m");
 			return Expression.Lambda(Expression.MakeMemberAccess(param, property), param);
-		}
-
-		private static void ThrowIfSetupMethodNotVisibleToProxyFactory(MethodInfo method)
-		{
-			if (ProxyFactory.Instance.IsMethodVisible(method, out string messageIfNotVisible) == false)
-			{
-				throw new ArgumentException(string.Format(
-					CultureInfo.CurrentCulture,
-					Resources.MethodNotVisibleToProxyFactory,
-					method.DeclaringType.Name,
-					method.Name,
-					messageIfNotVisible));
-			}
-		}
-
-		private static void ThrowIfSetupExpressionInvolvesUnsupportedMember(Expression setup, MethodInfo method)
-		{
-			if (method.IsStatic)
-			{
-				throw new NotSupportedException(string.Format(
-					CultureInfo.CurrentCulture,
-					method.IsExtensionMethod() ? Resources.SetupOnExtensionMethod : Resources.SetupOnStaticMember,
-					setup.ToStringFixed()));
-			}
-			else if (!method.CanOverride())
-			{
-				throw new NotSupportedException(string.Format(
-					CultureInfo.CurrentCulture,
-					Resources.SetupOnNonVirtualMember,
-					setup.ToStringFixed()));
-			}
-		}
-
-		private static void ThrowIfVerifyExpressionInvolvesUnsupportedMember(Expression verify, MethodInfo method)
-		{
-			if (method.IsStatic)
-			{
-				throw new NotSupportedException(string.Format(
-					CultureInfo.CurrentCulture,
-					method.IsExtensionMethod() ? Resources.VerifyOnExtensionMethod : Resources.VerifyOnStaticMember,
-					verify.ToStringFixed()));
-			}
-			else if (!method.CanOverride())
-			{
-				throw new NotSupportedException(string.Format(
-					CultureInfo.CurrentCulture,
-					Resources.VerifyOnNonVirtualMember,
-					verify.ToStringFixed()));
-			}
 		}
 
 		#endregion
@@ -820,9 +766,6 @@ namespace Moq
 
 				Debug.Assert(method == property.GetGetMethod(true));
 			}
-
-			ThrowIfSetupExpressionInvolvesUnsupportedMember(expression, method);
-			ThrowIfSetupMethodNotVisibleToProxyFactory(method);
 
 			this.Setups.Add(new InnerMockSetup(new InvocationShape(expression, method, arguments), returnValue));
 		}

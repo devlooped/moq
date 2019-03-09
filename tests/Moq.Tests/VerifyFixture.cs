@@ -1528,6 +1528,14 @@ namespace Moq.Tests
 			mock.Protected().Verify("Populate", Times.Once(), exactParameterMatch: true, ItExpr.Ref<ChildDto>.IsAny);
 		}
 
+		[Fact]
+		public void Verify_on_non_overridable_method_throws_NotSupportedException()
+		{
+			var mock = new Mock<Child>();
+			Assert.Throws<NotSupportedException>(() =>
+				mock.Verify(m => m.InvokePopulate(ref It.Ref<ChildDto>.IsAny), Times.Never));
+		}
+
 		public class Exclusion_of_unreachable_inner_mocks
 		{
 			[Fact]

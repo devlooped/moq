@@ -3151,7 +3151,8 @@ namespace Moq.Tests.Regressions
 				mock.Setup(m => m.OnExecute());
 
 				var e = Assert.Throws<NotSupportedException>(() => mock.Verify(m => m.Execute()));
-				Assert.StartsWith("Invalid verify", e.Message);
+				Assert.Contains("non-overridable", e.Message, StringComparison.CurrentCultureIgnoreCase);
+				Assert.Contains("Foo.Execute", e.Message);
 			}
 
 			public class Foo

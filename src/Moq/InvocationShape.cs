@@ -35,6 +35,9 @@ namespace Moq
 			Debug.Assert(expression != null);
 			Debug.Assert(method != null);
 
+			Guard.IsOverridable(method, expression);
+			Guard.IsVisibleToProxyFactory(method);
+
 			this.Expression = expression;
 			this.Method = method;
 			this.Arguments = arguments ?? noArguments;
