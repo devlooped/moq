@@ -277,9 +277,6 @@ Expected invocation on the mock once, but was {4} times: {1}</value>
 	<data name="UnhandledExpressionType" xml:space="preserve">
 		<value>Unhandled expression type: {0}</value>
 	</data>
-	<data name="ConfiguredSetups" xml:space="preserve">
-		<value>Configured setups: {0}</value>
-	</data>
 	<data name="DelaysMustBeGreaterThanZero" xml:space="preserve">
 		<value>Delays have to be greater than zero to ensure an async callback is used.</value>
 	</data>

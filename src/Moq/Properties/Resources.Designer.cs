@@ -106,15 +106,6 @@ namespace Moq.Properties {
 		}
 		
 		/// <summary>
-		///   Looks up a localized string similar to Configured setups: {0}.
-		/// </summary>
-		internal static string ConfiguredSetups {
-			get {
-				return ResourceManager.GetString("ConfiguredSetups", resourceCulture);
-			}
-		}
-		
-		/// <summary>
 		///   Looks up a localized string similar to Constructor arguments cannot be passed for delegate mocks..
 		/// </summary>
 		internal static string ConstructorArgsForDelegate {

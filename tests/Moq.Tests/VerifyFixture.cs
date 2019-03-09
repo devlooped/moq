@@ -861,17 +861,6 @@ namespace Moq.Tests
 		}
 
 		[Fact]
-		public void IncludesActualValuesFromSetups()
-		{
-			var expectedArg = "lorem,ipsum";
-			var mock = new Moq.Mock<IFoo>();
-			mock.Setup(f => f.Save(expectedArg.Substring(0, 5)));
-
-			var mex = Assert.Throws<MockException>(() => mock.Verify(foo => foo.Save("never")));
-			Assert.Contains("f.Save(\"lorem\")", mex.Message);
-		}
-
-		[Fact]
 		public void IncludesMessageAboutNoActualCallsInFailureMessage()
 		{
 			var mock = new Moq.Mock<IFoo>();
@@ -879,16 +868,6 @@ namespace Moq.Tests
 			MockException mex = Assert.Throws<MockException>(() => mock.Verify(f => f.Execute("pong")));
 
 			Assert.Contains("No invocations performed.", mex.Message);
-		}
-
-		[Fact]
-		public void IncludesMessageAboutNoSetupCallsInFailureMessage()
-		{
-			var mock = new Moq.Mock<IFoo>();
-
-			MockException mex = Assert.Throws<MockException>(() => mock.Verify(f => f.Execute("pong")));
-
-			Assert.Contains("No setups configured.", mex.Message);
 		}
 
 		[Fact]
@@ -1431,30 +1410,6 @@ namespace Moq.Tests
 
 			mock.VerifyAll();
 			mock.VerifyNoOtherCalls();
-		}
-
-		[Fact]
-		public void Verification_error_message_contains_setup_for_delegate_mock()
-		{
-			var mock = new Mock<Action>();
-			mock.Setup(m => m());
-
-			var ex = Record.Exception(() => mock.Verify(m => m(), Times.Once()));
-
-			Assert.Contains("Configured setups:", ex.Message);
-			Assert.Contains("Action m => m()", ex.Message);
-		}
-
-		[Fact]
-		public void Verification_error_message_contains_setup_for_delegate_mock_with_parameters()
-		{
-			var mock = new Mock<Action<int, int>>();
-			mock.Setup(m => m(1, It.IsAny<int>()));
-
-			var ex = Record.Exception(() => mock.Verify(m => m(1, 2), Times.Once()));
-
-			Assert.Contains("Configured setups:", ex.Message);
-			Assert.Contains("Action<int, int> m => m(1, It.IsAny<int>())", ex.Message);
 		}
 
 		[Fact]
