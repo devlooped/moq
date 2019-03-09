@@ -10,7 +10,6 @@ using System.Linq.Expressions;
 using System.Reflection;
 
 using Moq.Linq;
-using Moq.Properties;
 
 namespace Moq
 {
@@ -18,12 +17,6 @@ namespace Moq
 	/// Allows querying the universe of mocks for those that behave 
 	/// according to the LINQ query specification.
 	/// </summary>
-	/// <devdoc>
-	/// This entry-point into Linq to Mocks is the only one in the root Moq 
-	/// namespace to ease discovery. But to get all the mocking extension 
-	/// methods on Object, a using of Moq.Linq must be done, so that the 
-	/// polluting of the IntelliSense for all objects is an explicit opt-in.
-	/// </devdoc>
 	public static class Mocks
 	{
 		/// <summary>
