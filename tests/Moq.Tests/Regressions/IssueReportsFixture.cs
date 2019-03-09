@@ -2013,8 +2013,40 @@ namespace Moq.Tests.Regressions
 
 		#endregion
 
+		#region 696
+
+		public class Issue696
+		{
+			[Fact]
+			public void SetupSet_indexer_arguments_correctly_matched()
+			{
+				int x = default(int);
+				int result = default(int);
+
+				var mock = new Mock<IFoo>();
+				mock.SetupSet(f => f[It.IsAny<int>()] = 8)
+					.Callback(new Action<int, int>((x_, result_) =>
+					{
+						x = x_;
+						result = result_;
+					}));
+
+				mock.Object[10] = 8;
+				mock.Object[0] = 17;
+				Assert.Equal(10, x);
+				Assert.Equal(8, result);
+			}
+
+			public interface IFoo
+			{
+				int this[int index] { get;set; }
+			}
+		}
+
+		#endregion
+
 		#region 706
-		
+
 		public class Issue706
 		{
 			[Fact]
