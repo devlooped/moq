@@ -76,17 +76,7 @@ namespace Moq
 			return new MockException(
 				MockExceptionReasons.NoMatchingCalls,
 				times.GetExceptionMessage(failMessage, expression.PartialMatcherAwareEval().ToStringFixed(), callCount) +
-				Environment.NewLine + FormatSetupsInfo() +
 				Environment.NewLine + FormatInvocations());
-
-			string FormatSetupsInfo()
-			{
-				var expressionSetups = setups.Select(s => s.ToString()).ToArray();
-
-				return expressionSetups.Length == 0 ?
-					Resources.NoSetupsConfigured :
-					Environment.NewLine + string.Format(Resources.ConfiguredSetups, Environment.NewLine + string.Join(Environment.NewLine, expressionSetups));
-			}
 
 			string FormatInvocations()
 			{
