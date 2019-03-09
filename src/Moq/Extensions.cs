@@ -273,11 +273,26 @@ namespace Moq
 			}
 		}
 
-		public static bool TryFind(this IEnumerable<IDeterministicReturnValueSetup> setups, MethodInfo method, out IDeterministicReturnValueSetup setup)
+		public static bool TryFind(this IEnumerable<IDeterministicReturnValueSetup> setups, InvocationShape expectation, out IDeterministicReturnValueSetup setup)
 		{
 			foreach (Setup s in setups)
 			{
-				if (s.Method == method)
+				if (s.Expectation.Equals(expectation))
+				{
+					setup = (IDeterministicReturnValueSetup)s;
+					return true;
+				}
+			}
+
+			setup = default;
+			return false;
+		}
+
+		public static bool TryFind(this IEnumerable<IDeterministicReturnValueSetup> setups, Invocation invocation, out IDeterministicReturnValueSetup setup)
+		{
+			foreach (Setup s in setups)
+			{
+				if (s.Matches(invocation))
 				{
 					setup = (IDeterministicReturnValueSetup)s;
 					return true;

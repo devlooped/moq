@@ -491,7 +491,7 @@ namespace Moq.Properties {
 		}
 		
 		/// <summary>
-		///   Looks up a localized string similar to Performed invocations: {0}.
+		///   Looks up a localized string similar to Performed invocations:.
 		/// </summary>
 		internal static string PerformedInvocations {
 			get {

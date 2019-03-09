@@ -296,7 +296,7 @@ Expected invocation on the mock once, but was {4} times: {1}</value>
 		<value>No setups configured.</value>
 	</data>
 	<data name="PerformedInvocations" xml:space="preserve">
-		<value>Performed invocations: {0}</value>
+		<value>Performed invocations:</value>
 	</data>
 	<data name="UnexpectedTranslationOfMemberAccess" xml:space="preserve">
 		<value>Unexpected translation of a member access: {0}</value>

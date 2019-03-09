@@ -108,5 +108,25 @@ namespace Moq.Tests
 
 			Assert.Throws<IndexOutOfRangeException>(() => mock.Invocations[0]);
 	    }
+
+		[Fact]
+		public void Invocations_record_return_value()
+		{
+			var mock = new Mock<IComparable>();
+			mock.Setup(m => m.CompareTo(It.IsAny<object>())).Returns(42);
+			_ = mock.Object.CompareTo(default);
+			var invocation = mock.MutableInvocations.ToArray()[0];
+			Assert.Equal(42, invocation.ReturnValue);
+		}
+
+		[Fact]
+		public void Invocations_for_object_methods_on_interface_proxy_record_return_value()
+		{
+			var mock = new Mock<IComparable>();
+			mock.Setup(m => m.GetHashCode()).Returns(42);
+			_ = mock.Object.GetHashCode();
+			var invocation = mock.MutableInvocations.ToArray()[0];
+			Assert.Equal(42, invocation.ReturnValue);
+		}
 	}
 }

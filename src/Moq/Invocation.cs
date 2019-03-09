@@ -1,7 +1,6 @@
 // Copyright (c) 2007, Clarius Consulting, Manas Technology Solutions, InSTEDD.
 // All rights reserved. Licensed under the BSD 3-Clause License; see License.txt.
 
-using System.Collections;
 using System.Collections.Generic;
 using System.Diagnostics;
 using System.Reflection;
@@ -13,6 +12,7 @@ namespace Moq
 	{
 		private object[] arguments;
 		private MethodInfo method;
+		private object returnValue;
 		private VerificationState verificationState;
 
 		/// <summary>
@@ -44,6 +44,8 @@ namespace Moq
 		public object[] Arguments => this.arguments;
 
 		IReadOnlyList<object> IInvocation.Arguments => this.arguments;
+
+		public object ReturnValue => this.returnValue;
 
 		internal bool Verified => this.verificationState == VerificationState.Verified;
 
@@ -79,6 +81,7 @@ namespace Moq
 		/// and that no more calls to any of the three <c>Return</c> methods will be made.
 		/// <para>
 		/// Implementations must ensure that any by-reference parameters are written back from <see cref="Arguments"/>.
+		/// Implementations must also call <see cref="SetReturnValue(object)"/>.
 		/// </para>
 		/// </remarks>
 		public abstract void Return(object value);
@@ -117,6 +120,13 @@ namespace Moq
 			{
 				this.verificationState = VerificationState.Verified;
 			}
+		}
+
+		protected void SetReturnValue(object returnValue)
+		{
+			Debug.Assert(this.returnValue == null);  // quick & dirty check against double invocations
+
+			this.returnValue = returnValue;
 		}
 
 		/// <inheritdoc/>

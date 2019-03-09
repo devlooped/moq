@@ -66,24 +66,61 @@ namespace Moq
 		///   Returns the exception to be thrown when <see cref="Mock.Verify"/> finds no invocations (or the wrong number of invocations) that match the specified expectation.
 		/// </summary>
 		internal static MockException NoMatchingCalls(
-			string failMessage,
-			IEnumerable<Setup> setups,
-			IEnumerable<Invocation> invocations,
+			Mock rootMock,
 			LambdaExpression expression,
+			string failMessage,
 			Times times,
 			int callCount)
 		{
-			return new MockException(
-				MockExceptionReasons.NoMatchingCalls,
-				times.GetExceptionMessage(failMessage, expression.PartialMatcherAwareEval().ToStringFixed(), callCount) +
-				Environment.NewLine + FormatInvocations());
+			var message = new StringBuilder();
+			message.AppendLine(times.GetExceptionMessage(failMessage, expression.PartialMatcherAwareEval().ToStringFixed(), callCount))
+			       .AppendLine(Resources.PerformedInvocations)
+			       .AppendLine();
 
-			string FormatInvocations()
+			var visitedMocks = new HashSet<Mock>();
+
+			var mocks = new Queue<Mock>();
+			mocks.Enqueue(rootMock);
+
+			while (mocks.Any())
 			{
-				return invocations.Any() ? Environment.NewLine + string.Format(Resources.PerformedInvocations, Environment.NewLine + string.Join<Invocation>(Environment.NewLine, invocations))
-				                         : Resources.NoInvocationsPerformed;
+				var mock = mocks.Dequeue();
+
+				if (visitedMocks.Contains(mock)) continue;
+				visitedMocks.Add(mock);
+
+				message.AppendLine(mock == rootMock ? $"   {mock} ({expression.Parameters[0].Name}):"
+					                                : $"   {mock}:");
+
+				var invocations = mock.MutableInvocations.ToArray();
+				if (invocations.Any())
+				{
+					message.AppendLine();
+					foreach (var invocation in invocations)
+					{
+						message.Append($"      {invocation}");
+
+						if (invocation.Method.ReturnType != typeof(void) && Unwrap.ResultIfCompletedTask(invocation.ReturnValue) is IMocked mocked)
+						{
+							var innerMock = mocked.Mock;
+							mocks.Enqueue(innerMock);
+							message.Append($"  => {innerMock}");
+						}
+
+						message.AppendLine();
+					}
+				}
+				else
+				{
+					message.AppendLine($"   {Resources.NoInvocationsPerformed}");
+				}
+
+				message.AppendLine();
 			}
+
+			return new MockException(MockExceptionReasons.NoMatchingCalls, message.TrimEnd().AppendLine().ToString());
 		}
+
 
 		/// <summary>
 		///   Returns the exception to be thrown when a strict mock has no setup corresponding to the specified invocation.

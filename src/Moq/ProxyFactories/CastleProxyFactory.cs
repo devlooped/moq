@@ -220,6 +220,8 @@ namespace Moq
 				Debug.Assert(this.underlying != null);
 				Debug.Assert(this.underlying.Method.ReturnType != typeof(void));
 
+				this.SetReturnValue(value);
+
 				this.underlying.ReturnValue = value;
 				this.underlying = null;
 			}

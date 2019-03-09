@@ -16,7 +16,7 @@ This release contains several **minor breaking changes**. Please review your cod
 * `mock.Verify[All]` now performs a more thorough error aggregation. Error messages of inner/recursive mocks are included in the error message using indentation to show the relationship between mocks. (@stakx, #762)
 * `mock.Verify` no longer creates setups, nor will it override existing setups, as a side-effect of using a recursive expression. (@stakx, #765)
 * More accurate detection of argument matchers with `SetupSet` and `VerifySet`, especially when used in fluent setup expressions or with indexers (@stakx, #767)
-* `mock.Verify(expression)` no longer includes setups in its error message, as they are completely irrelevant in the context of this method (@stakx, #779)
+* `mock.Verify(expression)` error messages now contain a full listing of all invocations that occurred across all involved mocks. Setups are no longer listed, since they are completely irrelevant in the context of call verification. (@stakx, #779, #780)
 
 #### Added
 
