@@ -843,11 +843,10 @@ namespace Moq.Tests
 			var mex = Assert.Throws<MockException>(() => mock.Verify(f => f.Execute("pong")));
 
 			Assert.True(mex.Message.ContainsConsecutiveLines(
-				"Performed invocations: ",
-				"IFoo.Execute(\"ping\")",
-				"IFoo.Echo(42)",
-				"IFoo.Submit()",
-				"IFoo.Save([1, 2, \"hello\"])"));
+				"      IFoo.Execute(\"ping\")",
+				"      IFoo.Echo(42)",
+				"      IFoo.Submit()",
+				"      IFoo.Save([1, 2, \"hello\"])"));
 		}
 
 		[Fact]
@@ -867,7 +866,7 @@ namespace Moq.Tests
 
 			MockException mex = Assert.Throws<MockException>(() => mock.Verify(f => f.Execute("pong")));
 
-			Assert.Contains("No invocations performed.", mex.Message);
+			Assert.Contains("   No invocations performed.", mex.Message);
 		}
 
 		[Fact]
@@ -933,8 +932,7 @@ namespace Moq.Tests
 			mock.Object.Method(strings);
 			var mex = Assert.Throws<MockException>(() => mock.Verify(_ => _.Method(null)));
 			Assert.True(mex.Message.ContainsConsecutiveLines(
-				@"Performed invocations: ",
-				@"IArrays.Method([""1"", null, ""3""])"));
+				@"      IArrays.Method([""1"", null, ""3""])"));
 		}
 
 		[Fact]
@@ -945,8 +943,7 @@ namespace Moq.Tests
 			mock.Object.Method(strings);
 			var mex = Assert.Throws<MockException>(() => mock.Verify(_ => _.Method(null)));
 			Assert.True(mex.Message.ContainsConsecutiveLines(
-				@"Performed invocations: ",
-				@"IArrays.Method([""1"", null, ""3"", ""4"", ""5"", ""6"", ""7"", ""8"", ""9"", ""10""])"));
+				@"      IArrays.Method([""1"", null, ""3"", ""4"", ""5"", ""6"", ""7"", ""8"", ""9"", ""10""])"));
 		}
 
 		[Fact]
@@ -957,8 +954,7 @@ namespace Moq.Tests
 			mock.Object.Method(strings);
 			var mex = Assert.Throws<MockException>(() => mock.Verify(_ => _.Method(null)));
 			Assert.True(mex.Message.ContainsConsecutiveLines(
-				@"Performed invocations: ",
-				@"IArrays.Method([""1"", null, ""3"", ""4"", ""5"", ""6"", ""7"", ""8"", ""9"", ""10"", ...])"));
+				@"      IArrays.Method([""1"", null, ""3"", ""4"", ""5"", ""6"", ""7"", ""8"", ""9"", ""10"", ...])"));
 		}
 
 		[Fact]

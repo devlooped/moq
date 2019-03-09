@@ -258,11 +258,19 @@ namespace Moq
 		{
 			Guard.NotNull(times, nameof(times));
 
-			var parts = expression.Split();
-			Mock.VerifyRecursive(mock, expression, parts, times, failMessage, verifyLast: (part, targetMock) =>
+			var invocationCount = Mock.GetMatchingInvocationCount(mock, expression, out var invocationsToBeMarkedAsVerified);
+
+			if (times.Verify(invocationCount))
 			{
-				VerifyCalls(targetMock, expectation: part, expression, times, failMessage);
-			});
+				foreach (var invocation in invocationsToBeMarkedAsVerified)
+				{
+					invocation.MarkAsVerified();
+				}
+			}
+			else
+			{
+				throw MockException.NoMatchingCalls(mock, expression, failMessage, times, invocationCount);
+			}
 		}
 
 		internal static void VerifyGet(Mock mock, LambdaExpression expression, Times times, string failMessage)
@@ -284,47 +292,6 @@ namespace Moq
 			Guard.IsAssignmentToPropertyOrIndexer(expression, nameof(expression));
 
 			Mock.Verify(mock, expression, times, failMessage);
-		}
-
-		private static void VerifyRecursive(Mock mock, LambdaExpression expression, Stack<InvocationShape> parts, Times times, string failMessage, Action<InvocationShape, Mock> verifyLast)
-		{
-			var part = parts.Pop();
-			var (expr, method, arguments) = part;
-
-			if (mock.IsDelegateMock)
-			{
-				// The expression we have is for a call on the delegate, not our
-				// delegate interface proxy, so we need to map instead to the
-				// method on that interface.
-				_ = ProxyFactory.Instance.GetDelegateProxyInterface(mock.TargetType, out method);
-				part = new InvocationShape(expr, method, arguments);
-			}
-
-			if (parts.Count == 0)
-			{
-				verifyLast(part, mock);
-			}
-			else
-			{
-				Mock innerMock;
-				if (mock.GetInnerMockSetups().TryFind(part, out var setup) && setup.ReturnsInnerMock(out innerMock))
-				{
-					Mock.VerifyRecursive(innerMock, expression, parts, times, failMessage, verifyLast);
-				}
-				else if (times != Times.Never())
-				{
-					// some number of invocations were expected on a inner mock that doesn't exist.
-					throw MockException.NoMatchingCalls(
-						failMessage,
-						mock.Setups.ToArrayLive(s => AreSameMethod(s.Expression, expr)),
-						mock.MutableInvocations.ToArray(),
-						expression,
-						times, 0);
-
-					bool AreSameMethod(LambdaExpression l, LambdaExpression r) =>
-						l.Body is MethodCallExpression lc && r.Body is MethodCallExpression rc && lc.Method == rc.Method;
-				}
-			}
 		}
 
 		internal static void VerifyNoOtherCalls(Mock mock)
@@ -372,41 +339,78 @@ namespace Moq
 			}
 		}
 
-		private static void VerifyCalls(
-			Mock targetMock,
-			InvocationShape expectation,
+		private static int GetMatchingInvocationCount(
+			Mock mock,
 			LambdaExpression expression,
-			Times times,
-			string failMessage)
+			out List<Invocation> invocationsToBeMarkedAsVerified)
 		{
-			var allInvocations = targetMock.MutableInvocations.ToArray();
-			var matchingInvocations = allInvocations.Where(expectation.IsMatch).ToArray();
-			var matchingInvocationCount = matchingInvocations.Length;
-			if (!times.Verify(matchingInvocationCount))
+			Debug.Assert(mock != null);
+			Debug.Assert(expression != null);
+
+			invocationsToBeMarkedAsVerified = new List<Invocation>();
+			return Mock.GetMatchingInvocationCount(
+				mock,
+				new ImmutablePopOnlyStack<InvocationShape>(expression.Split()),
+				new HashSet<Mock>(),
+				invocationsToBeMarkedAsVerified);
+		}
+
+		private static int GetMatchingInvocationCount(
+			Mock mock,
+			in ImmutablePopOnlyStack<InvocationShape> parts,
+			HashSet<Mock> visitedInnerMocks,
+			List<Invocation> invocationsToBeMarkedAsVerified)
+		{
+			Debug.Assert(mock != null);
+			Debug.Assert(!parts.Empty);
+			Debug.Assert(visitedInnerMocks != null);
+
+			// Several different invocations might return the same inner `mock`.
+			// Keep track of the mocks whose invocations have already been counted:
+			if (visitedInnerMocks.Contains(mock))
 			{
-				Setup[] setups;
-				if (targetMock.IsDelegateMock)
+				return 0;
+			}
+			visitedInnerMocks.Add(mock);
+
+			var part = parts.Pop(out var remainingParts);
+
+			// The usual delegate method to delegate interface proxy method transform:
+			if (mock.IsDelegateMock)
+			{
+				_ = ProxyFactory.Instance.GetDelegateProxyInterface(mock.TargetType, out var method);
+				part = new InvocationShape(part.Expression, method, part.Arguments);
+			}
+
+			var count = 0;
+			foreach (var matchingInvocation in mock.MutableInvocations.ToArray().Where(part.IsMatch))
+			{
+				invocationsToBeMarkedAsVerified.Add(matchingInvocation);
+
+				if (remainingParts.Empty)
 				{
-					// For delegate mocks, there's no need to compare methods as for regular mocks (below)
-					// since there's only one single method, so include all setups unconditionally.
-					setups = targetMock.Setups.ToArrayLive(s => true);
+					// We are not processing an intermediate part of a fluent expression.
+					// Therefore, every matching invocation counts as one:
+					++count;
 				}
 				else
 				{
-					setups = targetMock.Setups.ToArrayLive(oc => AreSameMethod(oc.Expression, expression));
-				}
-				throw MockException.NoMatchingCalls(failMessage, setups, allInvocations, expression, times, matchingInvocationCount);
-			}
-			else
-			{
-				foreach (var matchingInvocation in matchingInvocations)
-				{
-					matchingInvocation.MarkAsVerified();
+					// We are processing an intermediate part of a fluent expression.
+					// Therefore, all matching invocations are assumed to have a return value;
+					// otherwise, they wouldn't be "chainable":
+					Debug.Assert(matchingInvocation.Method.ReturnType != typeof(void));
+
+					// Intermediate parts of a fluent expression do not contribute to the
+					// total count themselves. The matching invocation count of the rightmost
+					// expression gets "forwarded" towards the left:
+					if (Unwrap.ResultIfCompletedTask(matchingInvocation.ReturnValue) is IMocked mocked)
+					{
+						count += Mock.GetMatchingInvocationCount(mocked.Mock, remainingParts, visitedInnerMocks, invocationsToBeMarkedAsVerified);
+					}
 				}
 			}
 
-			bool AreSameMethod(LambdaExpression l, LambdaExpression r) =>
-				l.Body is MethodCallExpression lc && r.Body is MethodCallExpression rc && lc.Method == rc.Method;
+			return count;
 		}
 
 		#endregion

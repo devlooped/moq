@@ -2,9 +2,7 @@
 // All rights reserved. Licensed under the BSD 3-Clause License; see License.txt.
 
 using System;
-using System.Collections.Concurrent;
 using System.Collections.Generic;
-using System.Reflection;
 
 namespace Moq
 {
@@ -73,6 +71,11 @@ namespace Moq
 		protected override object OnGetObject()
 		{
 			return this.owner.Object;
+		}
+
+		public override string ToString()
+		{
+			return this.owner.ToString();
 		}
 	}
 }
