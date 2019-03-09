@@ -5,8 +5,11 @@ using System;
 using System.Diagnostics;
 using System.Globalization;
 using System.Linq.Expressions;
-using Moq.Properties;
 using System.Reflection;
+
+using Moq.Properties;
+
+using TypeNameFormatter;
 
 namespace Moq
 {
@@ -37,6 +40,48 @@ namespace Moq
 					expression.ToStringFixed()),
 				paramName);
 		}
+
+		public static void IsOverridable(MethodInfo method, Expression expression)
+		{
+			if (method.IsStatic)
+			{
+				throw new NotSupportedException(
+					string.Format(
+						CultureInfo.CurrentCulture,
+						Resources.UnsupportedExpressionWithHint,
+						expression.ToStringFixed(),
+						string.Format(
+							CultureInfo.CurrentCulture,
+							method.IsExtensionMethod() ? Resources.UnsupportedExtensionMethod : Resources.UnsupportedStaticMember,
+							$"{method.DeclaringType.GetFormattedName()}.{method.Name}")));
+			}
+			else if (!method.CanOverride())
+			{
+				throw new NotSupportedException(
+					string.Format(
+						CultureInfo.CurrentCulture,
+						Resources.UnsupportedExpressionWithHint,
+						expression.ToStringFixed(),
+						string.Format(
+							CultureInfo.CurrentCulture,
+							Resources.UnsupportedNonOverridableMember,
+							$"{method.DeclaringType.GetFormattedName()}.{method.Name}")));
+			}
+		}
+
+		public static void IsVisibleToProxyFactory(MethodInfo method)
+		{
+			if (ProxyFactory.Instance.IsMethodVisible(method, out string messageIfNotVisible) == false)
+			{
+				throw new ArgumentException(string.Format(
+					CultureInfo.CurrentCulture,
+					Resources.MethodNotVisibleToProxyFactory,
+					method.DeclaringType.Name,
+					method.Name,
+					messageIfNotVisible));
+			}
+		}
+
 
 		/// <summary>
 		/// Ensures the given <paramref name="value"/> is not null.

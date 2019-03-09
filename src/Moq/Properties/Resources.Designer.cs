@@ -590,33 +590,6 @@ namespace Moq.Properties {
 		}
 		
 		/// <summary>
-		///   Looks up a localized string similar to Invalid setup on an extension method: {0}.
-		/// </summary>
-		internal static string SetupOnExtensionMethod {
-			get {
-				return ResourceManager.GetString("SetupOnExtensionMethod", resourceCulture);
-			}
-		}
-		
-		/// <summary>
-		///   Looks up a localized string similar to Invalid setup on a non-virtual (overridable in VB) member: {0}.
-		/// </summary>
-		internal static string SetupOnNonVirtualMember {
-			get {
-				return ResourceManager.GetString("SetupOnNonVirtualMember", resourceCulture);
-			}
-		}
-		
-		/// <summary>
-		///   Looks up a localized string similar to Invalid setup on a static member: {0}.
-		/// </summary>
-		internal static string SetupOnStaticMember {
-			get {
-				return ResourceManager.GetString("SetupOnStaticMember", resourceCulture);
-			}
-		}
-		
-		/// <summary>
 		///   Looks up a localized string similar to Type {0} does not implement required interface {1}.
 		/// </summary>
 		internal static string TypeNotImplementInterface {
@@ -704,11 +677,38 @@ namespace Moq.Properties {
 		}
 		
 		/// <summary>
+		///   Looks up a localized string similar to Extension methods (here: {0}) may not be used in setup / verification expressions..
+		/// </summary>
+		internal static string UnsupportedExtensionMethod {
+			get {
+				return ResourceManager.GetString("UnsupportedExtensionMethod", resourceCulture);
+			}
+		}
+		
+		/// <summary>
 		///   Looks up a localized string similar to Member {0} is not supported for protected mocking..
 		/// </summary>
 		internal static string UnsupportedMember {
 			get {
 				return ResourceManager.GetString("UnsupportedMember", resourceCulture);
+			}
+		}
+		
+		/// <summary>
+		///   Looks up a localized string similar to Non-overridable members (here: {0}) may not be used in setup / verification expressions..
+		/// </summary>
+		internal static string UnsupportedNonOverridableMember {
+			get {
+				return ResourceManager.GetString("UnsupportedNonOverridableMember", resourceCulture);
+			}
+		}
+		
+		/// <summary>
+		///   Looks up a localized string similar to Static members (here: {0}) may not be used in setup / verification expressions..
+		/// </summary>
+		internal static string UnsupportedStaticMember {
+			get {
+				return ResourceManager.GetString("UnsupportedStaticMember", resourceCulture);
 			}
 		}
 		
@@ -756,33 +756,6 @@ namespace Moq.Properties {
 		internal static string VerificationErrorsOfMockRepository {
 			get {
 				return ResourceManager.GetString("VerificationErrorsOfMockRepository", resourceCulture);
-			}
-		}
-		
-		/// <summary>
-		///   Looks up a localized string similar to Invalid verify on an extension method: {0}.
-		/// </summary>
-		internal static string VerifyOnExtensionMethod {
-			get {
-				return ResourceManager.GetString("VerifyOnExtensionMethod", resourceCulture);
-			}
-		}
-		
-		/// <summary>
-		///   Looks up a localized string similar to Invalid verify on a non-virtual (overridable in VB) member: {0}.
-		/// </summary>
-		internal static string VerifyOnNonVirtualMember {
-			get {
-				return ResourceManager.GetString("VerifyOnNonVirtualMember", resourceCulture);
-			}
-		}
-		
-		/// <summary>
-		///   Looks up a localized string similar to Invalid verify on a static member: {0}.
-		/// </summary>
-		internal static string VerifyOnStaticMember {
-			get {
-				return ResourceManager.GetString("VerifyOnStaticMember", resourceCulture);
 			}
 		}
 	}
