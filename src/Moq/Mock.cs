@@ -464,7 +464,6 @@ namespace Moq
 			});
 		}
 
-		[DebuggerStepThrough]
 		private static TSetup SetupRecursive<TSetup>(Mock mock, LambdaExpression expression, Func<InvocationShape, Mock, TSetup> setupLast)
 		{
 			Debug.Assert(mock != null);
@@ -472,10 +471,10 @@ namespace Moq
 			Debug.Assert(setupLast != null);
 
 			var parts = expression.Split();
-			return PexProtector.Invoke(SetupRecursivePexProtected, mock, expression, parts, setupLast);
+			return Mock.SetupRecursive(mock, expression, parts, setupLast);
 		}
 
-		private static TSetup SetupRecursivePexProtected<TSetup>(Mock mock, LambdaExpression expression, Stack<InvocationShape> parts, Func<InvocationShape, Mock, TSetup> setupLast)
+		private static TSetup SetupRecursive<TSetup>(Mock mock, LambdaExpression expression, Stack<InvocationShape> parts, Func<InvocationShape, Mock, TSetup> setupLast)
 		{
 			var part = parts.Pop();
 			var (expr, method, arguments) = part;
@@ -512,15 +511,14 @@ namespace Moq
 				}
 				Debug.Assert(innerMock != null);
 
-				return Mock.SetupRecursivePexProtected(innerMock, expression, parts, setupLast);
+				return Mock.SetupRecursive(innerMock, expression, parts, setupLast);
 			}
 		}
 
-		[DebuggerStepThrough]
 		internal static void SetupAllProperties(Mock mock)
 		{
-			PexProtector.Invoke(SetupAllPropertiesPexProtected, mock, mock.DefaultValueProvider);
-			//                                                        ^^^^^^^^^^^^^^^^^^^^^^^^^
+			Mock.SetupAllProperties(mock, mock.DefaultValueProvider);
+			//                            ^^^^^^^^^^^^^^^^^^^^^^^^^
 			// `SetupAllProperties` no longer performs eager recursive property setup like in previous versions.
 			// If `mock` uses `DefaultValue.Mock`, mocked sub-objects are now only constructed when queried for
 			// the first time. In order for `SetupAllProperties`'s new mode of operation to be indistinguishable
@@ -528,7 +526,7 @@ namespace Moq
 			// moment, since it might be changed later (before queries to properties of a mockable type).
 		}
 
-		private static void SetupAllPropertiesPexProtected(Mock mock, DefaultValueProvider defaultValueProvider)
+		private static void SetupAllProperties(Mock mock, DefaultValueProvider defaultValueProvider)
 		{
 			var mockType = mock.MockedType;
 
@@ -577,7 +575,7 @@ namespace Moq
 
 						if (innerMock != null)
 						{
-							SetupAllPropertiesPexProtected(innerMock, defaultValueProvider);
+							Mock.SetupAllProperties(innerMock, defaultValueProvider);
 						}
 
 						value = initialValue;
