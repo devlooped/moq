@@ -22,7 +22,7 @@ namespace Moq
 		/// </summary>
 		public static object GetDefaultValue(this Type type)
 		{
-			return type.GetTypeInfo().IsValueType ? Activator.CreateInstance(type) : null;
+			return type.IsValueType ? Activator.CreateInstance(type) : null;
 		}
 
 		public static object InvokePreserveStack(this Delegate del, params object[] args)
@@ -92,7 +92,7 @@ namespace Moq
 		/// </summary>
 		public static bool IsDelegate(this Type t)
 		{
-			return t.GetTypeInfo().IsSubclassOf(typeof(Delegate));
+			return t.IsSubclassOf(typeof(Delegate));
 		}
 
 		public static void ThrowIfNotMockeable(this MemberExpression memberAccess)
@@ -108,7 +108,7 @@ namespace Moq
 		{
 			// A value type does not match any of these three 
 			// condition and therefore returns false.
-			return typeToMock.GetTypeInfo().IsInterface || typeToMock.GetTypeInfo().IsAbstract || typeToMock.IsDelegate() || (typeToMock.GetTypeInfo().IsClass && !typeToMock.GetTypeInfo().IsSealed);
+			return typeToMock.IsInterface || typeToMock.IsAbstract || typeToMock.IsDelegate() || (typeToMock.IsClass && !typeToMock.IsSealed);
 		}
 
 		public static bool CanOverride(this MethodBase method)
@@ -253,9 +253,9 @@ namespace Moq
 				//// follow down axis 1: add properties of base class. note that this is currently
 				//// disabled, since it wasn't done previously and this can only result in changed
 				//// behavior.
-				//if (type.GetTypeInfo().BaseType != null)
+				//if (type.BaseType != null)
 				//{
-				//	type.GetTypeInfo().BaseType.AddPropertiesInDepthFirstOrderTo(properties, typesAlreadyVisited);
+				//	type.BaseType.AddPropertiesInDepthFirstOrderTo(properties, typesAlreadyVisited);
 				//}
 
 				// follow down axis 2: add properties of inherited / implemented interfaces:

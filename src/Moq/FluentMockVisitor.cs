@@ -45,7 +45,7 @@ namespace Moq
 			// compiler-generated types as they are typically the
 			// anonymous types generated to build up the query expressions.
 			if (node.Expression.NodeType == ExpressionType.Parameter &&
-				node.Expression.Type.GetTypeInfo().IsDefined(typeof(CompilerGeneratedAttribute), false))
+				node.Expression.Type.IsDefined(typeof(CompilerGeneratedAttribute), false))
 			{
 				var memberType = node.Member is FieldInfo ?
 					((FieldInfo)node.Member).FieldType :

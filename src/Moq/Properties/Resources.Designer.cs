@@ -10,7 +10,7 @@
 
 namespace Moq.Properties {
 	using System;
-	using System.Reflection;
+	
 	
 	/// <summary>
 	///   A strongly-typed resource class, for looking up localized strings, etc.
@@ -39,7 +39,7 @@ namespace Moq.Properties {
 		internal static global::System.Resources.ResourceManager ResourceManager {
 			get {
 				if (object.ReferenceEquals(resourceMan, null)) {
-					global::System.Resources.ResourceManager temp = new global::System.Resources.ResourceManager("Moq.Properties.Resources", typeof(Resources).GetTypeInfo().Assembly);
+					global::System.Resources.ResourceManager temp = new global::System.Resources.ResourceManager("Moq.Properties.Resources", typeof(Resources).Assembly);
 					resourceMan = temp;
 				}
 				return resourceMan;

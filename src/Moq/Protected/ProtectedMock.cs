@@ -365,7 +365,7 @@ namespace Moq.Protected
 						if (field.Name == nameof(It.Ref<object>.IsAny))
 						{
 							var fieldDeclaringType = field.DeclaringType;
-							if (fieldDeclaringType.GetTypeInfo().IsGenericType)
+							if (fieldDeclaringType.IsGenericType)
 							{
 								var fieldDeclaringTypeDefinition = fieldDeclaringType.GetGenericTypeDefinition();
 								if (fieldDeclaringTypeDefinition == typeof(It.Ref<>))

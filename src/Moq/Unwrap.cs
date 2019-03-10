@@ -1,7 +1,6 @@
 // Copyright (c) 2007, Clarius Consulting, Manas Technology Solutions, InSTEDD.
 // All rights reserved. Licensed under the BSD 3-Clause License; see License.txt.
 
-using System.Reflection;
 using System.Threading.Tasks;
 
 namespace Moq
@@ -18,7 +17,7 @@ namespace Moq
 			if (obj != null)
 			{
 				var objType = obj.GetType();
-				if (objType.GetTypeInfo().IsGenericType)
+				if (objType.IsGenericType)
 				{
 					var genericTypeDefinition = objType.GetGenericTypeDefinition();
 					if (genericTypeDefinition == typeof(Task<>) || genericTypeDefinition == typeof(ValueTask<>))

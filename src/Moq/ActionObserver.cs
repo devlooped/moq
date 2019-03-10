@@ -197,7 +197,7 @@ namespace Moq
 						expressions[i] = Expression.Convert(argument, parameterType);
 					}
 					// boxing of value types (i.e. where a value-typed value is assigned to a reference-typed parameter):
-					else if (argument.Type.GetTypeInfo().IsValueType && !parameterType.GetTypeInfo().IsValueType)
+					else if (argument.Type.IsValueType && !parameterType.IsValueType)
 					{
 						expressions[i] = Expression.Convert(argument, parameterType);
 					}

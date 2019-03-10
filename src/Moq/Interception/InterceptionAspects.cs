@@ -252,7 +252,7 @@ namespace Moq
 		/// <param name="initialType">The type to find immediate ancestors of</param>
 		private static IEnumerable<Type> GetAncestorTypes(Type initialType)
 		{
-			var baseType = initialType.GetTypeInfo().BaseType;
+			var baseType = initialType.BaseType;
 			if (baseType != null)
 			{
 				return new[] { baseType };
@@ -276,16 +276,16 @@ namespace Moq
 			if (mock.CallBase)
 			{
 				var declaringType = method.DeclaringType;
-				if (declaringType.GetTypeInfo().IsInterface)
+				if (declaringType.IsInterface)
 				{
-					if (mock.TargetType.GetTypeInfo().IsInterface)
+					if (mock.TargetType.IsInterface)
 					{
 						// Case 1: Interface method of an interface proxy.
 						// There is no base method to call, so fall through.
 					}
 					else
 					{
-						Debug.Assert(mock.TargetType.GetTypeInfo().IsClass);
+						Debug.Assert(mock.TargetType.IsClass);
 						Debug.Assert(mock.ImplementsInterface(declaringType));
 
 						// Case 2: Explicitly implemented interface method of a class proxy.
@@ -311,7 +311,7 @@ namespace Moq
 				}
 				else
 				{
-					Debug.Assert(declaringType.GetTypeInfo().IsClass);
+					Debug.Assert(declaringType.IsClass);
 
 					// Case 3: Non-interface method of a class proxy.
 					// Only call base method if it isn't abstract.

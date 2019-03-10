@@ -8,7 +8,6 @@ using System.Diagnostics.CodeAnalysis;
 using System.Globalization;
 using System.Linq;
 using System.Linq.Expressions;
-using System.Reflection;
 using System.Text;
 using System.Threading;
 
@@ -29,7 +28,7 @@ namespace Moq
 			inheritedInterfaces =
 				typeof(T)
 				.GetInterfaces()
-				.Where(i => ProxyFactory.Instance.IsTypeVisible(i) && !i.GetTypeInfo().IsImport)
+				.Where(i => ProxyFactory.Instance.IsTypeVisible(i) && !i.IsImport)
 				.ToArray();
 
 			serialNumberCounter = 0;
@@ -126,7 +125,7 @@ namespace Moq
 		{
 			if (this.constructorArguments.Length > 0)
 			{
-				if (typeof(T).GetTypeInfo().IsInterface)
+				if (typeof(T).IsInterface)
 				{
 					throw new ArgumentException(Properties.Resources.ConstructorArgsForInterface);
 				}

@@ -509,7 +509,7 @@ namespace Moq
 				else
 				{
 					var argsFuncType = this.eventArgsFunc.GetType();
-					if (argsFuncType.GetTypeInfo().IsGenericType && argsFuncType.GetGenericArguments().Length == 1)
+					if (argsFuncType.IsGenericType && argsFuncType.GetGenericArguments().Length == 1)
 					{
 						args = new object[] { this.mock.Object, this.eventArgsFunc.InvokePreserveStack() };
 					}

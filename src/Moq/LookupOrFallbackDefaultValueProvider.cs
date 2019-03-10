@@ -117,9 +117,7 @@ namespace Moq
 			Debug.Assert(type != typeof(void));
 			Debug.Assert(mock != null);
 
-			var typeInfo = type.GetTypeInfo();
-
-			var handlerKey = typeInfo.IsGenericType ? type.GetGenericTypeDefinition()
+			var handlerKey = type.IsGenericType ? type.GetGenericTypeDefinition()
 			               : type.IsArray ? typeof(Array)
 			               : type;
 

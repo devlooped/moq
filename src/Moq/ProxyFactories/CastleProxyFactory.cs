@@ -64,7 +64,7 @@ namespace Moq
 			additionalInterfaces[0] = typeof(IProxy);
 			Array.Copy(interfaces, 0, additionalInterfaces, 1, interfaces.Length);
 
-			if (mockType.GetTypeInfo().IsInterface)
+			if (mockType.IsInterface)
 			{
 				// While `CreateClassProxy` could also be used for interface types,
 				// `CreateInterfaceProxyWithoutTarget` is much faster (about twice as fast):
