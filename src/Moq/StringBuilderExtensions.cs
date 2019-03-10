@@ -3,6 +3,7 @@
 
 using System;
 using System.Collections;
+using System.Collections.Generic;
 using System.Diagnostics;
 using System.Reflection;
 using System.Text;
@@ -82,14 +83,15 @@ namespace Moq
 			{
 				stringBuilder.Append(d.ToString("G17"));
 			}
-			else if (obj is IEnumerable enumerable && !(obj is IMocked))
-			{                                      // ^^^^^^^^^^^^^^^^^
-			                                       // This second check ensures that we have a usable implementation of IEnumerable.
-			                                       // If value is a mocked object, its IEnumerable implementation might very well
-			                                       // not work correctly.
+			else if (obj.GetType().IsEnum)
+			{
+				stringBuilder.AppendNameOf(obj.GetType()).Append('.').Append(obj);
+			}
+			else if (obj.GetType().IsArray || (obj.GetType().IsConstructedGenericType && obj.GetType().GetGenericTypeDefinition() == typeof(List<>)))
+			{
 				stringBuilder.Append('[');
 				const int maxCount = 10;
-				var enumerator = enumerable.GetEnumerator();
+				var enumerator = ((IEnumerable)obj).GetEnumerator();
 				for (int i = 0; enumerator.MoveNext() && i < maxCount + 1; ++i)
 				{
 					if (i > 0)
@@ -107,17 +109,17 @@ namespace Moq
 				}
 				stringBuilder.Append(']');
 			}
-			else if (obj.ToString() == obj.GetType().ToString())
-			{
-				stringBuilder.AppendNameOf(obj.GetType());
-			}
-			else if (obj.GetType().IsEnum)
-			{
-				stringBuilder.AppendNameOf(obj.GetType()).Append('.').Append(obj);
-			}
 			else
 			{
-				stringBuilder.Append(obj.ToString());
+				var formatted = obj.ToString();
+				if (formatted == null || formatted == obj.GetType().ToString())
+				{
+					stringBuilder.AppendNameOf(obj.GetType());
+				}
+				else
+				{
+					stringBuilder.Append(formatted);
+				}
 			}
 
 			return stringBuilder;
