@@ -17,6 +17,7 @@ This release contains several **minor breaking changes**. Please review your cod
 * `mock.Verify` no longer creates setups, nor will it override existing setups, as a side-effect of using a recursive expression. (@stakx, #765)
 * More accurate detection of argument matchers with `SetupSet` and `VerifySet`, especially when used in fluent setup expressions or with indexers (@stakx, #767)
 * `mock.Verify(expression)` error messages now contain a full listing of all invocations that occurred across all involved mocks. Setups are no longer listed, since they are completely irrelevant in the context of call verification. (@stakx, #779, #780)
+* Additionally target .NET Standard 2.0 (@stakx, #780)
 
 #### Added
 

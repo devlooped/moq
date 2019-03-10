@@ -4,14 +4,13 @@
 using System;
 using System.Collections.Generic;
 using System.Linq.Expressions;
-#if NETCORE
 using System.Reflection;
-#endif
+
+using Xunit;
+
 #if FEATURE_SERIALIZATION
 using System.Runtime.Serialization;
 #endif
-
-using Xunit;
 
 namespace Moq.Tests
 {
@@ -50,19 +49,17 @@ namespace Moq.Tests
 		{
 			var mock = new Mock<IComparable>();
 
-			Assert.Contains("System.IComparable", mock.ToString());
+			Assert.Contains("IComparable", mock.ToString());
 			Assert.Contains("mock", mock.ToString().ToLower());
 		}
 
-#if FEATURE_CODEDOM
 		[Fact]
 		public void HasADefaultNameThatIncludesItsGenericParameters()
 		{
 			var mock = new Mock<Dictionary<int, string>>();
 
-			Assert.Contains("System.Collections.Generic.Dictionary<int, string>", mock.ToString());
+			Assert.Contains("Dictionary<int, string>", mock.ToString());
 		}
-#endif
 
 		[Fact]
 		public void PassesItsNameOnToTheResultingMockObjectWhenMockingInterfaces()

@@ -24,13 +24,12 @@ namespace Moq
 		private string failMessage;
 		private Flags flags;
 		private Mock mock;
-#if !NETCORE
-		private string originalCallerFilePath;
-		private int originalCallerLineNumber;
-		private MethodBase originalCallerMember;
-#endif
 		private RaiseEventResponse raiseEventResponse;
 		private Response returnOrThrowResponse;
+
+#if FEATURE_CALLERINFO
+		private string declarationSite;
+#endif
 
 		public MethodCall(Mock mock, Condition condition, InvocationShape expectation)
 			: base(expectation)
@@ -39,7 +38,12 @@ namespace Moq
 			this.flags = expectation.Method.ReturnType != typeof(void) ? Flags.MethodIsNonVoid : 0;
 			this.mock = mock;
 
-			this.SetFileInfo();
+#if FEATURE_CALLERINFO
+			if ((mock.Switches & Switches.CollectDiagnosticFileInfoForSetups) != 0)
+			{
+				this.declarationSite = GetUserCodeCallSite();
+			}
+#endif
 		}
 
 		public string FailMessage
@@ -53,40 +57,44 @@ namespace Moq
 
 		public override bool IsVerifiable => (this.flags & Flags.Verifiable) != 0;
 
-		[Conditional("DESKTOP")]
-		[SuppressMessage("Microsoft.Design", "CA1031:DoNotCatchGeneralExceptionTypes")]
-		private void SetFileInfo()
+#if FEATURE_CALLERINFO
+		private static string GetUserCodeCallSite()
 		{
-#if !NETCORE
-			if ((this.mock.Switches & Switches.CollectDiagnosticFileInfoForSetups) == 0)
-			{
-				return;
-			}
-
 			try
 			{
 				var thisMethod = MethodBase.GetCurrentMethod();
 				var mockAssembly = Assembly.GetExecutingAssembly();
-				// Move 'till we're at the entry point into Moq API
 				var frame = new StackTrace(true)
 					.GetFrames()
 					.SkipWhile(f => f.GetMethod() != thisMethod)
 					.SkipWhile(f => f.GetMethod().DeclaringType == null || f.GetMethod().DeclaringType.Assembly == mockAssembly)
 					.FirstOrDefault();
-
-				if (frame != null)
+				var member = frame?.GetMethod();
+				if (member != null)
 				{
-					this.originalCallerLineNumber = frame.GetFileLineNumber();
-					this.originalCallerFilePath = Path.GetFileName(frame.GetFileName());
-					this.originalCallerMember = frame.GetMethod();
+					var declaredAt = new StringBuilder();
+					declaredAt.AppendNameOf(member.DeclaringType).Append('.').AppendNameOf(member, false);
+					var fileName = Path.GetFileName(frame.GetFileName());
+					if (fileName != null)
+					{
+						declaredAt.Append(" in ").Append(fileName);
+						var lineNumber = frame.GetFileLineNumber();
+						if (lineNumber != 0)
+						{
+							declaredAt.Append(": line ").Append(lineNumber);
+						}
+					}
+					return declaredAt.ToString();
 				}
 			}
 			catch
 			{
 				// Must NEVER fail, as this is a nice-to-have feature only.
 			}
-#endif
+
+			return null;
 		}
+#endif
 
 		public override void Execute(Invocation invocation)
 		{
@@ -351,14 +359,10 @@ namespace Moq
 
 			message.Append(base.ToString());
 
-#if !NETCORE
-			if (this.originalCallerMember != null && this.originalCallerFilePath != null && this.originalCallerLineNumber != 0)
+#if FEATURE_CALLERINFO
+			if (this.declarationSite != null)
 			{
-				message.AppendFormat(
-					" ({0}() in {1}: line {2})",
-					this.originalCallerMember.Name,
-					this.originalCallerFilePath,
-					this.originalCallerLineNumber);
+				message.Append(" (").Append(this.declarationSite).Append(')');
 			}
 #endif
 

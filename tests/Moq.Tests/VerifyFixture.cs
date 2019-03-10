@@ -1001,7 +1001,7 @@ namespace Moq.Tests
 			});
 		}
 
-#if !NETCORE
+#if FEATURE_CALLERINFO
 		[Fact]
 		public void Enabling_diagnostic_file_info_leads_to_that_information_in_verification_error_messages()
 		{
