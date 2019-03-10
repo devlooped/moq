@@ -32,7 +32,6 @@ namespace Moq
 		}
 
 		/// <include file='It.xdoc' path='docs/doc[@for="It.IsAny"]/*'/>
-		[Matcher]
 		public static TValue IsAny<TValue>()
 		{
 			return Match<TValue>.Create(
@@ -53,7 +52,6 @@ namespace Moq
 		}
 
 		/// <include file='It.xdoc' path='docs/doc[@for="It.IsNotNull"]/*'/>
-		[Matcher]
 		public static TValue IsNotNull<TValue>()
 		{
 			return Match<TValue>.Create(
@@ -68,7 +66,6 @@ namespace Moq
 
 
 		/// <include file='It.xdoc' path='docs/doc[@for="It.Is"]/*'/>
-		[Matcher]
 		[SuppressMessage("Microsoft.Design", "CA1006:DoNotNestGenericTypesInMemberSignatures")]
 		public static TValue Is<TValue>(Expression<Func<TValue, bool>> match)
 		{
@@ -78,7 +75,6 @@ namespace Moq
 		}
 
 		/// <include file='It.xdoc' path='docs/doc[@for="It.IsInRange"]/*'/>
-		[Matcher]
 		public static TValue IsInRange<TValue>(TValue from, TValue to, Range rangeKind)
 			where TValue : IComparable
 		{
@@ -100,35 +96,30 @@ namespace Moq
 		}
 
 		/// <include file='It.xdoc' path='docs/doc[@for="It.IsIn(enumerable)"]/*'/>
-		[Matcher]
 		public static TValue IsIn<TValue>(IEnumerable<TValue> items)
 		{
 			return Match<TValue>.Create(value => items.Contains(value), () => It.IsIn(items));
 		}
 
 		/// <include file='It.xdoc' path='docs/doc[@for="It.IsIn(params)"]/*'/>
-		[Matcher]
 		public static TValue IsIn<TValue>(params TValue[] items)
 		{
 			return Match<TValue>.Create(value => items.Contains(value), () => It.IsIn(items));
 		}
 
 		/// <include file='It.xdoc' path='docs/doc[@for="It.IsNotIn(enumerable)"]/*'/>
-		[Matcher]
 		public static TValue IsNotIn<TValue>(IEnumerable<TValue> items)
 		{
 			return Match<TValue>.Create(value => !items.Contains(value), () => It.IsNotIn(items));
 		}
 
 		/// <include file='It.xdoc' path='docs/doc[@for="It.IsNotIn(params)"]/*'/>
-		[Matcher]
 		public static TValue IsNotIn<TValue>(params TValue[] items)
 		{
 			return Match<TValue>.Create(value => !items.Contains(value), () => It.IsNotIn(items));
 		}
 
 		/// <include file='It.xdoc' path='docs/doc[@for="It.IsRegex(regex)"]/*'/>
-		[Matcher]
 		public static string IsRegex(string regex)
 		{
 			Guard.NotNull(regex, nameof(regex));
@@ -141,7 +132,6 @@ namespace Moq
 		}
 
 		/// <include file='It.xdoc' path='docs/doc[@for="It.IsRegex(regex,options)"]/*'/>
-		[Matcher]
 		public static string IsRegex(string regex, RegexOptions options)
 		{
 			Guard.NotNull(regex, nameof(regex));

@@ -704,7 +704,6 @@ namespace Moq.Tests
 			Assert.Equal(3, mock.Object.Echo(3));
 		}
 
-		[Matcher]
 		private int IsMultipleOf(int value)
 		{
 			return Match.Create<int>(i => i % value == 0);

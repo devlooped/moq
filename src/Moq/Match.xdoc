@@ -27,10 +27,9 @@
 			that returns a value from a call to <see cref="Match.Create{T}(Predicate{T})"/> with 
 			your matching condition and optional friendly render expression:
 			<code>
-				[Matcher]
 				public Order IsBigOrder()
 				{
-					return Match&lt;Order&gt;.Create(
+					return Match.Create&lt;Order&gt;(
 						o => o.GrandTotal &gt;= 5000, 
 						/* a friendly expression to render on failures */
 						() => IsBigOrder());
@@ -40,8 +39,7 @@
 			<code>
 				mock.Setup(m => m.Submit(IsBigOrder()).Throws&lt;UnauthorizedAccessException&gt;();
 			</code>
-			At runtime, Moq knows that the return value was a matcher (note that the method MUST be 
-			annotated with the [Matcher] attribute in order to determine this) and
+			At runtime, Moq knows that the return value was a matcher and
 			evaluates your predicate with the actual value passed into your predicate.
 			<para>
 				Another example might be a case where you want to match a lists of orders
@@ -50,10 +48,9 @@
 			<code>
 				public static class Orders
 				{
-					[Matcher]
 					public static IEnumerable&lt;Order&gt; Contains(Order order)
 					{
-						return Match&lt;IEnumerable&lt;Order&gt;&gt;.Create(orders => orders.Contains(order));
+						return Match.Create&lt;IEnumerable&lt;Order&gt;&gt;(orders => orders.Contains(order));
 					}
 				}
 			</code>
