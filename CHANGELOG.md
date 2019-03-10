@@ -33,6 +33,8 @@ This release contains several **minor breaking changes**. Please review your cod
 * Incomplete stack trace when raising an event with `mock.Raise` throws (@MutatedTomato, #738)
 * `Mock.Raise` only raises events on root object (@hallipr, #166)
 * Mocking indexer captures `It.IsAny()` as the value, even if given in the indexer argument (@idigra, #696)
+* `VerifySet` fails on non-trivial property setup (@TimothyHayes, #430)
+* Use of `SetupSet` 'forgets' method setup (@TimothyHayes, #432)
 
 ## 4.10.1 (2018-12-03)
 

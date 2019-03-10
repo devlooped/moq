@@ -176,6 +176,8 @@ namespace Moq
 			}
 		}
 
+		internal override object[] ConstructorArguments => this.constructorArguments;
+
 		internal override Dictionary<Type, object> ConfiguredDefaultValues => this.configuredDefaultValues;
 
 		/// <summary>
@@ -326,7 +328,7 @@ namespace Moq
 		public ISetupSetter<T, TProperty> SetupSet<TProperty>(Action<T> setterExpression)
 		{
 			Guard.NotNull(setterExpression, nameof(setterExpression));
-			var expression = ExpressionReconstructor.Instance.ReconstructExpression(setterExpression);
+			var expression = ExpressionReconstructor.Instance.ReconstructExpression(setterExpression, this.ConstructorArguments);
 
 			var setup = Mock.SetupSet(this, expression, condition: null);
 			return new SetterSetupPhrase<T, TProperty>(setup);
@@ -336,7 +338,7 @@ namespace Moq
 		public ISetup<T> SetupSet(Action<T> setterExpression)
 		{
 			Guard.NotNull(setterExpression, nameof(setterExpression));
-			var expression = ExpressionReconstructor.Instance.ReconstructExpression(setterExpression);
+			var expression = ExpressionReconstructor.Instance.ReconstructExpression(setterExpression, this.ConstructorArguments);
 
 			var setup = Mock.SetupSet(this, expression, condition: null);
 			return new VoidSetupPhrase<T>(setup);
@@ -528,7 +530,7 @@ namespace Moq
 		{
 			Guard.NotNull(setterExpression, nameof(setterExpression));
 
-			var expression = ExpressionReconstructor.Instance.ReconstructExpression(setterExpression);
+			var expression = ExpressionReconstructor.Instance.ReconstructExpression(setterExpression, this.ConstructorArguments);
 			Mock.VerifySet(this, expression, Times.AtLeastOnce(), null);
 		}
 
@@ -537,7 +539,7 @@ namespace Moq
 		{
 			Guard.NotNull(setterExpression, nameof(setterExpression));
 
-			var expression = ExpressionReconstructor.Instance.ReconstructExpression(setterExpression);
+			var expression = ExpressionReconstructor.Instance.ReconstructExpression(setterExpression, this.ConstructorArguments);
 			Mock.VerifySet(this, expression, times, null);
 		}
 
@@ -546,7 +548,7 @@ namespace Moq
 		{
 			Guard.NotNull(setterExpression, nameof(setterExpression));
 
-			var expression = ExpressionReconstructor.Instance.ReconstructExpression(setterExpression);
+			var expression = ExpressionReconstructor.Instance.ReconstructExpression(setterExpression, this.ConstructorArguments);
 			Mock.VerifySet(this, expression, times(), null);
 		}
 
@@ -555,7 +557,7 @@ namespace Moq
 		{
 			Guard.NotNull(setterExpression, nameof(setterExpression));
 
-			var expression = ExpressionReconstructor.Instance.ReconstructExpression(setterExpression);
+			var expression = ExpressionReconstructor.Instance.ReconstructExpression(setterExpression, this.ConstructorArguments);
 			Mock.VerifySet(this, expression, Times.AtLeastOnce(), failMessage);
 		}
 
@@ -564,7 +566,7 @@ namespace Moq
 		{
 			Guard.NotNull(setterExpression, nameof(setterExpression));
 
-			var expression = ExpressionReconstructor.Instance.ReconstructExpression(setterExpression);
+			var expression = ExpressionReconstructor.Instance.ReconstructExpression(setterExpression, this.ConstructorArguments);
 			Mock.VerifySet(this, expression, times, failMessage);
 		}
 
@@ -573,7 +575,7 @@ namespace Moq
 		{
 			Guard.NotNull(setterExpression, nameof(setterExpression));
 
-			var expression = ExpressionReconstructor.Instance.ReconstructExpression(setterExpression);
+			var expression = ExpressionReconstructor.Instance.ReconstructExpression(setterExpression, this.ConstructorArguments);
 			Mock.VerifySet(this, expression , times(), failMessage);
 		}
 

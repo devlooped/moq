@@ -26,12 +26,12 @@ namespace Moq
 	/// </summary>
 	internal sealed class ActionObserver : ExpressionReconstructor
 	{
-		public override Expression<Action<T>> ReconstructExpression<T>(Action<T> action)
+		public override Expression<Action<T>> ReconstructExpression<T>(Action<T> action, object[] ctorArgs = null)
 		{
 			using (var matcherObserver = MatcherObserver.Activate())
 			{
 				// Create the root recording proxy:
-				var root = (T)CreateProxy(typeof(T), matcherObserver, out var rootRecorder);
+				var root = (T)CreateProxy(typeof(T), ctorArgs, matcherObserver, out var rootRecorder);
 
 				Exception error = null;
 				try
@@ -213,10 +213,10 @@ namespace Moq
 		}
 
 		// Creates a proxy (way more light-weight than a `Mock<T>`!) with an invocation `Recorder` attached to it.
-		private static IProxy CreateProxy(Type type, MatcherObserver matcherObserver, out Recorder recorder)
+		private static IProxy CreateProxy(Type type, object[] ctorArgs, MatcherObserver matcherObserver, out Recorder recorder)
 		{
 			recorder = new Recorder(matcherObserver);
-			return (IProxy)ProxyFactory.Instance.CreateProxy(type, recorder, Type.EmptyTypes, new object[0]);
+			return (IProxy)ProxyFactory.Instance.CreateProxy(type, recorder, Type.EmptyTypes, ctorArgs ?? new object[0]);
 		}
 
 		// Records an invocation, mocks return values, and builds a chain to the return value's recorder.
@@ -254,12 +254,21 @@ namespace Moq
 			{
 				var returnType = invocation.Method.ReturnType;
 
-#if DEBUG
-				// In theory, each recorder receives exactly one invocation.
-				// We put the following guard here for debugging purposes, since your IDE's
-				// "Watch" window might cause additional calls that normally shouldn't happen.
-				if (this.invocation == null)
-#endif
+				// In theory, each recorder should receive exactly one invocation.
+				// There are some reasons why that may not always be true:
+				//
+				//  1. You may be inspecting a `Recorder` object in your IDE, causing
+				//     additional calls e.g. to `ToString`. In this case, any such
+				//     subsequent calls should be ignored.
+				//
+				//  2. The proxied type may perform virtual calls in its own ctor.
+				//     In this case, *only* the last call is going to be relevant.
+				//
+				// Getting (2) right is more important than getting (1) right, so we
+				// disable the following guard and allow subsequent calls to override
+				// earlier ones:
+
+				//if (this.invocation == null)
 				{
 					this.invocation = invocation;
 					this.invocationTimestamp = this.matcherObserver.GetNextTimestamp();
@@ -270,7 +279,7 @@ namespace Moq
 					}
 					else if (returnType.IsMockeable())
 					{
-						this.returnValue = CreateProxy(returnType, this.matcherObserver, out _);
+						this.returnValue = CreateProxy(returnType, null, this.matcherObserver, out _);
 					}
 					else
 					{
