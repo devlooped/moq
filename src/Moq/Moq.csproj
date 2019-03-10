@@ -9,7 +9,7 @@
 		<TargetFrameworks>net45;netstandard2.0</TargetFrameworks>
 		<AssemblyName>Moq</AssemblyName>
 		<DebugSymbols>True</DebugSymbols>
-		<DebugType>full</DebugType>
+		<DebugType>portable</DebugType>
 		<DocumentationFile>bin\$(Configuration)\$(TargetFramework)\$(AssemblyName).xml</DocumentationFile> 
 		<GenerateDocumentation>true</GenerateDocumentation>
 		<NoWarn>0419</NoWarn>
@@ -33,6 +33,8 @@
 		<PackageOutputPath>$(OutputDirectory)</PackageOutputPath>
 		<PackageTags>moq;tdd;mocking;mocks;unittesting;agile;unittest</PackageTags>
 		<RepositoryUrl>https://github.com/moq/moq4</RepositoryUrl>
+		<IncludeSymbols>True</IncludeSymbols>
+		<SymbolPackageFormat>snupkg</SymbolPackageFormat>
 	</PropertyGroup>
 
 	<PropertyGroup Condition=" '$(TargetFramework)' == 'net45' ">
