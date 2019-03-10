@@ -254,12 +254,21 @@ namespace Moq
 			{
 				var returnType = invocation.Method.ReturnType;
 
-#if DEBUG
-				// In theory, each recorder receives exactly one invocation.
-				// We put the following guard here for debugging purposes, since your IDE's
-				// "Watch" window might cause additional calls that normally shouldn't happen.
-				if (this.invocation == null)
-#endif
+				// In theory, each recorder should receive exactly one invocation.
+				// There are some reasons why that may not always be true:
+				//
+				//  1. You may be inspecting a `Recorder` object in your IDE, causing
+				//     additional calls e.g. to `ToString`. In this case, any such
+				//     subsequent calls should be ignored.
+				//
+				//  2. The proxied type may perform virtual calls in its own ctor.
+				//     In this case, *only* the last call is going to be relevant.
+				//
+				// Getting (2) right is more important than getting (1) right, so we
+				// disable the following guard and allow subsequent calls to override
+				// earlier ones:
+
+				//if (this.invocation == null)
 				{
 					this.invocation = invocation;
 					this.invocationTimestamp = this.matcherObserver.GetNextTimestamp();
