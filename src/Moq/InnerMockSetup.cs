@@ -3,7 +3,7 @@
 
 namespace Moq
 {
-	internal sealed class InnerMockSetup : SetupWithOutParameterSupport, IDeterministicReturnValueSetup
+	internal sealed class InnerMockSetup : SetupWithOutParameterSupport
 	{
 		private readonly object returnValue;
 
@@ -13,11 +13,15 @@ namespace Moq
 			this.returnValue = returnValue;
 		}
 
-		public object ReturnValue => this.returnValue;
-
 		public override void Execute(Invocation invocation)
 		{
 			invocation.Return(this.returnValue);
+		}
+
+		public override bool TryGetReturnValue(out object returnValue)
+		{
+			returnValue = this.returnValue;
+			return true;
 		}
 
 		public override MockException TryVerify()

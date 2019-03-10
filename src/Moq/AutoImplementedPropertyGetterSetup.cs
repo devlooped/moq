@@ -10,7 +10,7 @@ namespace Moq
 	/// <summary>
 	///   Setup used by <see cref="Mock.SetupAllProperties(Mock)"/> for property getters.
 	/// </summary>
-	internal sealed class AutoImplementedPropertyGetterSetup : Setup, IDeterministicReturnValueSetup
+	internal sealed class AutoImplementedPropertyGetterSetup : Setup
 	{
 		private static Expression[] noArguments = new Expression[0];
 
@@ -22,11 +22,15 @@ namespace Moq
 			this.getter = getter;
 		}
 
-		public object ReturnValue => this.getter.Invoke();
-
 		public override void Execute(Invocation invocation)
 		{
 			invocation.Return(this.getter.Invoke());
+		}
+
+		public override bool TryGetReturnValue(out object returnValue)
+		{
+			returnValue = this.getter.Invoke();
+			return true;
 		}
 
 		public override MockException TryVerify()

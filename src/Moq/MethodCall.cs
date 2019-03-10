@@ -123,6 +123,20 @@ namespace Moq
 			}
 		}
 
+		public override bool TryGetReturnValue(out object returnValue)
+		{
+			if (this.returnOrThrowResponse is ReturnEagerValueResponse revs)
+			{
+				returnValue = revs.Value;
+				return true;
+			}
+			else
+			{
+				returnValue = default;
+				return false;
+			}
+		}
+
 		public void SetCallBaseResponse()
 		{
 			if (this.Mock.TargetType.IsDelegate())
@@ -416,16 +430,16 @@ namespace Moq
 
 		private sealed class ReturnEagerValueResponse : Response
 		{
-			private readonly object value;
+			public readonly object Value;
 
 			public ReturnEagerValueResponse(object value)
 			{
-				this.value = value;
+				this.Value = value;
 			}
 
 			public override void RespondTo(Invocation invocation)
 			{
-				invocation.Return(this.value);
+				invocation.Return(this.Value);
 			}
 		}
 
