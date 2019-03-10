@@ -374,6 +374,46 @@ namespace Moq.Tests
 			}
 		}
 
+		public class Inner_mock_reachability
+		{
+			[Fact]
+			public void Reachable_if_set_up_using_eager_Returns()
+			{
+				var bar = new Mock<IBar>();
+				bar.Setup(b => b.Value).Returns(42);
+
+				var foo = new Mock<IFoo>();
+				foo.Setup(f => f.Bar).Returns(bar.Object);
+				foo.Setup(f => f.Bar.Baz);
+
+				Assert.Equal(42, foo.Object.Bar.Value);
+				bar.VerifyGet(b => b.Value, Times.Once);
+			}
+
+			[Fact]
+			public void Not_reachable_if_set_up_using_lazy_Returns()
+			{
+				var bar = new Mock<IBar>();
+				bar.Setup(b => b.Value).Returns(42);
+
+				var foo = new Mock<IFoo>();
+				foo.Setup(f => f.Bar).Returns(() => bar.Object);
+				//                            ^^^^^^
+				// Main difference to the above test. What we want to test for here is
+				// that Moq won't execute user-provided callbacks to figure out a setup's
+				// return value (as this could have side effects without Moq's control).
+
+				foo.Setup(f => f.Bar.Baz);
+				//              ^^^^^
+				// ... and because Moq can't query the above setup to figure out there's
+				// already an inner mock attached, it will create a fresh setup instead,
+				// effectively "cutting off" the above `IBar` mock.
+
+				Assert.NotEqual(42, foo.Object.Bar.Value);
+				bar.VerifyGet(b => b.Value, Times.Never);
+			}
+		}
+
 		public class Foo : IFoo
 		{
 

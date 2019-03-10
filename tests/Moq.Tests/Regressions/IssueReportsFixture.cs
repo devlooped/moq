@@ -220,6 +220,57 @@ namespace Moq.Tests.Regressions
 
 		#endregion
 
+		#region 110
+
+		public class Issue110
+		{
+			[Fact]
+			public void Recursive_property_does_not_override_previous_setups()
+			{
+				var baz = Mock.Of<Baz>(x => x.Value == "beforeBaz");
+				var qux = Mock.Of<Qux>(x => x.Value == "beforeQux");
+
+				var bar = Mock.Of<Bar>(x =>
+					x.Baz == baz &&
+					x.Qux == qux);
+
+				var obj = Mock.Of<Foo>(x => x.Bar == bar);
+
+				var mock = Mock.Get(obj);
+
+				Assert.Equal("beforeBaz", obj.Bar.Baz.Value); // Pass
+				Assert.Equal("beforeQux", obj.Bar.Qux.Value); // Pass
+
+				mock.SetupGet(x => x.Bar.Baz.Value).Returns("test");
+
+				Assert.Equal("test", obj.Bar.Baz.Value); // Pass
+				Assert.Equal("beforeQux", obj.Bar.Qux.Value); // Fail
+			}
+
+			public interface Foo
+			{
+				Bar Bar { get; }
+			}
+
+			public interface Bar
+			{
+				Baz Baz { get; }
+				Qux Qux { get; }
+			}
+
+			public interface Qux
+			{
+				string Value { get; }
+			}
+
+			public interface Baz
+			{
+				string Value { get; }
+			}
+		}
+
+		#endregion
+
 		#region 131
 
 		public class Issue131
