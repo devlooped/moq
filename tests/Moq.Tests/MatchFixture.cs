@@ -207,55 +207,46 @@ namespace Moq.Tests
 		{
 			public abstract decimal MetricTons { get; }
 
-			[Matcher]
 			public static Order IsSmall()
 			{
 				return Match.Create<Order>(order => order.MetricTons < 1000M);
 			}
 
-			[Matcher]
 			public static Order IsSmallRE()
 			{
 				return Match.Create<Order>(order => order.MetricTons < 1000M, () => Order.IsSmallRE());
 			}
 
-			[Matcher]
 			public static Order IsLarge()
 			{
 				return Match.Create<Order>(order => order.MetricTons >= 1000M);
 			}
 
-			[Matcher]
 			public static Order IsLargeRE()
 			{
 				return Match.Create<Order>(order => order.MetricTons >= 1000M, () => Order.IsLargeRE());
 			}
 
-			[Matcher]
 			public static Order IsSmallerThan(decimal threshold)
 			{
 				return Match.Create<Order>(order => order.MetricTons < threshold);
 			}
 
-			[Matcher]
 			public static Order IsSmallerThanRE(decimal threshold)
 			{
 				return Match.Create<Order>(order => order.MetricTons < threshold, () => Order.IsSmallerThanRE(threshold));
 			}
 
-			[Matcher]
 			public static Order IsLargerThan(decimal threshold)
 			{
 				return Match.Create<Order>(order => order.MetricTons > threshold);
 			}
 
-			[Matcher]
 			public static Order IsLargerThanRE(decimal threshold)
 			{
 				return Match.Create<Order>(order => order.MetricTons < threshold, () => Order.IsLargerThanRE(threshold));
 			}
 
-			[Matcher]
 			public static Order PretendIsAny()
 			{
 				return Match.Create<Order>(order => false, () => It.IsAny<Order>());
