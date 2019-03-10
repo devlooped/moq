@@ -21,11 +21,18 @@
 
 	<PropertyGroup>
 		<!-- Properties related to NuGet packaging: -->
-		<IncludeBuildOutput>False</IncludeBuildOutput>
+		<IsPackable>True</IsPackable>
+		<PackageId>Moq</PackageId>
+		<Title>Moq: an enjoyable mocking library</Title>
+		<Description>Moq is the most popular and friendly mocking framework for .NET.</Description>
+		<PackageReleaseNotes>A changelog is available at https://github.com/moq/moq4/blob/master/CHANGELOG.md.</PackageReleaseNotes>
+		<Authors>Daniel Cazzulino, kzu</Authors>
+		<PackageLicenseUrl>https://raw.githubusercontent.com/moq/moq4/master/License.txt</PackageLicenseUrl>
+		<PackageRequireLicenseAcceptance>False</PackageRequireLicenseAcceptance>
 		<NoPackageAnalysis>True</NoPackageAnalysis>
-		<NuspecFile>Moq.nuspec</NuspecFile>
-		<NuspecBasePath>$(MSBuildThisFileDirectory)</NuspecBasePath>
 		<PackageOutputPath>$(OutputDirectory)</PackageOutputPath>
+		<PackageTags>moq;tdd;mocking;mocks;unittesting;agile;unittest</PackageTags>
+		<RepositoryUrl>https://github.com/moq/moq4</RepositoryUrl>
 	</PropertyGroup>
 
 	<PropertyGroup Condition=" '$(TargetFramework)' == 'net45' ">
