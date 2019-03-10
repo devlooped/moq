@@ -300,7 +300,7 @@ namespace Moq
 		{
 			var unverifiedInvocations = mock.MutableInvocations.ToArray(invocation => !invocation.Verified);
 
-			var innerMockSetups = mock.GetInnerMockSetups();
+			var innerMockSetups = mock.Setups.GetInnerMockSetups();
 
 			if (unverifiedInvocations.Any())
 			{
@@ -496,7 +496,7 @@ namespace Moq
 			else
 			{
 				Mock innerMock;
-				if (!(mock.GetInnerMockSetups().TryFind(part, out var setup) && setup.ReturnsInnerMock(out innerMock)))
+				if (!(mock.Setups.GetInnerMockSetups().TryFind(part, out var setup) && setup.ReturnsInnerMock(out innerMock)))
 				{
 					var returnValue = mock.GetDefaultValue(method, out innerMock, useAlternateProvider: DefaultValueProvider.Mock);
 					if (innerMock == null)
@@ -647,7 +647,7 @@ namespace Moq
 				}
 
 			}
-			else if (mock.GetInnerMockSetups().TryFind(part, out var innerMockSetup) && innerMockSetup.ReturnsInnerMock(out var innerMock))
+			else if (mock.Setups.GetInnerMockSetups().TryFind(part, out var innerMockSetup) && innerMockSetup.ReturnsInnerMock(out var innerMock))
 			{
 				Mock.RaiseEvent(innerMock, expression, parts, arguments);
 			}
@@ -775,11 +775,6 @@ namespace Moq
 			}
 
 			this.Setups.Add(new InnerMockSetup(new InvocationShape(expression, method, arguments), returnValue));
-		}
-
-		internal IEnumerable<Setup> GetInnerMockSetups()
-		{
-			return this.Setups.ToArrayLive(setup => setup.ReturnsInnerMock(out _));
 		}
 
 		#endregion

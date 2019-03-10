@@ -79,6 +79,11 @@ namespace Moq
 			return matchingSetup;
 		}
 
+		public IEnumerable<Setup> GetInnerMockSetups()
+		{
+			return this.ToArrayLive(setup => setup.ReturnsInnerMock(out _));
+		}
+
 		public Setup[] ToArrayLive(Func<Setup, bool> predicate)
 		{
 			var matchingSetups = new Stack<Setup>();
