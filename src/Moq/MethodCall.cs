@@ -15,7 +15,7 @@ using Moq.Properties;
 
 namespace Moq
 {
-	internal sealed partial class MethodCall : SetupWithOutParameterSupport
+	internal sealed partial class MethodCall : SetupWithOutParameterSupport, IDeterministicReturnValueSetup
 	{
 		private Action<object[]> afterReturnCallback;
 		private Action<object[]> callbackResponse;
@@ -120,6 +120,20 @@ namespace Moq
 				}
 
 				this.afterReturnCallback?.Invoke(invocation.Arguments);
+			}
+		}
+
+		public bool IsReturnValueKnown(out object returnValue)
+		{
+			if (this.returnOrThrowResponse is ReturnEagerValueResponse revs)
+			{
+				returnValue = revs.Value;
+				return true;
+			}
+			else
+			{
+				returnValue = default;
+				return false;
 			}
 		}
 
@@ -416,16 +430,16 @@ namespace Moq
 
 		private sealed class ReturnEagerValueResponse : Response
 		{
-			private readonly object value;
+			public readonly object Value;
 
 			public ReturnEagerValueResponse(object value)
 			{
-				this.value = value;
+				this.Value = value;
 			}
 
 			public override void RespondTo(Invocation invocation)
 			{
-				invocation.Return(this.value);
+				invocation.Return(this.Value);
 			}
 		}
 
