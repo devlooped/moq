@@ -29,7 +29,7 @@
 	</PropertyGroup>
 
 	<PropertyGroup Condition=" '$(TargetFramework)' == 'net45' ">
-		<DefineConstants>$(DefineConstants);DESKTOP;FEATURE_CALLERINFO;FEATURE_CAS;FEATURE_CODEDOM;FEATURE_COM;FEATURE_SERIALIZATION</DefineConstants>
+		<DefineConstants>$(DefineConstants);DESKTOP;FEATURE_CALLERINFO;FEATURE_CAS;FEATURE_COM;FEATURE_SERIALIZATION</DefineConstants>
 	</PropertyGroup>
 	<PropertyGroup Condition=" '$(TargetFramework)' == 'netstandard1.3' ">
 		<DefineConstants>$(DefineConstants);NETCORE</DefineConstants>
