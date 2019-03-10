@@ -34,7 +34,7 @@ namespace Moq
 			return stringBuilder;
 		}
 
-		public static StringBuilder AppendNameOf(this StringBuilder stringBuilder, MethodInfo method, bool includeGenericArgumentList)
+		public static StringBuilder AppendNameOf(this StringBuilder stringBuilder, MethodBase method, bool includeGenericArgumentList)
 		{
 			stringBuilder.Append(method.Name);
 
