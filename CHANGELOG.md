@@ -28,6 +28,7 @@ This release contains several **minor breaking changes**. Please review your cod
 #### Removed
 
 * The library no longer has a target for .NET Standard 1.x. This has been decided based on the official [cross-platform targeting guideline](https://docs.microsoft.com/en-us/dotnet/standard/library-guidance/cross-platform-targeting) and the [End of Life announcement for .NET Core 1.x](https://devblogs.microsoft.com/dotnet/net-core-1-0-and-1-1-will-reach-end-of-life-on-june-27-2019/) (@stakx, #785)
+* Pex interop (which has not been maintained for years). You might notice changes when using Visual Studio's IntelliTest feature. (@stakx, #786)
 
 #### Fixed
 

@@ -201,13 +201,7 @@ namespace Moq
 			return this.Name;
 		}
 
-		[DebuggerStepThrough]
 		private void InitializeInstance()
-		{
-			PexProtector.Invoke(InitializeInstancePexProtected);
-		}
-
-		private void InitializeInstancePexProtected()
 		{
 			// Determine the set of interfaces that the proxy object should additionally implement.
 			var additionalInterfaceCount = this.AdditionalInterfaces.Count;
