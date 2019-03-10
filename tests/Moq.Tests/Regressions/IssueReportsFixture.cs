@@ -1589,6 +1589,100 @@ namespace Moq.Tests.Regressions
 
 		#endregion
 
+		#region 432
+
+		public class Issue432
+		{
+			[Fact]
+			public void Antlers_NoSetup()
+			{
+				// Arrange
+				int temp = 0;
+
+				// create mock of class under test
+				var sut = new Mock<Prancer>(args: true) { CallBase = true };
+				sut.Setup(x => x.ExecuteMe()).Callback(() => temp = 1); // nullify
+
+				// Act
+				sut.Object.Antlers = true;
+
+				// Assert
+				sut.VerifySet(x => x.Antlers = true);
+				Assert.Equal(1, temp);
+			}
+
+			[Fact]
+			public void Antlers_SetupProperty()
+			{
+				// Arrange
+				int temp = 0;
+
+				// create mock of class under test
+				var sut = new Mock<Prancer>(args: true) { CallBase = true };
+				sut.SetupProperty(x => x.Antlers, false);
+				sut.Setup(x => x.ExecuteMe()).Callback(() => temp = 2); // nullify
+
+				// Act
+				sut.Object.Antlers = true;
+
+				// Assert
+				sut.VerifySet(x => x.Antlers = true);
+				Assert.Equal(2, temp);
+			}
+
+			[Fact]
+			public void Antlers_SetupSet()
+			{
+				// Arrange
+				int temp = 0;
+
+				// create mock of class under test
+				var sut = new Mock<Prancer>(args: true) { CallBase = true };
+				sut.Setup(x => x.ExecuteMe()).Callback(() => temp = 3); // nullify
+				sut.SetupSet(x => x.Antlers = true);
+
+				// Act
+				sut.Object.Antlers = true;
+
+				// Assert
+				sut.VerifySet(x => x.Antlers = true);
+				Assert.Equal(3, temp);
+			}
+
+			public class Prancer
+			{
+				public Prancer(bool pIsMale)
+				{
+					IsMale = pIsMale;
+					ExecuteMe();
+				}
+
+				private bool _IsMale;
+				public virtual bool IsMale
+				{
+					get { return this._IsMale; }
+					private set { this._IsMale = value; }
+				}
+
+				private bool _Antlers;
+				public virtual bool Antlers
+				{
+					get { return this._Antlers; }
+					set
+					{
+						this._Antlers = value;
+					}
+				}
+
+				public virtual void ExecuteMe()
+				{
+					throw new Exception("Why am I here?");
+				}
+			}
+		}
+
+		#endregion
+
 		#region 438
 
 		public class Issue438
