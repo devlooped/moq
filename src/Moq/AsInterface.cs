@@ -21,6 +21,8 @@ namespace Moq
 
 		internal override Dictionary<Type, object> ConfiguredDefaultValues => this.owner.ConfiguredDefaultValues;
 
+		internal override object[] ConstructorArguments => this.owner.ConstructorArguments;
+
 		internal override InvocationCollection MutableInvocations => this.owner.MutableInvocations;
 
 		internal override bool IsObjectInitialized => this.owner.IsObjectInitialized;

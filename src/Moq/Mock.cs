@@ -113,6 +113,8 @@ namespace Moq
 		/// <include file='Mock.xdoc' path='docs/doc[@for="Mock.CallBase"]/*'/>
 		public abstract bool CallBase { get; set; }
 
+		internal abstract object[] ConstructorArguments { get; }
+
 		/// <include file='Mock.xdoc' path='docs/doc[@for="Mock.DefaultValue"]/*'/>
 		public DefaultValue DefaultValue
 		{
@@ -609,7 +611,7 @@ namespace Moq
 		{
 			Guard.NotNull(action, nameof(action));
 
-			var expression = ExpressionReconstructor.Instance.ReconstructExpression(action);
+			var expression = ExpressionReconstructor.Instance.ReconstructExpression(action, mock.ConstructorArguments);
 			var parts = expression.Split();
 			Mock.RaiseEvent(mock, expression, parts, arguments);
 		}

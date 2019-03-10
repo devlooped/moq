@@ -26,12 +26,12 @@ namespace Moq
 	/// </summary>
 	internal sealed class ActionObserver : ExpressionReconstructor
 	{
-		public override Expression<Action<T>> ReconstructExpression<T>(Action<T> action)
+		public override Expression<Action<T>> ReconstructExpression<T>(Action<T> action, object[] ctorArgs = null)
 		{
 			using (var matcherObserver = MatcherObserver.Activate())
 			{
 				// Create the root recording proxy:
-				var root = (T)CreateProxy(typeof(T), matcherObserver, out var rootRecorder);
+				var root = (T)CreateProxy(typeof(T), ctorArgs, matcherObserver, out var rootRecorder);
 
 				Exception error = null;
 				try
@@ -213,10 +213,10 @@ namespace Moq
 		}
 
 		// Creates a proxy (way more light-weight than a `Mock<T>`!) with an invocation `Recorder` attached to it.
-		private static IProxy CreateProxy(Type type, MatcherObserver matcherObserver, out Recorder recorder)
+		private static IProxy CreateProxy(Type type, object[] ctorArgs, MatcherObserver matcherObserver, out Recorder recorder)
 		{
 			recorder = new Recorder(matcherObserver);
-			return (IProxy)ProxyFactory.Instance.CreateProxy(type, recorder, Type.EmptyTypes, new object[0]);
+			return (IProxy)ProxyFactory.Instance.CreateProxy(type, recorder, Type.EmptyTypes, ctorArgs ?? new object[0]);
 		}
 
 		// Records an invocation, mocks return values, and builds a chain to the return value's recorder.
@@ -270,7 +270,7 @@ namespace Moq
 					}
 					else if (returnType.IsMockeable())
 					{
-						this.returnValue = CreateProxy(returnType, this.matcherObserver, out _);
+						this.returnValue = CreateProxy(returnType, null, this.matcherObserver, out _);
 					}
 					else
 					{
