@@ -287,6 +287,33 @@ namespace Moq.Tests.Regressions
 
 		#endregion
 
+		#region 142
+
+		public class Issue142
+		{
+			[Fact]
+			public void Mock_Of_recursive_with_argument_matchers()
+			{
+				var foo = Mock.Of<IFoo>(f =>
+					f.Foo(It.Is<int>(i => i == 1)).Name == "One" &&
+					f.Foo(It.Is<int>(i => i == 2)).Name == "Two");
+				Assert.Equal("One", foo.Foo(1).Name);
+				Assert.Equal("Two", foo.Foo(2).Name);
+			}
+
+			public interface INameHolder
+			{
+				string Name { get; }
+			}
+
+			public interface IFoo
+			{
+				INameHolder Foo(int index);
+			}
+		}
+
+		#endregion
+
 		#region 156
 
 		public class Issue156

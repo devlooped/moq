@@ -35,6 +35,7 @@ This release contains several **minor breaking changes**. Please review your cod
 * Mocking indexer captures `It.IsAny()` as the value, even if given in the indexer argument (@idigra, #696)
 * `VerifySet` fails on non-trivial property setup (@TimothyHayes, #430)
 * Use of `SetupSet` 'forgets' method setup (@TimothyHayes, #432)
+* Recursive mocks don't work with argument matching (@thalesmello, #142)
 
 ## 4.10.1 (2018-12-03)
 
