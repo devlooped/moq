@@ -17,13 +17,17 @@ This release contains several **minor breaking changes**. Please review your cod
 * `mock.Verify` no longer creates setups, nor will it override existing setups, as a side-effect of using a recursive expression. (@stakx, #765)
 * More accurate detection of argument matchers with `SetupSet` and `VerifySet`, especially when used in fluent setup expressions or with indexers (@stakx, #767)
 * `mock.Verify(expression)` error messages now contain a full listing of all invocations that occurred across all involved mocks. Setups are no longer listed, since they are completely irrelevant in the context of call verification. (@stakx, #779, #780)
-* Additionally target .NET Standard 2.0 (@stakx, #784)
 
 #### Added
 
+* The library now has a target for .NET Standard 2.0. (@stakx, #784)
 * New method overload `mock.Protected().Setup("VoidMethod", exactParameterMatch, args)` overload having a `bool exactParameterMatch` parameter. Due to method overload resolution, it was easy to think this already existed resolution when in fact it did not, leading to failing tests. (@stakx, #751)
 * New method overloads `mock.Protected().Verify("VoidMethod", times, exactParameterMatch, args)` and `mock.Protected().Verify<TResult>("NonVoidMethod", times, exactParameterMatch, args)` overloads having a `bool exactParameterMatch` parameter. (@Shereef, #753)
 * Ability in `mock.Raise` and `setup.Raises` to raise events on sub-objects (inner mocks) (@stakx, #772)
+
+#### Removed
+
+* The library no longer has a target for .NET Standard 1.x. This has been decided based on the official [cross-platform targeting guideline](https://docs.microsoft.com/en-us/dotnet/standard/library-guidance/cross-platform-targeting) and the [End of Life announcement for .NET Core 1.x](https://devblogs.microsoft.com/dotnet/net-core-1-0-and-1-1-will-reach-end-of-life-on-june-27-2019/) (@stakx, #785)
 
 #### Fixed
 
