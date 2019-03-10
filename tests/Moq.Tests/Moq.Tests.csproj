@@ -15,10 +15,10 @@
 	</PropertyGroup>
 
 	<PropertyGroup Condition=" '$(TargetFramework)' == 'net46' ">
-		<DefineConstants>$(DefineConstants);DESKTOP;FEATURE_CALLERINFO;FEATURE_CAS;FEATURE_COM;FEATURE_SERIALIZATION</DefineConstants>
+		<DefineConstants>$(DefineConstants);FEATURE_CALLERINFO;FEATURE_CAS;FEATURE_COM;FEATURE_EF;FEATURE_SERIALIZATION;FEATURE_SYSTEM_WEB;FEATURE_SYSTEM_WINDOWS_FORMS</DefineConstants>
 	</PropertyGroup>
 	<PropertyGroup Condition=" '$(TargetFramework)' == 'netcoreapp2.0' ">
-		<DefineConstants>$(DefineConstants);NETCORE</DefineConstants>
+		<DefineConstants>$(DefineConstants)</DefineConstants>
 	</PropertyGroup>
 
 	<ItemGroup>
@@ -27,13 +27,19 @@
 		<ProjectReference Include="..\..\src\Moq\Moq.csproj" />
 		<ProjectReference Include="..\Moq.Tests.FSharpTypes\Moq.Tests.FSharpTypes.fsproj" />
 	</ItemGroup>
-	<ItemGroup Condition=" '$(TargetFramework)' == 'net46' ">
-		<PackageReference Include="EntityFramework" Version="6.2.0" />
-		<Reference Include="System.Web" />
-		<Reference Include="System.Windows.Forms" />
+	<ItemGroup Condition=" $([System.Text.RegularExpressions.Regex]::IsMatch('$(DefineConstants)', 'FEATURE_COM'))">
 		<Reference Include="Moq.Tests.ComTypes">
 			<HintPath>..\Moq.Tests.ComTypes\Moq.Tests.ComTypes.dll</HintPath>
 		</Reference>
+	</ItemGroup>
+	<ItemGroup Condition=" $([System.Text.RegularExpressions.Regex]::IsMatch('$(DefineConstants)', 'FEATURE_EF'))">
+		<PackageReference Include="EntityFramework" Version="6.2.0" />
+	</ItemGroup>
+	<ItemGroup Condition=" $([System.Text.RegularExpressions.Regex]::IsMatch('$(DefineConstants)', 'FEATURE_SYSTEM_WEB'))">
+		<Reference Include="System.Web" />
+	</ItemGroup>
+	<ItemGroup Condition=" $([System.Text.RegularExpressions.Regex]::IsMatch('$(DefineConstants)', 'FEATURE_SYSTEM_WINDOWS_FORMS'))">
+		<Reference Include="System.Windows.Forms" />
 	</ItemGroup>
 	<ItemGroup Condition=" '$(TargetFramework)' == 'netcoreapp2.0' ">
 		<PackageReference Include="System.Collections.Specialized" Version="4.3.0" />

@@ -4,14 +4,13 @@
 using System;
 using System.Collections.Generic;
 using System.Linq.Expressions;
-#if NETCORE
 using System.Reflection;
-#endif
+
+using Xunit;
+
 #if FEATURE_SERIALIZATION
 using System.Runtime.Serialization;
 #endif
-
-using Xunit;
 
 namespace Moq.Tests
 {

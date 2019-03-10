@@ -4,10 +4,6 @@
 using System;
 using System.Collections;
 using System.Collections.Generic;
-#if DESKTOP
-using System.Data.Entity;
-using System.Data.Entity.Core.EntityClient;
-#endif
 using System.ComponentModel;
 using System.Globalization;
 using System.IO;
@@ -15,6 +11,8 @@ using System.Linq;
 using System.Linq.Expressions;
 using System.Reflection;
 using System.Text.RegularExpressions;
+using System.Threading;
+using System.Threading.Tasks;
 
 using Castle.DynamicProxy;
 
@@ -24,14 +22,9 @@ using Moq.Protected;
 
 using Xunit;
 
-#if !NETCORE
-using System.Web.UI.HtmlControls;
-#endif
 #if FEATURE_SERIALIZATION
 using System.Runtime.Serialization;
 #endif
-using System.Threading;
-using System.Threading.Tasks;
 
 #region #181
 
@@ -1894,14 +1887,14 @@ namespace Moq.Tests.Regressions
 
 		#region 464
 
-		#if DESKTOP
+		#if FEATURE_EF
 		public class Issue464
 		{
 			[Fact]
 			public void Test()
 			{
 				Mock<MyDbContext> mockDbContext = new Mock<MyDbContext>();
-				Mock<DbSet<MyEntity>> mockDbSet = new Mock<DbSet<MyEntity>>();
+				var mockDbSet = new Mock<System.Data.Entity.DbSet<MyEntity>>();
 				mockDbContext.Setup(m => m.Set<MyEntity>()).Returns(mockDbSet.Object);
 
 				var triggerObjectCreation = mockDbContext.Object;
@@ -1915,9 +1908,9 @@ namespace Moq.Tests.Regressions
 				Assert.IsType<MockException>(exception);
 			}
 
-			public partial class MyDbContext : DbContext
+			public partial class MyDbContext : System.Data.Entity.DbContext
 			{
-				public virtual DbSet<MyEntity> MyEntity { get; set; }
+				public virtual System.Data.Entity.DbSet<MyEntity> MyEntity { get; set; }
 			}
 
 			public class MyEntity { }
@@ -2014,13 +2007,13 @@ namespace Moq.Tests.Regressions
 
 		#region 526
 
-		#if DESKTOP
+		#if FEATURE_EF
 		public sealed class Issue526
 		{
 			[Fact]
 			public void Given_EntityConnection_mock_created_with_new_Mock_SetupGet_can_setup_ConnectionString_property()
 			{
-				var mockConnection = new Mock<EntityConnection>();
+				var mockConnection = new Mock<System.Data.Entity.Core.EntityClient.EntityConnection>();
 				var connection = mockConnection.Object;
 
 				mockConnection.SetupGet(c => c.ConnectionString).Returns("_");
@@ -2032,7 +2025,7 @@ namespace Moq.Tests.Regressions
 			[Fact]
 			public void Given_EntityConnection_mock_created_with_Mock_Of_SetupGet_can_setup_ConnectionString_property()
 			{
-				var connection = Mock.Of<EntityConnection>();
+				var connection = Mock.Of<System.Data.Entity.Core.EntityClient.EntityConnection>();
 				var mockConnection = Mock.Get(connection);
 
 				mockConnection.SetupGet(c => c.ConnectionString).Returns("_");
@@ -3177,14 +3170,14 @@ namespace Moq.Tests.Regressions
 
 		#region #160
 
-#if !NETCORE
+#if FEATURE_SYSTEM_WEB
 		public class _160
 		{
 			[Fact]
 			public void ShouldMockHtmlControl()
 			{
 				// CallBase was missing
-				var htmlInputTextMock = new Mock<HtmlInputText>() { CallBase = true };
+				var htmlInputTextMock = new Mock<System.Web.UI.HtmlControls.HtmlInputText>() { CallBase = true };
 				Assert.True(htmlInputTextMock.Object.Visible);
 			}
 		}
@@ -3960,7 +3953,7 @@ namespace Moq.Tests.Regressions
 
 		#region #326
 
-#if !NETCORE
+#if FEATURE_SYSTEM_WINDOWS_FORMS
 
 		public class _326
 		{
