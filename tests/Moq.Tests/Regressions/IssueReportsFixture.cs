@@ -1505,6 +1505,90 @@ namespace Moq.Tests.Regressions
 
 		#endregion
 
+		#region 430
+
+		public class Issue430
+		{
+			[Fact]
+			public void Antlers_NoSetup()
+			{
+				// Arrange
+
+				// create mock of class under test
+				var sut = new Mock<Vixen>(args: true) { CallBase = true };
+
+				// Act
+				sut.Object.Antlers = true;
+
+				// Assert
+				sut.VerifySet(x => x.Antlers = true);
+			}
+
+			[Fact]
+			public void Antlers_SetupProperty()
+			{
+				// Arrange
+
+				// create mock of class under test
+				var sut = new Mock<Vixen>(args: true) { CallBase = true };
+				sut.SetupProperty(x => x.Antlers, false);
+
+				// Act
+				sut.Object.Antlers = true;
+
+				// Assert
+				sut.VerifySet(x => x.Antlers = true);
+			}
+
+			[Fact]
+			public void Antlers_SetupSet()
+			{
+				// Arrange
+
+				// create mock of class under test
+				var sut = new Mock<Vixen>(args: true) { CallBase = true };
+				sut.SetupSet(x => x.Antlers = true);
+
+				// Act
+				sut.Object.Antlers = true;
+
+				// Assert
+				sut.VerifySet(x => x.Antlers = true);
+			}
+
+			public class Vixen
+			{
+
+				public Vixen(bool pIsMale)
+				{
+					IsMale = pIsMale;
+				}
+
+				private bool _IsMale;
+				public virtual bool IsMale
+				{
+					get { return this._IsMale; }
+					private set { this._IsMale = value; }
+				}
+
+				private bool _Antlers;
+				public virtual bool Antlers
+				{
+					get { return this._Antlers; }
+					set
+					{
+						// females cannot have antlers
+						if (IsMale)
+							this._Antlers = value;
+						else
+							this._Antlers = false;
+					}
+				}
+			}
+		}
+
+		#endregion
+
 		#region 438
 
 		public class Issue438
