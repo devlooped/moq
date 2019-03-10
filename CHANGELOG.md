@@ -36,6 +36,8 @@ This release contains several **minor breaking changes**. Please review your cod
 * `VerifySet` fails on non-trivial property setup (@TimothyHayes, #430)
 * Use of `SetupSet` 'forgets' method setup (@TimothyHayes, #432)
 * Recursive mocks don't work with argument matching (@thalesmello, #142)
+* Recursive property setup overrides previous setups (@jamesfoster, #110)
+
 
 ## 4.10.1 (2018-12-03)
 
