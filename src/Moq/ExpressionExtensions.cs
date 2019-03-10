@@ -367,11 +367,14 @@ namespace Moq
 				case ExpressionType.Extension:
 					return !(expression is MatchExpression);
 
+#pragma warning disable 618
 				case ExpressionType.Call:
-					return !((MethodCallExpression)expression).Method.IsDefined(typeof(MatcherAttribute), true);
+					return !((MethodCallExpression)expression).Method.IsDefined(typeof(MatcherAttribute), true)
+						&& !expression.IsMatch(out _);
+#pragma warning restore 618
 
 				case ExpressionType.MemberAccess:
-					return !((MemberExpression)expression).Member.IsDefined(typeof(MatcherAttribute), true);
+					return !expression.IsMatch(out _);
 
 				default:
 					return true;

@@ -31,13 +31,11 @@ namespace Moq.Tests
 			Assert.True(mock.Object.Do(5));
 		}
 
-		[Matcher]
 		public TValue Any<TValue>()
 		{
 			return Match.Create<TValue>(v => true);
 		}
 
-		[Matcher]
 		public TValue Between<TValue>(TValue from, TValue to, Range rangeKind)
 			where TValue : IComparable
 		{
@@ -92,10 +90,8 @@ namespace Moq.Tests
 
 		public class Toy
 		{
-			[Matcher]
 			public static Toy IsRed => Match.Create((Toy toy) => toy.Color == "red");
 
-			[Matcher]
 			public static Toy IsGreen() => Match.Create((Toy toy) => toy.Color == "green");
 
 			public string Color { get; set; }

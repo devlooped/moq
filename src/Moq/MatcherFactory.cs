@@ -105,26 +105,25 @@ namespace Moq
 
 			if (expression is MethodCallExpression call)
 			{
+				if (expression.IsMatch(out var match))
+				{
+					return match;
+				}
+
+#pragma warning disable 618
 				if (call.Method.IsDefined(typeof(MatcherAttribute), true))
 				{
-					if (expression.IsMatch(out var match))
-					{
-						return match;
-					}
-
 					return new MatcherAttributeMatcher(call);
 				}
+#pragma warning restore 618
 
 				return new LazyEvalMatcher(originalExpression);
 			}
 			else if (expression is MemberExpression memberAccess)
 			{
-				if (memberAccess.Member.IsDefined(typeof(MatcherAttribute), true))
+				if (expression.IsMatch(out var match))
 				{
-					if (expression.IsMatch(out var match))
-					{
-						return match;
-					}
+					return match;
 				}
 			}
 

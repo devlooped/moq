@@ -11,7 +11,6 @@ The format is loosely based on [Keep a Changelog](http://keepachangelog.com/en/1
 
 This release contains several **minor breaking changes**. Please review your code with respect to the following:
 
-* All custom argument matcher methods (including those using `Match.Create<T>`) must now be marked with the `[Matcher]` attribute. For this reason, `MatcherAttribute` is no longer marked obsolete (@stakx, #732)
 * Method overload resolution for `mock.Protected().Setup("VoidMethod", ...)`, `mock.Protected().Verify("VoidMethod", ...)` and `mock.Protected().Verify<TResult>("NonVoidMethod", ...)` may change due to a new overloads: If the first argument is a `bool`, make sure that argument gets interpreted as part of `args`, not as `exactParameterMatch` (see also *Added* section below). (@stakx & @Shereef, #751, #753)
 * `mock.Verify[All]` now performs a more thorough error aggregation. Error messages of inner/recursive mocks are included in the error message using indentation to show the relationship between mocks. (@stakx, #762)
 * `mock.Verify` no longer creates setups, nor will it override existing setups, as a side-effect of using a recursive expression. (@stakx, #765)

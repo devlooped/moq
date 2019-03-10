@@ -237,7 +237,6 @@ namespace Moq.Tests.Linq
 				Assert.Equal("foo", foo.Do(5));
 			}
 
-			[Matcher]
 			public TValue Any<TValue>()
 			{
 				return Match.Create<TValue>(v => true);

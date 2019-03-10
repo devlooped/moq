@@ -28,7 +28,6 @@ namespace Moq
 		/// Assert.Equal("Hello!", parameters.Single());
 		/// </code>
 		/// </example>
-		[Matcher]
 		public static T In<T>(ICollection<T> collection)
 		{
 			var match = new CaptureMatch<T>(collection.Add);
@@ -52,7 +51,6 @@ namespace Moq
 		/// Assert.Equal("Hello!", parameters.Single());
 		/// </code>
 		/// </example>
-		[Matcher]
 		public static T In<T>(IList<T> collection, Expression<Func<T, bool>> predicate)
 		{
 			var match = new CaptureMatch<T>(collection.Add, predicate);
@@ -75,7 +73,6 @@ namespace Moq
 		/// Assert.Equal("Hello!", capturedValue);
 		/// </code>
 		/// </example>
-		[Matcher]
 		public static T With<T>(CaptureMatch<T> match)
 		{
 			return Match.Create(match);
