@@ -15,7 +15,7 @@ using Moq.Properties;
 
 namespace Moq
 {
-	internal sealed partial class MethodCall : SetupWithOutParameterSupport, IDeterministicReturnValueSetup
+	internal sealed partial class MethodCall : SetupWithOutParameterSupport
 	{
 		private Action<object[]> afterReturnCallback;
 		private Action<object[]> callbackResponse;
@@ -123,7 +123,7 @@ namespace Moq
 			}
 		}
 
-		public bool IsReturnValueKnown(out object returnValue)
+		public override bool TryGetReturnValue(out object returnValue)
 		{
 			if (this.returnOrThrowResponse is ReturnEagerValueResponse revs)
 			{

@@ -777,10 +777,9 @@ namespace Moq
 			this.Setups.Add(new InnerMockSetup(new InvocationShape(expression, method, arguments), returnValue));
 		}
 
-		internal IEnumerable<IDeterministicReturnValueSetup> GetInnerMockSetups()
+		internal IEnumerable<Setup> GetInnerMockSetups()
 		{
-			return this.Setups.ToArrayLive(s => s is IDeterministicReturnValueSetup drvs && drvs.ReturnsInnerMock(out _))
-			                  .Cast<IDeterministicReturnValueSetup>();
+			return this.Setups.ToArrayLive(setup => setup.ReturnsInnerMock(out _));
 		}
 
 		#endregion
