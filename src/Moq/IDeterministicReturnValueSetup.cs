@@ -11,7 +11,7 @@ namespace Moq
 	/// </summary>
 	internal interface IDeterministicReturnValueSetup
 	{
-		object ReturnValue { get; }
+		bool IsReturnValueKnown(out object returnValue);
 	}
 
 	internal static class DeterministicReturnValueSetup
@@ -23,8 +23,16 @@ namespace Moq
 
 		public static bool ReturnsInnerMock(this IDeterministicReturnValueSetup setup, out Mock mock)
 		{
-			mock = (Unwrap.ResultIfCompletedTask(setup.ReturnValue) as IMocked)?.Mock;
-			return mock != null;
+			if (setup.IsReturnValueKnown(out var returnValue) && Unwrap.ResultIfCompletedTask(returnValue) is IMocked mocked)
+			{
+				mock = mocked.Mock;
+				return true;
+			}
+			else
+			{
+				mock = null;
+				return false;
+			}
 		}
 
 		public static MockException TryVerifyInnerMock(this IDeterministicReturnValueSetup setup, Func<Mock, MockException> verify)

@@ -13,11 +13,15 @@ namespace Moq
 			this.returnValue = returnValue;
 		}
 
-		public object ReturnValue => this.returnValue;
-
 		public override void Execute(Invocation invocation)
 		{
 			invocation.Return(this.returnValue);
+		}
+
+		public bool IsReturnValueKnown(out object returnValue)
+		{
+			returnValue = this.returnValue;
+			return true;
 		}
 
 		public override MockException TryVerify()

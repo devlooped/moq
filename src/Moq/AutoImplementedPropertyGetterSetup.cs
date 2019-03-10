@@ -22,11 +22,15 @@ namespace Moq
 			this.getter = getter;
 		}
 
-		public object ReturnValue => this.getter.Invoke();
-
 		public override void Execute(Invocation invocation)
 		{
 			invocation.Return(this.getter.Invoke());
+		}
+
+		public bool IsReturnValueKnown(out object returnValue)
+		{
+			returnValue = this.getter.Invoke();
+			return true;
 		}
 
 		public override MockException TryVerify()
