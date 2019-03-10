@@ -60,7 +60,7 @@ namespace Moq
 				// This is not valid as generic types 
 				// do not support covariance on 
 				// the generic parameters.
-				var imockedType = mocked.GetType().GetTypeInfo().ImplementedInterfaces.Single(i => i.Name.Equals("IMocked`1", StringComparison.Ordinal));
+				var imockedType = mocked.GetType().GetInterfaces().Single(i => i.Name.Equals("IMocked`1", StringComparison.Ordinal));
 				var mockedType = imockedType.GetGenericArguments()[0];
 				var types = string.Join(
 					", ",
@@ -664,7 +664,7 @@ namespace Moq
 		{
 			var interfaceType = typeof(TInterface);
 
-			if (!interfaceType.GetTypeInfo().IsInterface)
+			if (!interfaceType.IsInterface)
 			{
 				throw new ArgumentException(Resources.AsMustBeInterface);
 			}

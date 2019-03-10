@@ -111,7 +111,7 @@ namespace Moq
 			{
 				stringBuilder.AppendNameOf(obj.GetType());
 			}
-			else if (obj.GetType().GetTypeInfo().IsEnum)
+			else if (obj.GetType().IsEnum)
 			{
 				stringBuilder.AppendNameOf(obj.GetType()).Append('.').Append(obj);
 			}

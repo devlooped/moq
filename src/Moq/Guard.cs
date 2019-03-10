@@ -153,7 +153,7 @@ namespace Moq
 		{
 			if (!targetType.IsAssignableFrom(typeToAssign))
 			{
-				if (targetType.GetTypeInfo().IsInterface)
+				if (targetType.IsInterface)
 				{
 					throw new ArgumentException(string.Format(
 						CultureInfo.CurrentCulture,

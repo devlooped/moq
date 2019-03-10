@@ -50,7 +50,7 @@ namespace Moq
 						if (member.Name == nameof(It.Ref<object>.IsAny))
 						{
 							var memberDeclaringType = member.DeclaringType;
-							if (memberDeclaringType.GetTypeInfo().IsGenericType)
+							if (memberDeclaringType.IsGenericType)
 							{
 								var memberDeclaringTypeDefinition = memberDeclaringType.GetGenericTypeDefinition();
 								if (memberDeclaringTypeDefinition == typeof(It.Ref<>))
