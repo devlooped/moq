@@ -377,13 +377,6 @@ namespace Moq
 
 			var part = parts.Pop(out var remainingParts);
 
-			// The usual delegate method to delegate interface proxy method transform:
-			if (mock.IsDelegateMock)
-			{
-				_ = ProxyFactory.Instance.GetDelegateProxyInterface(mock.TargetType, out var method);
-				part = new InvocationShape(part.Expression, method, part.Arguments);
-			}
-
 			var count = 0;
 			foreach (var matchingInvocation in mock.MutableInvocations.ToArray().Where(part.IsMatch))
 			{
@@ -478,15 +471,6 @@ namespace Moq
 		{
 			var part = parts.Pop();
 			var (expr, method, arguments) = part;
-
-			if (mock.IsDelegateMock)
-			{
-				// The expression we have is for a call on the delegate, not our
-				// delegate interface proxy, so we need to map instead to the
-				// method on that interface.
-				_ = ProxyFactory.Instance.GetDelegateProxyInterface(mock.TargetType, out method);
-				part = new InvocationShape(expr, method, arguments);
-			}
 
 			if (parts.Count == 0)
 			{

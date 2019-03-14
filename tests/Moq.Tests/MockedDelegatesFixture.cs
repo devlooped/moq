@@ -80,14 +80,6 @@ namespace Moq.Tests
 		[Fact]
 		public void DelegateInterfacesAreReused()
 		{
-			// White box test: we want to ensure that we're not creating new proxy interfaces
-			// every time we come across a particular delegate type.
-			var interface1 = ProxyFactory.Instance.GetDelegateProxyInterface(typeof(PropertyChangedEventHandler), out var interfaceMethod1);
-			var interface2 = ProxyFactory.Instance.GetDelegateProxyInterface(typeof(PropertyChangedEventHandler), out var interfaceMethod2);
-			Assert.Same(interface1, interface2);
-			Assert.Same(interfaceMethod1, interfaceMethod2);
-
-			// Specifically,
 			// it's good if multiple mocks for the same delegate (interface) both
 			// consider themselves to be proxying for the same method.
 			var mock1 = new Mock<PropertyChangedEventHandler>();
