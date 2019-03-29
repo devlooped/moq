@@ -51,6 +51,12 @@ namespace Moq
 			return Expression.Call(It.isAnyMethod.MakeGenericMethod(genericArgument));
 		}
 
+		/// <include file='It.xdoc' path='docs/doc[@for="It.Ignore"]/*'/>
+		public static TValue Ignore<TValue>()
+		{
+			return Match<TValue>.Create<TValue>(null, () => It.Ignore<TValue>());
+		}
+
 		/// <include file='It.xdoc' path='docs/doc[@for="It.IsNotNull"]/*'/>
 		public static TValue IsNotNull<TValue>()
 		{

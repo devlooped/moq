@@ -32,6 +32,14 @@ namespace Moq
 
 		public static IMatcher CreateMatcher(Expression argument, ParameterInfo parameter)
 		{
+			if (argument is MethodCallExpression methodCallExpression)
+			{
+				if (methodCallExpression.Method.Name == nameof(It.Ignore))
+				{
+					return AnyMatcher.Instance;
+				}
+			}
+
 			if (parameter.ParameterType.IsByRef)
 			{
 				if ((parameter.Attributes & (ParameterAttributes.In | ParameterAttributes.Out)) == ParameterAttributes.Out)

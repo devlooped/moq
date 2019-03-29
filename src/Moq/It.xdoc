@@ -28,6 +28,22 @@
 		</example>
 		<typeparam name="TValue">Type of the value.</typeparam>
 	</doc>
+	<doc for="It.Ignore">
+		<summary>
+			Ignores any type or value.
+		</summary>
+		<remarks>
+			Typically used when the actual argument type for the method is 
+			internal or private.
+		</remarks>
+		<example>
+			<code>
+				// Verifies that a call to the logger was made for severity Warning, regardless of the actual log formatter.
+				mock.Verify(x => x.Log(LogLevel.Warning, It.IsAny&lt;EventId&gt;(), It.IsAny&lt;object&gt;(), It.IsAny&lt;Exception&gt;(), It.Ignore&lt;Func&lt;object, Exception, string&gt;&gt;()));
+			</code>
+		</example>
+		<typeparam name="TValue">Type of the value.</typeparam>
+	</doc>
 	<doc for="It.IsNotNull">
 		<summary>
 			Matches any value of the given <typeparamref name="TValue"/> type, except null.
