@@ -40,10 +40,15 @@ namespace Moq
 
 			this.Expression = expression;
 			this.Method = method;
-			this.Arguments = arguments ?? noArguments;
-
-			this.argumentMatchers = arguments != null ? MatcherFactory.CreateMatchers(arguments, method.GetParameters())
-			                                          : noArgumentMatchers;
+			if (arguments != null)
+			{
+				(this.argumentMatchers, this.Arguments) = MatcherFactory.CreateMatchers(arguments, method.GetParameters());
+			}
+			else
+			{
+				this.argumentMatchers = noArgumentMatchers;
+				this.Arguments = noArguments;
+			}
 		}
 
 		public void Deconstruct(out LambdaExpression expression, out MethodInfo method, out IReadOnlyList<Expression> arguments)

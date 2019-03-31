@@ -16,7 +16,7 @@ namespace Moq.Matchers
 			if (expression != null)
 			{
 				this.matchers = expression.Expressions
-					.Select(e => MatcherFactory.CreateMatcher(e)).ToArray();
+					.Select(e => MatcherFactory.CreateMatcher(e).Item1).ToArray();
 			}
 			else
 			{
