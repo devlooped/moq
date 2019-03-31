@@ -2339,6 +2339,38 @@ namespace Moq.Tests.Regressions
 
 		#endregion
 
+		#region 711
+
+		public class Issue711
+		{
+			[Fact]
+			public void Argument_expression_does_not_get_reevaluated_by_VerifyAll()
+			{
+				int? x = 1;
+				var mock = new Mock<Action<int?>>();
+				mock.Setup(m => m(x.Value));
+				mock.Object(1);
+				x = null; // if the argument expression `x.Value` got reevaluated by VerifyAll,
+				          // we'd expect to see a `NullReferenceException`.
+				mock.VerifyAll();
+			}
+
+			[Fact]
+			public void Argument_expression_of_overriding_setup_does_not_get_reevaluated_by_VerifyAll()
+			{
+				int? x = 1;
+				var mock = new Mock<Action<int?>>();
+				mock.Setup(m => m(1));  // only difference to the above test, and one would
+				                        // think that this won't change anything.
+				mock.Setup(m => m(x.Value));
+				mock.Object(1);
+				x = null;
+				mock.VerifyAll();
+			}
+		}
+
+		#endregion
+
 		#region 725
 
 		public sealed class Issue725
