@@ -2411,6 +2411,21 @@ namespace Moq.Tests.Regressions
 
 		#endregion
 
+		#region 791
+
+		public class Issue791
+		{
+			[Fact]
+			public void ConstantMatcher_does_not_cause_infinite_recursion_when_matching_against_mock_object()
+			{
+				var mock = new Mock<object>();
+				mock.Setup(m => m.Equals(mock.Object)).Returns(true);
+				mock.Object.Equals(new object());
+			}
+		}
+
+		#endregion
+
 		// Old @ Google Code
 
 		#region #47
