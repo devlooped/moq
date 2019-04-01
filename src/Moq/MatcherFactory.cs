@@ -71,9 +71,23 @@ namespace Moq
 					return new Pair<IMatcher, Expression>(new RefMatcher(constant.Value), constant);
 				}
 			}
-			else if (parameter.IsDefined(typeof(ParamArrayAttribute), true) && (argument.NodeType == ExpressionType.NewArrayInit || !argument.Type.IsArray))
+			else if (parameter.IsDefined(typeof(ParamArrayAttribute), true) && argument.NodeType == ExpressionType.NewArrayInit)
 			{
-				return new Pair<IMatcher, Expression>(new ParamArrayMatcher((NewArrayExpression)argument), argument);
+				var newArrayExpression = (NewArrayExpression)argument;
+
+				Debug.Assert(newArrayExpression.Type.IsArray);
+				var elementType = newArrayExpression.Type.GetElementType();
+
+				var n = newArrayExpression.Expressions.Count;
+				var matchers = new IMatcher[n];
+				var initializers = new Expression[n];
+
+				for (int i = 0; i < n; ++i)
+				{
+					(matchers[i], initializers[i]) = MatcherFactory.CreateMatcher(newArrayExpression.Expressions[i]);
+					initializers[i] = initializers[i].ConvertIfNeeded(elementType);
+				}
+				return new Pair<IMatcher, Expression>(new ParamArrayMatcher(matchers), Expression.NewArrayInit(elementType, initializers));
 			}
 			else
 			{
