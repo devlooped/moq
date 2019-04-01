@@ -43,6 +43,7 @@ This release contains several **minor breaking changes**. Please review your cod
 * Recursive mocks don't work with argument matching (@thalesmello, #142)
 * Recursive property setup overrides previous setups (@jamesfoster, #110)
 * Formatting of enumerable object for error message broke EF Core test case (@MichaelSagalovich, #741)
+* `Verify[All]` fails because of lazy (instead of eager) setup argument expression evaluation (@aeslinger, #711)
 
 
 ## 4.10.1 (2018-12-03)

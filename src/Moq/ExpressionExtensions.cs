@@ -17,6 +17,38 @@ namespace Moq
 {
 	internal static partial class ExpressionExtensions
 	{
+		/// <summary>
+		///   Wraps this <paramref name="expression"/> in a <see cref="ExpressionType.Convert"/> node if needed.
+		/// </summary>
+		/// <param name="expression">The <see cref="Expression"/> which should be wrapped.</param>
+		/// <param name="type">The <see cref="Type"/> with which to make the <paramref name="expression"/> compatible.</param>
+		/// <remarks>
+		///   LINQ expression trees generally enforce type compatibility rules that are stricter than
+		///   the assignment-compatibility used by e.g. <see cref="Type.IsAssignableFrom(Type)"/>. For
+		///   example, while <see langword="int"/> is assignable-to <see langword="object"/>, you
+		///   will need a conversion in a LINQ expression tree to model the value-type boxing operation.
+		/// </remarks>
+		internal static Expression ConvertIfNeeded(this Expression expression, Type type)
+		{
+			if (expression.Type == type)
+			{
+				// if source and target types match exactly,
+				// no conversion is necessary:
+				return expression;
+			}
+			if (!expression.Type.IsValueType && !type.IsValueType && type.IsAssignableFrom(expression.Type))
+			{
+				// if source and target types are reference types and assignment-compatible,
+				// no conversion is necessary:
+				return expression;
+			}
+			else
+			{
+				// everything else requires a conversion:
+				return Expression.Convert(expression, type);
+			}
+		}
+
 		internal static Delegate CompileUsingExpressionCompiler(this LambdaExpression expression)
 		{
 			// Expression trees are not compiled directly.

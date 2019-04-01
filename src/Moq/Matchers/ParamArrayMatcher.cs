@@ -2,8 +2,7 @@
 // All rights reserved. Licensed under the BSD 3-Clause License; see License.txt.
 
 using System;
-using System.Linq;
-using System.Linq.Expressions;
+using System.Diagnostics;
 
 namespace Moq.Matchers
 {
@@ -11,17 +10,11 @@ namespace Moq.Matchers
 	{
 		private IMatcher[] matchers;
 
-		public ParamArrayMatcher(NewArrayExpression expression)
+		public ParamArrayMatcher(IMatcher[] matchers)
 		{
-			if (expression != null)
-			{
-				this.matchers = expression.Expressions
-					.Select(e => MatcherFactory.CreateMatcher(e)).ToArray();
-			}
-			else
-			{
-				this.matchers = new IMatcher[0];
-			}
+			Debug.Assert(matchers != null);
+
+			this.matchers = matchers;
 		}
 
 		public bool Matches(object value)
