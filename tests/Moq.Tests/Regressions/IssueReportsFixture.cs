@@ -2371,6 +2371,31 @@ namespace Moq.Tests.Regressions
 
 		#endregion
 
+		#region 714
+
+		public class Issue714
+		{
+			[Fact]
+			public void Setup_argument_using_indexer_should_be_evaluated_eagerly()
+			{
+				Mock<IMockable> mock = new Mock<IMockable>();
+				var args = new List<object> { new object() };
+				for (var i = 0; i < args.Count; i++)
+				{
+					mock.Setup(m => m.Method(args[i]));
+				}
+
+				mock.Object.Method(args[0]);
+			}
+
+			public interface IMockable
+			{
+				void Method(object arg);
+			}
+		}
+
+		#endregion
+
 		#region 725
 
 		public sealed class Issue725
