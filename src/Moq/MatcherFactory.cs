@@ -132,9 +132,13 @@ namespace Moq
 				}
 #pragma warning restore 618
 
-				return new Pair<IMatcher, Expression>(new LazyEvalMatcher(originalExpression), originalExpression);
+				var method = call.Method;
+				if (!method.IsPropertyGetter() && !method.IsPropertyIndexerGetter())
+				{
+					return new Pair<IMatcher, Expression>(new LazyEvalMatcher(originalExpression), originalExpression);
+				}
 			}
-			else if (expression is MemberExpression memberAccess)
+			else if (expression is MemberExpression || expression is IndexExpression)
 			{
 				if (expression.IsMatch(out var match))
 				{
