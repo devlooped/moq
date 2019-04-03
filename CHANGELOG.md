@@ -16,6 +16,7 @@ This release contains several **minor breaking changes**. Please review your cod
 * `mock.Verify` no longer creates setups, nor will it override existing setups, as a side-effect of using a recursive expression. (@stakx, #765)
 * More accurate detection of argument matchers with `SetupSet` and `VerifySet`, especially when used in fluent setup expressions or with indexers (@stakx, #767)
 * `mock.Verify(expression)` error messages now contain a full listing of all invocations that occurred across all involved mocks. Setups are no longer listed, since they are completely irrelevant in the context of call verification. (@stakx, #779, #780)
+* Indexers used as arguments in setup expressions are now eagerly evaluated, like all other properties already are (except when they refer to matchers) (@stakx, #794)
 
 #### Added
 
@@ -44,6 +45,7 @@ This release contains several **minor breaking changes**. Please review your cod
 * Recursive property setup overrides previous setups (@jamesfoster, #110)
 * Formatting of enumerable object for error message broke EF Core test case (@MichaelSagalovich, #741)
 * `Verify[All]` fails because of lazy (instead of eager) setup argument expression evaluation (@aeslinger, #711)
+* `ArgumentOutOfRangeException` when setup expression contains indexer access (@mosentok, #714)
 
 
 ## 4.10.1 (2018-12-03)
