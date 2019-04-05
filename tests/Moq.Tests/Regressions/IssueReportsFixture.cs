@@ -2204,8 +2204,8 @@ namespace Moq.Tests.Regressions
 				_ = Mock.Of<IStructByValueConsumer>();
 			}
 
-			// Moq performs its own System.Reflection.Emit-ting for mocking delegate types,
-			// so add some tests that target that:
+			// Moq used to perform its own System.Reflection.Emit-ting for mocking delegate types,
+			// and the following tests were added to target that logic. It can't hurt to keep them around.
 
 			public delegate void StructByValueDelegate(Struct message);
 

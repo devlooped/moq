@@ -209,32 +209,11 @@ namespace Moq
 			interfaces[0] = typeof(IMocked<T>);
 			this.AdditionalInterfaces.CopyTo(0, interfaces, 1, additionalInterfaceCount);
 
-			if (this.IsDelegateMock)
-			{
-				// We're mocking a delegate.
-				// Firstly, get/create an interface with a method whose signature
-				// matches that of the delegate.
-				var delegateInterfaceType = ProxyFactory.Instance.GetDelegateProxyInterface(typeof(T), out var delegateInterfaceMethod);
-
-				// Then create a proxy for that.
-				var delegateProxy = ProxyFactory.Instance.CreateProxy(
-					delegateInterfaceType,
-					this,
-					interfaces,
-					this.constructorArguments);
-
-				// Then our instance is a delegate of the desired type, pointing at the
-				// appropriate method on that proxied interface instance.
-				this.instance = (T)(object)delegateInterfaceMethod.CreateDelegate(typeof(T), delegateProxy);
-			}
-			else
-			{
-				this.instance = (T)ProxyFactory.Instance.CreateProxy(
-					typeof(T),
-					this,
-					interfaces,
-					this.constructorArguments);
-			}
+			this.instance = (T)ProxyFactory.Instance.CreateProxy(
+				typeof(T),
+				this,
+				interfaces,
+				this.constructorArguments);
 		}
 
 		/// <summary>
