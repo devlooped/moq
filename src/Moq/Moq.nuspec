@@ -19,7 +19,6 @@
 			</group>
 			<group targetFramework=".NETStandard2.0">
 				<dependency id="Castle.Core" version="4.4.0" />
-				<dependency id="System.Reflection.Emit" version="4.3.0" />
 				<dependency id="System.Threading.Tasks.Extensions" version="4.5.1" />
 			</group>
 		</dependencies>

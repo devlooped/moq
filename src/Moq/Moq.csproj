@@ -46,9 +46,6 @@
 		<Reference Include="System.Core" />
 		<Reference Include="System.Xml" />
 	</ItemGroup>
-	<ItemGroup Condition=" '$(TargetFramework)' == 'netstandard2.0' ">
-		<PackageReference Include="System.Reflection.Emit" Version="4.3.0" />
-	</ItemGroup>
 
 	<ItemGroup>
 		<EmbeddedResource Update="Properties\Resources.resx">
