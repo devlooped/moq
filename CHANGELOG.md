@@ -17,6 +17,7 @@ This release contains several **minor breaking changes**. Please review your cod
 * More accurate detection of argument matchers with `SetupSet` and `VerifySet`, especially when used in fluent setup expressions or with indexers (@stakx, #767)
 * `mock.Verify(expression)` error messages now contain a full listing of all invocations that occurred across all involved mocks. Setups are no longer listed, since they are completely irrelevant in the context of call verification. (@stakx, #779, #780)
 * Indexers used as arguments in setup expressions are now eagerly evaluated, like all other properties already are (except when they refer to matchers) (@stakx, #794)
+* Update package reference to `Castle.Core` (DynamicProxy) from version 4.3.1 to 4.4.0 (@stakx, #797)
 
 #### Added
 
