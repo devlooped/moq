@@ -62,6 +62,7 @@
     "markdownEngineName": "markdig",
     "noLangKeyword": false,
     "keepFileLink": false,
+    "xrefService": [ "https://xref.docs.microsoft.com/query?uid={uid}" ],
     "cleanupCacheHistory": false,
     "disableGitFeatures": false
   }
