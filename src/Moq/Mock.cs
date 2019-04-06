@@ -171,8 +171,6 @@ namespace Moq
 		/// </summary>
 		internal abstract Type MockedType { get; }
 
-		internal bool IsDelegateMock => this.TargetType.IsDelegate();
-
 		/// <summary>
 		/// Gets or sets the <see cref="DefaultValueProvider"/> instance that will be used
 		/// e. g. to produce default return values for unexpected invocations.
