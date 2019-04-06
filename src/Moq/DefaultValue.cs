@@ -34,9 +34,9 @@ namespace Moq
 		///     are represented by this enumeration value.
 		///   </para>
 		///   <para>
-		///     Do not set <see cref="Mock.DefaultValue"/> (nor <see cref="MockFactory.DefaultValue"/>) to this value.
+		///     Do not set <see cref="Mock.DefaultValue"/> (nor <see cref="MockRepository.DefaultValue"/>) to this value.
 		///     If you want to set up a custom default value generation strategy, set <see cref="Mock.DefaultValueProvider"/>
-		///     or <see cref="MockFactory.DefaultValueProvider"/> instead.
+		///     or <see cref="MockRepository.DefaultValueProvider"/> instead.
 		///   </para>
 		/// </summary>
 		/// <remarks>
