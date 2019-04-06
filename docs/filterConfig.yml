@@ -1,0 +1,41 @@
+apiRules:
+
+# Object members are well-known and don't need to be repeated everywhere:
+- exclude:
+    uidRegex: ^System\.Object\.
+    type: Method
+
+# The whole point of IFluentInterface is to hide object members:
+- exclude:
+    uidRegex: ^Moq\.IFluentInterface$
+    type: Type
+- exclude:
+    uidRegex: ^Moq\.IFluentInterface\.
+    type: Method
+
+# These namespaces contain public members that users shouldn't
+# need to know about:
+- exclude:
+    uidRegex: ^Moq\.Internals(\..+)?$
+    type: Namespace
+- exclude:
+    uidRegex: ^Moq\.Language(\..+)?$
+    type: Namespace
+
+# TODO: This will need to be changed, but while getting documentation
+# into shape, it is useful to see all existing public members:
+- include:
+    hasAttribute:
+      uid: System.ComponentModel.EditorBrowsableAttribute
+      ctorArguments:
+      - System.ComponentModel.EditorBrowsableState.Never
+
+attributeRules:
+
+# Having these custom attributes displayed seems useful:
+- include:
+    uid: System.ComponentModel.EditorBrowsableAttribute
+    type: Type
+- include:
+    uid: System.ObsoleteAttribute
+    type: Type
