@@ -14,7 +14,7 @@ namespace Moq.Tests
 		[Fact]
 		public void ThrowsIfNullMock()
 		{
-			Assert.Throws<ArgumentNullException>(() => ProtectedExtension.Protected((Mock<string>)null));
+			Assert.Throws<ArgumentNullException>(() => ((Mock<string>)null).Protected());
 		}
 
 		[Fact]

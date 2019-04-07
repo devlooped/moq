@@ -12,7 +12,7 @@ namespace Moq.Protected
 	/// due to their visibility.
 	/// </summary>
 	[EditorBrowsable(EditorBrowsableState.Never)]
-	public static class ProtectedExtension
+	public static class MockExtensions
 	{
 		/// <summary>
 		/// Enable protected setups for the mock.

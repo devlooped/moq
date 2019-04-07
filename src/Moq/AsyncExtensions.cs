@@ -11,10 +11,10 @@ using Moq.Properties;
 namespace Moq
 {
 	/// <summary>
-	/// Defines async extension methods on IReturns.
+	/// Defines async setup extension methods.
 	/// </summary>
 	[EditorBrowsable(EditorBrowsableState.Never)]
-	public static partial class ReturnsExtensions
+	public static partial class AsyncExtensions
 	{
 		/// <summary>
 		/// Specifies the value to return from an asynchronous method.
@@ -62,6 +62,22 @@ namespace Moq
 		public static IReturnsResult<TMock> ReturnsAsync<TMock, TResult>(this IReturns<TMock, ValueTask<TResult>> mock, Func<TResult> valueFunction) where TMock : class
 		{
 			return mock.Returns(() => new ValueTask<TResult>(valueFunction()));
+		}
+
+		/// <summary>
+		/// Return a sequence of tasks, once per call.
+		/// </summary>
+		public static ISetupSequentialResult<Task<TResult>> ReturnsAsync<TResult>(this ISetupSequentialResult<Task<TResult>> setup, TResult value)
+		{
+			return setup.Returns(() => Task.FromResult(value));
+		}
+
+		/// <summary>
+		/// Return a sequence of tasks, once per call.
+		/// </summary>
+		public static ISetupSequentialResult<ValueTask<TResult>> ReturnsAsync<TResult>(this ISetupSequentialResult<ValueTask<TResult>> setup, TResult value)
+		{
+			return setup.Returns(() => new ValueTask<TResult>(value));
 		}
 
 		/// <summary>
@@ -254,6 +270,32 @@ namespace Moq
 			var delay = GetDelay(minDelay, maxDelay, random);
 
 			return DelayedException(mock, exception, delay);
+		}
+
+		/// <summary>
+		/// Throws a sequence of exceptions, once per call.
+		/// </summary>
+		public static ISetupSequentialResult<Task<TResult>> ThrowsAsync<TResult>(this ISetupSequentialResult<Task<TResult>> setup, Exception exception)
+		{
+			return setup.Returns(() =>
+			{
+				var tcs = new TaskCompletionSource<TResult>();
+				tcs.SetException(exception);
+				return tcs.Task;
+			});
+		}
+
+		/// <summary>
+		/// Throws a sequence of exceptions, once per call.
+		/// </summary>
+		public static ISetupSequentialResult<ValueTask<TResult>> ThrowsAsync<TResult>(this ISetupSequentialResult<ValueTask<TResult>> setup, Exception exception)
+		{
+			return setup.Returns(() =>
+			{
+				var tcs = new TaskCompletionSource<TResult>();
+				tcs.SetException(exception);
+				return new ValueTask<TResult>(tcs.Task);
+			});
 		}
 
 		private static TimeSpan GetDelay(TimeSpan minDelay, TimeSpan maxDelay, Random random)

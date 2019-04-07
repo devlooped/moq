@@ -2,7 +2,6 @@
 // All rights reserved. Licensed under the BSD 3-Clause License; see License.txt.
 
 using System;
-using System.ComponentModel;
 using System.Threading.Tasks;
 
 using Moq.Language;
@@ -10,11 +9,7 @@ using Moq.Language.Flow;
 
 namespace Moq
 {
-	/// <summary>
-	/// Defines async extension methods on IReturns.
-	/// </summary>
-	[EditorBrowsable(EditorBrowsableState.Never)]
-	public static class GeneratedReturnsExtensions
+	public static partial class AsyncExtensions
 	{
 		/// <summary>
 		/// Specifies a function that will calculate the value to return from the asynchronous method.
