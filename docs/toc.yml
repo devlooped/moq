@@ -1,3 +1,5 @@
+- name: Quickstart
+  href: quickstart.md
 - name: Articles
   href: articles/
 - name: Api Documentation
