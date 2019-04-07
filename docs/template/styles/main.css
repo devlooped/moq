@@ -1,0 +1,7 @@
+.navbar-brand > img#logo {
+  height: 50px;
+}
+
+.navbar.navbar-inverse {
+  background-color: #1e1916;
+}

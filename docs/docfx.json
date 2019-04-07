@@ -54,10 +54,15 @@
       }
     ],
     "dest": "_site",
+    "globalMetadata": {
+      "_appLogoPath": "images/logo.png",
+      "_appName": "Moq"
+    },
     "globalMetadataFiles": [],
     "fileMetadataFiles": [],
     "template": [
-      "default"
+      "default",
+      "template"
     ],
     "postProcessors": [],
     "markdownEngineName": "markdig",
