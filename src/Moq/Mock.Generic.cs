@@ -140,10 +140,10 @@ namespace Moq
 
 #region Properties
 
-		/// <include file='Mock.xdoc' path='docs/doc[@for="Mock.Behavior"]/*'/>
+		/// <inheritdoc/>
 		public override MockBehavior Behavior => this.behavior;
 
-		/// <include file='Mock.xdoc' path='docs/doc[@for="Mock.CallBase"]/*'/>
+		/// <inheritdoc/>
 		public override bool CallBase
 		{
 			get => this.callBase;

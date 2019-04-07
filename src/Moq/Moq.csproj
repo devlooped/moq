@@ -116,10 +116,6 @@
 			<SubType>Designer</SubType>
 		</None>
 
-		<None Update="Mock.xdoc">
-			<DependentUpon>Mock.cs</DependentUpon>
-		</None>
-
 		<None Update="Times.xdoc">
 			<DependentUpon>Times.cs</DependentUpon>
 		</None>

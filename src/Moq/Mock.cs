@@ -14,18 +14,35 @@ using Moq.Properties;
 
 namespace Moq
 {
-	/// <include file='Mock.xdoc' path='docs/doc[@for="Mock"]/*'/>
+	/// <summary>
+	///   Base class for mocks and static helper class with methods that
+	///   apply to mocked objects, such as <see cref = "Get" /> to
+	///   retrieve a <see cref="Mock{T}"/> from an object instance.
+	/// </summary>
 	public abstract partial class Mock : IFluentInterface
 	{
 		internal static readonly MethodInfo GetMethod =
 			typeof(Mock).GetMethod(nameof(Get), BindingFlags.Public | BindingFlags.Static);
 
-		/// <include file='Mock.xdoc' path='docs/doc[@for="Mock.ctor"]/*'/>
+		/// <summary>
+		///   Initializes a new instance of the <see cref="Mock"/> class.
+		/// </summary>
 		protected Mock()
 		{
 		}
 
-		/// <include file='Mock.xdoc' path='docs/doc[@for="Mock.Get"]/*'/>
+		/// <summary>
+		///   Retrieves the mock object for the given object instance.
+		/// </summary>
+		/// <typeparam name="T">
+		///   Type of the mock to retrieve. Can be omitted as it's inferred from the
+		///   object instance passed in as the <paramref name="mocked"/> instance.
+		/// </typeparam>
+		/// <param name="mocked">The instance of the mocked object.</param>
+		/// <returns>The mock associated with the mocked object.</returns>
+		/// <exception cref="ArgumentException">
+		///   The received <paramref name="mocked"/> instance was not created by Moq.
+		/// </exception>
 		public static Mock<T> Get<T>(T mocked) where T : class
 		{
 			var mockedOfT = mocked as IMocked<T>;
@@ -81,7 +98,10 @@ namespace Moq
 			throw new ArgumentException(Resources.ObjectInstanceNotMock, "mocked");
 		}
 
-		/// <include file='Mock.xdoc' path='docs/doc[@for="Mock.Verify"]/*'/>
+		/// <summary>
+		///   Verifies that all verifiable expectations on the specified mocks have been met.
+		/// </summary>
+		/// <exception cref="MockException">Not all verifiable expectations were met.</exception>
 		public static void Verify(params Mock[] mocks)
 		{
 			foreach (var mock in mocks)
@@ -90,7 +110,11 @@ namespace Moq
 			}
 		}
 
-		/// <include file='Mock.xdoc' path='docs/doc[@for="Mock.VerifyAll"]/*'/>
+		/// <summary>
+		///   Verifies all expectations on the specified mocks,
+		///   regardless of whether they have been flagged as verifiable.
+		/// </summary>
+		/// <exception cref="MockException">At least one expectation was not met.</exception>
 		public static void VerifyAll(params Mock[] mocks)
 		{
 			foreach (var mock in mocks)
@@ -107,15 +131,22 @@ namespace Moq
 		/// </remarks>
 		internal abstract List<Type> AdditionalInterfaces { get; }
 
-		/// <include file='Mock.xdoc' path='docs/doc[@for="Mock.Behavior"]/*'/>
+		/// <summary>
+		///   Behavior of the mock, according to the value set in the constructor.
+		/// </summary>
 		public abstract MockBehavior Behavior { get; }
 
-		/// <include file='Mock.xdoc' path='docs/doc[@for="Mock.CallBase"]/*'/>
+		/// <summary>
+		///   Whether the base member virtual implementation will be called for mocked classes
+		///   if no setup is matched. Defaults to <see langword="false"/>.
+		/// </summary>
 		public abstract bool CallBase { get; set; }
 
 		internal abstract object[] ConstructorArguments { get; }
 
-		/// <include file='Mock.xdoc' path='docs/doc[@for="Mock.DefaultValue"]/*'/>
+		/// <summary>
+		///   Specifies the behavior to use when returning default values for unexpected invocations on loose mocks.
+		/// </summary>
 		public DefaultValue DefaultValue
 		{
 			get
@@ -142,7 +173,9 @@ namespace Moq
 
 		internal abstract EventHandlerCollection EventHandlers { get; }
 
-		/// <include file='Mock.xdoc' path='docs/doc[@for="Mock.Object"]/*'/>
+		/// <summary>
+		///   Gets the mocked object instance.
+		/// </summary>
 		[SuppressMessage("Microsoft.Naming", "CA1716:IdentifiersShouldNotMatchKeywords", MessageId = "Object", Justification = "Exposes the mocked object instance, so it's appropriate.")]
 		[SuppressMessage("Microsoft.Naming", "CA1721:PropertyNamesShouldNotMatchGetMethods", Justification = "The public Object property is the only one visible to Moq consumers. The protected member is for internal use only.")]
 		public object Object => this.OnGetObject();
@@ -161,7 +194,10 @@ namespace Moq
 
 		internal abstract InvocationCollection MutableInvocations { get; }
 
-		/// <include file='Mock.xdoc' path='docs/doc[@for="Mock.OnGetObject"]/*'/>
+		/// <summary>
+		///   Returns the mocked object value.
+		/// </summary>
+		/// <returns></returns>
 		[SuppressMessage("Microsoft.Design", "CA1024:UsePropertiesWhereAppropriate", Justification = "This is actually the protected virtual implementation of the property Object.")]
 		protected abstract object OnGetObject();
 
@@ -189,7 +225,10 @@ namespace Moq
 
 		#region Verify
 
-		/// <include file='Mock.xdoc' path='docs/doc[@for="Mock.Verify"]/*'/>
+		/// <summary>
+		///   Verifies that all verifiable expectations have been met.
+		/// </summary>
+		/// <exception cref="MockException">Not all verifiable expectations were met.</exception>
 		public void Verify()
 		{
 			var error = this.TryVerify();
@@ -199,7 +238,10 @@ namespace Moq
 			}
 		}
 
-		/// <include file='Mock.xdoc' path='docs/doc[@for="Mock.VerifyAll"]/*'/>
+		/// <summary>
+		///   Verifies all expectations regardless of whether they have been flagged as verifiable.
+		/// </summary>
+		/// <exception cref="MockException">At least one expectation was not met.</exception>
 		public void VerifyAll()
 		{
 			var error = this.TryVerifyAll();
@@ -637,7 +679,24 @@ namespace Moq
 
 		#region As<TInterface>
 
-		/// <include file='Mock.xdoc' path='docs/doc[@for="Mock.As{TInterface}"]/*'/>
+		/// <summary>
+		///   Adds an interface implementation to the mock, allowing setups to be specified for it.
+		/// </summary>
+		/// <typeparam name="TInterface">Type of interface to cast the mock to.</typeparam>
+		/// <remarks>
+		///   This method can only be called before the first use of the mock <see cref="Object"/> property,
+		///   at which point the runtime type has already been generated and no more interfaces can be added to it.
+		///   <para>
+		///     Also, <typeparamref name="TInterface"/> must be an interface and not a class,
+		///     which must be specified when creating the mock instead.
+		///   </para>
+		/// </remarks>
+		/// <exception cref="InvalidOperationException">
+		///   The mock type has already been generated by accessing the <see cref="Object"/> property.
+		/// </exception>
+		/// <exception cref="ArgumentException">
+		///   The <typeparamref name="TInterface"/> specified is not an interface.
+		/// </exception>
 		[SuppressMessage("Microsoft.Naming", "CA1716:IdentifiersShouldNotMatchKeywords", MessageId = "As", Justification = "We want the method called exactly as the keyword because that's what it does, it adds an implemented interface so that you can cast it later.")]
 		public virtual Mock<TInterface> As<TInterface>()
 			where TInterface : class
