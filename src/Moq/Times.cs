@@ -7,7 +7,9 @@ using Moq.Properties;
 
 namespace Moq
 {
-	/// <include file='Times.xdoc' path='docs/doc[@for="Times"]/*'/>
+	/// <summary>
+	///   Defines the number of invocations allowed by a mocked method.
+	/// </summary>
 	public struct Times
 	{
 		private Func<int, bool> evaluator;
@@ -23,7 +25,11 @@ namespace Moq
 			this.messageFormat = messageFormat;
 		}
 
-		/// <include file='Times.xdoc' path='docs/doc[@for="Times.AtLeast"]/*'/>
+		/// <summary>
+		///   Specifies that a mocked method should be invoked <paramref name="callCount"/> times as minimum.
+		/// </summary>
+		/// <param name="callCount">The minimum number of times.</param>
+		/// <returns>An object defining the allowed number of invocations.</returns>
 		public static Times AtLeast(int callCount)
 		{
 			Guard.NotOutOfRangeInclusive(callCount, 1, int.MaxValue, nameof(callCount));
@@ -31,13 +37,20 @@ namespace Moq
 			return new Times(c => c >= callCount, callCount, int.MaxValue, Resources.NoMatchingCallsAtLeast);
 		}
 
-		/// <include file='Times.xdoc' path='docs/doc[@for="Times.AtLeastOnce"]/*'/>
+		/// <summary>
+		///   Specifies that a mocked method should be invoked one time as minimum.
+		/// </summary>
+		/// <returns>An object defining the allowed number of invocations.</returns>
 		public static Times AtLeastOnce()
 		{
 			return new Times(c => c >= 1, 1, int.MaxValue, Resources.NoMatchingCallsAtLeastOnce);
 		}
 
-		/// <include file='Times.xdoc' path='docs/doc[@for="Times.AtMost"]/*'/>
+		/// <summary>
+		///   Specifies that a mocked method should be invoked <paramref name="callCount"/> time as maximum.
+		/// </summary>
+		/// <param name="callCount">The maximum number of times.</param>
+		/// <returns>An object defining the allowed number of invocations.</returns>
 		public static Times AtMost(int callCount)
 		{
 			Guard.NotOutOfRangeInclusive(callCount, 0, int.MaxValue, nameof(callCount));
@@ -45,13 +58,23 @@ namespace Moq
 			return new Times(c => c >= 0 && c <= callCount, 0, callCount, Resources.NoMatchingCallsAtMost);
 		}
 
-		/// <include file='Times.xdoc' path='docs/doc[@for="Times.AtMostOnce"]/*'/>
+		/// <summary>
+		///   Specifies that a mocked method should be invoked one time as maximum.
+		/// </summary>
+		/// <returns>An object defining the allowed number of invocations.</returns>
 		public static Times AtMostOnce()
 		{
 			return new Times(c => c >= 0 && c <= 1, 0, 1, Resources.NoMatchingCallsAtMostOnce);
 		}
 
-		/// <include file='Times.xdoc' path='docs/doc[@for="Times.Between"]/*'/>
+		/// <summary>
+		///   Specifies that a mocked method should be invoked between <paramref name="callCountFrom"/>
+		///   and <paramref name="callCountTo"/> times.
+		/// </summary>
+		/// <param name="callCountFrom">The minimum number of times.</param>
+		/// <param name="callCountTo">The maximum number of times.</param>
+		/// <param name="rangeKind">The kind of range. See <see cref="Range"/>.</param>
+		/// <returns>An object defining the allowed number of invocations.</returns>
 		public static Times Between(int callCountFrom, int callCountTo, Range rangeKind)
 		{
 			if (rangeKind == Range.Exclusive)
@@ -77,7 +100,11 @@ namespace Moq
 				Resources.NoMatchingCallsBetweenInclusive);
 		}
 
-		/// <include file='Times.xdoc' path='docs/doc[@for="Times.Exactly"]/*'/>
+		/// <summary>
+		///   Specifies that a mocked method should be invoked exactly <paramref name="callCount"/> times.
+		/// </summary>
+		/// <param name="callCount">The times that a method or property can be called.</param>
+		/// <returns>An object defining the allowed number of invocations.</returns>
 		public static Times Exactly(int callCount)
 		{
 			Guard.NotOutOfRangeInclusive(callCount, 0, int.MaxValue, nameof(callCount));
@@ -85,19 +112,32 @@ namespace Moq
 			return new Times(c => c == callCount, callCount, callCount, Resources.NoMatchingCallsExactly);
 		}
 
-		/// <include file='Times.xdoc' path='docs/doc[@for="Times.Never"]/*'/>
+		/// <summary>
+		///   Specifies that a mocked method should not be invoked.
+		/// </summary>
+		/// <returns>An object defining the allowed number of invocations.</returns>
 		public static Times Never()
 		{
 			return new Times(c => c == 0, 0, 0, Resources.NoMatchingCallsNever);
 		}
 
-		/// <include file='Times.xdoc' path='docs/doc[@for="Times.Once"]/*'/>
+		/// <summary>
+		///   Specifies that a mocked method should be invoked exactly one time.
+		/// </summary>
+		/// <returns>An object defining the allowed number of invocations.</returns>
 		public static Times Once()
 		{
 			return new Times(c => c == 1, 1, 1, Resources.NoMatchingCallsOnce);
 		}
 
-		/// <include file='Times.xdoc' path='docs/doc[@for="Times.Equals"]/*'/>
+		/// <summary>
+		///   Determines whether the specified <see cref="object"/> is equal to this instance.
+		/// </summary>
+		/// <param name="obj">The <see cref="object"/> to compare with this instance.</param>
+		/// <returns>
+		///   <see langword="true"/> if the specified <see cref="object"/> is equal to this instance;
+		///   otherwise, <see langword="false"/>.
+		/// </returns>
 		public override bool Equals(object obj)
 		{
 			if (obj is Times)
@@ -109,19 +149,40 @@ namespace Moq
 			return false;
 		}
 
-		/// <include file='Times.xdoc' path='docs/doc[@for="Times.GetHashCode"]/*'/>
+		/// <summary>
+		///   Returns a hash code for this instance.
+		/// </summary>
+		/// <returns>
+		///   A hash code for this instance, suitable for use in hashing algorithms and data structures like a hash table.
+		/// </returns>
 		public override int GetHashCode()
 		{
 			return this.from.GetHashCode() ^ this.to.GetHashCode();
 		}
 
-		/// <include file='Times.xdoc' path='docs/doc[@for="Times.op_Equality"]/*'/>
+		/// <summary>
+		///   Determines whether two specified <see cref="Times"/> objects have the same value.
+		/// </summary>
+		/// <param name="left">The first <see cref="Times"/>.</param>
+		/// <param name="right">The second <see cref="Times"/>.</param>
+		/// <returns>
+		///   <see langword="true"/> if the value of <paramref name="left"/> is the same as
+		///   the value of <paramref name="right"/>; otherwise, <see langword="false"/>.
+		/// </returns>
 		public static bool operator ==(Times left, Times right)
 		{
 			return left.Equals(right);
 		}
 
-		/// <include file='Times.xdoc' path='docs/doc[@for="Times.op_Inequality"]/*'/>
+		/// <summary>
+		///   Determines whether two specified <see cref="Times"/> objects have different values.
+		/// </summary>
+		/// <param name="left">The first <see cref="Times"/>.</param>
+		/// <param name="right">The second <see cref="Times"/>.</param>
+		/// <returns>
+		///   <see langword="true"/> if the value of <paramref name="left"/> is different from
+		///   the value of <paramref name="right"/>; otherwise, <see langword="false"/>.
+		/// </returns>
 		public static bool operator !=(Times left, Times right)
 		{
 			return !left.Equals(right);
