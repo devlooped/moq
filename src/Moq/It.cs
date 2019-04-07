@@ -16,7 +16,14 @@ using Moq.Protected;
 
 namespace Moq
 {
-	/// <include file='It.xdoc' path='docs/doc[@for="It"]/*'/>
+	/// <summary>
+	///   Allows the specification of a matching condition for an argument in a method invocation,
+	///   rather than a specific argument value. "It" refers to the argument being matched.
+	/// </summary>
+	/// <remarks>
+	///   This class allows the setup to match a method invocation with an arbitrary value,
+	///   with a value in a specified range, or even one that matches a given predicate.
+	/// </remarks>
 	public static class It
 	{
 		/// <summary>
@@ -31,7 +38,13 @@ namespace Moq
 			public static TValue IsAny;
 		}
 
-		/// <include file='It.xdoc' path='docs/doc[@for="It.IsAny"]/*'/>
+		/// <summary>
+		///   Matches any value of the given <typeparamref name="TValue"/> type.
+		///   <para>
+		///     Typically used when the actual argument value for a method call is not relevant.
+		///   </para>
+		/// </summary>
+		/// <typeparam name="TValue">Type of the value.</typeparam>
 		public static TValue IsAny<TValue>()
 		{
 			return Match<TValue>.Create(
@@ -51,7 +64,10 @@ namespace Moq
 			return Expression.Call(It.isAnyMethod.MakeGenericMethod(genericArgument));
 		}
 
-		/// <include file='It.xdoc' path='docs/doc[@for="It.IsNotNull"]/*'/>
+		/// <summary>
+		///   Matches any value of the given <typeparamref name="TValue"/> type, except null.
+		/// </summary>
+		/// <typeparam name="TValue">Type of the value.</typeparam>
 		public static TValue IsNotNull<TValue>()
 		{
 			return Match<TValue>.Create(
@@ -64,8 +80,16 @@ namespace Moq
 				() => It.IsNotNull<TValue>());
 		}
 
-
-		/// <include file='It.xdoc' path='docs/doc[@for="It.Is"]/*'/>
+		/// <summary>
+		///   Matches any value that satisfies the given predicate.
+		/// </summary>
+		/// <typeparam name="TValue">Type of the argument to check.</typeparam>
+		/// <param name="match">The predicate used to match the method argument.</param>
+		/// <remarks>
+		///   Allows the specification of a predicate to perform matching of method call arguments.
+		///   If you keep using the same predicate, you might want to define a custom matcher,
+		///   see <see cref="Match.Create{T}(Predicate{T}, Expression{Func{T}})"/>.
+		/// </remarks>
 		[SuppressMessage("Microsoft.Design", "CA1006:DoNotNestGenericTypesInMemberSignatures")]
 		public static TValue Is<TValue>(Expression<Func<TValue, bool>> match)
 		{
@@ -74,7 +98,13 @@ namespace Moq
 				Expression.Lambda<Func<TValue>>(ItExpr.Is<TValue>(match)));
 		}
 
-		/// <include file='It.xdoc' path='docs/doc[@for="It.IsInRange"]/*'/>
+		/// <summary>
+		///   Matches any value that is in the range specified.
+		/// </summary>
+		/// <typeparam name="TValue">Type of the argument to check.</typeparam>
+		/// <param name="from">The lower bound of the range.</param>
+		/// <param name="to">The upper bound of the range.</param>
+		/// <param name="rangeKind">The kind of range. See <see cref="Range"/>.</param>
 		public static TValue IsInRange<TValue>(TValue from, TValue to, Range rangeKind)
 			where TValue : IComparable
 		{
@@ -95,31 +125,50 @@ namespace Moq
 			() => It.IsInRange(from, to, rangeKind));
 		}
 
-		/// <include file='It.xdoc' path='docs/doc[@for="It.IsIn(enumerable)"]/*'/>
+		/// <summary>
+		///   Matches any value that is present in the sequence specified.
+		/// </summary>
+		/// <typeparam name="TValue">Type of the argument to check.</typeparam>
+		/// <param name="items">The sequence of possible values.</param>
 		public static TValue IsIn<TValue>(IEnumerable<TValue> items)
 		{
 			return Match<TValue>.Create(value => items.Contains(value), () => It.IsIn(items));
 		}
 
-		/// <include file='It.xdoc' path='docs/doc[@for="It.IsIn(params)"]/*'/>
+		/// <summary>
+		///   Matches any value that is present in the sequence specified.
+		/// </summary>
+		/// <typeparam name="TValue">Type of the argument to check.</typeparam>
+		/// <param name="items">The possible values.</param>
 		public static TValue IsIn<TValue>(params TValue[] items)
 		{
 			return Match<TValue>.Create(value => items.Contains(value), () => It.IsIn(items));
 		}
 
-		/// <include file='It.xdoc' path='docs/doc[@for="It.IsNotIn(enumerable)"]/*'/>
+		/// <summary>
+		///   Matches any value that is not found in the sequence specified.
+		/// </summary>
+		/// <typeparam name="TValue">Type of the argument to check.</typeparam>
+		/// <param name="items">The sequence of disallowed values.</param>
 		public static TValue IsNotIn<TValue>(IEnumerable<TValue> items)
 		{
 			return Match<TValue>.Create(value => !items.Contains(value), () => It.IsNotIn(items));
 		}
 
-		/// <include file='It.xdoc' path='docs/doc[@for="It.IsNotIn(params)"]/*'/>
+		/// <summary>
+		///   Matches any value that is not found in the sequence specified.
+		/// </summary>
+		/// <typeparam name="TValue">Type of the argument to check.</typeparam>
+		/// <param name="items">The sequence of disallowed values.</param>
 		public static TValue IsNotIn<TValue>(params TValue[] items)
 		{
 			return Match<TValue>.Create(value => !items.Contains(value), () => It.IsNotIn(items));
 		}
 
-		/// <include file='It.xdoc' path='docs/doc[@for="It.IsRegex(regex)"]/*'/>
+		/// <summary>
+		///   Matches a string argument if it matches the given regular expression pattern.
+		/// </summary>
+		/// <param name="regex">The pattern to use to match the string argument value.</param>
 		public static string IsRegex(string regex)
 		{
 			Guard.NotNull(regex, nameof(regex));
@@ -131,7 +180,11 @@ namespace Moq
 			return Match<string>.Create(value => value != null && re.IsMatch(value), () => It.IsRegex(regex));
 		}
 
-		/// <include file='It.xdoc' path='docs/doc[@for="It.IsRegex(regex,options)"]/*'/>
+		/// <summary>
+		///   Matches a string argument if it matches the given regular expression pattern.
+		/// </summary>
+		/// <param name="regex">The pattern to use to match the string argument value.</param>
+		/// <param name="options">The options used to interpret the pattern.</param>
 		public static string IsRegex(string regex, RegexOptions options)
 		{
 			Guard.NotNull(regex, nameof(regex));
