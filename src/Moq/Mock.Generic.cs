@@ -17,7 +17,18 @@ using Moq.Properties;
 
 namespace Moq
 {
-	/// <include file='Mock.Generic.xdoc' path='docs/doc[@for="Mock{T}"]/*'/>
+	/// <summary>
+	///   Provides a mock implementation of <typeparamref name="T"/>.
+	/// </summary>
+	/// <typeparam name="T">Type to mock, which can be an interface or a class.</typeparam>
+	/// <remarks>
+	///   Any interface type can be used for mocking, but for classes, only abstract and virtual members can be mocked.
+	///   <para>
+	///     The behavior of the mock with regards to the setups and the actual calls is determined
+	///     by the optional <see cref="MockBehavior"/> that can be passed to the <see cref="Mock{T}(MockBehavior)"/>
+	///     constructor.
+	///   </para>
+	/// </remarks>
 	public partial class Mock<T> : Mock, IMock<T> where T : class
 	{
 		private static Type[] inheritedInterfaces;
@@ -64,31 +75,48 @@ namespace Moq
 			// from the regular ones which initializes the proxy, etc.
 		}
 
-		/// <include file='Mock.Generic.xdoc' path='docs/doc[@for="Mock{T}.ctor()"]/*'/>
-		[SuppressMessage("Microsoft.Usage", "CA2214:DoNotCallOverridableMethodsInConstructors")]
+		/// <summary>
+		///   Initializes an instance of the mock with <see cref="MockBehavior.Default">default behavior</see>.
+		/// </summary>
 		public Mock()
 			: this(MockBehavior.Default)
 		{
 		}
 
-#pragma warning disable CS1735 // XML comment has a typeparamref tag, but there is no type parameter by that name
-		/// <include file='Mock.Generic.xdoc' path='docs/doc[@for="Mock{T}.ctor(object[])"]/*'/>
-		[SuppressMessage("Microsoft.Usage", "CA2214:DoNotCallOverridableMethodsInConstructors")]
-#pragma warning restore CS1735 // XML comment has a typeparamref tag, but there is no type parameter by that name
+		/// <summary>
+		///   Initializes an instance of the mock with <see cref="MockBehavior.Default">default behavior</see>
+		///   and with the given constructor arguments for the class. (Only valid when <typeparamref name="T"/>
+		///   is a class.)
+		/// </summary>
+		/// <remarks>
+		///   The mock will try to find the best match constructor given the constructor arguments,
+		///   and invoke that to initialize the instance. This applies only for classes, not interfaces.
+		/// </remarks>
+		/// <param name="args">Optional constructor arguments if the mocked type is a class.</param>
 		public Mock(params object[] args)
 			: this(MockBehavior.Default, args)
 		{
 		}
 
-		/// <include file='Mock.Generic.xdoc' path='docs/doc[@for="Mock{T}.ctor(MockBehavior)"]/*'/>
-		[SuppressMessage("Microsoft.Usage", "CA2214:DoNotCallOverridableMethodsInConstructors")]
+		/// <summary>
+		///   Initializes an instance of the mock with the specified <see cref="MockBehavior">behavior</see>.
+		/// </summary>
+		/// <param name="behavior">Behavior of the mock.</param>
 		public Mock(MockBehavior behavior)
 			: this(behavior, new object[0])
 		{
 		}
 
-		/// <include file='Mock.Generic.xdoc' path='docs/doc[@for="Mock{T}.ctor(MockBehavior,object[])"]/*'/>
-		[SuppressMessage("Microsoft.Usage", "CA2214:DoNotCallOverridableMethodsInConstructors")]
+		/// <summary>
+		///   Initializes an instance of the mock with a specific <see cref="MockBehavior">behavior</see>
+		///   with the given constructor arguments for the class.
+		/// </summary>
+		/// <remarks>
+		///   The mock will try to find the best match constructor given the constructor arguments, and
+		///   invoke that to initialize the instance. This applies only to classes, not interfaces.
+		/// </remarks>
+		/// <param name="behavior">Behavior of the mock.</param>
+		/// <param name="args">Optional constructor arguments if the mocked type is a class.</param>
 		public Mock(MockBehavior behavior, params object[] args)
 		{
 			Guard.Mockable(typeof(T));
@@ -180,7 +208,10 @@ namespace Moq
 
 		internal override bool IsObjectInitialized => this.instance != null;
 
-		/// <include file='Mock.Generic.xdoc' path='docs/doc[@for="Mock{T}.Object"]/*'/>
+
+		/// <summary>
+		///   Exposes the mocked object instance.
+		/// </summary>
 		[SuppressMessage("Microsoft.Naming", "CA1716:IdentifiersShouldNotMatchKeywords", MessageId = "Object", Justification = "Exposes the mocked object instance, so it's appropriate.")]
 		[SuppressMessage("Microsoft.Naming", "CA1721:PropertyNamesShouldNotMatchGetMethods", Justification = "The public Object property is the only one visible to Moq consumers. The protected member is for internal use only.")]
 		public virtual new T Object
@@ -188,14 +219,19 @@ namespace Moq
 			get { return (T)base.Object; }
 		}
 
-		/// <include file='Mock.Generic.xdoc' path='docs/doc[@for="Mock{T}.Name"]/*'/>
+		/// <summary>
+		///   Allows naming of your mocks, so they can be easily identified in error messages
+		///   (e.g. from failed assertions).
+		/// </summary>
 		public string Name
 		{
 			get => this.name;
 			set => this.name = value;
 		}
 
-		/// <include file='Mock.Generic.xdoc' path='docs/doc[@for="Mock{T}.ToString"]/*'/>
+		/// <summary>
+		///   Returns the name of the mock.
+		/// </summary>
 		public override string ToString()
 		{
 			return this.Name;
@@ -251,11 +287,18 @@ namespace Moq
 			set => this.switches = value;
 		}
 
-#endregion
+		#endregion
 
-#region Setup
+		#region Setup
 
-		/// <include file='Mock.Generic.xdoc' path='docs/doc[@for="Mock{T}.Setup"]/*'/>
+		/// <summary>
+		///   Specifies a setup on the mocked type for a call to a <see langword="void"/> method.
+		/// </summary>
+		/// <param name="expression">Lambda expression that specifies the expected method invocation.</param>
+		/// <remarks>
+		///   If more than one setup is specified for the same method or property,
+		///   the latest one wins and is the one that will be executed.
+		/// </remarks>
 		[SuppressMessage("Microsoft.Design", "CA1006:DoNotNestGenericTypesInMemberSignatures", Justification = "By design")]
 		public ISetup<T> Setup(Expression<Action<T>> expression)
 		{
@@ -263,7 +306,17 @@ namespace Moq
 			return new VoidSetupPhrase<T>(setup);
 		}
 
-		/// <include file='Mock.Generic.xdoc' path='docs/doc[@for="Mock{T}.Setup{TResult}"]/*'/>
+		/// <summary>
+		///   Specifies a setup on the mocked type for a call to a value returning method.
+		/// </summary>
+		/// <param name="expression">Lambda expression that specifies the method invocation.</param>
+		/// <typeparam name="TResult">
+		///   Type of the return value. Typically omitted as it can be inferred from the expression.
+		/// </typeparam>
+		/// <remarks>
+		///   If more than one setup is specified for the same method or property,
+		///   the latest one wins and is the one that will be executed.
+		/// </remarks>
 		[SuppressMessage("Microsoft.Design", "CA1006:DoNotNestGenericTypesInMemberSignatures", Justification = "By design")]
 		public ISetup<T, TResult> Setup<TResult>(Expression<Func<T, TResult>> expression)
 		{
@@ -271,7 +324,17 @@ namespace Moq
 			return new NonVoidSetupPhrase<T, TResult>(setup);
 		}
 
-		/// <include file='Mock.Generic.xdoc' path='docs/doc[@for="Mock{T}.SetupGet"]/*'/>
+		/// <summary>
+		///   Specifies a setup on the mocked type for a call to a property getter.
+		/// </summary>
+		/// <typeparam name="TProperty">
+		///   Type of the property. Typically omitted as it can be inferred from the expression.
+		/// </typeparam>
+		/// <param name="expression">Lambda expression that specifies the property getter.</param>
+		/// <remarks>
+		///   If more than one setup is set for the same property getter,
+		///   the latest one wins and is the one that will be executed.
+		/// </remarks>
 		[SuppressMessage("Microsoft.Design", "CA1006:DoNotNestGenericTypesInMemberSignatures", Justification = "By design")]
 		public ISetupGetter<T, TProperty> SetupGet<TProperty>(Expression<Func<T, TProperty>> expression)
 		{
@@ -279,7 +342,20 @@ namespace Moq
 			return new NonVoidSetupPhrase<T, TProperty>(setup);
 		}
 
-		/// <include file='Mock.Generic.xdoc' path='docs/doc[@for="Mock{T}.SetupSet{TProperty}"]/*'/>
+		/// <summary>
+		///   Specifies a setup on the mocked type for a call to a property setter.
+		///   <para>
+		///     This overloads allows the use of a callback already typed for the property type.
+		///   </para>
+		/// </summary>
+		/// <typeparam name="TProperty">
+		///   Type of the property. Typically omitted as it can be inferred from the expression.
+		/// </typeparam>
+		/// <param name="setterExpression">The lambda expression that sets a property to a value.</param>
+		/// <remarks>
+		///   If more than one setup is set for the same property setter,
+		///   the latest one wins and is the one that will be executed.
+		/// </remarks>
 		public ISetupSetter<T, TProperty> SetupSet<TProperty>(Action<T> setterExpression)
 		{
 			Guard.NotNull(setterExpression, nameof(setterExpression));
@@ -289,7 +365,14 @@ namespace Moq
 			return new SetterSetupPhrase<T, TProperty>(setup);
 		}
 
-		/// <include file='Mock.Generic.xdoc' path='docs/doc[@for="Mock{T}.SetupSet"]/*'/>
+		/// <summary>
+		///   Specifies a setup on the mocked type for a call to a property setter.
+		/// </summary>
+		/// <param name="setterExpression">Lambda expression that sets a to a value.</param>
+		/// <remarks>
+		///   If more than one setup is set for the same property setter,
+		///   the latest one wins and is the one that will be executed.
+		/// </remarks>
 		public ISetup<T> SetupSet(Action<T> setterExpression)
 		{
 			Guard.NotNull(setterExpression, nameof(setterExpression));
@@ -299,7 +382,15 @@ namespace Moq
 			return new VoidSetupPhrase<T>(setup);
 		}
 
-		/// <include file='Mock.Generic.xdoc' path='docs/doc[@for="Mock{T}.SetupProperty(property)"]/*'/>
+		/// <summary>
+		///   Specifies that the given property should have "property behavior",
+		///   meaning that setting its value will cause it to be saved and later returned
+		///   when the property is requested. (This is also known as "stubbing".)
+		/// </summary>
+		/// <typeparam name="TProperty">
+		///   Type of the property, inferred from the property expression (does not need to be specified).
+		/// </typeparam>
+		/// <param name="property">Property expression to stub.</param>
 		[SuppressMessage("Microsoft.Design", "CA1006:DoNotNestGenericTypesInMemberSignatures", Justification = "By design")]
 		[SuppressMessage("Microsoft.Naming", "CA1716:IdentifiersShouldNotMatchKeywords", MessageId = "Property", Justification = "This sets properties, so it's appropriate.")]
 		public Mock<T> SetupProperty<TProperty>(Expression<Func<T, TProperty>> property)
@@ -307,7 +398,19 @@ namespace Moq
 			return this.SetupProperty(property, default(TProperty));
 		}
 
-		/// <include file='Mock.Generic.xdoc' path='docs/doc[@for="Mock{T}.SetupProperty(property,initialValue)"]/*'/>
+		/// <summary>
+		///   Specifies that the given property should have "property behavior",
+		///   meaning that setting its value will cause it to be saved and later returned
+		///   when the property is requested. (This is also known as "stubbing".)
+		///   <para>
+		///     This overload allows setting the initial value for the property.
+		///   </para>
+		/// </summary>
+		/// <typeparam name="TProperty">
+		///   Type of the property, inferred from the property expression (does not need to be specified).
+		/// </typeparam>
+		/// <param name="property">Property expression to stub.</param>
+		/// <param name="initialValue">Initial value for the property.</param>
 		[SuppressMessage("Microsoft.Design", "CA1006:DoNotNestGenericTypesInMemberSignatures", Justification = "By design")]
 		[SuppressMessage("Microsoft.Naming", "CA1716:IdentifiersShouldNotMatchKeywords", MessageId = "Property", Justification = "We're setting up a property, so it's appropriate.")]
 		public Mock<T> SetupProperty<TProperty>(Expression<Func<T, TProperty>> property, TProperty initialValue)
@@ -320,7 +423,19 @@ namespace Moq
 			return this;
 		}
 
-		/// <include file='Mock.Generic.xdoc' path='docs/doc[@for="Mock{T}.SetupAllProperties"]/*'/>
+		/// <summary>
+		///   Specifies that the all properties on the mock should have "property behavior",
+		///   meaning that setting its value will cause it to be saved and later returned
+		///   when the property is requested. (This is also known as "stubbing".)
+		///   <para>
+		///     The default value for each property will be the one generated as specified by
+		///     the <see cref="Mock.DefaultValue"/> property for the mock.
+		///   </para>
+		/// </summary>
+		/// <remarks>
+		///   If the mock <see cref="Mock.DefaultValue"/> is set to <see cref="DefaultValue.Mock"/>,
+		///   the mocked default values will also get all properties setup recursively.
+		/// </remarks>
 		public Mock<T> SetupAllProperties()
 		{
 			SetupAllProperties(this);
@@ -351,136 +466,316 @@ namespace Moq
 
 #region When
 
-		/// <include file='Mock.Generic.xdoc' path='docs/doc[@for="Mock{T}.When"]/*'/>
+		/// <summary>
+		///   Allows setting up a conditional setup. Conditional setups are only matched by an invocation
+		///   when the specified <paramref name="condition"/> evaluates to <see langword="true"/>
+		///   at the time when the invocation occurs.
+		/// </summary>
+		/// <param name="condition">
+		///   The condition that should be checked when a setup is being matched against an invocation.
+		/// </param>
 		public ISetupConditionResult<T> When(Func<bool> condition)
 		{
 			return new WhenPhrase<T>(this, new Condition(condition));
 		}
 
-#endregion
+		#endregion
 
-#region Verify
+		#region Verify
 
-		/// <include file='Mock.Generic.xdoc' path='docs/doc[@for="Mock{T}.Verify(expression)"]/*'/>
+		/// <summary>
+		///   Verifies that a specific invocation matching the given expression was performed on the mock.
+		///   <para>
+		///     Use in conjunction with the default <see cref="MockBehavior.Loose"/>.
+		///   </para>
+		/// </summary>
+		/// <param name="expression">Expression to verify.</param>
+		/// <exception cref="MockException">The invocation was not performed on the mock.</exception>
 		[SuppressMessage("Microsoft.Design", "CA1006:DoNotNestGenericTypesInMemberSignatures", Justification = "By design")]
 		public void Verify(Expression<Action<T>> expression)
 		{
 			Mock.Verify(this, expression, Times.AtLeastOnce(), null);
 		}
 
-		/// <include file='Mock.Generic.xdoc' path='docs/doc[@for="Mock{T}.Verify(expression,times)"]/*'/>
+		/// <summary>
+		///   Verifies that a specific invocation matching the given expression was performed on the mock,
+		///   specifying a failure error message.
+		///   <para>
+		///     Use in conjunction with the default <see cref="MockBehavior.Loose"/>.
+		///   </para>
+		/// </summary>
+		/// <param name="expression">Expression to verify.</param>
+		/// <param name="times">The number of times a method is allowed to be called.</param>
+		/// <exception cref="MockException">
+		///   The invocation was not called the amount times specified by <paramref name="times"/>.
+		/// </exception>
 		[SuppressMessage("Microsoft.Design", "CA1006:DoNotNestGenericTypesInMemberSignatures", Justification = "By design")]
 		public void Verify(Expression<Action<T>> expression, Times times)
 		{
 			Mock.Verify(this, expression, times, null);
 		}
 
-		/// <include file='Mock.Generic.xdoc' path='docs/doc[@for="Mock{T}.Verify(expression,times)"]/*'/>
+		/// <summary>
+		///   Verifies that a specific invocation matching the given expression was performed on the mock,
+		///   specifying a failure error message.
+		///   <para>
+		///     Use in conjunction with the default <see cref="MockBehavior.Loose"/>.
+		///   </para>
+		/// </summary>
+		/// <param name="expression">Expression to verify.</param>
+		/// <param name="times">The number of times a method is allowed to be called.</param>
+		/// <exception cref="MockException">
+		///   The invocation was not called the amount times specified by <paramref name="times"/>.
+		/// </exception>
 		[SuppressMessage("Microsoft.Design", "CA1006:DoNotNestGenericTypesInMemberSignatures", Justification = "By design")]
 		public void Verify(Expression<Action<T>> expression, Func<Times> times)
 		{
 			Verify(expression, times());
 		}
 
-		/// <include file='Mock.Generic.xdoc' path='docs/doc[@for="Mock{T}.Verify(expression,failMessage)"]/*'/>
+		/// <summary>
+		///  Verifies that a specific invocation matching the given expression was performed on the mock,
+		///  specifying a failure error message.
+		///  <para>
+		///    Use in conjunction with the default <see cref="MockBehavior.Loose"/>.
+		///  </para>
+		/// </summary>
+		/// <param name="expression">Expression to verify.</param>
+		/// <param name="failMessage">Message to show if verification fails.</param>
+		/// <exception cref="MockException">The invocation was not performed on the mock.</exception>
 		[SuppressMessage("Microsoft.Design", "CA1006:DoNotNestGenericTypesInMemberSignatures", Justification = "By design")]
 		public void Verify(Expression<Action<T>> expression, string failMessage)
 		{
 			Mock.Verify(this, expression, Times.AtLeastOnce(), failMessage);
 		}
 
-		/// <include file='Mock.Generic.xdoc' path='docs/doc[@for="Mock{T}.Verify(expression,times,failMessage)"]/*'/>
+		/// <summary>
+		///   Verifies that a specific invocation matching the given expression was performed on the mock,
+		///   specifying a failure error message.
+		///   <para>
+		///     Use in conjunction with the default <see cref="MockBehavior.Loose"/>.
+		///   </para>
+		/// </summary>
+		/// <param name="expression">Expression to verify.</param>
+		/// <param name="times">The number of times a method is allowed to be called.</param>
+		/// <param name="failMessage">Message to show if verification fails.</param>
+		/// <exception cref="MockException">
+		///   The invocation was not called the amount times specified by <paramref name="times"/>.
+		/// </exception>
 		[SuppressMessage("Microsoft.Design", "CA1006:DoNotNestGenericTypesInMemberSignatures", Justification = "By design")]
 		public void Verify(Expression<Action<T>> expression, Times times, string failMessage)
 		{
 			Mock.Verify(this, expression, times, failMessage);
 		}
 
-		/// <include file='Mock.Generic.xdoc' path='docs/doc[@for="Mock{T}.Verify(expression,times,failMessage)"]/*'/>
+		/// <summary>
+		///   Verifies that a specific invocation matching the given expression was performed on the mock,
+		///   specifying a failure error message.
+		///   <para>
+		///     Use in conjunction with the default <see cref="MockBehavior.Loose"/>.
+		///   </para>
+		/// </summary>
+		/// <param name="expression">Expression to verify.</param>
+		/// <param name="times">The number of times a method is allowed to be called.</param>
+		/// <param name="failMessage">Message to show if verification fails.</param>
+		/// <exception cref="MockException">
+		///   The invocation was not called the amount times specified by <paramref name="times"/>.
+		/// </exception>
 		[SuppressMessage("Microsoft.Design", "CA1006:DoNotNestGenericTypesInMemberSignatures", Justification = "By design")]
 		public void Verify(Expression<Action<T>> expression, Func<Times> times, string failMessage)
 		{
 			Mock.Verify(this, expression, times(), failMessage);
 		}
 
-		/// <include file='Mock.Generic.xdoc' path='docs/doc[@for="Mock{T}.Verify{TResult}(expression)"]/*'/>
+		/// <summary>
+		///   Verifies that a specific invocation matching the given expression was performed on the mock.
+		///   <para>
+		///     Use in conjunction with the default <see cref="MockBehavior.Loose"/>.
+		///   </para>
+		/// </summary>
+		/// <typeparam name="TResult">Type of return value from the expression.</typeparam>
+		/// <param name="expression">Expression to verify.</param>
+		/// <exception cref="MockException">The invocation was not performed on the mock.</exception>
 		[SuppressMessage("Microsoft.Design", "CA1006:DoNotNestGenericTypesInMemberSignatures", Justification = "By design")]
 		public void Verify<TResult>(Expression<Func<T, TResult>> expression)
 		{
 			Mock.Verify(this, expression, Times.AtLeastOnce(), null);
 		}
 
-		/// <include file='Mock.Generic.xdoc' path='docs/doc[@for="Mock{T}.Verify{TResult}(expression,times)"]/*'/>
+		/// <summary>
+		///   Verifies that a specific invocation matching the given expression was performed on the mock.
+		///   <para>
+		///     Use in conjunction with the default <see cref="MockBehavior.Loose"/>.
+		///   </para>
+		/// </summary>
+		/// <typeparam name="TResult">Type of return value from the expression.</typeparam>
+		/// <param name="expression">Expression to verify.</param>
+		/// <param name="times">The number of times a method is allowed to be called.</param>
+		/// <exception cref="MockException">
+		///   The invocation was not called the amount times specified by <paramref name="times"/>.
+		/// </exception>
 		[SuppressMessage("Microsoft.Design", "CA1006:DoNotNestGenericTypesInMemberSignatures", Justification = "By design")]
 		public void Verify<TResult>(Expression<Func<T, TResult>> expression, Times times)
 		{
 			Mock.Verify(this, expression, times, null);
 		}
 
-		/// <include file='Mock.Generic.xdoc' path='docs/doc[@for="Mock{T}.Verify{TResult}(expression,times)"]/*'/>
+		/// <summary>
+		///   Verifies that a specific invocation matching the given expression was performed on the mock.
+		///   <para>
+		///     Use in conjunction with the default <see cref="MockBehavior.Loose"/>.
+		///   </para>
+		/// </summary>
+		/// <typeparam name="TResult">Type of return value from the expression.</typeparam>
+		/// <param name="expression">Expression to verify.</param>
+		/// <param name="times">The number of times a method is allowed to be called.</param>
+		/// <exception cref="MockException">
+		///   The invocation was not called the amount times specified by <paramref name="times"/>.
+		/// </exception>
 		[SuppressMessage("Microsoft.Design", "CA1006:DoNotNestGenericTypesInMemberSignatures", Justification = "By design")]
 		public void Verify<TResult>(Expression<Func<T, TResult>> expression, Func<Times> times)
 		{
 			Mock.Verify(this, expression, times(), null);
 		}
 
-		/// <include file='Mock.Generic.xdoc' path='docs/doc[@for="Mock{T}.Verify{TResult}(expression,failMessage)"]/*'/>
+		/// <summary>
+		///   Verifies that a specific invocation matching the given expression was performed on the mock,
+		///   specifying a failure error message.
+		/// </summary>
+		/// <typeparam name="TResult">Type of return value from the expression.</typeparam>
+		/// <param name="expression">Expression to verify.</param>
+		/// <param name="failMessage">Message to show if verification fails.</param>
+		/// <exception cref="MockException">The invocation was not performed on the mock.</exception>
 		[SuppressMessage("Microsoft.Design", "CA1006:DoNotNestGenericTypesInMemberSignatures", Justification = "By design")]
 		public void Verify<TResult>(Expression<Func<T, TResult>> expression, string failMessage)
 		{
 			Mock.Verify(this, expression, Times.AtLeastOnce(), failMessage);
 		}
 
-		/// <include file='Mock.Generic.xdoc' path='docs/doc[@for="Mock{T}.Verify{TResult}(expression,times,failMessage)"]/*'/>
+		/// <summary>
+		///  Verifies that a specific invocation matching the given expression was performed on the mock,
+		///  specifying a failure error message.
+		/// </summary>
+		/// <typeparam name="TResult">Type of return value from the expression.</typeparam>
+		/// <param name="expression">Expression to verify.</param>
+		/// <param name="times">The number of times a method is allowed to be called.</param>
+		/// <param name="failMessage">Message to show if verification fails.</param>
+		/// <exception cref="MockException">
+		///   The invocation was not called the amount of times specified by <paramref name="times"/>.
+		/// </exception>
 		[SuppressMessage("Microsoft.Design", "CA1006:DoNotNestGenericTypesInMemberSignatures", Justification = "By design")]
 		public void Verify<TResult>(Expression<Func<T, TResult>> expression, Times times, string failMessage)
 		{
 			Mock.Verify(this, expression, times, failMessage);
 		}
 
-		/// <include file='Mock.Generic.xdoc' path='docs/doc[@for="Mock{T}.VerifyGet(expression)"]/*'/>
+
+		/// <summary>
+		///   Verifies that a property was read on the mock.
+		/// </summary>
+		/// <typeparam name="TProperty">
+		///   Type of the property to verify.
+		///   Typically omitted as it can be inferred from the expression's return type.
+		/// </typeparam>
+		/// <param name="expression">Expression to verify.</param>
+		/// <exception cref="MockException">The invocation was not performed on the mock.</exception>
 		[SuppressMessage("Microsoft.Design", "CA1006:DoNotNestGenericTypesInMemberSignatures", Justification = "By design")]
 		public void VerifyGet<TProperty>(Expression<Func<T, TProperty>> expression)
 		{
 			Mock.VerifyGet(this, expression, Times.AtLeastOnce(), null);
 		}
 
-		/// <include file='Mock.Generic.xdoc' path='docs/doc[@for="Mock{T}.VerifyGet(expression,times)"]/*'/>
+		/// <summary>
+		///   Verifies that a property was read on the mock.
+		/// </summary>
+		/// <typeparam name="TProperty">
+		///   Type of the property to verify. Typically omitted as it can be inferred from the expression's return type.
+		/// </typeparam>
+		/// <param name="expression">Expression to verify.</param>
+		/// <param name="times">The number of times a method is allowed to be called.</param>
+		/// <exception cref="MockException">
+		///   The invocation was not called the amount of times specified by <paramref name="times"/>.
+		/// </exception>
 		[SuppressMessage("Microsoft.Design", "CA1006:DoNotNestGenericTypesInMemberSignatures", Justification = "By design")]
 		public void VerifyGet<TProperty>(Expression<Func<T, TProperty>> expression, Times times)
 		{
 			Mock.VerifyGet(this, expression, times, null);
 		}
 
-		/// <include file='Mock.Generic.xdoc' path='docs/doc[@for="Mock{T}.VerifyGet(expression,times)"]/*'/>
+		/// <summary>
+		///   Verifies that a property was read on the mock.
+		/// </summary>
+		/// <typeparam name="TProperty">
+		///   Type of the property to verify. Typically omitted as it can be inferred from the expression's return type.
+		/// </typeparam>
+		/// <param name="expression">Expression to verify.</param>
+		/// <param name="times">The number of times a method is allowed to be called.</param>
+		/// <exception cref="MockException">
+		///   The invocation was not called the amount of times specified by <paramref name="times"/>.
+		/// </exception>
 		[SuppressMessage("Microsoft.Design", "CA1006:DoNotNestGenericTypesInMemberSignatures", Justification = "By design")]
 		public void VerifyGet<TProperty>(Expression<Func<T, TProperty>> expression, Func<Times> times)
 		{
 			VerifyGet(this, expression, times(), null);
 		}
 
-		/// <include file='Mock.Generic.xdoc' path='docs/doc[@for="Mock{T}.VerifyGet(expression,failMessage)"]/*'/>
+		/// <summary>
+		///   Verifies that a property was read on the mock, specifying a failure error message.
+		/// </summary>
+		/// <typeparam name="TProperty">
+		///   Type of the property to verify.
+		///   Typically omitted as it can be inferred from the expression's return type.
+		/// </typeparam>
+		/// <param name="expression">Expression to verify.</param>
+		/// <param name="failMessage">Message to show if verification fails.</param>
+		/// <exception cref="MockException">The invocation was not performed on the mock.</exception>
 		[SuppressMessage("Microsoft.Design", "CA1006:DoNotNestGenericTypesInMemberSignatures", Justification = "By design")]
 		public void VerifyGet<TProperty>(Expression<Func<T, TProperty>> expression, string failMessage)
 		{
 			Mock.VerifyGet(this, expression, Times.AtLeastOnce(), failMessage);
 		}
 
-		/// <include file='Mock.Generic.xdoc' path='docs/doc[@for="Mock{T}.VerifyGet(expression,times,failMessage)"]/*'/>
+		/// <summary>
+		///   Verifies that a property was read on the mock, specifying a failure error message.
+		/// </summary>
+		/// <typeparam name="TProperty">
+		///   Type of the property to verify. Typically omitted as it can be inferred from the expression's return type.
+		/// </typeparam>
+		/// <param name="expression">Expression to verify.</param>
+		/// <param name="times">The number of times a method is allowed to be called.</param>
+		/// <param name="failMessage">Message to show if verification fails.</param>
+		/// <exception cref="MockException">
+		///   The invocation was not called the amount of times specified by <paramref name="times"/>.
+		/// </exception>
 		[SuppressMessage("Microsoft.Design", "CA1006:DoNotNestGenericTypesInMemberSignatures", Justification = "By design")]
 		public void VerifyGet<TProperty>(Expression<Func<T, TProperty>> expression, Times times, string failMessage)
 		{
 			Mock.VerifyGet(this, expression, times, failMessage);
 		}
 
-		/// <include file='Mock.Generic.xdoc' path='docs/doc[@for="Mock{T}.VerifyGet(expression,times,failMessage)"]/*'/>
+		/// <summary>
+		///   Verifies that a property was read on the mock, specifying a failure error message.
+		/// </summary>
+		/// <typeparam name="TProperty">
+		///   Type of the property to verify. Typically omitted as it can be inferred from the expression's return type.
+		/// </typeparam>
+		/// <param name="expression">Expression to verify.</param>
+		/// <param name="times">The number of times a method is allowed to be called.</param>
+		/// <param name="failMessage">Message to show if verification fails.</param>
+		/// <exception cref="MockException">
+		///   The invocation was not called the amount of times specified by <paramref name="times"/>.
+		/// </exception>
 		[SuppressMessage("Microsoft.Design", "CA1006:DoNotNestGenericTypesInMemberSignatures", Justification = "By design")]
 		public void VerifyGet<TProperty>(Expression<Func<T, TProperty>> expression, Func<Times> times, string failMessage)
 		{
 			VerifyGet(this, expression, times(), failMessage);
 		}
 
-		/// <include file='Mock.Generic.xdoc' path='docs/doc[@for="Mock{T}.VerifySet(expression)"]/*'/>
+		/// <summary>
+		///   Verifies that a property was set on the mock.
+		/// </summary>
+		/// <param name="setterExpression">Expression to verify.</param>
+		/// <exception cref="MockException">The invocation was not performed on the mock.</exception>
 		public void VerifySet(Action<T> setterExpression)
 		{
 			Guard.NotNull(setterExpression, nameof(setterExpression));
@@ -489,7 +784,14 @@ namespace Moq
 			Mock.VerifySet(this, expression, Times.AtLeastOnce(), null);
 		}
 
-		/// <include file='Mock.Generic.xdoc' path='docs/doc[@for="Mock{T}.VerifySet(expression,times)"]/*'/>
+		/// <summary>
+		///   Verifies that a property was set on the mock.
+		/// </summary>
+		/// <param name="setterExpression">Expression to verify.</param>
+		/// <param name="times">The number of times a method is allowed to be called.</param>
+		/// <exception cref="MockException">
+		///   The invocation was not called the amount of times specified by <paramref name="times"/>.
+		/// </exception>
 		public void VerifySet(Action<T> setterExpression, Times times)
 		{
 			Guard.NotNull(setterExpression, nameof(setterExpression));
@@ -498,7 +800,14 @@ namespace Moq
 			Mock.VerifySet(this, expression, times, null);
 		}
 
-		/// <include file='Mock.Generic.xdoc' path='docs/doc[@for="Mock{T}.VerifySet(expression,times)"]/*'/>
+		/// <summary>
+		///   Verifies that a property was set on the mock.
+		/// </summary>
+		/// <param name="setterExpression">Expression to verify.</param>
+		/// <param name="times">The number of times a method is allowed to be called.</param>
+		/// <exception cref="MockException">
+		///   The invocation was not called the amount of times specified by <paramref name="times"/>.
+		/// </exception>
 		public void VerifySet(Action<T> setterExpression, Func<Times> times)
 		{
 			Guard.NotNull(setterExpression, nameof(setterExpression));
@@ -507,7 +816,12 @@ namespace Moq
 			Mock.VerifySet(this, expression, times(), null);
 		}
 
-		/// <include file='Mock.Generic.xdoc' path='docs/doc[@for="Mock{T}.VerifySet(expression,failMessage)"]/*'/>
+		/// <summary>
+		///   Verifies that a property was set on the mock, specifying a failure message.
+		/// </summary>
+		/// <param name="setterExpression">Expression to verify.</param>
+		/// <param name="failMessage">Message to show if verification fails.</param>
+		/// <exception cref="MockException">The invocation was not performed on the mock.</exception>
 		public void VerifySet(Action<T> setterExpression, string failMessage)
 		{
 			Guard.NotNull(setterExpression, nameof(setterExpression));
@@ -516,7 +830,15 @@ namespace Moq
 			Mock.VerifySet(this, expression, Times.AtLeastOnce(), failMessage);
 		}
 
-		/// <include file='Mock.Generic.xdoc' path='docs/doc[@for="Mock{T}.VerifySet(expression,times,failMessage)"]/*'/>
+		/// <summary>
+		///   Verifies that a property was set on the mock, specifying a failure message.
+		/// </summary>
+		/// <param name="setterExpression">Expression to verify.</param>
+		/// <param name="times">The number of times a method is allowed to be called.</param>
+		/// <param name="failMessage">Message to show if verification fails.</param>
+		/// <exception cref="MockException">
+		///   The invocation was not called the same amount of times specified by <paramref name="times"/>.
+		/// </exception>
 		public void VerifySet(Action<T> setterExpression, Times times, string failMessage)
 		{
 			Guard.NotNull(setterExpression, nameof(setterExpression));
@@ -525,7 +847,15 @@ namespace Moq
 			Mock.VerifySet(this, expression, times, failMessage);
 		}
 
-		/// <include file='Mock.Generic.xdoc' path='docs/doc[@for="Mock{T}.VerifySet(expression,times,failMessage)"]/*'/>
+		/// <summary>
+		///   Verifies that a property was set on the mock, specifying a failure message.
+		/// </summary>
+		/// <param name="setterExpression">Expression to verify.</param>
+		/// <param name="times">The number of times a method is allowed to be called.</param>
+		/// <param name="failMessage">Message to show if verification fails.</param>
+		/// <exception cref="MockException">
+		///   The invocation was not called the same amount of times specified by <paramref name="times"/>.
+		/// </exception>
 		public void VerifySet(Action<T> setterExpression, Func<Times> times, string failMessage)
 		{
 			Guard.NotNull(setterExpression, nameof(setterExpression));
@@ -543,18 +873,32 @@ namespace Moq
 			Mock.VerifyNoOtherCalls(this);
 		}
 
-#endregion
+		#endregion
 
-#region Raise
+		#region Raise
 
-		/// <include file='Mock.Generic.xdoc' path='docs/doc[@for="Mock{T}.Raise"]/*'/>
+		/// <summary>
+		///   Raises the event referenced in <paramref name="eventExpression"/> using the given
+		///   <paramref name="args"/> argument.
+		/// </summary>
+		/// <exception cref="ArgumentException">
+		///   The <paramref name="args"/> argument is invalid for the target event invocation,
+		///   or the <paramref name="eventExpression"/> is not an event attach or detach expression.
+		/// </exception>
 		[SuppressMessage("Microsoft.Design", "CA1030:UseEventsWhereAppropriate", Justification = "Raises the event, rather than being one.")]
 		public void Raise(Action<T> eventExpression, EventArgs args)
 		{
 			Mock.RaiseEvent(this, eventExpression, new object[] { this.Object, args });
 		}
 
-		/// <include file='Mock.Generic.xdoc' path='docs/doc[@for="Mock{T}.Raise(args)"]/*'/>
+		/// <summary>
+		///  Raises the event referenced in <paramref name="eventExpression"/> using the given
+		///  <paramref name="args"/> argument for a non-<see cref="EventHandler"/>-typed event.
+		/// </summary>
+		/// <exception cref="ArgumentException">
+		///   The <paramref name="args"/> arguments are invalid for the target event invocation,
+		///   or the <paramref name="eventExpression"/> is not an event attach or detach expression.
+		/// </exception>
 		[SuppressMessage("Microsoft.Design", "CA1030:UseEventsWhereAppropriate", Justification = "Raises the event, rather than being one.")]
 		public void Raise(Action<T> eventExpression, params object[] args)
 		{

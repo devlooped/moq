@@ -111,11 +111,6 @@
 			<DependentUpon>Match.cs</DependentUpon>
 		</None>
 
-		<None Update="Mock.Generic.xdoc">
-			<DependentUpon>Mock.Generic.cs</DependentUpon>
-			<SubType>Designer</SubType>
-		</None>
-
 		<None Update="Times.xdoc">
 			<DependentUpon>Times.cs</DependentUpon>
 		</None>
