@@ -163,7 +163,7 @@ namespace Moq
 
 		/// <include file='Mock.xdoc' path='docs/doc[@for="Mock.OnGetObject"]/*'/>
 		[SuppressMessage("Microsoft.Design", "CA1024:UsePropertiesWhereAppropriate", Justification = "This is actually the protected virtual implementation of the property Object.")]
-		protected abstract object OnGetObject();
+		protected internal abstract object OnGetObject();
 
 		/// <summary>
 		/// Retrieves the type of the mocked object, its generic type argument.

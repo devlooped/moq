@@ -50,11 +50,6 @@ namespace Moq
 
 		internal override Type[] InheritedInterfaces => this.owner.InheritedInterfaces;
 
-		public override TInterface Object
-		{
-			get { return this.owner.Object as TInterface; }
-		}
-
 		internal override SetupCollection Setups => this.owner.Setups;
 
 		public override Switches Switches
@@ -70,10 +65,7 @@ namespace Moq
 			return this.owner.As<TNewInterface>();
 		}
 
-		protected override object OnGetObject()
-		{
-			return this.owner.Object;
-		}
+		protected internal override object OnGetObject() => this.owner.OnGetObject();
 
 		public override string ToString()
 		{
