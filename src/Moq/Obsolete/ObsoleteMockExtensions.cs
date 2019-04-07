@@ -20,6 +20,61 @@ namespace Moq
 	public static class ObsoleteMockExtensions
 	{
 		/// <summary>
+		/// Obsolete.
+		/// </summary>
+		[Obsolete("Expect has been renamed to Setup.", false)]
+		[EditorBrowsable(EditorBrowsableState.Never)]
+		public static ISetup<T> Expect<T>(this Mock<T> mock, Expression<Action<T>> expression)
+			where T : class
+		{
+			return mock.Setup(expression);
+		}
+
+		/// <summary>
+		/// Obsolete.
+		/// </summary>
+		[Obsolete("Expect has been renamed to Setup.", false)]
+		[EditorBrowsable(EditorBrowsableState.Never)]
+		public static ISetup<T, TResult> Expect<T, TResult>(this Mock<T> mock, Expression<Func<T, TResult>> expression)
+			where T : class
+		{
+			return mock.Setup(expression);
+		}
+
+		/// <summary>
+		/// Obsolete.
+		/// </summary>
+		[Obsolete("ExpectGet has been renamed to SetupGet.", false)]
+		[EditorBrowsable(EditorBrowsableState.Never)]
+		public static ISetupGetter<T, TProperty> ExpectGet<T, TProperty>(this Mock<T> mock, Expression<Func<T, TProperty>> expression)
+			where T : class
+		{
+			return mock.SetupGet(expression);
+		}
+
+		/// <summary>
+		/// Obsolete.
+		/// </summary>
+		[Obsolete("ExpectSet has been renamed to SetupSet.", false)]
+		[EditorBrowsable(EditorBrowsableState.Never)]
+		public static ISetupSetter<T, TProperty> ExpectSet<T, TProperty>(this Mock<T> mock, Expression<Func<T, TProperty>> expression)
+			where T : class
+		{
+			return mock.SetupSet(expression);
+		}
+
+		/// <summary>
+		/// Obsolete.
+		/// </summary>
+		[Obsolete("ExpectSet has been renamed to SetupSet, and the new syntax allows you to pass the value in the expression itself, like f => f.Value = 25.", true)]
+		[EditorBrowsable(EditorBrowsableState.Never)]
+		public static ISetupSetter<T, TProperty> ExpectSet<T, TProperty>(this Mock<T> mock, Expression<Func<T, TProperty>> expression, TProperty value)
+			where T : class
+		{
+			throw new NotSupportedException();
+		}
+
+		/// <summary>
 		/// Specifies a setup on the mocked type for a call to 
 		/// to a property setter, regardless of its value.
 		/// </summary>
