@@ -2,6 +2,6 @@
   href: quickstart.md
 - name: Articles
   href: articles/
-- name: Api Documentation
+- name: API Documentation
   href: api/
   homepage: api/index.md
