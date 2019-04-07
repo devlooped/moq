@@ -93,6 +93,16 @@
 			<DependentUpon>IReturns.tt</DependentUpon>
 		</Compile>
 
+		<None Update="AsyncExtensions.tt">
+			<Generator>TextTemplatingFileGenerator</Generator>
+			<LastGenOutput>AsyncExtensions.Generated.cs</LastGenOutput>
+		</None>
+		<Compile Update="AsyncExtensions.Generated.cs">
+			<AutoGen>True</AutoGen>
+			<DesignTime>True</DesignTime>
+			<DependentUpon>AsyncExtensions.tt</DependentUpon>
+		</Compile>
+
 		<None Update="It.xdoc">
 			<DependentUpon>It.cs</DependentUpon>
 		</None>
@@ -109,16 +119,6 @@
 		<None Update="Mock.xdoc">
 			<DependentUpon>Mock.cs</DependentUpon>
 		</None>
-
-		<None Update="ReturnsExtensions.tt">
-			<Generator>TextTemplatingFileGenerator</Generator>
-			<LastGenOutput>ReturnsExtensions.Generated.cs</LastGenOutput>
-		</None>
-		<Compile Update="ReturnsExtensions.Generated.cs">
-			<AutoGen>True</AutoGen>
-			<DesignTime>True</DesignTime>
-			<DependentUpon>ReturnsExtensions.tt</DependentUpon>
-		</Compile>
 
 		<None Update="Times.xdoc">
 			<DependentUpon>Times.cs</DependentUpon>

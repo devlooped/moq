@@ -13,7 +13,7 @@ using Moq.Language.Flow;
 
 namespace Moq
 {
-	public static partial class ReturnsExtensions
+	public static partial class AsyncExtensions
 	{
 		/// <summary>
 		/// Specifies a function that will calculate the value to return from the asynchronous method.
