@@ -4,7 +4,7 @@
 using System;
 using System.ComponentModel;
 using System.Reflection;
-
+using System.Threading.Tasks;
 using Moq.Properties;
 
 namespace Moq.Language.Flow
@@ -71,9 +71,31 @@ namespace Moq.Language.Flow
 			if (valueFunction is TResult)
 			{
 				return this.Returns((TResult)(object)valueFunction);
-			}
+			}	
 
 			this.setup.AddReturns(() => valueFunction());
+			return this;
+		}
+
+		public ISetupSequentialResult<TResult> ReturnsAsync(Func<TResult> valueFunction)
+		{
+			Guard.NotNull(valueFunction, nameof(valueFunction));
+
+			// If `valueFunction` is `TResult`, that is someone is setting up the return value of a method
+			// that returns a `TResult`, then we have arrived here because C# picked the wrong overload:
+			// We don't want to invoke the passed delegate to get a return value; the passed delegate
+			// already is the return value.
+			if (valueFunction is TResult)
+			{
+				return this.Returns((TResult)(object)valueFunction);
+			}
+
+			this.setup.AddReturns(() => {
+				return Task.Run(() =>
+				{
+					return valueFunction();
+				});
+			});
 			return this;
 		}
 
