@@ -8,11 +8,11 @@ using Moq.Properties;
 namespace Moq
 {
 	/// <include file='Times.xdoc' path='docs/doc[@for="Times"]/*'/>
-	public struct Times : IEquatable<Times>
+	public readonly struct Times : IEquatable<Times>
 	{
-		private int from;
-		private int to;
-		private Kind kind;
+		private readonly int from;
+		private readonly int to;
+		private readonly Kind kind;
 
 		private Times(Kind kind, int from, int to)
 		{
