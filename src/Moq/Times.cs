@@ -10,14 +10,14 @@ namespace Moq
 	/// <include file='Times.xdoc' path='docs/doc[@for="Times"]/*'/>
 	public struct Times
 	{
-		private Func<int, bool> evaluator;
 		private string messageFormat;
 		private int from;
 		private int to;
+		private Kind kind;
 
-		private Times(Func<int, bool> evaluator, int from, int to, string messageFormat)
+		private Times(Kind kind, int from, int to, string messageFormat)
 		{
-			this.evaluator = evaluator;
+			this.kind = kind;
 			this.from = from;
 			this.to = to;
 			this.messageFormat = messageFormat;
@@ -28,13 +28,13 @@ namespace Moq
 		{
 			Guard.NotOutOfRangeInclusive(callCount, 1, int.MaxValue, nameof(callCount));
 
-			return new Times(c => c >= callCount, callCount, int.MaxValue, Resources.NoMatchingCallsAtLeast);
+			return new Times(Kind.AtLeast, callCount, int.MaxValue, Resources.NoMatchingCallsAtLeast);
 		}
 
 		/// <include file='Times.xdoc' path='docs/doc[@for="Times.AtLeastOnce"]/*'/>
 		public static Times AtLeastOnce()
 		{
-			return new Times(c => c >= 1, 1, int.MaxValue, Resources.NoMatchingCallsAtLeastOnce);
+			return new Times(Kind.AtLeastOnce, 1, int.MaxValue, Resources.NoMatchingCallsAtLeastOnce);
 		}
 
 		/// <include file='Times.xdoc' path='docs/doc[@for="Times.AtMost"]/*'/>
@@ -42,13 +42,13 @@ namespace Moq
 		{
 			Guard.NotOutOfRangeInclusive(callCount, 0, int.MaxValue, nameof(callCount));
 
-			return new Times(c => c >= 0 && c <= callCount, 0, callCount, Resources.NoMatchingCallsAtMost);
+			return new Times(Kind.AtMost, 0, callCount, Resources.NoMatchingCallsAtMost);
 		}
 
 		/// <include file='Times.xdoc' path='docs/doc[@for="Times.AtMostOnce"]/*'/>
 		public static Times AtMostOnce()
 		{
-			return new Times(c => c >= 0 && c <= 1, 0, 1, Resources.NoMatchingCallsAtMostOnce);
+			return new Times(Kind.AtMostOnce, 0, 1, Resources.NoMatchingCallsAtMostOnce);
 		}
 
 		/// <include file='Times.xdoc' path='docs/doc[@for="Times.Between"]/*'/>
@@ -63,7 +63,7 @@ namespace Moq
 				}
 
 				return new Times(
-					c => c > callCountFrom && c < callCountTo,
+					Kind.BetweenExclusive,
 					callCountFrom,
 					callCountTo,
 					Resources.NoMatchingCallsBetweenExclusive);
@@ -71,7 +71,7 @@ namespace Moq
 
 			Guard.NotOutOfRangeInclusive(callCountFrom, 0, callCountTo, nameof(callCountFrom));
 			return new Times(
-				c => c >= callCountFrom && c <= callCountTo,
+				Kind.BetweenInclusive,
 				callCountFrom,
 				callCountTo,
 				Resources.NoMatchingCallsBetweenInclusive);
@@ -82,19 +82,19 @@ namespace Moq
 		{
 			Guard.NotOutOfRangeInclusive(callCount, 0, int.MaxValue, nameof(callCount));
 
-			return new Times(c => c == callCount, callCount, callCount, Resources.NoMatchingCallsExactly);
+			return new Times(Kind.Exactly, callCount, callCount, Resources.NoMatchingCallsExactly);
 		}
 
 		/// <include file='Times.xdoc' path='docs/doc[@for="Times.Never"]/*'/>
 		public static Times Never()
 		{
-			return new Times(c => c == 0, 0, 0, Resources.NoMatchingCallsNever);
+			return new Times(Kind.Never, 0, 0, Resources.NoMatchingCallsNever);
 		}
 
 		/// <include file='Times.xdoc' path='docs/doc[@for="Times.Once"]/*'/>
 		public static Times Once()
 		{
-			return new Times(c => c == 1, 1, 1, Resources.NoMatchingCallsOnce);
+			return new Times(Kind.Once, 1, 1, Resources.NoMatchingCallsOnce);
 		}
 
 		/// <include file='Times.xdoc' path='docs/doc[@for="Times.Equals"]/*'/>
@@ -141,7 +141,21 @@ namespace Moq
 
 		internal bool Verify(int callCount)
 		{
-			return this.evaluator(callCount);
+			return this.kind == Kind.BetweenExclusive ? this.from <  callCount && callCount <  this.to
+			                                          : this.from <= callCount && callCount <= this.to;
+		}
+
+		private enum Kind
+		{
+			AtLeast,
+			AtLeastOnce,
+			AtMost,
+			AtMostOnce,
+			BetweenExclusive,
+			BetweenInclusive,
+			Exactly,
+			Once,
+			Never,
 		}
 	}
 }
