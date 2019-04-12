@@ -47,6 +47,7 @@ This release contains several **minor breaking changes**. Please review your cod
 * Formatting of enumerable object for error message broke EF Core test case (@MichaelSagalovich, #741)
 * `Verify[All]` fails because of lazy (instead of eager) setup argument expression evaluation (@aeslinger, #711)
 * `ArgumentOutOfRangeException` when setup expression contains indexer access (@mosentok, #714)
+* Incorrect implementation of `Times.Equals` (@stakx, #805)
 
 
 ## 4.10.1 (2018-12-03)
