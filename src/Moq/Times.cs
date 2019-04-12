@@ -25,7 +25,10 @@ namespace Moq
 		/// <include file='Times.xdoc' path='docs/doc[@for="Times.AtLeast"]/*'/>
 		public static Times AtLeast(int callCount)
 		{
-			Guard.NotOutOfRangeInclusive(callCount, 1, int.MaxValue, nameof(callCount));
+			if (callCount < 1)
+			{
+				throw new ArgumentOutOfRangeException(nameof(callCount));
+			}
 
 			return new Times(Kind.AtLeast, callCount, int.MaxValue);
 		}
@@ -39,7 +42,10 @@ namespace Moq
 		/// <include file='Times.xdoc' path='docs/doc[@for="Times.AtMost"]/*'/>
 		public static Times AtMost(int callCount)
 		{
-			Guard.NotOutOfRangeInclusive(callCount, 0, int.MaxValue, nameof(callCount));
+			if (callCount < 0)
+			{
+				throw new ArgumentOutOfRangeException(nameof(callCount));
+			}
 
 			return new Times(Kind.AtMost, 0, callCount);
 		}
@@ -55,23 +61,34 @@ namespace Moq
 		{
 			if (rangeKind == Range.Exclusive)
 			{
-				Guard.NotOutOfRangeExclusive(callCountFrom, 0, callCountTo, nameof(callCountFrom));
+				if (callCountFrom <= 0 || callCountTo <= callCountFrom)
+				{
+					throw new ArgumentOutOfRangeException(nameof(callCountFrom));
+				}
+
 				if (callCountTo - callCountFrom == 1)
 				{
-					throw new ArgumentOutOfRangeException("callCountTo");
+					throw new ArgumentOutOfRangeException(nameof(callCountTo));
 				}
 
 				return new Times(Kind.BetweenExclusive, callCountFrom + 1, callCountTo - 1);
 			}
 
-			Guard.NotOutOfRangeInclusive(callCountFrom, 0, callCountTo, nameof(callCountFrom));
+			if (callCountFrom < 0 || callCountTo < callCountFrom)
+			{
+				throw new ArgumentOutOfRangeException(nameof(callCountFrom));
+			}
+
 			return new Times(Kind.BetweenInclusive, callCountFrom, callCountTo);
 		}
 
 		/// <include file='Times.xdoc' path='docs/doc[@for="Times.Exactly"]/*'/>
 		public static Times Exactly(int callCount)
 		{
-			Guard.NotOutOfRangeInclusive(callCount, 0, int.MaxValue, nameof(callCount));
+			if (callCount < 0)
+			{
+				throw new ArgumentOutOfRangeException(nameof(callCount));
+			}
 
 			return new Times(Kind.Exactly, callCount, callCount);
 		}
