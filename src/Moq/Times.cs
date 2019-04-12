@@ -8,7 +8,7 @@ using Moq.Properties;
 namespace Moq
 {
 	/// <include file='Times.xdoc' path='docs/doc[@for="Times"]/*'/>
-	public struct Times
+	public struct Times : IEquatable<Times>
 	{
 		private int from;
 		private int to;
@@ -87,16 +87,23 @@ namespace Moq
 			return new Times(Kind.Once, 1, 1);
 		}
 
+		/// <summary>
+		///   Returns a value indicating whether this instance is equal to a specified <see cref="Times"/> value.
+		/// </summary>
+		/// <param name="other">A <see cref="Times"/> value to compare to this instance.</param>
+		/// <returns>
+		///   <see langword="true"/> if <paramref name="other"/> has the same value as this instance;
+		///   otherwise, <see langword="true"/>.
+		/// </returns>
+		public bool Equals(Times other)
+		{
+			return this.from == other.from && this.to == other.to;
+		}
+
 		/// <include file='Times.xdoc' path='docs/doc[@for="Times.Equals"]/*'/>
 		public override bool Equals(object obj)
 		{
-			if (obj is Times)
-			{
-				var other = (Times)obj;
-				return this.from == other.from && this.to == other.to;
-			}
-
-			return false;
+			return obj is Times other && this.Equals(other);
 		}
 
 		/// <include file='Times.xdoc' path='docs/doc[@for="Times.GetHashCode"]/*'/>
