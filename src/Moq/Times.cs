@@ -10,17 +10,15 @@ namespace Moq
 	/// <include file='Times.xdoc' path='docs/doc[@for="Times"]/*'/>
 	public struct Times
 	{
-		private string messageFormat;
 		private int from;
 		private int to;
 		private Kind kind;
 
-		private Times(Kind kind, int from, int to, string messageFormat)
+		private Times(Kind kind, int from, int to)
 		{
-			this.kind = kind;
 			this.from = from;
 			this.to = to;
-			this.messageFormat = messageFormat;
+			this.kind = kind;
 		}
 
 		/// <include file='Times.xdoc' path='docs/doc[@for="Times.AtLeast"]/*'/>
@@ -28,13 +26,13 @@ namespace Moq
 		{
 			Guard.NotOutOfRangeInclusive(callCount, 1, int.MaxValue, nameof(callCount));
 
-			return new Times(Kind.AtLeast, callCount, int.MaxValue, Resources.NoMatchingCallsAtLeast);
+			return new Times(Kind.AtLeast, callCount, int.MaxValue);
 		}
 
 		/// <include file='Times.xdoc' path='docs/doc[@for="Times.AtLeastOnce"]/*'/>
 		public static Times AtLeastOnce()
 		{
-			return new Times(Kind.AtLeastOnce, 1, int.MaxValue, Resources.NoMatchingCallsAtLeastOnce);
+			return new Times(Kind.AtLeastOnce, 1, int.MaxValue);
 		}
 
 		/// <include file='Times.xdoc' path='docs/doc[@for="Times.AtMost"]/*'/>
@@ -42,13 +40,13 @@ namespace Moq
 		{
 			Guard.NotOutOfRangeInclusive(callCount, 0, int.MaxValue, nameof(callCount));
 
-			return new Times(Kind.AtMost, 0, callCount, Resources.NoMatchingCallsAtMost);
+			return new Times(Kind.AtMost, 0, callCount);
 		}
 
 		/// <include file='Times.xdoc' path='docs/doc[@for="Times.AtMostOnce"]/*'/>
 		public static Times AtMostOnce()
 		{
-			return new Times(Kind.AtMostOnce, 0, 1, Resources.NoMatchingCallsAtMostOnce);
+			return new Times(Kind.AtMostOnce, 0, 1);
 		}
 
 		/// <include file='Times.xdoc' path='docs/doc[@for="Times.Between"]/*'/>
@@ -62,19 +60,11 @@ namespace Moq
 					throw new ArgumentOutOfRangeException("callCountTo");
 				}
 
-				return new Times(
-					Kind.BetweenExclusive,
-					callCountFrom + 1,
-					callCountTo - 1,
-					Resources.NoMatchingCallsBetweenExclusive);
+				return new Times(Kind.BetweenExclusive, callCountFrom + 1, callCountTo - 1);
 			}
 
 			Guard.NotOutOfRangeInclusive(callCountFrom, 0, callCountTo, nameof(callCountFrom));
-			return new Times(
-				Kind.BetweenInclusive,
-				callCountFrom,
-				callCountTo,
-				Resources.NoMatchingCallsBetweenInclusive);
+			return new Times(Kind.BetweenInclusive, callCountFrom, callCountTo);
 		}
 
 		/// <include file='Times.xdoc' path='docs/doc[@for="Times.Exactly"]/*'/>
@@ -82,19 +72,19 @@ namespace Moq
 		{
 			Guard.NotOutOfRangeInclusive(callCount, 0, int.MaxValue, nameof(callCount));
 
-			return new Times(Kind.Exactly, callCount, callCount, Resources.NoMatchingCallsExactly);
+			return new Times(Kind.Exactly, callCount, callCount);
 		}
 
 		/// <include file='Times.xdoc' path='docs/doc[@for="Times.Never"]/*'/>
 		public static Times Never()
 		{
-			return new Times(Kind.Never, 0, 0, Resources.NoMatchingCallsNever);
+			return new Times(Kind.Never, 0, 0);
 		}
 
 		/// <include file='Times.xdoc' path='docs/doc[@for="Times.Once"]/*'/>
 		public static Times Once()
 		{
-			return new Times(Kind.Once, 1, 1, Resources.NoMatchingCallsOnce);
+			return new Times(Kind.Once, 1, 1);
 		}
 
 		/// <include file='Times.xdoc' path='docs/doc[@for="Times.Equals"]/*'/>
@@ -132,9 +122,23 @@ namespace Moq
 			var from = this.kind == Kind.BetweenExclusive ? this.from - 1 : this.from;
 			var to   = this.kind == Kind.BetweenExclusive ? this.to   + 1 : this.to;
 
+			string message = null;
+			switch (this.kind)
+			{
+				case Kind.AtLeast:          message = Resources.NoMatchingCallsAtLeast; break;
+				case Kind.AtLeastOnce:      message = Resources.NoMatchingCallsAtLeastOnce; break;
+				case Kind.AtMost:           message = Resources.NoMatchingCallsAtMost; break;
+				case Kind.AtMostOnce:       message = Resources.NoMatchingCallsAtMostOnce; break;
+				case Kind.BetweenExclusive: message = Resources.NoMatchingCallsBetweenExclusive; break;
+				case Kind.BetweenInclusive: message = Resources.NoMatchingCallsBetweenInclusive; break;
+				case Kind.Exactly:          message = Resources.NoMatchingCallsExactly; break;
+				case Kind.Once:             message = Resources.NoMatchingCallsOnce; break;
+				case Kind.Never:            message = Resources.NoMatchingCallsNever; break;
+			}
+
 			return string.Format(
 				CultureInfo.CurrentCulture,
-				this.messageFormat,
+				message,
 				failMessage,
 				expression,
 				from,
