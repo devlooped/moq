@@ -64,8 +64,8 @@ namespace Moq
 
 				return new Times(
 					Kind.BetweenExclusive,
-					callCountFrom,
-					callCountTo,
+					callCountFrom + 1,
+					callCountTo - 1,
 					Resources.NoMatchingCallsBetweenExclusive);
 			}
 
@@ -129,20 +129,22 @@ namespace Moq
 
 		internal string GetExceptionMessage(string failMessage, string expression, int callCount)
 		{
+			var from = this.kind == Kind.BetweenExclusive ? this.from - 1 : this.from;
+			var to   = this.kind == Kind.BetweenExclusive ? this.to   + 1 : this.to;
+
 			return string.Format(
 				CultureInfo.CurrentCulture,
 				this.messageFormat,
 				failMessage,
 				expression,
-				this.from,
-				this.to,
+				from,
+				to,
 				callCount);
 		}
 
 		internal bool Verify(int callCount)
 		{
-			return this.kind == Kind.BetweenExclusive ? this.from <  callCount && callCount <  this.to
-			                                          : this.from <= callCount && callCount <= this.to;
+			return this.from <= callCount && callCount <= this.to;
 		}
 
 		private enum Kind
