@@ -186,8 +186,7 @@ mock.SetupSet(x =&gt; x.{1}).Callback(callbackDelegate);
 		<value>Expression is not a method invocation: {0}</value>
 	</data>
 	<data name="NoMatchingCallsAtLeastOnce" xml:space="preserve">
-		<value>{0}
-Expected invocation on the mock at least once, but was never performed: {1}</value>
+		<value>Expected invocation on the mock at least once, but was never performed: </value>
 	</data>
 	<data name="AlreadyInitialized" xml:space="preserve">
 		<value>Mock type has already been initialized by accessing its Object property. Adding interfaces must be done before that.</value>
@@ -216,36 +215,28 @@ Remember that there's no generics covariance in the CLR, so your object must be 
 		<value>Type {0} does not from required type {1}</value>
 	</data>
 	<data name="NoMatchingCallsAtLeast" xml:space="preserve">
-		<value>{0}
-Expected invocation on the mock at least {2} times, but was {4} times: {1}</value>
+		<value>Expected invocation on the mock at least {0} times, but was {2} times: </value>
 	</data>
 	<data name="NoMatchingCallsAtMost" xml:space="preserve">
-		<value>{0}
-Expected invocation on the mock at most {3} times, but was {4} times: {1}</value>
+		<value>Expected invocation on the mock at most {1} times, but was {2} times: </value>
 	</data>
 	<data name="NoMatchingCallsAtMostOnce" xml:space="preserve">
-		<value>{0}
-Expected invocation on the mock at most once, but was {4} times: {1}</value>
+		<value>Expected invocation on the mock at most once, but was {2} times: </value>
 	</data>
 	<data name="NoMatchingCallsBetweenInclusive" xml:space="preserve">
-		<value>{0}
-Expected invocation on the mock between {2} and {3} times (Inclusive), but was {4} times: {1}</value>
+		<value>Expected invocation on the mock between {0} and {1} times (Inclusive), but was {2} times: </value>
 	</data>
 	<data name="NoMatchingCallsExactly" xml:space="preserve">
-		<value>{0}
-Expected invocation on the mock exactly {2} times, but was {4} times: {1}</value>
+		<value>Expected invocation on the mock exactly {0} times, but was {2} times: </value>
 	</data>
 	<data name="NoMatchingCallsNever" xml:space="preserve">
-		<value>{0}
-Expected invocation on the mock should never have been performed, but was {4} times: {1}</value>
+		<value>Expected invocation on the mock should never have been performed, but was {2} times: </value>
 	</data>
 	<data name="NoMatchingCallsBetweenExclusive" xml:space="preserve">
-		<value>{0}
-Expected invocation on the mock between {2} and {3} times (Exclusive), but was {4} times: {1}</value>
+		<value>Expected invocation on the mock between {0} and {1} times (Exclusive), but was {2} times: </value>
 	</data>
 	<data name="NoMatchingCallsOnce" xml:space="preserve">
-		<value>{0}
-Expected invocation on the mock once, but was {4} times: {1}</value>
+		<value>Expected invocation on the mock once, but was {2} times: </value>
 	</data>
 	<data name="OutExpressionMustBeConstantValue" xml:space="preserve">
 		<value>Out expression must evaluate to a constant value.</value>

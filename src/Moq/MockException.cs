@@ -47,9 +47,12 @@ namespace Moq
 		/// </summary>
 		internal static MockException MoreThanOneCall(MethodCall setup, int invocationCount)
 		{
-			return new MockException(
-				MockExceptionReasons.MoreThanOneCall,
-				Times.AtMostOnce().GetExceptionMessage(setup.FailMessage, setup.Expression.ToStringFixed(), invocationCount));
+			var message = new StringBuilder();
+			message.AppendLine(setup.FailMessage ?? "")
+			       .Append(Times.AtMostOnce().GetExceptionMessage(invocationCount))
+			       .AppendLine(setup.Expression.ToStringFixed());
+
+			return new MockException(MockExceptionReasons.MoreThanOneCall, message.ToString());
 		}
 
 		/// <summary>
@@ -57,9 +60,12 @@ namespace Moq
 		/// </summary>
 		internal static MockException MoreThanNCalls(MethodCall setup, int maxInvocationCount, int invocationCount)
 		{
-			return new MockException(
-				MockExceptionReasons.MoreThanNCalls,
-				Times.AtMost(maxInvocationCount).GetExceptionMessage(setup.FailMessage, setup.Expression.ToStringFixed(), invocationCount));
+			var message = new StringBuilder();
+			message.AppendLine(setup.FailMessage ?? "")
+			       .Append(Times.AtMost(maxInvocationCount).GetExceptionMessage(invocationCount))
+			       .AppendLine(setup.Expression.ToStringFixed());
+
+			return new MockException(MockExceptionReasons.MoreThanNCalls, message.ToString());
 		}
 
 		/// <summary>
@@ -73,7 +79,10 @@ namespace Moq
 			int callCount)
 		{
 			var message = new StringBuilder();
-			message.AppendLine(times.GetExceptionMessage(failMessage, expression.PartialMatcherAwareEval().ToStringFixed(), callCount))
+			message.AppendLine(failMessage ?? "")
+			       .Append(times.GetExceptionMessage(callCount))
+			       .AppendLine(expression.PartialMatcherAwareEval().ToStringFixed())
+			       .AppendLine()
 			       .AppendLine(Resources.PerformedInvocations)
 			       .AppendLine();
 

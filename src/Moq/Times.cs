@@ -3,6 +3,7 @@
 
 using System;
 using System.Globalization;
+
 using Moq.Properties;
 
 namespace Moq
@@ -124,7 +125,7 @@ namespace Moq
 			return !left.Equals(right);
 		}
 
-		internal string GetExceptionMessage(string failMessage, string expression, int callCount)
+		internal string GetExceptionMessage(int callCount)
 		{
 			var from = this.kind == Kind.BetweenExclusive ? this.from - 1 : this.from;
 			var to   = this.kind == Kind.BetweenExclusive ? this.to   + 1 : this.to;
@@ -143,14 +144,7 @@ namespace Moq
 				case Kind.Never:            message = Resources.NoMatchingCallsNever; break;
 			}
 
-			return string.Format(
-				CultureInfo.CurrentCulture,
-				message,
-				failMessage,
-				expression,
-				from,
-				to,
-				callCount);
+			return string.Format(CultureInfo.CurrentCulture, message, from, to, callCount);
 		}
 
 		internal bool Verify(int callCount)
