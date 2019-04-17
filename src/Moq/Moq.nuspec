@@ -9,7 +9,7 @@
 		<licenseUrl>https://raw.githubusercontent.com/moq/moq4/master/License.txt</licenseUrl>
 		<projectUrl>https://github.com/moq/moq4</projectUrl>
 		<requireLicenseAcceptance>false</requireLicenseAcceptance>
-		<description>Moq is the most popular and friendly mocking framework for .NET</description>
+		<description>Moq is the most popular and friendly mocking library for .NET</description>
 		<tags>moq tdd mocking mocks unittesting agile unittest</tags>
 		<releaseNotes>A changelog is available at https://github.com/moq/moq4/blob/master/CHANGELOG.md.</releaseNotes>
 		<dependencies>

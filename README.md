@@ -1,7 +1,7 @@
 moq
 ===
 
-The most popular and friendly mocking framework for .NET
+The most popular and friendly mocking library for .NET
 
 [![Version](https://img.shields.io/nuget/v/Moq.svg)](https://www.nuget.org/packages/Moq)
 [![Downloads](https://img.shields.io/nuget/dt/Moq.svg)](https://www.nuget.org/packages/Moq)
@@ -10,26 +10,26 @@ The most popular and friendly mocking framework for .NET
 
 
 ```csharp
-  var mock = new Mock<ILoveThisFramework>();
+  var mock = new Mock<ILoveThisLibrary>();
 
   // WOW! No record/replay weirdness?! :)
-  mock.Setup(framework => framework.DownloadExists("2.0.0.0"))
+  mock.Setup(library => library.DownloadExists("2.0.0.0"))
       .Returns(true);
 
   // Use the Object property on the mock to get a reference to the object
-  // implementing ILoveThisFramework, and then exercise it by calling
+  // implementing ILoveThisLibrary, and then exercise it by calling
   // methods on it
-  ILoveThisFramework lovable = mock.Object;
+  ILoveThisLibrary lovable = mock.Object;
   bool download = lovable.DownloadExists("2.0.0.0");
 
   // Verify that the given method was indeed called with the expected value at most once
-  mock.Verify(framework => framework.DownloadExists("2.0.0.0"), Times.AtMostOnce());
+  mock.Verify(library => library.DownloadExists("2.0.0.0"), Times.AtMostOnce());
 ```
 
-Moq also is the first and only framework so far to provide Linq to Mocks, so that the same behavior above can be achieved much more succinctly:
+Moq also is the first and only library so far to provide Linq to Mocks, so that the same behavior above can be achieved much more succinctly:
 
 ```csharp
-  ILoveThisFramework lovable = Mock.Of<ILoveThisFramework>(l =>
+  ILoveThisLibrary lovable = Mock.Of<ILoveThisLibrary>(l =>
     l.DownloadExists("2.0.0.0") == true);
 
   // Exercise the instance returned by Mock.Of by calling methods on it...
@@ -40,7 +40,7 @@ Moq also is the first and only framework so far to provide Linq to Mocks, so tha
   
   // If you really want to go beyond state testing and want to 
   // verify the mock interaction instead...
-  Mock.Get(lovable).Verify(framework => framework.DownloadExists("2.0.0.0"));
+  Mock.Get(lovable).Verify(library => library.DownloadExists("2.0.0.0"));
 ```
 
 You can think of Linq to Mocks as "from the universe of mocks, give me one whose behavior matches this expression".
@@ -57,7 +57,7 @@ The library was created mainly for developers who aren't currently using any moc
 
 Moq is designed to be a very practical, unobtrusive and straight-forward way to quickly setup dependencies for your tests. Its API design helps even novice users to fall in the "pit of success" and avoid most common misuses/abuses of mocking. 
 
-When it was conceived, it was the only mocking library that went against the generalized and somewhat unintuitive (especially for novices) Record/Replay approach from all other frameworks (and [that might have been a good thing](http://blogs.clariusconsulting.net/kzu/whats-wrong-with-the-recordreplyverify-model-for-mocking-frameworks/) ;)). 
+When it was conceived, it was the only mocking library that went against the generalized and somewhat unintuitive (especially for novices) Record/Replay approach from all other libraries (and [that might have been a good thing](http://blogs.clariusconsulting.net/kzu/whats-wrong-with-the-recordreplyverify-model-for-mocking-frameworks/) ;)).
 
 Not using Record/Replay also means that it's straightforward to move common expectations to a fixture setup method and even override those expectations when needed in a specific unit test.
 
