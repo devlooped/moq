@@ -37,6 +37,11 @@ namespace Moq.Language.Flow
 			this.setup.AddThrows(exception);
 			return this;
 		}
+
+		public override string ToString()
+		{
+			return setup.Expression.ToStringFixed();
+		}
 	}
 
 	internal sealed class SetupSequencePhrase<TResult> : ISetupSequentialResult<TResult>
@@ -86,5 +91,10 @@ namespace Moq.Language.Flow
 		public ISetupSequentialResult<TResult> Throws<TException>()
 			where TException : Exception, new()
 			=> this.Throws(new TException());
+
+		public override string ToString()
+		{
+			return setup.Expression.ToStringFixed();
+		}
 	}
 }
