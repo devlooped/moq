@@ -2467,6 +2467,21 @@ namespace Moq.Tests.Regressions
 		}
 
 		#endregion
+		
+		#region #810
+
+		public class _810
+		{
+			[Fact]
+			public void SetupPhraseConvertsExpressionToDescriptiveString()
+			{
+				var setupPhrase = new Mock<IFoo>().Setup(x => x.DoThings(null));
+
+				Assert.Equal("x => x.DoThings(null)", setupPhrase.ToString());
+			}
+		}
+		
+		#endregion
 
 		// Old @ Google Code
 
