@@ -48,7 +48,7 @@ This release contains several **minor breaking changes**. Please review your cod
 * `Verify[All]` fails because of lazy (instead of eager) setup argument expression evaluation (@aeslinger, #711)
 * `ArgumentOutOfRangeException` when setup expression contains indexer access (@mosentok, #714)
 * Incorrect implementation of `Times.Equals` (@stakx, #805)
-
+* Calling `ToString()` on `SetupPhrase` does not return expression (@jacob-ewald, #810)
 
 ## 4.10.1 (2018-12-03)
 
