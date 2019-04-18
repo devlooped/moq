@@ -162,5 +162,10 @@ namespace Moq.Language.Flow
 		{
 			this.setup.Verifiable(failMessage);
 		}
+
+		public override string ToString()
+		{
+			return setup.Expression.ToStringFixed();
+		}
 	}
 }

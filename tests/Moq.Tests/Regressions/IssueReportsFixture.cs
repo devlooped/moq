@@ -2467,6 +2467,47 @@ namespace Moq.Tests.Regressions
 		}
 
 		#endregion
+		
+		#region #810
+
+		public class _810
+		{
+			[Fact]
+			public void VoidSetupPhraseConvertsExpressionToDescriptiveString()
+			{
+				var voidSetup = new Mock<IFoo>().Setup(x => x.DoThings(null));
+
+				Assert.Equal("x => x.DoThings(null)", voidSetup.ToString());
+			}
+
+			[Fact]
+			public void NonVoidSetupPhraseConvertsExpressionToDescriptiveString()
+			{
+				var nonVoidSetup = new Mock<IFoo>().Setup(x => x.Property1);
+
+				Assert.Equal("x => x.Property1", nonVoidSetup.ToString());
+			}
+
+			[Fact]
+			public void SetterSetupPhraseConvertsExpressionToDescriptiveString()
+			{
+				var setterSetup = new Mock<IFoo>().SetupSet<object>(x => x.Property1 = null);
+
+				Assert.Equal("x => x.Property1 = null", setterSetup.ToString());
+			}
+
+			[Fact]
+			public void SetupSequencePhraseConvertsExpressionToDescriptiveString()
+			{
+				var setupSequence = new Mock<IFoo>().SetupSequence(x => x.DoThings(null));
+				var setupGenericSequence = new Mock<IFoo>().SetupSequence(x => x.DoThings<object>(null));
+
+				Assert.Equal("x => x.DoThings(null)", setupSequence.ToString());
+				Assert.Equal("x => x.DoThings<object>(null)", setupGenericSequence.ToString());
+			}
+		}
+
+		#endregion
 
 		// Old @ Google Code
 
@@ -2566,6 +2607,8 @@ namespace Moq.Tests.Regressions
 		public interface IFoo
 		{
 			void DoThings(object arg);
+			T DoThings<T>(object arg);
+			object Property1 { get; set; }
 		}
 
 		[Fact]
