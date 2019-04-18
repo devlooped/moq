@@ -2475,35 +2475,35 @@ namespace Moq.Tests.Regressions
 			[Fact]
 			public void VoidSetupPhraseConvertsExpressionToDescriptiveString()
 			{
-				var voidSetupPhrase = new Mock<IFoo>().Setup(x => x.DoThings(null));
+				var voidSetup = new Mock<IFoo>().Setup(x => x.DoThings(null));
 
-				Assert.Equal("x => x.DoThings(null)", voidSetupPhrase.ToString());
+				Assert.Equal("x => x.DoThings(null)", voidSetup.ToString());
 			}
 
 			[Fact]
 			public void NonVoidSetupPhraseConvertsExpressionToDescriptiveString()
 			{
-				var nonVoidSetupPhrase = new Mock<IFoo>().Setup(x => x.Property1);
+				var nonVoidSetup = new Mock<IFoo>().Setup(x => x.Property1);
 
-				Assert.Equal("x => x.Property1", nonVoidSetupPhrase.ToString());
+				Assert.Equal("x => x.Property1", nonVoidSetup.ToString());
 			}
 
 			[Fact]
 			public void SetterSetupPhraseConvertsExpressionToDescriptiveString()
 			{
-				var setterSetupPhrase = new Mock<IFoo>().SetupSet<object>(x => x.Property1 = null);
+				var setterSetup = new Mock<IFoo>().SetupSet<object>(x => x.Property1 = null);
 
-				Assert.Equal("x => x.Property1 = null", setterSetupPhrase.ToString());
+				Assert.Equal("x => x.Property1 = null", setterSetup.ToString());
 			}
 
 			[Fact]
 			public void SetupSequencePhraseConvertsExpressionToDescriptiveString()
 			{
-				var setupSequencePhrase = new Mock<IFoo>().SetupSequence(x => x.DoThings(null));
-				var setupGenericSequencePhrase = new Mock<IFoo>().SetupSequence(x => x.DoThings<object>(null));
+				var setupSequence = new Mock<IFoo>().SetupSequence(x => x.DoThings(null));
+				var setupGenericSequence = new Mock<IFoo>().SetupSequence(x => x.DoThings<object>(null));
 
-				Assert.Equal("x => x.DoThings(null)", setupSequencePhrase.ToString());
-				Assert.Equal("x => x.DoThings<object>(null)", setupGenericSequencePhrase.ToString());
+				Assert.Equal("x => x.DoThings(null)", setupSequence.ToString());
+				Assert.Equal("x => x.DoThings<object>(null)", setupGenericSequence.ToString());
 			}
 		}
 
