@@ -183,7 +183,10 @@ namespace Moq
 		/// <include file='Mock.Generic.xdoc' path='docs/doc[@for="Mock{T}.Object"]/*'/>
 		[SuppressMessage("Microsoft.Naming", "CA1716:IdentifiersShouldNotMatchKeywords", MessageId = "Object", Justification = "Exposes the mocked object instance, so it's appropriate.")]
 		[SuppressMessage("Microsoft.Naming", "CA1721:PropertyNamesShouldNotMatchGetMethods", Justification = "The public Object property is the only one visible to Moq consumers. The protected member is for internal use only.")]
-		public new T Object => (T)this.OnGetObject();
+		public virtual new T Object
+		{
+			get { return (T)base.Object; }
+		}
 
 		/// <include file='Mock.Generic.xdoc' path='docs/doc[@for="Mock{T}.Name"]/*'/>
 		public string Name
@@ -198,25 +201,30 @@ namespace Moq
 			return this.Name;
 		}
 
+		private void InitializeInstance()
+		{
+			// Determine the set of interfaces that the proxy object should additionally implement.
+			var additionalInterfaceCount = this.AdditionalInterfaces.Count;
+			var interfaces = new Type[1 + additionalInterfaceCount];
+			interfaces[0] = typeof(IMocked<T>);
+			this.AdditionalInterfaces.CopyTo(0, interfaces, 1, additionalInterfaceCount);
+
+			this.instance = (T)ProxyFactory.Instance.CreateProxy(
+				typeof(T),
+				this,
+				interfaces,
+				this.constructorArguments);
+		}
+
 		/// <summary>
 		/// Returns the mocked object value.
 		/// </summary>
 		[SuppressMessage("Microsoft.Design", "CA1024:UsePropertiesWhereAppropriate", Justification = "This is actually the protected virtual implementation of the property Object.")]
-		protected internal override object OnGetObject()
+		protected override object OnGetObject()
 		{
 			if (this.instance == null)
 			{
-				// Determine the set of interfaces that the proxy object should additionally implement.
-				var additionalInterfaceCount = this.AdditionalInterfaces.Count;
-				var interfaces = new Type[1 + additionalInterfaceCount];
-				interfaces[0] = typeof(IMocked<T>);
-				this.AdditionalInterfaces.CopyTo(0, interfaces, 1, additionalInterfaceCount);
-
-				this.instance = (T)ProxyFactory.Instance.CreateProxy(
-					typeof(T),
-					this,
-					interfaces,
-					this.constructorArguments);
+				this.InitializeInstance();
 			}
 
 			return this.instance;

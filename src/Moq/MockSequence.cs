@@ -47,4 +47,24 @@ namespace Moq
 				success: NextStep));
 		}
 	}
+
+	/// <summary>
+	/// Contains extension methods that are related to <see cref="MockSequence"/>.
+	/// </summary>
+	[EditorBrowsable(EditorBrowsableState.Never)]
+	public static class MockSequenceHelper
+	{
+		/// <summary>
+		/// Perform an expectation in the trace.
+		/// </summary>
+		public static ISetupConditionResult<TMock> InSequence<TMock>(
+			this Mock<TMock> mock,
+			MockSequence sequence)
+			where TMock : class
+		{
+			Guard.NotNull(sequence, nameof(sequence));
+
+			return sequence.For(mock);
+		}
+	}
 }

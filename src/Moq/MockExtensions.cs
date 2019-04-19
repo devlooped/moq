@@ -3,8 +3,6 @@
 
 using System.ComponentModel;
 
-using Moq.Language;
-
 namespace Moq
 {
 	/// <summary>
@@ -13,17 +11,6 @@ namespace Moq
 	[EditorBrowsable(EditorBrowsableState.Never)]
 	public static partial class MockExtensions
 	{
-		/// <summary>
-		///   Perform an expectation in the trace.
-		/// </summary>
-		public static ISetupConditionResult<T> InSequence<T>(this Mock<T> mock, MockSequence sequence)
-			where T : class
-		{
-			Guard.NotNull(sequence, nameof(sequence));
-
-			return sequence.For(mock);
-		}
-
 		/// <summary>
 		/// Resets this mock's state. This includes its setups, configured default return values, registered event handlers, and all recorded invocations.
 		/// </summary>
