@@ -7,7 +7,7 @@ namespace Moq
 {
 	/// <summary>
 	/// Represents a switch, or a combination of switches, that can be either enabled or disabled.
-	/// When set via <see cref="Mock.Switches"/> or <see cref="MockRepository.Switches"/>, they determine how a mock will operate.
+	/// When set via <see cref="Mock.Switches"/> or <see cref="MockFactory.Switches"/>, they determine how a mock will operate.
 	/// </summary>
 	[Flags]
 	public enum Switches

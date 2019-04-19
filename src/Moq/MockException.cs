@@ -189,7 +189,7 @@ namespace Moq
 		/// <summary>
 		///   Returns an exception whose message is the concatenation of the given <paramref name="errors"/>' messages
 		///   and whose reason(s) is the combination of the given <paramref name="errors"/>' reason(s).
-		///   Used by <see cref="MockRepository.VerifyMocks(Action{Mock})"/> when it finds one or more mocks with verification errors.
+		///   Used by <see cref="MockFactory.VerifyMocks(Action{Mock})"/> when it finds one or more mocks with verification errors.
 		/// </summary>
 		internal static MockException Combined(IEnumerable<MockException> errors, string preamble)
 		{
