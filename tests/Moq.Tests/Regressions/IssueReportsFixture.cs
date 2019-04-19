@@ -2467,7 +2467,43 @@ namespace Moq.Tests.Regressions
 		}
 
 		#endregion
-		
+
+		#region 809
+
+		public class Issue809
+		{
+			[Fact]
+			public void Can_use_mocked_object_of_type_with_ctor_args_as_argument_in_setup_expression()
+			{
+				var mock1 = new Mock<IProperty>();
+				var mock2 = new Mock<IMethod>();
+				var ndc = new ClassWithoutDefaultConstructor(string.Empty);
+
+				mock1.Setup(x => x.Value).Returns(ndc);
+				var mockedObject1 = mock1.Object;
+				mock2.Setup(x => x.Test(mockedObject1.Value));
+			}
+
+			public class ClassWithoutDefaultConstructor
+			{
+				public ClassWithoutDefaultConstructor(string dummy)
+				{
+				}
+			}
+
+			public interface IProperty
+			{
+				ClassWithoutDefaultConstructor Value { get; }
+			}
+
+			public interface IMethod
+			{
+				void Test(ClassWithoutDefaultConstructor value);
+			}
+		}
+
+		#endregion
+
 		#region #810
 
 		public class _810
