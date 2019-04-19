@@ -5,13 +5,21 @@ All notable changes to this project will be documented in this file.
 The format is loosely based on [Keep a Changelog](http://keepachangelog.com/en/1.0.0/).
 
 
-## Unreleased
+## 4.11.0-rc1 (2019-04-19)
+
+This is a pre-release version.
+
+It contains several minor breaking changes, and there have been extensive internal rewrites in order to fix some very long-standing bugs in relation to argument matchers in fluent setup expressions.
 
 #### Changed
 
-This release contains several **minor breaking changes**. Please review your code with respect to the following:
+* The library now targets .NET Standard 2.0 instead of .NET Standard 1.x. This has been decided based on the official [cross-platform targeting guideline](https://docs.microsoft.com/en-us/dotnet/standard/library-guidance/cross-platform-targeting) and the [End of Life announcement for .NET Core 1.x](https://devblogs.microsoft.com/dotnet/net-core-1-0-and-1-1-will-reach-end-of-life-on-june-27-2019/) (@stakx, #784, #785)
+* Method overload resolution may change for:
+    - `mock.Protected().Setup("VoidMethod", ...)`
+    - `mock.Protected().Verify("VoidMethod", ...)`
+    - `mock.Protected().Verify<TResult>("NonVoidMethod", ...)`
 
-* Method overload resolution for `mock.Protected().Setup("VoidMethod", ...)`, `mock.Protected().Verify("VoidMethod", ...)` and `mock.Protected().Verify<TResult>("NonVoidMethod", ...)` may change due to a new overloads: If the first argument is a `bool`, make sure that argument gets interpreted as part of `args`, not as `exactParameterMatch` (see also *Added* section below). (@stakx & @Shereef, #751, #753)
+   due to a new overload: If the first argument is a `bool`, make sure that argument gets interpreted as part of `args`, not as `exactParameterMatch` (see also *Added* section below). (@stakx & @Shereef, #751, #753)
 * `mock.Verify[All]` now performs a more thorough error aggregation. Error messages of inner/recursive mocks are included in the error message using indentation to show the relationship between mocks. (@stakx, #762)
 * `mock.Verify` no longer creates setups, nor will it override existing setups, as a side-effect of using a recursive expression. (@stakx, #765)
 * More accurate detection of argument matchers with `SetupSet` and `VerifySet`, especially when used in fluent setup expressions or with indexers (@stakx, #767)
@@ -21,14 +29,16 @@ This release contains several **minor breaking changes**. Please review your cod
 
 #### Added
 
-* The library now has a target for .NET Standard 2.0. (@stakx, #784)
-* New method overload `mock.Protected().Setup("VoidMethod", exactParameterMatch, args)` overload having a `bool exactParameterMatch` parameter. Due to method overload resolution, it was easy to think this already existed resolution when in fact it did not, leading to failing tests. (@stakx, #751)
-* New method overloads `mock.Protected().Verify("VoidMethod", times, exactParameterMatch, args)` and `mock.Protected().Verify<TResult>("NonVoidMethod", times, exactParameterMatch, args)` overloads having a `bool exactParameterMatch` parameter. (@Shereef, #753)
+* New method overloads:
+   - `mock.Protected().Setup("VoidMethod", exactParameterMatch, args)`
+   - `mock.Protected().Verify("VoidMethod", times, exactParameterMatch, args)`
+   - `mock.Protected().Verify<TResult>("NonVoidMethod", times, exactParameterMatch, args)`
+
+   having a `bool exactParameterMatch` parameter. Due to method overload resolution, it was easy to think this already existed when in fact it did not, leading to failing tests. (@Shereef & @stakx, #753, #751)
 * Ability in `mock.Raise` and `setup.Raises` to raise events on sub-objects (inner mocks) (@stakx, #772)
 
 #### Removed
 
-* The library no longer has a target for .NET Standard 1.x. This has been decided based on the official [cross-platform targeting guideline](https://docs.microsoft.com/en-us/dotnet/standard/library-guidance/cross-platform-targeting) and the [End of Life announcement for .NET Core 1.x](https://devblogs.microsoft.com/dotnet/net-core-1-0-and-1-1-will-reach-end-of-life-on-june-27-2019/) (@stakx, #785)
 * Pex interop (which has not been maintained for years). You might notice changes when using Visual Studio's IntelliTest feature. (@stakx, #786)
 
 #### Fixed

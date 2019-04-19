@@ -14,9 +14,9 @@
 	<Target Name="SetAssemblyInfoVersions" AfterTargets="PrepareForBuild" BeforeTargets="GenerateAssemblyInfo" DependsOnTargets="GitVersion">
 		<PropertyGroup>
 			<AssemblyVersion Condition="'$(AssemblyVersion)' == ''">$(GitBaseVersionMajor).$(GitBaseVersionMinor).0.0</AssemblyVersion>
-			<FileVersion Condition="'$(FileVersion)' == ''">$(GitBaseVersion).$(GitCommits)</FileVersion>
-			<InformationalVersion Condition="'$(InformationalVersion)' == '' And '$(GitCommits)' == '0'">$(GitBaseVersion)$(GitSemVerDashLabel)+sha.$(GitCommit)</InformationalVersion>
-			<InformationalVersion Condition="'$(InformationalVersion)' == '' And '$(GitCommits)' != '0'">$(GitBaseVersion).$(GitCommits)$(GitSemVerDashLabel)+sha.$(GitCommit)</InformationalVersion>
+			<FileVersion Condition="'$(FileVersion)' == ''">$(GitBaseVersionMajor).$(GitBaseVersionMinor).$(GitBaseVersionPatch).$(GitCommits)</FileVersion>
+			<InformationalVersion Condition="'$(InformationalVersion)' == '' And '$(GitCommits)' == '0'">$(GitBaseVersionMajor).$(GitBaseVersionMinor).$(GitBaseVersionPatch)$(GitSemVerDashLabel)+sha.$(GitCommit)</InformationalVersion>
+			<InformationalVersion Condition="'$(InformationalVersion)' == '' And '$(GitCommits)' != '0'">$(GitBaseVersionMajor).$(GitBaseVersionMinor).$(GitBaseVersionPatch).$(GitCommits)$(GitSemVerDashLabel)+sha.$(GitCommit)</InformationalVersion>
 		</PropertyGroup>
 	</Target>
 
