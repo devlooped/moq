@@ -20,27 +20,38 @@ namespace Moq.Language.Flow
 
 		public ISetup<T> Setup(Expression<Action<T>> expression)
 		{
-			return Mock.Setup<T>(mock, expression, this.condition);
+			var setup = Mock.Setup(mock, expression, this.condition);
+			return new VoidSetupPhrase<T>(setup);
 		}
 
 		public ISetup<T, TResult> Setup<TResult>(Expression<Func<T, TResult>> expression)
 		{
-			return Mock.Setup<T, TResult>(mock, expression, this.condition);
+			var setup = Mock.Setup(mock, expression, this.condition);
+			return new NonVoidSetupPhrase<T, TResult>(setup);
 		}
 
 		public ISetupGetter<T, TProperty> SetupGet<TProperty>(Expression<Func<T, TProperty>> expression)
 		{
-			return Mock.SetupGet<T, TProperty>(mock, expression, this.condition);
+			var setup = Mock.SetupGet(mock, expression, this.condition);
+			return new NonVoidSetupPhrase<T, TProperty>(setup);
 		}
 
 		public ISetupSetter<T, TProperty> SetupSet<TProperty>(Action<T> setterExpression)
 		{
-			return Mock.SetupSet<T, TProperty>(mock, setterExpression, this.condition);
+			Guard.NotNull(setterExpression, nameof(setterExpression));
+			var expression = ExpressionReconstructor.Instance.ReconstructExpression(setterExpression, this.mock.ConstructorArguments);
+
+			var setup = Mock.SetupSet(mock, expression, this.condition);
+			return new SetterSetupPhrase<T, TProperty>(setup);
 		}
 
 		public ISetup<T> SetupSet(Action<T> setterExpression)
 		{
-			return Mock.SetupSet<T>(mock, setterExpression, this.condition);
+			Guard.NotNull(setterExpression, nameof(setterExpression));
+			var expression = ExpressionReconstructor.Instance.ReconstructExpression(setterExpression, this.mock.ConstructorArguments);
+
+			var setup = Mock.SetupSet(mock, expression, this.condition);
+			return new VoidSetupPhrase<T>(setup);
 		}
 	}
 }

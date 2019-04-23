@@ -4,7 +4,6 @@
 using System;
 using System.Collections.Generic;
 using System.Diagnostics;
-using System.Linq;
 using System.Linq.Expressions;
 using System.Reflection;
 
@@ -12,27 +11,52 @@ namespace Moq
 {
 	/// <summary>
 	///   Describes the "shape" of an invocation against which concrete <see cref="Invocation"/>s can be matched.
+	///   <para>
+	///     This shape is described by <see cref="InvocationShape.Expression"/> which has the general form
+	///     `mock => mock.Method(...arguments)`. Because the method and arguments are frequently needed,
+	///     they are cached in <see cref="InvocationShape.Method"/> and <see cref="InvocationShape.Arguments"/>
+	///     for faster access.
+	///   </para>
 	/// </summary>
-	internal readonly struct InvocationShape
+	internal sealed class InvocationShape : IEquatable<InvocationShape>
 	{
-		private readonly MethodInfo method;
+		private static readonly Expression[] noArguments = new Expression[0];
+		private static readonly IMatcher[] noArgumentMatchers = new IMatcher[0];
+
+		public readonly LambdaExpression Expression;
+		public readonly MethodInfo Method;
+		public readonly IReadOnlyList<Expression> Arguments;
+
 		private readonly IMatcher[] argumentMatchers;
+		private Expression[] partiallyEvaluatedArguments;
 
-		public InvocationShape(MethodInfo method, IReadOnlyList<Expression> arguments)
+		public InvocationShape(LambdaExpression expression, MethodInfo method, IReadOnlyList<Expression> arguments = null)
 		{
-			this.method = method;
-			this.argumentMatchers = GetArgumentMatchers(arguments, method.GetParameters());
+			Debug.Assert(expression != null);
+			Debug.Assert(method != null);
+
+			Guard.IsOverridable(method, expression);
+			Guard.IsVisibleToProxyFactory(method);
+
+			this.Expression = expression;
+			this.Method = method;
+			if (arguments != null)
+			{
+				(this.argumentMatchers, this.Arguments) = MatcherFactory.CreateMatchers(arguments, method.GetParameters());
+			}
+			else
+			{
+				this.argumentMatchers = noArgumentMatchers;
+				this.Arguments = noArguments;
+			}
 		}
 
-		public InvocationShape(MethodInfo method, IMatcher[] argumentMatchers)
+		public void Deconstruct(out LambdaExpression expression, out MethodInfo method, out IReadOnlyList<Expression> arguments)
 		{
-			this.method = method;
-			this.argumentMatchers = argumentMatchers;
+			expression = this.Expression;
+			method = this.Method;
+			arguments = this.Arguments;
 		}
-
-		public IReadOnlyList<IMatcher> ArgumentMatchers => this.argumentMatchers;
-
-		public MethodInfo Method => this.method;
 
 		public bool IsMatch(Invocation invocation)
 		{
@@ -42,7 +66,7 @@ namespace Moq
 				return false;
 			}
 
-			if (invocation.Method != this.method && !this.IsOverride(invocation.Method))
+			if (invocation.Method != this.Method && !this.IsOverride(invocation.Method))
 			{
 				return false;
 			}
@@ -60,7 +84,7 @@ namespace Moq
 
 		private bool IsOverride(MethodInfo invocationMethod)
 		{
-			var method = this.method;
+			var method = this.Method;
 
 			if (!method.DeclaringType.IsAssignableFrom(invocationMethod.DeclaringType))
 			{
@@ -82,7 +106,7 @@ namespace Moq
 				return false;
 			}
 
-			if (method.IsGenericMethod)
+			if (method.IsGenericMethod || invocationMethod.IsGenericMethod)
 			{
 				if (!method.GetGenericArguments().CompareTo(invocationMethod.GetGenericArguments(), exact: false))
 				{
@@ -100,19 +124,70 @@ namespace Moq
 			return true;
 		}
 
-		private static IMatcher[] GetArgumentMatchers(IReadOnlyList<Expression> arguments, ParameterInfo[] parameters)
+		public bool Equals(InvocationShape other)
+		{
+			if (this.Method != other.Method)
+			{
+				return false;
+			}
+
+			if (this.Arguments.Count != other.Arguments.Count)
+			{
+				return false;
+			}
+
+			if (this.partiallyEvaluatedArguments == null)
+			{
+				this.partiallyEvaluatedArguments = PartiallyEvaluateArguments(this.Arguments);
+			}
+
+			if (other.partiallyEvaluatedArguments == null)
+			{
+				other.partiallyEvaluatedArguments = PartiallyEvaluateArguments(other.Arguments);
+			}
+
+			for (int i = 0, n = this.partiallyEvaluatedArguments.Length; i < n; ++i)
+			{
+				if (!ExpressionComparer.Default.Equals(this.partiallyEvaluatedArguments[i], other.partiallyEvaluatedArguments[i]))
+				{
+					return false;
+				}
+			}
+
+			return true;
+		}
+
+		private static Expression[] PartiallyEvaluateArguments(IReadOnlyList<Expression> arguments)
 		{
 			Debug.Assert(arguments != null);
-			Debug.Assert(parameters != null);
-			Debug.Assert(arguments.Count == parameters.Length);
 
-			var n = parameters.Length;
-			var argumentMatchers = new IMatcher[n];
-			for (int i = 0; i < n; ++i)
+			if (arguments.Count == 0)
 			{
-				argumentMatchers[i] = MatcherFactory.CreateMatcher(arguments[i], parameters[i]);
+				return noArguments;
 			}
-			return argumentMatchers;
+
+			var partiallyEvaluatedArguments = new Expression[arguments.Count];
+			for (int i = 0, n = arguments.Count; i < n; ++i)
+			{
+				partiallyEvaluatedArguments[i] = arguments[i].PartialMatcherAwareEval();
+			}
+
+			return partiallyEvaluatedArguments;
+		}
+
+		public override bool Equals(object obj)
+		{
+			return obj is InvocationShape other && this.Equals(other);
+		}
+
+		public override int GetHashCode()
+		{
+			return this.Method.GetHashCode();
+		}
+
+		public override string ToString()
+		{
+			return this.Expression.ToStringFixed();
 		}
 	}
 }

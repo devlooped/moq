@@ -5,7 +5,7 @@ using System;
 
 namespace Moq.Language.Flow
 {
-	internal class VoidSetupPhrase<T> : SetupPhrase<MethodCall>, ISetup<T> where T : class
+	internal class VoidSetupPhrase<T> : SetupPhrase, ISetup<T> where T : class
 	{
 		public VoidSetupPhrase(MethodCall setup) : base(setup)
 		{

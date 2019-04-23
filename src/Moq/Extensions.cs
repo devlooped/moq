@@ -3,6 +3,7 @@
 
 using System;
 using System.Collections.Generic;
+using System.Diagnostics;
 using System.Globalization;
 using System.Linq;
 using System.Linq.Expressions;
@@ -21,7 +22,7 @@ namespace Moq
 		/// </summary>
 		public static object GetDefaultValue(this Type type)
 		{
-			return type.GetTypeInfo().IsValueType ? Activator.CreateInstance(type) : null;
+			return type.IsValueType ? Activator.CreateInstance(type) : null;
 		}
 
 		public static object InvokePreserveStack(this Delegate del, params object[] args)
@@ -44,23 +45,37 @@ namespace Moq
 
 		public static bool IsPropertyGetter(this MethodInfo method)
 		{
-			return method.Name.StartsWith("get_", StringComparison.Ordinal);
+			return method.IsSpecialName && method.Name.StartsWith("get_", StringComparison.Ordinal);
 		}
 
 		public static bool IsPropertyIndexerGetter(this MethodInfo method)
 		{
-			return method.Name.StartsWith("get_Item", StringComparison.Ordinal);
+			return method.IsSpecialName && method.Name.StartsWith("get_Item", StringComparison.Ordinal);
 		}
 
 		public static bool IsPropertyIndexerSetter(this MethodInfo method)
 		{
-			return method.Name.StartsWith("set_Item", StringComparison.Ordinal);
+			return method.IsSpecialName && method.Name.StartsWith("set_Item", StringComparison.Ordinal);
 		}
 
 		public static bool IsPropertySetter(this MethodInfo method)
 		{
-			return method.Name.StartsWith("set_", StringComparison.Ordinal);
+			return method.IsSpecialName && method.Name.StartsWith("set_", StringComparison.Ordinal);
 		}
+
+		// NOTE: The following two methods used to first check whether `method.IsSpecialName` was set
+		// as a quick guard against non-event accessor methods. This was removed in commit 44070a90
+		// to "increase compatibility with F# and COM". More specifically:
+		//
+		//  1. COM does not really have events. Some COM interop assemblies define events, but do not
+		//     mark those with the IL `specialname` flag. See:
+		//      - https://code.google.com/archive/p/moq/issues/226
+		//     - the `Microsoft.Office.Interop.Word.ApplicationEvents4_Event` interface in Office PIA
+		//
+		//  2. F# does not mark abstract events' accessors with the IL `specialname` flag. See:
+		//      - https://github.com/Microsoft/visualfsharp/issues/5834
+		//      - https://code.google.com/archive/p/moq/issues/238
+		//      - the unit tests in `FSharpCompatibilityFixture`
 
 		public static bool LooksLikeEventAttach(this MethodInfo method)
 		{
@@ -77,7 +92,7 @@ namespace Moq
 		/// </summary>
 		public static bool IsDelegate(this Type t)
 		{
-			return t.GetTypeInfo().IsSubclassOf(typeof(Delegate));
+			return t.IsSubclassOf(typeof(Delegate));
 		}
 
 		public static void ThrowIfNotMockeable(this MemberExpression memberAccess)
@@ -93,7 +108,7 @@ namespace Moq
 		{
 			// A value type does not match any of these three 
 			// condition and therefore returns false.
-			return typeToMock.GetTypeInfo().IsInterface || typeToMock.GetTypeInfo().IsAbstract || typeToMock.IsDelegate() || (typeToMock.GetTypeInfo().IsClass && !typeToMock.GetTypeInfo().IsSealed);
+			return typeToMock.IsInterface || typeToMock.IsAbstract || typeToMock.IsDelegate() || (typeToMock.IsClass && !typeToMock.IsSealed);
 		}
 
 		public static bool CanOverride(this MethodBase method)
@@ -121,41 +136,6 @@ namespace Moq
 			}
 
 			return false;
-		}
-
-		public static (EventInfo Event, Mock Target) GetEventWithTarget<TMock>(this Action<TMock> eventExpression, TMock mock)
-			where TMock : class
-		{
-			Guard.NotNull(eventExpression, nameof(eventExpression));
-
-			MethodBase addRemove;
-			Mock target;
-
-			using (var context = new FluentMockContext())
-			{
-				eventExpression(mock);
-
-				if (context.LastInvocation == null)
-				{
-					throw new ArgumentException(Resources.ExpressionIsNotEventAttachOrDetachOrIsNotVirtual);
-				}
-
-				addRemove = context.LastInvocation.Invocation.Method;
-				target = context.LastInvocation.Mock;
-			}
-
-			var ev = addRemove.DeclaringType.GetEvent(
-				addRemove.Name.Replace("add_", string.Empty).Replace("remove_", string.Empty));
-
-			if (ev == null)
-			{
-				throw new ArgumentException(string.Format(
-					CultureInfo.CurrentCulture,
-					Resources.EventNotFound,
-					addRemove));
-			}
-
-			return (ev, target);
 		}
 
 		public static IEnumerable<MethodInfo> GetMethods(this Type type, string name)
@@ -273,9 +253,9 @@ namespace Moq
 				//// follow down axis 1: add properties of base class. note that this is currently
 				//// disabled, since it wasn't done previously and this can only result in changed
 				//// behavior.
-				//if (type.GetTypeInfo().BaseType != null)
+				//if (type.BaseType != null)
 				//{
-				//	type.GetTypeInfo().BaseType.AddPropertiesInDepthFirstOrderTo(properties, typesAlreadyVisited);
+				//	type.BaseType.AddPropertiesInDepthFirstOrderTo(properties, typesAlreadyVisited);
 				//}
 
 				// follow down axis 2: add properties of inherited / implemented interfaces:
@@ -291,6 +271,38 @@ namespace Moq
 					properties.Add(property);
 				}
 			}
+		}
+
+		public static bool TryFind(this IEnumerable<Setup> innerMockSetups, InvocationShape expectation, out Setup setup)
+		{
+			Debug.Assert(innerMockSetups.All(s => s.ReturnsInnerMock(out _)));
+
+			foreach (Setup innerMockSetup in innerMockSetups)
+			{
+				if (innerMockSetup.Expectation.Equals(expectation))
+				{
+					setup = innerMockSetup;
+					return true;
+				}
+			}
+
+			setup = default;
+			return false;
+		}
+
+		public static bool TryFind(this IEnumerable<Setup> innerMockSetups, Invocation invocation, out Setup setup)
+		{
+			foreach (Setup innerMockSetup in innerMockSetups)
+			{
+				if (innerMockSetup.Matches(invocation))
+				{
+					setup = innerMockSetup;
+					return true;
+				}
+			}
+
+			setup = default;
+			return false;
 		}
 	}
 }

@@ -109,11 +109,6 @@ namespace Moq
 
 		public override InterceptionAction Handle(Invocation invocation, Mock mock)
 		{
-			if (FluentMockContext.IsActive)
-			{
-				return InterceptionAction.Continue;
-			}
-
 			var matchedSetup = mock.Setups.FindMatchFor(invocation);
 			if (matchedSetup != null)
 			{
@@ -147,36 +142,12 @@ namespace Moq
 		}
 	}
 
-	internal sealed class HandleTracking : InterceptionAspect
-	{
-		public static HandleTracking Instance { get; } = new HandleTracking();
-
-		public override InterceptionAction Handle(Invocation invocation, Mock mock)
-		{
-			// Track current invocation if we're in "record" mode in a fluent invocation context.
-			if (FluentMockContext.IsActive)
-			{
-				FluentMockContext.Current.Add(mock, invocation);
-			}
-			return InterceptionAction.Continue;
-		}
-	}
-
 	internal sealed class RecordInvocation : InterceptionAspect
 	{
 		public static RecordInvocation Instance { get; } = new RecordInvocation();
 
 		public override InterceptionAction Handle(Invocation invocation, Mock mock)
 		{
-			if (FluentMockContext.IsActive)
-			{
-				// In a fluent invocation context, which is a recorder-like
-				// mode we use to evaluate delegates by actually running them,
-				// we don't want to count the invocation, or actually run
-				// previous setups.
-				return InterceptionAction.Continue;
-			}
-
 			var methodName = invocation.Method.Name;
 
 			// Special case for event accessors. The following, seemingly random character checks are guards against
@@ -281,7 +252,7 @@ namespace Moq
 		/// <param name="initialType">The type to find immediate ancestors of</param>
 		private static IEnumerable<Type> GetAncestorTypes(Type initialType)
 		{
-			var baseType = initialType.GetTypeInfo().BaseType;
+			var baseType = initialType.BaseType;
 			if (baseType != null)
 			{
 				return new[] { baseType };
@@ -305,16 +276,16 @@ namespace Moq
 			if (mock.CallBase)
 			{
 				var declaringType = method.DeclaringType;
-				if (declaringType.GetTypeInfo().IsInterface)
+				if (declaringType.IsInterface)
 				{
-					if (mock.TargetType.GetTypeInfo().IsInterface)
+					if (mock.TargetType.IsInterface)
 					{
 						// Case 1: Interface method of an interface proxy.
 						// There is no base method to call, so fall through.
 					}
 					else
 					{
-						Debug.Assert(mock.TargetType.GetTypeInfo().IsClass);
+						Debug.Assert(mock.TargetType.IsClass);
 						Debug.Assert(mock.ImplementsInterface(declaringType));
 
 						// Case 2: Explicitly implemented interface method of a class proxy.
@@ -340,7 +311,7 @@ namespace Moq
 				}
 				else
 				{
-					Debug.Assert(declaringType.GetTypeInfo().IsClass);
+					Debug.Assert(declaringType.IsClass);
 
 					// Case 3: Non-interface method of a class proxy.
 					// Only call base method if it isn't abstract.
@@ -356,13 +327,14 @@ namespace Moq
 			{
 				invocation.Return();
 			}
-			else if (mock.InnerMocks.TryGetValue(method, out var inner))
-			{
-				invocation.Return(inner.WrappedMockObject);
-			}
 			else
 			{
-				invocation.Return(mock.GetDefaultValue(method));
+				var returnValue = mock.GetDefaultValue(method, out var innerMock);
+				if (innerMock != null)
+				{
+					mock.AddInnerMockSetup(invocation, returnValue);
+				}
+				invocation.Return(returnValue);
 			}
 
 			return InterceptionAction.Stop;

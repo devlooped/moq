@@ -59,8 +59,11 @@ namespace Moq
 					return;
 				case ExpressionType.Add:
 				case ExpressionType.AddChecked:
+				case ExpressionType.AddAssign:
+				case ExpressionType.Assign:
 				case ExpressionType.Subtract:
 				case ExpressionType.SubtractChecked:
+				case ExpressionType.SubtractAssign:
 				case ExpressionType.Multiply:
 				case ExpressionType.MultiplyChecked:
 				case ExpressionType.Divide:
@@ -100,6 +103,9 @@ namespace Moq
 				case ExpressionType.Call:
 					ToStringMethodCall((MethodCallExpression)exp);
 					return;
+				case ExpressionType.Index:
+					ToStringIndex((IndexExpression)exp);
+					return;
 				case ExpressionType.Lambda:
 					ToStringLambda((LambdaExpression)exp);
 					return;
@@ -119,6 +125,13 @@ namespace Moq
 				case ExpressionType.ListInit:
 					ToStringListInit((ListInitExpression)exp);
 					return;
+				case ExpressionType.Extension:
+					if (exp is MatchExpression me)
+					{
+						ToStringMatch(me);
+						return;
+					}
+					goto default;
 				default:
 					throw new Exception(string.Format(Resources.UnhandledExpressionType, exp.NodeType));
 			}
@@ -343,7 +356,15 @@ namespace Moq
 			}
 		}
 
-		private void ToStringExpressionList(ReadOnlyCollection<Expression> original)
+		private void ToStringIndex(IndexExpression expression)
+		{
+			ToString(expression.Object);
+			this.builder.Append('[');
+			ToStringExpressionList(expression.Arguments);
+			this.builder.Append(']');
+		}
+
+		private void ToStringExpressionList(IEnumerable<Expression> original)
 		{
 			AsCommaSeparatedValues(original, ToString);
 			return;
@@ -467,6 +488,12 @@ namespace Moq
 			}
 		}
 
+		private void ToStringMatch(MatchExpression node)
+		{
+			ToString(node.Match.RenderExpression);
+			return;
+		}
+
 		private void AsCommaSeparatedValues<T>(IEnumerable<T> source, Action<T> toStringAction) where T : Expression
 		{
 			bool appendComma = false;
@@ -497,6 +524,12 @@ namespace Moq
 				case ExpressionType.Add:
 				case ExpressionType.AddChecked:
 					return "+";
+
+				case ExpressionType.AddAssign:
+					return "+=";
+
+				case ExpressionType.Assign:
+					return "=";
 
 				case ExpressionType.And:
 					return "&";
@@ -556,6 +589,9 @@ namespace Moq
 				case ExpressionType.Subtract:
 				case ExpressionType.SubtractChecked:
 					return "-";
+
+				case ExpressionType.SubtractAssign:
+					return "-=";
 			}
 			return nodeType.ToString();
 		}

@@ -12,12 +12,12 @@ namespace Moq
 	/// </summary>
 	internal sealed class AutoImplementedPropertyGetterSetup : Setup
 	{
-		private static IMatcher[] noArgumentMatchers = new IMatcher[0];
+		private static Expression[] noArguments = new Expression[0];
 
 		private Func<object> getter;
 
 		public AutoImplementedPropertyGetterSetup(LambdaExpression originalExpression, MethodInfo method, Func<object> getter)
-			: base(new InvocationShape(method, noArgumentMatchers), originalExpression)
+			: base(new InvocationShape(originalExpression, method, noArguments))
 		{
 			this.getter = getter;
 		}
@@ -27,6 +27,20 @@ namespace Moq
 			invocation.Return(this.getter.Invoke());
 		}
 
-		public override bool TryVerifyAll() => true;
+		public override bool TryGetReturnValue(out object returnValue)
+		{
+			returnValue = this.getter.Invoke();
+			return true;
+		}
+
+		public override MockException TryVerify()
+		{
+			return this.TryVerifyInnerMock(innerMock => innerMock.TryVerify());
+		}
+
+		public override MockException TryVerifyAll()
+		{
+			return this.TryVerifyInnerMock(innerMock => innerMock.TryVerifyAll());
+		}
 	}
 }

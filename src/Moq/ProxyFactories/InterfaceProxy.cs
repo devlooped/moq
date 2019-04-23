@@ -26,7 +26,7 @@ namespace Moq.Internals
 		{
 			// Forward this call to the interceptor, so that `object.Equals` can be set up.
 			var invocation = new Invocation(equalsMethod, obj);
-			((IInterceptor)((IMocked)this).Mock).Intercept(invocation);
+			((IInterceptor)((IProxy)this).Interceptor).Intercept(invocation);
 			return (bool)invocation.ReturnValue;
 		}
 
@@ -36,7 +36,7 @@ namespace Moq.Internals
 		{
 			// Forward this call to the interceptor, so that `object.GetHashCode` can be set up.
 			var invocation = new Invocation(getHashCodeMethod);
-			((IInterceptor)((IMocked)this).Mock).Intercept(invocation);
+			((IInterceptor)((IProxy)this).Interceptor).Intercept(invocation);
 			return (int)invocation.ReturnValue;
 		}
 
@@ -46,15 +46,13 @@ namespace Moq.Internals
 		{
 			// Forward this call to the interceptor, so that `object.ToString` can be set up.
 			var invocation = new Invocation(toStringMethod);
-			((IInterceptor)((IMocked)this).Mock).Intercept(invocation);
+			((IInterceptor)((IProxy)this).Interceptor).Intercept(invocation);
 			return (string)invocation.ReturnValue;
 		}
 
 		private sealed class Invocation : Moq.Invocation
 		{
 			private static object[] noArguments = new object[0];
-
-			private object returnValue;
 
 			public Invocation(MethodInfo method, params object[] arguments)
 				: base(method, arguments)
@@ -66,13 +64,11 @@ namespace Moq.Internals
 			{
 			}
 
-			public object ReturnValue => this.returnValue;
-
 			public override void Return() { }
 
 			public override void Return(object value)
 			{
-				this.returnValue = value;
+				this.SetReturnValue(value);
 			}
 
 			public override void ReturnBase() { }

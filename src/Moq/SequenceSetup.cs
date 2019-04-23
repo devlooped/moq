@@ -3,50 +3,48 @@
 
 using System;
 using System.Collections.Concurrent;
-using System.Collections.Generic;
 using System.Linq.Expressions;
-using System.Reflection;
 
 namespace Moq
 {
 	/// <summary>
-	///   Programmable setup used by <see cref="Mock.SetupSequence(Mock, LambdaExpression)"/> and <see cref="Mock.SetupSequence{TResult}(Mock, LambdaExpression)"/>.
+	///   Programmable setup used by <see cref="Mock.SetupSequence(Mock, LambdaExpression)"/>.
 	/// </summary>
 	internal sealed class SequenceSetup : SetupWithOutParameterSupport
 	{
 		// contains the responses set up with the `CallBase`, `Pass`, `Returns`, and `Throws` verbs
-		private ConcurrentQueue<(ResponseKind, object)> responses;
+		private ConcurrentQueue<Response> responses;
 		private bool invoked;
 
-		public SequenceSetup(LambdaExpression originalExpression, MethodInfo method, IReadOnlyList<Expression> arguments)
-			: base(method, arguments, originalExpression)
+		public SequenceSetup(InvocationShape expectation)
+			: base(expectation)
 		{
-			this.responses = new ConcurrentQueue<(ResponseKind, object)>();
+			this.responses = new ConcurrentQueue<Response>();
 		}
 
 		public void AddCallBase()
 		{
-			this.responses.Enqueue((ResponseKind.CallBase, (object)null));
+			this.responses.Enqueue(new Response(ResponseKind.CallBase, null));
 		}
 
 		public void AddPass()
 		{
-			this.responses.Enqueue((ResponseKind.Pass, (object)null));
+			this.responses.Enqueue(new Response(ResponseKind.Pass, null));
 		}
 
 		public void AddReturns(object value)
 		{
-			this.responses.Enqueue((ResponseKind.Returns, value));
+			this.responses.Enqueue(new Response(ResponseKind.Returns, value));
 		}
 
 		public void AddReturns(Func<object> valueFunction)
 		{
-			this.responses.Enqueue((ResponseKind.InvokeFunc, valueFunction));
+			this.responses.Enqueue(new Response(ResponseKind.InvokeFunc, valueFunction));
 		}
 
 		public void AddThrows(Exception exception)
 		{
-			this.responses.Enqueue((ResponseKind.Throws, (object)exception));
+			this.responses.Enqueue(new Response(ResponseKind.Throws, exception));
 		}
 
 		public override void Execute(Invocation invocation)
@@ -95,9 +93,27 @@ namespace Moq
 			}
 		}
 
-		public override bool TryVerifyAll()
+		public override MockException TryVerifyAll()
 		{
-			return this.invoked;
+			return this.invoked ? null : MockException.UnmatchedSetup(this);
+		}
+
+		private readonly struct Response
+		{
+			private readonly ResponseKind kind;
+			private readonly object arg;
+
+			public Response(ResponseKind kind, object arg)
+			{
+				this.kind = kind;
+				this.arg = arg;
+			}
+
+			public void Deconstruct(out ResponseKind kind, out object arg)
+			{
+				kind = this.kind;
+				arg = this.arg;
+			}
 		}
 
 		private enum ResponseKind

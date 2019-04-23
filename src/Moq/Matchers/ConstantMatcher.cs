@@ -18,7 +18,7 @@ namespace Moq.Matchers
 
 		public bool Matches(object value)
 		{
-			if (object.Equals(constantValue, value))
+			if (object.Equals(value, constantValue))
 			{
 				return true;
 			}

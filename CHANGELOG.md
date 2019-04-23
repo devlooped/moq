@@ -5,6 +5,75 @@ All notable changes to this project will be documented in this file.
 The format is loosely based on [Keep a Changelog](http://keepachangelog.com/en/1.0.0/).
 
 
+## 4.11.0-rc1 (2019-04-19)
+
+This is a pre-release version.
+
+It contains several minor breaking changes, and there have been extensive internal rewrites in order to fix some very long-standing bugs in relation to argument matchers in fluent setup expressions.
+
+#### Changed
+
+* The library now targets .NET Standard 2.0 instead of .NET Standard 1.x. This has been decided based on the official [cross-platform targeting guideline](https://docs.microsoft.com/en-us/dotnet/standard/library-guidance/cross-platform-targeting) and the [End of Life announcement for .NET Core 1.x](https://devblogs.microsoft.com/dotnet/net-core-1-0-and-1-1-will-reach-end-of-life-on-june-27-2019/) (@stakx, #784, #785)
+* Method overload resolution may change for:
+    - `mock.Protected().Setup("VoidMethod", ...)`
+    - `mock.Protected().Verify("VoidMethod", ...)`
+    - `mock.Protected().Verify<TResult>("NonVoidMethod", ...)`
+
+   due to a new overload: If the first argument is a `bool`, make sure that argument gets interpreted as part of `args`, not as `exactParameterMatch` (see also *Added* section below). (@stakx & @Shereef, #751, #753)
+* `mock.Verify[All]` now performs a more thorough error aggregation. Error messages of inner/recursive mocks are included in the error message using indentation to show the relationship between mocks. (@stakx, #762)
+* `mock.Verify` no longer creates setups, nor will it override existing setups, as a side-effect of using a recursive expression. (@stakx, #765)
+* More accurate detection of argument matchers with `SetupSet` and `VerifySet`, especially when used in fluent setup expressions or with indexers (@stakx, #767)
+* `mock.Verify(expression)` error messages now contain a full listing of all invocations that occurred across all involved mocks. Setups are no longer listed, since they are completely irrelevant in the context of call verification. (@stakx, #779, #780)
+* Indexers used as arguments in setup expressions are now eagerly evaluated, like all other properties already are (except when they refer to matchers) (@stakx, #794)
+* Update package reference to `Castle.Core` (DynamicProxy) from version 4.3.1 to 4.4.0 (@stakx, #797)
+
+#### Added
+
+* New method overloads:
+   - `mock.Protected().Setup("VoidMethod", exactParameterMatch, args)`
+   - `mock.Protected().Verify("VoidMethod", times, exactParameterMatch, args)`
+   - `mock.Protected().Verify<TResult>("NonVoidMethod", times, exactParameterMatch, args)`
+
+   having a `bool exactParameterMatch` parameter. Due to method overload resolution, it was easy to think this already existed when in fact it did not, leading to failing tests. (@Shereef & @stakx, #753, #751)
+* Ability in `mock.Raise` and `setup.Raises` to raise events on sub-objects (inner mocks) (@stakx, #772)
+
+#### Removed
+
+* Pex interop (which has not been maintained for years). You might notice changes when using Visual Studio's IntelliTest feature. (@stakx, #786)
+
+#### Fixed
+
+* `InvalidOperationException` when specifiying setup on mock with mock containing property of type `Nullable<T>` (@dav1dev, #725)
+* `Verify` gets confused between the same generic and non-generic signature (@lepijohnny, #749)
+* Setup gets included in `Verify` despite being "unreachable" (@stakx, #703)
+* `Verify` can create setups that cause subsequent `VerifyAll` to fail (@stakx & @lepijohnny, #699)
+* Incomplete stack trace when raising an event with `mock.Raise` throws (@MutatedTomato, #738)
+* `Mock.Raise` only raises events on root object (@hallipr, #166)
+* Mocking indexer captures `It.IsAny()` as the value, even if given in the indexer argument (@idigra, #696)
+* `VerifySet` fails on non-trivial property setup (@TimothyHayes, #430)
+* Use of `SetupSet` 'forgets' method setup (@TimothyHayes, #432)
+* Recursive mocks don't work with argument matching (@thalesmello, #142)
+* Recursive property setup overrides previous setups (@jamesfoster, #110)
+* Formatting of enumerable object for error message broke EF Core test case (@MichaelSagalovich, #741)
+* `Verify[All]` fails because of lazy (instead of eager) setup argument expression evaluation (@aeslinger, #711)
+* `ArgumentOutOfRangeException` when setup expression contains indexer access (@mosentok, #714)
+* Incorrect implementation of `Times.Equals` (@stakx, #805)
+
+
+## 4.10.1 (2018-12-03)
+
+#### Fixed
+
+* `NullReferenceException` when using `SetupSet` on indexers with multiple parameters (@idigra, #694)
+* `CallBase` should not be allowed for delegate mocks (@tehmantra, #706)
+
+#### Changed
+
+* Dropped the dependency on the `System.ValueTuple` NuGet package, at no functional cost (i.e. value tuples are still supported just fine) (@stakx, #721)
+* Updated failure messages to show richer class names (@powerdude, #727)
+* Upgraded `System.Reflection.TypeExtensions` and `System.Threading.Tasks.Extensions` dependencies to versions 4.5.1 (@stakx, #729)
+
+
 ## 4.10.0 (2018-09-08)
 
 #### Added

@@ -3,6 +3,7 @@
 
 using System;
 using System.Linq.Expressions;
+
 using Xunit;
 
 namespace Moq.Tests.Matchers
@@ -14,7 +15,7 @@ namespace Moq.Tests.Matchers
 		{
 			var expr = ToExpression<object>(() => It.IsAny<object>()).Body;
 
-			var matcher = MatcherFactory.CreateMatcher(expr);
+			var (matcher, _) = MatcherFactory.CreateMatcher(expr);
 
 			Assert.True(matcher.Matches(null));
 		}
@@ -24,7 +25,7 @@ namespace Moq.Tests.Matchers
 		{
 			var expr = ToExpression<object>(() => It.IsAny<object>()).Body;
 
-			var matcher = MatcherFactory.CreateMatcher(expr);
+			var (matcher, _) = MatcherFactory.CreateMatcher(expr);
 
 			Assert.True(matcher.Matches("foo"));
 		}
@@ -34,7 +35,7 @@ namespace Moq.Tests.Matchers
 		{
 			var expr = ToExpression<IDisposable>(() => It.IsAny<IDisposable>()).Body;
 
-			var matcher = MatcherFactory.CreateMatcher(expr);
+			var (matcher, _) = MatcherFactory.CreateMatcher(expr);
 
 			Assert.True(matcher.Matches(new Disposable()));
 		}
@@ -44,7 +45,7 @@ namespace Moq.Tests.Matchers
 		{
 			var expr = ToExpression<IFormatProvider>(() => It.IsAny<IFormatProvider>()).Body;
 
-			var matcher = MatcherFactory.CreateMatcher(expr);
+			var (matcher, _) = MatcherFactory.CreateMatcher(expr);
 
 			Assert.False(matcher.Matches("foo"));
 		}

@@ -2,9 +2,7 @@
 // All rights reserved. Licensed under the BSD 3-Clause License; see License.txt.
 
 using System;
-using System.Collections.Concurrent;
 using System.Collections.Generic;
-using System.Reflection;
 
 namespace Moq
 {
@@ -23,10 +21,7 @@ namespace Moq
 
 		internal override Dictionary<Type, object> ConfiguredDefaultValues => this.owner.ConfiguredDefaultValues;
 
-		internal override ConcurrentDictionary<MethodInfo, MockWithWrappedMockObject> InnerMocks
-		{
-			get { return this.owner.InnerMocks; }
-		}
+		internal override object[] ConstructorArguments => this.owner.ConstructorArguments;
 
 		internal override InvocationCollection MutableInvocations => this.owner.MutableInvocations;
 
@@ -78,6 +73,11 @@ namespace Moq
 		protected override object OnGetObject()
 		{
 			return this.owner.Object;
+		}
+
+		public override string ToString()
+		{
+			return this.owner.ToString();
 		}
 	}
 }

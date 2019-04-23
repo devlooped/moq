@@ -10,7 +10,7 @@
 
 namespace Moq.Properties {
 	using System;
-	using System.Reflection;
+	
 	
 	/// <summary>
 	///   A strongly-typed resource class, for looking up localized strings, etc.
@@ -39,7 +39,7 @@ namespace Moq.Properties {
 		internal static global::System.Resources.ResourceManager ResourceManager {
 			get {
 				if (object.ReferenceEquals(resourceMan, null)) {
-					global::System.Resources.ResourceManager temp = new global::System.Resources.ResourceManager("Moq.Properties.Resources", typeof(Resources).GetTypeInfo().Assembly);
+					global::System.Resources.ResourceManager temp = new global::System.Resources.ResourceManager("Moq.Properties.Resources", typeof(Resources).Assembly);
 					resourceMan = temp;
 				}
 				return resourceMan;
@@ -88,20 +88,20 @@ namespace Moq.Properties {
 		}
 		
 		/// <summary>
+		///   Looks up a localized string similar to CallBase cannot be used with Delegate mocks..
+		/// </summary>
+		internal static string CallBaseCannotBeUsedWithDelegateMocks {
+			get {
+				return ResourceManager.GetString("CallBaseCannotBeUsedWithDelegateMocks", resourceCulture);
+			}
+		}
+		
+		/// <summary>
 		///   Looks up a localized string similar to Can&apos;t set return value for void method {0}..
 		/// </summary>
 		internal static string CantSetReturnValueForVoid {
 			get {
 				return ResourceManager.GetString("CantSetReturnValueForVoid", resourceCulture);
-			}
-		}
-		
-		/// <summary>
-		///   Looks up a localized string similar to Configured setups: {0}.
-		/// </summary>
-		internal static string ConfiguredSetups {
-			get {
-				return ResourceManager.GetString("ConfiguredSetups", resourceCulture);
 			}
 		}
 		
@@ -234,6 +234,15 @@ namespace Moq.Properties {
 		}
 		
 		/// <summary>
+		///   Looks up a localized string similar to The return type of the last member shown above is not mockable..
+		/// </summary>
+		internal static string LastMemberHasNonInterceptableReturnType {
+			get {
+				return ResourceManager.GetString("LastMemberHasNonInterceptableReturnType", resourceCulture);
+			}
+		}
+		
+		/// <summary>
 		///   Looks up a localized string similar to The equals (&quot;==&quot; or &quot;=&quot; in VB) and the conditional &apos;and&apos; (&quot;&amp;&amp;&quot; or &quot;AndAlso&quot; in VB) operators are the only ones supported in the query specification expression. Unsupported expression: {0}.
 		/// </summary>
 		internal static string LinqBinaryOperatorNotSupported {
@@ -257,6 +266,16 @@ namespace Moq.Properties {
 		internal static string LinqMethodNotVirtual {
 			get {
 				return ResourceManager.GetString("LinqMethodNotVirtual", resourceCulture);
+			}
+		}
+		
+		/// <summary>
+		///   Looks up a localized string similar to Could not determine the correct positions for all argument matchers ({0} in total) used in a call to this method: {1}.
+		///This could be caused by an unrecognized type conversion, coercion, narrowing, or widening, and is most likely a bug in Moq. Please report your use case to the Moq team..
+		/// </summary>
+		internal static string MatcherAssignmentFailedDuringExpressionReconstruction {
+			get {
+				return ResourceManager.GetString("MatcherAssignmentFailedDuringExpressionReconstruction", resourceCulture);
 			}
 		}
 		
@@ -328,6 +347,15 @@ namespace Moq.Properties {
 		}
 		
 		/// <summary>
+		///   Looks up a localized string similar to The next member after the last one shown above is non-virtual, sealed, or not visible to the proxy factory..
+		/// </summary>
+		internal static string NextMemberNonInterceptable {
+			get {
+				return ResourceManager.GetString("NextMemberNonInterceptable", resourceCulture);
+			}
+		}
+		
+		/// <summary>
 		///   Looks up a localized string similar to No invocations performed..
 		/// </summary>
 		internal static string NoInvocationsPerformed {
@@ -337,8 +365,7 @@ namespace Moq.Properties {
 		}
 		
 		/// <summary>
-		///   Looks up a localized string similar to {0}
-		///Expected invocation on the mock at least {2} times, but was {4} times: {1}.
+		///   Looks up a localized string similar to Expected invocation on the mock at least {1} times, but was {2} times:.
 		/// </summary>
 		internal static string NoMatchingCallsAtLeast {
 			get {
@@ -347,8 +374,7 @@ namespace Moq.Properties {
 		}
 		
 		/// <summary>
-		///   Looks up a localized string similar to {0}
-		///Expected invocation on the mock at least once, but was never performed: {1}.
+		///   Looks up a localized string similar to Expected invocation on the mock at least once, but was never performed: .
 		/// </summary>
 		internal static string NoMatchingCallsAtLeastOnce {
 			get {
@@ -357,8 +383,7 @@ namespace Moq.Properties {
 		}
 		
 		/// <summary>
-		///   Looks up a localized string similar to {0}
-		///Expected invocation on the mock at most {3} times, but was {4} times: {1}.
+		///   Looks up a localized string similar to Expected invocation on the mock at most {1} times, but was {2} times: .
 		/// </summary>
 		internal static string NoMatchingCallsAtMost {
 			get {
@@ -367,8 +392,7 @@ namespace Moq.Properties {
 		}
 		
 		/// <summary>
-		///   Looks up a localized string similar to {0}
-		///Expected invocation on the mock at most once, but was {4} times: {1}.
+		///   Looks up a localized string similar to Expected invocation on the mock at most once, but was {2} times: .
 		/// </summary>
 		internal static string NoMatchingCallsAtMostOnce {
 			get {
@@ -377,8 +401,7 @@ namespace Moq.Properties {
 		}
 		
 		/// <summary>
-		///   Looks up a localized string similar to {0}
-		///Expected invocation on the mock between {2} and {3} times (Exclusive), but was {4} times: {1}.
+		///   Looks up a localized string similar to Expected invocation on the mock between {0} and {1} times (Exclusive), but was {2} times: .
 		/// </summary>
 		internal static string NoMatchingCallsBetweenExclusive {
 			get {
@@ -387,8 +410,7 @@ namespace Moq.Properties {
 		}
 		
 		/// <summary>
-		///   Looks up a localized string similar to {0}
-		///Expected invocation on the mock between {2} and {3} times (Inclusive), but was {4} times: {1}.
+		///   Looks up a localized string similar to Expected invocation on the mock between {0} and {1} times (Inclusive), but was {2} times: .
 		/// </summary>
 		internal static string NoMatchingCallsBetweenInclusive {
 			get {
@@ -397,8 +419,7 @@ namespace Moq.Properties {
 		}
 		
 		/// <summary>
-		///   Looks up a localized string similar to {0}
-		///Expected invocation on the mock exactly {2} times, but was {4} times: {1}.
+		///   Looks up a localized string similar to Expected invocation on the mock exactly {0} times, but was {2} times: .
 		/// </summary>
 		internal static string NoMatchingCallsExactly {
 			get {
@@ -407,8 +428,7 @@ namespace Moq.Properties {
 		}
 		
 		/// <summary>
-		///   Looks up a localized string similar to {0}
-		///Expected invocation on the mock should never have been performed, but was {4} times: {1}.
+		///   Looks up a localized string similar to Expected invocation on the mock should never have been performed, but was {2} times: .
 		/// </summary>
 		internal static string NoMatchingCallsNever {
 			get {
@@ -417,8 +437,7 @@ namespace Moq.Properties {
 		}
 		
 		/// <summary>
-		///   Looks up a localized string similar to {0}
-		///Expected invocation on the mock once, but was {4} times: {1}.
+		///   Looks up a localized string similar to Expected invocation on the mock once, but was {2} times: .
 		/// </summary>
 		internal static string NoMatchingCallsOnce {
 			get {
@@ -463,7 +482,7 @@ namespace Moq.Properties {
 		}
 		
 		/// <summary>
-		///   Looks up a localized string similar to Performed invocations: {0}.
+		///   Looks up a localized string similar to Performed invocations:.
 		/// </summary>
 		internal static string PerformedInvocations {
 			get {
@@ -553,33 +572,6 @@ namespace Moq.Properties {
 		}
 		
 		/// <summary>
-		///   Looks up a localized string similar to Invalid setup on an extension method: {0}.
-		/// </summary>
-		internal static string SetupOnExtensionMethod {
-			get {
-				return ResourceManager.GetString("SetupOnExtensionMethod", resourceCulture);
-			}
-		}
-		
-		/// <summary>
-		///   Looks up a localized string similar to Invalid setup on a non-virtual (overridable in VB) member: {0}.
-		/// </summary>
-		internal static string SetupOnNonVirtualMember {
-			get {
-				return ResourceManager.GetString("SetupOnNonVirtualMember", resourceCulture);
-			}
-		}
-		
-		/// <summary>
-		///   Looks up a localized string similar to Invalid setup on a static member: {0}.
-		/// </summary>
-		internal static string SetupOnStaticMember {
-			get {
-				return ResourceManager.GetString("SetupOnStaticMember", resourceCulture);
-			}
-		}
-		
-		/// <summary>
 		///   Looks up a localized string similar to Type {0} does not implement required interface {1}.
 		/// </summary>
 		internal static string TypeNotImplementInterface {
@@ -638,12 +630,12 @@ namespace Moq.Properties {
 		}
 		
 		/// <summary>
-		///   Looks up a localized string similar to The following setups on mock &apos;{0}&apos; were not matched:
-		///{1}.
+		///   Looks up a localized string similar to {0}:
+		///This setup was not matched..
 		/// </summary>
-		internal static string UnmatchedSetups {
+		internal static string UnmatchedSetup {
 			get {
-				return ResourceManager.GetString("UnmatchedSetups", resourceCulture);
+				return ResourceManager.GetString("UnmatchedSetup", resourceCulture);
 			}
 		}
 		
@@ -657,6 +649,25 @@ namespace Moq.Properties {
 		}
 		
 		/// <summary>
+		///   Looks up a localized string similar to Unsupported expression: {0}
+		///{1}.
+		/// </summary>
+		internal static string UnsupportedExpressionWithHint {
+			get {
+				return ResourceManager.GetString("UnsupportedExpressionWithHint", resourceCulture);
+			}
+		}
+		
+		/// <summary>
+		///   Looks up a localized string similar to Extension methods (here: {0}) may not be used in setup / verification expressions..
+		/// </summary>
+		internal static string UnsupportedExtensionMethod {
+			get {
+				return ResourceManager.GetString("UnsupportedExtensionMethod", resourceCulture);
+			}
+		}
+		
+		/// <summary>
 		///   Looks up a localized string similar to Member {0} is not supported for protected mocking..
 		/// </summary>
 		internal static string UnsupportedMember {
@@ -666,8 +677,26 @@ namespace Moq.Properties {
 		}
 		
 		/// <summary>
-		///   Looks up a localized string similar to The following invocations were not verified:
-		///{0}.
+		///   Looks up a localized string similar to Non-overridable members (here: {0}) may not be used in setup / verification expressions..
+		/// </summary>
+		internal static string UnsupportedNonOverridableMember {
+			get {
+				return ResourceManager.GetString("UnsupportedNonOverridableMember", resourceCulture);
+			}
+		}
+		
+		/// <summary>
+		///   Looks up a localized string similar to Static members (here: {0}) may not be used in setup / verification expressions..
+		/// </summary>
+		internal static string UnsupportedStaticMember {
+			get {
+				return ResourceManager.GetString("UnsupportedStaticMember", resourceCulture);
+			}
+		}
+		
+		/// <summary>
+		///   Looks up a localized string similar to {0}:
+		///This mock failed verification due to the following unverified invocations:.
 		/// </summary>
 		internal static string UnverifiedInvocations {
 			get {
@@ -685,29 +714,30 @@ namespace Moq.Properties {
 		}
 		
 		/// <summary>
-		///   Looks up a localized string similar to Invalid verify on an extension method: {0}.
+		///   Looks up a localized string similar to {0}:.
 		/// </summary>
-		internal static string VerifyOnExtensionMethod {
+		internal static string VerificationErrorsOfInnerMock {
 			get {
-				return ResourceManager.GetString("VerifyOnExtensionMethod", resourceCulture);
+				return ResourceManager.GetString("VerificationErrorsOfInnerMock", resourceCulture);
 			}
 		}
 		
 		/// <summary>
-		///   Looks up a localized string similar to Invalid verify on a non-virtual (overridable in VB) member: {0}.
+		///   Looks up a localized string similar to {0}:
+		///This mock failed verification due to the following:.
 		/// </summary>
-		internal static string VerifyOnNonVirtualMember {
+		internal static string VerificationErrorsOfMock {
 			get {
-				return ResourceManager.GetString("VerifyOnNonVirtualMember", resourceCulture);
+				return ResourceManager.GetString("VerificationErrorsOfMock", resourceCulture);
 			}
 		}
 		
 		/// <summary>
-		///   Looks up a localized string similar to Invalid verify on a static member: {0}.
+		///   Looks up a localized string similar to The mock repository failed verification due to the following:.
 		/// </summary>
-		internal static string VerifyOnStaticMember {
+		internal static string VerificationErrorsOfMockRepository {
 			get {
-				return ResourceManager.GetString("VerifyOnStaticMember", resourceCulture);
+				return ResourceManager.GetString("VerificationErrorsOfMockRepository", resourceCulture);
 			}
 		}
 	}

@@ -12,9 +12,11 @@ namespace Moq
 	/// matching rules.
 	/// </summary>
 	/// <remarks>
+	/// <para>
 	/// <b>This feature has been deprecated in favor of the new 
 	/// and simpler <see cref="Match{T}"/>.
 	/// </b>
+	/// </para>
 	/// <para>
 	/// The argument matching is used to determine whether a concrete 
 	/// invocation in the mock matches a given setup. This 

@@ -4,31 +4,27 @@
 using System;
 using System.Collections;
 using System.Collections.Generic;
-#if DESKTOP
-using System.Data.Entity;
-using System.Data.Entity.Core.EntityClient;
-#endif
 using System.ComponentModel;
+using System.Globalization;
 using System.IO;
 using System.Linq;
 using System.Linq.Expressions;
 using System.Reflection;
-using System.Text;
 using System.Text.RegularExpressions;
+using System.Threading;
+using System.Threading.Tasks;
+
 using Castle.DynamicProxy;
+
 using Moq;
 using Moq.Properties;
 using Moq.Protected;
+
 using Xunit;
 
-#if !NETCORE
-using System.Web.UI.HtmlControls;
-#endif
 #if FEATURE_SERIALIZATION
 using System.Runtime.Serialization;
 #endif
-using System.Threading;
-using System.Threading.Tasks;
 
 #region #181
 
@@ -217,6 +213,57 @@ namespace Moq.Tests.Regressions
 
 		#endregion
 
+		#region 110
+
+		public class Issue110
+		{
+			[Fact]
+			public void Recursive_property_does_not_override_previous_setups()
+			{
+				var baz = Mock.Of<Baz>(x => x.Value == "beforeBaz");
+				var qux = Mock.Of<Qux>(x => x.Value == "beforeQux");
+
+				var bar = Mock.Of<Bar>(x =>
+					x.Baz == baz &&
+					x.Qux == qux);
+
+				var obj = Mock.Of<Foo>(x => x.Bar == bar);
+
+				var mock = Mock.Get(obj);
+
+				Assert.Equal("beforeBaz", obj.Bar.Baz.Value); // Pass
+				Assert.Equal("beforeQux", obj.Bar.Qux.Value); // Pass
+
+				mock.SetupGet(x => x.Bar.Baz.Value).Returns("test");
+
+				Assert.Equal("test", obj.Bar.Baz.Value); // Pass
+				Assert.Equal("beforeQux", obj.Bar.Qux.Value); // Fail
+			}
+
+			public interface Foo
+			{
+				Bar Bar { get; }
+			}
+
+			public interface Bar
+			{
+				Baz Baz { get; }
+				Qux Qux { get; }
+			}
+
+			public interface Qux
+			{
+				string Value { get; }
+			}
+
+			public interface Baz
+			{
+				string Value { get; }
+			}
+		}
+
+		#endregion
+
 		#region 131
 
 		public class Issue131
@@ -279,6 +326,33 @@ namespace Moq.Tests.Regressions
 			public class ConcreteClass : ISomeInterface
 			{
 				public void Method() { }
+			}
+		}
+
+		#endregion
+
+		#region 142
+
+		public class Issue142
+		{
+			[Fact]
+			public void Mock_Of_recursive_with_argument_matchers()
+			{
+				var foo = Mock.Of<IFoo>(f =>
+					f.Foo(It.Is<int>(i => i == 1)).Name == "One" &&
+					f.Foo(It.Is<int>(i => i == 2)).Name == "Two");
+				Assert.Equal("One", foo.Foo(1).Name);
+				Assert.Equal("Two", foo.Foo(2).Name);
+			}
+
+			public interface INameHolder
+			{
+				string Name { get; }
+			}
+
+			public interface IFoo
+			{
+				INameHolder Foo(int index);
 			}
 		}
 
@@ -1502,6 +1576,184 @@ namespace Moq.Tests.Regressions
 
 		#endregion
 
+		#region 430
+
+		public class Issue430
+		{
+			[Fact]
+			public void Antlers_NoSetup()
+			{
+				// Arrange
+
+				// create mock of class under test
+				var sut = new Mock<Vixen>(args: true) { CallBase = true };
+
+				// Act
+				sut.Object.Antlers = true;
+
+				// Assert
+				sut.VerifySet(x => x.Antlers = true);
+			}
+
+			[Fact]
+			public void Antlers_SetupProperty()
+			{
+				// Arrange
+
+				// create mock of class under test
+				var sut = new Mock<Vixen>(args: true) { CallBase = true };
+				sut.SetupProperty(x => x.Antlers, false);
+
+				// Act
+				sut.Object.Antlers = true;
+
+				// Assert
+				sut.VerifySet(x => x.Antlers = true);
+			}
+
+			[Fact]
+			public void Antlers_SetupSet()
+			{
+				// Arrange
+
+				// create mock of class under test
+				var sut = new Mock<Vixen>(args: true) { CallBase = true };
+				sut.SetupSet(x => x.Antlers = true);
+
+				// Act
+				sut.Object.Antlers = true;
+
+				// Assert
+				sut.VerifySet(x => x.Antlers = true);
+			}
+
+			public class Vixen
+			{
+
+				public Vixen(bool pIsMale)
+				{
+					IsMale = pIsMale;
+				}
+
+				private bool _IsMale;
+				public virtual bool IsMale
+				{
+					get { return this._IsMale; }
+					private set { this._IsMale = value; }
+				}
+
+				private bool _Antlers;
+				public virtual bool Antlers
+				{
+					get { return this._Antlers; }
+					set
+					{
+						// females cannot have antlers
+						if (IsMale)
+							this._Antlers = value;
+						else
+							this._Antlers = false;
+					}
+				}
+			}
+		}
+
+		#endregion
+
+		#region 432
+
+		public class Issue432
+		{
+			[Fact]
+			public void Antlers_NoSetup()
+			{
+				// Arrange
+				int temp = 0;
+
+				// create mock of class under test
+				var sut = new Mock<Prancer>(args: true) { CallBase = true };
+				sut.Setup(x => x.ExecuteMe()).Callback(() => temp = 1); // nullify
+
+				// Act
+				sut.Object.Antlers = true;
+
+				// Assert
+				sut.VerifySet(x => x.Antlers = true);
+				Assert.Equal(1, temp);
+			}
+
+			[Fact]
+			public void Antlers_SetupProperty()
+			{
+				// Arrange
+				int temp = 0;
+
+				// create mock of class under test
+				var sut = new Mock<Prancer>(args: true) { CallBase = true };
+				sut.SetupProperty(x => x.Antlers, false);
+				sut.Setup(x => x.ExecuteMe()).Callback(() => temp = 2); // nullify
+
+				// Act
+				sut.Object.Antlers = true;
+
+				// Assert
+				sut.VerifySet(x => x.Antlers = true);
+				Assert.Equal(2, temp);
+			}
+
+			[Fact]
+			public void Antlers_SetupSet()
+			{
+				// Arrange
+				int temp = 0;
+
+				// create mock of class under test
+				var sut = new Mock<Prancer>(args: true) { CallBase = true };
+				sut.Setup(x => x.ExecuteMe()).Callback(() => temp = 3); // nullify
+				sut.SetupSet(x => x.Antlers = true);
+
+				// Act
+				sut.Object.Antlers = true;
+
+				// Assert
+				sut.VerifySet(x => x.Antlers = true);
+				Assert.Equal(3, temp);
+			}
+
+			public class Prancer
+			{
+				public Prancer(bool pIsMale)
+				{
+					IsMale = pIsMale;
+					ExecuteMe();
+				}
+
+				private bool _IsMale;
+				public virtual bool IsMale
+				{
+					get { return this._IsMale; }
+					private set { this._IsMale = value; }
+				}
+
+				private bool _Antlers;
+				public virtual bool Antlers
+				{
+					get { return this._Antlers; }
+					set
+					{
+						this._Antlers = value;
+					}
+				}
+
+				public virtual void ExecuteMe()
+				{
+					throw new Exception("Why am I here?");
+				}
+			}
+		}
+
+		#endregion
+
 		#region 438
 
 		public class Issue438
@@ -1635,14 +1887,14 @@ namespace Moq.Tests.Regressions
 
 		#region 464
 
-		#if DESKTOP
+		#if FEATURE_EF
 		public class Issue464
 		{
 			[Fact]
 			public void Test()
 			{
 				Mock<MyDbContext> mockDbContext = new Mock<MyDbContext>();
-				Mock<DbSet<MyEntity>> mockDbSet = new Mock<DbSet<MyEntity>>();
+				var mockDbSet = new Mock<System.Data.Entity.DbSet<MyEntity>>();
 				mockDbContext.Setup(m => m.Set<MyEntity>()).Returns(mockDbSet.Object);
 
 				var triggerObjectCreation = mockDbContext.Object;
@@ -1656,9 +1908,9 @@ namespace Moq.Tests.Regressions
 				Assert.IsType<MockException>(exception);
 			}
 
-			public partial class MyDbContext : DbContext
+			public partial class MyDbContext : System.Data.Entity.DbContext
 			{
-				public virtual DbSet<MyEntity> MyEntity { get; set; }
+				public virtual System.Data.Entity.DbSet<MyEntity> MyEntity { get; set; }
 			}
 
 			public class MyEntity { }
@@ -1755,13 +2007,13 @@ namespace Moq.Tests.Regressions
 
 		#region 526
 
-		#if DESKTOP
+		#if FEATURE_EF
 		public sealed class Issue526
 		{
 			[Fact]
 			public void Given_EntityConnection_mock_created_with_new_Mock_SetupGet_can_setup_ConnectionString_property()
 			{
-				var mockConnection = new Mock<EntityConnection>();
+				var mockConnection = new Mock<System.Data.Entity.Core.EntityClient.EntityConnection>();
 				var connection = mockConnection.Object;
 
 				mockConnection.SetupGet(c => c.ConnectionString).Returns("_");
@@ -1773,7 +2025,7 @@ namespace Moq.Tests.Regressions
 			[Fact]
 			public void Given_EntityConnection_mock_created_with_Mock_Of_SetupGet_can_setup_ConnectionString_property()
 			{
-				var connection = Mock.Of<EntityConnection>();
+				var connection = Mock.Of<System.Data.Entity.Core.EntityClient.EntityConnection>();
 				var mockConnection = Mock.Get(connection);
 
 				mockConnection.SetupGet(c => c.ConnectionString).Returns("_");
@@ -1952,8 +2204,8 @@ namespace Moq.Tests.Regressions
 				_ = Mock.Of<IStructByValueConsumer>();
 			}
 
-			// Moq performs its own System.Reflection.Emit-ting for mocking delegate types,
-			// so add some tests that target that:
+			// Moq used to perform its own System.Reflection.Emit-ting for mocking delegate types,
+			// and the following tests were added to target that logic. It can't hurt to keep them around.
 
 			public delegate void StructByValueDelegate(Struct message);
 
@@ -2005,6 +2257,289 @@ namespace Moq.Tests.Regressions
 			{
 				void MyAction(int x);
 				int MyFunc(int x);
+			}
+		}
+
+		#endregion
+
+		#region 696
+
+		public class Issue696
+		{
+			[Fact]
+			public void SetupSet_indexer_arguments_correctly_matched()
+			{
+				int x = default(int);
+				int result = default(int);
+
+				var mock = new Mock<IFoo>();
+				mock.SetupSet(f => f[It.IsAny<int>()] = 8)
+					.Callback(new Action<int, int>((x_, result_) =>
+					{
+						x = x_;
+						result = result_;
+					}));
+
+				mock.Object[10] = 8;
+				mock.Object[0] = 17;
+				Assert.Equal(10, x);
+				Assert.Equal(8, result);
+			}
+
+			public interface IFoo
+			{
+				int this[int index] { get;set; }
+			}
+		}
+
+		#endregion
+
+		#region 706
+
+		public class Issue706
+		{
+			[Fact]
+			public void CallBase_should_not_be_allowed_for_void_delegate_mocks()
+			{
+				Mock<Action> mock = new Mock<Action>();
+				Language.Flow.ISetup<Action> setup = mock.Setup(m => m());
+				
+				Exception ex = Assert.Throws<NotSupportedException>(() => setup.CallBase());
+				Assert.Equal(string.Format(CultureInfo.CurrentCulture, Resources.CallBaseCannotBeUsedWithDelegateMocks), ex.Message);
+			}
+			
+			[Fact]
+			public void CallBase_should_not_be_allowed_for_non_void_delegate_mocks()
+			{
+				Mock<Func<bool>> mock = new Mock<Func<bool>>();
+				Language.Flow.ISetup<Func<bool>, bool> setup = mock.Setup(m => m());
+
+				Exception ex = Assert.Throws<NotSupportedException>(() => setup.CallBase());
+				Assert.Equal(string.Format(CultureInfo.CurrentCulture, Resources.CallBaseCannotBeUsedWithDelegateMocks), ex.Message);
+			}
+
+			[Fact]
+			public void CallBase_property_should_not_be_allowed_true_for_delegate_mocks()
+			{
+				Mock<Action> mock = new Mock<Action>();
+
+				Exception ex = Assert.Throws<NotSupportedException>(() => mock.CallBase = true);
+				Assert.Equal(string.Format(CultureInfo.CurrentCulture, Resources.CallBaseCannotBeUsedWithDelegateMocks), ex.Message);
+			}
+
+			[Fact]
+			public void CallBase_property_should_be_allowed_false_for_delegate_mocks()
+			{
+				Mock<Action> mock = new Mock<Action>();
+				mock.CallBase = false;
+				
+				Assert.False(mock.CallBase);
+			}
+		}
+
+		#endregion
+
+		#region 711
+
+		public class Issue711
+		{
+			[Fact]
+			public void Argument_expression_does_not_get_reevaluated_by_VerifyAll()
+			{
+				int? x = 1;
+				var mock = new Mock<Action<int?>>();
+				mock.Setup(m => m(x.Value));
+				mock.Object(1);
+				x = null; // if the argument expression `x.Value` got reevaluated by VerifyAll,
+				          // we'd expect to see a `NullReferenceException`.
+				mock.VerifyAll();
+			}
+
+			[Fact]
+			public void Argument_expression_of_overriding_setup_does_not_get_reevaluated_by_VerifyAll()
+			{
+				int? x = 1;
+				var mock = new Mock<Action<int?>>();
+				mock.Setup(m => m(1));  // only difference to the above test, and one would
+				                        // think that this won't change anything.
+				mock.Setup(m => m(x.Value));
+				mock.Object(1);
+				x = null;
+				mock.VerifyAll();
+			}
+		}
+
+		#endregion
+
+		#region 714
+
+		public class Issue714
+		{
+			[Fact]
+			public void Setup_argument_using_indexer_should_be_evaluated_eagerly()
+			{
+				Mock<IMockable> mock = new Mock<IMockable>();
+				var args = new List<object> { new object() };
+				for (var i = 0; i < args.Count; i++)
+				{
+					mock.Setup(m => m.Method(args[i]));
+				}
+
+				mock.Object.Method(args[0]);
+			}
+
+			public interface IMockable
+			{
+				void Method(object arg);
+			}
+		}
+
+		#endregion
+
+		#region 725
+
+		public sealed class Issue725
+		{
+			public interface IUseGuid
+			{
+				void Use(Guid id);
+				void UseNullable(Guid? id);
+			}
+
+			public interface IHaveGuid
+			{
+				Guid? Id { get; }
+			}
+
+			[Fact]
+			public void Setup_Do_should_succeed()
+			{
+				var id = Guid.NewGuid();
+				var data = Mock.Of<IHaveGuid>(x => x.Id == id);
+				new Mock<IUseGuid>().Setup(x => x.Use(data.Id.Value));
+			}
+
+			[Fact]
+			public void Setup_DoNullable_should_succeed()
+			{
+				var id = Guid.NewGuid();
+				var data = Mock.Of<IHaveGuid>(x => x.Id == id);
+				new Mock<IUseGuid>().Setup(x => x.UseNullable(data.Id));
+			}
+		}
+
+		#endregion
+
+		#region 735
+
+		public class Issue735
+		{
+			[Fact]
+			public void Protected_Setup_should_find_and_distinguish_between_two_method_overloads()
+			{
+				int which = 0;
+				var mockedRule = new Mock<MyAbstractClass>();
+				mockedRule.Protected().Setup("ApplyRule", true, ItExpr.IsAny<IDictionary<string, object>>()).Callback(() => which = 1);
+				mockedRule.Protected().Setup("ApplyRule", true, ItExpr.IsAny<object>()).Callback(() => which = 2);
+
+				mockedRule.Object.InvokeApplyRule(new object());
+				Assert.Equal(2, which);
+
+				mockedRule.Object.InvokeApplyRule(new Dictionary<string, object>());
+				Assert.Equal(1, which);
+			}
+
+			public abstract class MyAbstractClass
+			{
+				protected abstract void ApplyRule(IDictionary<string, object> tokens);
+				protected abstract void ApplyRule(object obj);
+
+				public void InvokeApplyRule(IDictionary<string, object> tokens)
+				{
+					this.ApplyRule(tokens);
+				}
+
+				public void InvokeApplyRule(object obj)
+				{
+					this.ApplyRule(obj);
+				}
+			}
+		}
+
+		#endregion
+
+		#region 809
+
+		public class Issue809
+		{
+			[Fact]
+			public void Can_use_mocked_object_of_type_with_ctor_args_as_argument_in_setup_expression()
+			{
+				var mock1 = new Mock<IProperty>();
+				var mock2 = new Mock<IMethod>();
+				var ndc = new ClassWithoutDefaultConstructor(string.Empty);
+
+				mock1.Setup(x => x.Value).Returns(ndc);
+				var mockedObject1 = mock1.Object;
+				mock2.Setup(x => x.Test(mockedObject1.Value));
+			}
+
+			public class ClassWithoutDefaultConstructor
+			{
+				public ClassWithoutDefaultConstructor(string dummy)
+				{
+				}
+			}
+
+			public interface IProperty
+			{
+				ClassWithoutDefaultConstructor Value { get; }
+			}
+
+			public interface IMethod
+			{
+				void Test(ClassWithoutDefaultConstructor value);
+			}
+		}
+
+		#endregion
+
+		#region #810
+
+		public class _810
+		{
+			[Fact]
+			public void VoidSetupPhraseConvertsExpressionToDescriptiveString()
+			{
+				var voidSetup = new Mock<IFoo>().Setup(x => x.DoThings(null));
+
+				Assert.Equal("x => x.DoThings(null)", voidSetup.ToString());
+			}
+
+			[Fact]
+			public void NonVoidSetupPhraseConvertsExpressionToDescriptiveString()
+			{
+				var nonVoidSetup = new Mock<IFoo>().Setup(x => x.Property1);
+
+				Assert.Equal("x => x.Property1", nonVoidSetup.ToString());
+			}
+
+			[Fact]
+			public void SetterSetupPhraseConvertsExpressionToDescriptiveString()
+			{
+				var setterSetup = new Mock<IFoo>().SetupSet<object>(x => x.Property1 = null);
+
+				Assert.Equal("x => x.Property1 = null", setterSetup.ToString());
+			}
+
+			[Fact]
+			public void SetupSequencePhraseConvertsExpressionToDescriptiveString()
+			{
+				var setupSequence = new Mock<IFoo>().SetupSequence(x => x.DoThings(null));
+				var setupGenericSequence = new Mock<IFoo>().SetupSequence(x => x.DoThings<object>(null));
+
+				Assert.Equal("x => x.DoThings(null)", setupSequence.ToString());
+				Assert.Equal("x => x.DoThings<object>(null)", setupGenericSequence.ToString());
 			}
 		}
 
@@ -2108,6 +2643,8 @@ namespace Moq.Tests.Regressions
 		public interface IFoo
 		{
 			void DoThings(object arg);
+			T DoThings<T>(object arg);
+			object Property1 { get; set; }
 		}
 
 		[Fact]
@@ -2352,7 +2889,7 @@ namespace Moq.Tests.Regressions
 				Assert.True(e.IsVerificationError);
 
 				Assert.Contains(
-					"IFoo t => t.Submit(It.IsAny<String>(), It.IsAny<String>(), new[] { It.IsAny<Int32>() })",
+					"IFoo t => t.Submit(It.IsAny<string>(), It.IsAny<string>(), new[] { It.IsAny<int>() })",
 					e.Message);
 			}
 
@@ -2773,14 +3310,14 @@ namespace Moq.Tests.Regressions
 
 		#region #160
 
-#if !NETCORE
+#if FEATURE_SYSTEM_WEB
 		public class _160
 		{
 			[Fact]
 			public void ShouldMockHtmlControl()
 			{
 				// CallBase was missing
-				var htmlInputTextMock = new Mock<HtmlInputText>() { CallBase = true };
+				var htmlInputTextMock = new Mock<System.Web.UI.HtmlControls.HtmlInputText>() { CallBase = true };
 				Assert.True(htmlInputTextMock.Object.Visible);
 			}
 		}
@@ -2966,64 +3503,6 @@ namespace Moq.Tests.Regressions
 
 		#endregion
 
-		#region #183
-
-		public class _183
-		{
-			[Fact]
-			public void Test()
-			{
-				var mock = new Mock<IFoo>();
-				mock.Setup(m => m.Execute(1));
-				mock.Setup(m => m.Execute(It.IsInRange(2, 20, Range.Exclusive)));
-				mock.Setup(m => m.Execute(3, "Caption"));
-
-				mock.Object.Execute(3);
-				mock.Object.Execute(4);
-				mock.Object.Execute(5);
-
-				var e = Assert.Throws<MockException>(() => mock.Verify(m => m.Execute(0)));
-				Assert.True(e.Message.ContainsConsecutiveLines(
-					"Configured setups: ",
-					"IFoo m => m.Execute(1)",
-					"IFoo m => m.Execute(It.IsInRange<Int32>(2, 20, Range.Exclusive))"));
-			}
-
-			[Fact]
-			public void TestGeneric()
-			{
-				var mock = new Mock<IFoo>();
-				mock.Setup(m => m.Execute<int>(1, 10));
-				mock.Setup(m => m.Execute<string>(1, "Foo"));
-
-				mock.Object.Execute(1, 10);
-
-				var e = Assert.Throws<MockException>(() => mock.Verify(m => m.Execute<int>(1, 1)));
-				Assert.True(e.Message.ContainsConsecutiveLines(
-					"Configured setups: ",
-					"IFoo m => m.Execute<Int32>(1, 10)"));
-			}
-
-			[Fact]
-			public void TestNoSetups()
-			{
-				var mock = new Mock<IFoo>();
-
-				var e = Assert.Throws<MockException>(() => mock.Verify(m => m.Execute(1)));
-				Assert.Contains("No setups configured.", e.Message);
-
-			}
-
-			public interface IFoo
-			{
-				void Execute(int param);
-				void Execute(int param, string caption);
-				void Execute<T>(int p, T param);
-			}
-		}
-
-		#endregion
-
 		#region #186
 
 		public class _186
@@ -3035,7 +3514,8 @@ namespace Moq.Tests.Regressions
 				mock.Setup(m => m.OnExecute());
 
 				var e = Assert.Throws<NotSupportedException>(() => mock.Verify(m => m.Execute()));
-				Assert.StartsWith("Invalid verify", e.Message);
+				Assert.Contains("non-overridable", e.Message, StringComparison.CurrentCultureIgnoreCase);
+				Assert.Contains("Foo.Execute", e.Message);
 			}
 
 			public class Foo
@@ -3613,7 +4093,7 @@ namespace Moq.Tests.Regressions
 
 		#region #326
 
-#if !NETCORE
+#if FEATURE_SYSTEM_WINDOWS_FORMS
 
 		public class _326
 		{

@@ -3,52 +3,57 @@
 
 using System;
 using System.Globalization;
+
 using Moq.Properties;
 
 namespace Moq
 {
 	/// <include file='Times.xdoc' path='docs/doc[@for="Times"]/*'/>
-	public struct Times
+	public readonly struct Times : IEquatable<Times>
 	{
-		private Func<int, bool> evaluator;
-		private string messageFormat;
-		private int from;
-		private int to;
+		private readonly int from;
+		private readonly int to;
+		private readonly Kind kind;
 
-		private Times(Func<int, bool> evaluator, int from, int to, string messageFormat)
+		private Times(Kind kind, int from, int to)
 		{
-			this.evaluator = evaluator;
 			this.from = from;
 			this.to = to;
-			this.messageFormat = messageFormat;
+			this.kind = kind;
 		}
 
 		/// <include file='Times.xdoc' path='docs/doc[@for="Times.AtLeast"]/*'/>
 		public static Times AtLeast(int callCount)
 		{
-			Guard.NotOutOfRangeInclusive(callCount, 1, int.MaxValue, nameof(callCount));
+			if (callCount < 1)
+			{
+				throw new ArgumentOutOfRangeException(nameof(callCount));
+			}
 
-			return new Times(c => c >= callCount, callCount, int.MaxValue, Resources.NoMatchingCallsAtLeast);
+			return new Times(Kind.AtLeast, callCount, int.MaxValue);
 		}
 
 		/// <include file='Times.xdoc' path='docs/doc[@for="Times.AtLeastOnce"]/*'/>
 		public static Times AtLeastOnce()
 		{
-			return new Times(c => c >= 1, 1, int.MaxValue, Resources.NoMatchingCallsAtLeastOnce);
+			return new Times(Kind.AtLeastOnce, 1, int.MaxValue);
 		}
 
 		/// <include file='Times.xdoc' path='docs/doc[@for="Times.AtMost"]/*'/>
 		public static Times AtMost(int callCount)
 		{
-			Guard.NotOutOfRangeInclusive(callCount, 0, int.MaxValue, nameof(callCount));
+			if (callCount < 0)
+			{
+				throw new ArgumentOutOfRangeException(nameof(callCount));
+			}
 
-			return new Times(c => c >= 0 && c <= callCount, 0, callCount, Resources.NoMatchingCallsAtMost);
+			return new Times(Kind.AtMost, 0, callCount);
 		}
 
 		/// <include file='Times.xdoc' path='docs/doc[@for="Times.AtMostOnce"]/*'/>
 		public static Times AtMostOnce()
 		{
-			return new Times(c => c >= 0 && c <= 1, 0, 1, Resources.NoMatchingCallsAtMostOnce);
+			return new Times(Kind.AtMostOnce, 0, 1);
 		}
 
 		/// <include file='Times.xdoc' path='docs/doc[@for="Times.Between"]/*'/>
@@ -56,57 +61,67 @@ namespace Moq
 		{
 			if (rangeKind == Range.Exclusive)
 			{
-				Guard.NotOutOfRangeExclusive(callCountFrom, 0, callCountTo, nameof(callCountFrom));
-				if (callCountTo - callCountFrom == 1)
+				if (callCountFrom <= 0 || callCountTo <= callCountFrom)
 				{
-					throw new ArgumentOutOfRangeException("callCountTo");
+					throw new ArgumentOutOfRangeException(nameof(callCountFrom));
 				}
 
-				return new Times(
-					c => c > callCountFrom && c < callCountTo,
-					callCountFrom,
-					callCountTo,
-					Resources.NoMatchingCallsBetweenExclusive);
+				if (callCountTo - callCountFrom == 1)
+				{
+					throw new ArgumentOutOfRangeException(nameof(callCountTo));
+				}
+
+				return new Times(Kind.BetweenExclusive, callCountFrom + 1, callCountTo - 1);
 			}
 
-			Guard.NotOutOfRangeInclusive(callCountFrom, 0, callCountTo, nameof(callCountFrom));
-			return new Times(
-				c => c >= callCountFrom && c <= callCountTo,
-				callCountFrom,
-				callCountTo,
-				Resources.NoMatchingCallsBetweenInclusive);
+			if (callCountFrom < 0 || callCountTo < callCountFrom)
+			{
+				throw new ArgumentOutOfRangeException(nameof(callCountFrom));
+			}
+
+			return new Times(Kind.BetweenInclusive, callCountFrom, callCountTo);
 		}
 
 		/// <include file='Times.xdoc' path='docs/doc[@for="Times.Exactly"]/*'/>
 		public static Times Exactly(int callCount)
 		{
-			Guard.NotOutOfRangeInclusive(callCount, 0, int.MaxValue, nameof(callCount));
+			if (callCount < 0)
+			{
+				throw new ArgumentOutOfRangeException(nameof(callCount));
+			}
 
-			return new Times(c => c == callCount, callCount, callCount, Resources.NoMatchingCallsExactly);
+			return new Times(Kind.Exactly, callCount, callCount);
 		}
 
 		/// <include file='Times.xdoc' path='docs/doc[@for="Times.Never"]/*'/>
 		public static Times Never()
 		{
-			return new Times(c => c == 0, 0, 0, Resources.NoMatchingCallsNever);
+			return new Times(Kind.Never, 0, 0);
 		}
 
 		/// <include file='Times.xdoc' path='docs/doc[@for="Times.Once"]/*'/>
 		public static Times Once()
 		{
-			return new Times(c => c == 1, 1, 1, Resources.NoMatchingCallsOnce);
+			return new Times(Kind.Once, 1, 1);
+		}
+
+		/// <summary>
+		///   Returns a value indicating whether this instance is equal to a specified <see cref="Times"/> value.
+		/// </summary>
+		/// <param name="other">A <see cref="Times"/> value to compare to this instance.</param>
+		/// <returns>
+		///   <see langword="true"/> if <paramref name="other"/> has the same value as this instance;
+		///   otherwise, <see langword="true"/>.
+		/// </returns>
+		public bool Equals(Times other)
+		{
+			return this.from == other.from && this.to == other.to;
 		}
 
 		/// <include file='Times.xdoc' path='docs/doc[@for="Times.Equals"]/*'/>
 		public override bool Equals(object obj)
 		{
-			if (obj is Times)
-			{
-				var other = (Times)obj;
-				return this.from == other.from && this.to == other.to;
-			}
-
-			return false;
+			return obj is Times other && this.Equals(other);
 		}
 
 		/// <include file='Times.xdoc' path='docs/doc[@for="Times.GetHashCode"]/*'/>
@@ -127,21 +142,44 @@ namespace Moq
 			return !left.Equals(right);
 		}
 
-		internal string GetExceptionMessage(string failMessage, string expression, int callCount)
+		internal string GetExceptionMessage(int callCount)
 		{
-			return string.Format(
-				CultureInfo.CurrentCulture,
-				this.messageFormat,
-				failMessage,
-				expression,
-				this.from,
-				this.to,
-				callCount);
+			var from = this.kind == Kind.BetweenExclusive ? this.from - 1 : this.from;
+			var to   = this.kind == Kind.BetweenExclusive ? this.to   + 1 : this.to;
+
+			string message = null;
+			switch (this.kind)
+			{
+				case Kind.AtLeast:          message = Resources.NoMatchingCallsAtLeast; break;
+				case Kind.AtLeastOnce:      message = Resources.NoMatchingCallsAtLeastOnce; break;
+				case Kind.AtMost:           message = Resources.NoMatchingCallsAtMost; break;
+				case Kind.AtMostOnce:       message = Resources.NoMatchingCallsAtMostOnce; break;
+				case Kind.BetweenExclusive: message = Resources.NoMatchingCallsBetweenExclusive; break;
+				case Kind.BetweenInclusive: message = Resources.NoMatchingCallsBetweenInclusive; break;
+				case Kind.Exactly:          message = Resources.NoMatchingCallsExactly; break;
+				case Kind.Once:             message = Resources.NoMatchingCallsOnce; break;
+				case Kind.Never:            message = Resources.NoMatchingCallsNever; break;
+			}
+
+			return string.Format(CultureInfo.CurrentCulture, message, from, to, callCount);
 		}
 
 		internal bool Verify(int callCount)
 		{
-			return this.evaluator(callCount);
+			return this.from <= callCount && callCount <= this.to;
+		}
+
+		private enum Kind
+		{
+			AtLeast,
+			AtLeastOnce,
+			AtMost,
+			AtMostOnce,
+			BetweenExclusive,
+			BetweenInclusive,
+			Exactly,
+			Once,
+			Never,
 		}
 	}
 }

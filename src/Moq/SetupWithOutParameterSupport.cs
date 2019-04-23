@@ -15,12 +15,12 @@ namespace Moq
 	{
 		private readonly List<KeyValuePair<int, object>> outValues;
 
-		protected SetupWithOutParameterSupport(MethodInfo method, IReadOnlyList<Expression> arguments, LambdaExpression expression)
-			: base(new InvocationShape(method, arguments), expression)
+		protected SetupWithOutParameterSupport(InvocationShape expectation)
+			: base(expectation)
 		{
-			Debug.Assert(arguments != null);
+			Debug.Assert(expectation != null);
 
-			this.outValues = GetOutValues(arguments, method.GetParameters());
+			this.outValues = GetOutValues(expectation.Arguments, expectation.Method.GetParameters());
 		}
 
 		public sealed override void SetOutParameters(Invocation invocation)

@@ -12,6 +12,8 @@ using System.Reflection;
 using static System.Runtime.InteropServices.Marshal;
 #endif
 
+using Moq.Protected;
+
 namespace Moq
 {
 	/// <include file='It.xdoc' path='docs/doc[@for="It"]/*'/>
@@ -42,6 +44,13 @@ namespace Moq
 				() => It.IsAny<TValue>());
 		}
 
+		private static readonly MethodInfo isAnyMethod = typeof(It).GetMethod(nameof(It.IsAny), BindingFlags.Public | BindingFlags.Static);
+
+		internal static MethodCallExpression IsAny(Type genericArgument)
+		{
+			return Expression.Call(It.isAnyMethod.MakeGenericMethod(genericArgument));
+		}
+
 		/// <include file='It.xdoc' path='docs/doc[@for="It.IsNotNull"]/*'/>
 		public static TValue IsNotNull<TValue>()
 		{
@@ -62,7 +71,7 @@ namespace Moq
 		{
 			return Match<TValue>.Create(
 				value => match.CompileUsingExpressionCompiler().Invoke(value),
-				() => It.Is<TValue>(match));
+				Expression.Lambda<Func<TValue>>(ItExpr.Is<TValue>(match)));
 		}
 
 		/// <include file='It.xdoc' path='docs/doc[@for="It.IsInRange"]/*'/>

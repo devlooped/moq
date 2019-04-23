@@ -3,10 +3,9 @@
 
 using System;
 using System.Linq;
-using Xunit;
 using System.Collections.Generic;
-using System.Linq.Expressions;
-using System.Reflection;
+
+using Xunit;
 
 namespace Moq.Tests
 {

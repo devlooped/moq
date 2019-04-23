@@ -6,6 +6,7 @@ using System.ComponentModel;
 using System.Linq.Expressions;
 
 using Moq.Language.Flow;
+using Moq.Protected;
 
 namespace Moq
 {
@@ -54,7 +55,7 @@ namespace Moq
 		[EditorBrowsable(EditorBrowsableState.Never)]
 		public ISetupSetter<T, TProperty> ExpectSet<TProperty>(Expression<Func<T, TProperty>> expression)
 		{
-			return Mock.SetupSet(this, expression);
+			return this.SetupSet(expression);
 		}
 
 		/// <summary>

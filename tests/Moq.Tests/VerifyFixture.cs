@@ -2,10 +2,12 @@
 // All rights reserved. Licensed under the BSD 3-Clause License; see License.txt.
 
 using System;
-using Moq;
-using Xunit;
-
 using System.Threading.Tasks;
+
+using Moq;
+using Moq.Protected;
+
+using Xunit;
 
 namespace Moq.Tests
 {
@@ -60,7 +62,7 @@ namespace Moq.Tests
 
 			var mex = Assert.Throws<MockException>(() => mock.Verify());
 			Assert.True(mex.IsVerificationError);
-			Assert.Contains(@".Execute(It.Is<String>(s => String.IsNullOrEmpty(s)))", mex.Message);
+			Assert.Contains(@".Execute(It.Is<string>(s => string.IsNullOrEmpty(s)))", mex.Message);
 		}
 
 		[Fact]
@@ -841,11 +843,10 @@ namespace Moq.Tests
 			var mex = Assert.Throws<MockException>(() => mock.Verify(f => f.Execute("pong")));
 
 			Assert.True(mex.Message.ContainsConsecutiveLines(
-				"Performed invocations: ",
-				"IFoo.Execute(\"ping\")",
-				"IFoo.Echo(42)",
-				"IFoo.Submit()",
-				"IFoo.Save([1, 2, \"hello\"])"));
+				"      IFoo.Execute(\"ping\")",
+				"      IFoo.Echo(42)",
+				"      IFoo.Submit()",
+				"      IFoo.Save([1, 2, \"hello\"])"));
 		}
 
 		[Fact]
@@ -859,34 +860,13 @@ namespace Moq.Tests
 		}
 
 		[Fact]
-		public void IncludesActualValuesFromSetups()
-		{
-			var expectedArg = "lorem,ipsum";
-			var mock = new Moq.Mock<IFoo>();
-			mock.Setup(f => f.Save(expectedArg.Substring(0, 5)));
-
-			var mex = Assert.Throws<MockException>(() => mock.Verify(foo => foo.Save("never")));
-			Assert.Contains("f.Save(\"lorem\")", mex.Message);
-		}
-
-		[Fact]
 		public void IncludesMessageAboutNoActualCallsInFailureMessage()
 		{
 			var mock = new Moq.Mock<IFoo>();
 
 			MockException mex = Assert.Throws<MockException>(() => mock.Verify(f => f.Execute("pong")));
 
-			Assert.Contains("No invocations performed.", mex.Message);
-		}
-
-		[Fact]
-		public void IncludesMessageAboutNoSetupCallsInFailureMessage()
-		{
-			var mock = new Moq.Mock<IFoo>();
-
-			MockException mex = Assert.Throws<MockException>(() => mock.Verify(f => f.Execute("pong")));
-
-			Assert.Contains("No setups configured.", mex.Message);
+			Assert.Contains("   No invocations performed.", mex.Message);
 		}
 
 		[Fact]
@@ -900,6 +880,51 @@ namespace Moq.Tests
 		}
 
 		[Fact]
+		public void Should_verify_derived_as_generic_parameters()
+		{
+			//Arrange
+			var mock = new Mock<IBaz>();
+
+			//Act
+			mock.Object.Subscribe<BazParam2>();
+			mock.Object.Subscribe<BazParam>();
+			mock.Object.Subscribe<IBazParam>();
+
+			//Assert
+			mock.Verify(foo => foo.Subscribe<IBazParam>(), Times.Exactly(3));
+			mock.Verify(foo => foo.Subscribe<BazParam>(), Times.Exactly(2));
+			mock.Verify(foo => foo.Subscribe<BazParam2>(), Times.Once);
+		}
+
+		[Fact]
+		public void Should_not_verify_nongeneric_when_generic_invoked()
+		{
+			//Arrange
+			var mock = new Mock<IBaz>();
+
+			//Act
+			mock.Object.Subscribe<IBazParam>();
+
+			//Assert
+			mock.Verify(foo => foo.Subscribe<IBazParam>(), Times.Once);
+			mock.Verify(foo => foo.Subscribe(), Times.Never);
+		}
+
+		[Fact]
+		public void Should_not_verify_generic_when_nongeneric_invoked()
+		{
+			//Arrange
+			var mock = new Mock<IBaz>();
+
+			//Act
+			mock.Object.Subscribe();
+
+			//Assert
+			mock.Verify(foo => foo.Subscribe<IBazParam>(), Times.Never);
+			mock.Verify(foo => foo.Subscribe(), Times.Once);
+		}
+
+		[Fact]
 		public void NullArrayValuesForActualInvocationArePrintedAsNullInMockExeptionMessage()
 		{
 			var strings = new string[] { "1", null, "3" };
@@ -907,8 +932,7 @@ namespace Moq.Tests
 			mock.Object.Method(strings);
 			var mex = Assert.Throws<MockException>(() => mock.Verify(_ => _.Method(null)));
 			Assert.True(mex.Message.ContainsConsecutiveLines(
-				@"Performed invocations: ",
-				@"IArrays.Method([""1"", null, ""3""])"));
+				@"      IArrays.Method([""1"", null, ""3""])"));
 		}
 
 		[Fact]
@@ -919,8 +943,7 @@ namespace Moq.Tests
 			mock.Object.Method(strings);
 			var mex = Assert.Throws<MockException>(() => mock.Verify(_ => _.Method(null)));
 			Assert.True(mex.Message.ContainsConsecutiveLines(
-				@"Performed invocations: ",
-				@"IArrays.Method([""1"", null, ""3"", ""4"", ""5"", ""6"", ""7"", ""8"", ""9"", ""10""])"));
+				@"      IArrays.Method([""1"", null, ""3"", ""4"", ""5"", ""6"", ""7"", ""8"", ""9"", ""10""])"));
 		}
 
 		[Fact]
@@ -931,8 +954,7 @@ namespace Moq.Tests
 			mock.Object.Method(strings);
 			var mex = Assert.Throws<MockException>(() => mock.Verify(_ => _.Method(null)));
 			Assert.True(mex.Message.ContainsConsecutiveLines(
-				@"Performed invocations: ",
-				@"IArrays.Method([""1"", null, ""3"", ""4"", ""5"", ""6"", ""7"", ""8"", ""9"", ""10"", ...])"));
+				@"      IArrays.Method([""1"", null, ""3"", ""4"", ""5"", ""6"", ""7"", ""8"", ""9"", ""10"", ...])"));
 		}
 
 		[Fact]
@@ -979,7 +1001,7 @@ namespace Moq.Tests
 			});
 		}
 
-#if !NETCORE
+#if FEATURE_CALLERINFO
 		[Fact]
 		public void Enabling_diagnostic_file_info_leads_to_that_information_in_verification_error_messages()
 		{
@@ -1387,30 +1409,6 @@ namespace Moq.Tests
 		}
 
 		[Fact]
-		public void Verification_error_message_contains_setup_for_delegate_mock()
-		{
-			var mock = new Mock<Action>();
-			mock.Setup(m => m());
-
-			var ex = Record.Exception(() => mock.Verify(m => m(), Times.Once()));
-
-			Assert.Contains("Configured setups:", ex.Message);
-			Assert.Contains("Action m => m()", ex.Message);
-		}
-
-		[Fact]
-		public void Verification_error_message_contains_setup_for_delegate_mock_with_parameters()
-		{
-			var mock = new Mock<Action<int, int>>();
-			mock.Setup(m => m(1, It.IsAny<int>()));
-
-			var ex = Record.Exception(() => mock.Verify(m => m(1, 2), Times.Once()));
-
-			Assert.Contains("Configured setups:", ex.Message);
-			Assert.Contains("Action<Int32, Int32> m => m(1, It.IsAny<Int32>())", ex.Message);
-		}
-
-		[Fact]
 		public void Verification_error_message_contains_complete_call_expression_for_delegate_mock()
 		{
 			var mock = new Mock<Action>();
@@ -1470,6 +1468,116 @@ namespace Moq.Tests
 			mock.VerifyAll();
 		}
 
+		[Fact]
+		public void VerifyProtectedMethodOnChildClass()
+		{
+			var mock = new Mock<Child>();
+			mock.Protected().Setup("Populate", exactParameterMatch: true, ItExpr.Ref<ChildDto>.IsAny).CallBase().Verifiable();
+			ChildDto dto = new ChildDto();
+			_ = mock.Object.InvokePopulate(ref dto);
+
+			mock.Protected().Verify("Populate", Times.Once(), exactParameterMatch: true, ItExpr.Ref<ChildDto>.IsAny);
+		}
+
+		[Fact]
+		public void Verify_on_non_overridable_method_throws_NotSupportedException()
+		{
+			var mock = new Mock<Child>();
+			Assert.Throws<NotSupportedException>(() =>
+				mock.Verify(m => m.InvokePopulate(ref It.Ref<ChildDto>.IsAny), Times.Never));
+		}
+
+		public class Exclusion_of_unreachable_inner_mocks
+		{
+			[Fact]
+			public void Failing_setup_detached_at_root_is_excluded_from_verification()
+			{
+				var xMock = new Mock<IX>();
+
+				// Set up a call that would fail verification:
+				xMock.Setup(x => x.Y.M()).Verifiable("M never called");
+
+				// Reset the root `.Y` of the above setup `.Y.M()` to something that'll pass verification:
+				xMock.Setup(x => x.Y).Verifiable();
+				_ = xMock.Object.Y;
+
+				// The first setup should be shadowed by the second, therefore verification should pass:
+				xMock.Verify();
+			}
+
+			[Fact]
+			public void Failing_setup_detached_by_resetting_stubbed_property_is_excluded_from_verification()
+			{
+				var xMock = new Mock<IX> { DefaultValue = DefaultValue.Mock };
+
+				// Setup an inner mock (as the initial value of a stubbed property) that would fail verification:
+				xMock.SetupAllProperties();
+				Mock.Get(xMock.Object.Y).Setup(y => y.M()).Verifiable("M never called");
+
+				// Reset the stubbed property to a different value:
+				xMock.Object.Y = null;
+
+				// Inner mock no longer reachable through `xMock`, verification should succeed:
+				xMock.Verify();
+			}
+
+			public interface IX
+			{
+				IY Y { get; set; }
+			}
+
+			public interface IY
+			{
+				void M();
+			}
+		}
+
+		public class Verify_forbidden_side_effects
+		{
+			[Fact]
+			public void Does_not_create_setups_seen_by_VerifyAll()
+			{
+				var mock = new Mock<IX>();
+				mock.Verify(m => m.X.X, Times.Never);
+				mock.VerifyAll();
+			}
+
+			[Fact]
+			public void Does_not_counteract_MockBehavior_Strict()
+			{
+				var mock = new Mock<IX>(MockBehavior.Strict);
+				mock.Verify(m => m.X.X, Times.Never);
+				Assert.Throws<MockException>(() => mock.Object.X);
+			}
+
+			[Fact]
+			public void Does_not_create_inner_mocks()
+			{
+				var mock = new Mock<IX>();
+				mock.Verify(m => m.X.X, Times.Never);
+				Assert.Throws<NullReferenceException>(() => _ = mock.Object.X.X);
+			}
+
+			[Fact]
+			public void Does_not_override_existing_setups()
+			{
+				var mock = new Mock<IX>();
+				var nested = new Mock<IX>();
+				nested.Setup(m => m.Count).Returns(5);
+				mock.Setup(m => m.X).Returns(nested.Object);
+
+				mock.Verify(m => m.X.X, Times.Never);
+				int c = mock.Object.X.Count;
+				Assert.Equal(5, c);
+			}
+
+			public interface IX
+			{
+				IX X { get; }
+				int Count { get; }
+			}
+		}
+
 		public interface IBar
 		{
 			int? Value { get; set; }
@@ -1496,6 +1604,8 @@ namespace Moq.Tests
 		public interface IBaz
 		{
 			void Call<T>(T param) where T:IBazParam;
+			void Subscribe<T>() where T : IBazParam;
+			void Subscribe();
 		}
 
 		public class BazParam:IBazParam
@@ -1521,6 +1631,31 @@ namespace Moq.Tests
 		{
 			string Purr(int amount);
 			void Hiss();
+		}
+
+		public class ParentDto { }
+
+		public class ChildDto : ParentDto { }
+
+		public class Parent
+		{
+			protected virtual bool Populate(ref ParentDto dto)
+			{
+				return true;
+			}
+		}
+
+		public class Child : Parent
+		{
+			protected virtual bool Populate(ref ChildDto dto)
+			{
+				return true;
+			}
+
+			public bool InvokePopulate(ref ChildDto dto)
+			{
+				return Populate(ref dto);
+			}
 		}
 	}
 }

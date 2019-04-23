@@ -4,6 +4,7 @@
 using System;
 using System.Collections.Generic;
 using System.Threading.Tasks;
+
 using Xunit;
 
 namespace Moq.Tests
@@ -193,6 +194,24 @@ namespace Moq.Tests
 			Assert.Equal(expectedIntResult, actual.Item1);
 			Assert.Equal(expectedFloatResult, actual.Item2);
 			Assert.Equal(expectedStringResult, actual.Item3);
+		}
+
+		[Fact]
+		public void Handling_of_ValueTuple_can_be_disabled()
+		{
+			// This test follows the same logic as the one above for `ValueTask<>`.
+
+			const string unexpectedString = "*";
+			const int unexpectedInt = 42;
+			var provider = new Provider();
+			provider.Register(typeof(string), (_, __) => unexpectedString);
+			provider.Register(typeof(int), (_, __) => unexpectedInt);
+			provider.Deregister(typeof(ValueTuple<,>));
+
+			var actual = ((string, int))provider.GetDefaultValue(typeof((string, int)));
+
+			Assert.Equal((default(string), default(int)), actual);
+			Assert.NotEqual((unexpectedString, unexpectedInt), actual);
 		}
 
 		/// <summary>

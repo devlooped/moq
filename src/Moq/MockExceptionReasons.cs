@@ -1,8 +1,11 @@
 // Copyright (c) 2007, Clarius Consulting, Manas Technology Solutions, InSTEDD.
 // All rights reserved. Licensed under the BSD 3-Clause License; see License.txt.
 
+using System;
+
 namespace Moq
 {
+	[Flags]
 	internal enum MockExceptionReasons
 	{
 		MoreThanOneCall = 1,
@@ -10,7 +13,7 @@ namespace Moq
 		NoMatchingCalls = 4,
 		NoSetup = 8,
 		ReturnValueRequired = 16,
-		UnmatchedSetups = 32,
+		UnmatchedSetup = 32,
 		UnverifiedInvocations = 64,
 	}
 }

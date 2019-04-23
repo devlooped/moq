@@ -1,31 +1,23 @@
 // Copyright (c) 2007, Clarius Consulting, Manas Technology Solutions, InSTEDD.
 // All rights reserved. Licensed under the BSD 3-Clause License; see License.txt.
 
-using System;
-using System.Linq.Expressions;
-using System.Reflection;
-
 namespace Moq.Matchers
 {
 	internal class RefMatcher : IMatcher
 	{
-		private Func<object, bool> equals;
+		private readonly object reference;
+		private readonly bool referenceIsValueType;
 
 		public RefMatcher(object reference)
 		{
-			if (reference != null && reference.GetType().GetTypeInfo().IsValueType)
-			{
-				equals = value => object.Equals(reference, value);
-			}
-			else
-			{
-				equals = value => object.ReferenceEquals(reference, value);
-			}
+			this.reference = reference;
+			this.referenceIsValueType = reference?.GetType().IsValueType ?? false;
 		}
 
 		public bool Matches(object value)
 		{
-			return equals(value);
+			return this.referenceIsValueType ? object.Equals(this.reference, value)
+			                                 : object.ReferenceEquals(this.reference, value);
 		}
 	}
 }

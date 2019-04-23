@@ -2,6 +2,7 @@
 // All rights reserved. Licensed under the BSD 3-Clause License; see License.txt.
 
 using System;
+
 using Xunit;
 
 namespace Moq.Tests
@@ -169,6 +170,41 @@ namespace Moq.Tests
 			Assert.False(target.Verify(0));
 			Assert.True(target.Verify(1));
 			Assert.False(target.Verify(int.MaxValue));
+		}
+
+		public class Equality
+		{
+			[Fact]
+			public void AtMostOnce_equals_Between_0_1_inclusive()
+			{
+				Assert.Equal(Times.AtMostOnce(), Times.Between(0, 1, Range.Inclusive));
+			}
+
+			[Fact]
+			public void Between_1_2_inclusive_equals_Between_0_3_exclusive()
+			{
+				Assert.Equal(Times.Between(2, 3, Range.Inclusive), Times.Between(1, 4, Range.Exclusive));
+			}
+
+			[Fact]
+			public void Once_equals_Once()
+			{
+				Assert.Equal(Times.Once(), Times.Once());
+			}
+
+			[Fact]
+			public void Once_equals_Exactly_1()
+			{
+				Assert.Equal(Times.Once(), Times.Exactly(1));
+			}
+
+			[Fact]
+			public void Between_x_y_inclusive_does_not_equal_Between_x_y_exclusive()
+			{
+				const int x = 1;
+				const int y = 10;
+				Assert.NotEqual(Times.Between(x, y, Range.Inclusive), Times.Between(x, y, Range.Exclusive));
+			}
 		}
 	}
 }

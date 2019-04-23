@@ -36,11 +36,19 @@ namespace Moq.Protected
 		{
 			Guard.NotNullOrEmpty(methodName, nameof(methodName));
 
-			var method = GetMethod(methodName, args);
+			return this.Setup(methodName, false, args);
+		}
+
+		public ISetup<T> Setup(string methodName, bool exactParameterMatch, params object[] args)
+		{
+			Guard.NotNullOrEmpty(methodName, nameof(methodName));
+
+			var method = GetMethod(methodName, exactParameterMatch, args);
 			ThrowIfMemberMissing(methodName, method);
 			ThrowIfPublicMethod(method, typeof(T).Name);
 
-			return Mock.Setup(mock, GetMethodCall(method, args), null);
+			var setup = Mock.Setup(mock, GetMethodCall(method, args), null);
+			return new VoidSetupPhrase<T>(setup);
 		}
 
 		public ISetup<T, TResult> Setup<TResult>(string methodName, params object[] args)
@@ -59,7 +67,8 @@ namespace Moq.Protected
 			{
 				ThrowIfPublicGetter(property, typeof(T).Name);
 				// TODO should consider property indexers
-				return Mock.SetupGet(mock, GetMemberAccess<TResult>(property), null);
+				var getterSetup = Mock.SetupGet(mock, GetMemberAccess<TResult>(property), null);
+				return new NonVoidSetupPhrase<T, TResult>(getterSetup);
 			}
 
 			var method = GetMethod(methodName, exactParameterMatch, args);
@@ -67,7 +76,8 @@ namespace Moq.Protected
 			ThrowIfVoidMethod(method);
 			ThrowIfPublicMethod(method, typeof(T).Name);
 
-			return Mock.Setup(mock, GetMethodCall<TResult>(method, args), null);
+			var setup = Mock.Setup(mock, GetMethodCall<TResult>(method, args), null);
+			return new NonVoidSetupPhrase<T, TResult>(setup);
 		}
 
 		public ISetupGetter<T, TProperty> SetupGet<TProperty>(string propertyName)
@@ -79,7 +89,8 @@ namespace Moq.Protected
 			ThrowIfPublicGetter(property, typeof(T).Name);
 			Guard.CanRead(property);
 
-			return Mock.SetupGet(mock, GetMemberAccess<TProperty>(property), null);
+			var setup = Mock.SetupGet(mock, GetMemberAccess<TProperty>(property), null);
+			return new NonVoidSetupPhrase<T, TProperty>(setup);
 		}
 
 		public ISetupSetter<T, TProperty> SetupSet<TProperty>(string propertyName, object value)
@@ -91,7 +102,10 @@ namespace Moq.Protected
 			ThrowIfPublicSetter(property, typeof(T).Name);
 			Guard.CanWrite(property);
 
-			return Mock.SetupSet<T, TProperty>(mock, GetSetterExpression(property, ItExpr.IsAny<TProperty>()), null);
+			var expression = GetSetterExpression(property, ItExpr.IsAny<TProperty>());
+
+			var setup = Mock.SetupSet(mock, expression, condition: null);
+			return new SetterSetupPhrase<T, TProperty>(setup);
 		}
 
 		public ISetupSequentialAction SetupSequence(string methodOrPropertyName, params object[] args)
@@ -107,7 +121,8 @@ namespace Moq.Protected
 			ThrowIfMemberMissing(methodOrPropertyName, method);
 			ThrowIfPublicMethod(method, typeof(T).Name);
 
-			return Mock.SetupSequence(mock, GetMethodCall(method, args));
+			var setup = Mock.SetupSequence(mock, GetMethodCall(method, args));
+			return new SetupSequencePhrase(setup);
 		}
 
 		public ISetupSequentialResult<TResult> SetupSequence<TResult>(string methodOrPropertyName, params object[] args)
@@ -124,7 +139,8 @@ namespace Moq.Protected
 			{
 				ThrowIfPublicGetter(property, typeof(T).Name);
 				// TODO should consider property indexers
-				return Mock.SetupSequence<TResult>(mock, GetMemberAccess<TResult>(property));
+				var getterSetup = Mock.SetupSequence(mock, GetMemberAccess<TResult>(property));
+				return new SetupSequencePhrase<TResult>(getterSetup);
 			}
 
 			var method = GetMethod(methodOrPropertyName, exactParameterMatch, args);
@@ -132,7 +148,8 @@ namespace Moq.Protected
 			ThrowIfVoidMethod(method);
 			ThrowIfPublicMethod(method, typeof(T).Name);
 
-			return Mock.SetupSequence<TResult>(mock, GetMethodCall<TResult>(method, args));
+			var setup = Mock.SetupSequence(mock, GetMethodCall<TResult>(method, args));
+			return new SetupSequencePhrase<TResult>(setup);
 		}
 
 		#endregion
@@ -141,9 +158,14 @@ namespace Moq.Protected
 
 		public void Verify(string methodName, Times times, object[] args)
 		{
+			this.Verify(methodName, times, false, args);
+		}
+
+		public void Verify(string methodName, Times times, bool exactParameterMatch, object[] args)
+		{
 			Guard.NotNullOrEmpty(methodName, nameof(methodName));
 
-			var method = GetMethod(methodName, args);
+			var method = GetMethod(methodName, exactParameterMatch, args);
 			ThrowIfMemberMissing(methodName, method);
 			ThrowIfPublicMethod(method, typeof(T).Name);
 
@@ -151,6 +173,11 @@ namespace Moq.Protected
 		}
 
 		public void Verify<TResult>(string methodName, Times times, object[] args)
+		{
+			this.Verify<TResult>(methodName, times, false, args);
+		}
+
+		public void Verify<TResult>(string methodName, Times times, bool exactParameterMatch, object[] args)
 		{
 			Guard.NotNullOrEmpty(methodName, nameof(methodName));
 
@@ -163,7 +190,7 @@ namespace Moq.Protected
 				return;
 			}
 
-			var method = GetMethod(methodName, args);
+			var method = GetMethod(methodName, exactParameterMatch, args);
 			ThrowIfMemberMissing(methodName, method);
 			ThrowIfPublicMethod(method, typeof(T).Name);
 
@@ -194,9 +221,10 @@ namespace Moq.Protected
 			ThrowIfPublicSetter(property, typeof(T).Name);
 			Guard.CanWrite(property);
 
+			var expression = GetSetterExpression(property, ItExpr.IsAny<TProperty>());
 			// TODO should consider property indexers
 			// TODO should receive the parameter here
-			Mock.VerifySet(mock, GetSetterExpression(property, ItExpr.IsAny<TProperty>()), times, null);
+			Mock.VerifySet(mock, expression, times, null);
 		}
 
 		#endregion
@@ -239,13 +267,13 @@ namespace Moq.Protected
 				BindingFlags.Instance | BindingFlags.NonPublic | BindingFlags.Public);
 		}
 
-		private static Action<T> GetSetterExpression(PropertyInfo property, Expression value)
+		private static Expression<Action<T>> GetSetterExpression(PropertyInfo property, Expression value)
 		{
 			var param = Expression.Parameter(typeof(T), "mock");
 
 			return Expression.Lambda<Action<T>>(
 				Expression.Call(param, property.GetSetMethod(true), value),
-				param).CompileUsingExpressionCompiler();
+				param);
 		}
 
 		private static void ThrowIfMemberMissing(string memberName, MemberInfo member)
@@ -337,7 +365,7 @@ namespace Moq.Protected
 						if (field.Name == nameof(It.Ref<object>.IsAny))
 						{
 							var fieldDeclaringType = field.DeclaringType;
-							if (fieldDeclaringType.GetTypeInfo().IsGenericType)
+							if (fieldDeclaringType.IsGenericType)
 							{
 								var fieldDeclaringTypeDefinition = fieldDeclaringType.GetGenericTypeDefinition();
 								if (fieldDeclaringTypeDefinition == typeof(It.Ref<>))

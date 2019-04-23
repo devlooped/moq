@@ -6,7 +6,7 @@
 	<Import Project="$(BuildDirectory)SourceLink.props" />
 
 	<PropertyGroup>
-		<TargetFrameworks>net45;netstandard1.3</TargetFrameworks>
+		<TargetFrameworks>net45;netstandard2.0</TargetFrameworks>
 		<AssemblyName>Moq</AssemblyName>
 		<DebugSymbols>True</DebugSymbols>
 		<DebugType>full</DebugType>
@@ -29,27 +29,22 @@
 	</PropertyGroup>
 
 	<PropertyGroup Condition=" '$(TargetFramework)' == 'net45' ">
-		<DefineConstants>$(DefineConstants);DESKTOP;FEATURE_CAS;FEATURE_CODEDOM;FEATURE_COM;FEATURE_SERIALIZATION</DefineConstants>
+		<DefineConstants>$(DefineConstants);FEATURE_CALLERINFO;FEATURE_CAS;FEATURE_COM;FEATURE_SERIALIZATION</DefineConstants>
 	</PropertyGroup>
-	<PropertyGroup Condition=" '$(TargetFramework)' == 'netstandard1.3' ">
-		<DefineConstants>$(DefineConstants);NETCORE</DefineConstants>
+	<PropertyGroup Condition=" '$(TargetFramework)' == 'netstandard2.0' ">
+		<DefineConstants>$(DefineConstants);FEATURE_CALLERINFO;FEATURE_SERIALIZATION</DefineConstants>
 	</PropertyGroup>
 
 	<ItemGroup>
-		<PackageReference Include="Castle.Core" Version="4.3.1" />
+		<PackageReference Include="Castle.Core" Version="4.4.0" />
 		<PackageReference Include="IFluentInterface" Version="2.1.0" />
-		<PackageReference Include="System.Threading.Tasks.Extensions" Version="4.3.0" />
-		<PackageReference Include="System.ValueTuple" Version="4.4.0" />
+		<PackageReference Include="System.Threading.Tasks.Extensions" Version="4.5.1" />
+		<PackageReference Include="TypeNameFormatter.Sources" Version="1.0.0" PrivateAssets="All" />
 	</ItemGroup>
 	<ItemGroup Condition=" '$(TargetFramework)' == 'net45' ">
 		<Reference Include="System" />
 		<Reference Include="System.Core" />
 		<Reference Include="System.Xml" />
-	</ItemGroup>
-	<ItemGroup Condition=" '$(TargetFramework)' == 'netstandard1.3' ">
-		<PackageReference Include="System.Linq.Queryable" Version="4.3.0" />
-		<PackageReference Include="System.Reflection.Emit" Version="4.3.0" />
-		<PackageReference Include="System.Reflection.TypeExtensions" Version="4.4.0" />
 	</ItemGroup>
 
 	<ItemGroup>

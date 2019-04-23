@@ -15,31 +15,37 @@
 	</PropertyGroup>
 
 	<PropertyGroup Condition=" '$(TargetFramework)' == 'net46' ">
-		<DefineConstants>$(DefineConstants);DESKTOP;FEATURE_CAS;FEATURE_CODEDOM;FEATURE_COM;FEATURE_SERIALIZATION</DefineConstants>
+		<DefineConstants>$(DefineConstants);FEATURE_CALLERINFO;FEATURE_CAS;FEATURE_COM;FEATURE_EF;FEATURE_SERIALIZATION;FEATURE_SYSTEM_WEB;FEATURE_SYSTEM_WINDOWS_FORMS</DefineConstants>
 	</PropertyGroup>
 	<PropertyGroup Condition=" '$(TargetFramework)' == 'netcoreapp2.0' ">
-		<DefineConstants>$(DefineConstants);NETCORE</DefineConstants>
+		<DefineConstants>$(DefineConstants)</DefineConstants>
 	</PropertyGroup>
 
 	<ItemGroup>
-		<PackageReference Include="Castle.Core" Version="4.3.1" />
-		<PackageReference Include="System.ValueTuple" Version="4.4.0" />
+		<PackageReference Include="Castle.Core" Version="4.4.0" />
+		<PackageReference Include="System.ValueTuple" Version="4.5.0" />
 		<ProjectReference Include="..\..\src\Moq\Moq.csproj" />
+		<ProjectReference Include="..\Moq.Tests.FSharpTypes\Moq.Tests.FSharpTypes.fsproj" />
 	</ItemGroup>
-	<ItemGroup Condition=" '$(TargetFramework)' == 'net46' ">
+	<ItemGroup Condition=" $([System.Text.RegularExpressions.Regex]::IsMatch('$(DefineConstants)', 'FEATURE_COM'))">
+		<Reference Include="Moq.Tests.ComTypes">
+			<HintPath>..\Moq.Tests.ComTypes\Moq.Tests.ComTypes.dll</HintPath>
+		</Reference>
+	</ItemGroup>
+	<ItemGroup Condition=" $([System.Text.RegularExpressions.Regex]::IsMatch('$(DefineConstants)', 'FEATURE_EF'))">
 		<PackageReference Include="EntityFramework" Version="6.2.0" />
+	</ItemGroup>
+	<ItemGroup Condition=" $([System.Text.RegularExpressions.Regex]::IsMatch('$(DefineConstants)', 'FEATURE_SYSTEM_WEB'))">
 		<Reference Include="System.Web" />
+	</ItemGroup>
+	<ItemGroup Condition=" $([System.Text.RegularExpressions.Regex]::IsMatch('$(DefineConstants)', 'FEATURE_SYSTEM_WINDOWS_FORMS'))">
 		<Reference Include="System.Windows.Forms" />
 	</ItemGroup>
 	<ItemGroup Condition=" '$(TargetFramework)' == 'netcoreapp2.0' ">
 		<PackageReference Include="System.Collections.Specialized" Version="4.3.0" />
 		<PackageReference Include="System.ComponentModel.Primitives" Version="4.3.0" />
 		<PackageReference Include="System.Diagnostics.TraceSource" Version="4.3.0" />
-		<PackageReference Include="System.ServiceModel.Primitives" Version="4.4.0" />
-	</ItemGroup>
-
-	<ItemGroup>
-		<Compile Remove="Pex\**\*.cs;Properties\**\*.cs" />
+		<PackageReference Include="System.ServiceModel.Primitives" Version="4.5.3" />
 	</ItemGroup>
 
 	<ItemGroup>

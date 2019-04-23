@@ -2,6 +2,7 @@
 // All rights reserved. Licensed under the BSD 3-Clause License; see License.txt.
 
 using System;
+
 using Xunit;
 
 namespace Moq.Tests
@@ -138,7 +139,7 @@ namespace Moq.Tests
 		[Fact]
 		public void VerifiesHierarchyMethodWithExpression()
 		{
-			var mock = new Mock<IFoo>();
+			var mock = new Mock<IFoo>() { DefaultValue = DefaultValue.Mock };
 
 			Assert.Throws<MockException>(() => mock.Verify(m => m.Bar.Do("ping")));
 
@@ -149,7 +150,7 @@ namespace Moq.Tests
 		[Fact]
 		public void VerifiesHierarchyPropertyGetWithExpression()
 		{
-			var mock = new Mock<IFoo>();
+			var mock = new Mock<IFoo>() { DefaultValue = DefaultValue.Mock };
 
 			Assert.Throws<MockException>(() => mock.VerifyGet(m => m.Bar.Value));
 
@@ -160,7 +161,7 @@ namespace Moq.Tests
 		[Fact]
 		public void VerifiesHierarchyPropertySetWithExpression()
 		{
-			var mock = new Mock<IFoo>();
+			var mock = new Mock<IFoo>() { DefaultValue = DefaultValue.Mock };
 
 			Assert.Throws<MockException>(() => mock.VerifySet(m => m.Bar.Value = It.IsAny<int>()));
 
@@ -262,7 +263,7 @@ namespace Moq.Tests
 		{
 			var mock = new Mock<Foo>();
 
-			Assert.Throws<NotSupportedException>(() => mock.Setup(m => m.BarField.Do("ping")));
+			Assert.Throws<ArgumentException>(() => mock.Setup(m => m.BarField.Do("ping")));
 		}
 
 		[Fact]
@@ -270,7 +271,7 @@ namespace Moq.Tests
 		{
 			var mock = new Mock<IFoo>();
 
-			Assert.Throws<NotSupportedException>(() => mock.Setup(m => m.Bar.Value.ToString()));
+			Assert.Throws<ArgumentException>(() => mock.Setup(m => m.Bar.Value.ToString()));
 		}
 
 		[Fact]
@@ -313,6 +314,104 @@ namespace Moq.Tests
 			fooMock.Setup(f => f.Bar.GetBaz(It.IsAny<string>()).Value).Returns(5);
 
 			Assert.Equal(5, fooMock.Object.Bar.GetBaz("foo").Value);
+		}
+
+		public class Verify_can_tell_apart_different_arguments_in_intermediate_part_of_fluent_expressions
+		{
+			[Fact]
+			public void When_set_up_by_DefaultValue_Mock_1()
+			{
+				var mock = new Mock<IBar> { DefaultValue = DefaultValue.Mock };
+				mock.Object.GetBaz("actual").Do();
+				mock.Verify(m => m.GetBaz("something else").Do(), Times.Never);
+			}
+
+			[Fact]
+			public void When_manually_set_up_1()
+			{
+				var mock = new Mock<IBar>();
+				mock.Setup(m => m.GetBaz(It.IsAny<string>()).Do());
+				mock.Object.GetBaz("actual").Do();
+				mock.Verify(m => m.GetBaz("something else").Do(), Times.Never);
+			}
+
+			[Fact]
+			public void When_set_up_by_DefaultValue_Mock_2()
+			{
+				var mock = new Mock<IBar> { DefaultValue = DefaultValue.Mock };
+				mock.Object.GetBaz("first").Do();
+				mock.Object.GetBaz("second").Do();
+				mock.Verify(m => m.GetBaz("first").Do(), Times.Once);
+				mock.Verify(m => m.GetBaz("second").Do(), Times.Once);
+			}
+
+			[Fact]
+			public void When_manually_set_up_2()
+			{
+				var mock = new Mock<IBar> { DefaultValue = DefaultValue.Mock };
+				mock.Object.GetBaz("first").Do();
+				mock.Object.GetBaz("second").Do();
+				mock.Verify(m => m.GetBaz("first").Do(), Times.Once);
+				mock.Verify(m => m.GetBaz("second").Do(), Times.Once);
+			}
+
+			[Fact]
+			public void When_set_up_by_DefaultValue_Mock_3()
+			{
+				var mock = new Mock<IBar> { DefaultValue = DefaultValue.Mock };
+				mock.Object.GetBaz("first").Do();
+				mock.Object.GetBaz("second").Do();
+				mock.Verify(m => m.GetBaz(It.IsAny<string>()).Do(), Times.Exactly(2));
+			}
+
+			[Fact]
+			public void When_manually_set_up_3()
+			{
+				var mock = new Mock<IBar> { DefaultValue = DefaultValue.Mock };
+				mock.Object.GetBaz("first").Do();
+				mock.Object.GetBaz("second").Do();
+				mock.Verify(m => m.GetBaz(It.IsAny<string>()).Do(), Times.Exactly(2));
+			}
+		}
+
+		public class Inner_mock_reachability
+		{
+			[Fact]
+			public void Reachable_if_set_up_using_eager_Returns()
+			{
+				var bar = new Mock<IBar>();
+				bar.Setup(b => b.Value).Returns(42);
+
+				var foo = new Mock<IFoo>();
+				foo.Setup(f => f.Bar).Returns(bar.Object);
+				foo.Setup(f => f.Bar.Baz);
+
+				Assert.Equal(42, foo.Object.Bar.Value);
+				bar.VerifyGet(b => b.Value, Times.Once);
+			}
+
+			[Fact]
+			public void Not_reachable_if_set_up_using_lazy_Returns()
+			{
+				var bar = new Mock<IBar>();
+				bar.Setup(b => b.Value).Returns(42);
+
+				var foo = new Mock<IFoo>();
+				foo.Setup(f => f.Bar).Returns(() => bar.Object);
+				//                            ^^^^^^
+				// Main difference to the above test. What we want to test for here is
+				// that Moq won't execute user-provided callbacks to figure out a setup's
+				// return value (as this could have side effects without Moq's control).
+
+				foo.Setup(f => f.Bar.Baz);
+				//              ^^^^^
+				// ... and because Moq can't query the above setup to figure out there's
+				// already an inner mock attached, it will create a fresh setup instead,
+				// effectively "cutting off" the above `IBar` mock.
+
+				Assert.NotEqual(42, foo.Object.Bar.Value);
+				bar.VerifyGet(b => b.Value, Times.Never);
+			}
 		}
 
 		public class Foo : IFoo

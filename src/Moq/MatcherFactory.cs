@@ -2,24 +2,43 @@
 // All rights reserved. Licensed under the BSD 3-Clause License; see License.txt.
 
 using System;
+using System.Collections.Generic;
+using System.Diagnostics;
 using System.Globalization;
 using System.Linq.Expressions;
-using Moq.Properties;
-using Moq.Matchers;
 using System.Reflection;
+
+using Moq.Matchers;
+using Moq.Properties;
 
 namespace Moq
 {
 	internal static class MatcherFactory
 	{
-		public static IMatcher CreateMatcher(Expression argument, ParameterInfo parameter)
+		public static Pair<IMatcher[], Expression[]> CreateMatchers(IReadOnlyList<Expression> arguments, ParameterInfo[] parameters)
+		{
+			Debug.Assert(arguments != null);
+			Debug.Assert(parameters != null);
+			Debug.Assert(arguments.Count == parameters.Length);
+
+			var n = parameters.Length;
+			var evaluatedArguments = new Expression[n];
+			var argumentMatchers = new IMatcher[n];
+			for (int i = 0; i < n; ++i)
+			{
+				(argumentMatchers[i], evaluatedArguments[i]) = MatcherFactory.CreateMatcher(arguments[i], parameters[i]);
+			}
+			return new Pair<IMatcher[], Expression[]>(argumentMatchers, evaluatedArguments);
+		}
+
+		public static Pair<IMatcher, Expression> CreateMatcher(Expression argument, ParameterInfo parameter)
 		{
 			if (parameter.ParameterType.IsByRef)
 			{
 				if ((parameter.Attributes & (ParameterAttributes.In | ParameterAttributes.Out)) == ParameterAttributes.Out)
 				{
 					// `out` parameter
-					return AnyMatcher.Instance;
+					return new Pair<IMatcher, Expression>(AnyMatcher.Instance, argument);
 				}
 				else
 				{
@@ -32,12 +51,12 @@ namespace Moq
 						if (member.Name == nameof(It.Ref<object>.IsAny))
 						{
 							var memberDeclaringType = member.DeclaringType;
-							if (memberDeclaringType.GetTypeInfo().IsGenericType)
+							if (memberDeclaringType.IsGenericType)
 							{
 								var memberDeclaringTypeDefinition = memberDeclaringType.GetGenericTypeDefinition();
 								if (memberDeclaringTypeDefinition == typeof(It.Ref<>))
 								{
-									return AnyMatcher.Instance;
+									return new Pair<IMatcher, Expression>(AnyMatcher.Instance, argument);
 								}
 							}
 						}
@@ -49,12 +68,26 @@ namespace Moq
 						throw new NotSupportedException(Resources.RefExpressionMustBeConstantValue);
 					}
 
-					return new RefMatcher(constant.Value);
+					return new Pair<IMatcher, Expression>(new RefMatcher(constant.Value), constant);
 				}
 			}
-			else if (parameter.IsDefined(typeof(ParamArrayAttribute), true) && (argument.NodeType == ExpressionType.NewArrayInit || !argument.Type.IsArray))
+			else if (parameter.IsDefined(typeof(ParamArrayAttribute), true) && argument.NodeType == ExpressionType.NewArrayInit)
 			{
-				return new ParamArrayMatcher((NewArrayExpression)argument);
+				var newArrayExpression = (NewArrayExpression)argument;
+
+				Debug.Assert(newArrayExpression.Type.IsArray);
+				var elementType = newArrayExpression.Type.GetElementType();
+
+				var n = newArrayExpression.Expressions.Count;
+				var matchers = new IMatcher[n];
+				var initializers = new Expression[n];
+
+				for (int i = 0; i < n; ++i)
+				{
+					(matchers[i], initializers[i]) = MatcherFactory.CreateMatcher(newArrayExpression.Expressions[i]);
+					initializers[i] = initializers[i].ConvertIfNeeded(elementType);
+				}
+				return new Pair<IMatcher, Expression>(new ParamArrayMatcher(matchers), Expression.NewArrayInit(elementType, initializers));
 			}
 			else
 			{
@@ -62,7 +95,7 @@ namespace Moq
 			}
 		}
 
-		public static IMatcher CreateMatcher(Expression expression)
+		public static Pair<IMatcher, Expression> CreateMatcher(Expression expression)
 		{
 			// Type inference on the call might 
 			// do automatic conversion to the desired 
@@ -82,45 +115,34 @@ namespace Moq
 			var matchExpression = expression as MatchExpression;
 			if (matchExpression != null)
 			{
-				return matchExpression.Match;
+				return new Pair<IMatcher, Expression>(matchExpression.Match, matchExpression);
 			}
 
-			if (expression.NodeType == ExpressionType.Call)
+			if (expression is MethodCallExpression call)
 			{
-				var call = (MethodCallExpression)expression;
-
-				// Try to determine if invocation is to a matcher.
-				using (var context = new FluentMockContext())
+				if (expression.IsMatch(out var match))
 				{
-					Expression.Lambda<Action>(call).CompileUsingExpressionCompiler().Invoke();
-
-					if (context.LastMatch != null)
-					{
-						return context.LastMatch;
-					}
+					return new Pair<IMatcher, Expression>(match, expression);
 				}
 
 #pragma warning disable 618
 				if (call.Method.IsDefined(typeof(MatcherAttribute), true))
 				{
-					return new MatcherAttributeMatcher(call);
+					return new Pair<IMatcher, Expression>(new MatcherAttributeMatcher(call), call);
 				}
 #pragma warning restore 618
-				else
+
+				var method = call.Method;
+				if (!method.IsPropertyGetter() && !method.IsPropertyIndexerGetter())
 				{
-					return new LazyEvalMatcher(originalExpression);
+					return new Pair<IMatcher, Expression>(new LazyEvalMatcher(originalExpression), originalExpression);
 				}
 			}
-			else if (expression.NodeType == ExpressionType.MemberAccess)
+			else if (expression is MemberExpression || expression is IndexExpression)
 			{
-				// Try to determine if invocation is to a matcher.
-				using (var context = new FluentMockContext())
+				if (expression.IsMatch(out var match))
 				{
-					Expression.Lambda<Action>((MemberExpression)expression).CompileUsingExpressionCompiler().Invoke();
-					if (context.LastMatch != null)
-					{
-						return context.LastMatch;
-					}
+					return new Pair<IMatcher, Expression>(match, expression);
 				}
 			}
 
@@ -128,12 +150,12 @@ namespace Moq
 			var reduced = originalExpression.PartialEval();
 			if (reduced.NodeType == ExpressionType.Constant)
 			{
-				return new ConstantMatcher(((ConstantExpression)reduced).Value);
+				return new Pair<IMatcher, Expression>(new ConstantMatcher(((ConstantExpression)reduced).Value), reduced);
 			}
 
 			if (reduced.NodeType == ExpressionType.Quote)
 			{
-				return new ExpressionMatcher(((UnaryExpression)expression).Operand);
+				return new Pair<IMatcher, Expression>(new ExpressionMatcher(((UnaryExpression)expression).Operand), reduced);
 			}
 
 			throw new NotSupportedException(

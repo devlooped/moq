@@ -9,23 +9,17 @@
 		<licenseUrl>https://raw.githubusercontent.com/moq/moq4/master/License.txt</licenseUrl>
 		<projectUrl>https://github.com/moq/moq4</projectUrl>
 		<requireLicenseAcceptance>false</requireLicenseAcceptance>
-		<description>Moq is the most popular and friendly mocking framework for .NET</description>
+		<description>Moq is the most popular and friendly mocking library for .NET</description>
 		<tags>moq tdd mocking mocks unittesting agile unittest</tags>
 		<releaseNotes>A changelog is available at https://github.com/moq/moq4/blob/master/CHANGELOG.md.</releaseNotes>
 		<dependencies>
 			<group targetFramework=".NETFramework4.5">
-				<dependency id="Castle.Core" version="4.3.1" />
-				<dependency id="System.Threading.Tasks.Extensions" version="4.3.0" />
-				<dependency id="System.ValueTuple" version="4.4.0" />
+				<dependency id="Castle.Core" version="4.4.0" />
+				<dependency id="System.Threading.Tasks.Extensions" version="4.5.1" />
 			</group>
-			<group targetFramework=".NETStandard1.3">
-				<dependency id="NETStandard.Library" version="1.6.1" />
-				<dependency id="System.Linq.Queryable" version="4.3.0" />
-				<dependency id="System.Reflection.Emit" version="4.3.0" />
-				<dependency id="System.Reflection.TypeExtensions" version="4.3.0" />
-				<dependency id="Castle.Core" version="4.3.1" />
-				<dependency id="System.Threading.Tasks.Extensions" version="4.3.0" />
-				<dependency id="System.ValueTuple" version="4.4.0" />
+			<group targetFramework=".NETStandard2.0">
+				<dependency id="Castle.Core" version="4.4.0" />
+				<dependency id="System.Threading.Tasks.Extensions" version="4.5.1" />
 			</group>
 		</dependencies>
 	</metadata>
@@ -33,8 +27,8 @@
 		<file src="bin\$configuration$\net45\Moq.dll" target="lib\net45" />
 		<file src="bin\$configuration$\net45\Moq.pdb" target="lib\net45" />
 		<file src="bin\$configuration$\net45\Moq.xml" target="lib\net45" />
-		<file src="bin\$configuration$\netstandard1.3\Moq.dll" target="lib\netstandard1.3" />
-		<file src="bin\$configuration$\netstandard1.3\Moq.pdb" target="lib\netstandard1.3" />
-		<file src="bin\$configuration$\netstandard1.3\Moq.xml" target="lib\netstandard1.3" />
+		<file src="bin\$configuration$\netstandard2.0\Moq.dll" target="lib\netstandard2.0" />
+		<file src="bin\$configuration$\netstandard2.0\Moq.pdb" target="lib\netstandard2.0" />
+		<file src="bin\$configuration$\netstandard2.0\Moq.xml" target="lib\netstandard2.0" />
 	</files>
 </package>

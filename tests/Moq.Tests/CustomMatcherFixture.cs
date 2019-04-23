@@ -2,6 +2,7 @@
 // All rights reserved. Licensed under the BSD 3-Clause License; see License.txt.
 
 using System;
+
 using Xunit;
 
 namespace Moq.Tests
@@ -73,7 +74,7 @@ namespace Moq.Tests
 
 			var ex = Assert.Throws<MockException>(() => child.Verify());
 
-			Assert.Contains(".PlayWith(Toy.IsRed)", ex.Message);
+			Assert.Contains(".PlayWith(CustomMatcherFixture.Toy.IsRed)", ex.Message);
 		}
 
 		[Fact]
@@ -84,7 +85,7 @@ namespace Moq.Tests
 
 			var ex = Assert.Throws<MockException>(() => child.Verify());
 
-			Assert.Contains(".PlayWith(Toy.IsGreen())", ex.Message);
+			Assert.Contains(".PlayWith(CustomMatcherFixture.Toy.IsGreen())", ex.Message);
 		}
 
 		public class Toy

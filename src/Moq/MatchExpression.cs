@@ -6,23 +6,26 @@ using System.Linq.Expressions;
 
 namespace Moq
 {
-	internal class MatchExpression : Expression
+	internal sealed class MatchExpression : Expression
 	{
+		public readonly Match Match;
+
 		public MatchExpression(Match match)
 		{
 			this.Match = match;
 		}
 
-		public override ExpressionType NodeType
-		{
-			get { return ExpressionType.Call; }
-		}
+		public override ExpressionType NodeType => ExpressionType.Extension;
 
-		public override Type Type
-		{
-			get { return typeof(Match); }
-		}
+		public override Type Type => this.Match.RenderExpression.Type;
 
-		public Match Match { get; private set; }
+		// This node type is irreducible in order to prevent compilation.
+		// The best possible reduction would involve `RenderExpression`,
+		// which isn't intended to be used for that purpose.
+		public override bool CanReduce => false;
+
+		protected override Expression VisitChildren(ExpressionVisitor visitor) => this;
+
+		public override string ToString() => this.Match.RenderExpression.ToString();
 	}
 }

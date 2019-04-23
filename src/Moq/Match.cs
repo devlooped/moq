@@ -6,6 +6,8 @@ using System.Diagnostics.CodeAnalysis;
 using System.Linq.Expressions;
 using System.Reflection;
 
+using Moq.Expressions.Visitors;
+
 namespace Moq
 {
 	/// <include file='Match.xdoc' path='docs/doc[@for="Match"]/*'/>
@@ -41,42 +43,35 @@ namespace Moq
 
 		internal static T Create<T>(Match<T> match)
 		{
-			SetLastMatch(match);
-			return default(T);
-		}
+			// This method is used to set an expression as the last matcher invoked,
+			// which is used in the SetupSet to allow matchers in the prop = value
+			// delegate expression. This delegate is executed in "fluent" mode in
+			// order to capture the value being set, and construct the corresponding
+			// methodcall.
+			// This is also used in the MatcherFactory for each argument expression.
+			// This method ensures that when we execute the delegate, we
+			// also track the matcher that was invoked, so that when we create the
+			// methodcall we build the expression using it, rather than the null/default
+			// value returned from the actual invocation.
 
-		/// <devdoc>
-		/// This method is used to set an expression as the last matcher invoked, 
-		/// which is used in the SetupSet to allow matchers in the prop = value 
-		/// delegate expression. This delegate is executed in "fluent" mode in 
-		/// order to capture the value being set, and construct the corresponding 
-		/// methodcall.
-		/// This is also used in the MatcherFactory for each argument expression.
-		/// This method ensures that when we execute the delegate, we 
-		/// also track the matcher that was invoked, so that when we create the 
-		/// methodcall we build the expression using it, rather than the null/default 
-		/// value returned from the actual invocation.
-		/// </devdoc>
-		private static Match<TValue> SetLastMatch<TValue>(Match<TValue> match)
-		{
-			if (FluentMockContext.IsActive)
+			if (MatcherObserver.IsActive(out var observer))
 			{
-				FluentMockContext.Current.LastMatch = match;
+				observer.OnMatch(match);
 			}
 
-			return match;
+			return default(T);
 		}
 	}
 
 	/// <include file='Match.xdoc' path='docs/doc[@for="Match{T}"]/*'/>
-	public class Match<T> : Match
+	public class Match<T> : Match, IEquatable<Match<T>>
 	{
 		internal Predicate<T> Condition { get; set; }
 
 		internal Match(Predicate<T> condition, Expression<Func<T>> renderExpression)
 		{
 			this.Condition = condition;
-			this.RenderExpression = renderExpression.Body;
+			this.RenderExpression = renderExpression.Body.Apply(EvaluateCaptures.Rewriter);
 		}
 
 		internal override bool Matches(object value)
@@ -87,8 +82,8 @@ namespace Moq
 			}
 
 			var matchType = typeof(T);
-			if (value == null && matchType.GetTypeInfo().IsValueType
-				&& (!matchType.GetTypeInfo().IsGenericType || matchType.GetGenericTypeDefinition() != typeof(Nullable<>)))
+			if (value == null && matchType.IsValueType
+				&& (!matchType.IsGenericType || matchType.GetGenericTypeDefinition() != typeof(Nullable<>)))
 			{
 				// If this.Condition expects a value type and we've been passed null,
 				// it can't possibly match.
@@ -102,5 +97,38 @@ namespace Moq
 			}
 			return this.Condition((T)value);
 		}
+
+		/// <inheritdoc/>
+		public override bool Equals(object obj)
+		{
+			return obj is Match<T> other && this.Equals(other);
+		}
+
+		/// <inheritdoc/>
+		public bool Equals(Match<T> other)
+		{
+			if (this.Condition == other.Condition)
+			{
+				return true;
+			}
+			else if (this.Condition.GetMethodInfo() != other.Condition.GetMethodInfo())
+			{
+				return false;
+			}
+			else if (!(this.RenderExpression is MethodCallExpression ce && ce.Method.DeclaringType == typeof(Match)))
+			{
+				return ExpressionComparer.Default.Equals(this.RenderExpression, other.RenderExpression);
+			}
+			else
+			{
+				return false;  // The test documented in `MatchFixture.Equality_ambiguity` is caused by this.
+				               // Returning true would break equality even worse. The only way to resolve the
+				               // ambiguity is to either add a render expression to your custom matcher, or
+				               // to test both `Condition.Target` objects for structural equality.
+			}
+		}
+
+		/// <inheritdoc/>
+		public override int GetHashCode() => 0;
 	}
 }

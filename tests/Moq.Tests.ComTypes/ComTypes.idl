@@ -1,0 +1,49 @@
+// Copyright (c) 2007, Clarius Consulting, Manas Technology Solutions, InSTEDD.
+// All rights reserved. Licensed under the BSD 3-Clause License; see License.txt.
+
+// See the `README.md` in the same directory as this file for instructions on
+// how to build `Moq.Tests.ComTypes` from these IDL definitions.
+
+// The below IDL definitions are based on information on Microsoft Docs, found
+// under .NET Framework 4 -> .NET Framework Advanced Development -> Interoperability
+// -> Advanced COM Interoperability -> Type Library to Assembly Conversion Summary
+// -> Imported Member Conversion:
+// https://docs.microsoft.com/en-us/previous-versions/dotnet/netframework-4.0/k639e386(v%3dvs.100)
+
+[uuid("2d5e9d51-b50d-4bb3-a2fd-193681186ab7")]
+library ComTypes
+{
+    importlib("stdole32.tlb");
+
+    [uuid("26049007-4f94-41ef-94f0-efc7b15d41c5")]
+    interface IButton : IUnknown
+    {
+    }
+
+    [uuid("c223276a-752b-4f16-bdfc-094bc453559f")]
+    interface IButtonEvents : IUnknown
+    {
+        HRESULT Click();
+    }
+
+    [uuid("aa7236e7-e655-497d-a700-79a17efcd734")]
+    coclass Button
+    {
+        [default] interface IButton;
+        [default, source] interface IButtonEvents;
+    }
+
+    [uuid("5ee16909-c4c7-49dc-8808-219078e5d3ba")]
+    interface IHasIndexer : IUnknown
+    {
+        [propget, bindable, defaultbind] HRESULT Item([in] long index, [out, retval] long *value);
+        [propput, bindable, defaultbind] HRESULT Item([in] long index, [in] long value);
+    }
+
+    [uuid("62a88a92-d8e5-45f7-bb7f-668a74c58749")]
+    interface IHasProperty : IUnknown
+    {
+        [propget] HRESULT Property([out, retval] long *value);
+        [propput] HRESULT Property([in] long value);
+    }
+}

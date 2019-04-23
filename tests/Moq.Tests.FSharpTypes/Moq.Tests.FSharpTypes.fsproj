@@ -1,0 +1,34 @@
+<Project Sdk="Microsoft.NET.Sdk">
+
+	<Import Project="$(BuildDirectory)AssemblyInfo.props" />
+	<Import Project="$(BuildDirectory)SignAssembly.props" />
+
+	<PropertyGroup>
+		<TargetFrameworks>net46;netcoreapp2.0</TargetFrameworks>
+		<DebugSymbols>True</DebugSymbols>
+		<DebugType>full</DebugType>
+		<IsPackable>False</IsPackable>
+	</PropertyGroup>
+
+	<ItemGroup>
+		<PackageReference Include="FSharp.Core" Version="4.5.4" />
+		<PackageReference Include="System.ValueTuple" Version="4.5.0" />
+	</ItemGroup>
+
+	<ItemGroup>
+		<Compile Include="HasAbstractActionEvent.fs" />
+		<Compile Include="HasAbstractEventHandlerEvent.fs" />
+		<Compile Include="HasAbstractIndexer.fs" />
+		<Compile Include="HasAbstractProperty.fs" />
+		<Compile Include="HasActionEvent.fs" />
+		<Compile Include="HasIndexer.fs" />
+		<Compile Include="HasProperty.fs" />
+		<Compile Include="IHasActionEvent.fs" />
+		<Compile Include="IHasEventHandlerEvent.fs" />
+		<Compile Include="IHasIndexer.fs" />
+		<Compile Include="IHasProperty.fs" />
+	</ItemGroup>
+
+	<Target Name="Test" DependsOnTargets="Build" />
+
+</Project>

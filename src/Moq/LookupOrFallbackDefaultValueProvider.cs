@@ -32,26 +32,26 @@ namespace Moq
 	[EditorBrowsable(EditorBrowsableState.Advanced)]
 	public abstract class LookupOrFallbackDefaultValueProvider : DefaultValueProvider
 	{
-		private Dictionary<Type, Func<Type, Mock, object>> factories;
+		private Dictionary<object, Func<Type, Mock, object>> factories;
 
 		/// <summary>
 		/// Initializes a new instance of the <see cref="LookupOrFallbackDefaultValueProvider"/> class.
 		/// </summary>
 		protected LookupOrFallbackDefaultValueProvider()
 		{
-			this.factories = new Dictionary<Type, Func<Type, Mock, object>>()
+			this.factories = new Dictionary<object, Func<Type, Mock, object>>()
 			{
 				[typeof(Task)] = CreateTask,
 				[typeof(Task<>)] = CreateTaskOf,
 				[typeof(ValueTask<>)] = CreateValueTaskOf,
-				[typeof(ValueTuple<>)] = CreateValueTupleOf,
-				[typeof(ValueTuple<,>)] = CreateValueTupleOf,
-				[typeof(ValueTuple<,,>)] = CreateValueTupleOf,
-				[typeof(ValueTuple<,,,>)] = CreateValueTupleOf,
-				[typeof(ValueTuple<,,,,>)] = CreateValueTupleOf,
-				[typeof(ValueTuple<,,,,,>)] = CreateValueTupleOf,
-				[typeof(ValueTuple<,,,,,,>)] = CreateValueTupleOf,
-				[typeof(ValueTuple<,,,,,,,>)] = CreateValueTupleOf,
+				["System.ValueTuple`1"] = CreateValueTupleOf,
+				["System.ValueTuple`2"] = CreateValueTupleOf,
+				["System.ValueTuple`3"] = CreateValueTupleOf,
+				["System.ValueTuple`4"] = CreateValueTupleOf,
+				["System.ValueTuple`5"] = CreateValueTupleOf,
+				["System.ValueTuple`6"] = CreateValueTupleOf,
+				["System.ValueTuple`7"] = CreateValueTupleOf,
+				["System.ValueTuple`8"] = CreateValueTupleOf,
 			};
 		}
 
@@ -65,6 +65,7 @@ namespace Moq
 			Debug.Assert(factoryKey != null);
 
 			this.factories.Remove(factoryKey);
+			this.factories.Remove(factoryKey.FullName);
 		}
 
 		/// <summary>
@@ -116,13 +117,13 @@ namespace Moq
 			Debug.Assert(type != typeof(void));
 			Debug.Assert(mock != null);
 
-			var typeInfo = type.GetTypeInfo();
-
-			var handlerKey = typeInfo.IsGenericType ? type.GetGenericTypeDefinition()
+			var handlerKey = type.IsGenericType ? type.GetGenericTypeDefinition()
 			               : type.IsArray ? typeof(Array)
 			               : type;
 
-			return this.factories.TryGetValue(handlerKey, out Func<Type, Mock, object> factory) ? factory.Invoke(type, mock)
+			Func<Type, Mock, object> factory;
+			return this.factories.TryGetValue(handlerKey         , out factory) ? factory.Invoke(type, mock)
+			     : this.factories.TryGetValue(handlerKey.FullName, out factory) ? factory.Invoke(type, mock)
 			     : this.GetFallbackDefaultValue(type, mock);
 		}
 

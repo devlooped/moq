@@ -2,22 +2,18 @@
 // All rights reserved. Licensed under the BSD 3-Clause License; see License.txt.
 
 using System;
-using System.Collections.Concurrent;
 using System.Collections.Generic;
 using System.Diagnostics;
 using System.Diagnostics.CodeAnalysis;
+using System.Globalization;
 using System.Linq;
 using System.Linq.Expressions;
-using System.Reflection;
+using System.Text;
 using System.Threading;
-
-#if FEATURE_CODEDOM
-using System.CodeDom;
-using Microsoft.CSharp;
-#endif
 
 using Moq.Language;
 using Moq.Language.Flow;
+using Moq.Properties;
 
 namespace Moq
 {
@@ -32,7 +28,7 @@ namespace Moq
 			inheritedInterfaces =
 				typeof(T)
 				.GetInterfaces()
-				.Where(i => ProxyFactory.Instance.IsTypeVisible(i) && !i.GetTypeInfo().IsImport)
+				.Where(i => ProxyFactory.Instance.IsTypeVisible(i) && !i.IsImport)
 				.ToArray();
 
 			serialNumberCounter = 0;
@@ -44,7 +40,6 @@ namespace Moq
 		private object[] constructorArguments;
 		private DefaultValueProvider defaultValueProvider;
 		private EventHandlerCollection eventHandlers;
-		private ConcurrentDictionary<MethodInfo, MockWithWrappedMockObject> innerMocks;
 		private InvocationCollection invocations;
 		private string name;
 		private SetupCollection setups;
@@ -109,7 +104,6 @@ namespace Moq
 			this.constructorArguments = args;
 			this.defaultValueProvider = DefaultValueProvider.Empty;
 			this.eventHandlers = new EventHandlerCollection();
-			this.innerMocks = new ConcurrentDictionary<MethodInfo, MockWithWrappedMockObject>();
 			this.invocations = new InvocationCollection();
 			this.name = CreateUniqueDefaultMockName();
 			this.setups = new SetupCollection();
@@ -120,29 +114,18 @@ namespace Moq
 
 		private static string CreateUniqueDefaultMockName()
 		{
-			var serialNumber = Interlocked.Increment(ref serialNumberCounter).ToString("x8");
+			var serialNumber = Interlocked.Increment(ref serialNumberCounter);
 
-			string typeName = typeof (T).FullName;
-
-#if FEATURE_CODEDOM
-			if (typeof (T).IsGenericType)
-			{
-				using (var provider = new CSharpCodeProvider())
-				{
-					var typeRef = new CodeTypeReference(typeof(T));
-					typeName = provider.GetTypeOutput(typeRef);
-				}
-			}
-#endif
-
-			return "Mock<" + typeName + ":" + serialNumber + ">";
+			var name = new StringBuilder();
+			name.Append("Mock<").AppendNameOf(typeof(T)).Append(':').Append(serialNumber).Append('>');
+			return name.ToString();
 		}
 
 		private void CheckParameters()
 		{
 			if (this.constructorArguments.Length > 0)
 			{
-				if (typeof(T).GetTypeInfo().IsInterface)
+				if (typeof(T).IsInterface)
 				{
 					throw new ArgumentException(Properties.Resources.ConstructorArgsForInterface);
 				}
@@ -164,8 +147,18 @@ namespace Moq
 		public override bool CallBase
 		{
 			get => this.callBase;
-			set => this.callBase = value;
+			set
+			{
+				if (value && this.MockedType.IsDelegate())
+				{
+					throw new NotSupportedException(string.Format(CultureInfo.CurrentCulture, Resources.CallBaseCannotBeUsedWithDelegateMocks));
+				}
+
+				this.callBase = value;
+			}
 		}
+
+		internal override object[] ConstructorArguments => this.constructorArguments;
 
 		internal override Dictionary<Type, object> ConfiguredDefaultValues => this.configuredDefaultValues;
 
@@ -180,8 +173,6 @@ namespace Moq
 		}
 
 		internal override EventHandlerCollection EventHandlers => this.eventHandlers;
-
-		internal override ConcurrentDictionary<MethodInfo, MockWithWrappedMockObject> InnerMocks => this.innerMocks;
 
 		internal override List<Type> AdditionalInterfaces => this.additionalInterfaces;
 
@@ -210,18 +201,7 @@ namespace Moq
 			return this.Name;
 		}
 
-		internal override bool IsDelegateMock
-        {
-            get { return typeof(T).IsDelegate(); }
-        }
-
-		[DebuggerStepThrough]
 		private void InitializeInstance()
-		{
-			PexProtector.Invoke(InitializeInstancePexProtected);
-		}
-
-		private void InitializeInstancePexProtected()
 		{
 			// Determine the set of interfaces that the proxy object should additionally implement.
 			var additionalInterfaceCount = this.AdditionalInterfaces.Count;
@@ -229,47 +209,11 @@ namespace Moq
 			interfaces[0] = typeof(IMocked<T>);
 			this.AdditionalInterfaces.CopyTo(0, interfaces, 1, additionalInterfaceCount);
 
-			if (this.IsDelegateMock)
-			{
-				// We're mocking a delegate.
-				// Firstly, get/create an interface with a method whose signature
-				// matches that of the delegate.
-				var delegateInterfaceType = ProxyFactory.Instance.GetDelegateProxyInterface(typeof(T), out delegateInterfaceMethod);
-
-				// Then create a proxy for that.
-				var delegateProxy = ProxyFactory.Instance.CreateProxy(
-					delegateInterfaceType,
-					this,
-					interfaces,
-					this.constructorArguments);
-
-				// Then our instance is a delegate of the desired type, pointing at the
-				// appropriate method on that proxied interface instance.
-				this.instance = (T)(object)delegateInterfaceMethod.CreateDelegate(typeof(T), delegateProxy);
-			}
-			else
-			{
-				this.instance = (T)ProxyFactory.Instance.CreateProxy(
-					typeof(T),
-					this,
-					interfaces,
-					this.constructorArguments);
-			}
-		}
-
-		private MethodInfo delegateInterfaceMethod;
-
-		/// <inheritdoc />
-		internal override MethodInfo DelegateInterfaceMethod
-		{
-			get
-			{
-				// Ensure object is created, which causes the delegateInterfaceMethod
-				// to be initialized.
-				OnGetObject();
-
-				return delegateInterfaceMethod;
-			}
+			this.instance = (T)ProxyFactory.Instance.CreateProxy(
+				typeof(T),
+				this,
+				interfaces,
+				this.constructorArguments);
 		}
 
 		/// <summary>
@@ -315,33 +259,44 @@ namespace Moq
 		[SuppressMessage("Microsoft.Design", "CA1006:DoNotNestGenericTypesInMemberSignatures", Justification = "By design")]
 		public ISetup<T> Setup(Expression<Action<T>> expression)
 		{
-			return Mock.Setup<T>(this, expression, null);
+			var setup = Mock.Setup(this, expression, null);
+			return new VoidSetupPhrase<T>(setup);
 		}
 
 		/// <include file='Mock.Generic.xdoc' path='docs/doc[@for="Mock{T}.Setup{TResult}"]/*'/>
 		[SuppressMessage("Microsoft.Design", "CA1006:DoNotNestGenericTypesInMemberSignatures", Justification = "By design")]
 		public ISetup<T, TResult> Setup<TResult>(Expression<Func<T, TResult>> expression)
 		{
-			return Mock.Setup(this, expression, null);
+			var setup = Mock.Setup(this, expression, null);
+			return new NonVoidSetupPhrase<T, TResult>(setup);
 		}
 
 		/// <include file='Mock.Generic.xdoc' path='docs/doc[@for="Mock{T}.SetupGet"]/*'/>
 		[SuppressMessage("Microsoft.Design", "CA1006:DoNotNestGenericTypesInMemberSignatures", Justification = "By design")]
 		public ISetupGetter<T, TProperty> SetupGet<TProperty>(Expression<Func<T, TProperty>> expression)
 		{
-			return Mock.SetupGet(this, expression, null);
+			var setup = Mock.SetupGet(this, expression, null);
+			return new NonVoidSetupPhrase<T, TProperty>(setup);
 		}
 
 		/// <include file='Mock.Generic.xdoc' path='docs/doc[@for="Mock{T}.SetupSet{TProperty}"]/*'/>
 		public ISetupSetter<T, TProperty> SetupSet<TProperty>(Action<T> setterExpression)
 		{
-			return Mock.SetupSet<T, TProperty>(this, setterExpression, null);
+			Guard.NotNull(setterExpression, nameof(setterExpression));
+			var expression = ExpressionReconstructor.Instance.ReconstructExpression(setterExpression, this.ConstructorArguments);
+
+			var setup = Mock.SetupSet(this, expression, condition: null);
+			return new SetterSetupPhrase<T, TProperty>(setup);
 		}
 
 		/// <include file='Mock.Generic.xdoc' path='docs/doc[@for="Mock{T}.SetupSet"]/*'/>
 		public ISetup<T> SetupSet(Action<T> setterExpression)
 		{
-			return Mock.SetupSet<T>(this, setterExpression, null);
+			Guard.NotNull(setterExpression, nameof(setterExpression));
+			var expression = ExpressionReconstructor.Instance.ReconstructExpression(setterExpression, this.ConstructorArguments);
+
+			var setup = Mock.SetupSet(this, expression, condition: null);
+			return new VoidSetupPhrase<T>(setup);
 		}
 
 		/// <include file='Mock.Generic.xdoc' path='docs/doc[@for="Mock{T}.SetupProperty(property)"]/*'/>
@@ -357,9 +312,11 @@ namespace Moq
 		[SuppressMessage("Microsoft.Naming", "CA1716:IdentifiersShouldNotMatchKeywords", MessageId = "Property", Justification = "We're setting up a property, so it's appropriate.")]
 		public Mock<T> SetupProperty<TProperty>(Expression<Func<T, TProperty>> property, TProperty initialValue)
 		{
+			Guard.NotNull(property, nameof(property));
+
 			TProperty value = initialValue;
 			this.SetupGet(property).Returns(() => value);
-			SetupSet<T, TProperty>(this, property).Callback(p => value = p);
+			Mock.SetupSet(this, property.AssignItIsAny(), condition: null).SetCallbackResponse(new Action<TProperty>(p => value = p));
 			return this;
 		}
 
@@ -376,7 +333,8 @@ namespace Moq
 		[SuppressMessage("Microsoft.Design", "CA1006:DoNotNestGenericTypesInMemberSignatures", Justification = "By Design")]
 		public ISetupSequentialResult<TResult> SetupSequence<TResult>(Expression<Func<T, TResult>> expression)
 		{
-			return Mock.SetupSequence<TResult>(this, expression);
+			var setup = Mock.SetupSequence(this, expression);
+			return new SetupSequencePhrase<TResult>(setup);
 		}
 
 		/// <summary>
@@ -385,7 +343,8 @@ namespace Moq
 		[SuppressMessage("Microsoft.Design", "CA1006:DoNotNestGenericTypesInMemberSignatures", Justification = "By Design")]
 		public ISetupSequentialAction SetupSequence(Expression<Action<T>> expression)
 		{
-			return Mock.SetupSequence(this, expression);
+			var setup = Mock.SetupSequence(this, expression);
+			return new SetupSequencePhrase(setup);
 		}
 
 #endregion
@@ -441,7 +400,7 @@ namespace Moq
 		[SuppressMessage("Microsoft.Design", "CA1006:DoNotNestGenericTypesInMemberSignatures", Justification = "By design")]
 		public void Verify(Expression<Action<T>> expression, Func<Times> times, string failMessage)
 		{
-			Verify(this, expression, times(), failMessage);
+			Mock.Verify(this, expression, times(), failMessage);
 		}
 
 		/// <include file='Mock.Generic.xdoc' path='docs/doc[@for="Mock{T}.Verify{TResult}(expression)"]/*'/>
@@ -462,7 +421,7 @@ namespace Moq
 		[SuppressMessage("Microsoft.Design", "CA1006:DoNotNestGenericTypesInMemberSignatures", Justification = "By design")]
 		public void Verify<TResult>(Expression<Func<T, TResult>> expression, Func<Times> times)
 		{
-			Verify(this, expression, times(), null);
+			Mock.Verify(this, expression, times(), null);
 		}
 
 		/// <include file='Mock.Generic.xdoc' path='docs/doc[@for="Mock{T}.Verify{TResult}(expression,failMessage)"]/*'/>
@@ -524,37 +483,55 @@ namespace Moq
 		/// <include file='Mock.Generic.xdoc' path='docs/doc[@for="Mock{T}.VerifySet(expression)"]/*'/>
 		public void VerifySet(Action<T> setterExpression)
 		{
-			Mock.VerifySet<T>(this, setterExpression, Times.AtLeastOnce(), null);
+			Guard.NotNull(setterExpression, nameof(setterExpression));
+
+			var expression = ExpressionReconstructor.Instance.ReconstructExpression(setterExpression, this.ConstructorArguments);
+			Mock.VerifySet(this, expression, Times.AtLeastOnce(), null);
 		}
 
 		/// <include file='Mock.Generic.xdoc' path='docs/doc[@for="Mock{T}.VerifySet(expression,times)"]/*'/>
 		public void VerifySet(Action<T> setterExpression, Times times)
 		{
-			Mock.VerifySet(this, setterExpression, times, null);
+			Guard.NotNull(setterExpression, nameof(setterExpression));
+
+			var expression = ExpressionReconstructor.Instance.ReconstructExpression(setterExpression, this.ConstructorArguments);
+			Mock.VerifySet(this, expression, times, null);
 		}
 
 		/// <include file='Mock.Generic.xdoc' path='docs/doc[@for="Mock{T}.VerifySet(expression,times)"]/*'/>
 		public void VerifySet(Action<T> setterExpression, Func<Times> times)
 		{
-			Mock.VerifySet(this, setterExpression, times(), null);
+			Guard.NotNull(setterExpression, nameof(setterExpression));
+
+			var expression = ExpressionReconstructor.Instance.ReconstructExpression(setterExpression, this.ConstructorArguments);
+			Mock.VerifySet(this, expression, times(), null);
 		}
 
 		/// <include file='Mock.Generic.xdoc' path='docs/doc[@for="Mock{T}.VerifySet(expression,failMessage)"]/*'/>
 		public void VerifySet(Action<T> setterExpression, string failMessage)
 		{
-			Mock.VerifySet(this, setterExpression, Times.AtLeastOnce(), failMessage);
+			Guard.NotNull(setterExpression, nameof(setterExpression));
+
+			var expression = ExpressionReconstructor.Instance.ReconstructExpression(setterExpression, this.ConstructorArguments);
+			Mock.VerifySet(this, expression, Times.AtLeastOnce(), failMessage);
 		}
 
 		/// <include file='Mock.Generic.xdoc' path='docs/doc[@for="Mock{T}.VerifySet(expression,times,failMessage)"]/*'/>
 		public void VerifySet(Action<T> setterExpression, Times times, string failMessage)
 		{
-			Mock.VerifySet(this, setterExpression, times, failMessage);
+			Guard.NotNull(setterExpression, nameof(setterExpression));
+
+			var expression = ExpressionReconstructor.Instance.ReconstructExpression(setterExpression, this.ConstructorArguments);
+			Mock.VerifySet(this, expression, times, failMessage);
 		}
 
 		/// <include file='Mock.Generic.xdoc' path='docs/doc[@for="Mock{T}.VerifySet(expression,times,failMessage)"]/*'/>
 		public void VerifySet(Action<T> setterExpression, Func<Times> times, string failMessage)
 		{
-			Mock.VerifySet(this, setterExpression, times(), failMessage);
+			Guard.NotNull(setterExpression, nameof(setterExpression));
+
+			var expression = ExpressionReconstructor.Instance.ReconstructExpression(setterExpression, this.ConstructorArguments);
+			Mock.VerifySet(this, expression , times(), failMessage);
 		}
 
 		/// <summary>
@@ -572,38 +549,16 @@ namespace Moq
 
 		/// <include file='Mock.Generic.xdoc' path='docs/doc[@for="Mock{T}.Raise"]/*'/>
 		[SuppressMessage("Microsoft.Design", "CA1030:UseEventsWhereAppropriate", Justification = "Raises the event, rather than being one.")]
-		[SuppressMessage("Microsoft.Usage", "CA2200:RethrowToPreserveStackDetails", Justification = "We want to reset the stack trace to avoid Moq noise in it.")]
 		public void Raise(Action<T> eventExpression, EventArgs args)
 		{
-			var (ev, target) = eventExpression.GetEventWithTarget(this.Object);
-
-			try
-			{
-				target.DoRaise(ev, args);
-			}
-			catch (Exception e)
-			{
-				// Reset stack trace so user gets this call site only.
-				throw e;
-			}
+			Mock.RaiseEvent(this, eventExpression, new object[] { this.Object, args });
 		}
 
 		/// <include file='Mock.Generic.xdoc' path='docs/doc[@for="Mock{T}.Raise(args)"]/*'/>
 		[SuppressMessage("Microsoft.Design", "CA1030:UseEventsWhereAppropriate", Justification = "Raises the event, rather than being one.")]
-		[SuppressMessage("Microsoft.Usage", "CA2200:RethrowToPreserveStackDetails", Justification = "We want to reset the stack trace to avoid Moq noise in it.")]
 		public void Raise(Action<T> eventExpression, params object[] args)
 		{
-			var (ev, target) = eventExpression.GetEventWithTarget(this.Object);
-
-			try
-			{
-				target.DoRaise(ev, args);
-			}
-			catch (Exception e)
-			{
-				// Reset stack trace so user gets this call site only.
-				throw e;
-			}
+			Mock.RaiseEvent(this, eventExpression, args);
 		}
 
 #endregion
