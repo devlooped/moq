@@ -3719,5 +3719,56 @@ namespace Moq.Tests.Regressions
 		}
 
 		#endregion
+
+		#region 657
+
+		public class _657
+		{
+			[Fact]
+			public void Test()
+			{
+				var mock = new Mock<Contract>() { CallBase = true };
+
+				mock.As<IContractOveride>().Setup(m => m.DoWork()).Returns(3);
+
+				var contractOveride = mock.Object as IContractOveride;
+
+				var resultOveride = contractOveride.DoWork();
+
+				Assert.Equal(3, resultOveride);
+
+				var result = mock.Object.PublicWork();
+
+				Assert.Equal(1, result);
+			}
+
+			public class Contract : IContractOveride
+			{
+				public int PublicWork()
+				{
+					return this.DoWork();
+				}
+
+				protected virtual int DoWork()
+				{
+					//Should not be able to mock this method: '...' is inaccessible due to its protection level
+					((IContractOveride)this).DoWork(); //Does not return the value of interface method.
+					return 1;
+				}
+
+				int IContractOveride.DoWork()
+				{
+					Console.WriteLine("IFace");
+					return 2;
+				}
+			}
+
+			public interface IContractOveride
+			{
+				int DoWork();
+			}
+		}
+
+		#endregion
 	}
 }

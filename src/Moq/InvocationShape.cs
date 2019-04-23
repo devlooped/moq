@@ -77,6 +77,11 @@ namespace Moq
 				return false;
 			}
 
+			if (!invocationMethod.IsPublic && method.DeclaringType.GetTypeInfo().IsInterface)
+			{
+				return false;
+			}
+
 			if (method.IsGenericMethod)
 			{
 				if (!method.GetGenericArguments().CompareTo(invocationMethod.GetGenericArguments(), exact: false))
