@@ -4199,5 +4199,114 @@ namespace Moq.Tests.Regressions
 		}
 
 		#endregion
+
+		#region 657
+
+		public class _657
+		{
+			public class Case1
+			{
+				[Fact]
+				public void Test()
+				{
+					var mock = new Mock<Contract>() { CallBase = true };
+
+					mock.As<IContractOveride>().Setup(m => m.DoWork()).Returns(3);
+
+					var contractOveride = mock.Object as IContractOveride;
+
+					var resultOveride = contractOveride.DoWork();
+
+					Assert.Equal(3, resultOveride);
+
+					var result = mock.Object.PublicWork();
+
+					Assert.Equal(1, result);
+				}
+
+				public class Contract : IContractOveride
+				{
+					public int PublicWork()
+					{
+						return this.DoWork();
+					}
+
+					protected virtual int DoWork()
+					{
+						((IContractOveride)this).DoWork();
+						return 1;
+					}
+
+					int IContractOveride.DoWork()
+					{
+						Console.WriteLine("IFace");
+						return 2;
+					}
+				}
+
+				public interface IContractOveride
+				{
+					int DoWork();
+				}
+			}
+
+			public class Case2
+			{
+				public interface IExplicit
+				{
+					int Bar();
+				}
+
+				public class Explicit : IExplicit
+				{
+					int IExplicit.Bar() => 1;
+
+					public virtual int Bar() => 2;
+				}
+
+				[Fact]
+				public void ExplicitTest()
+				{
+					var mock = new Mock<Explicit>();
+					mock.As<IExplicit>().Setup(m => m.Bar()).CallBase();
+
+					var a = ((IExplicit)mock.Object).Bar();
+					var b = mock.Object.Bar();
+
+					Assert.True(a == 1, "a");
+
+					Assert.True(b == 0, "b");
+				}
+			}
+
+			public class Case3
+			{
+				public interface IExplicit
+				{
+					int Bar();
+				}
+
+				public class Explicit : IExplicit
+				{
+					int IExplicit.Bar() => 1;
+
+					public virtual int Bar() => 2;
+				}
+
+				[Fact]
+				public void Test()
+				{
+					var mock = new Mock<Explicit>();
+					mock.As<IExplicit>().Setup(m => m.Bar()).CallBase();
+
+					var a = ((IExplicit)mock.Object).Bar();
+					var b = mock.Object.Bar();
+
+					Assert.True(a == 1 && b == 0);
+				}
+			}
+		}
+
+		#endregion
 	}
 }

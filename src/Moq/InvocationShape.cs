@@ -30,6 +30,8 @@ namespace Moq
 		private readonly IMatcher[] argumentMatchers;
 		private Expression[] partiallyEvaluatedArguments;
 
+		private readonly Dictionary<TypeInfo, bool> explicitMappingCache;
+
 		public InvocationShape(LambdaExpression expression, MethodInfo method, IReadOnlyList<Expression> arguments = null)
 		{
 			Debug.Assert(expression != null);
@@ -40,6 +42,7 @@ namespace Moq
 
 			this.Expression = expression;
 			this.Method = method;
+			this.explicitMappingCache = new Dictionary<TypeInfo, bool>();
 			if (arguments != null)
 			{
 				(this.argumentMatchers, this.Arguments) = MatcherFactory.CreateMatchers(arguments, method.GetParameters());
@@ -115,6 +118,11 @@ namespace Moq
 					return false;
 				}
 			}
+			
+			if (IsExplicitlyImplementedBy(invocationMethod.DeclaringType.GetTypeInfo()))
+			{
+				return false;
+			}
 
 			return true;
 		}
@@ -183,6 +191,29 @@ namespace Moq
 		public override string ToString()
 		{
 			return this.Expression.ToStringFixed();
+		}
+
+		private bool IsExplicitlyImplementedBy(TypeInfo typeInfo)
+		{
+			if (!this.explicitMappingCache.TryGetValue(typeInfo, out var isExplicit))
+			{
+				var methodTypeInfo = this.Method.DeclaringType.GetTypeInfo();
+
+				if (!methodTypeInfo.IsInterface || typeInfo.IsInterface)
+				{
+					isExplicit = false;
+					this.explicitMappingCache[typeInfo] = isExplicit;
+				}
+				else
+				{
+					var map = typeInfo.GetRuntimeInterfaceMap(methodTypeInfo);
+					var index = Array.IndexOf(map.InterfaceMethods, this.Method);
+					isExplicit = map.TargetMethods[index].IsPrivate;
+					this.explicitMappingCache[typeInfo] = isExplicit;
+				}
+			}
+
+			return isExplicit;
 		}
 	}
 }
