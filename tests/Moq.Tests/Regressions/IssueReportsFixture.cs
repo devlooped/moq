@@ -4204,48 +4204,80 @@ namespace Moq.Tests.Regressions
 
 		public class _657
 		{
-			[Fact]
-			public void Test()
+			public class Case1
 			{
-				var mock = new Mock<Contract>() { CallBase = true };
+				[Fact]
+				public void Test()
+				{
+					var mock = new Mock<Contract>() { CallBase = true };
 
-				mock.As<IContractOveride>().Setup(m => m.DoWork()).Returns(3);
+					mock.As<IContractOveride>().Setup(m => m.DoWork()).Returns(3);
 
-				var contractOveride = mock.Object as IContractOveride;
+					var contractOveride = mock.Object as IContractOveride;
 
-				var resultOveride = contractOveride.DoWork();
+					var resultOveride = contractOveride.DoWork();
 
-				Assert.Equal(3, resultOveride);
+					Assert.Equal(3, resultOveride);
 
-				var result = mock.Object.PublicWork();
+					var result = mock.Object.PublicWork();
 
-				Assert.Equal(1, result);
+					Assert.Equal(1, result);
+				}
+
+				public class Contract : IContractOveride
+				{
+					public int PublicWork()
+					{
+						return this.DoWork();
+					}
+
+					protected virtual int DoWork()
+					{
+						//Should not be able to mock this method: '...' is inaccessible due to its protection level
+						((IContractOveride)this).DoWork(); //Does not return the value of interface method.
+						return 1;
+					}
+
+					int IContractOveride.DoWork()
+					{
+						Console.WriteLine("IFace");
+						return 2;
+					}
+				}
+
+				public interface IContractOveride
+				{
+					int DoWork();
+				}
 			}
 
-			public class Contract : IContractOveride
+			public class Case2
 			{
-				public int PublicWork()
+				public interface IExplicit
 				{
-					return this.DoWork();
+					int Bar();
 				}
 
-				protected virtual int DoWork()
+				public class Explicit : IExplicit
 				{
-					//Should not be able to mock this method: '...' is inaccessible due to its protection level
-					((IContractOveride)this).DoWork(); //Does not return the value of interface method.
-					return 1;
+					int IExplicit.Bar() => 1;
+
+					public virtual int Bar() => 2;
 				}
 
-				int IContractOveride.DoWork()
+				[Fact]
+				public void ExplicitTest()
 				{
-					Console.WriteLine("IFace");
-					return 2;
-				}
-			}
+					var mock = new Mock<Explicit>();
+					mock.As<IExplicit>().Setup(m => m.Bar()).CallBase();
 
-			public interface IContractOveride
-			{
-				int DoWork();
+					var a = ((IExplicit)mock.Object).Bar();
+					var b = mock.Object.Bar();
+
+					Assert.True(a == 1, "a");
+
+					Assert.True(b == 0, "b");
+				}
 			}
 		}
 

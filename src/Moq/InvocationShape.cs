@@ -91,17 +91,17 @@ namespace Moq
 				return false;
 			}
 
+			if (!invocationMethod.DeclaringType.IsAssignableFrom(method.DeclaringType))
+			{
+				return false;
+			}
+
 			if (!method.Name.Equals(invocationMethod.Name, StringComparison.Ordinal))
 			{
 				return false;
 			}
 
 			if (method.ReturnType != invocationMethod.ReturnType)
-			{
-				return false;
-			}
-
-			if (!invocationMethod.IsPublic && method.DeclaringType.GetTypeInfo().IsInterface)
 			{
 				return false;
 			}
