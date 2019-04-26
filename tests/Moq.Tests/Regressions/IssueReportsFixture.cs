@@ -4305,6 +4305,58 @@ namespace Moq.Tests.Regressions
 					Assert.True(a == 1 && b == 0);
 				}
 			}
+
+			public class Case4
+			{
+				public interface IBar
+				{
+					IFoo Bar();
+				}
+
+				public interface IFoo
+				{
+					int Foo();
+				}
+
+				public abstract class BarBar : IBar
+				{
+					IFoo IBar.Bar() => default;
+
+					public abstract IFoo Bar();
+				}
+
+				public abstract class FooFoo : IFoo
+				{
+					int IFoo.Foo() => default;
+
+					public abstract int Foo();
+				}
+
+				[Fact]
+				public void Should_not_throw_when_invoked()
+				{
+					var mock = new Mock<BarBar>();
+					mock.Setup(m => m.Bar().Foo()).Returns(1).Verifiable();
+					mock.As<IBar>().Setup(m => m.Bar().Foo()).Returns(2).Verifiable();
+
+					var a = mock.Object.Bar().Foo();
+					var b = mock.As<IBar>().Object.Bar().Foo();
+
+					mock.Verify();
+				}
+
+				[Fact]
+				public void Should_throw_when_not_invoked()
+				{
+					var mock = new Mock<BarBar>();
+					mock.Setup(m => m.Bar().Foo()).Returns(1).Verifiable();
+					mock.As<IBar>().Setup(m => m.Bar().Foo()).Returns(2).Verifiable();
+
+					var a = mock.Object.Bar().Foo();
+
+					Assert.Throws<MockException>(() => mock.Verify());
+				}
+			}
 		}
 
 		#endregion
