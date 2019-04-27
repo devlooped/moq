@@ -4,27 +4,25 @@
 using System;
 using System.Collections.Generic;
 using System.Linq;
-using System.Linq.Expressions;
-using System.Reflection;
 
 namespace Moq
 {
 	internal sealed class SetupCollection
 	{
-		// Using a stack has the advantage that enumeration returns the items in reverse order (last added to first added).
-		// This helps in implementing the rule that "given two matching setups, the last one wins."
-		private Stack<Setup> setups;
+		private List<Setup> setups;
+		private uint overridden;  // bit mask for the first 32 setups flagging those known to be overridden
 
 		public SetupCollection()
 		{
-			this.setups = new Stack<Setup>();
+			this.setups = new List<Setup>();
+			this.overridden = 0U;
 		}
 
 		public void Add(Setup setup)
 		{
 			lock (this.setups)
 			{
-				this.setups.Push(setup);
+				this.setups.Add(setup);
 			}
 		}
 
@@ -41,6 +39,7 @@ namespace Moq
 			lock (this.setups)
 			{
 				this.setups.Clear();
+				this.overridden = 0U;
 			}
 		}
 
@@ -56,8 +55,13 @@ namespace Moq
 
 			lock (this.setups)
 			{
-				foreach (var setup in this.setups)
+				// Iterating in reverse order because newer setups are more relevant than (i.e. override) older ones
+				for (int i = this.setups.Count - 1; i >= 0; --i)
 				{
+					if (i < 32 && (this.overridden & (1U << i)) != 0) continue;
+
+					var setup = this.setups[i];
+
 					// the following conditions are repetitive, but were written that way to avoid
 					// unnecessary expensive calls to `setup.Matches`; cheap tests are run first.
 					if (matchingSetup == null && setup.Matches(invocation))
@@ -87,30 +91,27 @@ namespace Moq
 		public Setup[] ToArrayLive(Func<Setup, bool> predicate)
 		{
 			var matchingSetups = new Stack<Setup>();
-
-			// The following verification logic will remember each processed setup so that duplicate setups
-			// (that is, setups overridden by later setups with an equivalent expression) can be detected.
-			// To speed up duplicate detection, they are partitioned according to the method they target.
-			var visitedSetupsPerMethod = new Dictionary<MethodInfo, List<InvocationShape>>();
+			var visitedSetups = new HashSet<InvocationShape>();
 
 			lock (this.setups)
 			{
-				foreach (var setup in this.setups)
+				// Iterating in reverse order because newer setups are more relevant than (i.e. override) older ones
+				for (int i = this.setups.Count - 1; i >= 0; --i)
 				{
+					if (i < 32 && (this.overridden & (1U << i)) != 0) continue;
+
+					var setup = this.setups[i];
+
 					if (setup.Condition != null)
 					{
 						continue;
 					}
 
-					List<InvocationShape> visitedSetupsForMethod;
-					if (!visitedSetupsPerMethod.TryGetValue(setup.Method, out visitedSetupsForMethod))
+					if (!visitedSetups.Add(setup.Expectation))
 					{
-						visitedSetupsForMethod = new List<InvocationShape>();
-						visitedSetupsPerMethod.Add(setup.Method, visitedSetupsForMethod);
-					}
-
-					if (visitedSetupsForMethod.Contains(setup.Expectation))
-					{
+						// A setup with the same expression has already been iterated over,
+						// meaning that this older setup is an overridden one.
+						if (i < 32) this.overridden |= 1U << i;
 						continue;
 					}
 
@@ -118,8 +119,6 @@ namespace Moq
 					{
 						matchingSetups.Push(setup);
 					}
-
-					visitedSetupsForMethod.Add(setup.Expectation);
 				}
 			}
 
