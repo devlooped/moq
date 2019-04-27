@@ -17,20 +17,14 @@ namespace Moq
 				return;
 			}
 
-			if (RecordInvocation.Handle(invocation, this))
-			{
-				return;
-			}
+			RecordInvocation.Handle(invocation, this);
 
 			if (FindAndExecuteMatchingSetup.Handle(invocation, this))
 			{
 				return;
 			}
 
-			if (Return.Handle(invocation, this))
-			{
-				return;
-			}
+			Return.Handle(invocation, this);
 		}
 	}
 }

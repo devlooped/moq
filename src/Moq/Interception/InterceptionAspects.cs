@@ -250,17 +250,16 @@ namespace Moq
 
 	internal static class RecordInvocation
 	{
-		public static bool Handle(Invocation invocation, Mock mock)
+		public static void Handle(Invocation invocation, Mock mock)
 		{
 			// Save to support Verify[expression] pattern.
 			mock.MutableInvocations.Add(invocation);
-			return false;
 		}
 	}
 
 	internal static class Return
 	{
-		public static bool Handle(Invocation invocation, Mock mock)
+		public static void Handle(Invocation invocation, Mock mock)
 		{
 			Debug.Assert(invocation.Method != null);
 			Debug.Assert(invocation.Method.ReturnType != null);
@@ -291,7 +290,7 @@ namespace Moq
 							if (!method.LooksLikeEventAttach() && !method.LooksLikeEventDetach())
 							{
 								invocation.ReturnBase();
-								return true;
+								return;
 							}
 						}
 						else
@@ -312,7 +311,7 @@ namespace Moq
 					if (!method.IsAbstract)
 					{
 						invocation.ReturnBase();
-						return true;
+						return;
 					}
 				}
 			}
@@ -330,8 +329,6 @@ namespace Moq
 				}
 				invocation.Return(returnValue);
 			}
-
-			return true;
 		}
 	}
 }
