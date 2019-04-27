@@ -378,9 +378,9 @@ namespace Moq.Protected
 
 						types[index] = field.FieldType;
 					}
-					else if ((member.Member as PropertyInfo) != null)
+					else if (member.Member is PropertyInfo property)
 					{
-						types[index] = ((PropertyInfo)member.Member).PropertyType;
+						types[index] = property.PropertyType;
 					}
 					else
 					{
@@ -392,15 +392,7 @@ namespace Moq.Protected
 				}
 				else
 				{
-					var evalExpr = expr.PartialEval();
-					if (evalExpr.NodeType == ExpressionType.Constant)
-					{
-						types[index] = ((ConstantExpression)evalExpr).Type;
-					}
-					else
-					{
-						types[index] = null;
-					}
+					types[index] = (expr.PartialEval() as ConstantExpression)?.Type;
 				}
 			}
 
@@ -409,14 +401,12 @@ namespace Moq.Protected
 
 		private static Expression ToExpressionArg(ParameterInfo paramInfo, object arg)
 		{
-			var lambda = arg as LambdaExpression;
-			if (lambda != null)
+			if (arg is LambdaExpression lambda)
 			{
 				return lambda.Body;
 			}
 
-			var expression = arg as Expression;
-			if (expression != null)
+			if (arg is Expression expression)
 			{
 				return expression;
 			}

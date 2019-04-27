@@ -28,23 +28,18 @@ namespace Moq
 		/// <include file='Mock.xdoc' path='docs/doc[@for="Mock.Get"]/*'/>
 		public static Mock<T> Get<T>(T mocked) where T : class
 		{
-			var mockedOfT = mocked as IMocked<T>;
-			if (mockedOfT != null)
+			if (mocked is IMocked<T> mockedOfT)
 			{
 				// This would be the fastest check.
 				return mockedOfT.Mock;
 			}
 
-			var aDelegate = mocked as Delegate;
-			if (aDelegate != null)
+			if (mocked is Delegate aDelegate && aDelegate.Target is IMocked<T> mockedDelegateImpl)
 			{
-				var mockedDelegateImpl = aDelegate.Target as IMocked<T>;
-				if (mockedDelegateImpl != null)
-					return mockedDelegateImpl.Mock;
+				return mockedDelegateImpl.Mock;
 			}
 
-			var mockedPlain = mocked as IMocked;
-			if (mockedPlain != null)
+			if (mocked is IMocked mockedPlain)
 			{
 				// We may have received a T of an implemented 
 				// interface in the mock.

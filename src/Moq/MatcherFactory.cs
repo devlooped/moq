@@ -62,13 +62,12 @@ namespace Moq
 						}
 					}
 
-					var constant = argument.PartialEval() as ConstantExpression;
-					if (constant == null)
+					if (argument.PartialEval() is ConstantExpression constant)
 					{
-						throw new NotSupportedException(Resources.RefExpressionMustBeConstantValue);
+						return new Pair<IMatcher, Expression>(new RefMatcher(constant.Value), constant);
 					}
 
-					return new Pair<IMatcher, Expression>(new RefMatcher(constant.Value), constant);
+					throw new NotSupportedException(Resources.RefExpressionMustBeConstantValue);
 				}
 			}
 			else if (parameter.IsDefined(typeof(ParamArrayAttribute), true) && argument.NodeType == ExpressionType.NewArrayInit)
@@ -112,8 +111,7 @@ namespace Moq
 			}
 
 			// SetupSet passes a custom expression.
-			var matchExpression = expression as MatchExpression;
-			if (matchExpression != null)
+			if (expression is MatchExpression matchExpression)
 			{
 				return new Pair<IMatcher, Expression>(matchExpression.Match, matchExpression);
 			}
