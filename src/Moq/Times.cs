@@ -2,6 +2,7 @@
 // All rights reserved. Licensed under the BSD 3-Clause License; see License.txt.
 
 using System;
+using System.Diagnostics;
 using System.Globalization;
 
 using Moq.Properties;
@@ -20,6 +21,28 @@ namespace Moq
 			this.from = from;
 			this.to = to;
 			this.kind = kind;
+		}
+
+		private void Deconstruct(out int from, out int to)
+		{
+			if (this.kind == default)
+			{
+				// This branch makes `default(Times)` equivalent to `Times.AtLeastOnce()`,
+				// which is the implicit default across Moq's API for overloads that don't
+				// accept a `Times` instance. While user code shouldn't use `default(Times)`
+				// (but instead either specify `Times` explicitly or not at all), it is
+				// easy enough to correct:
+
+				Debug.Assert(this.kind == Kind.AtLeastOnce);
+
+				from = 1;
+				to = int.MaxValue;
+			}
+			else
+			{
+				from = this.from;
+				to = this.to;
+			}
 		}
 
 		/// <include file='Times.xdoc' path='docs/doc[@for="Times.AtLeast"]/*'/>
@@ -115,7 +138,9 @@ namespace Moq
 		/// </returns>
 		public bool Equals(Times other)
 		{
-			return this.from == other.from && this.to == other.to;
+			var (from, to) = this;
+			var (otherFrom, otherTo) = other;
+			return from == otherFrom && to == otherTo;
 		}
 
 		/// <include file='Times.xdoc' path='docs/doc[@for="Times.Equals"]/*'/>
@@ -127,7 +152,8 @@ namespace Moq
 		/// <include file='Times.xdoc' path='docs/doc[@for="Times.GetHashCode"]/*'/>
 		public override int GetHashCode()
 		{
-			return this.from.GetHashCode() ^ this.to.GetHashCode();
+			var (from, to) = this;
+			return from.GetHashCode() ^ to.GetHashCode();
 		}
 
 		/// <include file='Times.xdoc' path='docs/doc[@for="Times.op_Equality"]/*'/>
@@ -144,8 +170,13 @@ namespace Moq
 
 		internal string GetExceptionMessage(int callCount)
 		{
-			var from = this.kind == Kind.BetweenExclusive ? this.from - 1 : this.from;
-			var to   = this.kind == Kind.BetweenExclusive ? this.to   + 1 : this.to;
+			var (from, to) = this;
+
+			if (this.kind == Kind.BetweenExclusive)
+			{
+				--from;
+				++to;
+			}
 
 			string message = null;
 			switch (this.kind)
@@ -166,13 +197,14 @@ namespace Moq
 
 		internal bool Verify(int callCount)
 		{
-			return this.from <= callCount && callCount <= this.to;
+			var (from, to) = this;
+			return from <= callCount && callCount <= to;
 		}
 
 		private enum Kind
 		{
-			AtLeast,
 			AtLeastOnce,
+			AtLeast,
 			AtMost,
 			AtMostOnce,
 			BetweenExclusive,
