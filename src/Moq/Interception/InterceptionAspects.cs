@@ -132,7 +132,7 @@ namespace Moq
 		}
 	}
 
-	internal static class RecordInvocation
+	internal static class HandleEventSubscription
 	{
 		public static bool Handle(Invocation invocation, Mock mock)
 		{
@@ -188,8 +188,6 @@ namespace Moq
 				}
 			}
 
-			// Save to support Verify[expression] pattern.
-			mock.MutableInvocations.Add(invocation);
 			return false;
 		}
 
@@ -247,6 +245,16 @@ namespace Moq
 			}
 
 			return initialType.GetInterfaces();
+		}
+	}
+
+	internal static class RecordInvocation
+	{
+		public static bool Handle(Invocation invocation, Mock mock)
+		{
+			// Save to support Verify[expression] pattern.
+			mock.MutableInvocations.Add(invocation);
+			return false;
 		}
 	}
 

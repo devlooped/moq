@@ -12,6 +12,11 @@ namespace Moq
 				return;
 			}
 
+			if (HandleEventSubscription.Handle(invocation, this))
+			{
+				return;
+			}
+
 			if (RecordInvocation.Handle(invocation, this))
 			{
 				return;
