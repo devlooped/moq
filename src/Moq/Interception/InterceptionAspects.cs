@@ -9,11 +9,9 @@ using System.Reflection;
 
 namespace Moq
 {
-	internal sealed class HandleWellKnownMethods : InterceptionAspect
+	internal static class HandleWellKnownMethods
 	{
-		public static HandleWellKnownMethods Instance { get; } = new HandleWellKnownMethods();
-
-		private static Dictionary<string, Func<Invocation, Mock, InterceptionAction>> specialMethods = new Dictionary<string, Func<Invocation, Mock, InterceptionAction>>()
+		private static Dictionary<string, Func<Invocation, Mock, bool>> specialMethods = new Dictionary<string, Func<Invocation, Mock, bool>>()
 		{
 			["Equals"] = HandleEquals,
 			["Finalize"] = HandleFinalize,
@@ -22,74 +20,68 @@ namespace Moq
 			["ToString"] = HandleToString,
 		};
 
-		public override InterceptionAction Handle(Invocation invocation, Mock mock)
+		public static bool Handle(Invocation invocation, Mock mock)
 		{
-			if (specialMethods.TryGetValue(invocation.Method.Name, out Func<Invocation, Mock, InterceptionAction> handler))
-			{
-				return handler.Invoke(invocation, mock);
-			}
-			else
-			{
-				return InterceptionAction.Continue;
-			}
+			return specialMethods.TryGetValue(invocation.Method.Name, out var handler)
+				&& handler.Invoke(invocation, mock);
 		}
 
-		private static InterceptionAction HandleEquals(Invocation invocation, Mock mock)
+		private static bool HandleEquals(Invocation invocation, Mock mock)
 		{
 			if (IsObjectMethod(invocation.Method) && !mock.Setups.Any(c => IsObjectMethod(c.Method, "Equals")))
 			{
 				invocation.Return(ReferenceEquals(invocation.Arguments.First(), mock.Object));
-				return InterceptionAction.Stop;
+				return true;
 			}
 			else
 			{
-				return InterceptionAction.Continue;
+				return false;
 			}
 		}
 
-		private static InterceptionAction HandleFinalize(Invocation invocation, Mock mock)
+		private static bool HandleFinalize(Invocation invocation, Mock mock)
 		{
-			return IsFinalizer(invocation.Method) ? InterceptionAction.Stop : InterceptionAction.Continue;
+			return IsFinalizer(invocation.Method);
 		}
 
-		private static InterceptionAction HandleGetHashCode(Invocation invocation, Mock mock)
+		private static bool HandleGetHashCode(Invocation invocation, Mock mock)
 		{
 			// Only if there is no corresponding setup for `GetHashCode()`
 			if (IsObjectMethod(invocation.Method) && !mock.Setups.Any(c => IsObjectMethod(c.Method, "GetHashCode")))
 			{
 				invocation.Return(mock.GetHashCode());
-				return InterceptionAction.Stop;
+				return true;
 			}
 			else
 			{
-				return InterceptionAction.Continue;
+				return false;
 			}
 		}
 
-		private static InterceptionAction HandleToString(Invocation invocation, Mock mock)
+		private static bool HandleToString(Invocation invocation, Mock mock)
 		{
 			// Only if there is no corresponding setup for `ToString()`
 			if (IsObjectMethod(invocation.Method) && !mock.Setups.Any(c => IsObjectMethod(c.Method, "ToString")))
 			{
 				invocation.Return(mock.ToString() + ".Object");
-				return InterceptionAction.Stop;
+				return true;
 			}
 			else
 			{
-				return InterceptionAction.Continue;
+				return false;
 			}
 		}
 
-		private static InterceptionAction HandleMockGetter(Invocation invocation, Mock mock)
+		private static bool HandleMockGetter(Invocation invocation, Mock mock)
 		{
 			if (typeof(IMocked).IsAssignableFrom(invocation.Method.DeclaringType))
 			{
 				invocation.Return(mock);
-				return InterceptionAction.Stop;
+				return true;
 			}
 			else
 			{
-				return InterceptionAction.Continue;
+				return false;
 			}
 		}
 
@@ -103,11 +95,9 @@ namespace Moq
 		private static bool IsObjectMethod(MethodInfo method, string name) => IsObjectMethod(method) && method.Name == name;
 	}
 
-	internal sealed class FindAndExecuteMatchingSetup : InterceptionAspect
+	internal static class FindAndExecuteMatchingSetup
 	{
-		public static FindAndExecuteMatchingSetup Instance { get; } = new FindAndExecuteMatchingSetup();
-
-		public override InterceptionAction Handle(Invocation invocation, Mock mock)
+		public static bool Handle(Invocation invocation, Mock mock)
 		{
 			var matchedSetup = mock.Setups.FindMatchFor(invocation);
 			if (matchedSetup != null)
@@ -129,7 +119,7 @@ namespace Moq
 				// and therefore we might never get to the 
 				// next line.
 				matchedSetup.Execute(invocation);
-				return InterceptionAction.Stop;
+				return true;
 			}
 			else if (mock.Behavior == MockBehavior.Strict)
 			{
@@ -137,16 +127,14 @@ namespace Moq
 			}
 			else
 			{
-				return InterceptionAction.Continue;
+				return false;
 			}
 		}
 	}
 
-	internal sealed class RecordInvocation : InterceptionAspect
+	internal static class HandleEventSubscription
 	{
-		public static RecordInvocation Instance { get; } = new RecordInvocation();
-
-		public override InterceptionAction Handle(Invocation invocation, Mock mock)
+		public static bool Handle(Invocation invocation, Mock mock)
 		{
 			var methodName = invocation.Method.Name;
 
@@ -166,13 +154,13 @@ namespace Moq
 						if (mock.CallBase && !invocation.Method.IsAbstract)
 						{
 							invocation.ReturnBase();
-							return InterceptionAction.Stop;
+							return true;
 						}
 						else if (invocation.Arguments.Length > 0 && invocation.Arguments[0] is Delegate delegateInstance)
 						{
 							mock.EventHandlers.Add(eventInfo.Name, delegateInstance);
 							invocation.Return();
-							return InterceptionAction.Stop;
+							return true;
 						}
 					}
 				}
@@ -188,21 +176,19 @@ namespace Moq
 						if (mock.CallBase && !invocation.Method.IsAbstract)
 						{
 							invocation.ReturnBase();
-							return InterceptionAction.Stop;
+							return true;
 						}
 						else if (invocation.Arguments.Length > 0 && invocation.Arguments[0] is Delegate delegateInstance)
 						{
 							mock.EventHandlers.Remove(eventInfo.Name, delegateInstance);
 							invocation.Return();
-							return InterceptionAction.Stop;
+							return true;
 						}
 					}
 				}
 			}
 
-			// Save to support Verify[expression] pattern.
-			mock.MutableInvocations.Add(invocation);
-			return InterceptionAction.Continue;
+			return false;
 		}
 
 		/// <summary>
@@ -262,11 +248,18 @@ namespace Moq
 		}
 	}
 
-	internal sealed class Return : InterceptionAspect
+	internal static class RecordInvocation
 	{
-		public static Return Instance { get; } = new Return();
+		public static void Handle(Invocation invocation, Mock mock)
+		{
+			// Save to support Verify[expression] pattern.
+			mock.MutableInvocations.Add(invocation);
+		}
+	}
 
-		public override InterceptionAction Handle(Invocation invocation, Mock mock)
+	internal static class Return
+	{
+		public static void Handle(Invocation invocation, Mock mock)
 		{
 			Debug.Assert(invocation.Method != null);
 			Debug.Assert(invocation.Method.ReturnType != null);
@@ -297,7 +290,7 @@ namespace Moq
 							if (!method.LooksLikeEventAttach() && !method.LooksLikeEventDetach())
 							{
 								invocation.ReturnBase();
-								return InterceptionAction.Stop;
+								return;
 							}
 						}
 						else
@@ -318,7 +311,7 @@ namespace Moq
 					if (!method.IsAbstract)
 					{
 						invocation.ReturnBase();
-						return InterceptionAction.Stop;
+						return;
 					}
 				}
 			}
@@ -336,8 +329,6 @@ namespace Moq
 				}
 				invocation.Return(returnValue);
 			}
-
-			return InterceptionAction.Stop;
 		}
 	}
 }
