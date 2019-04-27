@@ -87,11 +87,7 @@ namespace Moq
 		public Setup[] ToArrayLive(Func<Setup, bool> predicate)
 		{
 			var matchingSetups = new Stack<Setup>();
-
-			// The following verification logic will remember each processed setup so that duplicate setups
-			// (that is, setups overridden by later setups with an equivalent expression) can be detected.
-			// To speed up duplicate detection, they are partitioned according to the method they target.
-			var visitedSetupsPerMethod = new Dictionary<MethodInfo, List<InvocationShape>>();
+			var visitedSetups = new HashSet<InvocationShape>();
 
 			lock (this.setups)
 			{
@@ -102,15 +98,10 @@ namespace Moq
 						continue;
 					}
 
-					List<InvocationShape> visitedSetupsForMethod;
-					if (!visitedSetupsPerMethod.TryGetValue(setup.Method, out visitedSetupsForMethod))
+					if (!visitedSetups.Add(setup.Expectation))
 					{
-						visitedSetupsForMethod = new List<InvocationShape>();
-						visitedSetupsPerMethod.Add(setup.Method, visitedSetupsForMethod);
-					}
-
-					if (visitedSetupsForMethod.Contains(setup.Expectation))
-					{
+						// A setup with the same expression has already been iterated over,
+						// meaning that this older setup is an overridden one.
 						continue;
 					}
 
@@ -118,8 +109,6 @@ namespace Moq
 					{
 						matchingSetups.Push(setup);
 					}
-
-					visitedSetupsForMethod.Add(setup.Expectation);
 				}
 			}
 
