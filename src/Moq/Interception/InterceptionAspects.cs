@@ -9,10 +9,8 @@ using System.Reflection;
 
 namespace Moq
 {
-	internal sealed class HandleWellKnownMethods : InterceptionAspect
+	internal static class HandleWellKnownMethods
 	{
-		public static HandleWellKnownMethods Instance { get; } = new HandleWellKnownMethods();
-
 		private static Dictionary<string, Func<Invocation, Mock, InterceptionAction>> specialMethods = new Dictionary<string, Func<Invocation, Mock, InterceptionAction>>()
 		{
 			["Equals"] = HandleEquals,
@@ -22,7 +20,7 @@ namespace Moq
 			["ToString"] = HandleToString,
 		};
 
-		public override InterceptionAction Handle(Invocation invocation, Mock mock)
+		public static InterceptionAction Handle(Invocation invocation, Mock mock)
 		{
 			if (specialMethods.TryGetValue(invocation.Method.Name, out Func<Invocation, Mock, InterceptionAction> handler))
 			{
@@ -103,11 +101,9 @@ namespace Moq
 		private static bool IsObjectMethod(MethodInfo method, string name) => IsObjectMethod(method) && method.Name == name;
 	}
 
-	internal sealed class FindAndExecuteMatchingSetup : InterceptionAspect
+	internal static class FindAndExecuteMatchingSetup
 	{
-		public static FindAndExecuteMatchingSetup Instance { get; } = new FindAndExecuteMatchingSetup();
-
-		public override InterceptionAction Handle(Invocation invocation, Mock mock)
+		public static InterceptionAction Handle(Invocation invocation, Mock mock)
 		{
 			var matchedSetup = mock.Setups.FindMatchFor(invocation);
 			if (matchedSetup != null)
@@ -142,11 +138,9 @@ namespace Moq
 		}
 	}
 
-	internal sealed class RecordInvocation : InterceptionAspect
+	internal static class RecordInvocation
 	{
-		public static RecordInvocation Instance { get; } = new RecordInvocation();
-
-		public override InterceptionAction Handle(Invocation invocation, Mock mock)
+		public static InterceptionAction Handle(Invocation invocation, Mock mock)
 		{
 			var methodName = invocation.Method.Name;
 
@@ -262,11 +256,9 @@ namespace Moq
 		}
 	}
 
-	internal sealed class Return : InterceptionAspect
+	internal static class Return
 	{
-		public static Return Instance { get; } = new Return();
-
-		public override InterceptionAction Handle(Invocation invocation, Mock mock)
+		public static InterceptionAction Handle(Invocation invocation, Mock mock)
 		{
 			Debug.Assert(invocation.Method != null);
 			Debug.Assert(invocation.Method.ReturnType != null);

@@ -7,22 +7,22 @@ namespace Moq
 	{
 		void IInterceptor.Intercept(Invocation invocation)
 		{
-			if (HandleWellKnownMethods.Instance.Handle(invocation, this) == InterceptionAction.Stop)
+			if (HandleWellKnownMethods.Handle(invocation, this) == InterceptionAction.Stop)
 			{
 				return;
 			}
 
-			if (RecordInvocation.Instance.Handle(invocation, this) == InterceptionAction.Stop)
+			if (RecordInvocation.Handle(invocation, this) == InterceptionAction.Stop)
 			{
 				return;
 			}
 
-			if (FindAndExecuteMatchingSetup.Instance.Handle(invocation, this) == InterceptionAction.Stop)
+			if (FindAndExecuteMatchingSetup.Handle(invocation, this) == InterceptionAction.Stop)
 			{
 				return;
 			}
 
-			if (Return.Instance.Handle(invocation, this) == InterceptionAction.Stop)
+			if (Return.Handle(invocation, this) == InterceptionAction.Stop)
 			{
 				return;
 			}
