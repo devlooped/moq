@@ -5,22 +5,26 @@ namespace Moq
 {
 	partial class Mock : IInterceptor
 	{
-		private static InterceptionAspect[] aspects = new InterceptionAspect[]
-		{
-			HandleWellKnownMethods.Instance,
-			RecordInvocation.Instance,
-			FindAndExecuteMatchingSetup.Instance,
-			Return.Instance,
-		};
-
 		void IInterceptor.Intercept(Invocation invocation)
 		{
-			foreach (var aspect in aspects)
+			if (HandleWellKnownMethods.Instance.Handle(invocation, this) == InterceptionAction.Stop)
 			{
-				if (aspect.Handle(invocation, this) == InterceptionAction.Stop)
-				{
-					break;
-				}
+				return;
+			}
+
+			if (RecordInvocation.Instance.Handle(invocation, this) == InterceptionAction.Stop)
+			{
+				return;
+			}
+
+			if (FindAndExecuteMatchingSetup.Instance.Handle(invocation, this) == InterceptionAction.Stop)
+			{
+				return;
+			}
+
+			if (Return.Instance.Handle(invocation, this) == InterceptionAction.Stop)
+			{
+				return;
 			}
 		}
 	}
