@@ -2,6 +2,7 @@
 // All rights reserved. Licensed under the BSD 3-Clause License; see License.txt.
 
 using System;
+using System.ComponentModel;
 using System.Diagnostics;
 using System.Globalization;
 
@@ -23,7 +24,11 @@ namespace Moq
 			this.kind = kind;
 		}
 
-		private void Deconstruct(out int from, out int to)
+		/// <summary>Deconstructs this instance.</summary>
+		/// <param name="from">This output parameter will receive the minimum required number of calls satisfying this instance (i.e. the lower inclusive bound).</param>
+		/// <param name="to">This output parameter will receive the maximum allowed number of calls satisfying this instance (i.e. the upper inclusive bound).</param>
+		[EditorBrowsable(EditorBrowsableState.Advanced)]
+		public void Deconstruct(out int from, out int to)
 		{
 			if (this.kind == default)
 			{

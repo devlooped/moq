@@ -181,6 +181,90 @@ namespace Moq.Tests
 			Assert.False(target.Verify(int.MaxValue));
 		}
 
+		public class Deconstruction
+		{
+			[Fact]
+			public void AtLeast_n_deconstructs_to_n_MaxValue()
+			{
+				const int n = 42;
+
+				var (from, to) = Times.AtLeast(n);
+				Assert.Equal(n, from);
+				Assert.Equal(int.MaxValue, to);
+			}
+
+			[Fact]
+			public void AtLeastOnce_deconstructs_to_1_MaxValue()
+			{
+				var (from, to) = Times.AtLeastOnce();
+				Assert.Equal(1, from);
+				Assert.Equal(int.MaxValue, to);
+			}
+
+			[Fact]
+			public void AtMost_n_deconstructs_to_0_n()
+			{
+				const int n = 42;
+
+				var (from, to) = Times.AtMost(n);
+				Assert.Equal(0, from);
+				Assert.Equal(n, to);
+			}
+
+			[Fact]
+			public void AtMostOnce_deconstructs_to_0_1()
+			{
+				var (from, to) = Times.AtMostOnce();
+				Assert.Equal(0, from);
+				Assert.Equal(1, to);
+			}
+
+			[Fact]
+			public void BetweenExclusive_n_m_deconstructs_to__n_plus_1__m_minus_1()
+			{
+				const int n = 13;
+				const int m = 42;
+				var (from, to) = Times.Between(n, m, Range.Exclusive);
+				Assert.Equal(n + 1, from);
+				Assert.Equal(m - 1, to);
+			}
+
+			[Fact]
+			public void BetweenInclusive_n_m_deconstructs_to_n_m()
+			{
+				const int n = 13;
+				const int m = 42;
+				var (from, to) = Times.Between(n, m, Range.Inclusive);
+				Assert.Equal(n, from);
+				Assert.Equal(m, to);
+			}
+
+			[Fact]
+			public void Exactly_n_deconstructs_to_n_n()
+			{
+				const int n = 42;
+				var (from, to) = Times.Exactly(n);
+				Assert.Equal(n, from);
+				Assert.Equal(n, to);
+			}
+
+			[Fact]
+			public void Once_deconstructs_to_1_1()
+			{
+				var (from, to) = Times.Once();
+				Assert.Equal(1, from);
+				Assert.Equal(1, to);
+			}
+
+			[Fact]
+			public void Never_deconstructs_to_0_0()
+			{
+				var (from, to) = Times.Never();
+				Assert.Equal(0, from);
+				Assert.Equal(0, to);
+			}
+		}
+
 		public class Equality
 		{
 #pragma warning disable xUnit2000 // Constants and literals should be the expected argument
