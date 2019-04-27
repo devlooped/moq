@@ -4,27 +4,23 @@
 using System;
 using System.Collections.Generic;
 using System.Linq;
-using System.Linq.Expressions;
-using System.Reflection;
 
 namespace Moq
 {
 	internal sealed class SetupCollection
 	{
-		// Using a stack has the advantage that enumeration returns the items in reverse order (last added to first added).
-		// This helps in implementing the rule that "given two matching setups, the last one wins."
-		private Stack<Setup> setups;
+		private List<Setup> setups;
 
 		public SetupCollection()
 		{
-			this.setups = new Stack<Setup>();
+			this.setups = new List<Setup>();
 		}
 
 		public void Add(Setup setup)
 		{
 			lock (this.setups)
 			{
-				this.setups.Push(setup);
+				this.setups.Add(setup);
 			}
 		}
 
@@ -56,8 +52,11 @@ namespace Moq
 
 			lock (this.setups)
 			{
-				foreach (var setup in this.setups)
+				// Iterating in reverse order because newer setups are more relevant than (i.e. override) older ones
+				for (int i = this.setups.Count - 1; i >= 0; --i)
 				{
+					var setup = this.setups[i];
+
 					// the following conditions are repetitive, but were written that way to avoid
 					// unnecessary expensive calls to `setup.Matches`; cheap tests are run first.
 					if (matchingSetup == null && setup.Matches(invocation))
@@ -91,8 +90,11 @@ namespace Moq
 
 			lock (this.setups)
 			{
-				foreach (var setup in this.setups)
+				// Iterating in reverse order because newer setups are more relevant than (i.e. override) older ones
+				for (int i = this.setups.Count - 1; i >= 0; --i)
 				{
+					var setup = this.setups[i];
+
 					if (setup.Condition != null)
 					{
 						continue;
