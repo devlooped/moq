@@ -10,10 +10,12 @@ namespace Moq
 	internal sealed class SetupCollection
 	{
 		private List<Setup> setups;
+		private uint overridden;  // bit mask for the first 32 setups flagging those known to be overridden
 
 		public SetupCollection()
 		{
 			this.setups = new List<Setup>();
+			this.overridden = 0U;
 		}
 
 		public void Add(Setup setup)
@@ -37,6 +39,7 @@ namespace Moq
 			lock (this.setups)
 			{
 				this.setups.Clear();
+				this.overridden = 0U;
 			}
 		}
 
@@ -55,6 +58,8 @@ namespace Moq
 				// Iterating in reverse order because newer setups are more relevant than (i.e. override) older ones
 				for (int i = this.setups.Count - 1; i >= 0; --i)
 				{
+					if (i < 32 && (this.overridden & (1U << i)) != 0) continue;
+
 					var setup = this.setups[i];
 
 					// the following conditions are repetitive, but were written that way to avoid
@@ -93,6 +98,8 @@ namespace Moq
 				// Iterating in reverse order because newer setups are more relevant than (i.e. override) older ones
 				for (int i = this.setups.Count - 1; i >= 0; --i)
 				{
+					if (i < 32 && (this.overridden & (1U << i)) != 0) continue;
+
 					var setup = this.setups[i];
 
 					if (setup.Condition != null)
@@ -104,6 +111,7 @@ namespace Moq
 					{
 						// A setup with the same expression has already been iterated over,
 						// meaning that this older setup is an overridden one.
+						if (i < 32) this.overridden |= 1U << i;
 						continue;
 					}
 
