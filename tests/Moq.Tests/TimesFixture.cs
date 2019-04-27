@@ -9,6 +9,15 @@ namespace Moq.Tests
 {
 	public class TimesFixture
 	{
+		[Theory]
+		[InlineData(0, false)]
+		[InlineData(1, true)]
+		[InlineData(int.MaxValue, true)]
+		public void default_ranges_between_one_and_MaxValue(int count, bool verifies)
+		{
+			Assert.Equal(verifies, default(Times).Verify(count));
+		}
+
 		[Fact]
 		public void AtLeastOnceRangesBetweenOneAndMaxValue()
 		{
@@ -174,6 +183,20 @@ namespace Moq.Tests
 
 		public class Equality
 		{
+#pragma warning disable xUnit2000 // Constants and literals should be the expected argument
+			[Fact]
+			public void default_Equals_AtLeastOnce()
+			{
+				Assert.Equal(Times.AtLeastOnce(), default(Times));
+			}
+#pragma warning restore xUnit2000
+
+			[Fact]
+			public void default_GetHashCode_equals_AtLeastOnce_GetHashCode()
+			{
+				Assert.Equal(Times.AtLeastOnce().GetHashCode(), default(Times).GetHashCode());
+			}
+
 			[Fact]
 			public void AtMostOnce_equals_Between_0_1_inclusive()
 			{
