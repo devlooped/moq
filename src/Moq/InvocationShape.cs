@@ -195,20 +195,34 @@ namespace Moq
 
 		private bool IsExplicitlyImplementedBy(TypeInfo typeInfo)
 		{
-			if (!this.explicitMappingCache.TryGetValue(typeInfo, out var isExplicit))
-			{
-				var methodTypeInfo = this.Method.DeclaringType.GetTypeInfo();
+			bool isExplicit = false;
 
-				if (!methodTypeInfo.IsInterface || typeInfo.IsInterface)
+			lock (this.explicitMappingCache)
+			{
+				if (this.explicitMappingCache.TryGetValue(typeInfo, out isExplicit))
 				{
-					isExplicit = false;
+					return isExplicit;
+				}
+			}
+
+			var methodTypeInfo = this.Method.DeclaringType.GetTypeInfo();
+
+			if (!methodTypeInfo.IsInterface || typeInfo.IsInterface)
+			{
+				lock (this.explicitMappingCache)
+				{
+					isExplicit = false;				
 					this.explicitMappingCache[typeInfo] = isExplicit;
 				}
-				else
+			}
+			else
+			{
+				var map = typeInfo.GetRuntimeInterfaceMap(methodTypeInfo);
+				var index = Array.IndexOf(map.InterfaceMethods, this.Method);
+
+				lock (this.explicitMappingCache)
 				{
-					var map = typeInfo.GetRuntimeInterfaceMap(methodTypeInfo);
-					var index = Array.IndexOf(map.InterfaceMethods, this.Method);
-					isExplicit = map.TargetMethods[index].IsPrivate;
+					isExplicit = map.TargetMethods[index].IsPrivate;				
 					this.explicitMappingCache[typeInfo] = isExplicit;
 				}
 			}
