@@ -5,6 +5,13 @@ All notable changes to this project will be documented in this file.
 The format is loosely based on [Keep a Changelog](http://keepachangelog.com/en/1.0.0/).
 
 
+## Unreleased
+
+#### Fixed
+
+* Regression: Unhelpful exception message when setting up an indexer with `SetupProperty` (@stakx, #823)
+
+
 ## 4.11.0-rc1 (2019-04-19)
 
 This is a pre-release version.

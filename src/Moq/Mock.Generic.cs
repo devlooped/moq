@@ -314,6 +314,10 @@ namespace Moq
 		{
 			Guard.NotNull(property, nameof(property));
 
+			var pi = property.ToPropertyInfo();
+			Guard.CanRead(pi);
+			Guard.CanWrite(pi);
+
 			TProperty value = initialValue;
 			this.SetupGet(property).Returns(() => value);
 			Mock.SetupSet(this, property.AssignItIsAny(), condition: null).SetCallbackResponse(new Action<TProperty>(p => value = p));
