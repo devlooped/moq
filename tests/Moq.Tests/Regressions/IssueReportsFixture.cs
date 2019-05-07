@@ -2545,6 +2545,32 @@ namespace Moq.Tests.Regressions
 
 		#endregion
 
+		#region 823
+
+		public class Issue823
+		{
+			public interface IX
+			{
+				string this[int index] { get;set; }
+			}
+
+			[Fact]
+			public void Setting_up_indexer_with_SetupProperty_throws_with_error_message_pointing_at_the_problem()
+			{
+				var mock = new Mock<IX>();
+				var ex = Assert.Throws<ArgumentException>(() => mock.SetupProperty(m => m[1]));
+				if (!string.IsNullOrEmpty(ex.ParamName))
+				{
+					Assert.Equal("property", ex.ParamName);
+				}
+				Assert.Contains("not a property", ex.Message);
+				// ^ To add some context for these tests, at one point the exception thrown read:
+				//   "Expression must be writeable", referring to a parameter "left".
+			}
+		}
+
+		#endregion
+
 		// Old @ Google Code
 
 		#region #47
