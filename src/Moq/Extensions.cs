@@ -63,6 +63,18 @@ namespace Moq
 			return method.IsSpecialName && method.Name.StartsWith("set_", StringComparison.Ordinal);
 		}
 
+		public static bool IsPropertyAccessor(this MethodInfo method)
+		{
+			return method.IsPropertyGetter()
+			       || method.IsPropertySetter();
+		}
+		
+		public static bool IsPropertyIndexerAccessor(this MethodInfo method)
+		{
+			return method.IsPropertyIndexerGetter()
+			       || method.IsPropertyIndexerSetter();
+		}
+
 		// NOTE: The following two methods used to first check whether `method.IsSpecialName` was set
 		// as a quick guard against non-event accessor methods. This was removed in commit 44070a90
 		// to "increase compatibility with F# and COM". More specifically:
@@ -220,56 +232,6 @@ namespace Moq
 			catch (AmbiguousMatchException)
 			{
 				return null;
-			}
-		}
-
-		/// <summary>
-		/// Gets all properties of the specified type in depth-first order.
-		/// That is, properties of the furthest ancestors are returned first,
-		/// and the type's own properties are returned last.
-		/// </summary>
-		/// <param name="type">The type whose properties are to be returned.</param>
-		internal static List<PropertyInfo> GetAllPropertiesInDepthFirstOrder(this Type type)
-		{
-			var properties = new List<PropertyInfo>();
-			var none = new HashSet<Type>();
-
-			type.AddPropertiesInDepthFirstOrderTo(properties, typesAlreadyVisited: none);
-
-			return properties;
-		}
-
-		/// <summary>
-		/// This is a helper method supporting <see cref="GetAllPropertiesInDepthFirstOrder(Type)"/>
-		/// and is not supposed to be called directly.
-		/// </summary>
-		private static void AddPropertiesInDepthFirstOrderTo(this Type type, List<PropertyInfo> properties, HashSet<Type> typesAlreadyVisited)
-		{
-			if (!typesAlreadyVisited.Contains(type))
-			{
-				// make sure we do not process properties of the current type twice:
-				typesAlreadyVisited.Add(type);
-
-				//// follow down axis 1: add properties of base class. note that this is currently
-				//// disabled, since it wasn't done previously and this can only result in changed
-				//// behavior.
-				//if (type.BaseType != null)
-				//{
-				//	type.BaseType.AddPropertiesInDepthFirstOrderTo(properties, typesAlreadyVisited);
-				//}
-
-				// follow down axis 2: add properties of inherited / implemented interfaces:
-				var superInterfaceTypes = type.GetInterfaces();
-				foreach (var superInterfaceType in superInterfaceTypes)
-				{
-					superInterfaceType.AddPropertiesInDepthFirstOrderTo(properties, typesAlreadyVisited);
-				}
-
-				// add own properties:
-				foreach (var property in type.GetProperties())
-				{
-					properties.Add(property);
-				}
 			}
 		}
 

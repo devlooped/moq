@@ -17,6 +17,11 @@ namespace Moq
 				return;
 			}
 
+			if (Switches.HasFlag(Switches.AutoSetupProperties))
+			{
+				HandleAutoSetupProperties.Handle(invocation, this);
+			}
+
 			RecordInvocation.Handle(invocation, this);
 
 			if (FindAndExecuteMatchingSetup.Handle(invocation, this))

@@ -5,6 +5,7 @@ using System;
 using System.Collections.Generic;
 using System.Diagnostics;
 using System.Linq;
+using System.Linq.Expressions;
 using System.Reflection;
 
 namespace Moq
@@ -329,6 +330,119 @@ namespace Moq
 				}
 				invocation.Return(returnValue);
 			}
+		}
+	}
+
+	internal static class HandleAutoSetupProperties
+	{
+		private static readonly int AccessorPrefixLength = "?et_".Length; // get_ or set_
+
+		public static void Handle(Invocation invocation, Mock mock)
+		{
+			MethodInfo invocationMethod = invocation.Method;
+			if (invocationMethod.IsPropertyAccessor() && !invocationMethod.IsPropertyIndexerAccessor())
+			{
+				if (mock.Setups.FindMatchFor(invocation) == null)
+				{
+					PropertyInfo property = GetPropertyFromAccessorMethod(mock, invocationMethod, out Type propertyHolderType);
+					var expression = GetPropertyExpression(propertyHolderType, property);
+					var getter = property.GetGetMethod(true);
+
+					object value = null;
+					bool valueNotSet = true;
+
+					mock.Setups.Add(new AutoImplementedPropertyGetterSetup(expression, getter, () =>
+					{
+						if (valueNotSet)
+						{
+							object initialValue;
+							Mock innerMock;
+							try
+							{
+								initialValue = mock.GetDefaultValue(getter, out innerMock,
+									useAlternateProvider: mock.DefaultValueProvider);
+							}
+							catch
+							{
+								// Since this method performs a batch operation, a single failure of the default value
+								// provider should not tear down the whole operation. The empty default value provider
+								// is a safe fallback because it does not throw.
+								initialValue = mock.GetDefaultValue(getter, out innerMock,
+									useAlternateProvider: DefaultValueProvider.Empty);
+							}
+
+							if (innerMock != null)
+							{
+								Mock.SetupAllProperties(innerMock);
+							}
+
+							value = initialValue;
+							valueNotSet = false;
+						}
+
+						return value;
+					}));
+
+					if (property.CanWrite)
+					{
+						mock.Setups.Add(new AutoImplementedPropertySetterSetup(expression, property.GetSetMethod(true),
+							(newValue) =>
+							{
+								value = newValue;
+								valueNotSet = false;
+							}));
+					}
+				}
+			}
+		}
+
+		private static PropertyInfo GetPropertyFromAccessorMethod(Mock mock, MethodInfo accessorMethod, out Type propertyHolderType)
+		{
+			string propertyNameToSearch = accessorMethod.Name.Substring(AccessorPrefixLength);
+			Type mockedType = mock.MockedType;
+			
+			PropertyInfo result = mockedType.GetProperty(propertyNameToSearch);
+			propertyHolderType = mockedType;
+
+			if (result == null)
+			{
+				if (mockedType.IsInterface)
+					result = SearchPropertyInInterfaces(mock.InheritedInterfaces, propertyNameToSearch, out _);
+				if (result == null)
+					result = SearchPropertyInInterfaces(mock.AdditionalInterfaces, propertyNameToSearch, out propertyHolderType);
+			}
+			
+			return result;
+		}
+
+		private static PropertyInfo SearchPropertyInInterfaces(IEnumerable<Type> interfaces, string propertyNameToSearch, out Type propertyHolderType)
+		{
+			foreach (Type @interface in interfaces)
+			{
+				PropertyInfo property = @interface.GetProperty(propertyNameToSearch);
+				if (property != null)
+				{
+					propertyHolderType = @interface;
+					return property;
+				}
+					
+				Type[] parentInterfaces = @interface.GetInterfaces();
+				if (parentInterfaces.Any())
+				{
+					property = SearchPropertyInInterfaces(parentInterfaces, propertyNameToSearch, out propertyHolderType);
+					if (property != null)
+						return property;
+				}
+			}
+
+			propertyHolderType = null;
+			return null;
+		}
+		
+		private static LambdaExpression GetPropertyExpression(Type mockType, PropertyInfo property)
+		{
+			var param = Expression.Parameter(mockType, "m");
+			return Expression.Lambda(Expression.MakeMemberAccess(param, property), param);
 		}
 	}
 }
