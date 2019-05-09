@@ -148,6 +148,17 @@ namespace Moq.Tests
 			mock.Object.Bar = new Bar { Value = 2 };
 			Assert.Equal(2, mock.Object.Bar.Value);
 		}
+		
+		[Fact]
+		public void Property_stubbed_by_SetupAllProperties_should_capture_default_value_behaviour()
+		{
+			var mock = new Mock<IFoo>() { DefaultValue = DefaultValue.Mock };
+			mock.SetupAllProperties();
+			mock.DefaultValue = DefaultValue.Empty;
+
+			mock.Object.Bar.Value = 5;
+			Assert.Equal(5, mock.Object.Bar.Value);
+		}
 
 		public abstract class WriteOnlyProperty
 		{
