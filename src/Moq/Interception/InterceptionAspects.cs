@@ -340,13 +340,14 @@ namespace Moq
 		public static void Handle(Invocation invocation, Mock mock)
 		{
 			MethodInfo invocationMethod = invocation.Method;
+			// Original implementation with eager setup skipped indexers too.
 			if (invocationMethod.IsPropertyAccessor() && !invocationMethod.IsPropertyIndexerAccessor())
 			{
 				if (mock.Setups.FindMatchFor(invocation) == null)
 				{
 					PropertyInfo property = GetPropertyFromAccessorMethod(mock, invocationMethod, out Type propertyHolderType);
 
-					// Should ignore write-only properties, as they will be handled by Return aspect
+					// Should ignore write-only properties, as they will be handled by Return aspect.
 					if (invocationMethod.IsPropertySetter() && !property.CanRead)
 					{
 						return;
@@ -408,13 +409,19 @@ namespace Moq
 			string propertyNameToSearch = accessorMethod.Name.Substring(AccessorPrefixLength);
 			Type mockedType = mock.MockedType;
 			
+			// Firstly try to search directly in mocked type.
 			PropertyInfo result = mockedType.GetProperty(propertyNameToSearch);
 			propertyHolderType = mockedType;
 
 			if (result == null)
 			{
+				// Interfaces do not simply return properties from base interfaces, so need to search there directly.
 				if (mockedType.IsInterface)
 					result = SearchPropertyInInterfaces(mock.InheritedInterfaces, propertyNameToSearch, out _);
+				// If there are additional interfaces applied via As<IInterface>, we also need to look there.
+				// At this point we need to capture interface type in which property was found. It is required to build
+				// property accessor expression later in GetPropertyExpression (mocked type can not be used in this case,
+				// since the property was found not in mocked type, but in additional interface.
 				if (result == null)
 					result = SearchPropertyInInterfaces(mock.AdditionalInterfaces, propertyNameToSearch, out propertyHolderType);
 			}
