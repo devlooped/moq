@@ -149,6 +149,20 @@ namespace Moq.Tests
 			Assert.Equal(2, mock.Object.Bar.Value);
 		}
 
+		public abstract class WriteOnlyProperty
+		{
+			public abstract string Test { set; }
+		}
+
+		[Fact]
+		public void Write_only_property_should_be_ignored_by_SetupAllProperties()
+		{
+			var mock = new Mock<WriteOnlyProperty>();
+			mock.SetupAllProperties();
+			
+			mock.Object.Test = "test";
+		}
+
 		private object GetValue() { return new object(); }
 
 		public interface IFoo
