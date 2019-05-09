@@ -502,7 +502,7 @@ namespace Moq
 		{
 			SetupAllProperties(mock, mock.DefaultValueProvider);
 		}
-		
+
 		internal static void SetupAllProperties(Mock mock, DefaultValueProvider defaultValueProvider)
 		{
 			mock.Switches |= Switches.AutoSetupProperties;

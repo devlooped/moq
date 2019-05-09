@@ -65,14 +65,12 @@ namespace Moq
 
 		public static bool IsPropertyAccessor(this MethodInfo method)
 		{
-			return method.IsPropertyGetter()
-			       || method.IsPropertySetter();
+			return method.IsPropertyGetter() || method.IsPropertySetter();
 		}
 		
 		public static bool IsPropertyIndexerAccessor(this MethodInfo method)
 		{
-			return method.IsPropertyIndexerGetter()
-			       || method.IsPropertyIndexerSetter();
+			return method.IsPropertyIndexerGetter() || method.IsPropertyIndexerSetter();
 		}
 
 		// NOTE: The following two methods used to first check whether `method.IsSpecialName` was set
