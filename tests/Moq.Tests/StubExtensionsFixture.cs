@@ -184,6 +184,15 @@ namespace Moq.Tests
 			mock.Object.Test = "test";
 		}
 
+		[Fact]
+		public void SetupAllProperties_should_enable_AutoSetupProperties_switch()
+		{
+			var mock = new Mock<IFoo>();
+			mock.SetupAllProperties();
+			
+			Assert.Equal(Switches.AutoSetupProperties, mock.Switches & Switches.AutoSetupProperties);
+		}
+
 		private object GetValue() { return new object(); }
 
 		public interface IFoo
