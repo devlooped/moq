@@ -367,7 +367,7 @@ namespace Moq
 							try
 							{
 								initialValue = mock.GetDefaultValue(getter, out innerMock,
-									useAlternateProvider: mock.DefaultValueProvider);
+									useAlternateProvider: mock.AutoSetupPropertiesDefaultValueProvider);
 							}
 							catch
 							{

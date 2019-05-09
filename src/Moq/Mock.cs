@@ -171,6 +171,12 @@ namespace Moq
 		/// e. g. to produce default return values for unexpected invocations.
 		/// </summary>
 		public abstract DefaultValueProvider DefaultValueProvider { get; set; }
+		
+		/// <summary>
+		/// Used to capture <see cref="DefaultValueProvider"/> at the moment of call <see cref="SetupAllProperties"/>
+		/// to align new "on-demand" implementation with existing behaviour.
+		/// </summary>
+		internal DefaultValueProvider AutoSetupPropertiesDefaultValueProvider { get; private set; } 
 
 		internal abstract SetupCollection Setups { get; }
 
@@ -495,6 +501,13 @@ namespace Moq
 		internal static void SetupAllProperties(Mock mock)
 		{
 			mock.Switches |= Switches.AutoSetupProperties;
+
+			mock.AutoSetupPropertiesDefaultValueProvider = mock.DefaultValueProvider;
+			// `SetupAllProperties` no longer performs property setup like in previous versions.
+			// Instead it just enables a switch to setup properties on-demand at the moment of first access.
+			// In order for `SetupAllProperties`'s new mode of operation to be indistinguishable
+			// from how it worked previously, it's important to capture the default value provider at this precise
+			// moment, since it might be changed later (before queries to properties).
 		}
 
 		#endregion

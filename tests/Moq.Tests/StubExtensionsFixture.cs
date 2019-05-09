@@ -150,7 +150,7 @@ namespace Moq.Tests
 		}
 		
 		[Fact]
-		public void Property_stubbed_by_SetupAllProperties_should_capture_default_value_behaviour()
+		public void Property_stubbed_by_SetupAllProperties_should_capture_DefaultValue_behaviour()
 		{
 			var mock = new Mock<IFoo>() { DefaultValue = DefaultValue.Mock };
 			mock.SetupAllProperties();
