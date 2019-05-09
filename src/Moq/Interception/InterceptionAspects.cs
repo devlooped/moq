@@ -345,8 +345,15 @@ namespace Moq
 				if (mock.Setups.FindMatchFor(invocation) == null)
 				{
 					PropertyInfo property = GetPropertyFromAccessorMethod(mock, invocationMethod, out Type propertyHolderType);
-					var expression = GetPropertyExpression(propertyHolderType, property);
+
+					// Should ignore write-only properties, as they will be handled by Return aspect
+					if (invocationMethod.IsPropertySetter() && !property.CanRead)
+					{
+						return;
+					}
+					
 					var getter = property.GetGetMethod(true);
+					var expression = GetPropertyExpression(propertyHolderType, property);
 
 					object value = null;
 					bool valueNotSet = true;
