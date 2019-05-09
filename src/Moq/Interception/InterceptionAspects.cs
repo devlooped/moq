@@ -380,7 +380,7 @@ namespace Moq
 
 							if (innerMock != null)
 							{
-								Mock.SetupAllProperties(innerMock);
+								Mock.SetupAllProperties(innerMock, mock.AutoSetupPropertiesDefaultValueProvider);
 							}
 
 							value = initialValue;

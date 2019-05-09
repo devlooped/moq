@@ -500,10 +500,15 @@ namespace Moq
 
 		internal static void SetupAllProperties(Mock mock)
 		{
+			SetupAllProperties(mock, mock.DefaultValueProvider);
+		}
+		
+		internal static void SetupAllProperties(Mock mock, DefaultValueProvider defaultValueProvider)
+		{
 			mock.Switches |= Switches.AutoSetupProperties;
 
-			mock.AutoSetupPropertiesDefaultValueProvider = mock.DefaultValueProvider;
-			// `SetupAllProperties` no longer performs property setup like in previous versions.
+			mock.AutoSetupPropertiesDefaultValueProvider = defaultValueProvider;
+			// `SetupAllProperties` no longer performs properties setup like in previous versions.
 			// Instead it just enables a switch to setup properties on-demand at the moment of first access.
 			// In order for `SetupAllProperties`'s new mode of operation to be indistinguishable
 			// from how it worked previously, it's important to capture the default value provider at this precise

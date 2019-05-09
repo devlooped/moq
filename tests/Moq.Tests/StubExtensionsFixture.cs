@@ -159,6 +159,16 @@ namespace Moq.Tests
 			mock.Object.Bar.Value = 5;
 			Assert.Equal(5, mock.Object.Bar.Value);
 		}
+		
+		[Fact]
+		public void Property_stubbed_by_SetupAllProperties_should_capture_DefaultValue_behaviour_for_inner_mocks()
+		{
+			var mock = new Mock<IHierarchy>() { DefaultValue = DefaultValue.Mock };
+			mock.SetupAllProperties();
+			mock.DefaultValue = DefaultValue.Empty;
+
+			Assert.NotNull(mock.Object.Hierarchy.Hierarchy);
+		}
 
 		public abstract class WriteOnlyProperty
 		{
