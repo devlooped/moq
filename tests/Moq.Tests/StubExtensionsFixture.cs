@@ -192,6 +192,42 @@ namespace Moq.Tests
 			
 			Assert.Equal(Switches.AutoSetupProperties, mock.Switches & Switches.AutoSetupProperties);
 		}
+		
+		public interface IWithReadOnlyProperty
+		{
+			string WriteAccessInDerived { get; }
+		}
+
+		public abstract class AddWriteAccessToInterface : IWithReadOnlyProperty
+		{
+			public abstract string WriteAccessInDerived { get; set; }
+		}
+
+		[Fact]
+		public void SetupAllProperties_should_setup_properties_from_interface_with_write_access_added_in_derived()
+		{
+			var mock = new Mock<AddWriteAccessToInterface>();
+			mock.SetupAllProperties();
+			IWithReadOnlyProperty asInterface = mock.Object;
+
+			mock.Object.WriteAccessInDerived = "test";
+			
+			Assert.Equal("test", mock.Object.WriteAccessInDerived);
+			Assert.Equal("test", asInterface.WriteAccessInDerived);
+		}
+		
+		[Fact]
+		public void SetupAllProperties_should_setup_properties_from_interface_with_write_access_added_in_derived_if_interface_is_reimplemented()
+		{
+			var mock = new Mock<AddWriteAccessToInterface>();
+			mock.SetupAllProperties();
+			IWithReadOnlyProperty asReimplementedInterface = mock.As<IWithReadOnlyProperty>().Object;
+
+			mock.Object.WriteAccessInDerived = "test";
+			
+			Assert.Equal("test", mock.Object.WriteAccessInDerived);
+			Assert.Equal("test", asReimplementedInterface.WriteAccessInDerived);
+		}
 
 		private object GetValue() { return new object(); }
 
