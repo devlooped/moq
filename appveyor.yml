@@ -16,7 +16,6 @@ deploy:
   - provider: NuGet
     api_key:
       secure: 7MS5+XWaFchMXFqzgneQCqo9U0DlxiPXe/KWWUnbCBDEizVn06EjdQZkWu1gbNOJ
-    artifact: Package
     on:
       appveyor_repo_tag: true
 
@@ -24,5 +23,5 @@ nuget:
   project_feed: true
 
 artifacts:
-  - path: out\*.nupkg
-    name: Package
+  - path: 'out\*.nupkg'
+  - path: 'out\*.snupkg'
