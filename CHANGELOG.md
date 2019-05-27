@@ -7,6 +7,10 @@ The format is loosely based on [Keep a Changelog](http://keepachangelog.com/en/1
 
 ## Unreleased
 
+#### Changed
+
+* Debug symbols (`Moq.pdb`) have moved into a separate NuGet symbol package (as per the current official [guideline](https://docs.microsoft.com/en-us/nuget/create-packages/symbol-packages-snupkg)). If you want the Visual Studio debugger to step into Moq's source code, disable Just My Code, enable SourceLink, and configure [NuGet's symbol server](https://docs.microsoft.com/en-us/nuget/create-packages/symbol-packages-snupkg#nugetorg-symbol-server). (@stakx, #789)
+
 #### Fixed
 
 * Regression: Unhelpful exception message when setting up an indexer with `SetupProperty` (@stakx, #823)

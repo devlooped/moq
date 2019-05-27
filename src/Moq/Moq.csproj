@@ -9,7 +9,7 @@
 		<TargetFrameworks>net45;netstandard2.0</TargetFrameworks>
 		<AssemblyName>Moq</AssemblyName>
 		<DebugSymbols>True</DebugSymbols>
-		<DebugType>full</DebugType>
+		<DebugType>portable</DebugType>
 		<DocumentationFile>bin\$(Configuration)\$(TargetFramework)\$(AssemblyName).xml</DocumentationFile> 
 		<GenerateDocumentation>true</GenerateDocumentation>
 		<NoWarn>0419</NoWarn>
@@ -21,11 +21,20 @@
 
 	<PropertyGroup>
 		<!-- Properties related to NuGet packaging: -->
-		<IncludeBuildOutput>False</IncludeBuildOutput>
+		<IsPackable>True</IsPackable>
+		<PackageId>Moq</PackageId>
+		<Title>Moq: an enjoyable mocking library</Title>
+		<Description>Moq is the most popular and friendly mocking framework for .NET.</Description>
+		<PackageReleaseNotes>A changelog is available at https://github.com/moq/moq4/blob/master/CHANGELOG.md.</PackageReleaseNotes>
+		<Authors>Daniel Cazzulino, kzu</Authors>
+		<PackageLicenseUrl>https://raw.githubusercontent.com/moq/moq4/master/License.txt</PackageLicenseUrl>
+		<PackageRequireLicenseAcceptance>False</PackageRequireLicenseAcceptance>
 		<NoPackageAnalysis>True</NoPackageAnalysis>
-		<NuspecFile>Moq.nuspec</NuspecFile>
-		<NuspecBasePath>$(MSBuildThisFileDirectory)</NuspecBasePath>
 		<PackageOutputPath>$(OutputDirectory)</PackageOutputPath>
+		<PackageTags>moq;tdd;mocking;mocks;unittesting;agile;unittest</PackageTags>
+		<RepositoryUrl>https://github.com/moq/moq4</RepositoryUrl>
+		<IncludeSymbols>True</IncludeSymbols>
+		<SymbolPackageFormat>snupkg</SymbolPackageFormat>
 	</PropertyGroup>
 
 	<PropertyGroup Condition=" '$(TargetFramework)' == 'net45' ">
@@ -37,14 +46,9 @@
 
 	<ItemGroup>
 		<PackageReference Include="Castle.Core" Version="4.4.0" />
-		<PackageReference Include="IFluentInterface" Version="2.1.0" />
+		<PackageReference Include="IFluentInterface" Version="2.1.0" PrivateAssets="All" />
 		<PackageReference Include="System.Threading.Tasks.Extensions" Version="4.5.1" />
 		<PackageReference Include="TypeNameFormatter.Sources" Version="1.0.0" PrivateAssets="All" />
-	</ItemGroup>
-	<ItemGroup Condition=" '$(TargetFramework)' == 'net45' ">
-		<Reference Include="System" />
-		<Reference Include="System.Core" />
-		<Reference Include="System.Xml" />
 	</ItemGroup>
 
 	<ItemGroup>
