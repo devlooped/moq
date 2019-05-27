@@ -5,7 +5,9 @@ All notable changes to this project will be documented in this file.
 The format is loosely based on [Keep a Changelog](http://keepachangelog.com/en/1.0.0/).
 
 
-## Unreleased
+## 4.11.0-rc2 (2019-05-27)
+
+This is a pre-release version.
 
 #### Changed
 
