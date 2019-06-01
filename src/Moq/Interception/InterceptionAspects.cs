@@ -351,7 +351,8 @@ namespace Moq
 					return false;
 				}
 
-				// Should ignore write-only properties, as they will be handled by Return aspect.
+				// Should ignore write-only properties, as they will be handled by Return aspect
+				// unless if the mock is strict; for those, interception terminates by FailForStrictMock aspect.
 				if (invocationMethod.IsPropertySetter() && !property.CanRead)
 				{
 					return false;
