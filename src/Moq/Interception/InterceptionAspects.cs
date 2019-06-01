@@ -351,20 +351,18 @@ namespace Moq
 					return false;
 				}
 
-				// Should ignore write-only properties, as they will be handled by Return aspect
-				// unless if the mock is strict; for those, interception terminates by FailForStrictMock aspect.
-				if (invocationMethod.IsPropertySetter() && !property.CanRead)
-				{
-					return false;
-				}
-
-				var getter = property.GetGetMethod(true);
 				var expression = GetPropertyExpression(invocationMethod.DeclaringType, property);
 
-				object propertyValue = CreateInitialPropertyValue(mock, getter);
+				object propertyValue;
 
-				Setup getterSetup = new AutoImplementedPropertyGetterSetup(expression, getter, () => propertyValue);
-				mock.Setups.Add(getterSetup);
+				Setup getterSetup = null;
+				if (property.CanRead)
+				{
+					var getter = property.GetGetMethod(true);
+					propertyValue = CreateInitialPropertyValue(mock, getter);
+					getterSetup = new AutoImplementedPropertyGetterSetup(expression, getter, () => propertyValue);
+					mock.Setups.Add(getterSetup);
+				}
 
 				Setup setterSetup = null;
 				if (property.CanWrite)
