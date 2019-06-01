@@ -122,10 +122,6 @@ namespace Moq
 				matchedSetup.Execute(invocation);
 				return true;
 			}
-			else if (mock.Behavior == MockBehavior.Strict)
-			{
-				throw MockException.NoSetup(invocation);
-			}
 			else
 			{
 				return false;
@@ -337,71 +333,84 @@ namespace Moq
 	{
 		private static readonly int AccessorPrefixLength = "?et_".Length; // get_ or set_
 
-		public static void Handle(Invocation invocation, Mock mock)
+		public static bool Handle(Invocation invocation, Mock mock)
 		{
+			if (!mock.Switches.HasFlag(Switches.AutoSetupProperties))
+			{
+				return false;
+			}
+			
 			MethodInfo invocationMethod = invocation.Method;
-			// Original implementation with eager setup skipped indexers too.
 			if (invocationMethod.IsPropertyAccessor() && !invocationMethod.IsPropertyIndexerAccessor())
 			{
-				if (mock.Setups.FindMatchFor(invocation) == null)
+				PropertyInfo property = GetPropertyFromAccessorMethod(mock, invocationMethod, out Type propertyHolderType);
+
+				if (property == null)
 				{
-					PropertyInfo property = GetPropertyFromAccessorMethod(mock, invocationMethod, out Type propertyHolderType);
-
-					// Should ignore write-only properties, as they will be handled by Return aspect.
-					if (invocationMethod.IsPropertySetter() && !property.CanRead)
-					{
-						return;
-					}
-					
-					var getter = property.GetGetMethod(true);
-					var expression = GetPropertyExpression(propertyHolderType, property);
-
-					object value = null;
-					bool valueNotSet = true;
-
-					mock.Setups.Add(new AutoImplementedPropertyGetterSetup(expression, getter, () =>
-					{
-						if (valueNotSet)
-						{
-							object initialValue;
-							Mock innerMock;
-							try
-							{
-								initialValue = mock.GetDefaultValue(getter, out innerMock,
-									useAlternateProvider: mock.AutoSetupPropertiesDefaultValueProvider);
-							}
-							catch
-							{
-								// Since this method performs a batch operation, a single failure of the default value
-								// provider should not tear down the whole operation. The empty default value provider
-								// is a safe fallback because it does not throw.
-								initialValue = mock.GetDefaultValue(getter, out innerMock,
-									useAlternateProvider: DefaultValueProvider.Empty);
-							}
-
-							if (innerMock != null)
-							{
-								Mock.SetupAllProperties(innerMock, mock.AutoSetupPropertiesDefaultValueProvider);
-							}
-
-							value = initialValue;
-							valueNotSet = false;
-						}
-
-						return value;
-					}));
-
-					if (property.CanWrite)
-					{
-						mock.Setups.Add(new AutoImplementedPropertySetterSetup(expression, property.GetSetMethod(true),
-							(newValue) =>
-							{
-								value = newValue;
-								valueNotSet = false;
-							}));
-					}
+					return false;
 				}
+
+				// Should ignore write-only properties, as they will be handled by Return aspect.
+				if (invocationMethod.IsPropertySetter() && !property.CanRead)
+				{
+					return false;
+				}
+
+				var getter = property.GetGetMethod(true);
+				var expression = GetPropertyExpression(propertyHolderType, property);
+
+				object propertyValue = CreateInitialPropertyValue(mock, getter);
+
+				Setup getterSetup = new AutoImplementedPropertyGetterSetup(expression, getter, () => propertyValue);
+				mock.Setups.Add(getterSetup);
+
+				Setup setterSetup = null;
+				if (property.CanWrite)
+				{
+					MethodInfo setter = property.GetSetMethod(nonPublic: true);
+					setterSetup = new AutoImplementedPropertySetterSetup(expression, setter, (newValue) =>
+					{
+						propertyValue = newValue;
+					});
+					mock.Setups.Add(setterSetup);
+				}
+
+				Setup setupToExecute = invocationMethod.IsPropertyGetter() ? getterSetup : setterSetup;
+				setupToExecute.Execute(invocation);
+
+				return true;
 			}
+			else
+			{
+				return false;
+			}
+		}
+
+		private static object CreateInitialPropertyValue(Mock mock, MethodInfo getter)
+		{
+			object initialValue;
+			Mock innerMock;
+			try
+			{
+				initialValue = mock.GetDefaultValue(getter, out innerMock, 
+					useAlternateProvider: mock.AutoSetupPropertiesDefaultValueProvider);
+			}
+			catch
+			{
+				// TODO: revisit this catch
+				// Since this method performs a batch operation, a single failure of the default value
+				// provider should not tear down the whole operation. The empty default value provider
+				// is a safe fallback because it does not throw.
+				initialValue = mock.GetDefaultValue(getter, out innerMock,
+					useAlternateProvider: DefaultValueProvider.Empty);
+			}
+
+			if (innerMock != null)
+			{
+				Mock.SetupAllProperties(innerMock, mock.AutoSetupPropertiesDefaultValueProvider);
+			}
+
+			return initialValue;
 		}
 
 		private static PropertyInfo GetPropertyFromAccessorMethod(Mock mock, MethodInfo accessorMethod, out Type propertyHolderType)
@@ -457,6 +466,17 @@ namespace Moq
 		{
 			var param = Expression.Parameter(mockType, "m");
 			return Expression.Lambda(Expression.MakeMemberAccess(param, property), param);
+		}
+	}
+
+	internal static class FailForStrictMock
+	{
+		public static void Handle(Invocation invocation, Mock mock)
+		{
+			if (mock.Behavior == MockBehavior.Strict)
+			{
+				throw MockException.NoSetup(invocation);
+			}
 		}
 	}
 }
