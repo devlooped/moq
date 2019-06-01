@@ -185,10 +185,12 @@ namespace Moq.Tests
 			public abstract string Test { set; }
 		}
 
-		[Fact]
-		public void Write_only_property_should_be_ignored_by_SetupAllProperties()
+		[Theory]
+		[InlineData(MockBehavior.Strict)]
+		[InlineData(MockBehavior.Loose)]
+		public void SetupAllProperties_should_setup_write_only_properties(MockBehavior mockBehavior)
 		{
-			var mock = new Mock<WriteOnlyProperty>();
+			var mock = new Mock<WriteOnlyProperty>(mockBehavior);
 			mock.SetupAllProperties();
 			
 			mock.Object.Test = "test";
