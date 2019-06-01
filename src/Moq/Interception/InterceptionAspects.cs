@@ -343,7 +343,8 @@ namespace Moq
 			MethodInfo invocationMethod = invocation.Method;
 			if (invocationMethod.IsPropertyAccessor() && !invocationMethod.IsPropertyIndexerAccessor())
 			{
-				PropertyInfo property = GetPropertyFromAccessorMethod(mock, invocationMethod, out Type propertyHolderType);
+				string propertyNameToSearch = invocationMethod.Name.Substring(AccessorPrefixLength);
+				PropertyInfo property = invocationMethod.DeclaringType.GetProperty(propertyNameToSearch);
 
 				if (property == null)
 				{
@@ -357,7 +358,7 @@ namespace Moq
 				}
 
 				var getter = property.GetGetMethod(true);
-				var expression = GetPropertyExpression(propertyHolderType, property);
+				var expression = GetPropertyExpression(invocationMethod.DeclaringType, property);
 
 				object propertyValue = CreateInitialPropertyValue(mock, getter);
 
@@ -413,55 +414,6 @@ namespace Moq
 			return initialValue;
 		}
 
-		private static PropertyInfo GetPropertyFromAccessorMethod(Mock mock, MethodInfo accessorMethod, out Type propertyHolderType)
-		{
-			string propertyNameToSearch = accessorMethod.Name.Substring(AccessorPrefixLength);
-			Type mockedType = mock.MockedType;
-			
-			// Firstly try to search directly in mocked type.
-			PropertyInfo result = mockedType.GetProperty(propertyNameToSearch);
-			propertyHolderType = mockedType;
-
-			if (result == null)
-			{
-				// Interfaces do not simply return properties from base interfaces, so need to search there directly.
-				if (mockedType.IsInterface)
-					result = SearchPropertyInInterfaces(mock.InheritedInterfaces, propertyNameToSearch, out _);
-				// If there are additional interfaces applied via As<IInterface>, we also need to look there.
-				// At this point we need to capture interface type in which property was found. It is required to build
-				// property accessor expression later in GetPropertyExpression (mocked type can not be used in this case,
-				// since the property was found not in mocked type, but in additional interface.
-				if (result == null)
-					result = SearchPropertyInInterfaces(mock.AdditionalInterfaces, propertyNameToSearch, out propertyHolderType);
-			}
-			
-			return result;
-		}
-
-		private static PropertyInfo SearchPropertyInInterfaces(IEnumerable<Type> interfaces, string propertyNameToSearch, out Type propertyHolderType)
-		{
-			foreach (Type @interface in interfaces)
-			{
-				PropertyInfo property = @interface.GetProperty(propertyNameToSearch);
-				if (property != null)
-				{
-					propertyHolderType = @interface;
-					return property;
-				}
-					
-				Type[] parentInterfaces = @interface.GetInterfaces();
-				if (parentInterfaces.Any())
-				{
-					property = SearchPropertyInInterfaces(parentInterfaces, propertyNameToSearch, out propertyHolderType);
-					if (property != null)
-						return property;
-				}
-			}
-
-			propertyHolderType = null;
-			return null;
-		}
-		
 		private static LambdaExpression GetPropertyExpression(Type mockType, PropertyInfo property)
 		{
 			var param = Expression.Parameter(mockType, "m");
