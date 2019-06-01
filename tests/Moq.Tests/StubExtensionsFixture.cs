@@ -148,6 +148,87 @@ namespace Moq.Tests
 			mock.Object.Bar = new Bar { Value = 2 };
 			Assert.Equal(2, mock.Object.Bar.Value);
 		}
+		
+		[Fact]
+		public void Property_stubbed_by_SetupAllProperties_should_capture_DefaultValue_behaviour()
+		{
+			var mock = new Mock<IFoo>() { DefaultValue = DefaultValue.Mock };
+			mock.SetupAllProperties();
+			mock.DefaultValue = DefaultValue.Empty;
+
+			mock.Object.Bar.Value = 5;
+			Assert.Equal(5, mock.Object.Bar.Value);
+		}
+		
+		[Fact]
+		public void Property_stubbed_by_SetupAllProperties_should_capture_DefaultValue_behaviour_for_inner_mocks()
+		{
+			var mock = new Mock<IHierarchy>() { DefaultValue = DefaultValue.Mock };
+			mock.SetupAllProperties();
+			mock.DefaultValue = DefaultValue.Empty;
+
+			Assert.NotNull(mock.Object.Hierarchy.Hierarchy);
+		}
+		
+		[Fact]
+		public void Property_stubbed_by_SetupAllProperties_should_use_parent_DefaultValue_behaviour_for_inner_mocks()
+		{
+			var mock = new Mock<IHierarchy>() { DefaultValue = DefaultValue.Mock };
+			mock.SetupAllProperties();
+			Mock.Get(mock.Object.Hierarchy).DefaultValue = DefaultValue.Empty;
+
+			Assert.NotNull(mock.Object.Hierarchy.Hierarchy);
+		}
+
+		public abstract class WriteOnlyProperty
+		{
+			public abstract string Test { set; }
+		}
+
+		[Fact]
+		public void Write_only_property_should_be_ignored_by_SetupAllProperties()
+		{
+			var mock = new Mock<WriteOnlyProperty>();
+			mock.SetupAllProperties();
+			
+			mock.Object.Test = "test";
+		}
+
+		public interface IWithReadOnlyProperty
+		{
+			string WriteAccessInDerived { get; }
+		}
+
+		public abstract class AddWriteAccessToInterface : IWithReadOnlyProperty
+		{
+			public abstract string WriteAccessInDerived { get; set; }
+		}
+
+		[Fact]
+		public void SetupAllProperties_should_setup_properties_from_interface_with_write_access_added_in_derived()
+		{
+			var mock = new Mock<AddWriteAccessToInterface>();
+			mock.SetupAllProperties();
+			IWithReadOnlyProperty asInterface = mock.Object;
+
+			mock.Object.WriteAccessInDerived = "test";
+			
+			Assert.Equal("test", mock.Object.WriteAccessInDerived);
+			Assert.Equal("test", asInterface.WriteAccessInDerived);
+		}
+		
+		[Fact]
+		public void SetupAllProperties_should_setup_properties_from_interface_with_write_access_added_in_derived_if_interface_is_reimplemented()
+		{
+			var mock = new Mock<AddWriteAccessToInterface>();
+			mock.SetupAllProperties();
+			IWithReadOnlyProperty asReimplementedInterface = mock.As<IWithReadOnlyProperty>().Object;
+
+			mock.Object.WriteAccessInDerived = "test";
+			
+			Assert.Equal("test", mock.Object.WriteAccessInDerived);
+			Assert.Equal("test", asReimplementedInterface.WriteAccessInDerived);
+		}
 
 		private object GetValue() { return new object(); }
 

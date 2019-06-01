@@ -23,6 +23,13 @@ namespace Moq
 			{
 				return;
 			}
+			
+			if (HandleAutoSetupProperties.Handle(invocation, this))
+			{
+				return;
+			}
+
+			FailForStrictMock.Handle(invocation, this);
 
 			Return.Handle(invocation, this);
 		}

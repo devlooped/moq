@@ -5,6 +5,7 @@ using System;
 using System.Collections.Generic;
 using System.Diagnostics;
 using System.Linq;
+using System.Linq.Expressions;
 using System.Reflection;
 
 namespace Moq
@@ -120,10 +121,6 @@ namespace Moq
 				// next line.
 				matchedSetup.Execute(invocation);
 				return true;
-			}
-			else if (mock.Behavior == MockBehavior.Strict)
-			{
-				throw MockException.NoSetup(invocation);
 			}
 			else
 			{
@@ -328,6 +325,96 @@ namespace Moq
 					mock.AddInnerMockSetup(invocation, returnValue);
 				}
 				invocation.Return(returnValue);
+			}
+		}
+	}
+
+	internal static class HandleAutoSetupProperties
+	{
+		private static readonly int AccessorPrefixLength = "?et_".Length; // get_ or set_
+
+		public static bool Handle(Invocation invocation, Mock mock)
+		{
+			if (mock.AutoSetupPropertiesDefaultValueProvider == null)
+			{
+				return false;
+			}
+			
+			MethodInfo invocationMethod = invocation.Method;
+			if (invocationMethod.IsPropertyAccessor() && !invocationMethod.IsPropertyIndexerAccessor())
+			{
+				string propertyNameToSearch = invocationMethod.Name.Substring(AccessorPrefixLength);
+				PropertyInfo property = invocationMethod.DeclaringType.GetProperty(propertyNameToSearch);
+
+				if (property == null)
+				{
+					return false;
+				}
+
+				// Should ignore write-only properties, as they will be handled by Return aspect
+				// unless if the mock is strict; for those, interception terminates by FailForStrictMock aspect.
+				if (invocationMethod.IsPropertySetter() && !property.CanRead)
+				{
+					return false;
+				}
+
+				var getter = property.GetGetMethod(true);
+				var expression = GetPropertyExpression(invocationMethod.DeclaringType, property);
+
+				object propertyValue = CreateInitialPropertyValue(mock, getter);
+
+				Setup getterSetup = new AutoImplementedPropertyGetterSetup(expression, getter, () => propertyValue);
+				mock.Setups.Add(getterSetup);
+
+				Setup setterSetup = null;
+				if (property.CanWrite)
+				{
+					MethodInfo setter = property.GetSetMethod(nonPublic: true);
+					setterSetup = new AutoImplementedPropertySetterSetup(expression, setter, (newValue) =>
+					{
+						propertyValue = newValue;
+					});
+					mock.Setups.Add(setterSetup);
+				}
+
+				Setup setupToExecute = invocationMethod.IsPropertyGetter() ? getterSetup : setterSetup;
+				setupToExecute.Execute(invocation);
+
+				return true;
+			}
+			else
+			{
+				return false;
+			}
+		}
+
+		private static object CreateInitialPropertyValue(Mock mock, MethodInfo getter)
+		{
+			object initialValue = mock.GetDefaultValue(getter, out Mock innerMock, 
+				useAlternateProvider: mock.AutoSetupPropertiesDefaultValueProvider);
+
+			if (innerMock != null)
+			{
+				Mock.SetupAllProperties(innerMock, mock.AutoSetupPropertiesDefaultValueProvider);
+			}
+
+			return initialValue;
+		}
+
+		private static LambdaExpression GetPropertyExpression(Type mockType, PropertyInfo property)
+		{
+			var param = Expression.Parameter(mockType, "m");
+			return Expression.Lambda(Expression.MakeMemberAccess(param, property), param);
+		}
+	}
+
+	internal static class FailForStrictMock
+	{
+		public static void Handle(Invocation invocation, Mock mock)
+		{
+			if (mock.Behavior == MockBehavior.Strict)
+			{
+				throw MockException.NoSetup(invocation);
 			}
 		}
 	}

@@ -172,6 +172,8 @@ namespace Moq
 			set => this.defaultValueProvider = value ?? throw new ArgumentNullException(nameof(value));
 		}
 
+		internal override DefaultValueProvider AutoSetupPropertiesDefaultValueProvider { get; set; }
+
 		internal override EventHandlerCollection EventHandlers => this.eventHandlers;
 
 		internal override List<Type> AdditionalInterfaces => this.additionalInterfaces;

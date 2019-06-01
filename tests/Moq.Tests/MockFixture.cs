@@ -1250,12 +1250,12 @@ namespace Moq.Tests
 		}
 
 		[Fact]
-		public void Setting_up_property_of_bad_serializable_type_with_SetupAllProperties_does_not_throw()
+		public void Accessing_property_of_bad_serializable_type_after_SetupAllProperties_throws()
 		{
 			var mock = new Mock<IHaveBadSerializableProperty>() { DefaultValue = DefaultValue.Mock };
 			mock.SetupAllProperties();
 
-			Assert.Null(mock.Object.BadSerializable);
+			Assert.ThrowsAny<Exception>(() => mock.Object.BadSerializable);
 		}
 #endif
 	}
