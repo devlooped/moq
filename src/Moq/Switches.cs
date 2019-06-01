@@ -21,11 +21,6 @@ namespace Moq
 		/// When enabled, specifies that source file information should be collected for each setup.
 		/// This results in more helpful error messages, but may affect performance.
 		/// </summary>
-		CollectDiagnosticFileInfoForSetups = 1 << 0,
-		
-		/// <summary>
-		/// When enabled, accesses to properties without a setup will cause a setup to be added on-demand.
-		/// </summary>
-		AutoSetupProperties = 1 << 1
+		CollectDiagnosticFileInfoForSetups = 1 << 0
 	}
 }

@@ -335,7 +335,7 @@ namespace Moq
 
 		public static bool Handle(Invocation invocation, Mock mock)
 		{
-			if (!mock.Switches.HasFlag(Switches.AutoSetupProperties))
+			if (mock.AutoSetupPropertiesDefaultValueProvider == null)
 			{
 				return false;
 			}
