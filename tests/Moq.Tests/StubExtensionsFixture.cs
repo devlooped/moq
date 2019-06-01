@@ -169,6 +169,16 @@ namespace Moq.Tests
 
 			Assert.NotNull(mock.Object.Hierarchy.Hierarchy);
 		}
+		
+		[Fact]
+		public void Property_stubbed_by_SetupAllProperties_should_use_parent_DefaultValue_behaviour_for_inner_mocks()
+		{
+			var mock = new Mock<IHierarchy>() { DefaultValue = DefaultValue.Mock };
+			mock.SetupAllProperties();
+			Mock.Get(mock.Object.Hierarchy).DefaultValue = DefaultValue.Empty;
+
+			Assert.NotNull(mock.Object.Hierarchy.Hierarchy);
+		}
 
 		public abstract class WriteOnlyProperty
 		{
