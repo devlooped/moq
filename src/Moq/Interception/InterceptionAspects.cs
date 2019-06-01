@@ -390,22 +390,8 @@ namespace Moq
 
 		private static object CreateInitialPropertyValue(Mock mock, MethodInfo getter)
 		{
-			object initialValue;
-			Mock innerMock;
-			try
-			{
-				initialValue = mock.GetDefaultValue(getter, out innerMock, 
-					useAlternateProvider: mock.AutoSetupPropertiesDefaultValueProvider);
-			}
-			catch
-			{
-				// TODO: revisit this catch
-				// Since this method performs a batch operation, a single failure of the default value
-				// provider should not tear down the whole operation. The empty default value provider
-				// is a safe fallback because it does not throw.
-				initialValue = mock.GetDefaultValue(getter, out innerMock,
-					useAlternateProvider: DefaultValueProvider.Empty);
-			}
+			object initialValue = mock.GetDefaultValue(getter, out Mock innerMock, 
+				useAlternateProvider: mock.AutoSetupPropertiesDefaultValueProvider);
 
 			if (innerMock != null)
 			{
