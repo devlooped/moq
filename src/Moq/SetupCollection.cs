@@ -34,6 +34,21 @@ namespace Moq
 			}
 		}
 
+		public void RemoveAll(Func<Setup, bool> predicate)
+		{
+			// Fast path (no `lock`) when there are no setups:
+			if (this.setups.Count == 0)
+			{
+				return;
+			}
+
+			lock (this.setups)
+			{
+				this.setups.RemoveAll(x => predicate(x));
+				this.overridden = 0U;
+			}
+		}
+
 		public void Clear()
 		{
 			lock (this.setups)

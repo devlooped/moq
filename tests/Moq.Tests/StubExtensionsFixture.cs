@@ -232,6 +232,32 @@ namespace Moq.Tests
 			Assert.Equal("test", asReimplementedInterface.WriteAccessInDerived);
 		}
 
+		[Fact]
+		public void SetupAllProperties_should_override_previous_SetupAllProperties()
+		{
+			var mock = new Mock<IBar>();
+
+			mock.SetReturnsDefault(1);
+			mock.SetupAllProperties();
+			Assert.Equal(1, mock.Object.Value);
+
+			mock.Object.Value = 2;
+
+			mock.SetupAllProperties();
+			Assert.Equal(1, mock.Object.Value);
+		}
+		
+		[Fact]
+		public void SetupAllProperties_should_override_regular_setups()
+		{
+			var mock = new Mock<IBar>();
+			mock.Setup(x => x.Value).Returns(1);
+
+			mock.SetupAllProperties();
+			
+			Assert.Equal(0, mock.Object.Value);
+		}
+
 		private object GetValue() { return new object(); }
 
 		public interface IFoo
