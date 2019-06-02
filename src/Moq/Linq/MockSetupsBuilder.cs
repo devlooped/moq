@@ -217,9 +217,11 @@ namespace Moq.Linq
 			var mockExpression = propertyCall.Object;
 			var propertyExpression = propertyCall.Arguments.First().StripQuotes();
 
-			// Because Mocks.CreateMocks (the underlying implementation of the IQueryable provider
-			// already sets up all properties as stubs, we can safely just set the value here, 
-			// which also allows the use of this querying capability against plain DTO even 
+			// We can safely just set the value here since `SetProperty` will temporarily enable auto-stubbing
+			// if the underlying `IQueryable` provider implementation hasn't already enabled it permanently by
+			// calling `SetupAllProperties`.
+			//
+			// This method also enables the use of this querying capability against plain DTO even
 			// if their properties are not virtual.
 			var setPropertyMethod = typeof(Mocks)
 				.GetMethod("SetProperty", BindingFlags.Static | BindingFlags.NonPublic)

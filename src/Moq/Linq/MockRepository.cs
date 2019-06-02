@@ -141,7 +141,10 @@ namespace Moq
 			do
 			{
 				var mock = this.Create<T>(behavior);
-				mock.SetupAllProperties();
+				if (behavior != MockBehavior.Strict)
+				{
+					mock.SetupAllProperties();
+				}
 
 				yield return mock.Object;
 			}

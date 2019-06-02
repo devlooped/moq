@@ -38,7 +38,10 @@ namespace Moq
 			// which involved a lot of avoidable `IQueryable` query provider overhead and lambda compilation.
 			// What it really boils down to is this (much faster) code:
 			var mock = new Mock<T>(behavior);
-			mock.SetupAllProperties();
+			if (behavior != MockBehavior.Strict)
+			{
+				mock.SetupAllProperties();
+			}
 			return mock.Object;
 		}
 

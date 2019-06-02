@@ -118,7 +118,10 @@ namespace Moq
 			do
 			{
 				var mock = new Mock<T>(behavior);
-				mock.SetupAllProperties();
+				if (behavior != MockBehavior.Strict)
+				{
+					mock.SetupAllProperties();
+				}
 
 				yield return mock.Object;
 			}
@@ -135,7 +138,30 @@ namespace Moq
 			var memberExpr = (MemberExpression)propertyReference.Body;
 			var member = (PropertyInfo)memberExpr.Member;
 
-			member.SetValue(target.Object, value, null);
+			// For strict mocks, we haven't called `SetupAllProperties` on the mock being set up.
+			// Therefore, whenever a property is being initialized, we quickly need to enable auto-stubbing.
+			//
+			// (One would think that it would be simpler to perform `SetupAllProperties` at the beginning
+			// and leave it enabled until the initialized mock is returned to the user. However, transforming
+			// the LINQ query such that a final disable of auto-stubbing happens is much more difficult!)
+
+			var temporaryAutoSetupProperties = target.AutoSetupPropertiesDefaultValueProvider == null;
+
+			if (temporaryAutoSetupProperties)
+			{
+				target.AutoSetupPropertiesDefaultValueProvider = target.DefaultValueProvider;
+			}
+			try
+			{
+				member.SetValue(target.Object, value, null);
+			}
+			finally
+			{
+				if (temporaryAutoSetupProperties)
+				{
+					target.AutoSetupPropertiesDefaultValueProvider = null;
+				}
+			}
 
 			return true;
 		}
