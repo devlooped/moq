@@ -25,7 +25,7 @@ namespace Moq
 		/// <typeparam name="T">The type of the mocked object to query.</typeparam>
 		public IQueryable<T> Of<T>() where T : class
 		{
-			return CreateMockQuery<T>();
+			return this.CreateMockQuery<T>(this.Behavior);
 		}
 
 		/// <summary>
@@ -37,7 +37,7 @@ namespace Moq
 		[SuppressMessage("Microsoft.Design", "CA1006:DoNotNestGenericTypesInMemberSignatures", Justification = "By design")]
 		public IQueryable<T> Of<T>(Expression<Func<T, bool>> specification) where T : class
 		{
-			return CreateMockQuery<T>().Where(specification);
+			return this.CreateMockQuery<T>(this.Behavior).Where(specification);
 		}
 
 		/// <summary>
@@ -48,7 +48,7 @@ namespace Moq
 		[EditorBrowsable(EditorBrowsableState.Never)]
 		public T OneOf<T>() where T : class
 		{
-			return CreateMockQuery<T>().First<T>();
+			return this.CreateMockQuery<T>(this.Behavior).First();
 		}
 
 		/// <summary>
@@ -61,26 +61,24 @@ namespace Moq
 		[EditorBrowsable(EditorBrowsableState.Never)]
 		public T OneOf<T>(Expression<Func<T, bool>> specification) where T : class
 		{
-			return CreateMockQuery<T>().First<T>(specification);
+			return this.CreateMockQuery<T>(this.Behavior).First(specification);
 		}
 
 		/// <summary>
 		/// Creates the mock query with the underlying queryable implementation.
 		/// </summary>
-		internal IQueryable<T> CreateMockQuery<T>() where T : class
+		internal IQueryable<T> CreateMockQuery<T>(MockBehavior behavior) where T : class
 		{
-			var method = ((Func<IQueryable<T>>)CreateQueryable<T>).GetMethodInfo();
-			return new MockQueryable<T>(Expression.Call(
-				Expression.Constant(this),
-				method));
+			var method = ((Func<MockBehavior, IQueryable<T>>)CreateQueryable<T>).GetMethodInfo();
+			return new MockQueryable<T>(Expression.Call(Expression.Constant(this), method, Expression.Constant(behavior)));
 		}
 
 		/// <summary>
 		/// Wraps the enumerator inside a queryable.
 		/// </summary>
-		internal IQueryable<T> CreateQueryable<T>() where T : class
+		internal IQueryable<T> CreateQueryable<T>(MockBehavior behavior) where T : class
 		{
-			return CreateMocks<T>().AsQueryable();
+			return this.CreateMocks<T>(behavior).AsQueryable();
 		}
 
 		/// <summary>
@@ -88,11 +86,11 @@ namespace Moq
 		/// transform the queryable query into a normal enumerable query.
 		/// This method is never used directly by consumers.
 		/// </summary>
-		private IEnumerable<T> CreateMocks<T>() where T : class
+		private IEnumerable<T> CreateMocks<T>(MockBehavior behavior) where T : class
 		{
 			do
 			{
-				var mock = this.Create<T>();
+				var mock = this.Create<T>(behavior);
 				mock.SetupAllProperties();
 
 				yield return mock.Object;

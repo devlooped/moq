@@ -26,7 +26,7 @@ namespace Moq
 		/// <typeparam name="T">The type of the mocked object to query.</typeparam>
 		public static IQueryable<T> Of<T>() where T : class
 		{
-			return CreateMockQuery<T>();
+			return Mocks.CreateMockQuery<T>(MockBehavior.Default);
 		}
 
 		/// <summary>
@@ -38,7 +38,7 @@ namespace Moq
 		[SuppressMessage("Microsoft.Design", "CA1006:DoNotNestGenericTypesInMemberSignatures", Justification = "By design")]
 		public static IQueryable<T> Of<T>(Expression<Func<T, bool>> specification) where T : class
 		{
-			return CreateMockQuery<T>().Where(specification);
+			return Mocks.CreateMockQuery<T>(MockBehavior.Default).Where(specification);
 		}
 
 		/// <summary>
@@ -70,19 +70,18 @@ namespace Moq
 		/// <summary>
 		/// Creates the mock query with the underlying queryable implementation.
 		/// </summary>
-		internal static IQueryable<T> CreateMockQuery<T>() where T : class
+		internal static IQueryable<T> CreateMockQuery<T>(MockBehavior behavior) where T : class
 		{
-			var method = ((Func<IQueryable<T>>)CreateQueryable<T>).GetMethodInfo();
-			return new MockQueryable<T>(Expression.Call(null,
-				method));
+			var method = ((Func<MockBehavior, IQueryable<T>>)CreateQueryable<T>).GetMethodInfo();
+			return new MockQueryable<T>(Expression.Call(method, Expression.Constant(behavior)));
 		}
 
 		/// <summary>
 		/// Wraps the enumerator inside a queryable.
 		/// </summary>
-		internal static IQueryable<T> CreateQueryable<T>() where T : class
+		internal static IQueryable<T> CreateQueryable<T>(MockBehavior behavior) where T : class
 		{
-			return CreateMocks<T>().AsQueryable();
+			return Mocks.CreateMocks<T>(behavior).AsQueryable();
 		}
 
 		/// <summary>
@@ -90,11 +89,11 @@ namespace Moq
 		/// transform the queryable query into a normal enumerable query.
 		/// This method is never used directly by consumers.
 		/// </summary>
-		private static IEnumerable<T> CreateMocks<T>() where T : class
+		private static IEnumerable<T> CreateMocks<T>(MockBehavior behavior) where T : class
 		{
 			do
 			{
-				var mock = new Mock<T>();
+				var mock = new Mock<T>(behavior);
 				mock.SetupAllProperties();
 
 				yield return mock.Object;

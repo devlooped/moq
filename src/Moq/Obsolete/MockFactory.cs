@@ -119,6 +119,11 @@ namespace Moq
 		}
 
 		/// <summary>
+		///   Gets the default <see cref="MockBehavior"/> of mocks created by this repository.
+		/// </summary>
+		internal MockBehavior Behavior => this.defaultBehavior;
+
+		/// <summary>
 		/// Whether the base member virtual implementation will be called 
 		/// for mocked classes if no setup is matched. Defaults to <see langword="false"/>.
 		/// </summary>

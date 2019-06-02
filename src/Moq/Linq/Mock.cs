@@ -26,7 +26,7 @@ namespace Moq
 			//
 			// which involved a lot of avoidable `IQueryable` query provider overhead and lambda compilation.
 			// What it really boils down to is this (much faster) code:
-			var mock = new Mock<T>();
+			var mock = new Mock<T>(MockBehavior.Default);
 			mock.SetupAllProperties();
 			return mock.Object;
 		}
@@ -40,7 +40,7 @@ namespace Moq
 		[SuppressMessage("Microsoft.Design", "CA1006:DoNotNestGenericTypesInMemberSignatures", Justification = "By Design")]
 		public static T Of<T>(Expression<Func<T, bool>> predicate) where T : class
 		{
-			var mocked = Mocks.CreateMockQuery<T>().First<T>(predicate);
+			var mocked = Mocks.CreateMockQuery<T>(MockBehavior.Default).First(predicate);
 
 			// The current implementation of LINQ to Mocks creates mocks that already have recorded invocations.
 			// Because this interferes with `VerifyNoOtherCalls`, we recursively clear all invocations before
