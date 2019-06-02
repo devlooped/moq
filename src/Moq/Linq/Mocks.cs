@@ -26,7 +26,18 @@ namespace Moq
 		/// <typeparam name="T">The type of the mocked object to query.</typeparam>
 		public static IQueryable<T> Of<T>() where T : class
 		{
-			return Mocks.CreateMockQuery<T>(MockBehavior.Default);
+			return Mocks.Of<T>(MockBehavior.Default);
+		}
+
+		/// <summary>
+		/// Access the universe of mocks of the given type, to retrieve those
+		/// that behave according to the LINQ query specification.
+		/// </summary>
+		/// <param name="behavior">Behavior of the mocks.</param>
+		/// <typeparam name="T">The type of the mocked object to query.</typeparam>
+		public static IQueryable<T> Of<T>(MockBehavior behavior) where T : class
+		{
+			return Mocks.CreateMockQuery<T>(behavior);
 		}
 
 		/// <summary>
@@ -38,7 +49,20 @@ namespace Moq
 		[SuppressMessage("Microsoft.Design", "CA1006:DoNotNestGenericTypesInMemberSignatures", Justification = "By design")]
 		public static IQueryable<T> Of<T>(Expression<Func<T, bool>> specification) where T : class
 		{
-			return Mocks.CreateMockQuery<T>(MockBehavior.Default).Where(specification);
+			return Mocks.Of<T>(specification, MockBehavior.Default);
+		}
+
+		/// <summary>
+		/// Access the universe of mocks of the given type, to retrieve those
+		/// that behave according to the LINQ query specification.
+		/// </summary>
+		/// <param name="specification">The predicate with the setup expressions.</param>
+		/// <param name="behavior">Behavior of the mocks.</param>
+		/// <typeparam name="T">The type of the mocked object to query.</typeparam>
+		[SuppressMessage("Microsoft.Design", "CA1006:DoNotNestGenericTypesInMemberSignatures", Justification = "By design")]
+		public static IQueryable<T> Of<T>(Expression<Func<T, bool>> specification, MockBehavior behavior) where T : class
+		{
+			return Mocks.CreateMockQuery<T>(behavior).Where(specification);
 		}
 
 		/// <summary>
