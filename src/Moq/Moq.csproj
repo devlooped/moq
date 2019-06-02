@@ -123,10 +123,6 @@
 			<DesignTime>True</DesignTime>
 			<DependentUpon>ReturnsExtensions.tt</DependentUpon>
 		</Compile>
-
-		<None Update="Times.xdoc">
-			<DependentUpon>Times.cs</DependentUpon>
-		</None>
 	</ItemGroup>
 
 	<Target Name="Test" />
