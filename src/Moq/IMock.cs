@@ -16,13 +16,20 @@ namespace Moq
 		[SuppressMessage("Microsoft.Naming", "CA1721:PropertyNamesShouldNotMatchGetMethods", Justification = "The public Object property is the only one visible to Moq consumers. The protected member is for internal use only.")]
 		T Object { get; }
 
-		/// <include file='Mock.xdoc' path='docs/doc[@for="Mock.Behavior"]/*'/>
+		/// <summary>
+		///   Behavior of the mock, according to the value set in the constructor.
+		/// </summary>
 		MockBehavior Behavior { get; }
 
-		/// <include file='Mock.xdoc' path='docs/doc[@for="Mock.CallBase"]/*'/>
+		/// <summary>
+		///   Whether the base member virtual implementation will be called for mocked classes if no setup is matched.
+		///   Defaults to <see langword="false"/>.
+		/// </summary>
 		bool CallBase { get; set; }
 
-		/// <include file='Mock.xdoc' path='docs/doc[@for="Mock.DefaultValue"]/*'/>
+		/// <summary>
+		///   Specifies the behavior to use when returning default values for unexpected invocations on loose mocks.
+		/// </summary>
 		DefaultValue DefaultValue { get; set; }
 	}
 }
