@@ -361,7 +361,6 @@ namespace Moq.Tests
 				setup();
 		}
 
-
 		[Fact]
 		public async Task ReturnsAsyncWithDelayReturnsValue()
 		{
@@ -458,7 +457,6 @@ namespace Moq.Tests
 			var exception = await Assert.ThrowsAsync<ArithmeticException>(test);
 			Assert.Equal("yikes", exception.Message);
 		}
-
 
 		[Fact]
 		public void ThrowsAsyncWithNullRandomGenerator()
@@ -780,7 +778,6 @@ namespace Moq.Tests
 				setup();
 		}
 
-
 		[Fact]
 		public async Task ValueTaskReturnsAsyncWithDelayReturnsValue()
 		{
@@ -880,7 +877,6 @@ namespace Moq.Tests
 			var exception = await Assert.ThrowsAsync<ArithmeticException>(() => test().AsTask());
 			Assert.Equal("yikes", exception.Message);
 		}
-
 
 		[Fact]
 		public void ValueTaskThrowsAsyncWithNullRandomGenerator()

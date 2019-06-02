@@ -387,7 +387,6 @@ namespace Moq.Tests
 			Assert.Throws<InvalidOperationException>(() => mock.Protected()
 				.Setup<FooBase>("Overloaded", ItExpr.IsAny<MyDerived>())
 				.Returns(new FooBase()));
-
 		}
 
 		[Fact]
@@ -645,10 +644,6 @@ namespace Moq.Tests
 
 			mock.Protected().VerifyGet<string>("ProtectedValue", Times.Exactly(2));
 		}
-	}
-
-	public partial class ProtectedMockFixture
-	{
 
 		[Fact]
 		public void ThrowsIfVerifySetNullPropertyName()

@@ -130,7 +130,6 @@ namespace Moq
 			return new MockException(MockExceptionReasons.NoMatchingCalls, message.TrimEnd().AppendLine().ToString());
 		}
 
-
 		/// <summary>
 		///   Returns the exception to be thrown when a strict mock has no setup corresponding to the specified invocation.
 		/// </summary>

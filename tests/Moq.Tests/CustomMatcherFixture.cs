@@ -65,7 +65,6 @@ namespace Moq.Tests
 			bool Do(int value);
 		}
 
-
 		[Fact]
 		public void Custom_matcher_property_appears_by_name_in_verification_error_message()
 		{

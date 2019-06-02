@@ -82,7 +82,6 @@ namespace Moq
 			}
 		}
 
-
 		/// <summary>
 		/// Ensures the given <paramref name="value"/> is not null.
 		/// Throws <see cref="ArgumentNullException"/> otherwise.

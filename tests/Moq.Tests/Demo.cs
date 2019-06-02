@@ -117,7 +117,6 @@ namespace Moq.Tests
 					IsFilled = true;
 				}
 			}
-
 		}
 	}
 }

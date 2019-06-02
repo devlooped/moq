@@ -293,7 +293,6 @@ namespace Moq.Tests
 				return new object[0];
 			}
 
-
 			public Guid GetGuid()
 			{
 				return default(Guid);

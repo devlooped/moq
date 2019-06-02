@@ -43,7 +43,6 @@ namespace Moq.Tests
 			Assert.Equal(mock.DefaultValue, barMock.DefaultValue);
 		}
 
-
 		[Fact]
 		public void CreatesMockForAccessedPropertyWithMethod()
 		{
@@ -416,7 +415,6 @@ namespace Moq.Tests
 
 		public class Foo : IFoo
 		{
-
 			public IBar BarField;
 			public IBar Bar { get; set; }
 			public IBar GetBar() { return null; }

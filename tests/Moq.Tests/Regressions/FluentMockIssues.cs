@@ -74,6 +74,5 @@ namespace Moq.Tests.Regressions
 			public virtual string SomeString { get; set; }
 		}
 #endif
-
 	}
 }

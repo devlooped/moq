@@ -239,7 +239,7 @@ namespace Moq.Tests
 		public void ShouldAttachToInheritedEvent()
 		{
 			var bar = new Mock<IDerived>(MockBehavior.Strict);
-			bar.Object.Event += (o, e) => { ;}; // Exception Fired here
+			bar.Object.Event += (o, e) => { }; // Exception Fired here
 		}
 
 		[Fact]
@@ -733,7 +733,6 @@ namespace Moq.Tests
 		public interface IDerived : IParent
 		{
 		}
-
 
 		public interface IInterfaceWithEvent
 		{

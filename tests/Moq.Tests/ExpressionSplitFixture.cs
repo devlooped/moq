@@ -350,7 +350,6 @@ namespace Moq.Tests
 
 		public interface IC
 		{
-
 		}
 
 		public delegate IB ADelegate();

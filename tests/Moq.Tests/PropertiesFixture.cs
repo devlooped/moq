@@ -27,7 +27,6 @@ namespace Moq.Tests
 			string Value { get; set; }
 		}
 
-
 		[Fact]
 		public void ShouldSupportMultipleIndexerGettersInFluentMock()
 		{
@@ -139,7 +138,6 @@ namespace Moq.Tests
 			Assert.NotEqual("mocked B", b); // it simply shouldn't be possible for Moq to intercept a sealed property;
 			Assert.NotNull(exception);      // and Moq should tell us by throwing an exception.
 		}
-
 
 		[Fact]
 		public void Cannot_Setup_virtual_but_sealed_property_that_implicitly_implements_a_property_from_inaccessible_interface()
