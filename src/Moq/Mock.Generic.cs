@@ -20,7 +20,7 @@ namespace Moq
 	/// <summary>
 	///   Provides a mock implementation of <typeparamref name="T"/>.
 	/// </summary>
-	/// <typeparam name="T">Type to mock, which can be an interface or a class.</typeparam>
+	/// <typeparam name="T">Type to mock, which can be an interface, a class, or a delegate.</typeparam>
 	/// <remarks>
 	///   Any interface type can be used for mocking, but for classes, only abstract and virtual members can be mocked.
 	///   <para>
