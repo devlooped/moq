@@ -14,6 +14,7 @@ The format is loosely based on [Keep a Changelog](http://keepachangelog.com/en/1
 #### Added
 
 * New method overload `sequenceSetup.ReturnsAsync(Func<T>)` (@stakx, #841)
+* LINQ to Mocks support for strict mocks, i.e. new method overloads for `Mock.Of`, `Mocks.Of`, `mockRepository.Of`, and `mockRepository.OneOf` that accept a `MockBehavior` parameter. (@stakx, #842)
 
 #### Fixed
 

@@ -57,11 +57,60 @@ namespace Moq.Tests.Linq
 
 				Assert.Equal("1", foo.Id);
 			}
+
+			[Fact]
+			public void Can_override_behavior_and_create_loose_mock()
+			{
+				var foo = this.repository.OneOf<IFoo>(MockBehavior.Loose);
+				Assert.Equal(MockBehavior.Loose, Mock.Get(foo).Behavior);
+				_ = foo.Id;
+			}
+		}
+
+		public class Strict_mocks
+		{
+			private MockRepository repository;
+
+			public Strict_mocks()
+			{
+				this.repository = new MockRepository(MockBehavior.Default);
+			}
+
+			[Fact]
+			public void Strict_Of_will_throw_for_non_setup_property()
+			{
+				var foo = this.repository.Of<IFoo>(MockBehavior.Strict).First();
+				Assert.Throws<MockException>(() => _ = foo.Name);
+			}
+
+			[Fact]
+			public void Strict_Of_with_expression_will_throw_for_non_setup_property()
+			{
+				var foo = this.repository.Of<IFoo>(f => f.Id == default, MockBehavior.Strict).First();
+				_ = foo.Id;
+				Assert.Throws<MockException>(() => _ = foo.Name);
+			}
+
+			[Fact]
+			public void Strict_OneOf_will_throw_for_non_setup_property()
+			{
+				var foo = this.repository.OneOf<IFoo>(MockBehavior.Strict);
+				Assert.Throws<MockException>(() => _ = foo.Name);
+			}
+
+			[Fact]
+			public void Strict_OneOf_with_expression_will_throw_for_non_setup_property()
+			{
+				var foo = this.repository.OneOf<IFoo>(f => f.Id == default, MockBehavior.Strict);
+				_ = foo.Id;
+				Assert.Throws<MockException>(() => _ = foo.Name);
+			}
 		}
 
 		public interface IFoo
 		{
 			string Id { get; set; }
+			string Name { get; set; }
 			bool Do();
 		}
 	}

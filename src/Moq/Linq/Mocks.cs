@@ -26,7 +26,18 @@ namespace Moq
 		/// <typeparam name="T">The type of the mocked object to query.</typeparam>
 		public static IQueryable<T> Of<T>() where T : class
 		{
-			return CreateMockQuery<T>();
+			return Mocks.Of<T>(MockBehavior.Default);
+		}
+
+		/// <summary>
+		/// Access the universe of mocks of the given type, to retrieve those
+		/// that behave according to the LINQ query specification.
+		/// </summary>
+		/// <param name="behavior">Behavior of the mocks.</param>
+		/// <typeparam name="T">The type of the mocked object to query.</typeparam>
+		public static IQueryable<T> Of<T>(MockBehavior behavior) where T : class
+		{
+			return Mocks.CreateMockQuery<T>(behavior);
 		}
 
 		/// <summary>
@@ -38,7 +49,20 @@ namespace Moq
 		[SuppressMessage("Microsoft.Design", "CA1006:DoNotNestGenericTypesInMemberSignatures", Justification = "By design")]
 		public static IQueryable<T> Of<T>(Expression<Func<T, bool>> specification) where T : class
 		{
-			return CreateMockQuery<T>().Where(specification);
+			return Mocks.Of<T>(specification, MockBehavior.Default);
+		}
+
+		/// <summary>
+		/// Access the universe of mocks of the given type, to retrieve those
+		/// that behave according to the LINQ query specification.
+		/// </summary>
+		/// <param name="specification">The predicate with the setup expressions.</param>
+		/// <param name="behavior">Behavior of the mocks.</param>
+		/// <typeparam name="T">The type of the mocked object to query.</typeparam>
+		[SuppressMessage("Microsoft.Design", "CA1006:DoNotNestGenericTypesInMemberSignatures", Justification = "By design")]
+		public static IQueryable<T> Of<T>(Expression<Func<T, bool>> specification, MockBehavior behavior) where T : class
+		{
+			return Mocks.CreateMockQuery<T>(behavior).Where(specification);
 		}
 
 		/// <summary>
@@ -70,19 +94,18 @@ namespace Moq
 		/// <summary>
 		/// Creates the mock query with the underlying queryable implementation.
 		/// </summary>
-		internal static IQueryable<T> CreateMockQuery<T>() where T : class
+		internal static IQueryable<T> CreateMockQuery<T>(MockBehavior behavior) where T : class
 		{
-			var method = ((Func<IQueryable<T>>)CreateQueryable<T>).GetMethodInfo();
-			return new MockQueryable<T>(Expression.Call(null,
-				method));
+			var method = ((Func<MockBehavior, IQueryable<T>>)CreateQueryable<T>).GetMethodInfo();
+			return new MockQueryable<T>(Expression.Call(method, Expression.Constant(behavior)));
 		}
 
 		/// <summary>
 		/// Wraps the enumerator inside a queryable.
 		/// </summary>
-		internal static IQueryable<T> CreateQueryable<T>() where T : class
+		internal static IQueryable<T> CreateQueryable<T>(MockBehavior behavior) where T : class
 		{
-			return CreateMocks<T>().AsQueryable();
+			return Mocks.CreateMocks<T>(behavior).AsQueryable();
 		}
 
 		/// <summary>
@@ -90,12 +113,15 @@ namespace Moq
 		/// transform the queryable query into a normal enumerable query.
 		/// This method is never used directly by consumers.
 		/// </summary>
-		private static IEnumerable<T> CreateMocks<T>() where T : class
+		private static IEnumerable<T> CreateMocks<T>(MockBehavior behavior) where T : class
 		{
 			do
 			{
-				var mock = new Mock<T>();
-				mock.SetupAllProperties();
+				var mock = new Mock<T>(behavior);
+				if (behavior != MockBehavior.Strict)
+				{
+					mock.SetupAllProperties();
+				}
 
 				yield return mock.Object;
 			}
@@ -112,7 +138,30 @@ namespace Moq
 			var memberExpr = (MemberExpression)propertyReference.Body;
 			var member = (PropertyInfo)memberExpr.Member;
 
-			member.SetValue(target.Object, value, null);
+			// For strict mocks, we haven't called `SetupAllProperties` on the mock being set up.
+			// Therefore, whenever a property is being initialized, we quickly need to enable auto-stubbing.
+			//
+			// (One would think that it would be simpler to perform `SetupAllProperties` at the beginning
+			// and leave it enabled until the initialized mock is returned to the user. However, transforming
+			// the LINQ query such that a final disable of auto-stubbing happens is much more difficult!)
+
+			var temporaryAutoSetupProperties = target.AutoSetupPropertiesDefaultValueProvider == null;
+
+			if (temporaryAutoSetupProperties)
+			{
+				target.AutoSetupPropertiesDefaultValueProvider = target.DefaultValueProvider;
+			}
+			try
+			{
+				member.SetValue(target.Object, value, null);
+			}
+			finally
+			{
+				if (temporaryAutoSetupProperties)
+				{
+					target.AutoSetupPropertiesDefaultValueProvider = null;
+				}
+			}
 
 			return true;
 		}
