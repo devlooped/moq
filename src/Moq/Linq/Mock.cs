@@ -14,7 +14,7 @@ namespace Moq
 	public partial class Mock
 	{
 		/// <summary>
-		/// Creates an mock object of the indicated type.
+		/// Creates a mock object of the indicated type.
 		/// </summary>
 		/// <typeparam name="T">The type of the mocked object.</typeparam>
 		/// <returns>The mocked object created.</returns>
@@ -24,7 +24,7 @@ namespace Moq
 		}
 
 		/// <summary>
-		/// Creates an mock object of the indicated type.
+		/// Creates a mock object of the indicated type.
 		/// </summary>
 		/// <param name="behavior">Behavior of the mock.</param>
 		/// <typeparam name="T">The type of the mocked object.</typeparam>
@@ -46,7 +46,7 @@ namespace Moq
 		}
 
 		/// <summary>
-		/// Creates an mock object of the indicated type.
+		/// Creates a mock object of the indicated type.
 		/// </summary>
 		/// <param name="predicate">The predicate with the specification of how the mocked object should behave.</param>
 		/// <typeparam name="T">The type of the mocked object.</typeparam>
@@ -58,7 +58,7 @@ namespace Moq
 		}
 
 		/// <summary>
-		/// Creates an mock object of the indicated type.
+		/// Creates a mock object of the indicated type.
 		/// </summary>
 		/// <param name="predicate">The predicate with the specification of how the mocked object should behave.</param>
 		/// <param name="behavior">Behavior of the mock.</param>

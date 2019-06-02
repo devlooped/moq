@@ -10,6 +10,15 @@ using Moq.Expressions.Visitors;
 
 namespace Moq
 {
+	/// <summary>
+	///   Allows creating custom value matchers that can be used on setups and verification,
+	///   completely replacing the built-in <see cref="It"/> class with your own
+	///   argument matching rules.
+	/// </summary>
+	/// <remarks>
+	///   Argument matching is used to determine whether a concrete invocation in the mock
+	///   matches a given setup. This matching mechanism is fully extensible.
+	/// </remarks>
 	/// <include file='Match.xdoc' path='docs/doc[@for="Match"]/*'/>
 	public abstract class Match : IMatcher
 	{
@@ -28,13 +37,25 @@ namespace Moq
 
 		internal Expression RenderExpression { get; set; }
 
-		/// <include file='Match.xdoc' path='docs/doc[@for="Match.Create{T}(condition)"]/*'/>
+		/// <summary>
+		///   Initializes the matcher with the condition that will be checked
+		///   in order to match invocation values.
+		/// </summary>
+		/// <param name="condition">The condition to match against actual values.</param>
 		public static T Create<T>(Predicate<T> condition)
 		{
 			return Create(new Match<T>(condition, () => Matcher<T>()));
 		}
 
-		/// <include file='Match.xdoc' path='docs/doc[@for="Match.Create{T}(condition,renderExpression"]/*'/>
+		/// <summary>
+		///   Initializes the matcher with the condition that will be checked
+		///   in order to match invocation values.
+		/// </summary>
+		/// <param name="condition">The condition to match against actual values.</param>
+		/// <param name="renderExpression">
+		///   A lambda representation of the matcher, to be used when rendering error messages,
+		///   such as <c>() => It.IsAny&lt;string&lt;()</c>.
+		/// </param>
 		[SuppressMessage("Microsoft.Design", "CA1006:DoNotNestGenericTypesInMemberSignatures")]
 		public static T Create<T>(Predicate<T> condition, Expression<Func<T>> renderExpression)
 		{
@@ -63,7 +84,12 @@ namespace Moq
 		}
 	}
 
-	/// <include file='Match.xdoc' path='docs/doc[@for="Match{T}"]/*'/>
+	/// <summary>
+	///   Allows creating custom value matchers that can be used on setups and verification,
+	///   completely replacing the built-in <see cref="It"/> class with your own
+	///   argument matching rules.
+	/// </summary>
+	/// <typeparam name="T">Type of the value to match.</typeparam>
 	public class Match<T> : Match, IEquatable<Match<T>>
 	{
 		internal Predicate<T> Condition { get; set; }
