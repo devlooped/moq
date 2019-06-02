@@ -26,9 +26,25 @@ namespace Moq
 		/// <summary>
 		/// Return a sequence of tasks, once per call.
 		/// </summary>
+		public static ISetupSequentialResult<Task<TResult>> ReturnsAsync<TResult>(this ISetupSequentialResult<Task<TResult>> setup, Func<TResult> valueFunction)
+		{
+			return setup.Returns(() => Task.FromResult(valueFunction()));
+		}
+
+		/// <summary>
+		/// Return a sequence of tasks, once per call.
+		/// </summary>
 		public static ISetupSequentialResult<ValueTask<TResult>> ReturnsAsync<TResult>(this ISetupSequentialResult<ValueTask<TResult>> setup, TResult value)
 		{
 			return setup.Returns(() => new ValueTask<TResult>(value));
+		}
+
+		/// <summary>
+		/// Return a sequence of tasks, once per call.
+		/// </summary>
+		public static ISetupSequentialResult<ValueTask<TResult>> ReturnsAsync<TResult>(this ISetupSequentialResult<ValueTask<TResult>> setup, Func<TResult> valueFunction)
+		{
+			return setup.Returns(() => new ValueTask<TResult>(valueFunction()));
 		}
 
 		/// <summary>
