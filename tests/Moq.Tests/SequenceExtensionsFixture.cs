@@ -2,6 +2,7 @@
 // All rights reserved. Licensed under the BSD 3-Clause License; see License.txt.
 
 using System;
+using System.Collections.Generic;
 using System.Threading.Tasks;
 
 using Xunit;
@@ -48,6 +49,30 @@ namespace Moq.Tests
 			{
 				Assert.IsType<InvalidOperationException>(ex.GetBaseException());
 			}
+		}
+
+		[Fact]
+		public async Task PerformSequenceAsync_ReturnsAsync_for_Task_with_value_function()
+		{
+			var mock = new Mock<IFoo>();
+			mock.SetupSequence(m => m.DoAsync())
+				.ReturnsAsync(() => 1)
+				.ReturnsAsync(() => 2);
+
+			Assert.Equal(1, await mock.Object.DoAsync());
+			Assert.Equal(2, await mock.Object.DoAsync());
+		}
+
+		[Fact]
+		public async Task PerformSequenceAsync_ReturnsAsync_for_ValueTask_with_value_function()
+		{
+			var mock = new Mock<IFoo>();
+			mock.SetupSequence(m => m.DoValueAsync())
+				.ReturnsAsync(() => 1)
+				.ReturnsAsync(() => 2);
+
+			Assert.Equal(1, await mock.Object.DoValueAsync());
+			Assert.Equal(2, await mock.Object.DoValueAsync());
 		}
 
 		[Fact]
@@ -173,6 +198,32 @@ namespace Moq.Tests
 		}
 
 		[Fact]
+		public async Task Func_are_invoked_deferred_for_Task()
+		{
+			var mock = new Mock<IFoo>();
+			var i = 0;
+			mock.SetupSequence(m => m.DoAsync())
+				.ReturnsAsync(() => i);
+
+			i++;
+
+			Assert.Equal(i, await mock.Object.DoAsync());
+		}
+
+		[Fact]
+		public async Task Func_are_invoked_deferred_for_ValueTask()
+		{
+			var mock = new Mock<IFoo>();
+			var i = 0;
+			mock.SetupSequence(m => m.DoValueAsync())
+				.ReturnsAsync(() => i);
+
+			i++;
+
+			Assert.Equal(i, await mock.Object.DoValueAsync());
+		}
+
+		[Fact]
 		public void Func_can_be_treated_as_return_value()
 		{
 			var mock = new Mock<IFoo>();
@@ -206,6 +257,8 @@ namespace Moq.Tests
 			int Do();
 
 			Task<int> DoAsync();
+
+			ValueTask<int> DoValueAsync();
 
 			Func<int> GetFunc();
 
