@@ -11,6 +11,10 @@ The format is loosely based on [Keep a Changelog](http://keepachangelog.com/en/1
 
 * Improved performance for `Mock.Of<T>` and `mock.SetupAllProperties()` as the latter now performs property setups just-in-time, instead of as an ahead-of-time batch operation. (@vanashimko, #826)
 
+#### Added
+
+* New method overload `sequenceSetup.ReturnsAsync(Func<T>)` (@stakx, #841)
+
 #### Fixed
 
 * `mock.SetupAllProperties()` now setups write-only properties for strict mocks, so that accessing such properties will not throw anymore. (@vanashimko, #836)
