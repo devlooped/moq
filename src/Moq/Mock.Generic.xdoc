@@ -1,18 +1,6 @@
 <?xml version="1.0" encoding="utf-8" ?>
 <docs xml:space="preserve">
 	<doc for="Mock{T}">
-		<summary>
-			Provides a mock implementation of <typeparamref name="T"/>.
-		</summary>
-		<remarks>
-			Any interface type can be used for mocking, but for classes, only abstract and virtual members can be mocked.
-			<para>
-				The behavior of the mock with regards to the setups and the actual calls is determined
-				by the optional <see cref="MockBehavior"/> that can be passed to the <see cref="Mock{T}(MockBehavior)"/>
-				constructor.
-			</para>
-		</remarks>
-		<typeparam name="T">Type to mock, which can be an interface or a class.</typeparam>
 		<example group="overview" order="0">
 			The following example shows establishing setups with specific values
 			for method invocations:
@@ -57,76 +45,26 @@
 		</example>
 	</doc>
 	<doc for="Mock{T}.ctor()">
-		<summary>
-			Initializes an instance of the mock with <see cref="MockBehavior.Default">default behavior</see>.
-		</summary>
 		<example>
 			<code>var mock = new Mock&lt;IFormatProvider&gt;();</code>
 		</example>
 	</doc>
 	<doc for="Mock{T}.ctor(object[])">
-		<summary>
-			Initializes an instance of the mock with <see cref="MockBehavior.Default">default behavior</see> and with
-			the given constructor arguments for the class. (Only valid when T is a class)
-		</summary>
-		<remarks>
-			The mock will try to find the best match constructor given the constructor arguments, and invoke that
-			to initialize the instance. This applies only for classes, not interfaces.
-		</remarks>
 		<example>
 			<code>var mock = new Mock&lt;MyProvider&gt;(someArgument, 25);</code>
 		</example>
-		<param name="args">Optional constructor arguments if the mocked type is a class.</param>
 	</doc>
 	<doc for="Mock{T}.ctor(MockBehavior)">
-		<summary>
-			Initializes an instance of the mock with the specified <see cref="MockBehavior">behavior</see>.
-		</summary>
 		<example>
 			<code>var mock = new Mock&lt;IFormatProvider&gt;(MockBehavior.Relaxed);</code>
 		</example>
-		<param name="behavior">Behavior of the mock.</param>
 	</doc>
 	<doc for="Mock{T}.ctor(MockBehavior,object[])">
-		<summary>
-			Initializes an instance of the mock with a specific <see cref="MockBehavior">behavior</see> with
-			the given constructor arguments for the class.
-		</summary>
-		<remarks>
-			The mock will try to find the best match constructor given the constructor arguments, and invoke that
-			to initialize the instance. This applies only to classes, not interfaces.
-		</remarks>
 		<example>
 			<code>var mock = new Mock&lt;MyProvider&gt;(someArgument, 25);</code>
 		</example>
-		<param name="behavior">Behavior of the mock.</param>
-		<param name="args">Optional constructor arguments if the mocked type is a class.</param>
-	</doc>
-	<doc for="Mock{T}.Object">
-		<summary>
-			Exposes the mocked object instance.
-		</summary>
-	</doc>
-	<doc for="Mock{T}.Name">
-		<summary>
-			Allows naming of your mocks, so they can be easily identified in error messages (e.g. from failed assertions).
-		</summary>
-	</doc>
-	<doc for="Mock{T}.ToString">
-		<summary>
-			Returns the name of the mock
-		</summary>
 	</doc>
 	<doc for="Mock{T}.Setup">
-		<summary>
-			Specifies a setup on the mocked type for a call
-			to a void method.
-		</summary>
-		<remarks>
-			If more than one setup is specified for the same method or property,
-			the latest one wins and is the one that will be executed.
-		</remarks>
-		<param name="expression">Lambda expression that specifies the expected method invocation.</param>
 		<example group="setups">
 			<code>
 				var mock = new Mock&lt;IProcessor&gt;();
@@ -135,16 +73,6 @@
 		</example>
 	</doc>
 	<doc for="Mock{T}.Setup{TResult}">
-		<summary>
-			Specifies a setup on the mocked type for a call
-			to a value returning method.
-		</summary>
-		<typeparam name="TResult">Type of the return value. Typically omitted as it can be inferred from the expression.</typeparam>
-		<remarks>
-			If more than one setup is specified for the same method or property,
-			the latest one wins and is the one that will be executed.
-		</remarks>
-		<param name="expression">Lambda expression that specifies the method invocation.</param>
 		<example group="setups">
 			<code>
 				mock.Setup(x =&gt; x.HasInventory("Talisker", 50)).Returns(true);
@@ -152,16 +80,6 @@
 		</example>
 	</doc>
 	<doc for="Mock{T}.SetupGet">
-		<summary>
-			Specifies a setup on the mocked type for a call
-			to a property getter.
-		</summary>
-		<remarks>
-			If more than one setup is set for the same property getter,
-			the latest one wins and is the one that will be executed.
-		</remarks>
-		<typeparam name="TProperty">Type of the property. Typically omitted as it can be inferred from the expression.</typeparam>
-		<param name="expression">Lambda expression that specifies the property getter.</param>
 		<example group="setups">
 			<code>
 				mock.SetupGet(x =&gt; x.Suspended)
@@ -170,20 +88,6 @@
 		</example>
 	</doc>
 	<doc for="Mock{T}.SetupSet{TProperty}">
-		<summary>
-			Specifies a setup on the mocked type for a call
-			to a property setter.
-		</summary>
-		<remarks>
-			If more than one setup is set for the same property setter,
-			the latest one wins and is the one that will be executed.
-			<para>
-				This overloads allows the use of a callback already
-				typed for the property type.
-			</para>
-		</remarks>
-		<typeparam name="TProperty">Type of the property. Typically omitted as it can be inferred from the expression.</typeparam>
-		<param name="setterExpression">The Lambda expression that sets a property to a value.</param>
 		<example group="setups">
 			<code>
 				mock.SetupSet(x =&gt; x.Suspended = true);
@@ -191,15 +95,6 @@
 		</example>
 	</doc>
 	<doc for="Mock{T}.SetupSet">
-		<summary>
-			Specifies a setup on the mocked type for a call
-			to a property setter.
-		</summary>
-		<remarks>
-			If more than one setup is set for the same property setter,
-			the latest one wins and is the one that will be executed.
-		</remarks>
-		<param name="setterExpression">Lambda expression that sets a property to a value.</param>
 		<example group="setups">
 			<code>
 				mock.SetupSet(x =&gt; x.Suspended = true);
@@ -207,17 +102,6 @@
 		</example>
 	</doc>
 	<doc for="Mock{T}.SetupProperty(property)">
-		<summary>
-			Specifies that the given property should have "property behavior",
-			meaning that setting its value will cause it to be saved and
-			later returned when the property is requested. (this is also
-			known as "stubbing").
-		</summary>
-		<typeparam name="TProperty">
-			Type of the property, inferred from the property
-			expression (does not need to be specified).
-		</typeparam>
-		<param name="property">Property expression to stub.</param>
 		<example>
 			If you have an interface with an int property <c>Value</c>, you might
 			stub it using the following straightforward call:
@@ -236,19 +120,6 @@
 		</example>
 	</doc>
 	<doc for="Mock{T}.SetupProperty(property,initialValue)">
-		<summary>
-			Specifies that the given property should have "property behavior",
-			meaning that setting its value will cause it to be saved and
-			later returned when the property is requested. This overload
-			allows setting the initial value for the property. (this is also
-			known as "stubbing").
-		</summary>
-		<typeparam name="TProperty">
-			Type of the property, inferred from the property
-			expression (does not need to be specified).
-		</typeparam>
-		<param name="property">Property expression to stub.</param>
-		<param name="initialValue">Initial value for the property.</param>
 		<example>
 			If you have an interface with an int property <c>Value</c>, you might
 			stub it using the following straightforward call:
@@ -269,24 +140,7 @@
 			</code>
 		</example>
 	</doc>
-	<doc for="Mock{T}.SetupAllProperties">
-		<summary>
-			Specifies that the all properties on the mock should have "property behavior",
-			meaning that setting its value will cause it to be saved and
-			later returned when the property is requested. (this is also
-			known as "stubbing"). The default value for each property will be the
-			one generated as specified by the <see cref="Mock.DefaultValue"/> property for the mock.
-		</summary>
-		<remarks>
-			If the mock <see cref="Mock.DefaultValue"/> is set to <see cref="DefaultValue.Mock"/>,
-			the mocked default values will also get all properties setup recursively.
-		</remarks>
-	</doc>
 	<doc for="Mock{T}.Verify(expression)">
-		<summary>
-			Verifies that a specific invocation matching the given expression was performed on the mock. Use
-			in conjunction with the default <see cref="MockBehavior.Loose"/>.
-		</summary>
 		<example group="verification">
 			This example assumes that the mock has been used, and later we want to verify that a given
 			invocation with specific parameters was performed:
@@ -298,27 +152,8 @@
 				mock.Verify(proc =&gt; proc.Execute("ping"));
 			</code>
 		</example>
-		<exception cref="MockException">The invocation was not performed on the mock.</exception>
-		<param name="expression">Expression to verify.</param>
-	</doc>
-	<doc for="Mock{T}.Verify(expression,times)">
-		<summary>
-			Verifies that a specific invocation matching the given expression was performed on the mock. Use
-			in conjunction with the default <see cref="MockBehavior.Loose"/>.
-		</summary>
-		<exception cref="MockException">
-			The invocation was not call the times specified by
-			<paramref name="times"/>.
-		</exception>
-		<param name="expression">Expression to verify.</param>
-		<param name="times">The number of times a method is allowed to be called.</param>
 	</doc>
 	<doc for="Mock{T}.Verify(expression,failMessage)">
-		<summary>
-			Verifies that a specific invocation matching the given expression was performed on the mock,
-			specifying a failure error message. Use in conjunction with the default
-			<see cref="MockBehavior.Loose"/>.
-		</summary>
 		<example group="verification">
 			This example assumes that the mock has been used, and later we want to verify that a given
 			invocation with specific parameters was performed:
@@ -330,29 +165,8 @@
 				mock.Verify(proc =&gt; proc.Execute("ping"));
 			</code>
 		</example>
-		<exception cref="MockException">The invocation was not performed on the mock.</exception>
-		<param name="expression">Expression to verify.</param>
-		<param name="failMessage">Message to show if verification fails.</param>
-	</doc>
-	<doc for="Mock{T}.Verify(expression,times,failMessage)">
-		<summary>
-			Verifies that a specific invocation matching the given expression was performed on the mock,
-			specifying a failure error message. Use in conjunction with the default
-			<see cref="MockBehavior.Loose"/>.
-		</summary>
-		<exception cref="MockException">
-			The invocation was not call the times specified by
-			<paramref name="times"/>.
-		</exception>
-		<param name="expression">Expression to verify.</param>
-		<param name="times">The number of times a method is allowed to be called.</param>
-		<param name="failMessage">Message to show if verification fails.</param>
 	</doc>
 	<doc for="Mock{T}.Verify{TResult}(expression)">
-		<summary>
-			Verifies that a specific invocation matching the given expression was performed on the mock. Use
-			in conjunction with the default <see cref="MockBehavior.Loose"/>.
-		</summary>
 		<example group="verification">
 			This example assumes that the mock has been used, and later we want to verify that a given
 			invocation with specific parameters was performed:
@@ -364,30 +178,8 @@
 				mock.Verify(warehouse =&gt; warehouse.HasInventory(TALISKER, 50));
 			</code>
 		</example>
-		<exception cref="MockException">The invocation was not performed on the mock.</exception>
-		<param name="expression">Expression to verify.</param>
-		<typeparam name="TResult">Type of return value from the expression.</typeparam>
-	</doc>
-	<doc for="Mock{T}.Verify{TResult}(expression,times)">
-		<summary>
-			Verifies that a specific invocation matching the given
-			expression was performed on the mock. Use in conjunction
-			with the default <see cref="MockBehavior.Loose"/>.
-		</summary>
-		<exception cref="MockException">
-			The invocation was not call the times specified by
-			<paramref name="times"/>.
-		</exception>
-		<param name="expression">Expression to verify.</param>
-		<param name="times">The number of times a method is allowed to be called.</param>
-		<typeparam name="TResult">Type of return value from the expression.</typeparam>
 	</doc>
 	<doc for="Mock{T}.Verify{TResult}(expression,failMessage)">
-		<summary>
-			Verifies that a specific invocation matching the given
-			expression was performed on the mock, specifying a failure
-			error message.
-		</summary>
 		<example group="verification">
 			This example assumes that the mock has been used,
 			and later we want to verify that a given invocation
@@ -400,30 +192,8 @@
 				mock.Verify(warehouse =&gt; warehouse.HasInventory(TALISKER, 50), "When filling orders, inventory has to be checked");
 			</code>
 		</example>
-		<exception cref="MockException">The invocation was not performed on the mock.</exception>
-		<param name="expression">Expression to verify.</param>
-		<param name="failMessage">Message to show if verification fails.</param>
-		<typeparam name="TResult">Type of return value from the expression.</typeparam>
-	</doc>
-	<doc for="Mock{T}.Verify{TResult}(expression,times,failMessage)">
-		<summary>
-			Verifies that a specific invocation matching the given
-			expression was performed on the mock, specifying a failure
-			error message.
-		</summary>
-		<exception cref="MockException">
-			The invocation was not call the times specified by
-			<paramref name="times"/>.
-		</exception>
-		<param name="expression">Expression to verify.</param>
-		<param name="times">The number of times a method is allowed to be called.</param>
-		<param name="failMessage">Message to show if verification fails.</param>
-		<typeparam name="TResult">Type of return value from the expression.</typeparam>
 	</doc>
 	<doc for="Mock{T}.VerifyGet(expression)">
-		<summary>
-			Verifies that a property was read on the mock.
-		</summary>
 		<example group="verification">
 			This example assumes that the mock has been used,
 			and later we want to verify that a given property
@@ -436,33 +206,8 @@
 				mock.VerifyGet(warehouse =&gt; warehouse.IsClosed);
 			</code>
 		</example>
-		<exception cref="MockException">The invocation was not performed on the mock.</exception>
-		<param name="expression">Expression to verify.</param>
-		<typeparam name="TProperty">
-			Type of the property to verify. Typically omitted as it can
-			be inferred from the expression's return type.
-		</typeparam>
-	</doc>
-	<doc for="Mock{T}.VerifyGet(expression,times)">
-		<summary>
-			Verifies that a property was read on the mock.
-		</summary>
-		<exception cref="MockException">
-			The invocation was not call the times specified by
-			<paramref name="times"/>.
-		</exception>
-		<param name="times">The number of times a method is allowed to be called.</param>
-		<param name="expression">Expression to verify.</param>
-		<typeparam name="TProperty">
-			Type of the property to verify. Typically omitted as it can
-			be inferred from the expression's return type.
-		</typeparam>
 	</doc>
 	<doc for="Mock{T}.VerifyGet(expression,failMessage)">
-		<summary>
-			Verifies that a property was read on the mock, specifying a failure
-			error message.
-		</summary>
 		<example group="verification">
 			This example assumes that the mock has been used,
 			and later we want to verify that a given property
@@ -475,35 +220,8 @@
 				mock.VerifyGet(warehouse =&gt; warehouse.IsClosed);
 			</code>
 		</example>
-		<exception cref="MockException">The invocation was not performed on the mock.</exception>
-		<param name="expression">Expression to verify.</param>
-		<param name="failMessage">Message to show if verification fails.</param>
-		<typeparam name="TProperty">
-			Type of the property to verify. Typically omitted as it can
-			be inferred from the expression's return type.
-		</typeparam>
-	</doc>
-	<doc for="Mock{T}.VerifyGet(expression,times,failMessage)">
-		<summary>
-			Verifies that a property was read on the mock, specifying a failure
-			error message.
-		</summary>
-		<exception cref="MockException">
-			The invocation was not call the times specified by
-			<paramref name="times"/>.
-		</exception>
-		<param name="times">The number of times a method is allowed to be called.</param>
-		<param name="expression">Expression to verify.</param>
-		<param name="failMessage">Message to show if verification fails.</param>
-		<typeparam name="TProperty">
-			Type of the property to verify. Typically omitted as it can
-			be inferred from the expression's return type.
-		</typeparam>
 	</doc>
 	<doc for="Mock{T}.VerifySet(expression)">
-		<summary>
-			Verifies that a property was set on the mock.
-		</summary>
 		<example group="verification">
 			This example assumes that the mock has been used,
 			and later we want to verify that a given property
@@ -516,25 +234,8 @@
 				mock.VerifySet(warehouse =&gt; warehouse.IsClosed = true);
 			</code>
 		</example>
-		<exception cref="MockException">The invocation was not performed on the mock.</exception>
-		<param name="setterExpression">Expression to verify.</param>
-	</doc>
-	<doc for="Mock{T}.VerifySet(expression,times)">
-		<summary>
-			Verifies that a property was set on the mock.
-		</summary>
-		<exception cref="MockException">
-			The invocation was not call the times specified by
-			<paramref name="times"/>.
-		</exception>
-		<param name="times">The number of times a method is allowed to be called.</param>
-		<param name="setterExpression">Expression to verify.</param>
 	</doc>
 	<doc for="Mock{T}.VerifySet(expression,failMessage)">
-		<summary>
-			Verifies that a property was set on the mock, specifying
-			a failure message.
-		</summary>
 		<example group="verification">
 			This example assumes that the mock has been used,
 			and later we want to verify that a given property
@@ -547,33 +248,8 @@
 				mock.VerifySet(warehouse =&gt; warehouse.IsClosed = true, "Warehouse should always be closed after the action");
 			</code>
 		</example>
-		<exception cref="MockException">The invocation was not performed on the mock.</exception>
-		<param name="setterExpression">Expression to verify.</param>
-		<param name="failMessage">Message to show if verification fails.</param>
-	</doc>
-	<doc for="Mock{T}.VerifySet(expression,times,failMessage)">
-		<summary>
-			Verifies that a property was set on the mock, specifying
-			a failure message.
-		</summary>
-		<exception cref="MockException">
-			The invocation was not call the times specified by
-			<paramref name="times"/>.
-		</exception>
-		<param name="times">The number of times a method is allowed to be called.</param>
-		<param name="setterExpression">Expression to verify.</param>
-		<param name="failMessage">Message to show if verification fails.</param>
 	</doc>
 	<doc for="Mock{T}.Raise">
-		<summary>
-			Raises the event referenced in <paramref name="eventExpression"/> using
-			the given <paramref name="args"/> argument.
-		</summary>
-		<exception cref="ArgumentException">
-			The <paramref name="args"/> argument is
-			invalid for the target event invocation, or the <paramref name="eventExpression"/> is
-			not an event attach or detach expression.
-		</exception>
 		<example>
 			The following example shows how to raise a <see cref="System.ComponentModel.INotifyPropertyChanged.PropertyChanged"/> event:
 			<code>
@@ -603,15 +279,6 @@
 		</example>		
 	</doc>
 	<doc for="Mock{T}.Raise(args)">
-		<summary>
-			Raises the event referenced in <paramref name="eventExpression"/> using
-			the given <paramref name="args"/> argument for a non-EventHandler typed event.
-		</summary>
-		<exception cref="ArgumentException">
-			The <paramref name="args"/> arguments are
-			invalid for the target event invocation, or the <paramref name="eventExpression"/> is
-			not an event attach or detach expression.
-		</exception>
 		<example>
 			The following example shows how to raise a custom event that does not adhere to 
 			the standard <c>EventHandler</c>:
