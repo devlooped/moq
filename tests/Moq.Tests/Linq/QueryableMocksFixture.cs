@@ -182,6 +182,36 @@ namespace Moq.Tests
 			Assert.Equal("foo", target.Value);
 		}
 
+		[Fact]
+		public void Strict_Mock_Of_will_throw_for_non_setup_property()
+		{
+			var foo = Mock.Of<IFoo>(MockBehavior.Strict);
+			Assert.Throws<MockException>(() => _ = foo.Name);
+		}
+
+		[Fact]
+		public void Strict_Mock_Of_with_specification_expression_will_throw_for_non_setup_property()
+		{
+			var foo = Mock.Of<IFoo>(f => f.Targets == default, MockBehavior.Strict);
+			_ = foo.Targets;
+			Assert.Throws<MockException>(() => _ = foo.Name);
+		}
+
+		[Fact]
+		public void Strict_Mocks_Of_will_throw_for_non_setup_property()
+		{
+			var foo = Mocks.Of<IFoo>(MockBehavior.Strict).First();
+			Assert.Throws<MockException>(() => _ = foo.Name);
+		}
+
+		[Fact]
+		public void Strict_Mocks_Of_with_specification_expression_will_throw_for_non_setup_property()
+		{
+			var foo = Mocks.Of<IFoo>(f => f.Targets == default, MockBehavior.Strict).First();
+			_ = foo.Targets;
+			Assert.Throws<MockException>(() => _ = foo.Name);
+		}
+
 		public class Dto
 		{
 			public string Value { get; set; }
