@@ -506,6 +506,10 @@ namespace Moq
 
 		internal static void SetupAllProperties(Mock mock, DefaultValueProvider defaultValueProvider)
 		{
+			mock.Setups.RemoveAll(x => x.Method.IsPropertyAccessor());
+			// Removing all the previous properties setups to keep the behaviour of overriding
+			// existing setups in `SetupAllProperties`.
+			
 			mock.AutoSetupPropertiesDefaultValueProvider = defaultValueProvider;
 			// `SetupAllProperties` no longer performs properties setup like in previous versions.
 			// Instead it just enables a switch to setup properties on-demand at the moment of first access.
