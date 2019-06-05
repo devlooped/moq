@@ -20,5 +20,9 @@ namespace Moq.Matchers
 			return value is Expression valueExpression
 				&& ExpressionComparer.Default.Equals(this.expression, valueExpression);
 		}
+
+		public void OnSuccess()
+		{
+		}
 	}
 }

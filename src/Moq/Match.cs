@@ -33,7 +33,13 @@ namespace Moq
 
 		internal abstract bool Matches(object value);
 
+		internal virtual void OnSuccess()
+		{
+		}
+
 		bool IMatcher.Matches(object value) => this.Matches(value);
+
+		void IMatcher.OnSuccess() => this.OnSuccess();
 
 		internal Expression RenderExpression { get; set; }
 

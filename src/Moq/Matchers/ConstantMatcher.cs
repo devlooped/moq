@@ -35,6 +35,10 @@ namespace Moq.Matchers
 			return false;
 		}
 
+		public void OnSuccess()
+		{
+		}
+
 		private bool MatchesEnumerable(IEnumerable enumerable)
 		{
 			var constValues = (IEnumerable)constantValue;

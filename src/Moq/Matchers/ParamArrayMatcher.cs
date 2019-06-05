@@ -35,5 +35,13 @@ namespace Moq.Matchers
 
 			return true;
 		}
+
+		public void OnSuccess()
+		{
+			foreach (var matcher in this.matchers)
+			{
+				matcher.OnSuccess();
+			}
+		}
 	}
 }

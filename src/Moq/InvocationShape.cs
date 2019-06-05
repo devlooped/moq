@@ -79,6 +79,11 @@ namespace Moq
 				}
 			}
 
+			foreach (var argumentMatcher in this.argumentMatchers)
+			{
+				argumentMatcher.OnSuccess();
+			}
+
 			return true;
 		}
 
