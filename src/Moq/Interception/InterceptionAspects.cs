@@ -359,20 +359,36 @@ namespace Moq
 				if (property.CanRead)
 				{
 					var getter = property.GetGetMethod(true);
-					propertyValue = CreateInitialPropertyValue(mock, getter);
-					getterSetup = new AutoImplementedPropertyGetterSetup(expression, getter, () => propertyValue);
-					mock.Setups.Add(getterSetup);
+					if (ProxyFactory.Instance.IsMethodVisible(getter, out _))
+					{
+						propertyValue = CreateInitialPropertyValue(mock, getter);
+						getterSetup = new AutoImplementedPropertyGetterSetup(expression, getter, () => propertyValue);
+						mock.Setups.Add(getterSetup);
+					}
+
+					// If we wanted to optimise for speed, we'd probably be forgiven
+					// for removing the above `IsMethodVisible` guard, as it's rather
+					// unlikely to encounter non-public getters such as the following
+					// in real-world code:
+					//
+					//     public T Property { internal get; set; }
+					//
+					// Usually, it's only the setters that are made non-public. For
+					// now however, we prefer correctness.
 				}
 
 				Setup setterSetup = null;
 				if (property.CanWrite)
 				{
 					MethodInfo setter = property.GetSetMethod(nonPublic: true);
-					setterSetup = new AutoImplementedPropertySetterSetup(expression, setter, (newValue) =>
+					if (ProxyFactory.Instance.IsMethodVisible(setter, out _))
 					{
-						propertyValue = newValue;
-					});
-					mock.Setups.Add(setterSetup);
+						setterSetup = new AutoImplementedPropertySetterSetup(expression, setter, (newValue) =>
+						{
+							propertyValue = newValue;
+						});
+						mock.Setups.Add(setterSetup);
+					}
 				}
 
 				Setup setupToExecute = invocationMethod.IsPropertyGetter() ? getterSetup : setterSetup;
