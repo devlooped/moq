@@ -1578,6 +1578,30 @@ namespace Moq.Tests
 			}
 		}
 
+		public class Object_graph_loops
+		{
+			public interface IX
+			{
+				IX Self { get; }
+			}
+
+			[Fact]
+			public void When_mock_returns_itself_via_setup_VerifyNoOtherCalls_wont_go_into_infinite_loop()
+			{
+				var mock = new Mock<IX>();
+				mock.Setup(m => m.Self).Returns(mock.Object);
+				mock.VerifyNoOtherCalls();
+			}
+
+			[Fact]
+			public void When_mock_returns_itself_lazily_via_setup_VerifyNoOtherCalls_wont_go_into_infinite_loop()
+			{
+				var mock = new Mock<IX>();
+				mock.Setup(m => m.Self).Returns(() => mock.Object);
+				mock.VerifyNoOtherCalls();
+			}
+		}
+
 		public interface IBar
 		{
 			int? Value { get; set; }
