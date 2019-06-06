@@ -338,6 +338,13 @@ namespace Moq
 
 		internal static void VerifyNoOtherCalls(Mock mock)
 		{
+			Mock.VerifyNoOtherCalls(mock, verifiedMocks: new HashSet<Mock>());
+		}
+
+		private static void VerifyNoOtherCalls(Mock mock, HashSet<Mock> verifiedMocks)
+		{
+			if (!verifiedMocks.Add(mock)) return;
+
 			var unverifiedInvocations = mock.MutableInvocations.ToArray(invocation => !invocation.Verified);
 
 			var innerMockSetups = mock.Setups.GetInnerMockSetups();
@@ -377,7 +384,7 @@ namespace Moq
 			// created by "transitive" invocations):
 			foreach (var inner in innerMockSetups)
 			{
-				VerifyNoOtherCalls(inner.GetInnerMock());
+				VerifyNoOtherCalls(inner.GetInnerMock(), verifiedMocks);
 			}
 		}
 
