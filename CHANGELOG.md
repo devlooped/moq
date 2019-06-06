@@ -19,6 +19,7 @@ The format is loosely based on [Keep a Changelog](http://keepachangelog.com/en/1
 #### Fixed
 
 * `mock.SetupAllProperties()` now setups write-only properties for strict mocks, so that accessing such properties will not throw anymore. (@vanashimko, #836)
+* Regression: `mock.SetupAllProperties()` and `Mock.Of<T>` fail due to inaccessible property accessors (@Mexe13, #845)
 
 
 ## 4.11.0 (2019-05-28)
