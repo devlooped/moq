@@ -2,6 +2,7 @@
 // All rights reserved. Licensed under the BSD 3-Clause License; see License.txt.
 
 using System;
+using System.Text.RegularExpressions;
 using System.Threading.Tasks;
 
 using Moq;
@@ -1599,6 +1600,31 @@ namespace Moq.Tests
 				var mock = new Mock<IX>();
 				mock.Setup(m => m.Self).Returns(() => mock.Object);
 				mock.VerifyNoOtherCalls();
+			}
+
+			[Fact]
+			public void When_mock_returns_itself_via_setup_Verify_exception_message_wont_go_into_infinite_loop()
+			{
+				var mock = new Mock<IX>();
+				mock.Setup(m => m.Self).Returns(mock.Object);
+				_ = mock.Object.Self;
+
+				var ex = Assert.Throws<MockException>(() => mock.Verify(m => m.Self, Times.Never));
+				//                                                                   ^^^^^^^^^^^
+				// We are intentionally provoking a verification exception so that Moq will have to
+				// build an error message showing all invocations grouped by mock.
+
+				Assert.Equal(2, SubstringCount(ex.Message, substring: mock.Name));
+				// That message should mention our mock only twice: once in the heading above
+				// the mock's invocations; and once for the invocation that returned it.
+
+				int SubstringCount(string str, string substring)
+				{
+					int count = 0;
+					int index = -1;
+					while ((index = str.IndexOf(substring, index + 1)) >= 0) ++count;
+					return count;
+				}
 			}
 		}
 
