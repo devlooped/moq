@@ -2571,6 +2571,45 @@ namespace Moq.Tests.Regressions
 
 		#endregion
 
+		#region 845
+
+		public class Issue845
+		{
+			public class Foo
+			{
+				public virtual object Bar { get; internal set; }
+			}
+
+			[Fact]
+			public void Mock_Of_can_deal_with_internal_setter()
+			{
+				_ = Mock.Of<Foo>();
+			}
+
+			[Fact]
+			public void Mock_Of_plus_property_access_can_deal_with_internal_setter()
+			{
+				var mocked = Mock.Of<Foo>();
+				_ = mocked.Bar;
+			}
+
+			[Fact]
+			public void SetupAllProperties_can_deal_with_internal_setter()
+			{
+				var mock = new Mock<Foo>();
+				mock.SetupAllProperties();
+			}
+
+			[Fact]
+			public void SetupAllProperties_plus_property_access_can_deal_with_internal_setter()
+			{
+				var mock = new Mock<Foo>();
+				mock.SetupAllProperties();
+				_ = mock.Object.Bar;
+			}
+		}
+		#endregion
+
 		// Old @ Google Code
 
 		#region #47
