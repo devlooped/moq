@@ -36,11 +36,11 @@ namespace Moq.Matchers
 			return true;
 		}
 
-		public void OnSuccess()
+		public void OnSuccess(object value)
 		{
 			foreach (var matcher in this.matchers)
 			{
-				matcher.OnSuccess();
+				matcher.OnSuccess(value);
 			}
 		}
 	}

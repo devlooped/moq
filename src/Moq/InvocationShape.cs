@@ -79,9 +79,9 @@ namespace Moq
 				}
 			}
 
-			foreach (var argumentMatcher in this.argumentMatchers)
+			for (int i = 0, n = this.argumentMatchers.Length; i < n; ++i)
 			{
-				argumentMatcher.OnSuccess();
+				this.argumentMatchers[i].OnSuccess(arguments[i]);
 			}
 
 			return true;

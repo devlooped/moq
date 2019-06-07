@@ -35,7 +35,7 @@ namespace Moq.Matchers
 			return false;
 		}
 
-		public void OnSuccess()
+		public void OnSuccess(object value)
 		{
 		}
 

@@ -33,13 +33,13 @@ namespace Moq
 
 		internal abstract bool Matches(object value);
 
-		internal virtual void OnSuccess()
+		internal virtual void OnSuccess(object value)
 		{
 		}
 
 		bool IMatcher.Matches(object value) => this.Matches(value);
 
-		void IMatcher.OnSuccess() => this.OnSuccess();
+		void IMatcher.OnSuccess(object value) => this.OnSuccess(value);
 
 		internal Expression RenderExpression { get; set; }
 
@@ -99,11 +99,13 @@ namespace Moq
 	public class Match<T> : Match, IEquatable<Match<T>>
 	{
 		internal Predicate<T> Condition { get; set; }
+		internal Action<T> SuccessCallback { get; set; }
 
-		internal Match(Predicate<T> condition, Expression<Func<T>> renderExpression)
+		internal Match(Predicate<T> condition, Expression<Func<T>> renderExpression, Action<T> successCallback = null)
 		{
 			this.Condition = condition;
 			this.RenderExpression = renderExpression.Body.Apply(EvaluateCaptures.Rewriter);
+			this.SuccessCallback = successCallback;
 		}
 
 		internal override bool Matches(object value)
@@ -128,6 +130,11 @@ namespace Moq
 				return false;
 			}
 			return this.Condition((T)value);
+		}
+
+		internal override void OnSuccess(object value)
+		{
+			this.SuccessCallback?.Invoke((T)value);
 		}
 
 		/// <inheritdoc/>

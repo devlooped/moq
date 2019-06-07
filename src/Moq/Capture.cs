@@ -30,7 +30,7 @@ namespace Moq
 		/// </example>
 		public static T In<T>(ICollection<T> collection)
 		{
-			var match = new CaptureMatch<T>(collection.Add, captureOnSuccessOnly: true);
+			var match = new CaptureMatch<T>(collection.Add);
 			return With(match);
 		}
 
@@ -53,7 +53,7 @@ namespace Moq
 		/// </example>
 		public static T In<T>(IList<T> collection, Expression<Func<T, bool>> predicate)
 		{
-			var match = new CaptureMatch<T>(collection.Add, predicate, captureOnSuccessOnly: true);
+			var match = new CaptureMatch<T>(collection.Add, predicate);
 			return With(match);
 		}
 

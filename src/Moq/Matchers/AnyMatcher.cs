@@ -13,7 +13,7 @@ namespace Moq.Matchers
 
 		public bool Matches(object value) => true;
 
-		public void OnSuccess()
+		public void OnSuccess(object value)
 		{
 		}
     }

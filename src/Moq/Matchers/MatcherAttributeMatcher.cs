@@ -89,7 +89,7 @@ namespace Moq.Matchers
 			return (bool)validatorMethod.Invoke(instance, args);
 		}
 
-		public void OnSuccess()
+		public void OnSuccess(object value)
 		{
 		}
 	}
