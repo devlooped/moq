@@ -10,6 +10,7 @@ The format is loosely based on [Keep a Changelog](http://keepachangelog.com/en/1
 #### Changed
 
 * Improved performance for `Mock.Of<T>` and `mock.SetupAllProperties()` as the latter now performs property setups just-in-time, instead of as an ahead-of-time batch operation. (@vanashimko, #826)
+* Setups with no `.Returns(…)` nor `.CallBase()` no longer return `default(T)` for loose mocks, but a value that is consistent with the mock's `CallBase` and `DefaultValue[Provider]` settings. (@stakx, #849)
 
 #### Added
 
@@ -18,6 +19,7 @@ The format is loosely based on [Keep a Changelog](http://keepachangelog.com/en/1
 
 #### Fixed
 
+* Adding `Callback` to a mock breaks async tests (@marcin-chwedczuk-meow, #702)
 * `mock.SetupAllProperties()` now setups write-only properties for strict mocks, so that accessing such properties will not throw anymore. (@vanashimko, #836)
 * Regression: `mock.SetupAllProperties()` and `Mock.Of<T>` fail due to inaccessible property accessors (@Mexe13, #845)
 * Regression: `VerifyNoOtherCalls` causes stack overflow when mock setup returns the mocked object (@bash, #846)

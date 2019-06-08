@@ -123,7 +123,11 @@ namespace Moq
 					}
 					else
 					{
-						invocation.Return(this.Method.ReturnType.GetDefaultValue());
+						// Instead of duplicating the entirety of `Return`'s implementation,
+						// let's just call it here. This is permissible only if the inter-
+						// ception pipeline will terminate right away (otherwise `Return`
+						// might be executed a second time).
+						Return.Handle(invocation, this.Mock);
 					}
 				}
 
