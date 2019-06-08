@@ -360,6 +360,35 @@ namespace Moq.Tests
 			Assert.Same(expectedResult, actualResult); // should be returned by method as is
 		}
 
+		[Fact]
+		public void Given_a_loose_mock_Return_value_of_setup_without_Returns_nor_CallBase_equals_return_value_if_setup_werent_there_at_all()
+		{
+			const int expected = 42;
+
+			var mock = new Mock<IFoo>(MockBehavior.Loose);
+			mock.SetReturnsDefault<int>(expected);
+
+			var actualWithoutSetup = mock.Object.Value;
+			Assert.Equal(expected, actualWithoutSetup);
+
+			mock.SetupGet(m => m.Value);
+
+			var actualWithSetup = mock.Object.Value;
+			Assert.Equal(actualWithoutSetup, actualWithSetup);
+		}
+
+		[Fact]
+		public void Given_a_loose_mock_with_CallBase_Return_value_of_setup_without_Returns_nor_CallBase_equals_return_value_if_setup_werent_there_at_all()
+		{
+			var mock = new Mock<Foo>(MockBehavior.Loose) { CallBase = true };
+			var expected = mock.Object.StringProperty;
+
+			mock.SetupGet(m => m.StringProperty);
+			var actual = mock.Object.StringProperty;
+
+			Assert.Equal(expected, actual);
+		}
+
 		public interface IFoo
 		{
 			void Execute();

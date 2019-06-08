@@ -2294,6 +2294,46 @@ namespace Moq.Tests.Regressions
 
 		#endregion
 
+		#region 702
+
+		public class Issue702
+		{
+			public interface ISomeDependency
+			{
+				Task DoMoreStuffAsync();
+			}
+
+			[Fact]
+			public async Task Can_await_async_method_if_Returns_used_to_set_return_value()
+			{
+				var mock = new Mock<ISomeDependency>();
+				mock.Setup(x => x.DoMoreStuffAsync())
+					.Returns(Task.CompletedTask)
+					.Callback(() => { });
+				await mock.Object.DoMoreStuffAsync();
+			}
+
+			[Theory]
+			[InlineData(DefaultValue.Empty)]
+			[InlineData(DefaultValue.Mock)]
+			public async Task Can_await_async_method_if_Returns_omitted(DefaultValue defaultValue)
+			{
+				// NOTE: This test expressly includes `DefaultValue` to document that
+				// the claim made in the method name isn't generally true due to some
+				// dedicated logic that treats "async methods" specially; it's simply
+				// the standard default value providers that happen to produce non-null
+				// return values for async methods.
+
+				var mock = new Mock<ISomeDependency>() { DefaultValue = defaultValue };
+				mock.Setup(x => x.DoMoreStuffAsync())
+				//  .Returns(Task.CompletedTask)
+				    .Callback(() => { });
+				await mock.Object.DoMoreStuffAsync();
+			}
+		}
+
+		#endregion
+
 		#region 706
 
 		public class Issue706
