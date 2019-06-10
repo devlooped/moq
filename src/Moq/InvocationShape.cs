@@ -79,12 +79,16 @@ namespace Moq
 				}
 			}
 
+			return true;
+		}
+
+		public void EvaluatedSuccessfully(Invocation invocation)
+		{
+			var arguments = invocation.Arguments;
 			for (int i = 0, n = this.argumentMatchers.Length; i < n; ++i)
 			{
 				this.argumentMatchers[i].OnSuccess(arguments[i]);
 			}
-
-			return true;
 		}
 
 		private bool IsOverride(MethodInfo invocationMethod)

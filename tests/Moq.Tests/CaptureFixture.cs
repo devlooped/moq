@@ -64,6 +64,18 @@ namespace Moq.Tests
 			Assert.Equal(expectedValues, items);
 		}
 
+		[Fact]
+		public void ShouldNotCaptureParameterWhenConditionalSetupIsFalse()
+		{
+			var captures = new List<string>();
+			var mock = new Mock<IFoo>();
+			mock.When(() => false).Setup(m => m.DoSomething(Capture.In(captures)));
+
+			mock.Object.DoSomething("X");
+
+			Assert.Empty(captures);
+		}
+
 		public interface IFoo
 		{
 			void DoSomething(string s);

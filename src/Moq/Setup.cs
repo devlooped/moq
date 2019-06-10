@@ -66,6 +66,12 @@ namespace Moq
 			}
 		}
 
+		public void EvaluatedSuccessfully(Invocation invocation)
+		{
+			this.Condition?.EvaluatedSuccessfully();
+			this.expectation.EvaluatedSuccessfully(invocation);
+		}
+
 		public virtual void SetOutParameters(Invocation invocation)
 		{
 		}
