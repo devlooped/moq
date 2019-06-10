@@ -82,7 +82,7 @@ namespace Moq
 			return true;
 		}
 
-		public void EvaluatedSuccessfully(Invocation invocation)
+		public void SetupEvaluatedSuccessfully(Invocation invocation)
 		{
 			var arguments = invocation.Arguments;
 			for (int i = 0, n = this.argumentMatchers.Length; i < n; ++i)

@@ -68,8 +68,8 @@ namespace Moq
 
 		public void EvaluatedSuccessfully(Invocation invocation)
 		{
-			this.Condition?.EvaluatedSuccessfully();
-			this.expectation.EvaluatedSuccessfully(invocation);
+			this.Condition?.SetupEvaluatedSuccessfully();
+			this.expectation.SetupEvaluatedSuccessfully(invocation);
 		}
 
 		public virtual void SetOutParameters(Invocation invocation)

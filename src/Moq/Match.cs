@@ -99,13 +99,13 @@ namespace Moq
 	public class Match<T> : Match, IEquatable<Match<T>>
 	{
 		internal Predicate<T> Condition { get; set; }
-		internal Action<T> SetupEvaluatedSuccessfullyCallback { get; set; }
+		internal Action<T> Success { get; set; }
 
-		internal Match(Predicate<T> condition, Expression<Func<T>> renderExpression, Action<T> setupEvaluatedSuccessfullyCallback = null)
+		internal Match(Predicate<T> condition, Expression<Func<T>> renderExpression, Action<T> success = null)
 		{
 			this.Condition = condition;
 			this.RenderExpression = renderExpression.Body.Apply(EvaluateCaptures.Rewriter);
-			this.SetupEvaluatedSuccessfullyCallback = setupEvaluatedSuccessfullyCallback;
+			this.Success = success;
 		}
 
 		internal override bool Matches(object value)
@@ -134,7 +134,7 @@ namespace Moq
 
 		internal override void SetupEvaluatedSuccessfully(object value)
 		{
-			this.SetupEvaluatedSuccessfullyCallback?.Invoke((T)value);
+			this.Success?.Invoke((T)value);
 		}
 
 		/// <inheritdoc/>
