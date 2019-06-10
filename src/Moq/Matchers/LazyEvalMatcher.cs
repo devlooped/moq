@@ -26,7 +26,7 @@ namespace Moq.Matchers
 			return false;
 		}
 
-		public void OnSuccess(object value)
+		public void SetupEvaluatedSuccessfully(object value)
 		{
 		}
 	}

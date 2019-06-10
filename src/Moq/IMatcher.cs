@@ -7,6 +7,6 @@ namespace Moq
 	{
 		bool Matches(object value);
 
-		void OnSuccess(object value);
+		void SetupEvaluatedSuccessfully(object value);
 	}
 }

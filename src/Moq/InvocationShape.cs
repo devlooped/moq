@@ -87,7 +87,7 @@ namespace Moq
 			var arguments = invocation.Arguments;
 			for (int i = 0, n = this.argumentMatchers.Length; i < n; ++i)
 			{
-				this.argumentMatchers[i].OnSuccess(arguments[i]);
+				this.argumentMatchers[i].SetupEvaluatedSuccessfully(arguments[i]);
 			}
 		}
 

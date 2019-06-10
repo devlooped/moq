@@ -21,7 +21,7 @@ namespace Moq.Matchers
 				&& ExpressionComparer.Default.Equals(this.expression, valueExpression);
 		}
 
-		public void OnSuccess(object value)
+		public void SetupEvaluatedSuccessfully(object value)
 		{
 		}
 	}

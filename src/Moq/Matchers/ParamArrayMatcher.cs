@@ -36,11 +36,11 @@ namespace Moq.Matchers
 			return true;
 		}
 
-		public void OnSuccess(object value)
+		public void SetupEvaluatedSuccessfully(object value)
 		{
 			foreach (var matcher in this.matchers)
 			{
-				matcher.OnSuccess(value);
+				matcher.SetupEvaluatedSuccessfully(value);
 			}
 		}
 	}

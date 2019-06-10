@@ -20,7 +20,7 @@ namespace Moq.Matchers
 			                                 : object.ReferenceEquals(this.reference, value);
 		}
 
-		public void OnSuccess(object value)
+		public void SetupEvaluatedSuccessfully(object value)
 		{
 		}
 	}
