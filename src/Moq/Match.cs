@@ -33,9 +33,7 @@ namespace Moq
 
 		internal abstract bool Matches(object value);
 
-		internal virtual void SetupEvaluatedSuccessfully(object value)
-		{
-		}
+		internal abstract void SetupEvaluatedSuccessfully(object value);
 
 		bool IMatcher.Matches(object value) => this.Matches(value);
 
