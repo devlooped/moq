@@ -35,5 +35,13 @@ namespace Moq.Matchers
 
 			return true;
 		}
+
+		public void SetupEvaluatedSuccessfully(object value)
+		{
+			foreach (var matcher in this.matchers)
+			{
+				matcher.SetupEvaluatedSuccessfully(value);
+			}
+		}
 	}
 }

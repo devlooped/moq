@@ -88,5 +88,9 @@ namespace Moq.Matchers
 			var instance = this.expression.Object == null ? null : (this.expression.Object.PartialEval() as ConstantExpression).Value;
 			return (bool)validatorMethod.Invoke(instance, args);
 		}
+
+		public void SetupEvaluatedSuccessfully(object value)
+		{
+		}
 	}
 }

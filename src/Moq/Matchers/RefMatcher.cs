@@ -19,5 +19,9 @@ namespace Moq.Matchers
 			return this.referenceIsValueType ? object.Equals(this.reference, value)
 			                                 : object.ReferenceEquals(this.reference, value);
 		}
+
+		public void SetupEvaluatedSuccessfully(object value)
+		{
+		}
 	}
 }

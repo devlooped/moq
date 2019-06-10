@@ -23,6 +23,34 @@ namespace Moq.Tests
 		}
 
 		[Fact]
+		public void ShouldOnlyCaptureParameterForSpecificArgumentBeforeCollection()
+		{
+			var items = new List<string>();
+			var mock = new Mock<IFoo>();
+			mock.Setup(x => x.DoSomething(1, Capture.In(items)));
+
+			mock.Object.DoSomething(1, "Hello!");
+			mock.Object.DoSomething(2, "World");
+
+			var expectedValues = new List<string> { "Hello!" };
+			Assert.Equal(expectedValues, items);
+		}
+
+		[Fact]
+		public void ShouldOnlyCaptureParameterForSpecificArgumentAfterCollection()
+		{
+			var items = new List<string>();
+			var mock = new Mock<IFoo>();
+			mock.Setup(x => x.DoSomething(Capture.In(items), 1));
+
+			mock.Object.DoSomething("Hello!", 1);
+			mock.Object.DoSomething("World", 2);
+
+			var expectedValues = new List<string> { "Hello!" };
+			Assert.Equal(expectedValues, items);
+		}
+
+		[Fact]
 		public void CanCaptureSpecificParameterInCollection()
 		{
 			var items = new List<string>();
@@ -36,9 +64,23 @@ namespace Moq.Tests
 			Assert.Equal(expectedValues, items);
 		}
 
+		[Fact]
+		public void ShouldNotCaptureParameterWhenConditionalSetupIsFalse()
+		{
+			var captures = new List<string>();
+			var mock = new Mock<IFoo>();
+			mock.When(() => false).Setup(m => m.DoSomething(Capture.In(captures)));
+
+			mock.Object.DoSomething("X");
+
+			Assert.Empty(captures);
+		}
+
 		public interface IFoo
 		{
 			void DoSomething(string s);
+			void DoSomething(int i, string s);
+			void DoSomething(string s, int i);
 		}
 	}
 }

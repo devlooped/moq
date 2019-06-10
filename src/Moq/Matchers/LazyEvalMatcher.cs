@@ -25,5 +25,9 @@ namespace Moq.Matchers
 
 			return false;
 		}
+
+		public void SetupEvaluatedSuccessfully(object value)
+		{
+		}
 	}
 }

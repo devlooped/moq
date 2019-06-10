@@ -18,6 +18,6 @@ namespace Moq
 
 		public bool IsTrue => this.condition?.Invoke() == true;
 
-		public void EvaluatedSuccessfully() => this.success?.Invoke();
+		public void SetupEvaluatedSuccessfully() => this.success?.Invoke();
 	}
 }

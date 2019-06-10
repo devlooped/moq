@@ -12,12 +12,14 @@ namespace Moq
 	/// <typeparam name="T"></typeparam>
 	public class CaptureMatch<T> : Match<T>
 	{
+		private static readonly Predicate<T> matchAllPredicate = _ => true;
+
 		/// <summary>
 		/// Initializes an instance of the capture match.
 		/// </summary>
 		/// <param name="captureCallback">An action to run on captured value</param>
 		public CaptureMatch(Action<T> captureCallback)
-			: base(CreatePredicate(captureCallback), () => It.IsAny<T>())
+			: base(matchAllPredicate, () => It.IsAny<T>(), captureCallback)
 		{
 		}
 
@@ -27,30 +29,14 @@ namespace Moq
 		/// <param name="captureCallback">An action to run on captured value</param>
 		/// <param name="predicate">A predicate used to filter captured parameters</param>
 		public CaptureMatch(Action<T> captureCallback, Expression<Func<T, bool>> predicate)
-			: base(CreatePredicate(captureCallback, predicate), () => It.Is(predicate))
+			: base(BuildCondition(predicate), () => It.Is(predicate), captureCallback)
 		{
 		}
 
-		private static Predicate<T> CreatePredicate(Action<T> captureCallback)
+		private static Predicate<T> BuildCondition(Expression<Func<T, bool>> predicateExpression)
 		{
-			return value =>
-			{
-				captureCallback.Invoke(value);
-				return true;
-			};
-		}
-
-		private static Predicate<T> CreatePredicate(Action<T> captureCallback, Expression<Func<T, bool>> predicate)
-		{
-			var predicateDelegate = predicate.CompileUsingExpressionCompiler();
-			return value =>
-			{
-				var matches = predicateDelegate.Invoke(value);
-				if (matches)
-					captureCallback.Invoke(value);
-
-				return matches;
-			};
+			var predicate = predicateExpression.CompileUsingExpressionCompiler();
+			return value => predicate.Invoke(value);
 		}
 	}
 }

@@ -103,7 +103,7 @@ namespace Moq
 			var matchedSetup = mock.Setups.FindMatchFor(invocation);
 			if (matchedSetup != null)
 			{
-				matchedSetup.Condition?.EvaluatedSuccessfully();
+				matchedSetup.EvaluatedSuccessfully(invocation);
 
 				if (matchedSetup.IsVerifiable)
 				{

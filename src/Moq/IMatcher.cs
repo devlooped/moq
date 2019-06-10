@@ -6,5 +6,7 @@ namespace Moq
 	internal interface IMatcher
 	{
 		bool Matches(object value);
+
+		void SetupEvaluatedSuccessfully(object value);
 	}
 }

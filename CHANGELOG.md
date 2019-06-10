@@ -23,6 +23,8 @@ The format is loosely based on [Keep a Changelog](http://keepachangelog.com/en/1
 * `mock.SetupAllProperties()` now setups write-only properties for strict mocks, so that accessing such properties will not throw anymore. (@vanashimko, #836)
 * Regression: `mock.SetupAllProperties()` and `Mock.Of<T>` fail due to inaccessible property accessors (@Mexe13, #845)
 * Regression: `VerifyNoOtherCalls` causes stack overflow when mock setup returns the mocked object (@bash, #846)
+* `Capture.In()` no longer captures arguments when other setup arguments do not match (@ocoanet, #844).
+* `CaptureMatch` no longer invokes the capture callback when other setup arguments do not match (@ocoanet, #844).
 
 
 ## 4.11.0 (2019-05-28)
