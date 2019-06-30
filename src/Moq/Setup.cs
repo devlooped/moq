@@ -109,5 +109,9 @@ namespace Moq
 
 			return null;
 		}
+
+		public virtual void Uninvoke()
+		{
+		}
 	}
 }

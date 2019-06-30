@@ -329,6 +329,12 @@ namespace Moq
 			return (this.flags & Flags.Invoked) == 0 ? MockException.UnmatchedSetup(this) : null;
 		}
 
+		public override void Uninvoke()
+		{
+			this.flags &= ~Flags.Invoked;
+			this.limitInvocationCountResponse?.Reset();
+		}
+
 		public void Verifiable()
 		{
 			this.flags |= Flags.Verifiable;
@@ -385,6 +391,11 @@ namespace Moq
 			{
 				this.setup = setup;
 				this.maxCount = maxCount;
+				this.count = 0;
+			}
+
+			public void Reset()
+			{
 				this.count = 0;
 			}
 

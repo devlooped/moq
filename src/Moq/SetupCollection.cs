@@ -119,6 +119,17 @@ namespace Moq
 			return this.ToArrayLive(setup => setup.ReturnsInnerMock(out _));
 		}
 
+		public void UninvokeAll()
+		{
+			lock (this.setups)
+			{
+				foreach (var setup in this.setups)
+				{
+					setup.Uninvoke();
+				}
+			}
+		}
+
 		public Setup[] ToArrayLive(Func<Setup, bool> predicate)
 		{
 			var matchingSetups = new Stack<Setup>();
