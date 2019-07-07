@@ -150,15 +150,22 @@ namespace Moq
 
 						if (mock.CallBase && !invocation.Method.IsAbstract)
 						{
-							invocation.ReturnBase();
-							return true;
+							if(!mock.Setups.HasEventSetup)
+							{
+								invocation.ReturnBase();
+							}
 						}
 						else if (invocation.Arguments.Length > 0 && invocation.Arguments[0] is Delegate delegateInstance)
 						{
 							mock.EventHandlers.Add(eventInfo.Name, delegateInstance);
-							invocation.Return();
-							return true;
+
+							if (!mock.Setups.HasEventSetup)
+							{
+								invocation.Return();
+							}
 						}
+
+						return !mock.Setups.HasEventSetup;
 					}
 				}
 				else if (methodName[0] == 'r' && methodName.Length > 7 && methodName[6] == '_' && invocation.Method.LooksLikeEventDetach())
@@ -172,15 +179,22 @@ namespace Moq
 
 						if (mock.CallBase && !invocation.Method.IsAbstract)
 						{
-							invocation.ReturnBase();
-							return true;
+							if (!mock.Setups.HasEventSetup)
+							{
+								invocation.ReturnBase();
+							}
 						}
 						else if (invocation.Arguments.Length > 0 && invocation.Arguments[0] is Delegate delegateInstance)
 						{
 							mock.EventHandlers.Remove(eventInfo.Name, delegateInstance);
-							invocation.Return();
-							return true;
+
+							if (!mock.Setups.HasEventSetup)
+							{
+								invocation.Return();
+							}
 						}
+
+						return !mock.Setups.HasEventSetup;
 					}
 				}
 			}

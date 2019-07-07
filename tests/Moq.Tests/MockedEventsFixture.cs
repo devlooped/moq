@@ -654,6 +654,147 @@ namespace Moq.Tests
 			Assert.Same(parentMock.Object, sender);
 		}
 
+		[Fact]
+		public void Should_verify_event_add_if_invoked()
+		{
+			//Arrange
+			var mock = new Mock<IAdder<EventArgs>>();
+			mock.SetupAdd(m => m.Added += (sender, args) => { });
+
+			//Act
+			mock.Object.Added += (sender, args) => { };
+			mock.Object.Added += (sender, args) => { };
+
+			//Assert
+			mock.VerifyAdd(m => m.Added += It.IsAny<EventHandler>(), Times.Exactly(2));
+		}
+
+		[Fact]
+		public void Should_verify_event_remove_if_invoked()
+		{
+			//Arrange
+			var mock = new Mock<IAdder<EventArgs>>();
+			mock.SetupRemove(m => m.Added -= (sender, args) => { });
+
+			//Act
+			mock.Object.Added -= (sender, args) => { };
+			mock.Object.Added -= (sender, args) => { };
+
+			//Assert
+			mock.VerifyRemove(m => m.Added -= It.IsAny<EventHandler>(), Times.Exactly(2));
+		}
+
+		[Fact]
+		public void Should_verify_event_add_remove_using_verifyall()
+		{
+			//Arrange
+			var mock = new Mock<IAdder<EventArgs>>();
+			mock.SetupAdd(m => m.Added += It.IsAny<EventHandler>());
+			mock.SetupRemove(m => m.Added -= It.IsAny<EventHandler>());
+
+			//Act
+			mock.Object.Added += (sender, args) => { };
+			mock.Object.Added -= (sender, args) => { };
+
+			//Assert
+			mock.VerifyAll();
+		}
+
+		[Fact]
+		public void Should_verify_event_add_remove_using_verifiable()
+		{
+			//Arrange
+			var mock = new Mock<IAdder<EventArgs>>();
+			mock.SetupAdd(m => m.Added += It.IsAny<EventHandler>()).Verifiable();
+			mock.SetupRemove(m => m.Added -= It.IsAny<EventHandler>());
+
+			//Act
+			mock.Object.Added += (sender, args) => { };
+
+			//Assert
+			mock.Verify();
+		}
+
+		[Fact]
+		public void Should_throw_when_event_not_verified()
+		{
+			//Arrange
+			var mock = new Mock<IAdder<EventArgs>>();
+			mock.SetupAdd(m => m.Added += It.IsAny<EventHandler>()).Verifiable();
+			mock.SetupRemove(m => m.Added -= It.IsAny<EventHandler>()).Verifiable("not invoked");
+
+			//Act
+			mock.Object.Added += (sender, args) => { };
+
+			//Assert
+			Assert.Throws<MockException>(() => mock.Verify());
+		}
+
+		[Fact]
+		public void Should_proceed_event_when_callbase()
+		{
+			//Arrange
+			var invoked = 0;
+			var mock = new Mock<WithEvent>();
+			mock.SetupAdd(m => m.VirtualEvent += It.IsAny<EventHandler>()).CallBase();
+
+			//Act
+			mock.Object.VirtualEvent += (s, a) => { invoked++; };
+			mock.Object.VirtualEvent += (s, a) => { invoked++; };
+			mock.Object.VirtualEvent += (s, a) => { invoked++; };
+			mock.Object.OnVirtualEvent();
+
+			//Assert
+			Assert.Equal(3, invoked);
+		}
+
+		[Fact]
+		public void Should_not_proceed_event_when_not_callbase()
+		{
+			//Arrange
+			var invoked = 0;
+			var mock = new Mock<WithEvent>();
+			mock.SetupAdd(m => m.VirtualEvent += It.IsAny<EventHandler>());
+
+			//Act
+			mock.Object.VirtualEvent += (s, a) => { invoked++; };
+			mock.Object.VirtualEvent += (s, a) => { invoked++; };
+			mock.Object.VirtualEvent += (s, a) => { invoked++; };
+			mock.Object.OnVirtualEvent();
+
+			//Assert
+			Assert.Equal(0, invoked);
+		}
+
+		[Fact]
+		public void Should_throw_verify_no_other_calls_when_not_verified()
+		{
+			//Arrange
+			var mock = new Mock<IAdder<EventArgs>>();
+			mock.SetupAdd(m => m.Added += It.IsAny<EventHandler>()).Verifiable();
+
+			//Act
+			mock.Object.Added += (sender, args) => { };
+
+			//Assert
+			Assert.Throws<MockException>(() => mock.VerifyNoOtherCalls());
+		}
+
+		[Fact]
+		public void Should_not_throw_verify_no_other_calls_when_verified()
+		{
+			//Arrange
+			var mock = new Mock<IAdder<EventArgs>>();
+			mock.SetupAdd(m => m.Added += It.IsAny<EventHandler>()).Verifiable();
+
+			//Act
+			mock.Object.Added += (sender, args) => { };
+
+			//Assert
+			mock.Verify();
+			mock.VerifyNoOtherCalls();
+		}
+
 		public delegate void CustomEvent(string message, int value);
 
 		public interface IWithEvent
@@ -669,6 +810,9 @@ namespace Moq.Tests
 			public event EventHandler ClassEvent = (s, e) => { };
 			public event CustomEvent CustomEvent = (s, e) => { };
 			public virtual event EventHandler VirtualEvent = (s, e) => { };
+
+			public void OnVirtualEvent() => VirtualEvent?.Invoke(this, new EventArgs());
+
 			public virtual object Value { get; set; }
 		}
 
@@ -682,10 +826,15 @@ namespace Moq.Tests
 			public string Value { get; set; }
 		}
 
+		public delegate void MyEventHandler<T>(object sender, T args) where T: EventArgs;
+
+		public class MyEventArgs : EventArgs { }
+
 		public interface IAdder<T>
 		{
 			event EventHandler<DoneArgs> Done;
 			event EventHandler Added;
+			event MyEventHandler<MyEventArgs> MyEvent;
 			void Add(T value);
 			int Insert(T value, int index);
 			void Do(string s);

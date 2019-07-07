@@ -41,18 +41,31 @@ namespace Moq
 
 			if (includeGenericArgumentList && method.IsGenericMethod)
 			{
-				stringBuilder.Append('<');
-				var genericArguments = method.GetGenericArguments();
-				for (int i = 0, n = genericArguments.Length; i < n; ++i)
-				{
-					if (i > 0)
-					{
-						stringBuilder.Append(", ");
-					}
-					stringBuilder.AppendNameOf(genericArguments[i]);
-				}
+				stringBuilder.AppendGenericArguments(method);
+			}
 
-				stringBuilder.Append('>');
+			return stringBuilder;
+		}
+
+		public static StringBuilder AppendNameOfAddEvent(this StringBuilder stringBuilder, MethodBase method, bool includeGenericArgumentList)
+		{
+			stringBuilder.Append(method.Name.Replace("add_", "")).Append(" += ");
+
+			if (includeGenericArgumentList && method.IsGenericMethod)
+			{
+				stringBuilder.AppendGenericArguments(method);
+			}
+
+			return stringBuilder;
+		}
+
+		public static StringBuilder AppendNameOfRemoveEvent(this StringBuilder stringBuilder, MethodBase method, bool includeGenericArgumentList)
+		{
+			stringBuilder.Append(method.Name.Replace("remove_", "")).Append(" -= ");
+
+			if (includeGenericArgumentList && method.IsGenericMethod)
+			{
+				stringBuilder.AppendGenericArguments(method);
 			}
 
 			return stringBuilder;
@@ -131,6 +144,23 @@ namespace Moq
 			{
 				--stringBuilder.Length;
 			}
+			return stringBuilder;
+		}
+
+		private static StringBuilder AppendGenericArguments(this StringBuilder stringBuilder, MethodBase method)
+		{
+			stringBuilder.Append('<');
+			var genericArguments = method.GetGenericArguments();
+			for (int i = 0, n = genericArguments.Length; i < n; ++i)
+			{
+				if (i > 0)
+				{
+					stringBuilder.Append(", ");
+				}
+				stringBuilder.AppendNameOf(genericArguments[i]);
+			}
+			stringBuilder.Append('>');
+
 			return stringBuilder;
 		}
 	}

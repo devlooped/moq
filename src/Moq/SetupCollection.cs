@@ -11,17 +11,35 @@ namespace Moq
 	{
 		private List<Setup> setups;
 		private uint overridden;  // bit mask for the first 32 setups flagging those known to be overridden
+		private bool hasEventSetup;
 
 		public SetupCollection()
 		{
 			this.setups = new List<Setup>();
 			this.overridden = 0U;
+			this.hasEventSetup = false;
+		}
+
+		public bool HasEventSetup
+		{
+			get
+			{
+				lock(this.setups)
+				{
+					return this.hasEventSetup;
+				}
+			}
 		}
 
 		public void Add(Setup setup)
 		{
 			lock (this.setups)
 			{
+				if (setup.Method.LooksLikeEventAttach() || setup.Method.LooksLikeEventDetach())
+				{
+					this.hasEventSetup = true;
+				}
+
 				this.setups.Add(setup);
 			}
 		}
@@ -44,7 +62,7 @@ namespace Moq
 
 			lock (this.setups)
 			{
-				this.setups.RemoveAll(x => predicate(x));
+				this.setups.RemoveAll(x => RecordEventSetupWhileRemove(x, predicate));
 				this.overridden = 0U;
 			}
 		}
@@ -55,6 +73,7 @@ namespace Moq
 			{
 				this.setups.Clear();
 				this.overridden = 0U;
+				this.hasEventSetup = false;
 			}
 		}
 
@@ -138,6 +157,14 @@ namespace Moq
 			}
 
 			return matchingSetups.ToArray();
+		}
+
+		private bool RecordEventSetupWhileRemove(Setup setup, Func<Setup, bool> predicate)
+		{
+			this.hasEventSetup = false;
+			var shouldBeRemoved = predicate(setup);
+			this.hasEventSetup |= !shouldBeRemoved && (setup.Method.LooksLikeEventAttach() || setup.Method.LooksLikeEventDetach());
+			return shouldBeRemoved;
 		}
 	}
 }

@@ -344,6 +344,18 @@ namespace Moq
 					this.builder.Append('.').Append(node.Method.Name.Substring(4)).Append(" = ");
 					ToString(node.Arguments.Last());
 				}
+				else if (node.Method.LooksLikeEventAttach())
+				{
+					this.builder.Append('.')
+					.AppendNameOfAddEvent(node.Method, includeGenericArgumentList: true);
+					AsCommaSeparatedValues(node.Arguments.Skip(paramFrom), ToString);
+				}
+				else if (node.Method.LooksLikeEventDetach())
+				{
+					this.builder.Append('.')
+					.AppendNameOfRemoveEvent(node.Method, includeGenericArgumentList: true);
+					AsCommaSeparatedValues(node.Arguments.Skip(paramFrom), ToString);
+				}
 				else
 				{
 					this.builder

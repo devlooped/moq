@@ -1091,6 +1091,7 @@ namespace Moq.Tests
 			void Submit();
 			string Execute(string command);
 			int this[int index] { get; set; }
+			event EventHandler EventHandler;
 		}
 
 		public interface IParams
@@ -1223,6 +1224,50 @@ namespace Moq.Tests
 			mock.Reset();
 
 			Assert.Empty(mock.ConfiguredDefaultValues);
+		}
+
+		[Fact]
+		public void Reset_clears_event_setup_flag()
+		{
+			var mock = new Mock<IFoo>();
+			mock.SetupAdd(m => m.EventHandler += It.IsAny<EventHandler>());
+
+			var before = mock.Setups.HasEventSetup;
+			mock.Reset();
+			var after = mock.Setups.HasEventSetup;
+
+			Assert.True(before, "Before reset");
+			Assert.False(after, "After reset");
+		}
+
+		[Fact]
+		public void RemoveAll_clears_event_setup_flag_when_predicate_matched()
+		{
+			var mock = new Mock<IFoo>();
+			mock.Setup(m => m.Submit()).Verifiable();
+			mock.SetupAdd(m => m.EventHandler += It.IsAny<EventHandler>()).Verifiable();
+
+			var before = mock.Setups.HasEventSetup;
+			mock.Setups.RemoveAll(s => s.IsVerifiable);
+			var after = mock.Setups.HasEventSetup;
+
+			Assert.True(before, "Before RemoveAll");
+			Assert.False(after, "After RemoveAll");
+		}
+
+		[Fact]
+		public void RemoveAll_doesnt_clears_event_setup_flag_when_predicate_not_matched()
+		{
+			var mock = new Mock<IFoo>();
+			mock.Setup(m => m.Submit()).Verifiable();
+			mock.SetupAdd(m => m.EventHandler += It.IsAny<EventHandler>());
+
+			var before = mock.Setups.HasEventSetup;
+			mock.Setups.RemoveAll(s => s.IsVerifiable);
+			var after = mock.Setups.HasEventSetup;
+
+			Assert.True(before, "Before RemoveAll");
+			Assert.True(after, "After RemoveAll");
 		}
 
 #if FEATURE_SERIALIZATION

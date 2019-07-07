@@ -82,6 +82,46 @@ namespace Moq
 			}
 		}
 
+		public static void IsEventAttach(LambdaExpression expression, string paramName)
+		{
+			Debug.Assert(expression != null);
+
+			switch (expression.Body.NodeType)
+			{
+				case ExpressionType.Call:
+					var call = (MethodCallExpression)expression.Body;
+					if (call.Method.LooksLikeEventAttach()) return;
+					break;
+			}
+
+			throw new ArgumentException(
+				string.Format(
+					CultureInfo.CurrentCulture,
+					Resources.SetupNotEventAttach,
+					expression.ToStringFixed()),
+				paramName);
+		}
+
+		public static void IsEventDetach(LambdaExpression expression, string paramName)
+		{
+			Debug.Assert(expression != null);
+
+			switch (expression.Body.NodeType)
+			{
+				case ExpressionType.Call:
+					var call = (MethodCallExpression)expression.Body;
+					if (call.Method.LooksLikeEventDetach()) return;
+					break;
+			}
+
+			throw new ArgumentException(
+				string.Format(
+					CultureInfo.CurrentCulture,
+					Resources.SetupNotEventDetach,
+					expression.ToStringFixed()),
+				paramName);
+		}
+
 		/// <summary>
 		/// Ensures the given <paramref name="value"/> is not null.
 		/// Throws <see cref="ArgumentNullException"/> otherwise.
