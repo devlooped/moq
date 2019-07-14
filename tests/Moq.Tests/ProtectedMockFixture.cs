@@ -44,13 +44,37 @@ namespace Moq.Tests
 		[Fact]
 		public void ThrowsIfSetupVoidMethodNotFound()
 		{
-			Assert.Throws<ArgumentException>(() => new Mock<FooBase>().Protected().Setup("Foo"));
+			var actual = Record.Exception(() =>
+			{
+				new Mock<FooBase>().Protected().Setup("Foo");
+			});
+
+			Assert.IsType<ArgumentException>(actual);
+			Assert.Equal("No Protected Method FooBase.Foo found whose parameters are compatible with provided types : ().", actual.Message);
 		}
 
 		[Fact]
 		public void ThrowsIfSetupResultMethodNotFound()
 		{
-			Assert.Throws<ArgumentException>(() => new Mock<FooBase>().Protected().Setup<int>("Foo"));
+			var actual = Record.Exception(() =>
+			{
+				new Mock<FooBase>().Protected().Setup<int>("Foo");
+			});
+
+			Assert.IsType<ArgumentException>(actual);
+			Assert.Equal("No Protected Method FooBase.Foo found whose parameters are compatible with provided types : ().", actual.Message);
+		}
+
+		[Fact]
+		public void ThrowsIfIncompatibleArgumentSupplied()
+		{
+			var actual = Record.Exception(() =>
+			{
+				new Mock<FooBase>().Protected().Setup<string>("StringArg", ItExpr.IsAny<int>());
+			});
+
+			Assert.IsType<ArgumentException>(actual);
+			Assert.Equal("No Protected Method FooBase.StringArg found whose parameters are compatible with provided types : (System.Int32).", actual.Message);
 		}
 
 		[Fact]
