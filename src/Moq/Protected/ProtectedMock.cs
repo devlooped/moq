@@ -44,7 +44,7 @@ namespace Moq.Protected
 			Guard.NotNullOrEmpty(methodName, nameof(methodName));
 
 			var method = GetMethod(methodName, exactParameterMatch, args);
-			ThrowIfMemberMissing(methodName, method);
+			ThrowIfMethodMissing(methodName, method, args);
 			ThrowIfPublicMethod(method, typeof(T).Name);
 
 			var setup = Mock.Setup(mock, GetMethodCall(method, args), null);
@@ -72,7 +72,7 @@ namespace Moq.Protected
 			}
 
 			var method = GetMethod(methodName, exactParameterMatch, args);
-			ThrowIfMemberMissing(methodName, method);
+			ThrowIfMethodMissing(methodName, method, args);
 			ThrowIfVoidMethod(method);
 			ThrowIfPublicMethod(method, typeof(T).Name);
 
@@ -166,7 +166,7 @@ namespace Moq.Protected
 			Guard.NotNullOrEmpty(methodName, nameof(methodName));
 
 			var method = GetMethod(methodName, exactParameterMatch, args);
-			ThrowIfMemberMissing(methodName, method);
+			ThrowIfMethodMissing(methodName, method, args);
 			ThrowIfPublicMethod(method, typeof(T).Name);
 
 			Mock.Verify(mock, GetMethodCall(method, args), times, null);
@@ -191,7 +191,7 @@ namespace Moq.Protected
 			}
 
 			var method = GetMethod(methodName, exactParameterMatch, args);
-			ThrowIfMemberMissing(methodName, method);
+			ThrowIfMethodMissing(methodName, method, args);
 			ThrowIfPublicMethod(method, typeof(T).Name);
 
 			Mock.Verify(mock, GetMethodCall<TResult>(method, args), times, null);
@@ -285,6 +285,33 @@ namespace Moq.Protected
 					Resources.MemberMissing,
 					typeof(T).Name,
 					memberName));
+			}
+		}
+
+		private static void ThrowIfMethodMissing(string methodName, MethodInfo method, object[] args)
+		{
+			if (method == null)
+			{
+				List<string> extractedTypeNames = new List<string>();
+				foreach (object o in args)
+				{
+					if (o is System.Linq.Expressions.MethodCallExpression)
+					{
+						extractedTypeNames.Add(((MethodCallExpression)o).Type.ToString());
+					} else
+					{
+						extractedTypeNames.Add(o.GetType().ToString());
+					}
+				}
+
+				throw new ArgumentException(string.Format(
+					CultureInfo.CurrentCulture,
+					Resources.MethodMissing,
+					typeof(T).Name,
+					methodName,
+					string.Join(
+						", ", 
+						extractedTypeNames.ToArray())));
 			}
 		}
 
