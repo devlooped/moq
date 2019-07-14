@@ -50,7 +50,7 @@ namespace Moq.Tests
 			});
 
 			Assert.IsType<ArgumentException>(actual);
-			Assert.Equal("No Protected Method FooBase.Foo found whose parameters are compatible with provided types : ().", actual.Message);
+			Assert.Equal("No protected method FooBase.Foo found whose signature is compatible with the provided arguments ().", actual.Message);
 		}
 
 		[Fact]
@@ -62,7 +62,7 @@ namespace Moq.Tests
 			});
 
 			Assert.IsType<ArgumentException>(actual);
-			Assert.Equal("No Protected Method FooBase.Foo found whose parameters are compatible with provided types : ().", actual.Message);
+			Assert.Equal("No protected method FooBase.Foo found whose signature is compatible with the provided arguments ().", actual.Message);
 		}
 
 		[Fact]
@@ -74,7 +74,7 @@ namespace Moq.Tests
 			});
 
 			Assert.IsType<ArgumentException>(actual);
-			Assert.Equal("No Protected Method FooBase.StringArg found whose parameters are compatible with provided types : (System.Int32).", actual.Message);
+			Assert.Equal("No protected method FooBase.StringArg found whose signature is compatible with the provided arguments (int).", actual.Message);
 		}
 
 		[Fact]
@@ -456,7 +456,7 @@ namespace Moq.Tests
 			});
 
 			Assert.IsType<ArgumentException>(actual);
-			Assert.Equal("No Protected Method FooBase.Foo found whose parameters are compatible with provided types : ().", actual.Message);
+			Assert.Equal("No protected method FooBase.Foo found whose signature is compatible with the provided arguments ().", actual.Message);
 		}
 
 		[Fact]
@@ -468,7 +468,7 @@ namespace Moq.Tests
 			});
 
 			Assert.IsType<ArgumentException>(actual);
-			Assert.Equal("No Protected Method FooBase.Foo found whose parameters are compatible with provided types : ().", actual.Message);
+			Assert.Equal("No protected method FooBase.Foo found whose signature is compatible with the provided arguments ().", actual.Message);
 		}
 
 		[Fact]
@@ -480,7 +480,7 @@ namespace Moq.Tests
 			});
 
 			Assert.IsType<ArgumentException>(actual);
-			Assert.Equal("No Protected Method FooBase.StringArg found whose parameters are compatible with provided types : (System.Int32).", actual.Message);
+			Assert.Equal("No protected method FooBase.StringArg found whose signature is compatible with the provided arguments (int).", actual.Message);
 		}
 
 		[Fact]

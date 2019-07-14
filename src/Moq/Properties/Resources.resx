@@ -355,6 +355,6 @@ This could be caused by an unrecognized type conversion, coercion, narrowing, or
 		<value>Static members (here: {0}) may not be used in setup / verification expressions.</value>
 	</data>
 	<data name="MethodMissing" xml:space="preserve">
-		<value>No Protected Method {0}.{1} found whose parameters are compatible with provided types : ({2}).</value>
+		<value>No protected method {0}.{1} found whose signature is compatible with the provided arguments ({2}).</value>
 	</data>
 </root>

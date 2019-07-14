@@ -300,7 +300,7 @@ namespace Moq.Properties {
 		}
 		
 		/// <summary>
-		///   Looks up a localized string similar to No Protected Method {0}.{1} found whose parameters are compatible with provided types : ({2})..
+		///   Looks up a localized string similar to No protected method {0}.{1} found whose signature is compatible with the provided arguments ({2})..
 		/// </summary>
 		internal static string MethodMissing {
 			get {

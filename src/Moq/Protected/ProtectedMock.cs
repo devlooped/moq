@@ -11,6 +11,7 @@ using System.Reflection;
 using Moq.Language;
 using Moq.Language.Flow;
 using Moq.Properties;
+using TypeNameFormatter;
 
 namespace Moq.Protected
 {
@@ -295,12 +296,12 @@ namespace Moq.Protected
 				List<string> extractedTypeNames = new List<string>();
 				foreach (object o in args)
 				{
-					if (o is System.Linq.Expressions.MethodCallExpression)
+					if (o is Expression expr)
 					{
-						extractedTypeNames.Add(((MethodCallExpression)o).Type.ToString());
+						extractedTypeNames.Add(expr.Type.GetFormattedName());
 					} else
 					{
-						extractedTypeNames.Add(o.GetType().ToString());
+						extractedTypeNames.Add(o.GetType().GetFormattedName());
 					}
 				}
 
