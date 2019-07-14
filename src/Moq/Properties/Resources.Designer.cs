@@ -19,7 +19,7 @@ namespace Moq.Properties {
 	// class via a tool like ResGen or Visual Studio.
 	// To add or remove a member, edit your .ResX file then rerun ResGen
 	// with the /str option, or rebuild your VS project.
-	[global::System.CodeDom.Compiler.GeneratedCodeAttribute("System.Resources.Tools.StronglyTypedResourceBuilder", "15.0.0.0")]
+	[global::System.CodeDom.Compiler.GeneratedCodeAttribute("System.Resources.Tools.StronglyTypedResourceBuilder", "16.0.0.0")]
 	[global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
 	[global::System.Runtime.CompilerServices.CompilerGeneratedAttribute()]
 	internal class Resources {
@@ -300,6 +300,15 @@ namespace Moq.Properties {
 		}
 		
 		/// <summary>
+		///   Looks up a localized string similar to No protected method {0}.{1} found whose signature is compatible with the provided arguments ({2})..
+		/// </summary>
+		internal static string MethodMissing {
+			get {
+				return ResourceManager.GetString("MethodMissing", resourceCulture);
+			}
+		}
+		
+		/// <summary>
 		///   Looks up a localized string similar to Cannot set up {0}.{1} because it is not accessible to the proxy generator used by Moq:
 		///{2}.
 		/// </summary>
@@ -365,7 +374,7 @@ namespace Moq.Properties {
 		}
 		
 		/// <summary>
-		///   Looks up a localized string similar to Expected invocation on the mock at least {1} times, but was {2} times:.
+		///   Looks up a localized string similar to Expected invocation on the mock at least {0} times, but was {2} times: .
 		/// </summary>
 		internal static string NoMatchingCallsAtLeast {
 			get {

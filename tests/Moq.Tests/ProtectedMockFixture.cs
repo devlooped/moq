@@ -44,13 +44,37 @@ namespace Moq.Tests
 		[Fact]
 		public void ThrowsIfSetupVoidMethodNotFound()
 		{
-			Assert.Throws<ArgumentException>(() => new Mock<FooBase>().Protected().Setup("Foo"));
+			var actual = Record.Exception(() =>
+			{
+				new Mock<FooBase>().Protected().Setup("Foo");
+			});
+
+			Assert.IsType<ArgumentException>(actual);
+			Assert.Equal("No protected method FooBase.Foo found whose signature is compatible with the provided arguments ().", actual.Message);
 		}
 
 		[Fact]
 		public void ThrowsIfSetupResultMethodNotFound()
 		{
-			Assert.Throws<ArgumentException>(() => new Mock<FooBase>().Protected().Setup<int>("Foo"));
+			var actual = Record.Exception(() =>
+			{
+				new Mock<FooBase>().Protected().Setup<int>("Foo");
+			});
+
+			Assert.IsType<ArgumentException>(actual);
+			Assert.Equal("No protected method FooBase.Foo found whose signature is compatible with the provided arguments ().", actual.Message);
+		}
+
+		[Fact]
+		public void ThrowsIfSetupIncompatibleArgumentSupplied()
+		{
+			var actual = Record.Exception(() =>
+			{
+				new Mock<FooBase>().Protected().Setup<string>("StringArg", ItExpr.IsAny<int>());
+			});
+
+			Assert.IsType<ArgumentException>(actual);
+			Assert.Equal("No protected method FooBase.StringArg found whose signature is compatible with the provided arguments (int).", actual.Message);
 		}
 
 		[Fact]
@@ -426,13 +450,37 @@ namespace Moq.Tests
 		[Fact]
 		public void ThrowsIfVerifyVoidMethodNotFound()
 		{
-			Assert.Throws<ArgumentException>(() => new Mock<FooBase>().Protected().Verify("Foo", Times.Once()));
+			var actual = Record.Exception(() =>
+			{
+				new Mock<FooBase>().Protected().Verify("Foo", Times.Once());
+			});
+
+			Assert.IsType<ArgumentException>(actual);
+			Assert.Equal("No protected method FooBase.Foo found whose signature is compatible with the provided arguments ().", actual.Message);
 		}
 
 		[Fact]
 		public void ThrowsIfVerifyResultMethodNotFound()
 		{
-			Assert.Throws<ArgumentException>(() => new Mock<FooBase>().Protected().Verify<int>("Foo", Times.Once()));
+			var actual = Record.Exception(() =>
+			{
+				new Mock<FooBase>().Protected().Verify<int>("Foo", Times.Once());
+			});
+
+			Assert.IsType<ArgumentException>(actual);
+			Assert.Equal("No protected method FooBase.Foo found whose signature is compatible with the provided arguments ().", actual.Message);
+		}
+
+		[Fact]
+		public void ThrowsIfVerifyIncompatibleArgumentSupplied()
+		{
+			var actual = Record.Exception(() =>
+			{
+				new Mock<FooBase>().Protected().Verify<string>("StringArg", Times.Once(), ItExpr.IsAny<int>());
+			});
+
+			Assert.IsType<ArgumentException>(actual);
+			Assert.Equal("No protected method FooBase.StringArg found whose signature is compatible with the provided arguments (int).", actual.Message);
 		}
 
 		[Fact]

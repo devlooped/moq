@@ -354,4 +354,7 @@ This could be caused by an unrecognized type conversion, coercion, narrowing, or
 	<data name="UnsupportedStaticMember" xml:space="preserve">
 		<value>Static members (here: {0}) may not be used in setup / verification expressions.</value>
 	</data>
+	<data name="MethodMissing" xml:space="preserve">
+		<value>No protected method {0}.{1} found whose signature is compatible with the provided arguments ({2}).</value>
+	</data>
 </root>

@@ -5,6 +5,12 @@ All notable changes to this project will be documented in this file.
 The format is loosely based on [Keep a Changelog](http://keepachangelog.com/en/1.0.0/).
 
 
+## Unreleased
+
+#### Changed
+
+* Improved error message that is supplied with `ArgumentException` thrown when `Setup` or `Verify` are called on a protected method if the method could not be found with both the name and compatible argument types specified (@thomasfdm, #852).
+
 ## 4.12.0 (2019-06-20)
 
 #### Changed
