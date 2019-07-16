@@ -148,9 +148,11 @@ namespace Moq
 						// If they are equal, then `invocation.Method` is definitely an event `add` accessor.
 						// Not sure whether this would work with F# and COM; see commit 44070a9.
 
+						bool doesntHaveEventSetup = !mock.Setups.HasEventSetup;
+
 						if (mock.CallBase && !invocation.Method.IsAbstract)
 						{
-							if(!mock.Setups.HasEventSetup)
+							if(doesntHaveEventSetup)
 							{
 								invocation.ReturnBase();
 							}
@@ -159,13 +161,13 @@ namespace Moq
 						{
 							mock.EventHandlers.Add(eventInfo.Name, delegateInstance);
 
-							if (!mock.Setups.HasEventSetup)
+							if (doesntHaveEventSetup)
 							{
 								invocation.Return();
 							}
 						}
 
-						return !mock.Setups.HasEventSetup;
+						return doesntHaveEventSetup;
 					}
 				}
 				else if (methodName[0] == 'r' && methodName.Length > 7 && methodName[6] == '_' && invocation.Method.LooksLikeEventDetach())
@@ -177,9 +179,11 @@ namespace Moq
 						// If they are equal, then `invocation.Method` is definitely an event `remove` accessor.
 						// Not sure whether this would work with F# and COM; see commit 44070a9.
 
+						bool doesntHaveEventSetup = !mock.Setups.HasEventSetup;
+
 						if (mock.CallBase && !invocation.Method.IsAbstract)
 						{
-							if (!mock.Setups.HasEventSetup)
+							if (doesntHaveEventSetup)
 							{
 								invocation.ReturnBase();
 							}
@@ -188,13 +192,13 @@ namespace Moq
 						{
 							mock.EventHandlers.Remove(eventInfo.Name, delegateInstance);
 
-							if (!mock.Setups.HasEventSetup)
+							if (doesntHaveEventSetup)
 							{
 								invocation.Return();
 							}
 						}
 
-						return !mock.Setups.HasEventSetup;
+						return doesntHaveEventSetup;
 					}
 				}
 			}
