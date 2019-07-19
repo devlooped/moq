@@ -29,7 +29,7 @@
 				...
 				// other test code
 				...
-				// Will throw if the test code has didn't call HasInventory.
+				// Will throw if the test code did not call HasInventory.
 				this.Verify();
 			</code>
 		</example>
@@ -45,8 +45,8 @@
 				...
 				// other test code
 				...
-				// Will throw if the test code has didn't call HasInventory, even
-				// that expectation was not marked as verifiable.
+				// Will throw if the test code did not call HasInventory, even
+				// though that expectation was not marked as verifiable.
 				this.VerifyAll();
 			</code>
 		</example>
