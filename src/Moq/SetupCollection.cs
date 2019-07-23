@@ -49,8 +49,6 @@ namespace Moq
 			}
 		}
 
-
-
 		public void RemoveAllPropertyAccessorSetups()
 		{
 			// Fast path (no `lock`) when there are no setups:
