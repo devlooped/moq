@@ -104,25 +104,16 @@ namespace Moq
 
 			this.callbackResponse?.Invoke(invocation.Arguments);
 
-			var methodIsNonVoid = (this.flags & Flags.MethodIsNonVoid) != 0;
-
-			if (!methodIsNonVoid)
+			if ((this.flags & Flags.CallBase) != 0)
 			{
-				if ((this.flags & Flags.CallBase) != 0)
-				{
-					invocation.ReturnBase();
-				}
-				else
-				{
-					invocation.Return();
-				}
+				invocation.ReturnBase();
 			}
 
 			this.raiseEventResponse?.RespondTo(invocation);
 
 			this.returnOrThrowResponse?.RespondTo(invocation);
 
-			if (methodIsNonVoid)
+			if ((this.flags & Flags.MethodIsNonVoid) != 0)
 			{
 				if (this.returnOrThrowResponse == null)
 				{

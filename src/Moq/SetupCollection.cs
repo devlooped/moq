@@ -11,7 +11,7 @@ namespace Moq
 	{
 		private List<Setup> setups;
 		private uint overridden;  // bit mask for the first 32 setups flagging those known to be overridden
-		private bool hasEventSetup;
+		private volatile bool hasEventSetup;
 
 		public SetupCollection()
 		{
@@ -24,10 +24,7 @@ namespace Moq
 		{
 			get
 			{
-				lock(this.setups)
-				{
-					return this.hasEventSetup;
-				}
+				return this.hasEventSetup;
 			}
 		}
 
@@ -52,7 +49,9 @@ namespace Moq
 			}
 		}
 
-		public void RemoveAll(Func<Setup, bool> predicate)
+
+
+		public void RemoveAllPropertyAccessorSetups()
 		{
 			// Fast path (no `lock`) when there are no setups:
 			if (this.setups.Count == 0)
@@ -62,7 +61,7 @@ namespace Moq
 
 			lock (this.setups)
 			{
-				this.setups.RemoveAll(x => RecordEventSetupWhileRemove(x, predicate));
+				this.setups.RemoveAll(x => x.Method.IsPropertyAccessor());
 				this.overridden = 0U;
 			}
 		}
@@ -157,14 +156,6 @@ namespace Moq
 			}
 
 			return matchingSetups.ToArray();
-		}
-
-		private bool RecordEventSetupWhileRemove(Setup setup, Func<Setup, bool> predicate)
-		{
-			this.hasEventSetup = false;
-			var shouldBeRemoved = predicate(setup);
-			this.hasEventSetup |= !shouldBeRemoved && (setup.Method.LooksLikeEventAttach() || setup.Method.LooksLikeEventDetach());
-			return shouldBeRemoved;
 		}
 	}
 }

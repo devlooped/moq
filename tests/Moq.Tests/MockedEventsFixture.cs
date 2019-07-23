@@ -4,7 +4,6 @@
 using System;
 using System.ComponentModel;
 using System.Diagnostics.CodeAnalysis;
-
 using Xunit;
 
 namespace Moq.Tests
@@ -655,7 +654,7 @@ namespace Moq.Tests
 		}
 
 		[Fact]
-		public void Should_verify_event_add_if_invoked()
+		public void VerifyAdd_should_not_throw_when_subscribed()
 		{
 			//Arrange
 			var mock = new Mock<IAdder<EventArgs>>();
@@ -670,7 +669,7 @@ namespace Moq.Tests
 		}
 
 		[Fact]
-		public void Should_verify_event_remove_if_invoked()
+		public void VerifyRemove_should_not_throw_when_unsubscribed()
 		{
 			//Arrange
 			var mock = new Mock<IAdder<EventArgs>>();
@@ -685,7 +684,7 @@ namespace Moq.Tests
 		}
 
 		[Fact]
-		public void Should_verify_event_add_remove_using_verifyall()
+		public void VerifyAll_should_not_throw_when_events_verified()
 		{
 			//Arrange
 			var mock = new Mock<IAdder<EventArgs>>();
@@ -701,7 +700,7 @@ namespace Moq.Tests
 		}
 
 		[Fact]
-		public void Should_verify_event_add_remove_using_verifiable()
+		public void Verify_should_not_throw_when_events_verified()
 		{
 			//Arrange
 			var mock = new Mock<IAdder<EventArgs>>();
@@ -716,7 +715,7 @@ namespace Moq.Tests
 		}
 
 		[Fact]
-		public void Should_throw_when_event_not_verified()
+		public void Verify_should_throw_when_event_not_verified()
 		{
 			//Arrange
 			var mock = new Mock<IAdder<EventArgs>>();
@@ -767,7 +766,7 @@ namespace Moq.Tests
 		}
 
 		[Fact]
-		public void Should_throw_verify_no_other_calls_when_not_verified()
+		public void VerifyNoOtherCalls_should_throw_when_not_verified()
 		{
 			//Arrange
 			var mock = new Mock<IAdder<EventArgs>>();
@@ -781,7 +780,7 @@ namespace Moq.Tests
 		}
 
 		[Fact]
-		public void Should_not_throw_verify_no_other_calls_when_verified()
+		public void VerifyNoOtherCalls_should_not_throw_when_verified()
 		{
 			//Arrange
 			var mock = new Mock<IAdder<EventArgs>>();
@@ -793,6 +792,62 @@ namespace Moq.Tests
 			//Assert
 			mock.Verify();
 			mock.VerifyNoOtherCalls();
+		}
+
+		[Fact]
+		public void VerifyAdd_should_throw_when_not_an_add_event()
+		{
+			//Arrange
+			var mock = new Mock<IAdder<EventArgs>>();
+
+			//Act
+			var exception = Record.Exception(() => mock.VerifyAdd(m => m.Do(It.IsAny<string>())));
+
+			//Assert
+			Assert.IsType<ArgumentException>(exception);
+		}
+
+		[Fact]
+		public void VerifyRemove_should_throw_when_not_an_remove_event()
+		{
+			//Arrange
+			var mock = new Mock<IAdder<EventArgs>>();
+
+			//Act
+			var exception = Record.Exception(() => mock.VerifyRemove(m => m.Do(It.IsAny<string>())));
+
+			//Assert
+			Assert.IsType<ArgumentException>(exception);
+		}
+
+		[Fact]
+		public void Should_invoke_callback_on_add_event_accessor_setup()
+		{
+			//Arrange
+			var invoked = false;
+			var mock = new Mock<IAdder<EventArgs>>();
+			mock.SetupAdd(m => m.Added += It.IsAny<EventHandler>()).Callback(() => invoked = true);
+
+			//Act
+			mock.Object.Added += (s, a) => { };
+
+			//Assert
+			Assert.True(invoked);
+		}
+
+		[Fact]
+		public void Should_invoke_callback_on_remove_event_accessor_setup()
+		{
+			//Arrange
+			var invoked = false;
+			var mock = new Mock<IAdder<EventArgs>>();
+			mock.SetupRemove(m => m.Added -= It.IsAny<EventHandler>()).Callback(() => invoked = true);
+
+			//Act
+			mock.Object.Added -= (s, a) => { };
+
+			//Assert
+			Assert.True(invoked);
 		}
 
 		public delegate void CustomEvent(string message, int value);
@@ -826,15 +881,10 @@ namespace Moq.Tests
 			public string Value { get; set; }
 		}
 
-		public delegate void MyEventHandler<T>(object sender, T args) where T: EventArgs;
-
-		public class MyEventArgs : EventArgs { }
-
 		public interface IAdder<T>
 		{
 			event EventHandler<DoneArgs> Done;
 			event EventHandler Added;
-			event MyEventHandler<MyEventArgs> MyEvent;
 			void Add(T value);
 			int Insert(T value, int index);
 			void Do(string s);

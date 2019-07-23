@@ -41,7 +41,17 @@ namespace Moq
 
 			if (includeGenericArgumentList && method.IsGenericMethod)
 			{
-				stringBuilder.AppendGenericArguments(method);
+				stringBuilder.Append('<');
+				var genericArguments = method.GetGenericArguments();
+				for (int i = 0, n = genericArguments.Length; i < n; ++i)
+				{
+					if (i > 0)
+					{
+						stringBuilder.Append(", ");
+					}
+					stringBuilder.AppendNameOf(genericArguments[i]);
+				}
+				stringBuilder.Append('>');
 			}
 
 			return stringBuilder;
@@ -49,26 +59,12 @@ namespace Moq
 
 		public static StringBuilder AppendNameOfAddEvent(this StringBuilder stringBuilder, MethodBase method, bool includeGenericArgumentList)
 		{
-			stringBuilder.Append(method.Name.Replace("add_", "")).Append(" += ");
-
-			if (includeGenericArgumentList && method.IsGenericMethod)
-			{
-				stringBuilder.AppendGenericArguments(method);
-			}
-
-			return stringBuilder;
+			return stringBuilder.Append(method.Name.Substring("add_".Length)).Append(" += ");
 		}
 
 		public static StringBuilder AppendNameOfRemoveEvent(this StringBuilder stringBuilder, MethodBase method, bool includeGenericArgumentList)
 		{
-			stringBuilder.Append(method.Name.Replace("remove_", "")).Append(" -= ");
-
-			if (includeGenericArgumentList && method.IsGenericMethod)
-			{
-				stringBuilder.AppendGenericArguments(method);
-			}
-
-			return stringBuilder;
+			return stringBuilder.Append(method.Name.Substring("remove_".Length)).Append(" -= ");
 		}
 
 		public static StringBuilder AppendNameOf(this StringBuilder stringBuilder, Type type)
@@ -144,23 +140,6 @@ namespace Moq
 			{
 				--stringBuilder.Length;
 			}
-			return stringBuilder;
-		}
-
-		private static StringBuilder AppendGenericArguments(this StringBuilder stringBuilder, MethodBase method)
-		{
-			stringBuilder.Append('<');
-			var genericArguments = method.GetGenericArguments();
-			for (int i = 0, n = genericArguments.Length; i < n; ++i)
-			{
-				if (i > 0)
-				{
-					stringBuilder.Append(", ");
-				}
-				stringBuilder.AppendNameOf(genericArguments[i]);
-			}
-			stringBuilder.Append('>');
-
 			return stringBuilder;
 		}
 	}

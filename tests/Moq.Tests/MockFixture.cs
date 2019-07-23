@@ -1240,36 +1240,6 @@ namespace Moq.Tests
 			Assert.False(after, "After reset");
 		}
 
-		[Fact]
-		public void RemoveAll_clears_event_setup_flag_when_predicate_matched()
-		{
-			var mock = new Mock<IFoo>();
-			mock.Setup(m => m.Submit()).Verifiable();
-			mock.SetupAdd(m => m.EventHandler += It.IsAny<EventHandler>()).Verifiable();
-
-			var before = mock.Setups.HasEventSetup;
-			mock.Setups.RemoveAll(s => s.IsVerifiable);
-			var after = mock.Setups.HasEventSetup;
-
-			Assert.True(before, "Before RemoveAll");
-			Assert.False(after, "After RemoveAll");
-		}
-
-		[Fact]
-		public void RemoveAll_doesnt_clears_event_setup_flag_when_predicate_not_matched()
-		{
-			var mock = new Mock<IFoo>();
-			mock.Setup(m => m.Submit()).Verifiable();
-			mock.SetupAdd(m => m.EventHandler += It.IsAny<EventHandler>());
-
-			var before = mock.Setups.HasEventSetup;
-			mock.Setups.RemoveAll(s => s.IsVerifiable);
-			var after = mock.Setups.HasEventSetup;
-
-			Assert.True(before, "Before RemoveAll");
-			Assert.True(after, "After RemoveAll");
-		}
-
 #if FEATURE_SERIALIZATION
 		[Serializable]
 		public class BadSerializable : ISerializable

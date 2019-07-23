@@ -263,7 +263,7 @@
 			</code>
 		</example>
 	</doc>
-	<doc for="Mock{T}.VerifyAdd(expression)">
+	<doc for="Mock{T}.VerifyAdd(addExpression)">
 		<example group="verification">
 			This example assumes that the mock has been used,
 			and later we want to verify that a given event
@@ -272,12 +272,12 @@
 				var mock = new Mock&lt;IWarehouse&gt;();
 				// exercise mock
 				//...
-				// Will throw if the test code didn't set the IsClosed property.
+				// Will throw if the test code didn't subscribe to the OnClosed event.
 				mock.VerifyAdd(warehouse =&gt; warehouse.OnClose += It.IsAny&lt;EventHandler&gt;());
 			</code>
 		</example>
 	</doc>
-	<doc for="Mock{T}.VerifyAdd(expression,failMessage)">
+	<doc for="Mock{T}.VerifyAdd(addExpression,failMessage)">
 		<example group="verification">
 			This example assumes that the mock has been used,
 			and later we want to verify that a given event
@@ -286,12 +286,12 @@
 				var mock = new Mock&lt;IWarehouse&gt;();
 				// exercise mock
 				//...
-				// Will throw if the test code didn't add the OnClose event.
+				// Will throw if the test code didn't subscribe to the OnClose event.
 				mock.VerifyAdd(warehouse =&gt; warehouse.OnClose += It.IsAny&lt;EventHandler&gt;(), "Warehouse should add an event");
 			</code>
 		</example>
 	</doc>
-	<doc for="Mock{T}.VerifyRemove(expression)">
+	<doc for="Mock{T}.VerifyRemove(removeExpression)">
 		<example group="verification">
 			This example assumes that the mock has been used,
 			and later we want to verify that a given event
@@ -300,12 +300,12 @@
 				var mock = new Mock&lt;IWarehouse&gt;();
 				// exercise mock
 				//...
-				// Will throw if the test code didn't set the IsClosed property.
-				mock.VerifyAdd(warehouse =&gt; warehouse.OnClose -= It.IsAny&lt;EventHandler&gt;());
+				// Will throw if the test code didn't unsubscribe from the OnClosed event.
+				mock.VerifyRemove(warehouse =&gt; warehouse.OnClose -= It.IsAny&lt;EventHandler&gt;());
 			</code>
 		</example>
 	</doc>
-	<doc for="Mock{T}.VerifyRemove(expression,failMessage)">
+	<doc for="Mock{T}.VerifyRemove(removeExpression,failMessage)">
 		<example group="verification">
 			This example assumes that the mock has been used,
 			and later we want to verify that a given event
@@ -314,8 +314,8 @@
 				var mock = new Mock&lt;IWarehouse&gt;();
 				// exercise mock
 				//...
-				// Will throw if the test code didn't set the IsClosed property.
-				mock.VerifyAdd(warehouse =&gt; warehouse.OnClose -= It.IsAny&lt;EventHandler&gt;(), "Warehouse should remove an event");
+				// Will throw if the test code didn't unsubscribe from the OnClosed event.
+				mock.VerifyRemove(warehouse =&gt; warehouse.OnClose -= It.IsAny&lt;EventHandler&gt;(), "Warehouse should remove an event");
 			</code>
 		</example>
 	</doc>
