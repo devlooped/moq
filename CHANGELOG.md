@@ -11,6 +11,10 @@ The format is loosely based on [Keep a Changelog](http://keepachangelog.com/en/1
 
 * Improved error message that is supplied with `ArgumentException` thrown when `Setup` or `Verify` are called on a protected method if the method could not be found with both the name and compatible argument types specified (@thomasfdm, #852).
 
+#### Added
+
+* Added support for setup and verification of the event handlers through `Setup[Add|Remove]` and `Verify[Add|Remove|All]` (@lepijohnny, #825) 
+
 ## 4.12.0 (2019-06-20)
 
 #### Changed

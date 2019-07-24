@@ -11,17 +11,32 @@ namespace Moq
 	{
 		private List<Setup> setups;
 		private uint overridden;  // bit mask for the first 32 setups flagging those known to be overridden
+		private volatile bool hasEventSetup;
 
 		public SetupCollection()
 		{
 			this.setups = new List<Setup>();
 			this.overridden = 0U;
+			this.hasEventSetup = false;
+		}
+
+		public bool HasEventSetup
+		{
+			get
+			{
+				return this.hasEventSetup;
+			}
 		}
 
 		public void Add(Setup setup)
 		{
 			lock (this.setups)
 			{
+				if (setup.Method.LooksLikeEventAttach() || setup.Method.LooksLikeEventDetach())
+				{
+					this.hasEventSetup = true;
+				}
+
 				this.setups.Add(setup);
 			}
 		}
@@ -34,7 +49,7 @@ namespace Moq
 			}
 		}
 
-		public void RemoveAll(Func<Setup, bool> predicate)
+		public void RemoveAllPropertyAccessorSetups()
 		{
 			// Fast path (no `lock`) when there are no setups:
 			if (this.setups.Count == 0)
@@ -44,7 +59,7 @@ namespace Moq
 
 			lock (this.setups)
 			{
-				this.setups.RemoveAll(x => predicate(x));
+				this.setups.RemoveAll(x => x.Method.IsPropertyAccessor());
 				this.overridden = 0U;
 			}
 		}
@@ -55,6 +70,7 @@ namespace Moq
 			{
 				this.setups.Clear();
 				this.overridden = 0U;
+				this.hasEventSetup = false;
 			}
 		}
 

@@ -1091,6 +1091,7 @@ namespace Moq.Tests
 			void Submit();
 			string Execute(string command);
 			int this[int index] { get; set; }
+			event EventHandler EventHandler;
 		}
 
 		public interface IParams
@@ -1223,6 +1224,20 @@ namespace Moq.Tests
 			mock.Reset();
 
 			Assert.Empty(mock.ConfiguredDefaultValues);
+		}
+
+		[Fact]
+		public void Reset_clears_event_setup_flag()
+		{
+			var mock = new Mock<IFoo>();
+			mock.SetupAdd(m => m.EventHandler += It.IsAny<EventHandler>());
+
+			var before = mock.Setups.HasEventSetup;
+			mock.Reset();
+			var after = mock.Setups.HasEventSetup;
+
+			Assert.True(before, "Before reset");
+			Assert.False(after, "After reset");
 		}
 
 #if FEATURE_SERIALIZATION

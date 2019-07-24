@@ -336,6 +336,22 @@ namespace Moq
 			Mock.Verify(mock, expression, times, failMessage);
 		}
 
+		internal static void VerifyAdd(Mock mock, LambdaExpression expression, Times times, string failMessage)
+		{
+			Guard.NotNull(expression, nameof(expression));
+			Guard.IsEventAttach(expression, nameof(expression));
+
+			Mock.Verify(mock, expression, times, failMessage);
+		}
+
+		internal static void VerifyRemove(Mock mock, LambdaExpression expression, Times times, string failMessage)
+		{
+			Guard.NotNull(expression, nameof(expression));
+			Guard.IsEventDetach(expression, nameof(expression));
+
+			Mock.Verify(mock, expression, times, failMessage);
+		}
+
 		internal static void VerifyNoOtherCalls(Mock mock)
 		{
 			Mock.VerifyNoOtherCalls(mock, verifiedMocks: new HashSet<Mock>());
@@ -492,6 +508,22 @@ namespace Moq
 			return Mock.Setup(mock, expression, condition);
 		}
 
+		internal static MethodCall SetupAdd(Mock mock, LambdaExpression expression, Condition condition)
+		{
+			Guard.NotNull(expression, nameof(expression));
+			Guard.IsEventAttach(expression, nameof(expression));
+
+			return Mock.Setup(mock, expression, condition);
+		}
+
+		internal static MethodCall SetupRemove(Mock mock, LambdaExpression expression, Condition condition)
+		{
+			Guard.NotNull(expression, nameof(expression));
+			Guard.IsEventDetach(expression, nameof(expression));
+
+			return Mock.Setup(mock, expression, condition);
+		}
+
 		internal static SequenceSetup SetupSequence(Mock mock, LambdaExpression expression)
 		{
 			Guard.NotNull(expression, nameof(expression));
@@ -553,7 +585,7 @@ namespace Moq
 
 		internal static void SetupAllProperties(Mock mock, DefaultValueProvider defaultValueProvider)
 		{
-			mock.Setups.RemoveAll(x => x.Method.IsPropertyAccessor());
+			mock.Setups.RemoveAllPropertyAccessorSetups();
 			// Removing all the previous properties setups to keep the behaviour of overriding
 			// existing setups in `SetupAllProperties`.
 			

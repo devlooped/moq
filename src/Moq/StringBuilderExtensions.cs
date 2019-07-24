@@ -51,11 +51,20 @@ namespace Moq
 					}
 					stringBuilder.AppendNameOf(genericArguments[i]);
 				}
-
 				stringBuilder.Append('>');
 			}
 
 			return stringBuilder;
+		}
+
+		public static StringBuilder AppendNameOfAddEvent(this StringBuilder stringBuilder, MethodBase method, bool includeGenericArgumentList)
+		{
+			return stringBuilder.Append(method.Name.Substring("add_".Length)).Append(" += ");
+		}
+
+		public static StringBuilder AppendNameOfRemoveEvent(this StringBuilder stringBuilder, MethodBase method, bool includeGenericArgumentList)
+		{
+			return stringBuilder.Append(method.Name.Substring("remove_".Length)).Append(" -= ");
 		}
 
 		public static StringBuilder AppendNameOf(this StringBuilder stringBuilder, Type type)

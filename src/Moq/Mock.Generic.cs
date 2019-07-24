@@ -389,6 +389,44 @@ namespace Moq
 		}
 
 		/// <summary>
+		///   Specifies a setup on the mocked type for a call to an event add.
+		/// </summary>
+		/// <param name="addExpression">Lambda expression that adds an event.</param>
+		/// <remarks>
+		///   If more than one setup is set for the same event add,
+		///   the latest one wins and is the one that will be executed.
+		/// </remarks>
+		/// <include file='Mock.Generic.xdoc' path='docs/doc[@for="Mock{T}.SetupAdd"]/*'/>
+		public ISetup<T> SetupAdd(Action<T> addExpression)
+		{
+			Guard.NotNull(addExpression, nameof(addExpression));
+
+			var expression = ExpressionReconstructor.Instance.ReconstructExpression(addExpression, this.ConstructorArguments);
+
+			var setup = Mock.SetupAdd(this, expression, condition: null);
+			return new VoidSetupPhrase<T>(setup);
+		}
+
+		/// <summary>
+		///   Specifies a setup on the mocked type for a call to an event 'remove.
+		/// </summary>
+		/// <param name="removeExpression">Lambda expression that removes an event.</param>
+		/// <remarks>
+		///   If more than one setup is set for the same event remove,
+		///   the latest one wins and is the one that will be executed.
+		/// </remarks>
+		/// <include file='Mock.Generic.xdoc' path='docs/doc[@for="Mock{T}.SetupRemove"]/*'/>
+		public ISetup<T> SetupRemove(Action<T> removeExpression)
+		{
+			Guard.NotNull(removeExpression, nameof(removeExpression));
+
+			var expression = ExpressionReconstructor.Instance.ReconstructExpression(removeExpression, this.ConstructorArguments);
+
+			var setup = Mock.SetupRemove(this, expression, condition: null);
+			return new VoidSetupPhrase<T>(setup);
+		}
+
+		/// <summary>
 		///   Specifies that the given property should have "property behavior",
 		///   meaning that setting its value will cause it to be saved and later returned when the property is requested.
 		///   (This is also known as "stubbing".)
@@ -857,6 +895,196 @@ namespace Moq
 
 			var expression = ExpressionReconstructor.Instance.ReconstructExpression(setterExpression, this.ConstructorArguments);
 			Mock.VerifySet(this, expression , times(), failMessage);
+		}
+
+		/// <summary>
+		///   Verifies that an event was added to the mock.
+		/// </summary>
+		/// <param name="addExpression">Expression to verify.</param>
+		/// <exception cref="MockException">The invocation was not performed on the mock.</exception>
+		/// <include file='Mock.Generic.xdoc' path='docs/doc[@for="Mock{T}.VerifyAdd(addExpression)"]/*'/>
+		public void VerifyAdd(Action<T> addExpression)
+		{
+			Guard.NotNull(addExpression, nameof(addExpression));
+
+			var expression = ExpressionReconstructor.Instance.ReconstructExpression(addExpression, this.ConstructorArguments);
+			Mock.VerifyAdd(this, expression, Times.AtLeastOnce(), null);
+		}
+
+		/// <summary>
+		///   Verifies that an event was added to the mock.
+		/// </summary>
+		/// <param name="times">The number of times a method is expected to be called.</param>
+		/// <param name="addExpression">Expression to verify.</param>
+		/// <exception cref="MockException">
+		///   The invocation was not called the number of times specified by <paramref name="times"/>.
+		/// </exception>
+		public void VerifyAdd(Action<T> addExpression, Times times)
+		{
+			Guard.NotNull(addExpression, nameof(addExpression));
+
+			var expression = ExpressionReconstructor.Instance.ReconstructExpression(addExpression, this.ConstructorArguments);
+			Mock.VerifyAdd(this, expression, times, null);
+		}
+
+		/// <summary>
+		///   Verifies that an event was added to the mock.
+		/// </summary>
+		/// <param name="times">The number of times a method is expected to be called.</param>
+		/// <param name="addExpression">Expression to verify.</param>
+		/// <exception cref="MockException">
+		///   The invocation was not called the number of times specified by <paramref name="times"/>.
+		/// </exception>
+		public void VerifyAdd(Action<T> addExpression, Func<Times> times)
+		{
+			Guard.NotNull(addExpression, nameof(addExpression));
+
+			var expression = ExpressionReconstructor.Instance.ReconstructExpression(addExpression, this.ConstructorArguments);
+			Mock.VerifyAdd(this, expression, times(), null);
+		}
+
+		/// <summary>
+		///   Verifies that an event was added to the mock, specifying a failure message.
+		/// </summary>
+		/// <param name="addExpression">Expression to verify.</param>
+		/// <param name="failMessage">Message to show if verification fails.</param>
+		/// <exception cref="MockException">The invocation was not performed on the mock.</exception>
+		/// <include file='Mock.Generic.xdoc' path='docs/doc[@for="Mock{T}.VerifyAdd(addExpression,failMessage)"]/*'/>
+		public void VerifyAdd(Action<T> addExpression, string failMessage)
+		{
+			Guard.NotNull(addExpression, nameof(addExpression));
+
+			var expression = ExpressionReconstructor.Instance.ReconstructExpression(addExpression, this.ConstructorArguments);
+			Mock.VerifyAdd(this, expression, Times.AtLeastOnce(), failMessage);
+		}
+
+		/// <summary>
+		///   Verifies that an event was added to the mock, specifying a failure message.
+		/// </summary>
+		/// <param name="times">The number of times a method is expected to be called.</param>
+		/// <param name="addExpression">Expression to verify.</param>
+		/// <param name="failMessage">Message to show if verification fails.</param>
+		/// <exception cref="MockException">
+		///   The invocation was not called the number of times specified by <paramref name="times"/>.
+		/// </exception>
+		public void VerifyAdd(Action<T> addExpression, Times times, string failMessage)
+		{
+			Guard.NotNull(addExpression, nameof(addExpression));
+
+			var expression = ExpressionReconstructor.Instance.ReconstructExpression(addExpression, this.ConstructorArguments);
+			Mock.VerifyAdd(this, expression, times, failMessage);
+		}
+
+		/// <summary>
+		///   Verifies that an event was added to the mock, specifying a failure message.
+		/// </summary>
+		/// <param name="times">The number of times a method is expected to be called.</param>
+		/// <param name="addExpression">Expression to verify.</param>
+		/// <param name="failMessage">Message to show if verification fails.</param>
+		/// <exception cref="MockException">
+		///   The invocation was not called the number of times specified by <paramref name="times"/>.
+		/// </exception>
+		public void VerifyAdd(Action<T> addExpression, Func<Times> times, string failMessage)
+		{
+			Guard.NotNull(addExpression, nameof(addExpression));
+
+			var expression = ExpressionReconstructor.Instance.ReconstructExpression(addExpression, this.ConstructorArguments);
+			Mock.VerifyAdd(this, expression, times(), failMessage);
+		}
+
+		/// <summary>
+		///   Verifies that an event was removed from the mock.
+		/// </summary>
+		/// <param name="removeExpression">Expression to verify.</param>
+		/// <exception cref="MockException">The invocation was not performed on the mock.</exception>
+		/// <include file='Mock.Generic.xdoc' path='docs/doc[@for="Mock{T}.VerifyRemove(removeExpression)"]/*'/>
+		public void VerifyRemove(Action<T> removeExpression)
+		{
+			Guard.NotNull(removeExpression, nameof(removeExpression));
+
+			var expression = ExpressionReconstructor.Instance.ReconstructExpression(removeExpression, this.ConstructorArguments);
+			Mock.VerifyRemove(this, expression, Times.AtLeastOnce(), null);
+		}
+
+		/// <summary>
+		///   Verifies that an event was removed from the mock.
+		/// </summary>
+		/// <param name="times">The number of times a method is expected to be called.</param>
+		/// <param name="removeExpression">Expression to verify.</param>
+		/// <exception cref="MockException">
+		///   The invocation was not called the number of times specified by <paramref name="times"/>.
+		/// </exception>
+		public void VerifyRemove(Action<T> removeExpression, Times times)
+		{
+			Guard.NotNull(removeExpression, nameof(removeExpression));
+
+			var expression = ExpressionReconstructor.Instance.ReconstructExpression(removeExpression, this.ConstructorArguments);
+			Mock.VerifyRemove(this, expression, times, null);
+		}
+
+		/// <summary>
+		///   Verifies that an event was removed from the mock.
+		/// </summary>
+		/// <param name="times">The number of times a method is expected to be called.</param>
+		/// <param name="removeExpression">Expression to verify.</param>
+		/// <exception cref="MockException">
+		///   The invocation was not called the number of times specified by <paramref name="times"/>.
+		/// </exception>
+		public void VerifyRemove(Action<T> removeExpression, Func<Times> times)
+		{
+			Guard.NotNull(removeExpression, nameof(removeExpression));
+
+			var expression = ExpressionReconstructor.Instance.ReconstructExpression(removeExpression, this.ConstructorArguments);
+			Mock.VerifyRemove(this, expression, times(), null);
+		}
+
+		/// <summary>
+		///   Verifies that an event was removed from the mock, specifying a failure message.
+		/// </summary>
+		/// <param name="removeExpression">Expression to verify.</param>
+		/// <param name="failMessage">Message to show if verification fails.</param>
+		/// <exception cref="MockException">The invocation was not performed on the mock.</exception>
+		/// <include file='Mock.Generic.xdoc' path='docs/doc[@for="Mock{T}.VerifyRemove(removeExpression,failMessage)"]/*'/>
+		public void VerifyRemove(Action<T> removeExpression, string failMessage)
+		{
+			Guard.NotNull(removeExpression, nameof(removeExpression));
+
+			var expression = ExpressionReconstructor.Instance.ReconstructExpression(removeExpression, this.ConstructorArguments);
+			Mock.VerifyRemove(this, expression, Times.AtLeastOnce(), failMessage);
+		}
+
+		/// <summary>
+		///   Verifies that an event was removed from the mock, specifying a failure message.
+		/// </summary>
+		/// <param name="times">The number of times a method is expected to be called.</param>
+		/// <param name="removeExpression">Expression to verify.</param>
+		/// <param name="failMessage">Message to show if verification fails.</param>
+		/// <exception cref="MockException">
+		///   The invocation was not called the number of times specified by <paramref name="times"/>.
+		/// </exception>
+		public void VerifyRemove(Action<T> removeExpression, Times times, string failMessage)
+		{
+			Guard.NotNull(removeExpression, nameof(removeExpression));
+
+			var expression = ExpressionReconstructor.Instance.ReconstructExpression(removeExpression, this.ConstructorArguments);
+			Mock.VerifyRemove(this, expression, times, failMessage);
+		}
+
+		/// <summary>
+		///   Verifies that an event was removed from the mock, specifying a failure message.
+		/// </summary>
+		/// <param name="times">The number of times a method is expected to be called.</param>
+		/// <param name="removeExpression">Expression to verify.</param>
+		/// <param name="failMessage">Message to show if verification fails.</param>
+		/// <exception cref="MockException">
+		///   The invocation was not called the number of times specified by <paramref name="times"/>.
+		/// </exception>
+		public void VerifyRemove(Action<T> removeExpression, Func<Times> times, string failMessage)
+		{
+			Guard.NotNull(removeExpression, nameof(removeExpression));
+
+			var expression = ExpressionReconstructor.Instance.ReconstructExpression(removeExpression, this.ConstructorArguments);
+			Mock.VerifyRemove(this, expression, times(), failMessage);
 		}
 
 		/// <summary>

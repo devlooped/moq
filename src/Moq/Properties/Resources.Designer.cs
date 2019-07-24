@@ -581,6 +581,24 @@ namespace Moq.Properties {
 		}
 		
 		/// <summary>
+		///   Looks up a localized string similar to Expression is not an event add invocation..
+		/// </summary>
+		internal static string SetupNotEventAttach {
+			get {
+				return ResourceManager.GetString("SetupNotEventAttach", resourceCulture);
+			}
+		}
+		
+		/// <summary>
+		///   Looks up a localized string similar to Expression is not an event remove invocation..
+		/// </summary>
+		internal static string SetupNotEventDetach {
+			get {
+				return ResourceManager.GetString("SetupNotEventDetach", resourceCulture);
+			}
+		}
+		
+		/// <summary>
 		///   Looks up a localized string similar to Type {0} does not implement required interface {1}.
 		/// </summary>
 		internal static string TypeNotImplementInterface {
