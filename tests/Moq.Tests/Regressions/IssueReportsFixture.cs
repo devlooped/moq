@@ -2650,6 +2650,68 @@ namespace Moq.Tests.Regressions
 		}
 		#endregion
 
+		#region 867
+
+		public class Issue867
+		{
+			[Fact]
+			public void Can_subscribe_to_virtual_event_from_ctor()
+			{
+				var c = new Mock<C1>();
+				c.Raise(x => x.E += null);
+				Assert.True(c.Object.Raised);
+			}
+
+			[Fact]
+			public void Can_subscribe_to_virtual_event_outside_type()
+			{
+				var raised = false;
+				var c = new Mock<C2>();
+				c.Object.E += () => raised = true;
+
+				c.Raise(x => x.E += null);
+
+				Assert.True(raised);
+			}
+
+			[Fact]
+			public void Can_subscribe_to_virtual_event_from_method()
+			{
+				var c = new Mock<C3>();
+				c.Object.M();
+				c.Raise(x => x.E += null);
+
+				Assert.True(c.Object.Raised);
+			}
+
+			public class C1
+			{
+				public bool Raised { get; private set; }
+				public virtual event Action E;
+				public C1()
+				{
+					E += () => Raised = true;
+				}
+			}
+
+			public class C2
+			{
+				public virtual event Action E;
+			}
+
+			public class C3
+			{
+				public bool Raised { get; private set; }
+				public virtual event Action E;
+				public void M()
+				{
+					E += () => Raised = true;
+				}
+			}
+		}
+
+		#endregion
+
 		// Old @ Google Code
 
 		#region #47
