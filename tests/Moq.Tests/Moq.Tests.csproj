@@ -8,7 +8,7 @@
 		<TargetFrameworks>net46;netcoreapp2.0</TargetFrameworks>
 		<AssemblyName>Moq.Tests</AssemblyName>
 		<DebugSymbols>True</DebugSymbols>
-		<DebugType>full</DebugType>
+		<DebugType>portable</DebugType>
 		<GenerateRuntimeConfigurationFiles>true</GenerateRuntimeConfigurationFiles>
 		<LangVersion>7.2</LangVersion>
 		<IsPackable>False</IsPackable>
