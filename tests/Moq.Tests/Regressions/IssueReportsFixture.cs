@@ -2658,6 +2658,7 @@ namespace Moq.Tests.Regressions
 			public void Can_subscribe_to_virtual_event_from_ctor()
 			{
 				var c = new Mock<C1>();
+				_ = c.Object;  // ensure that the ctor (and therefore event subscription) has run
 				c.Raise(x => x.E += null);
 				Assert.True(c.Object.Raised);
 			}
