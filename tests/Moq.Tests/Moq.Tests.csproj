@@ -5,7 +5,7 @@
 	<Import Project="$(BuildDirectory)xUnit.props" />
 
 	<PropertyGroup>
-		<TargetFrameworks>net46;netcoreapp2.0</TargetFrameworks>
+		<TargetFrameworks>net472;netcoreapp2.2</TargetFrameworks>
 		<AssemblyName>Moq.Tests</AssemblyName>
 		<DebugSymbols>True</DebugSymbols>
 		<DebugType>portable</DebugType>
@@ -14,10 +14,10 @@
 		<IsPackable>False</IsPackable>
 	</PropertyGroup>
 
-	<PropertyGroup Condition=" '$(TargetFramework)' == 'net46' ">
+	<PropertyGroup Condition=" '$(TargetFramework)' == 'net472' ">
 		<DefineConstants>$(DefineConstants);FEATURE_CALLERINFO;FEATURE_CAS;FEATURE_COM;FEATURE_EF;FEATURE_SERIALIZATION;FEATURE_SYSTEM_WEB;FEATURE_SYSTEM_WINDOWS_FORMS</DefineConstants>
 	</PropertyGroup>
-	<PropertyGroup Condition=" '$(TargetFramework)' == 'netcoreapp2.0' ">
+	<PropertyGroup Condition=" '$(TargetFramework)' == 'netcoreapp2.2' ">
 		<DefineConstants>$(DefineConstants)</DefineConstants>
 	</PropertyGroup>
 
@@ -41,7 +41,7 @@
 	<ItemGroup Condition=" $([System.Text.RegularExpressions.Regex]::IsMatch('$(DefineConstants)', 'FEATURE_SYSTEM_WINDOWS_FORMS'))">
 		<Reference Include="System.Windows.Forms" />
 	</ItemGroup>
-	<ItemGroup Condition=" '$(TargetFramework)' == 'netcoreapp2.0' ">
+	<ItemGroup Condition=" '$(TargetFramework)' == 'netcoreapp2.2' ">
 		<PackageReference Include="System.Collections.Specialized" Version="4.3.0" />
 		<PackageReference Include="System.ComponentModel.Primitives" Version="4.3.0" />
 		<PackageReference Include="System.Diagnostics.TraceSource" Version="4.3.0" />
