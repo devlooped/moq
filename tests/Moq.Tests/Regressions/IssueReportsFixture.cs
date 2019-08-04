@@ -969,6 +969,33 @@ namespace Moq.Tests.Regressions
 
 		#endregion // #184
 
+		#region 193
+
+		public class Issue193
+		{
+			[Fact(Skip = "Fails due to a bug in Castle DynamicProxy. Try enabling this test once we reference Castle.Core > 4.4.0.")]
+			public void Can_mock_class_type_where_generic_type_parameter_name_diverges_from_name_in_interface()
+			{
+				var mock = new Mock<C>();
+				mock.As<I>();
+				_ = mock.Object;
+			}
+
+			public interface I
+			{
+				void Method<T>();
+			}
+
+			public class C : I
+			{
+				public void Method<U>()
+				{
+				}
+			}
+		}
+
+		#endregion
+
 		#region 224
 
 		public class Issue224
