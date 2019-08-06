@@ -50,12 +50,12 @@ namespace Moq
 
 		public static bool IsPropertyIndexerGetter(this MethodInfo method)
 		{
-			return method.IsSpecialName && method.Name.StartsWith("get_Item", StringComparison.Ordinal);
+			return method.IsSpecialName && method.Name.Equals("get_Item", StringComparison.Ordinal);
 		}
 
 		public static bool IsPropertyIndexerSetter(this MethodInfo method)
 		{
-			return method.IsSpecialName && method.Name.StartsWith("set_Item", StringComparison.Ordinal);
+			return method.IsSpecialName && method.Name.Equals("set_Item", StringComparison.Ordinal);
 		}
 
 		public static bool IsPropertySetter(this MethodInfo method)
