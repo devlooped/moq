@@ -2677,6 +2677,42 @@ namespace Moq.Tests.Regressions
 		}
 		#endregion
 
+		#region 870
+
+		public class Issue870
+		{
+			[Fact]
+			public void SetupAllProperties_can_process_Items_property_1()
+			{
+				var httpContext = Mock.Of<HttpContext>();
+				httpContext.Items = new Dictionary<object, object>();
+				Assert.NotNull(httpContext.Items);
+			}
+
+			[Fact]
+			public void SetupAllProperties_can_process_Items_property_2()
+			{
+				var httpContext = Mock.Of<HttpContext>(c => c.Items == new Dictionary<object, object>());
+				Assert.NotNull(httpContext.Items);
+			}
+
+			[Fact]
+			public void SetupAllProperties_can_process_Items_property_3()
+			{
+				var httpContext = new Mock<HttpContext>();
+				httpContext.SetupAllProperties();
+				httpContext.Object.Items = new Dictionary<object, object>();
+				Assert.NotNull(httpContext.Object.Items);
+			}
+
+			public abstract partial class HttpContext
+			{
+				public abstract IDictionary<object, object> Items { get; set; }
+			}
+		}
+
+		#endregion
+
 		// Old @ Google Code
 
 		#region #47
