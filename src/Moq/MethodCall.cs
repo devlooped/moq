@@ -168,27 +168,17 @@ namespace Moq
 
 		public void SetCallbackResponse(Delegate callback)
 		{
-			if (this.returnOrThrowResponse != null)
-			{
-				if (callback is Action afterReturnCallbackWithoutArguments)
-				{
-					this.afterReturnCallback = delegate { afterReturnCallbackWithoutArguments(); };
-				}
-				else
-				{
-					this.afterReturnCallback = delegate (object[] args) { callback.InvokePreserveStack(args); };
-				}
-				return;
-			}
-
 			if (callback == null)
 			{
 				throw new ArgumentNullException(nameof(callback));
 			}
 
+			ref Action<object[]> response = ref this.returnOrThrowResponse == null ? ref this.callbackResponse
+			                                                                       : ref this.afterReturnCallback;
+
 			if (callback is Action callbackWithoutArguments)
 			{
-				this.callbackResponse = (object[] args) => callbackWithoutArguments();
+				response = (object[] args) => callbackWithoutArguments();
 			}
 			else
 			{
@@ -209,7 +199,7 @@ namespace Moq
 					throw new ArgumentException(Resources.InvalidCallbackNotADelegateWithReturnTypeVoid, nameof(callback));
 				}
 
-				this.callbackResponse = (object[] args) => callback.InvokePreserveStack(args);
+				response = (object[] args) => callback.InvokePreserveStack(args);
 			}
 		}
 
