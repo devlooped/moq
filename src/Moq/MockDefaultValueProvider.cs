@@ -36,7 +36,10 @@ namespace Moq
 				var mockType = typeof(Mock<>).MakeGenericType(type);
 				Mock newMock = (Mock)Activator.CreateInstance(mockType, mock.Behavior);
 				newMock.DefaultValueProvider = mock.DefaultValueProvider;
-				newMock.CallBase = mock.CallBase;
+				if(!type.IsDelegate())
+				{
+					newMock.CallBase = mock.CallBase;
+				}
 				newMock.Switches = mock.Switches;
 				return newMock.Object;
 			}
