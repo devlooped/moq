@@ -13,6 +13,8 @@ using System.Text;
 
 using Moq.Properties;
 
+using TypeNameFormatter;
+
 namespace Moq
 {
 	internal sealed partial class MethodCall : SetupWithOutParameterSupport
@@ -185,13 +187,14 @@ namespace Moq
 				var expectedParamTypes = this.Method.GetParameterTypes();
 				if (!callback.CompareParameterTypesTo(expectedParamTypes))
 				{
+					// TODO: the following won't properly distinguish between `in`, `ref`, and `out` parameters!
 					var actualParams = callback.GetMethodInfo().GetParameters();
 					throw new ArgumentException(
 						string.Format(
 							CultureInfo.CurrentCulture,
 							Resources.InvalidCallbackParameterMismatch,
-							string.Join(",", expectedParamTypes.Select(p => p.Name).ToArray()),
-							string.Join(",", actualParams.Select(p => p.ParameterType.Name).ToArray())));
+							string.Join(", ", expectedParamTypes.Select(p => p.GetFormattedName()).ToArray()),
+							string.Join(", ", actualParams.Select(p => p.ParameterType.GetFormattedName()).ToArray())));
 				}
 
 				if (callback.GetMethodInfo().ReturnType != typeof(void))
