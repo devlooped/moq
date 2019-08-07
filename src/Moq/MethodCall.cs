@@ -17,7 +17,7 @@ namespace Moq
 {
 	internal sealed partial class MethodCall : SetupWithOutParameterSupport
 	{
-		private Action<object[]> afterReturnCallback;
+		private Action<object[]> afterReturnCallbackResponse;
 		private Action<object[]> callbackResponse;
 		private LimitInvocationCountResponse limitInvocationCountResponse;
 		private Condition condition;
@@ -131,7 +131,7 @@ namespace Moq
 					}
 				}
 
-				this.afterReturnCallback?.Invoke(invocation.Arguments);
+				this.afterReturnCallbackResponse?.Invoke(invocation.Arguments);
 			}
 		}
 
@@ -174,7 +174,7 @@ namespace Moq
 			}
 
 			ref Action<object[]> response = ref this.returnOrThrowResponse == null ? ref this.callbackResponse
-			                                                                       : ref this.afterReturnCallback;
+			                                                                       : ref this.afterReturnCallbackResponse;
 
 			if (callback is Action callbackWithoutArguments)
 			{
