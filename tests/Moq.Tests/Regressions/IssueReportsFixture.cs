@@ -2713,6 +2713,35 @@ namespace Moq.Tests.Regressions
 
 		#endregion
 
+		#region 874
+		public class Issue874
+		{
+			[Fact]
+			public void MockDefaultValueProvider_will_Propagate_Callbase_to_nondelegates()
+			{
+				var mock = new Mock<IDictionary<string, IDictionary<string, string>>>()
+				{
+					CallBase = true,
+					DefaultValue = DefaultValue.Mock
+				};
+				var mockedIndexResult = mock.Object["foo"];
+				Assert.Null(mockedIndexResult["foo"]);
+			}
+
+			[Fact]
+			public void MockDefaultValueProvide_will_not_propagate_Callback_to_delegates()
+			{
+				var mock = new Mock<IDictionary<string, Func<string>>>()
+				{
+					CallBase = true,
+					DefaultValue = DefaultValue.Mock
+				};
+				var mockedIndexResult = mock.Object["foo"];
+				Assert.Null(mockedIndexResult());
+			}
+		}
+		#endregion
+
 		// Old @ Google Code
 
 		#region #47

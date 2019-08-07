@@ -18,6 +18,7 @@ The format is loosely based on [Keep a Changelog](http://keepachangelog.com/en/1
 #### Fixed
 
 * Regression: `SetupAllProperties` can no longer set up properties whose names start with `Item`. (@mattzink, #870; @kaan-kaya, #869)
+* Regression: `MockDefaultValueProvider` will no longer attempt to set `CallBase` to true for mocks generated for delegates. (@dammejed, #874)
 
 
 ## 4.12.0 (2019-06-20)
