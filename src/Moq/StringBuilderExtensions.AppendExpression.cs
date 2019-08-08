@@ -2,30 +2,18 @@
 // All rights reserved. Licensed under the BSD 3-Clause License; see License.txt.
 
 using System;
-using System.Collections.Generic;
-using System.Collections.ObjectModel;
 using System.Linq;
 using System.Linq.Expressions;
-using System.Reflection;
-using System.Runtime.CompilerServices;
 using System.Text;
 
 using Moq.Properties;
 
 namespace Moq
 {
-	/// <summary>
-	/// The intention of <see cref="ExpressionStringBuilder"/> is to create a more readable 
-	/// string representation for the failure message.
-	/// </summary>
-	internal static class ExpressionStringBuilder
+	// These methods are intended to create more readable string representations for use in failure messages.
+	partial class StringBuilderExtensions
 	{
-		public static string ToString(Expression expression)
-		{
-			return new StringBuilder().ToString(expression).ToString();
-		}
-
-		private static StringBuilder ToString(this StringBuilder builder, Expression expression)
+		public static StringBuilder AppendExpression(this StringBuilder builder, Expression expression)
 		{
 			if (expression == null)
 			{
@@ -114,7 +102,7 @@ namespace Moq
 				case ExpressionType.Extension:
 					if (expression is MatchExpression me)
 					{
-						return builder.AppendMatchExpression(me);
+						return builder.AppendExpression(me);
 					}
 					goto default;
 
@@ -123,27 +111,9 @@ namespace Moq
 			}
 		}
 
-		private static StringBuilder AppendMemberBinding(this StringBuilder builder, MemberBinding binding)
-		{
-			switch (binding.BindingType)
-			{
-				case MemberBindingType.Assignment:
-					return builder.AppendMemberAssignment((MemberAssignment)binding);
-
-				case MemberBindingType.MemberBinding:
-					return builder.AppendCommaSeparated(((MemberMemberBinding)binding).Bindings, AppendMemberBinding);
-
-				case MemberBindingType.ListBinding:
-					return builder.AppendElementInits(((MemberListBinding)binding).Initializers);
-
-				default:
-					throw new Exception(string.Format(Resources.UnhandledBindingType, binding.BindingType));
-			}
-		}
-
 		private static StringBuilder AppendElementInit(this StringBuilder builder, ElementInit initializer)
 		{
-			return builder.AppendCommaSeparated("{ ", initializer.Arguments, ToString, " }");
+			return builder.AppendCommaSeparated("{ ", initializer.Arguments, AppendExpression, " }");
 		}
 
 		private static StringBuilder AppendExpression(this StringBuilder builder, UnaryExpression expression)
@@ -155,28 +125,28 @@ namespace Moq
 					return builder.Append('(')
 					              .AppendNameOf(expression.Type)
 					              .Append(')')
-					              .ToString(expression.Operand);
+					              .AppendExpression(expression.Operand);
 
 				case ExpressionType.ArrayLength:
-					return builder.ToString(expression.Operand)
+					return builder.AppendExpression(expression.Operand)
 					              .Append(".Length");
 
 				case ExpressionType.Negate:
 				case ExpressionType.NegateChecked:
 					return builder.Append('-')
-					              .ToString(expression.Operand);
+					              .AppendExpression(expression.Operand);
 
 				case ExpressionType.Not:
 					return builder.Append("!(")
-					              .ToString(expression.Operand)
+					              .AppendExpression(expression.Operand)
 					              .Append(')');
 
 				case ExpressionType.Quote:
-					return builder.ToString(expression.Operand);
+					return builder.AppendExpression(expression.Operand);
 
 				case ExpressionType.TypeAs:
 					return builder.Append('(')
-					              .ToString(expression.Operand)
+					              .AppendExpression(expression.Operand)
 					              .Append(" as ")
 					              .AppendNameOf(expression.Type)
 					              .Append(')');
@@ -189,59 +159,129 @@ namespace Moq
 		{
 			if (expression.NodeType == ExpressionType.ArrayIndex)
 			{
-				builder.ToString(expression.Left)
+				builder.AppendExpression(expression.Left)
 				       .Append('[')
-				       .ToString(expression.Right)
+				       .AppendExpression(expression.Right)
 				       .Append(']');
 			}
 			else
 			{
-				string @operator = ToStringOperator(expression.NodeType);
-				if (NeedEncloseInParen(expression.Left))
-				{
-					builder.Append('(')
-					       .ToString(expression.Left)
-					       .Append(')');
-				}
-				else
-				{
-					builder.ToString(expression.Left);
-				}
+				AppendMaybeParenthesized(expression.Left, builder);
 				builder.Append(' ')
-				       .Append(@operator)
+				       .Append(GetOperator(expression.NodeType))
 				       .Append(' ');
-				if (NeedEncloseInParen(expression.Right))
-				{
-					builder.Append('(')
-					       .ToString(expression.Right)
-					       .Append(')');
-				}
-				else
-				{
-					builder.ToString(expression.Right);
-				}
+				AppendMaybeParenthesized(expression.Right, builder);
 			}
 
 			return builder;
-		}
 
-		private static bool NeedEncloseInParen(Expression operand)
-		{
-			return operand.NodeType == ExpressionType.AndAlso || operand.NodeType == ExpressionType.OrElse;
+			void AppendMaybeParenthesized(Expression operand, StringBuilder b)
+			{
+				bool parenthesize = operand.NodeType == ExpressionType.AndAlso || operand.NodeType == ExpressionType.OrElse;
+				if (parenthesize)
+				{
+					b.Append("(");
+				}
+				b.AppendExpression(operand);
+				if (parenthesize)
+				{
+					b.Append(")");
+				}
+			}
+
+			string GetOperator(ExpressionType nodeType)
+			{
+				switch (nodeType)
+				{
+					case ExpressionType.Add:
+					case ExpressionType.AddChecked:
+						return "+";
+
+					case ExpressionType.AddAssign:
+						return "+=";
+
+					case ExpressionType.Assign:
+						return "=";
+
+					case ExpressionType.And:
+						return "&";
+
+					case ExpressionType.AndAlso:
+						return "&&";
+
+					case ExpressionType.Coalesce:
+						return "??";
+
+					case ExpressionType.Divide:
+						return "/";
+
+					case ExpressionType.Equal:
+						return "==";
+
+					case ExpressionType.ExclusiveOr:
+						return "^";
+
+					case ExpressionType.GreaterThan:
+						return ">";
+
+					case ExpressionType.GreaterThanOrEqual:
+						return ">=";
+
+					case ExpressionType.LeftShift:
+						return "<<";
+
+					case ExpressionType.LessThan:
+						return "<";
+
+					case ExpressionType.LessThanOrEqual:
+						return "<=";
+
+					case ExpressionType.Modulo:
+						return "%";
+
+					case ExpressionType.Multiply:
+					case ExpressionType.MultiplyChecked:
+						return "*";
+
+					case ExpressionType.NotEqual:
+						return "!=";
+
+					case ExpressionType.Or:
+						return "|";
+
+					case ExpressionType.OrElse:
+						return "||";
+
+					case ExpressionType.Power:
+						return "^";
+
+					case ExpressionType.RightShift:
+						return ">>";
+
+					case ExpressionType.Subtract:
+					case ExpressionType.SubtractChecked:
+						return "-";
+
+					case ExpressionType.SubtractAssign:
+						return "-=";
+				}
+				return nodeType.ToString();
+			}
+
 		}
 
 		private static StringBuilder AppendExpression(this StringBuilder builder, TypeBinaryExpression expression)
 		{
-			return builder.ToString(expression.Expression);
+			return builder.AppendExpression(expression.Expression);
 		}
 
 		private static StringBuilder AppendExpression(this StringBuilder builder, ConditionalExpression expression)
 		{
-			return builder.ToString(expression.Test)
+			return builder.AppendExpression(expression.Test)
 			              .Append(" ? ")
-			              .ToString(expression.IfTrue)
+			              .AppendExpression(expression.IfTrue)
 			              .Append(" : ")
-			              .ToString(expression.IfFalse);
+			              .AppendExpression(expression.IfFalse);
 		}
 
 		private static StringBuilder AppendExpression(this StringBuilder builder, ParameterExpression expression)
@@ -253,7 +293,7 @@ namespace Moq
 		{
 			if (expression.Expression != null)
 			{
-				builder.ToString(expression.Expression);
+				builder.AppendExpression(expression.Expression);
 			}
 			else
 			{
@@ -279,7 +319,7 @@ namespace Moq
 
 				if (instance != null)
 				{
-					builder.ToString(instance);
+					builder.AppendExpression(instance);
 				}
 				else // Method is static
 				{
@@ -288,12 +328,12 @@ namespace Moq
 
 				if (expression.Method.IsPropertyIndexerGetter())
 				{
-					builder.AppendCommaSeparated("[", expression.Arguments.Skip(paramFrom), ToString, "]");
+					builder.AppendCommaSeparated("[", expression.Arguments.Skip(paramFrom), AppendExpression, "]");
 				}
 				else if (expression.Method.IsPropertyIndexerSetter())
 				{
-					builder.AppendCommaSeparated("[", expression.Arguments.Skip(paramFrom).Take(expression.Arguments.Count - paramFrom - 1), ToString, "] = ")
-					       .ToString(expression.Arguments.Last());
+					builder.AppendCommaSeparated("[", expression.Arguments.Skip(paramFrom).Take(expression.Arguments.Count - paramFrom - 1), AppendExpression, "] = ")
+					       .AppendExpression(expression.Arguments.Last());
 				}
 				else if (expression.Method.IsPropertyGetter())
 				{
@@ -301,7 +341,7 @@ namespace Moq
 					       .Append(expression.Method.Name.Substring(4));
 					if (expression.Arguments.Count > paramFrom)
 					{
-						builder.AppendCommaSeparated("[", expression.Arguments.Skip(paramFrom), ToString, "]");
+						builder.AppendCommaSeparated("[", expression.Arguments.Skip(paramFrom), AppendExpression, "]");
 					}
 				}
 				else if (expression.Method.IsPropertySetter())
@@ -309,25 +349,25 @@ namespace Moq
 					builder.Append('.')
 					       .Append(expression.Method.Name.Substring(4))
 					       .Append(" = ")
-					       .ToString(expression.Arguments.Last());
+					       .AppendExpression(expression.Arguments.Last());
 				}
 				else if (expression.Method.LooksLikeEventAttach())
 				{
 					builder.Append('.')
 					       .AppendNameOfAddEvent(expression.Method, includeGenericArgumentList: true)
-					       .AppendCommaSeparated(expression.Arguments.Skip(paramFrom), ToString);
+					       .AppendCommaSeparated(expression.Arguments.Skip(paramFrom), AppendExpression);
 				}
 				else if (expression.Method.LooksLikeEventDetach())
 				{
 					builder.Append('.')
 					       .AppendNameOfRemoveEvent(expression.Method, includeGenericArgumentList: true)
-					       .AppendCommaSeparated(expression.Arguments.Skip(paramFrom), ToString);
+					       .AppendCommaSeparated(expression.Arguments.Skip(paramFrom), AppendExpression);
 				}
 				else
 				{
 					builder.Append('.')
 					       .AppendNameOf(expression.Method, includeGenericArgumentList: true)
-					       .AppendCommaSeparated("(", expression.Arguments.Skip(paramFrom), ToString, ")");
+					       .AppendCommaSeparated("(", expression.Arguments.Skip(paramFrom), AppendExpression, ")");
 				}
 			}
 
@@ -336,24 +376,8 @@ namespace Moq
 
 		private static StringBuilder AppendExpression(this StringBuilder builder, IndexExpression expression)
 		{
-			return builder.ToString(expression.Object)
-			              .AppendCommaSeparated("[", expression.Arguments, ToString, "]");
-		}
-
-		private static StringBuilder AppendMemberAssignment(this StringBuilder builder, MemberAssignment assignment)
-		{
-			return builder.Append(assignment.Member.Name)
-			              .Append("= ")
-			              .ToString(assignment.Expression);
-		}
-
-		private static StringBuilder AppendElementInits(this StringBuilder builder, ReadOnlyCollection<ElementInit> original)
-		{
-			for (int i = 0, n = original.Count; i < n; i++)
-			{
-				builder.AppendElementInit(original[i]);
-			}
-			return builder;
+			return builder.AppendExpression(expression.Object)
+			              .AppendCommaSeparated("[", expression.Arguments, AppendExpression, "]");
 		}
 
 		private static StringBuilder AppendExpression(this StringBuilder builder, LambdaExpression expression)
@@ -367,7 +391,7 @@ namespace Moq
 				builder.AppendCommaSeparated("(", expression.Parameters, AppendExpression, ")");
 			}
 			return builder.Append(" => ")
-			              .ToString(expression.Body);
+			              .AppendExpression(expression.Body);
 		}
 
 		private static StringBuilder AppendExpression(this StringBuilder builder, NewExpression expression)
@@ -375,13 +399,61 @@ namespace Moq
 			Type type = (expression.Constructor == null) ? expression.Type : expression.Constructor.DeclaringType;
 			return builder.Append("new ")
 			              .AppendNameOf(type)
-			              .AppendCommaSeparated("(", expression.Arguments, ToString, ")");
+			              .AppendCommaSeparated("(", expression.Arguments, AppendExpression, ")");
+		}
+
+		private static StringBuilder AppendExpression(this StringBuilder builder, NewArrayExpression expression)
+		{
+			switch (expression.NodeType)
+			{
+				case ExpressionType.NewArrayInit:
+					return builder.AppendCommaSeparated("new[] { ", expression.Expressions, AppendExpression, " }");
+
+				case ExpressionType.NewArrayBounds:
+					return builder.Append("new ")
+					              .AppendNameOf(expression.Type.GetElementType())
+					              .AppendCommaSeparated("[", expression.Expressions, AppendExpression, "]");
+			}
+
+			return builder;  // TODO: check whether this should be unreachable
+		}
+
+		private static StringBuilder AppendExpression(this StringBuilder builder, InvocationExpression expression)
+		{
+			return builder.AppendExpression(expression.Expression)
+			              .AppendCommaSeparated("(", expression.Arguments, AppendExpression, ")");
 		}
 
 		private static StringBuilder AppendExpression(this StringBuilder builder, MemberInitExpression expression)
 		{
 			return builder.AppendExpression(expression.NewExpression)
 			              .AppendCommaSeparated(" { ", expression.Bindings, AppendMemberBinding, " }");
+
+			StringBuilder AppendMemberBinding(StringBuilder b, MemberBinding binding)
+			{
+				switch (binding.BindingType)
+				{
+					case MemberBindingType.Assignment:
+						var assignment = (MemberAssignment)binding;
+						return builder.Append(assignment.Member.Name)
+						              .Append("= ")
+						              .AppendExpression(assignment.Expression);
+
+					case MemberBindingType.MemberBinding:
+						return b.AppendCommaSeparated(((MemberMemberBinding)binding).Bindings, AppendMemberBinding);
+
+					case MemberBindingType.ListBinding:
+						var original = ((MemberListBinding)binding).Initializers;
+						for (int i = 0, n = original.Count; i < n; i++)
+						{
+							builder.AppendElementInit(original[i]);
+						}
+						return builder;
+
+					default:
+						throw new Exception(string.Format(Resources.UnhandledBindingType, binding.BindingType));
+				}
+			}
 		}
 
 		private static StringBuilder AppendExpression(this StringBuilder builder, ListInitExpression expression)
@@ -390,110 +462,9 @@ namespace Moq
 			              .AppendCommaSeparated(" { ", expression.Initializers, AppendElementInit, " }");
 		}
 
-		private static StringBuilder AppendExpression(this StringBuilder builder, NewArrayExpression expression)
+		private static StringBuilder AppendExpression(this StringBuilder builder, MatchExpression expression)
 		{
-			switch (expression.NodeType)
-			{
-				case ExpressionType.NewArrayInit:
-					return builder.AppendCommaSeparated("new[] { ", expression.Expressions, ToString, " }");
-
-				case ExpressionType.NewArrayBounds:
-					return builder.Append("new ")
-					              .AppendNameOf(expression.Type.GetElementType())
-					              .AppendCommaSeparated("[", expression.Expressions, ToString, "]");
-			}
-
-			return builder;  // TODO: check whether this should be unreachable
-		}
-
-		private static StringBuilder AppendMatchExpression(this StringBuilder builder, MatchExpression expression)
-		{
-			return builder.ToString(expression.Match.RenderExpression);
-		}
-
-		private static StringBuilder AppendExpression(this StringBuilder builder, InvocationExpression expression)
-		{
-			return builder.ToString(expression.Expression)
-			              .AppendCommaSeparated("(", expression.Arguments, ToString, ")");
-		}
-
-		internal static string ToStringOperator(ExpressionType nodeType)
-		{
-			switch (nodeType)
-			{
-				case ExpressionType.Add:
-				case ExpressionType.AddChecked:
-					return "+";
-
-				case ExpressionType.AddAssign:
-					return "+=";
-
-				case ExpressionType.Assign:
-					return "=";
-
-				case ExpressionType.And:
-					return "&";
-
-				case ExpressionType.AndAlso:
-					return "&&";
-
-				case ExpressionType.Coalesce:
-					return "??";
-
-				case ExpressionType.Divide:
-					return "/";
-
-				case ExpressionType.Equal:
-					return "==";
-
-				case ExpressionType.ExclusiveOr:
-					return "^";
-
-				case ExpressionType.GreaterThan:
-					return ">";
-
-				case ExpressionType.GreaterThanOrEqual:
-					return ">=";
-
-				case ExpressionType.LeftShift:
-					return "<<";
-
-				case ExpressionType.LessThan:
-					return "<";
-
-				case ExpressionType.LessThanOrEqual:
-					return "<=";
-
-				case ExpressionType.Modulo:
-					return "%";
-
-				case ExpressionType.Multiply:
-				case ExpressionType.MultiplyChecked:
-					return "*";
-
-				case ExpressionType.NotEqual:
-					return "!=";
-
-				case ExpressionType.Or:
-					return "|";
-
-				case ExpressionType.OrElse:
-					return "||";
-
-				case ExpressionType.Power:
-					return "^";
-
-				case ExpressionType.RightShift:
-					return ">>";
-
-				case ExpressionType.Subtract:
-				case ExpressionType.SubtractChecked:
-					return "-";
-
-				case ExpressionType.SubtractAssign:
-					return "-=";
-			}
-			return nodeType.ToString();
+			return builder.AppendExpression(expression.Match.RenderExpression);
 		}
 	}
 }

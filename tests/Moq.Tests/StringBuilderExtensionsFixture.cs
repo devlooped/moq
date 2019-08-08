@@ -3,15 +3,16 @@
 
 using System;
 using System.Linq.Expressions;
+using System.Text;
 
 using Xunit;
 
 namespace Moq.Tests
 {
-	public class ExpressionStringBuilderFixture
+	public class StringBuilderExtensionsFixture
 	{
 		[Fact]
-		public void Formats_call_to_indexer_setter_method_using_indexer_syntax()
+		public void AppendExpression_formats_call_to_indexer_setter_method_using_indexer_syntax()
 		{
 			// foo => foo.set_Item("index", "value")
 			var foo = Expression.Parameter(typeof(IFoo), "foo");
@@ -24,11 +25,11 @@ namespace Moq.Tests
 						Expression.Constant("value")),
 					foo);
 
-			Assert.Equal(@"foo => foo[""index""] = ""value""", ExpressionStringBuilder.ToString(expression));
+			Assert.Equal(@"foo => foo[""index""] = ""value""", GetAppendExpressionResult(expression));
 		}
 
 		[Fact]
-		public void Formats_ternary_conditional_expression_correctly()
+		public void AppendExpression_formats_ternary_conditional_expression_correctly()
 		{
 			// 1 == 2 ? 3 : 4
 			var expression = Expression.Condition(
@@ -36,7 +37,12 @@ namespace Moq.Tests
 				Expression.Constant(3),
 				Expression.Constant(4));
 
-			Assert.Equal(@"1 == 2 ? 3 : 4", ExpressionStringBuilder.ToString(expression));
+			Assert.Equal(@"1 == 2 ? 3 : 4", GetAppendExpressionResult(expression));
+		}
+
+		private string GetAppendExpressionResult(Expression expression)
+		{
+			return new StringBuilder().AppendExpression(expression).ToString();
 		}
 
 		public interface IFoo

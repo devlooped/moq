@@ -8,7 +8,7 @@ using System.Globalization;
 using System.Linq;
 using System.Linq.Expressions;
 using System.Reflection;
-using System.Runtime.CompilerServices;
+using System.Text;
 
 using Moq.Properties;
 using Moq.Protected;
@@ -419,7 +419,7 @@ namespace Moq
 		/// </devdoc>
 		public static string ToStringFixed(this Expression expression)
 		{
-			return ExpressionStringBuilder.ToString(expression);
+			return new StringBuilder().AppendExpression(expression).ToString();
 		}
 	}
 }
