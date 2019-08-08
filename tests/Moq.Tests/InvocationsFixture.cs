@@ -128,5 +128,32 @@ namespace Moq.Tests
 			var invocation = mock.MutableInvocations.ToArray()[0];
 			Assert.Equal(42, invocation.ReturnValue);
 		}
+
+		[Fact]
+		public void Invocations_Clear_also_resets_setup_verification_state()
+		{
+			var mock = new Mock<IComparable>();
+			mock.Setup(m => m.CompareTo(default));
+			_ = mock.Object.CompareTo(default);
+			mock.VerifyAll();  // ensure setup has been matched
+
+			mock.Invocations.Clear();
+			var ex = Assert.Throws<MockException>(() => mock.VerifyAll());
+			Assert.Equal(MockExceptionReasons.UnmatchedSetup, ex.Reasons);
+		}
+
+		[Fact]
+		[Obsolete()]
+		public void Invocations_Clear_resets_count_kept_by_setup_AtMost()
+		{
+			var mock = new Mock<IComparable>();
+			mock.Setup(m => m.CompareTo(default)).Returns(0).AtMostOnce();
+			_ = mock.Object.CompareTo(default);
+
+			mock.Invocations.Clear();
+			_ = mock.Object.CompareTo(default);  // this second call should now count as the first
+			var ex = Assert.Throws<MockException>(() => mock.Object.CompareTo(default));
+			Assert.Equal(MockExceptionReasons.MoreThanOneCall, ex.Reasons);
+		}
 	}
 }

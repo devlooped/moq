@@ -139,7 +139,7 @@ namespace Moq
 			this.constructorArguments = args;
 			this.defaultValueProvider = DefaultValueProvider.Empty;
 			this.eventHandlers = new EventHandlerCollection();
-			this.invocations = new InvocationCollection();
+			this.invocations = new InvocationCollection(this);
 			this.name = CreateUniqueDefaultMockName();
 			this.setups = new SetupCollection();
 			this.switches = Switches.Default;

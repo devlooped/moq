@@ -11,6 +11,8 @@ The format is loosely based on [Keep a Changelog](http://keepachangelog.com/en/1
 
 * Improved error message that is supplied with `ArgumentException` thrown when `Setup` or `Verify` are called on a protected method if the method could not be found with both the name and compatible argument types specified (@thomasfdm, #852).
 
+* `mock.Invocations.Clear()` now removes traces of previous invocations more thoroughly by additionally resetting all setups to an "unmatched" state. (@stakx, #854)
+
 * Consistent `Callback` delegate validation regardless of whether or not `Callback` is preceded by a `Returns`: Validation for post-`Returns` callback delegates used to be very relaxed, but is now equally strict as in the pre-`Returns` case.) (@stakx, #876)
 
 #### Added
@@ -19,7 +21,10 @@ The format is loosely based on [Keep a Changelog](http://keepachangelog.com/en/1
 
 #### Fixed
 
+* `Invocations.Clear()` does not cause `Verify` to fail (@jchessir, #733)
+
 * Regression: `SetupAllProperties` can no longer set up properties whose names start with `Item`. (@mattzink, #870; @kaan-kaya, #869)
+
 * Regression: `MockDefaultValueProvider` will no longer attempt to set `CallBase` to true for mocks generated for delegates. (@dammejed, #874)
 
 

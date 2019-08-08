@@ -4,7 +4,7 @@
 using System;
 using System.Collections;
 using System.Collections.Generic;
-using System.Linq;
+using System.Diagnostics;
 
 namespace Moq
 {
@@ -16,6 +16,14 @@ namespace Moq
 		private int count = 0;
 
 		private readonly object invocationsLock = new object();
+		private readonly Mock owner;
+
+		public InvocationCollection(Mock owner)
+		{
+			Debug.Assert(owner != null);
+
+			this.owner = owner;
+		}
 
 		public int Count
 		{
@@ -68,6 +76,9 @@ namespace Moq
 				this.invocations = null;
 				this.count = 0;
 				this.capacity = 0;
+
+				this.owner.Setups.UninvokeAll();
+				// ^ TODO: Currently this could cause a deadlock as another lock will be taken inside this one!
 			}
 		}
 
