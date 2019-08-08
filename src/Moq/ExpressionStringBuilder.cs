@@ -78,7 +78,7 @@ namespace Moq
 					return builder.ToStringConditional((ConditionalExpression)exp);
 
 				case ExpressionType.Constant:
-					return builder.ToStringConstant((ConstantExpression)exp);
+					return builder.AppendValueOf(((ConstantExpression)exp).Value);
 
 				case ExpressionType.Parameter:
 					return builder.ToStringParameter((ParameterExpression)exp);
@@ -131,10 +131,10 @@ namespace Moq
 					return builder.ToStringMemberAssignment((MemberAssignment)binding);
 
 				case MemberBindingType.MemberBinding:
-					return builder.ToStringMemberMemberBinding((MemberMemberBinding)binding);
+					return builder.AppendCommaSeparated(((MemberMemberBinding)binding).Bindings, ToStringBinding);
 
 				case MemberBindingType.ListBinding:
-					return builder.ToStringMemberListBinding((MemberListBinding)binding);
+					return builder.ToStringElementInitializerList(((MemberListBinding)binding).Initializers);
 
 				default:
 					throw new Exception(string.Format(Resources.UnhandledBindingType, binding.BindingType));
@@ -144,7 +144,7 @@ namespace Moq
 		private static StringBuilder ToStringElementInitializer(this StringBuilder builder, ElementInit initializer)
 		{
 			return builder.Append("{ ")
-			              .ToStringExpressionList(initializer.Arguments)
+			              .AppendCommaSeparated(initializer.Arguments, ToString)
 			              .Append(" }");
 		}
 
@@ -235,11 +235,6 @@ namespace Moq
 		private static StringBuilder ToStringTypeIs(this StringBuilder builder, TypeBinaryExpression b)
 		{
 			return builder.ToString(b.Expression);
-		}
-
-		private static StringBuilder ToStringConstant(this StringBuilder builder, ConstantExpression c)
-		{
-			return builder.AppendValueOf(c.Value);
 		}
 
 		private static StringBuilder ToStringConditional(this StringBuilder builder, ConditionalExpression c)
@@ -353,13 +348,8 @@ namespace Moq
 		{
 			return builder.ToString(expression.Object)
 			              .Append('[')
-			              .ToStringExpressionList(expression.Arguments)
+			              .AppendCommaSeparated(expression.Arguments, ToString)
 			              .Append(']');
-		}
-
-		private static StringBuilder ToStringExpressionList(this StringBuilder builder, IEnumerable<Expression> original)
-		{
-			return builder.AppendCommaSeparated(original, ToString);
 		}
 
 		private static StringBuilder ToStringMemberAssignment(this StringBuilder builder, MemberAssignment assignment)
@@ -367,21 +357,6 @@ namespace Moq
 			return builder.Append(assignment.Member.Name)
 			              .Append("= ")
 			              .ToString(assignment.Expression);
-		}
-
-		private static StringBuilder ToStringMemberMemberBinding(this StringBuilder builder, MemberMemberBinding binding)
-		{
-			return builder.ToStringBindingList(binding.Bindings);
-		}
-
-		private static StringBuilder ToStringMemberListBinding(this StringBuilder builder, MemberListBinding binding)
-		{
-			return builder.ToStringElementInitializerList(binding.Initializers);
-		}
-
-		private static StringBuilder ToStringBindingList(this StringBuilder builder, IEnumerable<MemberBinding> original)
-		{
-			return builder.AppendCommaSeparated(original, ToStringBinding);
 		}
 
 		private static StringBuilder ToStringElementInitializerList(this StringBuilder builder, ReadOnlyCollection<ElementInit> original)
@@ -423,7 +398,7 @@ namespace Moq
 		{
 			return builder.ToStringNew(init.NewExpression)
 			              .Append(" { ")
-			              .ToStringBindingList(init.Bindings)
+			              .AppendCommaSeparated(init.Bindings, ToStringBinding)
 			              .Append(" }");
 		}
 
@@ -464,7 +439,7 @@ namespace Moq
 		{
 			return builder.ToString(iv.Expression)
 			              .Append('(')
-			              .ToStringExpressionList(iv.Arguments)
+			              .AppendCommaSeparated(iv.Arguments, ToString)
 			              .Append(')');
 		}
 
