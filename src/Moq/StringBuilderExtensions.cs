@@ -74,6 +74,54 @@ namespace Moq
 			return stringBuilder.AppendFormattedName(type);
 		}
 
+		public static StringBuilder AppendParameterType(this StringBuilder stringBuilder, ParameterInfo parameter)
+		{
+			var parameterType = parameter.ParameterType;
+
+			if (parameterType.IsByRef)
+			{
+				switch (parameter.Attributes & (ParameterAttributes.In | ParameterAttributes.Out))
+				{
+					case ParameterAttributes.In:
+						stringBuilder.Append("in ");
+						break;
+
+					case ParameterAttributes.Out:
+						stringBuilder.Append("out ");
+						break;
+
+					case ParameterAttributes.In | ParameterAttributes.Out:
+					default:
+						stringBuilder.Append("ref ");
+						break;
+				}
+
+				parameterType = parameterType.GetElementType();
+			}
+
+			if (parameterType.IsArray && parameter.IsDefined(typeof(ParamArrayAttribute), true))
+			{
+				stringBuilder.Append("params ");
+			}
+
+			return stringBuilder.AppendFormattedName(parameterType);
+		}
+
+		public static StringBuilder AppendParameterTypeList(this StringBuilder stringBuilder, ParameterInfo[] parameters)
+		{
+			for (int i = 0; i < parameters.Length; ++i)
+			{
+				if (i > 0)
+				{
+					stringBuilder.Append(", ");
+				}
+
+				stringBuilder.AppendParameterType(parameters[i]);
+			}
+
+			return stringBuilder;
+		}
+
 		public static StringBuilder AppendValueOf(this StringBuilder stringBuilder, object obj)
 		{
 			if (obj == null)
