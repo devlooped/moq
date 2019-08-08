@@ -10,6 +10,7 @@ using System.Linq.Expressions;
 using System.Reflection;
 using System.Runtime.CompilerServices;
 using System.Runtime.ExceptionServices;
+using System.Text;
 
 using Moq.Properties;
 
@@ -186,6 +187,11 @@ namespace Moq
 			}
 
 			return true;
+		}
+
+		public static string GetParameterTypeList(this MethodInfo method)
+		{
+			return new StringBuilder().AppendParameterTypeList(method.GetParameters()).ToString();
 		}
 
 		public static ParameterTypes GetParameterTypes(this MethodInfo method)
