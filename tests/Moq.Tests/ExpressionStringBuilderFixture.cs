@@ -24,7 +24,7 @@ namespace Moq.Tests
 						Expression.Constant("value")),
 					foo);
 
-			Assert.Equal(@"foo => foo[""index""] = ""value""", Format(expression));
+			Assert.Equal(@"foo => foo[""index""] = ""value""", ExpressionStringBuilder.ToString(expression));
 		}
 
 		[Fact]
@@ -36,12 +36,7 @@ namespace Moq.Tests
 				Expression.Constant(3),
 				Expression.Constant(4));
 
-			Assert.Equal(@"1 == 2 ? 3 : 4", Format(expression));
-		}
-
-		private static string Format(Expression expression)
-		{
-			return new ExpressionStringBuilder().Append(expression).ToString();
+			Assert.Equal(@"1 == 2 ? 3 : 4", ExpressionStringBuilder.ToString(expression));
 		}
 
 		public interface IFoo

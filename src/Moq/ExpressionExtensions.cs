@@ -419,7 +419,7 @@ namespace Moq
 		/// </devdoc>
 		public static string ToStringFixed(this Expression expression)
 		{
-			return new ExpressionStringBuilder().Append(expression).ToString();
+			return ExpressionStringBuilder.ToString(expression);
 		}
 	}
 }
