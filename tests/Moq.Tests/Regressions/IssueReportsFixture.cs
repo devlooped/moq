@@ -2705,9 +2705,23 @@ namespace Moq.Tests.Regressions
 				Assert.NotNull(httpContext.Object.Items);
 			}
 
+			[Fact]
+			public void SetupAllProperties_can_process_Item_property()
+			{
+				var mock = new Mock<IFoo>();
+				mock.SetupAllProperties();
+				mock.Object.Item = "value";
+				Assert.Equal("value", mock.Object.Item);
+			}
+
 			public abstract partial class HttpContext
 			{
 				public abstract IDictionary<object, object> Items { get; set; }
+			}
+
+			public interface IFoo
+			{
+				string Item { get; set; }
 			}
 		}
 
