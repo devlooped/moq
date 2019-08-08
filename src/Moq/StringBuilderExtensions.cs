@@ -14,6 +14,11 @@ namespace Moq
 {
 	internal static partial class StringBuilderExtensions
 	{
+		public static StringBuilder Append(this StringBuilder stringBuilder, string str, int startIndex)
+		{
+			return stringBuilder.Append(str, startIndex, str.Length - startIndex);
+		}
+
 		public static StringBuilder AppendCommaSeparated<T>(this StringBuilder stringBuilder, string prefix, IEnumerable<T> source, Func<StringBuilder, T, StringBuilder> append, string suffix)
 		{
 			return stringBuilder.Append(prefix)
@@ -68,16 +73,6 @@ namespace Moq
 			}
 
 			return stringBuilder;
-		}
-
-		public static StringBuilder AppendNameOfAddEvent(this StringBuilder stringBuilder, MethodBase method, bool includeGenericArgumentList)
-		{
-			return stringBuilder.Append(method.Name.Substring("add_".Length)).Append(" += ");
-		}
-
-		public static StringBuilder AppendNameOfRemoveEvent(this StringBuilder stringBuilder, MethodBase method, bool includeGenericArgumentList)
-		{
-			return stringBuilder.Append(method.Name.Substring("remove_".Length)).Append(" -= ");
 		}
 
 		public static StringBuilder AppendNameOf(this StringBuilder stringBuilder, Type type)

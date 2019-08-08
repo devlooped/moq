@@ -338,7 +338,7 @@ namespace Moq
 				else if (expression.Method.IsPropertyGetter())
 				{
 					builder.Append('.')
-					       .Append(expression.Method.Name.Substring(4));
+					       .Append(expression.Method.Name, 4);
 					if (expression.Arguments.Count > paramFrom)
 					{
 						builder.AppendCommaSeparated("[", expression.Arguments.Skip(paramFrom), AppendExpression, "]");
@@ -347,20 +347,22 @@ namespace Moq
 				else if (expression.Method.IsPropertySetter())
 				{
 					builder.Append('.')
-					       .Append(expression.Method.Name.Substring(4))
+					       .Append(expression.Method.Name, 4)
 					       .Append(" = ")
 					       .AppendExpression(expression.Arguments.Last());
 				}
 				else if (expression.Method.LooksLikeEventAttach())
 				{
 					builder.Append('.')
-					       .AppendNameOfAddEvent(expression.Method, includeGenericArgumentList: true)
+					       .Append(expression.Method.Name, 4)
+					       .Append(" += ")
 					       .AppendCommaSeparated(expression.Arguments.Skip(paramFrom), AppendExpression);
 				}
 				else if (expression.Method.LooksLikeEventDetach())
 				{
 					builder.Append('.')
-					       .AppendNameOfRemoveEvent(expression.Method, includeGenericArgumentList: true)
+					       .Append(expression.Method.Name, 7)
+					       .Append(" -= ")
 					       .AppendCommaSeparated(expression.Arguments.Skip(paramFrom), AppendExpression);
 				}
 				else
