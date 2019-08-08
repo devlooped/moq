@@ -325,7 +325,7 @@ namespace Moq
 				else if (node.Method.IsPropertyIndexerSetter())
 				{
 					this.builder.Append('[');
-					AsCommaSeparatedValues(node.Arguments.Skip(paramFrom), ToString);
+					AsCommaSeparatedValues(node.Arguments.Skip(paramFrom).Take(node.Arguments.Count - paramFrom - 1), ToString);
 					this.builder.Append("] = ");
 					ToString(node.Arguments.Last());
 				}
