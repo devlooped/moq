@@ -143,9 +143,7 @@ namespace Moq
 
 		private static StringBuilder ToStringElementInitializer(this StringBuilder builder, ElementInit initializer)
 		{
-			return builder.Append("{ ")
-			              .AppendCommaSeparated(initializer.Arguments, ToString)
-			              .Append(" }");
+			return builder.AppendCommaSeparated("{ ", initializer.Arguments, ToString, " }");
 		}
 
 		private static StringBuilder ToStringUnary(this StringBuilder builder, UnaryExpression u)
@@ -290,15 +288,11 @@ namespace Moq
 
 				if (node.Method.IsPropertyIndexerGetter())
 				{
-					builder.Append('[')
-					       .AppendCommaSeparated(node.Arguments.Skip(paramFrom), ToString)
-					       .Append(']');
+					builder.AppendCommaSeparated("[", node.Arguments.Skip(paramFrom), ToString, "]");
 				}
 				else if (node.Method.IsPropertyIndexerSetter())
 				{
-					builder.Append('[')
-					       .AppendCommaSeparated(node.Arguments.Skip(paramFrom).Take(node.Arguments.Count - paramFrom - 1), ToString)
-					       .Append("] = ")
+					builder.AppendCommaSeparated("[", node.Arguments.Skip(paramFrom).Take(node.Arguments.Count - paramFrom - 1), ToString, "] = ")
 					       .ToString(node.Arguments.Last());
 				}
 				else if (node.Method.IsPropertyGetter())
@@ -307,9 +301,7 @@ namespace Moq
 					       .Append(node.Method.Name.Substring(4));
 					if (node.Arguments.Count > paramFrom)
 					{
-						builder.Append('[')
-						       .AppendCommaSeparated(node.Arguments.Skip(paramFrom), ToString)
-						       .Append(']');
+						builder.AppendCommaSeparated("[", node.Arguments.Skip(paramFrom), ToString, "]");
 					}
 				}
 				else if (node.Method.IsPropertySetter())
@@ -335,9 +327,7 @@ namespace Moq
 				{
 					builder.Append('.')
 					       .AppendNameOf(node.Method, includeGenericArgumentList: true)
-					       .Append('(')
-					       .AppendCommaSeparated(node.Arguments.Skip(paramFrom), ToString)
-					       .Append(')');
+					       .AppendCommaSeparated("(", node.Arguments.Skip(paramFrom), ToString, ")");
 				}
 			}
 
@@ -347,9 +337,7 @@ namespace Moq
 		private static StringBuilder ToStringIndex(this StringBuilder builder, IndexExpression expression)
 		{
 			return builder.ToString(expression.Object)
-			              .Append('[')
-			              .AppendCommaSeparated(expression.Arguments, ToString)
-			              .Append(']');
+			              .AppendCommaSeparated("[", expression.Arguments, ToString, "]");
 		}
 
 		private static StringBuilder ToStringMemberAssignment(this StringBuilder builder, MemberAssignment assignment)
@@ -376,9 +364,7 @@ namespace Moq
 			}
 			else
 			{
-				builder.Append('(')
-				       .AppendCommaSeparated(lambda.Parameters, ToStringParameter)
-				       .Append(')');
+				builder.AppendCommaSeparated("(", lambda.Parameters, ToStringParameter, ")");
 			}
 			return builder.Append(" => ")
 			              .ToString(lambda.Body);
@@ -389,25 +375,19 @@ namespace Moq
 			Type type = (nex.Constructor == null) ? nex.Type : nex.Constructor.DeclaringType;
 			return builder.Append("new ")
 			              .AppendNameOf(type)
-			              .Append('(')
-			              .AppendCommaSeparated(nex.Arguments, ToString)
-			              .Append(')');
+			              .AppendCommaSeparated("(", nex.Arguments, ToString, ")");
 		}
 
 		private static StringBuilder ToStringMemberInit(this StringBuilder builder, MemberInitExpression init)
 		{
 			return builder.ToStringNew(init.NewExpression)
-			              .Append(" { ")
-			              .AppendCommaSeparated(init.Bindings, ToStringBinding)
-			              .Append(" }");
+			              .AppendCommaSeparated(" { ", init.Bindings, ToStringBinding, " }");
 		}
 
 		private static StringBuilder ToStringListInit(this StringBuilder builder, ListInitExpression init)
 		{
 			return builder.ToStringNew(init.NewExpression)
-			              .Append(" { ")
-			              .AppendCommaSeparated(init.Initializers, ToStringElementInitializer)
-			              .Append(" }");
+			              .AppendCommaSeparated(" { ", init.Initializers, ToStringElementInitializer, " }");
 		}
 
 		private static StringBuilder ToStringNewArray(this StringBuilder builder, NewArrayExpression na)
@@ -415,16 +395,12 @@ namespace Moq
 			switch (na.NodeType)
 			{
 				case ExpressionType.NewArrayInit:
-					return builder.Append("new[] { ")
-					              .AppendCommaSeparated(na.Expressions, ToString)
-					              .Append(" }");
+					return builder.AppendCommaSeparated("new[] { ", na.Expressions, ToString, " }");
 
 				case ExpressionType.NewArrayBounds:
 					return builder.Append("new ")
 					              .AppendNameOf(na.Type.GetElementType())
-					              .Append('[')
-					              .AppendCommaSeparated(na.Expressions, ToString)
-					              .Append(']');
+					              .AppendCommaSeparated("[", na.Expressions, ToString, "]");
 			}
 
 			return builder;  // TODO: check whether this should be unreachable
@@ -438,9 +414,7 @@ namespace Moq
 		private static StringBuilder ToStringInvocation(this StringBuilder builder, InvocationExpression iv)
 		{
 			return builder.ToString(iv.Expression)
-			              .Append('(')
-			              .AppendCommaSeparated(iv.Arguments, ToString)
-			              .Append(')');
+			              .AppendCommaSeparated("(", iv.Arguments, ToString, ")");
 		}
 
 		internal static string ToStringOperator(ExpressionType nodeType)

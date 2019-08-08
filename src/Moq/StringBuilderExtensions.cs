@@ -14,6 +14,13 @@ namespace Moq
 {
 	internal static class StringBuilderExtensions
 	{
+		public static StringBuilder AppendCommaSeparated<T>(this StringBuilder stringBuilder, string prefix, IEnumerable<T> source, Func<StringBuilder, T, StringBuilder> append, string suffix)
+		{
+			return stringBuilder.Append(prefix)
+			                    .AppendCommaSeparated(source, append)
+			                    .Append(suffix);
+		}
+
 		public static StringBuilder AppendCommaSeparated<T>(this StringBuilder stringBuilder, IEnumerable<T> source, Func<StringBuilder, T, StringBuilder> append)
 		{
 			bool appendComma = false;
