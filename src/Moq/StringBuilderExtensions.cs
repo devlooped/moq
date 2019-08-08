@@ -64,17 +64,7 @@ namespace Moq
 
 			if (includeGenericArgumentList && method.IsGenericMethod)
 			{
-				stringBuilder.Append('<');
-				var genericArguments = method.GetGenericArguments();
-				for (int i = 0, n = genericArguments.Length; i < n; ++i)
-				{
-					if (i > 0)
-					{
-						stringBuilder.Append(", ");
-					}
-					stringBuilder.AppendNameOf(genericArguments[i]);
-				}
-				stringBuilder.Append('>');
+				stringBuilder.AppendCommaSeparated("<", method.GetGenericArguments(), AppendNameOf, ">");
 			}
 
 			return stringBuilder;
@@ -128,21 +118,6 @@ namespace Moq
 			}
 
 			return stringBuilder.AppendFormattedName(parameterType);
-		}
-
-		public static StringBuilder AppendParameterTypeList(this StringBuilder stringBuilder, ParameterInfo[] parameters)
-		{
-			for (int i = 0; i < parameters.Length; ++i)
-			{
-				if (i > 0)
-				{
-					stringBuilder.Append(", ");
-				}
-
-				stringBuilder.AppendParameterType(parameters[i]);
-			}
-
-			return stringBuilder;
 		}
 
 		public static StringBuilder AppendValueOf(this StringBuilder stringBuilder, object obj)
