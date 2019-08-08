@@ -262,7 +262,9 @@ namespace Moq
 		private void ToStringConditional(ConditionalExpression c)
 		{
 			ToString(c.Test);
+			builder.Append(" ? ");
 			ToString(c.IfTrue);
+			builder.Append(" : ");
 			ToString(c.IfFalse);
 			return;
 		}
