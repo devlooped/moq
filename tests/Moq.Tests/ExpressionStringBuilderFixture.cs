@@ -27,6 +27,18 @@ namespace Moq.Tests
 			Assert.Equal(@"foo => foo[""index""] = ""value""", Format(expression));
 		}
 
+		[Fact]
+		public void Formats_ternary_conditional_expression_correctly()
+		{
+			// 1 == 2 ? 3 : 4
+			var expression = Expression.Condition(
+				Expression.Equal(Expression.Constant(1), Expression.Constant(2)),
+				Expression.Constant(3),
+				Expression.Constant(4));
+
+			Assert.Equal(@"1 == 2 ? 3 : 4", Format(expression));
+		}
+
 		private static string Format(Expression expression)
 		{
 			return new ExpressionStringBuilder().Append(expression).ToString();
