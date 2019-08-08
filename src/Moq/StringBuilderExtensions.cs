@@ -14,6 +14,22 @@ namespace Moq
 {
 	internal static class StringBuilderExtensions
 	{
+		public static StringBuilder AppendCommaSeparated<T>(this StringBuilder stringBuilder, IEnumerable<T> source, Func<StringBuilder, T, StringBuilder> append)
+		{
+			bool appendComma = false;
+			foreach (var item in source)
+			{
+				if (appendComma)
+				{
+					stringBuilder.Append(", ");
+				}
+				append(stringBuilder, item);
+				appendComma = true;
+			}
+
+			return stringBuilder;
+		}
+
 		public static StringBuilder AppendIndented(this StringBuilder stringBuilder, string str, int count = 1, char indentChar = ' ')
 		{
 			var i = 0;

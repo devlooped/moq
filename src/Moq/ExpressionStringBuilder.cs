@@ -296,13 +296,13 @@ namespace Moq
 				if (node.Method.IsPropertyIndexerGetter())
 				{
 					builder.Append('[')
-					       .AsCommaSeparatedValues(node.Arguments.Skip(paramFrom), ToString)
+					       .AppendCommaSeparated(node.Arguments.Skip(paramFrom), ToString)
 					       .Append(']');
 				}
 				else if (node.Method.IsPropertyIndexerSetter())
 				{
 					builder.Append('[')
-					       .AsCommaSeparatedValues(node.Arguments.Skip(paramFrom).Take(node.Arguments.Count - paramFrom - 1), ToString)
+					       .AppendCommaSeparated(node.Arguments.Skip(paramFrom).Take(node.Arguments.Count - paramFrom - 1), ToString)
 					       .Append("] = ")
 					       .ToString(node.Arguments.Last());
 				}
@@ -313,7 +313,7 @@ namespace Moq
 					if (node.Arguments.Count > paramFrom)
 					{
 						builder.Append('[')
-						       .AsCommaSeparatedValues(node.Arguments.Skip(paramFrom), ToString)
+						       .AppendCommaSeparated(node.Arguments.Skip(paramFrom), ToString)
 						       .Append(']');
 					}
 				}
@@ -328,20 +328,20 @@ namespace Moq
 				{
 					builder.Append('.')
 					       .AppendNameOfAddEvent(node.Method, includeGenericArgumentList: true)
-					       .AsCommaSeparatedValues(node.Arguments.Skip(paramFrom), ToString);
+					       .AppendCommaSeparated(node.Arguments.Skip(paramFrom), ToString);
 				}
 				else if (node.Method.LooksLikeEventDetach())
 				{
 					builder.Append('.')
 					       .AppendNameOfRemoveEvent(node.Method, includeGenericArgumentList: true)
-					       .AsCommaSeparatedValues(node.Arguments.Skip(paramFrom), ToString);
+					       .AppendCommaSeparated(node.Arguments.Skip(paramFrom), ToString);
 				}
 				else
 				{
 					builder.Append('.')
 					       .AppendNameOf(node.Method, includeGenericArgumentList: true)
 					       .Append('(')
-					       .AsCommaSeparatedValues(node.Arguments.Skip(paramFrom), ToString)
+					       .AppendCommaSeparated(node.Arguments.Skip(paramFrom), ToString)
 					       .Append(')');
 				}
 			}
@@ -359,7 +359,7 @@ namespace Moq
 
 		private static StringBuilder ToStringExpressionList(this StringBuilder builder, IEnumerable<Expression> original)
 		{
-			return builder.AsCommaSeparatedValues(original, ToString);
+			return builder.AppendCommaSeparated(original, ToString);
 		}
 
 		private static StringBuilder ToStringMemberAssignment(this StringBuilder builder, MemberAssignment assignment)
@@ -381,17 +381,7 @@ namespace Moq
 
 		private static StringBuilder ToStringBindingList(this StringBuilder builder, IEnumerable<MemberBinding> original)
 		{
-			bool appendComma = false;
-			foreach (var exp in original)
-			{
-				if (appendComma)
-				{
-					builder.Append(", ");
-				}
-				builder.ToStringBinding(exp);
-				appendComma = true;
-			}
-			return builder;
+			return builder.AppendCommaSeparated(original, ToStringBinding);
 		}
 
 		private static StringBuilder ToStringElementInitializerList(this StringBuilder builder, ReadOnlyCollection<ElementInit> original)
@@ -412,7 +402,7 @@ namespace Moq
 			else
 			{
 				builder.Append('(')
-				       .AsCommaSeparatedValues(lambda.Parameters, ToStringParameter)
+				       .AppendCommaSeparated(lambda.Parameters, ToStringParameter)
 				       .Append(')');
 			}
 			return builder.Append(" => ")
@@ -425,7 +415,7 @@ namespace Moq
 			return builder.Append("new ")
 			              .AppendNameOf(type)
 			              .Append('(')
-			              .AsCommaSeparatedValues(nex.Arguments, ToString)
+			              .AppendCommaSeparated(nex.Arguments, ToString)
 			              .Append(')');
 		}
 
@@ -439,19 +429,10 @@ namespace Moq
 
 		private static StringBuilder ToStringListInit(this StringBuilder builder, ListInitExpression init)
 		{
-			builder.ToStringNew(init.NewExpression)
-			       .Append(" { ");
-			bool appendComma = false;
-			foreach (var initializer in init.Initializers)
-			{
-				if (appendComma)
-				{
-					builder.Append(", ");
-				}
-				builder.ToStringElementInitializer(initializer);
-				appendComma = true;
-			}
-			return builder.Append(" }");
+			return builder.ToStringNew(init.NewExpression)
+			              .Append(" { ")
+			              .AppendCommaSeparated(init.Initializers, ToStringElementInitializer)
+			              .Append(" }");
 		}
 
 		private static StringBuilder ToStringNewArray(this StringBuilder builder, NewArrayExpression na)
@@ -460,14 +441,14 @@ namespace Moq
 			{
 				case ExpressionType.NewArrayInit:
 					return builder.Append("new[] { ")
-					              .AsCommaSeparatedValues(na.Expressions, ToString)
+					              .AppendCommaSeparated(na.Expressions, ToString)
 					              .Append(" }");
 
 				case ExpressionType.NewArrayBounds:
 					return builder.Append("new ")
 					              .AppendNameOf(na.Type.GetElementType())
 					              .Append('[')
-					              .AsCommaSeparatedValues(na.Expressions, ToString)
+					              .AppendCommaSeparated(na.Expressions, ToString)
 					              .Append(']');
 			}
 
@@ -477,21 +458,6 @@ namespace Moq
 		private static StringBuilder ToStringMatch(this StringBuilder builder, MatchExpression node)
 		{
 			return builder.ToString(node.Match.RenderExpression);
-		}
-
-		private static StringBuilder AsCommaSeparatedValues<T>(this StringBuilder builder, IEnumerable<T> source, Func<StringBuilder, T, StringBuilder> append) where T : Expression
-		{
-			bool appendComma = false;
-			foreach (var exp in source)
-			{
-				if (appendComma)
-				{
-					builder.Append(", ");
-				}
-				append(builder, exp);
-				appendComma = true;
-			}
-			return builder;
 		}
 
 		private static StringBuilder ToStringInvocation(this StringBuilder builder, InvocationExpression iv)
