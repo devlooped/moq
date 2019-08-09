@@ -2756,6 +2756,42 @@ namespace Moq.Tests.Regressions
 		}
 		#endregion
 
+		#region 883
+
+		public class Issue883
+		{
+			[Fact]
+			public async Task Verify_can_process_recorded_invocation_that_threw_exception()
+			{
+				var mock = new Mock<IFoo>();
+
+				// Setup one invocation to throw an exception:
+				mock.SetupSequence(m => m.DoAsync())
+					.Returns(Task.FromException(new InvalidOperationException()))
+					.Returns(Task.CompletedTask);
+
+				// Perform fewer calls (1) than will be expected by verification (2),
+				// while ignoring the exception (we only want Moq to record the invocation):
+				try
+				{
+					await mock.Object.DoAsync();
+				}
+				catch (InvalidOperationException) { }
+
+				// Cause verification failure. We expect a regular verification exception.
+				// (This test is here because this code has been known to throw TargetInvocationException instead.)
+				var ex = Assert.Throws<MockException>(() => mock.Verify(m => m.DoAsync(), Times.AtLeast(3)));
+				Assert.True(ex.IsVerificationError);
+			}
+
+			public interface IFoo
+			{
+				Task DoAsync();
+			}
+		}
+
+		#endregion
+
 		// Old @ Google Code
 
 		#region #47
