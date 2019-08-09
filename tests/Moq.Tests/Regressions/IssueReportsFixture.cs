@@ -2761,27 +2761,45 @@ namespace Moq.Tests.Regressions
 		public class Issue883
 		{
 			[Fact]
-			public async Task Verify_can_process_recorded_invocation_that_threw_exception()
+			public async Task Verify_produces_correct_exception_type_if_one_async_invocation_threw()
+			{
+				// This test is here because below code has been known to throw
+				// a `TargetInvocationException` instead of a `MockException`.
+				var ex = await GetVerificationErrorAsync();
+				var mex = Assert.IsAssignableFrom<MockException>(ex);
+				Assert.True(mex.IsVerificationError);
+			}
+
+			[Fact]
+			public async Task Verify_produces_correct_count_in_exception_message_if_one_async_invocation_threw()
+			{
+				var ex = await GetVerificationErrorAsync();
+				Assert.Contains("exactly 3 times, but was 2 times", ex.Message);
+			}
+
+			private async Task<Exception> GetVerificationErrorAsync()
 			{
 				var mock = new Mock<IFoo>();
 
 				// Setup one invocation to throw an exception:
 				mock.SetupSequence(m => m.DoAsync())
 					.Returns(Task.FromException(new InvalidOperationException()))
+					.Returns(Task.CompletedTask)
 					.Returns(Task.CompletedTask);
 
-				// Perform fewer calls (1) than will be expected by verification (2),
+				// Perform fewer calls (2) than will be expected by verification (3),
 				// while ignoring the exception (we only want Moq to record the invocation):
-				try
+				for (int i = 0; i < 2; ++i)
 				{
-					await mock.Object.DoAsync();
+					try
+					{
+						await mock.Object.DoAsync();
+					}
+					catch (InvalidOperationException) { }
 				}
-				catch (InvalidOperationException) { }
 
 				// Cause verification failure. We expect a regular verification exception.
-				// (This test is here because this code has been known to throw TargetInvocationException instead.)
-				var ex = Assert.Throws<MockException>(() => mock.Verify(m => m.DoAsync(), Times.AtLeast(3)));
-				Assert.True(ex.IsVerificationError);
+				return Record.Exception(() => mock.Verify(m => m.DoAsync(), Times.Exactly(3)));
 			}
 
 			public interface IFoo
