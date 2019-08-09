@@ -25,8 +25,20 @@ namespace Moq
 						var isCompleted = (bool)objType.GetProperty("IsCompleted").GetValue(obj, null);
 						if (isCompleted)
 						{
-							var innerObj = objType.GetProperty("Result").GetValue(obj, null);
-							return Unwrap.ResultIfCompletedTask(innerObj);
+							try
+							{
+								var innerObj = objType.GetProperty("Result").GetValue(obj, null);
+								return Unwrap.ResultIfCompletedTask(innerObj);
+							}
+							catch
+							{
+								// We end up here when the task has completed, but not successfully;
+								// e.g. when an exception was thrown. (We *could* check for this by reading
+								// the task's `State` property, however this requires yet more reflection.
+								// For now, let's just leave this as is.)
+								//
+								// In this case, there's no return value to unwrap, so fall through.
+							}
 						}
 					}
 				}
