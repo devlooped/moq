@@ -40,6 +40,15 @@ namespace Moq.Tests
 			Assert.Equal(@"1 == 2 ? 3 : 4", GetAppendExpressionResult(expression));
 		}
 
+		[Fact]
+		public void AppendExpression_formats_is_operator_correctly()
+		{
+			// 1 is string
+			var expression = Expression.TypeIs(Expression.Constant(1), typeof(string));
+
+			Assert.Equal(@"1 is string", GetAppendExpressionResult(expression));
+		}
+
 		private string GetAppendExpressionResult(Expression expression)
 		{
 			return new StringBuilder().AppendExpression(expression).ToString();

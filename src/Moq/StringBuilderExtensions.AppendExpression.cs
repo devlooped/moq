@@ -272,7 +272,9 @@ namespace Moq
 
 		private static StringBuilder AppendExpression(this StringBuilder builder, TypeBinaryExpression expression)
 		{
-			return builder.AppendExpression(expression.Expression);
+			return builder.AppendExpression(expression.Expression)
+			              .Append(" is ")
+			              .AppendNameOf(expression.TypeOperand);
 		}
 
 		private static StringBuilder AppendExpression(this StringBuilder builder, ConditionalExpression expression)
