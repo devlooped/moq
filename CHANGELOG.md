@@ -27,6 +27,8 @@ The format is loosely based on [Keep a Changelog](http://keepachangelog.com/en/1
 
 * Regression: `MockDefaultValueProvider` will no longer attempt to set `CallBase` to true for mocks generated for delegates. (@dammejed, #874)
 
+* `Verify` throws `TargetInvocationException` instead of `MockException` when one of the recorded invocations was to an async method that threw. (@Cufeadir, #883)
+
 
 ## 4.12.0 (2019-06-20)
 
