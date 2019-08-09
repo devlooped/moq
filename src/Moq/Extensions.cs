@@ -191,7 +191,7 @@ namespace Moq
 
 		public static string GetParameterTypeList(this MethodInfo method)
 		{
-			return new StringBuilder().AppendParameterTypeList(method.GetParameters()).ToString();
+			return new StringBuilder().AppendCommaSeparated(method.GetParameters(), StringBuilderExtensions.AppendParameterType).ToString();
 		}
 
 		public static ParameterTypes GetParameterTypes(this MethodInfo method)

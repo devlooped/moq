@@ -12,8 +12,36 @@ using TypeNameFormatter;
 
 namespace Moq
 {
-	internal static class StringBuilderExtensions
+	internal static partial class StringBuilderExtensions
 	{
+		public static StringBuilder Append(this StringBuilder stringBuilder, string str, int startIndex)
+		{
+			return stringBuilder.Append(str, startIndex, str.Length - startIndex);
+		}
+
+		public static StringBuilder AppendCommaSeparated<T>(this StringBuilder stringBuilder, string prefix, IEnumerable<T> source, Func<StringBuilder, T, StringBuilder> append, string suffix)
+		{
+			return stringBuilder.Append(prefix)
+			                    .AppendCommaSeparated(source, append)
+			                    .Append(suffix);
+		}
+
+		public static StringBuilder AppendCommaSeparated<T>(this StringBuilder stringBuilder, IEnumerable<T> source, Func<StringBuilder, T, StringBuilder> append)
+		{
+			bool appendComma = false;
+			foreach (var item in source)
+			{
+				if (appendComma)
+				{
+					stringBuilder.Append(", ");
+				}
+				append(stringBuilder, item);
+				appendComma = true;
+			}
+
+			return stringBuilder;
+		}
+
 		public static StringBuilder AppendIndented(this StringBuilder stringBuilder, string str, int count = 1, char indentChar = ' ')
 		{
 			var i = 0;
@@ -41,30 +69,10 @@ namespace Moq
 
 			if (includeGenericArgumentList && method.IsGenericMethod)
 			{
-				stringBuilder.Append('<');
-				var genericArguments = method.GetGenericArguments();
-				for (int i = 0, n = genericArguments.Length; i < n; ++i)
-				{
-					if (i > 0)
-					{
-						stringBuilder.Append(", ");
-					}
-					stringBuilder.AppendNameOf(genericArguments[i]);
-				}
-				stringBuilder.Append('>');
+				stringBuilder.AppendCommaSeparated("<", method.GetGenericArguments(), AppendNameOf, ">");
 			}
 
 			return stringBuilder;
-		}
-
-		public static StringBuilder AppendNameOfAddEvent(this StringBuilder stringBuilder, MethodBase method, bool includeGenericArgumentList)
-		{
-			return stringBuilder.Append(method.Name.Substring("add_".Length)).Append(" += ");
-		}
-
-		public static StringBuilder AppendNameOfRemoveEvent(this StringBuilder stringBuilder, MethodBase method, bool includeGenericArgumentList)
-		{
-			return stringBuilder.Append(method.Name.Substring("remove_".Length)).Append(" -= ");
 		}
 
 		public static StringBuilder AppendNameOf(this StringBuilder stringBuilder, Type type)
@@ -105,21 +113,6 @@ namespace Moq
 			}
 
 			return stringBuilder.AppendFormattedName(parameterType);
-		}
-
-		public static StringBuilder AppendParameterTypeList(this StringBuilder stringBuilder, ParameterInfo[] parameters)
-		{
-			for (int i = 0; i < parameters.Length; ++i)
-			{
-				if (i > 0)
-				{
-					stringBuilder.Append(", ");
-				}
-
-				stringBuilder.AppendParameterType(parameters[i]);
-			}
-
-			return stringBuilder;
 		}
 
 		public static StringBuilder AppendValueOf(this StringBuilder stringBuilder, object obj)

@@ -1,6 +1,8 @@
 // Copyright (c) 2007, Clarius Consulting, Manas Technology Solutions, InSTEDD.
 // All rights reserved. Licensed under the BSD 3-Clause License; see License.txt.
 
+using System;
+using System.Linq.Expressions;
 using System.Text;
 
 using Xunit;
@@ -9,37 +11,43 @@ namespace Moq.Tests
 {
 	public class StringBuilderExtensionsFixture
 	{
-		[Theory]
-		[InlineData(nameof(IMethods.Empty), "")]
-		[InlineData(nameof(IMethods.Int), "int")]
-		[InlineData(nameof(IMethods.IntAndString), "int, string")]
-		[InlineData(nameof(IMethods.InInt), "in int")]
-		[InlineData(nameof(IMethods.RefInt), "ref int")]
-		[InlineData(nameof(IMethods.OutInt), "out int")]
-		[InlineData(nameof(IMethods.BoolAndParamsString), "bool, params string[]")]
-		public void AppendParameterList_formats_parameter_lists_correctly(string methodName, string expected)
+		[Fact]
+		public void AppendExpression_formats_call_to_indexer_setter_method_using_indexer_syntax()
 		{
-			var actual = GetFormattedParameterListOf(methodName);
-			Assert.Equal(expected, actual);
+			// foo => foo.set_Item("index", "value")
+			var foo = Expression.Parameter(typeof(IFoo), "foo");
+			var expression =
+				Expression.Lambda<Action<IFoo>>(
+					Expression.Call(
+						foo,
+						typeof(IFoo).GetProperty("Item").SetMethod,
+						Expression.Constant("index"),
+						Expression.Constant("value")),
+					foo);
+
+			Assert.Equal(@"foo => foo[""index""] = ""value""", GetAppendExpressionResult(expression));
 		}
 
-		private string GetFormattedParameterListOf(string methodName)
+		[Fact]
+		public void AppendExpression_formats_ternary_conditional_expression_correctly()
 		{
-			var stringBuilder = new StringBuilder();
-			var method = typeof(IMethods).GetMethod(methodName);
-			stringBuilder.AppendParameterTypeList(method.GetParameters());
-			return stringBuilder.ToString();
+			// 1 == 2 ? 3 : 4
+			var expression = Expression.Condition(
+				Expression.Equal(Expression.Constant(1), Expression.Constant(2)),
+				Expression.Constant(3),
+				Expression.Constant(4));
+
+			Assert.Equal(@"1 == 2 ? 3 : 4", GetAppendExpressionResult(expression));
 		}
 
-		public interface IMethods
+		private string GetAppendExpressionResult(Expression expression)
 		{
-			void Empty();
-			void Int(int arg1);
-			void IntAndString(int arg1, string arg2);
-			void InInt(in int arg1);
-			void RefInt(ref int arg1);
-			void OutInt(out int arg1);
-			void BoolAndParamsString(bool arg1, params string[] arg2);
+			return new StringBuilder().AppendExpression(expression).ToString();
+		}
+
+		public interface IFoo
+		{
+			object this[object index] { get; set; }
 		}
 	}
 }
