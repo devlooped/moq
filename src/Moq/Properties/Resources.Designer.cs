@@ -365,6 +365,15 @@ namespace Moq.Properties {
         }
         
         /// <summary>
+        ///   Looks up a localized string similar to No constructor call could be found..
+        /// </summary>
+        internal static string NoConstructorCallFound {
+            get {
+                return ResourceManager.GetString("NoConstructorCallFound", resourceCulture);
+            }
+        }
+        
+        /// <summary>
         ///   Looks up a localized string similar to No invocations performed..
         /// </summary>
         internal static string NoInvocationsPerformed {
@@ -672,6 +681,15 @@ namespace Moq.Properties {
         internal static string UnsupportedExpression {
             get {
                 return ResourceManager.GetString("UnsupportedExpression", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to The constructor call expression contains an unsupported expression type {0}..
+        /// </summary>
+        internal static string UnsupportedExpressionInConstructorCall {
+            get {
+                return ResourceManager.GetString("UnsupportedExpressionInConstructorCall", resourceCulture);
             }
         }
         

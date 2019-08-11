@@ -9,7 +9,7 @@ using System.Linq;
 using System.Linq.Expressions;
 using System.Reflection;
 using System.Text;
-
+using Moq.Linq;
 using Moq.Properties;
 using Moq.Protected;
 
@@ -420,6 +420,11 @@ namespace Moq
 		public static string ToStringFixed(this Expression expression)
 		{
 			return new StringBuilder().AppendExpression(expression).ToString();
+		}
+
+		public static object[] ExtractConstructorCallArguments<T>(this Expression<Func<T>> constructorExpression)
+		{
+			return ConstructorCallVisitor.ExtractArgumentValues(constructorExpression);
 		}
 	}
 }

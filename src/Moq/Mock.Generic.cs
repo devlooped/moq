@@ -147,6 +147,19 @@ namespace Moq
 			this.CheckParameters();
 		}
 
+		/// <summary>
+		///   Initializes an instance of the mock using the given constructor call including its
+		///   argument values and with a specific <see cref="MockBehavior"/> behavior.
+		/// </summary>
+		/// <param name="constructorExpression">Lambda expression that creates an instance of <typeparamref name="T"/> T.</param>
+		/// <param name="behavior">Behavior of the mock.</param>
+		/// <include file='Mock.Generic.xdoc' path='docs/doc[@for="Mock{T}.ctor(Expression{Func{T}},MockBehavior)"]/*'/>
+		[SuppressMessage("Microsoft.Usage", "CA2214:DoNotCallOverridableMethodsInConstructors")]
+		public Mock(Expression<Func<T>> constructorExpression, MockBehavior behavior = MockBehavior.Strict)
+			: this(behavior, constructorExpression.ExtractConstructorCallArguments())
+		{
+		}
+
 		private static string CreateUniqueDefaultMockName()
 		{
 			var serialNumber = Interlocked.Increment(ref serialNumberCounter);

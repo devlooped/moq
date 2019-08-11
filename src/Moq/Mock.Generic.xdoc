@@ -64,6 +64,11 @@
 			<code>var mock = new Mock&lt;MyProvider&gt;(someArgument, 25);</code>
 		</example>
 	</doc>
+	<doc for="Mock{T}.ctor(Expression{Func{T}},MockBehavior)">
+		<example>
+			<code>var mock = new Mock&lt;MyProvider&gt;(() => new MyProvider(someArgument, 25));</code>
+		</example>
+	</doc>
 	<doc for="Mock{T}.Setup">
 		<example group="setups">
 			<code>
