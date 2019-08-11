@@ -153,7 +153,9 @@ namespace Moq
 		/// </summary>
 		/// <param name="constructorExpression">Lambda expression that creates an instance of <typeparamref name="T"/> T.</param>
 		/// <param name="behavior">Behavior of the mock.</param>
-		/// <include file='Mock.Generic.xdoc' path='docs/doc[@for="Mock{T}.ctor(Expression{Func{T}},MockBehavior)"]/*'/>
+		/// <example>
+		/// <code>var mock = new Mock&lt;MyProvider&gt;(() => new MyProvider(someArgument, 25));</code>
+		/// </example>
 		[SuppressMessage("Microsoft.Usage", "CA2214:DoNotCallOverridableMethodsInConstructors")]
 		public Mock(Expression<Func<T>> constructorExpression, MockBehavior behavior = MockBehavior.Strict)
 			: this(behavior, constructorExpression.ExtractConstructorCallArguments())
