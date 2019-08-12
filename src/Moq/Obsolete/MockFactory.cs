@@ -298,7 +298,7 @@ namespace Moq
 		/// argument values and with a specific <see cref="MockBehavior"/> behavior.
 		/// </summary>
 		/// <typeparam name="T">Type to mock.</typeparam>
-		/// <param name="constructorExpression">Lambda expression that creates an instance of <typeparamref name="T"/> T.</param>
+		/// <param name="newExpression">Lambda expression that creates an instance of <typeparamref name="T"/> T.</param>
 		/// <param name="behavior">Behavior of the mock.</param>
 		/// <returns>A new <see cref="Mock{T}"/>.</returns>
 		/// <example ignore="true">
@@ -311,10 +311,10 @@ namespace Moq
 		/// factory.Verify();
 		/// </code>
 		/// </example>
-		public Mock<T> Create<T>(Expression<Func<T>> constructorExpression, MockBehavior behavior = MockBehavior.Strict)
+		public Mock<T> Create<T>(Expression<Func<T>> newExpression, MockBehavior behavior = MockBehavior.Strict)
 			where T : class
 		{
-			return Create<T>(behavior, constructorExpression.ExtractConstructorCallArguments());
+			return Create<T>(behavior, Expressions.Visitors.ConstructorCallVisitor.ExtractArgumentValues(newExpression));
 		}
 
 		/// <summary>

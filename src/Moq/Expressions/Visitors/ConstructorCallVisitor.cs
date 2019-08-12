@@ -1,25 +1,31 @@
-﻿using Moq.Properties;
+﻿// Copyright (c) 2007, Clarius Consulting, Manas Technology Solutions, InSTEDD.
+// All rights reserved. Licensed under the BSD 3-Clause License; see License.txt.
+
 using System;
-using System.Collections.Generic;
 using System.Linq;
 using System.Linq.Expressions;
 using System.Reflection;
-using System.Text;
-using System.Threading.Tasks;
 
-namespace Moq.Linq
+using Moq.Properties;
+
+namespace Moq.Expressions.Visitors
 {
 	internal class ConstructorCallVisitor : ExpressionVisitor
 	{
 		/// <summary>
 		/// Extracts the arguments from a lambda expression that calls a constructor.
 		/// </summary>
-		/// <param name="constructorExpression">The constructor expression.</param>
+		/// <param name="newExpression">The constructor expression.</param>
 		/// <returns>Extracted argument values.</returns>
-		public static object[] ExtractArgumentValues(LambdaExpression constructorExpression)
+		public static object[] ExtractArgumentValues(LambdaExpression newExpression)
 		{
+			if (newExpression is null)
+			{
+				throw new ArgumentNullException(nameof(newExpression));
+			}
+
 			var visitor = new ConstructorCallVisitor();
-			visitor.Visit(constructorExpression);
+			visitor.Visit(newExpression);
 
 			if (visitor._constructor == null)
 			{

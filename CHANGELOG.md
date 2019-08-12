@@ -21,7 +21,7 @@ The format is loosely based on [Keep a Changelog](http://keepachangelog.com/en/1
 
 * Added support for setup and verification of the event handlers through `Setup[Add|Remove]` and `Verify[Add|Remove|All]` (@lepijohnny, #825) 
 
-* Added support for lambda expressions while creating a mock through `new Mock<SomeType>(() => new SomeType("a", "b")` and `repository.Create<SomeType>("a", "b")` (@frblondin, #884)
+* Added support for lambda expressions while creating a mock through `new Mock<SomeType>(() => new SomeType("a", "b"))` and `repository.Create<SomeType>(() => new SomeType("a", "b"))`. This makes the process of mocking a class without a parameterless constructor simpler (compiler syntax checker...). (@frblondin, #884)
 
 #### Fixed
 
