@@ -31,27 +31,27 @@ namespace Moq.Tests
 		}
 
 		[Fact]
-		public void Moq_does_not_require_event_handlers_to_have_the_exact_same_type()
+		public void Moq_requires_event_handlers_to_have_the_exact_same_type()
 		{
 			var mouseMock = new Mock<Mouse>();
 			var mouse = mouseMock.Object;
 			var result = 2;
 
 			mouse.LeftButtonClicked += new Action<Button>(_ => result += 3);
-			mouse.LeftButtonClicked += new Action<LeftButton>(_ => result *= 4);
+			mouse.LeftButtonClicked += new Action<Button>(_ => result *= 4);
 			mouseMock.Raise(m => m.LeftButtonClicked += null, new LeftButton());
 
 			Assert.Equal(20, result);
 		}
 
 		[Fact]
-		public void Moq_does_not_throw_if_event_handlers_do_not_have_the_exact_same_type()
+		public void Moq_throws_if_event_handlers_do_not_have_the_exact_same_type()
 		{
 			var mouseMock = new Mock<Mouse>();
 			var mouse = mouseMock.Object;
 
 			mouse.LeftButtonClicked += new Action<Button>(delegate { });
-			mouse.LeftButtonClicked += new Action<LeftButton>(delegate { });
+			Assert.Throws<ArgumentException>(() => mouse.LeftButtonClicked += new Action<LeftButton>(delegate { }));
 		}
 
 		public class Mouse
