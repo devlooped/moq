@@ -15,6 +15,8 @@ The format is loosely based on [Keep a Changelog](http://keepachangelog.com/en/1
 
 * Consistent `Callback` delegate validation regardless of whether or not `Callback` is preceded by a `Returns`: Validation for post-`Returns` callback delegates used to be very relaxed, but is now equally strict as in the pre-`Returns` case.) (@stakx, #876)
 
+* Subscription to mocked events used to be handled less strictly than subscription to regular CLI events. As with the latter, subscribing to mocked events now also requires all handlers to have the same delegate type. (@stakx, #891)
+
 #### Added
 
 * Added support for setup and verification of the event handlers through `Setup[Add|Remove]` and `Verify[Add|Remove|All]` (@lepijohnny, #825) 
