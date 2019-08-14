@@ -1240,6 +1240,63 @@ namespace Moq.Tests
 			Assert.False(after, "After reset");
 		}
 
+		[Fact]
+		public void ResetSetups_clears_event_setup_flag()
+		{
+			var mock = new Mock<IFoo>();
+			mock.SetupAdd(m => m.EventHandler += It.IsAny<EventHandler>());
+
+			var before = mock.Setups.HasEventSetup;
+			mock.ResetSetups();
+			var after = mock.Setups.HasEventSetup;
+
+			Assert.True(before, "Before reset");
+			Assert.False(after, "After reset");
+		}
+
+		[Fact]
+		public void ResetEventHandlers_clears_event_setup_flag()
+		{
+			var mock = new Mock<IFoo>();
+			Action testDelegate = () => { };
+
+			mock.EventHandlers.Add("TestResetEventHandlersEvent", testDelegate);
+
+			var before = mock.EventHandlers.ToArray("TestResetEventHandlersEvent");
+			mock.ResetEventHandlers();
+			var after = mock.EventHandlers.ToArray("TestResetEventHandlersEvent");
+
+			Assert.True(before.Length == 1, "Before reset");
+			Assert.True(after.Length == 0, "After reset");
+		}
+
+		[Fact]
+		public void ResetConfiguredDefaultValues_clears_configured_default_return_values()
+		{
+			var mock = new Mock<object>();
+			mock.SetReturnsDefault<int>(123);
+
+			mock.ResetConfiguredDefaultValues();
+
+			Assert.Empty(mock.ConfiguredDefaultValues);
+		}
+
+		[Fact]
+		public void ResetInvocations_clears_event_setup_flag()
+		{
+			var mock = new Mock<IFoo>();
+			mock.Object.Echo(0);
+
+			int invocationsBeforeReset = mock.Invocations.Count;
+			mock.ResetInvocations();
+			int invocationsAfterReset = mock.Invocations.Count;
+
+			// To check that only 1 invocation was performed, the one on the test
+			Assert.True(invocationsBeforeReset == 1, "Before reset");
+			// To check that the invocations have been correctly cleared
+			Assert.True(invocationsAfterReset == 0, "After reset");
+		}
+
 #if FEATURE_SERIALIZATION
 		[Serializable]
 		public class BadSerializable : ISerializable
