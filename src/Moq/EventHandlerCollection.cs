@@ -3,33 +3,23 @@
 
 using System;
 using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 
 namespace Moq
 {
 	internal sealed class EventHandlerCollection
 	{
-		private Dictionary<string, List<Delegate>> eventHandlers;
+		private readonly Dictionary<string, Delegate> eventHandlers;
 
 		public EventHandlerCollection()
 		{
-			this.eventHandlers = new Dictionary<string, List<Delegate>>();
+			this.eventHandlers = new Dictionary<string, Delegate>();
 		}
 
 		public void Add(string eventName, Delegate eventHandler)
 		{
 			lock (this.eventHandlers)
 			{
-				List<Delegate> handlers;
-				if (!this.eventHandlers.TryGetValue(eventName, out handlers))
-				{
-					handlers = new List<Delegate>();
-					this.eventHandlers.Add(eventName, handlers);
-				}
-
-				handlers.Add(eventHandler);
+				this.eventHandlers[eventName] = Delegate.Combine(this.TryGet(eventName), eventHandler);
 			}
 		}
 
@@ -45,26 +35,21 @@ namespace Moq
 		{
 			lock (this.eventHandlers)
 			{
-				List<Delegate> handlers;
-				if (this.eventHandlers.TryGetValue(eventName, out handlers))
-				{
-					handlers.Remove(eventHandler);
-				}
+				this.eventHandlers[eventName] = Delegate.Remove(this.TryGet(eventName), eventHandler);
 			}
 		}
 
-		public Delegate[] ToArray(string eventName)
+		public bool TryGet(string eventName, out Delegate handlers)
 		{
 			lock (this.eventHandlers)
 			{
-				List<Delegate> handlers;
-				if (!this.eventHandlers.TryGetValue(eventName, out handlers))
-				{
-					return new Delegate[0];
-				}
-
-				return handlers.ToArray();
+				return this.eventHandlers.TryGetValue(eventName, out handlers) && handlers != null;
 			}
+		}
+
+		private Delegate TryGet(string eventName)
+		{
+			return this.eventHandlers.TryGetValue(eventName, out var handlers) ? handlers : null;
 		}
 	}
 }

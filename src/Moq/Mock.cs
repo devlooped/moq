@@ -635,11 +635,10 @@ namespace Moq
 							expression));
 				}
 
-				foreach (var eventHandler in mock.EventHandlers.ToArray(eventName))
+				if (mock.EventHandlers.TryGet(eventName, out var handlers))
 				{
-					eventHandler.InvokePreserveStack(arguments);
+					handlers.InvokePreserveStack(arguments);
 				}
-
 			}
 			else if (mock.Setups.GetInnerMockSetups().TryFind(part, out var innerMockSetup) && innerMockSetup.ReturnsInnerMock(out var innerMock))
 			{
