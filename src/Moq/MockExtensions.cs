@@ -22,5 +22,42 @@ namespace Moq
 			mock.EventHandlers.Clear();
 			mock.Invocations.Clear();
 		}
+
+
+		/// <summary>
+		/// Reset the mock's configured default values
+		/// </summary>
+		/// <param name="mock">The mock whose default values should be reset.</param>
+		public static void ResetConfiguredDefaultValues(this Mock mock)
+		{
+			mock.ConfiguredDefaultValues.Clear();
+		}
+
+		/// <summary>
+		/// Reset the mock's configured setups
+		/// </summary>
+		/// <param name="mock">The mock whose setups should be reset.</param>
+		public static void ResetSetups(this Mock mock)
+		{
+			mock.Setups.Clear();
+		}
+
+		/// <summary>
+		/// Reset the mock's configured event handlers
+		/// </summary>
+		/// <param name="mock">The mock whose event handlers should be reset.</param>
+		public static void ResetEventHandlers(this Mock mock)
+		{
+			mock.EventHandlers.Clear();
+		}
+
+		/// <summary>
+		/// Reset the mock's recorded invocations
+		/// </summary>
+		/// <param name="mock">The mock whose recorded invocations should be reset.</param>
+		public static void ResetInvocations(this Mock mock)
+		{
+			mock.Invocations.Clear();
+		}
 	}
 }
