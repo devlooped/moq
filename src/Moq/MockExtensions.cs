@@ -23,7 +23,6 @@ namespace Moq
 			mock.Invocations.Clear();
 		}
 
-
 		/// <summary>
 		/// Reset the mock's configured default values
 		/// </summary>
