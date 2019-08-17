@@ -15,7 +15,7 @@
 	</PropertyGroup>
 
 	<PropertyGroup Condition=" '$(TargetFramework)' == 'net472' ">
-		<DefineConstants>$(DefineConstants);FEATURE_CALLERINFO;FEATURE_CAS;FEATURE_COM;FEATURE_EF;FEATURE_SERIALIZATION;FEATURE_SYSTEM_WEB;FEATURE_SYSTEM_WINDOWS_FORMS</DefineConstants>
+		<DefineConstants>$(DefineConstants);FEATURE_CAS;FEATURE_DYNAMICPROXY_SERIALIZABLE_PROXIES;FEATURE_COM;FEATURE_EF;FEATURE_SYSTEM_WEB;FEATURE_SYSTEM_WINDOWS_FORMS</DefineConstants>
 	</PropertyGroup>
 	<PropertyGroup Condition=" '$(TargetFramework)' == 'netcoreapp2.2' ">
 		<DefineConstants>$(DefineConstants)</DefineConstants>

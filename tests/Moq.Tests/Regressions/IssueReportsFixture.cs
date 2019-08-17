@@ -10,6 +10,7 @@ using System.IO;
 using System.Linq;
 using System.Linq.Expressions;
 using System.Reflection;
+using System.Runtime.Serialization;
 using System.Text.RegularExpressions;
 using System.Threading;
 using System.Threading.Tasks;
@@ -21,10 +22,6 @@ using Moq.Properties;
 using Moq.Protected;
 
 using Xunit;
-
-#if FEATURE_SERIALIZATION
-using System.Runtime.Serialization;
-#endif
 
 #region #181
 
@@ -447,7 +444,7 @@ namespace Moq.Tests.Regressions
 
 		#region 163
 
-#if FEATURE_SERIALIZATION
+#if FEATURE_DYNAMICPROXY_SERIALIZABLE_PROXIES
 		public class Issue163  // see also issue 340 below
 		{
 			[Fact]
@@ -513,7 +510,6 @@ namespace Moq.Tests.Regressions
 					var proxy = proxyGenerator.CreateClassProxy(classToProxy);
 					Assert.NotNull(proxy);
 				}
-
 
 				[Theory]
 				[InlineData(typeof(NoDeserializationCtor))]
@@ -1503,7 +1499,6 @@ namespace Moq.Tests.Regressions
 
 		#region 340
 
-#if FEATURE_SERIALIZATION
 		/// <summary>
 		/// These tests check whether the presence of a deserialization ctor and/or a GetObjectData
 		/// method alone can fool Moq into assuming that a type is ISerializable, or implements
@@ -1542,7 +1537,6 @@ namespace Moq.Tests.Regressions
 				protected Foo(SerializationInfo info, StreamingContext context) { }
 			}
 		}
-#endif
 
 #endregion
 

@@ -29,9 +29,7 @@ namespace Moq
 		private RaiseEventResponse raiseEventResponse;
 		private Response returnOrThrowResponse;
 
-#if FEATURE_CALLERINFO
 		private string declarationSite;
-#endif
 
 		public MethodCall(Mock mock, Condition condition, InvocationShape expectation)
 			: base(expectation)
@@ -40,12 +38,10 @@ namespace Moq
 			this.flags = expectation.Method.ReturnType != typeof(void) ? Flags.MethodIsNonVoid : 0;
 			this.mock = mock;
 
-#if FEATURE_CALLERINFO
 			if ((mock.Switches & Switches.CollectDiagnosticFileInfoForSetups) != 0)
 			{
 				this.declarationSite = GetUserCodeCallSite();
 			}
-#endif
 		}
 
 		public string FailMessage
@@ -59,7 +55,6 @@ namespace Moq
 
 		public override bool IsVerifiable => (this.flags & Flags.Verifiable) != 0;
 
-#if FEATURE_CALLERINFO
 		private static string GetUserCodeCallSite()
 		{
 			try
@@ -96,7 +91,6 @@ namespace Moq
 
 			return null;
 		}
-#endif
 
 		public override void Execute(Invocation invocation)
 		{
@@ -360,12 +354,10 @@ namespace Moq
 
 			message.Append(base.ToString());
 
-#if FEATURE_CALLERINFO
 			if (this.declarationSite != null)
 			{
 				message.Append(" (").Append(this.declarationSite).Append(')');
 			}
-#endif
 
 			return message.ToString().Trim();
 		}

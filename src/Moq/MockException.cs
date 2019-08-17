@@ -8,9 +8,7 @@ using System.Diagnostics.CodeAnalysis;
 using System.Globalization;
 using System.Linq;
 using System.Linq.Expressions;
-#if FEATURE_SERIALIZATION
 using System.Runtime.Serialization;
-#endif
 using System.Security;
 using System.Text;
 
@@ -37,9 +35,7 @@ namespace Moq
 	/// </para>
 	/// </remarks>
 	[SuppressMessage("Microsoft.Design", "CA1032:ImplementStandardExceptionConstructors", Justification = "It's only initialized internally.")]
-#if FEATURE_SERIALIZATION
 	[Serializable]
-#endif
 	public class MockException : Exception
 	{
 		/// <summary>
@@ -256,7 +252,6 @@ namespace Moq
 			}
 		}
 
-#if FEATURE_SERIALIZATION
 		/// <summary>
 		/// Supports the serialization infrastructure.
 		/// </summary>
@@ -282,6 +277,5 @@ namespace Moq
 			base.GetObjectData(info, context);
 			info.AddValue(nameof(this.reasons), this.reasons);
 		}
-#endif
 	}
 }

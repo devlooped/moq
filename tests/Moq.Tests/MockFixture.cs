@@ -5,12 +5,9 @@ using System;
 using System.Collections.Generic;
 using System.Linq.Expressions;
 using System.Reflection;
+using System.Runtime.Serialization;
 
 using Xunit;
-
-#if FEATURE_SERIALIZATION
-using System.Runtime.Serialization;
-#endif
 
 namespace Moq.Tests
 {
@@ -1240,7 +1237,7 @@ namespace Moq.Tests
 			Assert.False(after, "After reset");
 		}
 
-#if FEATURE_SERIALIZATION
+#if FEATURE_DYNAMICPROXY_SERIALIZABLE_PROXIES
 		[Serializable]
 		public class BadSerializable : ISerializable
 		{
