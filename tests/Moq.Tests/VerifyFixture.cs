@@ -1002,7 +1002,6 @@ namespace Moq.Tests
 			});
 		}
 
-#if FEATURE_CALLERINFO
 		[Fact]
 		public void Enabling_diagnostic_file_info_leads_to_that_information_in_verification_error_messages()
 		{
@@ -1016,7 +1015,6 @@ namespace Moq.Tests
 			Assert.Contains("in ", ex.Message);
 			Assert.Contains("VerifyFixture.cs: line ", ex.Message);
 		}
-#endif
 
 		[Fact]
 		public void Disabling_diagnostic_file_info_leads_to_that_information_missing_in_verification_error_messages()
