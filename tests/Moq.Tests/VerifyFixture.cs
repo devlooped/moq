@@ -844,10 +844,10 @@ namespace Moq.Tests
 			var mex = Assert.Throws<MockException>(() => mock.Verify(f => f.Execute("pong")));
 
 			Assert.True(mex.Message.ContainsConsecutiveLines(
-				"      IFoo.Execute(\"ping\")",
-				"      IFoo.Echo(42)",
-				"      IFoo.Submit()",
-				"      IFoo.Save([1, 2, \"hello\"])"));
+				"      VerifyFixture.IFoo.Execute(\"ping\")",
+				"      VerifyFixture.IFoo.Echo(42)",
+				"      VerifyFixture.IFoo.Submit()",
+				"      VerifyFixture.IFoo.Save([1, 2, \"hello\"])"));
 		}
 
 		[Fact]
@@ -933,7 +933,7 @@ namespace Moq.Tests
 			mock.Object.Method(strings);
 			var mex = Assert.Throws<MockException>(() => mock.Verify(_ => _.Method(null)));
 			Assert.True(mex.Message.ContainsConsecutiveLines(
-				@"      IArrays.Method([""1"", null, ""3""])"));
+				@"      VerifyFixture.IArrays.Method([""1"", null, ""3""])"));
 		}
 
 		[Fact]
@@ -944,7 +944,7 @@ namespace Moq.Tests
 			mock.Object.Method(strings);
 			var mex = Assert.Throws<MockException>(() => mock.Verify(_ => _.Method(null)));
 			Assert.True(mex.Message.ContainsConsecutiveLines(
-				@"      IArrays.Method([""1"", null, ""3"", ""4"", ""5"", ""6"", ""7"", ""8"", ""9"", ""10""])"));
+				@"      VerifyFixture.IArrays.Method([""1"", null, ""3"", ""4"", ""5"", ""6"", ""7"", ""8"", ""9"", ""10""])"));
 		}
 
 		[Fact]
@@ -955,7 +955,7 @@ namespace Moq.Tests
 			mock.Object.Method(strings);
 			var mex = Assert.Throws<MockException>(() => mock.Verify(_ => _.Method(null)));
 			Assert.True(mex.Message.ContainsConsecutiveLines(
-				@"      IArrays.Method([""1"", null, ""3"", ""4"", ""5"", ""6"", ""7"", ""8"", ""9"", ""10"", ...])"));
+				@"      VerifyFixture.IArrays.Method([""1"", null, ""3"", ""4"", ""5"", ""6"", ""7"", ""8"", ""9"", ""10"", ...])"));
 		}
 
 		[Fact]

@@ -135,7 +135,7 @@ namespace Moq
 			var method = this.Method;
 
 			var builder = new StringBuilder();
-			builder.Append(method.DeclaringType.Name);
+			builder.AppendNameOf(method.DeclaringType);
 			builder.Append('.');
 
 			if (method.IsPropertyGetter())

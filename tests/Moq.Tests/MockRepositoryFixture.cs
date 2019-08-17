@@ -106,13 +106,13 @@ namespace Moq.Tests
 				$"   {fooMock}:",
 				$"   This mock failed verification due to the following unverified invocations:",
 				$"   ",
-				$"      IFoo.Do()"));
+				$"      MockRepositoryFixture.IFoo.Do()"));
 
 			Assert.True(ex.Message.ContainsConsecutiveLines(
 				$"   {barMock}:",
 				$"   This mock failed verification due to the following unverified invocations:",
 				$"   ",
-				$"      IBar.Redo()"));
+				$"      MockRepositoryFixture.IBar.Redo()"));
 		}
 
 		[Fact]
