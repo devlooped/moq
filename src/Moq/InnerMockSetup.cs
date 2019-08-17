@@ -33,5 +33,13 @@ namespace Moq
 		{
 			return this.TryVerifyInnerMock(innerMock => innerMock.TryVerifyAll());
 		}
+
+		public override void Uninvoke()
+		{
+			if (this.ReturnsInnerMock(out var innerMock))
+			{
+				innerMock.Setups.UninvokeAll();
+			}
+		}
 	}
 }
