@@ -69,7 +69,7 @@ namespace Moq
 				// `CreateInterfaceProxyWithoutTarget` is much faster (about twice as fast):
 				return generator.CreateInterfaceProxyWithoutTarget(mockType, additionalInterfaces, this.generationOptions, new Interceptor(interceptor));
 			}
-			else if (mockType.IsDelegate())
+			else if (mockType.IsDelegateType())
 			{
 				var options = new ProxyGenerationOptions();
 				options.AddDelegateTypeMixin(mockType);

@@ -252,7 +252,7 @@ namespace Moq
 					case ExpressionType.Invoke:  // delegate invocation
 					{
 						var invocationExpression = (InvocationExpression)e;
-						Debug.Assert(invocationExpression.Expression.Type.IsDelegate());
+						Debug.Assert(invocationExpression.Expression.Type.IsDelegateType());
 						r = invocationExpression.Expression;
 						var parameter = Expression.Parameter(r.Type, r is ParameterExpression ope ? ope.Name : ParameterName);
 						var arguments = invocationExpression.Arguments;

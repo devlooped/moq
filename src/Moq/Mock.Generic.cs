@@ -164,7 +164,7 @@ namespace Moq
 				{
 					throw new ArgumentException(Properties.Resources.ConstructorArgsForInterface);
 				}
-				if (typeof(T).IsDelegate())
+				if (typeof(T).IsDelegateType())
 				{
 					throw new ArgumentException(Properties.Resources.ConstructorArgsForDelegate);
 				}
@@ -184,7 +184,7 @@ namespace Moq
 			get => this.callBase;
 			set
 			{
-				if (value && this.MockedType.IsDelegate())
+				if (value && this.MockedType.IsDelegateType())
 				{
 					throw new NotSupportedException(string.Format(CultureInfo.CurrentCulture, Resources.CallBaseCannotBeUsedWithDelegateMocks));
 				}

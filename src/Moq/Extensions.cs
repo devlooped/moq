@@ -99,11 +99,12 @@ namespace Moq
 		}
 
 		/// <summary>
-		/// Tests if a type is a delegate type (subclasses <see cref="Delegate" />).
+		///   Gets whether the given <paramref name="type"/> is a delegate type.
 		/// </summary>
-		public static bool IsDelegate(this Type t)
+		public static bool IsDelegateType(this Type type)
 		{
-			return t.BaseType == typeof(MulticastDelegate);
+			Debug.Assert(type != null);
+			return type.BaseType == typeof(MulticastDelegate);
 		}
 
 		public static void ThrowIfNotMockeable(this MemberExpression memberAccess)
@@ -119,7 +120,7 @@ namespace Moq
 		{
 			// A value type does not match any of these three 
 			// condition and therefore returns false.
-			return typeToMock.IsInterface || typeToMock.IsAbstract || typeToMock.IsDelegate() || (typeToMock.IsClass && !typeToMock.IsSealed);
+			return typeToMock.IsInterface || typeToMock.IsAbstract || typeToMock.IsDelegateType() || (typeToMock.IsClass && !typeToMock.IsSealed);
 		}
 
 		public static bool CanOverride(this MethodBase method)
