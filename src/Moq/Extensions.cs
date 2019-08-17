@@ -103,7 +103,7 @@ namespace Moq
 		/// </summary>
 		public static bool IsDelegate(this Type t)
 		{
-			return t.IsSubclassOf(typeof(Delegate));
+			return t.BaseType == typeof(MulticastDelegate);
 		}
 
 		public static void ThrowIfNotMockeable(this MemberExpression memberAccess)
