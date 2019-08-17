@@ -98,6 +98,11 @@ namespace Moq
 			return this.invoked ? null : MockException.UnmatchedSetup(this);
 		}
 
+		public override void Uninvoke()
+		{
+			this.invoked = false;
+		}
+
 		private readonly struct Response
 		{
 			private readonly ResponseKind kind;

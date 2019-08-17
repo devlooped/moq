@@ -130,10 +130,23 @@ namespace Moq.Tests
 		}
 
 		[Fact]
-		public void Invocations_Clear_also_resets_setup_verification_state()
+		public void Invocations_Clear_also_resets_setup_verification_state_of_regular_setups()
 		{
 			var mock = new Mock<IComparable>();
 			mock.Setup(m => m.CompareTo(default));
+			_ = mock.Object.CompareTo(default);
+			mock.VerifyAll();  // ensure setup has been matched
+
+			mock.Invocations.Clear();
+			var ex = Assert.Throws<MockException>(() => mock.VerifyAll());
+			Assert.Equal(MockExceptionReasons.UnmatchedSetup, ex.Reasons);
+		}
+
+		[Fact]
+		public void Invocations_Clear_also_resets_setup_verification_state_of_sequence_setups()
+		{
+			var mock = new Mock<IComparable>();
+			mock.SetupSequence(m => m.CompareTo(default));
 			_ = mock.Object.CompareTo(default);
 			mock.VerifyAll();  // ensure setup has been matched
 
