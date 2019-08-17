@@ -1237,6 +1237,7 @@ namespace Moq.Tests
 			Assert.False(after, "After reset");
 		}
 
+#if FEATURE_DYNAMICPROXY_SERIALIZABLE_PROXIES
 		[Serializable]
 		public class BadSerializable : ISerializable
 		{
@@ -1268,5 +1269,6 @@ namespace Moq.Tests
 
 			Assert.ThrowsAny<Exception>(() => mock.Object.BadSerializable);
 		}
+#endif
 	}
 }

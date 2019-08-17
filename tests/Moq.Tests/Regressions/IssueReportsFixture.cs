@@ -444,6 +444,7 @@ namespace Moq.Tests.Regressions
 
 		#region 163
 
+#if FEATURE_DYNAMICPROXY_SERIALIZABLE_PROXIES
 		public class Issue163  // see also issue 340 below
 		{
 			[Fact]
@@ -509,7 +510,6 @@ namespace Moq.Tests.Regressions
 					var proxy = proxyGenerator.CreateClassProxy(classToProxy);
 					Assert.NotNull(proxy);
 				}
-
 
 				[Theory]
 				[InlineData(typeof(NoDeserializationCtor))]
@@ -591,6 +591,7 @@ namespace Moq.Tests.Regressions
 				}
 			}
 		}
+#endif
 
 		#endregion
 

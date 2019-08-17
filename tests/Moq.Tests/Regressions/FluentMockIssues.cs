@@ -37,6 +37,7 @@ namespace Moq.Tests.Regressions
 			Assert.NotSame(foo.Object.Two, foo.Object.Two.Three.LoopBack);
 		}
 
+#if FEATURE_DYNAMICPROXY_SERIALIZABLE_PROXIES
 		[Fact]
 		public void SerializableTypesNotImplementingISerializableProperlyNotMockable()
 		{
@@ -70,5 +71,6 @@ namespace Moq.Tests.Regressions
 
 			public virtual string SomeString { get; set; }
 		}
+#endif
 	}
 }
