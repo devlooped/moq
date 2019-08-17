@@ -267,7 +267,6 @@ namespace Moq
 				}
 				return nodeType.ToString();
 			}
-
 		}
 
 		private static StringBuilder AppendExpression(this StringBuilder builder, TypeBinaryExpression expression)

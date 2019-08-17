@@ -352,7 +352,7 @@ namespace Moq
 			Guard.NotNull(expression, nameof(expression));
 
 			return expression.Body is IndexExpression
-				|| expression.Body is MethodCallExpression methodCallExpression && methodCallExpression.Method.IsSpecialName;
+				|| (expression.Body is MethodCallExpression methodCallExpression && methodCallExpression.Method.IsSpecialName);
 		}
 
 		public static Expression StripQuotes(this Expression expression)

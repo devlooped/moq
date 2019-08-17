@@ -32,6 +32,7 @@ namespace Moq
 		private ProxyGenerationOptions generationOptions;
 		private ProxyGenerator generator;
 
+		#if FEATURE_CAS || FEATURE_COM
 		static CastleProxyFactory()
 		{
 			#if FEATURE_CAS
@@ -46,6 +47,7 @@ namespace Moq
 			AttributesToAvoidReplicating.Add<TypeIdentifierAttribute>();
 			#endif
 		}
+		#endif
 
 		public CastleProxyFactory()
 		{
