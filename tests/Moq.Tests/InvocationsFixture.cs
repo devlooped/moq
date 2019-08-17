@@ -156,6 +156,19 @@ namespace Moq.Tests
 		}
 
 		[Fact]
+		public void Invocations_Clear_also_resets_setup_verification_state_of_inner_mock_setups()
+		{
+			var mock = new Mock<IX>();
+			mock.Setup(m => m.Nested.Do());
+			mock.Object.Nested.Do();
+			mock.VerifyAll();  // ensure setup has been matched
+
+			mock.Invocations.Clear();
+			var ex = Assert.Throws<MockException>(() => mock.VerifyAll());
+			Assert.Equal(MockExceptionReasons.UnmatchedSetup, ex.Reasons);
+		}
+
+		[Fact]
 		[Obsolete()]
 		public void Invocations_Clear_resets_count_kept_by_setup_AtMost()
 		{
@@ -167,6 +180,12 @@ namespace Moq.Tests
 			_ = mock.Object.CompareTo(default);  // this second call should now count as the first
 			var ex = Assert.Throws<MockException>(() => mock.Object.CompareTo(default));
 			Assert.Equal(MockExceptionReasons.MoreThanOneCall, ex.Reasons);
+		}
+
+		public interface IX
+		{
+			IX Nested { get; }
+			void Do();
 		}
 	}
 }
