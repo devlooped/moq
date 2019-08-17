@@ -16,7 +16,7 @@ namespace Moq.Protected
 	internal sealed class ProtectedAsMock<T, TAnalog> : IProtectedAsMock<T, TAnalog>
 		where T : class
 		where TAnalog : class
-    {
+	{
 		private Mock<T> mock;
 
 		private static DuckReplacer DuckReplacerInstance = new DuckReplacer(typeof(TAnalog), typeof(T));
@@ -363,5 +363,5 @@ namespace Moq.Protected
 				// TODO: parameter lists should be compared, too, to properly support indexers.
 			}
 		}
-    }
+	}
 }

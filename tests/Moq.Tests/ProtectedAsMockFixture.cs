@@ -10,8 +10,8 @@ using Xunit;
 
 namespace Moq.Tests
 {
-    public class ProtectedAsMockFixture
-    {
+	public class ProtectedAsMockFixture
+	{
 		private Mock<Foo> mock;
 		private IProtectedAsMock<Foo, Fooish> protectedMock;
 

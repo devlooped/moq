@@ -23,7 +23,7 @@ namespace Moq.Protected
 	public interface IProtectedAsMock<T, TAnalog> : IFluentInterface
 		where T : class
 		where TAnalog : class
-    {
+	{
 		/// <summary>
 		/// Specifies a setup on the mocked type for a call to a <see langword="void"/> method.
 		/// </summary>

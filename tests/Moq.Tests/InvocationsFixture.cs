@@ -7,20 +7,20 @@ using Xunit;
 
 namespace Moq.Tests
 {
-    public class InvocationsFixture
-    {
-	    [Fact]
-	    public void MockInvocationsAreRecorded()
-	    {
-		    var mock = new Mock<IComparable>();
+	public class InvocationsFixture
+	{
+		[Fact]
+		public void MockInvocationsAreRecorded()
+		{
+			var mock = new Mock<IComparable>();
 
-		    mock.Object.CompareTo(new object());
+			mock.Object.CompareTo(new object());
 
-		    Assert.Equal(1, mock.Invocations.Count);
-	    }
+			Assert.Equal(1, mock.Invocations.Count);
+		}
 
 		[Fact]
-	    public void MockInvocationsIncludeInvokedMethod()
+		public void MockInvocationsIncludeInvokedMethod()
 		{
 			var mock = new Mock<IComparable>();
 
@@ -33,81 +33,81 @@ namespace Moq.Tests
 			Assert.Equal(expectedMethod, invocation.Method);
 		}
 
-	    [Fact]
-	    public void MockInvocationsIncludeArguments()
-	    {
+		[Fact]
+		public void MockInvocationsIncludeArguments()
+		{
 			var mock = new Mock<IComparable>();
 
-		    var obj = new object();
+			var obj = new object();
 
 			mock.Object.CompareTo(obj);
 
-		    var invocation = mock.Invocations[0];
+			var invocation = mock.Invocations[0];
 
-		    var expectedArguments = new[] {obj};
+			var expectedArguments = new[] {obj};
 
 			Assert.Equal(expectedArguments, invocation.Arguments);
-	    }
+		}
 
-	    [Fact]
-	    public void MockInvocationsCanBeEnumerated()
-	    {
+		[Fact]
+		public void MockInvocationsCanBeEnumerated()
+		{
 			var mock = new Mock<IComparable>();
 
-		    mock.Object.CompareTo(-1);
-		    mock.Object.CompareTo(0);
-		    mock.Object.CompareTo(1);
+			mock.Object.CompareTo(-1);
+			mock.Object.CompareTo(0);
+			mock.Object.CompareTo(1);
 
-		    var count = 0;
+			var count = 0;
 
-		    using (var enumerator = mock.Invocations.GetEnumerator())
-		    {
-			    while (enumerator.MoveNext())
-			    {
-				    Assert.NotNull(enumerator.Current);
+			using (var enumerator = mock.Invocations.GetEnumerator())
+			{
+				while (enumerator.MoveNext())
+				{
+					Assert.NotNull(enumerator.Current);
 
-				    count++;
-			    }
-		    }
+					count++;
+				}
+			}
 
 			Assert.Equal(3, count);
-	    }
+		}
 
-	    [Fact]
-	    public void MockInvocationsCanBeCleared()
-	    {
-		    var mock = new Mock<IComparable>();
+		[Fact]
+		public void MockInvocationsCanBeCleared()
+		{
+			var mock = new Mock<IComparable>();
 
-		    mock.Object.CompareTo(new object());
+			mock.Object.CompareTo(new object());
 
 			mock.Invocations.Clear();
 
-		    Assert.Equal(0, mock.Invocations.Count);
-	    }
+			Assert.Equal(0, mock.Invocations.Count);
+		}
 
 		[Fact]
-	    public void MockInvocationsCanBeRetrievedByIndex()
-	    {
+		public void MockInvocationsCanBeRetrievedByIndex()
+		{
 			var mock = new Mock<IComparable>();
 
-		    mock.Object.CompareTo(-1);
-		    mock.Object.CompareTo(0);
-		    mock.Object.CompareTo(1);
+			mock.Object.CompareTo(-1);
+			mock.Object.CompareTo(0);
+			mock.Object.CompareTo(1);
 
-		    var invocation = mock.Invocations[1];
+			var invocation = mock.Invocations[1];
 
-		    var arg = invocation.Arguments[0];
+			var arg = invocation.Arguments[0];
 
 			Assert.Equal(0, arg);
-	    }
+		}
 
 		[Fact]
-	    public void MockInvocationsIndexerThrowsIndexOutOfRangeWhenCollectionIsEmpty()
-	    {
+		public void MockInvocationsIndexerThrowsIndexOutOfRangeWhenCollectionIsEmpty()
+		{
 			var mock = new Mock<IComparable>();
 
 			Assert.Throws<IndexOutOfRangeException>(() => mock.Invocations[0]);
-	    }
+		}
 
 		[Fact]
 		public void Invocations_record_return_value()

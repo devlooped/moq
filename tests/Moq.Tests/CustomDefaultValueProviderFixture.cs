@@ -7,8 +7,8 @@ using Xunit;
 
 namespace Moq.Tests
 {
-    public class CustomDefaultValueProviderFixture
-    {
+	public class CustomDefaultValueProviderFixture
+	{
 		[Fact]
 		public void Custom_DefaultValueProvider_implementations_have_Kind_Custom()
 		{

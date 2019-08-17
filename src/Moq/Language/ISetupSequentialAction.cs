@@ -7,9 +7,9 @@ using System.ComponentModel;
 namespace Moq.Language
 {
 	/// <summary>
-	 /// Defines the <c>Pass</c> and <c>Throws</c> verbs for sequence setups 
-	 /// on <c>void</c> methods.
-	 /// </summary>
+	/// Defines the <c>Pass</c> and <c>Throws</c> verbs for sequence setups
+	/// on <c>void</c> methods.
+	/// </summary>
 	[EditorBrowsable(EditorBrowsableState.Never)]
 	public interface ISetupSequentialAction
 	{

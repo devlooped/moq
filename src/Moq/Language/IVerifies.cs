@@ -10,7 +10,7 @@ namespace Moq.Language
 	/// </summary>
 	[EditorBrowsable(EditorBrowsableState.Never)]
 	public interface IVerifies : IFluentInterface
-	{ 
+	{
 		/// <summary>
 		/// Marks the expectation as verifiable, meaning that a call 
 		/// to <see cref="Mock.Verify()"/> will check if this particular 

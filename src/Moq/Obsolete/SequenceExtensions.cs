@@ -11,7 +11,7 @@ using Moq.Language;
 namespace Moq
 {
 	partial class SequenceExtensions
-    {
+	{
 		/// <summary>
 		/// Return a sequence of values, once per call.
 		/// </summary>

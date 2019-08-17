@@ -3,8 +3,8 @@
 
 namespace Moq.Matchers
 {
-    internal sealed class AnyMatcher : IMatcher
-    {
+	internal sealed class AnyMatcher : IMatcher
+	{
 		public static AnyMatcher Instance { get; } = new AnyMatcher();
 
 		private AnyMatcher()
@@ -16,5 +16,5 @@ namespace Moq.Matchers
 		public void SetupEvaluatedSuccessfully(object value)
 		{
 		}
-    }
+	}
 }
