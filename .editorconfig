@@ -12,8 +12,16 @@ end_of_line = CRLF
 indent_style = tab
 indent_size = 4
 
-[*.{sln,proj,csproj,fsproj,vbproj,props,targets,xml,xdoc,resx,config,nuspec}]
+[*.{sln,proj,csproj,fsproj,vbproj,props,targets,xml,xdoc,config,nuspec}]
 indent_style = tab
+indent_size = 2
+
+[*.Designer.cs]
+indent_style = space
+indent_size = 4
+
+[*.resx]
+indent_style = space
 indent_size = 2
 
 [appveyor.yml]
