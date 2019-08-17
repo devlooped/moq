@@ -38,10 +38,10 @@
 	</PropertyGroup>
 
 	<PropertyGroup Condition=" '$(TargetFramework)' == 'net45' ">
-		<DefineConstants>$(DefineConstants);FEATURE_CAS;FEATURE_COM;FEATURE_SERIALIZATION</DefineConstants>
+		<DefineConstants>$(DefineConstants);FEATURE_CAS;FEATURE_COM</DefineConstants>
 	</PropertyGroup>
 	<PropertyGroup Condition=" '$(TargetFramework)' == 'netstandard2.0' ">
-		<DefineConstants>$(DefineConstants);FEATURE_SERIALIZATION</DefineConstants>
+		<DefineConstants>$(DefineConstants)</DefineConstants>
 	</PropertyGroup>
 
 	<ItemGroup>

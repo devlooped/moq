@@ -2,9 +2,7 @@
 // All rights reserved. Licensed under the BSD 3-Clause License; see License.txt.
 
 using System;
-#if FEATURE_SERIALIZATION
 using System.Runtime.Serialization;
-#endif
 
 using Xunit;
 
@@ -39,7 +37,6 @@ namespace Moq.Tests.Regressions
 			Assert.NotSame(foo.Object.Two, foo.Object.Two.Three.LoopBack);
 		}
 
-#if FEATURE_SERIALIZATION
 		[Fact]
 		public void SerializableTypesNotImplementingISerializableProperlyNotMockable()
 		{
@@ -73,6 +70,5 @@ namespace Moq.Tests.Regressions
 
 			public virtual string SomeString { get; set; }
 		}
-#endif
 	}
 }
