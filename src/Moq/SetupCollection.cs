@@ -59,7 +59,7 @@ namespace Moq
 
 			lock (this.setups)
 			{
-				this.setups.RemoveAll(x => x.Method.IsPropertyAccessor());
+				this.setups.RemoveAll(x => x.Method.IsPropertyAccessor() && !x.Method.IsPropertyIndexerAccessor());
 				this.overridden = 0U;
 			}
 		}
