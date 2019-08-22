@@ -172,6 +172,16 @@ namespace Moq.Tests
 			Assert.Null(exception);
 		}
 
+		[Fact]
+		public void SetupAllProperties_should_not_reset_indexer_setups()
+		{
+			var mock = new Mock<IIndexedFoo>();
+			mock.SetupGet(m => m[1]).Returns("value from setup");
+			Assert.Equal("value from setup", mock.Object[1]);
+			mock.SetupAllProperties();
+			Assert.Equal("value from setup", mock.Object[1]);
+		}
+
 		public abstract class FooBase
 		{
 			public abstract object A { get; }

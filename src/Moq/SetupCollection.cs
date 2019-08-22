@@ -32,7 +32,7 @@ namespace Moq
 		{
 			lock (this.setups)
 			{
-				if (setup.Method.LooksLikeEventAttach() || setup.Method.LooksLikeEventDetach())
+				if (setup.Method.IsEventAddAccessor() || setup.Method.IsEventRemoveAccessor())
 				{
 					this.hasEventSetup = true;
 				}

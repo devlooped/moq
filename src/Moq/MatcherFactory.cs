@@ -131,7 +131,7 @@ namespace Moq
 #pragma warning restore 618
 
 				var method = call.Method;
-				if (!method.IsPropertyGetter() && !method.IsPropertyIndexerGetter())
+				if (!method.IsGetAccessor())
 				{
 					return new Pair<IMatcher, Expression>(new LazyEvalMatcher(originalExpression), originalExpression);
 				}

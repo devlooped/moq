@@ -357,10 +357,10 @@ This could be caused by an unrecognized type conversion, coercion, narrowing, or
   <data name="MethodMissing" xml:space="preserve">
     <value>No protected method {0}.{1} found whose signature is compatible with the provided arguments ({2}).</value>
   </data>
-  <data name="SetupNotEventAttach" xml:space="preserve">
+  <data name="SetupNotEventAdd" xml:space="preserve">
     <value>Expression is not an event add: {0}</value>
   </data>
-  <data name="SetupNotEventDetach" xml:space="preserve">
+  <data name="SetupNotEventRemove" xml:space="preserve">
     <value>Expression is not an event remove: {0}</value>
   </data>
 </root>

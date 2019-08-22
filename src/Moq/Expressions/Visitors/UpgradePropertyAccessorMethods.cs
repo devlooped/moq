@@ -42,7 +42,7 @@ namespace Moq.Expressions.Visitors
 
 			if (node.Method.IsSpecialName)
 			{
-				if (node.Method.IsPropertyGetter())
+				if (node.Method.IsGetAccessor())
 				{
 					var name = node.Method.Name.Substring(4);
 					var argumentCount = node.Arguments.Count;
@@ -66,7 +66,7 @@ namespace Moq.Expressions.Visitors
 						return Expression.MakeIndex(instance, indexer, arguments.Take(argumentCount - 1));
 					}
 				}
-				else if (node.Method.IsPropertySetter())
+				else if (node.Method.IsSetAccessor())
 				{
 					var name = node.Method.Name.Substring(4);
 					var argumentCount = node.Arguments.Count;

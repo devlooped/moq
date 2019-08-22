@@ -99,7 +99,7 @@ namespace Moq.Tests
 		public void All_FSharp_indexer_getters_are_recognized_as_such(PropertyInfo indexer)
 		{
 			var getter = indexer.GetGetMethod(true);
-			Assert.True(getter.IsPropertyGetter());
+			Assert.True(getter.IsGetAccessor());
 		}
 
 		[Theory]
@@ -107,7 +107,7 @@ namespace Moq.Tests
 		public void All_FSharp_indexer_setters_are_recognized_as_such(PropertyInfo indexer)
 		{
 			var setter = indexer.GetSetMethod(true);
-			Assert.True(setter.IsPropertySetter());
+			Assert.True(setter.IsSetAccessor());
 		}
 
 		public static IEnumerable<object[]> FSharpProperties
@@ -132,7 +132,7 @@ namespace Moq.Tests
 		public void All_FSharp_property_getters_are_recognized_as_such(PropertyInfo property)
 		{
 			var getter = property.GetGetMethod(true);
-			Assert.True(getter.IsPropertyGetter());
+			Assert.True(getter.IsGetAccessor());
 		}
 
 		[Theory]
@@ -140,7 +140,7 @@ namespace Moq.Tests
 		public void All_FSharp_property_setters_are_recognized_as_such(PropertyInfo property)
 		{
 			var setter = property.GetSetMethod(true);
-			Assert.True(setter.IsPropertySetter());
+			Assert.True(setter.IsSetAccessor());
 		}
 	}
 }

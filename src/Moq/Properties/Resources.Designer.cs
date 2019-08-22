@@ -556,18 +556,18 @@ namespace Moq.Properties {
         /// <summary>
         ///   Looks up a localized string similar to Expression is not an event add: {0}.
         /// </summary>
-        internal static string SetupNotEventAttach {
+        internal static string SetupNotEventAdd {
             get {
-                return ResourceManager.GetString("SetupNotEventAttach", resourceCulture);
+                return ResourceManager.GetString("SetupNotEventAdd", resourceCulture);
             }
         }
         
         /// <summary>
         ///   Looks up a localized string similar to Expression is not an event remove: {0}.
         /// </summary>
-        internal static string SetupNotEventDetach {
+        internal static string SetupNotEventRemove {
             get {
-                return ResourceManager.GetString("SetupNotEventDetach", resourceCulture);
+                return ResourceManager.GetString("SetupNotEventRemove", resourceCulture);
             }
         }
         

@@ -2,6 +2,7 @@
 // All rights reserved. Licensed under the BSD 3-Clause License; see License.txt.
 
 using System;
+using System.Diagnostics;
 using System.Linq;
 using System.Linq.Expressions;
 using System.Text;
@@ -327,39 +328,49 @@ namespace Moq
 					builder.AppendNameOf(expression.Method.DeclaringType);
 				}
 
-				if (expression.Method.IsPropertyIndexerGetter())
+				if (expression.Method.IsGetAccessor())
 				{
-					builder.AppendCommaSeparated("[", expression.Arguments.Skip(paramFrom), AppendExpression, "]");
-				}
-				else if (expression.Method.IsPropertyIndexerSetter())
-				{
-					builder.AppendCommaSeparated("[", expression.Arguments.Skip(paramFrom).Take(expression.Arguments.Count - paramFrom - 1), AppendExpression, "] = ")
-					       .AppendExpression(expression.Arguments.Last());
-				}
-				else if (expression.Method.IsPropertyGetter())
-				{
-					builder.Append('.')
-					       .Append(expression.Method.Name, 4);
-					if (expression.Arguments.Count > paramFrom)
+					if (expression.Method.IsPropertyAccessor())
 					{
+						builder.Append('.')
+						       .Append(expression.Method.Name, 4);
+						if (expression.Arguments.Count > paramFrom)
+						{
+							builder.AppendCommaSeparated("[", expression.Arguments.Skip(paramFrom), AppendExpression, "]");
+						}
+					}
+					else
+					{
+						Debug.Assert(expression.Method.IsIndexerAccessor());
+
 						builder.AppendCommaSeparated("[", expression.Arguments.Skip(paramFrom), AppendExpression, "]");
 					}
 				}
-				else if (expression.Method.IsPropertySetter())
+				else if (expression.Method.IsSetAccessor())
 				{
-					builder.Append('.')
-					       .Append(expression.Method.Name, 4)
-					       .Append(" = ")
-					       .AppendExpression(expression.Arguments.Last());
+					if (expression.Method.IsPropertyAccessor())
+					{
+						builder.Append('.')
+						       .Append(expression.Method.Name, 4)
+						       .Append(" = ")
+						       .AppendExpression(expression.Arguments.Last());
+					}
+					else
+					{
+						Debug.Assert(expression.Method.IsIndexerAccessor());
+
+						builder.AppendCommaSeparated("[", expression.Arguments.Skip(paramFrom).Take(expression.Arguments.Count - paramFrom - 1), AppendExpression, "] = ")
+						       .AppendExpression(expression.Arguments.Last());
+					}
 				}
-				else if (expression.Method.LooksLikeEventAttach())
+				else if (expression.Method.IsEventAddAccessor())
 				{
 					builder.Append('.')
 					       .Append(expression.Method.Name, 4)
 					       .Append(" += ")
 					       .AppendCommaSeparated(expression.Arguments.Skip(paramFrom), AppendExpression);
 				}
-				else if (expression.Method.LooksLikeEventDetach())
+				else if (expression.Method.IsEventRemoveAccessor())
 				{
 					builder.Append('.')
 					       .Append(expression.Method.Name, 7)

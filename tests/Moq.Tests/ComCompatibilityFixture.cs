@@ -69,7 +69,7 @@ namespace Moq.Tests
 		{
 			var property = typeof(IHasProperty).GetProperty(nameof(IHasProperty.Property));
 			var getter = property.GetGetMethod(true);
-			Assert.True(getter.IsPropertyGetter());
+			Assert.True(getter.IsGetAccessor());
 		}
 
 		[Fact]
@@ -77,7 +77,7 @@ namespace Moq.Tests
 		{
 			var property = typeof(IHasProperty).GetProperty(nameof(IHasProperty.Property));
 			var setter = property.GetSetMethod(true);
-			Assert.True(setter.IsPropertySetter());
+			Assert.True(setter.IsSetAccessor());
 		}
 
 		[Fact]
@@ -92,7 +92,7 @@ namespace Moq.Tests
 		{
 			var indexer = typeof(IHasIndexer).GetProperty(nameof(IHasIndexer.Item));
 			var getter = indexer.GetGetMethod(true);
-			Assert.True(getter.IsPropertyIndexerGetter());
+			Assert.True(getter.IsGetAccessor() && getter.IsIndexerAccessor());
 		}
 
 		[Fact]
@@ -100,7 +100,7 @@ namespace Moq.Tests
 		{
 			var indexer = typeof(IHasIndexer).GetProperty(nameof(IHasIndexer.Item));
 			var setter = indexer.GetSetMethod(true);
-			Assert.True(setter.IsPropertyIndexerSetter());
+			Assert.True(setter.IsSetAccessor() && setter.IsIndexerAccessor());
 		}
 	}
 }
