@@ -139,7 +139,7 @@ namespace Moq
 			// more expensive checks (for the common case where the invoked method is *not* an event accessor).
 			if (methodName.Length > 4)
 			{
-				if (methodName[0] == 'a' && methodName[3] == '_' && invocation.Method.LooksLikeEventAttach())
+				if (methodName[0] == 'a' && methodName[3] == '_' && invocation.Method.IsEventAddAccessor())
 				{
 					var eventInfo = GetEventFromName(invocation.Method.Name.Substring("add_".Length), mock);
 					if (eventInfo != null)
@@ -170,7 +170,7 @@ namespace Moq
 						return doesntHaveEventSetup;
 					}
 				}
-				else if (methodName[0] == 'r' && methodName.Length > 7 && methodName[6] == '_' && invocation.Method.LooksLikeEventDetach())
+				else if (methodName[0] == 'r' && methodName.Length > 7 && methodName[6] == '_' && invocation.Method.IsEventRemoveAccessor())
 				{
 					var eventInfo = GetEventFromName(invocation.Method.Name.Substring("remove_".Length), mock);
 					if (eventInfo != null)
@@ -302,7 +302,7 @@ namespace Moq
 						{
 							// Case 2a: Re-implemented interface.
 							// The base class has its own implementation. Only call base method if it isn't an event accessor.
-							if (!method.LooksLikeEventAttach() && !method.LooksLikeEventDetach())
+							if (!method.IsEventAddAccessor() && !method.IsEventRemoveAccessor())
 							{
 								invocation.ReturnBase();
 								return;
@@ -359,7 +359,7 @@ namespace Moq
 			}
 			
 			MethodInfo invocationMethod = invocation.Method;
-			if (invocationMethod.IsPropertyAccessor() && !invocationMethod.IsPropertyIndexerAccessor())
+			if (invocationMethod.IsPropertyAccessor())
 			{
 				string propertyNameToSearch = invocationMethod.Name.Substring(AccessorPrefixLength);
 				PropertyInfo property = invocationMethod.DeclaringType.GetProperty(propertyNameToSearch);
@@ -409,7 +409,7 @@ namespace Moq
 					}
 				}
 
-				Setup setupToExecute = invocationMethod.IsPropertyGetter() ? getterSetup : setterSetup;
+				Setup setupToExecute = invocationMethod.IsGetAccessor() ? getterSetup : setterSetup;
 				setupToExecute.Execute(invocation);
 
 				return true;

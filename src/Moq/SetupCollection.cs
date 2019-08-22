@@ -32,7 +32,7 @@ namespace Moq
 		{
 			lock (this.setups)
 			{
-				if (setup.Method.LooksLikeEventAttach() || setup.Method.LooksLikeEventDetach())
+				if (setup.Method.IsEventAddAccessor() || setup.Method.IsEventRemoveAccessor())
 				{
 					this.hasEventSetup = true;
 				}
@@ -59,7 +59,7 @@ namespace Moq
 
 			lock (this.setups)
 			{
-				this.setups.RemoveAll(x => x.Method.IsPropertyAccessor() && !x.Method.IsPropertyIndexerAccessor());
+				this.setups.RemoveAll(x => x.Method.IsPropertyAccessor());
 				this.overridden = 0U;
 			}
 		}

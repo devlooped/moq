@@ -339,7 +339,7 @@ namespace Moq
 		internal static void VerifyAdd(Mock mock, LambdaExpression expression, Times times, string failMessage)
 		{
 			Guard.NotNull(expression, nameof(expression));
-			Guard.IsEventAttach(expression, nameof(expression));
+			Guard.IsEventAdd(expression, nameof(expression));
 
 			Mock.Verify(mock, expression, times, failMessage);
 		}
@@ -347,7 +347,7 @@ namespace Moq
 		internal static void VerifyRemove(Mock mock, LambdaExpression expression, Times times, string failMessage)
 		{
 			Guard.NotNull(expression, nameof(expression));
-			Guard.IsEventDetach(expression, nameof(expression));
+			Guard.IsEventRemove(expression, nameof(expression));
 
 			Mock.Verify(mock, expression, times, failMessage);
 		}
@@ -511,7 +511,7 @@ namespace Moq
 		internal static MethodCall SetupAdd(Mock mock, LambdaExpression expression, Condition condition)
 		{
 			Guard.NotNull(expression, nameof(expression));
-			Guard.IsEventAttach(expression, nameof(expression));
+			Guard.IsEventAdd(expression, nameof(expression));
 
 			return Mock.Setup(mock, expression, condition);
 		}
@@ -519,7 +519,7 @@ namespace Moq
 		internal static MethodCall SetupRemove(Mock mock, LambdaExpression expression, Condition condition)
 		{
 			Guard.NotNull(expression, nameof(expression));
-			Guard.IsEventDetach(expression, nameof(expression));
+			Guard.IsEventRemove(expression, nameof(expression));
 
 			return Mock.Setup(mock, expression, condition);
 		}
