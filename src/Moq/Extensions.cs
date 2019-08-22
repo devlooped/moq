@@ -101,15 +101,6 @@ namespace Moq
 			return type.BaseType == typeof(MulticastDelegate);
 		}
 
-		public static void ThrowIfNotMockeable(this MemberExpression memberAccess)
-		{
-			if (memberAccess.Member is FieldInfo)
-				throw new NotSupportedException(string.Format(
-					CultureInfo.CurrentCulture,
-					Resources.FieldsNotSupported,
-					memberAccess.ToStringFixed()));
-		}
-
 		public static bool IsMockeable(this Type typeToMock)
 		{
 			// A value type does not match any of these three 

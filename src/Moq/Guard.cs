@@ -173,6 +173,15 @@ namespace Moq
 			}
 		}
 
+		public static void NotField(MemberExpression memberAccess)
+		{
+			if (memberAccess.Member is FieldInfo)
+				throw new NotSupportedException(
+					string.Format(
+						Resources.FieldsNotSupported,
+						memberAccess.ToStringFixed()));
+		}
+
 		public static void Mockable(Type type)
 		{
 			if (!type.IsMockeable())
