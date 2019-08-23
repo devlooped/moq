@@ -2,6 +2,7 @@
 // All rights reserved. Licensed under the BSD 3-Clause License; see License.txt.
 
 using System;
+using System.Collections.Generic;
 using System.Diagnostics;
 using System.Linq;
 using System.Linq.Expressions;
@@ -308,81 +309,77 @@ namespace Moq
 
 		private static StringBuilder AppendExpression(this StringBuilder builder, MethodCallExpression expression)
 		{
-			if (expression != null)
+			var instance = expression.Object;
+			var method = expression.Method;
+			var arguments = (IEnumerable<Expression>)expression.Arguments;
+
+			if (method.IsExtensionMethod())
 			{
-				var paramFrom = 0;
-				var instance = expression.Object;
+				instance = arguments.First();
+				arguments = arguments.Skip(1);
+			}
 
-				if (expression.Method.IsExtensionMethod())
-				{
-					paramFrom = 1;
-					instance = expression.Arguments[0];
-				}
+			if (instance != null)
+			{
+				builder.AppendExpression(instance);
+			}
+			else
+			{
+				Debug.Assert(method.IsStatic);
 
-				if (instance != null)
-				{
-					builder.AppendExpression(instance);
-				}
-				else // Method is static
-				{
-					builder.AppendNameOf(expression.Method.DeclaringType);
-				}
+				builder.AppendNameOf(method.DeclaringType);
+			}
 
-				if (expression.Method.IsGetAccessor())
-				{
-					if (expression.Method.IsPropertyAccessor())
-					{
-						builder.Append('.')
-						       .Append(expression.Method.Name, 4);
-						if (expression.Arguments.Count > paramFrom)
-						{
-							builder.AppendCommaSeparated("[", expression.Arguments.Skip(paramFrom), AppendExpression, "]");
-						}
-					}
-					else
-					{
-						Debug.Assert(expression.Method.IsIndexerAccessor());
-
-						builder.AppendCommaSeparated("[", expression.Arguments.Skip(paramFrom), AppendExpression, "]");
-					}
-				}
-				else if (expression.Method.IsSetAccessor())
-				{
-					if (expression.Method.IsPropertyAccessor())
-					{
-						builder.Append('.')
-						       .Append(expression.Method.Name, 4)
-						       .Append(" = ")
-						       .AppendExpression(expression.Arguments.Last());
-					}
-					else
-					{
-						Debug.Assert(expression.Method.IsIndexerAccessor());
-
-						builder.AppendCommaSeparated("[", expression.Arguments.Skip(paramFrom).Take(expression.Arguments.Count - paramFrom - 1), AppendExpression, "] = ")
-						       .AppendExpression(expression.Arguments.Last());
-					}
-				}
-				else if (expression.Method.IsEventAddAccessor())
+			if (method.IsGetAccessor())
+			{
+				if (method.IsPropertyAccessor())
 				{
 					builder.Append('.')
-					       .Append(expression.Method.Name, 4)
-					       .Append(" += ")
-					       .AppendCommaSeparated(expression.Arguments.Skip(paramFrom), AppendExpression);
-				}
-				else if (expression.Method.IsEventRemoveAccessor())
-				{
-					builder.Append('.')
-					       .Append(expression.Method.Name, 7)
-					       .Append(" -= ")
-					       .AppendCommaSeparated(expression.Arguments.Skip(paramFrom), AppendExpression);
+					       .Append(method.Name, 4);
 				}
 				else
 				{
-					builder.Append('.')
-					       .AppendNameOf(expression.Method, includeGenericArgumentList: true)
-					       .AppendCommaSeparated("(", expression.Arguments.Skip(paramFrom), AppendExpression, ")");
+					Debug.Assert(method.IsIndexerAccessor());
+
+					builder.AppendCommaSeparated("[", arguments, AppendExpression, "]");
 				}
+			}
+			else if (method.IsSetAccessor())
+			{
+				if (method.IsPropertyAccessor())
+				{
+					builder.Append('.')
+					       .Append(method.Name, 4)
+					       .Append(" = ")
+					       .AppendExpression(arguments.Last());
+				}
+				else
+				{
+					Debug.Assert(method.IsIndexerAccessor());
+
+					builder.AppendCommaSeparated("[", arguments.Take(arguments.Count() - 1), AppendExpression, "] = ")
+					       .AppendExpression(arguments.Last());
+				}
+			}
+			else if (method.IsEventAddAccessor())
+			{
+				builder.Append('.')
+				       .Append(method.Name, 4)
+				       .Append(" += ")
+				       .AppendCommaSeparated(arguments, AppendExpression);
+			}
+			else if (method.IsEventRemoveAccessor())
+			{
+				builder.Append('.')
+				       .Append(method.Name, 7)
+				       .Append(" -= ")
+				       .AppendCommaSeparated(arguments, AppendExpression);
+			}
+			else
+			{
+				builder.Append('.')
+				       .AppendNameOf(method, includeGenericArgumentList: true)
+				       .AppendCommaSeparated("(", arguments, AppendExpression, ")");
 			}
 
 			return builder;
