@@ -363,4 +363,7 @@ This could be caused by an unrecognized type conversion, coercion, narrowing, or
   <data name="SetupNotEventRemove" xml:space="preserve">
     <value>Expression is not an event remove: {0}</value>
   </data>
+  <data name="ArgumentMatcherWillNeverMatch" xml:space="preserve">
+    <value>Matcher '{0}' is unmatchable: An implicit conversion operator will convert arguments of type '{1}' to the parameter's type '{2}', which is assignment-incompatible.</value>
+  </data>
 </root>

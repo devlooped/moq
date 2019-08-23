@@ -2804,6 +2804,46 @@ namespace Moq.Tests.Regressions
 
 		#endregion
 
+		#region 897
+
+		public class Issue897
+		{
+			private readonly List<int> data;
+
+			public Issue897()
+			{
+				this.data = new List<int> { 1, 2, 3 };
+			}
+
+			[Fact]
+			public void DateTimeOffset()
+			{
+				var serviceMock = new Mock<IMeteringDataServiceAgent>();
+				serviceMock.Setup(s => s.GetDataList(It.IsAny<DateTimeOffset>())).Returns(this.data);
+
+				var result = serviceMock.Object.GetDataList(DateTime.Now);
+
+				Assert.Equal(this.data, result);
+			}
+
+			[Fact]
+			public void DateTimeNotWorking()
+			{
+				var serviceMock = new Mock<IMeteringDataServiceAgent>();
+
+				Action setup = () => serviceMock.Setup(s => s.GetDataList(It.IsAny<DateTime>()));
+
+				Assert.Throws<ArgumentException>(setup);
+			}
+
+			public interface IMeteringDataServiceAgent
+			{
+				List<int> GetDataList(DateTimeOffset date);
+			}
+		}
+
+		#endregion
+
 		// Old @ Google Code
 
 		#region #47

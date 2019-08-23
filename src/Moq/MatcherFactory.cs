@@ -11,6 +11,8 @@ using System.Reflection;
 using Moq.Matchers;
 using Moq.Properties;
 
+using TypeNameFormatter;
+
 namespace Moq
 {
 	internal static class MatcherFactory
@@ -88,10 +90,24 @@ namespace Moq
 				}
 				return new Pair<IMatcher, Expression>(new ParamArrayMatcher(matchers), Expression.NewArrayInit(elementType, initializers));
 			}
-			else
+			else if (argument.NodeType == ExpressionType.Convert)
 			{
-				return MatcherFactory.CreateMatcher(argument);
+				var convertExpression = (UnaryExpression)argument;
+				if (convertExpression.Method?.Name == "op_Implicit")
+				{
+					if (!parameter.ParameterType.IsAssignableFrom(convertExpression.Operand.Type) && convertExpression.Operand.IsMatch(out _))
+					{
+						throw new ArgumentException(
+							string.Format(
+								Resources.ArgumentMatcherWillNeverMatch,
+								convertExpression.Operand.ToStringFixed(),
+								convertExpression.Operand.Type.GetFormattedName(),
+								parameter.ParameterType.GetFormattedName()));
+					}
+				}
 			}
+
+			return MatcherFactory.CreateMatcher(argument);
 		}
 
 		public static Pair<IMatcher, Expression> CreateMatcher(Expression expression)
