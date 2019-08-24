@@ -4,6 +4,7 @@
 using System;
 using System.Collections;
 using System.Collections.Generic;
+using System.Diagnostics;
 using System.Linq;
 using System.Linq.Expressions;
 using System.Reflection;
@@ -24,7 +25,7 @@ namespace Moq.Linq
 		/// </summary>
 		public MockQueryable(MethodCallExpression underlyingCreateMocks)
 		{
-			Guard.NotNull(underlyingCreateMocks, nameof(underlyingCreateMocks));
+			Debug.Assert(underlyingCreateMocks != null);
 
 			this.Expression = Expression.Constant(this);
 			this.underlyingCreateMocks = underlyingCreateMocks;
@@ -32,8 +33,11 @@ namespace Moq.Linq
 
 		public MockQueryable(MethodCallExpression underlyingCreateMocks, Expression expression)
 		{
-			Guard.NotNull(underlyingCreateMocks, nameof(underlyingCreateMocks));
-			Guard.NotNull(expression, nameof(expression));
+			Debug.Assert(underlyingCreateMocks != null);
+			Debug.Assert(expression != null);
+
+			// TODO: Find out whether this can be turned into an assertion. If so,
+			// we can get rid of Guard.CanBeAssigned along with two resource strings.
 			Guard.CanBeAssigned(expression.Type, typeof(IQueryable<T>), nameof(expression));
 
 			this.underlyingCreateMocks = underlyingCreateMocks;

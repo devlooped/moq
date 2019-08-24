@@ -339,7 +339,7 @@ namespace Moq
 		/// </summary>
 		public static bool IsProperty(this LambdaExpression expression)
 		{
-			Guard.NotNull(expression, nameof(expression));
+			Debug.Assert(expression != null);
 
 			return expression.Body is MemberExpression memberExpression && memberExpression.Member is PropertyInfo;
 		}
@@ -349,7 +349,7 @@ namespace Moq
 		/// </summary>
 		public static bool IsPropertyIndexer(this LambdaExpression expression)
 		{
-			Guard.NotNull(expression, nameof(expression));
+			Debug.Assert(expression != null);
 
 			return expression.Body is IndexExpression
 				|| (expression.Body is MethodCallExpression methodCallExpression && methodCallExpression.Method.IsSpecialName);
