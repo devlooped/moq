@@ -1,6 +1,7 @@
 // Copyright (c) 2007, Clarius Consulting, Manas Technology Solutions, InSTEDD.
 // All rights reserved. Licensed under the BSD 3-Clause License; see License.txt.
 
+using System;
 using System.Collections.Generic;
 using System.Diagnostics;
 using System.Reflection;
@@ -10,6 +11,7 @@ namespace Moq
 {
 	internal abstract class Invocation : IInvocation
 	{
+		private readonly Type proxyType;
 		private object[] arguments;
 		private MethodInfo method;
 		private object returnValue;
@@ -18,13 +20,16 @@ namespace Moq
 		/// <summary>
 		/// Initializes a new instance of the <see cref="Invocation"/> class.
 		/// </summary>
+		/// <param name="proxyType">The <see cref="Type"/> of the concrete proxy object on which a method is being invoked.</param>
 		/// <param name="method">The method being invoked.</param>
 		/// <param name="arguments">The arguments with which the specified <paramref name="method"/> is being invoked.</param>
-		protected Invocation(MethodInfo method, params object[] arguments)
+		protected Invocation(Type proxyType, MethodInfo method, params object[] arguments)
 		{
+			Debug.Assert(proxyType != null);
 			Debug.Assert(arguments != null);
 			Debug.Assert(method != null);
 
+			this.proxyType = proxyType;
 			this.arguments = arguments;
 			this.method = method;
 		}
@@ -44,6 +49,8 @@ namespace Moq
 		public object[] Arguments => this.arguments;
 
 		IReadOnlyList<object> IInvocation.Arguments => this.arguments;
+
+		public Type ProxyType => this.proxyType;
 
 		public object ReturnValue => this.returnValue;
 

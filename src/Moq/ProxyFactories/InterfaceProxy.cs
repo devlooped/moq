@@ -1,6 +1,7 @@
 // Copyright (c) 2007, Clarius Consulting, Manas Technology Solutions, InSTEDD.
 // All rights reserved. Licensed under the BSD 3-Clause License; see License.txt.
 
+using System;
 using System.ComponentModel;
 using System.Diagnostics;
 using System.Reflection;
@@ -25,8 +26,9 @@ namespace Moq.Internals
 		public sealed override bool Equals(object obj)
 		{
 			// Forward this call to the interceptor, so that `object.Equals` can be set up.
-			var invocation = new Invocation(equalsMethod, obj);
-			((IInterceptor)((IProxy)this).Interceptor).Intercept(invocation);
+			var interceptor = (IInterceptor)((IProxy)this).Interceptor;
+			var invocation = new Invocation(interceptor.GetType(), equalsMethod, obj);
+			interceptor.Intercept(invocation);
 			return (bool)invocation.ReturnValue;
 		}
 
@@ -35,8 +37,9 @@ namespace Moq.Internals
 		public sealed override int GetHashCode()
 		{
 			// Forward this call to the interceptor, so that `object.GetHashCode` can be set up.
-			var invocation = new Invocation(getHashCodeMethod);
-			((IInterceptor)((IProxy)this).Interceptor).Intercept(invocation);
+			var interceptor = (IInterceptor)((IProxy)this).Interceptor;
+			var invocation = new Invocation(interceptor.GetType(), getHashCodeMethod);
+			interceptor.Intercept(invocation);
 			return (int)invocation.ReturnValue;
 		}
 
@@ -45,8 +48,9 @@ namespace Moq.Internals
 		public sealed override string ToString()
 		{
 			// Forward this call to the interceptor, so that `object.ToString` can be set up.
-			var invocation = new Invocation(toStringMethod);
-			((IInterceptor)((IProxy)this).Interceptor).Intercept(invocation);
+			var interceptor = (IInterceptor)((IProxy)this).Interceptor;
+			var invocation = new Invocation(interceptor.GetType(), toStringMethod);
+			interceptor.Intercept(invocation);
 			return (string)invocation.ReturnValue;
 		}
 
@@ -54,13 +58,13 @@ namespace Moq.Internals
 		{
 			private static object[] noArguments = new object[0];
 
-			public Invocation(MethodInfo method, params object[] arguments)
-				: base(method, arguments)
+			public Invocation(Type proxyType, MethodInfo method, params object[] arguments)
+				: base(proxyType, method, arguments)
 			{
 			}
 
-			public Invocation(MethodInfo method)
-				: base(method, noArguments)
+			public Invocation(Type proxyType, MethodInfo method)
+				: base(proxyType, method, noArguments)
 			{
 			}
 
