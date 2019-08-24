@@ -182,11 +182,11 @@ namespace Moq
 						memberAccess.ToStringFixed()));
 		}
 
-		public static void Mockable(Type type)
+		public static void IsMockable(Type type)
 		{
-			if (!type.IsMockeable())
+			if (!type.IsMockable())
 			{
-				throw new NotSupportedException(Resources.InvalidMockClass);
+				throw new NotSupportedException(Resources.TypeNotMockable);
 			}
 		}
 

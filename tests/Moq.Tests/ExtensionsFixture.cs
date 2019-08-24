@@ -13,12 +13,6 @@ namespace Moq.Tests
 		#region Public Methods
 
 		[Fact]
-		public void IsMockeableReturnsFalseForValueType()
-		{
-			Assert.False(typeof(int).IsMockeable());
-		}
-
-		[Fact]
 		public void OnceDoesNotThrowOnSecondCallIfCountWasResetBefore()
 		{
 			var mock = new Mock<IFooReset>();

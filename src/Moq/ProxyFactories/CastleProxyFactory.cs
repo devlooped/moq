@@ -83,7 +83,7 @@ namespace Moq
 			}
 			catch (TypeLoadException e)
 			{
-				throw new ArgumentException(Resources.InvalidMockClass, e);
+				throw new ArgumentException(Resources.TypeNotMockable, e);
 			}
 			catch (MissingMethodException e)
 			{

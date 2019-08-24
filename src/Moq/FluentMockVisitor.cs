@@ -109,7 +109,7 @@ namespace Moq
 			else
 			{
 				//.FluentMock(mock => mock.Solution)
-				Guard.Mockable(returnType);
+				Guard.IsMockable(returnType);
 				return FluentMockMethod.MakeGenericMethod(objectType, returnType);
 			}
 		}
@@ -144,7 +144,7 @@ namespace Moq
 		{
 			Guard.NotNull(mock, nameof(mock));
 			Guard.NotNull(setup, nameof(setup));
-			Guard.Mockable(typeof(TResult));
+			Guard.IsMockable(typeof(TResult));
 
 			MethodInfo info;
 			IReadOnlyList<Expression> arguments;
@@ -168,7 +168,7 @@ namespace Moq
 				throw new NotSupportedException(string.Format(Resources.UnsupportedExpression, setup.ToStringFixed()));
 			}
 
-			Guard.Mockable(info.ReturnType);
+			Guard.IsMockable(info.ReturnType);
 
 			Mock fluentMock;
 			object result;

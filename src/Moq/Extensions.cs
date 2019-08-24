@@ -101,11 +101,9 @@ namespace Moq
 			return type.BaseType == typeof(MulticastDelegate);
 		}
 
-		public static bool IsMockeable(this Type typeToMock)
+		public static bool IsMockable(this Type type)
 		{
-			// A value type does not match any of these three 
-			// condition and therefore returns false.
-			return typeToMock.IsInterface || typeToMock.IsAbstract || typeToMock.IsDelegateType() || (typeToMock.IsClass && !typeToMock.IsSealed);
+			return !type.IsSealed || type.IsDelegateType();
 		}
 
 		public static bool CanOverride(this MethodBase method)

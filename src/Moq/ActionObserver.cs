@@ -277,7 +277,7 @@ namespace Moq
 					{
 						this.returnValue = null;
 					}
-					else if (returnType.IsMockeable())
+					else if (returnType.IsMockable())
 					{
 						this.returnValue = CreateProxy(returnType, null, this.matcherObserver, out _);
 					}

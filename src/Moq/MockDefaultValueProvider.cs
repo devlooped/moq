@@ -30,7 +30,7 @@ namespace Moq
 			{
 				return emptyValue;
 			}
-			else if (type.IsMockeable())
+			else if (type.IsMockable())
 			{
 				// Create a new mock to be placed to InnerMocks dictionary if it's missing there
 				var mockType = typeof(Mock<>).MakeGenericType(type);

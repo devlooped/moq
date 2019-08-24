@@ -214,15 +214,6 @@ namespace Moq.Properties {
         }
         
         /// <summary>
-        ///   Looks up a localized string similar to Type to mock must be an interface or an abstract or non-sealed class. .
-        /// </summary>
-        internal static string InvalidMockClass {
-            get {
-                return ResourceManager.GetString("InvalidMockClass", resourceCulture);
-            }
-        }
-        
-        /// <summary>
         ///   Looks up a localized string similar to Cannot retrieve a mock with the given object type {0} as it&apos;s not the main type of the mock or any of its additional interfaces.
         ///Please cast the argument to one of the supported types: {1}.
         ///Remember that there&apos;s no generics covariance in the CLR, so your object must be one of these types in order for the call to succeed..
@@ -622,6 +613,15 @@ namespace Moq.Properties {
         internal static string TypeNotInheritFromType {
             get {
                 return ResourceManager.GetString("TypeNotInheritFromType", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Type to mock must be an interface, a delegate, or a non-sealed, non-static class..
+        /// </summary>
+        internal static string TypeNotMockable {
+            get {
+                return ResourceManager.GetString("TypeNotMockable", resourceCulture);
             }
         }
         

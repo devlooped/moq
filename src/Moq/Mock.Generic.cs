@@ -126,7 +126,7 @@ namespace Moq
 		[SuppressMessage("Microsoft.Usage", "CA2214:DoNotCallOverridableMethodsInConstructors")]
 		public Mock(MockBehavior behavior, params object[] args)
 		{
-			Guard.Mockable(typeof(T));
+			Guard.IsMockable(typeof(T));
 
 			if (args == null)
 			{
