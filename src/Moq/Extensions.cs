@@ -26,6 +26,44 @@ namespace Moq
 			return type.IsValueType ? Activator.CreateInstance(type) : null;
 		}
 
+		/// <summary>
+		///   Gets the least-derived <see cref="MethodInfo"/> in the given type that provides
+		///   the implementation for the given <paramref name="method"/>.
+		/// </summary>
+		public static MethodInfo GetImplementingMethod(this MethodInfo method, Type proxyType)
+		{
+			Debug.Assert(method != null);
+			Debug.Assert(proxyType != null);
+			Debug.Assert(proxyType.IsClass);
+
+			if (method.IsGenericMethod)
+			{
+				method = method.GetGenericMethodDefinition();
+			}
+
+			var declaringType = method.DeclaringType;
+
+			if (declaringType.IsInterface)
+			{
+				Debug.Assert(declaringType.IsAssignableFrom(proxyType));
+
+				var map = proxyType.GetInterfaceMap(method.DeclaringType);
+				var index = Array.IndexOf(map.InterfaceMethods, method);
+				Debug.Assert(index >= 0);
+				return map.TargetMethods[index].GetBaseDefinition();
+			}
+			else if (declaringType.IsDelegateType())
+			{
+				return proxyType.GetMethod("Invoke");
+			}
+			else
+			{
+				Debug.Assert(declaringType.IsAssignableFrom(proxyType));
+
+				return method.GetBaseDefinition();
+			}
+		}
+
 		public static object InvokePreserveStack(this Delegate del, params object[] args)
 		{
 			try
