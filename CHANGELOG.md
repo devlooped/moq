@@ -19,11 +19,15 @@ The format is loosely based on [Keep a Changelog](http://keepachangelog.com/en/1
 
 * Moq will throw when it detects that an argument matcher will never match anything due to the presence of an implicit conversion operator. (@michelcedric, #897, #898)
 
+* New algorithm for matching invoked methods against methods specified in setup/verification expressions. (@stakx, #904)
+
 #### Added
 
 * Added support for setup and verification of the event handlers through `Setup[Add|Remove]` and `Verify[Add|Remove|All]` (@lepijohnny, #825) 
 
 #### Fixed
+
+* Moq does not mock explicit interface implementation and `protected virtual` correctly. (@oddbear, #657)
 
 * `Invocations.Clear()` does not cause `Verify` to fail (@jchessir, #733)
 
@@ -34,6 +38,8 @@ The format is loosely based on [Keep a Changelog](http://keepachangelog.com/en/1
 * `Verify` throws `TargetInvocationException` instead of `MockException` when one of the recorded invocations was to an async method that threw. (@Cufeadir, #883)
 
 * Regression in 4.12.0: `SetupAllProperties` removes indexer setups. (@stakx, #901)
+
+* Parameter types are ignored when matching an invoked generic method against setups. (@stakx, #903)
 
 
 ## 4.12.0 (2019-06-20)
