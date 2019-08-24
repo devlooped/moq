@@ -271,7 +271,7 @@ namespace Moq
 						Debug.Assert(memberAccessExpression.Member is PropertyInfo);
 						r = memberAccessExpression.Expression;
 						var parameter = Expression.Parameter(r.Type, r is ParameterExpression ope ? ope.Name : ParameterName);
-						var property = memberAccessExpression.GetReboundProperty();
+						var property = (PropertyInfo)memberAccessExpression.Member;
 						var method = property.CanRead ? property.GetGetMethod(true) : property.GetSetMethod(true);
 						//                    ^^^^^^^                               ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 						// We're in the switch case block for property read access, therefore we prefer the
@@ -295,37 +295,14 @@ namespace Moq
 			}
 		}
 
-		internal static PropertyInfo GetReboundProperty(this MemberExpression expression)
-		{
-			Debug.Assert(expression.Member is PropertyInfo);
-
-			var property = (PropertyInfo)expression.Member;
-
-			// the following block is required because .NET compilers put the wrong PropertyInfo into MemberExpression
-			// for properties originally declared in base classes; they will put the base class' PropertyInfo into
-			// the expression. we attempt to correct this here by checking whether the type of the accessed object
-			// has a property by the same name whose base definition equals the property in the expression; if so,
-			// we "upgrade" to the derived property.
-			if (property.DeclaringType != expression.Expression.Type)
-			{
-				var derivedProperty = expression.Expression.Type.GetProperty(property.Name, BindingFlags.Public | BindingFlags.NonPublic | BindingFlags.Instance);
-				if (derivedProperty != null && derivedProperty.GetMethod.GetBaseDefinition() == property.GetMethod)
-				{
-					return derivedProperty;
-				}
-			}
-
-			return property;
-		}
-
 		/// <summary>
 		/// Converts the body of the lambda expression into the <see cref="PropertyInfo"/> referenced by it.
 		/// </summary>
 		public static PropertyInfo ToPropertyInfo(this LambdaExpression expression)
 		{
-			if (expression.Body is MemberExpression prop)
+			if (expression.Body is MemberExpression memberExpression && memberExpression.Member is PropertyInfo property)
 			{
-				return prop.GetReboundProperty();
+				return property;
 			}
 
 			throw new ArgumentException(string.Format(
