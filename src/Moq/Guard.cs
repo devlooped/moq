@@ -29,7 +29,7 @@ namespace Moq
 
 				case ExpressionType.Call:
 					var call = (MethodCallExpression)expression.Body;
-					if (call.Method.IsPropertySetter() || call.Method.IsPropertyIndexerSetter()) return;
+					if (call.Method.IsSetAccessor()) return;
 					break;
 			}
 
@@ -82,7 +82,7 @@ namespace Moq
 			}
 		}
 
-		public static void IsEventAttach(LambdaExpression expression, string paramName)
+		public static void IsEventAdd(LambdaExpression expression, string paramName)
 		{
 			Debug.Assert(expression != null);
 
@@ -90,19 +90,19 @@ namespace Moq
 			{
 				case ExpressionType.Call:
 					var call = (MethodCallExpression)expression.Body;
-					if (call.Method.LooksLikeEventAttach()) return;
+					if (call.Method.IsEventAddAccessor()) return;
 					break;
 			}
 
 			throw new ArgumentException(
 				string.Format(
 					CultureInfo.CurrentCulture,
-					Resources.SetupNotEventAttach,
+					Resources.SetupNotEventAdd,
 					expression.ToStringFixed()),
 				paramName);
 		}
 
-		public static void IsEventDetach(LambdaExpression expression, string paramName)
+		public static void IsEventRemove(LambdaExpression expression, string paramName)
 		{
 			Debug.Assert(expression != null);
 
@@ -110,14 +110,14 @@ namespace Moq
 			{
 				case ExpressionType.Call:
 					var call = (MethodCallExpression)expression.Body;
-					if (call.Method.LooksLikeEventDetach()) return;
+					if (call.Method.IsEventRemoveAccessor()) return;
 					break;
 			}
 
 			throw new ArgumentException(
 				string.Format(
 					CultureInfo.CurrentCulture,
-					Resources.SetupNotEventDetach,
+					Resources.SetupNotEventRemove,
 					expression.ToStringFixed()),
 				paramName);
 		}
@@ -171,6 +171,15 @@ namespace Moq
 					typeToAssign,
 					targetType), paramName);
 			}
+		}
+
+		public static void NotField(MemberExpression memberAccess)
+		{
+			if (memberAccess.Member is FieldInfo)
+				throw new NotSupportedException(
+					string.Format(
+						Resources.FieldsNotSupported,
+						memberAccess.ToStringFixed()));
 		}
 
 		public static void Mockable(Type type)

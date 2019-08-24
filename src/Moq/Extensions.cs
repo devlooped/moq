@@ -44,34 +44,28 @@ namespace Moq
 			return method.IsStatic && method.IsDefined(typeof(ExtensionAttribute));
 		}
 
-		public static bool IsPropertyGetter(this MethodInfo method)
+		public static bool IsGetAccessor(this MethodInfo method)
 		{
 			return method.IsSpecialName && method.Name.StartsWith("get_", StringComparison.Ordinal);
 		}
 
-		public static bool IsPropertyIndexerGetter(this MethodInfo method)
-		{
-			return method.IsSpecialName && method.Name.StartsWith("get_", StringComparison.Ordinal) && method.GetParameters().Length > 0;
-		}
-
-		public static bool IsPropertyIndexerSetter(this MethodInfo method)
-		{
-			return method.IsSpecialName && method.Name.StartsWith("set_", StringComparison.Ordinal) && method.GetParameters().Length > 1;
-		}
-
-		public static bool IsPropertySetter(this MethodInfo method)
+		public static bool IsSetAccessor(this MethodInfo method)
 		{
 			return method.IsSpecialName && method.Name.StartsWith("set_", StringComparison.Ordinal);
 		}
 
+		public static bool IsIndexerAccessor(this MethodInfo method)
+		{
+			var parameterCount = method.GetParameters().Length;
+			return (method.IsGetAccessor() && parameterCount > 0)
+			    || (method.IsSetAccessor() && parameterCount > 1);
+		}
+
 		public static bool IsPropertyAccessor(this MethodInfo method)
 		{
-			return method.IsPropertyGetter() || method.IsPropertySetter();
-		}
-		
-		public static bool IsPropertyIndexerAccessor(this MethodInfo method)
-		{
-			return method.IsPropertyIndexerGetter() || method.IsPropertyIndexerSetter();
+			var parameterCount = method.GetParameters().Length;
+			return (method.IsGetAccessor() && parameterCount == 0)
+			    || (method.IsSetAccessor() && parameterCount == 1);
 		}
 
 		// NOTE: The following two methods used to first check whether `method.IsSpecialName` was set
@@ -88,12 +82,12 @@ namespace Moq
 		//      - https://code.google.com/archive/p/moq/issues/238
 		//      - the unit tests in `FSharpCompatibilityFixture`
 
-		public static bool LooksLikeEventAttach(this MethodInfo method)
+		public static bool IsEventAddAccessor(this MethodInfo method)
 		{
 			return method.Name.StartsWith("add_", StringComparison.Ordinal);
 		}
 
-		public static bool LooksLikeEventDetach(this MethodInfo method)
+		public static bool IsEventRemoveAccessor(this MethodInfo method)
 		{
 			return method.Name.StartsWith("remove_", StringComparison.Ordinal);
 		}
@@ -105,15 +99,6 @@ namespace Moq
 		{
 			Debug.Assert(type != null);
 			return type.BaseType == typeof(MulticastDelegate);
-		}
-
-		public static void ThrowIfNotMockeable(this MemberExpression memberAccess)
-		{
-			if (memberAccess.Member is FieldInfo)
-				throw new NotSupportedException(string.Format(
-					CultureInfo.CurrentCulture,
-					Resources.FieldsNotSupported,
-					memberAccess.ToStringFixed()));
 		}
 
 		public static bool IsMockeable(this Type typeToMock)

@@ -138,11 +138,11 @@ namespace Moq
 			builder.AppendNameOf(method.DeclaringType);
 			builder.Append('.');
 
-			if (method.IsPropertyGetter())
+			if (method.IsGetAccessor())
 			{
 				builder.Append(method.Name, 4, method.Name.Length - 4);
 			}
-			else if (method.IsPropertySetter())
+			else if (method.IsSetAccessor())
 			{
 				builder.Append(method.Name, 4, method.Name.Length - 4);
 				builder.Append(" = ");

@@ -117,7 +117,7 @@ namespace Moq.Linq
 			{
 				case ExpressionType.MemberAccess:
 					var member = (MemberExpression)left;
-					member.ThrowIfNotMockeable();
+					Guard.NotField(member);
 
 					return ConvertToSetupProperty(member.Expression, member, right);
 

@@ -151,7 +151,7 @@ namespace Moq
 			if (setup.Body.NodeType == ExpressionType.MemberAccess)
 			{
 				var memberExpr = ((MemberExpression)setup.Body);
-				memberExpr.ThrowIfNotMockeable();
+				Guard.NotField(memberExpr);
 
 				info = ((PropertyInfo)memberExpr.Member).GetGetMethod();
 				arguments = new Expression[0];

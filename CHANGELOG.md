@@ -17,6 +17,8 @@ The format is loosely based on [Keep a Changelog](http://keepachangelog.com/en/1
 
 * Subscription to mocked events used to be handled less strictly than subscription to regular CLI events. As with the latter, subscribing to mocked events now also requires all handlers to have the same delegate type. (@stakx, #891)
 
+* Moq will throw when it detects that an argument matcher will never match anything due to the presence of an implicit conversion operator. (@michelcedric, #897, #898)
+
 #### Added
 
 * Added support for setup and verification of the event handlers through `Setup[Add|Remove]` and `Verify[Add|Remove|All]` (@lepijohnny, #825) 
@@ -32,6 +34,8 @@ The format is loosely based on [Keep a Changelog](http://keepachangelog.com/en/1
 * Regression: `MockDefaultValueProvider` will no longer attempt to set `CallBase` to true for mocks generated for delegates. (@dammejed, #874)
 
 * `Verify` throws `TargetInvocationException` instead of `MockException` when one of the recorded invocations was to an async method that threw. (@Cufeadir, #883)
+
+* Regression in 4.12.0: `SetupAllProperties` removes indexer setups. (@stakx, #901)
 
 
 ## 4.12.0 (2019-06-20)

@@ -79,6 +79,15 @@ namespace Moq.Properties {
         }
         
         /// <summary>
+        ///   Looks up a localized string similar to Matcher &apos;{0}&apos; is unmatchable: An implicit conversion operator will convert arguments of type &apos;{1}&apos; to the parameter&apos;s type &apos;{2}&apos;, which is assignment-incompatible..
+        /// </summary>
+        internal static string ArgumentMatcherWillNeverMatch {
+            get {
+                return ResourceManager.GetString("ArgumentMatcherWillNeverMatch", resourceCulture);
+            }
+        }
+        
+        /// <summary>
         ///   Looks up a localized string similar to Can only add interfaces to the mock..
         /// </summary>
         internal static string AsMustBeInterface {
@@ -565,18 +574,18 @@ namespace Moq.Properties {
         /// <summary>
         ///   Looks up a localized string similar to Expression is not an event add: {0}.
         /// </summary>
-        internal static string SetupNotEventAttach {
+        internal static string SetupNotEventAdd {
             get {
-                return ResourceManager.GetString("SetupNotEventAttach", resourceCulture);
+                return ResourceManager.GetString("SetupNotEventAdd", resourceCulture);
             }
         }
         
         /// <summary>
         ///   Looks up a localized string similar to Expression is not an event remove: {0}.
         /// </summary>
-        internal static string SetupNotEventDetach {
+        internal static string SetupNotEventRemove {
             get {
-                return ResourceManager.GetString("SetupNotEventDetach", resourceCulture);
+                return ResourceManager.GetString("SetupNotEventRemove", resourceCulture);
             }
         }
         
