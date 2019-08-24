@@ -36,7 +36,7 @@ namespace Moq
 			throw new ArgumentException(
 				string.Format(
 					CultureInfo.CurrentCulture,
-					Resources.SetupNotProperty,
+					Resources.SetupNotSetter,
 					expression.ToStringFixed()),
 				paramName);
 		}

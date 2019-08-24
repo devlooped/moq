@@ -2366,7 +2366,7 @@ namespace Moq.Tests.Regressions
 				Language.Flow.ISetup<Action> setup = mock.Setup(m => m());
 				
 				Exception ex = Assert.Throws<NotSupportedException>(() => setup.CallBase());
-				Assert.Equal(string.Format(CultureInfo.CurrentCulture, Resources.CallBaseCannotBeUsedWithDelegateMocks), ex.Message);
+				Assert.Equal(Resources.CallBaseCannotBeUsedWithDelegateMocks, ex.Message);
 			}
 			
 			[Fact]
@@ -2376,7 +2376,7 @@ namespace Moq.Tests.Regressions
 				Language.Flow.ISetup<Func<bool>, bool> setup = mock.Setup(m => m());
 
 				Exception ex = Assert.Throws<NotSupportedException>(() => setup.CallBase());
-				Assert.Equal(string.Format(CultureInfo.CurrentCulture, Resources.CallBaseCannotBeUsedWithDelegateMocks), ex.Message);
+				Assert.Equal(Resources.CallBaseCannotBeUsedWithDelegateMocks, ex.Message);
 			}
 
 			[Fact]
@@ -2385,7 +2385,7 @@ namespace Moq.Tests.Regressions
 				Mock<Action> mock = new Mock<Action>();
 
 				Exception ex = Assert.Throws<NotSupportedException>(() => mock.CallBase = true);
-				Assert.Equal(string.Format(CultureInfo.CurrentCulture, Resources.CallBaseCannotBeUsedWithDelegateMocks), ex.Message);
+				Assert.Equal(Resources.CallBaseCannotBeUsedWithDelegateMocks, ex.Message);
 			}
 
 			[Fact]

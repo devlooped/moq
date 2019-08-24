@@ -151,24 +151,6 @@ namespace Moq.Properties {
         }
         
         /// <summary>
-        ///   Looks up a localized string similar to Could not locate event for attach or detach method {0}..
-        /// </summary>
-        internal static string EventNotFound {
-            get {
-                return ResourceManager.GetString("EventNotFound", resourceCulture);
-            }
-        }
-        
-        /// <summary>
-        ///   Looks up a localized string similar to Expression is not an event attach or detach, or the event is declared in a class but not marked virtual..
-        /// </summary>
-        internal static string ExpressionIsNotEventAttachOrDetachOrIsNotVirtual {
-            get {
-                return ResourceManager.GetString("ExpressionIsNotEventAttachOrDetachOrIsNotVirtual", resourceCulture);
-            }
-        }
-        
-        /// <summary>
         ///   Looks up a localized string similar to Expression {0} involves a field access, which is not supported. Use properties instead..
         /// </summary>
         internal static string FieldsNotSupported {
@@ -338,24 +320,6 @@ namespace Moq.Properties {
         }
         
         /// <summary>
-        ///   Looks up a localized string similar to Expected only {0} calls to {1}..
-        /// </summary>
-        internal static string MoreThanNCalls {
-            get {
-                return ResourceManager.GetString("MoreThanNCalls", resourceCulture);
-            }
-        }
-        
-        /// <summary>
-        ///   Looks up a localized string similar to Expected only one call to {0}..
-        /// </summary>
-        internal static string MoreThanOneCall {
-            get {
-                return ResourceManager.GetString("MoreThanOneCall", resourceCulture);
-            }
-        }
-        
-        /// <summary>
         ///   Looks up a localized string similar to The next member after the last one shown above is non-virtual, sealed, or not visible to the proxy factory..
         /// </summary>
         internal static string NextMemberNonInterceptable {
@@ -464,15 +428,6 @@ namespace Moq.Properties {
         }
         
         /// <summary>
-        ///   Looks up a localized string similar to No setups configured..
-        /// </summary>
-        internal static string NoSetupsConfigured {
-            get {
-                return ResourceManager.GetString("NoSetupsConfigured", resourceCulture);
-            }
-        }
-        
-        /// <summary>
         ///   Looks up a localized string similar to Object instance was not created by Moq..
         /// </summary>
         internal static string ObjectInstanceNotMock {
@@ -527,15 +482,6 @@ namespace Moq.Properties {
         }
         
         /// <summary>
-        ///   Looks up a localized string similar to Cannot raise a mocked event unless it has been associated (attached) to a concrete event in a mocked object..
-        /// </summary>
-        internal static string RaisedUnassociatedEvent {
-            get {
-                return ResourceManager.GetString("RaisedUnassociatedEvent", resourceCulture);
-            }
-        }
-        
-        /// <summary>
         ///   Looks up a localized string similar to Ref expression must evaluate to a constant value..
         /// </summary>
         internal static string RefExpressionMustBeConstantValue {
@@ -572,15 +518,6 @@ namespace Moq.Properties {
         }
         
         /// <summary>
-        ///   Looks up a localized string similar to Expression is not a method invocation: {0}.
-        /// </summary>
-        internal static string SetupNotMethod {
-            get {
-                return ResourceManager.GetString("SetupNotMethod", resourceCulture);
-            }
-        }
-        
-        /// <summary>
         ///   Looks up a localized string similar to Expression is not a property access: {0}.
         /// </summary>
         internal static string SetupNotProperty {
@@ -590,7 +527,7 @@ namespace Moq.Properties {
         }
         
         /// <summary>
-        ///   Looks up a localized string similar to Expression is not a property setter invocation..
+        ///   Looks up a localized string similar to Expression is not a setter: {0}.
         /// </summary>
         internal static string SetupNotSetter {
             get {

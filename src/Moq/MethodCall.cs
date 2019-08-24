@@ -149,7 +149,7 @@ namespace Moq
 		{
 			if (this.Mock.TargetType.IsDelegateType())
 			{
-				throw new NotSupportedException(string.Format(CultureInfo.CurrentCulture, Resources.CallBaseCannotBeUsedWithDelegateMocks));
+				throw new NotSupportedException(Resources.CallBaseCannotBeUsedWithDelegateMocks);
 			}
 
 			if ((this.flags & Flags.MethodIsNonVoid) != 0)
