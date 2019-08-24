@@ -28,7 +28,11 @@ namespace Moq
 		public readonly IReadOnlyList<Expression> Arguments;
 
 		private readonly IMatcher[] argumentMatchers;
+		private MethodInfo methodImplementation;
 		private Expression[] partiallyEvaluatedArguments;
+#if DEBUG
+		private Type proxyType;
+#endif
 
 		public InvocationShape(LambdaExpression expression, MethodInfo method, IReadOnlyList<Expression> arguments = null)
 		{
@@ -94,11 +98,29 @@ namespace Moq
 			var invocationMethod = invocation.Method;
 
 			var proxyType = invocation.ProxyType;
+#if DEBUG
+			// The following `if` block is a sanity check to ensure this `InvocationShape` always
+			// runs against the same proxy type. This is important because we're caching the result
+			// of mapping methods into that particular proxy type. We have no cache invalidation
+			// logic in place; instead, we simply assume that the cached results will stay valid.
+			// If the below assertion fails, that assumption was wrong.
+			if (this.proxyType == null)
+			{
+				this.proxyType = proxyType;
+			}
+			else
+			{
+				Debug.Assert(this.proxyType == proxyType);
+			}
+#endif
 
-			var invocationMethodImplementation = invocationMethod.GetImplementingMethod(proxyType);
-			var methodImplementation = method.GetImplementingMethod(proxyType);
+			// If not already in the cache, map this `InvocationShape`'s method into the proxy type:
+			if (this.methodImplementation == null)
+			{
+				this.methodImplementation = method.GetImplementingMethod(proxyType);
+			}
 
-			if (invocationMethodImplementation != methodImplementation)
+			if (invocation.MethodImplementation != this.methodImplementation)
 			{
 				return false;
 			}

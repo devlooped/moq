@@ -11,9 +11,10 @@ namespace Moq
 {
 	internal abstract class Invocation : IInvocation
 	{
-		private readonly Type proxyType;
 		private object[] arguments;
 		private MethodInfo method;
+		private MethodInfo methodImplementation;
+		private readonly Type proxyType;
 		private object returnValue;
 		private VerificationState verificationState;
 
@@ -29,15 +30,28 @@ namespace Moq
 			Debug.Assert(arguments != null);
 			Debug.Assert(method != null);
 
-			this.proxyType = proxyType;
 			this.arguments = arguments;
 			this.method = method;
+			this.proxyType = proxyType;
 		}
 
 		/// <summary>
 		/// Gets the method of the invocation.
 		/// </summary>
 		public MethodInfo Method => this.method;
+
+		public MethodInfo MethodImplementation
+		{
+			get
+			{
+				if (this.methodImplementation == null)
+				{
+					this.methodImplementation = this.method.GetImplementingMethod(this.proxyType);
+				}
+
+				return this.methodImplementation;
+			}
+		}
 
 		/// <summary>
 		/// Gets the arguments of the invocation.
