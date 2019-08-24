@@ -567,7 +567,7 @@ namespace Moq
 							string.Format(
 								CultureInfo.CurrentCulture,
 								Resources.UnsupportedExpression,
-								expr.ToStringFixed() + " in " + expression.ToStringFixed() + ":\n" + Resources.InvalidMockClass));
+								expr.ToStringFixed() + " in " + expression.ToStringFixed() + ":\n" + Resources.TypeNotMockable));
 					}
 					setup = new InnerMockSetup(expectation: part, returnValue);
 					mock.Setups.Add((Setup)setup);

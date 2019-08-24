@@ -120,8 +120,8 @@
 	<data name="FieldsNotSupported" xml:space="preserve">
 		<value>Expression {0} involves a field access, which is not supported. Use properties instead.</value>
 	</data>
-	<data name="InvalidMockClass" xml:space="preserve">
-		<value>Type to mock must be an interface or an abstract or non-sealed class. </value>
+  <data name="TypeNotMockable" xml:space="preserve">
+    <value>Type to mock must be an interface, a delegate, or a non-sealed, non-static class.</value>
 	</data>
 	<data name="MockExceptionMessage" xml:space="preserve">
 		<value>{0} invocation failed with mock behavior {1}.
