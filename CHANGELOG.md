@@ -27,6 +27,36 @@ The format is loosely based on [Keep a Changelog](http://keepachangelog.com/en/1
 
 * Added support for lambda expressions while creating a mock through `new Mock<SomeType>(() => new SomeType("a", "b"))` and `repository.Create<SomeType>(() => new SomeType("a", "b"))`. This makes the process of mocking a class without a parameterless constructor simpler (compiler syntax checker...). (@frblondin, #884)
 
+* Support for matching generic type arguments: `mock.Setup(m => m.Method<It.IsAnyType>(...))`. (@stakx, #908)
+
+   The standard type matchers are:
+
+   - `It.IsAnyType` &mdash; matches any type
+   - `It.IsSubtype<T>` &mdash; matches `T` and proper subtypes of `T`
+   - `It.IsValueType` &mdash; matches only value types
+
+   You can create your own custom type matchers:
+
+   ```csharp
+   [TypeMatcher]
+   class Either<A, B> : ITypeMatcher
+   {
+       public bool Matches(Type type) => type == typeof(A) || type == typeof(B);
+   }
+   ```
+
+* In order to support type matchers (see bullet point above), some new overloads have been added to existing methods:
+
+   - `setup.Callback(new InvocationAction(invocation => ...))`,  
+     `setup.Returns(new InvocationFunc(invocation => ...))`:
+
+      The lambda specified in these new overloads will receive an `IInvocation` representing the current invocation from which type arguments as well as arguments can be discovered.
+
+   - `Match.Create<T>((object argument, Type parameterType) => ..., ...)`,  
+     `It.Is<T>((object argument, Type parameterType) => ...)`:
+
+      Used to create custom matchers that work with type matchers. When a type matcher is used for `T`, the `argument` received by the custom matchers is untyped (`object`), and its actual type (or rather the type of the parameter for which the argument was passed) is provided via an additional parameter `parameterType`. (@stakx, #908)
+
 #### Fixed
 
 * Moq does not mock explicit interface implementation and `protected virtual` correctly. (@oddbear, #657)
