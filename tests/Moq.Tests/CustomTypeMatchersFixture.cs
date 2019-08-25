@@ -75,9 +75,26 @@ namespace Moq.Tests
 			mock.Verify(x => x.Method<PickyIntOrString>(), Times.Exactly(3));
 		}
 
+		[Fact]
+		public void Must_use_custom_type_matcher_when_type_constraints_present()
+		{
+			var mock = new Mock<IY>();
+			//mock.Setup(y => y.Method<It.IsAnyType>());  // wouldn't work because of the type constraint
+			mock.Setup(y => y.Method<AnyException>());
+
+			mock.Object.Method<ArgumentException>();
+
+			mock.VerifyAll();
+		}
+
 		public interface IX
 		{
 			void Method<T>();
+		}
+
+		public interface IY
+		{
+			void Method<TException>() where TException : Exception;
 		}
 
 		public sealed class IntOrString : ITypeMatcher
@@ -107,6 +124,14 @@ namespace Moq.Tests
 			public bool Matches(Type typeArgument)
 			{
 				return Array.IndexOf(this.types, typeArgument) >= 0;
+			}
+		}
+
+		public class AnyException : Exception, ITypeMatcher
+		{
+			public bool Matches(Type typeArgument)
+			{
+				return true;
 			}
 		}
 	}
