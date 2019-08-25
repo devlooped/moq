@@ -61,6 +61,20 @@ namespace Moq.Tests
 			Assert.Contains("Picky does not have a default (public parameterless) constructor", ex.Message);
 		}
 
+		[Fact]
+		public void Can_use_type_matcher_derived_from_one_having_a_parameterized_constructor()
+		{
+			var mock = new Mock<IX>();
+
+			mock.Object.Method<bool>();
+			mock.Object.Method<int>();
+			mock.Object.Method<object>();
+			mock.Object.Method<string>();
+			mock.Object.Method<string>();
+
+			mock.Verify(x => x.Method<PickyIntOrString>(), Times.Exactly(3));
+		}
+
 		public interface IX
 		{
 			void Method<T>();
@@ -71,6 +85,13 @@ namespace Moq.Tests
 			public bool Matches(Type typeArgument)
 			{
 				return typeArgument == typeof(int) || typeArgument == typeof(string);
+			}
+		}
+
+		public sealed class PickyIntOrString : Picky
+		{
+			public PickyIntOrString() : base(typeof(int), typeof(string))
+			{
 			}
 		}
 
