@@ -301,12 +301,16 @@ namespace Moq
 
 				if (!expectedReturnType.IsAssignableFrom(actualReturnType))
 				{
-					throw new ArgumentException(
-						string.Format(
-							CultureInfo.CurrentCulture,
-							Resources.InvalidCallbackReturnTypeMismatch,
-							expectedReturnType,
-							actualReturnType));
+					// TODO: If the return type is a matcher, does the callback's return type need to be matched against it?
+					if (typeof(ITypeMatcher).IsAssignableFrom(expectedReturnType) == false)
+					{
+						throw new ArgumentException(
+							string.Format(
+								CultureInfo.CurrentCulture,
+								Resources.InvalidCallbackReturnTypeMismatch,
+								expectedReturnType,
+								actualReturnType));
+					}
 				}
 			}
 		}
