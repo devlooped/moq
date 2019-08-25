@@ -58,6 +58,17 @@ namespace Moq
 		}
 
 		/// <summary>
+		///   A type matcher that matches any generic type argument.
+		/// </summary>
+		public sealed class IsAnyType : ITypeMatcher
+		{
+			bool ITypeMatcher.Matches(Type type)
+			{
+				return true;
+			}
+		}
+
+		/// <summary>
 		///   Matches any value of the given <typeparamref name="TValue"/> type, except null.
 		/// </summary>
 		/// <typeparam name="TValue">Type of the value.</typeparam>

@@ -127,7 +127,7 @@ namespace Moq
 
 			if (method.IsGenericMethod || invocationMethod.IsGenericMethod)
 			{
-				if (!method.GetGenericArguments().CompareTo(invocationMethod.GetGenericArguments(), exact: false))
+				if (!method.GetGenericArguments().CompareTo(invocationMethod.GetGenericArguments(), TypeComparison.TypeMatchersOrElseAssignmentCompatibility))
 				{
 					return false;
 				}
