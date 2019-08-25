@@ -19,7 +19,7 @@ namespace Moq.Properties {
     // class via a tool like ResGen or Visual Studio.
     // To add or remove a member, edit your .ResX file then rerun ResGen
     // with the /str option, or rebuild your VS project.
-    [global::System.CodeDom.Compiler.GeneratedCodeAttribute("System.Resources.Tools.StronglyTypedResourceBuilder", "16.0.0.0")]
+    [global::System.CodeDom.Compiler.GeneratedCodeAttribute("System.Resources.Tools.StronglyTypedResourceBuilder", "15.0.0.0")]
     [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
     [global::System.Runtime.CompilerServices.CompilerGeneratedAttribute()]
     internal class Resources {
@@ -541,6 +541,15 @@ namespace Moq.Properties {
         internal static string SetupNotSetter {
             get {
                 return ResourceManager.GetString("SetupNotSetter", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Type {0} does not have a default (public parameterless) constructor..
+        /// </summary>
+        internal static string TypeHasNoDefaultConstructor {
+            get {
+                return ResourceManager.GetString("TypeHasNoDefaultConstructor", resourceCulture);
             }
         }
         

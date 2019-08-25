@@ -6,13 +6,14 @@ using System.Collections.Generic;
 using System.Diagnostics;
 using System.Globalization;
 using System.Linq;
-using System.Linq.Expressions;
 using System.Reflection;
 using System.Runtime.CompilerServices;
 using System.Runtime.ExceptionServices;
 using System.Text;
 
 using Moq.Properties;
+
+using TypeNameFormatter;
 
 namespace Moq
 {
@@ -214,7 +215,14 @@ namespace Moq
 					{
 						if (typeof(ITypeMatcher).IsAssignableFrom(types[i]))
 						{
-							Debug.Assert(types[i].GetConstructor(Type.EmptyTypes) != null);
+							if (types[i].GetConstructor(Type.EmptyTypes) == null)
+							{
+								throw new ArgumentException(
+									string.Format(
+										CultureInfo.CurrentCulture,
+										Resources.TypeHasNoDefaultConstructor,
+										types[i].GetFormattedName()));
+							}
 
 							var typeMatcher = (ITypeMatcher)Activator.CreateInstance(types[i]);
 							if (typeMatcher.Matches(otherTypes[i]) == false)

@@ -5,7 +5,7 @@ namespace Moq
 	/// <summary>
 	///   A type matcher represents a criterion against which generic type arguments are matched.
 	/// </summary>
-	internal interface ITypeMatcher
+	public interface ITypeMatcher
 	{
 		/// <summary>
 		///   Matches the provided type argument against the criterion represented by this type matcher.
