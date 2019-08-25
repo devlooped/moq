@@ -11,6 +11,12 @@ namespace Moq.Language.Flow
 		{
 		}
 
+		public new IReturnsThrows<T, TResult> Callback(InvocationAction action)
+		{
+			this.Setup.SetCallbackResponse(action.Action);
+			return this;
+		}
+
 		public new IReturnsThrows<T, TResult> Callback(Delegate callback)
 		{
 			this.Setup.SetCallbackResponse(callback);
@@ -248,6 +254,12 @@ namespace Moq.Language.Flow
 		public IReturnsResult<T> Returns(TResult value)
 		{
 			this.Setup.SetEagerReturnsResponse(value);
+			return this;
+		}
+
+		public IReturnsResult<T> Returns(InvocationFunc valueFunction)
+		{
+			this.Setup.SetReturnsResponse(valueFunction.Func);
 			return this;
 		}
 

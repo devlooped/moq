@@ -3,6 +3,7 @@
 
 using System;
 using System.ComponentModel;
+
 using Moq.Language.Flow;
 
 namespace Moq.Language
@@ -13,6 +14,32 @@ namespace Moq.Language
 	[EditorBrowsable(EditorBrowsableState.Never)]
 	public partial interface ICallback : IFluentInterface
 	{
+		/// <summary>
+		///   Specifies a callback to invoke when the method is called that receives the original <see cref="IInvocation"/>.
+		///   <para>
+		///     This overload is intended to be used in scenarios involving generic type argument matchers
+		///     (such as <see cref="It.IsAnyType"/>). The callback will receive the current <see cref="IInvocation"/>,
+		///     which allows discovery of both arguments and type arguments.
+		///   </para>
+		///   <para>
+		///     For all other use cases, you should prefer the other <c>Callback</c> overloads as they provide
+		///     better static type safety.
+		///   </para>
+		/// </summary>
+		/// <example>
+		///   <code>
+		///     Figure out the generic type argument used for a mocked method call:
+		///     mock.Setup(m => m.DoSomethingWith&lt;It.IsAnyType&gt;(...))
+		///         .Callback(new InvocationAction(invocation =>
+		///                  {
+		///                      var typeArgument = invocation.Method.GetGenericArguments()[0];
+		///                      // do something interesting with the type argument
+		///                  });
+		///     mock.Object.DoSomethingWith&lt;Something&gt;();
+		///   </code>
+		/// </example>
+		ICallbackResult Callback(InvocationAction action);
+
 		/// <summary>
 		/// Specifies a callback of any delegate type to invoke when the method is called.
 		/// This overload specifically allows you to define callbacks for methods with by-ref parameters.
@@ -76,6 +103,32 @@ namespace Moq.Language
 	public partial interface ICallback<TMock, TResult> : IFluentInterface
 		where TMock : class
 	{
+		/// <summary>
+		///   Specifies a callback to invoke when the method is called that receives the original <see cref="IInvocation"/>.
+		///   <para>
+		///     This overload is intended to be used in scenarios involving generic type argument matchers
+		///     (such as <see cref="It.IsAnyType"/>). The callback will receive the current <see cref="IInvocation"/>,
+		///     which allows discovery of both arguments and type arguments.
+		///   </para>
+		///   <para>
+		///     For all other use cases, you should prefer the other <c>Callback</c> overloads as they provide
+		///     better static type safety.
+		///   </para>
+		/// </summary>
+		/// <example>
+		///     Figure out the generic type argument used for a mocked method call:
+		///   <code>
+		///     mock.Setup(m => m.DoSomethingWith&lt;It.IsAnyType&gt;(...))
+		///         .Callback(new InvocationAction(invocation =>
+		///                  {
+		///                      var typeArgument = invocation.Method.GetGenericArguments()[0];
+		///                      // do something interesting with the type argument
+		///                  });
+		///     mock.Object.DoSomethingWith&lt;Something&gt;();
+		///   </code>
+		/// </example>
+		IReturnsThrows<TMock, TResult> Callback(InvocationAction action);
+
 		/// <summary>
 		/// Specifies a callback of any delegate type to invoke when the method is called.
 		/// This overload specifically allows you to define callbacks for methods with by-ref parameters.

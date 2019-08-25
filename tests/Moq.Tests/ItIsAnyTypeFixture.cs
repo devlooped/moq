@@ -95,6 +95,37 @@ namespace Moq.Tests
 			Assert.Empty((int[])result);
 		}
 
+		[Fact]
+		public void Type_arguments_can_be_discovered_in_Callback_through_a_InvocationAction_callback()
+		{
+			Type typeArgument = null;
+			var mock = new Mock<IZ>();
+			mock.Setup(z => z.Method<It.IsAnyType>()).Callback(new InvocationAction(invocation =>
+			{
+				typeArgument = invocation.Method.GetGenericArguments()[0];
+			}));
+
+			_ = mock.Object.Method<string>();
+
+			Assert.Equal(typeof(string), typeArgument);
+		}
+
+		[Fact]
+		public void Type_arguments_can_be_discovered_in_Returns_through_a_InvocationFunc_callback()
+		{
+			var mock = new Mock<IZ>();
+			mock.Setup(z => z.Method<It.IsAnyType>()).Returns(new InvocationFunc(invocation =>
+			{
+				var typeArgument = invocation.Method.GetGenericArguments()[0];
+				return Activator.CreateInstance(typeArgument);
+			}));
+
+			var result = mock.Object.Method<DateTime>();
+
+			Assert.IsType<DateTime>(result);
+			Assert.Equal(default(DateTime), result);
+		}
+
 		public interface IX
 		{
 			void Method<T>();
@@ -103,6 +134,11 @@ namespace Moq.Tests
 		public interface IY
 		{
 			T Method<T>(T arg);
+		}
+
+		public interface IZ
+		{
+			T Method<T>();
 		}
 	}
 }
