@@ -1538,7 +1538,38 @@ namespace Moq.Tests.Regressions
 			}
 		}
 
-#endregion
+		#endregion
+
+		#region 343
+
+		public class Issue343
+		{
+			public class Fruit { }
+			public class Apple : Fruit { }
+			public class GreenApple : Apple { }
+			public class Orange : Fruit { }
+
+			public interface IFruitPicker
+			{
+				TFruit Pick<TFruit>() where TFruit : Fruit;
+			}
+
+			[Fact]
+			public void Return_type_variance_of_generic_method_setup()
+			{
+				var fruitPicker = new Mock<IFruitPicker>();
+				fruitPicker.Setup(m => m.Pick<Fruit>()).Returns(new Fruit());
+				fruitPicker.Setup(m => m.Pick<Apple>()).Returns(new GreenApple()); // set up method `Apple Pick<Apple>()`
+				fruitPicker.Setup(m => m.Pick<Orange>()).Returns(new Orange());
+
+				Assert.IsType<Fruit>(fruitPicker.Object.Pick<Fruit>());
+				Assert.IsType<GreenApple>(fruitPicker.Object.Pick<Apple>());
+				Assert.IsType<GreenApple>(fruitPicker.Object.Pick<GreenApple>()); // call method `GreenApple Pick<GreenApple>()` -- will the setup be matched despite the type difference?
+				Assert.IsType<Orange>(fruitPicker.Object.Pick<Orange>());
+			}
+		}
+
+		#endregion
 
 		#region 383
 
