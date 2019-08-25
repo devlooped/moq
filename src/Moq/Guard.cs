@@ -16,6 +16,18 @@ namespace Moq
 	[DebuggerStepThrough]
 	internal static class Guard
 	{
+		public static void HasDefaultConstructor(Type type)
+		{
+			if (!type.HasDefaultConstructor())
+			{
+				throw new ArgumentException(
+					string.Format(
+						CultureInfo.CurrentCulture,
+						Resources.TypeHasNoDefaultConstructor,
+						type.GetFormattedName()));
+			}
+		}
+
 		public static void IsAssignmentToPropertyOrIndexer(LambdaExpression expression, string paramName)
 		{
 			Debug.Assert(expression != null);

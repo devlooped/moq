@@ -40,15 +40,24 @@ namespace Moq.Tests
 		}
 
 		[Fact]
-		public void Cannot_use_type_matcher_with_parameterized_constructor_directly()
+		public void Cannot_use_type_matcher_with_parameterized_constructor_directly_in_Setup()
 		{
 			var mock = new Mock<IX>();
-			mock.Setup(x => x.Method<Picky>());
 
-			// TODO: Ideally, failure should occur as early as possible, i.e. during setup.
-			Action invocation = () => mock.Object.Method<object>();
+			Action setup = () => mock.Setup(x => x.Method<Picky>());
 
-			var ex = Assert.Throws<ArgumentException>(invocation);
+			var ex = Assert.Throws<ArgumentException>(setup);
+			Assert.Contains("Picky does not have a default (public parameterless) constructor", ex.Message);
+		}
+
+		[Fact]
+		public void Cannot_use_type_matcher_with_parameterized_constructor_directly_in_Verify()
+		{
+			var mock = new Mock<IX>();
+
+			Action verify = () => mock.Verify(x => x.Method<Picky>(), Times.Never);
+
+			var ex = Assert.Throws<ArgumentException>(verify);
 			Assert.Contains("Picky does not have a default (public parameterless) constructor", ex.Message);
 		}
 

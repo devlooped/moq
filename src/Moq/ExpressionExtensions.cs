@@ -201,6 +201,18 @@ namespace Moq
 					case ExpressionType.Call:  // regular method call
 					{
 						var methodCallExpression = (MethodCallExpression)e;
+
+						if (methodCallExpression.Method.IsGenericMethod)
+						{
+							foreach (var typeArgument in methodCallExpression.Method.GetGenericArguments())
+							{
+								if (typeArgument.IsTypeMatcher())
+								{
+									Guard.HasDefaultConstructor(typeArgument);
+								}
+							}
+						}
+
 						if (!methodCallExpression.Method.IsStatic)
 						{
 							r = methodCallExpression.Object;

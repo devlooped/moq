@@ -65,6 +65,11 @@ namespace Moq
 			}
 		}
 
+		public static bool HasDefaultConstructor(this Type type)
+		{
+			return type.GetConstructor(Type.EmptyTypes) != null;
+		}
+
 		public static object InvokePreserveStack(this Delegate del, params object[] args)
 		{
 			try
@@ -145,6 +150,11 @@ namespace Moq
 			return !type.IsSealed || type.IsDelegateType();
 		}
 
+		public static bool IsTypeMatcher(this Type type)
+		{
+			return typeof(ITypeMatcher).IsAssignableFrom(type);
+		}
+
 		public static bool CanOverride(this MethodBase method)
 		{
 			return method.IsVirtual && !method.IsFinal && !method.IsPrivate;
@@ -213,16 +223,9 @@ namespace Moq
 				case TypeComparison.TypeMatchersOrElseAssignmentCompatibility:
 					for (int i = 0; i < count; ++i)
 					{
-						if (typeof(ITypeMatcher).IsAssignableFrom(types[i]))
+						if (types[i].IsTypeMatcher())
 						{
-							if (types[i].GetConstructor(Type.EmptyTypes) == null)
-							{
-								throw new ArgumentException(
-									string.Format(
-										CultureInfo.CurrentCulture,
-										Resources.TypeHasNoDefaultConstructor,
-										types[i].GetFormattedName()));
-							}
+							Debug.Assert(types[i].HasDefaultConstructor());
 
 							var typeMatcher = (ITypeMatcher)Activator.CreateInstance(types[i]);
 							if (typeMatcher.Matches(otherTypes[i]) == false)
