@@ -206,9 +206,9 @@ namespace Moq
 						{
 							foreach (var typeArgument in methodCallExpression.Method.GetGenericArguments())
 							{
-								if (typeArgument.IsTypeMatcher())
+								if (typeArgument.IsTypeMatcher(out var typeMatcherType))
 								{
-									Guard.HasDefaultConstructor(typeArgument);
+									Guard.HasDefaultConstructor(typeMatcherType);
 								}
 							}
 						}

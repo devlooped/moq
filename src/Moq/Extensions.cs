@@ -150,9 +150,23 @@ namespace Moq
 			return !type.IsSealed || type.IsDelegateType();
 		}
 
-		public static bool IsTypeMatcher(this Type type)
+		public static bool IsTypeMatcher(this Type type, out Type typeMatcherType)
 		{
-			return typeof(ITypeMatcher).IsAssignableFrom(type);
+			if (typeof(ITypeMatcher).IsAssignableFrom(type))
+			{
+				typeMatcherType = type;
+				return true;
+			}
+			else if (Attribute.GetCustomAttribute(type, typeof(TypeMatcherAttribute)) is TypeMatcherAttribute attr)
+			{
+				typeMatcherType = attr.Type;
+				return true;
+			}
+			else
+			{
+				typeMatcherType = null;
+				return false;
+			}
 		}
 
 		public static bool CanOverride(this MethodBase method)
@@ -223,11 +237,11 @@ namespace Moq
 				case TypeComparison.TypeMatchersOrElseAssignmentCompatibility:
 					for (int i = 0; i < count; ++i)
 					{
-						if (types[i].IsTypeMatcher())
+						if (types[i].IsTypeMatcher(out var typeMatcherType))
 						{
-							Debug.Assert(types[i].HasDefaultConstructor());
+							Debug.Assert(typeMatcherType.HasDefaultConstructor());
 
-							var typeMatcher = (ITypeMatcher)Activator.CreateInstance(types[i]);
+							var typeMatcher = (ITypeMatcher)Activator.CreateInstance(typeMatcherType);
 							if (typeMatcher.Matches(otherTypes[i]) == false)
 							{
 								return false;

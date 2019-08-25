@@ -87,6 +87,19 @@ namespace Moq.Tests
 			mock.VerifyAll();
 		}
 
+		[Fact]
+		public void Must_use_TypeMatcherAttribute_when_type_constraints_present_that_prevents_direct_implementation_of_ITypeMatcher()
+		{
+			var mock = new Mock<IZ>();
+			mock.Setup(z => z.DelegateMethod<AnyDelegate>());
+			mock.Setup(z => z.EnumMethod<AnyEnum>());
+
+			mock.Object.DelegateMethod<Action>();
+			mock.Object.EnumMethod<AttributeTargets>();
+
+			mock.VerifyAll();
+		}
+
 		public interface IX
 		{
 			void Method<T>();
@@ -95,6 +108,12 @@ namespace Moq.Tests
 		public interface IY
 		{
 			void Method<TException>() where TException : Exception;
+		}
+
+		public interface IZ
+		{
+			void DelegateMethod<TDelegate>() where TDelegate : Delegate;
+			void EnumMethod<TEnum>() where TEnum : Enum;
 		}
 
 		public sealed class IntOrString : ITypeMatcher
@@ -134,5 +153,11 @@ namespace Moq.Tests
 				return true;
 			}
 		}
+
+		[TypeMatcher(typeof(It.IsAnyType))]
+		public enum AnyEnum { }
+
+		[TypeMatcher(typeof(It.IsAnyType))]
+		public delegate void AnyDelegate();
 	}
 }
