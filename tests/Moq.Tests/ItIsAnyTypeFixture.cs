@@ -55,6 +55,19 @@ namespace Moq.Tests
 		}
 
 		[Fact]
+		public void Setup_with_It_IsAnyType_and_Callback()
+		{
+			object received = null;
+			var mock = new Mock<IY>();
+			mock.Setup(m => m.Method<It.IsAnyType>((It.IsAnyType)It.IsAny<object>()))
+				.Callback((object arg) => received = arg);
+
+			_ = mock.Object.Method<int>(42);
+
+			Assert.Equal(42, received);
+		}
+
+		[Fact]
 		public void Setup_with_It_IsAnyType_and_Returns()
 		{
 			var mock = new Mock<IY>();
