@@ -65,6 +65,23 @@ namespace Moq.Tests
 			Assert.Equal("42", mock.Object.Method<string>("42"));
 		}
 
+		[Fact]
+		public void Setup_with_It_IsAnyType_default_return_value()
+		{
+			var mock = new Mock<IY>() { DefaultValue = DefaultValue.Empty };
+			mock.Setup(m => m.Method<It.IsAnyType>((It.IsAnyType)It.IsAny<object>()));
+
+			var result = mock.Object.Method<int[]>(null);
+
+			// Let's make sure that default value providers don't suddenly start producing `It.IsAnyType` instances:
+			Assert.IsNotType<It.IsAnyType>(result);
+
+			// Rather, we expect the usual behavior:
+			Assert.NotNull(result);
+			Assert.IsType<int[]>(result);
+			Assert.Empty((int[])result);
+		}
+
 		public interface IX
 		{
 			void Method<T>();
