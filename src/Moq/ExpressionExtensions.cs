@@ -208,7 +208,7 @@ namespace Moq
 							{
 								if (typeArgument.IsTypeMatcher(out var typeMatcherType))
 								{
-									Guard.HasDefaultConstructor(typeMatcherType);
+									Guard.CanCreateInstance(typeMatcherType);
 								}
 							}
 						}

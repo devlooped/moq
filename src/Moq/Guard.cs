@@ -16,9 +16,9 @@ namespace Moq
 	[DebuggerStepThrough]
 	internal static class Guard
 	{
-		public static void HasDefaultConstructor(Type type)
+		public static void CanCreateInstance(Type type)
 		{
-			if (!type.HasDefaultConstructor())
+			if (!type.CanCreateInstance())
 			{
 				throw new ArgumentException(
 					string.Format(

@@ -4,21 +4,21 @@
 using System;
 using System.Collections.Generic;
 using System.Diagnostics;
-using System.Globalization;
 using System.Linq;
 using System.Reflection;
 using System.Runtime.CompilerServices;
 using System.Runtime.ExceptionServices;
 using System.Text;
 
-using Moq.Properties;
-
-using TypeNameFormatter;
-
 namespace Moq
 {
 	internal static class Extensions
 	{
+		public static bool CanCreateInstance(this Type type)
+		{
+			return type.IsValueType || type.GetConstructor(Type.EmptyTypes) != null;
+		}
+
 		/// <summary>
 		///   Gets the default value for the specified type. This is the Reflection counterpart of C#'s <see langword="default"/> operator.
 		/// </summary>
@@ -63,11 +63,6 @@ namespace Moq
 
 				return method.GetBaseDefinition();
 			}
-		}
-
-		public static bool HasDefaultConstructor(this Type type)
-		{
-			return type.GetConstructor(Type.EmptyTypes) != null;
 		}
 
 		public static object InvokePreserveStack(this Delegate del, params object[] args)
@@ -239,7 +234,7 @@ namespace Moq
 					{
 						if (types[i].IsTypeMatcher(out var typeMatcherType))
 						{
-							Debug.Assert(typeMatcherType.HasDefaultConstructor());
+							Debug.Assert(typeMatcherType.CanCreateInstance());
 
 							var typeMatcher = (ITypeMatcher)Activator.CreateInstance(typeMatcherType);
 							if (typeMatcher.Matches(otherTypes[i]) == false)

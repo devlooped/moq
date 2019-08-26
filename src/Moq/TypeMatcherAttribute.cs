@@ -44,7 +44,7 @@ namespace Moq
 						typeof(ITypeMatcher).GetFormattedName()));
 			}
 
-			Guard.HasDefaultConstructor(type);
+			Guard.CanCreateInstance(type);
 
 			this.type = type;
 		}

@@ -76,6 +76,13 @@ namespace Moq.Tests
 		}
 
 		[Fact]
+		public void Can_use_struct_type_matchers()
+		{
+			var mock = new Mock<IX>();
+			mock.Setup(m => m.Method<AnyStruct>());
+		}
+
+		[Fact]
 		public void Must_use_custom_type_matcher_when_type_constraints_present()
 		{
 			var mock = new Mock<IY>();
@@ -159,5 +166,10 @@ namespace Moq.Tests
 
 		[TypeMatcher(typeof(It.IsAnyType))]
 		public delegate void AnyDelegate();
+
+		public struct AnyStruct : ITypeMatcher
+		{
+			public bool Matches(Type typeArgument) => typeArgument.IsValueType;
+		}
 	}
 }
