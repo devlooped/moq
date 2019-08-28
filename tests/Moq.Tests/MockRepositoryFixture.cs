@@ -43,7 +43,7 @@ namespace Moq.Tests
 		{
 			var repository = new MockRepository(MockBehavior.Loose);
 
-			var mock = repository.Create(() => new ConcreteClass("foo"));
+			var mock = repository.Create(() => new ClassWithoutParameterlessConstructor("foo"));
 
 			Assert.Equal("foo", mock.Object.Value);
 		}
@@ -314,9 +314,9 @@ namespace Moq.Tests
 			}
 		}
 
-		public class ConcreteClass : BaseClass
+		public class ClassWithoutParameterlessConstructor : BaseClass
 		{
-			public ConcreteClass(string value) : base(value)
+			public ClassWithoutParameterlessConstructor(string value) : base(value)
 			{
 			}
 		}

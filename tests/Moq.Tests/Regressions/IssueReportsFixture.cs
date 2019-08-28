@@ -308,10 +308,10 @@ namespace Moq.Tests.Regressions
 			[Fact]
 			public void MockingDoesNotChangeVirtualnessAndFinalnessOfInheritedInterfaceMethod()
 			{
-				var actualTypeMethod = typeof(ClassWithoutParameterlessConstructor).GetMethod("Method");
+				var actualTypeMethod = typeof(ConcreteClass).GetMethod("Method");
 				Assert.True(actualTypeMethod.IsVirtual && actualTypeMethod.IsFinal);
 
-				var mockedTypeMethod = new Mock<ClassWithoutParameterlessConstructor>().Object.GetType().GetMethod("Method");
+				var mockedTypeMethod = new Mock<ConcreteClass>().Object.GetType().GetMethod("Method");
 				Assert.True(mockedTypeMethod.IsVirtual && mockedTypeMethod.IsFinal);
 			}
 
@@ -320,7 +320,7 @@ namespace Moq.Tests.Regressions
 				void Method();
 			}
 
-			public class ClassWithoutParameterlessConstructor : ISomeInterface
+			public class ConcreteClass : ISomeInterface
 			{
 				public void Method() { }
 			}
