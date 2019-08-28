@@ -129,7 +129,7 @@ namespace Moq
 		{
 			private Castle.DynamicProxy.IInvocation underlying;
 
-			internal Invocation(Castle.DynamicProxy.IInvocation underlying) : base(underlying.Method, underlying.Arguments)
+			internal Invocation(Castle.DynamicProxy.IInvocation underlying) : base(underlying.Proxy.GetType(), underlying.Method, underlying.Arguments)
 			{
 				this.underlying = underlying;
 			}

@@ -149,9 +149,6 @@ This setup was not matched.</value>
 	<data name="ConstructorNotFound" xml:space="preserve">
 		<value>A matching constructor for the given arguments was not found on the mocked type.</value>
 	</data>
-	<data name="MoreThanOneCall" xml:space="preserve">
-		<value>Expected only one call to {0}.</value>
-	</data>
 	<data name="ObjectInstanceNotMock" xml:space="preserve">
 		<value>Object instance was not created by Moq.</value>
 	</data>
@@ -179,12 +176,6 @@ mock.SetupSet(x =&gt; x.{1}).Callback(callbackDelegate);
 	<data name="UnsupportedMember" xml:space="preserve">
 		<value>Member {0} is not supported for protected mocking.</value>
 	</data>
-	<data name="RaisedUnassociatedEvent" xml:space="preserve">
-		<value>Cannot raise a mocked event unless it has been associated (attached) to a concrete event in a mocked object.</value>
-	</data>
-	<data name="SetupNotMethod" xml:space="preserve">
-		<value>Expression is not a method invocation: {0}</value>
-	</data>
 	<data name="NoMatchingCallsAtLeastOnce" xml:space="preserve">
 		<value>Expected invocation on the mock at least once, but was never performed: </value>
 	</data>
@@ -199,11 +190,8 @@ mock.SetupSet(x =&gt; x.{1}).Callback(callbackDelegate);
 Please cast the argument to one of the supported types: {1}.
 Remember that there's no generics covariance in the CLR, so your object must be one of these types in order for the call to succeed.</value>
 	</data>
-	<data name="MoreThanNCalls" xml:space="preserve">
-		<value>Expected only {0} calls to {1}.</value>
-	</data>
 	<data name="SetupNotSetter" xml:space="preserve">
-		<value>Expression is not a property setter invocation.</value>
+    <value>Expression is not a setter: {0}</value>
 	</data>
 	<data name="ArgumentCannotBeEmpty" xml:space="preserve">
 		<value>Value cannot be an empty string.</value>
@@ -247,9 +235,6 @@ Remember that there's no generics covariance in the CLR, so your object must be 
 	<data name="LinqMethodNotSupported" xml:space="preserve">
 		<value>LINQ method '{0}' not supported.</value>
 	</data>
-	<data name="EventNotFound" xml:space="preserve">
-		<value>Could not locate event for attach or detach method {0}.</value>
-	</data>
 	<data name="LinqBinaryOperatorNotSupported" xml:space="preserve">
 		<value>The equals ("==" or "=" in VB) and the conditional 'and' ("&amp;&amp;" or "AndAlso" in VB) operators are the only ones supported in the query specification expression. Unsupported expression: {0}</value>
 	</data>
@@ -271,9 +256,6 @@ Remember that there's no generics covariance in the CLR, so your object must be 
 	<data name="DelaysMustBeGreaterThanZero" xml:space="preserve">
 		<value>Delays have to be greater than zero to ensure an async callback is used.</value>
 	</data>
-	<data name="ExpressionIsNotEventAttachOrDetachOrIsNotVirtual" xml:space="preserve">
-		<value>Expression is not an event attach or detach, or the event is declared in a class but not marked virtual.</value>
-	</data>
 	<data name="InvalidCallbackParameterMismatch" xml:space="preserve">
 		<value>Invalid callback. Setup on method with parameters ({0}) cannot invoke callback with parameters ({1}).</value>
 	</data>
@@ -282,9 +264,6 @@ Remember that there's no generics covariance in the CLR, so your object must be 
 	</data>
 	<data name="NoInvocationsPerformed" xml:space="preserve">
 		<value>No invocations performed.</value>
-	</data>
-	<data name="NoSetupsConfigured" xml:space="preserve">
-		<value>No setups configured.</value>
 	</data>
 	<data name="PerformedInvocations" xml:space="preserve">
 		<value>Performed invocations:</value>

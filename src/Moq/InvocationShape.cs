@@ -28,7 +28,11 @@ namespace Moq
 		public readonly IReadOnlyList<Expression> Arguments;
 
 		private readonly IMatcher[] argumentMatchers;
+		private MethodInfo methodImplementation;
 		private Expression[] partiallyEvaluatedArguments;
+#if DEBUG
+		private Type proxyType;
+#endif
 
 		public InvocationShape(LambdaExpression expression, MethodInfo method, IReadOnlyList<Expression> arguments = null)
 		{
@@ -60,17 +64,12 @@ namespace Moq
 
 		public bool IsMatch(Invocation invocation)
 		{
+			if (invocation.Method != this.Method && !this.IsOverride(invocation))
+			{
+				return false;
+			}
+
 			var arguments = invocation.Arguments;
-			if (this.argumentMatchers.Length != arguments.Length)
-			{
-				return false;
-			}
-
-			if (invocation.Method != this.Method && !this.IsOverride(invocation.Method))
-			{
-				return false;
-			}
-
 			for (int i = 0, n = this.argumentMatchers.Length; i < n; ++i)
 			{
 				if (this.argumentMatchers[i].Matches(arguments[i]) == false)
@@ -91,21 +90,37 @@ namespace Moq
 			}
 		}
 
-		private bool IsOverride(MethodInfo invocationMethod)
+		private bool IsOverride(Invocation invocation)
 		{
+			Debug.Assert(invocation.Method != this.Method);
+
 			var method = this.Method;
+			var invocationMethod = invocation.Method;
 
-			if (!method.DeclaringType.IsAssignableFrom(invocationMethod.DeclaringType))
+			var proxyType = invocation.ProxyType;
+#if DEBUG
+			// The following `if` block is a sanity check to ensure this `InvocationShape` always
+			// runs against the same proxy type. This is important because we're caching the result
+			// of mapping methods into that particular proxy type. We have no cache invalidation
+			// logic in place; instead, we simply assume that the cached results will stay valid.
+			// If the below assertion fails, that assumption was wrong.
+			if (this.proxyType == null)
 			{
-				return false;
+				this.proxyType = proxyType;
+			}
+			else
+			{
+				Debug.Assert(this.proxyType == proxyType);
+			}
+#endif
+
+			// If not already in the cache, map this `InvocationShape`'s method into the proxy type:
+			if (this.methodImplementation == null)
+			{
+				this.methodImplementation = method.GetImplementingMethod(proxyType);
 			}
 
-			if (!method.Name.Equals(invocationMethod.Name, StringComparison.Ordinal))
-			{
-				return false;
-			}
-
-			if (method.ReturnType != invocationMethod.ReturnType)
+			if (invocation.MethodImplementation != this.methodImplementation)
 			{
 				return false;
 			}
@@ -113,13 +128,6 @@ namespace Moq
 			if (method.IsGenericMethod || invocationMethod.IsGenericMethod)
 			{
 				if (!method.GetGenericArguments().CompareTo(invocationMethod.GetGenericArguments(), exact: false))
-				{
-					return false;
-				}
-			}
-			else
-			{
-				if (!invocationMethod.GetParameterTypes().CompareTo(method.GetParameterTypes(), exact: true))
 				{
 					return false;
 				}

@@ -1538,7 +1538,38 @@ namespace Moq.Tests.Regressions
 			}
 		}
 
-#endregion
+		#endregion
+
+		#region 343
+
+		public class Issue343
+		{
+			public class Fruit { }
+			public class Apple : Fruit { }
+			public class GreenApple : Apple { }
+			public class Orange : Fruit { }
+
+			public interface IFruitPicker
+			{
+				TFruit Pick<TFruit>() where TFruit : Fruit;
+			}
+
+			[Fact]
+			public void Return_type_variance_of_generic_method_setup()
+			{
+				var fruitPicker = new Mock<IFruitPicker>();
+				fruitPicker.Setup(m => m.Pick<Fruit>()).Returns(new Fruit());
+				fruitPicker.Setup(m => m.Pick<Apple>()).Returns(new GreenApple()); // set up method `Apple Pick<Apple>()`
+				fruitPicker.Setup(m => m.Pick<Orange>()).Returns(new Orange());
+
+				Assert.IsType<Fruit>(fruitPicker.Object.Pick<Fruit>());
+				Assert.IsType<GreenApple>(fruitPicker.Object.Pick<Apple>());
+				Assert.IsType<GreenApple>(fruitPicker.Object.Pick<GreenApple>()); // call method `GreenApple Pick<GreenApple>()` -- will the setup be matched despite the type difference?
+				Assert.IsType<Orange>(fruitPicker.Object.Pick<Orange>());
+			}
+		}
+
+		#endregion
 
 		#region 383
 
@@ -2283,6 +2314,46 @@ namespace Moq.Tests.Regressions
 
 		#endregion
 
+		#region 657
+
+		public class Issue657
+		{
+			[Fact]
+			public void Test()
+			{
+				var mock = new Moq.Mock<Contract>() { CallBase = true };
+				mock.As<IContractOveride>().Setup(m => m.DoWork()).Returns(3);
+				Assert.Equal(1, mock.Object.PublicWork());
+			}
+
+			public class Contract : IContractOveride
+			{
+				public int PublicWork()
+				{
+					return this.DoWork();
+				}
+
+				protected virtual int DoWork()
+				{
+					((IContractOveride)this).DoWork();
+					return 1;
+				}
+
+				int IContractOveride.DoWork()
+				{
+					Console.WriteLine("IFace");
+					return 2;
+				}
+			}
+
+			public interface IContractOveride
+			{
+				int DoWork();
+			}
+		}
+
+		#endregion
+
 		#region 696
 
 		public class Issue696
@@ -2366,7 +2437,7 @@ namespace Moq.Tests.Regressions
 				Language.Flow.ISetup<Action> setup = mock.Setup(m => m());
 				
 				Exception ex = Assert.Throws<NotSupportedException>(() => setup.CallBase());
-				Assert.Equal(string.Format(CultureInfo.CurrentCulture, Resources.CallBaseCannotBeUsedWithDelegateMocks), ex.Message);
+				Assert.Equal(Resources.CallBaseCannotBeUsedWithDelegateMocks, ex.Message);
 			}
 			
 			[Fact]
@@ -2376,7 +2447,7 @@ namespace Moq.Tests.Regressions
 				Language.Flow.ISetup<Func<bool>, bool> setup = mock.Setup(m => m());
 
 				Exception ex = Assert.Throws<NotSupportedException>(() => setup.CallBase());
-				Assert.Equal(string.Format(CultureInfo.CurrentCulture, Resources.CallBaseCannotBeUsedWithDelegateMocks), ex.Message);
+				Assert.Equal(Resources.CallBaseCannotBeUsedWithDelegateMocks, ex.Message);
 			}
 
 			[Fact]
@@ -2385,7 +2456,7 @@ namespace Moq.Tests.Regressions
 				Mock<Action> mock = new Mock<Action>();
 
 				Exception ex = Assert.Throws<NotSupportedException>(() => mock.CallBase = true);
-				Assert.Equal(string.Format(CultureInfo.CurrentCulture, Resources.CallBaseCannotBeUsedWithDelegateMocks), ex.Message);
+				Assert.Equal(Resources.CallBaseCannotBeUsedWithDelegateMocks, ex.Message);
 			}
 
 			[Fact]
@@ -2839,6 +2910,94 @@ namespace Moq.Tests.Regressions
 			public interface IMeteringDataServiceAgent
 			{
 				List<int> GetDataList(DateTimeOffset date);
+			}
+		}
+
+		#endregion
+
+		#region 903
+
+		public class Issue903
+		{
+			public interface IX
+			{
+				void Method<T>(bool arg);
+				void Method<T>(int arg);
+			}
+
+			private readonly Mock<IX> mock;
+
+			public Issue903()
+			{
+				this.mock = new Mock<IX>();
+			}
+
+			[Fact]
+			public void Bool_method_was_setup_first__when_bool_method_invoked__bool_method_setup_should_be_matched()
+			{
+				var boolMethodInvoked = false;
+				this.SetupBoolMethod(() => boolMethodInvoked = true);
+				this.SetupIntMethod(() => throw new Exception("Wrong method called."));
+
+				this.InvokeBoolMethod();
+
+				Assert.True(boolMethodInvoked);
+			}
+
+			[Fact]
+			public void Bool_method_was_setup_last__when_bool_method_invoked__bool_method_setup_should_be_matched()
+			{
+				var boolMethodInvoked = false;
+				this.SetupIntMethod(() => throw new Exception("Wrong method called."));
+				this.SetupBoolMethod(() => boolMethodInvoked = true);
+
+				this.InvokeBoolMethod();
+
+				Assert.True(boolMethodInvoked);
+			}
+
+			[Fact]
+			public void Int_method_was_setup_last__when_int_method_invoked__int_method_setup_should_be_matched()
+			{
+				bool intMethodInvoked = false;
+				this.SetupBoolMethod(() => throw new Exception("Wrong method called."));
+				this.SetupIntMethod(() => intMethodInvoked = true);
+
+				this.InvokeIntMethod();
+
+				Assert.True(intMethodInvoked);
+			}
+
+			[Fact]
+			public void Int_method_was_setup_first__when_int_method_invoked__int_method_setup_should_be_matched()
+			{
+				bool intMethodInvoked = false;
+				this.SetupIntMethod(() => intMethodInvoked = true);
+				this.SetupBoolMethod(() => throw new Exception("Wrong method called."));
+
+				this.InvokeIntMethod();
+
+				Assert.True(intMethodInvoked);
+			}
+
+			private void InvokeBoolMethod()
+			{
+				this.mock.Object.Method<bool>(default(bool));
+			}
+
+			private void InvokeIntMethod()
+			{
+				this.mock.Object.Method<int>(default(int));
+			}
+
+			private void SetupBoolMethod(Action callback)
+			{
+				mock.Setup(m => m.Method<object>((bool)It.IsAny<object>())).Callback(callback);
+			}
+
+			private void SetupIntMethod(Action callback)
+			{
+				this.mock.Setup(m => m.Method<object>((int)It.IsAny<object>())).Callback(callback);
 			}
 		}
 

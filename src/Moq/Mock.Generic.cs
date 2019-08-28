@@ -177,11 +177,11 @@ namespace Moq
 			{
 				if (typeof(T).IsInterface)
 				{
-					throw new ArgumentException(Properties.Resources.ConstructorArgsForInterface);
+					throw new ArgumentException(Resources.ConstructorArgsForInterface);
 				}
 				if (typeof(T).IsDelegateType())
 				{
-					throw new ArgumentException(Properties.Resources.ConstructorArgsForDelegate);
+					throw new ArgumentException(Resources.ConstructorArgsForDelegate);
 				}
 			}
 		}
@@ -201,7 +201,7 @@ namespace Moq
 			{
 				if (value && this.MockedType.IsDelegateType())
 				{
-					throw new NotSupportedException(string.Format(CultureInfo.CurrentCulture, Resources.CallBaseCannotBeUsedWithDelegateMocks));
+					throw new NotSupportedException(Resources.CallBaseCannotBeUsedWithDelegateMocks);
 				}
 
 				this.callBase = value;
