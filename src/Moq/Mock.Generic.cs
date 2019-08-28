@@ -151,13 +151,13 @@ namespace Moq
 		///   Initializes an instance of the mock using the given constructor call including its
 		///   argument values and with a specific <see cref="MockBehavior"/> behavior.
 		/// </summary>
-		/// <param name="newExpression">Lambda expression that creates an instance of <typeparamref name="T"/> T.</param>
+		/// <param name="newExpression">Lambda expression that creates an instance of <typeparamref name="T"/>.</param>
 		/// <param name="behavior">Behavior of the mock.</param>
 		/// <example>
-		/// <code>var mock = new Mock&lt;MyProvider&gt;(() => new MyProvider(someArgument, 25));</code>
+		/// <code>var mock = new Mock&lt;MyProvider&gt;(() => new MyProvider(someArgument, 25), MockBehavior.Loose);</code>
 		/// </example>
 		[SuppressMessage("Microsoft.Usage", "CA2214:DoNotCallOverridableMethodsInConstructors")]
-		public Mock(Expression<Func<T>> newExpression, MockBehavior behavior = MockBehavior.Strict)
+		public Mock(Expression<Func<T>> newExpression, MockBehavior behavior = MockBehavior.Default)
 			: this(behavior, Expressions.Visitors.ConstructorCallVisitor.ExtractArgumentValues(newExpression))
 		{
 		}

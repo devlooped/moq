@@ -2,6 +2,7 @@
 // All rights reserved. Licensed under the BSD 3-Clause License; see License.txt.
 
 using System;
+using System.Globalization;
 using System.Linq;
 using System.Linq.Expressions;
 using System.Reflection;
@@ -27,28 +28,31 @@ namespace Moq.Expressions.Visitors
 			var visitor = new ConstructorCallVisitor();
 			visitor.Visit(newExpression);
 
-			if (visitor._constructor == null)
+			if (visitor.constructor == null)
 			{
 				throw new NotSupportedException(Resources.NoConstructorCallFound);
 			}
 
-			return visitor._arguments;
+			return visitor.arguments;
 		}
 
-		private ConstructorInfo _constructor;
-		private object[] _arguments;
+		private ConstructorInfo constructor;
+		private object[] arguments;
 
 		public override Expression Visit(Expression node)
 		{
-			switch (node)
+			switch (node.NodeType)
 			{
-				case LambdaExpression _:
-				case NewExpression _:
-				case UnaryExpression unary when unary.NodeType == ExpressionType.Quote:
+				case ExpressionType.Lambda:
+				case ExpressionType.New:
+				case ExpressionType.Quote:
 					return base.Visit(node);
 				default:
 					throw new NotSupportedException(
-						string.Format(Resources.UnsupportedExpressionInConstructorCall, node.NodeType.ToString()));
+						string.Format(
+							CultureInfo.CurrentCulture,
+							Resources.UnsupportedExpression,
+							node.ToStringFixed()));
 			}
 		}
 
@@ -56,7 +60,7 @@ namespace Moq.Expressions.Visitors
 		{
 			if (node != null)
 			{
-				_constructor = node.Constructor;
+				constructor = node.Constructor;
 
 				// Creates a lambda which uses the same argument expressions as the
 				// arguments contained in the NewExpression
@@ -64,7 +68,7 @@ namespace Moq.Expressions.Visitors
 					Expression.NewArrayInit(
 						typeof(object),
 						node.Arguments.Select(a => Expression.Convert(a, typeof(object)))));
-				_arguments = argumentExtractor.Compile().Invoke();
+				arguments = ExpressionCompiler.Instance.Compile(argumentExtractor).Invoke();
 			}
 			return node;
 		}

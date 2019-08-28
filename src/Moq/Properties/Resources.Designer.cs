@@ -631,15 +631,6 @@ namespace Moq.Properties {
         }
         
         /// <summary>
-        ///   Looks up a localized string similar to The constructor call expression contains an unsupported expression type {0}..
-        /// </summary>
-        internal static string UnsupportedExpressionInConstructorCall {
-            get {
-                return ResourceManager.GetString("UnsupportedExpressionInConstructorCall", resourceCulture);
-            }
-        }
-        
-        /// <summary>
         ///   Looks up a localized string similar to Unsupported expression: {0}
         ///{1}.
         /// </summary>

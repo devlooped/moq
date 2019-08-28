@@ -348,7 +348,4 @@ This could be caused by an unrecognized type conversion, coercion, narrowing, or
 	<data name="NoConstructorCallFound" xml:space="preserve">
 		<value>No constructor call could be found.</value>
 	</data>
-	<data name="UnsupportedExpressionInConstructorCall" xml:space="preserve">
-		<value>The constructor call expression contains an unsupported expression type {0}.</value>
-	</data>
 </root>
