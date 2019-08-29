@@ -2,6 +2,7 @@
 // All rights reserved. Licensed under the BSD 3-Clause License; see License.txt.
 
 using System;
+using System.Diagnostics;
 using System.Diagnostics.CodeAnalysis;
 using System.Linq.Expressions;
 using System.Reflection;
@@ -108,24 +109,28 @@ namespace Moq
 
 		internal override bool Matches(object value)
 		{
-			bool canCastValueToT;
-
-			if (value != null)
-			{
-				canCastValueToT = value is T;
-			}
-			else
-			{
-				var t = typeof(T);
-				canCastValueToT = !t.IsValueType || (t.IsGenericType && t.GetGenericTypeDefinition() == typeof(Nullable<>));
-			}
-
-			return canCastValueToT && this.Condition((T)value);
+			return CanCast(value) && this.Condition((T)value);
 		}
 
 		internal override void SetupEvaluatedSuccessfully(object value)
 		{
+			Debug.Assert(this.Matches(value));
+			Debug.Assert(CanCast(value));
+
 			this.Success?.Invoke((T)value);
+		}
+
+		private static bool CanCast(object value)
+		{
+			if (value != null)
+			{
+				return value is T;
+			}
+			else
+			{
+				var t = typeof(T);
+				return !t.IsValueType || (t.IsGenericType && t.GetGenericTypeDefinition() == typeof(Nullable<>));
+			}
 		}
 
 		/// <inheritdoc/>

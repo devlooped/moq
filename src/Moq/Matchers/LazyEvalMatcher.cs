@@ -2,6 +2,7 @@
 // All rights reserved. Licensed under the BSD 3-Clause License; see License.txt.
 
 using System;
+using System.Diagnostics;
 using System.Linq.Expressions;
 
 namespace Moq.Matchers
@@ -28,6 +29,7 @@ namespace Moq.Matchers
 
 		public void SetupEvaluatedSuccessfully(object value)
 		{
+			Debug.Assert(this.Matches(value));
 		}
 	}
 }

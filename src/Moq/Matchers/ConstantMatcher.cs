@@ -2,8 +2,8 @@
 // All rights reserved. Licensed under the BSD 3-Clause License; see License.txt.
 
 using System.Collections;
+using System.Diagnostics;
 using System.Linq;
-using System.Linq.Expressions;
 
 namespace Moq.Matchers
 {
@@ -37,6 +37,7 @@ namespace Moq.Matchers
 
 		public void SetupEvaluatedSuccessfully(object value)
 		{
+			Debug.Assert(this.Matches(value));
 		}
 
 		private bool MatchesEnumerable(IEnumerable enumerable)
