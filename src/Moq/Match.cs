@@ -108,24 +108,29 @@ namespace Moq
 
 		internal override bool Matches(object value)
 		{
-			if (value != null && !(value is T))
+			if (value != null)
 			{
-				return false;
+				if (!(value is T))
+				{
+					return false;
+				}
 			}
 
 			var matchType = typeof(T);
-			if (value == null && matchType.IsValueType
-				&& (!matchType.IsGenericType || matchType.GetGenericTypeDefinition() != typeof(Nullable<>)))
+			if (value == null)
 			{
-				// If this.Condition expects a value type and we've been passed null,
-				// it can't possibly match.
-				// This tends to happen when you are trying to match a parameter of type int?
-				// with IsAny<int> but then pass null into the mock.
-				// We have to return early from here because you can't cast null to T
-				// when T is a value type.
-				//
-				// See GitHub issue #90: https://github.com/moq/moq4/issues/90
-				return false;
+				if (matchType.IsValueType && (!matchType.IsGenericType || matchType.GetGenericTypeDefinition() != typeof(Nullable<>)))
+				{
+					// If this.Condition expects a value type and we've been passed null,
+					// it can't possibly match.
+					// This tends to happen when you are trying to match a parameter of type int?
+					// with IsAny<int> but then pass null into the mock.
+					// We have to return early from here because you can't cast null to T
+					// when T is a value type.
+					//
+					// See GitHub issue #90: https://github.com/moq/moq4/issues/90
+					return false;
+				}
 			}
 			return this.Condition((T)value);
 		}
