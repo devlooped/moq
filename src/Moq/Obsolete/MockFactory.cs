@@ -5,7 +5,7 @@ using System;
 using System.Collections.Generic;
 using System.ComponentModel;
 using System.Linq;
-
+using System.Linq.Expressions;
 using Moq.Properties;
 
 namespace Moq
@@ -291,6 +291,30 @@ namespace Moq
 			where T : class
 		{
 			return CreateMock<T>(behavior, args);
+		}
+
+		/// <summary>
+		/// Creates an instance of the mock using the given constructor call including its
+		/// argument values and with a specific <see cref="MockBehavior"/> behavior.
+		/// </summary>
+		/// <typeparam name="T">Type to mock.</typeparam>
+		/// <param name="newExpression">Lambda expression that creates an instance of <typeparamref name="T"/>.</param>
+		/// <param name="behavior">Behavior of the mock.</param>
+		/// <returns>A new <see cref="Mock{T}"/>.</returns>
+		/// <example ignore="true">
+		/// <code>
+		/// var factory = new MockFactory(MockBehavior.Default);
+		/// 
+		/// var mock = factory.Create&lt;MyClass&gt;(() => new MyClass("Foo", 25, true), MockBehavior.Loose);
+		/// // use mock on tests
+		/// 
+		/// factory.Verify();
+		/// </code>
+		/// </example>
+		public Mock<T> Create<T>(Expression<Func<T>> newExpression, MockBehavior behavior = MockBehavior.Default)
+			where T : class
+		{
+			return Create<T>(behavior, Expressions.Visitors.ConstructorCallVisitor.ExtractArgumentValues(newExpression));
 		}
 
 		/// <summary>

@@ -6,6 +6,7 @@ using System.Collections.Generic;
 using System.Linq.Expressions;
 using System.Reflection;
 using System.Runtime.Serialization;
+using System.Text;
 
 using Xunit;
 
@@ -465,6 +466,61 @@ namespace Moq.Tests
 
 			Assert.Null(mock.Object.StringValue);
 			Assert.Equal(26, mock.Object.IntValue);
+		}
+
+		[Fact]
+		public void ConstructsObjectsWithCtorLambda()
+		{
+			var mock = new Mock<ClassWithNoDefaultConstructor>(
+				() => new ClassWithNoDefaultConstructor("Hello", 26),
+				MockBehavior.Default);
+
+			Assert.Equal("Hello", mock.Object.StringValue);
+			Assert.Equal(26, mock.Object.IntValue);
+		}
+
+		[Fact]
+		public void ConstructsObjectsWithCtorLambda_MethodCall()
+		{
+			var stringValue = new StringBuilder("Hello");
+			var mock = new Mock<ClassWithNoDefaultConstructor>(
+				() => new ClassWithNoDefaultConstructor(stringValue.ToString(), 26),
+				MockBehavior.Default);
+
+			Assert.Equal("Hello", mock.Object.StringValue);
+			Assert.Equal(26, mock.Object.IntValue);
+		}
+
+		[Fact]
+		public void ConstructsObjectsWithCtorLambda_MemberAccess()
+		{
+			var mock = new Mock<ClassWithNoDefaultConstructor>(
+				() => new ClassWithNoDefaultConstructor(new FooOverrideEquals { Name = "Hello" }.Name, 26),
+				MockBehavior.Default);
+
+			Assert.Equal("Hello", mock.Object.StringValue);
+			Assert.Equal(26, mock.Object.IntValue);
+		}
+
+		[Fact]
+		public void ConstructsObjectsWithCtorLambda_ArrayAccess()
+		{
+			var mock = new Mock<ClassWithNoDefaultConstructor>(
+				() => new ClassWithNoDefaultConstructor(new[] { "Hello" }[0], 26),
+				MockBehavior.Default);
+
+			Assert.Equal("Hello", mock.Object.StringValue);
+			Assert.Equal(26, mock.Object.IntValue);
+		}
+
+		[Fact]
+		public void ConstructsObjectsWithCtorLambda_NoParameter()
+		{
+			var mock = new Mock<FooOverrideEquals>(
+				() => new FooOverrideEquals(),
+				MockBehavior.Default);
+
+			Assert.Null(mock.Object.Name);
 		}
 
 		[Fact]

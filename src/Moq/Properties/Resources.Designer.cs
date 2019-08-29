@@ -329,6 +329,15 @@ namespace Moq.Properties {
         }
         
         /// <summary>
+        ///   Looks up a localized string similar to No constructor call could be found..
+        /// </summary>
+        internal static string NoConstructorCallFound {
+            get {
+                return ResourceManager.GetString("NoConstructorCallFound", resourceCulture);
+            }
+        }
+        
+        /// <summary>
         ///   Looks up a localized string similar to No invocations performed..
         /// </summary>
         internal static string NoInvocationsPerformed {

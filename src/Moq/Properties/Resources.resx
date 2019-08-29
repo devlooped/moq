@@ -62,6 +62,9 @@
   <xsd:schema id="root" xmlns="" xmlns:xsd="http://www.w3.org/2001/XMLSchema" xmlns:msdata="urn:schemas-microsoft-com:xml-msdata">
     <xsd:import namespace="http://www.w3.org/XML/1998/namespace" />
     <xsd:element name="root" msdata:IsDataSet="true">
+
+
+
       <xsd:complexType>
         <xsd:choice maxOccurs="unbounded">
           <xsd:element name="metadata">
@@ -120,6 +123,35 @@
   <data name="FieldsNotSupported" xml:space="preserve">
     <value>Expression {0} involves a field access, which is not supported. Use properties instead.</value>
   </data>
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
   <data name="TypeNotMockable" xml:space="preserve">
     <value>Type to mock must be an interface, a delegate, or a non-sealed, non-static class.</value>
   </data>
@@ -344,5 +376,8 @@ This could be caused by an unrecognized type conversion, coercion, narrowing, or
   </data>
   <data name="ArgumentMatcherWillNeverMatch" xml:space="preserve">
     <value>Matcher '{0}' is unmatchable: An implicit conversion operator will convert arguments of type '{1}' to the parameter's type '{2}', which is assignment-incompatible.</value>
+  </data>
+  <data name="NoConstructorCallFound" xml:space="preserve">
+    <value>No constructor call could be found.</value>
   </data>
 </root>

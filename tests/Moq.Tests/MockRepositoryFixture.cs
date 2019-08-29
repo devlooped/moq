@@ -39,6 +39,16 @@ namespace Moq.Tests
 		}
 
 		[Fact]
+		public void ShouldCreateMockWithCtorLambda()
+		{
+			var repository = new MockRepository(MockBehavior.Loose);
+
+			var mock = repository.Create(() => new ClassWithoutParameterlessConstructor("foo"));
+
+			Assert.Equal("foo", mock.Object.Value);
+		}
+
+		[Fact]
 		public void ShouldVerifyAll()
 		{
 			try
@@ -301,6 +311,13 @@ namespace Moq.Tests
 			public virtual void BaseMethod()
 			{
 				BaseCalled = true;
+			}
+		}
+
+		public class ClassWithoutParameterlessConstructor : BaseClass
+		{
+			public ClassWithoutParameterlessConstructor(string value) : base(value)
+			{
 			}
 		}
 	}
