@@ -8,9 +8,6 @@ using System.Linq.Expressions;
 using System.Text.RegularExpressions;
 using System.Diagnostics.CodeAnalysis;
 using System.Reflection;
-#if FEATURE_COM
-using static System.Runtime.InteropServices.Marshal;
-#endif
 
 using Moq.Protected;
 
@@ -49,12 +46,7 @@ namespace Moq
 		public static TValue IsAny<TValue>()
 		{
 			return Match<TValue>.Create(
-#if FEATURE_COM
-				value => value == null || (typeof(TValue).IsAssignableFrom(value.GetType())
-				                           || (IsComObject(value) && value is TValue)),
-#else
-				value => value == null || typeof(TValue).IsAssignableFrom(value.GetType()),
-#endif
+				value => value is TValue || value == null,
 				() => It.IsAny<TValue>());
 		}
 
@@ -72,12 +64,7 @@ namespace Moq
 		public static TValue IsNotNull<TValue>()
 		{
 			return Match<TValue>.Create(
-#if FEATURE_COM
-				value => value != null && (typeof(TValue).IsAssignableFrom(value.GetType())
-				                           || (IsComObject(value) && value is TValue)),
-#else
-				value => value != null && typeof(TValue).IsAssignableFrom(value.GetType()),
-#endif
+				value => value is TValue,
 				() => It.IsNotNull<TValue>());
 		}
 
