@@ -38,6 +38,7 @@ namespace Moq.Matchers
 
 		public void SetupEvaluatedSuccessfully(object value)
 		{
+			Debug.Assert(this.Matches(value));
 			Debug.Assert(value is Array array && array.Length == this.matchers.Length);
 
 			var values = (Array)value;

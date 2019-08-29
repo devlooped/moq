@@ -114,6 +114,7 @@ namespace Moq
 
 		internal override void SetupEvaluatedSuccessfully(object value)
 		{
+			Debug.Assert(this.Matches(value));
 			Debug.Assert(CanCast(value));
 
 			this.Success?.Invoke((T)value);
