@@ -115,10 +115,9 @@ namespace Moq
 					return false;
 				}
 			}
-
-			var matchType = typeof(T);
-			if (value == null)
+			else
 			{
+				var matchType = typeof(T);
 				if (matchType.IsValueType && (!matchType.IsGenericType || matchType.GetGenericTypeDefinition() != typeof(Nullable<>)))
 				{
 					// If this.Condition expects a value type and we've been passed null,
