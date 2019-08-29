@@ -38,9 +38,12 @@ namespace Moq.Matchers
 
 		public void SetupEvaluatedSuccessfully(object value)
 		{
-			foreach (var matcher in this.matchers)
+			Debug.Assert(value is Array array && array.Length == this.matchers.Length);
+
+			var values = (Array)value;
+			for (int i = 0, n = this.matchers.Length; i < n; ++i)
 			{
-				matcher.SetupEvaluatedSuccessfully(value);
+				this.matchers[i].SetupEvaluatedSuccessfully(values.GetValue(i));
 			}
 		}
 	}
