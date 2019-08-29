@@ -116,8 +116,8 @@ namespace Moq
 			}
 			else
 			{
-				var matchType = typeof(T);
-				canCastValueToT = !matchType.IsValueType || (matchType.IsGenericType && matchType.GetGenericTypeDefinition() == typeof(Nullable<>));
+				var t = typeof(T);
+				canCastValueToT = !t.IsValueType || (t.IsGenericType && t.GetGenericTypeDefinition() == typeof(Nullable<>));
 			}
 
 			return canCastValueToT && this.Condition((T)value);
