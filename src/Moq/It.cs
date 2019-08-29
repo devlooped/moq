@@ -50,8 +50,7 @@ namespace Moq
 		{
 			return Match<TValue>.Create(
 #if FEATURE_COM
-				value => value == null || (typeof(TValue).IsAssignableFrom(value.GetType())
-				                           || (IsComObject(value) && value is TValue)),
+				value => value == null || (typeof(TValue).IsAssignableFrom(value.GetType()) || IsComObject(value)),
 #else
 				value => value == null || typeof(TValue).IsAssignableFrom(value.GetType()),
 #endif
@@ -73,8 +72,7 @@ namespace Moq
 		{
 			return Match<TValue>.Create(
 #if FEATURE_COM
-				value => value != null && (typeof(TValue).IsAssignableFrom(value.GetType())
-				                           || (IsComObject(value) && value is TValue)),
+				value => value != null && (typeof(TValue).IsAssignableFrom(value.GetType()) || IsComObject(value)),
 #else
 				value => value != null && typeof(TValue).IsAssignableFrom(value.GetType()),
 #endif
