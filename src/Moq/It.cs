@@ -69,6 +69,15 @@ namespace Moq
 
 		/// <summary>
 		///   A type matcher that matches any generic type argument.
+		///   <para>
+		///     If the generic type parameter is constrained to <see langword="struct"/> (C#) / <see langword="Structure"/>
+		///     (VB.NET), use <see cref="It.IsValueType"/> instead.
+		///   </para>
+		///   <para>
+		///     If the generic type parameter has more specific constraints,
+		///     you can define your own type matcher inheriting from the type to which the type parameter is constrained.
+		///     See <see cref="TypeMatcherAttribute"/> and <see cref="ITypeMatcher"/>.
+		///   </para>
 		/// </summary>
 		[TypeMatcher]
 		public sealed class IsAnyType : ITypeMatcher
@@ -250,6 +259,31 @@ namespace Moq
 
 			// But evaluated every time :)
 			return Match<string>.Create(value => value != null && re.IsMatch(value), () => It.IsRegex(regex, options));
+		}
+
+		/// <summary>
+		///   A type matcher that matches subtypes of <typeparamref name="T"/>, as well as <typeparamref name="T"/> itself.
+		/// </summary>
+		/// <typeparam name="T">The type whose subtypes should match.</typeparam>
+		[TypeMatcher]
+		public sealed class IsSubtype<T> : ITypeMatcher
+		{
+			bool ITypeMatcher.Matches(Type type)
+			{
+				return typeof(T).IsAssignableFrom(type);
+			}
+		}
+
+		/// <summary>
+		///   A type matcher that matches any value type.
+		/// </summary>
+		[TypeMatcher]
+		public readonly struct IsValueType : ITypeMatcher
+		{
+			bool ITypeMatcher.Matches(Type type)
+			{
+				return type.IsValueType;
+			}
 		}
 	}
 }
