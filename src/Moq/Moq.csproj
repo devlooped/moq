@@ -97,10 +97,6 @@
 			<DependentUpon>IReturns.tt</DependentUpon>
 		</Compile>
 
-		<None Update="Match.xdoc">
-			<DependentUpon>Match.cs</DependentUpon>
-		</None>
-
 		<None Update="Mock.Generic.xdoc">
 			<DependentUpon>Mock.Generic.cs</DependentUpon>
 			<SubType>Designer</SubType>
