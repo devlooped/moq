@@ -133,6 +133,8 @@ namespace Moq
 	{
 		public static bool Handle(Invocation invocation, Mock mock)
 		{
+			const BindingFlags bindingFlags = BindingFlags.Public | BindingFlags.NonPublic | BindingFlags.Instance | BindingFlags.DeclaredOnly;
+
 			var methodName = invocation.Method.Name;
 
 			// Special case for event accessors. The following, seemingly random character checks are guards against
@@ -141,25 +143,22 @@ namespace Moq
 			{
 				if (methodName[0] == 'a' && methodName[3] == '_' && invocation.Method.IsEventAddAccessor())
 				{
-					var eventInfo = GetEventFromName(invocation.Method.Name.Substring("add_".Length), mock);
-					if (eventInfo != null)
+					var implementingMethod = invocation.Method.GetImplementingMethod(invocation.ProxyType);
+					var @event = implementingMethod.DeclaringType.GetEvents(bindingFlags).SingleOrDefault(e => e.GetAddMethod(true) == implementingMethod);
+					if (@event != null)
 					{
-						// TODO: We could compare `invocation.Method` and `eventInfo.GetAddMethod()` here.
-						// If they are equal, then `invocation.Method` is definitely an event `add` accessor.
-						// Not sure whether this would work with F# and COM; see commit 44070a9.
-
 						bool doesntHaveEventSetup = !mock.Setups.HasEventSetup;
 
 						if (mock.CallBase && !invocation.Method.IsAbstract)
 						{
-							if(doesntHaveEventSetup)
+							if (doesntHaveEventSetup)
 							{
 								invocation.ReturnBase();
 							}
 						}
 						else if (invocation.Arguments.Length > 0 && invocation.Arguments[0] is Delegate delegateInstance)
 						{
-							mock.EventHandlers.Add(eventInfo.Name, delegateInstance);
+							mock.EventHandlers.Add(@event, delegateInstance);
 
 							if (doesntHaveEventSetup)
 							{
@@ -172,13 +171,10 @@ namespace Moq
 				}
 				else if (methodName[0] == 'r' && methodName.Length > 7 && methodName[6] == '_' && invocation.Method.IsEventRemoveAccessor())
 				{
-					var eventInfo = GetEventFromName(invocation.Method.Name.Substring("remove_".Length), mock);
-					if (eventInfo != null)
+					var implementingMethod = invocation.Method.GetImplementingMethod(invocation.ProxyType);
+					var @event = implementingMethod.DeclaringType.GetEvents(bindingFlags).SingleOrDefault(e => e.GetRemoveMethod(true) == implementingMethod);
+					if (@event != null)
 					{
-						// TODO: We could compare `invocation.Method` and `eventInfo.GetRemoveMethod()` here.
-						// If they are equal, then `invocation.Method` is definitely an event `remove` accessor.
-						// Not sure whether this would work with F# and COM; see commit 44070a9.
-
 						bool doesntHaveEventSetup = !mock.Setups.HasEventSetup;
 
 						if (mock.CallBase && !invocation.Method.IsAbstract)
@@ -190,7 +186,7 @@ namespace Moq
 						}
 						else if (invocation.Arguments.Length > 0 && invocation.Arguments[0] is Delegate delegateInstance)
 						{
-							mock.EventHandlers.Remove(eventInfo.Name, delegateInstance);
+							mock.EventHandlers.Remove(@event, delegateInstance);
 
 							if (doesntHaveEventSetup)
 							{
@@ -204,62 +200,6 @@ namespace Moq
 			}
 
 			return false;
-		}
-
-		/// <summary>
-		/// Get an eventInfo for a given event name.  Search type ancestors depth first if necessary.
-		/// </summary>
-		/// <param name="eventName">Name of the event, with the set_ or get_ prefix already removed</param>
-		/// <param name="mock"/>
-		private static EventInfo GetEventFromName(string eventName, Mock mock)
-		{
-			return GetEventFromName(eventName, BindingFlags.Instance | BindingFlags.Static | BindingFlags.Public, mock)
-				?? GetEventFromName(eventName, BindingFlags.Instance | BindingFlags.NonPublic, mock);
-		}
-
-		/// <summary>
-		/// Get an eventInfo for a given event name.  Search type ancestors depth first if necessary.
-		/// Searches events using the specified binding constraints.
-		/// </summary>
-		/// <param name="eventName">Name of the event, with the set_ or get_ prefix already removed</param>
-		/// <param name="bindingAttr">Specifies how the search for events is conducted</param>
-		/// <param name="mock"/>
-		private static EventInfo GetEventFromName(string eventName, BindingFlags bindingAttr, Mock mock)
-		{
-			// Ignore inherited interfaces and internally defined IMocked<T>
-			var depthFirstProgress = new Queue<Type>(mock.AdditionalInterfaces);
-			depthFirstProgress.Enqueue(mock.TargetType);
-			while (depthFirstProgress.Count > 0)
-			{
-				var currentType = depthFirstProgress.Dequeue();
-				var eventInfo = currentType.GetEvent(eventName, bindingAttr);
-				if (eventInfo != null)
-				{
-					return eventInfo;
-				}
-
-				foreach (var implementedType in GetAncestorTypes(currentType))
-				{
-					depthFirstProgress.Enqueue(implementedType);
-				}
-			}
-
-			return null;
-		}
-
-		/// <summary>
-		/// Given a type return all of its ancestors, both types and interfaces.
-		/// </summary>
-		/// <param name="initialType">The type to find immediate ancestors of</param>
-		private static IEnumerable<Type> GetAncestorTypes(Type initialType)
-		{
-			var baseType = initialType.BaseType;
-			if (baseType != null)
-			{
-				return new[] { baseType };
-			}
-
-			return initialType.GetInterfaces();
 		}
 	}
 
