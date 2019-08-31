@@ -2,6 +2,7 @@
 // All rights reserved. Licensed under the BSD 3-Clause License; see License.txt.
 
 using System;
+using System.Linq;
 
 using Xunit;
 
@@ -107,9 +108,62 @@ namespace Moq.Tests
 			mock.VerifyAll();
 		}
 
+		[Fact]
+		public void It_IsAny_works_with_custom_matcher()
+		{
+			var invocationCount = 0;
+			var mock = new Mock<IX>();
+			mock.Setup(m => m.Method(It.IsAny<IntOrString>())).Callback((object arg) => invocationCount++);
+
+			mock.Object.Method(true);
+			mock.Object.Method(42);
+			mock.Object.Method("42");
+			mock.Object.Method(new Exception("42"));
+			mock.Object.Method((string)null);
+
+			Assert.Equal(3, invocationCount);
+		}
+
+		[Fact]
+		public void It_IsNotNull_works_with_custom_matcher()
+		{
+			var invocationCount = 0;
+			var mock = new Mock<IX>();
+			mock.Setup(m => m.Method(It.IsNotNull<IntOrString>())).Callback((object arg) => invocationCount++);
+
+			mock.Object.Method(true);
+			mock.Object.Method(42);
+			mock.Object.Method("42");
+			mock.Object.Method(new Exception("42"));
+			mock.Object.Method((string)null);
+
+			Assert.Equal(2, invocationCount);
+		}
+
+		[Fact]
+		public void It_Is_works_with_custom_matcher()
+		{
+			var acceptableArgs = new object[] { 42, "42" };
+
+			var invocationCount = 0;
+			var mock = new Mock<IX>();
+			mock.Setup(m => m.Method(It.Is<IntOrString>((arg, _) => acceptableArgs.Contains(arg))))
+			    .Callback((object arg) => invocationCount++);
+
+			mock.Object.Method(42);
+			mock.Object.Method(7);
+			Assert.Equal(1, invocationCount);
+
+			mock.Object.Method("42");
+			mock.Object.Method("7");
+			mock.Object.Method((string)null);
+			Assert.Equal(2, invocationCount);
+		}
+
 		public interface IX
 		{
 			void Method<T>();
+			void Method<T>(T arg);
 		}
 
 		public interface IY
