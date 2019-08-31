@@ -1,6 +1,7 @@
 // Copyright (c) 2007, Clarius Consulting, Manas Technology Solutions, InSTEDD.
 // All rights reserved. Licensed under the BSD 3-Clause License; see License.txt.
 
+using System;
 using System.Collections;
 using System.Diagnostics;
 using System.Linq;
@@ -16,15 +17,15 @@ namespace Moq.Matchers
 			this.constantValue = constantValue;
 		}
 
-		public bool Matches(object value)
+		public bool Matches(object argument, Type parameterType)
 		{
-			if (object.Equals(value, constantValue))
+			if (object.Equals(argument, constantValue))
 			{
 				return true;
 			}
 
-			if (this.constantValue is IEnumerable && value is IEnumerable enumerable &&
-				!(this.constantValue is IMocked) && !(value is IMocked))
+			if (this.constantValue is IEnumerable && argument is IEnumerable enumerable &&
+				!(this.constantValue is IMocked) && !(argument is IMocked))
 				// the above checks on the second line are necessary to ensure we have usable
 				// implementations of IEnumerable, which might very well not be the case for
 				// mocked objects.
@@ -35,9 +36,9 @@ namespace Moq.Matchers
 			return false;
 		}
 
-		public void SetupEvaluatedSuccessfully(object value)
+		public void SetupEvaluatedSuccessfully(object argument, Type parameterType)
 		{
-			Debug.Assert(this.Matches(value));
+			Debug.Assert(this.Matches(argument, parameterType));
 		}
 
 		private bool MatchesEnumerable(IEnumerable enumerable)

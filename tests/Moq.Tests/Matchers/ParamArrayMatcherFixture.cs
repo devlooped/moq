@@ -25,7 +25,7 @@ namespace Moq.Tests.Matchers
 
 			var (matcher, _) = MatcherFactory.CreateMatcher(expr, parameter);
 
-			Assert.Equal(shouldMatch, matcher.Matches(new object[] { first, second }));
+			Assert.Equal(shouldMatch, matcher.Matches(new object[] { first, second }, typeof(object[])));
 		}
 
 		[Fact]
@@ -38,7 +38,7 @@ namespace Moq.Tests.Matchers
 
 			var (matcher, _) = MatcherFactory.CreateMatcher(expr, parameter);
 
-			matcher.SetupEvaluatedSuccessfully(new object[] { 42, "" });
+			matcher.SetupEvaluatedSuccessfully(new object[] { 42, "" }, typeof(object[]));
 		}
 
 		private LambdaExpression ToExpression<T>(Expression<Action<T>> expr)

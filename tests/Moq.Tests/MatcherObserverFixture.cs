@@ -131,7 +131,7 @@ namespace Moq.Tests
 				_ = It.IsRegex(".*");
 
 				Assert.True(observer.TryGetLastMatch(out var last));
-				Assert.True(last.Matches("abc"));
+				Assert.True(last.Matches("abc", typeof(string)));
 			}
 		}
 

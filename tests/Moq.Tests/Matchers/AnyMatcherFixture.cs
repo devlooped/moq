@@ -17,7 +17,7 @@ namespace Moq.Tests.Matchers
 
 			var (matcher, _) = MatcherFactory.CreateMatcher(expr);
 
-			Assert.True(matcher.Matches(null));
+			Assert.True(matcher.Matches(null, typeof(object)));
 		}
 
 		[Fact]
@@ -27,7 +27,7 @@ namespace Moq.Tests.Matchers
 
 			var (matcher, _) = MatcherFactory.CreateMatcher(expr);
 
-			Assert.True(matcher.Matches("foo"));
+			Assert.True(matcher.Matches("foo", typeof(object)));
 		}
 
 		[Fact]
@@ -37,7 +37,7 @@ namespace Moq.Tests.Matchers
 
 			var (matcher, _) = MatcherFactory.CreateMatcher(expr);
 
-			Assert.True(matcher.Matches(new Disposable()));
+			Assert.True(matcher.Matches(new Disposable(), typeof(IDisposable)));
 		}
 
 		[Fact]
@@ -47,7 +47,7 @@ namespace Moq.Tests.Matchers
 
 			var (matcher, _) = MatcherFactory.CreateMatcher(expr);
 
-			Assert.False(matcher.Matches("foo"));
+			Assert.False(matcher.Matches("foo", typeof(IFormatProvider)));
 		}
 
 		private LambdaExpression ToExpression<TResult>(Expression<Func<TResult>> expr)

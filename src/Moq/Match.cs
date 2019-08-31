@@ -32,13 +32,13 @@ namespace Moq
 			return default(TValue);
 		}
 
-		internal abstract bool Matches(object value);
+		internal abstract bool Matches(object argument, Type parameterType);
 
-		internal abstract void SetupEvaluatedSuccessfully(object value);
+		internal abstract void SetupEvaluatedSuccessfully(object argument, Type parameterType);
 
-		bool IMatcher.Matches(object value) => this.Matches(value);
+		bool IMatcher.Matches(object argument, Type parameterType) => this.Matches(argument, parameterType);
 
-		void IMatcher.SetupEvaluatedSuccessfully(object value) => this.SetupEvaluatedSuccessfully(value);
+		void IMatcher.SetupEvaluatedSuccessfully(object value, Type parameterType) => this.SetupEvaluatedSuccessfully(value, parameterType);
 
 		internal Expression RenderExpression { get; set; }
 
@@ -107,17 +107,17 @@ namespace Moq
 			this.Success = success;
 		}
 
-		internal override bool Matches(object value)
+		internal override bool Matches(object argument, Type parameterType)
 		{
-			return CanCast(value) && this.Condition((T)value);
+			return CanCast(argument) && this.Condition((T)argument);
 		}
 
-		internal override void SetupEvaluatedSuccessfully(object value)
+		internal override void SetupEvaluatedSuccessfully(object argument, Type parameterType)
 		{
-			Debug.Assert(this.Matches(value));
-			Debug.Assert(CanCast(value));
+			Debug.Assert(this.Matches(argument, parameterType));
+			Debug.Assert(CanCast(argument));
 
-			this.Success?.Invoke((T)value);
+			this.Success?.Invoke((T)argument);
 		}
 
 		private static bool CanCast(object value)

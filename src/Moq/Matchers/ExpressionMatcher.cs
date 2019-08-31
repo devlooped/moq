@@ -1,6 +1,7 @@
 // Copyright (c) 2007, Clarius Consulting, Manas Technology Solutions, InSTEDD.
 // All rights reserved. Licensed under the BSD 3-Clause License; see License.txt.
 
+using System;
 using System.Diagnostics;
 using System.Linq.Expressions;
 
@@ -15,15 +16,15 @@ namespace Moq.Matchers
 			this.expression = expression;
 		}
 
-		public bool Matches(object value)
+		public bool Matches(object argument, Type parameterType)
 		{
-			return value is Expression valueExpression
+			return argument is Expression valueExpression
 				&& ExpressionComparer.Default.Equals(this.expression, valueExpression);
 		}
 
-		public void SetupEvaluatedSuccessfully(object value)
+		public void SetupEvaluatedSuccessfully(object argument, Type parameterType)
 		{
-			Debug.Assert(this.Matches(value));
+			Debug.Assert(this.Matches(argument, parameterType));
 		}
 	}
 }

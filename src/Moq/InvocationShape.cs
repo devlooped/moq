@@ -70,9 +70,10 @@ namespace Moq
 			}
 
 			var arguments = invocation.Arguments;
+			var parameterTypes = invocation.Method.GetParameterTypes();
 			for (int i = 0, n = this.argumentMatchers.Length; i < n; ++i)
 			{
-				if (this.argumentMatchers[i].Matches(arguments[i]) == false)
+				if (this.argumentMatchers[i].Matches(arguments[i], parameterTypes[i]) == false)
 				{
 					return false;
 				}
@@ -84,9 +85,10 @@ namespace Moq
 		public void SetupEvaluatedSuccessfully(Invocation invocation)
 		{
 			var arguments = invocation.Arguments;
+			var parameterTypes = invocation.Method.GetParameterTypes();
 			for (int i = 0, n = this.argumentMatchers.Length; i < n; ++i)
 			{
-				this.argumentMatchers[i].SetupEvaluatedSuccessfully(arguments[i]);
+				this.argumentMatchers[i].SetupEvaluatedSuccessfully(arguments[i], parameterTypes[i]);
 			}
 		}
 

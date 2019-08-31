@@ -17,17 +17,19 @@ namespace Moq.Matchers
 			this.matchers = matchers;
 		}
 
-		public bool Matches(object value)
+		public bool Matches(object argument, Type parameterType)
 		{
-			Array values = value as Array;
+			Array values = argument as Array;
 			if (values == null || this.matchers.Length != values.Length)
 			{
 				return false;
 			}
 
+			var elementType = parameterType.GetElementType();
+
 			for (int index = 0; index < values.Length; index++)
 			{
-				if (!this.matchers[index].Matches(values.GetValue(index)))
+				if (!this.matchers[index].Matches(values.GetValue(index), elementType))
 				{
 					return false;
 				}
@@ -36,15 +38,16 @@ namespace Moq.Matchers
 			return true;
 		}
 
-		public void SetupEvaluatedSuccessfully(object value)
+		public void SetupEvaluatedSuccessfully(object argument, Type parameterType)
 		{
-			Debug.Assert(this.Matches(value));
-			Debug.Assert(value is Array array && array.Length == this.matchers.Length);
+			Debug.Assert(this.Matches(argument, parameterType));
+			Debug.Assert(argument is Array array && array.Length == this.matchers.Length);
 
-			var values = (Array)value;
+			var values = (Array)argument;
+			var elementType = parameterType.GetElementType();
 			for (int i = 0, n = this.matchers.Length; i < n; ++i)
 			{
-				this.matchers[i].SetupEvaluatedSuccessfully(values.GetValue(i));
+				this.matchers[i].SetupEvaluatedSuccessfully(values.GetValue(i), elementType);
 			}
 		}
 	}

@@ -16,20 +16,20 @@ namespace Moq.Matchers
 			this.expression = expression;
 		}
 
-		public bool Matches(object value)
+		public bool Matches(object argument, Type parameterType)
 		{
 			var eval = Evaluator.PartialEval(this.expression);
 			if (eval.NodeType == ExpressionType.Constant)
 			{
-				return object.Equals(((ConstantExpression)eval).Value, value);
+				return object.Equals(((ConstantExpression)eval).Value, argument);
 			}
 
 			return false;
 		}
 
-		public void SetupEvaluatedSuccessfully(object value)
+		public void SetupEvaluatedSuccessfully(object argument, Type parameterType)
 		{
-			Debug.Assert(this.Matches(value));
+			Debug.Assert(this.Matches(argument, parameterType));
 		}
 	}
 }
