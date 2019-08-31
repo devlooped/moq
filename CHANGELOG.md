@@ -69,6 +69,8 @@ The format is loosely based on [Keep a Changelog](http://keepachangelog.com/en/1
 
 * `Verify` throws `TargetInvocationException` instead of `MockException` when one of the recorded invocations was to an async method that threw. (@Cufeadir, #883)
 
+* Moq does not distinguish between distinct events if they have the same name (@stakx, #893)
+
 * Regression in 4.12.0: `SetupAllProperties` removes indexer setups. (@stakx, #901)
 
 * Parameter types are ignored when matching an invoked generic method against setups. (@stakx, #903)
