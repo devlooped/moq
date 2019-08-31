@@ -27,6 +27,12 @@ namespace Moq.Language.Flow
 
 		public IVerifies AtMostOnce() => this.AtMost(1);
 
+		public ICallbackResult Callback(InvocationAction action)
+		{
+			this.setup.SetCallbackResponse(action.Action);
+			return this;
+		}
+
 		public ICallbackResult Callback(Delegate callback)
 		{
 			this.setup.SetCallbackResponse(callback);

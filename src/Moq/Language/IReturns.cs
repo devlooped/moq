@@ -30,6 +30,32 @@ namespace Moq.Language
 		IReturnsResult<TMock> Returns(TResult value);
 
 		/// <summary>
+		///   Specifies a function that will calculate the value to return from the method.
+		///   <para>
+		///     This overload is intended to be used in scenarios involving generic type argument matchers,
+		///     such as <see cref="It.IsAnyType"/>. The function will receive the current <see cref="IInvocation"/>,
+		///     which allows discovery of both arguments and type arguments.
+		///   </para>
+		///   <para>
+		///     For all other use cases, you should prefer the other <c>Returns</c> overloads as they provide
+		///     better static type safety.
+		///   </para>
+		/// </summary>
+		/// <example>
+		///   Mock a method to act like a generic factory method:
+		///   <code>
+		///     factory.Setup(m => m.Create&lt;It.IsAnyType&gt;())
+		///            .Returns(new InvocationFunc(invocation =>
+		///                     {
+		///                         var typeArgument = invocation.Method.GetGenericArguments()[0];
+		///                         return Activator.CreateInstance(typeArgument);
+		///                     });
+		///     var something = factory.Object.Create&lt;Something&gt;();
+		///   </code>
+		/// </example>
+		IReturnsResult<TMock> Returns(InvocationFunc valueFunction);
+
+		/// <summary>
 		/// Specifies a function that will calculate the value to return from the method.
 		/// This overload specifically allows you to specify a function with by-ref parameters.
 		/// Those by-ref parameters can be assigned to (though you should probably do that from

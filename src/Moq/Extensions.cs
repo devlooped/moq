@@ -4,20 +4,21 @@
 using System;
 using System.Collections.Generic;
 using System.Diagnostics;
-using System.Globalization;
 using System.Linq;
-using System.Linq.Expressions;
 using System.Reflection;
 using System.Runtime.CompilerServices;
 using System.Runtime.ExceptionServices;
 using System.Text;
 
-using Moq.Properties;
-
 namespace Moq
 {
 	internal static class Extensions
 	{
+		public static bool CanCreateInstance(this Type type)
+		{
+			return type.IsValueType || type.GetConstructor(Type.EmptyTypes) != null;
+		}
+
 		/// <summary>
 		///   Gets the default value for the specified type. This is the Reflection counterpart of C#'s <see langword="default"/> operator.
 		/// </summary>
@@ -144,6 +145,32 @@ namespace Moq
 			return !type.IsSealed || type.IsDelegateType();
 		}
 
+		public static bool IsTypeMatcher(this Type type)
+		{
+			return Attribute.IsDefined(type, typeof(TypeMatcherAttribute));
+		}
+
+		public static bool IsTypeMatcher(this Type type, out Type typeMatcherType)
+		{
+			if (type.IsTypeMatcher())
+			{
+				var attr = (TypeMatcherAttribute)Attribute.GetCustomAttribute(type, typeof(TypeMatcherAttribute));
+				typeMatcherType = attr.Type ?? type;
+				Guard.ImplementsTypeMatcherProtocol(typeMatcherType);
+				return true;
+			}
+			else
+			{
+				typeMatcherType = null;
+				return false;
+			}
+		}
+
+		public static bool ImplementsTypeMatcherProtocol(this Type type)
+		{
+			return typeof(ITypeMatcher).IsAssignableFrom(type) && type.CanCreateInstance();
+		}
+
 		public static bool CanOverride(this MethodBase method)
 		{
 			return method.IsVirtual && !method.IsFinal && !method.IsPrivate;
@@ -176,7 +203,7 @@ namespace Moq
 			return type.GetMember(name).OfType<MethodInfo>();
 		}
 
-		public static bool CompareTo<TTypes, TOtherTypes>(this TTypes types, TOtherTypes otherTypes, bool exact)
+		public static bool CompareTo<TTypes, TOtherTypes>(this TTypes types, TOtherTypes otherTypes, TypeComparison comparisonType)
 			where TTypes : IReadOnlyList<Type>
 			where TOtherTypes : IReadOnlyList<Type>
 		{
@@ -187,28 +214,51 @@ namespace Moq
 				return false;
 			}
 
-			if (exact)
+			switch (comparisonType)
 			{
-				for (int i = 0; i < count; ++i)
-				{
-					if (types[i] != otherTypes[i])
+				case TypeComparison.Equality:
+					for (int i = 0; i < count; ++i)
 					{
-						return false;
+						if (types[i] != otherTypes[i])
+						{
+							return false;
+						}
 					}
-				}
-			}
-			else
-			{
-				for (int i = 0; i < count; ++i)
-				{
-					if (types[i].IsAssignableFrom(otherTypes[i]) == false)
-					{
-						return false;
-					}
-				}
-			}
+					return true;
 
-			return true;
+				case TypeComparison.AssignmentCompatibility:
+					for (int i = 0; i < count; ++i)
+					{
+						if (types[i].IsAssignableFrom(otherTypes[i]) == false)
+						{
+							return false;
+						}
+					}
+					return true;
+
+				case TypeComparison.TypeMatchersOrElseAssignmentCompatibility:
+					for (int i = 0; i < count; ++i)
+					{
+						if (types[i].IsTypeMatcher(out var typeMatcherType))
+						{
+							Debug.Assert(typeMatcherType.ImplementsTypeMatcherProtocol());
+
+							var typeMatcher = (ITypeMatcher)Activator.CreateInstance(typeMatcherType);
+							if (typeMatcher.Matches(otherTypes[i]) == false)
+							{
+								return false;
+							}
+						}
+						else if (types[i].IsAssignableFrom(otherTypes[i]) == false)
+						{
+							return false;
+						}
+					}
+					return true;
+
+				default:
+					throw new ArgumentOutOfRangeException(nameof(comparisonType));
+			}
 		}
 
 		public static string GetParameterTypeList(this MethodInfo method)
@@ -225,7 +275,7 @@ namespace Moq
 			where TOtherTypes : IReadOnlyList<Type>
 		{
 			var method = function.GetMethodInfo();
-			if (method.GetParameterTypes().CompareTo(otherTypes, exact: false))
+			if (method.GetParameterTypes().CompareTo(otherTypes, TypeComparison.AssignmentCompatibility))
 			{
 				// the backing method for the literal delegate is compatible, DynamicInvoke(...) will succeed
 				return true;
@@ -236,7 +286,7 @@ namespace Moq
 			// an instance delegate invocation is created for an extension method (bundled with a receiver)
 			// or at times for DLR code generation paths because the CLR is optimized for instance methods.
 			var invokeMethod = GetInvokeMethodFromUntypedDelegateCallback(function);
-			if (invokeMethod != null && invokeMethod.GetParameterTypes().CompareTo(otherTypes, exact: false))
+			if (invokeMethod != null && invokeMethod.GetParameterTypes().CompareTo(otherTypes, TypeComparison.AssignmentCompatibility))
 			{
 				// the Invoke(...) method is compatible instead. DynamicInvoke(...) will succeed.
 				return true;

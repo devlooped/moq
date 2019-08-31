@@ -16,6 +16,35 @@ namespace Moq
 	[DebuggerStepThrough]
 	internal static class Guard
 	{
+		public static void CanCreateInstance(Type type)
+		{
+			if (!type.CanCreateInstance())
+			{
+				throw new ArgumentException(
+					string.Format(
+						CultureInfo.CurrentCulture,
+						Resources.TypeHasNoDefaultConstructor,
+						type.GetFormattedName()));
+			}
+		}
+
+		public static void ImplementsTypeMatcherProtocol(Type type)
+		{
+			Debug.Assert(type != null);
+
+			if (typeof(ITypeMatcher).IsAssignableFrom(type) == false)
+			{
+				throw new ArgumentException(
+					string.Format(
+						CultureInfo.CurrentCulture,
+						Resources.TypeNotImplementInterface,
+						type.GetFormattedName(),
+						typeof(ITypeMatcher).GetFormattedName()));
+			}
+
+			Guard.CanCreateInstance(type);
+		}
+
 		public static void IsAssignmentToPropertyOrIndexer(LambdaExpression expression, string paramName)
 		{
 			Debug.Assert(expression != null);

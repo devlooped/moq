@@ -3,7 +3,6 @@
 
 using System;
 using System.Diagnostics;
-using System.Diagnostics.CodeAnalysis;
 using System.Globalization;
 using System.IO;
 using System.Linq;
@@ -13,14 +12,12 @@ using System.Text;
 
 using Moq.Properties;
 
-using TypeNameFormatter;
-
 namespace Moq
 {
 	internal sealed partial class MethodCall : SetupWithOutParameterSupport
 	{
-		private Action<object[]> afterReturnCallbackResponse;
-		private Action<object[]> callbackResponse;
+		private Response afterReturnCallbackResponse;
+		private Response callbackResponse;
 		private LimitInvocationCountResponse limitInvocationCountResponse;
 		private Condition condition;
 		private string failMessage;
@@ -98,7 +95,7 @@ namespace Moq
 
 			this.limitInvocationCountResponse?.RespondTo(invocation);
 
-			this.callbackResponse?.Invoke(invocation.Arguments);
+			this.callbackResponse?.RespondTo(invocation);
 
 			if ((this.flags & Flags.CallBase) != 0)
 			{
@@ -127,7 +124,7 @@ namespace Moq
 					}
 				}
 
-				this.afterReturnCallbackResponse?.Invoke(invocation.Arguments);
+				this.afterReturnCallbackResponse?.RespondTo(invocation);
 			}
 		}
 
@@ -169,12 +166,19 @@ namespace Moq
 				throw new ArgumentNullException(nameof(callback));
 			}
 
-			ref Action<object[]> response = ref this.returnOrThrowResponse == null ? ref this.callbackResponse
-			                                                                       : ref this.afterReturnCallbackResponse;
+			ref Response response = ref this.returnOrThrowResponse == null ? ref this.callbackResponse
+			                                                               : ref this.afterReturnCallbackResponse;
 
 			if (callback is Action callbackWithoutArguments)
 			{
-				response = (object[] args) => callbackWithoutArguments();
+				response = new CallbackResponse(args => callbackWithoutArguments());
+			}
+			else if (callback.GetType() == typeof(Action<IInvocation>))
+			{
+				// NOTE: Do NOT rewrite the above condition as `callback is Action<IInvocation>`,
+				// because this will also yield true if `callback` is a `Action<object>` and thus
+				// break existing uses of `(object arg) => ...` callbacks!
+				response = new InvocationCallbackResponse((Action<IInvocation>)callback);
 			}
 			else
 			{
@@ -194,7 +198,7 @@ namespace Moq
 					throw new ArgumentException(Resources.InvalidCallbackNotADelegateWithReturnTypeVoid, nameof(callback));
 				}
 
-				response = (object[] args) => callback.InvokePreserveStack(args);
+				response = new CallbackResponse(args => callback.InvokePreserveStack(args));
 			}
 		}
 
@@ -253,6 +257,13 @@ namespace Moq
 				// already is the return value.
 				this.returnOrThrowResponse = new ReturnEagerValueResponse(valueFactory);
 			}
+			else if (valueFactory.GetType() == typeof(Func<IInvocation, object>))
+			{
+				// NOTE: Do NOT rewrite the above condition as `valueFactory is Func<IInvocation, object>`,
+				// for similar reasons as noted above in `SetCallbackResponse`. We want to test for this
+				// particular delegate type and no others that may happen to be implicitly convertible to it!
+				this.returnOrThrowResponse = new ReturnInvocationLazyValueResponse((Func<IInvocation, object>)valueFactory);
+			}
 			else
 			{
 				ValidateCallback(valueFactory);
@@ -301,12 +312,16 @@ namespace Moq
 
 				if (!expectedReturnType.IsAssignableFrom(actualReturnType))
 				{
-					throw new ArgumentException(
-						string.Format(
-							CultureInfo.CurrentCulture,
-							Resources.InvalidCallbackReturnTypeMismatch,
-							expectedReturnType,
-							actualReturnType));
+					// TODO: If the return type is a matcher, does the callback's return type need to be matched against it?
+					if (typeof(ITypeMatcher).IsAssignableFrom(expectedReturnType) == false)
+					{
+						throw new ArgumentException(
+							string.Format(
+								CultureInfo.CurrentCulture,
+								Resources.InvalidCallbackReturnTypeMismatch,
+								expectedReturnType,
+								actualReturnType));
+					}
 				}
 			}
 		}
@@ -416,6 +431,40 @@ namespace Moq
 			public abstract void RespondTo(Invocation invocation);
 		}
 
+		private sealed class CallbackResponse : Response
+		{
+			private readonly Action<object[]> callback;
+
+			public CallbackResponse(Action<object[]> callback)
+			{
+				Debug.Assert(callback != null);
+
+				this.callback = callback;
+			}
+
+			public override void RespondTo(Invocation invocation)
+			{
+				this.callback.Invoke(invocation.Arguments);
+			}
+		}
+
+		private sealed class InvocationCallbackResponse : Response
+		{
+			private readonly Action<IInvocation> callback;
+
+			public InvocationCallbackResponse(Action<IInvocation> callback)
+			{
+				Debug.Assert(callback != null);
+
+				this.callback = callback;
+			}
+
+			public override void RespondTo(Invocation invocation)
+			{
+				this.callback.Invoke(invocation);
+			}
+		}
+
 		private sealed class ReturnBaseResponse : Response
 		{
 			public static readonly ReturnBaseResponse Instance = new ReturnBaseResponse();
@@ -442,6 +491,23 @@ namespace Moq
 			public override void RespondTo(Invocation invocation)
 			{
 				invocation.Return(this.Value);
+			}
+		}
+
+		private sealed class ReturnInvocationLazyValueResponse : Response
+		{
+			private readonly Func<IInvocation, object> valueFactory;
+
+			public ReturnInvocationLazyValueResponse(Func<IInvocation, object> valueFactory)
+			{
+				Debug.Assert(valueFactory != null);
+
+				this.valueFactory = valueFactory;
+			}
+
+			public override void RespondTo(Invocation invocation)
+			{
+				invocation.Return(this.valueFactory.Invoke(invocation));
 			}
 		}
 

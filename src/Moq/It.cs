@@ -3,13 +3,14 @@
 
 using System;
 using System.Collections.Generic;
+using System.ComponentModel;
+using System.Diagnostics.CodeAnalysis;
 using System.Linq;
 using System.Linq.Expressions;
-using System.Text.RegularExpressions;
-using System.Diagnostics.CodeAnalysis;
 using System.Reflection;
+using System.Text.RegularExpressions;
 
-using Moq.Protected;
+using Moq.Properties;
 
 namespace Moq
 {
@@ -45,9 +46,18 @@ namespace Moq
 		/// <include file='It.xdoc' path='docs/doc[@for="It.IsAny"]/*'/>
 		public static TValue IsAny<TValue>()
 		{
-			return Match<TValue>.Create(
-				value => value is TValue || value == null,
-				() => It.IsAny<TValue>());
+			if (typeof(TValue).IsTypeMatcher())
+			{
+				return Match.Create<TValue>(
+					(argument, parameterType) => argument == null || parameterType.IsAssignableFrom(argument.GetType()),
+					() => It.IsAny<TValue>());
+			}
+			else
+			{
+				return Match.Create<TValue>(
+					 argument                 => argument == null || argument is TValue,
+					() => It.IsAny<TValue>());
+			}
 		}
 
 		private static readonly MethodInfo isAnyMethod = typeof(It).GetMethod(nameof(It.IsAny), BindingFlags.Public | BindingFlags.Static);
@@ -58,14 +68,44 @@ namespace Moq
 		}
 
 		/// <summary>
+		///   A type matcher that matches any generic type argument.
+		///   <para>
+		///     If the generic type parameter is constrained to <see langword="struct"/> (C#) / <see langword="Structure"/>
+		///     (VB.NET), use <see cref="It.IsValueType"/> instead.
+		///   </para>
+		///   <para>
+		///     If the generic type parameter has more specific constraints,
+		///     you can define your own type matcher inheriting from the type to which the type parameter is constrained.
+		///     See <see cref="TypeMatcherAttribute"/> and <see cref="ITypeMatcher"/>.
+		///   </para>
+		/// </summary>
+		[TypeMatcher]
+		public sealed class IsAnyType : ITypeMatcher
+		{
+			bool ITypeMatcher.Matches(Type type)
+			{
+				return true;
+			}
+		}
+
+		/// <summary>
 		///   Matches any value of the given <typeparamref name="TValue"/> type, except null.
 		/// </summary>
 		/// <typeparam name="TValue">Type of the value.</typeparam>
 		public static TValue IsNotNull<TValue>()
 		{
-			return Match<TValue>.Create(
-				value => value is TValue,
-				() => It.IsNotNull<TValue>());
+			if (typeof(TValue).IsTypeMatcher())
+			{
+				return Match.Create<TValue>(
+					(argument, parameterType) => argument != null && parameterType.IsAssignableFrom(argument.GetType()),
+					() => It.IsNotNull<TValue>());
+			}
+			else
+			{
+				return Match.Create<TValue>(
+					 argument                 => argument is TValue,
+					() => It.IsNotNull<TValue>());
+			}
 		}
 
 		/// <summary>
@@ -80,9 +120,40 @@ namespace Moq
 		[SuppressMessage("Microsoft.Design", "CA1006:DoNotNestGenericTypesInMemberSignatures")]
 		public static TValue Is<TValue>(Expression<Func<TValue, bool>> match)
 		{
-			return Match<TValue>.Create(
-				value => match.CompileUsingExpressionCompiler().Invoke(value),
-				Expression.Lambda<Func<TValue>>(ItExpr.Is<TValue>(match)));
+			if (typeof(TValue).IsTypeMatcher())
+			{
+				throw new ArgumentException(Resources.UseItIsOtherOverload, nameof(match));
+			}
+
+			var thisMethod = (MethodInfo)MethodBase.GetCurrentMethod();
+
+			return Match.Create<TValue>(
+				argument => match.CompileUsingExpressionCompiler().Invoke(argument),
+				Expression.Lambda<Func<TValue>>(Expression.Call(thisMethod.MakeGenericMethod(typeof(TValue)), match)));
+		}
+
+		/// <summary>
+		///   Matches any value that satisfies the given predicate.
+		///   <para>
+		///     Use this overload when you specify a type matcher for <typeparamref name="TValue"/>.
+		///     The <paramref name="match"/> callback you provide will then receive the actual parameter type
+		///     as well as the invocation argument.
+		///   </para>
+		/// </summary>
+		/// <param name="match">The predicate used to match the method argument.</param>
+		/// <typeparam name="TValue">Type of the argument to check.</typeparam>
+		/// <remarks>
+		///   Allows the specification of a predicate to perform matching of method call arguments.
+		/// </remarks>
+		/// <include file='It.xdoc' path='docs/doc[@for="It.Is"]/*'/>
+		[EditorBrowsable(EditorBrowsableState.Advanced)]
+		public static TValue Is<TValue>(Expression<Func<object, Type, bool>> match)
+		{
+			var thisMethod = (MethodInfo)MethodBase.GetCurrentMethod();
+
+			return Match.Create<TValue>(
+				(argument, parameterType) => match.CompileUsingExpressionCompiler().Invoke(argument, parameterType),
+				Expression.Lambda<Func<TValue>>(Expression.Call(thisMethod.MakeGenericMethod(typeof(TValue)), match)));
 		}
 
 		/// <summary>
@@ -188,6 +259,31 @@ namespace Moq
 
 			// But evaluated every time :)
 			return Match<string>.Create(value => value != null && re.IsMatch(value), () => It.IsRegex(regex, options));
+		}
+
+		/// <summary>
+		///   A type matcher that matches subtypes of <typeparamref name="T"/>, as well as <typeparamref name="T"/> itself.
+		/// </summary>
+		/// <typeparam name="T">The type whose subtypes should match.</typeparam>
+		[TypeMatcher]
+		public sealed class IsSubtype<T> : ITypeMatcher
+		{
+			bool ITypeMatcher.Matches(Type type)
+			{
+				return typeof(T).IsAssignableFrom(type);
+			}
+		}
+
+		/// <summary>
+		///   A type matcher that matches any value type.
+		/// </summary>
+		[TypeMatcher]
+		public readonly struct IsValueType : ITypeMatcher
+		{
+			bool ITypeMatcher.Matches(Type type)
+			{
+				return type.IsValueType;
+			}
 		}
 	}
 }

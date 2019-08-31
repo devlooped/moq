@@ -19,7 +19,7 @@ namespace Moq.Properties {
     // class via a tool like ResGen or Visual Studio.
     // To add or remove a member, edit your .ResX file then rerun ResGen
     // with the /str option, or rebuild your VS project.
-    [global::System.CodeDom.Compiler.GeneratedCodeAttribute("System.Resources.Tools.StronglyTypedResourceBuilder", "16.0.0.0")]
+    [global::System.CodeDom.Compiler.GeneratedCodeAttribute("System.Resources.Tools.StronglyTypedResourceBuilder", "15.0.0.0")]
     [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
     [global::System.Runtime.CompilerServices.CompilerGeneratedAttribute()]
     internal class Resources {
@@ -545,6 +545,15 @@ namespace Moq.Properties {
         }
         
         /// <summary>
+        ///   Looks up a localized string similar to Type {0} does not have a default (public parameterless) constructor..
+        /// </summary>
+        internal static string TypeHasNoDefaultConstructor {
+            get {
+                return ResourceManager.GetString("TypeHasNoDefaultConstructor", resourceCulture);
+            }
+        }
+        
+        /// <summary>
         ///   Looks up a localized string similar to Type {0} does not implement required interface {1}.
         /// </summary>
         internal static string TypeNotImplementInterface {
@@ -692,6 +701,15 @@ namespace Moq.Properties {
         internal static string UseItExprIsNullRatherThanNullArgumentValue {
             get {
                 return ResourceManager.GetString("UseItExprIsNullRatherThanNullArgumentValue", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to It is impossible to call the provided strongly-typed predicate due to the use of a type matcher. Provide a weakly-typed predicate with two parameters (object, Type) instead..
+        /// </summary>
+        internal static string UseItIsOtherOverload {
+            get {
+                return ResourceManager.GetString("UseItIsOtherOverload", resourceCulture);
             }
         }
         

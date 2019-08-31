@@ -123,9 +123,8 @@ namespace Moq.Protected
 		[SuppressMessage("Microsoft.Design", "CA1006:DoNotNestGenericTypesInMemberSignatures")]
 		public static Expression Is<TValue>(Expression<Func<TValue, bool>> match)
 		{
-			return Expression.Call(
-				typeof(It).GetMethod(nameof(It.Is), BindingFlags.Public | BindingFlags.Static).MakeGenericMethod(typeof(TValue)),
-				match);
+			Expression<Func<TValue>> expr = () => It.Is((Expression<Func<TValue, bool>>)null);
+			return Expression.Call(((MethodCallExpression)expr.Body).Method, match);
 		}
 
 		/// <summary>

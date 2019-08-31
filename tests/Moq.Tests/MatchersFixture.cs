@@ -263,8 +263,8 @@ namespace Moq.Tests
 			var b = new object();
 
 			var matcher = new RefMatcher(a);
-			Assert.True(matcher.Matches(a));
-			Assert.False(matcher.Matches(b));
+			Assert.True(matcher.Matches(a, typeof(object)));
+			Assert.False(matcher.Matches(b, typeof(object)));
 		}
 
 		[Fact]

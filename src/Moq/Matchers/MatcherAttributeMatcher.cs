@@ -80,19 +80,19 @@ namespace Moq.Matchers
 			return method;
 		}
 
-		public bool Matches(object value)
+		public bool Matches(object argument, Type parameterType)
 		{
 			// use matcher Expression to get extra arguments
 			var extraArgs = this.expression.Arguments.Select(ae => ((ConstantExpression)ae.PartialEval()).Value);
-			var args = new[] { value }.Concat(extraArgs).ToArray();
+			var args = new[] { argument }.Concat(extraArgs).ToArray();
 			// for static and non-static method
 			var instance = this.expression.Object == null ? null : (this.expression.Object.PartialEval() as ConstantExpression).Value;
 			return (bool)validatorMethod.Invoke(instance, args);
 		}
 
-		public void SetupEvaluatedSuccessfully(object value)
+		public void SetupEvaluatedSuccessfully(object argument, Type parameterType)
 		{
-			Debug.Assert(this.Matches(value));
+			Debug.Assert(this.Matches(argument, parameterType));
 		}
 	}
 }
