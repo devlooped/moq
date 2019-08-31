@@ -2923,6 +2923,30 @@ namespace Moq.Tests.Regressions
 				Assert.Equal(1, beRaiseCount);
 			}
 
+			[Fact]
+			public void Method_resolution__Subscribe_to_class_event__Raise_interface_event__succeeds()
+			{
+				var raised = false;
+				var mock = new Mock<A>();
+				mock.Object.E += () => raised = true;
+
+				mock.As<IA>().Raise(m => m.E += null);
+
+				Assert.True(raised);
+			}
+
+			[Fact]
+			public void Method_resolution__Subscribe_to_interface_event__Raise_class_event__succeeds()
+			{
+				var raised = false;
+				var mock = new Mock<A>();
+				(mock.Object as IA).E += () => raised = true;
+
+				mock.Raise(m => m.E += null);
+
+				Assert.True(raised);
+			}
+
 			public interface IA
 			{
 				event Action E;
@@ -2931,6 +2955,11 @@ namespace Moq.Tests.Regressions
 			public interface IB
 			{
 				event Action E;
+			}
+
+			public class A : IA
+			{
+				public virtual event Action E;
 			}
 
 			public class AB : IA, IB
