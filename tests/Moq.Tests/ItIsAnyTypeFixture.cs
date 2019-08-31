@@ -126,6 +126,38 @@ namespace Moq.Tests
 			Assert.Equal(default(DateTime), result);
 		}
 
+		[Fact]
+		public void Setup_with_It_IsAny_It_IsAnyType()
+		{
+			object received = null;
+			var mock = new Mock<IY>();
+			mock.Setup(m => m.Method(It.IsAny<It.IsAnyType>()))
+			    .Callback((object arg) => received = arg);
+
+			_ = mock.Object.Method<int>(42);
+			Assert.Equal(42, received);
+
+			_ = mock.Object.Method<string>("42");
+			Assert.Equal("42", received);
+		}
+
+		[Fact]
+		public void Setup_with_It_Ref_It_IsAnyType_IsAny()
+		{
+			object received = null;
+			var mock = new Mock<IY>();
+			mock.Setup(m => m.ByRefMethod(ref It.Ref<It.IsAnyType>.IsAny))
+			    .Callback(new ByRefMethodCallback<object>((ref object arg) => received = arg));
+
+			var i = 42;
+			_ = mock.Object.ByRefMethod<int>(ref i);
+			Assert.Equal(42, received);
+
+			var s = "42";
+			_ = mock.Object.ByRefMethod<string>(ref s);
+			Assert.Equal("42", received);
+		}
+
 		public interface IX
 		{
 			void Method<T>();
@@ -134,7 +166,10 @@ namespace Moq.Tests
 		public interface IY
 		{
 			T Method<T>(T arg);
+			T ByRefMethod<T>(ref T arg);
 		}
+
+		public delegate void ByRefMethodCallback<T>(ref T arg);
 
 		public interface IZ
 		{
