@@ -28,6 +28,23 @@ namespace Moq
 			}
 		}
 
+		public static void ImplementsTypeMatcherProtocol(Type type)
+		{
+			Debug.Assert(type != null);
+
+			if (typeof(ITypeMatcher).IsAssignableFrom(type) == false)
+			{
+				throw new ArgumentException(
+					string.Format(
+						CultureInfo.CurrentCulture,
+						Resources.TypeNotImplementInterface,
+						type.GetFormattedName(),
+						typeof(ITypeMatcher).GetFormattedName()));
+			}
+
+			Guard.CanCreateInstance(type);
+		}
+
 		public static void IsAssignmentToPropertyOrIndexer(LambdaExpression expression, string paramName)
 		{
 			Debug.Assert(expression != null);

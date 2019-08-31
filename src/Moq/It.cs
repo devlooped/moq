@@ -46,7 +46,7 @@ namespace Moq
 		/// <include file='It.xdoc' path='docs/doc[@for="It.IsAny"]/*'/>
 		public static TValue IsAny<TValue>()
 		{
-			if (typeof(TValue).IsTypeMatcher(out _))
+			if (typeof(TValue).IsTypeMatcher())
 			{
 				return Match.Create<TValue>(
 					(argument, parameterType) => argument == null || parameterType.IsAssignableFrom(argument.GetType()),
@@ -70,6 +70,7 @@ namespace Moq
 		/// <summary>
 		///   A type matcher that matches any generic type argument.
 		/// </summary>
+		[TypeMatcher]
 		public sealed class IsAnyType : ITypeMatcher
 		{
 			bool ITypeMatcher.Matches(Type type)
@@ -84,7 +85,7 @@ namespace Moq
 		/// <typeparam name="TValue">Type of the value.</typeparam>
 		public static TValue IsNotNull<TValue>()
 		{
-			if (typeof(TValue).IsTypeMatcher(out _))
+			if (typeof(TValue).IsTypeMatcher())
 			{
 				return Match.Create<TValue>(
 					(argument, parameterType) => argument != null && parameterType.IsAssignableFrom(argument.GetType()),
@@ -110,7 +111,7 @@ namespace Moq
 		[SuppressMessage("Microsoft.Design", "CA1006:DoNotNestGenericTypesInMemberSignatures")]
 		public static TValue Is<TValue>(Expression<Func<TValue, bool>> match)
 		{
-			if (typeof(TValue).IsTypeMatcher(out _))
+			if (typeof(TValue).IsTypeMatcher())
 			{
 				throw new ArgumentException(Resources.UseItIsOtherOverload, nameof(match));
 			}

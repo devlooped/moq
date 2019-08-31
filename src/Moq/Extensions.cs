@@ -145,16 +145,18 @@ namespace Moq
 			return !type.IsSealed || type.IsDelegateType();
 		}
 
+		public static bool IsTypeMatcher(this Type type)
+		{
+			return Attribute.IsDefined(type, typeof(TypeMatcherAttribute));
+		}
+
 		public static bool IsTypeMatcher(this Type type, out Type typeMatcherType)
 		{
-			if (typeof(ITypeMatcher).IsAssignableFrom(type))
+			if (type.IsTypeMatcher())
 			{
-				typeMatcherType = type;
-				return true;
-			}
-			else if (Attribute.GetCustomAttribute(type, typeof(TypeMatcherAttribute)) is TypeMatcherAttribute attr)
-			{
-				typeMatcherType = attr.Type;
+				var attr = (TypeMatcherAttribute)Attribute.GetCustomAttribute(type, typeof(TypeMatcherAttribute));
+				typeMatcherType = attr.Type ?? type;
+				Guard.ImplementsTypeMatcherProtocol(typeMatcherType);
 				return true;
 			}
 			else
@@ -162,6 +164,11 @@ namespace Moq
 				typeMatcherType = null;
 				return false;
 			}
+		}
+
+		public static bool ImplementsTypeMatcherProtocol(this Type type)
+		{
+			return typeof(ITypeMatcher).IsAssignableFrom(type) && type.CanCreateInstance();
 		}
 
 		public static bool CanOverride(this MethodBase method)
@@ -234,7 +241,7 @@ namespace Moq
 					{
 						if (types[i].IsTypeMatcher(out var typeMatcherType))
 						{
-							Debug.Assert(typeMatcherType.CanCreateInstance());
+							Debug.Assert(typeMatcherType.ImplementsTypeMatcherProtocol());
 
 							var typeMatcher = (ITypeMatcher)Activator.CreateInstance(typeMatcherType);
 							if (typeMatcher.Matches(otherTypes[i]) == false)

@@ -208,7 +208,7 @@ namespace Moq
 							{
 								if (typeArgument.IsTypeMatcher(out var typeMatcherType))
 								{
-									Guard.CanCreateInstance(typeMatcherType);
+									Guard.ImplementsTypeMatcherProtocol(typeMatcherType);
 								}
 							}
 						}

@@ -177,6 +177,7 @@ namespace Moq.Tests
 			void EnumMethod<TEnum>() where TEnum : Enum;
 		}
 
+		[TypeMatcher]
 		public sealed class IntOrString : ITypeMatcher
 		{
 			public bool Matches(Type typeArgument)
@@ -192,6 +193,7 @@ namespace Moq.Tests
 			}
 		}
 
+		[TypeMatcher]
 		public class Picky : ITypeMatcher
 		{
 			private readonly Type[] types;
@@ -207,6 +209,7 @@ namespace Moq.Tests
 			}
 		}
 
+		[TypeMatcher]
 		public class AnyException : Exception, ITypeMatcher
 		{
 			public bool Matches(Type typeArgument)
@@ -221,6 +224,7 @@ namespace Moq.Tests
 		[TypeMatcher(typeof(It.IsAnyType))]
 		public delegate void AnyDelegate();
 
+		[TypeMatcher]
 		public struct AnyStruct : ITypeMatcher
 		{
 			public bool Matches(Type typeArgument) => typeArgument.IsValueType;

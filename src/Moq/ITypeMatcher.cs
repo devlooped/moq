@@ -3,7 +3,10 @@ using System;
 namespace Moq
 {
 	/// <summary>
-	///   A type matcher represents a criterion against which generic type arguments are matched.
+	///   Types that implement this interface represent a criterion against which generic type arguments are matched.
+	///   <para>
+	///     To be used in combination with <see cref="TypeMatcherAttribute"/>.
+	///   </para>
 	/// </summary>
 	public interface ITypeMatcher
 	{
