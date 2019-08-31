@@ -49,7 +49,8 @@ namespace Moq
 		/// <param name="condition">The condition to match against actual values.</param>
 		public static T Create<T>(Predicate<T> condition)
 		{
-			return Create(new Match<T>(condition, () => Matcher<T>()));
+			Match.Register(new Match<T>(condition, () => Matcher<T>()));
+			return default(T);
 		}
 
 		/// <summary>
@@ -64,10 +65,11 @@ namespace Moq
 		[SuppressMessage("Microsoft.Design", "CA1006:DoNotNestGenericTypesInMemberSignatures")]
 		public static T Create<T>(Predicate<T> condition, Expression<Func<T>> renderExpression)
 		{
-			return Create(new Match<T>(condition, renderExpression));
+			Match.Register(new Match<T>(condition, renderExpression));
+			return default(T);
 		}
 
-		internal static T Create<T>(Match<T> match)
+		internal static void Register(Match match)
 		{
 			// This method is used to set an expression as the last matcher invoked,
 			// which is used in the SetupSet to allow matchers in the prop = value
@@ -84,8 +86,6 @@ namespace Moq
 			{
 				observer.OnMatch(match);
 			}
-
-			return default(T);
 		}
 	}
 
