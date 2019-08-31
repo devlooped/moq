@@ -102,10 +102,6 @@
 			<SubType>Designer</SubType>
 		</None>
 
-		<None Update="Mock.xdoc">
-			<DependentUpon>Mock.cs</DependentUpon>
-		</None>
-
 		<None Update="ReturnsExtensions.tt">
 			<Generator>TextTemplatingFileGenerator</Generator>
 			<LastGenOutput>ReturnsExtensions.Generated.cs</LastGenOutput>
