@@ -612,19 +612,39 @@ namespace Moq
 
 		internal static void RaiseEvent(Mock mock, LambdaExpression expression, Stack<InvocationShape> parts, object[] arguments)
 		{
+			const BindingFlags bindingFlags = BindingFlags.Public | BindingFlags.NonPublic | BindingFlags.Instance | BindingFlags.DeclaredOnly;
+
 			var part = parts.Pop();
 			var method = part.Method;
 
 			if (parts.Count == 0)
 			{
-				string eventName;
-				if (method.Name.StartsWith("add_", StringComparison.Ordinal))
+				EventInfo @event;
+				if (method.IsEventAddAccessor())
 				{
-					eventName = method.Name.Substring(4);
+					var implementingMethod = method.GetImplementingMethod(mock.Object.GetType());
+					@event = implementingMethod.DeclaringType.GetEvents(bindingFlags).SingleOrDefault(e => e.GetAddMethod(true) == implementingMethod);
+					if (@event == null)
+					{
+						throw new ArgumentException(
+							string.Format(
+								CultureInfo.CurrentCulture,
+								Resources.SetupNotEventAdd,
+								part.Expression));
+					}
 				}
-				else if (method.Name.StartsWith("remove_", StringComparison.Ordinal))
+				else if (method.IsEventRemoveAccessor())
 				{
-					eventName = method.Name.Substring(7);
+					var implementingMethod = method.GetImplementingMethod(mock.Object.GetType());
+					@event = implementingMethod.DeclaringType.GetEvents(bindingFlags).SingleOrDefault(e => e.GetRemoveMethod(true) == implementingMethod);
+					if (@event == null)
+					{
+						throw new ArgumentException(
+							string.Format(
+								CultureInfo.CurrentCulture,
+								Resources.SetupNotEventRemove,
+								part.Expression));
+					}
 				}
 				else
 				{
@@ -635,7 +655,7 @@ namespace Moq
 							expression));
 				}
 
-				if (mock.EventHandlers.TryGet(eventName, out var handlers))
+				if (mock.EventHandlers.TryGet(@event, out var handlers))
 				{
 					handlers.InvokePreserveStack(arguments);
 				}

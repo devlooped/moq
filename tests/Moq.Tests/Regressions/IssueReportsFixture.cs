@@ -2875,6 +2875,118 @@ namespace Moq.Tests.Regressions
 
 		#endregion
 
+		#region 893
+
+		public class Issue893
+		{
+			[Fact]
+			public void Csharp_can_distinguish_between_two_events_having_same_name()
+			{
+				var ab = new AB();
+				var a = (IA)ab;
+				var b = (IB)ab;
+
+				var aeRaiseCount = 0;
+				a.E += () => aeRaiseCount++;
+
+				var beRaiseCount = 0;
+				b.E += () => beRaiseCount++;
+
+				ab.RaiseAE();
+				Assert.Equal(1, aeRaiseCount);
+				Assert.Equal(0, beRaiseCount);
+
+				ab.RaiseBE();
+				Assert.Equal(1, aeRaiseCount);
+				Assert.Equal(1, beRaiseCount);
+			}
+
+			[Fact]
+			public void Moq_can_distinguish_between_two_events_having_same_name()
+			{
+				var ab = new Mock<object>();
+				var a = ab.As<IA>();
+				var b = ab.As<IB>();
+
+				var aeRaiseCount = 0;
+				(a.Object).E += () => aeRaiseCount++;
+
+				var beRaiseCount = 0;
+				(b.Object).E += () => beRaiseCount++;
+
+				a.Raise(m => m.E += null);
+				Assert.Equal(1, aeRaiseCount);
+				Assert.Equal(0, beRaiseCount);
+
+				b.Raise(m => m.E += null);
+				Assert.Equal(1, aeRaiseCount);
+				Assert.Equal(1, beRaiseCount);
+			}
+
+			[Fact]
+			public void Method_resolution__Subscribe_to_class_event__Raise_interface_event__succeeds()
+			{
+				var raised = false;
+				var mock = new Mock<A>();
+				mock.Object.E += () => raised = true;
+
+				mock.As<IA>().Raise(m => m.E += null);
+
+				Assert.True(raised);
+			}
+
+			[Fact]
+			public void Method_resolution__Subscribe_to_interface_event__Raise_class_event__succeeds()
+			{
+				var raised = false;
+				var mock = new Mock<A>();
+				(mock.Object as IA).E += () => raised = true;
+
+				mock.Raise(m => m.E += null);
+
+				Assert.True(raised);
+			}
+
+			public interface IA
+			{
+				event Action E;
+			}
+
+			public interface IB
+			{
+				event Action E;
+			}
+
+			public class A : IA
+			{
+				public virtual event Action E;
+			}
+
+			public class AB : IA, IB
+			{
+				private Action ae;
+				private Action be;
+
+				event Action IA.E
+				{
+					add => this.ae = (Action)Delegate.Combine(this.ae, value);
+					remove => this.ae = (Action)Delegate.Combine(this.ae, value);
+				}
+
+				event Action IB.E
+				{
+					add => this.be = (Action)Delegate.Combine(this.be, value);
+					remove => this.be = (Action)Delegate.Combine(this.be, value);
+				}
+
+				public void RaiseAE() => this.ae?.Invoke();
+
+				public void RaiseBE() => this.be?.Invoke();
+			}
+		}
+
+		#endregion
+
 		#region 897
 
 		public class Issue897
