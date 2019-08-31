@@ -45,9 +45,18 @@ namespace Moq
 		/// <include file='It.xdoc' path='docs/doc[@for="It.IsAny"]/*'/>
 		public static TValue IsAny<TValue>()
 		{
-			return Match<TValue>.Create(
-				value => value is TValue || value == null,
-				() => It.IsAny<TValue>());
+			if (typeof(TValue).IsTypeMatcher(out _))
+			{
+				return Match.Create<TValue>(
+					(argument, parameterType) => argument == null || parameterType.IsAssignableFrom(argument.GetType()),
+					() => It.IsAny<TValue>());
+			}
+			else
+			{
+				return Match.Create<TValue>(
+					 argument                 => argument == null || argument is TValue,
+					() => It.IsAny<TValue>());
+			}
 		}
 
 		private static readonly MethodInfo isAnyMethod = typeof(It).GetMethod(nameof(It.IsAny), BindingFlags.Public | BindingFlags.Static);

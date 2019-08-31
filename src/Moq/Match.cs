@@ -69,6 +69,33 @@ namespace Moq
 			return default(T);
 		}
 
+		/// <summary>
+		///   Initializes the matcher with the condition that will be checked in order to match invocation values.
+		///   <para>
+		///     The <paramref name="condition"/> predicate of this overload will not only be provided with a
+		///     method argument, but also with the associated parameter's type. This parameter type essentially
+		///     overrides <typeparamref name="T"/> in cases where the latter is a type matcher. Therefore,
+		///     use this method overload if you want your custom matcher to work together with type matchers.
+		///   </para>
+		/// </summary>
+		/// <param name="condition">
+		///   The condition to match against actual values.
+		///   <para>
+		///     This function will be passed the invocation argument, as well as the type of the associated parameter.
+		///   </para>
+		/// </param>
+		/// <param name="renderExpression">
+		///   A lambda representation of the matcher.
+		/// </param>
+		public static T Create<T>(Func<object, Type, bool> condition, Expression<Func<T>> renderExpression)
+		{
+			Guard.NotNull(condition, nameof(condition));
+			Guard.NotNull(renderExpression, nameof(renderExpression));
+
+			Match.Register(new MatchFactory(condition, renderExpression));
+			return default(T);
+		}
+
 		internal static void Register(Match match)
 		{
 			// This method is used to set an expression as the last matcher invoked,
@@ -165,5 +192,48 @@ namespace Moq
 
 		/// <inheritdoc/>
 		public override int GetHashCode() => 0;
+	}
+
+	internal sealed class MatchFactory : Match
+	{
+		private readonly Func<object, Type, bool> condition;
+
+		internal MatchFactory(Func<object, Type, bool> condition, LambdaExpression renderExpression)
+		{
+			Debug.Assert(condition != null);
+			Debug.Assert(renderExpression != null);
+
+			this.condition = condition;
+			this.RenderExpression = renderExpression.Body.Apply(EvaluateCaptures.Rewriter);
+		}
+
+		internal override bool Matches(object argument, Type parameterType)
+		{
+			var canCast = (Predicate<object>)Delegate.CreateDelegate(typeof(Predicate<object>), canCastMethod.MakeGenericMethod(parameterType));
+			return canCast(argument) && condition(argument, parameterType);
+		}
+
+		internal override void SetupEvaluatedSuccessfully(object argument, Type parameterType)
+		{
+			Debug.Assert(this.Matches(argument, parameterType));
+		}
+
+		private static bool CanCast<T>(object value)
+		{
+			if (value != null)
+			{
+				return value is T;
+			}
+			else
+			{
+				var t = typeof(T);
+				return !t.IsValueType || (t.IsGenericType && t.GetGenericTypeDefinition() == typeof(Nullable<>));
+			}
+		}
+
+		private static readonly MethodInfo canCastMethod = typeof(MatchFactory).GetMethod("CanCast", BindingFlags.NonPublic | BindingFlags.Static | BindingFlags.DeclaredOnly);
+
+		// TODO: Check whether we need to implement `IEquatable<>` to make this work with delegate-based
+		// setup & verification methods such as `SetupSet`!
 	}
 }
