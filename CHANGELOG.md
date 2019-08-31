@@ -75,6 +75,7 @@ The format is loosely based on [Keep a Changelog](http://keepachangelog.com/en/1
 
 * Parameter types are ignored when matching an invoked generic method against setups. (@stakx, #903)
 
+* For `[Value]Task<object>`, `.ReturnsAsync(null)` throws `NullReferenceException` instead of producing a completed task with result `null` (@voroninp, #909)
 
 ## 4.12.0 (2019-06-20)
 

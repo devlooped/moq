@@ -30,6 +30,11 @@ namespace Moq
 		/// <param name="valueFunction">The function that will calculate the return value.</param>
 		public static IReturnsResult<TMock> ReturnsAsync<T, TMock, TResult>(this IReturns<TMock, Task<TResult>> mock, Func<T, TResult> valueFunction) where TMock : class
 		{
+			if (ReturnsExtensions.IsNullResult(valueFunction, typeof(TResult)))
+			{
+				return mock.ReturnsAsync(() => default);
+			}
+
 			return mock.Returns((T t) => Task.FromResult(valueFunction(t)));
 		}	
 		<# 
@@ -50,6 +55,11 @@ namespace Moq
 				#>T<#=i#>, <#
 			}#>TResult> valueFunction) where TMock : class
 		{
+			if (ReturnsExtensions.IsNullResult(valueFunction, typeof(TResult)))
+			{
+				return mock.ReturnsAsync(() => default);
+			}
+
 			return mock.Returns((<#
 			for (var i = 1; i <= argumentCount; ++i)
 			{ #>T<#=i#> t<#=i#><#

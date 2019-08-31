@@ -49,6 +49,11 @@ namespace Moq
 		/// <param name="valueFunction">The function that will calculate the return value.</param>
 		public static IReturnsResult<TMock> ReturnsAsync<TMock, TResult>(this IReturns<TMock, Task<TResult>> mock, Func<TResult> valueFunction) where TMock : class
 		{
+			if (IsNullResult(valueFunction, typeof(TResult)))
+			{
+				return mock.ReturnsAsync(() => default);
+			}
+
 			return mock.Returns(() => Task.FromResult(valueFunction()));
 		}
 
@@ -61,6 +66,11 @@ namespace Moq
 		/// <param name="valueFunction">The function that will calculate the return value.</param>
 		public static IReturnsResult<TMock> ReturnsAsync<TMock, TResult>(this IReturns<TMock, ValueTask<TResult>> mock, Func<TResult> valueFunction) where TMock : class
 		{
+			if (IsNullResult(valueFunction, typeof(TResult)))
+			{
+				return mock.ReturnsAsync(() => default);
+			}
+
 			return mock.Returns(() => new ValueTask<TResult>(valueFunction()));
 		}
 
@@ -254,6 +264,18 @@ namespace Moq
 			var delay = GetDelay(minDelay, maxDelay, random);
 
 			return DelayedException(mock, exception, delay);
+		}
+
+		internal static bool IsNullResult(Delegate valueFunction, Type resultType)
+		{
+			if (valueFunction == null)
+			{
+				return !resultType.IsValueType || Nullable.GetUnderlyingType(resultType) != null;
+			}
+			else
+			{
+				return false;
+			}
 		}
 
 		private static TimeSpan GetDelay(TimeSpan minDelay, TimeSpan maxDelay, Random random)
