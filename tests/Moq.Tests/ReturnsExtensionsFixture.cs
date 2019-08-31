@@ -27,6 +27,12 @@ namespace Moq.Tests
 			Task<int> ValueParameterValueReturnType(int value);
 
 			Task<Guid> NewGuidAsync();
+
+			Task<object> NoParametersObjectReturnType();
+
+			Task<object> OneParameterObjectReturnType(string value);
+
+			Task<object> ManyParametersObjectReturnType(string arg1, bool arg2, float arg3);
 		}
 
 		public interface IValueTaskAsyncInterface
@@ -44,6 +50,12 @@ namespace Moq.Tests
 			ValueTask<int> ValueParameterValueReturnType(int value);
 
 			ValueTask<Guid> NewGuidAsync();
+
+			ValueTask<object> NoParametersObjectReturnType();
+
+			ValueTask<object> OneParameterObjectReturnType(string value);
+
+			ValueTask<object> ManyParametersObjectReturnType(string arg1, bool arg2, float arg3);
 		}
 
 		[Fact]
@@ -896,6 +908,72 @@ namespace Moq.Tests
 
 			var paramName = Assert.Throws<ArgumentNullException>(setup).ParamName;
 			Assert.Equal("random", paramName);
+		}
+
+		[Fact]
+		public async void No_parameters_object_return_type__ReturnsAsync_null__returns_completed_Task_with_null_result()
+		{
+			var mock = new Mock<IAsyncInterface>();
+			mock.Setup(m => m.NoParametersObjectReturnType()).ReturnsAsync(null);
+
+			var result = await mock.Object.NoParametersObjectReturnType();
+
+			Assert.Null(result);
+		}
+
+		[Fact]
+		public async void One_parameter_object_return_type__ReturnsAsync_null__returns_completed_Task_with_null_result()
+		{
+			var mock = new Mock<IAsyncInterface>();
+			mock.Setup(m => m.OneParameterObjectReturnType("")).ReturnsAsync(null);
+
+			var result = await mock.Object.OneParameterObjectReturnType("");
+
+			Assert.Null(result);
+		}
+
+		[Fact]
+		public async void Many_parameters_object_return_type__ReturnsAsync_null__returns_completed_Task_with_null_result()
+		{
+			var mock = new Mock<IAsyncInterface>();
+			mock.Setup(m => m.ManyParametersObjectReturnType("", false, 0f)).ReturnsAsync(null);
+
+			var result = await mock.Object.ManyParametersObjectReturnType("", false, 0f);
+
+			Assert.Null(result);
+		}
+
+		[Fact]
+		public async void No_parameters_object_return_type__ReturnsAsync_null__returns_completed_ValueTask_with_null_result()
+		{
+			var mock = new Mock<IValueTaskAsyncInterface>();
+			mock.Setup(m => m.NoParametersObjectReturnType()).ReturnsAsync(null);
+
+			var result = await mock.Object.NoParametersObjectReturnType();
+
+			Assert.Null(result);
+		}
+
+		[Fact]
+		public async void One_parameter_object_return_type__ReturnsAsync_null__returns_completed_ValueTask_with_null_result()
+		{
+			var mock = new Mock<IValueTaskAsyncInterface>();
+			mock.Setup(m => m.OneParameterObjectReturnType("")).ReturnsAsync(null);
+
+			var result = await mock.Object.OneParameterObjectReturnType("");
+
+			Assert.Null(result);
+		}
+
+		[Fact]
+		public async void Many_parameters_object_return_type__ReturnsAsync_null__returns_completed_ValueTask_with_null_result()
+		{
+			var mock = new Mock<IValueTaskAsyncInterface>();
+			mock.Setup(m => m.ManyParametersObjectReturnType("", false, 0f)).ReturnsAsync(null);
+
+			var result = await mock.Object.ManyParametersObjectReturnType("", false, 0f);
+
+			Assert.Null(result);
 		}
 	}
 }
