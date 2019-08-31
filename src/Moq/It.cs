@@ -43,7 +43,12 @@ namespace Moq
 		/// <remarks>
 		///   Typically used when the actual argument value for a method call is not relevant.
 		/// </remarks>
-		/// <include file='It.xdoc' path='docs/doc[@for="It.IsAny"]/*'/>
+		/// <example>
+		///   <code>
+		///     // Throws an exception for a call to Remove with any string value.
+		///     mock.Setup(x => x.Remove(It.IsAny&lt;string&gt;())).Throws(new InvalidOperationException());
+		///   </code>
+		/// </example>
 		public static TValue IsAny<TValue>()
 		{
 			if (typeof(TValue).IsTypeMatcher())
@@ -116,7 +121,22 @@ namespace Moq
 		/// <remarks>
 		///   Allows the specification of a predicate to perform matching of method call arguments.
 		/// </remarks>
-		/// <include file='It.xdoc' path='docs/doc[@for="It.Is"]/*'/>
+		/// <example>
+		///   This example shows how to return the value <c>1</c> whenever the argument to
+		///   the <c>Do</c> method is an even number.
+		///   <code>
+		///     mock.Setup(x =&gt; x.Do(It.Is&lt;int&gt;(i =&gt; i % 2 == 0)))
+		///         .Returns(1);
+		///   </code>
+		/// </example>
+		/// <example>
+		///   This example shows how to throw an exception if the argument to the method
+		///   is a negative number:
+		///   <code>
+		///     mock.Setup(x =&gt; x.GetUser(It.Is&lt;int&gt;(i =&gt; i &lt; 0)))
+		///         .Throws(new ArgumentException());
+		///   </code>
+		/// </example>
 		[SuppressMessage("Microsoft.Design", "CA1006:DoNotNestGenericTypesInMemberSignatures")]
 		public static TValue Is<TValue>(Expression<Func<TValue, bool>> match)
 		{
@@ -145,7 +165,6 @@ namespace Moq
 		/// <remarks>
 		///   Allows the specification of a predicate to perform matching of method call arguments.
 		/// </remarks>
-		/// <include file='It.xdoc' path='docs/doc[@for="It.Is"]/*'/>
 		[EditorBrowsable(EditorBrowsableState.Advanced)]
 		public static TValue Is<TValue>(Expression<Func<object, Type, bool>> match)
 		{
@@ -163,7 +182,16 @@ namespace Moq
 		/// <param name="to">The upper bound of the range.</param>
 		/// <param name="rangeKind">The kind of range. See <see cref="Range"/>.</param>
 		/// <typeparam name="TValue">Type of the argument to check.</typeparam>
-		/// <include file='It.xdoc' path='docs/doc[@for="It.IsInRange"]/*'/>
+		/// <example>
+		///   The following example shows how to expect a method call with an integer argument
+		///   within the 0..100 range.
+		///   <code>
+		///     mock.Setup(x => x.HasInventory(
+		///                         It.IsAny&lt;string&gt;(),
+		///                         It.IsInRange(0, 100, Range.Inclusive)))
+		///         .Returns(false);
+		///   </code>
+		/// </example>
 		public static TValue IsInRange<TValue>(TValue from, TValue to, Range rangeKind)
 			where TValue : IComparable
 		{
@@ -189,7 +217,18 @@ namespace Moq
 		/// </summary>
 		/// <param name="items">The sequence of possible values.</param>
 		/// <typeparam name="TValue">Type of the argument to check.</typeparam>
-		/// <include file='It.xdoc' path='docs/doc[@for="It.IsIn(enumerable)"]/*'/>
+		/// <example>
+		///   The following example shows how to expect a method call with an integer argument
+		///   with value from a list.
+		///   <code>
+		///     var values = new List&lt;int&gt; { 1, 2, 3 };
+		///
+		///     mock.Setup(x => x.HasInventory(
+		///                         It.IsAny&lt;string&gt;(),
+		///                         It.IsIn(values)))
+		///         .Returns(false);
+		///   </code>
+		/// </example>
 		public static TValue IsIn<TValue>(IEnumerable<TValue> items)
 		{
 			return Match<TValue>.Create(value => items.Contains(value), () => It.IsIn(items));
@@ -200,7 +239,16 @@ namespace Moq
 		/// </summary>
 		/// <param name="items">The sequence of possible values.</param>
 		/// <typeparam name="TValue">Type of the argument to check.</typeparam>
-		/// <include file='It.xdoc' path='docs/doc[@for="It.IsIn(params)"]/*'/>
+		/// <example>
+		///   The following example shows how to expect a method call with an integer argument
+		///   with a value of 1, 2, or 3.
+		///   <code>
+		///     mock.Setup(x => x.HasInventory(
+		///                         It.IsAny&lt;string&gt;(),
+		///                         It.IsIn(1, 2, 3)))
+		///         .Returns(false);
+		///   </code>
+		/// </example>
 		public static TValue IsIn<TValue>(params TValue[] items)
 		{
 			return Match<TValue>.Create(value => items.Contains(value), () => It.IsIn(items));
@@ -211,7 +259,18 @@ namespace Moq
 		/// </summary>
 		/// <param name="items">The sequence of disallowed values.</param>
 		/// <typeparam name="TValue">Type of the argument to check.</typeparam>
-		/// <include file='It.xdoc' path='docs/doc[@for="It.IsNotIn(enumerable)"]/*'/>
+		/// <example>
+		///   The following example shows how to expect a method call with an integer argument
+		///   with value not found from a list.
+		///   <code>
+		///     var values = new List&lt;int&gt; { 1, 2, 3 };
+		///
+		///     mock.Setup(x => x.HasInventory(
+		///                         It.IsAny&lt;string&gt;(),
+		///                         It.IsNotIn(values)))
+		///         .Returns(false);
+		///   </code>
+		/// </example>
 		public static TValue IsNotIn<TValue>(IEnumerable<TValue> items)
 		{
 			return Match<TValue>.Create(value => !items.Contains(value), () => It.IsNotIn(items));
@@ -222,7 +281,16 @@ namespace Moq
 		/// </summary>
 		/// <param name="items">The sequence of disallowed values.</param>
 		/// <typeparam name="TValue">Type of the argument to check.</typeparam>
-		/// <include file='It.xdoc' path='docs/doc[@for="It.IsNotIn(params)"]/*'/>
+		/// <example>
+		///   The following example shows how to expect a method call with an integer argument
+		///   of any value except 1, 2, or 3.
+		///   <code>
+		///     mock.Setup(x => x.HasInventory(
+		///                         It.IsAny&lt;string&gt;(),
+		///                         It.IsNotIn(1, 2, 3)))
+		///         .Returns(false);
+		///   </code>
+		/// </example>
 		public static TValue IsNotIn<TValue>(params TValue[] items)
 		{
 			return Match<TValue>.Create(value => !items.Contains(value), () => It.IsNotIn(items));
@@ -232,7 +300,14 @@ namespace Moq
 		///   Matches a string argument if it matches the given regular expression pattern.
 		/// </summary>
 		/// <param name="regex">The pattern to use to match the string argument value.</param>
-		/// <include file='It.xdoc' path='docs/doc[@for="It.IsRegex(regex)"]/*'/>
+		/// <example>
+		///   The following example shows how to expect a call to a method where the string argument
+		///   matches the given regular expression:
+		///   <code>
+		///     mock.Setup(x => x.Check(It.IsRegex("[a-z]+")))
+		///         .Returns(1);
+		///   </code>
+		/// </example>
 		public static string IsRegex(string regex)
 		{
 			Guard.NotNull(regex, nameof(regex));
@@ -249,7 +324,14 @@ namespace Moq
 		/// </summary>
 		/// <param name="regex">The pattern to use to match the string argument value.</param>
 		/// <param name="options">The options used to interpret the pattern.</param>
-		/// <include file='It.xdoc' path='docs/doc[@for="It.IsRegex(regex,options)"]/*'/>
+		/// <example>
+		///   The following example shows how to expect a call to a method where the string argument
+		///   matches the given regular expression, in a case insensitive way:
+		///   <code>
+		///     mock.Setup(x => x.Check(It.IsRegex("[a-z]+", RegexOptions.IgnoreCase)))
+		///         .Returns(1);
+		///   </code>
+		/// </example>
 		public static string IsRegex(string regex, RegexOptions options)
 		{
 			Guard.NotNull(regex, nameof(regex));

@@ -97,10 +97,6 @@
 			<DependentUpon>IReturns.tt</DependentUpon>
 		</Compile>
 
-		<None Update="It.xdoc">
-			<DependentUpon>It.cs</DependentUpon>
-		</None>
-
 		<None Update="Match.xdoc">
 			<DependentUpon>Match.cs</DependentUpon>
 		</None>
