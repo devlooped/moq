@@ -97,23 +97,6 @@
 			<DependentUpon>IReturns.tt</DependentUpon>
 		</Compile>
 
-		<None Update="It.xdoc">
-			<DependentUpon>It.cs</DependentUpon>
-		</None>
-
-		<None Update="Match.xdoc">
-			<DependentUpon>Match.cs</DependentUpon>
-		</None>
-
-		<None Update="Mock.Generic.xdoc">
-			<DependentUpon>Mock.Generic.cs</DependentUpon>
-			<SubType>Designer</SubType>
-		</None>
-
-		<None Update="Mock.xdoc">
-			<DependentUpon>Mock.cs</DependentUpon>
-		</None>
-
 		<None Update="ReturnsExtensions.tt">
 			<Generator>TextTemplatingFileGenerator</Generator>
 			<LastGenOutput>ReturnsExtensions.Generated.cs</LastGenOutput>
