@@ -705,6 +705,15 @@ namespace Moq.Properties {
         }
         
         /// <summary>
+        ///   Looks up a localized string similar to It is impossible to call the provided strongly-typed predicate due to the use of a type matcher. Provide a weakly-typed predicate with two parameters (object, Type) instead..
+        /// </summary>
+        internal static string UseItIsOtherOverload {
+            get {
+                return ResourceManager.GetString("UseItIsOtherOverload", resourceCulture);
+            }
+        }
+        
+        /// <summary>
         ///   Looks up a localized string similar to {0}:.
         /// </summary>
         internal static string VerificationErrorsOfInnerMock {

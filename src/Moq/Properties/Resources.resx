@@ -351,4 +351,7 @@ This could be caused by an unrecognized type conversion, coercion, narrowing, or
   <data name="TypeHasNoDefaultConstructor" xml:space="preserve">
     <value>Type {0} does not have a default (public parameterless) constructor.</value>
   </data>
+  <data name="UseItIsOtherOverload" xml:space="preserve">
+    <value>It is impossible to call the provided strongly-typed predicate due to the use of a type matcher. Provide a weakly-typed predicate with two parameters (object, Type) instead.</value>
+  </data>
 </root>

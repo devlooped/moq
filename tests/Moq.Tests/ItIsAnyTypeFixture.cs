@@ -2,6 +2,7 @@
 // All rights reserved. Licensed under the BSD 3-Clause License; see License.txt.
 
 using System;
+using System.Linq;
 
 using Xunit;
 
@@ -139,6 +140,65 @@ namespace Moq.Tests
 
 			_ = mock.Object.Method<string>("42");
 			Assert.Equal("42", received);
+		}
+
+		[Fact]
+		public void Setup_with_It_IsNotNull_It_IsAnyType()
+		{
+			var invocationCount = 0;
+			var mock = new Mock<IY>();
+			mock.Setup(m => m.Method(It.IsNotNull<It.IsAnyType>()))
+				.Callback((object arg) => invocationCount++);
+
+			_ = mock.Object.Method<string>("42");
+			Assert.Equal(1, invocationCount);
+
+			_ = mock.Object.Method<string>(null);
+			Assert.Equal(1, invocationCount);
+
+			_ = mock.Object.Method<int>(42);
+			Assert.Equal(2, invocationCount);
+
+			_ = mock.Object.Method<int?>(42);
+			Assert.Equal(3, invocationCount);
+
+			_ = mock.Object.Method<int?>(null);
+			Assert.Equal(3, invocationCount);
+		}
+
+		[Fact]
+		public void Setup_with_It_Is_It_IsAnyType()
+		{
+			var acceptableArgs = new object[] { 42, "42" };
+
+			var invocationCount = 0;
+			var mock = new Mock<IY>();
+			mock.Setup(m => m.Method(It.Is<It.IsAnyType>((x, _) => acceptableArgs.Contains(x))))
+			    .Callback((object arg) => invocationCount++);
+
+			_ = mock.Object.Method<string>("42");
+			Assert.Equal(1, invocationCount);
+
+			_ = mock.Object.Method<string>("7");
+			Assert.Equal(1, invocationCount);
+
+			_ = mock.Object.Method<int>(42);
+			Assert.Equal(2, invocationCount);
+
+			_ = mock.Object.Method<int>(7);
+			Assert.Equal(2, invocationCount);
+		}
+
+		[Fact]
+		public void It_Is_It_IsAnyType_will_throw_when_predicate_uninvokable()
+		{
+			Action useMatcher = () => _ = It.Is<It.IsAnyType>(arg => true);
+			//                                                ^^^
+			// When used like this, the predicate will have static type `It.IsAnyType`,
+			// and no *actual* argument will ever be of that type; therefore, we expect
+			// Moq to mark this as illegal use.
+
+			Assert.Throws<ArgumentException>(useMatcher);
 		}
 
 		[Fact]
