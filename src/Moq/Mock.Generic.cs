@@ -28,7 +28,48 @@ namespace Moq
 	///     <see cref = "MockBehavior" /> that can be passed to the<see cref="Mock{T}(MockBehavior)"/> constructor.
 	///   </para>
 	/// </remarks>
-	/// <include file='Mock.Generic.xdoc' path='docs/doc[@for="Mock{T}"]/*'/>
+	/// <example group="overview">
+	///   The following example shows establishing setups with specific values for method invocations:
+	///   <code>
+	///     // Arrange
+	///     var order = new Order(TALISKER, 50);
+	///     var warehouse = new Mock&lt;IWarehouse&gt;();
+	///     warehouse.Setup(w => w.HasInventory(TALISKER, 50)).Returns(true);
+	///
+	///     // Act
+	///     order.Fill(warehouse.Object);
+	///
+	///     // Assert
+	///     Assert.True(order.IsFilled);
+	///   </code>
+	/// </example>
+	/// <example group="overview">
+	///   The following example shows how to use the <see cref="It"/> class
+	///   to specify conditions for arguments instead of specific values:
+	///   <code>
+	///     // Arrange
+	///     var order = new Order(TALISKER, 50);
+	///     var warehouse = new Mock&lt;IWarehouse&gt;();
+	///
+	///     // shows how to expect a value within a range:
+	///     warehouse.Setup(x => x.HasInventory(
+	///                              It.IsAny&lt;string&gt;(),
+	///                              It.IsInRange(0, 100, Range.Inclusive)))
+	///              .Returns(false);
+	///
+	///     // shows how to throw for unexpected calls.
+	///     warehouse.Setup(x => x.Remove(
+	///                              It.IsAny&lt;string&gt;(),
+	///                              It.IsAny&lt;int&gt;()))
+	///              .Throws(new InvalidOperationException());
+	///
+	///     // Act
+	///     order.Fill(warehouse.Object);
+	///
+	///     // Assert
+	///     Assert.False(order.IsFilled);
+	///   </code>
+	/// </example>
 	public partial class Mock<T> : Mock, IMock<T> where T : class
 	{
 		private static Type[] inheritedInterfaces;
@@ -78,7 +119,11 @@ namespace Moq
 		/// <summary>
 		///   Initializes an instance of the mock with <see cref="MockBehavior.Default"/> behavior.
 		/// </summary>
-		/// <include file='Mock.Generic.xdoc' path='docs/doc[@for="Mock{T}.ctor()"]/*'/>
+		/// <example>
+		///   <code>
+		///     var mock = new Mock&lt;IFormatProvider&gt;();
+		///   </code>
+		/// </example>
 		[SuppressMessage("Microsoft.Usage", "CA2214:DoNotCallOverridableMethodsInConstructors")]
 		public Mock()
 			: this(MockBehavior.Default)
@@ -94,7 +139,11 @@ namespace Moq
 		///   The mock will try to find the best match constructor given the constructor arguments,
 		///   and invoke that to initialize the instance.This applies only for classes, not interfaces.
 		/// </remarks>
-		/// <include file='Mock.Generic.xdoc' path='docs/doc[@for="Mock{T}.ctor(object[])"]/*'/>
+		/// <example>
+		///   <code>
+		///     var mock = new Mock&lt;MyProvider&gt;(someArgument, 25);
+		///   </code>
+		/// </example>
 		[SuppressMessage("Microsoft.Usage", "CA2214:DoNotCallOverridableMethodsInConstructors")]
 		public Mock(params object[] args)
 			: this(MockBehavior.Default, args)
@@ -105,7 +154,11 @@ namespace Moq
 		///   Initializes an instance of the mock with the specified <see cref="MockBehavior"/> behavior.
 		/// </summary>
 		/// <param name="behavior">Behavior of the mock.</param>
-		/// <include file='Mock.Generic.xdoc' path='docs/doc[@for="Mock{T}.ctor(MockBehavior)"]/*'/>
+		/// <example>
+		///   <code>
+		///     var mock = new Mock&lt;IFormatProvider&gt;(MockBehavior.Strict);
+		///   </code>
+		/// </example>
 		[SuppressMessage("Microsoft.Usage", "CA2214:DoNotCallOverridableMethodsInConstructors")]
 		public Mock(MockBehavior behavior)
 			: this(behavior, new object[0])
@@ -122,7 +175,6 @@ namespace Moq
 		///   The mock will try to find the best match constructor given the constructor arguments,
 		///   and invoke that to initialize the instance. This applies only to classes, not interfaces.
 		/// </remarks>
-		/// <include file='Mock.Generic.xdoc' path='docs/doc[@for="Mock{T}.ctor(MockBehavior,object[])"]/*'/>
 		[SuppressMessage("Microsoft.Usage", "CA2214:DoNotCallOverridableMethodsInConstructors")]
 		public Mock(MockBehavior behavior, params object[] args)
 		{
@@ -321,7 +373,12 @@ namespace Moq
 		///   If more than one setup is specified for the same method or property,
 		///   the latest one wins and is the one that will be executed.
 		/// </remarks>
-		/// <include file='Mock.Generic.xdoc' path='docs/doc[@for="Mock{T}.Setup"]/*'/>
+		/// <example group="setups">
+		///   <code>
+		///     var mock = new Mock&lt;IProcessor&gt;();
+		///     mock.Setup(x => x.Execute("ping"));
+		///   </code>
+		/// </example>
 		[SuppressMessage("Microsoft.Design", "CA1006:DoNotNestGenericTypesInMemberSignatures", Justification = "By design")]
 		public ISetup<T> Setup(Expression<Action<T>> expression)
 		{
@@ -338,7 +395,12 @@ namespace Moq
 		///   If more than one setup is specified for the same method or property,
 		///   the latest one wins and is the one that will be executed.
 		/// </remarks>
-		/// <include file='Mock.Generic.xdoc' path='docs/doc[@for="Mock{T}.Setup{TResult}"]/*'/>
+		/// <example group="setups">
+		///   <code>
+		///     mock.Setup(x => x.HasInventory("Talisker", 50))
+		///         .Returns(true);
+		///   </code>
+		/// </example>
 		[SuppressMessage("Microsoft.Design", "CA1006:DoNotNestGenericTypesInMemberSignatures", Justification = "By design")]
 		public ISetup<T, TResult> Setup<TResult>(Expression<Func<T, TResult>> expression)
 		{
@@ -355,7 +417,12 @@ namespace Moq
 		///   If more than one setup is set for the same property getter,
 		///   the latest one wins and is the one that will be executed.
 		/// </remarks>
-		/// <include file='Mock.Generic.xdoc' path='docs/doc[@for="Mock{T}.SetupGet"]/*'/>
+		/// <example group="setups">
+		///   <code>
+		///     mock.SetupGet(x => x.Suspended)
+		///         .Returns(true);
+		///   </code>
+		/// </example>
 		[SuppressMessage("Microsoft.Design", "CA1006:DoNotNestGenericTypesInMemberSignatures", Justification = "By design")]
 		public ISetupGetter<T, TProperty> SetupGet<TProperty>(Expression<Func<T, TProperty>> expression)
 		{
@@ -375,7 +442,11 @@ namespace Moq
 		///     This overloads allows the use of a callback already typed for the property type.
 		///   </para>
 		/// </remarks>
-		/// <include file='Mock.Generic.xdoc' path='docs/doc[@for="Mock{T}.SetupSet{TProperty}"]/*'/>
+		/// <example group="setups">
+		///   <code>
+		///     mock.SetupSet(x => x.Suspended = true);
+		///   </code>
+		/// </example>
 		public ISetupSetter<T, TProperty> SetupSet<TProperty>(Action<T> setterExpression)
 		{
 			Guard.NotNull(setterExpression, nameof(setterExpression));
@@ -393,7 +464,11 @@ namespace Moq
 		///   If more than one setup is set for the same property setter,
 		///   the latest one wins and is the one that will be executed.
 		/// </remarks>
-		/// <include file='Mock.Generic.xdoc' path='docs/doc[@for="Mock{T}.SetupSet"]/*'/>
+		/// <example group="setups">
+		///   <code>
+		///     mock.SetupSet(x => x.Suspended = true);
+		///   </code>
+		/// </example>
 		public ISetup<T> SetupSet(Action<T> setterExpression)
 		{
 			Guard.NotNull(setterExpression, nameof(setterExpression));
@@ -411,7 +486,11 @@ namespace Moq
 		///   If more than one setup is set for the same event add,
 		///   the latest one wins and is the one that will be executed.
 		/// </remarks>
-		/// <include file='Mock.Generic.xdoc' path='docs/doc[@for="Mock{T}.SetupAdd"]/*'/>
+		/// <example group="setups">
+		///   <code>
+		///     mock.SetupAdd(x => x.EventHandler += (s, e) => {});
+		///   </code>
+		/// </example>
 		public ISetup<T> SetupAdd(Action<T> addExpression)
 		{
 			Guard.NotNull(addExpression, nameof(addExpression));
@@ -423,14 +502,18 @@ namespace Moq
 		}
 
 		/// <summary>
-		///   Specifies a setup on the mocked type for a call to an event 'remove.
+		///   Specifies a setup on the mocked type for a call to an event remove.
 		/// </summary>
 		/// <param name="removeExpression">Lambda expression that removes an event.</param>
 		/// <remarks>
 		///   If more than one setup is set for the same event remove,
 		///   the latest one wins and is the one that will be executed.
 		/// </remarks>
-		/// <include file='Mock.Generic.xdoc' path='docs/doc[@for="Mock{T}.SetupRemove"]/*'/>
+		/// <example group="setups">
+		///   <code>
+		///     mock.SetupRemove(x => x.EventHandler -= (s, e) => {});
+		///   </code>
+		/// </example>
 		public ISetup<T> SetupRemove(Action<T> removeExpression)
 		{
 			Guard.NotNull(removeExpression, nameof(removeExpression));
@@ -450,7 +533,21 @@ namespace Moq
 		/// <typeparam name="TProperty">
 		///   Type of the property, inferred from the property expression (does not need to be specified).
 		/// </typeparam>
-		/// <include file='Mock.Generic.xdoc' path='docs/doc[@for="Mock{T}.SetupProperty(property)"]/*'/>
+		/// <example group="setups">
+		///   If you have an interface with an int property <c>Value</c>,
+		///   you might stub it using the following straightforward call:
+		///   <code>
+		///     var mock = new Mock&lt;IHaveValue&gt;();
+		///     mock.SetupProperty(v => v.Value);
+		///   </code>
+		///   After the <c>SetupProperty</c> call has been issued, setting and retrieving
+		///   the object value will behave as expected:
+		///   <code>
+		///     IHaveValue v = mock.Object;
+		///     v.Value = 5;
+		///     Assert.Equal(5, v.Value);
+		///   </code>
+		/// </example>
 		[SuppressMessage("Microsoft.Design", "CA1006:DoNotNestGenericTypesInMemberSignatures", Justification = "By design")]
 		[SuppressMessage("Microsoft.Naming", "CA1716:IdentifiersShouldNotMatchKeywords", MessageId = "Property", Justification = "This sets properties, so it's appropriate.")]
 		public Mock<T> SetupProperty<TProperty>(Expression<Func<T, TProperty>> property)
@@ -469,7 +566,24 @@ namespace Moq
 		/// <typeparam name="TProperty">
 		///   Type of the property, inferred from the property expression (does not need to be specified).
 		/// </typeparam>
-		/// <include file='Mock.Generic.xdoc' path='docs/doc[@for="Mock{T}.SetupProperty(property,initialValue)"]/*'/>
+		/// <example group="setups">
+		///   If you have an interface with an int property <c>Value</c>,
+		///   you might stub it using the following straightforward call:
+		///   <code>
+		///     var mock = new Mock&lt;IHaveValue&gt;();
+		///     mock.SetupProperty(v => v.Value, 5);
+		///   </code>
+		///   After the <c>SetupProperty</c> call has been issued, setting and retrieving the object value
+		///   will behave as expected:
+		///   <code>
+		///     IHaveValue v = mock.Object;
+		///     Assert.Equal(5, v.Value); // Initial value was stored
+		///
+		///     // New value set which changes the initial value
+		///     v.Value = 6;
+		///     Assert.Equal(6, v.Value);
+		///   </code>
+		/// </example>
 		[SuppressMessage("Microsoft.Design", "CA1006:DoNotNestGenericTypesInMemberSignatures", Justification = "By design")]
 		[SuppressMessage("Microsoft.Naming", "CA1716:IdentifiersShouldNotMatchKeywords", MessageId = "Property", Justification = "We're setting up a property, so it's appropriate.")]
 		public Mock<T> SetupProperty<TProperty>(Expression<Func<T, TProperty>> property, TProperty initialValue)
@@ -552,7 +666,18 @@ namespace Moq
 		/// </summary>
 		/// <param name="expression">Expression to verify.</param>
 		/// <exception cref="MockException">The invocation was not performed on the mock.</exception>
-		/// <include file='Mock.Generic.xdoc' path='docs/doc[@for="Mock{T}.Verify(expression)"]/*'/>
+		/// <example group="verification">
+		///   This example assumes that the mock has been used, and later we want to verify
+		///   that a given invocation with specific parameters was performed:
+		///   <code>
+		///     var mock = new Mock&lt;IProcessor&gt;();
+		///
+		///     ... // exercise mock
+		///
+		///     // Will throw if the test code didn't call Execute with a "ping" string argument.
+		///     mock.Verify(proc => proc.Execute("ping"));
+		///   </code>
+		/// </example>
 		[SuppressMessage("Microsoft.Design", "CA1006:DoNotNestGenericTypesInMemberSignatures", Justification = "By design")]
 		public void Verify(Expression<Action<T>> expression)
 		{
@@ -597,7 +722,6 @@ namespace Moq
 		/// <param name="expression">Expression to verify.</param>
 		/// <param name="failMessage">Message to show if verification fails.</param>
 		/// <exception cref="MockException">The invocation was not performed on the mock.</exception>
-		/// <include file='Mock.Generic.xdoc' path='docs/doc[@for="Mock{T}.Verify(expression,failMessage)"]/*'/>
 		[SuppressMessage("Microsoft.Design", "CA1006:DoNotNestGenericTypesInMemberSignatures", Justification = "By design")]
 		public void Verify(Expression<Action<T>> expression, string failMessage)
 		{
@@ -645,7 +769,18 @@ namespace Moq
 		/// <param name="expression">Expression to verify.</param>
 		/// <typeparam name="TResult">Type of return value from the expression.</typeparam>
 		/// <exception cref="MockException">The invocation was not performed on the mock.</exception>
-		/// <include file='Mock.Generic.xdoc' path='docs/doc[@for="Mock{T}.Verify{TResult}(expression)"]/*'/>
+		/// <example group="verification">
+		///   This example assumes that the mock has been used, and later we want to verify
+		///   that a given invocation with specific parameters was performed:
+		///   <code>
+		///     var mock = new Mock&lt;IWarehouse&gt;();
+		///
+		///     ... // exercise mock
+		///
+		///     // Will throw if the test code didn't call HasInventory.
+		///     mock.Verify(warehouse => warehouse.HasInventory(TALISKER, 50));
+		///   </code>
+		/// </example>
 		[SuppressMessage("Microsoft.Design", "CA1006:DoNotNestGenericTypesInMemberSignatures", Justification = "By design")]
 		public void Verify<TResult>(Expression<Func<T, TResult>> expression)
 		{
@@ -692,7 +827,19 @@ namespace Moq
 		/// <param name="failMessage">Message to show if verification fails.</param>
 		/// <typeparam name="TResult">Type of return value from the expression.</typeparam>
 		/// <exception cref="MockException">The invocation was not performed on the mock.</exception>
-		/// <include file='Mock.Generic.xdoc' path='docs/doc[@for="Mock{T}.Verify{TResult}(expression,failMessage)"]/*'/>
+		/// <example group="verification">
+		///   This example assumes that the mock has been used, and later we want to verify
+		///   that a given invocation with specific parameters was performed:
+		///   <code>
+		///     var mock = new Mock&lt;IWarehouse&gt;();
+		///
+		///     ... // exercise mock
+		///
+		///     // Will throw if the test code didn't call HasInventory.
+		///     mock.Verify(warehouse => warehouse.HasInventory(TALISKER, 50),
+		///                 "When filling orders, inventory has to be checked");
+		///   </code>
+		/// </example>
 		[SuppressMessage("Microsoft.Design", "CA1006:DoNotNestGenericTypesInMemberSignatures", Justification = "By design")]
 		public void Verify<TResult>(Expression<Func<T, TResult>> expression, string failMessage)
 		{
@@ -724,7 +871,18 @@ namespace Moq
 		///   Type of the property to verify. Typically omitted as it can be inferred from the expression's return type.
 		/// </typeparam>
 		/// <exception cref="MockException">The invocation was not performed on the mock.</exception>
-		/// <include file='Mock.Generic.xdoc' path='docs/doc[@for="Mock{T}.VerifyGet(expression)"]/*'/>
+		/// <example group="verification">
+		///   This example assumes that the mock has been used, and later we want to verify
+		///   that a given property was retrieved from it:
+		///   <code>
+		///     var mock = new Mock&lt;IWarehouse&gt;();
+		///
+		///     ... // exercise mock
+		///
+		///     // Will throw if the test code didn't retrieve the IsClosed property.
+		///     mock.VerifyGet(warehouse => warehouse.IsClosed);
+		///   </code>
+		/// </example>
 		[SuppressMessage("Microsoft.Design", "CA1006:DoNotNestGenericTypesInMemberSignatures", Justification = "By design")]
 		public void VerifyGet<TProperty>(Expression<Func<T, TProperty>> expression)
 		{
@@ -774,7 +932,6 @@ namespace Moq
 		///   Type of the property to verify. Typically omitted as it can be inferred from the expression's return type.
 		/// </typeparam>
 		/// <exception cref="MockException">The invocation was not performed on the mock.</exception>
-		/// <include file='Mock.Generic.xdoc' path='docs/doc[@for="Mock{T}.VerifyGet(expression,failMessage)"]/*'/>
 		[SuppressMessage("Microsoft.Design", "CA1006:DoNotNestGenericTypesInMemberSignatures", Justification = "By design")]
 		public void VerifyGet<TProperty>(Expression<Func<T, TProperty>> expression, string failMessage)
 		{
@@ -822,7 +979,18 @@ namespace Moq
 		/// </summary>
 		/// <param name="setterExpression">Expression to verify.</param>
 		/// <exception cref="MockException">The invocation was not performed on the mock.</exception>
-		/// <include file='Mock.Generic.xdoc' path='docs/doc[@for="Mock{T}.VerifySet(expression)"]/*'/>
+		/// <example group="verification">
+		///   This example assumes that the mock has been used, and later we want to verify
+		///   that a given property was set on it:
+		///   <code>
+		///     var mock = new Mock&lt;IWarehouse&gt;();
+		///
+		///     ... // exercise mock
+		///
+		///     // Will throw if the test code didn't set the IsClosed property.
+		///     mock.VerifySet(warehouse => warehouse.IsClosed = true);
+		///   </code>
+		/// </example>
 		public void VerifySet(Action<T> setterExpression)
 		{
 			Guard.NotNull(setterExpression, nameof(setterExpression));
@@ -869,7 +1037,19 @@ namespace Moq
 		/// <param name="setterExpression">Expression to verify.</param>
 		/// <param name="failMessage">Message to show if verification fails.</param>
 		/// <exception cref="MockException">The invocation was not performed on the mock.</exception>
-		/// <include file='Mock.Generic.xdoc' path='docs/doc[@for="Mock{T}.VerifySet(expression,failMessage)"]/*'/>
+		/// <example>
+		///   This example assumes that the mock has been used, and later we want to verify
+		///   that a given property was set on it:
+		///   <code>
+		///     var mock = new Mock&lt;IWarehouse&gt;();
+		///
+		///     ... // exercise mock
+		///
+		///     // Will throw if the test code didn't set the IsClosed property.
+		///     mock.VerifySet(warehouse =&gt; warehouse.IsClosed = true,
+		///                    "Warehouse should always be closed after the action");
+		///   </code>
+		/// </example>
 		public void VerifySet(Action<T> setterExpression, string failMessage)
 		{
 			Guard.NotNull(setterExpression, nameof(setterExpression));
@@ -917,7 +1097,18 @@ namespace Moq
 		/// </summary>
 		/// <param name="addExpression">Expression to verify.</param>
 		/// <exception cref="MockException">The invocation was not performed on the mock.</exception>
-		/// <include file='Mock.Generic.xdoc' path='docs/doc[@for="Mock{T}.VerifyAdd(addExpression)"]/*'/>
+		/// <example group="verification">
+		///   This example assumes that the mock has been used, and later we want to verify
+		///   that a given event handler was subscribed to an event:
+		///   <code>
+		///     var mock = new Mock&lt;IWarehouse&gt;();
+		///
+		///     ... // exercise mock
+		///
+		///     // Will throw if the test code didn't subscribe to the OnClosed event.
+		///     mock.VerifyAdd(warehouse => warehouse.OnClosed += It.IsAny&lt;EventHandler&gt;());
+		///   </code>
+		/// </example>
 		public void VerifyAdd(Action<T> addExpression)
 		{
 			Guard.NotNull(addExpression, nameof(addExpression));
@@ -964,7 +1155,6 @@ namespace Moq
 		/// <param name="addExpression">Expression to verify.</param>
 		/// <param name="failMessage">Message to show if verification fails.</param>
 		/// <exception cref="MockException">The invocation was not performed on the mock.</exception>
-		/// <include file='Mock.Generic.xdoc' path='docs/doc[@for="Mock{T}.VerifyAdd(addExpression,failMessage)"]/*'/>
 		public void VerifyAdd(Action<T> addExpression, string failMessage)
 		{
 			Guard.NotNull(addExpression, nameof(addExpression));
@@ -1012,7 +1202,18 @@ namespace Moq
 		/// </summary>
 		/// <param name="removeExpression">Expression to verify.</param>
 		/// <exception cref="MockException">The invocation was not performed on the mock.</exception>
-		/// <include file='Mock.Generic.xdoc' path='docs/doc[@for="Mock{T}.VerifyRemove(removeExpression)"]/*'/>
+		/// <example group="verification">
+		///   This example assumes that the mock has been used, and later we want to verify
+		///   that a given event handler was removed from an event:
+		///   <code>
+		///     var mock = new Mock&lt;IWarehouse&gt;();
+		///
+		///     ... // exercise mock
+		///
+		///     // Will throw if the test code didn't unsubscribe from the OnClosed event.
+		///     mock.VerifyRemove(warehouse => warehouse.OnClose -= It.IsAny&lt;EventHandler&gt;());
+		///   </code>
+		/// </example>
 		public void VerifyRemove(Action<T> removeExpression)
 		{
 			Guard.NotNull(removeExpression, nameof(removeExpression));
@@ -1059,7 +1260,6 @@ namespace Moq
 		/// <param name="removeExpression">Expression to verify.</param>
 		/// <param name="failMessage">Message to show if verification fails.</param>
 		/// <exception cref="MockException">The invocation was not performed on the mock.</exception>
-		/// <include file='Mock.Generic.xdoc' path='docs/doc[@for="Mock{T}.VerifyRemove(removeExpression,failMessage)"]/*'/>
 		public void VerifyRemove(Action<T> removeExpression, string failMessage)
 		{
 			Guard.NotNull(removeExpression, nameof(removeExpression));
@@ -1122,7 +1322,32 @@ namespace Moq
 		///   The <paramref name="args"/> argument is invalid for the target event invocation,
 		///   or the <paramref name="eventExpression"/> is not an event attach or detach expression.
 		/// </exception>
-		/// <include file='Mock.Generic.xdoc' path='docs/doc[@for="Mock{T}.Raise"]/*'/>
+		/// <example>
+		///   The following example shows how to raise a
+		///   <see cref="System.ComponentModel.INotifyPropertyChanged.PropertyChanged"/> event:
+		///   <code>
+		///     var mock = new Mock&lt;IViewModel&gt;();
+		///     mock.Raise(x => x.PropertyChanged -= null, new PropertyChangedEventArgs("Name"));
+		///   </code>
+		/// </example>
+		/// <example>
+		///   This example shows how to invoke an event with a custom event arguments class
+		///   in a view that will cause its corresponding presenter to react by changing its state:
+		///   <code>
+		///     var mockView = new Mock&lt;IOrdersView&gt;();
+		///     var presenter = new OrdersPresenter(mockView.Object);
+		///
+		///     // Check that the presenter has no selection by default
+		///     Assert.Null(presenter.SelectedOrder);
+		///
+		///     // Raise the event with a specific arguments data
+		///     mockView.Raise(v => v.SelectionChanged += null, new OrderEventArgs { Order = new Order("moq", 500) });
+		///
+		///     // Now the presenter reacted to the event, and we have a selected order
+		///     Assert.NotNull(presenter.SelectedOrder);
+		///     Assert.Equal("moq", presenter.SelectedOrder.ProductName);
+		///   </code>
+		/// </example>
 		[SuppressMessage("Microsoft.Design", "CA1030:UseEventsWhereAppropriate", Justification = "Raises the event, rather than being one.")]
 		public void Raise(Action<T> eventExpression, EventArgs args)
 		{
@@ -1136,7 +1361,14 @@ namespace Moq
 		///   The <paramref name="args"/> arguments are invalid for the target event invocation,
 		///   or the <paramref name="eventExpression"/> is not an event attach or detach expression.
 		/// </exception>
-		/// <include file='Mock.Generic.xdoc' path='docs/doc[@for="Mock{T}.Raise(args)"]/*'/>
+		/// <example>
+		///   The following example shows how to raise a custom event that does not adhere
+		///   to the standard <c>EventHandler</c>:
+		///   <code>
+		///     var mock = new Mock&lt;IViewModel&gt;();
+		///     mock.Raise(x => x.MyEvent -= null, "Name", bool, 25);
+		///   </code>
+		/// </example>
 		[SuppressMessage("Microsoft.Design", "CA1030:UseEventsWhereAppropriate", Justification = "Raises the event, rather than being one.")]
 		public void Raise(Action<T> eventExpression, params object[] args)
 		{
