@@ -20,5 +20,10 @@ namespace Moq
 		/// Gets the arguments of the invocation.
 		/// </summary>
 		IReadOnlyList<object> Arguments { get; }
+
+		/// <summary>
+		/// Gets the return value of the invocation.
+		/// </summary>
+		object ReturnValue { get; }
 	}
 }
