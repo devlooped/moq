@@ -155,6 +155,7 @@ It contains several minor breaking changes, and there have been extensive intern
 
 #### Fixed
 
+* Setting multiple indexed object's property directly via LINQ fails (@TylerBrinkley, #314)
 * `InvalidOperationException` when specifiying setup on mock with mock containing property of type `Nullable<T>` (@dav1dev, #725)
 * `Verify` gets confused between the same generic and non-generic signature (@lepijohnny, #749)
 * Setup gets included in `Verify` despite being "unreachable" (@stakx, #703)
