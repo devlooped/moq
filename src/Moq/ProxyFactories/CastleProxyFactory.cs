@@ -2,6 +2,7 @@
 // All rights reserved. Licensed under the BSD 3-Clause License; see License.txt.
 
 using System;
+using System.Collections.Concurrent;
 using System.Collections.Generic;
 using System.Diagnostics;
 using System.Globalization;
@@ -30,7 +31,7 @@ namespace Moq
 	internal sealed class CastleProxyFactory : ProxyFactory
 	{
 		private ProxyGenerationOptions generationOptions;
-		private ProxyGenerator generator;
+		private readonly ConcurrentDictionary<string, ProxyGenerator> generators = new ConcurrentDictionary<string, ProxyGenerator>();
 
 		#if FEATURE_CAS || FEATURE_COM
 		static CastleProxyFactory()
@@ -52,12 +53,13 @@ namespace Moq
 		public CastleProxyFactory()
 		{
 			this.generationOptions = new ProxyGenerationOptions { Hook = new IncludeObjectMethodsHook(), BaseTypeForInterfaceProxy = typeof(InterfaceProxy) };
-			this.generator = new ProxyGenerator();
 		}
 
 		/// <inheritdoc />
 		public override object CreateProxy(Type mockType, Moq.IInterceptor interceptor, Type[] interfaces, object[] arguments)
 		{
+			var generator = generators.GetOrAdd(mockType.Name, key => new ProxyGenerator());
+
 			// All generated proxies need to implement `IProxy`:
 			var additionalInterfaces = new Type[1 + interfaces.Length];
 			additionalInterfaces[0] = typeof(IProxy);
