@@ -19,7 +19,6 @@ namespace Moq.Tests
 
 		public class C : B
 		{
-
 		}
 
 		[Fact]
