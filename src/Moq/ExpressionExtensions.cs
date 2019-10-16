@@ -320,7 +320,9 @@ namespace Moq
 			// we "upgrade" to the derived property.
 			if (property.DeclaringType != expression.Expression.Type)
 			{
-				var derivedProperty = expression.Expression.Type.GetProperty(property.Name, BindingFlags.Public | BindingFlags.NonPublic | BindingFlags.Instance);
+				var derivedProperty = expression.Expression.Type
+					.GetProperties(BindingFlags.Public | BindingFlags.NonPublic | BindingFlags.Instance)
+					.SingleOrDefault(p => p.Name == property.Name && p.PropertyType == property.PropertyType);
 				if (derivedProperty != null && derivedProperty.GetMethod.GetBaseDefinition() == property.GetMethod)
 				{
 					return derivedProperty;
