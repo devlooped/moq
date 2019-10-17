@@ -3150,6 +3150,57 @@ namespace Moq.Tests.Regressions
 
 		#endregion
 
+		#region 942
+
+		public class Issue942
+		{
+			public interface IContent
+			{
+				string Name { get; set; }
+			}
+
+			public interface IContainer
+			{
+				IContent Content { get; set; }
+			}
+
+			private const string toStringReturnValue = "some string here";
+
+			[Fact]
+			public void Setup_ToString_before_Name()
+			{
+				this.TestImpl(contentMock =>
+				{
+					contentMock.Setup(c => c.ToString()).Returns(toStringReturnValue);
+					contentMock.Setup(c => c.Name);
+				});
+			}
+
+			[Fact]
+			public void Setup_ToString_after_Name()
+			{
+				this.TestImpl(contentMock =>
+				{
+					contentMock.Setup(c => c.Name);
+					contentMock.Setup(c => c.ToString()).Returns(toStringReturnValue);
+				});
+			}
+
+			private void TestImpl(Action<Mock<IContent>> setup)
+			{
+				var contentMock = new Mock<IContent>();
+				var containerMock = new Mock<IContainer>();
+
+				containerMock.Setup(c => c.Content).Returns(contentMock.Object);
+				setup(contentMock);
+
+				Assert.Equal(toStringReturnValue, contentMock.Object.ToString());
+				Assert.Equal(toStringReturnValue, containerMock.Object.Content.ToString());
+			}
+		}
+
+		#endregion
+
 		// Old @ Google Code
 
 		#region #47
