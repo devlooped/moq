@@ -401,6 +401,11 @@ namespace Moq
 				throw new ArgumentException(Resources.AsMustBeInterface);
 			}
 
+			if (typeof(TInterface) == typeof(T))
+			{
+				return (Mock<TInterface>)(Mock)this;
+			}
+
 			if (this.IsObjectInitialized && this.ImplementsInterface(interfaceType) == false)
 			{
 				throw new InvalidOperationException(Resources.AlreadyInitialized);
