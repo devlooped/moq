@@ -321,8 +321,9 @@ namespace Moq
 			if (property.DeclaringType != expression.Expression.Type)
 			{
 				var derivedProperty = expression.Expression.Type
-					.GetProperties(BindingFlags.Public | BindingFlags.NonPublic | BindingFlags.Instance)
-					.SingleOrDefault(p => p.Name == property.Name && p.PropertyType == property.PropertyType);
+					.GetMember(property.Name, MemberTypes.Property, BindingFlags.Public | BindingFlags.NonPublic | BindingFlags.Instance)
+					.Cast<PropertyInfo>()
+					.SingleOrDefault(p => p.PropertyType == property.PropertyType);
 				if (derivedProperty != null && derivedProperty.GetMethod.GetBaseDefinition() == property.GetMethod)
 				{
 					return derivedProperty;
