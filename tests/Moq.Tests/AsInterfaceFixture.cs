@@ -186,6 +186,26 @@ namespace Moq.Tests
 			Assert.Equal(3, valueOfSetupMethod);
 		}
 
+		[Fact]
+		public void As_mocked_type_returns_original_mock()
+		{
+			Mock<A> mock = new Mock<A>();
+			Assert.Same(mock, mock.As<A>());
+		}
+
+		[Fact]
+		public void Can_roundtrip_to_original_interface_mock_via_Mock_Get_and_As_original_interface()
+		{
+			Mock<B> bMockOriginal = new Mock<B>();
+			A a = bMockOriginal.Object;
+			Mock<A> aMock = Mock.Get(a);
+			Mock<B> bMockRoundtripped = aMock.As<B>();
+			Assert.Same(bMockOriginal, bMockRoundtripped);
+		}
+
+		public interface A { }
+		public interface B : A { }
+
 		public class Service : IService
 		{
 			public virtual int GetValue() => 1;

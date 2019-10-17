@@ -10,6 +10,7 @@ The format is loosely based on [Keep a Changelog](http://keepachangelog.com/en/1
 
 * AmbiguousMatchException when setting up the property, that hides another one (@ishatalkin, #939)
 * `ArgumentException` ("Interface not found") when setting up `object.ToString` on an interface mock (@vslynko, #942)
+* Cannot "return" to original mocked type after downcasting with `Mock.Get` and then upcasting with `mock.As<>` (@pjquirk, #943)
 
 ## 4.13.0 (2019-08-31)
 
