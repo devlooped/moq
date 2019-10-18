@@ -143,6 +143,17 @@ namespace Moq
 
 		private static bool EqualsConstant(ConstantExpression x, ConstantExpression y)
 		{
+			if (x.Value is Array array1 && y.Value is Array array2 && array1.Length == array2.Length)
+			{
+				for (var index = 0; index < array1.Length; index++)
+				{
+					if (!object.Equals(array1.GetValue(index), array2.GetValue(index)))
+						return false;
+				}
+
+				return true;
+			}
+
 			return object.Equals(x.Value, y.Value);
 		}
 

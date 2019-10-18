@@ -315,6 +315,19 @@ namespace Moq.Tests
 			Assert.Equal(5, fooMock.Object.Bar.GetBaz("foo").Value);
 		}
 
+		[Fact]
+		public void ParamsAreMatchedInSecondSetup()
+		{
+			string expected = "1";
+
+			var target = new Mock<IFoo>();
+			target.Setup(x => x.Params(1).Do("1")).Returns("1");
+			target.Setup(x => x.Params(1).Do("2")).Returns("2");
+
+			string ret = target.Object.Params(1).Do("1");
+			Assert.Equal(expected, ret);
+		}
+
 		public class Verify_can_tell_apart_different_arguments_in_intermediate_part_of_fluent_expressions
 		{
 			[Fact]
@@ -417,6 +430,7 @@ namespace Moq.Tests
 		{
 			public IBar BarField;
 			public IBar Bar { get; set; }
+			public IBar Params(params int[] ints){ return null; }
 			public IBar GetBar() { return null; }
 			public IBar this[int index] { get { return null; } set { } }
 
@@ -431,6 +445,7 @@ namespace Moq.Tests
 			IBar Bar { get; set; }
 			IBar this[int index] { get; set; }
 			string Do(string command);
+			IBar Params(params int[] ints);
 			IBar GetBar();
 		}
 
