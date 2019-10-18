@@ -3,6 +3,7 @@
 
 using System;
 using System.Diagnostics;
+using System.Linq;
 using System.Linq.Expressions;
 
 using Xunit;
@@ -32,6 +33,22 @@ namespace Moq.Tests
 			var fst = ToInvocationShape<B>(b => b.Method(1, 2, 3));
 			var snd = ToInvocationShape<B>(b => b.Method(1, 2, 3));
 
+			Assert.NotSame(fst, snd);
+			Assert.Equal(fst, snd);
+		}
+
+		[Fact]
+		public void Param_array_args_are_compared_partially_evaluated()
+		{
+			int x = 1;
+
+			var fst = ToInvocationShape<B>(b => b.Method(1, 2, 3));
+			var snd = ToInvocationShape<B>(b => b.Method(x, 2, 3));
+			//                                           ^
+			// `x` will be captured and represented in the expression tree as a display class field access:
+			var xExpr = ((snd.Expression.Body as MethodCallExpression).Arguments.Last() as NewArrayExpression).Expressions.First();
+
+			Assert.False(xExpr is ConstantExpression);
 			Assert.NotSame(fst, snd);
 			Assert.Equal(fst, snd);
 		}

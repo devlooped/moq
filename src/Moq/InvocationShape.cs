@@ -170,6 +170,11 @@ namespace Moq
 				// not array reference equality:
 				if (i == li && lastParameterIsParamArray)
 				{
+					// In the following, if we retrieved the `params` arrays via `partiallyEvaluatedArguments`,
+					// we might see them either as `NewArrayExpression`s or reduced to `ConstantExpression`s.
+					// By retrieving them via `Arguments` we always see them as non-reduced `NewArrayExpression`s,
+					// so we don't have to distinguish between two cases. (However, the expressions inside those
+					// have already been partially evaluated by `MatcherFactory` earlier on!)
 					if (this.Arguments[li] is NewArrayExpression e1 && other.Arguments[li] is NewArrayExpression e2 && e1.Expressions.Count == e2.Expressions.Count)
 					{
 						for (int j = 0, nj = e1.Expressions.Count; j < nj; ++j)
