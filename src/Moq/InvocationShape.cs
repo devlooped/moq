@@ -4,6 +4,7 @@
 using System;
 using System.Collections.Generic;
 using System.Diagnostics;
+using System.Linq;
 using System.Linq.Expressions;
 using System.Reflection;
 
@@ -160,8 +161,34 @@ namespace Moq
 				other.partiallyEvaluatedArguments = PartiallyEvaluateArguments(other.Arguments);
 			}
 
-			for (int i = 0, n = this.partiallyEvaluatedArguments.Length; i < n; ++i)
+			var lastParameter = this.Method.GetParameters().LastOrDefault();
+			var lastParameterIsParamArray = lastParameter != null && lastParameter.ParameterType.IsArray && lastParameter.IsDefined(typeof(ParamArrayAttribute));
+
+			for (int i = 0, li = this.partiallyEvaluatedArguments.Length - 1; i <= li; ++i)
 			{
+				// Special case for final `params` parameters, which need to be compared by structural equality,
+				// not array reference equality:
+				if (i == li && lastParameterIsParamArray)
+				{
+					// In the following, if we retrieved the `params` arrays via `partiallyEvaluatedArguments`,
+					// we might see them either as `NewArrayExpression`s or reduced to `ConstantExpression`s.
+					// By retrieving them via `Arguments` we always see them as non-reduced `NewArrayExpression`s,
+					// so we don't have to distinguish between two cases. (However, the expressions inside those
+					// have already been partially evaluated by `MatcherFactory` earlier on!)
+					if (this.Arguments[li] is NewArrayExpression e1 && other.Arguments[li] is NewArrayExpression e2 && e1.Expressions.Count == e2.Expressions.Count)
+					{
+						for (int j = 0, nj = e1.Expressions.Count; j < nj; ++j)
+						{
+							if (!ExpressionComparer.Default.Equals(e1.Expressions[j], e2.Expressions[j]))
+							{
+								return false;
+							}
+						}
+
+						continue;
+					}
+				}
+
 				if (!ExpressionComparer.Default.Equals(this.partiallyEvaluatedArguments[i], other.partiallyEvaluatedArguments[i]))
 				{
 					return false;
