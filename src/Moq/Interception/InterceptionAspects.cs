@@ -314,9 +314,8 @@ namespace Moq
 				object propertyValue;
 
 				Setup getterSetup = null;
-				if (property.CanRead)
+				if (property.CanRead(out var getter))
 				{
-					var getter = property.GetGetMethod(true);
 					if (ProxyFactory.Instance.IsMethodVisible(getter, out _))
 					{
 						propertyValue = CreateInitialPropertyValue(mock, getter);
@@ -336,9 +335,8 @@ namespace Moq
 				}
 
 				Setup setterSetup = null;
-				if (property.CanWrite)
+				if (property.CanWrite(out var setter))
 				{
-					MethodInfo setter = property.GetSetMethod(nonPublic: true);
 					if (ProxyFactory.Instance.IsMethodVisible(setter, out _))
 					{
 						setterSetup = new AutoImplementedPropertySetterSetup(expression, setter, (newValue) =>

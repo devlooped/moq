@@ -19,6 +19,78 @@ namespace Moq
 			return type.IsValueType || type.GetConstructor(Type.EmptyTypes) != null;
 		}
 
+		public static bool CanRead(this PropertyInfo property, out MethodInfo getter)
+		{
+			if (property.CanRead)
+			{
+				// The given `PropertyInfo` should be able to provide a getter:
+				getter = property.GetGetMethod(nonPublic: true);
+				Debug.Assert(getter != null);
+				return true;
+			}
+			else
+			{
+				// The given `PropertyInfo` cannot provide a getter... but there may still be one in a base class'
+				// corresponding `PropertyInfo`! We need to find that base `PropertyInfo`, and because `PropertyInfo`
+				// does not have `.GetBaseDefinition()`, we'll find it via the setter's `.GetBaseDefinition()`.
+				// (We may assume that there's a setter because properties/indexers must have at least one accessor.)
+				Debug.Assert(property.CanWrite);
+				var setter = property.GetSetMethod(nonPublic: true);
+				Debug.Assert(setter != null);
+
+				var baseSetter = setter.GetBaseDefinition();
+				if (baseSetter != setter)
+				{
+					var baseProperty =
+						baseSetter
+						.DeclaringType
+						.GetMember(property.Name, MemberTypes.Property, BindingFlags.Public | BindingFlags.NonPublic | BindingFlags.Instance)
+						.Cast<PropertyInfo>()
+						.First(p => p.GetSetMethod(nonPublic: true) == baseSetter);
+					return baseProperty.CanRead(out getter);
+				}
+			}
+
+			getter = null;
+			return false;
+		}
+
+		public static bool CanWrite(this PropertyInfo property, out MethodInfo setter)
+		{
+			if (property.CanWrite)
+			{
+				// The given `PropertyInfo` should be able to provide a setter:
+				setter = property.GetSetMethod(nonPublic: true);
+				Debug.Assert(setter != null);
+				return true;
+			}
+			else
+			{
+				// The given `PropertyInfo` cannot provide a setter... but there may still be one in a base class'
+				// corresponding `PropertyInfo`! We need to find that base `PropertyInfo`, and because `PropertyInfo`
+				// does not have `.GetBaseDefinition()`, we'll find it via the getter's `.GetBaseDefinition()`.
+				// (We may assume that there's a getter because properties/indexers must have at least one accessor.)
+				Debug.Assert(property.CanRead);
+				var getter = property.GetGetMethod(nonPublic: true);
+				Debug.Assert(getter != null);
+
+				var baseGetter = getter.GetBaseDefinition();
+				if (baseGetter != getter)
+				{
+					var baseProperty =
+						baseGetter
+						.DeclaringType
+						.GetMember(property.Name, MemberTypes.Property, BindingFlags.Public | BindingFlags.NonPublic | BindingFlags.Instance)
+						.Cast<PropertyInfo>()
+						.First(p => p.GetGetMethod(nonPublic: true) == baseGetter);
+					return baseProperty.CanWrite(out setter);
+				}
+			}
+
+			setter = null;
+			return false;
+		}
+
 		/// <summary>
 		///   Gets the default value for the specified type. This is the Reflection counterpart of C#'s <see langword="default"/> operator.
 		/// </summary>
