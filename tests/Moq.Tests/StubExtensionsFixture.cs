@@ -267,6 +267,15 @@ namespace Moq.Tests
 			Assert.Equal("value", mock.Object.Property);
 		}
 
+		[Fact]
+		public void SetupProperty_retains_value_of_derived_read_write_property_that_overrides_only_setter()
+		{
+			var mock = new Mock<OverridesOnlySetter>();
+			mock.SetupProperty(m => m.Property);
+			mock.Object.Property = "value";
+			Assert.Equal("value", mock.Object.Property);
+		}
+
 		private object GetValue() { return new object(); }
 
 		public interface IFoo
