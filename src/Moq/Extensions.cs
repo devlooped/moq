@@ -256,6 +256,26 @@ namespace Moq
 					}
 					return true;
 
+				case TypeComparison.TypeMatchersOrElseEquality:
+					for (int i = 0; i < count; ++i)
+					{
+						if (types[i].IsTypeMatcher(out var typeMatcherType))
+						{
+							Debug.Assert(typeMatcherType.ImplementsTypeMatcherProtocol());
+
+							var typeMatcher = (ITypeMatcher)Activator.CreateInstance(typeMatcherType);
+							if (typeMatcher.Matches(otherTypes[i]) == false)
+							{
+								return false;
+							}
+						}
+						else if (types[i] != otherTypes[i])
+						{
+							return false;
+						}
+					}
+					return true;
+
 				default:
 					throw new ArgumentOutOfRangeException(nameof(comparisonType));
 			}

@@ -8,5 +8,6 @@ namespace Moq
 		AssignmentCompatibility,
 		Equality,
 		TypeMatchersOrElseAssignmentCompatibility,
+		TypeMatchersOrElseEquality,
 	}
 }

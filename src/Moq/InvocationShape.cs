@@ -34,8 +34,9 @@ namespace Moq
 #if DEBUG
 		private Type proxyType;
 #endif
+		private readonly TypeComparison genericTypeArgumentsComparisonMode;
 
-		public InvocationShape(LambdaExpression expression, MethodInfo method, IReadOnlyList<Expression> arguments = null)
+		public InvocationShape(LambdaExpression expression, MethodInfo method, IReadOnlyList<Expression> arguments = null, TypeComparison genericTypeArgumentsComparisonMode = TypeComparison.TypeMatchersOrElseAssignmentCompatibility)
 		{
 			Debug.Assert(expression != null);
 			Debug.Assert(method != null);
@@ -54,6 +55,8 @@ namespace Moq
 				this.argumentMatchers = noArgumentMatchers;
 				this.Arguments = noArguments;
 			}
+
+			this.genericTypeArgumentsComparisonMode = genericTypeArgumentsComparisonMode;
 		}
 
 		public void Deconstruct(out LambdaExpression expression, out MethodInfo method, out IReadOnlyList<Expression> arguments)
@@ -130,7 +133,7 @@ namespace Moq
 
 			if (method.IsGenericMethod || invocationMethod.IsGenericMethod)
 			{
-				if (!method.GetGenericArguments().CompareTo(invocationMethod.GetGenericArguments(), TypeComparison.TypeMatchersOrElseAssignmentCompatibility))
+				if (!method.GetGenericArguments().CompareTo(invocationMethod.GetGenericArguments(), this.genericTypeArgumentsComparisonMode))
 				{
 					return false;
 				}
