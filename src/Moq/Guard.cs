@@ -229,7 +229,7 @@ namespace Moq
 
 		public static void CanRead(PropertyInfo property)
 		{
-			if (!property.CanRead)
+			if (!property.CanRead(out _))
 			{
 				throw new ArgumentException(string.Format(
 					CultureInfo.CurrentCulture,
@@ -240,7 +240,7 @@ namespace Moq
 
 		public static void CanWrite(PropertyInfo property)
 		{
-			if (!property.CanWrite)
+			if (!property.CanWrite(out _))
 			{
 				throw new ArgumentException(string.Format(
 					CultureInfo.CurrentCulture,
