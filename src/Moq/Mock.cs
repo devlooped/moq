@@ -816,7 +816,7 @@ namespace Moq
 				Debug.Assert(method == property.GetGetMethod(true));
 			}
 
-			this.Setups.Add(new InnerMockSetup(new InvocationShape(expression, method, arguments), returnValue));
+			this.Setups.Add(new InnerMockSetup(new InvocationShape(expression, method, arguments, exactGenericTypeArguments: true), returnValue));
 		}
 
 		#endregion

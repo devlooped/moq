@@ -8,6 +8,7 @@ The format is loosely based on [Keep a Changelog](http://keepachangelog.com/en/1
 
 #### Fixed
 
+* Regression: `InvalidCastException` caused by Moq erroneously reusing a cached auto-mocked (`DefaultValue.Mock`) return value for a different generic method instantiation (@BrunoJuchli, #932)
 * AmbiguousMatchException when setting up the property, that hides another one (@ishatalkin, #939)
 * `ArgumentException` ("Interface not found") when setting up `object.ToString` on an interface mock (@vslynko, #942)
 * Cannot "return" to original mocked type after downcasting with `Mock.Get` and then upcasting with `mock.As<>` (@pjquirk, #943)
