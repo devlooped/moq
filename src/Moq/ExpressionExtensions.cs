@@ -284,8 +284,8 @@ namespace Moq
 						r = memberAccessExpression.Expression;
 						var parameter = Expression.Parameter(r.Type, r is ParameterExpression ope ? ope.Name : ParameterName);
 						var property = memberAccessExpression.GetReboundProperty();
-						var method = property.CanRead ? property.GetGetMethod(true) : property.GetSetMethod(true);
-						//                    ^^^^^^^                               ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+						var method = property.CanRead(out var getter) ? getter : property.GetSetMethod(true);
+						//                    ^^^^^^^                            ^^^^^^^^^^^^^^^^^^^^^^^^^^^
 						// We're in the switch case block for property read access, therefore we prefer the
 						// getter. When a read-write property is being assigned to, we end up here, too, and
 						// select the wrong accessor. However, that doesn't matter because it will be over-
@@ -324,8 +324,10 @@ namespace Moq
 					.GetMember(property.Name, MemberTypes.Property, BindingFlags.Public | BindingFlags.NonPublic | BindingFlags.Instance)
 					.Cast<PropertyInfo>()
 					.SingleOrDefault(p => p.PropertyType == property.PropertyType);
-				if (derivedProperty != null && derivedProperty.GetMethod.GetBaseDefinition() == property.GetMethod)
+				if (derivedProperty != null)
 				{
+					if ((derivedProperty.CanRead(out var getter) && getter.GetBaseDefinition() == property.GetGetMethod(true)) ||
+						(derivedProperty.CanWrite(out var setter) && setter.GetBaseDefinition() == property.GetSetMethod(true)))
 					return derivedProperty;
 				}
 			}

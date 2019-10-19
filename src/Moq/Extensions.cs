@@ -250,24 +250,12 @@ namespace Moq
 
 		public static bool CanOverrideGet(this PropertyInfo property)
 		{
-			if (property.CanRead)
-			{
-				var getter = property.GetGetMethod(true);
-				return getter != null && getter.CanOverride();
-			}
-
-			return false;
+			return property.CanRead(out var getter) && getter.CanOverride();
 		}
 
 		public static bool CanOverrideSet(this PropertyInfo property)
 		{
-			if (property.CanWrite)
-			{
-				var setter = property.GetSetMethod(true);
-				return setter != null && setter.CanOverride();
-			}
-
-			return false;
+			return property.CanWrite(out var setter) && setter.CanOverride();
 		}
 
 		public static IEnumerable<MethodInfo> GetMethods(this Type type, string name)

@@ -330,7 +330,7 @@ namespace Moq.Protected
 
 		private static void ThrowIfPublicGetter(PropertyInfo property, string reflectedTypeName)
 		{
-			if (property.CanRead && property.GetGetMethod() != null)
+			if (property.CanRead(out var getter) && getter.IsPublic)
 			{
 				throw new ArgumentException(string.Format(
 					CultureInfo.CurrentCulture,
@@ -342,7 +342,7 @@ namespace Moq.Protected
 
 		private static void ThrowIfPublicSetter(PropertyInfo property, string reflectedTypeName)
 		{
-			if (property.CanWrite && property.GetSetMethod() != null)
+			if (property.CanWrite(out var setter) && setter.IsPublic)
 			{
 				throw new ArgumentException(string.Format(
 					CultureInfo.CurrentCulture,
