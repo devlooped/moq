@@ -203,7 +203,7 @@ namespace Moq
 			return type.GetMember(name).OfType<MethodInfo>();
 		}
 
-		public static bool CompareTo<TTypes, TOtherTypes>(this TTypes types, TOtherTypes otherTypes, TypeComparison comparisonType)
+		public static bool CompareTo<TTypes, TOtherTypes>(this TTypes types, TOtherTypes otherTypes, bool exact, bool considerTypeMatchers)
 			where TTypes : IReadOnlyList<Type>
 			where TOtherTypes : IReadOnlyList<Type>
 		{
@@ -214,71 +214,35 @@ namespace Moq
 				return false;
 			}
 
-			switch (comparisonType)
+			for (int i = 0; i < count; ++i)
 			{
-				case TypeComparison.Equality:
-					for (int i = 0; i < count; ++i)
+				if (considerTypeMatchers && types[i].IsTypeMatcher(out var typeMatcherType))
+				{
+					Debug.Assert(typeMatcherType.ImplementsTypeMatcherProtocol());
+
+					var typeMatcher = (ITypeMatcher)Activator.CreateInstance(typeMatcherType);
+					if (typeMatcher.Matches(otherTypes[i]) == false)
 					{
-						if (types[i] != otherTypes[i])
-						{
-							return false;
-						}
+						return false;
 					}
-					return true;
-
-				case TypeComparison.AssignmentCompatibility:
-					for (int i = 0; i < count; ++i)
+				}
+				else if (exact)
+				{
+					if (types[i] != otherTypes[i])
 					{
-						if (types[i].IsAssignableFrom(otherTypes[i]) == false)
-						{
-							return false;
-						}
+						return false;
 					}
-					return true;
-
-				case TypeComparison.TypeMatchersOrElseAssignmentCompatibility:
-					for (int i = 0; i < count; ++i)
+				}
+				else
+				{
+					if (types[i].IsAssignableFrom(otherTypes[i]) == false)
 					{
-						if (types[i].IsTypeMatcher(out var typeMatcherType))
-						{
-							Debug.Assert(typeMatcherType.ImplementsTypeMatcherProtocol());
-
-							var typeMatcher = (ITypeMatcher)Activator.CreateInstance(typeMatcherType);
-							if (typeMatcher.Matches(otherTypes[i]) == false)
-							{
-								return false;
-							}
-						}
-						else if (types[i].IsAssignableFrom(otherTypes[i]) == false)
-						{
-							return false;
-						}
+						return false;
 					}
-					return true;
-
-				case TypeComparison.TypeMatchersOrElseEquality:
-					for (int i = 0; i < count; ++i)
-					{
-						if (types[i].IsTypeMatcher(out var typeMatcherType))
-						{
-							Debug.Assert(typeMatcherType.ImplementsTypeMatcherProtocol());
-
-							var typeMatcher = (ITypeMatcher)Activator.CreateInstance(typeMatcherType);
-							if (typeMatcher.Matches(otherTypes[i]) == false)
-							{
-								return false;
-							}
-						}
-						else if (types[i] != otherTypes[i])
-						{
-							return false;
-						}
-					}
-					return true;
-
-				default:
-					throw new ArgumentOutOfRangeException(nameof(comparisonType));
+				}
 			}
+
+			return true;
 		}
 
 		public static string GetParameterTypeList(this MethodInfo method)
@@ -295,7 +259,7 @@ namespace Moq
 			where TOtherTypes : IReadOnlyList<Type>
 		{
 			var method = function.GetMethodInfo();
-			if (method.GetParameterTypes().CompareTo(otherTypes, TypeComparison.AssignmentCompatibility))
+			if (method.GetParameterTypes().CompareTo(otherTypes, exact: false, considerTypeMatchers: false))
 			{
 				// the backing method for the literal delegate is compatible, DynamicInvoke(...) will succeed
 				return true;
@@ -306,7 +270,7 @@ namespace Moq
 			// an instance delegate invocation is created for an extension method (bundled with a receiver)
 			// or at times for DLR code generation paths because the CLR is optimized for instance methods.
 			var invokeMethod = GetInvokeMethodFromUntypedDelegateCallback(function);
-			if (invokeMethod != null && invokeMethod.GetParameterTypes().CompareTo(otherTypes, TypeComparison.AssignmentCompatibility))
+			if (invokeMethod != null && invokeMethod.GetParameterTypes().CompareTo(otherTypes, exact: false, considerTypeMatchers: false))
 			{
 				// the Invoke(...) method is compatible instead. DynamicInvoke(...) will succeed.
 				return true;
