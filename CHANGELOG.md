@@ -4,17 +4,25 @@ All notable changes to this project will be documented in this file.
 
 The format is loosely based on [Keep a Changelog](http://keepachangelog.com/en/1.0.0/).
 
-## Unreleased
+
+## 4.13.1 (2019-10-19)
 
 #### Fixed
 
 * `SetupAllProperties` does not recognize property as read-write if only setter is overridden (@stakx, #886)
+
 * Regression: `InvalidCastException` caused by Moq erroneously reusing a cached auto-mocked (`DefaultValue.Mock`) return value for a different generic method instantiation (@BrunoJuchli, #932)
+
 * AmbiguousMatchException when setting up the property, that hides another one (@ishatalkin, #939)
+
 * `ArgumentException` ("Interface not found") when setting up `object.ToString` on an interface mock (@vslynko, #942)
+
 * Cannot "return" to original mocked type after downcasting with `Mock.Get` and then upcasting with `mock.As<>` (@pjquirk, #943)
+
 * `params` arrays in recursive setup expressions are matched by reference equality instead of by structural equality (@danielcweber, #946)
+
 * `mock.SetupProperty` throws `NullReferenceException` when called for partially overridden property (@stakx, #951)
+
 
 ## 4.13.0 (2019-08-31)
 
@@ -87,6 +95,7 @@ The format is loosely based on [Keep a Changelog](http://keepachangelog.com/en/1
 * Parameter types are ignored when matching an invoked generic method against setups. (@stakx, #903)
 
 * For `[Value]Task<object>`, `.ReturnsAsync(null)` throws `NullReferenceException` instead of producing a completed task with result `null` (@voroninp, #909)
+
 
 ## 4.12.0 (2019-06-20)
 
