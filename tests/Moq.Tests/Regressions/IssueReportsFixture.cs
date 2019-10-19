@@ -3150,6 +3150,36 @@ namespace Moq.Tests.Regressions
 
 		#endregion
 
+		#region 932
+
+		public class Issue932
+		{
+			[Fact]
+			public void Should_not_reuse_cached_return_value_that_is_assignment_incompatible()
+			{
+				var mock = new Mock<X> { DefaultValue = DefaultValue.Mock };
+
+				// The following call will cause Moq to produce and return an auto-mocked instance of `IReadOnlyList<I>`.
+				// Additionally, an internal setup is added that will keep returning the same instance on subsequent calls:
+				mock.Object.Method<I>();
+
+				// The following call should not trigger the above setup, since we expect to get a `IReadOnlyList<C>`
+				// and the cached `IReadOnlyList<I>` wouldn't fit:
+				mock.Object.Method<C>();
+			}
+
+			public interface X
+			{
+				IReadOnlyList<T> Method<T>();
+			}
+
+			public interface I { }
+
+			public class C : I { }
+		}
+
+		#endregion
+
 		#region 942
 
 		public class Issue942
