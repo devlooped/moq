@@ -14,6 +14,7 @@ The format is loosely based on [Keep a Changelog](http://keepachangelog.com/en/1
 * `ArgumentException` ("Interface not found") when setting up `object.ToString` on an interface mock (@vslynko, #942)
 * Cannot "return" to original mocked type after downcasting with `Mock.Get` and then upcasting with `mock.As<>` (@pjquirk, #943)
 * `params` arrays in recursive setup expressions are matched by reference equality instead of by structural equality (@danielcweber, #946)
+* `mock.SetupProperty` throws `NullReferenceException` when called for partially overridden property (@stakx, #951)
 
 ## 4.13.0 (2019-08-31)
 
