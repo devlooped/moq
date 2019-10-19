@@ -813,7 +813,7 @@ namespace Moq
 				var property = expression.ToPropertyInfo();
 				Guard.CanRead(property);
 
-				Debug.Assert(method == property.GetGetMethod(true));
+				Debug.Assert(property.CanRead(out var getter) && method == getter);
 			}
 
 			this.Setups.Add(new InnerMockSetup(new InvocationShape(expression, method, arguments, exactGenericTypeArguments: true), returnValue));

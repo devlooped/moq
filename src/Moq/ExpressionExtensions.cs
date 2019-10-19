@@ -326,8 +326,8 @@ namespace Moq
 					.SingleOrDefault(p => p.PropertyType == property.PropertyType);
 				if (derivedProperty != null)
 				{
-					if ((derivedProperty.CanRead && derivedProperty.GetGetMethod(true).GetBaseDefinition() == property.GetGetMethod(true)) ||
-						(derivedProperty.CanWrite && derivedProperty.GetSetMethod(true).GetBaseDefinition() == property.GetSetMethod(true)))
+					if ((derivedProperty.CanRead(out var getter) && getter.GetBaseDefinition() == property.GetGetMethod(true)) ||
+						(derivedProperty.CanWrite(out var setter) && setter.GetBaseDefinition() == property.GetSetMethod(true)))
 					return derivedProperty;
 				}
 			}
