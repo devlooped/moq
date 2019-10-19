@@ -19,6 +19,36 @@ namespace Moq
 			return type.IsValueType || type.GetConstructor(Type.EmptyTypes) != null;
 		}
 
+		public static bool CanRead(this PropertyInfo property, out MethodInfo getter)
+		{
+			if (property.CanRead)
+			{
+				getter = property.GetGetMethod(nonPublic: true);
+				Debug.Assert(getter != null);
+				return true;
+			}
+			else
+			{
+				getter = null;
+				return false;
+			}
+		}
+
+		public static bool CanWrite(this PropertyInfo property, out MethodInfo setter)
+		{
+			if (property.CanWrite)
+			{
+				setter = property.GetSetMethod(nonPublic: true);
+				Debug.Assert(setter != null);
+				return true;
+			}
+			else
+			{
+				setter = null;
+				return false;
+			}
+		}
+
 		/// <summary>
 		///   Gets the default value for the specified type. This is the Reflection counterpart of C#'s <see langword="default"/> operator.
 		/// </summary>
