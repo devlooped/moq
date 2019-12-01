@@ -23,20 +23,20 @@ namespace Moq.Tests
 
 			Assert.Equal(2, mock.GetValue());
 		}
-	}
 
-	public class FooNonGenericConstructor
-	{
-		private readonly int value;
-
-		public FooNonGenericConstructor(int value)
+		public class FooNonGenericConstructor
 		{
-			this.value = value;
-		}
+			private readonly int value;
 
-		public virtual int GetValue()
-		{
-			return value;
+			public FooNonGenericConstructor(int value)
+			{
+				this.value = value;
+			}
+
+			public virtual int GetValue()
+			{
+				return value;
+			}
 		}
-	}
+	}	
 }
