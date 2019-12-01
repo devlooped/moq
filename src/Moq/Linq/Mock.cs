@@ -26,6 +26,17 @@ namespace Moq
 		/// <summary>
 		/// Creates a mock object of the indicated type.
 		/// </summary>
+		/// <param name="args">Optional constructor arguments if the mocked type is a class.</param>
+		/// <typeparam name="T">The type of the mocked object.</typeparam>
+		/// <returns>The mocked object created.</returns>
+		public static T Of<T>(params object[] args) where T : class
+		{
+			return Mock.Of<T>(MockBehavior.Default, args);
+		}
+
+		/// <summary>
+		/// Creates a mock object of the indicated type.
+		/// </summary>
 		/// <param name="behavior">Behavior of the mock.</param>
 		/// <typeparam name="T">The type of the mocked object.</typeparam>
 		/// <returns>The mocked object created.</returns>
@@ -38,6 +49,29 @@ namespace Moq
 			// which involved a lot of avoidable `IQueryable` query provider overhead and lambda compilation.
 			// What it really boils down to is this (much faster) code:
 			var mock = new Mock<T>(behavior);
+			if (behavior != MockBehavior.Strict)
+			{
+				mock.SetupAllProperties();
+			}
+			return mock.Object;
+		}
+
+		/// <summary>
+		/// Creates a mock object of the indicated type.
+		/// </summary>
+		/// <param name="behavior">Behavior of the mock.</param>
+		/// <param name="args">Optional constructor arguments if the mocked type is a class.</param>
+		/// <typeparam name="T">The type of the mocked object.</typeparam>
+		/// <returns>The mocked object created.</returns>
+		public static T Of<T>(MockBehavior behavior,params object[] args) where T : class
+		{
+			// This method was originally implemented as follows:
+			//
+			// return Mocks.CreateMockQuery<T>().First<T>();
+			//
+			// which involved a lot of avoidable `IQueryable` query provider overhead and lambda compilation.
+			// What it really boils down to is this (much faster) code:
+			var mock = new Mock<T>(behavior,args);
 			if (behavior != MockBehavior.Strict)
 			{
 				mock.SetupAllProperties();
