@@ -1,15 +1,16 @@
 // Copyright (c) 2007, Clarius Consulting, Manas Technology Solutions, InSTEDD.
 // All rights reserved. Licensed under the BSD 3-Clause License; see License.txt.
 
-using Moq.Language;
-using Moq.Language.Flow;
-using Moq.Properties;
 using System;
 using System.Collections.Generic;
 using System.Globalization;
 using System.Linq;
 using System.Linq.Expressions;
 using System.Reflection;
+
+using Moq.Language;
+using Moq.Language.Flow;
+using Moq.Properties;
 using TypeNameFormatter;
 
 namespace Moq.Protected

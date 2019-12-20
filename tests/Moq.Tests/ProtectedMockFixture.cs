@@ -200,7 +200,6 @@ namespace Moq.Tests
 
 			Assert.Equal(5, mock.Object.ProtectedInternalReturnGeneric<int>());
 			Assert.Equal("s", mock.Object.ProtectedInternalReturnGeneric<string>());
-
 		}
 
 		[Fact]
