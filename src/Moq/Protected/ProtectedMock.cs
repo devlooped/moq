@@ -1,16 +1,15 @@
 // Copyright (c) 2007, Clarius Consulting, Manas Technology Solutions, InSTEDD.
 // All rights reserved. Licensed under the BSD 3-Clause License; see License.txt.
 
+using Moq.Language;
+using Moq.Language.Flow;
+using Moq.Properties;
 using System;
 using System.Collections.Generic;
 using System.Globalization;
 using System.Linq;
 using System.Linq.Expressions;
 using System.Reflection;
-
-using Moq.Language;
-using Moq.Language.Flow;
-using Moq.Properties;
 using TypeNameFormatter;
 
 namespace Moq.Protected
@@ -35,16 +34,24 @@ namespace Moq.Protected
 
 		public ISetup<T> Setup(string methodName, params object[] args)
 		{
-			Guard.NotNullOrEmpty(methodName, nameof(methodName));
+			return Setup(methodName, null, false, args);
+		}
 
-			return this.Setup(methodName, false, args);
+		public ISetup<T> Setup(string methodName, Type[] genericTypeArguments, params object[] args)
+		{
+			return Setup(methodName, genericTypeArguments, false, args);
 		}
 
 		public ISetup<T> Setup(string methodName, bool exactParameterMatch, params object[] args)
 		{
+			return Setup(methodName, null, exactParameterMatch, args);
+		}
+
+		public ISetup<T> Setup(string methodName, Type[] genericTypeArguments, bool exactParameterMatch, params object[] args)
+		{
 			Guard.NotNullOrEmpty(methodName, nameof(methodName));
 
-			var method = GetMethod(methodName, exactParameterMatch, args);
+			var method = GetMethod(methodName, genericTypeArguments, exactParameterMatch, args);
 			ThrowIfMethodMissing(methodName, method, args);
 			ThrowIfPublicMethod(method, typeof(T).Name);
 
@@ -54,12 +61,20 @@ namespace Moq.Protected
 
 		public ISetup<T, TResult> Setup<TResult>(string methodName, params object[] args)
 		{
-			Guard.NotNullOrEmpty(methodName, nameof(methodName));
+			return Setup<TResult>(methodName, null, false, args);
+		}
 
-			return Setup<TResult>(methodName, false, args);
+		public ISetup<T, TResult> Setup<TResult>(string methodName, Type[] genericTypeArguments, params object[] args)
+		{
+			return Setup<TResult>(methodName, genericTypeArguments, false, args);
 		}
 
 		public ISetup<T, TResult> Setup<TResult>(string methodName, bool exactParameterMatch, params object[] args)
+		{
+			return Setup<TResult>(methodName, null, exactParameterMatch, args);
+		}
+
+		public ISetup<T, TResult> Setup<TResult>(string methodName, Type[] genericTypeArguments, bool exactParameterMatch, params object[] args)
 		{
 			Guard.NotNullOrEmpty(methodName, nameof(methodName));
 
@@ -72,7 +87,7 @@ namespace Moq.Protected
 				return new NonVoidSetupPhrase<T, TResult>(getterSetup);
 			}
 
-			var method = GetMethod(methodName, exactParameterMatch, args);
+			var method = GetMethod(methodName, genericTypeArguments, exactParameterMatch, args);
 			ThrowIfMethodMissing(methodName, method, args);
 			ThrowIfVoidMethod(method);
 			ThrowIfPublicMethod(method, typeof(T).Name);
@@ -111,14 +126,24 @@ namespace Moq.Protected
 
 		public ISetupSequentialAction SetupSequence(string methodOrPropertyName, params object[] args)
 		{
-			return this.SetupSequence(methodOrPropertyName, false, args);
+			return SetupSequence(methodOrPropertyName, null, false, args);
+		}
+
+		public ISetupSequentialAction SetupSequence(string methodOrPropertyName, Type[] genericTypeArguments, params object[] args)
+		{
+			return SetupSequence(methodOrPropertyName, genericTypeArguments, false, args);
 		}
 
 		public ISetupSequentialAction SetupSequence(string methodOrPropertyName, bool exactParameterMatch, params object[] args)
 		{
+			return SetupSequence(methodOrPropertyName, null, exactParameterMatch, args);
+		}
+
+		public ISetupSequentialAction SetupSequence(string methodOrPropertyName, Type[] genericTypeArguments, bool exactParameterMatch, params object[] args)
+		{
 			Guard.NotNullOrEmpty(methodOrPropertyName, nameof(methodOrPropertyName));
 
-			var method = GetMethod(methodOrPropertyName, exactParameterMatch, args);
+			var method = GetMethod(methodOrPropertyName, genericTypeArguments, exactParameterMatch, args);
 			ThrowIfMemberMissing(methodOrPropertyName, method);
 			ThrowIfPublicMethod(method, typeof(T).Name);
 
@@ -128,10 +153,20 @@ namespace Moq.Protected
 
 		public ISetupSequentialResult<TResult> SetupSequence<TResult>(string methodOrPropertyName, params object[] args)
 		{
-			return this.SetupSequence<TResult>(methodOrPropertyName, false, args);
+			return SetupSequence<TResult>(methodOrPropertyName, null, false, args);
+		}
+
+		public ISetupSequentialResult<TResult> SetupSequence<TResult>(string methodOrPropertyName, Type[] genericTypeArguments, params object[] args)
+		{
+			return SetupSequence<TResult>(methodOrPropertyName, genericTypeArguments, false, args);
 		}
 
 		public ISetupSequentialResult<TResult> SetupSequence<TResult>(string methodOrPropertyName, bool exactParameterMatch, params object[] args)
+		{
+			return SetupSequence<TResult>(methodOrPropertyName, null, exactParameterMatch, args);
+		}
+
+		public ISetupSequentialResult<TResult> SetupSequence<TResult>(string methodOrPropertyName, Type[] genericTypeArguments, bool exactParameterMatch, params object[] args)
 		{
 			Guard.NotNullOrEmpty(methodOrPropertyName, nameof(methodOrPropertyName));
 
@@ -144,7 +179,7 @@ namespace Moq.Protected
 				return new SetupSequencePhrase<TResult>(getterSetup);
 			}
 
-			var method = GetMethod(methodOrPropertyName, exactParameterMatch, args);
+			var method = GetMethod(methodOrPropertyName, genericTypeArguments, exactParameterMatch, args);
 			ThrowIfMemberMissing(methodOrPropertyName, method);
 			ThrowIfVoidMethod(method);
 			ThrowIfPublicMethod(method, typeof(T).Name);
@@ -159,14 +194,24 @@ namespace Moq.Protected
 
 		public void Verify(string methodName, Times times, object[] args)
 		{
-			this.Verify(methodName, times, false, args);
+			Verify(methodName, null, times, false, args);
+		}
+
+		public void Verify(string methodName, Type[] genericTypeArguments, Times times, params object[] args)
+		{
+			Verify(methodName, genericTypeArguments, times, false, args);
 		}
 
 		public void Verify(string methodName, Times times, bool exactParameterMatch, object[] args)
 		{
+			Verify(methodName, null, times, exactParameterMatch, args);
+		}
+
+		public void Verify(string methodName, Type[] genericTypeArguments, Times times, bool exactParameterMatch, params object[] args)
+		{
 			Guard.NotNullOrEmpty(methodName, nameof(methodName));
 
-			var method = GetMethod(methodName, exactParameterMatch, args);
+			var method = GetMethod(methodName, genericTypeArguments, exactParameterMatch, args);
 			ThrowIfMethodMissing(methodName, method, args);
 			ThrowIfPublicMethod(method, typeof(T).Name);
 
@@ -175,10 +220,20 @@ namespace Moq.Protected
 
 		public void Verify<TResult>(string methodName, Times times, object[] args)
 		{
-			this.Verify<TResult>(methodName, times, false, args);
+			Verify<TResult>(methodName, null, times, false, args);
+		}
+
+		public void Verify<TResult>(string methodName, Type[] genericTypeArguments, Times times, params object[] args)
+		{
+			Verify<TResult>(methodName, genericTypeArguments, times, false, args);
 		}
 
 		public void Verify<TResult>(string methodName, Times times, bool exactParameterMatch, object[] args)
+		{
+			Verify<TResult>(methodName, null, times, exactParameterMatch, args);
+		}
+
+		public void Verify<TResult>(string methodName, Type[] genericTypeArguments, Times times, bool exactParameterMatch, params object[] args)
 		{
 			Guard.NotNullOrEmpty(methodName, nameof(methodName));
 
@@ -191,7 +246,7 @@ namespace Moq.Protected
 				return;
 			}
 
-			var method = GetMethod(methodName, exactParameterMatch, args);
+			var method = GetMethod(methodName, genericTypeArguments, exactParameterMatch, args);
 			ThrowIfMethodMissing(methodName, method, args);
 			ThrowIfPublicMethod(method, typeof(T).Name);
 
@@ -236,16 +291,20 @@ namespace Moq.Protected
 			return Expression.Lambda<Func<T, TResult>>(Expression.MakeMemberAccess(param, property), param);
 		}
 
-		private static MethodInfo GetMethod(string methodName, params object[] args)
-		{
-			return GetMethod(methodName, false, args);
-		}
-
-		private static MethodInfo GetMethod(string methodName, bool exact, params object[] args)
+		private static MethodInfo GetMethod(string methodName, Type[] genericTypeArguments, bool exact, params object[] args)
 		{
 			var argTypes = ToArgTypes(args);
-			return typeof(T).GetMethods(BindingFlags.Instance | BindingFlags.NonPublic | BindingFlags.Public)
-				.SingleOrDefault(m => m.Name == methodName && m.GetParameterTypes().CompareTo(argTypes, exact, considerTypeMatchers: false));
+			var methods = typeof(T).GetMethods(BindingFlags.Instance | BindingFlags.NonPublic | BindingFlags.Public)
+				.Where(m => m.Name == methodName);
+			if (genericTypeArguments != null && genericTypeArguments.Length > 0)
+			{
+				methods = methods
+					.Where(m => m.IsGenericMethod && m.GetGenericArguments().Length == genericTypeArguments.Length)
+					.Select(m => m.MakeGenericMethod(genericTypeArguments));
+			}
+
+			return methods
+				.SingleOrDefault(m => m.GetParameterTypes().CompareTo(argTypes, exact, considerTypeMatchers: false));
 		}
 
 		private static Expression<Func<T, TResult>> GetMethodCall<TResult>(MethodInfo method, object[] args)
@@ -299,7 +358,8 @@ namespace Moq.Protected
 					if (o is Expression expr)
 					{
 						extractedTypeNames.Add(expr.Type.GetFormattedName());
-					} else
+					}
+					else
 					{
 						extractedTypeNames.Add(o.GetType().GetFormattedName());
 					}
@@ -311,7 +371,7 @@ namespace Moq.Protected
 					typeof(T).Name,
 					methodName,
 					string.Join(
-						", ", 
+						", ",
 						extractedTypeNames.ToArray())));
 			}
 		}
