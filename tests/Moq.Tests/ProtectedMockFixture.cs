@@ -21,6 +21,7 @@ namespace Moq.Tests
 		public void ThrowsIfSetupNullVoidMethodName()
 		{
 			Assert.Throws<ArgumentNullException>(() => new Mock<FooBase>().Protected().Setup(null));
+			Assert.Throws<ArgumentNullException>(() => new Mock<FooBase>().Protected().Setup<int>(null));
 		}
 
 		[Fact]
@@ -108,7 +109,7 @@ namespace Moq.Tests
 			mock.Protected().Setup("ProtectedInternal");
 			mock.Object.ProtectedInternal();
 
-			mock.Protected().Setup("ProtectedInternalGeneric", new[] { typeof(int) });
+			mock.Protected().Setup("ProtectedInternalGeneric", new[] { typeof(int) }, false);
 			mock.Object.ProtectedInternalGeneric<int>();
 
 			mock.VerifyAll();
@@ -125,7 +126,7 @@ namespace Moq.Tests
 			Assert.Equal(5, mock.Object.ProtectedInternalInt());
 
 			mock.Protected()
-				.Setup<int>("ProtectedInternalReturnGeneric", new[] { typeof(int) })
+				.Setup<int>("ProtectedInternalReturnGeneric", new[] { typeof(int) }, false)
 				.Returns(5);
 
 			Assert.Equal(5, mock.Object.ProtectedInternalReturnGeneric<int>());
@@ -137,7 +138,7 @@ namespace Moq.Tests
 			var mock = new Mock<FooBase>();
 			mock.Protected().Setup("Protected");
 			mock.Object.DoProtected();
-			mock.Protected().Setup("ProtectedGeneric", new[] { typeof(int) });
+			mock.Protected().Setup("ProtectedGeneric", new[] { typeof(int) }, false);
 			mock.Object.DoProtectedGeneric<int>();
 
 			mock.VerifyAll();
@@ -154,7 +155,7 @@ namespace Moq.Tests
 			Assert.Equal(5, mock.Object.DoProtectedInt());
 
 			mock.Protected()
-				.Setup<int>("ProtectedReturnGeneric", new[] { typeof(int) })
+				.Setup<int>("ProtectedReturnGeneric", new[] { typeof(int) }, false)
 				.Returns(5);
 
 			Assert.Equal(5, mock.Object.DoProtectedReturnGeneric<int>());
@@ -174,7 +175,7 @@ namespace Moq.Tests
 			Assert.Equal(expectedOutput, mock.Object.DoProtectedWithNullableIntParam(input));
 
 			mock.Protected()
-				.Setup<int?>("ProtectedWithGenericParam", new[] { typeof(int?) }, input)
+				.Setup<int?>("ProtectedWithGenericParam", new[] { typeof(int?) }, false, input)
 				.Returns(expectedOutput);
 
 			Assert.Equal(expectedOutput, mock.Object.DoProtectedWithGenericParam<int?>(input));
@@ -184,18 +185,18 @@ namespace Moq.Tests
 		public void SetupAllowsGenericProtectedMethodWithDiffrentGenericArguments()
 		{
 			var mock = new Mock<FooBase>();
-			mock.Protected().Setup("ProtectedGeneric", new[] { typeof(int) });
-			mock.Protected().Setup("ProtectedGeneric", new[] { typeof(string) });
+			mock.Protected().Setup("ProtectedGeneric", new[] { typeof(int) }, false);
+			mock.Protected().Setup("ProtectedGeneric", new[] { typeof(string) }, false);
 			mock.Object.DoProtectedGeneric<int>();
 			mock.Object.DoProtectedGeneric<string>();
 
 			mock.VerifyAll();
 
 			mock.Protected()
-				.Setup<int>("ProtectedInternalReturnGeneric", new[] { typeof(int) })
+				.Setup<int>("ProtectedInternalReturnGeneric", new[] { typeof(int) }, false)
 				.Returns(5);
 			mock.Protected()
-				.Setup<string>("ProtectedInternalReturnGeneric", new[] { typeof(string) })
+				.Setup<string>("ProtectedInternalReturnGeneric", new[] { typeof(string) }, false)
 				.Returns("s");
 
 			Assert.Equal(5, mock.Object.ProtectedInternalReturnGeneric<int>());
@@ -413,9 +414,9 @@ namespace Moq.Tests
 			// NOTE: There are two overloads named "Do" and "DoReturn"
 			var mock = new Mock<MethodOverloads>();
 			mock.Protected().Setup("Do", 1, 2).Verifiable();
-			mock.Protected().Setup("Do", new[] { typeof(int) }, 1, 3).Verifiable();
+			mock.Protected().Setup("Do", new[] { typeof(int) }, false, 1, 3).Verifiable();
 			mock.Protected().Setup<string>("DoReturn", "1", "2").Returns("3").Verifiable();
-			mock.Protected().Setup<string>("DoReturn", new[] { typeof(int), typeof(string) }, 1, "2")
+			mock.Protected().Setup<string>("DoReturn", new[] { typeof(int), typeof(string) }, false, 1, "2")
 				.Returns("4").Verifiable();
 
 			mock.Object.ExecuteDo(1, 2);
@@ -454,7 +455,7 @@ namespace Moq.Tests
 			Assert.Equal(5, mock.Object.DoProtectedInt());
 
 			mock.Protected()
-				.Setup<int>("ProtectedReturnGeneric", new[] { typeof(int) })
+				.Setup<int>("ProtectedReturnGeneric", new[] { typeof(int) }, false)
 				.Returns(5);
 			Assert.Equal(5, mock.Object.DoProtectedReturnGeneric<int>());
 		}

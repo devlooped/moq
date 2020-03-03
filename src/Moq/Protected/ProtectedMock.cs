@@ -52,6 +52,8 @@ namespace Moq.Protected
 
 		private ISetup<T> InternalSetup(string methodName, Type[] genericTypeArguments, bool exactParameterMatch, params object[] args)
 		{
+			Guard.NotNull(methodName, nameof(methodName));
+
 			var method = GetMethod(methodName, genericTypeArguments, exactParameterMatch, args);
 			ThrowIfMethodMissing(methodName, method, args);
 			ThrowIfPublicMethod(method, typeof(T).Name);
