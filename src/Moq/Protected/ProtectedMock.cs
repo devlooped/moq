@@ -28,30 +28,30 @@ namespace Moq.Protected
 		public IProtectedAsMock<T, TAnalog> As<TAnalog>()
 			where TAnalog : class
 		{
-			return new ProtectedAsMock<T, TAnalog>(this.mock);
+			return new ProtectedAsMock<T, TAnalog>(mock);
 		}
 
 		#region Setup
 
 		public ISetup<T> Setup(string methodName, params object[] args)
 		{
-			return Setup(methodName, null, false, args);
-		}
-
-		public ISetup<T> Setup(string methodName, Type[] genericTypeArguments, params object[] args)
-		{
-			return Setup(methodName, genericTypeArguments, false, args);
+			return this.InternalSetup(methodName, null, false, args);
 		}
 
 		public ISetup<T> Setup(string methodName, bool exactParameterMatch, params object[] args)
 		{
-			return Setup(methodName, null, exactParameterMatch, args);
+			return this.InternalSetup(methodName, null, exactParameterMatch, args);
 		}
 
 		public ISetup<T> Setup(string methodName, Type[] genericTypeArguments, bool exactParameterMatch, params object[] args)
 		{
-			Guard.NotNullOrEmpty(methodName, nameof(methodName));
+			Guard.NotNull(genericTypeArguments, nameof(genericTypeArguments));
 
+			return this.InternalSetup(methodName, genericTypeArguments, exactParameterMatch, args);
+		}
+
+		private ISetup<T> InternalSetup(string methodName, Type[] genericTypeArguments, bool exactParameterMatch, params object[] args)
+		{
 			var method = GetMethod(methodName, genericTypeArguments, exactParameterMatch, args);
 			ThrowIfMethodMissing(methodName, method, args);
 			ThrowIfPublicMethod(method, typeof(T).Name);
@@ -62,20 +62,23 @@ namespace Moq.Protected
 
 		public ISetup<T, TResult> Setup<TResult>(string methodName, params object[] args)
 		{
-			return Setup<TResult>(methodName, null, false, args);
-		}
-
-		public ISetup<T, TResult> Setup<TResult>(string methodName, Type[] genericTypeArguments, params object[] args)
-		{
-			return Setup<TResult>(methodName, genericTypeArguments, false, args);
+			return this.InternalSetup<TResult>(methodName, null, false, args);
 		}
 
 		public ISetup<T, TResult> Setup<TResult>(string methodName, bool exactParameterMatch, params object[] args)
 		{
-			return Setup<TResult>(methodName, null, exactParameterMatch, args);
+			return this.InternalSetup<TResult>(methodName, null, exactParameterMatch, args);
 		}
 
 		public ISetup<T, TResult> Setup<TResult>(string methodName, Type[] genericTypeArguments, bool exactParameterMatch, params object[] args)
+		{
+			Guard.NotNull(genericTypeArguments, nameof(genericTypeArguments));
+
+			return this.InternalSetup<TResult>(methodName, genericTypeArguments, exactParameterMatch, args);
+		}
+
+		private ISetup<T, TResult> InternalSetup<TResult>(string methodName, Type[] genericTypeArguments,
+			bool exactParameterMatch, params object[] args)
 		{
 			Guard.NotNullOrEmpty(methodName, nameof(methodName));
 
@@ -127,20 +130,21 @@ namespace Moq.Protected
 
 		public ISetupSequentialAction SetupSequence(string methodOrPropertyName, params object[] args)
 		{
-			return SetupSequence(methodOrPropertyName, null, false, args);
-		}
-
-		public ISetupSequentialAction SetupSequence(string methodOrPropertyName, Type[] genericTypeArguments, params object[] args)
-		{
-			return SetupSequence(methodOrPropertyName, genericTypeArguments, false, args);
+			return this.InternalSetupSequence(methodOrPropertyName, null, false, args);
 		}
 
 		public ISetupSequentialAction SetupSequence(string methodOrPropertyName, bool exactParameterMatch, params object[] args)
 		{
-			return SetupSequence(methodOrPropertyName, null, exactParameterMatch, args);
+			return this.InternalSetupSequence(methodOrPropertyName, null, exactParameterMatch, args);
 		}
 
 		public ISetupSequentialAction SetupSequence(string methodOrPropertyName, Type[] genericTypeArguments, bool exactParameterMatch, params object[] args)
+		{
+			Guard.NotNull(genericTypeArguments, nameof(genericTypeArguments));
+			return this.InternalSetupSequence(methodOrPropertyName, genericTypeArguments, exactParameterMatch, args);
+		}
+
+		private ISetupSequentialAction InternalSetupSequence(string methodOrPropertyName, Type[] genericTypeArguments, bool exactParameterMatch, params object[] args)
 		{
 			Guard.NotNullOrEmpty(methodOrPropertyName, nameof(methodOrPropertyName));
 
@@ -154,20 +158,21 @@ namespace Moq.Protected
 
 		public ISetupSequentialResult<TResult> SetupSequence<TResult>(string methodOrPropertyName, params object[] args)
 		{
-			return SetupSequence<TResult>(methodOrPropertyName, null, false, args);
-		}
-
-		public ISetupSequentialResult<TResult> SetupSequence<TResult>(string methodOrPropertyName, Type[] genericTypeArguments, params object[] args)
-		{
-			return SetupSequence<TResult>(methodOrPropertyName, genericTypeArguments, false, args);
+			return this.InternalSetupSequence<TResult>(methodOrPropertyName, null, false, args);
 		}
 
 		public ISetupSequentialResult<TResult> SetupSequence<TResult>(string methodOrPropertyName, bool exactParameterMatch, params object[] args)
 		{
-			return SetupSequence<TResult>(methodOrPropertyName, null, exactParameterMatch, args);
+			return this.InternalSetupSequence<TResult>(methodOrPropertyName, null, exactParameterMatch, args);
 		}
 
 		public ISetupSequentialResult<TResult> SetupSequence<TResult>(string methodOrPropertyName, Type[] genericTypeArguments, bool exactParameterMatch, params object[] args)
+		{
+			Guard.NotNull(genericTypeArguments, nameof(genericTypeArguments));
+			return this.InternalSetupSequence<TResult>(methodOrPropertyName, genericTypeArguments, exactParameterMatch, args);
+		}
+
+		private ISetupSequentialResult<TResult> InternalSetupSequence<TResult>(string methodOrPropertyName, Type[] genericTypeArguments, bool exactParameterMatch, params object[] args)
 		{
 			Guard.NotNullOrEmpty(methodOrPropertyName, nameof(methodOrPropertyName));
 
@@ -195,20 +200,27 @@ namespace Moq.Protected
 
 		public void Verify(string methodName, Times times, object[] args)
 		{
-			Verify(methodName, null, times, false, args);
+			this.InternalVerify(methodName, null, times, false, args);
 		}
 
 		public void Verify(string methodName, Type[] genericTypeArguments, Times times, params object[] args)
 		{
-			Verify(methodName, genericTypeArguments, times, false, args);
+			Guard.NotNull(genericTypeArguments, nameof(genericTypeArguments));
+			this.InternalVerify(methodName, genericTypeArguments, times, false, args);
 		}
 
 		public void Verify(string methodName, Times times, bool exactParameterMatch, object[] args)
 		{
-			Verify(methodName, null, times, exactParameterMatch, args);
+			this.InternalVerify(methodName, null, times, exactParameterMatch, args);
 		}
 
 		public void Verify(string methodName, Type[] genericTypeArguments, Times times, bool exactParameterMatch, params object[] args)
+		{
+			Guard.NotNull(genericTypeArguments, nameof(genericTypeArguments));
+			this.InternalVerify(methodName, genericTypeArguments, times, exactParameterMatch, args);
+		}
+
+		private void InternalVerify(string methodName, Type[] genericTypeArguments, Times times, bool exactParameterMatch, params object[] args)
 		{
 			Guard.NotNullOrEmpty(methodName, nameof(methodName));
 
@@ -221,20 +233,27 @@ namespace Moq.Protected
 
 		public void Verify<TResult>(string methodName, Times times, object[] args)
 		{
-			Verify<TResult>(methodName, null, times, false, args);
+			this.InternalVerify<TResult>(methodName, null, times, false, args);
 		}
 
 		public void Verify<TResult>(string methodName, Type[] genericTypeArguments, Times times, params object[] args)
 		{
-			Verify<TResult>(methodName, genericTypeArguments, times, false, args);
+			Guard.NotNull(genericTypeArguments, nameof(genericTypeArguments));
+			this.InternalVerify<TResult>(methodName, genericTypeArguments, times, false, args);
 		}
 
 		public void Verify<TResult>(string methodName, Times times, bool exactParameterMatch, object[] args)
 		{
-			Verify<TResult>(methodName, null, times, exactParameterMatch, args);
+			this.InternalVerify<TResult>(methodName, null, times, exactParameterMatch, args);
 		}
 
 		public void Verify<TResult>(string methodName, Type[] genericTypeArguments, Times times, bool exactParameterMatch, params object[] args)
+		{
+			Guard.NotNull(genericTypeArguments, nameof(genericTypeArguments));
+			this.InternalVerify<TResult>(methodName, null, times, exactParameterMatch, args);
+		}
+
+		private void InternalVerify<TResult>(string methodName, Type[] genericTypeArguments, Times times, bool exactParameterMatch, params object[] args)
 		{
 			Guard.NotNullOrEmpty(methodName, nameof(methodName));
 

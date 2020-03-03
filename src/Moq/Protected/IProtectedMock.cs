@@ -40,16 +40,6 @@ namespace Moq.Protected
 		ISetup<TMock> Setup(string voidMethodName, params object[] args);
 
 		/// <summary>
-		/// Specifies a setup for a void method invocation with the given 
-		/// <paramref name="voidMethodName"/>, optionally specifying arguments for the method call.
-		/// </summary>
-		/// <param name="voidMethodName">The name of the void method to be invoked.</param>
-		/// <param name="genericTypeArguments">An array of types to be substituted for the type parameters of the current generic method definition, null for non-generic method.</param>
-		/// <param name="args">The optional arguments for the invocation. If argument matchers are used, 
-		/// remember to use <see cref="ItExpr"/> rather than <see cref="It"/>.</param>
-		ISetup<TMock> Setup(string voidMethodName, Type[] genericTypeArguments, params object[] args);
-
-		/// <summary>
 		/// Specifies a setup for a void method invocation with the given
 		/// <paramref name="voidMethodName"/>, optionally specifying arguments for the method call.
 		/// </summary>
@@ -64,7 +54,7 @@ namespace Moq.Protected
 		/// <paramref name="voidMethodName"/>, optionally specifying arguments for the method call.
 		/// </summary>
 		/// <param name="voidMethodName">The name of the void method to be invoked.</param>
-		/// <param name="genericTypeArguments">An array of types to be substituted for the type parameters of the current generic method definition, null for non-generic method.</param>
+		/// <param name="genericTypeArguments">An array of types to be substituted for the type parameters of the current generic method definition.</param>
 		/// <param name="exactParameterMatch">Should the parameter types match exactly types that were provided</param>
 		/// <param name="args">The optional arguments for the invocation. If argument matchers are used,
 		/// remember to use <see cref="ItExpr"/> rather than <see cref="It"/>.</param>
@@ -85,17 +75,6 @@ namespace Moq.Protected
 		/// <paramref name="methodOrPropertyName"/>, optionally specifying arguments for the method call.
 		/// </summary>
 		/// <param name="methodOrPropertyName">The name of the method or property to be invoked.</param>
-		/// <param name="genericTypeArguments">An array of types to be substituted for the type parameters of the current generic method definition, null for non-generic method.</param>
-		/// <param name="args">The optional arguments for the invocation. If argument matchers are used, 
-		/// remember to use <see cref="ItExpr"/> rather than <see cref="It"/>.</param>
-		/// <typeparam name="TResult">The return type of the method or property.</typeparam>
-		ISetup<TMock, TResult> Setup<TResult>(string methodOrPropertyName, Type[] genericTypeArguments, params object[] args);
-
-		/// <summary>
-		/// Specifies a setup for an invocation on a property or a non void method with the given 
-		/// <paramref name="methodOrPropertyName"/>, optionally specifying arguments for the method call.
-		/// </summary>
-		/// <param name="methodOrPropertyName">The name of the method or property to be invoked.</param>
 		/// <param name="args">The optional arguments for the invocation. If argument matchers are used, 
 		/// remember to use <see cref="ItExpr"/> rather than <see cref="It"/>.</param>
 		/// <param name="exactParameterMatch">Should the parameter types match exactly types that were provided</param>
@@ -107,7 +86,7 @@ namespace Moq.Protected
 		/// <paramref name="methodOrPropertyName"/>, optionally specifying arguments for the method call.
 		/// </summary>
 		/// <param name="methodOrPropertyName">The name of the method or property to be invoked.</param>
-		/// <param name="genericTypeArguments">An array of types to be substituted for the type parameters of the current generic method definition, null for non-generic method.</param>
+		/// <param name="genericTypeArguments">An array of types to be substituted for the type parameters of the current generic method definition.</param>
 		/// <param name="args">The optional arguments for the invocation. If argument matchers are used, 
 		/// remember to use <see cref="ItExpr"/> rather than <see cref="It"/>.</param>
 		/// <param name="exactParameterMatch">Should the parameter types match exactly types that were provided</param>
@@ -144,15 +123,6 @@ namespace Moq.Protected
 		/// Performs a sequence of actions, one per call.
 		/// </summary>
 		/// <param name="methodOrPropertyName">Name of the method or property being set up.</param>
-		/// <param name="genericTypeArguments">An array of types to be substituted for the type parameters of the current generic method definition, null for non-generic method.</param>
-		/// <param name="args">The optional arguments for the invocation. If argument matchers are used,
-		/// remember to use <see cref="ItExpr"/> rather than <see cref="It"/>.</param>
-		ISetupSequentialAction SetupSequence(string methodOrPropertyName, Type[] genericTypeArguments, params object[] args);
-
-		/// <summary>
-		/// Performs a sequence of actions, one per call.
-		/// </summary>
-		/// <param name="methodOrPropertyName">Name of the method or property being set up.</param>
 		/// <param name="exactParameterMatch">Determines whether the parameter types should exactly match the types provided.</param>
 		/// <param name="args">The optional arguments for the invocation. If argument matchers are used,
 		/// remember to use <see cref="ItExpr"/> rather than <see cref="It"/>.</param>
@@ -162,7 +132,7 @@ namespace Moq.Protected
 		/// Performs a sequence of actions, one per call.
 		/// </summary>
 		/// <param name="methodOrPropertyName">Name of the method or property being set up.</param>
-		/// <param name="genericTypeArguments">An array of types to be substituted for the type parameters of the current generic method definition, null for non-generic method.</param>
+		/// <param name="genericTypeArguments">An array of types to be substituted for the type parameters of the current generic method definition.</param>
 		/// <param name="exactParameterMatch">Determines whether the parameter types should exactly match the types provided.</param>
 		/// <param name="args">The optional arguments for the invocation. If argument matchers are used,
 		/// remember to use <see cref="ItExpr"/> rather than <see cref="It"/>.</param>
@@ -181,16 +151,6 @@ namespace Moq.Protected
 		/// Return a sequence of values, once per call.
 		/// </summary>
 		/// <param name="methodOrPropertyName">Name of the method or property being set up.</param>
-		/// <param name="genericTypeArguments">An array of types to be substituted for the type parameters of the current generic method definition, null for non-generic method.</param>
-		/// <param name="args">The optional arguments for the invocation. If argument matchers are used,
-		/// remember to use <see cref="ItExpr"/> rather than <see cref="It"/>.</param>
-		/// <typeparam name="TResult">Return type of the method or property being set up.</typeparam>
-		ISetupSequentialResult<TResult> SetupSequence<TResult>(string methodOrPropertyName, Type[] genericTypeArguments, params object[] args);
-
-		/// <summary>
-		/// Return a sequence of values, once per call.
-		/// </summary>
-		/// <param name="methodOrPropertyName">Name of the method or property being set up.</param>
 		/// <param name="exactParameterMatch">Determines whether the parameter types should exactly match the types provided.</param>
 		/// <param name="args">The optional arguments for the invocation. If argument matchers are used,
 		/// remember to use <see cref="ItExpr"/> rather than <see cref="It"/>.</param>
@@ -201,7 +161,7 @@ namespace Moq.Protected
 		/// Return a sequence of values, once per call.
 		/// </summary>
 		/// <param name="methodOrPropertyName">Name of the method or property being set up.</param>
-		/// <param name="genericTypeArguments">An array of types to be substituted for the type parameters of the current generic method definition, null for non-generic method.</param>
+		/// <param name="genericTypeArguments">An array of types to be substituted for the type parameters of the current generic method definition.</param>
 		/// <param name="exactParameterMatch">Determines whether the parameter types should exactly match the types provided.</param>
 		/// <param name="args">The optional arguments for the invocation. If argument matchers are used,
 		/// remember to use <see cref="ItExpr"/> rather than <see cref="It"/>.</param>
@@ -233,7 +193,7 @@ namespace Moq.Protected
 		/// <exception cref="MockException">The invocation was not call the times specified by
 		/// <paramref name="times"/>.</exception>
 		/// <param name="methodName">The name of the void method to be verified.</param>
-		/// <param name="genericTypeArguments">An array of types to be substituted for the type parameters of the current generic method definition, null for non-generic method.</param>
+		/// <param name="genericTypeArguments">An array of types to be substituted for the type parameters of the current generic method definition.</param>
 		/// <param name="times">The number of times a method is allowed to be called.</param>
 		/// <param name="args">The optional arguments for the invocation. If argument matchers are used, 
 		/// remember to use <see cref="ItExpr"/> rather than <see cref="It"/>.</param>
@@ -261,7 +221,7 @@ namespace Moq.Protected
 		/// <exception cref="MockException">The invocation was not call the times specified by
 		/// <paramref name="times"/>.</exception>
 		/// <param name="methodName">The name of the void method to be verified.</param>
-		/// <param name="genericTypeArguments">An array of types to be substituted for the type parameters of the current generic method definition, null for non-generic method.</param>
+		/// <param name="genericTypeArguments">An array of types to be substituted for the type parameters of the current generic method definition.</param>
 		/// <param name="times">The number of times a method is allowed to be called.</param>
 		/// <param name="exactParameterMatch">Should the parameter types match exactly types that were provided</param>
 		/// <param name="args">The optional arguments for the invocation. If argument matchers are used, 
@@ -289,7 +249,7 @@ namespace Moq.Protected
 		/// <exception cref="MockException">The invocation was not call the times specified by 
 		/// <paramref name="times"/>.</exception>
 		/// <param name="methodName">The name of the method or property to be invoked.</param>
-		/// <param name="genericTypeArguments">An array of types to be substituted for the type parameters of the current generic method definition, null for non-generic method.</param>
+		/// <param name="genericTypeArguments">An array of types to be substituted for the type parameters of the current generic method definition.</param>
 		/// <param name="args">The optional arguments for the invocation. If argument matchers are used, 
 		/// remember to use <see cref="ItExpr"/> rather than <see cref="It"/>.</param>
 		/// <param name="times">The number of times a method is allowed to be called.</param>
@@ -319,7 +279,7 @@ namespace Moq.Protected
 		/// <exception cref="MockException">The invocation was not call the times specified by 
 		/// <paramref name="times"/>.</exception>
 		/// <param name="methodName">The name of the method or property to be invoked.</param>
-		/// <param name="genericTypeArguments">An array of types to be substituted for the type parameters of the current generic method definition, null for non-generic method.</param>
+		/// <param name="genericTypeArguments">An array of types to be substituted for the type parameters of the current generic method definition.</param>
 		/// <param name="exactParameterMatch">Should the parameter types match exactly types that were provided</param>
 		/// <param name="args">The optional arguments for the invocation. If argument matchers are used, 
 		/// remember to use <see cref="ItExpr"/> rather than <see cref="It"/>.</param>
