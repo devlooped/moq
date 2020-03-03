@@ -21,6 +21,7 @@ namespace Moq.Tests
 		public void ThrowsIfSetupNullVoidMethodName()
 		{
 			Assert.Throws<ArgumentNullException>(() => new Mock<FooBase>().Protected().Setup(null));
+			Assert.Throws<ArgumentNullException>(() => new Mock<FooBase>().Protected().Setup<int>(null));
 		}
 
 		[Fact]
@@ -108,6 +109,9 @@ namespace Moq.Tests
 			mock.Protected().Setup("ProtectedInternal");
 			mock.Object.ProtectedInternal();
 
+			mock.Protected().Setup("ProtectedInternalGeneric", new[] { typeof(int) }, false);
+			mock.Object.ProtectedInternalGeneric<int>();
+
 			mock.VerifyAll();
 		}
 
@@ -120,6 +124,12 @@ namespace Moq.Tests
 				.Returns(5);
 
 			Assert.Equal(5, mock.Object.ProtectedInternalInt());
+
+			mock.Protected()
+				.Setup<int>("ProtectedInternalReturnGeneric", new[] { typeof(int) }, false)
+				.Returns(5);
+
+			Assert.Equal(5, mock.Object.ProtectedInternalReturnGeneric<int>());
 		}
 
 		[Fact]
@@ -128,6 +138,8 @@ namespace Moq.Tests
 			var mock = new Mock<FooBase>();
 			mock.Protected().Setup("Protected");
 			mock.Object.DoProtected();
+			mock.Protected().Setup("ProtectedGeneric", new[] { typeof(int) }, false);
+			mock.Object.DoProtectedGeneric<int>();
 
 			mock.VerifyAll();
 		}
@@ -141,6 +153,12 @@ namespace Moq.Tests
 				.Returns(5);
 
 			Assert.Equal(5, mock.Object.DoProtectedInt());
+
+			mock.Protected()
+				.Setup<int>("ProtectedReturnGeneric", new[] { typeof(int) }, false)
+				.Returns(5);
+
+			Assert.Equal(5, mock.Object.DoProtectedReturnGeneric<int>());
 		}
 
 		[Fact]
@@ -155,6 +173,34 @@ namespace Moq.Tests
 				.Returns(expectedOutput);
 
 			Assert.Equal(expectedOutput, mock.Object.DoProtectedWithNullableIntParam(input));
+
+			mock.Protected()
+				.Setup<int?>("ProtectedWithGenericParam", new[] { typeof(int?) }, false, input)
+				.Returns(expectedOutput);
+
+			Assert.Equal(expectedOutput, mock.Object.DoProtectedWithGenericParam<int?>(input));
+		}
+
+		[Fact]
+		public void SetupAllowsGenericProtectedMethodWithDiffrentGenericArguments()
+		{
+			var mock = new Mock<FooBase>();
+			mock.Protected().Setup("ProtectedGeneric", new[] { typeof(int) }, false);
+			mock.Protected().Setup("ProtectedGeneric", new[] { typeof(string) }, false);
+			mock.Object.DoProtectedGeneric<int>();
+			mock.Object.DoProtectedGeneric<string>();
+
+			mock.VerifyAll();
+
+			mock.Protected()
+				.Setup<int>("ProtectedInternalReturnGeneric", new[] { typeof(int) }, false)
+				.Returns(5);
+			mock.Protected()
+				.Setup<string>("ProtectedInternalReturnGeneric", new[] { typeof(string) }, false)
+				.Returns("s");
+
+			Assert.Equal(5, mock.Object.ProtectedInternalReturnGeneric<int>());
+			Assert.Equal("s", mock.Object.ProtectedInternalReturnGeneric<string>());
 		}
 
 		[Fact]
@@ -368,10 +414,15 @@ namespace Moq.Tests
 			// NOTE: There are two overloads named "Do" and "DoReturn"
 			var mock = new Mock<MethodOverloads>();
 			mock.Protected().Setup("Do", 1, 2).Verifiable();
+			mock.Protected().Setup("Do", new[] { typeof(int) }, false, 1, 3).Verifiable();
 			mock.Protected().Setup<string>("DoReturn", "1", "2").Returns("3").Verifiable();
+			mock.Protected().Setup<string>("DoReturn", new[] { typeof(int), typeof(string) }, false, 1, "2")
+				.Returns("4").Verifiable();
 
 			mock.Object.ExecuteDo(1, 2);
+			mock.Object.ExecuteDo<int>(1, 3);
 			Assert.Equal("3", mock.Object.ExecuteDoReturn("1", "2"));
+			Assert.Equal("4", mock.Object.ExecuteDoReturn<int, string>(1, "2"));
 
 			mock.Verify();
 		}
@@ -402,6 +453,11 @@ namespace Moq.Tests
 				.Returns(5);
 
 			Assert.Equal(5, mock.Object.DoProtectedInt());
+
+			mock.Protected()
+				.Setup<int>("ProtectedReturnGeneric", new[] { typeof(int) }, false)
+				.Returns(5);
+			Assert.Equal(5, mock.Object.DoProtectedReturnGeneric<int>());
 		}
 
 		[Fact]
@@ -516,6 +572,9 @@ namespace Moq.Tests
 			mock.Object.ProtectedInternal();
 
 			mock.Protected().Verify("ProtectedInternal", Times.Once());
+
+			mock.Object.ProtectedInternalGeneric<int>();
+			mock.Protected().Verify("ProtectedInternalGeneric", new[] { typeof(int) }, Times.Once());
 		}
 
 		[Fact]
@@ -525,6 +584,10 @@ namespace Moq.Tests
 			mock.Object.ProtectedInternalInt();
 
 			mock.Protected().Verify<int>("ProtectedInternalInt", Times.Once());
+
+			mock.Object.ProtectedInternalReturnGeneric<int>();
+
+			mock.Protected().Verify<int>("ProtectedInternalReturnGeneric", new[] { typeof(int) }, Times.Once());
 		}
 
 		[Fact]
@@ -532,8 +595,10 @@ namespace Moq.Tests
 		{
 			var mock = new Mock<FooBase>();
 			mock.Object.DoProtected();
-
 			mock.Protected().Verify("Protected", Times.Once());
+
+			mock.Object.DoProtectedGeneric<int>();
+			mock.Protected().Verify("ProtectedGeneric", new[] { typeof(int) }, Times.Once());
 		}
 
 		[Fact]
@@ -541,8 +606,10 @@ namespace Moq.Tests
 		{
 			var mock = new Mock<FooBase>();
 			mock.Object.DoProtectedInt();
-
 			mock.Protected().Verify<int>("ProtectedInt", Times.Once());
+
+			mock.Object.DoProtectedReturnGeneric<int>();
+			mock.Protected().Verify<int>("ProtectedReturnGeneric", new[] { typeof(int) }, Times.Once());
 		}
 
 		[Fact]
@@ -785,6 +852,16 @@ namespace Moq.Tests
 				this.Do(a, b);
 			}
 
+			public void ExecuteDo<T>(T a, T b)
+			{
+				this.Do<T>(a, b);
+			}
+
+			public void ExecuteDo<T, T2>(T a, T2 b)
+			{
+				this.Do<T, T2>(a, b);
+			}
+
 			public int ExecuteDoReturn(int a, int b)
 			{
 				return this.DoReturn(a, b);
@@ -798,6 +875,14 @@ namespace Moq.Tests
 			{
 			}
 
+			protected virtual void Do<T>(T a, T b)
+			{
+			}
+
+			protected virtual void Do<T, T2>(T a, T2 b)
+			{
+			}
+
 			protected virtual int DoReturn(int a, int b)
 			{
 				return a + b;
@@ -808,9 +893,29 @@ namespace Moq.Tests
 				return DoReturn(a, b);
 			}
 
+			public T ExecuteDoReturn<T>(T a, T b)
+			{
+				return DoReturn<T>(a, b);
+			}
+
+			public T2 ExecuteDoReturn<T, T2>(T a, T2 b)
+			{
+				return DoReturn(a, b);
+			}
+
 			protected virtual string DoReturn(string a, string b)
 			{
 				return a + b;
+			}
+
+			protected virtual T DoReturn<T>(T a, T b)
+			{
+				return a;
+			}
+
+			protected virtual T2 DoReturn<T, T2>(T a, T2 b)
+			{
+				return b;
 			}
 
 			public void ExecuteSameFirstParameter(object a) { }
@@ -861,14 +966,29 @@ namespace Moq.Tests
 				this.Protected();
 			}
 
+			public void DoProtectedGeneric<T>()
+			{
+				this.ProtectedGeneric<T>();
+			}
+
 			public int DoProtectedInt()
 			{
 				return this.ProtectedInt();
 			}
 
+			public T DoProtectedReturnGeneric<T>()
+			{
+				return this.ProtectedReturnGeneric<T>();
+			}
+
 			public int DoProtectedWithNullableIntParam(int? value)
 			{
 				return this.ProtectedWithNullableIntParam(value);
+			}
+
+			public T DoProtectedWithGenericParam<T>(T value)
+			{
+				return this.ProtectedWithGenericParam(value);
 			}
 
 			public string DoStringArg(string arg)
@@ -904,12 +1024,25 @@ namespace Moq.Tests
 			{
 			}
 
+			internal protected virtual void ProtectedInternalGeneric<T>()
+			{
+			}
+
 			internal protected virtual int ProtectedInternalInt()
 			{
 				return 0;
 			}
 
+			internal protected virtual T ProtectedInternalReturnGeneric<T>()
+			{
+				return default(T);
+			}
+
 			protected virtual void Protected()
+			{
+			}
+
+			protected virtual void ProtectedGeneric<T>()
 			{
 			}
 
@@ -918,9 +1051,19 @@ namespace Moq.Tests
 				return 2;
 			}
 
+			protected virtual T ProtectedReturnGeneric<T>()
+			{
+				return default(T);
+			}
+
 			protected virtual int ProtectedWithNullableIntParam(int? value)
 			{
 				return value ?? 0;
+			}
+
+			protected virtual T ProtectedWithGenericParam<T>(T value)
+			{
+				return value;
 			}
 
 			protected void NonVirtual()

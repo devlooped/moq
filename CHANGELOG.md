@@ -4,6 +4,11 @@ All notable changes to this project will be documented in this file.
 
 The format is loosely based on [Keep a Changelog](http://keepachangelog.com/en/1.0.0/).
 
+## Unreleased
+
+#### Added
+
+ * New `.Protected().Setup` and `Protected().Verify` method overloads to deal with generic methods (@JmlSaul, #967)
 
 ## 4.13.1 (2019-10-19)
 
