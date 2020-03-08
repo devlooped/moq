@@ -10,6 +10,11 @@ The format is loosely based on [Keep a Changelog](http://keepachangelog.com/en/1
 
  * New `.Protected().Setup` and `Protected().Verify` method overloads to deal with generic methods (@JmlSaul, #967)
 
+#### Fixed
+
+ * Regression: Restored `Capture.In` use in `mock.Verify(expression, ...)` to extract arguments of previously recorded invocations. (@vgriph, #968; @stakx, #974)
+
+
 ## 4.13.1 (2019-10-19)
 
 #### Fixed
