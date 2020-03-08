@@ -349,8 +349,9 @@ namespace Moq
 
 			if (times.Verify(invocationCount))
 			{
-				foreach (var invocation in invocationsToBeMarkedAsVerified)
+				foreach (var (invocation, part) in invocationsToBeMarkedAsVerified)
 				{
+					part.SetupEvaluatedSuccessfully(invocation);
 					invocation.MarkAsVerified();
 				}
 			}
@@ -452,12 +453,12 @@ namespace Moq
 		private static int GetMatchingInvocationCount(
 			Mock mock,
 			LambdaExpression expression,
-			out List<Invocation> invocationsToBeMarkedAsVerified)
+			out List<Pair<Invocation, InvocationShape>> invocationsToBeMarkedAsVerified)
 		{
 			Debug.Assert(mock != null);
 			Debug.Assert(expression != null);
 
-			invocationsToBeMarkedAsVerified = new List<Invocation>();
+			invocationsToBeMarkedAsVerified = new List<Pair<Invocation, InvocationShape>>();
 			return Mock.GetMatchingInvocationCount(
 				mock,
 				new ImmutablePopOnlyStack<InvocationShape>(expression.Split()),
@@ -469,7 +470,7 @@ namespace Moq
 			Mock mock,
 			in ImmutablePopOnlyStack<InvocationShape> parts,
 			HashSet<Mock> visitedInnerMocks,
-			List<Invocation> invocationsToBeMarkedAsVerified)
+			List<Pair<Invocation, InvocationShape>> invocationsToBeMarkedAsVerified)
 		{
 			Debug.Assert(mock != null);
 			Debug.Assert(!parts.Empty);
@@ -488,7 +489,7 @@ namespace Moq
 			var count = 0;
 			foreach (var matchingInvocation in mock.MutableInvocations.ToArray().Where(part.IsMatch))
 			{
-				invocationsToBeMarkedAsVerified.Add(matchingInvocation);
+				invocationsToBeMarkedAsVerified.Add(new Pair<Invocation, InvocationShape>(matchingInvocation, part));
 
 				if (remainingParts.Empty)
 				{
