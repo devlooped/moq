@@ -15,7 +15,7 @@ namespace Moq.Tests
 		[InlineData(int.MaxValue, true)]
 		public void default_ranges_between_one_and_MaxValue(int count, bool verifies)
 		{
-			Assert.Equal(verifies, default(Times).Verify(count));
+			Assert.Equal(verifies, default(Times).Validate(count));
 		}
 
 		[Fact]
@@ -23,11 +23,11 @@ namespace Moq.Tests
 		{
 			var target = Times.AtLeastOnce();
 
-			Assert.False(target.Verify(-1));
-			Assert.False(target.Verify(0));
-			Assert.True(target.Verify(1));
-			Assert.True(target.Verify(5));
-			Assert.True(target.Verify(int.MaxValue));
+			Assert.False(target.Validate(-1));
+			Assert.False(target.Validate(0));
+			Assert.True(target.Validate(1));
+			Assert.True(target.Validate(5));
+			Assert.True(target.Validate(int.MaxValue));
 		}
 
 		[Fact]
@@ -42,11 +42,11 @@ namespace Moq.Tests
 		{
 			var target = Times.AtLeast(10);
 
-			Assert.False(target.Verify(-1));
-			Assert.False(target.Verify(0));
-			Assert.False(target.Verify(9));
-			Assert.True(target.Verify(10));
-			Assert.True(target.Verify(int.MaxValue));
+			Assert.False(target.Validate(-1));
+			Assert.False(target.Validate(0));
+			Assert.False(target.Validate(9));
+			Assert.True(target.Validate(10));
+			Assert.True(target.Validate(int.MaxValue));
 		}
 
 		[Fact]
@@ -54,11 +54,11 @@ namespace Moq.Tests
 		{
 			var target = Times.AtMostOnce();
 
-			Assert.False(target.Verify(-1));
-			Assert.True(target.Verify(0));
-			Assert.True(target.Verify(1));
-			Assert.False(target.Verify(5));
-			Assert.False(target.Verify(int.MaxValue));
+			Assert.False(target.Validate(-1));
+			Assert.True(target.Validate(0));
+			Assert.True(target.Validate(1));
+			Assert.False(target.Validate(5));
+			Assert.False(target.Validate(int.MaxValue));
 		}
 
 		[Fact]
@@ -73,12 +73,12 @@ namespace Moq.Tests
 		{
 			var target = Times.AtMost(10);
 
-			Assert.False(target.Verify(-1));
-			Assert.True(target.Verify(0));
-			Assert.True(target.Verify(6));
-			Assert.True(target.Verify(10));
-			Assert.False(target.Verify(11));
-			Assert.False(target.Verify(int.MaxValue));
+			Assert.False(target.Validate(-1));
+			Assert.True(target.Validate(0));
+			Assert.True(target.Validate(6));
+			Assert.True(target.Validate(10));
+			Assert.False(target.Validate(11));
+			Assert.False(target.Validate(int.MaxValue));
 		}
 
 		[Fact]
@@ -101,13 +101,13 @@ namespace Moq.Tests
 		{
 			var target = Times.Between(10, 20, Range.Inclusive);
 
-			Assert.False(target.Verify(0));
-			Assert.False(target.Verify(9));
-			Assert.True(target.Verify(10));
-			Assert.True(target.Verify(14));
-			Assert.True(target.Verify(20));
-			Assert.False(target.Verify(21));
-			Assert.False(target.Verify(int.MaxValue));
+			Assert.False(target.Validate(0));
+			Assert.False(target.Validate(9));
+			Assert.True(target.Validate(10));
+			Assert.True(target.Validate(14));
+			Assert.True(target.Validate(20));
+			Assert.False(target.Validate(21));
+			Assert.False(target.Validate(int.MaxValue));
 		}
 
 		[Fact]
@@ -130,13 +130,13 @@ namespace Moq.Tests
 		{
 			var target = Times.Between(10, 20, Range.Exclusive);
 
-			Assert.False(target.Verify(0));
-			Assert.False(target.Verify(10));
-			Assert.True(target.Verify(11));
-			Assert.True(target.Verify(14));
-			Assert.True(target.Verify(19));
-			Assert.False(target.Verify(20));
-			Assert.False(target.Verify(int.MaxValue));
+			Assert.False(target.Validate(0));
+			Assert.False(target.Validate(10));
+			Assert.True(target.Validate(11));
+			Assert.True(target.Validate(14));
+			Assert.True(target.Validate(19));
+			Assert.False(target.Validate(20));
+			Assert.False(target.Validate(int.MaxValue));
 		}
 
 		[Fact]
@@ -151,12 +151,12 @@ namespace Moq.Tests
 		{
 			var target = Times.Exactly(10);
 
-			Assert.False(target.Verify(-1));
-			Assert.False(target.Verify(0));
-			Assert.False(target.Verify(9));
-			Assert.True(target.Verify(10));
-			Assert.False(target.Verify(11));
-			Assert.False(target.Verify(int.MaxValue));
+			Assert.False(target.Validate(-1));
+			Assert.False(target.Validate(0));
+			Assert.False(target.Validate(9));
+			Assert.True(target.Validate(10));
+			Assert.False(target.Validate(11));
+			Assert.False(target.Validate(int.MaxValue));
 		}
 
 		[Fact]
@@ -164,10 +164,10 @@ namespace Moq.Tests
 		{
 			var target = Times.Never();
 
-			Assert.False(target.Verify(-1));
-			Assert.True(target.Verify(0));
-			Assert.False(target.Verify(1));
-			Assert.False(target.Verify(int.MaxValue));
+			Assert.False(target.Validate(-1));
+			Assert.True(target.Validate(0));
+			Assert.False(target.Validate(1));
+			Assert.False(target.Validate(int.MaxValue));
 		}
 
 		[Fact]
@@ -175,10 +175,10 @@ namespace Moq.Tests
 		{
 			var target = Times.Once();
 
-			Assert.False(target.Verify(-1));
-			Assert.False(target.Verify(0));
-			Assert.True(target.Verify(1));
-			Assert.False(target.Verify(int.MaxValue));
+			Assert.False(target.Validate(-1));
+			Assert.False(target.Validate(0));
+			Assert.True(target.Validate(1));
+			Assert.False(target.Validate(int.MaxValue));
 		}
 
 		public class Deconstruction
@@ -311,6 +311,69 @@ namespace Moq.Tests
 				const int x = 1;
 				const int y = 10;
 				Assert.NotEqual(Times.Between(x, y, Range.Inclusive), Times.Between(x, y, Range.Exclusive));
+			}
+		}
+
+		public class String_representation
+		{
+			[Fact]
+			public void Default()
+			{
+				Assert.Equal("AtLeastOnce", default(Times).ToString());
+			}
+
+			[Fact]
+			public void AtLeast()
+			{
+				Assert.Equal("AtLeast(123)", Times.AtLeast(123).ToString());
+			}
+
+			[Fact]
+			public void AtLeastOnce()
+			{
+				Assert.Equal("AtLeastOnce", Times.AtLeastOnce().ToString());
+			}
+
+			[Fact]
+			public void AtMost()
+			{
+				Assert.Equal("AtMost(123)", Times.AtMost(123).ToString());
+			}
+
+			[Fact]
+			public void AtMostOnce()
+			{
+				Assert.Equal("AtMostOnce", Times.AtMostOnce().ToString());
+			}
+
+			[Fact]
+			public void Between_Exclusive()
+			{
+				Assert.Equal("Between(123, 456, Exclusive)", Times.Between(123, 456, Range.Exclusive).ToString());
+			}
+
+			[Fact]
+			public void Between_Inclusive()
+			{
+				Assert.Equal("Between(123, 456, Inclusive)", Times.Between(123, 456, Range.Inclusive).ToString());
+			}
+
+			[Fact]
+			public void Exactly()
+			{
+				Assert.Equal("Exactly(123)", Times.Exactly(123).ToString());
+			}
+
+			[Fact]
+			public void Never()
+			{
+				Assert.Equal("Never", Times.Never().ToString());
+			}
+
+			[Fact]
+			public void Once()
+			{
+				Assert.Equal("Once", Times.Once().ToString());
 			}
 		}
 	}

@@ -9,6 +9,7 @@ The format is loosely based on [Keep a Changelog](http://keepachangelog.com/en/1
 #### Added
 
  * New `.Protected().Setup` and `Protected().Verify` method overloads to deal with generic methods (@JmlSaul, #967)
+ * Two new public methods in `Times`: `bool Validate(int count)` and `string ToString()` (@stakx, 975)
 
 #### Fixed
 

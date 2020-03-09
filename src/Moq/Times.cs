@@ -238,6 +238,24 @@ namespace Moq
 			return !left.Equals(right);
 		}
 
+		/// <inheritdoc/>
+		public override string ToString()
+		{
+			switch (this.kind)
+			{
+				case Kind.AtLeast:          return $"AtLeast({this.from})";
+				case Kind.AtMost:           return $"AtMost({this.to})";
+				case Kind.AtMostOnce:       return  "AtMostOnce";
+				case Kind.BetweenExclusive: return $"Between({this.from - 1}, {this.to + 1}, Exclusive)";
+				case Kind.BetweenInclusive: return $"Between({this.from}, {this.to}, Inclusive)";
+				case Kind.Exactly:          return $"Exactly({this.from})";
+				case Kind.Once:             return  "Once";
+				case Kind.Never:            return  "Never";
+				case Kind.AtLeastOnce:
+				default:                    return  "AtLeastOnce";
+			}
+		}
+
 		internal string GetExceptionMessage(int callCount)
 		{
 			var (from, to) = this;
@@ -265,10 +283,18 @@ namespace Moq
 			return string.Format(CultureInfo.CurrentCulture, message, from, to, callCount);
 		}
 
-		internal bool Verify(int callCount)
+		/// <summary>
+		///   Checks whether the specified number of invocations matches the constraint described by this instance.
+		/// </summary>
+		/// <param name="count">The number of invocations to check.</param>
+		/// <returns>
+		///   <see langword="true"/> if <paramref name="count"/> matches the constraint described by this instance;
+		///   otherwise, <see langword="false"/>.
+		/// </returns>
+		public bool Validate(int count)
 		{
 			var (from, to) = this;
-			return from <= callCount && callCount <= to;
+			return from <= count && count <= to;
 		}
 
 		private enum Kind
