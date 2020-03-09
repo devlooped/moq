@@ -265,10 +265,18 @@ namespace Moq
 			return string.Format(CultureInfo.CurrentCulture, message, from, to, callCount);
 		}
 
-		internal bool Verify(int callCount)
+		/// <summary>
+		///   Checks whether the specified number of invocations matches the constraint described by this instance.
+		/// </summary>
+		/// <param name="count">The number of invocations to check.</param>
+		/// <returns>
+		///   <see langword="true"/> if <paramref name="count"/> matches the constraint described by this instance;
+		///   otherwise, <see langword="false"/>.
+		/// </returns>
+		public bool Validate(int count)
 		{
 			var (from, to) = this;
-			return from <= callCount && callCount <= to;
+			return from <= count && count <= to;
 		}
 
 		private enum Kind

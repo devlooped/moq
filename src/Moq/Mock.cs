@@ -347,7 +347,7 @@ namespace Moq
 
 			var invocationCount = Mock.GetMatchingInvocationCount(mock, expression, out var invocationsToBeMarkedAsVerified);
 
-			if (times.Verify(invocationCount))
+			if (times.Validate(invocationCount))
 			{
 				foreach (var (invocation, part) in invocationsToBeMarkedAsVerified)
 				{

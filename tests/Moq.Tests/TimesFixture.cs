@@ -15,7 +15,7 @@ namespace Moq.Tests
 		[InlineData(int.MaxValue, true)]
 		public void default_ranges_between_one_and_MaxValue(int count, bool verifies)
 		{
-			Assert.Equal(verifies, default(Times).Verify(count));
+			Assert.Equal(verifies, default(Times).Validate(count));
 		}
 
 		[Fact]
@@ -23,11 +23,11 @@ namespace Moq.Tests
 		{
 			var target = Times.AtLeastOnce();
 
-			Assert.False(target.Verify(-1));
-			Assert.False(target.Verify(0));
-			Assert.True(target.Verify(1));
-			Assert.True(target.Verify(5));
-			Assert.True(target.Verify(int.MaxValue));
+			Assert.False(target.Validate(-1));
+			Assert.False(target.Validate(0));
+			Assert.True(target.Validate(1));
+			Assert.True(target.Validate(5));
+			Assert.True(target.Validate(int.MaxValue));
 		}
 
 		[Fact]
@@ -42,11 +42,11 @@ namespace Moq.Tests
 		{
 			var target = Times.AtLeast(10);
 
-			Assert.False(target.Verify(-1));
-			Assert.False(target.Verify(0));
-			Assert.False(target.Verify(9));
-			Assert.True(target.Verify(10));
-			Assert.True(target.Verify(int.MaxValue));
+			Assert.False(target.Validate(-1));
+			Assert.False(target.Validate(0));
+			Assert.False(target.Validate(9));
+			Assert.True(target.Validate(10));
+			Assert.True(target.Validate(int.MaxValue));
 		}
 
 		[Fact]
@@ -54,11 +54,11 @@ namespace Moq.Tests
 		{
 			var target = Times.AtMostOnce();
 
-			Assert.False(target.Verify(-1));
-			Assert.True(target.Verify(0));
-			Assert.True(target.Verify(1));
-			Assert.False(target.Verify(5));
-			Assert.False(target.Verify(int.MaxValue));
+			Assert.False(target.Validate(-1));
+			Assert.True(target.Validate(0));
+			Assert.True(target.Validate(1));
+			Assert.False(target.Validate(5));
+			Assert.False(target.Validate(int.MaxValue));
 		}
 
 		[Fact]
@@ -73,12 +73,12 @@ namespace Moq.Tests
 		{
 			var target = Times.AtMost(10);
 
-			Assert.False(target.Verify(-1));
-			Assert.True(target.Verify(0));
-			Assert.True(target.Verify(6));
-			Assert.True(target.Verify(10));
-			Assert.False(target.Verify(11));
-			Assert.False(target.Verify(int.MaxValue));
+			Assert.False(target.Validate(-1));
+			Assert.True(target.Validate(0));
+			Assert.True(target.Validate(6));
+			Assert.True(target.Validate(10));
+			Assert.False(target.Validate(11));
+			Assert.False(target.Validate(int.MaxValue));
 		}
 
 		[Fact]
@@ -101,13 +101,13 @@ namespace Moq.Tests
 		{
 			var target = Times.Between(10, 20, Range.Inclusive);
 
-			Assert.False(target.Verify(0));
-			Assert.False(target.Verify(9));
-			Assert.True(target.Verify(10));
-			Assert.True(target.Verify(14));
-			Assert.True(target.Verify(20));
-			Assert.False(target.Verify(21));
-			Assert.False(target.Verify(int.MaxValue));
+			Assert.False(target.Validate(0));
+			Assert.False(target.Validate(9));
+			Assert.True(target.Validate(10));
+			Assert.True(target.Validate(14));
+			Assert.True(target.Validate(20));
+			Assert.False(target.Validate(21));
+			Assert.False(target.Validate(int.MaxValue));
 		}
 
 		[Fact]
@@ -130,13 +130,13 @@ namespace Moq.Tests
 		{
 			var target = Times.Between(10, 20, Range.Exclusive);
 
-			Assert.False(target.Verify(0));
-			Assert.False(target.Verify(10));
-			Assert.True(target.Verify(11));
-			Assert.True(target.Verify(14));
-			Assert.True(target.Verify(19));
-			Assert.False(target.Verify(20));
-			Assert.False(target.Verify(int.MaxValue));
+			Assert.False(target.Validate(0));
+			Assert.False(target.Validate(10));
+			Assert.True(target.Validate(11));
+			Assert.True(target.Validate(14));
+			Assert.True(target.Validate(19));
+			Assert.False(target.Validate(20));
+			Assert.False(target.Validate(int.MaxValue));
 		}
 
 		[Fact]
@@ -151,12 +151,12 @@ namespace Moq.Tests
 		{
 			var target = Times.Exactly(10);
 
-			Assert.False(target.Verify(-1));
-			Assert.False(target.Verify(0));
-			Assert.False(target.Verify(9));
-			Assert.True(target.Verify(10));
-			Assert.False(target.Verify(11));
-			Assert.False(target.Verify(int.MaxValue));
+			Assert.False(target.Validate(-1));
+			Assert.False(target.Validate(0));
+			Assert.False(target.Validate(9));
+			Assert.True(target.Validate(10));
+			Assert.False(target.Validate(11));
+			Assert.False(target.Validate(int.MaxValue));
 		}
 
 		[Fact]
@@ -164,10 +164,10 @@ namespace Moq.Tests
 		{
 			var target = Times.Never();
 
-			Assert.False(target.Verify(-1));
-			Assert.True(target.Verify(0));
-			Assert.False(target.Verify(1));
-			Assert.False(target.Verify(int.MaxValue));
+			Assert.False(target.Validate(-1));
+			Assert.True(target.Validate(0));
+			Assert.False(target.Validate(1));
+			Assert.False(target.Validate(int.MaxValue));
 		}
 
 		[Fact]
@@ -175,10 +175,10 @@ namespace Moq.Tests
 		{
 			var target = Times.Once();
 
-			Assert.False(target.Verify(-1));
-			Assert.False(target.Verify(0));
-			Assert.True(target.Verify(1));
-			Assert.False(target.Verify(int.MaxValue));
+			Assert.False(target.Validate(-1));
+			Assert.False(target.Validate(0));
+			Assert.True(target.Validate(1));
+			Assert.False(target.Validate(int.MaxValue));
 		}
 
 		public class Deconstruction
