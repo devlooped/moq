@@ -313,5 +313,68 @@ namespace Moq.Tests
 				Assert.NotEqual(Times.Between(x, y, Range.Inclusive), Times.Between(x, y, Range.Exclusive));
 			}
 		}
+
+		public class String_representation
+		{
+			[Fact]
+			public void Default()
+			{
+				Assert.Equal("AtLeastOnce", default(Times).ToString());
+			}
+
+			[Fact]
+			public void AtLeast()
+			{
+				Assert.Equal("AtLeast(123)", Times.AtLeast(123).ToString());
+			}
+
+			[Fact]
+			public void AtLeastOnce()
+			{
+				Assert.Equal("AtLeastOnce", Times.AtLeastOnce().ToString());
+			}
+
+			[Fact]
+			public void AtMost()
+			{
+				Assert.Equal("AtMost(123)", Times.AtMost(123).ToString());
+			}
+
+			[Fact]
+			public void AtMostOnce()
+			{
+				Assert.Equal("AtMostOnce", Times.AtMostOnce().ToString());
+			}
+
+			[Fact]
+			public void Between_Exclusive()
+			{
+				Assert.Equal("Between(123, 456, Exclusive)", Times.Between(123, 456, Range.Exclusive).ToString());
+			}
+
+			[Fact]
+			public void Between_Inclusive()
+			{
+				Assert.Equal("Between(123, 456, Inclusive)", Times.Between(123, 456, Range.Inclusive).ToString());
+			}
+
+			[Fact]
+			public void Exactly()
+			{
+				Assert.Equal("Exactly(123)", Times.Exactly(123).ToString());
+			}
+
+			[Fact]
+			public void Never()
+			{
+				Assert.Equal("Never", Times.Never().ToString());
+			}
+
+			[Fact]
+			public void Once()
+			{
+				Assert.Equal("Once", Times.Once().ToString());
+			}
+		}
 	}
 }

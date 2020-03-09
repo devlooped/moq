@@ -238,6 +238,24 @@ namespace Moq
 			return !left.Equals(right);
 		}
 
+		/// <inheritdoc/>
+		public override string ToString()
+		{
+			switch (this.kind)
+			{
+				case Kind.AtLeast:          return $"AtLeast({this.from})";
+				case Kind.AtMost:           return $"AtMost({this.to})";
+				case Kind.AtMostOnce:       return  "AtMostOnce";
+				case Kind.BetweenExclusive: return $"Between({this.from - 1}, {this.to + 1}, Exclusive)";
+				case Kind.BetweenInclusive: return $"Between({this.from}, {this.to}, Inclusive)";
+				case Kind.Exactly:          return $"Exactly({this.from})";
+				case Kind.Once:             return  "Once";
+				case Kind.Never:            return  "Never";
+				case Kind.AtLeastOnce:
+				default:                    return  "AtLeastOnce";
+			}
+		}
+
 		internal string GetExceptionMessage(int callCount)
 		{
 			var (from, to) = this;
