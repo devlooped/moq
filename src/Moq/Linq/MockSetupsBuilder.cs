@@ -27,7 +27,7 @@ namespace Moq.Linq
 
 		protected override Expression VisitBinary(BinaryExpression node)
 		{
-			if (node != null && this.stackIndex > 0)
+			if (this.stackIndex > 0)
 			{
 				if (node.NodeType != ExpressionType.Equal && node.NodeType != ExpressionType.AndAlso)
 					throw new NotSupportedException(string.Format(CultureInfo.CurrentCulture, Resources.LinqBinaryOperatorNotSupported, node.ToStringFixed()));
@@ -52,7 +52,7 @@ namespace Moq.Linq
 
 		protected override Expression VisitConstant(ConstantExpression node)
 		{
-			if (node != null && node.Type.IsGenericType && node.Type.GetGenericTypeDefinition() == typeof(MockQueryable<>))
+			if (node.Type.IsGenericType && node.Type.GetGenericTypeDefinition() == typeof(MockQueryable<>))
 			{
 				//var asQueryableMethod = createQueryableMethod.MakeGenericMethod(node.Type.GetGenericArguments()[0]);
 
@@ -65,7 +65,7 @@ namespace Moq.Linq
 
 		protected override Expression VisitMember(MemberExpression node)
 		{
-			if (node != null && this.stackIndex > 0 && node.Type == typeof(bool))
+			if (this.stackIndex > 0 && node.Type == typeof(bool))
 			{
 				return ConvertToSetupReturns(node, Expression.Constant(true));
 			}
@@ -75,28 +75,25 @@ namespace Moq.Linq
 
 		protected override Expression VisitMethodCall(MethodCallExpression node)
 		{
-			if (node != null)
+			if (node.Method.DeclaringType == typeof(Queryable) && queryableMethods.Contains(node.Method.Name))
 			{
-				if (node.Method.DeclaringType == typeof(Queryable) && queryableMethods.Contains(node.Method.Name))
-				{
-					this.stackIndex++;
-					var result = base.VisitMethodCall(node);
-					this.stackIndex--;
-					return result;
-				}
+				this.stackIndex++;
+				var result = base.VisitMethodCall(node);
+				this.stackIndex--;
+				return result;
+			}
 
-				if (unsupportedMethods.Contains(node.Method.Name))
-				{
-					throw new NotSupportedException(string.Format(
-						CultureInfo.CurrentCulture,
-						Resources.LinqMethodNotSupported,
-						node.Method.Name));
-				}
+			if (unsupportedMethods.Contains(node.Method.Name))
+			{
+				throw new NotSupportedException(string.Format(
+					CultureInfo.CurrentCulture,
+					Resources.LinqMethodNotSupported,
+					node.Method.Name));
+			}
 
-				if (this.stackIndex > 0 && node.Type == typeof(bool))
-				{
-					return ConvertToSetupReturns(node, Expression.Constant(true));
-				}
+			if (this.stackIndex > 0 && node.Type == typeof(bool))
+			{
+				return ConvertToSetupReturns(node, Expression.Constant(true));
 			}
 
 			return base.VisitMethodCall(node);
@@ -104,7 +101,7 @@ namespace Moq.Linq
 
 		protected override Expression VisitUnary(UnaryExpression node)
 		{
-			if (node != null && this.stackIndex > 0 && node.NodeType == ExpressionType.Not)
+			if (this.stackIndex > 0 && node.NodeType == ExpressionType.Not)
 			{
 				return ConvertToSetup(node.Operand, Expression.Constant(false)) ?? base.VisitUnary(node);
 			}
