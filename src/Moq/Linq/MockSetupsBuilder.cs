@@ -213,12 +213,5 @@ namespace Moq.Linq
 				return node.NodeType == ExpressionType.Quote ? node : base.VisitUnary(node);
 			}
 		}
-
-		private static Expression VisitFluent(Expression expression)
-		{
-			return new FluentMockVisitor(resolveRoot: p => Expression.Call(null, Mock.GetMethod.MakeGenericMethod(p.Type), p),
-			                             setupRightmost: true)
-			       .Visit(expression);
-		}
 	}
 }
