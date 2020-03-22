@@ -139,15 +139,15 @@ namespace Moq.Tests
 
 			var setupsBefore = mock.Setups.ToArray();
 			Assert.Single(setupsBefore);
-			Assert.False(setupsBefore[0].IsDisabled);
+			Assert.False(setupsBefore[0].IsOverridden);
 
 			mock.Setup(setupExpression);
 
 			var setupsAfter = mock.Setups.ToArray();
 			Assert.Equal(2, setupsAfter.Length);
 			Assert.Same(setupsAfter[0], setupsBefore[0]);
-			Assert.True(setupsAfter[0].IsDisabled);
-			Assert.False(setupsAfter[1].IsDisabled);
+			Assert.True(setupsAfter[0].IsOverridden);
+			Assert.False(setupsAfter[1].IsOverridden);
 		}
 
 		[Fact]

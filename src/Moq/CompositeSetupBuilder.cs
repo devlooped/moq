@@ -28,7 +28,7 @@ namespace Moq
 
 		public bool IsConditional => this.parts.First().IsConditional;
 
-		bool ISetup.IsDisabled => this.parts.Any(p => p.IsDisabled);
+		bool ISetup.IsOverridden => this.parts.Any(p => p.IsOverridden);
 
 		public bool IsMatched => this.parts.All(p => p.IsMatched);
 

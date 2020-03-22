@@ -87,7 +87,7 @@ namespace Moq
 				for (int i = this.setups.Count - 1; i >= 0; --i)
 				{
 					var setup = this.setups[i];
-					if (setup.IsDisabled) continue;
+					if (setup.IsOverridden) continue;
 
 					// the following conditions are repetitive, but were written that way to avoid
 					// unnecessary expensive calls to `setup.Matches`; cheap tests are run first.
@@ -112,7 +112,7 @@ namespace Moq
 
 		public IEnumerable<Setup> GetInnerMockSetups()
 		{
-			return this.ToArray().Where(s => !s.IsDisabled && !s.IsConditional && s.ReturnsInnerMock(out _));
+			return this.ToArray().Where(s => !s.IsOverridden && !s.IsConditional && s.ReturnsInnerMock(out _));
 		}
 
 		public void UninvokeAll()
@@ -138,13 +138,13 @@ namespace Moq
 				{
 					var setup = this.setups[i];
 
-					if (!setup.IsDisabled && !setup.IsConditional)
+					if (!setup.IsOverridden && !setup.IsConditional)
 					{
 						if (!visitedSetups.Add(setup.Expectation))
 						{
 							// A setup with the same expression has already been iterated over,
 							// meaning that this older setup is an overridden one.
-							setup.Disable();
+							setup.MarkAsOverridden();
 						}
 					}
 

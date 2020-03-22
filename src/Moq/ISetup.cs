@@ -21,14 +21,14 @@ namespace Moq
 		bool IsConditional { get; }
 
 		/// <summary>
-		///   Gets whether this setup is disabled.
-		/// </summary>
-		bool IsDisabled { get; }
-
-		/// <summary>
 		///   Gets whether this setup was matched by at least one invocation on the mock.
 		/// </summary>
 		bool IsMatched { get; }
+
+		/// <summary>
+		///   Gets whether this setup is overridden (i.e. shadowed by a more recent setup having the same expression).
+		/// </summary>
+		bool IsOverridden { get; }
 
 		/// <summary>
 		///   Gets whether this setup is verifiable.

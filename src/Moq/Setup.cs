@@ -34,24 +34,19 @@ namespace Moq
 
 		public bool IsConditional => this.Condition != null;
 
-		public bool IsDisabled => (this.flags & Flags.Disabled) != 0;
-
 		public bool IsMatched
 		{
 			get => (this.flags & Flags.Matched) != 0;
 			set => this.flags = value ? this.flags | Flags.Matched : this.flags & ~Flags.Matched;
 		}
 
+		public bool IsOverridden => (this.flags & Flags.Overridden) != 0;
+
 		public bool IsVerifiable => (this.flags & Flags.Verifiable) != 0;
 
 		public MethodInfo Method => this.expectation.Method;
 
 		public Mock Mock => this.mock;
-
-		public void Disable()
-		{
-			this.flags |= Flags.Disabled;
-		}
 
 		public abstract void Execute(Invocation invocation);
 
@@ -63,6 +58,11 @@ namespace Moq
 		public bool IsPartOfCompositeSetup(out ICompositeSetup originalSetup)
 		{
 			return (originalSetup = this.originalSetup) != null;
+		}
+
+		public void MarkAsOverridden()
+		{
+			this.flags |= Flags.Overridden;
 		}
 
 		/// <summary>
@@ -164,8 +164,8 @@ namespace Moq
 		[Flags]
 		private enum Flags : byte
 		{
-			Disabled = 1,
-			Matched = 2,
+			Matched = 1,
+			Overridden = 2,
 			Verifiable = 4,
 		}
 	}
