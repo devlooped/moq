@@ -24,5 +24,25 @@ namespace Moq
 		///   Gets whether this setup is disabled.
 		/// </summary>
 		bool IsDisabled { get; }
+
+		/// <summary>
+		///   Gets whether this setup is verifiable.
+		/// </summary>
+		bool IsVerifiable { get; }
+
+		/// <summary>
+		///   Verifies this setup.
+		///   That is, checks whether it has been matched by at least one invocation on the mock.
+		///   <para>
+		///     If this setup is known to return an inner mock object, the inner mock will also be verified.
+		///   </para>
+		/// </summary>
+		/// <exception cref="MockException">
+		///   The setup or its inner mock did not verify successfully.
+		/// </exception>
+		/// <seealso cref="ReturnsInnerMock(out Mock)"/>
+		/// <seealso cref="Mock.Verify()"/>
+		/// <seealso cref="Mock.VerifyAll()"/>
+		void Verify();
 	}
 }

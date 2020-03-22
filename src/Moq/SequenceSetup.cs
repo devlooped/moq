@@ -16,8 +16,8 @@ namespace Moq
 		private ConcurrentQueue<Response> responses;
 		private bool invoked;
 
-		public SequenceSetup(InvocationShape expectation)
-			: base(expectation)
+		public SequenceSetup(Mock mock, InvocationShape expectation)
+			: base(mock, expectation)
 		{
 			this.responses = new ConcurrentQueue<Response>();
 		}

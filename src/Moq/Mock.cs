@@ -306,7 +306,7 @@ namespace Moq
 		{
 			foreach (Invocation invocation in this.MutableInvocations)
 			{
-				invocation.MarkAsVerifiedIfMatchedByVerifiableSetup();
+				invocation.MarkAsVerifiedIfMatchedBy(setup => setup.IsVerifiable);
 			}
 
 			return this.TryVerifySetups(setup => setup.TryVerify());
@@ -316,7 +316,7 @@ namespace Moq
 		{
 			foreach (Invocation invocation in this.MutableInvocations)
 			{
-				invocation.MarkAsVerifiedIfMatchedBySetup();
+				invocation.MarkAsVerifiedIfMatchedBy(setup => true);
 			}
 
 			return this.TryVerifySetups(setup => setup.TryVerifyAll());
@@ -582,7 +582,7 @@ namespace Moq
 
 			return Mock.SetupRecursive(mock, expression, setupLast: (part, targetMock) =>
 			{
-				var setup = new SequenceSetup(expectation: part);
+				var setup = new SequenceSetup(targetMock, expectation: part);
 				targetMock.MutableSetups.Add(setup);
 				return setup;
 			});
@@ -621,7 +621,7 @@ namespace Moq
 								Resources.UnsupportedExpression,
 								expr.ToStringFixed() + " in " + expression.ToStringFixed() + ":\n" + Resources.TypeNotMockable));
 					}
-					setup = new InnerMockSetup(expectation: part, returnValue);
+					setup = new InnerMockSetup(mock, expectation: part, returnValue);
 					mock.MutableSetups.Add((Setup)setup);
 				}
 				Debug.Assert(innerMock != null);
@@ -818,7 +818,7 @@ namespace Moq
 				Debug.Assert(property.CanRead(out var getter) && invocation.Method == getter);
 			}
 
-			this.MutableSetups.Add(new InnerMockSetup(new InvocationShape(expression, invocation.Method, arguments, exactGenericTypeArguments: true), returnValue));
+			this.MutableSetups.Add(new InnerMockSetup(this, new InvocationShape(expression, invocation.Method, arguments, exactGenericTypeArguments: true), returnValue));
 		}
 
 		#endregion

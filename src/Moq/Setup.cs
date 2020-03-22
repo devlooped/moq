@@ -12,13 +12,16 @@ namespace Moq
 	internal abstract class Setup : ISetup
 	{
 		private readonly InvocationShape expectation;
+		private readonly Mock mock;
 		private Flags flags;
 
-		protected Setup(InvocationShape expectation)
+		protected Setup(Mock mock, InvocationShape expectation)
 		{
 			Debug.Assert(expectation != null);
+			Debug.Assert(mock != null);
 
 			this.expectation = expectation;
+			this.mock = mock;
 		}
 
 		public virtual Condition Condition => null;
@@ -31,9 +34,11 @@ namespace Moq
 
 		public bool IsDisabled => (this.flags & Flags.Disabled) != 0;
 
-		public virtual bool IsVerifiable => false;
+		public bool IsVerifiable => (this.flags & Flags.Verifiable) != 0;
 
 		public MethodInfo Method => this.expectation.Method;
+
+		public Mock Mock => this.mock;
 
 		public void Disable()
 		{
@@ -124,10 +129,30 @@ namespace Moq
 		{
 		}
 
+		public void Verifiable()
+		{
+			this.flags |= Flags.Verifiable;
+		}
+
+		void ISetup.Verify()
+		{
+			foreach (Invocation invocation in this.mock.MutableInvocations)
+			{
+				invocation.MarkAsVerifiedIfMatchedBy(setup => setup == this);
+			}
+
+			var error = this.IsVerifiable ? this.TryVerify() : this.TryVerifyAll();
+			if (error?.IsVerificationError == true)
+			{
+				throw error;
+			}
+		}
+
 		[Flags]
 		private enum Flags : byte
 		{
 			Disabled = 1,
+			Verifiable = 2,
 		}
 	}
 }

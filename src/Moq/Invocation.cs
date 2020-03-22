@@ -16,7 +16,8 @@ namespace Moq
 		private MethodInfo methodImplementation;
 		private readonly Type proxyType;
 		private object returnValue;
-		private VerificationState verificationState;
+		private ISetup matchedBy;
+		private bool verified;
 
 		/// <summary>
 		/// Initializes a new instance of the <see cref="Invocation"/> class.
@@ -68,7 +69,7 @@ namespace Moq
 
 		public object ReturnValue => this.returnValue;
 
-		internal bool Verified => this.verificationState == VerificationState.Verified;
+		internal bool Verified => this.verified;
 
 		/// <summary>
 		/// Ends the invocation as if a <see langword="return"/> statement occurred.
@@ -107,39 +108,22 @@ namespace Moq
 		/// </remarks>
 		public abstract void Return(object value);
 
-		internal void MarkAsMatchedBySetup()  // this supports the `mock.VerifyAll()` machinery
+		internal void MarkAsMatchedBy(ISetup setup)
 		{
-			if (this.verificationState == VerificationState.Invoked)
-			{
-				this.verificationState = VerificationState.InvokedAndMatchedBySetup;
-			}
+			Debug.Assert(this.matchedBy == null);
+
+			this.matchedBy = setup;
 		}
 
-		internal void MarkAsMatchedByVerifiableSetup()  // this supports the `mock.Verify()` machinery
-		{
-			if (this.verificationState == VerificationState.Invoked ||
-				this.verificationState == VerificationState.InvokedAndMatchedBySetup)
-			{
-				this.verificationState = VerificationState.InvokedAndMatchedByVerifiableSetup;
-			}
-		}
+		internal void MarkAsVerified() => this.verified = true;
 
-		internal void MarkAsVerified() => this.verificationState = VerificationState.Verified;
-
-		internal void MarkAsVerifiedIfMatchedBySetup()  // this supports the `mock.VerifyAll()` machinery
+		internal void MarkAsVerifiedIfMatchedBy(Func<ISetup, bool> predicate)
 		{
-			if (this.verificationState == VerificationState.InvokedAndMatchedBySetup ||
-				this.verificationState == VerificationState.InvokedAndMatchedByVerifiableSetup)
-			{
-				this.verificationState = VerificationState.Verified;
-			}
-		}
+			Debug.Assert(predicate != null);
 
-		internal void MarkAsVerifiedIfMatchedByVerifiableSetup()  // this supports the `mock.Verify()` machinery
-		{
-			if (this.verificationState == VerificationState.InvokedAndMatchedByVerifiableSetup)
+			if (this.matchedBy != null && predicate(this.matchedBy))
 			{
-				this.verificationState = VerificationState.Verified;
+				this.verified = true;
 			}
 		}
 
@@ -188,14 +172,6 @@ namespace Moq
 			}
 
 			return builder.ToString();
-		}
-
-		private enum VerificationState : byte
-		{
-			Invoked = 0,
-			InvokedAndMatchedBySetup,
-			InvokedAndMatchedByVerifiableSetup,
-			Verified,
 		}
 	}
 }

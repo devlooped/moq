@@ -150,6 +150,83 @@ namespace Moq.Tests
 			Assert.False(setupsAfter[1].IsDisabled);
 		}
 
+		[Fact]
+		public void Can_detect_nonverifiable_setups()
+		{
+			var mock = new Mock<IX>();
+			mock.Setup(m => m.S);
+
+			Assert.False(mock.Setups.First().IsVerifiable);
+		}
+
+		[Fact]
+		public void Can_detect_verifiable_setups()
+		{
+			var mock = new Mock<IX>();
+			mock.Setup(m => m.S).Verifiable();
+
+			Assert.True(mock.Setups.First().IsVerifiable);
+		}
+
+		[Fact]
+		public void Can_verify_nonverifiable_setups()
+		{
+			var mock = new Mock<IX>();
+			mock.Setup(m => m.S).Returns("something");
+
+			var setup = mock.Setups.First();
+
+			Assert.Throws<MockException>(() => setup.Verify());
+
+			_ = mock.Object.S;
+
+			setup.Verify();
+		}
+
+		[Fact]
+		public void Can_verify_verifiable_setups()
+		{
+			var mock = new Mock<IX>();
+			mock.Setup(m => m.S).Returns("something").Verifiable();
+
+			var setup = mock.Setups.First();
+
+			Assert.Throws<MockException>(() => setup.Verify());
+
+			_ = mock.Object.S;
+
+			setup.Verify();
+		}
+
+		[Fact]
+		public void Can_verify_conditional_setups()
+		{
+			var mock = new Mock<IX>();
+			mock.When(() => true).Setup(m => m.S).Returns("something");
+
+			var setup = mock.Setups.First();
+
+			Assert.Throws<MockException>(() => setup.Verify());
+
+			_ = mock.Object.S;
+
+			setup.Verify();
+		}
+
+		[Fact]
+		public void Setup_Verify_works_together_with_Mock_VerifyNoOtherCalls()
+		{
+			var mock = new Mock<IX>();
+			mock.Setup(m => m.S);
+
+			_ = mock.Object.S;
+
+			var setup = mock.Setups.First();
+			setup.Verify();
+
+			mock.VerifyNoOtherCalls();
+		}
+
 		public interface IX
 		{
 			IX GetX(int arg);

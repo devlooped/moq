@@ -105,14 +105,7 @@ namespace Moq
 			{
 				matchedSetup.EvaluatedSuccessfully(invocation);
 
-				if (matchedSetup.IsVerifiable)
-				{
-					invocation.MarkAsMatchedByVerifiableSetup();
-				}
-				else
-				{
-					invocation.MarkAsMatchedBySetup();
-				}
+				invocation.MarkAsMatchedBy(matchedSetup);
 
 				matchedSetup.SetOutParameters(invocation);
 
@@ -319,7 +312,7 @@ namespace Moq
 					if (ProxyFactory.Instance.IsMethodVisible(getter, out _))
 					{
 						propertyValue = CreateInitialPropertyValue(mock, getter);
-						getterSetup = new AutoImplementedPropertyGetterSetup(expression, getter, () => propertyValue);
+						getterSetup = new AutoImplementedPropertyGetterSetup(mock, expression, getter, () => propertyValue);
 						mock.MutableSetups.Add(getterSetup);
 					}
 
@@ -339,7 +332,7 @@ namespace Moq
 				{
 					if (ProxyFactory.Instance.IsMethodVisible(setter, out _))
 					{
-						setterSetup = new AutoImplementedPropertySetterSetup(expression, setter, (newValue) =>
+						setterSetup = new AutoImplementedPropertySetterSetup(mock, expression, setter, (newValue) =>
 						{
 							propertyValue = newValue;
 						});
