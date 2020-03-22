@@ -6,7 +6,8 @@ using System.Globalization;
 using System.Linq;
 using System.Linq.Expressions;
 using System.Reflection;
-using Moq.Language;
+using System.Runtime.CompilerServices;
+
 using Moq.Properties;
 
 namespace Moq.Linq
@@ -66,7 +67,7 @@ namespace Moq.Linq
 		{
 			if (node != null && this.stackIndex > 0 && node.Type == typeof(bool))
 			{
-				return ConvertToSetup(node.Expression, node, Expression.Constant(true));
+				return ConvertToSetupReturns(node, Expression.Constant(true));
 			}
 
 			return base.VisitMember(node);
@@ -94,7 +95,7 @@ namespace Moq.Linq
 
 				if (this.stackIndex > 0 && node.Type == typeof(bool))
 				{
-					return ConvertToSetup(node.Object, node, Expression.Constant(true));
+					return ConvertToSetupReturns(node, Expression.Constant(true));
 				}
 			}
 
@@ -130,13 +131,13 @@ namespace Moq.Linq
 							Resources.LinqMethodNotVirtual,
 							method.ToStringFixed()));
 
-					return ConvertToSetup(method.Object, method, right);
+					return ConvertToSetupReturns(method, right);
 
 				case ExpressionType.Invoke:
 					var invocation = (InvocationExpression)left;
 					if (invocation.Expression is ParameterExpression && typeof(Delegate).IsAssignableFrom(invocation.Expression.Type))
 					{
-						return ConvertToSetup(invocation, right);
+						return ConvertToSetupReturns(invocation, right);
 					}
 					else
 					{
@@ -149,28 +150,6 @@ namespace Moq.Linq
 			}
 
 			return null;
-		}
-
-		private static Expression ConvertToSetup(InvocationExpression invocation, Expression right)
-		{
-			// transforms a delegate invocation expression such as `f(...) == x` (where `invocation` := `f(...)` and `right` := `x`)
-			// to `Mocks.SetupReturns(Mock.Get(f), f' => f'(...), (object)x)` (which in turn will get incorporated into a query
-			// `CreateMocks().First(f => ...)`.
-
-			var delegateParameter = (ParameterExpression)invocation.Expression;
-
-			return Expression.Call(
-				Mocks.SetupReturnsMethod,
-				// mock:
-				Expression.Call(
-					Mock.GetMethod.MakeGenericMethod(delegateParameter.Type),
-					delegateParameter),
-				// expression:
-				Expression.Lambda(
-					invocation,
-					delegateParameter),
-				// value:
-				Expression.Convert(right, typeof(object)));  // explicit boxing operation required for value types
 		}
 
 		private static Expression ConvertToSetupProperty(Expression targetObject, Expression left, Expression right)
@@ -186,7 +165,7 @@ namespace Moq.Linq
 
 			// if the property is readonly, we can only do a Setup(...) which is the same as a method setup.
 			if (!propertyInfo.CanWrite(out var setter) || setter.IsPrivate)
-				return ConvertToSetup(targetObject, left, right);
+				return ConvertToSetupReturns(left, right);
 
 			// This will get up to and including the Mock.Get(foo).Setup(mock => mock.Name) call.
 			var propertySetup = VisitFluent(left);
@@ -212,24 +191,89 @@ namespace Moq.Linq
 				Expression.Convert(right, typeof(object)));  // explicit boxing operation required for value types
 		}
 
-		private static Expression ConvertToSetup(Expression targetObject, Expression left, Expression right)
+		/// <summary>
+		///   Converts a taken-apart binary expression such as `m.A.B` (==) `x` to
+		///   `Mocks.SetupReturns(Mock.Get(m), m' => m'.A.B, (object)x)`.
+		/// </summary>
+		/// <param name="left">Body of the expression to set up.</param>
+		/// <param name="right">Return value to be configured for <paramref name="left"/>.</param>
+		private static Expression ConvertToSetupReturns(Expression left, Expression right)
 		{
-			// TODO: throw if target is a static class?
-			var sourceType = targetObject.Type;
-			var returnType = left.Type;
+			var v = new ReplaceMockObjectWithParameter();
+			var rewrittenLeft = v.Visit(left);
 
-			var returnsMethod = typeof(IReturns<,>)
-				.MakeGenericType(sourceType, returnType)
-				.GetMethod("Returns", new[] { returnType });
+			return Expression.Call(
+				Mocks.SetupReturnsMethod,
+				// mock:
+				Expression.Call(
+					Mock.GetMethod.MakeGenericMethod(v.MockObject.Type),
+					v.MockObject),
+				// expression:
+				Expression.Lambda(
+					rewrittenLeft,
+					v.MockObjectParameter),
+				// value:
+				Expression.Convert(right, typeof(object)));  // explicit boxing operation required for value types
+		}
 
-			if (right is ConstantExpression constExpr && constExpr.Value == null)
+		/// <summary>
+		///   Locates the root mock object in a setup expression (which is usually, but not always, a <see cref="ParameterExpression"/>),
+		///   stores a reference to it, and finally replaces it with a new <see cref="ParameterExpression"/>.
+		/// </summary>
+		private sealed class ReplaceMockObjectWithParameter : ExpressionVisitor
+		{
+			private Expression mockObject;
+			private ParameterExpression mockObjectParameter;
+
+			public Expression MockObject => this.mockObject;
+
+			public ParameterExpression MockObjectParameter => this.mockObjectParameter;
+
+			protected override Expression VisitMember(MemberExpression node)
 			{
-				right = Expression.Constant(null, left.Type);
+				if (node.Expression is ParameterExpression pe && pe.Type.IsDefined(typeof(CompilerGeneratedAttribute)))
+				{
+					// In LINQ query expressions with more than one `from` clause such as:
+					//
+					//   from a in Mocks.Of<A>()
+					//   from b in Mocks.Of<B>()
+					//   where ...
+					//
+					// The `.Where()` operator will have a parameter `p` that is neither of type `A` nor `B`,
+					// but of a compiler-generated anonymous type (essentially that of `new { a, b }`).
+					//
+					// In such cases, the mock object is not referenced by `p` itself, but rather by any
+					// member of `p`, that is, `p.a` or `p.b`:
+					mockObject = node;
+					mockObjectParameter = Expression.Parameter(node.Type, pe.Name);
+					return mockObjectParameter;
+				}
+				else
+				{
+					return base.VisitMember(node);
+				}
 			}
 
-			return Expression.NotEqual(
-				Expression.Call(VisitFluent(left), returnsMethod, right),
-				Expression.Constant(null));
+			protected override Expression VisitParameter(ParameterExpression node)
+			{
+				// Regular case: The parameter `p` directly references the mock object:
+				mockObject = node;
+				mockObjectParameter = Expression.Parameter(node.Type, node.Name);
+				return mockObjectParameter;
+			}
+
+			protected override Expression VisitUnary(UnaryExpression node)
+			{
+				// An expression may contain nested expressions, such as:
+				//
+				//     m => m.GetObjectById(It.IsAny<int>(id => id > 0))
+				//          ^                                   ^^
+				//   We're only interested            ...but not in this one!
+				//   in this parameter...
+				//
+				// Therefore, for the nested (quoted) expression, we short-circuit:
+				return node.NodeType == ExpressionType.Quote ? node : base.VisitUnary(node);
+			}
 		}
 
 		private static Expression VisitFluent(Expression expression)
