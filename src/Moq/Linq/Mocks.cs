@@ -167,5 +167,16 @@ namespace Moq
 
 			return true;
 		}
+
+		internal static readonly MethodInfo SetupReturnsMethod =
+			typeof(Mocks).GetMethod(nameof(SetupReturns), BindingFlags.NonPublic | BindingFlags.Static);
+
+		internal static bool SetupReturns(Mock mock, LambdaExpression expression, object value)
+		{
+			var setup = Mock.Setup(mock, expression, condition: null);
+			setup.SetEagerReturnsResponse(value);
+
+			return true;
+		}
 	}
 }

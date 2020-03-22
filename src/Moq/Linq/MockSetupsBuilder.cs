@@ -154,41 +154,23 @@ namespace Moq.Linq
 		private static Expression ConvertToSetup(InvocationExpression invocation, Expression right)
 		{
 			// transforms a delegate invocation expression such as `f(...) == x` (where `invocation` := `f(...)` and `right` := `x`)
-			// to `Mock.Get(f).Setup(f' => f'(...)).Returns(x) != null` (which in turn will get incorporated into a query
+			// to `Mocks.SetupReturns(Mock.Get(f), f' => f'(...), (object)x)` (which in turn will get incorporated into a query
 			// `CreateMocks().First(f => ...)`.
 
-			var delegateParameter = invocation.Expression;
+			var delegateParameter = (ParameterExpression)invocation.Expression;
 
-			var mockGetMethod =
-				typeof(Mock)
-				.GetMethod("Get", BindingFlags.Public | BindingFlags.Static)
-				.MakeGenericMethod(delegateParameter.Type);
-
-			var mockGetCall = Expression.Call(mockGetMethod, delegateParameter);
-
-			var setupMethod =
-				typeof(Mock<>)
-				.MakeGenericType(delegateParameter.Type)
-				.GetMethods("Setup")
-				.Single(m => m.IsGenericMethod)
-				.MakeGenericMethod(right.Type);
-
-			var setupCall = Expression.Call(
-				mockGetCall,
-				setupMethod,
-				Expression.Lambda(invocation, invocation.Expression as ParameterExpression));
-
-			var returnsMethod =
-				typeof(IReturns<,>)
-				.MakeGenericType(delegateParameter.Type, right.Type)
-				.GetMethod("Returns", new[] { right.Type });
-
-			var returnsCall = Expression.Call(
-				setupCall,
-				returnsMethod,
-				right);
-
-			return Expression.NotEqual(returnsCall, Expression.Constant(null));
+			return Expression.Call(
+				Mocks.SetupReturnsMethod,
+				// mock:
+				Expression.Call(
+					Mock.GetMethod.MakeGenericMethod(delegateParameter.Type),
+					delegateParameter),
+				// expression:
+				Expression.Lambda(
+					invocation,
+					delegateParameter),
+				// value:
+				Expression.Convert(right, typeof(object)));  // explicit boxing operation required for value types
 		}
 
 		private static Expression ConvertToSetupProperty(Expression targetObject, Expression left, Expression right)
