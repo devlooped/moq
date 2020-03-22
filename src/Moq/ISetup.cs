@@ -31,6 +31,20 @@ namespace Moq
 		bool IsVerifiable { get; }
 
 		/// <summary>
+		///   Checks whether this setup is known to return a mocked object.
+		///   If so, the corresponding <see cref="Mock"/> (the so-called "inner mock") is returned via the <see langword="out"/> parameter <paramref name="innerMock"/> instance.
+		/// </summary>
+		/// <param name="innerMock">
+		///   If this setup is known to return a mocked object,
+		///   this <see langword="out"/> parameter will be set to the corresponding <see cref="Mock"/> instance.
+		/// </param>
+		/// <returns>
+		///   <see langword="true"/> if this setup is known to return a mocked object;
+		///   otherwise, <see langword="false"/>.
+		/// </returns>
+		bool ReturnsInnerMock(out Mock innerMock);
+
+		/// <summary>
 		///   Verifies this setup.
 		///   That is, checks whether it has been matched by at least one invocation on the mock.
 		///   <para>

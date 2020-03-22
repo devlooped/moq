@@ -67,16 +67,16 @@ namespace Moq
 			return this.expectation.IsMatch(invocation) && (this.Condition == null || this.Condition.IsTrue);
 		}
 
-		public bool ReturnsInnerMock(out Mock mock)
+		public bool ReturnsInnerMock(out Mock innerMock)
 		{
 			if (this.TryGetReturnValue(out var returnValue) && Unwrap.ResultIfCompletedTask(returnValue) is IMocked mocked)
 			{
-				mock = mocked.Mock;
+				innerMock = mocked.Mock;
 				return true;
 			}
 			else
 			{
-				mock = null;
+				innerMock = null;
 				return false;
 			}
 		}

@@ -227,6 +227,47 @@ namespace Moq.Tests
 			mock.VerifyNoOtherCalls();
 		}
 
+		[Fact]
+		public void Can_retrieve_inner_mocks_manually_set_up_via_Returns()
+		{
+			Expression<Func<IX, IX>> outerMockSetupExpression = m => m.GetX(1);
+			Expression<Func<IX, string>> innerMockSetupExpression = m => m.S;
+
+			var innerMock = new Mock<IX>();
+			innerMock.Setup(innerMockSetupExpression);
+
+			var outerMock = new Mock<IX>();
+			outerMock.Setup(outerMockSetupExpression).Returns(innerMock.Object);
+
+			var outerMockSetup = outerMock.Setups.Single();
+			Assert.Equal(outerMockSetupExpression, outerMockSetup.Expression, ExpressionComparer.Default);
+			Assert.True(outerMockSetup.ReturnsInnerMock(out var reportedInnerMock));
+			Assert.Same(innerMock, reportedInnerMock);
+
+			var innerMockSetup = innerMock.Setups.Single();
+			Assert.Equal(innerMockSetupExpression, innerMockSetup.Expression, ExpressionComparer.Default);
+			Assert.False(innerMockSetup.ReturnsInnerMock(out _));
+		}
+
+		[Fact]
+		public void Can_retrieve_inner_mocks_set_up_via_multidot_setup_expression()
+		{
+			Expression<Func<IX, string>> originalSetupExpression = m => m.GetX(1).S;
+			Expression<Func<IX, IX>> outerMockSetupExpression = m => m.GetX(1);
+			Expression<Func<IX, string>> innerMockSetupExpression = m => m.S;
+
+			var outerMock = new Mock<IX>();
+			outerMock.Setup(originalSetupExpression);
+
+			var outerMockSetup = outerMock.Setups.Single();
+			Assert.Equal(outerMockSetupExpression, outerMockSetup.Expression, ExpressionComparer.Default);
+			Assert.True(outerMockSetup.ReturnsInnerMock(out var innerMock));
+
+			var innerMockSetup = innerMock.Setups.Single();
+			Assert.Equal(innerMockSetupExpression, innerMockSetup.Expression, ExpressionComparer.Default);
+			Assert.False(innerMockSetup.ReturnsInnerMock(out _));
+		}
+
 		public interface IX
 		{
 			IX GetX(int arg);
