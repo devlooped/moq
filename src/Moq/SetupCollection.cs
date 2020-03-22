@@ -2,12 +2,13 @@
 // All rights reserved. Licensed under the BSD 3-Clause License; see License.txt.
 
 using System;
+using System.Collections;
 using System.Collections.Generic;
 using System.Linq;
 
 namespace Moq
 {
-	internal sealed class SetupCollection
+	internal sealed class SetupCollection : ISetupList
 	{
 		private List<Setup> setups;
 		private uint overridden;  // bit mask for the first 32 setups flagging those known to be overridden
@@ -166,5 +167,12 @@ namespace Moq
 
 			return matchingSetups.ToArray();
 		}
+
+		public IEnumerator<ISetup> GetEnumerator()
+		{
+			return this.ToArrayLive(_ => true).Cast<ISetup>().GetEnumerator();
+		}
+
+		IEnumerator IEnumerable.GetEnumerator() => this.GetEnumerator();
 	}
 }

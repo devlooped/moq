@@ -38,7 +38,7 @@ namespace Moq
 		{
 			if (this.ReturnsInnerMock(out var innerMock))
 			{
-				innerMock.Setups.UninvokeAll();
+				innerMock.MutableSetups.UninvokeAll();
 			}
 		}
 	}
