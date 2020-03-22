@@ -46,21 +46,21 @@ namespace Moq.Tests.Linq
 		public class GivenAField
 		{
 			[Fact]
-			public void WhenQueryingField_ThenThrowsNotSupportedException()
+			public void WhenQueryingField_ThenThrowsArgumentException()
 			{
-				Assert.Throws<NotSupportedException>(() => Mock.Of<Bar>(x => x.FieldValue == "bar"));
+				Assert.Throws<ArgumentException>(() => Mock.Of<Bar>(x => x.FieldValue == "bar"));
 			}
 
 			[Fact]
-			public void WhenQueryingOnFluent_ThenThrowsNotSupportedException()
+			public void WhenQueryingOnFluent_ThenThrowsArgumentException()
 			{
-				Assert.Throws<NotSupportedException>(() => Mock.Of<Foo>(x => x.VirtualBar.FieldValue == "bar"));
+				Assert.Throws<ArgumentException>(() => Mock.Of<Foo>(x => x.VirtualBar.FieldValue == "bar"));
 			}
 
 			[Fact]
-			public void WhenIntermediateFluentReadonly_ThenThrowsNotSupportedException()
+			public void WhenIntermediateFluentReadonly_ThenThrowsArgumentException()
 			{
-				Assert.Throws<NotSupportedException>(() => Mock.Of<Foo>(x => x.Bar.VirtualValue == "bar"));
+				Assert.Throws<ArgumentException>(() => Mock.Of<Foo>(x => x.Bar.VirtualValue == "bar"));
 			}
 
 			public class Bar

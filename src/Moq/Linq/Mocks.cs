@@ -132,12 +132,8 @@ namespace Moq
 		/// Extension method used to support Linq-like setup properties that are not virtual but do have 
 		/// a getter and a setter, thereby allowing the use of Linq to Mocks to quickly initialize DTOs too :)
 		/// </summary>
-		internal static bool SetProperty<T, TResult>(Mock<T> target, Expression<Func<T, TResult>> propertyReference, TResult value)
-			where T : class
+		private static bool SetProperty(Mock target, PropertyInfo property, object value)
 		{
-			var memberExpr = (MemberExpression)propertyReference.Body;
-			var member = (PropertyInfo)memberExpr.Member;
-
 			// For strict mocks, we haven't called `SetupAllProperties` on the mock being set up.
 			// Therefore, whenever a property is being initialized, we quickly need to enable auto-stubbing.
 			//
@@ -153,7 +149,7 @@ namespace Moq
 			}
 			try
 			{
-				member.SetValue(target.Object, value, null);
+				property.SetValue(target.Object, value, null);
 			}
 			finally
 			{
@@ -161,6 +157,49 @@ namespace Moq
 				{
 					target.AutoSetupPropertiesDefaultValueProvider = null;
 				}
+			}
+
+			return true;
+		}
+
+		internal static readonly MethodInfo SetupReturnsMethod =
+			typeof(Mocks).GetMethod(nameof(SetupReturns), BindingFlags.NonPublic | BindingFlags.Static);
+
+		internal static bool SetupReturns(Mock mock, LambdaExpression expression, object value)
+		{
+			PropertyInfo propertyToSet = null;
+
+			if (expression.Body is MemberExpression me
+				&& me.Member is PropertyInfo pi
+				&& !(pi.CanRead(out var getter) && getter.CanOverride() && ProxyFactory.Instance.IsMethodVisible(getter, out _))
+				&& pi.CanWrite(out _))
+			{
+				// LINQ to Mocks allows setting non-interceptable properties, which is handy e.g. when initializing DTOs.
+				// Generally, we prefer having a setup for a property's return value, but if that isn't possible (e.g.
+				// with a non-virtual or sealed property), we will have to fall back to simply setting that property
+				// through reflection.
+				//
+				// The above condition detects exactly those cases.
+				propertyToSet = pi;
+
+				// The property access (which is one that cannot be setup) must be subtracted from the setup expression:
+				expression = Expression.Lambda(me.Expression, expression.Parameters);
+				if (!expression.CanSplit())
+				{
+					Mocks.SetProperty(mock, propertyToSet, value);
+					return true;
+				}
+			}
+
+			var setup = Mock.Setup(mock, expression, condition: null);
+
+			if (propertyToSet == null)
+			{
+				setup.SetEagerReturnsResponse(value);
+			}
+			else
+			{
+				Mocks.SetProperty(setup.Mock, propertyToSet, value);
 			}
 
 			return true;

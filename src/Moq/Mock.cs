@@ -804,20 +804,15 @@ namespace Moq
 				expression = Expression.Lambda(Expression.Call(mock, method, arguments), mock);
 			}
 
-			this.AddInnerMockSetup(invocation.Method, arguments, expression, returnValue);
-		}
-
-		internal void AddInnerMockSetup(MethodInfo method, IReadOnlyList<Expression> arguments, LambdaExpression expression, object returnValue)
-		{
 			if (expression.IsProperty())
 			{
 				var property = expression.ToPropertyInfo();
 				Guard.CanRead(property);
 
-				Debug.Assert(property.CanRead(out var getter) && method == getter);
+				Debug.Assert(property.CanRead(out var getter) && invocation.Method == getter);
 			}
 
-			this.Setups.Add(new InnerMockSetup(new InvocationShape(expression, method, arguments, exactGenericTypeArguments: true), returnValue));
+			this.Setups.Add(new InnerMockSetup(new InvocationShape(expression, invocation.Method, arguments, exactGenericTypeArguments: true), returnValue));
 		}
 
 		#endregion

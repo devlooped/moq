@@ -79,6 +79,47 @@ namespace Moq
 		}
 
 		/// <summary>
+		///   Checks whether the given expression <paramref name="e"/> can be split by <see cref="Split"/>.
+		/// </summary>
+		public static bool CanSplit(this Expression e)
+		{
+			switch (e.NodeType)
+			{
+				case ExpressionType.Assign:
+				case ExpressionType.AddAssign:
+				case ExpressionType.SubtractAssign:
+				{
+					var assignmentExpression = (BinaryExpression)e;
+					return CanSplit(assignmentExpression.Left);
+				}
+
+				case ExpressionType.Call:
+				case ExpressionType.Index:
+				{
+					return true;
+				}
+
+				case ExpressionType.Invoke:
+				{
+					var invocationExpression = (InvocationExpression)e;
+					return typeof(Delegate).IsAssignableFrom(invocationExpression.Expression.Type);
+				}
+
+				case ExpressionType.MemberAccess:
+				{
+					var memberAccessExpression = (MemberExpression)e;
+					return memberAccessExpression.Member is PropertyInfo;
+				}
+
+				case ExpressionType.Parameter:
+				default:
+				{
+					return false;
+				}
+			}
+		}
+
+		/// <summary>
 		///   Splits an expression such as `<c>m => m.A.B(x).C[y] = z</c>` into a chain of parts
 		///   that can be set up one at a time:
 		///   <list>
@@ -119,44 +160,6 @@ namespace Moq
 						CultureInfo.CurrentCulture,
 						Resources.UnsupportedExpression,
 						remainder.ToStringFixed()));
-			}
-
-			bool CanSplit(Expression e)
-			{
-				switch (e.NodeType)
-				{
-					case ExpressionType.Assign:
-					case ExpressionType.AddAssign:
-					case ExpressionType.SubtractAssign:
-					{
-						var assignmentExpression = (BinaryExpression)e;
-						return CanSplit(assignmentExpression.Left);
-					}
-
-					case ExpressionType.Call:
-					case ExpressionType.Index:
-					{
-						return true;
-					}
-
-					case ExpressionType.Invoke:
-					{
-						var invocationExpression = (InvocationExpression)e;
-						return typeof(Delegate).IsAssignableFrom(invocationExpression.Expression.Type);
-					}
-
-					case ExpressionType.MemberAccess:
-					{
-						var memberAccessExpression = (MemberExpression)e;
-						return memberAccessExpression.Member is PropertyInfo;
-					}
-
-					case ExpressionType.Parameter:
-					default:
-					{
-						return false;
-					}
-				}
 			}
 
 			void Split(Expression e, out Expression r /* remainder */, out InvocationShape p /* part */)
