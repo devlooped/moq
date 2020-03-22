@@ -128,12 +128,14 @@ namespace Moq
 			while (true);
 		}
 
+		internal static readonly MethodInfo SetPropertyMethod =
+			typeof(Mocks).GetMethod(nameof(SetProperty), BindingFlags.NonPublic | BindingFlags.Static);
+
 		/// <summary>
 		/// Extension method used to support Linq-like setup properties that are not virtual but do have 
 		/// a getter and a setter, thereby allowing the use of Linq to Mocks to quickly initialize DTOs too :)
 		/// </summary>
-		internal static bool SetProperty<T, TResult>(Mock<T> target, Expression<Func<T, TResult>> propertyReference, TResult value)
-			where T : class
+		internal static bool SetProperty(Mock target, LambdaExpression propertyReference, object value)
 		{
 			var memberExpr = (MemberExpression)propertyReference.Body;
 			var member = (PropertyInfo)memberExpr.Member;

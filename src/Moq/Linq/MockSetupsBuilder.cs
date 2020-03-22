@@ -200,7 +200,7 @@ namespace Moq.Linq
 
 			// where foo.Name == "bar"
 			// becomes:	
-			// where Mock.Get(foo).SetupProperty(mock => mock.Name, "bar") != null
+			// where Mocks.SetProperty(Mock.Get(foo), mock => mock.Name, (object)"bar")
 
 			// if the property is readonly, we can only do a Setup(...) which is the same as a method setup.
 			if (!propertyInfo.CanWrite(out var setter) || setter.IsPrivate)
@@ -223,13 +223,11 @@ namespace Moq.Linq
 			//
 			// This method also enables the use of this querying capability against plain DTO even
 			// if their properties are not virtual.
-			var setPropertyMethod = typeof(Mocks)
-				.GetMethod("SetProperty", BindingFlags.Static | BindingFlags.NonPublic)
-				.MakeGenericMethod(mockExpression.Type.GetGenericArguments().First(), propertyInfo.PropertyType);
-
-			return Expression.Equal(
-				Expression.Call(setPropertyMethod, mockExpression, propertyCall.Arguments.First(), right),
-				Expression.Constant(true));
+			return Expression.Call(
+				Mocks.SetPropertyMethod,
+				mockExpression,
+				propertyCall.Arguments.First(),
+				Expression.Convert(right, typeof(object)));  // explicit boxing operation required for value types
 		}
 
 		private static Expression ConvertToSetup(Expression targetObject, Expression left, Expression right)
