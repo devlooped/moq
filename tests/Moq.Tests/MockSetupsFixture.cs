@@ -268,6 +268,58 @@ namespace Moq.Tests
 			Assert.False(innerMockSetup.ReturnsInnerMock(out _));
 		}
 
+		[Fact]
+		public void IsPartOfCompositeSetup_returns_false_for_single_dot_setup()
+		{
+			var mock = new Mock<IX>();
+			mock.Setup(m => m.S);
+
+			var setup = mock.Setups.First();
+			Assert.False(setup.IsPartOfCompositeSetup(out _));
+		}
+
+		[Fact]
+		public void IsPartOfCompositeSetup_returns_true_for_multi_dot_setup_created_by_Setup()
+		{
+			var mock = new Mock<IX>();
+			mock.Setup(m => m.GetX(It.IsAny<int>()).S);
+
+			var setup = mock.Setups.First();
+			Assert.True(setup.IsPartOfCompositeSetup(out _));
+		}
+
+		[Fact]
+		public void IsPartOfCompositeSetup_returns_true_for_multi_dot_setup_created_by_Mock_Of()
+		{
+			var mockObject = Mock.Of<IX>(m => m.GetX(It.IsAny<int>()).S == "something");
+			var mock = Mock.Get(mockObject);
+
+			var setup = mock.Setups.First();
+			Assert.True(setup.IsPartOfCompositeSetup(out _));
+		}
+
+		[Fact]
+		public void Can_discover_composite_setup_parts()
+		{
+			Expression<Func<IX, string>> originalSetupExpression = m => m.GetX(1).S;
+			Expression<Func<IX, IX>> mockSetupExpression = m => m.GetX(1);
+			Expression<Func<IX, string>> innerMockSetupExpression = m => m.S;
+
+			var mock = new Mock<IX>();
+			mock.Setup(originalSetupExpression);
+
+			var setup = mock.Setups.Single();
+
+			Assert.True(setup.IsPartOfCompositeSetup(out var originalSetup));
+			Assert.Equal(mockSetupExpression, originalSetup.Parts[0].Expression, ExpressionComparer.Default);
+			Assert.Equal(innerMockSetupExpression, originalSetup.Parts[1].Expression, ExpressionComparer.Default);
+
+			Assert.True(setup.ReturnsInnerMock(out var innerMock));
+			var innerMockSetup = innerMock.Setups.Single();
+			Assert.Same(setup, originalSetup.Parts[0]);
+			Assert.Same(innerMockSetup, originalSetup.Parts[1]);
+		}
+
 		public interface IX
 		{
 			IX GetX(int arg);

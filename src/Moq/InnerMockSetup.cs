@@ -7,14 +7,15 @@ namespace Moq
 	{
 		private readonly object returnValue;
 
-		public InnerMockSetup(Mock mock, InvocationShape expectation, object returnValue)
-			: base(mock, expectation)
+		public InnerMockSetup(Mock mock, InvocationShape expectation, object returnValue, ICompositeSetup originalSetup)
+			: base(mock, expectation, originalSetup)
 		{
 			this.returnValue = returnValue;
 		}
 
 		public override void Execute(Invocation invocation)
 		{
+			this.IsMatched = true;
 			invocation.Return(this.returnValue);
 		}
 

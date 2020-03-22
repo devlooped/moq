@@ -12,14 +12,16 @@ namespace Moq
 	internal abstract class Setup : ISetup
 	{
 		private readonly InvocationShape expectation;
+		private readonly ICompositeSetup originalSetup;
 		private readonly Mock mock;
 		private Flags flags;
 
-		protected Setup(Mock mock, InvocationShape expectation)
+		protected Setup(Mock mock, InvocationShape expectation, ICompositeSetup originalSetup)
 		{
 			Debug.Assert(expectation != null);
 			Debug.Assert(mock != null);
 
+			this.originalSetup = originalSetup;
 			this.expectation = expectation;
 			this.mock = mock;
 		}
@@ -33,6 +35,12 @@ namespace Moq
 		public bool IsConditional => this.Condition != null;
 
 		public bool IsDisabled => (this.flags & Flags.Disabled) != 0;
+
+		public bool IsMatched
+		{
+			get => (this.flags & Flags.Matched) != 0;
+			set => this.flags = value ? this.flags | Flags.Matched : this.flags & ~Flags.Matched;
+		}
 
 		public bool IsVerifiable => (this.flags & Flags.Verifiable) != 0;
 
@@ -50,6 +58,11 @@ namespace Moq
 		public Mock GetInnerMock()
 		{
 			return this.ReturnsInnerMock(out var innerMock) ? innerMock : throw new InvalidOperationException();
+		}
+
+		public bool IsPartOfCompositeSetup(out ICompositeSetup originalSetup)
+		{
+			return (originalSetup = this.originalSetup) != null;
 		}
 
 		/// <summary>
@@ -152,7 +165,8 @@ namespace Moq
 		private enum Flags : byte
 		{
 			Disabled = 1,
-			Verifiable = 2,
+			Matched = 2,
+			Verifiable = 4,
 		}
 	}
 }

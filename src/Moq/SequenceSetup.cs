@@ -14,10 +14,9 @@ namespace Moq
 	{
 		// contains the responses set up with the `CallBase`, `Pass`, `Returns`, and `Throws` verbs
 		private ConcurrentQueue<Response> responses;
-		private bool invoked;
 
-		public SequenceSetup(Mock mock, InvocationShape expectation)
-			: base(mock, expectation)
+		public SequenceSetup(Mock mock, InvocationShape expectation, ICompositeSetup originalSetup)
+			: base(mock, expectation, originalSetup)
 		{
 			this.responses = new ConcurrentQueue<Response>();
 		}
@@ -49,7 +48,7 @@ namespace Moq
 
 		public override void Execute(Invocation invocation)
 		{
-			this.invoked = true;
+			this.IsMatched = true;
 
 			if (this.responses.TryDequeue(out var response))
 			{
@@ -95,12 +94,12 @@ namespace Moq
 
 		public override MockException TryVerifyAll()
 		{
-			return this.invoked ? null : MockException.UnmatchedSetup(this);
+			return this.IsMatched ? null : MockException.UnmatchedSetup(this);
 		}
 
 		public override void Uninvoke()
 		{
-			this.invoked = false;
+			this.IsMatched = false;
 		}
 
 		private readonly struct Response

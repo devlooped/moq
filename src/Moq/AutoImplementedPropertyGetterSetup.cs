@@ -17,13 +17,14 @@ namespace Moq
 		private Func<object> getter;
 
 		public AutoImplementedPropertyGetterSetup(Mock mock, LambdaExpression originalExpression, MethodInfo method, Func<object> getter)
-			: base(mock, new InvocationShape(originalExpression, method, noArguments))
+			: base(mock, new InvocationShape(originalExpression, method, noArguments), originalSetup: null)
 		{
 			this.getter = getter;
 		}
 
 		public override void Execute(Invocation invocation)
 		{
+			this.IsMatched = true;
 			invocation.Return(this.getter.Invoke());
 		}
 

@@ -27,8 +27,8 @@ namespace Moq
 
 		private string declarationSite;
 
-		public MethodCall(Mock mock, Condition condition, InvocationShape expectation)
-			: base(mock, expectation)
+		public MethodCall(Mock mock, Condition condition, InvocationShape expectation, ICompositeSetup originalSetup)
+			: base(mock, expectation, originalSetup)
 		{
 			this.condition = condition;
 			this.flags = expectation.Method.ReturnType != typeof(void) ? Flags.MethodIsNonVoid : 0;
@@ -85,7 +85,7 @@ namespace Moq
 
 		public override void Execute(Invocation invocation)
 		{
-			this.flags |= Flags.Invoked;
+			this.IsMatched = true;
 
 			this.limitInvocationCountResponse?.RespondTo(invocation);
 
@@ -327,12 +327,12 @@ namespace Moq
 
 		public override MockException TryVerifyAll()
 		{
-			return (this.flags & Flags.Invoked) == 0 ? MockException.UnmatchedSetup(this) : null;
+			return this.IsMatched ? null : MockException.UnmatchedSetup(this);
 		}
 
 		public override void Uninvoke()
 		{
-			this.flags &= ~Flags.Invoked;
+			this.IsMatched = false;
 			this.limitInvocationCountResponse?.Reset();
 		}
 
@@ -370,8 +370,7 @@ namespace Moq
 		private enum Flags : byte
 		{
 			CallBase = 1,
-			Invoked = 2,
-			MethodIsNonVoid = 4,
+			MethodIsNonVoid = 2,
 		}
 
 		private sealed class LimitInvocationCountResponse

@@ -16,13 +16,14 @@ namespace Moq
 		private Action<object> setter;
 
 		public AutoImplementedPropertySetterSetup(Mock mock, LambdaExpression originalExpression, MethodInfo method, Action<object> setter)
-			: base(mock, new InvocationShape(originalExpression, method, new Expression[] { It.IsAny(method.GetParameterTypes().Last()) }))
+			: base(mock, new InvocationShape(originalExpression, method, new Expression[] { It.IsAny(method.GetParameterTypes().Last()) }), originalSetup: null)
 		{
 			this.setter = setter;
 		}
 
 		public override void Execute(Invocation invocation)
 		{
+			this.IsMatched = true;
 			this.setter.Invoke(invocation.Arguments[0]);
 			invocation.Return();
 		}

@@ -26,9 +26,36 @@ namespace Moq
 		bool IsDisabled { get; }
 
 		/// <summary>
+		///   Gets whether this setup was matched by at least one invocation on the mock.
+		/// </summary>
+		bool IsMatched { get; }
+
+		/// <summary>
 		///   Gets whether this setup is verifiable.
 		/// </summary>
 		bool IsVerifiable { get; }
+
+		/// <summary>
+		///   Checks whether this setup is a part of a composite setup.
+		///   If so, the composite setup of which this one is a part is returned via the <see langword="out"/> parameter <paramref name="originalSetup"/>.
+		///   <para>
+		///     (Composite setups are those with expressions where several member accesses or calls are chained together.
+		///     They are a much more accurate reflection of the original setup expressions you will find in your own code,
+		///     whereas the setups returned by <see cref="Mock.Setups"/> are more "technical" in nature:
+		///     They only reflect the part of an original setup expression that is of immediate concern to the mock.)
+		///   </para>
+		/// </summary>
+		/// <param name="originalSetup">
+		///   If this setup is part of a composite setup,
+		///   this <see langword="out"/> parameter will be set to the latter.
+		/// </param>
+		/// <returns>
+		///   <see langword="true"/> if this setup is a part of a composite setup;
+		///   otherwise, <see langword="false"/>.
+		/// </returns>
+		/// <seealso cref="ICompositeSetup"/>
+		/// <seealso cref="ReturnsInnerMock(out Mock)"/>
+		bool IsPartOfCompositeSetup(out ICompositeSetup originalSetup);
 
 		/// <summary>
 		///   Checks whether this setup is known to return a mocked object.

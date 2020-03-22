@@ -159,7 +159,7 @@ namespace Moq
 		/// <summary>
 		///   Returns the exception to be thrown when a setup has not been invoked.
 		/// </summary>
-		internal static MockException UnmatchedSetup(Setup setup)
+		internal static MockException UnmatchedSetup(ISetup setup)
 		{
 			return new MockException(
 				MockExceptionReasons.UnmatchedSetup,
