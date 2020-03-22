@@ -326,7 +326,7 @@ namespace Moq
 		{
 			var errors = new List<MockException>();
 
-			foreach (var setup in this.MutableSetups.ToArrayLive(_ => true))
+			foreach (var setup in this.MutableSetups.ToArray().Where(s => !s.IsDisabled && !s.IsConditional))
 			{
 				var error = verifySetup(setup);
 				if (error?.IsVerificationError == true)

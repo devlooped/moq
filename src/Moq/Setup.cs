@@ -12,6 +12,7 @@ namespace Moq
 	internal abstract class Setup : ISetup
 	{
 		private readonly InvocationShape expectation;
+		private Flags flags;
 
 		protected Setup(InvocationShape expectation)
 		{
@@ -26,9 +27,18 @@ namespace Moq
 
 		public LambdaExpression Expression => this.expectation.Expression;
 
+		public bool IsConditional => this.Condition != null;
+
+		public bool IsDisabled => (this.flags & Flags.Disabled) != 0;
+
 		public virtual bool IsVerifiable => false;
 
 		public MethodInfo Method => this.expectation.Method;
+
+		public void Disable()
+		{
+			this.flags |= Flags.Disabled;
+		}
 
 		public abstract void Execute(Invocation invocation);
 
@@ -112,6 +122,12 @@ namespace Moq
 
 		public virtual void Uninvoke()
 		{
+		}
+
+		[Flags]
+		private enum Flags : byte
+		{
+			Disabled = 1,
 		}
 	}
 }

@@ -11,13 +11,11 @@ namespace Moq
 	internal sealed class SetupCollection : ISetupList
 	{
 		private List<Setup> setups;
-		private uint overridden;  // bit mask for the first 32 setups flagging those known to be overridden
 		private volatile bool hasEventSetup;
 
 		public SetupCollection()
 		{
 			this.setups = new List<Setup>();
-			this.overridden = 0U;
 			this.hasEventSetup = false;
 		}
 
@@ -61,7 +59,6 @@ namespace Moq
 			lock (this.setups)
 			{
 				this.setups.RemoveAll(x => x.Method.IsPropertyAccessor());
-				this.overridden = 0U;
 			}
 		}
 
@@ -70,7 +67,6 @@ namespace Moq
 			lock (this.setups)
 			{
 				this.setups.Clear();
-				this.overridden = 0U;
 				this.hasEventSetup = false;
 			}
 		}
@@ -90,9 +86,8 @@ namespace Moq
 				// Iterating in reverse order because newer setups are more relevant than (i.e. override) older ones
 				for (int i = this.setups.Count - 1; i >= 0; --i)
 				{
-					if (i < 32 && (this.overridden & (1U << i)) != 0) continue;
-
 					var setup = this.setups[i];
+					if (setup.IsDisabled) continue;
 
 					// the following conditions are repetitive, but were written that way to avoid
 					// unnecessary expensive calls to `setup.Matches`; cheap tests are run first.
@@ -117,7 +112,7 @@ namespace Moq
 
 		public IEnumerable<Setup> GetInnerMockSetups()
 		{
-			return this.ToArrayLive(setup => setup.ReturnsInnerMock(out _));
+			return this.ToArray().Where(s => !s.IsDisabled && !s.IsConditional && s.ReturnsInnerMock(out _));
 		}
 
 		public void UninvokeAll()
@@ -131,9 +126,9 @@ namespace Moq
 			}
 		}
 
-		public Setup[] ToArrayLive(Func<Setup, bool> predicate)
+		public IReadOnlyList<Setup> ToArray()
 		{
-			var matchingSetups = new Stack<Setup>();
+			var setups = new Stack<Setup>();
 			var visitedSetups = new HashSet<InvocationShape>();
 
 			lock (this.setups)
@@ -141,36 +136,28 @@ namespace Moq
 				// Iterating in reverse order because newer setups are more relevant than (i.e. override) older ones
 				for (int i = this.setups.Count - 1; i >= 0; --i)
 				{
-					if (i < 32 && (this.overridden & (1U << i)) != 0) continue;
-
 					var setup = this.setups[i];
 
-					if (setup.Condition != null)
+					if (!setup.IsDisabled && !setup.IsConditional)
 					{
-						continue;
+						if (!visitedSetups.Add(setup.Expectation))
+						{
+							// A setup with the same expression has already been iterated over,
+							// meaning that this older setup is an overridden one.
+							setup.Disable();
+						}
 					}
 
-					if (!visitedSetups.Add(setup.Expectation))
-					{
-						// A setup with the same expression has already been iterated over,
-						// meaning that this older setup is an overridden one.
-						if (i < 32) this.overridden |= 1U << i;
-						continue;
-					}
-
-					if (predicate(setup))
-					{
-						matchingSetups.Push(setup);
-					}
+					setups.Push(setup);
 				}
 			}
 
-			return matchingSetups.ToArray();
+			return setups.ToArray();
 		}
 
 		public IEnumerator<ISetup> GetEnumerator()
 		{
-			return this.ToArrayLive(_ => true).Cast<ISetup>().GetEnumerator();
+			return this.ToArray().GetEnumerator();
 		}
 
 		IEnumerator IEnumerable.GetEnumerator() => this.GetEnumerator();

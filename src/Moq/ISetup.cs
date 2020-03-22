@@ -14,5 +14,15 @@ namespace Moq
 		///   The setup expression.
 		/// </summary>
 		LambdaExpression Expression { get; }
+
+		/// <summary>
+		///   Gets whether this setup is conditional.
+		/// </summary>
+		bool IsConditional { get; }
+
+		/// <summary>
+		///   Gets whether this setup is disabled.
+		/// </summary>
+		bool IsDisabled { get; }
 	}
 }

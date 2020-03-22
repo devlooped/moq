@@ -111,6 +111,45 @@ namespace Moq.Tests
 			Assert.Equal(setupExpression2, setups[1].Expression, ExpressionComparer.Default);
 		}
 
+		[Fact]
+		public void Can_detect_non_conditional_setups()
+		{
+			var mock = new Mock<IX>();
+			mock.Setup(m => m.S);
+
+			Assert.False(mock.Setups.First().IsConditional);
+		}
+
+		[Fact]
+		public void Can_detect_conditional_setups()
+		{
+			var mock = new Mock<IX>();
+			mock.When(() => true).Setup(m => m.S);
+
+			Assert.True(mock.Setups.First().IsConditional);
+		}
+
+		[Fact]
+		public void Can_detect_overridden_setups()
+		{
+			Expression<Func<IX, IX>> setupExpression = x => x.GetX(1);
+
+			var mock = new Mock<IX>();
+			mock.Setup(setupExpression);
+
+			var setupsBefore = mock.Setups.ToArray();
+			Assert.Single(setupsBefore);
+			Assert.False(setupsBefore[0].IsDisabled);
+
+			mock.Setup(setupExpression);
+
+			var setupsAfter = mock.Setups.ToArray();
+			Assert.Equal(2, setupsAfter.Length);
+			Assert.Same(setupsAfter[0], setupsBefore[0]);
+			Assert.True(setupsAfter[0].IsDisabled);
+			Assert.False(setupsAfter[1].IsDisabled);
+		}
+
 		public interface IX
 		{
 			IX GetX(int arg);
