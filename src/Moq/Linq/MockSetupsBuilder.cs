@@ -116,33 +116,10 @@ namespace Moq.Linq
 		{
 			switch (left.NodeType)
 			{
-				case ExpressionType.MemberAccess:
-					var member = (MemberExpression)left;
-					Guard.NotField(member);
-
-					return ConvertToSetupProperty(member.Expression, member, right);
-
 				case ExpressionType.Call:
-					var method = (MethodCallExpression)left;
-
-					if (!method.Method.CanOverride())
-						throw new NotSupportedException(string.Format(
-							CultureInfo.CurrentCulture,
-							Resources.LinqMethodNotVirtual,
-							method.ToStringFixed()));
-
-					return ConvertToSetupReturns(method, right);
-
 				case ExpressionType.Invoke:
-					var invocation = (InvocationExpression)left;
-					if (invocation.Expression is ParameterExpression && typeof(Delegate).IsAssignableFrom(invocation.Expression.Type))
-					{
-						return ConvertToSetupReturns(invocation, right);
-					}
-					else
-					{
-						break;
-					}
+				case ExpressionType.MemberAccess:
+					return ConvertToSetupReturns(left, right);
 
 				case ExpressionType.Convert:
 					var left1 = (UnaryExpression)left;
@@ -150,45 +127,6 @@ namespace Moq.Linq
 			}
 
 			return null;
-		}
-
-		private static Expression ConvertToSetupProperty(Expression targetObject, Expression left, Expression right)
-		{
-			// TODO: throw if target is a static class?
-			var sourceType = targetObject.Type;
-			var propertyInfo = (PropertyInfo)((MemberExpression)left).Member;
-			var propertyType = propertyInfo.PropertyType;
-
-			// where foo.Name == "bar"
-			// becomes:	
-			// where Mocks.SetProperty(Mock.Get(foo), mock => mock.Name, (object)"bar")
-
-			// if the property is readonly, we can only do a Setup(...) which is the same as a method setup.
-			if (!propertyInfo.CanWrite(out var setter) || setter.IsPrivate)
-				return ConvertToSetupReturns(left, right);
-
-			// This will get up to and including the Mock.Get(foo).Setup(mock => mock.Name) call.
-			var propertySetup = VisitFluent(left);
-			// We need to go back one level, to the target expression of the Setup call, 
-			// which would be the Mock.Get(foo), where we will actually invoke SetupProperty instead.
-			if (propertySetup.NodeType != ExpressionType.Call)
-				throw new NotSupportedException(string.Format(Resources.UnexpectedTranslationOfMemberAccess, propertySetup.ToStringFixed()));
-
-			var propertyCall = (MethodCallExpression)propertySetup;
-			var mockExpression = propertyCall.Object;
-			var propertyExpression = propertyCall.Arguments.First().StripQuotes();
-
-			// We can safely just set the value here since `SetProperty` will temporarily enable auto-stubbing
-			// if the underlying `IQueryable` provider implementation hasn't already enabled it permanently by
-			// calling `SetupAllProperties`.
-			//
-			// This method also enables the use of this querying capability against plain DTO even
-			// if their properties are not virtual.
-			return Expression.Call(
-				Mocks.SetPropertyMethod,
-				mockExpression,
-				propertyCall.Arguments.First(),
-				Expression.Convert(right, typeof(object)));  // explicit boxing operation required for value types
 		}
 
 		/// <summary>
