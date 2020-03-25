@@ -182,10 +182,41 @@ namespace Moq.Tests
 			Assert.Equal(MockExceptionReasons.MoreThanOneCall, ex.Reasons);
 		}
 
+		[Fact]
+		public void New_Mock_should_keep_record_of_invocations_caused_by_mocked_type_ctor()
+		{
+			var mock = new Mock<FlagInitiallySetToTrue>();
+			mock.Setup(m => m.Flag).Returns(false);
+			var mockObject = mock.Object;
+
+			Assert.Single(mock.Invocations);
+			Assert.False(mockObject.Flag);
+		}
+
+		[Fact]
+		public void Mock_Of_should_keep_record_of_invocations_caused_by_mocked_type_ctor()
+		{
+			var mockObject = Mock.Of<FlagInitiallySetToTrue>(m => m.Flag == false);
+			var mock = Mock.Get(mockObject);
+
+			Assert.Single(mock.Invocations);
+			Assert.False(mockObject.Flag);
+		}
+
 		public interface IX
 		{
 			IX Nested { get; }
 			void Do();
+		}
+
+		public class FlagInitiallySetToTrue
+		{
+			public FlagInitiallySetToTrue()
+			{
+				this.Flag = true;
+			}
+
+			public virtual bool Flag { get; set; }
 		}
 	}
 }
