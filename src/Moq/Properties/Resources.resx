@@ -199,9 +199,6 @@ Remember that there's no generics covariance in the CLR, so your object must be 
   <data name="TypeNotImplementInterface" xml:space="preserve">
     <value>Type {0} does not implement required interface {1}</value>
   </data>
-  <data name="TypeNotInheritFromType" xml:space="preserve">
-    <value>Type {0} does not from required type {1}</value>
-  </data>
   <data name="NoMatchingCallsAtLeast" xml:space="preserve">
     <value>Expected invocation on the mock at least {0} times, but was {2} times: </value>
   </data>

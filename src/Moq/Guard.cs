@@ -28,20 +28,30 @@ namespace Moq
 			}
 		}
 
-		public static void ImplementsTypeMatcherProtocol(Type type)
+		public static void ImplementsInterface(Type interfaceType, Type type, string paramName = null)
 		{
+			Debug.Assert(interfaceType != null);
+			Debug.Assert(interfaceType.IsInterface);
+
 			Debug.Assert(type != null);
 
-			if (typeof(ITypeMatcher).IsAssignableFrom(type) == false)
+			if (interfaceType.IsAssignableFrom(type) == false)
 			{
 				throw new ArgumentException(
 					string.Format(
 						CultureInfo.CurrentCulture,
 						Resources.TypeNotImplementInterface,
 						type.GetFormattedName(),
-						typeof(ITypeMatcher).GetFormattedName()));
+						interfaceType.GetFormattedName()),
+					paramName);
 			}
+		}
 
+		public static void ImplementsTypeMatcherProtocol(Type type)
+		{
+			Debug.Assert(type != null);
+
+			Guard.ImplementsInterface(typeof(ITypeMatcher), type);
 			Guard.CanCreateInstance(type);
 		}
 
@@ -178,27 +188,6 @@ namespace Moq
 			if (value.Length == 0)
 			{
 				throw new ArgumentException(Resources.ArgumentCannotBeEmpty, paramName);
-			}
-		}
-
-		public static void CanBeAssigned(Type typeToAssign, Type targetType, string paramName)
-		{
-			if (!targetType.IsAssignableFrom(typeToAssign))
-			{
-				if (targetType.IsInterface)
-				{
-					throw new ArgumentException(string.Format(
-						CultureInfo.CurrentCulture,
-						Resources.TypeNotImplementInterface,
-						typeToAssign,
-						targetType), paramName);
-				}
-
-				throw new ArgumentException(string.Format(
-					CultureInfo.CurrentCulture,
-					Resources.TypeNotInheritFromType,
-					typeToAssign,
-					targetType), paramName);
 			}
 		}
 

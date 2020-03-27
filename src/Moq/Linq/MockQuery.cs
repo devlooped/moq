@@ -21,9 +21,7 @@ namespace Moq.Linq
 		{
 			Debug.Assert(expression != null);
 
-			// TODO: Find out whether this can be turned into an assertion. If so,
-			// we can get rid of Guard.CanBeAssigned along with two resource strings.
-			Guard.CanBeAssigned(expression.Type, typeof(IQueryable<T>), nameof(expression));
+			Guard.ImplementsInterface(typeof(IQueryable<T>), expression.Type, nameof(expression));
 
 			this.expression = expression;
 		}

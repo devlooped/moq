@@ -563,15 +563,6 @@ namespace Moq.Properties {
         }
         
         /// <summary>
-        ///   Looks up a localized string similar to Type {0} does not from required type {1}.
-        /// </summary>
-        internal static string TypeNotInheritFromType {
-            get {
-                return ResourceManager.GetString("TypeNotInheritFromType", resourceCulture);
-            }
-        }
-        
-        /// <summary>
         ///   Looks up a localized string similar to Type to mock must be an interface, a delegate, or a non-sealed, non-static class..
         /// </summary>
         internal static string TypeNotMockable {
