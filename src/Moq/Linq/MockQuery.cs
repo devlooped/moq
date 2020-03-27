@@ -7,7 +7,6 @@ using System.Collections.Generic;
 using System.Diagnostics;
 using System.Linq;
 using System.Linq.Expressions;
-using System.Reflection;
 
 namespace Moq.Linq
 {
@@ -16,32 +15,17 @@ namespace Moq.Linq
 	/// </summary>
 	internal class MockQueryable<T> : IQueryable<T>, IQueryProvider
 	{
-		private MethodCallExpression underlyingCreateMocks;
+		private readonly Expression expression;
 
-		/// <summary>
-		/// The <paramref name="underlyingCreateMocks"/> is a 
-		/// static method that returns an IQueryable of Mocks of T which is used to 
-		/// apply the linq specification to.
-		/// </summary>
-		public MockQueryable(MethodCallExpression underlyingCreateMocks)
+		public MockQueryable(Expression expression)
 		{
-			Debug.Assert(underlyingCreateMocks != null);
-
-			this.Expression = Expression.Constant(this);
-			this.underlyingCreateMocks = underlyingCreateMocks;
-		}
-
-		public MockQueryable(MethodCallExpression underlyingCreateMocks, Expression expression)
-		{
-			Debug.Assert(underlyingCreateMocks != null);
 			Debug.Assert(expression != null);
 
 			// TODO: Find out whether this can be turned into an assertion. If so,
 			// we can get rid of Guard.CanBeAssigned along with two resource strings.
 			Guard.CanBeAssigned(expression.Type, typeof(IQueryable<T>), nameof(expression));
 
-			this.underlyingCreateMocks = underlyingCreateMocks;
-			this.Expression = expression;
+			this.expression = expression;
 		}
 
 		public Type ElementType
@@ -49,7 +33,7 @@ namespace Moq.Linq
 			get { return typeof(T); }
 		}
 
-		public Expression Expression { get; private set; }
+		public Expression Expression => this.expression;
 
 		public IQueryProvider Provider
 		{
@@ -63,7 +47,7 @@ namespace Moq.Linq
 
 		public IQueryable<TElement> CreateQuery<TElement>(Expression expression)
 		{
-			return new MockQueryable<TElement>(this.underlyingCreateMocks, expression);
+			return new MockQueryable<TElement>(expression);
 		}
 
 		public object Execute(Expression expression)
@@ -73,7 +57,7 @@ namespace Moq.Linq
 
 		public TResult Execute<TResult>(Expression expression)
 		{
-			var replaced = new MockSetupsBuilder(this.underlyingCreateMocks).Visit(expression);
+			var replaced = new MockSetupsBuilder().Visit(expression);
 
 			var lambda = Expression.Lambda<Func<TResult>>(replaced);
 			return lambda.CompileUsingExpressionCompiler().Invoke();

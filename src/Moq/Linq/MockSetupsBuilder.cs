@@ -18,11 +18,9 @@ namespace Moq.Linq
 		private static readonly string[] unsupportedMethods = new[] { "All", "Any", "Last", "LastOrDefault", "Single", "SingleOrDefault" };
 
 		private int stackIndex;
-		private MethodCallExpression underlyingCreateMocks;
 
-		public MockSetupsBuilder(MethodCallExpression underlyingCreateMocks)
+		public MockSetupsBuilder()
 		{
-			this.underlyingCreateMocks = underlyingCreateMocks;
 		}
 
 		protected override Expression VisitBinary(BinaryExpression node)
@@ -48,19 +46,6 @@ namespace Moq.Linq
 			}
 
 			return base.VisitBinary(node);
-		}
-
-		protected override Expression VisitConstant(ConstantExpression node)
-		{
-			if (node.Type.IsGenericType && node.Type.GetGenericTypeDefinition() == typeof(MockQueryable<>))
-			{
-				//var asQueryableMethod = createQueryableMethod.MakeGenericMethod(node.Type.GetGenericArguments()[0]);
-
-				//return Expression.Call(null, asQueryableMethod);
-				return this.underlyingCreateMocks;
-			}
-
-			return base.VisitConstant(node);
 		}
 
 		protected override Expression VisitMember(MemberExpression node)
