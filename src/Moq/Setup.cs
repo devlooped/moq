@@ -89,6 +89,20 @@ namespace Moq
 			return builder.ToString();
 		}
 
+		/// <summary>
+		///   Verifies this setup and/or those of its inner mock (if present and known).
+		/// </summary>
+		/// <param name="predicate">
+		///   Specifies which setups should be verified.
+		/// </param>
+		/// <param name="error">
+		///   If this setup and/or any of its inner mock (if present and known) failed verification,
+		///   this <see langword="out"/> parameter will receive a <see cref="MockException"/> describing the verification error(s).
+		/// </param>
+		/// <returns>
+		///   <see langword="true"/> if verification succeeded without any errors;
+		///   otherwise, <see langword="false"/>.
+		/// </returns>
 		public bool TryVerify(Func<Setup, bool> predicate, out MockException error)
 		{
 			if (predicate(this))
@@ -103,6 +117,21 @@ namespace Moq
 			return this.TryVerifyInnerMock(predicate, out error);
 		}
 
+		/// <summary>
+		///   Verifies all setups of this setup's inner mock (if present and known).
+		///   Multiple verification errors are aggregated into a single <see cref="MockException"/>.
+		/// </summary>
+		/// <param name="predicate">
+		///   Specifies which setups should be verified.
+		/// </param>
+		/// <param name="error">
+		///   If one or more setups of this setup's inner mock (if present and known) failed verification,
+		///   this <see langword="out"/> parameter will receive a <see cref="MockException"/> describing the verification error(s).
+		/// </param>
+		/// <returns>
+		///   <see langword="true"/> if verification succeeded without any errors;
+		///   otherwise, <see langword="false"/>.
+		/// </returns>
 		protected virtual bool TryVerifyInnerMock(Func<Setup, bool> predicate, out MockException error)
 		{
 			if (this.ReturnsInnerMock(out var innerMock))
@@ -118,6 +147,17 @@ namespace Moq
 			return true;
 		}
 
+		/// <summary>
+		///   Verifies only this setup, excluding those of its inner mock (if present and known).
+		/// </summary>
+		/// <param name="error">
+		///   If this setup failed verification,
+		///   this <see langword="out"/> parameter will receive a <see cref="MockException"/> describing the verification error.
+		/// </param>
+		/// <returns>
+		///   <see langword="true"/> if verification succeeded without any errors;
+		///   otherwise, <see langword="false"/>.
+		/// </returns>
 		protected virtual bool TryVerifySelf(out MockException error)
 		{
 			error = null;
