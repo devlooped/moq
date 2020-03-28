@@ -38,7 +38,7 @@ namespace Moq.Expressions.Visitors
 		protected override Expression VisitMethodCall(MethodCallExpression node)
 		{
 			var instance = node.Object != null ? this.Visit(node.Object) : null;
-			var arguments = VisitArguments(node.Arguments);
+			var arguments = this.Visit(node.Arguments);
 
 			if (node.Method.IsSpecialName)
 			{
@@ -94,29 +94,6 @@ namespace Moq.Expressions.Visitors
 
 			return instance != node.Object || arguments != node.Arguments ? Expression.Call(instance, node.Method, arguments)
 			                                                              : node;
-		}
-
-		private IReadOnlyList<Expression> VisitArguments(ReadOnlyCollection<Expression> arguments)
-		{
-			if (arguments.Count > 0)
-			{
-				var argumentCount = arguments.Count;
-				var visitedArguments = new Expression[argumentCount];
-				var changed = false;
-
-				for (int i = 0; i < argumentCount; ++i)
-				{
-					var argument = arguments[i];
-					var visitedArgument = visitedArguments[i] = this.Visit(argument);
-					changed |= visitedArgument != argument;
-				}
-
-				return changed ? (IReadOnlyList<Expression>)visitedArguments : arguments;
-			}
-			else
-			{
-				return arguments;
-			}
 		}
 	}
 }
