@@ -260,11 +260,7 @@ namespace Moq
 		/// </example>
 		public void Verify()
 		{
-			var error = this.TryVerify();
-			if (error?.IsVerificationError == true)
-			{
-				throw error;
-			}
+			this.Verify(setup => setup.IsVerifiable);
 		}
 
 		/// <summary>
@@ -289,40 +285,30 @@ namespace Moq
 		/// </example>
 		public void VerifyAll()
 		{
-			var error = this.TryVerifyAll();
+			this.Verify(setup => true);
+		}
+
+		private void Verify(Func<Setup, bool> predicate)
+		{
+			var error = this.TryVerify(predicate);
 			if (error?.IsVerificationError == true)
 			{
 				throw error;
 			}
 		}
 
-		internal MockException TryVerify()
+		internal MockException TryVerify(Func<Setup, bool> predicate)
 		{
 			foreach (Invocation invocation in this.MutableInvocations)
 			{
-				invocation.MarkAsVerifiedIfMatchedByVerifiableSetup();
+				invocation.MarkAsVerifiedIfMatchedBy(predicate);
 			}
 
-			return this.TryVerifySetups(setup => setup.TryVerify());
-		}
-
-		internal MockException TryVerifyAll()
-		{
-			foreach (Invocation invocation in this.MutableInvocations)
-			{
-				invocation.MarkAsVerifiedIfMatchedBySetup();
-			}
-
-			return this.TryVerifySetups(setup => setup.TryVerifyAll());
-		}
-
-		private MockException TryVerifySetups(Func<Setup, MockException> verifySetup)
-		{
 			var errors = new List<MockException>();
 
 			foreach (var setup in this.Setups.ToArrayLive(_ => true))
 			{
-				var error = verifySetup(setup);
+				var error = setup.TryVerify(predicate);
 				if (error?.IsVerificationError == true)
 				{
 					errors.Add(error);

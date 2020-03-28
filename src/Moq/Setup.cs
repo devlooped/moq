@@ -89,18 +89,25 @@ namespace Moq
 			return builder.ToString();
 		}
 
-		public virtual MockException TryVerify()
+		public MockException TryVerify(Func<Setup, bool> predicate)
 		{
-			return this.IsVerifiable ? this.TryVerifyAll() : null;
+			if (predicate(this))
+			{
+				var error = this.TryVerifySelf();
+				if (error?.IsVerificationError == true)
+				{
+					return error;
+				}
+			}
+
+			return this.TryVerifyInnerMock(predicate);
 		}
 
-		public abstract MockException TryVerifyAll();
-
-		public MockException TryVerifyInnerMock(Func<Mock, MockException> verify)
+		protected virtual MockException TryVerifyInnerMock(Func<Setup, bool> predicate)
 		{
 			if (this.ReturnsInnerMock(out var innerMock))
 			{
-				var error = verify(innerMock);
+				var error = innerMock.TryVerify(predicate);
 				if (error?.IsVerificationError == true)
 				{
 					return MockException.FromInnerMockOf(this, error);
@@ -109,6 +116,8 @@ namespace Moq
 
 			return null;
 		}
+
+		protected virtual MockException TryVerifySelf() => null;
 
 		public virtual void Uninvoke()
 		{

@@ -93,7 +93,7 @@ namespace Moq
 			}
 		}
 
-		public override MockException TryVerifyAll()
+		protected override MockException TryVerifySelf()
 		{
 			return this.invoked ? null : MockException.UnmatchedSetup(this);
 		}

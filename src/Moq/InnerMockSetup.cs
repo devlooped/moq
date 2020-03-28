@@ -24,16 +24,6 @@ namespace Moq
 			return true;
 		}
 
-		public override MockException TryVerify()
-		{
-			return this.TryVerifyInnerMock(innerMock => innerMock.TryVerify());
-		}
-
-		public override MockException TryVerifyAll()
-		{
-			return this.TryVerifyInnerMock(innerMock => innerMock.TryVerifyAll());
-		}
-
 		public override void Uninvoke()
 		{
 			if (this.ReturnsInnerMock(out var innerMock))

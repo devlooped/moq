@@ -26,7 +26,5 @@ namespace Moq
 			this.setter.Invoke(invocation.Arguments[0]);
 			invocation.Return();
 		}
-
-		public override MockException TryVerifyAll() => null;
 	}
 }

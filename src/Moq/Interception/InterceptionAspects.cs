@@ -104,15 +104,7 @@ namespace Moq
 			if (matchedSetup != null)
 			{
 				matchedSetup.EvaluatedSuccessfully(invocation);
-
-				if (matchedSetup.IsVerifiable)
-				{
-					invocation.MarkAsMatchedByVerifiableSetup();
-				}
-				else
-				{
-					invocation.MarkAsMatchedBySetup();
-				}
+				invocation.MarkAsMatchedBy(matchedSetup);
 
 				matchedSetup.SetOutParameters(invocation);
 
