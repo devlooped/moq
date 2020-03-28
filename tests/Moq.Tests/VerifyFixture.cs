@@ -1486,6 +1486,23 @@ namespace Moq.Tests
 				mock.Verify(m => m.InvokePopulate(ref It.Ref<ChildDto>.IsAny), Times.Never));
 		}
 
+		[Fact]
+		public void Verification_marks_invocations_of_inner_mocks_as_verified()
+		{
+			var mock = new Mock<IFoo>() { DefaultValue = DefaultValue.Mock };
+			mock.Setup(m => m.Value).Returns(1);
+			mock.Setup(m => m.Bar.Value).Returns(2);
+
+			// Invoke everything that has been set up, and verify everything:
+			_ = mock.Object.Value;
+			_ = mock.Object.Bar.Value;
+			mock.VerifyAll();
+
+			// The above call to `VerifyAll` should have marked all invocations as verified,
+			// including those on the inner `Bar` mock:
+			Mock.Get(mock.Object.Bar).VerifyNoOtherCalls();
+		}
+
 		public class Exclusion_of_unreachable_inner_mocks
 		{
 			[Fact]

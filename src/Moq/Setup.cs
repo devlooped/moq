@@ -89,25 +89,79 @@ namespace Moq
 			return builder.ToString();
 		}
 
-		public virtual MockException TryVerify()
+		/// <summary>
+		///   Verifies this setup and/or those of its inner mock (if present and known).
+		/// </summary>
+		/// <param name="predicate">
+		///   Specifies which setups should be verified.
+		/// </param>
+		/// <param name="error">
+		///   If this setup and/or any of its inner mock (if present and known) failed verification,
+		///   this <see langword="out"/> parameter will receive a <see cref="MockException"/> describing the verification error(s).
+		/// </param>
+		/// <returns>
+		///   <see langword="true"/> if verification succeeded without any errors;
+		///   otherwise, <see langword="false"/>.
+		/// </returns>
+		public bool TryVerify(Func<Setup, bool> predicate, out MockException error)
 		{
-			return this.IsVerifiable ? this.TryVerifyAll() : null;
-		}
-
-		public abstract MockException TryVerifyAll();
-
-		public MockException TryVerifyInnerMock(Func<Mock, MockException> verify)
-		{
-			if (this.ReturnsInnerMock(out var innerMock))
+			if (predicate(this))
 			{
-				var error = verify(innerMock);
-				if (error?.IsVerificationError == true)
+				if (!this.TryVerifySelf(out var e) && e.IsVerificationError)
 				{
-					return MockException.FromInnerMockOf(this, error);
+					error = e;
+					return false;
 				}
 			}
 
-			return null;
+			return this.TryVerifyInnerMock(predicate, out error);
+		}
+
+		/// <summary>
+		///   Verifies all setups of this setup's inner mock (if present and known).
+		///   Multiple verification errors are aggregated into a single <see cref="MockException"/>.
+		/// </summary>
+		/// <param name="predicate">
+		///   Specifies which setups should be verified.
+		/// </param>
+		/// <param name="error">
+		///   If one or more setups of this setup's inner mock (if present and known) failed verification,
+		///   this <see langword="out"/> parameter will receive a <see cref="MockException"/> describing the verification error(s).
+		/// </param>
+		/// <returns>
+		///   <see langword="true"/> if verification succeeded without any errors;
+		///   otherwise, <see langword="false"/>.
+		/// </returns>
+		protected virtual bool TryVerifyInnerMock(Func<Setup, bool> predicate, out MockException error)
+		{
+			if (this.ReturnsInnerMock(out var innerMock))
+			{
+				if (!innerMock.TryVerify(predicate, out var e) && e.IsVerificationError)
+				{
+					error = MockException.FromInnerMockOf(this, e);
+					return false;
+				}
+			}
+
+			error = null;
+			return true;
+		}
+
+		/// <summary>
+		///   Verifies only this setup, excluding those of its inner mock (if present and known).
+		/// </summary>
+		/// <param name="error">
+		///   If this setup failed verification,
+		///   this <see langword="out"/> parameter will receive a <see cref="MockException"/> describing the verification error.
+		/// </param>
+		/// <returns>
+		///   <see langword="true"/> if verification succeeded without any errors;
+		///   otherwise, <see langword="false"/>.
+		/// </returns>
+		protected virtual bool TryVerifySelf(out MockException error)
+		{
+			error = null;
+			return true;
 		}
 
 		public virtual void Uninvoke()
