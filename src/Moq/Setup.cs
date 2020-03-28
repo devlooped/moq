@@ -89,35 +89,40 @@ namespace Moq
 			return builder.ToString();
 		}
 
-		public MockException TryVerify(Func<Setup, bool> predicate)
+		public bool TryVerify(Func<Setup, bool> predicate, out MockException error)
 		{
 			if (predicate(this))
 			{
-				var error = this.TryVerifySelf();
-				if (error?.IsVerificationError == true)
+				if (!this.TryVerifySelf(out var e) && e.IsVerificationError)
 				{
-					return error;
+					error = e;
+					return false;
 				}
 			}
 
-			return this.TryVerifyInnerMock(predicate);
+			return this.TryVerifyInnerMock(predicate, out error);
 		}
 
-		protected virtual MockException TryVerifyInnerMock(Func<Setup, bool> predicate)
+		protected virtual bool TryVerifyInnerMock(Func<Setup, bool> predicate, out MockException error)
 		{
 			if (this.ReturnsInnerMock(out var innerMock))
 			{
-				var error = innerMock.TryVerify(predicate);
-				if (error?.IsVerificationError == true)
+				if (!innerMock.TryVerify(predicate, out var e) && e.IsVerificationError)
 				{
-					return MockException.FromInnerMockOf(this, error);
+					error = MockException.FromInnerMockOf(this, e);
+					return false;
 				}
 			}
 
-			return null;
+			error = null;
+			return true;
 		}
 
-		protected virtual MockException TryVerifySelf() => null;
+		protected virtual bool TryVerifySelf(out MockException error)
+		{
+			error = null;
+			return true;
+		}
 
 		public virtual void Uninvoke()
 		{

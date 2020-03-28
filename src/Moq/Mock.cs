@@ -290,14 +290,13 @@ namespace Moq
 
 		private void Verify(Func<Setup, bool> predicate)
 		{
-			var error = this.TryVerify(predicate);
-			if (error?.IsVerificationError == true)
+			if (!this.TryVerify(predicate, out var error) && error.IsVerificationError)
 			{
 				throw error;
 			}
 		}
 
-		internal MockException TryVerify(Func<Setup, bool> predicate)
+		internal bool TryVerify(Func<Setup, bool> predicate, out MockException error)
 		{
 			foreach (Invocation invocation in this.MutableInvocations)
 			{
@@ -308,22 +307,23 @@ namespace Moq
 
 			foreach (var setup in this.Setups.ToArrayLive(_ => true))
 			{
-				var error = setup.TryVerify(predicate);
-				if (error?.IsVerificationError == true)
+				if (!setup.TryVerify(predicate, out var e) && e.IsVerificationError)
 				{
-					errors.Add(error);
+					errors.Add(e);
 				}
 			}
 
 			if (errors.Count > 0)
 			{
-				return MockException.Combined(
+				error = MockException.Combined(
 					errors,
 					preamble: string.Format(CultureInfo.CurrentCulture, Resources.VerificationErrorsOfMock, this));
+				return false;
 			}
 			else
 			{
-				return null;
+				error = null;
+				return true;
 			}
 		}
 

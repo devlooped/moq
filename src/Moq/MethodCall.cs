@@ -331,9 +331,10 @@ namespace Moq
 			this.returnOrThrowResponse = new ThrowExceptionResponse(exception);
 		}
 
-		protected override MockException TryVerifySelf()
+		protected override bool TryVerifySelf(out MockException error)
 		{
-			return (this.flags & Flags.Invoked) != 0 ? null : MockException.UnmatchedSetup(this);
+			error = (this.flags & Flags.Invoked) != 0 ? null : MockException.UnmatchedSetup(this);
+			return error == null;
 		}
 
 		public override void Uninvoke()
