@@ -13,6 +13,8 @@ namespace Moq
 			this.returnValue = returnValue;
 		}
 
+		public override bool IsVerifiable => true;
+
 		public override void Execute(Invocation invocation)
 		{
 			invocation.Return(this.returnValue);

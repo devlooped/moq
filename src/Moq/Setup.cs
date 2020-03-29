@@ -112,9 +112,16 @@ namespace Moq
 					error = e;
 					return false;
 				}
+				else
+				{
+					return this.TryVerifyInnerMock(predicate, out error);
+				}
 			}
-
-			return this.TryVerifyInnerMock(predicate, out error);
+			else
+			{
+				error = null;
+				return true;
+			}
 		}
 
 		/// <summary>

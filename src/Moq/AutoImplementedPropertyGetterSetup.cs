@@ -22,6 +22,8 @@ namespace Moq
 			this.getter = getter;
 		}
 
+		public override bool IsVerifiable => true;
+
 		public override void Execute(Invocation invocation)
 		{
 			invocation.Return(this.getter.Invoke());

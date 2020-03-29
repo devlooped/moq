@@ -21,6 +21,8 @@ namespace Moq
 			this.setter = setter;
 		}
 
+		public override bool IsVerifiable => true;
+
 		public override void Execute(Invocation invocation)
 		{
 			this.setter.Invoke(invocation.Arguments[0]);
