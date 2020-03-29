@@ -11,5 +11,9 @@ namespace Moq
 	/// <seealso cref="Mock.Setups"/>
 	public interface ISetup
 	{
+		/// <summary>
+		///   The setup expression.
+		/// </summary>
+		LambdaExpression Expression { get; }
 	}
 }
