@@ -37,6 +37,27 @@ namespace Moq
 				}
 
 				this.setups.Add(setup);
+
+				this.MarkOverriddenSetups();
+			}
+		}
+
+		private void MarkOverriddenSetups()
+		{
+			var visitedSetups = new HashSet<InvocationShape>();
+
+			// Iterating in reverse order because newer setups are more relevant than (i.e. override) older ones
+			for (int i = this.setups.Count - 1; i >= 0; --i)
+			{
+				var setup = this.setups[i];
+				if (setup.IsOverridden || setup.IsConditional) continue;
+
+				if (!visitedSetups.Add(setup.Expectation))
+				{
+					// A setup with the same expression has already been iterated over,
+					// meaning that this older setup is an overridden one.
+					setup.MarkAsOverridden();
+				}
 			}
 		}
 
@@ -135,7 +156,6 @@ namespace Moq
 		public IReadOnlyList<Setup> ToArrayLive(Func<Setup, bool> predicate)
 		{
 			var matchingSetups = new Stack<Setup>();
-			var visitedSetups = new HashSet<InvocationShape>();
 
 			lock (this.setups)
 			{
@@ -144,14 +164,6 @@ namespace Moq
 				{
 					var setup = this.setups[i];
 					if (setup.IsOverridden || setup.IsConditional) continue;
-
-					if (!visitedSetups.Add(setup.Expectation))
-					{
-						// A setup with the same expression has already been iterated over,
-						// meaning that this older setup is an overridden one.
-						setup.MarkAsOverridden();
-						continue;
-					}
 
 					if (predicate(setup))
 					{
