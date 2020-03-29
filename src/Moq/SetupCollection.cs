@@ -11,13 +11,11 @@ namespace Moq
 	internal sealed class SetupCollection : ISetupList
 	{
 		private List<Setup> setups;
-		private uint overridden;  // bit mask for the first 32 setups flagging those known to be overridden
 		private volatile bool hasEventSetup;
 
 		public SetupCollection()
 		{
 			this.setups = new List<Setup>();
-			this.overridden = 0U;
 			this.hasEventSetup = false;
 		}
 
@@ -61,7 +59,12 @@ namespace Moq
 			lock (this.setups)
 			{
 				this.setups.RemoveAll(x => x.Method.IsPropertyAccessor());
-				this.overridden = 0U;
+
+				// NOTE: In the general case, removing a setup means that some overridden setups might no longer
+				// be shadowed, and their `IsOverridden` flag should go back from `true` to `false`.
+				//
+				// In this particular case however, we don't need to worry about this because we are categorically
+				// removing all property accessors, and they could only have overridden other property accessors.
 			}
 		}
 
@@ -70,7 +73,6 @@ namespace Moq
 			lock (this.setups)
 			{
 				this.setups.Clear();
-				this.overridden = 0U;
 				this.hasEventSetup = false;
 			}
 		}
@@ -90,9 +92,8 @@ namespace Moq
 				// Iterating in reverse order because newer setups are more relevant than (i.e. override) older ones
 				for (int i = this.setups.Count - 1; i >= 0; --i)
 				{
-					if (i < 32 && (this.overridden & (1U << i)) != 0) continue;
-
 					var setup = this.setups[i];
+					if (setup.IsOverridden) continue;
 
 					// the following conditions are repetitive, but were written that way to avoid
 					// unnecessary expensive calls to `setup.Matches`; cheap tests are run first.
@@ -141,20 +142,14 @@ namespace Moq
 				// Iterating in reverse order because newer setups are more relevant than (i.e. override) older ones
 				for (int i = this.setups.Count - 1; i >= 0; --i)
 				{
-					if (i < 32 && (this.overridden & (1U << i)) != 0) continue;
-
 					var setup = this.setups[i];
-
-					if (setup.Condition != null)
-					{
-						continue;
-					}
+					if (setup.IsOverridden || setup.IsConditional) continue;
 
 					if (!visitedSetups.Add(setup.Expectation))
 					{
 						// A setup with the same expression has already been iterated over,
 						// meaning that this older setup is an overridden one.
-						if (i < 32) this.overridden |= 1U << i;
+						setup.MarkAsOverridden();
 						continue;
 					}
 
