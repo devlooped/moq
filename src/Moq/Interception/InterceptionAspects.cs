@@ -29,7 +29,7 @@ namespace Moq
 
 		private static bool HandleEquals(Invocation invocation, Mock mock)
 		{
-			if (IsObjectMethod(invocation.Method) && !mock.Setups.Any(c => IsObjectMethod(c.Method, "Equals")))
+			if (IsObjectMethod(invocation.Method) && !mock.MutableSetups.Any(c => IsObjectMethod(c.Method, "Equals")))
 			{
 				invocation.Return(ReferenceEquals(invocation.Arguments.First(), mock.Object));
 				return true;
@@ -48,7 +48,7 @@ namespace Moq
 		private static bool HandleGetHashCode(Invocation invocation, Mock mock)
 		{
 			// Only if there is no corresponding setup for `GetHashCode()`
-			if (IsObjectMethod(invocation.Method) && !mock.Setups.Any(c => IsObjectMethod(c.Method, "GetHashCode")))
+			if (IsObjectMethod(invocation.Method) && !mock.MutableSetups.Any(c => IsObjectMethod(c.Method, "GetHashCode")))
 			{
 				invocation.Return(mock.GetHashCode());
 				return true;
@@ -62,7 +62,7 @@ namespace Moq
 		private static bool HandleToString(Invocation invocation, Mock mock)
 		{
 			// Only if there is no corresponding setup for `ToString()`
-			if (IsObjectMethod(invocation.Method) && !mock.Setups.Any(c => IsObjectMethod(c.Method, "ToString")))
+			if (IsObjectMethod(invocation.Method) && !mock.MutableSetups.Any(c => IsObjectMethod(c.Method, "ToString")))
 			{
 				invocation.Return(mock.ToString() + ".Object");
 				return true;
@@ -100,7 +100,7 @@ namespace Moq
 	{
 		public static bool Handle(Invocation invocation, Mock mock)
 		{
-			var matchedSetup = mock.Setups.FindMatchFor(invocation);
+			var matchedSetup = mock.MutableSetups.FindMatchFor(invocation);
 			if (matchedSetup != null)
 			{
 				matchedSetup.EvaluatedSuccessfully(invocation);
@@ -139,7 +139,7 @@ namespace Moq
 					var @event = implementingMethod.DeclaringType.GetEvents(bindingFlags).SingleOrDefault(e => e.GetAddMethod(true) == implementingMethod);
 					if (@event != null)
 					{
-						bool doesntHaveEventSetup = !mock.Setups.HasEventSetup;
+						bool doesntHaveEventSetup = !mock.MutableSetups.HasEventSetup;
 
 						if (mock.CallBase && !invocation.Method.IsAbstract)
 						{
@@ -167,7 +167,7 @@ namespace Moq
 					var @event = implementingMethod.DeclaringType.GetEvents(bindingFlags).SingleOrDefault(e => e.GetRemoveMethod(true) == implementingMethod);
 					if (@event != null)
 					{
-						bool doesntHaveEventSetup = !mock.Setups.HasEventSetup;
+						bool doesntHaveEventSetup = !mock.MutableSetups.HasEventSetup;
 
 						if (mock.CallBase && !invocation.Method.IsAbstract)
 						{
@@ -312,7 +312,7 @@ namespace Moq
 					{
 						propertyValue = CreateInitialPropertyValue(mock, getter);
 						getterSetup = new AutoImplementedPropertyGetterSetup(expression, getter, () => propertyValue);
-						mock.Setups.Add(getterSetup);
+						mock.MutableSetups.Add(getterSetup);
 					}
 
 					// If we wanted to optimise for speed, we'd probably be forgiven
@@ -335,7 +335,7 @@ namespace Moq
 						{
 							propertyValue = newValue;
 						});
-						mock.Setups.Add(setterSetup);
+						mock.MutableSetups.Add(setterSetup);
 					}
 				}
 

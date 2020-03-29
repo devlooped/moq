@@ -61,7 +61,7 @@ namespace Moq
 			get { return this.owner.Object as TInterface; }
 		}
 
-		internal override SetupCollection Setups => this.owner.Setups;
+		internal override SetupCollection MutableSetups => this.owner.MutableSetups;
 
 		public override Switches Switches
 		{

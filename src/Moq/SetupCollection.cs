@@ -2,22 +2,32 @@
 // All rights reserved. Licensed under the BSD 3-Clause License; see License.txt.
 
 using System;
+using System.Collections;
 using System.Collections.Generic;
 using System.Linq;
 
 namespace Moq
 {
-	internal sealed class SetupCollection
+	internal sealed class SetupCollection : ISetupList
 	{
 		private List<Setup> setups;
-		private uint overridden;  // bit mask for the first 32 setups flagging those known to be overridden
 		private volatile bool hasEventSetup;
 
 		public SetupCollection()
 		{
 			this.setups = new List<Setup>();
-			this.overridden = 0U;
 			this.hasEventSetup = false;
+		}
+
+		public int Count
+		{
+			get
+			{
+				lock (this.setups)
+				{
+					return this.setups.Count;
+				}
+			}
 		}
 
 		public bool HasEventSetup
@@ -25,6 +35,17 @@ namespace Moq
 			get
 			{
 				return this.hasEventSetup;
+			}
+		}
+
+		public ISetup this[int index]
+		{
+			get
+			{
+				lock (this.setups)
+				{
+					return this.setups[index];
+				}
 			}
 		}
 
@@ -38,6 +59,27 @@ namespace Moq
 				}
 
 				this.setups.Add(setup);
+
+				this.MarkOverriddenSetups();
+			}
+		}
+
+		private void MarkOverriddenSetups()
+		{
+			var visitedSetups = new HashSet<InvocationShape>();
+
+			// Iterating in reverse order because newer setups are more relevant than (i.e. override) older ones
+			for (int i = this.setups.Count - 1; i >= 0; --i)
+			{
+				var setup = this.setups[i];
+				if (setup.IsOverridden || setup.IsConditional) continue;
+
+				if (!visitedSetups.Add(setup.Expectation))
+				{
+					// A setup with the same expression has already been iterated over,
+					// meaning that this older setup is an overridden one.
+					setup.MarkAsOverridden();
+				}
 			}
 		}
 
@@ -60,7 +102,12 @@ namespace Moq
 			lock (this.setups)
 			{
 				this.setups.RemoveAll(x => x.Method.IsPropertyAccessor());
-				this.overridden = 0U;
+
+				// NOTE: In the general case, removing a setup means that some overridden setups might no longer
+				// be shadowed, and their `IsOverridden` flag should go back from `true` to `false`.
+				//
+				// In this particular case however, we don't need to worry about this because we are categorically
+				// removing all property accessors, and they could only have overridden other property accessors.
 			}
 		}
 
@@ -69,7 +116,6 @@ namespace Moq
 			lock (this.setups)
 			{
 				this.setups.Clear();
-				this.overridden = 0U;
 				this.hasEventSetup = false;
 			}
 		}
@@ -89,9 +135,8 @@ namespace Moq
 				// Iterating in reverse order because newer setups are more relevant than (i.e. override) older ones
 				for (int i = this.setups.Count - 1; i >= 0; --i)
 				{
-					if (i < 32 && (this.overridden & (1U << i)) != 0) continue;
-
 					var setup = this.setups[i];
+					if (setup.IsOverridden) continue;
 
 					// the following conditions are repetitive, but were written that way to avoid
 					// unnecessary expensive calls to `setup.Matches`; cheap tests are run first.
@@ -116,7 +161,7 @@ namespace Moq
 
 		public IEnumerable<Setup> GetInnerMockSetups()
 		{
-			return this.ToArrayLive(setup => setup.ReturnsInnerMock(out _));
+			return this.ToArray(setup => !setup.IsOverridden && !setup.IsConditional && setup.ReturnsInnerMock(out _));
 		}
 
 		public void UninvokeAll()
@@ -130,33 +175,24 @@ namespace Moq
 			}
 		}
 
-		public Setup[] ToArrayLive(Func<Setup, bool> predicate)
+		public IReadOnlyList<Setup> ToArray()
+		{
+			lock (this.setups)
+			{
+				return this.setups.ToArray();
+			}
+		}
+
+		public IReadOnlyList<Setup> ToArray(Func<Setup, bool> predicate)
 		{
 			var matchingSetups = new Stack<Setup>();
-			var visitedSetups = new HashSet<InvocationShape>();
 
 			lock (this.setups)
 			{
 				// Iterating in reverse order because newer setups are more relevant than (i.e. override) older ones
 				for (int i = this.setups.Count - 1; i >= 0; --i)
 				{
-					if (i < 32 && (this.overridden & (1U << i)) != 0) continue;
-
 					var setup = this.setups[i];
-
-					if (setup.Condition != null)
-					{
-						continue;
-					}
-
-					if (!visitedSetups.Add(setup.Expectation))
-					{
-						// A setup with the same expression has already been iterated over,
-						// meaning that this older setup is an overridden one.
-						if (i < 32) this.overridden |= 1U << i;
-						continue;
-					}
-
 					if (predicate(setup))
 					{
 						matchingSetups.Push(setup);
@@ -166,5 +202,16 @@ namespace Moq
 
 			return matchingSetups.ToArray();
 		}
+
+		public IEnumerator<ISetup> GetEnumerator()
+		{
+			return this.ToArray().GetEnumerator();
+			//         ^^^^^^^^^^
+			// TODO: This is somewhat inefficient. We could avoid this array allocation by converting
+			// this class to something like `InvocationCollection`, however this won't be trivial due to
+			// the presence of a removal operation in `RemoveAllPropertyAccessorSetups`.
+		}
+
+		IEnumerator IEnumerable.GetEnumerator() => this.GetEnumerator();
 	}
 }

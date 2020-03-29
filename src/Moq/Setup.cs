@@ -9,9 +9,10 @@ using System.Text;
 
 namespace Moq
 {
-	internal abstract class Setup
+	internal abstract class Setup : ISetup
 	{
 		private readonly InvocationShape expectation;
+		private Flags flags;
 
 		protected Setup(InvocationShape expectation)
 		{
@@ -22,9 +23,13 @@ namespace Moq
 
 		public virtual Condition Condition => null;
 
+		public bool IsConditional => this.Condition != null;
+
 		public InvocationShape Expectation => this.expectation;
 
 		public LambdaExpression Expression => this.expectation.Expression;
+
+		public bool IsOverridden => (this.flags & Flags.Overridden) != 0;
 
 		public virtual bool IsVerifiable => false;
 
@@ -45,6 +50,13 @@ namespace Moq
 		{
 			returnValue = default;
 			return false;
+		}
+
+		public void MarkAsOverridden()
+		{
+			Debug.Assert(!this.IsOverridden);
+
+			this.flags |= Flags.Overridden;
 		}
 
 		public bool Matches(Invocation invocation)
@@ -173,6 +185,12 @@ namespace Moq
 
 		public virtual void Uninvoke()
 		{
+		}
+
+		[Flags]
+		private enum Flags : byte
+		{
+			Overridden = 1,
 		}
 	}
 }

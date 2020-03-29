@@ -345,7 +345,7 @@ namespace Moq
 			get { return typeof(T); }
 		}
 
-		internal override SetupCollection Setups => this.setups;
+		internal override SetupCollection MutableSetups => this.setups;
 
 		internal override Type TargetType => typeof(T);
 
