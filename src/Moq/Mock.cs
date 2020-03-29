@@ -226,7 +226,13 @@ namespace Moq
 		/// </summary>
 		internal abstract DefaultValueProvider AutoSetupPropertiesDefaultValueProvider { get; set; } 
 
-		internal abstract SetupCollection Setups { get; }
+		internal abstract SetupCollection MutableSetups { get; }
+
+		/// <summary>
+		///   Gets the setups that have been configured on this mock,
+		///   in chronological order (that is, oldest setup first, most recent setup last).
+		/// </summary>
+		public ISetupList Setups => this.MutableSetups;
 
 		/// <summary>
 		/// A set of switches that influence how this mock will operate.
@@ -305,7 +311,7 @@ namespace Moq
 
 			var errors = new List<MockException>();
 
-			foreach (var setup in this.Setups.ToArrayLive(_ => true))
+			foreach (var setup in this.MutableSetups.ToArrayLive(_ => true))
 			{
 				if (!setup.TryVerify(predicate, out var e) && e.IsVerificationError)
 				{
@@ -395,7 +401,7 @@ namespace Moq
 
 			var unverifiedInvocations = mock.MutableInvocations.ToArray(invocation => !invocation.Verified);
 
-			var innerMockSetups = mock.Setups.GetInnerMockSetups();
+			var innerMockSetups = mock.MutableSetups.GetInnerMockSetups();
 
 			if (unverifiedInvocations.Any())
 			{
@@ -514,7 +520,7 @@ namespace Moq
 			return Mock.SetupRecursive(mock, expression, setupLast: (part, targetMock) =>
 			{
 				var setup = new MethodCall(targetMock, condition, expectation: part);
-				targetMock.Setups.Add(setup);
+				targetMock.MutableSetups.Add(setup);
 				return setup;
 			});
 		}
@@ -563,7 +569,7 @@ namespace Moq
 			return Mock.SetupRecursive(mock, expression, setupLast: (part, targetMock) =>
 			{
 				var setup = new SequenceSetup(expectation: part);
-				targetMock.Setups.Add(setup);
+				targetMock.MutableSetups.Add(setup);
 				return setup;
 			});
 		}
@@ -590,7 +596,7 @@ namespace Moq
 			else
 			{
 				Mock innerMock;
-				if (!(mock.Setups.GetInnerMockSetups().TryFind(part, out var setup) && setup.ReturnsInnerMock(out innerMock)))
+				if (!(mock.MutableSetups.GetInnerMockSetups().TryFind(part, out var setup) && setup.ReturnsInnerMock(out innerMock)))
 				{
 					var returnValue = mock.GetDefaultValue(method, out innerMock, useAlternateProvider: DefaultValueProvider.Mock);
 					if (innerMock == null)
@@ -602,7 +608,7 @@ namespace Moq
 								expr.ToStringFixed() + " in " + expression.ToStringFixed() + ":\n" + Resources.TypeNotMockable));
 					}
 					setup = new InnerMockSetup(expectation: part, returnValue);
-					mock.Setups.Add((Setup)setup);
+					mock.MutableSetups.Add((Setup)setup);
 				}
 				Debug.Assert(innerMock != null);
 
@@ -617,7 +623,7 @@ namespace Moq
 
 		internal static void SetupAllProperties(Mock mock, DefaultValueProvider defaultValueProvider)
 		{
-			mock.Setups.RemoveAllPropertyAccessorSetups();
+			mock.MutableSetups.RemoveAllPropertyAccessorSetups();
 			// Removing all the previous properties setups to keep the behaviour of overriding
 			// existing setups in `SetupAllProperties`.
 			
@@ -692,7 +698,7 @@ namespace Moq
 					handlers.InvokePreserveStack(arguments);
 				}
 			}
-			else if (mock.Setups.GetInnerMockSetups().TryFind(part, out var innerMockSetup) && innerMockSetup.ReturnsInnerMock(out var innerMock))
+			else if (mock.MutableSetups.GetInnerMockSetups().TryFind(part, out var innerMockSetup) && innerMockSetup.ReturnsInnerMock(out var innerMock))
 			{
 				Mock.RaiseEvent(innerMock, expression, parts, arguments);
 			}
@@ -798,7 +804,7 @@ namespace Moq
 				Debug.Assert(property.CanRead(out var getter) && invocation.Method == getter);
 			}
 
-			this.Setups.Add(new InnerMockSetup(new InvocationShape(expression, invocation.Method, arguments, exactGenericTypeArguments: true), returnValue));
+			this.MutableSetups.Add(new InnerMockSetup(new InvocationShape(expression, invocation.Method, arguments, exactGenericTypeArguments: true), returnValue));
 		}
 
 		#endregion

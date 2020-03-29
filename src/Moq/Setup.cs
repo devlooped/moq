@@ -9,7 +9,7 @@ using System.Text;
 
 namespace Moq
 {
-	internal abstract class Setup
+	internal abstract class Setup : ISetup
 	{
 		private readonly InvocationShape expectation;
 
