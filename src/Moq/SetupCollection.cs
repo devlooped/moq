@@ -19,11 +19,33 @@ namespace Moq
 			this.hasEventSetup = false;
 		}
 
+		public int Count
+		{
+			get
+			{
+				lock (this.setups)
+				{
+					return this.setups.Count;
+				}
+			}
+		}
+
 		public bool HasEventSetup
 		{
 			get
 			{
 				return this.hasEventSetup;
+			}
+		}
+
+		public ISetup this[int index]
+		{
+			get
+			{
+				lock (this.setups)
+				{
+					return this.setups[index];
+				}
 			}
 		}
 
