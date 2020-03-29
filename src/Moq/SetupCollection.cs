@@ -139,7 +139,7 @@ namespace Moq
 
 		public IEnumerable<Setup> GetInnerMockSetups()
 		{
-			return this.ToArrayLive(setup => setup.ReturnsInnerMock(out _));
+			return this.ToArray(setup => !setup.IsOverridden && !setup.IsConditional && setup.ReturnsInnerMock(out _));
 		}
 
 		public void UninvokeAll()
@@ -153,7 +153,7 @@ namespace Moq
 			}
 		}
 
-		public IReadOnlyList<Setup> ToArrayLive(Func<Setup, bool> predicate)
+		public IReadOnlyList<Setup> ToArray(Func<Setup, bool> predicate)
 		{
 			var matchingSetups = new Stack<Setup>();
 
@@ -163,8 +163,6 @@ namespace Moq
 				for (int i = this.setups.Count - 1; i >= 0; --i)
 				{
 					var setup = this.setups[i];
-					if (setup.IsOverridden || setup.IsConditional) continue;
-
 					if (predicate(setup))
 					{
 						matchingSetups.Push(setup);
@@ -177,7 +175,7 @@ namespace Moq
 
 		public IEnumerator<ISetup> GetEnumerator()
 		{
-			return this.ToArrayLive(_ => true).GetEnumerator();
+			return this.ToArray(setup => !setup.IsOverridden && !setup.IsConditional).GetEnumerator();
 		}
 
 		IEnumerator IEnumerable.GetEnumerator() => this.GetEnumerator();
