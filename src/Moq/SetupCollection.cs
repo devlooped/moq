@@ -153,6 +153,14 @@ namespace Moq
 			}
 		}
 
+		public IReadOnlyList<Setup> ToArray()
+		{
+			lock (this.setups)
+			{
+				return this.setups.ToArray();
+			}
+		}
+
 		public IReadOnlyList<Setup> ToArray(Func<Setup, bool> predicate)
 		{
 			var matchingSetups = new Stack<Setup>();
@@ -175,7 +183,11 @@ namespace Moq
 
 		public IEnumerator<ISetup> GetEnumerator()
 		{
-			return this.ToArray(setup => !setup.IsOverridden && !setup.IsConditional).GetEnumerator();
+			return this.ToArray().GetEnumerator();
+			//         ^^^^^^^^^^
+			// TODO: This is somewhat inefficient. We could avoid this array allocation by converting
+			// this class to something like `InvocationCollection`, however this won't be trivial due to
+			// the presence of a removal operation in `RemoveAllPropertyAccessorSetups`.
 		}
 
 		IEnumerator IEnumerable.GetEnumerator() => this.GetEnumerator();

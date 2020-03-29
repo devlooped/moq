@@ -2,6 +2,7 @@
 // All rights reserved. Licensed under the BSD 3-Clause License; see License.txt.
 
 using System;
+using System.Linq;
 using System.Linq.Expressions;
 
 using Xunit;
@@ -61,22 +62,26 @@ namespace Moq.Tests
 		}
 
 		[Fact]
-		public void Setups_does_not_report_conditional_setups()
+		public void Setups_includes_conditional_setups()
 		{
 			var mock = new Mock<object>();
 			mock.When(() => true).Setup(m => m.ToString());
-			Assert.Empty(mock.Setups);
+
+			var setup = Assert.Single(mock.Setups);
+			Assert.True(setup.IsConditional);
 		}
 
 		[Fact]
-		public void Setups_does_not_report_overridden_setups()
+		public void Setups_includes_overridden_setups()
 		{
 			var mock = new Mock<object>();
 			mock.Setup(m => m.ToString());
-			var setupBeforeOverride = Assert.Single(mock.Setups);
 			mock.Setup(m => m.ToString());
-			var setupAfterOverride = Assert.Single(mock.Setups);
-			Assert.NotSame(setupBeforeOverride, setupAfterOverride);
+
+			var setups = mock.Setups.ToArray();
+			Assert.Equal(2, setups.Length);
+			Assert.True(setups[0].IsOverridden);
+			Assert.False(setups[1].IsOverridden);
 		}
 	}
 }
