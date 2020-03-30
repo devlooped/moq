@@ -23,11 +23,11 @@ namespace Moq
 
 		public virtual Condition Condition => null;
 
-		public bool IsConditional => this.Condition != null;
-
 		public InvocationShape Expectation => this.expectation;
 
 		public LambdaExpression Expression => this.expectation.Expression;
+
+		public bool IsConditional => this.Condition != null;
 
 		public bool IsOverridden => (this.flags & Flags.Overridden) != 0;
 
