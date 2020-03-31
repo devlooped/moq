@@ -8,13 +8,16 @@ The format is loosely based on [Keep a Changelog](http://keepachangelog.com/en/1
 
 #### Added
 
- * A mock's setups can now be inspected via the new `Mock.Setups` collection property (@stakx, #984)
+ * A mock's setups can now be inspected via the new `Mock.Setups` collection property and `IInvocation.WasMatched` method (@stakx, #984, #985)
+
  * New `.Protected().Setup` and `Protected().Verify` method overloads to deal with generic methods (@JmlSaul, #967)
+
  * Two new public methods in `Times`: `bool Validate(int count)` and `string ToString()` (@stakx, 975)
 
 #### Fixed
 
  * Regression: Restored `Capture.In` use in `mock.Verify(expression, ...)` to extract arguments of previously recorded invocations. (@vgriph, #968; @stakx, #974)
+
  * Consistency: When mocking a class `C` whose constructor invokes one of its virtual members, `Mock.Of<C>()` now operates like `new Mock<C>()`: a record of such invocations is retained in the mock's `Invocations` collection (@stakx, #980)
 
 ## 4.13.1 (2019-10-19)
