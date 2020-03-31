@@ -1643,6 +1643,36 @@ namespace Moq.Tests
 			}
 		}
 
+		[Fact]
+		public void Property_getter_setup_created_by_SetupAllProperties_should_not_fail_verification_even_when_not_matched()
+		{
+			var mock = new Mock<IFoo>();
+			mock.SetupAllProperties();
+
+			// Due to `SetupAllProperties` working in a lazy fashion,
+			// this should create two setups (one for the getter, one for the setter).
+			// Only invoke the setter:
+			mock.Object.Value = default;
+
+			// The getter hasn't been matched, but verification should still pass:
+			mock.VerifyAll();
+		}
+
+		[Fact]
+		public void Property_setter_setup_created_by_SetupAllProperties_should_not_fail_verification_even_when_not_matched()
+		{
+			var mock = new Mock<IFoo>();
+			mock.SetupAllProperties();
+
+			// Due to `SetupAllProperties` working in a lazy fashion,
+			// this should create two setups (one for the getter, one for the setter).
+			// Only invoke the getter:
+			_ = mock.Object.Value;
+
+			// The setter hasn't been matched, but verification should still pass:
+			mock.VerifyAll();
+		}
+
 		public interface IBar
 		{
 			int? Value { get; set; }
