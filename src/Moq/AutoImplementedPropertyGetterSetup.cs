@@ -34,5 +34,11 @@ namespace Moq
 			returnValue = this.getter.Invoke();
 			return true;
 		}
+
+		protected override bool TryVerifySelf(Func<Setup, bool> predicate, out MockException error)
+		{
+			error = null;
+			return true;
+		}
 	}
 }

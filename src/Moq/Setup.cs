@@ -131,15 +131,17 @@ namespace Moq
 		{
 			if (predicate(this))
 			{
+				MockException e;
+
 				// verify this setup:
-				if (!this.WasMatched)
+				if (!this.TryVerifySelf(predicate, out e) && e.IsVerificationError)
 				{
-					error = MockException.UnmatchedSetup(this);
+					error = e;
 					return false;
 				}
 
 				// verify setups of inner mock (if present and known):
-				if (this.ReturnsInnerMock(out var innerMock) && !innerMock.TryVerify(predicate, out var e) && e.IsVerificationError)
+				if (this.ReturnsInnerMock(out var innerMock) && !innerMock.TryVerify(predicate, out e) && e.IsVerificationError)
 				{
 					error = MockException.FromInnerMockOf(this, e);
 					return false;
@@ -148,6 +150,12 @@ namespace Moq
 
 			error = null;
 			return true;
+		}
+
+		protected virtual bool TryVerifySelf(Func<Setup, bool> predicate, out MockException error)
+		{
+			error = this.WasMatched ? null : MockException.UnmatchedSetup(this);
+			return error == null;
 		}
 
 		public void Reset()
