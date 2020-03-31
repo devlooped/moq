@@ -399,7 +399,7 @@ namespace Moq
 		{
 			if (!verifiedMocks.Add(mock)) return;
 
-			var unverifiedInvocations = mock.MutableInvocations.ToArray(invocation => !invocation.Verified);
+			var unverifiedInvocations = mock.MutableInvocations.ToArray(invocation => !invocation.WasVerified);
 
 			var innerMockSetups = mock.MutableSetups.GetInnerMockSetups();
 

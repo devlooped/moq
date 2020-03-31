@@ -1117,10 +1117,10 @@ namespace Moq.Tests
 			mock.Object.Submit();
 
 			var invocation = mock.MutableInvocations.ToArray()[0];
-			Assert.False(invocation.Verified);
+			Assert.False(invocation.WasVerified);
 
 			mock.Verify(m => m.Submit());
-			Assert.True(invocation.Verified);
+			Assert.True(invocation.WasVerified);
 		}
 
 		[Fact]
@@ -1132,14 +1132,14 @@ namespace Moq.Tests
 			mock.Object.Echo(3);
 
 			var invocations = mock.MutableInvocations.ToArray();
-			Assert.False(invocations[0].Verified);
-			Assert.False(invocations[1].Verified);
-			Assert.False(invocations[2].Verified);
+			Assert.False(invocations[0].WasVerified);
+			Assert.False(invocations[1].WasVerified);
+			Assert.False(invocations[2].WasVerified);
 
 			mock.Verify(m => m.Echo(It.Is<int>(i => i != 2)));
-			Assert.True(invocations[0].Verified);
-			Assert.False(invocations[1].Verified);
-			Assert.True(invocations[2].Verified);
+			Assert.True(invocations[0].WasVerified);
+			Assert.False(invocations[1].WasVerified);
+			Assert.True(invocations[2].WasVerified);
 		}
 
 		[Fact]
@@ -1151,14 +1151,14 @@ namespace Moq.Tests
 			mock.Object.Echo(3);
 
 			var invocations = mock.MutableInvocations.ToArray();
-			Assert.False(invocations[0].Verified);
-			Assert.False(invocations[1].Verified);
-			Assert.False(invocations[2].Verified);
+			Assert.False(invocations[0].WasVerified);
+			Assert.False(invocations[1].WasVerified);
+			Assert.False(invocations[2].WasVerified);
 
 			Assert.Throws<MockException>(() => mock.Verify(m => m.Echo(It.Is<int>(i => i != 2)), Times.Exactly(1)));
-			Assert.False(invocations[0].Verified);
-			Assert.False(invocations[1].Verified);
-			Assert.False(invocations[2].Verified);
+			Assert.False(invocations[0].WasVerified);
+			Assert.False(invocations[1].WasVerified);
+			Assert.False(invocations[2].WasVerified);
 		}
 
 		[Fact]
