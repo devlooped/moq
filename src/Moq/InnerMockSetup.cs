@@ -11,9 +11,9 @@ namespace Moq
 			: base(expectation)
 		{
 			this.returnValue = returnValue;
-		}
 
-		public override bool IsVerifiable => true;
+			this.MarkAsVerifiable();
+		}
 
 		protected override void ExecuteCore(Invocation invocation)
 		{

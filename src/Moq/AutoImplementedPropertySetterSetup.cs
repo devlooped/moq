@@ -19,9 +19,9 @@ namespace Moq
 			: base(new InvocationShape(originalExpression, method, new Expression[] { It.IsAny(method.GetParameterTypes().Last()) }))
 		{
 			this.setter = setter;
-		}
 
-		public override bool IsVerifiable => true;
+			this.MarkAsVerifiable();
+		}
 
 		protected override void ExecuteCore(Invocation invocation)
 		{

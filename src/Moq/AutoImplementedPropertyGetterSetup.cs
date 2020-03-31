@@ -20,9 +20,9 @@ namespace Moq
 			: base(new InvocationShape(originalExpression, method, noArguments))
 		{
 			this.getter = getter;
-		}
 
-		public override bool IsVerifiable => true;
+			this.MarkAsVerifiable();
+		}
 
 		protected override void ExecuteCore(Invocation invocation)
 		{

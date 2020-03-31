@@ -50,8 +50,6 @@ namespace Moq
 
 		public override Condition Condition => this.condition;
 
-		public override bool IsVerifiable => (this.flags & Flags.Verifiable) != 0;
-
 		private static string GetUserCodeCallSite()
 		{
 			try
@@ -200,6 +198,11 @@ namespace Moq
 			}
 		}
 
+		public void SetFailMessage(string failMessage)
+		{
+			this.failMessage = failMessage;
+		}
+
 		public void SetRaiseEventResponse<TMock>(Action<TMock> eventExpression, Delegate func)
 			where TMock : class
 		{
@@ -334,17 +337,6 @@ namespace Moq
 			this.limitInvocationCountResponse?.Reset();
 		}
 
-		public void Verifiable()
-		{
-			this.flags |= Flags.Verifiable;
-		}
-
-		public void Verifiable(string failMessage)
-		{
-			this.flags |= Flags.Verifiable;
-			this.failMessage = failMessage;
-		}
-
 		public void AtMost(int count)
 		{
 			this.limitInvocationCountResponse = new LimitInvocationCountResponse(this, count);
@@ -374,7 +366,6 @@ namespace Moq
 		{
 			CallBase = 1,
 			MethodIsNonVoid = 2,
-			Verifiable = 4,
 		}
 
 		private sealed class LimitInvocationCountResponse

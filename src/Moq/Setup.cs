@@ -31,7 +31,7 @@ namespace Moq
 
 		public bool IsOverridden => (this.flags & Flags.Overridden) != 0;
 
-		public virtual bool IsVerifiable => false;
+		public bool IsVerifiable => (this.flags & Flags.Verifiable) != 0;
 
 		public MethodInfo Method => this.expectation.Method;
 
@@ -75,6 +75,11 @@ namespace Moq
 			Debug.Assert(!this.IsOverridden);
 
 			this.flags |= Flags.Overridden;
+		}
+
+		public void MarkAsVerifiable()
+		{
+			this.flags |= Flags.Verifiable;
 		}
 
 		public bool Matches(Invocation invocation)
@@ -174,6 +179,7 @@ namespace Moq
 		{
 			Matched = 1,
 			Overridden = 2,
+			Verifiable = 4,
 		}
 	}
 }

@@ -161,12 +161,13 @@ namespace Moq.Language.Flow
 
 		public void Verifiable()
 		{
-			this.setup.Verifiable();
+			this.setup.MarkAsVerifiable();
 		}
 
 		public void Verifiable(string failMessage)
 		{
-			this.setup.Verifiable(failMessage);
+			this.setup.MarkAsVerifiable();
+			this.setup.SetFailMessage(failMessage);
 		}
 
 		public override string ToString()
