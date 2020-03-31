@@ -77,6 +77,34 @@ namespace Moq.Tests
 			Assert.True(setup.IsOverridden);
 		}
 
+		[Fact]
+		public void IsVerifiable_becomes_true_if_parameterless_Verifiable_setup_method_is_called()
+		{
+			var mock = new Mock<object>();
+			var setupBuilder = mock.Setup(m => m.ToString());
+			var setup = mock.Setups.First();
+
+			Assert.False(setup.IsVerifiable);
+
+			setupBuilder.Verifiable();
+
+			Assert.True(setup.IsVerifiable);
+		}
+
+		[Fact]
+		public void IsVerifiable_becomes_true_if_parameterized_Verifiable_setup_method_is_called()
+		{
+			var mock = new Mock<object>();
+			var setupBuilder = mock.Setup(m => m.ToString());
+			var setup = mock.Setups.First();
+
+			Assert.False(setup.IsVerifiable);
+
+			setupBuilder.Verifiable(failMessage: "...");
+
+			Assert.True(setup.IsVerifiable);
+		}
+
 		public interface IX
 		{
 			IX Inner { get; }

@@ -30,6 +30,19 @@ namespace Moq
 		bool IsOverridden { get; }
 
 		/// <summary>
+		///   Gets whether this setup is "verifiable".
+		/// </summary>
+		/// <remarks>
+		///   This property gets sets by the <c>`.Verifiable()`</c> setup verb.
+		///   <para>
+		///     Note that setups can be verified even if this property is <see langword="false"/>:
+		///     <see cref="Mock.VerifyAll()"/> completely ignores this property.
+		///     <see cref="Mock.Verify()"/>, however, will only verify setups where this property is <see langword="true"/>.
+		///   </para>
+		/// </remarks>
+		bool IsVerifiable { get; }
+
+		/// <summary>
 		///   Gets whether this setup was matched by at least one invocation on the mock.
 		/// </summary>
 		bool WasMatched { get; }
