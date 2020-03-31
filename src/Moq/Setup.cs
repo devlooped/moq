@@ -191,8 +191,8 @@ namespace Moq
 		/// </returns>
 		protected virtual bool TryVerifySelf(out MockException error)
 		{
-			error = null;
-			return true;
+			error = this.WasMatched ? null : MockException.UnmatchedSetup(this);
+			return error == null;
 		}
 
 		public void Reset()

@@ -90,12 +90,6 @@ namespace Moq
 			}
 		}
 
-		protected override bool TryVerifySelf(out MockException error)
-		{
-			error = this.WasMatched ? null : MockException.UnmatchedSetup(this);
-			return error == null;
-		}
-
 		private readonly struct Response
 		{
 			private readonly ResponseKind kind;

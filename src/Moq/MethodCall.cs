@@ -329,12 +329,6 @@ namespace Moq
 			this.returnOrThrowResponse = new ThrowExceptionResponse(exception);
 		}
 
-		protected override bool TryVerifySelf(out MockException error)
-		{
-			error = this.WasMatched ? null : MockException.UnmatchedSetup(this);
-			return error == null;
-		}
-
 		protected override void ResetCore()
 		{
 			this.limitInvocationCountResponse?.Reset();
