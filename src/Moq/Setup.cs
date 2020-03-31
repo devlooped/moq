@@ -132,7 +132,7 @@ namespace Moq
 		///   <see langword="true"/> if verification succeeded without any errors;
 		///   otherwise, <see langword="false"/>.
 		/// </returns>
-		public bool TryVerify(Func<Setup, bool> predicate, out MockException error)
+		public bool TryVerify(Func<ISetup, bool> predicate, out MockException error)
 		{
 			if (predicate(this))
 			{

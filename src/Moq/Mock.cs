@@ -294,7 +294,7 @@ namespace Moq
 			this.Verify(setup => !setup.IsOverridden && !setup.IsConditional);
 		}
 
-		private void Verify(Func<Setup, bool> predicate)
+		private void Verify(Func<ISetup, bool> predicate)
 		{
 			if (!this.TryVerify(predicate, out var error) && error.IsVerificationError)
 			{
@@ -302,7 +302,7 @@ namespace Moq
 			}
 		}
 
-		internal bool TryVerify(Func<Setup, bool> predicate, out MockException error)
+		internal bool TryVerify(Func<ISetup, bool> predicate, out MockException error)
 		{
 			foreach (Invocation invocation in this.MutableInvocations)
 			{
