@@ -37,7 +37,14 @@ namespace Moq
 
 		public bool WasMatched => (this.flags & Flags.Matched) != 0;
 
-		public abstract void Execute(Invocation invocation);
+		public void Execute(Invocation invocation)
+		{
+			this.MarkAsMatched();
+
+			this.ExecuteCore(invocation);
+		}
+
+		protected abstract void ExecuteCore(Invocation invocation);
 
 		public Mock GetInnerMock()
 		{

@@ -15,7 +15,7 @@ namespace Moq
 
 		public override bool IsVerifiable => true;
 
-		public override void Execute(Invocation invocation)
+		protected override void ExecuteCore(Invocation invocation)
 		{
 			invocation.Return(this.returnValue);
 		}

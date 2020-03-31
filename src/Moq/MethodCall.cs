@@ -89,10 +89,8 @@ namespace Moq
 			return null;
 		}
 
-		public override void Execute(Invocation invocation)
+		protected override void ExecuteCore(Invocation invocation)
 		{
-			this.MarkAsMatched();
-
 			this.limitInvocationCountResponse?.RespondTo(invocation);
 
 			this.callbackResponse?.RespondTo(invocation);

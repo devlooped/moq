@@ -46,10 +46,8 @@ namespace Moq
 			this.responses.Enqueue(new Response(ResponseKind.Throws, exception));
 		}
 
-		public override void Execute(Invocation invocation)
+		protected override void ExecuteCore(Invocation invocation)
 		{
-			this.MarkAsMatched();
-
 			if (this.responses.TryDequeue(out var response))
 			{
 				var (kind, arg) = response;
