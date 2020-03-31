@@ -15,7 +15,7 @@ namespace Moq
 
 		public override bool IsVerifiable => true;
 
-		public override void Execute(Invocation invocation)
+		protected override void ExecuteCore(Invocation invocation)
 		{
 			invocation.Return(this.returnValue);
 		}
@@ -26,11 +26,11 @@ namespace Moq
 			return true;
 		}
 
-		public override void Uninvoke()
+		protected override void ResetCore()
 		{
 			if (this.ReturnsInnerMock(out var innerMock))
 			{
-				innerMock.MutableSetups.UninvokeAll();
+				innerMock.MutableSetups.Reset();
 			}
 		}
 	}

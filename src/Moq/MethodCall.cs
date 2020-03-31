@@ -89,10 +89,8 @@ namespace Moq
 			return null;
 		}
 
-		public override void Execute(Invocation invocation)
+		protected override void ExecuteCore(Invocation invocation)
 		{
-			this.flags |= Flags.Invoked;
-
 			this.limitInvocationCountResponse?.RespondTo(invocation);
 
 			this.callbackResponse?.RespondTo(invocation);
@@ -331,15 +329,8 @@ namespace Moq
 			this.returnOrThrowResponse = new ThrowExceptionResponse(exception);
 		}
 
-		protected override bool TryVerifySelf(out MockException error)
+		protected override void ResetCore()
 		{
-			error = (this.flags & Flags.Invoked) != 0 ? null : MockException.UnmatchedSetup(this);
-			return error == null;
-		}
-
-		public override void Uninvoke()
-		{
-			this.flags &= ~Flags.Invoked;
 			this.limitInvocationCountResponse?.Reset();
 		}
 
@@ -382,9 +373,8 @@ namespace Moq
 		private enum Flags : byte
 		{
 			CallBase = 1,
-			Invoked = 2,
-			MethodIsNonVoid = 4,
-			Verifiable = 8,
+			MethodIsNonVoid = 2,
+			Verifiable = 4,
 		}
 
 		private sealed class LimitInvocationCountResponse

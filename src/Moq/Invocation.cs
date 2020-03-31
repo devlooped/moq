@@ -171,5 +171,10 @@ namespace Moq
 
 			return builder.ToString();
 		}
+
+		public bool WasMatched(out ISetup matchingSetup)
+		{
+			return (matchingSetup = this.matchingSetup) != null;
+		}
 	}
 }

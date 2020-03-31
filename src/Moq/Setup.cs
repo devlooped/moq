@@ -35,7 +35,25 @@ namespace Moq
 
 		public MethodInfo Method => this.expectation.Method;
 
-		public abstract void Execute(Invocation invocation);
+		public bool WasMatched => (this.flags & Flags.Matched) != 0;
+
+		public void Execute(Invocation invocation)
+		{
+			// update this setup:
+			this.flags |= Flags.Matched;
+
+			// update invocation:
+			invocation.MarkAsMatchedBy(this);
+			this.SetOutParameters(invocation);
+
+			// update condition (important for `MockSequence`) and matchers (important for `Capture`):
+			this.Condition?.SetupEvaluatedSuccessfully();
+			this.expectation.SetupEvaluatedSuccessfully(invocation);
+
+			this.ExecuteCore(invocation);
+		}
+
+		protected abstract void ExecuteCore(Invocation invocation);
 
 		public Mock GetInnerMock()
 		{
@@ -78,12 +96,6 @@ namespace Moq
 			}
 		}
 
-		public void EvaluatedSuccessfully(Invocation invocation)
-		{
-			this.Condition?.SetupEvaluatedSuccessfully();
-			this.expectation.SetupEvaluatedSuccessfully(invocation);
-		}
-
 		public virtual void SetOutParameters(Invocation invocation)
 		{
 		}
@@ -102,13 +114,13 @@ namespace Moq
 		}
 
 		/// <summary>
-		///   Verifies this setup and/or those of its inner mock (if present and known).
+		///   Verifies this setup and those of its inner mock (if present and known).
 		/// </summary>
 		/// <param name="predicate">
 		///   Specifies which setups should be verified.
 		/// </param>
 		/// <param name="error">
-		///   If this setup and/or any of its inner mock (if present and known) failed verification,
+		///   If this setup or any of its inner mock (if present and known) failed verification,
 		///   this <see langword="out"/> parameter will receive a <see cref="MockException"/> describing the verification error(s).
 		/// </param>
 		/// <returns>
@@ -119,43 +131,15 @@ namespace Moq
 		{
 			if (predicate(this))
 			{
-				if (!this.TryVerifySelf(out var e) && e.IsVerificationError)
+				// verify this setup:
+				if (!this.WasMatched)
 				{
-					error = e;
+					error = MockException.UnmatchedSetup(this);
 					return false;
 				}
-				else
-				{
-					return this.TryVerifyInnerMock(predicate, out error);
-				}
-			}
-			else
-			{
-				error = null;
-				return true;
-			}
-		}
 
-		/// <summary>
-		///   Verifies all setups of this setup's inner mock (if present and known).
-		///   Multiple verification errors are aggregated into a single <see cref="MockException"/>.
-		/// </summary>
-		/// <param name="predicate">
-		///   Specifies which setups should be verified.
-		/// </param>
-		/// <param name="error">
-		///   If one or more setups of this setup's inner mock (if present and known) failed verification,
-		///   this <see langword="out"/> parameter will receive a <see cref="MockException"/> describing the verification error(s).
-		/// </param>
-		/// <returns>
-		///   <see langword="true"/> if verification succeeded without any errors;
-		///   otherwise, <see langword="false"/>.
-		/// </returns>
-		protected virtual bool TryVerifyInnerMock(Func<Setup, bool> predicate, out MockException error)
-		{
-			if (this.ReturnsInnerMock(out var innerMock))
-			{
-				if (!innerMock.TryVerify(predicate, out var e) && e.IsVerificationError)
+				// verify setups of inner mock (if present and known):
+				if (this.ReturnsInnerMock(out var innerMock) && !innerMock.TryVerify(predicate, out var e) && e.IsVerificationError)
 				{
 					error = MockException.FromInnerMockOf(this, e);
 					return false;
@@ -166,31 +150,22 @@ namespace Moq
 			return true;
 		}
 
-		/// <summary>
-		///   Verifies only this setup, excluding those of its inner mock (if present and known).
-		/// </summary>
-		/// <param name="error">
-		///   If this setup failed verification,
-		///   this <see langword="out"/> parameter will receive a <see cref="MockException"/> describing the verification error.
-		/// </param>
-		/// <returns>
-		///   <see langword="true"/> if verification succeeded without any errors;
-		///   otherwise, <see langword="false"/>.
-		/// </returns>
-		protected virtual bool TryVerifySelf(out MockException error)
+		public void Reset()
 		{
-			error = null;
-			return true;
+			this.flags &= ~Flags.Matched;
+
+			this.ResetCore();
 		}
 
-		public virtual void Uninvoke()
+		protected virtual void ResetCore()
 		{
 		}
 
 		[Flags]
 		private enum Flags : byte
 		{
-			Overridden = 1,
+			Matched = 1,
+			Overridden = 2,
 		}
 	}
 }

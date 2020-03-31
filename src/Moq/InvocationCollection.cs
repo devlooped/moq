@@ -77,7 +77,7 @@ namespace Moq
 				this.count = 0;
 				this.capacity = 0;
 
-				this.owner.MutableSetups.UninvokeAll();
+				this.owner.MutableSetups.Reset();
 				// ^ TODO: Currently this could cause a deadlock as another lock will be taken inside this one!
 			}
 		}

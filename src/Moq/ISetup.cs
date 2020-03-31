@@ -28,5 +28,10 @@ namespace Moq
 		///   (that is, whether it is being shadowed by a more recent non-conditional setup with an equal expression).
 		/// </summary>
 		bool IsOverridden { get; }
+
+		/// <summary>
+		///   Gets whether this setup was matched by at least one invocation on the mock.
+		/// </summary>
+		bool WasMatched { get; }
 	}
 }
