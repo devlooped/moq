@@ -91,7 +91,7 @@ namespace Moq
 
 		public override void Execute(Invocation invocation)
 		{
-			this.flags |= Flags.Invoked;
+			this.flags |= Flags.Matched;
 
 			this.limitInvocationCountResponse?.RespondTo(invocation);
 
@@ -333,13 +333,13 @@ namespace Moq
 
 		protected override bool TryVerifySelf(out MockException error)
 		{
-			error = (this.flags & Flags.Invoked) != 0 ? null : MockException.UnmatchedSetup(this);
+			error = (this.flags & Flags.Matched) != 0 ? null : MockException.UnmatchedSetup(this);
 			return error == null;
 		}
 
-		public override void Uninvoke()
+		public override void Reset()
 		{
-			this.flags &= ~Flags.Invoked;
+			this.flags &= ~Flags.Matched;
 			this.limitInvocationCountResponse?.Reset();
 		}
 
@@ -382,7 +382,7 @@ namespace Moq
 		private enum Flags : byte
 		{
 			CallBase = 1,
-			Invoked = 2,
+			Matched = 2,
 			MethodIsNonVoid = 4,
 			Verifiable = 8,
 		}

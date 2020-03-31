@@ -164,13 +164,13 @@ namespace Moq
 			return this.ToArray(setup => !setup.IsOverridden && !setup.IsConditional && setup.ReturnsInnerMock(out _));
 		}
 
-		public void UninvokeAll()
+		public void Reset()
 		{
 			lock (this.setups)
 			{
 				foreach (var setup in this.setups)
 				{
-					setup.Uninvoke();
+					setup.Reset();
 				}
 			}
 		}

@@ -26,11 +26,11 @@ namespace Moq
 			return true;
 		}
 
-		public override void Uninvoke()
+		public override void Reset()
 		{
 			if (this.ReturnsInnerMock(out var innerMock))
 			{
-				innerMock.MutableSetups.UninvokeAll();
+				innerMock.MutableSetups.Reset();
 			}
 		}
 	}

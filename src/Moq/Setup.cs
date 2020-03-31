@@ -183,7 +183,7 @@ namespace Moq
 			return true;
 		}
 
-		public virtual void Uninvoke()
+		public virtual void Reset()
 		{
 		}
 
