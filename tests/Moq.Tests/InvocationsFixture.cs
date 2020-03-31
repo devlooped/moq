@@ -2,6 +2,7 @@
 // All rights reserved. Licensed under the BSD 3-Clause License; see License.txt.
 
 using System;
+using System.Linq;
 
 using Xunit;
 
@@ -201,6 +202,32 @@ namespace Moq.Tests
 
 			Assert.Single(mock.Invocations);
 			Assert.False(mockObject.Flag);
+		}
+
+		[Fact]
+		public void WasMatched_returns_false_if_there_was_no_matching_setup()
+		{
+			var mock = new Mock<IX>();
+
+			mock.Object.Do();
+			var invocation = mock.Invocations.First();
+
+			Assert.False(invocation.WasMatched(out var matchingSetup));
+			Assert.Null(matchingSetup);
+		}
+
+		[Fact]
+		public void WasMatched_returns_true_if_there_was_a_matching_setup()
+		{
+			var mock = new Mock<IX>();
+			mock.Setup(m => m.Do());
+			var setup = mock.Setups.First();
+
+			mock.Object.Do();
+			var invocation = mock.Invocations.First();
+
+			Assert.True(invocation.WasMatched(out var matchingSetup));
+			Assert.Same(setup, matchingSetup);
 		}
 
 		public interface IX
