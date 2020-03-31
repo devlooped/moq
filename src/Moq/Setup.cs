@@ -39,7 +39,15 @@ namespace Moq
 
 		public void Execute(Invocation invocation)
 		{
+			// update this setup:
 			this.MarkAsMatched();
+
+			// update invocation:
+			invocation.MarkAsMatchedBy(this);
+			this.SetOutParameters(invocation);
+
+			// update condition (important for `MockSequence`) and matchers (important for `Capture`):
+			this.EvaluatedSuccessfully(invocation);
 
 			this.ExecuteCore(invocation);
 		}

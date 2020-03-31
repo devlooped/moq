@@ -100,18 +100,10 @@ namespace Moq
 	{
 		public static bool Handle(Invocation invocation, Mock mock)
 		{
-			var matchedSetup = mock.MutableSetups.FindMatchFor(invocation);
-			if (matchedSetup != null)
+			var matchingSetup = mock.MutableSetups.FindMatchFor(invocation);
+			if (matchingSetup != null)
 			{
-				matchedSetup.EvaluatedSuccessfully(invocation);
-				invocation.MarkAsMatchedBy(matchedSetup);
-
-				matchedSetup.SetOutParameters(invocation);
-
-				// We first execute, as there may be a Throws 
-				// and therefore we might never get to the 
-				// next line.
-				matchedSetup.Execute(invocation);
+				matchingSetup.Execute(invocation);
 				return true;
 			}
 			else
