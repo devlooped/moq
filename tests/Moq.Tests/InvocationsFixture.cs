@@ -230,6 +230,34 @@ namespace Moq.Tests
 			Assert.Same(setup, matchingSetup);
 		}
 
+		[Fact]
+		public void WasMatched_returns_true_if_there_was_a_matching_setup_implicitly_created_by_SetupAllProperties()
+		{
+			var mock = new Mock<IX>();
+			mock.SetupAllProperties();
+
+			_ = mock.Object.Nested;
+			var invocation = mock.Invocations.First();
+			var setup = mock.Setups.First();
+
+			Assert.True(invocation.WasMatched(out var matchingSetup));
+			Assert.Same(setup, matchingSetup);
+		}
+
+		[Fact]
+		public void WasMatched_returns_true_if_there_was_a_matching_setup_implicitly_created_by_multi_dot_expression()
+		{
+			var mock = new Mock<IX>();
+			mock.Setup(m => m.Nested.Do());
+			var setup = mock.Setups.First();
+
+			_ = mock.Object.Nested;
+			var invocation = mock.Invocations.First();
+
+			Assert.True(invocation.WasMatched(out var matchingSetup));
+			Assert.Same(setup, matchingSetup);
+		}
+
 		public interface IX
 		{
 			IX Nested { get; }
