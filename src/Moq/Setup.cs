@@ -40,14 +40,15 @@ namespace Moq
 		public void Execute(Invocation invocation)
 		{
 			// update this setup:
-			this.MarkAsMatched();
+			this.flags |= Flags.Matched;
 
 			// update invocation:
 			invocation.MarkAsMatchedBy(this);
 			this.SetOutParameters(invocation);
 
 			// update condition (important for `MockSequence`) and matchers (important for `Capture`):
-			this.EvaluatedSuccessfully(invocation);
+			this.Condition?.SetupEvaluatedSuccessfully();
+			this.expectation.SetupEvaluatedSuccessfully(invocation);
 
 			this.ExecuteCore(invocation);
 		}
@@ -69,21 +70,11 @@ namespace Moq
 			return false;
 		}
 
-		public void MarkAsMatched()
-		{
-			this.flags |= Flags.Matched;
-		}
-
 		public void MarkAsOverridden()
 		{
 			Debug.Assert(!this.IsOverridden);
 
 			this.flags |= Flags.Overridden;
-		}
-
-		public void MarkAsUnmatched()
-		{
-			this.flags &= ~Flags.Matched;
 		}
 
 		public bool Matches(Invocation invocation)
@@ -103,12 +94,6 @@ namespace Moq
 				mock = null;
 				return false;
 			}
-		}
-
-		public void EvaluatedSuccessfully(Invocation invocation)
-		{
-			this.Condition?.SetupEvaluatedSuccessfully();
-			this.expectation.SetupEvaluatedSuccessfully(invocation);
 		}
 
 		public virtual void SetOutParameters(Invocation invocation)
@@ -212,7 +197,7 @@ namespace Moq
 
 		public void Reset()
 		{
-			this.MarkAsUnmatched();
+			this.flags &= ~Flags.Matched;
 
 			this.ResetCore();
 		}
