@@ -28,5 +28,11 @@ namespace Moq
 			this.setter.Invoke(invocation.Arguments[0]);
 			invocation.Return();
 		}
+
+		protected override bool TryVerifySelf(Func<Setup, bool> predicate, out MockException error)
+		{
+			error = null;
+			return true;
+		}
 	}
 }
