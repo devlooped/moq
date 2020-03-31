@@ -24,6 +24,32 @@ namespace Moq.Tests
 		}
 
 		[Fact]
+		public void IsMatched_of_setup_implicitly_created_by_SetupAllProperties_becomes_true_as_soon_as_matching_invocation_is_made()
+		{
+			var mock = new Mock<IX>();
+			mock.SetupAllProperties();
+
+			_ = mock.Object.Property;
+			var setup = mock.Setups.First();
+
+			Assert.True(setup.WasMatched);
+		}
+
+		[Fact]
+		public void IsMatched_of_setup_implicitly_created_by_multi_dot_expression_becomes_true_as_soon_as_matching_invocation_is_made()
+		{
+			var mock = new Mock<IX>();
+			mock.Setup(m => m.Inner.Property);
+			var setup = mock.Setups.First();
+
+			Assert.False(setup.WasMatched);
+
+			_ = mock.Object.Inner;
+
+			Assert.True(setup.WasMatched);
+		}
+
+		[Fact]
 		public void IsOverridden_does_not_become_true_if_another_setup_with_a_different_expression_is_added_to_the_mock()
 		{
 			var mock = new Mock<object>();
@@ -49,6 +75,12 @@ namespace Moq.Tests
 			mock.Setup(m => m.Equals(1));
 
 			Assert.True(setup.IsOverridden);
+		}
+
+		public interface IX
+		{
+			IX Inner { get; }
+			object Property { get; set; }
 		}
 	}
 }
