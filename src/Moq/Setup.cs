@@ -35,6 +35,8 @@ namespace Moq
 
 		public MethodInfo Method => this.expectation.Method;
 
+		public bool WasMatched => (this.flags & Flags.Matched) != 0;
+
 		public abstract void Execute(Invocation invocation);
 
 		public Mock GetInnerMock()
@@ -52,11 +54,21 @@ namespace Moq
 			return false;
 		}
 
+		public void MarkAsMatched()
+		{
+			this.flags |= Flags.Matched;
+		}
+
 		public void MarkAsOverridden()
 		{
 			Debug.Assert(!this.IsOverridden);
 
 			this.flags |= Flags.Overridden;
+		}
+
+		public void MarkAsUnmatched()
+		{
+			this.flags &= ~Flags.Matched;
 		}
 
 		public bool Matches(Invocation invocation)
@@ -190,7 +202,8 @@ namespace Moq
 		[Flags]
 		private enum Flags : byte
 		{
-			Overridden = 1,
+			Matched = 1,
+			Overridden = 2,
 		}
 	}
 }
