@@ -96,11 +96,6 @@ namespace Moq
 			return error == null;
 		}
 
-		public override void Reset()
-		{
-			this.MarkAsUnmatched();
-		}
-
 		private readonly struct Response
 		{
 			private readonly ResponseKind kind;

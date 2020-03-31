@@ -335,9 +335,8 @@ namespace Moq
 			return error == null;
 		}
 
-		public override void Reset()
+		protected override void ResetCore()
 		{
-			this.MarkAsUnmatched();
 			this.limitInvocationCountResponse?.Reset();
 		}
 

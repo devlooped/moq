@@ -26,7 +26,7 @@ namespace Moq
 			return true;
 		}
 
-		public override void Reset()
+		protected override void ResetCore()
 		{
 			if (this.ReturnsInnerMock(out var innerMock))
 			{

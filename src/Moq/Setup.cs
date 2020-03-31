@@ -210,7 +210,14 @@ namespace Moq
 			return true;
 		}
 
-		public virtual void Reset()
+		public void Reset()
+		{
+			this.MarkAsUnmatched();
+
+			this.ResetCore();
+		}
+
+		protected virtual void ResetCore()
 		{
 		}
 
