@@ -121,6 +121,9 @@ namespace Moq
 		/// <summary>
 		///   Verifies this setup and those of its inner mock (if present and known).
 		/// </summary>
+		/// <param name="recursive">
+		///   Specifies whether recursive verification should be performed.
+		/// </param>
 		/// <param name="predicate">
 		///   Specifies which setups should be verified.
 		/// </param>
@@ -132,25 +135,22 @@ namespace Moq
 		///   <see langword="true"/> if verification succeeded without any errors;
 		///   otherwise, <see langword="false"/>.
 		/// </returns>
-		public bool TryVerify(Func<ISetup, bool> predicate, out MockException error)
+		public bool TryVerify(bool recursive, Func<ISetup, bool> predicate, out MockException error)
 		{
-			if (predicate(this))
+			MockException e;
+
+			// verify this setup:
+			if (!this.TryVerifySelf(out e) && e.IsVerificationError)
 			{
-				MockException e;
+				error = e;
+				return false;
+			}
 
-				// verify this setup:
-				if (!this.TryVerifySelf(out e) && e.IsVerificationError)
-				{
-					error = e;
-					return false;
-				}
-
-				// verify setups of inner mock (if present and known):
-				if (this.ReturnsInnerMock(out var innerMock) && !innerMock.TryVerify(predicate, out e) && e.IsVerificationError)
-				{
-					error = MockException.FromInnerMockOf(this, e);
-					return false;
-				}
+			// optionally verify setups of inner mock (if present and known):
+			if (recursive && this.ReturnsInnerMock(out var innerMock) && !innerMock.TryVerify(predicate, out e) && e.IsVerificationError)
+			{
+				error = MockException.FromInnerMockOf(this, e);
+				return false;
 			}
 
 			error = null;
@@ -172,6 +172,24 @@ namespace Moq
 
 		protected virtual void ResetCore()
 		{
+		}
+
+		public void Verify(bool recursive = true)
+		{
+			this.Verify(recursive, setup => !setup.IsOverridden && !setup.IsConditional && setup.IsVerifiable);
+		}
+
+		public void VerifyAll()
+		{
+			this.Verify(recursive: true, setup => !setup.IsOverridden && !setup.IsConditional);
+		}
+
+		private void Verify(bool recursive, Func<ISetup, bool> predicate)
+		{
+			if (!this.TryVerify(recursive, predicate, out var error) && error.IsVerificationError)
+			{
+				throw error;
+			}
 		}
 
 		[Flags]

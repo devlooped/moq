@@ -46,5 +46,39 @@ namespace Moq
 		///   Gets whether this setup was matched by at least one invocation on the mock.
 		/// </summary>
 		bool WasMatched { get; }
+
+		/// <summary>
+		///   Verifies this setup and optionally all verifiable setups of its inner mock (if present and known).
+		///   <para>
+		///     If <paramref name="recursive"/> is set to <see langword="true"/>,
+		///     the semantics of this method are essentially the same as those of <see cref="Mock.Verify()"/>,
+		///     except that this setup (instead of a mock) is used as the starting point for verification,
+		///     and will always be verified itself (even if not flagged as verifiable).
+		///   </para>
+		/// </summary>
+		/// <param name="recursive">
+		///   Specifies whether recursive verification should be performed.
+		/// </param>
+		/// <exception cref="MockException">
+		///   Verification failed due to one or more unmatched setups.
+		/// </exception>
+		/// <seealso cref="VerifyAll()"/>
+		/// <seealso cref="Mock.Verify()"/>
+		void Verify(bool recursive = true);
+
+		/// <summary>
+		///   Verifies this setup and all setups of its inner mock (if present and known),
+		///   regardless of whether they have been flagged as verifiable.
+		///   <para>
+		///     The semantics of this method are essentially the same as those of <see cref="Mock.VerifyAll()"/>,
+		///     except that this setup (instead of a mock) is used as the starting point for verification.
+		///   </para>
+		/// </summary>
+		/// <exception cref="MockException">
+		///   Verification failed due to one or more unmatched setups.
+		/// </exception>
+		/// <seealso cref="Verify(bool)"/>
+		/// <seealso cref="Mock.VerifyAll()"/>
+		void VerifyAll();
 	}
 }

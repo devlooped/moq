@@ -105,6 +105,110 @@ namespace Moq.Tests
 			Assert.True(setup.IsVerifiable);
 		}
 
+		[Fact]
+		public void Verify_fails_on_unmatched_setup_even_when_not_flagged_as_verifiable()
+		{
+			var mock = new Mock<object>();
+			mock.Setup(m => m.ToString());
+			var setup = mock.Setups.First();
+
+			Assert.False(setup.IsVerifiable);  // the root setup should be verified despite this
+			Assert.False(setup.WasMatched);
+			Assert.Throws<MockException>(() => setup.Verify());
+		}
+
+		[Fact]
+		public void Verify_succeeds_on_matched_setup()
+		{
+			var mock = new Mock<object>();
+			mock.Setup(m => m.ToString());
+			var setup = mock.Setups.First();
+
+			_ = mock.Object.ToString();
+
+			Assert.False(setup.IsVerifiable);
+			Assert.True(setup.WasMatched);
+			setup.Verify();
+		}
+
+		[Fact]
+		public void Verify_fails_on_matched_setup_having_unmatched_verifiable_setup_on_inner_mock()
+		{
+			var mock = new Mock<IX>();
+			mock.Setup(m => m.Inner.Property).Verifiable();
+			var setup = mock.Setups.First();
+
+			var innerMock = mock.Object.Inner;
+			var innerMockSetup = Mock.Get(innerMock).Setups.First();
+
+			Assert.True(setup.WasMatched);
+			Assert.True(innerMockSetup.IsVerifiable);
+			Assert.False(innerMockSetup.WasMatched);  // this should make recursive verification fail
+			Assert.Throws<MockException>(() => setup.Verify());
+		}
+
+		[Fact]
+		public void Verify_succeeds_on_matched_setup_having_unmatched_setup_on_inner_mock()
+		{
+			var mock = new Mock<IX>();
+			mock.Setup(m => m.Inner.Property);
+			var setup = mock.Setups.First();
+
+			var innerMock = mock.Object.Inner;
+			var innerMockSetup = Mock.Get(innerMock).Setups.First();
+
+			Assert.True(setup.WasMatched);
+			Assert.False(innerMockSetup.IsVerifiable);  // which means that the inner mock setup will be ignored
+			Assert.False(innerMockSetup.WasMatched);  // this would make verification fail if that setup were not ignored
+			setup.Verify();
+		}
+
+		[Fact]
+		public void Verify_succeeds_on_matched_setup_having_unmatched_verifiable_setup_on_inner_mock_if_recursive_set_to_false()
+		{
+			var mock = new Mock<IX>();
+			mock.Setup(m => m.Inner.Property).Verifiable();
+			var setup = mock.Setups.First();
+
+			var innerMock = mock.Object.Inner;
+			var innerMockSetup = Mock.Get(innerMock).Setups.First();
+
+			Assert.True(setup.WasMatched);
+			Assert.True(innerMockSetup.IsVerifiable);
+			Assert.False(innerMockSetup.WasMatched);
+			setup.Verify(recursive: false);  // which means that verification will never get to `innerMockSetup`
+		}
+
+		[Fact]
+		public void VerifyAll_is_always_recursive()
+		{
+			var mock = new Mock<IX>();
+			mock.Setup(m => m.Inner.Property).Verifiable();
+			var setup = mock.Setups.First();
+
+			var innerMock = mock.Object.Inner;
+			var innerMockSetup = Mock.Get(innerMock).Setups.First();
+
+			Assert.True(setup.WasMatched);
+			Assert.False(innerMockSetup.WasMatched);  // this will make verification fail only if it is recursive
+			Assert.Throws<MockException>(() => setup.VerifyAll());
+		}
+
+		[Fact]
+		public void VerifyAll_includes_non_verifiable_setups()
+		{
+			var mock = new Mock<IX>();
+			mock.Setup(m => m.Inner.Property);
+			var setup = mock.Setups.First();
+
+			var innerMock = mock.Object.Inner;
+			var innerMockSetup = Mock.Get(innerMock).Setups.First();
+
+			Assert.True(setup.WasMatched);
+			Assert.False(innerMockSetup.IsVerifiable);  // this should not exclude the inner mock setup from verification
+			Assert.Throws<MockException>(() => setup.VerifyAll());
+		}
+
 		public interface IX
 		{
 			IX Inner { get; }
