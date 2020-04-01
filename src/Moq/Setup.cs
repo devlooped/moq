@@ -12,13 +12,16 @@ namespace Moq
 	internal abstract class Setup : ISetup
 	{
 		private readonly InvocationShape expectation;
+		private readonly Mock mock;
 		private Flags flags;
 
-		protected Setup(InvocationShape expectation)
+		protected Setup(Mock mock, InvocationShape expectation)
 		{
+			Debug.Assert(mock != null);
 			Debug.Assert(expectation != null);
 
 			this.expectation = expectation;
+			this.mock = mock;
 		}
 
 		public virtual Condition Condition => null;
@@ -34,6 +37,8 @@ namespace Moq
 		public bool IsVerifiable => (this.flags & Flags.Verifiable) != 0;
 
 		public MethodInfo Method => this.expectation.Method;
+
+		public Mock Mock => this.mock;
 
 		public bool WasMatched => (this.flags & Flags.Matched) != 0;
 
