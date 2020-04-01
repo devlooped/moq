@@ -191,6 +191,11 @@ namespace Moq
 
 		private void Verify(bool recursive, Func<ISetup, bool> predicate)
 		{
+			foreach (Invocation invocation in this.mock.MutableInvocations)
+			{
+				invocation.MarkAsVerifiedIfMatchedBy(setup => setup == this);
+			}
+
 			if (!this.TryVerify(recursive, predicate, out var error) && error.IsVerificationError)
 			{
 				throw error;
