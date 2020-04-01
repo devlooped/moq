@@ -294,7 +294,7 @@ namespace Moq
 			this.Verify(setup => !setup.IsOverridden && !setup.IsConditional);
 		}
 
-		private void Verify(Func<Setup, bool> predicate)
+		private void Verify(Func<ISetup, bool> predicate)
 		{
 			if (!this.TryVerify(predicate, out var error) && error.IsVerificationError)
 			{
@@ -302,7 +302,7 @@ namespace Moq
 			}
 		}
 
-		internal bool TryVerify(Func<Setup, bool> predicate, out MockException error)
+		internal bool TryVerify(Func<ISetup, bool> predicate, out MockException error)
 		{
 			foreach (Invocation invocation in this.MutableInvocations)
 			{
@@ -313,7 +313,7 @@ namespace Moq
 
 			foreach (var setup in this.MutableSetups.ToArray(predicate))
 			{
-				if (!setup.TryVerify(predicate, out var e) && e.IsVerificationError)
+				if (predicate(setup) && !setup.TryVerify(recursive: true, predicate, out var e) && e.IsVerificationError)
 				{
 					errors.Add(e);
 				}
@@ -399,7 +399,7 @@ namespace Moq
 		{
 			if (!verifiedMocks.Add(mock)) return;
 
-			var unverifiedInvocations = mock.MutableInvocations.ToArray(invocation => !invocation.Verified);
+			var unverifiedInvocations = mock.MutableInvocations.ToArray(invocation => !invocation.WasVerified);
 
 			var innerMockSetups = mock.MutableSetups.GetInnerMockSetups();
 
@@ -568,7 +568,7 @@ namespace Moq
 
 			return Mock.SetupRecursive(mock, expression, setupLast: (part, targetMock) =>
 			{
-				var setup = new SequenceSetup(expectation: part);
+				var setup = new SequenceSetup(targetMock, expectation: part);
 				targetMock.MutableSetups.Add(setup);
 				return setup;
 			});
@@ -607,7 +607,7 @@ namespace Moq
 								Resources.UnsupportedExpression,
 								expr.ToStringFixed() + " in " + expression.ToStringFixed() + ":\n" + Resources.TypeNotMockable));
 					}
-					setup = new InnerMockSetup(expectation: part, returnValue);
+					setup = new InnerMockSetup(mock, expectation: part, returnValue);
 					mock.MutableSetups.Add((Setup)setup);
 				}
 				Debug.Assert(innerMock != null);
@@ -804,7 +804,7 @@ namespace Moq
 				Debug.Assert(property.CanRead(out var getter) && invocation.Method == getter);
 			}
 
-			this.MutableSetups.Add(new InnerMockSetup(new InvocationShape(expression, invocation.Method, arguments, exactGenericTypeArguments: true), returnValue));
+			this.MutableSetups.Add(new InnerMockSetup(this, new InvocationShape(expression, invocation.Method, arguments, exactGenericTypeArguments: true), returnValue));
 		}
 
 		#endregion

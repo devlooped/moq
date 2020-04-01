@@ -22,18 +22,16 @@ namespace Moq
 		private Condition condition;
 		private string failMessage;
 		private Flags flags;
-		private Mock mock;
 		private RaiseEventResponse raiseEventResponse;
 		private Response returnOrThrowResponse;
 
 		private string declarationSite;
 
 		public MethodCall(Mock mock, Condition condition, InvocationShape expectation)
-			: base(expectation)
+			: base(mock, expectation)
 		{
 			this.condition = condition;
 			this.flags = expectation.Method.ReturnType != typeof(void) ? Flags.MethodIsNonVoid : 0;
-			this.mock = mock;
 
 			if ((mock.Switches & Switches.CollectDiagnosticFileInfoForSetups) != 0)
 			{
@@ -46,11 +44,7 @@ namespace Moq
 			get => this.failMessage;
 		}
 
-		public Mock Mock => this.mock;
-
 		public override Condition Condition => this.condition;
-
-		public override bool IsVerifiable => (this.flags & Flags.Verifiable) != 0;
 
 		private static string GetUserCodeCallSite()
 		{
@@ -200,16 +194,21 @@ namespace Moq
 			}
 		}
 
+		public void SetFailMessage(string failMessage)
+		{
+			this.failMessage = failMessage;
+		}
+
 		public void SetRaiseEventResponse<TMock>(Action<TMock> eventExpression, Delegate func)
 			where TMock : class
 		{
 			Guard.NotNull(eventExpression, nameof(eventExpression));
 
-			var expression = ExpressionReconstructor.Instance.ReconstructExpression(eventExpression, this.mock.ConstructorArguments);
+			var expression = ExpressionReconstructor.Instance.ReconstructExpression(eventExpression, this.Mock.ConstructorArguments);
 
 			// TODO: validate that expression is for event subscription or unsubscription
 
-			this.raiseEventResponse = new RaiseEventResponse(this.mock, expression, func, null);
+			this.raiseEventResponse = new RaiseEventResponse(this.Mock, expression, func, null);
 		}
 
 		public void SetRaiseEventResponse<TMock>(Action<TMock> eventExpression, params object[] args)
@@ -217,11 +216,11 @@ namespace Moq
 		{
 			Guard.NotNull(eventExpression, nameof(eventExpression));
 
-			var expression = ExpressionReconstructor.Instance.ReconstructExpression(eventExpression, this.mock.ConstructorArguments);
+			var expression = ExpressionReconstructor.Instance.ReconstructExpression(eventExpression, this.Mock.ConstructorArguments);
 
 			// TODO: validate that expression is for event subscription or unsubscription
 
-			this.raiseEventResponse = new RaiseEventResponse(this.mock, expression, null, args);
+			this.raiseEventResponse = new RaiseEventResponse(this.Mock, expression, null, args);
 		}
 
 		public void SetEagerReturnsResponse(object value)
@@ -334,17 +333,6 @@ namespace Moq
 			this.limitInvocationCountResponse?.Reset();
 		}
 
-		public void Verifiable()
-		{
-			this.flags |= Flags.Verifiable;
-		}
-
-		public void Verifiable(string failMessage)
-		{
-			this.flags |= Flags.Verifiable;
-			this.failMessage = failMessage;
-		}
-
 		public void AtMost(int count)
 		{
 			this.limitInvocationCountResponse = new LimitInvocationCountResponse(this, count);
@@ -374,7 +362,6 @@ namespace Moq
 		{
 			CallBase = 1,
 			MethodIsNonVoid = 2,
-			Verifiable = 4,
 		}
 
 		private sealed class LimitInvocationCountResponse

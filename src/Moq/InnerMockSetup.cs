@@ -7,13 +7,13 @@ namespace Moq
 	{
 		private readonly object returnValue;
 
-		public InnerMockSetup(InvocationShape expectation, object returnValue)
-			: base(expectation)
+		public InnerMockSetup(Mock mock, InvocationShape expectation, object returnValue)
+			: base(mock, expectation)
 		{
 			this.returnValue = returnValue;
-		}
 
-		public override bool IsVerifiable => true;
+			this.MarkAsVerifiable();
+		}
 
 		protected override void ExecuteCore(Invocation invocation)
 		{

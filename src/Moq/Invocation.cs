@@ -69,7 +69,7 @@ namespace Moq
 
 		public object ReturnValue => this.returnValue;
 
-		internal bool Verified => this.verified;
+		public bool WasVerified => this.verified;
 
 		/// <summary>
 		/// Ends the invocation as if a <see langword="return"/> statement occurred.

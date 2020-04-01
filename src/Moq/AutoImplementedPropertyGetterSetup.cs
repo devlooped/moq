@@ -16,13 +16,13 @@ namespace Moq
 
 		private Func<object> getter;
 
-		public AutoImplementedPropertyGetterSetup(LambdaExpression originalExpression, MethodInfo method, Func<object> getter)
-			: base(new InvocationShape(originalExpression, method, noArguments))
+		public AutoImplementedPropertyGetterSetup(Mock mock, LambdaExpression originalExpression, MethodInfo method, Func<object> getter)
+			: base(mock, new InvocationShape(originalExpression, method, noArguments))
 		{
 			this.getter = getter;
-		}
 
-		public override bool IsVerifiable => true;
+			this.MarkAsVerifiable();
+		}
 
 		protected override void ExecuteCore(Invocation invocation)
 		{

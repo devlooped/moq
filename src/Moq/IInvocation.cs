@@ -34,5 +34,10 @@ namespace Moq
 		///   otherwise, <see langword="false"/>.
 		/// </returns>
 		bool WasMatched(out ISetup matchingSetup);
+
+		/// <summary>
+		///   Gets whether this invocation was successfully verified by any of the various <c>`Verify`</c> methods.
+		/// </summary>
+		bool WasVerified { get; }
 	}
 }

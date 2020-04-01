@@ -12,13 +12,16 @@ namespace Moq
 	internal abstract class Setup : ISetup
 	{
 		private readonly InvocationShape expectation;
+		private readonly Mock mock;
 		private Flags flags;
 
-		protected Setup(InvocationShape expectation)
+		protected Setup(Mock mock, InvocationShape expectation)
 		{
+			Debug.Assert(mock != null);
 			Debug.Assert(expectation != null);
 
 			this.expectation = expectation;
+			this.mock = mock;
 		}
 
 		public virtual Condition Condition => null;
@@ -31,9 +34,11 @@ namespace Moq
 
 		public bool IsOverridden => (this.flags & Flags.Overridden) != 0;
 
-		public virtual bool IsVerifiable => false;
+		public bool IsVerifiable => (this.flags & Flags.Verifiable) != 0;
 
 		public MethodInfo Method => this.expectation.Method;
+
+		public Mock Mock => this.mock;
 
 		public bool WasMatched => (this.flags & Flags.Matched) != 0;
 
@@ -77,6 +82,11 @@ namespace Moq
 			this.flags |= Flags.Overridden;
 		}
 
+		public void MarkAsVerifiable()
+		{
+			this.flags |= Flags.Verifiable;
+		}
+
 		public bool Matches(Invocation invocation)
 		{
 			return this.expectation.IsMatch(invocation) && (this.Condition == null || this.Condition.IsTrue);
@@ -116,6 +126,9 @@ namespace Moq
 		/// <summary>
 		///   Verifies this setup and those of its inner mock (if present and known).
 		/// </summary>
+		/// <param name="recursive">
+		///   Specifies whether recursive verification should be performed.
+		/// </param>
 		/// <param name="predicate">
 		///   Specifies which setups should be verified.
 		/// </param>
@@ -127,25 +140,22 @@ namespace Moq
 		///   <see langword="true"/> if verification succeeded without any errors;
 		///   otherwise, <see langword="false"/>.
 		/// </returns>
-		public bool TryVerify(Func<Setup, bool> predicate, out MockException error)
+		public bool TryVerify(bool recursive, Func<ISetup, bool> predicate, out MockException error)
 		{
-			if (predicate(this))
+			MockException e;
+
+			// verify this setup:
+			if (!this.TryVerifySelf(out e) && e.IsVerificationError)
 			{
-				MockException e;
+				error = e;
+				return false;
+			}
 
-				// verify this setup:
-				if (!this.TryVerifySelf(out e) && e.IsVerificationError)
-				{
-					error = e;
-					return false;
-				}
-
-				// verify setups of inner mock (if present and known):
-				if (this.ReturnsInnerMock(out var innerMock) && !innerMock.TryVerify(predicate, out e) && e.IsVerificationError)
-				{
-					error = MockException.FromInnerMockOf(this, e);
-					return false;
-				}
+			// optionally verify setups of inner mock (if present and known):
+			if (recursive && this.ReturnsInnerMock(out var innerMock) && !innerMock.TryVerify(predicate, out e) && e.IsVerificationError)
+			{
+				error = MockException.FromInnerMockOf(this, e);
+				return false;
 			}
 
 			error = null;
@@ -169,11 +179,35 @@ namespace Moq
 		{
 		}
 
+		public void Verify(bool recursive = true)
+		{
+			this.Verify(recursive, setup => !setup.IsOverridden && !setup.IsConditional && setup.IsVerifiable);
+		}
+
+		public void VerifyAll()
+		{
+			this.Verify(recursive: true, setup => !setup.IsOverridden && !setup.IsConditional);
+		}
+
+		private void Verify(bool recursive, Func<ISetup, bool> predicate)
+		{
+			foreach (Invocation invocation in this.mock.MutableInvocations)
+			{
+				invocation.MarkAsVerifiedIfMatchedBy(setup => setup == this);
+			}
+
+			if (!this.TryVerify(recursive, predicate, out var error) && error.IsVerificationError)
+			{
+				throw error;
+			}
+		}
+
 		[Flags]
 		private enum Flags : byte
 		{
 			Matched = 1,
 			Overridden = 2,
+			Verifiable = 4,
 		}
 	}
 }
