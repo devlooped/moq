@@ -134,7 +134,7 @@ namespace Moq
 				MockException e;
 
 				// verify this setup:
-				if (!this.TryVerifySelf(predicate, out e) && e.IsVerificationError)
+				if (!this.TryVerifySelf(out e) && e.IsVerificationError)
 				{
 					error = e;
 					return false;
@@ -152,7 +152,7 @@ namespace Moq
 			return true;
 		}
 
-		protected virtual bool TryVerifySelf(Func<Setup, bool> predicate, out MockException error)
+		protected virtual bool TryVerifySelf(out MockException error)
 		{
 			error = this.WasMatched ? null : MockException.UnmatchedSetup(this);
 			return error == null;

@@ -29,7 +29,7 @@ namespace Moq
 			invocation.Return();
 		}
 
-		protected override bool TryVerifySelf(Func<Setup, bool> predicate, out MockException error)
+		protected override bool TryVerifySelf(out MockException error)
 		{
 			error = null;
 			return true;
