@@ -209,6 +209,80 @@ namespace Moq.Tests
 			Assert.Throws<MockException>(() => setup.VerifyAll());
 		}
 
+		[Fact]
+		public void Verify_marks_invocations_matched_by_setup_as_verified()
+		{
+			var mock = new Mock<object>();
+			mock.Setup(m => m.ToString());
+			var setup = mock.Setups.First();
+
+			_ = mock.Object.ToString();
+			_ = mock.Object.ToString();
+
+			Assert.All(mock.Invocations, i => Assert.False(i.WasVerified));
+
+			setup.Verify();
+
+			Assert.All(mock.Invocations, i => Assert.True(i.WasVerified));
+			mock.VerifyNoOtherCalls();
+		}
+
+		[Fact]
+		public void VerifyAll_marks_invocations_matched_by_setup_as_verified()
+		{
+			var mock = new Mock<object>();
+			mock.Setup(m => m.ToString());
+			var setup = mock.Setups.First();
+
+			_ = mock.Object.ToString();
+			_ = mock.Object.ToString();
+
+			Assert.All(mock.Invocations, i => Assert.False(i.WasVerified));
+
+			setup.VerifyAll();
+
+			Assert.All(mock.Invocations, i => Assert.True(i.WasVerified));
+			mock.VerifyNoOtherCalls();
+		}
+
+		[Fact]
+		public void Verify_marks_invocation_matched_by_verifiable_inner_mock_setup_as_verified()
+		{
+			var mock = new Mock<IX>();
+			mock.Setup(m => m.Inner.Property).Verifiable();
+			var setup = mock.Setups.First();
+
+			var innerMock = mock.Object.Inner;
+			_ = innerMock.Property;
+			var innerMockInvocation = Mock.Get(innerMock).Invocations.First();
+
+			Assert.False(innerMockInvocation.WasVerified);
+
+			setup.Verify();
+
+			Assert.True(innerMockInvocation.WasVerified);
+			mock.VerifyNoOtherCalls();
+		}
+
+		[Fact]
+		public void VerifyAll_marks_invocation_matched_by_inner_mock_setup_as_verified()
+		{
+			var mock = new Mock<IX>();
+			mock.Setup(m => m.Inner.Property);
+			var setup = mock.Setups.First();
+
+			var innerMock = mock.Object.Inner;
+			_ = innerMock.Property;
+			var innerMockInvocation = Mock.Get(innerMock).Invocations.First();
+
+			Assert.False(innerMockInvocation.WasVerified);
+
+			setup.VerifyAll();
+
+			Assert.True(innerMockInvocation.WasVerified);
+			mock.VerifyNoOtherCalls();
+		}
+
 		public interface IX
 		{
 			IX Inner { get; }
