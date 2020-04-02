@@ -7,8 +7,8 @@ namespace Moq
 	{
 		private readonly object returnValue;
 
-		public InnerMockSetup(Mock mock, InvocationShape expectation, object returnValue)
-			: base(mock, expectation)
+		public InnerMockSetup(FluentSetup fluentSetup, Mock mock, InvocationShape expectation, object returnValue)
+			: base(fluentSetup, mock, expectation)
 		{
 			this.returnValue = returnValue;
 

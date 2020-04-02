@@ -12,14 +12,16 @@ namespace Moq
 	internal abstract class Setup : ISetup
 	{
 		private readonly InvocationShape expectation;
+		private readonly FluentSetup fluentSetup;
 		private readonly Mock mock;
 		private Flags flags;
 
-		protected Setup(Mock mock, InvocationShape expectation)
+		protected Setup(FluentSetup fluentSetup, Mock mock, InvocationShape expectation)
 		{
 			Debug.Assert(mock != null);
 			Debug.Assert(expectation != null);
 
+			this.fluentSetup = fluentSetup;
 			this.expectation = expectation;
 			this.mock = mock;
 		}
@@ -41,6 +43,11 @@ namespace Moq
 		public Mock Mock => this.mock;
 
 		public bool WasMatched => (this.flags & Flags.Matched) != 0;
+
+		public bool IsPartOfFluentSetup(out IFluentSetup fluentSetup)
+		{
+			return (fluentSetup = this.fluentSetup) != null;
+		}
 
 		public void Execute(Invocation invocation)
 		{
@@ -94,15 +101,28 @@ namespace Moq
 
 		public bool ReturnsInnerMock(out Mock mock)
 		{
-			if (this.TryGetReturnValue(out var returnValue) && Unwrap.ResultIfCompletedTask(returnValue) is IMocked mocked)
+			return this.ReturnsMock(out mock) == true;
+		}
+
+		public bool? ReturnsMock(out Mock mock)
+		{
+			if (this.TryGetReturnValue(out var returnValue))
 			{
-				mock = mocked.Mock;
-				return true;
+				if (Unwrap.ResultIfCompletedTask(returnValue) is IMocked mocked)
+				{
+					mock = mocked.Mock;
+					return true;
+				}
+				else
+				{
+					mock = null;
+					return false;
+				}
 			}
 			else
 			{
 				mock = null;
-				return false;
+				return null;
 			}
 		}
 

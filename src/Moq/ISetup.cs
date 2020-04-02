@@ -43,9 +43,47 @@ namespace Moq
 		bool IsVerifiable { get; }
 
 		/// <summary>
+		///   Returns the <see cref="Mock"/> instance to which this setup belongs.
+		/// </summary>
+		Mock Mock { get; }
+
+		/// <summary>
 		///   Gets whether this setup was matched by at least one invocation on the mock.
 		/// </summary>
 		bool WasMatched { get; }
+
+		/// <summary>
+		///   Gets whether this setup is part of a "fluent" setup
+		///   (that is, one with a setup expression involving member chaining).
+		///   If so, the fluent setup of which this one is a part is returned via the <see langword="out"/> parameter <paramref name="fluentSetup"/>.
+		/// </summary>
+		/// <param name="fluentSetup">
+		///   If this setup is part of a fluent setup,
+		///   this <see langword="out"/> parameter will be set to the latter.
+		/// </param>
+		/// <returns>
+		///   <see langword="true"/> if this setup is part of a fluent setup;
+		///   otherwise, <see langword="false"/>.
+		/// </returns>
+		/// <seealso cref="IFluentSetup"/>
+		bool IsPartOfFluentSetup(out IFluentSetup fluentSetup);
+
+		/// <summary>
+		///   Gets whether this setup returns a mock object.
+		///   If so, the corresponding <see cref="Mock"/> instance is returned via the <see langword="out"/> parameter <paramref name="innerMock"/>.
+		/// </summary>
+		/// <param name="innerMock">
+		///   If this setup returns a mock object,
+		///   this <see langword="out"/> parameter will be set to the corresponding <see cref="Mock"/> instance.
+		/// </param>
+		/// <returns>
+		///   <list type="bullet">
+		///     <item><see langword="true"/> if this setup returns a mock object;</item>
+		///     <item><see langword="false"/> if it does not return a mock object;</item>
+		///     <item><see langword="null"/> if the return value cannot be determined without risking any side effects.</item>
+		///   </list>
+		/// </returns>
+		bool? ReturnsMock(out Mock innerMock);
 
 		/// <summary>
 		///   Verifies this setup and optionally all verifiable setups of its inner mock (if present and known).
