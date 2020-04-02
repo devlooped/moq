@@ -94,15 +94,28 @@ namespace Moq
 
 		public bool ReturnsInnerMock(out Mock mock)
 		{
-			if (this.TryGetReturnValue(out var returnValue) && Unwrap.ResultIfCompletedTask(returnValue) is IMocked mocked)
+			return this.ReturnsMock(out mock) == true;
+		}
+
+		public bool? ReturnsMock(out Mock mock)
+		{
+			if (this.TryGetReturnValue(out var returnValue))
 			{
-				mock = mocked.Mock;
-				return true;
+				if (Unwrap.ResultIfCompletedTask(returnValue) is IMocked mocked)
+				{
+					mock = mocked.Mock;
+					return true;
+				}
+				else
+				{
+					mock = null;
+					return false;
+				}
 			}
 			else
 			{
 				mock = null;
-				return false;
+				return null;
 			}
 		}
 
