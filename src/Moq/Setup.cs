@@ -12,14 +12,16 @@ namespace Moq
 	internal abstract class Setup : ISetup
 	{
 		private readonly InvocationShape expectation;
+		private readonly FluentSetup fluentSetup;
 		private readonly Mock mock;
 		private Flags flags;
 
-		protected Setup(Mock mock, InvocationShape expectation)
+		protected Setup(FluentSetup fluentSetup, Mock mock, InvocationShape expectation)
 		{
 			Debug.Assert(mock != null);
 			Debug.Assert(expectation != null);
 
+			this.fluentSetup = fluentSetup;
 			this.expectation = expectation;
 			this.mock = mock;
 		}
@@ -41,6 +43,11 @@ namespace Moq
 		public Mock Mock => this.mock;
 
 		public bool WasMatched => (this.flags & Flags.Matched) != 0;
+
+		public bool IsPartOfFluentSetup(out IFluentSetup fluentSetup)
+		{
+			return (fluentSetup = this.fluentSetup) != null;
+		}
 
 		public void Execute(Invocation invocation)
 		{

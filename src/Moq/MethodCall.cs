@@ -27,8 +27,8 @@ namespace Moq
 
 		private string declarationSite;
 
-		public MethodCall(Mock mock, Condition condition, InvocationShape expectation)
-			: base(mock, expectation)
+		public MethodCall(FluentSetup fluentSetup, Mock mock, Condition condition, InvocationShape expectation)
+			: base(fluentSetup, mock, expectation)
 		{
 			this.condition = condition;
 			this.flags = expectation.Method.ReturnType != typeof(void) ? Flags.MethodIsNonVoid : 0;

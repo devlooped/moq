@@ -48,6 +48,22 @@ namespace Moq
 		bool WasMatched { get; }
 
 		/// <summary>
+		///   Gets whether this setup is part of a "fluent" setup
+		///   (that is, one with a setup expression involving member chaining).
+		///   If so, the fluent setup of which this one is a part is returned via the <see langword="out"/> parameter <paramref name="fluentSetup"/>.
+		/// </summary>
+		/// <param name="fluentSetup">
+		///   If this setup is part of a fluent setup,
+		///   this <see langword="out"/> parameter will be set to the latter.
+		/// </param>
+		/// <returns>
+		///   <see langword="true"/> if this setup is part of a fluent setup;
+		///   otherwise, <see langword="false"/>.
+		/// </returns>
+		/// <seealso cref="IFluentSetup"/>
+		bool IsPartOfFluentSetup(out IFluentSetup fluentSetup);
+
+		/// <summary>
 		///   Gets whether this setup returns a mock object.
 		///   If so, the corresponding <see cref="Mock"/> instance is returned via the <see langword="out"/> parameter <paramref name="innerMock"/>.
 		/// </summary>

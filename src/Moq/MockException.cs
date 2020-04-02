@@ -169,7 +169,7 @@ namespace Moq
 					setup));
 		}
 
-		internal static MockException FromInnerMockOf(Setup setup, MockException error)
+		internal static MockException FromInnerMockOf(ISetup setup, MockException error)
 		{
 			var message = new StringBuilder();
 

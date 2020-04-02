@@ -517,9 +517,9 @@ namespace Moq
 		{
 			Guard.NotNull(expression, nameof(expression));
 
-			return Mock.SetupRecursive(mock, expression, setupLast: (part, targetMock) =>
+			return Mock.SetupRecursive(mock, expression, setupLast: (part, targetMock, fluentSetup) =>
 			{
-				var setup = new MethodCall(targetMock, condition, expectation: part);
+				var setup = new MethodCall(fluentSetup, targetMock, condition, expectation: part);
 				targetMock.MutableSetups.Add(setup);
 				return setup;
 			});
@@ -566,32 +566,40 @@ namespace Moq
 		{
 			Guard.NotNull(expression, nameof(expression));
 
-			return Mock.SetupRecursive(mock, expression, setupLast: (part, targetMock) =>
+			return Mock.SetupRecursive(mock, expression, setupLast: (part, targetMock, fluentSetup) =>
 			{
-				var setup = new SequenceSetup(targetMock, expectation: part);
+				var setup = new SequenceSetup(fluentSetup, targetMock, expectation: part);
 				targetMock.MutableSetups.Add(setup);
 				return setup;
 			});
 		}
 
-		private static TSetup SetupRecursive<TSetup>(Mock mock, LambdaExpression expression, Func<InvocationShape, Mock, TSetup> setupLast)
+		private static TSetup SetupRecursive<TSetup>(Mock mock, LambdaExpression expression, Func<InvocationShape, Mock, FluentSetup, TSetup> setupLast)
+			where TSetup : ISetup
 		{
 			Debug.Assert(mock != null);
 			Debug.Assert(expression != null);
 			Debug.Assert(setupLast != null);
 
 			var parts = expression.Split();
-			return Mock.SetupRecursive(mock, expression, parts, setupLast);
+			var fluentSetup = parts.Count > 1 ? new FluentSetup(expression) : null;
+			return Mock.SetupRecursive(fluentSetup, mock, expression, parts, setupLast);
 		}
 
-		private static TSetup SetupRecursive<TSetup>(Mock mock, LambdaExpression expression, Stack<InvocationShape> parts, Func<InvocationShape, Mock, TSetup> setupLast)
+		private static TSetup SetupRecursive<TSetup>(FluentSetup fluentSetup, Mock mock, LambdaExpression expression, Stack<InvocationShape> parts, Func<InvocationShape, Mock, FluentSetup, TSetup> setupLast)
+			where TSetup : ISetup
 		{
 			var part = parts.Pop();
 			var (expr, method, arguments) = part;
 
 			if (parts.Count == 0)
 			{
-				return setupLast(part, mock);
+				var setup = setupLast(part, mock, fluentSetup);
+				fluentSetup?.AddPart(setup);
+#if DEBUG
+				fluentSetup?.MarkAsComplete();
+#endif
+				return setup;
 			}
 			else
 			{
@@ -607,12 +615,13 @@ namespace Moq
 								Resources.UnsupportedExpression,
 								expr.ToStringFixed() + " in " + expression.ToStringFixed() + ":\n" + Resources.TypeNotMockable));
 					}
-					setup = new InnerMockSetup(mock, expectation: part, returnValue);
+					setup = new InnerMockSetup(fluentSetup, mock, expectation: part, returnValue);
+					fluentSetup.AddPart(setup);
 					mock.MutableSetups.Add((Setup)setup);
 				}
 				Debug.Assert(innerMock != null);
 
-				return Mock.SetupRecursive(innerMock, expression, parts, setupLast);
+				return Mock.SetupRecursive(fluentSetup, innerMock, expression, parts, setupLast);
 			}
 		}
 
@@ -804,7 +813,7 @@ namespace Moq
 				Debug.Assert(property.CanRead(out var getter) && invocation.Method == getter);
 			}
 
-			this.MutableSetups.Add(new InnerMockSetup(this, new InvocationShape(expression, invocation.Method, arguments, exactGenericTypeArguments: true), returnValue));
+			this.MutableSetups.Add(new InnerMockSetup(fluentSetup: null, this, new InvocationShape(expression, invocation.Method, arguments, exactGenericTypeArguments: true), returnValue));
 		}
 
 		#endregion

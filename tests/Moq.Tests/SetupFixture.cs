@@ -1,7 +1,9 @@
 // Copyright (c) 2007, Clarius Consulting, Manas Technology Solutions, InSTEDD.
 // All rights reserved. Licensed under the BSD 3-Clause License; see License.txt.
 
+using System;
 using System.Linq;
+using System.Linq.Expressions;
 using System.Threading.Tasks;
 
 using Xunit;
@@ -107,6 +109,157 @@ namespace Moq.Tests
 		}
 
 		[Fact]
+		public void IsPartOfFluentSetup_returns_false_for_simple_property_access()
+		{
+			var mock = new Mock<IX>();
+			mock.Setup(m => m.Inner);
+			var setup = mock.Setups.First();
+
+			Assert.False(setup.IsPartOfFluentSetup(out _));
+		}
+
+		[Fact]
+		public void IsPartOfFluentSetup_returns_false_for_simple_indexer_access()
+		{
+			var mock = new Mock<IX>();
+			mock.Setup(m => m[1]);
+			var setup = mock.Setups.First();
+
+			Assert.False(setup.IsPartOfFluentSetup(out _));
+		}
+
+		[Fact]
+		public void IsPartOfFluentSetup_returns_false_for_simple_method_call()
+		{
+			var mock = new Mock<IX>();
+			mock.Setup(m => m.ToString());
+			var setup = mock.Setups.First();
+
+			Assert.False(setup.IsPartOfFluentSetup(out _));
+		}
+
+		[Fact]
+		public void IsPartOfFluentSetup_returns_false_for_simple_expression_in_Mock_Of()
+		{
+			var mockObject = Mock.Of<IX>(m => m.Property == null);
+			var setup = Mock.Get(mockObject).Setups.First();
+
+			Assert.False(setup.IsPartOfFluentSetup(out _));
+		}
+
+		[Fact]
+		public void IsPartOfFluentSetup_returns_true_for_multi_dot_expression()
+		{
+			var mock = new Mock<IX>();
+			mock.Setup(m => m.Inner.ToString());
+			var setup = mock.Setups.First();
+
+			Assert.True(setup.IsPartOfFluentSetup(out var fluentSetup));
+			Assert.NotNull(fluentSetup);
+		}
+
+		[Fact]
+		public void IsPartOfFluentSetup_returns_true_for_multi_dot_expression_in_Mock_Of()
+		{
+			var mockObject = Mock.Of<IX>(m => m.Inner.Property == null);
+			var setup = Mock.Get(mockObject).Setups.First();
+
+			Assert.True(setup.IsPartOfFluentSetup(out var fluentSetup));
+			Assert.NotNull(fluentSetup);
+		}
+
+		[Fact]
+		public void IsPartOfFluentSetup_returns_fluent_setup_for_whole_multi_dot_expression()
+		{
+			Expression<Func<IX, string>> setupExpression = m => m.Inner[1].ToString();
+			var mock = new Mock<IX>();
+			mock.Setup(setupExpression);
+			var setup = mock.Setups.First();
+
+			Assert.True(setup.IsPartOfFluentSetup(out var fluentSetup));
+			Assert.Equal(setupExpression, fluentSetup.Expression, ExpressionComparer.Default);
+		}
+
+		[Fact]
+		public void IsPartOfFluentSetup_returns_fluent_setup_for_multi_dot_expression_on_left_hand_side_in_Mock_Of()
+		{
+			Expression<Func<IX, bool>> mockSpecification = m => m.Inner[1].ToString() == "";
+			Expression<Func<IX, string>> setupExpression = m => m.Inner[1].ToString();
+			var mockObject = Mock.Of<IX>(mockSpecification);
+			var setup = Mock.Get(mockObject).Setups.First();
+
+			Assert.True(setup.IsPartOfFluentSetup(out var fluentSetup));
+			Assert.Equal(setupExpression, fluentSetup.Expression, ExpressionComparer.Default);
+		}
+
+		[Fact]
+		public void IsPartOfFluentSetup_returns_fluent_setup_where_each_part_belongs_to_it()
+		{
+			var mock = new Mock<IX>();
+			mock.Setup(m => m.Inner[1].ToString());
+			var setup = mock.Setups.First();
+
+			Assert.True(setup.IsPartOfFluentSetup(out var expectedFluentSetup));
+			Assert.All(expectedFluentSetup.Parts, part =>
+			{
+				Assert.True(part.IsPartOfFluentSetup(out var actualFluentSetup));
+				Assert.Same(expectedFluentSetup, actualFluentSetup);
+			});
+		}
+
+		[Fact]
+		public void IsPartOfFluentSetup_Verify_succeeds_if_all_parts_of_expression_were_matched_even_when_recursive_false()
+		{
+			var mock = new Mock<IX>();
+			mock.Setup(m => m.Inner[1].ToString());
+			_ = mock.Setups.First().IsPartOfFluentSetup(out var fluentSetup);
+
+			_ = mock.Object.Inner[1].ToString();
+
+			// `recursive` should not have any effect because `fluentSetup` is logically a single setup
+			// (even though internally it has several parts), so there is no inner mock to proceed to.
+			fluentSetup.Verify(recursive: false);
+		}
+
+		[Fact]
+		public void IsPartOfFluentSetup_Verify_fails_if_not_all_parts_of_expression_were_matched()
+		{
+			var mock = new Mock<IX>();
+			mock.Setup(m => m.Inner[1].ToString());
+			_ = mock.Setups.First().IsPartOfFluentSetup(out var fluentSetup);
+
+			_ = mock.Object.Inner[1];
+
+			Assert.Throws<MockException>(() => fluentSetup.Verify());
+		}
+
+		[Fact]
+		public void IsPartOfFluentSetup_Verify_with_recursive_true_fails_if_inner_mock_has_unmatched_setup()
+		{
+			var innerMock = new Mock<IX>();
+			innerMock.Setup(m => m.OtherProperty).Verifiable();
+
+			var mock = new Mock<IX>();
+			mock.Setup(m => m.Inner[1].Property).Returns(innerMock.Object);
+			_ = mock.Setups.First().IsPartOfFluentSetup(out var fluentSetup);
+
+			_ = mock.Object.Inner[1].Property;
+
+			fluentSetup.Verify(recursive: false);  // it isn't the composite setup itself that should fail verification...
+			Assert.Throws<MockException>(() => fluentSetup.Verify(recursive: true));  // ...but its inner mock.
+		}
+
+		[Fact]
+		public void IsPartOfFluentSetup_of_fluent_setup_returns_false()
+		{
+			var mock = new Mock<IX>();
+			mock.Setup(m => m.Inner[1].Property);
+			_ = mock.Setups.First().IsPartOfFluentSetup(out var fluentSetup);
+
+			Assert.False(fluentSetup.IsPartOfFluentSetup(out _));
+		}
+
+		[Fact]
 		public void ReturnsMock_returns_null_if_return_value_cannot_be_determined_safely()
 		{
 			var mock = new Mock<IX>();
@@ -182,6 +335,29 @@ namespace Moq.Tests
 
 			Assert.True(setup.ReturnsMock(out var actualInnerMock));
 			Assert.Same(expectedInnerMock, actualInnerMock);
+		}
+
+		[Fact]
+		public void ReturnsMock_of_fluent_setup_without_inner_mock()
+		{
+			var mock = new Mock<IX>();
+			mock.Setup(m => m.Inner[1].Property);
+			_ = mock.Setups.First().IsPartOfFluentSetup(out var fluentSetup);
+
+			Assert.True(fluentSetup.ReturnsMock(out _) != true);  // sic! (three-valued logic)
+		}
+
+		[Fact]
+		public void ReturnsMock_of_fluent_setup_with_inner_mock()
+		{
+			var innerMock = new Mock<IX>();
+			innerMock.Setup(m => m.OtherProperty);
+
+			var mock = new Mock<IX>();
+			mock.Setup(m => m.Inner[1].Property).Returns(innerMock.Object);
+			_ = mock.Setups.First().IsPartOfFluentSetup(out var fluentSetup);
+
+			Assert.True(fluentSetup.ReturnsMock(out _));
 		}
 
 		[Fact]
@@ -364,8 +540,10 @@ namespace Moq.Tests
 
 		public interface IX
 		{
+			IX this[int index] { get; }
 			IX Inner { get; }
 			object Property { get; set; }
+			object OtherProperty { get; set; }
 			Task<IX> GetInnerTaskAsync();
 			ValueTask<IX> GetInnerValueTaskAsync();
 		}
