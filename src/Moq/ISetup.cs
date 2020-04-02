@@ -43,6 +43,11 @@ namespace Moq
 		bool IsVerifiable { get; }
 
 		/// <summary>
+		///   Returns the <see cref="Mock"/> instance to which this setup belongs.
+		/// </summary>
+		Mock Mock { get; }
+
+		/// <summary>
 		///   Gets whether this setup was matched by at least one invocation on the mock.
 		/// </summary>
 		bool WasMatched { get; }

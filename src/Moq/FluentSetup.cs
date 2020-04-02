@@ -33,6 +33,8 @@ namespace Moq
 
 		public bool IsVerifiable => this.parts.Last().IsVerifiable;
 
+		public Mock Mock => this.parts.First().Mock;
+
 		public IReadOnlyList<ISetup> Parts => this.parts;
 
 		public bool WasMatched => this.parts.All(p => p.WasMatched);
