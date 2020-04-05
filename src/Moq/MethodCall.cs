@@ -254,17 +254,27 @@ namespace Moq
 				// already is the return value.
 				this.returnOrThrowResponse = new ReturnEagerValueResponse(valueFactory);
 			}
-			else if (valueFactory.GetType() == typeof(Func<IInvocation, object>))
+			else if (IsInvocationFunc(valueFactory))
 			{
-				// NOTE: Do NOT rewrite the above condition as `valueFactory is Func<IInvocation, object>`,
-				// for similar reasons as noted above in `SetCallbackResponse`. We want to test for this
-				// particular delegate type and no others that may happen to be implicitly convertible to it!
-				this.returnOrThrowResponse = new ReturnInvocationLazyValueResponse((Func<IInvocation, object>)valueFactory);
+				this.returnOrThrowResponse = new ReturnInvocationLazyValueResponse(valueFactory);
 			}
 			else
 			{
 				ValidateCallback(valueFactory);
 				this.returnOrThrowResponse = new ReturnLazyValueResponse(valueFactory);
+			}
+
+			bool IsInvocationFunc(Delegate callback)
+			{
+				var type = callback.GetType();
+				if (type.IsGenericType && type.GetGenericTypeDefinition() == typeof(Func<,>))
+				{
+					var typeArguments = type.GetGenericArguments();
+					return typeArguments[0] == typeof(IInvocation)
+						&& (typeArguments[1] == typeof(object) || this.Method.ReturnType.IsAssignableFrom(typeArguments[1]));
+				}
+
+				return false;
 			}
 
 			void ValidateCallback(Delegate callback)
@@ -474,9 +484,9 @@ namespace Moq
 
 		private sealed class ReturnInvocationLazyValueResponse : Response
 		{
-			private readonly Func<IInvocation, object> valueFactory;
+			private readonly Delegate valueFactory;
 
-			public ReturnInvocationLazyValueResponse(Func<IInvocation, object> valueFactory)
+			public ReturnInvocationLazyValueResponse(Delegate valueFactory)
 			{
 				Debug.Assert(valueFactory != null);
 
@@ -485,7 +495,7 @@ namespace Moq
 
 			public override void RespondTo(Invocation invocation)
 			{
-				invocation.Return(this.valueFactory.Invoke(invocation));
+				invocation.Return(this.valueFactory.DynamicInvoke(invocation));
 			}
 		}
 
