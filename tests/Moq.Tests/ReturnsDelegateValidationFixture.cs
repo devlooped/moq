@@ -80,6 +80,27 @@ namespace Moq.Tests
 			this.setup.Returns(callback);
 		}
 
+		[Fact]
+		public void Returns_accepts_Func_of_IInvocation_and_assignable_return_type()
+		{
+			Func<IInvocation, bool> callback = invocation => true;
+			this.setup.Returns(callback);
+		}
+
+		[Fact]
+		public void Returns_accepts_Func_of_IInvocation_and_object()
+		{
+			Func<IInvocation, object> callback = invocation => true;
+			this.setup.Returns(callback);
+		}
+
+		[Fact]
+		public void Returns_does_not_accept_Func_of_IInvocation_and_incompatible_return_type()
+		{
+			Func<IInvocation, string> callback = invocation => "true";
+			Assert.Throws<ArgumentException>(() => this.setup.Returns(callback));
+		}
+
 		public interface IFoo
 		{
 			bool Func(int x);
