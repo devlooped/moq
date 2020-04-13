@@ -9,8 +9,8 @@ namespace Moq
 	{
 		private readonly object returnValue;
 
-		public InnerMockSetup(FluentSetup fluentSetup, Mock mock, InvocationShape expectation, object returnValue)
-			: base(fluentSetup, mock, expectation)
+		public InnerMockSetup(IFluentSetup originalSetup, Mock mock, InvocationShape expectation, object returnValue)
+			: base(originalSetup, mock, expectation)
 		{
 			Debug.Assert(Unwrap.ResultIfCompletedTask(returnValue) is IMocked);
 

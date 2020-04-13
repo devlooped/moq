@@ -48,25 +48,31 @@ namespace Moq
 		Mock Mock { get; }
 
 		/// <summary>
+		///   Returns the original setup as it would appear in user code.
+		///   <para>
+		///     For setups doing a simple member access or method invocation (such as <c>`mock => mock.Member`</c>),
+		///     this property will simply return the same <see cref="ISetup"/> instance.
+		///   </para>
+		///   <para>
+		///     For setups whose expression involves member chaining (such as <c>`parent => parent.Child.Member`</c>),
+		///     Moq does not create a single setup, but one for each member access/invocation.
+		///     The example just given will result in two setups:
+		///     <list type="number">
+		///       <item>a setup for <c>`parent => parent.Child`</c> on the parent mock; and</item>
+		///       <item>on its inner mock, a setup for <c>`(child) => (child).Member`</c>.</item>
+		///     </list>
+		///     These are the setups that will be put in the mocks' <see cref="Mock.Setups"/> collections;
+		///     for both of those, <see cref="OriginalSetup"/> will return the same <see cref="IFluentSetup"/>
+		///     whose <see cref="ISetup.Expression"/> represents the original, fluent setup expression.
+		///   </para>
+		/// </summary>
+		/// <seealso cref="IFluentSetup"/>
+		ISetup OriginalSetup { get; }
+
+		/// <summary>
 		///   Gets whether this setup was matched by at least one invocation on the mock.
 		/// </summary>
 		bool WasMatched { get; }
-
-		/// <summary>
-		///   Gets whether this setup is part of a "fluent" setup
-		///   (that is, one with a setup expression involving member chaining).
-		///   If so, the fluent setup of which this one is a part is returned via the <see langword="out"/> parameter <paramref name="fluentSetup"/>.
-		/// </summary>
-		/// <param name="fluentSetup">
-		///   If this setup is part of a fluent setup,
-		///   this <see langword="out"/> parameter will be set to the latter.
-		/// </param>
-		/// <returns>
-		///   <see langword="true"/> if this setup is part of a fluent setup;
-		///   otherwise, <see langword="false"/>.
-		/// </returns>
-		/// <seealso cref="IFluentSetup"/>
-		bool IsPartOfFluentSetup(out IFluentSetup fluentSetup);
 
 		/// <summary>
 		///   Gets whether this setup returns a mock object.

@@ -35,6 +35,8 @@ namespace Moq
 
 		public Mock Mock => this.parts.First().Mock;
 
+		public ISetup OriginalSetup => this;
+
 		public IReadOnlyList<ISetup> Parts => this.parts;
 
 		public bool WasMatched => this.parts.All(p => p.WasMatched);
@@ -64,12 +66,6 @@ namespace Moq
 			this.complete = true;
 		}
 #endif
-
-		public bool IsPartOfFluentSetup(out IFluentSetup fluentSetup)
-		{
-			fluentSetup = null;
-			return false;
-		}
 
 		public bool ReturnsMock(out Mock innerMock)
 		{

@@ -109,110 +109,108 @@ namespace Moq.Tests
 		}
 
 		[Fact]
-		public void IsPartOfFluentSetup_returns_false_for_simple_property_access()
+		public void OriginalSetup_returns_self_for_simple_property_access()
 		{
 			var mock = new Mock<IX>();
 			mock.Setup(m => m.Inner);
 			var setup = mock.Setups.First();
 
-			Assert.False(setup.IsPartOfFluentSetup(out _));
+			Assert.Same(setup, setup.OriginalSetup);
 		}
 
 		[Fact]
-		public void IsPartOfFluentSetup_returns_false_for_simple_indexer_access()
+		public void OriginalSetup_returns_self_for_simple_indexer_access()
 		{
 			var mock = new Mock<IX>();
 			mock.Setup(m => m[1]);
 			var setup = mock.Setups.First();
 
-			Assert.False(setup.IsPartOfFluentSetup(out _));
+			Assert.Same(setup, setup.OriginalSetup);
 		}
 
 		[Fact]
-		public void IsPartOfFluentSetup_returns_false_for_simple_method_call()
+		public void OriginalSetup_returns_self_for_simple_method_call()
 		{
 			var mock = new Mock<IX>();
 			mock.Setup(m => m.ToString());
 			var setup = mock.Setups.First();
 
-			Assert.False(setup.IsPartOfFluentSetup(out _));
+			Assert.Same(setup, setup.OriginalSetup);
 		}
 
 		[Fact]
-		public void IsPartOfFluentSetup_returns_false_for_simple_expression_in_Mock_Of()
+		public void OriginalSetup_returns_self_for_simple_expression_in_Mock_Of()
 		{
 			var mockObject = Mock.Of<IX>(m => m.Property == null);
 			var setup = Mock.Get(mockObject).Setups.First();
 
-			Assert.False(setup.IsPartOfFluentSetup(out _));
+			Assert.Same(setup, setup.OriginalSetup);
 		}
 
 		[Fact]
-		public void IsPartOfFluentSetup_returns_true_for_multi_dot_expression()
+		public void OriginalSetup_returns_fluent_setup_for_multi_dot_expression()
 		{
 			var mock = new Mock<IX>();
 			mock.Setup(m => m.Inner.ToString());
 			var setup = mock.Setups.First();
 
-			Assert.True(setup.IsPartOfFluentSetup(out var fluentSetup));
-			Assert.NotNull(fluentSetup);
+			Assert.IsAssignableFrom<IFluentSetup>(setup.OriginalSetup);
 		}
 
 		[Fact]
-		public void IsPartOfFluentSetup_returns_true_for_multi_dot_expression_in_Mock_Of()
+		public void OriginalSetup_returns_fluent_setup_for_multi_dot_expression_in_Mock_Of()
 		{
 			var mockObject = Mock.Of<IX>(m => m.Inner.Property == null);
 			var setup = Mock.Get(mockObject).Setups.First();
 
-			Assert.True(setup.IsPartOfFluentSetup(out var fluentSetup));
-			Assert.NotNull(fluentSetup);
+			Assert.IsAssignableFrom<IFluentSetup>(setup.OriginalSetup);
 		}
 
 		[Fact]
-		public void IsPartOfFluentSetup_returns_fluent_setup_for_whole_multi_dot_expression()
+		public void OriginalSetup_returns_fluent_setup_for_whole_multi_dot_expression()
 		{
 			Expression<Func<IX, string>> setupExpression = m => m.Inner[1].ToString();
 			var mock = new Mock<IX>();
 			mock.Setup(setupExpression);
 			var setup = mock.Setups.First();
 
-			Assert.True(setup.IsPartOfFluentSetup(out var fluentSetup));
+			var fluentSetup = Assert.IsAssignableFrom<IFluentSetup>(setup.OriginalSetup);
 			Assert.Equal(setupExpression, fluentSetup.Expression, ExpressionComparer.Default);
 		}
 
 		[Fact]
-		public void IsPartOfFluentSetup_returns_fluent_setup_for_multi_dot_expression_on_left_hand_side_in_Mock_Of()
+		public void OriginalSetup_returns_fluent_setup_for_multi_dot_expression_on_left_hand_side_in_Mock_Of()
 		{
 			Expression<Func<IX, bool>> mockSpecification = m => m.Inner[1].ToString() == "";
 			Expression<Func<IX, string>> setupExpression = m => m.Inner[1].ToString();
 			var mockObject = Mock.Of<IX>(mockSpecification);
 			var setup = Mock.Get(mockObject).Setups.First();
 
-			Assert.True(setup.IsPartOfFluentSetup(out var fluentSetup));
+			var fluentSetup = Assert.IsAssignableFrom<IFluentSetup>(setup.OriginalSetup);
 			Assert.Equal(setupExpression, fluentSetup.Expression, ExpressionComparer.Default);
 		}
 
 		[Fact]
-		public void IsPartOfFluentSetup_returns_fluent_setup_where_each_part_belongs_to_it()
+		public void OriginalSetup_returns_fluent_setup_where_each_part_belongs_to_it()
 		{
 			var mock = new Mock<IX>();
 			mock.Setup(m => m.Inner[1].ToString());
 			var setup = mock.Setups.First();
 
-			Assert.True(setup.IsPartOfFluentSetup(out var expectedFluentSetup));
+			var expectedFluentSetup = Assert.IsAssignableFrom<IFluentSetup>(setup.OriginalSetup);
 			Assert.All(expectedFluentSetup.Parts, part =>
 			{
-				Assert.True(part.IsPartOfFluentSetup(out var actualFluentSetup));
+				var actualFluentSetup = Assert.IsAssignableFrom<IFluentSetup>(part.OriginalSetup);
 				Assert.Same(expectedFluentSetup, actualFluentSetup);
 			});
 		}
 
 		[Fact]
-		public void IsPartOfFluentSetup_Verify_succeeds_if_all_parts_of_expression_were_matched_even_when_recursive_false()
+		public void Fluent_OriginalSetup_Verify_succeeds_if_all_parts_of_expression_were_matched_even_when_recursive_false()
 		{
 			var mock = new Mock<IX>();
 			mock.Setup(m => m.Inner[1].ToString());
-			_ = mock.Setups.First().IsPartOfFluentSetup(out var fluentSetup);
+			var fluentSetup = Assert.IsAssignableFrom<IFluentSetup>(mock.Setups.First().OriginalSetup);
 
 			_ = mock.Object.Inner[1].ToString();
 
@@ -222,11 +220,11 @@ namespace Moq.Tests
 		}
 
 		[Fact]
-		public void IsPartOfFluentSetup_Verify_fails_if_not_all_parts_of_expression_were_matched()
+		public void Fluent_OriginalSetup_Verify_fails_if_not_all_parts_of_expression_were_matched()
 		{
 			var mock = new Mock<IX>();
 			mock.Setup(m => m.Inner[1].ToString());
-			_ = mock.Setups.First().IsPartOfFluentSetup(out var fluentSetup);
+			var fluentSetup = Assert.IsAssignableFrom<IFluentSetup>(mock.Setups.First().OriginalSetup);
 
 			_ = mock.Object.Inner[1];
 
@@ -234,14 +232,14 @@ namespace Moq.Tests
 		}
 
 		[Fact]
-		public void IsPartOfFluentSetup_Verify_with_recursive_true_fails_if_inner_mock_has_unmatched_setup()
+		public void Fluent_OriginalSetup_Verify_with_recursive_true_fails_if_inner_mock_has_unmatched_setup()
 		{
 			var innerMock = new Mock<IX>();
 			innerMock.Setup(m => m.OtherProperty).Verifiable();
 
 			var mock = new Mock<IX>();
 			mock.Setup(m => m.Inner[1].Property).Returns(innerMock.Object);
-			_ = mock.Setups.First().IsPartOfFluentSetup(out var fluentSetup);
+			var fluentSetup = Assert.IsAssignableFrom<IFluentSetup>(mock.Setups.First().OriginalSetup);
 
 			_ = mock.Object.Inner[1].Property;
 
@@ -250,13 +248,13 @@ namespace Moq.Tests
 		}
 
 		[Fact]
-		public void IsPartOfFluentSetup_of_fluent_setup_returns_false()
+		public void OriginalSetup_of_fluent_setup_returns_self()
 		{
 			var mock = new Mock<IX>();
 			mock.Setup(m => m.Inner[1].Property);
-			_ = mock.Setups.First().IsPartOfFluentSetup(out var fluentSetup);
+			var fluentSetup = Assert.IsAssignableFrom<IFluentSetup>(mock.Setups.First().OriginalSetup);
 
-			Assert.False(fluentSetup.IsPartOfFluentSetup(out _));
+			Assert.Same(fluentSetup, fluentSetup.OriginalSetup);
 		}
 
 		[Fact]
@@ -342,9 +340,9 @@ namespace Moq.Tests
 		{
 			var mock = new Mock<IX>();
 			mock.Setup(m => m.Inner[1].Property);
-			_ = mock.Setups.First().IsPartOfFluentSetup(out var fluentSetup);
+			var fluentSetup = Assert.IsAssignableFrom<IFluentSetup>(mock.Setups.First().OriginalSetup);
 
-			Assert.True(fluentSetup.ReturnsMock(out _));
+			Assert.True(fluentSetup.ReturnsMock(out _) != true);  // sic! (three-valued logic)
 		}
 
 		[Fact]
@@ -355,7 +353,7 @@ namespace Moq.Tests
 
 			var mock = new Mock<IX>();
 			mock.Setup(m => m.Inner[1].Property).Returns(innerMock.Object);
-			_ = mock.Setups.First().IsPartOfFluentSetup(out var fluentSetup);
+			var fluentSetup = Assert.IsAssignableFrom<IFluentSetup>(mock.Setups.First().OriginalSetup);
 
 			Assert.True(fluentSetup.ReturnsMock(out _));
 		}
