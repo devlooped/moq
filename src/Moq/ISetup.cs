@@ -77,13 +77,10 @@ namespace Moq
 		///   this <see langword="out"/> parameter will be set to the corresponding <see cref="Mock"/> instance.
 		/// </param>
 		/// <returns>
-		///   <list type="bullet">
-		///     <item><see langword="true"/> if this setup returns a mock object;</item>
-		///     <item><see langword="false"/> if it does not return a mock object;</item>
-		///     <item><see langword="null"/> if the return value cannot be determined without risking any side effects.</item>
-		///   </list>
+		///   <see langword="true"/> if this setup returns a mock object;
+		///   otherwise (when the setup either doesn't return a mock object or when it isn't known if it does), <see langword="false"/>.
 		/// </returns>
-		bool? ReturnsMock(out Mock innerMock);
+		bool ReturnsMock(out Mock innerMock);
 
 		/// <summary>
 		///   Verifies this setup and optionally all verifiable setups of its inner mock (if present and known).

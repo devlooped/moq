@@ -604,7 +604,11 @@ namespace Moq
 			else
 			{
 				Mock innerMock;
-				if (!(mock.MutableSetups.GetInnerMockSetups().TryFind(part, out var setup) && setup.ReturnsInnerMock(out innerMock)))
+				if (mock.MutableSetups.GetInnerMockSetups().TryFind(part, out var setup))
+				{
+					innerMock = setup.GetInnerMock();
+				}
+				else
 				{
 					var returnValue = mock.GetDefaultValue(method, out innerMock, useAlternateProvider: DefaultValueProvider.Mock);
 					if (innerMock == null)
@@ -707,8 +711,9 @@ namespace Moq
 					handlers.InvokePreserveStack(arguments);
 				}
 			}
-			else if (mock.MutableSetups.GetInnerMockSetups().TryFind(part, out var innerMockSetup) && innerMockSetup.ReturnsInnerMock(out var innerMock))
+			else if (mock.MutableSetups.GetInnerMockSetups().TryFind(part, out var innerMockSetup))
 			{
+				var innerMock = innerMockSetup.GetInnerMock();
 				Mock.RaiseEvent(innerMock, expression, parts, arguments);
 			}
 		}

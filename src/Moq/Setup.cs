@@ -67,11 +67,6 @@ namespace Moq
 
 		protected abstract void ExecuteCore(Invocation invocation);
 
-		public Mock GetInnerMock()
-		{
-			return this.ReturnsInnerMock(out var innerMock) ? innerMock : throw new InvalidOperationException();
-		}
-
 		/// <summary>
 		///   Attempts to get this setup's return value without invoking user code
 		///   (which could have side effects beyond Moq's understanding and control).
@@ -99,30 +94,17 @@ namespace Moq
 			return this.expectation.IsMatch(invocation) && (this.Condition == null || this.Condition.IsTrue);
 		}
 
-		public bool ReturnsInnerMock(out Mock mock)
+		public bool ReturnsMock(out Mock innerMock)
 		{
-			return this.ReturnsMock(out mock) == true;
-		}
-
-		public bool? ReturnsMock(out Mock mock)
-		{
-			if (this.TryGetReturnValue(out var returnValue))
+			if (this.TryGetReturnValue(out var returnValue) && Unwrap.ResultIfCompletedTask(returnValue) is IMocked mocked)
 			{
-				if (Unwrap.ResultIfCompletedTask(returnValue) is IMocked mocked)
-				{
-					mock = mocked.Mock;
-					return true;
-				}
-				else
-				{
-					mock = null;
-					return false;
-				}
+				innerMock = mocked.Mock;
+				return true;
 			}
 			else
 			{
-				mock = null;
-				return null;
+				innerMock = null;
+				return false;
 			}
 		}
 
@@ -172,7 +154,7 @@ namespace Moq
 			}
 
 			// optionally verify setups of inner mock (if present and known):
-			if (recursive && this.ReturnsInnerMock(out var innerMock) && !innerMock.TryVerify(predicate, out e) && e.IsVerificationError)
+			if (recursive && this.ReturnsMock(out var innerMock) && !innerMock.TryVerify(predicate, out e) && e.IsVerificationError)
 			{
 				error = MockException.FromInnerMockOf(this, e);
 				return false;

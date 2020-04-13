@@ -71,7 +71,7 @@ namespace Moq
 			return false;
 		}
 
-		public bool? ReturnsMock(out Mock innerMock)
+		public bool ReturnsMock(out Mock innerMock)
 		{
 			return this.parts.Last().ReturnsMock(out innerMock);
 		}

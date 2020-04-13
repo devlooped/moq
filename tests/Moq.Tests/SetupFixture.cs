@@ -260,13 +260,13 @@ namespace Moq.Tests
 		}
 
 		[Fact]
-		public void ReturnsMock_returns_null_if_return_value_cannot_be_determined_safely()
+		public void ReturnsMock_returns_false_if_return_value_cannot_be_determined_safely()
 		{
 			var mock = new Mock<IX>();
 			mock.Setup(m => m.Inner).Returns(() => Mock.Of<IX>());
 			var setup = mock.Setups.First();
 
-			Assert.Null(setup.ReturnsMock(out _));
+			Assert.False(setup.ReturnsMock(out _));
 		}
 
 		[Fact]
@@ -344,7 +344,7 @@ namespace Moq.Tests
 			mock.Setup(m => m.Inner[1].Property);
 			_ = mock.Setups.First().IsPartOfFluentSetup(out var fluentSetup);
 
-			Assert.True(fluentSetup.ReturnsMock(out _) != true);  // sic! (three-valued logic)
+			Assert.True(fluentSetup.ReturnsMock(out _));
 		}
 
 		[Fact]
