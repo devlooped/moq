@@ -418,7 +418,7 @@ namespace Moq
 						// sub-object (inner mock); and that sub-object has to have received at least
 						// one call:
 						var wasTransitiveInvocation = innerMockSetups.TryFind(unverifiedInvocations[i], out var inner)
-						                              && inner.GetInnerMock().MutableInvocations.Any();
+						                              && inner.InnerMock.MutableInvocations.Any();
 						if (wasTransitiveInvocation)
 						{
 							unverifiedInvocations[i] = null;
@@ -438,7 +438,7 @@ namespace Moq
 			// created by "transitive" invocations):
 			foreach (var inner in innerMockSetups)
 			{
-				VerifyNoOtherCalls(inner.GetInnerMock(), verifiedMocks);
+				VerifyNoOtherCalls(inner.InnerMock, verifiedMocks);
 			}
 		}
 
@@ -517,9 +517,9 @@ namespace Moq
 		{
 			Guard.NotNull(expression, nameof(expression));
 
-			return Mock.SetupRecursive(mock, expression, setupLast: (part, targetMock, fluentSetup) =>
+			return Mock.SetupRecursive(mock, expression, setupLast: (part, targetMock, originalSetup) =>
 			{
-				var setup = new MethodCall(fluentSetup, targetMock, condition, expectation: part);
+				var setup = new MethodCall(originalSetup, targetMock, condition, expectation: part);
 				targetMock.MutableSetups.Add(setup);
 				return setup;
 			});
@@ -566,15 +566,15 @@ namespace Moq
 		{
 			Guard.NotNull(expression, nameof(expression));
 
-			return Mock.SetupRecursive(mock, expression, setupLast: (part, targetMock, fluentSetup) =>
+			return Mock.SetupRecursive(mock, expression, setupLast: (part, targetMock, originalSetup) =>
 			{
-				var setup = new SequenceSetup(fluentSetup, targetMock, expectation: part);
+				var setup = new SequenceSetup(originalSetup, targetMock, expectation: part);
 				targetMock.MutableSetups.Add(setup);
 				return setup;
 			});
 		}
 
-		private static TSetup SetupRecursive<TSetup>(Mock mock, LambdaExpression expression, Func<InvocationShape, Mock, FluentSetup, TSetup> setupLast)
+		private static TSetup SetupRecursive<TSetup>(Mock mock, LambdaExpression expression, Func<InvocationShape, Mock, ISetup, TSetup> setupLast)
 			where TSetup : ISetup
 		{
 			Debug.Assert(mock != null);
@@ -586,7 +586,7 @@ namespace Moq
 			return Mock.SetupRecursive(fluentSetup, mock, expression, parts, setupLast);
 		}
 
-		private static TSetup SetupRecursive<TSetup>(FluentSetup fluentSetup, Mock mock, LambdaExpression expression, Stack<InvocationShape> parts, Func<InvocationShape, Mock, FluentSetup, TSetup> setupLast)
+		private static TSetup SetupRecursive<TSetup>(FluentSetup fluentSetup, Mock mock, LambdaExpression expression, Stack<InvocationShape> parts, Func<InvocationShape, Mock, ISetup, TSetup> setupLast)
 			where TSetup : ISetup
 		{
 			var part = parts.Pop();
@@ -604,7 +604,11 @@ namespace Moq
 			else
 			{
 				Mock innerMock;
-				if (!(mock.MutableSetups.GetInnerMockSetups().TryFind(part, out var setup) && setup.ReturnsInnerMock(out innerMock)))
+				if (mock.MutableSetups.GetInnerMockSetups().TryFind(part, out var setup))
+				{
+					innerMock = setup.InnerMock;
+				}
+				else
 				{
 					var returnValue = mock.GetDefaultValue(method, out innerMock, useAlternateProvider: DefaultValueProvider.Mock);
 					if (innerMock == null)
@@ -707,9 +711,9 @@ namespace Moq
 					handlers.InvokePreserveStack(arguments);
 				}
 			}
-			else if (mock.MutableSetups.GetInnerMockSetups().TryFind(part, out var innerMockSetup) && innerMockSetup.ReturnsInnerMock(out var innerMock))
+			else if (mock.MutableSetups.GetInnerMockSetups().TryFind(part, out var innerMockSetup))
 			{
-				Mock.RaiseEvent(innerMock, expression, parts, arguments);
+				Mock.RaiseEvent(innerMockSetup.InnerMock, expression, parts, arguments);
 			}
 		}
 
@@ -813,7 +817,7 @@ namespace Moq
 				Debug.Assert(property.CanRead(out var getter) && invocation.Method == getter);
 			}
 
-			this.MutableSetups.Add(new InnerMockSetup(fluentSetup: null, this, new InvocationShape(expression, invocation.Method, arguments, exactGenericTypeArguments: true), returnValue));
+			this.MutableSetups.Add(new InnerMockSetup(originalSetup: null, this, new InvocationShape(expression, invocation.Method, arguments, exactGenericTypeArguments: true), returnValue));
 		}
 
 		#endregion

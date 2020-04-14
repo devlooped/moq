@@ -27,6 +27,8 @@ namespace Moq
 
 		public LambdaExpression Expression => this.expression;
 
+		public Mock InnerMock => this.parts.Last().InnerMock;
+
 		public bool IsConditional => this.parts.First().IsConditional;
 
 		public bool IsOverridden => this.parts.Any(p => p.IsOverridden);
@@ -34,6 +36,8 @@ namespace Moq
 		public bool IsVerifiable => this.parts.Last().IsVerifiable;
 
 		public Mock Mock => this.parts.First().Mock;
+
+		public ISetup OriginalSetup => this;
 
 		public IReadOnlyList<ISetup> Parts => this.parts;
 
@@ -64,17 +68,6 @@ namespace Moq
 			this.complete = true;
 		}
 #endif
-
-		public bool IsPartOfFluentSetup(out IFluentSetup fluentSetup)
-		{
-			fluentSetup = null;
-			return false;
-		}
-
-		public bool? ReturnsMock(out Mock innerMock)
-		{
-			return this.parts.Last().ReturnsMock(out innerMock);
-		}
 
 		public override string ToString()
 		{

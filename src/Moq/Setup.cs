@@ -12,16 +12,16 @@ namespace Moq
 	internal abstract class Setup : ISetup
 	{
 		private readonly InvocationShape expectation;
-		private readonly FluentSetup fluentSetup;
+		private readonly ISetup originalSetup;
 		private readonly Mock mock;
 		private Flags flags;
 
-		protected Setup(FluentSetup fluentSetup, Mock mock, InvocationShape expectation)
+		protected Setup(ISetup originalSetup, Mock mock, InvocationShape expectation)
 		{
 			Debug.Assert(mock != null);
 			Debug.Assert(expectation != null);
 
-			this.fluentSetup = fluentSetup;
+			this.originalSetup = originalSetup ?? this;
 			this.expectation = expectation;
 			this.mock = mock;
 		}
@@ -31,6 +31,9 @@ namespace Moq
 		public InvocationShape Expectation => this.expectation;
 
 		public LambdaExpression Expression => this.expectation.Expression;
+
+		public Mock InnerMock => this.TryGetReturnValue(out var returnValue)
+		                         && Unwrap.ResultIfCompletedTask(returnValue) is IMocked mocked ? mocked.Mock : null;
 
 		public bool IsConditional => this.Condition != null;
 
@@ -42,12 +45,9 @@ namespace Moq
 
 		public Mock Mock => this.mock;
 
-		public bool WasMatched => (this.flags & Flags.Matched) != 0;
+		public ISetup OriginalSetup => this.originalSetup;
 
-		public bool IsPartOfFluentSetup(out IFluentSetup fluentSetup)
-		{
-			return (fluentSetup = this.fluentSetup) != null;
-		}
+		public bool WasMatched => (this.flags & Flags.Matched) != 0;
 
 		public void Execute(Invocation invocation)
 		{
@@ -66,11 +66,6 @@ namespace Moq
 		}
 
 		protected abstract void ExecuteCore(Invocation invocation);
-
-		public Mock GetInnerMock()
-		{
-			return this.ReturnsInnerMock(out var innerMock) ? innerMock : throw new InvalidOperationException();
-		}
 
 		/// <summary>
 		///   Attempts to get this setup's return value without invoking user code
@@ -97,33 +92,6 @@ namespace Moq
 		public bool Matches(Invocation invocation)
 		{
 			return this.expectation.IsMatch(invocation) && (this.Condition == null || this.Condition.IsTrue);
-		}
-
-		public bool ReturnsInnerMock(out Mock mock)
-		{
-			return this.ReturnsMock(out mock) == true;
-		}
-
-		public bool? ReturnsMock(out Mock mock)
-		{
-			if (this.TryGetReturnValue(out var returnValue))
-			{
-				if (Unwrap.ResultIfCompletedTask(returnValue) is IMocked mocked)
-				{
-					mock = mocked.Mock;
-					return true;
-				}
-				else
-				{
-					mock = null;
-					return false;
-				}
-			}
-			else
-			{
-				mock = null;
-				return null;
-			}
 		}
 
 		public virtual void SetOutParameters(Invocation invocation)
@@ -172,7 +140,7 @@ namespace Moq
 			}
 
 			// optionally verify setups of inner mock (if present and known):
-			if (recursive && this.ReturnsInnerMock(out var innerMock) && !innerMock.TryVerify(predicate, out e) && e.IsVerificationError)
+			if (recursive && this.InnerMock?.TryVerify(predicate, out e) == false && e.IsVerificationError)
 			{
 				error = MockException.FromInnerMockOf(this, e);
 				return false;
