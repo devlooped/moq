@@ -22,18 +22,9 @@ namespace Moq
 		IReadOnlyList<object> Arguments { get; }
 
 		/// <summary>
-		///   Gets whether this invocation was matched by a setup.
-		///   If so, the matching setup is returned via the <see langword="out"/> parameter <paramref name="matchingSetup"/>.
+		///   Gets the setup that matched this invocation (or <see langword="null"/> if there was no matching setup).
 		/// </summary>
-		/// <param name="matchingSetup">
-		///   If this invocation was matched by a setup,
-		///   this <see langword="out"/> parameter will be set to the matching setup.
-		/// </param>
-		/// <returns>
-		///   <see langword="true"/> if this invocation was matched by a setup;
-		///   otherwise, <see langword="false"/>.
-		/// </returns>
-		bool WasMatched(out ISetup matchingSetup);
+		ISetup MatchingSetup { get; }
 
 		/// <summary>
 		///   Gets whether this invocation was successfully verified by any of the various <c>`Verify`</c> methods.

@@ -65,6 +65,8 @@ namespace Moq
 
 		IReadOnlyList<object> IInvocation.Arguments => this.arguments;
 
+		public ISetup MatchingSetup => this.matchingSetup;
+
 		public Type ProxyType => this.proxyType;
 
 		public object ReturnValue => this.returnValue;
@@ -170,11 +172,6 @@ namespace Moq
 			}
 
 			return builder.ToString();
-		}
-
-		public bool WasMatched(out ISetup matchingSetup)
-		{
-			return (matchingSetup = this.matchingSetup) != null;
 		}
 	}
 }

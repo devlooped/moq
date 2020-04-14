@@ -205,19 +205,18 @@ namespace Moq.Tests
 		}
 
 		[Fact]
-		public void WasMatched_returns_false_if_there_was_no_matching_setup()
+		public void MatchingSetup_is_null_if_there_was_no_matching_setup()
 		{
 			var mock = new Mock<IX>();
 
 			mock.Object.Do();
 			var invocation = mock.Invocations.First();
 
-			Assert.False(invocation.WasMatched(out var matchingSetup));
-			Assert.Null(matchingSetup);
+			Assert.Null(invocation.MatchingSetup);
 		}
 
 		[Fact]
-		public void WasMatched_returns_true_if_there_was_a_matching_setup()
+		public void MatchingSetup_is_set_if_there_was_a_matching_setup()
 		{
 			var mock = new Mock<IX>();
 			mock.Setup(m => m.Do());
@@ -226,12 +225,11 @@ namespace Moq.Tests
 			mock.Object.Do();
 			var invocation = mock.Invocations.First();
 
-			Assert.True(invocation.WasMatched(out var matchingSetup));
-			Assert.Same(setup, matchingSetup);
+			Assert.Same(setup, invocation.MatchingSetup);
 		}
 
 		[Fact]
-		public void WasMatched_returns_true_if_there_was_a_matching_setup_implicitly_created_by_SetupAllProperties()
+		public void MatchingSetup_is_set_if_there_was_a_matching_setup_implicitly_created_by_SetupAllProperties()
 		{
 			var mock = new Mock<IX>();
 			mock.SetupAllProperties();
@@ -240,12 +238,11 @@ namespace Moq.Tests
 			var invocation = mock.Invocations.First();
 			var setup = mock.Setups.First();
 
-			Assert.True(invocation.WasMatched(out var matchingSetup));
-			Assert.Same(setup, matchingSetup);
+			Assert.Same(setup, invocation.MatchingSetup);
 		}
 
 		[Fact]
-		public void WasMatched_returns_true_if_there_was_a_matching_setup_implicitly_created_by_multi_dot_expression()
+		public void MatchingSetup_is_set_if_there_was_a_matching_setup_implicitly_created_by_multi_dot_expression()
 		{
 			var mock = new Mock<IX>();
 			mock.Setup(m => m.Nested.Do());
@@ -254,8 +251,7 @@ namespace Moq.Tests
 			_ = mock.Object.Nested;
 			var invocation = mock.Invocations.First();
 
-			Assert.True(invocation.WasMatched(out var matchingSetup));
-			Assert.Same(setup, matchingSetup);
+			Assert.Same(setup, invocation.MatchingSetup);
 		}
 
 		public interface IX
