@@ -18,6 +18,23 @@ namespace Moq
 		LambdaExpression Expression { get; }
 
 		/// <summary>
+		///   Gets the inner mock of this setup (if present and known).
+		///   <para>
+		///     An "inner mock" is the <see cref="Moq.Mock"/> instance associated with a setup's return value,
+		///     if that setup is configured to return a mock object.
+		///   </para>
+		///   <para>
+		///     This property will be <see langword="null"/> if a setup either does not return a mock object,
+		///     or if Moq cannot safely determine its return value without risking any side effects. For instance,
+		///     Moq is able to inspect the return value if it is a constant (e.g. <c>`.Returns(value)`</c>);
+		///     if, on the other hand, it gets computed by a factory function (e.g. <c>`.Returns(() => value)`</c>),
+		///     Moq will not attempt to retrieve that value just to find the inner mock,
+		///     since calling a user-provided function could have effects beyond Moq's understanding and control.
+		///   </para>
+		/// </summary>
+		Mock InnerMock { get; }
+
+		/// <summary>
 		///   Gets whether this setup is conditional.
 		/// </summary>
 		/// <seealso cref="Mock{T}.When(Func{bool})"/>
@@ -73,20 +90,6 @@ namespace Moq
 		///   Gets whether this setup was matched by at least one invocation on the mock.
 		/// </summary>
 		bool WasMatched { get; }
-
-		/// <summary>
-		///   Gets whether this setup returns a mock object.
-		///   If so, the corresponding <see cref="Mock"/> instance is returned via the <see langword="out"/> parameter <paramref name="innerMock"/>.
-		/// </summary>
-		/// <param name="innerMock">
-		///   If this setup returns a mock object,
-		///   this <see langword="out"/> parameter will be set to the corresponding <see cref="Mock"/> instance.
-		/// </param>
-		/// <returns>
-		///   <see langword="true"/> if this setup returns a mock object;
-		///   otherwise (when the setup either doesn't return a mock object or when it isn't known if it does), <see langword="false"/>.
-		/// </returns>
-		bool ReturnsMock(out Mock innerMock);
 
 		/// <summary>
 		///   Verifies this setup and optionally all verifiable setups of its inner mock (if present and known).

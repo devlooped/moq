@@ -357,7 +357,7 @@ namespace Moq
 
 		public static bool TryFind(this IEnumerable<Setup> innerMockSetups, InvocationShape expectation, out Setup setup)
 		{
-			Debug.Assert(innerMockSetups.All(s => s.ReturnsMock(out _)));
+			Debug.Assert(innerMockSetups.All(s => s.InnerMock != null));
 
 			foreach (Setup innerMockSetup in innerMockSetups)
 			{

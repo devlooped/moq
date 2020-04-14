@@ -32,7 +32,7 @@ namespace Moq
 
 		protected override void ResetCore()
 		{
-			this.GetInnerMock().MutableSetups.Reset();
+			this.InnerMock.MutableSetups.Reset();
 		}
 	}
 }

@@ -258,72 +258,68 @@ namespace Moq.Tests
 		}
 
 		[Fact]
-		public void ReturnsMock_returns_false_if_return_value_cannot_be_determined_safely()
+		public void InnerMock_is_null_if_return_value_cannot_be_determined_safely()
 		{
 			var mock = new Mock<IX>();
 			mock.Setup(m => m.Inner).Returns(() => Mock.Of<IX>());
 			var setup = mock.Setups.First();
 
-			Assert.False(setup.ReturnsMock(out _));
+			Assert.Null(setup.InnerMock);
 		}
 
 		[Fact]
-		public void ReturnsMock_returns_false_if_return_value_can_be_determined_but_is_not_a_mock()
+		public void InnerMock_is_null_if_return_value_can_be_determined_but_is_not_a_mock()
 		{
 			var mock = new Mock<IX>();
 			mock.Setup(m => m.Inner).Returns((IX)null);
 			var setup = mock.Setups.First();
 
-			Assert.False(setup.ReturnsMock(out _));
+			Assert.Null(setup.InnerMock);
 		}
 
 		[Fact]
-		public void ReturnsMock_returns_true_if_return_value_can_be_determined_and_is_a_mock()
+		public void InnerMock_is_set_if_return_value_can_be_determined_and_is_a_mock()
 		{
 			var mock = new Mock<IX>();
 			mock.Setup(m => m.Inner).Returns(Mock.Of<IX>());
 			var setup = mock.Setups.First();
 
-			Assert.True(setup.ReturnsMock(out var innerMock));
-			Assert.IsAssignableFrom<Mock<IX>>(innerMock);
+			Assert.IsAssignableFrom<Mock<IX>>(setup.InnerMock);
 		}
 
 		[Fact]
-		public void ReturnsMock_returns_true_if_Task_async_return_value_can_be_determined_and_is_a_mock()
+		public void InnerMock_is_set_if_Task_async_return_value_can_be_determined_and_is_a_mock()
 		{
 			var mock = new Mock<IX>();
 			mock.Setup(m => m.GetInnerTaskAsync()).Returns(Task.FromResult<IX>(Mock.Of<IX>()));
 			var setup = mock.Setups.First();
 
-			Assert.True(setup.ReturnsMock(out var innerMock));
-			Assert.IsAssignableFrom<Mock<IX>>(innerMock);
+			Assert.IsAssignableFrom<Mock<IX>>(setup.InnerMock);
 		}
 
 		[Fact]
-		public void ReturnsMock_returns_true_if_ValueTask_async_return_value_can_be_determined_and_is_a_mock()
+		public void InnerMock_is_set_if_ValueTask_async_return_value_can_be_determined_and_is_a_mock()
 		{
 			var mock = new Mock<IX>();
 			mock.Setup(m => m.GetInnerValueTaskAsync()).Returns(new ValueTask<IX>(Mock.Of<IX>()));
 			var setup = mock.Setups.First();
 
-			Assert.True(setup.ReturnsMock(out var innerMock));
-			Assert.IsAssignableFrom<Mock<IX>>(innerMock);
+			Assert.IsAssignableFrom<Mock<IX>>(setup.InnerMock);
 		}
 
 		[Fact]
-		public void ReturnsMock_returns_correct_inner_mock_explicitly_setup_up()
+		public void InnerMock_returns_correct_inner_mock_explicitly_setup_up()
 		{
 			var expectedInnerMock = new Mock<IX>();
 			var mock = new Mock<IX>();
 			mock.Setup(m => m.Inner).Returns(expectedInnerMock.Object);
 			var setup = mock.Setups.First();
 
-			Assert.True(setup.ReturnsMock(out var actualInnerMock));
-			Assert.Same(expectedInnerMock, actualInnerMock);
+			Assert.Same(expectedInnerMock, setup.InnerMock);
 		}
 
 		[Fact]
-		public void ReturnsMock_returns_correct_inner_mock_implicitly_setup_up_via_multi_dot_expression()
+		public void InnerMock_returns_correct_inner_mock_implicitly_setup_up_via_multi_dot_expression()
 		{
 			var mock = new Mock<IX>();
 			mock.Setup(m => m.Inner.Property);
@@ -331,22 +327,21 @@ namespace Moq.Tests
 
 			var expectedInnerMock = Mock.Get(mock.Object.Inner);
 
-			Assert.True(setup.ReturnsMock(out var actualInnerMock));
-			Assert.Same(expectedInnerMock, actualInnerMock);
+			Assert.Same(expectedInnerMock, setup.InnerMock);
 		}
 
 		[Fact]
-		public void ReturnsMock_of_fluent_setup_without_inner_mock()
+		public void InnerMock_of_fluent_setup_without_inner_mock()
 		{
 			var mock = new Mock<IX>();
 			mock.Setup(m => m.Inner[1].Property);
 			var fluentSetup = Assert.IsAssignableFrom<IFluentSetup>(mock.Setups.First().OriginalSetup);
 
-			Assert.True(fluentSetup.ReturnsMock(out _) != true);  // sic! (three-valued logic)
+			Assert.Null(fluentSetup.InnerMock);
 		}
 
 		[Fact]
-		public void ReturnsMock_of_fluent_setup_with_inner_mock()
+		public void InnerMock_of_fluent_setup_with_inner_mock()
 		{
 			var innerMock = new Mock<IX>();
 			innerMock.Setup(m => m.OtherProperty);
@@ -355,7 +350,7 @@ namespace Moq.Tests
 			mock.Setup(m => m.Inner[1].Property).Returns(innerMock.Object);
 			var fluentSetup = Assert.IsAssignableFrom<IFluentSetup>(mock.Setups.First().OriginalSetup);
 
-			Assert.True(fluentSetup.ReturnsMock(out _));
+			Assert.NotNull(fluentSetup.InnerMock);
 		}
 
 		[Fact]

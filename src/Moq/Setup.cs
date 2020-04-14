@@ -32,6 +32,9 @@ namespace Moq
 
 		public LambdaExpression Expression => this.expectation.Expression;
 
+		public Mock InnerMock => this.TryGetReturnValue(out var returnValue)
+		                         && Unwrap.ResultIfCompletedTask(returnValue) is IMocked mocked ? mocked.Mock : null;
+
 		public bool IsConditional => this.Condition != null;
 
 		public bool IsOverridden => (this.flags & Flags.Overridden) != 0;
@@ -91,20 +94,6 @@ namespace Moq
 			return this.expectation.IsMatch(invocation) && (this.Condition == null || this.Condition.IsTrue);
 		}
 
-		public bool ReturnsMock(out Mock innerMock)
-		{
-			if (this.TryGetReturnValue(out var returnValue) && Unwrap.ResultIfCompletedTask(returnValue) is IMocked mocked)
-			{
-				innerMock = mocked.Mock;
-				return true;
-			}
-			else
-			{
-				innerMock = null;
-				return false;
-			}
-		}
-
 		public virtual void SetOutParameters(Invocation invocation)
 		{
 		}
@@ -151,7 +140,7 @@ namespace Moq
 			}
 
 			// optionally verify setups of inner mock (if present and known):
-			if (recursive && this.ReturnsMock(out var innerMock) && !innerMock.TryVerify(predicate, out e) && e.IsVerificationError)
+			if (recursive && this.InnerMock?.TryVerify(predicate, out e) == false && e.IsVerificationError)
 			{
 				error = MockException.FromInnerMockOf(this, e);
 				return false;

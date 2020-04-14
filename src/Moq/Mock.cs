@@ -418,7 +418,7 @@ namespace Moq
 						// sub-object (inner mock); and that sub-object has to have received at least
 						// one call:
 						var wasTransitiveInvocation = innerMockSetups.TryFind(unverifiedInvocations[i], out var inner)
-						                              && inner.GetInnerMock().MutableInvocations.Any();
+						                              && inner.InnerMock.MutableInvocations.Any();
 						if (wasTransitiveInvocation)
 						{
 							unverifiedInvocations[i] = null;
@@ -438,7 +438,7 @@ namespace Moq
 			// created by "transitive" invocations):
 			foreach (var inner in innerMockSetups)
 			{
-				VerifyNoOtherCalls(inner.GetInnerMock(), verifiedMocks);
+				VerifyNoOtherCalls(inner.InnerMock, verifiedMocks);
 			}
 		}
 
@@ -606,7 +606,7 @@ namespace Moq
 				Mock innerMock;
 				if (mock.MutableSetups.GetInnerMockSetups().TryFind(part, out var setup))
 				{
-					innerMock = setup.GetInnerMock();
+					innerMock = setup.InnerMock;
 				}
 				else
 				{
@@ -713,8 +713,7 @@ namespace Moq
 			}
 			else if (mock.MutableSetups.GetInnerMockSetups().TryFind(part, out var innerMockSetup))
 			{
-				var innerMock = innerMockSetup.GetInnerMock();
-				Mock.RaiseEvent(innerMock, expression, parts, arguments);
+				Mock.RaiseEvent(innerMockSetup.InnerMock, expression, parts, arguments);
 			}
 		}
 

@@ -27,6 +27,8 @@ namespace Moq
 
 		public LambdaExpression Expression => this.expression;
 
+		public Mock InnerMock => this.parts.Last().InnerMock;
+
 		public bool IsConditional => this.parts.First().IsConditional;
 
 		public bool IsOverridden => this.parts.Any(p => p.IsOverridden);
@@ -66,11 +68,6 @@ namespace Moq
 			this.complete = true;
 		}
 #endif
-
-		public bool ReturnsMock(out Mock innerMock)
-		{
-			return this.parts.Last().ReturnsMock(out innerMock);
-		}
 
 		public override string ToString()
 		{

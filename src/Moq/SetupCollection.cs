@@ -161,7 +161,7 @@ namespace Moq
 
 		public IEnumerable<Setup> GetInnerMockSetups()
 		{
-			return this.ToArray(setup => !setup.IsOverridden && !setup.IsConditional && setup.ReturnsMock(out _));
+			return this.ToArray(setup => !setup.IsOverridden && !setup.IsConditional && setup.InnerMock != null);
 		}
 
 		public void Reset()
