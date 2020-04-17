@@ -59,11 +59,11 @@ namespace Moq.Expressions.Visitors
 					{
 						// indexer getter:
 						var parameterTypes = node.Method.GetParameterTypes();
-						var argumentTypes = parameterTypes.Take(parameterTypes.Count - 1).ToArray();
+						var argumentTypes = parameterTypes.ToArray();
 						var indexer = node.Method.DeclaringType.GetProperty(name, node.Method.ReturnType, argumentTypes);
 						Debug.Assert(indexer != null && indexer.GetGetMethod(true) == node.Method);
 
-						return Expression.MakeIndex(instance, indexer, arguments.Take(argumentCount - 1));
+						return Expression.MakeIndex(instance, indexer, arguments);
 					}
 				}
 				else if (node.Method.IsSetAccessor())
