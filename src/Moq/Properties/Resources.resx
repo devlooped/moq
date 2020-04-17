@@ -351,4 +351,7 @@ This could be caused by an unrecognized type conversion, coercion, narrowing, or
   <data name="UseItIsOtherOverload" xml:space="preserve">
     <value>It is impossible to call the provided strongly-typed predicate due to the use of a type matcher. Provide a weakly-typed predicate with two parameters (object, Type) instead.</value>
   </data>
+  <data name="ConditionalSetupsAreNotVerifiable" xml:space="preserve">
+    <value>This call to 'Verifiable' will have no effect because conditional setups are ignored by both 'Verify' and 'VerifyAll'. This might indicate an error in your code.</value>
+  </data>
 </root>

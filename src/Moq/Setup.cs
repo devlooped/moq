@@ -7,6 +7,8 @@ using System.Linq.Expressions;
 using System.Reflection;
 using System.Text;
 
+using Moq.Properties;
+
 namespace Moq
 {
 	internal abstract class Setup : ISetup
@@ -86,6 +88,11 @@ namespace Moq
 
 		public void MarkAsVerifiable()
 		{
+			if (this.IsConditional)
+			{
+				throw new InvalidOperationException(Resources.ConditionalSetupsAreNotVerifiable);
+			}
+
 			this.flags |= Flags.Verifiable;
 		}
 
