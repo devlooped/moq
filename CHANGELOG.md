@@ -8,7 +8,7 @@ The format is loosely based on [Keep a Changelog](http://keepachangelog.com/en/1
 
 #### Added
 
- * A mock's setups can now be inspected and individually verified via the new `Mock.Setups` collection and `IInvocation.MatchingSetup` property (@stakx, #984-#987, #989, #995)
+ * A mock's setups can now be inspected and individually verified via the new `Mock.Setups` collection and `IInvocation.MatchingSetup` property (@stakx, #984-#987, #989, #995, #999)
 
  * New `.Protected().Setup` and `Protected().Verify` method overloads to deal with generic methods (@JmlSaul, #967)
 

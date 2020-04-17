@@ -17,7 +17,7 @@ namespace Moq
 		private Func<object> getter;
 
 		public AutoImplementedPropertyGetterSetup(Mock mock, LambdaExpression originalExpression, MethodInfo method, Func<object> getter)
-			: base(originalSetup: null, mock, new InvocationShape(originalExpression, method, noArguments))
+			: base(originalExpression: null, mock, new InvocationShape(originalExpression, method, noArguments))
 		{
 			this.getter = getter;
 
