@@ -15,8 +15,8 @@ namespace Moq
 		// contains the responses set up with the `CallBase`, `Pass`, `Returns`, and `Throws` verbs
 		private ConcurrentQueue<Response> responses;
 
-		public SequenceSetup(ISetup originalSetup, Mock mock, InvocationShape expectation)
-			: base(originalSetup, mock, expectation)
+		public SequenceSetup(Expression originalExpression, Mock mock, InvocationShape expectation)
+			: base(originalExpression, mock, expectation)
 		{
 			this.responses = new ConcurrentQueue<Response>();
 		}

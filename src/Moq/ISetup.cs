@@ -65,10 +65,10 @@ namespace Moq
 		Mock Mock { get; }
 
 		/// <summary>
-		///   Returns the original setup as it would appear in user code.
+		///   Returns the original setup expression from which this setup resulted.
 		///   <para>
 		///     For setups doing a simple member access or method invocation (such as <c>`mock => mock.Member`</c>),
-		///     this property will simply return the same <see cref="ISetup"/> instance.
+		///     this property will be equal to <see cref="Expression"/>.
 		///   </para>
 		///   <para>
 		///     For setups whose expression involves member chaining (such as <c>`parent => parent.Child.Member`</c>),
@@ -79,12 +79,15 @@ namespace Moq
 		///       <item>on its inner mock, a setup for <c>`(child) => (child).Member`</c>.</item>
 		///     </list>
 		///     These are the setups that will be put in the mocks' <see cref="Mock.Setups"/> collections;
-		///     for both of those, <see cref="OriginalSetup"/> will return the same <see cref="IFluentSetup"/>
-		///     whose <see cref="ISetup.Expression"/> represents the original, fluent setup expression.
+		///     their <see cref="Expression"/> will return the partial expression for just a single member access,
+		///     while their <see cref="OriginalExpression"/> will return the original, full expression.
+		///   </para>
+		///   <para>
+		///     This property may also return <see langword="null"/> if this setup was created automatically,
+		///     e.g. by <see cref="Mock{T}.SetupAllProperties"/> or by <see cref="DefaultValue.Mock"/>.
 		///   </para>
 		/// </summary>
-		/// <seealso cref="IFluentSetup"/>
-		ISetup OriginalSetup { get; }
+		Expression OriginalExpression { get; }
 
 		/// <summary>
 		///   Gets whether this setup was matched by at least one invocation on the mock.

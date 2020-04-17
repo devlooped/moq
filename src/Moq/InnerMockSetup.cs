@@ -2,6 +2,7 @@
 // All rights reserved. Licensed under the BSD 3-Clause License; see License.txt.
 
 using System.Diagnostics;
+using System.Linq.Expressions;
 
 namespace Moq
 {
@@ -9,8 +10,8 @@ namespace Moq
 	{
 		private readonly object returnValue;
 
-		public InnerMockSetup(IFluentSetup originalSetup, Mock mock, InvocationShape expectation, object returnValue)
-			: base(originalSetup, mock, expectation)
+		public InnerMockSetup(Expression originalExpression, Mock mock, InvocationShape expectation, object returnValue)
+			: base(originalExpression, mock, expectation)
 		{
 			Debug.Assert(Unwrap.ResultIfCompletedTask(returnValue) is IMocked);
 
