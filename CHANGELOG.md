@@ -14,6 +14,10 @@ The format is loosely based on [Keep a Changelog](http://keepachangelog.com/en/1
 
  * Two new public methods in `Times`: `bool Validate(int count)` and `string ToString()` (@stakx, 975)
 
+#### Changed
+
+ * Attempts to mark conditionals setup as verifiable are now considered an error, since conditional setups are ignored during verification. Calls to `.Verifiable()` on conditional setups are no-ops and can be safely removed. (@stakx, #997)
+
 #### Fixed
 
  * Regression: Restored `Capture.In` use in `mock.Verify(expression, ...)` to extract arguments of previously recorded invocations. (@vgriph, #968; @stakx, #974)
