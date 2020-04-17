@@ -10,6 +10,7 @@ using System.Linq;
 using System.Linq.Expressions;
 using System.Reflection;
 
+using Moq.Expressions.Visitors;
 using Moq.Properties;
 
 namespace Moq
@@ -806,7 +807,7 @@ namespace Moq
 			LambdaExpression expression;
 			{
 				var mock = Expression.Parameter(method.DeclaringType, "mock");
-				expression = Expression.Lambda(Expression.Call(mock, method, arguments), mock);
+				expression = Expression.Lambda(Expression.Call(mock, method, arguments).Apply(UpgradePropertyAccessorMethods.Rewriter), mock);
 			}
 
 			if (expression.IsProperty())
