@@ -63,7 +63,7 @@ namespace Moq.Expressions.Visitors
 						var indexer = node.Method.DeclaringType.GetProperty(name, node.Method.ReturnType, argumentTypes);
 						Debug.Assert(indexer != null && indexer.GetGetMethod(true) == node.Method);
 
-						return Expression.MakeIndex(instance, indexer, this.Visit(arguments));
+						return Expression.MakeIndex(instance, indexer, arguments);
 					}
 				}
 				else if (node.Method.IsSetAccessor())
@@ -78,7 +78,7 @@ namespace Moq.Expressions.Visitors
 						Debug.Assert(property != null && property.GetSetMethod(true) == node.Method);
 
 						var value = node.Arguments[0];
-						return Expression.Assign(Expression.MakeMemberAccess(instance, property), this.Visit(value));
+						return Expression.Assign(Expression.MakeMemberAccess(instance, property), value);
 					}
 					else
 					{
@@ -88,9 +88,9 @@ namespace Moq.Expressions.Visitors
 						var indexer = node.Method.DeclaringType.GetProperty(name, parameterTypes.Last(), argumentTypes);
 						Debug.Assert(indexer != null && indexer.GetSetMethod(true) == node.Method);
 
-						var indices = new ReadOnlyCollection<Expression>(arguments.Take(argumentCount - 1).ToList());
+						var indices = arguments.Take(argumentCount - 1);
 						var value = arguments.Last();
-						return Expression.Assign(Expression.MakeIndex(instance, indexer, this.Visit(indices)), this.Visit(value));
+						return Expression.Assign(Expression.MakeIndex(instance, indexer, indices), value);
 					}
 				}
 			}
