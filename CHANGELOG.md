@@ -18,11 +18,16 @@ The format is loosely based on [Keep a Changelog](http://keepachangelog.com/en/1
 
  * Attempts to mark conditionals setup as verifiable are now considered an error, since conditional setups are ignored during verification. Calls to `.Verifiable()` on conditional setups are no-ops and can be safely removed. (@stakx, #997)
 
+ * When matching invocations against setups, captured variables nested inside expression trees are now evaluated. Their values likely matter more than their identities. (@stakx, #1000)
+
 #### Fixed
 
  * Regression: Restored `Capture.In` use in `mock.Verify(expression, ...)` to extract arguments of previously recorded invocations. (@vgriph, #968; @stakx, #974)
 
  * Consistency: When mocking a class `C` whose constructor invokes one of its virtual members, `Mock.Of<C>()` now operates like `new Mock<C>()`: a record of such invocations is retained in the mock's `Invocations` collection (@stakx, #980)
+
+ * After updating Moq from 4.10.1 to 4.11, mocking NHibernate session throws a `System.NullReferenceException` (@ronenfe, #955)
+
 
 ## 4.13.1 (2019-10-19)
 
