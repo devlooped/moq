@@ -3231,6 +3231,54 @@ namespace Moq.Tests.Regressions
 
 		#endregion
 
+		#region 955
+
+		public class Issue955
+		{
+			[Fact]
+			public void Expression_lambdas_capturing_same_variable()
+			{
+				Guid originalItemId = Guid.NewGuid();
+				var session = new Mock<ISession>();
+				session.Setup(x => x.QueryOverExpression<IItem>(item => item.Id == originalItemId).List());
+
+				_ = session.Object.QueryOverExpression<IItem>(item => item.Id == originalItemId).List();
+			}
+
+			[Fact]
+			public void Expression_lambdas_capturing_different_variables_having_same_value()
+			{
+				Guid originalItemId = Guid.NewGuid();
+				var session = new Mock<ISession>();
+				session.Setup(x => x.QueryOverExpression<IItem>(item => item.Id == originalItemId).List());
+
+				var copiedItemId = originalItemId;
+				_ = session.Object.QueryOverExpression<IItem>(item => item.Id == copiedItemId).List();
+				//                                                               ^^^^^^^^^^^^
+				// This call should still match the above setup, even when a different variable is used;
+				// assuming that the two variables have equal values at the exact time of comparison.
+			}
+
+			public interface IItem
+			{
+				Guid Id { get; }
+			}
+
+			// The following two interfaces are adapted versions of types originally defined by NHibernate:
+
+			public interface ISession
+			{
+				IQueryOver<T> QueryOverExpression<T>(Expression<Func<T, bool>> predicateExpression);
+			}
+
+			public interface IQueryOver<T>
+			{
+				IList<T> List();
+			}
+		}
+
+		#endregion
+
 		// Old @ Google Code
 
 		#region #47

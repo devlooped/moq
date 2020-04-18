@@ -7,6 +7,8 @@ using System.Collections.ObjectModel;
 using System.Diagnostics;
 using System.Linq.Expressions;
 
+using Moq.Expressions.Visitors;
+
 namespace Moq
 {
 	internal sealed class ExpressionComparer : IEqualityComparer<Expression>
@@ -200,7 +202,21 @@ namespace Moq
 
 		private bool EqualsMember(MemberExpression x, MemberExpression y)
 		{
-			return x.Member == y.Member && this.Equals(x.Expression, y.Expression);
+			// If any of the two nodes represents an access to a captured variable,
+			// we want to compare its value, not its identity. (`EvaluateCaptures` is
+			// a no-op in all other cases, so it is safe to apply "just in case".)
+			var rx = x.Apply(EvaluateCaptures.Rewriter);
+			var ry = y.Apply(EvaluateCaptures.Rewriter);
+
+			if (rx == x && ry == y)
+			{
+				return x.Member == y.Member && this.Equals(x.Expression, y.Expression);
+			}
+			else
+			{
+				// Rewriting occurred, we might no longer have two `MemberExpression`s:
+				return this.Equals(rx, ry);
+			}
 		}
 
 		private bool EqualsMemberInit(MemberInitExpression x, MemberInitExpression y)
