@@ -136,7 +136,7 @@ namespace Moq
 
 		public void SetCallBaseResponse()
 		{
-			if (this.Mock.TargetType.IsDelegateType())
+			if (this.Mock.MockedType.IsDelegateType())
 			{
 				throw new NotSupportedException(Resources.CallBaseCannotBeUsedWithDelegateMocks);
 			}

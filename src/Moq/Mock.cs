@@ -189,7 +189,7 @@ namespace Moq
 		public object Object => this.OnGetObject();
 
 		/// <summary>
-		/// Gets the interfaces directly inherited from the mocked type (<see cref="TargetType"/>).
+		///   Gets the interfaces directly inherited from the mocked type (<see cref="MockedType"/>).
 		/// </summary>
 		internal abstract Type[] InheritedInterfaces { get; }
 
@@ -240,8 +240,6 @@ namespace Moq
 		/// You can opt in or out of certain features via this property.
 		/// </summary>
 		public abstract Switches Switches { get; set; }
-
-		internal abstract Type TargetType { get; }
 
 		#region Verify
 

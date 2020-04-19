@@ -340,14 +340,9 @@ namespace Moq
 			return this.instance;
 		}
 
-		internal override Type MockedType
-		{
-			get { return typeof(T); }
-		}
+		internal override Type MockedType => typeof(T);
 
 		internal override SetupCollection MutableSetups => this.setups;
-
-		internal override Type TargetType => typeof(T);
 
 		internal override Type[] InheritedInterfaces => Mock<T>.inheritedInterfaces;
 

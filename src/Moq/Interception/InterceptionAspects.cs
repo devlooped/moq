@@ -210,14 +210,14 @@ namespace Moq
 				var declaringType = method.DeclaringType;
 				if (declaringType.IsInterface)
 				{
-					if (mock.TargetType.IsInterface)
+					if (mock.MockedType.IsInterface)
 					{
 						// Case 1: Interface method of an interface proxy.
 						// There is no base method to call, so fall through.
 					}
 					else
 					{
-						Debug.Assert(mock.TargetType.IsClass);
+						Debug.Assert(mock.MockedType.IsClass);
 						Debug.Assert(mock.ImplementsInterface(declaringType));
 
 						// Case 2: Explicitly implemented interface method of a class proxy.

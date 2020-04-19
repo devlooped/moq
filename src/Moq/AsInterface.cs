@@ -27,10 +27,7 @@ namespace Moq
 
 		internal override bool IsObjectInitialized => this.owner.IsObjectInitialized;
 
-		internal override Type MockedType
-		{
-			get { return typeof(TInterface); }
-		}
+		internal override Type MockedType => this.owner.MockedType;
 
 		public override MockBehavior Behavior => this.owner.Behavior;
 
@@ -68,8 +65,6 @@ namespace Moq
 			get => this.owner.Switches;
 			set => this.owner.Switches = value;
 		}
-
-		internal override Type TargetType => this.owner.TargetType;
 
 		public override Mock<TNewInterface> As<TNewInterface>()
 		{

@@ -80,7 +80,7 @@ namespace Moq.Tests
 		}
 
 		[Fact]
-		public void ThrowsWithTargetTypeName()
+		public void ThrowsWithMockedTypeName()
 		{
 			var bag = new Mock<IBag>();
 			var foo = bag.As<IFoo>();
