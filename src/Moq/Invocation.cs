@@ -7,6 +7,8 @@ using System.Diagnostics;
 using System.Reflection;
 using System.Text;
 
+using Moq.Behaviors;
+
 namespace Moq
 {
 	internal abstract class Invocation : IInvocation
