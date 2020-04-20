@@ -128,8 +128,6 @@ namespace Moq
 				return null;
 			}
 
-			Setup matchingSetup = null;
-
 			lock (this.setups)
 			{
 				// Iterating in reverse order because newer setups are more relevant than (i.e. override) older ones
@@ -138,25 +136,14 @@ namespace Moq
 					var setup = this.setups[i];
 					if (setup.IsOverridden) continue;
 
-					// the following conditions are repetitive, but were written that way to avoid
-					// unnecessary expensive calls to `setup.Matches`; cheap tests are run first.
-					if (matchingSetup == null && setup.Matches(invocation))
+					if (setup.Matches(invocation))
 					{
-						matchingSetup = setup;
-						if (setup.Method == invocation.Method)
-						{
-							break;
-						}
-					}
-					else if (setup.Method == invocation.Method && setup.Matches(invocation))
-					{
-						matchingSetup = setup;
-						break;
+						return setup;
 					}
 				}
 			}
 
-			return matchingSetup;
+			return null;
 		}
 
 		public IEnumerable<Setup> GetInnerMockSetups()
