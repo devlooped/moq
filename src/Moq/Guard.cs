@@ -55,6 +55,15 @@ namespace Moq
 			Guard.CanCreateInstance(type);
 		}
 
+		public static void IsPropertyOrIndexer(LambdaExpression expression, string paramName)
+		{
+			if (!expression.IsPropertyIndexer())  // guard because `.ToPropertyInfo()` doesn't (yet) work for indexers
+			{
+				var property = expression.ToPropertyInfo();
+				Guard.CanRead(property);
+			}
+		}
+
 		public static void IsAssignmentToPropertyOrIndexer(LambdaExpression expression, string paramName)
 		{
 			Debug.Assert(expression != null);

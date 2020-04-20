@@ -527,12 +527,7 @@ namespace Moq
 		internal static MethodCall SetupGet(Mock mock, LambdaExpression expression, Condition condition)
 		{
 			Guard.NotNull(expression, nameof(expression));
-
-			if (!expression.IsPropertyIndexer())  // guard because `.ToPropertyInfo()` doesn't (yet) work for indexers
-			{
-				var property = expression.ToPropertyInfo();
-				Guard.CanRead(property);
-			}
+			Guard.IsPropertyOrIndexer(expression, nameof(expression));
 
 			return Mock.Setup(mock, expression, condition);
 		}
@@ -573,7 +568,7 @@ namespace Moq
 			});
 		}
 
-		private static TSetup SetupRecursive<TSetup>(Mock mock, LambdaExpression expression, Func<Mock, Expression, InvocationShape, TSetup> setupLast)
+		internal static TSetup SetupRecursive<TSetup>(Mock mock, LambdaExpression expression, Func<Mock, Expression, InvocationShape, TSetup> setupLast)
 			where TSetup : ISetup
 		{
 			Debug.Assert(mock != null);
@@ -780,7 +775,7 @@ namespace Moq
 
 		#region Inner mocks
 
-		internal void AddInnerMockSetup(Invocation invocation, object returnValue)
+		internal void AddInnerMockSetup(IInvocation invocation, object returnValue)
 		{
 			var method = invocation.Method;
 

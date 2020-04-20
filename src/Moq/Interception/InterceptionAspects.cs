@@ -8,6 +8,8 @@ using System.Linq;
 using System.Linq.Expressions;
 using System.Reflection;
 
+using Moq.Behaviors;
+
 namespace Moq
 {
 	internal static class HandleWellKnownMethods
@@ -200,74 +202,9 @@ namespace Moq
 	{
 		public static void Handle(Invocation invocation, Mock mock)
 		{
-			Debug.Assert(invocation.Method != null);
-			Debug.Assert(invocation.Method.ReturnType != null);
-
-			var method = invocation.Method;
-
-			if (mock.CallBase)
-			{
-				var declaringType = method.DeclaringType;
-				if (declaringType.IsInterface)
-				{
-					if (mock.MockedType.IsInterface)
-					{
-						// Case 1: Interface method of an interface proxy.
-						// There is no base method to call, so fall through.
-					}
-					else
-					{
-						Debug.Assert(mock.MockedType.IsClass);
-						Debug.Assert(mock.ImplementsInterface(declaringType));
-
-						// Case 2: Explicitly implemented interface method of a class proxy.
-
-						if (mock.InheritedInterfaces.Contains(declaringType))
-						{
-							// Case 2a: Re-implemented interface.
-							// The base class has its own implementation. Only call base method if it isn't an event accessor.
-							if (!method.IsEventAddAccessor() && !method.IsEventRemoveAccessor())
-							{
-								invocation.ReturnBase();
-								return;
-							}
-						}
-						else
-						{
-							Debug.Assert(mock.AdditionalInterfaces.Contains(declaringType));
-
-							// Case 2b: Additional interface.
-							// There is no base method to call, so fall through.
-						}
-					}
-				}
-				else
-				{
-					Debug.Assert(declaringType.IsClass);
-
-					// Case 3: Non-interface method of a class proxy.
-					// Only call base method if it isn't abstract.
-					if (!method.IsAbstract)
-					{
-						invocation.ReturnBase();
-						return;
-					}
-				}
-			}
-
-			if (method.ReturnType == typeof(void))
-			{
-				invocation.Return();
-			}
-			else
-			{
-				var returnValue = mock.GetDefaultValue(method, out var innerMock);
-				if (innerMock != null)
-				{
-					mock.AddInnerMockSetup(invocation, returnValue);
-				}
-				invocation.Return(returnValue);
-			}
+			var context = new BehaviorExecutionContext(mock);
+			var result = ReturnBaseOrDefaultValue.Instance.Execute(invocation, in context);
+			invocation.Apply(result);
 		}
 	}
 

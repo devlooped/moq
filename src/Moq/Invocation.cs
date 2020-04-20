@@ -75,6 +75,27 @@ namespace Moq
 
 		public bool WasVerified => this.verified;
 
+		public void Apply(in BehaviorExecution result)
+		{
+			switch (result.Kind)
+			{
+				case BehaviorExecutionKind.Return:
+					this.Return();
+					return;
+
+				case BehaviorExecutionKind.ReturnBase:
+					this.ReturnBase();
+					return;
+
+				case BehaviorExecutionKind.ReturnValue:
+					this.Return(result.Argument);
+					return;
+
+				case BehaviorExecutionKind.ThrowException:
+					throw (Exception)result.Argument;
+			}
+		}
+
 		/// <summary>
 		/// Ends the invocation as if a <see langword="return"/> statement occurred.
 		/// </summary>

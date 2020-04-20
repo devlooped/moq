@@ -144,7 +144,7 @@ namespace Moq
 		/// <summary>
 		///   Returns the exception to be thrown when a strict mock has no setup that provides a return value for the specified invocation.
 		/// </summary>
-		internal static MockException ReturnValueRequired(Invocation invocation)
+		internal static MockException ReturnValueRequired(IInvocation invocation)
 		{
 			return new MockException(
 				MockExceptionReasons.ReturnValueRequired,
