@@ -5,12 +5,20 @@ using System;
 
 namespace Moq.Behaviors
 {
-	/// <todo/>
+	/// <summary>
+	///   Terminates an invocation as if by a <see langword="return"/> statement with a lazily computed return value.
+	/// </summary>
 	public sealed class ReturnComputedValue : Behavior
 	{
 		private readonly Func<object> valueFunction;
 
-		/// <todo/>
+		/// <summary>
+		///   Initializes a new instance of the <see cref="ReturnComputedValue"/> class
+		///   using the specified return value factory function.
+		/// </summary>
+		/// <param name="valueFunction">
+		///   The factory function that computes the return value(s) to be returned when terminating invocations.
+		/// </param>
 		public ReturnComputedValue(Func<object> valueFunction)
 		{
 			if (valueFunction == null)
@@ -21,7 +29,9 @@ namespace Moq.Behaviors
 			this.valueFunction = valueFunction;
 		}
 
-		/// <todo/>
+		/// <summary>
+		///   The factory function that computes the return value(s) to be returned when terminating invocations.
+		/// </summary>
 		public Func<object> ValueFunction => this.valueFunction;
 
 		/// <inheritdoc/>

@@ -7,6 +7,9 @@ using Moq.Language;
 
 namespace Moq.Behaviors.Language
 {
+	/// <summary>
+	///   Implements the fluent API.
+	/// </summary>
 	[EditorBrowsable(EditorBrowsableState.Never)]
 	public interface IBehaviorSetupResult : IVerifies
 	{

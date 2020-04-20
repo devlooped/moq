@@ -3,7 +3,9 @@
 
 namespace Moq.Behaviors
 {
-	/// <todo/>
+	/// <summary>
+	///   Terminates an invocation by delegating to the invoked method's <see langword="base"/> implementation.
+	/// </summary>
 	public sealed class ReturnBase : Behavior
 	{
 		/// <inheritdoc/>

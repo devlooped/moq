@@ -6,7 +6,13 @@ using System.Linq;
 
 namespace Moq.Behaviors
 {
-	/// <todo/>
+	/// <summary>
+	///   Terminates an invocation either by delegating to the invoked method's <see langword="base"/> implementation
+	///   if <see cref="Mock.CallBase"/> is set on the mock; or by returning a value that is in line with
+	///   the default value settings of the mock (see <see cref="Mock.DefaultValue"/>, <see cref="Mock.DefaultValueProvider"/>,
+	///   and <see cref="Mock.SetReturnsDefault{TReturn}(TReturn)"/>; or, for <see langword="void"/> methods,
+	///   by a simple <see langword="return"/> statement.
+	/// </summary>
 	public sealed class ReturnBaseOrDefaultValue : Behavior
 	{
 		internal static readonly ReturnBaseOrDefaultValue Instance = new ReturnBaseOrDefaultValue();

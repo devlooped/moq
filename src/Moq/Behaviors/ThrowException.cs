@@ -5,12 +5,19 @@ using System;
 
 namespace Moq.Behaviors
 {
-	/// <todo/>
+	/// <summary>
+	///   Terminates an invocation as if by a <see langword="throw"/>-ing an exception.
+	/// </summary>
 	public sealed class ThrowException : Behavior
 	{
 		private readonly Exception exception;
 
-		/// <todo/>
+		/// <summary>
+		///   Initializes a new instance of the <see cref="ThrowException"/> class using the specified exception.
+		/// </summary>
+		/// <param name="exception">
+		///   The exception to be thrown when terminating invocations.
+		/// </param>
 		public ThrowException(Exception exception)
 		{
 			if (exception == null)
@@ -21,7 +28,9 @@ namespace Moq.Behaviors
 			this.exception = exception;
 		}
 
-		/// <todo/>
+		/// <summary>
+		///   The exception to be thrown when terminating invocations.
+		/// </summary>
 		public Exception Exception => this.exception;
 
 		/// <inheritdoc/>

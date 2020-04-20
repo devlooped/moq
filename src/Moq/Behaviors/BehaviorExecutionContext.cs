@@ -6,7 +6,9 @@ using System.Diagnostics;
 
 namespace Moq.Behaviors
 {
-	/// <todo/>
+	/// <summary>
+	///   Describes the context in which an <see cref="IInvocation"/> is occurring.
+	/// </summary>
 	[EditorBrowsable(EditorBrowsableState.Advanced)]
 	public readonly ref struct BehaviorExecutionContext
 	{
@@ -19,7 +21,9 @@ namespace Moq.Behaviors
 			this.mock = mock;
 		}
 
-		/// <todo/>
+		/// <summary>
+		///   The <see cref="Mock"/> on which an invocation is occurring.
+		/// </summary>
 		public Mock Mock => this.mock;
 	}
 }

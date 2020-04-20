@@ -3,7 +3,9 @@
 
 namespace Moq.Behaviors
 {
-	/// <todo/>
+	/// <summary>
+	///   Terminates an invocation as if by a <see langword="return"/> statement.
+	/// </summary>
 	public sealed class Return : Behavior
 	{
 		/// <inheritdoc/>

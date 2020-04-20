@@ -10,11 +10,30 @@ using Moq.Behaviors.Language;
 
 namespace Moq.Behaviors
 {
-	/// <todo/>
+	/// <summary>
+	///   Extension methods for creating <see cref="Behavior"/>-driven setups.
+	/// </summary>
 	[EditorBrowsable(EditorBrowsableState.Never)]
 	public static class MockExtensions
 	{
-		/// <todo/>
+		/// <summary>
+		///   Creates a <see cref="Behavior"/>-driven setup for the given expression.
+		///   <para>
+		///     This method offers practically no static type safety and shouldn't be casually used in regular test code.
+		///     It is intended as an advanced entry point into Moq's setup machinery for those developing extensions
+		///     beyond the fluent setup API.
+		///   </para>
+		/// </summary>
+		/// <param name="mock">
+		///   The mock on which to create a setup.
+		/// </param>
+		/// <param name="expression">
+		///   The expression describing the invocation(s) for which to create a setup.
+		/// </param>
+		/// <param name="behaviors">
+		///   A set of <see cref="Behavior"/> defining how the setup will react to invocations.
+		/// </param>
+		[EditorBrowsable(EditorBrowsableState.Advanced)]
 		public static IBehaviorSetupResult Setup(this Mock mock, LambdaExpression expression, IEnumerable<Behavior> behaviors)
 		{
 			Guard.NotNull(expression, nameof(expression));
@@ -32,7 +51,18 @@ namespace Moq.Behaviors
 			return new BehaviorSetupPhrase(setup);
 		}
 
-		/// <todo/>
+		/// <summary>
+		///   Creates a <see cref="Behavior"/>-driven setup for invocation(s) of a <see langword="void"/> method.
+		/// </summary>
+		/// <param name="mock">
+		///   The mock on which to create a setup.
+		/// </param>
+		/// <param name="action">
+		///   The expression describing the invocation(s) of a <see langword="void"/> method for which to create a setup.
+		/// </param>
+		/// <param name="behaviors">
+		///   A set of <see cref="Behavior"/> defining how the setup will react to invocations.
+		/// </param>
 		public static IBehaviorSetupResult Setup<T>(this Mock<T> mock, Expression<Action<T>> action, IEnumerable<Behavior> behaviors)
 			where T : class
 		{
@@ -42,7 +72,18 @@ namespace Moq.Behaviors
 			return mock.Setup((LambdaExpression)action, behaviors);
 		}
 
-		/// <todo/>
+		/// <summary>
+		///   Creates a <see cref="Behavior"/>-driven setup for invocation(s) of a non-<see langword="void"/> method or property.
+		/// </summary>
+		/// <param name="mock">
+		///   The mock on which to create a setup.
+		/// </param>
+		/// <param name="expression">
+		///   The expression describing the invocation(s) of a non-<see langword="void"/> method or property for which to create a setup.
+		/// </param>
+		/// <param name="behaviors">
+		///   A set of <see cref="Behavior"/> defining how the setup will react to invocations.
+		/// </param>
 		public static IBehaviorSetupResult Setup<T, TResult>(this Mock<T> mock, Expression<Func<T, TResult>> expression, IEnumerable<Behavior> behaviors)
 			where T : class
 		{
@@ -52,7 +93,18 @@ namespace Moq.Behaviors
 			return mock.Setup((LambdaExpression)expression, behaviors);
 		}
 
-		/// <todo/>
+		/// <summary>
+		///   Creates a <see cref="Behavior"/>-driven setup for invocation(s) of an event <see langword="add"/> accessor (<c>`+=`</c>).
+		/// </summary>
+		/// <param name="mock">
+		///   The mock on which to create a setup.
+		/// </param>
+		/// <param name="addExpression">
+		///   The expression describing the invocation(s) of an event <see langword="add"/> accessor for which to create a setup.
+		/// </param>
+		/// <param name="behaviors">
+		///   A set of <see cref="Behavior"/> defining how the setup will react to invocations.
+		/// </param>
 		public static IBehaviorSetupResult SetupAdd<T>(this Mock<T> mock, Action<T> addExpression, IEnumerable<Behavior> behaviors)
 			where T : class
 		{
@@ -65,7 +117,18 @@ namespace Moq.Behaviors
 			return mock.Setup((LambdaExpression)expression, behaviors);
 		}
 
-		/// <todo/>
+		/// <summary>
+		///   Creates a <see cref="Behavior"/>-driven setup for invocation(s) of a property getter.
+		/// </summary>
+		/// <param name="mock">
+		///   The mock on which to create a setup.
+		/// </param>
+		/// <param name="getterExpression">
+		///   The expression describing the invocation(s) of a property getter for which to create a setup.
+		/// </param>
+		/// <param name="behaviors">
+		///   A set of <see cref="Behavior"/> defining how the setup will react to invocations.
+		/// </param>
 		public static IBehaviorSetupResult SetupGet<T, TProperty>(this Mock<T> mock, Expression<Func<T, TProperty>> getterExpression, IEnumerable<Behavior> behaviors)
 			where T : class
 		{
@@ -76,7 +139,18 @@ namespace Moq.Behaviors
 			return mock.Setup((LambdaExpression)getterExpression, behaviors);
 		}
 
-		/// <todo/>
+		/// <summary>
+		///   Creates a <see cref="Behavior"/>-driven setup for invocation(s) of an event <see langword="remove"/> accessor (<c>`-=`</c>).
+		/// </summary>
+		/// <param name="mock">
+		///   The mock on which to create a setup.
+		/// </param>
+		/// <param name="removeExpression">
+		///   The expression describing the invocation(s) of an event <see langword="remove"/> accessor for which to create a setup.
+		/// </param>
+		/// <param name="behaviors">
+		///   A set of <see cref="Behavior"/> defining how the setup will react to invocations.
+		/// </param>
 		public static IBehaviorSetupResult SetupRemove<T>(this Mock<T> mock, Action<T> removeExpression, IEnumerable<Behavior> behaviors)
 			where T : class
 		{
@@ -89,7 +163,18 @@ namespace Moq.Behaviors
 			return mock.Setup((LambdaExpression)expression, behaviors);
 		}
 
-		/// <todo/>
+		/// <summary>
+		///   Creates a <see cref="Behavior"/>-driven setup for invocation(s) of a property setter.
+		/// </summary>
+		/// <param name="mock">
+		///   The mock on which to create a setup.
+		/// </param>
+		/// <param name="setterExpression">
+		///   The expression describing the invocation(s) of a property setter for which to create a setup.
+		/// </param>
+		/// <param name="behaviors">
+		///   A set of <see cref="Behavior"/> defining how the setup will react to invocations.
+		/// </param>
 		public static IBehaviorSetupResult SetupSet<T, TProperty>(this Mock<T> mock, Action<T> setterExpression, IEnumerable<Behavior> behaviors)
 			where T : class
 		{

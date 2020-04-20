@@ -5,12 +5,20 @@ using System;
 
 namespace Moq.Behaviors
 {
-	/// <todo/>
+	/// <summary>
+	///   Terminates an invocation as if by a <see langword="throw"/>-ing a lazily computed exception.
+	/// </summary>
 	public sealed class ThrowComputedException : Behavior
 	{
 		private readonly Func<Exception> exceptionFunction;
 
-		/// <todo/>
+		/// <summary>
+		///   Initializes a new instance of the <see cref="ThrowComputedException"/> class
+		///   using the specified exception factory function.
+		/// </summary>
+		/// <param name="exceptionFunction">
+		///   The factory function that computes the exception(s) to be thrown when terminating invocations.
+		/// </param>
 		public ThrowComputedException(Func<Exception> exceptionFunction)
 		{
 			if (exceptionFunction == null)
@@ -21,7 +29,9 @@ namespace Moq.Behaviors
 			this.exceptionFunction = exceptionFunction;
 		}
 
-		/// <todo/>
+		/// <summary>
+		///   The factory function that computes the exception(s) to be thrown when terminating invocations.
+		/// </summary>
 		public Func<Exception> ExceptionFunction => this.exceptionFunction;
 
 		/// <inheritdoc/>

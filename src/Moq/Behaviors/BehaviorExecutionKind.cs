@@ -3,22 +3,21 @@
 
 namespace Moq.Behaviors
 {
-	/// <todo/>
 	internal enum BehaviorExecutionKind
 	{
-		/// <todo/>
+		/// <seealso cref="BehaviorExecution.Continue"/>
 		Continue = default,
 
-		/// <todo/>
+		/// <seealso cref="BehaviorExecution.Return"/>
 		Return,
 
-		/// <todo/>
+		/// <seealso cref="BehaviorExecution.ReturnBase"/>
 		ReturnBase,
 
-		/// <todo/>
+		/// <seealso cref="BehaviorExecution.ReturnValue"/>
 		ReturnValue,
 
-		/// <todo/>
+		/// <seealso cref="BehaviorExecution.ThrowException(System.Exception)"/>
 		ThrowException,
 	}
 }
