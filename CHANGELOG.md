@@ -10,6 +10,8 @@ The format is loosely based on [Keep a Changelog](http://keepachangelog.com/en/1
 
  * A mock's setups can now be inspected and individually verified via the new `Mock.Setups` collection and `IInvocation.MatchingSetup` property (@stakx, #984-#987, #989, #995, #999)
 
+ * Setups with customizable behavior: Import the new `Moq.Behaviors` namespace to gain access to a few additional `Setup` methods, all of which accept a set of `Behavior` instances that together define how the created setups will react to invocations. Some core predefined `Behavior` classes are available from the same namespace. **Note:** This is an advanced feature for those wishing to extend Moq. It shouldn't be used casually in regular test code. Prefer the standard fluent API whenever possible! (@stakx, #1002)
+
  * New `.Protected().Setup` and `Protected().Verify` method overloads to deal with generic methods (@JmlSaul, #967)
 
  * Two new public methods in `Times`: `bool Validate(int count)` and `string ToString()` (@stakx, 975)
