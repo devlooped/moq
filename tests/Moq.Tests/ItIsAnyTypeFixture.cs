@@ -14,9 +14,9 @@ namespace Moq.Tests
 		public void Setup_without_It_IsAnyType()
 		{
 			var mock = new Mock<IX>();
+			mock.Setup(x => x.Method<object>());
 			mock.Setup(x => x.Method<bool>());
 			mock.Setup(x => x.Method<int>());
-			mock.Setup(x => x.Method<object>());
 			mock.Setup(x => x.Method<string>());
 
 			mock.Object.Method<bool>();
