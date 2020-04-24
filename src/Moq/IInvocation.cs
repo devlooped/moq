@@ -29,6 +29,6 @@ namespace Moq
 		/// <summary>
 		///   Gets whether this invocation was successfully verified by any of the various <c>`Verify`</c> methods.
 		/// </summary>
-		bool WasVerified { get; }
+		bool IsVerified { get; }
 	}
 }

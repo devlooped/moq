@@ -20,11 +20,11 @@ namespace Moq.Tests
 			mock.Setup(m => m.ToString());
 			var setup = mock.Setups.First();
 
-			Assert.False(setup.WasMatched);
+			Assert.False(setup.IsMatched);
 
 			_ = mock.Object.ToString();
 
-			Assert.True(setup.WasMatched);
+			Assert.True(setup.IsMatched);
 		}
 
 		[Fact]
@@ -36,7 +36,7 @@ namespace Moq.Tests
 			_ = mock.Object.Property;
 			var setup = mock.Setups.First();
 
-			Assert.True(setup.WasMatched);
+			Assert.True(setup.IsMatched);
 		}
 
 		[Fact]
@@ -46,11 +46,11 @@ namespace Moq.Tests
 			mock.Setup(m => m.Inner.Property);
 			var setup = mock.Setups.First();
 
-			Assert.False(setup.WasMatched);
+			Assert.False(setup.IsMatched);
 
 			_ = mock.Object.Inner;
 
-			Assert.True(setup.WasMatched);
+			Assert.True(setup.IsMatched);
 		}
 
 		[Fact]
@@ -316,7 +316,7 @@ namespace Moq.Tests
 			var setup = mock.Setups.First();
 
 			Assert.False(setup.IsVerifiable);  // the root setup should be verified despite this
-			Assert.False(setup.WasMatched);
+			Assert.False(setup.IsMatched);
 			Assert.Throws<MockException>(() => setup.Verify());
 		}
 
@@ -330,7 +330,7 @@ namespace Moq.Tests
 			_ = mock.Object.ToString();
 
 			Assert.False(setup.IsVerifiable);
-			Assert.True(setup.WasMatched);
+			Assert.True(setup.IsMatched);
 			setup.Verify();
 		}
 
@@ -344,9 +344,9 @@ namespace Moq.Tests
 			var innerMock = mock.Object.Inner;
 			var innerMockSetup = Mock.Get(innerMock).Setups.First();
 
-			Assert.True(setup.WasMatched);
+			Assert.True(setup.IsMatched);
 			Assert.True(innerMockSetup.IsVerifiable);
-			Assert.False(innerMockSetup.WasMatched);  // this should make recursive verification fail
+			Assert.False(innerMockSetup.IsMatched);  // this should make recursive verification fail
 			Assert.Throws<MockException>(() => setup.Verify());
 		}
 
@@ -360,9 +360,9 @@ namespace Moq.Tests
 			var innerMock = mock.Object.Inner;
 			var innerMockSetup = Mock.Get(innerMock).Setups.First();
 
-			Assert.True(setup.WasMatched);
+			Assert.True(setup.IsMatched);
 			Assert.False(innerMockSetup.IsVerifiable);  // which means that the inner mock setup will be ignored
-			Assert.False(innerMockSetup.WasMatched);  // this would make verification fail if that setup were not ignored
+			Assert.False(innerMockSetup.IsMatched);  // this would make verification fail if that setup were not ignored
 			setup.Verify();
 		}
 
@@ -376,9 +376,9 @@ namespace Moq.Tests
 			var innerMock = mock.Object.Inner;
 			var innerMockSetup = Mock.Get(innerMock).Setups.First();
 
-			Assert.True(setup.WasMatched);
+			Assert.True(setup.IsMatched);
 			Assert.True(innerMockSetup.IsVerifiable);
-			Assert.False(innerMockSetup.WasMatched);
+			Assert.False(innerMockSetup.IsMatched);
 			setup.Verify(recursive: false);  // which means that verification will never get to `innerMockSetup`
 		}
 
@@ -392,8 +392,8 @@ namespace Moq.Tests
 			var innerMock = mock.Object.Inner;
 			var innerMockSetup = Mock.Get(innerMock).Setups.First();
 
-			Assert.True(setup.WasMatched);
-			Assert.False(innerMockSetup.WasMatched);  // this will make verification fail only if it is recursive
+			Assert.True(setup.IsMatched);
+			Assert.False(innerMockSetup.IsMatched);  // this will make verification fail only if it is recursive
 			Assert.Throws<MockException>(() => setup.VerifyAll());
 		}
 
@@ -407,7 +407,7 @@ namespace Moq.Tests
 			var innerMock = mock.Object.Inner;
 			var innerMockSetup = Mock.Get(innerMock).Setups.First();
 
-			Assert.True(setup.WasMatched);
+			Assert.True(setup.IsMatched);
 			Assert.False(innerMockSetup.IsVerifiable);  // this should not exclude the inner mock setup from verification
 			Assert.Throws<MockException>(() => setup.VerifyAll());
 		}
@@ -422,11 +422,11 @@ namespace Moq.Tests
 			_ = mock.Object.ToString();
 			_ = mock.Object.ToString();
 
-			Assert.All(mock.Invocations, i => Assert.False(i.WasVerified));
+			Assert.All(mock.Invocations, i => Assert.False(i.IsVerified));
 
 			setup.Verify();
 
-			Assert.All(mock.Invocations, i => Assert.True(i.WasVerified));
+			Assert.All(mock.Invocations, i => Assert.True(i.IsVerified));
 			mock.VerifyNoOtherCalls();
 		}
 
@@ -440,11 +440,11 @@ namespace Moq.Tests
 			_ = mock.Object.ToString();
 			_ = mock.Object.ToString();
 
-			Assert.All(mock.Invocations, i => Assert.False(i.WasVerified));
+			Assert.All(mock.Invocations, i => Assert.False(i.IsVerified));
 
 			setup.VerifyAll();
 
-			Assert.All(mock.Invocations, i => Assert.True(i.WasVerified));
+			Assert.All(mock.Invocations, i => Assert.True(i.IsVerified));
 			mock.VerifyNoOtherCalls();
 		}
 
@@ -459,11 +459,11 @@ namespace Moq.Tests
 			_ = innerMock.Property;
 			var innerMockInvocation = Mock.Get(innerMock).Invocations.First();
 
-			Assert.False(innerMockInvocation.WasVerified);
+			Assert.False(innerMockInvocation.IsVerified);
 
 			setup.Verify();
 
-			Assert.True(innerMockInvocation.WasVerified);
+			Assert.True(innerMockInvocation.IsVerified);
 			mock.VerifyNoOtherCalls();
 		}
 
@@ -478,11 +478,11 @@ namespace Moq.Tests
 			_ = innerMock.Property;
 			var innerMockInvocation = Mock.Get(innerMock).Invocations.First();
 
-			Assert.False(innerMockInvocation.WasVerified);
+			Assert.False(innerMockInvocation.IsVerified);
 
 			setup.VerifyAll();
 
-			Assert.True(innerMockInvocation.WasVerified);
+			Assert.True(innerMockInvocation.IsVerified);
 			mock.VerifyNoOtherCalls();
 		}
 

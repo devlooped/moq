@@ -41,6 +41,11 @@ namespace Moq
 		bool IsConditional { get; }
 
 		/// <summary>
+		///   Gets whether this setup was matched by at least one invocation on the mock.
+		/// </summary>
+		bool IsMatched { get; }
+
+		/// <summary>
 		///   Gets whether this setup has been overridden
 		///   (that is, whether it is being shadowed by a more recent non-conditional setup with an equal expression).
 		/// </summary>
@@ -88,11 +93,6 @@ namespace Moq
 		///   </para>
 		/// </summary>
 		Expression OriginalExpression { get; }
-
-		/// <summary>
-		///   Gets whether this setup was matched by at least one invocation on the mock.
-		/// </summary>
-		bool WasMatched { get; }
 
 		/// <summary>
 		///   Verifies this setup and optionally all verifiable setups of its inner mock (if present and known).

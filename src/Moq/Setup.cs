@@ -49,7 +49,7 @@ namespace Moq
 
 		public Expression OriginalExpression => this.originalExpression;
 
-		public bool WasMatched => (this.flags & Flags.Matched) != 0;
+		public bool IsMatched => (this.flags & Flags.Matched) != 0;
 
 		public void Execute(Invocation invocation)
 		{
@@ -159,7 +159,7 @@ namespace Moq
 
 		protected virtual bool TryVerifySelf(out MockException error)
 		{
-			error = this.WasMatched ? null : MockException.UnmatchedSetup(this);
+			error = this.IsMatched ? null : MockException.UnmatchedSetup(this);
 			return error == null;
 		}
 
