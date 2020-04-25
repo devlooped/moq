@@ -59,6 +59,8 @@ namespace Moq
 			this.exactGenericTypeArguments = exactGenericTypeArguments;
 		}
 
+		internal bool Await { get; set; }
+
 		public void Deconstruct(out LambdaExpression expression, out MethodInfo method, out IReadOnlyList<Expression> arguments)
 		{
 			expression = this.Expression;

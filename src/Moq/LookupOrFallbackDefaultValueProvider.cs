@@ -151,22 +151,14 @@ namespace Moq
 		{
 			var resultType = type.GetGenericArguments()[0];
 			var result = this.GetDefaultValue(resultType, mock);
-
-			var tcsType = typeof(TaskCompletionSource<>).MakeGenericType(resultType);
-			var tcs = Activator.CreateInstance(tcsType);
-			tcsType.GetMethod("SetResult").Invoke(tcs, new[] { result });
-			return tcsType.GetProperty("Task").GetValue(tcs, null);
+			return Wrap.AsTask(type, result);
 		}
 
 		private object CreateValueTaskOf(Type type, Mock mock)
 		{
 			var resultType = type.GetGenericArguments()[0];
 			var result = this.GetDefaultValue(resultType, mock);
-
-			// `Activator.CreateInstance` could throw an `AmbiguousMatchException` in this use case,
-			// so we're explicitly selecting and calling the constructor we want to use:
-			var valueTaskCtor = type.GetConstructor(new[] { resultType });
-			return valueTaskCtor.Invoke(new object[] { result });
+			return Wrap.AsValueTask(type, result);
 		}
 
 		private object CreateValueTupleOf(Type type, Mock mock)

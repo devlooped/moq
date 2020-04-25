@@ -9,6 +9,7 @@ using System.Linq;
 using System.Linq.Expressions;
 using System.Reflection;
 using System.Text;
+using System.Threading.Tasks;
 
 using Moq.Properties;
 
@@ -223,12 +224,64 @@ namespace Moq
 			this.raiseEventResponse = new RaiseEventResponse(this.Mock, expression, null, args);
 		}
 
+		private Func<object, object> MakeWrap()
+		{
+			if (this.Expectation.Await)
+			{
+				var returnType = this.Method.ReturnType;
+				Debug.Assert(returnType.IsGenericType);
+				var genericTypeDef = returnType.GetGenericTypeDefinition();
+				if (genericTypeDef == typeof(Task<>))
+				{
+					return value => Wrap.AsTask(returnType, value);
+				}
+				else if (genericTypeDef == typeof(ValueTask<>))
+				{
+					return value => Wrap.AsValueTask(returnType, value);
+				}
+				else
+				{
+					throw new NotSupportedException();
+				}
+			}
+			else
+			{
+				return null;
+			}
+		}
+
+		private Func<Exception, object> MakeExceptionWrap()
+		{
+			if (this.Expectation.Await)
+			{
+				var returnType = this.Method.ReturnType;
+				Debug.Assert(returnType.IsGenericType);
+				var genericTypeDef = returnType.GetGenericTypeDefinition();
+				if (genericTypeDef == typeof(Task<>))
+				{
+					return exception => Wrap.AsFaultedTask(returnType, exception);
+				}
+				else if (genericTypeDef == typeof(ValueTask<>))
+				{
+					return exception => Wrap.AsFaultedValueTask(returnType, exception);
+				}
+				else
+				{
+					throw new NotSupportedException();
+				}
+			}
+			else
+			{
+				return null;
+			}
+		}
+
 		public void SetEagerReturnsResponse(object value)
 		{
 			Debug.Assert((this.flags & Flags.MethodIsNonVoid) != 0);
 			Debug.Assert(this.returnOrThrowResponse == null);
 
-			this.returnOrThrowResponse = new ReturnEagerValueResponse(value);
+			this.returnOrThrowResponse = new ReturnEagerValueResponse(value, this.MakeWrap());
 		}
 
 		public void SetReturnsResponse(Delegate valueFactory)
@@ -244,7 +297,7 @@ namespace Moq
 				// and instead of in `Returns(TResult)`, we ended up in `Returns(Delegate)` or `Returns(Func)`,
 				// which likely isn't what the user intended.
 				// So here we do what we would've done in `Returns(TResult)`:
-				this.returnOrThrowResponse = new ReturnEagerValueResponse(this.Method.ReturnType.GetDefaultValue());
+				this.returnOrThrowResponse = new ReturnEagerValueResponse(this.Method.ReturnType.GetDefaultValue(), this.MakeWrap());
 			}
 			else if (this.Method.ReturnType == typeof(Delegate))
 			{
@@ -252,7 +305,7 @@ namespace Moq
 				// that returns a `Delegate`, then we have arrived here because C# picked the wrong overload:
 				// We don't want to invoke the passed delegate to get a return value; the passed delegate
 				// already is the return value.
-				this.returnOrThrowResponse = new ReturnEagerValueResponse(valueFactory);
+				this.returnOrThrowResponse = new ReturnEagerValueResponse(valueFactory, this.MakeWrap());
 			}
 			else if (IsInvocationFunc(valueFactory))
 			{
@@ -261,7 +314,7 @@ namespace Moq
 			else
 			{
 				ValidateCallback(valueFactory);
-				this.returnOrThrowResponse = new ReturnLazyValueResponse(valueFactory);
+				this.returnOrThrowResponse = new ReturnLazyValueResponse(valueFactory, this.MakeWrap());
 			}
 
 			bool IsInvocationFunc(Delegate callback)
@@ -317,6 +370,12 @@ namespace Moq
 
 				var expectedReturnType = this.Method.ReturnType;
 
+				if (this.Expectation.Await)
+				{
+					Debug.Assert(this.Method.ReturnType.IsGenericType);
+					expectedReturnType = this.Method.ReturnType.GetGenericArguments()[0];
+				}
+
 				if (!expectedReturnType.IsAssignableFrom(actualReturnType))
 				{
 					// TODO: If the return type is a matcher, does the callback's return type need to be matched against it?
@@ -335,7 +394,7 @@ namespace Moq
 
 		public void SetThrowExceptionResponse(Exception exception)
 		{
-			this.returnOrThrowResponse = new ThrowExceptionResponse(exception);
+			this.returnOrThrowResponse = new ThrowExceptionResponse(exception, this.MakeExceptionWrap());
 		}
 
 		protected override void ResetCore()
@@ -470,15 +529,19 @@ namespace Moq
 		private sealed class ReturnEagerValueResponse : Response
 		{
 			public readonly object Value;
+			private readonly Func<object, object> wrap;
 
-			public ReturnEagerValueResponse(object value)
+			public ReturnEagerValueResponse(object value, Func<object, object> wrap)
 			{
 				this.Value = value;
+				this.wrap = wrap;
 			}
 
 			public override void RespondTo(Invocation invocation)
 			{
-				invocation.Return(this.Value);
+				var value = this.Value;
+				if (this.wrap != null) value = this.wrap(value);
+				invocation.Return(value);
 			}
 		}
 
@@ -502,32 +565,46 @@ namespace Moq
 		private sealed class ReturnLazyValueResponse : Response
 		{
 			private readonly Delegate valueFactory;
+			private readonly Func<object, object> wrap;
 
-			public ReturnLazyValueResponse(Delegate valueFactory)
+			public ReturnLazyValueResponse(Delegate valueFactory, Func<object, object> wrap)
 			{
 				this.valueFactory = valueFactory;
+				this.wrap = wrap;
 			}
 
 			public override void RespondTo(Invocation invocation)
 			{
-				invocation.Return(this.valueFactory.CompareParameterTypesTo(Type.EmptyTypes)
+				var value = this.valueFactory.CompareParameterTypesTo(Type.EmptyTypes)
 					? valueFactory.InvokePreserveStack()                //we need this, for the user to be able to use parameterless methods
-					: valueFactory.InvokePreserveStack(invocation.Arguments)); //will throw if parameters mismatch
+					: valueFactory.InvokePreserveStack(invocation.Arguments); //will throw if parameters mismatch
+				if (this.wrap != null) value = this.wrap(value);
+				invocation.Return(value);
 			}
 		}
 
 		private sealed class ThrowExceptionResponse : Response
 		{
 			private readonly Exception exception;
+			private readonly Func<Exception, object> wrap;
 
-			public ThrowExceptionResponse(Exception exception)
+			public ThrowExceptionResponse(Exception exception, Func<Exception, object> wrap)
 			{
 				this.exception = exception;
+				this.wrap = wrap;
 			}
 
 			public override void RespondTo(Invocation invocation)
 			{
-				throw this.exception;
+				if (this.wrap != null)
+				{
+					var value = this.wrap(exception);
+					invocation.Return(value);
+				}
+				else
+				{
+					throw this.exception;
+				}
 			}
 		}
 

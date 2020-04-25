@@ -229,6 +229,11 @@ namespace Moq
 										method,
 										arguments);
 						}
+						else if (methodCallExpression.Method.DeclaringType == typeof(Moq.Linq.Expressions.AwaitOperator))
+						{
+							Split(methodCallExpression.Arguments.Single(), out r, out p);
+							p.Await = true;
+						}
 						else
 						{
 							Debug.Assert(methodCallExpression.Method.IsExtensionMethod());
