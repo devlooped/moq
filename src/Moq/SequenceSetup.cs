@@ -14,11 +14,16 @@ namespace Moq
 	{
 		// contains the responses set up with the `CallBase`, `Pass`, `Returns`, and `Throws` verbs
 		private ConcurrentQueue<Response> responses;
+		private readonly Func<object, object> wrapper;
+		private readonly Func<Exception, object> exceptionWrapper;
 
 		public SequenceSetup(Expression originalExpression, Mock mock, InvocationShape expectation)
 			: base(originalExpression, mock, expectation)
 		{
 			this.responses = new ConcurrentQueue<Response>();
+
+			this.wrapper = expectation.Await ? Wrap.GetResultWrapper(expectation.Method.ReturnType) : null;
+			this.exceptionWrapper = expectation.Await ? Wrap.GetExceptionWrapper(expectation.Method.ReturnType) : null;
 		}
 
 		public void AddCallBase()
@@ -62,14 +67,25 @@ namespace Moq
 						break;
 
 					case ResponseKind.Returns:
+						if (this.wrapper != null) arg = this.wrapper(arg);
 						invocation.Return(arg);
 						break;
 
 					case ResponseKind.Throws:
-						throw (Exception)arg;
+						if (this.exceptionWrapper != null)
+						{
+							invocation.Return(this.exceptionWrapper((Exception)arg));
+							break;
+						}
+						else
+						{
+							throw (Exception)arg;
+						}
 
 					case ResponseKind.InvokeFunc:
-						invocation.Return(((Func<object>)arg)());
+						arg = ((Func<object>)arg)();
+						if (this.wrapper != null) arg = this.wrapper(arg);
+						invocation.Return(arg);
 						break;
 				}
 			}
