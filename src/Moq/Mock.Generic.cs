@@ -10,7 +10,7 @@ using System.Linq;
 using System.Linq.Expressions;
 using System.Text;
 using System.Threading;
-
+using System.Threading.Tasks;
 using Moq.Language;
 using Moq.Language.Flow;
 using Moq.Properties;
@@ -1416,6 +1416,45 @@ namespace Moq
 		}
 
 		/// <summary>
+		///   Raises the async event referenced in <paramref name="eventExpression"/> using the given <paramref name="args"/> argument.
+		/// </summary>
+		/// <exception cref="ArgumentException">
+		///   The <paramref name="args"/> argument is invalid for the target event invocation,
+		///   or the <paramref name="eventExpression"/> is not an event attach or detach expression.
+		/// </exception>
+		/// <example>
+		///   The following example shows how to raise a
+		///   <see cref="System.ComponentModel.INotifyPropertyChanged.PropertyChanged"/> event:
+		///   <code>
+		///     var mock = new Mock&lt;IViewModel&gt;();
+		///     await mock.RaiseAsync(x => x.PropertyChanged -= null, new PropertyChangedEventArgs("Name"));
+		///   </code>
+		/// </example>
+		/// <example>
+		///   This example shows how to invoke an event with a custom event arguments class
+		///   in a view that will cause its corresponding presenter to react by changing its state:
+		///   <code>
+		///     var mockView = new Mock&lt;IOrdersView&gt;();
+		///     var presenter = new OrdersPresenter(mockView.Object);
+		///
+		///     // Check that the presenter has no selection by default
+		///     Assert.Null(presenter.SelectedOrder);
+		///
+		///     // Raise the event with a specific arguments data
+		///     await mockView.RaiseAsync(v => v.SelectionChanged += null, new OrderEventArgs { Order = new Order("moq", 500) });
+		///
+		///     // Now the presenter reacted to the event, and we have a selected order
+		///     Assert.NotNull(presenter.SelectedOrder);
+		///     Assert.Equal("moq", presenter.SelectedOrder.ProductName);
+		///   </code>
+		/// </example>
+		[SuppressMessage("Microsoft.Design", "CA1030:UseEventsWhereAppropriate", Justification = "Raises the event, rather than being one.")]
+		public async Task RaiseAsync(Action<T> eventExpression, EventArgs args)
+		{
+			await Mock.RaiseEventAsync(this, eventExpression, new object[] { this.Object, args });
+		}
+
+		/// <summary>
 		///   Raises the event referenced in <paramref name="eventExpression"/> using the given <paramref name="args"/> argument for a non-<see cref="EventHandler"/>-typed event.
 		/// </summary>
 		/// <exception cref="ArgumentException">
@@ -1436,6 +1475,27 @@ namespace Moq
 			Mock.RaiseEvent(this, eventExpression, args);
 		}
 
-#endregion
+		/// <summary>
+		///   Raises the async event referenced in <paramref name="eventExpression"/> using the given <paramref name="args"/> argument for a non-<see cref="EventHandler"/>-typed event.
+		/// </summary>
+		/// <exception cref="ArgumentException">
+		///   The <paramref name="args"/> arguments are invalid for the target event invocation,
+		///   or the <paramref name="eventExpression"/> is not an event attach or detach expression.
+		/// </exception>
+		/// <example>
+		///   The following example shows how to raise a custom event that does not adhere
+		///   to the standard <c>EventHandler</c>:
+		///   <code>
+		///     var mock = new Mock&lt;IViewModel&gt;();
+		///     await mock.RaiseAsync(x => x.MyEvent -= null, "Name", bool, 25);
+		///   </code>
+		/// </example>
+		[SuppressMessage("Microsoft.Design", "CA1030:UseEventsWhereAppropriate", Justification = "Raises the event, rather than being one.")]
+		public async Task RaiseAsync(Action<T> eventExpression, params object[] args)
+		{
+			await Mock.RaiseEventAsync(this, eventExpression, args);
+		}
+
+		#endregion
 	}
 }

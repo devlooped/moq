@@ -9,7 +9,7 @@ using System.Globalization;
 using System.Linq;
 using System.Linq.Expressions;
 using System.Reflection;
-
+using System.Threading.Tasks;
 using Moq.Expressions.Visitors;
 using Moq.Properties;
 
@@ -706,6 +706,71 @@ namespace Moq
 			else if (mock.MutableSetups.GetInnerMockSetups().TryFind(part, out var innerMockSetup))
 			{
 				Mock.RaiseEvent(innerMockSetup.InnerMock, expression, parts, arguments);
+			}
+		}
+
+		internal static async Task RaiseEventAsync<T>(Mock mock, Action<T> action, object[] arguments)
+		{
+			Guard.NotNull(action, nameof(action));
+
+			var expression = ExpressionReconstructor.Instance.ReconstructExpression(action, mock.ConstructorArguments);
+			var parts = expression.Split();
+			await Mock.RaiseEventAsync(mock, expression, parts, arguments);
+		}
+
+		internal static async Task RaiseEventAsync(Mock mock, LambdaExpression expression, Stack<InvocationShape> parts, object[] arguments)
+		{
+			const BindingFlags bindingFlags = BindingFlags.Public | BindingFlags.NonPublic | BindingFlags.Instance | BindingFlags.DeclaredOnly;
+
+			var part = parts.Pop();
+			var method = part.Method;
+
+			if (parts.Count == 0)
+			{
+				EventInfo @event;
+				if (method.IsEventAddAccessor())
+				{
+					var implementingMethod = method.GetImplementingMethod(mock.Object.GetType());
+					@event = implementingMethod.DeclaringType.GetEvents(bindingFlags).SingleOrDefault(e => e.GetAddMethod(true) == implementingMethod);
+					if (@event == null)
+					{
+						throw new ArgumentException(
+							string.Format(
+								CultureInfo.CurrentCulture,
+								Resources.SetupNotEventAdd,
+								part.Expression));
+					}
+				}
+				else if (method.IsEventRemoveAccessor())
+				{
+					var implementingMethod = method.GetImplementingMethod(mock.Object.GetType());
+					@event = implementingMethod.DeclaringType.GetEvents(bindingFlags).SingleOrDefault(e => e.GetRemoveMethod(true) == implementingMethod);
+					if (@event == null)
+					{
+						throw new ArgumentException(
+							string.Format(
+								CultureInfo.CurrentCulture,
+								Resources.SetupNotEventRemove,
+								part.Expression));
+					}
+				}
+				else
+				{
+					throw new ArgumentException(
+						string.Format(
+							CultureInfo.CurrentCulture,
+							Resources.UnsupportedExpression,
+							expression));
+				}
+
+				if (mock.EventHandlers.TryGet(@event, out var handlers))
+				{
+					await (Task)handlers.InvokePreserveStack(arguments);
+				}
+			}
+			else if (mock.MutableSetups.GetInnerMockSetups().TryFind(part, out var innerMockSetup))
+			{
+				await Mock.RaiseEventAsync(innerMockSetup.InnerMock, expression, parts, arguments);
 			}
 		}
 
