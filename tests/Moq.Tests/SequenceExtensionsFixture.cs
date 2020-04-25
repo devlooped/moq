@@ -29,7 +29,7 @@ namespace Moq.Tests
 		}
 
 		[Fact]
-		public void PerformSequenceAsync()
+		public async Task PerformSequenceAsync()
 		{
 			var mock = new Mock<IFoo>();
 
@@ -40,15 +40,52 @@ namespace Moq.Tests
 
 			Assert.Equal(2, mock.Object.DoAsync().Result);
 			Assert.Equal(3, mock.Object.DoAsync().Result);
+			await Assert.ThrowsAsync<InvalidOperationException>(async () => await mock.Object.DoAsync());
+		}
 
-			try
-			{
-				var x = mock.Object.DoAsync().Result;
-			}
-			catch (AggregateException ex)
-			{
-				Assert.IsType<InvalidOperationException>(ex.GetBaseException());
-			}
+		[Fact]
+		public async Task PerformSequenceValueTaskAsync()
+		{
+			var mock = new Mock<IFoo>();
+
+			mock.SetupSequence(x => x.DoValueAsync())
+				.ReturnsAsync(2)
+				.ReturnsAsync(() => 3)
+				.ThrowsAsync(new InvalidOperationException());
+
+			Assert.Equal(2, mock.Object.DoValueAsync().Result);
+			Assert.Equal(3, mock.Object.DoValueAsync().Result);
+			await Assert.ThrowsAsync<InvalidOperationException>(async () => await mock.Object.DoValueAsync());
+		}
+
+		[Fact]
+		public async Task PerformSequenceVoidAsync()
+		{
+			var mock = new Mock<IFoo>();
+
+			mock.SetupSequence(x => x.DoVoidAsync())
+				.PassAsync()
+				.PassAsync()
+				.ThrowsAsync(new InvalidOperationException());
+
+			await mock.Object.DoVoidAsync();
+			await mock.Object.DoVoidAsync();
+			await Assert.ThrowsAsync<InvalidOperationException>(async () => await mock.Object.DoVoidAsync());
+		}
+
+		[Fact]
+		public async Task PerformSequenceValueTaskVoidAsync()
+		{
+			var mock = new Mock<IFoo>();
+
+			mock.SetupSequence(x => x.DoValueVoidAsync())
+				.PassAsync()
+				.PassAsync()
+				.ThrowsAsync(new InvalidOperationException());
+
+			await mock.Object.DoValueVoidAsync();
+			await mock.Object.DoValueVoidAsync();
+			await Assert.ThrowsAsync<InvalidOperationException>(async () => await mock.Object.DoValueVoidAsync());
 		}
 
 		[Fact]
@@ -259,6 +296,10 @@ namespace Moq.Tests
 			Task<int> DoAsync();
 
 			ValueTask<int> DoValueAsync();
+
+			Task DoVoidAsync();
+
+			ValueTask DoValueVoidAsync();
 
 			Func<int> GetFunc();
 
