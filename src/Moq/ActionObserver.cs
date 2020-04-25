@@ -8,9 +8,10 @@ using System.Globalization;
 using System.Linq;
 using System.Linq.Expressions;
 using System.Reflection;
-
+using System.Threading.Tasks;
 using Moq.Expressions.Visitors;
 using Moq.Internals;
+using Moq.Linq.Expressions;
 using Moq.Properties;
 
 using TypeNameFormatter;
@@ -28,10 +29,11 @@ namespace Moq
 	{
 		public override Expression<Action<T>> ReconstructExpression<T>(Action<T> action, object[] ctorArgs = null)
 		{
+			using (var awaitOperatorObserver = AwaitOperatorObserver.Activate())
 			using (var matcherObserver = MatcherObserver.Activate())
 			{
 				// Create the root recording proxy:
-				var root = (T)CreateProxy(typeof(T), ctorArgs, matcherObserver, out var rootRecorder);
+				var root = (T)CreateProxy(typeof(T), ctorArgs, awaitOperatorObserver, matcherObserver, out var rootRecorder);
 
 				Exception error = null;
 				try
@@ -61,6 +63,12 @@ namespace Moq
 					if (invocation != null)
 					{
 						body = Expression.Call(body, invocation.Method, GetArgumentExpressions(invocation, recorder.Matches.ToArray()));
+						if (recorder.Await)
+						{
+							var genArg = invocation.Method.ReturnType.GetGenericArguments()[0];
+							var awaitMethod = typeof(AwaitOperator).GetMethods("Await").First().MakeGenericMethod(genArg);
+							body = Expression.Call(awaitMethod, body);
+						}
 					}
 					else
 					{
@@ -213,9 +221,9 @@ namespace Moq
 		}
 
 		// Creates a proxy (way more light-weight than a `Mock<T>`!) with an invocation `Recorder` attached to it.
-		private static IProxy CreateProxy(Type type, object[] ctorArgs, MatcherObserver matcherObserver, out Recorder recorder)
+		private static IProxy CreateProxy(Type type, object[] ctorArgs, AwaitOperatorObserver awaitOperatorObserver, MatcherObserver matcherObserver, out Recorder recorder)
 		{
-			recorder = new Recorder(matcherObserver);
+			recorder = new Recorder(awaitOperatorObserver, matcherObserver);
 			return (IProxy)ProxyFactory.Instance.CreateProxy(type, recorder, Type.EmptyTypes, ctorArgs ?? new object[0]);
 		}
 
@@ -223,21 +231,26 @@ namespace Moq
 		// This record represents the basis for reconstructing an expression tree.
 		private sealed class Recorder : IInterceptor
 		{
+			private readonly AwaitOperatorObserver awaitOperatorObserver;
 			private readonly MatcherObserver matcherObserver;
 			private int creationTimestamp;
 			private Invocation invocation;
 			private int invocationTimestamp;
-			private IProxy returnValue;
+			private object returnValue;
 
-			public Recorder(MatcherObserver matcherObserver)
+			public Recorder(AwaitOperatorObserver awaitOperatorObserver, MatcherObserver matcherObserver)
 			{
+				Debug.Assert(awaitOperatorObserver != null);
 				Debug.Assert(matcherObserver != null);
 
+				this.awaitOperatorObserver = awaitOperatorObserver;
 				this.matcherObserver = matcherObserver;
 				this.creationTimestamp = this.matcherObserver.GetNextTimestamp();
 			}
 
 			public Invocation Invocation => this.invocation;
+
+			public bool Await => this.awaitOperatorObserver.HasAwaitOperatorBetween(this.creationTimestamp, this.invocationTimestamp);
 
 			public IEnumerable<Match> Matches
 			{
@@ -248,7 +261,7 @@ namespace Moq
 				}
 			}
 
-			public Recorder Next => this.returnValue?.Interceptor as Recorder;
+			public Recorder Next => (Unwrap.ResultIfCompletedTask(this.returnValue) as IProxy)?.Interceptor as Recorder;
 
 			public void Intercept(Invocation invocation)
 			{
@@ -277,9 +290,14 @@ namespace Moq
 					{
 						this.returnValue = null;
 					}
+					else if (IsTaskType(returnType, out var resultType))
+					{
+						var result = CreateProxy(resultType, null, this.awaitOperatorObserver, this.matcherObserver, out _);
+						this.returnValue = Wrap.GetResultWrapper(returnType).Invoke(result);
+					}
 					else if (returnType.IsMockable())
 					{
-						this.returnValue = CreateProxy(returnType, null, this.matcherObserver, out _);
+						this.returnValue = CreateProxy(returnType, null, this.awaitOperatorObserver, this.matcherObserver, out _);
 					}
 					else
 					{
@@ -295,6 +313,22 @@ namespace Moq
 				{
 					invocation.Return();
 				}
+			}
+
+			private static bool IsTaskType(Type type, out Type resultType)
+			{
+				if (type.IsGenericType)
+				{
+					var typeDef = type.GetGenericTypeDefinition();
+					if (typeDef == typeof(Task<>) || typeDef == typeof(ValueTask<>))
+					{
+						resultType = type.GetGenericArguments()[0];
+						return true;
+					}
+				}
+
+				resultType = null;
+				return false;
 			}
 		}
 	}

@@ -11,25 +11,35 @@ namespace Moq.Linq.Expressions
 		/// <todo/>
 		public static TResult Await<TResult>(Task<TResult> task)
 		{
-			return task.Result;
+			return Impl(task.Result);
 		}
 
 		/// <todo/>
 		public static TResult Await<TResult>(ValueTask<TResult> task)
 		{
-			return task.Result;
+			return Impl(task.Result);
 		}
 
 		/// <todo/>
 		public static TResult Result<TResult>(this Task<TResult> task)
 		{
-			return task.Result;
+			return Impl(task.Result);
 		}
 
 		/// <todo/>
 		public static TResult Result<TResult>(this ValueTask<TResult> task)
 		{
-			return task.Result;
+			return Impl(task.Result);
+		}
+
+		private static TResult Impl<TResult>(TResult result)
+		{
+			if (AwaitOperatorObserver.IsActive(out var o))
+			{
+				o.OnAwaitOperator();
+			}
+
+			return result;
 		}
 	}
 }
