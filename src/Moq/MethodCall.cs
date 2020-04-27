@@ -89,12 +89,12 @@ namespace Moq
 
 			this.callbackResponse?.RespondTo(invocation);
 
+			this.raiseEventResponse?.RespondTo(invocation);
+
 			if ((this.flags & Flags.CallBase) != 0)
 			{
 				invocation.ReturnBase();
 			}
-
-			this.raiseEventResponse?.RespondTo(invocation);
 
 			this.returnOrThrowResponse?.RespondTo(invocation);
 
