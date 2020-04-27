@@ -110,8 +110,6 @@ namespace Moq
 						Return.Handle(invocation, this.Mock);
 					}
 				}
-
-				this.afterReturnCallbackResponse?.RespondTo(invocation);
 			}
 			else
 			{
@@ -120,6 +118,8 @@ namespace Moq
 					invocation.Return();
 				}
 			}
+
+			this.afterReturnCallbackResponse?.RespondTo(invocation);
 		}
 
 		public override bool TryGetReturnValue(out object returnValue)
