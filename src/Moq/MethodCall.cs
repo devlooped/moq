@@ -91,11 +91,6 @@ namespace Moq
 
 			this.raiseEventResponse?.RespondTo(invocation);
 
-			if ((this.flags & Flags.CallBase) != 0)
-			{
-				invocation.ReturnBase();
-			}
-
 			this.returnOrThrowResponse?.RespondTo(invocation);
 
 			if ((this.flags & Flags.MethodIsNonVoid) != 0)
@@ -120,7 +115,7 @@ namespace Moq
 			}
 			else
 			{
-				if (this.returnOrThrowResponse == null && (this.flags & Flags.CallBase) == 0)
+				if (this.returnOrThrowResponse == null)
 				{
 					invocation.Return();
 				}
@@ -148,14 +143,7 @@ namespace Moq
 				throw new NotSupportedException(Resources.CallBaseCannotBeUsedWithDelegateMocks);
 			}
 
-			if ((this.flags & Flags.MethodIsNonVoid) != 0)
-			{
-				this.returnOrThrowResponse = ReturnBaseResponse.Instance;
-			}
-			else
-			{
-				this.flags |= Flags.CallBase;
-			}
+			this.returnOrThrowResponse = ReturnBaseResponse.Instance;
 		}
 
 		public void SetCallbackResponse(Delegate callback)
@@ -377,7 +365,6 @@ namespace Moq
 		[Flags]
 		private enum Flags : byte
 		{
-			CallBase = 1,
 			MethodIsNonVoid = 2,
 		}
 
