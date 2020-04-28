@@ -93,9 +93,9 @@ namespace Moq
 
 			this.returnOrThrowResponse?.RespondTo(invocation);
 
-			if ((this.flags & Flags.MethodIsNonVoid) != 0)
+			if (this.returnOrThrowResponse == null)
 			{
-				if (this.returnOrThrowResponse == null)
+				if ((this.flags & Flags.MethodIsNonVoid) != 0)
 				{
 					if (this.Mock.Behavior == MockBehavior.Strict)
 					{
@@ -110,10 +110,7 @@ namespace Moq
 						Return.Handle(invocation, this.Mock);
 					}
 				}
-			}
-			else
-			{
-				if (this.returnOrThrowResponse == null)
+				else
 				{
 					invocation.Return();
 				}
