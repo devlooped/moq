@@ -10,6 +10,11 @@ The format is loosely based on [Keep a Changelog](http://keepachangelog.com/en/1
 
 * New SetupSequence verbs .PassAsync() and .ThrowsAsync(...) for async methods with void return type (@fuzzybair, #993)
 
+#### Fixed
+
+* `StackOverflowException` on `VerifyAll` when mocked method returns mocked object (@hotchkj, #1012)
+
+
 ## 4.14.0 (2020-04-24)
 
 #### Added
