@@ -3279,6 +3279,40 @@ namespace Moq.Tests.Regressions
 
 		#endregion
 
+		#region 1012
+
+		public class Issue1012
+		{
+			[Fact]
+			public void Verification_can_deal_with_cycles_in_inner_mock_object_graph_1()
+			{
+				var mock = new Mock<IX>();
+				mock.Setup(m => m.X).Returns(mock.Object);
+				_ = mock.Object.X;
+				mock.VerifyAll();
+			}
+
+			[Fact]
+			public void Verification_can_deal_with_cycles_in_inner_mock_object_graph_2()
+			{
+				var mock = new Mock<IX>();
+				var otherMock = new Mock<IX>();
+				mock.Setup(m => m.X).Returns(otherMock.Object);
+				otherMock.Setup(m => m.X).Returns(mock.Object);
+				_ = mock.Object.X;
+				_ = otherMock.Object.X;
+				mock.VerifyAll();
+				otherMock.VerifyAll();
+			}
+
+			public interface IX
+			{
+				IX X { get; }
+			}
+		}
+
+		#endregion
+
 		// Old @ Google Code
 
 		#region #47

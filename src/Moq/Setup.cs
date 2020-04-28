@@ -2,6 +2,7 @@
 // All rights reserved. Licensed under the BSD 3-Clause License; see License.txt.
 
 using System;
+using System.Collections.Generic;
 using System.Diagnostics;
 using System.Linq.Expressions;
 using System.Reflection;
@@ -127,6 +128,9 @@ namespace Moq
 		/// <param name="predicate">
 		///   Specifies which setups should be verified.
 		/// </param>
+		/// <param name="verifiedMocks">
+		///   The set of mocks that have already been verified.
+		/// </param>
 		/// <param name="error">
 		///   If this setup or any of its inner mock (if present and known) failed verification,
 		///   this <see langword="out"/> parameter will receive a <see cref="MockException"/> describing the verification error(s).
@@ -135,7 +139,7 @@ namespace Moq
 		///   <see langword="true"/> if verification succeeded without any errors;
 		///   otherwise, <see langword="false"/>.
 		/// </returns>
-		public bool TryVerify(bool recursive, Func<ISetup, bool> predicate, out MockException error)
+		internal bool TryVerify(bool recursive, Func<ISetup, bool> predicate, HashSet<Mock> verifiedMocks, out MockException error)
 		{
 			MockException e;
 
@@ -147,7 +151,7 @@ namespace Moq
 			}
 
 			// optionally verify setups of inner mock (if present and known):
-			if (recursive && this.InnerMock?.TryVerify(predicate, out e) == false && e.IsVerificationError)
+			if (recursive && this.InnerMock?.TryVerify(predicate, verifiedMocks, out e) == false && e.IsVerificationError)
 			{
 				error = MockException.FromInnerMockOf(this, e);
 				return false;
@@ -186,12 +190,14 @@ namespace Moq
 
 		private void Verify(bool recursive, Func<ISetup, bool> predicate)
 		{
+			var verifiedMocks = new HashSet<Mock>();
+
 			foreach (Invocation invocation in this.mock.MutableInvocations)
 			{
 				invocation.MarkAsVerifiedIfMatchedBy(setup => setup == this);
 			}
 
-			if (!this.TryVerify(recursive, predicate, out var error) && error.IsVerificationError)
+			if (!this.TryVerify(recursive, predicate, verifiedMocks, out var error) && error.IsVerificationError)
 			{
 				throw error;
 			}

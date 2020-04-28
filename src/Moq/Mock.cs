@@ -295,14 +295,24 @@ namespace Moq
 
 		private void Verify(Func<ISetup, bool> predicate)
 		{
-			if (!this.TryVerify(predicate, out var error) && error.IsVerificationError)
+			var verifiedMocks = new HashSet<Mock>();
+
+			if (!this.TryVerify(predicate, verifiedMocks, out var error) && error.IsVerificationError)
 			{
 				throw error;
 			}
 		}
 
-		internal bool TryVerify(Func<ISetup, bool> predicate, out MockException error)
+		internal bool TryVerify(Func<ISetup, bool> predicate, HashSet<Mock> verifiedMocks, out MockException error)
 		{
+			if (verifiedMocks.Add(this) == false)
+			{
+				// This mock has already been verified; don't verify it again.
+				// (We can end up here e.g. when there are loops in the inner mock object graph.)
+				error = null;
+				return true;
+			}
+
 			foreach (Invocation invocation in this.MutableInvocations)
 			{
 				invocation.MarkAsVerifiedIfMatchedBy(predicate);
@@ -312,7 +322,7 @@ namespace Moq
 
 			foreach (var setup in this.MutableSetups.ToArray(predicate))
 			{
-				if (predicate(setup) && !setup.TryVerify(recursive: true, predicate, out var e) && e.IsVerificationError)
+				if (predicate(setup) && !setup.TryVerify(recursive: true, predicate, verifiedMocks, out var e) && e.IsVerificationError)
 				{
 					errors.Add(e);
 				}
