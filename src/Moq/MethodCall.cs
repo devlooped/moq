@@ -118,6 +118,13 @@ namespace Moq
 
 				this.afterReturnCallbackResponse?.RespondTo(invocation);
 			}
+			else
+			{
+				if (this.returnOrThrowResponse == null && (this.flags & Flags.CallBase) == 0)
+				{
+					invocation.Return();
+				}
+			}
 		}
 
 		public override bool TryGetReturnValue(out object returnValue)
