@@ -32,6 +32,7 @@ namespace Moq
 		{
 			this.condition = condition;
 			this.flags = expectation.Method.ReturnType != typeof(void) ? Flags.MethodIsNonVoid : 0;
+			this.returnOrThrowResponse = DefaultReturnResponse.Instance;
 
 			if ((mock.Switches & Switches.CollectDiagnosticFileInfoForSetups) != 0)
 			{
@@ -91,30 +92,7 @@ namespace Moq
 
 			this.raiseEventResponse?.RespondTo(invocation);
 
-			this.returnOrThrowResponse?.RespondTo(invocation);
-
-			if (this.returnOrThrowResponse == null)
-			{
-				if ((this.flags & Flags.MethodIsNonVoid) != 0)
-				{
-					if (this.Mock.Behavior == MockBehavior.Strict)
-					{
-						throw MockException.ReturnValueRequired(invocation);
-					}
-					else
-					{
-						// Instead of duplicating the entirety of `Return`'s implementation,
-						// let's just call it here. This is permissible only if the inter-
-						// ception pipeline will terminate right away (otherwise `Return`
-						// might be executed a second time).
-						Return.Handle(invocation, this.Mock);
-					}
-				}
-				else
-				{
-					invocation.Return();
-				}
-			}
+			this.returnOrThrowResponse.RespondTo(invocation);
 
 			this.afterReturnCallbackResponse?.RespondTo(invocation);
 		}
@@ -150,8 +128,8 @@ namespace Moq
 				throw new ArgumentNullException(nameof(callback));
 			}
 
-			ref Response response = ref this.returnOrThrowResponse == null ? ref this.callbackResponse
-			                                                               : ref this.afterReturnCallbackResponse;
+			ref Response response = ref (this.returnOrThrowResponse is DefaultReturnResponse) ? ref this.callbackResponse
+			                                                                                  : ref this.afterReturnCallbackResponse;
 
 			if (callback is Action callbackWithoutArguments)
 			{
@@ -218,7 +196,7 @@ namespace Moq
 		public void SetEagerReturnsResponse(object value)
 		{
 			Debug.Assert((this.flags & Flags.MethodIsNonVoid) != 0);
-			Debug.Assert(this.returnOrThrowResponse == null);
+			Debug.Assert(this.returnOrThrowResponse is DefaultReturnResponse);
 
 			this.returnOrThrowResponse = new ReturnEagerValueResponse(value);
 		}
@@ -226,7 +204,7 @@ namespace Moq
 		public void SetReturnsResponse(Delegate valueFactory)
 		{
 			Debug.Assert((this.flags & Flags.MethodIsNonVoid) != 0);
-			Debug.Assert(this.returnOrThrowResponse == null);
+			Debug.Assert(this.returnOrThrowResponse is DefaultReturnResponse);
 
 			if (valueFactory == null)
 			{
@@ -441,6 +419,41 @@ namespace Moq
 			public override void RespondTo(Invocation invocation)
 			{
 				this.callback.Invoke(invocation);
+			}
+		}
+
+		private sealed class DefaultReturnResponse : Response
+		{
+			public static readonly DefaultReturnResponse Instance = new DefaultReturnResponse();
+
+			private DefaultReturnResponse()
+			{
+			}
+
+			public override void RespondTo(Invocation invocation)
+			{
+				if (invocation.Method.ReturnType == typeof(void))
+				{
+					invocation.Return();
+				}
+				else
+				{
+					Debug.Assert(invocation.MatchingSetup is MethodCall);
+
+					var mock = invocation.MatchingSetup.Mock;
+					if (mock.Behavior == MockBehavior.Strict)
+					{
+						throw MockException.ReturnValueRequired(invocation);
+					}
+					else
+					{
+						// Instead of duplicating the entirety of `Return`'s implementation,
+						// let's just call it here. This is permissible only if the inter-
+						// ception pipeline will terminate right away (otherwise `Return`
+						// might be executed a second time).
+						Return.Handle(invocation, mock);
+					}
+				}
 			}
 		}
 
