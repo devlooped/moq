@@ -21,7 +21,6 @@ namespace Moq
 		private LimitInvocationCountResponse limitInvocationCountResponse;
 		private Condition condition;
 		private string failMessage;
-		private Flags flags;
 		private RaiseEventResponse raiseEventResponse;
 		private Response returnOrThrowResponse;
 
@@ -31,7 +30,6 @@ namespace Moq
 			: base(originalExpression, mock, expectation)
 		{
 			this.condition = condition;
-			this.flags = expectation.Method.ReturnType != typeof(void) ? Flags.MethodIsNonVoid : 0;
 			this.returnOrThrowResponse = DefaultReturnResponse.Instance;
 
 			if ((mock.Switches & Switches.CollectDiagnosticFileInfoForSetups) != 0)
@@ -195,7 +193,7 @@ namespace Moq
 
 		public void SetEagerReturnsResponse(object value)
 		{
-			Debug.Assert((this.flags & Flags.MethodIsNonVoid) != 0);
+			Debug.Assert(this.Method.ReturnType != typeof(void));
 			Debug.Assert(this.returnOrThrowResponse is DefaultReturnResponse);
 
 			this.returnOrThrowResponse = new ReturnEagerValueResponse(value);
@@ -203,7 +201,7 @@ namespace Moq
 
 		public void SetReturnsResponse(Delegate valueFactory)
 		{
-			Debug.Assert((this.flags & Flags.MethodIsNonVoid) != 0);
+			Debug.Assert(this.Method.ReturnType != typeof(void));
 			Debug.Assert(this.returnOrThrowResponse is DefaultReturnResponse);
 
 			if (valueFactory == null)
@@ -335,12 +333,6 @@ namespace Moq
 			}
 
 			return message.ToString().Trim();
-		}
-
-		[Flags]
-		private enum Flags : byte
-		{
-			MethodIsNonVoid = 2,
 		}
 
 		private sealed class LimitInvocationCountResponse
