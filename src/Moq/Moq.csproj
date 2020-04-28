@@ -32,6 +32,7 @@
 		<NoPackageAnalysis>True</NoPackageAnalysis>
 		<PackageOutputPath>$(OutputDirectory)</PackageOutputPath>
 		<PackageTags>moq;tdd;mocking;mocks;unittesting;agile;unittest</PackageTags>
+		<PackageProjectUrl>https://github.com/moq/moq4</PackageProjectUrl>
 		<RepositoryUrl>https://github.com/moq/moq4</RepositoryUrl>
 		<IncludeSymbols>True</IncludeSymbols>
 		<SymbolPackageFormat>snupkg</SymbolPackageFormat>
