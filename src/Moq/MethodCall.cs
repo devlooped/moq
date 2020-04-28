@@ -21,7 +21,6 @@ namespace Moq
 		private LimitInvocationCountResponse limitInvocationCountResponse;
 		private Condition condition;
 		private string failMessage;
-		private Flags flags;
 		private RaiseEventResponse raiseEventResponse;
 		private Response returnOrThrowResponse;
 
@@ -31,7 +30,7 @@ namespace Moq
 			: base(originalExpression, mock, expectation)
 		{
 			this.condition = condition;
-			this.flags = expectation.Method.ReturnType != typeof(void) ? Flags.MethodIsNonVoid : 0;
+			this.returnOrThrowResponse = DefaultReturnResponse.Instance;
 
 			if ((mock.Switches & Switches.CollectDiagnosticFileInfoForSetups) != 0)
 			{
@@ -89,35 +88,11 @@ namespace Moq
 
 			this.callbackResponse?.RespondTo(invocation);
 
-			if ((this.flags & Flags.CallBase) != 0)
-			{
-				invocation.ReturnBase();
-			}
-
 			this.raiseEventResponse?.RespondTo(invocation);
 
-			this.returnOrThrowResponse?.RespondTo(invocation);
+			this.returnOrThrowResponse.RespondTo(invocation);
 
-			if ((this.flags & Flags.MethodIsNonVoid) != 0)
-			{
-				if (this.returnOrThrowResponse == null)
-				{
-					if (this.Mock.Behavior == MockBehavior.Strict)
-					{
-						throw MockException.ReturnValueRequired(invocation);
-					}
-					else
-					{
-						// Instead of duplicating the entirety of `Return`'s implementation,
-						// let's just call it here. This is permissible only if the inter-
-						// ception pipeline will terminate right away (otherwise `Return`
-						// might be executed a second time).
-						Return.Handle(invocation, this.Mock);
-					}
-				}
-
-				this.afterReturnCallbackResponse?.RespondTo(invocation);
-			}
+			this.afterReturnCallbackResponse?.RespondTo(invocation);
 		}
 
 		public override bool TryGetReturnValue(out object returnValue)
@@ -141,14 +116,7 @@ namespace Moq
 				throw new NotSupportedException(Resources.CallBaseCannotBeUsedWithDelegateMocks);
 			}
 
-			if ((this.flags & Flags.MethodIsNonVoid) != 0)
-			{
-				this.returnOrThrowResponse = ReturnBaseResponse.Instance;
-			}
-			else
-			{
-				this.flags |= Flags.CallBase;
-			}
+			this.returnOrThrowResponse = ReturnBaseResponse.Instance;
 		}
 
 		public void SetCallbackResponse(Delegate callback)
@@ -158,8 +126,8 @@ namespace Moq
 				throw new ArgumentNullException(nameof(callback));
 			}
 
-			ref Response response = ref this.returnOrThrowResponse == null ? ref this.callbackResponse
-			                                                               : ref this.afterReturnCallbackResponse;
+			ref Response response = ref (this.returnOrThrowResponse is DefaultReturnResponse) ? ref this.callbackResponse
+			                                                                                  : ref this.afterReturnCallbackResponse;
 
 			if (callback is Action callbackWithoutArguments)
 			{
@@ -225,16 +193,16 @@ namespace Moq
 
 		public void SetEagerReturnsResponse(object value)
 		{
-			Debug.Assert((this.flags & Flags.MethodIsNonVoid) != 0);
-			Debug.Assert(this.returnOrThrowResponse == null);
+			Debug.Assert(this.Method.ReturnType != typeof(void));
+			Debug.Assert(this.returnOrThrowResponse is DefaultReturnResponse);
 
 			this.returnOrThrowResponse = new ReturnEagerValueResponse(value);
 		}
 
 		public void SetReturnsResponse(Delegate valueFactory)
 		{
-			Debug.Assert((this.flags & Flags.MethodIsNonVoid) != 0);
-			Debug.Assert(this.returnOrThrowResponse == null);
+			Debug.Assert(this.Method.ReturnType != typeof(void));
+			Debug.Assert(this.returnOrThrowResponse is DefaultReturnResponse);
 
 			if (valueFactory == null)
 			{
@@ -367,13 +335,6 @@ namespace Moq
 			return message.ToString().Trim();
 		}
 
-		[Flags]
-		private enum Flags : byte
-		{
-			CallBase = 1,
-			MethodIsNonVoid = 2,
-		}
-
 		private sealed class LimitInvocationCountResponse
 		{
 			private readonly MethodCall setup;
@@ -450,6 +411,41 @@ namespace Moq
 			public override void RespondTo(Invocation invocation)
 			{
 				this.callback.Invoke(invocation);
+			}
+		}
+
+		private sealed class DefaultReturnResponse : Response
+		{
+			public static readonly DefaultReturnResponse Instance = new DefaultReturnResponse();
+
+			private DefaultReturnResponse()
+			{
+			}
+
+			public override void RespondTo(Invocation invocation)
+			{
+				if (invocation.Method.ReturnType == typeof(void))
+				{
+					invocation.Return();
+				}
+				else
+				{
+					Debug.Assert(invocation.MatchingSetup is MethodCall);
+
+					var mock = invocation.MatchingSetup.Mock;
+					if (mock.Behavior == MockBehavior.Strict)
+					{
+						throw MockException.ReturnValueRequired(invocation);
+					}
+					else
+					{
+						// Instead of duplicating the entirety of `Return`'s implementation,
+						// let's just call it here. This is permissible only if the inter-
+						// ception pipeline will terminate right away (otherwise `Return`
+						// might be executed a second time).
+						Return.Handle(invocation, mock);
+					}
+				}
 			}
 		}
 
