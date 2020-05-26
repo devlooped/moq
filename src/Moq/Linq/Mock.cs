@@ -65,12 +65,6 @@ namespace Moq
 		/// <returns>The mocked object created.</returns>
 		public static T Of<T>(MockBehavior behavior,params object[] args) where T : class
 		{
-			// This method was originally implemented as follows:
-			//
-			// return Mocks.CreateMockQuery<T>().First<T>();
-			//
-			// which involved a lot of avoidable `IQueryable` query provider overhead and lambda compilation.
-			// What it really boils down to is this (much faster) code:
 			var mock = new Mock<T>(behavior,args);
 			if (behavior != MockBehavior.Strict)
 			{

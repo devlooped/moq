@@ -152,6 +152,38 @@ namespace Moq.Tests
 		}
 
 		[Fact]
+		public void ShouldOneOfCreateNewMockOfClassWithNotDefaultConstructor()
+		{
+			var target = Mock.Of<FooNotDefaultConstructor>(1);
+
+			Assert.NotNull(Mock.Get(target));
+		}
+
+		[Fact]
+		public void ShouldOneOfCreateNewMockOfClassWithDefaultConstructor()
+		{
+			var target = Mock.Of<Dto>(new object[0]);
+
+			Assert.NotNull(Mock.Get(target));
+		}
+
+		[Fact]
+		public void ShouldOneOfCreateNewMockOfClassWithNotDefaultConstructorUsingMockBehavior()
+		{
+			var target = Mock.Of<FooNotDefaultConstructor>(MockBehavior.Strict, 1);
+
+			Assert.NotNull(Mock.Get(target));
+		}
+
+		[Fact]
+		public void ShouldOneOfCreateNewMockOfClassWithDefaultConstructorUsingMockBehavior()
+		{
+			var target = Mock.Of<Dto>(MockBehavior.Strict, new object[0]);
+
+			Assert.NotNull(Mock.Get(target));
+		}
+
+		[Fact]
 		public void ShouldOneOfWithPredicateCreateNewMock()
 		{
 			var target = Mock.Of<IFoo>(x => x.Name == "Foo");
@@ -251,6 +283,22 @@ namespace Moq.Tests
 		}
 
 		public virtual string Value { get; private set; }
+	}
+
+	public class FooNotDefaultConstructor
+	{
+		private readonly int value;
+		public string Property { get; set; }
+
+		public FooNotDefaultConstructor(int value)
+		{
+			this.value = value;
+		}
+
+		public virtual int GetValue()
+		{
+			return value;
+		}
 	}
 
 	public class FooFixture
