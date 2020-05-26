@@ -8,7 +8,7 @@ The format is loosely based on [Keep a Changelog](http://keepachangelog.com/en/1
 
 #### Added
  
-Added support to use Mock.Of<T> with non generic constructors (@JorTurFer, #963)
+Added support to use Mock.Of<T> with not default constructors (@JorTurFer, #963)
 
 
 ## 4.13.1 (2019-10-19)
