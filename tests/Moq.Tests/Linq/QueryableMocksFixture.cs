@@ -288,7 +288,6 @@ namespace Moq.Tests
 	public class FooNotDefaultConstructor
 	{
 		private readonly int value;
-		public string Property { get; set; }
 
 		public FooNotDefaultConstructor(int value)
 		{
