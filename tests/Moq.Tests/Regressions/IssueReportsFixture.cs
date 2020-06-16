@@ -3313,6 +3313,28 @@ namespace Moq.Tests.Regressions
 
 		#endregion
 
+		#region 1024
+
+		public class Issue1024
+		{
+			[Fact]
+			public void Verify_passes_when_DefaultValue_Mock_and_setup_without_any_Returns()
+			{
+				var totoMock = new Mock<IToto>() { DefaultValue = DefaultValue.Mock };
+				totoMock.Setup(o => o.Do()).Verifiable();
+
+				totoMock.Object.Do();
+
+				totoMock.Verify();
+			}
+
+			public interface IToto
+			{
+				IList<string> Do();
+			}
+		}
+		#endregion
+
 		// Old @ Google Code
 
 		#region #47
