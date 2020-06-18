@@ -790,7 +790,7 @@ namespace Moq
 
 		#region Inner mocks
 
-		internal void AddInnerMockSetup(Invocation invocation, object returnValue)
+		internal InnerMockSetup AddInnerMockSetup(Invocation invocation, object returnValue)
 		{
 			var method = invocation.Method;
 
@@ -819,7 +819,9 @@ namespace Moq
 				Debug.Assert(property.CanRead(out var getter) && invocation.Method == getter);
 			}
 
-			this.MutableSetups.Add(new InnerMockSetup(originalExpression: null, this, new InvocationShape(expression, invocation.Method, arguments, exactGenericTypeArguments: true), returnValue));
+			var setup = new InnerMockSetup(originalExpression: null, this, new InvocationShape(expression, invocation.Method, arguments, exactGenericTypeArguments: true), returnValue);
+			this.MutableSetups.Add(setup);
+			return setup;
 		}
 
 		#endregion
