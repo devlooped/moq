@@ -3328,9 +3328,29 @@ namespace Moq.Tests.Regressions
 				totoMock.Verify();
 			}
 
+			[Fact]
+			public void Verify_passes_when_DefaultValue_Mock_and_setup_with_Returns()
+			{
+				var totoMock = new Mock<IToto>();
+				var tataMock = new Mock<ITata>() { DefaultValue = DefaultValue.Mock };
+
+				totoMock.Setup(o => o.DoToto()).Returns(tataMock.Object).Verifiable();
+
+				totoMock.Object.DoToto();
+				tataMock.Object.DoTata();
+
+				totoMock.Verify();
+			}
+
 			public interface IToto
 			{
 				IList<string> Do();
+				ITata DoToto();
+			}
+
+			public interface ITata
+			{
+				IList<string> DoTata();
 			}
 		}
 		#endregion
