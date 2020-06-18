@@ -15,7 +15,7 @@
 	</PropertyGroup>
 
 	<PropertyGroup Condition=" '$(TargetFramework)' == 'net472' ">
-		<DefineConstants>$(DefineConstants);FEATURE_CAS;FEATURE_DYNAMICPROXY_SERIALIZABLE_PROXIES;FEATURE_COM;FEATURE_EF;FEATURE_SYSTEM_WEB;FEATURE_SYSTEM_WINDOWS_FORMS</DefineConstants>
+		<DefineConstants>$(DefineConstants);FEATURE_DYNAMICPROXY_SERIALIZABLE_PROXIES;FEATURE_EF;FEATURE_SYSTEM_WEB;FEATURE_SYSTEM_WINDOWS_FORMS</DefineConstants>
 	</PropertyGroup>
 	<PropertyGroup Condition=" '$(TargetFramework)' == 'netcoreapp3.1' ">
 		<DefineConstants>$(DefineConstants)</DefineConstants>
@@ -27,7 +27,7 @@
 		<ProjectReference Include="..\..\src\Moq\Moq.csproj" />
 		<ProjectReference Include="..\Moq.Tests.FSharpTypes\Moq.Tests.FSharpTypes.fsproj" />
 	</ItemGroup>
-	<ItemGroup Condition=" $([System.Text.RegularExpressions.Regex]::IsMatch('$(DefineConstants)', 'FEATURE_COM'))">
+	<ItemGroup>
 		<Reference Include="Moq.Tests.ComTypes">
 			<HintPath>..\Moq.Tests.ComTypes\Moq.Tests.ComTypes.dll</HintPath>
 		</Reference>
