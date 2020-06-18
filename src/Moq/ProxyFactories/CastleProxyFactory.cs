@@ -13,15 +13,6 @@ using Castle.DynamicProxy;
 using Moq.Internals;
 using Moq.Properties;
 
-#if FEATURE_CAS
-using System.Security.Permissions;
-using Castle.DynamicProxy.Generators;
-#endif
-
-#if FEATURE_COM
-using System.Runtime.InteropServices;
-#endif
-
 namespace Moq
 {
 	/// <summary>
@@ -31,23 +22,6 @@ namespace Moq
 	{
 		private ProxyGenerationOptions generationOptions;
 		private ProxyGenerator generator;
-
-		#if FEATURE_CAS || FEATURE_COM
-		static CastleProxyFactory()
-		{
-			#if FEATURE_CAS
-			AttributesToAvoidReplicating.Add<SecurityPermissionAttribute>();
-			AttributesToAvoidReplicating.Add<ReflectionPermissionAttribute>();
-			AttributesToAvoidReplicating.Add<PermissionSetAttribute>();
-			AttributesToAvoidReplicating.Add<UIPermissionAttribute>();
-			#endif
-
-			#if FEATURE_COM
-			AttributesToAvoidReplicating.Add<MarshalAsAttribute>();
-			AttributesToAvoidReplicating.Add<TypeIdentifierAttribute>();
-			#endif
-		}
-		#endif
 
 		public CastleProxyFactory()
 		{
