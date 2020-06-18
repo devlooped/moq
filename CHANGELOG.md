@@ -5,6 +5,13 @@ All notable changes to this project will be documented in this file.
 The format is loosely based on [Keep a Changelog](http://keepachangelog.com/en/1.0.0/).
 
 
+## Unreleased
+
+#### Fixed
+
+* Regression, Part II: `Verify` behavior change using `DefaultValue.Mock` (@DesrosiersC, #1024)
+
+
 ## 4.14.2 (2020-06-16)
 
 #### Fixed
