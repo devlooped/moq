@@ -3355,6 +3355,56 @@ namespace Moq.Tests.Regressions
 		}
 		#endregion
 
+		#region 1031
+
+		public class Issue1031
+		{
+			[Fact]
+			public void MultiSetupNRE_Abbreviated()
+			{
+				StubDataStore obj = null;
+				var exampleMock = new Mock<IDataStore>(MockBehavior.Strict);
+				exampleMock.Setup(m => m.IsStored(It.Is<string>(s => obj.Value == s))); // Binds correctly
+				exampleMock.Setup(m => m.IsStored(It.Is<string>(s => obj.Value != s))); // Null Reference Exception
+			}
+
+			[Fact]
+			public void MultiSetupNRE()
+			{
+				// Arrange
+				var exampleMock = new Mock<IDataStore>(MockBehavior.Strict);
+
+				StubDataStore obj = null;
+				exampleMock.Setup(m => m.IsStored(It.Is<string>(s => obj.Value == s))) // Binds correctly
+					.Returns(true).Verifiable();
+				exampleMock.Setup(m => m.IsStored(It.Is<string>(s => obj.Value != s))) // Null Reference Exception
+					.Returns(false).Verifiable();
+
+				// Act
+				obj = new StubDataStore { Value = "a" };
+				var resHit = exampleMock.Object.IsStored("a");
+				var resMiss = exampleMock.Object.IsStored("b");
+
+				// Assert
+				exampleMock.Verify();
+				Assert.True(resHit);
+				Assert.False(resMiss);
+			}
+
+			public class StubDataStore
+			{
+				public string Value { get; set; }
+			}
+
+			public interface IDataStore
+			{
+				bool IsStored(string arg);
+			}
+		}
+
+
+		#endregion
+
 		// Old @ Google Code
 
 		#region #47
