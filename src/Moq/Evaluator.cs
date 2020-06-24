@@ -109,7 +109,17 @@ namespace Moq
 					base.Visit(expression);
 					if (!this.cannotBeEvaluated)
 					{
-						if (this.fnCanBeEvaluated(expression))
+						bool canBeEvaluated;
+						try
+						{
+							canBeEvaluated = this.fnCanBeEvaluated(expression);
+						}
+						catch
+						{
+							canBeEvaluated = false;
+						}
+
+						if (canBeEvaluated)
 						{
 							this.candidates.Add(expression);
 						}
