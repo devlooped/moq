@@ -355,36 +355,14 @@ namespace Moq
 			}
 		}
 
-		public static bool TryFind(this IEnumerable<Setup> innerMockSetups, InvocationShape expectation, out Setup setup)
+		public static Setup TryFind(this IEnumerable<Setup> setups, InvocationShape expectation)
 		{
-			Debug.Assert(innerMockSetups.All(s => s.InnerMock != null));
-
-			foreach (Setup innerMockSetup in innerMockSetups)
-			{
-				if (innerMockSetup.Expectation.Equals(expectation))
-				{
-					setup = innerMockSetup;
-					return true;
-				}
-			}
-
-			setup = default;
-			return false;
+			return setups.FirstOrDefault(setup => setup.Expectation.Equals(expectation));
 		}
 
-		public static bool TryFind(this IEnumerable<Setup> innerMockSetups, Invocation invocation, out Setup setup)
+		public static Setup TryFind(this IEnumerable<Setup> setups, Invocation invocation)
 		{
-			foreach (Setup innerMockSetup in innerMockSetups)
-			{
-				if (innerMockSetup.Matches(invocation))
-				{
-					setup = innerMockSetup;
-					return true;
-				}
-			}
-
-			setup = default;
-			return false;
+			return setups.FirstOrDefault(setup => setup.Matches(invocation));
 		}
 	}
 }

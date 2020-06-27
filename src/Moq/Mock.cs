@@ -426,7 +426,7 @@ namespace Moq
 						// In order for an invocation to be "transitive", its return value has to be a
 						// sub-object (inner mock); and that sub-object has to have received at least
 						// one call:
-						var wasTransitiveInvocation = innerMockSetups.TryFind(unverifiedInvocations[i], out var inner)
+						var wasTransitiveInvocation = innerMockSetups.TryFind(unverifiedInvocations[i]) is Setup inner
 						                              && inner.InnerMock.MutableInvocations.Any();
 						if (wasTransitiveInvocation)
 						{
@@ -607,7 +607,7 @@ namespace Moq
 			else
 			{
 				Mock innerMock;
-				if (mock.MutableSetups.GetInnerMockSetups().TryFind(part, out var setup))
+				if (mock.MutableSetups.GetInnerMockSetups().TryFind(part) is Setup setup)
 				{
 					innerMock = setup.InnerMock;
 				}
@@ -713,7 +713,7 @@ namespace Moq
 					handlers.InvokePreserveStack(arguments);
 				}
 			}
-			else if (mock.MutableSetups.GetInnerMockSetups().TryFind(part, out var innerMockSetup))
+			else if (mock.MutableSetups.GetInnerMockSetups().TryFind(part) is Setup innerMockSetup)
 			{
 				Mock.RaiseEvent(innerMockSetup.InnerMock, expression, parts, arguments);
 			}
