@@ -10,7 +10,7 @@
 		<DebugSymbols>True</DebugSymbols>
 		<DebugType>portable</DebugType>
 		<GenerateRuntimeConfigurationFiles>true</GenerateRuntimeConfigurationFiles>
-		<LangVersion>7.3</LangVersion>
+		<LangVersion>8.0</LangVersion>
 		<IsPackable>False</IsPackable>
 	</PropertyGroup>
 

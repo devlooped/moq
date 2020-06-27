@@ -16,7 +16,7 @@
 		<RootNamespace>Moq</RootNamespace>
 		<TreatWarningsAsErrors>true</TreatWarningsAsErrors>
 		<WarningLevel>4</WarningLevel>
-		<LangVersion>7.3</LangVersion>
+		<LangVersion>8.0</LangVersion>
 	</PropertyGroup>
 
 	<PropertyGroup>
