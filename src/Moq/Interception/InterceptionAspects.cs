@@ -264,7 +264,8 @@ namespace Moq
 				var returnValue = mock.GetDefaultValue(method, out var innerMock);
 				if (innerMock != null && invocation.MatchingSetup == null)
 				{
-					var setup = mock.AddInnerMockSetup(invocation, returnValue);
+					var setup = new InnerMockSetup(originalExpression: null, mock, expectation: InvocationShape.CreateFrom(invocation), returnValue);
+					mock.MutableSetups.Add(setup);
 					setup.Execute(invocation);
 				}
 				else

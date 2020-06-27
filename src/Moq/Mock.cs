@@ -787,43 +787,5 @@ namespace Moq
 		}
 
 		#endregion
-
-		#region Inner mocks
-
-		internal InnerMockSetup AddInnerMockSetup(Invocation invocation, object returnValue)
-		{
-			var method = invocation.Method;
-
-			Expression[] arguments;
-			{
-				var parameterTypes = method.GetParameterTypes();
-				var n = parameterTypes.Count;
-				arguments = new Expression[n];
-				for (int i = 0; i < n; ++i)
-				{
-					arguments[i] = Expression.Constant(invocation.Arguments[i], parameterTypes[i]);
-				}
-			}
-
-			LambdaExpression expression;
-			{
-				var mock = Expression.Parameter(method.DeclaringType, "mock");
-				expression = Expression.Lambda(Expression.Call(mock, method, arguments).Apply(UpgradePropertyAccessorMethods.Rewriter), mock);
-			}
-
-			if (expression.IsProperty())
-			{
-				var property = expression.ToPropertyInfo();
-				Guard.CanRead(property);
-
-				Debug.Assert(property.CanRead(out var getter) && invocation.Method == getter);
-			}
-
-			var setup = new InnerMockSetup(originalExpression: null, this, new InvocationShape(expression, invocation.Method, arguments, exactGenericTypeArguments: true), returnValue);
-			this.MutableSetups.Add(setup);
-			return setup;
-		}
-
-		#endregion
 	}
 }

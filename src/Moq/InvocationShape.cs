@@ -8,6 +8,10 @@ using System.Linq;
 using System.Linq.Expressions;
 using System.Reflection;
 
+using Moq.Expressions.Visitors;
+
+using E = System.Linq.Expressions.Expression;
+
 namespace Moq
 {
 	/// <summary>
@@ -21,6 +25,38 @@ namespace Moq
 	/// </summary>
 	internal sealed class InvocationShape : IEquatable<InvocationShape>
 	{
+		public static InvocationShape CreateFrom(Invocation invocation)
+		{
+			var method = invocation.Method;
+
+			Expression[] arguments;
+			{
+				var parameterTypes = method.GetParameterTypes();
+				var n = parameterTypes.Count;
+				arguments = new Expression[n];
+				for (int i = 0; i < n; ++i)
+				{
+					arguments[i] = E.Constant(invocation.Arguments[i], parameterTypes[i]);
+				}
+			}
+
+			LambdaExpression expression;
+			{
+				var mock = E.Parameter(method.DeclaringType, "mock");
+				expression = E.Lambda(E.Call(mock, method, arguments).Apply(UpgradePropertyAccessorMethods.Rewriter), mock);
+			}
+
+			if (expression.IsProperty())
+			{
+				var property = expression.ToPropertyInfo();
+				Guard.CanRead(property);
+
+				Debug.Assert(property.CanRead(out var getter) && method == getter);
+			}
+
+			return new InvocationShape(expression, method, arguments, exactGenericTypeArguments: true);
+		}
+
 		private static readonly Expression[] noArguments = new Expression[0];
 		private static readonly IMatcher[] noArgumentMatchers = new IMatcher[0];
 
