@@ -2994,7 +2994,9 @@ namespace Moq.Tests.Regressions
 
 			public class A : IA
 			{
+#pragma warning disable CS0067
 				public virtual event Action E;
+#pragma warning restore CS0067
 			}
 
 			public class AB : IA, IB

@@ -6,6 +6,8 @@ using System.Collections.Generic;
 
 using Xunit;
 
+#pragma warning disable CS0183, CS0184
+
 namespace Moq.Tests.Matchers
 {
 	// The purpose behind these tests is to find cases where `value is T` and
@@ -161,3 +163,5 @@ namespace Moq.Tests.Matchers
 		}
 	}
 }
+
+#pragma warning restore CS0183, CS0184
