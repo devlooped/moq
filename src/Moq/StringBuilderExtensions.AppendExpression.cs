@@ -193,81 +193,36 @@ namespace Moq
 
 			string GetOperator(ExpressionType nodeType)
 			{
-				switch (nodeType)
+				return nodeType switch
 				{
-					case ExpressionType.Add:
-					case ExpressionType.AddChecked:
-						return "+";
-
-					case ExpressionType.AddAssign:
-						return "+=";
-
-					case ExpressionType.Assign:
-						return "=";
-
-					case ExpressionType.And:
-						return "&";
-
-					case ExpressionType.AndAlso:
-						return "&&";
-
-					case ExpressionType.Coalesce:
-						return "??";
-
-					case ExpressionType.Divide:
-						return "/";
-
-					case ExpressionType.Equal:
-						return "==";
-
-					case ExpressionType.ExclusiveOr:
-						return "^";
-
-					case ExpressionType.GreaterThan:
-						return ">";
-
-					case ExpressionType.GreaterThanOrEqual:
-						return ">=";
-
-					case ExpressionType.LeftShift:
-						return "<<";
-
-					case ExpressionType.LessThan:
-						return "<";
-
-					case ExpressionType.LessThanOrEqual:
-						return "<=";
-
-					case ExpressionType.Modulo:
-						return "%";
-
-					case ExpressionType.Multiply:
-					case ExpressionType.MultiplyChecked:
-						return "*";
-
-					case ExpressionType.NotEqual:
-						return "!=";
-
-					case ExpressionType.Or:
-						return "|";
-
-					case ExpressionType.OrElse:
-						return "||";
-
-					case ExpressionType.Power:
-						return "^";
-
-					case ExpressionType.RightShift:
-						return ">>";
-
-					case ExpressionType.Subtract:
-					case ExpressionType.SubtractChecked:
-						return "-";
-
-					case ExpressionType.SubtractAssign:
-						return "-=";
-				}
-				return nodeType.ToString();
+					ExpressionType.Add                => "+",
+					ExpressionType.AddChecked         => "+",
+					ExpressionType.AddAssign          => "+=",
+					ExpressionType.Assign             => "=",
+					ExpressionType.And                => "&",
+					ExpressionType.AndAlso            => "&&",
+					ExpressionType.Coalesce           => "??",
+					ExpressionType.Divide             => "/",
+					ExpressionType.Equal              => "==",
+					ExpressionType.ExclusiveOr        => "^",
+					ExpressionType.GreaterThan        => ">",
+					ExpressionType.GreaterThanOrEqual => ">=",
+					ExpressionType.LeftShift          => "<<",
+					ExpressionType.LessThan           => "<",
+					ExpressionType.LessThanOrEqual    => "<=",
+					ExpressionType.Modulo             => "%",
+					ExpressionType.Multiply           => "*",
+					ExpressionType.MultiplyChecked    => "*",
+					ExpressionType.NotEqual           => "!=",
+					ExpressionType.Or                 => "|",
+					ExpressionType.OrElse             => "||",
+					ExpressionType.Power              => "^",
+					ExpressionType.RightShift         => ">>",
+					ExpressionType.Subtract           => "-",
+					ExpressionType.SubtractChecked    => "-",
+					ExpressionType.SubtractAssign     => "-=",
+					_                                 => nodeType.ToString(),
+				};
 			}
 		}
 

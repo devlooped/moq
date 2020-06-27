@@ -88,21 +88,12 @@ namespace Moq
 
 			if (parameterType.IsByRef)
 			{
-				switch (parameter.Attributes & (ParameterAttributes.In | ParameterAttributes.Out))
+				stringBuilder.Append((parameter.Attributes & (ParameterAttributes.In | ParameterAttributes.Out)) switch
 				{
-					case ParameterAttributes.In:
-						stringBuilder.Append("in ");
-						break;
-
-					case ParameterAttributes.Out:
-						stringBuilder.Append("out ");
-						break;
-
-					case ParameterAttributes.In | ParameterAttributes.Out:
-					default:
-						stringBuilder.Append("ref ");
-						break;
-				}
+					ParameterAttributes.In  => "in ",
+					ParameterAttributes.Out => "out ",
+					_                       => "ref ",
+				});
 
 				parameterType = parameterType.GetElementType();
 			}

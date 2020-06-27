@@ -163,19 +163,12 @@ namespace Moq
 			}
 			set
 			{
-				switch (value)
+				this.DefaultValueProvider = value switch
 				{
-					case DefaultValue.Empty:
-						this.DefaultValueProvider = DefaultValueProvider.Empty;
-						return;
-
-					case DefaultValue.Mock:
-						this.DefaultValueProvider = DefaultValueProvider.Mock;
-						return;
-
-					default:
-						throw new ArgumentOutOfRangeException(nameof(value));
-				}
+					DefaultValue.Empty => DefaultValueProvider.Empty,
+					DefaultValue.Mock  => DefaultValueProvider.Mock,
+					_                  => throw new ArgumentOutOfRangeException(nameof(value)),
+				};
 			}
 		}
 

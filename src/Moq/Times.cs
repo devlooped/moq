@@ -241,19 +241,19 @@ namespace Moq
 		/// <inheritdoc/>
 		public override string ToString()
 		{
-			switch (this.kind)
+			return this.kind switch
 			{
-				case Kind.AtLeast:          return $"AtLeast({this.from})";
-				case Kind.AtMost:           return $"AtMost({this.to})";
-				case Kind.AtMostOnce:       return  "AtMostOnce";
-				case Kind.BetweenExclusive: return $"Between({this.from - 1}, {this.to + 1}, Exclusive)";
-				case Kind.BetweenInclusive: return $"Between({this.from}, {this.to}, Inclusive)";
-				case Kind.Exactly:          return $"Exactly({this.from})";
-				case Kind.Once:             return  "Once";
-				case Kind.Never:            return  "Never";
-				case Kind.AtLeastOnce:
-				default:                    return  "AtLeastOnce";
-			}
+				Kind.AtLeastOnce      =>  "AtLeastOnce",
+				Kind.AtLeast          => $"AtLeast({this.from})",
+				Kind.AtMost           => $"AtMost({this.to})",
+				Kind.AtMostOnce       =>  "AtMostOnce",
+				Kind.BetweenExclusive => $"Between({this.from - 1}, {this.to + 1}, Exclusive)",
+				Kind.BetweenInclusive => $"Between({this.from}, {this.to}, Inclusive)",
+				Kind.Exactly          => $"Exactly({this.from})",
+				Kind.Once             =>  "Once",
+				Kind.Never            =>  "Never",
+				_                     => throw new InvalidOperationException(),
+			};
 		}
 
 		internal string GetExceptionMessage(int callCount)
@@ -266,19 +266,19 @@ namespace Moq
 				++to;
 			}
 
-			string message = null;
-			switch (this.kind)
+			var message = this.kind switch
 			{
-				case Kind.AtLeast:          message = Resources.NoMatchingCallsAtLeast; break;
-				case Kind.AtLeastOnce:      message = Resources.NoMatchingCallsAtLeastOnce; break;
-				case Kind.AtMost:           message = Resources.NoMatchingCallsAtMost; break;
-				case Kind.AtMostOnce:       message = Resources.NoMatchingCallsAtMostOnce; break;
-				case Kind.BetweenExclusive: message = Resources.NoMatchingCallsBetweenExclusive; break;
-				case Kind.BetweenInclusive: message = Resources.NoMatchingCallsBetweenInclusive; break;
-				case Kind.Exactly:          message = Resources.NoMatchingCallsExactly; break;
-				case Kind.Once:             message = Resources.NoMatchingCallsOnce; break;
-				case Kind.Never:            message = Resources.NoMatchingCallsNever; break;
-			}
+				Kind.AtLeastOnce      => Resources.NoMatchingCallsAtLeastOnce,
+				Kind.AtLeast          => Resources.NoMatchingCallsAtLeast,
+				Kind.AtMost           => Resources.NoMatchingCallsAtMost,
+				Kind.AtMostOnce       => Resources.NoMatchingCallsAtMostOnce,
+				Kind.BetweenExclusive => Resources.NoMatchingCallsBetweenExclusive,
+				Kind.BetweenInclusive => Resources.NoMatchingCallsBetweenInclusive,
+				Kind.Exactly          => Resources.NoMatchingCallsExactly,
+				Kind.Once             => Resources.NoMatchingCallsOnce,
+				Kind.Never            => Resources.NoMatchingCallsNever,
+				_                     => throw new InvalidOperationException(),
+			};
 
 			return string.Format(CultureInfo.CurrentCulture, message, from, to, callCount);
 		}

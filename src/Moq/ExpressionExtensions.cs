@@ -411,26 +411,17 @@ namespace Moq
 
 		private static bool PartialMatcherAwareEval_ShouldEvaluate(Expression expression)
 		{
-			switch (expression.NodeType)
-			{
-				case ExpressionType.Parameter:
-					return false;
-
-				case ExpressionType.Extension:
-					return !(expression is MatchExpression);
-
 #pragma warning disable 618
-				case ExpressionType.Call:
-					return !((MethodCallExpression)expression).Method.IsDefined(typeof(MatcherAttribute), true)
-						&& !expression.IsMatch(out _);
+			return expression.NodeType switch
+			{
+				ExpressionType.Parameter    => false,
+				ExpressionType.Extension    => !(expression is MatchExpression),
+				ExpressionType.Call         => !((MethodCallExpression)expression).Method.IsDefined(typeof(MatcherAttribute), true)
+				                               && !expression.IsMatch(out _),
+				ExpressionType.MemberAccess => !expression.IsMatch(out _),
+				_                           => true,
+			};
 #pragma warning restore 618
-
-				case ExpressionType.MemberAccess:
-					return !expression.IsMatch(out _);
-
-				default:
-					return true;
-			}
 		}
 
 		/// <devdoc>

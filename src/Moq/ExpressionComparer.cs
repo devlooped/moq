@@ -186,15 +186,13 @@ namespace Moq
 		{
 			if (x.BindingType == y.BindingType && x.Member == y.Member)
 			{
-				switch (x.BindingType)
+				return x.BindingType switch
 				{
-					case MemberBindingType.Assignment:
-						return this.EqualsMemberAssignment((MemberAssignment)x, (MemberAssignment)y);
-					case MemberBindingType.MemberBinding:
-						return this.EqualsMemberMemberBinding((MemberMemberBinding)x, (MemberMemberBinding)y);
-					case MemberBindingType.ListBinding:
-						return this.EqualsMemberListBinding((MemberListBinding)x, (MemberListBinding)y);
-				}
+					MemberBindingType.Assignment    => this.EqualsMemberAssignment((MemberAssignment)x, (MemberAssignment)y),
+					MemberBindingType.MemberBinding => this.EqualsMemberMemberBinding((MemberMemberBinding)x, (MemberMemberBinding)y),
+					MemberBindingType.ListBinding   => this.EqualsMemberListBinding((MemberListBinding)x, (MemberListBinding)y),
+					_                               => throw new ArgumentOutOfRangeException(nameof(x)),
+				};
 			}
 
 			return false;
