@@ -26,7 +26,7 @@ namespace Moq
 
 		protected override void ExecuteCore(Invocation invocation)
 		{
-			invocation.Return(this.getter.Invoke());
+			invocation.ReturnValue = this.getter.Invoke();
 		}
 
 		public override bool TryGetReturnValue(out object returnValue)

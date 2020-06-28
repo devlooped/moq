@@ -79,23 +79,32 @@ namespace Moq
 		{
 			private static readonly MethodInfo proxyInterceptorGetter = typeof(IProxy).GetProperty(nameof(IProxy.Interceptor)).GetMethod;
 
-			private Moq.IInterceptor underlying;
+			private Moq.IInterceptor interceptor;
 
-			internal Interceptor(Moq.IInterceptor underlying)
+			internal Interceptor(Moq.IInterceptor interceptor)
 			{
-				this.underlying = underlying;
+				this.interceptor = interceptor;
 			}
 
-			public void Intercept(Castle.DynamicProxy.IInvocation invocation)
+			public void Intercept(Castle.DynamicProxy.IInvocation underlying)
 			{
 				// This implements the `IProxy.Interceptor` property:
-				if (invocation.Method == proxyInterceptorGetter)
+				if (underlying.Method == proxyInterceptorGetter)
 				{
-					invocation.ReturnValue = this.underlying;
+					underlying.ReturnValue = this.interceptor;
 					return;
 				}
 
-				this.underlying.Intercept(new Invocation(underlying: invocation));
+				var invocation = new Invocation(underlying);
+				try
+				{
+					this.interceptor.Intercept(invocation);
+					underlying.ReturnValue = invocation.ReturnValue;
+				}
+				finally
+				{
+					invocation.DetachFromUnderlying();
+				}
 			}
 		}
 
@@ -108,30 +117,16 @@ namespace Moq
 				this.underlying = underlying;
 			}
 
-			public override void Return()
-			{
-				Debug.Assert(this.underlying != null);
-				Debug.Assert(this.underlying.Method.ReturnType == typeof(void));
-
-				this.underlying = null;
-			}
-
-			public override void ReturnBase()
+			protected internal override object CallBase()
 			{
 				Debug.Assert(this.underlying != null);
 
 				this.underlying.Proceed();
-				this.underlying = null;
+				return this.underlying.ReturnValue;
 			}
 
-			public override void Return(object value)
+			public void DetachFromUnderlying()
 			{
-				Debug.Assert(this.underlying != null);
-				Debug.Assert(this.underlying.Method.ReturnType != typeof(void));
-
-				this.SetReturnValue(value);
-
-				this.underlying.ReturnValue = value;
 				this.underlying = null;
 			}
 		}

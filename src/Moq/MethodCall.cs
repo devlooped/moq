@@ -416,11 +416,7 @@ namespace Moq
 
 			public override void RespondTo(Invocation invocation)
 			{
-				if (invocation.Method.ReturnType == typeof(void))
-				{
-					invocation.Return();
-				}
-				else
+				if (invocation.Method.ReturnType != typeof(void))
 				{
 					Debug.Assert(invocation.MatchingSetup is MethodCall);
 
@@ -451,7 +447,7 @@ namespace Moq
 
 			public override void RespondTo(Invocation invocation)
 			{
-				invocation.ReturnBase();
+				invocation.ReturnValue = invocation.CallBase();
 			}
 		}
 
@@ -466,7 +462,7 @@ namespace Moq
 
 			public override void RespondTo(Invocation invocation)
 			{
-				invocation.Return(this.Value);
+				invocation.ReturnValue = this.Value;
 			}
 		}
 
@@ -482,7 +478,7 @@ namespace Moq
 			public override void RespondTo(Invocation invocation)
 			{
 				var value = this.valueFactory.Invoke(invocation);
-				invocation.Return(value);
+				invocation.ReturnValue = value;
 			}
 		}
 

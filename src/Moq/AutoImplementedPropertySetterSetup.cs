@@ -26,7 +26,6 @@ namespace Moq
 		protected override void ExecuteCore(Invocation invocation)
 		{
 			this.setter.Invoke(invocation.Arguments[0]);
-			invocation.Return();
 		}
 
 		protected override bool TryVerifySelf(out MockException error)

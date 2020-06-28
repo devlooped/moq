@@ -22,7 +22,7 @@ namespace Moq
 
 		protected override void ExecuteCore(Invocation invocation)
 		{
-			invocation.Return(this.returnValue);
+			invocation.ReturnValue = this.returnValue;
 		}
 
 		public override bool TryGetReturnValue(out object returnValue)
