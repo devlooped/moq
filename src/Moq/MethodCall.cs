@@ -97,9 +97,9 @@ namespace Moq
 
 		public override bool TryGetReturnValue(out object returnValue)
 		{
-			if (this.returnOrThrowResponse is ReturnEagerValueResponse revs)
+			if (this.returnOrThrowResponse is ReturnValueResponse rvr)
 			{
-				returnValue = revs.Value;
+				returnValue = rvr.Value;
 				return true;
 			}
 			else
@@ -196,7 +196,7 @@ namespace Moq
 			Debug.Assert(this.Method.ReturnType != typeof(void));
 			Debug.Assert(this.returnOrThrowResponse is DefaultReturnResponse);
 
-			this.returnOrThrowResponse = new ReturnEagerValueResponse(value);
+			this.returnOrThrowResponse = new ReturnValueResponse(value);
 		}
 
 		public void SetReturnsResponse(Delegate valueFactory)
@@ -212,7 +212,7 @@ namespace Moq
 				// and instead of in `Returns(TResult)`, we ended up in `Returns(Delegate)` or `Returns(Func)`,
 				// which likely isn't what the user intended.
 				// So here we do what we would've done in `Returns(TResult)`:
-				this.returnOrThrowResponse = new ReturnEagerValueResponse(this.Method.ReturnType.GetDefaultValue());
+				this.returnOrThrowResponse = new ReturnValueResponse(this.Method.ReturnType.GetDefaultValue());
 			}
 			else if (this.Method.ReturnType == typeof(Delegate))
 			{
@@ -220,11 +220,11 @@ namespace Moq
 				// that returns a `Delegate`, then we have arrived here because C# picked the wrong overload:
 				// We don't want to invoke the passed delegate to get a return value; the passed delegate
 				// already is the return value.
-				this.returnOrThrowResponse = new ReturnEagerValueResponse(valueFactory);
+				this.returnOrThrowResponse = new ReturnValueResponse(valueFactory);
 			}
 			else if (IsInvocationFunc(valueFactory))
 			{
-				this.returnOrThrowResponse = new ReturnLazyValueResponse(invocation => valueFactory.DynamicInvoke(invocation));
+				this.returnOrThrowResponse = new ReturnComputedValueResponse(invocation => valueFactory.DynamicInvoke(invocation));
 			}
 			else
 			{
@@ -233,11 +233,11 @@ namespace Moq
 				if (valueFactory.CompareParameterTypesTo(Type.EmptyTypes))
 				{
 					// we need this for the user to be able to use parameterless methods
-					this.returnOrThrowResponse = new ReturnLazyValueResponse(invocation => valueFactory.InvokePreserveStack());
+					this.returnOrThrowResponse = new ReturnComputedValueResponse(invocation => valueFactory.InvokePreserveStack());
 				}
 				else
 				{
-					this.returnOrThrowResponse = new ReturnLazyValueResponse(invocation => valueFactory.InvokePreserveStack(invocation.Arguments));
+					this.returnOrThrowResponse = new ReturnComputedValueResponse(invocation => valueFactory.InvokePreserveStack(invocation.Arguments));
 				}
 			}
 
@@ -455,11 +455,11 @@ namespace Moq
 			}
 		}
 
-		private sealed class ReturnEagerValueResponse : Response
+		private sealed class ReturnValueResponse : Response
 		{
 			public readonly object Value;
 
-			public ReturnEagerValueResponse(object value)
+			public ReturnValueResponse(object value)
 			{
 				this.Value = value;
 			}
@@ -470,11 +470,11 @@ namespace Moq
 			}
 		}
 
-		private sealed class ReturnLazyValueResponse : Response
+		private sealed class ReturnComputedValueResponse : Response
 		{
 			private readonly Func<IInvocation, object> valueFactory;
 
-			public ReturnLazyValueResponse(Func<IInvocation, object> valueFactory)
+			public ReturnComputedValueResponse(Func<IInvocation, object> valueFactory)
 			{
 				this.valueFactory = valueFactory;
 			}
