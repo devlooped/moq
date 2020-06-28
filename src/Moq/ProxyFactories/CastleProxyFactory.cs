@@ -79,23 +79,31 @@ namespace Moq
 		{
 			private static readonly MethodInfo proxyInterceptorGetter = typeof(IProxy).GetProperty(nameof(IProxy.Interceptor)).GetMethod;
 
-			private Moq.IInterceptor underlying;
+			private Moq.IInterceptor interceptor;
 
-			internal Interceptor(Moq.IInterceptor underlying)
+			internal Interceptor(Moq.IInterceptor interceptor)
 			{
-				this.underlying = underlying;
+				this.interceptor = interceptor;
 			}
 
-			public void Intercept(Castle.DynamicProxy.IInvocation invocation)
+			public void Intercept(Castle.DynamicProxy.IInvocation underlying)
 			{
 				// This implements the `IProxy.Interceptor` property:
-				if (invocation.Method == proxyInterceptorGetter)
+				if (underlying.Method == proxyInterceptorGetter)
 				{
-					invocation.ReturnValue = this.underlying;
+					underlying.ReturnValue = this.interceptor;
 					return;
 				}
 
-				this.underlying.Intercept(new Invocation(underlying: invocation));
+				var invocation = new Invocation(underlying);
+				try
+				{
+					this.interceptor.Intercept(invocation);
+				}
+				finally
+				{
+					invocation.DetachFromUnderlying();
+				}
 			}
 		}
 
@@ -112,8 +120,6 @@ namespace Moq
 			{
 				Debug.Assert(this.underlying != null);
 				Debug.Assert(this.underlying.Method.ReturnType == typeof(void));
-
-				this.underlying = null;
 			}
 
 			public override void ReturnBase()
@@ -121,7 +127,6 @@ namespace Moq
 				Debug.Assert(this.underlying != null);
 
 				this.underlying.Proceed();
-				this.underlying = null;
 			}
 
 			public override void Return(object value)
@@ -132,6 +137,10 @@ namespace Moq
 				this.SetReturnValue(value);
 
 				this.underlying.ReturnValue = value;
+			}
+
+			public void DetachFromUnderlying()
+			{
 				this.underlying = null;
 			}
 		}
