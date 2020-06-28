@@ -216,7 +216,7 @@ namespace Moq
 					ExpressionType.NotEqual           => "!=",
 					ExpressionType.Or                 => "|",
 					ExpressionType.OrElse             => "||",
-					ExpressionType.Power              => "^",
+					ExpressionType.Power              => "**",
 					ExpressionType.RightShift         => ">>",
 					ExpressionType.Subtract           => "-",
 					ExpressionType.SubtractChecked    => "-",
