@@ -289,11 +289,7 @@ namespace Moq
 
 				if (returnType != typeof(void))
 				{
-					invocation.Return(this.returnValue);
-				}
-				else
-				{
-					invocation.Return();
+					invocation.ReturnValue = this.returnValue;
 				}
 			}
 		}

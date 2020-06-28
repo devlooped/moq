@@ -68,14 +68,10 @@ namespace Moq.Internals
 			{
 			}
 
-			public override void Return() { }
-
-			public override void Return(object value)
+			protected internal override object CallBase()
 			{
-				this.SetReturnValue(value);
+				throw new NotSupportedException();
 			}
-
-			public override void ReturnBase() { }
 		}
 	}
 }

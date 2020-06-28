@@ -99,6 +99,7 @@ namespace Moq
 				try
 				{
 					this.interceptor.Intercept(invocation);
+					underlying.ReturnValue = invocation.ReturnValue;
 				}
 				finally
 				{
@@ -116,27 +117,12 @@ namespace Moq
 				this.underlying = underlying;
 			}
 
-			public override void Return()
-			{
-				Debug.Assert(this.underlying != null);
-				Debug.Assert(this.underlying.Method.ReturnType == typeof(void));
-			}
-
-			public override void ReturnBase()
+			protected internal override object CallBase()
 			{
 				Debug.Assert(this.underlying != null);
 
 				this.underlying.Proceed();
-			}
-
-			public override void Return(object value)
-			{
-				Debug.Assert(this.underlying != null);
-				Debug.Assert(this.underlying.Method.ReturnType != typeof(void));
-
-				this.SetReturnValue(value);
-
-				this.underlying.ReturnValue = value;
+				return this.underlying.ReturnValue;
 			}
 
 			public void DetachFromUnderlying()

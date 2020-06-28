@@ -53,23 +53,19 @@ namespace Moq
 				var (kind, arg) = response;
 				switch (kind)
 				{
-					case ResponseKind.Pass:
-						invocation.Return();
-						break;
-
 					case ResponseKind.CallBase:
-						invocation.ReturnBase();
+						invocation.ReturnValue = invocation.CallBase();
 						break;
 
 					case ResponseKind.Returns:
-						invocation.Return(arg);
+						invocation.ReturnValue = arg;
 						break;
 
 					case ResponseKind.Throws:
 						throw (Exception)arg;
 
 					case ResponseKind.InvokeFunc:
-						invocation.Return(((Func<object>)arg)());
+						invocation.ReturnValue = ((Func<object>)arg)();
 						break;
 				}
 			}
@@ -85,7 +81,7 @@ namespace Moq
 				}
 				else
 				{
-					invocation.Return(returnType.GetDefaultValue());
+					invocation.ReturnValue = returnType.GetDefaultValue();
 				}
 			}
 		}

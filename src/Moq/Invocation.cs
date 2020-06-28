@@ -69,46 +69,23 @@ namespace Moq
 
 		public Type ProxyType => this.proxyType;
 
-		public object ReturnValue => this.returnValue;
+		public object ReturnValue
+		{
+			get => this.returnValue;
+			set
+			{
+				Debug.Assert(this.returnValue == null);
+				this.returnValue = value;
+			}
+		}
 
 		public bool IsVerified => this.verified;
 
 		/// <summary>
-		/// Ends the invocation as if a <see langword="return"/> statement occurred.
+		///   Calls the <see langword="base"/> method implementation
+		///   and returns its return value (or <see langword="null"/> for <see langword="void"/> methods).
 		/// </summary>
-		/// <remarks>
-		/// Implementations may assume that this method is only called for a <see langword="void"/> method,
-		/// and that no more calls to any of the three <c>Return</c> methods will be made.
-		/// <para>
-		/// Implementations must ensure that any by-reference parameters are written back from <see cref="Arguments"/>.
-		/// </para>
-		/// </remarks>
-		public abstract void Return();
-
-		/// <summary>
-		/// Ends the invocation as if a tail call to the base method were made.
-		/// </summary>
-		/// <remarks>
-		/// Implementations may assume that this method is only called for a method having a callable (non-<see langword="abstract"/>) base method,
-		/// and that no more calls to any of the three <c>Return</c> methods will be made.
-		/// <para>
-		/// Implementations must ensure that any by-reference parameters are written back from <see cref="Arguments"/>.
-		/// </para>
-		/// </remarks>
-		public abstract void ReturnBase();
-
-		/// <summary>
-		/// Ends the invocation as if a <see langword="return"/> statement with the specified return value occurred.
-		/// </summary>
-		/// <remarks>
-		/// Implementations may assume that this method is only called for a non-<see langword="void"/> method,
-		/// and that no more calls to any of the three <c>Return</c> methods will be made.
-		/// <para>
-		/// Implementations must ensure that any by-reference parameters are written back from <see cref="Arguments"/>.
-		/// Implementations must also call <see cref="SetReturnValue(object)"/>.
-		/// </para>
-		/// </remarks>
-		public abstract void Return(object value);
+		protected internal abstract object CallBase();
 
 		internal void MarkAsMatchedBy(Setup setup)
 		{
@@ -125,13 +102,6 @@ namespace Moq
 			{
 				this.verified = true;
 			}
-		}
-
-		protected void SetReturnValue(object returnValue)
-		{
-			Debug.Assert(this.returnValue == null);  // quick & dirty check against double invocations
-
-			this.returnValue = returnValue;
 		}
 
 		/// <inheritdoc/>

@@ -31,7 +31,7 @@ namespace Moq
 		{
 			if (IsObjectMethod(invocation.Method) && !mock.MutableSetups.Any(c => IsObjectMethod(c.Method, "Equals")))
 			{
-				invocation.Return(ReferenceEquals(invocation.Arguments.First(), mock.Object));
+				invocation.ReturnValue = ReferenceEquals(invocation.Arguments.First(), mock.Object);
 				return true;
 			}
 			else
@@ -50,7 +50,7 @@ namespace Moq
 			// Only if there is no corresponding setup for `GetHashCode()`
 			if (IsObjectMethod(invocation.Method) && !mock.MutableSetups.Any(c => IsObjectMethod(c.Method, "GetHashCode")))
 			{
-				invocation.Return(mock.GetHashCode());
+				invocation.ReturnValue = mock.GetHashCode();
 				return true;
 			}
 			else
@@ -64,7 +64,7 @@ namespace Moq
 			// Only if there is no corresponding setup for `ToString()`
 			if (IsObjectMethod(invocation.Method) && !mock.MutableSetups.Any(c => IsObjectMethod(c.Method, "ToString")))
 			{
-				invocation.Return(mock.ToString() + ".Object");
+				invocation.ReturnValue = mock.ToString() + ".Object";
 				return true;
 			}
 			else
@@ -77,7 +77,7 @@ namespace Moq
 		{
 			if (typeof(IMocked).IsAssignableFrom(invocation.Method.DeclaringType))
 			{
-				invocation.Return(mock);
+				invocation.ReturnValue = mock;
 				return true;
 			}
 			else
@@ -137,17 +137,12 @@ namespace Moq
 						{
 							if (doesntHaveEventSetup)
 							{
-								invocation.ReturnBase();
+								invocation.ReturnValue = invocation.CallBase();
 							}
 						}
 						else if (invocation.Arguments.Length > 0 && invocation.Arguments[0] is Delegate delegateInstance)
 						{
 							mock.EventHandlers.Add(@event, delegateInstance);
-
-							if (doesntHaveEventSetup)
-							{
-								invocation.Return();
-							}
 						}
 
 						return doesntHaveEventSetup;
@@ -165,17 +160,12 @@ namespace Moq
 						{
 							if (doesntHaveEventSetup)
 							{
-								invocation.ReturnBase();
+								invocation.ReturnValue = invocation.CallBase();
 							}
 						}
 						else if (invocation.Arguments.Length > 0 && invocation.Arguments[0] is Delegate delegateInstance)
 						{
 							mock.EventHandlers.Remove(@event, delegateInstance);
-
-							if (doesntHaveEventSetup)
-							{
-								invocation.Return();
-							}
 						}
 
 						return doesntHaveEventSetup;
@@ -228,7 +218,7 @@ namespace Moq
 							// The base class has its own implementation. Only call base method if it isn't an event accessor.
 							if (!method.IsEventAddAccessor() && !method.IsEventRemoveAccessor())
 							{
-								invocation.ReturnBase();
+								invocation.ReturnValue = invocation.CallBase();
 								return;
 							}
 						}
@@ -249,17 +239,13 @@ namespace Moq
 					// Only call base method if it isn't abstract.
 					if (!method.IsAbstract)
 					{
-						invocation.ReturnBase();
+						invocation.ReturnValue = invocation.CallBase();
 						return;
 					}
 				}
 			}
 
-			if (method.ReturnType == typeof(void))
-			{
-				invocation.Return();
-			}
-			else
+			if (method.ReturnType != typeof(void))
 			{
 				var returnValue = mock.GetDefaultValue(method, out var innerMock);
 				if (innerMock != null && invocation.MatchingSetup == null)
@@ -270,7 +256,7 @@ namespace Moq
 				}
 				else
 				{
-					invocation.Return(returnValue);
+					invocation.ReturnValue = returnValue;
 				}
 			}
 		}
