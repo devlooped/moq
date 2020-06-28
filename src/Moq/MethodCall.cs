@@ -31,7 +31,6 @@ namespace Moq
 			: base(originalExpression, mock, expectation)
 		{
 			this.condition = condition;
-			this.returnOrThrow = DefaultReturnOrThrow.Instance;
 
 			if ((mock.Switches & Switches.CollectDiagnosticFileInfoForSetups) != 0)
 			{
@@ -91,7 +90,21 @@ namespace Moq
 
 			this.raiseEvent?.Execute(invocation);
 
-			this.returnOrThrow.Execute(invocation);
+			if (this.returnOrThrow != null)
+			{
+				this.returnOrThrow.Execute(invocation);
+			}
+			else if (invocation.Method.ReturnType != typeof(void))
+			{
+				if (this.Mock.Behavior == MockBehavior.Strict)
+				{
+					throw MockException.ReturnValueRequired(invocation);
+				}
+				else
+				{
+					Return.Handle(invocation, this.Mock);
+				}
+			}
 
 			this.afterReturnCallback?.Execute(invocation);
 		}
@@ -127,8 +140,8 @@ namespace Moq
 				throw new ArgumentNullException(nameof(callback));
 			}
 
-			ref Behavior behavior = ref (this.returnOrThrow is DefaultReturnOrThrow) ? ref this.callback
-			                                                                          : ref this.afterReturnCallback;
+			ref Behavior behavior = ref (this.returnOrThrow == null) ? ref this.callback
+			                                                         : ref this.afterReturnCallback;
 
 			if (callback is Action callbackWithoutArguments)
 			{
@@ -195,7 +208,7 @@ namespace Moq
 		public void SetReturnValueBehavior(object value)
 		{
 			Debug.Assert(this.Method.ReturnType != typeof(void));
-			Debug.Assert(this.returnOrThrow is DefaultReturnOrThrow);
+			Debug.Assert(this.returnOrThrow == null);
 
 			this.returnOrThrow = new ReturnValue(value);
 		}
@@ -203,7 +216,7 @@ namespace Moq
 		public void SetReturnComputedValueBehavior(Delegate valueFactory)
 		{
 			Debug.Assert(this.Method.ReturnType != typeof(void));
-			Debug.Assert(this.returnOrThrow is DefaultReturnOrThrow);
+			Debug.Assert(this.returnOrThrow == null);
 
 			if (valueFactory == null)
 			{
@@ -343,37 +356,6 @@ namespace Moq
 			}
 
 			return message.ToString().Trim();
-		}
-
-		private sealed class DefaultReturnOrThrow : Behavior
-		{
-			public static readonly DefaultReturnOrThrow Instance = new DefaultReturnOrThrow();
-
-			private DefaultReturnOrThrow()
-			{
-			}
-
-			public override void Execute(Invocation invocation)
-			{
-				if (invocation.Method.ReturnType != typeof(void))
-				{
-					Debug.Assert(invocation.MatchingSetup is MethodCall);
-
-					var mock = invocation.MatchingSetup.Mock;
-					if (mock.Behavior == MockBehavior.Strict)
-					{
-						throw MockException.ReturnValueRequired(invocation);
-					}
-					else
-					{
-						// Instead of duplicating the entirety of `Return`'s implementation,
-						// let's just call it here. This is permissible only if the inter-
-						// ception pipeline will terminate right away (otherwise `Return`
-						// might be executed a second time).
-						Return.Handle(invocation, mock);
-					}
-				}
-			}
 		}
 	}
 }
