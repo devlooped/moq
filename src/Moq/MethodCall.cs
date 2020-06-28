@@ -102,7 +102,7 @@ namespace Moq
 				}
 				else
 				{
-					Return.Handle(invocation, this.Mock);
+					new ReturnBaseOrDefaultValue(this.Mock).Execute(invocation);
 				}
 			}
 
