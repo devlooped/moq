@@ -16,13 +16,13 @@ namespace Moq
 {
 	internal sealed partial class MethodCall : SetupWithOutParameterSupport
 	{
-		private Response afterReturnCallbackResponse;
-		private Response callbackResponse;
-		private LimitInvocationCount limitInvocationCountResponse;
+		private LimitInvocationCount limitInvocationCount;
+		private Behavior callback;
+		private Behavior raiseEvent;
+		private Behavior returnOrThrow;
+		private Behavior afterReturnCallback;
 		private Condition condition;
 		private string failMessage;
-		private RaiseEvent raiseEventResponse;
-		private Response returnOrThrowResponse;
 
 		private string declarationSite;
 
@@ -30,7 +30,7 @@ namespace Moq
 			: base(originalExpression, mock, expectation)
 		{
 			this.condition = condition;
-			this.returnOrThrowResponse = DefaultReturnOrThrow.Instance;
+			this.returnOrThrow = DefaultReturnOrThrow.Instance;
 
 			if ((mock.Switches & Switches.CollectDiagnosticFileInfoForSetups) != 0)
 			{
@@ -84,20 +84,20 @@ namespace Moq
 
 		protected override void ExecuteCore(Invocation invocation)
 		{
-			this.limitInvocationCountResponse?.RespondTo(invocation);
+			this.limitInvocationCount?.Execute(invocation);
 
-			this.callbackResponse?.RespondTo(invocation);
+			this.callback?.Execute(invocation);
 
-			this.raiseEventResponse?.RespondTo(invocation);
+			this.raiseEvent?.Execute(invocation);
 
-			this.returnOrThrowResponse.RespondTo(invocation);
+			this.returnOrThrow.Execute(invocation);
 
-			this.afterReturnCallbackResponse?.RespondTo(invocation);
+			this.afterReturnCallback?.Execute(invocation);
 		}
 
 		public override bool TryGetReturnValue(out object returnValue)
 		{
-			if (this.returnOrThrowResponse is ReturnValue rv)
+			if (this.returnOrThrow is ReturnValue rv)
 			{
 				returnValue = rv.Value;
 				return true;
@@ -109,36 +109,36 @@ namespace Moq
 			}
 		}
 
-		public void SetCallBaseResponse()
+		public void SetCallBaseBehavior()
 		{
 			if (this.Mock.MockedType.IsDelegateType())
 			{
 				throw new NotSupportedException(Resources.CallBaseCannotBeUsedWithDelegateMocks);
 			}
 
-			this.returnOrThrowResponse = ReturnBase.Instance;
+			this.returnOrThrow = ReturnBase.Instance;
 		}
 
-		public void SetCallbackResponse(Delegate callback)
+		public void SetCallbackBehavior(Delegate callback)
 		{
 			if (callback == null)
 			{
 				throw new ArgumentNullException(nameof(callback));
 			}
 
-			ref Response response = ref (this.returnOrThrowResponse is DefaultReturnOrThrow) ? ref this.callbackResponse
-			                                                                          : ref this.afterReturnCallbackResponse;
+			ref Behavior behavior = ref (this.returnOrThrow is DefaultReturnOrThrow) ? ref this.callback
+			                                                                          : ref this.afterReturnCallback;
 
 			if (callback is Action callbackWithoutArguments)
 			{
-				response = new Callback(_ => callbackWithoutArguments());
+				behavior = new Callback(_ => callbackWithoutArguments());
 			}
 			else if (callback.GetType() == typeof(Action<IInvocation>))
 			{
 				// NOTE: Do NOT rewrite the above condition as `callback is Action<IInvocation>`,
 				// because this will also yield true if `callback` is a `Action<object>` and thus
 				// break existing uses of `(object arg) => ...` callbacks!
-				response = new Callback((Action<IInvocation>)callback);
+				behavior = new Callback((Action<IInvocation>)callback);
 			}
 			else
 			{
@@ -158,7 +158,7 @@ namespace Moq
 					throw new ArgumentException(Resources.InvalidCallbackNotADelegateWithReturnTypeVoid, nameof(callback));
 				}
 
-				response = new Callback(invocation => callback.InvokePreserveStack(invocation.Arguments));
+				behavior = new Callback(invocation => callback.InvokePreserveStack(invocation.Arguments));
 			}
 		}
 
@@ -167,7 +167,7 @@ namespace Moq
 			this.failMessage = failMessage;
 		}
 
-		public void SetRaiseEventResponse<TMock>(Action<TMock> eventExpression, Delegate func)
+		public void SetRaiseEventBehavior<TMock>(Action<TMock> eventExpression, Delegate func)
 			where TMock : class
 		{
 			Guard.NotNull(eventExpression, nameof(eventExpression));
@@ -176,10 +176,10 @@ namespace Moq
 
 			// TODO: validate that expression is for event subscription or unsubscription
 
-			this.raiseEventResponse = new RaiseEvent(this.Mock, expression, func, null);
+			this.raiseEvent = new RaiseEvent(this.Mock, expression, func, null);
 		}
 
-		public void SetRaiseEventResponse<TMock>(Action<TMock> eventExpression, params object[] args)
+		public void SetRaiseEventBehavior<TMock>(Action<TMock> eventExpression, params object[] args)
 			where TMock : class
 		{
 			Guard.NotNull(eventExpression, nameof(eventExpression));
@@ -188,21 +188,21 @@ namespace Moq
 
 			// TODO: validate that expression is for event subscription or unsubscription
 
-			this.raiseEventResponse = new RaiseEvent(this.Mock, expression, null, args);
+			this.raiseEvent = new RaiseEvent(this.Mock, expression, null, args);
 		}
 
-		public void SetEagerReturnsResponse(object value)
+		public void SetReturnValueBehavior(object value)
 		{
 			Debug.Assert(this.Method.ReturnType != typeof(void));
-			Debug.Assert(this.returnOrThrowResponse is DefaultReturnOrThrow);
+			Debug.Assert(this.returnOrThrow is DefaultReturnOrThrow);
 
-			this.returnOrThrowResponse = new ReturnValue(value);
+			this.returnOrThrow = new ReturnValue(value);
 		}
 
-		public void SetReturnsResponse(Delegate valueFactory)
+		public void SetReturnComputedValueBehavior(Delegate valueFactory)
 		{
 			Debug.Assert(this.Method.ReturnType != typeof(void));
-			Debug.Assert(this.returnOrThrowResponse is DefaultReturnOrThrow);
+			Debug.Assert(this.returnOrThrow is DefaultReturnOrThrow);
 
 			if (valueFactory == null)
 			{
@@ -212,7 +212,7 @@ namespace Moq
 				// and instead of in `Returns(TResult)`, we ended up in `Returns(Delegate)` or `Returns(Func)`,
 				// which likely isn't what the user intended.
 				// So here we do what we would've done in `Returns(TResult)`:
-				this.returnOrThrowResponse = new ReturnValue(this.Method.ReturnType.GetDefaultValue());
+				this.returnOrThrow = new ReturnValue(this.Method.ReturnType.GetDefaultValue());
 			}
 			else if (this.Method.ReturnType == typeof(Delegate))
 			{
@@ -220,11 +220,11 @@ namespace Moq
 				// that returns a `Delegate`, then we have arrived here because C# picked the wrong overload:
 				// We don't want to invoke the passed delegate to get a return value; the passed delegate
 				// already is the return value.
-				this.returnOrThrowResponse = new ReturnValue(valueFactory);
+				this.returnOrThrow = new ReturnValue(valueFactory);
 			}
 			else if (IsInvocationFunc(valueFactory))
 			{
-				this.returnOrThrowResponse = new ReturnComputedValue(invocation => valueFactory.DynamicInvoke(invocation));
+				this.returnOrThrow = new ReturnComputedValue(invocation => valueFactory.DynamicInvoke(invocation));
 			}
 			else
 			{
@@ -233,11 +233,11 @@ namespace Moq
 				if (valueFactory.CompareParameterTypesTo(Type.EmptyTypes))
 				{
 					// we need this for the user to be able to use parameterless methods
-					this.returnOrThrowResponse = new ReturnComputedValue(invocation => valueFactory.InvokePreserveStack());
+					this.returnOrThrow = new ReturnComputedValue(invocation => valueFactory.InvokePreserveStack());
 				}
 				else
 				{
-					this.returnOrThrowResponse = new ReturnComputedValue(invocation => valueFactory.InvokePreserveStack(invocation.Arguments));
+					this.returnOrThrow = new ReturnComputedValue(invocation => valueFactory.InvokePreserveStack(invocation.Arguments));
 				}
 			}
 
@@ -310,19 +310,19 @@ namespace Moq
 			}
 		}
 
-		public void SetThrowExceptionResponse(Exception exception)
+		public void SetThrowExceptionBehavior(Exception exception)
 		{
-			this.returnOrThrowResponse = new ThrowException(exception);
+			this.returnOrThrow = new ThrowException(exception);
 		}
 
 		protected override void ResetCore()
 		{
-			this.limitInvocationCountResponse?.Reset();
+			this.limitInvocationCount?.Reset();
 		}
 
 		public void AtMost(int count)
 		{
-			this.limitInvocationCountResponse = new LimitInvocationCount(this, count);
+			this.limitInvocationCount = new LimitInvocationCount(this, count);
 		}
 
 		public override string ToString()
@@ -362,7 +362,7 @@ namespace Moq
 				this.count = 0;
 			}
 
-			public void RespondTo(Invocation invocation)
+			public void Execute(Invocation invocation)
 			{
 				++this.count;
 
@@ -380,16 +380,16 @@ namespace Moq
 			}
 		}
 
-		private abstract class Response
+		private abstract class Behavior
 		{
-			protected Response()
+			protected Behavior()
 			{
 			}
 
-			public abstract void RespondTo(Invocation invocation);
+			public abstract void Execute(Invocation invocation);
 		}
 
-		private sealed class Callback : Response
+		private sealed class Callback : Behavior
 		{
 			private readonly Action<IInvocation> callback;
 
@@ -400,13 +400,13 @@ namespace Moq
 				this.callback = callback;
 			}
 
-			public override void RespondTo(Invocation invocation)
+			public override void Execute(Invocation invocation)
 			{
 				this.callback.Invoke(invocation);
 			}
 		}
 
-		private sealed class DefaultReturnOrThrow : Response
+		private sealed class DefaultReturnOrThrow : Behavior
 		{
 			public static readonly DefaultReturnOrThrow Instance = new DefaultReturnOrThrow();
 
@@ -414,7 +414,7 @@ namespace Moq
 			{
 			}
 
-			public override void RespondTo(Invocation invocation)
+			public override void Execute(Invocation invocation)
 			{
 				if (invocation.Method.ReturnType != typeof(void))
 				{
@@ -437,7 +437,7 @@ namespace Moq
 			}
 		}
 
-		private sealed class ReturnBase : Response
+		private sealed class ReturnBase : Behavior
 		{
 			public static readonly ReturnBase Instance = new ReturnBase();
 
@@ -445,13 +445,13 @@ namespace Moq
 			{
 			}
 
-			public override void RespondTo(Invocation invocation)
+			public override void Execute(Invocation invocation)
 			{
 				invocation.ReturnValue = invocation.CallBase();
 			}
 		}
 
-		private sealed class ReturnValue : Response
+		private sealed class ReturnValue : Behavior
 		{
 			public readonly object Value;
 
@@ -460,13 +460,13 @@ namespace Moq
 				this.Value = value;
 			}
 
-			public override void RespondTo(Invocation invocation)
+			public override void Execute(Invocation invocation)
 			{
 				invocation.ReturnValue = this.Value;
 			}
 		}
 
-		private sealed class ReturnComputedValue : Response
+		private sealed class ReturnComputedValue : Behavior
 		{
 			private readonly Func<IInvocation, object> valueFactory;
 
@@ -475,14 +475,14 @@ namespace Moq
 				this.valueFactory = valueFactory;
 			}
 
-			public override void RespondTo(Invocation invocation)
+			public override void Execute(Invocation invocation)
 			{
 				var value = this.valueFactory.Invoke(invocation);
 				invocation.ReturnValue = value;
 			}
 		}
 
-		private sealed class ThrowException : Response
+		private sealed class ThrowException : Behavior
 		{
 			private readonly Exception exception;
 
@@ -491,13 +491,13 @@ namespace Moq
 				this.exception = exception;
 			}
 
-			public override void RespondTo(Invocation invocation)
+			public override void Execute(Invocation invocation)
 			{
 				throw this.exception;
 			}
 		}
 
-		private sealed class RaiseEvent
+		private sealed class RaiseEvent : Behavior
 		{
 			private Mock mock;
 			private LambdaExpression expression;
@@ -516,7 +516,7 @@ namespace Moq
 				this.eventArgsParams = eventArgsParams;
 			}
 
-			public void RespondTo(Invocation invocation)
+			public override void Execute(Invocation invocation)
 			{
 				object[] args;
 

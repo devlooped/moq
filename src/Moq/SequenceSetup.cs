@@ -12,66 +12,66 @@ namespace Moq
 	/// </summary>
 	internal sealed class SequenceSetup : SetupWithOutParameterSupport
 	{
-		// contains the responses set up with the `CallBase`, `Pass`, `Returns`, and `Throws` verbs
-		private ConcurrentQueue<Response> responses;
+		// contains the behaviors set up with the `CallBase`, `Pass`, `Returns`, and `Throws` verbs
+		private ConcurrentQueue<Behavior> behaviors;
 
 		public SequenceSetup(Expression originalExpression, Mock mock, InvocationShape expectation)
 			: base(originalExpression, mock, expectation)
 		{
-			this.responses = new ConcurrentQueue<Response>();
+			this.behaviors = new ConcurrentQueue<Behavior>();
 		}
 
 		public void AddCallBase()
 		{
-			this.responses.Enqueue(new Response(ResponseKind.CallBase, null));
+			this.behaviors.Enqueue(new Behavior(BehaviorKind.CallBase, null));
 		}
 
 		public void AddPass()
 		{
-			this.responses.Enqueue(new Response(ResponseKind.Pass, null));
+			this.behaviors.Enqueue(new Behavior(BehaviorKind.Pass, null));
 		}
 
 		public void AddReturns(object value)
 		{
-			this.responses.Enqueue(new Response(ResponseKind.Returns, value));
+			this.behaviors.Enqueue(new Behavior(BehaviorKind.Returns, value));
 		}
 
 		public void AddReturns(Func<object> valueFunction)
 		{
-			this.responses.Enqueue(new Response(ResponseKind.InvokeFunc, valueFunction));
+			this.behaviors.Enqueue(new Behavior(BehaviorKind.InvokeFunc, valueFunction));
 		}
 
 		public void AddThrows(Exception exception)
 		{
-			this.responses.Enqueue(new Response(ResponseKind.Throws, exception));
+			this.behaviors.Enqueue(new Behavior(BehaviorKind.Throws, exception));
 		}
 
 		protected override void ExecuteCore(Invocation invocation)
 		{
-			if (this.responses.TryDequeue(out var response))
+			if (this.behaviors.TryDequeue(out var behavior))
 			{
-				var (kind, arg) = response;
+				var (kind, arg) = behavior;
 				switch (kind)
 				{
-					case ResponseKind.CallBase:
+					case BehaviorKind.CallBase:
 						invocation.ReturnValue = invocation.CallBase();
 						break;
 
-					case ResponseKind.Returns:
+					case BehaviorKind.Returns:
 						invocation.ReturnValue = arg;
 						break;
 
-					case ResponseKind.Throws:
+					case BehaviorKind.Throws:
 						throw (Exception)arg;
 
-					case ResponseKind.InvokeFunc:
+					case BehaviorKind.InvokeFunc:
 						invocation.ReturnValue = ((Func<object>)arg)();
 						break;
 				}
 			}
 			else
 			{
-				// we get here if there are more invocations than configured responses.
+				// we get here if there are more invocations than configured behaviors.
 				// if the setup method does not have a return value, we don't need to do anything;
 				// if it does have a return value, we produce the default value.
 
@@ -86,25 +86,25 @@ namespace Moq
 			}
 		}
 
-		private readonly struct Response
+		private readonly struct Behavior
 		{
-			private readonly ResponseKind kind;
+			private readonly BehaviorKind kind;
 			private readonly object arg;
 
-			public Response(ResponseKind kind, object arg)
+			public Behavior(BehaviorKind kind, object arg)
 			{
 				this.kind = kind;
 				this.arg = arg;
 			}
 
-			public void Deconstruct(out ResponseKind kind, out object arg)
+			public void Deconstruct(out BehaviorKind kind, out object arg)
 			{
 				kind = this.kind;
 				arg = this.arg;
 			}
 		}
 
-		private enum ResponseKind
+		private enum BehaviorKind
 		{
 			Pass,
 			CallBase,

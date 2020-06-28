@@ -195,7 +195,7 @@ namespace Moq
 
 			if (propertyToSet == null)
 			{
-				setup.SetEagerReturnsResponse(value);
+				setup.SetReturnValueBehavior(value);
 			}
 			else
 			{
