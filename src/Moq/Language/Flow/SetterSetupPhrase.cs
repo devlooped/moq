@@ -13,7 +13,7 @@ namespace Moq.Language.Flow
 
 		public ICallbackResult Callback(Action<TProperty> callback)
 		{
-			this.Setup.SetCallbackResponse(callback);
+			this.Setup.SetCallbackBehavior(callback);
 			return this;
 		}
 	}

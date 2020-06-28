@@ -657,7 +657,7 @@ namespace Moq
 
 			TProperty value = initialValue;
 			this.SetupGet(property).Returns(() => value);
-			Mock.SetupSet(this, property.AssignItIsAny(), condition: null).SetCallbackResponse(new Action<TProperty>(p => value = p));
+			Mock.SetupSet(this, property.AssignItIsAny(), condition: null).SetCallbackBehavior(new Action<TProperty>(p => value = p));
 			return this;
 		}
 

@@ -1,8 +1,8 @@
 // Copyright (c) 2007, Clarius Consulting, Manas Technology Solutions, InSTEDD, and Contributors.
 // All rights reserved. Licensed under the BSD 3-Clause License; see License.txt.
 
-using System;
 using System.Collections.Concurrent;
+using System.Diagnostics;
 using System.Linq.Expressions;
 
 namespace Moq
@@ -12,105 +12,40 @@ namespace Moq
 	/// </summary>
 	internal sealed class SequenceSetup : SetupWithOutParameterSupport
 	{
-		// contains the responses set up with the `CallBase`, `Pass`, `Returns`, and `Throws` verbs
-		private ConcurrentQueue<Response> responses;
+		// contains the behaviors set up with the `CallBase`, `Pass`, `Returns`, and `Throws` verbs
+		private ConcurrentQueue<Behavior> behaviors;
 
 		public SequenceSetup(Expression originalExpression, Mock mock, InvocationShape expectation)
 			: base(originalExpression, mock, expectation)
 		{
-			this.responses = new ConcurrentQueue<Response>();
+			this.behaviors = new ConcurrentQueue<Behavior>();
 		}
 
-		public void AddCallBase()
+		public void AddBehavior(Behavior behavior)
 		{
-			this.responses.Enqueue(new Response(ResponseKind.CallBase, null));
-		}
+			Debug.Assert(behavior != null);
 
-		public void AddPass()
-		{
-			this.responses.Enqueue(new Response(ResponseKind.Pass, null));
-		}
-
-		public void AddReturns(object value)
-		{
-			this.responses.Enqueue(new Response(ResponseKind.Returns, value));
-		}
-
-		public void AddReturns(Func<object> valueFunction)
-		{
-			this.responses.Enqueue(new Response(ResponseKind.InvokeFunc, valueFunction));
-		}
-
-		public void AddThrows(Exception exception)
-		{
-			this.responses.Enqueue(new Response(ResponseKind.Throws, exception));
+			this.behaviors.Enqueue(behavior);
 		}
 
 		protected override void ExecuteCore(Invocation invocation)
 		{
-			if (this.responses.TryDequeue(out var response))
+			if (this.behaviors.TryDequeue(out var behavior))
 			{
-				var (kind, arg) = response;
-				switch (kind)
-				{
-					case ResponseKind.CallBase:
-						invocation.ReturnValue = invocation.CallBase();
-						break;
-
-					case ResponseKind.Returns:
-						invocation.ReturnValue = arg;
-						break;
-
-					case ResponseKind.Throws:
-						throw (Exception)arg;
-
-					case ResponseKind.InvokeFunc:
-						invocation.ReturnValue = ((Func<object>)arg)();
-						break;
-				}
+				behavior.Execute(invocation);
 			}
 			else
 			{
-				// we get here if there are more invocations than configured responses.
+				// we get here if there are more invocations than configured behaviors.
 				// if the setup method does not have a return value, we don't need to do anything;
 				// if it does have a return value, we produce the default value.
 
 				var returnType = invocation.Method.ReturnType;
-				if (returnType == typeof(void))
-				{
-				}
-				else
+				if (returnType != typeof(void))
 				{
 					invocation.ReturnValue = returnType.GetDefaultValue();
 				}
 			}
-		}
-
-		private readonly struct Response
-		{
-			private readonly ResponseKind kind;
-			private readonly object arg;
-
-			public Response(ResponseKind kind, object arg)
-			{
-				this.kind = kind;
-				this.arg = arg;
-			}
-
-			public void Deconstruct(out ResponseKind kind, out object arg)
-			{
-				kind = this.kind;
-				arg = this.arg;
-			}
-		}
-
-		private enum ResponseKind
-		{
-			Pass,
-			CallBase,
-			Returns,
-			Throws,
-			InvokeFunc
 		}
 	}
 }
