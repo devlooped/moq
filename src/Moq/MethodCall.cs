@@ -10,6 +10,7 @@ using System.Linq.Expressions;
 using System.Reflection;
 using System.Text;
 
+using Moq.Behaviors;
 using Moq.Properties;
 
 namespace Moq
@@ -344,68 +345,6 @@ namespace Moq
 			return message.ToString().Trim();
 		}
 
-		private sealed class LimitInvocationCount
-		{
-			private readonly MethodCall setup;
-			private readonly int maxCount;
-			private int count;
-
-			public LimitInvocationCount(MethodCall setup, int maxCount)
-			{
-				this.setup = setup;
-				this.maxCount = maxCount;
-				this.count = 0;
-			}
-
-			public void Reset()
-			{
-				this.count = 0;
-			}
-
-			public void Execute(Invocation invocation)
-			{
-				++this.count;
-
-				if (this.count > this.maxCount)
-				{
-					if (this.maxCount == 1)
-					{
-						throw MockException.MoreThanOneCall(this.setup, this.count);
-					}
-					else
-					{
-						throw MockException.MoreThanNCalls(this.setup, this.maxCount, this.count);
-					}
-				}
-			}
-		}
-
-		private abstract class Behavior
-		{
-			protected Behavior()
-			{
-			}
-
-			public abstract void Execute(Invocation invocation);
-		}
-
-		private sealed class Callback : Behavior
-		{
-			private readonly Action<IInvocation> callback;
-
-			public Callback(Action<IInvocation> callback)
-			{
-				Debug.Assert(callback != null);
-
-				this.callback = callback;
-			}
-
-			public override void Execute(Invocation invocation)
-			{
-				this.callback.Invoke(invocation);
-			}
-		}
-
 		private sealed class DefaultReturnOrThrow : Behavior
 		{
 			public static readonly DefaultReturnOrThrow Instance = new DefaultReturnOrThrow();
@@ -434,110 +373,6 @@ namespace Moq
 						Return.Handle(invocation, mock);
 					}
 				}
-			}
-		}
-
-		private sealed class ReturnBase : Behavior
-		{
-			public static readonly ReturnBase Instance = new ReturnBase();
-
-			private ReturnBase()
-			{
-			}
-
-			public override void Execute(Invocation invocation)
-			{
-				invocation.ReturnValue = invocation.CallBase();
-			}
-		}
-
-		private sealed class ReturnValue : Behavior
-		{
-			public readonly object Value;
-
-			public ReturnValue(object value)
-			{
-				this.Value = value;
-			}
-
-			public override void Execute(Invocation invocation)
-			{
-				invocation.ReturnValue = this.Value;
-			}
-		}
-
-		private sealed class ReturnComputedValue : Behavior
-		{
-			private readonly Func<IInvocation, object> valueFactory;
-
-			public ReturnComputedValue(Func<IInvocation, object> valueFactory)
-			{
-				this.valueFactory = valueFactory;
-			}
-
-			public override void Execute(Invocation invocation)
-			{
-				var value = this.valueFactory.Invoke(invocation);
-				invocation.ReturnValue = value;
-			}
-		}
-
-		private sealed class ThrowException : Behavior
-		{
-			private readonly Exception exception;
-
-			public ThrowException(Exception exception)
-			{
-				this.exception = exception;
-			}
-
-			public override void Execute(Invocation invocation)
-			{
-				throw this.exception;
-			}
-		}
-
-		private sealed class RaiseEvent : Behavior
-		{
-			private Mock mock;
-			private LambdaExpression expression;
-			private Delegate eventArgsFunc;
-			private object[] eventArgsParams;
-
-			public RaiseEvent(Mock mock, LambdaExpression expression, Delegate eventArgsFunc, object[] eventArgsParams)
-			{
-				Debug.Assert(mock != null);
-				Debug.Assert(expression != null);
-				Debug.Assert(eventArgsFunc != null ^ eventArgsParams != null);
-
-				this.mock = mock;
-				this.expression = expression;
-				this.eventArgsFunc = eventArgsFunc;
-				this.eventArgsParams = eventArgsParams;
-			}
-
-			public override void Execute(Invocation invocation)
-			{
-				object[] args;
-
-				if (this.eventArgsParams != null)
-				{
-					args = this.eventArgsParams;
-				}
-				else
-				{
-					var argsFuncType = this.eventArgsFunc.GetType();
-					if (argsFuncType.IsGenericType && argsFuncType.GetGenericArguments().Length == 1)
-					{
-						args = new object[] { this.mock.Object, this.eventArgsFunc.InvokePreserveStack() };
-					}
-					else
-					{
-						args = new object[] { this.mock.Object, this.eventArgsFunc.InvokePreserveStack(invocation.Arguments) };
-					}
-				}
-
-				Mock.RaiseEvent(this.mock, this.expression, this.expression.Split(), args);
 			}
 		}
 	}
