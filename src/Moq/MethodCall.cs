@@ -224,12 +224,21 @@ namespace Moq
 			}
 			else if (IsInvocationFunc(valueFactory))
 			{
-				this.returnOrThrowResponse = new ReturnInvocationLazyValueResponse(valueFactory);
+				this.returnOrThrowResponse = new ReturnLazyValueResponse(invocation => valueFactory.DynamicInvoke(invocation));
 			}
 			else
 			{
 				ValidateCallback(valueFactory);
-				this.returnOrThrowResponse = new ReturnLazyValueResponse(valueFactory);
+
+				if (valueFactory.CompareParameterTypesTo(Type.EmptyTypes))
+				{
+					// we need this for the user to be able to use parameterless methods
+					this.returnOrThrowResponse = new ReturnLazyValueResponse(invocation => valueFactory.InvokePreserveStack());
+				}
+				else
+				{
+					this.returnOrThrowResponse = new ReturnLazyValueResponse(invocation => valueFactory.InvokePreserveStack(invocation.Arguments));
+				}
 			}
 
 			bool IsInvocationFunc(Delegate callback)
@@ -461,37 +470,19 @@ namespace Moq
 			}
 		}
 
-		private sealed class ReturnInvocationLazyValueResponse : Response
-		{
-			private readonly Delegate valueFactory;
-
-			public ReturnInvocationLazyValueResponse(Delegate valueFactory)
-			{
-				Debug.Assert(valueFactory != null);
-
-				this.valueFactory = valueFactory;
-			}
-
-			public override void RespondTo(Invocation invocation)
-			{
-				invocation.Return(this.valueFactory.DynamicInvoke(invocation));
-			}
-		}
-
 		private sealed class ReturnLazyValueResponse : Response
 		{
-			private readonly Delegate valueFactory;
+			private readonly Func<IInvocation, object> valueFactory;
 
-			public ReturnLazyValueResponse(Delegate valueFactory)
+			public ReturnLazyValueResponse(Func<IInvocation, object> valueFactory)
 			{
 				this.valueFactory = valueFactory;
 			}
 
 			public override void RespondTo(Invocation invocation)
 			{
-				invocation.Return(this.valueFactory.CompareParameterTypesTo(Type.EmptyTypes)
-					? valueFactory.InvokePreserveStack()                //we need this, for the user to be able to use parameterless methods
-					: valueFactory.InvokePreserveStack(invocation.Arguments)); //will throw if parameters mismatch
+				var value = this.valueFactory.Invoke(invocation);
+				invocation.Return(value);
 			}
 		}
 
