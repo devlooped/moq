@@ -131,14 +131,14 @@ namespace Moq
 
 			if (callback is Action callbackWithoutArguments)
 			{
-				response = new CallbackResponse(args => callbackWithoutArguments());
+				response = new CallbackResponse(_ => callbackWithoutArguments());
 			}
 			else if (callback.GetType() == typeof(Action<IInvocation>))
 			{
 				// NOTE: Do NOT rewrite the above condition as `callback is Action<IInvocation>`,
 				// because this will also yield true if `callback` is a `Action<object>` and thus
 				// break existing uses of `(object arg) => ...` callbacks!
-				response = new InvocationCallbackResponse((Action<IInvocation>)callback);
+				response = new CallbackResponse((Action<IInvocation>)callback);
 			}
 			else
 			{
@@ -158,7 +158,7 @@ namespace Moq
 					throw new ArgumentException(Resources.InvalidCallbackNotADelegateWithReturnTypeVoid, nameof(callback));
 				}
 
-				response = new CallbackResponse(args => callback.InvokePreserveStack(args));
+				response = new CallbackResponse(invocation => callback.InvokePreserveStack(invocation.Arguments));
 			}
 		}
 
@@ -382,26 +382,9 @@ namespace Moq
 
 		private sealed class CallbackResponse : Response
 		{
-			private readonly Action<object[]> callback;
-
-			public CallbackResponse(Action<object[]> callback)
-			{
-				Debug.Assert(callback != null);
-
-				this.callback = callback;
-			}
-
-			public override void RespondTo(Invocation invocation)
-			{
-				this.callback.Invoke(invocation.Arguments);
-			}
-		}
-
-		private sealed class InvocationCallbackResponse : Response
-		{
 			private readonly Action<IInvocation> callback;
 
-			public InvocationCallbackResponse(Action<IInvocation> callback)
+			public CallbackResponse(Action<IInvocation> callback)
 			{
 				Debug.Assert(callback != null);
 
