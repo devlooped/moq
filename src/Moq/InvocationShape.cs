@@ -72,7 +72,7 @@ namespace Moq
 #endif
 		private readonly bool exactGenericTypeArguments;
 
-		public InvocationShape(LambdaExpression expression, MethodInfo method, IReadOnlyList<Expression> arguments = null, bool exactGenericTypeArguments = false)
+		public InvocationShape(LambdaExpression expression, MethodInfo method, IReadOnlyList<Expression> arguments = null, bool exactGenericTypeArguments = false, bool skipMatcherInitialization = false)
 		{
 			Debug.Assert(expression != null);
 			Debug.Assert(method != null);
@@ -82,14 +82,14 @@ namespace Moq
 
 			this.Expression = expression;
 			this.Method = method;
-			if (arguments != null)
+			if (arguments != null && !skipMatcherInitialization)
 			{
 				(this.argumentMatchers, this.Arguments) = MatcherFactory.CreateMatchers(arguments, method.GetParameters());
 			}
 			else
 			{
 				this.argumentMatchers = noArgumentMatchers;
-				this.Arguments = noArguments;
+				this.Arguments = arguments ?? noArguments;
 			}
 
 			this.exactGenericTypeArguments = exactGenericTypeArguments;

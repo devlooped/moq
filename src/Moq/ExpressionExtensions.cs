@@ -162,7 +162,7 @@ namespace Moq
 						remainder.ToStringFixed()));
 			}
 
-			void Split(Expression e, out Expression r /* remainder */, out InvocationShape p /* part */)
+			void Split(Expression e, out Expression r /* remainder */, out InvocationShape p /* part */, bool assignment = false)
 			{
 				const string ParameterName = "...";
 
@@ -173,7 +173,7 @@ namespace Moq
 					case ExpressionType.SubtractAssign:  // unsubscription of event handler from event
 					{
 						var assignmentExpression = (BinaryExpression)e;
-						Split(assignmentExpression.Left, out r, out var lhs);
+						Split(assignmentExpression.Left, out r, out var lhs, assignment: true);
 						PropertyInfo property;
 						if (lhs.Expression.Body is MemberExpression me)
 						{
@@ -186,7 +186,7 @@ namespace Moq
 							property = ((IndexExpression)lhs.Expression.Body).Indexer;
 						}
 						var parameter = Expression.Parameter(r.Type, r is ParameterExpression ope ? ope.Name : ParameterName);
-						var arguments = new Expression[lhs.Arguments.Count + 1];
+						var arguments = new Expression[lhs.Method.GetParameters().Length];
 						for (var ai = 0; ai < arguments.Length - 1; ++ai)
 						{
 							arguments[ai] = lhs.Arguments[ai];
@@ -196,7 +196,7 @@ namespace Moq
 							expression: Expression.Lambda(
 								Expression.MakeBinary(e.NodeType, lhs.Expression.Body, assignmentExpression.Right),
 								parameter),
-							method: property.GetSetMethod(true),
+							method: lhs.Method,
 							arguments);
 						return;
 					}
@@ -255,12 +255,16 @@ namespace Moq
 						var parameter = Expression.Parameter(r.Type, r is ParameterExpression ope ? ope.Name : ParameterName);
 						var indexer = indexExpression.Indexer;
 						var arguments = indexExpression.Arguments;
+						var method = !assignment && indexer.CanRead(out var getter)  ? getter
+						           :                indexer.CanWrite(out var setter) ? setter
+						           :                                                   null;
 						p = new InvocationShape(
 									expression: Expression.Lambda(
 										Expression.MakeIndex(parameter, indexer, arguments),
 										parameter),
-									method: indexer.GetGetMethod(true),
-									arguments);
+									method,
+									arguments,
+									skipMatcherInitialization: assignment);
 						return;
 					}
 
@@ -287,19 +291,15 @@ namespace Moq
 						r = memberAccessExpression.Expression;
 						var parameter = Expression.Parameter(r.Type, r is ParameterExpression ope ? ope.Name : ParameterName);
 						var property = memberAccessExpression.GetReboundProperty();
-						var method = property.CanRead(out var getter) ? getter : property.GetSetMethod(true);
-						//                    ^^^^^^^                            ^^^^^^^^^^^^^^^^^^^^^^^^^^^
-						// We're in the switch case block for property read access, therefore we prefer the
-						// getter. When a read-write property is being assigned to, we end up here, too, and
-						// select the wrong accessor. However, that doesn't matter because it will be over-
-						// ridden in the above `Assign` case. Finally, if a write-only property is being
-						// assigned to, we fall back to the setter here in order to not end up without a
-						// method at all.
+						var method = !assignment && property.CanRead(out var getter)  ? getter
+						           :                property.CanWrite(out var setter) ? setter
+						           :                                                    null;
 						p = new InvocationShape(
 									expression: Expression.Lambda(
 										Expression.MakeMemberAccess(parameter, property),
 										parameter),
-									method);
+									method,
+									skipMatcherInitialization: assignment);
 						return;
 					}
 

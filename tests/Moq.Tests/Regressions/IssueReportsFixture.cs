@@ -3407,6 +3407,26 @@ namespace Moq.Tests.Regressions
 
 		#endregion
 
+		#region 1036
+
+		public class Issue1036
+		{
+			[Fact]
+			public void VerifySet_for_assignment_to_write_only_property()
+			{
+				var mock = new Mock<ITest>();
+				mock.Object["key"] = "value";
+				mock.VerifySet(m => m["key"] = It.IsAny<string>(), Times.Once);
+			}
+
+			public interface ITest
+			{
+				string this[string key] { set; }
+			}
+		}
+
+		#endregion
+
 		// Old @ Google Code
 
 		#region #47

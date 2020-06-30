@@ -5,6 +5,13 @@ All notable changes to this project will be documented in this file.
 The format is loosely based on [Keep a Changelog](http://keepachangelog.com/en/1.0.0/).
 
 
+## Unreleased
+
+#### Fixed
+
+* Regression since version 4.11.0: `VerifySet` fails with `NullReferenceException` for write-only indexers (@Epicycle23, #1036)
+
+
 ## 4.14.4 (2020-06-24)
 
 #### Fixed
