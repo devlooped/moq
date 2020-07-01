@@ -174,17 +174,6 @@ namespace Moq
 					{
 						var assignmentExpression = (BinaryExpression)e;
 						Split(assignmentExpression.Left, out r, out var lhs, assignment: true);
-						PropertyInfo property;
-						if (lhs.Expression.Body is MemberExpression me)
-						{
-							Debug.Assert(me.Member is PropertyInfo);
-							property = (PropertyInfo)me.Member;
-						}
-						else
-						{
-							Debug.Assert(lhs.Expression.Body is IndexExpression);
-							property = ((IndexExpression)lhs.Expression.Body).Indexer;
-						}
 						var parameter = Expression.Parameter(r.Type, r is ParameterExpression ope ? ope.Name : ParameterName);
 						var arguments = new Expression[lhs.Method.GetParameters().Length];
 						for (var ai = 0; ai < arguments.Length - 1; ++ai)
