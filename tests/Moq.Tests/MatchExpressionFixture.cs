@@ -18,7 +18,7 @@ namespace Moq.Tests
 		{
 			var ex = Assert.Throws<ArgumentException>(() =>
 				GetExpression().CompileUsingExpressionCompiler());
-			Assert.Contains("reducible", ex.Message);
+			Assert.Contains("ReduceAndCheck", ex.StackTrace);
 		}
 
 		[Fact]
