@@ -4,6 +4,13 @@ All notable changes to this project will be documented in this file.
 
 The format is loosely based on [Keep a Changelog](http://keepachangelog.com/en/1.0.0/).
 
+## Unreleased
+
+#### Added
+
+* New method overloads for `It.Is`, `It.IsIn`, and `It.IsNotIn` that compare values using a custom `IEqualityComparer<T>` (@weitzhandler, #1064)
+Implement It.Is, It.IsIn, It.IsNotIn with a comparer overload (#1059)
+
 
 ## 4.14.6 (2020-09-30)
 
