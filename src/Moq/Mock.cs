@@ -548,6 +548,38 @@ namespace Moq
 			return Mock.Setup(mock, expression, condition);
 		}
 
+		// This specialized version of `SetupSet` exists to let `Mock.Of` support properties that are not overridable.
+		// Note that we generally prefer having a setup for a property's return value, but in this case, that isn't possible.
+		internal static void SetupSet(Mock mock, LambdaExpression expression, PropertyInfo propertyToSet, object value)
+		{
+			Guard.NotNull(expression, nameof(expression));
+
+			Mock.SetupRecursive<MethodCall>(mock, expression, setupLast: (targetMock, _, __) =>
+			{
+				// Setting a mock's property through reflection will only work (i.e. the property will only remember the value
+				// it's being set to) if it is being stubbed. In order to ensure it's stubbed, we temporarily enable
+				// auto-stubbing (if that isn't already switched on).
+
+				var temporaryAutoSetupProperties = targetMock.AutoSetupPropertiesDefaultValueProvider == null;
+				if (temporaryAutoSetupProperties)
+				{
+					targetMock.AutoSetupPropertiesDefaultValueProvider = targetMock.DefaultValueProvider;
+				}
+				try
+				{
+					propertyToSet.SetValue(targetMock.Object, value, null);
+				}
+				finally
+				{
+					if (temporaryAutoSetupProperties)
+					{
+						targetMock.AutoSetupPropertiesDefaultValueProvider = null;
+					}
+				}
+				return null;
+			}, allowNonOverridableLastProperty: true);
+		}
+
 		internal static MethodCall SetupAdd(Mock mock, LambdaExpression expression, Condition condition)
 		{
 			Guard.NotNull(expression, nameof(expression));
@@ -576,14 +608,14 @@ namespace Moq
 			});
 		}
 
-		private static TSetup SetupRecursive<TSetup>(Mock mock, LambdaExpression expression, Func<Mock, Expression, InvocationShape, TSetup> setupLast)
+		private static TSetup SetupRecursive<TSetup>(Mock mock, LambdaExpression expression, Func<Mock, Expression, InvocationShape, TSetup> setupLast, bool allowNonOverridableLastProperty = false)
 			where TSetup : ISetup
 		{
 			Debug.Assert(mock != null);
 			Debug.Assert(expression != null);
 			Debug.Assert(setupLast != null);
 
-			var parts = expression.Split();
+			var parts = expression.Split(allowNonOverridableLastProperty);
 			return Mock.SetupRecursive(mock, originalExpression: expression, parts, setupLast);
 		}
 

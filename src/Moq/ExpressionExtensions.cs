@@ -136,7 +136,7 @@ namespace Moq
 		/// <exception cref="ArgumentException">
 		///   It was not possible to completely split up the expression.
 		/// </exception>
-		internal static Stack<InvocationShape> Split(this LambdaExpression expression)
+		internal static Stack<InvocationShape> Split(this LambdaExpression expression, bool allowNonOverridableLastProperty = false)
 		{
 			Debug.Assert(expression != null);
 
@@ -145,7 +145,7 @@ namespace Moq
 			Expression remainder = expression.Body;
 			while (CanSplit(remainder))
 			{
-				Split(remainder, out remainder, out var part);
+				Split(remainder, out remainder, out var part, allowNonOverridableLastProperty: allowNonOverridableLastProperty);
 				parts.Push(part);
 			}
 
@@ -162,7 +162,7 @@ namespace Moq
 						remainder.ToStringFixed()));
 			}
 
-			void Split(Expression e, out Expression r /* remainder */, out InvocationShape p /* part */, bool assignment = false)
+			void Split(Expression e, out Expression r /* remainder */, out InvocationShape p /* part */, bool assignment = false, bool allowNonOverridableLastProperty = false)
 			{
 				const string ParameterName = "...";
 
@@ -253,7 +253,8 @@ namespace Moq
 										parameter),
 									method,
 									arguments,
-									skipMatcherInitialization: assignment);
+									skipMatcherInitialization: assignment,
+									allowNonOverridable: allowNonOverridableLastProperty);
 						return;
 					}
 
@@ -288,7 +289,8 @@ namespace Moq
 										Expression.MakeMemberAccess(parameter, property),
 										parameter),
 									method,
-									skipMatcherInitialization: assignment);
+									skipMatcherInitialization: assignment,
+									allowNonOverridable: allowNonOverridableLastProperty);
 						return;
 					}
 
