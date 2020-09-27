@@ -3427,6 +3427,30 @@ namespace Moq.Tests.Regressions
 
 		#endregion
 
+		#region 1039
+
+		public class Issue1039
+		{
+			[Fact]
+			public void Test()
+			{
+				Mock.Of<IOptions<DatabaseOptions>>(
+					o => o.Value.ConnectionString == "connection");
+			}
+
+			public interface IOptions<out TOptions>
+			{
+				TOptions Value { get; }
+			}
+
+			public class DatabaseOptions
+			{
+				public string ConnectionString { get; set; }
+			}
+		}
+
+		#endregion
+
 		// Old @ Google Code
 
 		#region #47
