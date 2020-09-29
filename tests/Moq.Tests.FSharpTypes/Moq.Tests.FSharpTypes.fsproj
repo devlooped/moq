@@ -12,6 +12,7 @@
 
 	<ItemGroup>
 		<PackageReference Include="FSharp.Core" Version="4.5.4" />
+		<PackageReference Include="Microsoft.NETFramework.ReferenceAssemblies" Version="1.0.0" PrivateAssets="All" />
 		<PackageReference Include="System.ValueTuple" Version="4.5.0" />
 	</ItemGroup>
 
