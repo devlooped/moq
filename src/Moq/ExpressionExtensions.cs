@@ -145,7 +145,7 @@ namespace Moq
 			Expression remainder = expression.Body;
 			while (CanSplit(remainder))
 			{
-				Split(remainder, out remainder, out var part, allowNonOverridableLastProperty: allowNonOverridableLastProperty);
+				Split(remainder, out remainder, out var part, allowNonOverridableLastProperty: allowNonOverridableLastProperty && parts.Count == 0);
 				parts.Push(part);
 			}
 
