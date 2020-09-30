@@ -72,13 +72,16 @@ namespace Moq
 #endif
 		private readonly bool exactGenericTypeArguments;
 
-		public InvocationShape(LambdaExpression expression, MethodInfo method, IReadOnlyList<Expression> arguments = null, bool exactGenericTypeArguments = false, bool skipMatcherInitialization = false)
+		public InvocationShape(LambdaExpression expression, MethodInfo method, IReadOnlyList<Expression> arguments = null, bool exactGenericTypeArguments = false, bool skipMatcherInitialization = false, bool allowNonOverridable = false)
 		{
 			Debug.Assert(expression != null);
 			Debug.Assert(method != null);
 
-			Guard.IsOverridable(method, expression);
-			Guard.IsVisibleToProxyFactory(method);
+			if (!allowNonOverridable)  // the sole currently known legitimate case where this evaluates to `false` is when setting non-overridable properties via LINQ to Mocks
+			{
+				Guard.IsOverridable(method, expression);
+				Guard.IsVisibleToProxyFactory(method);
+			}
 
 			this.Expression = expression;
 			this.Method = method;
