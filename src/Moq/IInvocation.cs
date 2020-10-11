@@ -30,5 +30,10 @@ namespace Moq
 		///   Gets whether this invocation was successfully verified by any of the various <c>`Verify`</c> methods.
 		/// </summary>
 		bool IsVerified { get; }
+
+		/// <summary>
+		/// Gets the return value of the invocation.
+		/// </summary>
+		object ReturnValue { get; }
 	}
 }
