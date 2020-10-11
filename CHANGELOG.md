@@ -11,6 +11,10 @@ The format is loosely based on [Keep a Changelog](http://keepachangelog.com/en/1
 * New method overloads for `It.Is`, `It.IsIn`, and `It.IsNotIn` that compare values using a custom `IEqualityComparer<T>` (@weitzhandler, #1064)
 Implement It.Is, It.IsIn, It.IsNotIn with a comparer overload (#1059)
 
+#### Fixed
+
+* Setup not triggered due to VB.NET transparently inserting superfluous type conversions into a setup expression (@InteXX, #1067)
+
 
 ## 4.14.6 (2020-09-30)
 
