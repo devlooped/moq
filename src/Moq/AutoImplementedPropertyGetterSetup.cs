@@ -1,4 +1,4 @@
-// Copyright (c) 2007, Clarius Consulting, Manas Technology Solutions, InSTEDD.
+// Copyright (c) 2007, Clarius Consulting, Manas Technology Solutions, InSTEDD, and Contributors.
 // All rights reserved. Licensed under the BSD 3-Clause License; see License.txt.
 
 using System;
@@ -16,15 +16,17 @@ namespace Moq
 
 		private Func<object> getter;
 
-		public AutoImplementedPropertyGetterSetup(LambdaExpression originalExpression, MethodInfo method, Func<object> getter)
-			: base(new InvocationShape(originalExpression, method, noArguments))
+		public AutoImplementedPropertyGetterSetup(Mock mock, LambdaExpression originalExpression, MethodInfo method, Func<object> getter)
+			: base(originalExpression: null, mock, new InvocationShape(originalExpression, method, noArguments))
 		{
 			this.getter = getter;
+
+			this.MarkAsVerifiable();
 		}
 
-		public override void Execute(Invocation invocation)
+		protected override void ExecuteCore(Invocation invocation)
 		{
-			invocation.Return(this.getter.Invoke());
+			invocation.ReturnValue = this.getter.Invoke();
 		}
 
 		public override bool TryGetReturnValue(out object returnValue)
@@ -33,14 +35,10 @@ namespace Moq
 			return true;
 		}
 
-		public override MockException TryVerify()
+		protected override bool TryVerifySelf(out MockException error)
 		{
-			return this.TryVerifyInnerMock(innerMock => innerMock.TryVerify());
-		}
-
-		public override MockException TryVerifyAll()
-		{
-			return this.TryVerifyInnerMock(innerMock => innerMock.TryVerifyAll());
+			error = null;
+			return true;
 		}
 	}
 }

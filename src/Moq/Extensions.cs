@@ -1,4 +1,4 @@
-// Copyright (c) 2007, Clarius Consulting, Manas Technology Solutions, InSTEDD.
+// Copyright (c) 2007, Clarius Consulting, Manas Technology Solutions, InSTEDD, and Contributors.
 // All rights reserved. Licensed under the BSD 3-Clause License; see License.txt.
 
 using System;
@@ -17,6 +17,78 @@ namespace Moq
 		public static bool CanCreateInstance(this Type type)
 		{
 			return type.IsValueType || type.GetConstructor(Type.EmptyTypes) != null;
+		}
+
+		public static bool CanRead(this PropertyInfo property, out MethodInfo getter)
+		{
+			if (property.CanRead)
+			{
+				// The given `PropertyInfo` should be able to provide a getter:
+				getter = property.GetGetMethod(nonPublic: true);
+				Debug.Assert(getter != null);
+				return true;
+			}
+			else
+			{
+				// The given `PropertyInfo` cannot provide a getter... but there may still be one in a base class'
+				// corresponding `PropertyInfo`! We need to find that base `PropertyInfo`, and because `PropertyInfo`
+				// does not have `.GetBaseDefinition()`, we'll find it via the setter's `.GetBaseDefinition()`.
+				// (We may assume that there's a setter because properties/indexers must have at least one accessor.)
+				Debug.Assert(property.CanWrite);
+				var setter = property.GetSetMethod(nonPublic: true);
+				Debug.Assert(setter != null);
+
+				var baseSetter = setter.GetBaseDefinition();
+				if (baseSetter != setter)
+				{
+					var baseProperty =
+						baseSetter
+						.DeclaringType
+						.GetMember(property.Name, MemberTypes.Property, BindingFlags.Public | BindingFlags.NonPublic | BindingFlags.Instance)
+						.Cast<PropertyInfo>()
+						.First(p => p.GetSetMethod(nonPublic: true) == baseSetter);
+					return baseProperty.CanRead(out getter);
+				}
+			}
+
+			getter = null;
+			return false;
+		}
+
+		public static bool CanWrite(this PropertyInfo property, out MethodInfo setter)
+		{
+			if (property.CanWrite)
+			{
+				// The given `PropertyInfo` should be able to provide a setter:
+				setter = property.GetSetMethod(nonPublic: true);
+				Debug.Assert(setter != null);
+				return true;
+			}
+			else
+			{
+				// The given `PropertyInfo` cannot provide a setter... but there may still be one in a base class'
+				// corresponding `PropertyInfo`! We need to find that base `PropertyInfo`, and because `PropertyInfo`
+				// does not have `.GetBaseDefinition()`, we'll find it via the getter's `.GetBaseDefinition()`.
+				// (We may assume that there's a getter because properties/indexers must have at least one accessor.)
+				Debug.Assert(property.CanRead);
+				var getter = property.GetGetMethod(nonPublic: true);
+				Debug.Assert(getter != null);
+
+				var baseGetter = getter.GetBaseDefinition();
+				if (baseGetter != getter)
+				{
+					var baseProperty =
+						baseGetter
+						.DeclaringType
+						.GetMember(property.Name, MemberTypes.Property, BindingFlags.Public | BindingFlags.NonPublic | BindingFlags.Instance)
+						.Cast<PropertyInfo>()
+						.First(p => p.GetGetMethod(nonPublic: true) == baseGetter);
+					return baseProperty.CanWrite(out setter);
+				}
+			}
+
+			setter = null;
+			return false;
 		}
 
 		/// <summary>
@@ -65,11 +137,11 @@ namespace Moq
 			}
 		}
 
-		public static object InvokePreserveStack(this Delegate del, params object[] args)
+		public static object InvokePreserveStack(this Delegate del, IReadOnlyList<object> args = null)
 		{
 			try
 			{
-				return del.DynamicInvoke(args);
+				return del.DynamicInvoke((args as object[]) ?? args?.ToArray());
 			}
 			catch (TargetInvocationException ex)
 			{
@@ -178,24 +250,12 @@ namespace Moq
 
 		public static bool CanOverrideGet(this PropertyInfo property)
 		{
-			if (property.CanRead)
-			{
-				var getter = property.GetGetMethod(true);
-				return getter != null && getter.CanOverride();
-			}
-
-			return false;
+			return property.CanRead(out var getter) && getter.CanOverride();
 		}
 
 		public static bool CanOverrideSet(this PropertyInfo property)
 		{
-			if (property.CanWrite)
-			{
-				var setter = property.GetSetMethod(true);
-				return setter != null && setter.CanOverride();
-			}
-
-			return false;
+			return property.CanWrite(out var setter) && setter.CanOverride();
 		}
 
 		public static IEnumerable<MethodInfo> GetMethods(this Type type, string name)
@@ -203,7 +263,7 @@ namespace Moq
 			return type.GetMember(name).OfType<MethodInfo>();
 		}
 
-		public static bool CompareTo<TTypes, TOtherTypes>(this TTypes types, TOtherTypes otherTypes, TypeComparison comparisonType)
+		public static bool CompareTo<TTypes, TOtherTypes>(this TTypes types, TOtherTypes otherTypes, bool exact, bool considerTypeMatchers)
 			where TTypes : IReadOnlyList<Type>
 			where TOtherTypes : IReadOnlyList<Type>
 		{
@@ -214,51 +274,35 @@ namespace Moq
 				return false;
 			}
 
-			switch (comparisonType)
+			for (int i = 0; i < count; ++i)
 			{
-				case TypeComparison.Equality:
-					for (int i = 0; i < count; ++i)
+				if (considerTypeMatchers && types[i].IsTypeMatcher(out var typeMatcherType))
+				{
+					Debug.Assert(typeMatcherType.ImplementsTypeMatcherProtocol());
+
+					var typeMatcher = (ITypeMatcher)Activator.CreateInstance(typeMatcherType);
+					if (typeMatcher.Matches(otherTypes[i]) == false)
 					{
-						if (types[i] != otherTypes[i])
-						{
-							return false;
-						}
+						return false;
 					}
-					return true;
-
-				case TypeComparison.AssignmentCompatibility:
-					for (int i = 0; i < count; ++i)
+				}
+				else if (exact)
+				{
+					if (types[i] != otherTypes[i])
 					{
-						if (types[i].IsAssignableFrom(otherTypes[i]) == false)
-						{
-							return false;
-						}
+						return false;
 					}
-					return true;
-
-				case TypeComparison.TypeMatchersOrElseAssignmentCompatibility:
-					for (int i = 0; i < count; ++i)
+				}
+				else
+				{
+					if (types[i].IsAssignableFrom(otherTypes[i]) == false)
 					{
-						if (types[i].IsTypeMatcher(out var typeMatcherType))
-						{
-							Debug.Assert(typeMatcherType.ImplementsTypeMatcherProtocol());
-
-							var typeMatcher = (ITypeMatcher)Activator.CreateInstance(typeMatcherType);
-							if (typeMatcher.Matches(otherTypes[i]) == false)
-							{
-								return false;
-							}
-						}
-						else if (types[i].IsAssignableFrom(otherTypes[i]) == false)
-						{
-							return false;
-						}
+						return false;
 					}
-					return true;
-
-				default:
-					throw new ArgumentOutOfRangeException(nameof(comparisonType));
+				}
 			}
+
+			return true;
 		}
 
 		public static string GetParameterTypeList(this MethodInfo method)
@@ -275,7 +319,7 @@ namespace Moq
 			where TOtherTypes : IReadOnlyList<Type>
 		{
 			var method = function.GetMethodInfo();
-			if (method.GetParameterTypes().CompareTo(otherTypes, TypeComparison.AssignmentCompatibility))
+			if (method.GetParameterTypes().CompareTo(otherTypes, exact: false, considerTypeMatchers: false))
 			{
 				// the backing method for the literal delegate is compatible, DynamicInvoke(...) will succeed
 				return true;
@@ -286,7 +330,7 @@ namespace Moq
 			// an instance delegate invocation is created for an extension method (bundled with a receiver)
 			// or at times for DLR code generation paths because the CLR is optimized for instance methods.
 			var invokeMethod = GetInvokeMethodFromUntypedDelegateCallback(function);
-			if (invokeMethod != null && invokeMethod.GetParameterTypes().CompareTo(otherTypes, TypeComparison.AssignmentCompatibility))
+			if (invokeMethod != null && invokeMethod.GetParameterTypes().CompareTo(otherTypes, exact: false, considerTypeMatchers: false))
 			{
 				// the Invoke(...) method is compatible instead. DynamicInvoke(...) will succeed.
 				return true;
@@ -311,36 +355,14 @@ namespace Moq
 			}
 		}
 
-		public static bool TryFind(this IEnumerable<Setup> innerMockSetups, InvocationShape expectation, out Setup setup)
+		public static Setup TryFind(this IEnumerable<Setup> setups, InvocationShape expectation)
 		{
-			Debug.Assert(innerMockSetups.All(s => s.ReturnsInnerMock(out _)));
-
-			foreach (Setup innerMockSetup in innerMockSetups)
-			{
-				if (innerMockSetup.Expectation.Equals(expectation))
-				{
-					setup = innerMockSetup;
-					return true;
-				}
-			}
-
-			setup = default;
-			return false;
+			return setups.FirstOrDefault(setup => setup.Expectation.Equals(expectation));
 		}
 
-		public static bool TryFind(this IEnumerable<Setup> innerMockSetups, Invocation invocation, out Setup setup)
+		public static Setup TryFind(this IEnumerable<Setup> setups, Invocation invocation)
 		{
-			foreach (Setup innerMockSetup in innerMockSetups)
-			{
-				if (innerMockSetup.Matches(invocation))
-				{
-					setup = innerMockSetup;
-					return true;
-				}
-			}
-
-			setup = default;
-			return false;
+			return setups.FirstOrDefault(setup => setup.Matches(invocation));
 		}
 	}
 }

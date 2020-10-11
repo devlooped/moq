@@ -1,4 +1,4 @@
-// Copyright (c) 2007, Clarius Consulting, Manas Technology Solutions, InSTEDD.
+// Copyright (c) 2007, Clarius Consulting, Manas Technology Solutions, InSTEDD, and Contributors.
 // All rights reserved. Licensed under the BSD 3-Clause License; see License.txt.
 
 using System;
@@ -88,21 +88,12 @@ namespace Moq
 
 			if (parameterType.IsByRef)
 			{
-				switch (parameter.Attributes & (ParameterAttributes.In | ParameterAttributes.Out))
+				stringBuilder.Append((parameter.Attributes & (ParameterAttributes.In | ParameterAttributes.Out)) switch
 				{
-					case ParameterAttributes.In:
-						stringBuilder.Append("in ");
-						break;
-
-					case ParameterAttributes.Out:
-						stringBuilder.Append("out ");
-						break;
-
-					case ParameterAttributes.In | ParameterAttributes.Out:
-					default:
-						stringBuilder.Append("ref ");
-						break;
-				}
+					ParameterAttributes.In  => "in ",
+					ParameterAttributes.Out => "out ",
+					_                       => "ref ",
+				});
 
 				parameterType = parameterType.GetElementType();
 			}

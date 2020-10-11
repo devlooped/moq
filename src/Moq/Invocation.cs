@@ -1,4 +1,4 @@
-// Copyright (c) 2007, Clarius Consulting, Manas Technology Solutions, InSTEDD.
+// Copyright (c) 2007, Clarius Consulting, Manas Technology Solutions, InSTEDD, and Contributors.
 // All rights reserved. Licensed under the BSD 3-Clause License; see License.txt.
 
 using System;
@@ -16,7 +16,8 @@ namespace Moq
 		private MethodInfo methodImplementation;
 		private readonly Type proxyType;
 		private object returnValue;
-		private VerificationState verificationState;
+		private Setup matchingSetup;
+		private bool verified;
 
 		/// <summary>
 		/// Initializes a new instance of the <see cref="Invocation"/> class.
@@ -64,90 +65,43 @@ namespace Moq
 
 		IReadOnlyList<object> IInvocation.Arguments => this.arguments;
 
+		public ISetup MatchingSetup => this.matchingSetup;
+
 		public Type ProxyType => this.proxyType;
 
-		public object ReturnValue => this.returnValue;
+		public object ReturnValue
+		{
+			get => this.returnValue;
+			set
+			{
+				Debug.Assert(this.returnValue == null);
+				this.returnValue = value;
+			}
+		}
 
-		internal bool Verified => this.verificationState == VerificationState.Verified;
+		public bool IsVerified => this.verified;
 
 		/// <summary>
-		/// Ends the invocation as if a <see langword="return"/> statement occurred.
+		///   Calls the <see langword="base"/> method implementation
+		///   and returns its return value (or <see langword="null"/> for <see langword="void"/> methods).
 		/// </summary>
-		/// <remarks>
-		/// Implementations may assume that this method is only called for a <see langword="void"/> method,
-		/// and that no more calls to any of the three <c>Return</c> methods will be made.
-		/// <para>
-		/// Implementations must ensure that any by-reference parameters are written back from <see cref="Arguments"/>.
-		/// </para>
-		/// </remarks>
-		public abstract void Return();
+		protected internal abstract object CallBase();
 
-		/// <summary>
-		/// Ends the invocation as if a tail call to the base method were made.
-		/// </summary>
-		/// <remarks>
-		/// Implementations may assume that this method is only called for a method having a callable (non-<see langword="abstract"/>) base method,
-		/// and that no more calls to any of the three <c>Return</c> methods will be made.
-		/// <para>
-		/// Implementations must ensure that any by-reference parameters are written back from <see cref="Arguments"/>.
-		/// </para>
-		/// </remarks>
-		public abstract void ReturnBase();
-
-		/// <summary>
-		/// Ends the invocation as if a <see langword="return"/> statement with the specified return value occurred.
-		/// </summary>
-		/// <remarks>
-		/// Implementations may assume that this method is only called for a non-<see langword="void"/> method,
-		/// and that no more calls to any of the three <c>Return</c> methods will be made.
-		/// <para>
-		/// Implementations must ensure that any by-reference parameters are written back from <see cref="Arguments"/>.
-		/// Implementations must also call <see cref="SetReturnValue(object)"/>.
-		/// </para>
-		/// </remarks>
-		public abstract void Return(object value);
-
-		internal void MarkAsMatchedBySetup()  // this supports the `mock.VerifyAll()` machinery
+		internal void MarkAsMatchedBy(Setup setup)
 		{
-			if (this.verificationState == VerificationState.Invoked)
-			{
-				this.verificationState = VerificationState.InvokedAndMatchedBySetup;
-			}
+			Debug.Assert(this.matchingSetup == null);
+
+			this.matchingSetup = setup;
 		}
 
-		internal void MarkAsMatchedByVerifiableSetup()  // this supports the `mock.Verify()` machinery
+		internal void MarkAsVerified() => this.verified = true;
+
+		internal void MarkAsVerifiedIfMatchedBy(Func<Setup, bool> predicate)
 		{
-			if (this.verificationState == VerificationState.Invoked ||
-				this.verificationState == VerificationState.InvokedAndMatchedBySetup)
+			if (this.matchingSetup != null && predicate(this.matchingSetup))
 			{
-				this.verificationState = VerificationState.InvokedAndMatchedByVerifiableSetup;
+				this.verified = true;
 			}
-		}
-
-		internal void MarkAsVerified() => this.verificationState = VerificationState.Verified;
-
-		internal void MarkAsVerifiedIfMatchedBySetup()  // this supports the `mock.VerifyAll()` machinery
-		{
-			if (this.verificationState == VerificationState.InvokedAndMatchedBySetup ||
-				this.verificationState == VerificationState.InvokedAndMatchedByVerifiableSetup)
-			{
-				this.verificationState = VerificationState.Verified;
-			}
-		}
-
-		internal void MarkAsVerifiedIfMatchedByVerifiableSetup()  // this supports the `mock.Verify()` machinery
-		{
-			if (this.verificationState == VerificationState.InvokedAndMatchedByVerifiableSetup)
-			{
-				this.verificationState = VerificationState.Verified;
-			}
-		}
-
-		protected void SetReturnValue(object returnValue)
-		{
-			Debug.Assert(this.returnValue == null);  // quick & dirty check against double invocations
-
-			this.returnValue = returnValue;
 		}
 
 		/// <inheritdoc/>
@@ -188,14 +142,6 @@ namespace Moq
 			}
 
 			return builder.ToString();
-		}
-
-		private enum VerificationState : byte
-		{
-			Invoked = 0,
-			InvokedAndMatchedBySetup,
-			InvokedAndMatchedByVerifiableSetup,
-			Verified,
 		}
 	}
 }

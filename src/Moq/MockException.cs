@@ -1,4 +1,4 @@
-// Copyright (c) 2007, Clarius Consulting, Manas Technology Solutions, InSTEDD.
+// Copyright (c) 2007, Clarius Consulting, Manas Technology Solutions, InSTEDD, and Contributors.
 // All rights reserved. Licensed under the BSD 3-Clause License; see License.txt.
 
 using System;
@@ -39,7 +39,7 @@ namespace Moq
 	public class MockException : Exception
 	{
 		/// <summary>
-		///   Returns the exception to be thrown when a setup limited by <see cref="IOccurrence.AtMostOnce()"/> is invoked more often than once.
+		///   Returns the exception to be thrown when a setup limited by <see cref="IOccurrence.AtMostOnce()"/> is matched more often than once.
 		/// </summary>
 		internal static MockException MoreThanOneCall(MethodCall setup, int invocationCount)
 		{
@@ -52,7 +52,7 @@ namespace Moq
 		}
 
 		/// <summary>
-		///   Returns the exception to be thrown when a setup limited by <see cref="IOccurrence.AtMost(int)"/> is invoked more often than the specified maximum number of times.
+		///   Returns the exception to be thrown when a setup limited by <see cref="IOccurrence.AtMost(int)"/> is matched more often than the specified maximum number of times.
 		/// </summary>
 		internal static MockException MoreThanNCalls(MethodCall setup, int maxInvocationCount, int invocationCount)
 		{
@@ -157,7 +157,7 @@ namespace Moq
 		}
 
 		/// <summary>
-		///   Returns the exception to be thrown when a setup has not been invoked.
+		///   Returns the exception to be thrown when a setup was not matched.
 		/// </summary>
 		internal static MockException UnmatchedSetup(Setup setup)
 		{
@@ -169,7 +169,7 @@ namespace Moq
 					setup));
 		}
 
-		internal static MockException FromInnerMockOf(Setup setup, MockException error)
+		internal static MockException FromInnerMockOf(ISetup setup, MockException error)
 		{
 			var message = new StringBuilder();
 

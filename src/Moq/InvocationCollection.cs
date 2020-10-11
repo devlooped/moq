@@ -1,4 +1,4 @@
-// Copyright (c) 2007, Clarius Consulting, Manas Technology Solutions, InSTEDD.
+// Copyright (c) 2007, Clarius Consulting, Manas Technology Solutions, InSTEDD, and Contributors.
 // All rights reserved. Licensed under the BSD 3-Clause License; see License.txt.
 
 using System;
@@ -77,7 +77,7 @@ namespace Moq
 				this.count = 0;
 				this.capacity = 0;
 
-				this.owner.Setups.UninvokeAll();
+				this.owner.MutableSetups.Reset();
 				// ^ TODO: Currently this could cause a deadlock as another lock will be taken inside this one!
 			}
 		}

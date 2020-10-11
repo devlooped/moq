@@ -1,4 +1,4 @@
-// Copyright (c) 2007, Clarius Consulting, Manas Technology Solutions, InSTEDD.
+// Copyright (c) 2007, Clarius Consulting, Manas Technology Solutions, InSTEDD, and Contributors.
 // All rights reserved. Licensed under the BSD 3-Clause License; see License.txt.
 
 using System;
@@ -1047,17 +1047,16 @@ namespace Moq.Tests
 		}
 
 		[Fact]
-		public void Verify_ignores_conditional_setups()
+		public void Verify_ignores_conditional_setups_so_calling_Verifiable_is_a_user_error()
 		{
 			var mock = new Mock<IFoo>();
-			mock.When(() => true).Setup(m => m.Submit()).Verifiable();
+			var setup = mock.When(() => true).Setup(m => m.Submit());
 
-			var exception = Record.Exception(() =>
-			{
-				mock.Verify();
-			});
-
-			Assert.Null(exception);
+			// Conditional setups are completely ignored by `Verify[All]`.
+			// Making such a setup verifiable is therefore a no-op, but
+			// may be indicative of the user making an incorrect assumption;
+			// best to warn the user so they revise their code:
+			Assert.Throws<InvalidOperationException>(() => setup.Verifiable());
 		}
 
 		[Fact]
@@ -1117,10 +1116,10 @@ namespace Moq.Tests
 			mock.Object.Submit();
 
 			var invocation = mock.MutableInvocations.ToArray()[0];
-			Assert.False(invocation.Verified);
+			Assert.False(invocation.IsVerified);
 
 			mock.Verify(m => m.Submit());
-			Assert.True(invocation.Verified);
+			Assert.True(invocation.IsVerified);
 		}
 
 		[Fact]
@@ -1132,14 +1131,14 @@ namespace Moq.Tests
 			mock.Object.Echo(3);
 
 			var invocations = mock.MutableInvocations.ToArray();
-			Assert.False(invocations[0].Verified);
-			Assert.False(invocations[1].Verified);
-			Assert.False(invocations[2].Verified);
+			Assert.False(invocations[0].IsVerified);
+			Assert.False(invocations[1].IsVerified);
+			Assert.False(invocations[2].IsVerified);
 
 			mock.Verify(m => m.Echo(It.Is<int>(i => i != 2)));
-			Assert.True(invocations[0].Verified);
-			Assert.False(invocations[1].Verified);
-			Assert.True(invocations[2].Verified);
+			Assert.True(invocations[0].IsVerified);
+			Assert.False(invocations[1].IsVerified);
+			Assert.True(invocations[2].IsVerified);
 		}
 
 		[Fact]
@@ -1151,14 +1150,14 @@ namespace Moq.Tests
 			mock.Object.Echo(3);
 
 			var invocations = mock.MutableInvocations.ToArray();
-			Assert.False(invocations[0].Verified);
-			Assert.False(invocations[1].Verified);
-			Assert.False(invocations[2].Verified);
+			Assert.False(invocations[0].IsVerified);
+			Assert.False(invocations[1].IsVerified);
+			Assert.False(invocations[2].IsVerified);
 
 			Assert.Throws<MockException>(() => mock.Verify(m => m.Echo(It.Is<int>(i => i != 2)), Times.Exactly(1)));
-			Assert.False(invocations[0].Verified);
-			Assert.False(invocations[1].Verified);
-			Assert.False(invocations[2].Verified);
+			Assert.False(invocations[0].IsVerified);
+			Assert.False(invocations[1].IsVerified);
+			Assert.False(invocations[2].IsVerified);
 		}
 
 		[Fact]
@@ -1486,6 +1485,23 @@ namespace Moq.Tests
 				mock.Verify(m => m.InvokePopulate(ref It.Ref<ChildDto>.IsAny), Times.Never));
 		}
 
+		[Fact]
+		public void Verification_marks_invocations_of_inner_mocks_as_verified()
+		{
+			var mock = new Mock<IFoo>() { DefaultValue = DefaultValue.Mock };
+			mock.Setup(m => m.Value).Returns(1);
+			mock.Setup(m => m.Bar.Value).Returns(2);
+
+			// Invoke everything that has been set up, and verify everything:
+			_ = mock.Object.Value;
+			_ = mock.Object.Bar.Value;
+			mock.VerifyAll();
+
+			// The above call to `VerifyAll` should have marked all invocations as verified,
+			// including those on the inner `Bar` mock:
+			Mock.Get(mock.Object.Bar).VerifyNoOtherCalls();
+		}
+
 		public class Exclusion_of_unreachable_inner_mocks
 		{
 			[Fact]
@@ -1624,6 +1640,36 @@ namespace Moq.Tests
 					return count;
 				}
 			}
+		}
+
+		[Fact]
+		public void Property_getter_setup_created_by_SetupAllProperties_should_not_fail_verification_even_when_not_matched()
+		{
+			var mock = new Mock<IFoo>();
+			mock.SetupAllProperties();
+
+			// Due to `SetupAllProperties` working in a lazy fashion,
+			// this should create two setups (one for the getter, one for the setter).
+			// Only invoke the setter:
+			mock.Object.Value = default;
+
+			// The getter hasn't been matched, but verification should still pass:
+			mock.VerifyAll();
+		}
+
+		[Fact]
+		public void Property_setter_setup_created_by_SetupAllProperties_should_not_fail_verification_even_when_not_matched()
+		{
+			var mock = new Mock<IFoo>();
+			mock.SetupAllProperties();
+
+			// Due to `SetupAllProperties` working in a lazy fashion,
+			// this should create two setups (one for the getter, one for the setter).
+			// Only invoke the getter:
+			_ = mock.Object.Value;
+
+			// The setter hasn't been matched, but verification should still pass:
+			mock.VerifyAll();
 		}
 
 		public interface IBar

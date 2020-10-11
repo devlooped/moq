@@ -1,4 +1,4 @@
-// Copyright (c) 2007, Clarius Consulting, Manas Technology Solutions, InSTEDD.
+// Copyright (c) 2007, Clarius Consulting, Manas Technology Solutions, InSTEDD, and Contributors.
 // All rights reserved. Licensed under the BSD 3-Clause License; see License.txt.
 
 using System;
@@ -81,6 +81,25 @@ namespace Moq.Tests
 		}
 
 		[Fact]
+		public void MatchesIsInEnumerableWithCustomComparer()
+		{
+			var acceptableArgs = Enumerable.Repeat("foo", 1);
+			var unacceptableArgs = Enumerable.Repeat("bar", 1);
+
+			var mock = new Mock<IFoo>();
+
+			mock.Setup(x => x.Execute(It.IsIn(acceptableArgs, StringComparer.OrdinalIgnoreCase))).Returns("foo");
+			mock.Setup(x => x.Execute(It.IsIn(unacceptableArgs, StringComparer.OrdinalIgnoreCase))).Returns("bar");
+
+			Assert.Equal("foo", mock.Object.Execute("foo"));
+			Assert.Equal("foo", mock.Object.Execute("FOO"));
+			Assert.Equal("foo", mock.Object.Execute("FoO"));
+
+			Assert.Equal("bar", mock.Object.Execute("bar"));
+			Assert.Equal("bar", mock.Object.Execute("BAR"));
+		}
+
+		[Fact]
 		public void MatchesIsInVariadicParameters()
 		{
 			var mock = new Mock<IFoo>();
@@ -110,6 +129,26 @@ namespace Moq.Tests
 
 			Assert.Equal(1, mock.Object.Echo(7));
 			Assert.Equal(1, mock.Object.Echo(9));
+		}
+
+		[Fact]
+		public void MatchesIsNotInEnumerableWithCustomComparer()
+		{
+			var acceptableArgs = new[] { "foo", "bar" };
+
+			var mock = new Mock<IFoo>();
+
+			mock.Setup(x => x.Execute(It.IsNotIn(acceptableArgs, StringComparer.OrdinalIgnoreCase))).Returns("foo");
+
+			Assert.Equal("foo", mock.Object.Execute("baz"));
+			Assert.Equal("foo", mock.Object.Execute("alpha"));
+
+			Assert.Equal(default, mock.Object.Execute("foo"));
+			Assert.Equal(default, mock.Object.Execute("FOO"));
+			Assert.Equal(default, mock.Object.Execute("FoO"));
+			Assert.Equal(default, mock.Object.Execute("Bar"));
+			Assert.Equal(default, mock.Object.Execute("BAR"));
+			Assert.Equal(default, mock.Object.Execute("bar"));
 		}
 
 		[Fact]

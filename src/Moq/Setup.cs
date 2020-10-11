@@ -1,23 +1,32 @@
-// Copyright (c) 2007, Clarius Consulting, Manas Technology Solutions, InSTEDD.
+// Copyright (c) 2007, Clarius Consulting, Manas Technology Solutions, InSTEDD, and Contributors.
 // All rights reserved. Licensed under the BSD 3-Clause License; see License.txt.
 
 using System;
+using System.Collections.Generic;
 using System.Diagnostics;
 using System.Linq.Expressions;
 using System.Reflection;
 using System.Text;
 
+using Moq.Properties;
+
 namespace Moq
 {
-	internal abstract class Setup
+	internal abstract class Setup : ISetup
 	{
 		private readonly InvocationShape expectation;
+		private readonly Expression originalExpression;
+		private readonly Mock mock;
+		private Flags flags;
 
-		protected Setup(InvocationShape expectation)
+		protected Setup(Expression originalExpression, Mock mock, InvocationShape expectation)
 		{
+			Debug.Assert(mock != null);
 			Debug.Assert(expectation != null);
 
+			this.originalExpression = originalExpression;
 			this.expectation = expectation;
+			this.mock = mock;
 		}
 
 		public virtual Condition Condition => null;
@@ -26,16 +35,40 @@ namespace Moq
 
 		public LambdaExpression Expression => this.expectation.Expression;
 
-		public virtual bool IsVerifiable => false;
+		public Mock InnerMock => this.TryGetReturnValue(out var returnValue)
+		                         && Unwrap.ResultIfCompletedTask(returnValue) is IMocked mocked ? mocked.Mock : null;
+
+		public bool IsConditional => this.Condition != null;
+
+		public bool IsOverridden => (this.flags & Flags.Overridden) != 0;
+
+		public bool IsVerifiable => (this.flags & Flags.Verifiable) != 0;
 
 		public MethodInfo Method => this.expectation.Method;
 
-		public abstract void Execute(Invocation invocation);
+		public Mock Mock => this.mock;
 
-		public Mock GetInnerMock()
+		public Expression OriginalExpression => this.originalExpression;
+
+		public bool IsMatched => (this.flags & Flags.Matched) != 0;
+
+		public void Execute(Invocation invocation)
 		{
-			return this.ReturnsInnerMock(out var innerMock) ? innerMock : throw new InvalidOperationException();
+			// update this setup:
+			this.flags |= Flags.Matched;
+
+			// update invocation:
+			invocation.MarkAsMatchedBy(this);
+			this.SetOutParameters(invocation);
+
+			// update condition (important for `MockSequence`) and matchers (important for `Capture`):
+			this.Condition?.SetupEvaluatedSuccessfully();
+			this.expectation.SetupEvaluatedSuccessfully(invocation);
+
+			this.ExecuteCore(invocation);
 		}
+
+		protected abstract void ExecuteCore(Invocation invocation);
 
 		/// <summary>
 		///   Attempts to get this setup's return value without invoking user code
@@ -47,29 +80,26 @@ namespace Moq
 			return false;
 		}
 
+		public void MarkAsOverridden()
+		{
+			Debug.Assert(!this.IsOverridden);
+
+			this.flags |= Flags.Overridden;
+		}
+
+		public void MarkAsVerifiable()
+		{
+			if (this.IsConditional)
+			{
+				throw new InvalidOperationException(Resources.ConditionalSetupsAreNotVerifiable);
+			}
+
+			this.flags |= Flags.Verifiable;
+		}
+
 		public bool Matches(Invocation invocation)
 		{
 			return this.expectation.IsMatch(invocation) && (this.Condition == null || this.Condition.IsTrue);
-		}
-
-		public bool ReturnsInnerMock(out Mock mock)
-		{
-			if (this.TryGetReturnValue(out var returnValue) && Unwrap.ResultIfCompletedTask(returnValue) is IMocked mocked)
-			{
-				mock = mocked.Mock;
-				return true;
-			}
-			else
-			{
-				mock = null;
-				return false;
-			}
-		}
-
-		public void EvaluatedSuccessfully(Invocation invocation)
-		{
-			this.Condition?.SetupEvaluatedSuccessfully();
-			this.expectation.SetupEvaluatedSuccessfully(invocation);
 		}
 
 		public virtual void SetOutParameters(Invocation invocation)
@@ -89,29 +119,96 @@ namespace Moq
 			return builder.ToString();
 		}
 
-		public virtual MockException TryVerify()
+		/// <summary>
+		///   Verifies this setup and those of its inner mock (if present and known).
+		/// </summary>
+		/// <param name="recursive">
+		///   Specifies whether recursive verification should be performed.
+		/// </param>
+		/// <param name="predicate">
+		///   Specifies which setups should be verified.
+		/// </param>
+		/// <param name="verifiedMocks">
+		///   The set of mocks that have already been verified.
+		/// </param>
+		/// <param name="error">
+		///   If this setup or any of its inner mock (if present and known) failed verification,
+		///   this <see langword="out"/> parameter will receive a <see cref="MockException"/> describing the verification error(s).
+		/// </param>
+		/// <returns>
+		///   <see langword="true"/> if verification succeeded without any errors;
+		///   otherwise, <see langword="false"/>.
+		/// </returns>
+		internal bool TryVerify(bool recursive, Func<ISetup, bool> predicate, HashSet<Mock> verifiedMocks, out MockException error)
 		{
-			return this.IsVerifiable ? this.TryVerifyAll() : null;
-		}
+			MockException e;
 
-		public abstract MockException TryVerifyAll();
-
-		public MockException TryVerifyInnerMock(Func<Mock, MockException> verify)
-		{
-			if (this.ReturnsInnerMock(out var innerMock))
+			// verify this setup:
+			if (!this.TryVerifySelf(out e) && e.IsVerificationError)
 			{
-				var error = verify(innerMock);
-				if (error?.IsVerificationError == true)
-				{
-					return MockException.FromInnerMockOf(this, error);
-				}
+				error = e;
+				return false;
 			}
 
-			return null;
+			// optionally verify setups of inner mock (if present and known):
+			if (recursive && this.InnerMock?.TryVerify(predicate, verifiedMocks, out e) == false && e.IsVerificationError)
+			{
+				error = MockException.FromInnerMockOf(this, e);
+				return false;
+			}
+
+			error = null;
+			return true;
 		}
 
-		public virtual void Uninvoke()
+		protected virtual bool TryVerifySelf(out MockException error)
 		{
+			error = this.IsMatched ? null : MockException.UnmatchedSetup(this);
+			return error == null;
+		}
+
+		public void Reset()
+		{
+			this.flags &= ~Flags.Matched;
+
+			this.ResetCore();
+		}
+
+		protected virtual void ResetCore()
+		{
+		}
+
+		public void Verify(bool recursive = true)
+		{
+			this.Verify(recursive, setup => !setup.IsOverridden && !setup.IsConditional && setup.IsVerifiable);
+		}
+
+		public void VerifyAll()
+		{
+			this.Verify(recursive: true, setup => !setup.IsOverridden && !setup.IsConditional);
+		}
+
+		private void Verify(bool recursive, Func<ISetup, bool> predicate)
+		{
+			var verifiedMocks = new HashSet<Mock>();
+
+			foreach (Invocation invocation in this.mock.MutableInvocations)
+			{
+				invocation.MarkAsVerifiedIfMatchedBy(setup => setup == this);
+			}
+
+			if (!this.TryVerify(recursive, predicate, verifiedMocks, out var error) && error.IsVerificationError)
+			{
+				throw error;
+			}
+		}
+
+		[Flags]
+		private enum Flags : byte
+		{
+			Matched = 1,
+			Overridden = 2,
+			Verifiable = 4,
 		}
 	}
 }

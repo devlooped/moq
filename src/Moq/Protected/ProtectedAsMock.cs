@@ -1,4 +1,4 @@
-// Copyright (c) 2007, Clarius Consulting, Manas Technology Solutions, InSTEDD.
+// Copyright (c) 2007, Clarius Consulting, Manas Technology Solutions, InSTEDD, and Contributors.
 // All rights reserved. Licensed under the BSD 3-Clause License; see License.txt.
 
 using System;
@@ -357,8 +357,8 @@ namespace Moq.Protected
 			{
 				return candidateTargetProperty.Name == duckProperty.Name
 				    && candidateTargetProperty.PropertyType == duckProperty.PropertyType
-				    && candidateTargetProperty.CanRead == duckProperty.CanRead
-				    && candidateTargetProperty.CanWrite == duckProperty.CanWrite;
+				    && candidateTargetProperty.CanRead(out _) == duckProperty.CanRead(out _)
+				    && candidateTargetProperty.CanWrite(out _) == duckProperty.CanWrite(out _);
 
 				// TODO: parameter lists should be compared, too, to properly support indexers.
 			}

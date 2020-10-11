@@ -1,4 +1,4 @@
-// Copyright (c) 2007, Clarius Consulting, Manas Technology Solutions, InSTEDD.
+// Copyright (c) 2007, Clarius Consulting, Manas Technology Solutions, InSTEDD, and Contributors.
 // All rights reserved. Licensed under the BSD 3-Clause License; see License.txt.
 
 using Xunit;
@@ -258,6 +258,24 @@ namespace Moq.Tests
 			Assert.Equal(0, mock.Object.Value);
 		}
 
+		[Fact]
+		public void SetupAllProperties_retains_value_of_derived_read_write_property_that_overrides_only_setter()
+		{
+			var mock = new Mock<OverridesOnlySetter>();
+			mock.SetupAllProperties();
+			mock.Object.Property = "value";
+			Assert.Equal("value", mock.Object.Property);
+		}
+
+		[Fact]
+		public void SetupProperty_retains_value_of_derived_read_write_property_that_overrides_only_setter()
+		{
+			var mock = new Mock<OverridesOnlySetter>();
+			mock.SetupProperty(m => m.Property);
+			mock.Object.Property = "value";
+			Assert.Equal("value", mock.Object.Property);
+		}
+
 		private object GetValue() { return new object(); }
 
 		public interface IFoo
@@ -297,6 +315,16 @@ namespace Moq.Tests
 		public interface IHierarchy
 		{
 			IHierarchy Hierarchy { get; set; }
+		}
+
+		public class WithAutoProperty
+		{
+			public virtual object Property { get; set; }
+		}
+
+		public class OverridesOnlySetter : WithAutoProperty
+		{
+			public override object Property { set => base.Property = value; }
 		}
 	}
 }

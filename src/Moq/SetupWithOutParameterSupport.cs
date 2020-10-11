@@ -1,4 +1,4 @@
-// Copyright (c) 2007, Clarius Consulting, Manas Technology Solutions, InSTEDD.
+// Copyright (c) 2007, Clarius Consulting, Manas Technology Solutions, InSTEDD, and Contributors.
 // All rights reserved. Licensed under the BSD 3-Clause License; see License.txt.
 
 using System;
@@ -15,8 +15,8 @@ namespace Moq
 	{
 		private readonly List<KeyValuePair<int, object>> outValues;
 
-		protected SetupWithOutParameterSupport(InvocationShape expectation)
-			: base(expectation)
+		protected SetupWithOutParameterSupport(Expression originalExpression, Mock mock, InvocationShape expectation)
+			: base(originalExpression, mock, expectation)
 		{
 			Debug.Assert(expectation != null);
 

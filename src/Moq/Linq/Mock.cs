@@ -1,4 +1,4 @@
-// Copyright (c) 2007, Clarius Consulting, Manas Technology Solutions, InSTEDD.
+// Copyright (c) 2007, Clarius Consulting, Manas Technology Solutions, InSTEDD, and Contributors.
 // All rights reserved. Licensed under the BSD 3-Clause License; see License.txt.
 
 using System;
@@ -67,21 +67,7 @@ namespace Moq
 		[SuppressMessage("Microsoft.Design", "CA1006:DoNotNestGenericTypesInMemberSignatures", Justification = "By Design")]
 		public static T Of<T>(Expression<Func<T, bool>> predicate, MockBehavior behavior) where T : class
 		{
-			var mocked = Mocks.CreateMockQuery<T>(behavior).First(predicate);
-
-			// The current implementation of LINQ to Mocks creates mocks that already have recorded invocations.
-			// Because this interferes with `VerifyNoOtherCalls`, we recursively clear all invocations before
-			// anyone ever gets to see the new created mock.
-			//
-			// TODO: Make LINQ to Mocks set up mocks without causing invocations of its own, then remove this hack.
-			var mock = Mock.Get(mocked);
-			mock.Invocations.Clear();
-			foreach (var inner in mock.Setups.GetInnerMockSetups())
-			{
-				inner.GetInnerMock().Invocations.Clear();
-			}
-
-			return mocked;
+			return Mocks.CreateMockQuery<T>(behavior).First(predicate);
 		}
 	}
 }

@@ -262,14 +262,50 @@ namespace Moq.Tests
 				A((IB b) => b.C, D<IC>()));
 		}
 
+		[Fact]
+		public void Non_lenient_split_fails_if_rightmost_part_is_non_overridable_property()
+		{
+			var expression = E((U u) => u.V.SealedW);
+
+			AssertSplitFails(expression, allowNonOverridableLastProperty: false);
+		}
+
+		[Fact]
+		public void Lenient_split_succeeds_if_rightmost_part_is_non_overridable_property()
+		{
+			var expression = E((U u) => u.V.SealedW);
+
+			AssertSplitYields(expression, allowNonOverridableLastProperty: true,
+				E((U u) => u.V),
+				E((V v) => v.SealedW));
+		}
+
+		[Fact]
+		public void Lenient_split_fails_if_any_part_other_than_the_rightmost_one_is_non_overridable_property()
+		{
+			var expression = E((U u) => u.SealedV.W);
+
+			AssertSplitFails(expression, allowNonOverridableLastProperty: true);
+		}
+
 		private void AssertSplitFails(LambdaExpression expression, params LambdaExpression[] expected)
 		{
 			Assert.Throws<ArgumentException>(() => expression.Split());
 		}
 
+		private void AssertSplitFails(LambdaExpression expression, bool allowNonOverridableLastProperty)
+		{
+			Assert.ThrowsAny<Exception>(() => expression.Split(allowNonOverridableLastProperty));
+		}
+
 		private void AssertSplitYields(LambdaExpression expression, params LambdaExpression[] expected)
 		{
 			Assert.Equal(expected, expression.Split().Select(e => e.Expression), ExpressionComparer.Default);
+		}
+
+		private void AssertSplitYields(LambdaExpression expression, bool allowNonOverridableLastProperty, params LambdaExpression[] expected)
+		{
+			Assert.Equal(expected, expression.Split(allowNonOverridableLastProperty).Select(e => e.Expression), ExpressionComparer.Default);
 		}
 
 		/// <summary>
@@ -353,5 +389,21 @@ namespace Moq.Tests
 		}
 
 		public delegate IB ADelegate();
+
+		public abstract class U
+		{
+			public abstract V V { get; }
+			public V SealedV { get => throw new NotImplementedException(); }
+		}
+
+		public abstract class V
+		{
+			public abstract W W { get; }
+			public W SealedW { get => throw new NotImplementedException(); }
+		}
+
+		public abstract class W
+		{
+		}
 	}
 }

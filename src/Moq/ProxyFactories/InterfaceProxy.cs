@@ -1,4 +1,4 @@
-// Copyright (c) 2007, Clarius Consulting, Manas Technology Solutions, InSTEDD.
+// Copyright (c) 2007, Clarius Consulting, Manas Technology Solutions, InSTEDD, and Contributors.
 // All rights reserved. Licensed under the BSD 3-Clause License; see License.txt.
 
 using System;
@@ -27,7 +27,7 @@ namespace Moq.Internals
 		{
 			// Forward this call to the interceptor, so that `object.Equals` can be set up.
 			var interceptor = (IInterceptor)((IProxy)this).Interceptor;
-			var invocation = new Invocation(interceptor.GetType(), equalsMethod, obj);
+			var invocation = new Invocation(this.GetType(), equalsMethod, obj);
 			interceptor.Intercept(invocation);
 			return (bool)invocation.ReturnValue;
 		}
@@ -38,7 +38,7 @@ namespace Moq.Internals
 		{
 			// Forward this call to the interceptor, so that `object.GetHashCode` can be set up.
 			var interceptor = (IInterceptor)((IProxy)this).Interceptor;
-			var invocation = new Invocation(interceptor.GetType(), getHashCodeMethod);
+			var invocation = new Invocation(this.GetType(), getHashCodeMethod);
 			interceptor.Intercept(invocation);
 			return (int)invocation.ReturnValue;
 		}
@@ -49,7 +49,7 @@ namespace Moq.Internals
 		{
 			// Forward this call to the interceptor, so that `object.ToString` can be set up.
 			var interceptor = (IInterceptor)((IProxy)this).Interceptor;
-			var invocation = new Invocation(interceptor.GetType(), toStringMethod);
+			var invocation = new Invocation(this.GetType(), toStringMethod);
 			interceptor.Intercept(invocation);
 			return (string)invocation.ReturnValue;
 		}
@@ -68,14 +68,10 @@ namespace Moq.Internals
 			{
 			}
 
-			public override void Return() { }
-
-			public override void Return(object value)
+			protected internal override object CallBase()
 			{
-				this.SetReturnValue(value);
+				throw new NotSupportedException();
 			}
-
-			public override void ReturnBase() { }
 		}
 	}
 }

@@ -199,9 +199,6 @@ Remember that there's no generics covariance in the CLR, so your object must be 
   <data name="TypeNotImplementInterface" xml:space="preserve">
     <value>Type {0} does not implement required interface {1}</value>
   </data>
-  <data name="TypeNotInheritFromType" xml:space="preserve">
-    <value>Type {0} does not from required type {1}</value>
-  </data>
   <data name="NoMatchingCallsAtLeast" xml:space="preserve">
     <value>Expected invocation on the mock at least {0} times, but was {2} times: </value>
   </data>
@@ -353,5 +350,8 @@ This could be caused by an unrecognized type conversion, coercion, narrowing, or
   </data>
   <data name="UseItIsOtherOverload" xml:space="preserve">
     <value>It is impossible to call the provided strongly-typed predicate due to the use of a type matcher. Provide a weakly-typed predicate with two parameters (object, Type) instead.</value>
+  </data>
+  <data name="ConditionalSetupsAreNotVerifiable" xml:space="preserve">
+    <value>This call to 'Verifiable' will have no effect because conditional setups are ignored by both 'Verify' and 'VerifyAll'. This might indicate an error in your code.</value>
   </data>
 </root>

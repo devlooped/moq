@@ -1,4 +1,4 @@
-// Copyright (c) 2007, Clarius Consulting, Manas Technology Solutions, InSTEDD.
+// Copyright (c) 2007, Clarius Consulting, Manas Technology Solutions, InSTEDD, and Contributors.
 // All rights reserved. Licensed under the BSD 3-Clause License; see License.txt.
 
 using System.Collections.Generic;
@@ -74,6 +74,20 @@ namespace Moq.Tests
 			mock.Object.DoSomething("X");
 
 			Assert.Empty(captures);
+		}
+
+		[Fact]
+		public void Can_be_used_with_Verify_to_replay_arguments()
+		{
+			var mock = new Mock<IFoo>();
+			mock.Object.DoSomething("1");
+			mock.Object.DoSomething("2");
+			mock.Object.DoSomething("3");
+
+			var args = new List<string>();
+			mock.Verify(m => m.DoSomething(Capture.In(args)), Times.Exactly(3));
+
+			Assert.Equal(new[] { "1", "2", "3" }, args);
 		}
 
 		public interface IFoo

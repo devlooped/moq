@@ -1,4 +1,4 @@
-// Copyright (c) 2007, Clarius Consulting, Manas Technology Solutions, InSTEDD.
+// Copyright (c) 2007, Clarius Consulting, Manas Technology Solutions, InSTEDD, and Contributors.
 // All rights reserved. Licensed under the BSD 3-Clause License; see License.txt.
 
 using System;
@@ -238,6 +238,24 @@ namespace Moq
 			return !left.Equals(right);
 		}
 
+		/// <inheritdoc/>
+		public override string ToString()
+		{
+			return this.kind switch
+			{
+				Kind.AtLeastOnce      =>  "AtLeastOnce",
+				Kind.AtLeast          => $"AtLeast({this.from})",
+				Kind.AtMost           => $"AtMost({this.to})",
+				Kind.AtMostOnce       =>  "AtMostOnce",
+				Kind.BetweenExclusive => $"Between({this.from - 1}, {this.to + 1}, Exclusive)",
+				Kind.BetweenInclusive => $"Between({this.from}, {this.to}, Inclusive)",
+				Kind.Exactly          => $"Exactly({this.from})",
+				Kind.Once             =>  "Once",
+				Kind.Never            =>  "Never",
+				_                     => throw new InvalidOperationException(),
+			};
+		}
+
 		internal string GetExceptionMessage(int callCount)
 		{
 			var (from, to) = this;
@@ -248,27 +266,35 @@ namespace Moq
 				++to;
 			}
 
-			string message = null;
-			switch (this.kind)
+			var message = this.kind switch
 			{
-				case Kind.AtLeast:          message = Resources.NoMatchingCallsAtLeast; break;
-				case Kind.AtLeastOnce:      message = Resources.NoMatchingCallsAtLeastOnce; break;
-				case Kind.AtMost:           message = Resources.NoMatchingCallsAtMost; break;
-				case Kind.AtMostOnce:       message = Resources.NoMatchingCallsAtMostOnce; break;
-				case Kind.BetweenExclusive: message = Resources.NoMatchingCallsBetweenExclusive; break;
-				case Kind.BetweenInclusive: message = Resources.NoMatchingCallsBetweenInclusive; break;
-				case Kind.Exactly:          message = Resources.NoMatchingCallsExactly; break;
-				case Kind.Once:             message = Resources.NoMatchingCallsOnce; break;
-				case Kind.Never:            message = Resources.NoMatchingCallsNever; break;
-			}
+				Kind.AtLeastOnce      => Resources.NoMatchingCallsAtLeastOnce,
+				Kind.AtLeast          => Resources.NoMatchingCallsAtLeast,
+				Kind.AtMost           => Resources.NoMatchingCallsAtMost,
+				Kind.AtMostOnce       => Resources.NoMatchingCallsAtMostOnce,
+				Kind.BetweenExclusive => Resources.NoMatchingCallsBetweenExclusive,
+				Kind.BetweenInclusive => Resources.NoMatchingCallsBetweenInclusive,
+				Kind.Exactly          => Resources.NoMatchingCallsExactly,
+				Kind.Once             => Resources.NoMatchingCallsOnce,
+				Kind.Never            => Resources.NoMatchingCallsNever,
+				_                     => throw new InvalidOperationException(),
+			};
 
 			return string.Format(CultureInfo.CurrentCulture, message, from, to, callCount);
 		}
 
-		internal bool Verify(int callCount)
+		/// <summary>
+		///   Checks whether the specified number of invocations matches the constraint described by this instance.
+		/// </summary>
+		/// <param name="count">The number of invocations to check.</param>
+		/// <returns>
+		///   <see langword="true"/> if <paramref name="count"/> matches the constraint described by this instance;
+		///   otherwise, <see langword="false"/>.
+		/// </returns>
+		public bool Validate(int count)
 		{
 			var (from, to) = this;
-			return from <= callCount && callCount <= to;
+			return from <= count && count <= to;
 		}
 
 		private enum Kind

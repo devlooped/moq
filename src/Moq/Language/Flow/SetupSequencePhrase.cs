@@ -1,11 +1,10 @@
-// Copyright (c) 2007, Clarius Consulting, Manas Technology Solutions, InSTEDD.
+// Copyright (c) 2007, Clarius Consulting, Manas Technology Solutions, InSTEDD, and Contributors.
 // All rights reserved. Licensed under the BSD 3-Clause License; see License.txt.
 
 using System;
 using System.ComponentModel;
-using System.Reflection;
 
-using Moq.Properties;
+using Moq.Behaviors;
 
 namespace Moq.Language.Flow
 {
@@ -24,7 +23,7 @@ namespace Moq.Language.Flow
 
 		public ISetupSequentialAction Pass()
 		{
-			this.setup.AddPass();
+			this.setup.AddBehavior(NoOp.Instance);
 			return this;
 		}
 
@@ -34,7 +33,7 @@ namespace Moq.Language.Flow
 
 		public ISetupSequentialAction Throws(Exception exception)
 		{
-			this.setup.AddThrows(exception);
+			this.setup.AddBehavior(new ThrowException(exception));
 			return this;
 		}
 
@@ -55,13 +54,13 @@ namespace Moq.Language.Flow
 
 		public ISetupSequentialResult<TResult> CallBase()
 		{
-			this.setup.AddCallBase();
+			this.setup.AddBehavior(ReturnBase.Instance);
 			return this;
 		}
 
 		public ISetupSequentialResult<TResult> Returns(TResult value)
 		{
-			this.setup.AddReturns(value);
+			this.setup.AddBehavior(new ReturnValue(value));
 			return this;
 		}
 
@@ -78,13 +77,13 @@ namespace Moq.Language.Flow
 				return this.Returns((TResult)(object)valueFunction);
 			}
 
-			this.setup.AddReturns(() => valueFunction());
+			this.setup.AddBehavior(new ReturnComputedValue(_ => valueFunction()));
 			return this;
 		}
 
 		public ISetupSequentialResult<TResult> Throws(Exception exception)
 		{
-			this.setup.AddThrows(exception);
+			this.setup.AddBehavior(new ThrowException(exception));
 			return this;
 		}
 

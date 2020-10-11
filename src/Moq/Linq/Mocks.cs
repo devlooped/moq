@@ -1,4 +1,4 @@
-// Copyright (c) 2007, Clarius Consulting, Manas Technology Solutions, InSTEDD.
+// Copyright (c) 2007, Clarius Consulting, Manas Technology Solutions, InSTEDD, and Contributors.
 // All rights reserved. Licensed under the BSD 3-Clause License; see License.txt.
 
 using System;
@@ -128,39 +128,23 @@ namespace Moq
 			while (true);
 		}
 
-		/// <summary>
-		/// Extension method used to support Linq-like setup properties that are not virtual but do have 
-		/// a getter and a setter, thereby allowing the use of Linq to Mocks to quickly initialize DTOs too :)
-		/// </summary>
-		internal static bool SetProperty<T, TResult>(Mock<T> target, Expression<Func<T, TResult>> propertyReference, TResult value)
-			where T : class
+		internal static readonly MethodInfo SetupReturnsMethod =
+			typeof(Mocks).GetMethod(nameof(SetupReturns), BindingFlags.NonPublic | BindingFlags.Static);
+
+		internal static bool SetupReturns(Mock mock, LambdaExpression expression, object value)
 		{
-			var memberExpr = (MemberExpression)propertyReference.Body;
-			var member = (PropertyInfo)memberExpr.Member;
-
-			// For strict mocks, we haven't called `SetupAllProperties` on the mock being set up.
-			// Therefore, whenever a property is being initialized, we quickly need to enable auto-stubbing.
-			//
-			// (One would think that it would be simpler to perform `SetupAllProperties` at the beginning
-			// and leave it enabled until the initialized mock is returned to the user. However, transforming
-			// the LINQ query such that a final disable of auto-stubbing happens is much more difficult!)
-
-			var temporaryAutoSetupProperties = target.AutoSetupPropertiesDefaultValueProvider == null;
-
-			if (temporaryAutoSetupProperties)
+			if (expression.Body is MemberExpression me
+				&& me.Member is PropertyInfo pi
+				&& !(pi.CanRead(out var getter) && getter.CanOverride() && ProxyFactory.Instance.IsMethodVisible(getter, out _))
+				&& pi.CanWrite(out _))
 			{
-				target.AutoSetupPropertiesDefaultValueProvider = target.DefaultValueProvider;
+				// LINQ to Mocks allows setting non-interceptable properties, which is handy e.g. when initializing DTOs.
+				Mock.SetupSet(mock, expression, propertyToSet: pi, value);
 			}
-			try
+			else
 			{
-				member.SetValue(target.Object, value, null);
-			}
-			finally
-			{
-				if (temporaryAutoSetupProperties)
-				{
-					target.AutoSetupPropertiesDefaultValueProvider = null;
-				}
+				var setup = Mock.Setup(mock, expression, condition: null);
+				setup.SetReturnValueBehavior(value);
 			}
 
 			return true;

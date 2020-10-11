@@ -1,4 +1,4 @@
-// Copyright (c) 2007, Clarius Consulting, Manas Technology Solutions, InSTEDD.
+// Copyright (c) 2007, Clarius Consulting, Manas Technology Solutions, InSTEDD, and Contributors.
 // All rights reserved. Licensed under the BSD 3-Clause License; see License.txt.
 
 using System;
@@ -28,20 +28,30 @@ namespace Moq
 			}
 		}
 
-		public static void ImplementsTypeMatcherProtocol(Type type)
+		public static void ImplementsInterface(Type interfaceType, Type type, string paramName = null)
 		{
+			Debug.Assert(interfaceType != null);
+			Debug.Assert(interfaceType.IsInterface);
+
 			Debug.Assert(type != null);
 
-			if (typeof(ITypeMatcher).IsAssignableFrom(type) == false)
+			if (interfaceType.IsAssignableFrom(type) == false)
 			{
 				throw new ArgumentException(
 					string.Format(
 						CultureInfo.CurrentCulture,
 						Resources.TypeNotImplementInterface,
 						type.GetFormattedName(),
-						typeof(ITypeMatcher).GetFormattedName()));
+						interfaceType.GetFormattedName()),
+					paramName);
 			}
+		}
 
+		public static void ImplementsTypeMatcherProtocol(Type type)
+		{
+			Debug.Assert(type != null);
+
+			Guard.ImplementsInterface(typeof(ITypeMatcher), type);
 			Guard.CanCreateInstance(type);
 		}
 
@@ -181,27 +191,6 @@ namespace Moq
 			}
 		}
 
-		public static void CanBeAssigned(Type typeToAssign, Type targetType, string paramName)
-		{
-			if (!targetType.IsAssignableFrom(typeToAssign))
-			{
-				if (targetType.IsInterface)
-				{
-					throw new ArgumentException(string.Format(
-						CultureInfo.CurrentCulture,
-						Resources.TypeNotImplementInterface,
-						typeToAssign,
-						targetType), paramName);
-				}
-
-				throw new ArgumentException(string.Format(
-					CultureInfo.CurrentCulture,
-					Resources.TypeNotInheritFromType,
-					typeToAssign,
-					targetType), paramName);
-			}
-		}
-
 		public static void NotField(MemberExpression memberAccess)
 		{
 			if (memberAccess.Member is FieldInfo)
@@ -229,7 +218,7 @@ namespace Moq
 
 		public static void CanRead(PropertyInfo property)
 		{
-			if (!property.CanRead)
+			if (!property.CanRead(out _))
 			{
 				throw new ArgumentException(string.Format(
 					CultureInfo.CurrentCulture,
@@ -240,7 +229,7 @@ namespace Moq
 
 		public static void CanWrite(PropertyInfo property)
 		{
-			if (!property.CanWrite)
+			if (!property.CanWrite(out _))
 			{
 				throw new ArgumentException(string.Format(
 					CultureInfo.CurrentCulture,

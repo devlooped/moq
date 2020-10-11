@@ -1,12 +1,13 @@
-// Copyright (c) 2007, Clarius Consulting, Manas Technology Solutions, InSTEDD.
+// Copyright (c) 2007, Clarius Consulting, Manas Technology Solutions, InSTEDD, and Contributors.
 // All rights reserved. Licensed under the BSD 3-Clause License; see License.txt.
 
 using System;
 using System.Collections.Generic;
-using System.Diagnostics;
 using System.Linq;
 using System.Linq.Expressions;
 using System.Reflection;
+
+using Moq.Behaviors;
 
 namespace Moq
 {
@@ -29,9 +30,9 @@ namespace Moq
 
 		private static bool HandleEquals(Invocation invocation, Mock mock)
 		{
-			if (IsObjectMethod(invocation.Method) && !mock.Setups.Any(c => IsObjectMethod(c.Method, "Equals")))
+			if (IsObjectMethod(invocation.Method) && !mock.MutableSetups.Any(c => IsObjectMethod(c.Method, "Equals")))
 			{
-				invocation.Return(ReferenceEquals(invocation.Arguments.First(), mock.Object));
+				invocation.ReturnValue = ReferenceEquals(invocation.Arguments.First(), mock.Object);
 				return true;
 			}
 			else
@@ -48,9 +49,9 @@ namespace Moq
 		private static bool HandleGetHashCode(Invocation invocation, Mock mock)
 		{
 			// Only if there is no corresponding setup for `GetHashCode()`
-			if (IsObjectMethod(invocation.Method) && !mock.Setups.Any(c => IsObjectMethod(c.Method, "GetHashCode")))
+			if (IsObjectMethod(invocation.Method) && !mock.MutableSetups.Any(c => IsObjectMethod(c.Method, "GetHashCode")))
 			{
-				invocation.Return(mock.GetHashCode());
+				invocation.ReturnValue = mock.GetHashCode();
 				return true;
 			}
 			else
@@ -62,9 +63,9 @@ namespace Moq
 		private static bool HandleToString(Invocation invocation, Mock mock)
 		{
 			// Only if there is no corresponding setup for `ToString()`
-			if (IsObjectMethod(invocation.Method) && !mock.Setups.Any(c => IsObjectMethod(c.Method, "ToString")))
+			if (IsObjectMethod(invocation.Method) && !mock.MutableSetups.Any(c => IsObjectMethod(c.Method, "ToString")))
 			{
-				invocation.Return(mock.ToString() + ".Object");
+				invocation.ReturnValue = mock.ToString() + ".Object";
 				return true;
 			}
 			else
@@ -77,7 +78,7 @@ namespace Moq
 		{
 			if (typeof(IMocked).IsAssignableFrom(invocation.Method.DeclaringType))
 			{
-				invocation.Return(mock);
+				invocation.ReturnValue = mock;
 				return true;
 			}
 			else
@@ -100,26 +101,10 @@ namespace Moq
 	{
 		public static bool Handle(Invocation invocation, Mock mock)
 		{
-			var matchedSetup = mock.Setups.FindMatchFor(invocation);
-			if (matchedSetup != null)
+			var matchingSetup = mock.MutableSetups.FindMatchFor(invocation);
+			if (matchingSetup != null)
 			{
-				matchedSetup.EvaluatedSuccessfully(invocation);
-
-				if (matchedSetup.IsVerifiable)
-				{
-					invocation.MarkAsMatchedByVerifiableSetup();
-				}
-				else
-				{
-					invocation.MarkAsMatchedBySetup();
-				}
-
-				matchedSetup.SetOutParameters(invocation);
-
-				// We first execute, as there may be a Throws 
-				// and therefore we might never get to the 
-				// next line.
-				matchedSetup.Execute(invocation);
+				matchingSetup.Execute(invocation);
 				return true;
 			}
 			else
@@ -147,23 +132,18 @@ namespace Moq
 					var @event = implementingMethod.DeclaringType.GetEvents(bindingFlags).SingleOrDefault(e => e.GetAddMethod(true) == implementingMethod);
 					if (@event != null)
 					{
-						bool doesntHaveEventSetup = !mock.Setups.HasEventSetup;
+						bool doesntHaveEventSetup = !mock.MutableSetups.HasEventSetup;
 
 						if (mock.CallBase && !invocation.Method.IsAbstract)
 						{
 							if (doesntHaveEventSetup)
 							{
-								invocation.ReturnBase();
+								invocation.ReturnValue = invocation.CallBase();
 							}
 						}
 						else if (invocation.Arguments.Length > 0 && invocation.Arguments[0] is Delegate delegateInstance)
 						{
 							mock.EventHandlers.Add(@event, delegateInstance);
-
-							if (doesntHaveEventSetup)
-							{
-								invocation.Return();
-							}
 						}
 
 						return doesntHaveEventSetup;
@@ -175,23 +155,18 @@ namespace Moq
 					var @event = implementingMethod.DeclaringType.GetEvents(bindingFlags).SingleOrDefault(e => e.GetRemoveMethod(true) == implementingMethod);
 					if (@event != null)
 					{
-						bool doesntHaveEventSetup = !mock.Setups.HasEventSetup;
+						bool doesntHaveEventSetup = !mock.MutableSetups.HasEventSetup;
 
 						if (mock.CallBase && !invocation.Method.IsAbstract)
 						{
 							if (doesntHaveEventSetup)
 							{
-								invocation.ReturnBase();
+								invocation.ReturnValue = invocation.CallBase();
 							}
 						}
 						else if (invocation.Arguments.Length > 0 && invocation.Arguments[0] is Delegate delegateInstance)
 						{
 							mock.EventHandlers.Remove(@event, delegateInstance);
-
-							if (doesntHaveEventSetup)
-							{
-								invocation.Return();
-							}
 						}
 
 						return doesntHaveEventSetup;
@@ -216,74 +191,7 @@ namespace Moq
 	{
 		public static void Handle(Invocation invocation, Mock mock)
 		{
-			Debug.Assert(invocation.Method != null);
-			Debug.Assert(invocation.Method.ReturnType != null);
-
-			var method = invocation.Method;
-
-			if (mock.CallBase)
-			{
-				var declaringType = method.DeclaringType;
-				if (declaringType.IsInterface)
-				{
-					if (mock.TargetType.IsInterface)
-					{
-						// Case 1: Interface method of an interface proxy.
-						// There is no base method to call, so fall through.
-					}
-					else
-					{
-						Debug.Assert(mock.TargetType.IsClass);
-						Debug.Assert(mock.ImplementsInterface(declaringType));
-
-						// Case 2: Explicitly implemented interface method of a class proxy.
-
-						if (mock.InheritedInterfaces.Contains(declaringType))
-						{
-							// Case 2a: Re-implemented interface.
-							// The base class has its own implementation. Only call base method if it isn't an event accessor.
-							if (!method.IsEventAddAccessor() && !method.IsEventRemoveAccessor())
-							{
-								invocation.ReturnBase();
-								return;
-							}
-						}
-						else
-						{
-							Debug.Assert(mock.AdditionalInterfaces.Contains(declaringType));
-
-							// Case 2b: Additional interface.
-							// There is no base method to call, so fall through.
-						}
-					}
-				}
-				else
-				{
-					Debug.Assert(declaringType.IsClass);
-
-					// Case 3: Non-interface method of a class proxy.
-					// Only call base method if it isn't abstract.
-					if (!method.IsAbstract)
-					{
-						invocation.ReturnBase();
-						return;
-					}
-				}
-			}
-
-			if (method.ReturnType == typeof(void))
-			{
-				invocation.Return();
-			}
-			else
-			{
-				var returnValue = mock.GetDefaultValue(method, out var innerMock);
-				if (innerMock != null)
-				{
-					mock.AddInnerMockSetup(invocation, returnValue);
-				}
-				invocation.Return(returnValue);
-			}
+			new ReturnBaseOrDefaultValue(mock).Execute(invocation);
 		}
 	}
 
@@ -314,14 +222,13 @@ namespace Moq
 				object propertyValue;
 
 				Setup getterSetup = null;
-				if (property.CanRead)
+				if (property.CanRead(out var getter))
 				{
-					var getter = property.GetGetMethod(true);
 					if (ProxyFactory.Instance.IsMethodVisible(getter, out _))
 					{
 						propertyValue = CreateInitialPropertyValue(mock, getter);
-						getterSetup = new AutoImplementedPropertyGetterSetup(expression, getter, () => propertyValue);
-						mock.Setups.Add(getterSetup);
+						getterSetup = new AutoImplementedPropertyGetterSetup(mock, expression, getter, () => propertyValue);
+						mock.MutableSetups.Add(getterSetup);
 					}
 
 					// If we wanted to optimise for speed, we'd probably be forgiven
@@ -336,16 +243,15 @@ namespace Moq
 				}
 
 				Setup setterSetup = null;
-				if (property.CanWrite)
+				if (property.CanWrite(out var setter))
 				{
-					MethodInfo setter = property.GetSetMethod(nonPublic: true);
 					if (ProxyFactory.Instance.IsMethodVisible(setter, out _))
 					{
-						setterSetup = new AutoImplementedPropertySetterSetup(expression, setter, (newValue) =>
+						setterSetup = new AutoImplementedPropertySetterSetup(mock, expression, setter, (newValue) =>
 						{
 							propertyValue = newValue;
 						});
-						mock.Setups.Add(setterSetup);
+						mock.MutableSetups.Add(setterSetup);
 					}
 				}
 

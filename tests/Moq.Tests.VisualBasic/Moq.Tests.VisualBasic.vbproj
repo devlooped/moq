@@ -5,13 +5,14 @@
 	<Import Project="$(BuildDirectory)xUnit.props" />
 
 	<PropertyGroup>
-		<TargetFrameworks>net472;netcoreapp2.2</TargetFrameworks>
+		<TargetFrameworks>net472;netcoreapp3.1</TargetFrameworks>
 		<DebugSymbols>True</DebugSymbols>
 		<DebugType>portable</DebugType>
 		<IsPackable>False</IsPackable>
 	</PropertyGroup>
 
 	<ItemGroup>
+		<PackageReference Include="Microsoft.NETFramework.ReferenceAssemblies" Version="1.0.0" PrivateAssets="All" />
 		<ProjectReference Include="..\..\src\Moq\Moq.csproj" />
 	</ItemGroup>
 

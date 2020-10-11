@@ -1,4 +1,4 @@
-// Copyright (c) 2007, Clarius Consulting, Manas Technology Solutions, InSTEDD.
+// Copyright (c) 2007, Clarius Consulting, Manas Technology Solutions, InSTEDD, and Contributors.
 // All rights reserved. Licensed under the BSD 3-Clause License; see License.txt.
 
 using System;
@@ -1356,6 +1356,41 @@ namespace Moq.Tests.Regressions
 		}
 
 		#endregion // #135
+
+		#region 314
+
+		public class Issue314
+		{
+			[Fact]
+			public void GivenAnIndexer_WhenQueryingWithTwoIndexes_ThenSetsThemDirectly1()
+			{
+				var foo = Mock.Of<IFoo>(x => x[0].Value == "hello" && x[1].Value == "goodbye");
+
+				Assert.Equal("hello", foo[0].Value); // Fails here as foo[0] is the same object as foo[1] and foo[1].Value == "goodbye"
+				Assert.Equal("goodbye", foo[1].Value);
+			}
+
+			[Fact]
+			public void WhenQueryingWithTwoIndexes_ThenSetsThemDirectly2()
+			{
+				var foo = Mock.Of<IFoo>(x => x[0] == Mock.Of<IBar>(b => b.Value == "hello") && x[1] == Mock.Of<IBar>(b => b.Value == "goodbye"));
+
+				Assert.Equal("hello", foo[0].Value); // These pass no problem
+				Assert.Equal("goodbye", foo[1].Value);
+			}
+
+			public interface IFoo
+			{
+				IBar this[int index] { get; }
+			}
+
+			public interface IBar
+			{
+				string Value { get; }
+			}
+		}
+
+		#endregion
 
 		#region 328
 
@@ -2959,7 +2994,9 @@ namespace Moq.Tests.Regressions
 
 			public class A : IA
 			{
+#pragma warning disable CS0067
 				public virtual event Action E;
+#pragma warning restore CS0067
 			}
 
 			public class AB : IA, IB
@@ -3110,6 +3147,305 @@ namespace Moq.Tests.Regressions
 			private void SetupIntMethod(Action callback)
 			{
 				this.mock.Setup(m => m.Method<object>((int)It.IsAny<object>())).Callback(callback);
+			}
+		}
+
+		#endregion
+
+		#region 932
+
+		public class Issue932
+		{
+			[Fact]
+			public void Should_not_reuse_cached_return_value_that_is_assignment_incompatible()
+			{
+				var mock = new Mock<X> { DefaultValue = DefaultValue.Mock };
+
+				// The following call will cause Moq to produce and return an auto-mocked instance of `IReadOnlyList<I>`.
+				// Additionally, an internal setup is added that will keep returning the same instance on subsequent calls:
+				mock.Object.Method<I>();
+
+				// The following call should not trigger the above setup, since we expect to get a `IReadOnlyList<C>`
+				// and the cached `IReadOnlyList<I>` wouldn't fit:
+				mock.Object.Method<C>();
+			}
+
+			public interface X
+			{
+				IReadOnlyList<T> Method<T>();
+			}
+
+			public interface I { }
+
+			public class C : I { }
+		}
+
+		#endregion
+
+		#region 942
+
+		public class Issue942
+		{
+			public interface IContent
+			{
+				string Name { get; set; }
+			}
+
+			public interface IContainer
+			{
+				IContent Content { get; set; }
+			}
+
+			private const string toStringReturnValue = "some string here";
+
+			[Fact]
+			public void Setup_ToString_before_Name()
+			{
+				this.TestImpl(contentMock =>
+				{
+					contentMock.Setup(c => c.ToString()).Returns(toStringReturnValue);
+					contentMock.Setup(c => c.Name);
+				});
+			}
+
+			[Fact]
+			public void Setup_ToString_after_Name()
+			{
+				this.TestImpl(contentMock =>
+				{
+					contentMock.Setup(c => c.Name);
+					contentMock.Setup(c => c.ToString()).Returns(toStringReturnValue);
+				});
+			}
+
+			private void TestImpl(Action<Mock<IContent>> setup)
+			{
+				var contentMock = new Mock<IContent>();
+				var containerMock = new Mock<IContainer>();
+
+				containerMock.Setup(c => c.Content).Returns(contentMock.Object);
+				setup(contentMock);
+
+				Assert.Equal(toStringReturnValue, contentMock.Object.ToString());
+				Assert.Equal(toStringReturnValue, containerMock.Object.Content.ToString());
+			}
+		}
+
+		#endregion
+
+		#region 955
+
+		public class Issue955
+		{
+			[Fact]
+			public void Expression_lambdas_capturing_same_variable()
+			{
+				Guid originalItemId = Guid.NewGuid();
+				var session = new Mock<ISession>();
+				session.Setup(x => x.QueryOverExpression<IItem>(item => item.Id == originalItemId).List());
+
+				_ = session.Object.QueryOverExpression<IItem>(item => item.Id == originalItemId).List();
+			}
+
+			[Fact]
+			public void Expression_lambdas_capturing_different_variables_having_same_value()
+			{
+				Guid originalItemId = Guid.NewGuid();
+				var session = new Mock<ISession>();
+				session.Setup(x => x.QueryOverExpression<IItem>(item => item.Id == originalItemId).List());
+
+				var copiedItemId = originalItemId;
+				_ = session.Object.QueryOverExpression<IItem>(item => item.Id == copiedItemId).List();
+				//                                                               ^^^^^^^^^^^^
+				// This call should still match the above setup, even when a different variable is used;
+				// assuming that the two variables have equal values at the exact time of comparison.
+			}
+
+			public interface IItem
+			{
+				Guid Id { get; }
+			}
+
+			// The following two interfaces are adapted versions of types originally defined by NHibernate:
+
+			public interface ISession
+			{
+				IQueryOver<T> QueryOverExpression<T>(Expression<Func<T, bool>> predicateExpression);
+			}
+
+			public interface IQueryOver<T>
+			{
+				IList<T> List();
+			}
+		}
+
+		#endregion
+
+		#region 1012
+
+		public class Issue1012
+		{
+			[Fact]
+			public void Verification_can_deal_with_cycles_in_inner_mock_object_graph_1()
+			{
+				var mock = new Mock<IX>();
+				mock.Setup(m => m.X).Returns(mock.Object);
+				_ = mock.Object.X;
+				mock.VerifyAll();
+			}
+
+			[Fact]
+			public void Verification_can_deal_with_cycles_in_inner_mock_object_graph_2()
+			{
+				var mock = new Mock<IX>();
+				var otherMock = new Mock<IX>();
+				mock.Setup(m => m.X).Returns(otherMock.Object);
+				otherMock.Setup(m => m.X).Returns(mock.Object);
+				_ = mock.Object.X;
+				_ = otherMock.Object.X;
+				mock.VerifyAll();
+				otherMock.VerifyAll();
+			}
+
+			public interface IX
+			{
+				IX X { get; }
+			}
+		}
+
+		#endregion
+
+		#region 1024
+
+		public class Issue1024
+		{
+			[Fact]
+			public void Verify_passes_when_DefaultValue_Mock_and_setup_without_any_Returns()
+			{
+				var totoMock = new Mock<IToto>() { DefaultValue = DefaultValue.Mock };
+				totoMock.Setup(o => o.Do()).Verifiable();
+
+				totoMock.Object.Do();
+
+				totoMock.Verify();
+			}
+
+			[Fact]
+			public void Verify_passes_when_DefaultValue_Mock_and_setup_with_Returns()
+			{
+				var totoMock = new Mock<IToto>();
+				var tataMock = new Mock<ITata>() { DefaultValue = DefaultValue.Mock };
+
+				totoMock.Setup(o => o.DoToto()).Returns(tataMock.Object).Verifiable();
+
+				totoMock.Object.DoToto();
+				tataMock.Object.DoTata();
+
+				totoMock.Verify();
+			}
+
+			public interface IToto
+			{
+				IList<string> Do();
+				ITata DoToto();
+			}
+
+			public interface ITata
+			{
+				IList<string> DoTata();
+			}
+		}
+		#endregion
+
+		#region 1031
+
+		public class Issue1031
+		{
+			[Fact]
+			public void MultiSetupNRE_Abbreviated()
+			{
+				StubDataStore obj = null;
+				var exampleMock = new Mock<IDataStore>(MockBehavior.Strict);
+				exampleMock.Setup(m => m.IsStored(It.Is<string>(s => obj.Value == s))); // Binds correctly
+				exampleMock.Setup(m => m.IsStored(It.Is<string>(s => obj.Value != s))); // Null Reference Exception
+			}
+
+			[Fact]
+			public void MultiSetupNRE()
+			{
+				// Arrange
+				var exampleMock = new Mock<IDataStore>(MockBehavior.Strict);
+
+				StubDataStore obj = null;
+				exampleMock.Setup(m => m.IsStored(It.Is<string>(s => obj.Value == s))) // Binds correctly
+					.Returns(true).Verifiable();
+				exampleMock.Setup(m => m.IsStored(It.Is<string>(s => obj.Value != s))) // Null Reference Exception
+					.Returns(false).Verifiable();
+
+				// Act
+				obj = new StubDataStore { Value = "a" };
+				var resHit = exampleMock.Object.IsStored("a");
+				var resMiss = exampleMock.Object.IsStored("b");
+
+				// Assert
+				exampleMock.Verify();
+				Assert.True(resHit);
+				Assert.False(resMiss);
+			}
+
+			public class StubDataStore
+			{
+				public string Value { get; set; }
+			}
+
+			public interface IDataStore
+			{
+				bool IsStored(string arg);
+			}
+		}
+
+
+		#endregion
+
+		#region 1036
+
+		public class Issue1036
+		{
+			[Fact]
+			public void VerifySet_for_assignment_to_write_only_property()
+			{
+				var mock = new Mock<ITest>();
+				mock.Object["key"] = "value";
+				mock.VerifySet(m => m["key"] = It.IsAny<string>(), Times.Once);
+			}
+
+			public interface ITest
+			{
+				string this[string key] { set; }
+			}
+		}
+
+		#endregion
+
+		#region 1039
+
+		public class Issue1039
+		{
+			[Fact]
+			public void Test()
+			{
+				Mock.Of<IOptions<DatabaseOptions>>(
+					o => o.Value.ConnectionString == "connection");
+			}
+
+			public interface IOptions<out TOptions>
+			{
+				TOptions Value { get; }
+			}
+
+			public class DatabaseOptions
+			{
+				public string ConnectionString { get; set; }
 			}
 		}
 

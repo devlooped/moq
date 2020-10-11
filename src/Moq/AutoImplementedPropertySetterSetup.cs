@@ -1,4 +1,4 @@
-// Copyright (c) 2007, Clarius Consulting, Manas Technology Solutions, InSTEDD.
+// Copyright (c) 2007, Clarius Consulting, Manas Technology Solutions, InSTEDD, and Contributors.
 // All rights reserved. Licensed under the BSD 3-Clause License; see License.txt.
 
 using System;
@@ -15,18 +15,23 @@ namespace Moq
 	{
 		private Action<object> setter;
 
-		public AutoImplementedPropertySetterSetup(LambdaExpression originalExpression, MethodInfo method, Action<object> setter)
-			: base(new InvocationShape(originalExpression, method, new Expression[] { It.IsAny(method.GetParameterTypes().Last()) }))
+		public AutoImplementedPropertySetterSetup(Mock mock, LambdaExpression originalExpression, MethodInfo method, Action<object> setter)
+			: base(originalExpression: null, mock, new InvocationShape(originalExpression, method, new Expression[] { It.IsAny(method.GetParameterTypes().Last()) }))
 		{
 			this.setter = setter;
+
+			this.MarkAsVerifiable();
 		}
 
-		public override void Execute(Invocation invocation)
+		protected override void ExecuteCore(Invocation invocation)
 		{
 			this.setter.Invoke(invocation.Arguments[0]);
-			invocation.Return();
 		}
 
-		public override MockException TryVerifyAll() => null;
+		protected override bool TryVerifySelf(out MockException error)
+		{
+			error = null;
+			return true;
+		}
 	}
 }

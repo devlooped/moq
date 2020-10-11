@@ -1,7 +1,5 @@
-// Copyright (c) 2007, Clarius Consulting, Manas Technology Solutions, InSTEDD.
+// Copyright (c) 2007, Clarius Consulting, Manas Technology Solutions, InSTEDD, and Contributors.
 // All rights reserved. Licensed under the BSD 3-Clause License; see License.txt.
-
-#if FEATURE_COM
 
 using Moq.Tests.ComTypes;
 
@@ -83,14 +81,14 @@ namespace Moq.Tests
 		[Fact]
 		public void COM_interop_type_indexer_has_accessors_that_are_marked_as_specialname()
 		{
-			var indexer = typeof(IHasIndexer).GetProperty(nameof(IHasIndexer.Item));
+			var indexer = typeof(IHasIndexer).GetProperty("Item");
 			Assert.All(indexer.GetAccessors(), accessor => Assert.True(accessor.IsSpecialName, "Accessor is not marked as `specialname`."));
 		}
 
 		[Fact]
 		public void COM_interop_type_indexer_getter_is_recognized_as_such()
 		{
-			var indexer = typeof(IHasIndexer).GetProperty(nameof(IHasIndexer.Item));
+			var indexer = typeof(IHasIndexer).GetProperty("Item");
 			var getter = indexer.GetGetMethod(true);
 			Assert.True(getter.IsGetAccessor() && getter.IsIndexerAccessor());
 		}
@@ -98,11 +96,9 @@ namespace Moq.Tests
 		[Fact]
 		public void COM_interop_type_indexer_setter_is_recognized_as_such()
 		{
-			var indexer = typeof(IHasIndexer).GetProperty(nameof(IHasIndexer.Item));
+			var indexer = typeof(IHasIndexer).GetProperty("Item");
 			var setter = indexer.GetSetMethod(true);
 			Assert.True(setter.IsSetAccessor() && setter.IsIndexerAccessor());
 		}
 	}
 }
-
-#endif

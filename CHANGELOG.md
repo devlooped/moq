@@ -4,6 +4,107 @@ All notable changes to this project will be documented in this file.
 
 The format is loosely based on [Keep a Changelog](http://keepachangelog.com/en/1.0.0/).
 
+## Unreleased
+
+#### Added
+
+* New method overloads for `It.Is`, `It.IsIn`, and `It.IsNotIn` that compare values using a custom `IEqualityComparer<T>` (@weitzhandler, #1064)
+Implement It.Is, It.IsIn, It.IsNotIn with a comparer overload (#1059)
+
+#### Fixed
+
+* Setup not triggered due to VB.NET transparently inserting superfluous type conversions into a setup expression (@InteXX, #1067)
+
+
+## 4.14.6 (2020-09-30)
+
+#### Fixed
+
+* Regression since 4.14.0: setting nested non-overridable properties via `Mock.Of` (@mariotee, #1039)
+
+
+## 4.14.5 (2020-07-01)
+
+#### Fixed
+
+* Regression since version 4.11.0: `VerifySet` fails with `NullReferenceException` for write-only indexers (@Epicycle23, #1036)
+
+
+## 4.14.4 (2020-06-24)
+
+#### Fixed
+
+* Regression: `NullReferenceException` on subsequent setup if expression contains null reference (@IanYates83, #1031)
+
+
+## 4.14.3 (2020-06-18)
+
+#### Fixed
+
+* Regression, Part II: `Verify` behavior change using `DefaultValue.Mock` (@DesrosiersC, #1024)
+
+
+## 4.14.2 (2020-06-16)
+
+#### Fixed
+
+* Regression: `Verify` behavior change using `DefaultValue.Mock` (@DesrosiersC, #1024)
+
+
+## 4.14.1 (2020-04-28)
+
+#### Added
+
+* New `SetupSequence` verbs `.PassAsync()` and `.ThrowsAsync(...)` for async methods with `void` return type (@fuzzybair, #993)
+
+#### Fixed
+
+* `StackOverflowException` on `VerifyAll` when mocked method returns mocked object (@hotchkj, #1012)
+
+
+## 4.14.0 (2020-04-24)
+
+#### Added
+
+ * A mock's setups can now be inspected and individually verified via the new `Mock.Setups` collection and `IInvocation.MatchingSetup` property (@stakx, #984-#987, #989, #995, #999)
+
+ * New `.Protected().Setup` and `Protected().Verify` method overloads to deal with generic methods (@JmlSaul, #967)
+
+ * Two new public methods in `Times`: `bool Validate(int count)` and `string ToString()` (@stakx, 975)
+
+#### Changed
+
+ * Attempts to mark conditionals setup as verifiable are now considered an error, since conditional setups are ignored during verification. Calls to `.Verifiable()` on conditional setups are no-ops and can be safely removed. (@stakx, #997)
+
+ * When matching invocations against setups, captured variables nested inside expression trees are now evaluated. Their values likely matter more than their identities. (@stakx, #1000)
+
+#### Fixed
+
+ * Regression: Restored `Capture.In` use in `mock.Verify(expression, ...)` to extract arguments of previously recorded invocations. (@vgriph, #968; @stakx, #974)
+
+ * Consistency: When mocking a class `C` whose constructor invokes one of its virtual members, `Mock.Of<C>()` now operates like `new Mock<C>()`: a record of such invocations is retained in the mock's `Invocations` collection (@stakx, #980)
+
+ * After updating Moq from 4.10.1 to 4.11, mocking NHibernate session throws a `System.NullReferenceException` (@ronenfe, #955)
+
+
+## 4.13.1 (2019-10-19)
+
+#### Fixed
+
+* `SetupAllProperties` does not recognize property as read-write if only setter is overridden (@stakx, #886)
+
+* Regression: `InvalidCastException` caused by Moq erroneously reusing a cached auto-mocked (`DefaultValue.Mock`) return value for a different generic method instantiation (@BrunoJuchli, #932)
+
+* AmbiguousMatchException when setting up the property, that hides another one (@ishatalkin, #939)
+
+* `ArgumentException` ("Interface not found") when setting up `object.ToString` on an interface mock (@vslynko, #942)
+
+* Cannot "return" to original mocked type after downcasting with `Mock.Get` and then upcasting with `mock.As<>` (@pjquirk, #943)
+
+* `params` arrays in recursive setup expressions are matched by reference equality instead of by structural equality (@danielcweber, #946)
+
+* `mock.SetupProperty` throws `NullReferenceException` when called for partially overridden property (@stakx, #951)
+
 
 ## 4.13.0 (2019-08-31)
 
@@ -76,6 +177,7 @@ The format is loosely based on [Keep a Changelog](http://keepachangelog.com/en/1
 * Parameter types are ignored when matching an invoked generic method against setups. (@stakx, #903)
 
 * For `[Value]Task<object>`, `.ReturnsAsync(null)` throws `NullReferenceException` instead of producing a completed task with result `null` (@voroninp, #909)
+
 
 ## 4.12.0 (2019-06-20)
 
@@ -155,6 +257,7 @@ It contains several minor breaking changes, and there have been extensive intern
 
 #### Fixed
 
+* Setting multiple indexed object's property directly via LINQ fails (@TylerBrinkley, #314)
 * `InvalidOperationException` when specifiying setup on mock with mock containing property of type `Nullable<T>` (@dav1dev, #725)
 * `Verify` gets confused between the same generic and non-generic signature (@lepijohnny, #749)
 * Setup gets included in `Verify` despite being "unreachable" (@stakx, #703)

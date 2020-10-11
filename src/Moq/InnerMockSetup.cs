@@ -1,5 +1,8 @@
-// Copyright (c) 2007, Clarius Consulting, Manas Technology Solutions, InSTEDD.
+// Copyright (c) 2007, Clarius Consulting, Manas Technology Solutions, InSTEDD, and Contributors.
 // All rights reserved. Licensed under the BSD 3-Clause License; see License.txt.
+
+using System.Diagnostics;
+using System.Linq.Expressions;
 
 namespace Moq
 {
@@ -7,15 +10,19 @@ namespace Moq
 	{
 		private readonly object returnValue;
 
-		public InnerMockSetup(InvocationShape expectation, object returnValue)
-			: base(expectation)
+		public InnerMockSetup(Expression originalExpression, Mock mock, InvocationShape expectation, object returnValue)
+			: base(originalExpression, mock, expectation)
 		{
+			Debug.Assert(Unwrap.ResultIfCompletedTask(returnValue) is IMocked);
+
 			this.returnValue = returnValue;
+
+			this.MarkAsVerifiable();
 		}
 
-		public override void Execute(Invocation invocation)
+		protected override void ExecuteCore(Invocation invocation)
 		{
-			invocation.Return(this.returnValue);
+			invocation.ReturnValue = this.returnValue;
 		}
 
 		public override bool TryGetReturnValue(out object returnValue)
@@ -24,22 +31,9 @@ namespace Moq
 			return true;
 		}
 
-		public override MockException TryVerify()
+		protected override void ResetCore()
 		{
-			return this.TryVerifyInnerMock(innerMock => innerMock.TryVerify());
-		}
-
-		public override MockException TryVerifyAll()
-		{
-			return this.TryVerifyInnerMock(innerMock => innerMock.TryVerifyAll());
-		}
-
-		public override void Uninvoke()
-		{
-			if (this.ReturnsInnerMock(out var innerMock))
-			{
-				innerMock.Setups.UninvokeAll();
-			}
+			this.InnerMock.MutableSetups.Reset();
 		}
 	}
 }

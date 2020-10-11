@@ -1,7 +1,9 @@
-// Copyright (c) 2007, Clarius Consulting, Manas Technology Solutions, InSTEDD.
+// Copyright (c) 2007, Clarius Consulting, Manas Technology Solutions, InSTEDD, and Contributors.
 // All rights reserved. Licensed under the BSD 3-Clause License; see License.txt.
 
 using System;
+using System.Collections.Generic;
+using System.Diagnostics;
 using System.Linq;
 
 using Xunit;
@@ -160,6 +162,46 @@ namespace Moq.Tests
 			Assert.Equal(2, invocationCount);
 		}
 
+		[Fact]
+		public void It_Is_works_with_custom_comparer()
+		{
+			var acceptableArg = "FOO";
+
+			var invocationCount = 0;
+			var mock = new Mock<IX>();
+			mock.Setup(m => m.Method(It.Is<string>(acceptableArg, StringComparer.OrdinalIgnoreCase)))
+				.Callback((object arg) => invocationCount++);
+
+			mock.Object.Method("foo");
+			mock.Object.Method("bar");
+			Assert.Equal(1, invocationCount);
+
+			mock.Object.Method("FOO");
+			mock.Object.Method("foo");
+			mock.Object.Method((string)null);
+			Assert.Equal(3, invocationCount);
+		}
+
+		[Fact]
+		public void It_Is_object_works_with_custom_comparer()
+		{
+			var acceptableArg = "FOO";
+
+			var invocationCount = 0;
+			var mock = new Mock<IX>();
+			mock.Setup(m => m.Method(It.Is<object>(acceptableArg, new ObjectStringOrdinalIgnoreCaseComparer())))
+				.Callback((object arg) => invocationCount++);
+
+			mock.Object.Method("foo");
+			mock.Object.Method("bar");
+			Assert.Equal(1, invocationCount);
+
+			mock.Object.Method("FOO");
+			mock.Object.Method("foo");
+			mock.Object.Method((string)null);
+			Assert.Equal(3, invocationCount);
+		}
+
 		public interface IX
 		{
 			void Method<T>();
@@ -228,6 +270,21 @@ namespace Moq.Tests
 		public struct AnyStruct : ITypeMatcher
 		{
 			public bool Matches(Type typeArgument) => typeArgument.IsValueType;
+		}
+
+		public class ObjectStringOrdinalIgnoreCaseComparer : IEqualityComparer<object>
+		{
+			private static IEqualityComparer<string> InternalComparer => StringComparer.OrdinalIgnoreCase;
+
+			public new bool Equals(object x, object y)
+			{
+				return InternalComparer.Equals((string)x, (string)y);
+			}
+
+			public int GetHashCode(object obj)
+			{
+				return InternalComparer.GetHashCode((string)obj);
+			}
 		}
 	}
 }

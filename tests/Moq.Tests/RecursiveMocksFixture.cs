@@ -1,4 +1,4 @@
-// Copyright (c) 2007, Clarius Consulting, Manas Technology Solutions, InSTEDD.
+// Copyright (c) 2007, Clarius Consulting, Manas Technology Solutions, InSTEDD, and Contributors.
 // All rights reserved. Licensed under the BSD 3-Clause License; see License.txt.
 
 using System;
@@ -315,6 +315,16 @@ namespace Moq.Tests
 			Assert.Equal(5, fooMock.Object.Bar.GetBaz("foo").Value);
 		}
 
+		[Fact]
+		public void Param_array_args_in_setup_expression_parts_are_compared_by_structural_equality_not_reference_equality()
+		{
+			var mock = new Mock<IFoo>();
+			mock.Setup(m => m.GetBar(1).Value).Returns(1);
+			mock.Setup(m => m.GetBar(1).OtherValue).Returns(2);
+			Assert.Equal(1, mock.Object.GetBar(1).Value);
+			Assert.Equal(2, mock.Object.GetBar(1).OtherValue);
+		}
+
 		public class Verify_can_tell_apart_different_arguments_in_intermediate_part_of_fluent_expressions
 		{
 			[Fact]
@@ -418,6 +428,7 @@ namespace Moq.Tests
 			public IBar BarField;
 			public IBar Bar { get; set; }
 			public IBar GetBar() { return null; }
+			public IBar GetBar(params int[] indices) { return null; }
 			public IBar this[int index] { get { return null; } set { } }
 
 			public string Do(string command)
@@ -432,11 +443,13 @@ namespace Moq.Tests
 			IBar this[int index] { get; set; }
 			string Do(string command);
 			IBar GetBar();
+			IBar GetBar(params int[] indices);
 		}
 
 		public interface IBar
 		{
 			int Value { get; set; }
+			int OtherValue { get; set; }
 			string Do(string command);
 			IBaz Baz { get; set; }
 			IBaz GetBaz(string value);

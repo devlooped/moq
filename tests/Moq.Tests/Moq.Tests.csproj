@@ -5,29 +5,30 @@
 	<Import Project="$(BuildDirectory)xUnit.props" />
 
 	<PropertyGroup>
-		<TargetFrameworks>net472;netcoreapp2.2</TargetFrameworks>
+		<TargetFrameworks>net472;netcoreapp3.1</TargetFrameworks>
 		<AssemblyName>Moq.Tests</AssemblyName>
 		<DebugSymbols>True</DebugSymbols>
 		<DebugType>portable</DebugType>
 		<GenerateRuntimeConfigurationFiles>true</GenerateRuntimeConfigurationFiles>
-		<LangVersion>7.3</LangVersion>
+		<LangVersion>8.0</LangVersion>
 		<IsPackable>False</IsPackable>
 	</PropertyGroup>
 
 	<PropertyGroup Condition=" '$(TargetFramework)' == 'net472' ">
-		<DefineConstants>$(DefineConstants);FEATURE_CAS;FEATURE_DYNAMICPROXY_SERIALIZABLE_PROXIES;FEATURE_COM;FEATURE_EF;FEATURE_SYSTEM_WEB;FEATURE_SYSTEM_WINDOWS_FORMS</DefineConstants>
+		<DefineConstants>$(DefineConstants);FEATURE_DYNAMICPROXY_SERIALIZABLE_PROXIES;FEATURE_EF;FEATURE_SYSTEM_WEB;FEATURE_SYSTEM_WINDOWS_FORMS</DefineConstants>
 	</PropertyGroup>
-	<PropertyGroup Condition=" '$(TargetFramework)' == 'netcoreapp2.2' ">
+	<PropertyGroup Condition=" '$(TargetFramework)' == 'netcoreapp3.1' ">
 		<DefineConstants>$(DefineConstants)</DefineConstants>
 	</PropertyGroup>
 
 	<ItemGroup>
 		<PackageReference Include="Castle.Core" Version="4.4.0" />
+		<PackageReference Include="Microsoft.NETFramework.ReferenceAssemblies" Version="1.0.0" PrivateAssets="All" />
 		<PackageReference Include="System.ValueTuple" Version="4.5.0" />
 		<ProjectReference Include="..\..\src\Moq\Moq.csproj" />
 		<ProjectReference Include="..\Moq.Tests.FSharpTypes\Moq.Tests.FSharpTypes.fsproj" />
 	</ItemGroup>
-	<ItemGroup Condition=" $([System.Text.RegularExpressions.Regex]::IsMatch('$(DefineConstants)', 'FEATURE_COM'))">
+	<ItemGroup>
 		<Reference Include="Moq.Tests.ComTypes">
 			<HintPath>..\Moq.Tests.ComTypes\Moq.Tests.ComTypes.dll</HintPath>
 		</Reference>
@@ -41,7 +42,7 @@
 	<ItemGroup Condition=" $([System.Text.RegularExpressions.Regex]::IsMatch('$(DefineConstants)', 'FEATURE_SYSTEM_WINDOWS_FORMS'))">
 		<Reference Include="System.Windows.Forms" />
 	</ItemGroup>
-	<ItemGroup Condition=" '$(TargetFramework)' == 'netcoreapp2.2' ">
+	<ItemGroup Condition=" '$(TargetFramework)' == 'netcoreapp3.1' ">
 		<PackageReference Include="System.Collections.Specialized" Version="4.3.0" />
 		<PackageReference Include="System.ComponentModel.Primitives" Version="4.3.0" />
 		<PackageReference Include="System.Diagnostics.TraceSource" Version="4.3.0" />

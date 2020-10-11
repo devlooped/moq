@@ -1,4 +1,4 @@
-// Copyright (c) 2007, Clarius Consulting, Manas Technology Solutions, InSTEDD.
+// Copyright (c) 2007, Clarius Consulting, Manas Technology Solutions, InSTEDD, and Contributors.
 // All rights reserved. Licensed under the BSD 3-Clause License; see License.txt.
 
 using System;
@@ -27,10 +27,7 @@ namespace Moq
 
 		internal override bool IsObjectInitialized => this.owner.IsObjectInitialized;
 
-		internal override Type MockedType
-		{
-			get { return typeof(TInterface); }
-		}
+		internal override Type MockedType => this.owner.MockedType;
 
 		public override MockBehavior Behavior => this.owner.Behavior;
 
@@ -61,15 +58,13 @@ namespace Moq
 			get { return this.owner.Object as TInterface; }
 		}
 
-		internal override SetupCollection Setups => this.owner.Setups;
+		internal override SetupCollection MutableSetups => this.owner.MutableSetups;
 
 		public override Switches Switches
 		{
 			get => this.owner.Switches;
 			set => this.owner.Switches = value;
 		}
-
-		internal override Type TargetType => this.owner.TargetType;
 
 		public override Mock<TNewInterface> As<TNewInterface>()
 		{

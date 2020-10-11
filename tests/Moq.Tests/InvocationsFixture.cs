@@ -1,7 +1,8 @@
-// Copyright (c) 2007, Clarius Consulting, Manas Technology Solutions, InSTEDD.
+// Copyright (c) 2007, Clarius Consulting, Manas Technology Solutions, InSTEDD, and Contributors.
 // All rights reserved. Licensed under the BSD 3-Clause License; see License.txt.
 
 using System;
+using System.Linq;
 
 using Xunit;
 
@@ -182,10 +183,91 @@ namespace Moq.Tests
 			Assert.Equal(MockExceptionReasons.MoreThanOneCall, ex.Reasons);
 		}
 
+		[Fact]
+		public void New_Mock_should_keep_record_of_invocations_caused_by_mocked_type_ctor()
+		{
+			var mock = new Mock<FlagInitiallySetToTrue>();
+			mock.Setup(m => m.Flag).Returns(false);
+			var mockObject = mock.Object;
+
+			Assert.Single(mock.Invocations);
+			Assert.False(mockObject.Flag);
+		}
+
+		[Fact]
+		public void Mock_Of_should_keep_record_of_invocations_caused_by_mocked_type_ctor()
+		{
+			var mockObject = Mock.Of<FlagInitiallySetToTrue>(m => m.Flag == false);
+			var mock = Mock.Get(mockObject);
+
+			Assert.Single(mock.Invocations);
+			Assert.False(mockObject.Flag);
+		}
+
+		[Fact]
+		public void MatchingSetup_is_null_if_there_was_no_matching_setup()
+		{
+			var mock = new Mock<IX>();
+
+			mock.Object.Do();
+			var invocation = mock.Invocations.First();
+
+			Assert.Null(invocation.MatchingSetup);
+		}
+
+		[Fact]
+		public void MatchingSetup_is_set_if_there_was_a_matching_setup()
+		{
+			var mock = new Mock<IX>();
+			mock.Setup(m => m.Do());
+			var setup = mock.Setups.First();
+
+			mock.Object.Do();
+			var invocation = mock.Invocations.First();
+
+			Assert.Same(setup, invocation.MatchingSetup);
+		}
+
+		[Fact]
+		public void MatchingSetup_is_set_if_there_was_a_matching_setup_implicitly_created_by_SetupAllProperties()
+		{
+			var mock = new Mock<IX>();
+			mock.SetupAllProperties();
+
+			_ = mock.Object.Nested;
+			var invocation = mock.Invocations.First();
+			var setup = mock.Setups.First();
+
+			Assert.Same(setup, invocation.MatchingSetup);
+		}
+
+		[Fact]
+		public void MatchingSetup_is_set_if_there_was_a_matching_setup_implicitly_created_by_multi_dot_expression()
+		{
+			var mock = new Mock<IX>();
+			mock.Setup(m => m.Nested.Do());
+			var setup = mock.Setups.First();
+
+			_ = mock.Object.Nested;
+			var invocation = mock.Invocations.First();
+
+			Assert.Same(setup, invocation.MatchingSetup);
+		}
+
 		public interface IX
 		{
 			IX Nested { get; }
 			void Do();
+		}
+
+		public class FlagInitiallySetToTrue
+		{
+			public FlagInitiallySetToTrue()
+			{
+				this.Flag = true;
+			}
+
+			public virtual bool Flag { get; set; }
 		}
 	}
 }

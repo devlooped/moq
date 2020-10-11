@@ -1,10 +1,12 @@
-// Copyright (c) 2007, Clarius Consulting, Manas Technology Solutions, InSTEDD.
+// Copyright (c) 2007, Clarius Consulting, Manas Technology Solutions, InSTEDD, and Contributors.
 // All rights reserved. Licensed under the BSD 3-Clause License; see License.txt.
 
 using System;
 using System.Collections.Generic;
 
 using Xunit;
+
+#pragma warning disable CS0183, CS0184
 
 namespace Moq.Tests.Matchers
 {
@@ -161,3 +163,5 @@ namespace Moq.Tests.Matchers
 		}
 	}
 }
+
+#pragma warning restore CS0183, CS0184

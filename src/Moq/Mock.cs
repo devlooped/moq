@@ -1,4 +1,4 @@
-// Copyright (c) 2007, Clarius Consulting, Manas Technology Solutions, InSTEDD.
+// Copyright (c) 2007, Clarius Consulting, Manas Technology Solutions, InSTEDD, and Contributors.
 // All rights reserved. Licensed under the BSD 3-Clause License; see License.txt.
 
 using System;
@@ -10,6 +10,7 @@ using System.Linq;
 using System.Linq.Expressions;
 using System.Reflection;
 
+using Moq.Expressions.Visitors;
 using Moq.Properties;
 
 namespace Moq
@@ -162,19 +163,12 @@ namespace Moq
 			}
 			set
 			{
-				switch (value)
+				this.DefaultValueProvider = value switch
 				{
-					case DefaultValue.Empty:
-						this.DefaultValueProvider = DefaultValueProvider.Empty;
-						return;
-
-					case DefaultValue.Mock:
-						this.DefaultValueProvider = DefaultValueProvider.Mock;
-						return;
-
-					default:
-						throw new ArgumentOutOfRangeException(nameof(value));
-				}
+					DefaultValue.Empty => DefaultValueProvider.Empty,
+					DefaultValue.Mock  => DefaultValueProvider.Mock,
+					_                  => throw new ArgumentOutOfRangeException(nameof(value)),
+				};
 			}
 		}
 
@@ -188,7 +182,7 @@ namespace Moq
 		public object Object => this.OnGetObject();
 
 		/// <summary>
-		/// Gets the interfaces directly inherited from the mocked type (<see cref="TargetType"/>).
+		///   Gets the interfaces directly inherited from the mocked type (<see cref="MockedType"/>).
 		/// </summary>
 		internal abstract Type[] InheritedInterfaces { get; }
 
@@ -226,15 +220,19 @@ namespace Moq
 		/// </summary>
 		internal abstract DefaultValueProvider AutoSetupPropertiesDefaultValueProvider { get; set; } 
 
-		internal abstract SetupCollection Setups { get; }
+		internal abstract SetupCollection MutableSetups { get; }
+
+		/// <summary>
+		///   Gets the setups that have been configured on this mock,
+		///   in chronological order (that is, oldest setup first, most recent setup last).
+		/// </summary>
+		public ISetupList Setups => this.MutableSetups;
 
 		/// <summary>
 		/// A set of switches that influence how this mock will operate.
 		/// You can opt in or out of certain features via this property.
 		/// </summary>
 		public abstract Switches Switches { get; set; }
-
-		internal abstract Type TargetType { get; }
 
 		#region Verify
 
@@ -260,11 +258,7 @@ namespace Moq
 		/// </example>
 		public void Verify()
 		{
-			var error = this.TryVerify();
-			if (error?.IsVerificationError == true)
-			{
-				throw error;
-			}
+			this.Verify(setup => !setup.IsOverridden && !setup.IsConditional && setup.IsVerifiable);
 		}
 
 		/// <summary>
@@ -289,55 +283,55 @@ namespace Moq
 		/// </example>
 		public void VerifyAll()
 		{
-			var error = this.TryVerifyAll();
-			if (error?.IsVerificationError == true)
+			this.Verify(setup => !setup.IsOverridden && !setup.IsConditional);
+		}
+
+		private void Verify(Func<ISetup, bool> predicate)
+		{
+			var verifiedMocks = new HashSet<Mock>();
+
+			if (!this.TryVerify(predicate, verifiedMocks, out var error) && error.IsVerificationError)
 			{
 				throw error;
 			}
 		}
 
-		internal MockException TryVerify()
+		internal bool TryVerify(Func<ISetup, bool> predicate, HashSet<Mock> verifiedMocks, out MockException error)
 		{
-			foreach (Invocation invocation in this.MutableInvocations)
+			if (verifiedMocks.Add(this) == false)
 			{
-				invocation.MarkAsVerifiedIfMatchedByVerifiableSetup();
+				// This mock has already been verified; don't verify it again.
+				// (We can end up here e.g. when there are loops in the inner mock object graph.)
+				error = null;
+				return true;
 			}
 
-			return this.TryVerifySetups(setup => setup.TryVerify());
-		}
-
-		internal MockException TryVerifyAll()
-		{
 			foreach (Invocation invocation in this.MutableInvocations)
 			{
-				invocation.MarkAsVerifiedIfMatchedBySetup();
+				invocation.MarkAsVerifiedIfMatchedBy(predicate);
 			}
 
-			return this.TryVerifySetups(setup => setup.TryVerifyAll());
-		}
-
-		private MockException TryVerifySetups(Func<Setup, MockException> verifySetup)
-		{
 			var errors = new List<MockException>();
 
-			foreach (var setup in this.Setups.ToArrayLive(_ => true))
+			foreach (var setup in this.MutableSetups.ToArray(predicate))
 			{
-				var error = verifySetup(setup);
-				if (error?.IsVerificationError == true)
+				if (predicate(setup) && !setup.TryVerify(recursive: true, predicate, verifiedMocks, out var e) && e.IsVerificationError)
 				{
-					errors.Add(error);
+					errors.Add(e);
 				}
 			}
 
 			if (errors.Count > 0)
 			{
-				return MockException.Combined(
+				error = MockException.Combined(
 					errors,
 					preamble: string.Format(CultureInfo.CurrentCulture, Resources.VerificationErrorsOfMock, this));
+				return false;
 			}
 			else
 			{
-				return null;
+				error = null;
+				return true;
 			}
 		}
 
@@ -347,10 +341,11 @@ namespace Moq
 
 			var invocationCount = Mock.GetMatchingInvocationCount(mock, expression, out var invocationsToBeMarkedAsVerified);
 
-			if (times.Verify(invocationCount))
+			if (times.Validate(invocationCount))
 			{
-				foreach (var invocation in invocationsToBeMarkedAsVerified)
+				foreach (var (invocation, part) in invocationsToBeMarkedAsVerified)
 				{
+					part.SetupEvaluatedSuccessfully(invocation);
 					invocation.MarkAsVerified();
 				}
 			}
@@ -406,9 +401,9 @@ namespace Moq
 		{
 			if (!verifiedMocks.Add(mock)) return;
 
-			var unverifiedInvocations = mock.MutableInvocations.ToArray(invocation => !invocation.Verified);
+			var unverifiedInvocations = mock.MutableInvocations.ToArray(invocation => !invocation.IsVerified);
 
-			var innerMockSetups = mock.Setups.GetInnerMockSetups();
+			var innerMockSetups = mock.MutableSetups.GetInnerMockSetups();
 
 			if (unverifiedInvocations.Any())
 			{
@@ -424,8 +419,8 @@ namespace Moq
 						// In order for an invocation to be "transitive", its return value has to be a
 						// sub-object (inner mock); and that sub-object has to have received at least
 						// one call:
-						var wasTransitiveInvocation = innerMockSetups.TryFind(unverifiedInvocations[i], out var inner)
-						                              && inner.GetInnerMock().MutableInvocations.Any();
+						var wasTransitiveInvocation = innerMockSetups.TryFind(unverifiedInvocations[i]) is Setup inner
+						                              && inner.InnerMock.MutableInvocations.Any();
 						if (wasTransitiveInvocation)
 						{
 							unverifiedInvocations[i] = null;
@@ -445,19 +440,19 @@ namespace Moq
 			// created by "transitive" invocations):
 			foreach (var inner in innerMockSetups)
 			{
-				VerifyNoOtherCalls(inner.GetInnerMock(), verifiedMocks);
+				VerifyNoOtherCalls(inner.InnerMock, verifiedMocks);
 			}
 		}
 
 		private static int GetMatchingInvocationCount(
 			Mock mock,
 			LambdaExpression expression,
-			out List<Invocation> invocationsToBeMarkedAsVerified)
+			out List<Pair<Invocation, InvocationShape>> invocationsToBeMarkedAsVerified)
 		{
 			Debug.Assert(mock != null);
 			Debug.Assert(expression != null);
 
-			invocationsToBeMarkedAsVerified = new List<Invocation>();
+			invocationsToBeMarkedAsVerified = new List<Pair<Invocation, InvocationShape>>();
 			return Mock.GetMatchingInvocationCount(
 				mock,
 				new ImmutablePopOnlyStack<InvocationShape>(expression.Split()),
@@ -469,7 +464,7 @@ namespace Moq
 			Mock mock,
 			in ImmutablePopOnlyStack<InvocationShape> parts,
 			HashSet<Mock> visitedInnerMocks,
-			List<Invocation> invocationsToBeMarkedAsVerified)
+			List<Pair<Invocation, InvocationShape>> invocationsToBeMarkedAsVerified)
 		{
 			Debug.Assert(mock != null);
 			Debug.Assert(!parts.Empty);
@@ -488,7 +483,7 @@ namespace Moq
 			var count = 0;
 			foreach (var matchingInvocation in mock.MutableInvocations.ToArray().Where(part.IsMatch))
 			{
-				invocationsToBeMarkedAsVerified.Add(matchingInvocation);
+				invocationsToBeMarkedAsVerified.Add(new Pair<Invocation, InvocationShape>(matchingInvocation, part));
 
 				if (remainingParts.Empty)
 				{
@@ -524,10 +519,10 @@ namespace Moq
 		{
 			Guard.NotNull(expression, nameof(expression));
 
-			return Mock.SetupRecursive(mock, expression, setupLast: (part, targetMock) =>
+			return Mock.SetupRecursive(mock, expression, setupLast: (targetMock, originalExpression, part) =>
 			{
-				var setup = new MethodCall(targetMock, condition, expectation: part);
-				targetMock.Setups.Add(setup);
+				var setup = new MethodCall(originalExpression, targetMock, condition, expectation: part);
+				targetMock.MutableSetups.Add(setup);
 				return setup;
 			});
 		}
@@ -553,6 +548,38 @@ namespace Moq
 			return Mock.Setup(mock, expression, condition);
 		}
 
+		// This specialized version of `SetupSet` exists to let `Mock.Of` support properties that are not overridable.
+		// Note that we generally prefer having a setup for a property's return value, but in this case, that isn't possible.
+		internal static void SetupSet(Mock mock, LambdaExpression expression, PropertyInfo propertyToSet, object value)
+		{
+			Guard.NotNull(expression, nameof(expression));
+
+			Mock.SetupRecursive<MethodCall>(mock, expression, setupLast: (targetMock, _, __) =>
+			{
+				// Setting a mock's property through reflection will only work (i.e. the property will only remember the value
+				// it's being set to) if it is being stubbed. In order to ensure it's stubbed, we temporarily enable
+				// auto-stubbing (if that isn't already switched on).
+
+				var temporaryAutoSetupProperties = targetMock.AutoSetupPropertiesDefaultValueProvider == null;
+				if (temporaryAutoSetupProperties)
+				{
+					targetMock.AutoSetupPropertiesDefaultValueProvider = targetMock.DefaultValueProvider;
+				}
+				try
+				{
+					propertyToSet.SetValue(targetMock.Object, value, null);
+				}
+				finally
+				{
+					if (temporaryAutoSetupProperties)
+					{
+						targetMock.AutoSetupPropertiesDefaultValueProvider = null;
+					}
+				}
+				return null;
+			}, allowNonOverridableLastProperty: true);
+		}
+
 		internal static MethodCall SetupAdd(Mock mock, LambdaExpression expression, Condition condition)
 		{
 			Guard.NotNull(expression, nameof(expression));
@@ -573,37 +600,43 @@ namespace Moq
 		{
 			Guard.NotNull(expression, nameof(expression));
 
-			return Mock.SetupRecursive(mock, expression, setupLast: (part, targetMock) =>
+			return Mock.SetupRecursive(mock, expression, setupLast: (targetMock, originalExpression, part) =>
 			{
-				var setup = new SequenceSetup(expectation: part);
-				targetMock.Setups.Add(setup);
+				var setup = new SequenceSetup(originalExpression, targetMock, expectation: part);
+				targetMock.MutableSetups.Add(setup);
 				return setup;
 			});
 		}
 
-		private static TSetup SetupRecursive<TSetup>(Mock mock, LambdaExpression expression, Func<InvocationShape, Mock, TSetup> setupLast)
+		private static TSetup SetupRecursive<TSetup>(Mock mock, LambdaExpression expression, Func<Mock, Expression, InvocationShape, TSetup> setupLast, bool allowNonOverridableLastProperty = false)
+			where TSetup : ISetup
 		{
 			Debug.Assert(mock != null);
 			Debug.Assert(expression != null);
 			Debug.Assert(setupLast != null);
 
-			var parts = expression.Split();
-			return Mock.SetupRecursive(mock, expression, parts, setupLast);
+			var parts = expression.Split(allowNonOverridableLastProperty);
+			return Mock.SetupRecursive(mock, originalExpression: expression, parts, setupLast);
 		}
 
-		private static TSetup SetupRecursive<TSetup>(Mock mock, LambdaExpression expression, Stack<InvocationShape> parts, Func<InvocationShape, Mock, TSetup> setupLast)
+		private static TSetup SetupRecursive<TSetup>(Mock mock, LambdaExpression originalExpression, Stack<InvocationShape> parts, Func<Mock, Expression, InvocationShape, TSetup> setupLast)
+			where TSetup : ISetup
 		{
 			var part = parts.Pop();
 			var (expr, method, arguments) = part;
 
 			if (parts.Count == 0)
 			{
-				return setupLast(part, mock);
+				return setupLast(mock, originalExpression, part);
 			}
 			else
 			{
 				Mock innerMock;
-				if (!(mock.Setups.GetInnerMockSetups().TryFind(part, out var setup) && setup.ReturnsInnerMock(out innerMock)))
+				if (mock.MutableSetups.GetInnerMockSetups().TryFind(part) is Setup setup)
+				{
+					innerMock = setup.InnerMock;
+				}
+				else
 				{
 					var returnValue = mock.GetDefaultValue(method, out innerMock, useAlternateProvider: DefaultValueProvider.Mock);
 					if (innerMock == null)
@@ -612,14 +645,14 @@ namespace Moq
 							string.Format(
 								CultureInfo.CurrentCulture,
 								Resources.UnsupportedExpression,
-								expr.ToStringFixed() + " in " + expression.ToStringFixed() + ":\n" + Resources.TypeNotMockable));
+								expr.ToStringFixed() + " in " + originalExpression.ToStringFixed() + ":\n" + Resources.TypeNotMockable));
 					}
-					setup = new InnerMockSetup(expectation: part, returnValue);
-					mock.Setups.Add((Setup)setup);
+					setup = new InnerMockSetup(originalExpression, mock, expectation: part, returnValue);
+					mock.MutableSetups.Add((Setup)setup);
 				}
 				Debug.Assert(innerMock != null);
 
-				return Mock.SetupRecursive(innerMock, expression, parts, setupLast);
+				return Mock.SetupRecursive(innerMock, originalExpression, parts, setupLast);
 			}
 		}
 
@@ -630,7 +663,7 @@ namespace Moq
 
 		internal static void SetupAllProperties(Mock mock, DefaultValueProvider defaultValueProvider)
 		{
-			mock.Setups.RemoveAllPropertyAccessorSetups();
+			mock.MutableSetups.RemoveAllPropertyAccessorSetups();
 			// Removing all the previous properties setups to keep the behaviour of overriding
 			// existing setups in `SetupAllProperties`.
 			
@@ -705,9 +738,9 @@ namespace Moq
 					handlers.InvokePreserveStack(arguments);
 				}
 			}
-			else if (mock.Setups.GetInnerMockSetups().TryFind(part, out var innerMockSetup) && innerMockSetup.ReturnsInnerMock(out var innerMock))
+			else if (mock.MutableSetups.GetInnerMockSetups().TryFind(part) is Setup innerMockSetup)
 			{
-				Mock.RaiseEvent(innerMock, expression, parts, arguments);
+				Mock.RaiseEvent(innerMockSetup.InnerMock, expression, parts, arguments);
 			}
 		}
 
@@ -731,52 +764,8 @@ namespace Moq
 		/// <exception cref="InvalidOperationException">
 		///   The mock type has already been generated by accessing the <see cref="Object"/> property.
 		/// </exception>
-		/// <example>
-		///   The following example creates a mock for the main interface
-		///   and later adds <see cref="IDisposable"/> to it to verify it's called by the consumer code:
-		///   <code>
-		///     var mock = new Mock&lt;IProcessor&gt;();
-		///     mock.Setup(x =&gt; x.Execute("ping"));
-		///
-		///     // add IDisposable interface
-		///     var disposable = mock.As&lt;IDisposable&gt;();
-		///     disposable.Setup(d => d.Dispose())
-		///               .Verifiable();
-		///   </code>
-		/// </example>
 		[SuppressMessage("Microsoft.Naming", "CA1716:IdentifiersShouldNotMatchKeywords", MessageId = "As", Justification = "We want the method called exactly as the keyword because that's what it does, it adds an implemented interface so that you can cast it later.")]
-		public virtual Mock<TInterface> As<TInterface>()
-			where TInterface : class
-		{
-			var interfaceType = typeof(TInterface);
-
-			if (!interfaceType.IsInterface)
-			{
-				throw new ArgumentException(Resources.AsMustBeInterface);
-			}
-
-			if (this.IsObjectInitialized && this.ImplementsInterface(interfaceType) == false)
-			{
-				throw new InvalidOperationException(Resources.AlreadyInitialized);
-			}
-
-			if (this.AdditionalInterfaces.Contains(interfaceType) == false)
-			{
-				// We get here for either of two reasons:
-				//
-				// 1. We are being asked to implement an interface that the mocked type does *not* itself
-				//    inherit or implement. We need to hand this interface type to DynamicProxy's
-				//    `CreateClassProxy` method as an additional interface to be implemented.
-				//
-				// 2. The user is possibly going to create a setup through an interface type that the
-				//    mocked type *does* implement. Since the mocked type might implement that interface's
-				//    methods non-virtually, we can only intercept those if DynamicProxy reimplements the
-				//    interface in the generated proxy type. Therefore we do the same as for (1).
-				this.AdditionalInterfaces.Add(interfaceType);
-			}
-
-			return new AsInterface<TInterface>(this);
-		}
+		public abstract Mock<TInterface> As<TInterface>() where TInterface : class;
 
 		internal bool ImplementsInterface(Type interfaceType)
 		{
@@ -820,47 +809,6 @@ namespace Moq
 
 			candidateInnerMock = (unwrappedResult as IMocked)?.Mock;
 			return result;
-		}
-
-		#endregion
-
-		#region Inner mocks
-
-		internal void AddInnerMockSetup(Invocation invocation, object returnValue)
-		{
-			var method = invocation.Method;
-
-			Expression[] arguments;
-			{
-				var parameterTypes = method.GetParameterTypes();
-				var n = parameterTypes.Count;
-				arguments = new Expression[n];
-				for (int i = 0; i < n; ++i)
-				{
-					arguments[i] = Expression.Constant(invocation.Arguments[i], parameterTypes[i]);
-				}
-			}
-
-			LambdaExpression expression;
-			{
-				var mock = Expression.Parameter(method.DeclaringType, "mock");
-				expression = Expression.Lambda(Expression.Call(mock, method, arguments), mock);
-			}
-
-			this.AddInnerMockSetup(invocation.Method, arguments, expression, returnValue);
-		}
-
-		internal void AddInnerMockSetup(MethodInfo method, IReadOnlyList<Expression> arguments, LambdaExpression expression, object returnValue)
-		{
-			if (expression.IsProperty())
-			{
-				var property = expression.ToPropertyInfo();
-				Guard.CanRead(property);
-
-				Debug.Assert(method == property.GetGetMethod(true));
-			}
-
-			this.Setups.Add(new InnerMockSetup(new InvocationShape(expression, method, arguments), returnValue));
 		}
 
 		#endregion

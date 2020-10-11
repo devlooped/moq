@@ -1,4 +1,4 @@
-// Copyright (c) 2007, Clarius Consulting, Manas Technology Solutions, InSTEDD.
+// Copyright (c) 2007, Clarius Consulting, Manas Technology Solutions, InSTEDD, and Contributors.
 // All rights reserved. Licensed under the BSD 3-Clause License; see License.txt.
 
 using System;
@@ -1285,9 +1285,9 @@ namespace Moq.Tests
 			var mock = new Mock<IFoo>();
 			mock.SetupAdd(m => m.EventHandler += It.IsAny<EventHandler>());
 
-			var before = mock.Setups.HasEventSetup;
+			var before = mock.MutableSetups.HasEventSetup;
 			mock.Reset();
-			var after = mock.Setups.HasEventSetup;
+			var after = mock.MutableSetups.HasEventSetup;
 
 			Assert.True(before, "Before reset");
 			Assert.False(after, "After reset");

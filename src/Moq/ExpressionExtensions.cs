@@ -1,4 +1,4 @@
-// Copyright (c) 2007, Clarius Consulting, Manas Technology Solutions, InSTEDD.
+// Copyright (c) 2007, Clarius Consulting, Manas Technology Solutions, InSTEDD, and Contributors.
 // All rights reserved. Licensed under the BSD 3-Clause License; see License.txt.
 
 using System;
@@ -79,6 +79,47 @@ namespace Moq
 		}
 
 		/// <summary>
+		///   Checks whether the given expression <paramref name="e"/> can be split by <see cref="Split"/>.
+		/// </summary>
+		public static bool CanSplit(this Expression e)
+		{
+			switch (e.NodeType)
+			{
+				case ExpressionType.Assign:
+				case ExpressionType.AddAssign:
+				case ExpressionType.SubtractAssign:
+				{
+					var assignmentExpression = (BinaryExpression)e;
+					return CanSplit(assignmentExpression.Left);
+				}
+
+				case ExpressionType.Call:
+				case ExpressionType.Index:
+				{
+					return true;
+				}
+
+				case ExpressionType.Invoke:
+				{
+					var invocationExpression = (InvocationExpression)e;
+					return typeof(Delegate).IsAssignableFrom(invocationExpression.Expression.Type);
+				}
+
+				case ExpressionType.MemberAccess:
+				{
+					var memberAccessExpression = (MemberExpression)e;
+					return memberAccessExpression.Member is PropertyInfo;
+				}
+
+				case ExpressionType.Parameter:
+				default:
+				{
+					return false;
+				}
+			}
+		}
+
+		/// <summary>
 		///   Splits an expression such as `<c>m => m.A.B(x).C[y] = z</c>` into a chain of parts
 		///   that can be set up one at a time:
 		///   <list>
@@ -95,7 +136,7 @@ namespace Moq
 		/// <exception cref="ArgumentException">
 		///   It was not possible to completely split up the expression.
 		/// </exception>
-		internal static Stack<InvocationShape> Split(this LambdaExpression expression)
+		internal static Stack<InvocationShape> Split(this LambdaExpression expression, bool allowNonOverridableLastProperty = false)
 		{
 			Debug.Assert(expression != null);
 
@@ -104,7 +145,7 @@ namespace Moq
 			Expression remainder = expression.Body;
 			while (CanSplit(remainder))
 			{
-				Split(remainder, out remainder, out var part);
+				Split(remainder, out remainder, out var part, allowNonOverridableLastProperty: allowNonOverridableLastProperty && parts.Count == 0);
 				parts.Push(part);
 			}
 
@@ -121,45 +162,7 @@ namespace Moq
 						remainder.ToStringFixed()));
 			}
 
-			bool CanSplit(Expression e)
-			{
-				switch (e.NodeType)
-				{
-					case ExpressionType.Assign:
-					case ExpressionType.AddAssign:
-					case ExpressionType.SubtractAssign:
-					{
-						var assignmentExpression = (BinaryExpression)e;
-						return CanSplit(assignmentExpression.Left);
-					}
-
-					case ExpressionType.Call:
-					case ExpressionType.Index:
-					{
-						return true;
-					}
-
-					case ExpressionType.Invoke:
-					{
-						var invocationExpression = (InvocationExpression)e;
-						return typeof(Delegate).IsAssignableFrom(invocationExpression.Expression.Type);
-					}
-
-					case ExpressionType.MemberAccess:
-					{
-						var memberAccessExpression = (MemberExpression)e;
-						return memberAccessExpression.Member is PropertyInfo;
-					}
-
-					case ExpressionType.Parameter:
-					default:
-					{
-						return false;
-					}
-				}
-			}
-
-			void Split(Expression e, out Expression r /* remainder */, out InvocationShape p /* part */)
+			void Split(Expression e, out Expression r /* remainder */, out InvocationShape p /* part */, bool assignment = false, bool allowNonOverridableLastProperty = false)
 			{
 				const string ParameterName = "...";
 
@@ -170,20 +173,9 @@ namespace Moq
 					case ExpressionType.SubtractAssign:  // unsubscription of event handler from event
 					{
 						var assignmentExpression = (BinaryExpression)e;
-						Split(assignmentExpression.Left, out r, out var lhs);
-						PropertyInfo property;
-						if (lhs.Expression.Body is MemberExpression me)
-						{
-							Debug.Assert(me.Member is PropertyInfo);
-							property = (PropertyInfo)me.Member;
-						}
-						else
-						{
-							Debug.Assert(lhs.Expression.Body is IndexExpression);
-							property = ((IndexExpression)lhs.Expression.Body).Indexer;
-						}
+						Split(assignmentExpression.Left, out r, out var lhs, assignment: true);
 						var parameter = Expression.Parameter(r.Type, r is ParameterExpression ope ? ope.Name : ParameterName);
-						var arguments = new Expression[lhs.Arguments.Count + 1];
+						var arguments = new Expression[lhs.Method.GetParameters().Length];
 						for (var ai = 0; ai < arguments.Length - 1; ++ai)
 						{
 							arguments[ai] = lhs.Arguments[ai];
@@ -193,7 +185,7 @@ namespace Moq
 							expression: Expression.Lambda(
 								Expression.MakeBinary(e.NodeType, lhs.Expression.Body, assignmentExpression.Right),
 								parameter),
-							method: property.GetSetMethod(true),
+							method: lhs.Method,
 							arguments);
 						return;
 					}
@@ -252,12 +244,17 @@ namespace Moq
 						var parameter = Expression.Parameter(r.Type, r is ParameterExpression ope ? ope.Name : ParameterName);
 						var indexer = indexExpression.Indexer;
 						var arguments = indexExpression.Arguments;
+						var method = !assignment && indexer.CanRead(out var getter)  ? getter
+						           :                indexer.CanWrite(out var setter) ? setter
+						           :                                                   null;
 						p = new InvocationShape(
 									expression: Expression.Lambda(
 										Expression.MakeIndex(parameter, indexer, arguments),
 										parameter),
-									method: indexer.GetGetMethod(true),
-									arguments);
+									method,
+									arguments,
+									skipMatcherInitialization: assignment,
+									allowNonOverridable: allowNonOverridableLastProperty);
 						return;
 					}
 
@@ -284,19 +281,16 @@ namespace Moq
 						r = memberAccessExpression.Expression;
 						var parameter = Expression.Parameter(r.Type, r is ParameterExpression ope ? ope.Name : ParameterName);
 						var property = memberAccessExpression.GetReboundProperty();
-						var method = property.CanRead ? property.GetGetMethod(true) : property.GetSetMethod(true);
-						//                    ^^^^^^^                               ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
-						// We're in the switch case block for property read access, therefore we prefer the
-						// getter. When a read-write property is being assigned to, we end up here, too, and
-						// select the wrong accessor. However, that doesn't matter because it will be over-
-						// ridden in the above `Assign` case. Finally, if a write-only property is being
-						// assigned to, we fall back to the setter here in order to not end up without a
-						// method at all.
+						var method = !assignment && property.CanRead(out var getter)  ? getter
+						           :                property.CanWrite(out var setter) ? setter
+						           :                                                    null;
 						p = new InvocationShape(
 									expression: Expression.Lambda(
 										Expression.MakeMemberAccess(parameter, property),
 										parameter),
-									method);
+									method,
+									skipMatcherInitialization: assignment,
+									allowNonOverridable: allowNonOverridableLastProperty);
 						return;
 					}
 
@@ -320,9 +314,14 @@ namespace Moq
 			// we "upgrade" to the derived property.
 			if (property.DeclaringType != expression.Expression.Type)
 			{
-				var derivedProperty = expression.Expression.Type.GetProperty(property.Name, BindingFlags.Public | BindingFlags.NonPublic | BindingFlags.Instance);
-				if (derivedProperty != null && derivedProperty.GetMethod.GetBaseDefinition() == property.GetMethod)
+				var derivedProperty = expression.Expression.Type
+					.GetMember(property.Name, MemberTypes.Property, BindingFlags.Public | BindingFlags.NonPublic | BindingFlags.Instance)
+					.Cast<PropertyInfo>()
+					.SingleOrDefault(p => p.PropertyType == property.PropertyType);
+				if (derivedProperty != null)
 				{
+					if ((derivedProperty.CanRead(out var getter) && getter.GetBaseDefinition() == property.GetGetMethod(true)) ||
+						(derivedProperty.CanWrite(out var setter) && setter.GetBaseDefinition() == property.GetSetMethod(true)))
 					return derivedProperty;
 				}
 			}
@@ -403,26 +402,17 @@ namespace Moq
 
 		private static bool PartialMatcherAwareEval_ShouldEvaluate(Expression expression)
 		{
-			switch (expression.NodeType)
-			{
-				case ExpressionType.Parameter:
-					return false;
-
-				case ExpressionType.Extension:
-					return !(expression is MatchExpression);
-
 #pragma warning disable 618
-				case ExpressionType.Call:
-					return !((MethodCallExpression)expression).Method.IsDefined(typeof(MatcherAttribute), true)
-						&& !expression.IsMatch(out _);
+			return expression.NodeType switch
+			{
+				ExpressionType.Parameter    => false,
+				ExpressionType.Extension    => !(expression is MatchExpression),
+				ExpressionType.Call         => !((MethodCallExpression)expression).Method.IsDefined(typeof(MatcherAttribute), true)
+				                               && !expression.IsMatch(out _),
+				ExpressionType.MemberAccess => !expression.IsMatch(out _),
+				_                           => true,
+			};
 #pragma warning restore 618
-
-				case ExpressionType.MemberAccess:
-					return !expression.IsMatch(out _);
-
-				default:
-					return true;
-			}
 		}
 
 		/// <devdoc>

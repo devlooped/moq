@@ -1,4 +1,4 @@
-// Copyright (c) 2007, Clarius Consulting, Manas Technology Solutions, InSTEDD.
+// Copyright (c) 2007, Clarius Consulting, Manas Technology Solutions, InSTEDD, and Contributors.
 // All rights reserved. Licensed under the BSD 3-Clause License; see License.txt.
 
 using System;
@@ -80,7 +80,7 @@ namespace Moq.Tests
 		}
 
 		[Fact]
-		public void ThrowsWithTargetTypeName()
+		public void ThrowsWithMockedTypeName()
 		{
 			var bag = new Mock<IBag>();
 			var foo = bag.As<IFoo>();
@@ -185,6 +185,26 @@ namespace Moq.Tests
 			var valueOfSetupMethod = ((IService)mock.Object).GetValue();
 			Assert.Equal(3, valueOfSetupMethod);
 		}
+
+		[Fact]
+		public void As_mocked_type_returns_original_mock()
+		{
+			Mock<A> mock = new Mock<A>();
+			Assert.Same(mock, mock.As<A>());
+		}
+
+		[Fact]
+		public void Can_roundtrip_to_original_interface_mock_via_Mock_Get_and_As_original_interface()
+		{
+			Mock<B> bMockOriginal = new Mock<B>();
+			A a = bMockOriginal.Object;
+			Mock<A> aMock = Mock.Get(a);
+			Mock<B> bMockRoundtripped = aMock.As<B>();
+			Assert.Same(bMockOriginal, bMockRoundtripped);
+		}
+
+		public interface A { }
+		public interface B : A { }
 
 		public class Service : IService
 		{

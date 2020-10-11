@@ -1,4 +1,4 @@
-// Copyright (c) 2007, Clarius Consulting, Manas Technology Solutions, InSTEDD.
+// Copyright (c) 2007, Clarius Consulting, Manas Technology Solutions, InSTEDD, and Contributors.
 // All rights reserved. Licensed under the BSD 3-Clause License; see License.txt.
 
 using System;
@@ -10,30 +10,27 @@ using System.Linq.Expressions;
 using System.Reflection;
 using System.Text;
 
+using Moq.Behaviors;
 using Moq.Properties;
 
 namespace Moq
 {
 	internal sealed partial class MethodCall : SetupWithOutParameterSupport
 	{
-		private Response afterReturnCallbackResponse;
-		private Response callbackResponse;
-		private LimitInvocationCountResponse limitInvocationCountResponse;
+		private LimitInvocationCount limitInvocationCount;
+		private Behavior callback;
+		private Behavior raiseEvent;
+		private Behavior returnOrThrow;
+		private Behavior afterReturnCallback;
 		private Condition condition;
 		private string failMessage;
-		private Flags flags;
-		private Mock mock;
-		private RaiseEventResponse raiseEventResponse;
-		private Response returnOrThrowResponse;
 
 		private string declarationSite;
 
-		public MethodCall(Mock mock, Condition condition, InvocationShape expectation)
-			: base(expectation)
+		public MethodCall(Expression originalExpression, Mock mock, Condition condition, InvocationShape expectation)
+			: base(originalExpression, mock, expectation)
 		{
 			this.condition = condition;
-			this.flags = expectation.Method.ReturnType != typeof(void) ? Flags.MethodIsNonVoid : 0;
-			this.mock = mock;
 
 			if ((mock.Switches & Switches.CollectDiagnosticFileInfoForSetups) != 0)
 			{
@@ -46,11 +43,7 @@ namespace Moq
 			get => this.failMessage;
 		}
 
-		public Mock Mock => this.mock;
-
 		public override Condition Condition => this.condition;
-
-		public override bool IsVerifiable => (this.flags & Flags.Verifiable) != 0;
 
 		private static string GetUserCodeCallSite()
 		{
@@ -89,50 +82,38 @@ namespace Moq
 			return null;
 		}
 
-		public override void Execute(Invocation invocation)
+		protected override void ExecuteCore(Invocation invocation)
 		{
-			this.flags |= Flags.Invoked;
+			this.limitInvocationCount?.Execute(invocation);
 
-			this.limitInvocationCountResponse?.RespondTo(invocation);
+			this.callback?.Execute(invocation);
 
-			this.callbackResponse?.RespondTo(invocation);
+			this.raiseEvent?.Execute(invocation);
 
-			if ((this.flags & Flags.CallBase) != 0)
+			if (this.returnOrThrow != null)
 			{
-				invocation.ReturnBase();
+				this.returnOrThrow.Execute(invocation);
 			}
-
-			this.raiseEventResponse?.RespondTo(invocation);
-
-			this.returnOrThrowResponse?.RespondTo(invocation);
-
-			if ((this.flags & Flags.MethodIsNonVoid) != 0)
+			else if (invocation.Method.ReturnType != typeof(void))
 			{
-				if (this.returnOrThrowResponse == null)
+				if (this.Mock.Behavior == MockBehavior.Strict)
 				{
-					if (this.Mock.Behavior == MockBehavior.Strict)
-					{
-						throw MockException.ReturnValueRequired(invocation);
-					}
-					else
-					{
-						// Instead of duplicating the entirety of `Return`'s implementation,
-						// let's just call it here. This is permissible only if the inter-
-						// ception pipeline will terminate right away (otherwise `Return`
-						// might be executed a second time).
-						Return.Handle(invocation, this.Mock);
-					}
+					throw MockException.ReturnValueRequired(invocation);
 				}
-
-				this.afterReturnCallbackResponse?.RespondTo(invocation);
+				else
+				{
+					new ReturnBaseOrDefaultValue(this.Mock).Execute(invocation);
+				}
 			}
+
+			this.afterReturnCallback?.Execute(invocation);
 		}
 
 		public override bool TryGetReturnValue(out object returnValue)
 		{
-			if (this.returnOrThrowResponse is ReturnEagerValueResponse revs)
+			if (this.returnOrThrow is ReturnValue rv)
 			{
-				returnValue = revs.Value;
+				returnValue = rv.Value;
 				return true;
 			}
 			else
@@ -142,43 +123,36 @@ namespace Moq
 			}
 		}
 
-		public void SetCallBaseResponse()
+		public void SetCallBaseBehavior()
 		{
-			if (this.Mock.TargetType.IsDelegateType())
+			if (this.Mock.MockedType.IsDelegateType())
 			{
 				throw new NotSupportedException(Resources.CallBaseCannotBeUsedWithDelegateMocks);
 			}
 
-			if ((this.flags & Flags.MethodIsNonVoid) != 0)
-			{
-				this.returnOrThrowResponse = ReturnBaseResponse.Instance;
-			}
-			else
-			{
-				this.flags |= Flags.CallBase;
-			}
+			this.returnOrThrow = ReturnBase.Instance;
 		}
 
-		public void SetCallbackResponse(Delegate callback)
+		public void SetCallbackBehavior(Delegate callback)
 		{
 			if (callback == null)
 			{
 				throw new ArgumentNullException(nameof(callback));
 			}
 
-			ref Response response = ref this.returnOrThrowResponse == null ? ref this.callbackResponse
-			                                                               : ref this.afterReturnCallbackResponse;
+			ref Behavior behavior = ref (this.returnOrThrow == null) ? ref this.callback
+			                                                         : ref this.afterReturnCallback;
 
 			if (callback is Action callbackWithoutArguments)
 			{
-				response = new CallbackResponse(args => callbackWithoutArguments());
+				behavior = new Callback(_ => callbackWithoutArguments());
 			}
 			else if (callback.GetType() == typeof(Action<IInvocation>))
 			{
 				// NOTE: Do NOT rewrite the above condition as `callback is Action<IInvocation>`,
 				// because this will also yield true if `callback` is a `Action<object>` and thus
 				// break existing uses of `(object arg) => ...` callbacks!
-				response = new InvocationCallbackResponse((Action<IInvocation>)callback);
+				behavior = new Callback((Action<IInvocation>)callback);
 			}
 			else
 			{
@@ -198,46 +172,51 @@ namespace Moq
 					throw new ArgumentException(Resources.InvalidCallbackNotADelegateWithReturnTypeVoid, nameof(callback));
 				}
 
-				response = new CallbackResponse(args => callback.InvokePreserveStack(args));
+				behavior = new Callback(invocation => callback.InvokePreserveStack(invocation.Arguments));
 			}
 		}
 
-		public void SetRaiseEventResponse<TMock>(Action<TMock> eventExpression, Delegate func)
+		public void SetFailMessage(string failMessage)
+		{
+			this.failMessage = failMessage;
+		}
+
+		public void SetRaiseEventBehavior<TMock>(Action<TMock> eventExpression, Delegate func)
 			where TMock : class
 		{
 			Guard.NotNull(eventExpression, nameof(eventExpression));
 
-			var expression = ExpressionReconstructor.Instance.ReconstructExpression(eventExpression, this.mock.ConstructorArguments);
+			var expression = ExpressionReconstructor.Instance.ReconstructExpression(eventExpression, this.Mock.ConstructorArguments);
 
 			// TODO: validate that expression is for event subscription or unsubscription
 
-			this.raiseEventResponse = new RaiseEventResponse(this.mock, expression, func, null);
+			this.raiseEvent = new RaiseEvent(this.Mock, expression, func, null);
 		}
 
-		public void SetRaiseEventResponse<TMock>(Action<TMock> eventExpression, params object[] args)
+		public void SetRaiseEventBehavior<TMock>(Action<TMock> eventExpression, params object[] args)
 			where TMock : class
 		{
 			Guard.NotNull(eventExpression, nameof(eventExpression));
 
-			var expression = ExpressionReconstructor.Instance.ReconstructExpression(eventExpression, this.mock.ConstructorArguments);
+			var expression = ExpressionReconstructor.Instance.ReconstructExpression(eventExpression, this.Mock.ConstructorArguments);
 
 			// TODO: validate that expression is for event subscription or unsubscription
 
-			this.raiseEventResponse = new RaiseEventResponse(this.mock, expression, null, args);
+			this.raiseEvent = new RaiseEvent(this.Mock, expression, null, args);
 		}
 
-		public void SetEagerReturnsResponse(object value)
+		public void SetReturnValueBehavior(object value)
 		{
-			Debug.Assert((this.flags & Flags.MethodIsNonVoid) != 0);
-			Debug.Assert(this.returnOrThrowResponse == null);
+			Debug.Assert(this.Method.ReturnType != typeof(void));
+			Debug.Assert(this.returnOrThrow == null);
 
-			this.returnOrThrowResponse = new ReturnEagerValueResponse(value);
+			this.returnOrThrow = new ReturnValue(value);
 		}
 
-		public void SetReturnsResponse(Delegate valueFactory)
+		public void SetReturnComputedValueBehavior(Delegate valueFactory)
 		{
-			Debug.Assert((this.flags & Flags.MethodIsNonVoid) != 0);
-			Debug.Assert(this.returnOrThrowResponse == null);
+			Debug.Assert(this.Method.ReturnType != typeof(void));
+			Debug.Assert(this.returnOrThrow == null);
 
 			if (valueFactory == null)
 			{
@@ -247,7 +226,7 @@ namespace Moq
 				// and instead of in `Returns(TResult)`, we ended up in `Returns(Delegate)` or `Returns(Func)`,
 				// which likely isn't what the user intended.
 				// So here we do what we would've done in `Returns(TResult)`:
-				this.returnOrThrowResponse = new ReturnEagerValueResponse(this.Method.ReturnType.GetDefaultValue());
+				this.returnOrThrow = new ReturnValue(this.Method.ReturnType.GetDefaultValue());
 			}
 			else if (this.Method.ReturnType == typeof(Delegate))
 			{
@@ -255,19 +234,38 @@ namespace Moq
 				// that returns a `Delegate`, then we have arrived here because C# picked the wrong overload:
 				// We don't want to invoke the passed delegate to get a return value; the passed delegate
 				// already is the return value.
-				this.returnOrThrowResponse = new ReturnEagerValueResponse(valueFactory);
+				this.returnOrThrow = new ReturnValue(valueFactory);
 			}
-			else if (valueFactory.GetType() == typeof(Func<IInvocation, object>))
+			else if (IsInvocationFunc(valueFactory))
 			{
-				// NOTE: Do NOT rewrite the above condition as `valueFactory is Func<IInvocation, object>`,
-				// for similar reasons as noted above in `SetCallbackResponse`. We want to test for this
-				// particular delegate type and no others that may happen to be implicitly convertible to it!
-				this.returnOrThrowResponse = new ReturnInvocationLazyValueResponse((Func<IInvocation, object>)valueFactory);
+				this.returnOrThrow = new ReturnComputedValue(invocation => valueFactory.DynamicInvoke(invocation));
 			}
 			else
 			{
 				ValidateCallback(valueFactory);
-				this.returnOrThrowResponse = new ReturnLazyValueResponse(valueFactory);
+
+				if (valueFactory.CompareParameterTypesTo(Type.EmptyTypes))
+				{
+					// we need this for the user to be able to use parameterless methods
+					this.returnOrThrow = new ReturnComputedValue(invocation => valueFactory.InvokePreserveStack());
+				}
+				else
+				{
+					this.returnOrThrow = new ReturnComputedValue(invocation => valueFactory.InvokePreserveStack(invocation.Arguments));
+				}
+			}
+
+			bool IsInvocationFunc(Delegate callback)
+			{
+				var type = callback.GetType();
+				if (type.IsGenericType && type.GetGenericTypeDefinition() == typeof(Func<,>))
+				{
+					var typeArguments = type.GetGenericArguments();
+					return typeArguments[0] == typeof(IInvocation)
+						&& (typeArguments[1] == typeof(object) || this.Method.ReturnType.IsAssignableFrom(typeArguments[1]));
+				}
+
+				return false;
 			}
 
 			void ValidateCallback(Delegate callback)
@@ -326,36 +324,19 @@ namespace Moq
 			}
 		}
 
-		public void SetThrowExceptionResponse(Exception exception)
+		public void SetThrowExceptionBehavior(Exception exception)
 		{
-			this.returnOrThrowResponse = new ThrowExceptionResponse(exception);
+			this.returnOrThrow = new ThrowException(exception);
 		}
 
-		public override MockException TryVerifyAll()
+		protected override void ResetCore()
 		{
-			return (this.flags & Flags.Invoked) == 0 ? MockException.UnmatchedSetup(this) : null;
-		}
-
-		public override void Uninvoke()
-		{
-			this.flags &= ~Flags.Invoked;
-			this.limitInvocationCountResponse?.Reset();
-		}
-
-		public void Verifiable()
-		{
-			this.flags |= Flags.Verifiable;
-		}
-
-		public void Verifiable(string failMessage)
-		{
-			this.flags |= Flags.Verifiable;
-			this.failMessage = failMessage;
+			this.limitInvocationCount?.Reset();
 		}
 
 		public void AtMost(int count)
 		{
-			this.limitInvocationCountResponse = new LimitInvocationCountResponse(this, count);
+			this.limitInvocationCount = new LimitInvocationCount(this, count);
 		}
 
 		public override string ToString()
@@ -375,216 +356,6 @@ namespace Moq
 			}
 
 			return message.ToString().Trim();
-		}
-
-		[Flags]
-		private enum Flags : byte
-		{
-			CallBase = 1,
-			Invoked = 2,
-			MethodIsNonVoid = 4,
-			Verifiable = 8,
-		}
-
-		private sealed class LimitInvocationCountResponse
-		{
-			private readonly MethodCall setup;
-			private readonly int maxCount;
-			private int count;
-
-			public LimitInvocationCountResponse(MethodCall setup, int maxCount)
-			{
-				this.setup = setup;
-				this.maxCount = maxCount;
-				this.count = 0;
-			}
-
-			public void Reset()
-			{
-				this.count = 0;
-			}
-
-			public void RespondTo(Invocation invocation)
-			{
-				++this.count;
-
-				if (this.count > this.maxCount)
-				{
-					if (this.maxCount == 1)
-					{
-						throw MockException.MoreThanOneCall(this.setup, this.count);
-					}
-					else
-					{
-						throw MockException.MoreThanNCalls(this.setup, this.maxCount, this.count);
-					}
-				}
-			}
-		}
-
-		private abstract class Response
-		{
-			protected Response()
-			{
-			}
-
-			public abstract void RespondTo(Invocation invocation);
-		}
-
-		private sealed class CallbackResponse : Response
-		{
-			private readonly Action<object[]> callback;
-
-			public CallbackResponse(Action<object[]> callback)
-			{
-				Debug.Assert(callback != null);
-
-				this.callback = callback;
-			}
-
-			public override void RespondTo(Invocation invocation)
-			{
-				this.callback.Invoke(invocation.Arguments);
-			}
-		}
-
-		private sealed class InvocationCallbackResponse : Response
-		{
-			private readonly Action<IInvocation> callback;
-
-			public InvocationCallbackResponse(Action<IInvocation> callback)
-			{
-				Debug.Assert(callback != null);
-
-				this.callback = callback;
-			}
-
-			public override void RespondTo(Invocation invocation)
-			{
-				this.callback.Invoke(invocation);
-			}
-		}
-
-		private sealed class ReturnBaseResponse : Response
-		{
-			public static readonly ReturnBaseResponse Instance = new ReturnBaseResponse();
-
-			private ReturnBaseResponse()
-			{
-			}
-
-			public override void RespondTo(Invocation invocation)
-			{
-				invocation.ReturnBase();
-			}
-		}
-
-		private sealed class ReturnEagerValueResponse : Response
-		{
-			public readonly object Value;
-
-			public ReturnEagerValueResponse(object value)
-			{
-				this.Value = value;
-			}
-
-			public override void RespondTo(Invocation invocation)
-			{
-				invocation.Return(this.Value);
-			}
-		}
-
-		private sealed class ReturnInvocationLazyValueResponse : Response
-		{
-			private readonly Func<IInvocation, object> valueFactory;
-
-			public ReturnInvocationLazyValueResponse(Func<IInvocation, object> valueFactory)
-			{
-				Debug.Assert(valueFactory != null);
-
-				this.valueFactory = valueFactory;
-			}
-
-			public override void RespondTo(Invocation invocation)
-			{
-				invocation.Return(this.valueFactory.Invoke(invocation));
-			}
-		}
-
-		private sealed class ReturnLazyValueResponse : Response
-		{
-			private readonly Delegate valueFactory;
-
-			public ReturnLazyValueResponse(Delegate valueFactory)
-			{
-				this.valueFactory = valueFactory;
-			}
-
-			public override void RespondTo(Invocation invocation)
-			{
-				invocation.Return(this.valueFactory.CompareParameterTypesTo(Type.EmptyTypes)
-					? valueFactory.InvokePreserveStack()                //we need this, for the user to be able to use parameterless methods
-					: valueFactory.InvokePreserveStack(invocation.Arguments)); //will throw if parameters mismatch
-			}
-		}
-
-		private sealed class ThrowExceptionResponse : Response
-		{
-			private readonly Exception exception;
-
-			public ThrowExceptionResponse(Exception exception)
-			{
-				this.exception = exception;
-			}
-
-			public override void RespondTo(Invocation invocation)
-			{
-				throw this.exception;
-			}
-		}
-
-		private sealed class RaiseEventResponse
-		{
-			private Mock mock;
-			private LambdaExpression expression;
-			private Delegate eventArgsFunc;
-			private object[] eventArgsParams;
-
-			public RaiseEventResponse(Mock mock, LambdaExpression expression, Delegate eventArgsFunc, object[] eventArgsParams)
-			{
-				Debug.Assert(mock != null);
-				Debug.Assert(expression != null);
-				Debug.Assert(eventArgsFunc != null ^ eventArgsParams != null);
-
-				this.mock = mock;
-				this.expression = expression;
-				this.eventArgsFunc = eventArgsFunc;
-				this.eventArgsParams = eventArgsParams;
-			}
-
-			public void RespondTo(Invocation invocation)
-			{
-				object[] args;
-
-				if (this.eventArgsParams != null)
-				{
-					args = this.eventArgsParams;
-				}
-				else
-				{
-					var argsFuncType = this.eventArgsFunc.GetType();
-					if (argsFuncType.IsGenericType && argsFuncType.GetGenericArguments().Length == 1)
-					{
-						args = new object[] { this.mock.Object, this.eventArgsFunc.InvokePreserveStack() };
-					}
-					else
-					{
-						args = new object[] { this.mock.Object, this.eventArgsFunc.InvokePreserveStack(invocation.Arguments) };
-					}
-				}
-
-				Mock.RaiseEvent(this.mock, this.expression, this.expression.Split(), args);
-			}
 		}
 	}
 }

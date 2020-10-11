@@ -16,7 +16,7 @@
 		<RootNamespace>Moq</RootNamespace>
 		<TreatWarningsAsErrors>true</TreatWarningsAsErrors>
 		<WarningLevel>4</WarningLevel>
-		<LangVersion>7.3</LangVersion>
+		<LangVersion>8.0</LangVersion>
 	</PropertyGroup>
 
 	<PropertyGroup>
@@ -32,21 +32,16 @@
 		<NoPackageAnalysis>True</NoPackageAnalysis>
 		<PackageOutputPath>$(OutputDirectory)</PackageOutputPath>
 		<PackageTags>moq;tdd;mocking;mocks;unittesting;agile;unittest</PackageTags>
+		<PackageProjectUrl>https://github.com/moq/moq4</PackageProjectUrl>
 		<RepositoryUrl>https://github.com/moq/moq4</RepositoryUrl>
 		<IncludeSymbols>True</IncludeSymbols>
 		<SymbolPackageFormat>snupkg</SymbolPackageFormat>
 	</PropertyGroup>
 
-	<PropertyGroup Condition=" '$(TargetFramework)' == 'net45' ">
-		<DefineConstants>$(DefineConstants);FEATURE_CAS;FEATURE_COM</DefineConstants>
-	</PropertyGroup>
-	<PropertyGroup Condition=" '$(TargetFramework)' == 'netstandard2.0' ">
-		<DefineConstants>$(DefineConstants)</DefineConstants>
-	</PropertyGroup>
-
 	<ItemGroup>
 		<PackageReference Include="Castle.Core" Version="4.4.0" />
 		<PackageReference Include="IFluentInterface" Version="2.1.0" PrivateAssets="All" />
+		<PackageReference Include="Microsoft.NETFramework.ReferenceAssemblies" Version="1.0.0" PrivateAssets="All" />
 		<PackageReference Include="System.Threading.Tasks.Extensions" Version="4.5.1" />
 		<PackageReference Include="TypeNameFormatter.Sources" Version="1.0.0" PrivateAssets="All" />
 	</ItemGroup>

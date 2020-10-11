@@ -1,4 +1,4 @@
-// Copyright (c) 2007, Clarius Consulting, Manas Technology Solutions, InSTEDD.
+// Copyright (c) 2007, Clarius Consulting, Manas Technology Solutions, InSTEDD, and Contributors.
 // All rights reserved. Licensed under the BSD 3-Clause License; see License.txt.
 
 using System;
@@ -6,6 +6,8 @@ using System.Collections.Generic;
 using System.Collections.ObjectModel;
 using System.Diagnostics;
 using System.Linq.Expressions;
+
+using Moq.Expressions.Visitors;
 
 namespace Moq
 {
@@ -184,15 +186,13 @@ namespace Moq
 		{
 			if (x.BindingType == y.BindingType && x.Member == y.Member)
 			{
-				switch (x.BindingType)
+				return x.BindingType switch
 				{
-					case MemberBindingType.Assignment:
-						return this.EqualsMemberAssignment((MemberAssignment)x, (MemberAssignment)y);
-					case MemberBindingType.MemberBinding:
-						return this.EqualsMemberMemberBinding((MemberMemberBinding)x, (MemberMemberBinding)y);
-					case MemberBindingType.ListBinding:
-						return this.EqualsMemberListBinding((MemberListBinding)x, (MemberListBinding)y);
-				}
+					MemberBindingType.Assignment    => this.EqualsMemberAssignment((MemberAssignment)x, (MemberAssignment)y),
+					MemberBindingType.MemberBinding => this.EqualsMemberMemberBinding((MemberMemberBinding)x, (MemberMemberBinding)y),
+					MemberBindingType.ListBinding   => this.EqualsMemberListBinding((MemberListBinding)x, (MemberListBinding)y),
+					_                               => throw new ArgumentOutOfRangeException(nameof(x)),
+				};
 			}
 
 			return false;
@@ -200,7 +200,21 @@ namespace Moq
 
 		private bool EqualsMember(MemberExpression x, MemberExpression y)
 		{
-			return x.Member == y.Member && this.Equals(x.Expression, y.Expression);
+			// If any of the two nodes represents an access to a captured variable,
+			// we want to compare its value, not its identity. (`EvaluateCaptures` is
+			// a no-op in all other cases, so it is safe to apply "just in case".)
+			var rx = x.Apply(EvaluateCaptures.Rewriter);
+			var ry = y.Apply(EvaluateCaptures.Rewriter);
+
+			if (rx == x && ry == y)
+			{
+				return x.Member == y.Member && this.Equals(x.Expression, y.Expression);
+			}
+			else
+			{
+				// Rewriting occurred, we might no longer have two `MemberExpression`s:
+				return this.Equals(rx, ry);
+			}
 		}
 
 		private bool EqualsMemberInit(MemberInitExpression x, MemberInitExpression y)

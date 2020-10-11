@@ -1,4 +1,4 @@
-// Copyright (c) 2007, Clarius Consulting, Manas Technology Solutions, InSTEDD.
+// Copyright (c) 2007, Clarius Consulting, Manas Technology Solutions, InSTEDD, and Contributors.
 // All rights reserved. Licensed under the BSD 3-Clause License; see License.txt.
 
 using System.Collections.Generic;
@@ -118,6 +118,56 @@ namespace Moq.Tests
 			return method.GetParameterTypeList();
 		}
 
+		[Fact]
+		public void CanRead_returns_false_for_true_write_only_property()
+		{
+			var property = typeof(WithWriteOnlyProperty).GetProperty("Property");
+			Assert.False(property.CanRead(out var getter));
+			Assert.Null(getter);
+		}
+
+		[Fact]
+		public void CanRead_identifies_getter_in_true_read_only_property()
+		{
+			var property = typeof(WithReadOnlyProperty).GetProperty("Property");
+			Assert.True(property.CanRead(out var getter));
+			Assert.Equal(typeof(WithReadOnlyProperty), getter.DeclaringType);
+		}
+
+		[Fact]
+		public void CanRead_identifies_getter_when_declared_in_base_class()
+		{
+			var property = typeof(OverridesOnlySetter).GetProperty("Property");
+			Assert.False(property.CanRead);
+			Assert.True(property.CanRead(out var getter));
+			Assert.Equal(typeof(WithAutoProperty), getter.DeclaringType);
+		}
+
+		[Fact]
+		public void CanWrite_returns_false_for_true_read_only_property()
+		{
+			var property = typeof(WithReadOnlyProperty).GetProperty("Property");
+			Assert.False(property.CanWrite(out var setter));
+			Assert.Null(setter);
+		}
+
+		[Fact]
+		public void CanWrite_identifies_setter_in_true_write_only_property()
+		{
+			var property = typeof(WithWriteOnlyProperty).GetProperty("Property");
+			Assert.True(property.CanWrite(out var setter));
+			Assert.Equal(typeof(WithWriteOnlyProperty), setter.DeclaringType);
+		}
+
+		[Fact]
+		public void CanWrite_identifies_setter_when_declared_in_base_class()
+		{
+			var property = typeof(OverridesOnlyGetter).GetProperty("Property");
+			Assert.False(property.CanWrite);
+			Assert.True(property.CanWrite(out var setter));
+			Assert.Equal(typeof(WithAutoProperty), setter.DeclaringType);
+		}
+
 		public interface IMethods
 		{
 			void Empty();
@@ -127,6 +177,31 @@ namespace Moq.Tests
 			void RefInt(ref int arg1);
 			void OutInt(out int arg1);
 			void BoolAndParamsString(bool arg1, params string[] arg2);
+		}
+
+		public class WithReadOnlyProperty
+		{
+			public virtual object Property => null;
+		}
+
+		public class WithWriteOnlyProperty
+		{
+			public virtual object Property { set { } }
+		}
+
+		public class WithAutoProperty
+		{
+			public virtual object Property { get; set; }
+		}
+
+		public class OverridesOnlyGetter : WithAutoProperty
+		{
+			public override object Property { get => base.Property; }
+		}
+
+		public class OverridesOnlySetter : WithAutoProperty
+		{
+			public override object Property { set => base.Property = value; }
 		}
 	}
 

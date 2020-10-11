@@ -1,4 +1,4 @@
-// Copyright (c) 2007, Clarius Consulting, Manas Technology Solutions, InSTEDD.
+// Copyright (c) 2007, Clarius Consulting, Manas Technology Solutions, InSTEDD, and Contributors.
 // All rights reserved. Licensed under the BSD 3-Clause License; see License.txt.
 
 using System;
@@ -176,6 +176,23 @@ namespace Moq
 		}
 
 		/// <summary>
+		///   Matches any value that equals the <paramref name="value"/> using the <paramref name="comparer"/>.
+		///   To use the default comparer for the specified object, specify the value inline,
+		///   i.e. <code>mock.Verify(service => service.DoWork(value))</code>.
+		///   <para>
+		///     Use this overload when you specify a value and a comparer.
+		///   </para>
+		/// </summary>
+		/// <param name="value">The value to match with.</param>
+		/// <param name="comparer">An <see cref="IEqualityComparer{T}"/> with which the values should be compared.</param>
+		/// <typeparam name="TValue">Type of the argument to check.</typeparam>
+		[EditorBrowsable(EditorBrowsableState.Advanced)]
+		public static TValue Is<TValue>(TValue value, IEqualityComparer<TValue> comparer)
+		{
+			return Match.Create<TValue>(actual => comparer.Equals(actual, value), () => It.Is<TValue>(value, comparer));
+		}
+
+		/// <summary>
 		///   Matches any value that is in the range specified.
 		/// </summary>
 		/// <param name="from">The lower bound of the range.</param>
@@ -238,6 +255,17 @@ namespace Moq
 		///   Matches any value that is present in the sequence specified.
 		/// </summary>
 		/// <param name="items">The sequence of possible values.</param>
+		/// <param name="comparer">An <see cref="IEqualityComparer{T}"/> with which the values should be compared.</param>
+		/// <typeparam name="TValue">Type of the argument to check.</typeparam>
+		public static TValue IsIn<TValue>(IEnumerable<TValue> items, IEqualityComparer<TValue> comparer)
+		{
+			return Match<TValue>.Create(value => items.Contains(value, comparer), () => It.IsIn(items, comparer));
+		}
+
+		/// <summary>
+		///   Matches any value that is present in the sequence specified.
+		/// </summary>
+		/// <param name="items">The sequence of possible values.</param>
 		/// <typeparam name="TValue">Type of the argument to check.</typeparam>
 		/// <example>
 		///   The following example shows how to expect a method call with an integer argument
@@ -274,6 +302,17 @@ namespace Moq
 		public static TValue IsNotIn<TValue>(IEnumerable<TValue> items)
 		{
 			return Match<TValue>.Create(value => !items.Contains(value), () => It.IsNotIn(items));
+		}
+
+		/// <summary>
+		///   Matches any value that is not found in the sequence specified.
+		/// </summary>
+		/// <param name="items">The sequence of disallowed values.</param>
+		/// <param name="comparer">An <see cref="IEqualityComparer{T}"/> with which the values should be compared.</param>
+		/// <typeparam name="TValue">Type of the argument to check.</typeparam>
+		public static TValue IsNotIn<TValue>(IEnumerable<TValue> items, IEqualityComparer<TValue> comparer)
+		{
+			return Match<TValue>.Create(value => !items.Contains(value, comparer), () => It.IsNotIn(items, comparer));
 		}
 
 		/// <summary>
