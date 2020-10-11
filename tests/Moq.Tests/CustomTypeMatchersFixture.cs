@@ -278,15 +278,11 @@ namespace Moq.Tests
 
 			public new bool Equals(object x, object y)
 			{
-				Debug.Assert(x is string && y is string);
-
 				return InternalComparer.Equals((string)x, (string)y);
 			}
 
 			public int GetHashCode(object obj)
 			{
-				Debug.Assert(obj is string);
-
 				return InternalComparer.GetHashCode((string)obj);
 			}
 		}
