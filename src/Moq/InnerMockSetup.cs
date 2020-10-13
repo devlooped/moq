@@ -35,5 +35,11 @@ namespace Moq
 		{
 			this.InnerMock.MutableSetups.Reset();
 		}
+
+		protected override bool TryVerifySelf(out MockException error)
+		{
+			error = null;
+			return true;
+		}
 	}
 }
