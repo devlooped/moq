@@ -151,7 +151,7 @@ namespace Moq.Linq
 
 			protected override Expression VisitMember(MemberExpression node)
 			{
-				if (node.Expression is ParameterExpression pe && pe.Type.IsDefined(typeof(CompilerGeneratedAttribute)))
+				if (node.Expression is ParameterExpression pe && pe.Type.IsDefined(typeof(CompilerGeneratedAttribute)) && pe.Type.Name.Contains("f__AnonymousType"))
 				{
 					// In LINQ query expressions with more than one `from` clause such as:
 					//
