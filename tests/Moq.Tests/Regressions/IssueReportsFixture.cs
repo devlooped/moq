@@ -3488,6 +3488,30 @@ namespace Moq.Tests.Regressions
 
 		#endregion
 
+		#region 1073
+
+		public class Issue1073
+		{
+			[Fact]
+			public void Test()
+			{
+				var mock = new Mock<IClassA>();
+				mock.Setup(x => x.Items.Count).Returns(1);  // not verifiable, but won't be invoked
+				mock.Setup(x => x.Method()).Verifiable();   // verifiable, and will be invoked
+
+				mock.Object.Method();
+
+				mock.Verify();
+			}
+			public interface IClassA
+			{
+				public IList<string> Items { get; set; }
+				public void Method();
+			}
+		}
+
+		#endregion
+
 		// Old @ Google Code
 
 		#region #47
