@@ -118,23 +118,15 @@ namespace Moq.Tests
 		{
 			var mock = new Mock<IComparable>();
 			var exception = new Exception("Message");
-			var exceptionThrownAndHandled = false;
 			mock.Setup(c => c.CompareTo(It.IsAny<object>())).Throws(exception);
 
-			try
-			{
-				mock.Object.CompareTo(null);
-			}
-			catch (Exception thrown)
-			{
-				Assert.Equal(exception.Message, thrown.Message);
-				var invocation = mock.Invocations[0];
+			var thrown = Assert.Throws<Exception>(() => mock.Object.CompareTo(null));
+			
+			Assert.Equal(exception.Message, thrown.Message);
 
-				Assert.Same(thrown, invocation.Exception);
-				exceptionThrownAndHandled = true;
-			}
+			var invocation = mock.Invocations[0];
+			Assert.Same(thrown, invocation.Exception);
 
-			Assert.True(exceptionThrownAndHandled);
 		}
 
 		[Fact]
@@ -157,46 +149,28 @@ namespace Moq.Tests
 			{
 				CallBase = true,
 			};
-			var exceptionThrownAndHandled = false;
 
-			try
-			{
-				mock.Object.ThrowingVirtualMethod();
-			}
-			catch (Exception thrown)
-			{
-				Assert.Equal("Message", thrown.Message);
-				var invocation = mock.Invocations[0];
+			var thrown = Assert.Throws<Exception>(() => mock.Object.ThrowingVirtualMethod());
 
-				Assert.Same(thrown, invocation.Exception);
-				exceptionThrownAndHandled = true;
-			}
+			Assert.Equal("Message", thrown.Message);
 
-			Assert.True(exceptionThrownAndHandled);
+			var invocation = mock.Invocations[0];
+			Assert.Same(thrown, invocation.Exception);
 		}
 
 		[Fact]
 		public void MockInvocationsIncludeException_MockException()
 		{
 			var mock = new Mock<ICloneable>(MockBehavior.Strict);
-			var exceptionThrownAndHandled = false;
 
-			try
-			{
-				mock.Object.Clone();
-			}
-			catch (MockException thrown)
-			{
-				Assert.Equal(
-@"ICloneable.Clone() invocation failed with mock behavior Strict.
+			var thrown = Assert.Throws<MockException>(() => mock.Object.Clone());
+
+			Assert.Equal(
+		@"ICloneable.Clone() invocation failed with mock behavior Strict.
 All invocations on the mock must have a corresponding setup.", thrown.Message);
-				var invocation = mock.Invocations[0];
 
-				Assert.Same(thrown, invocation.Exception);
-				exceptionThrownAndHandled = true;
-			}
-
-			Assert.True(exceptionThrownAndHandled);
+			var invocation = mock.Invocations[0];
+			Assert.Same(thrown, invocation.Exception);
 		}
 
 		[Fact]
