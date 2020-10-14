@@ -126,7 +126,6 @@ namespace Moq.Tests
 
 			var invocation = mock.Invocations[0];
 			Assert.Same(thrown, invocation.Exception);
-
 		}
 
 		[Fact]
