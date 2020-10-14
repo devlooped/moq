@@ -101,6 +101,15 @@ namespace Moq
 					this.interceptor.Intercept(invocation);
 					underlying.ReturnValue = invocation.ReturnValue;
 				}
+				catch (MockException)
+				{
+					throw;
+				}
+				catch (Exception ex)
+				{
+					invocation.ReturnValue = new InvocationExceptionWrapper(ex);
+					throw;
+				}
 				finally
 				{
 					invocation.DetachFromUnderlying();
@@ -146,8 +155,8 @@ namespace Moq
 			private static bool IsRelevantObjectMethod(MethodInfo method)
 			{
 				return method.DeclaringType == typeof(object) && (method.Name == nameof(object.ToString)
-				                                              ||  method.Name == nameof(object.Equals)
-				                                              ||  method.Name == nameof(object.GetHashCode));
+															  || method.Name == nameof(object.Equals)
+															  || method.Name == nameof(object.GetHashCode));
 			}
 		}
 	}
