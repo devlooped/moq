@@ -151,8 +151,8 @@ namespace Moq
 			private static bool IsRelevantObjectMethod(MethodInfo method)
 			{
 				return method.DeclaringType == typeof(object) && (method.Name == nameof(object.ToString)
-															  || method.Name == nameof(object.Equals)
-															  || method.Name == nameof(object.GetHashCode));
+				                                              || method.Name == nameof(object.Equals)
+				                                              || method.Name == nameof(object.GetHashCode));
 			}
 		}
 	}
