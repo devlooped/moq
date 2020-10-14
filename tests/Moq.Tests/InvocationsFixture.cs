@@ -94,7 +94,7 @@ namespace Moq.Tests
 
 			var invocation = mock.Invocations[0];
 
-			Assert.Equal(534011718, invocation.ReturnValue);
+			Assert.Equal(new Random(Seed: 1).Next(), invocation.ReturnValue);
 			Assert.Null(invocation.Exception);
 		}
 
