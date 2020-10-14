@@ -2,6 +2,8 @@
 // All rights reserved. Licensed under the BSD 3-Clause License; see License.txt.
 
 using System;
+using System.Collections;
+using System.Collections.Generic;
 using System.Linq;
 
 using Xunit;
@@ -97,10 +99,26 @@ namespace Moq.Tests
 		}
 
 		[Fact]
+		public void MockInvocationsIncludeReturnValue_ReturnsException()
+		{
+			var mock = new Mock<ICloneable>();
+			var returnValue = new Exception();
+			mock.Setup(c => c.Clone()).Returns(returnValue);
+
+			mock.Object.Clone();
+
+			var invocation = mock.Invocations[0];
+
+			Assert.Equal(returnValue, invocation.ReturnValue);
+			Assert.Null(invocation.Exception);
+		}
+
+		[Fact]
 		public void MockInvocationsIncludeException_Setup()
 		{
 			var mock = new Mock<IComparable>();
 			var exception = new Exception("Message");
+			var exceptionThrownAndHandled = false;
 			mock.Setup(c => c.CompareTo(It.IsAny<object>())).Throws(exception);
 
 			try
@@ -113,7 +131,22 @@ namespace Moq.Tests
 				var invocation = mock.Invocations[0];
 
 				Assert.Same(thrown, invocation.Exception);
+				exceptionThrownAndHandled = true;
 			}
+
+			Assert.True(exceptionThrownAndHandled);
+		}
+
+		[Fact]
+		public void MockInvocationsIncludeException_BaseCall()
+		{
+			var mock = new Mock<List<int>>()
+			{
+				CallBase = true,
+			};
+
+			Assert.Throws<ArgumentException>(() => mock.Object.GetRange(1, 1));
+			Assert.Empty(mock.Invocations);
 		}
 
 		[Fact]
