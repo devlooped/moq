@@ -4,6 +4,12 @@ All notable changes to this project will be documented in this file.
 
 The format is loosely based on [Keep a Changelog](http://keepachangelog.com/en/1.0.0/).
 
+## Unreleased
+
+#### Fixed
+
+* Setup not triggered due to VB.NET transparently inserting superfluous type conversions into a setup expression (@InteXX, #1067)
+
 
 ## 4.14.6 (2020-09-30)
 

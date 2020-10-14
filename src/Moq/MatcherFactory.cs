@@ -120,8 +120,13 @@ namespace Moq
 			// the values are ints, but if the method to call 
 			// expects, say, a double, a Convert node will be on 
 			// the expression.
+			//
+			// Another case is VB.NET explicitly upcasting generic type parameters to the type they're constrained to,
+			// in places where the constrained-to type is expected. Say you have a parameter with static type `TBase`,
+			// and you're passing `It.IsAny<T>()` where `T : TBase`. VB.NET will then transform this call to
+			// `(TBase)(object)It.IsAny<T>()`.
 			var originalExpression = expression;
-			if (expression.NodeType == ExpressionType.Convert)
+			while (expression.NodeType == ExpressionType.Convert)
 			{
 				expression = ((UnaryExpression)expression).Operand;
 			}
@@ -173,7 +178,7 @@ namespace Moq
 			}
 
 			throw new NotSupportedException(
-				string.Format(CultureInfo.CurrentCulture, Resources.UnsupportedExpression, expression));
+				string.Format(CultureInfo.CurrentCulture, Resources.UnsupportedExpression, originalExpression));
 		}
 	}
 }
