@@ -3451,6 +3451,43 @@ namespace Moq.Tests.Regressions
 
 		#endregion
 
+		#region 1071
+
+		public class Issue1071
+		{
+			public interface IFoo
+			{
+				int Property { get; set; }
+			}
+
+			public interface IBar
+			{
+				IFoo Foo { get; set; }
+			}
+
+			[Fact]
+			public void Property_set_up_with_Mock_Of__is_automatically_stubbed__automatic_inner_mock()
+			{
+				var bar = Mock.Of<IBar>(x => x.Foo.Property == 123);
+				Assert.Equal(123, bar.Foo.Property);
+
+				bar.Foo.Property = 321;
+				Assert.Equal(321, bar.Foo.Property);
+			}
+
+			[Fact]
+			public void Property_set_up_with_Mock_Of_is_automatically_stubbed__manual_inner_mock()
+			{
+				var bar = Mock.Of<IBar>(x => x.Foo == Mock.Of<IFoo>(y => y.Property == 123));
+				Assert.Equal(123, bar.Foo.Property);
+
+				bar.Foo.Property = 321;
+				Assert.Equal(321, bar.Foo.Property);
+			}
+		}
+
+		#endregion
+
 		// Old @ Google Code
 
 		#region #47

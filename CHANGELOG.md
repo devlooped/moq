@@ -6,9 +6,14 @@ The format is loosely based on [Keep a Changelog](http://keepachangelog.com/en/1
 
 ## Unreleased
 
+#### Changed
+
+* Mocks created by `DefaultValue.Mock` now inherit `SetupAllProperties` from their "parent" mock (like it says in the XML documentation) (@stakx, #1074)
+
 #### Fixed
 
 * Setup not triggered due to VB.NET transparently inserting superfluous type conversions into a setup expression (@InteXX, #1067)
+* Nested mocks created by `Mock.Of<T>()` no longer have their properties stubbed since version 4.14.0 (@vruss, @1071)
 
 
 ## 4.14.6 (2020-09-30)
