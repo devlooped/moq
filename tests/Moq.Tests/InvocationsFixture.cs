@@ -146,6 +146,7 @@ namespace Moq.Tests
 			};
 
 			Assert.Throws<ArgumentException>(() => mock.Object.GetRange(1, 1));
+			// Base-call exceptions are not recorded
 			Assert.Empty(mock.Invocations);
 		}
 
