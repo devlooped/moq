@@ -45,9 +45,55 @@ namespace Moq.Tests
 
 			var invocation = mock.Invocations[0];
 
-			var expectedArguments = new[] {obj};
+			var expectedArguments = new[] { obj };
 
 			Assert.Equal(expectedArguments, invocation.Arguments);
+		}
+
+		[Fact]
+		public void MockInvocationsIncludeReturnValue_NoSetup()
+		{
+			var mock = new Mock<IComparable>();
+
+			var obj = new object();
+
+			mock.Object.CompareTo(obj);
+
+			var invocation = mock.Invocations[0];
+
+			Assert.Equal(0, invocation.ReturnValue);
+			Assert.Null(invocation.Exception);
+		}
+
+		[Fact]
+		public void MockInvocationsIncludeReturnValue_Setup()
+		{
+			var mock = new Mock<IComparable>();
+			var obj = new object();
+			mock.Setup(c => c.CompareTo(obj)).Returns(42);
+
+			mock.Object.CompareTo(obj);
+
+			var invocation = mock.Invocations[0];
+
+			Assert.Equal(42, invocation.ReturnValue);
+			Assert.Null(invocation.Exception);
+		}
+
+		[Fact]
+		public void MockInvocationsIncludeReturnValue_BaseCall()
+		{
+			var mock = new Mock<Random>(1) // seed: 1
+			{
+				CallBase = true,
+			};
+
+			mock.Object.Next();
+
+			var invocation = mock.Invocations[0];
+
+			Assert.Equal(534011718, invocation.ReturnValue);
+			Assert.Null(invocation.Exception);
 		}
 
 		[Fact]
