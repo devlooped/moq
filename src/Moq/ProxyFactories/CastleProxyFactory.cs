@@ -101,10 +101,6 @@ namespace Moq
 					this.interceptor.Intercept(invocation);
 					underlying.ReturnValue = invocation.ReturnValue;
 				}
-				catch (MockException)
-				{
-					throw;
-				}
 				catch (Exception ex)
 				{
 					invocation.ReturnValue = new InvocationExceptionWrapper(ex);

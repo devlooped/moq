@@ -176,6 +176,30 @@ namespace Moq.Tests
 		}
 
 		[Fact]
+		public void MockInvocationsIncludeException_MockException()
+		{
+			var mock = new Mock<ICloneable>(MockBehavior.Strict);
+			var exceptionThrownAndHandled = false;
+
+			try
+			{
+				mock.Object.Clone();
+			}
+			catch (MockException thrown)
+			{
+				Assert.Equal(
+@"ICloneable.Clone() invocation failed with mock behavior Strict.
+All invocations on the mock must have a corresponding setup.", thrown.Message);
+				var invocation = mock.Invocations[0];
+
+				Assert.Same(thrown, invocation.Exception);
+				exceptionThrownAndHandled = true;
+			}
+
+			Assert.True(exceptionThrownAndHandled);
+		}
+
+		[Fact]
 		public void MockInvocationsCanBeEnumerated()
 		{
 			var mock = new Mock<IComparable>();
