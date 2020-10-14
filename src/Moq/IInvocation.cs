@@ -1,6 +1,7 @@
 // Copyright (c) 2007, Clarius Consulting, Manas Technology Solutions, InSTEDD, and Contributors.
 // All rights reserved. Licensed under the BSD 3-Clause License; see License.txt.
 
+using System;
 using System.Collections.Generic;
 using System.Reflection;
 
@@ -35,5 +36,13 @@ namespace Moq
 		/// Gets the return value of the invocation.
 		/// </summary>
 		object ReturnValue { get; }
+
+		/// <summary>
+		/// Gets the exception, thrown during the invocation.
+		/// </summary>
+		/// <remarks>
+		/// Returns <see langword="null" /> if no exception was raised.
+		/// </remarks>
+		Exception Exception { get; }
 	}
 }
