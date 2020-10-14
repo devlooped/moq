@@ -97,6 +97,26 @@ namespace Moq.Tests
 		}
 
 		[Fact]
+		public void MockInvocationsIncludeException_Setup()
+		{
+			var mock = new Mock<IComparable>();
+			var exception = new Exception("Message");
+			mock.Setup(c => c.CompareTo(It.IsAny<object>())).Throws(exception);
+
+			try
+			{
+				mock.Object.CompareTo(null);
+			}
+			catch (Exception thrown)
+			{
+				Assert.Equal(exception.Message, thrown.Message);
+				var invocation = mock.Invocations[0];
+
+				Assert.Same(thrown, invocation.Exception);
+			}
+		}
+
+		[Fact]
 		public void MockInvocationsCanBeEnumerated()
 		{
 			var mock = new Mock<IComparable>();
