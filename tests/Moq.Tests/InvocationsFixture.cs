@@ -138,7 +138,7 @@ namespace Moq.Tests
 		}
 
 		[Fact]
-		public void MockInvocationsIncludeException_BaseCall()
+		public void MockInvocationsIncludeException_BaseCall_Nonvirtual()
 		{
 			var mock = new Mock<List<int>>()
 			{
@@ -148,6 +148,31 @@ namespace Moq.Tests
 			Assert.Throws<ArgumentException>(() => mock.Object.GetRange(1, 1));
 			// Base-call exceptions are not recorded
 			Assert.Empty(mock.Invocations);
+		}
+
+		[Fact]
+		public void MockInvocationsIncludeException_BaseCall_Virtual()
+		{
+			var mock = new Mock<Test>()
+			{
+				CallBase = true,
+			};
+			var exceptionThrownAndHandled = false;
+
+			try
+			{
+				mock.Object.ThrowingVirtualMethod();
+			}
+			catch (Exception thrown)
+			{
+				Assert.Equal("Message", thrown.Message);
+				var invocation = mock.Invocations[0];
+
+				Assert.Same(thrown, invocation.Exception);
+				exceptionThrownAndHandled = true;
+			}
+
+			Assert.True(exceptionThrownAndHandled);
 		}
 
 		[Fact]
@@ -368,6 +393,11 @@ namespace Moq.Tests
 			}
 
 			public virtual bool Flag { get; set; }
+		}
+
+		public class Test
+		{
+			public virtual int ThrowingVirtualMethod() => throw new InvalidOperationException("Message");
 		}
 	}
 }
