@@ -165,7 +165,7 @@ namespace Moq.Tests
 			var thrown = Assert.Throws<MockException>(() => mock.Object.Clone());
 
 			Assert.Equal(
-		@"ICloneable.Clone() invocation failed with mock behavior Strict.
+@"ICloneable.Clone() invocation failed with mock behavior Strict.
 All invocations on the mock must have a corresponding setup.", thrown.Message);
 
 			var invocation = mock.Invocations[0];
