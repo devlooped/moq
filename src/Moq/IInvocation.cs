@@ -33,16 +33,13 @@ namespace Moq
 		bool IsVerified { get; }
 
 		/// <summary>
-		/// Gets the return value of the invocation.
+		/// The value being returned for a non-void method if no exception was thrown.
 		/// </summary>
 		object ReturnValue { get; }
 
 		/// <summary>
-		/// Gets the exception, thrown during the invocation.
+		/// Optional exception if the method invocation results in an exception being thrown.
 		/// </summary>
-		/// <remarks>
-		/// Returns <see langword="null" /> if no exception was raised.
-		/// </remarks>
 		Exception Exception { get; }
 	}
 }
