@@ -69,7 +69,6 @@ namespace Moq
 
 		public Type ProxyType => this.proxyType;
 
-		/// <inheritdoc cref="IInvocation.ReturnValue"/>
 		public object ReturnValue
 		{
 			get => this.returnValue is InvocationExceptionWrapper
@@ -82,7 +81,6 @@ namespace Moq
 			}
 		}
 
-		/// <inheritdoc cref="IInvocation.Exception"/>
 		public Exception Exception
 			=> this.returnValue is InvocationExceptionWrapper wrapper
 				? wrapper.Exception
