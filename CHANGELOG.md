@@ -12,6 +12,9 @@ The format is loosely based on [Keep a Changelog](http://keepachangelog.com/en/1
 * Implement It.Is, It.IsIn, It.IsNotIn with a comparer overload (#1059)
 * New property `IInvocation.ReturnValue` to query recorded invocations return values (@MaStr11, #921)
 
+
+## 4.14.7 (2020-10-14)
+
 #### Changed
 
 * Mocks created by `DefaultValue.Mock` now inherit `SetupAllProperties` from their "parent" mock (like it says in the XML documentation) (@stakx, #1074)
