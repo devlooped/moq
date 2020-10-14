@@ -1,6 +1,9 @@
 // Copyright (c) 2007, Clarius Consulting, Manas Technology Solutions, InSTEDD, and Contributors.
 // All rights reserved. Licensed under the BSD 3-Clause License; see License.txt.
 
+using System.Runtime.CompilerServices;
+using System.Runtime.InteropServices;
+
 using Moq.Tests.ComTypes;
 
 using Xunit;
@@ -99,6 +102,51 @@ namespace Moq.Tests
 			var indexer = typeof(IHasIndexer).GetProperty("Item");
 			var setter = indexer.GetSetMethod(true);
 			Assert.True(setter.IsSetAccessor() && setter.IsIndexerAccessor());
+		}
+
+		[Fact]
+		public void Can_create_mock_of_Excel_Workbook_using_Mock_Of_1()
+		{
+			_ = Mock.Of<GoodWorkbook>(workbook => workbook.FullName == "");
+		}
+
+		[Fact]
+		public void Can_create_mock_of_Excel_Workbook_using_Mock_Of_2()
+		{
+			_ = Mock.Of<BadWorkbook>(workbook => workbook.FullName == "");
+		}
+
+		// The following two interfaces are simplified versions of the `_Workbook` interface from
+		// two different versions of the `Microsoft.Office.Excel.Interop` interop assemblies.
+		// Note how they differ only in one `[CompilerGenerated]` attribute.
+
+		[ComImport]
+		[Guid("000208DA-0000-0000-C000-000000000046")]
+		public interface GoodWorkbook
+		{
+			[DispId(289)]
+			string FullName
+			{
+				[DispId(289)]
+				[LCIDConversion(0)]
+				[return: MarshalAs(UnmanagedType.BStr)]
+				get;
+			}
+		}
+
+		[ComImport]
+		[CompilerGenerated]
+		[Guid("000208DA-0000-0000-C000-000000000046")]
+		public interface BadWorkbook
+		{
+			[DispId(289)]
+			string FullName
+			{
+				[DispId(289)]
+				[LCIDConversion(0)]
+				[return: MarshalAs(UnmanagedType.BStr)]
+				get;
+			}
 		}
 	}
 }
