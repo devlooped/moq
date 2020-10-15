@@ -101,6 +101,11 @@ namespace Moq
 					this.interceptor.Intercept(invocation);
 					underlying.ReturnValue = invocation.ReturnValue;
 				}
+				catch (Exception ex)
+				{
+					invocation.ReturnValue = new InvocationExceptionWrapper(ex);
+					throw;
+				}
 				finally
 				{
 					invocation.DetachFromUnderlying();

@@ -10,7 +10,7 @@ The format is loosely based on [Keep a Changelog](http://keepachangelog.com/en/1
 #### Added
 
 * New method overloads for `It.Is`, `It.IsIn`, and `It.IsNotIn` that compare values using a custom `IEqualityComparer<T>` (@weitzhandler, #1064)
-* New property `IInvocation.ReturnValue` to query recorded invocations return values (@MaStr11, #921)
+* New properties `ReturnValue` and `Exception` on `IInvocation` to query recorded invocations return values or exceptions (@MaStr11, #921, #1077)
 
 
 ## 4.14.7 (2020-10-14)

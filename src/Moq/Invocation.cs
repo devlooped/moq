@@ -71,13 +71,20 @@ namespace Moq
 
 		public object ReturnValue
 		{
-			get => this.returnValue;
+			get => this.returnValue is InvocationExceptionWrapper
+				? null
+				: this.returnValue;
 			set
 			{
 				Debug.Assert(this.returnValue == null);
 				this.returnValue = value;
 			}
 		}
+
+		public Exception Exception
+			=> this.returnValue is InvocationExceptionWrapper wrapper
+				? wrapper.Exception
+				: null;
 
 		public bool IsVerified => this.verified;
 

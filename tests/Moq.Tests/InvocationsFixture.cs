@@ -2,6 +2,8 @@
 // All rights reserved. Licensed under the BSD 3-Clause License; see License.txt.
 
 using System;
+using System.Collections;
+using System.Collections.Generic;
 using System.Linq;
 
 using Xunit;
@@ -45,9 +47,114 @@ namespace Moq.Tests
 
 			var invocation = mock.Invocations[0];
 
-			var expectedArguments = new[] {obj};
+			var expectedArguments = new[] { obj };
 
 			Assert.Equal(expectedArguments, invocation.Arguments);
+		}
+
+		[Fact]
+		public void MockInvocationsIncludeReturnValue_NoSetup()
+		{
+			var mock = new Mock<IComparable>();
+
+			var obj = new object();
+
+			mock.Object.CompareTo(obj);
+
+			var invocation = mock.Invocations[0];
+
+			Assert.Equal(0, invocation.ReturnValue);
+			Assert.Null(invocation.Exception);
+		}
+
+		[Fact]
+		public void MockInvocationsIncludeReturnValue_Setup()
+		{
+			var mock = new Mock<IComparable>();
+			var obj = new object();
+			mock.Setup(c => c.CompareTo(obj)).Returns(42);
+
+			mock.Object.CompareTo(obj);
+
+			var invocation = mock.Invocations[0];
+
+			Assert.Equal(42, invocation.ReturnValue);
+			Assert.Null(invocation.Exception);
+		}
+
+		[Fact]
+		public void MockInvocationsIncludeReturnValue_BaseCall()
+		{
+			var mock = new Mock<Random>(1) // seed: 1
+			{
+				CallBase = true,
+			};
+
+			mock.Object.Next();
+
+			var invocation = mock.Invocations[0];
+
+			Assert.Equal(new Random(Seed: 1).Next(), invocation.ReturnValue);
+			Assert.Null(invocation.Exception);
+		}
+
+		[Fact]
+		public void MockInvocationsIncludeReturnValue_ReturnsException()
+		{
+			var mock = new Mock<ICloneable>();
+			var returnValue = new Exception();
+			mock.Setup(c => c.Clone()).Returns(returnValue);
+
+			mock.Object.Clone();
+
+			var invocation = mock.Invocations[0];
+
+			Assert.Equal(returnValue, invocation.ReturnValue);
+			Assert.Null(invocation.Exception);
+		}
+
+		[Fact]
+		public void MockInvocationsIncludeException_Setup()
+		{
+			var mock = new Mock<IComparable>();
+			var exception = new Exception("Message");
+			mock.Setup(c => c.CompareTo(It.IsAny<object>())).Throws(exception);
+
+			var thrown = Assert.Throws<Exception>(() => mock.Object.CompareTo(null));
+
+			Assert.Equal(exception.Message, thrown.Message);
+
+			var invocation = mock.Invocations[0];
+			Assert.Same(thrown, invocation.Exception);
+		}
+
+		[Fact]
+		public void MockInvocationsIncludeException_BaseCall_Virtual()
+		{
+			var mock = new Mock<Test>()
+			{
+				CallBase = true,
+			};
+
+			var thrown = Assert.Throws<InvalidOperationException>(() => mock.Object.ThrowingVirtualMethod());
+
+			Assert.Equal("Message", thrown.Message);
+
+			var invocation = mock.Invocations[0];
+			Assert.Same(thrown, invocation.Exception);
+		}
+
+		[Fact]
+		public void MockInvocationsIncludeException_MockException()
+		{
+			var mock = new Mock<ICloneable>(MockBehavior.Strict);
+
+			var thrown = Assert.Throws<MockException>(() => mock.Object.Clone());
+
+			Assert.Equal(MockExceptionReasons.NoSetup, thrown.Reasons);
+
+			var invocation = mock.Invocations[0];
+			Assert.Same(thrown, invocation.Exception);
 		}
 
 		[Fact]
@@ -268,6 +375,11 @@ namespace Moq.Tests
 			}
 
 			public virtual bool Flag { get; set; }
+		}
+
+		public class Test
+		{
+			public virtual int ThrowingVirtualMethod() => throw new InvalidOperationException("Message");
 		}
 	}
 }
