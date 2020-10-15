@@ -129,19 +129,6 @@ namespace Moq.Tests
 		}
 
 		[Fact]
-		public void MockInvocationsIncludeException_BaseCall_Nonvirtual()
-		{
-			var mock = new Mock<List<int>>()
-			{
-				CallBase = true,
-			};
-
-			Assert.Throws<ArgumentException>(() => mock.Object.GetRange(1, 1));
-			// Base-call exceptions are not recorded
-			Assert.Empty(mock.Invocations);
-		}
-
-		[Fact]
 		public void MockInvocationsIncludeException_BaseCall_Virtual()
 		{
 			var mock = new Mock<Test>()
