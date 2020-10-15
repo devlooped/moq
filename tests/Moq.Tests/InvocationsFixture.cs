@@ -121,7 +121,7 @@ namespace Moq.Tests
 			mock.Setup(c => c.CompareTo(It.IsAny<object>())).Throws(exception);
 
 			var thrown = Assert.Throws<Exception>(() => mock.Object.CompareTo(null));
-			
+
 			Assert.Equal(exception.Message, thrown.Message);
 
 			var invocation = mock.Invocations[0];
@@ -151,9 +151,7 @@ namespace Moq.Tests
 
 			var thrown = Assert.Throws<MockException>(() => mock.Object.Clone());
 
-			Assert.Equal(
-@"ICloneable.Clone() invocation failed with mock behavior Strict.
-All invocations on the mock must have a corresponding setup.", thrown.Message);
+			Assert.Equal(MockExceptionReasons.NoSetup, thrown.Reasons);
 
 			var invocation = mock.Invocations[0];
 			Assert.Same(thrown, invocation.Exception);
