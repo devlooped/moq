@@ -12,6 +12,10 @@ The format is loosely based on [Keep a Changelog](http://keepachangelog.com/en/1
 * New method overloads for `It.Is`, `It.IsIn`, and `It.IsNotIn` that compare values using a custom `IEqualityComparer<T>` (@weitzhandler, #1064)
 * New properties `ReturnValue` and `Exception` on `IInvocation` to query recorded invocations return values or exceptions (@MaStr11, #921, #1077)
 
+#### Fixed
+
+* `SetupProperty` fails if property getter and setter are not both defined in mocked type (@stakx, #1017)
+
 
 ## 4.14.7 (2020-10-14)
 
