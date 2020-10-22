@@ -244,9 +244,21 @@ namespace Moq
 						var parameter = Expression.Parameter(r.Type, r is ParameterExpression ope ? ope.Name : ParameterName);
 						var indexer = indexExpression.Indexer;
 						var arguments = indexExpression.Arguments;
-						var method = !assignment && indexer.CanRead(out var getter)  ? getter
-						           :                indexer.CanWrite(out var setter) ? setter
-						           :                                                   null;
+						MethodInfo method;
+						if (!assignment && indexer.CanRead(out var getter, out var getterIndexer))
+						{
+							method = getter;
+							indexer = getterIndexer;
+						}
+						else if (indexer.CanWrite(out var setter, out var setterIndexer))
+						{
+							method = setter;
+							indexer = setterIndexer;
+						}
+						else  // This should be unreachable.
+						{
+							method = null;
+						}
 						p = new InvocationShape(
 									expression: Expression.Lambda(
 										Expression.MakeIndex(parameter, indexer, arguments),
@@ -281,9 +293,21 @@ namespace Moq
 						r = memberAccessExpression.Expression;
 						var parameter = Expression.Parameter(r.Type, r is ParameterExpression ope ? ope.Name : ParameterName);
 						var property = memberAccessExpression.GetReboundProperty();
-						var method = !assignment && property.CanRead(out var getter)  ? getter
-						           :                property.CanWrite(out var setter) ? setter
-						           :                                                    null;
+						MethodInfo method;
+						if (!assignment && property.CanRead(out var getter, out var getterProperty))
+						{
+							method = getter;
+							property = getterProperty;
+						}
+						else if (property.CanWrite(out var setter, out var setterProperty))
+						{
+							method = setter;
+							property = setterProperty;
+						}
+						else  // This should be unreachable.
+						{
+							method = null;
+						}
 						p = new InvocationShape(
 									expression: Expression.Lambda(
 										Expression.MakeMemberAccess(parameter, property),
