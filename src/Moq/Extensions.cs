@@ -21,10 +21,16 @@ namespace Moq
 
 		public static bool CanRead(this PropertyInfo property, out MethodInfo getter)
 		{
+			return property.CanRead(out getter, out _);
+		}
+
+		public static bool CanRead(this PropertyInfo property, out MethodInfo getter, out PropertyInfo getterProperty)
+		{
 			if (property.CanRead)
 			{
 				// The given `PropertyInfo` should be able to provide a getter:
 				getter = property.GetGetMethod(nonPublic: true);
+				getterProperty = property;
 				Debug.Assert(getter != null);
 				return true;
 			}
@@ -47,20 +53,27 @@ namespace Moq
 						.GetMember(property.Name, MemberTypes.Property, BindingFlags.Public | BindingFlags.NonPublic | BindingFlags.Instance)
 						.Cast<PropertyInfo>()
 						.First(p => p.GetSetMethod(nonPublic: true) == baseSetter);
-					return baseProperty.CanRead(out getter);
+					return baseProperty.CanRead(out getter, out getterProperty);
 				}
 			}
 
 			getter = null;
+			getterProperty = null;
 			return false;
 		}
 
 		public static bool CanWrite(this PropertyInfo property, out MethodInfo setter)
 		{
+			return property.CanWrite(out setter, out _);
+		}
+
+		public static bool CanWrite(this PropertyInfo property, out MethodInfo setter, out PropertyInfo setterProperty)
+		{
 			if (property.CanWrite)
 			{
 				// The given `PropertyInfo` should be able to provide a setter:
 				setter = property.GetSetMethod(nonPublic: true);
+				setterProperty = property;
 				Debug.Assert(setter != null);
 				return true;
 			}
@@ -83,11 +96,12 @@ namespace Moq
 						.GetMember(property.Name, MemberTypes.Property, BindingFlags.Public | BindingFlags.NonPublic | BindingFlags.Instance)
 						.Cast<PropertyInfo>()
 						.First(p => p.GetGetMethod(nonPublic: true) == baseGetter);
-					return baseProperty.CanWrite(out setter);
+					return baseProperty.CanWrite(out setter, out setterProperty);
 				}
 			}
 
 			setter = null;
+			setterProperty = null;
 			return false;
 		}
 
