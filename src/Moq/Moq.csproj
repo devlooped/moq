@@ -27,6 +27,7 @@
 		<Description>Moq is the most popular and friendly mocking framework for .NET.</Description>
 		<PackageReleaseNotes>A changelog is available at https://github.com/moq/moq4/blob/master/CHANGELOG.md.</PackageReleaseNotes>
 		<Authors>Daniel Cazzulino, kzu</Authors>
+		<PackageIcon>moq.png</PackageIcon>
 		<PackageLicenseUrl>https://raw.githubusercontent.com/moq/moq4/master/License.txt</PackageLicenseUrl>
 		<PackageRequireLicenseAcceptance>False</PackageRequireLicenseAcceptance>
 		<NoPackageAnalysis>True</NoPackageAnalysis>
@@ -101,6 +102,10 @@
 			<DesignTime>True</DesignTime>
 			<DependentUpon>ReturnsExtensions.tt</DependentUpon>
 		</Compile>
+	</ItemGroup>
+
+	<ItemGroup>
+		<None Include="$(SolutionDir)moq-icon.png" Pack="true" PackagePath="moq.png" Visible="False" />
 	</ItemGroup>
 
 	<Target Name="Test" />
