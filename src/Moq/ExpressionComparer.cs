@@ -31,6 +31,19 @@ namespace Moq
 				return false;
 			}
 
+			// Before actually comparing two nodes, make sure that captures variables have been
+			// evaluated to their current values (as we don't want to compare their identities):
+
+			if (x is MemberExpression)
+			{
+				x = x.Apply(EvaluateCaptures.Rewriter);
+			}
+
+			if (y is MemberExpression)
+			{
+				y = y.Apply(EvaluateCaptures.Rewriter);
+			}
+
 			if (x.NodeType == y.NodeType)
 			{
 				switch (x.NodeType)
@@ -200,21 +213,7 @@ namespace Moq
 
 		private bool EqualsMember(MemberExpression x, MemberExpression y)
 		{
-			// If any of the two nodes represents an access to a captured variable,
-			// we want to compare its value, not its identity. (`EvaluateCaptures` is
-			// a no-op in all other cases, so it is safe to apply "just in case".)
-			var rx = x.Apply(EvaluateCaptures.Rewriter);
-			var ry = y.Apply(EvaluateCaptures.Rewriter);
-
-			if (rx == x && ry == y)
-			{
-				return x.Member == y.Member && this.Equals(x.Expression, y.Expression);
-			}
-			else
-			{
-				// Rewriting occurred, we might no longer have two `MemberExpression`s:
-				return this.Equals(rx, ry);
-			}
+			return x.Member == y.Member && this.Equals(x.Expression, y.Expression);
 		}
 
 		private bool EqualsMemberInit(MemberInitExpression x, MemberInitExpression y)
