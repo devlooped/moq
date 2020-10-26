@@ -15,6 +15,7 @@ The format is loosely based on [Keep a Changelog](http://keepachangelog.com/en/1
 #### Fixed
 
 * `SetupProperty` fails if property getter and setter are not both defined in mocked type (@stakx, #1017)
+* Expression tree argument not matched when it contains a captured variable &ndash; evaluate all captures to their current values when comparing two expression trees (@QTom01, #1054)
 
 
 ## 4.14.7 (2020-10-14)
