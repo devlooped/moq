@@ -94,19 +94,19 @@ namespace Moq.Tests
 		}
 
 		[Fact]
-		public void Event_subscription__not_recorded__if_CallBase_false()
+		public void Event_subscription__recorded__if_CallBase_false()
 		{
 			var mock = new Mock<HasEvent>();
 			mock.Object.Event += () => { };
-			Assert.Empty(mock.Invocations);
+			Assert.Single(mock.Invocations);
 		}
 
 		[Fact]
-		public void Event_subscription__not_recorded__if_CallBase_true()
+		public void Event_subscription__recorded__if_CallBase_true()
 		{
 			var mock = new Mock<HasEvent>() { CallBase = true };
 			mock.Object.Event += () => { };
-			Assert.Empty(mock.Invocations);
+			Assert.Single(mock.Invocations);
 		}
 
 		[Fact]
@@ -118,20 +118,20 @@ namespace Moq.Tests
 			Assert.Single(mock.Invocations);
 		}
 
-		[Fact]  // this is inconsistent with the usual `VerifyNoOtherCalls` behavior
-		public void VerifyNoOtherCalls__does_not_see_event_subscription__if_CallBase_false()
+		[Fact]
+		public void VerifyNoOtherCalls__sees_event_subscription__if_CallBase_false()
 		{
 			var mock = new Mock<HasEvent>();
 			mock.Object.Event += () => { };
-			mock.VerifyNoOtherCalls();
+			Assert.Throws<MockException>(() => mock.VerifyNoOtherCalls());
 		}
 
-		[Fact]  // this is inconsistent with the usual `VerifyNoOtherCalls` behavior
-		public void VerifyNoOtherCalls__does_not_see_event_subscription__if_CallBase_true()
+		[Fact]
+		public void VerifyNoOtherCalls__sees_event_subscription__if_CallBase_true()
 		{
 			var mock = new Mock<HasEvent>() { CallBase = true };
 			mock.Object.Event += () => { };
-			mock.VerifyNoOtherCalls();
+			Assert.Throws<MockException>(() => mock.VerifyNoOtherCalls());
 		}
 
 		[Fact]
