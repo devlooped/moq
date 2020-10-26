@@ -3451,6 +3451,52 @@ namespace Moq.Tests.Regressions
 
 		#endregion
 
+		#region 1054
+
+		public class Issue1054
+		{
+			// These tests assert that Moq compares the values of captured variables
+			// (as opposed to their identities).
+
+			[Fact]
+			public void String_constant()
+			{
+				var s1 = "example";
+				const string s2 = "example";
+
+				var mock = new Mock<IMockObject>();
+				mock.Setup(x => x.Method(y => y.Id == s1)).Returns("mockResult");
+				var result = mock.Object.Method(x => x.Id == s2);
+
+				Assert.Equal("mockResult", result);
+			}
+
+			[Fact]
+			public void String_variable()
+			{
+				var s1 = "example";
+				var s2 = "example";
+
+				var mock = new Mock<IMockObject>();
+				mock.Setup(x => x.Method(y => y.Id == s1)).Returns("mockResult");
+				var result = mock.Object.Method(x => x.Id == s2);
+
+				Assert.Equal("mockResult", result);
+			}
+
+			public class MyObject
+			{
+				public string Id { get; set; }
+			}
+
+			public interface IMockObject
+			{
+				public string Method(Expression<Func<MyObject, bool>> expression);
+			}
+		}
+
+		#endregion
+
 		#region 1071
 
 		public class Issue1071
