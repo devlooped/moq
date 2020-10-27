@@ -82,15 +82,15 @@ namespace Moq.Tests
 			Assert.True(handled);
 		}
 
-		[Fact]  // this is inconsistent with the above test `Raising_event__using_Raise__does_not_trigger_handler__if_CallBase_true`
-		public void Raising_event__using_Raise__triggers_handler__if_setup_with_CallBase_present()
+		[Fact]
+		public void Raising_event__using_Raise__does_not_trigger_handler__if_setup_with_CallBase_present()
 		{
 			var handled = false;
 			var mock = new Mock<HasEvent>();
 			mock.SetupAdd(m => m.Event += It.IsAny<Action>()).CallBase();
 			mock.Object.Event += () => handled = true;
 			mock.Raise(m => m.Event += null);
-			Assert.True(handled);
+			Assert.False(handled);
 		}
 
 		[Fact]

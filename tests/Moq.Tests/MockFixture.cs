@@ -1279,20 +1279,6 @@ namespace Moq.Tests
 			Assert.Empty(mock.ConfiguredDefaultValues);
 		}
 
-		[Fact]
-		public void Reset_clears_event_setup_flag()
-		{
-			var mock = new Mock<IFoo>();
-			mock.SetupAdd(m => m.EventHandler += It.IsAny<EventHandler>());
-
-			var before = mock.MutableSetups.HasEventSetup;
-			mock.Reset();
-			var after = mock.MutableSetups.HasEventSetup;
-
-			Assert.True(before, "Before reset");
-			Assert.False(after, "After reset");
-		}
-
 #if FEATURE_DYNAMICPROXY_SERIALIZABLE_PROXIES
 		[Serializable]
 		public class BadSerializable : ISerializable

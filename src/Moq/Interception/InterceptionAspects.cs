@@ -132,21 +132,16 @@ namespace Moq
 					var @event = implementingMethod.DeclaringType.GetEvents(bindingFlags).SingleOrDefault(e => e.GetAddMethod(true) == implementingMethod);
 					if (@event != null)
 					{
-						bool doesntHaveEventSetup = !mock.MutableSetups.HasEventSetup;
-
 						if (mock.CallBase && !invocation.Method.IsAbstract)
 						{
-							if (doesntHaveEventSetup)
-							{
-								invocation.ReturnValue = invocation.CallBase();
-							}
+							invocation.ReturnValue = invocation.CallBase();
+							return true;
 						}
 						else if (invocation.Arguments.Length > 0 && invocation.Arguments[0] is Delegate delegateInstance)
 						{
 							mock.EventHandlers.Add(@event, delegateInstance);
+							return true;
 						}
-
-						return doesntHaveEventSetup;
 					}
 				}
 				else if (methodName[0] == 'r' && methodName.Length > 7 && methodName[6] == '_' && invocation.Method.IsEventRemoveAccessor())
@@ -155,21 +150,16 @@ namespace Moq
 					var @event = implementingMethod.DeclaringType.GetEvents(bindingFlags).SingleOrDefault(e => e.GetRemoveMethod(true) == implementingMethod);
 					if (@event != null)
 					{
-						bool doesntHaveEventSetup = !mock.MutableSetups.HasEventSetup;
-
 						if (mock.CallBase && !invocation.Method.IsAbstract)
 						{
-							if (doesntHaveEventSetup)
-							{
-								invocation.ReturnValue = invocation.CallBase();
-							}
+							invocation.ReturnValue = invocation.CallBase();
+							return true;
 						}
 						else if (invocation.Arguments.Length > 0 && invocation.Arguments[0] is Delegate delegateInstance)
 						{
 							mock.EventHandlers.Remove(@event, delegateInstance);
+							return true;
 						}
-
-						return doesntHaveEventSetup;
 					}
 				}
 			}

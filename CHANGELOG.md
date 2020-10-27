@@ -14,7 +14,7 @@ The format is loosely based on [Keep a Changelog](http://keepachangelog.com/en/1
 
 #### Changed
 
-* Event accessor calls (`+=` and `-=`) now get consistently recorded in `Mock.Invocations`. This previously wasn't the case for backwards compatibility with `VerifyNoOtherCalls` (which got implemented before it was possible to check them using `Verify{Add,Remove}`). You now need to explicitly verify expected calls to event accessors prior to `VerifyNoOtherCalls`. Verification of `+=` and `-=` now works regardless of whether or not you set those up (which makes it consistent with how verification usually works). (@80O, @stakx, #1058)
+* Event accessor calls (`+=` and `-=`) now get consistently recorded in `Mock.Invocations`. This previously wasn't the case for backwards compatibility with `VerifyNoOtherCalls` (which got implemented before it was possible to check them using `Verify{Add,Remove}`). You now need to explicitly verify expected calls to event accessors prior to `VerifyNoOtherCalls`. Verification of `+=` and `-=` now works regardless of whether or not you set those up (which makes it consistent with how verification usually works). (@80O, @stakx, #1058, #1084)
 
 #### Fixed
 
