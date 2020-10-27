@@ -105,6 +105,10 @@ namespace Moq
 					new ReturnBaseOrDefaultValue(this.Mock).Execute(invocation);
 				}
 			}
+			else
+			{
+				HandleEventSubscription.Handle(invocation, this.Mock);  // no-op for everything other than event accessors
+			}
 
 			this.afterReturnCallback?.Execute(invocation);
 		}

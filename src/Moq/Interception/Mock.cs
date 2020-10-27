@@ -14,17 +14,17 @@ namespace Moq
 
 			RecordInvocation.Handle(invocation, this);
 
-			if (HandleEventSubscription.Handle(invocation, this))
-			{
-				return;
-			}
-
 			if (FindAndExecuteMatchingSetup.Handle(invocation, this))
 			{
 				return;
 			}
 			
 			if (HandleAutoSetupProperties.Handle(invocation, this))
+			{
+				return;
+			}
+
+			if (HandleEventSubscription.Handle(invocation, this))
 			{
 				return;
 			}
