@@ -12,12 +12,12 @@ namespace Moq
 				return;
 			}
 
+			RecordInvocation.Handle(invocation, this);
+
 			if (HandleEventSubscription.Handle(invocation, this))
 			{
 				return;
 			}
-
-			RecordInvocation.Handle(invocation, this);
 
 			if (FindAndExecuteMatchingSetup.Handle(invocation, this))
 			{

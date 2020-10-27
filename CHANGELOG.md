@@ -12,6 +12,10 @@ The format is loosely based on [Keep a Changelog](http://keepachangelog.com/en/1
 * New method overloads for `It.Is`, `It.IsIn`, and `It.IsNotIn` that compare values using a custom `IEqualityComparer<T>` (@weitzhandler, #1064)
 * New properties `ReturnValue` and `Exception` on `IInvocation` to query recorded invocations return values or exceptions (@MaStr11, #921, #1077)
 
+#### Changed
+
+* Event accessor calls (`+=` and `-=`) now get consistently recorded in `Mock.Invocations`. This previously wasn't the case for backwards compatibility with `VerifyNoOtherCalls` (which got implemented before it was possible to check them using `Verify{Add,Remove}`). You now need to explicitly verify expected calls to event accessors prior to `VerifyNoOtherCalls`. Verification of `+=` and `-=` now works regardless of whether or not you set those up (which makes it consistent with how verification usually works). (@80O, @stakx, #1058)
+
 #### Fixed
 
 * `SetupProperty` fails if property getter and setter are not both defined in mocked type (@stakx, #1017)
