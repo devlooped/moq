@@ -11,12 +11,10 @@ namespace Moq
 	internal sealed class SetupCollection : ISetupList
 	{
 		private List<Setup> setups;
-		private volatile bool hasEventSetup;
 
 		public SetupCollection()
 		{
 			this.setups = new List<Setup>();
-			this.hasEventSetup = false;
 		}
 
 		public int Count
@@ -27,14 +25,6 @@ namespace Moq
 				{
 					return this.setups.Count;
 				}
-			}
-		}
-
-		public bool HasEventSetup
-		{
-			get
-			{
-				return this.hasEventSetup;
 			}
 		}
 
@@ -53,11 +43,6 @@ namespace Moq
 		{
 			lock (this.setups)
 			{
-				if (setup.Method.IsEventAddAccessor() || setup.Method.IsEventRemoveAccessor())
-				{
-					this.hasEventSetup = true;
-				}
-
 				this.setups.Add(setup);
 
 				this.MarkOverriddenSetups();
@@ -116,7 +101,6 @@ namespace Moq
 			lock (this.setups)
 			{
 				this.setups.Clear();
-				this.hasEventSetup = false;
 			}
 		}
 
