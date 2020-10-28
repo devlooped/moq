@@ -18,6 +18,7 @@ namespace Moq.Linq
 		private static readonly string[] unsupportedMethods = new[] { "All", "Any", "Last", "LastOrDefault", "Single", "SingleOrDefault" };
 
 		private int stackIndex;
+		private int quoteDepth;
 
 		public MockSetupsBuilder()
 		{
@@ -89,6 +90,14 @@ namespace Moq.Linq
 			if (this.stackIndex > 0 && node.NodeType == ExpressionType.Not)
 			{
 				return ConvertToSetup(node.Operand, Expression.Constant(false)) ?? base.VisitUnary(node);
+			}
+
+			if (node.NodeType == ExpressionType.Quote)
+			{
+				this.quoteDepth++;
+				var result = this.quoteDepth > 1 ? node : base.VisitUnary(node);
+				this.quoteDepth--;
+				return result;
 			}
 
 			return base.VisitUnary(node);

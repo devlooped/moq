@@ -7,7 +7,7 @@ using System.Collections.Generic;
 
 using Xunit;
 
-namespace Moq.Tests
+namespace Moq.Tests.Linq
 {
 	public class QueryableMocksFixture
 	{
@@ -210,6 +210,27 @@ namespace Moq.Tests
 			var foo = Mocks.Of<IFoo>(f => f.Targets == default, MockBehavior.Strict).First();
 			_ = foo.Targets;
 			Assert.Throws<MockException>(() => _ = foo.Name);
+		}
+
+		[Fact]
+		public void Multiple_mocks_with_query_comprehension_syntax__predicates_in_where_clause()
+		{
+			var x = (from x1 in Mocks.Of<IFoo>()
+			         from __ in Mocks.Of<IFoo>()
+			         where x1.Name == "1" && __.Name == "2"
+			         select x1)
+			        .First();
+			Assert.Equal("1", x.Name);
+		}
+
+		[Fact]
+		public void Multiple_mocks_with_query_comprehension_syntax__predicates_in_from_clause()
+		{
+			var x = (from x1 in Mocks.Of<IFoo>(_ => _.Name == "1")
+			         from __ in Mocks.Of<IFoo>(_ => _.Name == "2")
+			         select x1)
+			        .First();
+			Assert.Equal("1", x.Name);
 		}
 
 		public class Dto
