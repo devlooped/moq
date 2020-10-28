@@ -7,7 +7,7 @@ using System.Collections.Generic;
 
 using Xunit;
 
-namespace Moq.Tests
+namespace Moq.Tests.Linq
 {
 	public class QueryableMocksFixture
 	{
