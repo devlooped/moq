@@ -23,6 +23,7 @@
 
 	<ItemGroup>
 		<PackageReference Include="Castle.Core" Version="4.4.0" />
+		<PackageReference Include="Microsoft.Extensions.Logging.Abstractions" Version="3.1.9" />
 		<PackageReference Include="Microsoft.NETFramework.ReferenceAssemblies" Version="1.0.0" PrivateAssets="All" />
 		<PackageReference Include="System.ValueTuple" Version="4.5.0" />
 		<ProjectReference Include="..\..\src\Moq\Moq.csproj" />

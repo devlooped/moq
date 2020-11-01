@@ -57,5 +57,23 @@ namespace Moq.Tests
 		}
 
 		#endregion
+
+		#region Test cases
+
+		[Fact]
+		public void It_IsAnyType_used_as_generic_type_argument_of_method()
+		{
+			var mock = new Mock<IX>();
+			mock.Setup(m => m.Method<It.IsAnyType>(It.IsAny<IEnumerable<It.IsAnyType>>())).Verifiable();
+			mock.Object.Method(new string[] { "a", "b" });
+			mock.Verify();
+		}
+
+		public interface IX
+		{
+			void Method<T>(IEnumerable<T> args);
+		}
+
+		#endregion
 	}
 }
