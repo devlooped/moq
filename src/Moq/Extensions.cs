@@ -252,6 +252,26 @@ namespace Moq
 			}
 		}
 
+		public static bool IsOrContainsTypeMatcher(this Type type)
+		{
+			if (type.IsTypeMatcher())
+			{
+				return true;
+			}
+			else if (type.HasElementType)
+			{
+				return type.GetElementType().IsOrContainsTypeMatcher();
+			}
+			else if (type.IsGenericType)
+			{
+				return type.GetGenericArguments().Any(IsOrContainsTypeMatcher);
+			}
+			else
+			{
+				return false;
+			}
+		}
+
 		public static bool ImplementsTypeMatcherProtocol(this Type type)
 		{
 			return typeof(ITypeMatcher).IsAssignableFrom(type) && type.CanCreateInstance();
@@ -290,26 +310,23 @@ namespace Moq
 
 			for (int i = 0; i < count; ++i)
 			{
-				if (considerTypeMatchers && types[i].IsTypeMatcher(out var typeMatcherType))
-				{
-					Debug.Assert(typeMatcherType.ImplementsTypeMatcherProtocol());
+				var t = types[i];
 
-					var typeMatcher = (ITypeMatcher)Activator.CreateInstance(typeMatcherType);
-					if (typeMatcher.Matches(otherTypes[i]) == false)
-					{
-						return false;
-					}
-				}
-				else if (exact)
+				if (considerTypeMatchers && t.IsOrContainsTypeMatcher())
 				{
-					if (types[i] != otherTypes[i])
+					t = t.SubstituteTypeMatchers(otherTypes[i]);
+				}
+
+				if (exact)
+				{
+					if (t.Equals(otherTypes[i]) == false)
 					{
 						return false;
 					}
 				}
 				else
 				{
-					if (types[i].IsAssignableFrom(otherTypes[i]) == false)
+					if (t.IsAssignableFrom(otherTypes[i]) == false)
 					{
 						return false;
 					}
