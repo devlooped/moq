@@ -11,6 +11,7 @@ The format is loosely based on [Keep a Changelog](http://keepachangelog.com/en/1
 
 * New method overloads for `It.Is`, `It.IsIn`, and `It.IsNotIn` that compare values using a custom `IEqualityComparer<T>` (@weitzhandler, #1064)
 * New properties `ReturnValue` and `Exception` on `IInvocation` to query recorded invocations return values or exceptions (@MaStr11, #921, #1077)
+* Support for "nested" type matchers, i.e. type matchers that appear as part of a composite type (such as `It.IsAnyType[]` or `Func<It.IsAnyType, bool>`). Argument match expressions like `It.IsAny<Func<It.IsAnyType, bool>>()` should now work as expected, whereas they previously didn't. In this particular example, you should no longer need a workaround like `(Func<It.IsAnyType, bool>)It.IsAny<object>()` as originally suggested in #918. (@stakx, #1092)
 
 #### Changed
 
