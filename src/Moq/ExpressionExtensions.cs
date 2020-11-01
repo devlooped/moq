@@ -198,9 +198,13 @@ namespace Moq
 						{
 							foreach (var typeArgument in methodCallExpression.Method.GetGenericArguments())
 							{
-								if (typeArgument.IsTypeMatcher(out var typeMatcherType))
+								if (typeArgument.IsOrContainsTypeMatcher())
 								{
-									Guard.ImplementsTypeMatcherProtocol(typeMatcherType);
+									// This is a (somewhat roundabout) way of ensuring that the type matchers used
+									// will be usable. They will not be usable if they don't implement the type
+									// matcher protocol correctly; and `SubstituteTypeMatchers` tests for that, so
+									// we'll reuse its recursive logic instead of having to reimplement our own.
+									_ = typeArgument.SubstituteTypeMatchers(typeArgument);
 								}
 							}
 						}

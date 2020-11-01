@@ -51,7 +51,7 @@ namespace Moq
 		/// </example>
 		public static TValue IsAny<TValue>()
 		{
-			if (typeof(TValue).IsTypeMatcher())
+			if (typeof(TValue).IsOrContainsTypeMatcher())
 			{
 				return Match.Create<TValue>(
 					(argument, parameterType) => argument == null || parameterType.IsAssignableFrom(argument.GetType()),
@@ -99,7 +99,7 @@ namespace Moq
 		/// <typeparam name="TValue">Type of the value.</typeparam>
 		public static TValue IsNotNull<TValue>()
 		{
-			if (typeof(TValue).IsTypeMatcher())
+			if (typeof(TValue).IsOrContainsTypeMatcher())
 			{
 				return Match.Create<TValue>(
 					(argument, parameterType) => argument != null && parameterType.IsAssignableFrom(argument.GetType()),
@@ -140,7 +140,7 @@ namespace Moq
 		[SuppressMessage("Microsoft.Design", "CA1006:DoNotNestGenericTypesInMemberSignatures")]
 		public static TValue Is<TValue>(Expression<Func<TValue, bool>> match)
 		{
-			if (typeof(TValue).IsTypeMatcher())
+			if (typeof(TValue).IsOrContainsTypeMatcher())
 			{
 				throw new ArgumentException(Resources.UseItIsOtherOverload, nameof(match));
 			}

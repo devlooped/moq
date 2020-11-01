@@ -17,6 +17,8 @@ using System.Threading.Tasks;
 
 using Castle.DynamicProxy;
 
+using Microsoft.Extensions.Logging;
+
 using Moq;
 using Moq.Properties;
 using Moq.Protected;
@@ -3147,6 +3149,57 @@ namespace Moq.Tests.Regressions
 			private void SetupIntMethod(Action callback)
 			{
 				this.mock.Setup(m => m.Method<object>((int)It.IsAny<object>())).Callback(callback);
+			}
+		}
+
+		#endregion
+
+		#region 918
+
+		public class Issue918
+		{
+			[Fact]  // just to remind ourselves why It.IsAnyType (see next test) may be needed in a real-world scenario
+			public void object_with_Microsoft_Extensions_Logging_Abstractions_ILogger()
+			{
+				var loggerMock = new Mock<ILogger>();
+				loggerMock.Setup(m => m.Log<object>(
+					It.IsAny<LogLevel>(),
+					It.IsAny<EventId>(),
+					It.IsAny<object>(),
+					It.IsAny<Exception>(),
+					It.IsAny<Func<object, Exception, string>>())).Verifiable();
+
+				var logger = loggerMock.Object;
+				logger.Log<AttributeTargets>(
+					logLevel: LogLevel.Information,
+					eventId: new EventId(123),
+					state: AttributeTargets.All,
+					exception: null,
+					formatter: (state, ex) => "");
+
+				Assert.Throws<MockException>(() => loggerMock.Verify());
+			}
+
+			[Fact]
+			public void It_IsAnyType_with_Microsoft_Extensions_Logging_Abstractions_ILogger()
+			{
+				var loggerMock = new Mock<ILogger>();
+				loggerMock.Setup(m => m.Log<It.IsAnyType>(
+					It.IsAny<LogLevel>(),
+					It.IsAny<EventId>(),
+					It.IsAny<It.IsAnyType>(),
+					It.IsAny<Exception>(),
+					It.IsAny<Func<It.IsAnyType, Exception, string>>())).Verifiable();
+
+				var logger = loggerMock.Object;
+				logger.Log<AttributeTargets>(
+					logLevel: LogLevel.Information,
+					eventId: new EventId(123),
+					state: AttributeTargets.All,
+					exception: null,
+					formatter: (state, ex) => "");
+
+				loggerMock.Verify();
 			}
 		}
 
