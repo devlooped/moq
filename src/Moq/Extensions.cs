@@ -369,6 +369,96 @@ namespace Moq
 			}
 		}
 
+		/// <summary>
+		///   Visits all constituent parts of <paramref name="type"/>, replacing all type matchers
+		///   that match the type argument at the corresponding position in <paramref name="other"/>.
+		/// </summary>
+		/// <param name="type">The type to be matched. May be, or contain, type matchers.</param>
+		/// <param name="other">The type argument to match against <paramref name="type"/>.</param>
+		public static Type SubstituteTypeMatchers(this Type type, Type other)
+		{
+			// If a type matcher `T` successfully matches its corresponding type `O` from `other`, `T` in `type`
+			// gets replaced by `O`. If all type matchers successfully matched, and they have been replaced by
+			// their arguments in `other`, callers can then perform a final `IsAssignableFrom` check to match
+			// everything else (fixed types). Being able to defer to `IsAssignableFrom` saves us from having to
+			// re-implement all of its type equivalence rules (polymorphism, co-/contravariance, etc.).
+			//
+			// We still need to do some checks ourselves, however: In order to traverse both `type` and `other`
+			// in lockstep, we need to ensure that they have the same basic structure.
+
+			if (type.IsTypeMatcher(out var typeMatcherType))
+			{
+				var typeMatcher = (ITypeMatcher)Activator.CreateInstance(typeMatcherType);
+
+				if (typeMatcher.Matches(other))
+				{
+					return other;
+				}
+			}
+			else if (type.HasElementType && other.HasElementType)
+			{
+				var te = type.GetElementType();
+				var oe = other.GetElementType();
+
+				if (type.IsArray && other.IsArray)
+				{
+					var tr = type.GetArrayRank();
+					var or = other.GetArrayRank();
+
+					if (tr == or)
+					{
+						var se = te.SubstituteTypeMatchers(oe);
+						if (se.Equals(te))
+						{
+							return type;
+						}
+						else
+						{
+							return tr == 1 ? se.MakeArrayType() : se.MakeArrayType(tr);
+						}
+					}
+				}
+				else if (type.IsByRef && other.IsByRef)
+				{
+					var se = te.SubstituteTypeMatchers(oe);
+					return se == te ? type : se.MakeByRefType();
+				}
+				else if (type.IsPointer && other.IsPointer)
+				{
+					var se = te.SubstituteTypeMatchers(oe);
+					return se == te ? type : se.MakePointerType();
+				}
+			}
+			else if (type.IsGenericType && other.IsGenericType)
+			{
+				var td = type.GetGenericTypeDefinition();
+				var od = other.GetGenericTypeDefinition();
+
+				if (td.Equals(od))
+				{
+					var ta = type.GetGenericArguments();
+					var oa = other.GetGenericArguments();
+					var changed = false;
+
+					Debug.Assert(oa.Length == ta.Length);
+
+					for (int i = 0; i < ta.Length; ++i)
+					{
+						var sa = ta[i].SubstituteTypeMatchers(oa[i]);
+						if (sa.Equals(ta[i]) == false)
+						{
+							changed = true;
+							ta[i] = sa;
+						}
+					}
+
+					return changed ? td.MakeGenericType(ta) : type;
+				}
+			}
+
+			return type;
+		}
+
 		public static Setup TryFind(this IEnumerable<Setup> setups, InvocationShape expectation)
 		{
 			return setups.FirstOrDefault(setup => setup.Expectation.Equals(expectation));
