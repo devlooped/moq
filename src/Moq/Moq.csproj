@@ -105,7 +105,7 @@
 	</ItemGroup>
 
 	<ItemGroup>
-		<None Include="$(SolutionDir)moq-icon.png" Pack="true" PackagePath="moq.png" Visible="False" />
+		<None Include="$([MSBuild]::GetDirectoryNameOfFileAbove($(MSBuildThisFileDirectory), moq-icon.png))\moq-icon.png" Pack="true" PackagePath="moq.png" Visible="False" />
 	</ItemGroup>
 
 	<Target Name="Test" />
