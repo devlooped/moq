@@ -208,14 +208,14 @@ namespace Moq
 		internal abstract Type MockedType { get; }
 
 		/// <summary>
-		/// Gets or sets the <see cref="DefaultValueProvider"/> instance that will be used
+		/// Gets or sets the <see cref="Moq.DefaultValueProvider"/> instance that will be used
 		/// e. g. to produce default return values for unexpected invocations.
 		/// </summary>
 		public abstract DefaultValueProvider DefaultValueProvider { get; set; }
 
 		/// <summary>
 		/// The <see cref="Moq.DefaultValueProvider"/> used to initialize automatically stubbed properties.
-		/// It is equal to the value of <see cref="Moq.Mock.DefaultValueProvider"/> at the time when
+		/// It is equal to the value of <see cref="DefaultValueProvider"/> at the time when
 		/// <see cref="SetupAllProperties"/> was last called.
 		/// </summary>
 		internal abstract DefaultValueProvider AutoSetupPropertiesDefaultValueProvider { get; set; } 
