@@ -109,4 +109,19 @@
 
 	<Target Name="Test" />
 
+	<Target Name="UpdatePackageMetadata"
+          BeforeTargets="PrepareForBuild;GetAssemblyVersion;GenerateNuspec;Pack"
+          DependsOnTargets="InitializeSourceControlInformation"
+          Condition="'$(SourceControlInformationFeatureSupported)' And
+                     '$(RepositoryUrl)' != '' And 
+                     '$(SourceRevisionId)' != ''">
+		<PropertyGroup>
+			<Description>$(Description)
+
+Built from $(RepositoryUrl)/tree/$(SourceRevisionId.Substring(0, 9))
+			</Description>
+			<PackageDescription>$(Description)</PackageDescription>
+		</PropertyGroup>
+	</Target>
+
 </Project>
