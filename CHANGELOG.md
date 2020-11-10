@@ -5,7 +5,7 @@ All notable changes to this project will be documented in this file.
 The format is loosely based on [Keep a Changelog](http://keepachangelog.com/en/1.0.0/).
 
 
-## 4.15.0 (2020-11-10)
+## 4.15.1 (2020-11-10)
 
 #### Added
 
@@ -23,6 +23,11 @@ The format is loosely based on [Keep a Changelog](http://keepachangelog.com/en/1
 * `SetupProperty` fails if property getter and setter are not both defined in mocked type (@stakx, #1017)
 * Expression tree argument not matched when it contains a captured variable &ndash; evaluate all captures to their current values when comparing two expression trees (@QTom01, #1054)
 * Failure when parameterized `Mock.Of<>` is used in query comprehension `from` clause (@stakx, #982)
+
+
+## 4.15.0
+
+This version was accidentally published as 4.15.1 due to an intermittent problem with NuGet publishing.
 
 
 ## 4.14.7 (2020-10-14)
