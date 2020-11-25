@@ -42,7 +42,7 @@
 		<PackageReference Include="Castle.Core" Version="4.4.0" />
 		<PackageReference Include="IFluentInterface" Version="2.1.0" PrivateAssets="All" />
 		<PackageReference Include="Microsoft.NETFramework.ReferenceAssemblies" Version="1.0.0" PrivateAssets="All" />
-		<PackageReference Include="System.Threading.Tasks.Extensions" Version="4.5.1" />
+		<PackageReference Include="System.Threading.Tasks.Extensions" Version="4.5.4" />
 		<PackageReference Include="TypeNameFormatter.Sources" Version="1.0.0" PrivateAssets="All" />
 	</ItemGroup>
 
