@@ -5,6 +5,12 @@ All notable changes to this project will be documented in this file.
 The format is loosely based on [Keep a Changelog](http://keepachangelog.com/en/1.0.0/).
 
 
+## Unreleased
+
+#### Changed
+
+* Upgraded `System.Threading.Tasks.Extensions` dependency to version 4.5.4 (@JeffAshton, #1108)
+
 ## 4.15.1 (2020-11-10)
 
 #### Added
