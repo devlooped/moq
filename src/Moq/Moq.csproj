@@ -13,6 +13,7 @@
 		<DocumentationFile>bin\$(Configuration)\$(TargetFramework)\$(AssemblyName).xml</DocumentationFile> 
 		<GenerateDocumentation>true</GenerateDocumentation>
 		<NoWarn>0419</NoWarn>
+		<PackageId>D2L.Moq</PackageId>
 		<RootNamespace>Moq</RootNamespace>
 		<TreatWarningsAsErrors>true</TreatWarningsAsErrors>
 		<WarningLevel>4</WarningLevel>
