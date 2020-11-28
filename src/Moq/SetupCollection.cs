@@ -11,10 +11,12 @@ namespace Moq
 	internal sealed class SetupCollection : ISetupList
 	{
 		private List<Setup> setups;
+		private HashSet<InvocationShape> activeInvocationShapes;
 
 		public SetupCollection()
 		{
 			this.setups = new List<Setup>();
+			this.activeInvocationShapes = new HashSet<InvocationShape>();
 		}
 
 		public int Count
@@ -44,8 +46,10 @@ namespace Moq
 			lock (this.setups)
 			{
 				this.setups.Add(setup);
-
-				this.MarkOverriddenSetups();
+				if (!this.activeInvocationShapes.Add(setup.Expectation))
+				{
+					this.MarkOverriddenSetups();
+				}
 			}
 		}
 
@@ -101,6 +105,7 @@ namespace Moq
 			lock (this.setups)
 			{
 				this.setups.Clear();
+				this.activeInvocationShapes.Clear();
 			}
 		}
 
