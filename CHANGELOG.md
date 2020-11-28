@@ -5,6 +5,12 @@ All notable changes to this project will be documented in this file.
 The format is loosely based on [Keep a Changelog](http://keepachangelog.com/en/1.0.0/).
 
 
+## Unreleased
+
+#### Fixed
+
+* Added Hashset of active invocations to SetupCollection to only call MarkOverridden when a duplicated expectation is added (@CeesKaas, #1110)
+
 ## 4.15.2 (2020-11-26)
 
 #### Changed
