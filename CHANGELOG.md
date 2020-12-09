@@ -8,7 +8,7 @@ The format is loosely based on [Keep a Changelog](http://keepachangelog.com/en/1
 
 #### Added
 
-* Added extension method `GetInvocationsOf` which returns only the invocations on the specified method (same lamda specification like in Setup/Verify).
+* Added extension method `GetInvocationsOf` which returns only the invocations on the specified method (same lamda specification like in Setup/Verify). (@Mrxx99, #1115)
 
 
 ## 4.15.2 (2020-11-26)
