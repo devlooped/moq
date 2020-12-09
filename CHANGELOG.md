@@ -4,6 +4,12 @@ All notable changes to this project will be documented in this file.
 
 The format is loosely based on [Keep a Changelog](http://keepachangelog.com/en/1.0.0/).
 
+## Unreleased
+
+#### Added
+
+* Added extension method `GetInvocationsOf` which returns only the invocations on the specified method (same lamda specification like in Setup/Verify).
+
 
 ## 4.15.2 (2020-11-26)
 

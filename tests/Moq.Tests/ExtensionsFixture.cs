@@ -2,6 +2,7 @@
 // All rights reserved. Licensed under the BSD 3-Clause License; see License.txt.
 
 using System.Collections.Generic;
+using System.Linq;
 using System.Reflection;
 
 using Xunit;
@@ -80,6 +81,55 @@ namespace Moq.Tests
 			myMock.Reset();
 			myMock.VerifyAll();
 		}
+
+		[Fact]
+		public void GetInvocationsOf_returns_only_invocations_of_right_method()
+		{
+			var myMock = new Mock<IMethods>(MockBehavior.Loose);
+
+			myMock.Object.BoolAndParamsString(true);
+			myMock.Object.OutInt(out int anInt);
+			myMock.Object.BoolAndParamsString(true);
+
+			var actualInvocationOnBoolAndParamsString = myMock.GetInvocationsOf(x => x.BoolAndParamsString(default));
+			int ignoredInt;
+			var actualInvocationOnOutInt = myMock.GetInvocationsOf(x => x.OutInt(out ignoredInt));
+
+			Assert.Equal(new[] { myMock.Invocations[0], myMock.Invocations[2] }, actualInvocationOnBoolAndParamsString);
+			Assert.Equal(new[] { myMock.Invocations[1] }, actualInvocationOnOutInt);
+		}
+
+		[Fact]
+		public void GetInvocationsOf_returns_only_invocations_with_right_overload()
+		{
+			var myMock = new Mock<IMethods>(MockBehavior.Loose);
+
+			myMock.Object.OverloadedMethod("hi");
+			myMock.Object.OverloadedMethod("bye");
+
+			var actualInvocationOnRightOverload = myMock.GetInvocationsOf(x => x.OverloadedMethod(default(string)));
+			var actualInvocationOnWrongOverload = myMock.GetInvocationsOf(x => x.OverloadedMethod(default, default));
+
+			Assert.Equal(myMock.Invocations, actualInvocationOnRightOverload);
+			Assert.Empty(actualInvocationOnWrongOverload);
+		}
+
+		[Fact]
+		public void GetInvocationsOf_returns_only_invocations_with_right_generic_type()
+		{
+			var myMock = new Mock<IMethods>(MockBehavior.Loose);
+
+			myMock.Object.GenericMethod(5);
+
+			var actualInvocationOnInt = myMock.GetInvocationsOf(x => x.GenericMethod<int>(default));
+			var actualInvocationOnObject = myMock.GetInvocationsOf(x => x.GenericMethod<object>(default));
+			var actualInvocationOnDouble = myMock.GetInvocationsOf(x => x.GenericMethod<double>(default));
+
+			Assert.Equal(myMock.Invocations, actualInvocationOnInt);
+			Assert.Empty(actualInvocationOnObject);
+			Assert.Empty(actualInvocationOnDouble);
+		}
+
 		#endregion
 
 		[Fact]
@@ -177,6 +227,10 @@ namespace Moq.Tests
 			void RefInt(ref int arg1);
 			void OutInt(out int arg1);
 			void BoolAndParamsString(bool arg1, params string[] arg2);
+			void OverloadedMethod(string arg);
+			void OverloadedMethod(int arg);
+			void OverloadedMethod(string arg1, int arg2);
+			void GenericMethod<T>(T arg);
 		}
 
 		public class WithReadOnlyProperty
