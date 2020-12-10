@@ -207,7 +207,7 @@ namespace Moq
 				throw new NotSupportedException(
 					string.Format(
 						Resources.TypeNotMockable,
-						type.Name));
+						type.GetFormattedName()));
 			}
 		}
 
