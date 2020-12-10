@@ -204,7 +204,10 @@ namespace Moq
 		{
 			if (!type.IsMockable())
 			{
-				throw new NotSupportedException(Resources.TypeNotMockable);
+				throw new NotSupportedException(
+					string.Format(
+						Resources.TypeNotMockable,
+						type.Name));
 			}
 		}
 
