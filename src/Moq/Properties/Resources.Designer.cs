@@ -572,7 +572,7 @@ namespace Moq.Properties {
         }
         
         /// <summary>
-        ///   Looks up a localized string similar to Mocked type {0} must be an interface, a delegate, or a non-sealed, non-static class..
+        ///   Looks up a localized string similar to Type to mock ({0}) must be an interface, a delegate, or a non-sealed, non-static class..
         /// </summary>
         internal static string TypeNotMockable {
             get {
