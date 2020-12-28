@@ -9,7 +9,7 @@ The format is loosely based on [Keep a Changelog](http://keepachangelog.com/en/1
 
 #### Fixed
 
-* Added Hashset of active invocations to SetupCollection to only call MarkOverridden when a duplicated expectation is added (@CeesKaas, #1110)
+* Performance regression: Adding setups to a mock becomes slower with each setup (@CeesKaas, #1110)
 
 ## 4.15.2 (2020-11-26)
 
