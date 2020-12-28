@@ -1047,16 +1047,17 @@ namespace Moq.Tests
 		}
 
 		[Fact]
-		public void Verify_ignores_conditional_setups_so_calling_Verifiable_is_a_user_error()
+		public void Verify_ignores_conditional_setups()
 		{
 			var mock = new Mock<IFoo>();
-			var setup = mock.When(() => true).Setup(m => m.Submit());
+			mock.When(() => true).Setup(m => m.Submit()).Verifiable();
 
-			// Conditional setups are completely ignored by `Verify[All]`.
-			// Making such a setup verifiable is therefore a no-op, but
-			// may be indicative of the user making an incorrect assumption;
-			// best to warn the user so they revise their code:
-			Assert.Throws<InvalidOperationException>(() => setup.Verifiable());
+			var exception = Record.Exception(() =>
+			{
+				mock.Verify();
+			});
+
+			Assert.Null(exception);
 		}
 
 		[Fact]
