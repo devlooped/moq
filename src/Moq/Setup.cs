@@ -173,12 +173,12 @@ namespace Moq
 
 		public void Verify(bool recursive = true)
 		{
-			this.Verify(recursive, setup => !setup.IsOverridden && !setup.IsConditional && setup.IsVerifiable);
+			this.Verify(recursive, setup => setup.IsVerifiable);
 		}
 
 		public void VerifyAll()
 		{
-			this.Verify(recursive: true, setup => !setup.IsOverridden && !setup.IsConditional);
+			this.Verify(recursive: true, setup => true);
 		}
 
 		private void Verify(bool recursive, Func<ISetup, bool> predicate)

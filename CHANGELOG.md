@@ -15,6 +15,9 @@ The format is loosely based on [Keep a Changelog](http://keepachangelog.com/en/1
 
 * Performance regression: Adding setups to a mock becomes slower with each setup (@CeesKaas, #1110)
 
+* Regression: `mock.Verify[All]` no longer marks invocations as verified if they were matched by conditional setups. (@Lyra2108, #1114)
+
+
 ## 4.15.2 (2020-11-26)
 
 #### Changed
