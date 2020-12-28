@@ -1312,37 +1312,5 @@ namespace Moq.Tests
 			Assert.ThrowsAny<Exception>(() => mock.Object.BadSerializable);
 		}
 #endif
-
-		public interface ITestInterface
-		{
-			void Get(Guid id);
-		}
-
-		[Fact]
-		public void Thousand_different_setups_can_be_done_in_under_a_second()
-		{
-			var sw = System.Diagnostics.Stopwatch.StartNew();
-			var mock = new Mock<ITestInterface>();
-			for (int i = 0; i < 1000; i++)
-			{
-				mock.Setup(m => m.Get(Guid.NewGuid()));
-			}
-			sw.Stop();
-			Assert.True(sw.Elapsed < TimeSpan.FromSeconds(1), $"Setups were expected to take less than a second but it took {sw.Elapsed}");
-		}
-
-		[Fact]
-		public void Thousand_same_setups_can_be_done_in_under_a_second()
-		{
-			var sw = System.Diagnostics.Stopwatch.StartNew();
-			var mock = new Mock<ITestInterface>();
-			var id = Guid.NewGuid();
-			for (int i = 0; i < 1000; i++)
-			{
-				mock.Setup(m => m.Get(id));
-			}
-			sw.Stop();
-			Assert.True(sw.Elapsed < TimeSpan.FromSeconds(1), $"Setups were expected to take less than a second but it took {sw.Elapsed}");
-		}
 	}
 }
