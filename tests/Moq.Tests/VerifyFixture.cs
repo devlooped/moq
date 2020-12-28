@@ -1502,6 +1502,16 @@ namespace Moq.Tests
 			Mock.Get(mock.Object.Bar).VerifyNoOtherCalls();
 		}
 
+		[Fact]
+		public void Verify__marks_invocations_as_verified__even_if_the_setups_they_were_matched_by_were_conditional()
+		{
+			var mock = new Mock<IFoo>();
+			mock.When(() => true).Setup(m => m.Submit()).Verifiable();
+			mock.Object.Submit();
+			mock.Verify();
+			mock.VerifyNoOtherCalls();
+		}
+
 		public class Exclusion_of_unreachable_inner_mocks
 		{
 			[Fact]

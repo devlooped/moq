@@ -3611,6 +3611,55 @@ namespace Moq.Tests.Regressions
 
 		#endregion
 
+		#region 1114
+
+		public class Issue1114
+		{
+			[Fact]
+			public void TestMockSequence()
+			{
+				var myMock = new Mock<MyClass>();
+				var myTestObject = new MyTestObject(myMock.Object);
+				var sequence = new MockSequence { Cyclic = false };
+				myMock.InSequence(sequence).Setup(x => x.FirstCall()).Verifiable();
+				myMock.InSequence(sequence).Setup(x => x.SecondCall()).Verifiable();
+
+				myTestObject.TestMe();
+
+				myMock.Verify();
+				myMock.VerifyNoOtherCalls();
+			}
+
+			public class MyTestObject
+			{
+				private readonly MyClass _myMockObject;
+
+				public MyTestObject(MyClass myMockObject)
+				{
+					_myMockObject = myMockObject;
+				}
+
+				public void TestMe()
+				{
+					_myMockObject.FirstCall();
+					_myMockObject.SecondCall();
+				}
+			}
+
+			public class MyClass
+			{
+				public virtual void FirstCall()
+				{
+				}
+
+				public virtual void SecondCall()
+				{
+				}
+			}
+		}
+
+		#endregion
+
 		// Old @ Google Code
 
 		#region #47
