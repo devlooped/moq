@@ -115,15 +115,6 @@ namespace Moq.Properties {
         }
         
         /// <summary>
-        ///   Looks up a localized string similar to This call to &apos;Verifiable&apos; will have no effect because conditional setups are ignored by both &apos;Verify&apos; and &apos;VerifyAll&apos;. This might indicate an error in your code..
-        /// </summary>
-        internal static string ConditionalSetupsAreNotVerifiable {
-            get {
-                return ResourceManager.GetString("ConditionalSetupsAreNotVerifiable", resourceCulture);
-            }
-        }
-        
-        /// <summary>
         ///   Looks up a localized string similar to Constructor arguments cannot be passed for delegate mocks..
         /// </summary>
         internal static string ConstructorArgsForDelegate {

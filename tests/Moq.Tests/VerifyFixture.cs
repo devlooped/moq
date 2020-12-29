@@ -1047,16 +1047,17 @@ namespace Moq.Tests
 		}
 
 		[Fact]
-		public void Verify_ignores_conditional_setups_so_calling_Verifiable_is_a_user_error()
+		public void Verify_ignores_conditional_setups()
 		{
 			var mock = new Mock<IFoo>();
-			var setup = mock.When(() => true).Setup(m => m.Submit());
+			mock.When(() => true).Setup(m => m.Submit()).Verifiable();
 
-			// Conditional setups are completely ignored by `Verify[All]`.
-			// Making such a setup verifiable is therefore a no-op, but
-			// may be indicative of the user making an incorrect assumption;
-			// best to warn the user so they revise their code:
-			Assert.Throws<InvalidOperationException>(() => setup.Verifiable());
+			var exception = Record.Exception(() =>
+			{
+				mock.Verify();
+			});
+
+			Assert.Null(exception);
 		}
 
 		[Fact]
@@ -1500,6 +1501,16 @@ namespace Moq.Tests
 			// The above call to `VerifyAll` should have marked all invocations as verified,
 			// including those on the inner `Bar` mock:
 			Mock.Get(mock.Object.Bar).VerifyNoOtherCalls();
+		}
+
+		[Fact]
+		public void Verify__marks_invocations_as_verified__even_if_the_setups_they_were_matched_by_were_conditional()
+		{
+			var mock = new Mock<IFoo>();
+			mock.When(() => true).Setup(m => m.Submit()).Verifiable();
+			mock.Object.Submit();
+			mock.Verify();
+			mock.VerifyNoOtherCalls();
 		}
 
 		public class Exclusion_of_unreachable_inner_mocks

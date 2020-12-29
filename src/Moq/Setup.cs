@@ -8,8 +8,6 @@ using System.Linq.Expressions;
 using System.Reflection;
 using System.Text;
 
-using Moq.Properties;
-
 namespace Moq
 {
 	internal abstract class Setup : ISetup
@@ -89,11 +87,6 @@ namespace Moq
 
 		public void MarkAsVerifiable()
 		{
-			if (this.IsConditional)
-			{
-				throw new InvalidOperationException(Resources.ConditionalSetupsAreNotVerifiable);
-			}
-
 			this.flags |= Flags.Verifiable;
 		}
 
@@ -180,12 +173,12 @@ namespace Moq
 
 		public void Verify(bool recursive = true)
 		{
-			this.Verify(recursive, setup => !setup.IsOverridden && !setup.IsConditional && setup.IsVerifiable);
+			this.Verify(recursive, setup => setup.IsVerifiable);
 		}
 
 		public void VerifyAll()
 		{
-			this.Verify(recursive: true, setup => !setup.IsOverridden && !setup.IsConditional);
+			this.Verify(recursive: true, setup => true);
 		}
 
 		private void Verify(bool recursive, Func<ISetup, bool> predicate)

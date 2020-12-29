@@ -258,7 +258,7 @@ namespace Moq
 		/// </example>
 		public void Verify()
 		{
-			this.Verify(setup => !setup.IsOverridden && !setup.IsConditional && setup.IsVerifiable);
+			this.Verify(setup => setup.IsVerifiable);
 		}
 
 		/// <summary>
@@ -283,7 +283,7 @@ namespace Moq
 		/// </example>
 		public void VerifyAll()
 		{
-			this.Verify(setup => !setup.IsOverridden && !setup.IsConditional);
+			this.Verify(setup => true);
 		}
 
 		private void Verify(Func<ISetup, bool> predicate)
@@ -313,9 +313,9 @@ namespace Moq
 
 			var errors = new List<MockException>();
 
-			foreach (var setup in this.MutableSetups.ToArray(predicate))
+			foreach (var setup in this.MutableSetups.ToArray(setup => !setup.IsOverridden && !setup.IsConditional && predicate(setup)))
 			{
-				if (predicate(setup) && !setup.TryVerify(recursive: true, predicate, verifiedMocks, out var e) && e.IsVerificationError)
+				if (!setup.TryVerify(recursive: true, predicate, verifiedMocks, out var e) && e.IsVerificationError)
 				{
 					errors.Add(e);
 				}
