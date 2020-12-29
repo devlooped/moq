@@ -124,40 +124,34 @@ namespace Moq
 		/// <param name="verifiedMocks">
 		///   The set of mocks that have already been verified.
 		/// </param>
-		/// <param name="error">
-		///   If this setup or any of its inner mock (if present and known) failed verification,
-		///   this <see langword="out"/> parameter will receive a <see cref="MockException"/> describing the verification error(s).
-		/// </param>
-		/// <returns>
-		///   <see langword="true"/> if verification succeeded without any errors;
-		///   otherwise, <see langword="false"/>.
-		/// </returns>
-		internal bool TryVerify(bool recursive, Func<ISetup, bool> predicate, HashSet<Mock> verifiedMocks, out MockException error)
+		/// <exception cref="MockException">
+		///   This setup or any of its inner mock (if present and known) failed verification.
+		/// </exception>
+		internal void Verify(bool recursive, Func<ISetup, bool> predicate, HashSet<Mock> verifiedMocks)
 		{
-			MockException e;
-
 			// verify this setup:
-			if (!this.TryVerifySelf(out e) && e.IsVerificationError)
-			{
-				error = e;
-				return false;
-			}
+			this.VerifySelf();
 
 			// optionally verify setups of inner mock (if present and known):
-			if (recursive && this.InnerMock?.TryVerify(predicate, verifiedMocks, out e) == false && e.IsVerificationError)
+			if (recursive)
 			{
-				error = MockException.FromInnerMockOf(this, e);
-				return false;
+				try
+				{
+					this.InnerMock?.Verify(predicate, verifiedMocks);
+				}
+				catch (MockException error) when (error.IsVerificationError)
+				{
+					throw MockException.FromInnerMockOf(this, error);
+				}
 			}
-
-			error = null;
-			return true;
 		}
 
-		protected virtual bool TryVerifySelf(out MockException error)
+		protected virtual void VerifySelf()
 		{
-			error = this.IsMatched ? null : MockException.UnmatchedSetup(this);
-			return error == null;
+			if (!this.IsMatched)
+			{
+				throw MockException.UnmatchedSetup(this);
+			}
 		}
 
 		public void Reset()
@@ -190,10 +184,7 @@ namespace Moq
 				invocation.MarkAsVerifiedIfMatchedBy(setup => setup == this);
 			}
 
-			if (!this.TryVerify(recursive, predicate, verifiedMocks, out var error) && error.IsVerificationError)
-			{
-				throw error;
-			}
+			this.Verify(recursive, predicate, verifiedMocks);
 		}
 
 		[Flags]

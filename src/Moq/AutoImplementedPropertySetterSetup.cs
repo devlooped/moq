@@ -28,10 +28,8 @@ namespace Moq
 			this.setter.Invoke(invocation.Arguments[0]);
 		}
 
-		protected override bool TryVerifySelf(out MockException error)
+		protected override void VerifySelf()
 		{
-			error = null;
-			return true;
 		}
 	}
 }
