@@ -24,4 +24,3 @@ nuget:
 
 artifacts:
   - path: 'out\*.nupkg'
-  - path: 'out\*.snupkg'
