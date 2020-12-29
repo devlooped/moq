@@ -35,10 +35,8 @@ namespace Moq
 			return true;
 		}
 
-		protected override bool TryVerifySelf(out MockException error)
+		protected override void VerifySelf()
 		{
-			error = null;
-			return true;
 		}
 	}
 }
