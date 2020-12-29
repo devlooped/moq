@@ -13,6 +13,36 @@ namespace Moq.Tests
 	public class AwaitOperatorFixture
 	{
 		[Fact]
+		public async Task Callback__on_awaited_non_generic_Task()
+		{
+			var invoked = false;
+
+			var mock = new Mock<IPerson>();
+			mock.Setup(m => Await(m.DoSomethingTaskAsync())).Callback(() => invoked = true);
+
+			Assert.False(invoked);
+
+			await mock.Object.DoSomethingTaskAsync();
+
+			Assert.True(invoked);
+		}
+
+		[Fact]
+		public async Task Callback__on_awaited_non_generic_ValueTask()
+		{
+			var invoked = false;
+
+			var mock = new Mock<IPerson>();
+			mock.Setup(m => Await(m.DoSomethingValueTaskAsync())).Callback(() => invoked = true);
+
+			Assert.False(invoked);
+
+			await mock.Object.DoSomethingValueTaskAsync();
+
+			Assert.True(invoked);
+		}
+
+		[Fact]
 		public async Task Callback__on_awaited_Task()
 		{
 			var invoked = false;
@@ -94,6 +124,40 @@ namespace Moq.Tests
 			var actualException = await Assert.ThrowsAsync<Exception>(async () => await task);
 
 			Assert.Same(expectedException, actualException);
+		}
+
+		[Fact]
+		public async Task Callback__on_awaited_Task__of_property()
+		{
+			var invoked = false;
+
+			var mock = new Mock<IPerson>();
+			mock.Setup(m => Await(m.Friend.DoSomethingTaskAsync())).Callback(() => invoked = true);
+
+			var friend = mock.Object.Friend;
+
+			Assert.False(invoked);
+
+			await friend.DoSomethingTaskAsync();
+
+			Assert.True(invoked);
+		}
+
+		[Fact]
+		public async Task Callback__on_awaited_ValueTask__of_property()
+		{
+			var invoked = false;
+
+			var mock = new Mock<IPerson>();
+			mock.Setup(m => Await(m.Friend.DoSomethingValueTaskAsync())).Callback(() => invoked = true);
+
+			var friend = mock.Object.Friend;
+
+			Assert.False(invoked);
+
+			await friend.DoSomethingValueTaskAsync();
+
+			Assert.True(invoked);
 		}
 
 		[Fact]
@@ -188,11 +252,14 @@ namespace Moq.Tests
 
 		public interface IPerson
 		{
+			IPerson Friend { get; }
 			string Name { get; }
 			Task<string> GetNameTaskAsync();
 			ValueTask<string> GetNameValueTaskAsync();
 			Task<IPerson> GetFriendTaskAsync();
 			ValueTask<IPerson> GetFriendValueTaskAsync();
+			Task DoSomethingTaskAsync();
+			ValueTask DoSomethingValueTaskAsync();
 		}
 	}
 }
