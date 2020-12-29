@@ -22,5 +22,13 @@ namespace Moq
 		{
 			return default(TResult);
 		}
+
+		/// <summary>
+		///   Continues to set up what should happen when the given task completes.
+		/// </summary>
+		public static TResult Await<TResult>(ValueTask<TResult> task)
+		{
+			return default(TResult);
+		}
 	}
 }
