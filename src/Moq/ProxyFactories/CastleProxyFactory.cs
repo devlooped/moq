@@ -103,7 +103,7 @@ namespace Moq
 				}
 				catch (Exception ex)
 				{
-					invocation.ReturnValue = new InvocationExceptionWrapper(ex);
+					invocation.Exception = ex;
 					throw;
 				}
 				finally

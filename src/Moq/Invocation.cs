@@ -15,7 +15,7 @@ namespace Moq
 		private MethodInfo method;
 		private MethodInfo methodImplementation;
 		private readonly Type proxyType;
-		private object returnValue;
+		private object result;
 		private Setup matchingSetup;
 		private bool verified;
 
@@ -71,20 +71,23 @@ namespace Moq
 
 		public object ReturnValue
 		{
-			get => this.returnValue is InvocationExceptionWrapper
-				? null
-				: this.returnValue;
+			get => this.result is ExceptionResult ? null : this.result;
 			set
 			{
-				Debug.Assert(this.returnValue == null);
-				this.returnValue = value;
+				Debug.Assert(this.result == null);
+				this.result = value;
 			}
 		}
 
 		public Exception Exception
-			=> this.returnValue is InvocationExceptionWrapper wrapper
-				? wrapper.Exception
-				: null;
+		{
+			get => this.result is ExceptionResult r ? r.Exception : null;
+			set
+			{
+				Debug.Assert(this.result == null);
+				this.result = new ExceptionResult(value);
+			}
+		}
 
 		public bool IsVerified => this.verified;
 
@@ -149,6 +152,21 @@ namespace Moq
 			}
 
 			return builder.ToString();
+		}
+
+		/// <summary>
+		/// Internal type to mark invocation results as "exception occurred during execution". The type just
+		/// wraps the Exception so a thrown exception can be distinguished from an <see cref="System.Exception"/>
+		/// return value.
+		/// </summary>
+		private readonly struct ExceptionResult
+		{
+			public ExceptionResult(Exception exception)
+			{
+				Exception = exception;
+			}
+
+			public Exception Exception { get; }
 		}
 	}
 }
