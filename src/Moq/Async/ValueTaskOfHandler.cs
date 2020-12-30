@@ -6,7 +6,7 @@ using System.Threading.Tasks;
 
 namespace Moq.Async
 {
-	internal sealed class ValueTaskOfHandler : IAwaitableHandler
+	internal sealed class ValueTaskOfHandler : AwaitableHandler
 	{
 		private readonly Type resultType;
 		private readonly Type taskType;
@@ -19,9 +19,9 @@ namespace Moq.Async
 			this.tcsType = typeof(TaskCompletionSource<>).MakeGenericType(this.resultType);
 		}
 
-		public Type ResultType => this.resultType;
+		public override Type ResultType => this.resultType;
 
-		public object CreateCompleted(object result)
+		public override object CreateCompleted(object result)
 		{
 			// `Activator.CreateInstance` could throw an `AmbiguousMatchException` in this use case,
 			// so we're explicitly selecting and calling the constructor we want to use:
@@ -31,7 +31,7 @@ namespace Moq.Async
 
 		}
 
-		public object CreateFaulted(Exception exception)
+		public override object CreateFaulted(Exception exception)
 		{
 			var tcs = Activator.CreateInstance(this.tcsType);
 			this.tcsType.GetMethod("SetException", new Type[] { typeof(Exception) }).Invoke(tcs, new object[] { exception });
@@ -44,7 +44,7 @@ namespace Moq.Async
 			return valueTask;
 		}
 
-		public bool TryGetResult(object valueTask, out object result)
+		public override bool TryGetResult(object valueTask, out object result)
 		{
 			if (valueTask != null)
 			{

@@ -6,7 +6,7 @@ using System.Threading.Tasks;
 
 namespace Moq.Async
 {
-	internal sealed class TaskHandler : IAwaitableHandler
+	internal sealed class TaskHandler : AwaitableHandler
 	{
 		public static readonly TaskHandler Instance = new TaskHandler();
 
@@ -14,7 +14,7 @@ namespace Moq.Async
 		{
 		}
 
-		Type IAwaitableHandler.ResultType => typeof(void);
+		public override Type ResultType => typeof(void);
 
 		public object CreateCompleted()
 		{
@@ -23,16 +23,16 @@ namespace Moq.Async
 			return tcs.Task;
 		}
 
-		object IAwaitableHandler.CreateCompleted(object _) => this.CreateCompleted();
+		public override object CreateCompleted(object _) => this.CreateCompleted();
 
-		public object CreateFaulted(Exception exception)
+		public override object CreateFaulted(Exception exception)
 		{
 			var tcs = new TaskCompletionSource<bool>();
 			tcs.SetException(exception);
 			return tcs.Task;
 		}
 
-		bool IAwaitableHandler.TryGetResult(object task, out object result)
+		public override bool TryGetResult(object task, out object result)
 		{
 			result = null;
 			return false;

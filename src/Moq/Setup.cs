@@ -34,7 +34,7 @@ namespace Moq
 		public LambdaExpression Expression => this.expectation.Expression;
 
 		public Mock InnerMock => this.TryGetReturnValue(out var returnValue)
-		                         && Unwrap.ResultIfCompletedTask(returnValue) is IMocked mocked ? mocked.Mock : null;
+		                         && Unwrap.ResultIfCompletedAwaitable(returnValue) is IMocked mocked ? mocked.Mock : null;
 
 		public bool IsConditional => this.Condition != null;
 

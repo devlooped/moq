@@ -13,7 +13,7 @@ namespace Moq
 		public InnerMockSetup(Expression originalExpression, Mock mock, InvocationShape expectation, object returnValue)
 			: base(originalExpression, mock, expectation)
 		{
-			Debug.Assert(Unwrap.ResultIfCompletedTask(returnValue) is IMocked);
+			Debug.Assert(Unwrap.ResultIfCompletedAwaitable(returnValue) is IMocked);
 
 			this.returnValue = returnValue;
 
