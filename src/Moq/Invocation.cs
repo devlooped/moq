@@ -93,8 +93,14 @@ namespace Moq
 
 		public void ConvertResultUsing(IAwaitableHandler awaitableHandler)
 		{
-			this.result = this.result is ExceptionResult r ? awaitableHandler.CreateFaulted(r.Exception)
-			                                               : awaitableHandler.CreateCompleted(this.result);
+			if (this.result is ExceptionResult r)
+			{
+				this.result = awaitableHandler.CreateFaulted(r.Exception);
+			}
+			else if (this.result == null || !this.method.ReturnType.IsAssignableFrom(this.result.GetType()))
+			{
+				this.result = awaitableHandler.CreateCompleted(this.result);
+			}
 		}
 
 		public bool IsVerified => this.verified;
