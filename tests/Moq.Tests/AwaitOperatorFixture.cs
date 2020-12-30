@@ -5,6 +5,8 @@ using System;
 using System.Runtime.CompilerServices;
 using System.Threading.Tasks;
 
+using Moq.Async;
+
 using Xunit;
 
 using static Moq.AwaitOperator;
@@ -14,6 +16,13 @@ namespace Moq.Tests
 {
 	public class AwaitOperatorFixture
 	{
+		public AwaitOperatorFixture()
+		{
+			AwaitableHandler.Register(
+				typeof(Some<>),
+				type => new SomeOfHandler(resultType: type.GetGenericArguments()[0]));
+		}
+
 		[Fact]
 		public async Task Callback__on_awaited_non_generic_Task()
 		{
@@ -526,6 +535,11 @@ namespace Moq.Tests
 				this.task = Task.FromResult(result);
 			}
 
+			public Some(Exception exception)
+			{
+				this.task = Task.FromException<TResult>(exception);
+			}
+
 			public TaskAwaiter<TResult> GetAwaiter() => this.task.GetAwaiter();
 		}
 
@@ -534,6 +548,43 @@ namespace Moq.Tests
 			public static TResult Await<TResult>(Some<TResult> some)
 			{
 				return default(TResult);
+			}
+		}
+
+		private sealed class SomeOfHandler : IAwaitableHandler
+		{
+			private readonly Type resultType;
+
+			public SomeOfHandler(Type resultType)
+			{
+				this.resultType = resultType;
+			}
+
+			public Type ResultType => this.resultType;
+
+			public object CreateCompleted(object result)
+			{
+				var someType = typeof(Some<>).MakeGenericType(this.resultType);
+				var ctor = someType.GetConstructor(new Type[] { this.resultType });
+				var some = ctor.Invoke(new object[] { result });
+				return some;
+			}
+
+			public object CreateFaulted(Exception exception)
+			{
+				var someType = typeof(Some<>).MakeGenericType(this.resultType);
+				var ctor = someType.GetConstructor(new Type[] { typeof(Exception) });
+				var some = ctor.Invoke(new object[] { exception });
+				return some;
+			}
+
+			public bool TryGetResult(object some, out object result)
+			{
+				var type = some.GetType();
+				var awaiter = type.GetMethod("GetAwaiter").Invoke(some, null);
+				var awaiterType = awaiter.GetType();
+				result = awaiterType.GetMethod("GetResult").Invoke(awaiter, null);
+				return true;
 			}
 		}
 	}

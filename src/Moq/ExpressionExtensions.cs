@@ -66,9 +66,9 @@ namespace Moq
 
 		public static bool IsAwait(this MethodCallExpression expression, out IAwaitableHandler awaitableHandler)
 		{
-			if (expression.Method.DeclaringType == typeof(AwaitOperator))
+			if (expression.Method.IsStatic && expression.Arguments.Count == 1)
 			{
-				var awaitableType = expression.Method.GetParameters().Single().ParameterType;
+				var awaitableType = expression.Method.GetParameters()[0].ParameterType;
 				awaitableHandler = AwaitableHandler.TryGet(awaitableType);
 			}
 			else
