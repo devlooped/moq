@@ -339,6 +339,28 @@ namespace Moq.Tests
 		}
 
 		[Fact]
+		public async Task Callback__on_property_set__of_awaited_Task__of_property__of_awaited_ValueTask__of_awaited_custom_awaitable_type()
+		{
+			var expectedName = "Alice";
+
+			string invokedWithName = "not yet invoked";
+
+			var mock = new Mock<IPerson>();
+			mock.SetupSet(m => Await(Await(Await(m.GetFriendSomeAsync()).GetFriendValueTaskAsync()).Friend.GetFriendTaskAsync()).Name = It.IsAny<string>()).Callback((string name) => invokedWithName = name);
+
+			var friend = await mock.Object.GetFriendSomeAsync();
+			var friendOfFriend = await friend.GetFriendValueTaskAsync();
+			var friendOfFriendOfFriend = friendOfFriend.Friend;
+			var friendOfFriendOfFriendOfFriend = await friendOfFriendOfFriend.GetFriendTaskAsync();
+
+			Assert.Equal("not yet invoked", invokedWithName);
+
+			friendOfFriendOfFriendOfFriend.Name = expectedName;
+
+			Assert.Equal(expectedName, invokedWithName);
+		}
+
+		[Fact]
 		public async Task Returns__on_property__of_awaited_Task()
 		{
 			var expectedName = "Alice";
@@ -448,8 +470,6 @@ namespace Moq.Tests
 
 			var secondTask = mock.Object.DoSomethingValueTaskAsync();
 			await secondTask;
-
-			Assert.NotSame(firstTask, secondTask);
 		}
 
 		[Fact]
