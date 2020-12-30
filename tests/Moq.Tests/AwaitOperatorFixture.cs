@@ -282,6 +282,63 @@ namespace Moq.Tests
 		}
 
 		[Fact]
+		public async Task Callback__on_property_set__of_awaited_Task()
+		{
+			var expectedName = "Alice";
+
+			string invokedWithName = "not yet invoked";
+
+			var mock = new Mock<IPerson>();
+			mock.SetupSet(m => Await(m.GetFriendTaskAsync()).Name = It.IsAny<string>()).Callback((string name) => invokedWithName = name);
+
+			var friend = await mock.Object.GetFriendTaskAsync();
+
+			Assert.Equal("not yet invoked", invokedWithName);
+
+			friend.Name = expectedName;
+
+			Assert.Equal(expectedName, invokedWithName);
+		}
+
+		[Fact]
+		public async Task Callback__on_property_set__of_awaited_ValueTask()
+		{
+			var expectedName = "Alice";
+
+			string invokedWithName = "not yet invoked";
+
+			var mock = new Mock<IPerson>();
+			mock.SetupSet(m => Await(m.GetFriendValueTaskAsync()).Name = It.IsAny<string>()).Callback((string name) => invokedWithName = name);
+
+			var friend = await mock.Object.GetFriendValueTaskAsync();
+
+			Assert.Equal("not yet invoked", invokedWithName);
+
+			friend.Name = expectedName;
+
+			Assert.Equal(expectedName, invokedWithName);
+		}
+
+		[Fact]
+		public async Task Callback__on_property_set__of_awaited_custom_awaitable()
+		{
+			var expectedName = "Alice";
+
+			string invokedWithName = "not yet invoked";
+
+			var mock = new Mock<IPerson>();
+			mock.SetupSet(m => Await(m.GetFriendSomeAsync()).Name = It.IsAny<string>()).Callback((string name) => invokedWithName = name);
+
+			var friend = await mock.Object.GetFriendSomeAsync();
+
+			Assert.Equal("not yet invoked", invokedWithName);
+
+			friend.Name = expectedName;
+
+			Assert.Equal(expectedName, invokedWithName);
+		}
+
+		[Fact]
 		public async Task Returns__on_property__of_awaited_Task()
 		{
 			var expectedName = "Alice";
@@ -515,7 +572,7 @@ namespace Moq.Tests
 		public interface IPerson
 		{
 			IPerson Friend { get; }
-			string Name { get; }
+			string Name { get; set; }
 			Some<string> GetNameSomeAsync();
 			Task<string> GetNameTaskAsync();
 			ValueTask<string> GetNameValueTaskAsync();
