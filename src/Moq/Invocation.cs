@@ -7,6 +7,8 @@ using System.Diagnostics;
 using System.Reflection;
 using System.Text;
 
+using Moq.Async;
+
 namespace Moq
 {
 	internal abstract class Invocation : IInvocation
@@ -87,6 +89,12 @@ namespace Moq
 				Debug.Assert(this.result == null);
 				this.result = new ExceptionResult(value);
 			}
+		}
+
+		public void ConvertResultUsing(IAwaitableHandler awaitableHandler)
+		{
+			this.result = this.result is ExceptionResult r ? awaitableHandler.CreateFaulted(r.Exception)
+			                                               : awaitableHandler.CreateCompleted(this.result);
 		}
 
 		public bool IsVerified => this.verified;

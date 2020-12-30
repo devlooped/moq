@@ -8,6 +8,7 @@ using System.Linq;
 using System.Linq.Expressions;
 using System.Reflection;
 
+using Moq.Async;
 using Moq.Expressions.Visitors;
 
 using E = System.Linq.Expressions.Expression;
@@ -63,6 +64,7 @@ namespace Moq
 		public readonly LambdaExpression Expression;
 		public readonly MethodInfo Method;
 		public readonly IReadOnlyList<Expression> Arguments;
+		public IAwaitableHandler AwaitableHandler;
 
 		private readonly IMatcher[] argumentMatchers;
 		private MethodInfo methodImplementation;

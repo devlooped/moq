@@ -63,7 +63,25 @@ namespace Moq
 			this.Condition?.SetupEvaluatedSuccessfully();
 			this.expectation.SetupEvaluatedSuccessfully(invocation);
 
-			this.ExecuteCore(invocation);
+			if (this.expectation.AwaitableHandler == null)
+			{
+				this.ExecuteCore(invocation);
+			}
+			else
+			{
+				try
+				{
+					this.ExecuteCore(invocation);
+				}
+				catch (Exception ex)
+				{
+					invocation.Exception = ex;
+				}
+				finally
+				{
+					invocation.ConvertResultUsing(this.expectation.AwaitableHandler);
+				}
+			}
 		}
 
 		protected abstract void ExecuteCore(Invocation invocation);

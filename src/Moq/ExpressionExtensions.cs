@@ -10,6 +10,7 @@ using System.Linq.Expressions;
 using System.Reflection;
 using System.Text;
 
+using Moq.Async;
 using Moq.Properties;
 using Moq.Protected;
 
@@ -61,6 +62,21 @@ namespace Moq
 			// Expression trees are not compiled directly.
 			// The indirection via an ExpressionCompiler allows users to plug a different expression compiler.
 			return ExpressionCompiler.Instance.Compile(expression);
+		}
+
+		public static bool IsAwait(this MethodCallExpression expression, out IAwaitableHandler awaitableHandler)
+		{
+			if (expression.Method.DeclaringType == typeof(AwaitOperator))
+			{
+				var awaitableType = expression.Method.GetParameters().Single().ParameterType;
+				awaitableHandler = AwaitableHandler.TryGet(awaitableType);
+			}
+			else
+			{
+				awaitableHandler = null;
+			}
+
+			return awaitableHandler != null;
 		}
 
 		public static bool IsMatch(this Expression expression, out Match match)
@@ -221,6 +237,11 @@ namespace Moq
 											parameter),
 										method,
 										arguments);
+						}
+						else if (methodCallExpression.IsAwait(out var awaitableHandler))
+						{
+							Split(methodCallExpression.Arguments.Single(), out r, out p);
+							p.AwaitableHandler = awaitableHandler;
 						}
 						else
 						{
