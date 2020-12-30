@@ -2,11 +2,13 @@
 // All rights reserved. Licensed under the BSD 3-Clause License; see License.txt.
 
 using System;
+using System.Runtime.CompilerServices;
 using System.Threading.Tasks;
 
 using Xunit;
 
 using static Moq.AwaitOperator;
+using static Moq.Tests.AwaitOperatorFixture.AwaitSomeOperator;
 
 namespace Moq.Tests
 {
@@ -73,6 +75,21 @@ namespace Moq.Tests
 		}
 
 		[Fact]
+		public async Task Callback__on_awaited_custom_awaitable()
+		{
+			var invoked = false;
+
+			var mock = new Mock<IPerson>();
+			mock.Setup(m => Await(m.GetNameSomeAsync())).Callback(() => invoked = true);
+
+			Assert.False(invoked);
+
+			await mock.Object.GetNameSomeAsync();
+
+			Assert.True(invoked);
+		}
+
+		[Fact]
 		public async Task Returns__on_awaited_Task()
 		{
 			var expectedName = "Alice";
@@ -94,6 +111,19 @@ namespace Moq.Tests
 			mock.Setup(m => Await(m.GetNameValueTaskAsync())).Returns(expectedName);
 
 			var actualName = await mock.Object.GetNameValueTaskAsync();
+
+			Assert.Equal(expectedName, actualName);
+		}
+
+		[Fact]
+		public async Task Returns__on_awaited_custom_awaitable()
+		{
+			var expectedName = "Alice";
+
+			var mock = new Mock<IPerson>();
+			mock.Setup(m => Await(m.GetNameSomeAsync())).Returns(expectedName);
+
+			var actualName = await mock.Object.GetNameSomeAsync();
 
 			Assert.Equal(expectedName, actualName);
 		}
@@ -121,6 +151,20 @@ namespace Moq.Tests
 			mock.Setup(m => Await(m.GetNameValueTaskAsync())).Throws(expectedException);
 
 			var task = mock.Object.GetNameValueTaskAsync();
+			var actualException = await Assert.ThrowsAsync<Exception>(async () => await task);
+
+			Assert.Same(expectedException, actualException);
+		}
+
+		[Fact]
+		public async Task Throws__on_awaited_custom_awaitable()
+		{
+			var expectedException = new Exception();
+
+			var mock = new Mock<IPerson>();
+			mock.Setup(m => Await(m.GetNameSomeAsync())).Throws(expectedException);
+
+			var task = mock.Object.GetNameSomeAsync();
 			var actualException = await Assert.ThrowsAsync<Exception>(async () => await task);
 
 			Assert.Same(expectedException, actualException);
@@ -161,6 +205,23 @@ namespace Moq.Tests
 		}
 
 		[Fact]
+		public async Task Callback__on_awaited_custom_awaitable__of_property()
+		{
+			var invoked = false;
+
+			var mock = new Mock<IPerson>();
+			mock.Setup(m => Await(m.Friend.GetNameSomeAsync())).Callback(() => invoked = true);
+
+			var friend = mock.Object.Friend;
+
+			Assert.False(invoked);
+
+			await friend.GetNameSomeAsync();
+
+			Assert.True(invoked);
+		}
+
+		[Fact]
 		public async Task Callback__on_property__of_awaited_Task()
 		{
 			var invoked = false;
@@ -186,6 +247,23 @@ namespace Moq.Tests
 			mock.Setup(m => Await(m.GetFriendValueTaskAsync()).Name).Callback(() => invoked = true);
 
 			var friend = await mock.Object.GetFriendValueTaskAsync();
+
+			Assert.False(invoked);
+
+			_ = friend.Name;
+
+			Assert.True(invoked);
+		}
+
+		[Fact]
+		public async Task Callback__on_property__of_awaited_custom_awaitable()
+		{
+			var invoked = false;
+
+			var mock = new Mock<IPerson>();
+			mock.Setup(m => Await(m.GetFriendSomeAsync()).Name).Callback(() => invoked = true);
+
+			var friend = await mock.Object.GetFriendSomeAsync();
 
 			Assert.False(invoked);
 
@@ -223,6 +301,20 @@ namespace Moq.Tests
 		}
 
 		[Fact]
+		public async Task Returns__on_property__of_awaited_custom_awaitable()
+		{
+			var expectedName = "Alice";
+
+			var mock = new Mock<IPerson>();
+			mock.Setup(m => Await(m.GetFriendSomeAsync()).Name).Returns(expectedName);
+
+			var friend = await mock.Object.GetFriendSomeAsync();
+			var actualName = friend.Name;
+
+			Assert.Equal(expectedName, actualName);
+		}
+
+		[Fact]
 		public async Task Throws__on_property__of_awaited_Task()
 		{
 			var expectedException = new Exception();
@@ -245,6 +337,20 @@ namespace Moq.Tests
 			mock.Setup(m => Await(m.GetFriendValueTaskAsync()).Name).Throws(expectedException);
 
 			var friend = await mock.Object.GetFriendValueTaskAsync();
+			var actualException = Assert.Throws<Exception>(() => friend.Name);
+
+			Assert.Same(expectedException, actualException);
+		}
+
+		[Fact]
+		public async Task Throws__on_property__of_awaited_custom_awaitable()
+		{
+			var expectedException = new Exception();
+
+			var mock = new Mock<IPerson>();
+			mock.Setup(m => Await(m.GetFriendSomeAsync()).Name).Throws(expectedException);
+
+			var friend = await mock.Object.GetFriendSomeAsync();
 			var actualException = Assert.Throws<Exception>(() => friend.Name);
 
 			Assert.Same(expectedException, actualException);
@@ -401,12 +507,34 @@ namespace Moq.Tests
 		{
 			IPerson Friend { get; }
 			string Name { get; }
+			Some<string> GetNameSomeAsync();
 			Task<string> GetNameTaskAsync();
 			ValueTask<string> GetNameValueTaskAsync();
+			Some<IPerson> GetFriendSomeAsync();
 			Task<IPerson> GetFriendTaskAsync();
 			ValueTask<IPerson> GetFriendValueTaskAsync();
 			Task DoSomethingTaskAsync();
 			ValueTask DoSomethingValueTaskAsync();
+		}
+
+		public class Some<TResult>
+		{
+			private readonly Task<TResult> task;
+
+			public Some(TResult result)
+			{
+				this.task = Task.FromResult(result);
+			}
+
+			public TaskAwaiter<TResult> GetAwaiter() => this.task.GetAwaiter();
+		}
+
+		public static class AwaitSomeOperator
+		{
+			public static TResult Await<TResult>(Some<TResult> some)
+			{
+				return default(TResult);
+			}
 		}
 	}
 }
