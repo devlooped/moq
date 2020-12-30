@@ -7,6 +7,28 @@ The format is loosely based on [Keep a Changelog](http://keepachangelog.com/en/1
 
 ## Unreleased
 
+#### Added
+
+* "Await anything". Async methods can now be set up using the `Await` methods that act as a substitute for the `await` keyword (which the compilers don't allow inside setup expressions). This also enables method chaining across async calls in setup expressions. Should work almost anywhere.
+
+   ```csharp
+   using static Moq.AwaitOperator;
+
+   mock.SetupGet(m => Await(m.GetByIdAsync(...)).Items)
+       .Returns(new[] { 1, 2 });
+
+   var x = await mock.Object.GetByIdAsync(...);
+   var items = x.Items;  // [ 1, 2 ]
+   ```
+
+   or, using `Mock.Of`:
+
+   ```csharp
+   Mock.Of(m => Await(m.GetByIdAsync(...)).Items == new[] { 1, 2 }));
+   ```
+
+   See [details in the pull request description](https://github.com/moq/moq4/pull/1123), including an example of how to enable custom awaitable types. (@stakx, #1123)
+
 #### Changed
 
 * Attempts to mark conditionals setup as verifiable are once again allowed; it turns out that forbidding it (as was done in #997 for version 4.14.0) is in fact a regression. (@stakx, #1121)
