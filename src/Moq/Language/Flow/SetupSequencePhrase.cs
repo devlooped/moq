@@ -4,6 +4,7 @@
 using System;
 using System.ComponentModel;
 
+using Moq.Async;
 using Moq.Behaviors;
 
 namespace Moq.Language.Flow

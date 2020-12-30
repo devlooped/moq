@@ -250,6 +250,132 @@ namespace Moq.Tests
 			Assert.Same(expectedException, actualException);
 		}
 
+		[Fact]
+		public async Task SetupSequence_Pass__on_awaited_non_generic_Task()
+		{
+			var mock = new Mock<IPerson>();
+			mock.SetupSequence(m => Await(m.DoSomethingTaskAsync())).Pass().Pass();
+
+			var firstTask = mock.Object.DoSomethingTaskAsync();
+			await firstTask;
+
+			var secondTask = mock.Object.DoSomethingTaskAsync();
+			await secondTask;
+
+			Assert.NotSame(firstTask, secondTask);
+		}
+
+		[Fact]
+		public async Task SetupSequence_Pass__on_awaited_non_generic_ValueTask()
+		{
+			var mock = new Mock<IPerson>();
+			mock.SetupSequence(m => Await(m.DoSomethingValueTaskAsync())).Pass().Pass();
+
+			var firstTask = mock.Object.DoSomethingValueTaskAsync();
+			await firstTask;
+
+			var secondTask = mock.Object.DoSomethingValueTaskAsync();
+			await secondTask;
+
+			Assert.NotSame(firstTask, secondTask);
+		}
+
+		[Fact]
+		public async Task SetupSequence_Returns__on_awaited_Task()
+		{
+			var expectedFirstName = "Alice";
+			var expectedSecondName = "Betty";
+
+			var mock = new Mock<IPerson>();
+			mock.SetupSequence(m => Await(m.GetNameTaskAsync())).Returns(expectedFirstName).Returns(expectedSecondName);
+
+			var actualFirstName = await mock.Object.GetNameTaskAsync();
+			var actualSecondName = await mock.Object.GetNameTaskAsync();
+
+			Assert.Equal(expectedFirstName, actualFirstName);
+			Assert.Equal(expectedSecondName, actualSecondName);
+		}
+
+		[Fact]
+		public async Task SetupSequence_Returns__on_awaited_ValueTask()
+		{
+			var expectedFirstName = "Alice";
+			var expectedSecondName = "Betty";
+
+			var mock = new Mock<IPerson>();
+			mock.SetupSequence(m => Await(m.GetNameValueTaskAsync())).Returns(expectedFirstName).Returns(expectedSecondName);
+
+			var actualFirstName = await mock.Object.GetNameValueTaskAsync();
+			var actualSecondName = await mock.Object.GetNameValueTaskAsync();
+
+			Assert.Equal(expectedFirstName, actualFirstName);
+			Assert.Equal(expectedSecondName, actualSecondName);
+		}
+
+		[Fact]
+		public async Task SetupSequence_Throws__on_awaited_non_generic_Task()
+		{
+			var expectedFirstException = new Exception();
+			var expectedSecondException = new Exception();
+
+			var mock = new Mock<IPerson>();
+			mock.SetupSequence(m => Await(m.DoSomethingTaskAsync())).Throws(expectedFirstException).Throws(expectedSecondException);
+
+			var actualFirstException = await Assert.ThrowsAsync<Exception>(async () => await mock.Object.DoSomethingTaskAsync());
+			var actualSecondException = await Assert.ThrowsAsync<Exception>(async () => await mock.Object.DoSomethingTaskAsync());
+
+			Assert.Same(expectedFirstException, actualFirstException);
+			Assert.Same(expectedSecondException, actualSecondException);
+		}
+
+		[Fact]
+		public async Task SetupSequence_Throws__on_awaited_non_generic_ValueTask()
+		{
+			var expectedFirstException = new Exception();
+			var expectedSecondException = new Exception();
+
+			var mock = new Mock<IPerson>();
+			mock.SetupSequence(m => Await(m.DoSomethingValueTaskAsync())).Throws(expectedFirstException).Throws(expectedSecondException);
+
+			var actualFirstException = await Assert.ThrowsAsync<Exception>(async () => await mock.Object.DoSomethingValueTaskAsync());
+			var actualSecondException = await Assert.ThrowsAsync<Exception>(async () => await mock.Object.DoSomethingValueTaskAsync());
+
+			Assert.Same(expectedFirstException, actualFirstException);
+			Assert.Same(expectedSecondException, actualSecondException);
+		}
+
+		[Fact]
+		public async Task SetupSequence_Throws__on_awaited_Task()
+		{
+			var expectedFirstException = new Exception();
+			var expectedSecondException = new Exception();
+
+			var mock = new Mock<IPerson>();
+			mock.SetupSequence(m => Await(m.GetNameTaskAsync())).Throws(expectedFirstException).Throws(expectedSecondException);
+
+			var actualFirstException = await Assert.ThrowsAsync<Exception>(async () => await mock.Object.GetNameTaskAsync());
+			var actualSecondException = await Assert.ThrowsAsync<Exception>(async () => await mock.Object.GetNameTaskAsync());
+
+			Assert.Same(expectedFirstException, actualFirstException);
+			Assert.Same(expectedSecondException, actualSecondException);
+		}
+
+		[Fact]
+		public async Task SetupSequence_Throws__on_awaited_ValueTask()
+		{
+			var expectedFirstException = new Exception();
+			var expectedSecondException = new Exception();
+
+			var mock = new Mock<IPerson>();
+			mock.SetupSequence(m => Await(m.GetNameValueTaskAsync())).Throws(expectedFirstException).Throws(expectedSecondException);
+
+			var actualFirstException = await Assert.ThrowsAsync<Exception>(async () => await mock.Object.GetNameValueTaskAsync());
+			var actualSecondException = await Assert.ThrowsAsync<Exception>(async () => await mock.Object.GetNameValueTaskAsync());
+
+			Assert.Same(expectedFirstException, actualFirstException);
+			Assert.Same(expectedSecondException, actualSecondException);
+		}
+
 		public interface IPerson
 		{
 			IPerson Friend { get; }
