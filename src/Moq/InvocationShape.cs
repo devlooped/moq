@@ -64,7 +64,7 @@ namespace Moq
 		public readonly LambdaExpression Expression;
 		public readonly MethodInfo Method;
 		public readonly IReadOnlyList<Expression> Arguments;
-		public IAwaitableHandler AwaitableHandler;
+		public AwaitableHandler AwaitableHandler;
 
 		private readonly IMatcher[] argumentMatchers;
 		private MethodInfo methodImplementation;

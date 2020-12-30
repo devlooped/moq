@@ -6,7 +6,7 @@ using System.Threading.Tasks;
 
 namespace Moq.Async
 {
-	internal sealed class TaskOfHandler : IAwaitableHandler
+	internal sealed class TaskOfHandler : AwaitableHandler
 	{
 		private readonly Type resultType;
 		private readonly Type tcsType;
@@ -17,9 +17,9 @@ namespace Moq.Async
 			this.tcsType = typeof(TaskCompletionSource<>).MakeGenericType(this.resultType);
 		}
 
-		public Type ResultType => this.resultType;
+		public override Type ResultType => this.resultType;
 
-		public object CreateCompleted(object result)
+		public override object CreateCompleted(object result)
 		{
 			var tcs = Activator.CreateInstance(this.tcsType);
 			this.tcsType.GetMethod("SetResult").Invoke(tcs, new object[] { result });
@@ -27,7 +27,7 @@ namespace Moq.Async
 			return task;
 		}
 
-		public object CreateFaulted(Exception exception)
+		public override object CreateFaulted(Exception exception)
 		{
 			var tcs = Activator.CreateInstance(this.tcsType);
 			this.tcsType.GetMethod("SetException", new Type[] { typeof(Exception) }).Invoke(tcs, new object[] { exception });
@@ -35,7 +35,7 @@ namespace Moq.Async
 			return task;
 		}
 
-		public bool TryGetResult(object task, out object result)
+		public override bool TryGetResult(object task, out object result)
 		{
 			if (task != null)
 			{

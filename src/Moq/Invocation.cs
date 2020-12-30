@@ -91,7 +91,7 @@ namespace Moq
 			}
 		}
 
-		public void ConvertResultUsing(IAwaitableHandler awaitableHandler)
+		public void ConvertResultUsing(AwaitableHandler awaitableHandler)
 		{
 			if (this.result is ExceptionResult r)
 			{

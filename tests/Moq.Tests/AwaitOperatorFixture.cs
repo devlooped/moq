@@ -551,7 +551,7 @@ namespace Moq.Tests
 			}
 		}
 
-		private sealed class SomeOfHandler : IAwaitableHandler
+		private sealed class SomeOfHandler : AwaitableHandler
 		{
 			private readonly Type resultType;
 
@@ -560,9 +560,9 @@ namespace Moq.Tests
 				this.resultType = resultType;
 			}
 
-			public Type ResultType => this.resultType;
+			public override Type ResultType => this.resultType;
 
-			public object CreateCompleted(object result)
+			public override object CreateCompleted(object result)
 			{
 				var someType = typeof(Some<>).MakeGenericType(this.resultType);
 				var ctor = someType.GetConstructor(new Type[] { this.resultType });
@@ -570,21 +570,12 @@ namespace Moq.Tests
 				return some;
 			}
 
-			public object CreateFaulted(Exception exception)
+			public override object CreateFaulted(Exception exception)
 			{
 				var someType = typeof(Some<>).MakeGenericType(this.resultType);
 				var ctor = someType.GetConstructor(new Type[] { typeof(Exception) });
 				var some = ctor.Invoke(new object[] { exception });
 				return some;
-			}
-
-			public bool TryGetResult(object some, out object result)
-			{
-				var type = some.GetType();
-				var awaiter = type.GetMethod("GetAwaiter").Invoke(some, null);
-				var awaiterType = awaiter.GetType();
-				result = awaiterType.GetMethod("GetResult").Invoke(awaiter, null);
-				return true;
 			}
 		}
 	}
