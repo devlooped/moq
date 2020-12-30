@@ -28,7 +28,6 @@ namespace Moq.Async
 			var ctor = this.taskType.GetConstructor(new[] { resultType });
 			var valueTask = ctor.Invoke(new object[] { result });
 			return valueTask;
-
 		}
 
 		public override object CreateFaulted(Exception exception)
