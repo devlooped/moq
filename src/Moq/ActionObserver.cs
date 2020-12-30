@@ -9,6 +9,7 @@ using System.Linq;
 using System.Linq.Expressions;
 using System.Reflection;
 
+using Moq.Async;
 using Moq.Expressions.Visitors;
 using Moq.Internals;
 using Moq.Properties;
@@ -60,6 +61,19 @@ namespace Moq
 					var invocation = recorder.Invocation;
 					if (invocation != null)
 					{
+						var resultType = invocation.Method.DeclaringType;
+						if (resultType.IsAssignableFrom(body.Type) == false)
+						{
+							if (AwaitableHandler.TryGet(body.Type) is { } awaitableHandler
+								&& awaitableHandler.ResultType.IsAssignableFrom(resultType))
+							{
+								// We are here because the current invocation cannot be chained onto the previous one,
+								// however it *can* be chained if we assume that there was an `Await` call around the
+								// former invocation that we simply don't see because static methods aren't recorded.
+								// In this case, we make things work by wrapping an `await` around the left invocation:
+								body = new AwaitExpression(body, awaitableHandler);
+							}
+						}
 						body = Expression.Call(body, invocation.Method, GetArgumentExpressions(invocation, recorder.Matches.ToArray()));
 					}
 					else
@@ -227,7 +241,7 @@ namespace Moq
 			private int creationTimestamp;
 			private Invocation invocation;
 			private int invocationTimestamp;
-			private IProxy returnValue;
+			private object returnValue;
 
 			public Recorder(MatcherObserver matcherObserver)
 			{
@@ -248,7 +262,7 @@ namespace Moq
 				}
 			}
 
-			public Recorder Next => this.returnValue?.Interceptor as Recorder;
+			public Recorder Next => (Unwrap.ResultIfCompletedAwaitable(this.returnValue) as IProxy)?.Interceptor as Recorder;
 
 			public void Intercept(Invocation invocation)
 			{
@@ -276,6 +290,11 @@ namespace Moq
 					if (returnType == typeof(void))
 					{
 						this.returnValue = null;
+					}
+					else if (AwaitableHandler.TryGet(returnType) is { } awaitableHandler)
+					{
+						var result = CreateProxy(awaitableHandler.ResultType, null, this.matcherObserver, out _);
+						this.returnValue = awaitableHandler.CreateCompleted(result);
 					}
 					else if (returnType.IsMockable())
 					{

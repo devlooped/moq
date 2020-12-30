@@ -7,6 +7,7 @@ using System.Collections.ObjectModel;
 using System.Diagnostics;
 using System.Linq.Expressions;
 
+using Moq.Async;
 using Moq.Expressions.Visitors;
 
 namespace Moq
@@ -265,11 +266,20 @@ namespace Moq
 
 		private bool EqualsExtension(Expression x, Expression y)
 		{
-			// For now, we only care about our own `MatchExpression` extension;
+			// For now, we only care about our own extensions;
 			// if we wanted to be more thorough, we'd try to reduce `x` and `y`,
 			// then compare the reduced nodes.
 
-			return x.IsMatch(out var xm) && y.IsMatch(out var ym) && object.Equals(xm, ym);
+			if (x.IsMatch(out var xm))
+			{
+				return y.IsMatch(out var ym) && object.Equals(xm, ym);
+			}
+			else if (x is AwaitExpression xa)
+			{
+				return y is AwaitExpression ya && this.Equals(xa, ya);
+			}
+
+			return false;
 		}
 	}
 }

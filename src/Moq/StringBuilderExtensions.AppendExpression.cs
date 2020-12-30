@@ -8,6 +8,7 @@ using System.Linq;
 using System.Linq.Expressions;
 using System.Text;
 
+using Moq.Async;
 using Moq.Properties;
 
 namespace Moq
@@ -105,6 +106,10 @@ namespace Moq
 					if (expression is MatchExpression me)
 					{
 						return builder.AppendExpression(me);
+					}
+					else if (expression is AwaitExpression ae)
+					{
+						return builder.AppendExpression(ae);
 					}
 					goto default;
 
@@ -431,6 +436,11 @@ namespace Moq
 		private static StringBuilder AppendExpression(this StringBuilder builder, MatchExpression expression)
 		{
 			return builder.AppendExpression(expression.Match.RenderExpression);
+		}
+
+		private static StringBuilder AppendExpression(this StringBuilder builder, AwaitExpression expression)
+		{
+			return builder.Append("(await ").AppendExpression(expression.Operand).Append(")");
 		}
 	}
 }

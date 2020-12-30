@@ -64,16 +64,31 @@ namespace Moq
 			return ExpressionCompiler.Instance.Compile(expression);
 		}
 
-		public static bool IsAwait(this MethodCallExpression expression, out AwaitableHandler awaitableHandler)
+		public static bool IsAwait(this Expression expression, out AwaitableHandler awaitableHandler)
 		{
-			if (expression.Method.IsStatic && expression.Arguments.Count == 1)
+			awaitableHandler = null;
+
+			switch (expression)
 			{
-				var awaitableType = expression.Method.GetParameters()[0].ParameterType;
-				awaitableHandler = AwaitableHandler.TryGet(awaitableType);
-			}
-			else
-			{
-				awaitableHandler = null;
+				case AwaitExpression awaitExpression:
+				{
+					awaitableHandler = awaitExpression.AwaitableHandler;
+					break;
+				}
+
+				case MethodCallExpression methodCallExpression:
+				{
+					if (methodCallExpression.Method.IsStatic && methodCallExpression.Arguments.Count == 1)
+					{
+						var awaitableType = methodCallExpression.Method.GetParameters()[0].ParameterType;
+						awaitableHandler = AwaitableHandler.TryGet(awaitableType);
+					}
+					else
+					{
+						awaitableHandler = null;
+					}
+					break;
+				}
 			}
 
 			return awaitableHandler != null;
@@ -111,6 +126,7 @@ namespace Moq
 
 				case ExpressionType.Call:
 				case ExpressionType.Index:
+				case ExpressionType.Extension when (e is AwaitExpression):
 				{
 					return true;
 				}
@@ -259,6 +275,13 @@ namespace Moq
 										method,
 										arguments);
 						}
+						return;
+					}
+
+					case ExpressionType.Extension when (e is AwaitExpression awaitExpression):
+					{
+						Split(awaitExpression.Operand, out r, out p);
+						p.AwaitableHandler = awaitExpression.AwaitableHandler;
 						return;
 					}
 

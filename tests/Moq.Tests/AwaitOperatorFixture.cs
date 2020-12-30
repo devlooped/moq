@@ -604,7 +604,7 @@ namespace Moq.Tests
 		{
 			public static TResult Await<TResult>(Some<TResult> some)
 			{
-				return default(TResult);
+				return some.GetAwaiter().GetResult();
 			}
 		}
 

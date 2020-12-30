@@ -34,7 +34,7 @@ namespace Moq
 		/// </summary>
 		public static TResult Await<TResult>(Task<TResult> task)
 		{
-			return default(TResult);
+			return task.Result;
 		}
 
 		/// <summary>
@@ -42,7 +42,7 @@ namespace Moq
 		/// </summary>
 		public static TResult Await<TResult>(ValueTask<TResult> task)
 		{
-			return default(TResult);
+			return task.Result;
 		}
 	}
 }
