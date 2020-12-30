@@ -15,7 +15,9 @@ namespace Moq.Async
 		{
 			AwaitableHandler.factories = new Dictionary<Type, Func<Type, IAwaitableHandler>>()
 			{
+				[typeof(Task)] = type => TaskHandler.Instance,
 				[typeof(Task<>)] = type => new TaskOfHandler(type.GetGenericArguments()[0]),
+				[typeof(ValueTask)] = type => ValueTaskHandler.Instance,
 				[typeof(ValueTask<>)] = type => new ValueTaskOfHandler(type, type.GetGenericArguments()[0]),
 			};
 		}
