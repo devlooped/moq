@@ -488,7 +488,7 @@ namespace Moq
 					// Intermediate parts of a fluent expression do not contribute to the
 					// total count themselves. The matching invocation count of the rightmost
 					// expression gets "forwarded" towards the left:
-					if (Unwrap.ResultIfCompletedTask(matchingInvocation.ReturnValue) is IMocked mocked)
+					if (Unwrap.ResultIfCompletedAwaitable(matchingInvocation.ReturnValue) is IMocked mocked)
 					{
 						count += Mock.GetMatchingInvocationCount(mocked.Mock, remainingParts, visitedInnerMocks, invocationsToBeMarkedAsVerified);
 					}
@@ -792,7 +792,7 @@ namespace Moq
 			}
 
 			var result = (useAlternateProvider ?? this.DefaultValueProvider).GetDefaultReturnValue(method, this);
-			var unwrappedResult = Unwrap.ResultIfCompletedTask(result);
+			var unwrappedResult = Unwrap.ResultIfCompletedAwaitable(result);
 
 			candidateInnerMock = (unwrappedResult as IMocked)?.Mock;
 			return result;

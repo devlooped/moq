@@ -105,7 +105,7 @@ namespace Moq
 					{
 						message.Append($"      {invocation}");
 
-						if (invocation.Method.ReturnType != typeof(void) && Unwrap.ResultIfCompletedTask(invocation.ReturnValue) is IMocked mocked)
+						if (invocation.Method.ReturnType != typeof(void) && Unwrap.ResultIfCompletedAwaitable(invocation.ReturnValue) is IMocked mocked)
 						{
 							var innerMock = mocked.Mock;
 							mocks.Enqueue(innerMock);
