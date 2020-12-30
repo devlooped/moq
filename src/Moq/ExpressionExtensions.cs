@@ -257,6 +257,13 @@ namespace Moq
 						else if (methodCallExpression.IsAwait(out var awaitableHandler))
 						{
 							Split(methodCallExpression.Arguments.Single(), out r, out p);
+							p = new InvocationShape(
+								expression:
+									Expression.Lambda(
+										new AwaitExpression(methodCallExpression.Arguments.Single(), awaitableHandler),
+										p.Expression.Parameters),
+								method: p.Method,
+								arguments: p.Arguments);
 							p.AwaitableHandler = awaitableHandler;
 						}
 						else

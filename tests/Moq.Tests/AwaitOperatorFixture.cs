@@ -2,6 +2,7 @@
 // All rights reserved. Licensed under the BSD 3-Clause License; see License.txt.
 
 using System;
+using System.Linq;
 using System.Runtime.CompilerServices;
 using System.Threading.Tasks;
 
@@ -587,6 +588,29 @@ namespace Moq.Tests
 			actualName = await friend.GetNameValueTaskAsync();
 
 			Assert.Equal(expectedSameName, actualName);
+		}
+
+		[Fact]
+		public void Await__is_represented__in_setup_Expression()
+		{
+			var mock = new Mock<IPerson>();
+			mock.Setup(m => Await(m.DoSomethingTaskAsync()));
+			var setup = mock.Setups.Last();
+			Assert.Contains("aWAiT", setup.Expression.ToStringFixed(), StringComparison.OrdinalIgnoreCase);
+			//               ^^^^^
+			// NOTE: Depending on the exact scenario, the `Await` method name may get converted to
+			// a faux `await` keyword (e.g. with `SetupSet`). Right now, we don't care too much about
+			// that slight loss of accuracy, as long as a clue for the occurred await remains.
+		}
+
+		[Fact]
+		public void Await__is_represented__in_setup_OriginalExpression()
+		{
+			// NOTE: The note in the test above applies here, too.
+			var mock = new Mock<IPerson>();
+			mock.Setup(m => Await(m.DoSomethingTaskAsync()));
+			var setup = mock.Setups.Last();
+			Assert.Contains("await", setup.OriginalExpression.ToStringFixed(), StringComparison.OrdinalIgnoreCase);
 		}
 
 		public interface IPerson
