@@ -376,6 +376,27 @@ namespace Moq.Tests
 			Assert.Same(expectedSecondException, actualSecondException);
 		}
 
+		[Fact]
+		public async Task Mock_Of()
+		{
+			var expectedName = "Alice";
+			var expectedSameName = "also Alice";
+
+			var mock = Mock.Of<IPerson>(m =>
+				Await(m.GetFriendTaskAsync()).Name == expectedName &&
+				Await(m.Friend.GetNameValueTaskAsync()) == expectedSameName);
+
+			var friend = await mock.GetFriendTaskAsync();
+			var actualName = friend.Name;
+
+			Assert.Equal(expectedName, actualName);
+
+			friend = mock.Friend;
+			actualName = await friend.GetNameValueTaskAsync();
+
+			Assert.Equal(expectedSameName, actualName);
+		}
+
 		public interface IPerson
 		{
 			IPerson Friend { get; }
