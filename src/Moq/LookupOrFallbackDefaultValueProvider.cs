@@ -9,6 +9,8 @@ using System.Diagnostics;
 using System.Reflection;
 using System.Threading.Tasks;
 
+using Moq.Async;
+
 namespace Moq
 {
 	/// <summary>
@@ -41,9 +43,6 @@ namespace Moq
 		{
 			this.factories = new Dictionary<object, Func<Type, Mock, object>>()
 			{
-				[typeof(Task)] = CreateTask,
-				[typeof(Task<>)] = CreateTaskOf,
-				[typeof(ValueTask<>)] = CreateValueTaskOf,
 				["System.ValueTuple`1"] = CreateValueTupleOf,
 				["System.ValueTuple`2"] = CreateValueTupleOf,
 				["System.ValueTuple`3"] = CreateValueTupleOf,
@@ -64,8 +63,11 @@ namespace Moq
 		{
 			Debug.Assert(factoryKey != null);
 
-			this.factories.Remove(factoryKey);
-			this.factories.Remove(factoryKey.FullName);
+			// NOTE: In order to be able to unregister the default logic for awaitable types,
+			// we need a way (below) to know when to delegate to an `IAwaitableFactory`, and when not to.
+			// This is why we only reset the dictionary entry instead of removing it.
+			this.factories[factoryKey] = null;
+			this.factories[factoryKey.FullName] = null;
 		}
 
 		/// <summary>
@@ -122,9 +124,21 @@ namespace Moq
 			               : type;
 
 			Func<Type, Mock, object> factory;
-			return this.factories.TryGetValue(handlerKey         , out factory) ? factory.Invoke(type, mock)
-			     : this.factories.TryGetValue(handlerKey.FullName, out factory) ? factory.Invoke(type, mock)
-			     : this.GetFallbackDefaultValue(type, mock);
+			if (this.factories.TryGetValue(handlerKey, out factory) || this.factories.TryGetValue(handlerKey.FullName, out factory))
+			{
+				if (factory != null)  // This prevents delegation to an `IAwaitableFactory` for deregistered awaitable types; see note above.
+				{
+					return factory.Invoke(type, mock);
+				}
+			}
+			else if (AwaitableFactory.TryGet(type) is { } awaitableFactory)
+			{
+				var resultType = awaitableFactory.ResultType;
+				var result = resultType != typeof(void) ? this.GetDefaultValue(resultType, mock) : null;
+				return awaitableFactory.CreateCompleted(result);
+			}
+
+			return this.GetFallbackDefaultValue(type, mock);
 		}
 
 		/// <summary>
@@ -140,33 +154,6 @@ namespace Moq
 			Debug.Assert(mock != null);
 
 			return type.GetDefaultValue();
-		}
-
-		private static object CreateTask(Type type, Mock mock)
-		{
-			return Task.FromResult(false);
-		}
-
-		private object CreateTaskOf(Type type, Mock mock)
-		{
-			var resultType = type.GetGenericArguments()[0];
-			var result = this.GetDefaultValue(resultType, mock);
-
-			var tcsType = typeof(TaskCompletionSource<>).MakeGenericType(resultType);
-			var tcs = Activator.CreateInstance(tcsType);
-			tcsType.GetMethod("SetResult").Invoke(tcs, new[] { result });
-			return tcsType.GetProperty("Task").GetValue(tcs, null);
-		}
-
-		private object CreateValueTaskOf(Type type, Mock mock)
-		{
-			var resultType = type.GetGenericArguments()[0];
-			var result = this.GetDefaultValue(resultType, mock);
-
-			// `Activator.CreateInstance` could throw an `AmbiguousMatchException` in this use case,
-			// so we're explicitly selecting and calling the constructor we want to use:
-			var valueTaskCtor = type.GetConstructor(new[] { resultType });
-			return valueTaskCtor.Invoke(new object[] { result });
 		}
 
 		private object CreateValueTupleOf(Type type, Mock mock)

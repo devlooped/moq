@@ -8,6 +8,8 @@ using System.Linq.Expressions;
 using System.Reflection;
 using System.Text;
 
+using Moq.Async;
+
 namespace Moq
 {
 	internal abstract class Setup : ISetup
@@ -34,7 +36,7 @@ namespace Moq
 		public LambdaExpression Expression => this.expectation.Expression;
 
 		public Mock InnerMock => this.TryGetReturnValue(out var returnValue)
-		                         && Unwrap.ResultIfCompletedTask(returnValue) is IMocked mocked ? mocked.Mock : null;
+		                         && Awaitable.TryGetResultRecursive(returnValue) is IMocked mocked ? mocked.Mock : null;
 
 		public bool IsConditional => this.Condition != null;
 

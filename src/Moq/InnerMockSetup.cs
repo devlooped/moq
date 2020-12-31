@@ -4,6 +4,8 @@
 using System.Diagnostics;
 using System.Linq.Expressions;
 
+using Moq.Async;
+
 namespace Moq
 {
 	internal sealed class InnerMockSetup : SetupWithOutParameterSupport
@@ -13,7 +15,7 @@ namespace Moq
 		public InnerMockSetup(Expression originalExpression, Mock mock, InvocationShape expectation, object returnValue)
 			: base(originalExpression, mock, expectation)
 		{
-			Debug.Assert(Unwrap.ResultIfCompletedTask(returnValue) is IMocked);
+			Debug.Assert(Awaitable.TryGetResultRecursive(returnValue) is IMocked);
 
 			this.returnValue = returnValue;
 
