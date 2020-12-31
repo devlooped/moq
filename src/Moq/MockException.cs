@@ -12,6 +12,7 @@ using System.Runtime.Serialization;
 using System.Security;
 using System.Text;
 
+using Moq.Async;
 using Moq.Language;
 using Moq.Properties;
 
@@ -105,7 +106,7 @@ namespace Moq
 					{
 						message.Append($"      {invocation}");
 
-						if (invocation.Method.ReturnType != typeof(void) && Unwrap.ResultIfCompletedTask(invocation.ReturnValue) is IMocked mocked)
+						if (invocation.Method.ReturnType != typeof(void) && Awaitable.TryGetResultRecursive(invocation.ReturnValue) is IMocked mocked)
 						{
 							var innerMock = mocked.Mock;
 							mocks.Enqueue(innerMock);
