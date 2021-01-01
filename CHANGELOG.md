@@ -7,6 +7,38 @@ The format is loosely based on [Keep a Changelog](http://keepachangelog.com/en/1
 
 ## Unreleased
 
+#### Added
+
+* Ability to directly set up the `.Result` of tasks and value tasks, which makes setup expressions more uniform by rendering dedicated async verbs like `.ReturnsAsync`, `.ThrowsAsync`, etc. unnecessary:
+
+   ```diff
+   -mock.Setup(x => x.GetFooAsync()).ReturnsAsync(foo)
+   +mock.Setup(x => x.GetFooAsync().Result).Returns(foo)
+   ```
+
+   This is useful in places where there currently aren't any such async verbs at all:
+
+   ```diff
+   -Mock.Of<X>(x => x.GetFooAsync() == Task.FromResult(foo))
+   +Mock.Of<X>(x => x.GetFooAsync().Result == foo)
+   ```
+
+   This also allows recursive setups / method chaining across async calls inside a single setup expression:
+
+   ```diff
+   -mock.Setup(x => x.GetFooAsync()).ReturnsAsync(Mock.Of<IFoo>(f => f.Bar == bar))
+   +mock.Setup(x => x.GetFooAsync().Result.Bar).Returns(bar)
+   ```
+
+   or, with only `Mock.Of`:
+
+   ```diff
+   -Mock.Of<X>(x => x.GetFooAsync() == Task.FromResult(Mock.Of<IFoo>(f => f.Bar == bar)))
+   +Mock.Of<X>(x => x.GetFooAsync().Result.Bar == bar)
+   ```
+
+   This should work in all principal setup methods (`Mock.Of`, `mock.Setup…`, `mock.Verify…`). Support in `mock.Protected()` and for custom awaitable types may be added in the future. (@stakx, #1125)
+
 #### Changed
 
 * Attempts to mark conditionals setup as verifiable are once again allowed; it turns out that forbidding it (as was done in #997 for version 4.14.0) is in fact a regression. (@stakx, #1121)
