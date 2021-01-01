@@ -65,7 +65,25 @@ namespace Moq
 			this.Condition?.SetupEvaluatedSuccessfully();
 			this.expectation.SetupEvaluatedSuccessfully(invocation);
 
-			this.ExecuteCore(invocation);
+			if (this.expectation.HasResultExpression(out var awaitableFactory))
+			{
+				try
+				{
+					this.ExecuteCore(invocation);
+				}
+				catch (Exception exception)
+				{
+					invocation.Exception = exception;
+				}
+				finally
+				{
+					invocation.ConvertResultToAwaitable(awaitableFactory);
+				}
+			}
+			else
+			{
+				this.ExecuteCore(invocation);
+			}
 		}
 
 		protected abstract void ExecuteCore(Invocation invocation);
