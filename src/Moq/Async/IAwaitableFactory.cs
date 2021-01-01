@@ -3,6 +3,7 @@
 
 using System;
 using System.Collections.Generic;
+using System.Linq.Expressions;
 
 namespace Moq.Async
 {
@@ -15,6 +16,8 @@ namespace Moq.Async
 		object CreateFaulted(Exception exception);
 
 		object CreateFaulted(IEnumerable<Exception> exceptions);
+
+		Expression CreateResultExpression(Expression awaitableExpression);
 
 		bool TryGetResult(object awaitable, out object result);
 	}

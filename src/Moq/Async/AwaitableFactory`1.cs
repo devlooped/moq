@@ -5,6 +5,7 @@ using System;
 using System.Collections.Generic;
 using System.Diagnostics;
 using System.Linq;
+using System.Linq.Expressions;
 
 namespace Moq.Async
 {
@@ -42,6 +43,11 @@ namespace Moq.Async
 			Debug.Assert(exceptions.Any());
 
 			return this.CreateFaulted(exceptions);
+		}
+
+		Expression IAwaitableFactory.CreateResultExpression(Expression awaitableExpression)
+		{
+			return new AwaitExpression(awaitableExpression, this);
 		}
 
 		bool IAwaitableFactory.TryGetResult(object awaitable, out object result)

@@ -5,6 +5,7 @@ using System;
 using System.Collections.Generic;
 using System.Diagnostics;
 using System.Linq;
+using System.Linq.Expressions;
 
 namespace Moq.Async
 {
@@ -45,6 +46,8 @@ namespace Moq.Async
 		}
 
 		public abstract bool TryGetResult(TAwaitable awaitable, out TResult result);
+
+		public abstract Expression CreateResultExpression(Expression awaitableExpression);
 
 		bool IAwaitableFactory.TryGetResult(object awaitable, out object result)
 		{

@@ -3,6 +3,7 @@
 
 using System;
 using System.Collections.Generic;
+using System.Linq.Expressions;
 using System.Threading.Tasks;
 
 namespace Moq.Async
@@ -26,6 +27,13 @@ namespace Moq.Async
 			var tcs = new TaskCompletionSource<TResult>();
 			tcs.SetException(exceptions);
 			return new ValueTask<TResult>(tcs.Task);
+		}
+
+		public override Expression CreateResultExpression(Expression awaitableExpression)
+		{
+			return Expression.MakeMemberAccess(
+				awaitableExpression,
+				typeof(ValueTask<TResult>).GetProperty(nameof(ValueTask<TResult>.Result)));
 		}
 
 		public override bool TryGetResult(ValueTask<TResult> valueTask, out TResult result)
