@@ -10,6 +10,7 @@ using System.Linq.Expressions;
 using System.Reflection;
 using System.Text;
 
+using Moq.Async;
 using Moq.Properties;
 using Moq.Protected;
 
@@ -294,6 +295,16 @@ namespace Moq
 					{
 						var memberAccessExpression = (MemberExpression)e;
 						Debug.Assert(memberAccessExpression.Member is PropertyInfo);
+
+						if (IsResult(memberAccessExpression.Member, out var awaitableFactory))
+						{
+							Split(memberAccessExpression.Expression, out r, out p);
+							p.AddResultExpression(
+								awaitable => Expression.MakeMemberAccess(awaitable, memberAccessExpression.Member),
+								awaitableFactory);
+							return;
+						}
+
 						r = memberAccessExpression.Expression;
 						var parameter = Expression.Parameter(r.Type, r is ParameterExpression ope ? ope.Name : ParameterName);
 						var property = memberAccessExpression.GetReboundProperty();
@@ -326,6 +337,15 @@ namespace Moq
 						Debug.Assert(!CanSplit(e));
 						throw new InvalidOperationException();  // this should be unreachable
 				}
+			}
+
+			bool IsResult(MemberInfo member, out IAwaitableFactory awaitableFactory)
+			{
+				var instanceType = member.DeclaringType;
+				awaitableFactory = AwaitableFactory.TryGet(instanceType);
+				var returnType = member switch { PropertyInfo p => p.PropertyType,
+				                                 _              => null };
+				return awaitableFactory != null && object.Equals(returnType, awaitableFactory.ResultType);
 			}
 		}
 

@@ -8,6 +8,7 @@ using System.Linq;
 using System.Linq.Expressions;
 using System.Reflection;
 
+using Moq.Async;
 using Moq.Expressions.Visitors;
 
 using E = System.Linq.Expressions.Expression;
@@ -60,11 +61,12 @@ namespace Moq
 		private static readonly Expression[] noArguments = new Expression[0];
 		private static readonly IMatcher[] noArgumentMatchers = new IMatcher[0];
 
-		public readonly LambdaExpression Expression;
+		public LambdaExpression Expression;
 		public readonly MethodInfo Method;
 		public readonly IReadOnlyList<Expression> Arguments;
 
 		private readonly IMatcher[] argumentMatchers;
+		private IAwaitableFactory awaitableFactory;
 		private MethodInfo methodImplementation;
 		private Expression[] partiallyEvaluatedArguments;
 #if DEBUG
@@ -96,6 +98,17 @@ namespace Moq
 			}
 
 			this.exactGenericTypeArguments = exactGenericTypeArguments;
+		}
+
+		public void AddResultExpression(Func<E, E> add, IAwaitableFactory awaitableFactory)
+		{
+			this.Expression = E.Lambda(add(this.Expression.Body), this.Expression.Parameters);
+			this.awaitableFactory = awaitableFactory;
+		}
+
+		public bool HasResultExpression(out IAwaitableFactory awaitableFactory)
+		{
+			return (awaitableFactory = this.awaitableFactory) != null;
 		}
 
 		public void Deconstruct(out LambdaExpression expression, out MethodInfo method, out IReadOnlyList<Expression> arguments)

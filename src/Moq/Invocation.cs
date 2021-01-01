@@ -7,6 +7,8 @@ using System.Diagnostics;
 using System.Reflection;
 using System.Text;
 
+using Moq.Async;
+
 namespace Moq
 {
 	internal abstract class Invocation : IInvocation
@@ -86,6 +88,18 @@ namespace Moq
 			{
 				Debug.Assert(this.result == null);
 				this.result = new ExceptionResult(value);
+			}
+		}
+
+		public void ConvertResultToAwaitable(IAwaitableFactory awaitableFactory)
+		{
+			if (this.result is ExceptionResult r)
+			{
+				this.result = awaitableFactory.CreateFaulted(r.Exception);
+			}
+			else if (this.result != null && !this.method.ReturnType.IsAssignableFrom(this.result.GetType()))
+			{
+				this.result = awaitableFactory.CreateCompleted(this.result);
 			}
 		}
 
