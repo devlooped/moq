@@ -37,7 +37,7 @@ The format is loosely based on [Keep a Changelog](http://keepachangelog.com/en/1
    +Mock.Of<X>(x => x.GetFooAsync().Result.Bar == bar)
    ```
 
-   This should work in all principal setup methods (`Mock.Of`, `mock.Setup…`, `mock.Verify…`). Support in `mock.Protected()` and for custom awaitable types may be added in the future. (@stakx, #1125)
+   This should work in all principal setup methods (`Mock.Of`, `mock.Setup…`, `mock.Verify…`). Support in `mock.Protected()` and for custom awaitable types may be added in the future. (@stakx, #1126)
 
 #### Changed
 
