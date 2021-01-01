@@ -2,7 +2,9 @@
 // All rights reserved. Licensed under the BSD 3-Clause License; see License.txt.
 
 using System;
+using System.Collections.Generic;
 using System.Diagnostics;
+using System.Linq;
 
 namespace Moq.Async
 {
@@ -21,6 +23,25 @@ namespace Moq.Async
 			Debug.Assert(result == null);
 
 			return this.CreateCompleted();
+		}
+
+		public abstract TAwaitable CreateFaulted(Exception exception);
+
+		object IAwaitableFactory.CreateFaulted(Exception exception)
+		{
+			Debug.Assert(exception != null);
+
+			return this.CreateFaulted(exception);
+		}
+
+		public abstract TAwaitable CreateFaulted(IEnumerable<Exception> exceptions);
+
+		object IAwaitableFactory.CreateFaulted(IEnumerable<Exception> exceptions)
+		{
+			Debug.Assert(exceptions != null);
+			Debug.Assert(exceptions.Any());
+
+			return this.CreateFaulted(exceptions);
 		}
 
 		bool IAwaitableFactory.TryGetResult(object awaitable, out object result)

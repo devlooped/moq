@@ -1,6 +1,8 @@
 // Copyright (c) 2007, Clarius Consulting, Manas Technology Solutions, InSTEDD, and Contributors.
 // All rights reserved. Licensed under the BSD 3-Clause License; see License.txt.
 
+using System;
+using System.Collections.Generic;
 using System.Threading.Tasks;
 
 namespace Moq.Async
@@ -10,6 +12,20 @@ namespace Moq.Async
 		public override ValueTask<TResult> CreateCompleted(TResult result)
 		{
 			return new ValueTask<TResult>(result);
+		}
+
+		public override ValueTask<TResult> CreateFaulted(Exception exception)
+		{
+			var tcs = new TaskCompletionSource<TResult>();
+			tcs.SetException(exception);
+			return new ValueTask<TResult>(tcs.Task);
+		}
+
+		public override ValueTask<TResult> CreateFaulted(IEnumerable<Exception> exceptions)
+		{
+			var tcs = new TaskCompletionSource<TResult>();
+			tcs.SetException(exceptions);
+			return new ValueTask<TResult>(tcs.Task);
 		}
 
 		public override bool TryGetResult(ValueTask<TResult> valueTask, out TResult result)
