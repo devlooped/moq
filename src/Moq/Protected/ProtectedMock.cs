@@ -31,6 +31,8 @@ namespace Moq.Protected
 			return new ProtectedAsMock<T, TAnalog>(mock);
 		}
 
+		public Mock<T> UnderlyingMock => mock;
+				
 		#region Setup
 
 		public ISetup<T> Setup(string methodName, params object[] args)

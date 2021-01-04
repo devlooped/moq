@@ -25,6 +25,11 @@ namespace Moq.Protected
 		where TAnalog : class
 	{
 		/// <summary>
+		/// Accesses the underlying Mock<typeparamref name="T"/>.
+		/// </summary>
+		Mock<T> UnderlyingMock { get; }
+
+		/// <summary>
 		/// Specifies a setup on the mocked type for a call to a <see langword="void"/> method.
 		/// </summary>
 		/// <param name="expression">Lambda expression that specifies the expected method invocation.</param>

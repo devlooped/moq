@@ -39,6 +39,8 @@ The format is loosely based on [Keep a Changelog](http://keepachangelog.com/en/1
 
    This should work in all principal setup methods (`Mock.Of`, `mock.Setup…`, `mock.Verify…`). Support in `mock.Protected()` and for custom awaitable types may be added in the future. (@stakx, #1126)
 
+* `InSequence` can now be used with protected mocks (@FTWinston, #1127)
+
 #### Changed
 
 * Attempts to mark conditionals setup as verifiable are once again allowed; it turns out that forbidding it (as was done in #997 for version 4.14.0) is in fact a regression. (@stakx, #1121)

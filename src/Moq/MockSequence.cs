@@ -5,6 +5,7 @@ using System.ComponentModel;
 
 using Moq.Language;
 using Moq.Language.Flow;
+using Moq.Protected;
 
 namespace Moq
 {
@@ -65,6 +66,33 @@ namespace Moq
 			Guard.NotNull(sequence, nameof(sequence));
 
 			return sequence.For(mock);
+		}
+
+		/// <summary>
+		/// Perform an expectation in the trace.
+		/// </summary>
+		public static ISetupConditionResult<TMock> InSequence<TMock>(
+			this IProtectedMock<TMock> mock,
+			MockSequence sequence)
+			where TMock : class
+		{
+			Guard.NotNull(sequence, nameof(sequence));
+
+			return sequence.For(mock.UnderlyingMock);
+		}
+
+		/// <summary>
+		/// Perform an expectation in the trace.
+		/// </summary>
+		public static ISetupConditionResult<TMock> InSequence<TMock, TAnalog>(
+			this IProtectedAsMock<TMock, TAnalog> mock,
+			MockSequence sequence)
+			where TMock : class
+			where TAnalog : class
+		{
+			Guard.NotNull(sequence, nameof(sequence));
+
+			return sequence.For(mock.UnderlyingMock);
 		}
 	}
 }

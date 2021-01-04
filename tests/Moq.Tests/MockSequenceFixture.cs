@@ -1,6 +1,7 @@
 // Copyright (c) 2007, Clarius Consulting, Manas Technology Solutions, InSTEDD, and Contributors.
 // All rights reserved. Licensed under the BSD 3-Clause License; see License.txt.
 
+using Moq.Protected;
 using Xunit;
 
 namespace Moq.Tests
@@ -115,7 +116,74 @@ namespace Moq.Tests
 			Assert.Throws<MockException>(() => a.Object.Do(200));
 		}
 
+		[Fact]
+		public void ProtectedMockRightSequenceSuccess()
+		{
+			var a = new Mock<IFoo>(MockBehavior.Strict);
+
+			var protectedA = a.Protected();
+
+			var sequence = new MockSequence();
+			protectedA.InSequence(sequence).Setup(x => x.Do(100)).Returns(101);
+			protectedA.InSequence(sequence).Setup(x => x.Do(200)).Returns(201);
+
+			Assert.Equal(101, a.Object.Do(100));
+			Assert.Equal(201, a.Object.Do(200));
+			Assert.Throws<MockException>(() => a.Object.Do(100));
+			Assert.Throws<MockException>(() => a.Object.Do(200));
+		}
+
+		[Fact]
+		public void ProtectedMockInvalidSequenceFail()
+		{
+			var a = new Mock<IFoo>(MockBehavior.Strict);
+
+			var protectedA = a.Protected();
+
+			var sequence = new MockSequence();
+			protectedA.InSequence(sequence).Setup(x => x.Do(100)).Returns(101);
+			protectedA.InSequence(sequence).Setup(x => x.Do(200)).Returns(201);
+
+			Assert.Throws<MockException>(() => a.Object.Do(200));
+		}
+
+		[Fact]
+		public void ProtectedAsMockRightSequenceSuccess()
+		{
+			var a = new Mock<IFoo>(MockBehavior.Strict);
+
+			var protectedA = a.Protected().As<IBar>();
+
+			var sequence = new MockSequence();
+			protectedA.InSequence(sequence).Setup(x => x.Do(100)).Returns(101);
+			protectedA.InSequence(sequence).Setup(x => x.Do(200)).Returns(201);
+
+			Assert.Equal(101, a.Object.Do(100));
+			Assert.Equal(201, a.Object.Do(200));
+			Assert.Throws<MockException>(() => a.Object.Do(100));
+			Assert.Throws<MockException>(() => a.Object.Do(200));
+		}
+
+		[Fact]
+		public void ProtectedAsMockInvalidSequenceFail()
+		{
+			var a = new Mock<IFoo>(MockBehavior.Strict);
+
+			var protectedA = a.Protected().As<IBar>();
+
+			var sequence = new MockSequence();
+			protectedA.InSequence(sequence).Setup(x => x.Do(100)).Returns(101);
+			protectedA.InSequence(sequence).Setup(x => x.Do(200)).Returns(201);
+
+			Assert.Throws<MockException>(() => a.Object.Do(200));
+		}
+
 		public interface IFoo
+		{
+			int Do(int arg);
+		}
+
+		public interface IBar
 		{
 			int Do(int arg);
 		}

@@ -28,6 +28,8 @@ namespace Moq.Protected
 			this.mock = mock;
 		}
 
+		public Mock<T> UnderlyingMock => mock;
+
 		public ISetup<T> Setup(Expression<Action<TAnalog>> expression)
 		{
 			Guard.NotNull(expression, nameof(expression));

@@ -28,6 +28,11 @@ namespace Moq.Protected
 		IProtectedAsMock<TMock, TAnalog> As<TAnalog>()
 			where TAnalog : class;
 
+		/// <summary>
+		/// Accesses the underlying Mock<typeparamref name="TMock"/>.
+		/// </summary>
+		Mock<TMock> UnderlyingMock { get; }
+			
 		#region Setup
 
 		/// <summary>
