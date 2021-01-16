@@ -4,6 +4,11 @@ All notable changes to this project will be documented in this file.
 
 The format is loosely based on [Keep a Changelog](http://keepachangelog.com/en/1.0.0/).
 
+## Unreleased
+
+#### Fixed
+* Newly introduced: `AmbiguousMatchException` raised when interface has property indexer besides property in VB. (@mujdatdinc, #1129)
+
 
 ## 4.16.0 (2021-01-16)
 
