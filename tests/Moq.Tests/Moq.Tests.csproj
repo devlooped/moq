@@ -18,7 +18,7 @@
 		<DefineConstants>$(DefineConstants);FEATURE_DYNAMICPROXY_SERIALIZABLE_PROXIES;FEATURE_EF;FEATURE_SYSTEM_WEB;FEATURE_SYSTEM_WINDOWS_FORMS</DefineConstants>
 	</PropertyGroup>
 	<PropertyGroup Condition=" '$(TargetFramework)' == 'netcoreapp3.1' ">
-		<DefineConstants>$(DefineConstants)</DefineConstants>
+		<DefineConstants>$(DefineConstants);FEATURE_DEFAULT_INTERFACE_IMPLEMENTATIONS</DefineConstants>
 	</PropertyGroup>
 
 	<ItemGroup>
