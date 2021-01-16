@@ -200,7 +200,7 @@ namespace Moq
 			if (invocationMethod.IsPropertyAccessor())
 			{
 				string propertyNameToSearch = invocationMethod.Name.Substring(AccessorPrefixLength);
-				PropertyInfo property = invocationMethod.DeclaringType.GetProperty(propertyNameToSearch);
+				PropertyInfo property = invocationMethod.DeclaringType.GetProperty(propertyNameToSearch, Type.EmptyTypes);
 
 				if (property == null)
 				{
@@ -258,7 +258,7 @@ namespace Moq
 
 		private static object CreateInitialPropertyValue(Mock mock, MethodInfo getter)
 		{
-			object initialValue = mock.GetDefaultValue(getter, out Mock innerMock, 
+			object initialValue = mock.GetDefaultValue(getter, out Mock innerMock,
 				useAlternateProvider: mock.AutoSetupPropertiesDefaultValueProvider);
 
 			if (innerMock != null)

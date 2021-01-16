@@ -75,4 +75,22 @@ Public Class IssueReports
 
 	End Class
 
+	Public Class Issue1129
+
+		<Fact>
+		Public Sub Test()
+			Dim classMock = New Mock(Of IndexerInterface)()
+
+			classMock.SetupAllProperties()
+
+			Assert.False(classMock.Object.Value)
+		End Sub
+		Public Interface IndexerInterface
+			ReadOnly Property SystemDefault() As Boolean
+			Property Value() As Boolean
+			Property Value(ByVal OverrideLevel As Integer) As Boolean
+			Property Value(ByVal OverrideLevel As Integer, ByVal OverrideID As String) As Boolean
+		End Interface
+	End Class
+
 End Class
