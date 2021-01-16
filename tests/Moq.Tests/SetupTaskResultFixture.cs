@@ -281,7 +281,6 @@ namespace Moq.Tests
 		[Fact]
 		public async Task SetupSet__property_of__completed_Task__Throws()
 		{
-			string setToValue = null;
 			var person = new Mock<IPerson>();
 			person.SetupSet(p => p.GetFriendTaskAsync().Result.Name = It.IsAny<string>()).Throws(Exception);
 			var friend = await person.Object.GetFriendTaskAsync();
@@ -292,7 +291,6 @@ namespace Moq.Tests
 		[Fact]
 		public async Task SetupSet__property_of__completed_ValueTask__Throws()
 		{
-			string setToValue = null;
 			var person = new Mock<IPerson>();
 			person.SetupSet(p => p.GetFriendValueTaskAsync().Result.Name = It.IsAny<string>()).Throws(Exception);
 			var friend = await person.Object.GetFriendValueTaskAsync();
