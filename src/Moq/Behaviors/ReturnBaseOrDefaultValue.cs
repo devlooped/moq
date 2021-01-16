@@ -26,13 +26,24 @@ namespace Moq.Behaviors
 
 			if (this.mock.CallBase)
 			{
+
+#if FEATURE_DEFAULT_INTERFACE_IMPLEMENTATIONS
+				var tryCallDefaultInterfaceImplementation = false;
+#endif
+
 				var declaringType = method.DeclaringType;
 				if (declaringType.IsInterface)
 				{
 					if (this.mock.MockedType.IsInterface)
 					{
 						// Case 1: Interface method of an interface proxy.
+
+#if FEATURE_DEFAULT_INTERFACE_IMPLEMENTATIONS
+						// Fall through to invoke default implementation (if one exists).
+						tryCallDefaultInterfaceImplementation = true;
+#else
 						// There is no base method to call, so fall through.
+#endif
 					}
 					else
 					{
@@ -56,7 +67,13 @@ namespace Moq.Behaviors
 							Debug.Assert(this.mock.AdditionalInterfaces.Contains(declaringType));
 
 							// Case 2b: Additional interface.
+
+#if FEATURE_DEFAULT_INTERFACE_IMPLEMENTATIONS
+							// Fall through to invoke default implementation (if one exists).
+							tryCallDefaultInterfaceImplementation = true;
+#else
 							// There is no base method to call, so fall through.
+#endif
 						}
 					}
 				}
@@ -72,6 +89,16 @@ namespace Moq.Behaviors
 						return;
 					}
 				}
+
+#if FEATURE_DEFAULT_INTERFACE_IMPLEMENTATIONS
+				if (tryCallDefaultInterfaceImplementation && !method.IsAbstract)
+				{
+					// Invoke default implementation.
+					invocation.ReturnValue = invocation.CallBase();
+					return;
+				}
+#endif
+
 			}
 
 			if (method.ReturnType != typeof(void))

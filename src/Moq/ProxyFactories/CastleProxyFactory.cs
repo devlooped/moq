@@ -2,11 +2,13 @@
 // All rights reserved. Licensed under the BSD 3-Clause License; see License.txt.
 
 using System;
+using System.Collections.Concurrent;
 using System.Collections.Generic;
 using System.Diagnostics;
 using System.Globalization;
 using System.Linq;
 using System.Reflection;
+using System.Reflection.Emit;
 
 using Castle.DynamicProxy;
 
@@ -126,6 +128,19 @@ namespace Moq
 			{
 				Debug.Assert(this.underlying != null);
 
+#if FEATURE_DEFAULT_INTERFACE_IMPLEMENTATIONS
+				var method = this.Method;
+				if (method.DeclaringType.IsInterface && !method.IsAbstract)
+				{
+					// As of version 4.4.0, DynamicProxy cannot proceed to default method implementations of interfaces.
+					// In order to support this anyway, we use a dynamic thunk that calls it via a non-virtual `call`.
+					// This is roughly equivalent to how you'd choose the interface default implementation in C#:
+					// you'd cast the object to the desired interface, and call the method on that.
+					var thunk = DefaultImplementationThunk.Get(method);
+					return thunk.Invoke(this.underlying.Proxy, this.Arguments);
+				}
+#endif
+
 				this.underlying.Proceed();
 				return this.underlying.ReturnValue;
 			}
@@ -135,6 +150,108 @@ namespace Moq
 				this.underlying = null;
 			}
 		}
+
+#if FEATURE_DEFAULT_INTERFACE_IMPLEMENTATIONS
+		// NOTE: In theory, this helper should work on any platform. It is excluded on `netstandard2.0`
+		// and lower mostly to avoid an additional NuGet dependency required for `DynamicMethod`.
+		private static class DefaultImplementationThunk
+		{
+			// We store previously generated dynamic thunks for reuse.
+			private static ConcurrentDictionary<MethodInfo, Func<object, object[], object>> thunks;
+
+			static DefaultImplementationThunk()
+			{
+				thunks = new ConcurrentDictionary<MethodInfo, Func<object, object[], object>>();
+			}
+
+			public static Func<object, object[], object> Get(MethodInfo method)
+			{
+				return thunks.GetOrAdd(method, static method =>
+				{
+					var originalParameterTypes = method.GetParameterTypes();
+					var n = originalParameterTypes.Count;
+
+					var dynamicMethod = new DynamicMethod(string.Empty, returnType: typeof(object), parameterTypes: new[] { typeof(object), typeof(object[]) });
+					dynamicMethod.InitLocals = true;
+					var il = dynamicMethod.GetILGenerator();
+
+					var arguments = new LocalBuilder[n];
+					var returnValue = il.DeclareLocal(typeof(object));
+
+					// Erase by-ref-ness of parameter types to get at the actual type of value.
+					// We need this because we are handed `invocation.Arguments` as an `object[]` array.
+					var parameterTypes = originalParameterTypes.ToArray();
+					for (var i = 0; i < n; ++i)
+					{
+						if (parameterTypes[i].IsByRef)
+						{
+							parameterTypes[i] = parameterTypes[i].GetElementType();
+						}
+					}
+
+					// Transfer `invocation.Arguments` into appropriately typed local variables.
+					// This involves unboxing value-typed arguments, and possibly down-casting others from `object`.
+					// The `unbox.any` instruction will do the right thing in both cases.
+					for (var i = 0; i < n; ++i)
+					{
+						arguments[i] = il.DeclareLocal(parameterTypes[i]);
+
+						il.Emit(OpCodes.Ldarg_1);
+						il.Emit(OpCodes.Ldc_I4, i);
+						il.Emit(OpCodes.Ldelem_Ref);
+						il.Emit(OpCodes.Unbox_Any, parameterTypes[i]);
+						il.Emit(OpCodes.Stloc, arguments[i]);
+					}
+
+					// Now we're going to call the actual default implementation.
+
+					// We do this inside a `try` block because we need to write back possibly modified
+					// arguments to `invocation.Arguments` even if the called method throws.
+					var returnLabel = il.DefineLabel();
+					il.BeginExceptionBlock();
+
+					// Perform the actual call.
+					il.Emit(OpCodes.Ldarg_0);
+					il.Emit(OpCodes.Castclass, method.DeclaringType);
+					for (var i = 0; i < n; ++i)
+					{
+						il.Emit(originalParameterTypes[i].IsByRef ? OpCodes.Ldloca : OpCodes.Ldloc, arguments[i]);
+					}
+					il.Emit(OpCodes.Call, method);
+
+					// Put the return value in a local variable for later retrieval.
+					if (method.ReturnType != typeof(void))
+					{
+						il.Emit(OpCodes.Box, method.ReturnType);
+						il.Emit(OpCodes.Castclass, typeof(object));
+						il.Emit(OpCodes.Stloc, returnValue);
+					}
+					il.Emit(OpCodes.Leave, returnLabel);
+
+					il.BeginFinallyBlock();
+
+					// Write back possibly modified arguments to `invocation.Arguments`.
+					for (var i = 0; i < n; ++i)
+					{
+						il.Emit(OpCodes.Ldarg_1);
+						il.Emit(OpCodes.Ldc_I4, i);
+						il.Emit(OpCodes.Ldloc, arguments[i]);
+						il.Emit(OpCodes.Box, arguments[i].LocalType);
+						il.Emit(OpCodes.Stelem_Ref);
+					}
+					il.Emit(OpCodes.Endfinally);
+
+					il.EndExceptionBlock();
+					il.MarkLabel(returnLabel);
+
+					il.Emit(OpCodes.Ldloc, returnValue);
+					il.Emit(OpCodes.Ret);
+
+					return (Func<object, object[], object>)dynamicMethod.CreateDelegate(typeof(Func<object, object[], object>));
+				});
+			}
+		}
+#endif
 
 		/// <summary>
 		/// This hook tells Castle DynamicProxy to proxy the default methods it suggests,
