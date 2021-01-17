@@ -23,13 +23,14 @@ namespace Moq.Tests.ProxyFactories
 		[InlineData(typeof(IA), "Method", typeof(ICfromBoverride), typeof(ICfromBoverride), "Moq.Tests.ProxyFactories.MostSpecificOverrideFixture.IA.Method")]
 		[InlineData(typeof(IA), "Method", typeof(ICfromBnew), typeof(ICfromBnew), "Moq.Tests.ProxyFactories.MostSpecificOverrideFixture.IA.Method")]
 		[InlineData(typeof(IBnew), "Method", typeof(ICfromBnew), typeof(ICfromBnew), "Moq.Tests.ProxyFactories.MostSpecificOverrideFixture.IBnew.Method")]
-		public void Finds_correct_most_specific_override(Type declarationType, string declarationName, Type proxyType, Type overrideType, string overrideName)
+		public void Finds_correct_most_specific_override(Type declarationType, string declarationName, Type proxiedType, Type overrideType, string overrideName)
 		{
 			var expected = overrideType.GetMethod(overrideName, BindingFlags.Public | BindingFlags.NonPublic | BindingFlags.Instance | BindingFlags.DeclaredOnly);
-			var proxy = typeof(Mock).GetMethod("Of", BindingFlags.Public | BindingFlags.Static, null, Type.EmptyTypes, null).MakeGenericMethod(proxyType).Invoke(null, null);
-			var actual = MostSpecificOverride.Find(
+			var proxy = typeof(Mock).GetMethod("Of", BindingFlags.Public | BindingFlags.Static, null, Type.EmptyTypes, null).MakeGenericMethod(proxiedType).Invoke(null, null);
+			var proxyType = proxy.GetType();
+			var actual = CastleProxyFactory.FindMostSpecificOverride(
 				declaration: declarationType.GetMethod(declarationName, BindingFlags.Public | BindingFlags.NonPublic | BindingFlags.Instance | BindingFlags.DeclaredOnly),
-				proxy);
+				proxyType);
 			Assert.Same(expected, actual);
 		}
 
