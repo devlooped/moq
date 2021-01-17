@@ -6,9 +6,14 @@ The format is loosely based on [Keep a Changelog](http://keepachangelog.com/en/1
 
 ## Unreleased
 
-#### Fixed
-* Newly introduced: `AmbiguousMatchException` raised when interface has property indexer besides property in VB. (@mujdatdinc, #1129)
+#### Added
 
+* `CallBase` can now be used with interface methods that have a default interface implementation. It will call [the most specific override](https://docs.microsoft.com/en-us/dotnet/csharp/language-reference/proposals/csharp-8.0/default-interface-methods#the-most-specific-override-rule). (@stakx, #1130)
+
+#### Fixed
+
+* `AmbiguousMatchException` raised when interface has property indexer besides property in VB. (@mujdatdinc, #1129)
+* Interface default methods are ignored (@hahn-kev, #972)
 
 ## 4.16.0 (2021-01-16)
 
