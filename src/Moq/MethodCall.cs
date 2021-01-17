@@ -310,7 +310,8 @@ namespace Moq
 					throw new ArgumentException(Resources.InvalidReturnsCallbackNotADelegateWithReturnType);
 				}
 
-				var expectedReturnType = this.Method.ReturnType;
+				var expectedReturnType = this.Expectation.HasResultExpression(out var awaitable) ? awaitable.ResultType
+				                                                                                 : this.Method.ReturnType;
 
 				if (!expectedReturnType.IsAssignableFrom(actualReturnType))
 				{
