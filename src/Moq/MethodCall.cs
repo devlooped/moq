@@ -13,6 +13,8 @@ using System.Text;
 using Moq.Behaviors;
 using Moq.Properties;
 
+using TypeNameFormatter;
+
 namespace Moq
 {
 	internal sealed partial class MethodCall : SetupWithOutParameterSupport
@@ -322,8 +324,8 @@ namespace Moq
 							string.Format(
 								CultureInfo.CurrentCulture,
 								Resources.InvalidCallbackReturnTypeMismatch,
-								expectedReturnType,
-								actualReturnType));
+								expectedReturnType.GetFormattedName(),
+								actualReturnType.GetFormattedName()));
 					}
 				}
 			}
