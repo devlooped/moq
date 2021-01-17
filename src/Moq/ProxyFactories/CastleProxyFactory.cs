@@ -9,6 +9,8 @@ using System.Globalization;
 using System.Linq;
 using System.Reflection;
 using System.Reflection.Emit;
+using System.Runtime;
+using System.Text;
 
 using Castle.DynamicProxy;
 
@@ -136,7 +138,8 @@ namespace Moq
 					// In order to support this anyway, we use a dynamic thunk that calls it via a non-virtual `call`.
 					// This is roughly equivalent to how you'd choose the interface default implementation in C#:
 					// you'd cast the object to the desired interface, and call the method on that.
-					var thunk = DefaultImplementationThunk.Get(method);
+					var mostSpecificOverride = MostSpecificOverride.Find(method, this.underlying.Proxy);
+					var thunk = DefaultImplementationThunk.Get(mostSpecificOverride);
 					return thunk.Invoke(this.underlying.Proxy, this.Arguments);
 				}
 #endif
@@ -152,6 +155,94 @@ namespace Moq
 		}
 
 #if FEATURE_DEFAULT_INTERFACE_IMPLEMENTATIONS
+		internal static class MostSpecificOverride
+		{
+			private static ConcurrentDictionary<Pair<MethodInfo, Type>, MethodInfo> cache;
+
+			static MostSpecificOverride()
+			{
+				cache = new ConcurrentDictionary<Pair<MethodInfo, Type>, MethodInfo>();
+			}
+
+			/// <summary>
+			///   Attempts to find the most specific override for the given method <paramref name="declaration"/>
+			///   in the type(s) proxied by <paramref name="proxy"/>.
+			/// </summary>
+			public static MethodInfo Find(MethodInfo declaration, object proxy)
+			{
+				// This follows the rule specified in:
+				// https://docs.microsoft.com/en-us/dotnet/csharp/language-reference/proposals/csharp-8.0/default-interface-methods#the-most-specific-override-rule.
+				return cache.GetOrAdd(new Pair<MethodInfo, Type>(declaration, proxy.GetType()), key =>
+				{
+					var (declaration, proxyType) = key;
+
+					var genericParameterCount = declaration.IsGenericMethod ? declaration.GetGenericArguments().Length : 0;
+					var returnType = declaration.ReturnType;
+					var parameterTypes = declaration.GetParameterTypes().ToArray();
+					var declaringType = declaration.DeclaringType;
+
+					// If the base class has a method implementation, then by rule (2) it will be more specific
+					// than any candidate method from an implemented interface:
+					var baseClass = proxyType.BaseType;
+					if (baseClass != null && declaringType.IsAssignableFrom(baseClass))
+					{
+						var map = baseClass.GetInterfaceMap(declaringType);
+						var index = Array.IndexOf(map.InterfaceMethods, declaration);
+						return map.TargetMethods[index];
+					}
+
+					// Otherwise, we need to look for candidates in all directly or indirectly implemented interfaces:
+					var implementedInterfaces = proxyType.GetInterfaces();
+					var candidateMethods = new HashSet<MethodInfo>();
+					foreach (var implementedInterface in implementedInterfaces.Where(i => declaringType.IsAssignableFrom(i)))
+					{
+						// Search for an implicit override:
+						var candidateMethod = implementedInterface.GetMethod(declaration.Name, genericParameterCount, BindingFlags.Public | BindingFlags.NonPublic | BindingFlags.Instance, null, parameterTypes, null);
+
+						// Search for an explicit override:
+						if (candidateMethod?.GetBaseDefinition() != declaration)
+						{
+							// Unfortunately, we cannot use `.GetInterfaceMap` to find out whether an interface method
+							// overrides another base interface method, i.e. whether they share the same vtbl slot.
+							// It appears that the best thing we can do is to look for a non-public method having
+							// the right name and parameter types, and hope for the best:
+							var name = new StringBuilder();
+							name.Append(declaringType.FullName);
+							name.Replace('+', '.');
+							name.Append('.');
+							name.Append(declaration.Name);
+							candidateMethod = implementedInterface.GetMethod(name.ToString(), genericParameterCount, BindingFlags.NonPublic | BindingFlags.Instance, null, parameterTypes, null);
+						}
+
+						if (candidateMethod == null) continue;
+
+						// Now we have a candidate override. We need to check if it is less specific than any others
+						// that we have already found earlier:
+						if (candidateMethods.Any(cm => implementedInterface.IsAssignableFrom(cm.DeclaringType))) continue;
+
+						// No, it is the most specific override so far. Add it to the list, but before doing so,
+						// remove all less specific overrides from it:
+						candidateMethods.ExceptWith(candidateMethods.Where(cm => cm.DeclaringType.IsAssignableFrom(implementedInterface)).ToArray());
+						candidateMethods.Add(candidateMethod);
+					}
+
+					var candidateCount = candidateMethods.Count();
+					if (candidateCount > 1)
+					{
+						throw new AmbiguousImplementationException();
+					}
+					else if (candidateCount == 1)
+					{
+						return candidateMethods.First();
+					}
+					else
+					{
+						return declaration;
+					}
+				});
+			}
+		}
+
 		// NOTE: In theory, this helper should work on any platform. It is excluded on `netstandard2.0`
 		// and lower mostly to avoid an additional NuGet dependency required for `DynamicMethod`.
 		private static class DefaultImplementationThunk
