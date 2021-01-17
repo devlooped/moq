@@ -285,7 +285,7 @@ Remember that there's no generics covariance in the CLR, so your object must be 
     <value>Type {0} does not have matching protected member: {1}</value>
   </data>
   <data name="InvalidCallbackReturnTypeMismatch" xml:space="preserve">
-    <value>Invalid callback. Setup on method with return type ({0}) cannot invoke callback with return type ({1}).</value>
+    <value>Invalid callback. Setup on method with return type '{0}' cannot invoke callback with return type '{1}'.</value>
   </data>
   <data name="InvalidCallbackParameterCountMismatch" xml:space="preserve">
     <value>Invalid callback. Setup on method with {0} parameter(s) cannot invoke callback with different number of parameters ({1}).</value>

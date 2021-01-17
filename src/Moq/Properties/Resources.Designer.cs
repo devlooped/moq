@@ -187,7 +187,7 @@ namespace Moq.Properties {
         }
         
         /// <summary>
-        ///   Looks up a localized string similar to Invalid callback. Setup on method with return type ({0}) cannot invoke callback with return type ({1})..
+        ///   Looks up a localized string similar to Invalid callback. Setup on method with return type &apos;{0}&apos; cannot invoke callback with return type &apos;{1}&apos;..
         /// </summary>
         internal static string InvalidCallbackReturnTypeMismatch {
             get {

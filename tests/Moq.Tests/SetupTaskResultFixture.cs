@@ -102,6 +102,15 @@ namespace Moq.Tests
 		}
 
 		[Fact]
+		public async Task Setup__completed_Task__Returns_callback()
+		{
+			var person = new Mock<IPerson>();
+			person.Setup(p => p.GetFriendTaskAsync().Result).Returns(() => Friend);
+			var friend = await person.Object.GetFriendTaskAsync();
+			Assert.Same(Friend, friend);
+		}
+
+		[Fact]
 		public async Task Setup__completed_Task__Throws()
 		{
 			var person = new Mock<IPerson>();
@@ -115,6 +124,15 @@ namespace Moq.Tests
 		{
 			var person = new Mock<IPerson>();
 			person.Setup(p => p.GetFriendValueTaskAsync().Result).Returns(Friend);
+			var friend = await person.Object.GetFriendValueTaskAsync();
+			Assert.Same(Friend, friend);
+		}
+
+		[Fact]
+		public async Task Setup__completed_ValueTask__Returns_callback()
+		{
+			var person = new Mock<IPerson>();
+			person.Setup(p => p.GetFriendValueTaskAsync().Result).Returns(()=> Friend);
 			var friend = await person.Object.GetFriendValueTaskAsync();
 			Assert.Same(Friend, friend);
 		}

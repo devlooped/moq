@@ -13,6 +13,8 @@ using System.Text;
 using Moq.Behaviors;
 using Moq.Properties;
 
+using TypeNameFormatter;
+
 namespace Moq
 {
 	internal sealed partial class MethodCall : SetupWithOutParameterSupport
@@ -310,7 +312,8 @@ namespace Moq
 					throw new ArgumentException(Resources.InvalidReturnsCallbackNotADelegateWithReturnType);
 				}
 
-				var expectedReturnType = this.Method.ReturnType;
+				var expectedReturnType = this.Expectation.HasResultExpression(out var awaitable) ? awaitable.ResultType
+				                                                                                 : this.Method.ReturnType;
 
 				if (!expectedReturnType.IsAssignableFrom(actualReturnType))
 				{
@@ -321,8 +324,8 @@ namespace Moq
 							string.Format(
 								CultureInfo.CurrentCulture,
 								Resources.InvalidCallbackReturnTypeMismatch,
-								expectedReturnType,
-								actualReturnType));
+								expectedReturnType.GetFormattedName(),
+								actualReturnType.GetFormattedName()));
 					}
 				}
 			}
