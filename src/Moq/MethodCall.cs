@@ -224,6 +224,9 @@ namespace Moq
 			Debug.Assert(this.Method.ReturnType != typeof(void));
 			Debug.Assert(this.returnOrThrow == null);
 
+			var expectedReturnType = this.Expectation.HasResultExpression(out var awaitable) ? awaitable.ResultType
+			                                                                                 : this.Method.ReturnType;
+
 			if (valueFactory == null)
 			{
 				// A `null` reference (instead of a valid delegate) is interpreted as the actual return value.
@@ -232,9 +235,9 @@ namespace Moq
 				// and instead of in `Returns(TResult)`, we ended up in `Returns(Delegate)` or `Returns(Func)`,
 				// which likely isn't what the user intended.
 				// So here we do what we would've done in `Returns(TResult)`:
-				this.returnOrThrow = new ReturnValue(this.Method.ReturnType.GetDefaultValue());
+				this.returnOrThrow = new ReturnValue(expectedReturnType.GetDefaultValue());
 			}
-			else if (this.Method.ReturnType == typeof(Delegate))
+			else if (expectedReturnType == typeof(Delegate))
 			{
 				// If `TResult` is `Delegate`, that is someone is setting up the return value of a method
 				// that returns a `Delegate`, then we have arrived here because C# picked the wrong overload:
@@ -268,7 +271,7 @@ namespace Moq
 				{
 					var typeArguments = type.GetGenericArguments();
 					return typeArguments[0] == typeof(IInvocation)
-						&& (typeArguments[1] == typeof(object) || this.Method.ReturnType.IsAssignableFrom(typeArguments[1]));
+						&& (typeArguments[1] == typeof(object) || expectedReturnType.IsAssignableFrom(typeArguments[1]));
 				}
 
 				return false;
@@ -311,9 +314,6 @@ namespace Moq
 				{
 					throw new ArgumentException(Resources.InvalidReturnsCallbackNotADelegateWithReturnType);
 				}
-
-				var expectedReturnType = this.Expectation.HasResultExpression(out var awaitable) ? awaitable.ResultType
-				                                                                                 : this.Method.ReturnType;
 
 				if (!expectedReturnType.IsAssignableFrom(actualReturnType))
 				{

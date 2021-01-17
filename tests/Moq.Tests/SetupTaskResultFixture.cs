@@ -111,6 +111,15 @@ namespace Moq.Tests
 		}
 
 		[Fact]
+		public async Task Setup__completed_Task__Returns_IInvocation_callback()
+		{
+			var person = new Mock<IPerson>();
+			person.Setup(p => p.GetFriendTaskAsync().Result).Returns((IInvocation _) => Friend);
+			var friend = await person.Object.GetFriendTaskAsync();
+			Assert.Same(Friend, friend);
+		}
+
+		[Fact]
 		public async Task Setup__completed_Task__Throws()
 		{
 			var person = new Mock<IPerson>();
