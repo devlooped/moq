@@ -4,9 +4,6 @@
 using System;
 using System.Linq.Expressions;
 using System.Text.RegularExpressions;
-using Moq.Matchers;
-using System.Reflection;
-using System.Linq;
 
 namespace Moq.Protected
 {

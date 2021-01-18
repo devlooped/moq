@@ -6,7 +6,6 @@ using System.ComponentModel;
 using System.Linq.Expressions;
 
 using Moq.Language.Flow;
-using Moq.Protected;
 
 namespace Moq
 {

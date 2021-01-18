@@ -10,7 +10,6 @@ using System.Linq.Expressions;
 using System.Reflection;
 
 using Moq.Async;
-using Moq.Expressions.Visitors;
 using Moq.Properties;
 
 namespace Moq

@@ -11,6 +11,7 @@ using System.Reflection;
 using Moq.Language;
 using Moq.Language.Flow;
 using Moq.Properties;
+
 using TypeNameFormatter;
 
 namespace Moq.Protected
