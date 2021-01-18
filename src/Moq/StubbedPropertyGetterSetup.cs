@@ -10,13 +10,13 @@ namespace Moq
 	/// <summary>
 	///   Setup used by <see cref="Mock.SetupAllProperties(Mock)"/> for property getters.
 	/// </summary>
-	internal sealed class AutoImplementedPropertyGetterSetup : Setup
+	internal sealed class StubbedPropertyGetterSetup : Setup
 	{
 		private static Expression[] noArguments = new Expression[0];
 
 		private Func<object> getter;
 
-		public AutoImplementedPropertyGetterSetup(Mock mock, LambdaExpression originalExpression, MethodInfo method, Func<object> getter)
+		public StubbedPropertyGetterSetup(Mock mock, LambdaExpression originalExpression, MethodInfo method, Func<object> getter)
 			: base(originalExpression: null, mock, new InvocationShape(originalExpression, method, noArguments))
 		{
 			this.getter = getter;

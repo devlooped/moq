@@ -11,11 +11,11 @@ namespace Moq
 	/// <summary>
 	///   Setup used by <see cref="Mock.SetupAllProperties(Mock)"/> for property setters.
 	/// </summary>
-	internal sealed class AutoImplementedPropertySetterSetup : Setup
+	internal sealed class StubbedPropertySetterSetup : Setup
 	{
 		private Action<object> setter;
 
-		public AutoImplementedPropertySetterSetup(Mock mock, LambdaExpression originalExpression, MethodInfo method, Action<object> setter)
+		public StubbedPropertySetterSetup(Mock mock, LambdaExpression originalExpression, MethodInfo method, Action<object> setter)
 			: base(originalExpression: null, mock, new InvocationShape(originalExpression, method, new Expression[] { It.IsAny(method.GetParameterTypes().Last()) }))
 		{
 			this.setter = setter;

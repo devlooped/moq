@@ -217,7 +217,7 @@ namespace Moq
 					if (ProxyFactory.Instance.IsMethodVisible(getter, out _))
 					{
 						propertyValue = CreateInitialPropertyValue(mock, getter);
-						getterSetup = new AutoImplementedPropertyGetterSetup(mock, expression, getter, () => propertyValue);
+						getterSetup = new StubbedPropertyGetterSetup(mock, expression, getter, () => propertyValue);
 						mock.MutableSetups.Add(getterSetup);
 					}
 
@@ -237,7 +237,7 @@ namespace Moq
 				{
 					if (ProxyFactory.Instance.IsMethodVisible(setter, out _))
 					{
-						setterSetup = new AutoImplementedPropertySetterSetup(mock, expression, setter, (newValue) =>
+						setterSetup = new StubbedPropertySetterSetup(mock, expression, setter, (newValue) =>
 						{
 							propertyValue = newValue;
 						});
