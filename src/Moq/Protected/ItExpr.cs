@@ -2,7 +2,6 @@
 // All rights reserved. Licensed under the BSD 3-Clause License; see License.txt.
 
 using System;
-using System.Diagnostics.CodeAnalysis;
 using System.Linq.Expressions;
 using System.Text.RegularExpressions;
 using Moq.Matchers;
@@ -23,7 +22,6 @@ namespace Moq.Protected
 	/// with an arbitrary value, with a value in a specified range, or 
 	/// even one that matches a given predicate, or null.
 	/// </remarks>
-	[SuppressMessage("Microsoft.Naming", "CA1704:IdentifiersShouldBeSpelledCorrectly", MessageId = "Expr")]
 	public static class ItExpr
 	{
 		/// <summary>
@@ -62,8 +60,6 @@ namespace Moq.Protected
 		/// </code>
 		/// </example>
 		/// <typeparam name="TValue">Type of the value.</typeparam>
-		[SuppressMessage("Microsoft.Design", "CA1004:GenericMethodsShouldProvideTypeParameter")]
-		[SuppressMessage("Microsoft.Design", "CA1006:DoNotNestGenericTypesInMemberSignatures")]
 		public static Expression IsNull<TValue>()
 		{
 			Expression<Func<TValue>> expr = () => It.Is<TValue>(v => Object.Equals(v, default(TValue)));
@@ -87,8 +83,6 @@ namespace Moq.Protected
 		/// </code>
 		/// </example>
 		/// <typeparam name="TValue">Type of the value.</typeparam>
-		[SuppressMessage("Microsoft.Design", "CA1004:GenericMethodsShouldProvideTypeParameter")]
-		[SuppressMessage("Microsoft.Design", "CA1006:DoNotNestGenericTypesInMemberSignatures")]
 		public static Expression IsAny<TValue>()
 		{
 			Expression<Func<TValue>> expr = () => It.IsAny<TValue>();
@@ -120,7 +114,6 @@ namespace Moq.Protected
 		///     .Throws(new ArgumentException());
 		/// </code>
 		/// </example>
-		[SuppressMessage("Microsoft.Design", "CA1006:DoNotNestGenericTypesInMemberSignatures")]
 		public static Expression Is<TValue>(Expression<Func<TValue, bool>> match)
 		{
 			Expression<Func<TValue>> expr = () => It.Is((Expression<Func<TValue, bool>>)null);

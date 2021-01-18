@@ -4,7 +4,6 @@
 using System;
 using System.Collections.Generic;
 using System.ComponentModel;
-using System.Diagnostics.CodeAnalysis;
 using System.Linq;
 using System.Linq.Expressions;
 using System.Reflection;
@@ -46,7 +45,6 @@ namespace Moq
 		/// </summary>
 		/// <param name="specification">The predicate with the setup expressions.</param>
 		/// <typeparam name="T">The type of the mocked object to query.</typeparam>
-		[SuppressMessage("Microsoft.Design", "CA1006:DoNotNestGenericTypesInMemberSignatures", Justification = "By design")]
 		public static IQueryable<T> Of<T>(Expression<Func<T, bool>> specification) where T : class
 		{
 			return Mocks.Of<T>(specification, MockBehavior.Default);
@@ -59,7 +57,6 @@ namespace Moq
 		/// <param name="specification">The predicate with the setup expressions.</param>
 		/// <param name="behavior">Behavior of the mocks.</param>
 		/// <typeparam name="T">The type of the mocked object to query.</typeparam>
-		[SuppressMessage("Microsoft.Design", "CA1006:DoNotNestGenericTypesInMemberSignatures", Justification = "By design")]
 		public static IQueryable<T> Of<T>(Expression<Func<T, bool>> specification, MockBehavior behavior) where T : class
 		{
 			return Mocks.CreateMockQuery<T>(behavior).Where(specification);
@@ -83,7 +80,6 @@ namespace Moq
 		/// <param name="specification">The predicate with the setup expressions.</param>
 		/// <typeparam name="T">The type of the mocked object.</typeparam>
 		/// <returns>The mocked object created.</returns>
-		[SuppressMessage("Microsoft.Design", "CA1006:DoNotNestGenericTypesInMemberSignatures", Justification = "By Design")]
 		[EditorBrowsable(EditorBrowsableState.Never)]
 		[Obsolete("Moved to Mock.Of<T>, as it's a single one, so no reason to be on Mocks.", true)]
 		public static T OneOf<T>(Expression<Func<T, bool>> specification) where T : class

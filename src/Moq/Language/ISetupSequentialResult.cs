@@ -3,7 +3,6 @@
 
 using System;
 using System.ComponentModel;
-using System.Diagnostics.CodeAnalysis;
 
 namespace Moq.Language
 {
@@ -35,7 +34,6 @@ namespace Moq.Language
 		/// <summary>
 		/// Throws an exception
 		/// </summary>
-		[SuppressMessage("Microsoft.Design", "CA1004:GenericMethodsShouldProvideTypeParameter", Justification = "By Design")]
 		ISetupSequentialResult<TResult> Throws<TException>() where TException : Exception, new();
 
 		/// <summary>

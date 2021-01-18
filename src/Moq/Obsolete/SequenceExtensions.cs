@@ -3,7 +3,6 @@
 
 using System;
 using System.ComponentModel;
-using System.Diagnostics.CodeAnalysis;
 using System.Linq.Expressions;
 
 using Moq.Language;
@@ -17,7 +16,6 @@ namespace Moq
 		/// </summary>
 		[EditorBrowsable(EditorBrowsableState.Never)]
 		[Obsolete("Please use instance method Mock<T>.SetupSequence instead.")]
-		[SuppressMessage("Microsoft.Design", "CA1006:DoNotNestGenericTypesInMemberSignatures", Justification = "By Design")]
 		public static ISetupSequentialResult<TResult> SetupSequence<TMock, TResult>(
 			this Mock<TMock> mock,
 			Expression<Func<TMock, TResult>> expression)
@@ -31,7 +29,6 @@ namespace Moq
 		/// </summary>
 		[EditorBrowsable(EditorBrowsableState.Never)]
 		[Obsolete("Please use instance method Mock<T>.SetupSequence instead.")]
-		[SuppressMessage("Microsoft.Design", "CA1006:DoNotNestGenericTypesInMemberSignatures", Justification = "By Design")]
 		public static ISetupSequentialAction SetupSequence<TMock>(this Mock<TMock> mock, Expression<Action<TMock>> expression)
 			where TMock : class
 		{

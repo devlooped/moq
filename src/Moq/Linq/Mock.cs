@@ -6,7 +6,7 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using System.Linq.Expressions;
-using System.Diagnostics.CodeAnalysis;
+
 using Moq.Linq;
 
 namespace Moq
@@ -51,7 +51,6 @@ namespace Moq
 		/// <param name="predicate">The predicate with the specification of how the mocked object should behave.</param>
 		/// <typeparam name="T">The type of the mocked object.</typeparam>
 		/// <returns>The mocked object created.</returns>
-		[SuppressMessage("Microsoft.Design", "CA1006:DoNotNestGenericTypesInMemberSignatures", Justification = "By Design")]
 		public static T Of<T>(Expression<Func<T, bool>> predicate) where T : class
 		{
 			return Mock.Of<T>(predicate, MockBehavior.Default);
@@ -64,7 +63,6 @@ namespace Moq
 		/// <param name="behavior">Behavior of the mock.</param>
 		/// <typeparam name="T">The type of the mocked object.</typeparam>
 		/// <returns>The mocked object created.</returns>
-		[SuppressMessage("Microsoft.Design", "CA1006:DoNotNestGenericTypesInMemberSignatures", Justification = "By Design")]
 		public static T Of<T>(Expression<Func<T, bool>> predicate, MockBehavior behavior) where T : class
 		{
 			return Mocks.CreateMockQuery<T>(behavior).First(predicate);

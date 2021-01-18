@@ -3,7 +3,7 @@
 
 using System;
 using System.ComponentModel;
-using System.Diagnostics.CodeAnalysis;
+
 using Moq.Language.Flow;
 
 namespace Moq.Language
@@ -40,7 +40,6 @@ namespace Moq.Language
 		///     .Throws&lt;ArgumentException&gt;();
 		/// </code>
 		/// </example>
-		[SuppressMessage("Microsoft.Design", "CA1004:GenericMethodsShouldProvideTypeParameter")]
 		IThrowsResult Throws<TException>() where TException : Exception, new();
 	}
 }

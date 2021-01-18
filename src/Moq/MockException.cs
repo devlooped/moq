@@ -4,7 +4,6 @@
 using System;
 using System.Collections.Generic;
 using System.Diagnostics;
-using System.Diagnostics.CodeAnalysis;
 using System.Globalization;
 using System.Linq;
 using System.Linq.Expressions;
@@ -35,7 +34,6 @@ namespace Moq
 	/// allow the test to pass.
 	/// </para>
 	/// </remarks>
-	[SuppressMessage("Microsoft.Design", "CA1032:ImplementStandardExceptionConstructors", Justification = "It's only initialized internally.")]
 	[Serializable]
 	public class MockException : Exception
 	{
@@ -272,7 +270,6 @@ namespace Moq
 		/// <param name="info">Serialization information.</param>
 		/// <param name="context">Streaming context.</param>
 		[SecurityCritical]
-		[SuppressMessage("Microsoft.Security", "CA2123:OverrideLinkDemandsShouldBeIdenticalToBase")]
 		public override void GetObjectData(SerializationInfo info, StreamingContext context)
 		{
 			base.GetObjectData(info, context);

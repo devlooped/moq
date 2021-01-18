@@ -1,8 +1,6 @@
 // Copyright (c) 2007, Clarius Consulting, Manas Technology Solutions, InSTEDD, and Contributors.
 // All rights reserved. Licensed under the BSD 3-Clause License; see License.txt.
 
-using System.Diagnostics.CodeAnalysis;
-
 namespace Moq
 {
 	/// <summary>
@@ -14,8 +12,6 @@ namespace Moq
 		/// <summary>
 		///   Exposes the mocked object instance.
 		/// </summary>
-		[SuppressMessage("Microsoft.Naming", "CA1716:IdentifiersShouldNotMatchKeywords", MessageId = "Object", Justification = "Exposes the mocked object instance, so it's appropriate.")]
-		[SuppressMessage("Microsoft.Naming", "CA1721:PropertyNamesShouldNotMatchGetMethods", Justification = "The public Object property is the only one visible to Moq consumers. The protected member is for internal use only.")]
 		T Object { get; }
 
 		/// <summary>

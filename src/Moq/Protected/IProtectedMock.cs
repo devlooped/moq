@@ -3,7 +3,6 @@
 
 using System;
 using System.ComponentModel;
-using System.Diagnostics.CodeAnalysis;
 
 using Moq.Language;
 using Moq.Language.Flow;
@@ -239,7 +238,6 @@ namespace Moq.Protected
 		/// remember to use <see cref="ItExpr"/> rather than <see cref="It"/>.</param>
 		/// <param name="times">The number of times a method is allowed to be called.</param>
 		/// <typeparam name="TResult">The type of return value from the expression.</typeparam>
-		[SuppressMessage("Microsoft.Design", "CA1004:GenericMethodsShouldProvideTypeParameter")]
 		void Verify<TResult>(string methodName, Times times, params object[] args);
 
 		/// <summary>
@@ -254,7 +252,6 @@ namespace Moq.Protected
 		/// remember to use <see cref="ItExpr"/> rather than <see cref="It"/>.</param>
 		/// <param name="times">The number of times a method is allowed to be called.</param>
 		/// <typeparam name="TResult">The type of return value from the expression.</typeparam>
-		[SuppressMessage("Microsoft.Design", "CA1004:GenericMethodsShouldProvideTypeParameter")]
 		void Verify<TResult>(string methodName, Type[] genericTypeArguments, Times times, params object[] args);
 
 		/// <summary>
@@ -269,7 +266,6 @@ namespace Moq.Protected
 		/// remember to use <see cref="ItExpr"/> rather than <see cref="It"/>.</param>
 		/// <param name="times">The number of times a method is allowed to be called.</param>
 		/// <typeparam name="TResult">The type of return value from the expression.</typeparam>
-		[SuppressMessage("Microsoft.Design", "CA1004:GenericMethodsShouldProvideTypeParameter")]
 		void Verify<TResult>(string methodName, Times times, bool exactParameterMatch, params object[] args);
 
 		/// <summary>
@@ -285,7 +281,6 @@ namespace Moq.Protected
 		/// remember to use <see cref="ItExpr"/> rather than <see cref="It"/>.</param>
 		/// <param name="times">The number of times a method is allowed to be called.</param>
 		/// <typeparam name="TResult">The type of return value from the expression.</typeparam>
-		[SuppressMessage("Microsoft.Design", "CA1004:GenericMethodsShouldProvideTypeParameter")]
 		void Verify<TResult>(string methodName, Type[] genericTypeArguments, Times times, bool exactParameterMatch, params object[] args);
 
 		/// <summary>
@@ -298,7 +293,6 @@ namespace Moq.Protected
 		/// <param name="times">The number of times a method is allowed to be called.</param>
 		/// <typeparam name="TProperty">The type of the property.</typeparam>
 		// TODO should receive args to support indexers
-		[SuppressMessage("Microsoft.Design", "CA1004:GenericMethodsShouldProvideTypeParameter")]
 		void VerifyGet<TProperty>(string propertyName, Times times);
 
 		/// <summary>
@@ -313,7 +307,6 @@ namespace Moq.Protected
 		/// <typeparam name="TProperty">The type of the property. If argument matchers are used, 
 		/// remember to use <see cref="ItExpr"/> rather than <see cref="It"/>.</typeparam>
 		// TODO should receive args to support indexers
-		[SuppressMessage("Microsoft.Design", "CA1004:GenericMethodsShouldProvideTypeParameter")]
 		void VerifySet<TProperty>(string propertyName, Times times, object value);
 
 		#endregion

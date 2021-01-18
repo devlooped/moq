@@ -4,7 +4,6 @@
 using System;
 using System.Collections.Generic;
 using System.Diagnostics;
-using System.Diagnostics.CodeAnalysis;
 using System.Globalization;
 using System.Linq;
 using System.Linq.Expressions;
@@ -105,7 +104,6 @@ namespace Moq
 		/// <summary>
 		/// Ctor invoked by AsTInterface exclusively.
 		/// </summary>
-		[SuppressMessage("Microsoft.Usage", "CA1801:ReviewUnusedParameters", MessageId = "skipInitialize")]
 		internal Mock(bool skipInitialize)
 		{
 			// HACK: this is quick hackish. 
@@ -124,7 +122,6 @@ namespace Moq
 		///     var mock = new Mock&lt;IFormatProvider&gt;();
 		///   </code>
 		/// </example>
-		[SuppressMessage("Microsoft.Usage", "CA2214:DoNotCallOverridableMethodsInConstructors")]
 		public Mock()
 			: this(MockBehavior.Default)
 		{
@@ -144,7 +141,6 @@ namespace Moq
 		///     var mock = new Mock&lt;MyProvider&gt;(someArgument, 25);
 		///   </code>
 		/// </example>
-		[SuppressMessage("Microsoft.Usage", "CA2214:DoNotCallOverridableMethodsInConstructors")]
 		public Mock(params object[] args)
 			: this(MockBehavior.Default, args)
 		{
@@ -159,7 +155,6 @@ namespace Moq
 		///     var mock = new Mock&lt;IFormatProvider&gt;(MockBehavior.Strict);
 		///   </code>
 		/// </example>
-		[SuppressMessage("Microsoft.Usage", "CA2214:DoNotCallOverridableMethodsInConstructors")]
 		public Mock(MockBehavior behavior)
 			: this(behavior, new object[0])
 		{
@@ -175,7 +170,6 @@ namespace Moq
 		///   The mock will try to find the best match constructor given the constructor arguments,
 		///   and invoke that to initialize the instance. This applies only to classes, not interfaces.
 		/// </remarks>
-		[SuppressMessage("Microsoft.Usage", "CA2214:DoNotCallOverridableMethodsInConstructors")]
 		public Mock(MockBehavior behavior, params object[] args)
 		{
 			Guard.IsMockable(typeof(T));
@@ -208,7 +202,6 @@ namespace Moq
 		/// <example>
 		/// <code>var mock = new Mock&lt;MyProvider&gt;(() => new MyProvider(someArgument, 25), MockBehavior.Loose);</code>
 		/// </example>
-		[SuppressMessage("Microsoft.Usage", "CA2214:DoNotCallOverridableMethodsInConstructors")]
 		public Mock(Expression<Func<T>> newExpression, MockBehavior behavior = MockBehavior.Default)
 			: this(behavior, Expressions.Visitors.ConstructorCallVisitor.ExtractArgumentValues(newExpression))
 		{
@@ -287,8 +280,6 @@ namespace Moq
 		/// <summary>
 		///   Exposes the mocked object instance.
 		/// </summary>
-		[SuppressMessage("Microsoft.Naming", "CA1716:IdentifiersShouldNotMatchKeywords", MessageId = "Object", Justification = "Exposes the mocked object instance, so it's appropriate.")]
-		[SuppressMessage("Microsoft.Naming", "CA1721:PropertyNamesShouldNotMatchGetMethods", Justification = "The public Object property is the only one visible to Moq consumers. The protected member is for internal use only.")]
 		public virtual new T Object
 		{
 			get { return (T)base.Object; }
@@ -329,7 +320,6 @@ namespace Moq
 		/// <summary>
 		/// Returns the mocked object value.
 		/// </summary>
-		[SuppressMessage("Microsoft.Design", "CA1024:UsePropertiesWhereAppropriate", Justification = "This is actually the protected virtual implementation of the property Object.")]
 		protected override object OnGetObject()
 		{
 			if (this.instance == null)
@@ -440,7 +430,6 @@ namespace Moq
 		///     mock.Setup(x => x.Execute("ping"));
 		///   </code>
 		/// </example>
-		[SuppressMessage("Microsoft.Design", "CA1006:DoNotNestGenericTypesInMemberSignatures", Justification = "By design")]
 		public ISetup<T> Setup(Expression<Action<T>> expression)
 		{
 			var setup = Mock.Setup(this, expression, null);
@@ -462,7 +451,6 @@ namespace Moq
 		///         .Returns(true);
 		///   </code>
 		/// </example>
-		[SuppressMessage("Microsoft.Design", "CA1006:DoNotNestGenericTypesInMemberSignatures", Justification = "By design")]
 		public ISetup<T, TResult> Setup<TResult>(Expression<Func<T, TResult>> expression)
 		{
 			var setup = Mock.Setup(this, expression, null);
@@ -484,7 +472,6 @@ namespace Moq
 		///         .Returns(true);
 		///   </code>
 		/// </example>
-		[SuppressMessage("Microsoft.Design", "CA1006:DoNotNestGenericTypesInMemberSignatures", Justification = "By design")]
 		public ISetupGetter<T, TProperty> SetupGet<TProperty>(Expression<Func<T, TProperty>> expression)
 		{
 			var setup = Mock.SetupGet(this, expression, null);
@@ -609,8 +596,6 @@ namespace Moq
 		///     Assert.Equal(5, v.Value);
 		///   </code>
 		/// </example>
-		[SuppressMessage("Microsoft.Design", "CA1006:DoNotNestGenericTypesInMemberSignatures", Justification = "By design")]
-		[SuppressMessage("Microsoft.Naming", "CA1716:IdentifiersShouldNotMatchKeywords", MessageId = "Property", Justification = "This sets properties, so it's appropriate.")]
 		public Mock<T> SetupProperty<TProperty>(Expression<Func<T, TProperty>> property)
 		{
 			return this.SetupProperty(property, default(TProperty));
@@ -645,8 +630,6 @@ namespace Moq
 		///     Assert.Equal(6, v.Value);
 		///   </code>
 		/// </example>
-		[SuppressMessage("Microsoft.Design", "CA1006:DoNotNestGenericTypesInMemberSignatures", Justification = "By design")]
-		[SuppressMessage("Microsoft.Naming", "CA1716:IdentifiersShouldNotMatchKeywords", MessageId = "Property", Justification = "We're setting up a property, so it's appropriate.")]
 		public Mock<T> SetupProperty<TProperty>(Expression<Func<T, TProperty>> property, TProperty initialValue)
 		{
 			Guard.NotNull(property, nameof(property));
@@ -681,7 +664,6 @@ namespace Moq
 		/// <summary>
 		/// Return a sequence of values, once per call.
 		/// </summary>
-		[SuppressMessage("Microsoft.Design", "CA1006:DoNotNestGenericTypesInMemberSignatures", Justification = "By Design")]
 		public ISetupSequentialResult<TResult> SetupSequence<TResult>(Expression<Func<T, TResult>> expression)
 		{
 			var setup = Mock.SetupSequence(this, expression);
@@ -691,7 +673,6 @@ namespace Moq
 		/// <summary>
 		/// Performs a sequence of actions, one per call.
 		/// </summary>
-		[SuppressMessage("Microsoft.Design", "CA1006:DoNotNestGenericTypesInMemberSignatures", Justification = "By Design")]
 		public ISetupSequentialAction SetupSequence(Expression<Action<T>> expression)
 		{
 			var setup = Mock.SetupSequence(this, expression);
@@ -739,7 +720,6 @@ namespace Moq
 		///     mock.Verify(proc => proc.Execute("ping"));
 		///   </code>
 		/// </example>
-		[SuppressMessage("Microsoft.Design", "CA1006:DoNotNestGenericTypesInMemberSignatures", Justification = "By design")]
 		public void Verify(Expression<Action<T>> expression)
 		{
 			Mock.Verify(this, expression, Times.AtLeastOnce(), null);
@@ -754,7 +734,6 @@ namespace Moq
 		/// <exception cref="MockException">
 		///   The invocation was not called the number of times specified by <paramref name="times"/>.
 		/// </exception>
-		[SuppressMessage("Microsoft.Design", "CA1006:DoNotNestGenericTypesInMemberSignatures", Justification = "By design")]
 		public void Verify(Expression<Action<T>> expression, Times times)
 		{
 			Mock.Verify(this, expression, times, null);
@@ -769,7 +748,6 @@ namespace Moq
 		/// <exception cref="MockException">
 		///   The invocation was not called the number of times specified by <paramref name="times"/>.
 		/// </exception>
-		[SuppressMessage("Microsoft.Design", "CA1006:DoNotNestGenericTypesInMemberSignatures", Justification = "By design")]
 		public void Verify(Expression<Action<T>> expression, Func<Times> times)
 		{
 			Verify(expression, times());
@@ -783,7 +761,6 @@ namespace Moq
 		/// <param name="expression">Expression to verify.</param>
 		/// <param name="failMessage">Message to show if verification fails.</param>
 		/// <exception cref="MockException">The invocation was not performed on the mock.</exception>
-		[SuppressMessage("Microsoft.Design", "CA1006:DoNotNestGenericTypesInMemberSignatures", Justification = "By design")]
 		public void Verify(Expression<Action<T>> expression, string failMessage)
 		{
 			Mock.Verify(this, expression, Times.AtLeastOnce(), failMessage);
@@ -800,7 +777,6 @@ namespace Moq
 		/// <exception cref="MockException">
 		///   The invocation was not called the number of times specified by <paramref name="times"/>.
 		/// </exception>
-		[SuppressMessage("Microsoft.Design", "CA1006:DoNotNestGenericTypesInMemberSignatures", Justification = "By design")]
 		public void Verify(Expression<Action<T>> expression, Times times, string failMessage)
 		{
 			Mock.Verify(this, expression, times, failMessage);
@@ -817,7 +793,6 @@ namespace Moq
 		/// <exception cref="MockException">
 		///   The invocation was not called the number of times specified by <paramref name="times"/>.
 		/// </exception>
-		[SuppressMessage("Microsoft.Design", "CA1006:DoNotNestGenericTypesInMemberSignatures", Justification = "By design")]
 		public void Verify(Expression<Action<T>> expression, Func<Times> times, string failMessage)
 		{
 			Mock.Verify(this, expression, times(), failMessage);
@@ -842,7 +817,6 @@ namespace Moq
 		///     mock.Verify(warehouse => warehouse.HasInventory(TALISKER, 50));
 		///   </code>
 		/// </example>
-		[SuppressMessage("Microsoft.Design", "CA1006:DoNotNestGenericTypesInMemberSignatures", Justification = "By design")]
 		public void Verify<TResult>(Expression<Func<T, TResult>> expression)
 		{
 			Mock.Verify(this, expression, Times.AtLeastOnce(), null);
@@ -858,7 +832,6 @@ namespace Moq
 		/// <exception cref="MockException">
 		///   The invocation was not called the number of times specified by <paramref name="times"/>.
 		/// </exception>
-		[SuppressMessage("Microsoft.Design", "CA1006:DoNotNestGenericTypesInMemberSignatures", Justification = "By design")]
 		public void Verify<TResult>(Expression<Func<T, TResult>> expression, Times times)
 		{
 			Mock.Verify(this, expression, times, null);
@@ -874,7 +847,6 @@ namespace Moq
 		/// <exception cref="MockException">
 		///   The invocation was not called the number of times specified by <paramref name="times"/>.
 		/// </exception>
-		[SuppressMessage("Microsoft.Design", "CA1006:DoNotNestGenericTypesInMemberSignatures", Justification = "By design")]
 		public void Verify<TResult>(Expression<Func<T, TResult>> expression, Func<Times> times)
 		{
 			Mock.Verify(this, expression, times(), null);
@@ -901,7 +873,6 @@ namespace Moq
 		///                 "When filling orders, inventory has to be checked");
 		///   </code>
 		/// </example>
-		[SuppressMessage("Microsoft.Design", "CA1006:DoNotNestGenericTypesInMemberSignatures", Justification = "By design")]
 		public void Verify<TResult>(Expression<Func<T, TResult>> expression, string failMessage)
 		{
 			Mock.Verify(this, expression, Times.AtLeastOnce(), failMessage);
@@ -918,7 +889,6 @@ namespace Moq
 		/// <exception cref="MockException">
 		///   The invocation was not called the number times specified by <paramref name="times"/>.
 		/// </exception>
-		[SuppressMessage("Microsoft.Design", "CA1006:DoNotNestGenericTypesInMemberSignatures", Justification = "By design")]
 		public void Verify<TResult>(Expression<Func<T, TResult>> expression, Times times, string failMessage)
 		{
 			Mock.Verify(this, expression, times, failMessage);
@@ -944,7 +914,6 @@ namespace Moq
 		///     mock.VerifyGet(warehouse => warehouse.IsClosed);
 		///   </code>
 		/// </example>
-		[SuppressMessage("Microsoft.Design", "CA1006:DoNotNestGenericTypesInMemberSignatures", Justification = "By design")]
 		public void VerifyGet<TProperty>(Expression<Func<T, TProperty>> expression)
 		{
 			Mock.VerifyGet(this, expression, Times.AtLeastOnce(), null);
@@ -961,7 +930,6 @@ namespace Moq
 		/// <exception cref="MockException">
 		///   The invocation was not called the number times specified by <paramref name="times"/>.
 		/// </exception>
-		[SuppressMessage("Microsoft.Design", "CA1006:DoNotNestGenericTypesInMemberSignatures", Justification = "By design")]
 		public void VerifyGet<TProperty>(Expression<Func<T, TProperty>> expression, Times times)
 		{
 			Mock.VerifyGet(this, expression, times, null);
@@ -978,7 +946,6 @@ namespace Moq
 		/// <exception cref="MockException">
 		///   The invocation was not called the number times specified by <paramref name="times"/>.
 		/// </exception>
-		[SuppressMessage("Microsoft.Design", "CA1006:DoNotNestGenericTypesInMemberSignatures", Justification = "By design")]
 		public void VerifyGet<TProperty>(Expression<Func<T, TProperty>> expression, Func<Times> times)
 		{
 			VerifyGet(this, expression, times(), null);
@@ -993,7 +960,6 @@ namespace Moq
 		///   Type of the property to verify. Typically omitted as it can be inferred from the expression's return type.
 		/// </typeparam>
 		/// <exception cref="MockException">The invocation was not performed on the mock.</exception>
-		[SuppressMessage("Microsoft.Design", "CA1006:DoNotNestGenericTypesInMemberSignatures", Justification = "By design")]
 		public void VerifyGet<TProperty>(Expression<Func<T, TProperty>> expression, string failMessage)
 		{
 			Mock.VerifyGet(this, expression, Times.AtLeastOnce(), failMessage);
@@ -1011,7 +977,6 @@ namespace Moq
 		/// <exception cref="MockException">
 		///   The invocation was not called the number times specified by <paramref name="times"/>.
 		/// </exception>
-		[SuppressMessage("Microsoft.Design", "CA1006:DoNotNestGenericTypesInMemberSignatures", Justification = "By design")]
 		public void VerifyGet<TProperty>(Expression<Func<T, TProperty>> expression, Times times, string failMessage)
 		{
 			Mock.VerifyGet(this, expression, times, failMessage);
@@ -1029,7 +994,6 @@ namespace Moq
 		/// <exception cref="MockException">
 		///   The invocation was not called the number times specified by <paramref name="times"/>.
 		/// </exception>
-		[SuppressMessage("Microsoft.Design", "CA1006:DoNotNestGenericTypesInMemberSignatures", Justification = "By design")]
 		public void VerifyGet<TProperty>(Expression<Func<T, TProperty>> expression, Func<Times> times, string failMessage)
 		{
 			VerifyGet(this, expression, times(), failMessage);
@@ -1409,7 +1373,6 @@ namespace Moq
 		///     Assert.Equal("moq", presenter.SelectedOrder.ProductName);
 		///   </code>
 		/// </example>
-		[SuppressMessage("Microsoft.Design", "CA1030:UseEventsWhereAppropriate", Justification = "Raises the event, rather than being one.")]
 		public void Raise(Action<T> eventExpression, EventArgs args)
 		{
 			Mock.RaiseEvent(this, eventExpression, new object[] { this.Object, args });
@@ -1430,7 +1393,6 @@ namespace Moq
 		///     mock.Raise(x => x.MyEvent -= null, "Name", bool, 25);
 		///   </code>
 		/// </example>
-		[SuppressMessage("Microsoft.Design", "CA1030:UseEventsWhereAppropriate", Justification = "Raises the event, rather than being one.")]
 		public void Raise(Action<T> eventExpression, params object[] args)
 		{
 			Mock.RaiseEvent(this, eventExpression, args);

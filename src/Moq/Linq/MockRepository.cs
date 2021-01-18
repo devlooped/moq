@@ -5,7 +5,6 @@ using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
-using System.Diagnostics.CodeAnalysis;
 using System.ComponentModel;
 using System.Linq.Expressions;
 using Moq.Linq;
@@ -13,11 +12,8 @@ using System.Reflection;
 
 namespace Moq
 {
-#pragma warning disable 618
 	public partial class MockRepository
 	{
-#pragma warning restore 618
-
 		/// <summary>
 		/// Access the universe of mocks of the given type, to retrieve those 
 		/// that behave according to the LINQ query specification.
@@ -45,7 +41,6 @@ namespace Moq
 		/// </summary>
 		/// <param name="specification">The predicate with the setup expressions.</param>
 		/// <typeparam name="T">The type of the mocked object to query.</typeparam>
-		[SuppressMessage("Microsoft.Design", "CA1006:DoNotNestGenericTypesInMemberSignatures", Justification = "By design")]
 		public IQueryable<T> Of<T>(Expression<Func<T, bool>> specification) where T : class
 		{
 			return this.Of<T>(specification, this.Behavior);
@@ -58,7 +53,6 @@ namespace Moq
 		/// <param name="specification">The predicate with the setup expressions.</param>
 		/// <param name="behavior">Behavior of the mocks.</param>
 		/// <typeparam name="T">The type of the mocked object to query.</typeparam>
-		[SuppressMessage("Microsoft.Design", "CA1006:DoNotNestGenericTypesInMemberSignatures", Justification = "By design")]
 		public IQueryable<T> Of<T>(Expression<Func<T, bool>> specification, MockBehavior behavior) where T : class
 		{
 			return this.CreateMockQuery<T>(behavior).Where(specification);
@@ -93,7 +87,6 @@ namespace Moq
 		/// <param name="specification">The predicate with the setup expressions.</param>
 		/// <typeparam name="T">The type of the mocked object.</typeparam>
 		/// <returns>The mocked object created.</returns>
-		[SuppressMessage("Microsoft.Design", "CA1006:DoNotNestGenericTypesInMemberSignatures", Justification = "By Design")]
 		[EditorBrowsable(EditorBrowsableState.Never)]
 		public T OneOf<T>(Expression<Func<T, bool>> specification) where T : class
 		{
@@ -107,7 +100,6 @@ namespace Moq
 		/// <param name="behavior">Behavior of the mock.</param>
 		/// <typeparam name="T">The type of the mocked object.</typeparam>
 		/// <returns>The mocked object created.</returns>
-		[SuppressMessage("Microsoft.Design", "CA1006:DoNotNestGenericTypesInMemberSignatures", Justification = "By Design")]
 		[EditorBrowsable(EditorBrowsableState.Never)]
 		public T OneOf<T>(Expression<Func<T, bool>> specification, MockBehavior behavior) where T : class
 		{

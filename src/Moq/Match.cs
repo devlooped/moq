@@ -3,7 +3,6 @@
 
 using System;
 using System.Diagnostics;
-using System.Diagnostics.CodeAnalysis;
 using System.Linq.Expressions;
 using System.Reflection;
 
@@ -102,7 +101,6 @@ namespace Moq
 		///   A lambda representation of the matcher, to be used when rendering error messages,
 		///   such as <c>() => It.IsAny&lt;string&lt;()</c>.
 		/// </param>
-		[SuppressMessage("Microsoft.Design", "CA1006:DoNotNestGenericTypesInMemberSignatures")]
 		public static T Create<T>(Predicate<T> condition, Expression<Func<T>> renderExpression)
 		{
 			Match.Register(new Match<T>(condition, renderExpression));
