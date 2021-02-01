@@ -6,6 +6,8 @@ using System.Collections.Generic;
 using System.Diagnostics;
 using System.Linq;
 using System.Linq.Expressions;
+using System.Reflection;
+using System.Runtime.CompilerServices;
 using System.Text;
 
 using Moq.Properties;
@@ -259,7 +261,15 @@ namespace Moq
 		{
 			if (expression.Expression != null)
 			{
-				builder.AppendExpression(expression.Expression);
+				if (expression.Expression is ConstantExpression ce
+					&& ce.Type.IsDefined(typeof(CompilerGeneratedAttribute)))
+				{
+					return builder.Append(expression.Member.Name);
+				}
+				else
+				{
+					builder.AppendExpression(expression.Expression);
+				}
 			}
 			else
 			{
