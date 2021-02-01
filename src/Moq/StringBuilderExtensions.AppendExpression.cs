@@ -68,7 +68,15 @@ namespace Moq
 					return builder.AppendExpression((ConditionalExpression)expression);
 
 				case ExpressionType.Constant:
-					return builder.AppendValueOf(((ConstantExpression)expression).Value);
+					var constantValue = ((ConstantExpression)expression).Value;
+					if (constantValue is LambdaExpression lambda)
+					{
+						return builder.AppendExpression(lambda);
+					}
+					else
+					{
+						return builder.AppendValueOf(constantValue);
+					}
 
 				case ExpressionType.Parameter:
 					return builder.AppendExpression((ParameterExpression)expression);
