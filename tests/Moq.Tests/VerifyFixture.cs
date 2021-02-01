@@ -83,6 +83,24 @@ namespace Moq.Tests
 		}
 
 		[Fact]
+		public void ThrowsWithExpressionIfVerifiableExpectationWithLambdaMatcherVariableAndClosureAccessNotCalled()
+		{
+			var mock = new Mock<IFoo>();
+
+			string password = "abc123";
+
+			Expression<Func<string, bool>> matchingPassword = s => s == password;
+
+			mock.Setup(x => x.Execute(It.Is(matchingPassword)))
+				.Returns("ack")
+				.Verifiable();
+
+			var mex = Assert.Throws<MockException>(() => mock.Verify());
+			Assert.True(mex.IsVerificationError);
+			Assert.Contains(@".Execute(It.Is<string>(s => s == password)", mex.Message);
+		}
+
+		[Fact]
 		public void VerifiesNoOpIfNoVerifiableExpectations()
 		{
 			var mock = new Mock<IFoo>();
