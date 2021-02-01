@@ -2,6 +2,7 @@
 // All rights reserved. Licensed under the BSD 3-Clause License; see License.txt.
 
 using System;
+using System.Linq.Expressions;
 using System.Threading.Tasks;
 
 using Moq;
@@ -57,6 +58,22 @@ namespace Moq.Tests
 			var mock = new Mock<IFoo>();
 
 			mock.Setup(x => x.Execute(It.Is<string>(s => string.IsNullOrEmpty(s))))
+				.Returns("ack")
+				.Verifiable();
+
+			var mex = Assert.Throws<MockException>(() => mock.Verify());
+			Assert.True(mex.IsVerificationError);
+			Assert.Contains(@".Execute(It.Is<string>(s => string.IsNullOrEmpty(s)))", mex.Message);
+		}
+
+		[Fact]
+		public void ThrowsWithExpressionIfVerifiableExpectationWithLambdaMatcherVariableNotCalled()
+		{
+			var mock = new Mock<IFoo>();
+
+			Expression<Func<string, bool>> nullOrEmpty = s => string.IsNullOrEmpty(s);
+
+			mock.Setup(x => x.Execute(It.Is(nullOrEmpty)))
 				.Returns("ack")
 				.Verifiable();
 
