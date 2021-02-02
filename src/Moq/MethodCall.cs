@@ -247,7 +247,7 @@ namespace Moq
 			}
 			else if (IsInvocationFunc(valueFactory))
 			{
-				this.returnOrThrow = new ReturnComputedValue(invocation => valueFactory.DynamicInvoke(invocation));
+				this.returnOrThrow = new ReturnComputedValue(invocation => valueFactory.InvokePreserveStack(new object[] { invocation }));
 			}
 			else
 			{

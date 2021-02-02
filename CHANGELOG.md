@@ -19,6 +19,7 @@ The format is loosely based on [Keep a Changelog](http://keepachangelog.com/en/1
 * `AmbiguousMatchException` raised when interface has property indexer besides property in VB. (@mujdatdinc, #1129)
 * Interface default methods are ignored (@hahn-kev, #972)
 * Callback validation too strict when setting up a task's `.Result` property (@stakx, #1132)
+* `setup.Returns(InvocationFunc)` wraps thrown exceptions in `TargetInvocationException` (@stakx, #1141)
 
 
 ## 4.16.0 (2021-01-16)
