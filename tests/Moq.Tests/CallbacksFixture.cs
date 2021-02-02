@@ -516,6 +516,19 @@ namespace Moq.Tests
 			Assert.Equal(2, result);
 		}
 
+		[Fact]
+		public void Type_of_exception_thrown_from_InvocationFunc_callback_should_be_preserved()
+		{
+			var mock = new Mock<IFoo>();
+			mock.Setup(m => m.Submit("good", "bad")).Returns(new InvocationFunc(invocation =>
+			{
+				throw new Exception("very bad");  // this used to be erroneously wrapped as a `TargetInvocationException`
+			}));
+
+			var ex = Assert.Throws<Exception>(() => mock.Object.Submit("good", "bad"));
+			Assert.Equal("very bad", ex.Message);
+		}
+
 		public interface IInterface
 		{
 			void Method(Derived b);
