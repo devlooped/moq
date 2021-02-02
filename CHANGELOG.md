@@ -10,6 +10,10 @@ The format is loosely based on [Keep a Changelog](http://keepachangelog.com/en/1
 
 * `CallBase` can now be used with interface methods that have a default interface implementation. It will call [the most specific override](https://docs.microsoft.com/en-us/dotnet/csharp/language-reference/proposals/csharp-8.0/default-interface-methods#the-most-specific-override-rule). (@stakx, #1130)
 
+#### Changed
+
+* Improved error message formatting of `It.Is` lambda expressions that capture local variables. (@bfriesen, #1140)
+
 #### Fixed
 
 * `AmbiguousMatchException` raised when interface has property indexer besides property in VB. (@mujdatdinc, #1129)
