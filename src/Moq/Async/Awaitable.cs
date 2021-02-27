@@ -20,7 +20,7 @@ namespace Moq.Async
 				&& AwaitableFactory.TryGet(obj.GetType()) is { } awaitableFactory
 				&& awaitableFactory.TryGetResult(obj, out var result))
 			{
-				return result;
+				return Awaitable.TryGetResultRecursive(result);
 			}
 
 			return obj;
