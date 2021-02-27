@@ -29,10 +29,10 @@
 		<PackageId>Moq</PackageId>
 		<Title>Moq: an enjoyable mocking library</Title>
 		<Description>Moq is the most popular and friendly mocking framework for .NET.</Description>
-		<PackageReleaseNotes>A changelog is available at https://github.com/moq/moq4/blob/master/CHANGELOG.md.</PackageReleaseNotes>
+		<PackageReleaseNotes>A changelog is available at https://github.com/moq/moq4/blob/main/CHANGELOG.md.</PackageReleaseNotes>
 		<Authors>Daniel Cazzulino, kzu</Authors>
 		<PackageIcon>moq.png</PackageIcon>
-		<PackageLicenseUrl>https://raw.githubusercontent.com/moq/moq4/master/License.txt</PackageLicenseUrl>
+		<PackageLicenseUrl>https://raw.githubusercontent.com/moq/moq4/main/License.txt</PackageLicenseUrl>
 		<PackageRequireLicenseAcceptance>False</PackageRequireLicenseAcceptance>
 		<NoPackageAnalysis>True</NoPackageAnalysis>
 		<PackageOutputPath>$(OutputDirectory)</PackageOutputPath>
