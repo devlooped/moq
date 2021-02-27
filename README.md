@@ -6,7 +6,7 @@ The most popular and friendly mocking library for .NET
 [![Version](https://img.shields.io/nuget/vpre/Moq.svg)](https://www.nuget.org/packages/Moq)
 [![Downloads](https://img.shields.io/nuget/dt/Moq.svg)](https://www.nuget.org/packages/Moq)
 [![Discord Chat](https://img.shields.io/badge/chat-on%20discord-7289DA.svg)](https://discord.gg/8PtpGdu)
-[![Join the chat at https://gitter.im/moq/moq](https://badges.gitter.im/Join%20Chat.svg)](https://gitter.im/moq/moq?utm_source=badge&utm_medium=badge&utm_campaign=pr-badge&utm_content=badge)
+[![Gitter chat](https://img.shields.io/badge/chat-on%20gitter-753A88.svg)](https://gitter.im/moq/moq)
 
 
 ```csharp
@@ -92,8 +92,8 @@ Moq offers the following features:
 We appreciate deeply any feedback that you may have! Feel free to participate in the [chat], or report an issue in the [issue tracker].
 
  [chat]:
- https://gitter.im/moq/moq
- "Moq chat room on Gitter"
+ https://discord.gg/8PtpGdu
+ "Moq channel on Discord"
 
  [issue tracker]:
  https://github.com/moq/moq4/issues
