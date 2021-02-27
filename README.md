@@ -91,9 +91,6 @@ Moq offers the following features:
 
 We appreciate deeply any feedback that you may have! Feel free to participate in the [chat], or report an issue in the [issue tracker].
 
-![OhLoh](http://www.ohloh.net/p/moq/widgets/project_thin_badge.gif)
-
-
  [chat]:
  https://gitter.im/moq/moq
  "Moq chat room on Gitter"
