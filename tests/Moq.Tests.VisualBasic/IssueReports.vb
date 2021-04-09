@@ -91,4 +91,37 @@ Public Class IssueReports
 		End Interface
 	End Class
 
+	Public Class Issue1153
+
+		<Fact>
+		Public Sub Indexer_overload_can_be_distinguished_from_property_when_mocking_declaring_class()
+			Dim mock = New Mock(Of MyVBClassBase)()
+			mock.Setup(Function(m) m.Prop).Returns(True)
+		End Sub
+
+		<Fact>
+		Public Sub Indexer_overload_can_be_distinguished_from_property_when_mocking_subclass_of_declaring_class()
+			Dim mock = New Mock(Of MyVBClass)()
+			mock.Setup(Function(m) m.Prop).Returns(True)
+		End Sub
+
+		Public Class MyVBClassBase
+			Public Overridable ReadOnly Property Prop() As Boolean
+				Get
+					Return True
+				End Get
+			End Property
+			Public Overridable ReadOnly Property Prop(ByVal userID As Guid) As Boolean
+				Get
+					Return False
+				End Get
+			End Property
+		End Class
+
+		Public Class MyVBClass
+			Inherits MyVBClassBase
+		End Class
+
+	End Class
+
 End Class
