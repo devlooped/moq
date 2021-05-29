@@ -151,6 +151,25 @@ namespace Moq.Tests
 		}
 
 		[Fact]
+		public void SetUpGet_can_automock()
+		{
+			this.protectedMock.SetupGet(m => m.Nested.Value).Returns(42);
+
+			var actual = mock.Object.GetNested().Value;
+
+			Assert.Equal(42, actual);
+		}
+
+		[Fact] void SetupGet_can_setup_virtual_property()
+		{
+			this.protectedMock.SetupGet(m => m.Virtual).Returns(42);
+
+			var actual = mock.Object.GetVirtual();
+
+			Assert.Equal(42, actual);
+		}
+
+		[Fact]
 		public void SetupProperty_can_setup_readwrite_property()
 		{
 			this.protectedMock.SetupProperty(m => m.ReadWritePropertyImpl, 42);
@@ -298,6 +317,10 @@ namespace Moq.Tests
 			Assert.Contains("Was not queried.", exception.Message);
 		}
 
+		public interface INested
+		{
+			int Value { get; }
+		}
 		public abstract class Foo
 		{
 			protected Foo()
@@ -336,6 +359,32 @@ namespace Moq.Tests
 			protected abstract void DoSomethingImpl(int arg);
 
 			protected abstract int GetSomethingImpl();
+
+			protected abstract INested Nested { get; set; }
+
+			public INested GetNested()
+			{
+				return Nested;
+			}
+
+			private int virtualProperty;
+			public virtual int Virtual
+			{
+				protected get
+				{
+					return virtualProperty;
+				}
+				set
+				{
+					virtualProperty = value;
+				}
+
+			}
+
+			public int GetVirtual()
+			{
+				return Virtual;
+			}
 		}
 
 		public interface Fooish
@@ -347,6 +396,8 @@ namespace Moq.Tests
 			void DoSomethingImpl(int arg);
 			int GetSomethingImpl();
 			void NonExistentMethod();
+			INested Nested { get; set; }
+			int Virtual { get; set; }
 		}
 
 		public abstract class MessageHandlerBase
