@@ -20,6 +20,7 @@ namespace Moq.Protected
 		private Mock<T> mock;
 
 		private static DuckReplacer DuckReplacerInstance = new DuckReplacer(typeof(TAnalog), typeof(T));
+		private static DuckSetterReplacer<T, TAnalog> DuckSetterReplacerInstance = new DuckSetterReplacer<T, TAnalog>();
 
 		public ProtectedAsMock(Mock<T> mock)
 		{
@@ -62,6 +63,18 @@ namespace Moq.Protected
 
 			var setup = Mock.Setup(this.mock, rewrittenExpression, null);
 			return new NonVoidSetupPhrase<T, TResult>(setup);
+		}
+
+		public ISetupSetter<T, TProperty> SetupSet<TProperty>(Action<TAnalog> setterExpression)
+		{
+			var setup = Mock.SetupSet(mock, ReplaceDuckSetter(setterExpression), condition: null);
+			return new SetterSetupPhrase<T, TProperty>(setup);
+		}
+
+		public ISetup<T> SetupSet(Action<TAnalog> setterExpression)
+		{
+			var setup = Mock.SetupSet(mock, ReplaceDuckSetter(setterExpression), condition: null);
+			return new VoidSetupPhrase<T>(setup);
 		}
 
 		public ISetupGetter<T, TProperty> SetupGet<TProperty>(Expression<Func<TAnalog, TProperty>> expression)
@@ -169,6 +182,11 @@ namespace Moq.Protected
 			Mock.Verify(this.mock, rewrittenExpression, times ?? Times.AtLeastOnce(), failMessage);
 		}
 
+		public void VerifySet(Action<TAnalog> setterExpression, Times? times = null, string failMessage = null)
+		{
+			Mock.VerifySet(mock, ReplaceDuckSetter(setterExpression), times.HasValue ? times.Value : Times.AtLeastOnce(), failMessage);
+		}
+
 		public void VerifyGet<TProperty>(Expression<Func<TAnalog, TProperty>> expression, Times? times = null, string failMessage = null)
 		{
 			Guard.NotNull(expression, nameof(expression));
@@ -186,6 +204,13 @@ namespace Moq.Protected
 			Mock.VerifyGet(this.mock, rewrittenExpression, times ?? Times.AtLeastOnce(), failMessage);
 		}
 
+		private Expression<Action<T>> ReplaceDuckSetter(Action<TAnalog> setterExpression)
+		{
+			Guard.NotNull(setterExpression, nameof(setterExpression));
+
+			var expression = ExpressionReconstructor.Instance.ReconstructExpression(setterExpression, mock.ConstructorArguments);
+			return DuckSetterReplacerInstance.Replace(expression);
+		}
 		private static LambdaExpression ReplaceDuck(LambdaExpression expression)
 		{
 			Debug.Assert(expression.Parameters.Count == 1);
@@ -363,5 +388,6 @@ namespace Moq.Protected
 				// TODO: parameter lists should be compared, too, to properly support indexers.
 			}
 		}
+		
 	}
 }
