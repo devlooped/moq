@@ -31,7 +31,7 @@ namespace Moq.Protected
 		{
 			return new ProtectedAsMock<T, TAnalog>(mock);
 		}
-
+		
 		#region Setup
 
 		public ISetup<T> Setup(string methodName, params object[] args)
@@ -53,13 +53,18 @@ namespace Moq.Protected
 
 		private ISetup<T> InternalSetup(string methodName, Type[] genericTypeArguments, bool exactParameterMatch, params object[] args)
 		{
-			Guard.NotNull(methodName, nameof(methodName));
+			MethodCall setup = null;
+			GetSetterIncludingIndexerOrMethodExpression(methodName, nameof(methodName), genericTypeArguments, exactParameterMatch, args,
+				propertyExpression =>
+				{
+					setup = Mock.SetupSet(mock, propertyExpression, null);
+				},
+				methodExpression =>
+				{
+					setup = Mock.Setup(mock, methodExpression, null);
+				}
+			);
 
-			var method = GetMethod(methodName, genericTypeArguments, exactParameterMatch, args);
-			ThrowIfMethodMissing(methodName, method, args);
-			ThrowIfPublicMethod(method, typeof(T).Name);
-
-			var setup = Mock.Setup(mock, GetMethodCall(method, args), null);
 			return new VoidSetupPhrase<T>(setup);
 		}
 
@@ -79,56 +84,61 @@ namespace Moq.Protected
 
 			return this.InternalSetup<TResult>(methodName, genericTypeArguments, exactParameterMatch, args);
 		}
-
+		
 		private ISetup<T, TResult> InternalSetup<TResult>(string methodName, Type[] genericTypeArguments,
 			bool exactParameterMatch, params object[] args)
 		{
-			Guard.NotNullOrEmpty(methodName, nameof(methodName));
-
-			var property = GetProperty(methodName);
-			if (property != null)
-			{
-				ThrowIfPublicGetter(property, typeof(T).Name);
-				// TODO should consider property indexers
-				var getterSetup = Mock.SetupGet(mock, GetMemberAccess<TResult>(property), null);
-				return new NonVoidSetupPhrase<T, TResult>(getterSetup);
-			}
-
-			var method = GetMethod(methodName, genericTypeArguments, exactParameterMatch, args);
-			ThrowIfMethodMissing(methodName, method, args);
-			ThrowIfVoidMethod(method);
-			ThrowIfPublicMethod(method, typeof(T).Name);
-
-			var setup = Mock.Setup(mock, GetMethodCall<TResult>(method, args), null);
-			return new NonVoidSetupPhrase<T, TResult>(setup);
+			ISetup<T, TResult> setup = null;
+			GetGetterIncludingIndexerOrMethodExpression<TResult>(methodName, nameof(methodName), genericTypeArguments, exactParameterMatch, args,
+				propertyExpression =>
+				{
+					var getterSetup = Mock.SetupGet(mock, propertyExpression, null);
+					setup = new NonVoidSetupPhrase<T, TResult>(getterSetup);
+				},
+				methodExpression =>
+				{
+					var methodSetup = Mock.Setup(mock, methodExpression, null);
+					setup = new NonVoidSetupPhrase<T, TResult>(methodSetup);
+				}
+			);
+			return setup;
 		}
 
 		public ISetupGetter<T, TProperty> SetupGet<TProperty>(string propertyName)
 		{
-			Guard.NotNullOrEmpty(propertyName, nameof(propertyName));
+			var setup = Mock.SetupGet(mock, GetGetterExpression<TProperty>(propertyName), null);
+			return new NonVoidSetupPhrase<T, TProperty>(setup);
+		}
 
-			var property = GetProperty(propertyName);
-			ThrowIfMemberMissing(propertyName, property);
-			ThrowIfPublicGetter(property, typeof(T).Name);
-			Guard.CanRead(property);
-
-			var setup = Mock.SetupGet(mock, GetMemberAccess<TProperty>(property), null);
+		public ISetup<T, TProperty> SetupGet<TProperty>(string indexerName, object[] indexerKeys)
+		{
+			var expression = GetIndexerGetterExpression(indexerName, indexerKeys);
+			var setup = Mock.SetupGet(mock, expression, null);
 			return new NonVoidSetupPhrase<T, TProperty>(setup);
 		}
 
 		public ISetupSetter<T, TProperty> SetupSet<TProperty>(string propertyName, object value)
 		{
-			Guard.NotNullOrEmpty(propertyName, nameof(propertyName));
+			return new SetterSetupPhrase<T, TProperty>(CommonSetupSet(propertyName, value));
+		}
 
-			var property = GetProperty(propertyName);
-			ThrowIfMemberMissing(propertyName, property);
-			ThrowIfPublicSetter(property, typeof(T).Name);
-			Guard.CanWrite(property);
+		public ISetup<T> SetupSet(string propertyName, object value)
+		{
+			return new VoidSetupPhrase<T>(CommonSetupSet(propertyName, value));
+		}
 
-			var expression = GetSetterExpression(property, ItExpr.IsAny<TProperty>());
+		private MethodCall CommonSetupSet(string propertyName, object value)
+		{
+			var expression = GetSetterExpressionIncludingIndexer(propertyName, value, false, nameof(propertyName));
 
-			var setup = Mock.SetupSet(mock, expression, condition: null);
-			return new SetterSetupPhrase<T, TProperty>(setup);
+			return Mock.SetupSet(mock, expression, condition: null);
+		}
+
+		public ISetup<T> SetupSet(string indexerName, object[] indexerKeys, object value)
+		{
+			var expression = GetIndexerSetterExpression(indexerName, indexerKeys, value);
+			var methodCall = Mock.SetupSet(mock, expression, condition: null);
+			return new VoidSetupPhrase<T>(methodCall);
 		}
 
 		public ISetupSequentialAction SetupSequence(string methodOrPropertyName, params object[] args)
@@ -149,13 +159,13 @@ namespace Moq.Protected
 
 		private ISetupSequentialAction InternalSetupSequence(string methodOrPropertyName, Type[] genericTypeArguments, bool exactParameterMatch, params object[] args)
 		{
-			Guard.NotNullOrEmpty(methodOrPropertyName, nameof(methodOrPropertyName));
+			LambdaExpression expression = null;
+			GetSetterIncludingIndexerOrMethodExpression(methodOrPropertyName, nameof(methodOrPropertyName), genericTypeArguments, exactParameterMatch, args,
+				propertyExpression => expression = propertyExpression,
+				methodExpression => expression = methodExpression
+			);
 
-			var method = GetMethod(methodOrPropertyName, genericTypeArguments, exactParameterMatch, args);
-			ThrowIfMemberMissing(methodOrPropertyName, method);
-			ThrowIfPublicMethod(method, typeof(T).Name);
-
-			var setup = Mock.SetupSequence(mock, GetMethodCall(method, args));
+			var setup = Mock.SetupSequence(mock, expression);
 			return new SetupSequencePhrase(setup);
 		}
 
@@ -177,23 +187,13 @@ namespace Moq.Protected
 
 		private ISetupSequentialResult<TResult> InternalSetupSequence<TResult>(string methodOrPropertyName, Type[] genericTypeArguments, bool exactParameterMatch, params object[] args)
 		{
-			Guard.NotNullOrEmpty(methodOrPropertyName, nameof(methodOrPropertyName));
+			LambdaExpression expression = null;
+			GetGetterIncludingIndexerOrMethodExpression<TResult>(methodOrPropertyName, nameof(methodOrPropertyName), genericTypeArguments, exactParameterMatch, args,
+				propertyExpression => expression = propertyExpression,
+				methodExpression => expression = methodExpression
+			);
 
-			var property = GetProperty(methodOrPropertyName);
-			if (property != null)
-			{
-				ThrowIfPublicGetter(property, typeof(T).Name);
-				// TODO should consider property indexers
-				var getterSetup = Mock.SetupSequence(mock, GetMemberAccess<TResult>(property));
-				return new SetupSequencePhrase<TResult>(getterSetup);
-			}
-
-			var method = GetMethod(methodOrPropertyName, genericTypeArguments, exactParameterMatch, args);
-			ThrowIfMemberMissing(methodOrPropertyName, method);
-			ThrowIfVoidMethod(method);
-			ThrowIfPublicMethod(method, typeof(T).Name);
-
-			var setup = Mock.SetupSequence(mock, GetMethodCall<TResult>(method, args));
+			var setup = Mock.SetupSequence(mock, expression);
 			return new SetupSequencePhrase<TResult>(setup);
 		}
 
@@ -225,13 +225,16 @@ namespace Moq.Protected
 
 		private void InternalVerify(string methodName, Type[] genericTypeArguments, Times times, bool exactParameterMatch, params object[] args)
 		{
-			Guard.NotNullOrEmpty(methodName, nameof(methodName));
-
-			var method = GetMethod(methodName, genericTypeArguments, exactParameterMatch, args);
-			ThrowIfMethodMissing(methodName, method, args);
-			ThrowIfPublicMethod(method, typeof(T).Name);
-
-			Mock.Verify(mock, GetMethodCall(method, args), times, null);
+			GetSetterIncludingIndexerOrMethodExpression(methodName, nameof(methodName), genericTypeArguments, exactParameterMatch, args,
+				propertyExpression =>
+				{
+					Mock.VerifySet(mock, propertyExpression, times, null);
+				},
+				methodExpression =>
+				{
+					Mock.Verify(mock, methodExpression, times, null);
+				}
+			);
 		}
 
 		public void Verify<TResult>(string methodName, Times times, object[] args)
@@ -258,51 +261,46 @@ namespace Moq.Protected
 
 		private void InternalVerify<TResult>(string methodName, Type[] genericTypeArguments, Times times, bool exactParameterMatch, params object[] args)
 		{
-			Guard.NotNullOrEmpty(methodName, nameof(methodName));
-
-			var property = GetProperty(methodName);
-			if (property != null)
-			{
-				ThrowIfPublicGetter(property, typeof(T).Name);
-				// TODO should consider property indexers
-				Mock.VerifyGet(mock, GetMemberAccess<TResult>(property), times, null);
-				return;
-			}
-
-			var method = GetMethod(methodName, genericTypeArguments, exactParameterMatch, args);
-			ThrowIfMethodMissing(methodName, method, args);
-			ThrowIfPublicMethod(method, typeof(T).Name);
-
-			Mock.Verify(mock, GetMethodCall<TResult>(method, args), times, null);
+			GetGetterIncludingIndexerOrMethodExpression<TResult>(methodName, nameof(methodName), genericTypeArguments, exactParameterMatch, args,
+				propertyExpression =>
+				{
+					Mock.VerifyGet(mock, propertyExpression, times, null);
+				},
+				methodExpression =>
+				{
+					Mock.Verify(mock, methodExpression, times, null);
+				}
+			);
 		}
-
-		// TODO should receive args to support indexers
+		
 		public void VerifyGet<TProperty>(string propertyName, Times times)
 		{
-			Guard.NotNullOrEmpty(propertyName, nameof(propertyName));
-
-			var property = GetProperty(propertyName);
-			ThrowIfMemberMissing(propertyName, property);
-			ThrowIfPublicGetter(property, typeof(T).Name);
-			Guard.CanRead(property);
-
-			// TODO should consider property indexers
-			Mock.VerifyGet(mock, GetMemberAccess<TProperty>(property), times, null);
+			Mock.VerifyGet(mock, GetGetterExpression<TProperty>(propertyName), times, null);
 		}
 
-		// TODO should receive args to support indexers
+		public void VerifyGet(string indexerName, Times times, object[] indexerKeys)
+		{
+			var expression = GetIndexerGetterExpression(indexerName, indexerKeys);
+			Mock.VerifyGet(mock, expression, times, null);
+		}
+
+		public void VerifySet(string propertyName, Times times, object value)
+		{
+			var expression = GetSetterExpressionIncludingIndexer(propertyName, value, false, nameof(propertyName));
+
+			Mock.VerifySet(mock, expression, times, null);
+		}
+
+		public void VerifySet(string indexerName, Times times, object[] indexerKeys, object value)
+		{
+			var expression = GetIndexerSetterExpression(indexerName, indexerKeys, value);
+			Mock.VerifySet(mock, expression, times, null);
+		}
+
 		public void VerifySet<TProperty>(string propertyName, Times times, object value)
 		{
-			Guard.NotNullOrEmpty(propertyName, nameof(propertyName));
+			var expression = GetSetterExpressionIncludingIndexer(propertyName, value, false, nameof(propertyName));
 
-			var property = GetProperty(propertyName);
-			ThrowIfMemberMissing(propertyName, property);
-			ThrowIfPublicSetter(property, typeof(T).Name);
-			Guard.CanWrite(property);
-
-			var expression = GetSetterExpression(property, ItExpr.IsAny<TProperty>());
-			// TODO should consider property indexers
-			// TODO should receive the parameter here
 			Mock.VerifySet(mock, expression, times, null);
 		}
 
@@ -330,24 +328,52 @@ namespace Moq.Protected
 				.SingleOrDefault(m => m.GetParameterTypes().CompareTo(argTypes, exact, considerTypeMatchers: false));
 		}
 
-		private static Expression<Func<T, TResult>> GetMethodCall<TResult>(MethodInfo method, object[] args)
+		private static Expression<Func<T, TResult>> GetMethodCall<TResult>(string methodName, string methodNameParameterName, Type[] genericTypeArguments,
+			bool exactParameterMatch, object[] args)
 		{
-			var param = Expression.Parameter(typeof(T), "mock");
-			return Expression.Lambda<Func<T, TResult>>(Expression.Call(param, method, ToExpressionArgs(method, args)), param);
+			Guard.NotNullOrEmpty(methodName, methodNameParameterName);
+
+			var method = GetMethod(methodName, genericTypeArguments, exactParameterMatch, args);
+			ThrowIfMethodMissing(methodName, method, args);
+			ThrowIfVoidMethod(method);
+			ThrowIfPublicMethod(method, typeof(T).Name);
+
+			return GetMethodCallImpl<Func<T, TResult>>(method, args);
 		}
 
-		private static Expression<Action<T>> GetMethodCall(MethodInfo method, object[] args)
+		private static Expression<Action<T>> GetMethodCall(string methodName, string methodNameParameterName,Type[] genericTypeArguments, bool exactParameterMatch, params object[] args)
 		{
-			var param = Expression.Parameter(typeof(T), "mock");
-			return Expression.Lambda<Action<T>>(Expression.Call(param, method, ToExpressionArgs(method, args)), param);
+			Guard.NotNullOrEmpty(methodName, methodNameParameterName);
+
+			var method = GetMethod(methodName, genericTypeArguments, exactParameterMatch, args);
+			ThrowIfMethodMissing(methodName, method, args);
+			ThrowIfPublicMethod(method, typeof(T).Name);
+
+			return GetMethodCallImpl<Action<T>>(method, args);
 		}
 
-		// TODO should support arguments for property indexers
+		private static Expression<TDelegate> GetMethodCallImpl<TDelegate>(MethodInfo method, object[] args)
+		{
+			var param = Expression.Parameter(typeof(T), "mock");
+			return Expression.Lambda<TDelegate>(Expression.Call(param, method, ToExpressionArgs(method, args)), param);
+		}
+		
 		private static PropertyInfo GetProperty(string propertyName)
 		{
 			return typeof(T).GetProperty(
 				propertyName,
 				BindingFlags.Instance | BindingFlags.NonPublic | BindingFlags.Public);
+		}
+
+		private static Expression<Func<T, TProperty>> GetGetterExpression<TProperty>(string propertyName)
+		{
+			Guard.NotNullOrEmpty(propertyName, nameof(propertyName));
+
+			var property = GetProperty(propertyName);
+			ThrowIfMemberMissing(propertyName, property);
+			ThrowIfGetterNotApplicable(property);
+
+			return GetMemberAccess<TProperty>(property);
 		}
 
 		private static Expression<Action<T>> GetSetterExpression(PropertyInfo property, Expression value)
@@ -357,6 +383,211 @@ namespace Moq.Protected
 			return Expression.Lambda<Action<T>>(
 				Expression.Call(param, property.GetSetMethod(true), value),
 				param);
+		}
+
+		private static PropertyInfo GetPropertyIncludingIndexer(string propertyName, bool isSetter, object value, bool exact = true)
+		{
+			var properties = typeof(T).GetProperties(BindingFlags.Instance | BindingFlags.NonPublic | BindingFlags.Public);
+			var matchingProperties = properties.Where(p => p.Name == propertyName).ToList();
+			if (matchingProperties.Count > 1)
+			{
+				return GetMatchingIndexer(matchingProperties, CastValueForIndexer(value, propertyName), isSetter, exact);
+			}
+			if (matchingProperties.Count == 0)
+			{
+				return null;
+			}
+			return matchingProperties[0];
+		}
+
+		private static PropertyInfo GetMatchingIndexer(List<PropertyInfo> indexers, object[] keys, bool isSetter, bool exact)
+		{
+			var argTypes = ToArgTypes(keys);
+
+			var matchingIndexer = indexers.FirstOrDefault(p =>
+			{
+				if (isSetter)
+				{
+					if (!p.CanWrite) { return false; }
+					return p.GetSetMethod(true).GetParameterTypes().CompareTo(argTypes, exact, considerTypeMatchers: false);
+				}
+				else
+				{
+					if (!p.CanRead) { return false; }
+					return p.GetGetMethod(true).GetParameterTypes().CompareTo(argTypes, exact, considerTypeMatchers: false);
+				}
+
+			});
+
+			return matchingIndexer;
+		}
+		
+		private static Expression<Action<T>> GetIndexerSetterExpression(string indexerName, object[] indexerKeys, object value)
+		{
+			Guard.NotNullOrEmpty(indexerName, nameof(indexerName));
+			Guard.NotNullOrEmpty(indexerKeys, nameof(indexerKeys));
+
+			var setupSetArguments = indexerKeys.Concat(new object[] { value }).ToArray();
+			var indexer = GetPropertyIncludingIndexer(indexerName, false, indexerKeys, false);
+			ThrowIfMemberMissing(indexerName, indexer);
+			Guard.IsIndexer(indexer, nameof(indexerName));
+			ThrowIfSetterNotApplicable(indexer);
+
+			return GetIndexerSetterExpression(indexer, setupSetArguments);
+		}
+
+		private static Expression<Action<T>> GetIndexerSetterExpression(PropertyInfo property, object[] indexerKeysAndValue)
+		{
+			var param = Expression.Parameter(typeof(T), "mock");
+
+			return Expression.Lambda<Action<T>>(
+				Expression.Call(param, property.GetSetMethod(true), IndexerArgsToExpressions(indexerKeysAndValue, property, true)),
+				param);
+		}
+
+		private static LambdaExpression GetIndexerGetterExpression(string indexerName, object[] indexerKeys)
+		{
+			Guard.NotNullOrEmpty(indexerName, nameof(indexerName));
+			Guard.NotNullOrEmpty(indexerKeys, nameof(indexerKeys));
+
+			var indexer = GetPropertyIncludingIndexer(indexerName, false, indexerKeys, false);
+			ThrowIfMemberMissing(indexerName, indexer);
+			Guard.IsIndexer(indexer, nameof(indexerName));
+			ThrowIfGetterNotApplicable(indexer);
+
+			return GetIndexerGetterExpression(indexer, indexerKeys);
+		}
+
+		private static LambdaExpression GetIndexerGetterExpression(PropertyInfo property, object[] indexerKeys)
+		{
+			var param = Expression.Parameter(typeof(T), "mock");
+
+			return Expression.Lambda(
+				Expression.Call(param, property.GetGetMethod(true), IndexerArgsToExpressions(indexerKeys, property, true)),
+				param
+			);
+		}
+		
+		private static Expression<Action<T>> GetFixedUpSetterExpression(PropertyInfo property, object value)
+		{
+			Expression<Action<T>> expression;
+
+			// guaranteed object[] from Setup / SetupSequence and Verify
+			// SetupSet and VerifySet will provide as appropriate for the property type
+			if (value is object[] arrayValue)
+			{
+				if (!property.PropertyType.IsAssignableFrom(typeof(object[])))
+				{
+					if (arrayValue.Length == 1)
+					{
+						value = (value as object[])[0];
+						expression = GetSetterExpression(property, ToExpressionArg(property.PropertyType, value));
+					}
+					else
+					{
+						// throw ?
+						expression = GetSetterExpression(property, ToExpressionArg(property.PropertyType, value));
+					}
+				}
+				else
+				{
+					// e.g Property type IEnumerable<string> but set up with ItExpr.IsAny<IEnumerable<string>>
+					// will have []{ItExpr.IsAny<IEnumerable<string>>}
+					if (arrayValue.Length == 1 && arrayValue[0] is Expression objectExpression && objectExpression.IsMatch(out _))
+					{
+						expression = GetSetterExpression(property, objectExpression);
+					}
+					else
+					{
+						expression = GetSetterExpression(property, ToExpressionArg(property.PropertyType, value));
+					}
+				}
+
+			}
+			else
+			{
+				expression = GetSetterExpression(property, ToExpressionArg(property.PropertyType, value));
+			}
+
+			return expression;
+		}
+
+		private static LambdaExpression GetSetterExpressionIncludingIndexer(string propertyName, object value, bool exact, string propertyNameParameterName, bool throwIfMemberMissing = true)
+		{
+			Guard.NotNullOrEmpty(propertyName, propertyNameParameterName);
+
+			var property = GetPropertyIncludingIndexer(propertyName, true, value, exact);
+			if (property == null && !throwIfMemberMissing)
+			{
+				return null;
+			}
+
+			ThrowIfMemberMissing(propertyName, property);
+			ThrowIfSetterNotApplicable(property);
+
+			Expression<Action<T>> expression;
+			if (property.GetIndexParameters().Length > 0)
+			{
+				expression = GetIndexerSetterExpression(property, CastValueForIndexer(value, propertyName));
+			}
+			else
+			{
+				expression = GetFixedUpSetterExpression(property, value);
+
+			}
+			return expression;
+		}
+
+		private static LambdaExpression GetGetterExpressionIncludingIndexer<TResult>(string propertyName, object value, bool exact, string propertyNameParameterName)
+		{
+			Guard.NotNullOrEmpty(propertyName, propertyNameParameterName);
+			LambdaExpression expression = null;
+			var property = GetPropertyIncludingIndexer(propertyName, false, value, exact);
+			if (property != null)
+			{
+				ThrowIfGetterNotApplicable(property);
+
+				if (property.GetIndexParameters().Length > 0)
+				{
+					expression = GetIndexerGetterExpression(property, value as object[]);
+				}
+				else
+				{
+					expression = GetMemberAccess<TResult>(property);
+				}
+			}
+
+			return expression;
+		}
+
+		private void GetGetterIncludingIndexerOrMethodExpression<TResult>(string methodOrPropertyName, string methodOrPropertyNameParameterName,
+			Type[] genericTypeArguments, bool exactParameterMatch, object[] args, Action<LambdaExpression> propertyExpressionCallback, Action<Expression<Func<T, TResult>>> methodExpressionCallback)
+		{
+			var propertyExpression = GetGetterExpressionIncludingIndexer<TResult>(methodOrPropertyName, args, exactParameterMatch, methodOrPropertyNameParameterName);
+			if (propertyExpression != null)
+			{
+				propertyExpressionCallback(propertyExpression);
+			}
+			else
+			{
+				var methodCall = GetMethodCall<TResult>(methodOrPropertyName, methodOrPropertyNameParameterName, genericTypeArguments, exactParameterMatch, args);
+				methodExpressionCallback(methodCall);
+			}
+		}
+
+		private void GetSetterIncludingIndexerOrMethodExpression(string methodOrPropertyName, string methodOrPropertyNameParameterName,
+			Type[] genericTypeArguments, bool exactParameterMatch, object[] args, Action<LambdaExpression> propertyExpressionCallback, Action<Expression<Action<T>>> methodExpressionCallback)
+		{
+			var propertyExpression = GetSetterExpressionIncludingIndexer(methodOrPropertyName, args, exactParameterMatch, methodOrPropertyNameParameterName, false);
+			if (propertyExpression != null)
+			{
+				propertyExpressionCallback(propertyExpression);
+			}
+			else
+			{
+				var methodCall = GetMethodCall(methodOrPropertyName, methodOrPropertyNameParameterName, genericTypeArguments, exactParameterMatch, args);
+				methodExpressionCallback(methodCall);
+			}
 		}
 
 		private static void ThrowIfMemberMissing(string memberName, MemberInfo member)
@@ -434,6 +665,18 @@ namespace Moq.Protected
 					property.Name));
 			}
 		}
+		
+		private static void ThrowIfGetterNotApplicable(PropertyInfo property)
+		{
+			ThrowIfPublicGetter(property, typeof(T).Name);
+			Guard.CanRead(property);
+		}
+
+		private static void ThrowIfSetterNotApplicable(PropertyInfo property)
+		{
+			ThrowIfPublicSetter(property, typeof(T).Name);
+			Guard.CanWrite(property);
+		}
 
 		private static void ThrowIfVoidMethod(MethodInfo method)
 		{
@@ -441,6 +684,16 @@ namespace Moq.Protected
 			{
 				throw new ArgumentException(Resources.CantSetReturnValueForVoid);
 			}
+		}
+
+		private static object[] CastValueForIndexer(object value,string propertyName)
+		{
+			if (value is object[])
+			{
+				return value as object[];
+			}
+
+			throw new ArgumentException($"{propertyName} is an indexer but value is not an object array");
 		}
 
 		private static Type[] ToArgTypes(object[] args)
@@ -510,7 +763,7 @@ namespace Moq.Protected
 			return types;
 		}
 
-		private static Expression ToExpressionArg(ParameterInfo paramInfo, object arg)
+		private static Expression ToExpressionArg(Type type, object arg)
 		{
 			if (arg is LambdaExpression lambda)
 			{
@@ -522,7 +775,7 @@ namespace Moq.Protected
 				return expression;
 			}
 
-			return Expression.Constant(arg, paramInfo.ParameterType);
+			return Expression.Constant(arg, type);
 		}
 
 		private static IEnumerable<Expression> ToExpressionArgs(MethodInfo method, object[] args)
@@ -530,8 +783,27 @@ namespace Moq.Protected
 			ParameterInfo[] methodParams = method.GetParameters();
 			for (int i = 0; i < args.Length; i++)
 			{
-				yield return ToExpressionArg(methodParams[i], args[i]);
+				yield return ToExpressionArg(methodParams[i].ParameterType, args[i]);
 			}
+		}
+
+		private static Type[] GetIndexerTypes(PropertyInfo property, bool isSet)
+		{
+			var types = property.GetIndexParameters().Select(p => p.ParameterType);
+			if (isSet)
+			{
+				types = types.Concat(new Type[] { property.PropertyType });
+			}
+			return types.ToArray();
+		}
+
+		private static Expression[] IndexerArgsToExpressions(object[] indexerArgs, PropertyInfo property, bool isSet)
+		{
+			Type[] types = GetIndexerTypes(property, isSet);
+			return indexerArgs.Select((a,i) =>
+			{
+				return ToExpressionArg(types[i], indexerArgs[i]);
+			}).ToArray();
 		}
 	}
 }

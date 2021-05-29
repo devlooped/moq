@@ -101,6 +101,15 @@ namespace Moq.Protected
 		ISetupGetter<TMock, TProperty> SetupGet<TProperty>(string propertyName);
 
 		/// <summary>
+		/// Specifies a setup for an invocation on a indexer getter with the given 
+		/// <paramref name="indexerName"/>.
+		/// </summary>
+		/// <param name="indexerName">The name of the indexer.</param>
+		/// <param name="indexerKeys">The indexer keys.</param>
+		/// <typeparam name="TProperty">The type of the indexer.</typeparam>
+		ISetup<TMock, TProperty> SetupGet<TProperty>(string indexerName, object[] indexerKeys);
+
+		/// <summary>
 		/// Specifies a setup for an invocation on a property setter with the given 
 		/// <paramref name="propertyName"/>.
 		/// </summary>
@@ -109,6 +118,25 @@ namespace Moq.Protected
 		/// remember to use <see cref="ItExpr"/> rather than <see cref="It"/>.</param>
 		/// <typeparam name="TProperty">The type of the property.</typeparam>
 		ISetupSetter<TMock, TProperty> SetupSet<TProperty>(string propertyName, object value);
+
+		/// <summary>
+		/// Specifies a setup for an invocation on a indexer setter with the given 
+		/// <paramref name="indexerName"/>.
+		/// </summary>
+		/// <param name="indexerName">The name of the indexer.</param>
+		/// <param name="indexerKeys">The indexer keys.</param>
+		/// <param name="value">The indexer value. If argument matchers are used, 
+		/// remember to use <see cref="ItExpr"/> rather than <see cref="It"/>.</param>
+		ISetup<TMock> SetupSet(string indexerName, object[] indexerKeys, object value);
+
+		/// <summary>
+		/// Specifies a setup for an invocation on a property setter with the given 
+		/// <paramref name="propertyName"/>.
+		/// </summary>
+		/// <param name="propertyName">The name of the property.</param>
+		/// <param name="value">The property value. If argument matchers are used, 
+		/// remember to use <see cref="ItExpr"/> rather than <see cref="It"/>.</param>
+		ISetup<TMock> SetupSet(string propertyName, object value);
 
 		/// <summary>
 		/// Performs a sequence of actions, one per call.
@@ -292,8 +320,18 @@ namespace Moq.Protected
 		/// <param name="propertyName">The name of the property.</param>
 		/// <param name="times">The number of times a method is allowed to be called.</param>
 		/// <typeparam name="TProperty">The type of the property.</typeparam>
-		// TODO should receive args to support indexers
 		void VerifyGet<TProperty>(string propertyName, Times times);
+
+		/// <summary>
+		/// Specifies a verify for an invocation on an indexer getter with the given 
+		/// <paramref name="indexerName"/>.
+		/// <exception cref="MockException">The invocation was not call the times specified by 
+		/// <paramref name="times"/>.</exception>
+		/// </summary>
+		/// <param name="indexerName">The name of the property.</param>
+		/// <param name="times">The number of times a method is allowed to be called.</param>
+		/// <param name="indexerKeys">The indexer keys.</param>
+		void VerifyGet(string indexerName, Times times, object[] indexerKeys);
 
 		/// <summary>
 		/// Specifies a setup for an invocation on a property setter with the given 
@@ -306,9 +344,32 @@ namespace Moq.Protected
 		/// <param name="value">The property value.</param>
 		/// <typeparam name="TProperty">The type of the property. If argument matchers are used, 
 		/// remember to use <see cref="ItExpr"/> rather than <see cref="It"/>.</typeparam>
-		// TODO should receive args to support indexers
 		void VerifySet<TProperty>(string propertyName, Times times, object value);
 
+		/// <summary>
+		/// Specifies a setup for an invocation on a property setter with the given 
+		/// <paramref name="propertyName"/>.
+		/// </summary>
+		/// <exception cref="MockException">The invocation was not call the times specified by 
+		/// <paramref name="times"/>.</exception>
+		/// <param name="propertyName">The name of the property.</param>
+		/// <param name="times">The number of times a method is allowed to be called.</param>
+		/// <param name="value">The property value.</param>
+		/// remember to use <see cref="ItExpr"/> rather than <see cref="It"/>
+		void VerifySet(string propertyName, Times times, object value);
+
+		/// <summary>
+		/// Specifies a setup for an invocation on a property setter with the given 
+		/// <paramref name="indexerName"/>.
+		/// </summary>
+		/// <exception cref="MockException">The invocation was not call the times specified by 
+		/// <paramref name="times"/>.</exception>
+		/// <param name="indexerName">The name of the property.</param>
+		/// <param name="times">The number of times a method is allowed to be called.</param>
+		/// <param name="indexerKeys">The indexer keys.</param>
+		/// <param name="value">The property value.</param>
+		/// remember to use <see cref="ItExpr"/> rather than <see cref="It"/>
+		void VerifySet(string indexerName, Times times, object[] indexerKeys, object value);
 		#endregion
 	}
 }

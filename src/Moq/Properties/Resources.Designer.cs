@@ -88,6 +88,15 @@ namespace Moq.Properties {
         }
         
         /// <summary>
+        ///   Looks up a localized string similar to Array {0} cannot be empty. .
+        /// </summary>
+        internal static string ArrayArgumentCannotBeEmpty {
+            get {
+                return ResourceManager.GetString("ArrayArgumentCannotBeEmpty", resourceCulture);
+            }
+        }
+        
+        /// <summary>
         ///   Looks up a localized string similar to Can only add interfaces to the mock..
         /// </summary>
         internal static string AsMustBeInterface {
@@ -316,6 +325,15 @@ namespace Moq.Properties {
         internal static string MockExceptionMessage {
             get {
                 return ResourceManager.GetString("MockExceptionMessage", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Parameter {0} is not the name of an indexer..
+        /// </summary>
+        internal static string NameIsNotAnIndexer {
+            get {
+                return ResourceManager.GetString("NameIsNotAnIndexer", resourceCulture);
             }
         }
         

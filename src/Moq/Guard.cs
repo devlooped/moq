@@ -240,5 +240,29 @@ namespace Moq
 					property.DeclaringType.Name, property.Name));
 			}
 		}
+
+		public static void NotNullOrEmpty(object[] array, string paramName)
+		{
+			if (array == null)
+			{
+				throw new ArgumentNullException(paramName);
+			}
+
+			if (array.Length == 0)
+			{
+				throw new ArgumentException(
+					string.Format(Resources.ArrayArgumentCannotBeEmpty, paramName),
+					paramName
+					);
+			}
+		}
+
+		internal static void IsIndexer(PropertyInfo indexer, string paramName)
+		{
+			if (indexer.GetIndexParameters().Length == 0)
+			{
+				throw new ArgumentException(string.Format(Resources.NameIsNotAnIndexer, paramName), paramName);
+			}
+		}
 	}
 }
