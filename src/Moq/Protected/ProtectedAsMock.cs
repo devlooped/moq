@@ -20,7 +20,6 @@ namespace Moq.Protected
 		private Mock<T> mock;
 
 		private static DuckReplacer DuckReplacerInstance = new DuckReplacer(typeof(TAnalog), typeof(T));
-		private static DuckSetterReplacer<T, TAnalog> DuckSetterReplacerInstance = new DuckSetterReplacer<T, TAnalog>();
 
 		public ProtectedAsMock(Mock<T> mock)
 		{
@@ -67,13 +66,19 @@ namespace Moq.Protected
 
 		public ISetupSetter<T, TProperty> SetupSet<TProperty>(Action<TAnalog> setterExpression)
 		{
-			var setup = Mock.SetupSet(mock, ReplaceDuckSetter(setterExpression), condition: null);
+			Guard.NotNull(setterExpression, nameof(setterExpression));
+
+			var rewrittenExpression = ReconstructAndReplaceSetter(setterExpression);
+			var setup = Mock.SetupSet(mock, rewrittenExpression, condition: null);
 			return new SetterSetupPhrase<T, TProperty>(setup);
 		}
 
 		public ISetup<T> SetupSet(Action<TAnalog> setterExpression)
 		{
-			var setup = Mock.SetupSet(mock, ReplaceDuckSetter(setterExpression), condition: null);
+			Guard.NotNull(setterExpression, nameof(setterExpression));
+
+			var rewrittenExpression = ReconstructAndReplaceSetter(setterExpression);
+			var setup = Mock.SetupSet(mock, rewrittenExpression, condition: null);
 			return new VoidSetupPhrase<T>(setup);
 		}
 
@@ -184,7 +189,10 @@ namespace Moq.Protected
 
 		public void VerifySet(Action<TAnalog> setterExpression, Times? times = null, string failMessage = null)
 		{
-			Mock.VerifySet(mock, ReplaceDuckSetter(setterExpression), times.HasValue ? times.Value : Times.AtLeastOnce(), failMessage);
+			Guard.NotNull(setterExpression, nameof(setterExpression));
+
+			var rewrittenExpression = ReconstructAndReplaceSetter(setterExpression);
+			Mock.VerifySet(mock, rewrittenExpression, times.HasValue ? times.Value : Times.AtLeastOnce(), failMessage);
 		}
 
 		public void VerifyGet<TProperty>(Expression<Func<TAnalog, TProperty>> expression, Times? times = null, string failMessage = null)
@@ -204,13 +212,12 @@ namespace Moq.Protected
 			Mock.VerifyGet(this.mock, rewrittenExpression, times ?? Times.AtLeastOnce(), failMessage);
 		}
 
-		private Expression<Action<T>> ReplaceDuckSetter(Action<TAnalog> setterExpression)
+		private LambdaExpression ReconstructAndReplaceSetter(Action<TAnalog> setterExpression)
 		{
-			Guard.NotNull(setterExpression, nameof(setterExpression));
-
 			var expression = ExpressionReconstructor.Instance.ReconstructExpression(setterExpression, mock.ConstructorArguments);
-			return DuckSetterReplacerInstance.Replace(expression);
+			return ReplaceDuck(expression);
 		}
+
 		private static LambdaExpression ReplaceDuck(LambdaExpression expression)
 		{
 			Debug.Assert(expression.Parameters.Count == 1);
@@ -239,11 +246,21 @@ namespace Moq.Protected
 				{
 					var targetParameter = Expression.Parameter(this.targetType, left.Name);
 					return Expression.Call(targetParameter, FindCorrespondingMethod(node.Method), node.Arguments);
-				}
+				} 
 				else
 				{
-					return node;
+					return base.VisitMethodCall(node);
 				}
+			}
+
+			protected override Expression VisitIndex(IndexExpression node)
+			{
+				if (node.Object is ParameterExpression left && left.Type == this.duckType)
+				{
+					var targetParameter = Expression.Parameter(this.targetType, left.Name);
+					return Expression.MakeIndex(targetParameter, FindCorrespondingProperty(node.Indexer), node.Arguments);
+				}
+				return base.VisitIndex(node);
 			}
 
 			protected override Expression VisitMember(MemberExpression node)
@@ -255,7 +272,7 @@ namespace Moq.Protected
 				}
 				else
 				{
-					return node;
+					return base.VisitMember(node);
 				}
 			}
 
@@ -305,7 +322,7 @@ namespace Moq.Protected
 			{
 				var candidateTargetProperties =
 				    this.targetType
-				    .GetProperties(BindingFlags.NonPublic | BindingFlags.Instance)
+				    .GetProperties(BindingFlags.NonPublic | BindingFlags.Public | BindingFlags.Instance)
 				    .Where(ctp => IsCorrespondingProperty(duckProperty, ctp))
 				    .ToArray();
 
@@ -388,6 +405,5 @@ namespace Moq.Protected
 				// TODO: parameter lists should be compared, too, to properly support indexers.
 			}
 		}
-		
 	}
 }

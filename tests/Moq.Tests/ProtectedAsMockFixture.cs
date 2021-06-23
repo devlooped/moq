@@ -131,6 +131,13 @@ namespace Moq.Tests
 		}
 
 		[Fact]
+		public void Setup_can_automock()
+		{
+			this.protectedMock.Setup(m => m.Nested.Method(1)).Returns(123);
+			Assert.Equal(123, mock.Object.GetNested().Method(1));
+		}
+
+		[Fact]
 		public void SetupGet_can_setup_readonly_property()
 		{
 			this.protectedMock.SetupGet(m => m.ReadOnlyPropertyImpl).Returns(42);
@@ -146,6 +153,26 @@ namespace Moq.Tests
 			this.protectedMock.SetupGet(m => m.ReadWritePropertyImpl).Returns(42);
 
 			var actual = this.mock.Object.ReadWriteProperty;
+
+			Assert.Equal(42, actual);
+		}
+
+		[Fact]
+		public void SetUpGet_can_automock()
+		{
+			this.protectedMock.SetupGet(m => m.Nested.Value).Returns(42);
+
+			var actual = mock.Object.GetNested().Value;
+
+			Assert.Equal(42, actual);
+		}
+
+		[Fact]
+		public void SetupGet_can_setup_virtual_property()
+		{
+			this.protectedMock.SetupGet(m => m.VirtualGet).Returns(42);
+
+			var actual = mock.Object.GetVirtual();
 
 			Assert.Equal(42, actual);
 		}
@@ -259,7 +286,15 @@ namespace Moq.Tests
 			mock.Object.SetMultipleIndexer(1, "Ok", 999);
 
 			Assert.Throws<ExpectedException>(() => mock.Object.SetMultipleIndexer(1, "Bad", 999));
+		}
 
+		[Fact]
+		public void SetupSet_can_setup_virtual_property()
+		{
+			this.protectedMock.SetupSet(m => m.VirtualSet = 999).Throws(new ExpectedException());
+
+			mock.Object.SetVirtual(123);
+			Assert.Throws<ExpectedException>(() => mock.Object.SetVirtual(999));
 		}
 
 		[Fact]
@@ -293,7 +328,6 @@ namespace Moq.Tests
 
 			var mockException = Assert.Throws<MockException>(() => VerifySet(Times.AtMostOnce(),"custom fail message"));
 			Assert.StartsWith("custom fail message", mockException.Message);
-
 		}
 
 		[Fact]
@@ -384,11 +418,50 @@ namespace Moq.Tests
 		public interface INested
 		{
 			int Value { get; set; }
+			int Method(int value);
 		}
+
 		public abstract class Foo
 		{
 			protected Foo()
 			{
+			}
+			private int _virtualSet;
+			public virtual int VirtualSet
+			{
+				get
+				{
+					return _virtualSet;
+				}
+				protected set
+				{
+					_virtualSet = value;
+				}
+
+			}
+
+			public void SetVirtual(int value)
+			{
+				VirtualSet = value;
+			}
+
+			private int _virtualGet;
+			public virtual int VirtualGet
+			{
+				protected get
+				{
+					return _virtualGet;
+				}
+				set
+				{
+					_virtualGet = value;
+				}
+
+			}
+
+			public int GetVirtual()
+			{
+				return VirtualGet;
 			}
 
 			public int ReadOnlyProperty => this.ReadOnlyPropertyImpl;
@@ -437,10 +510,17 @@ namespace Moq.Tests
 			{
 				this[index, sIndex] = value;
 			}
+
+			public int GetMultipleIndexer(int index, string sIndex)
+			{
+				return this[index, sIndex];
+			}
 		}
 
 		public interface Fooish
 		{
+			int VirtualGet { get; set; }
+			int VirtualSet { get; set; }
 			int ReadOnlyPropertyImpl { get; }
 			int ReadWritePropertyImpl { get; set; }
 			int NonExistentProperty { get; }

@@ -54,7 +54,7 @@ namespace Moq.Protected
 		/// </remarks>
 		/// <example group="setups">
 		///   <code>
-		///     mock.SetupSet(x => x.Suspended = true);
+		///     mock.SetupSet&lt;bool&gt;(x => x.Suspended = true);
 		///   </code>
 		/// </example>
 		ISetupSetter<T, TProperty> SetupSet<TProperty>(Action<TAnalog> setterExpression);
@@ -132,10 +132,13 @@ namespace Moq.Protected
 		void Verify<TResult>(Expression<Func<TAnalog, TResult>> expression, Times? times = null, string failMessage = null);
 
 		/// <summary>
-		///   Verifies that a property was set on the mock, specifying a failure message.
+		///   Verifies that a property was set on the mock.
 		/// </summary>
-		/// <param name="times">The number of times a method is expected to be called. Defaults to Times.AtLeastOnce</param>
 		/// <param name="setterExpression">Expression to verify.</param>
+		/// <param name="times">
+		/// Number of times that the setter is expected to have occurred.
+		/// If omitted, assumed to be <see cref="Times.AtLeastOnce"/>.
+		/// </param>
 		/// <param name="failMessage">Message to show if verification fails.</param>
 		/// <exception cref="MockException">
 		///   The invocation was not called the number of times specified by <paramref name="times"/>.
