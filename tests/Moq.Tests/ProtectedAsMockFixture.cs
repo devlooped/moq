@@ -131,6 +131,13 @@ namespace Moq.Tests
 		}
 
 		[Fact]
+		public void Setup_can_automock()
+		{
+			this.protectedMock.Setup(m => m.Nested.Method(1)).Returns(123);
+			Assert.Equal(123, mock.Object.GetNested().Method(1));
+		}
+
+		[Fact]
 		public void SetupGet_can_setup_readonly_property()
 		{
 			this.protectedMock.SetupGet(m => m.ReadOnlyPropertyImpl).Returns(42);
@@ -320,7 +327,9 @@ namespace Moq.Tests
 		public interface INested
 		{
 			int Value { get; }
+			int Method(int value);
 		}
+
 		public abstract class Foo
 		{
 			protected Foo()

@@ -217,7 +217,7 @@ namespace Moq.Protected
 				}
 				else
 				{
-					return node;
+					return base.VisitMethodCall(node);
 				}
 			}
 
