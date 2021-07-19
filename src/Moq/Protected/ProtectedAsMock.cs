@@ -217,7 +217,7 @@ namespace Moq.Protected
 				}
 				else
 				{
-					return node;
+					return base.VisitMethodCall(node);
 				}
 			}
 
@@ -230,7 +230,7 @@ namespace Moq.Protected
 				}
 				else
 				{
-					return node;
+					return base.VisitMember(node);
 				}
 			}
 
@@ -280,7 +280,7 @@ namespace Moq.Protected
 			{
 				var candidateTargetProperties =
 				    this.targetType
-				    .GetProperties(BindingFlags.NonPublic | BindingFlags.Instance)
+				    .GetProperties(BindingFlags.Public | BindingFlags.NonPublic | BindingFlags.Instance)
 				    .Where(ctp => IsCorrespondingProperty(duckProperty, ctp))
 				    .ToArray();
 
