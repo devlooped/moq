@@ -322,7 +322,7 @@ namespace Moq.Protected
 			{
 				var candidateTargetProperties =
 				    this.targetType
-				    .GetProperties(BindingFlags.NonPublic | BindingFlags.Public | BindingFlags.Instance)
+				    .GetProperties(BindingFlags.Public | BindingFlags.NonPublic | BindingFlags.Instance)
 				    .Where(ctp => IsCorrespondingProperty(duckProperty, ctp))
 				    .ToArray();
 

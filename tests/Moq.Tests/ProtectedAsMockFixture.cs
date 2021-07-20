@@ -426,43 +426,6 @@ namespace Moq.Tests
 			protected Foo()
 			{
 			}
-			private int _virtualSet;
-			public virtual int VirtualSet
-			{
-				get
-				{
-					return _virtualSet;
-				}
-				protected set
-				{
-					_virtualSet = value;
-				}
-
-			}
-
-			public void SetVirtual(int value)
-			{
-				VirtualSet = value;
-			}
-
-			private int _virtualGet;
-			public virtual int VirtualGet
-			{
-				protected get
-				{
-					return _virtualGet;
-				}
-				set
-				{
-					_virtualGet = value;
-				}
-
-			}
-
-			public int GetVirtual()
-			{
-				return VirtualGet;
-			}
 
 			public int ReadOnlyProperty => this.ReadOnlyPropertyImpl;
 
@@ -510,12 +473,53 @@ namespace Moq.Tests
 			{
 				this[index, sIndex] = value;
 			}
+
+			public int GetMultipleIndexer(int index, string sIndex)
+			{
+				return this[index, sIndex];
+			}
+
+      private int _virtualSet;
+			public virtual int VirtualSet
+			{
+				get
+				{
+					return _virtualSet;
+				}
+				protected set
+				{
+					_virtualSet = value;
+				}
+
+			}
+
+			public void SetVirtual(int value)
+			{
+				VirtualSet = value;
+			}
+
+			private int _virtualGet;
+			public virtual int VirtualGet
+			{
+				protected get
+				{
+					return _virtualGet;
+				}
+				set
+				{
+					_virtualGet = value;
+				}
+
+			}
+
+			public int GetVirtual()
+			{
+				return VirtualGet;
+			}
 		}
 
 		public interface Fooish
 		{
-			int VirtualGet { get; set; }
-			int VirtualSet { get; set; }
 			int ReadOnlyPropertyImpl { get; }
 			int ReadWritePropertyImpl { get; set; }
 			int NonExistentProperty { get; }
@@ -525,6 +529,8 @@ namespace Moq.Tests
 			void NonExistentMethod();
 			INested Nested { get; set; }
 			int this[int i, string s] { get; set; }
+			int VirtualGet { get; set; }
+			int VirtualSet { get; set; }
 		}
 
 		public abstract class MessageHandlerBase
