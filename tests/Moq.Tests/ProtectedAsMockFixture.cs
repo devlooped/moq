@@ -474,12 +474,7 @@ namespace Moq.Tests
 				this[index, sIndex] = value;
 			}
 
-			public int GetMultipleIndexer(int index, string sIndex)
-			{
-				return this[index, sIndex];
-			}
-
-      private int _virtualSet;
+			private int _virtualSet;
 			public virtual int VirtualSet
 			{
 				get
