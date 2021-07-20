@@ -510,11 +510,6 @@ namespace Moq.Tests
 			{
 				this[index, sIndex] = value;
 			}
-
-			public int GetMultipleIndexer(int index, string sIndex)
-			{
-				return this[index, sIndex];
-			}
 		}
 
 		public interface Fooish
