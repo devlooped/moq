@@ -246,7 +246,7 @@ namespace Moq.Protected
 				{
 					var targetParameter = Expression.Parameter(this.targetType, left.Name);
 					return Expression.Call(targetParameter, FindCorrespondingMethod(node.Method), node.Arguments);
-				} 
+				}
 				else
 				{
 					return base.VisitMethodCall(node);
