@@ -9,6 +9,8 @@ The format is loosely based on [Keep a Changelog](http://keepachangelog.com/en/1
 
 #### Fixed
 
+* Parameter is invalid in Protected().SetupSet() ... VerifySet (@tonyhallett, #1186)
+
 * Virtual properties and automocking not working for `mock.Protected().As<>()` (@tonyhallett, #1185)
 
 * Issue mocking VB.NET class with overloaded property/indexer in base class (@myurashchyk, #1153)

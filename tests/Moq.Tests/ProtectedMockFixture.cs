@@ -351,6 +351,20 @@ namespace Moq.Tests
 		}
 
 		[Fact]
+		public void SetupSetUsesTheValueParameter()
+		{
+			var mock = new Mock<FooBase>();
+			var value = string.Empty;
+			mock.Protected().SetupSet<string>("ProtectedValue", "foo").Callback(v => value = v);
+
+			mock.Object.SetProtectedValue("not foo");
+			Assert.Equal(string.Empty, value);
+
+			mock.Object.SetProtectedValue("foo");
+			Assert.Equal("foo", value);
+		}
+
+		[Fact]
 		public void ThrowsIfNullArgs()
 		{
 			Assert.Throws<ArgumentException>(() => new Mock<FooBase>().Protected()
@@ -808,7 +822,8 @@ namespace Moq.Tests
 			var mock = new Mock<FooBase>();
 			mock.Object.ProtectedInternalValue = "foo";
 
-			mock.Protected().VerifySet<string>("ProtectedInternalValue", Times.Once(), "bar");
+			Assert.Throws<MockException>(() => mock.Protected().VerifySet<string>("ProtectedInternalValue", Times.Once(), "bar"));
+			mock.Protected().VerifySet<string>("ProtectedInternalValue", Times.Once(), "foo");
 		}
 
 		[Fact]
@@ -837,7 +852,7 @@ namespace Moq.Tests
 			mock.Object.SetProtectedValue("foo");
 			mock.Object.SetProtectedValue("foo");
 
-			mock.Protected().VerifySet<string>("ProtectedValue", Times.Exactly(2), ItExpr.IsAny<int>());
+			mock.Protected().VerifySet<string>("ProtectedValue", Times.Exactly(2), ItExpr.IsAny<string>());
 		}
 
 		public class MethodOverloads
