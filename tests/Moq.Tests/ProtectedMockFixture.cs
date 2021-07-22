@@ -2,7 +2,7 @@
 // All rights reserved. Licensed under the BSD 3-Clause License; see License.txt.
 
 using System;
-
+using System.Linq.Expressions;
 using Moq.Protected;
 
 using Xunit;
@@ -855,6 +855,23 @@ namespace Moq.Tests
 			mock.Protected().VerifySet<string>("ProtectedValue", Times.Exactly(2), ItExpr.IsAny<string>());
 		}
 
+		[Fact]
+		public void SetupShouldWorkWithExpressionTypes()
+		{
+			var mock = new Mock<FooBase>();
+
+			var expression = Expression.Constant(1);
+			ConstantExpression setExpression = null;
+			mock.Protected().SetupSet<ConstantExpression>("ExpressionProperty", expression).Callback(expr => setExpression = expr);
+			mock.Object.SetExpressionProperty(expression);
+			Assert.Equal(expression, setExpression);
+
+			ConstantExpression setExpression2 = null;
+			mock.Protected().SetupSet<ConstantExpression>("ExpressionProperty", ItExpr.Is<ConstantExpression>( e => (int)e.Value == 2)).Callback(expr => setExpression2 = expr);
+			mock.Object.SetExpressionProperty(Expression.Constant(2));
+			Assert.NotNull(setExpression2);
+		}
+
 		public class MethodOverloads
 		{
 			public void ExecuteDo(int a, int b)
@@ -952,6 +969,12 @@ namespace Moq.Tests
 
 		public class FooBase
 		{
+			protected virtual ConstantExpression ExpressionProperty { get; set; }
+			public void SetExpressionProperty(ConstantExpression expression)
+			{
+				ExpressionProperty = expression;
+			}
+
 			public virtual string PublicValue { get; set; }
 
 			protected internal virtual string ProtectedInternalValue { get; set; }

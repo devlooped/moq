@@ -467,26 +467,15 @@ namespace Moq.Protected
 				{
 					types[index] = ((MethodCallExpression)expr).Method.ReturnType;
 				}
+				else if(ItRefAnyField(expr) is var itRefAnyField && itRefAnyField != null)
+				{
+					types[index] = itRefAnyField.FieldType.MakeByRefType();
+				}
 				else if (expr.NodeType == ExpressionType.MemberAccess)
 				{
 					var member = (MemberExpression)expr;
 					if (member.Member is FieldInfo field)
 					{
-						// Test for special case: `It.Ref<TValue>.IsAny`
-						if (field.Name == nameof(It.Ref<object>.IsAny))
-						{
-							var fieldDeclaringType = field.DeclaringType;
-							if (fieldDeclaringType.IsGenericType)
-							{
-								var fieldDeclaringTypeDefinition = fieldDeclaringType.GetGenericTypeDefinition();
-								if (fieldDeclaringTypeDefinition == typeof(It.Ref<>))
-								{
-									types[index] = field.FieldType.MakeByRefType();
-									continue;
-								}
-							}
-						}
-
 						types[index] = field.FieldType;
 					}
 					else if (member.Member is PropertyInfo property)
@@ -510,16 +499,57 @@ namespace Moq.Protected
 			return types;
 		}
 
+		private static FieldInfo ItRefAnyField(Expression expr)
+		{
+			FieldInfo itRefAnyField = null;
+
+			if (expr.NodeType == ExpressionType.MemberAccess)
+			{
+				var member = (MemberExpression)expr;
+				if (member.Member is FieldInfo field)
+				{
+					if (field.Name == nameof(It.Ref<object>.IsAny))
+					{
+						var fieldDeclaringType = field.DeclaringType;
+						if (fieldDeclaringType.IsGenericType)
+						{
+							var fieldDeclaringTypeDefinition = fieldDeclaringType.GetGenericTypeDefinition();
+							if (fieldDeclaringTypeDefinition == typeof(It.Ref<>))
+							{
+								itRefAnyField = field;
+							}
+						}
+					}
+				}
+			}
+
+			return itRefAnyField;
+		}
+
 		private static Expression ToExpressionArg(Type type, object arg)
 		{
-			if (arg is LambdaExpression lambda)
+			if (arg is LambdaExpression lambda && !typeof(LambdaExpression).IsAssignableFrom(type))
 			{
 				return lambda.Body;
 			}
 
 			if (arg is Expression expression)
 			{
-				return expression;
+				if (!typeof(Expression).IsAssignableFrom(type))
+				{
+					return expression;
+				}
+
+				if (expression.IsMatch(out _))
+				{
+					return expression;
+				}
+				
+				if (ItRefAnyField(expression) != null)
+				{
+					return expression;
+				}
+				
 			}
 
 			return Expression.Constant(arg, type);
