@@ -468,42 +468,6 @@ namespace Moq.Protected
 			);
 		}
 		
-		private static Expression<Action<T>> GetFixedUpSetterExpression(PropertyInfo property, object[] args)
-		{
-			Expression<Action<T>> expression;
-
-			if (!property.PropertyType.IsAssignableFrom(typeof(object[])))
-			{
-				if (args.Length == 1)
-				{
-					var value = args[0];
-					expression = GetSetterExpression(property, ToExpressionArg(property.PropertyType, value));
-				}
-				else
-				{
-					// throw ?
-					expression = GetSetterExpression(property, ToExpressionArg(property.PropertyType, args));
-				}
-			}
-			else
-			{
-				// e.g Property type IEnumerable<string> but set up with ItExpr.IsAny<IEnumerable<string>>
-				// will have []{ItExpr.IsAny<IEnumerable<string>>}
-				if (args.Length == 1 && args[0] is Expression objectExpression && objectExpression.IsMatch(out _))
-				{
-					expression = GetSetterExpression(property, objectExpression);
-				}
-				else
-				{
-					expression = GetSetterExpression(property, ToExpressionArg(property.PropertyType, args));
-				}
-			}
-
-			
-
-			return expression;
-		}
-
 		private static LambdaExpression GetSetterExpressionIncludingIndexer(string propertyName, object value, bool exact, string propertyNameParameterName, bool throwIfMemberMissing = true)
 		{
 			Guard.NotNullOrEmpty(propertyName, propertyNameParameterName);
@@ -550,7 +514,7 @@ namespace Moq.Protected
 			}
 			else
 			{
-				expression = GetFixedUpSetterExpression(property, value);
+				expression = GetSetterExpression(property, ToExpressionArg(property.PropertyType, value[0]));
 
 			}
 			return expression;

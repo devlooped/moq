@@ -1260,7 +1260,7 @@ namespace Moq.Tests
 		}
 
 		[Fact]
-		public void SetupSequenceSetsUpPropertySetterObjectArrayAssignable()
+		public void SetupSequenceSetsUpPropertySetterObjectArrayAssignableExpression()
 		{
 			var mock = new Mock<FooBase>();
 			var mocked = mock.Object;
@@ -1275,7 +1275,24 @@ namespace Moq.Tests
 		}
 
 		[Fact]
-		public void SetupSequenceSetsUpIndexerSetterObjectArrayAssignable()
+		public void SetupSequenceSetsUpPropertySetterObjectArrayAssignableObjectArray()
+		{
+			var mock = new Mock<FooBase>();
+			var mocked = mock.Object;
+			var specific = new object[] { 1 };
+			mock.Protected().SetupSequence("ObjectArrayAssignable", new object[] { specific})
+				.Pass()
+				.Pass()
+				.Throws(ExpectedException.Instance);
+
+			mocked.SetObjectArrayAssignable(specific);
+			mocked.SetObjectArrayAssignable(specific);
+			mocked.SetObjectArrayAssignable(new object[] { });
+			Assert.Throws<ExpectedException>(() => mocked.SetObjectArrayAssignable(specific));
+		}
+
+		[Fact]
+		public void SetupSequenceSetsUpIndexerSetterObjectArrayAssignableExpr()
 		{
 			var mock = new Mock<FooBase>();
 			var mocked = mock.Object;
@@ -1285,6 +1302,23 @@ namespace Moq.Tests
 				.Throws(ExpectedException.Instance);
 
 			mocked.SetEnumerableIndexer(new object[] { },1);
+			mocked.SetEnumerableIndexer(new object[] { }, 1);
+			Assert.Throws<ExpectedException>(() => mocked.SetEnumerableIndexer(new object[] { }, 1));
+		}
+
+		[Fact]
+		public void SetupSequenceSetsUpIndexerSetterObjectArrayAssignable()
+		{
+			var mock = new Mock<FooBase>();
+			var mocked = mock.Object;
+			var specific = new object[] { 1 };
+			mock.Protected().SetupSequence(FooBase.IndexerName, specific, 1)
+				.Pass()
+				.Pass()
+				.Throws(ExpectedException.Instance);
+
+			mocked.SetEnumerableIndexer(specific, 1);
+			mocked.SetEnumerableIndexer(specific, 1);
 			mocked.SetEnumerableIndexer(new object[] { }, 1);
 			Assert.Throws<ExpectedException>(() => mocked.SetEnumerableIndexer(new object[] { }, 1));
 		}
