@@ -468,46 +468,38 @@ namespace Moq.Protected
 			);
 		}
 		
-		private static Expression<Action<T>> GetFixedUpSetterExpression(PropertyInfo property, object value)
+		private static Expression<Action<T>> GetFixedUpSetterExpression(PropertyInfo property, object[] args)
 		{
 			Expression<Action<T>> expression;
 
-			// guaranteed object[] from Setup / SetupSequence and Verify
-			// SetupSet and VerifySet will provide as appropriate for the property type
-			if (value is object[] arrayValue)
+			if (!property.PropertyType.IsAssignableFrom(typeof(object[])))
 			{
-				if (!property.PropertyType.IsAssignableFrom(typeof(object[])))
+				if (args.Length == 1)
 				{
-					if (arrayValue.Length == 1)
-					{
-						value = (value as object[])[0];
-						expression = GetSetterExpression(property, ToExpressionArg(property.PropertyType, value));
-					}
-					else
-					{
-						// throw ?
-						expression = GetSetterExpression(property, ToExpressionArg(property.PropertyType, value));
-					}
+					var value = args[0];
+					expression = GetSetterExpression(property, ToExpressionArg(property.PropertyType, value));
 				}
 				else
 				{
-					// e.g Property type IEnumerable<string> but set up with ItExpr.IsAny<IEnumerable<string>>
-					// will have []{ItExpr.IsAny<IEnumerable<string>>}
-					if (arrayValue.Length == 1 && arrayValue[0] is Expression objectExpression && objectExpression.IsMatch(out _))
-					{
-						expression = GetSetterExpression(property, objectExpression);
-					}
-					else
-					{
-						expression = GetSetterExpression(property, ToExpressionArg(property.PropertyType, value));
-					}
+					// throw ?
+					expression = GetSetterExpression(property, ToExpressionArg(property.PropertyType, args));
 				}
-
 			}
 			else
 			{
-				expression = GetSetterExpression(property, ToExpressionArg(property.PropertyType, value));
+				// e.g Property type IEnumerable<string> but set up with ItExpr.IsAny<IEnumerable<string>>
+				// will have []{ItExpr.IsAny<IEnumerable<string>>}
+				if (args.Length == 1 && args[0] is Expression objectExpression && objectExpression.IsMatch(out _))
+				{
+					expression = GetSetterExpression(property, objectExpression);
+				}
+				else
+				{
+					expression = GetSetterExpression(property, ToExpressionArg(property.PropertyType, args));
+				}
 			}
+
+			
 
 			return expression;
 		}
@@ -529,6 +521,32 @@ namespace Moq.Protected
 			if (property.GetIndexParameters().Length > 0)
 			{
 				expression = GetIndexerSetterExpression(property, CastValueForIndexer(value, propertyName));
+			}
+			else
+			{
+				expression = GetSetterExpression(property, ToExpressionArg(property.PropertyType, value));
+
+			}
+			return expression;
+		}
+
+		private static LambdaExpression GetSetterExpressionIncludingIndexerParams(string propertyName, object[] value, bool exact, string propertyNameParameterName, bool throwIfMemberMissing = true)
+		{
+			Guard.NotNullOrEmpty(propertyName, propertyNameParameterName);
+
+			var property = GetPropertyIncludingIndexer(propertyName, true, value, exact);
+			if (property == null && !throwIfMemberMissing)
+			{
+				return null;
+			}
+
+			ThrowIfMemberMissing(propertyName, property);
+			ThrowIfSetterNotApplicable(property);
+
+			Expression<Action<T>> expression;
+			if (property.GetIndexParameters().Length > 0)
+			{
+				expression = GetIndexerSetterExpression(property, value);
 			}
 			else
 			{
@@ -578,7 +596,7 @@ namespace Moq.Protected
 		private void GetSetterIncludingIndexerOrMethodExpression(string methodOrPropertyName, string methodOrPropertyNameParameterName,
 			Type[] genericTypeArguments, bool exactParameterMatch, object[] args, Action<LambdaExpression> propertyExpressionCallback, Action<Expression<Action<T>>> methodExpressionCallback)
 		{
-			var propertyExpression = GetSetterExpressionIncludingIndexer(methodOrPropertyName, args, exactParameterMatch, methodOrPropertyNameParameterName, false);
+			var propertyExpression = GetSetterExpressionIncludingIndexerParams(methodOrPropertyName, args, exactParameterMatch, methodOrPropertyNameParameterName, false);
 			if (propertyExpression != null)
 			{
 				propertyExpressionCallback(propertyExpression);
