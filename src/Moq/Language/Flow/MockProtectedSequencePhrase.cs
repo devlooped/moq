@@ -11,25 +11,17 @@ using Moq.Protected;
 
 namespace Moq.Language.Flow
 {
-	internal sealed class WhenPhraseProtected<T,TAnalog> : ISetupConditionResultProtected<T,TAnalog>
+	internal sealed class MockProtectedSequencePhrase
+		<T, TAnalog> : MockSequencePhraseBase<T, TAnalog>
 		where T : class
 		where TAnalog : class
 	{
 		private static DuckReplacer DuckReplacerInstance = new DuckReplacer(typeof(TAnalog), typeof(T));
 
-		private Mock<T> mock;
-		private Condition condition;
+		public MockProtectedSequencePhrase(IProtectedAsMock<T, TAnalog> protectedAsMock, IMockSequence mockSequence) : base(protectedAsMock.Mocked, mockSequence) { }
 
-		public WhenPhraseProtected(IProtectedAsMock<T, TAnalog> protectedAsMock, Condition condition)
+		protected override LambdaExpression GetSetupExpression(Expression<Action<TAnalog>> expression)
 		{
-			mock = protectedAsMock.Mocked;
-			this.condition = condition;
-		}
-
-		public ISetup<T> Setup(Expression<Action<TAnalog>> expression)
-		{
-			Guard.NotNull(expression, nameof(expression));
-
 			Expression<Action<T>> rewrittenExpression;
 			try
 			{
@@ -39,15 +31,11 @@ namespace Moq.Language.Flow
 			{
 				throw new ArgumentException(ex.Message, nameof(expression));
 			}
-
-			var setup = Mock.Setup(this.mock, rewrittenExpression, condition);
-			return new VoidSetupPhrase<T>(setup);
+			return rewrittenExpression;
 		}
 
-		public ISetup<T, TResult> Setup<TResult>(Expression<Func<TAnalog, TResult>> expression)
+		protected override LambdaExpression GetSetupExpression<TResult>(Expression<Func<TAnalog, TResult>> expression)
 		{
-			Guard.NotNull(expression, nameof(expression));
-
 			Expression<Func<T, TResult>> rewrittenExpression;
 			try
 			{
@@ -57,15 +45,11 @@ namespace Moq.Language.Flow
 			{
 				throw new ArgumentException(ex.Message, nameof(expression));
 			}
-
-			var setup = Mock.Setup(this.mock, rewrittenExpression, condition);
-			return new NonVoidSetupPhrase<T, TResult>(setup);
+			return rewrittenExpression;
 		}
 
-		public ISetupGetter<T, TProperty> SetupGet<TProperty>(Expression<Func<TAnalog, TProperty>> expression)
+		protected override LambdaExpression GetSetupGetExpression<TProperty>(Expression<Func<TAnalog, TProperty>> expression)
 		{
-			Guard.NotNull(expression, nameof(expression));
-
 			Expression<Func<T, TProperty>> rewrittenExpression;
 			try
 			{
@@ -76,16 +60,10 @@ namespace Moq.Language.Flow
 				throw new ArgumentException(ex.Message, nameof(expression));
 			}
 
-			var setup = Mock.SetupGet(this.mock, rewrittenExpression, condition);
-			return new NonVoidSetupPhrase<T, TProperty>(setup);
+			return rewrittenExpression;
 		}
 
-		public ISetupSetter<T, TProperty> SetupSet<TProperty>(Action<TAnalog> setterExpression)
-		{
-			throw new NotImplementedException();
-		}
-
-		public ISetup<T> SetupSet(Action<TAnalog> setterExpression)
+		protected override LambdaExpression GetSetupSetExpression(Action<TAnalog> setterExpression)
 		{
 			throw new NotImplementedException();
 		}
@@ -267,4 +245,5 @@ namespace Moq.Language.Flow
 		}
 
 	}
+
 }

@@ -129,7 +129,7 @@ namespace Moq.Tests
 			Assert.Equal(101, a.Object.Do(100));
 			Assert.Equal(201, a.Object.Do(200));
 			Assert.Equal(301, protectedAs.Mocked.Object.InvokeProtectedDo(300));
-			
+
 		}
 
 		[Fact]
