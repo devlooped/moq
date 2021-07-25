@@ -16,14 +16,14 @@ namespace Moq
 	/// </summary>
 	public class MockSequence : VerifiableSequence
 	{
-		int expectedSequenceIndex;
+		int expectedSetupIndex;
 
 		/// <summary>
 		/// Initialize a trace setup
 		/// </summary>
 		public MockSequence()
 		{
-			expectedSequenceIndex = 0;
+			expectedSetupIndex = 0;
 		}
 
 		/// <summary>
@@ -34,19 +34,19 @@ namespace Moq
 		/// <summary>
 		/// 
 		/// </summary>
-		/// <param name="sequenceIndex"></param>
 		/// <returns></returns>
-		public override bool Condition(int sequenceIndex)
+		protected override bool ConditionImpl(ITrackedSetup trackedSetup)
 		{
-			if(sequenceIndex == expectedSequenceIndex)
+			var setupIndex = trackedSetup.SetupIndex;
+			if(setupIndex == expectedSetupIndex)
 			{
-				if(expectedSequenceIndex == numberOfSetups - 1 && Cyclic)
+				if(expectedSetupIndex == numberOfSetups - 1 && Cyclic)
 				{
-					expectedSequenceIndex = 0;
+					expectedSetupIndex = 0;
 				}
 				else
 				{
-					expectedSequenceIndex++;
+					expectedSetupIndex++;
 				}
 				
 				return true;
@@ -54,13 +54,6 @@ namespace Moq
 			return false;
 		}
 
-		/// <summary>
-		/// 
-		/// </summary>
-		/// <param name="sequenceIndex"></param>
-		public override void SequenceSetupExecuted(int sequenceIndex)
-		{
-		}
 	}
 
 	/// <summary>
@@ -114,13 +107,71 @@ namespace Moq
 		/// 
 		/// </summary>
 		/// <param name="setup"></param>
-		/// <param name="index"></param>
+		/// <param name="setupIndex"></param>
 		/// <param name="mock"></param>
-		void AddSetup(ISetup setup, int index,Mock mock);
+		void AddSetup(ISetup setup, int setupIndex,Mock mock);
 		
 		bool Condition(int index);
 		
-		void SequenceSetupExecuted(int index);
+		void SequenceSetupExecuted(int setupIndex);
+	}
+
+	/// <summary>
+	/// 
+	/// </summary>
+	public static class VerifiableSequenceExtensions
+	{
+		/// <summary>
+		/// 
+		/// </summary>
+		/// <param name="mock"></param>
+		/// <param name="sequences"></param>
+		public static void Verify(this Mock mock, params VerifiableSequence[] sequences)
+		{
+			foreach (var sequence in sequences)
+			{
+				sequence.VerifySetupsForMock(mock, false);
+			}
+			mock.Verify();
+		}
+
+		/// <summary>
+		/// 
+		/// </summary>
+		/// <param name="mock"></param>
+		/// <param name="sequences"></param>
+		public static void VerifyAll(this Mock mock, params VerifiableSequence[] sequences)
+		{
+			foreach (var sequence in sequences)
+			{
+				sequence.VerifySetupsForMock(mock, true);
+			}
+			mock.VerifyAll();
+		}
+	}
+
+	/// <summary>
+	/// 
+	/// </summary>
+	public interface ITrackedSetup
+	{
+		/// <summary>
+		/// 
+		/// </summary>
+		ISetup Setup { get; }
+		/// <summary>
+		/// 
+		/// </summary>
+		int SetupIndex { get; }
+		/// <summary>
+		/// 
+		/// </summary>
+		IReadOnlyList<int> ExecutionIndices { get; }
+
+		/// <summary>
+		/// 
+		/// </summary>
+		Mock Mock { get; }
 	}
 
 	/// <summary>
@@ -128,38 +179,66 @@ namespace Moq
 	/// </summary>
 	public abstract class VerifiableSequence : IMockSequence
 	{
+		private class TrackedSetup : ITrackedSetup
+		{
+			public ISetup Setup { get; set; }
+
+			public int SetupIndex { get; set; }
+
+			public List<int> ExecutionIndicesList { get; } = new List<int>();
+
+			public IReadOnlyList<int> ExecutionIndices => ExecutionIndicesList;
+
+			public Mock Mock { get; set; }
+		}
+
+		private int executionCount = 0;
+
 		/// <summary>
 		/// 
 		/// </summary>
 		public int SetupIndex { get; set; }
 
-		private Dictionary<Mock, List<Moq.ISetup>> mockSetups = new Dictionary<Mock, List<ISetup>>();
+		private Dictionary<Mock, List<TrackedSetup>> trackedSetups = new Dictionary<Mock, List<TrackedSetup>>();
+		
 		/// <summary>
 		/// 
 		/// </summary>
 		protected int numberOfSetups = 0;
+		
 		/// <summary>
 		/// 
 		/// </summary>
 		/// <param name="setup"></param>
-		/// <param name="index"></param>
+		/// <param name="setupIndex"></param>
 		/// <param name="mock"></param>
-		public void AddSetup(ISetup setup, int index, Mock mock)
+		public void AddSetup(ISetup setup, int setupIndex, Mock mock)
 		{
 			numberOfSetups++;
-			if (!mockSetups.TryGetValue(mock, out var setups))
+			if (!trackedSetups.TryGetValue(mock, out var setups))
 			{
-				setups = new List<Moq.ISetup>();
-				mockSetups.Add(mock, setups);
+				setups = new List<TrackedSetup>();
+				trackedSetups.Add(mock, setups);
 			}
-			setups.Add(setup);
+			var trackedSetup = new TrackedSetup { Setup = setup, SetupIndex = setupIndex, Mock = mock };
+			setups.Add(new TrackedSetup { Setup = setup, SetupIndex = setupIndex, Mock = mock});
+			AddedSetup(trackedSetup);
+		}
+
+		/// <summary>
+		/// 
+		/// </summary>
+		/// <param name="trackedSetup"></param>
+		protected virtual void AddedSetup(ITrackedSetup trackedSetup)
+		{
+
 		}
 
 		/// <summary>
 		/// 
 		/// </summary>
 		/// <param name="verifyAll"></param>
-		public void VerifySequence(bool verifyAll = true)
+		public virtual void VerifySequence(bool verifyAll = true)
 		{
 			VerifySetups(GetCurrentSetups(), verifyAll);
 		}
@@ -180,11 +259,20 @@ namespace Moq
 		/// <summary>
 		/// 
 		/// </summary>
-		/// <param name="mock"></param>
+		/// <param name="mocks"></param>
 		/// <param name="verifyAll"></param>
-		public void VerifySequenceAndMock(Mock mock, bool verifyAll = true)
+		public void VerifySequenceAndMocks(bool verifyAll,params Mock[] mocks)
 		{
-			VerifySequenceAndMocks(new Mock[] { mock }, verifyAll);
+			VerifySequence(verifyAll);
+
+			if (verifyAll)
+			{
+				Mock.VerifyAll(mocks);
+			}
+			else
+			{
+				Mock.Verify(mocks);
+			}
 		}
 
 		/// <summary>
@@ -193,7 +281,7 @@ namespace Moq
 		/// <param name="verifyAll"></param>
 		public void VerifySequenceAndAllMocks(bool verifyAll = true)
 		{
-			VerifySequenceAndMocks(mockSetups.Keys.ToArray(), verifyAll);
+			VerifySequenceAndMocks(verifyAll, trackedSetups.Keys.ToArray());
 		}
 
 		/// <summary>
@@ -215,7 +303,7 @@ namespace Moq
 		/// <param name="mock"></param>
 		public void MockVerify(Mock mock)
 		{
-			VerifySetups(GetCurrentSetups(mock), false);
+			VerifySetupsForMock(mock, false);
 			mock.Verify();
 		}
 
@@ -225,8 +313,13 @@ namespace Moq
 		/// <param name="mock"></param>
 		public void MockVerifyAll(Mock mock)
 		{
-			VerifySetups(GetCurrentSetups(mock), true);
+			VerifySetupsForMock(mock, true);
 			mock.VerifyAll();
+		}
+
+		internal void VerifySetupsForMock(Mock mock, bool verifyAll)
+		{
+			VerifySetups(GetCurrentSetups(mock), verifyAll);
 		}
 
 		/// <summary>
@@ -234,9 +327,9 @@ namespace Moq
 		/// </summary>
 		/// <param name="setups"></param>
 		/// <param name="verifyAll"></param>
-		private void VerifySetups(IEnumerable<Moq.ISetup> setups, bool verifyAll)
+		protected void VerifySetups(IEnumerable<ITrackedSetup> setups, bool verifyAll)
 		{
-			foreach (var setupForVerification in setups)
+			foreach (var setupForVerification in setups.Select( s=> s.Setup))
 			{
 				if (verifyAll)
 				{
@@ -252,37 +345,27 @@ namespace Moq
 			}
 		}
 
-		private void VerifySequenceAndMocks(Mock[] mocks, bool verifyAll)
+		/// <summary>
+		/// 
+		/// </summary>
+		/// <returns></returns>
+		protected List<ITrackedSetup> GetCurrentSetups()
 		{
-			VerifySequence(verifyAll);
-
-			if (verifyAll)
-			{
-				Mock.VerifyAll(mocks);
-			}
-			else
-			{
-				Mock.Verify(mocks);
-			}
-		}
-
-		private List<Moq.ISetup> GetCurrentSetups()
-		{
-			List<Moq.ISetup> currentSetups = new List<ISetup>();
-			foreach (var entry in mockSetups)
+			List<ITrackedSetup> currentSetups = new List<ITrackedSetup>();
+			foreach (var entry in trackedSetups)
 			{
 				currentSetups.AddRange(GetCurrentSetups(entry.Key, entry.Value));
 			}
 			return currentSetups;
 		}
 
-		private List<ISetup> GetCurrentSetups(Mock mock, List<ISetup> storedSetups)
+		private List<TrackedSetup> GetCurrentSetups(Mock mock, List<TrackedSetup> storedSetups)
 		{
 			var currentMockSetups = mock.MutableSetups;
-			var removals = new List<Moq.ISetup>();
+			var removals = new List<TrackedSetup>();
 			foreach (var storedSetup in storedSetups)
 			{
-				if (!currentMockSetups.Contains(storedSetup))
+				if (!currentMockSetups.Contains(storedSetup.Setup))
 				{
 					removals.Add(storedSetup);
 				}
@@ -294,11 +377,11 @@ namespace Moq
 			return storedSetups;
 		}
 
-		private List<ISetup> GetCurrentSetups(Mock mock)
+		private List<TrackedSetup> GetCurrentSetups(Mock mock)
 		{
-			if (mockSetups.ContainsKey(mock))
+			if (trackedSetups.ContainsKey(mock))
 			{
-				return GetCurrentSetups(mock, mockSetups[mock]);
+				return GetCurrentSetups(mock, trackedSetups[mock]);
 			}
 			else
 			{
@@ -309,16 +392,64 @@ namespace Moq
 		/// <summary>
 		/// 
 		/// </summary>
-		/// <param name="sequenceIndex"></param>
+		/// <param name="setupIndex"></param>
 		/// <returns></returns>
-		public abstract bool Condition(int sequenceIndex);
+		public bool Condition(int setupIndex)
+		{
+			return ConditionImpl(GetTrackedSetup(setupIndex));
+		}
 
 		/// <summary>
 		/// 
 		/// </summary>
-		/// <param name="sequenceIndex"></param>
+		/// <param name="trackedSetup"></param>
 		/// <returns></returns>
-		public abstract void SequenceSetupExecuted(int sequenceIndex);
+		protected abstract bool ConditionImpl(ITrackedSetup trackedSetup);
+
+		/// <summary>
+		/// 
+		/// </summary>
+		/// <param name="setupIndex"></param>
+		/// <returns></returns>
+		public void SequenceSetupExecuted(int setupIndex)
+		{
+			TrackedSetup trackedSetup = GetTrackedSetup(setupIndex);
+			trackedSetup.ExecutionIndicesList.Add(executionCount);
+			executionCount++;
+			SequenceSetupExecutedImpl(trackedSetup);
+		}
+
+		private TrackedSetup GetTrackedSetup(int setupIndex)
+		{
+			TrackedSetup trackedSetup = null;
+			foreach (var setups in trackedSetups.Values)
+			{
+				var found = false;
+				foreach (var setup in setups)
+				{
+					if (setup.SetupIndex == setupIndex)
+					{
+						trackedSetup = setup;
+						found = true;
+						break;
+					}
+				}
+				if (found)
+				{
+					break;
+				}
+			}
+			return trackedSetup;
+		}
+
+		/// <summary>
+		/// 
+		/// </summary>
+		/// <param name="trackedSetup"></param>
+		protected virtual void SequenceSetupExecutedImpl(ITrackedSetup trackedSetup)
+		{
+
+		}
 
 		internal ISequenceSetupConditionResult<TMock,TMock> For<TMock>(Mock<TMock> mock)
 			where TMock : class

@@ -18,7 +18,7 @@ namespace Moq.Language.Flow
 		{
 			var index = mockSequence.SetupIndex;
 			var sequenceSetup = setup(new Condition(() => mockSequence.Condition(index), () => mockSequence.SequenceSetupExecuted(index)));
-			mockSequence.AddSetup(sequenceSetup, index, mock);// todo mock vs protected mock
+			mockSequence.AddSetup(sequenceSetup, index, mock);
 			mockSequence.SetupIndex++;
 			return sequenceSetup;
 		}
