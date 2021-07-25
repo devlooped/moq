@@ -83,12 +83,7 @@ namespace Moq
 		/// <param name="exception">Exception instance to throw.</param>
 		public static IReturnsResult<TMock> ThrowsAsync<TMock>(this IReturns<TMock, Task> mock, Exception exception) where TMock : class
 		{
-			return mock.Returns(() =>
-			{
-				var tcs = new TaskCompletionSource<bool>();
-				tcs.SetException(exception);
-				return tcs.Task;
-			});
+			return mock.ThrowsAsync(() => exception);
 		}
 
 		/// <summary>
@@ -100,12 +95,7 @@ namespace Moq
 		/// <param name="exception">Exception instance to throw.</param>
 		public static IReturnsResult<TMock> ThrowsAsync<TMock, TResult>(this IReturns<TMock, Task<TResult>> mock, Exception exception) where TMock : class
 		{
-			return mock.Returns(() =>
-			{
-				var tcs = new TaskCompletionSource<TResult>();
-				tcs.SetException(exception);
-				return tcs.Task;
-			});
+			return mock.ThrowsAsync(() => exception);
 		}
 
 		/// <summary>
@@ -117,10 +107,70 @@ namespace Moq
 		/// <param name="exception">Exception instance to throw.</param>
 		public static IReturnsResult<TMock> ThrowsAsync<TMock, TResult>(this IReturns<TMock, ValueTask<TResult>> mock, Exception exception) where TMock : class
 		{
+			return mock.ThrowsAsync(() => exception);
+		}
+
+		/// <summary>
+		/// Specifies a function that will calculate the exception to throw when the asynchronous method is invoked.
+		/// </summary>
+		/// <typeparam name="TMock">Mocked type.</typeparam>
+		/// <param name="mock">Returns verb which represents the mocked type and the task return type</param>
+		/// <param name="exceptionFunction">Exception instance to throw.</param>
+		public static IReturnsResult<TMock> ThrowsAsync<TMock>(this IReturns<TMock, Task> mock, Func<Exception> exceptionFunction) where TMock : class
+		{
+			if (exceptionFunction == null)
+			{
+				return mock.ThrowsAsync(() => default);
+			}
+
+			return mock.Returns(() =>
+			{
+				var tcs = new TaskCompletionSource<bool>();
+				tcs.SetException(exceptionFunction());
+				return tcs.Task;
+			});
+		}
+
+		/// <summary>
+		/// Specifies a function that will calculate the exception to throw when the asynchronous method is invoked.
+		/// </summary>
+		/// <typeparam name="TMock">Mocked type.</typeparam>
+		/// <typeparam name="TResult">Type of the return value.</typeparam>
+		/// <param name="mock">Returns verb which represents the mocked type and the task of return type</param>
+		/// <param name="exceptionFunction">The function that will calculate the exception to throw.</param>
+		public static IReturnsResult<TMock> ThrowsAsync<TMock, TResult>(this IReturns<TMock, Task<TResult>> mock, Func<Exception> exceptionFunction) where TMock : class
+		{
+			if (exceptionFunction == null)
+			{
+				return mock.ThrowsAsync(() => default);
+			}
+
 			return mock.Returns(() =>
 			{
 				var tcs = new TaskCompletionSource<TResult>();
-				tcs.SetException(exception);
+				tcs.SetException(exceptionFunction());
+				return tcs.Task;
+			});
+		}
+
+		/// <summary>
+		/// Specifies a function that will calculate the exception to throw when the asynchronous method is invoked.
+		/// </summary>
+		/// <typeparam name="TMock">Mocked type.</typeparam>
+		/// <typeparam name="TResult">Type of the return value.</typeparam>
+		/// <param name="mock">Returns verb which represents the mocked type and the task of return type</param>
+		/// <param name="exceptionFunction">The function that will calculate the exception to throw.</param>
+		public static IReturnsResult<TMock> ThrowsAsync<TMock, TResult>(this IReturns<TMock, ValueTask<TResult>> mock, Func<Exception> exceptionFunction) where TMock : class
+		{
+			if (exceptionFunction == null)
+			{
+				return mock.ThrowsAsync(() => default);
+			}
+
+			return mock.Returns(() =>
+			{
+				var tcs = new TaskCompletionSource<TResult>();
+				tcs.SetException(exceptionFunction());
 				return new ValueTask<TResult>(tcs.Task);
 			});
 		}
