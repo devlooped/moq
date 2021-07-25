@@ -10,6 +10,7 @@ The format is loosely based on [Keep a Changelog](http://keepachangelog.com/en/1
 #### Added
 
 * `SetupSet`, `VerifySet` methods for `mock.Protected().As<>()` (@tonyhallett, #1165)
+* New `ThrowsAsync` method overloads that allow specifying a function to provide an exception, for example `.ThrowsAsync(() => new InvalidOperationException())`. (@adam-knights, #1190)
 
 #### Fixed
 
