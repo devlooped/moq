@@ -562,12 +562,13 @@ namespace Moq.Tests
 			var a = new Mock<IFoo>(MockBehavior.Loose);
 			var foo = a.Object;
 			var seq = new MockSequence();
+			
 			a.InSequence(seq).Setup(f => f.Do(1)).Returns(1);
 			a.InSequence(seq).Setup(f => f.Do(2)).Returns(2);
 
-			// have the setup so will check the invocations for the matching setup
-			// but is that set when Condition fails
-			Assert.Throws<Exception>(() => foo.Do(2));
+			foo.Do(1);
+			var mockException = Assert.Throws<MockException>(() => foo.Do(1));
+			var msg = mockException.Message;
 		}
 
 		public abstract class Protected

@@ -201,7 +201,7 @@ namespace Moq
 		/// <summary>
 		/// 
 		/// </summary>
-		public int SetupIndex { get; set; }
+		int IMockSequence.SetupIndex { get; set; }
 
 		private Dictionary<Mock, List<TrackedSetup>> trackedSetups = new Dictionary<Mock, List<TrackedSetup>>();
 		
@@ -216,7 +216,7 @@ namespace Moq
 		/// <param name="setup"></param>
 		/// <param name="setupIndex"></param>
 		/// <param name="mock"></param>
-		public void AddSetup(ISetup setup, int setupIndex, Mock mock)
+		void IMockSequence.AddSetup(ISetup setup, int setupIndex, Mock mock)
 		{
 			numberOfSetups++;
 			if (!trackedSetups.TryGetValue(mock, out var setups))
@@ -398,13 +398,13 @@ namespace Moq
 		/// </summary>
 		/// <param name="setupIndex"></param>
 		/// <returns></returns>
-		public bool Condition(int setupIndex)
+		bool IMockSequence.Condition(int setupIndex)
 		{
 			var trackedSetup = GetTrackedSetup(setupIndex);
 			var pass = ConditionImpl(trackedSetup);
 			if(!pass && ThrowIfConditionNotMetWhenLoose && trackedSetup.Mock.Behavior == MockBehavior.Loose)
 			{
-				throw new Exception("todo");//todo MockException
+				throw new Exception("todo");//todo
 			}
 			return pass;
 		}
