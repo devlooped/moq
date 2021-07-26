@@ -37,6 +37,14 @@ namespace Moq.Language.Flow
 			return this;
 		}
 
+		public ISetupSequentialAction Throws<TException>(Func<TException> exceptionFunction) where TException : Exception
+		{
+			Guard.NotNull(exceptionFunction, nameof(exceptionFunction));
+
+			this.setup.AddBehavior(new ThrowComputedException(_ => exceptionFunction()));
+			return this;
+		}
+
 		public override string ToString()
 		{
 			return setup.Expression.ToStringFixed();
@@ -90,6 +98,14 @@ namespace Moq.Language.Flow
 		public ISetupSequentialResult<TResult> Throws<TException>()
 			where TException : Exception, new()
 			=> this.Throws(new TException());
+
+		public ISetupSequentialResult<TResult> Throws<TException>(Func<TException> exceptionFunction) where TException : Exception
+		{
+			Guard.NotNull(exceptionFunction, nameof(exceptionFunction));
+
+			this.setup.AddBehavior(new ThrowComputedException(_ => exceptionFunction()));
+			return this;
+		}
 
 		public override string ToString()
 		{

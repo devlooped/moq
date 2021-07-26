@@ -281,59 +281,50 @@ namespace Moq
 			{
 				var callbackMethod = callback.GetMethodInfo();
 
-				// validate number of parameters:
+				ValidateNumberOfCallbackParameters(callback, callbackMethod);
 
-				var numberOfActualParameters = callbackMethod.GetParameters().Length;
-				if (callbackMethod.IsStatic)
-				{
-					if (callbackMethod.IsExtensionMethod() || callback.Target != null)
-					{
-						numberOfActualParameters--;
-					}
-				}
-
-				if (numberOfActualParameters > 0)
-				{
-					var numberOfExpectedParameters = this.Method.GetParameters().Length;
-					if (numberOfActualParameters != numberOfExpectedParameters)
-					{
-						throw new ArgumentException(
-							string.Format(
-								CultureInfo.CurrentCulture,
-								Resources.InvalidCallbackParameterCountMismatch,
-								numberOfExpectedParameters,
-								numberOfActualParameters));
-					}
-				}
-
-				// validate return type:
-
-				var actualReturnType = callbackMethod.ReturnType;
-
-				if (actualReturnType == typeof(void))
-				{
-					throw new ArgumentException(Resources.InvalidReturnsCallbackNotADelegateWithReturnType);
-				}
-
-				if (!expectedReturnType.IsAssignableFrom(actualReturnType))
-				{
-					// TODO: If the return type is a matcher, does the callback's return type need to be matched against it?
-					if (typeof(ITypeMatcher).IsAssignableFrom(expectedReturnType) == false)
-					{
-						throw new ArgumentException(
-							string.Format(
-								CultureInfo.CurrentCulture,
-								Resources.InvalidCallbackReturnTypeMismatch,
-								expectedReturnType.GetFormattedName(),
-								actualReturnType.GetFormattedName()));
-					}
-				}
+				ValidateCallbackReturnType(callbackMethod, expectedReturnType);
 			}
 		}
-
+		
 		public void SetThrowExceptionBehavior(Exception exception)
 		{
 			this.returnOrThrow = new ThrowException(exception);
+		}
+
+		public void SetThrowComputedExceptionBehavior(Delegate exceptionFactory)
+		{
+			Debug.Assert(this.Method.ReturnType != typeof(void));
+			Debug.Assert(this.returnOrThrow == null);
+
+			if (exceptionFactory == null)
+			{
+				// A `null` reference (instead of a valid delegate) is interpreted as the actual return value.
+				// This is necessary because the compiler might have picked the unexpected overload for calls
+				// like `Throws(null)`, or the user might have picked an overload like `Throws<TException>(null)`,
+				// and instead of in `Throws(TException)`, we ended up in `Throws(Delegate)` or `Throws(Func)`,
+				// which likely isn't what the user intended.
+				// So here we do what we would've done in `Throws(TException)`:
+				this.returnOrThrow = new ThrowException(default);
+			}
+			else
+			{
+				var callbackMethod = exceptionFactory.GetMethodInfo();
+
+				ValidateNumberOfCallbackParameters(exceptionFactory, callbackMethod);
+
+				ValidateCallbackReturnType(callbackMethod, typeof(Exception));
+
+				if (exceptionFactory.CompareParameterTypesTo(Type.EmptyTypes))
+				{
+					// we need this for the user to be able to use parameterless methods
+					this.returnOrThrow = new ThrowComputedException(invocation => exceptionFactory.InvokePreserveStack() as Exception);
+				}
+				else
+				{
+					this.returnOrThrow = new ThrowComputedException(invocation => exceptionFactory.InvokePreserveStack(invocation.Arguments) as Exception);
+				}
+			}
 		}
 
 		protected override void ResetCore()
@@ -363,6 +354,56 @@ namespace Moq
 			}
 
 			return message.ToString().Trim();
+		}
+
+		private void ValidateNumberOfCallbackParameters(Delegate callback, MethodInfo callbackMethod)
+		{
+			var numberOfActualParameters = callbackMethod.GetParameters().Length;
+			if (callbackMethod.IsStatic)
+			{
+				if (callbackMethod.IsExtensionMethod() || callback.Target != null)
+				{
+					numberOfActualParameters--;
+				}
+			}
+
+			if (numberOfActualParameters > 0)
+			{
+				var numberOfExpectedParameters = this.Method.GetParameters().Length;
+				if (numberOfActualParameters != numberOfExpectedParameters)
+				{
+					throw new ArgumentException(
+						string.Format(
+							CultureInfo.CurrentCulture,
+							Resources.InvalidCallbackParameterCountMismatch,
+							numberOfExpectedParameters,
+							numberOfActualParameters));
+				}
+			}
+		}
+
+		private void ValidateCallbackReturnType(MethodInfo callbackMethod, Type expectedReturnType)
+		{
+			var actualReturnType = callbackMethod.ReturnType;
+
+			if (actualReturnType == typeof(void))
+			{
+				throw new ArgumentException(Resources.InvalidReturnsCallbackNotADelegateWithReturnType);
+			}
+
+			if (!expectedReturnType.IsAssignableFrom(actualReturnType))
+			{
+				// TODO: If the return type is a matcher, does the callback's return type need to be matched against it?
+				if (typeof(ITypeMatcher).IsAssignableFrom(expectedReturnType) == false)
+				{
+					throw new ArgumentException(
+						string.Format(
+							CultureInfo.CurrentCulture,
+							Resources.InvalidCallbackReturnTypeMismatch,
+							expectedReturnType.GetFormattedName(),
+							actualReturnType.GetFormattedName()));
+				}
+			}
 		}
 	}
 }

@@ -1,0 +1,61 @@
+﻿<#@ template debug="false" hostspecific="false" language="C#" #>
+<#@ output extension=".Generated.cs" #>
+<#@ Assembly Name="System.Core" #>
+<#@ Import Namespace="System.Linq" #>
+// Copyright (c) 2007, Clarius Consulting, Manas Technology Solutions, InSTEDD, and Contributors.
+// All rights reserved. Licensed under the BSD 3-Clause License; see License.txt.
+
+using System;
+using System.ComponentModel;
+using Moq.Language.Flow;
+
+namespace Moq.Language
+{
+	partial interface IThrows
+	{ <#
+for (var typeCount = 2; typeCount <= GenericTypeMax; typeCount++)
+{
+	var typeList = GetGenericList(typeCount, GenericTypeFormat);
+#>
+
+		/// <summary>
+		/// Specifies a function that will calculate the exception to throw when the method is invoked, 
+		/// retrieving the arguments for the invocation.
+		/// </summary>
+<#
+	for (var typeIndex = 1; typeIndex <= typeCount; typeIndex++)
+	{
+#>
+		/// <typeparam name="T<#= typeIndex #>">The type of the <#= ConvertToOrdinal(typeIndex) #> argument of the invoked method.</typeparam>
+<#
+	}
+#>
+		/// <typeparam name="TException">Type of exception that will be calculated and thrown when the setup is matched.</typeparam>
+		/// <param name="exceptionFunction">The function that will calculate the exception to be thrown.</param>
+		/// <example>
+		/// <para>
+		/// The thrown exception is calculated from the value of the actual method invocation arguments. 
+		/// Notice how the arguments are retrieved by simply declaring them as part of the lambda 
+		/// expression:
+		/// </para>
+		/// <code>
+		/// mock.Setup(x => x.Execute(
+<#
+	for (var typeIndex = 1; typeIndex < typeCount; typeIndex++)
+	{
+#>
+		///                      It.IsAny&lt;string&gt;(), 
+<#
+	}
+#>
+		///                      It.IsAny&lt;string&gt;()))
+		///     .Throws((<#= GetGenericList(typeCount, "string arg{0}") #>) => new Exception(<#= GetGenericList(typeCount, "arg{0}", " + ") #>));
+		/// </code>
+		/// </example>
+		IThrowsResult Throws<<#= typeList #>, TException>(Func<<#= typeList #>, TException> exceptionFunction) where TException : Exception;
+<#
+}
+#>
+	}
+}
+<#@ Include File="..\Includes\GenericTypeParameters.tt" #>
