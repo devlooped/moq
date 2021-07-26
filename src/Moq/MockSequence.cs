@@ -193,6 +193,10 @@ namespace Moq
 		}
 
 		private int executionCount = 0;
+		/// <summary>
+		/// 
+		/// </summary>
+		protected bool ThrowIfConditionNotMetWhenLoose { get; set; } = true;
 
 		/// <summary>
 		/// 
@@ -396,7 +400,13 @@ namespace Moq
 		/// <returns></returns>
 		public bool Condition(int setupIndex)
 		{
-			return ConditionImpl(GetTrackedSetup(setupIndex));
+			var trackedSetup = GetTrackedSetup(setupIndex);
+			var pass = ConditionImpl(trackedSetup);
+			if(!pass && ThrowIfConditionNotMetWhenLoose && trackedSetup.Mock.Behavior == MockBehavior.Loose)
+			{
+				throw new Exception("todo");//todo MockException
+			}
+			return pass;
 		}
 
 		/// <summary>
