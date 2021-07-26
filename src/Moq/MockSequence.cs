@@ -35,7 +35,7 @@ namespace Moq
 		/// 
 		/// </summary>
 		/// <returns></returns>
-		protected override bool ConditionImpl(ITrackedSetup trackedSetup)
+		protected sealed override bool ConditionImpl(ITrackedSetup trackedSetup)
 		{
 			var setupIndex = trackedSetup.SetupIndex;
 			if(setupIndex == expectedSetupIndex)
