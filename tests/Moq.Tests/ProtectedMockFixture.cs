@@ -552,6 +552,20 @@ namespace Moq.Tests
 		}
 
 		[Fact]
+		public void SetupSetUsesTheValueParameter()
+		{
+			var mock = new Mock<FooBase>();
+			var value = string.Empty;
+			mock.Protected().SetupSet<string>("ProtectedValue", "foo").Callback(v => value = v);
+
+			mock.Object.SetProtectedValue("not foo");
+			Assert.Equal(string.Empty, value);
+
+			mock.Object.SetProtectedValue("foo");
+			Assert.Equal("foo", value);
+		}
+
+		[Fact]
 		public void ThrowsIfNullArgs()
 		{
 			Assert.Throws<ArgumentException>(() => new Mock<FooBase>().Protected()
@@ -1062,6 +1076,7 @@ namespace Moq.Tests
 			var mock = new Mock<FooBase>();
 			mock.Object.ProtectedInternalValue = "foo";
 
+			Assert.Throws<MockException>(() => mock.Protected().VerifySet<string>("ProtectedInternalValue", Times.Once(), "bar"));
 			mock.Protected().VerifySet<string>("ProtectedInternalValue", Times.Once(), "foo");
 		}
 
@@ -1109,7 +1124,6 @@ namespace Moq.Tests
 			protectedMock.VerifySet("Indexer", Times.Once(), new object[] { ItExpr.Is<int>(v => v == 3) }, ItExpr.Is<int>(v => v == 4 ));
 		}
 
-		#region VerifySet without TProperty - does not ignore Value parameter and supports indexers
 		[Fact]
 		public void VerifySetUsesValueParameterWhenConstant()
 		{
@@ -1145,9 +1159,7 @@ namespace Moq.Tests
 					FooBase.IndexerName,
 					Times.Once(),
 					new object[] { ItExpr.IsInRange(6, 10, Range.Inclusive), ItExpr.IsAny<int>() });
-
 		}
-		#endregion
 
 		[Fact]
 		public void SetUpSequenceSetsUpIndexerGetter()
@@ -1170,7 +1182,6 @@ namespace Moq.Tests
 			Assert.Equal(3, mock.Object.GetMultipleIndexer(1, "2"));
 			Assert.Equal(4, mock.Object.GetMultipleIndexer(1, "2"));
 			Assert.Throws<ExpectedException>(() => mock.Object.GetMultipleIndexer(1, "2"));
-
 		}
 
 		[Fact]
@@ -1191,7 +1202,6 @@ namespace Moq.Tests
 			Assert.Throws<ExpectedException>(SetIndexer);
 
 			mocked.SetIndexer(1, 1);
-
 		}
 
 		[Fact]
@@ -1210,7 +1220,6 @@ namespace Moq.Tests
 
 			InvokeMethod();
 			Assert.Throws<ExpectedException>(InvokeMethod);
-
 		}
 
 		[Fact]
@@ -1342,7 +1351,6 @@ namespace Moq.Tests
 			
 			mocked.SetObjectArrayAssignable(exactArray);
 			Assert.Equal(exactArray, exactSetValue);
-
 		}
 
 		public class MethodOverloads

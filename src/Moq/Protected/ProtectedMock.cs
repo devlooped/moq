@@ -130,7 +130,6 @@ namespace Moq.Protected
 		private MethodCall CommonSetupSet(string propertyName, object value)
 		{
 			var expression = GetSetterExpressionIncludingIndexer(propertyName, value, false, nameof(propertyName));
-
 			return Mock.SetupSet(mock, expression, condition: null);
 		}
 
@@ -300,7 +299,6 @@ namespace Moq.Protected
 		public void VerifySet<TProperty>(string propertyName, Times times, object value)
 		{
 			var expression = GetSetterExpressionIncludingIndexer(propertyName, value, false, nameof(propertyName));
-
 			Mock.VerifySet(mock, expression, times, null);
 		}
 
