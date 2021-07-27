@@ -13,6 +13,7 @@ The format is loosely based on [Keep a Changelog](http://keepachangelog.com/en/1
 
 #### Fixed
 
+* mock.Protected().SetupSet fails when argument is of type Expression (@tonyhallett, #1189)
 * Parameter is invalid in Protected().SetupSet() ... VerifySet (@tonyhallett, #1186)
 
 * Virtual properties and automocking not working for `mock.Protected().As<>()` (@tonyhallett, #1185)
