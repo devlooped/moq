@@ -1329,7 +1329,7 @@ namespace Moq.Tests
 			mocked.SetEnumerableIndexer(specific, 1);
 			mocked.SetEnumerableIndexer(specific, 1);
 			mocked.SetEnumerableIndexer(new object[] { }, 1);
-			Assert.Throws<ExpectedException>(() => mocked.SetEnumerableIndexer(new object[] { }, 1));
+			Assert.Throws<ExpectedException>(() => mocked.SetEnumerableIndexer(specific, 1));
 		}
 
 		[Fact]
