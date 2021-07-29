@@ -567,7 +567,7 @@ namespace Moq.Tests
 			a.InSequence(seq).Setup(f => f.Do(2)).Returns(2);
 
 			foo.Do(1);
-			var mockException = Assert.Throws<MockException>(() => foo.Do(1));
+			var mockException = Assert.Throws<Exception>(() => foo.Do(1));
 			var msg = mockException.Message;
 		}
 
