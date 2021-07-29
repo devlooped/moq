@@ -49,7 +49,7 @@ for (var typeCount = 2; typeCount <= GenericTypeMax; typeCount++)
 	}
 #>
 		///                      It.IsAny&lt;int&gt;()))
-		///     .Returns((<#= GetGenericList(typeCount, "string arg{0}") #>) => <#= GetGenericList(typeCount, "arg{0}", " + ") #>);
+		///     .Returns((<#= GetGenericList(typeCount, "int arg{0}") #>) => <#= GetGenericList(typeCount, "arg{0}", " + ") #>);
 		/// </code>
 		/// </example>
 		IReturnsResult<TMock> Returns<<#= typeList #>>(Func<<#= typeList #>, TResult> valueFunction);
