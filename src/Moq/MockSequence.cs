@@ -358,17 +358,20 @@ namespace Moq
 			List<ITrackedSetup> currentSetups = new List<ITrackedSetup>();
 			foreach (var entry in trackedSetups)
 			{
-				currentSetups.AddRange(GetCurrentSetups(entry.Key, entry.Value));
+				currentSetups.AddRange(GetCurrentSetups(entry.Value));
 			}
 			return currentSetups;
 		}
 
-		private List<TrackedSetup> GetCurrentSetups(Mock mock, List<TrackedSetup> storedSetups)
+		private List<TrackedSetup> GetCurrentSetups(List<TrackedSetup> storedSetups)
 		{
-			var currentMockSetups = mock.MutableSetups;
 			var removals = new List<TrackedSetup>();
 			foreach (var storedSetup in storedSetups)
 			{
+				var setup = storedSetup.Setup;
+				var setupMock = setup.Mock;
+				var currentMockSetups = setupMock.MutableSetups;
+
 				if (!currentMockSetups.Contains(storedSetup.Setup))
 				{
 					removals.Add(storedSetup);
@@ -385,7 +388,7 @@ namespace Moq
 		{
 			if (trackedSetups.ContainsKey(mock))
 			{
-				return GetCurrentSetups(mock, trackedSetups[mock]);
+				return GetCurrentSetups(trackedSetups[mock]);
 			}
 			else
 			{
