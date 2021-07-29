@@ -37,6 +37,11 @@ namespace Moq.Language
 		ISetupSequentialResult<TResult> Throws<TException>() where TException : Exception, new();
 
 		/// <summary>
+		/// Uses delegate to throws an exception
+		/// </summary>
+		ISetupSequentialResult<TResult> Throws<TException>(Func<TException> exceptionFunction) where TException : Exception;
+
+		/// <summary>
 		/// Calls original method
 		/// </summary>
 		ISetupSequentialResult<TResult> CallBase();
