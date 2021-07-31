@@ -18,6 +18,10 @@ namespace Moq
 		private readonly int from;
 		private readonly int to;
 		private readonly Kind kind;
+		internal Kind GetKind()
+		{
+			return kind;
+		}
 
 		private Times(Kind kind, int from, int to)
 		{
@@ -297,7 +301,7 @@ namespace Moq
 			return from <= count && count <= to;
 		}
 
-		private enum Kind
+		internal enum Kind
 		{
 			AtLeastOnce,
 			AtLeast,

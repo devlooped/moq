@@ -45,6 +45,11 @@ namespace Moq
 			get => this.failMessage;
 		}
 
+		internal void SetCondition(Condition condition)
+		{
+			this.condition = condition;
+		}
+
 		public override Condition Condition => this.condition;
 
 		private static string GetUserCodeCallSite()

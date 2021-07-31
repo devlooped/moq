@@ -65,6 +65,7 @@ namespace Moq
 
 				this.invocations[this.count] = invocation;
 				this.count++;
+				owner.AddedInvocation(invocation);
 			}
 		}
 
