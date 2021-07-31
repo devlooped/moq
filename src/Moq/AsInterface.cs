@@ -25,6 +25,11 @@ namespace Moq
 
 		internal override InvocationCollection MutableInvocations => this.owner.MutableInvocations;
 
+		internal override void AddInvocationListener(Action<Invocation> listener)
+		{
+			owner.AddInvocationListener(listener);
+		}
+
 		internal override bool IsObjectInitialized => this.owner.IsObjectInitialized;
 
 		internal override Type MockedType => this.owner.MockedType;

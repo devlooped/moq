@@ -123,12 +123,7 @@
 
 	<Target Name="Test" />
 
-	<Target Name="UpdatePackageMetadata"
-          BeforeTargets="PrepareForBuild;GetAssemblyVersion;GenerateNuspec;Pack"
-          DependsOnTargets="InitializeSourceControlInformation"
-          Condition="'$(SourceControlInformationFeatureSupported)' And
-                     '$(RepositoryUrl)' != '' And 
-                     '$(SourceRevisionId)' != ''">
+	<Target Name="UpdatePackageMetadata" BeforeTargets="PrepareForBuild;GetAssemblyVersion;GenerateNuspec;Pack" DependsOnTargets="InitializeSourceControlInformation" Condition="'$(SourceControlInformationFeatureSupported)' And&#xD;&#xA;                     '$(RepositoryUrl)' != '' And &#xD;&#xA;                     '$(SourceRevisionId)' != ''">
 		<PropertyGroup>
 			<Description>$(Description)
 

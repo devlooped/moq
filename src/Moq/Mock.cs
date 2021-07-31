@@ -192,6 +192,21 @@ namespace Moq
 
 		internal abstract InvocationCollection MutableInvocations { get; }
 
+		private readonly List<Action<Invocation>> invocationListeners = new List<Action<Invocation>>();
+
+		internal virtual void AddInvocationListener(Action<Invocation> listener)
+		{
+			invocationListeners.Add(listener);
+		}
+
+		internal virtual void AddedInvocation(Invocation invocation)
+		{
+			foreach(var listener in invocationListeners)
+			{
+				listener(invocation);
+			}
+		}
+
 		/// <summary>
 		///   Returns the mocked object value.
 		/// </summary>
