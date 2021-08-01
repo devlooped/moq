@@ -27,15 +27,25 @@ namespace Moq
 	/// </summary>
 	public class VerifiableSetup
 	{
-		private readonly ITrackedSetup<Times> trackedSetup;
+		private ISequenceSetup<Times> sequenceSetup;
+		private ITrackedSetup<Times> trackedSetup;
 
 		/// <summary>
 		/// 
 		/// </summary>
-		/// <param name="trackedSetup"></param>
-		public VerifiableSetup(ITrackedSetup<Times> trackedSetup)
+		/// <param name="sequenceSetup"></param>
+		public VerifiableSetup(ISequenceSetup<Times> sequenceSetup)
 		{
-			this.trackedSetup = trackedSetup;
+			this.sequenceSetup = sequenceSetup;
+			this.trackedSetup = sequenceSetup.TrackedSetup;
+		}
+
+		/// <summary>
+		/// 
+		/// </summary>
+		public void Verify()
+		{
+			VerifySequenceSetup(sequenceSetup);
 		}
 
 		/// <summary>
@@ -44,27 +54,44 @@ namespace Moq
 		/// <param name="times"></param>
 		public void Verify(Times times)
 		{
-			var success = times.Validate(trackedSetup.ExecutionIndices.Count);
-			if (!success)
+			Verify(times, sequenceSetup.ExecutionCount);
+		}
+
+		/// <summary>
+		/// 
+		/// </summary>
+		public void VerifyAll()
+		{
+			var trackedSetup = sequenceSetup.TrackedSetup;
+			foreach (var sequenceSetup in trackedSetup.SequenceSetups)
 			{
-				throw new SequenceVerificationException();
+				VerifySequenceSetup(sequenceSetup);
 			}
 		}
 
 		/// <summary>
 		/// 
 		/// </summary>
-		public void Verify()
+		/// <param name="times"></param>
+		public void VerifyAll(Times times)
 		{
-			if (trackedSetup.SequenceSetups.Count == 1)
+			Verify(times, trackedSetup.ExecutionIndices.Count);
+		}
+
+		private void VerifySequenceSetup(ISequenceSetup<Times> sequenceSetup)
+		{
+			Verify(sequenceSetup.Context, sequenceSetup.ExecutionCount);
+		}
+
+		private void Verify(Times times, int executionCount)
+		{
+			var success = times.Validate(executionCount);
+			if (!success)
 			{
-				Verify(trackedSetup.SequenceSetups[0].Context);
-			}
-			else
-			{
-				throw new Exception("not valid");
+				throw new SequenceVerificationException();
 			}
 		}
+
 	}
 
 	/// <summary>
@@ -82,7 +109,7 @@ namespace Moq
 		}
 
 		private int currentSequenceSetupIndex;
-		private ITrackedSetup<Times> lastSetup;
+		private ITrackedSetup<Times> lastTrackedSetup;
 
 		/// <summary>
 		/// 
@@ -101,14 +128,15 @@ namespace Moq
 		{
 			Times t = times ?? Times.Once();
 			VerifiableSetup verifiableSetup = null;
-			base.InterceptSetup(setup, (ts, setupOrder) =>
+			base.InterceptSetup(setup, (sequenceSetup) =>
 			{
-				if(lastSetup == ts)
+				var trackedSetup = sequenceSetup.TrackedSetup;
+				if(lastTrackedSetup == trackedSetup)
 				{
 					throw new Exception("Consecutive setups are the same");
 				}
-				lastSetup = ts;
-				verifiableSetup = new VerifiableSetup(ts);
+				lastTrackedSetup = trackedSetup;
+				verifiableSetup = new VerifiableSetup(sequenceSetup);
 				return t;
 			});
 			return verifiableSetup;

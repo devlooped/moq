@@ -127,10 +127,10 @@ namespace Moq.Tests
 			var aMockSequence = new AMockSequence(false,mock, nestedMock);
 			ITrackedSetup<int> trackedSetup = null;
 			int order = -1;
-			Func<ITrackedSetup<int>, int,int> callback = (ts, o) =>
+			Func<ISequenceSetup<int>, int> callback = (sequenceSetup) =>
 			 {
-				 trackedSetup = ts;
-				 order = o;
+				 trackedSetup = sequenceSetup.TrackedSetup;
+				 order = sequenceSetup.SetupIndex;
 				 return contextCounter++;
 			 };
 			aMockSequence.Setup(() => mock.Setup(f => f.Do(1)), callback);
@@ -180,7 +180,7 @@ namespace Moq.Tests
 		{
 			var mock = new Mock<IFoo>();
 			var aMockSequence = new AMockSequence(false,mock);
-			aMockSequence.Setup(() => mock.Setup(f => f.Do(1)), (ts, order) => order);
+			aMockSequence.Setup(() => mock.Setup(f => f.Do(1)), (sequenceSetup) => sequenceSetup.SetupIndex);
 			mock.Object.Do(1);
 			Assert.Single(aMockSequence.ConditionCalls);
 			var conditionCall = aMockSequence.ConditionCalls[0];
@@ -217,15 +217,15 @@ namespace Moq.Tests
 			var mocked = mock.Object;
 			var aMockSequence = new AMockSequence(false, mock);
 			IReadOnlyList<int> executionIndices1 = null;
-			aMockSequence.Setup(() => mock.Setup(m => m.Do(1)), (ts, setupOrder) =>
+			aMockSequence.Setup(() => mock.Setup(m => m.Do(1)), (sequenceSetup) =>
 			 {
-				 executionIndices1 = ts.ExecutionIndices;
+				 executionIndices1 = sequenceSetup.TrackedSetup.ExecutionIndices;
 				 return 1;
 			 });
 			IReadOnlyList<int> executionIndices2 = null;
-			aMockSequence.Setup(() => mock.Setup(m => m.Do(2)), (ts, setupOrder) =>
+			aMockSequence.Setup(() => mock.Setup(m => m.Do(2)), (sequenceSetup) =>
 			{
-				executionIndices2 = ts.ExecutionIndices;
+				executionIndices2 = sequenceSetup.TrackedSetup.ExecutionIndices;
 				return 2;
 			});
 			
@@ -262,7 +262,7 @@ namespace Moq.Tests
 			Assert.False(aMockSequence.InvocationsHaveMatchingSetups());
 
 			aMockSequence = new AMockSequence(false, mock);
-			aMockSequence.Setup(() => mock.Setup(m => m.Do(2)), (ts, order) => order);
+			aMockSequence.Setup(() => mock.Setup(m => m.Do(2)), sequenceSetup => sequenceSetup.SetupIndex);
 			mock.Object.Do(2);
 			Assert.Single(aMockSequence.sequenceInvocations);
 			Assert.True(aMockSequence.InvocationsHaveMatchingSetups());
@@ -274,7 +274,7 @@ namespace Moq.Tests
 		{
 			var mock = new Mock<IFoo>();
 			var aMockSequence = new AMockSequence(true, mock);
-			aMockSequence.Setup(() => mock.Setup(m => m.Do(2)), (ts, order) => order);
+			aMockSequence.Setup(() => mock.Setup(m => m.Do(2)), sequenceSetup => sequenceSetup.SetupIndex);
 			
 			mock.Object.Do(1);
 			Assert.False(aMockSequence.StrictFailure);
@@ -290,7 +290,7 @@ namespace Moq.Tests
 			var mock = new Mock<IFoo>();
 			var aMockSequence = new AMockSequence(true, mock);
 			aMockSequence.CallBaseForStrictFailure = true;
-			aMockSequence.Setup(() => mock.Setup(m => m.Do(2)), (ts, order) => order);
+			aMockSequence.Setup(() => mock.Setup(m => m.Do(2)), sequenceSetup => sequenceSetup.SetupIndex);
 			mock.Object.Do(1);
 
 			// strictness test occurs when condition returns true
@@ -564,7 +564,7 @@ namespace Moq.Tests
 		}
 
 		[Fact]
-		public void MockSequenceCanUseVerifiableSetupToVerify()
+		public void MockSequenceCanUseVerifiableSetupToVerifyASequenceSetup()
 		{
 			VerifiableSetup verifiableSetup1 = null;
 			VerifiableSetup verifiableSetup2 = null;
@@ -580,7 +580,28 @@ namespace Moq.Tests
 			verifiableSetup1.Verify();
 			Assert.Throws<SequenceVerificationException>(() => verifiableSetup2.Verify(Times.Once()));
 		}
-		
+
+		[Fact]
+		public void MockSequenceCanUseVerifiableSetupToVerifyAllSameSequenceSetups()
+		{
+			VerifiableSetup verifiableSetup1 = null;
+			VerifiableSetup verifiableSetup2 = null;
+			LooseNewMockSequenceTestBase((mock, protectedAs, mockSequence) =>
+			{
+				verifiableSetup1 = mockSequence.Setup(() => mock.Setup(m => m.Do(1)));
+				verifiableSetup2 = mockSequence.Setup(() => protectedAs.Setup(p => p.ProtectedDo(1)));
+				mockSequence.Setup(() => mock.Setup(m => m.Do(1)));
+				mockSequence.Setup(() => protectedAs.Setup(p => p.ProtectedDo(1)));
+			}, (mocked, protectedMocked) =>
+			{
+				mocked.Do(1);
+				protectedMocked.InvokeProtectedDo(1);
+			});
+
+			verifiableSetup1.VerifyAll(Times.Once());
+			Assert.Throws<SequenceVerificationException>(() => verifiableSetup2.VerifyAll());
+		}
+
 		[Fact]
 		public void MockSequenceVerifyVerifiesThatAllSetupsHaveBeenMet()
 		{
@@ -679,7 +700,7 @@ namespace Moq.Tests
 			public bool StrictFailure { get; set; }
 			public bool CallBaseForStrictFailure { get; set; }
 			public AMockSequence(bool strict, params Mock[] mocks) : base(strict, mocks) { }
-			public void Setup(Action setup,Func<ITrackedSetup<int>,int,int> setupCallback)
+			public void Setup(Action setup,Func<ISequenceSetup<int>,int> setupCallback)
 			{
 				base.InterceptSetup(setup,setupCallback);
 			}

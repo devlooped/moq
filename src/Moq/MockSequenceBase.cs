@@ -171,7 +171,7 @@ namespace Moq
 		/// </summary>
 		/// <param name="setup"></param>
 		/// <param name="trackedSetupCallback"></param>
-		protected void InterceptSetup(Action setup, Func<ITrackedSetup<TContext>,int,TContext> trackedSetupCallback)
+		protected void InterceptSetup(Action setup, Func<ISequenceSetup<TContext>,TContext> trackedSetupCallback)
 		{
 			setupCount++;
 			List<List<SetupWithDepth>> allSetupsBefore = mocks.Select(m => MoqSetupFinder.GetAllSetups(m)).ToList();
@@ -187,10 +187,12 @@ namespace Moq
 					ListenForInvocations(result.NewSetups.Select(s => s.Setup.Mock));
 					var terminalTrackedSetup = ResolveSetups(setupsExceptTerminal, terminalSetup);
 					SetCondition(terminalTrackedSetup);
-					var context = trackedSetupCallback(terminalTrackedSetup, setupCount);
-					var sequenceSetup = new SequenceSetup<TContext> { Context = context, TrackedSetup = terminalTrackedSetup, SetupIndex = setupCount };
+					var sequenceSetup = new SequenceSetup<TContext> { TrackedSetup = terminalTrackedSetup, SetupIndex = setupCount };
+					var context = trackedSetupCallback(sequenceSetup);
+					sequenceSetup.Context = context;
 					sequenceSetups.Add(sequenceSetup);
 					terminalTrackedSetup.sequenceSetupsInternal.Add(sequenceSetup);
+
 					return;
 				}
 
