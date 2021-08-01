@@ -82,6 +82,8 @@ namespace Moq
 		}
 
 		private int currentSequenceSetupIndex;
+		private ITrackedSetup<Times> lastSetup;
+
 		/// <summary>
 		/// 
 		/// </summary>
@@ -101,6 +103,11 @@ namespace Moq
 			VerifiableSetup verifiableSetup = null;
 			base.InterceptSetup(setup, (ts, setupOrder) =>
 			{
+				if(lastSetup == ts)
+				{
+					throw new Exception("Consecutive setups are the same");
+				}
+				lastSetup = ts;
 				verifiableSetup = new VerifiableSetup(ts);
 				return t;
 			});

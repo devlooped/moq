@@ -658,6 +658,22 @@ namespace Moq.Tests
 			mockSequence.Verify();
 		}
 
+		[Fact]
+		public void MockSequenceShouldThrowWithConsecutiveSameSetups()
+		{
+			var mock = new Mock<IFoo>();
+			var mockSequence = new NewMockSequence(false, mock);
+			
+			void Setup()
+			{
+				mockSequence.Setup(() => mock.Setup(m => m.Do(1)));
+			}
+
+			Setup();
+			var exception = Assert.Throws<Exception>(Setup);
+			Assert.Equal("Consecutive setups are the same", exception.Message);
+		}
+
 		internal class AMockSequence : MockSequenceBase<int>
 		{
 			public bool StrictFailure { get; set; }
