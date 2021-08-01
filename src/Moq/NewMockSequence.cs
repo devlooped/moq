@@ -9,17 +9,9 @@ namespace Moq
 	/// <summary>
 	/// 
 	/// </summary>
-	public class SequenceVerificationException : Exception
-	{
-
-	}
-
-	/// <summary>
-	/// 
-	/// </summary>
 	public partial class SequenceException : Exception
 	{
-		internal SequenceException(Times times, int executedCount, ISetup setup) : base($"{setup} {times.GetExceptionMessage(executedCount)}") { }
+		internal SequenceException(Times times, int executedCount, ISetup setup = null) : base($"{(setup == null ? "" : $"{setup} ")}{times.GetExceptionMessage(executedCount)}") { }
 	}
 
 	/// <summary>
@@ -54,7 +46,7 @@ namespace Moq
 		/// <param name="times"></param>
 		public void Verify(Times times)
 		{
-			Verify(times, sequenceSetup.ExecutionCount);
+			Verify(times, sequenceSetup.ExecutionCount,sequenceSetup.TrackedSetup.Setup);
 		}
 
 		/// <summary>
@@ -80,15 +72,15 @@ namespace Moq
 
 		private void VerifySequenceSetup(ISequenceSetup<Times> sequenceSetup)
 		{
-			Verify(sequenceSetup.Context, sequenceSetup.ExecutionCount);
+			Verify(sequenceSetup.Context, sequenceSetup.ExecutionCount, sequenceSetup.TrackedSetup.Setup);
 		}
 
-		private void Verify(Times times, int executionCount)
+		private void Verify(Times times, int executionCount, ISetup setup = null)
 		{
 			var success = times.Validate(executionCount);
 			if (!success)
 			{
-				throw new SequenceVerificationException();
+				throw new SequenceException(times, executionCount, setup);
 			}
 		}
 
@@ -133,7 +125,7 @@ namespace Moq
 				var trackedSetup = sequenceSetup.TrackedSetup;
 				if(lastTrackedSetup == trackedSetup)
 				{
-					throw new SequenceException("Consecutive setups are the same");
+					throw new ArgumentException("Consecutive setups are the same",nameof(setup));
 				}
 				lastTrackedSetup = trackedSetup;
 				verifiableSetup = new VerifiableSetup(sequenceSetup);

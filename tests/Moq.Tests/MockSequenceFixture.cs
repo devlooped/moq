@@ -119,6 +119,22 @@ namespace Moq.Tests
 		}
 
 		[Fact]
+		public void MockSequenceBaseShouldThrowIfNoMocksInConstructor()
+		{
+			var exception = Assert.Throws<ArgumentException>(() => new AMockSequence(false));
+			Assert.StartsWith("No mocks", exception.Message);
+		}
+
+		[Fact]
+		public void MockSequenceBaseShouldThrowIfSetupDoesNotSetup()
+		{
+			var mock = new Mock<IFoo>();
+			var sequence = new AMockSequence(false, mock);
+			var exception = Assert.Throws<ArgumentException>(() => sequence.Setup(() => { },_ => 1));
+			Assert.StartsWith("No setup performed", exception.Message);
+		}
+
+		[Fact]
 		public void MockSequenceBaseFindsSetupsFromActions()
 		{
 			var contextCounter = 0;
@@ -578,7 +594,7 @@ namespace Moq.Tests
 			});
 
 			verifiableSetup1.Verify();
-			Assert.Throws<SequenceVerificationException>(() => verifiableSetup2.Verify(Times.Once()));
+			Assert.Throws<SequenceException>(() => verifiableSetup2.Verify(Times.Once()));
 		}
 
 		[Fact]
@@ -599,7 +615,7 @@ namespace Moq.Tests
 			});
 
 			verifiableSetup1.VerifyAll(Times.Once());
-			Assert.Throws<SequenceVerificationException>(() => verifiableSetup2.VerifyAll());
+			Assert.Throws<SequenceException>(() => verifiableSetup2.VerifyAll());
 		}
 
 		[Fact]
@@ -691,8 +707,8 @@ namespace Moq.Tests
 			}
 
 			Setup();
-			var exception = Assert.Throws<SequenceException>(Setup);
-			Assert.Equal("Consecutive setups are the same", exception.Message);
+			var exception = Assert.Throws<ArgumentException>(Setup);
+			Assert.StartsWith("Consecutive setups are the same", exception.Message);
 		}
 
 		internal class AMockSequence : MockSequenceBase<int>

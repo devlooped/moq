@@ -145,7 +145,7 @@ namespace Moq
 		{
 			if(mocks.Length == 0)
 			{
-				throw new SequenceException("No mocks");
+				throw new ArgumentException("No mocks", nameof(mocks));
 			}
 			this.mocks = mocks;
 			this.strict = strict;
@@ -207,7 +207,7 @@ namespace Moq
 
 			}
 
-			throw new SequenceException("No setup");
+			throw new ArgumentException("No setup performed",nameof(setup));
 		}
 
 		private TrackedSetup<TContext> ResolveSetups(IEnumerable<SetupWithDepth> setupsExceptTerminal,SetupWithDepth terminal)
