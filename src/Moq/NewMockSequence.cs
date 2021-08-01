@@ -17,7 +17,7 @@ namespace Moq
 	/// <summary>
 	/// 
 	/// </summary>
-	public class SequenceException : Exception
+	public partial class SequenceException : Exception
 	{
 		internal SequenceException(Times times, int executedCount, ISetup setup) : base($"{setup} {times.GetExceptionMessage(executedCount)}") { }
 	}
@@ -133,7 +133,7 @@ namespace Moq
 				var trackedSetup = sequenceSetup.TrackedSetup;
 				if(lastTrackedSetup == trackedSetup)
 				{
-					throw new Exception("Consecutive setups are the same");
+					throw new SequenceException("Consecutive setups are the same");
 				}
 				lastTrackedSetup = trackedSetup;
 				verifiableSetup = new VerifiableSetup(sequenceSetup);

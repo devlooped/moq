@@ -691,7 +691,7 @@ namespace Moq.Tests
 			}
 
 			Setup();
-			var exception = Assert.Throws<Exception>(Setup);
+			var exception = Assert.Throws<SequenceException>(Setup);
 			Assert.Equal("Consecutive setups are the same", exception.Message);
 		}
 

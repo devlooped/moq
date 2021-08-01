@@ -96,7 +96,16 @@ namespace Moq
 	/// <summary>
 	/// 
 	/// </summary>
-	public class StrictSequenceException : Exception
+	public partial class SequenceException : Exception
+	{
+		internal SequenceException() { }
+		internal SequenceException(string message) : base(message) { }
+	}
+
+	/// <summary>
+	/// 
+	/// </summary>
+	public class StrictSequenceException : SequenceException
 	{
 		/// <summary>
 		/// 
@@ -136,7 +145,7 @@ namespace Moq
 		{
 			if(mocks.Length == 0)
 			{
-				throw new Exception("No mocks");
+				throw new SequenceException("No mocks");
 			}
 			this.mocks = mocks;
 			this.strict = strict;
@@ -198,7 +207,7 @@ namespace Moq
 
 			}
 
-			throw new Exception("No setup");
+			throw new SequenceException("No setup");
 		}
 
 		private TrackedSetup<TContext> ResolveSetups(IEnumerable<SetupWithDepth> setupsExceptTerminal,SetupWithDepth terminal)
