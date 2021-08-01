@@ -529,6 +529,41 @@ namespace Moq.Tests
 		}
 
 		[Fact]
+		public void MockSequenceWillNotThrowWhenSkipOptionalTimesSetups()
+		{
+			LooseNewMockSequenceTestBase((mock, protectedAs, mockSequence) =>
+			{
+				mockSequence.Setup(() => mock.Setup(m => m.Do(1)));
+				mockSequence.Setup(() => protectedAs.Setup(p => p.ProtectedDo(1)), NewMockSequence.OptionalTimes());
+				mockSequence.Setup(() => protectedAs.Setup(p => p.ProtectedDo(2)), NewMockSequence.OptionalTimes());
+				mockSequence.Setup(() => mock.Setup(m => m.Do(2)));
+			}, (mocked, protectedMocked) =>
+			{
+				mocked.Do(1);
+				mocked.Do(2);
+			});
+		}
+
+		[Fact]
+		public void MockSequenceWillThrowWhenSkipNonOptionalTimesSetups()
+		{
+			Assert.Throws<SequenceException>(() =>
+			{
+				LooseNewMockSequenceTestBase((mock, protectedAs, mockSequence) =>
+				{
+					mockSequence.Setup(() => mock.Setup(m => m.Do(1)));
+					mockSequence.Setup(() => protectedAs.Setup(p => p.ProtectedDo(1)), NewMockSequence.OptionalTimes());
+					mockSequence.Setup(() => protectedAs.Setup(p => p.ProtectedDo(2)), Times.Once());
+					mockSequence.Setup(() => mock.Setup(m => m.Do(2)));
+				}, (mocked, protectedMocked) =>
+				{
+					mocked.Do(1);
+					mocked.Do(2);
+				});
+			});
+		}
+
+		[Fact]
 		public void MockSequenceCanUseVerifiableSetupToVerify()
 		{
 			VerifiableSetup verifiableSetup1 = null;

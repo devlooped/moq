@@ -72,7 +72,16 @@ namespace Moq
 	/// </summary>
 	public sealed class NewMockSequence : MockSequenceBase<Times>
 	{
-		private int currentSequenceSetup;
+		/// <summary>
+		/// 
+		/// </summary>
+		/// <returns></returns>
+		public static Times OptionalTimes()
+		{
+			return Times.Between(0, int.MaxValue, Range.Inclusive);
+		}
+
+		private int currentSequenceSetupIndex;
 		/// <summary>
 		/// 
 		/// </summary>
@@ -106,34 +115,53 @@ namespace Moq
 		/// <returns></returns>
 		protected override bool Condition(ITrackedSetup<Times> trackedSetup, int invocationIndex)
 		{
-			var sequenceSetup = SequenceSetups[currentSequenceSetup];
+			var currentSequenceSetup = SequenceSetups[currentSequenceSetupIndex];
 
-			if (sequenceSetup.TrackedSetup == trackedSetup)
+			if (currentSequenceSetup.TrackedSetup == trackedSetup)
 			{
-				ConfirmSequenceSetup(sequenceSetup);
+				ConfirmSequenceSetup(currentSequenceSetup);
 			}
 			else
 			{
-				ConfirmPreviousSequenceSetup(sequenceSetup);
-
-				var nextSequenceSetup = currentSequenceSetup + 1;
-				if (nextSequenceSetup > SequenceSetups.Count)
+				ConfirmSequenceSetupSatisfied(currentSequenceSetup);
+				var nextSequenceSetupIndex = GetNextSequenceSetupIndex(trackedSetup);
+				if(nextSequenceSetupIndex != -1)
 				{
-					//cyclical....
+					ConfirmSequenceSetupsSatisfied(nextSequenceSetupIndex);
+					ConfirmSequenceSetup(SequenceSetups[nextSequenceSetupIndex]);
+					currentSequenceSetupIndex = nextSequenceSetupIndex;
 				}
 				else
 				{
-					currentSequenceSetup++;
-					sequenceSetup = SequenceSetups[currentSequenceSetup];
-					ConfirmSequenceSetup(sequenceSetup);
+					// cyclical
 				}
 			}
-
 
 			return true;
 		}
 
-		private void ConfirmPreviousSequenceSetup(ISequenceSetup<Times> sequenceSetup)
+		private void ConfirmSequenceSetupsSatisfied(int upToIndex)
+		{
+			for (var j = currentSequenceSetupIndex + 1; j < upToIndex; j++)
+			{
+				ConfirmSequenceSetupSatisfied(SequenceSetups[j]);
+			}
+		}
+
+		private int GetNextSequenceSetupIndex(ITrackedSetup<Times> trackedSetup)
+		{
+			for (var i = currentSequenceSetupIndex + 1; i < SequenceSetups.Count; i++)
+			{
+				var sequenceSetup = SequenceSetups[i];
+				if (sequenceSetup.TrackedSetup == trackedSetup)
+				{
+					return i;
+				}
+			}
+			return -1;
+		}
+
+		private void ConfirmSequenceSetupSatisfied(ISequenceSetup<Times> sequenceSetup)
 		{
 			var times = sequenceSetup.Context;
 			var kind = times.GetKind();
@@ -173,7 +201,7 @@ namespace Moq
 				case Times.Kind.Once:
 					if (times.Validate(sequenceSetup.ExecutionCount))
 					{
-						currentSequenceSetup++;
+						currentSequenceSetupIndex++;
 					}
 					break;
 				case Times.Kind.AtLeast:
@@ -204,9 +232,9 @@ namespace Moq
 		/// </summary>
 		protected override void VerifyImpl()
 		{
-			for(var i = currentSequenceSetup; i < SequenceSetups.Count; i++)
+			for(var i = currentSequenceSetupIndex; i < SequenceSetups.Count; i++)
 			{
-				ConfirmPreviousSequenceSetup(SequenceSetups[i]);
+				ConfirmSequenceSetupSatisfied(SequenceSetups[i]);
 			}
 		}
 	}
