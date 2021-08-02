@@ -543,18 +543,17 @@ namespace Moq.Protected
 					}
 					return expression;
 				}
-
-				var requiresExpressionMatch = type.IsAssignableFrom(typeof(MethodCallExpression));
-				if (requiresExpressionMatch && expression.IsMatch(out _))
-				{
-					return expression;
-				}
 				
 				if (IsItRefAny(expression))
 				{
 					return expression;
 				}
-				
+
+				if (expression.IsMatch(out _))
+				{
+					return expression;
+				}
+
 			}
 
 			return Expression.Constant(arg, type);
