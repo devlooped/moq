@@ -499,6 +499,11 @@ namespace Moq.Protected
 			return types;
 		}
 
+		private static bool IsItRefAny(Expression expression)
+		{
+			return ItRefAnyField(expression) != null;
+		}
+
 		private static FieldInfo ItRefAnyField(Expression expr)
 		{
 			FieldInfo itRefAnyField = null;
@@ -528,24 +533,24 @@ namespace Moq.Protected
 
 		private static Expression ToExpressionArg(Type type, object arg)
 		{
-			if (arg is LambdaExpression lambda && !typeof(LambdaExpression).IsAssignableFrom(type))
-			{
-				return lambda.Body;
-			}
-
 			if (arg is Expression expression)
 			{
-				if (!typeof(Expression).IsAssignableFrom(type))
+				if (!type.IsAssignableFrom(expression.GetType()))
 				{
+					if(arg is LambdaExpression lambda)
+					{
+						expression = lambda.Body;
+					}
 					return expression;
 				}
 
-				if (expression.IsMatch(out _))
+				var requiresExpressionMatch = type.IsAssignableFrom(typeof(MethodCallExpression));
+				if (requiresExpressionMatch && expression.IsMatch(out _))
 				{
 					return expression;
 				}
 				
-				if (ItRefAnyField(expression) != null)
+				if (IsItRefAny(expression))
 				{
 					return expression;
 				}
