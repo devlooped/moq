@@ -3,6 +3,7 @@
 
 using System;
 using System.Linq.Expressions;
+
 using Moq.Protected;
 
 using Xunit;
@@ -970,6 +971,7 @@ namespace Moq.Tests
 		public class FooBase
 		{
 			protected virtual ConstantExpression ExpressionProperty { get; set; }
+
 			public void SetExpressionProperty(ConstantExpression expression)
 			{
 				ExpressionProperty = expression;

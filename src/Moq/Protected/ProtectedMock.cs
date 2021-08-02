@@ -467,7 +467,7 @@ namespace Moq.Protected
 				{
 					types[index] = ((MethodCallExpression)expr).Method.ReturnType;
 				}
-				else if(ItRefAnyField(expr) is var itRefAnyField && itRefAnyField != null)
+				else if (ItRefAnyField(expr) is FieldInfo itRefAnyField)
 				{
 					types[index] = itRefAnyField.FieldType.MakeByRefType();
 				}
