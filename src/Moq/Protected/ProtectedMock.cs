@@ -461,7 +461,14 @@ namespace Moq.Protected
 				var expr = args[index] as Expression;
 				if (expr == null)
 				{
-					types[index] = args[index].GetType();
+					if (args[index] is RefOut refOut)
+					{
+						types[index] = refOut.RefType;
+					}
+					else
+					{
+						types[index] = args[index].GetType();
+					}
 				}
 				else if (expr.NodeType == ExpressionType.Call)
 				{
@@ -499,11 +506,6 @@ namespace Moq.Protected
 			return types;
 		}
 
-		private static bool IsItRefAny(Expression expression)
-		{
-			return ItRefAnyField(expression) != null;
-		}
-
 		private static FieldInfo ItRefAnyField(Expression expr)
 		{
 			FieldInfo itRefAnyField = null;
@@ -537,23 +539,23 @@ namespace Moq.Protected
 			{
 				if (!type.IsAssignableFrom(expression.GetType()))
 				{
-					if(arg is LambdaExpression lambda)
+					if (arg is LambdaExpression lambda)
 					{
 						expression = lambda.Body;
 					}
 					return expression;
 				}
 				
-				if (IsItRefAny(expression))
-				{
-					return expression;
-				}
-
 				if (expression.IsMatch(out _))
 				{
 					return expression;
 				}
 
+			}
+
+			if (arg is RefOut refOut)
+			{
+				return Expression.Constant(refOut.Argument);
 			}
 
 			return Expression.Constant(arg, type);

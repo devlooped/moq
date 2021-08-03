@@ -912,6 +912,52 @@ namespace Moq.Tests
 			mocked.SetLambdaExpressionProperty(lambdaExpression2);
 			Assert.Same(lambdaExpression2, setLambdaExpression2);
 
+			MemberExpression callbackExpression = null;
+			protectedMock.Setup("ExpressionRefMethod", ItExpr.Ref<MemberExpression>.IsAny).Callback(new ExecuteRExpressionHandler((ref MemberExpression arg) =>
+			{
+				callbackExpression = arg;
+			}));
+
+			MemberExpression matchExpression = Expression.Field(null, typeof(FooBase), nameof(FooBase.FieldForReflection));
+			mocked.DoExpressionRefMethod(ref matchExpression);
+			Assert.Same(matchExpression, callbackExpression);
+		}
+
+		[Fact]
+		public void SetupShouldWorkWithRefOutParameters()
+		{
+			var fooBaseMatch = new FooBase { Id = 1 };
+			var refReplacementFooBase = new FooBase();
+			var notFooBaseMatch = new FooBase();
+			var outFooBase = new FooBase { Id = 3 };
+			var nonOutFooBase = new FooBase();
+
+			var mock = new Mock<MethodOverloads>(MockBehavior.Strict);
+			var mocked = mock.Object;
+			mock.Protected().Setup("OverloadedByRefMethod", RefOut.Arg(fooBaseMatch)).Callback(new ExecuteRHandler((ref FooBase arg) =>
+			{
+				arg = refReplacementFooBase;
+			}));
+			Assert.Throws<MockException>(() => mocked.ExecuteOverloadedRefMethod(ref notFooBaseMatch));
+			mocked.ExecuteOverloadedRefMethod(ref fooBaseMatch);
+			Assert.Same(refReplacementFooBase, fooBaseMatch);
+
+			// non ref overload
+			mock.Protected().Setup("OverloadedByRefMethod", fooBaseMatch);
+			Assert.Throws<MockException>(() => mocked.ExecuteOverloadedNonRefMethod(notFooBaseMatch));
+			mocked.ExecuteOverloadedNonRefMethod(fooBaseMatch);
+
+			// eagerly evaluates
+			mock.Protected().Setup("OverloadedByOutMethod", RefOut.Arg(outFooBase));
+			var expectedOriginalId = outFooBase.Id;
+			outFooBase = fooBaseMatch;
+			mocked.ExecuteOverloadedOutMethod(out var actualOut);
+			Assert.Equal(expectedOriginalId, actualOut.Id);
+
+			// non out overload
+			mock.Protected().Setup("OverloadedByOutMethod", nonOutFooBase);
+			Assert.Throws<MockException>(() => mocked.ExecuteOverloadedNonOutMethod(new FooBase()));
+			mocked.ExecuteOverloadedNonOutMethod(nonOutFooBase);
 		}
 
 		public class ExpectedException : Exception
@@ -920,8 +966,31 @@ namespace Moq.Tests
 			public static ExpectedException Instance => instance;
 		}
 
+		public delegate void ExecuteRHandler(ref FooBase arg);
+		public delegate void ExecuteRExpressionHandler(ref MemberExpression arg);
+
 		public class MethodOverloads
 		{
+			public void ExecuteOverloadedRefMethod(ref FooBase arg)
+			{
+				OverloadedByRefMethod(ref arg);
+			}
+
+			public void ExecuteOverloadedNonRefMethod(FooBase arg)
+			{
+				OverloadedByRefMethod(arg);
+			}
+
+			public void ExecuteOverloadedOutMethod(out FooBase arg)
+			{
+				OverloadedByOutMethod(out arg);
+			}
+
+			public void ExecuteOverloadedNonOutMethod(FooBase arg)
+			{
+				OverloadedByOutMethod(arg);
+			}
+
 			public void ExecuteDo(int a, int b)
 			{
 				this.Do(a, b);
@@ -1013,12 +1082,28 @@ namespace Moq.Tests
 			{
 				return null;
 			}
+
+			protected virtual void OverloadedByRefMethod(FooBase arg) { }
+
+			protected virtual void OverloadedByRefMethod(ref FooBase arg) { }
+
+			protected virtual void OverloadedByOutMethod(FooBase arg) { }
+
+			protected virtual void OverloadedByOutMethod(out FooBase arg)
+			{
+				arg = default;
+			}
 		}
 
 		public class FooBase
 		{
 			public static void MethodForReflection() { }
 			public static void MethodForReflection2() { }
+
+			public static int FieldForReflection;
+
+			public int Id { get; set; }
+
 			protected virtual Expression ExpressionProperty { get; set; }
 
 			public void SetExpressionProperty(Expression expression)
@@ -1045,6 +1130,13 @@ namespace Moq.Tests
 			public void SetLambdaExpressionProperty(LambdaExpression expression)
 			{
 				LambdaExpressionProperty = expression;
+			}
+
+			protected virtual void ExpressionRefMethod(ref MemberExpression expression) { }
+
+			public void DoExpressionRefMethod(ref MemberExpression expression)
+			{
+				ExpressionRefMethod(ref expression);
 			}
 
 			public virtual string PublicValue { get; set; }
