@@ -15,6 +15,7 @@ and `Setup(x => x.GetFooAsync(It.IsAny<string>()).Result).Throws((string s) => n
 
 #### Fixed
 
+* mock.Protected() setup methods fail when argument is of type Expression (@tonyhallett, #1189)
 * Parameter is invalid in Protected().SetupSet() ... VerifySet (@tonyhallett, #1186)
 
 * Virtual properties and automocking not working for `mock.Protected().As<>()` (@tonyhallett, #1185)
