@@ -4,7 +4,6 @@
 using System;
 using System.Collections.Generic;
 using System.Linq.Expressions;
-using System.Reflection;
 
 using Moq.Protected;
 
@@ -238,8 +237,6 @@ namespace Moq.Tests
 		[Fact]
 		public void SetupResultShouldWorkWithIndexersByName()
 		{
-			// Already works if supply as a method get_Item
-
 			var mock = new Mock<FooBase>();
 			mock.Protected().Setup<int>(FooBase.IndexerName, new object[] { 1 }).Returns(2);
 
@@ -254,10 +251,9 @@ namespace Moq.Tests
 		public void SetUpResultShouldWorkWithIndexersByNameWithNonExactParameterMatching()
 		{
 			var mock = new Mock<FooBase>();
-			Assert.Throws<ArgumentException>(() => mock.Protected().Setup<int>(FooBase.IndexerName, true, new object[] { ItExpr.IsAny<IndexerClass>() }));
+			Assert.Throws<ArgumentException>(() => mock.Protected().Setup<int>(FooBase.IndexerName, true, new object[] { ItExpr.IsAny<MyDerived>() }));
 
-			mock.Protected().Setup<int>(FooBase.IndexerName, false, new object[] { ItExpr.IsAny<IndexerClass>() }).Returns(123);
-			Assert.Equal(123, mock.Object.GetInterfaceIndexer(new IndexerClass()));
+			mock.Protected().Setup<int>(FooBase.IndexerName, false, new object[] { ItExpr.IsAny<MyDerived>() }).Returns(123);
 		}
 
 		[Fact]
@@ -398,7 +394,6 @@ namespace Moq.Tests
 			Assert.Equal("indexerName", argumentException.ParamName);
 			Assert.StartsWith("Parameter indexerName is not the name of an indexer.", argumentException.Message);
 		}
-		//
 
 		[Fact]
 		public void ThrowsIfSetupSetNullPropertyName()
@@ -480,7 +475,6 @@ namespace Moq.Tests
 			mock.VerifyAll();
 		}
 
-		#region SetUpSet without TProperty - does not ignore Value parameter and supports indexers
 		[Fact]
 		public void SetUpSetDoesNotIgnoreValueParameter()
 		{
@@ -523,8 +517,6 @@ namespace Moq.Tests
 			Assert.Throws<ExpectedException>(() => mock.Object.SetMultipleIndexer(999, "throws", 999));
 			mock.Object.SetMultipleIndexer(123, "No throw", 1);
 		}
-
-		#endregion
 
 		[Fact]
 		public void SetupSetSupportsIndexers()
@@ -940,6 +932,7 @@ namespace Moq.Tests
 			mock.Object.GetIndexer(1);
 			Verify(Times.Once());
 		}
+		
 		[Fact]
 		public void ThrowsIfVerifyGetNullPropertyName()
 		{
@@ -1513,17 +1506,7 @@ namespace Moq.Tests
 				return null;
 			}
 		}
-
-		public interface IIndexerInterface
-		{
-
-		}
-
-		public class IndexerClass : IIndexerInterface
-		{
-
-		}
-
+		
 		public class FooBase
 		{
 			public static void MethodForReflection() { }
@@ -1617,15 +1600,10 @@ namespace Moq.Tests
 			}
 
 			[System.Runtime.CompilerServices.IndexerName(IndexerName)]
-			protected virtual int this[IIndexerInterface index]
+			protected virtual int this[MyBase index]
 			{
 				get { return 0; }
 				set { }
-			}
-
-			public int GetInterfaceIndexer(IIndexerInterface index)
-			{
-				return this[index];
 			}
 
 			public void DoProtected()
