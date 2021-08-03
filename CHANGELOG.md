@@ -10,9 +10,12 @@ The format is loosely based on [Keep a Changelog](http://keepachangelog.com/en/1
 #### Added
 
 * `SetupSet`, `VerifySet` methods for `mock.Protected().As<>()` (@tonyhallett, #1165)
+* New `Throws` method overloads that allow specifying a function with or without paramaters, to provide an exception, for example `.Throws(() => new InvalidOperationException())`
+and `Setup(x => x.GetFooAsync(It.IsAny<string>()).Result).Throws((string s) => new InvalidOperationException(s))`. (@adam-knights, #1191)
 
 #### Fixed
 
+* mock.Protected() setup methods fail when argument is of type Expression (@tonyhallett, #1189)
 * Parameter is invalid in Protected().SetupSet() ... VerifySet (@tonyhallett, #1186)
 
 * Virtual properties and automocking not working for `mock.Protected().As<>()` (@tonyhallett, #1185)

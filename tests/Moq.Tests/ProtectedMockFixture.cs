@@ -3,7 +3,9 @@
 
 using System;
 using System.Collections.Generic;
+using System.Linq.Expressions;
 using System.Reflection;
+
 using Moq.Protected;
 
 using Xunit;
@@ -1353,6 +1355,70 @@ namespace Moq.Tests
 			Assert.Equal(exactArray, exactSetValue);
 		}
 
+		[Fact]
+		public void SetupShouldWorkWithExpressionTypes()
+		{
+			var mock = new Mock<FooBase>();
+			var mocked = mock.Object;
+			var protectedMock = mock.Protected();
+
+			var expression = Expression.Constant(1);
+			Expression setExpression1 = null;
+			protectedMock.SetupSet<Expression>("ExpressionProperty", expression).Callback(expr => setExpression1 = expr);
+			mocked.SetExpressionProperty(expression);
+			Assert.Same(expression, setExpression1);
+
+			var expression2 = Expression.Constant(2);
+			Expression setExpression2 = null;
+			protectedMock.SetupSet<Expression>("ExpressionProperty", ItExpr.Is<ConstantExpression>(e => (int)e.Value == 2)).Callback(expr => setExpression2 = expr);
+			mocked.SetExpressionProperty(expression2);
+			Assert.Same(expression2, setExpression2);
+
+			var constantExpression = Expression.Constant(1);
+			ConstantExpression setConstantExpression = null;
+			protectedMock.SetupSet<ConstantExpression>("NotAMatcherExpressionProperty", constantExpression).Callback(expr => setConstantExpression = expr);
+			mocked.SetNotAMatcherExpressionProperty(constantExpression);
+			Assert.Same(constantExpression, setConstantExpression);
+
+			var constantExpression2 = Expression.Constant(2);
+			ConstantExpression setConstantExpression2 = null;
+			protectedMock.SetupSet<ConstantExpression>("NotAMatcherExpressionProperty", ItExpr.Is<ConstantExpression>(e => (int)e.Value == 2)).Callback(expr => setConstantExpression2 = expr);
+			mocked.SetNotAMatcherExpressionProperty(constantExpression2);
+			Assert.Same(constantExpression2, setConstantExpression2);
+
+			var method = typeof(FooBase).GetMethod(nameof(FooBase.MethodForReflection));
+			var methodCallExpression = Expression.Call(method);
+			MethodCallExpression setMethodCallExpression = null;
+			protectedMock.SetupSet<MethodCallExpression>("MatcherExpressionProperty", methodCallExpression).Callback(expr => setMethodCallExpression = expr);
+			mocked.SetMatcherExpressionProperty(methodCallExpression);
+			Assert.Same(methodCallExpression, setMethodCallExpression);
+
+			var methodCallExpression2 = Expression.Call(typeof(FooBase).GetMethod(nameof(FooBase.MethodForReflection2)));
+			MethodCallExpression setMethodCallExpression2 = null;
+			protectedMock.SetupSet<MethodCallExpression>("MatcherExpressionProperty", ItExpr.Is<MethodCallExpression>(e => e.Method != method)).Callback(expr => setMethodCallExpression2 = expr);
+			mocked.SetMatcherExpressionProperty(methodCallExpression2);
+			Assert.Same(methodCallExpression2, setMethodCallExpression2);
+
+			Expression<Func<int, bool>> lambdaExpression = i => i < 5;
+			LambdaExpression setLambdaExpression = null;
+			protectedMock.SetupSet<LambdaExpression>("LambdaExpressionProperty", lambdaExpression).Callback(expr => setLambdaExpression = expr);
+			mocked.SetLambdaExpressionProperty(lambdaExpression);
+			Assert.Same(lambdaExpression, setLambdaExpression);
+
+			Expression<Func<int, int>> lambdaExpression2 = i => i;
+			LambdaExpression setLambdaExpression2 = null;
+			protectedMock.SetupSet<LambdaExpression>("LambdaExpressionProperty", ItExpr.Is<LambdaExpression>(e => e == lambdaExpression2)).Callback(expr => setLambdaExpression2 = expr);
+			mocked.SetLambdaExpressionProperty(lambdaExpression2);
+			Assert.Same(lambdaExpression2, setLambdaExpression2);
+
+		}
+
+		public class ExpectedException : Exception
+		{
+			private static ExpectedException instance = new ExpectedException();
+			public static ExpectedException Instance => instance;
+		}
+
 		public class MethodOverloads
 		{
 			public void ExecuteDo(int a, int b)
@@ -1460,6 +1526,36 @@ namespace Moq.Tests
 
 		public class FooBase
 		{
+			public static void MethodForReflection() { }
+			public static void MethodForReflection2() { }
+			protected virtual Expression ExpressionProperty { get; set; }
+
+			public void SetExpressionProperty(Expression expression)
+			{
+				ExpressionProperty = expression;
+			}
+
+			protected virtual ConstantExpression NotAMatcherExpressionProperty { get; set; }
+
+			public void SetNotAMatcherExpressionProperty(ConstantExpression expression)
+			{
+				NotAMatcherExpressionProperty = expression;
+			}
+
+			protected virtual MethodCallExpression MatcherExpressionProperty { get; set; }
+
+			public void SetMatcherExpressionProperty(MethodCallExpression expression)
+			{
+				MatcherExpressionProperty = expression;
+			}
+
+			protected virtual LambdaExpression LambdaExpressionProperty { get; set; }
+			
+			public void SetLambdaExpressionProperty(LambdaExpression expression)
+			{
+				LambdaExpressionProperty = expression;
+			}
+
 			public virtual string PublicValue { get; set; }
 
 			protected internal virtual string ProtectedInternalValue { get; set; }
@@ -1671,12 +1767,5 @@ namespace Moq.Tests
 		public class MyBase { }
 
 		public class MyDerived : MyBase { }
-
-		public class ExpectedException : Exception
-		{
-			private static ExpectedException expectedException = new ExpectedException();
-			public static ExpectedException Instance => expectedException;
-		}
-
 	}
 }

@@ -96,6 +96,16 @@
 			<DependentUpon>IReturns.tt</DependentUpon>
 		</Compile>
 
+		<None Update="Language\IThrows.tt">
+			<Generator>TextTemplatingFileGenerator</Generator>
+			<LastGenOutput>IThrows.Generated.cs</LastGenOutput>
+		</None>
+		<Compile Update="Language\IThrows.Generated.cs">
+			<AutoGen>True</AutoGen>
+			<DesignTime>True</DesignTime>
+			<DependentUpon>IThrows.tt</DependentUpon>
+		</Compile>
+
 		<None Update="ReturnsExtensions.tt">
 			<Generator>TextTemplatingFileGenerator</Generator>
 			<LastGenOutput>ReturnsExtensions.Generated.cs</LastGenOutput>

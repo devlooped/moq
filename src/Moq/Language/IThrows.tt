@@ -1,4 +1,4 @@
-<#@ template debug="false" hostspecific="false" language="C#" #>
+﻿<#@ template debug="false" hostspecific="false" language="C#" #>
 <#@ output extension=".Generated.cs" #>
 <#@ Assembly Name="System.Core" #>
 <#@ Import Namespace="System.Linq" #>
@@ -11,7 +11,7 @@ using Moq.Language.Flow;
 
 namespace Moq.Language
 {
-	partial interface IReturns<TMock, TResult>
+	partial interface IThrows
 	{ <#
 for (var typeCount = 2; typeCount <= GenericTypeMax; typeCount++)
 {
@@ -19,7 +19,7 @@ for (var typeCount = 2; typeCount <= GenericTypeMax; typeCount++)
 #>
 
 		/// <summary>
-		/// Specifies a function that will calculate the value to return from the method, 
+		/// Specifies a function that will calculate the exception to throw when the method is invoked, 
 		/// retrieving the arguments for the invocation.
 		/// </summary>
 <#
@@ -30,11 +30,11 @@ for (var typeCount = 2; typeCount <= GenericTypeMax; typeCount++)
 <#
 	}
 #>
-		/// <param name="valueFunction">The function that will calculate the return value.</param>
-		/// <return>Returns a calculated value which is evaluated lazily at the time of the invocation.</return>
+		/// <typeparam name="TException">Type of exception that will be calculated and thrown when the setup is matched.</typeparam>
+		/// <param name="exceptionFunction">The function that will calculate the exception to be thrown.</param>
 		/// <example>
 		/// <para>
-		/// The return value is calculated from the value of the actual method invocation arguments. 
+		/// The thrown exception is calculated from the value of the actual method invocation arguments. 
 		/// Notice how the arguments are retrieved by simply declaring them as part of the lambda 
 		/// expression:
 		/// </para>
@@ -44,15 +44,15 @@ for (var typeCount = 2; typeCount <= GenericTypeMax; typeCount++)
 	for (var typeIndex = 1; typeIndex < typeCount; typeIndex++)
 	{
 #>
-		///                      It.IsAny&lt;int&gt;(), 
+		///                      It.IsAny&lt;string&gt;(), 
 <#
 	}
 #>
-		///                      It.IsAny&lt;int&gt;()))
-		///     .Returns((<#= GetGenericList(typeCount, "int arg{0}") #>) => <#= GetGenericList(typeCount, "arg{0}", " + ") #>);
+		///                      It.IsAny&lt;string&gt;()))
+		///     .Throws((<#= GetGenericList(typeCount, "string arg{0}") #>) => new Exception(<#= GetGenericList(typeCount, "arg{0}", " + ") #>));
 		/// </code>
 		/// </example>
-		IReturnsResult<TMock> Returns<<#= typeList #>>(Func<<#= typeList #>, TResult> valueFunction);
+		IThrowsResult Throws<<#= typeList #>, TException>(Func<<#= typeList #>, TException> exceptionFunction) where TException : Exception;
 <#
 }
 #>

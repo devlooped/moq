@@ -55,5 +55,20 @@ namespace Moq.Language
 		/// </code>
 		/// </example>
 		ISetupSequentialAction Throws(Exception exception);
+
+		/// <summary>
+		/// Configures the next call in the sequence to throw a calculated exception.
+		/// </summary>
+		/// <example>
+		/// The following code configures the first call to <c>Execute()</c>
+		/// to do nothing, and the second call to throw a calculated exception.
+		/// <code>
+		/// mock.SetupSequence(m => m.Execute())
+		///    .Pass()
+		///    .Throws(() => new InvalidOperationException());
+		/// </code>
+		/// </example>
+		ISetupSequentialAction Throws<TException>(Func<TException> exceptionFunction)
+			where TException : Exception;
 	}
 }
