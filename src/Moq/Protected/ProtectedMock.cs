@@ -31,7 +31,7 @@ namespace Moq.Protected
 		{
 			return new ProtectedAsMock<T, TAnalog>(mock);
 		}
-		
+
 		#region Setup
 
 		public ISetup<T> Setup(string methodName, params object[] args)
@@ -84,7 +84,7 @@ namespace Moq.Protected
 
 			return this.InternalSetup<TResult>(methodName, genericTypeArguments, exactParameterMatch, args);
 		}
-		
+
 		private ISetup<T, TResult> InternalSetup<TResult>(string methodName, Type[] genericTypeArguments,
 			bool exactParameterMatch, params object[] args)
 		{
