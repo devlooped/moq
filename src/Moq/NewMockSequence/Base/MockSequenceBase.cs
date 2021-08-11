@@ -194,7 +194,12 @@ namespace Moq
 		/// </summary>
 		public void VerifyNoOtherCalls()
 		{
-			var invocationsWithoutSequenceSetup = SequenceInvocations.Where(si => si.Invocation.MatchingSetup == null).ToList();
+			var invocationsWithoutSequenceSetup = SequenceInvocations.Where(si =>
+			{
+				var matchingSetup = si.Invocation.MatchingSetup;
+				return matchingSetup == null || !allSetups.Any(s => s == matchingSetup);
+			}).ToList();
+
 			if (invocationsWithoutSequenceSetup.Count > 0)
 			{
 				throw new SequenceException($"Expected no invocations without sequence setup but found {invocationsWithoutSequenceSetup.Count}");

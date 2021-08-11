@@ -188,14 +188,27 @@ namespace Moq.Tests
 		public void MockSequenceBaseLooseVerifyNoOtherCallsShouldThrowIfInvocationsWithoutSequenceSetups()
 		{
 			var mock = new Mock<IFoo>();
+			mock.Setup(m => m.Do(1));
+
 			var mockSequence = new AMockSequence(false, mock);
 			mockSequence.Setup(() => mock.Setup(m => m.Do(2)));
-			
+
+			mock.Object.Do(2);
 			mockSequence.VerifyNoOtherCalls();
 			
 			mock.Object.Do(1);
 
 			var exception = Assert.Throws<SequenceException>(() => mockSequence.VerifyNoOtherCalls());
+			Assert.Equal("Expected no invocations without sequence setup but found 1", exception.Message);
+
+			var mockSequence2 = new AMockSequence(false, mock);
+			mock.Object.Do(0);
+			Assert.Equal("Expected no invocations without sequence setup but found 1", exception.Message);
+
+			var nestedMock = new Mock<IHaveNested>();
+			var mockSequence3 = new AMockSequence(false, nestedMock);
+			mockSequence3.Setup(() => nestedMock.Setup(m => m.ReturnNested(1).DoNested(1)));
+			nestedMock.Object.ReturnNested(1).DoNested(0);
 			Assert.Equal("Expected no invocations without sequence setup but found 1", exception.Message);
 		}
 
