@@ -54,9 +54,11 @@ namespace Moq
 		// todo - for MockAs get duplicate events
 		private void SequenceInvocationListener_NewInvocationEvent(object sender, SequenceInvocation sequenceInvocation)
 		{
-			var invocation = sequenceInvocation.InvocationInternal;
+			if (strict)
+			{
+				var invocation = sequenceInvocation.InvocationInternal;
 
-			var noMatch = !allSetups.Any(setup =>
+				var noMatch = !allSetups.Any(setup =>
 				{
 					var isMatch = false;
 					// second condition for mock.As
@@ -66,13 +68,12 @@ namespace Moq
 					}
 					return isMatch;
 				});
-			if (noMatch)
-			{
-				if (strict)
+				
+				if (noMatch)
 				{
 					StrictnessFailure(sequenceInvocation);
+
 				}
-				
 			}
 			
 		}
