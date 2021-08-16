@@ -1077,7 +1077,16 @@ namespace Moq.Tests
 					base.StrictnessFailure(unmatchedInvocation);
 				}
 			}
-			
+
+			protected override DefaultSequenceSetup CreateSequenceSetup()
+			{
+				return new DefaultSequenceSetup();
+			}
+
+			protected override DefaultInvocationShapeSetups CreateInvocationShapeSetups(DefaultSequenceSetup sequenceSetup)
+			{
+				return new DefaultInvocationShapeSetups(sequenceSetup);
+			}
 		}
 
 		public interface IHaveNested

@@ -210,5 +210,24 @@ namespace Moq
 				ConfirmSequenceSetupSatisfied(SequenceSetups[i]);
 			}
 		}
+
+		/// <summary>
+		/// 
+		/// </summary>
+		/// <returns></returns>
+		protected sealed override CyclicalTimesSequenceSetup CreateSequenceSetup()
+		{
+			return new CyclicalTimesSequenceSetup();
+		}
+
+		/// <summary>
+		/// 
+		/// </summary>
+		/// <param name="sequenceSetup"></param>
+		/// <returns></returns>
+		protected sealed override CyclicalInvocationShapeSetups CreateInvocationShapeSetups(CyclicalTimesSequenceSetup sequenceSetup)
+		{
+			return new CyclicalInvocationShapeSetups(sequenceSetup);
+		}
 	}
 }

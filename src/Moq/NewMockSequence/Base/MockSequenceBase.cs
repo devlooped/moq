@@ -107,7 +107,20 @@ namespace Moq
 
 			throw new ArgumentException("No setup performed",nameof(setup));
 		}
-		
+
+		/// <summary>
+		/// 
+		/// </summary>
+		/// <returns></returns>
+		protected abstract TSequenceSetup CreateSequenceSetup();
+
+		/// <summary>
+		/// 
+		/// </summary>
+		/// <param name="sequenceSetup"></param>
+		/// <returns></returns>
+		protected abstract TInvocationShapeSetups CreateInvocationShapeSetups(TSequenceSetup sequenceSetup);
+
 		private void InitializeSequenceSetup(TSequenceSetup sequenceSetup)
 		{
 			sequenceSetups.Add(sequenceSetup);
@@ -118,7 +131,7 @@ namespace Moq
 		
 		private TSequenceSetup CreateSequenceSetup(Setup setup)
 		{
-			var sequenceSetup = (TSequenceSetup)Activator.CreateInstance(typeof(TSequenceSetup));
+			var sequenceSetup = CreateSequenceSetup();
 			sequenceSetup.SetupIndex = setupCount;
 			sequenceSetup.SetupInternal = setup;
 			
@@ -131,7 +144,7 @@ namespace Moq
 			var invocationShapeSetups = allInvocationShapeSetups.SingleOrDefault(ts => ts.InvocationShape.Equals(invocationShape));
 			if (invocationShapeSetups == null)
 			{
-				invocationShapeSetups = (TInvocationShapeSetups) Activator.CreateInstance(typeof( TInvocationShapeSetups),newSequenceSetup);
+				invocationShapeSetups = CreateInvocationShapeSetups(newSequenceSetup);
 				allInvocationShapeSetups.Add(invocationShapeSetups);
 			}
 			else
