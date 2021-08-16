@@ -51,7 +51,6 @@ namespace Moq
 			sequenceInvocationListener.ListenForInvocations();
 		}
 
-		// todo - for MockAs get duplicate events
 		private void SequenceInvocationListener_NewInvocationEvent(object sender, SequenceInvocation sequenceInvocation)
 		{
 			if (strict)
@@ -72,7 +71,6 @@ namespace Moq
 				if (noMatch)
 				{
 					StrictnessFailure(sequenceInvocation);
-
 				}
 			}
 			

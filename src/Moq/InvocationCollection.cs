@@ -10,6 +10,7 @@ namespace Moq
 {
 	internal sealed class InvocationCollection : IInvocationList
 	{
+		public event EventHandler<Invocation> NewInvocationEvent;
 		private Invocation[] invocations;
 
 		private int capacity = 0;
@@ -65,7 +66,7 @@ namespace Moq
 
 				this.invocations[this.count] = invocation;
 				this.count++;
-				owner.AddedInvocation(invocation);
+				NewInvocationEvent?.Invoke(this, invocation);
 			}
 		}
 

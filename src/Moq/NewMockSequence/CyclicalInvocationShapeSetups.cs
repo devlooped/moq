@@ -33,7 +33,7 @@ namespace Moq
 
 		internal int TotalExecutions()
 		{
-			return SequenceSetups.Sum(ss => ss.TotalExecutionCount);
+			return SequenceSetups.Sum(ss => ss.TotalInvocationCount);
 		}
 
 		// first that comes after or the first setup

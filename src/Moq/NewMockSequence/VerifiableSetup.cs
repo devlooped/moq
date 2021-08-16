@@ -18,7 +18,7 @@ namespace Moq
 			get
 			{
 				var cyclicalExecutionCount = new List<int>(sequenceSetup.CompletedCyclicalExecutionCount);
-				cyclicalExecutionCount.Add(sequenceSetup.ExecutionCount);
+				cyclicalExecutionCount.Add(sequenceSetup.InvocationCount);
 				return cyclicalExecutionCount;
 			}
 		}
@@ -42,7 +42,7 @@ namespace Moq
 
 		private void VerifySequenceSetup(CyclicalTimesSequenceSetup sequenceSetup)
 		{
-			Verify(sequenceSetup.Times, sequenceSetup.ExecutionCount, sequenceSetup.Setup);
+			Verify(sequenceSetup.Times, sequenceSetup.InvocationCount, sequenceSetup.Setup);
 		}
 
 		/// <summary>
@@ -51,7 +51,7 @@ namespace Moq
 		/// <param name="times"></param>
 		public void Verify(Times times)
 		{
-			Verify(times, sequenceSetup.TotalExecutionCount, sequenceSetup.Setup);
+			Verify(times, sequenceSetup.TotalInvocationCount, sequenceSetup.Setup);
 		}
 
 		/// <summary>

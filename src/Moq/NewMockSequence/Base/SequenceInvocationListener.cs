@@ -10,7 +10,7 @@ namespace Moq
 	internal class SequenceInvocationListener
 	{
 		public event EventHandler<SequenceInvocation> NewInvocationEvent;
-		private readonly List<Mock> listenedToMocks = new List<Mock>();
+		private readonly List<InvocationCollection> listenedToMocks = new List<InvocationCollection>();
 		private readonly Mock[] mocks;
 		internal List<SequenceInvocation> SequenceInvocations { get; } = new List<SequenceInvocation>();
 
@@ -35,10 +35,13 @@ namespace Moq
 		private void ListenForInvocation(Mock mock)
 		{
 			ListenForInvocations(mock.MutableSetups.Where(s => s.InnerMock != null).Select(s => s.InnerMock));
-			if (!listenedToMocks.Contains(mock))
+			if (!listenedToMocks.Contains(mock.MutableInvocations))
 			{
-				mock.AddInvocationListener(invocation => NewInvocation(new SequenceInvocation(mock, invocation)));
-				listenedToMocks.Add(mock);
+				mock.MutableInvocations.NewInvocationEvent += (object sender, Invocation invocation) =>
+				{
+					NewInvocation(new SequenceInvocation(mock, invocation));
+				};
+				listenedToMocks.Add(mock.MutableInvocations);
 			}
 		}
 
@@ -46,7 +49,6 @@ namespace Moq
 		{
 			SequenceInvocations.Add(sequenceInvocation);
 			NewInvocationEvent?.Invoke(this, sequenceInvocation);
-
 		}
 
 	}
