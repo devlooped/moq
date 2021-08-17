@@ -294,7 +294,6 @@ namespace Moq
 
 		public void SetThrowComputedExceptionBehavior(Delegate exceptionFactory)
 		{
-			Debug.Assert(this.Method.ReturnType != typeof(void));
 			Debug.Assert(this.returnOrThrow == null);
 
 			if (exceptionFactory == null)
