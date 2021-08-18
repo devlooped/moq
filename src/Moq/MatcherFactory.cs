@@ -137,6 +137,15 @@ namespace Moq
 				return new Pair<IMatcher, Expression>(matchExpression.Match, matchExpression);
 			}
 
+			// add support for https://github.com/moq/moq4/issues/1199
+			if (expression is MemberExpression memberExpression)
+			{
+				if (memberExpression.Member.IsDefined(typeof(AnyValueAttribute), inherit: true))
+				{
+					return BuildMatchPair(originalExpression);
+				}
+			}
+
 			if (expression is MethodCallExpression call)
 			{
 				if (expression.IsMatch(out var match))
@@ -179,6 +188,18 @@ namespace Moq
 
 			throw new NotSupportedException(
 				string.Format(CultureInfo.CurrentCulture, Resources.UnsupportedExpression, originalExpression));
+		}
+
+		// There is probably a better way to do this, but I'm not super familiar with all the Moq internals
+		private static Pair<IMatcher, Expression> BuildMatchPair(Expression expression)
+		{
+			using (var observer = MatcherObserver.Activate())
+			{
+				var methodCallExpr = It.IsAny(expression.Type);
+				Expression.Lambda<Action>(methodCallExpr).CompileUsingExpressionCompiler().Invoke();
+				observer.TryGetLastMatch(out Match match);
+				return new Pair<IMatcher, Expression>(match, expression);
+			}
 		}
 	}
 }
