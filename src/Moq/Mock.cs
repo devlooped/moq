@@ -386,7 +386,7 @@ namespace Moq
 
 			var unverifiedInvocations = mock.MutableInvocations.ToArray(invocation => !invocation.IsVerified);
 
-			var innerMockSetups = mock.MutableSetups.GetInnerMockSetups();
+			var innerMocks = mock.MutableSetups.FindAllInnerMocks();
 
 			if (unverifiedInvocations.Any())
 			{
@@ -395,7 +395,7 @@ namespace Moq
 				// to verify `X`. If that succeeds, it's reasonable to expect that `m.A`, `m.A.B`, and
 				// `m.A.B.C` have implicitly been verified as well. Below, invocations such as those to
 				// the left of `X` are referred to as "transitive" (for lack of a better word).
-				if (innerMockSetups.Any())
+				if (innerMocks.Any())
 				{
 					for (int i = 0, n = unverifiedInvocations.Length; i < n; ++i)
 					{
@@ -421,9 +421,9 @@ namespace Moq
 
 			// Perform verification for all automatically created sub-objects (that is, those
 			// created by "transitive" invocations):
-			foreach (var inner in innerMockSetups)
+			foreach (var innerMock in innerMocks)
 			{
-				VerifyNoOtherCalls(inner.InnerMock, verifiedMocks);
+				VerifyNoOtherCalls(innerMock, verifiedMocks);
 			}
 		}
 

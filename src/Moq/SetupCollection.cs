@@ -148,11 +148,6 @@ namespace Moq
 			return null;
 		}
 
-		public IEnumerable<Setup> GetInnerMockSetups()
-		{
-			return this.FindAll(setup => !setup.IsConditional && setup.InnerMock != null);
-		}
-
 		public void Reset()
 		{
 			lock (this.setups)
