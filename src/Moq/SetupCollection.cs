@@ -164,21 +164,17 @@ namespace Moq
 			}
 		}
 
-		public IReadOnlyList<Setup> ToArray()
+		public IEnumerator<ISetup> GetEnumerator()
 		{
 			lock (this.setups)
 			{
-				return this.setups.ToArray();
+				IEnumerable<Setup> array = this.setups.ToArray();
+				//                                    ^^^^^^^^^^
+				// TODO: This is somewhat inefficient. We could avoid this array allocation by converting
+				// this class to something like `InvocationCollection`, however this won't be trivial due to
+				// the presence of a removal operation in `RemoveAllPropertyAccessorSetups`.
+				return array.GetEnumerator();
 			}
-		}
-
-		public IEnumerator<ISetup> GetEnumerator()
-		{
-			return this.ToArray().GetEnumerator();
-			//         ^^^^^^^^^^
-			// TODO: This is somewhat inefficient. We could avoid this array allocation by converting
-			// this class to something like `InvocationCollection`, however this won't be trivial due to
-			// the presence of a removal operation in `RemoveAllPropertyAccessorSetups`.
 		}
 
 		IEnumerator IEnumerable.GetEnumerator() => this.GetEnumerator();
