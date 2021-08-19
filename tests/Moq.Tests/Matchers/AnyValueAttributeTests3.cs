@@ -82,6 +82,29 @@ namespace Moq.Tests.Matchers.AnyValueAttribute3
 		int DoSomething(ICar a, GearId b, int c);
 	}
 
+	public class Car : ICar
+	{
+		public int Calc(int a, int b, int c, int d)
+		{
+			throw new NotImplementedException();
+		}
+
+		public int DoSomething(ICar a, GearId b, int c)
+		{
+			throw new NotImplementedException();
+		}
+
+		public int Echo(int a)
+		{
+			throw new NotImplementedException();
+		}
+
+		public int Race(ICar a)
+		{
+			throw new NotImplementedException();
+		}
+	}
+
 
 	public class Tests
 	{
@@ -111,8 +134,26 @@ namespace Moq.Tests.Matchers.AnyValueAttribute3
 			var mockCar = new Mock<ICar>();
 			var car = mockCar.Object;
 
+
 			mockCar.Setup(car => car.Race(_)).Returns(0x68);
 			Assert.Equal(0x68, car.Race(default));
+
+			var realCar = new Car();
+			Assert.Equal(0x68, car.Race(realCar));
+		}
+
+		[Fact]
+		public void OldRace_1Interface()
+		{
+			var mockCar = new Mock<ICar>();
+			var car = mockCar.Object;
+
+
+			mockCar.Setup(car => car.Race(It.IsAny<ICar>())).Returns(0x68);
+			Assert.Equal(0x68, car.Race(default));
+
+			var realCar = new Car();
+			Assert.Equal(0x68, car.Race(realCar));
 		}
 
 		[Fact]
