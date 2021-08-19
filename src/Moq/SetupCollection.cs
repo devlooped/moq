@@ -109,7 +109,7 @@ namespace Moq
 			}
 		}
 
-		public Setup FindMatchFor(Invocation invocation)
+		public Setup FindLast(Func<Setup, bool> predicate)
 		{
 			// Fast path (no `lock`) when there are no setups:
 			if (this.setups.Count == 0)
@@ -125,7 +125,7 @@ namespace Moq
 					var setup = this.setups[i];
 					if (setup.IsOverridden) continue;
 
-					if (setup.Matches(invocation))
+					if (predicate(setup))
 					{
 						return setup;
 					}

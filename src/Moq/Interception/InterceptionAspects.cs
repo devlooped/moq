@@ -101,7 +101,7 @@ namespace Moq
 	{
 		public static bool Handle(Invocation invocation, Mock mock)
 		{
-			var matchingSetup = mock.MutableSetups.FindMatchFor(invocation);
+			var matchingSetup = mock.MutableSetups.FindLast(setup => setup.Matches(invocation));
 			if (matchingSetup != null)
 			{
 				matchingSetup.Execute(invocation);
