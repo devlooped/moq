@@ -298,7 +298,7 @@ namespace Moq
 
 			var errors = new List<MockException>();
 
-			foreach (var setup in this.MutableSetups.ToArray(setup => !setup.IsOverridden && !setup.IsConditional && predicate(setup)))
+			foreach (var setup in this.MutableSetups.FindAll(setup => !setup.IsConditional && predicate(setup)))
 			{
 				try
 				{

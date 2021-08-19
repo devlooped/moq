@@ -109,6 +109,27 @@ namespace Moq
 			}
 		}
 
+		public List<Setup> FindAll(Func<Setup, bool> predicate)
+		{
+			var setups = new List<Setup>();
+
+			lock (this.setups)
+			{
+				for (int i = 0; i < this.setups.Count; ++i)
+				{
+					var setup = this.setups[i];
+					if (setup.IsOverridden) continue;
+
+					if (predicate(setup))
+					{
+						setups.Add(setup);
+					}
+				}
+			}
+
+			return setups;
+		}
+
 		public Setup FindLast(Func<Setup, bool> predicate)
 		{
 			// Fast path (no `lock`) when there are no setups:
@@ -137,7 +158,7 @@ namespace Moq
 
 		public IEnumerable<Setup> GetInnerMockSetups()
 		{
-			return this.ToArray(setup => !setup.IsOverridden && !setup.IsConditional && setup.InnerMock != null);
+			return this.FindAll(setup => !setup.IsConditional && setup.InnerMock != null);
 		}
 
 		public void Reset()
@@ -157,26 +178,6 @@ namespace Moq
 			{
 				return this.setups.ToArray();
 			}
-		}
-
-		public IReadOnlyList<Setup> ToArray(Func<Setup, bool> predicate)
-		{
-			var matchingSetups = new Stack<Setup>();
-
-			lock (this.setups)
-			{
-				// Iterating in reverse order because newer setups are more relevant than (i.e. override) older ones
-				for (int i = this.setups.Count - 1; i >= 0; --i)
-				{
-					var setup = this.setups[i];
-					if (predicate(setup))
-					{
-						matchingSetups.Push(setup);
-					}
-				}
-			}
-
-			return matchingSetups.ToArray();
 		}
 
 		public IEnumerator<ISetup> GetEnumerator()
