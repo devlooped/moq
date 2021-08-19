@@ -72,14 +72,6 @@ namespace Moq
 			}
 		}
 
-		public bool Any(Func<Setup, bool> predicate)
-		{
-			lock (this.setups)
-			{
-				return this.setups.Any(predicate);
-			}
-		}
-
 		public void RemoveAllPropertyAccessorSetups()
 		{
 			// Fast path (no `lock`) when there are no setups:
@@ -109,7 +101,28 @@ namespace Moq
 			}
 		}
 
-		public Setup FindMatchFor(Invocation invocation)
+		public List<Setup> FindAll(Func<Setup, bool> predicate)
+		{
+			var setups = new List<Setup>();
+
+			lock (this.setups)
+			{
+				for (int i = 0; i < this.setups.Count; ++i)
+				{
+					var setup = this.setups[i];
+					if (setup.IsOverridden) continue;
+
+					if (predicate(setup))
+					{
+						setups.Add(setup);
+					}
+				}
+			}
+
+			return setups;
+		}
+
+		public Setup FindLast(Func<Setup, bool> predicate)
 		{
 			// Fast path (no `lock`) when there are no setups:
 			if (this.setups.Count == 0)
@@ -125,7 +138,7 @@ namespace Moq
 					var setup = this.setups[i];
 					if (setup.IsOverridden) continue;
 
-					if (setup.Matches(invocation))
+					if (predicate(setup))
 					{
 						return setup;
 					}
@@ -133,11 +146,6 @@ namespace Moq
 			}
 
 			return null;
-		}
-
-		public IEnumerable<Setup> GetInnerMockSetups()
-		{
-			return this.ToArray(setup => !setup.IsOverridden && !setup.IsConditional && setup.InnerMock != null);
 		}
 
 		public void Reset()
@@ -151,41 +159,17 @@ namespace Moq
 			}
 		}
 
-		public IReadOnlyList<Setup> ToArray()
-		{
-			lock (this.setups)
-			{
-				return this.setups.ToArray();
-			}
-		}
-
-		public IReadOnlyList<Setup> ToArray(Func<Setup, bool> predicate)
-		{
-			var matchingSetups = new Stack<Setup>();
-
-			lock (this.setups)
-			{
-				// Iterating in reverse order because newer setups are more relevant than (i.e. override) older ones
-				for (int i = this.setups.Count - 1; i >= 0; --i)
-				{
-					var setup = this.setups[i];
-					if (predicate(setup))
-					{
-						matchingSetups.Push(setup);
-					}
-				}
-			}
-
-			return matchingSetups.ToArray();
-		}
-
 		public IEnumerator<ISetup> GetEnumerator()
 		{
-			return this.ToArray().GetEnumerator();
-			//         ^^^^^^^^^^
-			// TODO: This is somewhat inefficient. We could avoid this array allocation by converting
-			// this class to something like `InvocationCollection`, however this won't be trivial due to
-			// the presence of a removal operation in `RemoveAllPropertyAccessorSetups`.
+			lock (this.setups)
+			{
+				IEnumerable<Setup> array = this.setups.ToArray();
+				//                                    ^^^^^^^^^^
+				// TODO: This is somewhat inefficient. We could avoid this array allocation by converting
+				// this class to something like `InvocationCollection`, however this won't be trivial due to
+				// the presence of a removal operation in `RemoveAllPropertyAccessorSetups`.
+				return array.GetEnumerator();
+			}
 		}
 
 		IEnumerator IEnumerable.GetEnumerator() => this.GetEnumerator();

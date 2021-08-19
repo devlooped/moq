@@ -298,7 +298,7 @@ namespace Moq
 
 			var errors = new List<MockException>();
 
-			foreach (var setup in this.MutableSetups.ToArray(setup => !setup.IsOverridden && !setup.IsConditional && predicate(setup)))
+			foreach (var setup in this.MutableSetups.FindAll(setup => !setup.IsConditional && predicate(setup)))
 			{
 				try
 				{
@@ -386,7 +386,7 @@ namespace Moq
 
 			var unverifiedInvocations = mock.MutableInvocations.ToArray(invocation => !invocation.IsVerified);
 
-			var innerMockSetups = mock.MutableSetups.GetInnerMockSetups();
+			var innerMocks = mock.MutableSetups.FindAllInnerMocks();
 
 			if (unverifiedInvocations.Any())
 			{
@@ -395,15 +395,15 @@ namespace Moq
 				// to verify `X`. If that succeeds, it's reasonable to expect that `m.A`, `m.A.B`, and
 				// `m.A.B.C` have implicitly been verified as well. Below, invocations such as those to
 				// the left of `X` are referred to as "transitive" (for lack of a better word).
-				if (innerMockSetups.Any())
+				if (innerMocks.Any())
 				{
 					for (int i = 0, n = unverifiedInvocations.Length; i < n; ++i)
 					{
 						// In order for an invocation to be "transitive", its return value has to be a
 						// sub-object (inner mock); and that sub-object has to have received at least
 						// one call:
-						var wasTransitiveInvocation = innerMockSetups.TryFind(unverifiedInvocations[i]) is Setup inner
-						                              && inner.InnerMock.MutableInvocations.Any();
+						var wasTransitiveInvocation = mock.MutableSetups.FindLastInnerMock(setup => setup.Matches(unverifiedInvocations[i])) is Mock innerMock
+						                              && innerMock.MutableInvocations.Any();
 						if (wasTransitiveInvocation)
 						{
 							unverifiedInvocations[i] = null;
@@ -421,9 +421,9 @@ namespace Moq
 
 			// Perform verification for all automatically created sub-objects (that is, those
 			// created by "transitive" invocations):
-			foreach (var inner in innerMockSetups)
+			foreach (var innerMock in innerMocks)
 			{
-				VerifyNoOtherCalls(inner.InnerMock, verifiedMocks);
+				VerifyNoOtherCalls(innerMock, verifiedMocks);
 			}
 		}
 
@@ -614,12 +614,8 @@ namespace Moq
 			}
 			else
 			{
-				Mock innerMock;
-				if (mock.MutableSetups.GetInnerMockSetups().TryFind(part) is Setup setup)
-				{
-					innerMock = setup.InnerMock;
-				}
-				else
+				Mock innerMock = mock.MutableSetups.FindLastInnerMock(setup => setup.Matches(part));
+				if (innerMock == null)
 				{
 					var returnValue = mock.GetDefaultValue(method, out innerMock, useAlternateProvider: DefaultValueProvider.Mock);
 					if (innerMock == null)
@@ -630,8 +626,8 @@ namespace Moq
 								Resources.UnsupportedExpression,
 								expr.ToStringFixed() + " in " + originalExpression.ToStringFixed() + ":\n" + Resources.TypeNotMockable));
 					}
-					setup = new InnerMockSetup(originalExpression, mock, expectation: part, returnValue);
-					mock.MutableSetups.Add((Setup)setup);
+					var innerMockSetup = new InnerMockSetup(originalExpression, mock, expectation: part, returnValue);
+					mock.MutableSetups.Add(innerMockSetup);
 				}
 				Debug.Assert(innerMock != null);
 
@@ -721,9 +717,13 @@ namespace Moq
 					handlers.InvokePreserveStack(arguments);
 				}
 			}
-			else if (mock.MutableSetups.GetInnerMockSetups().TryFind(part) is Setup innerMockSetup)
+			else
 			{
-				Mock.RaiseEvent(innerMockSetup.InnerMock, expression, parts, arguments);
+				var innerMock = mock.MutableSetups.FindLastInnerMock(setup => setup.Matches(part));
+				if (innerMock != null)
+				{
+					Mock.RaiseEvent(innerMock, expression, parts, arguments);
+				}
 			}
 		}
 
