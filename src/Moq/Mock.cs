@@ -402,8 +402,8 @@ namespace Moq
 						// In order for an invocation to be "transitive", its return value has to be a
 						// sub-object (inner mock); and that sub-object has to have received at least
 						// one call:
-						var wasTransitiveInvocation = innerMockSetups.TryFind(unverifiedInvocations[i]) is Setup inner
-						                              && inner.InnerMock.MutableInvocations.Any();
+						var wasTransitiveInvocation = mock.MutableSetups.FindLastInnerMock(setup => setup.Matches(unverifiedInvocations[i])) is Mock innerMock
+						                              && innerMock.MutableInvocations.Any();
 						if (wasTransitiveInvocation)
 						{
 							unverifiedInvocations[i] = null;
@@ -614,12 +614,8 @@ namespace Moq
 			}
 			else
 			{
-				Mock innerMock;
-				if (mock.MutableSetups.GetInnerMockSetups().TryFind(part) is Setup setup)
-				{
-					innerMock = setup.InnerMock;
-				}
-				else
+				Mock innerMock = mock.MutableSetups.FindLastInnerMock(setup => setup.Matches(part));
+				if (innerMock == null)
 				{
 					var returnValue = mock.GetDefaultValue(method, out innerMock, useAlternateProvider: DefaultValueProvider.Mock);
 					if (innerMock == null)
@@ -630,8 +626,8 @@ namespace Moq
 								Resources.UnsupportedExpression,
 								expr.ToStringFixed() + " in " + originalExpression.ToStringFixed() + ":\n" + Resources.TypeNotMockable));
 					}
-					setup = new InnerMockSetup(originalExpression, mock, expectation: part, returnValue);
-					mock.MutableSetups.Add((Setup)setup);
+					var innerMockSetup = new InnerMockSetup(originalExpression, mock, expectation: part, returnValue);
+					mock.MutableSetups.Add(innerMockSetup);
 				}
 				Debug.Assert(innerMock != null);
 
@@ -721,9 +717,13 @@ namespace Moq
 					handlers.InvokePreserveStack(arguments);
 				}
 			}
-			else if (mock.MutableSetups.GetInnerMockSetups().TryFind(part) is Setup innerMockSetup)
+			else
 			{
-				Mock.RaiseEvent(innerMockSetup.InnerMock, expression, parts, arguments);
+				var innerMock = mock.MutableSetups.FindLastInnerMock(setup => setup.Matches(part));
+				if (innerMock != null)
+				{
+					Mock.RaiseEvent(innerMock, expression, parts, arguments);
+				}
 			}
 		}
 

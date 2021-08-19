@@ -476,14 +476,9 @@ namespace Moq
 			return type;
 		}
 
-		public static Setup TryFind(this IEnumerable<Setup> setups, InvocationShape expectation)
+		public static Mock FindLastInnerMock(this SetupCollection setups, Func<Setup, bool> predicate)
 		{
-			return setups.FirstOrDefault(setup => setup.Matches(expectation));
-		}
-
-		public static Setup TryFind(this IEnumerable<Setup> setups, Invocation invocation)
-		{
-			return setups.FirstOrDefault(setup => setup.Matches(invocation));
+			return setups.FindLast(setup => !setup.IsConditional && predicate(setup))?.InnerMock;
 		}
 	}
 }
