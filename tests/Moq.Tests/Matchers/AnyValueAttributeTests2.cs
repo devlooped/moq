@@ -1,13 +1,15 @@
 ﻿using Xunit;
-using Moq.Tests.Matchers.AnyAttribute2.SomeOtherLib;
+using Moq.Tests.Matchers.AnyValueAttribute2.SomeOtherLib;
 
 /// <summary>
+/// This example usage is OK, but not ideal. See <see cref="Moq.Tests.Matchers.AnyValueAttribute3.AutoIsAny"/> example instead.
+/// 
 /// This example allows using `Any` for any non-interface type and `AnyI` otherwise.
 /// This avoids extra user maintennance when the interfaces are refactored.
 /// Tests for https://github.com/moq/moq4/issues/1199
 /// </summary>
 
-namespace Moq.Tests.Matchers.AnyAttribute2.SomeOtherLib
+namespace Moq.Tests.Matchers.AnyValueAttribute2.SomeOtherLib
 {
 	/// <summary>
 	/// Helper class probably provided by user/3rd party lib and not Moq
@@ -39,7 +41,7 @@ namespace Moq.Tests.Matchers.AnyAttribute2.SomeOtherLib
 }
 
 
-namespace Moq.Tests.Matchers.AnyAttribute2
+namespace Moq.Tests.Matchers.AnyValueAttribute2
 {
 	using static AnyValueHelper<AdamsAnyHelper, IAdamsAnyInterfaceHelper>;   // note using static to simplify syntax
 
@@ -79,7 +81,7 @@ namespace Moq.Tests.Matchers.AnyAttribute2
 		int DoSomething(ICar a, GearId b, int c);
 	}
 
-	public class AnyValueAttributeTests2
+	public class Tests
 	{
 		[Fact]
 		public void Echo_1Primitive()

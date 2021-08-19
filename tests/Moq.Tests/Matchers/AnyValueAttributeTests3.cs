@@ -1,51 +1,40 @@
 ﻿using Xunit;
 using System;
-using Moq.Tests.Matchers.AnyValueAttribute1.SomeOtherLib;
 
 /// <summary>
-/// This example usage is OK, but not ideal. See <see cref="Moq.Tests.Matchers.AnyValueAttribute3.AutoIsAny"/> example instead.
+/// This is my favorite potential solution so far. Nothing that looks too weird to users. Fairly understandable.
 /// 
 /// This example allows using `_` for any type including interfaces, but it has the downside of requiring some
-/// extra user maintennance when an implemented interface is changed. This could be eased with a Roslyn analyzer/code fix.
+/// extra user maintennance when an implemented interface is changed. IDE based auto explicit interface implementation
+/// also makes this pretty easy.
+/// 
+/// This could be eased with a Roslyn analyzer/code fix.
+/// 
 /// Tests for https://github.com/moq/moq4/issues/1199
 /// </summary>
 
-namespace Moq.Tests.Matchers.AnyValueAttribute1.SomeOtherLib
+namespace Moq.Tests.Matchers.AnyValueAttribute3
 {
+	using static AutoIsAny;   // note using static to simplify syntax
+
 	/// <summary>
-	/// Helper class probably provided by user/3rd party lib and not Moq
+	/// Helper class provided by user
 	/// </summary>
-	public class AnyValueHelper<T> where T : AnyValueBase, new()
+	public abstract class AutoIsAny
 	{
 		[AnyValue] //new Attribute that allows this to work
-		public static T _ => default;
+		public static AnyValue _ => default;
 		[AnyValue]
-		public static T any => default;
+		public static AnyValue Any => default;	//alternative syntax to `_`
 	}
 
 	/// <summary>
-	/// Helper class probably provided by user/3rd party lib and not Moq
+	/// Helper class provided by user. Interfaces implemented via IDE auto explicit interface implementation
+	/// or Roslyn analyzer/code fix.
 	/// </summary>
-	public class AnyValueBase
-	{
-		public static implicit operator int(AnyValueBase _) => default;
-		public static implicit operator byte(AnyValueBase _) => default;
-		//TODO all the built-in value types
-	}
-}
-
-
-namespace Moq.Tests.Matchers.AnyValueAttribute1
-{
-	using static AnyValueHelper<AdamsAnyHelper>;   // note using static to simplify syntax
-
-	/// <summary>
-	/// Helper class probably provided by user (Adam) for any types not handled by <see cref="AnyValueBase"/>.
-	/// </summary>
-	public class AdamsAnyHelper : AnyValueBase, ICar
+	public abstract class AnyValue : ICar
 	{
 		#region boilerplate
-
 		int ICar.Calc(int a, int b, int c, int d)
 		{
 			throw new NotImplementedException();
@@ -66,8 +55,9 @@ namespace Moq.Tests.Matchers.AnyValueAttribute1
 			throw new NotImplementedException();
 		}
 
-		public static implicit operator GearId(AdamsAnyHelper _) => default;
-
+		public static implicit operator int(AnyValue _) => default;
+		public static implicit operator byte(AnyValue _) => default;
+		public static implicit operator GearId(AnyValue _) => default;
 		#endregion
 	}
 
@@ -91,6 +81,7 @@ namespace Moq.Tests.Matchers.AnyValueAttribute1
 		int Race(ICar a);
 		int DoSomething(ICar a, GearId b, int c);
 	}
+
 
 	public class Tests
 	{
