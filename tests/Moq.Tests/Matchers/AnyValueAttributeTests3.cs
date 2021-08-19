@@ -115,7 +115,7 @@ namespace Moq.Tests.Matchers.AnyValueAttribute3
 			var car = mockCar.Object;
 
 			mockCar.Setup(car => car.Echo(_)).Returns(0x68);
-			Assert.Equal(0x68, car.Echo(default));
+			Assert.Equal(0x68, car.Echo(1));
 		}
 
 		[Fact]
@@ -125,7 +125,7 @@ namespace Moq.Tests.Matchers.AnyValueAttribute3
 			var car = mockCar.Object;
 
 			mockCar.Setup(car => car.Calc(_, _, _, _)).Returns(123456);
-			Assert.Equal(123456, car.Calc(default, default, default, default));
+			Assert.Equal(123456, car.Calc(1, 2, 3, 4));
 		}
 
 		[Fact]
@@ -136,7 +136,7 @@ namespace Moq.Tests.Matchers.AnyValueAttribute3
 
 
 			mockCar.Setup(car => car.Race(_)).Returns(0x68);
-			Assert.Equal(0x68, car.Race(default));
+			Assert.Equal(0x68, car.Race(null));
 
 			var realCar = new Car();
 			Assert.Equal(0x68, car.Race(realCar));
@@ -150,7 +150,7 @@ namespace Moq.Tests.Matchers.AnyValueAttribute3
 
 
 			mockCar.Setup(car => car.Race(It.IsAny<ICar>())).Returns(0x68);
-			Assert.Equal(0x68, car.Race(default));
+			Assert.Equal(0x68, car.Race(null));
 
 			var realCar = new Car();
 			Assert.Equal(0x68, car.Race(realCar));
@@ -163,7 +163,7 @@ namespace Moq.Tests.Matchers.AnyValueAttribute3
 			var car = mockCar.Object;
 
 			mockCar.Setup(car => car.DoSomething(_, _, _)).Returns(0x68);
-			Assert.Equal(0x68, car.DoSomething(default, default, default));
+			Assert.Equal(0x68, car.DoSomething(null, GearId.Neutral, 1));
 		}
 	}
 }
