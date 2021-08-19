@@ -72,14 +72,6 @@ namespace Moq
 			}
 		}
 
-		public bool Any(Func<Setup, bool> predicate)
-		{
-			lock (this.setups)
-			{
-				return this.setups.Any(predicate);
-			}
-		}
-
 		public void RemoveAllPropertyAccessorSetups()
 		{
 			// Fast path (no `lock`) when there are no setups:

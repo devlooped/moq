@@ -30,7 +30,7 @@ namespace Moq
 
 		private static bool HandleEquals(Invocation invocation, Mock mock)
 		{
-			if (IsObjectMethod(invocation.Method) && !mock.MutableSetups.Any(c => IsObjectMethod(c.Method, "Equals")))
+			if (IsObjectMethod(invocation.Method) && mock.MutableSetups.FindLast(c => IsObjectMethod(c.Method, "Equals")) == null)
 			{
 				invocation.ReturnValue = ReferenceEquals(invocation.Arguments.First(), mock.Object);
 				return true;
@@ -49,7 +49,7 @@ namespace Moq
 		private static bool HandleGetHashCode(Invocation invocation, Mock mock)
 		{
 			// Only if there is no corresponding setup for `GetHashCode()`
-			if (IsObjectMethod(invocation.Method) && !mock.MutableSetups.Any(c => IsObjectMethod(c.Method, "GetHashCode")))
+			if (IsObjectMethod(invocation.Method) && mock.MutableSetups.FindLast(c => IsObjectMethod(c.Method, "GetHashCode")) == null)
 			{
 				invocation.ReturnValue = mock.GetHashCode();
 				return true;
@@ -63,7 +63,7 @@ namespace Moq
 		private static bool HandleToString(Invocation invocation, Mock mock)
 		{
 			// Only if there is no corresponding setup for `ToString()`
-			if (IsObjectMethod(invocation.Method) && !mock.MutableSetups.Any(c => IsObjectMethod(c.Method, "ToString")))
+			if (IsObjectMethod(invocation.Method) && mock.MutableSetups.FindLast(c => IsObjectMethod(c.Method, "ToString")) == null)
 			{
 				invocation.ReturnValue = mock.ToString() + ".Object";
 				return true;
