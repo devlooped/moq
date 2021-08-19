@@ -115,6 +115,11 @@ namespace Moq
 			return this.expectation.IsMatch(invocation) && (this.Condition == null || this.Condition.IsTrue);
 		}
 
+		public bool Matches(InvocationShape expectation)
+		{
+			return this.expectation.Equals(expectation);
+		}
+
 		public virtual void SetOutParameters(Invocation invocation)
 		{
 		}
