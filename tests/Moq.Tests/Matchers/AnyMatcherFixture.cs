@@ -15,7 +15,7 @@ namespace Moq.Tests.Matchers
 		{
 			var expr = ToExpression<object>(() => It.IsAny<object>()).Body;
 
-			var (matcher, _) = MatcherFactory.CreateMatcher(expr);
+			var (matcher, _) = MatcherFactory.CreateMatcher2(expr);
 
 			Assert.True(matcher.Matches(null, typeof(object)));
 		}
@@ -25,7 +25,7 @@ namespace Moq.Tests.Matchers
 		{
 			var expr = ToExpression<object>(() => It.IsAny<object>()).Body;
 
-			var (matcher, _) = MatcherFactory.CreateMatcher(expr);
+			var (matcher, _) = MatcherFactory.CreateMatcher2(expr);
 
 			Assert.True(matcher.Matches("foo", typeof(object)));
 		}
@@ -35,7 +35,7 @@ namespace Moq.Tests.Matchers
 		{
 			var expr = ToExpression<IDisposable>(() => It.IsAny<IDisposable>()).Body;
 
-			var (matcher, _) = MatcherFactory.CreateMatcher(expr);
+			var (matcher, _) = MatcherFactory.CreateMatcher2(expr);
 
 			Assert.True(matcher.Matches(new Disposable(), typeof(IDisposable)));
 		}
@@ -45,7 +45,7 @@ namespace Moq.Tests.Matchers
 		{
 			var expr = ToExpression<IFormatProvider>(() => It.IsAny<IFormatProvider>()).Body;
 
-			var (matcher, _) = MatcherFactory.CreateMatcher(expr);
+			var (matcher, _) = MatcherFactory.CreateMatcher2(expr);
 
 			Assert.False(matcher.Matches("foo", typeof(IFormatProvider)));
 		}

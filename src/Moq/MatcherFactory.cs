@@ -85,7 +85,7 @@ namespace Moq
 
 				for (int i = 0; i < n; ++i)
 				{
-					(matchers[i], initializers[i]) = MatcherFactory.CreateMatcher(newArrayExpression.Expressions[i]);
+					(matchers[i], initializers[i]) = MatcherFactory.CreateMatcher2(newArrayExpression.Expressions[i], parameter);	//TODO test
 					initializers[i] = initializers[i].ConvertIfNeeded(elementType);
 				}
 				return new Pair<IMatcher, Expression>(new ParamArrayMatcher(matchers), Expression.NewArrayInit(elementType, initializers));
@@ -107,10 +107,11 @@ namespace Moq
 				}
 			}
 
-			return MatcherFactory.CreateMatcher(argument);
+			return MatcherFactory.CreateMatcher2(argument, parameter);
 		}
 
-		public static Pair<IMatcher, Expression> CreateMatcher(Expression expression)
+		// TODO rework to avoid changing public API. Needed ParameterInfo to desired type if arg is an interface.
+		public static Pair<IMatcher, Expression> CreateMatcher2(Expression expression, ParameterInfo parameter = null)
 		{
 			// Type inference on the call might 
 			// do automatic conversion to the desired 
@@ -138,11 +139,11 @@ namespace Moq
 			}
 
 			// add support for https://github.com/moq/moq4/issues/1199
-			if (expression is MemberExpression memberExpression)
+			if (parameter != null && expression is MemberExpression memberExpression)
 			{
 				if (memberExpression.Member.IsDefined(typeof(AnyValueAttribute), inherit: true))
 				{
-					return BuildMatchPair(originalExpression);
+					return BuildMatchPair(originalExpression, parameter.ParameterType);
 				}
 			}
 
@@ -191,11 +192,11 @@ namespace Moq
 		}
 
 		// There is probably a better way to do this, but I'm not super familiar with all the Moq internals
-		private static Pair<IMatcher, Expression> BuildMatchPair(Expression expression)
+		private static Pair<IMatcher, Expression> BuildMatchPair(Expression expression, Type type)
 		{
 			using (var observer = MatcherObserver.Activate())
 			{
-				var methodCallExpr = It.IsAny(expression.Type);
+				var methodCallExpr = It.IsAny(type);
 				Expression.Lambda<Action>(methodCallExpr).CompileUsingExpressionCompiler().Invoke();
 				observer.TryGetLastMatch(out Match match);
 				return new Pair<IMatcher, Expression>(match, expression);

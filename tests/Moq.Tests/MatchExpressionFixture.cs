@@ -95,7 +95,7 @@ namespace Moq.Tests
 			var expression = GetExpression();
 			var matchExpression = FindMatchExpression(expression);
 			Debug.Assert(matchExpression != null);
-			var (matcher, _) = MatcherFactory.CreateMatcher(matchExpression);
+			var (matcher, _) = MatcherFactory.CreateMatcher2(matchExpression);
 			Assert.IsType<Match<int>>(matcher);
 		}
 
