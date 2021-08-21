@@ -97,20 +97,20 @@ namespace Moq
 				{
 					if (convertExpression.IsMatch(out var match))
 					{
-						Type foundType;
+						Type matchedValuesType;
 
 						if (match.GetType().IsGenericType)
 						{
-							// If match type is `Match<int>`, foundType set to `int`
+							// If match type is `Match<int>`, matchedValuesType set to `int`
 							// Fix for https://github.com/moq/moq4/issues/1199
-							foundType = match.GetType().GenericTypeArguments[0];
+							matchedValuesType = match.GetType().GenericTypeArguments[0];
 						}
 						else
 						{
-							foundType = convertExpression.Operand.Type;
+							matchedValuesType = convertExpression.Operand.Type;
 						}
 
-						if (!parameter.ParameterType.IsAssignableFrom(foundType))
+						if (!parameter.ParameterType.IsAssignableFrom(matchedValuesType))
 						{
 							throw new ArgumentException(
 								string.Format(
