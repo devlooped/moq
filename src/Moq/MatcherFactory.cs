@@ -95,14 +95,30 @@ namespace Moq
 				var convertExpression = (UnaryExpression)argument;
 				if (convertExpression.Method?.Name == "op_Implicit")
 				{
-					if (!parameter.ParameterType.IsAssignableFrom(convertExpression.Operand.Type) && convertExpression.Operand.IsMatch(out _))
+					if (convertExpression.IsMatch(out var match))
 					{
-						throw new ArgumentException(
-							string.Format(
-								Resources.ArgumentMatcherWillNeverMatch,
-								convertExpression.Operand.ToStringFixed(),
-								convertExpression.Operand.Type.GetFormattedName(),
-								parameter.ParameterType.GetFormattedName()));
+						Type foundType;
+
+						if (match.GetType().IsGenericType)
+						{
+							// If match type is `Match<int>`, foundType set to `int`
+							// Fix for https://github.com/moq/moq4/issues/1199
+							foundType = match.GetType().GenericTypeArguments[0];
+						}
+						else
+						{
+							foundType = convertExpression.Operand.Type;
+						}
+
+						if (!parameter.ParameterType.IsAssignableFrom(foundType))
+						{
+							throw new ArgumentException(
+								string.Format(
+									Resources.ArgumentMatcherWillNeverMatch,
+									convertExpression.Operand.ToStringFixed(),
+									convertExpression.Operand.Type.GetFormattedName(),
+									parameter.ParameterType.GetFormattedName()));
+						}
 					}
 				}
 			}
