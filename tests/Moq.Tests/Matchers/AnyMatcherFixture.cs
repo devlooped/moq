@@ -50,6 +50,32 @@ namespace Moq.Tests.Matchers
 			Assert.False(matcher.Matches("foo", typeof(IFormatProvider)));
 		}
 
+		[Fact]
+		public void ParameterIncompatibleWithMatchedType()
+		{
+			//shorthand wrapper
+			void AssertNotCompatible(Type parameterType, Type matchType)
+			{
+				Assert.True(MatcherFactory.ParameterIncompatibleWithMatchedType(parameterType: parameterType, matchType: matchType));
+			}
+			//shorthand wrapper
+			void AssertCompatible(Type parameterType, Type matchType)
+			{
+				Assert.False(MatcherFactory.ParameterIncompatibleWithMatchedType(parameterType: parameterType, matchType: matchType));
+			}
+
+			// incompatible tests
+			AssertNotCompatible(parameterType: typeof(DateTimeOffset), matchType: typeof(DateTime));
+			AssertNotCompatible(parameterType: typeof(DateTime), matchType: typeof(DateTimeOffset));
+			AssertNotCompatible(parameterType: typeof(DateTime), matchType: typeof(object));
+
+			// if mocked method parameter type is an object, should allow `It.IsAny<string>()`
+			AssertCompatible(parameterType: typeof(object), matchType: typeof(string));
+
+			// if mocked method parameter type is an object, should allow `It.IsAny<DateTime>()`
+			AssertCompatible(parameterType: typeof(object), matchType: typeof(DateTime));
+		}
+
 		private LambdaExpression ToExpression<TResult>(Expression<Func<TResult>> expr)
 		{
 			return expr;

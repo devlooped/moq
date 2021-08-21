@@ -110,7 +110,7 @@ namespace Moq
 							matchedValuesType = convertExpression.Operand.Type;
 						}
 
-						if (!parameter.ParameterType.IsAssignableFrom(matchedValuesType))
+						if (ParameterIncompatibleWithMatchedType(parameterType: parameter.ParameterType, matchedValuesType))
 						{
 							throw new ArgumentException(
 								string.Format(
@@ -124,6 +124,11 @@ namespace Moq
 			}
 
 			return MatcherFactory.CreateMatcher(argument);
+		}
+
+		public static bool ParameterIncompatibleWithMatchedType(Type parameterType, Type matchType)
+		{
+			return !parameterType.IsAssignableFrom(matchType);
 		}
 
 		public static Pair<IMatcher, Expression> CreateMatcher(Expression expression)
