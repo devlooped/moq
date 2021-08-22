@@ -18,10 +18,7 @@ namespace Moq.Tests.Matchers.Wildcard
 		{
 			get
 			{
-				It.IsAny<object>(); // This allows it to work for interface types. It doesn't hit the implicit conversion guard, because no implicit conversion
-									// is required for interfaces. Implicit interface conversions also aren't allowed in C#.
-									// For non-interface types, the AnyValue implicit conversion below will overwrite `It.IsAny<object>()`
-									// with the appropriate `It.IsAny<T>()`.
+				It.IsAny<object>();
 				return new AnyValue();
 			}
 		}
@@ -63,11 +60,11 @@ namespace Moq.Tests.Matchers.Wildcard
 			throw new NotImplementedException();
 		}
 
-		public static implicit operator int(AnyValue _) => It.IsAny<int>();
-		public static implicit operator byte(AnyValue _) => It.IsAny<byte>();
-		public static implicit operator GearId(AnyValue _) => It.IsAny<GearId>();
-		public static implicit operator Animal(AnyValue _) => It.IsAny<Animal>();
-		public static implicit operator Dolphin(AnyValue _) => It.IsAny<Dolphin>();
+		public static implicit operator int(AnyValue _) => default;
+		public static implicit operator byte(AnyValue _) => default;
+		public static implicit operator GearId(AnyValue _) => default;
+		public static implicit operator Animal(AnyValue _) => default;
+		public static implicit operator Dolphin(AnyValue _) => default;
 	}
 
 

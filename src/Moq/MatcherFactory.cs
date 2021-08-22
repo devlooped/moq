@@ -95,7 +95,7 @@ namespace Moq
 				var convertExpression = (UnaryExpression)argument;
 				if (convertExpression.Method?.Name == "op_Implicit")
 				{
-					if (convertExpression.IsMatch(out var match))
+					if (convertExpression.Operand.IsMatch(out var match))
 					{
 						Type matchedValuesType;
 
@@ -110,7 +110,7 @@ namespace Moq
 							matchedValuesType = convertExpression.Operand.Type;
 						}
 
-						if (!parameter.ParameterType.IsAssignableFrom(matchedValuesType))
+						if (!matchedValuesType.IsAssignableFrom(parameter.ParameterType))
 						{
 							throw new ArgumentException(
 								string.Format(
