@@ -13,12 +13,12 @@ namespace Moq
 {
 	internal abstract class Setup : ISetup
 	{
-		private readonly MethodExpectation expectation;
+		private readonly Expectation expectation;
 		private readonly Expression originalExpression;
 		private readonly Mock mock;
 		private Flags flags;
 
-		protected Setup(Expression originalExpression, Mock mock, MethodExpectation expectation)
+		protected Setup(Expression originalExpression, Mock mock, Expectation expectation)
 		{
 			Debug.Assert(mock != null);
 			Debug.Assert(expectation != null);
@@ -30,7 +30,7 @@ namespace Moq
 
 		public virtual Condition Condition => null;
 
-		public MethodExpectation Expectation => this.expectation;
+		public Expectation Expectation => this.expectation;
 
 		public LambdaExpression Expression => this.expectation.Expression;
 

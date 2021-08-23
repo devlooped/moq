@@ -16,6 +16,6 @@ namespace Moq
 		{
 		}
 
-		public MethodInfo Method => this.Expectation.Method;
+		public MethodInfo Method => ((MethodExpectation)this.Expectation).Method;
 	}
 }
