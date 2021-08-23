@@ -16,7 +16,6 @@ namespace Moq
 		private static Dictionary<string, Func<Invocation, Mock, bool>> specialMethods = new Dictionary<string, Func<Invocation, Mock, bool>>()
 		{
 			["Equals"] = HandleEquals,
-			["Finalize"] = HandleFinalize,
 			["GetHashCode"] = HandleGetHashCode,
 			["get_" + nameof(IMocked.Mock)] = HandleMockGetter,
 			["ToString"] = HandleToString,
@@ -39,11 +38,6 @@ namespace Moq
 			{
 				return false;
 			}
-		}
-
-		private static bool HandleFinalize(Invocation invocation, Mock mock)
-		{
-			return IsFinalizer(invocation.Method);
 		}
 
 		private static bool HandleGetHashCode(Invocation invocation, Mock mock)
@@ -83,11 +77,6 @@ namespace Moq
 			{
 				return false;
 			}
-		}
-
-		private static bool IsFinalizer(MethodInfo method)
-		{
-			return method.GetBaseDefinition() == typeof(object).GetMethod("Finalize", BindingFlags.NonPublic | BindingFlags.Instance);
 		}
 
 		private static bool IsObjectMethodWithoutSetup(Invocation invocation, Mock mock)
