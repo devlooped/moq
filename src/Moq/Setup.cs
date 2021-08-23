@@ -13,12 +13,12 @@ namespace Moq
 {
 	internal abstract class Setup : ISetup
 	{
-		private readonly InvocationShape expectation;
+		private readonly MethodExpectation expectation;
 		private readonly Expression originalExpression;
 		private readonly Mock mock;
 		private Flags flags;
 
-		protected Setup(Expression originalExpression, Mock mock, InvocationShape expectation)
+		protected Setup(Expression originalExpression, Mock mock, MethodExpectation expectation)
 		{
 			Debug.Assert(mock != null);
 			Debug.Assert(expectation != null);
@@ -30,7 +30,7 @@ namespace Moq
 
 		public virtual Condition Condition => null;
 
-		public InvocationShape Expectation => this.expectation;
+		public MethodExpectation Expectation => this.expectation;
 
 		public LambdaExpression Expression => this.expectation.Expression;
 
@@ -101,7 +101,7 @@ namespace Moq
 			return this.expectation.IsMatch(invocation) && (this.Condition == null || this.Condition.IsTrue);
 		}
 
-		public bool Matches(InvocationShape expectation)
+		public bool Matches(MethodExpectation expectation)
 		{
 			return this.expectation.Equals(expectation);
 		}

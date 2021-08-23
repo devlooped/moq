@@ -18,15 +18,15 @@ namespace Moq
 	/// <summary>
 	///   Describes the "shape" of an invocation against which concrete <see cref="Invocation"/>s can be matched.
 	///   <para>
-	///     This shape is described by <see cref="InvocationShape.Expression"/> which has the general form
+	///     This shape is described by <see cref="MethodExpectation.Expression"/> which has the general form
 	///     `mock => mock.Method(...arguments)`. Because the method and arguments are frequently needed,
-	///     they are cached in <see cref="InvocationShape.Method"/> and <see cref="InvocationShape.Arguments"/>
+	///     they are cached in <see cref="MethodExpectation.Method"/> and <see cref="MethodExpectation.Arguments"/>
 	///     for faster access.
 	///   </para>
 	/// </summary>
-	internal sealed class InvocationShape : IEquatable<InvocationShape>
+	internal sealed class MethodExpectation : IEquatable<MethodExpectation>
 	{
-		public static InvocationShape CreateFrom(Invocation invocation)
+		public static MethodExpectation CreateFrom(Invocation invocation)
 		{
 			var method = invocation.Method;
 
@@ -55,7 +55,7 @@ namespace Moq
 				Debug.Assert(property.CanRead(out var getter) && method == getter);
 			}
 
-			return new InvocationShape(expression, method, arguments, exactGenericTypeArguments: true);
+			return new MethodExpectation(expression, method, arguments, exactGenericTypeArguments: true);
 		}
 
 		private static readonly Expression[] noArguments = new Expression[0];
@@ -74,7 +74,7 @@ namespace Moq
 #endif
 		private readonly bool exactGenericTypeArguments;
 
-		public InvocationShape(LambdaExpression expression, MethodInfo method, IReadOnlyList<Expression> arguments = null, bool exactGenericTypeArguments = false, bool skipMatcherInitialization = false, bool allowNonOverridable = false)
+		public MethodExpectation(LambdaExpression expression, MethodInfo method, IReadOnlyList<Expression> arguments = null, bool exactGenericTypeArguments = false, bool skipMatcherInitialization = false, bool allowNonOverridable = false)
 		{
 			Debug.Assert(expression != null);
 			Debug.Assert(method != null);
@@ -194,7 +194,7 @@ namespace Moq
 			return true;
 		}
 
-		public bool Equals(InvocationShape other)
+		public bool Equals(MethodExpectation other)
 		{
 			if (this.Method != other.Method)
 			{
@@ -273,7 +273,7 @@ namespace Moq
 
 		public override bool Equals(object obj)
 		{
-			return obj is InvocationShape other && this.Equals(other);
+			return obj is MethodExpectation other && this.Equals(other);
 		}
 
 		public override int GetHashCode()

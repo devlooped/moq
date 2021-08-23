@@ -11,7 +11,7 @@ namespace Moq
 	/// </summary>
 	internal abstract class MethodSetup : Setup
 	{
-		protected MethodSetup(Expression originalExpression, Mock mock, InvocationShape expectation)
+		protected MethodSetup(Expression originalExpression, Mock mock, MethodExpectation expectation)
 			: base(originalExpression, mock, expectation)
 		{
 		}

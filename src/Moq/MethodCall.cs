@@ -29,7 +29,7 @@ namespace Moq
 
 		private string declarationSite;
 
-		public MethodCall(Expression originalExpression, Mock mock, Condition condition, InvocationShape expectation)
+		public MethodCall(Expression originalExpression, Mock mock, Condition condition, MethodExpectation expectation)
 			: base(originalExpression, mock, expectation)
 		{
 			this.condition = condition;

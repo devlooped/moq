@@ -15,7 +15,7 @@ namespace Moq
 	{
 		private readonly List<KeyValuePair<int, object>> outValues;
 
-		protected SetupWithOutParameterSupport(Expression originalExpression, Mock mock, InvocationShape expectation)
+		protected SetupWithOutParameterSupport(Expression originalExpression, Mock mock, MethodExpectation expectation)
 			: base(originalExpression, mock, expectation)
 		{
 			Debug.Assert(expectation != null);

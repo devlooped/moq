@@ -17,7 +17,7 @@ namespace Moq
 		private Func<object> getter;
 
 		public StubbedPropertyGetterSetup(Mock mock, LambdaExpression originalExpression, MethodInfo method, Func<object> getter)
-			: base(originalExpression: null, mock, new InvocationShape(originalExpression, method, noArguments))
+			: base(originalExpression: null, mock, new MethodExpectation(originalExpression, method, noArguments))
 		{
 			this.getter = getter;
 

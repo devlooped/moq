@@ -11,12 +11,12 @@ namespace Moq
 	internal sealed class SetupCollection : ISetupList
 	{
 		private List<Setup> setups;
-		private HashSet<InvocationShape> activeInvocationShapes;
+		private HashSet<MethodExpectation> activeSetups;
 
 		public SetupCollection()
 		{
 			this.setups = new List<Setup>();
-			this.activeInvocationShapes = new HashSet<InvocationShape>();
+			this.activeSetups = new HashSet<MethodExpectation>();
 		}
 
 		public int Count
@@ -46,7 +46,7 @@ namespace Moq
 			lock (this.setups)
 			{
 				this.setups.Add(setup);
-				if (!this.activeInvocationShapes.Add(setup.Expectation))
+				if (!this.activeSetups.Add(setup.Expectation))
 				{
 					this.MarkOverriddenSetups();
 				}
@@ -55,7 +55,7 @@ namespace Moq
 
 		private void MarkOverriddenSetups()
 		{
-			var visitedSetups = new HashSet<InvocationShape>();
+			var visitedSetups = new HashSet<MethodExpectation>();
 
 			// Iterating in reverse order because newer setups are more relevant than (i.e. override) older ones
 			for (int i = this.setups.Count - 1; i >= 0; --i)
@@ -97,7 +97,7 @@ namespace Moq
 			lock (this.setups)
 			{
 				this.setups.Clear();
-				this.activeInvocationShapes.Clear();
+				this.activeSetups.Clear();
 			}
 		}
 

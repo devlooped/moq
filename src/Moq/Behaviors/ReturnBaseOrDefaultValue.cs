@@ -106,7 +106,7 @@ namespace Moq.Behaviors
 				var returnValue = this.mock.GetDefaultValue(method, out var innerMock);
 				if (innerMock != null && invocation.MatchingSetup == null)
 				{
-					var setup = new InnerMockSetup(originalExpression: null, this.mock, expectation: InvocationShape.CreateFrom(invocation), returnValue);
+					var setup = new InnerMockSetup(originalExpression: null, this.mock, expectation: MethodExpectation.CreateFrom(invocation), returnValue);
 					this.mock.MutableSetups.Add(setup);
 					setup.Execute(invocation);
 				}

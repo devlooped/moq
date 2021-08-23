@@ -16,7 +16,7 @@ namespace Moq
 		private Action<object> setter;
 
 		public StubbedPropertySetterSetup(Mock mock, LambdaExpression originalExpression, MethodInfo method, Action<object> setter)
-			: base(originalExpression: null, mock, new InvocationShape(originalExpression, method, new Expression[] { It.IsAny(method.GetParameterTypes().Last()) }))
+			: base(originalExpression: null, mock, new MethodExpectation(originalExpression, method, new Expression[] { It.IsAny(method.GetParameterTypes().Last()) }))
 		{
 			this.setter = setter;
 
