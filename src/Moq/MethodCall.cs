@@ -47,6 +47,8 @@ namespace Moq
 
 		public override Condition Condition => this.condition;
 
+		public override Mock InnerMock => TryGetInnerMockFrom((this.returnOrThrow as ReturnValue)?.Value);
+
 		private static string GetUserCodeCallSite()
 		{
 			try
@@ -113,20 +115,6 @@ namespace Moq
 			}
 
 			this.afterReturnCallback?.Execute(invocation);
-		}
-
-		public override bool TryGetReturnValue(out object returnValue)
-		{
-			if (this.returnOrThrow is ReturnValue rv)
-			{
-				returnValue = rv.Value;
-				return true;
-			}
-			else
-			{
-				returnValue = default;
-				return false;
-			}
 		}
 
 		public void SetCallBaseBehavior()

@@ -22,15 +22,11 @@ namespace Moq
 			this.MarkAsVerifiable();
 		}
 
+		public override Mock InnerMock => TryGetInnerMockFrom(this.returnValue);
+
 		protected override void ExecuteCore(Invocation invocation)
 		{
 			invocation.ReturnValue = this.returnValue;
-		}
-
-		public override bool TryGetReturnValue(out object returnValue)
-		{
-			returnValue = this.returnValue;
-			return true;
 		}
 
 		protected override void ResetCore()

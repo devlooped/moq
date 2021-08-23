@@ -35,8 +35,7 @@ namespace Moq
 
 		public LambdaExpression Expression => this.expectation.Expression;
 
-		public Mock InnerMock => this.TryGetReturnValue(out var returnValue)
-		                         && Awaitable.TryGetResultRecursive(returnValue) is IMocked mocked ? mocked.Mock : null;
+		public virtual Mock InnerMock => null;
 
 		public bool IsConditional => this.Condition != null;
 
@@ -87,16 +86,6 @@ namespace Moq
 		}
 
 		protected abstract void ExecuteCore(Invocation invocation);
-
-		/// <summary>
-		///   Attempts to get this setup's return value without invoking user code
-		///   (which could have side effects beyond Moq's understanding and control).
-		/// </summary>
-		public virtual bool TryGetReturnValue(out object returnValue)
-		{
-			returnValue = default;
-			return false;
-		}
 
 		public void MarkAsOverridden()
 		{
@@ -210,6 +199,11 @@ namespace Moq
 			}
 
 			this.Verify(recursive, predicate, verifiedMocks);
+		}
+
+		protected static Mock TryGetInnerMockFrom(object returnValue)
+		{
+			return (Awaitable.TryGetResultRecursive(returnValue) as IMocked)?.Mock;
 		}
 
 		[Flags]
