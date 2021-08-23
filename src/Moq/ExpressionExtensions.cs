@@ -419,16 +419,6 @@ namespace Moq
 				|| (expression.Body is MethodCallExpression methodCallExpression && methodCallExpression.Method.IsSpecialName);
 		}
 
-		public static Expression StripQuotes(this Expression expression)
-		{
-			while (expression.NodeType == ExpressionType.Quote)
-			{
-				expression = ((UnaryExpression)expression).Operand;
-			}
-
-			return expression;
-		}
-
 		public static Expression<Action<TMock>> AssignItIsAny<TMock, T>(this Expression<Func<TMock, T>> expression)
 		{
 			Debug.Assert(expression != null);
