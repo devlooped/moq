@@ -30,7 +30,7 @@ namespace Moq
 
 		private static bool HandleEquals(Invocation invocation, Mock mock)
 		{
-			if (IsObjectMethod(invocation.Method) && mock.MutableSetups.FindLast(c => IsObjectMethod(c.Method, "Equals")) == null)
+			if (IsObjectMethodWithoutSetup(invocation, mock))
 			{
 				invocation.ReturnValue = ReferenceEquals(invocation.Arguments.First(), mock.Object);
 				return true;
@@ -48,8 +48,7 @@ namespace Moq
 
 		private static bool HandleGetHashCode(Invocation invocation, Mock mock)
 		{
-			// Only if there is no corresponding setup for `GetHashCode()`
-			if (IsObjectMethod(invocation.Method) && mock.MutableSetups.FindLast(c => IsObjectMethod(c.Method, "GetHashCode")) == null)
+			if (IsObjectMethodWithoutSetup(invocation, mock))
 			{
 				invocation.ReturnValue = mock.GetHashCode();
 				return true;
@@ -62,8 +61,7 @@ namespace Moq
 
 		private static bool HandleToString(Invocation invocation, Mock mock)
 		{
-			// Only if there is no corresponding setup for `ToString()`
-			if (IsObjectMethod(invocation.Method) && mock.MutableSetups.FindLast(c => IsObjectMethod(c.Method, "ToString")) == null)
+			if (IsObjectMethodWithoutSetup(invocation, mock))
 			{
 				invocation.ReturnValue = mock.ToString() + ".Object";
 				return true;
@@ -92,9 +90,11 @@ namespace Moq
 			return method.GetBaseDefinition() == typeof(object).GetMethod("Finalize", BindingFlags.NonPublic | BindingFlags.Instance);
 		}
 
-		private static bool IsObjectMethod(MethodInfo method) => method.DeclaringType == typeof(object);
-
-		private static bool IsObjectMethod(MethodInfo method, string name) => IsObjectMethod(method) && method.Name == name;
+		private static bool IsObjectMethodWithoutSetup(Invocation invocation, Mock mock)
+		{
+			return invocation.Method.DeclaringType == typeof(object)
+			    && mock.MutableSetups.FindLast(setup => setup.Matches(invocation)) == null;
+		}
 	}
 
 	internal static class FindAndExecuteMatchingSetup
