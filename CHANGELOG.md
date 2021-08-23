@@ -15,6 +15,7 @@ and `Setup(x => x.GetFooAsync(It.IsAny<string>()).Result).Throws((string s) => n
 
 #### Fixed
 
+* The guard against unmatchable matchers (added in #900) was too strict; relaxed it to enable an alternative user-code shorthand `_` for `It.IsAny<>()` (@adamfk, #1199)
 * mock.Protected() setup methods fail when argument is of type Expression (@tonyhallett, #1189)
 * Parameter is invalid in Protected().SetupSet() ... VerifySet (@tonyhallett, #1186)
 
