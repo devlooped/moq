@@ -62,7 +62,7 @@
 			<DependentUpon>Resources.resx</DependentUpon>
 		</Compile>
 
-		<None Update="Includes\GenericTypeParameters.tt">
+		<None Update="Language\GenericTypeParameters.tt">
 			<Generator>TextTemplatingFileGenerator</Generator>
 		</None>
 

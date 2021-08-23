@@ -38,4 +38,4 @@ for (var typeCount = 1; typeCount <= GenericTypeMax; typeCount++)
 #>
 	}
 }
-<#@ Include File="..\Includes\GenericTypeParameters.tt" #>
+<#@ Include File="GenericTypeParameters.tt" #>
