@@ -10,7 +10,7 @@ namespace Moq
 	/// <summary>
 	///   Setup used by <see cref="Mock.SetupAllProperties(Mock)"/> for property getters.
 	/// </summary>
-	internal sealed class StubbedPropertyGetterSetup : Setup
+	internal sealed class StubbedPropertyGetterSetup : MethodSetup
 	{
 		private static Expression[] noArguments = new Expression[0];
 

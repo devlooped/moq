@@ -11,7 +11,7 @@ using Moq.Properties;
 
 namespace Moq
 {
-	internal abstract class SetupWithOutParameterSupport : Setup
+	internal abstract class SetupWithOutParameterSupport : MethodSetup
 	{
 		private readonly List<KeyValuePair<int, object>> outValues;
 

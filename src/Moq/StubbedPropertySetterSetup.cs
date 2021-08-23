@@ -11,7 +11,7 @@ namespace Moq
 	/// <summary>
 	///   Setup used by <see cref="Mock.SetupAllProperties(Mock)"/> for property setters.
 	/// </summary>
-	internal sealed class StubbedPropertySetterSetup : Setup
+	internal sealed class StubbedPropertySetterSetup : MethodSetup
 	{
 		private Action<object> setter;
 

@@ -5,7 +5,6 @@ using System;
 using System.Collections.Generic;
 using System.Diagnostics;
 using System.Linq.Expressions;
-using System.Reflection;
 using System.Text;
 
 using Moq.Async;
@@ -42,8 +41,6 @@ namespace Moq
 		public bool IsOverridden => (this.flags & Flags.Overridden) != 0;
 
 		public bool IsVerifiable => (this.flags & Flags.Verifiable) != 0;
-
-		public MethodInfo Method => this.expectation.Method;
 
 		public Mock Mock => this.mock;
 
