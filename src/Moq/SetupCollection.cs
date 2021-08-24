@@ -82,7 +82,7 @@ namespace Moq
 
 			lock (this.setups)
 			{
-				this.setups.RemoveAll(s => s is MethodSetup ms && ms.Method.IsPropertyAccessor());
+				this.setups.RemoveAll(s => s is StubbedPropertySetup || (s is MethodSetup ms && ms.Method.IsPropertyAccessor()));
 
 				// NOTE: In the general case, removing a setup means that some overridden setups might no longer
 				// be shadowed, and their `IsOverridden` flag should go back from `true` to `false`.

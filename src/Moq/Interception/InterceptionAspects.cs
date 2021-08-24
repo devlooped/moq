@@ -3,6 +3,7 @@
 
 using System;
 using System.Collections.Generic;
+using System.Diagnostics;
 using System.Linq;
 using System.Linq.Expressions;
 using System.Reflection;
@@ -186,63 +187,25 @@ namespace Moq
 			}
 			
 			MethodInfo invocationMethod = invocation.Method;
-			if (invocationMethod.IsPropertyAccessor())
-			{
-				string propertyNameToSearch = invocationMethod.Name.Substring(AccessorPrefixLength);
-				PropertyInfo property = invocationMethod.DeclaringType.GetProperty(propertyNameToSearch, Type.EmptyTypes);
-
-				if (property == null)
-				{
-					return false;
-				}
-
-				var expression = GetPropertyExpression(invocationMethod.DeclaringType, property);
-
-				object propertyValue;
-
-				Setup getterSetup = null;
-				if (property.CanRead(out var getter))
-				{
-					if (ProxyFactory.Instance.IsMethodVisible(getter, out _))
-					{
-						propertyValue = CreateInitialPropertyValue(mock, getter);
-						getterSetup = new StubbedPropertyGetterSetup(mock, expression, getter, () => propertyValue);
-						mock.MutableSetups.Add(getterSetup);
-					}
-
-					// If we wanted to optimise for speed, we'd probably be forgiven
-					// for removing the above `IsMethodVisible` guard, as it's rather
-					// unlikely to encounter non-public getters such as the following
-					// in real-world code:
-					//
-					//     public T Property { internal get; set; }
-					//
-					// Usually, it's only the setters that are made non-public. For
-					// now however, we prefer correctness.
-				}
-
-				Setup setterSetup = null;
-				if (property.CanWrite(out var setter))
-				{
-					if (ProxyFactory.Instance.IsMethodVisible(setter, out _))
-					{
-						setterSetup = new StubbedPropertySetterSetup(mock, expression, setter, (newValue) =>
-						{
-							propertyValue = newValue;
-						});
-						mock.MutableSetups.Add(setterSetup);
-					}
-				}
-
-				Setup setupToExecute = invocationMethod.IsGetAccessor() ? getterSetup : setterSetup;
-				setupToExecute.Execute(invocation);
-
-				return true;
-			}
-			else
+			if (!invocationMethod.IsPropertyAccessor())
 			{
 				return false;
 			}
+
+			string propertyName = invocationMethod.Name.Substring(AccessorPrefixLength);
+			PropertyInfo property = invocationMethod.DeclaringType.GetProperty(propertyName, Type.EmptyTypes);
+			Debug.Assert(property != null);
+
+			bool accessorFound = property.CanRead(out var getter) | property.CanWrite(out var setter);
+			Debug.Assert(accessorFound);
+
+			var expression = GetPropertyExpression(invocationMethod.DeclaringType, property);
+			var initialValue = getter != null ? CreateInitialPropertyValue(mock, getter) : null;
+			var setup = new StubbedPropertySetup(mock, expression, getter, setter, initialValue);
+			mock.MutableSetups.Add(setup);
+			setup.Execute(invocation);
+
+			return true;
 		}
 
 		private static object CreateInitialPropertyValue(Mock mock, MethodInfo getter)
