@@ -479,13 +479,13 @@ namespace Moq
 		public static IEnumerable<Mock> FindAllInnerMocks(this SetupCollection setups)
 		{
 			return setups.FindAll(setup => !setup.IsConditional)
-			             .Select(setup => setup.InnerMock)
+			             .SelectMany(setup => setup.InnerMocks)
 			             .Where(innerMock => innerMock != null);
 		}
 
 		public static Mock FindLastInnerMock(this SetupCollection setups, Func<Setup, bool> predicate)
 		{
-			return setups.FindLast(setup => !setup.IsConditional && predicate(setup))?.InnerMock;
+			return setups.FindLast(setup => !setup.IsConditional && predicate(setup))?.InnerMocks.SingleOrDefault();
 		}
 	}
 }

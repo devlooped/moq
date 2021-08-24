@@ -2,6 +2,7 @@
 // All rights reserved. Licensed under the BSD 3-Clause License; see License.txt.
 
 using System;
+using System.Collections.Generic;
 using System.Linq.Expressions;
 using System.Reflection;
 
@@ -24,7 +25,17 @@ namespace Moq
 			this.MarkAsVerifiable();
 		}
 
-		public override Mock InnerMock => TryGetInnerMockFrom(this.getter.Invoke());
+		public override IEnumerable<Mock> InnerMocks
+		{
+			get
+			{
+				var innerMock = TryGetInnerMockFrom(this.getter.Invoke());
+				if (innerMock != null)
+				{
+					yield return innerMock;
+				}
+			}
+		}
 
 		protected override void ExecuteCore(Invocation invocation)
 		{

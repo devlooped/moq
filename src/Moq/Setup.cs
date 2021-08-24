@@ -4,6 +4,7 @@
 using System;
 using System.Collections.Generic;
 using System.Diagnostics;
+using System.Linq;
 using System.Linq.Expressions;
 using System.Text;
 
@@ -34,7 +35,9 @@ namespace Moq
 
 		public LambdaExpression Expression => this.expectation.Expression;
 
-		public virtual Mock InnerMock => null;
+		Mock ISetup.InnerMock => this.InnerMocks.SingleOrDefault();
+
+		public virtual IEnumerable<Mock> InnerMocks => Enumerable.Empty<Mock>();
 
 		public bool IsConditional => this.Condition != null;
 
@@ -148,7 +151,10 @@ namespace Moq
 			{
 				try
 				{
-					this.InnerMock?.Verify(predicate, verifiedMocks);
+					foreach (var innerMock in this.InnerMocks)
+					{
+						innerMock.Verify(predicate, verifiedMocks);
+					}
 				}
 				catch (MockException error) when (error.IsVerificationError)
 				{

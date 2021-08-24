@@ -2,6 +2,8 @@
 // All rights reserved. Licensed under the BSD 3-Clause License; see License.txt.
 
 using System;
+using System.Collections.Generic;
+using System.ComponentModel;
 using System.Linq.Expressions;
 
 namespace Moq
@@ -16,6 +18,18 @@ namespace Moq
 		///   The setup expression.
 		/// </summary>
 		LambdaExpression Expression { get; }
+
+		// NOTE regarding the `InnerMock` and `InnerMocks` properties below:
+		//
+		// Moq has support for multi-method setups, but does not yet make actual use of them.
+		// Once that changes, some setups may have more than one inner mock. This possibility
+		// has already been accounted for in Moq's internals, but not in this interface:
+		// The `InnerMock` property should really be replaced with an `InnerMocks` one.
+		//
+		// Before making this change, let's wait a little longer to see whether it can be avoided.
+		// This is a distinct possibility since fixing Moq's recursive verification algorithm
+		// may do away with the need to expose the "inner mock" concept altogether. It would be
+		// a pity to add `InnerMocks`, only to have both properties become obsolete soon after.
 
 		/// <summary>
 		///   Gets the inner mock of this setup (if present and known).
@@ -32,7 +46,27 @@ namespace Moq
 		///     since calling a user-provided function could have effects beyond Moq's understanding and control.
 		///   </para>
 		/// </summary>
+		// /// <exception cref="InvalidOperationException">The setup has more than one inner mock.</exception>
+		// [Obsolete("Use 'InnerMocks' instead.")]
+		// [EditorBrowsable(EditorBrowsableState.Never)]
 		Mock InnerMock { get; }
+
+		// /// <summary>
+		// ///   Gets the inner mocks of this setup (if present and known).
+		// ///   <para>
+		// ///     An "inner mock" is the <see cref="Moq.Mock"/> instance associated with a setup's return value,
+		// ///     if that setup is configured to return a mock object.
+		// ///   </para>
+		// ///   <para>
+		// ///     This property will return an empty sequence if a setup either does not return any mock objects,
+		// ///     or if Moq cannot safely determine its return value(s) without risking any side effects. For instance,
+		// ///     Moq is able to inspect the return value if it is a constant (e.g. <c>`.Returns(value)`</c>);
+		// ///     if, on the other hand, it gets computed by a factory function (e.g. <c>`.Returns(() => value)`</c>),
+		// ///     Moq will not attempt to retrieve that value just to find the inner mock,
+		// ///     since calling a user-provided function could have effects beyond Moq's understanding and control.
+		// ///   </para>
+		// /// </summary>
+		// IEnumerable<Mock> InnerMocks { get; }
 
 		/// <summary>
 		///   Gets whether this setup is conditional.
