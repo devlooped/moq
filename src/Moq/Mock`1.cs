@@ -633,12 +633,19 @@ namespace Moq
 			Guard.NotNull(property, nameof(property));
 
 			var pi = property.ToPropertyInfo();
-			Guard.CanRead(pi);
-			Guard.CanWrite(pi);
 
-			TProperty value = initialValue;
-			this.SetupGet(property).Returns(() => value);
-			Mock.SetupSet(this, property.AssignItIsAny(), condition: null).SetCallbackBehavior(new Action<TProperty>(p => value = p));
+			if (!pi.CanRead(out var getter))
+			{
+				Guard.CanRead(pi);
+			}
+
+			if (!pi.CanWrite(out var setter))
+			{
+				Guard.CanWrite(pi);
+			}
+
+			var setup = new StubbedPropertySetup(this, property, getter, setter, initialValue);
+			this.MutableSetups.Add(setup);
 			return this;
 		}
 
