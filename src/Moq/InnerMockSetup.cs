@@ -1,6 +1,7 @@
 // Copyright (c) 2007, Clarius Consulting, Manas Technology Solutions, InSTEDD, and Contributors.
 // All rights reserved. Licensed under the BSD 3-Clause License; see License.txt.
 
+using System.Collections.Generic;
 using System.Diagnostics;
 using System.Linq.Expressions;
 
@@ -12,7 +13,7 @@ namespace Moq
 	{
 		private readonly object returnValue;
 
-		public InnerMockSetup(Expression originalExpression, Mock mock, InvocationShape expectation, object returnValue)
+		public InnerMockSetup(Expression originalExpression, Mock mock, MethodExpectation expectation, object returnValue)
 			: base(originalExpression, mock, expectation)
 		{
 			Debug.Assert(Awaitable.TryGetResultRecursive(returnValue) is IMocked);
@@ -22,7 +23,15 @@ namespace Moq
 			this.MarkAsVerifiable();
 		}
 
-		public override Mock InnerMock => TryGetInnerMockFrom(this.returnValue);
+		public override IEnumerable<Mock> InnerMocks
+		{
+			get
+			{
+				var innerMock = TryGetInnerMockFrom(this.returnValue);
+				Debug.Assert(innerMock != null);
+				yield return innerMock;
+			}
+		}
 
 		protected override void ExecuteCore(Invocation invocation)
 		{
@@ -31,7 +40,10 @@ namespace Moq
 
 		protected override void ResetCore()
 		{
-			this.InnerMock.MutableSetups.Reset();
+			foreach (var innerMock in this.InnerMocks)
+			{
+				innerMock.MutableSetups.Reset();
+			}
 		}
 
 		protected override void VerifySelf()

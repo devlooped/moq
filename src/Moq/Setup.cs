@@ -4,8 +4,8 @@
 using System;
 using System.Collections.Generic;
 using System.Diagnostics;
+using System.Linq;
 using System.Linq.Expressions;
-using System.Reflection;
 using System.Text;
 
 using Moq.Async;
@@ -14,12 +14,12 @@ namespace Moq
 {
 	internal abstract class Setup : ISetup
 	{
-		private readonly InvocationShape expectation;
+		private readonly Expectation expectation;
 		private readonly Expression originalExpression;
 		private readonly Mock mock;
 		private Flags flags;
 
-		protected Setup(Expression originalExpression, Mock mock, InvocationShape expectation)
+		protected Setup(Expression originalExpression, Mock mock, Expectation expectation)
 		{
 			Debug.Assert(mock != null);
 			Debug.Assert(expectation != null);
@@ -31,19 +31,19 @@ namespace Moq
 
 		public virtual Condition Condition => null;
 
-		public InvocationShape Expectation => this.expectation;
+		public Expectation Expectation => this.expectation;
 
 		public LambdaExpression Expression => this.expectation.Expression;
 
-		public virtual Mock InnerMock => null;
+		Mock ISetup.InnerMock => this.InnerMocks.SingleOrDefault();
+
+		public virtual IEnumerable<Mock> InnerMocks => Enumerable.Empty<Mock>();
 
 		public bool IsConditional => this.Condition != null;
 
 		public bool IsOverridden => (this.flags & Flags.Overridden) != 0;
 
 		public bool IsVerifiable => (this.flags & Flags.Verifiable) != 0;
-
-		public MethodInfo Method => this.expectation.Method;
 
 		public Mock Mock => this.mock;
 
@@ -104,7 +104,7 @@ namespace Moq
 			return this.expectation.IsMatch(invocation) && (this.Condition == null || this.Condition.IsTrue);
 		}
 
-		public bool Matches(InvocationShape expectation)
+		public bool Matches(MethodExpectation expectation)
 		{
 			return this.expectation.Equals(expectation);
 		}
@@ -151,7 +151,10 @@ namespace Moq
 			{
 				try
 				{
-					this.InnerMock?.Verify(predicate, verifiedMocks);
+					foreach (var innerMock in this.InnerMocks)
+					{
+						innerMock.Verify(predicate, verifiedMocks);
+					}
 				}
 				catch (MockException error) when (error.IsVerificationError)
 				{

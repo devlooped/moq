@@ -2,6 +2,7 @@
 // All rights reserved. Licensed under the BSD 3-Clause License; see License.txt.
 
 using System;
+using System.Collections.Generic;
 using System.Diagnostics;
 using System.Globalization;
 using System.IO;
@@ -29,7 +30,7 @@ namespace Moq
 
 		private string declarationSite;
 
-		public MethodCall(Expression originalExpression, Mock mock, Condition condition, InvocationShape expectation)
+		public MethodCall(Expression originalExpression, Mock mock, Condition condition, MethodExpectation expectation)
 			: base(originalExpression, mock, expectation)
 		{
 			this.condition = condition;
@@ -47,7 +48,17 @@ namespace Moq
 
 		public override Condition Condition => this.condition;
 
-		public override Mock InnerMock => TryGetInnerMockFrom((this.returnOrThrow as ReturnValue)?.Value);
+		public override IEnumerable<Mock> InnerMocks
+		{
+			get
+			{
+				var innerMock = TryGetInnerMockFrom((this.returnOrThrow as ReturnValue)?.Value);
+				if (innerMock != null)
+				{
+					yield return innerMock;
+				}
+			}
+		}
 
 		private static string GetUserCodeCallSite()
 		{

@@ -16,17 +16,17 @@ using E = System.Linq.Expressions.Expression;
 namespace Moq
 {
 	/// <summary>
-	///   Describes the "shape" of an invocation against which concrete <see cref="Invocation"/>s can be matched.
+	///   An <see cref="Expectation"/> that is bound to a single, specific method.
 	///   <para>
-	///     This shape is described by <see cref="InvocationShape.Expression"/> which has the general form
-	///     `mock => mock.Method(...arguments)`. Because the method and arguments are frequently needed,
-	///     they are cached in <see cref="InvocationShape.Method"/> and <see cref="InvocationShape.Arguments"/>
+	///     <see cref="MethodExpectation.Expression"/> has the general form
+	///     <c>`mock => mock.Method(...arguments)`</c>. Because the method and arguments are frequently needed,
+	///     they are cached in <see cref="MethodExpectation.Method"/> and <see cref="MethodExpectation.Arguments"/>
 	///     for faster access.
 	///   </para>
 	/// </summary>
-	internal sealed class InvocationShape : IEquatable<InvocationShape>
+	internal sealed class MethodExpectation : Expectation
 	{
-		public static InvocationShape CreateFrom(Invocation invocation)
+		public static MethodExpectation CreateFrom(Invocation invocation)
 		{
 			var method = invocation.Method;
 
@@ -55,13 +55,13 @@ namespace Moq
 				Debug.Assert(property.CanRead(out var getter) && method == getter);
 			}
 
-			return new InvocationShape(expression, method, arguments, exactGenericTypeArguments: true);
+			return new MethodExpectation(expression, method, arguments, exactGenericTypeArguments: true);
 		}
 
 		private static readonly Expression[] noArguments = new Expression[0];
 		private static readonly IMatcher[] noArgumentMatchers = new IMatcher[0];
 
-		public LambdaExpression Expression;
+		private LambdaExpression expression;
 		public readonly MethodInfo Method;
 		public readonly IReadOnlyList<Expression> Arguments;
 
@@ -74,7 +74,7 @@ namespace Moq
 #endif
 		private readonly bool exactGenericTypeArguments;
 
-		public InvocationShape(LambdaExpression expression, MethodInfo method, IReadOnlyList<Expression> arguments = null, bool exactGenericTypeArguments = false, bool skipMatcherInitialization = false, bool allowNonOverridable = false)
+		public MethodExpectation(LambdaExpression expression, MethodInfo method, IReadOnlyList<Expression> arguments = null, bool exactGenericTypeArguments = false, bool skipMatcherInitialization = false, bool allowNonOverridable = false)
 		{
 			Debug.Assert(expression != null);
 			Debug.Assert(method != null);
@@ -85,7 +85,7 @@ namespace Moq
 				Guard.IsVisibleToProxyFactory(method);
 			}
 
-			this.Expression = expression;
+			this.expression = expression;
 			this.Method = method;
 			if (arguments != null && !skipMatcherInitialization)
 			{
@@ -100,13 +100,15 @@ namespace Moq
 			this.exactGenericTypeArguments = exactGenericTypeArguments;
 		}
 
+		public override LambdaExpression Expression => this.expression;
+
 		public void AddResultExpression(Func<E, E> add, IAwaitableFactory awaitableFactory)
 		{
-			this.Expression = E.Lambda(add(this.Expression.Body), this.Expression.Parameters);
+			this.expression = E.Lambda(add(this.Expression.Body), this.Expression.Parameters);
 			this.awaitableFactory = awaitableFactory;
 		}
 
-		public bool HasResultExpression(out IAwaitableFactory awaitableFactory)
+		public override bool HasResultExpression(out IAwaitableFactory awaitableFactory)
 		{
 			return (awaitableFactory = this.awaitableFactory) != null;
 		}
@@ -118,7 +120,7 @@ namespace Moq
 			arguments = this.Arguments;
 		}
 
-		public bool IsMatch(Invocation invocation)
+		public override bool IsMatch(Invocation invocation)
 		{
 			if (invocation.Method != this.Method && !this.IsOverride(invocation))
 			{
@@ -138,7 +140,7 @@ namespace Moq
 			return true;
 		}
 
-		public void SetupEvaluatedSuccessfully(Invocation invocation)
+		public override void SetupEvaluatedSuccessfully(Invocation invocation)
 		{
 			var arguments = invocation.Arguments;
 			var parameterTypes = invocation.Method.GetParameterTypes();
@@ -194,8 +196,10 @@ namespace Moq
 			return true;
 		}
 
-		public bool Equals(InvocationShape other)
+		public override bool Equals(Expectation obj)
 		{
+			if (obj is not MethodExpectation other) return false;
+
 			if (this.Method != other.Method)
 			{
 				return false;
@@ -271,19 +275,9 @@ namespace Moq
 			return partiallyEvaluatedArguments;
 		}
 
-		public override bool Equals(object obj)
-		{
-			return obj is InvocationShape other && this.Equals(other);
-		}
-
 		public override int GetHashCode()
 		{
 			return this.Method.GetHashCode();
-		}
-
-		public override string ToString()
-		{
-			return this.Expression.ToStringFixed();
 		}
 	}
 }

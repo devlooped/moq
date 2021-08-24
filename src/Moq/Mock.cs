@@ -430,24 +430,24 @@ namespace Moq
 		private static int GetMatchingInvocationCount(
 			Mock mock,
 			LambdaExpression expression,
-			out List<Pair<Invocation, InvocationShape>> invocationsToBeMarkedAsVerified)
+			out List<Pair<Invocation, MethodExpectation>> invocationsToBeMarkedAsVerified)
 		{
 			Debug.Assert(mock != null);
 			Debug.Assert(expression != null);
 
-			invocationsToBeMarkedAsVerified = new List<Pair<Invocation, InvocationShape>>();
+			invocationsToBeMarkedAsVerified = new List<Pair<Invocation, MethodExpectation>>();
 			return Mock.GetMatchingInvocationCount(
 				mock,
-				new ImmutablePopOnlyStack<InvocationShape>(expression.Split()),
+				new ImmutablePopOnlyStack<MethodExpectation>(expression.Split()),
 				new HashSet<Mock>(),
 				invocationsToBeMarkedAsVerified);
 		}
 
 		private static int GetMatchingInvocationCount(
 			Mock mock,
-			in ImmutablePopOnlyStack<InvocationShape> parts,
+			in ImmutablePopOnlyStack<MethodExpectation> parts,
 			HashSet<Mock> visitedInnerMocks,
-			List<Pair<Invocation, InvocationShape>> invocationsToBeMarkedAsVerified)
+			List<Pair<Invocation, MethodExpectation>> invocationsToBeMarkedAsVerified)
 		{
 			Debug.Assert(mock != null);
 			Debug.Assert(!parts.Empty);
@@ -466,7 +466,7 @@ namespace Moq
 			var count = 0;
 			foreach (var matchingInvocation in mock.MutableInvocations.ToArray().Where(part.IsMatch))
 			{
-				invocationsToBeMarkedAsVerified.Add(new Pair<Invocation, InvocationShape>(matchingInvocation, part));
+				invocationsToBeMarkedAsVerified.Add(new Pair<Invocation, MethodExpectation>(matchingInvocation, part));
 
 				if (remainingParts.Empty)
 				{
@@ -591,7 +591,7 @@ namespace Moq
 			});
 		}
 
-		private static TSetup SetupRecursive<TSetup>(Mock mock, LambdaExpression expression, Func<Mock, Expression, InvocationShape, TSetup> setupLast, bool allowNonOverridableLastProperty = false)
+		private static TSetup SetupRecursive<TSetup>(Mock mock, LambdaExpression expression, Func<Mock, Expression, MethodExpectation, TSetup> setupLast, bool allowNonOverridableLastProperty = false)
 			where TSetup : ISetup
 		{
 			Debug.Assert(mock != null);
@@ -602,7 +602,7 @@ namespace Moq
 			return Mock.SetupRecursive(mock, originalExpression: expression, parts, setupLast);
 		}
 
-		private static TSetup SetupRecursive<TSetup>(Mock mock, LambdaExpression originalExpression, Stack<InvocationShape> parts, Func<Mock, Expression, InvocationShape, TSetup> setupLast)
+		private static TSetup SetupRecursive<TSetup>(Mock mock, LambdaExpression originalExpression, Stack<MethodExpectation> parts, Func<Mock, Expression, MethodExpectation, TSetup> setupLast)
 			where TSetup : ISetup
 		{
 			var part = parts.Pop();
@@ -667,7 +667,7 @@ namespace Moq
 			Mock.RaiseEvent(mock, expression, parts, arguments);
 		}
 
-		internal static void RaiseEvent(Mock mock, LambdaExpression expression, Stack<InvocationShape> parts, object[] arguments)
+		internal static void RaiseEvent(Mock mock, LambdaExpression expression, Stack<MethodExpectation> parts, object[] arguments)
 		{
 			const BindingFlags bindingFlags = BindingFlags.Public | BindingFlags.NonPublic | BindingFlags.Instance | BindingFlags.DeclaredOnly;
 

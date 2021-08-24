@@ -137,11 +137,11 @@ namespace Moq
 		/// <exception cref="ArgumentException">
 		///   It was not possible to completely split up the expression.
 		/// </exception>
-		internal static Stack<InvocationShape> Split(this LambdaExpression expression, bool allowNonOverridableLastProperty = false)
+		internal static Stack<MethodExpectation> Split(this LambdaExpression expression, bool allowNonOverridableLastProperty = false)
 		{
 			Debug.Assert(expression != null);
 
-			var parts = new Stack<InvocationShape>();
+			var parts = new Stack<MethodExpectation>();
 
 			Expression remainder = expression.Body;
 			while (CanSplit(remainder))
@@ -163,7 +163,7 @@ namespace Moq
 						remainder.ToStringFixed()));
 			}
 
-			void Split(Expression e, out Expression r /* remainder */, out InvocationShape p /* part */, bool assignment = false, bool allowNonOverridableLastProperty = false)
+			void Split(Expression e, out Expression r /* remainder */, out MethodExpectation p /* part */, bool assignment = false, bool allowNonOverridableLastProperty = false)
 			{
 				const string ParameterName = "...";
 
@@ -182,7 +182,7 @@ namespace Moq
 							arguments[ai] = lhs.Arguments[ai];
 						}
 						arguments[arguments.Length - 1] = assignmentExpression.Right;
-						p = new InvocationShape(
+						p = new MethodExpectation(
 							expression: Expression.Lambda(
 								Expression.MakeBinary(e.NodeType, lhs.Expression.Body, assignmentExpression.Right),
 								parameter),
@@ -216,7 +216,7 @@ namespace Moq
 							var parameter = Expression.Parameter(r.Type, r is ParameterExpression ope ? ope.Name : ParameterName);
 							var method = methodCallExpression.Method;
 							var arguments = methodCallExpression.Arguments;
-							p = new InvocationShape(
+							p = new MethodExpectation(
 										expression: Expression.Lambda(
 											Expression.Call(parameter, method, arguments),
 											parameter),
@@ -232,7 +232,7 @@ namespace Moq
 							var method = methodCallExpression.Method;
 							var arguments = methodCallExpression.Arguments.ToArray();
 							arguments[0] = parameter;
-							p = new InvocationShape(
+							p = new MethodExpectation(
 										expression: Expression.Lambda(
 											Expression.Call(method, arguments),
 											parameter),
@@ -264,7 +264,7 @@ namespace Moq
 						{
 							method = null;
 						}
-						p = new InvocationShape(
+						p = new MethodExpectation(
 									expression: Expression.Lambda(
 										Expression.MakeIndex(parameter, indexer, arguments),
 										parameter),
@@ -282,7 +282,7 @@ namespace Moq
 						r = invocationExpression.Expression;
 						var parameter = Expression.Parameter(r.Type, r is ParameterExpression ope ? ope.Name : ParameterName);
 						var arguments = invocationExpression.Arguments;
-						p = new InvocationShape(
+						p = new MethodExpectation(
 									expression: Expression.Lambda(
 										Expression.Invoke(parameter, arguments),
 										parameter),
@@ -323,7 +323,7 @@ namespace Moq
 						{
 							method = null;
 						}
-						p = new InvocationShape(
+						p = new MethodExpectation(
 									expression: Expression.Lambda(
 										Expression.MakeMemberAccess(parameter, property),
 										parameter),

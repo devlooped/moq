@@ -11,12 +11,12 @@ namespace Moq
 	internal sealed class SetupCollection : ISetupList
 	{
 		private List<Setup> setups;
-		private HashSet<InvocationShape> activeInvocationShapes;
+		private HashSet<Expectation> activeSetups;
 
 		public SetupCollection()
 		{
 			this.setups = new List<Setup>();
-			this.activeInvocationShapes = new HashSet<InvocationShape>();
+			this.activeSetups = new HashSet<Expectation>();
 		}
 
 		public int Count
@@ -46,7 +46,7 @@ namespace Moq
 			lock (this.setups)
 			{
 				this.setups.Add(setup);
-				if (!this.activeInvocationShapes.Add(setup.Expectation))
+				if (!this.activeSetups.Add(setup.Expectation))
 				{
 					this.MarkOverriddenSetups();
 				}
@@ -55,7 +55,7 @@ namespace Moq
 
 		private void MarkOverriddenSetups()
 		{
-			var visitedSetups = new HashSet<InvocationShape>();
+			var visitedSetups = new HashSet<Expectation>();
 
 			// Iterating in reverse order because newer setups are more relevant than (i.e. override) older ones
 			for (int i = this.setups.Count - 1; i >= 0; --i)
@@ -82,7 +82,7 @@ namespace Moq
 
 			lock (this.setups)
 			{
-				this.setups.RemoveAll(x => x.Method.IsPropertyAccessor());
+				this.setups.RemoveAll(s => s is MethodSetup ms && ms.Method.IsPropertyAccessor());
 
 				// NOTE: In the general case, removing a setup means that some overridden setups might no longer
 				// be shadowed, and their `IsOverridden` flag should go back from `true` to `false`.
@@ -97,7 +97,7 @@ namespace Moq
 			lock (this.setups)
 			{
 				this.setups.Clear();
-				this.activeInvocationShapes.Clear();
+				this.activeSetups.Clear();
 			}
 		}
 

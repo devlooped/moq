@@ -10,14 +10,14 @@ using Xunit;
 
 namespace Moq.Tests
 {
-	public class InvocationShapeFixture
+	public class MethodExpectationFixture
 	{
 		// This test is unspectacular but sets the stage for the one following it. See comment below.
 		[Fact]
 		public void Regular_parameters_are_compared_using_equality()
 		{
-			var fst = ToInvocationShape<A>(a => a.Method(1, 2, 3));
-			var snd = ToInvocationShape<A>(a => a.Method(1, 2, 3));
+			var fst = ToMethodExpectation<A>(a => a.Method(1, 2, 3));
+			var snd = ToMethodExpectation<A>(a => a.Method(1, 2, 3));
 
 			Assert.NotSame(fst, snd);
 			Assert.Equal(fst, snd);
@@ -30,8 +30,8 @@ namespace Moq.Tests
 		[Fact]
 		public void Param_array_args_are_compared_using_structural_equality_not_reference_equality()
 		{
-			var fst = ToInvocationShape<B>(b => b.Method(1, 2, 3));
-			var snd = ToInvocationShape<B>(b => b.Method(1, 2, 3));
+			var fst = ToMethodExpectation<B>(b => b.Method(1, 2, 3));
+			var snd = ToMethodExpectation<B>(b => b.Method(1, 2, 3));
 
 			Assert.NotSame(fst, snd);
 			Assert.Equal(fst, snd);
@@ -42,8 +42,8 @@ namespace Moq.Tests
 		{
 			int x = 1;
 
-			var fst = ToInvocationShape<B>(b => b.Method(1, 2, 3));
-			var snd = ToInvocationShape<B>(b => b.Method(x, 2, 3));
+			var fst = ToMethodExpectation<B>(b => b.Method(1, 2, 3));
+			var snd = ToMethodExpectation<B>(b => b.Method(x, 2, 3));
 			//                                           ^
 			// `x` will be captured and represented in the expression tree as a display class field access:
 			var xExpr = ((snd.Expression.Body as MethodCallExpression).Arguments.Last() as NewArrayExpression).Expressions.First();
@@ -53,13 +53,13 @@ namespace Moq.Tests
 			Assert.Equal(fst, snd);
 		}
 
-		private static InvocationShape ToInvocationShape<T>(Expression<Action<T>> expression)
+		private static MethodExpectation ToMethodExpectation<T>(Expression<Action<T>> expression)
 		{
 			Debug.Assert(expression != null);
 			Debug.Assert(expression.Body is MethodCallExpression);
 
 			var methodCall = (MethodCallExpression)expression.Body;
-			return new InvocationShape(expression, methodCall.Method, methodCall.Arguments);
+			return new MethodExpectation(expression, methodCall.Method, methodCall.Arguments);
 		}
 
 		public interface A
