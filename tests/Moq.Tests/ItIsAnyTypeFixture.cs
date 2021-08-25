@@ -202,6 +202,38 @@ namespace Moq.Tests
 		}
 
 		[Fact]
+		public void Type_matcher_should_be_disallowed_in_Callback()
+		{
+			var mock = new Mock<IY>();
+			var setup = mock.Setup(m => m.Method(It.IsAny<It.IsAnyType>()));
+
+			Assert.Throws<ArgumentException>(() => setup.Callback<It.IsAnyType>(arg => { }));
+			//                                                                  ^^^
+			// Similar to the above test, no actual argument will ever have type `It.IsAnyType`;
+			// Moq should mark this as illegal use, and one should be using `object` instead.
+
+			_ = mock.Object.Method(true);
+			//                     ^^^^
+			// this would cause an `ArgumentException`: "... cannot be converted to type 'It.IsAnyType'"
+		}
+
+		[Fact]
+		public void Type_matcher_should_be_disallowed_in_Returns()
+		{
+			var mock = new Mock<IY>();
+			var setup = mock.Setup(m => m.Method(It.IsAny<It.IsAnyType>()));
+
+			Assert.Throws<ArgumentException>(() => setup.Returns<It.IsAnyType>(arg => arg));
+			//                                                                 ^^^
+			// Similar to the above test, no actual argument will ever have type `It.IsAnyType`;
+			// Moq should mark this as illegal use, and one should be using `object` instead.
+
+			_ = mock.Object.Method(true);
+			//                     ^^^^
+			// this would cause an `ArgumentException`: "... cannot be converted to type 'It.IsAnyType'"
+		}
+
+		[Fact]
 		public void Setup_with_It_Ref_It_IsAnyType_IsAny()
 		{
 			object received = null;

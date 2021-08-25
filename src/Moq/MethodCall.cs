@@ -172,9 +172,16 @@ namespace Moq
 							callback.GetMethodInfo().GetParameterTypeList()));
 				}
 
-				if (callback.GetMethodInfo().ReturnType != typeof(void))
+				var callbackMethod = callback.GetMethodInfo();
+
+				if (callbackMethod.ReturnType != typeof(void))
 				{
 					throw new ArgumentException(Resources.InvalidCallbackNotADelegateWithReturnTypeVoid, nameof(callback));
+				}
+
+				if (callbackMethod.GetParameterTypes().Any(Extensions.IsOrContainsTypeMatcher))
+				{
+					throw new ArgumentException(Resources.TypeMatchersMayNotBeUsedWithCallbacks);
 				}
 
 				behavior = new Callback(invocation => callback.InvokePreserveStack(invocation.Arguments));
@@ -283,6 +290,11 @@ namespace Moq
 				ValidateNumberOfCallbackParameters(callback, callbackMethod);
 
 				ValidateCallbackReturnType(callbackMethod, expectedReturnType);
+
+				if (callbackMethod.GetParameterTypes().Any(Extensions.IsOrContainsTypeMatcher))
+				{
+					throw new ArgumentException(Resources.TypeMatchersMayNotBeUsedWithCallbacks);
+				}
 			}
 		}
 		

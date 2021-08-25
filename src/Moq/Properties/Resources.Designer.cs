@@ -554,6 +554,15 @@ namespace Moq.Properties {
         }
         
         /// <summary>
+        ///   Looks up a localized string similar to Type matchers may not be used as the type for &apos;Callback&apos; or &apos;Returns&apos; parameters, because no argument will never have that precise type. Consider using type &apos;object&apos; instead..
+        /// </summary>
+        internal static string TypeMatchersMayNotBeUsedWithCallbacks {
+            get {
+                return ResourceManager.GetString("TypeMatchersMayNotBeUsedWithCallbacks", resourceCulture);
+            }
+        }
+        
+        /// <summary>
         ///   Looks up a localized string similar to Type {0} does not implement required interface {1}.
         /// </summary>
         internal static string TypeNotImplementInterface {
