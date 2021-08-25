@@ -351,4 +351,7 @@ This could be caused by an unrecognized type conversion, coercion, narrowing, or
   <data name="UseItIsOtherOverload" xml:space="preserve">
     <value>It is impossible to call the provided strongly-typed predicate due to the use of a type matcher. Provide a weakly-typed predicate with two parameters (object, Type) instead.</value>
   </data>
+  <data name="TypeMatchersMayNotBeUsedWithCallbacks" xml:space="preserve">
+    <value>Type matchers may not be used as the type for 'Callback' or 'Returns' parameters, because no argument will never have that precise type. Consider using type 'object' instead.</value>
+  </data>
 </root>
