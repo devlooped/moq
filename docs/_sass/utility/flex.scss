@@ -1,0 +1,21 @@
+.flex {
+    display: flex;
+
+    &-grow {
+        flex-grow: 1;
+    }
+}
+
+.items {
+
+    &-center {
+        align-items: center;
+    }
+}
+
+.justify {
+
+    &-stretch {
+        justify-content: stretch;
+    }
+}
