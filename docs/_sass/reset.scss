@@ -1,0 +1,34 @@
+*,
+*::before,
+*::after {
+    box-sizing: border-box;
+}
+
+footer,
+header,
+main {
+    display: block;
+}
+
+blockquote,
+body,
+figure,
+h1,
+h2,
+h3,
+h4,
+img,
+p,
+pre {
+    margin: 0;
+    padding: 0;
+}
+
+:root,
+body {
+    min-height: 100%;
+}
+
+img {
+    display: inline-block;
+}

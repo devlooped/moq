@@ -1,0 +1,118 @@
+---
+---
+
+@import
+    "reset",
+    "utility/flex",
+    "utility/height",
+    "utility/margin",
+    "utility/max-width",
+    "utility/padding",
+    "utility/position",
+    "utility/space-between",
+    "utility/text-alignment",
+    "utility/width";
+
+$body-color: #1c1c1c;
+$body-light-color: #2a2a29;
+$body-text-color: #f0e7d5;
+$heading-text-color: #e8e8e8;
+$primary-color: #ffcc00;
+$primary-light-color: lighten($primary-color, 25%);
+
+:root {
+    font-size: 14px;
+    line-height: 1.5;
+    font-family: 'Open Sans', sans-serif;
+}
+
+code {
+    font-family: 'Inconsolata', monospace;
+}
+
+body {
+    color: $body-text-color;
+    background: linear-gradient($body-light-color, $body-color);
+}
+
+header {
+    background-image: url('data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAAQAAAAECAIAAAAmkwkpAAAAAXNSR0IArs4c6QAAAARnQU1BAACxjwv8YQUAAAAJcEhZcwAAFiUAABYlAUlSJPAAAAAZdEVYdFNvZnR3YXJlAHBhaW50Lm5ldCA0LjAuMTnU1rJkAAAAHklEQVQYV2PQ0tIyhQEGIIbzQRwggPChHCDQ0tICAPUsCW2mN2EYAAAAAElFTkSuQmCC');
+    background-repeat: repeat;
+    border-bottom: 4px solid #434343;
+}
+
+main {
+
+    h1 {
+        font-size: 28px;
+    }
+
+    h2 {
+        font-size: 24px;
+    }
+
+    h1, h2 {
+        color: $heading-text-color;
+        font-weight: inherit;
+        line-height: 1.1;
+        margin-bottom: 10px;
+    }
+
+    img,
+    p,
+    pre {
+        margin-bottom: 20px;
+    }
+
+    blockquote {
+        border-left: 3px solid $primary-color;
+        padding-left: 20px;
+        font-style: italic;
+    }
+}
+
+a {
+    color: $primary-color;
+    text-decoration: none;
+
+    &:hover {
+        color: $primary-light-color;
+    }
+}
+
+pre.highlight {
+    background: rgba(0, 0, 0, 0.125);
+    border-radius: 3px;
+    line-height: 1.25;
+    overflow-y: auto;
+    padding: 8px 12px;
+    scrollbar-width: thin;
+}
+
+p code {
+    background: rgba(0, 0, 0, 0.125);
+    border-radius: 3px;
+    padding: 2px 6px;
+}
+
+.highlight {
+
+    & .c1,
+    & .cm {
+        color: mix($primary-light-color, $body-light-color, 50%);
+        font-style: italic;
+    }
+
+    & .k,
+    & .kt {
+        font-weight: bold;
+    }
+
+    & .m {
+        color: $primary-color;
+    }
+
+    & .p {
+        color: darken($body-text-color, 50%);
+    }
+}

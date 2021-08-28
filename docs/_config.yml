@@ -1,0 +1,14 @@
+baseurl: /moq4
+
+defaults:
+  - scope:
+      path: ""
+    values:
+      layout: "default"
+  - scope:
+      path: "index.md"
+    values:
+      layout: "homepage"
+
+plugins:
+  - jekyll-relative-links

@@ -1,0 +1,18 @@
+.space-x {
+
+    &-4 > * + * {
+        margin-left: 4px;
+    }
+
+    &-8 > * + * {
+        margin-left: 8px;
+    }
+
+    &-12 > * + * {
+        margin-left: 12px;
+    }
+
+    &-16 > * + * {
+        margin-left: 16px;
+    }
+}
