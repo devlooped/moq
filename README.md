@@ -5,6 +5,7 @@ The most popular and friendly mocking library for .NET
 
 [![Version](https://img.shields.io/nuget/vpre/Moq.svg)](https://www.nuget.org/packages/Moq)
 [![Downloads](https://img.shields.io/nuget/dt/Moq.svg)](https://www.nuget.org/packages/Moq)
+[![Documentation](https://img.shields.io/badge/docs-website-%23fc0)](https://www.moqthis.com/moq4/)
 [![Discord Chat](https://img.shields.io/badge/chat-on%20discord-7289DA.svg)](https://discord.gg/8PtpGdu)
 [![Gitter chat](https://img.shields.io/badge/chat-on%20gitter-753A88.svg)](https://gitter.im/moq/moq)
 
@@ -68,6 +69,8 @@ You can read more about the "why" and see some nice screenshots at [kzu's blog](
 See our [Quickstart](https://github.com/Moq/moq4/wiki/Quickstart) examples to get a feeling of the extremely simple API and install from [NuGet](http://nuget.org/packages/moq).
 
 Read about the announcement at [kzu's blog](https://web.archive.org/web/20201130233544/http://blogs.clariusconsulting.net/kzu/linq-to-mock-moq-is-born/). Get some background on [the state of mock libraries from Scott Hanselman](http://www.hanselman.com/blog/MoqLinqLambdasAndPredicatesAppliedToMockObjects.aspx).
+
+In-depth documentation is being added to the [documentation website](https://www.moqthis.com/moq4/).
 
 
 ## Who?
