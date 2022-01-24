@@ -28,7 +28,7 @@ namespace Moq
 			this.behaviors.Enqueue(behavior);
 		}
 
-		protected override void ExecuteCore(Invocation invocation)
+		protected override void ExecuteCore(IInvocation invocation)
 		{
 			if (this.behaviors.TryDequeue(out var behavior))
 			{

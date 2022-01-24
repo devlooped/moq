@@ -18,7 +18,7 @@ namespace Moq
 		private MethodInfo methodImplementation;
 		private readonly Type proxyType;
 		private object result;
-		private Setup matchingSetup;
+		private ISetup matchingSetup;
 		private bool verified;
 
 		/// <summary>
@@ -65,8 +65,6 @@ namespace Moq
 		/// </remarks>
 		public object[] Arguments => this.arguments;
 
-		IReadOnlyList<object> IInvocation.Arguments => this.arguments;
-
 		public ISetup MatchingSetup => this.matchingSetup;
 
 		public Type ProxyType => this.proxyType;
@@ -109,9 +107,9 @@ namespace Moq
 		///   Calls the <see langword="base"/> method implementation
 		///   and returns its return value (or <see langword="null"/> for <see langword="void"/> methods).
 		/// </summary>
-		protected internal abstract object CallBase();
+		public abstract object CallBase();
 
-		internal void MarkAsMatchedBy(Setup setup)
+		public void MarkAsMatchedBy(ISetup setup)
 		{
 			Debug.Assert(this.matchingSetup == null);
 
@@ -120,7 +118,7 @@ namespace Moq
 
 		internal void MarkAsVerified() => this.verified = true;
 
-		internal void MarkAsVerifiedIfMatchedBy(Func<Setup, bool> predicate)
+		internal void MarkAsVerifiedIfMatchedBy(Func<ISetup, bool> predicate)
 		{
 			if (this.matchingSetup != null && predicate(this.matchingSetup))
 			{

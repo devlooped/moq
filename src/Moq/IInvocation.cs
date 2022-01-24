@@ -4,6 +4,7 @@
 using System;
 using System.Collections.Generic;
 using System.Reflection;
+using Moq.Async;
 
 namespace Moq
 {
@@ -18,14 +19,22 @@ namespace Moq
 		MethodInfo Method { get; }
 
 		/// <summary>
+		/// </summary>
+		MethodInfo MethodImplementation { get; }
+
+		/// <summary>
 		/// Gets the arguments of the invocation.
 		/// </summary>
-		IReadOnlyList<object> Arguments { get; }
+		object[] Arguments { get; }
 
 		/// <summary>
 		///   Gets the setup that matched this invocation (or <see langword="null"/> if there was no matching setup).
 		/// </summary>
 		ISetup MatchingSetup { get; }
+
+		/// <summary>
+		/// </summary>
+		Type ProxyType { get; }
 
 		/// <summary>
 		///   Gets whether this invocation was successfully verified by any of the various <c>`Verify`</c> methods.
@@ -35,11 +44,23 @@ namespace Moq
 		/// <summary>
 		/// The value being returned for a non-void method if no exception was thrown.
 		/// </summary>
-		object ReturnValue { get; }
+		object ReturnValue { get; set; }
 
 		/// <summary>
 		/// Optional exception if the method invocation results in an exception being thrown.
 		/// </summary>
-		Exception Exception { get; }
+		Exception Exception { get; set; }
+
+		/// <summary>
+		/// </summary>
+		void MarkAsMatchedBy(ISetup setup);
+
+		/// <summary>
+		/// </summary>
+		void ConvertResultToAwaitable(IAwaitableFactory awaitableFactory);
+
+		/// <summary>
+		/// </summary>
+		object CallBase();
 	}
 }

@@ -7,18 +7,32 @@ using System.Linq.Expressions;
 
 namespace Moq.Async
 {
-	internal interface IAwaitableFactory
+	/// <summary>
+	/// </summary>
+	public interface IAwaitableFactory
 	{
+		/// <summary>
+		/// </summary>
 		Type ResultType { get; }
 
+		/// <summary>
+		/// </summary>
 		object CreateCompleted(object result = null);
 
+		/// <summary>
+		/// </summary>
 		object CreateFaulted(Exception exception);
 
+		/// <summary>
+		/// </summary>
 		object CreateFaulted(IEnumerable<Exception> exceptions);
 
+		/// <summary>
+		/// </summary>
 		Expression CreateResultExpression(Expression awaitableExpression);
 
+		/// <summary>
+		/// </summary>
 		bool TryGetResult(object awaitable, out object result);
 	}
 }

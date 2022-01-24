@@ -52,7 +52,7 @@ namespace Moq
 
 		public bool IsMatched => (this.flags & Flags.Matched) != 0;
 
-		public void Execute(Invocation invocation)
+		public void Execute(IInvocation invocation)
 		{
 			// update this setup:
 			this.flags |= Flags.Matched;
@@ -86,7 +86,7 @@ namespace Moq
 			}
 		}
 
-		protected abstract void ExecuteCore(Invocation invocation);
+		protected abstract void ExecuteCore(IInvocation invocation);
 
 		/// <summary>
 		///   Attempts to get this setup's return value without invoking user code
@@ -110,12 +110,12 @@ namespace Moq
 			this.flags |= Flags.Verifiable;
 		}
 
-		public bool Matches(Invocation invocation)
+		public bool Matches(IInvocation invocation)
 		{
 			return this.expectation.IsMatch(invocation) && (this.Condition == null || this.Condition.IsTrue);
 		}
 
-		public virtual void SetOutParameters(Invocation invocation)
+		public virtual void SetOutParameters(IInvocation invocation)
 		{
 		}
 

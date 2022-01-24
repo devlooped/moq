@@ -5,7 +5,7 @@ namespace Moq
 {
 	partial class Mock : IInterceptor
 	{
-		void IInterceptor.Intercept(Invocation invocation)
+		void IInterceptor.Intercept(IInvocation invocation)
 		{
 			if (HandleWellKnownMethods.Handle(invocation, this))
 			{

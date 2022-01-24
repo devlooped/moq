@@ -17,7 +17,7 @@ namespace Moq.Behaviors
 			this.callback = callback;
 		}
 
-		public override void Execute(Invocation invocation)
+		public override void Execute(IInvocation invocation)
 		{
 			this.callback.Invoke(invocation);
 		}

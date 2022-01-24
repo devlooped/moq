@@ -11,7 +11,7 @@ namespace Moq.Behaviors
 		{
 		}
 
-		public override void Execute(Invocation invocation)
+		public override void Execute(IInvocation invocation)
 		{
 			invocation.ReturnValue = invocation.CallBase();
 		}

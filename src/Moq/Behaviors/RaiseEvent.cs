@@ -26,7 +26,7 @@ namespace Moq.Behaviors
 			this.eventArgsParams = eventArgsParams;
 		}
 
-		public override void Execute(Invocation invocation)
+		public override void Execute(IInvocation invocation)
 		{
 			object[] args;
 

@@ -9,6 +9,6 @@ namespace Moq
 		{
 		}
 
-		public abstract void Execute(Invocation invocation);
+		public abstract void Execute(IInvocation invocation);
 	}
 }

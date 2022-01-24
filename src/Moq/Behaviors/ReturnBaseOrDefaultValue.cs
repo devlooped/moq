@@ -17,7 +17,7 @@ namespace Moq.Behaviors
 			this.mock = mock;
 		}
 
-		public override void Execute(Invocation invocation)
+		public override void Execute(IInvocation invocation)
 		{
 			Debug.Assert(invocation.Method != null);
 			Debug.Assert(invocation.Method.ReturnType != null);

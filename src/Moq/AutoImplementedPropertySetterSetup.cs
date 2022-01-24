@@ -23,7 +23,7 @@ namespace Moq
 			this.MarkAsVerifiable();
 		}
 
-		protected override void ExecuteCore(Invocation invocation)
+		protected override void ExecuteCore(IInvocation invocation)
 		{
 			this.setter.Invoke(invocation.Arguments[0]);
 		}

@@ -17,7 +17,7 @@ namespace Moq.Behaviors
 			this.exception = exception;
 		}
 
-		public override void Execute(Invocation invocation)
+		public override void Execute(IInvocation invocation)
 		{
 			throw this.exception;
 		}

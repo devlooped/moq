@@ -82,7 +82,7 @@ namespace Moq
 			return null;
 		}
 
-		protected override void ExecuteCore(Invocation invocation)
+		protected override void ExecuteCore(IInvocation invocation)
 		{
 			this.limitInvocationCount?.Execute(invocation);
 

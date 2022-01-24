@@ -23,7 +23,7 @@ namespace Moq
 			this.outValues = GetOutValues(expectation.Arguments, expectation.Method.GetParameters());
 		}
 
-		public sealed override void SetOutParameters(Invocation invocation)
+		public sealed override void SetOutParameters(IInvocation invocation)
 		{
 			if (this.outValues != null)
 			{

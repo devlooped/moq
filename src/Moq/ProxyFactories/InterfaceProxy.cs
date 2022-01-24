@@ -68,7 +68,7 @@ namespace Moq.Internals
 			{
 			}
 
-			protected internal override object CallBase()
+			public override object CallBase()
 			{
 				throw new NotSupportedException();
 			}

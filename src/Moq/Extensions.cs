@@ -481,7 +481,7 @@ namespace Moq
 			return setups.FirstOrDefault(setup => setup.Expectation.Equals(expectation));
 		}
 
-		public static Setup TryFind(this IEnumerable<Setup> setups, Invocation invocation)
+		public static Setup TryFind(this IEnumerable<Setup> setups, IInvocation invocation)
 		{
 			return setups.FirstOrDefault(setup => setup.Matches(invocation));
 		}

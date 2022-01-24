@@ -13,7 +13,7 @@ namespace Moq
 {
 	internal static class HandleWellKnownMethods
 	{
-		private static Dictionary<string, Func<Invocation, Mock, bool>> specialMethods = new Dictionary<string, Func<Invocation, Mock, bool>>()
+		private static Dictionary<string, Func<IInvocation, Mock, bool>> specialMethods = new Dictionary<string, Func<IInvocation, Mock, bool>>()
 		{
 			["Equals"] = HandleEquals,
 			["Finalize"] = HandleFinalize,
@@ -22,13 +22,13 @@ namespace Moq
 			["ToString"] = HandleToString,
 		};
 
-		public static bool Handle(Invocation invocation, Mock mock)
+		public static bool Handle(IInvocation invocation, Mock mock)
 		{
 			return specialMethods.TryGetValue(invocation.Method.Name, out var handler)
 				&& handler.Invoke(invocation, mock);
 		}
 
-		private static bool HandleEquals(Invocation invocation, Mock mock)
+		private static bool HandleEquals(IInvocation invocation, Mock mock)
 		{
 			if (IsObjectMethod(invocation.Method) && !mock.MutableSetups.Any(c => IsObjectMethod(c.Method, "Equals")))
 			{
@@ -41,12 +41,12 @@ namespace Moq
 			}
 		}
 
-		private static bool HandleFinalize(Invocation invocation, Mock mock)
+		private static bool HandleFinalize(IInvocation invocation, Mock mock)
 		{
 			return IsFinalizer(invocation.Method);
 		}
 
-		private static bool HandleGetHashCode(Invocation invocation, Mock mock)
+		private static bool HandleGetHashCode(IInvocation invocation, Mock mock)
 		{
 			// Only if there is no corresponding setup for `GetHashCode()`
 			if (IsObjectMethod(invocation.Method) && !mock.MutableSetups.Any(c => IsObjectMethod(c.Method, "GetHashCode")))
@@ -60,7 +60,7 @@ namespace Moq
 			}
 		}
 
-		private static bool HandleToString(Invocation invocation, Mock mock)
+		private static bool HandleToString(IInvocation invocation, Mock mock)
 		{
 			// Only if there is no corresponding setup for `ToString()`
 			if (IsObjectMethod(invocation.Method) && !mock.MutableSetups.Any(c => IsObjectMethod(c.Method, "ToString")))
@@ -74,7 +74,7 @@ namespace Moq
 			}
 		}
 
-		private static bool HandleMockGetter(Invocation invocation, Mock mock)
+		private static bool HandleMockGetter(IInvocation invocation, Mock mock)
 		{
 			if (typeof(IMocked).IsAssignableFrom(invocation.Method.DeclaringType))
 			{
@@ -99,7 +99,7 @@ namespace Moq
 
 	internal static class FindAndExecuteMatchingSetup
 	{
-		public static bool Handle(Invocation invocation, Mock mock)
+		public static bool Handle(IInvocation invocation, Mock mock)
 		{
 			var matchingSetup = mock.MutableSetups.FindMatchFor(invocation);
 			if (matchingSetup != null)
@@ -116,7 +116,7 @@ namespace Moq
 
 	internal static class HandleEventSubscription
 	{
-		public static bool Handle(Invocation invocation, Mock mock)
+		public static bool Handle(IInvocation invocation, Mock mock)
 		{
 			const BindingFlags bindingFlags = BindingFlags.Public | BindingFlags.NonPublic | BindingFlags.Instance | BindingFlags.DeclaredOnly;
 
@@ -170,7 +170,7 @@ namespace Moq
 
 	internal static class RecordInvocation
 	{
-		public static void Handle(Invocation invocation, Mock mock)
+		public static void Handle(IInvocation invocation, Mock mock)
 		{
 			// Save to support Verify[expression] pattern.
 			mock.MutableInvocations.Add(invocation);
@@ -179,7 +179,7 @@ namespace Moq
 
 	internal static class Return
 	{
-		public static void Handle(Invocation invocation, Mock mock)
+		public static void Handle(IInvocation invocation, Mock mock)
 		{
 			new ReturnBaseOrDefaultValue(mock).Execute(invocation);
 		}
@@ -189,7 +189,7 @@ namespace Moq
 	{
 		private static readonly int AccessorPrefixLength = "?et_".Length; // get_ or set_
 
-		public static bool Handle(Invocation invocation, Mock mock)
+		public static bool Handle(IInvocation invocation, Mock mock)
 		{
 			if (mock.AutoSetupPropertiesDefaultValueProvider == null)
 			{
@@ -278,7 +278,7 @@ namespace Moq
 
 	internal static class FailForStrictMock
 	{
-		public static void Handle(Invocation invocation, Mock mock)
+		public static void Handle(IInvocation invocation, Mock mock)
 		{
 			if (mock.Behavior == MockBehavior.Strict)
 			{

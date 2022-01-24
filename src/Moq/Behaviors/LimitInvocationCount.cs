@@ -21,7 +21,7 @@ namespace Moq.Behaviors
 			this.count = 0;
 		}
 
-		public override void Execute(Invocation invocation)
+		public override void Execute(IInvocation invocation)
 		{
 			++this.count;
 

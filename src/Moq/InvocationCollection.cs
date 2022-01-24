@@ -10,7 +10,7 @@ namespace Moq
 {
 	internal sealed class InvocationCollection : IInvocationList
 	{
-		private Invocation[] invocations;
+		private IInvocation[] invocations;
 
 		private int capacity = 0;
 		private int count = 0;
@@ -52,7 +52,7 @@ namespace Moq
 			}
 		}
 
-		public void Add(Invocation invocation)
+		public void Add(IInvocation invocation)
 		{
 			lock (this.invocationsLock)
 			{
@@ -99,7 +99,7 @@ namespace Moq
 			}
 		}
 
-		public Invocation[] ToArray(Func<Invocation, bool> predicate)
+		public IInvocation[] ToArray(Func<IInvocation, bool> predicate)
 		{
 			lock (this.invocationsLock)
 			{
@@ -108,7 +108,7 @@ namespace Moq
 					return new Invocation[0];
 				}
 				
-				var result = new List<Invocation>(this.count);
+				var result = new List<IInvocation>(this.count);
 
 				for (var i = 0; i < this.count; i++)
 				{
@@ -126,7 +126,7 @@ namespace Moq
 		public IEnumerator<IInvocation> GetEnumerator()
 		{
 			// Take local copies of collection and count so they are isolated from changes by other threads.
-			Invocation[] collection;
+			IInvocation[] collection;
 			int count;
 
 			lock (this.invocationsLock)

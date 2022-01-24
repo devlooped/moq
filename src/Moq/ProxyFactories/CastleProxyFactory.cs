@@ -16,6 +16,27 @@ using Moq.Properties;
 namespace Moq
 {
 	/// <summary>
+	/// An implementation of <see cref="ProxyFactory"/> that is based on Cecil.
+	/// </summary>
+	internal sealed class CecilProxyFactory : ProxyFactory
+	{
+		public override object CreateProxy(Type mockType, IInterceptor interceptor, Type[] interfaces, object[] arguments)
+		{
+			throw new NotImplementedException();
+		}
+
+		public override bool IsMethodVisible(MethodInfo method, out string messageIfNotVisible)
+		{
+			throw new NotImplementedException();
+		}
+
+		public override bool IsTypeVisible(Type type)
+		{
+			throw new NotImplementedException();
+		}
+	}
+
+	/// <summary>
 	/// An implementation of <see cref="ProxyFactory"/> that is based on Castle DynamicProxy.
 	/// </summary>
 	internal sealed class CastleProxyFactory : ProxyFactory
@@ -122,7 +143,7 @@ namespace Moq
 				this.underlying = underlying;
 			}
 
-			protected internal override object CallBase()
+			public override object CallBase()
 			{
 				Debug.Assert(this.underlying != null);
 

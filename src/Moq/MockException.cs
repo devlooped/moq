@@ -130,7 +130,7 @@ namespace Moq
 		/// <summary>
 		///   Returns the exception to be thrown when a strict mock has no setup corresponding to the specified invocation.
 		/// </summary>
-		internal static MockException NoSetup(Invocation invocation)
+		internal static MockException NoSetup(IInvocation invocation)
 		{
 			return new MockException(
 				MockExceptionReasons.NoSetup,
@@ -145,7 +145,7 @@ namespace Moq
 		/// <summary>
 		///   Returns the exception to be thrown when a strict mock has no setup that provides a return value for the specified invocation.
 		/// </summary>
-		internal static MockException ReturnValueRequired(Invocation invocation)
+		internal static MockException ReturnValueRequired(IInvocation invocation)
 		{
 			return new MockException(
 				MockExceptionReasons.ReturnValueRequired,
@@ -214,7 +214,7 @@ namespace Moq
 		/// <summary>
 		///   Returns the exception to be thrown when <see cref="Mock.VerifyNoOtherCalls(Mock)"/> finds invocations that have not been verified.
 		/// </summary>
-		internal static MockException UnverifiedInvocations(Mock mock, IEnumerable<Invocation> invocations)
+		internal static MockException UnverifiedInvocations(Mock mock, IEnumerable<IInvocation> invocations)
 		{
 			var message = new StringBuilder();
 

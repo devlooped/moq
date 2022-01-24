@@ -14,7 +14,7 @@ namespace Moq.Behaviors
 
 		public object Value => this.value;
 
-		public override void Execute(Invocation invocation)
+		public override void Execute(IInvocation invocation)
 		{
 			invocation.ReturnValue = this.value;
 		}

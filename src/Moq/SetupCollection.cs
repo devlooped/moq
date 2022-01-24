@@ -109,7 +109,7 @@ namespace Moq
 			}
 		}
 
-		public Setup FindMatchFor(Invocation invocation)
+		public Setup FindMatchFor(IInvocation invocation)
 		{
 			// Fast path (no `lock`) when there are no setups:
 			if (this.setups.Count == 0)

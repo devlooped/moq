@@ -107,7 +107,7 @@ namespace Moq
 				}
 			}
 
-			Expression[] GetArgumentExpressions(Invocation invocation, Match[] matches)
+			Expression[] GetArgumentExpressions(IInvocation invocation, Match[] matches)
 			{
 				// First, let's pretend that all arguments are constant values:
 				var parameterTypes = invocation.Method.GetParameterTypes();
@@ -239,7 +239,7 @@ namespace Moq
 		{
 			private readonly MatcherObserver matcherObserver;
 			private int creationTimestamp;
-			private Invocation invocation;
+			private IInvocation invocation;
 			private int invocationTimestamp;
 			private object returnValue;
 
@@ -251,7 +251,7 @@ namespace Moq
 				this.creationTimestamp = this.matcherObserver.GetNextTimestamp();
 			}
 
-			public Invocation Invocation => this.invocation;
+			public IInvocation Invocation => this.invocation;
 
 			public IEnumerable<Match> Matches
 			{
@@ -264,7 +264,7 @@ namespace Moq
 
 			public Recorder Next => (Awaitable.TryGetResultRecursive(this.returnValue) as IProxy)?.Interceptor as Recorder;
 
-			public void Intercept(Invocation invocation)
+			public void Intercept(IInvocation invocation)
 			{
 				var returnType = invocation.Method.ReturnType;
 

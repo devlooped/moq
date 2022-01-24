@@ -63,7 +63,7 @@ namespace Moq.Tests
 				this.returnValue = returnValue;
 			}
 
-			public void Intercept(Invocation invocation)
+			public void Intercept(IInvocation invocation)
 			{
 				invocation.ReturnValue = this.returnValue;
 			}

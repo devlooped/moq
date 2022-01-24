@@ -17,7 +17,7 @@ namespace Moq.Behaviors
 			this.valueFactory = valueFactory;
 		}
 
-		public override void Execute(Invocation invocation)
+		public override void Execute(IInvocation invocation)
 		{
 			invocation.ReturnValue = this.valueFactory.Invoke(invocation);
 		}
