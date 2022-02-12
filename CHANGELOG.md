@@ -10,14 +10,18 @@ The format is loosely based on [Keep a Changelog](http://keepachangelog.com/en/1
 #### Added
 
 * `SetupSet`, `VerifySet` methods for `mock.Protected().As<>()` (@tonyhallett, #1165)
-* New `Throws` method overloads that allow specifying a function with or without paramaters, to provide an exception, for example `.Throws(() => new InvalidOperationException())`
+* New `Throws` method overloads that allow specifying a function with or without parameters, to provide an exception, for example `.Throws(() => new InvalidOperationException())`
 and `Setup(x => x.GetFooAsync(It.IsAny<string>()).Result).Throws((string s) => new InvalidOperationException(s))`. (@adam-knights, #1191)
+
+#### Changed
+
+* Update package reference to `Castle.Core` (DynamicProxy) from version 4.4.0 to 4.4.1 (@stakx, #1233)
 
 #### Fixed
 
 * The guard against unmatchable matchers (added in #900) was too strict; relaxed it to enable an alternative user-code shorthand `_` for `It.IsAny<>()` (@adamfk, #1199)
-* mock.Protected() setup methods fail when argument is of type Expression (@tonyhallett, #1189)
-* Parameter is invalid in Protected().SetupSet() ... VerifySet (@tonyhallett, #1186)
+* `mock.Protected()` setup methods fail when argument is of type `Expression` (@tonyhallett, #1189)
+* Parameter is invalid in `Protected().SetupSet()` ... `VerifySet` (@tonyhallett, #1186)
 * Virtual properties and automocking not working for `mock.Protected().As<>()` (@tonyhallett, #1185)
 * Issue mocking VB.NET class with overloaded property/indexer in base class (@myurashchyk, #1153)
 * Equivalent arrays don't test equal when returned from a method, making `Verify` fail when it should not (@evilc0, #1225)
