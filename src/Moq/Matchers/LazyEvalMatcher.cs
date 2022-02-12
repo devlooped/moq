@@ -19,12 +19,7 @@ namespace Moq.Matchers
 		public bool Matches(object argument, Type parameterType)
 		{
 			var eval = Evaluator.PartialEval(this.expression);
-			if (eval.NodeType == ExpressionType.Constant)
-			{
-				return object.Equals(((ConstantExpression)eval).Value, argument);
-			}
-
-			return false;
+			return eval is ConstantExpression ce && new ConstantMatcher(ce.Value).Matches(argument, parameterType);
 		}
 
 		public void SetupEvaluatedSuccessfully(object argument, Type parameterType)
