@@ -209,13 +209,6 @@ namespace Moq
 		/// </summary>
 		public abstract DefaultValueProvider DefaultValueProvider { get; set; }
 
-		/// <summary>
-		/// The <see cref="Moq.DefaultValueProvider"/> used to initialize automatically stubbed properties.
-		/// It is equal to the value of <see cref="DefaultValueProvider"/> at the time when
-		/// <see cref="SetupAllProperties"/> was last called.
-		/// </summary>
-		internal abstract DefaultValueProvider AutoSetupPropertiesDefaultValueProvider { get; set; } 
-
 		internal abstract SetupCollection MutableSetups { get; }
 
 		/// <summary>
@@ -539,26 +532,7 @@ namespace Moq
 
 			Mock.SetupRecursive<MethodCall>(mock, expression, setupLast: (targetMock, _, __) =>
 			{
-				// Setting a mock's property through reflection will only work (i.e. the property will only remember the value
-				// it's being set to) if it is being stubbed. In order to ensure it's stubbed, we temporarily enable
-				// auto-stubbing (if that isn't already switched on).
-
-				var temporaryAutoSetupProperties = targetMock.AutoSetupPropertiesDefaultValueProvider == null;
-				if (temporaryAutoSetupProperties)
-				{
-					targetMock.AutoSetupPropertiesDefaultValueProvider = targetMock.DefaultValueProvider;
-				}
-				try
-				{
-					propertyToSet.SetValue(targetMock.Object, value, null);
-				}
-				finally
-				{
-					if (temporaryAutoSetupProperties)
-					{
-						targetMock.AutoSetupPropertiesDefaultValueProvider = null;
-					}
-				}
+				propertyToSet.SetValue(targetMock.Object, value, null);
 				return null;
 			}, allowNonOverridableLastProperty: true);
 		}
@@ -637,21 +611,7 @@ namespace Moq
 
 		internal static void SetupAllProperties(Mock mock)
 		{
-			SetupAllProperties(mock, mock.DefaultValueProvider);
-		}
-
-		internal static void SetupAllProperties(Mock mock, DefaultValueProvider defaultValueProvider)
-		{
-			mock.MutableSetups.RemoveAllPropertyAccessorSetups();
-			// Removing all the previous properties setups to keep the behaviour of overriding
-			// existing setups in `SetupAllProperties`.
-			
-			mock.AutoSetupPropertiesDefaultValueProvider = defaultValueProvider;
-			// `SetupAllProperties` no longer performs properties setup like in previous versions.
-			// Instead it just enables a switch to setup properties on-demand at the moment of first access.
-			// In order for `SetupAllProperties`'s new mode of operation to be indistinguishable
-			// from how it worked previously, it's important to capture the default value provider at this precise
-			// moment, since it might be changed later (before queries to properties).
+			// TODO: implement!
 		}
 
 		#endregion

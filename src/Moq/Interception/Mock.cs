@@ -19,11 +19,6 @@ namespace Moq
 				return;
 			}
 			
-			if (HandleAutoSetupProperties.Handle(invocation, this))
-			{
-				return;
-			}
-
 			if (HandleEventSubscription.Handle(invocation, this))
 			{
 				return;
