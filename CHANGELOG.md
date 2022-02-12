@@ -18,9 +18,9 @@ and `Setup(x => x.GetFooAsync(It.IsAny<string>()).Result).Throws((string s) => n
 * The guard against unmatchable matchers (added in #900) was too strict; relaxed it to enable an alternative user-code shorthand `_` for `It.IsAny<>()` (@adamfk, #1199)
 * mock.Protected() setup methods fail when argument is of type Expression (@tonyhallett, #1189)
 * Parameter is invalid in Protected().SetupSet() ... VerifySet (@tonyhallett, #1186)
-
 * Virtual properties and automocking not working for `mock.Protected().As<>()` (@tonyhallett, #1185)
 * Issue mocking VB.NET class with overloaded property/indexer in base class (@myurashchyk, #1153)
+* Equivalent arrays don't test equal when returned from a method, making `Verify` fail when it should not (@evilc0, #1225)
 
 
 ## 4.16.1 (2021-02-23)
