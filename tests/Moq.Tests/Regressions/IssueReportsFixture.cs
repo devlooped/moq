@@ -3659,6 +3659,57 @@ namespace Moq.Tests.Regressions
 
 		#endregion
 
+		#region 1225
+
+		public class Issue1225
+		{
+			public interface IHardware
+			{
+				void Transmit(IntPtr ptr, byte[] send, byte[] recv);
+			}
+
+			public class MyImpl : IHardware
+			{
+				public void Transmit(IntPtr ptr, byte[] send, byte[] recv)
+				{
+					Console.WriteLine(ptr);
+					Console.WriteLine(BitConverter.ToString(send));
+					Console.WriteLine(BitConverter.ToString(recv));
+				}
+			}
+
+			private static void DoWork(IHardware hw, byte[] send)
+			{
+				hw.Transmit((IntPtr)1, send, new byte[8]);
+			}
+
+			[Fact]
+			public void Pass_byte_array_directly()
+			{
+				Mock<IHardware> hwMock = new Mock<IHardware>();
+				hwMock.Setup(m => m.Transmit(It.IsAny<IntPtr>(), It.IsAny<byte[]>(), It.IsAny<byte[]>()));
+
+				DoWork(hwMock.Object, new byte[] { 1, 2, 3 });
+
+				hwMock.Verify(m => m.Transmit((IntPtr)1, new byte[] { 1, 2, 3 }, It.IsAny<byte[]>()));
+			}
+
+			[Fact]
+			public void Pass_byte_array_indirectly_via_method_call()
+			{
+				Mock<IHardware> hwMock = new Mock<IHardware>();
+				hwMock.Setup(m => m.Transmit(It.IsAny<IntPtr>(), It.IsAny<byte[]>(), It.IsAny<byte[]>()));
+
+				DoWork(hwMock.Object, new byte[] { 1, 2, 3 });
+
+				string inputAsString = Convert.ToBase64String(new byte[] { 1, 2, 3 });
+
+				hwMock.Verify(m => m.Transmit((IntPtr)1, Convert.FromBase64String(inputAsString), It.IsAny<byte[]>()));
+			}
+		}
+
+		#endregion
+
 		// Old @ Google Code
 
 		#region #47
