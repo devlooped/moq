@@ -140,15 +140,6 @@ namespace Moq.Tests
 		}
 
 		[Fact]
-		public void OriginalExpression_equal_to_Expression_for_simple_expression_in_Mock_Of()
-		{
-			var mockObject = Mock.Of<IX>(m => m.Property == null);
-			var setup = Mock.Get(mockObject).Setups.First();
-
-			Assert.Equal(setup.Expression, setup.OriginalExpression, ExpressionComparer.Default);
-		}
-
-		[Fact]
 		public void OriginalExpression_returns_expression_different_from_Expression_for_multi_dot_expression()
 		{
 			var mock = new Mock<IX>();
@@ -176,23 +167,6 @@ namespace Moq.Tests
 			var setup = mock.Setups.First();
 
 			Assert.Equal(originalExpression, setup.OriginalExpression, ExpressionComparer.Default);
-		}
-
-		[Fact]
-		public void OriginalExpression_returns_only_left_hand_side_of_expression_in_Mock_Of()
-		{
-			Expression<Func<IX, string>> originalExpressionLeftHandSide = m => m.Inner[1].ToString();
-			Expression<Func<IX, bool>> mockSpecification =
-				Expression.Lambda<Func<IX, bool>>(
-					Expression.MakeBinary(
-						ExpressionType.Equal,
-						originalExpressionLeftHandSide.Body,
-						Expression.Constant("")),
-					originalExpressionLeftHandSide.Parameters);
-			var mockObject = Mock.Of<IX>(mockSpecification);
-			var setup = Mock.Get(mockObject).Setups.First();
-
-			Assert.Equal(originalExpressionLeftHandSide, setup.OriginalExpression, ExpressionComparer.Default);
 		}
 
 		[Fact]

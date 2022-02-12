@@ -611,7 +611,7 @@ namespace Moq
 
 		internal static void SetupAllProperties(Mock mock)
 		{
-			// TODO: implement!
+			mock.MutableSetups.Add(new StubbedPropertiesSetup(mock));
 		}
 
 		#endregion
