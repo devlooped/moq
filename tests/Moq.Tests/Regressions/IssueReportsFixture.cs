@@ -3549,6 +3549,36 @@ namespace Moq.Tests.Regressions
 
 		#endregion
 
+		#region 1066
+
+		public class Issue1066
+		{
+			public interface IX
+			{
+				int Property { get; set; }
+			}
+
+			[Fact]
+			public void Stubbed_property_set_before_SetupGet()
+			{
+				var mock = Mock.Get(Mock.Of<IX>());
+				mock.Object.Property = 4;
+				mock.SetupGet(m => m.Property).Returns(3);
+				Assert.Equal(3, mock.Object.Property);
+			}
+
+			[Fact]
+			public void Stubbed_property_set_after_SetupGet()
+			{
+				var mock = Mock.Get(Mock.Of<IX>());
+				mock.SetupGet(m => m.Property).Returns(3);
+				mock.Object.Property = 4;
+				Assert.Equal(3, mock.Object.Property);
+			}
+		}
+
+		#endregion
+
 		#region 1071
 
 		public class Issue1071
