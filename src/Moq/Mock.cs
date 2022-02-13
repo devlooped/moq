@@ -524,17 +524,61 @@ namespace Moq
 			return Mock.Setup(mock, expression, condition);
 		}
 
-		// This specialized version of `SetupSet` exists to let `Mock.Of` support properties that are not overridable.
-		// Note that we generally prefer having a setup for a property's return value, but in this case, that isn't possible.
-		internal static void SetupSet(Mock mock, LambdaExpression expression, PropertyInfo propertyToSet, object value)
+		internal static readonly MethodInfo SetupReturnsMethod =
+			typeof(Mock).GetMethod(nameof(SetupReturns), BindingFlags.NonPublic | BindingFlags.Static);
+
+		// This specialized setup method is used to set up a single `Mock.Of` predicate.
+		// Unlike other setup methods, LINQ to Mocks can set non-interceptable properties, which is handy when initializing DTOs.
+		internal static bool SetupReturns(Mock mock, LambdaExpression expression, object value)
 		{
 			Guard.NotNull(expression, nameof(expression));
 
-			Mock.SetupRecursive<MethodCall>(mock, expression, setupLast: (targetMock, _, __) =>
+			Mock.SetupRecursive<MethodCall>(mock, expression, setupLast: (targetMock, oe, part) =>
 			{
-				propertyToSet.SetValue(targetMock.Object, value, null);
+				var originalExpression = (LambdaExpression)oe;
+
+				// There are two special cases involving settable properties where we do something other than creating a new setup:
+
+				if (originalExpression.IsProperty())
+				{
+					var pi = originalExpression.ToPropertyInfo();
+					if (pi.CanWrite(out var setter))
+					{
+						if (pi.CanRead(out var getter) && getter.CanOverride() && ProxyFactory.Instance.IsMethodVisible(getter, out _))
+						{
+							if (setter.CanOverride() && ProxyFactory.Instance.IsMethodVisible(setter, out _)
+								&& targetMock.MutableSetups.FindLast(s => s is StubbedPropertiesSetup) is StubbedPropertiesSetup sps)
+							{
+								// (a) We have a mock where `SetupAllProperties` was called, and the property can be fully stubbed.
+								//     (A property can be "fully stubbed" if both its accessors can be intercepted.)
+								//     In this case, we set the property's internal backing field directly on the setup.
+								sps.SetProperty(pi.Name, value);
+								return null;
+							}
+						}
+						else
+						{
+							// (b) The property is settable, but Moq is unable to intercept the getter,
+							//     so setting up the setter would be pointless and the property also cannot be fully stubbed.
+							//     In this case, the best thing we can do is to simply invoke the setter.
+							pi.SetValue(targetMock.Object, value, null);
+							return null;
+						}
+					}
+				}
+
+				// For all other cases, we create a regular setup.
+
+				Guard.IsOverridable(part.Method, part.Expression);
+				Guard.IsVisibleToProxyFactory(part.Method);
+
+				var setup = new MethodCall(originalExpression, targetMock, condition: null, expectation: part);
+				setup.SetReturnValueBehavior(value);
+				targetMock.MutableSetups.Add(setup);
 				return null;
 			}, allowNonOverridableLastProperty: true);
+
+			return true;
 		}
 
 		internal static MethodCall SetupAdd(Mock mock, LambdaExpression expression, Condition condition)
