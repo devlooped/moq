@@ -1,6 +1,7 @@
 ﻿// Copyright (c) 2007, Clarius Consulting, Manas Technology Solutions, InSTEDD, and Contributors.
 // All rights reserved. Licensed under the BSD 3-Clause License; see License.txt.
 
+using System.Collections.Concurrent;
 using System.Collections.Generic;
 using System.Diagnostics;
 using System.Linq.Expressions;
@@ -11,13 +12,13 @@ namespace Moq
 {
 	internal sealed class StubbedPropertiesSetup : Setup
 	{
-		private readonly Dictionary<string, object> values;
+		private readonly ConcurrentDictionary<string, object> values;
 		private readonly DefaultValueProvider defaultValueProvider;
 
 		public StubbedPropertiesSetup(Mock mock, DefaultValueProvider defaultValueProvider = null)
 			: base(originalExpression: null, mock, new PropertyAccessorExpectation(mock))
 		{
-			this.values = new Dictionary<string, object>();
+			this.values = new ConcurrentDictionary<string, object>();
 			this.defaultValueProvider = defaultValueProvider ?? mock.DefaultValueProvider;
 
 			this.MarkAsVerifiable();
@@ -60,11 +61,7 @@ namespace Moq
 				Debug.Assert(invocation.Method.IsGetAccessor());
 
 				var propertyName = invocation.Method.Name.Substring(4);
-				if (!this.values.TryGetValue(propertyName, out var value))
-				{
-					value = this.values[propertyName] = this.Mock.GetDefaultValue(invocation.Method, out _, this.defaultValueProvider);
-				}
-
+				var value = this.values.GetOrAdd(propertyName, pn => this.Mock.GetDefaultValue(invocation.Method, out _, this.defaultValueProvider));
 				invocation.ReturnValue = value;
 			}
 		}
