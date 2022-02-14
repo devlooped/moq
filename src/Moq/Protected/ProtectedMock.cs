@@ -439,7 +439,7 @@ namespace Moq.Protected
 			var param = Expression.Parameter(typeof(T), "mock");
 
 			return Expression.Lambda<Action<T>>(
-				Expression.Call(param, property.GetSetMethod(true), IndexerArgsToExpressions(indexerKeysAndValue, property)),
+				GetIndexerMethodCallExpression(param, property.GetSetMethod(true), indexerKeysAndValue),
 				param);
 		}
 
@@ -461,9 +461,19 @@ namespace Moq.Protected
 			var param = Expression.Parameter(typeof(T), "mock");
 
 			return Expression.Lambda(
-				Expression.Call(param, property.GetGetMethod(true), IndexerArgsToExpressions(indexerKeys, property)),
+				GetIndexerMethodCallExpression(param, property.GetGetMethod(true), indexerKeys),
 				param
 			);
+		}
+
+		private static MethodCallExpression GetIndexerMethodCallExpression(ParameterExpression mockParameter,MethodInfo accessorMethod, object[] indexerArguments)
+		{
+			var types = accessorMethod.GetParameterTypes();
+			var expressionArgs = indexerArguments.Select((a, i) =>
+			{
+				return ToExpressionArg(types[i], indexerArguments[i]);
+			}).ToArray();
+			return Expression.Call(mockParameter, accessorMethod, expressionArgs);
 		}
 		
 		private static LambdaExpression GetSetterExpressionIncludingIndexer(string propertyName, object value, bool exact, string propertyNameParameterName, bool throwIfMemberMissing = true)
@@ -799,20 +809,6 @@ namespace Moq.Protected
 			{
 				yield return ToExpressionArg(methodParams[i].ParameterType, args[i]);
 			}
-		}
-
-		private static Type[] GetIndexerTypes(PropertyInfo property)
-		{
-			return property.GetIndexParameters().Select(p => p.ParameterType).Concat(new Type[] { property.PropertyType }).ToArray();
-		}
-
-		private static Expression[] IndexerArgsToExpressions(object[] indexerArgs, PropertyInfo property)
-		{
-			Type[] types = GetIndexerTypes(property);
-			return indexerArgs.Select((a,i) =>
-			{
-				return ToExpressionArg(types[i], indexerArgs[i]);
-			}).ToArray();
 		}
 	}
 }
