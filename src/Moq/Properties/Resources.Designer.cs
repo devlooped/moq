@@ -88,15 +88,6 @@ namespace Moq.Properties {
         }
         
         /// <summary>
-        ///   Looks up a localized string similar to Array {0} cannot be empty. .
-        /// </summary>
-        internal static string ArrayArgumentCannotBeEmpty {
-            get {
-                return ResourceManager.GetString("ArrayArgumentCannotBeEmpty", resourceCulture);
-            }
-        }
-        
-        /// <summary>
         ///   Looks up a localized string similar to Can only add interfaces to the mock..
         /// </summary>
         internal static string AsMustBeInterface {
@@ -469,6 +460,15 @@ namespace Moq.Properties {
         internal static string OutExpressionMustBeConstantValue {
             get {
                 return ResourceManager.GetString("OutExpressionMustBeConstantValue", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Array parameter {0} cannot be empty. .
+        /// </summary>
+        internal static string ParameterMayNotBeEmptyArray {
+            get {
+                return ResourceManager.GetString("ParameterMayNotBeEmptyArray", resourceCulture);
             }
         }
         

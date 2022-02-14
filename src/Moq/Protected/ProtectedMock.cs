@@ -669,7 +669,7 @@ namespace Moq.Protected
 			}
 		}
 
-		private static object[] CastValueForIndexer(object value,string propertyName)
+		private static object[] CastValueForIndexer(object value, string propertyName)
 		{
 			if (value is object[])
 			{

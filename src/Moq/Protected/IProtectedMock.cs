@@ -328,7 +328,7 @@ namespace Moq.Protected
 		/// <exception cref="MockException">The invocation was not call the times specified by 
 		/// <paramref name="times"/>.</exception>
 		/// </summary>
-		/// <param name="indexerName">The name of the property.</param>
+		/// <param name="indexerName">The name of the indexer.</param>
 		/// <param name="times">The number of times a method is allowed to be called.</param>
 		/// <param name="indexerKeys">The indexer keys.</param>
 		void VerifyGet(string indexerName, Times times, object[] indexerKeys);
@@ -359,15 +359,15 @@ namespace Moq.Protected
 		void VerifySet(string propertyName, Times times, object value);
 
 		/// <summary>
-		/// Specifies a setup for an invocation on a property setter with the given 
+		/// Specifies a setup for an invocation on an indexer setter with the given 
 		/// <paramref name="indexerName"/>.
 		/// </summary>
 		/// <exception cref="MockException">The invocation was not call the times specified by 
 		/// <paramref name="times"/>.</exception>
-		/// <param name="indexerName">The name of the property.</param>
-		/// <param name="times">The number of times a method is allowed to be called.</param>
+		/// <param name="indexerName">The name of the indexer.</param>
+		/// <param name="times">The number of times an indexer setter is allowed to be called.</param>
 		/// <param name="indexerKeys">The indexer keys.</param>
-		/// <param name="value">The property value.</param>
+		/// <param name="value">The indexer value.</param>
 		/// remember to use <see cref="ItExpr"/> rather than <see cref="It"/>
 		void VerifySet(string indexerName, Times times, object[] indexerKeys, object value);
 		#endregion

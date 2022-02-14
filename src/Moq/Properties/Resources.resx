@@ -354,7 +354,7 @@ This could be caused by an unrecognized type conversion, coercion, narrowing, or
   <data name="NameIsNotAnIndexer" xml:space="preserve">
     <value>Parameter {0} is not the name of an indexer.</value>
   </data>
-  <data name="ArrayArgumentCannotBeEmpty" xml:space="preserve">
-    <value>Array {0} cannot be empty. </value>
+  <data name="ParameterMayNotBeEmptyArray" xml:space="preserve">
+    <value>Array parameter {0} cannot be empty. </value>
   </data>
 </root>

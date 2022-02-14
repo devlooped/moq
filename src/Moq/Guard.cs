@@ -251,13 +251,13 @@ namespace Moq
 			if (array.Length == 0)
 			{
 				throw new ArgumentException(
-					string.Format(Resources.ArrayArgumentCannotBeEmpty, paramName),
+					string.Format(Resources.ParameterMayNotBeEmptyArray, paramName),
 					paramName
 					);
 			}
 		}
 
-		internal static void IsIndexer(PropertyInfo indexer, string paramName)
+		public static void IsIndexer(PropertyInfo indexer, string paramName)
 		{
 			if (indexer.GetIndexParameters().Length == 0)
 			{
