@@ -426,7 +426,7 @@ namespace Moq.Protected
 			Guard.NotNullOrEmpty(indexerKeys, nameof(indexerKeys));
 
 			var setupSetArguments = indexerKeys.Concat(new object[] { value }).ToArray();
-			var indexer = GetPropertyIncludingIndexer(indexerName, false, indexerKeys, false);
+			var indexer = GetPropertyIncludingIndexer(indexerName, true, setupSetArguments, false);
 			ThrowIfMemberMissing(indexerName, indexer);
 			Guard.IsIndexer(indexer, nameof(indexerName));
 			ThrowIfSetterNotApplicable(indexer);
