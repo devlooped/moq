@@ -88,20 +88,18 @@ namespace Moq.Protected
 		private ISetup<T, TResult> InternalSetup<TResult>(string methodName, Type[] genericTypeArguments,
 			bool exactParameterMatch, params object[] args)
 		{
-			ISetup<T, TResult> setup = null;
-			GetGetterIncludingIndexerOrMethodExpression<TResult>(methodName, nameof(methodName), genericTypeArguments, exactParameterMatch, args,
-				propertyExpression =>
-				{
-					var getterSetup = Mock.SetupGet(mock, propertyExpression, null);
-					setup = new NonVoidSetupPhrase<T, TResult>(getterSetup);
-				},
-				methodExpression =>
-				{
-					var methodSetup = Mock.Setup(mock, methodExpression, null);
-					setup = new NonVoidSetupPhrase<T, TResult>(methodSetup);
-				}
-			);
-			return setup;
+			var result = GetGetterIncludingIndexerOrMethodExpression<TResult>(methodName, nameof(methodName), genericTypeArguments, exactParameterMatch, args);
+			MethodCall methodCall;
+			if (result.Item2)
+			{
+				methodCall = Mock.SetupGet(mock, result.Item1, null);
+			}
+			else
+			{
+				methodCall = Mock.Setup(mock, result.Item1, null);
+			}
+
+			return new NonVoidSetupPhrase<T, TResult>(methodCall);
 		}
 
 		public ISetupGetter<T, TProperty> SetupGet<TProperty>(string propertyName)
@@ -186,11 +184,9 @@ namespace Moq.Protected
 
 		private ISetupSequentialResult<TResult> InternalSetupSequence<TResult>(string methodOrPropertyName, Type[] genericTypeArguments, bool exactParameterMatch, params object[] args)
 		{
-			LambdaExpression expression = null;
-			GetGetterIncludingIndexerOrMethodExpression<TResult>(methodOrPropertyName, nameof(methodOrPropertyName), genericTypeArguments, exactParameterMatch, args,
-				propertyExpression => expression = propertyExpression,
-				methodExpression => expression = methodExpression
-			);
+			var expression = GetGetterIncludingIndexerOrMethodExpression<TResult>(
+				methodOrPropertyName, nameof(methodOrPropertyName), genericTypeArguments, exactParameterMatch, args).Item1;
+			
 
 			var setup = Mock.SetupSequence(mock, expression);
 			return new SetupSequencePhrase<TResult>(setup);
@@ -260,16 +256,15 @@ namespace Moq.Protected
 
 		private void InternalVerify<TResult>(string methodName, Type[] genericTypeArguments, Times times, bool exactParameterMatch, params object[] args)
 		{
-			GetGetterIncludingIndexerOrMethodExpression<TResult>(methodName, nameof(methodName), genericTypeArguments, exactParameterMatch, args,
-				propertyExpression =>
-				{
-					Mock.VerifyGet(mock, propertyExpression, times, null);
-				},
-				methodExpression =>
-				{
-					Mock.Verify(mock, methodExpression, times, null);
-				}
-			);
+			var result = GetGetterIncludingIndexerOrMethodExpression<TResult>(methodName, nameof(methodName), genericTypeArguments, exactParameterMatch, args);
+			if (result.Item2)
+			{
+				Mock.VerifyGet(mock, result.Item1, times, null);
+			}
+			else
+			{
+				Mock.Verify(mock, result.Item1, times, null);
+			}
 		}
 		
 		public void VerifyGet<TProperty>(string propertyName, Times times)
@@ -550,19 +545,17 @@ namespace Moq.Protected
 			return expression;
 		}
 
-		private void GetGetterIncludingIndexerOrMethodExpression<TResult>(string methodOrPropertyName, string methodOrPropertyNameParameterName,
-			Type[] genericTypeArguments, bool exactParameterMatch, object[] args, Action<LambdaExpression> propertyExpressionCallback, Action<Expression<Func<T, TResult>>> methodExpressionCallback)
+		private Tuple<LambdaExpression,bool> GetGetterIncludingIndexerOrMethodExpression<TResult>(string methodOrPropertyName, string methodOrPropertyNameParameterName,
+			Type[] genericTypeArguments, bool exactParameterMatch, object[] args)
 		{
-			var propertyExpression = GetGetterExpressionIncludingIndexer<TResult>(methodOrPropertyName, args, exactParameterMatch, methodOrPropertyNameParameterName);
-			if (propertyExpression != null)
+			var isPropertyExpression = true;
+			var expression = GetGetterExpressionIncludingIndexer<TResult>(methodOrPropertyName, args, exactParameterMatch, methodOrPropertyNameParameterName);
+			if (expression == null)
 			{
-				propertyExpressionCallback(propertyExpression);
+				isPropertyExpression = false;
+				expression = GetMethodCall<TResult>(methodOrPropertyName, methodOrPropertyNameParameterName, genericTypeArguments, exactParameterMatch, args);
 			}
-			else
-			{
-				var methodCall = GetMethodCall<TResult>(methodOrPropertyName, methodOrPropertyNameParameterName, genericTypeArguments, exactParameterMatch, args);
-				methodExpressionCallback(methodCall);
-			}
+			return new Tuple<LambdaExpression, bool>(expression, isPropertyExpression);
 		}
 
 		private void GetSetterIncludingIndexerOrMethodExpression(string methodOrPropertyName, string methodOrPropertyNameParameterName,
