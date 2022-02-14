@@ -108,11 +108,28 @@ namespace Moq.Protected
 			return new NonVoidSetupPhrase<T, TProperty>(setup);
 		}
 
-		public ISetup<T, TProperty> SetupGet<TProperty>(string indexerName, object[] indexerKeys)
+		public ISetup<T, TProperty> SetupGet<TProperty>(string indexerName, object[] indexes)
 		{
-			var expression = GetIndexerGetterExpression(indexerName, indexerKeys);
+			var expression = GetIndexerGetterExpression(indexerName, indexes);
 			var setup = Mock.SetupGet(mock, expression, null);
 			return new NonVoidSetupPhrase<T, TProperty>(setup);
+		}
+
+		public ISetup<T, TProperty> SetupGet<TProperty>(object[] indexes)
+		{
+			return SetupGet<TProperty>(GetIndexerName(), indexes);
+		}
+
+		public ISetup<T> SetupGet(string indexerName, object[] indexes)
+		{
+			var expression = GetIndexerGetterExpression(indexerName, indexes);
+			var setup = Mock.SetupGet(mock, expression, null);
+			return new VoidSetupPhrase<T>(setup);
+		}
+
+		public ISetup<T> SetupGet(object[] indexes)
+		{
+			return SetupGet(GetIndexerName(), indexes);
 		}
 
 		public ISetupSetter<T, TProperty> SetupSet<TProperty>(string propertyName, object value)
@@ -131,11 +148,16 @@ namespace Moq.Protected
 			return Mock.SetupSet(mock, expression, condition: null);
 		}
 
-		public ISetup<T> SetupSet(string indexerName, object[] indexerKeys, object value)
+		public ISetup<T> SetupSet(string indexerName, object[] indexes, object value)
 		{
-			var expression = GetIndexerSetterExpression(indexerName, indexerKeys, value);
+			var expression = GetIndexerSetterExpression(indexerName, indexes, value);
 			var methodCall = Mock.SetupSet(mock, expression, condition: null);
 			return new VoidSetupPhrase<T>(methodCall);
+		}
+
+		public ISetup<T> SetupSet(object[] indexes, object value)
+		{
+			return SetupSet(GetIndexerName(), indexes, value);
 		}
 
 		public ISetupSequentialAction SetupSequence(string methodOrPropertyName, params object[] args)
@@ -272,10 +294,15 @@ namespace Moq.Protected
 			Mock.VerifyGet(mock, GetGetterExpression<TProperty>(propertyName), times, null);
 		}
 
-		public void VerifyGet(string indexerName, Times times, object[] indexerKeys)
+		public void VerifyGet(string indexerName, object[] indexes, Times times)
 		{
-			var expression = GetIndexerGetterExpression(indexerName, indexerKeys);
+			var expression = GetIndexerGetterExpression(indexerName, indexes);
 			Mock.VerifyGet(mock, expression, times, null);
+		}
+
+		public void VerifyGet(object[] indexes, Times times)
+		{
+			VerifyGet(GetIndexerName(), indexes, times);
 		}
 
 		public void VerifySet(string propertyName, Times times, object value)
@@ -285,10 +312,15 @@ namespace Moq.Protected
 			Mock.VerifySet(mock, expression, times, null);
 		}
 
-		public void VerifySet(string indexerName, Times times, object[] indexerKeys, object value)
+		public void VerifySet(string indexerName, object[] indexes, object value, Times times)
 		{
-			var expression = GetIndexerSetterExpression(indexerName, indexerKeys, value);
+			var expression = GetIndexerSetterExpression(indexerName, indexes, value);
 			Mock.VerifySet(mock, expression, times, null);
+		}
+
+		public void VerifySet(object[] indexes, object value, Times times)
+		{
+			VerifySet(GetIndexerName(), indexes, value, times);
 		}
 
 		public void VerifySet<TProperty>(string propertyName, Times times, object value)
@@ -298,6 +330,18 @@ namespace Moq.Protected
 		}
 
 		#endregion
+
+
+		private string GetIndexerName()
+		{
+			var mockedType = typeof(T);
+			var defaultMemberAttribute = mockedType.GetCustomAttribute(typeof(DefaultMemberAttribute), true) as DefaultMemberAttribute;
+			if (defaultMemberAttribute == null)
+			{
+				throw new Exception($"{mockedType.Name} does not have an indexer");
+			}
+			return defaultMemberAttribute.MemberName;
+		}
 
 		private static Expression<Func<T, TResult>> GetMemberAccess<TResult>(PropertyInfo property)
 		{
@@ -415,48 +459,48 @@ namespace Moq.Protected
 			return matchingIndexer;
 		}
 		
-		private static Expression<Action<T>> GetIndexerSetterExpression(string indexerName, object[] indexerKeys, object value)
+		private static Expression<Action<T>> GetIndexerSetterExpression(string indexerName, object[] indexes, object value)
 		{
 			Guard.NotNullOrEmpty(indexerName, nameof(indexerName));
-			Guard.NotNullOrEmpty(indexerKeys, nameof(indexerKeys));
+			Guard.NotNullOrEmpty(indexes, nameof(indexes));
 
-			var setupSetArguments = indexerKeys.Concat(new object[] { value }).ToArray();
+			var setupSetArguments = indexes.Concat(new object[] { value }).ToArray();
 			var indexer = GetPropertyIncludingIndexer(indexerName, true, setupSetArguments, false);
 			ThrowIfMemberMissing(indexerName, indexer);
-			Guard.IsIndexer(indexer, nameof(indexerName));
+			Guard.IsIndexer(indexer);
 			ThrowIfSetterNotApplicable(indexer);
 
 			return GetIndexerSetterExpression(indexer, setupSetArguments);
 		}
 
-		private static Expression<Action<T>> GetIndexerSetterExpression(PropertyInfo property, object[] indexerKeysAndValue)
+		private static Expression<Action<T>> GetIndexerSetterExpression(PropertyInfo property, object[] indexesAndValue)
 		{
 			var param = Expression.Parameter(typeof(T), "mock");
 
 			return Expression.Lambda<Action<T>>(
-				GetIndexerMethodCallExpression(param, property.GetSetMethod(true), indexerKeysAndValue),
+				GetIndexerMethodCallExpression(param, property.GetSetMethod(true), indexesAndValue),
 				param);
 		}
 
-		private static LambdaExpression GetIndexerGetterExpression(string indexerName, object[] indexerKeys)
+		private static LambdaExpression GetIndexerGetterExpression(string indexerName, object[] indexes)
 		{
 			Guard.NotNullOrEmpty(indexerName, nameof(indexerName));
-			Guard.NotNullOrEmpty(indexerKeys, nameof(indexerKeys));
+			Guard.NotNullOrEmpty(indexes, nameof(indexes));
 
-			var indexer = GetPropertyIncludingIndexer(indexerName, false, indexerKeys, false);
+			var indexer = GetPropertyIncludingIndexer(indexerName, false, indexes, false);
 			ThrowIfMemberMissing(indexerName, indexer);
-			Guard.IsIndexer(indexer, nameof(indexerName));
+			Guard.IsIndexer(indexer);
 			ThrowIfGetterNotApplicable(indexer);
 
-			return GetIndexerGetterExpression(indexer, indexerKeys);
+			return GetIndexerGetterExpression(indexer, indexes);
 		}
 
-		private static LambdaExpression GetIndexerGetterExpression(PropertyInfo property, object[] indexerKeys)
+		private static LambdaExpression GetIndexerGetterExpression(PropertyInfo property, object[] indexes)
 		{
 			var param = Expression.Parameter(typeof(T), "mock");
 
 			return Expression.Lambda(
-				GetIndexerMethodCallExpression(param, property.GetGetMethod(true), indexerKeys),
+				GetIndexerMethodCallExpression(param, property.GetGetMethod(true), indexes),
 				param
 			);
 		}

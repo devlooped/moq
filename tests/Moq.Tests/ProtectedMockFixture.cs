@@ -4,7 +4,7 @@
 using System;
 using System.Collections.Generic;
 using System.Linq.Expressions;
-
+using Moq.Properties;
 using Moq.Protected;
 
 using Xunit;
@@ -277,7 +277,7 @@ namespace Moq.Tests
 		[Fact]
 		public void ThrowsIfSetupGetNullPropertyName()
 		{
-			Assert.Throws<ArgumentNullException>(() => new Mock<FooBase>().Protected().SetupGet<string>(null));
+			Assert.Throws<ArgumentNullException>(() => new Mock<FooBase>().Protected().SetupGet<string>((string)null));
 		}
 
 		[Fact]
@@ -366,7 +366,7 @@ namespace Moq.Tests
 		{
 			var argumentNullException = Assert.Throws<ArgumentNullException>(
 				() => new Mock<FooBase>().Protected().SetupGet<string>(FooBase.IndexerName,null));
-			Assert.Equal("indexerKeys", argumentNullException.ParamName);
+			Assert.Equal("indexes", argumentNullException.ParamName);
 		}
 
 		[Fact]
@@ -374,8 +374,8 @@ namespace Moq.Tests
 		{
 			var argumentException = Assert.Throws<ArgumentException>(
 				() => new Mock<FooBase>().Protected().SetupGet<string>(FooBase.IndexerName, new object[] { }));
-			Assert.Equal("indexerKeys", argumentException.ParamName);
-			Assert.StartsWith("Array indexerKeys cannot be empty.", argumentException.Message);
+			Assert.Equal("indexes", argumentException.ParamName);
+			Assert.StartsWith("Array parameter indexes cannot be empty.", argumentException.Message);
 		}
 
 		[Fact]
@@ -391,8 +391,7 @@ namespace Moq.Tests
 		{
 			var argumentException = Assert.Throws<ArgumentException>(
 				() => new Mock<FooBase>().Protected().SetupGet<string>("PublicValue", new object[] { 1 }));
-			Assert.Equal("indexerName", argumentException.ParamName);
-			Assert.StartsWith("Parameter indexerName is not the name of an indexer.", argumentException.Message);
+			Assert.Equal(Resources.PropertyIsNotAnIndexer, argumentException.Message);
 		}
 
 		[Fact]
@@ -1015,12 +1014,12 @@ namespace Moq.Tests
 			var protectedMock = mock.Protected();
 			mock.Object.GetIndexer(1);
 
-			protectedMock.VerifyGet("Indexer", Times.Once(), new object[] { 1 });
+			protectedMock.VerifyGet("Indexer", new object[] { 1 }, Times.Once());
 
-			Assert.Throws<MockException>(() => protectedMock.VerifyGet("Indexer", Times.Once(), new object[] { 2 }));
+			Assert.Throws<MockException>(() => protectedMock.VerifyGet("Indexer", new object[] { 2 }, Times.Once()));
 
 			mock.Object.GetIndexer(2);
-			protectedMock.VerifyGet("Indexer", Times.Once(), new object[] { ItExpr.Is<int>(v => v == 2 )});
+			protectedMock.VerifyGet("Indexer", new object[] { ItExpr.Is<int>(v => v == 2 )}, Times.Once());
 		}
 
 		[Fact]
@@ -1111,12 +1110,12 @@ namespace Moq.Tests
 			var protectedMock = mock.Protected();
 			mock.Object.SetIndexer(1,1);
 
-			protectedMock.VerifySet("Indexer", Times.Once(), new object[] { 1 }, 1);
+			protectedMock.VerifySet("Indexer", new object[] { 1 }, 1, Times.Once());
 
-			Assert.Throws<MockException>(() => protectedMock.VerifySet("Indexer", Times.Once(), new object[] { 1 }, 2));
+			Assert.Throws<MockException>(() => protectedMock.VerifySet("Indexer", new object[] { 1 }, 2, Times.Once()));
 
 			mock.Object.SetIndexer(3, 4);
-			protectedMock.VerifySet("Indexer", Times.Once(), new object[] { ItExpr.Is<int>(v => v == 3) }, ItExpr.Is<int>(v => v == 4 ));
+			protectedMock.VerifySet("Indexer", new object[] { ItExpr.Is<int>(v => v == 3) }, ItExpr.Is<int>(v => v == 4 ), Times.Once());
 		}
 
 		[Fact]

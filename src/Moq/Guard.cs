@@ -257,11 +257,11 @@ namespace Moq
 			}
 		}
 
-		public static void IsIndexer(PropertyInfo indexer, string paramName)
+		public static void IsIndexer(PropertyInfo indexer)
 		{
 			if (indexer.GetIndexParameters().Length == 0)
 			{
-				throw new ArgumentException(string.Format(Resources.NameIsNotAnIndexer, paramName), paramName);
+				throw new ArgumentException(Resources.PropertyIsNotAnIndexer);
 			}
 		}
 	}

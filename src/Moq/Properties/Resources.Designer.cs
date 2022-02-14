@@ -320,15 +320,6 @@ namespace Moq.Properties {
         }
         
         /// <summary>
-        ///   Looks up a localized string similar to Parameter {0} is not the name of an indexer..
-        /// </summary>
-        internal static string NameIsNotAnIndexer {
-            get {
-                return ResourceManager.GetString("NameIsNotAnIndexer", resourceCulture);
-            }
-        }
-        
-        /// <summary>
         ///   Looks up a localized string similar to The next member after the last one shown above is non-virtual, sealed, or not visible to the proxy factory..
         /// </summary>
         internal static string NextMemberNonInterceptable {
@@ -487,6 +478,15 @@ namespace Moq.Properties {
         internal static string PropertyGetNotFound {
             get {
                 return ResourceManager.GetString("PropertyGetNotFound", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Property is not an indexer..
+        /// </summary>
+        internal static string PropertyIsNotAnIndexer {
+            get {
+                return ResourceManager.GetString("PropertyIsNotAnIndexer", resourceCulture);
             }
         }
         

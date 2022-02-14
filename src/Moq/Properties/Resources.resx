@@ -351,8 +351,8 @@ This could be caused by an unrecognized type conversion, coercion, narrowing, or
   <data name="UseItIsOtherOverload" xml:space="preserve">
     <value>It is impossible to call the provided strongly-typed predicate due to the use of a type matcher. Provide a weakly-typed predicate with two parameters (object, Type) instead.</value>
   </data>
-  <data name="NameIsNotAnIndexer" xml:space="preserve">
-    <value>Parameter {0} is not the name of an indexer.</value>
+  <data name="PropertyIsNotAnIndexer" xml:space="preserve">
+    <value>Property is not an indexer.</value>
   </data>
   <data name="ParameterMayNotBeEmptyArray" xml:space="preserve">
     <value>Array parameter {0} cannot be empty. </value>
