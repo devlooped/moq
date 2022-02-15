@@ -3,9 +3,7 @@
 
 using System;
 using System.Collections.Generic;
-using System.Diagnostics;
 using System.Linq;
-using System.Linq.Expressions;
 using System.Reflection;
 
 using Moq.Behaviors;
@@ -172,59 +170,6 @@ namespace Moq
 		public static void Handle(Invocation invocation, Mock mock)
 		{
 			new ReturnBaseOrDefaultValue(mock).Execute(invocation);
-		}
-	}
-
-	internal static class HandleAutoSetupProperties
-	{
-		private static readonly int AccessorPrefixLength = "?et_".Length; // get_ or set_
-
-		public static bool Handle(Invocation invocation, Mock mock)
-		{
-			if (mock.AutoSetupPropertiesDefaultValueProvider == null)
-			{
-				return false;
-			}
-			
-			MethodInfo invocationMethod = invocation.Method;
-			if (!invocationMethod.IsPropertyAccessor())
-			{
-				return false;
-			}
-
-			string propertyName = invocationMethod.Name.Substring(AccessorPrefixLength);
-			PropertyInfo property = invocationMethod.DeclaringType.GetProperty(propertyName, Type.EmptyTypes);
-			Debug.Assert(property != null);
-
-			bool accessorFound = property.CanRead(out var getter) | property.CanWrite(out var setter);
-			Debug.Assert(accessorFound);
-
-			var expression = GetPropertyExpression(invocationMethod.DeclaringType, property);
-			var initialValue = getter != null ? CreateInitialPropertyValue(mock, getter) : null;
-			var setup = new StubbedPropertySetup(mock, expression, getter, setter, initialValue);
-			mock.MutableSetups.Add(setup);
-			setup.Execute(invocation);
-
-			return true;
-		}
-
-		private static object CreateInitialPropertyValue(Mock mock, MethodInfo getter)
-		{
-			object initialValue = mock.GetDefaultValue(getter, out Mock innerMock,
-				useAlternateProvider: mock.AutoSetupPropertiesDefaultValueProvider);
-
-			if (innerMock != null)
-			{
-				Mock.SetupAllProperties(innerMock, mock.AutoSetupPropertiesDefaultValueProvider);
-			}
-
-			return initialValue;
-		}
-
-		private static LambdaExpression GetPropertyExpression(Type mockType, PropertyInfo property)
-		{
-			var param = Expression.Parameter(mockType, "m");
-			return Expression.Lambda(Expression.MakeMemberAccess(param, property), param);
 		}
 	}
 

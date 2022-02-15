@@ -123,27 +123,5 @@ namespace Moq
 			}
 			while (true);
 		}
-
-		internal static readonly MethodInfo SetupReturnsMethod =
-			typeof(Mocks).GetMethod(nameof(SetupReturns), BindingFlags.NonPublic | BindingFlags.Static);
-
-		internal static bool SetupReturns(Mock mock, LambdaExpression expression, object value)
-		{
-			if (expression.Body is MemberExpression me
-				&& me.Member is PropertyInfo pi
-				&& !(pi.CanRead(out var getter) && getter.CanOverride() && ProxyFactory.Instance.IsMethodVisible(getter, out _))
-				&& pi.CanWrite(out _))
-			{
-				// LINQ to Mocks allows setting non-interceptable properties, which is handy e.g. when initializing DTOs.
-				Mock.SetupSet(mock, expression, propertyToSet: pi, value);
-			}
-			else
-			{
-				var setup = Mock.Setup(mock, expression, condition: null);
-				setup.SetReturnValueBehavior(value);
-			}
-
-			return true;
-		}
 	}
 }

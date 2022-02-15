@@ -36,7 +36,10 @@ namespace Moq
 				var mockType = typeof(Mock<>).MakeGenericType(type);
 				Mock newMock = (Mock)Activator.CreateInstance(mockType, mock.Behavior);
 				newMock.DefaultValueProvider = mock.DefaultValueProvider;
-				newMock.AutoSetupPropertiesDefaultValueProvider = mock.AutoSetupPropertiesDefaultValueProvider;
+				if (mock.MutableSetups.FindLast(s => s is StubbedPropertiesSetup) is StubbedPropertiesSetup sts)
+				{
+					newMock.MutableSetups.Add(new StubbedPropertiesSetup(newMock, sts.DefaultValueProvider));
+				}
 				if(!type.IsDelegateType())
 				{
 					newMock.CallBase = mock.CallBase;

@@ -5,6 +5,14 @@ All notable changes to this project will be documented in this file.
 The format is loosely based on [Keep a Changelog](http://keepachangelog.com/en/1.0.0/).
 
 
+## Unreleased
+
+#### Fixed
+
+* Property setups are ignored on mocks instantiated using `Mock.Of` (@stakx, #1066)
+* `SetupAllProperties` causes mocks to become race-prone (@estrizhok, #1231)
+
+
 ## 4.17.0 (2022-02-13)
 
 #### Added

@@ -209,13 +209,6 @@ namespace Moq
 		/// </summary>
 		public abstract DefaultValueProvider DefaultValueProvider { get; set; }
 
-		/// <summary>
-		/// The <see cref="Moq.DefaultValueProvider"/> used to initialize automatically stubbed properties.
-		/// It is equal to the value of <see cref="DefaultValueProvider"/> at the time when
-		/// <see cref="SetupAllProperties"/> was last called.
-		/// </summary>
-		internal abstract DefaultValueProvider AutoSetupPropertiesDefaultValueProvider { get; set; } 
-
 		internal abstract SetupCollection MutableSetups { get; }
 
 		/// <summary>
@@ -531,36 +524,61 @@ namespace Moq
 			return Mock.Setup(mock, expression, condition);
 		}
 
-		// This specialized version of `SetupSet` exists to let `Mock.Of` support properties that are not overridable.
-		// Note that we generally prefer having a setup for a property's return value, but in this case, that isn't possible.
-		internal static void SetupSet(Mock mock, LambdaExpression expression, PropertyInfo propertyToSet, object value)
+		internal static readonly MethodInfo SetupReturnsMethod =
+			typeof(Mock).GetMethod(nameof(SetupReturns), BindingFlags.NonPublic | BindingFlags.Static);
+
+		// This specialized setup method is used to set up a single `Mock.Of` predicate.
+		// Unlike other setup methods, LINQ to Mocks can set non-interceptable properties, which is handy when initializing DTOs.
+		internal static bool SetupReturns(Mock mock, LambdaExpression expression, object value)
 		{
 			Guard.NotNull(expression, nameof(expression));
 
-			Mock.SetupRecursive<MethodCall>(mock, expression, setupLast: (targetMock, _, __) =>
+			Mock.SetupRecursive<MethodCall>(mock, expression, setupLast: (targetMock, oe, part) =>
 			{
-				// Setting a mock's property through reflection will only work (i.e. the property will only remember the value
-				// it's being set to) if it is being stubbed. In order to ensure it's stubbed, we temporarily enable
-				// auto-stubbing (if that isn't already switched on).
+				var originalExpression = (LambdaExpression)oe;
 
-				var temporaryAutoSetupProperties = targetMock.AutoSetupPropertiesDefaultValueProvider == null;
-				if (temporaryAutoSetupProperties)
+				// There are two special cases involving settable properties where we do something other than creating a new setup:
+
+				if (originalExpression.IsProperty())
 				{
-					targetMock.AutoSetupPropertiesDefaultValueProvider = targetMock.DefaultValueProvider;
-				}
-				try
-				{
-					propertyToSet.SetValue(targetMock.Object, value, null);
-				}
-				finally
-				{
-					if (temporaryAutoSetupProperties)
+					var pi = originalExpression.ToPropertyInfo();
+					if (pi.CanWrite(out var setter))
 					{
-						targetMock.AutoSetupPropertiesDefaultValueProvider = null;
+						if (pi.CanRead(out var getter) && getter.CanOverride() && ProxyFactory.Instance.IsMethodVisible(getter, out _))
+						{
+							if (setter.CanOverride() && ProxyFactory.Instance.IsMethodVisible(setter, out _)
+								&& targetMock.MutableSetups.FindLast(s => s is StubbedPropertiesSetup) is StubbedPropertiesSetup sps)
+							{
+								// (a) We have a mock where `SetupAllProperties` was called, and the property can be fully stubbed.
+								//     (A property can be "fully stubbed" if both its accessors can be intercepted.)
+								//     In this case, we set the property's internal backing field directly on the setup.
+								sps.SetProperty(pi.Name, value);
+								return null;
+							}
+						}
+						else
+						{
+							// (b) The property is settable, but Moq is unable to intercept the getter,
+							//     so setting up the setter would be pointless and the property also cannot be fully stubbed.
+							//     In this case, the best thing we can do is to simply invoke the setter.
+							pi.SetValue(targetMock.Object, value, null);
+							return null;
+						}
 					}
 				}
+
+				// For all other cases, we create a regular setup.
+
+				Guard.IsOverridable(part.Method, part.Expression);
+				Guard.IsVisibleToProxyFactory(part.Method);
+
+				var setup = new MethodCall(originalExpression, targetMock, condition: null, expectation: part);
+				setup.SetReturnValueBehavior(value);
+				targetMock.MutableSetups.Add(setup);
 				return null;
 			}, allowNonOverridableLastProperty: true);
+
+			return true;
 		}
 
 		internal static MethodCall SetupAdd(Mock mock, LambdaExpression expression, Condition condition)
@@ -637,21 +655,7 @@ namespace Moq
 
 		internal static void SetupAllProperties(Mock mock)
 		{
-			SetupAllProperties(mock, mock.DefaultValueProvider);
-		}
-
-		internal static void SetupAllProperties(Mock mock, DefaultValueProvider defaultValueProvider)
-		{
-			mock.MutableSetups.RemoveAllPropertyAccessorSetups();
-			// Removing all the previous properties setups to keep the behaviour of overriding
-			// existing setups in `SetupAllProperties`.
-			
-			mock.AutoSetupPropertiesDefaultValueProvider = defaultValueProvider;
-			// `SetupAllProperties` no longer performs properties setup like in previous versions.
-			// Instead it just enables a switch to setup properties on-demand at the moment of first access.
-			// In order for `SetupAllProperties`'s new mode of operation to be indistinguishable
-			// from how it worked previously, it's important to capture the default value provider at this precise
-			// moment, since it might be changed later (before queries to properties).
+			mock.MutableSetups.Add(new StubbedPropertiesSetup(mock));
 		}
 
 		#endregion

@@ -4,7 +4,6 @@
 using System;
 using System.Collections;
 using System.Collections.Generic;
-using System.Linq;
 
 namespace Moq
 {
@@ -69,26 +68,6 @@ namespace Moq
 					// meaning that this older setup is an overridden one.
 					setup.MarkAsOverridden();
 				}
-			}
-		}
-
-		public void RemoveAllPropertyAccessorSetups()
-		{
-			// Fast path (no `lock`) when there are no setups:
-			if (this.setups.Count == 0)
-			{
-				return;
-			}
-
-			lock (this.setups)
-			{
-				this.setups.RemoveAll(s => s is StubbedPropertySetup || (s is MethodSetup ms && ms.Method.IsPropertyAccessor()));
-
-				// NOTE: In the general case, removing a setup means that some overridden setups might no longer
-				// be shadowed, and their `IsOverridden` flag should go back from `true` to `false`.
-				//
-				// In this particular case however, we don't need to worry about this because we are categorically
-				// removing all property accessors, and they could only have overridden other property accessors.
 			}
 		}
 

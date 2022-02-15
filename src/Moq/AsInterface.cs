@@ -43,12 +43,6 @@ namespace Moq
 			set => this.owner.DefaultValueProvider = value;
 		}
 
-		internal override DefaultValueProvider AutoSetupPropertiesDefaultValueProvider
-		{
-			get => this.owner.AutoSetupPropertiesDefaultValueProvider;
-			set => this.owner.AutoSetupPropertiesDefaultValueProvider = value;
-		}
-
 		internal override EventHandlerCollection EventHandlers => this.owner.EventHandlers;
 
 		internal override Type[] InheritedInterfaces => this.owner.InheritedInterfaces;

@@ -132,7 +132,7 @@ namespace Moq.Linq
 			var rewrittenLeft = v.Visit(left);
 
 			return Expression.Call(
-				Mocks.SetupReturnsMethod,
+				Mock.SetupReturnsMethod,
 				// mock:
 				Expression.Call(
 					Mock.GetMethod.MakeGenericMethod(v.MockObject.Type),
