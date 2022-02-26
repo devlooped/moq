@@ -5,15 +5,7 @@ All notable changes to this project will be documented in this file.
 The format is loosely based on [Keep a Changelog](http://keepachangelog.com/en/1.0.0/).
 
 
-## Unreleased
-
-#### Fixed
-
-* Property setups are ignored on mocks instantiated using `Mock.Of` (@stakx, #1066)
-* `SetupAllProperties` causes mocks to become race-prone (@estrizhok, #1231)
-
-
-## 4.17.0 (2022-02-13)
+## 4.17.1 (2022-02-26)
 
 #### Added
 
@@ -33,6 +25,13 @@ and `Setup(x => x.GetFooAsync(It.IsAny<string>()).Result).Throws((string s) => n
 * Virtual properties and automocking not working for `mock.Protected().As<>()` (@tonyhallett, #1185)
 * Issue mocking VB.NET class with overloaded property/indexer in base class (@myurashchyk, #1153)
 * Equivalent arrays don't test equal when returned from a method, making `Verify` fail when it should not (@evilc0, #1225)
+* Property setups are ignored on mocks instantiated using `Mock.Of` (@stakx, #1066)
+* `SetupAllProperties` causes mocks to become race-prone (@estrizhok, #1231)
+
+
+## 4.17.0
+
+This version was skipped due to an intermittent NuGet publishing issue.
 
 
 ## 4.16.1 (2021-02-23)
