@@ -609,6 +609,30 @@ namespace Moq
 			});
 		}
 
+		internal static StubbedPropertySetup SetupProperty(Mock mock, LambdaExpression expression, object initialValue)
+		{
+			Guard.NotNull(expression, nameof(expression));
+
+			var pi = expression.ToPropertyInfo();
+
+			if (!pi.CanRead(out var getter))
+			{
+				Guard.CanRead(pi);
+			}
+
+			if (!pi.CanWrite(out var setter))
+			{
+				Guard.CanWrite(pi);
+			}
+
+			return Mock.SetupRecursive(mock, expression, (targetMock, _, _) =>
+			{
+				var setup = new StubbedPropertySetup(targetMock, expression, getter, setter, initialValue);
+				targetMock.MutableSetups.Add(setup);
+				return setup;
+			});
+		}
+
 		private static TSetup SetupRecursive<TSetup>(Mock mock, LambdaExpression expression, Func<Mock, Expression, MethodExpectation, TSetup> setupLast, bool allowNonOverridableLastProperty = false)
 			where TSetup : ISetup
 		{

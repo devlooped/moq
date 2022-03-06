@@ -3740,6 +3740,48 @@ namespace Moq.Tests.Regressions
 
 		#endregion
 
+		#region 1240
+
+		public class Issue1240
+		{
+			public interface IFoo { IBar Bar { get; } }
+			public interface IBar
+			{
+				string Prop1 { get; }
+				string Prop2 { get; set; }
+			}
+
+			[Fact]
+			public void Property_on_submock_should_be_stubbed_1()
+			{
+				const string prop2 = "Prop2";
+				var mock = new Mock<IFoo>();
+
+				// mock.SetupGet(m => m.Bar.Prop1).Returns("Prop1");
+				//  ^ This line being commented out is the only difference from the test below.
+				//    Its absence would cause a `NullReferenceException` later.
+
+				mock.SetupProperty(m => m.Bar.Prop2);
+				mock.Object.Bar.Prop2 = prop2;
+				Assert.Equal(prop2, mock.Object.Bar.Prop2);
+			}
+
+			[Fact]
+			public void Property_on_submock_should_be_stubbed_2()
+			{
+				const string prop2 = "Prop2";
+				var mock = new Mock<IFoo>();
+
+				mock.SetupGet(m => m.Bar.Prop1).Returns("Prop1");
+
+				mock.SetupProperty(m => m.Bar.Prop2);
+				mock.Object.Bar.Prop2 = prop2;
+				Assert.Equal(prop2, mock.Object.Bar.Prop2);
+			}
+		}
+
+		#endregion
+
 		// Old @ Google Code
 
 		#region #47
