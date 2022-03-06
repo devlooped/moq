@@ -628,22 +628,7 @@ namespace Moq
 		/// </example>
 		public Mock<T> SetupProperty<TProperty>(Expression<Func<T, TProperty>> property, TProperty initialValue)
 		{
-			Guard.NotNull(property, nameof(property));
-
-			var pi = property.ToPropertyInfo();
-
-			if (!pi.CanRead(out var getter))
-			{
-				Guard.CanRead(pi);
-			}
-
-			if (!pi.CanWrite(out var setter))
-			{
-				Guard.CanWrite(pi);
-			}
-
-			var setup = new StubbedPropertySetup(this, property, getter, setter, initialValue);
-			this.MutableSetups.Add(setup);
+			Mock.SetupProperty(this, property, initialValue);
 			return this;
 		}
 
