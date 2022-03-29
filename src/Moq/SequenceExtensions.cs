@@ -123,7 +123,7 @@ namespace Moq
 			{
 				var tcs = new TaskCompletionSource<TResult>();
 				tcs.SetException(exception);
-				return AsyncEnumerable.Empty<TResult>();
+				return tcs.Task.ToAsyncEnumerable();
 			});
 		}
 #endif
