@@ -8,6 +8,11 @@ using System.Threading.Tasks;
 using Moq.Language;
 using Moq.Language.Flow;
 
+#if FEATURE_ASYNC_ENUMERABLE
+using System.Collections.Generic;
+using System.Linq;
+#endif
+
 namespace Moq
 {
 	/// <summary>
@@ -396,5 +401,146 @@ namespace Moq
 		{
 			return mock.Returns((T1 t1, T2 t2, T3 t3, T4 t4, T5 t5, T6 t6, T7 t7, T8 t8, T9 t9, T10 t10, T11 t11, T12 t12, T13 t13, T14 t14, T15 t15) => new ValueTask<TResult>(valueFunction(t1, t2, t3, t4, t5, t6, t7, t8, t9, t10, t11, t12, t13, t14, t15)));
 		}
+
+#if FEATURE_ASYNC_ENUMERABLE
+		/// <summary>
+		/// Specifies a function that will calculate the value to return from the asynchronous method.
+		/// </summary>
+		/// <typeparam name="T">Type of the function parameter.</typeparam>
+		/// <typeparam name="TMock">Mocked type.</typeparam>
+		/// <typeparam name="TResult">Type of the return value.</typeparam>
+		/// <param name="mock">Returns verb which represents the mocked type and the task of return type</param>
+		/// <param name="valueFunction">The function that will calculate the return value.</param>
+		public static IReturnsResult<TMock> ReturnsAsync<T, TMock, TResult>(this IReturns<TMock, IAsyncEnumerable<TResult>> mock, Func<T, IEnumerable<TResult>> valueFunction) where TMock : class
+		{
+			return mock.Returns((T t) => valueFunction(t).ToAsyncEnumerable());
+		}
+				/// <summary>
+		/// Specifies a function that will calculate the value to return from the asynchronous method.
+		/// </summary>
+		/// <param name="mock">Returns verb which represents the mocked type and the task of return type</param>
+		/// <param name="valueFunction">The function that will calculate the return value.</param>
+		public static IReturnsResult<TMock> ReturnsAsync<T1, T2, TMock, TResult>(this IReturns<TMock, IAsyncEnumerable<TResult>> mock, Func<T1, T2, IEnumerable<TResult>> valueFunction) where TMock : class
+		{
+			return mock.Returns((T1 t1, T2 t2) => valueFunction(t1, t2).ToAsyncEnumerable());
+		}
+		/// <summary>
+		/// Specifies a function that will calculate the value to return from the asynchronous method.
+		/// </summary>
+		/// <param name="mock">Returns verb which represents the mocked type and the task of return type</param>
+		/// <param name="valueFunction">The function that will calculate the return value.</param>
+		public static IReturnsResult<TMock> ReturnsAsync<T1, T2, T3, TMock, TResult>(this IReturns<TMock, IAsyncEnumerable<TResult>> mock, Func<T1, T2, T3, IEnumerable<TResult>> valueFunction) where TMock : class
+		{
+			return mock.Returns((T1 t1, T2 t2, T3 t3) => valueFunction(t1, t2, t3).ToAsyncEnumerable());
+		}
+		/// <summary>
+		/// Specifies a function that will calculate the value to return from the asynchronous method.
+		/// </summary>
+		/// <param name="mock">Returns verb which represents the mocked type and the task of return type</param>
+		/// <param name="valueFunction">The function that will calculate the return value.</param>
+		public static IReturnsResult<TMock> ReturnsAsync<T1, T2, T3, T4, TMock, TResult>(this IReturns<TMock, IAsyncEnumerable<TResult>> mock, Func<T1, T2, T3, T4, IEnumerable<TResult>> valueFunction) where TMock : class
+		{
+			return mock.Returns((T1 t1, T2 t2, T3 t3, T4 t4) => valueFunction(t1, t2, t3, t4).ToAsyncEnumerable());
+		}
+		/// <summary>
+		/// Specifies a function that will calculate the value to return from the asynchronous method.
+		/// </summary>
+		/// <param name="mock">Returns verb which represents the mocked type and the task of return type</param>
+		/// <param name="valueFunction">The function that will calculate the return value.</param>
+		public static IReturnsResult<TMock> ReturnsAsync<T1, T2, T3, T4, T5, TMock, TResult>(this IReturns<TMock, IAsyncEnumerable<TResult>> mock, Func<T1, T2, T3, T4, T5, IEnumerable<TResult>> valueFunction) where TMock : class
+		{
+			return mock.Returns((T1 t1, T2 t2, T3 t3, T4 t4, T5 t5) => valueFunction(t1, t2, t3, t4, t5).ToAsyncEnumerable());
+		}
+		/// <summary>
+		/// Specifies a function that will calculate the value to return from the asynchronous method.
+		/// </summary>
+		/// <param name="mock">Returns verb which represents the mocked type and the task of return type</param>
+		/// <param name="valueFunction">The function that will calculate the return value.</param>
+		public static IReturnsResult<TMock> ReturnsAsync<T1, T2, T3, T4, T5, T6, TMock, TResult>(this IReturns<TMock, IAsyncEnumerable<TResult>> mock, Func<T1, T2, T3, T4, T5, T6, IEnumerable<TResult>> valueFunction) where TMock : class
+		{
+			return mock.Returns((T1 t1, T2 t2, T3 t3, T4 t4, T5 t5, T6 t6) => valueFunction(t1, t2, t3, t4, t5, t6).ToAsyncEnumerable());
+		}
+		/// <summary>
+		/// Specifies a function that will calculate the value to return from the asynchronous method.
+		/// </summary>
+		/// <param name="mock">Returns verb which represents the mocked type and the task of return type</param>
+		/// <param name="valueFunction">The function that will calculate the return value.</param>
+		public static IReturnsResult<TMock> ReturnsAsync<T1, T2, T3, T4, T5, T6, T7, TMock, TResult>(this IReturns<TMock, IAsyncEnumerable<TResult>> mock, Func<T1, T2, T3, T4, T5, T6, T7, IEnumerable<TResult>> valueFunction) where TMock : class
+		{
+			return mock.Returns((T1 t1, T2 t2, T3 t3, T4 t4, T5 t5, T6 t6, T7 t7) => valueFunction(t1, t2, t3, t4, t5, t6, t7).ToAsyncEnumerable());
+		}
+		/// <summary>
+		/// Specifies a function that will calculate the value to return from the asynchronous method.
+		/// </summary>
+		/// <param name="mock">Returns verb which represents the mocked type and the task of return type</param>
+		/// <param name="valueFunction">The function that will calculate the return value.</param>
+		public static IReturnsResult<TMock> ReturnsAsync<T1, T2, T3, T4, T5, T6, T7, T8, TMock, TResult>(this IReturns<TMock, IAsyncEnumerable<TResult>> mock, Func<T1, T2, T3, T4, T5, T6, T7, T8, IEnumerable<TResult>> valueFunction) where TMock : class
+		{
+			return mock.Returns((T1 t1, T2 t2, T3 t3, T4 t4, T5 t5, T6 t6, T7 t7, T8 t8) => valueFunction(t1, t2, t3, t4, t5, t6, t7, t8).ToAsyncEnumerable());
+		}
+		/// <summary>
+		/// Specifies a function that will calculate the value to return from the asynchronous method.
+		/// </summary>
+		/// <param name="mock">Returns verb which represents the mocked type and the task of return type</param>
+		/// <param name="valueFunction">The function that will calculate the return value.</param>
+		public static IReturnsResult<TMock> ReturnsAsync<T1, T2, T3, T4, T5, T6, T7, T8, T9, TMock, TResult>(this IReturns<TMock, IAsyncEnumerable<TResult>> mock, Func<T1, T2, T3, T4, T5, T6, T7, T8, T9, IEnumerable<TResult>> valueFunction) where TMock : class
+		{
+			return mock.Returns((T1 t1, T2 t2, T3 t3, T4 t4, T5 t5, T6 t6, T7 t7, T8 t8, T9 t9) => valueFunction(t1, t2, t3, t4, t5, t6, t7, t8, t9).ToAsyncEnumerable());
+		}
+		/// <summary>
+		/// Specifies a function that will calculate the value to return from the asynchronous method.
+		/// </summary>
+		/// <param name="mock">Returns verb which represents the mocked type and the task of return type</param>
+		/// <param name="valueFunction">The function that will calculate the return value.</param>
+		public static IReturnsResult<TMock> ReturnsAsync<T1, T2, T3, T4, T5, T6, T7, T8, T9, T10, TMock, TResult>(this IReturns<TMock, IAsyncEnumerable<TResult>> mock, Func<T1, T2, T3, T4, T5, T6, T7, T8, T9, T10, IEnumerable<TResult>> valueFunction) where TMock : class
+		{
+			return mock.Returns((T1 t1, T2 t2, T3 t3, T4 t4, T5 t5, T6 t6, T7 t7, T8 t8, T9 t9, T10 t10) => valueFunction(t1, t2, t3, t4, t5, t6, t7, t8, t9, t10).ToAsyncEnumerable());
+		}
+		/// <summary>
+		/// Specifies a function that will calculate the value to return from the asynchronous method.
+		/// </summary>
+		/// <param name="mock">Returns verb which represents the mocked type and the task of return type</param>
+		/// <param name="valueFunction">The function that will calculate the return value.</param>
+		public static IReturnsResult<TMock> ReturnsAsync<T1, T2, T3, T4, T5, T6, T7, T8, T9, T10, T11, TMock, TResult>(this IReturns<TMock, IAsyncEnumerable<TResult>> mock, Func<T1, T2, T3, T4, T5, T6, T7, T8, T9, T10, T11, IEnumerable<TResult>> valueFunction) where TMock : class
+		{
+			return mock.Returns((T1 t1, T2 t2, T3 t3, T4 t4, T5 t5, T6 t6, T7 t7, T8 t8, T9 t9, T10 t10, T11 t11) => valueFunction(t1, t2, t3, t4, t5, t6, t7, t8, t9, t10, t11).ToAsyncEnumerable());
+		}
+		/// <summary>
+		/// Specifies a function that will calculate the value to return from the asynchronous method.
+		/// </summary>
+		/// <param name="mock">Returns verb which represents the mocked type and the task of return type</param>
+		/// <param name="valueFunction">The function that will calculate the return value.</param>
+		public static IReturnsResult<TMock> ReturnsAsync<T1, T2, T3, T4, T5, T6, T7, T8, T9, T10, T11, T12, TMock, TResult>(this IReturns<TMock, IAsyncEnumerable<TResult>> mock, Func<T1, T2, T3, T4, T5, T6, T7, T8, T9, T10, T11, T12, IEnumerable<TResult>> valueFunction) where TMock : class
+		{
+			return mock.Returns((T1 t1, T2 t2, T3 t3, T4 t4, T5 t5, T6 t6, T7 t7, T8 t8, T9 t9, T10 t10, T11 t11, T12 t12) => valueFunction(t1, t2, t3, t4, t5, t6, t7, t8, t9, t10, t11, t12).ToAsyncEnumerable());
+		}
+		/// <summary>
+		/// Specifies a function that will calculate the value to return from the asynchronous method.
+		/// </summary>
+		/// <param name="mock">Returns verb which represents the mocked type and the task of return type</param>
+		/// <param name="valueFunction">The function that will calculate the return value.</param>
+		public static IReturnsResult<TMock> ReturnsAsync<T1, T2, T3, T4, T5, T6, T7, T8, T9, T10, T11, T12, T13, TMock, TResult>(this IReturns<TMock, IAsyncEnumerable<TResult>> mock, Func<T1, T2, T3, T4, T5, T6, T7, T8, T9, T10, T11, T12, T13, IEnumerable<TResult>> valueFunction) where TMock : class
+		{
+			return mock.Returns((T1 t1, T2 t2, T3 t3, T4 t4, T5 t5, T6 t6, T7 t7, T8 t8, T9 t9, T10 t10, T11 t11, T12 t12, T13 t13) => valueFunction(t1, t2, t3, t4, t5, t6, t7, t8, t9, t10, t11, t12, t13).ToAsyncEnumerable());
+		}
+		/// <summary>
+		/// Specifies a function that will calculate the value to return from the asynchronous method.
+		/// </summary>
+		/// <param name="mock">Returns verb which represents the mocked type and the task of return type</param>
+		/// <param name="valueFunction">The function that will calculate the return value.</param>
+		public static IReturnsResult<TMock> ReturnsAsync<T1, T2, T3, T4, T5, T6, T7, T8, T9, T10, T11, T12, T13, T14, TMock, TResult>(this IReturns<TMock, IAsyncEnumerable<TResult>> mock, Func<T1, T2, T3, T4, T5, T6, T7, T8, T9, T10, T11, T12, T13, T14, IEnumerable<TResult>> valueFunction) where TMock : class
+		{
+			return mock.Returns((T1 t1, T2 t2, T3 t3, T4 t4, T5 t5, T6 t6, T7 t7, T8 t8, T9 t9, T10 t10, T11 t11, T12 t12, T13 t13, T14 t14) => valueFunction(t1, t2, t3, t4, t5, t6, t7, t8, t9, t10, t11, t12, t13, t14).ToAsyncEnumerable());
+		}
+		/// <summary>
+		/// Specifies a function that will calculate the value to return from the asynchronous method.
+		/// </summary>
+		/// <param name="mock">Returns verb which represents the mocked type and the task of return type</param>
+		/// <param name="valueFunction">The function that will calculate the return value.</param>
+		public static IReturnsResult<TMock> ReturnsAsync<T1, T2, T3, T4, T5, T6, T7, T8, T9, T10, T11, T12, T13, T14, T15, TMock, TResult>(this IReturns<TMock, IAsyncEnumerable<TResult>> mock, Func<T1, T2, T3, T4, T5, T6, T7, T8, T9, T10, T11, T12, T13, T14, T15, IEnumerable<TResult>> valueFunction) where TMock : class
+		{
+			return mock.Returns((T1 t1, T2 t2, T3 t3, T4 t4, T5 t5, T6 t6, T7 t7, T8 t8, T9 t9, T10 t10, T11 t11, T12 t12, T13 t13, T14 t14, T15 t15) => valueFunction(t1, t2, t3, t4, t5, t6, t7, t8, t9, t10, t11, t12, t13, t14, t15).ToAsyncEnumerable());
+		}
+#endif
 	}
 }

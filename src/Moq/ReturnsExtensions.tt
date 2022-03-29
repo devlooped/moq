@@ -12,6 +12,11 @@ using System.Threading.Tasks;
 using Moq.Language;
 using Moq.Language.Flow;
 
+#if FEATURE_ASYNC_ENUMERABLE
+using System.Collections.Generic;
+using System.Linq;
+#endif
+
 namespace Moq
 {
 	/// <summary>
@@ -119,5 +124,52 @@ namespace Moq
 <#
 		}
 		#>
+
+#if FEATURE_ASYNC_ENUMERABLE
+		/// <summary>
+		/// Specifies a function that will calculate the value to return from the asynchronous method.
+		/// </summary>
+		/// <typeparam name="T">Type of the function parameter.</typeparam>
+		/// <typeparam name="TMock">Mocked type.</typeparam>
+		/// <typeparam name="TResult">Type of the return value.</typeparam>
+		/// <param name="mock">Returns verb which represents the mocked type and the task of return type</param>
+		/// <param name="valueFunction">The function that will calculate the return value.</param>
+		public static IReturnsResult<TMock> ReturnsAsync<T, TMock, TResult>(this IReturns<TMock, IAsyncEnumerable<TResult>> mock, Func<T, IEnumerable<TResult>> valueFunction) where TMock : class
+		{
+			return mock.Returns((T t) => valueFunction(t).ToAsyncEnumerable());
+		}
+		<#
+		for (var argumentCount = 2; argumentCount <= 15; ++argumentCount)
+		{ #>
+		/// <summary>
+		/// Specifies a function that will calculate the value to return from the asynchronous method.
+		/// </summary>
+		/// <param name="mock">Returns verb which represents the mocked type and the task of return type</param>
+		/// <param name="valueFunction">The function that will calculate the return value.</param>
+		public static IReturnsResult<TMock> ReturnsAsync<<#
+			for (var i = 1; i <= argumentCount; ++i)
+			{
+				#>T<#=i#>, <#
+			}#>TMock, TResult>(this IReturns<TMock, IAsyncEnumerable<TResult>> mock, Func<<#
+			for (var i = 1; i <= argumentCount; ++i)
+			{
+				#>T<#=i#>, <#
+			}#>IEnumerable<TResult>> valueFunction) where TMock : class
+		{
+			return mock.Returns((<#
+			for (var i = 1; i <= argumentCount; ++i)
+			{ #>T<#=i#> t<#=i#><#
+				if(i != argumentCount) {#>, <#}#><#
+			}#>) => valueFunction(<#
+			for (var i = 1; i <= argumentCount; ++i)
+			{
+				#>t<#=i#><#
+				if (i != argumentCount) { #>, <#}#><#
+			}#>).ToAsyncEnumerable());
+		}
+<#
+		}
+		#>
+#endif
 	}
 }
