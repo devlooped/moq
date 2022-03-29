@@ -978,7 +978,7 @@ namespace Moq.Tests
 			var enumerable = mock.Object.RefParameterRefReturnType("Param1");
 			var task = enumerable.ToArrayAsync();
 
-			Assert.IsAssignableFrom<IAsyncEnumerable<int>>(enumerable);
+			Assert.IsAssignableFrom<IAsyncEnumerable<string>>(enumerable);
 			Assert.True(task.IsCompleted);
 			Assert.Equal(new[] { "TestString" }, task.Result);
 		}
@@ -1138,7 +1138,7 @@ namespace Moq.Tests
 
 			Assert.IsAssignableFrom<IAsyncEnumerable<string>>(firstEnumerable);
 			Assert.IsAssignableFrom<IAsyncEnumerable<string>>(secondEnumerable);
-			Assert.NotEqual(firstTask.Result, secondTask.Result);
+			Assert.NotSame(firstTask.Result, secondTask.Result);
 		}
 
 		[Fact]
@@ -1267,11 +1267,11 @@ namespace Moq.Tests
 		[Fact]
 		public async Task AsyncEnumerableReturnsAsyncWithDelayReturnsValue()
 		{
-			var mock = new Mock<IAsyncEnumerableAsyncInterface>();
+			var mock = new Mock<IAsyncEnumerableAsyncInterface>(MockBehavior.Strict);
 			mock.Setup(x => x.RefParameterValueReturnType("test")).ReturnsAsync(new[] { 5 }, TimeSpan.FromMilliseconds(1));
 
-			var task = mock.Object.RefParameterValueReturnType("test");
-			var value = await Assert.IsAssignableFrom<IAsyncEnumerable<int>>(task).ToArrayAsync();
+			var enumerable = mock.Object.RefParameterValueReturnType("test");
+			var value = await Assert.IsAssignableFrom<IAsyncEnumerable<int>>(enumerable).ToArrayAsync();
 
 			Assert.Equal(new[] { 5 }, value);
 		}

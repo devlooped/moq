@@ -469,11 +469,16 @@ namespace Moq
 		{
 			Guard.Positive(delay);
 
-			return mock.Returns(() =>
+			async IAsyncEnumerable<TResult> DelayThenContinue()
 			{
-				Task.Delay(delay).ContinueWith(t => value);
-				return AsyncEnumerable.Empty<TResult>();
-			});
+				await Task.Delay(delay);
+				foreach (var item in value)
+				{
+					yield return item;
+				}
+			}
+
+			return mock.Returns(DelayThenContinue);
 		}
 
 #endif
