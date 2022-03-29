@@ -6,7 +6,7 @@
 	<Import Project="$(BuildDirectory)SourceLink.props" />
 
 	<PropertyGroup>
-		<TargetFrameworks>net45;netstandard2.0;netstandard2.1</TargetFrameworks>
+		<TargetFrameworks>net45;net461;netstandard2.0;netstandard2.1</TargetFrameworks>
 		<AssemblyName>Moq</AssemblyName>
 		<DebugSymbols>True</DebugSymbols>
 		<DebugType>embedded</DebugType>
@@ -20,10 +20,14 @@
 	</PropertyGroup>
 
 	<PropertyGroup Condition=" '$(TargetFramework)' == 'netstandard2.1' ">
-		<DefineConstants>$(DefineConstants);FEATURE_DEFAULT_INTERFACE_IMPLEMENTATIONS;FEATURE_ASYNC_ENUMERABLE</DefineConstants>
+		<DefineConstants>$(DefineConstants);FEATURE_ASYNC_ENUMERABLE;FEATURE_DEFAULT_INTERFACE_IMPLEMENTATIONS</DefineConstants>
 	</PropertyGroup>
 
 	<PropertyGroup Condition=" '$(TargetFramework)' == 'netstandard2.0' ">
+		<DefineConstants>$(DefineConstants);FEATURE_ASYNC_ENUMERABLE</DefineConstants>
+	</PropertyGroup>
+
+	<PropertyGroup Condition=" '$(TargetFramework)' == 'net461' ">
 		<DefineConstants>$(DefineConstants);FEATURE_ASYNC_ENUMERABLE</DefineConstants>
 	</PropertyGroup>
 
@@ -53,8 +57,7 @@
 		<PackageReference Include="System.Threading.Tasks.Extensions" Version="4.5.4" />
 		<PackageReference Include="TypeNameFormatter.Sources" Version="1.0.0" PrivateAssets="All" />
 	</ItemGroup>
-
-	<ItemGroup Condition="'$(TargetFramework)' != 'net45'">
+	<ItemGroup Condition=" $([System.Text.RegularExpressions.Regex]::IsMatch('$(DefineConstants)', 'FEATURE_ASYNC_ENUMERABLE'))">
 		<PackageReference Include="System.Linq.Async" Version="4.0.0" />
 	</ItemGroup>
 

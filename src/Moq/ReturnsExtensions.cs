@@ -217,7 +217,7 @@ namespace Moq
 		/// Allows to specify the delayed return value of an asynchronous enumerable method.
 		/// </summary>
 		public static IReturnsResult<TMock> ReturnsAsync<TMock, TResult>(this IReturns<TMock, IAsyncEnumerable<TResult>> mock,
-			TResult value, TimeSpan delay) where TMock : class
+			IEnumerable<TResult> value, TimeSpan delay) where TMock : class
 		{
 			return DelayedResult(mock, value, delay);
 		}
@@ -250,7 +250,7 @@ namespace Moq
 		/// Allows to specify the delayed return value of an asynchronous enumerable method.
 		/// </summary>
 		public static IReturnsResult<TMock> ReturnsAsync<TMock, TResult>(this IReturns<TMock, IAsyncEnumerable<TResult>> mock,
-			TResult value, TimeSpan minDelay, TimeSpan maxDelay) where TMock : class
+			IEnumerable<TResult> value, TimeSpan minDelay, TimeSpan maxDelay) where TMock : class
 		{
 			var delay = GetDelay(minDelay, maxDelay, Random);
 
@@ -294,7 +294,7 @@ namespace Moq
 		/// <para>Use the <see cref="Random"/> argument to pass in (seeded) random generators used across your unit test.</para>
 		/// </summary>
 		public static IReturnsResult<TMock> ReturnsAsync<TMock, TResult>(this IReturns<TMock, IAsyncEnumerable<TResult>> mock,
-			TResult value, TimeSpan minDelay, TimeSpan maxDelay, Random random) where TMock : class
+			IEnumerable<TResult> value, TimeSpan minDelay, TimeSpan maxDelay, Random random) where TMock : class
 		{
 			if (random == null)
 				throw new ArgumentNullException(nameof(random));
@@ -397,6 +397,23 @@ namespace Moq
 
 			return DelayedException(mock, exception, delay);
 		}
+
+#if FEATURE_ASYNC_ENUMERABLE
+		/// <summary>
+		/// <para>Allows to specify the exception thrown by an asynchronous method.</para> 
+		/// <para>Use the <see cref="Random"/> argument to pass in (seeded) random generators used across your unit test.</para>
+		/// </summary>
+		public static IReturnsResult<TMock> ThrowsAsync<TMock, TResult>(this IReturns<TMock, IAsyncEnumerable<TResult>> mock,
+			Exception exception, TimeSpan minDelay, TimeSpan maxDelay, Random random) where TMock : class
+		{
+			if (random == null)
+				throw new ArgumentNullException(nameof(random));
+
+			var delay = GetDelay(minDelay, maxDelay, random);
+
+			return DelayedException(mock, exception, delay);
+		}
+#endif
 
 		internal static bool IsNullResult(Delegate valueFunction, Type resultType)
 		{
@@ -447,7 +464,7 @@ namespace Moq
 
 #if FEATURE_ASYNC_ENUMERABLE
 		private static IReturnsResult<TMock> DelayedResult<TMock, TResult>(IReturns<TMock, IAsyncEnumerable<TResult>> mock,
-			TResult value, TimeSpan delay)
+			IEnumerable<TResult> value, TimeSpan delay)
 			where TMock : class
 		{
 			Guard.Positive(delay);

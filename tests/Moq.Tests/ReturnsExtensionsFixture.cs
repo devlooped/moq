@@ -6,6 +6,11 @@ using System.Threading.Tasks;
 
 using Xunit;
 
+#if FEATURE_ASYNC_ENUMERABLE
+using System.Collections.Generic;
+using System.Linq;
+#endif
+
 namespace Moq.Tests
 {
 	public class ReturnsExtensionsFixture
@@ -57,6 +62,31 @@ namespace Moq.Tests
 
 			ValueTask<object> ManyParametersObjectReturnType(string arg1, bool arg2, float arg3);
 		}
+
+#if FEATURE_ASYNC_ENUMERABLE
+		public interface IAsyncEnumerableAsyncInterface
+		{
+			IAsyncEnumerable<string> NoParametersRefReturnType();
+
+			IAsyncEnumerable<int> NoParametersValueReturnType();
+
+			IAsyncEnumerable<string> RefParameterRefReturnType(string value);
+
+			IAsyncEnumerable<int> RefParameterValueReturnType(string value);
+
+			IAsyncEnumerable<string> ValueParameterRefReturnType(int value);
+
+			IAsyncEnumerable<int> ValueParameterValueReturnType(int value);
+
+			IAsyncEnumerable<Guid> NewGuidAsync();
+
+			IAsyncEnumerable<object> NoParametersObjectReturnType();
+
+			IAsyncEnumerable<object> OneParameterObjectReturnType(string value);
+
+			IAsyncEnumerable<object> ManyParametersObjectReturnType(string arg1, bool arg2, float arg3);
+		}
+#endif
 
 		[Fact]
 		public void ReturnsAsync_on_NoParametersRefReturnType()
@@ -909,6 +939,453 @@ namespace Moq.Tests
 			var paramName = Assert.Throws<ArgumentNullException>(setup).ParamName;
 			Assert.Equal("random", paramName);
 		}
+
+#if FEATURE_ASYNC_ENUMERABLE
+		[Fact]
+		public void AsyncEnumerableReturnsAsync_on_NoParametersRefReturnType()
+		{
+			var mock = new Mock<IAsyncEnumerableAsyncInterface>();
+			mock.Setup(x => x.NoParametersRefReturnType()).ReturnsAsync(new[] { "TestString" });
+
+			var enumerable = mock.Object.NoParametersRefReturnType();
+			var task = enumerable.ToArrayAsync();
+
+			Assert.IsAssignableFrom<IAsyncEnumerable<string>>(enumerable);
+			Assert.True(task.IsCompleted);
+			Assert.Equal(new[] { "TestString" }, task.Result);
+		}
+
+		[Fact]
+		public void AsyncEnumerableReturnsAsync_on_NoParametersValueReturnType()
+		{
+			var mock = new Mock<IAsyncEnumerableAsyncInterface>();
+			mock.Setup(x => x.NoParametersValueReturnType()).ReturnsAsync(new[] { 36 });
+
+			var enumerable = mock.Object.NoParametersValueReturnType();
+			var task = enumerable.ToArrayAsync();
+
+			Assert.IsAssignableFrom<IAsyncEnumerable<int>>(enumerable);
+			Assert.True(task.IsCompleted);
+			Assert.Equal(new[] { 36 }, task.Result);
+		}
+
+		[Fact]
+		public void AsyncEnumerableReturnsAsync_on_RefParameterRefReturnType()
+		{
+			var mock = new Mock<IAsyncEnumerableAsyncInterface>();
+			mock.Setup(x => x.RefParameterRefReturnType("Param1")).ReturnsAsync(new[] { "TestString" });
+
+			var enumerable = mock.Object.RefParameterRefReturnType("Param1");
+			var task = enumerable.ToArrayAsync();
+
+			Assert.IsAssignableFrom<IAsyncEnumerable<int>>(enumerable);
+			Assert.True(task.IsCompleted);
+			Assert.Equal(new[] { "TestString" }, task.Result);
+		}
+
+		[Fact]
+		public void AsyncEnumerableReturnsAsync_on_RefParameterValueReturnType()
+		{
+			var mock = new Mock<IAsyncEnumerableAsyncInterface>();
+			mock.Setup(x => x.RefParameterValueReturnType("Param1")).ReturnsAsync(new[] { 36 });
+
+			var enumerable = mock.Object.RefParameterValueReturnType("Param1");
+			var task = enumerable.ToArrayAsync();
+
+			Assert.IsAssignableFrom<IAsyncEnumerable<int>>(enumerable);
+			Assert.True(task.IsCompleted);
+			Assert.Equal(new[] { 36 }, task.Result);
+		}
+
+		[Fact]
+		public void AsyncEnumerableReturnsAsync_on_ValueParameterRefReturnType()
+		{
+			var mock = new Mock<IAsyncEnumerableAsyncInterface>();
+			mock.Setup(x => x.ValueParameterRefReturnType(36)).ReturnsAsync(new[] { "TestString" });
+
+			var enumerable = mock.Object.ValueParameterRefReturnType(36);
+			var task = enumerable.ToArrayAsync();
+
+			Assert.IsAssignableFrom<IAsyncEnumerable<string>>(enumerable);
+			Assert.True(task.IsCompleted);
+			Assert.Equal(new[] { "TestString" }, task.Result);
+		}
+
+		[Fact]
+		public void AsyncEnumerableReturnsAsync_on_ValueParameterValueReturnType()
+		{
+			var mock = new Mock<IAsyncEnumerableAsyncInterface>();
+			mock.Setup(x => x.ValueParameterValueReturnType(36)).ReturnsAsync(new[] { 37 });
+
+			var enumerable = mock.Object.ValueParameterValueReturnType(36);
+			var task = enumerable.ToArrayAsync();
+
+			Assert.IsAssignableFrom<IAsyncEnumerable<int>>(enumerable);
+			Assert.True(task.IsCompleted);
+			Assert.Equal(new[] { 37 }, task.Result);
+		}
+
+		[Fact]
+		public void AsyncEnumerableReturnsAsyncFunc_on_NoParametersRefReturnType()
+		{
+			var mock = new Mock<IAsyncEnumerableAsyncInterface>();
+			mock.Setup(x => x.NoParametersRefReturnType()).ReturnsAsync(() => new[] { "TestString" });
+
+			var enumerable = mock.Object.NoParametersRefReturnType();
+			var task = enumerable.ToArrayAsync();
+
+			Assert.IsAssignableFrom<IAsyncEnumerable<string>>(enumerable);
+			Assert.True(task.IsCompleted);
+			Assert.Equal(new[] { "TestString" }, task.Result);
+		}
+
+		[Fact]
+		public void AsyncEnumerableReturnsAsyncFunc_on_NoParametersValueReturnType()
+		{
+			var mock = new Mock<IAsyncEnumerableAsyncInterface>();
+			mock.Setup(x => x.NoParametersValueReturnType()).ReturnsAsync(() => new[] { 36 });
+
+			var enumerable = mock.Object.NoParametersValueReturnType();
+			var task = enumerable.ToArrayAsync();
+
+			Assert.IsAssignableFrom<IAsyncEnumerable<int>>(enumerable);
+			Assert.True(task.IsCompleted);
+			Assert.Equal(new[] { 36 }, task.Result);
+		}
+
+		[Fact]
+		public void AsyncEnumerableReturnsAsyncFunc_on_RefParameterRefReturnType()
+		{
+			var mock = new Mock<IAsyncEnumerableAsyncInterface>();
+			mock.Setup(x => x.RefParameterRefReturnType("Param1")).ReturnsAsync(() => new[] { "TestString" });
+
+			var enumerable = mock.Object.RefParameterRefReturnType("Param1");
+			var task = enumerable.ToArrayAsync();
+
+			Assert.IsAssignableFrom<IAsyncEnumerable<string>>(enumerable);
+			Assert.True(task.IsCompleted);
+			Assert.Equal(new[] { "TestString" }, task.Result);
+		}
+
+		[Fact]
+		public void AsyncEnumerableReturnsAsyncFunc_on_RefParameterValueReturnType()
+		{
+			var mock = new Mock<IAsyncEnumerableAsyncInterface>();
+			mock.Setup(x => x.RefParameterValueReturnType("Param1")).ReturnsAsync(() => new[] { 36 });
+
+			var enumerable = mock.Object.RefParameterValueReturnType("Param1");
+			var task = enumerable.ToArrayAsync();
+
+			Assert.IsAssignableFrom<IAsyncEnumerable<int>>(enumerable);
+			Assert.True(task.IsCompleted);
+			Assert.Equal(new[] { 36 }, task.Result);
+		}
+
+		[Fact]
+		public void AsyncEnumerableReturnsAsyncFunc_on_ValueParameterRefReturnType()
+		{
+			var mock = new Mock<IAsyncEnumerableAsyncInterface>();
+			mock.Setup(x => x.ValueParameterRefReturnType(36)).ReturnsAsync(() => new[] { "TestString" });
+
+			var enumerable = mock.Object.ValueParameterRefReturnType(36);
+			var task = enumerable.ToArrayAsync();
+
+			Assert.IsAssignableFrom<IAsyncEnumerable<string>>(enumerable);
+			Assert.True(task.IsCompleted);
+			Assert.Equal(new[] { "TestString" }, task.Result);
+		}
+
+		[Fact]
+		public void AsyncEnumerableReturnsAsyncFunc_on_ValueParameterValueReturnType()
+		{
+			var mock = new Mock<IAsyncEnumerableAsyncInterface>();
+			mock.Setup(x => x.ValueParameterValueReturnType(36)).ReturnsAsync(() => new[] { 37 });
+
+			var enumerable = mock.Object.ValueParameterValueReturnType(36);
+			var task = enumerable.ToArrayAsync();
+
+			Assert.IsAssignableFrom<IAsyncEnumerable<int>>(enumerable);
+			Assert.True(task.IsCompleted);
+			Assert.Equal(new[] { 37 }, task.Result);
+		}
+
+		[Fact]
+		public void AsyncEnumerableReturnsAsyncFunc_onEachInvocation_ValueReturnTypeLazyEvaluation()
+		{
+			var mock = new Mock<IAsyncEnumerableAsyncInterface>();
+			mock.Setup(x => x.NewGuidAsync()).ReturnsAsync(() => new[] { Guid.NewGuid() });
+
+			var firstEnumerable = mock.Object.NewGuidAsync();
+			var secondEnumerable = mock.Object.NewGuidAsync();
+			var firstTask = firstEnumerable.ToArrayAsync();
+			var secondTask = secondEnumerable.ToArrayAsync();
+
+			Assert.IsAssignableFrom<IAsyncEnumerable<Guid>>(firstEnumerable);
+			Assert.IsAssignableFrom<IAsyncEnumerable<Guid>>(secondEnumerable);
+			Assert.NotEqual(firstTask.Result, secondTask.Result);
+		}
+
+		[Fact]
+		public void AsyncEnumerableReturnsAsyncFunc_onEachInvocation_RefReturnTypeLazyEvaluation()
+		{
+			var mock = new Mock<IAsyncEnumerableAsyncInterface>();
+			mock.Setup(x => x.ValueParameterRefReturnType(36)).ReturnsAsync(() => new[] { new string(new[] { 'M', 'o', 'q', '4' }) });
+
+			var firstEnumerable = mock.Object.ValueParameterRefReturnType(36);
+			var secondEnumerable = mock.Object.ValueParameterRefReturnType(36);
+			var firstTask = firstEnumerable.ToArrayAsync();
+			var secondTask = secondEnumerable.ToArrayAsync();
+
+			Assert.IsAssignableFrom<IAsyncEnumerable<string>>(firstEnumerable);
+			Assert.IsAssignableFrom<IAsyncEnumerable<string>>(secondEnumerable);
+			Assert.NotEqual(firstTask.Result, secondTask.Result);
+		}
+
+		[Fact]
+		public void AsyncEnumerableThrowsAsync_on_NoParametersRefReturnType()
+		{
+			var mock = new Mock<IAsyncEnumerableAsyncInterface>();
+			var exception = new InvalidOperationException();
+			mock.Setup(x => x.NoParametersRefReturnType()).ThrowsAsync(exception);
+
+			var enumerable = mock.Object.NoParametersRefReturnType();
+			var task = enumerable.ToArrayAsync();
+
+			Assert.IsAssignableFrom<IAsyncEnumerable<string>>(enumerable);
+			Assert.True(task.IsFaulted);
+			Assert.Equal(exception, task.AsTask().Exception.InnerException);
+		}
+
+		[Fact]
+		public void AsyncEnumerableThrowsAsync_on_NoParametersValueReturnType()
+		{
+			var mock = new Mock<IAsyncEnumerableAsyncInterface>();
+			var exception = new InvalidOperationException();
+			mock.Setup(x => x.NoParametersValueReturnType()).ThrowsAsync(exception);
+
+			var enumerable = mock.Object.NoParametersValueReturnType();
+			var task = enumerable.ToArrayAsync();
+
+			Assert.IsAssignableFrom<IAsyncEnumerable<int>>(enumerable);
+			Assert.True(task.IsFaulted);
+			Assert.Equal(exception, task.AsTask().Exception.InnerException);
+		}
+
+		[Fact]
+		public void AsyncEnumerableThrowsAsync_on_RefParameterRefReturnType()
+		{
+			var mock = new Mock<IAsyncEnumerableAsyncInterface>();
+			var exception = new InvalidOperationException();
+			mock.Setup(x => x.RefParameterRefReturnType("Param1")).ThrowsAsync(exception);
+
+			var enumerable = mock.Object.RefParameterRefReturnType("Param1");
+			var task = enumerable.ToArrayAsync();
+
+			Assert.IsAssignableFrom<IAsyncEnumerable<string>>(enumerable);
+			Assert.True(task.IsFaulted);
+			Assert.Equal(exception, task.AsTask().Exception.InnerException);
+		}
+
+		[Fact]
+		public void AsyncEnumerableThrowsAsync_on_RefParameterValueReturnType()
+		{
+			var mock = new Mock<IAsyncEnumerableAsyncInterface>();
+			var exception = new InvalidOperationException();
+			mock.Setup(x => x.RefParameterValueReturnType("Param1")).ThrowsAsync(exception);
+
+			var enumerable = mock.Object.RefParameterValueReturnType("Param1");
+			var task = enumerable.ToArrayAsync();
+
+			Assert.IsAssignableFrom<IAsyncEnumerable<int>>(enumerable);
+			Assert.True(task.IsFaulted);
+			Assert.Equal(exception, task.AsTask().Exception.InnerException);
+		}
+
+		[Fact]
+		public void AsyncEnumerableThrowsAsync_on_ValueParameterRefReturnType()
+		{
+			var mock = new Mock<IAsyncEnumerableAsyncInterface>();
+			var exception = new InvalidOperationException();
+			mock.Setup(x => x.ValueParameterRefReturnType(36)).ThrowsAsync(exception);
+
+			var enumerable = mock.Object.ValueParameterRefReturnType(36);
+			var task = enumerable.ToArrayAsync();
+
+			Assert.IsAssignableFrom<IAsyncEnumerable<string>>(enumerable);
+			Assert.True(task.IsFaulted);
+			Assert.Equal(exception, task.AsTask().Exception.InnerException);
+		}
+
+		[Fact]
+		public void AsyncEnumerableThrowsAsync_on_ValueParameterValueReturnType()
+		{
+			var mock = new Mock<IAsyncEnumerableAsyncInterface>();
+			var exception = new InvalidOperationException();
+			mock.Setup(x => x.ValueParameterValueReturnType(36)).ThrowsAsync(exception);
+
+			var enumerable = mock.Object.ValueParameterValueReturnType(36);
+			var task = enumerable.ToArrayAsync();
+
+			Assert.IsAssignableFrom<IAsyncEnumerable<int>>(enumerable);
+			Assert.True(task.IsFaulted);
+			Assert.Equal(exception, task.AsTask().Exception.InnerException);
+		}
+
+		[Fact]
+		public void AsyncEnumerableReturnsAsyncWithDelayDoesNotImmediatelyComplete()
+		{
+			var longEnoughForAnyBuildServer = TimeSpan.FromSeconds(5);
+
+			var mock = new Mock<IAsyncEnumerableAsyncInterface>();
+			mock.Setup(x => x.RefParameterValueReturnType("test")).ReturnsAsync(new[] { 5 }, longEnoughForAnyBuildServer);
+
+			var enumerable = mock.Object.RefParameterValueReturnType("test");
+			var task = enumerable.ToArrayAsync();
+
+			Assert.IsAssignableFrom<IAsyncEnumerable<int>>(enumerable);
+			Assert.False(task.IsCompleted);
+		}
+
+		[Theory]
+		[InlineData(-1, true)]
+		[InlineData(0, true)]
+		[InlineData(1, false)]
+		public void AsyncEnumerableDelayMustBePositive(int ticks, bool mustThrow)
+		{
+			var mock = new Mock<IAsyncEnumerableAsyncInterface>();
+
+			Action setup = () => mock
+				.Setup(x => x.RefParameterValueReturnType("test"))
+				.ReturnsAsync(new[] { 5 }, TimeSpan.FromTicks(ticks));
+
+			if (mustThrow)
+				Assert.Throws<ArgumentException>(setup);
+			else
+				setup();
+		}
+
+		[Fact]
+		public async Task AsyncEnumerableReturnsAsyncWithDelayReturnsValue()
+		{
+			var mock = new Mock<IAsyncEnumerableAsyncInterface>();
+			mock.Setup(x => x.RefParameterValueReturnType("test")).ReturnsAsync(new[] { 5 }, TimeSpan.FromMilliseconds(1));
+
+			var task = mock.Object.RefParameterValueReturnType("test");
+			var value = await Assert.IsAssignableFrom<IAsyncEnumerable<int>>(task).ToArrayAsync();
+
+			Assert.Equal(new[] { 5 }, value);
+		}
+
+		[Fact]
+		public async Task AsyncEnumerableReturnsAsyncWithMinAndMaxDelayReturnsValue()
+		{
+			var mock = new Mock<IAsyncEnumerableAsyncInterface>();
+			mock.Setup(x => x.RefParameterValueReturnType("test")).ReturnsAsync(new[] { 5 }, TimeSpan.FromMilliseconds(1), TimeSpan.FromMilliseconds(2));
+
+			var enumerable = mock.Object.RefParameterValueReturnType("test");
+			var value = await Assert.IsAssignableFrom<IAsyncEnumerable<int>>(enumerable).ToArrayAsync();
+
+			Assert.Equal(new[] { 5 }, value);
+		}
+
+		[Fact]
+		public async Task AsyncEnumerableReturnsAsyncWithMinAndMaxDelayAndOwnRandomGeneratorReturnsValue()
+		{
+			var mock = new Mock<IAsyncEnumerableAsyncInterface>();
+			mock.Setup(x => x.RefParameterValueReturnType("test")).ReturnsAsync(new[] { 5 }, TimeSpan.FromMilliseconds(1), TimeSpan.FromMilliseconds(2), new Random());
+
+			var task = mock.Object.RefParameterValueReturnType("test");
+			var value = await Assert.IsAssignableFrom<IAsyncEnumerable<int>>(task).ToArrayAsync();
+
+			Assert.Equal(new[] { 5 }, value);
+		}
+
+		[Fact]
+		public void AsyncEnumerableReturnsAsyncWithNullRandomGenerator()
+		{
+			var mock = new Mock<IAsyncEnumerableAsyncInterface>();
+
+			Action setup = () => mock
+				.Setup(x => x.RefParameterValueReturnType("test"))
+				.ReturnsAsync(new[] { 5 }, TimeSpan.FromMilliseconds(1), TimeSpan.FromMilliseconds(2), null);
+
+			var paramName = Assert.Throws<ArgumentNullException>(setup).ParamName;
+			Assert.Equal("random", paramName);
+		}
+
+		[Fact]
+		public async Task AsyncEnumerableThrowsWithDelay()
+		{
+			var mock = new Mock<IAsyncEnumerableAsyncInterface>();
+
+			mock
+				.Setup(x => x.RefParameterValueReturnType("test"))
+				.ThrowsAsync(new ArithmeticException("yikes"), TimeSpan.FromMilliseconds(1));
+
+			Func<IAsyncEnumerable<int>> test = () => mock.Object.RefParameterValueReturnType("test");
+
+			var exception = await Assert.ThrowsAsync<ArithmeticException>(() => test().ToArrayAsync().AsTask());
+			Assert.Equal("yikes", exception.Message);
+		}
+
+		[Fact]
+		public async Task AsyncEnumerableThrowsWithRandomDelay()
+		{
+			var mock = new Mock<IAsyncEnumerableAsyncInterface>();
+
+			var minDelay = TimeSpan.FromMilliseconds(1);
+			var maxDelay = TimeSpan.FromMilliseconds(2);
+
+			mock
+				.Setup(x => x.RefParameterValueReturnType("test"))
+				.ThrowsAsync(new ArithmeticException("yikes"), minDelay, maxDelay);
+
+			Func<IAsyncEnumerable<int>> test = () => mock.Object.RefParameterValueReturnType("test");
+
+			var exception = await Assert.ThrowsAsync<ArithmeticException>(() => test().ToArrayAsync().AsTask());
+			Assert.Equal("yikes", exception.Message);
+		}
+
+		[Fact]
+		public async Task AsyncEnumerableThrowsWithRandomDelayAndOwnRandomGenerator()
+		{
+			var mock = new Mock<IAsyncEnumerableAsyncInterface>();
+
+			var minDelay = TimeSpan.FromMilliseconds(1);
+			var maxDelay = TimeSpan.FromMilliseconds(2);
+
+			mock
+				.Setup(x => x.RefParameterValueReturnType("test"))
+				.ThrowsAsync(new ArithmeticException("yikes"), minDelay, maxDelay, new Random());
+
+			Func<IAsyncEnumerable<int>> test = () => mock.Object.RefParameterValueReturnType("test");
+
+			var exception = await Assert.ThrowsAsync<ArithmeticException>(() => test().ToArrayAsync().AsTask());
+			Assert.Equal("yikes", exception.Message);
+		}
+
+		[Fact]
+		public void AsyncEnumerableThrowsAsyncWithNullRandomGenerator()
+		{
+			var mock = new Mock<IAsyncEnumerableAsyncInterface>();
+
+			Action setup = () =>
+			{
+				var anyException = new Exception();
+				var minDelay = TimeSpan.FromMilliseconds(1);
+				var maxDelay = TimeSpan.FromMilliseconds(2);
+
+				mock
+					.Setup(x => x.RefParameterValueReturnType("test"))
+					.ThrowsAsync(anyException, minDelay, maxDelay, null);
+			};
+
+			var paramName = Assert.Throws<ArgumentNullException>(setup).ParamName;
+			Assert.Equal("random", paramName);
+		}
+
+
+#endif
 
 		[Fact]
 		public async void No_parameters_object_return_type__ReturnsAsync_null__returns_completed_Task_with_null_result()

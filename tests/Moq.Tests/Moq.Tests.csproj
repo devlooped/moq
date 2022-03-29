@@ -15,10 +15,10 @@
 	</PropertyGroup>
 
 	<PropertyGroup Condition=" '$(TargetFramework)' == 'net472' ">
-		<DefineConstants>$(DefineConstants);FEATURE_DYNAMICPROXY_SERIALIZABLE_PROXIES;FEATURE_EF;FEATURE_SYSTEM_WEB;FEATURE_SYSTEM_WINDOWS_FORMS</DefineConstants>
+		<DefineConstants>$(DefineConstants);FEATURE_ASYNC_ENUMERABLE;FEATURE_DYNAMICPROXY_SERIALIZABLE_PROXIES;FEATURE_EF;FEATURE_SYSTEM_WEB;FEATURE_SYSTEM_WINDOWS_FORMS</DefineConstants>
 	</PropertyGroup>
 	<PropertyGroup Condition=" '$(TargetFramework)' == 'netcoreapp3.1' ">
-		<DefineConstants>$(DefineConstants);FEATURE_DEFAULT_INTERFACE_IMPLEMENTATIONS</DefineConstants>
+		<DefineConstants>$(DefineConstants);FEATURE_ASYNC_ENUMERABLE;FEATURE_DEFAULT_INTERFACE_IMPLEMENTATIONS</DefineConstants>
 	</PropertyGroup>
 
 	<ItemGroup>
@@ -33,6 +33,9 @@
 		<Reference Include="Moq.Tests.ComTypes">
 			<HintPath>..\Moq.Tests.ComTypes\Moq.Tests.ComTypes.dll</HintPath>
 		</Reference>
+	</ItemGroup>
+	<ItemGroup Condition=" $([System.Text.RegularExpressions.Regex]::IsMatch('$(DefineConstants)', 'FEATURE_ASYNC_ENUMERABLE'))">
+		<PackageReference Include="System.Linq.Async" Version="4.0.0" />
 	</ItemGroup>
 	<ItemGroup Condition=" $([System.Text.RegularExpressions.Regex]::IsMatch('$(DefineConstants)', 'FEATURE_EF'))">
 		<PackageReference Include="EntityFramework" Version="6.2.0" />
