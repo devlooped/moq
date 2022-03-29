@@ -1452,5 +1452,40 @@ namespace Moq.Tests
 
 			Assert.Null(result);
 		}
+
+#if FEATURE_ASYNC_ENUMERABLE
+		[Fact]
+		public void No_parameters_object_return_type__ReturnsAsync_null__returns_null_AsyncEnumerable()
+		{
+			var mock = new Mock<IAsyncEnumerableAsyncInterface>();
+			mock.Setup(m => m.NoParametersObjectReturnType()).ReturnsAsync((IEnumerable<object>) null);
+
+			var result = mock.Object.NoParametersObjectReturnType();
+
+			Assert.Null(result);
+		}
+
+		[Fact]
+		public void One_parameter_object_return_type__ReturnsAsync_null__returns_null_AsyncEnumerable()
+		{
+			var mock = new Mock<IAsyncEnumerableAsyncInterface>();
+			mock.Setup(m => m.OneParameterObjectReturnType("")).ReturnsAsync((IEnumerable<object>) null);
+
+			var result = mock.Object.OneParameterObjectReturnType("");
+
+			Assert.Null(result);
+		}
+
+		[Fact]
+		public void Many_parameters_object_return_type__ReturnsAsync_null__returns_null_AsyncEnumerable()
+		{
+			var mock = new Mock<IAsyncEnumerableAsyncInterface>();
+			mock.Setup(m => m.ManyParametersObjectReturnType("", false, 0f)).ReturnsAsync((IEnumerable<object>) null);
+
+			var result = mock.Object.ManyParametersObjectReturnType("", false, 0f);
+
+			Assert.Null(result);
+		}
+#endif
 	}
 }

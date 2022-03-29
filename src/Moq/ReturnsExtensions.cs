@@ -105,12 +105,12 @@ namespace Moq
 		/// <param name="valueFunction">The function that will calculate the return values.</param>
 		public static IReturnsResult<TMock> ReturnsAsync<TMock, TResult>(this IReturns<TMock, IAsyncEnumerable<TResult>> mock, Func<IEnumerable<TResult>> valueFunction) where TMock : class
 		{
-			if (IsNullResult(valueFunction, typeof(TResult)))
+			if (IsNullResult(valueFunction, typeof(IEnumerable<TResult>)))
 			{
 				return mock.ReturnsAsync(() => default);
 			}
 
-			return mock.Returns(() => valueFunction().ToAsyncEnumerable());
+			return mock.Returns(() => valueFunction()?.ToAsyncEnumerable());
 		}
 #endif
 
