@@ -56,17 +56,17 @@ namespace Moq
 		/// <summary>
 		/// Return a sequence of tasks, once per call.
 		/// </summary>
-		public static ISetupSequentialResult<IAsyncEnumerable<TResult>> ReturnsAsync<TResult>(this ISetupSequentialResult<IAsyncEnumerable<TResult>> setup, TResult value)
+		public static ISetupSequentialResult<IAsyncEnumerable<TResult>> ReturnsAsync<TResult>(this ISetupSequentialResult<IAsyncEnumerable<TResult>> setup, IEnumerable<TResult> value)
 		{
-			return setup.Returns(() => new[] { value }.ToAsyncEnumerable());
+			return setup.Returns(() => value.ToAsyncEnumerable());
 		}
 
 		/// <summary>
 		/// Return a sequence of tasks, once per call.
 		/// </summary>
-		public static ISetupSequentialResult<IAsyncEnumerable<TResult>> ReturnsAsync<TResult>(this ISetupSequentialResult<IAsyncEnumerable<TResult>> setup, Func<TResult> valueFunction)
+		public static ISetupSequentialResult<IAsyncEnumerable<TResult>> ReturnsAsync<TResult>(this ISetupSequentialResult<IAsyncEnumerable<TResult>> setup, Func<IEnumerable<TResult>> valueFunction)
 		{
-			return setup.Returns(() => new[] { valueFunction() }.ToAsyncEnumerable());
+			return setup.Returns(() => valueFunction().ToAsyncEnumerable());
 		}
 
 #endif

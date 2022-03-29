@@ -1267,7 +1267,7 @@ namespace Moq.Tests
 		[Fact]
 		public async Task AsyncEnumerableReturnsAsyncWithDelayReturnsValue()
 		{
-			var mock = new Mock<IAsyncEnumerableAsyncInterface>(MockBehavior.Strict);
+			var mock = new Mock<IAsyncEnumerableAsyncInterface>();
 			mock.Setup(x => x.RefParameterValueReturnType("test")).ReturnsAsync(new[] { 5 }, TimeSpan.FromMilliseconds(1));
 
 			var enumerable = mock.Object.RefParameterValueReturnType("test");

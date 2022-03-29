@@ -6,6 +6,11 @@ using System.Threading.Tasks;
 
 using Xunit;
 
+#if FEATURE_ASYNC_ENUMERABLE
+using System.Collections.Generic;
+using System.Linq;
+#endif
+
 namespace Moq.Tests
 {
 	public class SequenceExtensionsFixture
@@ -56,6 +61,23 @@ namespace Moq.Tests
 			Assert.Equal(3, mock.Object.DoValueAsync().Result);
 			await Assert.ThrowsAsync<InvalidOperationException>(async () => await mock.Object.DoValueAsync());
 		}
+
+#if FEATURE_ASYNC_ENUMERABLE
+		[Fact]
+		public async Task PerformSequenceAsyncEnumerableAsync()
+		{
+			var mock = new Mock<IFoo>();
+
+			mock.SetupSequence(x => x.DoEnumerableAsync())
+				.ReturnsAsync(new[] { 2 })
+				.ReturnsAsync(() => new[] { 3 })
+				.ThrowsAsync(new InvalidOperationException());
+
+			Assert.Equal(new[] { 2 }, await mock.Object.DoEnumerableAsync().ToArrayAsync());
+			Assert.Equal(new[] { 3 }, await mock.Object.DoEnumerableAsync().ToArrayAsync());
+			await Assert.ThrowsAsync<InvalidOperationException>(async () => await mock.Object.DoEnumerableAsync().ToArrayAsync());
+		}
+#endif
 
 		[Fact]
 		public async Task PerformSequenceVoidAsync()
@@ -110,6 +132,20 @@ namespace Moq.Tests
 			Assert.Equal(1, await mock.Object.DoValueAsync());
 			Assert.Equal(2, await mock.Object.DoValueAsync());
 		}
+
+#if FEATURE_ASYNC_ENUMERABLE
+		[Fact]
+		public async Task PerformSequenceAsync_ReturnsAsync_for_AsyncEnumerable_with_value_function()
+		{
+			var mock = new Mock<IFoo>();
+			mock.SetupSequence(m => m.DoEnumerableAsync())
+				.ReturnsAsync(() => new[] { 1 })
+				.ReturnsAsync(() => new[] { 2 });
+
+			Assert.Equal(new[] { 1 }, await mock.Object.DoEnumerableAsync().ToArrayAsync());
+			Assert.Equal(new[] { 2 }, await mock.Object.DoEnumerableAsync().ToArrayAsync());
+		}
+#endif
 
 		[Fact]
 		public void PerformSequenceOnProperty()
@@ -259,6 +295,21 @@ namespace Moq.Tests
 			Assert.Equal(i, await mock.Object.DoValueAsync());
 		}
 
+#if FEATURE_ASYNC_ENUMERABLE
+		[Fact]
+		public async Task Func_are_invoked_deferred_for_AsyncEnumerable()
+		{
+			var mock = new Mock<IFoo>();
+			var i = new[] { 0 };
+			mock.SetupSequence(m => m.DoEnumerableAsync())
+				.ReturnsAsync(() => i);
+
+			i[0]++;
+
+			Assert.Equal(i, await mock.Object.DoEnumerableAsync().ToArrayAsync());
+		}
+#endif
+
 		[Fact]
 		public void Func_can_be_treated_as_return_value()
 		{
@@ -295,6 +346,10 @@ namespace Moq.Tests
 			Task<int> DoAsync();
 
 			ValueTask<int> DoValueAsync();
+
+#if FEATURE_ASYNC_ENUMERABLE
+			IAsyncEnumerable<int> DoEnumerableAsync();
+#endif
 
 			Task DoVoidAsync();
 
