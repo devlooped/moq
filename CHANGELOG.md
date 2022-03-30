@@ -4,6 +4,11 @@ All notable changes to this project will be documented in this file.
 
 The format is loosely based on [Keep a Changelog](http://keepachangelog.com/en/1.0.0/).
 
+## Unreleased
+
+#### Added
+
+* `IAsyncEnumerable` `ReturnsAsync` support (@cdonnellytx, #1250)
 
 ## 4.17.2 (2022-03-06)
 
