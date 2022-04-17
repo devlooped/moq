@@ -3782,6 +3782,27 @@ namespace Moq.Tests.Regressions
 
 		#endregion
 
+		#region 1249
+
+		public class Issue1249
+		{
+			public class NonSealedType { }
+
+			public interface IFoo
+			{
+				NonSealedType Method(in int arg);
+			}
+
+			[Fact]
+			public void No_ArgumentException_due_to_parameter_refness()
+			{
+				var mock = new Mock<IFoo>() { CallBase = true, DefaultValue = DefaultValue.Mock };
+				_ = mock.Object.Method(default);
+			}
+		}
+
+		#endregion
+
 		// Old @ Google Code
 
 		#region #47
