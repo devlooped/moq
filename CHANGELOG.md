@@ -10,6 +10,7 @@ The format is loosely based on [Keep a Changelog](http://keepachangelog.com/en/1
 #### Fixed
 
 * Regression: Property stubs not working on sub mock (@aaronburro, #1240)
+* Failure when invoking a method with by-ref parameter & mockable return type on a mock with `CallBase` and `DefaultValue.Mock` configured (@IanKemp, #1249)
 
 
 ## 4.17.1 (2022-02-26)
