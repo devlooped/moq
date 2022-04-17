@@ -37,7 +37,9 @@ namespace Moq
 				arguments = new Expression[n];
 				for (int i = 0; i < n; ++i)
 				{
-					arguments[i] = E.Constant(invocation.Arguments[i], parameterTypes[i]);
+					var parameterType = parameterTypes[i];
+					if (parameterType.IsByRef) parameterType = parameterType.GetElementType();
+					arguments[i] = E.Constant(invocation.Arguments[i], parameterType);
 				}
 			}
 
