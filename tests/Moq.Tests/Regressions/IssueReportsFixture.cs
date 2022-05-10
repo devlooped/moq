@@ -970,7 +970,6 @@ namespace Moq.Tests.Regressions
 
 		public class Issue193
 		{
-			[Fact(Skip = "Fails due to a bug in Castle DynamicProxy. Try enabling this test once we reference Castle.Core > 4.4.0.")]
 			public void Can_mock_class_type_where_generic_type_parameter_name_diverges_from_name_in_interface()
 			{
 				var mock = new Mock<C>();
