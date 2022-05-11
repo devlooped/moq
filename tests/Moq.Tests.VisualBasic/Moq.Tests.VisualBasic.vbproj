@@ -5,7 +5,7 @@
 	<Import Project="$(BuildDirectory)xUnit.props" />
 
 	<PropertyGroup>
-		<TargetFrameworks>net472;netcoreapp3.1</TargetFrameworks>
+		<TargetFrameworks>net472;netcoreapp3.1;net6.0</TargetFrameworks>
 		<DebugSymbols>True</DebugSymbols>
 		<DebugType>portable</DebugType>
 		<IsPackable>False</IsPackable>
