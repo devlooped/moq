@@ -5,6 +5,20 @@ All notable changes to this project will be documented in this file.
 The format is loosely based on [Keep a Changelog](http://keepachangelog.com/en/1.0.0/).
 
 
+## Unreleased
+
+New major version of DynamicProxy (you may get better performance!), so please update with care.
+
+#### Changed
+
+* Update package reference to `Castle.Core` (DynamicProxy) from version 4.4.1 to 5.0.0 (@stakx, #1257)
+
+#### Fixed
+
+* Can't set up "private protected" properties (@RobSiklos, #1170)
+* Using [...] an old version of `System.Net.Http` which is vulnerable to "DoS", "Spoofing", "Privilege Escalation", "Authentication Bypass" and "Information Exposure"  (@sidseter, #1219)
+
+
 ## 4.17.2 (2022-03-06)
 
 #### Fixed

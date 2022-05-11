@@ -5,24 +5,25 @@
 	<Import Project="$(BuildDirectory)xUnit.props" />
 
 	<PropertyGroup>
-		<TargetFrameworks>net472;netcoreapp3.1</TargetFrameworks>
+		<TargetFrameworks>net472;netcoreapp3.1;net6.0</TargetFrameworks>
 		<AssemblyName>Moq.Tests</AssemblyName>
 		<DebugSymbols>True</DebugSymbols>
 		<DebugType>portable</DebugType>
 		<GenerateRuntimeConfigurationFiles>true</GenerateRuntimeConfigurationFiles>
 		<LangVersion>8.0</LangVersion>
 		<IsPackable>False</IsPackable>
+		<NoWarn>$(NoWarn);CS8032</NoWarn>
 	</PropertyGroup>
 
 	<PropertyGroup Condition=" '$(TargetFramework)' == 'net472' ">
 		<DefineConstants>$(DefineConstants);FEATURE_DYNAMICPROXY_SERIALIZABLE_PROXIES;FEATURE_EF;FEATURE_SYSTEM_WEB;FEATURE_SYSTEM_WINDOWS_FORMS</DefineConstants>
 	</PropertyGroup>
-	<PropertyGroup Condition=" '$(TargetFramework)' == 'netcoreapp3.1' ">
+	<PropertyGroup Condition=" '$(TargetFramework)' == 'netcoreapp3.1' Or '$(TargetFramework)' == 'net6.0' ">
 		<DefineConstants>$(DefineConstants);FEATURE_DEFAULT_INTERFACE_IMPLEMENTATIONS</DefineConstants>
 	</PropertyGroup>
 
 	<ItemGroup>
-		<PackageReference Include="Castle.Core" Version="4.4.1" />
+		<PackageReference Include="Castle.Core" Version="5.0.0" />
 		<PackageReference Include="Microsoft.Extensions.Logging.Abstractions" Version="3.1.9" />
 		<PackageReference Include="Microsoft.NETFramework.ReferenceAssemblies" Version="1.0.0" PrivateAssets="All" />
 		<PackageReference Include="System.ValueTuple" Version="4.5.0" />
