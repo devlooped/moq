@@ -3781,6 +3781,42 @@ namespace Moq.Tests.Regressions
 
 		#endregion
 
+		#region 1248
+
+		public class Issue1248
+		{
+			public interface IBase
+			{
+				bool Property { get; set; }
+			}
+
+			public interface IDerived : IBase
+			{
+			}
+
+			public class Base : IBase
+			{
+				public virtual bool Property { get; set; }
+			}
+
+			[Fact]
+			public void Test()
+			{
+				var mock = new Mock<Base>();
+				var mockAsDerived = mock.As<IDerived>();
+				mockAsDerived.SetupProperty(x => x.Property, false);
+
+				mockAsDerived.Object.Property = true;
+
+				mock.VerifySet(x => x.Property = true, Times.Once());
+				mockAsDerived.VerifySet(x => x.Property = true, Times.Once());
+				Assert.True(mockAsDerived.Object.Property);
+				Assert.True(mock.Object.Property);
+			}
+		}
+
+		#endregion
+
 		#region 1249
 
 		public class Issue1249
