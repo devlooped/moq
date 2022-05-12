@@ -9,6 +9,7 @@ The format is loosely based on [Keep a Changelog](http://keepachangelog.com/en/1
 
 #### Fixed
 
+* Regression with `SetupProperty` where Moq fails to match a property accessor implementation against its definition in an interface (@Naxemar, #1248)
 * Difference in behavior when mocking async method using `.Result` vs without (@cyungmann, #1253)
 
 
@@ -24,7 +25,6 @@ New major version of DynamicProxy (you may get better performance!), so please u
 
 * Can't set up "private protected" properties (@RobSiklos, #1170)
 * Using [...] an old version of `System.Net.Http` which is vulnerable to "DoS", "Spoofing", "Privilege Escalation", "Authentication Bypass" and "Information Exposure"  (@sidseter, #1219)
-* Regression with `SetupProperty` where Moq fails to match a property accessor implementation against its definition in an interface (@Naxemar, #1248)
 * Failure when invoking a method with by-ref parameter & mockable return type on a mock with `CallBase` and `DefaultValue.Mock` configured (@IanKemp, #1249)
 
 
