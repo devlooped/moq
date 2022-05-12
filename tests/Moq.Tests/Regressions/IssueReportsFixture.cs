@@ -3802,6 +3802,29 @@ namespace Moq.Tests.Regressions
 
 		#endregion
 
+		#region 1253
+
+		public class Issue1253
+		{
+			public interface IFoo
+			{
+				Task<string> Bar();
+			}
+
+			[Fact]
+			public async Task Test()
+			{
+				var mock = new Mock<IFoo>();
+				mock.Setup(x => x.Bar().Result).Returns((string)null);
+
+				var result = await mock.Object.Bar();
+
+				Assert.Null(result);
+			}
+		}
+
+		#endregion
+
 		// Old @ Google Code
 
 		#region #47
