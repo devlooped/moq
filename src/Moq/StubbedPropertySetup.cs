@@ -100,8 +100,8 @@ namespace Moq
 
 			public override bool IsMatch(Invocation invocation)
 			{
-				var method = invocation.Method;
-				return method == this.getter || method == this.setter;
+				var methodName = invocation.Method.Name;
+				return methodName == this.getter.Name || methodName == this.setter.Name;
 			}
 		}
 	}
