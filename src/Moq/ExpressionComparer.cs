@@ -18,6 +18,11 @@ namespace Moq
 		{
 		}
 
+		public bool EqualsAfterCapturesEvaluated(Expression x, Expression y)
+		{
+			return this.Equals(x?.Apply(EvaluateCaptures.Rewriter), y?.Apply(EvaluateCaptures.Rewriter));
+		}
+
 		public bool Equals(Expression x, Expression y)
 		{
 			if (object.ReferenceEquals(x, y))
@@ -28,19 +33,6 @@ namespace Moq
 			if (x == null || y == null)
 			{
 				return false;
-			}
-
-			// Before actually comparing two nodes, make sure that captures variables have been
-			// evaluated to their current values (as we don't want to compare their identities):
-
-			if (x is MemberExpression)
-			{
-				x = x.Apply(EvaluateCaptures.Rewriter);
-			}
-
-			if (y is MemberExpression)
-			{
-				y = y.Apply(EvaluateCaptures.Rewriter);
 			}
 
 			if (x.NodeType == y.NodeType)

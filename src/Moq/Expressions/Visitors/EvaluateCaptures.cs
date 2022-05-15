@@ -31,5 +31,10 @@ namespace Moq.Expressions.Visitors
 				return base.VisitMember(node);
 			}
 		}
+
+		protected override Expression VisitUnary(UnaryExpression node)
+		{
+			return node.NodeType == ExpressionType.Quote ? node : base.VisitUnary(node);
+		}
 	}
 }

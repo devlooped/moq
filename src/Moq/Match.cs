@@ -217,7 +217,7 @@ namespace Moq
 			}
 			else if (!(this.RenderExpression is MethodCallExpression ce && ce.Method.DeclaringType == typeof(Match)))
 			{
-				return ExpressionComparer.Default.Equals(this.RenderExpression, other.RenderExpression);
+				return ExpressionComparer.Default.EqualsAfterCapturesEvaluated(this.RenderExpression, other.RenderExpression);
 			}
 			else
 			{

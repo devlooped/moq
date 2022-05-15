@@ -90,7 +90,7 @@ namespace Moq
 
 			public override bool Equals(Expectation other)
 			{
-				return other is PropertyAccessorExpectation pae && ExpressionComparer.Default.Equals(this.expression, pae.expression);
+				return other is PropertyAccessorExpectation pae && ExpressionComparer.Default.EqualsAfterCapturesEvaluated(this.expression, pae.expression);
 			}
 
 			public override int GetHashCode()
