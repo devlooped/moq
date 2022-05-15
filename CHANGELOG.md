@@ -9,6 +9,7 @@ The format is loosely based on [Keep a Changelog](http://keepachangelog.com/en/1
 
 #### Fixed
 
+* Regression with lazy evaluation of `It.Is` predicates in setup expressions after updating from 4.13.1 to 4.16.1 (@b3go, #1217)
 * Regression with `SetupProperty` where Moq fails to match a property accessor implementation against its definition in an interface (@Naxemar, #1248)
 * Difference in behavior when mocking async method using `.Result` vs without (@cyungmann, #1253)
 
