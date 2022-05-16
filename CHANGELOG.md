@@ -21,6 +21,9 @@ New major version of DynamicProxy (you may get better performance!), so please u
 #### Changed
 
 * Update package reference to `Castle.Core` (DynamicProxy) from version 4.4.1 to 5.0.0 (@stakx, #1257)
+* Adjusted our target frameworks to match DynamicProxy's (see [their discussion about which frameworks to target](https://github.com/castleproject/Core/issues/597)):
+   - minimum .NET Framework version raised from `net45` to `net462`
+   - additional `net6.0` TFM
 
 #### Fixed
 
