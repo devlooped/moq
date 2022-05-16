@@ -3688,6 +3688,35 @@ namespace Moq.Tests.Regressions
 
 		#endregion
 
+		#region 1217
+
+		public class Issue1217
+		{
+			[Fact]
+			public void It_Is_predicates_are_evaluated_lazily()
+			{
+				var patternKey = "";
+				var exeKey = "";
+
+				var mock = new Mock<ISettingsService>();
+				mock.Setup(x => x.GetSetting(It.Is<string>(y => y == patternKey))).Returns(() => patternKey);
+				mock.Setup(x => x.GetSetting(It.Is<string>(y => y == exeKey))).Returns(() => exeKey);
+
+				patternKey = "foo";
+				exeKey = "bar";
+
+				Assert.Equal("foo", mock.Object.GetSetting(patternKey));
+				Assert.Equal("bar", mock.Object.GetSetting(exeKey));
+			}
+
+			public interface ISettingsService
+			{
+				string GetSetting(string key);
+			}
+		}
+
+		#endregion
+
 		#region 1225
 
 		public class Issue1225
