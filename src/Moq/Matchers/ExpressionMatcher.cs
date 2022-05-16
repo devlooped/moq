@@ -19,7 +19,7 @@ namespace Moq.Matchers
 		public bool Matches(object argument, Type parameterType)
 		{
 			return argument is Expression valueExpression
-				&& ExpressionComparer.Default.EqualsAfterCapturesEvaluated(this.expression, valueExpression);
+				&& ExpressionComparer.Default.Equals(this.expression, valueExpression);
 		}
 
 		public void SetupEvaluatedSuccessfully(object argument, Type parameterType)
