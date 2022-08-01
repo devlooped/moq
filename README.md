@@ -102,10 +102,14 @@ We appreciate deeply any feedback that you may have! Feel free to participate in
  https://github.com/moq/moq4/issues
  "Moq issue tracker on GitHub"
 
-## Sponsors
+![Sponsors](https://raw.githubusercontent.com/devlooped/oss/main/assets/images/sponsors.svg) Sponsors
+============
 
-<h3 style="vertical-align: text-top" id="by-clarius">
-<img src="https://raw.githubusercontent.com/devlooped/oss/main/assets/images/sponsors.svg" alt="sponsors" height="36" width="36" style="vertical-align: text-top; border: 0px; padding: 0px; margin: 0px">&nbsp;&nbsp;by&nbsp;<a href="https://github.com/clarius">@clarius</a>&nbsp;<img src="https://raw.githubusercontent.com/clarius/branding/main/logo/logo.svg" alt="sponsors" height="36" width="36" style="vertical-align: text-top; border: 0px; padding: 0px; margin: 0px">
-</h3>
+Special thanks to the following organizations that support this project:
+
+<a href="https://github.com/aws"><img src="https://avatars.githubusercontent.com/u/2232217?s=70&v=4" alt="Supported by AWS" title="Supported by AWS"></a>
+
+<a href="https://github.com/clarius"><img src="https://avatars.githubusercontent.com/u/71888636?s=50&v=4" alt="Supported by Clarius" title="Supported by Clarius"></a>
+
 
 *[get mentioned here too](https://github.com/sponsors/devlooped)!*
