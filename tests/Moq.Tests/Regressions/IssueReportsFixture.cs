@@ -3759,6 +3759,48 @@ namespace Moq.Tests.Regressions
 
 		#endregion
 
+		#region 1209
+
+#if NET6_0_OR_GREATER
+
+		public class Issue1209
+		{
+			[Fact]
+			public void Can_invoke_default_impl()
+			{
+				var mock = new Mock<ILog>();
+				mock.Object.LogTesting();
+			}
+
+			[Fact]
+			public void Can_setup_method_called_by_default_impl()
+			{
+				string receivedMsg = null;
+
+				var mock = new Mock<ILog>();
+				mock.Setup(p => p.Log(It.IsAny<string>()))
+					.Callback<string>(msg => receivedMsg = msg);
+
+				mock.Object.LogTesting();
+
+				Assert.Equal("Testing", receivedMsg);
+			}
+
+			public interface ILog
+			{
+				public sealed void LogTesting()
+				{
+					Log("Testing");
+				}
+
+				void Log(string msg);
+			}
+		}
+
+#endif
+
+		#endregion
+
 		#region 1217
 
 		public class Issue1217
@@ -3786,9 +3828,9 @@ namespace Moq.Tests.Regressions
 			}
 		}
 
-		#endregion
+#endregion
 
-		#region 1225
+#region 1225
 
 		public class Issue1225
 		{
@@ -3837,9 +3879,9 @@ namespace Moq.Tests.Regressions
 			}
 		}
 
-		#endregion
+#endregion
 
-		#region 1240
+#region 1240
 
 		public class Issue1240
 		{
@@ -3879,9 +3921,9 @@ namespace Moq.Tests.Regressions
 			}
 		}
 
-		#endregion
+#endregion
 
-		#region 1248
+#region 1248
 
 		public class Issue1248
 		{
@@ -3915,9 +3957,9 @@ namespace Moq.Tests.Regressions
 			}
 		}
 
-		#endregion
+#endregion
 
-		#region 1249
+#region 1249
 
 		public class Issue1249
 		{
@@ -3936,9 +3978,9 @@ namespace Moq.Tests.Regressions
 			}
 		}
 
-		#endregion
+#endregion
 
-		#region 1253
+#region 1253
 
 		public class Issue1253
 		{
@@ -3959,11 +4001,11 @@ namespace Moq.Tests.Regressions
 			}
 		}
 
-		#endregion
+#endregion
 
 		// Old @ Google Code
 
-		#region #47
+#region #47
 
 		[Fact]
 		public void ShouldReturnListFromDateTimeArg()
@@ -3985,9 +4027,9 @@ namespace Moq.Tests.Regressions
 			IEnumerable<string> GetValuesSince(DateTime since);
 		}
 
-		#endregion
+#endregion
 
-		#region #48
+#region #48
 
 		public class Issue48
 		{
@@ -4009,9 +4051,9 @@ namespace Moq.Tests.Regressions
 			}
 		}
 
-		#endregion
+#endregion
 
-		#region #52
+#region #52
 
 		[Fact]
 		public void ShouldNotOverridePreviousExpectation()
@@ -4037,9 +4079,9 @@ namespace Moq.Tests.Regressions
 			void DoSomething(int id);
 		}
 
-		#endregion
+#endregion
 
-		#region #62
+#region #62
 
 		public interface ISomething<T>
 		{
@@ -4052,9 +4094,9 @@ namespace Moq.Tests.Regressions
 			var mock = new Mock<ISomething<object>>();
 		}
 
-		#endregion
+#endregion
 
-		#region #60
+#region #60
 
 		public interface IFoo
 		{
@@ -4079,9 +4121,9 @@ namespace Moq.Tests.Regressions
 			mocked.VerifyAll();
 		}
 
-		#endregion
+#endregion
 
-		#region #21
+#region #21
 
 		[Fact]
 		public void MatchesLatestExpectations()
@@ -4105,9 +4147,9 @@ namespace Moq.Tests.Regressions
 			int Method(int value);
 		}
 
-		#endregion
+#endregion
 
-		#region #49
+#region #49
 
 		[Fact]
 #pragma warning disable 618
@@ -4150,9 +4192,9 @@ namespace Moq.Tests.Regressions
 			}
 		}
 
-		#endregion
+#endregion
 
-		#region #68
+#region #68
 
 		[Fact]
 		public void GetMockCastedToObjectThrows()
@@ -4163,9 +4205,9 @@ namespace Moq.Tests.Regressions
 			Assert.Throws<ArgumentException>(() => Mock.Get(m));
 		}
 
-		#endregion
+#endregion
 
-		#region #69
+#region #69
 
 		public interface IFooPtr
 		{
@@ -4186,9 +4228,9 @@ namespace Moq.Tests.Regressions
 		}
 
 
-		#endregion
+#endregion
 
-		#region #85
+#region #85
 
 		public class Issue85
 		{
@@ -4233,9 +4275,9 @@ namespace Moq.Tests.Regressions
 			}
 		}
 
-		#endregion
+#endregion
 
-		#region #89
+#region #89
 
 		public class Issue89
 		{
@@ -4255,9 +4297,9 @@ namespace Moq.Tests.Regressions
 			}
 		}
 
-		#endregion
+#endregion
 
-		#region #128
+#region #128
 
 		public class Issue128
 		{
@@ -4289,9 +4331,9 @@ namespace Moq.Tests.Regressions
 			}
 		}
 
-		#endregion
+#endregion
 
-		#region #134
+#region #134
 
 		public class Issue134
 		{
@@ -4315,18 +4357,18 @@ namespace Moq.Tests.Regressions
 			}
 		}
 
-		#endregion
+#endregion
 
-		#region #136
+#region #136
 
 		public class _136
 		{
 			// Fixed on PropertiesFixture.cs
 		}
 
-		#endregion
+#endregion
 
-		#region #138
+#region #138
 
 		public class _138
 		{
@@ -4352,9 +4394,9 @@ namespace Moq.Tests.Regressions
 			}
 		}
 
-		#endregion
+#endregion
 
-		#region #145
+#region #145
 
 		public class _145
 		{
@@ -4386,9 +4428,9 @@ namespace Moq.Tests.Regressions
 
 		}
 
-		#endregion
+#endregion
 
-		#region #111 & #155
+#region #111 & #155
 
 		public class _111
 		{
@@ -4493,9 +4535,9 @@ namespace Moq.Tests.Regressions
 			}
 		}
 
-		#endregion
+#endregion
 
-		#region #159
+#region #159
 
 		public class _159
 		{
@@ -4549,9 +4591,9 @@ namespace Moq.Tests.Regressions
 			}
 		}
 
-		#endregion
+#endregion
 
-		#region #152
+#region #152
 
 		public class _152
 		{
@@ -4578,9 +4620,9 @@ namespace Moq.Tests.Regressions
 			}
 		}
 
-		#endregion
+#endregion
 
-		#region #153
+#region #153
 
 		public class _153
 		{
@@ -4664,9 +4706,9 @@ namespace Moq.Tests.Regressions
 			}
 		}
 
-		#endregion
+#endregion
 
-		#region #146
+#region #146
 
 		public class _146
 		{
@@ -4691,9 +4733,9 @@ namespace Moq.Tests.Regressions
 			}
 		}
 
-		#endregion
+#endregion
 
-		#region #158
+#region #158
 
 		public class _158
 		{
@@ -4722,9 +4764,9 @@ namespace Moq.Tests.Regressions
 			}
 		}
 
-		#endregion
+#endregion
 
-		#region #160
+#region #160
 
 #if FEATURE_SYSTEM_WEB
 		public class _160
@@ -4739,9 +4781,9 @@ namespace Moq.Tests.Regressions
 		}
 #endif
 
-		#endregion
+#endregion
 
-		#region #161
+#region #161
 
 		public class _161
 		{
@@ -4783,9 +4825,9 @@ namespace Moq.Tests.Regressions
 			}
 		}
 
-		#endregion
+#endregion
 
-		#region #174
+#region #174
 
 		public class _174
 		{
@@ -4810,9 +4852,9 @@ namespace Moq.Tests.Regressions
 			}
 		}
 
-		#endregion
+#endregion
 
-		#region #177
+#region #177
 
 		public class _177
 		{
@@ -4829,9 +4871,9 @@ namespace Moq.Tests.Regressions
 			}
 		}
 
-		#endregion
+#endregion
 
-		#region #184
+#region #184
 
 		public class _184
 		{
@@ -4865,9 +4907,9 @@ namespace Moq.Tests.Regressions
 			}
 		}
 
-		#endregion
+#endregion
 
-		#region #185
+#region #185
 
 		public class _185
 		{
@@ -4879,9 +4921,9 @@ namespace Moq.Tests.Regressions
 			}
 		}
 
-		#endregion
+#endregion
 
-		#region #187
+#region #187
 
 		public class _187
 		{
@@ -4917,9 +4959,9 @@ namespace Moq.Tests.Regressions
 			}
 		}
 
-		#endregion
+#endregion
 
-		#region #186
+#region #186
 
 		public class _186
 		{
@@ -4948,9 +4990,9 @@ namespace Moq.Tests.Regressions
 			}
 		}
 
-		#endregion
+#endregion
 
-		#region #190
+#region #190
 
 		public class _190
 		{
@@ -4996,9 +5038,9 @@ namespace Moq.Tests.Regressions
 
 		}
 
-		#endregion
+#endregion
 
-		#region #204
+#region #204
 
 		public class _204
 		{
@@ -5032,9 +5074,9 @@ namespace Moq.Tests.Regressions
 			}
 		}
 
-		#endregion
+#endregion
 
-		#region #205
+#region #205
 
 		public class _205
 		{
@@ -5051,9 +5093,9 @@ namespace Moq.Tests.Regressions
 			}
 		}
 
-		#endregion
+#endregion
 
-		#region #223
+#region #223
 
 		public class _223
 		{
@@ -5090,9 +5132,9 @@ namespace Moq.Tests.Regressions
 			}
 		}
 
-		#endregion
+#endregion
 
-		#region #228
+#region #228
 
 		public class _228
 		{
@@ -5143,9 +5185,9 @@ namespace Moq.Tests.Regressions
 			}
 		}
 
-		#endregion
+#endregion
 
-		#region #229
+#region #229
 
 		public class _229
 		{
@@ -5175,9 +5217,9 @@ namespace Moq.Tests.Regressions
 			}
 		}
 
-		#endregion
+#endregion
 
-		#region #230
+#region #230
 
 		public class _230
 		{
@@ -5198,9 +5240,9 @@ namespace Moq.Tests.Regressions
 			}
 		}
 
-		#endregion
+#endregion
 
-		#region #232
+#region #232
 
 		public class _232
 		{
@@ -5251,9 +5293,9 @@ namespace Moq.Tests.Regressions
 			}
 		}
 
-		#endregion
+#endregion
 
-		#region #242
+#region #242
 
 		public class _242
 		{
@@ -5278,9 +5320,9 @@ namespace Moq.Tests.Regressions
 			}
 		}
 
-		#endregion
+#endregion
 
-		#region #245
+#region #245
 
 		public class _245
 		{
@@ -5299,9 +5341,9 @@ namespace Moq.Tests.Regressions
 			}
 		}
 
-		#endregion
+#endregion
 
-		#region #251
+#region #251
 
 		public class _251
 		{
@@ -5327,9 +5369,9 @@ namespace Moq.Tests.Regressions
 			}
 		}
 
-		#endregion
+#endregion
 
-		#region #256
+#region #256
 
 		public class _256
 		{
@@ -5356,9 +5398,9 @@ namespace Moq.Tests.Regressions
 			}
 		}
 
-		#endregion
+#endregion
 
-		#region #261
+#region #261
 
 		public class _261
 		{
@@ -5384,9 +5426,9 @@ namespace Moq.Tests.Regressions
 			}
 		}
 
-		#endregion
+#endregion
 
-		#region #267
+#region #267
 
 		public class _267
 		{
@@ -5456,9 +5498,9 @@ namespace Moq.Tests.Regressions
 			}
 		}
 
-		#endregion
+#endregion
 
-		#region #325
+#region #325
 
 		public class _325
 		{
@@ -5505,9 +5547,9 @@ namespace Moq.Tests.Regressions
 
 		}
 
-		#endregion
+#endregion
 
-		#region #326
+#region #326
 
 #if FEATURE_SYSTEM_WINDOWS_FORMS
 
@@ -5523,9 +5565,9 @@ namespace Moq.Tests.Regressions
 
 #endif
 
-		#endregion
+#endregion
 
-		#region Recursive issue
+#region Recursive issue
 
 		public class RecursiveFixture
 		{
@@ -5579,9 +5621,9 @@ namespace Moq.Tests.Regressions
 			}
 		}
 
-		#endregion
+#endregion
 
-		#region #250
+#region #250
 
 		public class _250
 		{
@@ -5594,9 +5636,9 @@ namespace Moq.Tests.Regressions
 			}
 		}
 
-		#endregion
+#endregion
 
-		#region Matcher should work with Convert
+#region Matcher should work with Convert
 
 		public class MatcherConvertFixture
 		{
@@ -5614,6 +5656,6 @@ namespace Moq.Tests.Regressions
 			}
 		}
 
-		#endregion
+#endregion
 	}
 }

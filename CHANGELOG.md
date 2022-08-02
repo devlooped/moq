@@ -14,6 +14,7 @@ The format is loosely based on [Keep a Changelog](http://keepachangelog.com/en/1
 #### Fixed
 
 * "Expression is not an event add" when using `.Raises()` with redeclared event (@howcheng, #1175)
+* `MissingMethodException` when mocking interface with sealed default implementation (@pjquirk, #1209)
 * Throws `TypeLoadException` on mock when a record has a base record on .NET 6 (@tgrieger-sf, #1273)
 
 
