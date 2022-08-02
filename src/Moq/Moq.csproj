@@ -43,7 +43,7 @@
 	</PropertyGroup>
 
 	<ItemGroup>
-		<PackageReference Include="Castle.Core" Version="5.0.0" />
+		<PackageReference Include="Castle.Core" Version="5.1.0" />
 		<PackageReference Include="IFluentInterface" Version="2.1.0" PrivateAssets="All" />
 		<PackageReference Include="Microsoft.NETFramework.ReferenceAssemblies" Version="1.0.0" PrivateAssets="All" />
 		<PackageReference Include="TypeNameFormatter.Sources" Version="1.0.0" PrivateAssets="All" />

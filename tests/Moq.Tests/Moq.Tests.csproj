@@ -10,7 +10,7 @@
 		<DebugSymbols>True</DebugSymbols>
 		<DebugType>portable</DebugType>
 		<GenerateRuntimeConfigurationFiles>true</GenerateRuntimeConfigurationFiles>
-		<LangVersion>8.0</LangVersion>
+		<LangVersion>9.0</LangVersion>
 		<IsPackable>False</IsPackable>
 		<NoWarn>$(NoWarn);CS8032</NoWarn>
 	</PropertyGroup>
@@ -23,7 +23,7 @@
 	</PropertyGroup>
 
 	<ItemGroup>
-		<PackageReference Include="Castle.Core" Version="5.0.0" />
+		<PackageReference Include="Castle.Core" Version="5.1.0" />
 		<PackageReference Include="Microsoft.Extensions.Logging.Abstractions" Version="3.1.9" />
 		<PackageReference Include="Microsoft.NETFramework.ReferenceAssemblies" Version="1.0.0" PrivateAssets="All" />
 		<PackageReference Include="System.ValueTuple" Version="4.5.0" />
