@@ -5,11 +5,12 @@ All notable changes to this project will be documented in this file.
 The format is loosely based on [Keep a Changelog](http://keepachangelog.com/en/1.0.0/).
 
 
-## Unreleased
+## 4.18.2 (2022-08-02)
 
 #### Changed
 
 * Update package reference to `Castle.Core` (DynamicProxy) from version 5.0.0 to 5.1.0 (@stakx, #1275)
+* Removed dependency on `System.Threading.Tasks.Extensions` for `netstandard2.1` and `net6.0` (@tibel, #1274)
 
 #### Fixed
 
