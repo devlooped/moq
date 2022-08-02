@@ -10,7 +10,7 @@
 		<DebugSymbols>True</DebugSymbols>
 		<DebugType>portable</DebugType>
 		<GenerateRuntimeConfigurationFiles>true</GenerateRuntimeConfigurationFiles>
-		<LangVersion>8.0</LangVersion>
+		<LangVersion>9.0</LangVersion>
 		<IsPackable>False</IsPackable>
 		<NoWarn>$(NoWarn);CS8032</NoWarn>
 	</PropertyGroup>
