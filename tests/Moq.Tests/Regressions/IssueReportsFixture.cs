@@ -3688,6 +3688,77 @@ namespace Moq.Tests.Regressions
 
 		#endregion
 
+		#region 1175
+
+		public class Issue1175
+		{
+			[Fact]
+			public void Can_subscribe_to_and_raise_redeclared_event_1()
+			{
+				var handled = false;
+
+				var mock = new Mock<IDerived>();
+				mock.Setup(x => x.RaiseEvent()).Raises(x => x.Event += null, false);
+				mock.Object.Event += _ => handled = true;
+
+				mock.Object.RaiseEvent();
+
+				Assert.True(handled);
+			}
+
+			public interface IBase
+			{
+				event Action Event;
+				void RaiseEvent();
+			}
+
+			public interface IDerived : IBase
+			{
+				new event Action<bool> Event;
+			}
+
+			[Fact]
+			public void Can_subscribe_to_and_raise_redeclared_event_2()
+			{
+				var aEventsMock = new Mock<IGenericHidingEvents<bool>>();
+				var aConsumer = new GenericHidingEventConsumer(aEventsMock.Object);
+
+				aEventsMock.Raise(theO => theO.Created += null, this, true);
+
+				Assert.True(aConsumer.EventHandled);
+			}
+
+			public interface IEvents
+			{
+				event EventHandler Created;
+			}
+
+			public interface IGenericHidingEvents<T> : IEvents
+			{
+				new event EventHandler<T> Created;
+			}
+
+			public class GenericHidingEventConsumer
+			{
+				private IGenericHidingEvents<bool> myHidingEvents;
+
+				public GenericHidingEventConsumer(IGenericHidingEvents<bool> theHidingEvents)
+				{
+					this.myHidingEvents = theHidingEvents;
+					this.myHidingEvents.Created += this.HidingEventsOnCreated;
+				}
+
+				private void HidingEventsOnCreated(object theSender, bool theE)
+				{
+					EventHandled = true;
+				}
+
+				public bool EventHandled { get; set; }
+			}
+		}
+
+		#endregion
+
 		#region 1217
 
 		public class Issue1217
