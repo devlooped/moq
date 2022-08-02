@@ -5,6 +5,17 @@ All notable changes to this project will be documented in this file.
 The format is loosely based on [Keep a Changelog](http://keepachangelog.com/en/1.0.0/).
 
 
+## Unreleased
+
+#### Changed
+
+* Update package reference to `Castle.Core` (DynamicProxy) from version 5.0.0 to 5.1.0 (@stakx, #1275)
+
+#### Fixed
+
+* Throws `TypeLoadException` on mock when a record has a base record on .NET 6 (@tgrieger-sf, #1273)
+
+
 ## 4.18.1 (2022-05-16)
 
 #### Fixed
