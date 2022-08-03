@@ -105,11 +105,37 @@ We appreciate deeply any feedback that you may have! Feel free to participate in
 ![Sponsors](https://raw.githubusercontent.com/devlooped/oss/main/assets/images/sponsors.svg) Sponsors
 ============
 
-Special thanks to the following organizations that support this project:
+Special thanks to the following gold sponsors of this project:
 
-<a href="https://github.com/aws"><img src="https://avatars.githubusercontent.com/u/2232217?s=70&v=4" alt="Supported by AWS" title="Supported by AWS"></a>
+<a href="https://github.com/aws"><img src="https://avatars.githubusercontent.com/u/2232217?s=70&v=4" alt="Supported by Amazon Web Services" title="Supported by Amazon Web Services"></a>
+<a href="https://github.com/clarius"><img src="https://avatars.githubusercontent.com/u/71888636?s=70&v=4" alt="Supported by Clarius" title="Supported by Clarius"></a>
 
-<a href="https://github.com/clarius"><img src="https://avatars.githubusercontent.com/u/71888636?s=50&v=4" alt="Supported by Clarius" title="Supported by Clarius"></a>
+And to all our sponsors!
 
+<!-- sponsors -->
 
+<a href='https://github.com/KirillOsenkov'>
+  <img src='https://github.com/devlooped/devlooped.github.io/raw/main/.github/avatars/KirillOsenkov.svg' alt='Kirill Osenkov' title='Kirill Osenkov'>
+</a>
+<a href='https://github.com/augustoproiete'>
+  <img src='https://github.com/devlooped/devlooped.github.io/raw/main/.github/avatars/augustoproiete.svg' alt='C. Augusto Proiete' title='C. Augusto Proiete'>
+</a>
+<a href='https://github.com/sandrock'>
+  <img src='https://github.com/devlooped/devlooped.github.io/raw/main/.github/avatars/sandrock.svg' alt='SandRock' title='SandRock'>
+</a>
+<a href='https://github.com/aws'>
+  <img src='https://github.com/devlooped/devlooped.github.io/raw/main/.github/avatars/aws.svg' alt='Amazon Web Services' title='Amazon Web Services'>
+</a>
+<a href='https://github.com/MelbourneDeveloper'>
+  <img src='https://github.com/devlooped/devlooped.github.io/raw/main/.github/avatars/MelbourneDeveloper.svg' alt='Christian Findlay' title='Christian Findlay'>
+</a>
+<a href='https://github.com/clarius'>
+  <img src='https://github.com/devlooped/devlooped.github.io/raw/main/.github/avatars/clarius.svg' alt='Clarius Org' title='Clarius Org'>
+</a>
+<a href='https://github.com/MFB-Technologies-Inc'>
+  <img src='https://github.com/devlooped/devlooped.github.io/raw/main/.github/avatars/MFB-Technologies-Inc.svg' alt='MFB Technologies, Inc.' title='MFB Technologies, Inc.'>
+</a>
+
+<!-- sponsors -->
+<br><br>
 *[get mentioned here too](https://github.com/sponsors/devlooped)!*
