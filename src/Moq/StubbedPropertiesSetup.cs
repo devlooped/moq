@@ -79,9 +79,9 @@ namespace Moq
 				Debug.Assert(mock != null);
 
 				var mockType = mock.GetType();
-				var mockedType = mockType.GetGenericArguments()[0];
-				var mockGetMethod = Mock.GetMethod.MakeGenericMethod(mockedType);
 				var setupAllPropertiesMethod = mockType.GetMethod(nameof(Mock<object>.SetupAllProperties));
+				var mockedType = setupAllPropertiesMethod.ReturnType.GetGenericArguments()[0];
+				var mockGetMethod = Mock.GetMethod.MakeGenericMethod(mockedType);
 				var mockParam = E.Parameter(mockedType, "m");
 				this.expression = E.Lambda(E.Call(E.Call(mockGetMethod, mockParam), setupAllPropertiesMethod), mockParam);
 			}
