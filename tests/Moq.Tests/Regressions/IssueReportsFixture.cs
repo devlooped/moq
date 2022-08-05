@@ -4003,6 +4003,29 @@ namespace Moq.Tests.Regressions
 
 #endregion
 
+#region 1278
+
+		public class Issue1278
+		{
+			[Fact]
+			public void Can_call_SetupAllProperties_on_instance_of_Mock_T_subclass()
+			{
+				var mock = new MockOfX();
+				mock.SetupAllProperties();
+			}
+
+			public class MockOfX : Mock<IX>
+			{
+			}
+
+			public interface IX
+			{
+				object P { get; set; }
+			}
+		}
+
+#endregion
+
 		// Old @ Google Code
 
 #region #47
