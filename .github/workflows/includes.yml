@@ -1,0 +1,28 @@
+name: +M▼ includes
+on: 
+  workflow_dispatch:
+  push:
+    branches:
+      - 'main'
+    paths:
+      - '**.md'    
+
+jobs:
+  includes:
+    runs-on: ubuntu-latest
+    steps:
+      - name: 🤘 checkout
+        uses: actions/checkout@v2
+
+      - name: +M▼ includes
+        uses: devlooped/actions-include@v3
+
+      - name: ✍ pull request
+        uses: peter-evans/create-pull-request@v3
+        with:
+          base: main
+          branch: markdown-includes
+          delete-branch: true
+          commit-message: +M▼ includes
+          title: +M▼ includes
+          body: +M▼ includes
