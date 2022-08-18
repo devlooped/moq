@@ -3,11 +3,6 @@
 	sha = 6a6d38b090c3a32ec64476681bd9e2ef0e66661a
 	etag = 7394fd706a975e87eaa5a44302351f6b85731df2627865fdb640eee6f8a9d515
 	weak
-[file "sponsors.md"]
-	url = https://github.com/devlooped/sponsors/blob/main/sponsors.md
-	sha = 9cef22e1ebde745ec32963eb2677b70c86c4dcea
-	etag = 555eea0c0cd7014181709931752b99360405799579027d4dccf21975455561ab
-	weak
 [file ".github/workflows/dotnet-file.yml"]
 	url = https://github.com/devlooped/oss/blob/main/.github/workflows/dotnet-file.yml
 	sha = ef47d782b45dbf3dc7f47f39168a2eed9c536a40
@@ -17,4 +12,9 @@
 	url = https://github.com/devlooped/oss/blob/main/.github/FUNDING.yml
 	sha = 4c91539ec08a3f9c14ff1e8c6a7c4ae88795f5f1
 	etag = f4d02805592d1f86c29acc9da3a40e817fb3611d6ff0f6409f547137f38f65df
+	weak
+[file ".github/workflows/sponsor.yml"]
+	url = https://github.com/devlooped/.github/blob/main/.github/workflows/sponsor.yml
+	sha = e347e5c7b91aaeb11eff95037c2c0b54206cc976
+	etag = 06319ff741c03cf4cd5113926d490ec09999a85b5a0e0480ce44222db026341a
 	weak
