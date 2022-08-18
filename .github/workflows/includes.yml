@@ -6,8 +6,7 @@ on:
       - 'main'
     paths:
       - '**.md'    
-    paths-ignore:
-      - changelog.md
+      - '!changelog.md'
 
 jobs:
   includes:
