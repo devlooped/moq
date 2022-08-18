@@ -124,6 +124,6 @@ And to all our sponsors!
 
 
 <!-- https://github.com/devlooped/sponsors/raw/main/sponsors.md -->
-<br><br>
+<br>
 
 *[get mentioned here too](https://github.com/sponsors/devlooped)!*
