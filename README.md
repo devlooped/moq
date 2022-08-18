@@ -7,8 +7,6 @@ The most popular and friendly mocking library for .NET
 [![Downloads](https://img.shields.io/nuget/dt/Moq.svg)](https://www.nuget.org/packages/Moq)
 [![Documentation](https://img.shields.io/badge/docs-website-%23fc0)](http://moq.github.io/moq4/)
 [![Discord Chat](https://img.shields.io/badge/chat-on%20discord-7289DA.svg)](https://discord.gg/8PtpGdu)
-[![Gitter chat](https://img.shields.io/badge/chat-on%20gitter-753A88.svg)](https://gitter.im/moq/moq)
-
 
 ```csharp
   var mock = new Mock<ILoveThisLibrary>();
