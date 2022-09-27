@@ -129,18 +129,14 @@ namespace Moq
 		/// This method is never used directly by consumers.
 		/// </summary>
 		private IEnumerable<T> CreateMocks<T>(MockBehavior behavior) where T : class
-		{
-			do
+		{			
+			var mock = this.Create<T>(behavior);
+			if (behavior != MockBehavior.Strict)
 			{
-				var mock = this.Create<T>(behavior);
-				if (behavior != MockBehavior.Strict)
-				{
-					mock.SetupAllProperties();
-				}
-
-				yield return mock.Object;
+				mock.SetupAllProperties();
 			}
-			while (true);
+
+			yield return mock.Object;			
 		}
 	}
 }
