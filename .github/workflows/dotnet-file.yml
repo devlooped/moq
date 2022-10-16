@@ -70,6 +70,7 @@ jobs:
 
       - name: ✍ pull request
         uses: peter-evans/create-pull-request@v3
+        continue-on-error: true
         with:
           base: main
           branch: dotnet-file-sync
