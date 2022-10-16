@@ -1,12 +1,12 @@
 [file ".github/workflows/includes.yml"]
 	url = https://github.com/devlooped/oss/blob/main/.github/workflows/includes.yml
-	sha = 7985d4eaacbb691cea6ad5d534096d8e82be16e5
-	etag = 42144f0731a93828e1785cb9c1fc9992c41f10c52e70170c13d57b11151b123a
+	sha = 5d05e541d7b028d64b044c5b9cc80afa19dc0de0
+	etag = c73a2aa293ec204e46771a99b095566082cad7989595ea725e5d76b27fe90894
 	weak
 [file ".github/workflows/dotnet-file.yml"]
 	url = https://github.com/devlooped/oss/blob/main/.github/workflows/dotnet-file.yml
-	sha = aed791a3a35919e3088cd2bde604cbae6f47b393
-	etag = 0f7649805f5e84fba5104339bfd0c21ac4747b65186b16eab39f863e2db7a3e1
+	sha = b97b8f19569fa1b93cece4b22afab0e838693c5a
+	etag = a9d246d40ee9cf9796fe694835b787cba415f4f23e919c6a763dd3ebfa607681
 	weak
 [file ".github/FUNDING.yml"]
 	url = https://github.com/devlooped/oss/blob/main/.github/FUNDING.yml
