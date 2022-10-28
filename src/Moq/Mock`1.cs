@@ -22,7 +22,7 @@ namespace Moq
 	///   Any interface type can be used for mocking, but for classes, only abstract and virtual members can be mocked.
 	///   <para>
 	///     The behavior of the mock with regards to the setups and the actual calls is determined by the optional
-	///     <see cref = "MockBehavior" /> that can be passed to the<see cref="Mock{T}(MockBehavior)"/> constructor.
+	///     <see cref = "MockBehavior" /> that can be passed to the <see cref="Mock{T}(MockBehavior)"/> constructor.
 	///   </para>
 	/// </remarks>
 	/// <example group="overview">
