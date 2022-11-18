@@ -13,6 +13,7 @@ env:
 jobs:
   sync:
     runs-on: windows-latest
+    continue-on-error: true
     steps:
       - name: 🤖 defaults
         uses: devlooped/actions-bot@v1
@@ -69,8 +70,7 @@ jobs:
           validate: false
 
       - name: ✍ pull request
-        uses: peter-evans/create-pull-request@v3
-        continue-on-error: true
+        uses: peter-evans/create-pull-request@v4
         with:
           base: main
           branch: dotnet-file-sync
