@@ -100,7 +100,7 @@ We appreciate deeply any feedback that you may have! Feel free to participate in
  https://github.com/moq/moq4/issues
  "Moq issue tracker on GitHub"
 
-![Sponsors](https://raw.githubusercontent.com/devlooped/oss/main/assets/images/sponsors.svg) Sponsors
+![Sponsors](https://raw.githubusercontent.com/devlooped/sponsors/main/assets/sponsors.svg) Sponsors
 ============
 
 Special thanks to the following gold sponsors of this project:
