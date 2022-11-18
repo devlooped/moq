@@ -124,4 +124,7 @@ And to all our sponsors!
 <!-- https://github.com/devlooped/sponsors/raw/main/sponsors.md -->
 <br>
 
-*[get mentioned here too](https://github.com/sponsors/devlooped)!*
+[![Sponsor this project](https://raw.githubusercontent.com/devlooped/sponsors/main/sponsor.png "Sponsor this project")](https://github.com/sponsors/devlooped)
+&nbsp;
+
+[Learn more about GitHub Sponsors](https://github.com/sponsors)
