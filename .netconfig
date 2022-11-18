@@ -9,12 +9,12 @@
 	etag = a9d246d40ee9cf9796fe694835b787cba415f4f23e919c6a763dd3ebfa607681
 	weak
 [file ".github/FUNDING.yml"]
-	url = https://github.com/devlooped/oss/blob/main/.github/FUNDING.yml
+	url = https://github.com/devlooped/.github/blob/main/.github/FUNDING.yml
 	sha = 4c91539ec08a3f9c14ff1e8c6a7c4ae88795f5f1
 	etag = f4d02805592d1f86c29acc9da3a40e817fb3611d6ff0f6409f547137f38f65df
 	weak
 [file ".github/workflows/sponsor.yml"]
-	url = https://github.com/devlooped/.github/blob/main/.github/workflows/sponsor.yml
+	url = https://github.com/devlooped/oss/blob/main/.github/workflows/sponsor.yml
 	sha = e347e5c7b91aaeb11eff95037c2c0b54206cc976
 	etag = 06319ff741c03cf4cd5113926d490ec09999a85b5a0e0480ce44222db026341a
 	weak
