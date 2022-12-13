@@ -7,6 +7,7 @@ using System.Linq;
 using System.Linq.Expressions;
 using System.Text;
 using System.Threading;
+using System.Threading.Tasks;
 
 using Moq.Language;
 using Moq.Language.Flow;
@@ -1386,6 +1387,33 @@ namespace Moq
 			Mock.RaiseEvent(this, eventExpression, args);
 		}
 
-#endregion
+		/// <summary>
+		///   Raises the event referenced in <paramref name="eventExpression"/> using the given arguments
+		///   for an event with a <c>Func&lt;..., Task&gt;</c> or <c>Func&lt;..., ValueTask&gt;</c> signature.
+		///   The returned <see cref="Task"/> completes when all of the <see cref="Task"/>s / <see cref="ValueTask"/>s
+		///   returned by the event handlers have completed.
+		/// </summary>
+		/// <exception cref="ArgumentException">
+		///   The <paramref name="args"/> arguments are invalid for the target event invocation,
+		///   or the <paramref name="eventExpression"/> is not an event attach or detach expression.
+		/// </exception>
+		/// <example>
+		///   The following example shows how to raise an event with async event handlers:
+		///   <code>
+		///     interface IViewModel
+		///     {
+		///         event Func&lt;InitializationData, Task&gt; Initialized;
+		///     }
+		///     var mock = new Mock&lt;IViewModel&gt;();
+		///     mock.Object.Initialized += async initializationData => ...;
+		///     await mock.RaiseAsync(x => x.Initialized += null, new InitializationData { ... });
+		///   </code>
+		/// </example>
+		public Task RaiseAsync(Action<T> eventExpression, params object[] args)
+		{
+			return Mock.RaiseEventAsync(this, eventExpression, args);
+		}
+
+		#endregion
 	}
 }
