@@ -5,6 +5,13 @@ All notable changes to this project will be documented in this file.
 The format is loosely based on [Keep a Changelog](http://keepachangelog.com/en/1.0.0/).
 
 
+## Unreleased
+
+#### Added
+
+* `Mock<T>.RaiseAsync` method for raising "async" events, i.e. events that use a `Func<..., Task>` or `Func<..., ValueTask>` delegate. (@stakx, #1313)
+
+
 ## 4.18.4 (2022-12-30)
 
 #### Changed

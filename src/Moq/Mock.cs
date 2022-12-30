@@ -8,6 +8,7 @@ using System.Globalization;
 using System.Linq;
 using System.Linq.Expressions;
 using System.Reflection;
+using System.Threading.Tasks;
 
 using Moq.Async;
 using Moq.Properties;
@@ -695,7 +696,16 @@ namespace Moq
 			Mock.RaiseEvent(mock, expression, parts, arguments);
 		}
 
-		internal static void RaiseEvent(Mock mock, LambdaExpression expression, Stack<MethodExpectation> parts, object[] arguments)
+		internal static Task RaiseEventAsync<T>(Mock mock, Action<T> action, object[] arguments)
+		{
+			Guard.NotNull(action, nameof(action));
+
+			var expression = ExpressionReconstructor.Instance.ReconstructExpression(action, mock.ConstructorArguments);
+			var parts = expression.Split();
+			return (Task)Mock.RaiseEvent(mock, expression, parts, arguments);
+		}
+
+		internal static object RaiseEvent(Mock mock, LambdaExpression expression, Stack<MethodExpectation> parts, object[] arguments)
 		{
 			const BindingFlags bindingFlags = BindingFlags.Public | BindingFlags.NonPublic | BindingFlags.Instance | BindingFlags.DeclaredOnly;
 
@@ -742,7 +752,27 @@ namespace Moq
 
 				if (mock.EventHandlers.TryGet(@event, out var handlers))
 				{
-					handlers.InvokePreserveStack(arguments);
+					var returnType = handlers.GetMethodInfo().ReturnType;
+					if (returnType == typeof(Task) || returnType == typeof(ValueTask))
+					{
+						var invocationList = handlers.GetInvocationList();
+						var tasks = new List<Task>(invocationList.Length);
+						foreach (var handler in invocationList)
+						{
+							var returnValue = handler.InvokePreserveStack(arguments);
+							if (returnValue is Task task)
+							{
+								tasks.Add(task);
+							}
+							else if (returnValue is ValueTask valueTask)
+							{
+								tasks.Add(valueTask.AsTask());
+							}
+						}
+						return Task.WhenAll(tasks);
+					}
+
+					return handlers.InvokePreserveStack(arguments);
 				}
 			}
 			else
@@ -750,9 +780,11 @@ namespace Moq
 				var innerMock = mock.MutableSetups.FindLastInnerMock(setup => setup.Matches(part));
 				if (innerMock != null)
 				{
-					Mock.RaiseEvent(innerMock, expression, parts, arguments);
+					return Mock.RaiseEvent(innerMock, expression, parts, arguments);
 				}
 			}
+
+			return null;
 		}
 
 		#endregion
