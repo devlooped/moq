@@ -5,6 +5,13 @@ All notable changes to this project will be documented in this file.
 The format is loosely based on [Keep a Changelog](http://keepachangelog.com/en/1.0.0/).
 
 
+## Unreleased
+
+#### Changed
+
+* Update package reference to `Castle.Core` (DynamicProxy) from version 5.1.0 to 5.1.1 (@stakx, #1317)
+
+
 ## 4.18.3 (2022-12-05)
 
 #### Fixed
