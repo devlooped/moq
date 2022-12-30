@@ -20,7 +20,7 @@ namespace Moq
 {
 	internal sealed partial class MethodCall : SetupWithOutParameterSupport
 	{
-		private LimitInvocationCount limitInvocationCount;
+		private VerifyInvocationCount verifyInvocationCount;
 		private Behavior callback;
 		private Behavior raiseEvent;
 		private Behavior returnOrThrow;
@@ -99,7 +99,7 @@ namespace Moq
 
 		protected override void ExecuteCore(Invocation invocation)
 		{
-			this.limitInvocationCount?.Execute(invocation);
+			this.verifyInvocationCount?.Execute(invocation);
 
 			this.callback?.Execute(invocation);
 
@@ -339,12 +339,24 @@ namespace Moq
 
 		protected override void ResetCore()
 		{
-			this.limitInvocationCount?.Reset();
+			this.verifyInvocationCount?.Reset();
 		}
 
-		public void AtMost(int count)
+		public void SetExpectedInvocationCount(Times times)
 		{
-			this.limitInvocationCount = new LimitInvocationCount(this, count);
+			this.verifyInvocationCount = new VerifyInvocationCount(this, times);
+		}
+
+		protected override void VerifySelf()
+		{
+			if (this.verifyInvocationCount != null)
+			{
+				this.verifyInvocationCount.Verify();
+			}
+			else
+			{
+				base.VerifySelf();
+			}
 		}
 
 		public override string ToString()

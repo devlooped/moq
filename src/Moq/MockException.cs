@@ -38,29 +38,16 @@ namespace Moq
 	public class MockException : Exception
 	{
 		/// <summary>
-		///   Returns the exception to be thrown when a setup limited by <see cref="IOccurrence.AtMostOnce()"/> is matched more often than once.
+		///   Returns the exception to be thrown when a setup has been invoked an incorrect (unexpected) number of times.
 		/// </summary>
-		internal static MockException MoreThanOneCall(MethodCall setup, int invocationCount)
+		internal static MockException IncorrectNumberOfCalls(MethodCall setup, Times times, int invocationCount)
 		{
 			var message = new StringBuilder();
 			message.AppendLine(setup.FailMessage ?? "")
-			       .Append(Times.AtMostOnce().GetExceptionMessage(invocationCount))
+			       .Append(times.GetExceptionMessage(invocationCount))
 			       .AppendLine(setup.Expression.ToStringFixed());
 
-			return new MockException(MockExceptionReasons.MoreThanOneCall, message.ToString());
-		}
-
-		/// <summary>
-		///   Returns the exception to be thrown when a setup limited by <see cref="IOccurrence.AtMost(int)"/> is matched more often than the specified maximum number of times.
-		/// </summary>
-		internal static MockException MoreThanNCalls(MethodCall setup, int maxInvocationCount, int invocationCount)
-		{
-			var message = new StringBuilder();
-			message.AppendLine(setup.FailMessage ?? "")
-			       .Append(Times.AtMost(maxInvocationCount).GetExceptionMessage(invocationCount))
-			       .AppendLine(setup.Expression.ToStringFixed());
-
-			return new MockException(MockExceptionReasons.MoreThanNCalls, message.ToString());
+			return new MockException(MockExceptionReasons.IncorrectNumberOfCalls, message.ToString());
 		}
 
 		/// <summary>

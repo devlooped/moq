@@ -21,11 +21,15 @@ namespace Moq.Language.Flow
 
 		public IVerifies AtMost(int callCount)
 		{
-			this.setup.AtMost(callCount);
+			this.setup.SetExpectedInvocationCount(Times.AtMost(callCount));
 			return this;
 		}
 
-		public IVerifies AtMostOnce() => this.AtMost(1);
+		public IVerifies AtMostOnce()
+		{
+			this.setup.SetExpectedInvocationCount(Times.AtMostOnce());
+			return this;
+		}
 
 		public ICallbackResult Callback(InvocationAction action)
 		{
@@ -276,6 +280,22 @@ namespace Moq.Language.Flow
 		{
 			this.setup.MarkAsVerifiable();
 			this.setup.SetFailMessage(failMessage);
+		}
+
+		public void Verifiable(Func<Times> times) => this.Verifiable(times(), null);
+
+		public void Verifiable(Times times) => this.Verifiable(times, null);
+
+		public void Verifiable(Func<Times> times, string failMessage) => this.Verifiable(times(), failMessage);
+
+		public void Verifiable(Times times, string failMessage)
+		{
+			this.setup.MarkAsVerifiable();
+			this.setup.SetExpectedInvocationCount(times);
+			if (failMessage != null)
+			{
+				this.setup.SetFailMessage(failMessage);
+			}
 		}
 
 		public override string ToString()
