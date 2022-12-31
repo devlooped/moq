@@ -8,8 +8,7 @@ namespace Moq
 	[Flags]
 	internal enum MockExceptionReasons
 	{
-		MoreThanOneCall = 1,
-		MoreThanNCalls = 2,
+		IncorrectNumberOfCalls = 1,
 		NoMatchingCalls = 4,
 		NoSetup = 8,
 		ReturnValueRequired = 16,

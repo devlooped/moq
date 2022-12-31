@@ -22,7 +22,7 @@ namespace Moq.Language
 		///     .AtMostOnce();
 		/// </code>
 		/// </example>
-		[Obsolete("To verify this condition, use the overload to Verify that receives Times.AtMostOnce().")]
+		[Obsolete("Use 'mock.Verify(call, Times.AtMostOnce)' or 'setup.Verifiable(Times.AtMostOnce)' instead.")]
 		[EditorBrowsable(EditorBrowsableState.Never)]
 		IVerifies AtMostOnce();
 		/// <summary>
@@ -36,7 +36,7 @@ namespace Moq.Language
 		///     .AtMost( 5 );
 		/// </code>
 		/// </example>
-		[Obsolete("To verify this condition, use the overload to Verify that receives Times.AtMost(callCount).")]
+		[Obsolete("Use 'mock.Verify(call, Times.AtMost(callCount))' or 'setup.Verifiable(Times.AtMost(callCount))' instead.")]
 		[EditorBrowsable(EditorBrowsableState.Never)]
 		IVerifies AtMost(int callCount);
 	}
