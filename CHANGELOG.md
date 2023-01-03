@@ -7,6 +7,10 @@ The format is loosely based on [Keep a Changelog](http://keepachangelog.com/en/1
 
 ## Unreleased
 
+#### Added
+
+* Align `ThrowsAsync` methods for `ValueTask` (@johnthcall, #1235)
+
 #### Fixed
 
 * Property setups are ignored on mocks instantiated using `Mock.Of` (@stakx, #1066)

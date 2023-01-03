@@ -37,6 +37,8 @@ namespace Moq.Tests
 
 		public interface IValueTaskAsyncInterface
 		{
+			ValueTask NoParametersNonGenericValueTaskReturnType();
+
 			ValueTask<string> NoParametersRefReturnType();
 
 			ValueTask<int> NoParametersValueReturnType();
@@ -672,6 +674,20 @@ namespace Moq.Tests
 			Assert.IsType<ValueTask<string>>(firstTask);
 			Assert.IsType<ValueTask<string>>(secondTask);
 			Assert.NotSame(firstTask.Result, secondTask.Result);
+		}
+
+		[Fact]
+		public void ValueTaskThrowsAsync_on_NoParametersNonGenericValueTaskReturnType()
+		{
+			var mock = new Mock<IValueTaskAsyncInterface>();
+			var exception = new InvalidOperationException();
+			mock.Setup(x => x.NoParametersNonGenericValueTaskReturnType()).ThrowsAsync(exception);
+
+			var task = mock.Object.NoParametersNonGenericValueTaskReturnType();
+
+			Assert.IsType<ValueTask>(task);
+			Assert.True(task.IsFaulted);
+			Assert.Equal(exception, task.AsTask().Exception.InnerException);
 		}
 
 		[Fact]

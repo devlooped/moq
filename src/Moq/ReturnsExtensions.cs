@@ -90,6 +90,22 @@ namespace Moq
 				return tcs.Task;
 			});
 		}
+		
+		/// <summary>
+		/// Specifies the exception to throw when the asynchronous method is invoked.
+		/// </summary>
+		/// <typeparam name="TMock">Mocked type.</typeparam>
+		/// <param name="mock">Returns verb which represents the mocked type and the valuetask return type</param>
+		/// <param name="exception">Exception instance to throw.</param>
+		public static IReturnsResult<TMock> ThrowsAsync<TMock>(this IReturns<TMock, ValueTask> mock, Exception exception) where TMock : class
+		{
+			return mock.Returns(() =>
+			{
+				var tcs = new TaskCompletionSource<bool>();
+				tcs.SetException(exception);
+				return new ValueTask(tcs.Task);
+			});
+		}
 
 		/// <summary>
 		/// Specifies the exception to throw when the asynchronous method is invoked.
