@@ -7,6 +7,7 @@ using System.Linq;
 using System.Linq.Expressions;
 using System.Text;
 using System.Threading;
+using System.Threading.Tasks;
 
 using Moq.Language;
 using Moq.Language.Flow;
@@ -22,7 +23,7 @@ namespace Moq
 	///   Any interface type can be used for mocking, but for classes, only abstract and virtual members can be mocked.
 	///   <para>
 	///     The behavior of the mock with regards to the setups and the actual calls is determined by the optional
-	///     <see cref = "MockBehavior" /> that can be passed to the<see cref="Mock{T}(MockBehavior)"/> constructor.
+	///     <see cref = "MockBehavior" /> that can be passed to the <see cref="Mock{T}(MockBehavior)"/> constructor.
 	///   </para>
 	/// </remarks>
 	/// <example group="overview">
@@ -628,22 +629,7 @@ namespace Moq
 		/// </example>
 		public Mock<T> SetupProperty<TProperty>(Expression<Func<T, TProperty>> property, TProperty initialValue)
 		{
-			Guard.NotNull(property, nameof(property));
-
-			var pi = property.ToPropertyInfo();
-
-			if (!pi.CanRead(out var getter))
-			{
-				Guard.CanRead(pi);
-			}
-
-			if (!pi.CanWrite(out var setter))
-			{
-				Guard.CanWrite(pi);
-			}
-
-			var setup = new StubbedPropertySetup(this, property, getter, setter, initialValue);
-			this.MutableSetups.Add(setup);
+			Mock.SetupProperty(this, property, initialValue);
 			return this;
 		}
 
@@ -1401,6 +1387,33 @@ namespace Moq
 			Mock.RaiseEvent(this, eventExpression, args);
 		}
 
-#endregion
+		/// <summary>
+		///   Raises the event referenced in <paramref name="eventExpression"/> using the given arguments
+		///   for an event with a <c>Func&lt;..., Task&gt;</c> or <c>Func&lt;..., ValueTask&gt;</c> signature.
+		///   The returned <see cref="Task"/> completes when all of the <see cref="Task"/>s / <see cref="ValueTask"/>s
+		///   returned by the event handlers have completed.
+		/// </summary>
+		/// <exception cref="ArgumentException">
+		///   The <paramref name="args"/> arguments are invalid for the target event invocation,
+		///   or the <paramref name="eventExpression"/> is not an event attach or detach expression.
+		/// </exception>
+		/// <example>
+		///   The following example shows how to raise an event with async event handlers:
+		///   <code>
+		///     interface IViewModel
+		///     {
+		///         event Func&lt;InitializationData, Task&gt; Initialized;
+		///     }
+		///     var mock = new Mock&lt;IViewModel&gt;();
+		///     mock.Object.Initialized += async initializationData => ...;
+		///     await mock.RaiseAsync(x => x.Initialized += null, new InitializationData { ... });
+		///   </code>
+		/// </example>
+		public Task RaiseAsync(Action<T> eventExpression, params object[] args)
+		{
+			return Mock.RaiseEventAsync(this, eventExpression, args);
+		}
+
+		#endregion
 	}
 }

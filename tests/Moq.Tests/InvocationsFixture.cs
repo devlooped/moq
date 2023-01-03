@@ -285,7 +285,7 @@ namespace Moq.Tests
 			mock.Invocations.Clear();
 			_ = mock.Object.CompareTo(default);  // this second call should now count as the first
 			var ex = Assert.Throws<MockException>(() => mock.Object.CompareTo(default));
-			Assert.Equal(MockExceptionReasons.MoreThanOneCall, ex.Reasons);
+			Assert.Equal(MockExceptionReasons.IncorrectNumberOfCalls, ex.Reasons);
 		}
 
 		[Fact]

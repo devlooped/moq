@@ -448,6 +448,7 @@ namespace Moq
 #pragma warning disable 618
 			return expression.NodeType switch
 			{
+				ExpressionType.Quote        => false,
 				ExpressionType.Parameter    => false,
 				ExpressionType.Extension    => !(expression is MatchExpression),
 				ExpressionType.Call         => !((MethodCallExpression)expression).Method.IsDefined(typeof(MatcherAttribute), true)

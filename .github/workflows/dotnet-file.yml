@@ -1,0 +1,86 @@
+# Synchronizes .netconfig-configured files with dotnet-file
+name: dotnet-file
+on:
+  workflow_dispatch:
+  schedule:
+    - cron: "0 0 * * *"
+  push:
+    branches: [ 'dotnet-file' ]
+
+env:
+  DOTNET_NOLOGO: true
+
+jobs:
+  sync:
+    runs-on: windows-latest
+    continue-on-error: true
+    steps:
+      - name: 🤖 defaults
+        uses: devlooped/actions-bot@v1
+        with:
+          name: ${{ secrets.BOT_NAME }}
+          email: ${{ secrets.BOT_EMAIL }}
+          gh_token: ${{ secrets.GH_TOKEN }}
+          github_token: ${{ secrets.GITHUB_TOKEN }}
+
+      - name: 🤘 checkout
+        uses: actions/checkout@v2
+        with:
+          fetch-depth: 0
+          ref: main
+          token: ${{ env.GH_TOKEN }}
+
+      - name: ⌛ rate
+        shell: pwsh
+        run: |
+          # add random sleep since we run on fixed schedule
+          sleep (get-random -max 60)
+          # get currently authenticated user rate limit info
+          $rate = gh api rate_limit | convertfrom-json | select -expandproperty rate
+          # if we don't have at least 100 requests left, wait until reset
+          if ($rate.remaining -lt 10) {
+              $wait = ($rate.reset - (Get-Date (Get-Date).ToUniversalTime() -UFormat %s))
+              echo "Rate limit remaining is $($rate.remaining), waiting for $($wait / 1000) seconds to reset"
+              sleep $wait
+              $rate = gh api rate_limit | convertfrom-json | select -expandproperty rate
+              echo "Rate limit has reset to $($rate.remaining) requests"
+          }
+
+      - name: 🔄 sync
+        shell: pwsh
+        run: |
+          dotnet tool update -g dotnet-gcm
+          dotnet gcm store --protocol=https --host=github.com --username=$env:GITHUB_ACTOR --password=$env:GH_TOKEN
+          gh auth status
+
+          dotnet tool update -g dotnet-file
+          dotnet file sync -c:$env:TEMP\dotnet-file.md
+          if (test-path $env:TEMP\dotnet-file.md) {
+            echo 'CHANGES<<EOF' >> $env:GITHUB_ENV
+            cat $env:TEMP\dotnet-file.md >> $env:GITHUB_ENV
+            echo 'EOF' >> $env:GITHUB_ENV
+            cat $env:TEMP\dotnet-file.md
+          } else {
+            echo 'No changelog was generated'
+          }
+
+      - name: +Mᐁ includes
+        uses: devlooped/actions-include@v1
+        with:
+          validate: false
+
+      - name: ✍ pull request
+        uses: peter-evans/create-pull-request@v4
+        with:
+          base: main
+          branch: dotnet-file-sync
+          delete-branch: true
+          labels: dependencies
+          author: ${{ env.BOT_AUTHOR }}
+          committer: ${{ env.BOT_AUTHOR }}
+          commit-message: ⬆️ Bump files with dotnet-file sync
+          
+            ${{ env.CHANGES }}
+          title: "⬆️ Bump files with dotnet-file sync"
+          body: ${{ env.CHANGES }}
+          token: ${{ env.GH_TOKEN }}

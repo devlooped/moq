@@ -5,10 +5,8 @@ The most popular and friendly mocking library for .NET
 
 [![Version](https://img.shields.io/nuget/vpre/Moq.svg)](https://www.nuget.org/packages/Moq)
 [![Downloads](https://img.shields.io/nuget/dt/Moq.svg)](https://www.nuget.org/packages/Moq)
-[![Documentation](https://img.shields.io/badge/docs-website-%23fc0)](https://www.moqthis.com/moq4/)
+[![Documentation](https://img.shields.io/badge/docs-website-%23fc0)](http://moq.github.io/moq4/)
 [![Discord Chat](https://img.shields.io/badge/chat-on%20discord-7289DA.svg)](https://discord.gg/8PtpGdu)
-[![Gitter chat](https://img.shields.io/badge/chat-on%20gitter-753A88.svg)](https://gitter.im/moq/moq)
-
 
 ```csharp
   var mock = new Mock<ILoveThisLibrary>();
@@ -39,14 +37,14 @@ Moq also is the first and only library so far to provide Linq to Mocks, so that 
   // Simply assert the returned state:
   Assert.True(download);
   
-  // If you really want to go beyond state testing and want to 
+  // If you want to go beyond state testing and want to 
   // verify the mock interaction instead...
   Mock.Get(lovable).Verify(library => library.DownloadExists("2.0.0.0"));
 ```
 
 You can think of Linq to Mocks as "from the universe of mocks, give me one whose behavior matches this expression".
 
-Checkout the [Quickstart](https://github.com/Moq/moq4/wiki/Quickstart) for more examples!
+Check out the [Quickstart](https://github.com/Moq/moq4/wiki/Quickstart) for more examples!
 
 ## What?
 
@@ -70,7 +68,7 @@ See our [Quickstart](https://github.com/Moq/moq4/wiki/Quickstart) examples to ge
 
 Read about the announcement at [kzu's blog](https://web.archive.org/web/20201130233544/http://blogs.clariusconsulting.net/kzu/linq-to-mock-moq-is-born/). Get some background on [the state of mock libraries from Scott Hanselman](http://www.hanselman.com/blog/MoqLinqLambdasAndPredicatesAppliedToMockObjects.aspx).
 
-In-depth documentation is being added to the [documentation website](https://www.moqthis.com/moq4/).
+In-depth documentation is being added to the [documentation website](http://moq.github.io/moq4/).
 
 
 ## Who?
@@ -101,3 +99,32 @@ We appreciate deeply any feedback that you may have! Feel free to participate in
  [issue tracker]:
  https://github.com/moq/moq4/issues
  "Moq issue tracker on GitHub"
+
+![Sponsors](https://raw.githubusercontent.com/devlooped/sponsors/main/assets/sponsors.svg) Sponsors
+============
+
+Special thanks to the following gold sponsors of this project:
+
+<a href="https://github.com/aws"><img src="https://avatars.githubusercontent.com/u/2232217?s=70&v=4" alt="Supported by Amazon Web Services" title="Supported by Amazon Web Services"></a>
+<a href="https://github.com/clarius"><img src="https://avatars.githubusercontent.com/u/71888636?s=70&v=4" alt="Supported by Clarius" title="Supported by Clarius"></a>
+
+And to all our sponsors!
+
+<!-- include https://github.com/devlooped/sponsors/raw/main/sponsors.md -->
+[![Clarius Org](https://raw.githubusercontent.com/devlooped/sponsors/main/.github/avatars/clarius.png "Clarius Org")](https://github.com/clarius)
+[![Christian Findlay](https://raw.githubusercontent.com/devlooped/sponsors/main/.github/avatars/MelbourneDeveloper.png "Christian Findlay")](https://github.com/MelbourneDeveloper)
+[![C. Augusto Proiete](https://raw.githubusercontent.com/devlooped/sponsors/main/.github/avatars/augustoproiete.png "C. Augusto Proiete")](https://github.com/augustoproiete)
+[![Kirill Osenkov](https://raw.githubusercontent.com/devlooped/sponsors/main/.github/avatars/KirillOsenkov.png "Kirill Osenkov")](https://github.com/KirillOsenkov)
+[![MFB Technologies, Inc.](https://raw.githubusercontent.com/devlooped/sponsors/main/.github/avatars/MFB-Technologies-Inc.png "MFB Technologies, Inc.")](https://github.com/MFB-Technologies-Inc)
+[![SandRock](https://raw.githubusercontent.com/devlooped/sponsors/main/.github/avatars/sandrock.png "SandRock")](https://github.com/sandrock)
+[![Eric C](https://raw.githubusercontent.com/devlooped/sponsors/main/.github/avatars/eeseewy.png "Eric C")](https://github.com/eeseewy)
+[![Andy Gocke](https://raw.githubusercontent.com/devlooped/sponsors/main/.github/avatars/agocke.png "Andy Gocke")](https://github.com/agocke)
+
+
+<!-- https://github.com/devlooped/sponsors/raw/main/sponsors.md -->
+<br>
+
+[![Sponsor this project](https://raw.githubusercontent.com/devlooped/sponsors/main/sponsor.png "Sponsor this project")](https://github.com/sponsors/devlooped)
+&nbsp;
+
+[Learn more about GitHub Sponsors](https://github.com/sponsors)

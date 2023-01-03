@@ -102,7 +102,7 @@ namespace Moq
 
 			public override Expression Visit(Expression expression)
 			{
-				if (expression != null)
+				if (expression != null && expression.NodeType != ExpressionType.Quote)
 				{
 					bool saveCannotBeEvaluated = this.cannotBeEvaluated;
 					this.cannotBeEvaluated = false;

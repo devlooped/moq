@@ -4,14 +4,13 @@
 	<Import Project="$(BuildDirectory)SignAssembly.props" />
 
 	<PropertyGroup>
-		<TargetFrameworks>net472;netcoreapp3.1</TargetFrameworks>
+		<TargetFrameworks>net472;netcoreapp3.1;net6.0</TargetFrameworks>
 		<DebugSymbols>True</DebugSymbols>
 		<DebugType>portable</DebugType>
 		<IsPackable>False</IsPackable>
 	</PropertyGroup>
 
 	<ItemGroup>
-		<PackageReference Include="FSharp.Core" Version="4.5.4" />
 		<PackageReference Include="Microsoft.NETFramework.ReferenceAssemblies" Version="1.0.0" PrivateAssets="All" />
 		<PackageReference Include="System.ValueTuple" Version="4.5.0" />
 	</ItemGroup>

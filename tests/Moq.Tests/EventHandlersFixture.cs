@@ -2,6 +2,7 @@
 // All rights reserved. Licensed under the BSD 3-Clause License; see License.txt.
 
 using System;
+using System.Threading.Tasks;
 
 using Xunit;
 
@@ -148,6 +149,40 @@ namespace Moq.Tests
 			public virtual event Action Event;
 
 			public void RaiseEvent() => this.Event?.Invoke();
+		}
+
+		[Fact]
+		public async Task Can_raise_async_event_using_RaiseAsync()
+		{
+			var handled = false;
+			var mock = new Mock<HasAsyncEvent>();
+			mock.Object.Event += async () =>
+			{
+				await Task.Delay(50);
+				handled = true;
+			};
+			await mock.RaiseAsync(m => m.Event += null);
+			Assert.True(handled);
+		}
+
+		[Fact]
+		public async Task Can_raise_parameterized_async_event_using_RaiseAsync()
+		{
+			var received = 0;
+			var mock = new Mock<HasAsyncEvent>();
+			mock.Object.ParameterizedEvent += async incoming =>
+			{
+				await Task.Delay(50);
+				received = incoming;
+			};
+			await mock.RaiseAsync(m => m.ParameterizedEvent += null, 42);
+			Assert.Equal(42, received);
+		}
+
+		public class HasAsyncEvent
+		{
+			public virtual event Func<Task> Event;
+			public virtual event Func<int, Task> ParameterizedEvent;
 		}
 	}
 }

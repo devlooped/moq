@@ -9,15 +9,73 @@ The format is loosely based on [Keep a Changelog](http://keepachangelog.com/en/1
 
 #### Added
 
-* Align `ThrowsAsync` methods for `ValueTask` (@johnthcall, #1235)
+* `Mock<T>.RaiseAsync` method for raising "async" events, i.e. events that use a `Func<..., Task>` or `Func<..., ValueTask>` delegate. (@stakx, #1313)
+* `setup.Verifiable(Times times, [string failMessage])` method to specify the expected number of calls upfront. `mock.Verify[All]` can then be used to check whether the setup was called that many times. The upper bound (maximum allowed number of calls) will be checked right away, i.e. whenever a setup gets called. (@stakx, #1319)
+* Add `ThrowsAsync` methods for non-generic `ValueTask` (@johnthcall, #1235)
+
+## 4.18.4 (2022-12-30)
+
+#### Changed
+
+* Update package reference to `Castle.Core` (DynamicProxy) from version 5.1.0 to 5.1.1 (@stakx, #1317)
+
+
+## 4.18.3 (2022-12-05)
 
 #### Fixed
 
-* Property setups are ignored on mocks instantiated using `Mock.Of` (@stakx, #1066)
-* `SetupAllProperties` causes mocks to become race-prone (@estrizhok, #1231)
+* `SetupAllProperties` crashes when invoked on a `Mock<T>` subclass (@mo-russo, #1278)
 
 
-## 4.17.0 (2022-02-13)
+## 4.18.2 (2022-08-02)
+
+#### Changed
+
+* Update package reference to `Castle.Core` (DynamicProxy) from version 5.0.0 to 5.1.0 (@stakx, #1275)
+* Removed dependency on `System.Threading.Tasks.Extensions` for `netstandard2.1` and `net6.0` (@tibel, #1274)
+
+#### Fixed
+
+* "Expression is not an event add" when using `.Raises()` with redeclared event (@howcheng, #1175)
+* `MissingMethodException` when mocking interface with sealed default implementation (@pjquirk, #1209)
+* Throws `TypeLoadException` on mock when a record has a base record on .NET 6 (@tgrieger-sf, #1273)
+
+
+## 4.18.1 (2022-05-16)
+
+#### Fixed
+
+* Regression with lazy evaluation of `It.Is` predicates in setup expressions after updating from 4.13.1 to 4.16.1 (@b3go, #1217)
+* Regression with `SetupProperty` where Moq fails to match a property accessor implementation against its definition in an interface (@Naxemar, #1248)
+* Difference in behavior when mocking async method using `.Result` vs without (@cyungmann, #1253)
+
+
+## 4.18.0 (2022-05-12)
+
+New major version of DynamicProxy (you may get better performance!), so please update with care.
+
+#### Changed
+
+* Update package reference to `Castle.Core` (DynamicProxy) from version 4.4.1 to 5.0.0 (@stakx, #1257)
+* Adjusted our target frameworks to match DynamicProxy's (see [their discussion about which frameworks to target](https://github.com/castleproject/Core/issues/597)):
+   - minimum .NET Framework version raised from `net45` to `net462`
+   - additional `net6.0` TFM
+
+#### Fixed
+
+* Can't set up "private protected" properties (@RobSiklos, #1170)
+* Using [...] an old version of `System.Net.Http` which is vulnerable to "DoS", "Spoofing", "Privilege Escalation", "Authentication Bypass" and "Information Exposure"  (@sidseter, #1219)
+* Failure when invoking a method with by-ref parameter & mockable return type on a mock with `CallBase` and `DefaultValue.Mock` configured (@IanKemp, #1249)
+
+
+## 4.17.2 (2022-03-06)
+
+#### Fixed
+
+* Regression: Property stubs not working on sub mock (@aaronburro, #1240)
+
+
+## 4.17.1 (2022-02-26)
 
 #### Added
 
@@ -37,6 +95,13 @@ and `Setup(x => x.GetFooAsync(It.IsAny<string>()).Result).Throws((string s) => n
 * Virtual properties and automocking not working for `mock.Protected().As<>()` (@tonyhallett, #1185)
 * Issue mocking VB.NET class with overloaded property/indexer in base class (@myurashchyk, #1153)
 * Equivalent arrays don't test equal when returned from a method, making `Verify` fail when it should not (@evilc0, #1225)
+* Property setups are ignored on mocks instantiated using `Mock.Of` (@stakx, #1066)
+* `SetupAllProperties` causes mocks to become race-prone (@estrizhok, #1231)
+
+
+## 4.17.0
+
+This version was skipped due to an intermittent NuGet publishing issue.
 
 
 ## 4.16.1 (2021-02-23)

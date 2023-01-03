@@ -1,0 +1,43 @@
+name: +Mᐁ includes
+on: 
+  workflow_dispatch:
+  push:
+    branches:
+      - 'main'
+    paths:
+      - '**.md'    
+      - '!changelog.md'
+
+jobs:
+  includes:
+    runs-on: ubuntu-latest
+    steps:
+      - name: 🤖 defaults
+        uses: devlooped/actions-bot@v1
+        with:
+          name: ${{ secrets.BOT_NAME }}
+          email: ${{ secrets.BOT_EMAIL }}
+          gh_token: ${{ secrets.GH_TOKEN }}
+          github_token: ${{ secrets.GITHUB_TOKEN }}
+
+      - name: 🤘 checkout
+        uses: actions/checkout@v2
+        with: 
+          token: ${{ env.GH_TOKEN }}
+
+      - name: +Mᐁ includes
+        uses: devlooped/actions-include@v1
+
+      - name: ✍ pull request
+        uses: peter-evans/create-pull-request@v4
+        with:
+          base: main
+          branch: markdown-includes
+          delete-branch: true
+          labels: docs
+          author: ${{ env.BOT_AUTHOR }}
+          committer: ${{ env.BOT_AUTHOR }}
+          commit-message: +Mᐁ includes
+          title: +Mᐁ includes
+          body: +Mᐁ includes
+          token: ${{ env.GH_TOKEN }}

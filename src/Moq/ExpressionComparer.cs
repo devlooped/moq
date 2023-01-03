@@ -14,6 +14,9 @@ namespace Moq
 	{
 		public static readonly ExpressionComparer Default = new ExpressionComparer();
 
+		[ThreadStatic]
+		private static int quoteDepth = 0;
+
 		private ExpressionComparer()
 		{
 		}
@@ -30,15 +33,16 @@ namespace Moq
 				return false;
 			}
 
-			// Before actually comparing two nodes, make sure that captures variables have been
-			// evaluated to their current values (as we don't want to compare their identities):
+			// Before actually comparing two nodes, make sure that captured variables have been
+			// evaluated to their current values (as we don't want to compare their identities).
+			// But do so only for the main expression; leave quoted (nested) expressions unchanged.
 
-			if (x is MemberExpression)
+			if (x is MemberExpression && ExpressionComparer.quoteDepth == 0)
 			{
 				x = x.Apply(EvaluateCaptures.Rewriter);
 			}
 
-			if (y is MemberExpression)
+			if (y is MemberExpression && ExpressionComparer.quoteDepth == 0)
 			{
 				y = y.Apply(EvaluateCaptures.Rewriter);
 			}
@@ -47,13 +51,23 @@ namespace Moq
 			{
 				switch (x.NodeType)
 				{
+					case ExpressionType.Quote:
+						ExpressionComparer.quoteDepth++;
+						try
+						{
+							return this.EqualsUnary((UnaryExpression)x, (UnaryExpression)y);
+						}
+						finally
+						{
+							ExpressionComparer.quoteDepth--;
+						}
+
 					case ExpressionType.Negate:
 					case ExpressionType.NegateChecked:
 					case ExpressionType.Not:
 					case ExpressionType.Convert:
 					case ExpressionType.ConvertChecked:
 					case ExpressionType.ArrayLength:
-					case ExpressionType.Quote:
 					case ExpressionType.TypeAs:
 					case ExpressionType.UnaryPlus:
 						return this.EqualsUnary((UnaryExpression)x, (UnaryExpression)y);
