@@ -32,7 +32,7 @@
 		<PackageReleaseNotes>A changelog is available at https://github.com/moq/moq4/blob/main/CHANGELOG.md.</PackageReleaseNotes>
 		<Authors>Daniel Cazzulino, kzu</Authors>
 		<PackageIcon>moq.png</PackageIcon>
-		<PackageLicenseUrl>https://raw.githubusercontent.com/moq/moq4/main/License.txt</PackageLicenseUrl>
+		<PackageLicenseExpression>BSD-3-Clause</PackageLicenseExpression>
 		<PackageRequireLicenseAcceptance>False</PackageRequireLicenseAcceptance>
 		<NoPackageAnalysis>True</NoPackageAnalysis>
 		<PackageOutputPath>$(OutputDirectory)</PackageOutputPath>
