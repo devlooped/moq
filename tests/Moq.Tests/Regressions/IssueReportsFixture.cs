@@ -4026,6 +4026,34 @@ namespace Moq.Tests.Regressions
 
 #endregion
 
+#region #1314
+
+		public class Issue1314
+		{
+			[Fact]
+			public void Verify_protected_generic_non_void_method_using_exactParameterMatch_overload_uses_provided_generic_type_arguments()
+			{
+				var mock = new Mock<C>();
+
+				_ = mock.Object.InvokeMethod<int>();
+				_ = mock.Object.InvokeMethod<bool>();
+				_ = mock.Object.InvokeMethod<int>();
+
+				mock.Protected().Verify<string>("Method", new Type[] { typeof(float) }, Times.Never(), true);
+				mock.Protected().Verify<string>("Method", new Type[] { typeof(bool) }, Times.Once(), true);
+				mock.Protected().Verify<string>("Method", new Type[] { typeof(int) }, Times.Exactly(2), true);
+			}
+
+			public abstract class C
+			{
+				protected abstract string Method<T>();
+
+				public string InvokeMethod<T>() => Method<T>();
+			}
+		}
+
+#endregion
+
 		// Old @ Google Code
 
 #region #47

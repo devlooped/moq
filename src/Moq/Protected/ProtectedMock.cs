@@ -253,7 +253,7 @@ namespace Moq.Protected
 		public void Verify<TResult>(string methodName, Type[] genericTypeArguments, Times times, bool exactParameterMatch, params object[] args)
 		{
 			Guard.NotNull(genericTypeArguments, nameof(genericTypeArguments));
-			this.InternalVerify<TResult>(methodName, null, times, exactParameterMatch, args);
+			this.InternalVerify<TResult>(methodName, genericTypeArguments, times, exactParameterMatch, args);
 		}
 
 		private void InternalVerify<TResult>(string methodName, Type[] genericTypeArguments, Times times, bool exactParameterMatch, params object[] args)
