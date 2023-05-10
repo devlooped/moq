@@ -326,8 +326,24 @@ namespace Moq.Protected
 					.Select(m => m.MakeGenericMethod(genericTypeArguments));
 			}
 
-			return methods
-				.SingleOrDefault(m => m.GetParameterTypes().CompareTo(argTypes, exact, considerTypeMatchers: false));
+			methods = methods.Where(m => m.GetParameterTypes().CompareTo(argTypes, exact, considerTypeMatchers: false));
+
+			if (methods.Count() < 2)
+			{
+				return methods.FirstOrDefault();
+			}
+
+			for (Type type = typeof(T); type != typeof(object); type = type.BaseType)
+			{
+				var method = methods.SingleOrDefault(m => m.DeclaringType == typeof(T));
+
+				if (method != null)
+				{
+					return method;
+				}
+			}
+
+			return null;
 		}
 
 		private static Expression<Func<T, TResult>> GetMethodCall<TResult>(MethodInfo method, object[] args)
@@ -543,7 +559,7 @@ namespace Moq.Protected
 					}
 					return expression;
 				}
-				
+
 				if (IsItRefAny(expression))
 				{
 					return expression;

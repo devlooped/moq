@@ -7,6 +7,10 @@ The format is loosely based on [Keep a Changelog](http://keepachangelog.com/en/1
 
 ## Unreleased
 
+#### Fixed
+
+* mock.Protected().Setup<int>("Foo") fails if base implementation of the method is hidden in the derived class (#1341)
+
 #### Added
 
 * `Mock<T>.RaiseAsync` method for raising "async" events, i.e. events that use a `Func<..., Task>` or `Func<..., ValueTask>` delegate. (@stakx, #1313)
