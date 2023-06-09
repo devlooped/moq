@@ -5,11 +5,22 @@ init:
 
 environment:
   MSBUILD_LOGGER: C:\Program Files\AppVeyor\BuildAgent\Appveyor.MSBuildLogger.dll
+  SN_EXE: C:\Program Files (x86)\Microsoft SDKs\Windows\v10.0A\bin\NETFX 4.7 Tools\x64\sn.exe
+  SNK_FILE: Moq.snk
+  FSHARPTYPES_DLL: .\tests\Moq.Tests\bin\Release\net472\Moq.Tests.FSharpTypes.dll
 
 build_script:
-  - msbuild Moq.sln /r /t:Build;Test;Pack /logger:"%MSBUILD_LOGGER%"
+  - dotnet restore Moq.sln # --logger:"%MSBUILD_LOGGER%"
+  - dotnet build Moq.sln --configuration Release --no-restore # --logger:"%MSBUILD_LOGGER%"
 
-test: off
+before_test:
+  - call "%SN_EXE%" -R %FSHARPTYPES_DLL% %SNK_FILE%
+
+test_script:
+  - dotnet test --no-build --configuration Release .\tests\Moq.Tests\Moq.Tests.csproj # --logger:"%MSBUILD_LOGGER%"
+
+after_test:
+  - dotnet pack Moq.sln --no-build --no-restore --configuration Release --output out # --logger:"%MSBUILD_LOGGER%"
 
 deploy:
   - provider: NuGet
