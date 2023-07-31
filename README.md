@@ -119,6 +119,7 @@ And to all our sponsors!
 [![SandRock](https://raw.githubusercontent.com/devlooped/sponsors/main/.github/avatars/sandrock.png "SandRock")](https://github.com/sandrock)
 [![Eric C](https://raw.githubusercontent.com/devlooped/sponsors/main/.github/avatars/eeseewy.png "Eric C")](https://github.com/eeseewy)
 [![Andy Gocke](https://raw.githubusercontent.com/devlooped/sponsors/main/.github/avatars/agocke.png "Andy Gocke")](https://github.com/agocke)
+[![Torutek](https://avatars.githubusercontent.com/u/70122437?s=38&v=4 "Torutek")](https://github.com/torutek)
 
 
 <!-- https://github.com/devlooped/sponsors/raw/main/sponsors.md -->
