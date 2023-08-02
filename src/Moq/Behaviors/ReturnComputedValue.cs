@@ -6,20 +6,62 @@ using System.Diagnostics;
 
 namespace Moq.Behaviors
 {
-	internal sealed class ReturnComputedValue : Behavior
-	{
-		private readonly Func<IInvocation, object> valueFactory;
 
-		public ReturnComputedValue(Func<IInvocation, object> valueFactory)
-		{
-			Debug.Assert(valueFactory != null);
+    /* Unmerged change from project 'Moq(netstandard2.0)'
+    Before:
+        internal sealed class ReturnComputedValue : Behavior
+    After:
+        sealed class ReturnComputedValue : Behavior
+    */
 
-			this.valueFactory = valueFactory;
-		}
+    /* Unmerged change from project 'Moq(netstandard2.1)'
+    Before:
+        internal sealed class ReturnComputedValue : Behavior
+    After:
+        sealed class ReturnComputedValue : Behavior
+    */
 
-		public override void Execute(Invocation invocation)
-		{
-			invocation.ReturnValue = this.valueFactory.Invoke(invocation);
-		}
-	}
+    /* Unmerged change from project 'Moq(net6.0)'
+    Before:
+        internal sealed class ReturnComputedValue : Behavior
+    After:
+        sealed class ReturnComputedValue : Behavior
+    */
+    sealed class ReturnComputedValue : Behavior
+
+    /* Unmerged change from project 'Moq(netstandard2.0)'
+    Before:
+            private readonly Func<IInvocation, object> valueFactory;
+    After:
+            readonly Func<IInvocation, object> valueFactory;
+    */
+
+    /* Unmerged change from project 'Moq(netstandard2.1)'
+    Before:
+            private readonly Func<IInvocation, object> valueFactory;
+    After:
+            readonly Func<IInvocation, object> valueFactory;
+    */
+
+    /* Unmerged change from project 'Moq(net6.0)'
+    Before:
+            private readonly Func<IInvocation, object> valueFactory;
+    After:
+            readonly Func<IInvocation, object> valueFactory;
+    */
+    {
+        readonly Func<IInvocation, object> valueFactory;
+
+        public ReturnComputedValue(Func<IInvocation, object> valueFactory)
+        {
+            Debug.Assert(valueFactory != null);
+
+            this.valueFactory = valueFactory;
+        }
+
+        public override void Execute(Invocation invocation)
+        {
+            invocation.ReturnValue = this.valueFactory.Invoke(invocation);
+        }
+    }
 }

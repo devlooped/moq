@@ -17,250 +17,292 @@ using Moq.Properties;
 
 namespace Moq
 {
-	/// <summary>
-	/// Exception thrown by mocks when they are not properly set up,
-	/// when setups are not matched, when verification fails, etc.
-	/// </summary>
-	/// <remarks>
-	/// A distinct exception type is provided so that exceptions
-	/// thrown by a mock can be distinguished from other exceptions
-	/// that might be thrown in tests.
-	/// <para>
-	/// Moq does not provide a richer hierarchy of exception types, as
-	/// tests typically should <em>not</em> catch or expect exceptions
-	/// from mocks. These are typically the result of changes
-	/// in the tested class or its collaborators' implementation, and
-	/// result in fixes in the mock setup so that they disappear and
-	/// allow the test to pass.
-	/// </para>
-	/// </remarks>
-	[Serializable]
-	public class MockException : Exception
-	{
-		/// <summary>
-		///   Returns the exception to be thrown when a setup has been invoked an incorrect (unexpected) number of times.
-		/// </summary>
-		internal static MockException IncorrectNumberOfCalls(MethodCall setup, Times times, int invocationCount)
-		{
-			var message = new StringBuilder();
-			message.AppendLine(setup.FailMessage ?? "")
-			       .Append(times.GetExceptionMessage(invocationCount))
-			       .AppendLine(setup.Expression.ToStringFixed());
+    /// <summary>
+    /// Exception thrown by mocks when they are not properly set up,
+    /// when setups are not matched, when verification fails, etc.
+    /// </summary>
+    /// <remarks>
+    /// A distinct exception type is provided so that exceptions
+    /// thrown by a mock can be distinguished from other exceptions
+    /// that might be thrown in tests.
+    /// <para>
+    /// Moq does not provide a richer hierarchy of exception types, as
+    /// tests typically should <em>not</em> catch or expect exceptions
+    /// from mocks. These are typically the result of changes
+    /// in the tested class or its collaborators' implementation, and
+    /// result in fixes in the mock setup so that they disappear and
+    /// allow the test to pass.
+    /// </para>
+    /// </remarks>
+    [Serializable]
+    public class MockException : Exception
+    {
+        /// <summary>
+        ///   Returns the exception to be thrown when a setup has been invoked an incorrect (unexpected) number of times.
+        /// </summary>
+        internal static MockException IncorrectNumberOfCalls(MethodCall setup, Times times, int invocationCount)
+        {
+            var message = new StringBuilder();
+            message.AppendLine(setup.FailMessage ?? "")
+                   .Append(times.GetExceptionMessage(invocationCount))
+                   .AppendLine(setup.Expression.ToStringFixed());
 
-			return new MockException(MockExceptionReasons.IncorrectNumberOfCalls, message.ToString());
-		}
+            return new MockException(MockExceptionReasons.IncorrectNumberOfCalls, message.ToString());
+        }
 
-		/// <summary>
-		///   Returns the exception to be thrown when <see cref="Mock.Verify"/> finds no invocations (or the wrong number of invocations) that match the specified expectation.
-		/// </summary>
-		internal static MockException NoMatchingCalls(
-			Mock rootMock,
-			LambdaExpression expression,
-			string failMessage,
-			Times times,
-			int callCount)
-		{
-			var message = new StringBuilder();
-			message.AppendLine(failMessage ?? "")
-			       .Append(times.GetExceptionMessage(callCount))
-			       .AppendLine(expression.PartialMatcherAwareEval().ToStringFixed())
-			       .AppendLine()
-			       .AppendLine(Resources.PerformedInvocations)
-			       .AppendLine();
+        /// <summary>
+        ///   Returns the exception to be thrown when <see cref="Mock.Verify"/> finds no invocations (or the wrong number of invocations) that match the specified expectation.
+        /// </summary>
+        internal static MockException NoMatchingCalls(
+            Mock rootMock,
+            LambdaExpression expression,
+            string failMessage,
+            Times times,
+            int callCount)
+        {
+            var message = new StringBuilder();
+            message.AppendLine(failMessage ?? "")
+                   .Append(times.GetExceptionMessage(callCount))
+                   .AppendLine(expression.PartialMatcherAwareEval().ToStringFixed())
+                   .AppendLine()
+                   .AppendLine(Resources.PerformedInvocations)
+                   .AppendLine();
 
-			var visitedMocks = new HashSet<Mock>();
+            var visitedMocks = new HashSet<Mock>();
 
-			var mocks = new Queue<Mock>();
-			mocks.Enqueue(rootMock);
+            var mocks = new Queue<Mock>();
+            mocks.Enqueue(rootMock);
 
-			while (mocks.Any())
-			{
-				var mock = mocks.Dequeue();
+            while (mocks.Any())
+            {
+                var mock = mocks.Dequeue();
 
-				if (visitedMocks.Contains(mock)) continue;
-				visitedMocks.Add(mock);
+                if (visitedMocks.Contains(mock)) continue;
+                visitedMocks.Add(mock);
 
-				message.AppendLine(mock == rootMock ? $"   {mock} ({expression.Parameters[0].Name}):"
-					                                : $"   {mock}:");
+                message.AppendLine(mock == rootMock ? $"   {mock} ({expression.Parameters[0].Name}):"
+                                                    : $"   {mock}:");
 
-				var invocations = mock.MutableInvocations.ToArray();
-				if (invocations.Any())
-				{
-					message.AppendLine();
-					foreach (var invocation in invocations)
-					{
-						message.Append($"      {invocation}");
+                var invocations = mock.MutableInvocations.ToArray();
+                if (invocations.Any())
+                {
+                    message.AppendLine();
+                    foreach (var invocation in invocations)
+                    {
+                        message.Append($"      {invocation}");
 
-						if (invocation.Method.ReturnType != typeof(void) && Awaitable.TryGetResultRecursive(invocation.ReturnValue) is IMocked mocked)
-						{
-							var innerMock = mocked.Mock;
-							mocks.Enqueue(innerMock);
-							message.Append($"  => {innerMock}");
-						}
+                        if (invocation.Method.ReturnType != typeof(void) && Awaitable.TryGetResultRecursive(invocation.ReturnValue) is IMocked mocked)
+                        {
+                            var innerMock = mocked.Mock;
+                            mocks.Enqueue(innerMock);
+                            message.Append($"  => {innerMock}");
+                        }
 
-						message.AppendLine();
-					}
-				}
-				else
-				{
-					message.AppendLine($"   {Resources.NoInvocationsPerformed}");
-				}
+                        message.AppendLine();
+                    }
+                }
+                else
+                {
+                    message.AppendLine($"   {Resources.NoInvocationsPerformed}");
+                }
 
-				message.AppendLine();
-			}
+                message.AppendLine();
+            }
 
-			return new MockException(MockExceptionReasons.NoMatchingCalls, message.TrimEnd().AppendLine().ToString());
-		}
+            return new MockException(MockExceptionReasons.NoMatchingCalls, message.TrimEnd().AppendLine().ToString());
+        }
 
-		/// <summary>
-		///   Returns the exception to be thrown when a strict mock has no setup corresponding to the specified invocation.
-		/// </summary>
-		internal static MockException NoSetup(Invocation invocation)
-		{
-			return new MockException(
-				MockExceptionReasons.NoSetup,
-				string.Format(
-					CultureInfo.CurrentCulture,
-					Resources.MockExceptionMessage,
-					invocation.ToString(),
-					MockBehavior.Strict,
-					Resources.NoSetup));
-		}
+        /// <summary>
+        ///   Returns the exception to be thrown when a strict mock has no setup corresponding to the specified invocation.
+        /// </summary>
+        internal static MockException NoSetup(Invocation invocation)
+        {
+            return new MockException(
+                MockExceptionReasons.NoSetup,
+                string.Format(
+                    CultureInfo.CurrentCulture,
+                    Resources.MockExceptionMessage,
+                    invocation.ToString(),
+                    MockBehavior.Strict,
+                    Resources.NoSetup));
+        }
 
-		/// <summary>
-		///   Returns the exception to be thrown when a strict mock has no setup that provides a return value for the specified invocation.
-		/// </summary>
-		internal static MockException ReturnValueRequired(Invocation invocation)
-		{
-			return new MockException(
-				MockExceptionReasons.ReturnValueRequired,
-				string.Format(
-					CultureInfo.CurrentCulture,
-					Resources.MockExceptionMessage,
-					invocation.ToString(),
-					MockBehavior.Strict,
-					Resources.ReturnValueRequired));
-		}
+        /// <summary>
+        ///   Returns the exception to be thrown when a strict mock has no setup that provides a return value for the specified invocation.
+        /// </summary>
+        internal static MockException ReturnValueRequired(Invocation invocation)
+        {
+            return new MockException(
+                MockExceptionReasons.ReturnValueRequired,
+                string.Format(
+                    CultureInfo.CurrentCulture,
+                    Resources.MockExceptionMessage,
+                    invocation.ToString(),
+                    MockBehavior.Strict,
+                    Resources.ReturnValueRequired));
+        }
 
-		/// <summary>
-		///   Returns the exception to be thrown when a setup was not matched.
-		/// </summary>
-		internal static MockException UnmatchedSetup(Setup setup)
-		{
-			return new MockException(
-				MockExceptionReasons.UnmatchedSetup,
-				string.Format(
-					CultureInfo.CurrentCulture,
-					Resources.UnmatchedSetup,
-					setup));
-		}
+        /// <summary>
+        ///   Returns the exception to be thrown when a setup was not matched.
+        /// </summary>
+        internal static MockException UnmatchedSetup(Setup setup)
+        {
+            return new MockException(
+                MockExceptionReasons.UnmatchedSetup,
+                string.Format(
+                    CultureInfo.CurrentCulture,
+                    Resources.UnmatchedSetup,
+                    setup));
+        }
 
-		internal static MockException FromInnerMockOf(ISetup setup, MockException error)
-		{
-			var message = new StringBuilder();
+        internal static MockException FromInnerMockOf(ISetup setup, MockException error)
+        {
+            var message = new StringBuilder();
 
-			message.AppendLine(string.Format(CultureInfo.CurrentCulture, Resources.VerificationErrorsOfInnerMock, setup)).TrimEnd().AppendLine()
-			       .AppendLine();
+            message.AppendLine(string.Format(CultureInfo.CurrentCulture, Resources.VerificationErrorsOfInnerMock, setup)).TrimEnd().AppendLine()
+                   .AppendLine();
 
-			message.AppendIndented(error.Message, count: 3);
+            message.AppendIndented(error.Message, count: 3);
 
-			return new MockException(error.Reasons, message.ToString());
-		}
+            return new MockException(error.Reasons, message.ToString());
+        }
 
-		/// <summary>
-		///   Returns an exception whose message is the concatenation of the given <paramref name="errors"/>' messages
-		///   and whose reason(s) is the combination of the given <paramref name="errors"/>' reason(s).
-		///   Used by <see cref="MockFactory.VerifyMocks(Action{Mock})"/> when it finds one or more mocks with verification errors.
-		/// </summary>
-		internal static MockException Combined(IEnumerable<MockException> errors, string preamble)
-		{
-			Debug.Assert(errors != null);
-			Debug.Assert(errors.Any());
+        /// <summary>
+        ///   Returns an exception whose message is the concatenation of the given <paramref name="errors"/>' messages
+        ///   and whose reason(s) is the combination of the given <paramref name="errors"/>' reason(s).
+        ///   Used by <see cref="MockFactory.VerifyMocks(Action{Mock})"/> when it finds one or more mocks with verification errors.
+        /// </summary>
+        internal static MockException Combined(IEnumerable<MockException> errors, string preamble)
+        {
+            Debug.Assert(errors != null);
+            Debug.Assert(errors.Any());
 
-			var reasons = default(MockExceptionReasons);
-			var message = new StringBuilder();
+            var reasons = default(MockExceptionReasons);
+            var message = new StringBuilder();
 
-			if (preamble != null)
-			{
-				message.Append(preamble).TrimEnd().AppendLine()
-				       .AppendLine();
-			}
+            if (preamble != null)
+            {
+                message.Append(preamble).TrimEnd().AppendLine()
+                       .AppendLine();
+            }
 
-			foreach (var error in errors)
-			{
-				reasons |= error.Reasons;
-				message.AppendIndented(error.Message, count: 3).TrimEnd().AppendLine()
-				       .AppendLine();
-			}
+            foreach (var error in errors)
+            {
+                reasons |= error.Reasons;
+                message.AppendIndented(error.Message, count: 3).TrimEnd().AppendLine()
+                       .AppendLine();
+            }
 
-			return new MockException(reasons, message.TrimEnd().ToString());
-		}
+            return new MockException(reasons, message.TrimEnd().ToString());
+        }
 
-		/// <summary>
-		///   Returns the exception to be thrown when <see cref="Mock.VerifyNoOtherCalls(Mock)"/> finds invocations that have not been verified.
-		/// </summary>
-		internal static MockException UnverifiedInvocations(Mock mock, IEnumerable<Invocation> invocations)
-		{
-			var message = new StringBuilder();
+        /// <summary>
+        ///   Returns the exception to be thrown when <see cref="Mock.VerifyNoOtherCalls(Mock)"/> finds invocations that have not been verified.
+        /// </summary>
+        internal static MockException UnverifiedInvocations(Mock mock, IEnumerable<Invocation> invocations)
+        {
+            var message = new StringBuilder();
 
-			message.AppendLine(string.Format(CultureInfo.CurrentCulture, Resources.UnverifiedInvocations, mock)).TrimEnd().AppendLine()
-			       .AppendLine();
+            message.AppendLine(string.Format(CultureInfo.CurrentCulture, Resources.UnverifiedInvocations, mock)).TrimEnd().AppendLine()
+                   .AppendLine();
 
-			foreach (var invocation in invocations)
-			{
-				message.AppendIndented(invocation.ToString(), count: 3).TrimEnd().AppendLine();
-			}
+            foreach (var invocation in invocations)
+            {
+                message.AppendIndented(invocation.ToString(), count: 3).TrimEnd().AppendLine();
+            }
 
-			return new MockException(MockExceptionReasons.UnverifiedInvocations, message.TrimEnd().ToString());
-		}
+            return new MockException(MockExceptionReasons.UnverifiedInvocations, message.TrimEnd().ToString());
 
-		private readonly MockExceptionReasons reasons;
+            /* Unmerged change from project 'Moq(netstandard2.0)'
+            Before:
+                    private readonly MockExceptionReasons reasons;
+            After:
+                    readonly MockExceptionReasons reasons;
+            */
 
-		private MockException(MockExceptionReasons reasons, string message)
-			: base(message)
-		{
-			this.reasons = reasons;
-		}
+            /* Unmerged change from project 'Moq(netstandard2.1)'
+            Before:
+                    private readonly MockExceptionReasons reasons;
+            After:
+                    readonly MockExceptionReasons reasons;
+            */
 
-		internal MockExceptionReasons Reasons => this.reasons;
+            /* Unmerged change from project 'Moq(net6.0)'
+            Before:
+                    private readonly MockExceptionReasons reasons;
+            After:
+                    readonly MockExceptionReasons reasons;
+            */
+        }
 
-		/// <summary>
-		/// Indicates whether this exception is a verification fault raised by Verify()
-		/// </summary>
-		public bool IsVerificationError
-		{
-			get
-			{
-				const MockExceptionReasons verificationErrorMask = MockExceptionReasons.NoMatchingCalls
-				                                                 | MockExceptionReasons.UnmatchedSetup
-				                                                 | MockExceptionReasons.UnverifiedInvocations;
-				return (this.reasons & verificationErrorMask) != 0;
-			}
-		}
+        readonly MockExceptionReasons reasons;
 
-		/// <summary>
-		/// Supports the serialization infrastructure.
-		/// </summary>
-		/// <param name="info">Serialization information.</param>
-		/// <param name="context">Streaming context.</param>
-		protected MockException(
-		  System.Runtime.Serialization.SerializationInfo info,
-		  System.Runtime.Serialization.StreamingContext context)
-			: base(info, context)
-		{
-			this.reasons = (MockExceptionReasons)info.GetValue(nameof(this.reasons), typeof(MockExceptionReasons));
-		}
 
-		/// <summary>
-		/// Supports the serialization infrastructure.
-		/// </summary>
-		/// <param name="info">Serialization information.</param>
-		/// <param name="context">Streaming context.</param>
-		[SecurityCritical]
-		public override void GetObjectData(SerializationInfo info, StreamingContext context)
-		{
-			base.GetObjectData(info, context);
-			info.AddValue(nameof(this.reasons), this.reasons);
-		}
-	}
+        /* Unmerged change from project 'Moq(netstandard2.0)'
+        Before:
+                private MockException(MockExceptionReasons reasons, string message)
+        After:
+                MockException(MockExceptionReasons reasons, string message)
+        */
+
+        /* Unmerged change from project 'Moq(netstandard2.1)'
+        Before:
+                private MockException(MockExceptionReasons reasons, string message)
+        After:
+                MockException(MockExceptionReasons reasons, string message)
+        */
+
+        /* Unmerged change from project 'Moq(net6.0)'
+        Before:
+                private MockException(MockExceptionReasons reasons, string message)
+        After:
+                MockException(MockExceptionReasons reasons, string message)
+        */
+        MockException(MockExceptionReasons reasons, string message)
+            : base(message)
+        {
+            this.reasons = reasons;
+        }
+
+        internal MockExceptionReasons Reasons => this.reasons;
+
+        /// <summary>
+        /// Indicates whether this exception is a verification fault raised by Verify()
+        /// </summary>
+        public bool IsVerificationError
+        {
+            get
+            {
+                const MockExceptionReasons verificationErrorMask = MockExceptionReasons.NoMatchingCalls
+                                                                 | MockExceptionReasons.UnmatchedSetup
+                                                                 | MockExceptionReasons.UnverifiedInvocations;
+                return (this.reasons & verificationErrorMask) != 0;
+            }
+        }
+
+        /// <summary>
+        /// Supports the serialization infrastructure.
+        /// </summary>
+        /// <param name="info">Serialization information.</param>
+        /// <param name="context">Streaming context.</param>
+        protected MockException(
+          System.Runtime.Serialization.SerializationInfo info,
+          System.Runtime.Serialization.StreamingContext context)
+            : base(info, context)
+        {
+            this.reasons = (MockExceptionReasons)info.GetValue(nameof(this.reasons), typeof(MockExceptionReasons));
+        }
+
+        /// <summary>
+        /// Supports the serialization infrastructure.
+        /// </summary>
+        /// <param name="info">Serialization information.</param>
+        /// <param name="context">Streaming context.</param>
+        [SecurityCritical]
+        public override void GetObjectData(SerializationInfo info, StreamingContext context)
+        {
+            base.GetObjectData(info, context);
+            info.AddValue(nameof(this.reasons), this.reasons);
+        }
+    }
 }

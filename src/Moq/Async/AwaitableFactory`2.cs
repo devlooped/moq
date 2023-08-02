@@ -9,58 +9,79 @@ using System.Linq.Expressions;
 
 namespace Moq.Async
 {
-	/// <summary>
-	///   Abstract base class that facilitates type-safe implementation of <see cref="IAwaitableFactory"/>
-	///   for awaitables that produce a result when awaited.
-	/// </summary>
-	internal abstract class AwaitableFactory<TAwaitable, TResult> : IAwaitableFactory
-	{
-		public Type ResultType => typeof(TResult);
 
-		public abstract TAwaitable CreateCompleted(TResult result);
+    /* Unmerged change from project 'Moq(netstandard2.0)'
+    Before:
+        internal abstract class AwaitableFactory<TAwaitable, TResult> : IAwaitableFactory
+    After:
+        abstract class AwaitableFactory<TAwaitable, TResult> : IAwaitableFactory
+    */
 
-		object IAwaitableFactory.CreateCompleted(object result)
-		{
-			Debug.Assert(result is TResult || result == null);
+    /* Unmerged change from project 'Moq(netstandard2.1)'
+    Before:
+        internal abstract class AwaitableFactory<TAwaitable, TResult> : IAwaitableFactory
+    After:
+        abstract class AwaitableFactory<TAwaitable, TResult> : IAwaitableFactory
+    */
 
-			return this.CreateCompleted((TResult)result);
-		}
+    /* Unmerged change from project 'Moq(net6.0)'
+    Before:
+        internal abstract class AwaitableFactory<TAwaitable, TResult> : IAwaitableFactory
+    After:
+        abstract class AwaitableFactory<TAwaitable, TResult> : IAwaitableFactory
+    */
+    /// <summary>
+    ///   Abstract base class that facilitates type-safe implementation of <see cref="IAwaitableFactory"/>
+    ///   for awaitables that produce a result when awaited.
+    /// </summary>
+    abstract class AwaitableFactory<TAwaitable, TResult> : IAwaitableFactory
+    {
+        public Type ResultType => typeof(TResult);
 
-		public abstract TAwaitable CreateFaulted(Exception exception);
+        public abstract TAwaitable CreateCompleted(TResult result);
 
-		object IAwaitableFactory.CreateFaulted(Exception exception)
-		{
-			Debug.Assert(exception != null);
+        object IAwaitableFactory.CreateCompleted(object result)
+        {
+            Debug.Assert(result is TResult || result == null);
 
-			return this.CreateFaulted(exception);
-		}
+            return this.CreateCompleted((TResult)result);
+        }
 
-		public abstract TAwaitable CreateFaulted(IEnumerable<Exception> exceptions);
+        public abstract TAwaitable CreateFaulted(Exception exception);
 
-		object IAwaitableFactory.CreateFaulted(IEnumerable<Exception> exceptions)
-		{
-			Debug.Assert(exceptions != null);
-			Debug.Assert(exceptions.Any());
+        object IAwaitableFactory.CreateFaulted(Exception exception)
+        {
+            Debug.Assert(exception != null);
 
-			return this.CreateFaulted(exceptions);
-		}
+            return this.CreateFaulted(exception);
+        }
 
-		public abstract bool TryGetResult(TAwaitable awaitable, out TResult result);
+        public abstract TAwaitable CreateFaulted(IEnumerable<Exception> exceptions);
 
-		public abstract Expression CreateResultExpression(Expression awaitableExpression);
+        object IAwaitableFactory.CreateFaulted(IEnumerable<Exception> exceptions)
+        {
+            Debug.Assert(exceptions != null);
+            Debug.Assert(exceptions.Any());
 
-		bool IAwaitableFactory.TryGetResult(object awaitable, out object result)
-		{
-			Debug.Assert(awaitable is TAwaitable);
+            return this.CreateFaulted(exceptions);
+        }
 
-			if (this.TryGetResult((TAwaitable)awaitable, out var r))
-			{
-				result = r;
-				return true;
-			}
+        public abstract bool TryGetResult(TAwaitable awaitable, out TResult result);
 
-			result = null;
-			return false;
-		}
-	}
+        public abstract Expression CreateResultExpression(Expression awaitableExpression);
+
+        bool IAwaitableFactory.TryGetResult(object awaitable, out object result)
+        {
+            Debug.Assert(awaitable is TAwaitable);
+
+            if (this.TryGetResult((TAwaitable)awaitable, out var r))
+            {
+                result = r;
+                return true;
+            }
+
+            result = null;
+            return false;
+        }
+    }
 }

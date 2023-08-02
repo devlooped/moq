@@ -5,37 +5,58 @@ using System;
 
 namespace Moq
 {
-	internal readonly struct Pair<T1, T2> : IEquatable<Pair<T1, T2>>
-	{
-		public readonly T1 Item1;
-		public readonly T2 Item2;
 
-		public Pair(T1 item1, T2 item2)
-		{
-			this.Item1 = item1;
-			this.Item2 = item2;
-		}
+    /* Unmerged change from project 'Moq(netstandard2.0)'
+    Before:
+        internal readonly struct Pair<T1, T2> : IEquatable<Pair<T1, T2>>
+    After:
+        readonly struct Pair<T1, T2> : IEquatable<Pair<T1, T2>>
+    */
 
-		public void Deconstruct(out T1 item1, out T2 item2)
-		{
-			item1 = this.Item1;
-			item2 = this.Item2;
-		}
+    /* Unmerged change from project 'Moq(netstandard2.1)'
+    Before:
+        internal readonly struct Pair<T1, T2> : IEquatable<Pair<T1, T2>>
+    After:
+        readonly struct Pair<T1, T2> : IEquatable<Pair<T1, T2>>
+    */
 
-		public bool Equals(Pair<T1, T2> other)
-		{
-			return object.Equals(this.Item1, other.Item1)
-				&& object.Equals(this.Item2, other.Item2);
-		}
+    /* Unmerged change from project 'Moq(net6.0)'
+    Before:
+        internal readonly struct Pair<T1, T2> : IEquatable<Pair<T1, T2>>
+    After:
+        readonly struct Pair<T1, T2> : IEquatable<Pair<T1, T2>>
+    */
+    readonly struct Pair<T1, T2> : IEquatable<Pair<T1, T2>>
+    {
+        public readonly T1 Item1;
+        public readonly T2 Item2;
 
-		public override bool Equals(object obj)
-		{
-			return obj is Pair<T1, T2> other && this.Equals(other);
-		}
+        public Pair(T1 item1, T2 item2)
+        {
+            this.Item1 = item1;
+            this.Item2 = item2;
+        }
 
-		public override int GetHashCode()
-		{
-			return unchecked(1001 * this.Item1?.GetHashCode() ?? 101 + this.Item2?.GetHashCode() ?? 11);
-		}
-	}
+        public void Deconstruct(out T1 item1, out T2 item2)
+        {
+            item1 = this.Item1;
+            item2 = this.Item2;
+        }
+
+        public bool Equals(Pair<T1, T2> other)
+        {
+            return object.Equals(this.Item1, other.Item1)
+                && object.Equals(this.Item2, other.Item2);
+        }
+
+        public override bool Equals(object obj)
+        {
+            return obj is Pair<T1, T2> other && this.Equals(other);
+        }
+
+        public override int GetHashCode()
+        {
+            return unchecked(1001 * this.Item1?.GetHashCode() ?? 101 + this.Item2?.GetHashCode() ?? 11);
+        }
+    }
 }

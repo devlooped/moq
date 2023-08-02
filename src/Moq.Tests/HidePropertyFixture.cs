@@ -5,31 +5,31 @@ using Xunit;
 
 namespace Moq.Tests
 {
-	public class HidePropertyFixture
-	{
-		public class A
-		{
-			public string Prop { get; }
-		}
+    public class HidePropertyFixture
+    {
+        public class A
+        {
+            public string Prop { get; }
+        }
 
-		public class B : A
-		{
-			public new virtual int Prop { get; }
-		}
+        public class B : A
+        {
+            public new virtual int Prop { get; }
+        }
 
-		public class C : B
-		{
-		}
+        public class C : B
+        {
+        }
 
-		[Fact]
-		public void SetupsDerivedProperty()
-		{
-			var mock = new Mock<C>();
-			var value = 5;
+        [Fact]
+        public void SetupsDerivedProperty()
+        {
+            var mock = new Mock<C>();
+            var value = 5;
 
-			mock.Setup(m => m.Prop).Returns(value);
+            mock.Setup(m => m.Prop).Returns(value);
 
-			Assert.Equal(value, mock.Object.Prop);
-		}
-	}
+            Assert.Equal(value, mock.Object.Prop);
+        }
+    }
 }

@@ -6,26 +6,74 @@ using System.Diagnostics;
 
 namespace Moq.Matchers
 {
-	internal class RefMatcher : IMatcher
-	{
-		private readonly object reference;
-		private readonly bool referenceIsValueType;
 
-		public RefMatcher(object reference)
-		{
-			this.reference = reference;
-			this.referenceIsValueType = reference?.GetType().IsValueType ?? false;
-		}
+    /* Unmerged change from project 'Moq(netstandard2.0)'
+    Before:
+        internal class RefMatcher : IMatcher
+    After:
+        class RefMatcher : IMatcher
+    */
 
-		public bool Matches(object argument, Type parameterType)
-		{
-			return this.referenceIsValueType ? object.Equals(this.reference, argument)
-			                                 : object.ReferenceEquals(this.reference, argument);
-		}
+    /* Unmerged change from project 'Moq(netstandard2.1)'
+    Before:
+        internal class RefMatcher : IMatcher
+    After:
+        class RefMatcher : IMatcher
+    */
 
-		public void SetupEvaluatedSuccessfully(object value, Type parameterType)
-		{
-			Debug.Assert(this.Matches(value, parameterType));
-		}
-	}
+    /* Unmerged change from project 'Moq(net6.0)'
+    Before:
+        internal class RefMatcher : IMatcher
+    After:
+        class RefMatcher : IMatcher
+    */
+    class RefMatcher : IMatcher
+
+    /* Unmerged change from project 'Moq(netstandard2.0)'
+    Before:
+            private readonly object reference;
+            private readonly bool referenceIsValueType;
+    After:
+            readonly object reference;
+            readonly bool referenceIsValueType;
+    */
+
+    /* Unmerged change from project 'Moq(netstandard2.1)'
+    Before:
+            private readonly object reference;
+            private readonly bool referenceIsValueType;
+    After:
+            readonly object reference;
+            readonly bool referenceIsValueType;
+    */
+
+    /* Unmerged change from project 'Moq(net6.0)'
+    Before:
+            private readonly object reference;
+            private readonly bool referenceIsValueType;
+    After:
+            readonly object reference;
+            readonly bool referenceIsValueType;
+    */
+    {
+        readonly object reference;
+        readonly bool referenceIsValueType;
+
+        public RefMatcher(object reference)
+        {
+            this.reference = reference;
+            this.referenceIsValueType = reference?.GetType().IsValueType ?? false;
+        }
+
+        public bool Matches(object argument, Type parameterType)
+        {
+            return this.referenceIsValueType ? object.Equals(this.reference, argument)
+                                             : object.ReferenceEquals(this.reference, argument);
+        }
+
+        public void SetupEvaluatedSuccessfully(object value, Type parameterType)
+        {
+            Debug.Assert(this.Matches(value, parameterType));
+        }
+    }
 }

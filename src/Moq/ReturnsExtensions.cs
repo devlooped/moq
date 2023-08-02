@@ -11,351 +11,477 @@ using Moq.Properties;
 
 namespace Moq
 {
-	/// <summary>
-	/// Defines async extension methods on IReturns.
-	/// </summary>
-	[EditorBrowsable(EditorBrowsableState.Never)]
-	public static partial class ReturnsExtensions
-	{
-		/// <summary>
-		/// Specifies the value to return from an asynchronous method.
-		/// </summary>
-		/// <typeparam name="TMock">Mocked type.</typeparam>
-		/// <typeparam name="TResult">Type of the return value.</typeparam>
-		/// <param name="mock">Returns verb which represents the mocked type and the task of return type</param>
-		/// <param name="value">The value to return, or <see longword="null"/>.</param>
-		public static IReturnsResult<TMock> ReturnsAsync<TMock, TResult>(this IReturns<TMock, Task<TResult>> mock, TResult value) where TMock : class
-		{
-			return mock.ReturnsAsync(() => value);
-		}
+    /// <summary>
+    /// Defines async extension methods on IReturns.
+    /// </summary>
+    [EditorBrowsable(EditorBrowsableState.Never)]
+    public static partial class ReturnsExtensions
+    {
+        /// <summary>
+        /// Specifies the value to return from an asynchronous method.
+        /// </summary>
+        /// <typeparam name="TMock">Mocked type.</typeparam>
+        /// <typeparam name="TResult">Type of the return value.</typeparam>
+        /// <param name="mock">Returns verb which represents the mocked type and the task of return type</param>
+        /// <param name="value">The value to return, or <see longword="null"/>.</param>
+        public static IReturnsResult<TMock> ReturnsAsync<TMock, TResult>(this IReturns<TMock, Task<TResult>> mock, TResult value) where TMock : class
+        {
+            return mock.ReturnsAsync(() => value);
+        }
 
-		/// <summary>
-		/// Specifies the value to return from an asynchronous method.
-		/// </summary>
-		/// <typeparam name="TMock">Mocked type.</typeparam>
-		/// <typeparam name="TResult">Type of the return value.</typeparam>
-		/// <param name="mock">Returns verb which represents the mocked type and the task of return type</param>
-		/// <param name="value">The value to return, or <see longword="null"/>.</param>
-		public static IReturnsResult<TMock> ReturnsAsync<TMock, TResult>(this IReturns<TMock, ValueTask<TResult>> mock, TResult value) where TMock : class
-		{
-			return mock.ReturnsAsync(() => value);
-		}
+        /// <summary>
+        /// Specifies the value to return from an asynchronous method.
+        /// </summary>
+        /// <typeparam name="TMock">Mocked type.</typeparam>
+        /// <typeparam name="TResult">Type of the return value.</typeparam>
+        /// <param name="mock">Returns verb which represents the mocked type and the task of return type</param>
+        /// <param name="value">The value to return, or <see longword="null"/>.</param>
+        public static IReturnsResult<TMock> ReturnsAsync<TMock, TResult>(this IReturns<TMock, ValueTask<TResult>> mock, TResult value) where TMock : class
+        {
+            return mock.ReturnsAsync(() => value);
+        }
 
-		/// <summary>
-		/// Specifies a function that will calculate the value to return from the asynchronous method.
-		/// </summary>
-		/// <typeparam name="TMock">Mocked type.</typeparam>
-		/// <typeparam name="TResult">Type of the return value.</typeparam>
-		/// <param name="mock">Returns verb which represents the mocked type and the task of return type</param>
-		/// <param name="valueFunction">The function that will calculate the return value.</param>
-		public static IReturnsResult<TMock> ReturnsAsync<TMock, TResult>(this IReturns<TMock, Task<TResult>> mock, Func<TResult> valueFunction) where TMock : class
-		{
-			if (IsNullResult(valueFunction, typeof(TResult)))
-			{
-				return mock.ReturnsAsync(() => default);
-			}
+        /// <summary>
+        /// Specifies a function that will calculate the value to return from the asynchronous method.
+        /// </summary>
+        /// <typeparam name="TMock">Mocked type.</typeparam>
+        /// <typeparam name="TResult">Type of the return value.</typeparam>
+        /// <param name="mock">Returns verb which represents the mocked type and the task of return type</param>
+        /// <param name="valueFunction">The function that will calculate the return value.</param>
+        public static IReturnsResult<TMock> ReturnsAsync<TMock, TResult>(this IReturns<TMock, Task<TResult>> mock, Func<TResult> valueFunction) where TMock : class
+        {
+            if (IsNullResult(valueFunction, typeof(TResult)))
+            {
+                return mock.ReturnsAsync(() => default);
+            }
 
-			return mock.Returns(() => Task.FromResult(valueFunction()));
-		}
+            return mock.Returns(() => Task.FromResult(valueFunction()));
+        }
 
-		/// <summary>
-		/// Specifies a function that will calculate the value to return from the asynchronous method.
-		/// </summary>
-		/// <typeparam name="TMock">Mocked type.</typeparam>
-		/// <typeparam name="TResult">Type of the return value.</typeparam>
-		/// <param name="mock">Returns verb which represents the mocked type and the task of return type</param>
-		/// <param name="valueFunction">The function that will calculate the return value.</param>
-		public static IReturnsResult<TMock> ReturnsAsync<TMock, TResult>(this IReturns<TMock, ValueTask<TResult>> mock, Func<TResult> valueFunction) where TMock : class
-		{
-			if (IsNullResult(valueFunction, typeof(TResult)))
-			{
-				return mock.ReturnsAsync(() => default);
-			}
+        /// <summary>
+        /// Specifies a function that will calculate the value to return from the asynchronous method.
+        /// </summary>
+        /// <typeparam name="TMock">Mocked type.</typeparam>
+        /// <typeparam name="TResult">Type of the return value.</typeparam>
+        /// <param name="mock">Returns verb which represents the mocked type and the task of return type</param>
+        /// <param name="valueFunction">The function that will calculate the return value.</param>
+        public static IReturnsResult<TMock> ReturnsAsync<TMock, TResult>(this IReturns<TMock, ValueTask<TResult>> mock, Func<TResult> valueFunction) where TMock : class
+        {
+            if (IsNullResult(valueFunction, typeof(TResult)))
+            {
+                return mock.ReturnsAsync(() => default);
+            }
 
-			return mock.Returns(() => new ValueTask<TResult>(valueFunction()));
-		}
+            return mock.Returns(() => new ValueTask<TResult>(valueFunction()));
+        }
 
-		/// <summary>
-		/// Specifies the exception to throw when the asynchronous method is invoked.
-		/// </summary>
-		/// <typeparam name="TMock">Mocked type.</typeparam>
-		/// <param name="mock">Returns verb which represents the mocked type and the task return type</param>
-		/// <param name="exception">Exception instance to throw.</param>
-		public static IReturnsResult<TMock> ThrowsAsync<TMock>(this IReturns<TMock, Task> mock, Exception exception) where TMock : class
-		{
-			return mock.Returns(() =>
-			{
-				var tcs = new TaskCompletionSource<bool>();
-				tcs.SetException(exception);
-				return tcs.Task;
-			});
-		}
-		
-		/// <summary>
-		/// Specifies the exception to throw when the asynchronous method is invoked.
-		/// </summary>
-		/// <typeparam name="TMock">Mocked type.</typeparam>
-		/// <param name="mock">Returns verb which represents the mocked type and the valuetask return type</param>
-		/// <param name="exception">Exception instance to throw.</param>
-		public static IReturnsResult<TMock> ThrowsAsync<TMock>(this IReturns<TMock, ValueTask> mock, Exception exception) where TMock : class
-		{
-			return mock.Returns(() =>
-			{
-				var tcs = new TaskCompletionSource<bool>();
-				tcs.SetException(exception);
-				return new ValueTask(tcs.Task);
-			});
-		}
+        /// <summary>
+        /// Specifies the exception to throw when the asynchronous method is invoked.
+        /// </summary>
+        /// <typeparam name="TMock">Mocked type.</typeparam>
+        /// <param name="mock">Returns verb which represents the mocked type and the task return type</param>
+        /// <param name="exception">Exception instance to throw.</param>
+        public static IReturnsResult<TMock> ThrowsAsync<TMock>(this IReturns<TMock, Task> mock, Exception exception) where TMock : class
+        {
+            return mock.Returns(() =>
+            {
+                var tcs = new TaskCompletionSource<bool>();
+                tcs.SetException(exception);
+                return tcs.Task;
+            });
+        }
 
-		/// <summary>
-		/// Specifies the exception to throw when the asynchronous method is invoked.
-		/// </summary>
-		/// <typeparam name="TMock">Mocked type.</typeparam>
-		/// <typeparam name="TResult">Type of the return value.</typeparam>
-		/// <param name="mock">Returns verb which represents the mocked type and the task of return type</param>
-		/// <param name="exception">Exception instance to throw.</param>
-		public static IReturnsResult<TMock> ThrowsAsync<TMock, TResult>(this IReturns<TMock, Task<TResult>> mock, Exception exception) where TMock : class
-		{
-			return mock.Returns(() =>
-			{
-				var tcs = new TaskCompletionSource<TResult>();
-				tcs.SetException(exception);
-				return tcs.Task;
-			});
-		}
+        /// <summary>
+        /// Specifies the exception to throw when the asynchronous method is invoked.
+        /// </summary>
+        /// <typeparam name="TMock">Mocked type.</typeparam>
+        /// <param name="mock">Returns verb which represents the mocked type and the valuetask return type</param>
+        /// <param name="exception">Exception instance to throw.</param>
+        public static IReturnsResult<TMock> ThrowsAsync<TMock>(this IReturns<TMock, ValueTask> mock, Exception exception) where TMock : class
+        {
+            return mock.Returns(() =>
+            {
+                var tcs = new TaskCompletionSource<bool>();
+                tcs.SetException(exception);
+                return new ValueTask(tcs.Task);
+            });
+        }
 
-		/// <summary>
-		/// Specifies the exception to throw when the asynchronous method is invoked.
-		/// </summary>
-		/// <typeparam name="TMock">Mocked type.</typeparam>
-		/// <typeparam name="TResult">Type of the return value.</typeparam>
-		/// <param name="mock">Returns verb which represents the mocked type and the task of return type</param>
-		/// <param name="exception">Exception instance to throw.</param>
-		public static IReturnsResult<TMock> ThrowsAsync<TMock, TResult>(this IReturns<TMock, ValueTask<TResult>> mock, Exception exception) where TMock : class
-		{
-			return mock.Returns(() =>
-			{
-				var tcs = new TaskCompletionSource<TResult>();
-				tcs.SetException(exception);
-				return new ValueTask<TResult>(tcs.Task);
-			});
-		}
+        /// <summary>
+        /// Specifies the exception to throw when the asynchronous method is invoked.
+        /// </summary>
+        /// <typeparam name="TMock">Mocked type.</typeparam>
+        /// <typeparam name="TResult">Type of the return value.</typeparam>
+        /// <param name="mock">Returns verb which represents the mocked type and the task of return type</param>
+        /// <param name="exception">Exception instance to throw.</param>
+        public static IReturnsResult<TMock> ThrowsAsync<TMock, TResult>(this IReturns<TMock, Task<TResult>> mock, Exception exception) where TMock : class
+        {
+            return mock.Returns(() =>
+            {
+                var tcs = new TaskCompletionSource<TResult>();
+                tcs.SetException(exception);
+                return tcs.Task;
+            });
+        }
 
-		private static readonly Random Random = new Random();
+        /// <summary>
+        /// Specifies the exception to throw when the asynchronous method is invoked.
+        /// </summary>
+        /// <typeparam name="TMock">Mocked type.</typeparam>
+        /// <typeparam name="TResult">Type of the return value.</typeparam>
+        /// <param name="mock">Returns verb which represents the mocked type and the task of return type</param>
+        /// <param name="exception">Exception instance to throw.</param>
+        public static IReturnsResult<TMock> ThrowsAsync<TMock, TResult>(this IReturns<TMock, ValueTask<TResult>> mock, Exception exception) where TMock : class
+        {
+            return mock.Returns(() =>
+            {
+                var tcs = new TaskCompletionSource<TResult>();
+                tcs.SetException(exception);
+                return new ValueTask<TResult>(tcs.Task);
+            });
 
-		/// <summary>
-		/// Allows to specify the delayed return value of an asynchronous method.
-		/// </summary>
-		public static IReturnsResult<TMock> ReturnsAsync<TMock, TResult>(this IReturns<TMock, Task<TResult>> mock,
-			TResult value, TimeSpan delay) where TMock : class
-		{
-			return DelayedResult(mock, value, delay);
-		}
+            /* Unmerged change from project 'Moq(netstandard2.0)'
+            Before:
+                    private static readonly Random Random = new Random();
+            After:
+                    static readonly Random Random = new Random();
+            */
 
-		/// <summary>
-		/// Allows to specify the delayed return value of an asynchronous method.
-		/// </summary>
-		public static IReturnsResult<TMock> ReturnsAsync<TMock, TResult>(this IReturns<TMock, ValueTask<TResult>> mock,
-			TResult value, TimeSpan delay) where TMock : class
-		{
-			return DelayedResult(mock, value, delay);
-		}
+            /* Unmerged change from project 'Moq(netstandard2.1)'
+            Before:
+                    private static readonly Random Random = new Random();
+            After:
+                    static readonly Random Random = new Random();
+            */
 
-		/// <summary>
-		/// Allows to specify the delayed return value of an asynchronous method.
-		/// </summary>
-		public static IReturnsResult<TMock> ReturnsAsync<TMock, TResult>(this IReturns<TMock, Task<TResult>> mock,
-			TResult value, TimeSpan minDelay, TimeSpan maxDelay) where TMock : class
-		{
-			var delay = GetDelay(minDelay, maxDelay, Random);
+            /* Unmerged change from project 'Moq(net6.0)'
+            Before:
+                    private static readonly Random Random = new Random();
+            After:
+                    static readonly Random Random = new Random();
+            */
+        }
 
-			return DelayedResult(mock, value, delay);
-		}
+        static readonly Random Random = new Random();
 
-		/// <summary>
-		/// Allows to specify the delayed return value of an asynchronous method.
-		/// </summary>
-		public static IReturnsResult<TMock> ReturnsAsync<TMock, TResult>(this IReturns<TMock, ValueTask<TResult>> mock,
-			TResult value, TimeSpan minDelay, TimeSpan maxDelay) where TMock : class
-		{
-			var delay = GetDelay(minDelay, maxDelay, Random);
+        /// <summary>
+        /// Allows to specify the delayed return value of an asynchronous method.
+        /// </summary>
+        public static IReturnsResult<TMock> ReturnsAsync<TMock, TResult>(this IReturns<TMock, Task<TResult>> mock,
+            TResult value, TimeSpan delay) where TMock : class
+        {
+            return DelayedResult(mock, value, delay);
+        }
 
-			return DelayedResult(mock, value, delay);
-		}
+        /// <summary>
+        /// Allows to specify the delayed return value of an asynchronous method.
+        /// </summary>
+        public static IReturnsResult<TMock> ReturnsAsync<TMock, TResult>(this IReturns<TMock, ValueTask<TResult>> mock,
+            TResult value, TimeSpan delay) where TMock : class
+        {
+            return DelayedResult(mock, value, delay);
+        }
 
-		/// <summary>
-		/// <para>Allows to specify the delayed return value of an asynchronous method.</para>
-		/// <para>Use the <see cref="Random"/> argument to pass in (seeded) random generators used across your unit test.</para>
-		/// </summary>
-		public static IReturnsResult<TMock> ReturnsAsync<TMock, TResult>(this IReturns<TMock, Task<TResult>> mock,
-			TResult value, TimeSpan minDelay, TimeSpan maxDelay, Random random) where TMock : class
-		{
-			if(random == null)
-				throw new ArgumentNullException(nameof(random));
+        /// <summary>
+        /// Allows to specify the delayed return value of an asynchronous method.
+        /// </summary>
+        public static IReturnsResult<TMock> ReturnsAsync<TMock, TResult>(this IReturns<TMock, Task<TResult>> mock,
+            TResult value, TimeSpan minDelay, TimeSpan maxDelay) where TMock : class
+        {
+            var delay = GetDelay(minDelay, maxDelay, Random);
 
-			var delay = GetDelay(minDelay, maxDelay, random);
+            return DelayedResult(mock, value, delay);
+        }
 
-			return DelayedResult(mock, value, delay);
-		}
+        /// <summary>
+        /// Allows to specify the delayed return value of an asynchronous method.
+        /// </summary>
+        public static IReturnsResult<TMock> ReturnsAsync<TMock, TResult>(this IReturns<TMock, ValueTask<TResult>> mock,
+            TResult value, TimeSpan minDelay, TimeSpan maxDelay) where TMock : class
+        {
+            var delay = GetDelay(minDelay, maxDelay, Random);
 
-		/// <summary>
-		/// <para>Allows to specify the delayed return value of an asynchronous method.</para>
-		/// <para>Use the <see cref="Random"/> argument to pass in (seeded) random generators used across your unit test.</para>
-		/// </summary>
-		public static IReturnsResult<TMock> ReturnsAsync<TMock, TResult>(this IReturns<TMock, ValueTask<TResult>> mock,
-			TResult value, TimeSpan minDelay, TimeSpan maxDelay, Random random) where TMock : class
-		{
-			if (random == null)
-				throw new ArgumentNullException(nameof(random));
+            return DelayedResult(mock, value, delay);
+        }
 
-			var delay = GetDelay(minDelay, maxDelay, random);
+        /// <summary>
+        /// <para>Allows to specify the delayed return value of an asynchronous method.</para>
+        /// <para>Use the <see cref="Random"/> argument to pass in (seeded) random generators used across your unit test.</para>
+        /// </summary>
+        public static IReturnsResult<TMock> ReturnsAsync<TMock, TResult>(this IReturns<TMock, Task<TResult>> mock,
+            TResult value, TimeSpan minDelay, TimeSpan maxDelay, Random random) where TMock : class
+        {
+            if (random == null)
+                throw new ArgumentNullException(nameof(random));
 
-			return DelayedResult(mock, value, delay);
-		}
+            var delay = GetDelay(minDelay, maxDelay, random);
 
-		/// <summary>
-		/// Allows to specify the exception thrown by an asynchronous method.
-		/// </summary>
-		public static IReturnsResult<TMock> ThrowsAsync<TMock, TResult>(this IReturns<TMock, Task<TResult>> mock,
-			Exception exception, TimeSpan delay) where TMock : class
-		{
-			return DelayedException(mock, exception, delay);
-		}
+            return DelayedResult(mock, value, delay);
+        }
 
-		/// <summary>
-		/// Allows to specify the exception thrown by an asynchronous method.
-		/// </summary>
-		public static IReturnsResult<TMock> ThrowsAsync<TMock, TResult>(this IReturns<TMock, ValueTask<TResult>> mock,
-			Exception exception, TimeSpan delay) where TMock : class
-		{
-			return DelayedException(mock, exception, delay);
-		}
+        /// <summary>
+        /// <para>Allows to specify the delayed return value of an asynchronous method.</para>
+        /// <para>Use the <see cref="Random"/> argument to pass in (seeded) random generators used across your unit test.</para>
+        /// </summary>
+        public static IReturnsResult<TMock> ReturnsAsync<TMock, TResult>(this IReturns<TMock, ValueTask<TResult>> mock,
+            TResult value, TimeSpan minDelay, TimeSpan maxDelay, Random random) where TMock : class
+        {
+            if (random == null)
+                throw new ArgumentNullException(nameof(random));
 
-		/// <summary>
-		/// Allows to specify the exception thrown by an asynchronous method.
-		/// </summary>
-		public static IReturnsResult<TMock> ThrowsAsync<TMock, TResult>(this IReturns<TMock, Task<TResult>> mock,
-			Exception exception, TimeSpan minDelay, TimeSpan maxDelay) where TMock : class
-		{
-			var delay = GetDelay(minDelay, maxDelay, Random);
+            var delay = GetDelay(minDelay, maxDelay, random);
 
-			return DelayedException(mock, exception, delay);
-		}
+            return DelayedResult(mock, value, delay);
+        }
 
-		/// <summary>
-		/// Allows to specify the exception thrown by an asynchronous method.
-		/// </summary>
-		public static IReturnsResult<TMock> ThrowsAsync<TMock, TResult>(this IReturns<TMock, ValueTask<TResult>> mock,
-			Exception exception, TimeSpan minDelay, TimeSpan maxDelay) where TMock : class
-		{
-			var delay = GetDelay(minDelay, maxDelay, Random);
+        /// <summary>
+        /// Allows to specify the exception thrown by an asynchronous method.
+        /// </summary>
+        public static IReturnsResult<TMock> ThrowsAsync<TMock, TResult>(this IReturns<TMock, Task<TResult>> mock,
+            Exception exception, TimeSpan delay) where TMock : class
+        {
+            return DelayedException(mock, exception, delay);
+        }
 
-			return DelayedException(mock, exception, delay);
-		}
+        /// <summary>
+        /// Allows to specify the exception thrown by an asynchronous method.
+        /// </summary>
+        public static IReturnsResult<TMock> ThrowsAsync<TMock, TResult>(this IReturns<TMock, ValueTask<TResult>> mock,
+            Exception exception, TimeSpan delay) where TMock : class
+        {
+            return DelayedException(mock, exception, delay);
+        }
 
-		/// <summary>
-		/// <para>Allows to specify the exception thrown by an asynchronous method.</para> 
-		/// <para>Use the <see cref="Random"/> argument to pass in (seeded) random generators used across your unit test.</para>
-		/// </summary>
-		public static IReturnsResult<TMock> ThrowsAsync<TMock, TResult>(this IReturns<TMock, Task<TResult>> mock,
-			Exception exception, TimeSpan minDelay, TimeSpan maxDelay, Random random) where TMock : class
-		{
-			if (random == null)
-				throw new ArgumentNullException(nameof(random));
+        /// <summary>
+        /// Allows to specify the exception thrown by an asynchronous method.
+        /// </summary>
+        public static IReturnsResult<TMock> ThrowsAsync<TMock, TResult>(this IReturns<TMock, Task<TResult>> mock,
+            Exception exception, TimeSpan minDelay, TimeSpan maxDelay) where TMock : class
+        {
+            var delay = GetDelay(minDelay, maxDelay, Random);
 
-			var delay = GetDelay(minDelay, maxDelay, random);
+            return DelayedException(mock, exception, delay);
+        }
 
-			return DelayedException(mock, exception, delay);
-		}
+        /// <summary>
+        /// Allows to specify the exception thrown by an asynchronous method.
+        /// </summary>
+        public static IReturnsResult<TMock> ThrowsAsync<TMock, TResult>(this IReturns<TMock, ValueTask<TResult>> mock,
+            Exception exception, TimeSpan minDelay, TimeSpan maxDelay) where TMock : class
+        {
+            var delay = GetDelay(minDelay, maxDelay, Random);
 
-		/// <summary>
-		/// <para>Allows to specify the exception thrown by an asynchronous method.</para> 
-		/// <para>Use the <see cref="Random"/> argument to pass in (seeded) random generators used across your unit test.</para>
-		/// </summary>
-		public static IReturnsResult<TMock> ThrowsAsync<TMock, TResult>(this IReturns<TMock, ValueTask<TResult>> mock,
-			Exception exception, TimeSpan minDelay, TimeSpan maxDelay, Random random) where TMock : class
-		{
-			if (random == null)
-				throw new ArgumentNullException(nameof(random));
+            return DelayedException(mock, exception, delay);
+        }
 
-			var delay = GetDelay(minDelay, maxDelay, random);
+        /// <summary>
+        /// <para>Allows to specify the exception thrown by an asynchronous method.</para> 
+        /// <para>Use the <see cref="Random"/> argument to pass in (seeded) random generators used across your unit test.</para>
+        /// </summary>
+        public static IReturnsResult<TMock> ThrowsAsync<TMock, TResult>(this IReturns<TMock, Task<TResult>> mock,
+            Exception exception, TimeSpan minDelay, TimeSpan maxDelay, Random random) where TMock : class
+        {
+            if (random == null)
+                throw new ArgumentNullException(nameof(random));
 
-			return DelayedException(mock, exception, delay);
-		}
+            var delay = GetDelay(minDelay, maxDelay, random);
 
-		internal static bool IsNullResult(Delegate valueFunction, Type resultType)
-		{
-			if (valueFunction == null)
-			{
-				return !resultType.IsValueType || Nullable.GetUnderlyingType(resultType) != null;
-			}
-			else
-			{
-				return false;
-			}
-		}
+            return DelayedException(mock, exception, delay);
+        }
 
-		private static TimeSpan GetDelay(TimeSpan minDelay, TimeSpan maxDelay, Random random)
-		{
-			if (!(minDelay < maxDelay))
-				throw new ArgumentException(Resources.MinDelayMustBeLessThanMaxDelay);
+        /// <summary>
+        /// <para>Allows to specify the exception thrown by an asynchronous method.</para> 
+        /// <para>Use the <see cref="Random"/> argument to pass in (seeded) random generators used across your unit test.</para>
+        /// </summary>
+        public static IReturnsResult<TMock> ThrowsAsync<TMock, TResult>(this IReturns<TMock, ValueTask<TResult>> mock,
+            Exception exception, TimeSpan minDelay, TimeSpan maxDelay, Random random) where TMock : class
+        {
+            if (random == null)
+                throw new ArgumentNullException(nameof(random));
 
-			var min = (int)minDelay.Ticks;
-			var max = (int)maxDelay.Ticks;
+            var delay = GetDelay(minDelay, maxDelay, random);
 
-			return new TimeSpan(random.Next(min, max));
-		}
+            return DelayedException(mock, exception, delay);
+        }
 
-		private static IReturnsResult<TMock> DelayedResult<TMock, TResult>(IReturns<TMock, Task<TResult>> mock,
-			TResult value, TimeSpan delay)
-			where TMock : class
-		{
-			Guard.Positive(delay);
+        internal static bool IsNullResult(Delegate valueFunction, Type resultType)
+        {
+            if (valueFunction == null)
+            {
+                return !resultType.IsValueType || Nullable.GetUnderlyingType(resultType) != null;
+            }
+            else
+            {
+                return false;
 
-			return mock.Returns(() =>
-			{
-				return Task.Delay(delay).ContinueWith(t => value);
-			});
-		}
+                /* Unmerged change from project 'Moq(netstandard2.0)'
+                Before:
+                        private static TimeSpan GetDelay(TimeSpan minDelay, TimeSpan maxDelay, Random random)
+                After:
+                        static TimeSpan GetDelay(TimeSpan minDelay, TimeSpan maxDelay, Random random)
+                */
 
-		private static IReturnsResult<TMock> DelayedResult<TMock, TResult>(IReturns<TMock, ValueTask<TResult>> mock,
-			TResult value, TimeSpan delay)
-			where TMock : class
-		{
-			Guard.Positive(delay);
+                /* Unmerged change from project 'Moq(netstandard2.1)'
+                Before:
+                        private static TimeSpan GetDelay(TimeSpan minDelay, TimeSpan maxDelay, Random random)
+                After:
+                        static TimeSpan GetDelay(TimeSpan minDelay, TimeSpan maxDelay, Random random)
+                */
 
-			return mock.Returns(() =>
-			{
-				return new ValueTask<TResult>(Task.Delay(delay).ContinueWith(t => value));
-			});
-		}
+                /* Unmerged change from project 'Moq(net6.0)'
+                Before:
+                        private static TimeSpan GetDelay(TimeSpan minDelay, TimeSpan maxDelay, Random random)
+                After:
+                        static TimeSpan GetDelay(TimeSpan minDelay, TimeSpan maxDelay, Random random)
+                */
+            }
+        }
 
-		private static IReturnsResult<TMock> DelayedException<TMock, TResult>(IReturns<TMock, Task<TResult>> mock,
-			Exception exception, TimeSpan delay)
-			where TMock : class
-		{
-			Guard.Positive(delay);
+        static TimeSpan GetDelay(TimeSpan minDelay, TimeSpan maxDelay, Random random)
+        {
+            if (!(minDelay < maxDelay))
+                throw new ArgumentException(Resources.MinDelayMustBeLessThanMaxDelay);
 
-			return mock.Returns(() =>
-			{
-				var tcs = new TaskCompletionSource<TResult>();
-				Task.Delay(delay).ContinueWith(task => tcs.SetException(exception));
-				return tcs.Task;
-			});
-		}
+            var min = (int)minDelay.Ticks;
+            var max = (int)maxDelay.Ticks;
 
-		private static IReturnsResult<TMock> DelayedException<TMock, TResult>(IReturns<TMock, ValueTask<TResult>> mock,
-			Exception exception, TimeSpan delay)
-			where TMock : class
-		{
-			Guard.Positive(delay);
+            return new TimeSpan(random.Next(min, max));
 
-			return mock.Returns(() =>
-			{
-				var tcs = new TaskCompletionSource<TResult>();
-				Task.Delay(delay).ContinueWith(task => tcs.SetException(exception));
-				return new ValueTask<TResult>(tcs.Task);
-			});
-		}
-	}
+            /* Unmerged change from project 'Moq(netstandard2.0)'
+            Before:
+                    private static IReturnsResult<TMock> DelayedResult<TMock, TResult>(IReturns<TMock, Task<TResult>> mock,
+            After:
+                    static IReturnsResult<TMock> DelayedResult<TMock, TResult>(IReturns<TMock, Task<TResult>> mock,
+            */
+
+            /* Unmerged change from project 'Moq(netstandard2.1)'
+            Before:
+                    private static IReturnsResult<TMock> DelayedResult<TMock, TResult>(IReturns<TMock, Task<TResult>> mock,
+            After:
+                    static IReturnsResult<TMock> DelayedResult<TMock, TResult>(IReturns<TMock, Task<TResult>> mock,
+            */
+
+            /* Unmerged change from project 'Moq(net6.0)'
+            Before:
+                    private static IReturnsResult<TMock> DelayedResult<TMock, TResult>(IReturns<TMock, Task<TResult>> mock,
+            After:
+                    static IReturnsResult<TMock> DelayedResult<TMock, TResult>(IReturns<TMock, Task<TResult>> mock,
+            */
+        }
+
+        static IReturnsResult<TMock> DelayedResult<TMock, TResult>(IReturns<TMock, Task<TResult>> mock,
+            TResult value, TimeSpan delay)
+            where TMock : class
+        {
+            Guard.Positive(delay);
+
+            return mock.Returns(() =>
+            {
+                return Task.Delay(delay).ContinueWith(t => value);
+            });
+
+            /* Unmerged change from project 'Moq(netstandard2.0)'
+            Before:
+                    private static IReturnsResult<TMock> DelayedResult<TMock, TResult>(IReturns<TMock, ValueTask<TResult>> mock,
+            After:
+                    static IReturnsResult<TMock> DelayedResult<TMock, TResult>(IReturns<TMock, ValueTask<TResult>> mock,
+            */
+
+            /* Unmerged change from project 'Moq(netstandard2.1)'
+            Before:
+                    private static IReturnsResult<TMock> DelayedResult<TMock, TResult>(IReturns<TMock, ValueTask<TResult>> mock,
+            After:
+                    static IReturnsResult<TMock> DelayedResult<TMock, TResult>(IReturns<TMock, ValueTask<TResult>> mock,
+            */
+
+            /* Unmerged change from project 'Moq(net6.0)'
+            Before:
+                    private static IReturnsResult<TMock> DelayedResult<TMock, TResult>(IReturns<TMock, ValueTask<TResult>> mock,
+            After:
+                    static IReturnsResult<TMock> DelayedResult<TMock, TResult>(IReturns<TMock, ValueTask<TResult>> mock,
+            */
+        }
+
+        static IReturnsResult<TMock> DelayedResult<TMock, TResult>(IReturns<TMock, ValueTask<TResult>> mock,
+            TResult value, TimeSpan delay)
+            where TMock : class
+        {
+            Guard.Positive(delay);
+
+            return mock.Returns(() =>
+            {
+                return new ValueTask<TResult>(Task.Delay(delay).ContinueWith(t => value));
+            });
+
+            /* Unmerged change from project 'Moq(netstandard2.0)'
+            Before:
+                    private static IReturnsResult<TMock> DelayedException<TMock, TResult>(IReturns<TMock, Task<TResult>> mock,
+            After:
+                    static IReturnsResult<TMock> DelayedException<TMock, TResult>(IReturns<TMock, Task<TResult>> mock,
+            */
+
+            /* Unmerged change from project 'Moq(netstandard2.1)'
+            Before:
+                    private static IReturnsResult<TMock> DelayedException<TMock, TResult>(IReturns<TMock, Task<TResult>> mock,
+            After:
+                    static IReturnsResult<TMock> DelayedException<TMock, TResult>(IReturns<TMock, Task<TResult>> mock,
+            */
+
+            /* Unmerged change from project 'Moq(net6.0)'
+            Before:
+                    private static IReturnsResult<TMock> DelayedException<TMock, TResult>(IReturns<TMock, Task<TResult>> mock,
+            After:
+                    static IReturnsResult<TMock> DelayedException<TMock, TResult>(IReturns<TMock, Task<TResult>> mock,
+            */
+        }
+
+        static IReturnsResult<TMock> DelayedException<TMock, TResult>(IReturns<TMock, Task<TResult>> mock,
+            Exception exception, TimeSpan delay)
+            where TMock : class
+        {
+            Guard.Positive(delay);
+
+            return mock.Returns(() =>
+            {
+                var tcs = new TaskCompletionSource<TResult>();
+                Task.Delay(delay).ContinueWith(task => tcs.SetException(exception));
+                return tcs.Task;
+            });
+
+            /* Unmerged change from project 'Moq(netstandard2.0)'
+            Before:
+                    private static IReturnsResult<TMock> DelayedException<TMock, TResult>(IReturns<TMock, ValueTask<TResult>> mock,
+            After:
+                    static IReturnsResult<TMock> DelayedException<TMock, TResult>(IReturns<TMock, ValueTask<TResult>> mock,
+            */
+
+            /* Unmerged change from project 'Moq(netstandard2.1)'
+            Before:
+                    private static IReturnsResult<TMock> DelayedException<TMock, TResult>(IReturns<TMock, ValueTask<TResult>> mock,
+            After:
+                    static IReturnsResult<TMock> DelayedException<TMock, TResult>(IReturns<TMock, ValueTask<TResult>> mock,
+            */
+
+            /* Unmerged change from project 'Moq(net6.0)'
+            Before:
+                    private static IReturnsResult<TMock> DelayedException<TMock, TResult>(IReturns<TMock, ValueTask<TResult>> mock,
+            After:
+                    static IReturnsResult<TMock> DelayedException<TMock, TResult>(IReturns<TMock, ValueTask<TResult>> mock,
+            */
+        }
+
+        static IReturnsResult<TMock> DelayedException<TMock, TResult>(IReturns<TMock, ValueTask<TResult>> mock,
+            Exception exception, TimeSpan delay)
+            where TMock : class
+        {
+            Guard.Positive(delay);
+
+            return mock.Returns(() =>
+            {
+                var tcs = new TaskCompletionSource<TResult>();
+                Task.Delay(delay).ContinueWith(task => tcs.SetException(exception));
+                return new ValueTask<TResult>(tcs.Task);
+            });
+        }
+    }
 }

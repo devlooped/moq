@@ -15,271 +15,463 @@ using E = System.Linq.Expressions.Expression;
 
 namespace Moq
 {
-	/// <summary>
-	///   An <see cref="Expectation"/> that is bound to a single, specific method.
-	///   <para>
-	///     <see cref="MethodExpectation.Expression"/> has the general form
-	///     <c>`mock => mock.Method(...arguments)`</c>. Because the method and arguments are frequently needed,
-	///     they are cached in <see cref="MethodExpectation.Method"/> and <see cref="MethodExpectation.Arguments"/>
-	///     for faster access.
-	///   </para>
-	/// </summary>
-	internal sealed class MethodExpectation : Expectation
-	{
-		public static MethodExpectation CreateFrom(Invocation invocation)
-		{
-			var method = invocation.Method;
 
-			Expression[] arguments;
-			{
-				var parameterTypes = method.GetParameterTypes();
-				var n = parameterTypes.Count;
-				arguments = new Expression[n];
-				for (int i = 0; i < n; ++i)
-				{
-					var parameterType = parameterTypes[i];
-					if (parameterType.IsByRef) parameterType = parameterType.GetElementType();
-					arguments[i] = E.Constant(invocation.Arguments[i], parameterType);
-				}
-			}
+    /* Unmerged change from project 'Moq(netstandard2.0)'
+    Before:
+        internal sealed class MethodExpectation : Expectation
+    After:
+        sealed class MethodExpectation : Expectation
+    */
 
-			LambdaExpression expression;
-			{
-				var mock = E.Parameter(method.DeclaringType, "mock");
-				expression = E.Lambda(E.Call(mock, method, arguments).Apply(UpgradePropertyAccessorMethods.Rewriter), mock);
-			}
+    /* Unmerged change from project 'Moq(netstandard2.1)'
+    Before:
+        internal sealed class MethodExpectation : Expectation
+    After:
+        sealed class MethodExpectation : Expectation
+    */
 
-			if (expression.IsProperty())
-			{
-				var property = expression.ToPropertyInfo();
-				Guard.CanRead(property);
+    /* Unmerged change from project 'Moq(net6.0)'
+    Before:
+        internal sealed class MethodExpectation : Expectation
+    After:
+        sealed class MethodExpectation : Expectation
+    */
+    /// <summary>
+    ///   An <see cref="Expectation"/> that is bound to a single, specific method.
+    ///   <para>
+    ///     <see cref="MethodExpectation.Expression"/> has the general form
+    ///     <c>`mock => mock.Method(...arguments)`</c>. Because the method and arguments are frequently needed,
+    ///     they are cached in <see cref="MethodExpectation.Method"/> and <see cref="MethodExpectation.Arguments"/>
+    ///     for faster access.
+    ///   </para>
+    /// </summary>
+    sealed class MethodExpectation : Expectation
+    {
+        public static MethodExpectation CreateFrom(Invocation invocation)
+        {
+            var method = invocation.Method;
 
-				Debug.Assert(property.CanRead(out var getter) && method == getter);
-			}
+            Expression[] arguments;
+            {
+                var parameterTypes = method.GetParameterTypes();
+                var n = parameterTypes.Count;
+                arguments = new Expression[n];
+                for (int i = 0; i < n; ++i)
+                {
+                    var parameterType = parameterTypes[i];
+                    if (parameterType.IsByRef) parameterType = parameterType.GetElementType();
+                    arguments[i] = E.Constant(invocation.Arguments[i], parameterType);
+                }
+            }
 
-			return new MethodExpectation(expression, method, arguments, exactGenericTypeArguments: true);
-		}
+            LambdaExpression expression;
+            {
+                var mock = E.Parameter(method.DeclaringType, "mock");
+                expression = E.Lambda(E.Call(mock, method, arguments).Apply(UpgradePropertyAccessorMethods.Rewriter), mock);
+            }
 
-		private static readonly Expression[] noArguments = new Expression[0];
-		private static readonly IMatcher[] noArgumentMatchers = new IMatcher[0];
+            if (expression.IsProperty())
+            {
+                var property = expression.ToPropertyInfo();
+                Guard.CanRead(property);
 
-		private LambdaExpression expression;
-		public readonly MethodInfo Method;
-		public readonly IReadOnlyList<Expression> Arguments;
+                Debug.Assert(property.CanRead(out var getter) && method == getter);
+            }
 
-		private readonly IMatcher[] argumentMatchers;
-		private IAwaitableFactory awaitableFactory;
-		private MethodInfo methodImplementation;
-		private Expression[] partiallyEvaluatedArguments;
+            return new MethodExpectation(expression, method, arguments, exactGenericTypeArguments: true);
+
+            /* Unmerged change from project 'Moq(netstandard2.0)'
+            Before:
+                    private static readonly Expression[] noArguments = new Expression[0];
+                    private static readonly IMatcher[] noArgumentMatchers = new IMatcher[0];
+            After:
+                    static readonly Expression[] noArguments = new Expression[0];
+                    static readonly IMatcher[] noArgumentMatchers = new IMatcher[0];
+            */
+
+            /* Unmerged change from project 'Moq(netstandard2.1)'
+            Before:
+                    private static readonly Expression[] noArguments = new Expression[0];
+                    private static readonly IMatcher[] noArgumentMatchers = new IMatcher[0];
+            After:
+                    static readonly Expression[] noArguments = new Expression[0];
+                    static readonly IMatcher[] noArgumentMatchers = new IMatcher[0];
+            */
+
+            /* Unmerged change from project 'Moq(net6.0)'
+            Before:
+                    private static readonly Expression[] noArguments = new Expression[0];
+                    private static readonly IMatcher[] noArgumentMatchers = new IMatcher[0];
+            After:
+                    static readonly Expression[] noArguments = new Expression[0];
+                    static readonly IMatcher[] noArgumentMatchers = new IMatcher[0];
+            */
+        }
+
+        static readonly Expression[] noArguments = new Expression[0];
+        static readonly IMatcher[] noArgumentMatchers = new IMatcher[0];
+
+
+        /* Unmerged change from project 'Moq(netstandard2.0)'
+        Before:
+                private LambdaExpression expression;
+        After:
+                LambdaExpression expression;
+        */
+
+        /* Unmerged change from project 'Moq(netstandard2.1)'
+        Before:
+                private LambdaExpression expression;
+        After:
+                LambdaExpression expression;
+        */
+
+        /* Unmerged change from project 'Moq(net6.0)'
+        Before:
+                private LambdaExpression expression;
+        After:
+                LambdaExpression expression;
+        */
+        LambdaExpression expression;
+        public readonly MethodInfo Method;
+        public readonly IReadOnlyList<Expression> Arguments;
+
+
+        /* Unmerged change from project 'Moq(netstandard2.0)'
+        Before:
+                private readonly IMatcher[] argumentMatchers;
+                private IAwaitableFactory awaitableFactory;
+                private MethodInfo methodImplementation;
+                private Expression[] partiallyEvaluatedArguments;
+        After:
+                readonly IMatcher[] argumentMatchers;
+                IAwaitableFactory awaitableFactory;
+                MethodInfo methodImplementation;
+                Expression[] partiallyEvaluatedArguments;
+        */
+
+        /* Unmerged change from project 'Moq(netstandard2.1)'
+        Before:
+                private readonly IMatcher[] argumentMatchers;
+                private IAwaitableFactory awaitableFactory;
+                private MethodInfo methodImplementation;
+                private Expression[] partiallyEvaluatedArguments;
+        After:
+                readonly IMatcher[] argumentMatchers;
+                IAwaitableFactory awaitableFactory;
+                MethodInfo methodImplementation;
+                Expression[] partiallyEvaluatedArguments;
+        */
+
+        /* Unmerged change from project 'Moq(net6.0)'
+        Before:
+                private readonly IMatcher[] argumentMatchers;
+                private IAwaitableFactory awaitableFactory;
+                private MethodInfo methodImplementation;
+                private Expression[] partiallyEvaluatedArguments;
+        After:
+                readonly IMatcher[] argumentMatchers;
+                IAwaitableFactory awaitableFactory;
+                MethodInfo methodImplementation;
+                Expression[] partiallyEvaluatedArguments;
+        */
+        readonly IMatcher[] argumentMatchers;
+        IAwaitableFactory awaitableFactory;
+        MethodInfo methodImplementation;
+        Expression[] partiallyEvaluatedArguments;
 #if DEBUG
-		private Type proxyType;
+
+        /* Unmerged change from project 'Moq(netstandard2.0)'
+        Before:
+                private Type proxyType;
+        After:
+                Type proxyType;
+        */
+
+        /* Unmerged change from project 'Moq(netstandard2.1)'
+        Before:
+                private Type proxyType;
+        After:
+                Type proxyType;
+        */
+
+        /* Unmerged change from project 'Moq(net6.0)'
+        Before:
+                private Type proxyType;
+        After:
+                Type proxyType;
+        */
+        Type proxyType;
 #endif
-		private readonly bool exactGenericTypeArguments;
 
-		public MethodExpectation(LambdaExpression expression, MethodInfo method, IReadOnlyList<Expression> arguments = null, bool exactGenericTypeArguments = false, bool skipMatcherInitialization = false, bool allowNonOverridable = false)
-		{
-			Debug.Assert(expression != null);
-			Debug.Assert(method != null);
+        /* Unmerged change from project 'Moq(netstandard2.0)'
+        Before:
+                private readonly bool exactGenericTypeArguments;
+        After:
+                readonly bool exactGenericTypeArguments;
+        */
 
-			if (!allowNonOverridable)  // the sole currently known legitimate case where this evaluates to `false` is when setting non-overridable properties via LINQ to Mocks
-			{
-				Guard.IsOverridable(method, expression);
-				Guard.IsVisibleToProxyFactory(method);
-			}
+        /* Unmerged change from project 'Moq(netstandard2.1)'
+        Before:
+                private readonly bool exactGenericTypeArguments;
+        After:
+                readonly bool exactGenericTypeArguments;
+        */
 
-			this.expression = expression;
-			this.Method = method;
-			if (arguments != null && !skipMatcherInitialization)
-			{
-				(this.argumentMatchers, this.Arguments) = MatcherFactory.CreateMatchers(arguments, method.GetParameters());
-			}
-			else
-			{
-				this.argumentMatchers = noArgumentMatchers;
-				this.Arguments = arguments ?? noArguments;
-			}
+        /* Unmerged change from project 'Moq(net6.0)'
+        Before:
+                private readonly bool exactGenericTypeArguments;
+        After:
+                readonly bool exactGenericTypeArguments;
+        */
+        readonly bool exactGenericTypeArguments;
 
-			this.exactGenericTypeArguments = exactGenericTypeArguments;
-		}
+        public MethodExpectation(LambdaExpression expression, MethodInfo method, IReadOnlyList<Expression> arguments = null, bool exactGenericTypeArguments = false, bool skipMatcherInitialization = false, bool allowNonOverridable = false)
+        {
+            Debug.Assert(expression != null);
+            Debug.Assert(method != null);
 
-		public override LambdaExpression Expression => this.expression;
+            if (!allowNonOverridable)  // the sole currently known legitimate case where this evaluates to `false` is when setting non-overridable properties via LINQ to Mocks
+            {
+                Guard.IsOverridable(method, expression);
+                Guard.IsVisibleToProxyFactory(method);
+            }
 
-		public void AddResultExpression(Func<E, E> add, IAwaitableFactory awaitableFactory)
-		{
-			this.expression = E.Lambda(add(this.Expression.Body), this.Expression.Parameters);
-			this.awaitableFactory = awaitableFactory;
-		}
+            this.expression = expression;
+            this.Method = method;
+            if (arguments != null && !skipMatcherInitialization)
+            {
+                (this.argumentMatchers, this.Arguments) = MatcherFactory.CreateMatchers(arguments, method.GetParameters());
+            }
+            else
+            {
+                this.argumentMatchers = noArgumentMatchers;
+                this.Arguments = arguments ?? noArguments;
+            }
 
-		public override bool HasResultExpression(out IAwaitableFactory awaitableFactory)
-		{
-			return (awaitableFactory = this.awaitableFactory) != null;
-		}
+            this.exactGenericTypeArguments = exactGenericTypeArguments;
+        }
 
-		public void Deconstruct(out LambdaExpression expression, out MethodInfo method, out IReadOnlyList<Expression> arguments)
-		{
-			expression = this.Expression;
-			method = this.Method;
-			arguments = this.Arguments;
-		}
+        public override LambdaExpression Expression => this.expression;
 
-		public override bool IsMatch(Invocation invocation)
-		{
-			if (invocation.Method != this.Method && !this.IsOverride(invocation))
-			{
-				return false;
-			}
+        public void AddResultExpression(Func<E, E> add, IAwaitableFactory awaitableFactory)
+        {
+            this.expression = E.Lambda(add(this.Expression.Body), this.Expression.Parameters);
+            this.awaitableFactory = awaitableFactory;
+        }
 
-			var arguments = invocation.Arguments;
-			var parameterTypes = invocation.Method.GetParameterTypes();
-			for (int i = 0, n = this.argumentMatchers.Length; i < n; ++i)
-			{
-				if (this.argumentMatchers[i].Matches(arguments[i], parameterTypes[i]) == false)
-				{
-					return false;
-				}
-			}
+        public override bool HasResultExpression(out IAwaitableFactory awaitableFactory)
+        {
+            return (awaitableFactory = this.awaitableFactory) != null;
+        }
 
-			return true;
-		}
+        public void Deconstruct(out LambdaExpression expression, out MethodInfo method, out IReadOnlyList<Expression> arguments)
+        {
+            expression = this.Expression;
+            method = this.Method;
+            arguments = this.Arguments;
+        }
 
-		public override void SetupEvaluatedSuccessfully(Invocation invocation)
-		{
-			var arguments = invocation.Arguments;
-			var parameterTypes = invocation.Method.GetParameterTypes();
-			for (int i = 0, n = this.argumentMatchers.Length; i < n; ++i)
-			{
-				this.argumentMatchers[i].SetupEvaluatedSuccessfully(arguments[i], parameterTypes[i]);
-			}
-		}
+        public override bool IsMatch(Invocation invocation)
+        {
+            if (invocation.Method != this.Method && !this.IsOverride(invocation))
+            {
+                return false;
+            }
 
-		private bool IsOverride(Invocation invocation)
-		{
-			Debug.Assert(invocation.Method != this.Method);
+            var arguments = invocation.Arguments;
+            var parameterTypes = invocation.Method.GetParameterTypes();
+            for (int i = 0, n = this.argumentMatchers.Length; i < n; ++i)
+            {
+                if (this.argumentMatchers[i].Matches(arguments[i], parameterTypes[i]) == false)
+                {
+                    return false;
+                }
+            }
 
-			var method = this.Method;
-			var invocationMethod = invocation.Method;
+            return true;
+        }
 
-			var proxyType = invocation.ProxyType;
+        public override void SetupEvaluatedSuccessfully(Invocation invocation)
+        {
+            var arguments = invocation.Arguments;
+            var parameterTypes = invocation.Method.GetParameterTypes();
+            for (int i = 0, n = this.argumentMatchers.Length; i < n; ++i)
+            {
+                this.argumentMatchers[i].SetupEvaluatedSuccessfully(arguments[i], parameterTypes[i]);
+
+                /* Unmerged change from project 'Moq(netstandard2.0)'
+                Before:
+                        private bool IsOverride(Invocation invocation)
+                After:
+                        bool IsOverride(Invocation invocation)
+                */
+
+                /* Unmerged change from project 'Moq(netstandard2.1)'
+                Before:
+                        private bool IsOverride(Invocation invocation)
+                After:
+                        bool IsOverride(Invocation invocation)
+                */
+
+                /* Unmerged change from project 'Moq(net6.0)'
+                Before:
+                        private bool IsOverride(Invocation invocation)
+                After:
+                        bool IsOverride(Invocation invocation)
+                */
+            }
+        }
+
+        bool IsOverride(Invocation invocation)
+        {
+            Debug.Assert(invocation.Method != this.Method);
+
+            var method = this.Method;
+            var invocationMethod = invocation.Method;
+
+            var proxyType = invocation.ProxyType;
 #if DEBUG
-			// The following `if` block is a sanity check to ensure this `InvocationShape` always
-			// runs against the same proxy type. This is important because we're caching the result
-			// of mapping methods into that particular proxy type. We have no cache invalidation
-			// logic in place; instead, we simply assume that the cached results will stay valid.
-			// If the below assertion fails, that assumption was wrong.
-			if (this.proxyType == null)
-			{
-				this.proxyType = proxyType;
-			}
-			else
-			{
-				Debug.Assert(this.proxyType == proxyType);
-			}
+            // The following `if` block is a sanity check to ensure this `InvocationShape` always
+            // runs against the same proxy type. This is important because we're caching the result
+            // of mapping methods into that particular proxy type. We have no cache invalidation
+            // logic in place; instead, we simply assume that the cached results will stay valid.
+            // If the below assertion fails, that assumption was wrong.
+            if (this.proxyType == null)
+            {
+                this.proxyType = proxyType;
+            }
+            else
+            {
+                Debug.Assert(this.proxyType == proxyType);
+            }
 #endif
 
-			// If not already in the cache, map this `InvocationShape`'s method into the proxy type:
-			if (this.methodImplementation == null)
-			{
-				this.methodImplementation = method.GetImplementingMethod(proxyType);
-			}
+            // If not already in the cache, map this `InvocationShape`'s method into the proxy type:
+            if (this.methodImplementation == null)
+            {
+                this.methodImplementation = method.GetImplementingMethod(proxyType);
+            }
 
-			if (invocation.MethodImplementation != this.methodImplementation)
-			{
-				return false;
-			}
+            if (invocation.MethodImplementation != this.methodImplementation)
+            {
+                return false;
+            }
 
-			if (method.IsGenericMethod || invocationMethod.IsGenericMethod)
-			{
-				if (!method.GetGenericArguments().CompareTo(invocationMethod.GetGenericArguments(), exact: this.exactGenericTypeArguments, considerTypeMatchers: true))
-				{
-					return false;
-				}
-			}
+            if (method.IsGenericMethod || invocationMethod.IsGenericMethod)
+            {
+                if (!method.GetGenericArguments().CompareTo(invocationMethod.GetGenericArguments(), exact: this.exactGenericTypeArguments, considerTypeMatchers: true))
+                {
+                    return false;
+                }
+            }
 
-			return true;
-		}
+            return true;
+        }
 
-		public override bool Equals(Expectation obj)
-		{
-			if (obj is not MethodExpectation other) return false;
+        public override bool Equals(Expectation obj)
+        {
+            if (obj is not MethodExpectation other) return false;
 
-			if (this.Method != other.Method)
-			{
-				return false;
-			}
+            if (this.Method != other.Method)
+            {
+                return false;
+            }
 
-			if (this.Arguments.Count != other.Arguments.Count)
-			{
-				return false;
-			}
+            if (this.Arguments.Count != other.Arguments.Count)
+            {
+                return false;
+            }
 
-			if (this.partiallyEvaluatedArguments == null)
-			{
-				this.partiallyEvaluatedArguments = PartiallyEvaluateArguments(this.Arguments);
-			}
+            if (this.partiallyEvaluatedArguments == null)
+            {
+                this.partiallyEvaluatedArguments = PartiallyEvaluateArguments(this.Arguments);
+            }
 
-			if (other.partiallyEvaluatedArguments == null)
-			{
-				other.partiallyEvaluatedArguments = PartiallyEvaluateArguments(other.Arguments);
-			}
+            if (other.partiallyEvaluatedArguments == null)
+            {
+                other.partiallyEvaluatedArguments = PartiallyEvaluateArguments(other.Arguments);
+            }
 
-			var lastParameter = this.Method.GetParameters().LastOrDefault();
-			var lastParameterIsParamArray = lastParameter != null && lastParameter.ParameterType.IsArray && lastParameter.IsDefined(typeof(ParamArrayAttribute));
+            var lastParameter = this.Method.GetParameters().LastOrDefault();
+            var lastParameterIsParamArray = lastParameter != null && lastParameter.ParameterType.IsArray && lastParameter.IsDefined(typeof(ParamArrayAttribute));
 
-			for (int i = 0, li = this.partiallyEvaluatedArguments.Length - 1; i <= li; ++i)
-			{
-				// Special case for final `params` parameters, which need to be compared by structural equality,
-				// not array reference equality:
-				if (i == li && lastParameterIsParamArray)
-				{
-					// In the following, if we retrieved the `params` arrays via `partiallyEvaluatedArguments`,
-					// we might see them either as `NewArrayExpression`s or reduced to `ConstantExpression`s.
-					// By retrieving them via `Arguments` we always see them as non-reduced `NewArrayExpression`s,
-					// so we don't have to distinguish between two cases. (However, the expressions inside those
-					// have already been partially evaluated by `MatcherFactory` earlier on!)
-					if (this.Arguments[li] is NewArrayExpression e1 && other.Arguments[li] is NewArrayExpression e2 && e1.Expressions.Count == e2.Expressions.Count)
-					{
-						for (int j = 0, nj = e1.Expressions.Count; j < nj; ++j)
-						{
-							if (!ExpressionComparer.Default.Equals(e1.Expressions[j], e2.Expressions[j]))
-							{
-								return false;
-							}
-						}
+            for (int i = 0, li = this.partiallyEvaluatedArguments.Length - 1; i <= li; ++i)
+            {
+                // Special case for final `params` parameters, which need to be compared by structural equality,
+                // not array reference equality:
+                if (i == li && lastParameterIsParamArray)
+                {
+                    // In the following, if we retrieved the `params` arrays via `partiallyEvaluatedArguments`,
+                    // we might see them either as `NewArrayExpression`s or reduced to `ConstantExpression`s.
+                    // By retrieving them via `Arguments` we always see them as non-reduced `NewArrayExpression`s,
+                    // so we don't have to distinguish between two cases. (However, the expressions inside those
+                    // have already been partially evaluated by `MatcherFactory` earlier on!)
+                    if (this.Arguments[li] is NewArrayExpression e1 && other.Arguments[li] is NewArrayExpression e2 && e1.Expressions.Count == e2.Expressions.Count)
+                    {
+                        for (int j = 0, nj = e1.Expressions.Count; j < nj; ++j)
+                        {
+                            if (!ExpressionComparer.Default.Equals(e1.Expressions[j], e2.Expressions[j]))
+                            {
+                                return false;
+                            }
+                        }
 
-						continue;
-					}
-				}
+                        continue;
+                    }
+                }
 
-				if (!ExpressionComparer.Default.Equals(this.partiallyEvaluatedArguments[i], other.partiallyEvaluatedArguments[i]))
-				{
-					return false;
-				}
-			}
+                if (!ExpressionComparer.Default.Equals(this.partiallyEvaluatedArguments[i], other.partiallyEvaluatedArguments[i]))
+                {
+                    return false;
+                }
+            }
 
-			return true;
-		}
+            return true;
 
-		private static Expression[] PartiallyEvaluateArguments(IReadOnlyList<Expression> arguments)
-		{
-			Debug.Assert(arguments != null);
+            /* Unmerged change from project 'Moq(netstandard2.0)'
+            Before:
+                    private static Expression[] PartiallyEvaluateArguments(IReadOnlyList<Expression> arguments)
+            After:
+                    static Expression[] PartiallyEvaluateArguments(IReadOnlyList<Expression> arguments)
+            */
 
-			if (arguments.Count == 0)
-			{
-				return noArguments;
-			}
+            /* Unmerged change from project 'Moq(netstandard2.1)'
+            Before:
+                    private static Expression[] PartiallyEvaluateArguments(IReadOnlyList<Expression> arguments)
+            After:
+                    static Expression[] PartiallyEvaluateArguments(IReadOnlyList<Expression> arguments)
+            */
 
-			var partiallyEvaluatedArguments = new Expression[arguments.Count];
-			for (int i = 0, n = arguments.Count; i < n; ++i)
-			{
-				partiallyEvaluatedArguments[i] = arguments[i].PartialMatcherAwareEval();
-			}
+            /* Unmerged change from project 'Moq(net6.0)'
+            Before:
+                    private static Expression[] PartiallyEvaluateArguments(IReadOnlyList<Expression> arguments)
+            After:
+                    static Expression[] PartiallyEvaluateArguments(IReadOnlyList<Expression> arguments)
+            */
+        }
 
-			return partiallyEvaluatedArguments;
-		}
+        static Expression[] PartiallyEvaluateArguments(IReadOnlyList<Expression> arguments)
+        {
+            Debug.Assert(arguments != null);
 
-		public override int GetHashCode()
-		{
-			return this.Method.GetHashCode();
-		}
-	}
+            if (arguments.Count == 0)
+            {
+                return noArguments;
+            }
+
+            var partiallyEvaluatedArguments = new Expression[arguments.Count];
+            for (int i = 0, n = arguments.Count; i < n; ++i)
+            {
+                partiallyEvaluatedArguments[i] = arguments[i].PartialMatcherAwareEval();
+            }
+
+            return partiallyEvaluatedArguments;
+        }
+
+        public override int GetHashCode()
+        {
+            return this.Method.GetHashCode();
+        }
+    }
 }

@@ -6,20 +6,62 @@ using System.Diagnostics;
 
 namespace Moq.Behaviors
 {
-	internal sealed class ThrowException : Behavior
-	{
-		private readonly Exception exception;
 
-		public ThrowException(Exception exception)
-		{
-			Debug.Assert(exception != null);
+    /* Unmerged change from project 'Moq(netstandard2.0)'
+    Before:
+        internal sealed class ThrowException : Behavior
+    After:
+        sealed class ThrowException : Behavior
+    */
 
-			this.exception = exception;
-		}
+    /* Unmerged change from project 'Moq(netstandard2.1)'
+    Before:
+        internal sealed class ThrowException : Behavior
+    After:
+        sealed class ThrowException : Behavior
+    */
 
-		public override void Execute(Invocation invocation)
-		{
-			throw this.exception;
-		}
-	}
+    /* Unmerged change from project 'Moq(net6.0)'
+    Before:
+        internal sealed class ThrowException : Behavior
+    After:
+        sealed class ThrowException : Behavior
+    */
+    sealed class ThrowException : Behavior
+
+    /* Unmerged change from project 'Moq(netstandard2.0)'
+    Before:
+            private readonly Exception exception;
+    After:
+            readonly Exception exception;
+    */
+
+    /* Unmerged change from project 'Moq(netstandard2.1)'
+    Before:
+            private readonly Exception exception;
+    After:
+            readonly Exception exception;
+    */
+
+    /* Unmerged change from project 'Moq(net6.0)'
+    Before:
+            private readonly Exception exception;
+    After:
+            readonly Exception exception;
+    */
+    {
+        readonly Exception exception;
+
+        public ThrowException(Exception exception)
+        {
+            Debug.Assert(exception != null);
+
+            this.exception = exception;
+        }
+
+        public override void Execute(Invocation invocation)
+        {
+            throw this.exception;
+        }
+    }
 }

@@ -6,73 +6,115 @@ using System.Collections.Generic;
 
 namespace Moq
 {
-	internal class AsInterface<TInterface> : Mock<TInterface>
-		where TInterface : class
-	{
-		private Mock owner;
 
-		public AsInterface(Mock owner)
-			: base(true)
-		{
-			this.owner = owner;
-		}
+    /* Unmerged change from project 'Moq(netstandard2.0)'
+    Before:
+        internal class AsInterface<TInterface> : Mock<TInterface>
+    After:
+        class AsInterface<TInterface> : Mock<TInterface>
+    */
 
-		internal override List<Type> AdditionalInterfaces => this.owner.AdditionalInterfaces;
+    /* Unmerged change from project 'Moq(netstandard2.1)'
+    Before:
+        internal class AsInterface<TInterface> : Mock<TInterface>
+    After:
+        class AsInterface<TInterface> : Mock<TInterface>
+    */
 
-		internal override Dictionary<Type, object> ConfiguredDefaultValues => this.owner.ConfiguredDefaultValues;
+    /* Unmerged change from project 'Moq(net6.0)'
+    Before:
+        internal class AsInterface<TInterface> : Mock<TInterface>
+    After:
+        class AsInterface<TInterface> : Mock<TInterface>
+    */
+    class AsInterface<TInterface> : Mock<TInterface>
+        where TInterface : class
 
-		internal override object[] ConstructorArguments => this.owner.ConstructorArguments;
+        /* Unmerged change from project 'Moq(netstandard2.0)'
+        Before:
+                private Mock owner;
+        After:
+                Mock owner;
+        */
 
-		internal override InvocationCollection MutableInvocations => this.owner.MutableInvocations;
+        /* Unmerged change from project 'Moq(netstandard2.1)'
+        Before:
+                private Mock owner;
+        After:
+                Mock owner;
+        */
 
-		internal override bool IsObjectInitialized => this.owner.IsObjectInitialized;
+        /* Unmerged change from project 'Moq(net6.0)'
+        Before:
+                private Mock owner;
+        After:
+                Mock owner;
+        */
+    {
+        Mock owner;
 
-		internal override Type MockedType => this.owner.MockedType;
+        public AsInterface(Mock owner)
+            : base(true)
+        {
+            this.owner = owner;
+        }
 
-		public override MockBehavior Behavior => this.owner.Behavior;
+        internal override List<Type> AdditionalInterfaces => this.owner.AdditionalInterfaces;
 
-		public override bool CallBase
-		{
-			get { return this.owner.CallBase; }
-			set { this.owner.CallBase = value; }
-		}
+        internal override Dictionary<Type, object> ConfiguredDefaultValues => this.owner.ConfiguredDefaultValues;
 
-		public override DefaultValueProvider DefaultValueProvider
-		{
-			get => this.owner.DefaultValueProvider;
-			set => this.owner.DefaultValueProvider = value;
-		}
+        internal override object[] ConstructorArguments => this.owner.ConstructorArguments;
 
-		internal override EventHandlerCollection EventHandlers => this.owner.EventHandlers;
+        internal override InvocationCollection MutableInvocations => this.owner.MutableInvocations;
 
-		internal override Type[] InheritedInterfaces => this.owner.InheritedInterfaces;
+        internal override bool IsObjectInitialized => this.owner.IsObjectInitialized;
 
-		public override TInterface Object
-		{
-			get { return this.owner.Object as TInterface; }
-		}
+        internal override Type MockedType => this.owner.MockedType;
 
-		internal override SetupCollection MutableSetups => this.owner.MutableSetups;
+        public override MockBehavior Behavior => this.owner.Behavior;
 
-		public override Switches Switches
-		{
-			get => this.owner.Switches;
-			set => this.owner.Switches = value;
-		}
+        public override bool CallBase
+        {
+            get { return this.owner.CallBase; }
+            set { this.owner.CallBase = value; }
+        }
 
-		public override Mock<TNewInterface> As<TNewInterface>()
-		{
-			return this.owner.As<TNewInterface>();
-		}
+        public override DefaultValueProvider DefaultValueProvider
+        {
+            get => this.owner.DefaultValueProvider;
+            set => this.owner.DefaultValueProvider = value;
+        }
 
-		protected override object OnGetObject()
-		{
-			return this.owner.Object;
-		}
+        internal override EventHandlerCollection EventHandlers => this.owner.EventHandlers;
 
-		public override string ToString()
-		{
-			return this.owner.ToString();
-		}
-	}
+        internal override Type[] InheritedInterfaces => this.owner.InheritedInterfaces;
+
+        public override TInterface Object
+        {
+            get { return this.owner.Object as TInterface; }
+        }
+
+        internal override SetupCollection MutableSetups => this.owner.MutableSetups;
+
+        public override Switches Switches
+        {
+            get => this.owner.Switches;
+            set => this.owner.Switches = value;
+        }
+
+        public override Mock<TNewInterface> As<TNewInterface>()
+        {
+            return this.owner.As<TNewInterface>();
+        }
+
+        protected override object OnGetObject()
+        {
+            return this.owner.Object;
+        }
+
+        public override string ToString()
+        {
+            return this.owner.ToString();
+        }
+    }
 }

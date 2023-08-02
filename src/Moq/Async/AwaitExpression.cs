@@ -7,34 +7,82 @@ using System.Linq.Expressions;
 
 namespace Moq.Async
 {
-	internal sealed class AwaitExpression : Expression
-	{
-		private readonly IAwaitableFactory awaitableFactory;
-		private readonly Expression operand;
 
-		public AwaitExpression(Expression operand, IAwaitableFactory awaitableFactory)
-		{
-			Debug.Assert(awaitableFactory != null);
-			Debug.Assert(operand != null);
+    /* Unmerged change from project 'Moq(netstandard2.0)'
+    Before:
+        internal sealed class AwaitExpression : Expression
+    After:
+        sealed class AwaitExpression : Expression
+    */
 
-			this.awaitableFactory = awaitableFactory;
-			this.operand = operand;
-		}
+    /* Unmerged change from project 'Moq(netstandard2.1)'
+    Before:
+        internal sealed class AwaitExpression : Expression
+    After:
+        sealed class AwaitExpression : Expression
+    */
 
-		public override bool CanReduce => false;
+    /* Unmerged change from project 'Moq(net6.0)'
+    Before:
+        internal sealed class AwaitExpression : Expression
+    After:
+        sealed class AwaitExpression : Expression
+    */
+    sealed class AwaitExpression : Expression
 
-		public override ExpressionType NodeType => ExpressionType.Extension;
+    /* Unmerged change from project 'Moq(netstandard2.0)'
+    Before:
+            private readonly IAwaitableFactory awaitableFactory;
+            private readonly Expression operand;
+    After:
+            readonly IAwaitableFactory awaitableFactory;
+            readonly Expression operand;
+    */
 
-		public Expression Operand => this.operand;
+    /* Unmerged change from project 'Moq(netstandard2.1)'
+    Before:
+            private readonly IAwaitableFactory awaitableFactory;
+            private readonly Expression operand;
+    After:
+            readonly IAwaitableFactory awaitableFactory;
+            readonly Expression operand;
+    */
 
-		public override Type Type => this.awaitableFactory.ResultType;
+    /* Unmerged change from project 'Moq(net6.0)'
+    Before:
+            private readonly IAwaitableFactory awaitableFactory;
+            private readonly Expression operand;
+    After:
+            readonly IAwaitableFactory awaitableFactory;
+            readonly Expression operand;
+    */
+    {
+        readonly IAwaitableFactory awaitableFactory;
+        readonly Expression operand;
 
-		public override string ToString()
-		{
-			return this.awaitableFactory.ResultType == typeof(void) ? $"await {this.operand}"
-			                                                        : $"(await {this.operand})";
-		}
+        public AwaitExpression(Expression operand, IAwaitableFactory awaitableFactory)
+        {
+            Debug.Assert(awaitableFactory != null);
+            Debug.Assert(operand != null);
 
-		protected override Expression VisitChildren(ExpressionVisitor visitor) => this;
-	}
+            this.awaitableFactory = awaitableFactory;
+            this.operand = operand;
+        }
+
+        public override bool CanReduce => false;
+
+        public override ExpressionType NodeType => ExpressionType.Extension;
+
+        public Expression Operand => this.operand;
+
+        public override Type Type => this.awaitableFactory.ResultType;
+
+        public override string ToString()
+        {
+            return this.awaitableFactory.ResultType == typeof(void) ? $"await {this.operand}"
+                                                                    : $"(await {this.operand})";
+        }
+
+        protected override Expression VisitChildren(ExpressionVisitor visitor) => this;
+    }
 }

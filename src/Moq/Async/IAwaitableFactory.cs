@@ -7,18 +7,39 @@ using System.Linq.Expressions;
 
 namespace Moq.Async
 {
-	internal interface IAwaitableFactory
-	{
-		Type ResultType { get; }
 
-		object CreateCompleted(object result = null);
+    /* Unmerged change from project 'Moq(netstandard2.0)'
+    Before:
+        internal interface IAwaitableFactory
+    After:
+        interface IAwaitableFactory
+    */
 
-		object CreateFaulted(Exception exception);
+    /* Unmerged change from project 'Moq(netstandard2.1)'
+    Before:
+        internal interface IAwaitableFactory
+    After:
+        interface IAwaitableFactory
+    */
 
-		object CreateFaulted(IEnumerable<Exception> exceptions);
+    /* Unmerged change from project 'Moq(net6.0)'
+    Before:
+        internal interface IAwaitableFactory
+    After:
+        interface IAwaitableFactory
+    */
+    interface IAwaitableFactory
+    {
+        Type ResultType { get; }
 
-		Expression CreateResultExpression(Expression awaitableExpression);
+        object CreateCompleted(object result = null);
 
-		bool TryGetResult(object awaitable, out object result);
-	}
+        object CreateFaulted(Exception exception);
+
+        object CreateFaulted(IEnumerable<Exception> exceptions);
+
+        Expression CreateResultExpression(Expression awaitableExpression);
+
+        bool TryGetResult(object awaitable, out object result);
+    }
 }

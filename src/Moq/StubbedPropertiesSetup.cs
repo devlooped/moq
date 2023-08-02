@@ -10,98 +10,188 @@ using E = System.Linq.Expressions.Expression;
 
 namespace Moq
 {
-	internal sealed class StubbedPropertiesSetup : Setup
-	{
-		private readonly ConcurrentDictionary<string, object> values;
-		private readonly DefaultValueProvider defaultValueProvider;
 
-		public StubbedPropertiesSetup(Mock mock, DefaultValueProvider defaultValueProvider = null)
-			: base(originalExpression: null, mock, new PropertyAccessorExpectation(mock))
-		{
-			this.values = new ConcurrentDictionary<string, object>();
-			this.defaultValueProvider = defaultValueProvider ?? mock.DefaultValueProvider;
+    /* Unmerged change from project 'Moq(netstandard2.0)'
+    Before:
+        internal sealed class StubbedPropertiesSetup : Setup
+    After:
+        sealed class StubbedPropertiesSetup : Setup
+    */
 
-			this.MarkAsVerifiable();
-		}
+    /* Unmerged change from project 'Moq(netstandard2.1)'
+    Before:
+        internal sealed class StubbedPropertiesSetup : Setup
+    After:
+        sealed class StubbedPropertiesSetup : Setup
+    */
 
-		public DefaultValueProvider DefaultValueProvider => this.defaultValueProvider;
+    /* Unmerged change from project 'Moq(net6.0)'
+    Before:
+        internal sealed class StubbedPropertiesSetup : Setup
+    After:
+        sealed class StubbedPropertiesSetup : Setup
+    */
+    sealed class StubbedPropertiesSetup : Setup
 
-		public override IEnumerable<Mock> InnerMocks
-		{
-			get
-			{
-				foreach (var value in this.values.Values)
-				{
-					var innerMock = TryGetInnerMockFrom(value);
-					if (innerMock != null)
-					{
-						yield return innerMock;
-					}
-				}
-			}
-		}
+    /* Unmerged change from project 'Moq(netstandard2.0)'
+    Before:
+            private readonly ConcurrentDictionary<string, object> values;
+            private readonly DefaultValueProvider defaultValueProvider;
+    After:
+            readonly ConcurrentDictionary<string, object> values;
+            readonly DefaultValueProvider defaultValueProvider;
+    */
 
-		public void SetProperty(string propertyName, object value)
-		{
-			this.values[propertyName] = value;
-		}
+    /* Unmerged change from project 'Moq(netstandard2.1)'
+    Before:
+            private readonly ConcurrentDictionary<string, object> values;
+            private readonly DefaultValueProvider defaultValueProvider;
+    After:
+            readonly ConcurrentDictionary<string, object> values;
+            readonly DefaultValueProvider defaultValueProvider;
+    */
 
-		protected override void ExecuteCore(Invocation invocation)
-		{
-			if (invocation.Method.ReturnType == typeof(void))
-			{
-				Debug.Assert(invocation.Method.IsSetAccessor());
-				Debug.Assert(invocation.Arguments.Length == 1);
+    /* Unmerged change from project 'Moq(net6.0)'
+    Before:
+            private readonly ConcurrentDictionary<string, object> values;
+            private readonly DefaultValueProvider defaultValueProvider;
+    After:
+            readonly ConcurrentDictionary<string, object> values;
+            readonly DefaultValueProvider defaultValueProvider;
+    */
+    {
+        readonly ConcurrentDictionary<string, object> values;
+        readonly DefaultValueProvider defaultValueProvider;
 
-				var propertyName = invocation.Method.Name.Substring(4);
-				this.values[propertyName] = invocation.Arguments[0];
-			}
-			else
-			{
-				Debug.Assert(invocation.Method.IsGetAccessor());
+        public StubbedPropertiesSetup(Mock mock, DefaultValueProvider defaultValueProvider = null)
+            : base(originalExpression: null, mock, new PropertyAccessorExpectation(mock))
+        {
+            this.values = new ConcurrentDictionary<string, object>();
+            this.defaultValueProvider = defaultValueProvider ?? mock.DefaultValueProvider;
 
-				var propertyName = invocation.Method.Name.Substring(4);
-				var value = this.values.GetOrAdd(propertyName, pn => this.Mock.GetDefaultValue(invocation.Method, out _, this.defaultValueProvider));
-				invocation.ReturnValue = value;
-			}
-		}
+            this.MarkAsVerifiable();
+        }
 
-		protected override void VerifySelf()
-		{
-		}
+        public DefaultValueProvider DefaultValueProvider => this.defaultValueProvider;
 
-		private sealed class PropertyAccessorExpectation : Expectation
-		{
-			private readonly LambdaExpression expression;
+        public override IEnumerable<Mock> InnerMocks
+        {
+            get
+            {
+                foreach (var value in this.values.Values)
+                {
+                    var innerMock = TryGetInnerMockFrom(value);
+                    if (innerMock != null)
+                    {
+                        yield return innerMock;
+                    }
+                }
+            }
+        }
 
-			public PropertyAccessorExpectation(Mock mock)
-			{
-				Debug.Assert(mock != null);
+        public void SetProperty(string propertyName, object value)
+        {
+            this.values[propertyName] = value;
+        }
 
-				var mockType = mock.GetType();
-				var setupAllPropertiesMethod = mockType.GetMethod(nameof(Mock<object>.SetupAllProperties));
-				var mockedType = setupAllPropertiesMethod.ReturnType.GetGenericArguments()[0];
-				var mockGetMethod = Mock.GetMethod.MakeGenericMethod(mockedType);
-				var mockParam = E.Parameter(mockedType, "m");
-				this.expression = E.Lambda(E.Call(E.Call(mockGetMethod, mockParam), setupAllPropertiesMethod), mockParam);
-			}
+        protected override void ExecuteCore(Invocation invocation)
+        {
+            if (invocation.Method.ReturnType == typeof(void))
+            {
+                Debug.Assert(invocation.Method.IsSetAccessor());
+                Debug.Assert(invocation.Arguments.Length == 1);
 
-			public override LambdaExpression Expression => this.expression;
+                var propertyName = invocation.Method.Name.Substring(4);
+                this.values[propertyName] = invocation.Arguments[0];
+            }
+            else
+            {
+                Debug.Assert(invocation.Method.IsGetAccessor());
 
-			public override bool Equals(Expectation other)
-			{
-				return other is PropertyAccessorExpectation pae && ExpressionComparer.Default.Equals(this.expression, pae.expression);
-			}
+                var propertyName = invocation.Method.Name.Substring(4);
+                var value = this.values.GetOrAdd(propertyName, pn => this.Mock.GetDefaultValue(invocation.Method, out _, this.defaultValueProvider));
+                invocation.ReturnValue = value;
+            }
+        }
 
-			public override int GetHashCode()
-			{
-				return typeof(PropertyAccessorExpectation).GetHashCode();
-			}
+        protected override void VerifySelf()
 
-			public override bool IsMatch(Invocation invocation)
-			{
-				return invocation.Method.IsPropertyAccessor();
-			}
-		}
-	}
+        /* Unmerged change from project 'Moq(netstandard2.0)'
+        Before:
+                private sealed class PropertyAccessorExpectation : Expectation
+        After:
+                sealed class PropertyAccessorExpectation : Expectation
+        */
+
+        /* Unmerged change from project 'Moq(netstandard2.1)'
+        Before:
+                private sealed class PropertyAccessorExpectation : Expectation
+        After:
+                sealed class PropertyAccessorExpectation : Expectation
+        */
+
+        /* Unmerged change from project 'Moq(net6.0)'
+        Before:
+                private sealed class PropertyAccessorExpectation : Expectation
+        After:
+                sealed class PropertyAccessorExpectation : Expectation
+        */
+        {
+        }
+
+        sealed class PropertyAccessorExpectation : Expectation
+
+        /* Unmerged change from project 'Moq(netstandard2.0)'
+        Before:
+                    private readonly LambdaExpression expression;
+        After:
+                    readonly LambdaExpression expression;
+        */
+
+        /* Unmerged change from project 'Moq(netstandard2.1)'
+        Before:
+                    private readonly LambdaExpression expression;
+        After:
+                    readonly LambdaExpression expression;
+        */
+
+        /* Unmerged change from project 'Moq(net6.0)'
+        Before:
+                    private readonly LambdaExpression expression;
+        After:
+                    readonly LambdaExpression expression;
+        */
+        {
+            readonly LambdaExpression expression;
+
+            public PropertyAccessorExpectation(Mock mock)
+            {
+                Debug.Assert(mock != null);
+
+                var mockType = mock.GetType();
+                var setupAllPropertiesMethod = mockType.GetMethod(nameof(Mock<object>.SetupAllProperties));
+                var mockedType = setupAllPropertiesMethod.ReturnType.GetGenericArguments()[0];
+                var mockGetMethod = Mock.GetMethod.MakeGenericMethod(mockedType);
+                var mockParam = E.Parameter(mockedType, "m");
+                this.expression = E.Lambda(E.Call(E.Call(mockGetMethod, mockParam), setupAllPropertiesMethod), mockParam);
+            }
+
+            public override LambdaExpression Expression => this.expression;
+
+            public override bool Equals(Expectation other)
+            {
+                return other is PropertyAccessorExpectation pae && ExpressionComparer.Default.Equals(this.expression, pae.expression);
+            }
+
+            public override int GetHashCode()
+            {
+                return typeof(PropertyAccessorExpectation).GetHashCode();
+            }
+
+            public override bool IsMatch(Invocation invocation)
+            {
+                return invocation.Method.IsPropertyAccessor();
+            }
+        }
+    }
 }
