@@ -3,13 +3,6 @@
 Moq welcomes your contributions! :heart:
 
 
-## A quick word about the upcoming next major version of Moq (v5)
-
-The next major version of Moq is currently in active development (over at the [moq/moq](https://github.com/moq/moq) repository). Because of this, we are somewhat hesitant about big API changes in Moq v4. The plan for v5 is to have an API very similar to Moq v4 (to make migration easy). Therefore, any radical changes in v4 might have to be reproduced in v5, which costs additional time.
-
-For this reason, the main (but not sole!) focus at this repository (v4) is on bug fixing, improving stability, and performance. That being said, small additions stand a good chance of getting in if they seem generally useful.
-
-
 ## Asking usage questions
 
 This repository's focus is on the development of Moq (i.e. fixing bugs and improving features; see above). Because the Moq team is rather small, our resources to answer usage questions is very limited. You might be better off asking usage questions over at [Stack Overflow](https://stackoverflow.com) as your question will meet with a much larger audience. Please observe SO's rules and etiquette, and tag your question with `moq`.
@@ -17,9 +10,9 @@ This repository's focus is on the development of Moq (i.e. fixing bugs and impro
 
 ## Submitting a bug report (as an issue)
 
-If you think you've found a bug, please start by searching [the changelog](https://github.com/moq/moq4/blob/main/CHANGELOG.md) and [GitHub issues](https://github.com/moq/moq4/issues) (both open and closed ones!) to see if the problem has already been addressed or documented in any way.
+If you think you've found a bug, please start by searching [the changelog](https://github.com/moq/moq/blob/main/CHANGELOG.md) and [GitHub issues](https://github.com/moq/moq/issues) (both open and closed ones!) to see if the problem has already been addressed or documented in any way.
 
-If you find nothing of relevance, [open a new issue](https://github.com/moq/moq4/issues/new).
+If you find nothing of relevance, [open a new issue](https://github.com/moq/moq/issues/new).
 
 
 **What to include:** Try to include the following information in it:

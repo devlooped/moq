@@ -1,0 +1,178 @@
+<Project>
+  <!-- To extend/change the defaults, create a Directory.targets alongside this file -->
+
+  <PropertyGroup Condition="'$(CI)' == 'true' and '$(Language)' == 'C#'">
+    <DefineConstants>CI;$(DefineConstants)</DefineConstants>
+  </PropertyGroup>
+  
+  <PropertyGroup Condition="'$(IsPackable)' == ''">
+    <IsPackable Condition="'$(PackAsTool)' == 'true'">true</IsPackable>
+    <IsPackable Condition="'$(PackFolder)' != ''">true</IsPackable>
+  </PropertyGroup>
+  
+  <PropertyGroup Condition="'$(IsPackable)' == ''">
+    <!-- The Sdks\NuGet.Build.Tasks.Pack\build\NuGet.Build.Tasks.Pack.targets unconditionally sets 
+        PackageId=AssemblyName if no PackageId is provided, and then defaults IsPackable=true if 
+        a PackageId is set (?!), meaning that by default everything is packable in Sdk-style 
+        projects. 
+
+        The Directory.Build.targets are imported after the user's project properties have been 
+        read, and therefore gives us a chance to inspect if an explicit PackageId was provided, 
+        before the NuGet SDK target is imported and defaults it. At this point, we can give 
+        IsPackable a more sensible default, making it false if no PackageId was provided at this 
+        point. -->
+    <IsPackable Condition="'$(PackageId)' == ''">false</IsPackable>
+    <IsPackable Condition="'$(PackageId)' != ''">true</IsPackable>
+  </PropertyGroup>
+  
+  <ItemGroup Condition="'$(IsPackable)' == 'true'" Label="NuGet">
+    <!-- This is compatible with nugetizer and SDK pack -->
+
+    <!-- Project-level icon/readme will already be part of None items -->
+    <None Update="@(None -> WithMetadataValue('Filename', 'icon'))" 
+          Pack="true" PackagePath="%(Filename)%(Extension)" 
+          Condition="'$(PackageIcon)' != ''" />
+
+    <None Update="@(None -> WithMetadataValue('Filename', 'readme'))" 
+          Pack="true" PackagePath="%(Filename)%(Extension)" 
+          Condition="'$(PackageReadmeFile)' != ''" />
+    
+    <!-- src-level will need explicit inclusion -->
+    <None Include="$(MSBuildThisFileDirectory)icon.png" Link="icon.png" Visible="false" 
+          Pack="true" PackagePath="%(Filename)%(Extension)"
+          Condition="Exists('$(MSBuildThisFileDirectory)icon.png') and !Exists('$(MSBuildProjectDirectory)icon.png')" />
+
+    <None Include="$(MSBuildThisFileDirectory)readme.md" Link="readme.md"  
+          Pack="true" PackagePath="%(Filename)%(Extension)"
+          Condition="Exists('$(MSBuildThisFileDirectory)readme.md') and !Exists('$(MSBuildProjectDirectory)readme.md')" />
+  </ItemGroup>
+
+  <!-- Microsoft.NET.Sdk\targets\Microsoft.NET.DefaultAssemblyInfo.targets does this and is imported 
+       before Directory.Build.targets, but it's not imported for .msbuildproj -->
+  <PropertyGroup Condition="'$(Version)' == ''">
+    <VersionPrefix Condition="'$(VersionPrefix)' == ''">1.0.0</VersionPrefix>
+    <Version Condition="'$(VersionSuffix)' != ''">$(VersionPrefix)-$(VersionSuffix)</Version>
+    <Version Condition="'$(Version)' == ''">$(VersionPrefix)</Version>
+  </PropertyGroup>
+
+  <!-- Append $(PackFolder) directory to output and intermediate paths to prevent bin clashes between targets. -->
+  <PropertyGroup Condition="'$(AppendPackFolderToOutputPath)' == 'true' and '$(PackFolder)' != ''">
+    <PackFolderPath>$(PackFolder)</PackFolderPath>
+    <PackFolderPath Condition="'$(TargetFramework)' != ''">$(PackFolderPath.Replace('\$(TargetFramework)', ''))</PackFolderPath>
+    <IntermediateOutputPath>$(IntermediateOutputPath)$(PackFolderPath)\</IntermediateOutputPath>
+    <OutputPath>$(OutputPath)$(PackFolderPath)\</OutputPath>
+    <OutDir>$(OutputPath)</OutDir>
+  </PropertyGroup>
+
+  <PropertyGroup Condition="'$(RepositoryBranch)' == ''">
+    <!-- GitHub Actions: https://docs.github.com/en/actions/reference/environment-variables#default-environment-variables -->
+    <RepositoryBranch Condition="'$(RepositoryBranch)' == '' and '$(GITHUB_REF)' != '' and $(GITHUB_REF.Contains('refs/pull/'))">pr$(GITHUB_REF.Replace('refs/pull/', '').Replace('/merge', ''))</RepositoryBranch>
+    <RepositoryBranch Condition="'$(RepositoryBranch)' == '' and '$(GITHUB_REF)' != ''">$(GITHUB_REF.Replace('refs/heads/', '').Replace('refs/tags/', ''))</RepositoryBranch>
+    <!-- Azure DevOps: https://docs.microsoft.com/en-us/azure/devops/pipelines/build/variables -->
+    <RepositoryBranch Condition="'$(RepositoryBranch)' == '' and '$(BUILD_SOURCEBRANCH)' != ''">$(BUILD_SOURCEBRANCH.Replace('refs/heads/', '').Replace('refs/tags/', ''))</RepositoryBranch>
+    <!-- AppVeyor: https://www.appveyor.com/docs/environment-variables/ -->
+    <RepositoryBranch Condition="'$(RepositoryBranch)' == '' and '$(APPVEYOR_PULL_REQUEST_NUMBER)' != ''">pr$(APPVEYOR_PULL_REQUEST_NUMBER)</RepositoryBranch>
+    <RepositoryBranch Condition="'$(RepositoryBranch)' == '' and '$(APPVEYOR_REPO_TAG_NAME)' != ''">$(APPVEYOR_REPO_TAG_NAME)</RepositoryBranch>
+    <RepositoryBranch Condition="'$(RepositoryBranch)' == '' and '$(APPVEYOR_REPO_BRANCH)' != ''">$(APPVEYOR_REPO_BRANCH)</RepositoryBranch>
+    <!-- TeamCity: https://www.jetbrains.com/help/teamcity/predefined-build-parameters.html#Branch-Related+Parameters -->
+    <RepositoryBranch Condition="'$(RepositoryBranch)' == '' and '$(TEAMCITY_BUILD_BRANCH)' != ''">$(TEAMCITY_BUILD_BRANCH)</RepositoryBranch>
+    <!--TravisCI: https://docs.travis-ci.com/user/environment-variables/ -->
+    <RepositoryBranch Condition="'$(RepositoryBranch)' == '' and '$(TRAVIS_PULL_REQUEST)' != '' and '$(TRAVIS_PULL_REQUEST)' != 'false'">pr$(TRAVIS_PULL_REQUEST)</RepositoryBranch>
+    <RepositoryBranch Condition="'$(RepositoryBranch)' == '' and '$(TRAVIS_BRANCH)' != ''">$(TRAVIS_BRANCH)</RepositoryBranch>
+    <!-- CircleCI: https://circleci.com/docs/2.0/env-vars/ -->
+    <RepositoryBranch Condition="'$(RepositoryBranch)' == '' and '$(CIRCLE_PR_NUMBER)' != ''">pr$(CIRCLE_PR_NUMBER)</RepositoryBranch>
+    <RepositoryBranch Condition="'$(RepositoryBranch)' == '' and '$(CIRCLE_TAG)' != ''">$(CIRCLE_TAG)</RepositoryBranch>
+    <RepositoryBranch Condition="'$(RepositoryBranch)' == '' and '$(CIRCLE_BRANCH)' != ''">$(CIRCLE_BRANCH)</RepositoryBranch>
+    <!-- GitLab: https://docs.gitlab.com/ee/ci/variables/predefined_variables.html -->
+    <RepositoryBranch Condition="'$(RepositoryBranch)' == '' and '$(CI_COMMIT_TAG)' != ''">$(CI_COMMIT_TAG)</RepositoryBranch>
+    <RepositoryBranch Condition="'$(RepositoryBranch)' == '' and '$(CI_MERGE_REQUEST_IID)' != ''">pr$(CI_MERGE_REQUEST_IID)</RepositoryBranch>
+    <RepositoryBranch Condition="'$(RepositoryBranch)' == '' and '$(CI_EXTERNAL_PULL_REQUEST_IID)' != ''">pr$(CI_EXTERNAL_PULL_REQUEST_IID)</RepositoryBranch>
+    <RepositoryBranch Condition="'$(RepositoryBranch)' == '' and '$(CI_COMMIT_BRANCH)' != ''">$(CI_COMMIT_BRANCH)</RepositoryBranch>
+    <!-- Buddy: https://buddy.works/docs/pipelines/environment-variables#default-environment-variables -->
+    <RepositoryBranch Condition="'$(RepositoryBranch)' == '' and '$(BUDDY_EXECUTION_PULL_REQUEST_NO)' != ''">pr$(BUDDY_EXECUTION_PULL_REQUEST_NO)</RepositoryBranch>
+    <RepositoryBranch Condition="'$(RepositoryBranch)' == '' and '$(BUDDY_EXECUTION_TAG)' != ''">$(BUDDY_EXECUTION_TAG)</RepositoryBranch>
+    <RepositoryBranch Condition="'$(RepositoryBranch)' == '' and '$(BUDDY_EXECUTION_BRANCH)' != ''">$(BUDDY_EXECUTION_BRANCH)</RepositoryBranch>
+  </PropertyGroup>  
+
+  <PropertyGroup Condition="'$(EnableRexCodeGenerator)' == 'true'">
+    <!-- VSCode/Razor compatibility -->
+    <CoreCompileDependsOn>PrepareResources;$(CoreCompileDependsOn)</CoreCompileDependsOn>
+  </PropertyGroup>
+  
+  <ItemGroup>
+    <!-- Consider the project out of date if any of these files changes -->
+    <UpToDateCheck Include="@(None);@(Content);@(EmbeddedResource)" />
+    <!-- We'll typically use ThisAssembly.Strings instead of the built-in resource manager codegen -->
+    <EmbeddedResource Update="@(EmbeddedResource)"  Generator="" Condition="'$(EnableRexCodeGenerator)' != 'true'" />
+    <EmbeddedResource Update="@(EmbeddedResource)" Condition="'$(EnableRexCodeGenerator)' == 'true'">
+      <!-- Default to Just Works resources generation. See https://www.cazzulino.com/resources.html -->
+      <Generator>MSBuild:Compile</Generator>
+      <StronglyTypedFileName>$(IntermediateOutputPath)\$([MSBuild]::ValueOrDefault('%(RelativeDir)', '').Replace('\', '.').Replace('/', '.'))%(Filename).g$(DefaultLanguageSourceExtension)</StronglyTypedFileName>
+      <StronglyTypedLanguage>$(Language)</StronglyTypedLanguage>
+      <StronglyTypedNamespace Condition="'%(RelativeDir)' == ''">$(RootNamespace)</StronglyTypedNamespace>
+      <StronglyTypedNamespace Condition="'%(RelativeDir)' != ''">$(RootNamespace).$([MSBuild]::ValueOrDefault('%(RelativeDir)', '').Replace('\', '.').Replace('/', '.').TrimEnd('.'))</StronglyTypedNamespace>
+      <StronglyTypedClassName>%(Filename)</StronglyTypedClassName>
+    </EmbeddedResource>
+  </ItemGroup>
+
+  <Target Name="IsPackable" Returns="@(IsPackable)">
+    <ItemGroup>
+      <IsPackable Include="$(MSBuildProjectFullPath)" IsPackable="$(IsPackable)" PackageId="$(PackageId)" />
+    </ItemGroup>
+  </Target>
+
+  <ItemGroup>
+    <!-- Make these available via ThisAssembly.Project -->
+    <ProjectProperty Include="RepositoryBranch" />
+    <ProjectProperty Include="RepositorySha" />
+    <ProjectProperty Include="RepositoryCommit" />
+    <ProjectProperty Include="RepositoryRoot" />
+    <ProjectProperty Include="RepositoryUrl" />
+  </ItemGroup>
+
+  <!-- Make sure the source control info is available before calling source generators -->
+  <Target Name="EnsureProjectInformation" 
+          BeforeTargets="GenerateMSBuildEditorConfigFileShouldRun"
+          AfterTargets="InitializeSourceControlInformation"
+          DependsOnTargets="InitializeSourceControlInformation">
+    
+    <PropertyGroup Condition="'$(SourceControlInformationFeatureSupported)' == 'true'">
+      <!-- The project must specify PublishRepositoryUrl=true in order to publish the URL, in order to prevent inadvertent leak of internal URL. -->
+      <RepositoryUrl Condition="'$(RepositoryUrl)' == '' and '$(PublishRepositoryUrl)' == 'true'">$(PrivateRepositoryUrl)</RepositoryUrl>
+    </PropertyGroup>
+
+    <PropertyGroup Condition="'$(SourceRevisionId)' != ''">
+      <RepositoryCommit Condition="'$(RepositoryCommit)' == ''">$(SourceRevisionId)</RepositoryCommit>
+      <RepositorySha Condition="'$(RepositorySha)' == ''">$(SourceRevisionId.Substring(0, 9))</RepositorySha>
+      <!-- This allows the commit label added to the InformationalVersion to be the short sha instead :) -->
+      <SourceRevisionId>$(RepositorySha)</SourceRevisionId>
+    </PropertyGroup>
+
+    <!-- Add SourceRoot as a project property too -->
+    <ItemGroup>
+      <_GitSourceRoot Include="@(SourceRoot -> WithMetadataValue('SourceControl', 'git'))" />
+    </ItemGroup>
+
+    <PropertyGroup>
+      <RepositoryRoot>@(_GitSourceRoot)</RepositoryRoot>
+    </PropertyGroup>
+
+  </Target>
+
+  <Target Name="UpdatePackageMetadata"
+          BeforeTargets="PrepareForBuild;GenerateMSBuildEditorConfigFileShouldRun;GetAssemblyVersion;GetPackageMetadata;GenerateNuspec;Pack"
+          DependsOnTargets="EnsureProjectInformation"
+          Condition="'$(SourceControlInformationFeatureSupported)' == 'true' And
+                     '$(IsPackable)' == 'true'">
+    <PropertyGroup>
+      <PackageProjectUrl Condition="'$(PackageProjectUrl)' == '' and '$(PublishRepositoryUrl)' == 'true'">$(RepositoryUrl)</PackageProjectUrl>
+      <PackageDescription>$(Description)</PackageDescription>
+      <PackageReleaseNotes Condition="'$(RepositoryUrl)' != '' and Exists('$(MSBuildThisFileDirectory)..\changelog.md')">$(RepositoryUrl)/blob/main/changelog.md</PackageReleaseNotes>
+    </PropertyGroup>
+  </Target>
+
+  <!-- Import before UsingTask because first to declare tasks wins -->
+  <Import Project="Directory.targets" Condition="Exists('Directory.targets')"/>
+  <Import Project="Directory.targets.user" Condition="Exists('Directory.targets.user')" />
+
+</Project>
