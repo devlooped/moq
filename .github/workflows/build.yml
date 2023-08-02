@@ -25,29 +25,8 @@ defaults:
     shell: bash
 
 jobs:
-  os-matrix:
-    runs-on: ubuntu-latest
-    outputs:
-      matrix: ${{ steps.lookup.outputs.matrix }}
-    steps:
-      - name: 🤘 checkout
-        uses: actions/checkout@v2
-        
-      - name: 🔎 lookup
-        id: lookup
-        shell: pwsh
-        run: |
-          $path = './.github/workflows/os-matrix.json'
-          $os = if (test-path $path) { cat $path } else { '["ubuntu-latest"]' }
-          echo "matrix=$os" >> $env:GITHUB_OUTPUT
-
   build:
-    needs: os-matrix
-    name: build-${{ matrix.os }}
-    runs-on: ${{ matrix.os }}
-    strategy:
-      matrix:
-        os: ${{ fromJSON(needs.os-matrix.outputs.matrix) }}
+    runs-on: windows-latest
     steps:
       - name: 🤘 checkout
         uses: actions/checkout@v2
@@ -57,12 +36,6 @@ jobs:
 
       - name: 🙏 build
         run: dotnet build -m:1
-
-      - name: ⚙ GNU grep
-        if: matrix.os == 'macOS-latest'
-        run: |
-          brew install grep
-          echo 'export PATH="/usr/local/opt/grep/libexec/gnubin:$PATH"' >> .bash_profile
 
       - name: 🧪 test
         uses: ./.github/workflows/test
