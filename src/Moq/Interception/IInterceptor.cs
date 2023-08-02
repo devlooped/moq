@@ -3,12 +3,33 @@
 
 namespace Moq
 {
-	/// <summary>
-	/// This role interface represents a <see cref="Mock"/>'s ability to intercept method invocations for its <see cref="Mock.Object"/>.
-	/// It is meant for use by <see cref="ProxyFactory"/>.
-	/// </summary>
-	internal interface IInterceptor
-	{
-		void Intercept(Invocation invocation);
-	}
+
+    /* Unmerged change from project 'Moq(netstandard2.0)'
+    Before:
+        internal interface IInterceptor
+    After:
+        interface IInterceptor
+    */
+
+    /* Unmerged change from project 'Moq(netstandard2.1)'
+    Before:
+        internal interface IInterceptor
+    After:
+        interface IInterceptor
+    */
+
+    /* Unmerged change from project 'Moq(net6.0)'
+    Before:
+        internal interface IInterceptor
+    After:
+        interface IInterceptor
+    */
+    /// <summary>
+    /// This role interface represents a <see cref="Mock"/>'s ability to intercept method invocations for its <see cref="Mock.Object"/>.
+    /// It is meant for use by <see cref="ProxyFactory"/>.
+    /// </summary>
+    interface IInterceptor
+    {
+        void Intercept(Invocation invocation);
+    }
 }

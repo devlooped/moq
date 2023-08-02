@@ -9,45 +9,87 @@ using Moq.Async;
 
 namespace Moq
 {
-	internal sealed class InnerMockSetup : SetupWithOutParameterSupport
-	{
-		private readonly object returnValue;
 
-		public InnerMockSetup(Expression originalExpression, Mock mock, MethodExpectation expectation, object returnValue)
-			: base(originalExpression, mock, expectation)
-		{
-			Debug.Assert(Awaitable.TryGetResultRecursive(returnValue) is IMocked);
+    /* Unmerged change from project 'Moq(netstandard2.0)'
+    Before:
+        internal sealed class InnerMockSetup : SetupWithOutParameterSupport
+    After:
+        sealed class InnerMockSetup : SetupWithOutParameterSupport
+    */
 
-			this.returnValue = returnValue;
+    /* Unmerged change from project 'Moq(netstandard2.1)'
+    Before:
+        internal sealed class InnerMockSetup : SetupWithOutParameterSupport
+    After:
+        sealed class InnerMockSetup : SetupWithOutParameterSupport
+    */
 
-			this.MarkAsVerifiable();
-		}
+    /* Unmerged change from project 'Moq(net6.0)'
+    Before:
+        internal sealed class InnerMockSetup : SetupWithOutParameterSupport
+    After:
+        sealed class InnerMockSetup : SetupWithOutParameterSupport
+    */
+    sealed class InnerMockSetup : SetupWithOutParameterSupport
 
-		public override IEnumerable<Mock> InnerMocks
-		{
-			get
-			{
-				var innerMock = TryGetInnerMockFrom(this.returnValue);
-				Debug.Assert(innerMock != null);
-				yield return innerMock;
-			}
-		}
+    /* Unmerged change from project 'Moq(netstandard2.0)'
+    Before:
+            private readonly object returnValue;
+    After:
+            readonly object returnValue;
+    */
 
-		protected override void ExecuteCore(Invocation invocation)
-		{
-			invocation.ReturnValue = this.returnValue;
-		}
+    /* Unmerged change from project 'Moq(netstandard2.1)'
+    Before:
+            private readonly object returnValue;
+    After:
+            readonly object returnValue;
+    */
 
-		protected override void ResetCore()
-		{
-			foreach (var innerMock in this.InnerMocks)
-			{
-				innerMock.MutableSetups.Reset();
-			}
-		}
+    /* Unmerged change from project 'Moq(net6.0)'
+    Before:
+            private readonly object returnValue;
+    After:
+            readonly object returnValue;
+    */
+    {
+        readonly object returnValue;
 
-		protected override void VerifySelf()
-		{
-		}
-	}
+        public InnerMockSetup(Expression originalExpression, Mock mock, MethodExpectation expectation, object returnValue)
+            : base(originalExpression, mock, expectation)
+        {
+            Debug.Assert(Awaitable.TryGetResultRecursive(returnValue) is IMocked);
+
+            this.returnValue = returnValue;
+
+            this.MarkAsVerifiable();
+        }
+
+        public override IEnumerable<Mock> InnerMocks
+        {
+            get
+            {
+                var innerMock = TryGetInnerMockFrom(this.returnValue);
+                Debug.Assert(innerMock != null);
+                yield return innerMock;
+            }
+        }
+
+        protected override void ExecuteCore(Invocation invocation)
+        {
+            invocation.ReturnValue = this.returnValue;
+        }
+
+        protected override void ResetCore()
+        {
+            foreach (var innerMock in this.InnerMocks)
+            {
+                innerMock.MutableSetups.Reset();
+            }
+        }
+
+        protected override void VerifySelf()
+        {
+        }
+    }
 }

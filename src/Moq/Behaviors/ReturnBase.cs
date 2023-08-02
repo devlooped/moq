@@ -3,17 +3,59 @@
 
 namespace Moq.Behaviors
 {
-	internal sealed class ReturnBase : Behavior
-	{
-		public static readonly ReturnBase Instance = new ReturnBase();
 
-		private ReturnBase()
-		{
-		}
+    /* Unmerged change from project 'Moq(netstandard2.0)'
+    Before:
+        internal sealed class ReturnBase : Behavior
+    After:
+        sealed class ReturnBase : Behavior
+    */
 
-		public override void Execute(Invocation invocation)
-		{
-			invocation.ReturnValue = invocation.CallBase();
-		}
-	}
+    /* Unmerged change from project 'Moq(netstandard2.1)'
+    Before:
+        internal sealed class ReturnBase : Behavior
+    After:
+        sealed class ReturnBase : Behavior
+    */
+
+    /* Unmerged change from project 'Moq(net6.0)'
+    Before:
+        internal sealed class ReturnBase : Behavior
+    After:
+        sealed class ReturnBase : Behavior
+    */
+    sealed class ReturnBase : Behavior
+    {
+        public static readonly ReturnBase Instance = new ReturnBase();
+
+
+        /* Unmerged change from project 'Moq(netstandard2.0)'
+        Before:
+                private ReturnBase()
+        After:
+                ReturnBase()
+        */
+
+        /* Unmerged change from project 'Moq(netstandard2.1)'
+        Before:
+                private ReturnBase()
+        After:
+                ReturnBase()
+        */
+
+        /* Unmerged change from project 'Moq(net6.0)'
+        Before:
+                private ReturnBase()
+        After:
+                ReturnBase()
+        */
+        ReturnBase()
+        {
+        }
+
+        public override void Execute(Invocation invocation)
+        {
+            invocation.ReturnValue = invocation.CallBase();
+        }
+    }
 }

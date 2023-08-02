@@ -7,111 +7,125 @@ using Xunit;
 
 namespace Moq.Tests.Linq
 {
-	public class MockRepositoryQuerying
-	{
-		public class GivenAStrictFactory
-		{
-			private MockRepository repository;
+    public class MockRepositoryQuerying
+    {
+        public class GivenAStrictFactory
 
-			public GivenAStrictFactory()
-			{
-				this.repository = new MockRepository(MockBehavior.Strict);
-			}
+        /* Unmerged change from project 'Moq.Tests(net6.0)'
+        Before:
+                    private MockRepository repository;
+        After:
+                    MockRepository repository;
+        */
+        {
+            MockRepository repository;
 
-			[Fact]
-			public void WhenQueryingSingle_ThenItIsStrict()
-			{
-				var foo = this.repository.OneOf<IFoo>();
+            public GivenAStrictFactory()
+            {
+                this.repository = new MockRepository(MockBehavior.Strict);
+            }
 
-				Assert.Throws<MockException>(() => foo.Do());
-			}
+            [Fact]
+            public void WhenQueryingSingle_ThenItIsStrict()
+            {
+                var foo = this.repository.OneOf<IFoo>();
 
-			[Fact]
-			public void WhenQueryingMultiple_ThenItIsStrict()
-			{
-				var foo = this.repository.Of<IFoo>().First();
+                Assert.Throws<MockException>(() => foo.Do());
+            }
 
-				Assert.Throws<MockException>(() => foo.Do());
-			}
+            [Fact]
+            public void WhenQueryingMultiple_ThenItIsStrict()
+            {
+                var foo = this.repository.Of<IFoo>().First();
 
-			[Fact]
-			public void WhenQueryingSingleWithProperty_ThenItIsStrict()
-			{
-				var foo = this.repository.OneOf<IFoo>(x => x.Id == "1");
+                Assert.Throws<MockException>(() => foo.Do());
+            }
 
-				Assert.Throws<MockException>(() => foo.Do());
+            [Fact]
+            public void WhenQueryingSingleWithProperty_ThenItIsStrict()
+            {
+                var foo = this.repository.OneOf<IFoo>(x => x.Id == "1");
 
-				Mock.Get(foo).Verify();
+                Assert.Throws<MockException>(() => foo.Do());
 
-				Assert.Equal("1", foo.Id);
-			}
+                Mock.Get(foo).Verify();
 
-			[Fact]
-			public void WhenQueryingMultipleWithProperty_ThenItIsStrict()
-			{
-				var foo = this.repository.Of<IFoo>(x => x.Id == "1").First();
+                Assert.Equal("1", foo.Id);
+            }
 
-				Assert.Throws<MockException>(() => foo.Do());
+            [Fact]
+            public void WhenQueryingMultipleWithProperty_ThenItIsStrict()
+            {
+                var foo = this.repository.Of<IFoo>(x => x.Id == "1").First();
 
-				Mock.Get(foo).Verify();
+                Assert.Throws<MockException>(() => foo.Do());
 
-				Assert.Equal("1", foo.Id);
-			}
+                Mock.Get(foo).Verify();
 
-			[Fact]
-			public void Can_override_behavior_and_create_loose_mock()
-			{
-				var foo = this.repository.OneOf<IFoo>(MockBehavior.Loose);
-				Assert.Equal(MockBehavior.Loose, Mock.Get(foo).Behavior);
-				_ = foo.Id;
-			}
-		}
+                Assert.Equal("1", foo.Id);
+            }
 
-		public class Strict_mocks
-		{
-			private MockRepository repository;
+            [Fact]
+            public void Can_override_behavior_and_create_loose_mock()
+            {
+                var foo = this.repository.OneOf<IFoo>(MockBehavior.Loose);
+                Assert.Equal(MockBehavior.Loose, Mock.Get(foo).Behavior);
+                _ = foo.Id;
+            }
+        }
 
-			public Strict_mocks()
-			{
-				this.repository = new MockRepository(MockBehavior.Default);
-			}
+        public class Strict_mocks
 
-			[Fact]
-			public void Strict_Of_will_throw_for_non_setup_property()
-			{
-				var foo = this.repository.Of<IFoo>(MockBehavior.Strict).First();
-				Assert.Throws<MockException>(() => _ = foo.Name);
-			}
+        /* Unmerged change from project 'Moq.Tests(net6.0)'
+        Before:
+                    private MockRepository repository;
+        After:
+                    MockRepository repository;
+        */
+        {
+            MockRepository repository;
 
-			[Fact]
-			public void Strict_Of_with_expression_will_throw_for_non_setup_property()
-			{
-				var foo = this.repository.Of<IFoo>(f => f.Id == default, MockBehavior.Strict).First();
-				_ = foo.Id;
-				Assert.Throws<MockException>(() => _ = foo.Name);
-			}
+            public Strict_mocks()
+            {
+                this.repository = new MockRepository(MockBehavior.Default);
+            }
 
-			[Fact]
-			public void Strict_OneOf_will_throw_for_non_setup_property()
-			{
-				var foo = this.repository.OneOf<IFoo>(MockBehavior.Strict);
-				Assert.Throws<MockException>(() => _ = foo.Name);
-			}
+            [Fact]
+            public void Strict_Of_will_throw_for_non_setup_property()
+            {
+                var foo = this.repository.Of<IFoo>(MockBehavior.Strict).First();
+                Assert.Throws<MockException>(() => _ = foo.Name);
+            }
 
-			[Fact]
-			public void Strict_OneOf_with_expression_will_throw_for_non_setup_property()
-			{
-				var foo = this.repository.OneOf<IFoo>(f => f.Id == default, MockBehavior.Strict);
-				_ = foo.Id;
-				Assert.Throws<MockException>(() => _ = foo.Name);
-			}
-		}
+            [Fact]
+            public void Strict_Of_with_expression_will_throw_for_non_setup_property()
+            {
+                var foo = this.repository.Of<IFoo>(f => f.Id == default, MockBehavior.Strict).First();
+                _ = foo.Id;
+                Assert.Throws<MockException>(() => _ = foo.Name);
+            }
 
-		public interface IFoo
-		{
-			string Id { get; set; }
-			string Name { get; set; }
-			bool Do();
-		}
-	}
+            [Fact]
+            public void Strict_OneOf_will_throw_for_non_setup_property()
+            {
+                var foo = this.repository.OneOf<IFoo>(MockBehavior.Strict);
+                Assert.Throws<MockException>(() => _ = foo.Name);
+            }
+
+            [Fact]
+            public void Strict_OneOf_with_expression_will_throw_for_non_setup_property()
+            {
+                var foo = this.repository.OneOf<IFoo>(f => f.Id == default, MockBehavior.Strict);
+                _ = foo.Id;
+                Assert.Throws<MockException>(() => _ = foo.Name);
+            }
+        }
+
+        public interface IFoo
+        {
+            string Id { get; set; }
+            string Name { get; set; }
+            bool Do();
+        }
+    }
 }

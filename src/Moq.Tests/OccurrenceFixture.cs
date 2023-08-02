@@ -7,72 +7,79 @@ using Xunit;
 
 namespace Moq.Tests
 {
-	public class OccurrenceFixture
-	{
-		[Fact]
-		[Obsolete]
-		public void OnceThrowsOnSecondCall()
-		{
-			var mock = new Mock<IFoo>();
-			mock.Setup(foo => foo.Execute("ping"))
-				.Returns("ack")
-				.AtMostOnce();
+    public class OccurrenceFixture
+    {
+        [Fact]
+        [Obsolete]
+        public void OnceThrowsOnSecondCall()
+        {
+            var mock = new Mock<IFoo>();
+            mock.Setup(foo => foo.Execute("ping"))
+                .Returns("ack")
+                .AtMostOnce();
 
-			Assert.Equal("ack", mock.Object.Execute("ping"));
-			MockException mex = Assert.Throws<MockException>(() => mock.Object.Execute("ping"));
-			Assert.Equal(MockExceptionReasons.IncorrectNumberOfCalls, mex.Reasons);
-		}
+            Assert.Equal("ack", mock.Object.Execute("ping"));
+            MockException mex = Assert.Throws<MockException>(() => mock.Object.Execute("ping"));
+            Assert.Equal(MockExceptionReasons.IncorrectNumberOfCalls, mex.Reasons);
+        }
 
-		[Fact]
-		[Obsolete]
-		public void RepeatThrowsOnNPlusOneCall()
-		{
-			var repeat = 5;
-			var mock = new Mock<IFoo>();
-			mock.Setup(foo => foo.Execute("ping"))
-				.Returns("ack")
-				.AtMost(5);
+        [Fact]
+        [Obsolete]
+        public void RepeatThrowsOnNPlusOneCall()
+        {
+            var repeat = 5;
+            var mock = new Mock<IFoo>();
+            mock.Setup(foo => foo.Execute("ping"))
+                .Returns("ack")
+                .AtMost(5);
 
-			var calls = 0;
-			MockException mex = Assert.Throws<MockException>(() =>
-			{
-				while (calls <= repeat + 1)
-				{
-					mock.Object.Execute("ping");
-					calls++;
-				}
+            var calls = 0;
+            MockException mex = Assert.Throws<MockException>(() =>
+            {
+                while (calls <= repeat + 1)
+                {
+                    mock.Object.Execute("ping");
+                    calls++;
 
-				Assert.True(false, "should fail on two calls");
-			});
+                    /* Unmerged change from project 'Moq.Tests(net6.0)'
+                    Before:
+                                    Assert.True(false, "should fail on two calls");
+                    After:
+                                    Assert.Fail("should fail on two calls");
+                    */
+                }
 
-			Assert.Equal(MockExceptionReasons.IncorrectNumberOfCalls, mex.Reasons);
-			Assert.Equal(calls, repeat);
-		}
+                Assert.Fail("should fail on two calls");
+            });
 
-		[Fact]
-		[Obsolete]
-		public void CallsThatThrowExceptionStillCountAsCalls()
-		{
-			var mock = new Mock<IFoo>();
-			mock.Setup(f => f.Submit()).Throws<InvalidOperationException>().AtMostOnce();
+            Assert.Equal(MockExceptionReasons.IncorrectNumberOfCalls, mex.Reasons);
+            Assert.Equal(calls, repeat);
+        }
 
-			var firstException = Record.Exception(() => mock.Object.Submit());
-			var secondException = Record.Exception(() => mock.Object.Submit());
+        [Fact]
+        [Obsolete]
+        public void CallsThatThrowExceptionStillCountAsCalls()
+        {
+            var mock = new Mock<IFoo>();
+            mock.Setup(f => f.Submit()).Throws<InvalidOperationException>().AtMostOnce();
 
-			// The first call should trigger the exception specified in the setup:
-			Assert.IsType<InvalidOperationException>(firstException);
+            var firstException = Record.Exception(() => mock.Object.Submit());
+            var secondException = Record.Exception(() => mock.Object.Submit());
 
-			// The second call should trigger a MockException since the max call count
-			// was exceeded:
-			Assert.IsType<MockException>(secondException);
-		}
+            // The first call should trigger the exception specified in the setup:
+            Assert.IsType<InvalidOperationException>(firstException);
 
-		public interface IFoo
-		{
-			int Value { get; set; }
-			int Echo(int value);
-			void Submit();
-			string Execute(string command);
-		}
-	}
+            // The second call should trigger a MockException since the max call count
+            // was exceeded:
+            Assert.IsType<MockException>(secondException);
+        }
+
+        public interface IFoo
+        {
+            int Value { get; set; }
+            int Echo(int value);
+            void Submit();
+            string Execute(string command);
+        }
+    }
 }

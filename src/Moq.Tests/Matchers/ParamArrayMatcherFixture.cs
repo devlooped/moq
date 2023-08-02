@@ -10,46 +10,53 @@ using Xunit;
 
 namespace Moq.Tests.Matchers
 {
-	public class ParamArrayMatcherFixture
-	{
-		[Theory]
-		[InlineData(42, "", true)]
-		[InlineData(42, null, true)]
-		[InlineData(3.141f, "", false)]
-		[InlineData(null, "", false)]
-		public void Matches_several_matchers_from_params_array(object first, object second, bool shouldMatch)
-		{
-			var seconds = new List<string>();
-			var methodCallExpr = (MethodCallExpression)ToExpression<IX>(x => x.Method(It.IsAny<int>(), Capture.In(seconds))).Body;
-			var expr = methodCallExpr.Arguments.Single();
-			var parameter = typeof(IX).GetMethod("Method").GetParameters().Single();
+    public class ParamArrayMatcherFixture
+    {
+        [Theory]
+        [InlineData(42, "", true)]
+        [InlineData(42, null, true)]
+        [InlineData(3.141f, "", false)]
+        [InlineData(null, "", false)]
+        public void Matches_several_matchers_from_params_array(object first, object second, bool shouldMatch)
+        {
+            var seconds = new List<string>();
+            var methodCallExpr = (MethodCallExpression)ToExpression<IX>(x => x.Method(It.IsAny<int>(), Capture.In(seconds))).Body;
+            var expr = methodCallExpr.Arguments.Single();
+            var parameter = typeof(IX).GetMethod("Method").GetParameters().Single();
 
-			var (matcher, _) = MatcherFactory.CreateMatcher(expr, parameter);
+            var (matcher, _) = MatcherFactory.CreateMatcher(expr, parameter);
 
-			Assert.Equal(shouldMatch, matcher.Matches(new object[] { first, second }, typeof(object[])));
-		}
+            Assert.Equal(shouldMatch, matcher.Matches(new object[] { first, second }, typeof(object[])));
+        }
 
-		[Fact]
-		public void SetupEvaluatedSuccessfully_succeeds_for_matching_values()
-		{
-			var seconds = new List<string>();
-			var methodCallExpr = (MethodCallExpression)ToExpression<IX>(x => x.Method(It.IsAny<int>(), Capture.In(seconds))).Body;
-			var expr = methodCallExpr.Arguments.Single();
-			var parameter = typeof(IX).GetMethod("Method").GetParameters().Single();
+        [Fact]
+        public void SetupEvaluatedSuccessfully_succeeds_for_matching_values()
+        {
+            var seconds = new List<string>();
+            var methodCallExpr = (MethodCallExpression)ToExpression<IX>(x => x.Method(It.IsAny<int>(), Capture.In(seconds))).Body;
+            var expr = methodCallExpr.Arguments.Single();
+            var parameter = typeof(IX).GetMethod("Method").GetParameters().Single();
 
-			var (matcher, _) = MatcherFactory.CreateMatcher(expr, parameter);
+            var (matcher, _) = MatcherFactory.CreateMatcher(expr, parameter);
 
-			matcher.SetupEvaluatedSuccessfully(new object[] { 42, "" }, typeof(object[]));
-		}
+            matcher.SetupEvaluatedSuccessfully(new object[] { 42, "" }, typeof(object[]));
 
-		private LambdaExpression ToExpression<T>(Expression<Action<T>> expr)
-		{
-			return expr;
-		}
+            /* Unmerged change from project 'Moq.Tests(net6.0)'
+            Before:
+                    private LambdaExpression ToExpression<T>(Expression<Action<T>> expr)
+            After:
+                    LambdaExpression ToExpression<T>(Expression<Action<T>> expr)
+            */
+        }
 
-		public interface IX
-		{
-			void Method(params object[] args);
-		}
-	}
+        LambdaExpression ToExpression<T>(Expression<Action<T>> expr)
+        {
+            return expr;
+        }
+
+        public interface IX
+        {
+            void Method(params object[] args);
+        }
+    }
 }

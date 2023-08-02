@@ -8,139 +8,235 @@ using System.Diagnostics;
 
 namespace Moq
 {
-	internal sealed class InvocationCollection : IInvocationList
-	{
-		private Invocation[] invocations;
 
-		private int capacity = 0;
-		private int count = 0;
+    /* Unmerged change from project 'Moq(netstandard2.0)'
+    Before:
+        internal sealed class InvocationCollection : IInvocationList
+    After:
+        sealed class InvocationCollection : IInvocationList
+    */
 
-		private readonly object invocationsLock = new object();
-		private readonly Mock owner;
+    /* Unmerged change from project 'Moq(netstandard2.1)'
+    Before:
+        internal sealed class InvocationCollection : IInvocationList
+    After:
+        sealed class InvocationCollection : IInvocationList
+    */
 
-		public InvocationCollection(Mock owner)
-		{
-			Debug.Assert(owner != null);
+    /* Unmerged change from project 'Moq(net6.0)'
+    Before:
+        internal sealed class InvocationCollection : IInvocationList
+    After:
+        sealed class InvocationCollection : IInvocationList
+    */
+    sealed class InvocationCollection : IInvocationList
 
-			this.owner = owner;
-		}
+    /* Unmerged change from project 'Moq(netstandard2.0)'
+    Before:
+            private Invocation[] invocations;
+    After:
+            Invocation[] invocations;
+    */
 
-		public int Count
-		{
-			get
-			{
-				lock (this.invocationsLock)
-				{
-					return count;
-				}
-			}
-		}
+    /* Unmerged change from project 'Moq(netstandard2.1)'
+    Before:
+            private Invocation[] invocations;
+    After:
+            Invocation[] invocations;
+    */
 
-		public IInvocation this[int index]
-		{
-			get
-			{
-				lock (this.invocationsLock)
-				{
-					if (this.count <= index || index < 0)
-					{
-						throw new IndexOutOfRangeException();
-					}
+    /* Unmerged change from project 'Moq(net6.0)'
+    Before:
+            private Invocation[] invocations;
+    After:
+            Invocation[] invocations;
+    */
+    {
+        Invocation[] invocations;
 
-					return this.invocations[index];
-				}
-			}
-		}
 
-		public void Add(Invocation invocation)
-		{
-			lock (this.invocationsLock)
-			{
-				if (this.count == this.capacity)
-				{
-					var targetCapacity = this.capacity == 0 ? 4 : (this.capacity * 2);
-					Array.Resize(ref this.invocations, targetCapacity);
-					this.capacity = targetCapacity;
-				}
+        /* Unmerged change from project 'Moq(netstandard2.0)'
+        Before:
+                private int capacity = 0;
+                private int count = 0;
+        After:
+                int capacity = 0;
+                int count = 0;
+        */
 
-				this.invocations[this.count] = invocation;
-				this.count++;
-			}
-		}
+        /* Unmerged change from project 'Moq(netstandard2.1)'
+        Before:
+                private int capacity = 0;
+                private int count = 0;
+        After:
+                int capacity = 0;
+                int count = 0;
+        */
 
-		public void Clear()
-		{
-			lock (this.invocationsLock)
-			{
-				// Replace the collection so readers with a reference to the old collection aren't interrupted
-				this.invocations = null;
-				this.count = 0;
-				this.capacity = 0;
+        /* Unmerged change from project 'Moq(net6.0)'
+        Before:
+                private int capacity = 0;
+                private int count = 0;
+        After:
+                int capacity = 0;
+                int count = 0;
+        */
+        int capacity = 0;
+        int count = 0;
 
-				this.owner.MutableSetups.Reset();
-				// ^ TODO: Currently this could cause a deadlock as another lock will be taken inside this one!
-			}
-		}
 
-		public Invocation[] ToArray()
-		{
-			lock (this.invocationsLock)
-			{
-				if (this.count == 0)
-				{
-					return new Invocation[0];
-				}
+        /* Unmerged change from project 'Moq(netstandard2.0)'
+        Before:
+                private readonly object invocationsLock = new object();
+                private readonly Mock owner;
+        After:
+                readonly object invocationsLock = new object();
+                readonly Mock owner;
+        */
 
-				var result = new Invocation[this.count];
+        /* Unmerged change from project 'Moq(netstandard2.1)'
+        Before:
+                private readonly object invocationsLock = new object();
+                private readonly Mock owner;
+        After:
+                readonly object invocationsLock = new object();
+                readonly Mock owner;
+        */
 
-				Array.Copy(this.invocations, result, this.count);
+        /* Unmerged change from project 'Moq(net6.0)'
+        Before:
+                private readonly object invocationsLock = new object();
+                private readonly Mock owner;
+        After:
+                readonly object invocationsLock = new object();
+                readonly Mock owner;
+        */
+        readonly object invocationsLock = new object();
+        readonly Mock owner;
 
-				return result;
-			}
-		}
+        public InvocationCollection(Mock owner)
+        {
+            Debug.Assert(owner != null);
 
-		public Invocation[] ToArray(Func<Invocation, bool> predicate)
-		{
-			lock (this.invocationsLock)
-			{
-				if (this.count == 0)
-				{
-					return new Invocation[0];
-				}
-				
-				var result = new List<Invocation>(this.count);
+            this.owner = owner;
+        }
 
-				for (var i = 0; i < this.count; i++)
-				{
-					var invocation = this.invocations[i];
-					if (predicate(invocation))
-					{
-						result.Add(invocation);
-					}
-				}
+        public int Count
+        {
+            get
+            {
+                lock (this.invocationsLock)
+                {
+                    return count;
+                }
+            }
+        }
 
-				return result.ToArray();
-			}
-		}
+        public IInvocation this[int index]
+        {
+            get
+            {
+                lock (this.invocationsLock)
+                {
+                    if (this.count <= index || index < 0)
+                    {
+                        throw new IndexOutOfRangeException();
+                    }
 
-		public IEnumerator<IInvocation> GetEnumerator()
-		{
-			// Take local copies of collection and count so they are isolated from changes by other threads.
-			Invocation[] collection;
-			int count;
+                    return this.invocations[index];
+                }
+            }
+        }
 
-			lock (this.invocationsLock)
-			{
-				collection = this.invocations;
-				count = this.count;
-			}
+        public void Add(Invocation invocation)
+        {
+            lock (this.invocationsLock)
+            {
+                if (this.count == this.capacity)
+                {
+                    var targetCapacity = this.capacity == 0 ? 4 : (this.capacity * 2);
+                    Array.Resize(ref this.invocations, targetCapacity);
+                    this.capacity = targetCapacity;
+                }
 
-			for (var i = 0; i < count; i++)
-			{
-				yield return collection[i];
-			}
-		}
+                this.invocations[this.count] = invocation;
+                this.count++;
+            }
+        }
 
-		IEnumerator IEnumerable.GetEnumerator() => GetEnumerator();
-	}
+        public void Clear()
+        {
+            lock (this.invocationsLock)
+            {
+                // Replace the collection so readers with a reference to the old collection aren't interrupted
+                this.invocations = null;
+                this.count = 0;
+                this.capacity = 0;
+
+                this.owner.MutableSetups.Reset();
+                // ^ TODO: Currently this could cause a deadlock as another lock will be taken inside this one!
+            }
+        }
+
+        public Invocation[] ToArray()
+        {
+            lock (this.invocationsLock)
+            {
+                if (this.count == 0)
+                {
+                    return new Invocation[0];
+                }
+
+                var result = new Invocation[this.count];
+
+                Array.Copy(this.invocations, result, this.count);
+
+                return result;
+            }
+        }
+
+        public Invocation[] ToArray(Func<Invocation, bool> predicate)
+        {
+            lock (this.invocationsLock)
+            {
+                if (this.count == 0)
+                {
+                    return new Invocation[0];
+                }
+
+                var result = new List<Invocation>(this.count);
+
+                for (var i = 0; i < this.count; i++)
+                {
+                    var invocation = this.invocations[i];
+                    if (predicate(invocation))
+                    {
+                        result.Add(invocation);
+                    }
+                }
+
+                return result.ToArray();
+            }
+        }
+
+        public IEnumerator<IInvocation> GetEnumerator()
+        {
+            // Take local copies of collection and count so they are isolated from changes by other threads.
+            Invocation[] collection;
+            int count;
+
+            lock (this.invocationsLock)
+            {
+                collection = this.invocations;
+                count = this.count;
+            }
+
+            for (var i = 0; i < count; i++)
+            {
+                yield return collection[i];
+            }
+        }
+
+        IEnumerator IEnumerable.GetEnumerator() => GetEnumerator();
+    }
 }

@@ -8,278 +8,278 @@ using Xunit;
 
 namespace Moq.Tests.Linq
 {
-	public class SupportedQuerying
-	{
-		public class GivenABooleanProperty
-		{
-			[Fact]
-			public void WhenImplicitlyQueryingTrueOneOf_ThenSetsPropertyToTrue()
-			{
-				var target = Mock.Of<IFoo>(x => x.IsValid);
+    public class SupportedQuerying
+    {
+        public class GivenABooleanProperty
+        {
+            [Fact]
+            public void WhenImplicitlyQueryingTrueOneOf_ThenSetsPropertyToTrue()
+            {
+                var target = Mock.Of<IFoo>(x => x.IsValid);
 
-				Assert.True(target.IsValid);
-			}
+                Assert.True(target.IsValid);
+            }
 
-			[Fact]
-			public void WhenImplicitlyQueryingTrueWhere_ThenSetsPropertyToTrue()
-			{
-				var target = Mocks.Of<IFoo>().Where(x => x.IsValid);
+            [Fact]
+            public void WhenImplicitlyQueryingTrueWhere_ThenSetsPropertyToTrue()
+            {
+                var target = Mocks.Of<IFoo>().Where(x => x.IsValid);
 
-				Assert.True(target.First().IsValid);
-			}
+                Assert.True(target.First().IsValid);
+            }
 
-			[Fact]
-			public void WhenImplicitlyQueryingTrueFirst_ThenSetsPropertyToTrue()
-			{
-				var target = Mocks.Of<IFoo>().First(x => x.IsValid);
+            [Fact]
+            public void WhenImplicitlyQueryingTrueFirst_ThenSetsPropertyToTrue()
+            {
+                var target = Mocks.Of<IFoo>().First(x => x.IsValid);
 
-				Assert.True(target.IsValid);
-			}
+                Assert.True(target.IsValid);
+            }
 
-			[Fact]
-			public void WhenImplicitlyQueryingTrueFirstOrDefault_ThenSetsPropertyToTrue()
-			{
-				var target = Mocks.Of<IFoo>().FirstOrDefault(x => x.IsValid);
+            [Fact]
+            public void WhenImplicitlyQueryingTrueFirstOrDefault_ThenSetsPropertyToTrue()
+            {
+                var target = Mocks.Of<IFoo>().FirstOrDefault(x => x.IsValid);
 
-				Assert.True(target.IsValid);
-			}
+                Assert.True(target.IsValid);
+            }
 
-			[Fact]
-			public void WhenExplicitlyQueryingTrueOneOf_ThenSetsPropertyToTrue()
-			{
-				var target = Mock.Of<IFoo>(x => x.IsValid == true);
+            [Fact]
+            public void WhenExplicitlyQueryingTrueOneOf_ThenSetsPropertyToTrue()
+            {
+                var target = Mock.Of<IFoo>(x => x.IsValid == true);
 
-				Assert.True(target.IsValid);
-			}
+                Assert.True(target.IsValid);
+            }
 
-			[Fact]
-			public void WhenExplicitlyQueryingTrueWhere_ThenSetsPropertyToTrue()
-			{
-				var target = Mocks.Of<IFoo>().Where(x => x.IsValid == true);
+            [Fact]
+            public void WhenExplicitlyQueryingTrueWhere_ThenSetsPropertyToTrue()
+            {
+                var target = Mocks.Of<IFoo>().Where(x => x.IsValid == true);
 
-				Assert.True(target.First().IsValid);
-			}
+                Assert.True(target.First().IsValid);
+            }
 
-			[Fact]
-			public void WhenExplicitlyQueryingTrueFirst_ThenSetsPropertyToTrue()
-			{
-				var target = Mocks.Of<IFoo>().First(x => x.IsValid == true);
+            [Fact]
+            public void WhenExplicitlyQueryingTrueFirst_ThenSetsPropertyToTrue()
+            {
+                var target = Mocks.Of<IFoo>().First(x => x.IsValid == true);
 
-				Assert.True(target.IsValid);
-			}
+                Assert.True(target.IsValid);
+            }
 
-			[Fact]
-			public void WhenExplicitlyQueryingTrueFirstOrDefault_ThenSetsPropertyToTrue()
-			{
-				var target = Mocks.Of<IFoo>().FirstOrDefault(x => x.IsValid == true);
+            [Fact]
+            public void WhenExplicitlyQueryingTrueFirstOrDefault_ThenSetsPropertyToTrue()
+            {
+                var target = Mocks.Of<IFoo>().FirstOrDefault(x => x.IsValid == true);
 
-				Assert.True(target.IsValid);
-			}
+                Assert.True(target.IsValid);
+            }
 
-			[Fact]
-			public void WhenQueryingOnFluent_ThenSetsPropertyToTrue()
-			{
-				var target = Mocks.Of<IFluent>().FirstOrDefault(x => x.Foo.IsValid == true);
+            [Fact]
+            public void WhenQueryingOnFluent_ThenSetsPropertyToTrue()
+            {
+                var target = Mocks.Of<IFluent>().FirstOrDefault(x => x.Foo.IsValid == true);
 
-				Assert.True(target.Foo.IsValid);
-			}
+                Assert.True(target.Foo.IsValid);
+            }
 
-			[Fact]
-			public void WhenQueryingWithFalse_ThenSetsProperty()
-			{
-				var target = Mock.Of<FooDefaultIsValid>(x => x.IsValid == false);
+            [Fact]
+            public void WhenQueryingWithFalse_ThenSetsProperty()
+            {
+                var target = Mock.Of<FooDefaultIsValid>(x => x.IsValid == false);
 
-				Assert.False(target.IsValid);
-			}
+                Assert.False(target.IsValid);
+            }
 
-			[Fact]
-			public void WhenQueryingTrueEquals_ThenSetsProperty()
-			{
-				var target = Mock.Of<IFoo>(x => true == x.IsValid);
+            [Fact]
+            public void WhenQueryingTrueEquals_ThenSetsProperty()
+            {
+                var target = Mock.Of<IFoo>(x => true == x.IsValid);
 
-				Assert.True(target.IsValid);
-			}
+                Assert.True(target.IsValid);
+            }
 
-			[Fact]
-			public void WhenQueryingFalseEquals_ThenSetsProperty()
-			{
-				var target = Mock.Of<FooDefaultIsValid>(x => false == x.IsValid);
+            [Fact]
+            public void WhenQueryingFalseEquals_ThenSetsProperty()
+            {
+                var target = Mock.Of<FooDefaultIsValid>(x => false == x.IsValid);
 
-				Assert.False(target.IsValid);
-			}
+                Assert.False(target.IsValid);
+            }
 
-			[Fact]
-			public void WhenQueryingNegatedProperty_ThenSetsProperty()
-			{
-				var target = Mock.Of<FooDefaultIsValid>(x => !x.IsValid);
+            [Fact]
+            public void WhenQueryingNegatedProperty_ThenSetsProperty()
+            {
+                var target = Mock.Of<FooDefaultIsValid>(x => !x.IsValid);
 
-				Assert.False(target.IsValid);
-			}
+                Assert.False(target.IsValid);
+            }
 
-			[Fact]
-			public void WhenQueryingWithNoValue_ThenAlwaysHasPropertyStubBehavior()
-			{
-				var foo = Mock.Of<IFoo>();
+            [Fact]
+            public void WhenQueryingWithNoValue_ThenAlwaysHasPropertyStubBehavior()
+            {
+                var foo = Mock.Of<IFoo>();
 
-				foo.IsValid = true;
+                foo.IsValid = true;
 
-				Assert.True(foo.IsValid);
+                Assert.True(foo.IsValid);
 
-				foo.IsValid = false;
+                foo.IsValid = false;
 
-				Assert.False(foo.IsValid);
-			}
+                Assert.False(foo.IsValid);
+            }
 
-			public class FooDefaultIsValid : IFoo
-			{
-				public FooDefaultIsValid()
-				{
-					this.IsValid = true;
-				}
+            public class FooDefaultIsValid : IFoo
+            {
+                public FooDefaultIsValid()
+                {
+                    this.IsValid = true;
+                }
 
-				public virtual bool IsValid { get; set; }
-			}
+                public virtual bool IsValid { get; set; }
+            }
 
-			public interface IFoo
-			{
-				bool IsValid { get; set; }
-			}
+            public interface IFoo
+            {
+                bool IsValid { get; set; }
+            }
 
-			public interface IFluent
-			{
-				IFoo Foo { get; set; }
-			}
-		}
+            public interface IFluent
+            {
+                IFoo Foo { get; set; }
+            }
+        }
 
-		public class GivenAnEnumProperty
-		{
-			[Fact]
-			public void WhenQueryingWithEnumValue_ThenSetsPropertyValue()
-			{
-				var target = Mocks.Of<IFoo>().First(f => f.Targets == AttributeTargets.Class);
+        public class GivenAnEnumProperty
+        {
+            [Fact]
+            public void WhenQueryingWithEnumValue_ThenSetsPropertyValue()
+            {
+                var target = Mocks.Of<IFoo>().First(f => f.Targets == AttributeTargets.Class);
 
-				Assert.Equal(AttributeTargets.Class, target.Targets);
-			}
+                Assert.Equal(AttributeTargets.Class, target.Targets);
+            }
 
-			//[Fact(Skip = "Not implemented yet. Need to refactor old matcher stuff to the new one, require the MatcherAttribute on matchers, and verify it.")]
-			//public void WhenQueryingWithItIsAny_ThenThrowsNotSupportedException()
-			//{
-			//	var target = Mocks.Of<IFoo>().First(f => f.Targets == It.IsAny<AttributeTargets>());
-			//
-			//	Assert.Equal(AttributeTargets.Class, target.Targets);
-			//}
+            //[Fact(Skip = "Not implemented yet. Need to refactor old matcher stuff to the new one, require the MatcherAttribute on matchers, and verify it.")]
+            //public void WhenQueryingWithItIsAny_ThenThrowsNotSupportedException()
+            //{
+            //	var target = Mocks.Of<IFoo>().First(f => f.Targets == It.IsAny<AttributeTargets>());
+            //
+            //	Assert.Equal(AttributeTargets.Class, target.Targets);
+            //}
 
-			public interface IFoo
-			{
-				AttributeTargets Targets { get; set; }
-			}
-		}
+            public interface IFoo
+            {
+                AttributeTargets Targets { get; set; }
+            }
+        }
 
-		public class GivenTwoProperties
-		{
-			[Fact]
-			public void WhenCombiningQueryingWithImplicitBoolean_ThenSetsBothProperties()
-			{
-				var target = Mock.Of<IFoo>(x => x.IsValid && x.Value == "foo");
+        public class GivenTwoProperties
+        {
+            [Fact]
+            public void WhenCombiningQueryingWithImplicitBoolean_ThenSetsBothProperties()
+            {
+                var target = Mock.Of<IFoo>(x => x.IsValid && x.Value == "foo");
 
-				Assert.True(target.IsValid);
-				Assert.Equal("foo", target.Value);
-			}
+                Assert.True(target.IsValid);
+                Assert.Equal("foo", target.Value);
+            }
 
-			[Fact]
-			public void WhenCombiningQueryingWithExplicitBoolean_ThenSetsBothProperties()
-			{
-				var target = Mock.Of<IFoo>(x => x.IsValid == true && x.Value == "foo");
+            [Fact]
+            public void WhenCombiningQueryingWithExplicitBoolean_ThenSetsBothProperties()
+            {
+                var target = Mock.Of<IFoo>(x => x.IsValid == true && x.Value == "foo");
 
-				Assert.True(target.IsValid);
-				Assert.Equal("foo", target.Value);
-			}
+                Assert.True(target.IsValid);
+                Assert.Equal("foo", target.Value);
+            }
 
-			public interface IFoo
-			{
-				string Value { get; set; }
-				bool IsValid { get; set; }
-			}
-		}
+            public interface IFoo
+            {
+                string Value { get; set; }
+                bool IsValid { get; set; }
+            }
+        }
 
-		public class GivenAMethodWithOneParameter
-		{
-			[Fact]
-			public void WhenUsingSpecificArgumentValue_ThenSetsReturnValue()
-			{
-				var foo = Mock.Of<IFoo>(x => x.Do(5) == "foo");
+        public class GivenAMethodWithOneParameter
+        {
+            [Fact]
+            public void WhenUsingSpecificArgumentValue_ThenSetsReturnValue()
+            {
+                var foo = Mock.Of<IFoo>(x => x.Do(5) == "foo");
 
-				Assert.Equal("foo", foo.Do(5));
-			}
+                Assert.Equal("foo", foo.Do(5));
+            }
 
-			[Fact]
-			public void WhenUsingItIsAnyForArgument_ThenSetsReturnValue()
-			{
-				var foo = Mock.Of<IFoo>(x => x.Do(It.IsAny<int>()) == "foo");
+            [Fact]
+            public void WhenUsingItIsAnyForArgument_ThenSetsReturnValue()
+            {
+                var foo = Mock.Of<IFoo>(x => x.Do(It.IsAny<int>()) == "foo");
 
-				Assert.Equal("foo", foo.Do(5));
-			}
+                Assert.Equal("foo", foo.Do(5));
+            }
 
-			[Fact]
-			public void WhenUsingItIsForArgument_ThenSetsReturnValue()
-			{
-				var foo = Mock.Of<IFoo>(x => x.Do(It.Is<int>(i => i > 0)) == "foo");
+            [Fact]
+            public void WhenUsingItIsForArgument_ThenSetsReturnValue()
+            {
+                var foo = Mock.Of<IFoo>(x => x.Do(It.Is<int>(i => i > 0)) == "foo");
 
-				Assert.Equal("foo", foo.Do(5));
-				Assert.Equal(default(string), foo.Do(-5));
-			}
+                Assert.Equal("foo", foo.Do(5));
+                Assert.Equal(default(string), foo.Do(-5));
+            }
 
-			[Fact]
-			public void WhenUsingCustomMatcherForArgument_ThenSetsReturnValue()
-			{
-				var foo = Mock.Of<IFoo>(x => x.Do(Any<int>()) == "foo");
+            [Fact]
+            public void WhenUsingCustomMatcherForArgument_ThenSetsReturnValue()
+            {
+                var foo = Mock.Of<IFoo>(x => x.Do(Any<int>()) == "foo");
 
-				Assert.Equal("foo", foo.Do(5));
-			}
+                Assert.Equal("foo", foo.Do(5));
+            }
 
-			public TValue Any<TValue>()
-			{
-				return Match.Create<TValue>(v => true);
-			}
+            public TValue Any<TValue>()
+            {
+                return Match.Create<TValue>(v => true);
+            }
 
-			public interface IFoo
-			{
-				string Do(int value);
-			}
-		}
+            public interface IFoo
+            {
+                string Do(int value);
+            }
+        }
 
-		public class GivenAClassWithNonVirtualProperties
-		{
-			[Fact]
-			public void WhenQueryingByProperties_ThenSetsThemDirectly()
-			{
-				var foo = Mock.Of<Foo>(x => x.Id == 1 && x.Value == "hello");
+        public class GivenAClassWithNonVirtualProperties
+        {
+            [Fact]
+            public void WhenQueryingByProperties_ThenSetsThemDirectly()
+            {
+                var foo = Mock.Of<Foo>(x => x.Id == 1 && x.Value == "hello");
 
-				Assert.Equal(1, foo.Id);
-				Assert.Equal("hello", foo.Value);
-			}
+                Assert.Equal(1, foo.Id);
+                Assert.Equal("hello", foo.Value);
+            }
 
-			public class Foo
-			{
-				public int Id { get; set; }
-				public string Value { get; set; }
-			}
-		}
+            public class Foo
+            {
+                public int Id { get; set; }
+                public string Value { get; set; }
+            }
+        }
 
-		public class GivenAReadonlyProperty
-		{
-			[Fact]
-			public void WhenQueryingByProperties_ThenSetsThemDirectly()
-			{
-				var foo = Mock.Of<Foo>(x => x.Id == 1);
+        public class GivenAReadonlyProperty
+        {
+            [Fact]
+            public void WhenQueryingByProperties_ThenSetsThemDirectly()
+            {
+                var foo = Mock.Of<Foo>(x => x.Id == 1);
 
-				Assert.Equal(1, foo.Id);
-			}
+                Assert.Equal(1, foo.Id);
+            }
 
-			public class Foo
-			{
-				public virtual int Id { get { return 0; } }
-			}
-		}
-	}
+            public class Foo
+            {
+                public virtual int Id { get { return 0; } }
+            }
+        }
+    }
 }

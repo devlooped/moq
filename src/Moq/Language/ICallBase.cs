@@ -7,15 +7,15 @@ using Moq.Language.Flow;
 
 namespace Moq.Language
 {
-	/// <summary>
-	/// Defines the <c>CallBase</c> verb.
-	/// </summary>
-	[EditorBrowsable(EditorBrowsableState.Never)]
-	public interface ICallBase : IFluentInterface
-	{
-		/// <summary>
-		/// Calls the real method of the object.
-		/// </summary>
-		ICallBaseResult CallBase();
-	}
+    /// <summary>
+    /// Defines the <c>CallBase</c> verb.
+    /// </summary>
+    [EditorBrowsable(EditorBrowsableState.Never)]
+    public interface ICallBase : IFluentInterface
+    {
+        /// <summary>
+        /// Calls the real method of the object.
+        /// </summary>
+        ICallBaseResult CallBase();
+    }
 }

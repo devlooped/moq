@@ -8,40 +8,103 @@ using System.Threading.Tasks;
 
 namespace Moq.Async
 {
-	internal static class AwaitableFactory
-	{
-		private static readonly Dictionary<Type, Func<Type, IAwaitableFactory>> Providers;
 
-		static AwaitableFactory()
-		{
-			AwaitableFactory.Providers = new Dictionary<Type, Func<Type, IAwaitableFactory>>
-			{
-				[typeof(Task)] = awaitableType => TaskFactory.Instance,
-				[typeof(ValueTask)] = awaitableType => ValueTaskFactory.Instance,
-				[typeof(Task<>)] = awaitableType => AwaitableFactory.Create(typeof(TaskFactory<>), awaitableType),
-				[typeof(ValueTask<>)] = awaitableType => AwaitableFactory.Create(typeof(ValueTaskFactory<>), awaitableType),
-			};
-		}
+    /* Unmerged change from project 'Moq(netstandard2.0)'
+    Before:
+        internal static class AwaitableFactory
+    After:
+        static class AwaitableFactory
+    */
 
-		private static IAwaitableFactory Create(Type awaitableFactoryType, Type awaitableType)
-		{
-			return (IAwaitableFactory)Activator.CreateInstance(
-				awaitableFactoryType.MakeGenericType(
-					awaitableType.GetGenericArguments()));
-		}
+    /* Unmerged change from project 'Moq(netstandard2.1)'
+    Before:
+        internal static class AwaitableFactory
+    After:
+        static class AwaitableFactory
+    */
 
-		public static IAwaitableFactory TryGet(Type type)
-		{
-			Debug.Assert(type != null);
+    /* Unmerged change from project 'Moq(net6.0)'
+    Before:
+        internal static class AwaitableFactory
+    After:
+        static class AwaitableFactory
+    */
+    static class AwaitableFactory
 
-			var key = type.IsConstructedGenericType ? type.GetGenericTypeDefinition() : type;
+    /* Unmerged change from project 'Moq(netstandard2.0)'
+    Before:
+            private static readonly Dictionary<Type, Func<Type, IAwaitableFactory>> Providers;
+    After:
+            static readonly Dictionary<Type, Func<Type, IAwaitableFactory>> Providers;
+    */
 
-			if (AwaitableFactory.Providers.TryGetValue(key, out var provider))
-			{
-				return provider.Invoke(type);
-			}
+    /* Unmerged change from project 'Moq(netstandard2.1)'
+    Before:
+            private static readonly Dictionary<Type, Func<Type, IAwaitableFactory>> Providers;
+    After:
+            static readonly Dictionary<Type, Func<Type, IAwaitableFactory>> Providers;
+    */
 
-			return null;
-		}
-	}
+    /* Unmerged change from project 'Moq(net6.0)'
+    Before:
+            private static readonly Dictionary<Type, Func<Type, IAwaitableFactory>> Providers;
+    After:
+            static readonly Dictionary<Type, Func<Type, IAwaitableFactory>> Providers;
+    */
+    {
+        static readonly Dictionary<Type, Func<Type, IAwaitableFactory>> Providers;
+
+        static AwaitableFactory()
+        {
+            AwaitableFactory.Providers = new Dictionary<Type, Func<Type, IAwaitableFactory>>
+            {
+                [typeof(Task)] = awaitableType => TaskFactory.Instance,
+                [typeof(ValueTask)] = awaitableType => ValueTaskFactory.Instance,
+                [typeof(Task<>)] = awaitableType => AwaitableFactory.Create(typeof(TaskFactory<>), awaitableType),
+                [typeof(ValueTask<>)] = awaitableType => AwaitableFactory.Create(typeof(ValueTaskFactory<>), awaitableType),
+            };
+
+            /* Unmerged change from project 'Moq(netstandard2.0)'
+            Before:
+                    private static IAwaitableFactory Create(Type awaitableFactoryType, Type awaitableType)
+            After:
+                    static IAwaitableFactory Create(Type awaitableFactoryType, Type awaitableType)
+            */
+
+            /* Unmerged change from project 'Moq(netstandard2.1)'
+            Before:
+                    private static IAwaitableFactory Create(Type awaitableFactoryType, Type awaitableType)
+            After:
+                    static IAwaitableFactory Create(Type awaitableFactoryType, Type awaitableType)
+            */
+
+            /* Unmerged change from project 'Moq(net6.0)'
+            Before:
+                    private static IAwaitableFactory Create(Type awaitableFactoryType, Type awaitableType)
+            After:
+                    static IAwaitableFactory Create(Type awaitableFactoryType, Type awaitableType)
+            */
+        }
+
+        static IAwaitableFactory Create(Type awaitableFactoryType, Type awaitableType)
+        {
+            return (IAwaitableFactory)Activator.CreateInstance(
+                awaitableFactoryType.MakeGenericType(
+                    awaitableType.GetGenericArguments()));
+        }
+
+        public static IAwaitableFactory TryGet(Type type)
+        {
+            Debug.Assert(type != null);
+
+            var key = type.IsConstructedGenericType ? type.GetGenericTypeDefinition() : type;
+
+            if (AwaitableFactory.Providers.TryGetValue(key, out var provider))
+            {
+                return provider.Invoke(type);
+            }
+
+            return null;
+        }
+    }
 }

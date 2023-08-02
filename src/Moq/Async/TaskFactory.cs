@@ -9,31 +9,73 @@ using System.Threading.Tasks;
 
 namespace Moq.Async
 {
-	internal sealed class TaskFactory : AwaitableFactory<Task>
-	{
-		public static readonly TaskFactory Instance = new TaskFactory();
 
-		private TaskFactory()
-		{
-		}
+    /* Unmerged change from project 'Moq(netstandard2.0)'
+    Before:
+        internal sealed class TaskFactory : AwaitableFactory<Task>
+    After:
+        sealed class TaskFactory : AwaitableFactory<Task>
+    */
 
-		public override Task CreateCompleted()
-		{
-			return Task.FromResult<object>(default);
-		}
+    /* Unmerged change from project 'Moq(netstandard2.1)'
+    Before:
+        internal sealed class TaskFactory : AwaitableFactory<Task>
+    After:
+        sealed class TaskFactory : AwaitableFactory<Task>
+    */
 
-		public override Task CreateFaulted(Exception exception)
-		{
-			var tcs = new TaskCompletionSource<object>();
-			tcs.SetException(exception);
-			return tcs.Task;
-		}
+    /* Unmerged change from project 'Moq(net6.0)'
+    Before:
+        internal sealed class TaskFactory : AwaitableFactory<Task>
+    After:
+        sealed class TaskFactory : AwaitableFactory<Task>
+    */
+    sealed class TaskFactory : AwaitableFactory<Task>
+    {
+        public static readonly TaskFactory Instance = new TaskFactory();
 
-		public override Task CreateFaulted(IEnumerable<Exception> exceptions)
-		{
-			var tcs = new TaskCompletionSource<object>();
-			tcs.SetException(exceptions);
-			return tcs.Task;
-		}
-	}
+
+        /* Unmerged change from project 'Moq(netstandard2.0)'
+        Before:
+                private TaskFactory()
+        After:
+                TaskFactory()
+        */
+
+        /* Unmerged change from project 'Moq(netstandard2.1)'
+        Before:
+                private TaskFactory()
+        After:
+                TaskFactory()
+        */
+
+        /* Unmerged change from project 'Moq(net6.0)'
+        Before:
+                private TaskFactory()
+        After:
+                TaskFactory()
+        */
+        TaskFactory()
+        {
+        }
+
+        public override Task CreateCompleted()
+        {
+            return Task.FromResult<object>(default);
+        }
+
+        public override Task CreateFaulted(Exception exception)
+        {
+            var tcs = new TaskCompletionSource<object>();
+            tcs.SetException(exception);
+            return tcs.Task;
+        }
+
+        public override Task CreateFaulted(IEnumerable<Exception> exceptions)
+        {
+            var tcs = new TaskCompletionSource<object>();
+            tcs.SetException(exceptions);
+            return tcs.Task;
+        }
+    }
 }

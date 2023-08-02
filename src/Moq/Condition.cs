@@ -5,19 +5,67 @@ using System;
 
 namespace Moq
 {
-	internal sealed class Condition
-	{
-		private Func<bool> condition;
-		private Action success;
 
-		public Condition(Func<bool> condition, Action success = null)
-		{
-			this.condition = condition;
-			this.success = success;
-		}
+    /* Unmerged change from project 'Moq(netstandard2.0)'
+    Before:
+        internal sealed class Condition
+    After:
+        sealed class Condition
+    */
 
-		public bool IsTrue => this.condition?.Invoke() == true;
+    /* Unmerged change from project 'Moq(netstandard2.1)'
+    Before:
+        internal sealed class Condition
+    After:
+        sealed class Condition
+    */
 
-		public void SetupEvaluatedSuccessfully() => this.success?.Invoke();
-	}
+    /* Unmerged change from project 'Moq(net6.0)'
+    Before:
+        internal sealed class Condition
+    After:
+        sealed class Condition
+    */
+    sealed class Condition
+
+    /* Unmerged change from project 'Moq(netstandard2.0)'
+    Before:
+            private Func<bool> condition;
+            private Action success;
+    After:
+            Func<bool> condition;
+            Action success;
+    */
+
+    /* Unmerged change from project 'Moq(netstandard2.1)'
+    Before:
+            private Func<bool> condition;
+            private Action success;
+    After:
+            Func<bool> condition;
+            Action success;
+    */
+
+    /* Unmerged change from project 'Moq(net6.0)'
+    Before:
+            private Func<bool> condition;
+            private Action success;
+    After:
+            Func<bool> condition;
+            Action success;
+    */
+    {
+        Func<bool> condition;
+        Action success;
+
+        public Condition(Func<bool> condition, Action success = null)
+        {
+            this.condition = condition;
+            this.success = success;
+        }
+
+        public bool IsTrue => this.condition?.Invoke() == true;
+
+        public void SetupEvaluatedSuccessfully() => this.success?.Invoke();
+    }
 }

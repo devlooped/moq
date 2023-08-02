@@ -6,26 +6,47 @@ using System.Linq.Expressions;
 
 namespace Moq
 {
-	internal sealed class MatchExpression : Expression
-	{
-		public readonly Match Match;
 
-		public MatchExpression(Match match)
-		{
-			this.Match = match;
-		}
+    /* Unmerged change from project 'Moq(netstandard2.0)'
+    Before:
+        internal sealed class MatchExpression : Expression
+    After:
+        sealed class MatchExpression : Expression
+    */
 
-		public override ExpressionType NodeType => ExpressionType.Extension;
+    /* Unmerged change from project 'Moq(netstandard2.1)'
+    Before:
+        internal sealed class MatchExpression : Expression
+    After:
+        sealed class MatchExpression : Expression
+    */
 
-		public override Type Type => this.Match.RenderExpression.Type;
+    /* Unmerged change from project 'Moq(net6.0)'
+    Before:
+        internal sealed class MatchExpression : Expression
+    After:
+        sealed class MatchExpression : Expression
+    */
+    sealed class MatchExpression : Expression
+    {
+        public readonly Match Match;
 
-		// This node type is irreducible in order to prevent compilation.
-		// The best possible reduction would involve `RenderExpression`,
-		// which isn't intended to be used for that purpose.
-		public override bool CanReduce => false;
+        public MatchExpression(Match match)
+        {
+            this.Match = match;
+        }
 
-		protected override Expression VisitChildren(ExpressionVisitor visitor) => this;
+        public override ExpressionType NodeType => ExpressionType.Extension;
 
-		public override string ToString() => this.Match.RenderExpression.ToString();
-	}
+        public override Type Type => this.Match.RenderExpression.Type;
+
+        // This node type is irreducible in order to prevent compilation.
+        // The best possible reduction would involve `RenderExpression`,
+        // which isn't intended to be used for that purpose.
+        public override bool CanReduce => false;
+
+        protected override Expression VisitChildren(ExpressionVisitor visitor) => this;
+
+        public override string ToString() => this.Match.RenderExpression.ToString();
+    }
 }

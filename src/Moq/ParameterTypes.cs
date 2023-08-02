@@ -8,30 +8,72 @@ using System.Reflection;
 
 namespace Moq
 {
-	/// <summary>
-	///   Allocation-free adapter type for treating a `ParameterInfo[]` array like a `Type[]` array.
-	/// </summary>
-	internal readonly struct ParameterTypes : IReadOnlyList<Type>
-	{
-		private readonly ParameterInfo[] parameters;
 
-		public ParameterTypes(ParameterInfo[] parameters)
-		{
-			this.parameters = parameters;
-		}
+    /* Unmerged change from project 'Moq(netstandard2.0)'
+    Before:
+        internal readonly struct ParameterTypes : IReadOnlyList<Type>
+    After:
+        readonly struct ParameterTypes : IReadOnlyList<Type>
+    */
 
-		public Type this[int index] => this.parameters[index].ParameterType;
+    /* Unmerged change from project 'Moq(netstandard2.1)'
+    Before:
+        internal readonly struct ParameterTypes : IReadOnlyList<Type>
+    After:
+        readonly struct ParameterTypes : IReadOnlyList<Type>
+    */
 
-		public int Count => this.parameters.Length;
+    /* Unmerged change from project 'Moq(net6.0)'
+    Before:
+        internal readonly struct ParameterTypes : IReadOnlyList<Type>
+    After:
+        readonly struct ParameterTypes : IReadOnlyList<Type>
+    */
+    /// <summary>
+    ///   Allocation-free adapter type for treating a `ParameterInfo[]` array like a `Type[]` array.
+    /// </summary>
+    readonly struct ParameterTypes : IReadOnlyList<Type>
 
-		public IEnumerator<Type> GetEnumerator()
-		{
-			for (int i = 0, n = this.Count; i < n; ++i)
-			{
-				yield return this[i];
-			}
-		}
+    /* Unmerged change from project 'Moq(netstandard2.0)'
+    Before:
+            private readonly ParameterInfo[] parameters;
+    After:
+            readonly ParameterInfo[] parameters;
+    */
 
-		IEnumerator IEnumerable.GetEnumerator() => this.GetEnumerator();
-	}
+    /* Unmerged change from project 'Moq(netstandard2.1)'
+    Before:
+            private readonly ParameterInfo[] parameters;
+    After:
+            readonly ParameterInfo[] parameters;
+    */
+
+    /* Unmerged change from project 'Moq(net6.0)'
+    Before:
+            private readonly ParameterInfo[] parameters;
+    After:
+            readonly ParameterInfo[] parameters;
+    */
+    {
+        readonly ParameterInfo[] parameters;
+
+        public ParameterTypes(ParameterInfo[] parameters)
+        {
+            this.parameters = parameters;
+        }
+
+        public Type this[int index] => this.parameters[index].ParameterType;
+
+        public int Count => this.parameters.Length;
+
+        public IEnumerator<Type> GetEnumerator()
+        {
+            for (int i = 0, n = this.Count; i < n; ++i)
+            {
+                yield return this[i];
+            }
+        }
+
+        IEnumerator IEnumerable.GetEnumerator() => this.GetEnumerator();
+    }
 }

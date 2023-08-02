@@ -6,22 +6,64 @@ using System.Linq.Expressions;
 
 namespace Moq
 {
-	internal sealed class DefaultExpressionCompiler : ExpressionCompiler
-	{
-		new public static readonly DefaultExpressionCompiler Instance = new DefaultExpressionCompiler();
 
-		private DefaultExpressionCompiler()
-		{
-		}
+    /* Unmerged change from project 'Moq(netstandard2.0)'
+    Before:
+        internal sealed class DefaultExpressionCompiler : ExpressionCompiler
+    After:
+        sealed class DefaultExpressionCompiler : ExpressionCompiler
+    */
 
-		public override Delegate Compile(LambdaExpression expression)
-		{
-			return expression.Compile();
-		}
+    /* Unmerged change from project 'Moq(netstandard2.1)'
+    Before:
+        internal sealed class DefaultExpressionCompiler : ExpressionCompiler
+    After:
+        sealed class DefaultExpressionCompiler : ExpressionCompiler
+    */
 
-		public override TDelegate Compile<TDelegate>(Expression<TDelegate> expression)
-		{
-			return expression.Compile();
-		}
-	}
+    /* Unmerged change from project 'Moq(net6.0)'
+    Before:
+        internal sealed class DefaultExpressionCompiler : ExpressionCompiler
+    After:
+        sealed class DefaultExpressionCompiler : ExpressionCompiler
+    */
+    sealed class DefaultExpressionCompiler : ExpressionCompiler
+    {
+        new public static readonly DefaultExpressionCompiler Instance = new DefaultExpressionCompiler();
+
+
+        /* Unmerged change from project 'Moq(netstandard2.0)'
+        Before:
+                private DefaultExpressionCompiler()
+        After:
+                DefaultExpressionCompiler()
+        */
+
+        /* Unmerged change from project 'Moq(netstandard2.1)'
+        Before:
+                private DefaultExpressionCompiler()
+        After:
+                DefaultExpressionCompiler()
+        */
+
+        /* Unmerged change from project 'Moq(net6.0)'
+        Before:
+                private DefaultExpressionCompiler()
+        After:
+                DefaultExpressionCompiler()
+        */
+        DefaultExpressionCompiler()
+        {
+        }
+
+        public override Delegate Compile(LambdaExpression expression)
+        {
+            return expression.Compile();
+        }
+
+        public override TDelegate Compile<TDelegate>(Expression<TDelegate> expression)
+        {
+            return expression.Compile();
+        }
+    }
 }

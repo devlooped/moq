@@ -7,31 +7,73 @@ using System.Threading.Tasks;
 
 namespace Moq.Async
 {
-	internal sealed class ValueTaskFactory : AwaitableFactory<ValueTask>
-	{
-		public static readonly ValueTaskFactory Instance = new ValueTaskFactory();
 
-		private ValueTaskFactory()
-		{
-		}
+    /* Unmerged change from project 'Moq(netstandard2.0)'
+    Before:
+        internal sealed class ValueTaskFactory : AwaitableFactory<ValueTask>
+    After:
+        sealed class ValueTaskFactory : AwaitableFactory<ValueTask>
+    */
 
-		public override ValueTask CreateCompleted()
-		{
-			return default;
-		}
+    /* Unmerged change from project 'Moq(netstandard2.1)'
+    Before:
+        internal sealed class ValueTaskFactory : AwaitableFactory<ValueTask>
+    After:
+        sealed class ValueTaskFactory : AwaitableFactory<ValueTask>
+    */
 
-		public override ValueTask CreateFaulted(Exception exception)
-		{
-			var tcs = new TaskCompletionSource<object>();
-			tcs.SetException(exception);
-			return new ValueTask(tcs.Task);
-		}
+    /* Unmerged change from project 'Moq(net6.0)'
+    Before:
+        internal sealed class ValueTaskFactory : AwaitableFactory<ValueTask>
+    After:
+        sealed class ValueTaskFactory : AwaitableFactory<ValueTask>
+    */
+    sealed class ValueTaskFactory : AwaitableFactory<ValueTask>
+    {
+        public static readonly ValueTaskFactory Instance = new ValueTaskFactory();
 
-		public override ValueTask CreateFaulted(IEnumerable<Exception> exceptions)
-		{
-			var tcs = new TaskCompletionSource<object>();
-			tcs.SetException(exceptions);
-			return new ValueTask(tcs.Task);
-		}
-	}
+
+        /* Unmerged change from project 'Moq(netstandard2.0)'
+        Before:
+                private ValueTaskFactory()
+        After:
+                ValueTaskFactory()
+        */
+
+        /* Unmerged change from project 'Moq(netstandard2.1)'
+        Before:
+                private ValueTaskFactory()
+        After:
+                ValueTaskFactory()
+        */
+
+        /* Unmerged change from project 'Moq(net6.0)'
+        Before:
+                private ValueTaskFactory()
+        After:
+                ValueTaskFactory()
+        */
+        ValueTaskFactory()
+        {
+        }
+
+        public override ValueTask CreateCompleted()
+        {
+            return default;
+        }
+
+        public override ValueTask CreateFaulted(Exception exception)
+        {
+            var tcs = new TaskCompletionSource<object>();
+            tcs.SetException(exception);
+            return new ValueTask(tcs.Task);
+        }
+
+        public override ValueTask CreateFaulted(IEnumerable<Exception> exceptions)
+        {
+            var tcs = new TaskCompletionSource<object>();
+            tcs.SetException(exceptions);
+            return new ValueTask(tcs.Task);
+        }
+    }
 }

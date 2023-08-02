@@ -3,20 +3,62 @@
 
 namespace Moq.Behaviors
 {
-	internal sealed class ReturnValue : Behavior
-	{
-		private readonly object value;
 
-		public ReturnValue(object value)
-		{
-			this.value = value;
-		}
+    /* Unmerged change from project 'Moq(netstandard2.0)'
+    Before:
+        internal sealed class ReturnValue : Behavior
+    After:
+        sealed class ReturnValue : Behavior
+    */
 
-		public object Value => this.value;
+    /* Unmerged change from project 'Moq(netstandard2.1)'
+    Before:
+        internal sealed class ReturnValue : Behavior
+    After:
+        sealed class ReturnValue : Behavior
+    */
 
-		public override void Execute(Invocation invocation)
-		{
-			invocation.ReturnValue = this.value;
-		}
-	}
+    /* Unmerged change from project 'Moq(net6.0)'
+    Before:
+        internal sealed class ReturnValue : Behavior
+    After:
+        sealed class ReturnValue : Behavior
+    */
+    sealed class ReturnValue : Behavior
+
+    /* Unmerged change from project 'Moq(netstandard2.0)'
+    Before:
+            private readonly object value;
+    After:
+            readonly object value;
+    */
+
+    /* Unmerged change from project 'Moq(netstandard2.1)'
+    Before:
+            private readonly object value;
+    After:
+            readonly object value;
+    */
+
+    /* Unmerged change from project 'Moq(net6.0)'
+    Before:
+            private readonly object value;
+    After:
+            readonly object value;
+    */
+    {
+        readonly object value;
+
+        public ReturnValue(object value)
+        {
+            this.value = value;
+        }
+
+        public object Value => this.value;
+
+        public override void Execute(Invocation invocation)
+        {
+            invocation.ReturnValue = this.value;
+        }
+    }
 }

@@ -6,19 +6,61 @@ using System.Diagnostics;
 
 namespace Moq.Matchers
 {
-	internal sealed class AnyMatcher : IMatcher
-	{
-		public static AnyMatcher Instance { get; } = new AnyMatcher();
 
-		private AnyMatcher()
-		{
-		}
+    /* Unmerged change from project 'Moq(netstandard2.0)'
+    Before:
+        internal sealed class AnyMatcher : IMatcher
+    After:
+        sealed class AnyMatcher : IMatcher
+    */
 
-		public bool Matches(object argument, Type parameterType) => true;
+    /* Unmerged change from project 'Moq(netstandard2.1)'
+    Before:
+        internal sealed class AnyMatcher : IMatcher
+    After:
+        sealed class AnyMatcher : IMatcher
+    */
 
-		public void SetupEvaluatedSuccessfully(object argument, Type parameterType)
-		{
-			Debug.Assert(this.Matches(argument, parameterType));
-		}
-	}
+    /* Unmerged change from project 'Moq(net6.0)'
+    Before:
+        internal sealed class AnyMatcher : IMatcher
+    After:
+        sealed class AnyMatcher : IMatcher
+    */
+    sealed class AnyMatcher : IMatcher
+    {
+        public static AnyMatcher Instance { get; } = new AnyMatcher();
+
+
+        /* Unmerged change from project 'Moq(netstandard2.0)'
+        Before:
+                private AnyMatcher()
+        After:
+                AnyMatcher()
+        */
+
+        /* Unmerged change from project 'Moq(netstandard2.1)'
+        Before:
+                private AnyMatcher()
+        After:
+                AnyMatcher()
+        */
+
+        /* Unmerged change from project 'Moq(net6.0)'
+        Before:
+                private AnyMatcher()
+        After:
+                AnyMatcher()
+        */
+        AnyMatcher()
+        {
+        }
+
+        public bool Matches(object argument, Type parameterType) => true;
+
+        public void SetupEvaluatedSuccessfully(object argument, Type parameterType)
+        {
+            Debug.Assert(this.Matches(argument, parameterType));
+        }
+    }
 }

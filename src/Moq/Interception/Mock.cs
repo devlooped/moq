@@ -3,30 +3,30 @@
 
 namespace Moq
 {
-	partial class Mock : IInterceptor
-	{
-		void IInterceptor.Intercept(Invocation invocation)
-		{
-			if (HandleWellKnownMethods.Handle(invocation, this))
-			{
-				return;
-			}
+    partial class Mock : IInterceptor
+    {
+        void IInterceptor.Intercept(Invocation invocation)
+        {
+            if (HandleWellKnownMethods.Handle(invocation, this))
+            {
+                return;
+            }
 
-			RecordInvocation.Handle(invocation, this);
+            RecordInvocation.Handle(invocation, this);
 
-			if (FindAndExecuteMatchingSetup.Handle(invocation, this))
-			{
-				return;
-			}
-			
-			if (HandleEventSubscription.Handle(invocation, this))
-			{
-				return;
-			}
+            if (FindAndExecuteMatchingSetup.Handle(invocation, this))
+            {
+                return;
+            }
 
-			FailForStrictMock.Handle(invocation, this);
+            if (HandleEventSubscription.Handle(invocation, this))
+            {
+                return;
+            }
 
-			Return.Handle(invocation, this);
-		}
-	}
+            FailForStrictMock.Handle(invocation, this);
+
+            Return.Handle(invocation, this);
+        }
+    }
 }

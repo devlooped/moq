@@ -18,414 +18,576 @@ using TypeNameFormatter;
 
 namespace Moq
 {
-	internal sealed partial class MethodCall : SetupWithOutParameterSupport
-	{
-		private VerifyInvocationCount verifyInvocationCount;
-		private Behavior callback;
-		private Behavior raiseEvent;
-		private Behavior returnOrThrow;
-		private Behavior afterReturnCallback;
-		private Condition condition;
-		private string failMessage;
 
-		private string declarationSite;
+    /* Unmerged change from project 'Moq(netstandard2.0)'
+    Before:
+        internal sealed partial class MethodCall : SetupWithOutParameterSupport
+    After:
+        sealed partial class MethodCall : SetupWithOutParameterSupport
+    */
 
-		public MethodCall(Expression originalExpression, Mock mock, Condition condition, MethodExpectation expectation)
-			: base(originalExpression, mock, expectation)
-		{
-			this.condition = condition;
+    /* Unmerged change from project 'Moq(netstandard2.1)'
+    Before:
+        internal sealed partial class MethodCall : SetupWithOutParameterSupport
+    After:
+        sealed partial class MethodCall : SetupWithOutParameterSupport
+    */
 
-			if ((mock.Switches & Switches.CollectDiagnosticFileInfoForSetups) != 0)
-			{
-				this.declarationSite = GetUserCodeCallSite();
-			}
-		}
+    /* Unmerged change from project 'Moq(net6.0)'
+    Before:
+        internal sealed partial class MethodCall : SetupWithOutParameterSupport
+    After:
+        sealed partial class MethodCall : SetupWithOutParameterSupport
+    */
+    sealed partial class MethodCall : SetupWithOutParameterSupport
 
-		public string FailMessage
-		{
-			get => this.failMessage;
-		}
+    /* Unmerged change from project 'Moq(netstandard2.0)'
+    Before:
+            private VerifyInvocationCount verifyInvocationCount;
+            private Behavior callback;
+            private Behavior raiseEvent;
+            private Behavior returnOrThrow;
+            private Behavior afterReturnCallback;
+            private Condition condition;
+            private string failMessage;
+    After:
+            VerifyInvocationCount verifyInvocationCount;
+            Behavior callback;
+            Behavior raiseEvent;
+            Behavior returnOrThrow;
+            Behavior afterReturnCallback;
+            Condition condition;
+            string failMessage;
+    */
 
-		public override Condition Condition => this.condition;
+    /* Unmerged change from project 'Moq(netstandard2.1)'
+    Before:
+            private VerifyInvocationCount verifyInvocationCount;
+            private Behavior callback;
+            private Behavior raiseEvent;
+            private Behavior returnOrThrow;
+            private Behavior afterReturnCallback;
+            private Condition condition;
+            private string failMessage;
+    After:
+            VerifyInvocationCount verifyInvocationCount;
+            Behavior callback;
+            Behavior raiseEvent;
+            Behavior returnOrThrow;
+            Behavior afterReturnCallback;
+            Condition condition;
+            string failMessage;
+    */
 
-		public override IEnumerable<Mock> InnerMocks
-		{
-			get
-			{
-				var innerMock = TryGetInnerMockFrom((this.returnOrThrow as ReturnValue)?.Value);
-				if (innerMock != null)
-				{
-					yield return innerMock;
-				}
-			}
-		}
+    /* Unmerged change from project 'Moq(net6.0)'
+    Before:
+            private VerifyInvocationCount verifyInvocationCount;
+            private Behavior callback;
+            private Behavior raiseEvent;
+            private Behavior returnOrThrow;
+            private Behavior afterReturnCallback;
+            private Condition condition;
+            private string failMessage;
+    After:
+            VerifyInvocationCount verifyInvocationCount;
+            Behavior callback;
+            Behavior raiseEvent;
+            Behavior returnOrThrow;
+            Behavior afterReturnCallback;
+            Condition condition;
+            string failMessage;
+    */
+    {
+        VerifyInvocationCount verifyInvocationCount;
+        Behavior callback;
+        Behavior raiseEvent;
+        Behavior returnOrThrow;
+        Behavior afterReturnCallback;
+        Condition condition;
+        string failMessage;
 
-		private static string GetUserCodeCallSite()
-		{
-			try
-			{
-				var thisMethod = MethodBase.GetCurrentMethod();
-				var mockAssembly = Assembly.GetExecutingAssembly();
-				var frame = new StackTrace(true)
-					.GetFrames()
-					.SkipWhile(f => f.GetMethod() != thisMethod)
-					.SkipWhile(f => f.GetMethod().DeclaringType == null || f.GetMethod().DeclaringType.Assembly == mockAssembly)
-					.FirstOrDefault();
-				var member = frame?.GetMethod();
-				if (member != null)
-				{
-					var declaredAt = new StringBuilder();
-					declaredAt.AppendNameOf(member.DeclaringType).Append('.').AppendNameOf(member, false);
-					var fileName = Path.GetFileName(frame.GetFileName());
-					if (fileName != null)
-					{
-						declaredAt.Append(" in ").Append(fileName);
-						var lineNumber = frame.GetFileLineNumber();
-						if (lineNumber != 0)
-						{
-							declaredAt.Append(": line ").Append(lineNumber);
-						}
-					}
-					return declaredAt.ToString();
-				}
-			}
-			catch
-			{
-				// Must NEVER fail, as this is a nice-to-have feature only.
-			}
 
-			return null;
-		}
+        /* Unmerged change from project 'Moq(netstandard2.0)'
+        Before:
+                private string declarationSite;
+        After:
+                string declarationSite;
+        */
 
-		protected override void ExecuteCore(Invocation invocation)
-		{
-			this.verifyInvocationCount?.Execute(invocation);
+        /* Unmerged change from project 'Moq(netstandard2.1)'
+        Before:
+                private string declarationSite;
+        After:
+                string declarationSite;
+        */
 
-			this.callback?.Execute(invocation);
+        /* Unmerged change from project 'Moq(net6.0)'
+        Before:
+                private string declarationSite;
+        After:
+                string declarationSite;
+        */
+        string declarationSite;
 
-			this.raiseEvent?.Execute(invocation);
+        public MethodCall(Expression originalExpression, Mock mock, Condition condition, MethodExpectation expectation)
+            : base(originalExpression, mock, expectation)
+        {
+            this.condition = condition;
 
-			if (this.returnOrThrow != null)
-			{
-				this.returnOrThrow.Execute(invocation);
-			}
-			else if (invocation.Method.ReturnType != typeof(void))
-			{
-				if (this.Mock.Behavior == MockBehavior.Strict)
-				{
-					throw MockException.ReturnValueRequired(invocation);
-				}
-				else
-				{
-					new ReturnBaseOrDefaultValue(this.Mock).Execute(invocation);
-				}
-			}
-			else
-			{
-				HandleEventSubscription.Handle(invocation, this.Mock);  // no-op for everything other than event accessors
-			}
+            if ((mock.Switches & Switches.CollectDiagnosticFileInfoForSetups) != 0)
+            {
+                this.declarationSite = GetUserCodeCallSite();
+            }
+        }
 
-			this.afterReturnCallback?.Execute(invocation);
-		}
+        public string FailMessage
+        {
+            get => this.failMessage;
+        }
 
-		public void SetCallBaseBehavior()
-		{
-			if (this.Mock.MockedType.IsDelegateType())
-			{
-				throw new NotSupportedException(Resources.CallBaseCannotBeUsedWithDelegateMocks);
-			}
+        public override Condition Condition => this.condition;
 
-			this.returnOrThrow = ReturnBase.Instance;
-		}
+        public override IEnumerable<Mock> InnerMocks
+        {
+            get
+            {
+                var innerMock = TryGetInnerMockFrom((this.returnOrThrow as ReturnValue)?.Value);
+                if (innerMock != null)
+                {
+                    yield return innerMock;
 
-		public void SetCallbackBehavior(Delegate callback)
-		{
-			if (callback == null)
-			{
-				throw new ArgumentNullException(nameof(callback));
-			}
+                    /* Unmerged change from project 'Moq(netstandard2.0)'
+                    Before:
+                            private static string GetUserCodeCallSite()
+                    After:
+                            static string GetUserCodeCallSite()
+                    */
 
-			ref Behavior behavior = ref (this.returnOrThrow == null) ? ref this.callback
-			                                                         : ref this.afterReturnCallback;
+                    /* Unmerged change from project 'Moq(netstandard2.1)'
+                    Before:
+                            private static string GetUserCodeCallSite()
+                    After:
+                            static string GetUserCodeCallSite()
+                    */
 
-			if (callback is Action callbackWithoutArguments)
-			{
-				behavior = new Callback(_ => callbackWithoutArguments());
-			}
-			else if (callback.GetType() == typeof(Action<IInvocation>))
-			{
-				// NOTE: Do NOT rewrite the above condition as `callback is Action<IInvocation>`,
-				// because this will also yield true if `callback` is a `Action<object>` and thus
-				// break existing uses of `(object arg) => ...` callbacks!
-				behavior = new Callback((Action<IInvocation>)callback);
-			}
-			else
-			{
-				var expectedParamTypes = this.Method.GetParameterTypes();
-				if (!callback.CompareParameterTypesTo(expectedParamTypes))
-				{
-					throw new ArgumentException(
-						string.Format(
-							CultureInfo.CurrentCulture,
-							Resources.InvalidCallbackParameterMismatch,
-							this.Method.GetParameterTypeList(),
-							callback.GetMethodInfo().GetParameterTypeList()));
-				}
+                    /* Unmerged change from project 'Moq(net6.0)'
+                    Before:
+                            private static string GetUserCodeCallSite()
+                    After:
+                            static string GetUserCodeCallSite()
+                    */
+                }
+            }
+        }
 
-				var callbackMethod = callback.GetMethodInfo();
+        static string GetUserCodeCallSite()
+        {
+            try
+            {
+                var thisMethod = MethodBase.GetCurrentMethod();
+                var mockAssembly = Assembly.GetExecutingAssembly();
+                var frame = new StackTrace(true)
+                    .GetFrames()
+                    .SkipWhile(f => f.GetMethod() != thisMethod)
+                    .SkipWhile(f => f.GetMethod().DeclaringType == null || f.GetMethod().DeclaringType.Assembly == mockAssembly)
+                    .FirstOrDefault();
+                var member = frame?.GetMethod();
+                if (member != null)
+                {
+                    var declaredAt = new StringBuilder();
+                    declaredAt.AppendNameOf(member.DeclaringType).Append('.').AppendNameOf(member, false);
+                    var fileName = Path.GetFileName(frame.GetFileName());
+                    if (fileName != null)
+                    {
+                        declaredAt.Append(" in ").Append(fileName);
+                        var lineNumber = frame.GetFileLineNumber();
+                        if (lineNumber != 0)
+                        {
+                            declaredAt.Append(": line ").Append(lineNumber);
+                        }
+                    }
+                    return declaredAt.ToString();
+                }
+            }
+            catch
+            {
+                // Must NEVER fail, as this is a nice-to-have feature only.
+            }
 
-				if (callbackMethod.ReturnType != typeof(void))
-				{
-					throw new ArgumentException(Resources.InvalidCallbackNotADelegateWithReturnTypeVoid, nameof(callback));
-				}
+            return null;
+        }
 
-				if (callbackMethod.GetParameterTypes().Any(Extensions.IsOrContainsTypeMatcher))
-				{
-					throw new ArgumentException(Resources.TypeMatchersMayNotBeUsedWithCallbacks);
-				}
+        protected override void ExecuteCore(Invocation invocation)
+        {
+            this.verifyInvocationCount?.Execute(invocation);
 
-				behavior = new Callback(invocation => callback.InvokePreserveStack(invocation.Arguments));
-			}
-		}
+            this.callback?.Execute(invocation);
 
-		public void SetFailMessage(string failMessage)
-		{
-			this.failMessage = failMessage;
-		}
+            this.raiseEvent?.Execute(invocation);
 
-		public void SetRaiseEventBehavior<TMock>(Action<TMock> eventExpression, Delegate func)
-			where TMock : class
-		{
-			Guard.NotNull(eventExpression, nameof(eventExpression));
+            if (this.returnOrThrow != null)
+            {
+                this.returnOrThrow.Execute(invocation);
+            }
+            else if (invocation.Method.ReturnType != typeof(void))
+            {
+                if (this.Mock.Behavior == MockBehavior.Strict)
+                {
+                    throw MockException.ReturnValueRequired(invocation);
+                }
+                else
+                {
+                    new ReturnBaseOrDefaultValue(this.Mock).Execute(invocation);
+                }
+            }
+            else
+            {
+                HandleEventSubscription.Handle(invocation, this.Mock);  // no-op for everything other than event accessors
+            }
 
-			var expression = ExpressionReconstructor.Instance.ReconstructExpression(eventExpression, this.Mock.ConstructorArguments);
+            this.afterReturnCallback?.Execute(invocation);
+        }
 
-			// TODO: validate that expression is for event subscription or unsubscription
+        public void SetCallBaseBehavior()
+        {
+            if (this.Mock.MockedType.IsDelegateType())
+            {
+                throw new NotSupportedException(Resources.CallBaseCannotBeUsedWithDelegateMocks);
+            }
 
-			this.raiseEvent = new RaiseEvent(this.Mock, expression, func, null);
-		}
+            this.returnOrThrow = ReturnBase.Instance;
+        }
 
-		public void SetRaiseEventBehavior<TMock>(Action<TMock> eventExpression, params object[] args)
-			where TMock : class
-		{
-			Guard.NotNull(eventExpression, nameof(eventExpression));
+        public void SetCallbackBehavior(Delegate callback)
+        {
+            if (callback == null)
+            {
+                throw new ArgumentNullException(nameof(callback));
+            }
 
-			var expression = ExpressionReconstructor.Instance.ReconstructExpression(eventExpression, this.Mock.ConstructorArguments);
+            ref Behavior behavior = ref (this.returnOrThrow == null) ? ref this.callback
+                                                                     : ref this.afterReturnCallback;
 
-			// TODO: validate that expression is for event subscription or unsubscription
+            if (callback is Action callbackWithoutArguments)
+            {
+                behavior = new Callback(_ => callbackWithoutArguments());
+            }
+            else if (callback.GetType() == typeof(Action<IInvocation>))
+            {
+                // NOTE: Do NOT rewrite the above condition as `callback is Action<IInvocation>`,
+                // because this will also yield true if `callback` is a `Action<object>` and thus
+                // break existing uses of `(object arg) => ...` callbacks!
+                behavior = new Callback((Action<IInvocation>)callback);
+            }
+            else
+            {
+                var expectedParamTypes = this.Method.GetParameterTypes();
+                if (!callback.CompareParameterTypesTo(expectedParamTypes))
+                {
+                    throw new ArgumentException(
+                        string.Format(
+                            CultureInfo.CurrentCulture,
+                            Resources.InvalidCallbackParameterMismatch,
+                            this.Method.GetParameterTypeList(),
+                            callback.GetMethodInfo().GetParameterTypeList()));
+                }
 
-			this.raiseEvent = new RaiseEvent(this.Mock, expression, null, args);
-		}
+                var callbackMethod = callback.GetMethodInfo();
 
-		public void SetReturnValueBehavior(object value)
-		{
-			Debug.Assert(this.Method.ReturnType != typeof(void));
-			Debug.Assert(this.returnOrThrow == null);
+                if (callbackMethod.ReturnType != typeof(void))
+                {
+                    throw new ArgumentException(Resources.InvalidCallbackNotADelegateWithReturnTypeVoid, nameof(callback));
+                }
 
-			this.returnOrThrow = new ReturnValue(value);
-		}
+                if (callbackMethod.GetParameterTypes().Any(Extensions.IsOrContainsTypeMatcher))
+                {
+                    throw new ArgumentException(Resources.TypeMatchersMayNotBeUsedWithCallbacks);
+                }
 
-		public void SetReturnComputedValueBehavior(Delegate valueFactory)
-		{
-			Debug.Assert(this.Method.ReturnType != typeof(void));
-			Debug.Assert(this.returnOrThrow == null);
+                behavior = new Callback(invocation => callback.InvokePreserveStack(invocation.Arguments));
+            }
+        }
 
-			var expectedReturnType = this.Expectation.HasResultExpression(out var awaitable) ? awaitable.ResultType
-			                                                                                 : this.Method.ReturnType;
+        public void SetFailMessage(string failMessage)
+        {
+            this.failMessage = failMessage;
+        }
 
-			if (valueFactory == null)
-			{
-				// A `null` reference (instead of a valid delegate) is interpreted as the actual return value.
-				// This is necessary because the compiler might have picked the unexpected overload for calls
-				// like `Returns(null)`, or the user might have picked an overload like `Returns<T>(null)`,
-				// and instead of in `Returns(TResult)`, we ended up in `Returns(Delegate)` or `Returns(Func)`,
-				// which likely isn't what the user intended.
-				// So here we do what we would've done in `Returns(TResult)`:
-				this.returnOrThrow = new ReturnValue(expectedReturnType.GetDefaultValue());
-			}
-			else if (expectedReturnType == typeof(Delegate))
-			{
-				// If `TResult` is `Delegate`, that is someone is setting up the return value of a method
-				// that returns a `Delegate`, then we have arrived here because C# picked the wrong overload:
-				// We don't want to invoke the passed delegate to get a return value; the passed delegate
-				// already is the return value.
-				this.returnOrThrow = new ReturnValue(valueFactory);
-			}
-			else if (IsInvocationFunc(valueFactory))
-			{
-				this.returnOrThrow = new ReturnComputedValue(invocation => valueFactory.InvokePreserveStack(new object[] { invocation }));
-			}
-			else
-			{
-				ValidateCallback(valueFactory);
+        public void SetRaiseEventBehavior<TMock>(Action<TMock> eventExpression, Delegate func)
+            where TMock : class
+        {
+            Guard.NotNull(eventExpression, nameof(eventExpression));
 
-				if (valueFactory.CompareParameterTypesTo(Type.EmptyTypes))
-				{
-					// we need this for the user to be able to use parameterless methods
-					this.returnOrThrow = new ReturnComputedValue(invocation => valueFactory.InvokePreserveStack());
-				}
-				else
-				{
-					this.returnOrThrow = new ReturnComputedValue(invocation => valueFactory.InvokePreserveStack(invocation.Arguments));
-				}
-			}
+            var expression = ExpressionReconstructor.Instance.ReconstructExpression(eventExpression, this.Mock.ConstructorArguments);
 
-			bool IsInvocationFunc(Delegate callback)
-			{
-				var type = callback.GetType();
-				if (type.IsGenericType && type.GetGenericTypeDefinition() == typeof(Func<,>))
-				{
-					var typeArguments = type.GetGenericArguments();
-					return typeArguments[0] == typeof(IInvocation)
-						&& (typeArguments[1] == typeof(object) || expectedReturnType.IsAssignableFrom(typeArguments[1]));
-				}
+            // TODO: validate that expression is for event subscription or unsubscription
 
-				return false;
-			}
+            this.raiseEvent = new RaiseEvent(this.Mock, expression, func, null);
+        }
 
-			void ValidateCallback(Delegate callback)
-			{
-				var callbackMethod = callback.GetMethodInfo();
+        public void SetRaiseEventBehavior<TMock>(Action<TMock> eventExpression, params object[] args)
+            where TMock : class
+        {
+            Guard.NotNull(eventExpression, nameof(eventExpression));
 
-				ValidateNumberOfCallbackParameters(callback, callbackMethod);
+            var expression = ExpressionReconstructor.Instance.ReconstructExpression(eventExpression, this.Mock.ConstructorArguments);
 
-				ValidateCallbackReturnType(callbackMethod, expectedReturnType);
+            // TODO: validate that expression is for event subscription or unsubscription
 
-				if (callbackMethod.GetParameterTypes().Any(Extensions.IsOrContainsTypeMatcher))
-				{
-					throw new ArgumentException(Resources.TypeMatchersMayNotBeUsedWithCallbacks);
-				}
-			}
-		}
-		
-		public void SetThrowExceptionBehavior(Exception exception)
-		{
-			this.returnOrThrow = new ThrowException(exception);
-		}
+            this.raiseEvent = new RaiseEvent(this.Mock, expression, null, args);
+        }
 
-		public void SetThrowComputedExceptionBehavior(Delegate exceptionFactory)
-		{
-			Debug.Assert(this.returnOrThrow == null);
+        public void SetReturnValueBehavior(object value)
+        {
+            Debug.Assert(this.Method.ReturnType != typeof(void));
+            Debug.Assert(this.returnOrThrow == null);
 
-			if (exceptionFactory == null)
-			{
-				// A `null` reference (instead of a valid delegate) is interpreted as the actual return value.
-				// This is necessary because the compiler might have picked the unexpected overload for calls
-				// like `Throws(null)`, or the user might have picked an overload like `Throws<TException>(null)`,
-				// and instead of in `Throws(TException)`, we ended up in `Throws(Delegate)` or `Throws(Func)`,
-				// which likely isn't what the user intended.
-				// So here we do what we would've done in `Throws(TException)`:
-				this.returnOrThrow = new ThrowException(default);
-			}
-			else
-			{
-				var callbackMethod = exceptionFactory.GetMethodInfo();
+            this.returnOrThrow = new ReturnValue(value);
+        }
 
-				ValidateNumberOfCallbackParameters(exceptionFactory, callbackMethod);
+        public void SetReturnComputedValueBehavior(Delegate valueFactory)
+        {
+            Debug.Assert(this.Method.ReturnType != typeof(void));
+            Debug.Assert(this.returnOrThrow == null);
 
-				ValidateCallbackReturnType(callbackMethod, typeof(Exception));
+            var expectedReturnType = this.Expectation.HasResultExpression(out var awaitable) ? awaitable.ResultType
+                                                                                             : this.Method.ReturnType;
 
-				if (exceptionFactory.CompareParameterTypesTo(Type.EmptyTypes))
-				{
-					// we need this for the user to be able to use parameterless methods
-					this.returnOrThrow = new ThrowComputedException(invocation => exceptionFactory.InvokePreserveStack() as Exception);
-				}
-				else
-				{
-					this.returnOrThrow = new ThrowComputedException(invocation => exceptionFactory.InvokePreserveStack(invocation.Arguments) as Exception);
-				}
-			}
-		}
+            if (valueFactory == null)
+            {
+                // A `null` reference (instead of a valid delegate) is interpreted as the actual return value.
+                // This is necessary because the compiler might have picked the unexpected overload for calls
+                // like `Returns(null)`, or the user might have picked an overload like `Returns<T>(null)`,
+                // and instead of in `Returns(TResult)`, we ended up in `Returns(Delegate)` or `Returns(Func)`,
+                // which likely isn't what the user intended.
+                // So here we do what we would've done in `Returns(TResult)`:
+                this.returnOrThrow = new ReturnValue(expectedReturnType.GetDefaultValue());
+            }
+            else if (expectedReturnType == typeof(Delegate))
+            {
+                // If `TResult` is `Delegate`, that is someone is setting up the return value of a method
+                // that returns a `Delegate`, then we have arrived here because C# picked the wrong overload:
+                // We don't want to invoke the passed delegate to get a return value; the passed delegate
+                // already is the return value.
+                this.returnOrThrow = new ReturnValue(valueFactory);
+            }
+            else if (IsInvocationFunc(valueFactory))
+            {
+                this.returnOrThrow = new ReturnComputedValue(invocation => valueFactory.InvokePreserveStack(new object[] { invocation }));
+            }
+            else
+            {
+                ValidateCallback(valueFactory);
 
-		protected override void ResetCore()
-		{
-			this.verifyInvocationCount?.Reset();
-		}
+                if (valueFactory.CompareParameterTypesTo(Type.EmptyTypes))
+                {
+                    // we need this for the user to be able to use parameterless methods
+                    this.returnOrThrow = new ReturnComputedValue(invocation => valueFactory.InvokePreserveStack());
+                }
+                else
+                {
+                    this.returnOrThrow = new ReturnComputedValue(invocation => valueFactory.InvokePreserveStack(invocation.Arguments));
+                }
+            }
 
-		public void SetExpectedInvocationCount(Times times)
-		{
-			this.verifyInvocationCount = new VerifyInvocationCount(this, times);
-		}
+            bool IsInvocationFunc(Delegate callback)
+            {
+                var type = callback.GetType();
+                if (type.IsGenericType && type.GetGenericTypeDefinition() == typeof(Func<,>))
+                {
+                    var typeArguments = type.GetGenericArguments();
+                    return typeArguments[0] == typeof(IInvocation)
+                        && (typeArguments[1] == typeof(object) || expectedReturnType.IsAssignableFrom(typeArguments[1]));
+                }
 
-		protected override void VerifySelf()
-		{
-			if (this.verifyInvocationCount != null)
-			{
-				this.verifyInvocationCount.Verify();
-			}
-			else
-			{
-				base.VerifySelf();
-			}
-		}
+                return false;
+            }
 
-		public override string ToString()
-		{
-			var message = new StringBuilder();
+            void ValidateCallback(Delegate callback)
+            {
+                var callbackMethod = callback.GetMethodInfo();
 
-			if (this.failMessage != null)
-			{
-				message.Append(this.failMessage).Append(": ");
-			}
+                ValidateNumberOfCallbackParameters(callback, callbackMethod);
 
-			message.Append(base.ToString());
+                ValidateCallbackReturnType(callbackMethod, expectedReturnType);
 
-			if (this.declarationSite != null)
-			{
-				message.Append(" (").Append(this.declarationSite).Append(')');
-			}
+                if (callbackMethod.GetParameterTypes().Any(Extensions.IsOrContainsTypeMatcher))
+                {
+                    throw new ArgumentException(Resources.TypeMatchersMayNotBeUsedWithCallbacks);
+                }
+            }
+        }
 
-			return message.ToString().Trim();
-		}
+        public void SetThrowExceptionBehavior(Exception exception)
+        {
+            this.returnOrThrow = new ThrowException(exception);
+        }
 
-		private void ValidateNumberOfCallbackParameters(Delegate callback, MethodInfo callbackMethod)
-		{
-			var numberOfActualParameters = callbackMethod.GetParameters().Length;
-			if (callbackMethod.IsStatic)
-			{
-				if (callbackMethod.IsExtensionMethod() || callback.Target != null)
-				{
-					numberOfActualParameters--;
-				}
-			}
+        public void SetThrowComputedExceptionBehavior(Delegate exceptionFactory)
+        {
+            Debug.Assert(this.returnOrThrow == null);
 
-			if (numberOfActualParameters > 0)
-			{
-				var numberOfExpectedParameters = this.Method.GetParameters().Length;
-				if (numberOfActualParameters != numberOfExpectedParameters)
-				{
-					throw new ArgumentException(
-						string.Format(
-							CultureInfo.CurrentCulture,
-							Resources.InvalidCallbackParameterCountMismatch,
-							numberOfExpectedParameters,
-							numberOfActualParameters));
-				}
-			}
-		}
+            if (exceptionFactory == null)
+            {
+                // A `null` reference (instead of a valid delegate) is interpreted as the actual return value.
+                // This is necessary because the compiler might have picked the unexpected overload for calls
+                // like `Throws(null)`, or the user might have picked an overload like `Throws<TException>(null)`,
+                // and instead of in `Throws(TException)`, we ended up in `Throws(Delegate)` or `Throws(Func)`,
+                // which likely isn't what the user intended.
+                // So here we do what we would've done in `Throws(TException)`:
+                this.returnOrThrow = new ThrowException(default);
+            }
+            else
+            {
+                var callbackMethod = exceptionFactory.GetMethodInfo();
 
-		private void ValidateCallbackReturnType(MethodInfo callbackMethod, Type expectedReturnType)
-		{
-			var actualReturnType = callbackMethod.ReturnType;
+                ValidateNumberOfCallbackParameters(exceptionFactory, callbackMethod);
 
-			if (actualReturnType == typeof(void))
-			{
-				throw new ArgumentException(Resources.InvalidReturnsCallbackNotADelegateWithReturnType);
-			}
+                ValidateCallbackReturnType(callbackMethod, typeof(Exception));
 
-			if (!expectedReturnType.IsAssignableFrom(actualReturnType))
-			{
-				// TODO: If the return type is a matcher, does the callback's return type need to be matched against it?
-				if (typeof(ITypeMatcher).IsAssignableFrom(expectedReturnType) == false)
-				{
-					throw new ArgumentException(
-						string.Format(
-							CultureInfo.CurrentCulture,
-							Resources.InvalidCallbackReturnTypeMismatch,
-							expectedReturnType.GetFormattedName(),
-							actualReturnType.GetFormattedName()));
-				}
-			}
-		}
-	}
+                if (exceptionFactory.CompareParameterTypesTo(Type.EmptyTypes))
+                {
+                    // we need this for the user to be able to use parameterless methods
+                    this.returnOrThrow = new ThrowComputedException(invocation => exceptionFactory.InvokePreserveStack() as Exception);
+                }
+                else
+                {
+                    this.returnOrThrow = new ThrowComputedException(invocation => exceptionFactory.InvokePreserveStack(invocation.Arguments) as Exception);
+                }
+            }
+        }
+
+        protected override void ResetCore()
+        {
+            this.verifyInvocationCount?.Reset();
+        }
+
+        public void SetExpectedInvocationCount(Times times)
+        {
+            this.verifyInvocationCount = new VerifyInvocationCount(this, times);
+        }
+
+        protected override void VerifySelf()
+        {
+            if (this.verifyInvocationCount != null)
+            {
+                this.verifyInvocationCount.Verify();
+            }
+            else
+            {
+                base.VerifySelf();
+            }
+        }
+
+        public override string ToString()
+        {
+            var message = new StringBuilder();
+
+            if (this.failMessage != null)
+            {
+                message.Append(this.failMessage).Append(": ");
+            }
+
+            message.Append(base.ToString());
+
+            if (this.declarationSite != null)
+            {
+                message.Append(" (").Append(this.declarationSite).Append(')');
+            }
+
+            return message.ToString().Trim();
+
+            /* Unmerged change from project 'Moq(netstandard2.0)'
+            Before:
+                    private void ValidateNumberOfCallbackParameters(Delegate callback, MethodInfo callbackMethod)
+            After:
+                    void ValidateNumberOfCallbackParameters(Delegate callback, MethodInfo callbackMethod)
+            */
+
+            /* Unmerged change from project 'Moq(netstandard2.1)'
+            Before:
+                    private void ValidateNumberOfCallbackParameters(Delegate callback, MethodInfo callbackMethod)
+            After:
+                    void ValidateNumberOfCallbackParameters(Delegate callback, MethodInfo callbackMethod)
+            */
+
+            /* Unmerged change from project 'Moq(net6.0)'
+            Before:
+                    private void ValidateNumberOfCallbackParameters(Delegate callback, MethodInfo callbackMethod)
+            After:
+                    void ValidateNumberOfCallbackParameters(Delegate callback, MethodInfo callbackMethod)
+            */
+        }
+
+        void ValidateNumberOfCallbackParameters(Delegate callback, MethodInfo callbackMethod)
+        {
+            var numberOfActualParameters = callbackMethod.GetParameters().Length;
+            if (callbackMethod.IsStatic)
+            {
+                if (callbackMethod.IsExtensionMethod() || callback.Target != null)
+                {
+                    numberOfActualParameters--;
+                }
+            }
+
+            if (numberOfActualParameters > 0)
+            {
+                var numberOfExpectedParameters = this.Method.GetParameters().Length;
+                if (numberOfActualParameters != numberOfExpectedParameters)
+                {
+                    throw new ArgumentException(
+                        string.Format(
+                            CultureInfo.CurrentCulture,
+                            Resources.InvalidCallbackParameterCountMismatch,
+                            numberOfExpectedParameters,
+                            numberOfActualParameters));
+
+                    /* Unmerged change from project 'Moq(netstandard2.0)'
+                    Before:
+                            private void ValidateCallbackReturnType(MethodInfo callbackMethod, Type expectedReturnType)
+                    After:
+                            void ValidateCallbackReturnType(MethodInfo callbackMethod, Type expectedReturnType)
+                    */
+
+                    /* Unmerged change from project 'Moq(netstandard2.1)'
+                    Before:
+                            private void ValidateCallbackReturnType(MethodInfo callbackMethod, Type expectedReturnType)
+                    After:
+                            void ValidateCallbackReturnType(MethodInfo callbackMethod, Type expectedReturnType)
+                    */
+
+                    /* Unmerged change from project 'Moq(net6.0)'
+                    Before:
+                            private void ValidateCallbackReturnType(MethodInfo callbackMethod, Type expectedReturnType)
+                    After:
+                            void ValidateCallbackReturnType(MethodInfo callbackMethod, Type expectedReturnType)
+                    */
+                }
+            }
+        }
+
+        void ValidateCallbackReturnType(MethodInfo callbackMethod, Type expectedReturnType)
+        {
+            var actualReturnType = callbackMethod.ReturnType;
+
+            if (actualReturnType == typeof(void))
+            {
+                throw new ArgumentException(Resources.InvalidReturnsCallbackNotADelegateWithReturnType);
+            }
+
+            if (!expectedReturnType.IsAssignableFrom(actualReturnType))
+            {
+                // TODO: If the return type is a matcher, does the callback's return type need to be matched against it?
+                if (typeof(ITypeMatcher).IsAssignableFrom(expectedReturnType) == false)
+                {
+                    throw new ArgumentException(
+                        string.Format(
+                            CultureInfo.CurrentCulture,
+                            Resources.InvalidCallbackReturnTypeMismatch,
+                            expectedReturnType.GetFormattedName(),
+                            actualReturnType.GetFormattedName()));
+                }
+            }
+        }
+    }
 }

@@ -8,38 +8,59 @@ using Moq.Async;
 
 namespace Moq
 {
-	/// <summary>
-	///   Represents a set (or the "shape") of invocations
-	///   against which concrete <see cref="Invocation"/>s can be matched.
-	/// </summary>
-	internal abstract class Expectation : IEquatable<Expectation>
-	{
-		public abstract LambdaExpression Expression { get; }
 
-		public virtual bool HasResultExpression(out IAwaitableFactory awaitableFactory)
-		{
-			awaitableFactory = null;
-			return false;
-		}
+    /* Unmerged change from project 'Moq(netstandard2.0)'
+    Before:
+        internal abstract class Expectation : IEquatable<Expectation>
+    After:
+        abstract class Expectation : IEquatable<Expectation>
+    */
 
-		public override bool Equals(object obj)
-		{
-			return obj is Expectation other && this.Equals(other);
-		}
+    /* Unmerged change from project 'Moq(netstandard2.1)'
+    Before:
+        internal abstract class Expectation : IEquatable<Expectation>
+    After:
+        abstract class Expectation : IEquatable<Expectation>
+    */
 
-		public abstract bool Equals(Expectation other);
+    /* Unmerged change from project 'Moq(net6.0)'
+    Before:
+        internal abstract class Expectation : IEquatable<Expectation>
+    After:
+        abstract class Expectation : IEquatable<Expectation>
+    */
+    /// <summary>
+    ///   Represents a set (or the "shape") of invocations
+    ///   against which concrete <see cref="Invocation"/>s can be matched.
+    /// </summary>
+    abstract class Expectation : IEquatable<Expectation>
+    {
+        public abstract LambdaExpression Expression { get; }
 
-		public abstract override int GetHashCode();
+        public virtual bool HasResultExpression(out IAwaitableFactory awaitableFactory)
+        {
+            awaitableFactory = null;
+            return false;
+        }
 
-		public abstract bool IsMatch(Invocation invocation);
+        public override bool Equals(object obj)
+        {
+            return obj is Expectation other && this.Equals(other);
+        }
 
-		public virtual void SetupEvaluatedSuccessfully(Invocation invocation)
-		{
-		}
+        public abstract bool Equals(Expectation other);
 
-		public override string ToString()
-		{
-			return this.Expression.ToStringFixed();
-		}
-	}
+        public abstract override int GetHashCode();
+
+        public abstract bool IsMatch(Invocation invocation);
+
+        public virtual void SetupEvaluatedSuccessfully(Invocation invocation)
+        {
+        }
+
+        public override string ToString()
+        {
+            return this.Expression.ToStringFixed();
+        }
+    }
 }
