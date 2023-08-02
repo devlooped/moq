@@ -1,0 +1,34 @@
+# Please see the documentation for all configuration options:
+# https://help.github.com/github/administering-a-repository/configuration-options-for-dependency-updates
+
+version: 2
+updates:
+- package-ecosystem: nuget
+  directory: /
+  schedule:
+    interval: daily
+  groups:
+    Azure:
+      patterns:
+        - "Azure*"
+        - "Microsoft.Azure*"
+    System:
+      patterns:
+        - "System*"
+    Extensions:
+      patterns:
+        - "Microsoft.Extensions*"
+    Web:
+      patterns:
+        - "Microsoft.AspNetCore*"
+    Tests:
+      patterns:
+        - "Microsoft.NET.Tests*"
+        - "xunit*"
+        - "coverlet*"
+    ThisAssembly:
+      patterns:
+        - "ThisAssembly*"
+    ProtoBuf:
+      patterns:
+        - "protobuf-*"

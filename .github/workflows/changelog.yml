@@ -1,0 +1,39 @@
+﻿name: changelog
+on:
+  workflow_dispatch:
+  release:
+    types: [released]
+
+jobs:
+  changelog:
+    runs-on: ubuntu-latest
+    steps:
+      - name: 🤖 defaults
+        uses: devlooped/actions-bot@v1
+        with:
+          name: ${{ secrets.BOT_NAME }}
+          email: ${{ secrets.BOT_EMAIL }}
+          gh_token: ${{ secrets.GH_TOKEN }}
+          github_token: ${{ secrets.GITHUB_TOKEN }}
+          
+      - name: 🤘 checkout
+        uses: actions/checkout@v2
+        with:
+          fetch-depth: 0
+          ref: main
+          token: ${{ env.GH_TOKEN }}
+          
+      - name: ⚙ ruby
+        uses: ruby/setup-ruby@v1
+        with:
+          ruby-version: 3.0.3
+
+      - name: ⚙ changelog
+        run: |
+          gem install github_changelog_generator 
+          github_changelog_generator --user ${GITHUB_REPOSITORY%/*} --project ${GITHUB_REPOSITORY##*/} --token $GH_TOKEN --o changelog.md --config-file .github/workflows/changelog.config
+
+      - name: 🚀 changelog
+        run: |
+          git add changelog.md
+          (git commit -m "🖉 Update changelog with ${GITHUB_REF#refs/*/}" && git push) || echo "Done"

@@ -1,0 +1,36 @@
+name: test
+description: runs dotnet tests with retry
+runs:
+  using: "composite"
+  steps:
+    - name: 🧪 test
+      shell: bash --noprofile --norc {0}
+      env:
+        LC_ALL: en_US.utf8
+      run: |
+        [ -f .bash_profile ] && source .bash_profile
+        counter=0
+        exitcode=0
+        reset="\e[0m"
+        warn="\e[0;33m"
+        while [ $counter -lt 6 ]
+        do
+            # run test and forward output also to a file in addition to stdout (tee command)
+            if [ $filter ]
+            then
+                echo -e "${warn}Retry $counter for $filter ${reset}"
+                dotnet test --no-build -m:1 --blame-hang --blame-hang-timeout 5m --filter=$filter | tee ./output.log
+            else
+                dotnet test --no-build -m:1 --blame-hang --blame-hang-timeout 5m | tee ./output.log
+            fi
+            # capture dotnet test exit status, different from tee
+            exitcode=${PIPESTATUS[0]}
+            if [ $exitcode == 0 ]
+            then
+                exit 0
+            fi
+            # cat output, get failed test names, remove trailing whitespace, sort+dedupe, join as FQN~TEST with |, remove trailing |.
+            filter=$(cat ./output.log | grep -o -P '(?<=\sFailed\s)[\w\._]*' | sed 's/ *$//g' | sort -u | awk 'BEGIN { ORS="|" } { print("FullyQualifiedName~" $0) }' | grep -o -P '.*(?=\|$)')
+            ((counter++))
+        done
+        exit $exitcode

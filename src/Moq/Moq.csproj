@@ -1,19 +1,9 @@
 ﻿<Project Sdk="Microsoft.NET.Sdk">
 
-	<Import Project="$(BuildDirectory)AssemblyInfo.props" />
-	<Import Project="$(BuildDirectory)GitVersion.props" />
-	<Import Project="$(BuildDirectory)SignAssembly.props" />
-	<Import Project="$(BuildDirectory)SourceLink.props" />
-
 	<PropertyGroup>
 		<TargetFrameworks>net462;netstandard2.0;netstandard2.1;net6.0</TargetFrameworks>
 		<AssemblyName>Moq</AssemblyName>
-		<DebugSymbols>True</DebugSymbols>
-		<DebugType>embedded</DebugType>
-		<DocumentationFile>bin\$(Configuration)\$(TargetFramework)\$(AssemblyName).xml</DocumentationFile> 
-		<GenerateDocumentation>true</GenerateDocumentation>
 		<NoWarn>$(NoWarn);0419;CS8032</NoWarn>
-		<RootNamespace>Moq</RootNamespace>
 		<TreatWarningsAsErrors>true</TreatWarningsAsErrors>
 		<WarningLevel>4</WarningLevel>
 		<LangVersion>9.0</LangVersion>
@@ -29,26 +19,27 @@
 		<PackageId>Moq</PackageId>
 		<Title>Moq: an enjoyable mocking library</Title>
 		<Description>Moq is the most popular and friendly mocking framework for .NET.</Description>
-		<PackageReleaseNotes>A changelog is available at https://github.com/moq/moq4/blob/main/CHANGELOG.md.</PackageReleaseNotes>
 		<Authors>Daniel Cazzulino, kzu</Authors>
 		<Copyright>Copyright (c) 2007, Clarius Consulting, Manas Technology Solutions, InSTEDD, and Contributors. All rights reserved.</Copyright>
-		<PackageIcon>moq.png</PackageIcon>
+		<PackageIcon>icon.png</PackageIcon>
 		<PackageLicenseExpression>BSD-3-Clause</PackageLicenseExpression>
 		<PackageRequireLicenseAcceptance>False</PackageRequireLicenseAcceptance>
-		<NoPackageAnalysis>True</NoPackageAnalysis>
+    <PackageReleaseNotes>A changelog is available at https://github.com/moq/moq/blob/main/CHANGELOG.md.</PackageReleaseNotes>
+    <NoPackageAnalysis>True</NoPackageAnalysis>
 		<PackageOutputPath>$(OutputDirectory)</PackageOutputPath>
 		<PackageTags>moq;tdd;mocking;mocks;unittesting;agile;unittest</PackageTags>
-		<PackageProjectUrl>https://github.com/moq/moq4</PackageProjectUrl>
-		<RepositoryUrl>https://github.com/moq/moq4</RepositoryUrl>
-		<IncludeSymbols>false</IncludeSymbols>
+		<PackageProjectUrl>https://github.com/moq/moq</PackageProjectUrl>
+		<RepositoryUrl>https://github.com/moq/moq</RepositoryUrl>
 	</PropertyGroup>
 
 	<ItemGroup>
 		<PackageReference Include="Castle.Core" Version="5.1.1" />
 		<PackageReference Include="IFluentInterface" Version="2.1.0" PrivateAssets="All" />
 		<PackageReference Include="Microsoft.NETFramework.ReferenceAssemblies" Version="1.0.0" PrivateAssets="All" />
+		<PackageReference Include="NuGetizer" Version="1.0.5" />
 		<PackageReference Include="TypeNameFormatter.Sources" Version="1.0.0" PrivateAssets="All" />
 	</ItemGroup>
+
 	<ItemGroup Condition=" '$(TargetFramework)' == 'net462' Or '$(TargetFramework)' == 'netstandard2.0' ">
 		<PackageReference Include="System.Threading.Tasks.Extensions" Version="4.5.4" />
 	</ItemGroup>
@@ -120,25 +111,9 @@
 		</Compile>
 	</ItemGroup>
 
-	<ItemGroup>
-		<None Include="$([MSBuild]::GetDirectoryNameOfFileAbove($(MSBuildThisFileDirectory), moq-icon.png))\moq-icon.png" Pack="true" PackagePath="moq.png" Visible="False" />
-	</ItemGroup>
-
-	<Target Name="Test" />
-
-	<Target Name="UpdatePackageMetadata"
-          BeforeTargets="PrepareForBuild;GetAssemblyVersion;GenerateNuspec;Pack"
-          DependsOnTargets="InitializeSourceControlInformation"
-          Condition="'$(SourceControlInformationFeatureSupported)' And
-                     '$(RepositoryUrl)' != '' And 
-                     '$(SourceRevisionId)' != ''">
-		<PropertyGroup>
-			<Description>$(Description)
-
-Built from $(RepositoryUrl)/tree/$(SourceRevisionId.Substring(0, 9))
-			</Description>
-			<PackageDescription>$(Description)</PackageDescription>
-		</PropertyGroup>
-	</Target>
+  <ItemGroup>
+    <InternalsVisibleTo Include="Moq.Tests" />
+    <InternalsVisibleTo Include="DynamicProxyGenAssembly2" PublicKey="0024000004800000940000000602000000240000525341310004000001000100c547cac37abd99c8db225ef2f6c8a3602f3b3606cc9891605d02baa56104f4cfc0734aa39b93bf7852f7d9266654753cc297e7d2edfe0bac1cdcf9f717241550e0a7b191195b7667bb4f64bcb8e2121380fd1d9d46ad2d92d2d15605093924cceaf74c4861eff62abf69b9291ed0a340e113be11e6a7d3113e92484cf7045cc7" />
+  </ItemGroup>
 
 </Project>

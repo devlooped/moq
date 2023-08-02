@@ -1,0 +1,94 @@
+﻿# Builds and runs tests in all three supported OSes
+# Pushes CI feed if secrets.SLEET_CONNECTION is provided
+
+name: build
+on: 
+  workflow_dispatch:
+  push:
+    branches: [ main, dev, 'dev/*', 'feature/*', 'rel/*' ]
+    paths-ignore:
+      - changelog.md
+      - code-of-conduct.md
+      - security.md
+      - support.md
+      - readme.md
+  pull_request:
+    types: [opened, synchronize, reopened]
+
+env:
+  DOTNET_NOLOGO: true
+  VersionPrefix: 42.42.${{ github.run_number }}
+  VersionLabel: ${{ github.ref }}
+
+defaults:
+  run:
+    shell: bash
+
+jobs:
+  os-matrix:
+    runs-on: ubuntu-latest
+    outputs:
+      matrix: ${{ steps.lookup.outputs.matrix }}
+    steps:
+      - name: 🤘 checkout
+        uses: actions/checkout@v2
+        
+      - name: 🔎 lookup
+        id: lookup
+        shell: pwsh
+        run: |
+          $path = './.github/workflows/os-matrix.json'
+          $os = if (test-path $path) { cat $path } else { '["ubuntu-latest"]' }
+          echo "matrix=$os" >> $env:GITHUB_OUTPUT
+
+  build:
+    needs: os-matrix
+    name: build-${{ matrix.os }}
+    runs-on: ${{ matrix.os }}
+    strategy:
+      matrix:
+        os: ${{ fromJSON(needs.os-matrix.outputs.matrix) }}
+    steps:
+      - name: 🤘 checkout
+        uses: actions/checkout@v2
+        with: 
+          submodules: recursive
+          fetch-depth: 0
+
+      - name: 🙏 build
+        run: dotnet build -m:1
+
+      - name: ⚙ GNU grep
+        if: matrix.os == 'macOS-latest'
+        run: |
+          brew install grep
+          echo 'export PATH="/usr/local/opt/grep/libexec/gnubin:$PATH"' >> .bash_profile
+
+      - name: 🧪 test
+        uses: ./.github/workflows/test
+
+      - name: 📦 pack
+        run: dotnet pack -m:1
+
+      # Only push CI package to sleet feed if building on ubuntu (fastest)
+      - name: 🚀 sleet
+        env:
+          SLEET_CONNECTION: ${{ secrets.SLEET_CONNECTION }}
+        if: env.SLEET_CONNECTION != ''
+        run: |
+          dotnet tool install -g --version 4.0.18 sleet 
+          sleet push bin --config none -f --verbose -p "SLEET_FEED_CONTAINER=nuget" -p "SLEET_FEED_CONNECTIONSTRING=${{ secrets.SLEET_CONNECTION }}" -p "SLEET_FEED_TYPE=azure" || echo "No packages found"
+
+  dotnet-format:
+    runs-on: ubuntu-latest
+    steps:
+      - name: 🤘 checkout
+        uses: actions/checkout@v2
+        with: 
+          submodules: recursive
+          fetch-depth: 0
+
+      - name: ✓ ensure format
+        run: |
+          dotnet format whitespace --verify-no-changes -v:diag --exclude ~/.nuget
+          dotnet format style --verify-no-changes -v:diag --exclude ~/.nuget
