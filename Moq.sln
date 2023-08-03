@@ -10,7 +10,7 @@ Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Solution Items", "Solution 
 		CONTRIBUTING.md = CONTRIBUTING.md
 		src\Directory.props = src\Directory.props
 		License.txt = License.txt
-		README.md = README.md
+		readme.md = readme.md
 	EndProjectSection
 EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Moq", "src\Moq\Moq.csproj", "{1C91AC30-5977-4BE5-BA67-8EB186C03514}"
