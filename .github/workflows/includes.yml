@@ -26,7 +26,7 @@ jobs:
           token: ${{ env.GH_TOKEN }}
 
       - name: +Mᐁ includes
-        uses: devlooped/actions-include@v1
+        uses: devlooped/actions-includes@v1
 
       - name: ✍ pull request
         uses: peter-evans/create-pull-request@v4
