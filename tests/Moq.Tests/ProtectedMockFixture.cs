@@ -476,6 +476,39 @@ namespace Moq.Tests
 		}
 
 		[Fact]
+		public void SetupResultAllowsHiddenVirtualMethods()
+		{
+			var mock = new Mock<FooDerived>();
+			mock.Protected()
+				.Setup<int>("ProtectedHiddenInt")
+				.Returns(5);
+
+			Assert.Equal(5, mock.Object.DoProtectedHiddenInt());
+			Assert.Equal(2, ((FooBase)mock.Object).DoProtectedHiddenInt());
+
+			mock.Protected()
+				.Setup<int>("ProtectedHiddenWithGenericParam", new[] { typeof(int) }, false)
+				.Returns(5);
+			Assert.Equal(5, mock.Object.DoProtectedHiddenWithGenericParam<int>());
+
+			mock.Protected()
+				.Setup<int>("ProtectedHiddenSum", genericTypeArguments: Array.Empty<Type>(), exactParameterMatch: true, 1, 2)
+				.Returns(3);
+
+			Assert.Equal(3, mock.Object.DoProtectedHiddenSum(1, 2));
+
+			mock.Protected()
+				.Setup<int>("ProtectedHiddenSum", genericTypeArguments: Array.Empty<Type>(), exactParameterMatch: true, 1, 2, 3)
+				.Returns(6);
+			Assert.Equal(6, mock.Object.DoProtectedHiddenSum(1, 2, 3));
+
+			mock.Protected()
+				.Setup<int>("ProtectedHiddenSum", genericTypeArguments: Array.Empty<Type>(), exactParameterMatch: true, 1, 2, 3, 4)
+				.Returns(10);
+			Assert.Equal(10, mock.Object.DoProtectedHiddenSum(1, 2, 3, 4));
+		}
+
+		[Fact]
 		public void SetupResultDefaulTwoOverloadsWithDerivedClassThrowsInvalidOperationException()
 		{
 			var mock = new Mock<MethodOverloads>();
@@ -1041,7 +1074,7 @@ namespace Moq.Tests
 			}
 
 			protected virtual LambdaExpression LambdaExpressionProperty { get; set; }
-			
+
 			public void SetLambdaExpressionProperty(LambdaExpression expression)
 			{
 				LambdaExpressionProperty = expression;
@@ -1110,6 +1143,14 @@ namespace Moq.Tests
 			{
 				return this.TwoArgs(arg, arg1);
 			}
+
+			public int DoProtectedHiddenInt() => this.ProtectedHiddenInt();
+
+			public T DoProtectedHiddenWithGenericParam<T>() => this.ProtectedHiddenWithGenericParam<T>();
+
+			public int DoProtectedHiddenSum(int op1, int op2) => this.ProtectedHiddenSum(op1, op2);
+
+			public int DoProtectedHiddenSum(int op1, int op2, int op3) => this.ProtectedHiddenSum(op1, op2, op3);
 
 			public string GetProtectedValue()
 			{
@@ -1194,10 +1235,33 @@ namespace Moq.Tests
 			{
 				return arg;
 			}
+
+			protected virtual int ProtectedHiddenInt() => 2;
+
+			protected virtual T ProtectedHiddenWithGenericParam<T>() => default(T);
+
+			protected new virtual int ProtectedHiddenSum(int op1, int op2) => throw new NotImplementedException();
+
+			protected new virtual int ProtectedHiddenSum(int op1, int op2, int op3) => throw new NotImplementedException();
 		}
 
 		public class FooDerived : FooBase
 		{
+			protected new virtual int ProtectedHiddenInt() => 22;
+
+			protected new virtual T ProtectedHiddenWithGenericParam<T>() => default(T);
+
+			protected new virtual int ProtectedHiddenSum(int op1, int op2) => throw new NotImplementedException();
+
+			protected virtual int ProtectedHiddenSum(int op1, int op2, int op3, int op4) => throw new NotImplementedException();
+
+			public new int DoProtectedHiddenInt() => this.ProtectedHiddenInt();
+
+			public new T DoProtectedHiddenWithGenericParam<T>() => this.ProtectedHiddenWithGenericParam<T>();
+
+			public new int DoProtectedHiddenSum(int op1, int op2) => this.ProtectedHiddenSum(op1, op2);
+
+			public int DoProtectedHiddenSum(int op1, int op2, int op3, int op4) => this.ProtectedHiddenSum(op1, op2, op3, op4);
 		}
 
 		public class MyBase { }
