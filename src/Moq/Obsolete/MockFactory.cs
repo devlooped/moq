@@ -248,12 +248,9 @@ namespace Moq
         {
             // "fix" compiler picking this overload instead of 
             // the one receiving the mock behavior.
-            if (args != null && args.Length > 0 && args[0] is MockBehavior)
-            {
-                return CreateMock<T>((MockBehavior)args[0], args.Skip(1).ToArray());
-            }
-
-            return CreateMock<T>(defaultBehavior, args);
+            return args != null && args.Length > 0 && args[0] is MockBehavior behavior
+                ? CreateMock<T>(behavior, args.Skip(1).ToArray())
+                : CreateMock<T>(defaultBehavior, args);
         }
 
         /// <summary>
