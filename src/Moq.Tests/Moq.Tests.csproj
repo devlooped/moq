@@ -1,4 +1,4 @@
-﻿<Project Sdk="Microsoft.NET.Sdk">
+<Project Sdk="Microsoft.NET.Sdk">
 
 	<PropertyGroup>
 		<TargetFrameworks>net472;net6.0</TargetFrameworks>
@@ -47,7 +47,7 @@
   </ItemGroup>
 
   <ItemGroup Condition=" $([System.Text.RegularExpressions.Regex]::IsMatch('$(DefineConstants)', 'FEATURE_EF'))">
-		<PackageReference Include="EntityFramework" Version="6.2.0" />
+		<PackageReference Include="EntityFramework" Version="6.4.4" />
 	</ItemGroup>
 
 	<ItemGroup Condition=" $([System.Text.RegularExpressions.Regex]::IsMatch('$(DefineConstants)', 'FEATURE_SYSTEM_WEB'))">
