@@ -115,8 +115,8 @@ We appreciate deeply any feedback that you may have! Feel free to participate in
 
 Special thanks to the following gold sponsors of this project:
 
-<a href="https://github.com/aws"><img src="https://avatars.githubusercontent.com/u/2232217?s=70&v=4" alt="Supported by Amazon Web Services" title="Supported by Amazon Web Services"></a>
-<a href="https://github.com/clarius"><img src="https://avatars.githubusercontent.com/u/71888636?s=70&v=4" alt="Supported by Clarius" title="Supported by Clarius"></a>
+[![Supported by Amazon Web Services](https://raw.githubusercontent.com/devlooped/sponsors/main/.github/avatars/aws.png "Supported by Amazon Web Services")](https://github.com/aws)
+[![Supported by Clarius](https://raw.githubusercontent.com/devlooped/sponsors/main/.github/avatars/clarius.png "Supported by Clarius")](https://github.com/clarius)
 
 And to all our sponsors!
 
