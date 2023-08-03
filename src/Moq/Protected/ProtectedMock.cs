@@ -458,8 +458,7 @@ namespace Moq.Protected
                     throw new ArgumentException(Resources.UseItExprIsNullRatherThanNullArgumentValue);
                 }
 
-                var expr = args[index] as Expression;
-                if (expr == null)
+                if (args[index] is not Expression expr)
                 {
                     types[index] = args[index].GetType();
                 }

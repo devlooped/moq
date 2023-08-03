@@ -5,10 +5,10 @@ Imports Xunit
 
 Public Class IssueReports
 
-    Public Class Issue278
+    Class Issue278
 
         <Fact()>
-        Public Sub SetupsForPropertiesWithMultipleArgsDoNotOverwriteEachOther()
+        Sub SetupsForPropertiesWithMultipleArgsDoNotOverwriteEachOther()
             Dim mock As New Mock(Of ISimpleInterface)()
 
             mock.Setup(Function(m) m.PropertyWithMultipleArgs(1, 1)).Returns(1)
@@ -19,17 +19,17 @@ Public Class IssueReports
 
         End Sub
 
-        Public Interface ISimpleInterface
+        Interface ISimpleInterface
 
             ReadOnly Property PropertyWithMultipleArgs(setting As Integer, setting2 As Integer) As Integer
 
         End Interface
     End Class
 
-    Public Class Issue1067
+    Class Issue1067
 
         <Fact>
-        Public Sub Test_NonGeneric()
+        Sub Test_NonGeneric()
             Dim userManagerMock = New Mock(Of IUserManager)()
             Setup_NonGeneric(userManagerMock, 42)
 
@@ -40,7 +40,7 @@ Public Class IssueReports
         End Sub
 
         <Fact>
-        Public Sub Test_Generic()
+        Sub Test_Generic()
             Dim userManagerMock = New Mock(Of IUserManager)()
             Setup_Generic(Of User)(userManagerMock, 42)
 
@@ -50,11 +50,11 @@ Public Class IssueReports
             Assert.Equal(42, user.Id)
         End Sub
 
-        Public Class User
+        Class User
             Property Id As Integer
         End Class
 
-        Public Interface IUserManager
+        Interface IUserManager
             Sub Create(User As User)
         End Interface
 
@@ -73,17 +73,17 @@ Public Class IssueReports
 
     End Class
 
-    Public Class Issue1129
+    Class Issue1129
 
         <Fact>
-        Public Sub Test()
+        Sub Test()
             Dim classMock = New Mock(Of IndexerInterface)()
 
             classMock.SetupAllProperties()
 
             Assert.False(classMock.Object.Value)
         End Sub
-        Public Interface IndexerInterface
+        Interface IndexerInterface
             ReadOnly Property SystemDefault() As Boolean
             Property Value() As Boolean
             Property Value(ByVal OverrideLevel As Integer) As Boolean
@@ -91,34 +91,34 @@ Public Class IssueReports
         End Interface
     End Class
 
-    Public Class Issue1153
+    Class Issue1153
 
         <Fact>
-        Public Sub Indexer_overload_can_be_distinguished_from_property_when_mocking_declaring_class()
+        Sub Indexer_overload_can_be_distinguished_from_property_when_mocking_declaring_class()
             Dim mock = New Mock(Of MyVBClassBase)()
             mock.Setup(Function(m) m.Prop).Returns(True)
         End Sub
 
         <Fact>
-        Public Sub Indexer_overload_can_be_distinguished_from_property_when_mocking_subclass_of_declaring_class()
+        Sub Indexer_overload_can_be_distinguished_from_property_when_mocking_subclass_of_declaring_class()
             Dim mock = New Mock(Of MyVBClass)()
             mock.Setup(Function(m) m.Prop).Returns(True)
         End Sub
 
-        Public Class MyVBClassBase
-            Public Overridable ReadOnly Property Prop() As Boolean
+        Class MyVBClassBase
+            Overridable ReadOnly Property Prop() As Boolean
                 Get
                     Return True
                 End Get
             End Property
-            Public Overridable ReadOnly Property Prop(ByVal userID As Guid) As Boolean
+            Overridable ReadOnly Property Prop(ByVal userID As Guid) As Boolean
                 Get
                     Return False
                 End Get
             End Property
         End Class
 
-        Public Class MyVBClass
+        Class MyVBClass
             Inherits MyVBClassBase
         End Class
 
