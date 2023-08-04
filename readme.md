@@ -3,7 +3,7 @@ moq
 
 [![Version](https://img.shields.io/nuget/vpre/Moq.svg)](https://www.nuget.org/packages/Moq)
 [![Downloads](https://img.shields.io/nuget/dt/Moq.svg)](https://www.nuget.org/packages/Moq)
-[![Documentation](https://img.shields.io/badge/docs-website-%23fc0)](http://moq.github.io/moq4/)
+[![Documentation](https://img.shields.io/badge/docs-website-%23fc0)](http://moq.github.io/moq/)
 [![Discord Chat](https://img.shields.io/badge/chat-on%20discord-7289DA.svg)](https://discord.gg/8PtpGdu)
 
 <!-- #content -->
@@ -69,11 +69,11 @@ You can read more about the "why" and see some nice screenshots at [kzu's blog](
 
 ## Where?
 
-See our [Quickstart](https://github.com/Moq/moq4/wiki/Quickstart) examples to get a feeling of the extremely simple API and install from [NuGet](http://nuget.org/packages/moq).
+See our [Quickstart](https://github.com/moq/moq/wiki/Quickstart) examples to get a feeling of the extremely simple API and install from [NuGet](http://nuget.org/packages/moq).
 
 Read about the announcement at [kzu's blog](https://web.archive.org/web/20201130233544/http://blogs.clariusconsulting.net/kzu/linq-to-mock-moq-is-born/). Get some background on [the state of mock libraries from Scott Hanselman](http://www.hanselman.com/blog/MoqLinqLambdasAndPredicatesAppliedToMockObjects.aspx).
 
-In-depth documentation is being added to the [documentation website](http://moq.github.io/moq4/).
+In-depth documentation is being added to the [documentation website](http://moq.github.io/moq/).
 
 
 ## Who?
@@ -104,7 +104,7 @@ We appreciate deeply any feedback that you may have! Feel free to participate in
  "Moq channel on Discord"
 
  [issue tracker]:
- https://github.com/moq/moq4/issues
+ https://github.com/moq/moq/issues
  "Moq issue tracker on GitHub"
 
 <!-- #features -->
