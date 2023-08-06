@@ -2,6 +2,7 @@
 // All rights reserved. Licensed under the BSD 3-Clause License; see License.txt.
 
 using System;
+using System.Collections.Concurrent;
 using System.Collections.Generic;
 using System.Diagnostics;
 using System.Linq;
@@ -155,7 +156,7 @@ namespace Moq
             {
                 Debug.Assert(declaringType.IsAssignableFrom(proxyType));
 
-                var map = proxyType.GetInterfaceMap(method.DeclaringType);
+                var map = GetInterfaceMap(proxyType, method.DeclaringType);
                 var index = Array.IndexOf(map.InterfaceMethods, method);
                 Debug.Assert(index >= 0);
                 return map.TargetMethods[index].GetBaseDefinition();
@@ -516,6 +517,13 @@ namespace Moq
             }
 
             return type;
+        }
+
+        private static readonly ConcurrentDictionary<Tuple<Type, Type>, InterfaceMapping> mappingsCache = new ();
+
+        private static InterfaceMapping GetInterfaceMap(Type type, Type interfaceType)
+        {
+            return mappingsCache.GetOrAdd(Tuple.Create(type, interfaceType), tuple => tuple.Item1.GetInterfaceMap(tuple.Item2));
         }
 
         public static IEnumerable<Mock> FindAllInnerMocks(this SetupCollection setups)
