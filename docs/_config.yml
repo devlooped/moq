@@ -1,4 +1,4 @@
-baseurl: /moq4
+baseurl: /moq
 
 defaults:
   - scope:
