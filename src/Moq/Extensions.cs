@@ -519,7 +519,7 @@ namespace Moq
             return type;
         }
 
-        private static readonly ConcurrentDictionary<Tuple<Type, Type>, InterfaceMapping> mappingsCache = new ();
+        private static readonly ConcurrentDictionary<Tuple<Type, Type>, InterfaceMapping> mappingsCache = new();
 
         private static InterfaceMapping GetInterfaceMap(Type type, Type interfaceType)
         {
