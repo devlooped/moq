@@ -26,7 +26,7 @@
 	<PropertyGroup>
 		<!-- Properties related to NuGet packaging: -->
 		<IsPackable>True</IsPackable>
-		<PackageId>Moq</PackageId>
+		<PackageId>CriticalArc.Moq</PackageId>
 		<Title>Moq: an enjoyable mocking library</Title>
 		<Description>Moq is the most popular and friendly mocking framework for .NET.</Description>
 		<PackageReleaseNotes>A changelog is available at https://github.com/moq/moq4/blob/main/CHANGELOG.md.</PackageReleaseNotes>
