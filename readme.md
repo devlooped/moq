@@ -1,13 +1,7 @@
-moq
+CleanMoq
 ===
 
-[![Version](https://img.shields.io/nuget/vpre/Moq.svg)](https://www.nuget.org/packages/Moq)
-[![Downloads](https://img.shields.io/nuget/dt/Moq.svg)](https://www.nuget.org/packages/Moq)
-[![Documentation](https://img.shields.io/badge/docs-website-%23fc0)](http://moq.github.io/moq/)
-[![Discord Chat](https://img.shields.io/badge/chat-on%20discord-7289DA.svg)](https://discord.gg/8PtpGdu)
-
-<!-- #content -->
-The most popular and friendly mocking library for .NET
+This is a branch off of Moq library.
 
 ```csharp
   var mock = new Mock<ILoveThisLibrary>();
@@ -96,13 +90,3 @@ Moq offers the following features:
 * Pass constructor arguments for mocked classes
 * Intercept and raise events on mocks
 * Intuitive support for ```out/ref``` arguments
-
-We appreciate deeply any feedback that you may have! Feel free to participate in the [chat], or report an issue in the [issue tracker].
-
- [chat]:
- https://discord.gg/8PtpGdu
- "Moq channel on Discord"
-
- [issue tracker]:
- https://github.com/moq/moq/issues
- "Moq issue tracker on GitHub"
