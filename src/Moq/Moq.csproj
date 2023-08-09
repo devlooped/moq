@@ -19,7 +19,7 @@
 		<PackageId>CleanMoq</PackageId>
 		<Title>CleanMoq: a CLEAN enjoyable mocking library</Title>
 		<Description>CleanMoq is the most popular and friendly mocking framework for .NET.</Description>
-		<Authors>Daniel Cazzulino, kzu</Authors>
+		<Authors>Hassan Habib</Authors>
 		<Copyright>Copyright (c) 2007, Clarius Consulting, Manas Technology Solutions, InSTEDD, and Contributors. All rights reserved.</Copyright>
 		<PackageIcon>icon.png</PackageIcon>
 		<PackageLicenseExpression>BSD-3-Clause</PackageLicenseExpression>
