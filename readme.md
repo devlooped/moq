@@ -115,7 +115,6 @@ We appreciate deeply any feedback that you may have! Feel free to participate in
 
 Special thanks to the following gold sponsors of this project:
 
-[![Supported by Amazon Web Services](https://raw.githubusercontent.com/devlooped/sponsors/main/.github/avatars/aws.png "Supported by Amazon Web Services")](https://github.com/aws)
 [![Supported by Clarius](https://raw.githubusercontent.com/devlooped/sponsors/main/.github/avatars/clarius.png "Supported by Clarius")](https://github.com/clarius)
 
 And to all our sponsors!
