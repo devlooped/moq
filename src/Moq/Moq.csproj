@@ -1,8 +1,8 @@
 ﻿<Project Sdk="Microsoft.NET.Sdk">
 
 	<PropertyGroup>
-		<TargetFrameworks>net462;netstandard2.0;netstandard2.1;net6.0</TargetFrameworks>
-		<AssemblyName>Moq</AssemblyName>
+		<TargetFrameworks>netstandard2.1;net6.0</TargetFrameworks>
+		<AssemblyName>CleanMoq</AssemblyName>
 		<NoWarn>$(NoWarn);0419;CS8032</NoWarn>
 		<TreatWarningsAsErrors>true</TreatWarningsAsErrors>
 		<WarningLevel>4</WarningLevel>
@@ -16,19 +16,22 @@
 	<PropertyGroup>
 		<!-- Properties related to NuGet packaging: -->
 		<IsPackable>True</IsPackable>
-		<PackageId>Moq</PackageId>
-		<Title>Moq: an enjoyable mocking library</Title>
-		<Description>Moq is the most popular and friendly mocking framework for .NET.</Description>
+		<PackageId>CleanMoq</PackageId>
+		<Title>CleanMoq: a CLEAN enjoyable mocking library</Title>
+		<Description>CleanMoq is the most popular and friendly mocking framework for .NET.</Description>
 		<Authors>Daniel Cazzulino, kzu</Authors>
 		<Copyright>Copyright (c) 2007, Clarius Consulting, Manas Technology Solutions, InSTEDD, and Contributors. All rights reserved.</Copyright>
 		<PackageIcon>icon.png</PackageIcon>
 		<PackageLicenseExpression>BSD-3-Clause</PackageLicenseExpression>
 		<PackageRequireLicenseAcceptance>False</PackageRequireLicenseAcceptance>
-    <PackageReleaseNotes>A changelog is available at https://github.com/moq/moq/blob/main/CHANGELOG.md.</PackageReleaseNotes>
+    <PackageReleaseNotes>Moq without Spyware :-)</PackageReleaseNotes>
     <NoPackageAnalysis>True</NoPackageAnalysis>
 		<PackageTags>moq;tdd;mocking;mocks;unittesting;agile;unittest</PackageTags>
-		<PackageProjectUrl>https://github.com/moq/moq</PackageProjectUrl>
-		<RepositoryUrl>https://github.com/moq/moq</RepositoryUrl>
+		<PackageProjectUrl>https://github.com/hassanhabib/moq</PackageProjectUrl>
+		<RepositoryUrl>https://github.com/hassanhabib/moq</RepositoryUrl>
+		<GeneratePackageOnBuild>True</GeneratePackageOnBuild>
+		<Product>CleanMoq</Product>
+		<RepositoryType>git</RepositoryType>
 	</PropertyGroup>
 
 	<ItemGroup>
