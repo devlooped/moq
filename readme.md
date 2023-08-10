@@ -1,6 +1,6 @@
 # CleanMoq
 
-![CleanMoq](https://raw.githubusercontent.com/hassanhabib/CleanMoq/master/CleanMoq/assets/img/cleanmoq_git_logo.png)
+![CleanMoq](https://raw.githubusercontent.com/hassanhabib/CleanMoq/e52332d5f3a991a7827f8133bb8a95c057753a68/assets/img/cleanmoq_git_logo.png)
 
 [![Nuget](https://img.shields.io/nuget/v/CleanMoq?logo=nuget&style=default)](https://www.nuget.org/packages/CleanMoq)
 ![Nuget](https://img.shields.io/nuget/dt/CleanMoq?logo=nuget&style=default&color=blue&label=Downloads)
