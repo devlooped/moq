@@ -12,6 +12,7 @@ using System.Threading.Tasks;
 using Moq.Language;
 using Moq.Language.Flow;
 using Moq.Properties;
+using Moq.Sponsorships;
 
 namespace Moq
 {
@@ -234,11 +235,11 @@ namespace Moq
         /// </summary>
         internal Mock(bool skipInitialize)
         {
-            // HACK: this is quick hackish. 
-            // In order to avoid having an IMock<T> I relevant members 
+            // HACK: this is quick hackish.
+            // In order to avoid having an IMock<T> I relevant members
             // virtual so that As<TInterface> overrides them (i.e. Interceptor).
-            // The skipInitialize parameter is not used at all, and it's 
-            // just to differentiate this ctor that should do nothing 
+            // The skipInitialize parameter is not used at all, and it's
+            // just to differentiate this ctor that should do nothing
             // from the regular ones which initializes the proxy, etc.
         }
 
@@ -300,6 +301,17 @@ namespace Moq
         /// </remarks>
         public Mock(MockBehavior behavior, params object[] args)
         {
+            if (!Sponsorship.Instance.IsSponsor().GetAwaiter().GetResult())
+            {
+                //  Alert the user that they are not sponsoring the project!
+                //  Note: Similarly to the old method causing issues when "Treat warnings as errors" is enabled,
+                //  this may run into issues with people using the non-standardized "throwing exceptions halts execution" behavior
+                //  to prevent undefined states in their code.
+                //
+                //  I have long heralded this as an anti-pattern, so that's 100% their fault.
+                throw new Exception("You are not sponsoring this project! Please consider doing so at https://github.com/devlooped :^)");
+            }
+
             Guard.IsMockable(typeof(T));
 
             if (args == null)
