@@ -97,7 +97,13 @@ Install from [NuGet](http://nuget.org/packages/CleanMoq).
 
 The library was created mainly for developers who aren't currently using any mocking library or are displeased with the complexities of some other implementation.
 
-CleanMoq is designed to be a very practical, unobtrusive and straight-forward way to quickly setup dependencies for your tests. Its API design helps even novice users to fall in the "pit of success" and avoid most common misuses/abuses of mocking. 
+CleanMoq is designed to be a very practical, unobtrusive and straight-forward way to quickly setup dependencies for your tests. Its API design helps even novice users to fall in the "pit of success" and avoid most common misuses/abuses of mocking.
+
+## Who?
+
+Moq was originally developed by [Clarius](http://www.clariusconsulting.net), [Manas](http://www.manas.com.ar) and [InSTEDD](http://www.instedd.org).
+
+Moq uses [Castle DynamicProxy](http://www.castleproject.org/projects/dynamicproxy/) internally as the interception mechanism to enable mocking.
 
 ## Features at a glance
 CleanMoq offers all the same original features as the Moq library, features like below:
