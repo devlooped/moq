@@ -519,9 +519,9 @@ namespace Moq
             return type;
         }
 
-        private static readonly ConcurrentDictionary<Tuple<Type, Type>, InterfaceMapping> mappingsCache = new();
+        static readonly ConcurrentDictionary<Tuple<Type, Type>, InterfaceMapping> mappingsCache = new();
 
-        private static InterfaceMapping GetInterfaceMap(Type type, Type interfaceType)
+        static InterfaceMapping GetInterfaceMap(Type type, Type interfaceType)
         {
             return mappingsCache.GetOrAdd(Tuple.Create(type, interfaceType), tuple => tuple.Item1.GetInterfaceMap(tuple.Item2));
         }
