@@ -1,3 +1,8 @@
+[file]
+	url = https://github.com/devlooped/oss
+[file ".netconfig"]
+	url = https://github.com/devlooped/oss/blob/main/.netconfig
+	skip
 [file ".github/workflows/includes.yml"]
 	url = https://github.com/devlooped/oss/blob/main/.github/workflows/includes.yml
 	sha = ac753b791d03997eb655efb26ae141b51addd1c0
@@ -18,11 +23,6 @@
 	sha = 8990ebb36199046e0b8098bad9e46dcef739c56e
 	etag = e1dc114d2e8b57d50649989d32dbf0c9080ec77da3738a4cc79e9256d6ca5d3e
 	weak
-[file]
-	url = https://github.com/devlooped/oss
-[file ".netconfig"]
-	url = https://github.com/devlooped/oss/blob/main/.netconfig
-	skip
 [file "readme.md"]
 	url = https://github.com/devlooped/oss/blob/main/readme.md
 	skip
@@ -102,8 +102,8 @@
 	weak
 [file "src/Directory.Build.targets"]
 	url = https://github.com/devlooped/oss/blob/main/src/Directory.Build.targets
-	sha = 1514d15399a7d545ad92a0e9d57dc8295fdd6af8
-	etag = 428f80b0786ff17b836c7a5b0640948724855d17933e958642b22849ac00dadb
+	sha = 5cec43dd514aeb9050ea2ccbc546f7afa428c5b5
+	etag = 8e0f43f00e0c29b408d4ce5c821b44a9bf7dbc8d4917895cfc39f2964d839bf6
 	weak
 [file "src/kzu.snk"]
 	url = https://github.com/devlooped/oss/blob/main/src/kzu.snk
