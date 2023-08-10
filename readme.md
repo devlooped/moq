@@ -117,3 +117,6 @@ CleanMoq offers all the same original features as the Moq library, features like
 * Pass constructor arguments for mocked classes
 * Intercept and raise events on mocks
 * Intuitive support for ```out/ref``` arguments
+
+## Thank You
+Special thanks to the original maintainers and supporters of Moq - find the list on the front-page for Moq [here](https://github.com/moq/moq)
