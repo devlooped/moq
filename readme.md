@@ -10,7 +10,7 @@
 ## Introduction
 This is CleanMoq a branch of the popular Moq library.
 
-All copyrights of use can be found in the  license text [here](./license.text)
+All copyrights of use can be found in the  license text [here](https://github.com/hassanhabib/CleanMoq/blob/main/License.txt)
 
 CleanMoq is a mocking library for .NET developers to take full advantage of .NET Linq expression trees and lambda expressions, which makes it the most productive, type-safe and refactoring-friendly mocking library available. And it supports mocking interfaces as well as classes. Its API is extremely simple and straightforward, and doesn't require any prior knowledge or experience with mocking concepts.
 
