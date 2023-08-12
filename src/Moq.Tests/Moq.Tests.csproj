@@ -20,7 +20,6 @@
 
   <ItemGroup>
     <ProjectReference Include="..\Moq\Moq.csproj" />
-    <ProjectReference Include="..\Moq.Tests.FSharpTypes\Moq.Tests.FSharpTypes.fsproj" />
   </ItemGroup>
 
   <ItemGroup>
