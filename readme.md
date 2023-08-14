@@ -20,6 +20,25 @@ We take the utmost opinion that no bots or obtrusive hidden features without con
 This forked branch of the original Moq library was born to do just that, to protect all our systems from future potential unwarranted harms.
 Please use with confidence in building your Standard Compliant systems.
 
+## Roadmap
+On August 4, 2023 SponserLink was introduced in the 4.20.0 version of the Moq library by its creators, and on August 9, 2023 it was removed via the proj file only after the Apple systems failed to build.
+
+Moq Version 4.20.69 released on August 11, 2023 states SponsorLink removal via pull request #1375.  Again only with the removal of the project reference. SponsorLink is still a viable potential threat of being reimplemented at any givin point in time as the coding for it still resides within this cuurent version v4.20.69.
+
+CleanMoq was forked from Moq version 4.20.0 where all reference coding to SponsorLink has been removed not just the project reference within the Moq.CodeAnalysis project file. 
+
+It has been completely removed in CleanMoq.
+
+Version 1.0.0 is the beginning of CleanMoq, it is the version 4.20.0 without the spywhere.
+
+CleanMoq will be enhanced to standard principles as required and versioning forward will commence from version 1.0.0. 
+
+CleanMoq may or may not be updated with future enhancements of the original Moq library as it progresses towards the future. 
+
+CleanMoq will stand as its own library into the future, we hope we can build everyones confidence in using it without worry or concerns. 
+
+The motto remains the same in The Standard Community (Coalition of Good-Hearted Engineers)
+
 ## How to install
 Install from [NuGet](http://nuget.org/packages/CleanMoq).
 
