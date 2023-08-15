@@ -172,6 +172,13 @@ We appreciate deeply any feedback that you may have! Feel free to participate in
 [![Seann Alexander](https://raw.githubusercontent.com/devlooped/sponsors/main/.github/avatars/seanalexander.png "Seann Alexander")](https://github.com/seanalexander)
 [![Tino Hager](https://raw.githubusercontent.com/devlooped/sponsors/main/.github/avatars/tinohager.png "Tino Hager")](https://github.com/tinohager)
 [![Badre BSAILA](https://raw.githubusercontent.com/devlooped/sponsors/main/.github/avatars/pedrobsaila.png "Badre BSAILA")](https://github.com/pedrobsaila)
+[![Mark Seemann](https://raw.githubusercontent.com/devlooped/sponsors/main/.github/avatars/ploeh.png "Mark Seemann")](https://github.com/ploeh)
+[![Angelo Belchior](https://raw.githubusercontent.com/devlooped/sponsors/main/.github/avatars/angelobelchior.png "Angelo Belchior")](https://github.com/angelobelchior)
+[![Tony Qu](https://raw.githubusercontent.com/devlooped/sponsors/main/.github/avatars/tonyqus.png "Tony Qu")](https://github.com/tonyqus)
+[![Luca Briguglia](https://raw.githubusercontent.com/devlooped/sponsors/main/.github/avatars/lucabriguglia.png "Luca Briguglia")](https://github.com/lucabriguglia)
+[![Daniel May](https://raw.githubusercontent.com/devlooped/sponsors/main/.github/avatars/danielrmay.png "Daniel May")](https://github.com/danielrmay)
+[![Blauhaus Technology (Pty) Ltd](https://raw.githubusercontent.com/devlooped/sponsors/main/.github/avatars/BlauhausTechnology.png "Blauhaus Technology (Pty) Ltd")](https://github.com/BlauhausTechnology)
+[![Richard Collette](https://raw.githubusercontent.com/devlooped/sponsors/main/.github/avatars/rcollette.png "Richard Collette")](https://github.com/rcollette)
 
 
 <!-- sponsors.md -->
