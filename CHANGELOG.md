@@ -4,19 +4,41 @@ All notable changes to this project will be documented in this file.
 
 The format is loosely based on [Keep a Changelog](http://keepachangelog.com/en/1.0.0/).
 
+## 4.20.69 (2023-08-11)
 
-## Unreleased
+* Removed SponsorLink https://github.com/moq/moq/pull/1375
+* Remove AWS sponsorship from readme by @kzu in https://github.com/moq/moq/pull/1383
+* Add everyone how now DOES sponsor 🫶
 
-#### Added
+## 4.20.2 (2023-08-09)
+### 🐛 Fixed bugs
+* Remove SponsorLink since it breaks MacOS restore by @kzu in https://github.com/moq/moq/pull/1375
 
+> NOTE: in addition, there were potential privacy issues raised with regards to the SHA256 hashing of 
+> user' email to check for sponsorship, so it won't be coming back until that's properly addressed
+
+## 4.20.1 (2023-08-08)
+### ✨ Implemented enhancements
+* Add Sponsor button to package readme 💜
+
+## 4.20.0 (2023-08-07)
+
+### ✨ Implemented enhancements
 * `Mock<T>.RaiseAsync` method for raising "async" events, i.e. events that use a `Func<..., Task>` or `Func<..., ValueTask>` delegate. (@stakx, #1313)
 * `setup.Verifiable(Times times, [string failMessage])` method to specify the expected number of calls upfront. `mock.Verify[All]` can then be used to check whether the setup was called that many times. The upper bound (maximum allowed number of calls) will be checked right away, i.e. whenever a setup gets called. (@stakx, #1319)
-* Add `ThrowsAsync` methods for non-generic `ValueTask` (@johnthcall, #1235)
+
+### 🔨 Other
+* Add `ThrowsAsync` for non-generic `ValueTask` by @johnthcall in https://github.com/moq/moq/pull/1235
+* Use PackageLicenseExpression instead of PackageLicenseUrl by @wismann in https://github.com/moq/moq/pull/1322
+* Don't throw away generic type arguments in one `mock.Protected().Verify<T>()` method overload by @stakx in https://github.com/moq/moq/pull/1325
+* #1340 updated appveyor.yml with workaround to make builds work again by @david-kalbermatten in https://github.com/moq/moq/pull/1346
+* Revamp structure, apply oss template, cleanup projects/imports by @kzu in https://github.com/moq/moq/pull/1358
+* Add 💜 SponsorLink support by @kzu in https://github.com/moq/moq/pull/1363
+* fix website url by @tibel in https://github.com/moq/moq/pull/1364
 
 #### Fixed
 
 * Verifying a protected generic method that returns a value is broken (@nthornton2010, #1314)
-
 
 ## 4.18.4 (2022-12-30)
 
