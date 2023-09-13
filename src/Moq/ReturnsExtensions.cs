@@ -339,7 +339,7 @@ namespace Moq
 
         static TimeSpan GetDelay(TimeSpan minDelay, TimeSpan maxDelay, Random random)
         {
-            if (!(minDelay < maxDelay))
+            if (minDelay >= maxDelay)
                 throw new ArgumentException(Resources.MinDelayMustBeLessThanMaxDelay);
 
             var min = (int)minDelay.Ticks;
