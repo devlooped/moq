@@ -35,7 +35,7 @@
 
     <None Update="@(None -> WithMetadataValue('Filename', 'readme'))" 
           Pack="true" PackagePath="%(Filename)%(Extension)" 
-          Condition="'$(PackageReadmeFile)' != ''" />
+          Condition="'$(PackReadme)' != 'false' and '$(PackageReadmeFile)' != ''" />
     
     <!-- src-level will need explicit inclusion -->
     <None Include="$(MSBuildThisFileDirectory)icon.png" Link="icon.png" Visible="false" 
@@ -44,7 +44,7 @@
 
     <None Include="$(MSBuildThisFileDirectory)readme.md" Link="readme.md"  
           Pack="true" PackagePath="%(Filename)%(Extension)"
-          Condition="Exists('$(MSBuildThisFileDirectory)readme.md') and !Exists('$(MSBuildProjectDirectory)\readme.md')" />
+          Condition="'$(PackReadme)' != 'false' and Exists('$(MSBuildThisFileDirectory)readme.md') and !Exists('$(MSBuildProjectDirectory)\readme.md')" />
   </ItemGroup>
 
   <!-- Microsoft.NET.Sdk\targets\Microsoft.NET.DefaultAssemblyInfo.targets does this and is imported 
