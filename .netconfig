@@ -97,13 +97,13 @@
     skip
 [file "src/Directory.Build.props"]
 	url = https://github.com/devlooped/oss/blob/main/src/Directory.Build.props
-	sha = 6ae80a175a8f926ac5d9ffb0f6afd55d85cc9320
-	etag = 69d4b16c14d5047b3ed812dbf556b0b8d77deb86f73af04b9bd3640220056fa8
+	sha = 1bf1eacc7ac3920d52c8e7045bfa34abc7c05302
+	etag = e9fd8ef4740d5559fa495580b04ec3437b99edbfb8452813907337f9374c1282
 	weak
 [file "src/Directory.Build.targets"]
 	url = https://github.com/devlooped/oss/blob/main/src/Directory.Build.targets
-	sha = 5cec43dd514aeb9050ea2ccbc546f7afa428c5b5
-	etag = 8e0f43f00e0c29b408d4ce5c821b44a9bf7dbc8d4917895cfc39f2964d839bf6
+	sha = 1bf1eacc7ac3920d52c8e7045bfa34abc7c05302
+	etag = 7cb1421f00d9f6f4c00f0ca98e485dcadb927cfa6b3f0b5d4fb212525d2ce9c0
 	weak
 [file "src/kzu.snk"]
 	url = https://github.com/devlooped/oss/blob/main/src/kzu.snk

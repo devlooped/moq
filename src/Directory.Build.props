@@ -26,10 +26,10 @@
 
     <!-- Pick src-level readme+icon automatically -->
     <PackageIcon Condition="Exists('$(MSBuildThisFileDirectory)icon.png')">icon.png</PackageIcon>
-    <PackageReadmeFile Condition="Exists('$(MSBuildThisFileDirectory)readme.md')">readme.md</PackageReadmeFile>
+    <PackageReadmeFile Condition="'$(PackReadme)' != 'false' and Exists('$(MSBuildThisFileDirectory)readme.md')">readme.md</PackageReadmeFile>
     <!-- Pick project-level readme+icon overrides automatically -->
     <PackageIcon Condition="Exists('$(MSBuildProjectDirectory)\icon.png')">icon.png</PackageIcon>
-    <PackageReadmeFile Condition="Exists('$(MSBuildProjectDirectory)\readme.md')">readme.md</PackageReadmeFile>
+    <PackageReadmeFile Condition="'$(PackReadme)' != 'false' and Exists('$(MSBuildProjectDirectory)\readme.md')">readme.md</PackageReadmeFile>
 
     <PublishRepositoryUrl>true</PublishRepositoryUrl>
     <GenerateRepositoryUrlAttribute>true</GenerateRepositoryUrlAttribute>
