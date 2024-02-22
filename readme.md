@@ -26,7 +26,7 @@ The most popular and friendly mocking library for .NET
   mock.Verify(library => library.DownloadExists("2.0.0.0"), Times.AtMostOnce());
 ```
 
-Moq also is the first and only library so far to provide Linq to Mocks, so that the
+Moq also is the first and only library so far to provide Linq to Mocks, so that the 
 same behavior above can be achieved much more succinctly:
 
 ```csharp
@@ -44,7 +44,7 @@ same behavior above can be achieved much more succinctly:
   Mock.Get(lovable).Verify(library => library.DownloadExists("2.0.0.0"));
 ```
 
-You can think of Linq to Mocks as "from the universe of mocks, give me one whose behavior
+You can think of Linq to Mocks as "from the universe of mocks, give me one whose behavior 
 matches this expression".
 
 Check out the [Quickstart](https://github.com/moq/moq/wiki/Quickstart) for more examples!
@@ -59,7 +59,7 @@ Moq (pronounced "Mock-you" or just "Mock") is the only mocking library for .NET 
 
 The library was created mainly for developers who aren't currently using any mocking library (or are displeased with the complexities of some other implementation), and who are typically [manually writing their own mocks](https://web.archive.org/web/20200920165817/http://blogs.clariusconsulting.net/kzu/mocks-stubs-and-fakes-its-a-continuum/) (with more or less "fanciness"). Most developers in this situation also happen to be [quite pragmatic and adhere to state](https://web.archive.org/web/20200414170510/http://blogs.clariusconsulting.net/kzu/state-testing-vs-interaction-testing/) (or classic) TDD. It's the result of feeling that the barrier of entry from other mocking libraries is a bit high, and a simpler, more lightweight and elegant approach is possible. Moq achieves all this by taking full advantage of the elegant and compact C# and VB language features collectively known as LINQ (they are not just for queries, as the acronym implies).
 
-Moq is designed to be a very practical, unobtrusive and straight-forward way to quickly setup dependencies for your tests. Its API design helps even novice users to fall in the "pit of success" and avoid most common misuses/abuses of mocking.
+Moq is designed to be a very practical, unobtrusive and straight-forward way to quickly setup dependencies for your tests. Its API design helps even novice users to fall in the "pit of success" and avoid most common misuses/abuses of mocking. 
 
 When it was conceived, it was the only mocking library that went against the generalized and somewhat unintuitive (especially for novices) Record/Replay approach from all other libraries (and [that might have been a good thing](https://web.archive.org/web/20200920165939/http://blogs.clariusconsulting.net/kzu/whats-wrong-with-the-recordreplyverify-model-for-mocking-frameworks/) ;)).
 
@@ -99,18 +99,18 @@ Moq offers the following features:
 
 We appreciate deeply any feedback that you may have! Feel free to participate in the [chat], or report an issue in the [issue tracker].
 
-[chat]:
-https://discord.gg/8PtpGdu
-"Moq channel on Discord"
+ [chat]:
+ https://discord.gg/8PtpGdu
+ "Moq channel on Discord"
 
-[issue tracker]:
-https://github.com/moq/moq/issues
-"Moq issue tracker on GitHub"
+ [issue tracker]:
+ https://github.com/moq/moq/issues
+ "Moq issue tracker on GitHub"
 
 <!-- #features -->
 <!-- #sponsors -->
 <!-- include https://raw.githubusercontent.com/devlooped/sponsors/main/footer.md -->
-# Sponsors
+# Sponsors 
 
 <!-- sponsors.md -->
 [![Clarius Org](https://raw.githubusercontent.com/devlooped/sponsors/main/.github/avatars/clarius.png "Clarius Org")](https://github.com/clarius)
