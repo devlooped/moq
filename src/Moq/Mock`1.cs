@@ -1038,6 +1038,22 @@ namespace Moq
         ///   specifying a failure error message.
         /// </summary>
         /// <param name="expression">Expression to verify.</param>
+        /// <param name="times">The number of times a method is expected to be called.</param>
+        /// <param name="failMessage">Message to show if verification fails.</param>
+        /// <typeparam name="TResult">Type of return value from the expression.</typeparam>
+        /// <exception cref="MockException">
+        ///   The invocation was not called the number times specified by <paramref name="times"/>.
+        /// </exception>
+        public void Verify<TResult>(Expression<Func<T, TResult>> expression, Func<Times> times, string failMessage)
+        {
+            Mock.Verify(this, expression, times(), failMessage);
+        }
+
+        /// <summary>
+        ///   Verifies that a specific invocation matching the given expression was performed on the mock,
+        ///   specifying a failure error message.
+        /// </summary>
+        /// <param name="expression">Expression to verify.</param>
         /// <param name="failMessage">Message to show if verification fails.</param>
         /// <typeparam name="TResult">Type of return value from the expression.</typeparam>
         /// <exception cref="MockException">The invocation was not performed on the mock.</exception>
