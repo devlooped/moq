@@ -36,7 +36,7 @@
 		<PackageReference Include="IFluentInterface" Version="2.1.0" PrivateAssets="All" />
 		<PackageReference Include="Microsoft.NETFramework.ReferenceAssemblies" Version="1.0.3" PrivateAssets="All" />
 		<PackageReference Include="Microsoft.SourceLink.GitHub" Version="1.1.1" PrivateAssets="All" />
-		<PackageReference Include="NuGetizer" Version="1.2.0" />
+		<PackageReference Include="NuGetizer" Version="1.2.1" />
 		<PackageReference Include="TypeNameFormatter.Sources" Version="1.1.1" PrivateAssets="All" />
 	</ItemGroup>
 
