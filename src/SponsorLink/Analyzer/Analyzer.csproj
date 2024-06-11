@@ -1,0 +1,32 @@
+﻿<Project Sdk="Microsoft.NET.Sdk">
+
+  <PropertyGroup>
+    <TargetFramework>netstandard2.0</TargetFramework>
+    <IsRoslynComponent>true</IsRoslynComponent>
+    <PackFolder>analyzers/dotnet/roslyn4.0</PackFolder>
+    <PublishRepositoryUrl>true</PublishRepositoryUrl>
+    <CustomAfterMicrosoftCSharpTargets>$(MSBuildThisFileDirectory)..\SponsorLink.targets</CustomAfterMicrosoftCSharpTargets>
+    <MergeAnalyzerAssemblies>true</MergeAnalyzerAssemblies>
+    <ImplicitUsings>disable</ImplicitUsings>
+  </PropertyGroup>
+
+  <ItemGroup>
+    <PackageReference Include="NuGetizer" Version="1.2.2" />
+    <PackageReference Include="Microsoft.CodeAnalysis.CSharp" Version="4.3.1" Pack="false" />
+    <PackageReference Include="PolySharp" Version="1.14.1" PrivateAssets="all" />
+    <PackageReference Include="ThisAssembly.AssemblyInfo" Version="1.4.3" PrivateAssets="all" />
+    <PackageReference Include="ThisAssembly.Git" Version="1.4.3" PrivateAssets="all" />
+    <PackageReference Include="ThisAssembly.Constants" Version="1.4.3" PrivateAssets="all" />
+    <PackageReference Include="ThisAssembly.Strings" Version="1.4.3" PrivateAssets="all" />
+    <PackageReference Include="ThisAssembly.Project" Version="1.4.3" PrivateAssets="all" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <InternalsVisibleTo Include="Tests" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <None Update="buildTransitive\SponsorableLib.targets" Pack="true" />
+  </ItemGroup>
+
+</Project>

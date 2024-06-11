@@ -24,7 +24,7 @@ jobs:
           github_token: ${{ secrets.GITHUB_TOKEN }}
 
       - name: 🤘 checkout
-        uses: actions/checkout@v2
+        uses: actions/checkout@v4
         with:
           fetch-depth: 0
           ref: main
@@ -32,6 +32,7 @@ jobs:
 
       - name: ⌛ rate
         shell: pwsh
+        if: github.event_name != 'workflow_dispatch'
         run: |
           # add random sleep since we run on fixed schedule
           sleep (get-random -max 60)
@@ -70,7 +71,7 @@ jobs:
           validate: false
 
       - name: ✍ pull request
-        uses: peter-evans/create-pull-request@v4
+        uses: peter-evans/create-pull-request@v6
         with:
           base: main
           branch: dotnet-file-sync

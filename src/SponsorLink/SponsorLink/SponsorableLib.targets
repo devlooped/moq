@@ -1,0 +1,60 @@
+<Project xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
+
+  <PropertyGroup>
+    <!-- This showcases how to use a package-provided file as diagnostics linked content -->
+    <SponsorableLibSponsorable>$([System.IO.Path]::GetFullPath($(MSBuildThisFileDirectory)sponsorable.md))</SponsorableLibSponsorable>
+  </PropertyGroup>
+
+  <ItemGroup>
+    <!-- This makes it visible to the generator -->
+    <CompilerVisibleProperty Include="SponsorableLibSponsorable" />
+  </ItemGroup>
+
+  <PropertyGroup>
+    <!-- This makes sure builds are never broken from sponsorship warnings, even if WarningsAsErrors is used -->
+    <WarningsNotAsErrors>$(WarningsNotAsErrors);LIB001;LIB002;LIB003;LIB004;LIB005</WarningsNotAsErrors>
+
+    <AutoSyncStampFile>$(BaseIntermediateOutputPath)autosync.stamp</AutoSyncStampFile>
+
+    <UserProfileHome Condition="'$([MSBuild]::IsOSUnixLike())' == 'true'">$(HOME)</UserProfileHome>
+    <UserProfileHome Condition="'$([MSBuild]::IsOSUnixLike())' != 'true'">$(USERPROFILE)</UserProfileHome>
+    <!--$(UsingMicrosoftNETSdk)-->
+    <SponsorLinkSupported>true</SponsorLinkSupported>
+    <SponsorLinkHome Condition="$(SponsorLinkSupported) == 'true'">$([System.IO.Path]::GetFullPath('$(UserProfileHome)/.sponsorlink'))</SponsorLinkHome>
+  </PropertyGroup>
+
+  <ItemGroup Condition="'$(SponsorLinkHome)' != ''">
+    <SponsorManifest Include="$(SponsorLinkHome)/github/*.jwt" />
+    <AdditionalFiles Include="@(SponsorManifest -> Distinct())" Kind="SponsorLink" />
+
+    <CompilerVisibleProperty Include="DesignTimeBuild" />
+
+    <CompilerVisibleItemMetadata Include="AdditionalFiles" MetadataName="Kind" />
+  </ItemGroup>
+
+  <Target Name="CleanExpiredAutoSyncStamp" Condition="Exists($(AutoSyncStampFile))" BeforeTargets="AutoSyncSponsors">
+
+  </Target>
+
+  <Target Name="AutoSyncSponsors" Condition="!Exists($(AutoSyncStampFile))" BeforeTargets="GenerateMSBuildEditorConfigFileShouldRun">
+    <AutoSyncManifest />
+    <WriteLinesToFile File="$(AutoSyncStampFile)" Lines='$([System.DateTime]::Now.ToString("yyyy-MM-yy"))' Overwrite="true" />
+  </Target>
+
+  <Target Name="SL_GitConfig"
+          Condition="'$(SourceControlInformationFeatureSupported)' == 'true'"
+          BeforeTargets="GenerateMSBuildEditorConfigFileShouldRun"
+          DependsOnTargets="InitializeSourceControlInformation">
+    <ItemGroup>
+      <GitRoot Include="@(SourceRoot -> WithMetadataValue('SourceControl', 'git'))" />
+    </ItemGroup>
+    <PropertyGroup>
+      <GitRoot>%(GitRoot.FullPath)</GitRoot>
+    </PropertyGroup>
+    <ItemGroup Condition="'$(GitRoot)' != ''">
+      <AdditionalFiles Include="$([System.IO.Path]::GetFullPath($(GitRoot).git/config))" Kind="GitConfig" />
+      <AdditionalFiles Include="$([System.IO.Path]::GetFullPath($(UserProfileHome)/.gitconfig))" Kind="GitConfig" />
+    </ItemGroup>
+  </Target>
+
+</Project>

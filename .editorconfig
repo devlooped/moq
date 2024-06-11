@@ -107,3 +107,6 @@ dotnet_analyzer_diagnostic.category-Style.severity = none
 
 # VSTHRD200: Use "Async" suffix for async methods
 dotnet_diagnostic.VSTHRD200.severity = none
+
+[**/*SponsorLink*/**]
+generated_code = true

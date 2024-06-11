@@ -1,0 +1,43 @@
+<Project>
+
+  <PropertyGroup>
+    <GenerateDocumentationFile>false</GenerateDocumentationFile>
+    <LangVersion>latest</LangVersion>
+    <ImplicitUsings>true</ImplicitUsings>
+    <Nullable>annotations</Nullable>
+    <PackOnBuild>true</PackOnBuild>
+    <!-- Avoid deleting older packed versions to avoid rebuild errors (since package is in same solution, which is uncommon) -->
+    <EnablePackCleanup>false</EnablePackCleanup>
+    <PackageOutputPath>$([System.IO.Path]::GetFullPath('$(MSBuildThisFileDirectory)bin'))</PackageOutputPath>
+
+    <RestoreSources>https://pkg.kzu.app/index.json;https://api.nuget.org/v3/index.json</RestoreSources>
+    <RestoreSources Condition="Exists('$(PackageOutputPath)')">$(PackageOutputPath);$(RestoreSources)</RestoreSources>
+
+    <!-- Roslyn caches analyzers aggressively so we are better off using a very dynamic version number 
+         for local builds where a quick devloop is key. We bump version every 10 seconds -->
+    <Version>42.42.$([System.Math]::Floor($([MSBuild]::Divide($([System.DateTime]::Now.TimeOfDay.TotalSeconds), 10))))</Version>
+
+    <Product>SponsorableLib</Product>
+  </PropertyGroup>
+
+  <ItemGroup>
+    <!--<Constant Include="Funding.Product" Value="$(Product)" />
+    <Constant Include="Funding.AnalyzerPrefix" Value="SLIB" />-->
+    <!--<Constant Include="Funding.GraceDays" Value="21" />-->
+  </ItemGroup>
+
+  <!-- DOGFOODING LOCAL BUILDS -->
+  <!-- Create a Directory.targets.user alongside this file, with the following content 
+       (update the version number to the number of the built local package): -->
+  <!-- 
+  <Project>
+
+    <ItemGroup Condition="Exists('$(DevPath)')">
+      <PackageReference Update="@(PackageReference -> WithMetadataValue('Identity', 'Devlooped.SponsorLink'))" 
+                        Version="42.42.6587" />
+    </ItemGroup>
+
+  </Project>
+  -->
+
+</Project>

@@ -1,0 +1,141 @@
+<Project>
+  <!-- For inclusion in analyzer projects that want to integrate SponsorLink -->
+  <!-- Import using the following property: -->
+  <!--<CustomAfterMicrosoftCSharpTargets>$(MSBuildThisFileDirectory)..\SponsorLink\SponsorLink.targets</CustomAfterMicrosoftCSharpTargets>-->
+
+  <PropertyGroup>
+    <ShowSponsorLinkInProject Condition="$(ShowSponsorLinkInProject) == '' and '$(TargetFramework)' == 'netstandard2.0'">true</ShowSponsorLinkInProject>
+    <!-- This ensures we expose only the main assembly in the Dependencies > Analyzers node -->
+    <MergeAnalyzerAssemblies Condition="'$(MergeAnalyzerAssemblies)' == '' and '$(Configuration)' == 'Release'">true</MergeAnalyzerAssemblies>
+    <!-- If we are going to merge files, we need to copy local -->
+    <CopyLocalLockFileAssemblies Condition="'$(MergeAnalyzerAssemblies)' == 'true'">true</CopyLocalLockFileAssemblies>
+
+    <!-- Read public key we validate manifests against -->
+    <DevloopedJwk>$([System.IO.File]::ReadAllText('$(MSBuildThisFileDirectory)SponsorLink/devlooped.pub.jwk'))</DevloopedJwk>
+
+    <!-- Default funding product the Product, which already part of ThisAssembly -->
+    <FundingProduct Condition="'$(FundingProduct)' == ''">$(Product)</FundingProduct>
+    <!-- Default prefix is the joined upper-case letters in the product name (i.e. for ThisAssembly, TA) -->
+    <FundingPrefix Condition="'$(FundingPrefix)' == ''">$([System.Text.RegularExpressions.Regex]::Replace("$(FundingProduct)", "[^A-Z]", ""))</FundingPrefix>
+    <!-- Default grace days for an expired sponsor manifest -->
+    <FundingGrace Condition="'$(FundingGrace)' == ''">21</FundingGrace>
+  </PropertyGroup>
+
+  <ItemGroup>
+    <AssemblyMetadata Include="Funding.GitHub.devlooped" Value="$(DevloopedJwk)" />
+    <Constant Include="Funding.Product" Value="$(FundingProduct)" />
+    <Constant Include="Funding.Prefix" Value="$(FundingPrefix)" />
+    <Constant Include="Funding.Grace" Value="$(FundingGrace)" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <Compile Include="$(MSBuildThisFileDirectory)SponsorLink/*.cs"
+             Exclude="$(MSBuildThisFileDirectory)SponsorLink/bin/**;$(MSBuildThisFileDirectory)SponsorLink/obj/**"
+             Source="SponsorLink"/>
+    <EmbeddedResource Include="$(MSBuildThisFileDirectory)SponsorLink/*.resx"
+                      Exclude="$(MSBuildThisFileDirectory)SponsorLink/bin/**;$(MSBuildThisFileDirectory)SponsorLink/obj/**"
+                      Source="SponsorLink"
+                      ManifestResourceName="Devlooped.%(Filename)"/>
+    <None Include="$(MSBuildThisFileDirectory)SponsorLink/buildTransitive/*.*"
+          Source="SponsorLink"
+          PackagePath="buildTransitive/%(Filename)%(Extension)"/>
+  </ItemGroup>
+
+  <ItemGroup Condition="$(ShowSponsorLinkInProject) == 'true'">
+    <Compile Update="@(Compile -> WithMetadataValue('Source', 'SponsorLink'))">
+      <Link>SponsorLink\%(RecursiveDir)%(Filename)%(Extension)</Link>
+    </Compile>
+    <EmbeddedResource Update="@(EmbeddedResource -> WithMetadataValue('Source', 'SponsorLink'))">
+      <Link>SponsorLink\%(RecursiveDir)%(Filename)%(Extension)</Link>
+    </EmbeddedResource>
+    <Content Update="@(Content -> WithMetadataValue('Source', 'SponsorLink'))">
+      <Link>SponsorLink\%(RecursiveDir)%(Filename)%(Extension)</Link>
+    </Content>
+    <None Update="@(None -> WithMetadataValue('Source', 'SponsorLink'))">
+      <Link>SponsorLink\%(PackagePath)</Link>
+    </None>
+  </ItemGroup>
+
+  <ItemGroup Condition="$(ShowSponsorLinkInProject) != 'true'">
+    <Compile Update="@(Compile -> WithMetadataValue('Source', 'SponsorLink'))">
+      <Visible>false</Visible>
+    </Compile>
+    <EmbeddedResource Update="@(EmbeddedResource -> WithMetadataValue('Source', 'SponsorLink'))">
+      <Visible>false</Visible>
+    </EmbeddedResource>
+    <Content Update="@(Content -> WithMetadataValue('Source', 'SponsorLink'))">
+      <Visible>false</Visible>
+    </Content>
+    <None Update="@(None -> WithMetadataValue('Source', 'SponsorLink'))">
+      <Visible>false</Visible>
+    </None>
+  </ItemGroup>
+
+  <ItemGroup Condition="'$(ManagePackageVersionsCentrally)' == 'true'">
+    <PackageReference Include="Humanizer.Core" VersionOverride="2.14.1" PrivateAssets="all" Pack="false" />
+    <PackageReference Include="Humanizer.Core.es" VersionOverride="2.14.1" PrivateAssets="all" />
+    <PackageReference Include="System.IdentityModel.Tokens.Jwt" VersionOverride="7.6.0" PrivateAssets="all" Pack="false" />
+    <PackageReference Include="ILRepack" Version="2.0.33" VersionOverride="all" PrivateAssets="all" Pack="false" />
+  </ItemGroup>
+
+  <ItemGroup Condition="'$(ManagePackageVersionsCentrally)' != 'true'">
+    <PackageReference Include="Humanizer.Core" Version="2.14.1" PrivateAssets="all" Pack="false" />
+    <PackageReference Include="Humanizer.Core.es" Version="2.14.1" PrivateAssets="all" />
+    <PackageReference Include="System.IdentityModel.Tokens.Jwt" Version="7.6.0" PrivateAssets="all" Pack="false" />
+    <PackageReference Include="ILRepack" Version="2.0.33" PrivateAssets="all"  Pack="false" />
+  </ItemGroup>
+
+  <Target Name="ILRepack" AfterTargets="CoreCompile" BeforeTargets="CopyFilesToOutputDirectory"
+          Inputs="@(IntermediateAssembly -&gt; '%(FullPath)')"
+          Outputs="$(IntermediateOutputPath)ilrepack.txt"
+          Returns="@(MergedAssemblies)"
+          Condition="Exists(@(IntermediateAssembly -&gt; '%(FullPath)')) And '$(MergeAnalyzerAssemblies)' == 'true'">
+    <ItemGroup>
+      <ReferenceCopyLocalAssemblies Include="@(ReferenceCopyLocalPaths)" Condition="'%(Extension)' == '.dll' 
+        And !$([MSBuild]::ValueOrDefault('%(FileName)', '').EndsWith('.resources', StringComparison.OrdinalIgnoreCase))" />
+      <MergedAssemblies Include="@(ReferenceCopyLocalAssemblies)" Condition="
+        !$([MSBuild]::ValueOrDefault('%(FileName)', '').StartsWith('Microsoft.CodeAnalysis', StringComparison.OrdinalIgnoreCase)) And
+        !$([MSBuild]::ValueOrDefault('%(FileName)', '').StartsWith('Microsoft.CSharp', StringComparison.OrdinalIgnoreCase)) And
+        !$([MSBuild]::ValueOrDefault('%(FileName)', '').StartsWith('System.', StringComparison.OrdinalIgnoreCase))"
+      />
+      <!-- Brings in System/Microsoft.IdentityModel, System.Text.Encodings.Web, System.Text.Json  -->
+      <MergedAssemblies Include="@(ReferenceCopyLocalAssemblies)" Condition="
+        $([MSBuild]::ValueOrDefault('%(FileName)', '').StartsWith('System.IdentityModel', StringComparison.OrdinalIgnoreCase)) Or
+        $([MSBuild]::ValueOrDefault('%(FileName)', '').StartsWith('Microsoft.IdentityModel', StringComparison.OrdinalIgnoreCase)) Or
+        $([MSBuild]::ValueOrDefault('%(FileName)', '').StartsWith('System.Text', StringComparison.OrdinalIgnoreCase))"
+      />
+    </ItemGroup>
+    <ItemGroup>
+      <ReferenceCopyLocalDirs Include="@(ReferenceCopyLocalPaths -&gt; '%(RootDir)%(Directory)')" />
+      <ReferenceCopyLocalPaths Remove="@(MergedAssemblies)" />
+      <LibDir Include="@(ReferenceCopyLocalDirs -&gt; Distinct())" />
+    </ItemGroup>
+    <PropertyGroup>
+      <AbsoluteAssemblyOriginatorKeyFile Condition="'$(AssemblyOriginatorKeyFile)' != ''">$([System.IO.Path]::GetFullPath($([System.IO.Path]::Combine('$(MSBuildProjectDirectory)','$(AssemblyOriginatorKeyFile)'))))</AbsoluteAssemblyOriginatorKeyFile>
+      <ILRepackArgs Condition="'$(AbsoluteAssemblyOriginatorKeyFile)' != ''">/keyfile:"$(AbsoluteAssemblyOriginatorKeyFile)" /delaysign</ILRepackArgs>
+      <ILRepackArgs>$(ILRepackArgs) /internalize</ILRepackArgs>
+      <ILRepackArgs>$(ILRepackArgs) /union</ILRepackArgs>
+      <!-- This is needed to merge types with identical names into one, wich happens with IFluentInterface in Merq and Merq.Core (Xamarin.Messaging dependencies) -->
+      <ILRepackArgs>$(ILRepackArgs) @(LibDir -&gt; '/lib:"%(Identity)."', ' ')</ILRepackArgs>
+      <ILRepackArgs>$(ILRepackArgs) /out:"@(IntermediateAssembly -&gt; '%(FullPath)')"</ILRepackArgs>
+      <ILRepackArgs>$(ILRepackArgs) "@(IntermediateAssembly -&gt; '%(FullPath)')"</ILRepackArgs>
+      <ILRepackArgs>$(ILRepackArgs) @(MergedAssemblies -&gt; '"%(FullPath)"', ' ')</ILRepackArgs>
+      <!--<ILRepackArgs>$(ILRepackArgs) "/lib:$(NetstandardDirectory)"</ILRepackArgs> -->
+      <!-- This is needed for ilrepack to find netstandard.dll, which is referenced by the System.Text.Json assembly -->
+    </PropertyGroup>
+    <Exec Command="&quot;$(ILRepack)&quot; $(ILRepackArgs)" WorkingDirectory="$(MSBuildProjectDirectory)\$(OutputPath)" StandardErrorImportance="high" StandardOutputImportance="low" ConsoleToMSBuild="true" ContinueOnError="true">
+      <Output TaskParameter="ConsoleOutput" PropertyName="ILRepackOutput" />
+      <Output TaskParameter="ExitCode" PropertyName="ExitCode" />
+    </Exec>
+    <Message Importance="high" Text="$(ILRepackOutput)" Condition="'$(ExitCode)' != '0'" />
+    <Delete Files="$(IntermediateOutputPath)ilrepack.txt" Condition="'$(ExitCode)' != '0'" />
+    <Touch AlwaysCreate="true" Files="$(IntermediateOutputPath)ilrepack.txt" Condition="'$(ExitCode)' == '0'" />
+    <Error Text="$(ILRepackOutput)" Condition="'$(ExitCode)' != '0' And '$(ContinueOnError)' != 'true'" />
+    <ItemGroup>
+      <MergedAssembliesToRemove Include="@(MergedAssemblies)" />
+      <MergedAssembliesToRemove Remove="@(ReferenceToPreserve)" />
+    </ItemGroup>
+    <Delete Files="@(MergedAssembliesToRemove -&gt; '$(MSBuildProjectDirectory)\$(OutputPath)%(Filename)%(Extension)')" Condition="Exists('$(MSBuildProjectDirectory)\$(OutputPath)%(Filename)%(Extension)')" />
+  </Target>
+
+</Project>

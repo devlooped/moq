@@ -1,0 +1,99 @@
+<Project xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
+
+  <PropertyGroup>
+    <!-- We autosync manifests daily, if opted-in -->
+    <Today>$([System.DateTime]::Now.ToString("yyyy-MM-yy"))</Today>
+    <!-- Daily sync stamp, if opted-in -->
+    <SyncStampFile>$(BaseIntermediateOutputPath)autosync-$(Today).stamp</SyncStampFile>
+    <!-- Incremental read of autosync setting -->
+    <AutoSyncStampFile>$(BaseIntermediateOutputPath)autosync.stamp</AutoSyncStampFile>
+
+    <UserProfileHome Condition="'$([MSBuild]::IsOSUnixLike())' == 'true'">$(HOME)</UserProfileHome>
+    <UserProfileHome Condition="'$([MSBuild]::IsOSUnixLike())' != 'true'">$(USERPROFILE)</UserProfileHome>
+    <!-- Root dir for SL files -->
+    <SponsorLinkHome>$([System.IO.Path]::GetFullPath('$(UserProfileHome)/.sponsorlink'))</SponsorLinkHome>
+    <!-- SL dotnet-config file -->
+    <SponsorLinkConfig>$([System.IO.Path]::Combine('$(SponsorLinkHome)', '.netconfig'))</SponsorLinkConfig>
+  </PropertyGroup>
+
+  <ItemGroup>
+    <!-- All GH manifests. For now, we don't support other funding platforms -->
+    <SponsorManifest Include="$(SponsorLinkHome)/github/*.jwt" />
+
+    <CompilerVisibleItemMetadata Include="AdditionalFiles" MetadataName="SourceItemType" />
+    <!-- To quickly exit if true -->
+    <CompilerVisibleProperty Include="DesignTimeBuild" />
+  </ItemGroup>
+
+  <PropertyGroup>
+    <SLDependsOn>SL_CollectDependencies</SLDependsOn>
+    <SLDependsOn Condition="'$(BuildingInsideVisualStudio)' == 'true' and '$(DesignTimeBuild)' != 'true'">$(SLDependsOn);SL_CheckAutoSync;SL_ReadAutoSyncEnabled;SL_SyncSponsors</SLDependsOn>
+  </PropertyGroup>
+
+  <Target Name="SL" BeforeTargets="GenerateMSBuildEditorConfigFileShouldRun" DependsOnTargets="$(SLDependsOn)">
+    <ItemGroup>
+      <!-- Make manifests visible to analyzers -->
+      <AdditionalFiles Include="@(SponsorManifest -> Distinct())" SourceItemType="SponsorManifest" />
+    </ItemGroup>
+  </Target>
+
+  <Target Name="SL_CollectDependencies" DependsOnTargets="_GenerateRestoreGraph">
+    <!-- Makes direct dependencies visible to the compiler, so that sponsoring checks can selectively skip indirectly referenced analyzer -->
+    <ItemGroup>
+      <CompilerVisibleProperty Include="$([MSBuild]::ValueOrDefault('%(_RestoreGraphEntry.Id)', '').Replace('.', '_'))" />
+    </ItemGroup>
+    <CreateProperty Value="%(_RestoreGraphEntry.VersionRange)" Condition="%(_RestoreGraphEntry.Type) == 'Dependency'" >
+      <Output TaskParameter="Value" PropertyName="$([MSBuild]::ValueOrDefault('%(_RestoreGraphEntry.Id)', '').Replace('.', '_'))"/>
+    </CreateProperty>
+  </Target>
+
+  <Target Name="SL_Clean" AfterTargets="Clean">
+    <!-- Cleanup of stamp files -->
+    <ItemGroup>
+      <AutoSyncStampFile Include="$(BaseIntermediateOutputPath)autosync*.stamp" />
+    </ItemGroup>
+    <Delete Files="@(AutoSyncStampFile)" />
+  </Target>
+  
+  <Target Name="SL_CheckAutoSync" Inputs="$(SponsorLinkConfig)" Outputs="$(AutoSyncStampFile)" Condition="Exists($(SponsorLinkConfig))">
+    <!-- Read autosync setting from config file and cache its value -->
+    <ReadLinesFromFile File="$(SponsorLinkConfig)">
+      <Output TaskParameter="Lines" ItemName="SLConfig" />
+    </ReadLinesFromFile>
+    <ItemGroup>
+      <SLConfigAutoSync Include="$([MSBuild]::ValueOrDefault(%(SLConfig.Identity), '').Trim())"
+                        Condition="$([MSBuild]::ValueOrDefault(%(SLConfig.Identity), '').Trim().StartsWith('autosync'))" />
+    </ItemGroup>
+    <PropertyGroup>
+      <SLConfigAutoSync>%(SLConfigAutoSync.Identity)</SLConfigAutoSync>
+      <AutoSyncEnabled Condition="$(SLConfigAutoSync.EndsWith('true'))">true</AutoSyncEnabled>
+      <AutoSyncEnabled Condition="$(SLConfigAutoSync.EndsWith('false'))">false</AutoSyncEnabled>
+    </PropertyGroup>
+    <WriteLinesToFile File="$(AutoSyncStampFile)" Lines="$(AutoSyncEnabled)" Overwrite="true" />
+  </Target>
+
+  <Target Name="SL_ReadAutoSyncEnabled" Condition="'$(AutoSyncEnabled)' == '' and Exists($(AutoSyncStampFile))">
+    <!-- In subsequent runs, directly read the cached value from the previous target -->
+    <PropertyGroup>
+      <AutoSyncEnabled>$([System.IO.File]::ReadAllText($(AutoSyncStampFile)).Trim())</AutoSyncEnabled>
+    </PropertyGroup>
+  </Target>
+
+  <Target Name="SL_SyncSponsors" Inputs="@(SponsorLinkManifest);$(SponsorLinkConfig)" Outputs="$(SyncStampFile)" Condition="'$(AutoSyncEnabled)' == 'true'">
+    <!-- Sync all local manifests in unattended mode (non-interactive).
+         It's possible that some manifests will need interactive sync, and we'll render the 
+         messages in that case. 
+         Note that since running this requires autosync=true, we can safely assume the user 
+         has already run `gh sponsors [...] -autosync` at least once to turn it on. Otherwise, 
+         this target won't run at all.
+         -->
+    <Exec Command="gh sponsors sync --local --unattended" StandardErrorImportance="high" StandardOutputImportance="low" ConsoleToMSBuild="true" ContinueOnError="true">
+      <Output TaskParameter="ExitCode" PropertyName="SponsorsExitCode" />
+      <Output TaskParameter="ConsoleOutput" PropertyName="SponsorsOutput" />
+    </Exec>
+    <Message Importance="high" Text="$(SponsorsOutput)" Condition="'$(SponsorsExitCode)' != '0'" />
+    <!-- We only touch the stamp file to avoid future sync runs if we could sync all manifests  -->
+    <Touch Files="$(SyncStampFile)" Condition="$(SponsorsExitCode) == '0'" AlwaysCreate="True" />
+  </Target>
+
+</Project>

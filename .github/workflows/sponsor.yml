@@ -15,7 +15,7 @@ jobs:
     steps:
       - name: 🤘 checkout
         if: env.token != ''
-        uses: actions/checkout@v2
+        uses: actions/checkout@v4
           
       - name: 💜 sponsor 
         if: env.token != ''

@@ -1,0 +1,31 @@
+﻿<Project Sdk="Microsoft.NET.Sdk">
+
+  <PropertyGroup>
+    <TargetFramework>netstandard2.0</TargetFramework>
+    <PackNone>true</PackNone>
+    <PackageId>SponsorableLib</PackageId>
+    <Description>Sample library incorporating SponsorLink checks</Description>
+    <PackOnBuild>true</PackOnBuild>
+  </PropertyGroup>
+
+  <ItemGroup>
+    <PackageReference Include="NuGetizer" Version="1.2.2" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <ProjectReference Include="..\Analyzer\Analyzer.csproj" ReferenceOutputAssembly="false" OutputType="Analyzer" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <EmbeddedResource Update="Resources.resx">
+      <!-- Default to Just Works resources generation. See https://www.cazzulino.com/resources.html -->
+      <Generator>MSBuild:Compile</Generator>
+      <StronglyTypedFileName>$(IntermediateOutputPath)\$([MSBuild]::ValueOrDefault('%(RelativeDir)', '').Replace('\', '.').Replace('/', '.'))%(Filename).g$(DefaultLanguageSourceExtension)</StronglyTypedFileName>
+      <StronglyTypedLanguage>$(Language)</StronglyTypedLanguage>
+      <StronglyTypedNamespace Condition="'%(RelativeDir)' == ''">$(RootNamespace)</StronglyTypedNamespace>
+      <StronglyTypedNamespace Condition="'%(RelativeDir)' != ''">$(RootNamespace).$([MSBuild]::ValueOrDefault('%(RelativeDir)', '').Replace('\', '.').Replace('/', '.').TrimEnd('.'))</StronglyTypedNamespace>
+      <StronglyTypedClassName>%(Filename)</StronglyTypedClassName>
+    </EmbeddedResource>
+  </ItemGroup>
+
+</Project>
