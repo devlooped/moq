@@ -8,7 +8,7 @@ The format is loosely based on [Keep a Changelog](http://keepachangelog.com/en/1
 
 * Removed SponsorLink https://github.com/moq/moq/pull/1375
 * Remove AWS sponsorship from readme by @kzu in https://github.com/moq/moq/pull/1383
-* Add everyone how now DOES sponsor 🫶
+* Add everyone who now DOES sponsor 🫶
 
 ## 4.20.2 (2023-08-09)
 ### 🐛 Fixed bugs
