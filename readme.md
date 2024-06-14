@@ -1,6 +1,7 @@
 moq
 ===
 
+[![Sponsors](https://img.shields.io/github/sponsors/devlooped?style=social)](https://github.com/sponsors/devlooped)
 [![Version](https://img.shields.io/nuget/vpre/Moq.svg)](https://www.nuget.org/packages/Moq)
 [![Downloads](https://img.shields.io/nuget/dt/Moq.svg)](https://www.nuget.org/packages/Moq)
 [![Documentation](https://img.shields.io/badge/docs-website-%23fc0)](http://moq.github.io/moq/)
