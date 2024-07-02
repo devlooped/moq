@@ -1,0 +1,11 @@
+{
+  "profiles": {
+    "SponsorableLib": {
+      "commandName": "DebugRoslynComponent",
+      "targetProject": "..\\Tests\\Tests.csproj",
+      "environmentVariables": {
+        "SPONSORLINK_TRACE": "true"
+      }
+    }
+  }
+}

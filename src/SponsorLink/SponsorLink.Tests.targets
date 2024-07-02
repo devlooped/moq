@@ -1,0 +1,38 @@
+<Project>
+  <!-- For inclusion in test projects that reference analyzers as project references -->
+
+  <PropertyGroup>
+    <CopyLocalLockFileAssemblies>true</CopyLocalLockFileAssemblies>
+  </PropertyGroup>
+
+  <ItemGroup Condition="'$(ManagePackageVersionsCentrally)' == 'true'">
+    <PackageReference Include="Humanizer.Core" VersionOverride="2.14.1" PrivateAssets="all" Pack="false" />
+    <PackageReference Include="Microsoft.IdentityModel.JsonWebTokens" Version="7.6.2" PrivateAssets="all" Pack="false" />
+  </ItemGroup>
+
+  <ItemGroup Condition="'$(ManagePackageVersionsCentrally)' != 'true'">
+    <PackageReference Include="Humanizer.Core" Version="2.14.1" PrivateAssets="all" Pack="false" />
+    <PackageReference Include="Microsoft.IdentityModel.JsonWebTokens" Version="7.6.2" PrivateAssets="all" Pack="false" />
+  </ItemGroup>
+
+  <Target Name="AddSponsorLinkAnalyzerDependencies" BeforeTargets="CoreCompile" DependsOnTargets="ResolveLockFileCopyLocalFiles">
+    <ItemGroup>
+      <!-- NOTE: keep in sync with ILRepack'ed assemblies as needed -->
+      <ReferenceCopyLocalAssemblies Include="@(ReferenceCopyLocalPaths)" Condition="'%(Extension)' == '.dll' 
+        And !$([MSBuild]::ValueOrDefault('%(FileName)', '').EndsWith('.resources', StringComparison.OrdinalIgnoreCase))
+        And !$([MSBuild]::ValueOrDefault('%(FileName)', '').StartsWith('ThisAssembly', StringComparison.OrdinalIgnoreCase))" />
+      <Analyzer Include="@(ReferenceCopyLocalAssemblies)" Condition="
+        !$([MSBuild]::ValueOrDefault('%(FileName)', '').StartsWith('Microsoft.CodeAnalysis', StringComparison.OrdinalIgnoreCase)) And
+        !$([MSBuild]::ValueOrDefault('%(FileName)', '').StartsWith('Microsoft.CSharp', StringComparison.OrdinalIgnoreCase)) And
+        !$([MSBuild]::ValueOrDefault('%(FileName)', '').StartsWith('System.', StringComparison.OrdinalIgnoreCase))"
+      />
+      <!-- Brings in System/Microsoft.IdentityModel, System.Text.Encodings.Web, System.Text.Json  -->
+      <Analyzer Include="@(ReferenceCopyLocalAssemblies)" Condition="
+        $([MSBuild]::ValueOrDefault('%(FileName)', '').StartsWith('System.IdentityModel', StringComparison.OrdinalIgnoreCase)) Or
+        $([MSBuild]::ValueOrDefault('%(FileName)', '').StartsWith('Microsoft.IdentityModel', StringComparison.OrdinalIgnoreCase)) Or
+        $([MSBuild]::ValueOrDefault('%(FileName)', '').StartsWith('System.Text', StringComparison.OrdinalIgnoreCase))"
+      />
+    </ItemGroup>
+  </Target>
+
+</Project>

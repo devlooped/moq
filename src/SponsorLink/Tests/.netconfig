@@ -1,0 +1,17 @@
+[config] 
+    root = true 
+[file "SponsorableManifest.cs"]
+	url = https://github.com/devlooped/SponsorLink/blob/main/src/Core/SponsorableManifest.cs
+	sha = 5a4cad3a084f53afe34a6b75e4f3a084a0f1bf9e
+	etag = 9a07c856d06e0cde629fce3ec014f64f9adfd5ae5805a35acf623eba0ee045c1
+	weak
+[file "JsonOptions.cs"]
+	url = https://github.com/devlooped/SponsorLink/blob/main/src/Core/JsonOptions.cs
+	sha = 80ea1bfe47049ef6c6ed4f424dcf7febb729cbba
+	etag = 17799725ad9b24eb5998365962c30b9a487bddadca37c616e35b76b8c9eb161a
+	weak
+[file "Extensions.cs"]
+	url = https://github.com/devlooped/SponsorLink/blob/main/src/Core/Extensions.cs
+	sha = c455f6fa1a4d404181d076d7f3362345c8ed7df2
+	etag = 9e51b7e6540fae140490a5283b1e67ce071bd18a267bc2ae0b35c7248261aed1
+	weak

@@ -1,0 +1,1 @@
+curl https://raw.githubusercontent.com/devlooped/.github/main/sponsorlink.jwt --silent | jq -R 'split(".") | .[1] | @base64d | fromjson' | jq '.sub_jwk'

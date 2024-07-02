@@ -29,7 +29,7 @@ updates:
         - "Microsoft.AspNetCore*"
     Tests:
       patterns:
-        - "Microsoft.NET.Tests*"
+        - "Microsoft.NET.Test*"
         - "xunit*"
         - "coverlet*"
     ThisAssembly:
