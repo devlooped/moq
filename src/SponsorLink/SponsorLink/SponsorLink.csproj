@@ -1,0 +1,79 @@
+﻿<Project Sdk="Microsoft.NET.Sdk">
+
+  <PropertyGroup>
+    <TargetFramework>netstandard2.0</TargetFramework>
+    <Product>SponsorLink</Product>
+    <ImplicitUsings>disable</ImplicitUsings>
+    <GenerateDocumentationFile>false</GenerateDocumentationFile>
+    <CoreCompileDependsOn>CoreResGen;$(CoreCompileDependsOn)</CoreCompileDependsOn>
+  </PropertyGroup>
+
+  <PropertyGroup Label="SponsorLink">
+    <!-- Default funding product the Product, which already part of ThisAssembly -->
+    <FundingProduct Condition="'$(FundingProduct)' == ''">$(Product)</FundingProduct>
+    <!-- Default prefix is the joined upper-case letters in the product name (i.e. for ThisAssembly, TA) -->
+    <FundingPrefix Condition="'$(FundingPrefix)' == ''">$([System.Text.RegularExpressions.Regex]::Replace("$(FundingProduct)", "[^A-Z]", ""))</FundingPrefix>
+    <!-- Default grace days for an expired sponsor manifest -->
+    <FundingGrace Condition="'$(FundingGrace)' == ''">21</FundingGrace>
+  </PropertyGroup>
+
+  <ItemGroup>
+    <PackageReference Include="Humanizer.Core" Version="2.14.1" />
+    <PackageReference Include="Humanizer.Core.es" Version="2.14.1" />
+    <PackageReference Include="ILRepack" Version="2.0.33" PrivateAssets="all" />
+    <PackageReference Include="NuGetizer" Version="1.2.2" />
+    <PackageReference Include="Microsoft.CodeAnalysis.CSharp" Version="4.0.1" Pack="false" />
+    <PackageReference Include="PolySharp" Version="1.14.1" PrivateAssets="all" />
+    <PackageReference Include="Microsoft.IdentityModel.JsonWebTokens" Version="7.6.2" PrivateAssets="all" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <EmbeddedResource Update="Resources.es.resx" ManifestResourceName="Devlooped.Sponsors.%(Filename)"/>
+    <EmbeddedResource Update="Resources.resx" ManifestResourceName="Devlooped.Sponsors.%(Filename)" StronglyTypedManifestPrefix="Devlooped.Sponsors" StronglyTypedClassName="%(Filename)" StronglyTypedNamespace="Devlooped.Sponsors" StronglyTypedLanguage="$(Language)" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <None Include="..\SponsorLink.targets" Link="SponsorLink.targets" />
+  </ItemGroup>
+
+  <Target Name="EmitFunding" BeforeTargets="GenerateMSBuildEditorConfigFileShouldRun" Inputs="$(MSBuildAllProjects)" Outputs="$(IntermediateOutputPath)SponsorLink.g.cs">
+    <PropertyGroup>
+      <SponsorLinkPartial>namespace Devlooped.Sponsors%3B
+
+partial class SponsorLink
+{
+    public partial class Funding
+    {
+        public const string Product = "$(FundingProduct)"%3B
+        public const string Prefix = "$(FundingPrefix)"%3B
+        public const int Grace = $(FundingGrace)%3B
+    }
+}
+</SponsorLinkPartial>
+    </PropertyGroup>
+    <WriteLinesToFile File="$(IntermediateOutputPath)SponsorLink.g.cs" Lines="$(SponsorLinkPartial)" WriteOnlyWhenDifferent="true" Overwrite="true" />
+    <ItemGroup>
+      <Compile Include="$(IntermediateOutputPath)SponsorLink.g.cs" />
+    </ItemGroup>
+  </Target>
+
+  <Target Name="DownloadDevloopedJwk" BeforeTargets="GetAssemblyAttributes" Inputs="$(MSBuildProjectFullPath)" Outputs="$(MSBuildProjectDirectory)\$(BaseIntermediateOutputPath)devlooped.jwk">
+    <Exec Command="pwsh -nop -f $(MSBuildThisFileDirectory)..\jwk.ps1" ConsoleToMSBuild="true" EchoOff="true">
+      <Output TaskParameter="ConsoleOutput" PropertyName="DevloopedJwk" />
+      <Output TaskParameter="ExitCode" PropertyName="MSBuildLastExitCode" />
+    </Exec>
+    <Error Text="$(DevloopedJwk)" Condition="'$(MSBuildLastExitCode)' != '0'" />
+    <WriteLinesToFile File="$(MSBuildProjectDirectory)\$(BaseIntermediateOutputPath)devlooped.jwk" Lines="$(DevloopedJwk)" Overwrite="true" />
+  </Target>
+
+  <Target Name="ReadDevloopedJwk" DependsOnTargets="DownloadDevloopedJwk" BeforeTargets="GetAssemblyAttributes">
+    <PropertyGroup>
+      <!-- Read public key we validate manifests against -->
+      <DevloopedJwk>$([System.IO.File]::ReadAllText('$(MSBuildProjectDirectory)\$(BaseIntermediateOutputPath)devlooped.jwk'))</DevloopedJwk>
+    </PropertyGroup>
+    <ItemGroup>
+      <AssemblyMetadata Include="Funding.GitHub.devlooped" Value="$(DevloopedJwk)" />
+    </ItemGroup>
+  </Target>
+
+</Project>

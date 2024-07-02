@@ -1,0 +1,25 @@
+﻿<Project Sdk="Microsoft.NET.Sdk">
+
+  <PropertyGroup>
+    <AssemblyName>SponsorableLib</AssemblyName>
+    <TargetFramework>netstandard2.0</TargetFramework>
+    <PackNone>true</PackNone>
+    <PackageId>SponsorableLib</PackageId>
+    <Description>Sample library incorporating SponsorLink checks</Description>
+    <PackOnBuild>true</PackOnBuild>
+    <PublishRepositoryUrl>true</PublishRepositoryUrl>
+  </PropertyGroup>
+
+  <ItemGroup>
+    <PackageReference Include="NuGetizer" Version="1.2.2" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <ProjectReference Include="..\Analyzer\Analyzer.csproj" ReferenceOutputAssembly="false" OutputType="Analyzer" />
+  </ItemGroup>
+
+  <Target Name="Version" AfterTargets="GetPackageContents" DependsOnTargets="GetPackageTargetPath">
+    <Message Importance="high" Text="$(MSBuildProjectName) &gt; $(PackageTargetPath)" />
+  </Target>
+
+</Project>

@@ -1,0 +1,69 @@
+﻿<Project Sdk="Microsoft.NET.Sdk">
+
+  <PropertyGroup>
+    <TargetFramework>net8.0</TargetFramework>
+    <EmitCompilerGeneratedFiles>true</EmitCompilerGeneratedFiles>
+  </PropertyGroup>
+
+  <ItemGroup>
+    <PackageReference Include="Microsoft.Extensions.Configuration" Version="8.0.0" />
+    <PackageReference Include="Microsoft.Extensions.Configuration.UserSecrets" Version="8.0.0" />
+    <PackageReference Include="Microsoft.Extensions.Logging" Version="8.0.0" />
+    <PackageReference Include="Microsoft.IdentityModel.JsonWebTokens" Version="7.6.2" PrivateAssets="all" />
+    <PackageReference Include="Microsoft.NET.Test.Sdk" Version="17.10.0" />
+    <PackageReference Include="xunit" Version="2.8.1" />
+    <PackageReference Include="xunit.runner.visualstudio" Version="2.8.1" />
+    <PackageReference Include="Humanizer.Core" Version="2.14.1" />
+    <PackageReference Include="Humanizer.Core.es" Version="2.14.1" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <!-- This project reference allows debugging the source generator/analyzer project -->
+    <ProjectReference Include="..\Analyzer\Analyzer.csproj" Aliases="Analyzer" />
+    <Analyzer Include="..\Analyzer\bin\$(Configuration)\netstandard2.0\*.dll" NuGetPackageId="SponsorableLib" Visible="false" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <Compile Update="Resources.Designer.cs">
+      <DesignTime>True</DesignTime>
+      <AutoGen>True</AutoGen>
+      <DependentUpon>Resources.resx</DependentUpon>
+    </Compile>
+  </ItemGroup>
+
+  <ItemGroup>
+    <EmbeddedResource Update="Resources.resx">
+      <Generator>ResXFileCodeGenerator</Generator>
+      <LastGenOutput>Resources.Designer.cs</LastGenOutput>
+    </EmbeddedResource>
+  </ItemGroup>
+
+  <Target Name="Sample_GitConfig" Condition="'$(SourceControlInformationFeatureSupported)' == 'true'" DependsOnTargets="InitializeSourceControlInformation">
+    <!-- Follows recommendation from Microsoft.Common.CurrentVersion.targets on how to depend on SCC info. -->
+    <ItemGroup>
+      <GitRoot Include="@(SourceRoot -&gt; WithMetadataValue('SourceControl', 'git'))" />
+    </ItemGroup>
+    <PropertyGroup>
+      <GitRoot>%(GitRoot.FullPath)</GitRoot>
+    </PropertyGroup>
+    <ItemGroup Condition="'$(GitRoot)' != ''">
+      <AdditionalFiles Include="$([System.IO.Path]::GetFullPath($(GitRoot).git/config))" SourceItemType="GitConfig" />
+      <AdditionalFiles Include="$([System.IO.Path]::GetFullPath($(UserProfileHome)/.gitconfig))" SourceItemType="GitConfig" />
+    </ItemGroup>
+  </Target>
+
+  <!-- Simulates importing SponsorableLib.targets -->
+  <Import Project="..\SponsorLink\buildTransitive\Devlooped.Sponsors.targets" />
+  <ItemGroup>
+    <!-- Brings in the analyzer file to report installation time -->
+    <SponsorablePackageId Include="SponsorableLib" />
+  </ItemGroup>
+
+  <!-- Force immediate reporting of status, no install-time grace period -->
+  <PropertyGroup>
+    <SponsorLinkNoInstallGrace>true</SponsorLinkNoInstallGrace>
+  </PropertyGroup>
+  <ItemGroup>
+    <CompilerVisibleProperty Include="SponsorLinkNoInstallGrace" />
+  </ItemGroup>
+</Project>

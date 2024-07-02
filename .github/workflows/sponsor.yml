@@ -10,12 +10,12 @@ jobs:
     runs-on: ubuntu-latest
     continue-on-error: true
     env:
-      token: ${{ secrets.GH_TOKEN }}
+      token: ${{ secrets.DEVLOOPED_TOKEN }}
     if: ${{ !endsWith(github.event.sender.login, '[bot]') && !endsWith(github.event.sender.login, 'bot') }}      
     steps:
       - name: 🤘 checkout
         if: env.token != ''
-        uses: actions/checkout@v2
+        uses: actions/checkout@v4
           
       - name: 💜 sponsor 
         if: env.token != ''
