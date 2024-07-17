@@ -73,7 +73,7 @@ See our [Quickstart](https://github.com/moq/moq/wiki/Quickstart) examples to get
 
 Read about the announcement at [kzu's blog](https://web.archive.org/web/20201130233544/http://blogs.clariusconsulting.net/kzu/linq-to-mock-moq-is-born/). Get some background on [the state of mock libraries from Scott Hanselman](http://www.hanselman.com/blog/MoqLinqLambdasAndPredicatesAppliedToMockObjects.aspx).
 
-In-depth documentation is being added to the [documentation website](http://moq.github.io/moq/).
+In-depth documentation is being added to the [documentation website](https://github.com/moq/moq4/wiki).
 
 
 ## Who?
