@@ -47,7 +47,7 @@ same behavior above can be achieved much more succinctly:
 You can think of Linq to Mocks as "from the universe of mocks, give me one whose behavior 
 matches this expression".
 
-Check out the [Quickstart](https://github.com/moq/moq/wiki/Quickstart) for more examples!
+Check out the [Quickstart](https://github.com/devlooped/moq/wiki/Quickstart) for more examples!
 
 <!-- #content -->
 
@@ -69,7 +69,7 @@ You can read more about the "why" and see some nice screenshots at [kzu's blog](
 
 ## Where?
 
-See our [Quickstart](https://github.com/moq/moq/wiki/Quickstart) examples to get a feeling of the extremely simple API and install from [NuGet](http://nuget.org/packages/moq).
+See our [Quickstart](https://github.com/devlooped/moq/wiki/Quickstart) examples to get a feeling of the extremely simple API and install from [NuGet](http://nuget.org/packages/moq).
 
 Read about the announcement at [kzu's blog](https://web.archive.org/web/20201130233544/http://blogs.clariusconsulting.net/kzu/linq-to-mock-moq-is-born/). Get some background on [the state of mock libraries from Scott Hanselman](http://www.hanselman.com/blog/MoqLinqLambdasAndPredicatesAppliedToMockObjects.aspx).
 
