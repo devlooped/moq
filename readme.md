@@ -3,7 +3,6 @@ moq
 
 [![Version](https://img.shields.io/nuget/vpre/Moq.svg)](https://www.nuget.org/packages/Moq)
 [![Downloads](https://img.shields.io/nuget/dt/Moq.svg)](https://www.nuget.org/packages/Moq)
-[![Discord Chat](https://img.shields.io/badge/chat-on%20discord-7289DA.svg)](https://discord.gg/8PtpGdu)
 [![Sponsors](https://img.shields.io/github/sponsors/devlooped?style=social)](https://github.com/sponsors/devlooped)
 
 <!-- #content -->
