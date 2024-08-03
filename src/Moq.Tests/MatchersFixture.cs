@@ -70,7 +70,7 @@ namespace Moq.Tests
             var mock = new Mock<IFoo>();
 
             mock.Setup(x => x.Echo(It.IsIn(Enumerable.Range(1, 5)))).Returns(1);
-            mock.Setup(x => x.Echo(It.IsIn(Enumerable.Range(6, 10)))).Returns(2);
+            mock.Setup(x => x.Echo(It.IsIn(Enumerable.Range(6, 5)))).Returns(2);
 
             Assert.Equal(1, mock.Object.Echo(1));
             Assert.Equal(1, mock.Object.Echo(2));
@@ -121,7 +121,7 @@ namespace Moq.Tests
             var mock = new Mock<IFoo>();
 
             mock.Setup(x => x.Echo(It.IsNotIn(Enumerable.Range(1, 5)))).Returns(1);
-            mock.Setup(x => x.Echo(It.IsNotIn(Enumerable.Range(6, 10)))).Returns(2);
+            mock.Setup(x => x.Echo(It.IsNotIn(Enumerable.Range(6, 5)))).Returns(2);
 
             Assert.Equal(2, mock.Object.Echo(1));
             Assert.Equal(2, mock.Object.Echo(2));
