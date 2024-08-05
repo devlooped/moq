@@ -72,9 +72,6 @@ See our [Quickstart](https://github.com/devlooped/moq/wiki/Quickstart) examples 
 
 Read about the announcement at [kzu's blog](https://web.archive.org/web/20201130233544/http://blogs.clariusconsulting.net/kzu/linq-to-mock-moq-is-born/). Get some background on [the state of mock libraries from Scott Hanselman](http://www.hanselman.com/blog/MoqLinqLambdasAndPredicatesAppliedToMockObjects.aspx).
 
-In-depth documentation is being added to the [documentation website](http://moq.github.io/moq/).
-
-
 ## Who?
 
 Moq was originally developed by [Clarius](http://www.clariusconsulting.net), [Manas](http://www.manas.com.ar) and [InSTEDD](http://www.instedd.org).
