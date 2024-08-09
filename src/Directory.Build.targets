@@ -4,6 +4,13 @@
   <PropertyGroup Condition="'$(CI)' == 'true' and '$(Language)' == 'C#'">
     <DefineConstants>CI;$(DefineConstants)</DefineConstants>
   </PropertyGroup>
+
+  <PropertyGroup Label="Build">
+    <!-- Tests projects don't need API docs, typically -->
+    <GenerateDocumentationFile Condition="$(GenerateDocumentationFile) == '' and $(IsTestProject) == 'true'">false</GenerateDocumentationFile>
+    <GenerateDocumentationFile Condition="$(GenerateDocumentationFile) == '' and $(MSBuildProjectName.Contains('Tests'))">false</GenerateDocumentationFile>
+    <GenerateDocumentationFile Condition="$(GenerateDocumentationFile) == ''">true</GenerateDocumentationFile>
+  </PropertyGroup>
   
   <PropertyGroup Condition="'$(IsPackable)' == ''">
     <IsPackable Condition="'$(PackAsTool)' == 'true'">true</IsPackable>
