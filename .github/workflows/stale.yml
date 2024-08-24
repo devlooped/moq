@@ -58,3 +58,6 @@ jobs:
           days-before-close: ${{ fromJson(inputs.daysBeforeClose || 30  ) }}
           days-before-pr-close: -1 # Do not close PRs labeled as 'stale'
           operations-per-run: ${{ fromJson(inputs.operationsPerRun || 4000 )}}
+          exempt-all-milestones: true
+          exempt-all-assignees: true
+          exempt-issue-labels: priority,sponsor,backed
