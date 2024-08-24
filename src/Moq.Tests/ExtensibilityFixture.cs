@@ -22,13 +22,6 @@ namespace Moq.Tests
             {
                 mock.Object.Save(new Order { Amount = 1000 });
 
-
-                /* Unmerged change from project 'Moq.Tests(net6.0)'
-                Before:
-                                Assert.True(false, "Should have failed for big order");
-                After:
-                                Assert.Fail("Should have failed for big order");
-                */
                 Assert.Fail("Should have failed for big order");
             }
             catch (InvalidOperationException)
@@ -61,13 +54,6 @@ namespace Moq.Tests
             {
                 mock.Object.Save(new Order { Amount = 50 });
 
-
-                /* Unmerged change from project 'Moq.Tests(net6.0)'
-                Before:
-                                Assert.True(false, "Should have failed for small order");
-                After:
-                                Assert.Fail("Should have failed for small order");
-                */
                 Assert.Fail("Should have failed for small order");
             }
             catch (InvalidOperationException)

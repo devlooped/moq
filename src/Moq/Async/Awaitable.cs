@@ -3,27 +3,6 @@
 
 namespace Moq.Async
 {
-
-    /* Unmerged change from project 'Moq(netstandard2.0)'
-    Before:
-        internal static class Awaitable
-    After:
-        static class Awaitable
-    */
-
-    /* Unmerged change from project 'Moq(netstandard2.1)'
-    Before:
-        internal static class Awaitable
-    After:
-        static class Awaitable
-    */
-
-    /* Unmerged change from project 'Moq(net6.0)'
-    Before:
-        internal static class Awaitable
-    After:
-        static class Awaitable
-    */
     static class Awaitable
     {
         /// <summary>

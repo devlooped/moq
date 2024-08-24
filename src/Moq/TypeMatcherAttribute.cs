@@ -15,27 +15,6 @@ namespace Moq
     /// </summary>
     [AttributeUsage(AttributeTargets.Class | AttributeTargets.Delegate | AttributeTargets.Enum | AttributeTargets.Interface | AttributeTargets.Struct, AllowMultiple = false, Inherited = true)]
     public class TypeMatcherAttribute : Attribute
-
-    /* Unmerged change from project 'Moq(netstandard2.0)'
-    Before:
-            private readonly Type type;
-    After:
-            readonly Type type;
-    */
-
-    /* Unmerged change from project 'Moq(netstandard2.1)'
-    Before:
-            private readonly Type type;
-    After:
-            readonly Type type;
-    */
-
-    /* Unmerged change from project 'Moq(net6.0)'
-    Before:
-            private readonly Type type;
-    After:
-            readonly Type type;
-    */
     {
         readonly Type type;
 

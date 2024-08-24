@@ -16,39 +16,6 @@ namespace Moq.Internals
     // to make this type accessible. Therefore we need to declare it as public.
     [EditorBrowsable(EditorBrowsableState.Never)]
     public abstract class InterfaceProxy
-
-    /* Unmerged change from project 'Moq(netstandard2.0)'
-    Before:
-            private static MethodInfo equalsMethod = typeof(object).GetMethod("Equals", BindingFlags.Public | BindingFlags.Instance);
-            private static MethodInfo getHashCodeMethod = typeof(object).GetMethod("GetHashCode", BindingFlags.Public | BindingFlags.Instance);
-            private static MethodInfo toStringMethod = typeof(object).GetMethod("ToString", BindingFlags.Public | BindingFlags.Instance);
-    After:
-            static MethodInfo equalsMethod = typeof(object).GetMethod("Equals", BindingFlags.Public | BindingFlags.Instance);
-            static MethodInfo getHashCodeMethod = typeof(object).GetMethod("GetHashCode", BindingFlags.Public | BindingFlags.Instance);
-            static MethodInfo toStringMethod = typeof(object).GetMethod("ToString", BindingFlags.Public | BindingFlags.Instance);
-    */
-
-    /* Unmerged change from project 'Moq(netstandard2.1)'
-    Before:
-            private static MethodInfo equalsMethod = typeof(object).GetMethod("Equals", BindingFlags.Public | BindingFlags.Instance);
-            private static MethodInfo getHashCodeMethod = typeof(object).GetMethod("GetHashCode", BindingFlags.Public | BindingFlags.Instance);
-            private static MethodInfo toStringMethod = typeof(object).GetMethod("ToString", BindingFlags.Public | BindingFlags.Instance);
-    After:
-            static MethodInfo equalsMethod = typeof(object).GetMethod("Equals", BindingFlags.Public | BindingFlags.Instance);
-            static MethodInfo getHashCodeMethod = typeof(object).GetMethod("GetHashCode", BindingFlags.Public | BindingFlags.Instance);
-            static MethodInfo toStringMethod = typeof(object).GetMethod("ToString", BindingFlags.Public | BindingFlags.Instance);
-    */
-
-    /* Unmerged change from project 'Moq(net6.0)'
-    Before:
-            private static MethodInfo equalsMethod = typeof(object).GetMethod("Equals", BindingFlags.Public | BindingFlags.Instance);
-            private static MethodInfo getHashCodeMethod = typeof(object).GetMethod("GetHashCode", BindingFlags.Public | BindingFlags.Instance);
-            private static MethodInfo toStringMethod = typeof(object).GetMethod("ToString", BindingFlags.Public | BindingFlags.Instance);
-    After:
-            static MethodInfo equalsMethod = typeof(object).GetMethod("Equals", BindingFlags.Public | BindingFlags.Instance);
-            static MethodInfo getHashCodeMethod = typeof(object).GetMethod("GetHashCode", BindingFlags.Public | BindingFlags.Instance);
-            static MethodInfo toStringMethod = typeof(object).GetMethod("ToString", BindingFlags.Public | BindingFlags.Instance);
-    */
     {
         static MethodInfo equalsMethod = typeof(object).GetMethod("Equals", BindingFlags.Public | BindingFlags.Instance);
         static MethodInfo getHashCodeMethod = typeof(object).GetMethod("GetHashCode", BindingFlags.Public | BindingFlags.Instance);
@@ -85,51 +52,9 @@ namespace Moq.Internals
             var invocation = new Invocation(this.GetType(), toStringMethod);
             interceptor.Intercept(invocation);
             return (string)invocation.ReturnValue;
-
-            /* Unmerged change from project 'Moq(netstandard2.0)'
-            Before:
-                    private sealed class Invocation : Moq.Invocation
-            After:
-                    sealed class Invocation : Moq.Invocation
-            */
-
-            /* Unmerged change from project 'Moq(netstandard2.1)'
-            Before:
-                    private sealed class Invocation : Moq.Invocation
-            After:
-                    sealed class Invocation : Moq.Invocation
-            */
-
-            /* Unmerged change from project 'Moq(net6.0)'
-            Before:
-                    private sealed class Invocation : Moq.Invocation
-            After:
-                    sealed class Invocation : Moq.Invocation
-            */
         }
 
         sealed class Invocation : Moq.Invocation
-
-        /* Unmerged change from project 'Moq(netstandard2.0)'
-        Before:
-                    private static object[] noArguments = new object[0];
-        After:
-                    static object[] noArguments = new object[0];
-        */
-
-        /* Unmerged change from project 'Moq(netstandard2.1)'
-        Before:
-                    private static object[] noArguments = new object[0];
-        After:
-                    static object[] noArguments = new object[0];
-        */
-
-        /* Unmerged change from project 'Moq(net6.0)'
-        Before:
-                    private static object[] noArguments = new object[0];
-        After:
-                    static object[] noArguments = new object[0];
-        */
         {
             static object[] noArguments = new object[0];
 

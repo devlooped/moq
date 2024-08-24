@@ -15,27 +15,6 @@ using TypeNameFormatter;
 
 namespace Moq
 {
-
-    /* Unmerged change from project 'Moq(netstandard2.0)'
-    Before:
-        internal static class MatcherFactory
-    After:
-        static class MatcherFactory
-    */
-
-    /* Unmerged change from project 'Moq(netstandard2.1)'
-    Before:
-        internal static class MatcherFactory
-    After:
-        static class MatcherFactory
-    */
-
-    /* Unmerged change from project 'Moq(net6.0)'
-    Before:
-        internal static class MatcherFactory
-    After:
-        static class MatcherFactory
-    */
     static class MatcherFactory
     {
         public static Pair<IMatcher[], Expression[]> CreateMatchers(IReadOnlyList<Expression> arguments, ParameterInfo[] parameters)

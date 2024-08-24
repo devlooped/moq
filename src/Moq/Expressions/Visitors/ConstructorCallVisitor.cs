@@ -11,27 +11,6 @@ using Moq.Properties;
 
 namespace Moq.Expressions.Visitors
 {
-
-    /* Unmerged change from project 'Moq(netstandard2.0)'
-    Before:
-        internal class ConstructorCallVisitor : ExpressionVisitor
-    After:
-        class ConstructorCallVisitor : ExpressionVisitor
-    */
-
-    /* Unmerged change from project 'Moq(netstandard2.1)'
-    Before:
-        internal class ConstructorCallVisitor : ExpressionVisitor
-    After:
-        class ConstructorCallVisitor : ExpressionVisitor
-    */
-
-    /* Unmerged change from project 'Moq(net6.0)'
-    Before:
-        internal class ConstructorCallVisitor : ExpressionVisitor
-    After:
-        class ConstructorCallVisitor : ExpressionVisitor
-    */
     class ConstructorCallVisitor : ExpressionVisitor
     {
         /// <summary>
@@ -55,33 +34,6 @@ namespace Moq.Expressions.Visitors
             }
 
             return visitor.arguments;
-
-            /* Unmerged change from project 'Moq(netstandard2.0)'
-            Before:
-                    private ConstructorInfo constructor;
-                    private object[] arguments;
-            After:
-                    ConstructorInfo constructor;
-                    object[] arguments;
-            */
-
-            /* Unmerged change from project 'Moq(netstandard2.1)'
-            Before:
-                    private ConstructorInfo constructor;
-                    private object[] arguments;
-            After:
-                    ConstructorInfo constructor;
-                    object[] arguments;
-            */
-
-            /* Unmerged change from project 'Moq(net6.0)'
-            Before:
-                    private ConstructorInfo constructor;
-                    private object[] arguments;
-            After:
-                    ConstructorInfo constructor;
-                    object[] arguments;
-            */
         }
 
         ConstructorInfo constructor;

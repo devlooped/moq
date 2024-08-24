@@ -10,13 +10,6 @@ namespace Moq.Tests.Linq
     public class MockRepositoryQuerying
     {
         public class GivenAStrictFactory
-
-        /* Unmerged change from project 'Moq.Tests(net6.0)'
-        Before:
-                    private MockRepository repository;
-        After:
-                    MockRepository repository;
-        */
         {
             MockRepository repository;
 
@@ -75,13 +68,6 @@ namespace Moq.Tests.Linq
         }
 
         public class Strict_mocks
-
-        /* Unmerged change from project 'Moq.Tests(net6.0)'
-        Before:
-                    private MockRepository repository;
-        After:
-                    MockRepository repository;
-        */
         {
             MockRepository repository;
 

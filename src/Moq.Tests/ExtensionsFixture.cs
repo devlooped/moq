@@ -110,13 +110,6 @@ namespace Moq.Tests
         {
             var actual = GetParameterTypeList(methodName);
             Assert.Equal(expected, actual);
-
-            /* Unmerged change from project 'Moq.Tests(net6.0)'
-            Before:
-                    private string GetParameterTypeList(string methodName)
-            After:
-                    string GetParameterTypeList(string methodName)
-            */
         }
 
         string GetParameterTypeList(string methodName)

@@ -10,55 +10,7 @@ using E = System.Linq.Expressions.Expression;
 
 namespace Moq
 {
-
-    /* Unmerged change from project 'Moq(netstandard2.0)'
-    Before:
-        internal sealed class StubbedPropertiesSetup : Setup
-    After:
-        sealed class StubbedPropertiesSetup : Setup
-    */
-
-    /* Unmerged change from project 'Moq(netstandard2.1)'
-    Before:
-        internal sealed class StubbedPropertiesSetup : Setup
-    After:
-        sealed class StubbedPropertiesSetup : Setup
-    */
-
-    /* Unmerged change from project 'Moq(net6.0)'
-    Before:
-        internal sealed class StubbedPropertiesSetup : Setup
-    After:
-        sealed class StubbedPropertiesSetup : Setup
-    */
     sealed class StubbedPropertiesSetup : Setup
-
-    /* Unmerged change from project 'Moq(netstandard2.0)'
-    Before:
-            private readonly ConcurrentDictionary<string, object> values;
-            private readonly DefaultValueProvider defaultValueProvider;
-    After:
-            readonly ConcurrentDictionary<string, object> values;
-            readonly DefaultValueProvider defaultValueProvider;
-    */
-
-    /* Unmerged change from project 'Moq(netstandard2.1)'
-    Before:
-            private readonly ConcurrentDictionary<string, object> values;
-            private readonly DefaultValueProvider defaultValueProvider;
-    After:
-            readonly ConcurrentDictionary<string, object> values;
-            readonly DefaultValueProvider defaultValueProvider;
-    */
-
-    /* Unmerged change from project 'Moq(net6.0)'
-    Before:
-            private readonly ConcurrentDictionary<string, object> values;
-            private readonly DefaultValueProvider defaultValueProvider;
-    After:
-            readonly ConcurrentDictionary<string, object> values;
-            readonly DefaultValueProvider defaultValueProvider;
-    */
     {
         readonly ConcurrentDictionary<string, object> values;
         readonly DefaultValueProvider defaultValueProvider;
@@ -115,52 +67,10 @@ namespace Moq
         }
 
         protected override void VerifySelf()
-
-        /* Unmerged change from project 'Moq(netstandard2.0)'
-        Before:
-                private sealed class PropertyAccessorExpectation : Expectation
-        After:
-                sealed class PropertyAccessorExpectation : Expectation
-        */
-
-        /* Unmerged change from project 'Moq(netstandard2.1)'
-        Before:
-                private sealed class PropertyAccessorExpectation : Expectation
-        After:
-                sealed class PropertyAccessorExpectation : Expectation
-        */
-
-        /* Unmerged change from project 'Moq(net6.0)'
-        Before:
-                private sealed class PropertyAccessorExpectation : Expectation
-        After:
-                sealed class PropertyAccessorExpectation : Expectation
-        */
         {
         }
 
         sealed class PropertyAccessorExpectation : Expectation
-
-        /* Unmerged change from project 'Moq(netstandard2.0)'
-        Before:
-                    private readonly LambdaExpression expression;
-        After:
-                    readonly LambdaExpression expression;
-        */
-
-        /* Unmerged change from project 'Moq(netstandard2.1)'
-        Before:
-                    private readonly LambdaExpression expression;
-        After:
-                    readonly LambdaExpression expression;
-        */
-
-        /* Unmerged change from project 'Moq(net6.0)'
-        Before:
-                    private readonly LambdaExpression expression;
-        After:
-                    readonly LambdaExpression expression;
-        */
         {
             readonly LambdaExpression expression;
 

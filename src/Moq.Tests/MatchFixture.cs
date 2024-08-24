@@ -190,13 +190,6 @@ namespace Moq.Tests
                 var first = GetMatch(() => Order.IsSmallerThan(123M));
                 var second = GetMatch(() => Order.IsSmallerThan(123M));
                 Assert.NotEqual(first, second);
-
-                /* Unmerged change from project 'Moq.Tests(net6.0)'
-                Before:
-                        private static Match GetMatch<T>(Func<T> func)
-                After:
-                        static Match GetMatch<T>(Func<T> func)
-                */
             }
         }
 
@@ -206,13 +199,6 @@ namespace Moq.Tests
             {
                 _ = func();
                 return observer.TryGetLastMatch(out var match) ? match as Match<T> : null;
-
-                /* Unmerged change from project 'Moq.Tests(net6.0)'
-                Before:
-                        private abstract class Order
-                After:
-                        abstract class Order
-                */
             }
         }
 

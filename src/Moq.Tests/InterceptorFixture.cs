@@ -47,35 +47,14 @@ namespace Moq.Tests
             public abstract class ClassType { }
 
             public interface IInterfaceType { }
-
-            /* Unmerged change from project 'Moq.Tests(net6.0)'
-            Before:
-                    private static object CreateProxy(Type type, IInterceptor interceptor)
-            After:
-                    static object CreateProxy(Type type, IInterceptor interceptor)
-            */
         }
 
         static object CreateProxy(Type type, IInterceptor interceptor)
         {
             return ProxyFactory.Instance.CreateProxy(type, interceptor, Type.EmptyTypes, new object[0]);
-
-            /* Unmerged change from project 'Moq.Tests(net6.0)'
-            Before:
-                    private sealed class Echo : IInterceptor
-            After:
-                    sealed class Echo : IInterceptor
-            */
         }
 
         sealed class Echo : IInterceptor
-
-        /* Unmerged change from project 'Moq.Tests(net6.0)'
-        Before:
-                    private readonly object returnValue;
-        After:
-                    readonly object returnValue;
-        */
         {
             readonly object returnValue;
 

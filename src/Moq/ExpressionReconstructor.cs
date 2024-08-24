@@ -6,53 +6,11 @@ using System.Linq.Expressions;
 
 namespace Moq
 {
-
-    /* Unmerged change from project 'Moq(netstandard2.0)'
-    Before:
-        internal abstract class ExpressionReconstructor
-    After:
-        abstract class ExpressionReconstructor
-    */
-
-    /* Unmerged change from project 'Moq(netstandard2.1)'
-    Before:
-        internal abstract class ExpressionReconstructor
-    After:
-        abstract class ExpressionReconstructor
-    */
-
-    /* Unmerged change from project 'Moq(net6.0)'
-    Before:
-        internal abstract class ExpressionReconstructor
-    After:
-        abstract class ExpressionReconstructor
-    */
     /// <summary>
     ///   A <see cref="ExpressionReconstructor"/> reconstructs LINQ expression trees (<see cref="LambdaExpression"/>)
     ///   from <see cref="Action"/> delegates. It is the counterpart to <see cref="ExpressionCompiler"/>.
     /// </summary>
     abstract class ExpressionReconstructor
-
-    /* Unmerged change from project 'Moq(netstandard2.0)'
-    Before:
-            private static ExpressionReconstructor instance = new ActionObserver();
-    After:
-            static ExpressionReconstructor instance = new ActionObserver();
-    */
-
-    /* Unmerged change from project 'Moq(netstandard2.1)'
-    Before:
-            private static ExpressionReconstructor instance = new ActionObserver();
-    After:
-            static ExpressionReconstructor instance = new ActionObserver();
-    */
-
-    /* Unmerged change from project 'Moq(net6.0)'
-    Before:
-            private static ExpressionReconstructor instance = new ActionObserver();
-    After:
-            static ExpressionReconstructor instance = new ActionObserver();
-    */
     {
         static ExpressionReconstructor instance = new ActionObserver();
 

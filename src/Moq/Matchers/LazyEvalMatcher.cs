@@ -7,49 +7,7 @@ using System.Linq.Expressions;
 
 namespace Moq.Matchers
 {
-
-    /* Unmerged change from project 'Moq(netstandard2.0)'
-    Before:
-        internal class LazyEvalMatcher : IMatcher
-    After:
-        class LazyEvalMatcher : IMatcher
-    */
-
-    /* Unmerged change from project 'Moq(netstandard2.1)'
-    Before:
-        internal class LazyEvalMatcher : IMatcher
-    After:
-        class LazyEvalMatcher : IMatcher
-    */
-
-    /* Unmerged change from project 'Moq(net6.0)'
-    Before:
-        internal class LazyEvalMatcher : IMatcher
-    After:
-        class LazyEvalMatcher : IMatcher
-    */
     class LazyEvalMatcher : IMatcher
-
-    /* Unmerged change from project 'Moq(netstandard2.0)'
-    Before:
-            private Expression expression;
-    After:
-            Expression expression;
-    */
-
-    /* Unmerged change from project 'Moq(netstandard2.1)'
-    Before:
-            private Expression expression;
-    After:
-            Expression expression;
-    */
-
-    /* Unmerged change from project 'Moq(net6.0)'
-    Before:
-            private Expression expression;
-    After:
-            Expression expression;
-    */
     {
         Expression expression;
 

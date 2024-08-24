@@ -289,61 +289,26 @@ namespace Moq.Tests
             var expression = E((U u) => u.SealedV.W);
 
             AssertSplitFails(expression, allowNonOverridableLastProperty: true);
-
-            /* Unmerged change from project 'Moq.Tests(net6.0)'
-            Before:
-                    private void AssertSplitFails(LambdaExpression expression, params LambdaExpression[] expected)
-            After:
-                    void AssertSplitFails(LambdaExpression expression, params LambdaExpression[] expected)
-            */
         }
 
         void AssertSplitFails(LambdaExpression expression, params LambdaExpression[] expected)
         {
             Assert.Throws<ArgumentException>(() => expression.Split());
-
-            /* Unmerged change from project 'Moq.Tests(net6.0)'
-            Before:
-                    private void AssertSplitFails(LambdaExpression expression, bool allowNonOverridableLastProperty)
-            After:
-                    void AssertSplitFails(LambdaExpression expression, bool allowNonOverridableLastProperty)
-            */
         }
 
         void AssertSplitFails(LambdaExpression expression, bool allowNonOverridableLastProperty)
         {
             Assert.ThrowsAny<Exception>(() => expression.Split(allowNonOverridableLastProperty));
-
-            /* Unmerged change from project 'Moq.Tests(net6.0)'
-            Before:
-                    private void AssertSplitYields(LambdaExpression expression, params LambdaExpression[] expected)
-            After:
-                    void AssertSplitYields(LambdaExpression expression, params LambdaExpression[] expected)
-            */
         }
 
         void AssertSplitYields(LambdaExpression expression, params LambdaExpression[] expected)
         {
             Assert.Equal(expected, expression.Split().Select(e => e.Expression), ExpressionComparer.Default);
-
-            /* Unmerged change from project 'Moq.Tests(net6.0)'
-            Before:
-                    private void AssertSplitYields(LambdaExpression expression, bool allowNonOverridableLastProperty, params LambdaExpression[] expected)
-            After:
-                    void AssertSplitYields(LambdaExpression expression, bool allowNonOverridableLastProperty, params LambdaExpression[] expected)
-            */
         }
 
         void AssertSplitYields(LambdaExpression expression, bool allowNonOverridableLastProperty, params LambdaExpression[] expected)
         {
             Assert.Equal(expected, expression.Split(allowNonOverridableLastProperty).Select(e => e.Expression), ExpressionComparer.Default);
-
-            /* Unmerged change from project 'Moq.Tests(net6.0)'
-            Before:
-                    private static LambdaExpression A<T, TResult>(Expression<Func<T, TResult>> left, Expression right)
-            After:
-                    static LambdaExpression A<T, TResult>(Expression<Func<T, TResult>> left, Expression right)
-            */
         }
 
         /// <summary>
@@ -357,13 +322,6 @@ namespace Moq.Tests
                     IndexerReplacer.Instance.Visit(left.Body),
                     IndexerReplacer.Instance.Visit(right)),
                 left.Parameters);
-
-            /* Unmerged change from project 'Moq.Tests(net6.0)'
-            Before:
-                    private static ConstantExpression D<T>()
-            After:
-                    static ConstantExpression D<T>()
-            */
         }
 
         /// <summary>
@@ -372,13 +330,6 @@ namespace Moq.Tests
         static ConstantExpression D<T>()
         {
             return Expression.Constant(default(T), typeof(T));
-
-            /* Unmerged change from project 'Moq.Tests(net6.0)'
-            Before:
-                    private static LambdaExpression E<T, TResult>(Expression<Func<T, TResult>> expression)
-            After:
-                    static LambdaExpression E<T, TResult>(Expression<Func<T, TResult>> expression)
-            */
         }
 
         /// <summary>
@@ -387,13 +338,6 @@ namespace Moq.Tests
         static LambdaExpression E<T, TResult>(Expression<Func<T, TResult>> expression)
         {
             return (LambdaExpression)IndexerReplacer.Instance.Visit(expression);
-
-            /* Unmerged change from project 'Moq.Tests(net6.0)'
-            Before:
-                    private sealed class IndexerReplacer : ExpressionVisitor
-            After:
-                    sealed class IndexerReplacer : ExpressionVisitor
-            */
         }
 
         /// <summary>

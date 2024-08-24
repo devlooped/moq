@@ -130,13 +130,6 @@ namespace Moq.Tests
                 void NullableInt(int? arg);
                 void Object(object arg);
                 void Short(long arg);
-
-                /* Unmerged change from project 'Moq.Tests(net6.0)'
-                Before:
-                            private static void AssertConvert(Expression<Action<IX>> expression)
-                After:
-                            static void AssertConvert(Expression<Action<IX>> expression)
-                */
             }
 
             static void AssertConvert(Expression<Action<IX>> expression)
@@ -144,13 +137,6 @@ namespace Moq.Tests
                 var visitor = new FilteringVisitor(e => e.NodeType == ExpressionType.Convert);
                 visitor.Visit(expression.Body);
                 Assert.True(visitor.Result.Any());
-
-                /* Unmerged change from project 'Moq.Tests(net6.0)'
-                Before:
-                            private static void AssertNoConvert(Expression<Action<IX>> expression)
-                After:
-                            static void AssertNoConvert(Expression<Action<IX>> expression)
-                */
             }
 
             static void AssertNoConvert(Expression<Action<IX>> expression)
@@ -158,26 +144,10 @@ namespace Moq.Tests
                 var visitor = new FilteringVisitor(e => e.NodeType == ExpressionType.Convert);
                 visitor.Visit(expression.Body);
                 Assert.False(visitor.Result.Any());
-
-                /* Unmerged change from project 'Moq.Tests(net6.0)'
-                Before:
-                        private sealed class FilteringVisitor : ExpressionVisitor
-                After:
-                        sealed class FilteringVisitor : ExpressionVisitor
-                */
             }
         }
 
         sealed class FilteringVisitor : ExpressionVisitor
-
-        /* Unmerged change from project 'Moq.Tests(net6.0)'
-        Before:
-                    private readonly Func<Expression, bool> predicate;
-                    private readonly List<Expression> result;
-        After:
-                    readonly Func<Expression, bool> predicate;
-                    readonly List<Expression> result;
-        */
         {
             readonly Func<Expression, bool> predicate;
             readonly List<Expression> result;

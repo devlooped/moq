@@ -5,27 +5,6 @@ using System;
 
 namespace Moq.Language.Flow
 {
-
-    /* Unmerged change from project 'Moq(netstandard2.0)'
-    Before:
-        internal class NonVoidSetupPhrase<T, TResult> : SetupPhrase, ISetup<T, TResult>, ISetupGetter<T, TResult>, IReturnsResult<T> where T : class
-    After:
-        class NonVoidSetupPhrase<T, TResult> : SetupPhrase, ISetup<T, TResult>, ISetupGetter<T, TResult>, IReturnsResult<T> where T : class
-    */
-
-    /* Unmerged change from project 'Moq(netstandard2.1)'
-    Before:
-        internal class NonVoidSetupPhrase<T, TResult> : SetupPhrase, ISetup<T, TResult>, ISetupGetter<T, TResult>, IReturnsResult<T> where T : class
-    After:
-        class NonVoidSetupPhrase<T, TResult> : SetupPhrase, ISetup<T, TResult>, ISetupGetter<T, TResult>, IReturnsResult<T> where T : class
-    */
-
-    /* Unmerged change from project 'Moq(net6.0)'
-    Before:
-        internal class NonVoidSetupPhrase<T, TResult> : SetupPhrase, ISetup<T, TResult>, ISetupGetter<T, TResult>, IReturnsResult<T> where T : class
-    After:
-        class NonVoidSetupPhrase<T, TResult> : SetupPhrase, ISetup<T, TResult>, ISetupGetter<T, TResult>, IReturnsResult<T> where T : class
-    */
     class NonVoidSetupPhrase<T, TResult> : SetupPhrase, ISetup<T, TResult>, ISetupGetter<T, TResult>, IReturnsResult<T> where T : class
     {
         public NonVoidSetupPhrase(MethodCall setup) : base(setup)

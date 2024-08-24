@@ -7,27 +7,6 @@ using System.Linq.Expressions;
 
 namespace Moq.Async
 {
-
-    /* Unmerged change from project 'Moq(netstandard2.0)'
-    Before:
-        internal interface IAwaitableFactory
-    After:
-        interface IAwaitableFactory
-    */
-
-    /* Unmerged change from project 'Moq(netstandard2.1)'
-    Before:
-        internal interface IAwaitableFactory
-    After:
-        interface IAwaitableFactory
-    */
-
-    /* Unmerged change from project 'Moq(net6.0)'
-    Before:
-        internal interface IAwaitableFactory
-    After:
-        interface IAwaitableFactory
-    */
     interface IAwaitableFactory
     {
         Type ResultType { get; }

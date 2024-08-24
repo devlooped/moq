@@ -6,52 +6,10 @@ using System.Linq.Expressions;
 
 namespace Moq
 {
-
-    /* Unmerged change from project 'Moq(netstandard2.0)'
-    Before:
-        internal sealed class DefaultExpressionCompiler : ExpressionCompiler
-    After:
-        sealed class DefaultExpressionCompiler : ExpressionCompiler
-    */
-
-    /* Unmerged change from project 'Moq(netstandard2.1)'
-    Before:
-        internal sealed class DefaultExpressionCompiler : ExpressionCompiler
-    After:
-        sealed class DefaultExpressionCompiler : ExpressionCompiler
-    */
-
-    /* Unmerged change from project 'Moq(net6.0)'
-    Before:
-        internal sealed class DefaultExpressionCompiler : ExpressionCompiler
-    After:
-        sealed class DefaultExpressionCompiler : ExpressionCompiler
-    */
     sealed class DefaultExpressionCompiler : ExpressionCompiler
     {
         new public static readonly DefaultExpressionCompiler Instance = new DefaultExpressionCompiler();
 
-
-        /* Unmerged change from project 'Moq(netstandard2.0)'
-        Before:
-                private DefaultExpressionCompiler()
-        After:
-                DefaultExpressionCompiler()
-        */
-
-        /* Unmerged change from project 'Moq(netstandard2.1)'
-        Before:
-                private DefaultExpressionCompiler()
-        After:
-                DefaultExpressionCompiler()
-        */
-
-        /* Unmerged change from project 'Moq(net6.0)'
-        Before:
-                private DefaultExpressionCompiler()
-        After:
-                DefaultExpressionCompiler()
-        */
         DefaultExpressionCompiler()
         {
         }

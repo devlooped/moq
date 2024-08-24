@@ -10,13 +10,6 @@ using Xunit;
 namespace Moq.Tests
 {
     public class AfterReturnCallbackDelegateValidationFixture
-
-    /* Unmerged change from project 'Moq.Tests(net6.0)'
-    Before:
-            private readonly ISetup<IFoo, bool> setup;
-    After:
-            readonly ISetup<IFoo, bool> setup;
-    */
     {
         readonly ISetup<IFoo, bool> setup;
 

@@ -11,15 +11,6 @@ using Xunit;
 namespace Moq.Tests
 {
     public class ProtectedAsMockFixture
-
-    /* Unmerged change from project 'Moq.Tests(net6.0)'
-    Before:
-            private Mock<Foo> mock;
-            private IProtectedAsMock<Foo, Fooish> protectedMock;
-    After:
-            Mock<Foo> mock;
-            IProtectedAsMock<Foo, Fooish> protectedMock;
-    */
     {
         Mock<Foo> mock;
         IProtectedAsMock<Foo, Fooish> protectedMock;
@@ -481,13 +472,6 @@ namespace Moq.Tests
             public void SetMultipleIndexer(int index, string sIndex, int value)
             {
                 this[index, sIndex] = value;
-
-                /* Unmerged change from project 'Moq.Tests(net6.0)'
-                Before:
-                            private int _virtualSet;
-                After:
-                            int _virtualSet;
-                */
             }
 
             int _virtualSet;
@@ -507,13 +491,6 @@ namespace Moq.Tests
             public void SetVirtual(int value)
             {
                 VirtualSet = value;
-
-                /* Unmerged change from project 'Moq.Tests(net6.0)'
-                Before:
-                            private int _virtualGet;
-                After:
-                            int _virtualGet;
-                */
             }
 
             int _virtualGet;
@@ -570,13 +547,6 @@ namespace Moq.Tests
         }
 
         public class ExpectedException : Exception
-
-        /* Unmerged change from project 'Moq.Tests(net6.0)'
-        Before:
-                    private static ExpectedException expectedException = new ExpectedException();
-        After:
-                    static ExpectedException expectedException = new ExpectedException();
-        */
         {
             static ExpectedException expectedException = new ExpectedException();
             public static ExpectedException Instance => expectedException;

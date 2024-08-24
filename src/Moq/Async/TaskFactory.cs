@@ -9,52 +9,10 @@ using System.Threading.Tasks;
 
 namespace Moq.Async
 {
-
-    /* Unmerged change from project 'Moq(netstandard2.0)'
-    Before:
-        internal sealed class TaskFactory : AwaitableFactory<Task>
-    After:
-        sealed class TaskFactory : AwaitableFactory<Task>
-    */
-
-    /* Unmerged change from project 'Moq(netstandard2.1)'
-    Before:
-        internal sealed class TaskFactory : AwaitableFactory<Task>
-    After:
-        sealed class TaskFactory : AwaitableFactory<Task>
-    */
-
-    /* Unmerged change from project 'Moq(net6.0)'
-    Before:
-        internal sealed class TaskFactory : AwaitableFactory<Task>
-    After:
-        sealed class TaskFactory : AwaitableFactory<Task>
-    */
     sealed class TaskFactory : AwaitableFactory<Task>
     {
         public static readonly TaskFactory Instance = new TaskFactory();
 
-
-        /* Unmerged change from project 'Moq(netstandard2.0)'
-        Before:
-                private TaskFactory()
-        After:
-                TaskFactory()
-        */
-
-        /* Unmerged change from project 'Moq(netstandard2.1)'
-        Before:
-                private TaskFactory()
-        After:
-                TaskFactory()
-        */
-
-        /* Unmerged change from project 'Moq(net6.0)'
-        Before:
-                private TaskFactory()
-        After:
-                TaskFactory()
-        */
         TaskFactory()
         {
         }

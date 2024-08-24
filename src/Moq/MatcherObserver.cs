@@ -8,27 +8,6 @@ using System.Linq;
 
 namespace Moq
 {
-
-    /* Unmerged change from project 'Moq(netstandard2.0)'
-    Before:
-        internal sealed class MatcherObserver : IDisposable
-    After:
-        sealed class MatcherObserver : IDisposable
-    */
-
-    /* Unmerged change from project 'Moq(netstandard2.1)'
-    Before:
-        internal sealed class MatcherObserver : IDisposable
-    After:
-        sealed class MatcherObserver : IDisposable
-    */
-
-    /* Unmerged change from project 'Moq(net6.0)'
-    Before:
-        internal sealed class MatcherObserver : IDisposable
-    After:
-        sealed class MatcherObserver : IDisposable
-    */
     /// <summary>
     ///   A per-thread observer that records invocations to matchers for later inspection.
     /// </summary>
@@ -71,60 +50,12 @@ namespace Moq
             {
                 observer = null;
                 return false;
-
-                /* Unmerged change from project 'Moq(netstandard2.0)'
-                Before:
-                        private int timestamp;
-                        private List<Observation> observations;
-                After:
-                        int timestamp;
-                        List<Observation> observations;
-                */
-
-                /* Unmerged change from project 'Moq(netstandard2.1)'
-                Before:
-                        private int timestamp;
-                        private List<Observation> observations;
-                After:
-                        int timestamp;
-                        List<Observation> observations;
-                */
-
-                /* Unmerged change from project 'Moq(net6.0)'
-                Before:
-                        private int timestamp;
-                        private List<Observation> observations;
-                After:
-                        int timestamp;
-                        List<Observation> observations;
-                */
             }
         }
 
         int timestamp;
         List<Observation> observations;
 
-
-        /* Unmerged change from project 'Moq(netstandard2.0)'
-        Before:
-                private MatcherObserver()
-        After:
-                MatcherObserver()
-        */
-
-        /* Unmerged change from project 'Moq(netstandard2.1)'
-        Before:
-                private MatcherObserver()
-        After:
-                MatcherObserver()
-        */
-
-        /* Unmerged change from project 'Moq(net6.0)'
-        Before:
-                private MatcherObserver()
-        After:
-                MatcherObserver()
-        */
         MatcherObserver()
         {
         }
@@ -186,27 +117,6 @@ namespace Moq
             else
             {
                 return Enumerable.Empty<Match>();
-
-                /* Unmerged change from project 'Moq(netstandard2.0)'
-                Before:
-                        private readonly struct Observation
-                After:
-                        readonly struct Observation
-                */
-
-                /* Unmerged change from project 'Moq(netstandard2.1)'
-                Before:
-                        private readonly struct Observation
-                After:
-                        readonly struct Observation
-                */
-
-                /* Unmerged change from project 'Moq(net6.0)'
-                Before:
-                        private readonly struct Observation
-                After:
-                        readonly struct Observation
-                */
             }
         }
 

@@ -17,13 +17,6 @@ namespace Moq.Tests
     /// </summary>
     /// <seealso cref="ReturnsDelegateValidationFixture"/>
     public class CallbackDelegateValidationFixture
-
-    /* Unmerged change from project 'Moq.Tests(net6.0)'
-    Before:
-            private ISetup<IFoo> setup;
-    After:
-            ISetup<IFoo> setup;
-    */
     {
         ISetup<IFoo> setup;
 

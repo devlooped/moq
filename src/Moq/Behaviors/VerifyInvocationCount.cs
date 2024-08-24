@@ -3,61 +3,7 @@
 
 namespace Moq.Behaviors
 {
-
-    /* Unmerged change from project 'Moq(netstandard2.0)'
-    Before:
-        internal sealed class VerifyInvocationCount : Behavior
-    After:
-        sealed class VerifyInvocationCount : Behavior
-    */
-
-    /* Unmerged change from project 'Moq(netstandard2.1)'
-    Before:
-        internal sealed class VerifyInvocationCount : Behavior
-    After:
-        sealed class VerifyInvocationCount : Behavior
-    */
-
-    /* Unmerged change from project 'Moq(net6.0)'
-    Before:
-        internal sealed class VerifyInvocationCount : Behavior
-    After:
-        sealed class VerifyInvocationCount : Behavior
-    */
     sealed class VerifyInvocationCount : Behavior
-
-    /* Unmerged change from project 'Moq(netstandard2.0)'
-    Before:
-            private int count;
-            private readonly Times times;
-            private readonly MethodCall setup;
-    After:
-            int count;
-            readonly Times times;
-            readonly MethodCall setup;
-    */
-
-    /* Unmerged change from project 'Moq(netstandard2.1)'
-    Before:
-            private int count;
-            private readonly Times times;
-            private readonly MethodCall setup;
-    After:
-            int count;
-            readonly Times times;
-            readonly MethodCall setup;
-    */
-
-    /* Unmerged change from project 'Moq(net6.0)'
-    Before:
-            private int count;
-            private readonly Times times;
-            private readonly MethodCall setup;
-    After:
-            int count;
-            readonly Times times;
-            readonly MethodCall setup;
-    */
     {
         int count;
         readonly Times times;

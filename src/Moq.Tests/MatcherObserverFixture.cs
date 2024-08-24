@@ -56,13 +56,6 @@ namespace Moq.Tests
                 }
                 _ = CreateMatch();
                 Assert.True(outer.TryGetLastMatch(out var match));
-
-                /* Unmerged change from project 'Moq.Tests(net6.0)'
-                Before:
-                        private int CreateMatch()
-                After:
-                        int CreateMatch()
-                */
             }
         }
 

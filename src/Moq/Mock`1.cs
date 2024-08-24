@@ -69,33 +69,6 @@ namespace Moq
     ///   </code>
     /// </example>
     public partial class Mock<T> : Mock, IMock<T> where T : class
-
-        /* Unmerged change from project 'Moq(netstandard2.0)'
-        Before:
-                private static Type[] inheritedInterfaces;
-                private static int serialNumberCounter;
-        After:
-                static Type[] inheritedInterfaces;
-                static int serialNumberCounter;
-        */
-
-        /* Unmerged change from project 'Moq(netstandard2.1)'
-        Before:
-                private static Type[] inheritedInterfaces;
-                private static int serialNumberCounter;
-        After:
-                static Type[] inheritedInterfaces;
-                static int serialNumberCounter;
-        */
-
-        /* Unmerged change from project 'Moq(net6.0)'
-        Before:
-                private static Type[] inheritedInterfaces;
-                private static int serialNumberCounter;
-        After:
-                static Type[] inheritedInterfaces;
-                static int serialNumberCounter;
-        */
     {
         static Type[] inheritedInterfaces;
         static int serialNumberCounter;
@@ -109,75 +82,6 @@ namespace Moq
                 .ToArray();
 
             serialNumberCounter = 0;
-
-            /* Unmerged change from project 'Moq(netstandard2.0)'
-            Before:
-                    private T instance;
-                    private List<Type> additionalInterfaces;
-                    private Dictionary<Type, object> configuredDefaultValues;
-                    private object[] constructorArguments;
-                    private DefaultValueProvider defaultValueProvider;
-                    private EventHandlerCollection eventHandlers;
-                    private InvocationCollection invocations;
-                    private string name;
-                    private SetupCollection setups;
-            After:
-                    T instance;
-                    List<Type> additionalInterfaces;
-                    Dictionary<Type, object> configuredDefaultValues;
-                    object[] constructorArguments;
-                    DefaultValueProvider defaultValueProvider;
-                    EventHandlerCollection eventHandlers;
-                    InvocationCollection invocations;
-                    string name;
-                    SetupCollection setups;
-            */
-
-            /* Unmerged change from project 'Moq(netstandard2.1)'
-            Before:
-                    private T instance;
-                    private List<Type> additionalInterfaces;
-                    private Dictionary<Type, object> configuredDefaultValues;
-                    private object[] constructorArguments;
-                    private DefaultValueProvider defaultValueProvider;
-                    private EventHandlerCollection eventHandlers;
-                    private InvocationCollection invocations;
-                    private string name;
-                    private SetupCollection setups;
-            After:
-                    T instance;
-                    List<Type> additionalInterfaces;
-                    Dictionary<Type, object> configuredDefaultValues;
-                    object[] constructorArguments;
-                    DefaultValueProvider defaultValueProvider;
-                    EventHandlerCollection eventHandlers;
-                    InvocationCollection invocations;
-                    string name;
-                    SetupCollection setups;
-            */
-
-            /* Unmerged change from project 'Moq(net6.0)'
-            Before:
-                    private T instance;
-                    private List<Type> additionalInterfaces;
-                    private Dictionary<Type, object> configuredDefaultValues;
-                    private object[] constructorArguments;
-                    private DefaultValueProvider defaultValueProvider;
-                    private EventHandlerCollection eventHandlers;
-                    private InvocationCollection invocations;
-                    private string name;
-                    private SetupCollection setups;
-            After:
-                    T instance;
-                    List<Type> additionalInterfaces;
-                    Dictionary<Type, object> configuredDefaultValues;
-                    object[] constructorArguments;
-                    DefaultValueProvider defaultValueProvider;
-                    EventHandlerCollection eventHandlers;
-                    InvocationCollection invocations;
-                    string name;
-                    SetupCollection setups;
-            */
         }
 
         T instance;
@@ -189,40 +93,6 @@ namespace Moq
         InvocationCollection invocations;
         string name;
         SetupCollection setups;
-
-
-        /* Unmerged change from project 'Moq(netstandard2.0)'
-        Before:
-                private MockBehavior behavior;
-                private bool callBase;
-                private Switches switches;
-        After:
-                MockBehavior behavior;
-                bool callBase;
-                Switches switches;
-        */
-
-        /* Unmerged change from project 'Moq(netstandard2.1)'
-        Before:
-                private MockBehavior behavior;
-                private bool callBase;
-                private Switches switches;
-        After:
-                MockBehavior behavior;
-                bool callBase;
-                Switches switches;
-        */
-
-        /* Unmerged change from project 'Moq(net6.0)'
-        Before:
-                private MockBehavior behavior;
-                private bool callBase;
-                private Switches switches;
-        After:
-                MockBehavior behavior;
-                bool callBase;
-                Switches switches;
-        */
         MockBehavior behavior;
         bool callBase;
         Switches switches;
@@ -332,27 +202,6 @@ namespace Moq
         /// </example>
         public Mock(Expression<Func<T>> newExpression, MockBehavior behavior = MockBehavior.Default)
             : this(behavior, Expressions.Visitors.ConstructorCallVisitor.ExtractArgumentValues(newExpression))
-
-        /* Unmerged change from project 'Moq(netstandard2.0)'
-        Before:
-                private static string CreateUniqueDefaultMockName()
-        After:
-                static string CreateUniqueDefaultMockName()
-        */
-
-        /* Unmerged change from project 'Moq(netstandard2.1)'
-        Before:
-                private static string CreateUniqueDefaultMockName()
-        After:
-                static string CreateUniqueDefaultMockName()
-        */
-
-        /* Unmerged change from project 'Moq(net6.0)'
-        Before:
-                private static string CreateUniqueDefaultMockName()
-        After:
-                static string CreateUniqueDefaultMockName()
-        */
         {
         }
 
@@ -363,27 +212,6 @@ namespace Moq
             var name = new StringBuilder();
             name.Append("Mock<").AppendNameOf(typeof(T)).Append(':').Append(serialNumber).Append('>');
             return name.ToString();
-
-            /* Unmerged change from project 'Moq(netstandard2.0)'
-            Before:
-                    private void CheckParameters()
-            After:
-                    void CheckParameters()
-            */
-
-            /* Unmerged change from project 'Moq(netstandard2.1)'
-            Before:
-                    private void CheckParameters()
-            After:
-                    void CheckParameters()
-            */
-
-            /* Unmerged change from project 'Moq(net6.0)'
-            Before:
-                    private void CheckParameters()
-            After:
-                    void CheckParameters()
-            */
         }
 
         void CheckParameters()
@@ -468,27 +296,6 @@ namespace Moq
         public override string ToString()
         {
             return this.Name;
-
-            /* Unmerged change from project 'Moq(netstandard2.0)'
-            Before:
-                    private void InitializeInstance()
-            After:
-                    void InitializeInstance()
-            */
-
-            /* Unmerged change from project 'Moq(netstandard2.1)'
-            Before:
-                    private void InitializeInstance()
-            After:
-                    void InitializeInstance()
-            */
-
-            /* Unmerged change from project 'Moq(net6.0)'
-            Before:
-                    private void InitializeInstance()
-            After:
-                    void InitializeInstance()
-            */
         }
 
         void InitializeInstance()

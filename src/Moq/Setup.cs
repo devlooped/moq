@@ -12,67 +12,7 @@ using Moq.Async;
 
 namespace Moq
 {
-
-    /* Unmerged change from project 'Moq(netstandard2.0)'
-    Before:
-        internal abstract class Setup : ISetup
-    After:
-        abstract class Setup : ISetup
-    */
-
-    /* Unmerged change from project 'Moq(netstandard2.1)'
-    Before:
-        internal abstract class Setup : ISetup
-    After:
-        abstract class Setup : ISetup
-    */
-
-    /* Unmerged change from project 'Moq(net6.0)'
-    Before:
-        internal abstract class Setup : ISetup
-    After:
-        abstract class Setup : ISetup
-    */
     abstract class Setup : ISetup
-
-    /* Unmerged change from project 'Moq(netstandard2.0)'
-    Before:
-            private readonly Expectation expectation;
-            private readonly Expression originalExpression;
-            private readonly Mock mock;
-            private Flags flags;
-    After:
-            readonly Expectation expectation;
-            readonly Expression originalExpression;
-            readonly Mock mock;
-            Flags flags;
-    */
-
-    /* Unmerged change from project 'Moq(netstandard2.1)'
-    Before:
-            private readonly Expectation expectation;
-            private readonly Expression originalExpression;
-            private readonly Mock mock;
-            private Flags flags;
-    After:
-            readonly Expectation expectation;
-            readonly Expression originalExpression;
-            readonly Mock mock;
-            Flags flags;
-    */
-
-    /* Unmerged change from project 'Moq(net6.0)'
-    Before:
-            private readonly Expectation expectation;
-            private readonly Expression originalExpression;
-            private readonly Mock mock;
-            private Flags flags;
-    After:
-            readonly Expectation expectation;
-            readonly Expression originalExpression;
-            readonly Mock mock;
-            Flags flags;
-    */
     {
         readonly Expectation expectation;
         readonly Expression originalExpression;
@@ -250,27 +190,6 @@ namespace Moq
         public void VerifyAll()
         {
             this.Verify(recursive: true, setup => true);
-
-            /* Unmerged change from project 'Moq(netstandard2.0)'
-            Before:
-                    private void Verify(bool recursive, Func<ISetup, bool> predicate)
-            After:
-                    void Verify(bool recursive, Func<ISetup, bool> predicate)
-            */
-
-            /* Unmerged change from project 'Moq(netstandard2.1)'
-            Before:
-                    private void Verify(bool recursive, Func<ISetup, bool> predicate)
-            After:
-                    void Verify(bool recursive, Func<ISetup, bool> predicate)
-            */
-
-            /* Unmerged change from project 'Moq(net6.0)'
-            Before:
-                    private void Verify(bool recursive, Func<ISetup, bool> predicate)
-            After:
-                    void Verify(bool recursive, Func<ISetup, bool> predicate)
-            */
         }
 
         void Verify(bool recursive, Func<ISetup, bool> predicate)

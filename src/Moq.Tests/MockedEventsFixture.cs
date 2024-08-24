@@ -870,13 +870,6 @@ namespace Moq.Tests
             public void OnVirtualEvent() => VirtualEvent?.Invoke(this, new EventArgs());
 
             public virtual object Value { get; set; }
-
-            /* Unmerged change from project 'Moq.Tests(net6.0)'
-            Before:
-                    private void OnRaised(object sender, EventArgs e)
-            After:
-                    void OnRaised(object sender, EventArgs e)
-            */
         }
 
         void OnRaised(object sender, EventArgs e)
@@ -947,13 +940,6 @@ namespace Moq.Tests
         }
 
         public class FordawrdEventDoProtectedImplementation : INotifyPropertyChanged
-
-        /* Unmerged change from project 'Moq.Tests(net6.0)'
-        Before:
-                    private PropertyChangedEventHandler eventHandler;
-        After:
-                    PropertyChangedEventHandler eventHandler;
-        */
         {
             PropertyChangedEventHandler eventHandler;
 

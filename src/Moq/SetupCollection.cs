@@ -7,55 +7,7 @@ using System.Collections.Generic;
 
 namespace Moq
 {
-
-    /* Unmerged change from project 'Moq(netstandard2.0)'
-    Before:
-        internal sealed class SetupCollection : ISetupList
-    After:
-        sealed class SetupCollection : ISetupList
-    */
-
-    /* Unmerged change from project 'Moq(netstandard2.1)'
-    Before:
-        internal sealed class SetupCollection : ISetupList
-    After:
-        sealed class SetupCollection : ISetupList
-    */
-
-    /* Unmerged change from project 'Moq(net6.0)'
-    Before:
-        internal sealed class SetupCollection : ISetupList
-    After:
-        sealed class SetupCollection : ISetupList
-    */
     sealed class SetupCollection : ISetupList
-
-    /* Unmerged change from project 'Moq(netstandard2.0)'
-    Before:
-            private List<Setup> setups;
-            private HashSet<Expectation> activeSetups;
-    After:
-            List<Setup> setups;
-            HashSet<Expectation> activeSetups;
-    */
-
-    /* Unmerged change from project 'Moq(netstandard2.1)'
-    Before:
-            private List<Setup> setups;
-            private HashSet<Expectation> activeSetups;
-    After:
-            List<Setup> setups;
-            HashSet<Expectation> activeSetups;
-    */
-
-    /* Unmerged change from project 'Moq(net6.0)'
-    Before:
-            private List<Setup> setups;
-            private HashSet<Expectation> activeSetups;
-    After:
-            List<Setup> setups;
-            HashSet<Expectation> activeSetups;
-    */
     {
         List<Setup> setups;
         HashSet<Expectation> activeSetups;
@@ -96,27 +48,6 @@ namespace Moq
                 if (!this.activeSetups.Add(setup.Expectation))
                 {
                     this.MarkOverriddenSetups();
-
-                    /* Unmerged change from project 'Moq(netstandard2.0)'
-                    Before:
-                            private void MarkOverriddenSetups()
-                    After:
-                            void MarkOverriddenSetups()
-                    */
-
-                    /* Unmerged change from project 'Moq(netstandard2.1)'
-                    Before:
-                            private void MarkOverriddenSetups()
-                    After:
-                            void MarkOverriddenSetups()
-                    */
-
-                    /* Unmerged change from project 'Moq(net6.0)'
-                    Before:
-                            private void MarkOverriddenSetups()
-                    After:
-                            void MarkOverriddenSetups()
-                    */
                 }
             }
         }

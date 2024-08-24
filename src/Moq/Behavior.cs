@@ -3,27 +3,6 @@
 
 namespace Moq
 {
-
-    /* Unmerged change from project 'Moq(netstandard2.0)'
-    Before:
-        internal abstract class Behavior
-    After:
-        abstract class Behavior
-    */
-
-    /* Unmerged change from project 'Moq(netstandard2.1)'
-    Before:
-        internal abstract class Behavior
-    After:
-        abstract class Behavior
-    */
-
-    /* Unmerged change from project 'Moq(net6.0)'
-    Before:
-        internal abstract class Behavior
-    After:
-        abstract class Behavior
-    */
     abstract class Behavior
     {
         protected Behavior()
