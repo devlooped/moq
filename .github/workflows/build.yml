@@ -38,7 +38,9 @@ jobs:
         run: dotnet build -m:1
 
       - name: 🧪 test
-        uses: ./.github/workflows/test
+        run: |
+          dotnet tool update -g dotnet-retest
+          dotnet retest -- --no-build
 
       - name: 📦 pack
         run: dotnet pack -m:1
