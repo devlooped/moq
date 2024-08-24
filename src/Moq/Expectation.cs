@@ -8,27 +8,6 @@ using Moq.Async;
 
 namespace Moq
 {
-
-    /* Unmerged change from project 'Moq(netstandard2.0)'
-    Before:
-        internal abstract class Expectation : IEquatable<Expectation>
-    After:
-        abstract class Expectation : IEquatable<Expectation>
-    */
-
-    /* Unmerged change from project 'Moq(netstandard2.1)'
-    Before:
-        internal abstract class Expectation : IEquatable<Expectation>
-    After:
-        abstract class Expectation : IEquatable<Expectation>
-    */
-
-    /* Unmerged change from project 'Moq(net6.0)'
-    Before:
-        internal abstract class Expectation : IEquatable<Expectation>
-    After:
-        abstract class Expectation : IEquatable<Expectation>
-    */
     /// <summary>
     ///   Represents a set (or the "shape") of invocations
     ///   against which concrete <see cref="Invocation"/>s can be matched.

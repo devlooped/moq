@@ -157,50 +157,22 @@ namespace Moq.Tests
             methMock.VerifyAll();
             dlgtMock.VerifyAll();
             Assert.Equal(methResult, dlgtResult);
-
-            /* Unmerged change from project 'Moq.Tests(net6.0)'
-            Before:
-                    private static void Use(Action<int> action, int valueToPass)
-            After:
-                    static void Use(Action<int> action, int valueToPass)
-            */
         }
 
         static void Use(Action<int> action, int valueToPass)
         {
             action(valueToPass);
-
-            /* Unmerged change from project 'Moq.Tests(net6.0)'
-            Before:
-                    private static string UseAndGetReturn(Func<int, string> func, int valueToPass)
-            After:
-                    static string UseAndGetReturn(Func<int, string> func, int valueToPass)
-            */
         }
 
         static string UseAndGetReturn(Func<int, string> func, int valueToPass)
         {
             return func(valueToPass);
-
-            /* Unmerged change from project 'Moq.Tests(net6.0)'
-            Before:
-                    private class NotifyingObject : INotifyPropertyChanged
-            After:
-                    class NotifyingObject : INotifyPropertyChanged
-            */
         }
 
         class NotifyingObject : INotifyPropertyChanged
         {
             public event PropertyChangedEventHandler PropertyChanged;
 
-
-            /* Unmerged change from project 'Moq.Tests(net6.0)'
-            Before:
-                        private int value;
-            After:
-                        int value;
-            */
             int value;
             public int Value
             {

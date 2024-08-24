@@ -398,13 +398,6 @@ namespace Moq.Tests
             mock.Object.Do(ref anyDifferentValue);
 
             Assert.Equal(2, setupInvocationCount);
-
-            /* Unmerged change from project 'Moq.Tests(net6.0)'
-            Before:
-                    private int GetToRange()
-            After:
-                    int GetToRange()
-            */
         }
 
         int GetToRange()

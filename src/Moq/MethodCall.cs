@@ -18,85 +18,7 @@ using TypeNameFormatter;
 
 namespace Moq
 {
-
-    /* Unmerged change from project 'Moq(netstandard2.0)'
-    Before:
-        internal sealed partial class MethodCall : SetupWithOutParameterSupport
-    After:
-        sealed partial class MethodCall : SetupWithOutParameterSupport
-    */
-
-    /* Unmerged change from project 'Moq(netstandard2.1)'
-    Before:
-        internal sealed partial class MethodCall : SetupWithOutParameterSupport
-    After:
-        sealed partial class MethodCall : SetupWithOutParameterSupport
-    */
-
-    /* Unmerged change from project 'Moq(net6.0)'
-    Before:
-        internal sealed partial class MethodCall : SetupWithOutParameterSupport
-    After:
-        sealed partial class MethodCall : SetupWithOutParameterSupport
-    */
     sealed partial class MethodCall : SetupWithOutParameterSupport
-
-    /* Unmerged change from project 'Moq(netstandard2.0)'
-    Before:
-            private VerifyInvocationCount verifyInvocationCount;
-            private Behavior callback;
-            private Behavior raiseEvent;
-            private Behavior returnOrThrow;
-            private Behavior afterReturnCallback;
-            private Condition condition;
-            private string failMessage;
-    After:
-            VerifyInvocationCount verifyInvocationCount;
-            Behavior callback;
-            Behavior raiseEvent;
-            Behavior returnOrThrow;
-            Behavior afterReturnCallback;
-            Condition condition;
-            string failMessage;
-    */
-
-    /* Unmerged change from project 'Moq(netstandard2.1)'
-    Before:
-            private VerifyInvocationCount verifyInvocationCount;
-            private Behavior callback;
-            private Behavior raiseEvent;
-            private Behavior returnOrThrow;
-            private Behavior afterReturnCallback;
-            private Condition condition;
-            private string failMessage;
-    After:
-            VerifyInvocationCount verifyInvocationCount;
-            Behavior callback;
-            Behavior raiseEvent;
-            Behavior returnOrThrow;
-            Behavior afterReturnCallback;
-            Condition condition;
-            string failMessage;
-    */
-
-    /* Unmerged change from project 'Moq(net6.0)'
-    Before:
-            private VerifyInvocationCount verifyInvocationCount;
-            private Behavior callback;
-            private Behavior raiseEvent;
-            private Behavior returnOrThrow;
-            private Behavior afterReturnCallback;
-            private Condition condition;
-            private string failMessage;
-    After:
-            VerifyInvocationCount verifyInvocationCount;
-            Behavior callback;
-            Behavior raiseEvent;
-            Behavior returnOrThrow;
-            Behavior afterReturnCallback;
-            Condition condition;
-            string failMessage;
-    */
     {
         VerifyInvocationCount verifyInvocationCount;
         Behavior callback;
@@ -105,28 +27,6 @@ namespace Moq
         Behavior afterReturnCallback;
         Condition condition;
         string failMessage;
-
-
-        /* Unmerged change from project 'Moq(netstandard2.0)'
-        Before:
-                private string declarationSite;
-        After:
-                string declarationSite;
-        */
-
-        /* Unmerged change from project 'Moq(netstandard2.1)'
-        Before:
-                private string declarationSite;
-        After:
-                string declarationSite;
-        */
-
-        /* Unmerged change from project 'Moq(net6.0)'
-        Before:
-                private string declarationSite;
-        After:
-                string declarationSite;
-        */
         string declarationSite;
 
         public MethodCall(Expression originalExpression, Mock mock, Condition condition, MethodExpectation expectation)
@@ -155,27 +55,6 @@ namespace Moq
                 if (innerMock != null)
                 {
                     yield return innerMock;
-
-                    /* Unmerged change from project 'Moq(netstandard2.0)'
-                    Before:
-                            private static string GetUserCodeCallSite()
-                    After:
-                            static string GetUserCodeCallSite()
-                    */
-
-                    /* Unmerged change from project 'Moq(netstandard2.1)'
-                    Before:
-                            private static string GetUserCodeCallSite()
-                    After:
-                            static string GetUserCodeCallSite()
-                    */
-
-                    /* Unmerged change from project 'Moq(net6.0)'
-                    Before:
-                            private static string GetUserCodeCallSite()
-                    After:
-                            static string GetUserCodeCallSite()
-                    */
                 }
             }
         }
@@ -496,27 +375,6 @@ namespace Moq
             }
 
             return message.ToString().Trim();
-
-            /* Unmerged change from project 'Moq(netstandard2.0)'
-            Before:
-                    private void ValidateNumberOfCallbackParameters(Delegate callback, MethodInfo callbackMethod)
-            After:
-                    void ValidateNumberOfCallbackParameters(Delegate callback, MethodInfo callbackMethod)
-            */
-
-            /* Unmerged change from project 'Moq(netstandard2.1)'
-            Before:
-                    private void ValidateNumberOfCallbackParameters(Delegate callback, MethodInfo callbackMethod)
-            After:
-                    void ValidateNumberOfCallbackParameters(Delegate callback, MethodInfo callbackMethod)
-            */
-
-            /* Unmerged change from project 'Moq(net6.0)'
-            Before:
-                    private void ValidateNumberOfCallbackParameters(Delegate callback, MethodInfo callbackMethod)
-            After:
-                    void ValidateNumberOfCallbackParameters(Delegate callback, MethodInfo callbackMethod)
-            */
         }
 
         void ValidateNumberOfCallbackParameters(Delegate callback, MethodInfo callbackMethod)
@@ -541,27 +399,6 @@ namespace Moq
                             Resources.InvalidCallbackParameterCountMismatch,
                             numberOfExpectedParameters,
                             numberOfActualParameters));
-
-                    /* Unmerged change from project 'Moq(netstandard2.0)'
-                    Before:
-                            private void ValidateCallbackReturnType(MethodInfo callbackMethod, Type expectedReturnType)
-                    After:
-                            void ValidateCallbackReturnType(MethodInfo callbackMethod, Type expectedReturnType)
-                    */
-
-                    /* Unmerged change from project 'Moq(netstandard2.1)'
-                    Before:
-                            private void ValidateCallbackReturnType(MethodInfo callbackMethod, Type expectedReturnType)
-                    After:
-                            void ValidateCallbackReturnType(MethodInfo callbackMethod, Type expectedReturnType)
-                    */
-
-                    /* Unmerged change from project 'Moq(net6.0)'
-                    Before:
-                            private void ValidateCallbackReturnType(MethodInfo callbackMethod, Type expectedReturnType)
-                    After:
-                            void ValidateCallbackReturnType(MethodInfo callbackMethod, Type expectedReturnType)
-                    */
                 }
             }
         }

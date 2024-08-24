@@ -33,27 +33,6 @@ namespace Moq
     /// </remarks>
     [EditorBrowsable(EditorBrowsableState.Advanced)]
     public abstract class LookupOrFallbackDefaultValueProvider : DefaultValueProvider
-
-    /* Unmerged change from project 'Moq(netstandard2.0)'
-    Before:
-            private Dictionary<object, Func<Type, Mock, object>> factories;
-    After:
-            Dictionary<object, Func<Type, Mock, object>> factories;
-    */
-
-    /* Unmerged change from project 'Moq(netstandard2.1)'
-    Before:
-            private Dictionary<object, Func<Type, Mock, object>> factories;
-    After:
-            Dictionary<object, Func<Type, Mock, object>> factories;
-    */
-
-    /* Unmerged change from project 'Moq(net6.0)'
-    Before:
-            private Dictionary<object, Func<Type, Mock, object>> factories;
-    After:
-            Dictionary<object, Func<Type, Mock, object>> factories;
-    */
     {
         Dictionary<object, Func<Type, Mock, object>> factories;
 
@@ -175,27 +154,6 @@ namespace Moq
             Debug.Assert(mock != null);
 
             return type.GetDefaultValue();
-
-            /* Unmerged change from project 'Moq(netstandard2.0)'
-            Before:
-                    private object CreateValueTupleOf(Type type, Mock mock)
-            After:
-                    object CreateValueTupleOf(Type type, Mock mock)
-            */
-
-            /* Unmerged change from project 'Moq(netstandard2.1)'
-            Before:
-                    private object CreateValueTupleOf(Type type, Mock mock)
-            After:
-                    object CreateValueTupleOf(Type type, Mock mock)
-            */
-
-            /* Unmerged change from project 'Moq(net6.0)'
-            Before:
-                    private object CreateValueTupleOf(Type type, Mock mock)
-            After:
-                    object CreateValueTupleOf(Type type, Mock mock)
-            */
         }
 
         object CreateValueTupleOf(Type type, Mock mock)

@@ -8,49 +8,7 @@ using System.Linq;
 
 namespace Moq.Matchers
 {
-
-    /* Unmerged change from project 'Moq(netstandard2.0)'
-    Before:
-        internal class ConstantMatcher : IMatcher
-    After:
-        class ConstantMatcher : IMatcher
-    */
-
-    /* Unmerged change from project 'Moq(netstandard2.1)'
-    Before:
-        internal class ConstantMatcher : IMatcher
-    After:
-        class ConstantMatcher : IMatcher
-    */
-
-    /* Unmerged change from project 'Moq(net6.0)'
-    Before:
-        internal class ConstantMatcher : IMatcher
-    After:
-        class ConstantMatcher : IMatcher
-    */
     class ConstantMatcher : IMatcher
-
-    /* Unmerged change from project 'Moq(netstandard2.0)'
-    Before:
-            private object constantValue;
-    After:
-            object constantValue;
-    */
-
-    /* Unmerged change from project 'Moq(netstandard2.1)'
-    Before:
-            private object constantValue;
-    After:
-            object constantValue;
-    */
-
-    /* Unmerged change from project 'Moq(net6.0)'
-    Before:
-            private object constantValue;
-    After:
-            object constantValue;
-    */
     {
         object constantValue;
 
@@ -81,27 +39,6 @@ namespace Moq.Matchers
         public void SetupEvaluatedSuccessfully(object argument, Type parameterType)
         {
             Debug.Assert(this.Matches(argument, parameterType));
-
-            /* Unmerged change from project 'Moq(netstandard2.0)'
-            Before:
-                    private bool MatchesEnumerable(IEnumerable enumerable)
-            After:
-                    bool MatchesEnumerable(IEnumerable enumerable)
-            */
-
-            /* Unmerged change from project 'Moq(netstandard2.1)'
-            Before:
-                    private bool MatchesEnumerable(IEnumerable enumerable)
-            After:
-                    bool MatchesEnumerable(IEnumerable enumerable)
-            */
-
-            /* Unmerged change from project 'Moq(net6.0)'
-            Before:
-                    private bool MatchesEnumerable(IEnumerable enumerable)
-            After:
-                    bool MatchesEnumerable(IEnumerable enumerable)
-            */
         }
 
         bool MatchesEnumerable(IEnumerable enumerable)

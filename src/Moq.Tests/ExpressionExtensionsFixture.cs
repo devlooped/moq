@@ -109,62 +109,25 @@ namespace Moq.Tests
             var actual = expression.ToPropertyInfo();
 
             Assert.Same(expected, actual);
-
-            /* Unmerged change from project 'Moq.Tests(net6.0)'
-            Before:
-                    private LambdaExpression ToExpression<T>(Expression<Func<T>> expression)
-            After:
-                    LambdaExpression ToExpression<T>(Expression<Func<T>> expression)
-            */
         }
 
         LambdaExpression ToExpression<T>(Expression<Func<T>> expression)
         {
             return expression;
-
-            /* Unmerged change from project 'Moq.Tests(net6.0)'
-            Before:
-                    private LambdaExpression ToExpression<T>(Expression<Action<T>> expression)
-            After:
-                    LambdaExpression ToExpression<T>(Expression<Action<T>> expression)
-            */
         }
 
         LambdaExpression ToExpression<T>(Expression<Action<T>> expression)
         {
             return expression;
-
-            /* Unmerged change from project 'Moq.Tests(net6.0)'
-            Before:
-                    private LambdaExpression ToExpression<T, TResult>(Expression<Func<T, TResult>> expression)
-            After:
-                    LambdaExpression ToExpression<T, TResult>(Expression<Func<T, TResult>> expression)
-            */
         }
 
         LambdaExpression ToExpression<T, TResult>(Expression<Func<T, TResult>> expression)
         {
             return expression;
-
-            /* Unmerged change from project 'Moq.Tests(net6.0)'
-            Before:
-                    private void Do<T>(T value) { }
-            After:
-                    void Do<T>(T value) { }
-            */
         }
 
         void Do<T>(T value) { }
 
-
-        /* Unmerged change from project 'Moq.Tests(net6.0)'
-        Before:
-                private static void DoStatic(int value) { }
-                private static void DoStaticGeneric<T>(T value) { }
-        After:
-                static void DoStatic(int value) { }
-                static void DoStaticGeneric<T>(T value) { }
-        */
         static void DoStatic(int value) { }
         static void DoStaticGeneric<T>(T value) { }
 

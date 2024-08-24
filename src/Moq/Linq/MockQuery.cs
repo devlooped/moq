@@ -10,52 +10,10 @@ using System.Linq.Expressions;
 
 namespace Moq.Linq
 {
-
-    /* Unmerged change from project 'Moq(netstandard2.0)'
-    Before:
-        internal class MockQueryable<T> : IQueryable<T>, IQueryProvider
-    After:
-        class MockQueryable<T> : IQueryable<T>, IQueryProvider
-    */
-
-    /* Unmerged change from project 'Moq(netstandard2.1)'
-    Before:
-        internal class MockQueryable<T> : IQueryable<T>, IQueryProvider
-    After:
-        class MockQueryable<T> : IQueryable<T>, IQueryProvider
-    */
-
-    /* Unmerged change from project 'Moq(net6.0)'
-    Before:
-        internal class MockQueryable<T> : IQueryable<T>, IQueryProvider
-    After:
-        class MockQueryable<T> : IQueryable<T>, IQueryProvider
-    */
     /// <summary>
     /// A default implementation of IQueryable for use with QueryProvider
     /// </summary>
     class MockQueryable<T> : IQueryable<T>, IQueryProvider
-
-    /* Unmerged change from project 'Moq(netstandard2.0)'
-    Before:
-            private readonly Expression expression;
-    After:
-            readonly Expression expression;
-    */
-
-    /* Unmerged change from project 'Moq(netstandard2.1)'
-    Before:
-            private readonly Expression expression;
-    After:
-            readonly Expression expression;
-    */
-
-    /* Unmerged change from project 'Moq(net6.0)'
-    Before:
-            private readonly Expression expression;
-    After:
-            readonly Expression expression;
-    */
     {
         readonly Expression expression;
 

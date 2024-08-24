@@ -10,17 +10,6 @@ using Xunit;
 namespace Moq.Tests
 {
     public class ReturnsValidationFixture
-
-    /* Unmerged change from project 'Moq.Tests(net6.0)'
-    Before:
-            private Mock<IType> mock;
-            private ISetup<IType, IType> setup;
-            private ISetup<IType, IType> setupNoArgs;
-    After:
-            Mock<IType> mock;
-            ISetup<IType, IType> setup;
-            ISetup<IType, IType> setupNoArgs;
-    */
     {
         Mock<IType> mock;
         ISetup<IType, IType> setup;

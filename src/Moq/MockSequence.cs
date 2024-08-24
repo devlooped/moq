@@ -30,27 +30,6 @@ namespace Moq
         /// </summary>
         public bool Cyclic { get; set; }
 
-
-        /* Unmerged change from project 'Moq(netstandard2.0)'
-        Before:
-                private void NextStep()
-        After:
-                void NextStep()
-        */
-
-        /* Unmerged change from project 'Moq(netstandard2.1)'
-        Before:
-                private void NextStep()
-        After:
-                void NextStep()
-        */
-
-        /* Unmerged change from project 'Moq(net6.0)'
-        Before:
-                private void NextStep()
-        After:
-                void NextStep()
-        */
         void NextStep()
         {
             sequenceStep++;

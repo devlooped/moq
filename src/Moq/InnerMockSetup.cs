@@ -9,49 +9,7 @@ using Moq.Async;
 
 namespace Moq
 {
-
-    /* Unmerged change from project 'Moq(netstandard2.0)'
-    Before:
-        internal sealed class InnerMockSetup : SetupWithOutParameterSupport
-    After:
-        sealed class InnerMockSetup : SetupWithOutParameterSupport
-    */
-
-    /* Unmerged change from project 'Moq(netstandard2.1)'
-    Before:
-        internal sealed class InnerMockSetup : SetupWithOutParameterSupport
-    After:
-        sealed class InnerMockSetup : SetupWithOutParameterSupport
-    */
-
-    /* Unmerged change from project 'Moq(net6.0)'
-    Before:
-        internal sealed class InnerMockSetup : SetupWithOutParameterSupport
-    After:
-        sealed class InnerMockSetup : SetupWithOutParameterSupport
-    */
     sealed class InnerMockSetup : SetupWithOutParameterSupport
-
-    /* Unmerged change from project 'Moq(netstandard2.0)'
-    Before:
-            private readonly object returnValue;
-    After:
-            readonly object returnValue;
-    */
-
-    /* Unmerged change from project 'Moq(netstandard2.1)'
-    Before:
-            private readonly object returnValue;
-    After:
-            readonly object returnValue;
-    */
-
-    /* Unmerged change from project 'Moq(net6.0)'
-    Before:
-            private readonly object returnValue;
-    After:
-            readonly object returnValue;
-    */
     {
         readonly object returnValue;
 

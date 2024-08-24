@@ -9,27 +9,6 @@ using System.Linq.Expressions;
 
 namespace Moq.Async
 {
-
-    /* Unmerged change from project 'Moq(netstandard2.0)'
-    Before:
-        internal abstract class AwaitableFactory<TAwaitable, TResult> : IAwaitableFactory
-    After:
-        abstract class AwaitableFactory<TAwaitable, TResult> : IAwaitableFactory
-    */
-
-    /* Unmerged change from project 'Moq(netstandard2.1)'
-    Before:
-        internal abstract class AwaitableFactory<TAwaitable, TResult> : IAwaitableFactory
-    After:
-        abstract class AwaitableFactory<TAwaitable, TResult> : IAwaitableFactory
-    */
-
-    /* Unmerged change from project 'Moq(net6.0)'
-    Before:
-        internal abstract class AwaitableFactory<TAwaitable, TResult> : IAwaitableFactory
-    After:
-        abstract class AwaitableFactory<TAwaitable, TResult> : IAwaitableFactory
-    */
     /// <summary>
     ///   Abstract base class that facilitates type-safe implementation of <see cref="IAwaitableFactory"/>
     ///   for awaitables that produce a result when awaited.

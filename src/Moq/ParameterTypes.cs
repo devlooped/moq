@@ -8,52 +8,10 @@ using System.Reflection;
 
 namespace Moq
 {
-
-    /* Unmerged change from project 'Moq(netstandard2.0)'
-    Before:
-        internal readonly struct ParameterTypes : IReadOnlyList<Type>
-    After:
-        readonly struct ParameterTypes : IReadOnlyList<Type>
-    */
-
-    /* Unmerged change from project 'Moq(netstandard2.1)'
-    Before:
-        internal readonly struct ParameterTypes : IReadOnlyList<Type>
-    After:
-        readonly struct ParameterTypes : IReadOnlyList<Type>
-    */
-
-    /* Unmerged change from project 'Moq(net6.0)'
-    Before:
-        internal readonly struct ParameterTypes : IReadOnlyList<Type>
-    After:
-        readonly struct ParameterTypes : IReadOnlyList<Type>
-    */
     /// <summary>
     ///   Allocation-free adapter type for treating a `ParameterInfo[]` array like a `Type[]` array.
     /// </summary>
     readonly struct ParameterTypes : IReadOnlyList<Type>
-
-    /* Unmerged change from project 'Moq(netstandard2.0)'
-    Before:
-            private readonly ParameterInfo[] parameters;
-    After:
-            readonly ParameterInfo[] parameters;
-    */
-
-    /* Unmerged change from project 'Moq(netstandard2.1)'
-    Before:
-            private readonly ParameterInfo[] parameters;
-    After:
-            readonly ParameterInfo[] parameters;
-    */
-
-    /* Unmerged change from project 'Moq(net6.0)'
-    Before:
-            private readonly ParameterInfo[] parameters;
-    After:
-            readonly ParameterInfo[] parameters;
-    */
     {
         readonly ParameterInfo[] parameters;
 

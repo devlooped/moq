@@ -187,13 +187,6 @@ namespace Moq.Tests
             Assert.NotNull(barTask);
             Assert.True(barTask.IsCompleted);
             Assert.Equal(default(IBar), barTask.Result);
-
-            /* Unmerged change from project 'Moq.Tests(net6.0)'
-            Before:
-                    private static object GetDefaultValueForProperty(string propertyName)
-            After:
-                    static object GetDefaultValueForProperty(string propertyName)
-            */
         }
 
         static object GetDefaultValueForProperty(string propertyName)

@@ -7,27 +7,6 @@ using System.Runtime.CompilerServices;
 
 namespace Moq.Expressions.Visitors
 {
-
-    /* Unmerged change from project 'Moq(netstandard2.0)'
-    Before:
-        internal sealed class EvaluateCaptures : ExpressionVisitor
-    After:
-        sealed class EvaluateCaptures : ExpressionVisitor
-    */
-
-    /* Unmerged change from project 'Moq(netstandard2.1)'
-    Before:
-        internal sealed class EvaluateCaptures : ExpressionVisitor
-    After:
-        sealed class EvaluateCaptures : ExpressionVisitor
-    */
-
-    /* Unmerged change from project 'Moq(net6.0)'
-    Before:
-        internal sealed class EvaluateCaptures : ExpressionVisitor
-    After:
-        sealed class EvaluateCaptures : ExpressionVisitor
-    */
     /// <summary>
     ///   Evaluates variables that have been closed over by a lambda function.
     /// </summary>
@@ -35,27 +14,6 @@ namespace Moq.Expressions.Visitors
     {
         public static readonly ExpressionVisitor Rewriter = new EvaluateCaptures();
 
-
-        /* Unmerged change from project 'Moq(netstandard2.0)'
-        Before:
-                private EvaluateCaptures()
-        After:
-                EvaluateCaptures()
-        */
-
-        /* Unmerged change from project 'Moq(netstandard2.1)'
-        Before:
-                private EvaluateCaptures()
-        After:
-                EvaluateCaptures()
-        */
-
-        /* Unmerged change from project 'Moq(net6.0)'
-        Before:
-                private EvaluateCaptures()
-        After:
-                EvaluateCaptures()
-        */
         EvaluateCaptures()
         {
         }

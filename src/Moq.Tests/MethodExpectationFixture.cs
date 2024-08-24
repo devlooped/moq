@@ -51,13 +51,6 @@ namespace Moq.Tests
             Assert.False(xExpr is ConstantExpression);
             Assert.NotSame(fst, snd);
             Assert.Equal(fst, snd);
-
-            /* Unmerged change from project 'Moq.Tests(net6.0)'
-            Before:
-                    private static MethodExpectation ToMethodExpectation<T>(Expression<Action<T>> expression)
-            After:
-                    static MethodExpectation ToMethodExpectation<T>(Expression<Action<T>> expression)
-            */
         }
 
         static MethodExpectation ToMethodExpectation<T>(Expression<Action<T>> expression)

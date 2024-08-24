@@ -6,27 +6,6 @@ using System.Reflection;
 
 namespace Moq
 {
-
-    /* Unmerged change from project 'Moq(netstandard2.0)'
-    Before:
-        internal abstract class MethodSetup : Setup
-    After:
-        abstract class MethodSetup : Setup
-    */
-
-    /* Unmerged change from project 'Moq(netstandard2.1)'
-    Before:
-        internal abstract class MethodSetup : Setup
-    After:
-        abstract class MethodSetup : Setup
-    */
-
-    /* Unmerged change from project 'Moq(net6.0)'
-    Before:
-        internal abstract class MethodSetup : Setup
-    After:
-        abstract class MethodSetup : Setup
-    */
     /// <summary>
     ///   Abstract base class for setups that target a single, specific method.
     /// </summary>

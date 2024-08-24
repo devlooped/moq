@@ -7,55 +7,7 @@ using System.Linq.Expressions;
 
 namespace Moq.Async
 {
-
-    /* Unmerged change from project 'Moq(netstandard2.0)'
-    Before:
-        internal sealed class AwaitExpression : Expression
-    After:
-        sealed class AwaitExpression : Expression
-    */
-
-    /* Unmerged change from project 'Moq(netstandard2.1)'
-    Before:
-        internal sealed class AwaitExpression : Expression
-    After:
-        sealed class AwaitExpression : Expression
-    */
-
-    /* Unmerged change from project 'Moq(net6.0)'
-    Before:
-        internal sealed class AwaitExpression : Expression
-    After:
-        sealed class AwaitExpression : Expression
-    */
     sealed class AwaitExpression : Expression
-
-    /* Unmerged change from project 'Moq(netstandard2.0)'
-    Before:
-            private readonly IAwaitableFactory awaitableFactory;
-            private readonly Expression operand;
-    After:
-            readonly IAwaitableFactory awaitableFactory;
-            readonly Expression operand;
-    */
-
-    /* Unmerged change from project 'Moq(netstandard2.1)'
-    Before:
-            private readonly IAwaitableFactory awaitableFactory;
-            private readonly Expression operand;
-    After:
-            readonly IAwaitableFactory awaitableFactory;
-            readonly Expression operand;
-    */
-
-    /* Unmerged change from project 'Moq(net6.0)'
-    Before:
-            private readonly IAwaitableFactory awaitableFactory;
-            private readonly Expression operand;
-    After:
-            readonly IAwaitableFactory awaitableFactory;
-            readonly Expression operand;
-    */
     {
         readonly IAwaitableFactory awaitableFactory;
         readonly Expression operand;

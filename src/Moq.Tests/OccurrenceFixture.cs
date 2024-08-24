@@ -40,13 +40,6 @@ namespace Moq.Tests
                 {
                     mock.Object.Execute("ping");
                     calls++;
-
-                    /* Unmerged change from project 'Moq.Tests(net6.0)'
-                    Before:
-                                    Assert.True(false, "should fail on two calls");
-                    After:
-                                    Assert.Fail("should fail on two calls");
-                    */
                 }
 
                 Assert.Fail("should fail on two calls");

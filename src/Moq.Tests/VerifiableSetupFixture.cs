@@ -31,13 +31,6 @@ namespace Moq.Tests
         public void Verifiable_Times_AtMost_N_will_fail_fast_when_setup_invoked_too_often()
         {
             VerifyFailsFastWhenUpperBoundExceeded(Times.AtMost(2));
-
-            /* Unmerged change from project 'Moq.Tests(net6.0)'
-            Before:
-                    private void VerifyFailsFastWhenUpperBoundExceeded(Times times)
-            After:
-                    void VerifyFailsFastWhenUpperBoundExceeded(Times times)
-            */
         }
 
         void VerifyFailsFastWhenUpperBoundExceeded(Times times)

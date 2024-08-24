@@ -8,49 +8,7 @@ using System.Reflection;
 
 namespace Moq
 {
-
-    /* Unmerged change from project 'Moq(netstandard2.0)'
-    Before:
-        internal sealed class StubbedPropertySetup : Setup
-    After:
-        sealed class StubbedPropertySetup : Setup
-    */
-
-    /* Unmerged change from project 'Moq(netstandard2.1)'
-    Before:
-        internal sealed class StubbedPropertySetup : Setup
-    After:
-        sealed class StubbedPropertySetup : Setup
-    */
-
-    /* Unmerged change from project 'Moq(net6.0)'
-    Before:
-        internal sealed class StubbedPropertySetup : Setup
-    After:
-        sealed class StubbedPropertySetup : Setup
-    */
     sealed class StubbedPropertySetup : Setup
-
-    /* Unmerged change from project 'Moq(netstandard2.0)'
-    Before:
-            private object value;
-    After:
-            object value;
-    */
-
-    /* Unmerged change from project 'Moq(netstandard2.1)'
-    Before:
-            private object value;
-    After:
-            object value;
-    */
-
-    /* Unmerged change from project 'Moq(net6.0)'
-    Before:
-            private object value;
-    After:
-            object value;
-    */
     {
         object value;
 
@@ -106,64 +64,10 @@ namespace Moq
         }
 
         protected override void VerifySelf()
-
-        /* Unmerged change from project 'Moq(netstandard2.0)'
-        Before:
-                private sealed class PropertyAccessorExpectation : Expectation
-        After:
-                sealed class PropertyAccessorExpectation : Expectation
-        */
-
-        /* Unmerged change from project 'Moq(netstandard2.1)'
-        Before:
-                private sealed class PropertyAccessorExpectation : Expectation
-        After:
-                sealed class PropertyAccessorExpectation : Expectation
-        */
-
-        /* Unmerged change from project 'Moq(net6.0)'
-        Before:
-                private sealed class PropertyAccessorExpectation : Expectation
-        After:
-                sealed class PropertyAccessorExpectation : Expectation
-        */
         {
         }
 
         sealed class PropertyAccessorExpectation : Expectation
-
-        /* Unmerged change from project 'Moq(netstandard2.0)'
-        Before:
-                    private readonly LambdaExpression expression;
-                    private readonly MethodInfo getter;
-                    private readonly MethodInfo setter;
-        After:
-                    readonly LambdaExpression expression;
-                    readonly MethodInfo getter;
-                    readonly MethodInfo setter;
-        */
-
-        /* Unmerged change from project 'Moq(netstandard2.1)'
-        Before:
-                    private readonly LambdaExpression expression;
-                    private readonly MethodInfo getter;
-                    private readonly MethodInfo setter;
-        After:
-                    readonly LambdaExpression expression;
-                    readonly MethodInfo getter;
-                    readonly MethodInfo setter;
-        */
-
-        /* Unmerged change from project 'Moq(net6.0)'
-        Before:
-                    private readonly LambdaExpression expression;
-                    private readonly MethodInfo getter;
-                    private readonly MethodInfo setter;
-        After:
-                    readonly LambdaExpression expression;
-                    readonly MethodInfo getter;
-                    readonly MethodInfo setter;
-        */
         {
             readonly LambdaExpression expression;
             readonly MethodInfo getter;

@@ -212,52 +212,10 @@ namespace Moq
             }
 
             return new MockException(MockExceptionReasons.UnverifiedInvocations, message.TrimEnd().ToString());
-
-            /* Unmerged change from project 'Moq(netstandard2.0)'
-            Before:
-                    private readonly MockExceptionReasons reasons;
-            After:
-                    readonly MockExceptionReasons reasons;
-            */
-
-            /* Unmerged change from project 'Moq(netstandard2.1)'
-            Before:
-                    private readonly MockExceptionReasons reasons;
-            After:
-                    readonly MockExceptionReasons reasons;
-            */
-
-            /* Unmerged change from project 'Moq(net6.0)'
-            Before:
-                    private readonly MockExceptionReasons reasons;
-            After:
-                    readonly MockExceptionReasons reasons;
-            */
         }
 
         readonly MockExceptionReasons reasons;
 
-
-        /* Unmerged change from project 'Moq(netstandard2.0)'
-        Before:
-                private MockException(MockExceptionReasons reasons, string message)
-        After:
-                MockException(MockExceptionReasons reasons, string message)
-        */
-
-        /* Unmerged change from project 'Moq(netstandard2.1)'
-        Before:
-                private MockException(MockExceptionReasons reasons, string message)
-        After:
-                MockException(MockExceptionReasons reasons, string message)
-        */
-
-        /* Unmerged change from project 'Moq(net6.0)'
-        Before:
-                private MockException(MockExceptionReasons reasons, string message)
-        After:
-                MockException(MockExceptionReasons reasons, string message)
-        */
         MockException(MockExceptionReasons reasons, string message)
             : base(message)
         {

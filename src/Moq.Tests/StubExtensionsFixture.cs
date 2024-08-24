@@ -283,13 +283,6 @@ namespace Moq.Tests
             mock.SetupProperty(m => m.Property);
             mock.Object.Property = "value";
             Assert.Equal("value", mock.Object.Property);
-
-            /* Unmerged change from project 'Moq.Tests(net6.0)'
-            Before:
-                    private object GetValue() { return new object(); }
-            After:
-                    object GetValue() { return new object(); }
-            */
         }
 
         object GetValue() { return new object(); }

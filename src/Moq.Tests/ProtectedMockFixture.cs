@@ -915,13 +915,6 @@ namespace Moq.Tests
         }
 
         public class ExpectedException : Exception
-
-        /* Unmerged change from project 'Moq.Tests(net6.0)'
-        Before:
-                    private static ExpectedException instance = new ExpectedException();
-        After:
-                    static ExpectedException instance = new ExpectedException();
-        */
         {
             static ExpectedException instance = new ExpectedException();
             public static ExpectedException Instance => instance;

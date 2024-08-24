@@ -47,13 +47,6 @@ namespace Moq.Tests
             var expression = Expression.TypeIs(Expression.Constant(1), typeof(string));
 
             Assert.Equal(@"1 is string", GetAppendExpressionResult(expression));
-
-            /* Unmerged change from project 'Moq.Tests(net6.0)'
-            Before:
-                    private string GetAppendExpressionResult(Expression expression)
-            After:
-                    string GetAppendExpressionResult(Expression expression)
-            */
         }
 
         string GetAppendExpressionResult(Expression expression)

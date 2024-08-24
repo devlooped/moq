@@ -12,86 +12,11 @@ using Moq.Properties;
 
 namespace Moq.Linq
 {
-
-    /* Unmerged change from project 'Moq(netstandard2.0)'
-    Before:
-        internal class MockSetupsBuilder : ExpressionVisitor
-    After:
-        class MockSetupsBuilder : ExpressionVisitor
-    */
-
-    /* Unmerged change from project 'Moq(netstandard2.1)'
-    Before:
-        internal class MockSetupsBuilder : ExpressionVisitor
-    After:
-        class MockSetupsBuilder : ExpressionVisitor
-    */
-
-    /* Unmerged change from project 'Moq(net6.0)'
-    Before:
-        internal class MockSetupsBuilder : ExpressionVisitor
-    After:
-        class MockSetupsBuilder : ExpressionVisitor
-    */
     class MockSetupsBuilder : ExpressionVisitor
-
-    /* Unmerged change from project 'Moq(netstandard2.0)'
-    Before:
-            private static readonly string[] queryableMethods = new[] { "First", "Where", "FirstOrDefault" };
-            private static readonly string[] unsupportedMethods = new[] { "All", "Any", "Last", "LastOrDefault", "Single", "SingleOrDefault" };
-    After:
-            static readonly string[] queryableMethods = new[] { "First", "Where", "FirstOrDefault" };
-            static readonly string[] unsupportedMethods = new[] { "All", "Any", "Last", "LastOrDefault", "Single", "SingleOrDefault" };
-    */
-
-    /* Unmerged change from project 'Moq(netstandard2.1)'
-    Before:
-            private static readonly string[] queryableMethods = new[] { "First", "Where", "FirstOrDefault" };
-            private static readonly string[] unsupportedMethods = new[] { "All", "Any", "Last", "LastOrDefault", "Single", "SingleOrDefault" };
-    After:
-            static readonly string[] queryableMethods = new[] { "First", "Where", "FirstOrDefault" };
-            static readonly string[] unsupportedMethods = new[] { "All", "Any", "Last", "LastOrDefault", "Single", "SingleOrDefault" };
-    */
-
-    /* Unmerged change from project 'Moq(net6.0)'
-    Before:
-            private static readonly string[] queryableMethods = new[] { "First", "Where", "FirstOrDefault" };
-            private static readonly string[] unsupportedMethods = new[] { "All", "Any", "Last", "LastOrDefault", "Single", "SingleOrDefault" };
-    After:
-            static readonly string[] queryableMethods = new[] { "First", "Where", "FirstOrDefault" };
-            static readonly string[] unsupportedMethods = new[] { "All", "Any", "Last", "LastOrDefault", "Single", "SingleOrDefault" };
-    */
     {
         static readonly string[] queryableMethods = new[] { "First", "Where", "FirstOrDefault" };
         static readonly string[] unsupportedMethods = new[] { "All", "Any", "Last", "LastOrDefault", "Single", "SingleOrDefault" };
 
-
-        /* Unmerged change from project 'Moq(netstandard2.0)'
-        Before:
-                private int stackIndex;
-                private int quoteDepth;
-        After:
-                int stackIndex;
-                int quoteDepth;
-        */
-
-        /* Unmerged change from project 'Moq(netstandard2.1)'
-        Before:
-                private int stackIndex;
-                private int quoteDepth;
-        After:
-                int stackIndex;
-                int quoteDepth;
-        */
-
-        /* Unmerged change from project 'Moq(net6.0)'
-        Before:
-                private int stackIndex;
-                private int quoteDepth;
-        After:
-                int stackIndex;
-                int quoteDepth;
-        */
         int stackIndex;
         int quoteDepth;
 
@@ -176,27 +101,6 @@ namespace Moq.Linq
             }
 
             return base.VisitUnary(node);
-
-            /* Unmerged change from project 'Moq(netstandard2.0)'
-            Before:
-                    private static Expression ConvertToSetup(Expression left, Expression right)
-            After:
-                    static Expression ConvertToSetup(Expression left, Expression right)
-            */
-
-            /* Unmerged change from project 'Moq(netstandard2.1)'
-            Before:
-                    private static Expression ConvertToSetup(Expression left, Expression right)
-            After:
-                    static Expression ConvertToSetup(Expression left, Expression right)
-            */
-
-            /* Unmerged change from project 'Moq(net6.0)'
-            Before:
-                    private static Expression ConvertToSetup(Expression left, Expression right)
-            After:
-                    static Expression ConvertToSetup(Expression left, Expression right)
-            */
         }
 
         static Expression ConvertToSetup(Expression left, Expression right)
@@ -214,27 +118,6 @@ namespace Moq.Linq
             }
 
             return null;
-
-            /* Unmerged change from project 'Moq(netstandard2.0)'
-            Before:
-                    private static Expression ConvertToSetupReturns(Expression left, Expression right)
-            After:
-                    static Expression ConvertToSetupReturns(Expression left, Expression right)
-            */
-
-            /* Unmerged change from project 'Moq(netstandard2.1)'
-            Before:
-                    private static Expression ConvertToSetupReturns(Expression left, Expression right)
-            After:
-                    static Expression ConvertToSetupReturns(Expression left, Expression right)
-            */
-
-            /* Unmerged change from project 'Moq(net6.0)'
-            Before:
-                    private static Expression ConvertToSetupReturns(Expression left, Expression right)
-            After:
-                    static Expression ConvertToSetupReturns(Expression left, Expression right)
-            */
         }
 
         /// <summary>
@@ -260,27 +143,6 @@ namespace Moq.Linq
                     v.MockObjectParameter),
                 // value:
                 Expression.Convert(right, typeof(object)));  // explicit boxing operation required for value types
-
-            /* Unmerged change from project 'Moq(netstandard2.0)'
-            Before:
-                    private sealed class ReplaceMockObjectWithParameter : ExpressionVisitor
-            After:
-                    sealed class ReplaceMockObjectWithParameter : ExpressionVisitor
-            */
-
-            /* Unmerged change from project 'Moq(netstandard2.1)'
-            Before:
-                    private sealed class ReplaceMockObjectWithParameter : ExpressionVisitor
-            After:
-                    sealed class ReplaceMockObjectWithParameter : ExpressionVisitor
-            */
-
-            /* Unmerged change from project 'Moq(net6.0)'
-            Before:
-                    private sealed class ReplaceMockObjectWithParameter : ExpressionVisitor
-            After:
-                    sealed class ReplaceMockObjectWithParameter : ExpressionVisitor
-            */
         }
 
         /// <summary>
@@ -288,33 +150,6 @@ namespace Moq.Linq
         ///   stores a reference to it, and finally replaces it with a new <see cref="ParameterExpression"/>.
         /// </summary>
         sealed class ReplaceMockObjectWithParameter : ExpressionVisitor
-
-        /* Unmerged change from project 'Moq(netstandard2.0)'
-        Before:
-                    private Expression mockObject;
-                    private ParameterExpression mockObjectParameter;
-        After:
-                    Expression mockObject;
-                    ParameterExpression mockObjectParameter;
-        */
-
-        /* Unmerged change from project 'Moq(netstandard2.1)'
-        Before:
-                    private Expression mockObject;
-                    private ParameterExpression mockObjectParameter;
-        After:
-                    Expression mockObject;
-                    ParameterExpression mockObjectParameter;
-        */
-
-        /* Unmerged change from project 'Moq(net6.0)'
-        Before:
-                    private Expression mockObject;
-                    private ParameterExpression mockObjectParameter;
-        After:
-                    Expression mockObject;
-                    ParameterExpression mockObjectParameter;
-        */
         {
             Expression mockObject;
             ParameterExpression mockObjectParameter;

@@ -6,55 +6,7 @@ using System.Diagnostics;
 
 namespace Moq.Matchers
 {
-
-    /* Unmerged change from project 'Moq(netstandard2.0)'
-    Before:
-        internal class RefMatcher : IMatcher
-    After:
-        class RefMatcher : IMatcher
-    */
-
-    /* Unmerged change from project 'Moq(netstandard2.1)'
-    Before:
-        internal class RefMatcher : IMatcher
-    After:
-        class RefMatcher : IMatcher
-    */
-
-    /* Unmerged change from project 'Moq(net6.0)'
-    Before:
-        internal class RefMatcher : IMatcher
-    After:
-        class RefMatcher : IMatcher
-    */
     class RefMatcher : IMatcher
-
-    /* Unmerged change from project 'Moq(netstandard2.0)'
-    Before:
-            private readonly object reference;
-            private readonly bool referenceIsValueType;
-    After:
-            readonly object reference;
-            readonly bool referenceIsValueType;
-    */
-
-    /* Unmerged change from project 'Moq(netstandard2.1)'
-    Before:
-            private readonly object reference;
-            private readonly bool referenceIsValueType;
-    After:
-            readonly object reference;
-            readonly bool referenceIsValueType;
-    */
-
-    /* Unmerged change from project 'Moq(net6.0)'
-    Before:
-            private readonly object reference;
-            private readonly bool referenceIsValueType;
-    After:
-            readonly object reference;
-            readonly bool referenceIsValueType;
-    */
     {
         readonly object reference;
         readonly bool referenceIsValueType;

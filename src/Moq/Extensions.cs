@@ -13,27 +13,6 @@ using System.Text;
 
 namespace Moq
 {
-
-    /* Unmerged change from project 'Moq(netstandard2.0)'
-    Before:
-        internal static class Extensions
-    After:
-        static class Extensions
-    */
-
-    /* Unmerged change from project 'Moq(netstandard2.1)'
-    Before:
-        internal static class Extensions
-    After:
-        static class Extensions
-    */
-
-    /* Unmerged change from project 'Moq(net6.0)'
-    Before:
-        internal static class Extensions
-    After:
-        static class Extensions
-    */
     static class Extensions
     {
         public static bool CanCreateInstance(this Type type)
@@ -392,27 +371,6 @@ namespace Moq
             // Neither the literal backing field of the delegate was compatible
             // nor the delegate invoke signature.
             return false;
-
-            /* Unmerged change from project 'Moq(netstandard2.0)'
-            Before:
-                    private static MethodInfo GetInvokeMethodFromUntypedDelegateCallback(Delegate callback)
-            After:
-                    static MethodInfo GetInvokeMethodFromUntypedDelegateCallback(Delegate callback)
-            */
-
-            /* Unmerged change from project 'Moq(netstandard2.1)'
-            Before:
-                    private static MethodInfo GetInvokeMethodFromUntypedDelegateCallback(Delegate callback)
-            After:
-                    static MethodInfo GetInvokeMethodFromUntypedDelegateCallback(Delegate callback)
-            */
-
-            /* Unmerged change from project 'Moq(net6.0)'
-            Before:
-                    private static MethodInfo GetInvokeMethodFromUntypedDelegateCallback(Delegate callback)
-            After:
-                    static MethodInfo GetInvokeMethodFromUntypedDelegateCallback(Delegate callback)
-            */
         }
 
         static MethodInfo GetInvokeMethodFromUntypedDelegateCallback(Delegate callback)

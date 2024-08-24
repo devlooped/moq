@@ -11,27 +11,6 @@ namespace Moq
     /// </summary>
     /// <typeparam name="T"></typeparam>
     public class CaptureMatch<T> : Match<T>
-
-    /* Unmerged change from project 'Moq(netstandard2.0)'
-    Before:
-            private static readonly Predicate<T> matchAllPredicate = _ => true;
-    After:
-            static readonly Predicate<T> matchAllPredicate = _ => true;
-    */
-
-    /* Unmerged change from project 'Moq(netstandard2.1)'
-    Before:
-            private static readonly Predicate<T> matchAllPredicate = _ => true;
-    After:
-            static readonly Predicate<T> matchAllPredicate = _ => true;
-    */
-
-    /* Unmerged change from project 'Moq(net6.0)'
-    Before:
-            private static readonly Predicate<T> matchAllPredicate = _ => true;
-    After:
-            static readonly Predicate<T> matchAllPredicate = _ => true;
-    */
     {
         static readonly Predicate<T> matchAllPredicate = _ => true;
 
@@ -51,27 +30,6 @@ namespace Moq
         /// <param name="predicate">A predicate used to filter captured parameters</param>
         public CaptureMatch(Action<T> captureCallback, Expression<Func<T, bool>> predicate)
             : base(BuildCondition(predicate), () => It.Is(predicate), captureCallback)
-
-        /* Unmerged change from project 'Moq(netstandard2.0)'
-        Before:
-                private static Predicate<T> BuildCondition(Expression<Func<T, bool>> predicateExpression)
-        After:
-                static Predicate<T> BuildCondition(Expression<Func<T, bool>> predicateExpression)
-        */
-
-        /* Unmerged change from project 'Moq(netstandard2.1)'
-        Before:
-                private static Predicate<T> BuildCondition(Expression<Func<T, bool>> predicateExpression)
-        After:
-                static Predicate<T> BuildCondition(Expression<Func<T, bool>> predicateExpression)
-        */
-
-        /* Unmerged change from project 'Moq(net6.0)'
-        Before:
-                private static Predicate<T> BuildCondition(Expression<Func<T, bool>> predicateExpression)
-        After:
-                static Predicate<T> BuildCondition(Expression<Func<T, bool>> predicateExpression)
-        */
         {
         }
 

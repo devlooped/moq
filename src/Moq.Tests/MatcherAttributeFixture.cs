@@ -50,13 +50,6 @@ namespace Moq.Tests
         static string OddLength()
         {
             return default(string);
-
-            /* Unmerged change from project 'Moq.Tests(net6.0)'
-            Before:
-                    private static bool OddLength(string value)
-            After:
-                    static bool OddLength(string value)
-            */
         }
 
         static bool OddLength(string value)
@@ -93,13 +86,6 @@ namespace Moq.Tests
 
             Assert.True(IsMagicStringCalled);
             Assert.NotNull(expectedException);
-
-            /* Unmerged change from project 'Moq.Tests(net6.0)'
-            Before:
-                    private static bool IsMagicStringCalled;
-            After:
-                    static bool IsMagicStringCalled;
-            */
         }
 
         static bool IsMagicStringCalled;
@@ -190,13 +176,6 @@ namespace Moq.Tests
         public bool NonStaticMatcherHook(string arg)
         {
             return arg == NonStaticMatcherHookExpectedArg;
-
-            /* Unmerged change from project 'Moq.Tests(net6.0)'
-            Before:
-                    private string NonStaticMatcherHookExpectedArg;
-            After:
-                    string NonStaticMatcherHookExpectedArg;
-            */
         }
 
         string NonStaticMatcherHookExpectedArg;

@@ -13,27 +13,6 @@ namespace Moq.Language.Flow
     // work that having a generic fluent API counterpart `SequenceMethodCall<TResult>`.
     [EditorBrowsable(EditorBrowsableState.Never)]
     sealed class SetupSequencePhrase : ISetupSequentialAction
-
-    /* Unmerged change from project 'Moq(netstandard2.0)'
-    Before:
-            private SequenceSetup setup;
-    After:
-            SequenceSetup setup;
-    */
-
-    /* Unmerged change from project 'Moq(netstandard2.1)'
-    Before:
-            private SequenceSetup setup;
-    After:
-            SequenceSetup setup;
-    */
-
-    /* Unmerged change from project 'Moq(net6.0)'
-    Before:
-            private SequenceSetup setup;
-    After:
-            SequenceSetup setup;
-    */
     {
         SequenceSetup setup;
 
@@ -69,52 +48,10 @@ namespace Moq.Language.Flow
         public override string ToString()
         {
             return setup.Expression.ToStringFixed();
-
-            /* Unmerged change from project 'Moq(netstandard2.0)'
-            Before:
-                internal sealed class SetupSequencePhrase<TResult> : ISetupSequentialResult<TResult>
-            After:
-                sealed class SetupSequencePhrase<TResult> : ISetupSequentialResult<TResult>
-            */
-
-            /* Unmerged change from project 'Moq(netstandard2.1)'
-            Before:
-                internal sealed class SetupSequencePhrase<TResult> : ISetupSequentialResult<TResult>
-            After:
-                sealed class SetupSequencePhrase<TResult> : ISetupSequentialResult<TResult>
-            */
-
-            /* Unmerged change from project 'Moq(net6.0)'
-            Before:
-                internal sealed class SetupSequencePhrase<TResult> : ISetupSequentialResult<TResult>
-            After:
-                sealed class SetupSequencePhrase<TResult> : ISetupSequentialResult<TResult>
-            */
         }
     }
 
     sealed class SetupSequencePhrase<TResult> : ISetupSequentialResult<TResult>
-
-    /* Unmerged change from project 'Moq(netstandard2.0)'
-    Before:
-            private SequenceSetup setup;
-    After:
-            SequenceSetup setup;
-    */
-
-    /* Unmerged change from project 'Moq(netstandard2.1)'
-    Before:
-            private SequenceSetup setup;
-    After:
-            SequenceSetup setup;
-    */
-
-    /* Unmerged change from project 'Moq(net6.0)'
-    Before:
-            private SequenceSetup setup;
-    After:
-            SequenceSetup setup;
-    */
     {
         SequenceSetup setup;
 

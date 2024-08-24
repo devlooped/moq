@@ -183,27 +183,6 @@ namespace Moq
             Debug.Assert(CanCast(argument));
 
             this.Success?.Invoke((T)argument);
-
-            /* Unmerged change from project 'Moq(netstandard2.0)'
-            Before:
-                    private static bool CanCast(object value)
-            After:
-                    static bool CanCast(object value)
-            */
-
-            /* Unmerged change from project 'Moq(netstandard2.1)'
-            Before:
-                    private static bool CanCast(object value)
-            After:
-                    static bool CanCast(object value)
-            */
-
-            /* Unmerged change from project 'Moq(net6.0)'
-            Before:
-                    private static bool CanCast(object value)
-            After:
-                    static bool CanCast(object value)
-            */
         }
 
         static bool CanCast(object value)
@@ -251,51 +230,9 @@ namespace Moq
 
         /// <inheritdoc/>
         public override int GetHashCode() => 0;
-
-        /* Unmerged change from project 'Moq(netstandard2.0)'
-        Before:
-            internal sealed class MatchFactory : Match
-        After:
-            sealed class MatchFactory : Match
-        */
-
-        /* Unmerged change from project 'Moq(netstandard2.1)'
-        Before:
-            internal sealed class MatchFactory : Match
-        After:
-            sealed class MatchFactory : Match
-        */
-
-        /* Unmerged change from project 'Moq(net6.0)'
-        Before:
-            internal sealed class MatchFactory : Match
-        After:
-            sealed class MatchFactory : Match
-        */
     }
 
     sealed class MatchFactory : Match
-
-    /* Unmerged change from project 'Moq(netstandard2.0)'
-    Before:
-            private readonly Func<object, Type, bool> condition;
-    After:
-            readonly Func<object, Type, bool> condition;
-    */
-
-    /* Unmerged change from project 'Moq(netstandard2.1)'
-    Before:
-            private readonly Func<object, Type, bool> condition;
-    After:
-            readonly Func<object, Type, bool> condition;
-    */
-
-    /* Unmerged change from project 'Moq(net6.0)'
-    Before:
-            private readonly Func<object, Type, bool> condition;
-    After:
-            readonly Func<object, Type, bool> condition;
-    */
     {
         readonly Func<object, Type, bool> condition;
 
@@ -317,27 +254,6 @@ namespace Moq
         internal override void SetupEvaluatedSuccessfully(object argument, Type parameterType)
         {
             Debug.Assert(this.Matches(argument, parameterType));
-
-            /* Unmerged change from project 'Moq(netstandard2.0)'
-            Before:
-                    private static bool CanCast<T>(object value)
-            After:
-                    static bool CanCast<T>(object value)
-            */
-
-            /* Unmerged change from project 'Moq(netstandard2.1)'
-            Before:
-                    private static bool CanCast<T>(object value)
-            After:
-                    static bool CanCast<T>(object value)
-            */
-
-            /* Unmerged change from project 'Moq(net6.0)'
-            Before:
-                    private static bool CanCast<T>(object value)
-            After:
-                    static bool CanCast<T>(object value)
-            */
         }
 
         static bool CanCast<T>(object value)
@@ -350,27 +266,6 @@ namespace Moq
             {
                 var t = typeof(T);
                 return !t.IsValueType || (t.IsGenericType && t.GetGenericTypeDefinition() == typeof(Nullable<>));
-
-                /* Unmerged change from project 'Moq(netstandard2.0)'
-                Before:
-                        private static readonly MethodInfo canCastMethod = typeof(MatchFactory).GetMethod("CanCast", BindingFlags.NonPublic | BindingFlags.Static | BindingFlags.DeclaredOnly);
-                After:
-                        static readonly MethodInfo canCastMethod = typeof(MatchFactory).GetMethod("CanCast", BindingFlags.NonPublic | BindingFlags.Static | BindingFlags.DeclaredOnly);
-                */
-
-                /* Unmerged change from project 'Moq(netstandard2.1)'
-                Before:
-                        private static readonly MethodInfo canCastMethod = typeof(MatchFactory).GetMethod("CanCast", BindingFlags.NonPublic | BindingFlags.Static | BindingFlags.DeclaredOnly);
-                After:
-                        static readonly MethodInfo canCastMethod = typeof(MatchFactory).GetMethod("CanCast", BindingFlags.NonPublic | BindingFlags.Static | BindingFlags.DeclaredOnly);
-                */
-
-                /* Unmerged change from project 'Moq(net6.0)'
-                Before:
-                        private static readonly MethodInfo canCastMethod = typeof(MatchFactory).GetMethod("CanCast", BindingFlags.NonPublic | BindingFlags.Static | BindingFlags.DeclaredOnly);
-                After:
-                        static readonly MethodInfo canCastMethod = typeof(MatchFactory).GetMethod("CanCast", BindingFlags.NonPublic | BindingFlags.Static | BindingFlags.DeclaredOnly);
-                */
             }
         }
 

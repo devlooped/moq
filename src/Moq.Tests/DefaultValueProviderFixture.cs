@@ -12,31 +12,11 @@ namespace Moq.Tests
     /// Tests for the <see cref="DefaultValueProvider"/> abstract base class.
     /// </summary>
     public class DefaultValueProviderFixture
-
-    /* Unmerged change from project 'Moq.Tests(net6.0)'
-    Before:
-            private static MethodInfo fooActionMethod = typeof(IFoo).GetMethod(nameof(IFoo.Action));
-            private static ParameterInfo fooActionMethodParameter = typeof(IFoo).GetMethod(nameof(IFoo.Action)).GetParameters()[0];
-            private static MethodInfo fooFuncMethod = typeof(IFoo).GetMethod(nameof(IFoo.Func));
-    After:
-            static MethodInfo fooActionMethod = typeof(IFoo).GetMethod(nameof(IFoo.Action));
-            static ParameterInfo fooActionMethodParameter = typeof(IFoo).GetMethod(nameof(IFoo.Action)).GetParameters()[0];
-            static MethodInfo fooFuncMethod = typeof(IFoo).GetMethod(nameof(IFoo.Func));
-    */
     {
         static MethodInfo fooActionMethod = typeof(IFoo).GetMethod(nameof(IFoo.Action));
         static ParameterInfo fooActionMethodParameter = typeof(IFoo).GetMethod(nameof(IFoo.Action)).GetParameters()[0];
         static MethodInfo fooFuncMethod = typeof(IFoo).GetMethod(nameof(IFoo.Func));
 
-
-        /* Unmerged change from project 'Moq.Tests(net6.0)'
-        Before:
-                private DefaultValueProvider defaultValueProvider;
-                private Mock<IFoo> fooMock;
-        After:
-                DefaultValueProvider defaultValueProvider;
-                Mock<IFoo> fooMock;
-        */
         DefaultValueProvider defaultValueProvider;
         Mock<IFoo> fooMock;
 
@@ -74,13 +54,6 @@ namespace Moq.Tests
         {
             void Action(object arg);
             object Func();
-
-            /* Unmerged change from project 'Moq.Tests(net6.0)'
-            Before:
-                    private sealed class DefaultValueProviderStub : DefaultValueProvider
-            After:
-                    sealed class DefaultValueProviderStub : DefaultValueProvider
-            */
         }
 
         sealed class DefaultValueProviderStub : DefaultValueProvider

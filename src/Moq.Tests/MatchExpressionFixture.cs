@@ -109,13 +109,6 @@ namespace Moq.Tests
             Assert.Throws<MockException>(() => mock.Verify());
             mock.Object.M(5);
             mock.Verify();
-
-            /* Unmerged change from project 'Moq.Tests(net6.0)'
-            Before:
-                    private Expression<Action<IX>> GetExpression()
-            After:
-                    Expression<Action<IX>> GetExpression()
-            */
         }
 
         Expression<Action<IX>> GetExpression()
@@ -128,13 +121,6 @@ namespace Moq.Tests
                     new MatchExpression(
                         new Match<int>(arg => arg == 5, () => It.Is<int>(arg => arg == 5)))),
                 x);
-
-            /* Unmerged change from project 'Moq.Tests(net6.0)'
-            Before:
-                    private Expression<Action<IX>> GetItIsAnyExpression()
-            After:
-                    Expression<Action<IX>> GetItIsAnyExpression()
-            */
         }
 
         Expression<Action<IX>> GetItIsAnyExpression()
@@ -146,13 +132,6 @@ namespace Moq.Tests
                     typeof(IX).GetMethod(nameof(IX.M)),
                     ItExpr.IsAny<int>()),
                 x);
-
-            /* Unmerged change from project 'Moq.Tests(net6.0)'
-            Before:
-                    private Expression<Action<IX>> GetItIsAnyMatchExpression()
-            After:
-                    Expression<Action<IX>> GetItIsAnyMatchExpression()
-            */
         }
 
         Expression<Action<IX>> GetItIsAnyMatchExpression()
@@ -171,13 +150,6 @@ namespace Moq.Tests
                     typeof(IX).GetMethod(nameof(IX.M)),
                     new MatchExpression(itIsAnyMatch)),
                 x);
-
-            /* Unmerged change from project 'Moq.Tests(net6.0)'
-            Before:
-                    private static MatchExpression FindMatchExpression(Expression expression)
-            After:
-                    static MatchExpression FindMatchExpression(Expression expression)
-            */
         }
 
         static MatchExpression FindMatchExpression(Expression expression)

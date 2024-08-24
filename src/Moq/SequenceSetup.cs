@@ -7,52 +7,10 @@ using System.Linq.Expressions;
 
 namespace Moq
 {
-
-    /* Unmerged change from project 'Moq(netstandard2.0)'
-    Before:
-        internal sealed class SequenceSetup : SetupWithOutParameterSupport
-    After:
-        sealed class SequenceSetup : SetupWithOutParameterSupport
-    */
-
-    /* Unmerged change from project 'Moq(netstandard2.1)'
-    Before:
-        internal sealed class SequenceSetup : SetupWithOutParameterSupport
-    After:
-        sealed class SequenceSetup : SetupWithOutParameterSupport
-    */
-
-    /* Unmerged change from project 'Moq(net6.0)'
-    Before:
-        internal sealed class SequenceSetup : SetupWithOutParameterSupport
-    After:
-        sealed class SequenceSetup : SetupWithOutParameterSupport
-    */
     /// <summary>
     ///   Programmable setup used by <see cref="Mock.SetupSequence(Mock, LambdaExpression)"/>.
     /// </summary>
     sealed class SequenceSetup : SetupWithOutParameterSupport
-
-    /* Unmerged change from project 'Moq(netstandard2.0)'
-    Before:
-            private ConcurrentQueue<Behavior> behaviors;
-    After:
-            ConcurrentQueue<Behavior> behaviors;
-    */
-
-    /* Unmerged change from project 'Moq(netstandard2.1)'
-    Before:
-            private ConcurrentQueue<Behavior> behaviors;
-    After:
-            ConcurrentQueue<Behavior> behaviors;
-    */
-
-    /* Unmerged change from project 'Moq(net6.0)'
-    Before:
-            private ConcurrentQueue<Behavior> behaviors;
-    After:
-            ConcurrentQueue<Behavior> behaviors;
-    */
     {
         // contains the behaviors set up with the `CallBase`, `Pass`, `Returns`, and `Throws` verbs
         ConcurrentQueue<Behavior> behaviors;

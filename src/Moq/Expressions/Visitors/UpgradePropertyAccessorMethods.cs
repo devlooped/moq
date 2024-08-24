@@ -8,27 +8,6 @@ using System.Reflection;
 
 namespace Moq.Expressions.Visitors
 {
-
-    /* Unmerged change from project 'Moq(netstandard2.0)'
-    Before:
-        internal sealed class UpgradePropertyAccessorMethods : ExpressionVisitor
-    After:
-        sealed class UpgradePropertyAccessorMethods : ExpressionVisitor
-    */
-
-    /* Unmerged change from project 'Moq(netstandard2.1)'
-    Before:
-        internal sealed class UpgradePropertyAccessorMethods : ExpressionVisitor
-    After:
-        sealed class UpgradePropertyAccessorMethods : ExpressionVisitor
-    */
-
-    /* Unmerged change from project 'Moq(net6.0)'
-    Before:
-        internal sealed class UpgradePropertyAccessorMethods : ExpressionVisitor
-    After:
-        sealed class UpgradePropertyAccessorMethods : ExpressionVisitor
-    */
     /// <summary>
     ///   Replaces <see cref="ExpressionType.Call"/> nodes for property or indexer accessor methods
     ///   with equivalent <see cref="ExpressionType.MemberAccess"/> nodes.
@@ -50,27 +29,6 @@ namespace Moq.Expressions.Visitors
     {
         public static readonly ExpressionVisitor Rewriter = new UpgradePropertyAccessorMethods();
 
-
-        /* Unmerged change from project 'Moq(netstandard2.0)'
-        Before:
-                private UpgradePropertyAccessorMethods()
-        After:
-                UpgradePropertyAccessorMethods()
-        */
-
-        /* Unmerged change from project 'Moq(netstandard2.1)'
-        Before:
-                private UpgradePropertyAccessorMethods()
-        After:
-                UpgradePropertyAccessorMethods()
-        */
-
-        /* Unmerged change from project 'Moq(net6.0)'
-        Before:
-                private UpgradePropertyAccessorMethods()
-        After:
-                UpgradePropertyAccessorMethods()
-        */
         UpgradePropertyAccessorMethods()
         {
         }

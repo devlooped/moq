@@ -6,49 +6,7 @@ using System.Diagnostics;
 
 namespace Moq.Language.Flow
 {
-
-    /* Unmerged change from project 'Moq(netstandard2.0)'
-    Before:
-        internal abstract class SetupPhrase : ICallbackResult, IVerifies, IThrowsResult
-    After:
-        abstract class SetupPhrase : ICallbackResult, IVerifies, IThrowsResult
-    */
-
-    /* Unmerged change from project 'Moq(netstandard2.1)'
-    Before:
-        internal abstract class SetupPhrase : ICallbackResult, IVerifies, IThrowsResult
-    After:
-        abstract class SetupPhrase : ICallbackResult, IVerifies, IThrowsResult
-    */
-
-    /* Unmerged change from project 'Moq(net6.0)'
-    Before:
-        internal abstract class SetupPhrase : ICallbackResult, IVerifies, IThrowsResult
-    After:
-        abstract class SetupPhrase : ICallbackResult, IVerifies, IThrowsResult
-    */
     abstract class SetupPhrase : ICallbackResult, IVerifies, IThrowsResult
-
-    /* Unmerged change from project 'Moq(netstandard2.0)'
-    Before:
-            private MethodCall setup;
-    After:
-            MethodCall setup;
-    */
-
-    /* Unmerged change from project 'Moq(netstandard2.1)'
-    Before:
-            private MethodCall setup;
-    After:
-            MethodCall setup;
-    */
-
-    /* Unmerged change from project 'Moq(net6.0)'
-    Before:
-            private MethodCall setup;
-    After:
-            MethodCall setup;
-    */
     {
         MethodCall setup;
 

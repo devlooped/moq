@@ -212,28 +212,12 @@ namespace Moq.Tests
 
             Assert.Equal((default(string), default(int)), actual);
             Assert.NotEqual((unexpectedString, unexpectedInt), actual);
-
-            /* Unmerged change from project 'Moq.Tests(net6.0)'
-            Before:
-                    private sealed class Provider : LookupOrFallbackDefaultValueProvider
-            After:
-                    sealed class Provider : LookupOrFallbackDefaultValueProvider
-            */
         }
 
         /// <summary>
         /// Subclass of <see cref="LookupOrFallbackDefaultValueProvider"/> used as a test surrogate.
         /// </summary>
         sealed class Provider : LookupOrFallbackDefaultValueProvider
-
-        /* Unmerged change from project 'Moq.Tests(net6.0)'
-        Before:
-                    private Mock<object> mock;
-                    private Func<Type, Mock, object> fallback;
-        After:
-                    Mock<object> mock;
-                    Func<Type, Mock, object> fallback;
-        */
         {
             Mock<object> mock;
             Func<Type, Mock, object> fallback;

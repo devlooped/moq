@@ -11,85 +11,7 @@ using Moq.Async;
 
 namespace Moq
 {
-
-    /* Unmerged change from project 'Moq(netstandard2.0)'
-    Before:
-        internal abstract class Invocation : IInvocation
-    After:
-        abstract class Invocation : IInvocation
-    */
-
-    /* Unmerged change from project 'Moq(netstandard2.1)'
-    Before:
-        internal abstract class Invocation : IInvocation
-    After:
-        abstract class Invocation : IInvocation
-    */
-
-    /* Unmerged change from project 'Moq(net6.0)'
-    Before:
-        internal abstract class Invocation : IInvocation
-    After:
-        abstract class Invocation : IInvocation
-    */
     abstract class Invocation : IInvocation
-
-    /* Unmerged change from project 'Moq(netstandard2.0)'
-    Before:
-            private object[] arguments;
-            private MethodInfo method;
-            private MethodInfo methodImplementation;
-            private readonly Type proxyType;
-            private object result;
-            private Setup matchingSetup;
-            private bool verified;
-    After:
-            object[] arguments;
-            MethodInfo method;
-            MethodInfo methodImplementation;
-            readonly Type proxyType;
-            object result;
-            Setup matchingSetup;
-            bool verified;
-    */
-
-    /* Unmerged change from project 'Moq(netstandard2.1)'
-    Before:
-            private object[] arguments;
-            private MethodInfo method;
-            private MethodInfo methodImplementation;
-            private readonly Type proxyType;
-            private object result;
-            private Setup matchingSetup;
-            private bool verified;
-    After:
-            object[] arguments;
-            MethodInfo method;
-            MethodInfo methodImplementation;
-            readonly Type proxyType;
-            object result;
-            Setup matchingSetup;
-            bool verified;
-    */
-
-    /* Unmerged change from project 'Moq(net6.0)'
-    Before:
-            private object[] arguments;
-            private MethodInfo method;
-            private MethodInfo methodImplementation;
-            private readonly Type proxyType;
-            private object result;
-            private Setup matchingSetup;
-            private bool verified;
-    After:
-            object[] arguments;
-            MethodInfo method;
-            MethodInfo methodImplementation;
-            readonly Type proxyType;
-            object result;
-            Setup matchingSetup;
-            bool verified;
-    */
     {
         object[] arguments;
         MethodInfo method;
@@ -244,27 +166,6 @@ namespace Moq
             }
 
             return builder.ToString();
-
-            /* Unmerged change from project 'Moq(netstandard2.0)'
-            Before:
-                    private readonly struct ExceptionResult
-            After:
-                    readonly struct ExceptionResult
-            */
-
-            /* Unmerged change from project 'Moq(netstandard2.1)'
-            Before:
-                    private readonly struct ExceptionResult
-            After:
-                    readonly struct ExceptionResult
-            */
-
-            /* Unmerged change from project 'Moq(net6.0)'
-            Before:
-                    private readonly struct ExceptionResult
-            After:
-                    readonly struct ExceptionResult
-            */
         }
 
         /// <summary>

@@ -8,13 +8,6 @@ using Xunit;
 namespace Moq.Tests
 {
     public class Demo
-
-    /* Unmerged change from project 'Moq.Tests(net6.0)'
-    Before:
-            private static string TALISKER = "Talisker";
-    After:
-            static string TALISKER = "Talisker";
-    */
     {
         static string TALISKER = "Talisker";
 
@@ -91,13 +84,6 @@ namespace Moq.Tests
 
             public Order SelectedOrder { get; private set; }
 
-
-            /* Unmerged change from project 'Moq.Tests(net6.0)'
-            Before:
-                        private void DoOrderSelection(Order selectedOrder)
-            After:
-                        void DoOrderSelection(Order selectedOrder)
-            */
             void DoOrderSelection(Order selectedOrder)
             {
                 // Do something when the view selects an order.

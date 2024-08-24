@@ -9,41 +9,14 @@ using Xunit;
 namespace Moq.Tests
 {
     public class SetupTaskResultFixture
-
-    /* Unmerged change from project 'Moq.Tests(net6.0)'
-    Before:
-            private readonly Exception Exception = new Exception("bad");
-            private readonly Exception SecondException = new Exception("very bad");
-    After:
-            readonly Exception Exception = new Exception("bad");
-            readonly Exception SecondException = new Exception("very bad");
-    */
     {
         readonly Exception Exception = new Exception("bad");
         readonly Exception SecondException = new Exception("very bad");
 
-
-        /* Unmerged change from project 'Moq.Tests(net6.0)'
-        Before:
-                private readonly IPerson Friend = Mock.Of<IPerson>(p => p.Name == "Alice");
-                private readonly string NameOfFriend = "Alice";
-                private readonly string SecondNameOfFriend = "Alicia";
-        After:
-                readonly IPerson Friend = Mock.Of<IPerson>(p => p.Name == "Alice");
-                readonly string NameOfFriend = "Alice";
-                readonly string SecondNameOfFriend = "Alicia";
-        */
         readonly IPerson Friend = Mock.Of<IPerson>(p => p.Name == "Alice");
         readonly string NameOfFriend = "Alice";
         readonly string SecondNameOfFriend = "Alicia";
 
-
-        /* Unmerged change from project 'Moq.Tests(net6.0)'
-        Before:
-                private readonly IPerson SecondFriend = Mock.Of<IPerson>(p => p.Name == "Betty");
-        After:
-                readonly IPerson SecondFriend = Mock.Of<IPerson>(p => p.Name == "Betty");
-        */
         readonly IPerson SecondFriend = Mock.Of<IPerson>(p => p.Name == "Betty");
 
         public interface IPerson

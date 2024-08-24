@@ -5,27 +5,6 @@ using System;
 
 namespace Moq.Language.Flow
 {
-
-    /* Unmerged change from project 'Moq(netstandard2.0)'
-    Before:
-        internal class VoidSetupPhrase<T> : SetupPhrase, ISetup<T> where T : class
-    After:
-        class VoidSetupPhrase<T> : SetupPhrase, ISetup<T> where T : class
-    */
-
-    /* Unmerged change from project 'Moq(netstandard2.1)'
-    Before:
-        internal class VoidSetupPhrase<T> : SetupPhrase, ISetup<T> where T : class
-    After:
-        class VoidSetupPhrase<T> : SetupPhrase, ISetup<T> where T : class
-    */
-
-    /* Unmerged change from project 'Moq(net6.0)'
-    Before:
-        internal class VoidSetupPhrase<T> : SetupPhrase, ISetup<T> where T : class
-    After:
-        class VoidSetupPhrase<T> : SetupPhrase, ISetup<T> where T : class
-    */
     class VoidSetupPhrase<T> : SetupPhrase, ISetup<T> where T : class
     {
         public VoidSetupPhrase(MethodCall setup) : base(setup)

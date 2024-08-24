@@ -13,27 +13,6 @@ namespace Moq
     /// </summary>
     [EditorBrowsable(EditorBrowsableState.Advanced)]
     public abstract class ExpressionCompiler
-
-    /* Unmerged change from project 'Moq(netstandard2.0)'
-    Before:
-            private static ExpressionCompiler instance = DefaultExpressionCompiler.Instance;
-    After:
-            static ExpressionCompiler instance = DefaultExpressionCompiler.Instance;
-    */
-
-    /* Unmerged change from project 'Moq(netstandard2.1)'
-    Before:
-            private static ExpressionCompiler instance = DefaultExpressionCompiler.Instance;
-    After:
-            static ExpressionCompiler instance = DefaultExpressionCompiler.Instance;
-    */
-
-    /* Unmerged change from project 'Moq(net6.0)'
-    Before:
-            private static ExpressionCompiler instance = DefaultExpressionCompiler.Instance;
-    After:
-            static ExpressionCompiler instance = DefaultExpressionCompiler.Instance;
-    */
     {
         static ExpressionCompiler instance = DefaultExpressionCompiler.Instance;
 

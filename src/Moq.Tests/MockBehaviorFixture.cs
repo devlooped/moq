@@ -20,12 +20,6 @@ namespace Moq.Tests
             {
                 mock.Object.Do();
 
-                /* Unmerged change from project 'Moq.Tests(net6.0)'
-                Before:
-                                Assert.True(false, "Should have thrown for unexpected call with MockBehavior.Strict");
-                After:
-                                Assert.Fail("Should have thrown for unexpected call with MockBehavior.Strict");
-                */
                 Assert.Fail("Should have thrown for unexpected call with MockBehavior.Strict");
             }
             catch (MockException mex)
