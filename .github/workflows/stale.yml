@@ -1,0 +1,60 @@
+name: 'stale'
+on:
+  schedule:
+    - cron: '42 0 * * *'
+
+  workflow_dispatch:
+    # Manual triggering through the GitHub UI, API, or CLI
+    inputs:
+      daysBeforeStale:
+        required: true
+        default: "180"
+      daysBeforeClose:
+        required: true
+        default: "30"
+      operationsPerRun:
+        required: true
+        default: "4000"
+
+permissions:
+  actions: write # For managing the operation state cache
+  issues: write
+
+jobs:
+  stale:
+    # Do not run on forks
+    if: github.repository_owner == 'devlooped' 
+    runs-on: ubuntu-latest
+    steps:
+      - name: ⌛ rate
+        shell: pwsh
+        if: github.event_name != 'workflow_dispatch'
+        run: |
+          # add random sleep since we run on fixed schedule
+          sleep (get-random -max 60)
+          # get currently authenticated user rate limit info
+          $rate = gh api rate_limit | convertfrom-json | select -expandproperty rate
+          # if we don't have at least 100 requests left, wait until reset
+          if ($rate.remaining -lt 10) {
+              $wait = ($rate.reset - (Get-Date (Get-Date).ToUniversalTime() -UFormat %s))
+              echo "Rate limit remaining is $($rate.remaining), waiting for $($wait / 1000) seconds to reset"
+              sleep $wait
+              $rate = gh api rate_limit | convertfrom-json | select -expandproperty rate
+              echo "Rate limit has reset to $($rate.remaining) requests"
+          }
+        
+      - name: ✏️ label
+        uses: actions/stale@v9
+        with:
+          ascending: true # Process the oldest issues first
+          stale-issue-label: 'stale'
+          stale-issue-message: |
+            Due to lack of recent activity, this issue has been labeled as 'stale'. 
+            It will be closed if no further activity occurs within ${{ fromJson(inputs.daysBeforeClose || 30  ) }} more days. 
+            Any new comment will remove the label.
+          close-issue-message: |
+            This issue will now be closed since it has been labeled 'stale' without activity for ${{ fromJson(inputs.daysBeforeClose || 30  ) }} days.
+          days-before-stale: ${{ fromJson(inputs.daysBeforeStale || 180) }}  
+          days-before-close: ${{ fromJson(inputs.daysBeforeClose || 30  ) }}
+          days-before-pr-close: -1 # Do not close PRs labeled as 'stale'
+          operations-per-run: ${{ fromJson(inputs.operationsPerRun || 4000 )}}
