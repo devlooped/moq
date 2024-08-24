@@ -37,7 +37,8 @@
     <PackageOutputPath Condition="'$(PackageOutputPath)' == ''">$([System.IO.Path]::GetFullPath('$(MSBuildThisFileDirectory)..\bin'))</PackageOutputPath>
 
     <!-- Use Directory.Packages.props if possible. NOTE: other MSBuild SDKs (i.e. NoTargets/Traversal) do not support central packages -->
-    <ManagePackageVersionsCentrally Condition="Exists('$(MSBuildThisFileDirectory)Directory.Packages.props') AND ('$(MSBuildProjectExtension)' == '.csproj' OR '$(MSBuildProjectExtension)' == '.vbproj')">true</ManagePackageVersionsCentrally>
+    <ManagePackageVersionsCentrally Condition="Exists('$(MSBuildThisFileDirectory)Directory.Packages.props')">true</ManagePackageVersionsCentrally>
+    <CentralPackageFloatingVersionsEnabled>true</CentralPackageFloatingVersionsEnabled>
 
     <!-- Ensure MSBuild tooling can access package artifacts always via PKG_[PackageId] -->
     <GeneratePathProperty>true</GeneratePathProperty>
@@ -45,8 +46,6 @@
 
   <PropertyGroup Label="Build">
     <Configuration Condition="'$(Configuration)' == '' and $(CI)">Release</Configuration>
-    <GenerateDocumentationFile>true</GenerateDocumentationFile>
-    <GenerateDocumentationFile Condition="$(MSBuildProjectName.Contains('Tests'))">false</GenerateDocumentationFile>
     <LangVersion>Latest</LangVersion>
 
     <!-- See https://docs.microsoft.com/en-us/dotnet/standard/assembly/reference-assemblies -->
@@ -117,6 +116,8 @@
 
   <PropertyGroup Label="Version" Condition="$(VersionLabel) != ''">
     <_VersionLabel>$(VersionLabel.Replace('refs/heads/', ''))</_VersionLabel>
+    <_VersionLabel>$(_VersionLabel.Replace('refs/tags/v', ''))</_VersionLabel>
+
     <!-- For PRs, we just need a fixed package version numbered after the PR # itself, so remove the commits # at the end -->
     <_VersionLabel Condition="$(_VersionLabel.Contains('refs/pull/'))">$(VersionLabel.TrimEnd('.0123456789'))</_VersionLabel>
     <!-- Next replace the prefix for simply 'pr', so we end up with 'pr99/merge' by default -->
@@ -127,7 +128,9 @@
     <_VersionLabel>$(_VersionLabel.Replace('/', '-'))</_VersionLabel>
 
     <!-- Set sanitized version to the actual version suffix used in build/pack -->
-    <VersionSuffix>$(_VersionLabel)</VersionSuffix>
+    <VersionSuffix Condition="!$(VersionLabel.Contains('refs/tags/'))">$(_VersionLabel)</VersionSuffix>
+    <!-- Special case for tags, the label is actually the version. Backs compat since passed-in value overrides MSBuild-set one -->
+    <Version Condition="$(VersionLabel.Contains('refs/tags/'))">$(_VersionLabel)</Version>
   </PropertyGroup>
 
   <ItemGroup Label="ThisAssembly.Project">
@@ -141,6 +144,16 @@
     <ProjectProperty Include="PublicKeyToken" />
   </ItemGroup>
 
+  <ItemGroup Label="Throw">
+    <Using Include="System.ArgumentException" Static="true" />
+    <Using Include="System.ArgumentOutOfRangeException" Static="true" />
+    <Using Include="System.ArgumentNullException" Static="true" />
+  </ItemGroup>
+
   <Import Project="Directory.props" Condition="Exists('Directory.props')"/>
   <Import Project="Directory.props.user" Condition="Exists('Directory.props.user')" />
+
+  <!-- Implemented by SDK in .targets, guaranteeing it's overwritten. Added here since we add a DependsOnTargets to it. 
+       Covers backwards compatiblity with non-SDK projects. -->
+  <Target Name="InitializeSourceControlInformation" />
 </Project>

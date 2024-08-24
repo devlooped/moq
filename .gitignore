@@ -1,9 +1,11 @@
 bin
-app
 obj
 artifacts
 pack
 TestResults
+results
+BenchmarkDotNet.Artifacts
+/app
 .vs
 .vscode
 .idea
