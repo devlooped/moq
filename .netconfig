@@ -103,6 +103,6 @@
 	skip
 [file ".github/workflows/stale.yml"]
 	url = https://github.com/devlooped/oss/blob/main/.github/workflows/stale.yml
-	sha = 695ccee03855bd584a1d7e2f6a59d05e0f919ce1
-	etag = fac9da58349366f7031314cd05c8b554a262945c6e4d6bd3897906854b68153e
+	sha = 68f4c7321b9fda30af59c4797cd557d321e97256
+	etag = a6338e345de8ab01bc2630cb5b48d9cd9b4b7349159abb6db595956fb8c0315e
 	weak
