@@ -29,6 +29,8 @@ jobs:
       - name: ⌛ rate
         shell: pwsh
         if: github.event_name != 'workflow_dispatch'
+        env:
+          GH_TOKEN: ${{ github.token }}        
         run: |
           # add random sleep since we run on fixed schedule
           sleep (get-random -max 60)
