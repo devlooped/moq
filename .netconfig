@@ -101,8 +101,8 @@
 [file "src/nuget.config"]
 	url = https://github.com/devlooped/oss/blob/main/src/nuget.config
 	skip
-[file ".github/workflows/stale.yml"]
-	url = https://github.com/devlooped/oss/blob/main/.github/workflows/stale.yml
-	sha = 68f4c7321b9fda30af59c4797cd557d321e97256
-	etag = a6338e345de8ab01bc2630cb5b48d9cd9b4b7349159abb6db595956fb8c0315e
+[file ".github/workflows/triage.yml"]
+	url = https://github.com/devlooped/oss/blob/main/.github/workflows/triage.yml
+	sha = 33000c0c4ab4eb4e0e142fa54515b811a189d55c
+	etag = 013a47739e348f06891f37c45164478cca149854e6cd5c5158e6f073f852b61a
 	weak
