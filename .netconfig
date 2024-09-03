@@ -63,8 +63,8 @@
 	weak
 [file ".github/workflows/publish.yml"]
 	url = https://github.com/devlooped/oss/blob/main/.github/workflows/publish.yml
-	sha = 0345b45183b708b5b2f3452614652a3df01dfdc9
-	etag = 5b5a35d93eaeb5f89bcb6fa423ee972f0ccd57b8921976232389f6861ffc463e
+	sha = fcfc66a8735f5338f97c7292db5f4ee83a712254
+	etag = e3269a4ec0a33deccb7e35b51178aa34831146a709af435fd10e659cd4dd967b
 	weak
 [file ".gitignore"]
 	url = https://github.com/devlooped/oss/blob/main/.gitignore
