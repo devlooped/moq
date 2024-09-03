@@ -4,48 +4,81 @@
 name: build
 on: 
   workflow_dispatch:
+    inputs:
+      configuration:
+        type: choice
+        description: Configuration
+        options: 
+        - Release
+        - Debug
   push:
     branches: [ main, dev, 'dev/*', 'feature/*', 'rel/*' ]
     paths-ignore:
       - changelog.md
-      - code-of-conduct.md
-      - security.md
-      - support.md
       - readme.md
   pull_request:
     types: [opened, synchronize, reopened]
 
 env:
   DOTNET_NOLOGO: true
+  PackOnBuild: true
+  GeneratePackageOnBuild: true
   VersionPrefix: 42.42.${{ github.run_number }}
   VersionLabel: ${{ github.ref }}
+  GH_TOKEN: ${{ secrets.GH_TOKEN }}
+  MSBUILDTERMINALLOGGER: auto
+  Configuration: ${{ github.event.inputs.configuration || 'Release' }}
 
 defaults:
   run:
     shell: bash
 
 jobs:
-  build:
-    runs-on: windows-latest
+  os-matrix:
+    runs-on: ubuntu-latest
+    outputs:
+      matrix: ${{ steps.lookup.outputs.matrix }}
     steps:
       - name: 🤘 checkout
-        uses: actions/checkout@v2
+        uses: actions/checkout@v4
+        
+      - name: 🔎 lookup
+        id: lookup
+        shell: pwsh
+        run: |
+          $path = './.github/workflows/os-matrix.json'
+          $os = if (test-path $path) { cat $path } else { '["ubuntu-latest"]' }
+          echo "matrix=$os" >> $env:GITHUB_OUTPUT
+
+  build:
+    needs: os-matrix
+    name: build-${{ matrix.os }}
+    runs-on: ${{ matrix.os }}
+    strategy:
+      matrix:
+        os: ${{ fromJSON(needs.os-matrix.outputs.matrix) }}
+    steps:
+      - name: 🤘 checkout
+        uses: actions/checkout@v4
         with: 
           submodules: recursive
           fetch-depth: 0
 
       - name: 🙏 build
-        run: dotnet build -m:1
+        run: dotnet build -m:1 -bl:build.binlog
 
       - name: 🧪 test
         run: |
           dotnet tool update -g dotnet-retest
           dotnet retest -- --no-build
 
-      - name: 📦 pack
-        run: dotnet pack -m:1
+      - name: 🐛 logs
+        uses: actions/upload-artifact@v3
+        if: runner.debug && always()
+        with:
+          name: logs
+          path: '*.binlog'
 
-      # Only push CI package to sleet feed if building on ubuntu (fastest)
       - name: 🚀 sleet
         env:
           SLEET_CONNECTION: ${{ secrets.SLEET_CONNECTION }}
@@ -55,10 +88,10 @@ jobs:
           sleet push bin --config none -f --verbose -p "SLEET_FEED_CONTAINER=nuget" -p "SLEET_FEED_CONNECTIONSTRING=${{ secrets.SLEET_CONNECTION }}" -p "SLEET_FEED_TYPE=azure" || echo "No packages found"
 
   dotnet-format:
-    runs-on: windows-latest
+    runs-on: ubuntu-latest
     steps:
       - name: 🤘 checkout
-        uses: actions/checkout@v2
+        uses: actions/checkout@v4
         with: 
           submodules: recursive
           fetch-depth: 0
