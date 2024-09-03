@@ -1,5 +1,34 @@
 # Changelog
 
+## [v4.20.71](https://github.com/devlooped/moq/tree/v4.20.71) (2024-09-03)
+
+[Full Changelog](https://github.com/devlooped/moq/compare/v4.20.70...v4.20.71)
+
+:bug: Fixed bugs:
+
+- \(To delete\) [\#1497](https://github.com/devlooped/moq/issues/1497)
+- Documentation link gives 404 [\#1495](https://github.com/devlooped/moq/issues/1495)
+- mock.Protected\(\).Verify\(\) does not work correctly [\#1493](https://github.com/devlooped/moq/issues/1493)
+- Documentation link is broken [\#1487](https://github.com/devlooped/moq/issues/1487)
+- Moq library throwing TypeIniatilizationException. [\#1459](https://github.com/devlooped/moq/issues/1459)
+
+:hammer: Other:
+
+- Documentation Unavailable Online [\#1473](https://github.com/devlooped/moq/issues/1473)
+- Supporting .NET8 [\#1462](https://github.com/devlooped/moq/issues/1462)
+- Some source code files is filled with comments like: "Unmerged change from project " [\#1451](https://github.com/devlooped/moq/issues/1451)
+- Question: would it make sense to call verify all on a strict mock when the mock gets disposed? [\#1440](https://github.com/devlooped/moq/issues/1440)
+- SponsorLink Integration Makes Moq Unuasable due to PII and GDPR Requirements [\#1433](https://github.com/devlooped/moq/issues/1433)
+- Default value ILookup\<\> in loose mode is `null` [\#1391](https://github.com/devlooped/moq/issues/1391)
+- Verifying a protected method when the exact parameter types are not statically known [\#1339](https://github.com/devlooped/moq/issues/1339)
+
+:twisted_rightwards_arrows: Merged:
+
+- Remove spurious unmerged change comment from dotnet format [\#1499](https://github.com/devlooped/moq/pull/1499) (@kzu)
+- Fix semantic error in MatchersFixture.cs test [\#1496](https://github.com/devlooped/moq/pull/1496) (@go-hoon)
+- Update License.txt to use SPDX identifier for automatic recognition [\#1471](https://github.com/devlooped/moq/pull/1471) (@georg-eckert-zeiss)
+- Additional Verify overload [\#1463](https://github.com/devlooped/moq/pull/1463) (@bkijonka)
+
 ## [v4.20.70](https://github.com/devlooped/moq/tree/v4.20.70) (2023-11-28)
 
 [Full Changelog](https://github.com/devlooped/moq/compare/v4.20.69...v4.20.70)
