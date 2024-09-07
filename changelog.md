@@ -1,21 +1,29 @@
 # Changelog
 
+## [v4.20.72](https://github.com/devlooped/moq/tree/v4.20.72) (2024-09-07)
+
+[Full Changelog](https://github.com/devlooped/moq/compare/v4.20.71...v4.20.72)
+
+:hammer: Other:
+
+- Question: Sponsorable Attribute in release v4.20.71 [\#1513](https://github.com/devlooped/moq/issues/1513)
+
+:twisted_rightwards_arrows: Merged:
+
+- Remove unused attribute [\#1515](https://github.com/devlooped/moq/pull/1515) (@kzu)
+
 ## [v4.20.71](https://github.com/devlooped/moq/tree/v4.20.71) (2024-09-03)
 
 [Full Changelog](https://github.com/devlooped/moq/compare/v4.20.70...v4.20.71)
 
 :bug: Fixed bugs:
 
-- \(To delete\) [\#1497](https://github.com/devlooped/moq/issues/1497)
 - Documentation link gives 404 [\#1495](https://github.com/devlooped/moq/issues/1495)
-- mock.Protected\(\).Verify\(\) does not work correctly [\#1493](https://github.com/devlooped/moq/issues/1493)
 - Documentation link is broken [\#1487](https://github.com/devlooped/moq/issues/1487)
-- Moq library throwing TypeIniatilizationException. [\#1459](https://github.com/devlooped/moq/issues/1459)
 
 :hammer: Other:
 
 - Documentation Unavailable Online [\#1473](https://github.com/devlooped/moq/issues/1473)
-- Supporting .NET8 [\#1462](https://github.com/devlooped/moq/issues/1462)
 - Some source code files is filled with comments like: "Unmerged change from project " [\#1451](https://github.com/devlooped/moq/issues/1451)
 - Question: would it make sense to call verify all on a strict mock when the mock gets disposed? [\#1440](https://github.com/devlooped/moq/issues/1440)
 - SponsorLink Integration Makes Moq Unuasable due to PII and GDPR Requirements [\#1433](https://github.com/devlooped/moq/issues/1433)
