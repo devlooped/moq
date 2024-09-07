@@ -14,16 +14,8 @@ using Moq;
 using Moq.Async;
 using Moq.Properties;
 
-[assembly: Sponsorable(60)]
-
 namespace Moq
 {
-    class SponsorableAttribute : Attribute
-    {
-        public SponsorableAttribute() { }
-        public SponsorableAttribute(int days) { }
-    }
-
     /// <summary>
     ///   Base class for mocks and static helper class with methods that apply to mocked objects,
     ///   such as <see cref="Get"/> to retrieve a <see cref="Mock{T}"/> from an object instance.
@@ -39,13 +31,6 @@ namespace Moq
         protected Mock()
         {
         }
-
-        /// <summary>
-        /// If you're a sponsor, you can see this API!
-        /// </summary>
-        [Sponsorable]
-        [EditorBrowsable(EditorBrowsableState.Never)]
-        public static bool IsSponsor => true;
 
         /// <summary>
         ///   Retrieves the mock object for the given object instance.
