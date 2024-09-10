@@ -33,20 +33,9 @@ Unless for very simple and straightforward changes, please open an issue first t
 
  * Unit tests whenever you add a bug fix, new feature, or when you change an existing one.
 
- * All changes relevant to Moq users should be documented in the `CHANGELOG.md`. Please describe your change or bug fix in that file (more specifically under the _Unreleased_ heading at the beginning of it). Phrase the summary in a way that it will be easily understandable and useful to other Moq users.
-
-   ```diff
-    # Unreleased
-    
-    ...
-    
-    #### Fixed
-    
-   +* <Short explanation of the bug fix> (@<your username>, #<issue or PR number>)
-   ```
-
-   Note the inclusion of your user name and a reference to the relevant PR or issue. The former is included to give you credit for your contribution. The latter allows users to trace the history of a change back to the issue where it was first reported.
-
+ * Your merged PR title will be included automatically in the changelog of the next release
+   if labeled as a bug fix, documentation update or feature.
+   Make sure it's a good short explanation of the bug/feature for that purpose.
 
 **Structuring your PR commits (example):** One good way, but not the only one, of structuring your PR might be to follow a test-first approach:
 
