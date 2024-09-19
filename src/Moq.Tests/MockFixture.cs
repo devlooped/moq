@@ -998,12 +998,21 @@ namespace Moq.Tests
             target.VerifyAll();
         }
 
+#nullable enable
         [Fact]
         public void ArgumentNullMatchProperCtor()
         {
             var target = new Mock<Foo>(null);
             Assert.Null(target.Object.Bar);
         }
+
+        [Fact]
+        public void ParamsArrayContainsNullMatchProperCtor()
+        {
+            var target = new Mock<Foo>(new Bar?[] { null });
+            Assert.Null(target.Object.Bar);
+        }
+#nullable disable
 
         [Fact]
         public void DistinguishesSameMethodsWithDifferentGenericArguments()
