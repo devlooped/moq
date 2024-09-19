@@ -139,7 +139,7 @@ namespace Moq
         ///     var mock = new Mock&lt;MyProvider&gt;(someArgument, 25);
         ///   </code>
         /// </example>
-        public Mock(params object[] args)
+        public Mock(params object?[]? args)
             : this(MockBehavior.Default, args)
         {
         }
@@ -154,7 +154,7 @@ namespace Moq
         ///   </code>
         /// </example>
         public Mock(MockBehavior behavior)
-            : this(behavior, new object[0])
+            : this(behavior, Array.Empty<object?>())
         {
         }
 
@@ -168,14 +168,11 @@ namespace Moq
         ///   The mock will try to find the best match constructor given the constructor arguments,
         ///   and invoke that to initialize the instance. This applies only to classes, not interfaces.
         /// </remarks>
-        public Mock(MockBehavior behavior, params object[] args)
+        public Mock(MockBehavior behavior, params object?[]? args)
         {
             Guard.IsMockable(typeof(T));
 
-            if (args == null)
-            {
-                args = new object[] { null };
-            }
+            args ??= new object?[] { null };
 
             this.additionalInterfaces = new List<Type>();
             this.behavior = behavior;
