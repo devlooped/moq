@@ -1,24 +1,8 @@
-# sln, csproj files (and friends) are always CRLF, even on linux
-*.sln text eol=crlf
-*.proj text eol=crlf
-*.csproj text eol=crlf
+# normalize by default
+* text=auto encoding=UTF-8
+*.sh text eol=lf
 
 # These are windows specific files which we may as well ensure are
 # always crlf on checkout
 *.bat text eol=crlf
 *.cmd text eol=crlf
-
-# Opt in known filetypes to always normalize line endings on checkin
-# and always use native endings on checkout
-*.c text
-*.config text
-*.h text
-*.cs text
-*.md text
-*.tt text
-*.txt text
-
-# Some must always be checked out as lf so enforce that for those files
-# If these are not lf then bash/cygwin on windows will not be able to
-# excute the files
-*.sh text eol=lf
