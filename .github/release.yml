@@ -8,7 +8,6 @@ changelog:
       - invalid
       - wontfix
       - need info
-      - docs
       - techdebt
     authors:
       - devlooped-bot
@@ -24,6 +23,7 @@ changelog:
     - title: 📝 Documentation updates
       labels: 
         - docs
+        - documentation
     - title: 🔨 Other
       labels: 
         - '*'

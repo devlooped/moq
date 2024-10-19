@@ -34,23 +34,28 @@
   
   <ItemGroup Condition="'$(IsPackable)' == 'true'" Label="NuGet">
     <!-- This is compatible with nugetizer and SDK pack -->
+    <!-- Only difference is we don't copy either to output directory -->
 
     <!-- Project-level icon/readme will already be part of None items -->
     <None Update="@(None -> WithMetadataValue('Filename', 'icon'))" 
           Pack="true" PackagePath="%(Filename)%(Extension)" 
+          CopyToOutputDirectory="Never"
           Condition="'$(PackageIcon)' != ''" />
 
     <None Update="@(None -> WithMetadataValue('Filename', 'readme'))" 
           Pack="true" PackagePath="%(Filename)%(Extension)" 
+          CopyToOutputDirectory="Never"
           Condition="'$(PackReadme)' != 'false' and '$(PackageReadmeFile)' != ''" />
     
     <!-- src-level will need explicit inclusion -->
     <None Include="$(MSBuildThisFileDirectory)icon.png" Link="icon.png" Visible="false" 
           Pack="true" PackagePath="%(Filename)%(Extension)"
+          CopyToOutputDirectory="Never"
           Condition="Exists('$(MSBuildThisFileDirectory)icon.png') and !Exists('$(MSBuildProjectDirectory)\icon.png')" />
 
     <None Include="$(MSBuildThisFileDirectory)readme.md" Link="readme.md"  
           Pack="true" PackagePath="%(Filename)%(Extension)"
+          CopyToOutputDirectory="Never"
           Condition="'$(PackReadme)' != 'false' and Exists('$(MSBuildThisFileDirectory)readme.md') and !Exists('$(MSBuildProjectDirectory)\readme.md')" />
   </ItemGroup>
 
@@ -101,19 +106,17 @@
     <RepositoryBranch Condition="'$(RepositoryBranch)' == '' and '$(BUDDY_EXECUTION_BRANCH)' != ''">$(BUDDY_EXECUTION_BRANCH)</RepositoryBranch>
   </PropertyGroup>  
 
-  <PropertyGroup Condition="'$(EnableRexCodeGenerator)' == 'true'">
-    <!-- VSCode/Razor compatibility -->
-    <CoreCompileDependsOn>PrepareResources;$(CoreCompileDependsOn)</CoreCompileDependsOn>
+  <PropertyGroup>
+    <!-- Default to Just Works resources generation. See https://www.cazzulino.com/resources.html -->
+    <CoreCompileDependsOn>CoreResGen;$(CoreCompileDependsOn)</CoreCompileDependsOn>
   </PropertyGroup>
-  
+
   <ItemGroup>
     <!-- Consider the project out of date if any of these files changes -->
     <UpToDateCheck Include="@(None);@(Content);@(EmbeddedResource)" />
-    <!-- We'll typically use ThisAssembly.Strings instead of the built-in resource manager codegen -->
-    <EmbeddedResource Update="@(EmbeddedResource)"  Generator="" Condition="'$(EnableRexCodeGenerator)' != 'true'" />
-    <EmbeddedResource Update="@(EmbeddedResource)" Condition="'$(EnableRexCodeGenerator)' == 'true'">
+    <!-- Opt-in to typed resource generation by setting custom tool to MSBuild:Compile -->
+    <EmbeddedResource Update="@(EmbeddedResource -> WithMetadataValue('Generator', 'MSBuild:Compile'))" Type="Resx">
       <!-- Default to Just Works resources generation. See https://www.cazzulino.com/resources.html -->
-      <Generator>MSBuild:Compile</Generator>
       <StronglyTypedFileName>$(IntermediateOutputPath)\$([MSBuild]::ValueOrDefault('%(RelativeDir)', '').Replace('\', '.').Replace('/', '.'))%(Filename).g$(DefaultLanguageSourceExtension)</StronglyTypedFileName>
       <StronglyTypedLanguage>$(Language)</StronglyTypedLanguage>
       <StronglyTypedNamespace Condition="'%(RelativeDir)' == ''">$(RootNamespace)</StronglyTypedNamespace>
