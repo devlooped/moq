@@ -1,7 +1,7 @@
 <Project Sdk="Microsoft.NET.Sdk">
 
 	<PropertyGroup>
-		<TargetFrameworks>net472;net6.0</TargetFrameworks>
+		<TargetFrameworks>net472;net6.0;net8.0</TargetFrameworks>
 		<AssemblyName>Moq.Tests</AssemblyName>
 		<DebugSymbols>True</DebugSymbols>
 		<DebugType>portable</DebugType>
@@ -15,6 +15,9 @@
 		<DefineConstants>$(DefineConstants);FEATURE_DYNAMICPROXY_SERIALIZABLE_PROXIES;FEATURE_EF;FEATURE_SYSTEM_WEB;FEATURE_SYSTEM_WINDOWS_FORMS</DefineConstants>
 	</PropertyGroup>
 	<PropertyGroup Condition=" '$(TargetFramework)' == 'net6.0' ">
+		<DefineConstants>$(DefineConstants);FEATURE_DEFAULT_INTERFACE_IMPLEMENTATIONS</DefineConstants>
+	</PropertyGroup>
+  <PropertyGroup Condition=" '$(TargetFramework)' == 'net8.0' ">
 		<DefineConstants>$(DefineConstants);FEATURE_DEFAULT_INTERFACE_IMPLEMENTATIONS</DefineConstants>
 	</PropertyGroup>
 

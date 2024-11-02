@@ -1,7 +1,7 @@
 <Project Sdk="Microsoft.NET.Sdk">
 
 	<PropertyGroup>
-		<TargetFrameworks>net462;netstandard2.0;netstandard2.1;net6.0</TargetFrameworks>
+		<TargetFrameworks>net462;netstandard2.0;netstandard2.1;net6.0;net8.0</TargetFrameworks>
 		<AssemblyName>Moq</AssemblyName>
 		<NoWarn>$(NoWarn);0419;CS8032</NoWarn>
 		<TreatWarningsAsErrors>true</TreatWarningsAsErrors>
@@ -9,7 +9,7 @@
 		<LangVersion>10.0</LangVersion>
 	</PropertyGroup>
 
-	<PropertyGroup Condition=" '$(TargetFramework)' == 'netstandard2.1' Or '$(TargetFramework)' == 'net6.0' ">
+	<PropertyGroup Condition=" '$(TargetFramework)' == 'netstandard2.1' Or '$(TargetFramework)' == 'net6.0' Or '$(TargetFramework)' == 'net8.0' ">
 		<DefineConstants>$(DefineConstants);FEATURE_DEFAULT_INTERFACE_IMPLEMENTATIONS</DefineConstants>
 	</PropertyGroup>
 
