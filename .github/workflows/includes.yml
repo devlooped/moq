@@ -11,6 +11,9 @@ on:
 jobs:
   includes:
     runs-on: ubuntu-latest
+    permissions:
+      contents: write
+      pull-requests: write
     steps:
       - name: 🤖 defaults
         uses: devlooped/actions-bot@v1
