@@ -1,0 +1,88 @@
+# Synchronizes .netconfig-configured files with dotnet-file
+name: dotnet-file-core
+on:
+  workflow_call:
+
+env:
+  DOTNET_NOLOGO: true
+
+defaults:
+  run:
+    shell: pwsh
+
+jobs:
+  sync:
+    runs-on: ubuntu-latest 
+    continue-on-error: true
+    steps:
+      - name: 🤖 defaults
+        uses: devlooped/actions-bot@v1
+        with:
+          name: ${{ secrets.BOT_NAME }}
+          email: ${{ secrets.BOT_EMAIL }}
+          gh_token: ${{ secrets.GH_TOKEN }}
+          github_token: ${{ secrets.GITHUB_TOKEN }}
+
+      - name: 🤘 checkout
+        uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+          ref: main
+          token: ${{ env.GH_TOKEN }}
+
+      - name: ⌛ rate
+        if: github.event_name != 'workflow_dispatch'
+        run: |
+          # add random sleep since we run on fixed schedule
+          sleep (get-random -max 60)
+          # get currently authenticated user rate limit info
+          $rate = gh api rate_limit | convertfrom-json | select -expandproperty rate
+          # if we don't have at least 100 requests left, wait until reset
+          if ($rate.remaining -lt 10) {
+              $wait = ($rate.reset - (Get-Date (Get-Date).ToUniversalTime() -UFormat %s))
+              echo "Rate limit remaining is $($rate.remaining), waiting for $($wait / 1000) seconds to reset"
+              sleep $wait
+              $rate = gh api rate_limit | convertfrom-json | select -expandproperty rate
+              echo "Rate limit has reset to $($rate.remaining) requests"
+          }
+
+      - name: 🔄 sync
+        run: |
+          dotnet tool update -g dotnet-gcm
+          # store credentials in plaintext for linux compat
+          git config --local credential.credentialStore plaintext
+          dotnet gcm store --protocol=https --host=github.com --username=$env:GITHUB_ACTOR --password=$env:GH_TOKEN
+          gh auth status
+
+          dotnet tool update -g dotnet-file
+          $changelog = "$([System.IO.Path]::GetTempPath())dotnet-file.md"
+          dotnet file sync -c:$changelog
+          if (test-path $changelog) {
+            echo 'CHANGES<<EOF' >> $env:GITHUB_ENV
+            cat $changelog >> $env:GITHUB_ENV
+            echo 'EOF' >> $env:GITHUB_ENV
+            cat $changelog
+          } else {
+            echo 'No changelog was generated'
+          }
+
+      - name: +Mᐁ includes
+        uses: devlooped/actions-includes@v1
+        with:
+          validate: false
+
+      - name: ✍ pull request
+        uses: peter-evans/create-pull-request@v7
+        with:
+          base: main
+          branch: dotnet-file-sync
+          delete-branch: true
+          labels: dependencies
+          author: ${{ env.BOT_AUTHOR }}
+          committer: ${{ env.BOT_AUTHOR }}
+          commit-message: ⬆️ Bump files with dotnet-file sync
+          
+            ${{ env.CHANGES }}
+          title: "⬆️ Bump files with dotnet-file sync"
+          body: ${{ env.CHANGES }}
+          token: ${{ env.GH_TOKEN }}
