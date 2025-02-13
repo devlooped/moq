@@ -2,11 +2,11 @@
 // All rights reserved. Licensed under the BSD 3-Clause License; see License.txt.
 
 using System;
+using System.Collections.Concurrent;
 using System.Diagnostics;
 using System.Reflection;
 
 #if FEATURE_DEFAULT_INTERFACE_IMPLEMENTATIONS
-using System.Collections.Concurrent;
 using System.Collections.Generic;
 using System.Linq;
 using System.Reflection.Emit;
@@ -28,11 +28,19 @@ namespace Moq
     {
         ProxyGenerationOptions generationOptions;
         ProxyGenerator generator;
+        ConcurrentDictionary<string, ProxyGenerator> classGenerators;
 
         public CastleProxyFactory()
         {
             this.generationOptions = new ProxyGenerationOptions { Hook = new IncludeObjectMethodsHook(), BaseTypeForInterfaceProxy = typeof(InterfaceProxy) };
             this.generator = new ProxyGenerator();
+            this.classGenerators = new ConcurrentDictionary<string, ProxyGenerator>();
+        }
+
+        ProxyGenerator GetClassGenerator(Type mockType)
+        {
+            var ns = mockType.Namespace ?? string.Empty;
+            return classGenerators.GetOrAdd(ns, _ => new ProxyGenerator());
         }
 
         /// <inheritdoc />
@@ -53,13 +61,13 @@ namespace Moq
             {
                 var options = new ProxyGenerationOptions();
                 options.AddDelegateTypeMixin(mockType);
-                var container = generator.CreateClassProxy(typeof(object), additionalInterfaces, options, new Interceptor(interceptor));
+                var container = GetClassGenerator(mockType).CreateClassProxy(typeof(object), additionalInterfaces, options, new Interceptor(interceptor));
                 return Delegate.CreateDelegate(mockType, container, container.GetType().GetMethod("Invoke"));
             }
 
             try
             {
-                return generator.CreateClassProxy(mockType, additionalInterfaces, this.generationOptions, arguments, new Interceptor(interceptor));
+                return GetClassGenerator(mockType).CreateClassProxy(mockType, additionalInterfaces, this.generationOptions, arguments, new Interceptor(interceptor));
             }
             catch (TypeLoadException e)
             {
