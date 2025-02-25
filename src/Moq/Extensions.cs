@@ -60,7 +60,7 @@ namespace Moq
                     var baseProperty =
                         baseSetter
                         .DeclaringType
-                        .GetMember(property.Name, MemberTypes.Property, BindingFlags.Public | BindingFlags.NonPublic | BindingFlags.Instance)
+                        !.GetMember(property.Name, MemberTypes.Property, BindingFlags.Public | BindingFlags.NonPublic | BindingFlags.Instance)
                         .Cast<PropertyInfo>()
                         .First(p => p.GetSetMethod(nonPublic: true) == baseSetter);
                     return baseProperty.CanRead(out getter, out getterProperty);
@@ -513,7 +513,7 @@ namespace Moq
                          .Where(innerMock => innerMock != null);
         }
 
-        public static Mock FindLastInnerMock(this SetupCollection setups, Func<Setup, bool> predicate)
+        public static Mock? FindLastInnerMock(this SetupCollection setups, Func<Setup, bool> predicate)
         {
             return setups.FindLast(setup => !setup.IsConditional && predicate(setup))?.InnerMocks.SingleOrDefault();
         }
