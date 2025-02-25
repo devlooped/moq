@@ -23,7 +23,7 @@ namespace Moq
     public abstract partial class Mock : IFluentInterface
     {
         internal static readonly MethodInfo GetMethod =
-            typeof(Mock).GetMethod(nameof(Get), BindingFlags.Public | BindingFlags.Static);
+            typeof(Mock).GetMethod(nameof(Get), BindingFlags.Public | BindingFlags.Static)!;
 
         /// <summary>
         ///   Initializes a new instance of the <see cref="Mock"/> class.
@@ -313,7 +313,7 @@ namespace Moq
             }
         }
 
-        internal static void Verify(Mock mock, LambdaExpression expression, Times times, string failMessage)
+        internal static void Verify(Mock mock, LambdaExpression expression, Times times, string? failMessage)
         {
             Guard.NotNull(times, nameof(times));
 
@@ -333,7 +333,7 @@ namespace Moq
             }
         }
 
-        internal static void VerifyGet(Mock mock, LambdaExpression expression, Times times, string failMessage)
+        internal static void VerifyGet(Mock mock, LambdaExpression expression, Times times, string? failMessage)
         {
             Guard.NotNull(expression, nameof(expression));
 
@@ -346,7 +346,7 @@ namespace Moq
             Mock.Verify(mock, expression, times, failMessage);
         }
 
-        internal static void VerifySet(Mock mock, LambdaExpression expression, Times times, string failMessage)
+        internal static void VerifySet(Mock mock, LambdaExpression expression, Times times, string? failMessage)
         {
             Guard.NotNull(expression, nameof(expression));
             Guard.IsAssignmentToPropertyOrIndexer(expression, nameof(expression));
@@ -354,7 +354,7 @@ namespace Moq
             Mock.Verify(mock, expression, times, failMessage);
         }
 
-        internal static void VerifyAdd(Mock mock, LambdaExpression expression, Times times, string failMessage)
+        internal static void VerifyAdd(Mock mock, LambdaExpression expression, Times times, string? failMessage)
         {
             Guard.NotNull(expression, nameof(expression));
             Guard.IsEventAdd(expression, nameof(expression));
@@ -362,7 +362,7 @@ namespace Moq
             Mock.Verify(mock, expression, times, failMessage);
         }
 
-        internal static void VerifyRemove(Mock mock, LambdaExpression expression, Times times, string failMessage)
+        internal static void VerifyRemove(Mock mock, LambdaExpression expression, Times times, string? failMessage)
         {
             Guard.NotNull(expression, nameof(expression));
             Guard.IsEventRemove(expression, nameof(expression));
@@ -379,7 +379,7 @@ namespace Moq
         {
             if (!verifiedMocks.Add(mock)) return;
 
-            var unverifiedInvocations = mock.MutableInvocations.ToArray(invocation => !invocation.IsVerified);
+            Invocation?[] unverifiedInvocations = mock.MutableInvocations.ToArray(invocation => !invocation.IsVerified);
 
             var innerMocks = mock.MutableSetups.FindAllInnerMocks();
 
@@ -410,7 +410,7 @@ namespace Moq
                 var remainingUnverifiedInvocations = unverifiedInvocations.Where(i => i != null);
                 if (remainingUnverifiedInvocations.Any())
                 {
-                    throw MockException.UnverifiedInvocations(mock, remainingUnverifiedInvocations);
+                    throw MockException.UnverifiedInvocations(mock, remainingUnverifiedInvocations!);
                 }
             }
 
@@ -493,7 +493,7 @@ namespace Moq
 
         #region Setup
 
-        internal static MethodCall Setup(Mock mock, LambdaExpression expression, Condition condition)
+        internal static MethodCall Setup(Mock mock, LambdaExpression expression, Condition? condition)
         {
             Guard.NotNull(expression, nameof(expression));
 
@@ -505,7 +505,7 @@ namespace Moq
             });
         }
 
-        internal static MethodCall SetupGet(Mock mock, LambdaExpression expression, Condition condition)
+        internal static MethodCall SetupGet(Mock mock, LambdaExpression expression, Condition? condition)
         {
             Guard.NotNull(expression, nameof(expression));
 
@@ -527,7 +527,7 @@ namespace Moq
         }
 
         internal static readonly MethodInfo SetupReturnsMethod =
-            typeof(Mock).GetMethod(nameof(SetupReturns), BindingFlags.NonPublic | BindingFlags.Static);
+            typeof(Mock).GetMethod(nameof(SetupReturns), BindingFlags.NonPublic | BindingFlags.Static)!;
 
         // This specialized setup method is used to set up a single `Mock.Of` predicate.
         // Unlike other setup methods, LINQ to Mocks can set non-interceptable properties, which is handy when initializing DTOs.
@@ -535,7 +535,7 @@ namespace Moq
         {
             Guard.NotNull(expression, nameof(expression));
 
-            Mock.SetupRecursive<MethodCall>(mock, expression, setupLast: (targetMock, oe, part) =>
+            Mock.SetupRecursive<MethodCall?>(mock, expression, setupLast: (targetMock, oe, part) =>
             {
                 var originalExpression = (LambdaExpression)oe;
 
@@ -636,7 +636,7 @@ namespace Moq
         }
 
         static TSetup SetupRecursive<TSetup>(Mock mock, LambdaExpression expression, Func<Mock, Expression, MethodExpectation, TSetup> setupLast, bool allowNonOverridableLastProperty = false)
-            where TSetup : ISetup
+            where TSetup : ISetup?
         {
             Debug.Assert(mock != null);
             Debug.Assert(expression != null);
@@ -647,7 +647,7 @@ namespace Moq
         }
 
         static TSetup SetupRecursive<TSetup>(Mock mock, LambdaExpression originalExpression, Stack<MethodExpectation> parts, Func<Mock, Expression, MethodExpectation, TSetup> setupLast)
-            where TSetup : ISetup
+            where TSetup : ISetup?
         {
             var part = parts.Pop();
             var (expr, method, arguments) = part;
@@ -658,7 +658,7 @@ namespace Moq
             }
             else
             {
-                Mock innerMock = mock.MutableSetups.FindLastInnerMock(setup => setup.Matches(part));
+                Mock? innerMock = mock.MutableSetups.FindLastInnerMock(setup => setup.Matches(part));
                 if (innerMock == null)
                 {
                     var returnValue = mock.GetDefaultValue(method, out innerMock, useAlternateProvider: DefaultValueProvider.Mock);
@@ -697,16 +697,18 @@ namespace Moq
             Mock.RaiseEvent(mock, expression, parts, arguments);
         }
 
-        internal static Task RaiseEventAsync<T>(Mock mock, Action<T> action, object[] arguments)
+        internal static Task RaiseEventAsync<T>(Mock mock, Action<T> action, object?[] arguments)
         {
             Guard.NotNull(action, nameof(action));
 
             var expression = ExpressionReconstructor.Instance.ReconstructExpression(action, mock.ConstructorArguments);
             var parts = expression.Split();
+            
+            // TODO: Will this code never return null?
             return (Task)Mock.RaiseEvent(mock, expression, parts, arguments);
         }
 
-        internal static object RaiseEvent(Mock mock, LambdaExpression expression, Stack<MethodExpectation> parts, object[] arguments)
+        internal static object? RaiseEvent(Mock mock, LambdaExpression expression, Stack<MethodExpectation> parts, object?[] arguments)
         {
             const BindingFlags bindingFlags = BindingFlags.Public | BindingFlags.NonPublic | BindingFlags.Instance | BindingFlags.DeclaredOnly;
 
@@ -719,28 +721,22 @@ namespace Moq
                 if (method.IsEventAddAccessor())
                 {
                     var implementingMethod = method.GetImplementingMethod(mock.Object.GetType());
-                    @event = implementingMethod.DeclaringType.GetEvents(bindingFlags).SingleOrDefault(e => e.GetAddMethod(true) == implementingMethod);
-                    if (@event == null)
-                    {
-                        throw new ArgumentException(
-                            string.Format(
-                                CultureInfo.CurrentCulture,
-                                Resources.SetupNotEventAdd,
-                                part.Expression));
-                    }
+                    @event = implementingMethod.DeclaringType!.GetEvents(bindingFlags)
+                                               .SingleOrDefault(e => e.GetAddMethod(true) == implementingMethod)
+                             ?? throw new ArgumentException(string.Format(CultureInfo.CurrentCulture,
+                                                                          Resources.SetupNotEventAdd,
+                                                                          part.Expression));
+
                 }
                 else if (method.IsEventRemoveAccessor())
                 {
                     var implementingMethod = method.GetImplementingMethod(mock.Object.GetType());
-                    @event = implementingMethod.DeclaringType.GetEvents(bindingFlags).SingleOrDefault(e => e.GetRemoveMethod(true) == implementingMethod);
-                    if (@event == null)
-                    {
-                        throw new ArgumentException(
-                            string.Format(
-                                CultureInfo.CurrentCulture,
-                                Resources.SetupNotEventRemove,
-                                part.Expression));
-                    }
+                    @event = implementingMethod.DeclaringType!.GetEvents(bindingFlags)
+                                               .SingleOrDefault(e => e.GetRemoveMethod(true) == implementingMethod)
+                             ?? throw new ArgumentException(string.Format(CultureInfo.CurrentCulture,
+                                                                          Resources.SetupNotEventRemove,
+                                                                          part.Expression));
+
                 }
                 else
                 {
@@ -820,7 +816,7 @@ namespace Moq
 
         #region Default Values
 
-        internal abstract Dictionary<Type, object> ConfiguredDefaultValues { get; }
+        internal abstract Dictionary<Type, object?> ConfiguredDefaultValues { get; }
 
         /// <summary>
         /// Defines the default return value for all mocked methods or properties with return type <typeparamref name= "TReturn" />.
@@ -835,13 +831,13 @@ namespace Moq
             this.ConfiguredDefaultValues[typeof(TReturn)] = value;
         }
 
-        internal object GetDefaultValue(MethodInfo method, out Mock candidateInnerMock, DefaultValueProvider useAlternateProvider = null)
+        internal object? GetDefaultValue(MethodInfo method, out Mock? candidateInnerMock, DefaultValueProvider? useAlternateProvider = null)
         {
             Debug.Assert(method != null);
             Debug.Assert(method.ReturnType != null);
             Debug.Assert(method.ReturnType != typeof(void));
 
-            if (this.ConfiguredDefaultValues.TryGetValue(method.ReturnType, out object configuredDefaultValue))
+            if (this.ConfiguredDefaultValues.TryGetValue(method.ReturnType, out object? configuredDefaultValue))
             {
                 candidateInnerMock = null;
                 return configuredDefaultValue;
