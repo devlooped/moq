@@ -101,7 +101,7 @@ namespace Moq
             return setups;
         }
 
-        public Setup FindLast(Func<Setup, bool> predicate)
+        public Setup? FindLast(Func<Setup, bool> predicate)
         {
             // Fast path (no `lock`) when there are no setups:
             if (this.setups.Count == 0)
