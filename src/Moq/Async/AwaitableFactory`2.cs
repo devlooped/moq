@@ -4,6 +4,7 @@
 using System;
 using System.Collections.Generic;
 using System.Diagnostics;
+using System.Diagnostics.CodeAnalysis;
 using System.Linq;
 using System.Linq.Expressions;
 
@@ -47,7 +48,11 @@ namespace Moq.Async
             return this.CreateFaulted(exceptions);
         }
 
+#if NULLABLE_REFERENCE_TYPES
+        public abstract bool TryGetResult(TAwaitable awaitable, [MaybeNullWhen(false)] out TResult result);
+#else
         public abstract bool TryGetResult(TAwaitable awaitable, out TResult result);
+#endif
 
         public abstract Expression CreateResultExpression(Expression awaitableExpression);
 
