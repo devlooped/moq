@@ -68,16 +68,16 @@ namespace Moq
         public readonly IReadOnlyList<Expression> Arguments;
 
         readonly IMatcher[] argumentMatchers;
-        IAwaitableFactory awaitableFactory;
-        MethodInfo methodImplementation;
-        Expression[] partiallyEvaluatedArguments;
+        IAwaitableFactory? awaitableFactory;
+        MethodInfo? methodImplementation;
+        Expression[]? partiallyEvaluatedArguments;
 #if DEBUG
-        Type proxyType;
+        Type? proxyType;
 #endif
 
         readonly bool exactGenericTypeArguments;
 
-        public MethodExpectation(LambdaExpression expression, MethodInfo method, IReadOnlyList<Expression> arguments = null, bool exactGenericTypeArguments = false, bool skipMatcherInitialization = false, bool allowNonOverridable = false)
+        public MethodExpectation(LambdaExpression expression, MethodInfo method, IReadOnlyList<Expression>? arguments = null, bool exactGenericTypeArguments = false, bool skipMatcherInitialization = false, bool allowNonOverridable = false)
         {
             Debug.Assert(expression != null);
             Debug.Assert(method != null);
