@@ -11,6 +11,8 @@
 
 	<PropertyGroup Condition=" '$(TargetFramework)' == 'netstandard2.1' Or '$(TargetFramework)' == 'net6.0' ">
 		<DefineConstants>$(DefineConstants);FEATURE_DEFAULT_INTERFACE_IMPLEMENTATIONS</DefineConstants>
+    <Nullable>enable</Nullable>
+    <WarningsNotAsErrors>nullable</WarningsNotAsErrors>
 	</PropertyGroup>
 
 	<PropertyGroup>
