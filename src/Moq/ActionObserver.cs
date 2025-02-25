@@ -178,7 +178,7 @@ namespace Moq
                                 CultureInfo.CurrentCulture,
                                 Resources.MatcherAssignmentFailedDuringExpressionReconstruction,
                                 matches.Length,
-                                $"{invocation.Method.DeclaringType.GetFormattedName()}.{invocation.Method.Name}"));
+                                $"{invocation.Method.DeclaringType!.GetFormattedName()}.{invocation.Method.Name}"));
                     }
 
                     bool CanDistribute(int msi, int asi)
