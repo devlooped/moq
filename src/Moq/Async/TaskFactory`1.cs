@@ -3,6 +3,7 @@
 
 using System;
 using System.Collections.Generic;
+using System.Diagnostics.CodeAnalysis;
 using System.Linq.Expressions;
 using System.Threading.Tasks;
 
@@ -33,10 +34,14 @@ namespace Moq.Async
         {
             return Expression.MakeMemberAccess(
                 awaitableExpression,
-                typeof(Task<TResult>).GetProperty(nameof(Task<TResult>.Result)));
+                typeof(Task<TResult>).GetProperty(nameof(Task<TResult>.Result))!);
         }
 
-        public override bool TryGetResult(Task<TResult> task, out TResult result)
+#if NULLABLE_REFERENCE_TYPES
+        public override bool TryGetResult(Task<TResult> task, [MaybeNullWhen(false)] out TResult result)
+#else
+        public override bool TryGetResult(Task<TResult> task, out TResult? result)
+#endif
         {
             if (task.Status == TaskStatus.RanToCompletion)
             {
