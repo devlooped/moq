@@ -28,7 +28,7 @@ namespace Moq
 
         static object CreateArray(Type type, Mock mock)
         {
-            var elementType = type.GetElementType();
+            var elementType = type.GetElementType()!;
             var lengths = new int[type.GetArrayRank()];
             return Array.CreateInstance(elementType, lengths);
         }
