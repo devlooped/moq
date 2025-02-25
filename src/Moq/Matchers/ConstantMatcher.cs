@@ -10,14 +10,14 @@ namespace Moq.Matchers
 {
     class ConstantMatcher : IMatcher
     {
-        object constantValue;
+        object? constantValue;
 
-        public ConstantMatcher(object constantValue)
+        public ConstantMatcher(object? constantValue)
         {
             this.constantValue = constantValue;
         }
 
-        public bool Matches(object argument, Type parameterType)
+        public bool Matches(object? argument, Type parameterType)
         {
             if (object.Equals(argument, constantValue))
             {
@@ -36,14 +36,14 @@ namespace Moq.Matchers
             return false;
         }
 
-        public void SetupEvaluatedSuccessfully(object argument, Type parameterType)
+        public void SetupEvaluatedSuccessfully(object? argument, Type parameterType)
         {
             Debug.Assert(this.Matches(argument, parameterType));
         }
 
         bool MatchesEnumerable(IEnumerable enumerable)
         {
-            var constValues = (IEnumerable)constantValue;
+            var constValues = (IEnumerable)constantValue!;
             return constValues.Cast<object>().SequenceEqual(enumerable.Cast<object>());
         }
     }
