@@ -680,6 +680,11 @@ namespace Moq
         /// </param>
         public ISetupConditionResult<T> When(Func<bool> condition)
         {
+            if (condition == null)
+            {
+                throw new ArgumentNullException(nameof(condition));
+            }
+
             return new WhenPhrase<T>(this, new Condition(condition));
         }
 

@@ -8,15 +8,15 @@ namespace Moq
     sealed class Condition
     {
         Func<bool> condition;
-        Action success;
+        Action? success;
 
-        public Condition(Func<bool> condition, Action success = null)
+        public Condition(Func<bool> condition, Action? success = null)
         {
             this.condition = condition;
             this.success = success;
         }
 
-        public bool IsTrue => this.condition?.Invoke() == true;
+        public bool IsTrue => this.condition.Invoke();
 
         public void SetupEvaluatedSuccessfully() => this.success?.Invoke();
     }
