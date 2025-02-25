@@ -126,7 +126,7 @@ namespace Moq
         ///     e.g. by <see cref="Mock{T}.SetupAllProperties"/> or by <see cref="DefaultValue.Mock"/>.
         ///   </para>
         /// </summary>
-        Expression OriginalExpression { get; }
+        Expression? OriginalExpression { get; }
 
         /// <summary>
         ///   Verifies this setup and optionally all verifiable setups of its inner mock (if present and known).
