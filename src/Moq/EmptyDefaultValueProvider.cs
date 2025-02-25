@@ -57,7 +57,7 @@ namespace Moq
             return typeof(Queryable).GetMethods("AsQueryable")
                 .Single(x => x.IsGenericMethod)
                 .MakeGenericMethod(elementType)
-                .Invoke(null, new[] { array });
+                .Invoke(null, new[] { array })!;
         }
     }
 }
