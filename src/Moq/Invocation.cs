@@ -4,6 +4,7 @@
 using System;
 using System.Collections.Generic;
 using System.Diagnostics;
+using System.Diagnostics.CodeAnalysis;
 using System.Reflection;
 using System.Text;
 
@@ -15,10 +16,10 @@ namespace Moq
     {
         object[] arguments;
         MethodInfo method;
-        MethodInfo methodImplementation;
+        MethodInfo? methodImplementation;
         readonly Type proxyType;
-        object result;
-        Setup matchingSetup;
+        object? result;
+        Setup? matchingSetup;
         bool verified;
 
         /// <summary>
@@ -67,11 +68,11 @@ namespace Moq
 
         IReadOnlyList<object> IInvocation.Arguments => this.arguments;
 
-        public ISetup MatchingSetup => this.matchingSetup;
+        public ISetup? MatchingSetup => this.matchingSetup;
 
         public Type ProxyType => this.proxyType;
 
-        public object ReturnValue
+        public object? ReturnValue
         {
             get => this.result is ExceptionResult ? null : this.result;
             set
@@ -80,8 +81,10 @@ namespace Moq
                 this.result = value;
             }
         }
-
-        public Exception Exception
+#if NULLABLE_REFERENCE_TYPES  
+        [DisallowNull]
+#endif
+        public Exception? Exception
         {
             get => this.result is ExceptionResult r ? r.Exception : null;
             set
@@ -134,7 +137,7 @@ namespace Moq
             var method = this.Method;
 
             var builder = new StringBuilder();
-            builder.AppendNameOf(method.DeclaringType);
+            builder.AppendNameOf(method.DeclaringType!);
             builder.Append('.');
 
             if (method.IsGetAccessor())
