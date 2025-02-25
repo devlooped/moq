@@ -286,9 +286,9 @@ namespace Moq.Language.Flow
 
         public void Verifiable(Times times) => this.Verifiable(times, null);
 
-        public void Verifiable(Func<Times> times, string failMessage) => this.Verifiable(times(), failMessage);
+        public void Verifiable(Func<Times> times, string? failMessage) => this.Verifiable(times(), failMessage);
 
-        public void Verifiable(Times times, string failMessage)
+        public void Verifiable(Times times, string? failMessage)
         {
             this.setup.MarkAsVerifiable();
             this.setup.SetExpectedInvocationCount(times);
