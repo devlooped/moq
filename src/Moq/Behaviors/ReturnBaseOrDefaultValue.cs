@@ -31,7 +31,7 @@ namespace Moq.Behaviors
 				var tryCallDefaultInterfaceImplementation = false;
 #endif
 
-                var declaringType = method.DeclaringType;
+                var declaringType = method.DeclaringType!;
                 if (declaringType.IsInterface)
                 {
                     if (this.mock.MockedType.IsInterface)
