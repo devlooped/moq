@@ -4,6 +4,7 @@
 using System;
 using System.Collections.Generic;
 using System.Diagnostics;
+using System.Diagnostics.CodeAnalysis;
 using System.Linq;
 
 namespace Moq
@@ -21,7 +22,7 @@ namespace Moq
     sealed class MatcherObserver : IDisposable
     {
         [ThreadStatic]
-        static Stack<MatcherObserver> activations;
+        static Stack<MatcherObserver>? activations;
 
         public static MatcherObserver Activate()
         {
@@ -37,7 +38,11 @@ namespace Moq
             return activation;
         }
 
-        public static bool IsActive(out MatcherObserver observer)
+#if NULLABLE_REFERENCE_TYPES
+        public static bool IsActive([NotNullWhen(true)] out MatcherObserver? observer)
+#else
+        public static bool IsActive(out MatcherObserver? observer)
+#endif
         {
             var activations = MatcherObserver.activations;
 
@@ -54,7 +59,7 @@ namespace Moq
         }
 
         int timestamp;
-        List<Observation> observations;
+        List<Observation>? observations;
 
         MatcherObserver()
         {
@@ -94,7 +99,11 @@ namespace Moq
         ///   and if so, returns the last one.
         /// </summary>
         /// <param name="match">The observed <see cref="Match"/> matcher observed last.</param>
-        public bool TryGetLastMatch(out Match match)
+#if NULLABLE_REFERENCE_TYPES
+        public bool TryGetLastMatch([NotNullWhen(true)] out Match? match)
+#else
+        public bool TryGetLastMatch(out Match? match)
+#endif
         {
             if (this.observations != null && this.observations.Count > 0)
             {
