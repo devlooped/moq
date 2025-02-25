@@ -10,9 +10,9 @@ namespace Moq
 {
     sealed class StubbedPropertySetup : Setup
     {
-        object value;
+        object? value;
 
-        public StubbedPropertySetup(Mock mock, LambdaExpression expression, MethodInfo getter, MethodInfo setter, object initialValue)
+        public StubbedPropertySetup(Mock mock, LambdaExpression expression, MethodInfo? getter, MethodInfo? setter, object? initialValue)
             : base(originalExpression: null, mock, new PropertyAccessorExpectation(expression, getter, setter))
         {
             // NOTE:
