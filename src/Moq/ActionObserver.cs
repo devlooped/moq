@@ -34,7 +34,7 @@ namespace Moq
                 // Create the root recording proxy:
                 var root = (T)CreateProxy(typeof(T), ctorArgs, matcherObserver, out var rootRecorder);
 
-                Exception error = null;
+                Exception? error = null;
                 try
                 {
                     // Execute the delegate. The root recorder will automatically "mock" return values
@@ -61,7 +61,7 @@ namespace Moq
                     var invocation = recorder.Invocation;
                     if (invocation != null)
                     {
-                        var resultType = invocation.Method.DeclaringType;
+                        var resultType = invocation.Method.DeclaringType!;
                         if (resultType.IsAssignableFrom(body.Type) == false)
                         {
                             if (AwaitableFactory.TryGet(body.Type) is { } awaitableHandler
@@ -128,7 +128,7 @@ namespace Moq
                         // it will have left behind a `default(T)` argument, possibly coerced to the parameter type.
                         // Therefore, we attempt to reproduce such coercions using `Convert.ChangeType`:
                         Type defaultValueType = matches[matchIndex].RenderExpression.Type;
-                        object defaultValue = defaultValueType.GetDefaultValue();
+                        object? defaultValue = defaultValueType.GetDefaultValue();
                         try
                         {
                             defaultValue = Convert.ChangeType(defaultValue, parameterTypes[argumentIndex]);
@@ -241,9 +241,9 @@ namespace Moq
         {
             readonly MatcherObserver matcherObserver;
             int creationTimestamp;
-            Invocation invocation;
-            int invocationTimestamp;
-            object returnValue;
+            Invocation? invocation;
+            int? invocationTimestamp;
+            object? returnValue;
 
             public Recorder(MatcherObserver matcherObserver)
             {
@@ -253,18 +253,18 @@ namespace Moq
                 this.creationTimestamp = this.matcherObserver.GetNextTimestamp();
             }
 
-            public Invocation Invocation => this.invocation;
+            public Invocation? Invocation => this.invocation;
 
             public IEnumerable<Match> Matches
             {
                 get
                 {
                     Debug.Assert(this.invocationTimestamp != default);
-                    return this.matcherObserver.GetMatchesBetween(this.creationTimestamp, this.invocationTimestamp);
+                    return this.matcherObserver.GetMatchesBetween(this.creationTimestamp, this.invocationTimestamp!.Value);
                 }
             }
 
-            public Recorder Next => (Awaitable.TryGetResultRecursive(this.returnValue) as IProxy)?.Interceptor as Recorder;
+            public Recorder? Next => (Awaitable.TryGetResultRecursive(this.returnValue) as IProxy)?.Interceptor as Recorder;
 
             public void Intercept(Invocation invocation)
             {
