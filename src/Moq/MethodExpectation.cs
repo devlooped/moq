@@ -4,6 +4,7 @@
 using System;
 using System.Collections.Generic;
 using System.Diagnostics;
+using System.Diagnostics.CodeAnalysis;
 using System.Linq;
 using System.Linq.Expressions;
 using System.Reflection;
@@ -38,14 +39,14 @@ namespace Moq
                 for (int i = 0; i < n; ++i)
                 {
                     var parameterType = parameterTypes[i];
-                    if (parameterType.IsByRef) parameterType = parameterType.GetElementType();
+                    if (parameterType.IsByRef) parameterType = parameterType.GetElementType()!;
                     arguments[i] = E.Constant(invocation.Arguments[i], parameterType);
                 }
             }
 
             LambdaExpression expression;
             {
-                var mock = E.Parameter(method.DeclaringType, "mock");
+                var mock = E.Parameter(method.DeclaringType!, "mock");
                 expression = E.Lambda(E.Call(mock, method, arguments).Apply(UpgradePropertyAccessorMethods.Rewriter), mock);
             }
 
@@ -111,7 +112,11 @@ namespace Moq
             this.awaitableFactory = awaitableFactory;
         }
 
-        public override bool HasResultExpression(out IAwaitableFactory awaitableFactory)
+#if NULLABLE_REFERENCE_TYPES
+        public override bool HasResultExpression([NotNullWhen(true)] out IAwaitableFactory? awaitableFactory)
+#else
+        public override bool HasResultExpression(out IAwaitableFactory? awaitableFactory)
+#endif
         {
             return (awaitableFactory = this.awaitableFactory) != null;
         }
@@ -199,7 +204,7 @@ namespace Moq
             return true;
         }
 
-        public override bool Equals(Expectation obj)
+        public override bool Equals(Expectation? obj)
         {
             if (obj is not MethodExpectation other) return false;
 
