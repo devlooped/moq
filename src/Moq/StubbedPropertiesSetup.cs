@@ -15,7 +15,7 @@ namespace Moq
         readonly ConcurrentDictionary<string, object> values;
         readonly DefaultValueProvider defaultValueProvider;
 
-        public StubbedPropertiesSetup(Mock mock, DefaultValueProvider defaultValueProvider = null)
+        public StubbedPropertiesSetup(Mock mock, DefaultValueProvider? defaultValueProvider = null)
             : base(originalExpression: null, mock, new PropertyAccessorExpectation(mock))
         {
             this.values = new ConcurrentDictionary<string, object>();
@@ -79,7 +79,7 @@ namespace Moq
                 Debug.Assert(mock != null);
 
                 var mockType = mock.GetType();
-                var setupAllPropertiesMethod = mockType.GetMethod(nameof(Mock<object>.SetupAllProperties));
+                var setupAllPropertiesMethod = mockType.GetMethod(nameof(Mock<object>.SetupAllProperties))!;
                 var mockedType = setupAllPropertiesMethod.ReturnType.GetGenericArguments()[0];
                 var mockGetMethod = Mock.GetMethod.MakeGenericMethod(mockedType);
                 var mockParam = E.Parameter(mockedType, "m");
@@ -88,7 +88,7 @@ namespace Moq
 
             public override LambdaExpression Expression => this.expression;
 
-            public override bool Equals(Expectation other)
+            public override bool Equals(Expectation? other)
             {
                 return other is PropertyAccessorExpectation pae && ExpressionComparer.Default.Equals(this.expression, pae.expression);
             }

@@ -15,11 +15,11 @@ namespace Moq
     abstract class Setup : ISetup
     {
         readonly Expectation expectation;
-        readonly Expression originalExpression;
+        readonly Expression? originalExpression;
         readonly Mock mock;
         Flags flags;
 
-        protected Setup(Expression originalExpression, Mock mock, Expectation expectation)
+        protected Setup(Expression? originalExpression, Mock mock, Expectation expectation)
         {
             Debug.Assert(mock != null);
             Debug.Assert(expectation != null);
@@ -29,7 +29,7 @@ namespace Moq
             this.mock = mock;
         }
 
-        public virtual Condition Condition => null;
+        public virtual Condition? Condition => null;
 
         public Expectation Expectation => this.expectation;
 
@@ -47,7 +47,7 @@ namespace Moq
 
         public Mock Mock => this.mock;
 
-        public Expression OriginalExpression => this.originalExpression;
+        public Expression? OriginalExpression => this.originalExpression;
 
         public bool IsMatched => (this.flags & Flags.Matched) != 0;
 
@@ -204,7 +204,7 @@ namespace Moq
             this.Verify(recursive, predicate, verifiedMocks);
         }
 
-        protected static Mock TryGetInnerMockFrom(object returnValue)
+        protected static Mock? TryGetInnerMockFrom(object returnValue)
         {
             return (Awaitable.TryGetResultRecursive(returnValue) as IMocked)?.Mock;
         }
