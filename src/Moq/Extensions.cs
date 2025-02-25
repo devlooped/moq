@@ -170,11 +170,11 @@ namespace Moq
             }
         }
 
-        public static object InvokePreserveStack(this Delegate del, IReadOnlyList<object>? args = null)
+        public static object? InvokePreserveStack(this Delegate del, IReadOnlyList<object?>? args = null)
         {
             try
             {
-                return del.DynamicInvoke((args as object[]) ?? args?.ToArray());
+                return del.DynamicInvoke((args as object?[]) ?? args?.ToArray());
             }
             catch (TargetInvocationException ex)
             {
@@ -428,7 +428,7 @@ namespace Moq
 
             if (type.IsTypeMatcher(out var typeMatcherType))
             {
-                var typeMatcher = (ITypeMatcher)Activator.CreateInstance(typeMatcherType);
+                var typeMatcher = (ITypeMatcher)Activator.CreateInstance(typeMatcherType)!;
 
                 if (typeMatcher.Matches(other))
                 {
@@ -509,8 +509,7 @@ namespace Moq
         public static IEnumerable<Mock> FindAllInnerMocks(this SetupCollection setups)
         {
             return setups.FindAll(setup => !setup.IsConditional)
-                         .SelectMany(setup => setup.InnerMocks)
-                         .Where(innerMock => innerMock != null);
+                         .SelectMany(setup => setup.InnerMocks);
         }
 
         public static Mock? FindLastInnerMock(this SetupCollection setups, Func<Setup, bool> predicate)
