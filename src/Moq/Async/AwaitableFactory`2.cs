@@ -18,13 +18,14 @@ namespace Moq.Async
     {
         public Type ResultType => typeof(TResult);
 
-        public abstract TAwaitable CreateCompleted(TResult? result);
+        public abstract TAwaitable CreateCompleted(TResult result);
 
         object IAwaitableFactory.CreateCompleted(object? result)
         {
+            // TODO: result should only be null if TResult is a nullable type.
             Debug.Assert(result is TResult || result == null);
 
-            return this.CreateCompleted((TResult?)result);
+            return this.CreateCompleted((TResult)result!);
         }
 
         public abstract TAwaitable CreateFaulted(Exception exception);
