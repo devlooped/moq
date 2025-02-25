@@ -56,7 +56,7 @@ namespace Moq
         internal static MockException NoMatchingCalls(
             Mock rootMock,
             LambdaExpression expression,
-            string failMessage,
+            string? failMessage,
             Times times,
             int callCount)
         {
@@ -172,7 +172,7 @@ namespace Moq
         ///   and whose reason(s) is the combination of the given <paramref name="errors"/>' reason(s).
         ///   Used by <see cref="MockFactory.VerifyMocks(Action{Mock})"/> when it finds one or more mocks with verification errors.
         /// </summary>
-        internal static MockException Combined(IEnumerable<MockException> errors, string preamble)
+        internal static MockException Combined(IEnumerable<MockException> errors, string? preamble)
         {
             Debug.Assert(errors != null);
             Debug.Assert(errors.Any());
