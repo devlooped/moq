@@ -43,7 +43,7 @@ namespace Moq.Matchers
         {
             var expectedParametersTypes = new[] { call.Method.ReturnType }.Concat(call.Method.GetParameters().Select(p => p.ParameterType)).ToArray();
 
-            MethodInfo method = null;
+            MethodInfo? method;
 
             if (call.Method.IsGenericMethod)
             {
@@ -51,7 +51,7 @@ namespace Moq.Matchers
                 // passing generic type arguments for the query.
                 var genericArgs = call.Method.GetGenericArguments();
 
-                method = call.Method.DeclaringType.GetMethods(call.Method.Name)
+                method = call.Method.DeclaringType!.GetMethods(call.Method.Name)
                     .Where(m =>
                         m.IsGenericMethodDefinition &&
                         m.GetGenericArguments().Length ==
@@ -63,7 +63,7 @@ namespace Moq.Matchers
             }
             else
             {
-                method = call.Method.DeclaringType.GetMethod(call.Method.Name, expectedParametersTypes);
+                method = call.Method.DeclaringType!.GetMethod(call.Method.Name, expectedParametersTypes);
             }
 
             // throw if validatorMethod doesn't exists			
@@ -74,22 +74,22 @@ namespace Moq.Matchers
                     call.Method.IsStatic ? "static " : String.Empty,
                     call.Method.Name,
                     String.Join(", ", expectedParametersTypes.Select(x => x.Name).ToArray()),
-                    call.Method.DeclaringType.ToString()));
+                    call.Method.DeclaringType!.ToString()));
             }
             return method;
         }
 
-        public bool Matches(object argument, Type parameterType)
+        public bool Matches(object? argument, Type parameterType)
         {
             // use matcher Expression to get extra arguments
             var extraArgs = this.expression.Arguments.Select(ae => ((ConstantExpression)ae.PartialEval()).Value);
             var args = new[] { argument }.Concat(extraArgs).ToArray();
             // for static and non-static method
             var instance = this.expression.Object == null ? null : (this.expression.Object.PartialEval() as ConstantExpression).Value;
-            return (bool)validatorMethod.Invoke(instance, args);
+            return (bool)validatorMethod.Invoke(instance, args)!;
         }
 
-        public void SetupEvaluatedSuccessfully(object argument, Type parameterType)
+        public void SetupEvaluatedSuccessfully(object? argument, Type parameterType)
         {
             Debug.Assert(this.Matches(argument, parameterType));
         }
