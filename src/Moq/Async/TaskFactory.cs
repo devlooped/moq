@@ -19,7 +19,7 @@ namespace Moq.Async
 
         public override Task CreateCompleted()
         {
-            return Task.FromResult<object>(default);
+            return Task.CompletedTask;
         }
 
         public override Task CreateFaulted(Exception exception)
