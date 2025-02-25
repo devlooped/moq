@@ -14,12 +14,13 @@ namespace Moq.Async
     ///   for awaitables that do not produce a result when awaited.
     /// </summary>
     abstract class AwaitableFactory<TAwaitable> : IAwaitableFactory
+        where TAwaitable : notnull
     {
         Type IAwaitableFactory.ResultType => typeof(void);
 
         public abstract TAwaitable CreateCompleted();
 
-        object IAwaitableFactory.CreateCompleted(object result)
+        object IAwaitableFactory.CreateCompleted(object? result)
         {
             Debug.Assert(result == null);
 
@@ -50,7 +51,7 @@ namespace Moq.Async
             return new AwaitExpression(awaitableExpression, this);
         }
 
-        bool IAwaitableFactory.TryGetResult(object awaitable, out object result)
+        bool IAwaitableFactory.TryGetResult(object awaitable, out object? result)
         {
             Debug.Assert(awaitable is TAwaitable);
 
