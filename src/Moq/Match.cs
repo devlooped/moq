@@ -163,9 +163,9 @@ namespace Moq
     public class Match<T> : Match, IEquatable<Match<T>>
     {
         internal Predicate<T> Condition { get; set; }
-        internal Action<T> Success { get; set; }
+        internal Action<T>? Success { get; set; }
 
-        internal Match(Predicate<T> condition, Expression<Func<T>> renderExpression, Action<T> success = null)
+        internal Match(Predicate<T> condition, Expression<Func<T>> renderExpression, Action<T>? success = null)
         {
             this.Condition = condition;
             this.RenderExpression = renderExpression.Body.Apply(EvaluateCaptures.Rewriter);
