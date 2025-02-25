@@ -192,7 +192,7 @@ namespace Moq
         ///   <see langword="true"/> if <paramref name="obj"/> has the same value as this instance;
         ///   otherwise, <see langword="false"/>.
         /// </returns>
-        public override bool Equals(object obj)
+        public override bool Equals(object? obj)
         {
             return obj is Times other && this.Equals(other);
         }
