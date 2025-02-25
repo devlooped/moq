@@ -89,7 +89,7 @@ namespace Moq.Protected
         /// <typeparam name="TProperty">Type of the property. Typically omitted as it can be inferred from the expression.</typeparam>
         /// <param name="expression">Lambda expression that specifies the property.</param>
         /// <param name="initialValue">Initial value for the property.</param>
-        Mock<T> SetupProperty<TProperty>(Expression<Func<TAnalog, TProperty>> expression, TProperty initialValue = default(TProperty));
+        Mock<T> SetupProperty<TProperty>(Expression<Func<TAnalog, TProperty>> expression, TProperty? initialValue = default(TProperty));
 
         /// <summary>
         /// Return a sequence of values, once per call.

@@ -100,7 +100,7 @@ namespace Moq.Protected
             return new NonVoidSetupPhrase<T, TProperty>(setup);
         }
 
-        public Mock<T> SetupProperty<TProperty>(Expression<Func<TAnalog, TProperty>> expression, TProperty initialValue = default(TProperty))
+        public Mock<T> SetupProperty<TProperty>(Expression<Func<TAnalog, TProperty>> expression, TProperty? initialValue = default(TProperty))
         {
             Guard.NotNull(expression, nameof(expression));
 

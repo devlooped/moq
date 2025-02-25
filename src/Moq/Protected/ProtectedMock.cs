@@ -314,7 +314,7 @@ namespace Moq.Protected
             return Expression.Lambda<Func<T, TResult>>(Expression.MakeMemberAccess(param, property), param);
         }
 
-        static MethodInfo GetMethod(string methodName, Type[] genericTypeArguments, bool exact, params object[] args)
+        static MethodInfo? GetMethod(string methodName, Type[]? genericTypeArguments, bool exact, params object[] args)
         {
             var argTypes = ToArgTypes(args);
             var methods = typeof(T).GetMethods(BindingFlags.Instance | BindingFlags.NonPublic | BindingFlags.Public)
@@ -343,7 +343,7 @@ namespace Moq.Protected
         }
 
         // TODO should support arguments for property indexers
-        static PropertyInfo GetProperty(string propertyName)
+        static PropertyInfo? GetProperty(string propertyName)
         {
             return typeof(T).GetProperty(
                 propertyName,
