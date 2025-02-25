@@ -12,13 +12,13 @@ namespace Moq
 {
     sealed class StubbedPropertiesSetup : Setup
     {
-        readonly ConcurrentDictionary<string, object> values;
+        readonly ConcurrentDictionary<string, object?> values;
         readonly DefaultValueProvider defaultValueProvider;
 
         public StubbedPropertiesSetup(Mock mock, DefaultValueProvider? defaultValueProvider = null)
             : base(originalExpression: null, mock, new PropertyAccessorExpectation(mock))
         {
-            this.values = new ConcurrentDictionary<string, object>();
+            this.values = new ConcurrentDictionary<string, object?>();
             this.defaultValueProvider = defaultValueProvider ?? mock.DefaultValueProvider;
 
             this.MarkAsVerifiable();
