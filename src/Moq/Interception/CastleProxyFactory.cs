@@ -62,7 +62,7 @@ namespace Moq
                 var options = new ProxyGenerationOptions();
                 options.AddDelegateTypeMixin(mockType);
                 var container = GetClassGenerator(mockType).CreateClassProxy(typeof(object), additionalInterfaces, options, new Interceptor(interceptor));
-                return Delegate.CreateDelegate(mockType, container, container.GetType().GetMethod("Invoke"));
+                return Delegate.CreateDelegate(mockType, container, container.GetType().GetMethod("Invoke")!);
             }
 
             try
@@ -91,7 +91,7 @@ namespace Moq
 
         sealed class Interceptor : Castle.DynamicProxy.IInterceptor
         {
-            static readonly MethodInfo proxyInterceptorGetter = typeof(IProxy).GetProperty(nameof(IProxy.Interceptor)).GetMethod;
+            static readonly MethodInfo proxyInterceptorGetter = typeof(IProxy).GetProperty(nameof(IProxy.Interceptor))!.GetMethod!;
 
             Moq.IInterceptor interceptor;
 
@@ -129,7 +129,7 @@ namespace Moq
 
         sealed class Invocation : Moq.Invocation
         {
-            Castle.DynamicProxy.IInvocation underlying;
+            Castle.DynamicProxy.IInvocation? underlying;
 
             internal Invocation(Castle.DynamicProxy.IInvocation underlying) : base(underlying.Proxy.GetType(), underlying.Method, underlying.Arguments)
             {
@@ -142,7 +142,7 @@ namespace Moq
 
 #if FEATURE_DEFAULT_INTERFACE_IMPLEMENTATIONS
 				var method = this.Method;
-				if (method.DeclaringType.IsInterface && !method.IsAbstract)
+				if (method.DeclaringType!.IsInterface && !method.IsAbstract)
 				{
 					// As of version 4.4.0, DynamicProxy cannot proceed to default method implementations of interfaces.
 					// we need to find and call those manually.
@@ -165,12 +165,12 @@ namespace Moq
 		// Finding and calling default interface implementations currently involves a lot of reflection,
 		// we are using two caches to speed up these operations for repeated calls.
 		static ConcurrentDictionary<Pair<MethodInfo, Type>, MethodInfo> mostSpecificOverrides;
-		static ConcurrentDictionary<MethodInfo, Func<object, object[], object>> nonVirtualInvocationThunks;
+		static ConcurrentDictionary<MethodInfo, Func<object, object?[], object>> nonVirtualInvocationThunks;
 
 		static CastleProxyFactory()
 		{
 			mostSpecificOverrides = new ConcurrentDictionary<Pair<MethodInfo, Type>, MethodInfo>();
-			nonVirtualInvocationThunks = new ConcurrentDictionary<MethodInfo, Func<object, object[], object>>();
+			nonVirtualInvocationThunks = new ConcurrentDictionary<MethodInfo, Func<object, object?[], object>>();
 		}
 
 		/// <summary>
@@ -189,7 +189,7 @@ namespace Moq
 				var genericParameterCount = declaration.IsGenericMethod ? declaration.GetGenericArguments().Length : 0;
 				var returnType = declaration.ReturnType;
 				var parameterTypes = declaration.GetParameterTypes().ToArray();
-				var declaringType = declaration.DeclaringType;
+				var declaringType = declaration.DeclaringType!;
 
 				// If the base class has a method implementation, then by rule (2) it will be more specific
 				// than any candidate method from an implemented interface:
@@ -232,7 +232,7 @@ namespace Moq
 
 					// No, it is the most specific override so far. Add it to the list, but before doing so,
 					// remove all less specific overrides from it:
-					candidateMethods.ExceptWith(candidateMethods.Where(cm => cm.DeclaringType.IsAssignableFrom(implementedInterface)).ToArray());
+					candidateMethods.ExceptWith(candidateMethods.Where(cm => cm.DeclaringType!.IsAssignableFrom(implementedInterface)).ToArray());
 					candidateMethods.Add(candidateMethod);
 				}
 
@@ -256,7 +256,7 @@ namespace Moq
 		///   Performs a non-virtual (non-polymorphic) call to the given <paramref name="method"/>
 		///   using the specified object <paramref name="instance"/> and <paramref name="arguments"/>.
 		/// </summary>
-		public static object DynamicInvokeNonVirtually(MethodInfo method, object instance, object[] arguments)
+		public static object DynamicInvokeNonVirtually(MethodInfo method, object instance, object?[] arguments)
 		{
 			// There are a couple of probable alternatives to the following implementation that
 			// unfortunately don't work in practice:
@@ -293,7 +293,7 @@ namespace Moq
 				{
 					if (parameterTypes[i].IsByRef)
 					{
-						parameterTypes[i] = parameterTypes[i].GetElementType();
+						parameterTypes[i] = parameterTypes[i].GetElementType()!;
 					}
 				}
 
@@ -320,7 +320,7 @@ namespace Moq
 
 				// Perform the actual call.
 				il.Emit(OpCodes.Ldarg_0);
-				il.Emit(OpCodes.Castclass, method.DeclaringType);
+				il.Emit(OpCodes.Castclass, method.DeclaringType!);
 				for (var i = 0; i < n; ++i)
 				{
 					il.Emit(originalParameterTypes[i].IsByRef ? OpCodes.Ldloca : OpCodes.Ldloc, arguments[i]);
@@ -355,7 +355,7 @@ namespace Moq
 				il.Emit(OpCodes.Ldloc, returnValue);
 				il.Emit(OpCodes.Ret);
 
-				return (Func<object, object[], object>)dynamicMethod.CreateDelegate(typeof(Func<object, object[], object>));
+				return (Func<object, object?[], object>)dynamicMethod.CreateDelegate(typeof(Func<object, object?[], object>));
 			});
 
 			return thunk.Invoke(instance, arguments);
