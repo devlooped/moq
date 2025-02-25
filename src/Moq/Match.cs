@@ -71,14 +71,15 @@ namespace Moq
             return default(TValue)!;
         }
 
-        internal abstract bool Matches(object argument, Type parameterType);
+        internal abstract bool Matches(object? argument, Type parameterType);
 
-        internal abstract void SetupEvaluatedSuccessfully(object argument, Type parameterType);
+        internal abstract void SetupEvaluatedSuccessfully(object? argument, Type parameterType);
 
-        bool IMatcher.Matches(object argument, Type parameterType) => this.Matches(argument, parameterType);
+        bool IMatcher.Matches(object? argument, Type parameterType) => this.Matches(argument, parameterType);
 
-        void IMatcher.SetupEvaluatedSuccessfully(object value, Type parameterType) => this.SetupEvaluatedSuccessfully(value, parameterType);
-
+        void IMatcher.SetupEvaluatedSuccessfully(object? value, Type parameterType) => this.SetupEvaluatedSuccessfully(value, parameterType);
+        
+        // TODO: Consider making the constructor set this to avoid the nullable reference warning.
         internal Expression RenderExpression { get; set; }
 
         /// <summary>
@@ -89,7 +90,7 @@ namespace Moq
         public static T Create<T>(Predicate<T> condition)
         {
             Match.Register(new Match<T>(condition, () => Matcher<T>()));
-            return default(T);
+            return default(T)!;
         }
 
         /// <summary>
@@ -125,7 +126,7 @@ namespace Moq
         /// <param name="renderExpression">
         ///   A lambda representation of the matcher.
         /// </param>
-        public static T Create<T>(Func<object, Type, bool> condition, Expression<Func<T>> renderExpression)
+        public static T Create<T>(Func<object?, Type, bool> condition, Expression<Func<T>> renderExpression)
         {
             Guard.NotNull(condition, nameof(condition));
             Guard.NotNull(renderExpression, nameof(renderExpression));
@@ -172,17 +173,17 @@ namespace Moq
             this.Success = success;
         }
 
-        internal override bool Matches(object argument, Type parameterType)
+        internal override bool Matches(object? argument, Type parameterType)
         {
-            return CanCast(argument) && this.Condition((T)argument);
+            return CanCast(argument) && this.Condition((T)argument!);
         }
 
-        internal override void SetupEvaluatedSuccessfully(object argument, Type parameterType)
+        internal override void SetupEvaluatedSuccessfully(object? argument, Type parameterType)
         {
             Debug.Assert(this.Matches(argument, parameterType));
             Debug.Assert(CanCast(argument));
 
-            this.Success?.Invoke((T)argument);
+            this.Success?.Invoke((T)argument!);
         }
 
         static bool CanCast(object? value)
@@ -238,9 +239,9 @@ namespace Moq
 
     sealed class MatchFactory : Match
     {
-        readonly Func<object, Type, bool> condition;
+        readonly Func<object?, Type, bool> condition;
 
-        internal MatchFactory(Func<object, Type, bool> condition, LambdaExpression renderExpression)
+        internal MatchFactory(Func<object?, Type, bool> condition, LambdaExpression renderExpression)
         {
             Debug.Assert(condition != null);
             Debug.Assert(renderExpression != null);
@@ -249,13 +250,13 @@ namespace Moq
             this.RenderExpression = renderExpression.Body.Apply(EvaluateCaptures.Rewriter);
         }
 
-        internal override bool Matches(object argument, Type parameterType)
+        internal override bool Matches(object? argument, Type parameterType)
         {
-            var canCast = (Predicate<object>)Delegate.CreateDelegate(typeof(Predicate<object>), canCastMethod.MakeGenericMethod(parameterType));
+            var canCast = (Predicate<object?>)Delegate.CreateDelegate(typeof(Predicate<object?>), canCastMethod.MakeGenericMethod(parameterType));
             return canCast(argument) && condition(argument, parameterType);
         }
 
-        internal override void SetupEvaluatedSuccessfully(object argument, Type parameterType)
+        internal override void SetupEvaluatedSuccessfully(object? argument, Type parameterType)
         {
             Debug.Assert(this.Matches(argument, parameterType));
         }
