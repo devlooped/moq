@@ -35,7 +35,7 @@ namespace Moq
 
         public LambdaExpression Expression => this.expectation.Expression;
 
-        Mock ISetup.InnerMock => this.InnerMocks.SingleOrDefault();
+        Mock? ISetup.InnerMock => this.InnerMocks.SingleOrDefault();
 
         public virtual IEnumerable<Mock> InnerMocks => Enumerable.Empty<Mock>();
 
@@ -204,7 +204,7 @@ namespace Moq
             this.Verify(recursive, predicate, verifiedMocks);
         }
 
-        protected static Mock? TryGetInnerMockFrom(object returnValue)
+        protected static Mock? TryGetInnerMockFrom(object? returnValue)
         {
             return (Awaitable.TryGetResultRecursive(returnValue) as IMocked)?.Mock;
         }
