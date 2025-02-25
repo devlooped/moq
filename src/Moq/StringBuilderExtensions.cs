@@ -95,7 +95,7 @@ namespace Moq
                     _ => "ref ",
                 });
 
-                parameterType = parameterType.GetElementType();
+                parameterType = parameterType.GetElementType()!;
             }
 
             if (parameterType.IsArray && parameter.IsDefined(typeof(ParamArrayAttribute), true))
@@ -106,7 +106,7 @@ namespace Moq
             return stringBuilder.AppendFormattedName(parameterType);
         }
 
-        public static StringBuilder AppendValueOf(this StringBuilder stringBuilder, object obj)
+        public static StringBuilder AppendValueOf(this StringBuilder stringBuilder, object? obj)
         {
             if (obj == null)
             {
@@ -148,6 +148,8 @@ namespace Moq
 
                     stringBuilder.AppendValueOf(enumerator.Current);
                 }
+                
+                (enumerator as IDisposable)?.Dispose();
                 stringBuilder.Append(']');
             }
             else
