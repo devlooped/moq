@@ -24,7 +24,7 @@ namespace Moq.Matchers
                 return false;
             }
 
-            var elementType = parameterType.GetElementType();
+            var elementType = parameterType.GetElementType()!;
 
             for (int index = 0; index < values.Length; index++)
             {
