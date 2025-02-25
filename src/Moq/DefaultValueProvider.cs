@@ -49,7 +49,7 @@ namespace Moq
         /// <remarks>
         /// Implementations may assume that all parameters have valid, non-<see langword="null"/>, non-<see langword="void"/> values.
         /// </remarks>
-        protected internal abstract object GetDefaultValue(Type type, Mock mock);
+        protected internal abstract object? GetDefaultValue(Type type, Mock mock);
 
         /// <summary>
         ///   <para>
@@ -65,7 +65,7 @@ namespace Moq
         /// <remarks>
         /// Implementations may assume that all parameters have valid, non-<see langword="null"/>, non-<see langword="void"/> values.
         /// </remarks>
-        protected internal virtual object GetDefaultParameterValue(ParameterInfo parameter, Mock mock)
+        protected internal virtual object? GetDefaultParameterValue(ParameterInfo parameter, Mock mock)
         {
             Debug.Assert(parameter != null);
             Debug.Assert(parameter.ParameterType != typeof(void));
@@ -88,7 +88,7 @@ namespace Moq
         /// <remarks>
         /// Implementations may assume that all parameters have valid, non-<see langword="null"/>, non-<see langword="void"/> values.
         /// </remarks>
-        protected internal virtual object GetDefaultReturnValue(MethodInfo method, Mock mock)
+        protected internal virtual object? GetDefaultReturnValue(MethodInfo method, Mock mock)
         {
             Debug.Assert(method != null);
             Debug.Assert(method.ReturnType != typeof(void));
