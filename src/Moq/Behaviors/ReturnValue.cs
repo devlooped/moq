@@ -5,14 +5,14 @@ namespace Moq.Behaviors
 {
     sealed class ReturnValue : Behavior
     {
-        readonly object value;
+        readonly object? value;
 
-        public ReturnValue(object value)
+        public ReturnValue(object? value)
         {
             this.value = value;
         }
 
-        public object Value => this.value;
+        public object? Value => this.value;
 
         public override void Execute(Invocation invocation)
         {
