@@ -199,15 +199,19 @@ namespace Moq
         }
 
         /// <inheritdoc/>
-        public override bool Equals(object obj)
+        public override bool Equals(object? obj)
         {
             return obj is Match<T> other && this.Equals(other);
         }
 
         /// <inheritdoc/>
-        public bool Equals(Match<T> other)
+        public bool Equals(Match<T>? other)
         {
-            if (this.Condition == other.Condition)
+            if (other == null)
+            {
+                return false;
+            }
+            else if (this.Condition == other.Condition)
             {
                 return true;
             }
