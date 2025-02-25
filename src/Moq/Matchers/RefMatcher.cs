@@ -17,13 +17,13 @@ namespace Moq.Matchers
             this.referenceIsValueType = reference?.GetType().IsValueType ?? false;
         }
 
-        public bool Matches(object argument, Type parameterType)
+        public bool Matches(object? argument, Type parameterType)
         {
             return this.referenceIsValueType ? object.Equals(this.reference, argument)
                                              : object.ReferenceEquals(this.reference, argument);
         }
 
-        public void SetupEvaluatedSuccessfully(object value, Type parameterType)
+        public void SetupEvaluatedSuccessfully(object? value, Type parameterType)
         {
             Debug.Assert(this.Matches(value, parameterType));
         }

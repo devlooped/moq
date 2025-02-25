@@ -16,13 +16,13 @@ namespace Moq.Matchers
             this.expression = expression;
         }
 
-        public bool Matches(object argument, Type parameterType)
+        public bool Matches(object? argument, Type parameterType)
         {
             var eval = Evaluator.PartialEval(this.expression);
             return eval is ConstantExpression ce && new ConstantMatcher(ce.Value).Matches(argument, parameterType);
         }
 
-        public void SetupEvaluatedSuccessfully(object argument, Type parameterType)
+        public void SetupEvaluatedSuccessfully(object? argument, Type parameterType)
         {
             Debug.Assert(this.Matches(argument, parameterType));
         }

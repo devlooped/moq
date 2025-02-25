@@ -16,13 +16,13 @@ namespace Moq.Matchers
             this.expression = expression;
         }
 
-        public bool Matches(object argument, Type parameterType)
+        public bool Matches(object? argument, Type parameterType)
         {
             return argument is Expression valueExpression
                 && ExpressionComparer.Default.Equals(this.expression, valueExpression);
         }
 
-        public void SetupEvaluatedSuccessfully(object argument, Type parameterType)
+        public void SetupEvaluatedSuccessfully(object? argument, Type parameterType)
         {
             Debug.Assert(this.Matches(argument, parameterType));
         }
