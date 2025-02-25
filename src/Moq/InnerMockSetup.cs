@@ -13,7 +13,7 @@ namespace Moq
     {
         readonly object? returnValue;
 
-        public InnerMockSetup(Expression originalExpression, Mock mock, MethodExpectation expectation, object? returnValue)
+        public InnerMockSetup(Expression? originalExpression, Mock mock, MethodExpectation expectation, object? returnValue)
             : base(originalExpression, mock, expectation)
         {
             Debug.Assert(Awaitable.TryGetResultRecursive(returnValue) is IMocked);
