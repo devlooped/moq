@@ -8,10 +8,10 @@ namespace Moq.Matchers
 {
     class RefMatcher : IMatcher
     {
-        readonly object reference;
+        readonly object? reference;
         readonly bool referenceIsValueType;
 
-        public RefMatcher(object reference)
+        public RefMatcher(object? reference)
         {
             this.reference = reference;
             this.referenceIsValueType = reference?.GetType().IsValueType ?? false;
