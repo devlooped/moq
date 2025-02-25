@@ -5,6 +5,7 @@ using System;
 using System.Collections.Concurrent;
 using System.Collections.Generic;
 using System.Diagnostics;
+using System.Diagnostics.CodeAnalysis;
 using System.Linq;
 using System.Reflection;
 using System.Runtime.CompilerServices;
@@ -19,13 +20,21 @@ namespace Moq
         {
             return type.IsValueType || type.GetConstructor(Type.EmptyTypes) != null;
         }
-
-        public static bool CanRead(this PropertyInfo property, out MethodInfo getter)
+        
+#if NULLABLE_REFERENCE_TYPES
+        public static bool CanRead(this PropertyInfo property, [NotNullWhen(true)] out MethodInfo? getter)
+#else
+        public static bool CanRead(this PropertyInfo property, out MethodInfo? getter)
+#endif
         {
             return property.CanRead(out getter, out _);
         }
 
-        public static bool CanRead(this PropertyInfo property, out MethodInfo getter, out PropertyInfo getterProperty)
+#if NULLABLE_REFERENCE_TYPES
+        public static bool CanRead(this PropertyInfo property, [NotNullWhen(true)] out MethodInfo? getter, [NotNullWhen(true)] out PropertyInfo? getterProperty)
+#else
+        public static bool CanRead(this PropertyInfo property, out MethodInfo? getter, out PropertyInfo? getterProperty)
+#endif
         {
             if (property.CanRead)
             {
@@ -63,12 +72,21 @@ namespace Moq
             return false;
         }
 
-        public static bool CanWrite(this PropertyInfo property, out MethodInfo setter)
+#if NULLABLE_REFERENCE_TYPES
+        public static bool CanWrite(this PropertyInfo property, [NotNullWhen(true)] out MethodInfo? setter)
+#else
+        public static bool CanWrite(this PropertyInfo property, out MethodInfo? setter)
+#endif
         {
             return property.CanWrite(out setter, out _);
         }
 
-        public static bool CanWrite(this PropertyInfo property, out MethodInfo setter, out PropertyInfo setterProperty)
+#if NULLABLE_REFERENCE_TYPES
+        public static bool CanWrite(this PropertyInfo property, [NotNullWhen(true)] out MethodInfo? setter, [NotNullWhen(true)] out PropertyInfo? setterProperty)
+      
+#else
+        public static bool CanWrite(this PropertyInfo property, out MethodInfo? setter, out PropertyInfo? setterProperty)
+#endif
         {
             if (property.CanWrite)
             {
@@ -94,7 +112,7 @@ namespace Moq
                     var baseProperty =
                         baseGetter
                         .DeclaringType
-                        .GetMember(property.Name, MemberTypes.Property, BindingFlags.Public | BindingFlags.NonPublic | BindingFlags.Instance)
+                        !.GetMember(property.Name, MemberTypes.Property, BindingFlags.Public | BindingFlags.NonPublic | BindingFlags.Instance)
                         .Cast<PropertyInfo>()
                         .First(p => p.GetGetMethod(nonPublic: true) == baseGetter);
                     return baseProperty.CanWrite(out setter, out setterProperty);
@@ -109,7 +127,7 @@ namespace Moq
         /// <summary>
         ///   Gets the default value for the specified type. This is the Reflection counterpart of C#'s <see langword="default"/> operator.
         /// </summary>
-        public static object GetDefaultValue(this Type type)
+        public static object? GetDefaultValue(this Type type)
         {
             return type.IsValueType ? Activator.CreateInstance(type) : null;
         }
@@ -129,20 +147,20 @@ namespace Moq
                 method = method.GetGenericMethodDefinition();
             }
 
-            var declaringType = method.DeclaringType;
+            var declaringType = method.DeclaringType!;
 
             if (declaringType.IsInterface)
             {
                 Debug.Assert(declaringType.IsAssignableFrom(proxyType));
 
-                var map = GetInterfaceMap(proxyType, method.DeclaringType);
+                var map = GetInterfaceMap(proxyType, declaringType);
                 var index = Array.IndexOf(map.InterfaceMethods, method);
                 Debug.Assert(index >= 0);
                 return map.TargetMethods[index].GetBaseDefinition();
             }
             else if (declaringType.IsDelegateType())
             {
-                return proxyType.GetMethod("Invoke");
+                return proxyType.GetMethod("Invoke")!;
             }
             else
             {
@@ -152,7 +170,7 @@ namespace Moq
             }
         }
 
-        public static object InvokePreserveStack(this Delegate del, IReadOnlyList<object> args = null)
+        public static object InvokePreserveStack(this Delegate del, IReadOnlyList<object>? args = null)
         {
             try
             {
@@ -160,7 +178,7 @@ namespace Moq
             }
             catch (TargetInvocationException ex)
             {
-                ExceptionDispatchInfo.Capture(ex.InnerException).Throw();
+                ExceptionDispatchInfo.Capture(ex.InnerException!).Throw();
                 throw;
             }
         }
@@ -237,11 +255,15 @@ namespace Moq
             return Attribute.IsDefined(type, typeof(TypeMatcherAttribute));
         }
 
-        public static bool IsTypeMatcher(this Type type, out Type typeMatcherType)
+#if NULLABLE_REFERENCE_TYPES
+        public static bool IsTypeMatcher(this Type type, [NotNullWhen(true)] out Type? typeMatcherType)
+#else
+        public static bool IsTypeMatcher(this Type type, out Type? typeMatcherType)
+#endif
         {
             if (type.IsTypeMatcher())
             {
-                var attr = (TypeMatcherAttribute)Attribute.GetCustomAttribute(type, typeof(TypeMatcherAttribute));
+                var attr = (TypeMatcherAttribute)Attribute.GetCustomAttribute(type, typeof(TypeMatcherAttribute))!;
                 typeMatcherType = attr.Type ?? type;
                 Guard.ImplementsTypeMatcherProtocol(typeMatcherType);
                 return true;
@@ -261,7 +283,7 @@ namespace Moq
             }
             else if (type.HasElementType)
             {
-                return type.GetElementType().IsOrContainsTypeMatcher();
+                return type.GetElementType()!.IsOrContainsTypeMatcher();
             }
             else if (type.IsGenericType)
             {
@@ -373,7 +395,7 @@ namespace Moq
             return false;
         }
 
-        static MethodInfo GetInvokeMethodFromUntypedDelegateCallback(Delegate callback)
+        static MethodInfo? GetInvokeMethodFromUntypedDelegateCallback(Delegate callback)
         {
             // Section 8.9.3 of 4th Ed ECMA 335 CLI spec requires delegates to have an 'Invoke' method.
             // However, there is not a requirement for 'public', or for it to be unambiguous.
@@ -415,8 +437,8 @@ namespace Moq
             }
             else if (type.HasElementType && other.HasElementType)
             {
-                var te = type.GetElementType();
-                var oe = other.GetElementType();
+                var te = type.GetElementType()!;
+                var oe = other.GetElementType()!;
 
                 if (type.IsArray && other.IsArray)
                 {
