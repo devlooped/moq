@@ -22,7 +22,7 @@ namespace Moq.Expressions.Visitors
         {
             if (node.Member is FieldInfo fi
                 && node.Expression is ConstantExpression ce
-                && node.Member.DeclaringType.IsDefined(typeof(CompilerGeneratedAttribute)))
+                && fi.DeclaringType!.IsDefined(typeof(CompilerGeneratedAttribute)))
             {
                 return Expression.Constant(fi.GetValue(ce.Value), node.Type);
             }
