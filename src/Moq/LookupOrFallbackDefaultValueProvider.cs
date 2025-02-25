@@ -34,14 +34,14 @@ namespace Moq
     [EditorBrowsable(EditorBrowsableState.Advanced)]
     public abstract class LookupOrFallbackDefaultValueProvider : DefaultValueProvider
     {
-        Dictionary<object, Func<Type, Mock, object>> factories;
+        Dictionary<object, Func<Type, Mock, object>?> factories;
 
         /// <summary>
         /// Initializes a new instance of the <see cref="LookupOrFallbackDefaultValueProvider"/> class.
         /// </summary>
         protected LookupOrFallbackDefaultValueProvider()
         {
-            this.factories = new Dictionary<object, Func<Type, Mock, object>>()
+            this.factories = new Dictionary<object, Func<Type, Mock, object>?>()
             {
                 ["System.ValueTuple`1"] = CreateValueTupleOf,
                 ["System.ValueTuple`2"] = CreateValueTupleOf,
@@ -61,7 +61,7 @@ namespace Moq
         /// <param name="factoryKey">The type(s) for which to remove any registered factory function.</param>
         protected void Deregister(Type factoryKey)
         {
-            Debug.Assert(factoryKey != null);
+            Debug.Assert(factoryKey.FullName != null);
 
             // NOTE: In order to be able to unregister the default logic for awaitable types,
             // we need a way (below) to know when to delegate to an `IAwaitableFactory`, and when not to.
@@ -93,7 +93,7 @@ namespace Moq
         }
 
         /// <inheritdoc/>
-        protected internal sealed override object GetDefaultParameterValue(ParameterInfo parameter, Mock mock)
+        protected internal sealed override object? GetDefaultParameterValue(ParameterInfo parameter, Mock mock)
         {
             Debug.Assert(parameter != null);
             Debug.Assert(parameter.ParameterType != typeof(void));
@@ -103,7 +103,7 @@ namespace Moq
         }
 
         /// <inheritdoc/>
-        protected internal sealed override object GetDefaultReturnValue(MethodInfo method, Mock mock)
+        protected internal sealed override object? GetDefaultReturnValue(MethodInfo method, Mock mock)
         {
             Debug.Assert(method != null);
             Debug.Assert(method.ReturnType != typeof(void));
@@ -113,7 +113,7 @@ namespace Moq
         }
 
         /// <inheritdoc/>
-        protected internal sealed override object GetDefaultValue(Type type, Mock mock)
+        protected internal sealed override object? GetDefaultValue(Type type, Mock mock)
         {
             Debug.Assert(type != null);
             Debug.Assert(type != typeof(void));
@@ -123,8 +123,8 @@ namespace Moq
                            : type.IsArray ? typeof(Array)
                            : type;
 
-            Func<Type, Mock, object> factory;
-            if (this.factories.TryGetValue(handlerKey, out factory) || this.factories.TryGetValue(handlerKey.FullName, out factory))
+            Func<Type, Mock, object>? factory;
+            if (this.factories.TryGetValue(handlerKey, out factory) || this.factories.TryGetValue(handlerKey.FullName!, out factory))
             {
                 if (factory != null)  // This prevents delegation to an `IAwaitableFactory` for deregistered awaitable types; see note above.
                 {
@@ -147,7 +147,7 @@ namespace Moq
         /// </summary>
         /// <param name="type">The type of which to produce a value.</param>
         /// <param name="mock">The <see cref="Moq.Mock"/> on which an unexpected invocation has occurred.</param>
-        protected virtual object GetFallbackDefaultValue(Type type, Mock mock)
+        protected virtual object? GetFallbackDefaultValue(Type type, Mock mock)
         {
             Debug.Assert(type != null);
             Debug.Assert(type != typeof(void));
@@ -159,12 +159,12 @@ namespace Moq
         object CreateValueTupleOf(Type type, Mock mock)
         {
             var itemTypes = type.GetGenericArguments();
-            var items = new object[itemTypes.Length];
+            var items = new object?[itemTypes.Length];
             for (int i = 0, n = itemTypes.Length; i < n; ++i)
             {
                 items[i] = this.GetDefaultValue(itemTypes[i], mock);
             }
-            return Activator.CreateInstance(type, items);
+            return Activator.CreateInstance(type, items)!;
         }
     }
 }
