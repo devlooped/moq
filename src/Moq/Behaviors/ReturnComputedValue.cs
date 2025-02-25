@@ -8,9 +8,9 @@ namespace Moq.Behaviors
 {
     sealed class ReturnComputedValue : Behavior
     {
-        readonly Func<IInvocation, object> valueFactory;
+        readonly Func<IInvocation, object?> valueFactory;
 
-        public ReturnComputedValue(Func<IInvocation, object> valueFactory)
+        public ReturnComputedValue(Func<IInvocation, object?> valueFactory)
         {
             Debug.Assert(valueFactory != null);
 
