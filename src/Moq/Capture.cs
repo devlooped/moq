@@ -76,7 +76,7 @@ namespace Moq
         public static T With<T>(CaptureMatch<T> match)
         {
             Match.Register(match);
-            return default(T);
+            return default(T)!;
         }
     }
 }
