@@ -21,7 +21,7 @@ namespace Moq
         {
         }
 
-        public bool Equals(Expression x, Expression y)
+        public bool Equals(Expression? x, Expression? y)
         {
             if (object.ReferenceEquals(x, y))
             {
@@ -137,7 +137,7 @@ namespace Moq
 
         public int GetHashCode(Expression obj)
         {
-            return obj == null ? 0 : obj.GetHashCode();
+            return obj.GetHashCode();
         }
 
         static bool Equals<T>(ReadOnlyCollection<T> x, ReadOnlyCollection<T> y, Func<T, T, bool> comparer)
