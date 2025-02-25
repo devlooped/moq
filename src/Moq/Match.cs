@@ -68,7 +68,7 @@ namespace Moq
         /// </devdoc>
         internal static TValue Matcher<TValue>()
         {
-            return default(TValue);
+            return default(TValue)!;
         }
 
         internal abstract bool Matches(object argument, Type parameterType);
@@ -104,7 +104,7 @@ namespace Moq
         public static T Create<T>(Predicate<T> condition, Expression<Func<T>> renderExpression)
         {
             Match.Register(new Match<T>(condition, renderExpression));
-            return default(T);
+            return default(T)!;
         }
 
         /// <summary>
@@ -131,7 +131,7 @@ namespace Moq
             Guard.NotNull(renderExpression, nameof(renderExpression));
 
             Match.Register(new MatchFactory(condition, renderExpression));
-            return default(T);
+            return default(T)!;
         }
 
         internal static void Register(Match match)
@@ -185,7 +185,7 @@ namespace Moq
             this.Success?.Invoke((T)argument);
         }
 
-        static bool CanCast(object value)
+        static bool CanCast(object? value)
         {
             if (value != null)
             {
@@ -260,7 +260,7 @@ namespace Moq
             Debug.Assert(this.Matches(argument, parameterType));
         }
 
-        static bool CanCast<T>(object value)
+        static bool CanCast<T>(object? value)
         {
             if (value != null)
             {
@@ -273,7 +273,7 @@ namespace Moq
             }
         }
 
-        static readonly MethodInfo canCastMethod = typeof(MatchFactory).GetMethod("CanCast", BindingFlags.NonPublic | BindingFlags.Static | BindingFlags.DeclaredOnly);
+        static readonly MethodInfo canCastMethod = typeof(MatchFactory).GetMethod(nameof(CanCast), BindingFlags.NonPublic | BindingFlags.Static | BindingFlags.DeclaredOnly)!;
 
         // TODO: Check whether we need to implement `IEquatable<>` to make this work with delegate-based
         // setup & verification methods such as `SetupSet`!
