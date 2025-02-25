@@ -12,9 +12,9 @@ namespace Moq.Behaviors
         Mock mock;
         LambdaExpression expression;
         Delegate? eventArgsFunc;
-        object[]? eventArgsParams;
+        object?[]? eventArgsParams;
 
-        public RaiseEvent(Mock mock, LambdaExpression expression, Delegate? eventArgsFunc, object[]? eventArgsParams)
+        public RaiseEvent(Mock mock, LambdaExpression expression, Delegate? eventArgsFunc, object?[]? eventArgsParams)
         {
             Debug.Assert(mock != null);
             Debug.Assert(expression != null);
@@ -28,7 +28,7 @@ namespace Moq.Behaviors
 
         public override void Execute(Invocation invocation)
         {
-            object[] args;
+            object?[] args;
 
             if (this.eventArgsParams != null)
             {
@@ -39,11 +39,11 @@ namespace Moq.Behaviors
                 var argsFuncType = this.eventArgsFunc!.GetType();
                 if (argsFuncType.IsGenericType && argsFuncType.GetGenericArguments().Length == 1)
                 {
-                    args = new object[] { this.mock.Object, this.eventArgsFunc.InvokePreserveStack() };
+                    args = new object?[] { this.mock.Object, this.eventArgsFunc.InvokePreserveStack() };
                 }
                 else
                 {
-                    args = new object[] { this.mock.Object, this.eventArgsFunc.InvokePreserveStack(invocation.Arguments) };
+                    args = new object?[] { this.mock.Object, this.eventArgsFunc.InvokePreserveStack(invocation.Arguments) };
                 }
             }
 
