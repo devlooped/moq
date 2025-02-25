@@ -27,7 +27,7 @@ namespace Moq
     /// </summary>
     sealed class ActionObserver : ExpressionReconstructor
     {
-        public override Expression<Action<T>> ReconstructExpression<T>(Action<T> action, object[] ctorArgs = null)
+        public override Expression<Action<T>> ReconstructExpression<T>(Action<T> action, object[]? ctorArgs = null)
         {
             using (var matcherObserver = MatcherObserver.Activate())
             {
@@ -228,7 +228,7 @@ namespace Moq
         }
 
         // Creates a proxy (way more light-weight than a `Mock<T>`!) with an invocation `Recorder` attached to it.
-        static IProxy CreateProxy(Type type, object[] ctorArgs, MatcherObserver matcherObserver, out Recorder recorder)
+        static IProxy CreateProxy(Type type, object[]? ctorArgs, MatcherObserver matcherObserver, out Recorder recorder)
         {
             recorder = new Recorder(matcherObserver);
             return (IProxy)ProxyFactory.Instance.CreateProxy(type, recorder, Type.EmptyTypes, ctorArgs ?? new object[0]);
