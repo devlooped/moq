@@ -2,6 +2,7 @@
 // All rights reserved. Licensed under the BSD 3-Clause License; see License.txt.
 
 using System;
+using System.Diagnostics.CodeAnalysis;
 using System.Globalization;
 using System.Linq;
 using System.Linq.Expressions;
@@ -36,13 +37,18 @@ namespace Moq.Expressions.Visitors
             return visitor.arguments;
         }
 
-        ConstructorInfo constructor;
+        ConstructorInfo? constructor;
         object[] arguments;
 
-        public override Expression Visit(Expression node)
+#if NULLABLE_REFERENCE_TYPES
+        [return: NotNullIfNotNull("node")]
+#endif
+        public override Expression? Visit(Expression? node)
         {
-            switch (node.NodeType)
+            switch (node?.NodeType)
             {
+                case null:
+                    return null;
                 case ExpressionType.Lambda:
                 case ExpressionType.New:
                 case ExpressionType.Quote:
@@ -58,18 +64,15 @@ namespace Moq.Expressions.Visitors
 
         protected override Expression VisitNew(NewExpression node)
         {
-            if (node != null)
-            {
-                constructor = node.Constructor;
+            constructor = node.Constructor;
 
-                // Creates a lambda which uses the same argument expressions as the
-                // arguments contained in the NewExpression
-                var argumentExtractor = Expression.Lambda<Func<object[]>>(
-                    Expression.NewArrayInit(
-                        typeof(object),
-                        node.Arguments.Select(a => Expression.Convert(a, typeof(object)))));
-                arguments = ExpressionCompiler.Instance.Compile(argumentExtractor).Invoke();
-            }
+            // Creates a lambda which uses the same argument expressions as the
+            // arguments contained in the NewExpression
+            var argumentExtractor = Expression.Lambda<Func<object[]>>(
+                                                                      Expression.NewArrayInit(
+                                                                       typeof(object),
+                                                                       node.Arguments.Select(a => Expression.Convert(a, typeof(object)))));
+            arguments = ExpressionCompiler.Instance.Compile(argumentExtractor).Invoke();
             return node;
         }
     }
