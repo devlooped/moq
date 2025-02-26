@@ -3,6 +3,7 @@
 
 using System;
 using System.Collections.Generic;
+using System.Diagnostics.CodeAnalysis;
 using System.Linq;
 using System.Linq.Expressions;
 using System.Text;
@@ -84,10 +85,10 @@ namespace Moq
             serialNumberCounter = 0;
         }
 
-        T instance;
+        T? instance;
         List<Type> additionalInterfaces;
-        Dictionary<Type, object> configuredDefaultValues;
-        object[] constructorArguments;
+        Dictionary<Type, object?> configuredDefaultValues;
+        object?[] constructorArguments;
         DefaultValueProvider defaultValueProvider;
         EventHandlerCollection eventHandlers;
         InvocationCollection invocations;
@@ -110,6 +111,7 @@ namespace Moq
             // The skipInitialize parameter is not used at all, and it's 
             // just to differentiate this ctor that should do nothing 
             // from the regular ones which initializes the proxy, etc.
+            // TODO: How should nullable references be handled here?
         }
 
         /// <summary>
@@ -176,7 +178,7 @@ namespace Moq
 
             this.additionalInterfaces = new List<Type>();
             this.behavior = behavior;
-            this.configuredDefaultValues = new Dictionary<Type, object>();
+            this.configuredDefaultValues = new Dictionary<Type, object?>();
             this.constructorArguments = args;
             this.defaultValueProvider = DefaultValueProvider.Empty;
             this.eventHandlers = new EventHandlerCollection();
@@ -248,9 +250,9 @@ namespace Moq
             }
         }
 
-        internal override object[] ConstructorArguments => this.constructorArguments;
+        internal override object?[] ConstructorArguments => this.constructorArguments;
 
-        internal override Dictionary<Type, object> ConfiguredDefaultValues => this.configuredDefaultValues;
+        internal override Dictionary<Type, object?> ConfiguredDefaultValues => this.configuredDefaultValues;
 
         /// <summary>
         /// Gets or sets the <see cref="DefaultValueProvider"/> instance that will be used
@@ -295,6 +297,9 @@ namespace Moq
             return this.Name;
         }
 
+#if NET
+        [MemberNotNull(nameof(instance))]
+#endif
         void InitializeInstance()
         {
             // Determine the set of interfaces that the proxy object should additionally implement.
@@ -623,7 +628,7 @@ namespace Moq
         ///     Assert.Equal(6, v.Value);
         ///   </code>
         /// </example>
-        public Mock<T> SetupProperty<TProperty>(Expression<Func<T, TProperty>> property, TProperty initialValue)
+        public Mock<T> SetupProperty<TProperty>(Expression<Func<T, TProperty>> property, TProperty? initialValue)
         {
             Mock.SetupProperty(this, property, initialValue);
             return this;
