@@ -4,6 +4,7 @@
 using System;
 using System.Collections.Generic;
 using System.Diagnostics;
+using System.Diagnostics.CodeAnalysis;
 using System.Globalization;
 using System.Linq;
 using System.Linq.Expressions;
@@ -64,7 +65,11 @@ namespace Moq
             return ExpressionCompiler.Instance.Compile(expression);
         }
 
-        public static bool IsMatch(this Expression expression, out Match match)
+#if NULLABLE_REFERENCE_TYPES
+        public static bool IsMatch(this Expression expression, [NotNullWhen(true)] out Match? match)
+#else
+        public static bool IsMatch(this Expression expression, out Match? match)
+#endif
         {
             if (expression is MatchExpression matchExpression)
             {
@@ -262,6 +267,7 @@ namespace Moq
                             }
                             else  // This should be unreachable.
                             {
+                                // TODO: Should we throw here?
                                 method = null;
                             }
                             p = new MethodExpectation(
@@ -286,7 +292,7 @@ namespace Moq
                                         expression: Expression.Lambda(
                                             Expression.Invoke(parameter, arguments),
                                             parameter),
-                                        method: r.Type.GetMethod("Invoke", BindingFlags.Public | BindingFlags.NonPublic | BindingFlags.Instance),
+                                        method: r.Type.GetMethod("Invoke", BindingFlags.Public | BindingFlags.NonPublic | BindingFlags.Instance)!,
                                         arguments);
                             return;
                         }
@@ -321,7 +327,8 @@ namespace Moq
                             }
                             else  // This should be unreachable.
                             {
-                                method = null;
+                                // TODO: Should we throw here?
+                                method = null!;
                             }
                             p = new MethodExpectation(
                                         expression: Expression.Lambda(
@@ -341,7 +348,7 @@ namespace Moq
 
             bool IsResult(MemberInfo member, out IAwaitableFactory? awaitableFactory)
             {
-                var instanceType = member.DeclaringType;
+                var instanceType = member.DeclaringType!;
                 awaitableFactory = AwaitableFactory.TryGet(instanceType);
                 var returnType = member switch
                 {
@@ -363,7 +370,7 @@ namespace Moq
             // the expression. we attempt to correct this here by checking whether the type of the accessed object
             // has a property by the same name whose base definition equals the property in the expression; if so,
             // we "upgrade" to the derived property.
-            if (property.DeclaringType != expression.Expression.Type)
+            if (property.DeclaringType != expression.Expression!.Type)
             {
                 var parameterTypes = new ParameterTypes(property.GetIndexParameters());
                 var derivedProperty = expression.Expression.Type
