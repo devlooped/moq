@@ -151,7 +151,7 @@ namespace Moq
         /// </summary>
         public abstract bool CallBase { get; set; }
 
-        internal abstract object[] ConstructorArguments { get; }
+        internal abstract object?[] ConstructorArguments { get; }
 
         /// <summary>
         ///   Specifies the behavior to use when returning default values for unexpected invocations on loose mocks.
@@ -397,7 +397,7 @@ namespace Moq
                         // In order for an invocation to be "transitive", its return value has to be a
                         // sub-object (inner mock); and that sub-object has to have received at least
                         // one call:
-                        var wasTransitiveInvocation = mock.MutableSetups.FindLastInnerMock(setup => setup.Matches(unverifiedInvocations[i])) is Mock innerMock
+                        var wasTransitiveInvocation = mock.MutableSetups.FindLastInnerMock(setup => setup.Matches(unverifiedInvocations[i]!)) is Mock innerMock
                                                       && innerMock.MutableInvocations.Any();
                         if (wasTransitiveInvocation)
                         {
@@ -518,7 +518,7 @@ namespace Moq
             return Mock.Setup(mock, expression, condition);
         }
 
-        internal static MethodCall SetupSet(Mock mock, LambdaExpression expression, Condition condition)
+        internal static MethodCall SetupSet(Mock mock, LambdaExpression expression, Condition? condition)
         {
             Guard.NotNull(expression, nameof(expression));
             Guard.IsAssignmentToPropertyOrIndexer(expression, nameof(expression));
@@ -583,7 +583,7 @@ namespace Moq
             return true;
         }
 
-        internal static MethodCall SetupAdd(Mock mock, LambdaExpression expression, Condition condition)
+        internal static MethodCall SetupAdd(Mock mock, LambdaExpression expression, Condition? condition)
         {
             Guard.NotNull(expression, nameof(expression));
             Guard.IsEventAdd(expression, nameof(expression));
@@ -591,7 +591,7 @@ namespace Moq
             return Mock.Setup(mock, expression, condition);
         }
 
-        internal static MethodCall SetupRemove(Mock mock, LambdaExpression expression, Condition condition)
+        internal static MethodCall SetupRemove(Mock mock, LambdaExpression expression, Condition? condition)
         {
             Guard.NotNull(expression, nameof(expression));
             Guard.IsEventRemove(expression, nameof(expression));
@@ -611,7 +611,7 @@ namespace Moq
             });
         }
 
-        internal static StubbedPropertySetup SetupProperty(Mock mock, LambdaExpression expression, object initialValue)
+        internal static StubbedPropertySetup SetupProperty(Mock mock, LambdaExpression expression, object? initialValue)
         {
             Guard.NotNull(expression, nameof(expression));
 
