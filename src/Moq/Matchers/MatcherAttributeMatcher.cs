@@ -85,7 +85,7 @@ namespace Moq.Matchers
             var extraArgs = this.expression.Arguments.Select(ae => ((ConstantExpression)ae.PartialEval()).Value);
             var args = new[] { argument }.Concat(extraArgs).ToArray();
             // for static and non-static method
-            var instance = this.expression.Object == null ? null : (this.expression.Object.PartialEval() as ConstantExpression).Value;
+            var instance = this.expression.Object == null ? null : ((ConstantExpression)this.expression.Object.PartialEval()).Value;
             return (bool)validatorMethod.Invoke(instance, args)!;
         }
 
