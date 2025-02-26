@@ -19,9 +19,9 @@ namespace Moq
 
         internal override List<Type> AdditionalInterfaces => this.owner.AdditionalInterfaces;
 
-        internal override Dictionary<Type, object> ConfiguredDefaultValues => this.owner.ConfiguredDefaultValues;
+        internal override Dictionary<Type, object?> ConfiguredDefaultValues => this.owner.ConfiguredDefaultValues;
 
-        internal override object[] ConstructorArguments => this.owner.ConstructorArguments;
+        internal override object?[] ConstructorArguments => this.owner.ConstructorArguments;
 
         internal override InvocationCollection MutableInvocations => this.owner.MutableInvocations;
 
