@@ -242,7 +242,7 @@ namespace Moq
             readonly MatcherObserver matcherObserver;
             int creationTimestamp;
             Invocation? invocation;
-            int? invocationTimestamp;
+            int invocationTimestamp;
             object? returnValue;
 
             public Recorder(MatcherObserver matcherObserver)
@@ -260,7 +260,7 @@ namespace Moq
                 get
                 {
                     Debug.Assert(this.invocationTimestamp != default);
-                    return this.matcherObserver.GetMatchesBetween(this.creationTimestamp, this.invocationTimestamp!.Value);
+                    return this.matcherObserver.GetMatchesBetween(this.creationTimestamp, this.invocationTimestamp);
                 }
             }
 
