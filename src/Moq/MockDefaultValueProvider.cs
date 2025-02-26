@@ -19,7 +19,7 @@ namespace Moq
 
         internal override DefaultValue Kind => DefaultValue.Mock;
 
-        protected override object GetFallbackDefaultValue(Type type, Mock mock)
+        protected override object? GetFallbackDefaultValue(Type type, Mock mock)
         {
             Debug.Assert(type != null);
             Debug.Assert(type != typeof(void));
@@ -34,7 +34,7 @@ namespace Moq
             {
                 // Create a new mock to be placed to InnerMocks dictionary if it's missing there
                 var mockType = typeof(Mock<>).MakeGenericType(type);
-                Mock newMock = (Mock)Activator.CreateInstance(mockType, mock.Behavior);
+                Mock newMock = (Mock)Activator.CreateInstance(mockType, mock.Behavior)!;
                 newMock.DefaultValueProvider = mock.DefaultValueProvider;
                 if (mock.MutableSetups.FindLast(s => s is StubbedPropertiesSetup) is StubbedPropertiesSetup sts)
                 {
