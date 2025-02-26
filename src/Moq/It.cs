@@ -32,7 +32,7 @@ namespace Moq
             /// <summary>
             /// Matches any value that is assignment-compatible with type <typeparamref name="TValue"/>.
             /// </summary>
-            public static TValue IsAny;
+            public static TValue IsAny = default(TValue)!;
         }
 
         /// <summary>
@@ -64,7 +64,7 @@ namespace Moq
             }
         }
 
-        static readonly MethodInfo isAnyMethod = typeof(It).GetMethod(nameof(It.IsAny), BindingFlags.Public | BindingFlags.Static);
+        static readonly MethodInfo isAnyMethod = typeof(It).GetMethod(nameof(It.IsAny), BindingFlags.Public | BindingFlags.Static)!;
 
         internal static MethodCallExpression IsAny(Type genericArgument)
         {
@@ -143,7 +143,7 @@ namespace Moq
                 throw new ArgumentException(Resources.UseItIsOtherOverload, nameof(match));
             }
 
-            var thisMethod = (MethodInfo)MethodBase.GetCurrentMethod();
+            var thisMethod = (MethodInfo)MethodBase.GetCurrentMethod()!;
             var compiledMatchMethod = match.CompileUsingExpressionCompiler();
 
             return Match.Create<TValue>(
@@ -165,9 +165,9 @@ namespace Moq
         ///   Allows the specification of a predicate to perform matching of method call arguments.
         /// </remarks>
         [EditorBrowsable(EditorBrowsableState.Advanced)]
-        public static TValue Is<TValue>(Expression<Func<object, Type, bool>> match)
+        public static TValue Is<TValue>(Expression<Func<object?, Type, bool>> match)
         {
-            var thisMethod = (MethodInfo)MethodBase.GetCurrentMethod();
+            var thisMethod = (MethodInfo)MethodBase.GetCurrentMethod()!;
             var compiledMatchMethod = match.CompileUsingExpressionCompiler();
 
             return Match.Create<TValue>(
