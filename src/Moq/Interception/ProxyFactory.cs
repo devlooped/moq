@@ -13,7 +13,7 @@ namespace Moq
         /// </summary>
         public static ProxyFactory Instance { get; } = new CastleProxyFactory();
 
-        public abstract object CreateProxy(Type mockType, IInterceptor interceptor, Type[] interfaces, object[] arguments);
+        public abstract object CreateProxy(Type mockType, IInterceptor interceptor, Type[] interfaces, object?[] arguments);
 
         public abstract bool IsMethodVisible(MethodInfo method, out string messageIfNotVisible);
 
