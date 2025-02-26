@@ -44,7 +44,7 @@ namespace Moq
         }
 
         /// <inheritdoc />
-        public override object CreateProxy(Type mockType, Moq.IInterceptor interceptor, Type[] interfaces, object[] arguments)
+        public override object CreateProxy(Type mockType, Moq.IInterceptor interceptor, Type[] interfaces, object?[] arguments)
         {
             // All generated proxies need to implement `IProxy`:
             var additionalInterfaces = new Type[1 + interfaces.Length];
