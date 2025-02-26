@@ -17,7 +17,7 @@ namespace Moq
     // These methods are intended to create more readable string representations for use in failure messages.
     partial class StringBuilderExtensions
     {
-        public static StringBuilder AppendExpression(this StringBuilder builder, Expression expression)
+        public static StringBuilder AppendExpression(this StringBuilder builder, Expression? expression)
         {
             if (expression == null)
             {
@@ -273,7 +273,7 @@ namespace Moq
             }
             else
             {
-                builder.AppendNameOf(expression.Member.DeclaringType);
+                builder.AppendNameOf(expression.Member.DeclaringType!);
             }
 
             return builder.Append('.')
@@ -300,7 +300,7 @@ namespace Moq
             {
                 Debug.Assert(method.IsStatic);
 
-                builder.AppendNameOf(method.DeclaringType);
+                builder.AppendNameOf(method.DeclaringType!);
             }
 
             if (method.IsGetAccessor())
@@ -380,7 +380,7 @@ namespace Moq
 
         static StringBuilder AppendExpression(this StringBuilder builder, NewExpression expression)
         {
-            Type type = (expression.Constructor == null) ? expression.Type : expression.Constructor.DeclaringType;
+            Type type = (expression.Constructor == null) ? expression.Type : expression.Constructor.DeclaringType!;
             return builder.Append("new ")
                           .AppendNameOf(type)
                           .AppendCommaSeparated("(", expression.Arguments, AppendExpression, ")");
@@ -395,7 +395,7 @@ namespace Moq
 
                 case ExpressionType.NewArrayBounds:
                     return builder.Append("new ")
-                                  .AppendNameOf(expression.Type.GetElementType())
+                                  .AppendNameOf(expression.Type.GetElementType()!)
                                   .AppendCommaSeparated("[", expression.Expressions, AppendExpression, "]");
             }
 
