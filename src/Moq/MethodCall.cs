@@ -20,16 +20,16 @@ namespace Moq
 {
     sealed partial class MethodCall : SetupWithOutParameterSupport
     {
-        VerifyInvocationCount verifyInvocationCount;
-        Behavior callback;
-        Behavior raiseEvent;
-        Behavior returnOrThrow;
-        Behavior afterReturnCallback;
-        Condition condition;
-        string failMessage;
-        string declarationSite;
+        VerifyInvocationCount? verifyInvocationCount;
+        Behavior? callback;
+        Behavior? raiseEvent;
+        Behavior? returnOrThrow;
+        Behavior? afterReturnCallback;
+        Condition? condition;
+        string? failMessage;
+        string? declarationSite;
 
-        public MethodCall(Expression originalExpression, Mock mock, Condition condition, MethodExpectation expectation)
+        public MethodCall(Expression originalExpression, Mock mock, Condition? condition, MethodExpectation expectation)
             : base(originalExpression, mock, expectation)
         {
             this.condition = condition;
@@ -40,12 +40,12 @@ namespace Moq
             }
         }
 
-        public string FailMessage
+        public string? FailMessage
         {
             get => this.failMessage;
         }
 
-        public override Condition Condition => this.condition;
+        public override Condition? Condition => this.condition;
 
         public override IEnumerable<Mock> InnerMocks
         {
@@ -59,7 +59,7 @@ namespace Moq
             }
         }
 
-        static string GetUserCodeCallSite()
+        static string? GetUserCodeCallSite()
         {
             try
             {
@@ -68,14 +68,14 @@ namespace Moq
                 var frame = new StackTrace(true)
                     .GetFrames()
                     .SkipWhile(f => f.GetMethod() != thisMethod)
-                    .SkipWhile(f => f.GetMethod().DeclaringType == null || f.GetMethod().DeclaringType.Assembly == mockAssembly)
+                    .SkipWhile(f => f.GetMethod()!.DeclaringType == null || f.GetMethod()!.DeclaringType!.Assembly == mockAssembly)
                     .FirstOrDefault();
                 var member = frame?.GetMethod();
                 if (member != null)
                 {
                     var declaredAt = new StringBuilder();
-                    declaredAt.AppendNameOf(member.DeclaringType).Append('.').AppendNameOf(member, false);
-                    var fileName = Path.GetFileName(frame.GetFileName());
+                    declaredAt.AppendNameOf(member.DeclaringType!).Append('.').AppendNameOf(member, false);
+                    var fileName = Path.GetFileName(frame!.GetFileName());
                     if (fileName != null)
                     {
                         declaredAt.Append(" in ").Append(fileName);
@@ -144,7 +144,7 @@ namespace Moq
                 throw new ArgumentNullException(nameof(callback));
             }
 
-            ref Behavior behavior = ref (this.returnOrThrow == null) ? ref this.callback
+            ref Behavior? behavior = ref (this.returnOrThrow == null) ? ref this.callback
                                                                      : ref this.afterReturnCallback;
 
             if (callback is Action callbackWithoutArguments)
@@ -224,7 +224,7 @@ namespace Moq
             this.returnOrThrow = new ReturnValue(value);
         }
 
-        public void SetReturnComputedValueBehavior(Delegate valueFactory)
+        public void SetReturnComputedValueBehavior(Delegate? valueFactory)
         {
             Debug.Assert(this.Method.ReturnType != typeof(void));
             Debug.Assert(this.returnOrThrow == null);
@@ -302,7 +302,7 @@ namespace Moq
             this.returnOrThrow = new ThrowException(exception);
         }
 
-        public void SetThrowComputedExceptionBehavior(Delegate exceptionFactory)
+        public void SetThrowComputedExceptionBehavior(Delegate? exceptionFactory)
         {
             Debug.Assert(this.returnOrThrow == null);
 
@@ -314,6 +314,7 @@ namespace Moq
                 // and instead of in `Throws(TException)`, we ended up in `Throws(Delegate)` or `Throws(Func)`,
                 // which likely isn't what the user intended.
                 // So here we do what we would've done in `Throws(TException)`:
+                // TODO: ThrowException expects non-null argument.
                 this.returnOrThrow = new ThrowException(default);
             }
             else
