@@ -104,6 +104,14 @@ jobs:
           submodules: recursive
           fetch-depth: 0
 
+      - name: ⚙ dotnet
+        uses: actions/setup-dotnet@v4
+        with:
+          dotnet-version: |
+            6.x
+            8.x
+            9.x
+
       - name: ✓ ensure format
         run: |
           dotnet format whitespace --verify-no-changes -v:diag --exclude ~/.nuget

@@ -153,6 +153,18 @@
   <Import Project="Directory.props" Condition="Exists('Directory.props')"/>
   <Import Project="Directory.props.user" Condition="Exists('Directory.props.user')" />
 
+  <!-- If the imported props changed ManagePackageVersionsCentrally, we need to replicate 
+       the Version defaults from Microsoft.NET.DefaultAssemblyInfo.targets since it's too 
+       early here and Directory.Packages.props will be imported right after this time, 
+       meaning dependencies that expect to use the currently building Version would not 
+       get the expected value.
+   -->
+  <PropertyGroup Condition="'$(ManagePackageVersionsCentrally)' == 'true' and '$(Version)' == ''">
+    <VersionPrefix Condition=" '$(VersionPrefix)' == '' ">1.0.0</VersionPrefix>
+    <Version Condition=" '$(VersionSuffix)' != '' ">$(VersionPrefix)-$(VersionSuffix)</Version>
+    <Version Condition=" '$(Version)' == '' ">$(VersionPrefix)</Version>
+  </PropertyGroup>
+
   <!-- Implemented by SDK in .targets, guaranteeing it's overwritten. Added here since we add a DependsOnTargets to it. 
        Covers backwards compatiblity with non-SDK projects. -->
   <Target Name="InitializeSourceControlInformation" />
