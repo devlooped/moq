@@ -2,6 +2,13 @@
 name: dotnet-file-core
 on:
   workflow_call:
+    secrets:
+      BOT_NAME:
+        required: false
+      BOT_EMAIL:
+        required: false
+      GH_TOKEN:
+        required: false
 
 env:
   DOTNET_NOLOGO: true
