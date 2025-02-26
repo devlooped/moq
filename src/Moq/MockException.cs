@@ -248,7 +248,7 @@ namespace Moq
           System.Runtime.Serialization.StreamingContext context)
             : base(info, context)
         {
-            this.reasons = (MockExceptionReasons)info.GetValue(nameof(this.reasons), typeof(MockExceptionReasons));
+            this.reasons = (MockExceptionReasons)info.GetValue(nameof(this.reasons), typeof(MockExceptionReasons))!;
         }
 
         /// <summary>
