@@ -103,7 +103,7 @@ namespace Moq.Linq
             return base.VisitUnary(node);
         }
 
-        static Expression ConvertToSetup(Expression left, Expression right)
+        static Expression? ConvertToSetup(Expression left, Expression right)
         {
             switch (left.NodeType)
             {
