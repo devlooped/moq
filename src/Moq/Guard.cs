@@ -3,6 +3,7 @@
 
 using System;
 using System.Diagnostics;
+using System.Diagnostics.CodeAnalysis;
 using System.Globalization;
 using System.Linq.Expressions;
 using System.Reflection;
@@ -165,7 +166,11 @@ namespace Moq
         /// Ensures the given <paramref name="value"/> is not null.
         /// Throws <see cref="ArgumentNullException"/> otherwise.
         /// </summary>
-        public static void NotNull(object value, string paramName)
+#if NULLABLE_REFERENCE_TYPES
+        public static void NotNull([NotNull] object? value, string paramName)
+#else
+        public static void NotNull(object? value, string paramName)
+#endif
         {
             if (value == null)
             {
