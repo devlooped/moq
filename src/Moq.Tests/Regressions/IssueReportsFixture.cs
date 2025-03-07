@@ -3542,7 +3542,7 @@ namespace Moq.Tests.Regressions
 
             public interface IMockObject
             {
-                public string Method(Expression<Func<MyObject, bool>> expression);
+                string Method(Expression<Func<MyObject, bool>> expression);
             }
         }
 
@@ -3632,8 +3632,8 @@ namespace Moq.Tests.Regressions
             }
             public interface IClassA
             {
-                public IList<string> Items { get; set; }
-                public void Method();
+                IList<string> Items { get; set; }
+                void Method();
             }
         }
 
