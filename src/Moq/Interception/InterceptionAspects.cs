@@ -117,7 +117,7 @@ namespace Moq
                 if (methodName[0] == 'a' && methodName[3] == '_' && invocation.Method.IsEventAddAccessor())
                 {
                     var implementingMethod = invocation.Method.GetImplementingMethod(invocation.ProxyType);
-                    var @event = implementingMethod.DeclaringType.GetEvents(bindingFlags).SingleOrDefault(e => e.GetAddMethod(true) == implementingMethod);
+                    var @event = implementingMethod.DeclaringType!.GetEvents(bindingFlags).SingleOrDefault(e => e.GetAddMethod(true) == implementingMethod);
                     if (@event != null)
                     {
                         if (mock.CallBase && !invocation.Method.IsAbstract)
@@ -135,7 +135,7 @@ namespace Moq
                 else if (methodName[0] == 'r' && methodName.Length > 7 && methodName[6] == '_' && invocation.Method.IsEventRemoveAccessor())
                 {
                     var implementingMethod = invocation.Method.GetImplementingMethod(invocation.ProxyType);
-                    var @event = implementingMethod.DeclaringType.GetEvents(bindingFlags).SingleOrDefault(e => e.GetRemoveMethod(true) == implementingMethod);
+                    var @event = implementingMethod.DeclaringType!.GetEvents(bindingFlags).SingleOrDefault(e => e.GetRemoveMethod(true) == implementingMethod);
                     if (@event != null)
                     {
                         if (mock.CallBase && !invocation.Method.IsAbstract)

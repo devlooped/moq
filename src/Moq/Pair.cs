@@ -28,7 +28,7 @@ namespace Moq
                 && object.Equals(this.Item2, other.Item2);
         }
 
-        public override bool Equals(object obj)
+        public override bool Equals(object? obj)
         {
             return obj is Pair<T1, T2> other && this.Equals(other);
         }

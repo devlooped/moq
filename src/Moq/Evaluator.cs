@@ -3,6 +3,7 @@
 
 using System;
 using System.Collections.Generic;
+using System.Diagnostics.CodeAnalysis;
 using System.Linq.Expressions;
 
 namespace Moq
@@ -53,7 +54,10 @@ namespace Moq
                 return this.Visit(exp);
             }
 
-            public override Expression Visit(Expression exp)
+#if NULLABLE_REFERENCE_TYPES
+            [return: NotNullIfNotNull("exp")]
+#endif
+            public override Expression? Visit(Expression? exp)
             {
                 if (exp == null)
                 {
@@ -85,7 +89,7 @@ namespace Moq
         class Nominator : ExpressionVisitor
         {
             Func<Expression, bool> fnCanBeEvaluated;
-            HashSet<Expression> candidates;
+            HashSet<Expression> candidates = null!;
             bool cannotBeEvaluated;
 
             internal Nominator(Func<Expression, bool> fnCanBeEvaluated)
@@ -100,7 +104,7 @@ namespace Moq
                 return this.candidates;
             }
 
-            public override Expression Visit(Expression expression)
+            public override Expression? Visit(Expression? expression)
             {
                 if (expression != null && expression.NodeType != ExpressionType.Quote)
                 {

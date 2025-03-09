@@ -52,7 +52,7 @@ namespace Moq
                         var member = memberExpression.Member;
                         if (member.Name == nameof(It.Ref<object>.IsAny))
                         {
-                            var memberDeclaringType = member.DeclaringType;
+                            var memberDeclaringType = member.DeclaringType!;
                             if (memberDeclaringType.IsGenericType)
                             {
                                 var memberDeclaringTypeDefinition = memberDeclaringType.GetGenericTypeDefinition();
@@ -77,7 +77,7 @@ namespace Moq
                 var newArrayExpression = (NewArrayExpression)argument;
 
                 Debug.Assert(newArrayExpression.Type.IsArray);
-                var elementType = newArrayExpression.Type.GetElementType();
+                var elementType = newArrayExpression.Type.GetElementType()!;
 
                 var n = newArrayExpression.Expressions.Count;
                 var matchers = new IMatcher[n];
