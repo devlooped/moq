@@ -47,7 +47,7 @@
   </ItemGroup>
 
   <ItemGroup Condition=" $([System.Text.RegularExpressions.Regex]::IsMatch('$(DefineConstants)', 'FEATURE_EF'))">
-		<PackageReference Include="EntityFramework" Version="6.4.4" />
+		<PackageReference Include="EntityFramework" Version="6.5.1" />
 	</ItemGroup>
 
 	<ItemGroup Condition=" $([System.Text.RegularExpressions.Regex]::IsMatch('$(DefineConstants)', 'FEATURE_SYSTEM_WEB'))">
