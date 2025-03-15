@@ -15,7 +15,8 @@ env:
   VersionLabel: ${{ github.ref }}
   GH_TOKEN: ${{ secrets.GH_TOKEN }}
   MSBUILDTERMINALLOGGER: auto
-    
+  SLEET_FEED_URL: ${{ vars.SLEET_FEED_URL }}
+      
 jobs:
   publish:
     runs-on: ${{ vars.PUBLISH_AGENT || 'ubuntu-latest' }}

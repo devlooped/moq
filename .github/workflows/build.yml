@@ -28,6 +28,7 @@ env:
   GH_TOKEN: ${{ secrets.GH_TOKEN }}
   MSBUILDTERMINALLOGGER: auto
   Configuration: ${{ github.event.inputs.configuration || 'Release' }}
+  SLEET_FEED_URL: ${{ vars.SLEET_FEED_URL }}
 
 defaults:
   run:
