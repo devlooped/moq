@@ -296,7 +296,7 @@ namespace Moq
                             var memberAccessExpression = (MemberExpression)e;
                             Debug.Assert(memberAccessExpression.Member is PropertyInfo);
 
-                            if (IsResult(memberAccessExpression.Member, out var awaitableFactory))
+                            if (IsResult(memberAccessExpression.Member, out var awaitableFactory) && awaitableFactory is not null)
                             {
                                 Split(memberAccessExpression.Expression, out r, out p);
                                 p.AddResultExpression(
@@ -339,7 +339,7 @@ namespace Moq
                 }
             }
 
-            bool IsResult(MemberInfo member, out IAwaitableFactory awaitableFactory)
+            bool IsResult(MemberInfo member, out IAwaitableFactory? awaitableFactory)
             {
                 var instanceType = member.DeclaringType;
                 awaitableFactory = AwaitableFactory.TryGet(instanceType);
