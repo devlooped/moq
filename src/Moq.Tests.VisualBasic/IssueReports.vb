@@ -59,11 +59,19 @@ Public Class IssueReports
         End Interface
 
         Protected Sub Setup_NonGeneric(userManagerMock As Mock(Of IUserManager), expectedId As Integer)
+#Disable Warning BC42020 ' Variable declaration without an 'As' clause
+#Disable Warning BC42017 ' Late bound resolution
             userManagerMock.Setup(Sub(manager) manager.Create(It.IsAny(Of User))).Callback(Sub(user) user.Id = expectedId)
+#Enable Warning BC42017 ' Late bound resolution
+#Enable Warning BC42020 ' Variable declaration without an 'As' clause
         End Sub
 
         Protected Sub Setup_Generic(Of TUser As User)(userManagerMock As Mock(Of IUserManager), expectedId As Integer)
+#Disable Warning BC42020 ' Variable declaration without an 'As' clause
+#Disable Warning BC42017 ' Late bound resolution
             userManagerMock.Setup(Sub(manager) manager.Create(It.IsAny(Of TUser))).Callback(Sub(user) user.Id = expectedId)
+#Enable Warning BC42017 ' Late bound resolution
+#Enable Warning BC42020 ' Variable declaration without an 'As' clause
             '                                                             ^
             ' The use of generics will cause the VB.NET compiler to wrap the `It.IsAny<>` call with two `Convert` nodes.
             ' The inner conversion will convert to `Object`, and the outer conversion will convert to `User` (i.e. the type that

@@ -108,120 +108,120 @@ namespace Moq.Tests
         }
 
         [Fact]
-        public void Provides_completed_Task_containing_default_value_for_Task_of_value_type()
+        public async Task Provides_completed_Task_containing_default_value_for_Task_of_value_type()
         {
             var mock = new Mock<IFoo>() { DefaultValue = DefaultValue.Mock };
             var task = (Task<int>)GetDefaultValueForProperty(nameof(IFoo.TaskOfValueType), mock);
 
             Assert.NotNull(task);
             Assert.True(task.IsCompleted);
-            Assert.Equal(default(int), task.Result);
+            Assert.Equal(default(int), await task);
         }
 
         [Fact]
-        public void Provides_completed_Task_containing_empty_value_for_Task_of_emptyable_type()
+        public async Task Provides_completed_Task_containing_empty_value_for_Task_of_emptyable_type()
         {
             var mock = new Mock<IFoo>() { DefaultValue = DefaultValue.Mock };
             var task = (Task<int[]>)GetDefaultValueForProperty(nameof(IFoo.TaskOfEmptyableType), mock);
 
             Assert.NotNull(task);
             Assert.True(task.IsCompleted);
-            Assert.NotNull(task.Result);
-            Assert.Empty(task.Result);
+            Assert.NotNull(await task);
+            Assert.Empty(await task);
         }
 
         [Fact]
-        public void Provides_completed_Task_containing_null_for_Task_of_unmockable_reference_type()
+        public async Task Provides_completed_Task_containing_null_for_Task_of_unmockable_reference_type()
         {
             var mock = new Mock<IFoo>() { DefaultValue = DefaultValue.Mock };
             var task = (Task<IndexOutOfRangeException>)GetDefaultValueForProperty(nameof(IFoo.TaskOfUnmockableReferenceType), mock);
 
             Assert.NotNull(task);
             Assert.True(task.IsCompleted);
-            Assert.Null(task.Result);
+            Assert.Null(await task);
         }
 
         [Fact]
-        public void Provides_completed_Task_containing_mocked_value_for_Task_of_mockable_type()
+        public async Task Provides_completed_Task_containing_mocked_value_for_Task_of_mockable_type()
         {
             var mock = new Mock<IFoo>() { DefaultValue = DefaultValue.Mock };
             var task = (Task<IBar>)GetDefaultValueForProperty(nameof(IFoo.TaskOfMockableType), mock);
 
             Assert.NotNull(task);
             Assert.True(task.IsCompleted);
-            Assert.NotNull(task.Result);
-            Assert.True(task.Result is IMocked);
+            Assert.NotNull(await task);
+            Assert.True(await task is IMocked);
         }
 
         [Fact]
-        public void Provides_completed_Task_containing_completed_Task_containing_whatever_for_Task_of_Task_of_whatever()
+        public async Task Provides_completed_Task_containing_completed_Task_containing_whatever_for_Task_of_Task_of_whatever()
         {
             var mock = new Mock<IFoo>() { DefaultValue = DefaultValue.Mock };
             var task = (Task<Task<int>>)GetDefaultValueForProperty(nameof(IFoo.TaskOfTaskOfWhatever), mock);
 
             Assert.NotNull(task);
             Assert.True(task.IsCompleted);
-            Assert.NotNull(task.Result);
-            Assert.True(task.Result.IsCompleted);
+            Assert.NotNull(await task);
+            Assert.True((await task).IsCompleted);
         }
 
         [Fact]
-        public void Provides_completed_ValueTask_containing_default_value_for_ValueTask_of_value_type()
+        public async Task Provides_completed_ValueTask_containing_default_value_for_ValueTask_of_value_type()
         {
             var mock = new Mock<IFoo>() { DefaultValue = DefaultValue.Mock };
             var task = (ValueTask<int>)GetDefaultValueForProperty(nameof(IFoo.ValueTaskOfValueType), mock);
 
             Assert.True(task.IsCompleted);
-            Assert.Equal(default(int), task.Result);
+            Assert.Equal(default(int), await task);
         }
 
         [Fact]
-        public void Provides_completed_ValueTask_containing_empty_value_for_ValueTask_of_emptyable_type()
+        public async Task Provides_completed_ValueTask_containing_empty_value_for_ValueTask_of_emptyable_type()
         {
             var mock = new Mock<IFoo>() { DefaultValue = DefaultValue.Mock };
             var task = (ValueTask<int[]>)GetDefaultValueForProperty(nameof(IFoo.ValueTaskOfEmptyableType), mock);
 
             Assert.True(task.IsCompleted);
-            Assert.NotNull(task.Result);
-            Assert.Empty(task.Result);
+            Assert.NotNull(await task);
+            Assert.Empty(await task);
         }
 
         [Fact]
-        public void Provides_completed_ValueTask_containing_null_for_Task_of_unmockable_reference_type()
+        public async Task Provides_completed_ValueTask_containing_null_for_Task_of_unmockable_reference_type()
         {
             var mock = new Mock<IFoo>() { DefaultValue = DefaultValue.Mock };
             var task = (ValueTask<IndexOutOfRangeException>)GetDefaultValueForProperty(nameof(IFoo.ValueTaskOfUnmockableReferenceType), mock);
 
             Assert.True(task.IsCompleted);
-            Assert.Null(task.Result);
+            Assert.Null(await task);
         }
 
         [Fact]
-        public void Provides_completed_ValueTask_containing_mocked_value_for_ValueTask_of_mockable_type()
+        public async Task Provides_completed_ValueTask_containing_mocked_value_for_ValueTask_of_mockable_type()
         {
             var mock = new Mock<IFoo>() { DefaultValue = DefaultValue.Mock };
             var task = (ValueTask<IBar>)GetDefaultValueForProperty(nameof(IFoo.ValueTaskOfMockableType), mock);
 
             Assert.True(task.IsCompleted);
-            Assert.NotNull(task.Result);
-            Assert.True(task.Result is IMocked);
+            Assert.NotNull(await task);
+            Assert.True(await task is IMocked);
         }
 
         [Fact]
-        public void Provides_completed_ValueTask_of_completed_Task_of_mocked_value_for_ValueTask_of_Task_of_mockable_type()
+        public async Task Provides_completed_ValueTask_of_completed_Task_of_mocked_value_for_ValueTask_of_Task_of_mockable_type()
         {
             var mock = new Mock<IFoo>() { DefaultValue = DefaultValue.Mock };
             var task = (ValueTask<Task<IBar>>)GetDefaultValueForProperty(nameof(IFoo.ValueTaskOfTaskOfMockableType), mock);
 
             Assert.True(task.IsCompleted);
-            Assert.NotNull(task.Result);
-            Assert.True(task.Result.IsCompleted);
-            Assert.NotNull(task.Result.Result);
-            Assert.True(task.Result.Result is IMocked);
+            Assert.NotNull(await task);
+            Assert.True((await task).IsCompleted);
+            Assert.NotNull(await (await task));
+            Assert.True(await (await task) is IMocked);
         }
 
         [Fact]
-        public void Provides_ValueTuple_of_empty_array_and_completed_task_of_mocked_type()
+        public async Task Provides_ValueTuple_of_empty_array_and_completed_task_of_mocked_type()
         {
             var mock = new Mock<IFoo>() { DefaultValue = DefaultValue.Mock };
             var value = GetDefaultValueForProperty(nameof(IFoo.ValueTupleOfReferenceTypeArrayAndTaskOfReferenceType), mock);
@@ -231,8 +231,8 @@ namespace Moq.Tests
             Assert.Empty(bars);
             Assert.NotNull(barTask);
             Assert.True(barTask.IsCompleted);
-            Assert.IsAssignableFrom<IBar>(barTask.Result);
-            Assert.True(barTask.Result is IMocked);
+            Assert.IsAssignableFrom<IBar>(await barTask);
+            Assert.True(await barTask is IMocked);
         }
 
         [Fact]

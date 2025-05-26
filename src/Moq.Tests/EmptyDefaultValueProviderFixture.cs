@@ -104,80 +104,80 @@ namespace Moq.Tests
         }
 
         [Fact]
-        public void ProvidesDefaultGenericTaskOfValueType()
+        public async Task ProvidesDefaultGenericTaskOfValueType()
         {
             var value = GetDefaultValueForProperty(nameof(IFoo.GenericTaskOfValueType));
 
             Assert.NotNull(value);
             Assert.True(((Task)value).IsCompleted);
-            Assert.Equal(default(int), ((Task<int>)value).Result);
+            Assert.Equal(default(int), await ((Task<int>)value));
         }
 
         [Fact]
-        public void ProvidesDefaultGenericTaskOfReferenceType()
+        public async Task ProvidesDefaultGenericTaskOfReferenceType()
         {
             var value = GetDefaultValueForProperty(nameof(IFoo.GenericTaskOfReferenceType));
 
             Assert.NotNull(value);
             Assert.True(((Task)value).IsCompleted);
-            Assert.Equal(default(string), ((Task<string>)value).Result);
+            Assert.Equal(default(string), await (Task<string>)value);
         }
 
         [Fact]
-        public void ProvidesDefaultTaskOfGenericTask()
+        public async Task ProvidesDefaultTaskOfGenericTask()
         {
             var value = GetDefaultValueForProperty(nameof(IFoo.TaskOfGenericTaskOfValueType));
 
             Assert.NotNull(value);
             Assert.True(((Task)value).IsCompleted);
-            Assert.Equal(default(int), ((Task<Task<int>>)value).Result.Result);
+            Assert.Equal(default(int), await (await (Task<Task<int>>)value));
         }
 
         [Fact]
-        public void ProvidesDefaultValueTaskOfValueType()
+        public async Task ProvidesDefaultValueTaskOfValueType()
         {
             var value = GetDefaultValueForProperty(nameof(IFoo.ValueTaskOfValueType));
 
             var result = (ValueTask<int>)value;
             Assert.True(result.IsCompleted);
-            Assert.Equal(default(int), result.Result);
+            Assert.Equal(default(int), await result);
         }
 
         [Fact]
-        public void ProvidesDefaultValueTaskOfValueTypeArray()
+        public async Task ProvidesDefaultValueTaskOfValueTypeArray()
         {
             var value = GetDefaultValueForProperty(nameof(IFoo.ValueTaskOfValueTypeArray));
 
             var result = (ValueTask<int[]>)value;
             Assert.True(result.IsCompleted);
-            Assert.NotNull(result.Result);
-            Assert.Empty(result.Result);
+            Assert.NotNull(await result);
+            Assert.Empty(await result);
         }
 
         [Fact]
-        public void ProvidesDefaultValueTaskOfReferenceType()
+        public async Task ProvidesDefaultValueTaskOfReferenceType()
         {
             var value = GetDefaultValueForProperty(nameof(IFoo.ValueTaskOfReferenceType));
 
             var result = (ValueTask<string>)value;
             Assert.True(result.IsCompleted);
-            Assert.Equal(default(string), result.Result);
+            Assert.Equal(default(string), await result);
         }
 
         [Fact]
-        public void ProvidesDefaultValueTaskOfTaskOfValueType()
+        public async Task ProvidesDefaultValueTaskOfTaskOfValueType()
         {
             var value = GetDefaultValueForProperty(nameof(IFoo.ValueTaskOfTaskOfValueType));
 
             var result = (ValueTask<Task<int>>)value;
             Assert.True(result.IsCompleted);
-            Assert.NotNull(result.Result);
-            Assert.True(result.Result.IsCompleted);
-            Assert.Equal(default(int), result.Result.Result);
+            Assert.NotNull(await result);
+            Assert.True((await result).IsCompleted);
+            Assert.Equal(default(int), await (await result));
         }
 
         [Fact]
-        public void ProvidesDefaultValueTupleOfReferenceTypeArrayAndTaskOfReferenceType()
+        public async Task ProvidesDefaultValueTupleOfReferenceTypeArrayAndTaskOfReferenceType()
         {
             var value = GetDefaultValueForProperty(nameof(IFoo.ValueTupleOfReferenceTypeArrayAndTaskOfReferenceType));
 
@@ -186,7 +186,7 @@ namespace Moq.Tests
             Assert.Empty(bars);
             Assert.NotNull(barTask);
             Assert.True(barTask.IsCompleted);
-            Assert.Equal(default(IBar), barTask.Result);
+            Assert.Equal(default(IBar), await barTask);
         }
 
         static object GetDefaultValueForProperty(string propertyName)

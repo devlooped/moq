@@ -37,8 +37,8 @@ namespace Moq.Tests
                 .ReturnsAsync(3)
                 .ThrowsAsync(new InvalidOperationException());
 
-            Assert.Equal(2, mock.Object.DoAsync().Result);
-            Assert.Equal(3, mock.Object.DoAsync().Result);
+            Assert.Equal(2, await mock.Object.DoAsync());
+            Assert.Equal(3, await mock.Object.DoAsync());
             await Assert.ThrowsAsync<InvalidOperationException>(async () => await mock.Object.DoAsync());
         }
 
@@ -52,8 +52,8 @@ namespace Moq.Tests
                 .ReturnsAsync(() => 3)
                 .ThrowsAsync(new InvalidOperationException());
 
-            Assert.Equal(2, mock.Object.DoValueAsync().Result);
-            Assert.Equal(3, mock.Object.DoValueAsync().Result);
+            Assert.Equal(2, await mock.Object.DoValueAsync());
+            Assert.Equal(3, await mock.Object.DoValueAsync());
             await Assert.ThrowsAsync<InvalidOperationException>(async () => await mock.Object.DoValueAsync());
         }
 
