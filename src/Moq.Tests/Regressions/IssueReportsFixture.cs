@@ -1001,11 +1001,13 @@ namespace Moq.Tests.Regressions
             {
                 var infiniteLoopTimeout = TimeSpan.FromSeconds(5);
 
+#pragma warning disable xUnit1031 // Do not use blocking task operations in test method
                 var timedOut = !Task.Run(() =>
                 {
                     var fn = Mock.Of<Func<int>>(f => f() == 42);
                     Assert.Equal(42, fn());
                 }).Wait(infiniteLoopTimeout);
+#pragma warning restore xUnit1031 // Do not use blocking task operations in test method
 
                 Assert.False(timedOut);
             }

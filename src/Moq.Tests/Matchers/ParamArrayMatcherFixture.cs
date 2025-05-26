@@ -17,7 +17,7 @@ namespace Moq.Tests.Matchers
         [InlineData(42, null, true)]
         [InlineData(3.141f, "", false)]
         [InlineData(null, "", false)]
-        public void Matches_several_matchers_from_params_array(object first, object second, bool shouldMatch)
+        public void Matches_several_matchers_from_params_array(object? first, object? second, bool shouldMatch)
         {
             var seconds = new List<string>();
             var methodCallExpr = (MethodCallExpression)ToExpression<IX>(x => x.Method(It.IsAny<int>(), Capture.In(seconds))).Body;
@@ -42,10 +42,7 @@ namespace Moq.Tests.Matchers
             matcher.SetupEvaluatedSuccessfully(new object[] { 42, "" }, typeof(object[]));
         }
 
-        LambdaExpression ToExpression<T>(Expression<Action<T>> expr)
-        {
-            return expr;
-        }
+        LambdaExpression ToExpression<T>(Expression<Action<T>> expr) => expr;
 
         public interface IX
         {
