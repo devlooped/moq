@@ -1,0 +1,35 @@
+name: ⚙ dotnet
+description: Configures dotnet if the repo/org defines the DOTNET custom property
+
+runs:
+  using: composite
+  steps:
+    - name: 🔎 dotnet
+      id: dotnet
+      shell: bash
+      run: |
+        VERSIONS=$(gh api repos/${{ github.repository }}/properties/values | jq -r '.[] | select(.property_name == "DOTNET") | .value')
+        # Remove extra whitespace from VERSIONS
+        VERSIONS=$(echo "$VERSIONS" | tr -s ' ' | tr -d ' ')
+        # Convert comma-separated to newline-separated
+        NEWLINE_VERSIONS=$(echo "$VERSIONS" | tr ',' '\n')
+        # Validate versions
+        while IFS= read -r version; do
+          if ! [[ $version =~ ^[0-9]+(\.[0-9]+(\.[0-9]+)?)?(\.x)?$ ]]; then
+            echo "Error: Invalid version format: $version"
+            exit 1
+          fi
+        done <<< "$NEWLINE_VERSIONS"
+        # Write multiline output to $GITHUB_OUTPUT
+        {
+          echo 'versions<<EOF'
+          echo "$NEWLINE_VERSIONS"
+          echo 'EOF'
+        } >> $GITHUB_OUTPUT
+
+    - name: ⚙ dotnet
+      if: steps.dotnet.outputs.versions != ''
+      uses: actions/setup-dotnet@v4
+      with:
+        dotnet-version: |
+          ${{ steps.dotnet.outputs.versions }}
