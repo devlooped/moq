@@ -6,19 +6,32 @@ runs:
   steps:
     - name: 🔎 dotnet
       id: dotnet
-      shell: bash
+      shell: pwsh
       run: |
-        if [ -f .github/workflows/dotnet.json ]; then
-          VERSIONS=$(jq -r '.[]' .github/workflows/dotnet.json)
-        else
-          VERSIONS=$(gh api repos/${{ github.repository }}/properties/values | jq -r '[.[] | select(.property_name == "DOTNET") | .value] | join(",") | split(",")[] | gsub("^\\s+|\\s+$"; "")')
-        fi
-        # Write multiline output to $GITHUB_OUTPUT
-        {
-          echo 'versions<<EOF'
-          echo "$VERSIONS"
-          echo 'EOF'
-        } >> $GITHUB_OUTPUT
+        # Collect .NET major versions used across the repo
+        $projFiles = Get-ChildItem -Recurse -Include *.*proj
+        $versions = New-Object System.Collections.Generic.HashSet[string]
+
+        foreach ($file in $projFiles) {
+            $tfOutput = dotnet msbuild $file.FullName -getProperty:TargetFramework
+            if ([string]::IsNullOrWhiteSpace($tfOutput)) {
+                $tfOutput = dotnet msbuild $file.FullName -getProperty:TargetFrameworks
+            }
+            if ($tfOutput) {
+                $frameworks = $tfOutput.Trim().Split(';')
+                foreach ($framework in $frameworks) {
+                    if ($framework -match '^net(\d+)\.\d+$') {
+                        $majorVersion = $Matches[1]
+                        $versions.Add($majorVersion) | Out-Null
+                    }
+                }
+            }
+        }
+
+        $versionOutput = ($versions | ForEach-Object { "$_.x" }) -join "`n"
+        "versions<<EOF" | Out-File -FilePath $env:GITHUB_OUTPUT -Append
+        $versionOutput | Out-File -FilePath $env:GITHUB_OUTPUT -Append
+        "EOF" | Out-File -FilePath $env:GITHUB_OUTPUT -Append
 
     - name: ⚙ dotnet
       if: steps.dotnet.outputs.versions != ''
