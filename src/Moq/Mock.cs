@@ -703,7 +703,7 @@ namespace Moq
 
             var expression = ExpressionReconstructor.Instance.ReconstructExpression(action, mock.ConstructorArguments);
             var parts = expression.Split();
-            
+
             // TODO: Will this code never return null?
             return (Task)Mock.RaiseEvent(mock, expression, parts, arguments);
         }
