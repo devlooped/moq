@@ -148,7 +148,7 @@ namespace Moq
 
                     stringBuilder.AppendValueOf(enumerator.Current);
                 }
-                
+
                 (enumerator as IDisposable)?.Dispose();
                 stringBuilder.Append(']');
             }
