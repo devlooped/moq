@@ -78,7 +78,7 @@ namespace Moq
         bool IMatcher.Matches(object? argument, Type parameterType) => this.Matches(argument, parameterType);
 
         void IMatcher.SetupEvaluatedSuccessfully(object? value, Type parameterType) => this.SetupEvaluatedSuccessfully(value, parameterType);
-        
+
         // TODO: Consider making the constructor set this to avoid the nullable reference warning.
         internal Expression RenderExpression { get; set; }
 

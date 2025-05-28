@@ -20,7 +20,7 @@ namespace Moq
         {
             return type.IsValueType || type.GetConstructor(Type.EmptyTypes) != null;
         }
-        
+
 #if NULLABLE_REFERENCE_TYPES
         public static bool CanRead(this PropertyInfo property, [NotNullWhen(true)] out MethodInfo? getter)
 #else

@@ -49,7 +49,7 @@ namespace Moq
 
         public override TInterface Object
         {
-            get { return (TInterface) this.owner.Object; }
+            get { return (TInterface)this.owner.Object; }
         }
 
         internal override SetupCollection MutableSetups => this.owner.MutableSetups;
