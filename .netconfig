@@ -45,9 +45,9 @@
 	weak
 [file ".github/workflows/build.yml"]
 	url = https://github.com/devlooped/oss/blob/main/.github/workflows/build.yml
-	sha = 08c70776943839f73dbea2e65355108747468508
+	sha = 56c2b8532c2f86235a0f5bd00ba6eba126f199cf
 
-	etag = fb2e91cdc9fb7a4d3e8f698e525816c5d8febb35b005c278eecca8056e78f809
+	etag = bf99c19427f4372ecfe38ec56aa8c411058684fb717da5661f17ac00388b3602
 	weak
 [file ".github/workflows/changelog.config"]
 	url = https://github.com/devlooped/oss/blob/main/.github/workflows/changelog.config
@@ -66,9 +66,9 @@
 	weak
 [file ".github/workflows/publish.yml"]
 	url = https://github.com/devlooped/oss/blob/main/.github/workflows/publish.yml
-	sha = 08c70776943839f73dbea2e65355108747468508
+	sha = 56c2b8532c2f86235a0f5bd00ba6eba126f199cf
 
-	etag = 722a2c7cb3a42bc24ca7fb48d2e9a336641ed0599418239e24efbafccf64bd50
+	etag = 2ef43521627aa3a91dd55bdc2856ec0c6a93b42485d4fe9d6b181f9ee42c8e18
 	weak
 [file ".gitignore"]
 	url = https://github.com/devlooped/oss/blob/main/.gitignore
@@ -82,8 +82,8 @@
 	weak
 [file "_config.yml"]
 	url = https://github.com/devlooped/oss/blob/main/_config.yml
-	sha = fa83a5161ba52bc5d510ce0ba75ee0b1f8d4bc63
-	etag = 9139148f845adf503fd3c3c140eb64421fc476a1f9c027fc50825c0efb05f557
+	sha = 68b409c486842062e0de0e5b11e6fdb7cd12d6e2
+	etag = d608aa0ddaedc2d8a87260f50756e8d8314964ad4671b76bd085bcb458757010
 	weak
 [file "assets/css/style.scss"]
 	url = https://github.com/devlooped/oss/blob/main/assets/css/style.scss
@@ -122,4 +122,9 @@
 	url = https://github.com/devlooped/oss/blob/main/.github/actions/dotnet/action.yml
 	sha = f2b690ce307acb76c5b8d7faec1a5b971a93653e
 	etag = 27ea11baa2397b3ec9e643a935832da97719c4e44215cfd135c49cad4c29373f
+	weak
+[file ".github/workflows/dotnet-env.yml"]
+	url = https://github.com/devlooped/oss/blob/main/.github/workflows/dotnet-env.yml
+	sha = 77e83f238196d2723640abef0c7b6f43994f9747
+	etag = fcb9759a96966df40dcd24906fd328ddec05953b7e747a6bb8d0d1e4c3865274
 	weak
