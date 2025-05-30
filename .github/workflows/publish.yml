@@ -28,7 +28,7 @@ jobs:
           fetch-depth: 0
 
       - name: ⚙ dotnet
-        uses: ./.github/actions/dotnet
+        uses: devlooped/actions-dotnet-env@v1
 
       - name: 🙏 build
         run: dotnet build -m:1 -bl:build.binlog
