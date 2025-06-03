@@ -66,7 +66,7 @@ jobs:
           fetch-depth: 0
 
       - name: ⚙ dotnet
-        uses: ./.github/actions/dotnet
+        uses: devlooped/actions-dotnet-env@v1
 
       - name: 🙏 build
         run: dotnet build -m:1 -bl:build.binlog
@@ -101,12 +101,7 @@ jobs:
           fetch-depth: 0
 
       - name: ⚙ dotnet
-        uses: actions/setup-dotnet@v4
-        with:
-          dotnet-version: |
-            6.x
-            8.x
-            9.x
+        uses: devlooped/actions-dotnet-env@v1
 
       - name: ✓ ensure format
         run: |
