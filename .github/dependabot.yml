@@ -24,6 +24,11 @@ updates:
     Extensions:
       patterns:
         - "Microsoft.Extensions*"
+      exclude-patterns:
+        - "Microsoft.Extensions.AI*"
+    ExtensionsAI:
+      patterns:
+        - "Microsoft.Extensions.AI*"
     Web:
       patterns:
         - "Microsoft.AspNetCore*"

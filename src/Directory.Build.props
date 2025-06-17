@@ -126,6 +126,8 @@
     <_VersionLabel>$(_VersionLabel.Replace('/merge', ''))</_VersionLabel>
     <!-- Finally sanitize the branch with dashes, so we can build path-separated branches, like rel/v1.0.0 or feature/foo -->
     <_VersionLabel>$(_VersionLabel.Replace('/', '-'))</_VersionLabel>
+    <!-- And underscores which are also invalid labels, so we can use branches like dev/feature_foo -->
+    <_VersionLabel>$(_VersionLabel.Replace('_', '-'))</_VersionLabel>
 
     <!-- Set sanitized version to the actual version suffix used in build/pack -->
     <VersionSuffix Condition="!$(VersionLabel.Contains('refs/tags/'))">$(_VersionLabel)</VersionSuffix>
