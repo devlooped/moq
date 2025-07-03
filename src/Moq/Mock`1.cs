@@ -1423,6 +1423,7 @@ namespace Moq
         /// </example>
         public Task RaiseAsync(Action<T> eventExpression, params object[] args)
         {
+            if (eventExpression.Method.ReturnType == typeof(void)) throw new ArgumentOutOfRangeException(nameof(eventExpression), "The event expression must return Task or ValueTask.");
             return Mock.RaiseEventAsync(this, eventExpression, args);
         }
 
