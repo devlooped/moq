@@ -179,11 +179,29 @@ namespace Moq.Tests
             Assert.Equal(42, received);
         }
 
-        public class HasAsyncEvent
+        [Fact]
+        public async Task RaiseAsync_WithVoidEventDelegate_ThrowsArgumentOutOfRangeException()
         {
-#pragma warning disable CS0067 // Event never used
-            public virtual event Func<Task> Event;
-            public virtual event Func<int, Task> ParameterizedEvent;
+            //Arrange
+            var mock = new Mock<IWithEvent>();
+
+            await Assert.ThrowsAnyAsync<ArgumentOutOfRangeException>(async () => await mock.RaiseAsync(e => e.CustomEvent += null, "foo", 5));
         }
+
     }
+}
+
+public delegate void CustomEvent(string message, int value);
+
+public interface IWithEvent
+{
+    event CustomEvent CustomEvent;
+
+}
+
+public class HasAsyncEvent
+{
+#pragma warning disable CS0067 // Event never used
+    public virtual event Func<Task> Event;
+    public virtual event Func<int, Task> ParameterizedEvent;
 }
