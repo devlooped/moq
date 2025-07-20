@@ -28,7 +28,7 @@ namespace Moq
 
         static object CreateArray(Type type, Mock mock)
         {
-            var elementType = type.GetElementType();
+            var elementType = type.GetElementType()!;
             var lengths = new int[type.GetArrayRank()];
             return Array.CreateInstance(elementType, lengths);
         }
@@ -57,7 +57,7 @@ namespace Moq
             return typeof(Queryable).GetMethods("AsQueryable")
                 .Single(x => x.IsGenericMethod)
                 .MakeGenericMethod(elementType)
-                .Invoke(null, new[] { array });
+                .Invoke(null, new[] { array })!;
         }
     }
 }

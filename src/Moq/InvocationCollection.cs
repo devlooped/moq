@@ -10,7 +10,7 @@ namespace Moq
 {
     sealed class InvocationCollection : IInvocationList
     {
-        Invocation[] invocations;
+        Invocation[] invocations = new Invocation[0];
         int capacity = 0;
         int count = 0;
 
@@ -72,7 +72,7 @@ namespace Moq
             lock (this.invocationsLock)
             {
                 // Replace the collection so readers with a reference to the old collection aren't interrupted
-                this.invocations = null;
+                this.invocations = new Invocation[0];
                 this.count = 0;
                 this.capacity = 0;
 

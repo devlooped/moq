@@ -113,7 +113,7 @@ namespace Moq.Protected
         /// </example>
         public static Expression Is<TValue>(Expression<Func<TValue, bool>> match)
         {
-            Expression<Func<TValue>> expr = () => It.Is((Expression<Func<TValue, bool>>)null);
+            Expression<Func<TValue>> expr = () => It.Is((Expression<Func<TValue, bool>>)null!);
             return Expression.Call(((MethodCallExpression)expr.Body).Method, match);
         }
 

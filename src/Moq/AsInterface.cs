@@ -19,9 +19,9 @@ namespace Moq
 
         internal override List<Type> AdditionalInterfaces => this.owner.AdditionalInterfaces;
 
-        internal override Dictionary<Type, object> ConfiguredDefaultValues => this.owner.ConfiguredDefaultValues;
+        internal override Dictionary<Type, object?> ConfiguredDefaultValues => this.owner.ConfiguredDefaultValues;
 
-        internal override object[] ConstructorArguments => this.owner.ConstructorArguments;
+        internal override object?[] ConstructorArguments => this.owner.ConstructorArguments;
 
         internal override InvocationCollection MutableInvocations => this.owner.MutableInvocations;
 
@@ -49,7 +49,7 @@ namespace Moq
 
         public override TInterface Object
         {
-            get { return this.owner.Object as TInterface; }
+            get { return (TInterface)this.owner.Object; }
         }
 
         internal override SetupCollection MutableSetups => this.owner.MutableSetups;
@@ -72,7 +72,7 @@ namespace Moq
 
         public override string ToString()
         {
-            return this.owner.ToString();
+            return this.owner.ToString()!;
         }
     }
 }

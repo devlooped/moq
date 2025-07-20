@@ -4,6 +4,7 @@
 using System;
 using System.Collections.Generic;
 using System.Diagnostics;
+using System.Diagnostics.CodeAnalysis;
 using System.Reflection;
 using System.Text;
 
@@ -13,12 +14,12 @@ namespace Moq
 {
     abstract class Invocation : IInvocation
     {
-        object[] arguments;
+        object?[] arguments;
         MethodInfo method;
-        MethodInfo methodImplementation;
+        MethodInfo? methodImplementation;
         readonly Type proxyType;
-        object result;
-        Setup matchingSetup;
+        object? result;
+        Setup? matchingSetup;
         bool verified;
 
         /// <summary>
@@ -27,7 +28,7 @@ namespace Moq
         /// <param name="proxyType">The <see cref="Type"/> of the concrete proxy object on which a method is being invoked.</param>
         /// <param name="method">The method being invoked.</param>
         /// <param name="arguments">The arguments with which the specified <paramref name="method"/> is being invoked.</param>
-        protected Invocation(Type proxyType, MethodInfo method, params object[] arguments)
+        protected Invocation(Type proxyType, MethodInfo method, params object?[] arguments)
         {
             Debug.Assert(proxyType != null);
             Debug.Assert(arguments != null);
@@ -63,15 +64,15 @@ namespace Moq
         /// Arguments may be modified. Derived classes must ensure that by-reference parameters are written back
         /// when the invocation is ended by a call to any of the three <c>Returns</c> methods.
         /// </remarks>
-        public object[] Arguments => this.arguments;
+        public object?[] Arguments => this.arguments;
 
-        IReadOnlyList<object> IInvocation.Arguments => this.arguments;
+        IReadOnlyList<object?> IInvocation.Arguments => this.arguments;
 
-        public ISetup MatchingSetup => this.matchingSetup;
+        public ISetup? MatchingSetup => this.matchingSetup;
 
         public Type ProxyType => this.proxyType;
 
-        public object ReturnValue
+        public object? ReturnValue
         {
             get => this.result is ExceptionResult ? null : this.result;
             set
@@ -80,8 +81,10 @@ namespace Moq
                 this.result = value;
             }
         }
-
-        public Exception Exception
+#if NULLABLE_REFERENCE_TYPES  
+        [DisallowNull]
+#endif
+        public Exception? Exception
         {
             get => this.result is ExceptionResult r ? r.Exception : null;
             set
@@ -134,7 +137,7 @@ namespace Moq
             var method = this.Method;
 
             var builder = new StringBuilder();
-            builder.AppendNameOf(method.DeclaringType);
+            builder.AppendNameOf(method.DeclaringType!);
             builder.Append('.');
 
             if (method.IsGetAccessor())

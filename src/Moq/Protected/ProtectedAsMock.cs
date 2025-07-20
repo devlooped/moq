@@ -100,7 +100,7 @@ namespace Moq.Protected
             return new NonVoidSetupPhrase<T, TProperty>(setup);
         }
 
-        public Mock<T> SetupProperty<TProperty>(Expression<Func<TAnalog, TProperty>> expression, TProperty initialValue = default(TProperty))
+        public Mock<T> SetupProperty<TProperty>(Expression<Func<TAnalog, TProperty>> expression, TProperty? initialValue = default(TProperty))
         {
             Guard.NotNull(expression, nameof(expression));
 
@@ -153,7 +153,7 @@ namespace Moq.Protected
             return new SetupSequencePhrase(setup);
         }
 
-        public void Verify(Expression<Action<TAnalog>> expression, Times? times = null, string failMessage = null)
+        public void Verify(Expression<Action<TAnalog>> expression, Times? times = null, string? failMessage = null)
         {
             Guard.NotNull(expression, nameof(expression));
 
@@ -170,7 +170,7 @@ namespace Moq.Protected
             Mock.Verify(this.mock, rewrittenExpression, times ?? Times.AtLeastOnce(), failMessage);
         }
 
-        public void Verify<TResult>(Expression<Func<TAnalog, TResult>> expression, Times? times = null, string failMessage = null)
+        public void Verify<TResult>(Expression<Func<TAnalog, TResult>> expression, Times? times = null, string? failMessage = null)
         {
             Guard.NotNull(expression, nameof(expression));
 
@@ -187,7 +187,7 @@ namespace Moq.Protected
             Mock.Verify(this.mock, rewrittenExpression, times ?? Times.AtLeastOnce(), failMessage);
         }
 
-        public void VerifySet(Action<TAnalog> setterExpression, Times? times = null, string failMessage = null)
+        public void VerifySet(Action<TAnalog> setterExpression, Times? times = null, string? failMessage = null)
         {
             Guard.NotNull(setterExpression, nameof(setterExpression));
 
@@ -195,7 +195,7 @@ namespace Moq.Protected
             Mock.VerifySet(mock, rewrittenExpression, times.HasValue ? times.Value : Times.AtLeastOnce(), failMessage);
         }
 
-        public void VerifyGet<TProperty>(Expression<Func<TAnalog, TProperty>> expression, Times? times = null, string failMessage = null)
+        public void VerifyGet<TProperty>(Expression<Func<TAnalog, TProperty>> expression, Times? times = null, string? failMessage = null)
         {
             Guard.NotNull(expression, nameof(expression));
 

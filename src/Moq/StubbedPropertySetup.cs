@@ -10,9 +10,9 @@ namespace Moq
 {
     sealed class StubbedPropertySetup : Setup
     {
-        object value;
+        object? value;
 
-        public StubbedPropertySetup(Mock mock, LambdaExpression expression, MethodInfo getter, MethodInfo setter, object initialValue)
+        public StubbedPropertySetup(Mock mock, LambdaExpression expression, MethodInfo? getter, MethodInfo? setter, object? initialValue)
             : base(originalExpression: null, mock, new PropertyAccessorExpectation(expression, getter, setter))
         {
             // NOTE:
@@ -70,10 +70,10 @@ namespace Moq
         sealed class PropertyAccessorExpectation : Expectation
         {
             readonly LambdaExpression expression;
-            readonly MethodInfo getter;
-            readonly MethodInfo setter;
+            readonly MethodInfo? getter;
+            readonly MethodInfo? setter;
 
-            public PropertyAccessorExpectation(LambdaExpression expression, MethodInfo getter, MethodInfo setter)
+            public PropertyAccessorExpectation(LambdaExpression expression, MethodInfo? getter, MethodInfo? setter)
             {
                 Debug.Assert(expression != null);
                 Debug.Assert(expression.IsProperty());
@@ -86,7 +86,7 @@ namespace Moq
 
             public override LambdaExpression Expression => this.expression;
 
-            public override bool Equals(Expectation obj)
+            public override bool Equals(Expectation? obj)
             {
                 return obj is PropertyAccessorExpectation other
                     && other.getter == this.getter
@@ -101,7 +101,7 @@ namespace Moq
             public override bool IsMatch(Invocation invocation)
             {
                 var methodName = invocation.Method.Name;
-                return methodName == this.getter.Name || methodName == this.setter.Name;
+                return methodName == this.getter?.Name || methodName == this.setter?.Name;
             }
         }
     }
