@@ -4,13 +4,7 @@
   <PropertyGroup Label="CI" Condition="'$(CI)' == ''">
     <CI>false</CI>
     <!-- GH, CircleCI, GitLab and BitBucket already use CI -->
-    <CI Condition="'$(TF_BUILD)' == 'true' or 
-                   '$(TEAMCITY_VERSION)' != '' or 
-                   '$(APPVEYOR)' != '' or 
-                   '$(BuildRunner)' == 'MyGet' or 
-                   '$(JENKINS_URL)' != '' or 
-                   '$(TRAVIS)' == 'true' or 
-                   '$(BUDDY)' == 'true'">true</CI>
+    <CI Condition="'$(TF_BUILD)' == 'true' or                     '$(TEAMCITY_VERSION)' != '' or                     '$(APPVEYOR)' != '' or                     '$(BuildRunner)' == 'MyGet' or                     '$(JENKINS_URL)' != '' or                     '$(TRAVIS)' == 'true' or                     '$(BUDDY)' == 'true'">true</CI>
   </PropertyGroup>
 
   <PropertyGroup>
@@ -150,7 +144,7 @@
     <Using Include="System.ArgumentNullException" Static="true" />
   </ItemGroup>
 
-  <Import Project="Directory.props" Condition="Exists('Directory.props')"/>
+  <Import Project="Directory.props" Condition="Exists('Directory.props')" />
   <Import Project="Directory.props.user" Condition="Exists('Directory.props.user')" />
 
   <!-- If the imported props changed ManagePackageVersionsCentrally, we need to replicate 
