@@ -705,9 +705,10 @@ namespace Moq
         ///     mock.Verify(proc => proc.Execute("ping"));
         ///   </code>
         /// </example>
-        public void Verify(Expression<Action<T>> expression)
+        /// <returns>A list of matching invocations</returns>
+        public IVerifyResult<T> Verify(Expression<Action<T>> expression)
         {
-            Mock.Verify(this, expression, Times.AtLeastOnce(), null);
+            return new VerifyResult<T>(this, Mock.Verify(this, expression, Times.AtLeastOnce(), null));
         }
 
         /// <summary>
@@ -719,9 +720,10 @@ namespace Moq
         /// <exception cref="MockException">
         ///   The invocation was not called the number of times specified by <paramref name="times"/>.
         /// </exception>
-        public void Verify(Expression<Action<T>> expression, Times times)
+        /// <returns>A list of matching invocations</returns>
+        public IVerifyResult<T> Verify(Expression<Action<T>> expression, Times times)
         {
-            Mock.Verify(this, expression, times, null);
+            return new VerifyResult<T>(this, Mock.Verify(this, expression, times, null));
         }
 
         /// <summary>
@@ -733,9 +735,10 @@ namespace Moq
         /// <exception cref="MockException">
         ///   The invocation was not called the number of times specified by <paramref name="times"/>.
         /// </exception>
-        public void Verify(Expression<Action<T>> expression, Func<Times> times)
+        /// <returns>A list of matching invocations</returns>
+        public IVerifyResult<T> Verify(Expression<Action<T>> expression, Func<Times> times)
         {
-            Verify(expression, times());
+            return Verify(expression, times());
         }
 
         /// <summary>
@@ -746,9 +749,10 @@ namespace Moq
         /// <param name="expression">Expression to verify.</param>
         /// <param name="failMessage">Message to show if verification fails.</param>
         /// <exception cref="MockException">The invocation was not performed on the mock.</exception>
-        public void Verify(Expression<Action<T>> expression, string failMessage)
+        /// <returns>A list of matching invocations</returns>
+        public IVerifyResult<T> Verify(Expression<Action<T>> expression, string failMessage)
         {
-            Mock.Verify(this, expression, Times.AtLeastOnce(), failMessage);
+            return new VerifyResult<T>(this, Mock.Verify(this, expression, Times.AtLeastOnce(), failMessage));
         }
 
         /// <summary>
@@ -762,9 +766,10 @@ namespace Moq
         /// <exception cref="MockException">
         ///   The invocation was not called the number of times specified by <paramref name="times"/>.
         /// </exception>
-        public void Verify(Expression<Action<T>> expression, Times times, string failMessage)
+        /// <returns>A list of matching invocations</returns>
+        public IVerifyResult<T> Verify(Expression<Action<T>> expression, Times times, string failMessage)
         {
-            Mock.Verify(this, expression, times, failMessage);
+            return new VerifyResult<T>(this, Mock.Verify(this, expression, times, failMessage));
         }
 
         /// <summary>
@@ -778,9 +783,10 @@ namespace Moq
         /// <exception cref="MockException">
         ///   The invocation was not called the number of times specified by <paramref name="times"/>.
         /// </exception>
-        public void Verify(Expression<Action<T>> expression, Func<Times> times, string failMessage)
+        /// <returns>A list of matching invocations</returns>
+        public IVerifyResult<T> Verify(Expression<Action<T>> expression, Func<Times> times, string failMessage)
         {
-            Mock.Verify(this, expression, times(), failMessage);
+            return new VerifyResult<T>(this, Mock.Verify(this, expression, times(), failMessage));
         }
 
         /// <summary>
@@ -802,9 +808,10 @@ namespace Moq
         ///     mock.Verify(warehouse => warehouse.HasInventory(TALISKER, 50));
         ///   </code>
         /// </example>
-        public void Verify<TResult>(Expression<Func<T, TResult>> expression)
+        /// <returns>A list of matching invocations</returns>
+        public IVerifyResult<T> Verify<TResult>(Expression<Func<T, TResult>> expression)
         {
-            Mock.Verify(this, expression, Times.AtLeastOnce(), null);
+            return new VerifyResult<T>(this, Mock.Verify(this, expression, Times.AtLeastOnce(), null));
         }
 
         /// <summary>
@@ -817,9 +824,10 @@ namespace Moq
         /// <exception cref="MockException">
         ///   The invocation was not called the number of times specified by <paramref name="times"/>.
         /// </exception>
-        public void Verify<TResult>(Expression<Func<T, TResult>> expression, Times times)
+        /// <returns>A list of matching invocations</returns>
+        public IVerifyResult<T> Verify<TResult>(Expression<Func<T, TResult>> expression, Times times)
         {
-            Mock.Verify(this, expression, times, null);
+            return new VerifyResult<T>(this, Mock.Verify(this, expression, times, null));
         }
 
         /// <summary>
@@ -832,9 +840,10 @@ namespace Moq
         /// <exception cref="MockException">
         ///   The invocation was not called the number of times specified by <paramref name="times"/>.
         /// </exception>
-        public void Verify<TResult>(Expression<Func<T, TResult>> expression, Func<Times> times)
+        /// <returns>A list of matching invocations</returns>
+        public IVerifyResult<T> Verify<TResult>(Expression<Func<T, TResult>> expression, Func<Times> times)
         {
-            Mock.Verify(this, expression, times(), null);
+            return new VerifyResult<T>(this, Mock.Verify(this, expression, times(), null));
         }
 
         /// <summary>
@@ -848,9 +857,10 @@ namespace Moq
         /// <exception cref="MockException">
         ///   The invocation was not called the number times specified by <paramref name="times"/>.
         /// </exception>
-        public void Verify<TResult>(Expression<Func<T, TResult>> expression, Func<Times> times, string failMessage)
+        /// <returns>A list of matching invocations</returns>
+        public IVerifyResult<T> Verify<TResult>(Expression<Func<T, TResult>> expression, Func<Times> times, string failMessage)
         {
-            Mock.Verify(this, expression, times(), failMessage);
+            return new VerifyResult<T>(this, Mock.Verify(this, expression, times(), failMessage));
         }
 
         /// <summary>
@@ -874,9 +884,10 @@ namespace Moq
         ///                 "When filling orders, inventory has to be checked");
         ///   </code>
         /// </example>
-        public void Verify<TResult>(Expression<Func<T, TResult>> expression, string failMessage)
+        /// <returns>A list of matching invocations</returns>
+        public IVerifyResult<T> Verify<TResult>(Expression<Func<T, TResult>> expression, string failMessage)
         {
-            Mock.Verify(this, expression, Times.AtLeastOnce(), failMessage);
+            return new VerifyResult<T>(this, Mock.Verify(this, expression, Times.AtLeastOnce(), failMessage));
         }
 
         /// <summary>
@@ -890,9 +901,10 @@ namespace Moq
         /// <exception cref="MockException">
         ///   The invocation was not called the number times specified by <paramref name="times"/>.
         /// </exception>
-        public void Verify<TResult>(Expression<Func<T, TResult>> expression, Times times, string failMessage)
+        /// <returns>A list of matching invocations</returns>
+        public IVerifyResult<T> Verify<TResult>(Expression<Func<T, TResult>> expression, Times times, string failMessage)
         {
-            Mock.Verify(this, expression, times, failMessage);
+            return new VerifyResult<T>(this, Mock.Verify(this, expression, times, failMessage));
         }
 
         /// <summary>
@@ -912,12 +924,13 @@ namespace Moq
         ///     ... // exercise mock
         ///
         ///     // Will throw if the test code didn't retrieve the IsClosed property.
-        ///     mock.VerifyGet(warehouse => warehouse.IsClosed);
+        ///     new VerifyResult<T>(this, mock.VerifyGet(warehouse => warehouse.IsClosed));
         ///   </code>
         /// </example>
-        public void VerifyGet<TProperty>(Expression<Func<T, TProperty>> expression)
+        /// <returns>A list of matching invocations</returns>
+        public IVerifyResult<T> VerifyGet<TProperty>(Expression<Func<T, TProperty>> expression)
         {
-            Mock.VerifyGet(this, expression, Times.AtLeastOnce(), null);
+            return new VerifyResult<T>(this, Mock.VerifyGet(this, expression, Times.AtLeastOnce(), null));
         }
 
         /// <summary>
@@ -931,9 +944,10 @@ namespace Moq
         /// <exception cref="MockException">
         ///   The invocation was not called the number times specified by <paramref name="times"/>.
         /// </exception>
-        public void VerifyGet<TProperty>(Expression<Func<T, TProperty>> expression, Times times)
+        /// <returns>A list of matching invocations</returns>
+        public IVerifyResult<T> VerifyGet<TProperty>(Expression<Func<T, TProperty>> expression, Times times)
         {
-            Mock.VerifyGet(this, expression, times, null);
+            return new VerifyResult<T>(this, Mock.VerifyGet(this, expression, times, null));
         }
 
         /// <summary>
@@ -947,9 +961,10 @@ namespace Moq
         /// <exception cref="MockException">
         ///   The invocation was not called the number times specified by <paramref name="times"/>.
         /// </exception>
-        public void VerifyGet<TProperty>(Expression<Func<T, TProperty>> expression, Func<Times> times)
+        /// <returns>A list of matching invocations</returns>
+        public IVerifyResult<T> VerifyGet<TProperty>(Expression<Func<T, TProperty>> expression, Func<Times> times)
         {
-            VerifyGet(this, expression, times(), null);
+            return new VerifyResult<T>(this, VerifyGet(this, expression, times(), null));
         }
 
         /// <summary>
@@ -961,9 +976,10 @@ namespace Moq
         ///   Type of the property to verify. Typically omitted as it can be inferred from the expression's return type.
         /// </typeparam>
         /// <exception cref="MockException">The invocation was not performed on the mock.</exception>
-        public void VerifyGet<TProperty>(Expression<Func<T, TProperty>> expression, string failMessage)
+        /// <returns>A list of matching invocations</returns>
+        public IVerifyResult<T> VerifyGet<TProperty>(Expression<Func<T, TProperty>> expression, string failMessage)
         {
-            Mock.VerifyGet(this, expression, Times.AtLeastOnce(), failMessage);
+            return new VerifyResult<T>(this, Mock.VerifyGet(this, expression, Times.AtLeastOnce(), failMessage));
         }
 
         /// <summary>
@@ -978,9 +994,10 @@ namespace Moq
         /// <exception cref="MockException">
         ///   The invocation was not called the number times specified by <paramref name="times"/>.
         /// </exception>
-        public void VerifyGet<TProperty>(Expression<Func<T, TProperty>> expression, Times times, string failMessage)
+        /// <returns>A list of matching invocations</returns>
+        public IVerifyResult<T> VerifyGet<TProperty>(Expression<Func<T, TProperty>> expression, Times times, string failMessage)
         {
-            Mock.VerifyGet(this, expression, times, failMessage);
+            return new VerifyResult<T>(this, Mock.VerifyGet(this, expression, times, failMessage));
         }
 
         /// <summary>
@@ -995,9 +1012,10 @@ namespace Moq
         /// <exception cref="MockException">
         ///   The invocation was not called the number times specified by <paramref name="times"/>.
         /// </exception>
-        public void VerifyGet<TProperty>(Expression<Func<T, TProperty>> expression, Func<Times> times, string failMessage)
+        /// <returns>A list of matching invocations</returns>
+        public IVerifyResult<T> VerifyGet<TProperty>(Expression<Func<T, TProperty>> expression, Func<Times> times, string failMessage)
         {
-            VerifyGet(this, expression, times(), failMessage);
+            return new VerifyResult<T>(this, VerifyGet(this, expression, times(), failMessage));
         }
 
         /// <summary>
@@ -1014,15 +1032,16 @@ namespace Moq
         ///     ... // exercise mock
         ///
         ///     // Will throw if the test code didn't set the IsClosed property.
-        ///     mock.VerifySet(warehouse => warehouse.IsClosed = true);
+        ///     new VerifyResult<T>(this, mock.VerifySet(warehouse => warehouse.IsClosed = true));
         ///   </code>
         /// </example>
-        public void VerifySet(Action<T> setterExpression)
+        /// <returns>A list of matching invocations</returns>
+        public IVerifyResult<T> VerifySet(Action<T> setterExpression)
         {
             Guard.NotNull(setterExpression, nameof(setterExpression));
 
             var expression = ExpressionReconstructor.Instance.ReconstructExpression(setterExpression, this.ConstructorArguments);
-            Mock.VerifySet(this, expression, Times.AtLeastOnce(), null);
+            return new VerifyResult<T>(this, Mock.VerifySet(this, expression, Times.AtLeastOnce(), null));
         }
 
         /// <summary>
@@ -1033,12 +1052,13 @@ namespace Moq
         /// <exception cref="MockException">
         ///   The invocation was not called the number of times specified by <paramref name="times"/>.
         /// </exception>
-        public void VerifySet(Action<T> setterExpression, Times times)
+        /// <returns>A list of matching invocations</returns>
+        public IVerifyResult<T> VerifySet(Action<T> setterExpression, Times times)
         {
             Guard.NotNull(setterExpression, nameof(setterExpression));
 
             var expression = ExpressionReconstructor.Instance.ReconstructExpression(setterExpression, this.ConstructorArguments);
-            Mock.VerifySet(this, expression, times, null);
+            return new VerifyResult<T>(this, Mock.VerifySet(this, expression, times, null));
         }
 
         /// <summary>
@@ -1049,12 +1069,13 @@ namespace Moq
         /// <exception cref="MockException">
         ///   The invocation was not called the number of times specified by <paramref name="times"/>.
         /// </exception>
-        public void VerifySet(Action<T> setterExpression, Func<Times> times)
+        /// <returns>A list of matching invocations</returns>
+        public IVerifyResult<T> VerifySet(Action<T> setterExpression, Func<Times> times)
         {
             Guard.NotNull(setterExpression, nameof(setterExpression));
 
             var expression = ExpressionReconstructor.Instance.ReconstructExpression(setterExpression, this.ConstructorArguments);
-            Mock.VerifySet(this, expression, times(), null);
+            return new VerifyResult<T>(this, Mock.VerifySet(this, expression, times(), null));
         }
 
         /// <summary>
@@ -1076,12 +1097,13 @@ namespace Moq
         ///                    "Warehouse should always be closed after the action");
         ///   </code>
         /// </example>
-        public void VerifySet(Action<T> setterExpression, string failMessage)
+        /// <returns>A list of matching invocations</returns>
+        public IVerifyResult<T> VerifySet(Action<T> setterExpression, string failMessage)
         {
             Guard.NotNull(setterExpression, nameof(setterExpression));
 
             var expression = ExpressionReconstructor.Instance.ReconstructExpression(setterExpression, this.ConstructorArguments);
-            Mock.VerifySet(this, expression, Times.AtLeastOnce(), failMessage);
+            return new VerifyResult<T>(this, Mock.VerifySet(this, expression, Times.AtLeastOnce(), failMessage));
         }
 
         /// <summary>
@@ -1093,12 +1115,13 @@ namespace Moq
         /// <exception cref="MockException">
         ///   The invocation was not called the number of times specified by <paramref name="times"/>.
         /// </exception>
-        public void VerifySet(Action<T> setterExpression, Times times, string failMessage)
+        /// <returns>A list of matching invocations</returns>
+        public IVerifyResult<T> VerifySet(Action<T> setterExpression, Times times, string failMessage)
         {
             Guard.NotNull(setterExpression, nameof(setterExpression));
 
             var expression = ExpressionReconstructor.Instance.ReconstructExpression(setterExpression, this.ConstructorArguments);
-            Mock.VerifySet(this, expression, times, failMessage);
+            return new VerifyResult<T>(this, Mock.VerifySet(this, expression, times, failMessage));
         }
 
         /// <summary>
@@ -1110,12 +1133,13 @@ namespace Moq
         /// <exception cref="MockException">
         ///   The invocation was not called the number of times specified by <paramref name="times"/>.
         /// </exception>
-        public void VerifySet(Action<T> setterExpression, Func<Times> times, string failMessage)
+        /// <returns>A list of matching invocations</returns>
+        public IVerifyResult<T> VerifySet(Action<T> setterExpression, Func<Times> times, string failMessage)
         {
             Guard.NotNull(setterExpression, nameof(setterExpression));
 
             var expression = ExpressionReconstructor.Instance.ReconstructExpression(setterExpression, this.ConstructorArguments);
-            Mock.VerifySet(this, expression, times(), failMessage);
+            return new VerifyResult<T>(this, Mock.VerifySet(this, expression, times(), failMessage));
         }
 
         /// <summary>
@@ -1135,12 +1159,13 @@ namespace Moq
         ///     mock.VerifyAdd(warehouse => warehouse.OnClosed += It.IsAny&lt;EventHandler&gt;());
         ///   </code>
         /// </example>
-        public void VerifyAdd(Action<T> addExpression)
+        /// <returns>A list of matching invocations</returns>
+        public IVerifyResult<T> VerifyAdd(Action<T> addExpression)
         {
             Guard.NotNull(addExpression, nameof(addExpression));
 
             var expression = ExpressionReconstructor.Instance.ReconstructExpression(addExpression, this.ConstructorArguments);
-            Mock.VerifyAdd(this, expression, Times.AtLeastOnce(), null);
+            return new VerifyResult<T>(this, Mock.VerifyAdd(this, expression, Times.AtLeastOnce(), null));
         }
 
         /// <summary>
@@ -1151,12 +1176,13 @@ namespace Moq
         /// <exception cref="MockException">
         ///   The invocation was not called the number of times specified by <paramref name="times"/>.
         /// </exception>
-        public void VerifyAdd(Action<T> addExpression, Times times)
+        /// <returns>A list of matching invocations</returns>
+        public IVerifyResult<T> VerifyAdd(Action<T> addExpression, Times times)
         {
             Guard.NotNull(addExpression, nameof(addExpression));
 
             var expression = ExpressionReconstructor.Instance.ReconstructExpression(addExpression, this.ConstructorArguments);
-            Mock.VerifyAdd(this, expression, times, null);
+            return new VerifyResult<T>(this, Mock.VerifyAdd(this, expression, times, null));
         }
 
         /// <summary>
@@ -1167,12 +1193,13 @@ namespace Moq
         /// <exception cref="MockException">
         ///   The invocation was not called the number of times specified by <paramref name="times"/>.
         /// </exception>
-        public void VerifyAdd(Action<T> addExpression, Func<Times> times)
+        /// <returns>A list of matching invocations</returns>
+        public IVerifyResult<T> VerifyAdd(Action<T> addExpression, Func<Times> times)
         {
             Guard.NotNull(addExpression, nameof(addExpression));
 
             var expression = ExpressionReconstructor.Instance.ReconstructExpression(addExpression, this.ConstructorArguments);
-            Mock.VerifyAdd(this, expression, times(), null);
+            return new VerifyResult<T>(this, Mock.VerifyAdd(this, expression, times(), null));
         }
 
         /// <summary>
@@ -1181,12 +1208,13 @@ namespace Moq
         /// <param name="addExpression">Expression to verify.</param>
         /// <param name="failMessage">Message to show if verification fails.</param>
         /// <exception cref="MockException">The invocation was not performed on the mock.</exception>
-        public void VerifyAdd(Action<T> addExpression, string failMessage)
+        /// <returns>A list of matching invocations</returns>
+        public IVerifyResult<T> VerifyAdd(Action<T> addExpression, string failMessage)
         {
             Guard.NotNull(addExpression, nameof(addExpression));
 
             var expression = ExpressionReconstructor.Instance.ReconstructExpression(addExpression, this.ConstructorArguments);
-            Mock.VerifyAdd(this, expression, Times.AtLeastOnce(), failMessage);
+            return new VerifyResult<T>(this, Mock.VerifyAdd(this, expression, Times.AtLeastOnce(), failMessage));
         }
 
         /// <summary>
@@ -1198,12 +1226,13 @@ namespace Moq
         /// <exception cref="MockException">
         ///   The invocation was not called the number of times specified by <paramref name="times"/>.
         /// </exception>
-        public void VerifyAdd(Action<T> addExpression, Times times, string failMessage)
+        /// <returns>A list of matching invocations</returns>
+        public IVerifyResult<T> VerifyAdd(Action<T> addExpression, Times times, string failMessage)
         {
             Guard.NotNull(addExpression, nameof(addExpression));
 
             var expression = ExpressionReconstructor.Instance.ReconstructExpression(addExpression, this.ConstructorArguments);
-            Mock.VerifyAdd(this, expression, times, failMessage);
+            return new VerifyResult<T>(this, Mock.VerifyAdd(this, expression, times, failMessage));
         }
 
         /// <summary>
@@ -1215,12 +1244,13 @@ namespace Moq
         /// <exception cref="MockException">
         ///   The invocation was not called the number of times specified by <paramref name="times"/>.
         /// </exception>
-        public void VerifyAdd(Action<T> addExpression, Func<Times> times, string failMessage)
+        /// <returns>A list of matching invocations</returns>
+        public IVerifyResult<T> VerifyAdd(Action<T> addExpression, Func<Times> times, string failMessage)
         {
             Guard.NotNull(addExpression, nameof(addExpression));
 
             var expression = ExpressionReconstructor.Instance.ReconstructExpression(addExpression, this.ConstructorArguments);
-            Mock.VerifyAdd(this, expression, times(), failMessage);
+            return new VerifyResult<T>(this, Mock.VerifyAdd(this, expression, times(), failMessage));
         }
 
         /// <summary>
@@ -1240,12 +1270,13 @@ namespace Moq
         ///     mock.VerifyRemove(warehouse => warehouse.OnClose -= It.IsAny&lt;EventHandler&gt;());
         ///   </code>
         /// </example>
-        public void VerifyRemove(Action<T> removeExpression)
+        /// <returns>A list of matching invocations</returns>
+        public IVerifyResult<T> VerifyRemove(Action<T> removeExpression)
         {
             Guard.NotNull(removeExpression, nameof(removeExpression));
 
             var expression = ExpressionReconstructor.Instance.ReconstructExpression(removeExpression, this.ConstructorArguments);
-            Mock.VerifyRemove(this, expression, Times.AtLeastOnce(), null);
+            return new VerifyResult<T>(this, Mock.VerifyRemove(this, expression, Times.AtLeastOnce(), null));
         }
 
         /// <summary>
@@ -1256,12 +1287,13 @@ namespace Moq
         /// <exception cref="MockException">
         ///   The invocation was not called the number of times specified by <paramref name="times"/>.
         /// </exception>
-        public void VerifyRemove(Action<T> removeExpression, Times times)
+        /// <returns>A list of matching invocations</returns>
+        public IVerifyResult<T> VerifyRemove(Action<T> removeExpression, Times times)
         {
             Guard.NotNull(removeExpression, nameof(removeExpression));
 
             var expression = ExpressionReconstructor.Instance.ReconstructExpression(removeExpression, this.ConstructorArguments);
-            Mock.VerifyRemove(this, expression, times, null);
+            return new VerifyResult<T>(this, Mock.VerifyRemove(this, expression, times, null));
         }
 
         /// <summary>
@@ -1272,12 +1304,13 @@ namespace Moq
         /// <exception cref="MockException">
         ///   The invocation was not called the number of times specified by <paramref name="times"/>.
         /// </exception>
-        public void VerifyRemove(Action<T> removeExpression, Func<Times> times)
+        /// <returns>A list of matching invocations</returns>
+        public IVerifyResult<T> VerifyRemove(Action<T> removeExpression, Func<Times> times)
         {
             Guard.NotNull(removeExpression, nameof(removeExpression));
 
             var expression = ExpressionReconstructor.Instance.ReconstructExpression(removeExpression, this.ConstructorArguments);
-            Mock.VerifyRemove(this, expression, times(), null);
+            return new VerifyResult<T>(this, Mock.VerifyRemove(this, expression, times(), null));
         }
 
         /// <summary>
@@ -1286,12 +1319,13 @@ namespace Moq
         /// <param name="removeExpression">Expression to verify.</param>
         /// <param name="failMessage">Message to show if verification fails.</param>
         /// <exception cref="MockException">The invocation was not performed on the mock.</exception>
-        public void VerifyRemove(Action<T> removeExpression, string failMessage)
+        /// <returns>A list of matching invocations</returns>
+        public IVerifyResult<T> VerifyRemove(Action<T> removeExpression, string failMessage)
         {
             Guard.NotNull(removeExpression, nameof(removeExpression));
 
             var expression = ExpressionReconstructor.Instance.ReconstructExpression(removeExpression, this.ConstructorArguments);
-            Mock.VerifyRemove(this, expression, Times.AtLeastOnce(), failMessage);
+            return new VerifyResult<T>(this, Mock.VerifyRemove(this, expression, Times.AtLeastOnce(), failMessage));
         }
 
         /// <summary>
@@ -1303,12 +1337,13 @@ namespace Moq
         /// <exception cref="MockException">
         ///   The invocation was not called the number of times specified by <paramref name="times"/>.
         /// </exception>
-        public void VerifyRemove(Action<T> removeExpression, Times times, string failMessage)
+        /// <returns>A list of matching invocations</returns>
+        public IVerifyResult<T> VerifyRemove(Action<T> removeExpression, Times times, string failMessage)
         {
             Guard.NotNull(removeExpression, nameof(removeExpression));
 
             var expression = ExpressionReconstructor.Instance.ReconstructExpression(removeExpression, this.ConstructorArguments);
-            Mock.VerifyRemove(this, expression, times, failMessage);
+            return new VerifyResult<T>(this, Mock.VerifyRemove(this, expression, times, failMessage));
         }
 
         /// <summary>
@@ -1320,12 +1355,13 @@ namespace Moq
         /// <exception cref="MockException">
         ///   The invocation was not called the number of times specified by <paramref name="times"/>.
         /// </exception>
-        public void VerifyRemove(Action<T> removeExpression, Func<Times> times, string failMessage)
+        /// <returns>A list of matching invocations</returns>
+        public IVerifyResult<T> VerifyRemove(Action<T> removeExpression, Func<Times> times, string failMessage)
         {
             Guard.NotNull(removeExpression, nameof(removeExpression));
 
             var expression = ExpressionReconstructor.Instance.ReconstructExpression(removeExpression, this.ConstructorArguments);
-            Mock.VerifyRemove(this, expression, times(), failMessage);
+            return new VerifyResult<T>(this, Mock.VerifyRemove(this, expression, times(), failMessage));
         }
 
         /// <summary>

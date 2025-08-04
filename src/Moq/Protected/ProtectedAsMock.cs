@@ -2,6 +2,7 @@
 // All rights reserved. Licensed under the BSD 3-Clause License; see License.txt.
 
 using System;
+using System.Collections.Generic;
 using System.Diagnostics;
 using System.Linq;
 using System.Linq.Expressions;
@@ -153,7 +154,7 @@ namespace Moq.Protected
             return new SetupSequencePhrase(setup);
         }
 
-        public void Verify(Expression<Action<TAnalog>> expression, Times? times = null, string failMessage = null)
+        public IVerifyResult<T> Verify(Expression<Action<TAnalog>> expression, Times? times = null, string failMessage = null)
         {
             Guard.NotNull(expression, nameof(expression));
 
@@ -167,10 +168,10 @@ namespace Moq.Protected
                 throw new ArgumentException(ex.Message, nameof(expression));
             }
 
-            Mock.Verify(this.mock, rewrittenExpression, times ?? Times.AtLeastOnce(), failMessage);
+            return new VerifyResult<T>(this.mock, Mock.Verify(this.mock, rewrittenExpression, times ?? Times.AtLeastOnce(), failMessage));
         }
 
-        public void Verify<TResult>(Expression<Func<TAnalog, TResult>> expression, Times? times = null, string failMessage = null)
+        public IVerifyResult<T> Verify<TResult>(Expression<Func<TAnalog, TResult>> expression, Times? times = null, string failMessage = null)
         {
             Guard.NotNull(expression, nameof(expression));
 
@@ -184,18 +185,18 @@ namespace Moq.Protected
                 throw new ArgumentException(ex.Message, nameof(expression));
             }
 
-            Mock.Verify(this.mock, rewrittenExpression, times ?? Times.AtLeastOnce(), failMessage);
+            return new VerifyResult<T>(this.mock, Mock.Verify(this.mock, rewrittenExpression, times ?? Times.AtLeastOnce(), failMessage));
         }
 
-        public void VerifySet(Action<TAnalog> setterExpression, Times? times = null, string failMessage = null)
+        public IVerifyResult<T> VerifySet(Action<TAnalog> setterExpression, Times? times = null, string failMessage = null)
         {
             Guard.NotNull(setterExpression, nameof(setterExpression));
 
             var rewrittenExpression = ReconstructAndReplaceSetter(setterExpression);
-            Mock.VerifySet(mock, rewrittenExpression, times.HasValue ? times.Value : Times.AtLeastOnce(), failMessage);
+            return new VerifyResult<T>(mock, Mock.VerifySet(mock, rewrittenExpression, times.HasValue ? times.Value : Times.AtLeastOnce(), failMessage));
         }
 
-        public void VerifyGet<TProperty>(Expression<Func<TAnalog, TProperty>> expression, Times? times = null, string failMessage = null)
+        public IVerifyResult<T> VerifyGet<TProperty>(Expression<Func<TAnalog, TProperty>> expression, Times? times = null, string failMessage = null)
         {
             Guard.NotNull(expression, nameof(expression));
 
@@ -209,7 +210,7 @@ namespace Moq.Protected
                 throw new ArgumentException(ex.Message, nameof(expression));
             }
 
-            Mock.VerifyGet(this.mock, rewrittenExpression, times ?? Times.AtLeastOnce(), failMessage);
+            return new VerifyResult<T>(this.mock, Mock.VerifyGet(this.mock, rewrittenExpression, times ?? Times.AtLeastOnce(), failMessage));
         }
 
         LambdaExpression ReconstructAndReplaceSetter(Action<TAnalog> setterExpression)
