@@ -19,7 +19,7 @@ namespace Moq.Tests
         [InlineData(typeof(IEnumerable<>), null)] // emptyable
         [InlineData(typeof(string), default(string))] // primitive reference type
         [InlineData(typeof(Exception), default(Exception))] // reference type
-        public void Produces_default_when_no_factory_registered(Type type, object expected)
+        public void Produces_default_when_no_factory_registered(Type type, object? expected)
         {
             var provider = new Provider();
 
@@ -105,7 +105,7 @@ namespace Moq.Tests
         }
 
         [Fact]
-        public void Produces_completed_generic_Task()
+        public async Task Produces_completed_generic_Task()
         {
             const int expected = 42;
             var provider = new Provider();
@@ -114,7 +114,7 @@ namespace Moq.Tests
             var actual = (Task<int>)provider.GetDefaultValue(typeof(Task<int>));
 
             Assert.True(actual.IsCompleted);
-            Assert.Equal(42, actual.Result);
+            Assert.Equal(42, await actual);
         }
 
         [Fact]
@@ -129,7 +129,7 @@ namespace Moq.Tests
         }
 
         [Fact]
-        public void Produces_completed_ValueTask()
+        public async Task Produces_completed_ValueTask()
         {
             const int expectedResult = 42;
             var provider = new Provider();
@@ -138,11 +138,11 @@ namespace Moq.Tests
             var actual = (ValueTask<int>)provider.GetDefaultValue(typeof(ValueTask<int>));
 
             Assert.True(actual.IsCompleted);
-            Assert.Equal(42, actual.Result);
+            Assert.Equal(42, await actual);
         }
 
         [Fact]
-        public void Handling_of_ValueTask_can_be_disabled()
+        public async Task Handling_of_ValueTask_can_be_disabled()
         {
             // If deregistration of ValueTask<> handling really works, the fallback strategy will produce
             // `default(ValueTask<int>)`, which equals a completed task containing 0 as result. So this test
@@ -160,7 +160,7 @@ namespace Moq.Tests
             var actual = (ValueTask<int>)provider.GetDefaultValue(typeof(ValueTask<int>));
 
             Assert.Equal(default(ValueTask<int>), actual);
-            Assert.NotEqual(unexpected, actual.Result);
+            Assert.NotEqual(unexpected, await actual);
         }
 
         [Fact]

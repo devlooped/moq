@@ -20,7 +20,7 @@ namespace Moq.Language
         /// <example>
         /// The following example marks the expectation as verifiable:
         /// <code>
-        /// mock.Expect(x => x.Execute("ping"))
+        /// mock.Setup(x => x.Execute("ping"))
         ///     .Returns(true)
         ///     .Verifiable();
         /// </code>
@@ -35,7 +35,7 @@ namespace Moq.Language
         /// <example>
         /// The following example marks the expectation as verifiable:
         /// <code>
-        /// mock.Expect(x => x.Execute("ping"))
+        /// mock.Setup(x => x.Execute("ping"))
         ///     .Returns(true)
         ///     .Verifiable("Ping should be executed always!");
         /// </code>

@@ -1,0 +1,28 @@
+name: ⚙ dotnet
+description: Configures dotnet if the repo/org defines the DOTNET custom property
+
+runs:
+  using: composite
+  steps:
+    - name: 🔎 dotnet
+      id: dotnet
+      shell: bash
+      run: |
+        if [ -f .github/workflows/dotnet.json ]; then
+          VERSIONS=$(jq -r '.[]' .github/workflows/dotnet.json)
+        else
+          VERSIONS=$(gh api repos/${{ github.repository }}/properties/values | jq -r '[.[] | select(.property_name == "DOTNET") | .value] | join(",") | split(",")[] | gsub("^\\s+|\\s+$"; "")')
+        fi
+        # Write multiline output to $GITHUB_OUTPUT
+        {
+          echo 'versions<<EOF'
+          echo "$VERSIONS"
+          echo 'EOF'
+        } >> $GITHUB_OUTPUT
+
+    - name: ⚙ dotnet
+      if: steps.dotnet.outputs.versions != ''
+      uses: actions/setup-dotnet@v4
+      with:
+        dotnet-version: |
+          ${{ steps.dotnet.outputs.versions }}

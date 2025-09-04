@@ -30,7 +30,7 @@ namespace Moq.Async
                     awaitableType.GetGenericArguments()));
         }
 
-        public static IAwaitableFactory TryGet(Type type)
+        public static IAwaitableFactory? TryGet(Type type)
         {
             Debug.Assert(type != null);
 

@@ -8,6 +8,7 @@ BenchmarkDotNet.Artifacts
 /app
 .vs
 .vscode
+.genaiscript
 .idea
 local.settings.json
 

@@ -1001,11 +1001,13 @@ namespace Moq.Tests.Regressions
             {
                 var infiniteLoopTimeout = TimeSpan.FromSeconds(5);
 
+#pragma warning disable xUnit1031 // Do not use blocking task operations in test method
                 var timedOut = !Task.Run(() =>
                 {
                     var fn = Mock.Of<Func<int>>(f => f() == 42);
                     Assert.Equal(42, fn());
                 }).Wait(infiniteLoopTimeout);
+#pragma warning restore xUnit1031 // Do not use blocking task operations in test method
 
                 Assert.False(timedOut);
             }
@@ -3542,7 +3544,7 @@ namespace Moq.Tests.Regressions
 
             public interface IMockObject
             {
-                public string Method(Expression<Func<MyObject, bool>> expression);
+                string Method(Expression<Func<MyObject, bool>> expression);
             }
         }
 
@@ -3632,8 +3634,8 @@ namespace Moq.Tests.Regressions
             }
             public interface IClassA
             {
-                public IList<string> Items { get; set; }
-                public void Method();
+                IList<string> Items { get; set; }
+                void Method();
             }
         }
 

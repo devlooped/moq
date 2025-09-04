@@ -38,3 +38,6 @@ updates:
     ProtoBuf:
       patterns:
         - "protobuf-*"
+    Spectre:
+      patterns:
+        - "Spectre.Console*"

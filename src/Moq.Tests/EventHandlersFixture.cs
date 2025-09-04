@@ -181,6 +181,7 @@ namespace Moq.Tests
 
         public class HasAsyncEvent
         {
+#pragma warning disable CS0067 // Event never used
             public virtual event Func<Task> Event;
             public virtual event Func<int, Task> ParameterizedEvent;
         }

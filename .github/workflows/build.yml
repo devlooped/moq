@@ -28,6 +28,7 @@ env:
   GH_TOKEN: ${{ secrets.GH_TOKEN }}
   MSBUILDTERMINALLOGGER: auto
   Configuration: ${{ github.event.inputs.configuration || 'Release' }}
+  SLEET_FEED_URL: ${{ vars.SLEET_FEED_URL }}
 
 defaults:
   run:
@@ -64,6 +65,9 @@ jobs:
           submodules: recursive
           fetch-depth: 0
 
+      - name: ⚙ dotnet
+        uses: ./.github/actions/dotnet
+
       - name: 🙏 build
         run: dotnet build -m:1 -bl:build.binlog
 
@@ -73,7 +77,7 @@ jobs:
           dotnet retest -- --no-build
 
       - name: 🐛 logs
-        uses: actions/upload-artifact@v3
+        uses: actions/upload-artifact@v4
         if: runner.debug && always()
         with:
           name: logs
@@ -95,6 +99,14 @@ jobs:
         with: 
           submodules: recursive
           fetch-depth: 0
+
+      - name: ⚙ dotnet
+        uses: actions/setup-dotnet@v4
+        with:
+          dotnet-version: |
+            6.x
+            8.x
+            9.x
 
       - name: ✓ ensure format
         run: |
