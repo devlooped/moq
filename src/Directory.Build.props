@@ -20,6 +20,7 @@
 
   <PropertyGroup Label="NuGet">
     <Authors>Daniel Cazzulino</Authors>
+    <Company>Devlooped</Company>
     <Copyright>Copyright (C) Daniel Cazzulino and Contributors. All rights reserved.</Copyright>
     <PackageRequireLicenseAcceptance>false</PackageRequireLicenseAcceptance>
     <PackageLicenseExpression>MIT</PackageLicenseExpression>
@@ -42,6 +43,8 @@
 
     <!-- Ensure MSBuild tooling can access package artifacts always via PKG_[PackageId] -->
     <GeneratePathProperty>true</GeneratePathProperty>
+    <!-- Avoid warnings for test projects when we run dotnet pack on the whole solution. -->
+    <WarnOnPackingNonPackableProject>false</WarnOnPackingNonPackableProject>
   </PropertyGroup>
 
   <PropertyGroup Label="Build">
@@ -126,6 +129,8 @@
     <_VersionLabel>$(_VersionLabel.Replace('/merge', ''))</_VersionLabel>
     <!-- Finally sanitize the branch with dashes, so we can build path-separated branches, like rel/v1.0.0 or feature/foo -->
     <_VersionLabel>$(_VersionLabel.Replace('/', '-'))</_VersionLabel>
+    <!-- And underscores which are also invalid labels, so we can use branches like dev/feature_foo -->
+    <_VersionLabel>$(_VersionLabel.Replace('_', '-'))</_VersionLabel>
 
     <!-- Set sanitized version to the actual version suffix used in build/pack -->
     <VersionSuffix Condition="!$(VersionLabel.Contains('refs/tags/'))">$(_VersionLabel)</VersionSuffix>

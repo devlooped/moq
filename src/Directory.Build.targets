@@ -165,6 +165,9 @@
 
     <PropertyGroup>
       <RepositoryRoot>@(_GitSourceRoot)</RepositoryRoot>
+      <!-- Only change if it wasn't just the default from Microsoft.NET.DefaultAssemblyInfo.targets -->
+      <ProductFromUrl Condition="'$(SourceControlInformationFeatureSupported)' == 'true'">$([System.IO.Path]::GetFileNameWithoutExtension($(PrivateRepositoryUrl)))</ProductFromUrl>
+      <Product Condition="'$(Product)' == '$(AssemblyName)' and '$(ProductFromUrl)' != ''">$(ProductFromUrl)</Product>
     </PropertyGroup>
 
   </Target>
@@ -175,9 +178,9 @@
           Condition="'$(SourceControlInformationFeatureSupported)' == 'true' And
                      '$(IsPackable)' == 'true'">
     <PropertyGroup>
-      <PackageProjectUrl Condition="'$(PackageProjectUrl)' == '' and '$(PublishRepositoryUrl)' == 'true'">$(RepositoryUrl)</PackageProjectUrl>
+      <PackageProjectUrl Condition="'$(PackageProjectUrl)' == '' and '$(PublishRepositoryUrl)' == 'true'">$(RepositoryUrl.Replace('.git', ''))</PackageProjectUrl>
       <PackageDescription>$(Description)</PackageDescription>
-      <PackageReleaseNotes Condition="'$(RepositoryUrl)' != '' and Exists('$(MSBuildThisFileDirectory)..\changelog.md')">$(RepositoryUrl)/blob/main/changelog.md</PackageReleaseNotes>
+      <PackageReleaseNotes Condition="'$(RepositoryUrl)' != '' and Exists('$(MSBuildThisFileDirectory)..\changelog.md')">$(RepositoryUrl.Replace('.git', ''))/blob/main/changelog.md</PackageReleaseNotes>
     </PropertyGroup>
   </Target>
 

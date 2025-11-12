@@ -11,6 +11,7 @@ BenchmarkDotNet.Artifacts
 .genaiscript
 .idea
 local.settings.json
+.env
 
 *.suo
 *.sdf
