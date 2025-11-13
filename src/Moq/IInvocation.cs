@@ -41,5 +41,10 @@ namespace Moq
         /// Optional exception if the method invocation results in an exception being thrown.
         /// </summary>
         Exception Exception { get; }
+
+        /// <summary>
+        /// A number representing the order of this invocation in time with respect to all other invocations
+        /// </summary>
+        long SequenceNumber { get; }
     }
 }

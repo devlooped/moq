@@ -2,6 +2,7 @@
 // All rights reserved. Licensed under the BSD 3-Clause License; see License.txt.
 
 using System;
+using System.Collections.Generic;
 using System.ComponentModel;
 
 using Moq.Language;
@@ -182,7 +183,8 @@ namespace Moq.Protected
         /// <param name="times">The number of times a method is allowed to be called.</param>
         /// <param name="args">The optional arguments for the invocation. If argument matchers are used, 
         /// remember to use <see cref="ItExpr"/> rather than <see cref="It"/>.</param>
-        void Verify(string methodName, Times times, params object[] args);
+        /// <returns>A list of matching invocations</returns>
+        IVerifyResult<TMock> Verify(string methodName, Times times, params object[] args);
 
         /// <summary>
         /// Specifies a verify for a void method with the given <paramref name="methodName"/>,
@@ -196,7 +198,8 @@ namespace Moq.Protected
         /// <param name="times">The number of times a method is allowed to be called.</param>
         /// <param name="args">The optional arguments for the invocation. If argument matchers are used, 
         /// remember to use <see cref="ItExpr"/> rather than <see cref="It"/>.</param>
-        void Verify(string methodName, Type[] genericTypeArguments, Times times, params object[] args);
+        /// <returns>A list of matching invocations</returns>
+        IVerifyResult<TMock> Verify(string methodName, Type[] genericTypeArguments, Times times, params object[] args);
 
         /// <summary>
         /// Specifies a verify for a void method with the given <paramref name="methodName"/>,
@@ -210,7 +213,8 @@ namespace Moq.Protected
         /// <param name="exactParameterMatch">Should the parameter types match exactly types that were provided</param>
         /// <param name="args">The optional arguments for the invocation. If argument matchers are used, 
         /// remember to use <see cref="ItExpr"/> rather than <see cref="It"/>.</param>
-        void Verify(string methodName, Times times, bool exactParameterMatch, params object[] args);
+        /// <returns>A list of matching invocations</returns>
+        IVerifyResult<TMock> Verify(string methodName, Times times, bool exactParameterMatch, params object[] args);
 
         /// <summary>
         /// Specifies a verify for a void method with the given <paramref name="methodName"/>,
@@ -225,7 +229,8 @@ namespace Moq.Protected
         /// <param name="exactParameterMatch">Should the parameter types match exactly types that were provided</param>
         /// <param name="args">The optional arguments for the invocation. If argument matchers are used, 
         /// remember to use <see cref="ItExpr"/> rather than <see cref="It"/>.</param>
-        void Verify(string methodName, Type[] genericTypeArguments, Times times, bool exactParameterMatch, params object[] args);
+        /// <returns>A list of matching invocations</returns>
+        IVerifyResult<TMock> Verify(string methodName, Type[] genericTypeArguments, Times times, bool exactParameterMatch, params object[] args);
 
         /// <summary>
         /// Specifies a verify for an invocation on a property or a non void method with the given 
@@ -238,7 +243,8 @@ namespace Moq.Protected
         /// remember to use <see cref="ItExpr"/> rather than <see cref="It"/>.</param>
         /// <param name="times">The number of times a method is allowed to be called.</param>
         /// <typeparam name="TResult">The type of return value from the expression.</typeparam>
-        void Verify<TResult>(string methodName, Times times, params object[] args);
+        /// <returns>A list of matching invocations</returns>
+        IVerifyResult<TMock> Verify<TResult>(string methodName, Times times, params object[] args);
 
         /// <summary>
         /// Specifies a verify for an invocation on a property or a non void method with the given 
@@ -252,7 +258,8 @@ namespace Moq.Protected
         /// remember to use <see cref="ItExpr"/> rather than <see cref="It"/>.</param>
         /// <param name="times">The number of times a method is allowed to be called.</param>
         /// <typeparam name="TResult">The type of return value from the expression.</typeparam>
-        void Verify<TResult>(string methodName, Type[] genericTypeArguments, Times times, params object[] args);
+        /// <returns>A list of matching invocations</returns>
+        IVerifyResult<TMock> Verify<TResult>(string methodName, Type[] genericTypeArguments, Times times, params object[] args);
 
         /// <summary>
         /// Specifies a verify for an invocation on a property or a non void method with the given 
@@ -266,7 +273,8 @@ namespace Moq.Protected
         /// remember to use <see cref="ItExpr"/> rather than <see cref="It"/>.</param>
         /// <param name="times">The number of times a method is allowed to be called.</param>
         /// <typeparam name="TResult">The type of return value from the expression.</typeparam>
-        void Verify<TResult>(string methodName, Times times, bool exactParameterMatch, params object[] args);
+        /// <returns>A list of matching invocations</returns>
+        IVerifyResult<TMock> Verify<TResult>(string methodName, Times times, bool exactParameterMatch, params object[] args);
 
         /// <summary>
         /// Specifies a verify for an invocation on a property or a non void method with the given 
@@ -281,7 +289,8 @@ namespace Moq.Protected
         /// remember to use <see cref="ItExpr"/> rather than <see cref="It"/>.</param>
         /// <param name="times">The number of times a method is allowed to be called.</param>
         /// <typeparam name="TResult">The type of return value from the expression.</typeparam>
-        void Verify<TResult>(string methodName, Type[] genericTypeArguments, Times times, bool exactParameterMatch, params object[] args);
+        /// <returns>A list of matching invocations</returns>
+        IVerifyResult<TMock> Verify<TResult>(string methodName, Type[] genericTypeArguments, Times times, bool exactParameterMatch, params object[] args);
 
         /// <summary>
         /// Specifies a verify for an invocation on a property getter with the given 
@@ -292,8 +301,9 @@ namespace Moq.Protected
         /// <param name="propertyName">The name of the property.</param>
         /// <param name="times">The number of times a method is allowed to be called.</param>
         /// <typeparam name="TProperty">The type of the property.</typeparam>
+        /// <returns>A list of matching invocations</returns>
         // TODO should receive args to support indexers
-        void VerifyGet<TProperty>(string propertyName, Times times);
+        IVerifyResult<TMock> VerifyGet<TProperty>(string propertyName, Times times);
 
         /// <summary>
         /// Specifies a setup for an invocation on a property setter with the given 
@@ -306,8 +316,9 @@ namespace Moq.Protected
         /// <param name="value">The property value.</param>
         /// <typeparam name="TProperty">The type of the property. If argument matchers are used, 
         /// remember to use <see cref="ItExpr"/> rather than <see cref="It"/>.</typeparam>
+        /// <returns>A list of matching invocations</returns>
         // TODO should receive args to support indexers
-        void VerifySet<TProperty>(string propertyName, Times times, object value);
+        IVerifyResult<TMock> VerifySet<TProperty>(string propertyName, Times times, object value);
 
         #endregion
     }

@@ -313,7 +313,7 @@ namespace Moq
             }
         }
 
-        internal static void Verify(Mock mock, LambdaExpression expression, Times times, string failMessage)
+        internal static IEnumerable<IInvocation> Verify(Mock mock, LambdaExpression expression, Times times, string failMessage)
         {
             Guard.NotNull(times, nameof(times));
 
@@ -326,6 +326,7 @@ namespace Moq
                     part.SetupEvaluatedSuccessfully(invocation);
                     invocation.MarkAsVerified();
                 }
+                return invocationsToBeMarkedAsVerified.Select(pair => (IInvocation)pair.Item1);
             }
             else
             {
@@ -333,7 +334,7 @@ namespace Moq
             }
         }
 
-        internal static void VerifyGet(Mock mock, LambdaExpression expression, Times times, string failMessage)
+        internal static IEnumerable<IInvocation> VerifyGet(Mock mock, LambdaExpression expression, Times times, string failMessage)
         {
             Guard.NotNull(expression, nameof(expression));
 
@@ -343,31 +344,31 @@ namespace Moq
                 Guard.CanRead(property);
             }
 
-            Mock.Verify(mock, expression, times, failMessage);
+            return Mock.Verify(mock, expression, times, failMessage);
         }
 
-        internal static void VerifySet(Mock mock, LambdaExpression expression, Times times, string failMessage)
+        internal static IEnumerable<IInvocation> VerifySet(Mock mock, LambdaExpression expression, Times times, string failMessage)
         {
             Guard.NotNull(expression, nameof(expression));
             Guard.IsAssignmentToPropertyOrIndexer(expression, nameof(expression));
 
-            Mock.Verify(mock, expression, times, failMessage);
+            return Mock.Verify(mock, expression, times, failMessage);
         }
 
-        internal static void VerifyAdd(Mock mock, LambdaExpression expression, Times times, string failMessage)
+        internal static IEnumerable<IInvocation> VerifyAdd(Mock mock, LambdaExpression expression, Times times, string failMessage)
         {
             Guard.NotNull(expression, nameof(expression));
             Guard.IsEventAdd(expression, nameof(expression));
 
-            Mock.Verify(mock, expression, times, failMessage);
+            return Mock.Verify(mock, expression, times, failMessage);
         }
 
-        internal static void VerifyRemove(Mock mock, LambdaExpression expression, Times times, string failMessage)
+        internal static IEnumerable<IInvocation> VerifyRemove(Mock mock, LambdaExpression expression, Times times, string failMessage)
         {
             Guard.NotNull(expression, nameof(expression));
             Guard.IsEventRemove(expression, nameof(expression));
 
-            Mock.Verify(mock, expression, times, failMessage);
+            return Mock.Verify(mock, expression, times, failMessage);
         }
 
         internal static void VerifyNoOtherCalls(Mock mock)
