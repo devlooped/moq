@@ -35,7 +35,7 @@
 		<PackageReference Include="Castle.Core" Version="5.2.1" />
 		<PackageReference Include="IFluentInterface" Version="2.1.0" PrivateAssets="All" />
 		<PackageReference Include="Microsoft.NETFramework.ReferenceAssemblies" Version="1.0.3" PrivateAssets="All" />
-		<PackageReference Include="NuGetizer" Version="1.4.6" />
+		<PackageReference Include="NuGetizer" Version="1.4.7" />
 		<PackageReference Include="TypeNameFormatter.Sources" Version="1.1.2" PrivateAssets="All" />
 	</ItemGroup>
 
