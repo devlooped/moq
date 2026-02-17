@@ -3,8 +3,6 @@
 	<PropertyGroup>
 		<TargetFrameworks>net472;net8.0</TargetFrameworks>
 		<AssemblyName>Moq.Tests</AssemblyName>
-		<DebugSymbols>True</DebugSymbols>
-		<DebugType>portable</DebugType>
 		<GenerateRuntimeConfigurationFiles>true</GenerateRuntimeConfigurationFiles>
 		<IsPackable>False</IsPackable>
 		<NoWarn>$(NoWarn);CS8032</NoWarn>

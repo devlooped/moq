@@ -2,8 +2,6 @@
 
 	<PropertyGroup>
     <TargetFrameworks>net472;net8.0</TargetFrameworks>
-    <DebugSymbols>True</DebugSymbols>
-		<DebugType>portable</DebugType>
 		<IsPackable>False</IsPackable>
 	</PropertyGroup>
 
