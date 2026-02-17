@@ -32,15 +32,15 @@
 	</PropertyGroup>
 
 	<ItemGroup>
-		<PackageReference Include="Castle.Core" Version="5.2.1" />
-		<PackageReference Include="IFluentInterface" Version="2.1.0" PrivateAssets="All" />
-		<PackageReference Include="Microsoft.NETFramework.ReferenceAssemblies" Version="1.0.3" PrivateAssets="All" />
-		<PackageReference Include="NuGetizer" Version="1.4.6" />
-		<PackageReference Include="TypeNameFormatter.Sources" Version="1.1.2" PrivateAssets="All" />
+		<PackageReference Include="Castle.Core" />
+		<PackageReference Include="IFluentInterface" PrivateAssets="All" />
+		<PackageReference Include="Microsoft.NETFramework.ReferenceAssemblies" PrivateAssets="All" />
+		<PackageReference Include="NuGetizer" />
+		<PackageReference Include="TypeNameFormatter.Sources" PrivateAssets="All" />
 	</ItemGroup>
 
 	<ItemGroup Condition=" '$(TargetFramework)' == 'net462' Or '$(TargetFramework)' == 'netstandard2.0' ">
-		<PackageReference Include="System.Threading.Tasks.Extensions" Version="4.6.3" />
+		<PackageReference Include="System.Threading.Tasks.Extensions" />
 	</ItemGroup>
 
 	<ItemGroup>
