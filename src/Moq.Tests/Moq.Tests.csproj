@@ -39,15 +39,15 @@
     </Reference>
   </ItemGroup>
 
-  <ItemGroup Condition=" $([System.Text.RegularExpressions.Regex]::IsMatch('$(DefineConstants)', 'FEATURE_EF'))">
+  <ItemGroup Condition="$(DefineConstants.Contains('FEATURE_EF'))">
 		<PackageReference Include="EntityFramework" />
 	</ItemGroup>
 
-	<ItemGroup Condition=" $([System.Text.RegularExpressions.Regex]::IsMatch('$(DefineConstants)', 'FEATURE_SYSTEM_WEB'))">
+	<ItemGroup Condition="$(DefineConstants.Contains('FEATURE_SYSTEM_WEB'))">
 		<Reference Include="System.Web" />
 	</ItemGroup>
 
-	<ItemGroup Condition=" $([System.Text.RegularExpressions.Regex]::IsMatch('$(DefineConstants)', 'FEATURE_SYSTEM_WINDOWS_FORMS'))">
+	<ItemGroup Condition="$(DefineConstants.Contains('FEATURE_SYSTEM_WINDOWS_FORMS'))">
 		<Reference Include="System.Windows.Forms" />
 	</ItemGroup>
 
