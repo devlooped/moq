@@ -5,6 +5,12 @@
     <DefineConstants>CI;$(DefineConstants)</DefineConstants>
   </PropertyGroup>
 
+  <PropertyGroup Condition=" '$(TargetFramework)' == 'netstandard2.1' or '$(TargetFramework)' == 'net6.0' or '$(TargetFramework)' == 'net8.0' "
+                 Label="Feature Flags">
+    <DefineConstants Condition="'$(Language)' != 'VB'">$(DefineConstants);FEATURE_DEFAULT_INTERFACE_IMPLEMENTATIONS</DefineConstants>
+    <DefineConstants Condition="'$(Language)' == 'VB'">$(DefineConstants),FEATURE_DEFAULT_INTERFACE_IMPLEMENTATIONS</DefineConstants>
+  </PropertyGroup>
+
   <PropertyGroup Label="Build">
     <!-- Tests projects don't need API docs, typically -->
     <GenerateDocumentationFile Condition="$(GenerateDocumentationFile) == '' and $(IsTestProject) == 'true'">false</GenerateDocumentationFile>

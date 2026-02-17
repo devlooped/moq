@@ -8,10 +8,6 @@
 		<WarningLevel>4</WarningLevel>
 	</PropertyGroup>
 
-	<PropertyGroup Condition=" '$(TargetFramework)' == 'netstandard2.1' Or '$(TargetFramework)' == 'net6.0' ">
-		<DefineConstants>$(DefineConstants);FEATURE_DEFAULT_INTERFACE_IMPLEMENTATIONS</DefineConstants>
-	</PropertyGroup>
-
 	<PropertyGroup>
 		<!-- Properties related to NuGet packaging: -->
 		<IsPackable>True</IsPackable>
