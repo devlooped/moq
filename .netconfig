@@ -123,3 +123,6 @@
 	sha = f2b690ce307acb76c5b8d7faec1a5b971a93653e
 	etag = 27ea11baa2397b3ec9e643a935832da97719c4e44215cfd135c49cad4c29373f
 	weak
+[file "osmfeula.txt"]
+	url = https://github.com/devlooped/.github/blob/main/osmfeula.txt
+	skip
