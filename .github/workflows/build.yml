@@ -12,7 +12,7 @@ on:
         - Release
         - Debug
   push:
-    branches: [ main, dev, 'dev/*', 'feature/*', 'rel/*' ]
+    branches: [ main, 'feature/*', 'rel/*' ]
     paths-ignore:
       - changelog.md
       - readme.md
@@ -66,15 +66,14 @@ jobs:
           fetch-depth: 0
 
       - name: ⚙ dotnet
-        uses: ./.github/actions/dotnet
+        uses: devlooped/actions-dotnet-env@v1
 
       - name: 🙏 build
         run: dotnet build -m:1 -bl:build.binlog
 
       - name: 🧪 test
-        run: |
-          dotnet tool update -g dotnet-retest
-          dotnet retest -- --no-build
+        shell: pwsh
+        run: dnx --yes retest -- --no-build
 
       - name: 🐛 logs
         uses: actions/upload-artifact@v4
@@ -101,12 +100,7 @@ jobs:
           fetch-depth: 0
 
       - name: ⚙ dotnet
-        uses: actions/setup-dotnet@v4
-        with:
-          dotnet-version: |
-            6.x
-            8.x
-            9.x
+        uses: devlooped/actions-dotnet-env@v1
 
       - name: ✓ ensure format
         run: |

@@ -5,8 +5,9 @@ on:
     branches:
       - 'main'
     paths:
-      - '**.md'    
+      - '**.md'
       - '!changelog.md'
+      - 'osmfeula.txt'
 
 jobs:
   includes:
@@ -31,14 +32,33 @@ jobs:
       - name: +Mᐁ includes
         uses: devlooped/actions-includes@v1
 
+      - name: 📝 OSMF EULA
+        shell: pwsh
+        run: |
+          $file = "osmfeula.txt"
+          $props = "src/Directory.Build.props"
+          if (-not (test-path $file) -or -not (test-path $props)) {
+            exit 0
+          }
+
+          $product = dotnet msbuild $props -getproperty:Product
+          if (-not $product) { 
+            write-error 'To use OSMF EULA, ensure the $(Product) property is set in Directory.props'
+            exit 1
+          }
+          
+          ((get-content -raw $file) -replace '\$product\$',$product).trim() | set-content $file
+
       - name: ✍ pull request
-        uses: peter-evans/create-pull-request@v6
+        uses: peter-evans/create-pull-request@v8
         with:
-          add-paths: '**.md'
+          add-paths: |
+            **.md
+            *.txt
           base: main
           branch: markdown-includes
           delete-branch: true
-          labels: docs
+          labels: dependencies
           author: ${{ env.BOT_AUTHOR }}
           committer: ${{ env.BOT_AUTHOR }}
           commit-message: +Mᐁ includes

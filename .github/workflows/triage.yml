@@ -49,7 +49,11 @@ jobs:
           # if we don't have at least 100 requests left, wait until reset
           if ($rate.remaining -lt 100) {
               $wait = ($rate.reset - (Get-Date (Get-Date).ToUniversalTime() -UFormat %s))
-              echo "Rate limit remaining is $($rate.remaining), waiting for $($wait / 1000) seconds to reset"
+              if ($wait -gt 300) {
+                  echo "Rate limit remaining is $($rate.remaining), reset in $wait seconds (more than 5'). Aborting."
+                  exit 1
+              }
+              echo "Rate limit remaining is $($rate.remaining), waiting $wait seconds to reset"
               sleep $wait
               $rate = gh api rate_limit | convertfrom-json | select -expandproperty rate
               echo "Rate limit has reset to $($rate.remaining) requests"
