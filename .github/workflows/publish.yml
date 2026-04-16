@@ -28,15 +28,14 @@ jobs:
           fetch-depth: 0
 
       - name: ⚙ dotnet
-        uses: ./.github/actions/dotnet
+        uses: devlooped/actions-dotnet-env@v1
 
       - name: 🙏 build
         run: dotnet build -m:1 -bl:build.binlog
 
       - name: 🧪 test
-        run: |
-          dotnet tool update -g dotnet-retest
-          dotnet retest -- --no-build
+        shell: pwsh
+        run: dnx --yes retest -- --no-build
 
       - name: 🐛 logs
         uses: actions/upload-artifact@v4

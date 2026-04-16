@@ -30,6 +30,8 @@ indent_size = 2
 
 # Dotnet code style settings:
 [*.{cs,vb}]
+tab_width = 4
+
 # Sort using and Import directives with System.* appearing first
 dotnet_sort_system_directives_first = true
 # Avoid "this." and "Me." if not necessary
@@ -56,6 +58,9 @@ dotnet_style_require_accessibility_modifiers = omit_if_default:error
 
 # IDE0040: Add accessibility modifiers
 dotnet_diagnostic.IDE0040.severity = error
+
+# IDE1100: Error reading content of source file 'Project.TargetFrameworkMoniker' (i.e. from ThisAssembly)
+dotnet_diagnostic.IDE1100.severity = none
 
 [*.cs]
 # Top-level files are definitely OK
