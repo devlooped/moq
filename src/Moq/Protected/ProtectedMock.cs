@@ -201,29 +201,29 @@ namespace Moq.Protected
 
         #region Verify
 
-        public void Verify(string methodName, Times times, object[] args)
+        public IVerifyResult<T> Verify(string methodName, Times times, object[] args)
         {
-            this.InternalVerify(methodName, null, times, false, args);
+            return this.InternalVerify(methodName, null, times, false, args);
         }
 
-        public void Verify(string methodName, Type[] genericTypeArguments, Times times, params object[] args)
-        {
-            Guard.NotNull(genericTypeArguments, nameof(genericTypeArguments));
-            this.InternalVerify(methodName, genericTypeArguments, times, false, args);
-        }
-
-        public void Verify(string methodName, Times times, bool exactParameterMatch, object[] args)
-        {
-            this.InternalVerify(methodName, null, times, exactParameterMatch, args);
-        }
-
-        public void Verify(string methodName, Type[] genericTypeArguments, Times times, bool exactParameterMatch, params object[] args)
+        public IVerifyResult<T> Verify(string methodName, Type[] genericTypeArguments, Times times, params object[] args)
         {
             Guard.NotNull(genericTypeArguments, nameof(genericTypeArguments));
-            this.InternalVerify(methodName, genericTypeArguments, times, exactParameterMatch, args);
+            return this.InternalVerify(methodName, genericTypeArguments, times, false, args);
         }
 
-        void InternalVerify(string methodName, Type[] genericTypeArguments, Times times, bool exactParameterMatch, params object[] args)
+        public IVerifyResult<T> Verify(string methodName, Times times, bool exactParameterMatch, object[] args)
+        {
+            return this.InternalVerify(methodName, null, times, exactParameterMatch, args);
+        }
+
+        public IVerifyResult<T> Verify(string methodName, Type[] genericTypeArguments, Times times, bool exactParameterMatch, params object[] args)
+        {
+            Guard.NotNull(genericTypeArguments, nameof(genericTypeArguments));
+            return this.InternalVerify(methodName, genericTypeArguments, times, exactParameterMatch, args);
+        }
+
+        IVerifyResult<T> InternalVerify(string methodName, Type[] genericTypeArguments, Times times, bool exactParameterMatch, params object[] args)
         {
             Guard.NotNullOrEmpty(methodName, nameof(methodName));
 
@@ -231,32 +231,32 @@ namespace Moq.Protected
             ThrowIfMethodMissing(methodName, method, args);
             ThrowIfPublicMethod(method, typeof(T).Name);
 
-            Mock.Verify(mock, GetMethodCall(method, args), times, null);
+            return new VerifyResult<T>(mock, Mock.Verify(mock, GetMethodCall(method, args), times, null));
         }
 
-        public void Verify<TResult>(string methodName, Times times, object[] args)
+        public IVerifyResult<T> Verify<TResult>(string methodName, Times times, object[] args)
         {
-            this.InternalVerify<TResult>(methodName, null, times, false, args);
+            return this.InternalVerify<TResult>(methodName, null, times, false, args);
         }
 
-        public void Verify<TResult>(string methodName, Type[] genericTypeArguments, Times times, params object[] args)
-        {
-            Guard.NotNull(genericTypeArguments, nameof(genericTypeArguments));
-            this.InternalVerify<TResult>(methodName, genericTypeArguments, times, false, args);
-        }
-
-        public void Verify<TResult>(string methodName, Times times, bool exactParameterMatch, object[] args)
-        {
-            this.InternalVerify<TResult>(methodName, null, times, exactParameterMatch, args);
-        }
-
-        public void Verify<TResult>(string methodName, Type[] genericTypeArguments, Times times, bool exactParameterMatch, params object[] args)
+        public IVerifyResult<T> Verify<TResult>(string methodName, Type[] genericTypeArguments, Times times, params object[] args)
         {
             Guard.NotNull(genericTypeArguments, nameof(genericTypeArguments));
-            this.InternalVerify<TResult>(methodName, genericTypeArguments, times, exactParameterMatch, args);
+            return this.InternalVerify<TResult>(methodName, genericTypeArguments, times, false, args);
         }
 
-        void InternalVerify<TResult>(string methodName, Type[] genericTypeArguments, Times times, bool exactParameterMatch, params object[] args)
+        public IVerifyResult<T> Verify<TResult>(string methodName, Times times, bool exactParameterMatch, object[] args)
+        {
+            return this.InternalVerify<TResult>(methodName, null, times, exactParameterMatch, args);
+        }
+
+        public IVerifyResult<T> Verify<TResult>(string methodName, Type[] genericTypeArguments, Times times, bool exactParameterMatch, params object[] args)
+        {
+            Guard.NotNull(genericTypeArguments, nameof(genericTypeArguments));
+            return this.InternalVerify<TResult>(methodName, genericTypeArguments, times, exactParameterMatch, args);
+        }
+
+        IVerifyResult<T> InternalVerify<TResult>(string methodName, Type[] genericTypeArguments, Times times, bool exactParameterMatch, params object[] args)
         {
             Guard.NotNullOrEmpty(methodName, nameof(methodName));
 
@@ -265,19 +265,18 @@ namespace Moq.Protected
             {
                 ThrowIfPublicGetter(property, typeof(T).Name);
                 // TODO should consider property indexers
-                Mock.VerifyGet(mock, GetMemberAccess<TResult>(property), times, null);
-                return;
+                return new VerifyResult<T>(mock, Mock.VerifyGet(mock, GetMemberAccess<TResult>(property), times, null));
             }
 
             var method = GetMethod(methodName, genericTypeArguments, exactParameterMatch, args);
             ThrowIfMethodMissing(methodName, method, args);
             ThrowIfPublicMethod(method, typeof(T).Name);
 
-            Mock.Verify(mock, GetMethodCall<TResult>(method, args), times, null);
+            return new VerifyResult<T>(mock, Mock.Verify(mock, GetMethodCall<TResult>(method, args), times, null));
         }
 
         // TODO should receive args to support indexers
-        public void VerifyGet<TProperty>(string propertyName, Times times)
+        public IVerifyResult<T> VerifyGet<TProperty>(string propertyName, Times times)
         {
             Guard.NotNullOrEmpty(propertyName, nameof(propertyName));
 
@@ -287,11 +286,11 @@ namespace Moq.Protected
             Guard.CanRead(property);
 
             // TODO should consider property indexers
-            Mock.VerifyGet(mock, GetMemberAccess<TProperty>(property), times, null);
+            return new VerifyResult<T>(mock, Mock.VerifyGet(mock, GetMemberAccess<TProperty>(property), times, null));
         }
 
         // TODO should receive args to support indexers
-        public void VerifySet<TProperty>(string propertyName, Times times, object value)
+        public IVerifyResult<T> VerifySet<TProperty>(string propertyName, Times times, object value)
         {
             Guard.NotNullOrEmpty(propertyName, nameof(propertyName));
 
@@ -303,7 +302,7 @@ namespace Moq.Protected
             var expression = GetSetterExpression(property, ToExpressionArg(property.PropertyType, value));
             // TODO should consider property indexers
             // TODO should receive the parameter here
-            Mock.VerifySet(mock, expression, times, null);
+            return new VerifyResult<T>(mock, Mock.VerifySet(mock, expression, times, null));
         }
 
         #endregion

@@ -2,6 +2,7 @@
 // All rights reserved. Licensed under the BSD 3-Clause License; see License.txt.
 
 using System;
+using System.Collections.Generic;
 using System.ComponentModel;
 using System.Linq.Expressions;
 
@@ -115,7 +116,8 @@ namespace Moq.Protected
         /// </param>
         /// <param name="failMessage">Message to include in the thrown <see cref="MockException"/> if verification fails.</param>
         /// <exception cref="MockException">The specified invocation did not occur (or did not occur the specified number of times).</exception>
-        void Verify(Expression<Action<TAnalog>> expression, Times? times = null, string failMessage = null);
+        /// <returns>A list of matching invocations</returns>
+        IVerifyResult<T> Verify(Expression<Action<TAnalog>> expression, Times? times = null, string failMessage = null);
 
         /// <summary>
         /// Verifies that a specific invocation matching the given expression was performed on the mock.
@@ -129,7 +131,8 @@ namespace Moq.Protected
         /// </param>
         /// <param name="failMessage">Message to include in the thrown <see cref="MockException"/> if verification fails.</param>
         /// <exception cref="MockException">The specified invocation did not occur (or did not occur the specified number of times).</exception>
-        void Verify<TResult>(Expression<Func<TAnalog, TResult>> expression, Times? times = null, string failMessage = null);
+        /// <returns>A list of matching invocations</returns>
+        IVerifyResult<T> Verify<TResult>(Expression<Func<TAnalog, TResult>> expression, Times? times = null, string failMessage = null);
 
         /// <summary>
         ///   Verifies that a property was set on the mock.
@@ -143,7 +146,8 @@ namespace Moq.Protected
         /// <exception cref="MockException">
         ///   The invocation was not called the number of times specified by <paramref name="times"/>.
         /// </exception>
-        void VerifySet(Action<TAnalog> setterExpression, Times? times = null, string failMessage = null);
+        /// <returns>A list of matching invocations</returns>
+        IVerifyResult<T> VerifySet(Action<TAnalog> setterExpression, Times? times = null, string failMessage = null);
 
         /// <summary>
         /// Verifies that a property was read on the mock.
@@ -156,6 +160,7 @@ namespace Moq.Protected
         /// </param>
         /// <param name="failMessage">Message to include in the thrown <see cref="MockException"/> if verification fails.</param>
         /// <exception cref="MockException">The specified invocation did not occur (or did not occur the specified number of times).</exception>
-        void VerifyGet<TProperty>(Expression<Func<TAnalog, TProperty>> expression, Times? times = null, string failMessage = null);
+        /// <returns>A list of matching invocations</returns>
+        IVerifyResult<T> VerifyGet<TProperty>(Expression<Func<TAnalog, TProperty>> expression, Times? times = null, string failMessage = null);
     }
 }

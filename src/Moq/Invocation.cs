@@ -6,7 +6,7 @@ using System.Collections.Generic;
 using System.Diagnostics;
 using System.Reflection;
 using System.Text;
-
+using System.Threading;
 using Moq.Async;
 
 namespace Moq
@@ -20,6 +20,8 @@ namespace Moq
         object result;
         Setup matchingSetup;
         bool verified;
+        long sequenceNumber;
+        static long globalSequenceNumber = 0;//ONLY access with Interlocked.Increment()
 
         /// <summary>
         /// Initializes a new instance of the <see cref="Invocation"/> class.
@@ -36,7 +38,10 @@ namespace Moq
             this.arguments = arguments;
             this.method = method;
             this.proxyType = proxyType;
+            this.sequenceNumber = Interlocked.Increment(ref globalSequenceNumber);
         }
+
+        public long SequenceNumber => this.sequenceNumber;
 
         /// <summary>
         /// Gets the method of the invocation.
