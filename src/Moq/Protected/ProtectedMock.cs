@@ -3,6 +3,7 @@
 
 using System;
 using System.Collections.Generic;
+using System.Diagnostics.CodeAnalysis;
 using System.Globalization;
 using System.Linq;
 using System.Linq.Expressions;
@@ -51,7 +52,7 @@ namespace Moq.Protected
             return this.InternalSetup(methodName, genericTypeArguments, exactParameterMatch, args);
         }
 
-        ISetup<T> InternalSetup(string methodName, Type[] genericTypeArguments, bool exactParameterMatch, params object[] args)
+        ISetup<T> InternalSetup(string methodName, Type[]? genericTypeArguments, bool exactParameterMatch, params object[] args)
         {
             Guard.NotNull(methodName, nameof(methodName));
 
@@ -80,7 +81,7 @@ namespace Moq.Protected
             return this.InternalSetup<TResult>(methodName, genericTypeArguments, exactParameterMatch, args);
         }
 
-        ISetup<T, TResult> InternalSetup<TResult>(string methodName, Type[] genericTypeArguments,
+        ISetup<T, TResult> InternalSetup<TResult>(string methodName, Type[]? genericTypeArguments,
             bool exactParameterMatch, params object[] args)
         {
             Guard.NotNullOrEmpty(methodName, nameof(methodName));
@@ -147,7 +148,7 @@ namespace Moq.Protected
             return this.InternalSetupSequence(methodOrPropertyName, genericTypeArguments, exactParameterMatch, args);
         }
 
-        ISetupSequentialAction InternalSetupSequence(string methodOrPropertyName, Type[] genericTypeArguments, bool exactParameterMatch, params object[] args)
+        ISetupSequentialAction InternalSetupSequence(string methodOrPropertyName, Type[]? genericTypeArguments, bool exactParameterMatch, params object[] args)
         {
             Guard.NotNullOrEmpty(methodOrPropertyName, nameof(methodOrPropertyName));
 
@@ -175,7 +176,7 @@ namespace Moq.Protected
             return this.InternalSetupSequence<TResult>(methodOrPropertyName, genericTypeArguments, exactParameterMatch, args);
         }
 
-        ISetupSequentialResult<TResult> InternalSetupSequence<TResult>(string methodOrPropertyName, Type[] genericTypeArguments, bool exactParameterMatch, params object[] args)
+        ISetupSequentialResult<TResult> InternalSetupSequence<TResult>(string methodOrPropertyName, Type[]? genericTypeArguments, bool exactParameterMatch, params object[] args)
         {
             Guard.NotNullOrEmpty(methodOrPropertyName, nameof(methodOrPropertyName));
 
@@ -223,7 +224,7 @@ namespace Moq.Protected
             this.InternalVerify(methodName, genericTypeArguments, times, exactParameterMatch, args);
         }
 
-        void InternalVerify(string methodName, Type[] genericTypeArguments, Times times, bool exactParameterMatch, params object[] args)
+        void InternalVerify(string methodName, Type[]? genericTypeArguments, Times times, bool exactParameterMatch, params object[] args)
         {
             Guard.NotNullOrEmpty(methodName, nameof(methodName));
 
@@ -256,7 +257,7 @@ namespace Moq.Protected
             this.InternalVerify<TResult>(methodName, genericTypeArguments, times, exactParameterMatch, args);
         }
 
-        void InternalVerify<TResult>(string methodName, Type[] genericTypeArguments, Times times, bool exactParameterMatch, params object[] args)
+        void InternalVerify<TResult>(string methodName, Type[]? genericTypeArguments, Times times, bool exactParameterMatch, params object[] args)
         {
             Guard.NotNullOrEmpty(methodName, nameof(methodName));
 
@@ -314,7 +315,7 @@ namespace Moq.Protected
             return Expression.Lambda<Func<T, TResult>>(Expression.MakeMemberAccess(param, property), param);
         }
 
-        static MethodInfo GetMethod(string methodName, Type[] genericTypeArguments, bool exact, params object[] args)
+        static MethodInfo? GetMethod(string methodName, Type[]? genericTypeArguments, bool exact, params object[] args)
         {
             var argTypes = ToArgTypes(args);
             var methods = typeof(T).GetMethods(BindingFlags.Instance | BindingFlags.NonPublic | BindingFlags.Public)
@@ -343,7 +344,7 @@ namespace Moq.Protected
         }
 
         // TODO should support arguments for property indexers
-        static PropertyInfo GetProperty(string propertyName)
+        static PropertyInfo? GetProperty(string propertyName)
         {
             return typeof(T).GetProperty(
                 propertyName,
@@ -359,7 +360,11 @@ namespace Moq.Protected
                 param);
         }
 
-        static void ThrowIfMemberMissing(string memberName, MemberInfo member)
+#if NULLABLE_REFERENCE_TYPES
+        static void ThrowIfMemberMissing(string memberName, [NotNull] MemberInfo? member)
+#else
+        static void ThrowIfMemberMissing(string memberName, MemberInfo? member)
+#endif
         {
             if (member == null)
             {
@@ -371,7 +376,11 @@ namespace Moq.Protected
             }
         }
 
-        static void ThrowIfMethodMissing(string methodName, MethodInfo method, object[] args)
+#if NULLABLE_REFERENCE_TYPES
+        static void ThrowIfMethodMissing(string methodName, [NotNull] MethodInfo? method, object[] args)
+#else
+        static void ThrowIfMethodMissing(string methodName, MethodInfo? method, object[] args)
+#endif
         {
             if (method == null)
             {
@@ -443,14 +452,14 @@ namespace Moq.Protected
             }
         }
 
-        static Type[] ToArgTypes(object[] args)
+        static Type?[] ToArgTypes(object[] args)
         {
             if (args == null)
             {
                 throw new ArgumentException(Resources.UseItExprIsNullRatherThanNullArgumentValue);
             }
 
-            var types = new Type[args.Length];
+            var types = new Type?[args.Length];
             for (int index = 0; index < args.Length; index++)
             {
                 if (args[index] == null)
@@ -503,9 +512,9 @@ namespace Moq.Protected
             return ItRefAnyField(expression) != null;
         }
 
-        static FieldInfo ItRefAnyField(Expression expr)
+        static FieldInfo? ItRefAnyField(Expression expr)
         {
-            FieldInfo itRefAnyField = null;
+            FieldInfo? itRefAnyField = null;
 
             if (expr.NodeType == ExpressionType.MemberAccess)
             {
@@ -514,7 +523,7 @@ namespace Moq.Protected
                 {
                     if (field.Name == nameof(It.Ref<object>.IsAny))
                     {
-                        var fieldDeclaringType = field.DeclaringType;
+                        var fieldDeclaringType = field.DeclaringType!;
                         if (fieldDeclaringType.IsGenericType)
                         {
                             var fieldDeclaringTypeDefinition = fieldDeclaringType.GetGenericTypeDefinition();

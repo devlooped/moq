@@ -3,6 +3,7 @@
 
 using System;
 using System.Diagnostics;
+using System.Diagnostics.CodeAnalysis;
 using System.Globalization;
 using System.Linq.Expressions;
 using System.Reflection;
@@ -28,7 +29,7 @@ namespace Moq
             }
         }
 
-        public static void ImplementsInterface(Type interfaceType, Type type, string paramName = null)
+        public static void ImplementsInterface(Type interfaceType, Type type, string? paramName = null)
         {
             Debug.Assert(interfaceType != null);
             Debug.Assert(interfaceType.IsInterface);
@@ -92,7 +93,7 @@ namespace Moq
                         string.Format(
                             CultureInfo.CurrentCulture,
                             method.IsExtensionMethod() ? Resources.UnsupportedExtensionMethod : Resources.UnsupportedStaticMember,
-                            $"{method.DeclaringType.GetFormattedName()}.{method.Name}")));
+                            $"{method.DeclaringType!.GetFormattedName()}.{method.Name}")));
             }
             else if (!method.CanOverride())
             {
@@ -104,18 +105,18 @@ namespace Moq
                         string.Format(
                             CultureInfo.CurrentCulture,
                             Resources.UnsupportedNonOverridableMember,
-                            $"{method.DeclaringType.GetFormattedName()}.{method.Name}")));
+                            $"{method.DeclaringType!.GetFormattedName()}.{method.Name}")));
             }
         }
 
         public static void IsVisibleToProxyFactory(MethodInfo method)
         {
-            if (ProxyFactory.Instance.IsMethodVisible(method, out string messageIfNotVisible) == false)
+            if (ProxyFactory.Instance.IsMethodVisible(method, out string? messageIfNotVisible) == false)
             {
                 throw new ArgumentException(string.Format(
                     CultureInfo.CurrentCulture,
                     Resources.MethodNotVisibleToProxyFactory,
-                    method.DeclaringType.Name,
+                    method.DeclaringType!.Name,
                     method.Name,
                     messageIfNotVisible));
             }
@@ -165,7 +166,11 @@ namespace Moq
         /// Ensures the given <paramref name="value"/> is not null.
         /// Throws <see cref="ArgumentNullException"/> otherwise.
         /// </summary>
-        public static void NotNull(object value, string paramName)
+#if NULLABLE_REFERENCE_TYPES
+        public static void NotNull([NotNull] object? value, string paramName)
+#else
+        public static void NotNull(object? value, string paramName)
+#endif
         {
             if (value == null)
             {
@@ -226,7 +231,7 @@ namespace Moq
                 throw new ArgumentException(string.Format(
                     CultureInfo.CurrentCulture,
                     Resources.PropertyGetNotFound,
-                    property.DeclaringType.Name, property.Name));
+                    property.DeclaringType!.Name, property.Name));
             }
         }
 
@@ -237,7 +242,7 @@ namespace Moq
                 throw new ArgumentException(string.Format(
                     CultureInfo.CurrentCulture,
                     Resources.PropertySetNotFound,
-                    property.DeclaringType.Name, property.Name));
+                    property.DeclaringType!.Name, property.Name));
             }
         }
     }

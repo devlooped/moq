@@ -3,6 +3,7 @@
 
 using System;
 using System.Collections.Generic;
+using System.Diagnostics.CodeAnalysis;
 using System.Reflection;
 
 namespace Moq
@@ -36,19 +37,31 @@ namespace Moq
         {
             lock (this.eventHandlers)
             {
-                this.eventHandlers[@event] = Delegate.Remove(this.TryGet(@event), eventHandler);
+                var resultingDelegate = Delegate.Remove(this.TryGet(@event), eventHandler);
+                if (resultingDelegate == null)
+                {
+                    eventHandlers.Remove(@event);
+                }
+                else
+                {
+                    eventHandlers[@event] = resultingDelegate;
+                }
             }
         }
 
-        public bool TryGet(EventInfo @event, out Delegate handlers)
+#if NULLABLE_REFERENCE_TYPES
+        public bool TryGet(EventInfo @event, [NotNullWhen(true)] out Delegate? handlers)
+#else
+        public bool TryGet(EventInfo @event, out Delegate? handlers)
+#endif
         {
             lock (this.eventHandlers)
             {
-                return this.eventHandlers.TryGetValue(@event, out handlers) && handlers != null;
+                return this.eventHandlers.TryGetValue(@event, out handlers);
             }
         }
 
-        Delegate TryGet(EventInfo @event)
+        Delegate? TryGet(EventInfo @event)
         {
             return this.eventHandlers.TryGetValue(@event, out var handlers) ? handlers : null;
         }

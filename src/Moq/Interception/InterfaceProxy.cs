@@ -17,19 +17,19 @@ namespace Moq.Internals
     [EditorBrowsable(EditorBrowsableState.Never)]
     public abstract class InterfaceProxy
     {
-        static MethodInfo equalsMethod = typeof(object).GetMethod("Equals", BindingFlags.Public | BindingFlags.Instance);
-        static MethodInfo getHashCodeMethod = typeof(object).GetMethod("GetHashCode", BindingFlags.Public | BindingFlags.Instance);
-        static MethodInfo toStringMethod = typeof(object).GetMethod("ToString", BindingFlags.Public | BindingFlags.Instance);
+        static MethodInfo equalsMethod = typeof(object).GetMethod("Equals", BindingFlags.Public | BindingFlags.Instance)!;
+        static MethodInfo getHashCodeMethod = typeof(object).GetMethod("GetHashCode", BindingFlags.Public | BindingFlags.Instance)!;
+        static MethodInfo toStringMethod = typeof(object).GetMethod("ToString", BindingFlags.Public | BindingFlags.Instance)!;
 
         /// <summary/>
         [DebuggerHidden]
-        public sealed override bool Equals(object obj)
+        public sealed override bool Equals(object? obj)
         {
             // Forward this call to the interceptor, so that `object.Equals` can be set up.
             var interceptor = (IInterceptor)((IProxy)this).Interceptor;
             var invocation = new Invocation(this.GetType(), equalsMethod, obj);
             interceptor.Intercept(invocation);
-            return (bool)invocation.ReturnValue;
+            return (bool)invocation.ReturnValue!;
         }
 
         /// <summary/>
@@ -40,25 +40,25 @@ namespace Moq.Internals
             var interceptor = (IInterceptor)((IProxy)this).Interceptor;
             var invocation = new Invocation(this.GetType(), getHashCodeMethod);
             interceptor.Intercept(invocation);
-            return (int)invocation.ReturnValue;
+            return (int)invocation.ReturnValue!;
         }
 
         /// <summary/>
         [DebuggerHidden]
-        public sealed override string ToString()
+        public sealed override string? ToString()
         {
             // Forward this call to the interceptor, so that `object.ToString` can be set up.
             var interceptor = (IInterceptor)((IProxy)this).Interceptor;
             var invocation = new Invocation(this.GetType(), toStringMethod);
             interceptor.Intercept(invocation);
-            return (string)invocation.ReturnValue;
+            return (string?)invocation.ReturnValue;
         }
 
         sealed class Invocation : Moq.Invocation
         {
-            static object[] noArguments = new object[0];
+            static object?[] noArguments = new object?[0];
 
-            public Invocation(Type proxyType, MethodInfo method, params object[] arguments)
+            public Invocation(Type proxyType, MethodInfo method, params object?[] arguments)
                 : base(proxyType, method, arguments)
             {
             }

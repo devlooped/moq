@@ -8,9 +8,9 @@ namespace Moq.Behaviors
 {
     sealed class ThrowComputedException : Behavior
     {
-        readonly Func<IInvocation, Exception> exceptionFactory;
+        readonly Func<IInvocation, Exception?> exceptionFactory;
 
-        public ThrowComputedException(Func<IInvocation, Exception> exceptionFactory)
+        public ThrowComputedException(Func<IInvocation, Exception?> exceptionFactory)
         {
             Debug.Assert(exceptionFactory != null);
 
@@ -19,6 +19,7 @@ namespace Moq.Behaviors
 
         public override void Execute(Invocation invocation)
         {
+            // TODO: Technically this permits `throw null` here.
             throw this.exceptionFactory.Invoke(invocation);
         }
     }
