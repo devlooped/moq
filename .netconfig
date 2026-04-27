@@ -5,8 +5,8 @@
 	skip
 [file ".github/workflows/includes.yml"]
 	url = https://github.com/devlooped/oss/blob/main/.github/workflows/includes.yml
-	sha = 06628725a6303bb8c4cf3076a384fc982a91bc0b
-	etag = 478f91d4126230e57cc601382da1ba23f9daa054645b4af89800d8dd862e64fd
+	sha = 7c1c6e615b5785e0ac9db33cb17343d6c1de16ff
+	etag = 5e6a10be141ee629201bfad01eae09b5c36a67f541ec7ab411ae400b5d73de1d
 	weak
 [file ".github/workflows/dotnet-file.yml"]
 	url = https://github.com/devlooped/oss/blob/main/.github/workflows/dotnet-file.yml
@@ -72,8 +72,8 @@
 	weak
 [file ".gitignore"]
 	url = https://github.com/devlooped/oss/blob/main/.gitignore
-	sha = a225b7a9f609f26bcc24e0d84f663387be251a7d
-	etag = 20a8b49d57024abbd85aac5b0020c30e5eb68e0384b2761e93727c8780c4a991
+	sha = 12c18e78c4bbab118b798d04344e5a5253216841
+	etag = 69c38c664debe4cbb8b68a87bacb1c93d0ac9757635c31a42292317f05484728
 	weak
 [file "Directory.Build.rsp"]
 	url = https://github.com/devlooped/oss/blob/main/Directory.Build.rsp
@@ -139,6 +139,6 @@
 	weak
 [file ".github/workflows/dotnet-env.yml"]
 	url = https://github.com/devlooped/oss/blob/main/.github/workflows/dotnet-env.yml
-	sha = 77e83f238196d2723640abef0c7b6f43994f9747
-	etag = fcb9759a96966df40dcd24906fd328ddec05953b7e747a6bb8d0d1e4c3865274
+	sha = 7c1c6e615b5785e0ac9db33cb17343d6c1de16ff
+	etag = 68c1e28f475ff9d05f985bf53a51fce6e64b24a8b75bd8e47119ff57309281f1
 	weak
