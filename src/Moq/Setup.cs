@@ -35,7 +35,7 @@ namespace Moq
 
         public LambdaExpression Expression => this.expectation.Expression;
 
-        Mock ISetup.InnerMock => this.InnerMocks.SingleOrDefault();
+        Mock? ISetup.InnerMock => this.InnerMocks.SingleOrDefault();
 
         public virtual IEnumerable<Mock> InnerMocks => Enumerable.Empty<Mock>();
 
