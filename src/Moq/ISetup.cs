@@ -49,7 +49,7 @@ namespace Moq
         // /// <exception cref="InvalidOperationException">The setup has more than one inner mock.</exception>
         // [Obsolete("Use 'InnerMocks' instead.")]
         // [EditorBrowsable(EditorBrowsableState.Never)]
-        Mock InnerMock { get; }
+        Mock? InnerMock { get; }
 
         // /// <summary>
         // ///   Gets the inner mocks of this setup (if present and known).
