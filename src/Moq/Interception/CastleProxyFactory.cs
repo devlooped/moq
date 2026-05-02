@@ -14,6 +14,7 @@ using System.Runtime;
 using System.Text;
 #endif
 
+using Castle.Core.Logging;
 using Castle.DynamicProxy;
 
 using Moq.Internals;
@@ -33,7 +34,11 @@ namespace Moq
         public CastleProxyFactory()
         {
             this.generationOptions = new ProxyGenerationOptions { Hook = new IncludeObjectMethodsHook(), BaseTypeForInterfaceProxy = typeof(InterfaceProxy) };
-            this.generator = new ProxyGenerator();
+            this.generator = new ProxyGenerator()
+            {
+                Logger = NullLogger.Instance,
+            };
+
             this.classGenerators = new ConcurrentDictionary<string, ProxyGenerator>();
         }
 
