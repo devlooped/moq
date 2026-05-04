@@ -26,6 +26,7 @@ local.settings.json
 *.binlog
 *.zip
 __azurite*.*
+AzuriteConfig
 __*__
 
 .nuget
