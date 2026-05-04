@@ -10,6 +10,8 @@ on:
 jobs:
   which-dotnet:
     runs-on: ubuntu-latest 
+    env:
+      PR_TOKEN: ${{ secrets.DEVLOOPED_TOKEN || secrets.GH_TOKEN }}
     permissions:
       contents: write
       pull-requests: write
@@ -20,18 +22,19 @@ jobs:
         with:
           name: ${{ secrets.BOT_NAME }}
           email: ${{ secrets.BOT_EMAIL }}
-          gh_token: ${{ secrets.GH_TOKEN }}
+          gh_token: ${{ env.PR_TOKEN }}
           github_token: ${{ secrets.GITHUB_TOKEN }}
 
       - name: 🤘 checkout
         uses: actions/checkout@v4
         with: 
-          token: ${{ env.GH_TOKEN }}
+          token: ${{ env.PR_TOKEN || github.token }}
 
       - name: 🤌 dotnet
         uses: devlooped/actions-which-dotnet@v1
 
       - name: ✍ pull request
+        if: env.PR_TOKEN != ''
         uses: peter-evans/create-pull-request@v7
         with:
           base: main
@@ -41,4 +44,9 @@ jobs:
           title: "⚙ Update dotnet versions"
           body: "Update dotnet versions"
           commit-message: "Update dotnet versions"
-          token: ${{ env.GH_TOKEN }}          
+          token: ${{ env.PR_TOKEN }}
+
+      - name: ⚠️ skip pull request
+        if: env.PR_TOKEN == ''
+        shell: bash
+        run: echo "::warning::Skipping PR creation because neither DEVLOOPED_TOKEN nor GH_TOKEN is configured. GITHUB_TOKEN cannot create pull requests in this repository."

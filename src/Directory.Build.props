@@ -167,7 +167,7 @@
   </ItemGroup>
 
   <ItemGroup Label="OSMF" Condition="Exists('$(MSBuildThisFileDirectory)..\osmfeula.txt')">
-    <Content Include="$(MSBuildThisFileDirectory)..\osmfeula.txt" Link="osmfeula.txt" Pack="true" PackagePath="OSMFEULA.txt" />
+    <Content Include="$(MSBuildThisFileDirectory)..\osmfeula.txt" Link="osmfeula.txt" Pack="true" PackagePath="OSMFEULA.txt" Visible="false" />
   </ItemGroup>
 
   <Import Project="Directory.props" Condition="Exists('Directory.props')"/>
