@@ -34,10 +34,8 @@ namespace Moq
         public CastleProxyFactory()
         {
             this.generationOptions = new ProxyGenerationOptions { Hook = new IncludeObjectMethodsHook(), BaseTypeForInterfaceProxy = typeof(InterfaceProxy) };
-            this.generator = new ProxyGenerator()
-            {
-                Logger = NullLogger.Instance,
-            };
+            this.generator = new ProxyGenerator();
+            (this.generator.Logger as TraceLogger)?.Level = LoggerLevel.Warn;
 
             this.classGenerators = new ConcurrentDictionary<string, ProxyGenerator>();
         }
