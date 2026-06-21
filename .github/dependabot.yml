@@ -32,6 +32,9 @@ updates:
     Web:
       patterns:
         - "Microsoft.AspNetCore*"
+    OpenTelemetry:
+      patterns:
+        - "OpenTelemetry*"
     Tests:
       patterns:
         - "Microsoft.NET.Test*"
