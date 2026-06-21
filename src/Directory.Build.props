@@ -47,6 +47,9 @@
     <WarnOnPackingNonPackableProject>false</WarnOnPackingNonPackableProject>
     <!-- See https://learn.microsoft.com/en-us/nuget/consume-packages/package-references-in-project-files#prunepackagereference-specification -->
     <RestoreEnablePackagePruning>true</RestoreEnablePackagePruning>
+
+    <!-- Needed to improve nuget default for empty PackageId. Workaround for https://github.com/NuGet/Home/issues/14928 -->
+    <ImportNuGetBuildTasksPackTargetsFromSdk>false</ImportNuGetBuildTasksPackTargetsFromSdk>
   </PropertyGroup>
 
   <PropertyGroup Label="Build">
@@ -167,7 +170,7 @@
   </ItemGroup>
 
   <ItemGroup Label="OSMF" Condition="Exists('$(MSBuildThisFileDirectory)..\osmfeula.txt')">
-    <Content Include="$(MSBuildThisFileDirectory)..\osmfeula.txt" Link="osmfeula.txt" Pack="true" PackagePath="OSMFEULA.txt" />
+    <Content Include="$(MSBuildThisFileDirectory)..\osmfeula.txt" Link="osmfeula.txt" Pack="true" PackagePath="OSMFEULA.txt" Visible="false" />
   </ItemGroup>
 
   <Import Project="Directory.props" Condition="Exists('Directory.props')"/>

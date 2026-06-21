@@ -1,17 +1,23 @@
 bin
 obj
+out
 artifacts
 pack
+agent-tools
+terminals
 TestResults
 results
 BenchmarkDotNet.Artifacts
+mcps
 /app
+/temp
 .vs
 .vscode
 .genaiscript
 .idea
 local.settings.json
 .env
+.next
 *.local
 
 *.suo
@@ -26,6 +32,7 @@ local.settings.json
 *.binlog
 *.zip
 __azurite*.*
+AzuriteConfig
 __*__
 
 .nuget
