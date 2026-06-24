@@ -21,6 +21,8 @@
   <ItemGroup>
     <ProjectReference Include="..\Moq\Moq.csproj" />
     <ProjectReference Include="..\Moq.Tests.FSharpTypes\Moq.Tests.FSharpTypes.fsproj" />
+    <!-- Build the committed harness exe as part of testing so the Issue1648 test can drive it on net472. -->
+    <ProjectReference Include="..\Moq.Tests.Issue1648Harness\Issue1648Harness.csproj" />
   </ItemGroup>
 
   <ItemGroup>
