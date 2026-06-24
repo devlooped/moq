@@ -1,0 +1,29 @@
+<Project Sdk="Microsoft.NET.Sdk">
+
+  <PropertyGroup>
+    <OutputType>Exe</OutputType>
+    <TargetFramework>net472</TargetFramework>
+    <LangVersion>10.0</LangVersion>
+    <!-- Allow selecting older ext for sim even if Moq transitive pulls newer; the harness uses explicit LoadFrom for cold Moq. -->
+    <NoWarn>$(NoWarn);NU1605</NoWarn>
+    <CopyLocalLockFileAssemblies>true</CopyLocalLockFileAssemblies>
+  </PropertyGroup>
+
+  <ItemGroup>
+    <!-- Force exact 4.5.4 net461 copy for genuine conflict sim (asm ver 4.2.0.1).
+         This is the 'older' version preloaded to trigger the original FileLoad scenario against Moq's 4.6.3 ref. -->
+    <Content Include="C:\Users\danie\.nuget\packages\system.threading.tasks.extensions\4.5.4\lib\net461\System.Threading.Tasks.Extensions.dll">
+      <Link>System.Threading.Tasks.Extensions.dll</Link>
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+      <Visible>false</Visible>
+    </Content>
+    <PackageReference Include="Microsoft.NETFramework.ReferenceAssemblies" Version="1.0.3" PrivateAssets="All" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <!-- Project ref ensures net462 Moq is available/built when building harness for test.
+         Runtime LoadFrom will still be used for cold load simulation of the passed Moq.dll. -->
+    <ProjectReference Include="..\Moq\Moq.csproj" />
+  </ItemGroup>
+
+</Project>

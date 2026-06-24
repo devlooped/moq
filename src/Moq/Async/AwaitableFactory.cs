@@ -9,16 +9,62 @@ using System.Threading.Tasks;
 
 namespace Moq.Async
 {
-    static class AwaitableFactory
+    internal static class AwaitableFactory
+    {
+#if NET462 || NETSTANDARD2_0
+        public static IAwaitableFactory? TryGet(Type type) => LegacyAwaitableFactory.TryGet(type);
+#else
+        // Modern TFMs (ValueTask lives in platform BCL; direct, no static cctor, direct
+        // type checks for non-generic, simple creation for generics. This path performs
+        // no assembly name/FullName probing or deferred loading tricks.
+        // Non-VT (Task) path has no ValueTask tokens or VT-specific code in its IL when
+        // the helper is NoInlining.
+        public static IAwaitableFactory? TryGet(Type type)
+        {
+            Debug.Assert(type != null);
+
+            if (type == typeof(Task))
+                return TaskFactory.Instance;
+
+            if (type.IsConstructedGenericType && type.GetGenericTypeDefinition() == typeof(Task<>))
+                return Create(typeof(TaskFactory<>), type);
+
+            // VT handling isolated so common Task path never touches VT metadata at jit time for this method
+            return TryGetValueTask(type);
+        }
+
+        [System.Runtime.CompilerServices.MethodImpl(System.Runtime.CompilerServices.MethodImplOptions.NoInlining)]
+        static IAwaitableFactory? TryGetValueTask(Type type)
+        {
+            if (type == typeof(ValueTask))
+                return ValueTaskFactory.Instance;
+
+            if (type.IsConstructedGenericType && type.GetGenericTypeDefinition() == typeof(ValueTask<>))
+                return Create(typeof(ValueTaskFactory<>), type);
+
+            return null;
+        }
+
+        static IAwaitableFactory Create(Type awaitableFactoryType, Type awaitableType)
+        {
+            return (IAwaitableFactory)Activator.CreateInstance(
+                awaitableFactoryType.MakeGenericType(
+                    awaitableType.GetGenericArguments()))!;
+        }
+#endif
+    }
+
+#if NET462 || NETSTANDARD2_0
+    internal static class LegacyAwaitableFactory
     {
         static readonly Dictionary<Type, Func<Type, IAwaitableFactory>> Providers;
 
-        static AwaitableFactory()
+        static LegacyAwaitableFactory()
         {
-            AwaitableFactory.Providers = new Dictionary<Type, Func<Type, IAwaitableFactory>>
+            LegacyAwaitableFactory.Providers = new Dictionary<Type, Func<Type, IAwaitableFactory>>
             {
                 [typeof(Task)] = awaitableType => TaskFactory.Instance,
-                [typeof(Task<>)] = awaitableType => AwaitableFactory.Create(typeof(TaskFactory<>), awaitableType),
+                [typeof(Task<>)] = awaitableType => LegacyAwaitableFactory.Create(typeof(TaskFactory<>), awaitableType),
             };
         }
 
@@ -31,11 +77,7 @@ namespace Moq.Async
 
         static IAwaitableFactory GetValueTaskFactory()
         {
-            // Use string-based lookup + reflection so that AwaitableFactory's type initializer
-            // and common TryGet paths contain no tokens referencing ValueTask types.
-            // This prevents premature loading of System.Threading.Tasks.Extensions (and version conflicts)
-            // during early initialization for code paths that never use ValueTask.
-            var asm = typeof(AwaitableFactory).Assembly;
+            var asm = typeof(LegacyAwaitableFactory).Assembly;
             var factoryType = asm.GetType("Moq.Async.ValueTaskFactory", throwOnError: true)!;
             var instanceField = factoryType.GetField("Instance", BindingFlags.Public | BindingFlags.Static | BindingFlags.DeclaredOnly);
             if (instanceField != null)
@@ -47,8 +89,7 @@ namespace Moq.Async
 
         static IAwaitableFactory GetValueTaskFactoryGeneric(Type awaitableType)
         {
-            // Deferred creation for ValueTask<T> using only runtime strings/Activator.
-            var asm = typeof(AwaitableFactory).Assembly;
+            var asm = typeof(LegacyAwaitableFactory).Assembly;
             var factoryType = asm.GetType("Moq.Async.ValueTaskFactory`1", throwOnError: true)!;
             factoryType = factoryType.MakeGenericType(awaitableType.GetGenericArguments());
             return (IAwaitableFactory)Activator.CreateInstance(factoryType)!;
@@ -60,13 +101,11 @@ namespace Moq.Async
 
             var key = type.IsConstructedGenericType ? type.GetGenericTypeDefinition() : type;
 
-            if (AwaitableFactory.Providers.TryGetValue(key, out var provider))
+            if (LegacyAwaitableFactory.Providers.TryGetValue(key, out var provider))
             {
                 return provider.Invoke(type);
             }
 
-            // Runtime FullName-based detection for ValueTask cases (no typeof(ValueTask) in init or this method source).
-            // Only exercised when a ValueTask* type is actually passed to TryGet (i.e. async usage paths).
             var fullName = key.FullName;
             if (fullName == "System.Threading.Tasks.ValueTask")
             {
@@ -80,4 +119,5 @@ namespace Moq.Async
             return null;
         }
     }
+#endif
 }
