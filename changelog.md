@@ -1,5 +1,11 @@
 # Changelog
 
+## Unreleased
+
+:bug: Fixed bugs:
+
+- FileLoadException for 'System.Threading.Tasks.Extensions, Version=4.2.0.1' (or similar) at `Moq.Async.AwaitableFactory..cctor()` on .NET Framework 4.6.2+ no longer occurs when updating Moq and other dependencies bring in newer versions of the package. Common non-ValueTask usage succeeds without binding redirects. The initialization now only eagerly registers Task providers and uses runtime FullName checks + deferred creation for ValueTask support. [#1648](https://github.com/devlooped/moq/issues/1648)
+
 ## [v4.20.72](https://github.com/devlooped/moq/tree/v4.20.72) (2024-09-07)
 
 [Full Changelog](https://github.com/devlooped/moq/compare/v4.20.71...v4.20.72)
