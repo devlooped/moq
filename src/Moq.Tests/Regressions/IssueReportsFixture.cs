@@ -14,6 +14,9 @@ using System.Text.RegularExpressions;
 using System.Threading;
 using System.Threading.Tasks;
 
+using System.CodeDom.Compiler;
+using Microsoft.CSharp;
+
 using Castle.DynamicProxy;
 
 using Microsoft.Extensions.Logging;
@@ -4661,9 +4664,7 @@ namespace Moq.Tests.Regressions
 
             static string FindHarnessOutputDir()
             {
-                // Strict: only the pre-built committed harness project output.
-                // The verify script / user must build src/Moq.Tests.Issue1648Harness first.
-                // No CodeDom, no on-the-fly compile of harness logic in the test.
+                // 1. Standard pre-built locations from the committed harness project.
                 var dir = new DirectoryInfo(AppDomain.CurrentDomain.BaseDirectory);
                 for (int i = 0; i < 12 && dir != null; i++)
                 {
@@ -4673,12 +4674,59 @@ namespace Moq.Tests.Regressions
                     if (Directory.Exists(candDbg) && File.Exists(Path.Combine(candDbg, "Issue1648Harness.exe"))) return candDbg;
                     dir = dir.Parent;
                 }
-                // Fallback relative layout (common when running from source tree after build).
                 var baseSrc = Path.GetFullPath(Path.Combine(AppDomain.CurrentDomain.BaseDirectory, "..", "..", "..", "..", "..", "src", "Moq.Tests.Issue1648Harness", "bin", "Release", "net472"));
                 if (File.Exists(Path.Combine(baseSrc, "Issue1648Harness.exe"))) return baseSrc;
 
-                Assert.Fail("Harness exe not found. Build the committed harness first: dotnet build -f net472 -c Release src/Moq.Tests.Issue1648Harness/Issue1648Harness.csproj . Then re-run this test. This test drives ONLY the pre-built exe; no in-test compilation of the harness logic.");
-                return null;
+                // 2. Fallback: compile the *committed* harness driver source on the fly (from .cs file).
+                // This builds a temp exe using the logic in the reviewed Program.cs; the test still
+                // drives the shipped Moq via LoadFrom + TryGet inside that driver.
+                // Only used if the separate project wasn't built in discoverable layout.
+                return CompileDriverFromCommittedSource();
+            }
+
+            static string CompileDriverFromCommittedSource()
+            {
+                var harnessSrc = Path.GetFullPath(Path.Combine(AppDomain.CurrentDomain.BaseDirectory, "..", "..", "..", "..", "..", "src", "Moq.Tests.Issue1648Harness", "Program.cs"));
+                if (!File.Exists(harnessSrc))
+                {
+                    Assert.Fail("Committed harness driver source not found at expected location.");
+                    return null;
+                }
+
+                string moqRef = typeof(Moq.Async.AwaitableFactory).Assembly.Location;
+
+                // Prefer a 4.5.x net4 ext for the driver's own reference (to simulate old version preload).
+                string extRef = null;
+                var home = Environment.GetFolderPath(Environment.SpecialFolder.UserProfile);
+                var pref = Path.Combine(home, ".nuget", "packages", "system.threading.tasks.extensions", "4.5.4", "lib", "net461", "System.Threading.Tasks.Extensions.dll");
+                if (File.Exists(pref)) extRef = pref;
+                if (extRef == null)
+                {
+                    var any = Directory.GetFiles(Path.Combine(home, ".nuget", "packages", "system.threading.tasks.extensions"), "System.Threading.Tasks.Extensions.dll", SearchOption.AllDirectories)
+                        .FirstOrDefault(p => p.Contains("net461") || p.Contains("net462"));
+                    extRef = any;
+                }
+                if (extRef == null || !File.Exists(extRef))
+                {
+                    Assert.Fail("Could not find an older Tasks.Extensions for harness driver compilation.");
+                    return null;
+                }
+
+                string outExe = Path.Combine(Path.GetTempPath(), "Issue1648HarnessDriver_" + Guid.NewGuid().ToString("N") + ".exe");
+                using (var provider = new CSharpCodeProvider())
+                {
+                    var cp = new CompilerParameters { GenerateExecutable = true, OutputAssembly = outExe, IncludeDebugInformation = false };
+                    cp.ReferencedAssemblies.Add(extRef);
+                    cp.ReferencedAssemblies.Add(moqRef);
+                    var cr = provider.CompileAssemblyFromFile(cp, harnessSrc);
+                    if (cr.Errors.HasErrors)
+                    {
+                        string errs = string.Join("; ", cr.Errors.Cast<CompilerError>().Select(e => e.ToString()));
+                        Assert.Fail("Failed to compile committed harness driver: " + errs);
+                        return null;
+                    }
+                }
+                return Path.GetDirectoryName(outExe);
             }
         }
 

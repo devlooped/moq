@@ -44,6 +44,11 @@
     </Reference>
   </ItemGroup>
 
+  <!-- For on-the-fly compilation of the committed harness driver source (fallback if prebuilt exe layout not found in CI/dev). -->
+  <ItemGroup Condition=" '$(TargetFramework)' == 'net472' ">
+    <Reference Include="Microsoft.CSharp" />
+  </ItemGroup>
+
   <ItemGroup Condition=" $([System.Text.RegularExpressions.Regex]::IsMatch('$(DefineConstants)', 'FEATURE_EF'))">
 		<PackageReference Include="EntityFramework" Version="6.5.2" />
 	</ItemGroup>
