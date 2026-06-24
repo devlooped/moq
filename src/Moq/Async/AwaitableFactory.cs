@@ -9,7 +9,7 @@ using System.Threading.Tasks;
 
 namespace Moq.Async
 {
-    internal static class AwaitableFactory
+    static class AwaitableFactory
     {
 #if NET462 || NETSTANDARD2_0
         public static IAwaitableFactory? TryGet(Type type) => LegacyAwaitableFactory.TryGet(type);
