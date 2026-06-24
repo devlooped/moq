@@ -750,7 +750,7 @@ namespace Moq
                 if (mock.EventHandlers.TryGet(@event, out var handlers))
                 {
                     var returnType = handlers.GetMethodInfo().ReturnType;
-                    if (returnType == typeof(Task) || returnType == typeof(ValueTask))
+                    if (returnType == typeof(Task) || returnType.FullName == "System.Threading.Tasks.ValueTask")
                     {
                         var invocationList = handlers.GetInvocationList();
                         var tasks = new List<Task>(invocationList.Length);
@@ -761,9 +761,12 @@ namespace Moq
                             {
                                 tasks.Add(task);
                             }
-                            else if (returnValue is ValueTask valueTask)
+                            else if (returnValue != null && returnValue.GetType().FullName == "System.Threading.Tasks.ValueTask")
                             {
-                                tasks.Add(valueTask.AsTask());
+                                // Use reflection to obtain .AsTask() to avoid embedding ValueTask type tokens
+                                // in this method's IL for non-ValueTask execution paths.
+                                var asTaskMethod = returnValue.GetType().GetMethod("AsTask", Type.EmptyTypes)!;
+                                tasks.Add((Task)asTaskMethod.Invoke(returnValue, null)!);
                             }
                         }
                         return Task.WhenAll(tasks);

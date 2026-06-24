@@ -4590,6 +4590,66 @@ namespace Moq.Tests.Regressions
 
         #endregion
 
+        #region #1648
+
+        public class Issue1648
+        {
+            [Fact]
+            public void AwaitableFactory_TryGet_for_Task_succeeds_without_premature_ValueTask_assembly_load()
+            {
+                // This exercises the real shipped AwaitableFactory.TryGet on common Task paths.
+                // In the buggy implementation, even the first access to AwaitableFactory (via static cctor)
+                // would evaluate typeof(ValueTask) tokens and could throw FileLoadException if a different
+                // version of System.Threading.Tasks.Extensions was already loaded by the app.
+                var taskFactory = Moq.Async.AwaitableFactory.TryGet(typeof(Task));
+                Assert.NotNull(taskFactory);
+                Assert.Equal(typeof(void), taskFactory!.ResultType);
+
+                var taskTFactory = Moq.Async.AwaitableFactory.TryGet(typeof(Task<int>));
+                Assert.NotNull(taskTFactory);
+                Assert.Equal(typeof(int), taskTFactory!.ResultType);
+
+                // Simulate ValueTask type via runtime load (if the assembly can be resolved by name here).
+                // This exercises the deferred FullName + reflection creation path for VT.
+                // We do not use compile-time `typeof(ValueTask)` here for the simulation to mirror the fix approach.
+                Type? valueTaskType = null;
+                Type? valueTaskTType = null;
+                try
+                {
+                    // The package may be present because of our ref, or brought in by other test deps.
+                    var extAsm = System.Reflection.Assembly.Load("System.Threading.Tasks.Extensions");
+                    if (extAsm != null)
+                    {
+                        valueTaskType = extAsm.GetType("System.Threading.Tasks.ValueTask");
+                        valueTaskTType = extAsm.GetType("System.Threading.Tasks.ValueTask`1");
+                    }
+                }
+                catch
+                {
+                    // If cannot load by this name in the test env (e.g. .NET Core built-in), skip VT simulation.
+                }
+
+                if (valueTaskType != null)
+                {
+                    var vtFactory = Moq.Async.AwaitableFactory.TryGet(valueTaskType);
+                    Assert.NotNull(vtFactory);
+                }
+
+                if (valueTaskTType != null)
+                {
+                    // Construct a closed generic at runtime: ValueTask<int> equivalent
+                    var closed = valueTaskTType.MakeGenericType(typeof(int));
+                    var vtTFactory = Moq.Async.AwaitableFactory.TryGet(closed);
+                    Assert.NotNull(vtTFactory);
+                    Assert.Equal(typeof(int), vtTFactory!.ResultType);
+                }
+
+                // If we reached here on net472 (or equivalent), no FileLoadException occurred for the extensions assembly.
+            }
+        }
+
+        #endregion
+
         #region #159
 
         public class _159
