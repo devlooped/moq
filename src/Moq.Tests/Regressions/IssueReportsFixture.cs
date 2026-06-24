@@ -4616,7 +4616,7 @@ namespace Moq.Tests.Regressions
                 Assert.False(string.IsNullOrEmpty(ext454) || !File.Exists(ext454), "REQUIRED: Tasks.Extensions.dll from harness output dir (the explicitly copied older one). Build harness project.");
                 // Verify older for mismatch.
                 var extAsmVer = System.Reflection.AssemblyName.GetAssemblyName(ext454).Version;
-                Assert.True(extAsmVer < new Version(4,6,0), "Must use pre-4.6 version for real mismatch (got " + extAsmVer + ")");
+                Assert.True(extAsmVer < new Version(4, 6, 0), "Must use pre-4.6 version for real mismatch (got " + extAsmVer + ")");
 
                 // Launch the harness (it preloads the ext, sets resolve that throws real FileLoad on hit, LoadFrom Moq, TryGet Task only).
                 var psi = new System.Diagnostics.ProcessStartInfo(harnessExe, $"\"{moq462}\" \"{ext454}\"");
