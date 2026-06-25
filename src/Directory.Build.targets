@@ -39,7 +39,7 @@
     <NuGetBuildTasksPackTargets Condition="'$(NuGetBuildTasksPackTargets)' == ''">$(MSBuildSDKsPath)\..\NuGet.Build.Tasks.Pack.targets</NuGetBuildTasksPackTargets>
   </PropertyGroup>
 
-  <Import Project="$(NuGetBuildTasksPackTargets)" Condition="Exists('$(NuGetBuildTasksPackTargets)')"/>
+  <Import Project="$(NuGetBuildTasksPackTargets)" Condition="Exists('$(NuGetBuildTasksPackTargets)') And '$(NuGetize)' != 'true'" />
 
   <PropertyGroup>
     <!-- Revert the forced PackageId by the NuGet SDK targets for non-packable projects, see https://github.com/NuGet/Home/issues/14928 -->
