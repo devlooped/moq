@@ -49,6 +49,10 @@
     <Reference Include="Microsoft.CSharp" />
   </ItemGroup>
 
+  <ItemGroup Condition=" '$(TargetFramework)' == 'net8.0' ">
+    <PackageReference Include="System.CodeDom" Version="8.0.0" />
+  </ItemGroup>
+
   <ItemGroup Condition=" $([System.Text.RegularExpressions.Regex]::IsMatch('$(DefineConstants)', 'FEATURE_EF'))">
 		<PackageReference Include="EntityFramework" Version="6.5.2" />
 	</ItemGroup>
