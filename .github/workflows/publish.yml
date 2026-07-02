@@ -12,7 +12,7 @@ env:
   Configuration: Release
   PackOnBuild: true
   GeneratePackageOnBuild: true
-  VersionLabel: ${{ github.ref }}
+  VersionLabel: refs/tags/${{ github.event.release.tag_name }}
   GH_TOKEN: ${{ secrets.GH_TOKEN }}
   MSBUILDTERMINALLOGGER: auto
   SLEET_FEED_URL: https://api.nuget.org/v3/index.json
