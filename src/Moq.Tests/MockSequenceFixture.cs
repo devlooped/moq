@@ -1,6 +1,8 @@
 // Copyright (c) 2007, Clarius Consulting, Manas Technology Solutions, InSTEDD, and Contributors.
 // All rights reserved. Licensed under the BSD 3-Clause License; see License.txt.
 
+using System;
+using System.Collections.Generic;
 using Xunit;
 
 namespace Moq.Tests
@@ -113,6 +115,22 @@ namespace Moq.Tests
             a.InSequence(sequence).Setup(x => x.Do(200)).Returns(201);
 
             Assert.Throws<MockException>(() => a.Object.Do(200));
+        }
+        
+        [Fact]
+        public void SameMockNotAllSequenceCalledFail()
+        {
+            var a = new Mock<IFoo>(MockBehavior.Strict);
+
+            var sequence = new MockSequence();
+            a.InSequence(sequence).Setup(x => x.Do(100)).Returns(101);
+            a.InSequence(sequence).Setup(x => x.Do(200)).Returns(201);
+            a.InSequence(sequence).Setup(x => x.Do(300)).Returns(301);
+
+            a.Object.Do(100);
+            a.Object.Do(200);
+
+            Assert.Throws<MockException>(() => a.VerifyAll());
         }
 
         public interface IFoo
