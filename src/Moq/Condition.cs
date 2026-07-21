@@ -10,13 +10,16 @@ namespace Moq
         Func<bool> condition;
         Action? success;
 
-        public Condition(Func<bool> condition, Action? success = null)
+        public Condition(Func<bool> condition, Action? success = null, bool sequence = false)
         {
             this.condition = condition;
             this.success = success;
+            this.sequence = sequence;
         }
 
         public bool IsTrue => this.condition.Invoke();
+
+        public bool sequence { get; }
 
         public void SetupEvaluatedSuccessfully() => this.success?.Invoke();
     }
