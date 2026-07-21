@@ -44,7 +44,8 @@ namespace Moq
 
             return new WhenPhrase<TMock>(mock, new Condition(
                 condition: () => expectationPosition == sequenceStep,
-                success: NextStep));
+                success: NextStep,
+                sequence: true));
         }
     }
 
