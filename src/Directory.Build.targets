@@ -41,6 +41,13 @@
 
   <Import Project="$(NuGetBuildTasksPackTargets)" Condition="Exists('$(NuGetBuildTasksPackTargets)') And '$(NuGetize)' != 'true'" />
 
+  <!-- Fix for hardcoded assumption in SDK: <GenerateStaticWebAssetsManifest Source="$(PackageId)" -->
+  <Target Name="EnsureStaticWebAssetsSource" BeforeTargets="GenerateStaticWebAssetsManifest">
+    <PropertyGroup>
+      <PackageId Condition="'$(PackageId)' == ''">$(MSBuildProjectName)</PackageId>
+    </PropertyGroup>
+  </Target>
+
   <PropertyGroup>
     <!-- Revert the forced PackageId by the NuGet SDK targets for non-packable projects, see https://github.com/NuGet/Home/issues/14928 -->
     <PackageId Condition="'$(IsPackable)' == 'false'">$(_PackageId)</PackageId>
@@ -56,7 +63,12 @@
     <None Update="@(None -> WithMetadataValue('Filename', 'icon'))" 
           Pack="true" PackagePath="%(Filename)%(Extension)" 
           CopyToOutputDirectory="Never"
-          Condition="'$(PackageIcon)' != ''" />
+          Condition="'$(PackageIcon)' == 'icon.png'" />
+
+    <None Update="@(None -> WithMetadataValue('Filename', 'logo'))" 
+          Pack="true" PackagePath="%(Filename)%(Extension)" 
+          CopyToOutputDirectory="Never"
+          Condition="'$(PackageIcon)' == 'logo.png'" />
 
     <None Update="@(None -> WithMetadataValue('Filename', 'readme'))" 
           Pack="true" PackagePath="%(Filename)%(Extension)" 
@@ -64,10 +76,10 @@
           Condition="'$(PackReadme)' != 'false' and '$(PackageReadmeFile)' != ''" />
     
     <!-- src-level will need explicit inclusion -->
-    <None Include="$(MSBuildThisFileDirectory)icon.png" Link="icon.png" Visible="false" 
-          Pack="true" PackagePath="%(Filename)%(Extension)"
+    <None Include="$(MSBuildThisFileDirectory)$(PackageIcon)" Link="$(PackageIcon)" Visible="false" 
+          Pack="true" PackagePath="$(PackageIcon)"
           CopyToOutputDirectory="Never"
-          Condition="Exists('$(MSBuildThisFileDirectory)icon.png') and !Exists('$(MSBuildProjectDirectory)\icon.png')" />
+          Condition="'$(PackageIcon)' != '' and Exists('$(MSBuildThisFileDirectory)$(PackageIcon)') and !Exists('$(MSBuildProjectDirectory)\$(PackageIcon)')" />
 
     <None Include="$(MSBuildThisFileDirectory)readme.md" Link="readme.md"  
           Pack="true" PackagePath="%(Filename)%(Extension)"
