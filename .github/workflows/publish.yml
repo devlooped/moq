@@ -12,7 +12,7 @@ env:
   Configuration: Release
   PackOnBuild: true
   GeneratePackageOnBuild: true
-  VersionLabel: ${{ github.ref }}
+  VersionLabel: refs/tags/${{ github.event.release.tag_name }}
   GH_TOKEN: ${{ secrets.GH_TOKEN }}
   MSBUILDTERMINALLOGGER: auto
   SLEET_FEED_URL: https://api.nuget.org/v3/index.json
@@ -43,6 +43,16 @@ jobs:
         with:
           name: logs
           path: '*.binlog'
+
+      - name: ✅ validate
+        shell: pwsh
+        working-directory: bin
+        run: |
+          $invalid = Get-ChildItem -File -Filter "*.42.42*.nupkg"
+          if ($invalid) {
+            Write-Error "Found dev/local packages with disallowed 42.42* version prefix:`n$($invalid.Name -join "`n")"
+            exit 1
+          }
 
       - name: 🚀 nuget
         env:
