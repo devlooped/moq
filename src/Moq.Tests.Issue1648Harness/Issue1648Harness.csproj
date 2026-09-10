@@ -10,7 +10,7 @@
   </PropertyGroup>
 
   <ItemGroup>
-    <PackageReference Include="System.Threading.Tasks.Extensions" Version="4.5.4" PrivateAssets="All" ExcludeAssets="all" GeneratePathProperty="true" />
+    <PackageReference Include="System.Threading.Tasks.Extensions" Version="4.6.3" PrivateAssets="All" ExcludeAssets="all" GeneratePathProperty="true" />
     <!-- Force exact 4.5.4 net461 copy for genuine conflict sim (asm ver 4.2.0.1).
          This is the 'older' version preloaded to trigger the original FileLoad scenario against Moq's 4.6.3 ref.
          Uses the package-specific path property (guaranteed to be present after restore) instead of $(NuGetPackageRoot). -->
