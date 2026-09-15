@@ -705,10 +705,10 @@ namespace Moq
             var parts = expression.Split();
 
             // TODO: Will this code never return null?
-            return (Task)Mock.RaiseEvent(mock, expression, parts, arguments);
+            return (Task)Mock.RaiseEvent(mock, expression, parts, arguments, isAsync: true);
         }
 
-        internal static object? RaiseEvent(Mock mock, LambdaExpression expression, Stack<MethodExpectation> parts, object?[] arguments)
+        internal static object? RaiseEvent(Mock mock, LambdaExpression expression, Stack<MethodExpectation> parts, object?[] arguments, bool isAsync = false)
         {
             const BindingFlags bindingFlags = BindingFlags.Public | BindingFlags.NonPublic | BindingFlags.Instance | BindingFlags.DeclaredOnly;
 
@@ -747,6 +747,13 @@ namespace Moq
                             expression));
                 }
 
+                if (isAsync)
+                {
+                    var returnType = @event.EventHandlerType?.GetMethod("Invoke")?.ReturnType;
+                    if (returnType != typeof(Task) && returnType?.FullName != "System.Threading.Tasks.ValueTask")
+                        throw new ArgumentOutOfRangeException("eventExpression", "The event expression must return Task or ValueTask.");
+                }
+
                 if (mock.EventHandlers.TryGet(@event, out var handlers))
                 {
                     var returnType = handlers.GetMethodInfo().ReturnType;
@@ -774,13 +781,16 @@ namespace Moq
 
                     return handlers.InvokePreserveStack(arguments);
                 }
+
+                if (isAsync)
+                    return Task.CompletedTask;
             }
             else
             {
                 var innerMock = mock.MutableSetups.FindLastInnerMock(setup => setup.Matches(part));
                 if (innerMock != null)
                 {
-                    return Mock.RaiseEvent(innerMock, expression, parts, arguments);
+                    return Mock.RaiseEvent(innerMock, expression, parts, arguments, isAsync);
                 }
             }
 

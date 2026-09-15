@@ -184,6 +184,7 @@ namespace Moq.Tests
         {
             //Arrange
             var mock = new Mock<IWithEvent>();
+            mock.Object.CustomEvent += (message, value) => { };
 
             await Assert.ThrowsAnyAsync<ArgumentOutOfRangeException>(async () => await mock.RaiseAsync(e => e.CustomEvent += null, "foo", 5));
         }
