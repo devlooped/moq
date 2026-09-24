@@ -297,7 +297,7 @@ namespace Moq
             {
                 try
                 {
-                    setup.Verify(recursive: true, predicate, verifiedMocks);
+                    setup.Verify(recursive: setup is InnerMockSetup, predicate, verifiedMocks);
                 }
                 catch (MockException error) when (error.IsVerificationError)
                 {

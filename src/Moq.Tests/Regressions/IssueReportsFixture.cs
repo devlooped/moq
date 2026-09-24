@@ -5847,5 +5847,60 @@ namespace Moq.Tests.Regressions
         }
 
         #endregion
+
+        #region 1699
+
+        public class Issue1699
+        {
+            [Fact]
+            public void Verify_on_one_mock_should_not_verify_setups_on_another_mock_returned_by_setup()
+            {
+                var mockOne = new Mock<IOne>(MockBehavior.Strict);
+                var mockTwo = new Mock<ITwo>(MockBehavior.Strict);
+                mockOne.Setup(x => x.GetSomething()).Returns(mockTwo.Object).Verifiable();
+                mockTwo.Setup(x => x.DoSomething()).Verifiable();
+
+                var objectToTest = new ObjectToTest(mockOne.Object);
+
+                objectToTest.FirstMethod();
+                mockOne.Verify();
+
+                objectToTest.SecondMethod();
+                mockTwo.Verify();
+            }
+
+            class ObjectToTest
+            {
+                readonly IOne one;
+                ITwo member;
+
+                public ObjectToTest(IOne one)
+                {
+                    this.one = one;
+                }
+
+                public void FirstMethod()
+                {
+                    this.member = this.one.GetSomething();
+                }
+
+                public void SecondMethod()
+                {
+                    this.member?.DoSomething();
+                }
+            }
+
+            public interface IOne
+            {
+                ITwo GetSomething();
+            }
+
+            public interface ITwo
+            {
+                void DoSomething();
+            }
+        }
+
+        #endregion
     }
 }
