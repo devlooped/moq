@@ -24,6 +24,10 @@
     <DebugSymbols>true</DebugSymbols>
     <Nullable>enable</Nullable>
 
+    <!-- CodeAnalysis.Analyzers 3.11 adds every .resx as an AdditionalFile and
+         blanks ThisAssembly.Strings' SourceItemType, so the strings generator emits nothing. -->
+    <SkipAddAllResxFilesAsAdditionalFiles>true</SkipAddAllResxFilesAsAdditionalFiles>
+
     <DefaultItemExcludes>$(DefaultItemExcludes);*.binlog;*.zip;*.rsp;*.items;TestResults/**/*.*</DefaultItemExcludes>
 
     <!-- Use Directory.Packages.props -->

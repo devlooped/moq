@@ -40,10 +40,7 @@
     <PackageReference Include="Microsoft.Build.Locator" />
     <PackageReference Include="MSBuild.StructuredLogger" />
 
-    <PackageReference Include="System.ComponentModel.Composition" />
-    <PackageReference Include="Microsoft.CodeAnalysis.CSharp.Features" />
     <PackageReference Include="Microsoft.CodeAnalysis.CSharp.Workspaces" />
-    <PackageReference Include="Microsoft.CodeAnalysis.VisualBasic.Features" />
     <PackageReference Include="Microsoft.CodeAnalysis.VisualBasic.Workspaces" />
     <PackageReference Include="SQLitePCLRaw.bundle_green" />
 

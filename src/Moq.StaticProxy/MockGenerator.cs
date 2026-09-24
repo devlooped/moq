@@ -1,4 +1,5 @@
-﻿using System.Collections.Generic;
+﻿using System;
+using System.Collections.Generic;
 using System.Collections.Immutable;
 using System.Linq;
 using System.Runtime.CompilerServices;
@@ -29,7 +30,7 @@ namespace Moq
                 .WithGeneratorAttribute(typeof(MockGeneratorAttribute))
                 .WithProcessor(new DefaultImports(typeof(IMocked).Namespace, typeof(LazyInitializer).Namespace))
                 .WithProcessor(new CSharpMocked())
-                .WithSyntaxReceiver(() => new RecursiveMockCandidatesReceiver());
+                .WithSyntaxReceiver(() => new RecursiveMockCandidatesReceiver(typeof(MockGeneratorAttribute)));
         }
 
         [MethodImpl(MethodImplOptions.NoInlining)]
@@ -47,11 +48,17 @@ namespace Moq
 
         class RecursiveMockCandidatesReceiver : IAvatarCandidatesReceiver
         {
+            readonly Type generatorAttribute;
             readonly List<SyntaxNode> nodes = new();
 
-            public IEnumerable<INamedTypeSymbol[]> GetCandidates(ProcessorContext context)
+            public RecursiveMockCandidatesReceiver(Type generatorAttribute) => this.generatorAttribute = generatorAttribute;
+
+            public IEnumerable<(SyntaxNode source, INamedTypeSymbol[] candidate)> GetCandidates(ProcessorContext context)
             {
-                var generatorAttr = context.GeneratorAttribute;
+                var generatorAttr = context.Compilation.GetTypeByMetadataName(generatorAttribute.FullName);
+                if (generatorAttr == null)
+                    yield break;
+
                 var moqmodule = context.Compilation.GetTypeByMetadataName("Moq.IMoq")!.ContainingModule;
                 var sdkmodule = context.Compilation.GetTypeByMetadataName(typeof(IMock).FullName!)!.ContainingModule;
 
@@ -69,16 +76,55 @@ namespace Moq
                     //      this is a recursive "read outside" flow: the flow into the recursive expression
                     //      is actually the lambda parameter, not useful. But the "read outside" is the actual 
                     //      mock variable where the Setup is being performed, which is what we need.
-                    bool IsMockFlow(ImmutableArray<ISymbol> data) =>
-                        data.Length == 1 &&
-                        data[0].DeclaringSyntaxReferences.Length == 1 &&
-                        data[0].DeclaringSyntaxReferences[0].GetSyntax(context.CancellationToken) is VariableDeclaratorSyntax variable &&
+                    // Roslyn 4.x does not report a data flow for a method-group receiver
+                    // (mock.GetBar()), so also walk to the root identifier and to an enclosing lambda.
+                    bool IsGeneratedMock(ISymbol symbol) =>
+                        symbol.DeclaringSyntaxReferences.Length == 1 &&
+                        symbol.DeclaringSyntaxReferences[0].GetSyntax(context.CancellationToken) is VariableDeclaratorSyntax variable &&
                         variable.Initializer?.Value is InvocationExpressionSyntax create &&
-                        semantic!.GetSymbolInfo(create, context.CancellationToken).Symbol is IMethodSymbol method &&
+                        semantic.GetSymbolInfo(create, context.CancellationToken).Symbol is IMethodSymbol method &&
                         method.GetAttributes().Any(attr => SymbolEqualityComparer.Default.Equals(attr.AttributeClass, generatorAttr));
 
+                    bool IsMockFlow(ImmutableArray<ISymbol> data) =>
+                        data.Length == 1 && IsGeneratedMock(data[0]);
+
+                    bool IsMockAccess()
+                    {
+                        if (IsMockFlow(flow.DataFlowsIn) || IsMockFlow(flow.ReadOutside))
+                            return true;
+
+                        var current = node;
+                        while (current is InvocationExpressionSyntax or MemberAccessExpressionSyntax or ParenthesizedExpressionSyntax)
+                        {
+                            var next = current switch
+                            {
+                                InvocationExpressionSyntax invocation => invocation.Expression,
+                                MemberAccessExpressionSyntax access => access.Expression,
+                                ParenthesizedExpressionSyntax parenthesized => parenthesized.Expression,
+                                _ => null
+                            };
+                            if (next == null || next == current)
+                                break;
+
+                            current = next;
+                        }
+
+                        if (semantic.GetSymbolInfo(current, context.CancellationToken).Symbol is ISymbol root &&
+                            IsGeneratedMock(root))
+                            return true;
+
+                        foreach (var lambda in node.Ancestors().OfType<AnonymousFunctionExpressionSyntax>())
+                        {
+                            var lambdaFlow = semantic.AnalyzeDataFlow(lambda);
+                            if (IsMockFlow(lambdaFlow.DataFlowsIn) || IsMockFlow(lambdaFlow.ReadOutside))
+                                return true;
+                        }
+
+                        return false;
+                    }
+
                     // Detect if the variable being accessed was initialized from a generator method call
-                    if (!IsMockFlow(flow.DataFlowsIn) && !IsMockFlow(flow.ReadOutside))
+                    if (!IsMockAccess())
                         continue;
 
                     var symbol = semantic.GetSymbolInfo(node);
@@ -106,7 +152,7 @@ namespace Moq
                     if (type != null && type.CanBeIntercepted() == false)
                         continue;
 
-                    yield return new[] { type! };
+                    yield return (node, new[] { type! });
                 }
             }
 

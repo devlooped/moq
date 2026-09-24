@@ -20,19 +20,19 @@
   </ItemGroup>
 
   <ItemGroup Label="Roslyn">
-    <PackageVersion Include="Microsoft.CodeAnalysis.Common" Version="3.8.0" />
-    <PackageVersion Include="Microsoft.CodeAnalysis.CSharp" Version="3.8.0" />
-    <PackageVersion Include="Microsoft.CodeAnalysis.CSharp.Features" Version="3.8.0" />
-    <PackageVersion Include="Microsoft.CodeAnalysis.CSharp.Workspaces" Version="3.8.0"/>
-    <PackageVersion Include="Microsoft.CodeAnalysis.VisualBasic" Version="3.8.0" />
-    <PackageVersion Include="Microsoft.CodeAnalysis.VisualBasic.Features" Version="3.8.0" />
-    <PackageVersion Include="Microsoft.CodeAnalysis.VisualBasic.Workspaces" Version="3.8.0" />
+    <PackageVersion Include="Microsoft.CodeAnalysis.Common" Version="4.14.0" />
+    <PackageVersion Include="Microsoft.CodeAnalysis.CSharp" Version="4.14.0" />
+    <PackageVersion Include="Microsoft.CodeAnalysis.CSharp.Features" Version="4.14.0" />
+    <PackageVersion Include="Microsoft.CodeAnalysis.CSharp.Workspaces" Version="4.14.0"/>
+    <PackageVersion Include="Microsoft.CodeAnalysis.VisualBasic" Version="4.14.0" />
+    <PackageVersion Include="Microsoft.CodeAnalysis.VisualBasic.Features" Version="4.14.0" />
+    <PackageVersion Include="Microsoft.CodeAnalysis.VisualBasic.Workspaces" Version="4.14.0" />
     <PackageVersion Include="Microsoft.CodeAnalysis.CSharp.CodeStyle" Version="3.8.0" />
 
     <PackageVersion Include="Microsoft.Bcl.HashCode" Version="1.1.0" />
     
     <!-- For packaging purposes -->
-    <PackageVersion Include="Microsoft.Bcl.AsyncInterfaces" Version="5.0.0" />
+    <PackageVersion Include="Microsoft.Bcl.AsyncInterfaces" Version="9.0.0" />
 
     <!-- Unit tests need to pack this for tests to run on macOS, for example -->
     <PackageVersion Include="SQLitePCLRaw.bundle_green" Version="2.0.4" />

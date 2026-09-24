@@ -12,7 +12,7 @@ namespace Moq.Processors
     /// <summary>
     /// Generates the C# implementation of the mock interfaces.
     /// </summary>
-    class CSharpMocked : IAvatarProcessor
+    class CSharpMocked : ISyntaxProcessor
     {
         public string Language => LanguageNames.CSharp;
 

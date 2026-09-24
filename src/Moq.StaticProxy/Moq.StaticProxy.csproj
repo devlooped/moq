@@ -7,6 +7,8 @@
     <DisableTransitiveFrameworkReferences>true</DisableTransitiveFrameworkReferences>
     <CopyLocalLockFileAssemblies>true</CopyLocalLockFileAssemblies>
     <PackFolder>tools\$(TargetFramework)</PackFolder>
+    <!-- ISourceGenerator is obsolete in the Roslyn 4.14 reference but still what this generator implements. -->
+    <NoWarn>$(NoWarn);RS1042</NoWarn>
   </PropertyGroup>
 
   <ItemGroup>
@@ -17,10 +19,6 @@
     <PackageReference Include="Microsoft.CodeAnalysis.CSharp" Pack="false" />
     <PackageReference Include="Microsoft.CodeAnalysis.VisualBasic" Pack="false" />
 
-    <PackageReference Include="Microsoft.CodeAnalysis.CSharp.Features" Pack="false" />
-    <PackageReference Include="Microsoft.CodeAnalysis.VisualBasic.Features" Pack="false" />
-
-    <PackageReference Include="System.ComponentModel.Composition" Pack="false" />
     <PackageReference Include="Microsoft.Bcl.AsyncInterfaces" Pack="false" />
     <PackageReference Include="Microsoft.Bcl.HashCode" Pack="false" />
   </ItemGroup>
