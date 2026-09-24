@@ -297,7 +297,10 @@ namespace Moq
             {
                 try
                 {
-                    setup.Verify(recursive: true, predicate, verifiedMocks);
+                    setup.Verify(
+                        recursive: setup is InnerMockSetup or StubbedPropertySetup or StubbedPropertiesSetup,
+                        predicate,
+                        verifiedMocks);
                 }
                 catch (MockException error) when (error.IsVerificationError)
                 {
