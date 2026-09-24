@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Reflection;
 using Avatars;
 using Sample;
 using Xunit;
@@ -23,7 +24,7 @@ namespace Moq.Sdk.Tests
         public void ExecutesAnonymousBehavior()
         {
             var called = false;
-            var behavior = new AnonymousMockBehavior((m, i, n) => { called = true; return i.CreateValueReturn(null); }, "test");
+            var behavior = new AnonymousMockBehavior((m, i, n) => { called = true; return i.CreateReturn(); }, "test");
             var mock = new FakeMock();
 
             behavior.Execute(mock.Mock, new MethodInvocation(mock, typeof(object).GetMethod(nameof(object.ToString))), () => null);
@@ -38,7 +39,7 @@ namespace Moq.Sdk.Tests
             var mock = new Mocked();
 
             behavior.Execute(new MethodInvocation(mock, typeof(object).GetMethod(nameof(object.ToString))),
-                () => (m, n) => m.CreateValueReturn(null));
+                (m, n) => m.CreateReturn());
 
             Assert.Equal(1, mock.Mock.Invocations.Count);
         }
@@ -51,13 +52,13 @@ namespace Moq.Sdk.Tests
             Assert.Throws<ArgumentException>(() => behavior.Execute(new MethodInvocation(
                 new object(),
                 typeof(Mocked).GetProperty(nameof(IMocked.Mock)).GetGetMethod()),
-                () => (m, n) => m.CreateValueReturn(null)));
+                (m, n) => m.CreateReturn()));
         }
 
         [Fact]
         public void WhenAddingMockBehavior_ThenCanInterceptSelectively()
         {
-            var calculator = new CalculatorInterfaceAvatar();
+            var calculator = new SelectiveCalculator();
 
             // TODO: this is not adding a mock behavior but a regular stunt behavior
             calculator.AddBehavior((m, n) => m.CreateValueReturn(CalculatorMode.Scientific), m => m.MethodBase.Name == "get_Mode");
@@ -69,6 +70,13 @@ namespace Moq.Sdk.Tests
 
             Assert.Equal(CalculatorMode.Scientific, mode);
             Assert.Equal(0, add);
+        }
+
+        class SelectiveCalculator : FakeMock
+        {
+            public CalculatorMode Mode => Pipeline.Execute<CalculatorMode>(MethodInvocation.Create(this, MethodBase.GetCurrentMethod()));
+
+            public int Add(int x, int y) => Pipeline.Execute<int>(MethodInvocation.Create(this, MethodBase.GetCurrentMethod(), x, y));
         }
     }
 }

@@ -1,4 +1,4 @@
-﻿using System;
+using System;
 using System.Collections.Generic;
 using System.Linq;
 using Avatars;
@@ -242,14 +242,14 @@ namespace Moq
         {
             public bool AppliesTo(IMethodInvocation invocation) => true;
 
-            public IMethodReturn Execute(IMethodInvocation invocation, GetNextBehavior next)
+            public IMethodReturn Execute(IMethodInvocation invocation, ExecuteHandler next)
             {
                 var mock = invocation.Target.AsMock();
                 var setup = MockContext.CurrentSetup ?? CallContext.ThrowUnexpectedNull<IMockSetup>();
                 if (mock.Invocations.Where(x => setup.AppliesTo(x)).Any())
                     throw new VerifyException(mock, setup);
 
-                return next().Invoke(invocation, next);
+                return next.Invoke(invocation, next);
             }
         }
     }

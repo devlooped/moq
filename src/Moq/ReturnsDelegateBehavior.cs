@@ -18,10 +18,12 @@ namespace Moq
 
         public IMethodReturn Execute(IMock mock, IMethodInvocation invocation, GetNextMockBehavior next)
         {
-            var arguments = invocation.Arguments.Select(prm => invocation.Arguments.GetValue(prm.Name)).ToArray();
-            var returnValue = @delegate.DynamicInvoke(arguments);
+            var values = invocation.Arguments.Select(prm => invocation.Arguments.GetValue(prm.Name)).ToArray();
+            var returnValue = @delegate.DynamicInvoke(values);
+            for (var i = 0; i < values.Length; i++)
+                invocation.Arguments.SetValue(i, values[i]);
 
-            return invocation.CreateValueReturn(returnValue, arguments);
+            return invocation.CreateValueReturn(returnValue, invocation.Arguments);
         }
     }
 }

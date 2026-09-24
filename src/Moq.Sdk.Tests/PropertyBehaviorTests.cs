@@ -1,4 +1,4 @@
-﻿using System;
+using System;
 using System.Reflection;
 using Avatars;
 using Xunit;
@@ -11,7 +11,7 @@ namespace Moq.Sdk.Tests
         public void AppliesToGet()
         {
             var behavior = new PropertyBehavior();
-            Assert.True(behavior.AppliesTo(new MethodInvocation(
+            Assert.True(behavior.AppliesTo(MethodInvocation.Create(
                 new PropertiesMock(),
                 typeof(PropertiesMock).GetProperty(nameof(PropertiesMock.Id)).GetGetMethod())));
         }
@@ -20,7 +20,7 @@ namespace Moq.Sdk.Tests
         public void AppliesToSet()
         {
             var behavior = new PropertyBehavior();
-            Assert.True(behavior.AppliesTo(new MethodInvocation(
+            Assert.True(behavior.AppliesTo(MethodInvocation.Create(
                 new PropertiesMock(),
                 typeof(PropertiesMock).GetProperty(nameof(PropertiesMock.Id)).GetSetMethod(),
                 "foo")));
@@ -40,24 +40,25 @@ namespace Moq.Sdk.Tests
         [Fact]
         public void ThrowsIfNullInvocation()
             => Assert.Throws<ArgumentNullException>(()
-                => new PropertyBehavior().Execute(null, () => throw new NotImplementedException()));
+                => new PropertyBehavior().Execute(null, (m, n) => throw new NotImplementedException()));
 
         [Fact]
         public void ThrowsIfTargetNotMocked()
         {
             var behavior = new PropertyBehavior();
-            Assert.Throws<ArgumentException>(() => behavior.Execute(new MethodInvocation(
+            Assert.Throws<ArgumentException>(() => behavior.Execute(MethodInvocation.Create(
                 new object(),
-                typeof(PropertiesMock).GetProperty(nameof(PropertiesMock.Id)).GetSetMethod()),
-                () => throw new NotImplementedException()));
+                typeof(PropertiesMock).GetProperty(nameof(PropertiesMock.Id)).GetSetMethod(),
+                "foo"),
+                (m, n) => throw new NotImplementedException()));
         }
 
         public class PropertiesMock : FakeMock
         {
             public string Id
             {
-                get => Pipeline.Execute<string>(new MethodInvocation(this, MethodBase.GetCurrentMethod()));
-                set => Pipeline.Execute(new MethodInvocation(this, MethodBase.GetCurrentMethod(), value));
+                get => Pipeline.Execute<string>(MethodInvocation.Create(this, MethodBase.GetCurrentMethod()));
+                set => Pipeline.Execute(MethodInvocation.Create(this, MethodBase.GetCurrentMethod(), value));
             }
         }
     }

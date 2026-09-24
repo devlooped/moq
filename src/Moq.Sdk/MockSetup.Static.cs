@@ -44,7 +44,7 @@ namespace Moq.Sdk
             for (var i = 0; i < invocation.Arguments.Count; i++)
             {
                 var argument = invocation.Arguments.GetValue(i);
-                var parameter = invocation.Arguments[i];
+                var parameter = invocation.Arguments[i].Parameter;
 
                 // This is a bit fuzzy since we compare the actual argument value against the 
                 // default value for the parameter type, or the type of the matcher in the 

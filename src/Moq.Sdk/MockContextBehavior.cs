@@ -1,4 +1,4 @@
-﻿using System;
+using System;
 using System.Diagnostics;
 using Avatars;
 
@@ -23,7 +23,7 @@ namespace Moq.Sdk
         /// <summary>
         /// Implements the tracking of invocations for the excuted invocations.
         /// </summary>
-        public IMethodReturn Execute(IMethodInvocation invocation, GetNextBehavior next)
+        public IMethodReturn Execute(IMethodInvocation invocation, ExecuteHandler next)
         {
             // Allows subsequent extension methods on the fluent API to retrieve the 
             // current invocation being performed via the MockContext.
@@ -40,7 +40,7 @@ namespace Moq.Sdk
             if (Debugger.IsAttached)
                 invocation.Context[nameof(Environment.StackTrace)] = invocation.GetStackTrace();
 
-            return next().Invoke(invocation, next);
+            return next.Invoke(invocation, next);
         }
     }
 }

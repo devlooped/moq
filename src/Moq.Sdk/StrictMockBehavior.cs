@@ -1,4 +1,4 @@
-﻿using Avatars;
+using Avatars;
 
 namespace Moq.Sdk
 {
@@ -17,6 +17,6 @@ namespace Moq.Sdk
         /// <summary>
         /// Throws <see cref="StrictMockException"/>.
         /// </summary>
-        public IMethodReturn Execute(IMethodInvocation invocation, GetNextBehavior next) => throw new StrictMockException();
+        public IMethodReturn Execute(IMethodInvocation invocation, ExecuteHandler next) => throw new StrictMockException();
     }
 }

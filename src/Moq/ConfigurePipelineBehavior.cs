@@ -1,4 +1,4 @@
-﻿using System.ComponentModel;
+using System.ComponentModel;
 using Avatars;
 using Moq.Sdk;
 
@@ -20,7 +20,7 @@ namespace Moq
         /// Configures the current invocation depending on the <see cref="MockBehavior"/> 
         /// specified for the mock.
         /// </summary>
-        public IMethodReturn Execute(IMethodInvocation invocation, GetNextBehavior next)
+        public IMethodReturn Execute(IMethodInvocation invocation, ExecuteHandler next)
         {
             var moq = invocation.Target.AsMoq();
             if (moq.Behavior != MockBehavior.Strict)
@@ -36,7 +36,7 @@ namespace Moq
                     .GetPipeline(MockContext.CurrentSetup ?? CallContext.ThrowUnexpectedNull<IMockSetup>());
             }
 
-            return next().Invoke(invocation, next);
+            return next.Invoke(invocation, next);
         }
     }
 }

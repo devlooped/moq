@@ -1,4 +1,4 @@
-﻿using System;
+using System;
 using System.Collections.Generic;
 using System.ComponentModel;
 using System.Linq;
@@ -29,14 +29,14 @@ namespace Moq
         /// <summary>
         /// Skips all non-setup behaviors from execution.
         /// </summary>
-        public IMethodReturn Execute(IMethodInvocation invocation, GetNextBehavior next)
+        public IMethodReturn Execute(IMethodInvocation invocation, ExecuteHandler next)
         {
             foreach (var behavior in invocation.Target.AsMock().Behaviors.Where(x => !setupScopeBehaviors.Contains(x.GetType())))
             {
                 invocation.SkipBehaviors.Add(behavior.GetType());
             }
 
-            return next().Invoke(invocation, next);
+            return next.Invoke(invocation, next);
         }
     }
 }

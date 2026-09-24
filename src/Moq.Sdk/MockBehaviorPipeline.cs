@@ -1,4 +1,4 @@
-﻿using System;
+using System;
 using System.Collections.ObjectModel;
 using System.Diagnostics;
 using Avatars;
@@ -35,7 +35,7 @@ namespace Moq.Sdk
         /// where all sub-pipeline behaviors automatically apply to the invocation, since they 
         /// are filtered as a whole according to the <see cref="Setup"/>.
         /// </summary>
-        public IMethodReturn Execute(IMethodInvocation invocation, GetNextBehavior next)
+        public IMethodReturn Execute(IMethodInvocation invocation, ExecuteHandler next)
         {
             var mock = (invocation.Target as IMocked)?.Mock ?? throw new ArgumentException(ThisAssembly.Strings.TargetNotMock);
 
@@ -50,7 +50,7 @@ namespace Moq.Sdk
             invocation.SkipBehavior<StrictMockBehavior>();
 
             if (Behaviors.Count == 0)
-                return next().Invoke(invocation, next);
+                return next.Invoke(invocation, next);
 
             var index = 0;
             var result = Behaviors[0].Execute(mock, invocation, () =>
@@ -59,7 +59,7 @@ namespace Moq.Sdk
                 return (index < Behaviors.Count) ?
                     Behaviors[index].Execute :
                     // Adapt the GetNextBehavior to our mock version
-                    new ExecuteMockDelegate((m, i, n) => next().Invoke(i, next));
+                    new ExecuteMockDelegate((m, i, n) => next.Invoke(i, next));
             });
 
             return result;

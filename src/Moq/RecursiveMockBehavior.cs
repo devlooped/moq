@@ -1,4 +1,4 @@
-﻿using System;
+using System;
 using System.ComponentModel;
 using System.Linq;
 using System.Reflection;
@@ -25,13 +25,13 @@ namespace Moq
         /// Ensures that a recursive mock invocation during a setup returns a 
         /// new mock instead of null.
         /// </summary>
-        public IMethodReturn Execute(IMethodInvocation invocation, GetNextBehavior next)
+        public IMethodReturn Execute(IMethodInvocation invocation, ExecuteHandler next)
         {
             if (invocation.MethodBase is MethodInfo info &&
                 info.ReturnType != typeof(void) &&
                 info.ReturnType.CanBeIntercepted())
             {
-                var result = next().Invoke(invocation, next);
+                var result = next.Invoke(invocation, next);
                 if (result.ReturnValue == null)
                 {
                     // Turn the null value into a mock for the current invocation setup
@@ -68,12 +68,12 @@ namespace Moq
                         setup.Behaviors.Add(new ReturnsBehavior(recursiveMock.Object));
 
                     // Copy over values from the result, so that outputs contain the default values.
-                    var arguments = invocation.Arguments.Select((p, i) => invocation.Arguments.GetValue(i)).ToArray();
-                    for (var i = 0; i < invocation.Arguments.Count; i++)
+                    var arguments = invocation.Arguments;
+                    for (var i = 0; i < arguments.Count; i++)
                     {
-                        var parameter = invocation.Arguments[i];
+                        var parameter = arguments[i].Parameter;
                         if (parameter.IsOut)
-                            arguments[i] = result.Outputs.GetValue(parameter.Name);
+                            arguments.SetValue(i, result.Outputs.GetValue(parameter.Name));
                     }
 
                     return invocation.CreateValueReturn(recursiveMock.Object, arguments);
@@ -82,7 +82,7 @@ namespace Moq
                 return result;
             }
 
-            return next().Invoke(invocation, next);
+            return next.Invoke(invocation, next);
         }
     }
 }

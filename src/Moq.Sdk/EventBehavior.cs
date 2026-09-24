@@ -1,4 +1,4 @@
-﻿using System;
+using System;
 using System.Diagnostics;
 using System.Linq;
 using System.Reflection;
@@ -23,7 +23,7 @@ namespace Moq.Sdk
                invocation.MethodBase.Name.StartsWith("remove_", StringComparison.Ordinal));
 
         /// <inheritdoc />
-        public IMethodReturn Execute(IMethodInvocation invocation, GetNextBehavior next)
+        public IMethodReturn Execute(IMethodInvocation invocation, ExecuteHandler next)
         {
             var info = invocation.MethodBase.DeclaringType.GetRuntimeEvent(
                 invocation.MethodBase.Name.Replace("add_", string.Empty).Replace("remove_", string.Empty));
@@ -74,7 +74,7 @@ namespace Moq.Sdk
                 }
             }
 
-            return next()(invocation, next);
+            return next(invocation, next);
         }
 
         static void CombineDelegate(EventInfo info, Delegate handler, IMock mock)

@@ -1,4 +1,4 @@
-﻿using Avatars;
+using Avatars;
 
 namespace Moq.Sdk
 {
@@ -17,11 +17,11 @@ namespace Moq.Sdk
         /// <summary>
         /// Implements the tracking of invocations for the excuted invocations.
         /// </summary>
-        public IMethodReturn Execute(IMethodInvocation invocation, GetNextBehavior next)
+        public IMethodReturn Execute(IMethodInvocation invocation, ExecuteHandler next)
         {
             invocation.Target.AsMock().Invocations.Add(invocation);
 
-            return next().Invoke(invocation, next);
+            return next.Invoke(invocation, next);
         }
     }
 }

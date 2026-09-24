@@ -1,7 +1,6 @@
 ﻿using System;
 using System.ComponentModel;
 using System.Diagnostics;
-using System.Linq;
 using Avatars;
 using Moq.Sdk;
 
@@ -55,6 +54,6 @@ namespace Moq
         object DebuggerValue => value ?? "<function>";
 
         public IMethodReturn Execute(IMock mock, IMethodInvocation invocation, GetNextMockBehavior next)
-            => invocation.CreateValueReturn(getter(invocation.Arguments), invocation.Arguments.Select(p => invocation.Arguments.GetValue(p.Name)).ToArray());
+            => invocation.CreateValueReturn(getter(invocation.Arguments), invocation.Arguments);
     }
 }

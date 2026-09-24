@@ -1,4 +1,4 @@
-﻿using System;
+using System;
 using System.Reflection;
 using Avatars;
 using Xunit;
@@ -45,9 +45,9 @@ namespace Moq.Sdk.Tests
 
         class FakeCalls : FakeMock
         {
-            public void TurnOn() => Pipeline.Execute(new MethodInvocation(this, MethodBase.GetCurrentMethod()));
+            public void TurnOn() => Pipeline.Execute(MethodInvocation.Create(this, MethodBase.GetCurrentMethod()));
 
-            public int Add(int x, int y) => Pipeline.Execute<int>(new MethodInvocation(this, MethodBase.GetCurrentMethod(), x, y));
+            public int Add(int x, int y) => Pipeline.Execute<int>(MethodInvocation.Create(this, MethodBase.GetCurrentMethod(), x, y));
         }
     }
 }

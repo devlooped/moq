@@ -14,8 +14,8 @@ namespace Moq.Sdk.Tests
             var args = new object[] { true, "foo", PlatformID.Win32NT };
             var target = this;
 
-            IEquatable<IMethodInvocation> equatable = new MethodInvocation(target, method, args);
-            IEquatable<IMethodInvocation> other = new MethodInvocation(target, method, args);
+            IEquatable<IMethodInvocation> equatable = Invocation(target, method, args);
+            IEquatable<IMethodInvocation> other = Invocation(target, method, args);
 
             Assert.True(equatable.Equals(other));
             Assert.Equal(equatable.GetHashCode(), other.GetHashCode());
@@ -28,9 +28,9 @@ namespace Moq.Sdk.Tests
             var args = new object[] { true, "foo", PlatformID.Win32NT };
             var target = this;
 
-            var equatable = new MethodInvocation(target, method, args);
+            var equatable = Invocation(target, method, args);
             equatable.Context["foo"] = "bar";
-            var other = new MethodInvocation(target, method, args);
+            var other = Invocation(target, method, args);
 
             Assert.True(equatable.Equals(other));
         }
@@ -42,7 +42,7 @@ namespace Moq.Sdk.Tests
             var args = new object[] { true, "foo", PlatformID.Win32NT };
             var target = this;
 
-            var equatable = new MethodInvocation(target, method, args);
+            var equatable = Invocation(target, method, args);
 
             Assert.False(equatable.Equals(null));
         }
@@ -54,7 +54,7 @@ namespace Moq.Sdk.Tests
             var args = new object[] { true, "foo", PlatformID.Win32NT };
             var target = this;
 
-            var equatable = new MethodInvocation(target, method, args);
+            var equatable = Invocation(target, method, args);
 
             Assert.False(equatable.Equals(new object()));
         }
@@ -99,8 +99,8 @@ namespace Moq.Sdk.Tests
             var conditional = new ConditionalMatcher<string>(condition, "foo");
             var value = new ValueMatcher(typeof(string), "foo");
 
-            var setup = new MockSetup(new MethodInvocation(target, method, args), new[] { any, conditional, value });
-            var other = new MockSetup(new MethodInvocation(target, method, args), new[] { any, conditional, value });
+            var setup = new MockSetup(Invocation(target, method, args), new[] { any, conditional, value });
+            var other = new MockSetup(Invocation(target, method, args), new[] { any, conditional, value });
 
             Assert.True(setup.Equals(other));
             Assert.Equal(setup.GetHashCode(), other.GetHashCode());
@@ -112,7 +112,7 @@ namespace Moq.Sdk.Tests
             Assert.Contains(other, hash);
 
             Assert.False(setup.Equals(
-                new MockSetup(new MethodInvocation(new object(), method, args), new[] { any, conditional, value })));
+                new MockSetup(Invocation(new object(), method, args), new[] { any, conditional, value })));
         }
 
         [Fact]
@@ -127,5 +127,12 @@ namespace Moq.Sdk.Tests
         }
 
         void AMethod(bool b, string s, PlatformID p) { }
+
+        static MethodInvocation Invocation(object target, System.Reflection.MethodBase method, object[] args)
+            => new MethodInvocation(target, method, ArgumentCollection.Create(
+                method.GetParameters(),
+                (bool)args[0],
+                (string)args[1],
+                (PlatformID)args[2]));
     }
 }

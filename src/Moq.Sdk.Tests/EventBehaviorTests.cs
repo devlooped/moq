@@ -1,4 +1,4 @@
-﻿using System;
+using System;
 using System.ComponentModel;
 using System.Reflection;
 using Avatars;
@@ -12,7 +12,7 @@ namespace Moq.Sdk.Tests
         public void AppliesToAdd()
         {
             var behavior = new EventBehavior();
-            Assert.True(behavior.AppliesTo(new MethodInvocation(
+            Assert.True(behavior.AppliesTo(MethodInvocation.Create(
                 new EventfulMock(),
                 typeof(EventfulMock).GetEvent(nameof(EventfulMock.Empty)).GetAddMethod(),
                 new EventHandler((s, a) => { }))));
@@ -22,7 +22,7 @@ namespace Moq.Sdk.Tests
         public void AppliesToRemove()
         {
             var behavior = new EventBehavior();
-            Assert.True(behavior.AppliesTo(new MethodInvocation(
+            Assert.True(behavior.AppliesTo(MethodInvocation.Create(
                 new EventfulMock(),
                 typeof(EventfulMock).GetEvent(nameof(EventfulMock.Empty)).GetRemoveMethod(),
                 new EventHandler((s, a) => { }))));
@@ -33,7 +33,7 @@ namespace Moq.Sdk.Tests
         {
             var mock = new EventfulMock();
             mock.Behaviors.Add(new EventBehavior());
-            mock.AddBehavior((m, n) => m.CreateValueReturn(null));
+            mock.AddBehavior((m, n) => m.CreateReturn());
 
             EventHandler handler = (_, __) => { };
             mock.Empty += handler;
@@ -47,7 +47,7 @@ namespace Moq.Sdk.Tests
         {
             var mock = new EventfulMock();
             mock.Behaviors.Add(new EventBehavior());
-            mock.AddBehavior((m, n) => m.CreateValueReturn(null));
+            mock.AddBehavior((m, n) => m.CreateReturn());
 
             EventHandler handler = (_, __) => { };
             mock.Empty += handler;
@@ -67,7 +67,7 @@ namespace Moq.Sdk.Tests
         {
             var mock = new EventfulMock();
             mock.Behaviors.Add(new EventBehavior());
-            mock.AddBehavior((m, n) => m.CreateValueReturn(null));
+            mock.AddBehavior((m, n) => m.CreateReturn());
 
             var called = false;
             EventHandler handler = (_, __) => called = true;
@@ -84,7 +84,7 @@ namespace Moq.Sdk.Tests
         {
             var mock = new EventfulMock();
             mock.Behaviors.Add(new EventBehavior());
-            mock.AddBehavior((m, n) => m.CreateValueReturn(null));
+            mock.AddBehavior((m, n) => m.CreateReturn());
 
             var expected = new Args();
             var actual = default(Args);
@@ -102,7 +102,7 @@ namespace Moq.Sdk.Tests
         {
             var mock = new EventfulMock();
             mock.Behaviors.Add(new EventBehavior());
-            mock.AddBehavior((m, n) => m.CreateValueReturn(null));
+            mock.AddBehavior((m, n) => m.CreateReturn());
 
             var expected = new PropertyChangedEventArgs("Foo");
             var actual = default(PropertyChangedEventArgs);
@@ -120,7 +120,7 @@ namespace Moq.Sdk.Tests
         {
             var mock = new EventfulMock();
             mock.Behaviors.Add(new EventBehavior());
-            mock.AddBehavior((m, n) => m.CreateValueReturn(null));
+            mock.AddBehavior((m, n) => m.CreateReturn());
 
             var expected = 5;
             var actual = 0;
@@ -138,7 +138,7 @@ namespace Moq.Sdk.Tests
         {
             var mock = new EventfulMock();
             mock.Behaviors.Add(new EventBehavior());
-            mock.AddBehavior((m, n) => m.CreateValueReturn(null));
+            mock.AddBehavior((m, n) => m.CreateReturn());
 
             var (id, name) = (5, "foo");
             var (id2, name2) = (0, "");
@@ -157,32 +157,32 @@ namespace Moq.Sdk.Tests
         {
             public event EventHandler Empty
             {
-                add => Pipeline.Execute<EventHandler>(new MethodInvocation(this, MethodBase.GetCurrentMethod(), value));
-                remove => Pipeline.Execute<EventHandler>(new MethodInvocation(this, MethodBase.GetCurrentMethod(), value));
+                add => Pipeline.Execute<EventHandler>(MethodInvocation.Create(this, MethodBase.GetCurrentMethod(), value));
+                remove => Pipeline.Execute<EventHandler>(MethodInvocation.Create(this, MethodBase.GetCurrentMethod(), value));
             }
 
             public event EventHandler<Args> WithArgs
             {
-                add => Pipeline.Execute<EventHandler<Args>>(new MethodInvocation(this, MethodBase.GetCurrentMethod(), value));
-                remove => Pipeline.Execute<EventHandler<Args>>(new MethodInvocation(this, MethodBase.GetCurrentMethod(), value));
+                add => Pipeline.Execute<EventHandler<Args>>(MethodInvocation.Create(this, MethodBase.GetCurrentMethod(), value));
+                remove => Pipeline.Execute<EventHandler<Args>>(MethodInvocation.Create(this, MethodBase.GetCurrentMethod(), value));
             }
 
             public event PropertyChangedEventHandler PropertyChanged
             {
-                add => Pipeline.Execute<PropertyChangedEventHandler>(new MethodInvocation(this, MethodBase.GetCurrentMethod(), value));
-                remove => Pipeline.Execute<PropertyChangedEventHandler>(new MethodInvocation(this, MethodBase.GetCurrentMethod(), value));
+                add => Pipeline.Execute<PropertyChangedEventHandler>(MethodInvocation.Create(this, MethodBase.GetCurrentMethod(), value));
+                remove => Pipeline.Execute<PropertyChangedEventHandler>(MethodInvocation.Create(this, MethodBase.GetCurrentMethod(), value));
             }
 
             public event CustomDelegate Custom
             {
-                add => Pipeline.Execute<CustomDelegate>(new MethodInvocation(this, MethodBase.GetCurrentMethod(), value));
-                remove => Pipeline.Execute<CustomDelegate>(new MethodInvocation(this, MethodBase.GetCurrentMethod(), value));
+                add => Pipeline.Execute<CustomDelegate>(MethodInvocation.Create(this, MethodBase.GetCurrentMethod(), value));
+                remove => Pipeline.Execute<CustomDelegate>(MethodInvocation.Create(this, MethodBase.GetCurrentMethod(), value));
             }
 
             public event Action<int> Action
             {
-                add => Pipeline.Execute<Action<int>>(new MethodInvocation(this, MethodBase.GetCurrentMethod(), value));
-                remove => Pipeline.Execute<Action<int>>(new MethodInvocation(this, MethodBase.GetCurrentMethod(), value));
+                add => Pipeline.Execute<Action<int>>(MethodInvocation.Create(this, MethodBase.GetCurrentMethod(), value));
+                remove => Pipeline.Execute<Action<int>>(MethodInvocation.Create(this, MethodBase.GetCurrentMethod(), value));
             }
         }
 

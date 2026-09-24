@@ -11,6 +11,7 @@
   
   <ItemGroup>
     <PackageReference Include="Avatar" />
+    <PackageReference Include="TypeNameFormatter.Sources" />
     <PackageReference Include="Microsoft.Bcl.HashCode" />
     <PackageReference Include="Ben.Demystifier" />
     <PackageReference Include="IFluentInterface" PrivateAssets="all" />

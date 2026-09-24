@@ -1,4 +1,4 @@
-﻿using System;
+using System;
 using Avatars;
 
 namespace Moq.Sdk
@@ -29,7 +29,7 @@ namespace Moq.Sdk
         /// <summary>
         /// Gets or sets the value of the given property as an entry in the mock <see cref="IMock.State"/>.
         /// </summary>
-        public IMethodReturn Execute(IMethodInvocation invocation, GetNextBehavior next)
+        public IMethodReturn Execute(IMethodInvocation invocation, ExecuteHandler next)
         {
             if (invocation == null) throw new ArgumentNullException(nameof(invocation));
 
@@ -44,10 +44,10 @@ namespace Moq.Sdk
                 (!SetterRequiresSetup || SetupScope.IsActive))
             {
                 state.Set("_" + invocation.MethodBase.Name.Substring(4), invocation.Arguments.GetValue(0));
-                return invocation.CreateValueReturn(null);
+                return invocation.CreateReturn();
             }
 
-            return next()(invocation, next);
+            return next(invocation, next);
         }
     }
 }

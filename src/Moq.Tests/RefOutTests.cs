@@ -18,7 +18,7 @@ namespace Moq.Tests.RefOut
             var mock = Mock.Of<ICalculator>();
             int x = 10;
             int y = 20;
-            int z;
+            int? z;
 
             mock.TryAdd(ref x, ref y, out z)
                 .Returns(true);
@@ -32,12 +32,12 @@ namespace Moq.Tests.RefOut
             var mock = Mock.Of<ICalculator>();
             int x = 10;
             int y = 20;
-            int z;
+            int? z;
 
             mock.TryAdd(ref x, ref y, out z)
                 .Returns(c =>
                 {
-                    c.Set(2, c.Get<int>(0) + c.Get<int>(1));
+                    c.Set(2, (int?)(c.Get<int>(0) + c.Get<int>(1)));
                     c.Set(0, 15);
                     c.Set(1, 25);
                     return true;
@@ -55,11 +55,11 @@ namespace Moq.Tests.RefOut
             var mock = Mock.Of<ICalculator>();
 
             mock.Setup<TryAdd>(mock.TryAdd)
-                .Returns((ref int x, ref int y, out int z) => (z = x + y) == z);
+                .Returns((ref int x, ref int y, out int? z) => (z = x + y) == z);
 
             var x1 = 10;
             var y1 = 20;
-            int z1;
+            int? z1;
 
             Assert.True(mock.TryAdd(ref x1, ref y1, out z1));
             Assert.Equal(30, z1);
@@ -81,7 +81,7 @@ namespace Moq.Tests.RefOut
 
         delegate bool TryParse(string input, out DateTimeOffset date);
 
-        delegate bool TryAdd(ref int x, ref int y, out int z);
+        delegate bool TryAdd(ref int x, ref int y, out int? z);
     }
 
     public interface IRefOutParent

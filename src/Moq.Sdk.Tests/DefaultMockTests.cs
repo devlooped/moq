@@ -1,4 +1,4 @@
-﻿using System;
+using System;
 using System.Collections.Generic;
 using System.Reflection;
 using System.Threading;
@@ -53,14 +53,14 @@ namespace Moq.Sdk.Tests
             Assert.NotNull(stunt.Mock);
 
             var setup = new MockSetup(
-                new MethodInvocation(stunt, typeof(FakeStunt).GetMethod("Do")),
+                MethodInvocation.Create(stunt, typeof(FakeStunt).GetMethod("Do")),
                 Array.Empty<IArgumentMatcher>());
 
             var initialBehaviors = stunt.Behaviors.Count;
             var behavior = new MockBehaviorPipeline(setup);
 
             stunt.AddBehavior(behavior);
-            stunt.AddBehavior((m, n) => n().Invoke(m, n));
+            stunt.AddBehavior((m, n) => n(m, n));
             Assert.Equal(initialBehaviors + 2, stunt.Behaviors.Count);
 
             Assert.Single(stunt.Mock.Setups);
@@ -81,7 +81,7 @@ namespace Moq.Sdk.Tests
 
             var initialBehaviors = stunt.Behaviors.Count;
             var setup = new MockSetup(
-                new MethodInvocation(stunt, typeof(FakeStunt).GetMethod("Do")),
+                MethodInvocation.Create(stunt, typeof(FakeStunt).GetMethod("Do")),
                 Array.Empty<IArgumentMatcher>());
 
             var behavior = stunt.Mock.GetPipeline(setup);
@@ -111,7 +111,7 @@ namespace Moq.Sdk.Tests
 
             public IMock Mock => LazyInitializer.EnsureInitialized(ref mock, () => new DefaultMock(this));
 
-            public void Do() => pipeline.Execute(new MethodInvocation(this, MethodBase.GetCurrentMethod()));
+            public void Do() => pipeline.Execute(MethodInvocation.Create(this, MethodBase.GetCurrentMethod()));
         }
     }
 }

@@ -1,4 +1,4 @@
-﻿using System.ComponentModel;
+using System.ComponentModel;
 using System.Linq;
 using Avatars;
 using Moq.Sdk;
@@ -16,7 +16,7 @@ namespace Moq
         public bool AppliesTo(IMethodInvocation invocation) => true;
 
         /// <inheritdoc />
-        public IMethodReturn Execute(IMethodInvocation invocation, GetNextBehavior next)
+        public IMethodReturn Execute(IMethodInvocation invocation, ExecuteHandler next)
         {
             // Check if CallBase is configured at the Mock or Invocation level
             var shouldCallBase = invocation.Target.AsMoq().CallBase || invocation.Context.ContainsKey(nameof(IMoq.CallBase));
@@ -32,7 +32,7 @@ namespace Moq
                     invocation.SkipBehaviors.Add(typeof(StrictMockBehavior));
             }
 
-            return next().Invoke(invocation, next);
+            return next.Invoke(invocation, next);
         }
     }
 }

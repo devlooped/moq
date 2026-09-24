@@ -52,15 +52,13 @@ namespace Moq.Sdk.Tests
 
         public HashSet<Type> SkipBehaviors { get; } = new HashSet<Type>();
 
-        public bool SupportsCallBase => throw new NotImplementedException();
+        public bool HasImplementation => false;
 
-        public IMethodReturn CreateCallBaseReturn(IArgumentCollection? arguments = null) => throw new NotImplementedException();
+        public IMethodReturn CreateInvokeReturn(IArgumentCollection? arguments = null) => throw new NotImplementedException();
 
         public IMethodReturn CreateExceptionReturn(Exception exception) => new FakeReturn { Exception = exception };
 
-        public IMethodReturn CreateValueReturn(object returnValue, params object[] allArguments) => new FakeReturn { ReturnValue = returnValue };
-
-        public IMethodReturn CreateValueReturn(object? returnValue, IArgumentCollection? arguments = null) => throw new NotImplementedException();
+        public IMethodReturn CreateValueReturn(object? returnValue, IArgumentCollection arguments) => new FakeReturn { ReturnValue = returnValue, Outputs = arguments };
 
         public bool Equals(IMethodInvocation other) => base.Equals(other);
 
