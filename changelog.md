@@ -1,18 +1,88 @@
 # Changelog
 
-## Unreleased
+## [v4.21.0](https://github.com/devlooped/moq/tree/v4.21.0) (2026-07-01)
+
+[Full Changelog](https://github.com/devlooped/moq/compare/v4.20.72...v4.21.0)
+
+:sparkles: Implemented enhancements:
+
+- Constructor arguments should be nullable [\#1494](https://github.com/devlooped/moq/issues/1494)
+- Moq "set" matcher fails when setting StringValues with string [\#1465](https://github.com/devlooped/moq/issues/1465)
+- Add the ability to compare ref argument by value [\#1437](https://github.com/devlooped/moq/issues/1437)
+- The public API is still missing nullable reference type annotations [\#1418](https://github.com/devlooped/moq/issues/1418)
+- "Invalid Callback" in NonVoidSetupPhrase.Returns -\> ValidateCallbackReturnType is not informative or actionable [\#1297](https://github.com/devlooped/moq/issues/1297)
+- Allow passing method parameters to Throws/ThrowsAsync [\#1296](https://github.com/devlooped/moq/issues/1296)
+- Fail message on VerifyNoOtherCalls [\#1263](https://github.com/devlooped/moq/issues/1263)
+- Custom formatter for error messages [\#1144](https://github.com/devlooped/moq/issues/1144)
+- SetupSequence: CallBase Support for Void methods [\#1096](https://github.com/devlooped/moq/issues/1096)
+- Ability to specify proxy generator or invalidate it [\#925](https://github.com/devlooped/moq/issues/925)
+- Performance improvement for Mocking many large classes [\#1530](https://github.com/devlooped/moq/pull/1530) (@crinksdr)
+- Updated ctor params to support nullable args  [\#1518](https://github.com/devlooped/moq/pull/1518) (@Asafima)
+- Improve performance of It.Is matcher when used with an expression by compiling only once [\#1512](https://github.com/devlooped/moq/pull/1512) (@peterder72)
 
 :bug: Fixed bugs:
 
-- FileLoadException for 'System.Threading.Tasks.Extensions, Version=4.2.0.1' (or similar) at `Moq.Async.AwaitableFactory..cctor()` on .NET Framework 4.6.2+ no longer occurs when updating Moq and other dependencies bring in newer versions of the package. Common non-ValueTask usage succeeds without binding redirects. The initialization now only eagerly registers Task providers and uses runtime FullName checks + deferred creation for ValueTask support. [#1648](https://github.com/devlooped/moq/issues/1648)
+- Unit tests using Moq fail with runtime error after updating Moq to 4.20.72 \(failure to load System.Threading.Tasks.Extensions\) [\#1648](https://github.com/devlooped/moq/issues/1648)
+- \[4.20.72\] Missing XML Documentation [\#1632](https://github.com/devlooped/moq/issues/1632)
+- CollectionBuilderAttribute not considered for "default empty" [\#1565](https://github.com/devlooped/moq/issues/1565)
+- MockException reports wrong invocation list [\#1534](https://github.com/devlooped/moq/issues/1534)
+- Weird issue using spread operator on IEnumerable\<Task\> when using mocked methods [\#1526](https://github.com/devlooped/moq/issues/1526)
+- Changes made between 4.14.7 and 4.15.1 break exception handling [\#1519](https://github.com/devlooped/moq/issues/1519)
+- Generic method setups of parent types invoked [\#1498](https://github.com/devlooped/moq/issues/1498)
+- IVerifies.Verifiable\* documentation comments errata? [\#1481](https://github.com/devlooped/moq/issues/1481)
+- It.IsAny\<StructObject\>\(\) isn't  [\#1466](https://github.com/devlooped/moq/issues/1466)
+- Mock.Protected\(\).Verify fails sometimes [\#1464](https://github.com/devlooped/moq/issues/1464)
+- VerifySet throws TargetInvocationException when constructer refers to itself [\#1455](https://github.com/devlooped/moq/issues/1455)
+- Wrong Setup by using String interpolation within It.Is\<string\> [\#1439](https://github.com/devlooped/moq/issues/1439)
+- Cannot cast inside the Action\<T\> parameter of Verify method [\#1438](https://github.com/devlooped/moq/issues/1438)
+- `mock.Invocations.Clear()` violates self-consistency of inner mocks [\#1120](https://github.com/devlooped/moq/issues/1120)
+- Fix \#1648 reliably \(lazy ValueTask registration + committed harness verification\) [\#1680](https://github.com/devlooped/moq/pull/1680) (@kzu)
+- Minor enhancement to avoid null exceptions [\#1542](https://github.com/devlooped/moq/pull/1542) (@ShirAvneri)
+
+:hammer: Other:
+
+- Example for Scenario not covered in Examples [\#1655](https://github.com/devlooped/moq/issues/1655)
+- Adding Try Catch to Method returns empty List [\#1595](https://github.com/devlooped/moq/issues/1595)
+- Will Native AOT supported in future? [\#1552](https://github.com/devlooped/moq/issues/1552)
+- Possibility of adding Callback to ISetupSequentialAction [\#1541](https://github.com/devlooped/moq/issues/1541)
+- Mock.VerifyAll\(\) with no parameters passed in should throw ArgumentOutOfRangeException [\#1540](https://github.com/devlooped/moq/issues/1540)
+- Could we add Verify methods to IMock\<T\>? [\#1538](https://github.com/devlooped/moq/issues/1538)
+- \[FeatureRequest\] Allow setting the default MockBehavior constructor parameter value [\#1537](https://github.com/devlooped/moq/issues/1537)
+- Question: Will parallel running mess up invocation counts? [\#1536](https://github.com/devlooped/moq/issues/1536)
+- Minor enhancement to avoid null exceptions. [\#1533](https://github.com/devlooped/moq/issues/1533)
+- Unable to use Callback or Returns on methods with more than 16 parameters. [\#1531](https://github.com/devlooped/moq/issues/1531)
+- Add Way to Exclude Calls from VerifyNoOtherCalls [\#1490](https://github.com/devlooped/moq/issues/1490)
+- Semantic error in unit test MatchesIsNotInEnumerable\(\)? [\#1483](https://github.com/devlooped/moq/issues/1483)
+- Moq Setup does not work with "object" as generic type? [\#1478](https://github.com/devlooped/moq/issues/1478)
+- Explicit support for matching cancellation tokens with It class. \(It.IsCancellationToken\(\)\) [\#1477](https://github.com/devlooped/moq/issues/1477)
+- Request: Ability to setup a property of type Task\<ConcreteType\> by mocking interface [\#1460](https://github.com/devlooped/moq/issues/1460)
+- Add ability for asynchronously waiting for an invocation [\#1457](https://github.com/devlooped/moq/issues/1457)
+- `DefaultValueProvider` extensibility [\#1450](https://github.com/devlooped/moq/issues/1450)
+- Should allow null references as constructor parameters. [\#1416](https://github.com/devlooped/moq/issues/1416)
+- Support Static Abstract property  [\#1398](https://github.com/devlooped/moq/issues/1398)
+- IProtectedMock fails on a new virtual methods [\#1341](https://github.com/devlooped/moq/issues/1341)
+- Mocking an interface that has a sealed implementation of a method [\#1334](https://github.com/devlooped/moq/issues/1334)
+- Issue with multiple identical setups [\#1330](https://github.com/devlooped/moq/issues/1330)
+- Proper usage of It.IsAnyType [\#1329](https://github.com/devlooped/moq/issues/1329)
+- Better \(Async\) support for method returning nongeneric Task [\#1328](https://github.com/devlooped/moq/issues/1328)
+- Opt in parameters matching logic  [\#1267](https://github.com/devlooped/moq/issues/1267)
+- Invocations.Clear\(\) does not work on recursive mocks [\#1242](https://github.com/devlooped/moq/issues/1242)
+- VerifyNoOtherCalls fails reporting issue with different mock when using factory pattern [\#1181](https://github.com/devlooped/moq/issues/1181)
+- InSequence is not available for protected [\#1173](https://github.com/devlooped/moq/issues/1173)
+- MockRepository.Verify\(\) also verifies mocks created outside of the repo [\#1018](https://github.com/devlooped/moq/issues/1018)
+- Cannot mock subclass of superclass with internal virtual methods [\#991](https://github.com/devlooped/moq/issues/991)
+
+:twisted_rightwards_arrows: Merged:
+
+- Bump NuGetizer to 1.4.9 [\#1684](https://github.com/devlooped/moq/pull/1684) (@Copilot)
+- Address build warnings [\#1546](https://github.com/devlooped/moq/pull/1546) (@kzu)
+- Bump dependencies [\#1545](https://github.com/devlooped/moq/pull/1545) (@kzu)
+- Enable nullable references in Moq.csproj [\#1535](https://github.com/devlooped/moq/pull/1535) (@andrewimcclement)
+- Updated IVerifies.Verifiable method documentation code example [\#1528](https://github.com/devlooped/moq/pull/1528) (@Asafima)
 
 ## [v4.20.72](https://github.com/devlooped/moq/tree/v4.20.72) (2024-09-07)
 
 [Full Changelog](https://github.com/devlooped/moq/compare/v4.20.71...v4.20.72)
-
-:hammer: Other:
-
-- Question: Sponsorable Attribute in release v4.20.71 [\#1513](https://github.com/devlooped/moq/issues/1513)
 
 :twisted_rightwards_arrows: Merged:
 
@@ -40,7 +110,7 @@
 
 - Remove spurious unmerged change comment from dotnet format [\#1499](https://github.com/devlooped/moq/pull/1499) (@kzu)
 - Fix semantic error in MatchersFixture.cs test [\#1496](https://github.com/devlooped/moq/pull/1496) (@go-hoon)
-- Update License.txt to use SPDX identifier for automatic recognition [\#1471](https://github.com/devlooped/moq/pull/1471) (@georg-eckert-zeiss)
+- Update License.txt to use SPDX identifier for automatic recognition [\#1471](https://github.com/devlooped/moq/pull/1471) (@cz-dev-ge)
 - Additional Verify overload [\#1463](https://github.com/devlooped/moq/pull/1463) (@bkijonka)
 
 ## [v4.20.70](https://github.com/devlooped/moq/tree/v4.20.70) (2023-11-28)
@@ -71,7 +141,6 @@
 
 - Trouble to unit test a lambda expression with Moq [\#1387](https://github.com/devlooped/moq/issues/1387)
 - Strange System.UnauthorizedAccessException during build using latest version [\#1377](https://github.com/devlooped/moq/issues/1377)
-- Privacy issues with SponsorLink, starting from version 4.20 [\#1372](https://github.com/devlooped/moq/issues/1372)
 - Upgrading to version 4.20.1 breaks the build [\#1371](https://github.com/devlooped/moq/issues/1371)
 - Warnings with latest version from SponsorLink [\#1370](https://github.com/devlooped/moq/issues/1370)
 - Missing License Information In Nuget metadata [\#1348](https://github.com/devlooped/moq/issues/1348)
@@ -818,11 +887,11 @@
 - Clean up XML documentation [\#843](https://github.com/devlooped/moq/pull/843) (@stakx)
 - Add LINQ to Mocks support for strict mocks [\#842](https://github.com/devlooped/moq/pull/842) (@stakx)
 - Add `sequenceSetup.ReturnsAsync(Func<T>)` [\#841](https://github.com/devlooped/moq/pull/841) (@stakx)
-- Fix SetupAllProperties to override pre-existing property setups \(\#837\) [\#840](https://github.com/devlooped/moq/pull/840) (@ishimko)
+- Fix SetupAllProperties to override pre-existing property setups \(\#837\) [\#840](https://github.com/devlooped/moq/pull/840) (@ishymko)
 - Unskip unit tests regarding indexers & matchers [\#838](https://github.com/devlooped/moq/pull/838) (@stakx)
-- Handle write-only properties in SetupAllProperties for strict mocks \(fix \#835\) [\#836](https://github.com/devlooped/moq/pull/836) (@ishimko)
+- Handle write-only properties in SetupAllProperties for strict mocks \(fix \#835\) [\#836](https://github.com/devlooped/moq/pull/836) (@ishymko)
 - Delete obsolete `.nuspec` file [\#832](https://github.com/devlooped/moq/pull/832) (@stakx)
-- On-demand SetupAllProperties [\#826](https://github.com/devlooped/moq/pull/826) (@ishimko)
+- On-demand SetupAllProperties [\#826](https://github.com/devlooped/moq/pull/826) (@ishymko)
 
 ## [v4.11.0](https://github.com/devlooped/moq/tree/v4.11.0) (2019-05-27)
 
@@ -1268,7 +1337,7 @@
 -  Record calls to methods with event accessor-like names [\#488](https://github.com/devlooped/moq/pull/488) (@stakx)
 - Clean up solution and build script regarding unit test projects [\#485](https://github.com/devlooped/moq/pull/485) (@stakx)
 - Reimplement `SetupSequence` to make it thread-safe [\#476](https://github.com/devlooped/moq/pull/476) (@stakx)
-- Added test to show regression described in \#469 [\#474](https://github.com/devlooped/moq/pull/474) (@ADThomsen)
+- Added test to show regression described in \#469 [\#474](https://github.com/devlooped/moq/pull/474) (@AndersAppelt)
 - Update invocation count correctly, even when setup throws exception [\#473](https://github.com/devlooped/moq/pull/473) (@stakx)
 - Add new `Callback` and `Returns` overloads for setting up methods with `ref` parameters [\#468](https://github.com/devlooped/moq/pull/468) (@stakx)
 - Add support for void sequences \(2nd iteration\) [\#463](https://github.com/devlooped/moq/pull/463) (@alexbestul)
