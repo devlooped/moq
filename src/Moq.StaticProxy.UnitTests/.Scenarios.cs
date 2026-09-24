@@ -90,10 +90,10 @@ namespace Moq.StaticProxy.UnitTests
         {
             ReferenceAssemblies assemblies;
 
-#if NET472
-            assemblies = ReferenceAssemblies.NetFramework.Net472.Default;
+#if NET48
+            assemblies = ReferenceAssemblies.NetFramework.Net48.Default;
 #else
-            assemblies = ReferenceAssemblies.Net.Net50;
+            assemblies = ReferenceAssemblies.Net.Net100;
 #endif
 
             var references = assemblies.ResolveAsync(default, default).Result;
@@ -104,9 +104,15 @@ namespace Moq.StaticProxy.UnitTests
             var args = CSharpCommandLineParser.Default.Parse(
                 File.ReadAllLines("csc.txt"), ThisAssembly.Project.MSBuildProjectDirectory, sdkDirectory: null);
 
+            // net10 csc passes /features:InterceptorsNamespaces. The generator builds its
+            // trees with default parse options, and Roslyn refuses to mix those features.
+            var parseOptions = args.ParseOptions
+                .WithLanguageVersion(LanguageVersion.Latest)
+                .WithFeatures(Enumerable.Empty<KeyValuePair<string, string>>());
+
             var syntaxTree = CSharpSyntaxTree.ParseText(
                 File.ReadAllText(path),
-                options: args.ParseOptions.WithLanguageVersion(LanguageVersion.Latest),
+                options: parseOptions,
                 path: new FileInfo(path).FullName,
                 encoding: Encoding.UTF8);
 
@@ -124,7 +130,7 @@ namespace Moq.StaticProxy.UnitTests
 
                 sources.Add(CSharpSyntaxTree.ParseText(
                     File.ReadAllText(filePath),
-                    options: args.ParseOptions.WithLanguageVersion(LanguageVersion.Latest),
+                    options: parseOptions,
                     path: filePath,
                     encoding: Encoding.UTF8));
             }
@@ -139,7 +145,7 @@ namespace Moq.StaticProxy.UnitTests
             {
                 sources.Add(CSharpSyntaxTree.ParseText(
                     File.ReadAllText(thisAssemblyFile),
-                    options: args.ParseOptions.WithLanguageVersion(LanguageVersion.Latest),
+                    options: parseOptions,
                     path: thisAssemblyFile,
                     encoding: Encoding.UTF8));
             }
@@ -167,7 +173,7 @@ namespace Moq.StaticProxy.UnitTests
 
             var driver = CSharpGeneratorDriver.Create(
                 new[] { new MockGenerator() },
-                parseOptions: args.ParseOptions.WithLanguageVersion(LanguageVersion.Latest),
+                parseOptions: parseOptions,
                 optionsProvider: EditorConfigOptionsProvider.Create(Directory.EnumerateFiles(
                     Path.Combine(ThisAssembly.Project.MSBuildProjectDirectory, ThisAssembly.Project.IntermediateOutputPath),
                     "*.editorconfig", SearchOption.TopDirectoryOnly)));

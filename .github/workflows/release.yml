@@ -13,14 +13,14 @@ jobs:
     steps:
       - name: 🤘 checkout
         uses: actions/checkout@v2
-      - name: ⚙ dotnet 5.0 rc2
-        uses: actions/setup-dotnet@v1
+      - name: ⚙ dotnet 10.0.x
+        uses: actions/setup-dotnet@v4
         with:
-          dotnet-version: 5.0.100-rc.2.20479.15
+          dotnet-version: 10.0.x
       - name: 🙏 build
         run: dotnet msbuild -r -m:1 -bl:build.binlog -p:version=${GITHUB_REF#refs/*/v}
-      - name: 🧪 test net5.0
-        run: dotnet test --no-build -f net5.0
+      - name: 🧪 test net10.0
+        run: dotnet test --no-build -f net10.0
       - name: 🔼 logs
         if: ${{ always() }}
         uses: actions/upload-artifact@v2

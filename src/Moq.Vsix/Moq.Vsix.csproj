@@ -2,7 +2,7 @@
   <Import Sdk="Microsoft.NET.Sdk" Project="Sdk.props" />
 
   <PropertyGroup>
-    <TargetFramework>net472</TargetFramework>
+    <TargetFramework>net48</TargetFramework>
     <RootNamespace>Moq.Vsix</RootNamespace>
     <AssemblyName>Moq.Vsix</AssemblyName>
   </PropertyGroup>
