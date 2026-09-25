@@ -32,7 +32,7 @@ jobs:
           token: ${{ env.PR_TOKEN || github.token }}
 
       - name: +Mᐁ includes
-        uses: devlooped/actions-includes@v1
+        uses: devlooped/actions-includes@v2
 
       - name: 📝 OSMF EULA
         shell: pwsh
