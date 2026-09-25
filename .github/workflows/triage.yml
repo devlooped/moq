@@ -1,7 +1,7 @@
 name: 'triage'
 on:
   schedule:
-    - cron: '42 0 * * *'
+    - cron: '42 0 1,15 * *'
 
   workflow_dispatch:
     # Manual triggering through the GitHub UI, API, or CLI

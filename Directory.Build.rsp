@@ -3,3 +3,4 @@
 -m:1
 -v:m
 -clp:Summary;ForceNoAlign
+-p:WarnOnPackingNonPackableProject=false
