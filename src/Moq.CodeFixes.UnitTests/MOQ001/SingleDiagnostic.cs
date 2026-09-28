@@ -1,8 +1,8 @@
 ﻿using System;
 
-namespace Moq.CodeAnalysis.UnitTests.MOQ001
+namespace Moq.CodeFixes.UnitTests.MOQ001
 {
-    public class MultipleDiagnosticSameMethod
+    public class SingleDiagnostic
     {
         public void Test()
         {
@@ -11,11 +11,6 @@ namespace Moq.CodeAnalysis.UnitTests.MOQ001
             using (mock.Setup())
             {
                 mock.GetService(typeof(IFormatProvider)).Returns(default(IFormatProvider));
-            }
-
-            using (mock.Setup())
-            {
-                mock.GetService(typeof(IFormattable)).Returns(default(IFormattable));
             }
         }
     }

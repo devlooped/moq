@@ -18,7 +18,7 @@ static class WorkspaceServices
             {
                     // Moq.Sdk.dll
                     typeof(IMock).Assembly,
-                    // Moq.CodeAnalysis.dll
+                    // Moq.CodeFixes.dll
                     typeof(MockValidateTypesAnalyzer).Assembly,
                     // Moq.dll
                     typeof(IMoq).Assembly,

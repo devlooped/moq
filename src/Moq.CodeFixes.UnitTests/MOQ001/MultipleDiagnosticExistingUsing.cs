@@ -1,7 +1,7 @@
 ﻿using System;
 using static Moq.Syntax;
 
-namespace Moq.CodeAnalysis.UnitTests.MOQ001.Fixed
+namespace Moq.CodeFixes.UnitTests.MOQ001
 {
     public class MultipleDiagnosticExistingUsing
     {
@@ -14,7 +14,7 @@ namespace Moq.CodeAnalysis.UnitTests.MOQ001.Fixed
                 mock.GetService(typeof(IFormatProvider)).Returns(default(IFormatProvider));
             }
 
-            using (Setup())
+            using (mock.Setup())
             {
                 mock.GetService(typeof(IFormattable)).Returns(default(IFormattable));
             }
