@@ -1,0 +1,27 @@
+<Solution>
+  <Folder Name="/Solution Items/">
+    <File Path=".editorconfig" />
+    <File Path="Directory.Build.rsp" />
+    <File Path="README.md" />
+    <File Path="src/Directory.Build.props" />
+    <File Path="src/Directory.Build.targets" />
+    <File Path="src/Directory.Packages.props" />
+  </Folder>
+  <Folder Name="/Solution Items/workflows/">
+    <File Path=".github/dependabot.yml" />
+    <File Path=".github/workflows/build.yml" />
+    <File Path=".github/workflows/release.yml" />
+    <File Path="azure-pipelines.yml" />
+  </Folder>
+  <Project Path="src/Moq.CodeAnalysis.UnitTests/Moq.CodeAnalysis.UnitTests.csproj" />
+  <Project Path="src/Moq.CodeAnalysis/Moq.CodeAnalysis.csproj" />
+  <Project Path="src/Moq.DynamicProxy/Moq.DynamicProxy.csproj" />
+  <Project Path="src/Moq.Package/Moq.Package.msbuildproj" Type="13b669be-bb05-4ddf-9536-439f39a36129" />
+  <Project Path="src/Moq.Sdk.Tests/Moq.Sdk.Tests.csproj" />
+  <Project Path="src/Moq.Sdk/Moq.Sdk.csproj" />
+  <Project Path="src/Moq.StaticProxy.UnitTests/Moq.StaticProxy.UnitTests.csproj" />
+  <Project Path="src/Moq.StaticProxy/Moq.StaticProxy.csproj" />
+  <Project Path="src/Moq.Tests/Moq.Tests.csproj" />
+  <Project Path="src/Moq.Vsix/Moq.Vsix.csproj" />
+  <Project Path="src/Moq/Moq.csproj" />
+</Solution>
