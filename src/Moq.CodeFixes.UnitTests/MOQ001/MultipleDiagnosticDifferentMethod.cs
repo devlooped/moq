@@ -1,6 +1,6 @@
 ﻿using System;
 
-namespace Moq.CodeAnalysis.UnitTests.MOQ001
+namespace Moq.CodeFixes.UnitTests.MOQ001
 {
     public class MultipleDiagnosticDifferentMethod
     {

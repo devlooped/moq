@@ -24,7 +24,7 @@
   </ItemGroup>
 
   <ItemGroup>
-    <ProjectReference Include="..\Moq.CodeAnalysis\Moq.CodeAnalysis.csproj" />
+    <ProjectReference Include="..\Moq.CodeFixes\Moq.CodeFixes.csproj" />
     <ProjectReference Include="..\Moq.Sdk\Moq.Sdk.csproj" />
     <ProjectReference Include="..\Moq\Moq.csproj" />
   </ItemGroup>

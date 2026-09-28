@@ -11,7 +11,7 @@
   <ItemGroup>
     <ProjectReference Include="..\..\Stunts\Stunts\Stunts.csproj" Pack="false" />
     <ProjectReference Include="..\..\Stunts\Stunts.CodeFix\Stunts.CodeFix.csproj" Pack="false" />
-    <ProjectReference Include="..\Moq.CodeAnalysis\Moq.CodeAnalysis.csproj" Pack="false" />
+    <ProjectReference Include="..\Moq.CodeFixes\Moq.CodeFixes.csproj" Pack="false" />
     <ProjectReference Include="..\Moq.Sdk\Moq.Sdk.csproj" Pack="false" />
   </ItemGroup>
 

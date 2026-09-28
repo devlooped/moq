@@ -11,7 +11,7 @@ using Microsoft.CodeAnalysis.Options;
 using Microsoft.CodeAnalysis.Tags;
 using Microsoft.CodeAnalysis.Text;
 
-namespace Moq.CodeAnalysis
+namespace Moq.CodeFixes
 {
     [ExportCompletionProvider(nameof(CustomDelegateCompletion), LanguageNames.CSharp)]
     public class CustomDelegateCompletion : CompletionProvider

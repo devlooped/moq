@@ -3,7 +3,7 @@ using Microsoft.CodeAnalysis.CodeFixes;
 using Microsoft.CodeAnalysis.Diagnostics;
 using Xunit;
 
-namespace Moq.CodeAnalysis.UnitTests.MOQ001
+namespace Moq.CodeFixes.UnitTests.MOQ001
 {
     public class SimplifySetupTests : CodeFixVerifier
     {

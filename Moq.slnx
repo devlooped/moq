@@ -1,6 +1,6 @@
 <Solution>
-  <Project Path="src/Moq.CodeAnalysis.UnitTests/Moq.CodeAnalysis.UnitTests.csproj" />
-  <Project Path="src/Moq.CodeAnalysis/Moq.CodeAnalysis.csproj" />
+  <Project Path="src/Moq.CodeFixes.UnitTests/Moq.CodeFixes.UnitTests.csproj" />
+  <Project Path="src/Moq.CodeFixes/Moq.CodeFixes.csproj" />
   <Project Path="src/Moq.DynamicProxy/Moq.DynamicProxy.csproj" />
   <Project Path="src/Moq.Package/Moq.Package.msbuildproj" Type="13b669be-bb05-4ddf-9536-439f39a36129" />
   <Project Path="src/Moq.Sdk.Tests/Moq.Sdk.Tests.csproj" />

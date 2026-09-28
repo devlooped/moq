@@ -41,7 +41,7 @@
   <Import Project="$(VSToolsPath)\VSSDK\Microsoft.VsSDK.targets" Condition="Exists('$(VSToolsPath)\VSSDK\Microsoft.VsSDK.targets')" />
   
   <ItemGroup>
-    <ProjectReference Include="..\Moq.CodeAnalysis\Moq.CodeAnalysis.csproj" />
+    <ProjectReference Include="..\Moq.CodeFixes\Moq.CodeFixes.csproj" />
     <ProjectReference Include="..\Moq.Sdk\Moq.Sdk.csproj" />
   </ItemGroup>
 

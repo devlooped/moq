@@ -9,8 +9,8 @@
     <InstallationTarget Id="Microsoft.VisualStudio.Community" Version="[16.0,)" />
   </Installation>
   <Assets>
-    <Asset Type="Microsoft.VisualStudio.MefComponent" d:Source="Project" d:ProjectName="Moq.CodeAnalysis" Path="|Moq.CodeAnalysis|"/>
-    <Asset Type="Microsoft.VisualStudio.Analyzer" d:Source="Project" d:ProjectName="Moq.CodeAnalysis" Path="|Moq.CodeAnalysis|"/>
+    <Asset Type="Microsoft.VisualStudio.MefComponent" d:Source="Project" d:ProjectName="Moq.CodeFixes" Path="|Moq.CodeFixes|"/>
+    <Asset Type="Microsoft.VisualStudio.Analyzer" d:Source="Project" d:ProjectName="Moq.CodeFixes" Path="|Moq.CodeFixes|"/>
     <Asset Type="Microsoft.VisualStudio.MefComponent" d:Source="Project" d:ProjectName="Moq.Sdk" Path="|Moq.Sdk|"/>
     <Asset Type="Microsoft.VisualStudio.Analyzer" d:Source="Project" d:ProjectName="Moq.Sdk" Path="|Moq.Sdk|"/>
     <Asset Type="Microsoft.VisualStudio.MefComponent" d:Source="File" Path="Stunts"/>

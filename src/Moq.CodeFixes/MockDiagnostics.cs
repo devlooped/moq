@@ -1,6 +1,6 @@
 ﻿using Microsoft.CodeAnalysis;
 
-namespace Moq.CodeAnalysis
+namespace Moq.CodeFixes
 {
     public static class MockDiagnostics
     {

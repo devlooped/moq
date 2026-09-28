@@ -1,7 +1,7 @@
 ﻿using System;
 using static Moq.Syntax;
 
-namespace Moq.CodeAnalysis.UnitTests.MOQ001.Fixed
+namespace Moq.CodeFixes.UnitTests.MOQ001.Fixed
 {
     public class MultipleDiagnosticDifferentMethod
     {
