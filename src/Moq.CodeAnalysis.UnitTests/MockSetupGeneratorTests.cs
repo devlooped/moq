@@ -35,7 +35,7 @@ namespace Moq.CodeAnalysis.UnitTests
             """;
 
         [Fact]
-        public void GeneratesNothingWithoutMockGeneratorUsages()
+        public void GeneratesNothingWithoutMockUsages()
         {
             var result = new MockSetupGenerator().Run(GeneratorTester.CreateCompilation(Calculator), out _);
 
@@ -92,7 +92,6 @@ namespace Moq.CodeAnalysis.UnitTests
                         Mock.Of<ICalculator>();
                         Mock.Of<ICalculator, IDisposable>();
                         Mock.Of2<ICalculator>(MockBehavior.Strict);
-                        Mock.Of2<IDisposable>();
                         Mock.Of<IServiceProvider>();
                     }
                 }
@@ -105,7 +104,66 @@ namespace Moq.CodeAnalysis.UnitTests
                     "MockSetupExtensions.System.IDisposable.g.cs",
                     "MockSetupExtensions.System.IServiceProvider.g.cs",
                 },
-                result.GeneratedTrees.Select(tree => System.IO.Path.GetFileName(tree.FilePath)).OrderBy(name => name, StringComparer.Ordinal));
+                HintNames(result));
+        }
+
+        [Fact]
+        public void DiscoversMockedTypesFromMockReferencesAndCreations()
+        {
+            var result = new MockSetupGenerator().Run(GeneratorTester.CreateCompilation(
+                """
+                using Moq;
+
+                public interface IParameter { void Run(); }
+                public interface IField { void Run(); }
+                public interface ICreated { void Run(); }
+                public interface ITargetTyped { void Run(); }
+                public interface IConstructor { void Run(); }
+                public interface IDerived { void Run(); }
+                public interface IGot { void Run(); }
+                public interface INotMocked { void Run(); }
+
+                [MockGenerator]
+                public class Factory<T> where T : class { }
+
+                public class DerivedFactory<T> : Factory<T> where T : class { }
+
+                public class Constructor<T> where T : class
+                {
+                    [MockGenerator]
+                    public Constructor() { }
+                }
+
+                public class Plain<T> { }
+
+                class Usage
+                {
+                    Moq.IMock<IField>? field;
+
+                    void Run(IMock<IParameter> mock, IGot got)
+                    {
+                        Mock.Get(got);
+                        new Factory<ICreated>();
+                        Factory<ITargetTyped> targetTyped = new();
+                        new Constructor<IConstructor>();
+                        new DerivedFactory<IDerived>();
+                        new Plain<INotMocked>();
+                    }
+                }
+                """), out _);
+
+            Assert.Equal(
+                new[]
+                {
+                    "MockSetupExtensions.IConstructor.g.cs",
+                    "MockSetupExtensions.ICreated.g.cs",
+                    "MockSetupExtensions.IDerived.g.cs",
+                    "MockSetupExtensions.IField.g.cs",
+                    "MockSetupExtensions.IGot.g.cs",
+                    "MockSetupExtensions.IParameter.g.cs",
+                    "MockSetupExtensions.ITargetTyped.g.cs",
+                },
+                HintNames(result));
         }
 
         [Fact]
@@ -119,86 +177,103 @@ namespace Moq.CodeAnalysis.UnitTests
                     "Add(int, int)",
                     "Add(int, int, int)",
                     "Clear(string)",
-                    "IsOn()",
+                    "IsOn",
                     "Item(string)",
-                    "Item(string, int?)",
-                    "Mode()",
-                    "Mode(Sample.CalculatorMode)",
+                    "Mode",
+                    "RaiseTurnedOn()",
+                    "RaiseTurnedOn(System.EventArgs)",
+                    "RaiseTurnedOn(object?, System.EventArgs)",
                     "Recall(string)",
                     "Store(string, int)",
                     "TryAdd(ref int, ref int, out int?)",
                     "TurnOn()",
                 },
-                Extensions(output, "Sample.ICalculator").OrderBy(signature => signature, StringComparer.Ordinal));
+                Members(output, "Sample.ICalculator"));
         }
 
         [Fact]
-        public void ExtensionsReturnMockSetup()
+        public void ExtensionsReturnTypedSetups()
         {
             new MockSetupGenerator().Run(GeneratorTester.CreateCompilation(Calculator, Usage("Sample.ICalculator")), out var output);
 
-            var extensions = output.GetTypeByMetadataName("Moq.MockSetupExtensions")!.GetMembers().OfType<IMethodSymbol>().ToArray();
+            var block = Assert.Single(Blocks(output, "Sample.ICalculator"));
+            string TypeOf(string name, int parameters = -1) => block.GetMembers(name)
+                .Where(x => parameters == -1 || x is IMethodSymbol method && method.Parameters.Length == parameters)
+                .Select(x => x is IMethodSymbol method ? method.ReturnType : ((IPropertySymbol)x).Type)
+                .Single().ToDisplayString();
 
-            Assert.NotEmpty(extensions);
-            Assert.All(extensions, method =>
-            {
-                Assert.True(method.IsExtensionMethod);
-                Assert.Equal("Moq.Sdk.IMockSetup", method.ReturnType.ToDisplayString());
-                Assert.Equal("Moq.IMock<Sample.ICalculator>", method.Parameters[0].Type.ToDisplayString());
-            });
+            Assert.Equal("Moq.ISetup<System.Func<int, int, int>, int>", TypeOf("Add", 2));
+            Assert.Equal("Moq.ISetup<System.Action>", TypeOf("TurnOn"));
+            Assert.Equal("Moq.ISetup<System.Action<string, int>>", TypeOf("Store"));
+            Assert.Equal("Moq.ISetup<System.Func<string, int?>, int?>", TypeOf("Recall"));
+            Assert.Equal("Moq.ISetup<Moq.MockSetupExtensions.Sample_ICalculator.TryAdd, bool>", TypeOf("TryAdd"));
+            Assert.Equal("Moq.IPropertySetup<System.Func<bool>, bool>", TypeOf("IsOn"));
+            Assert.Equal("Moq.IPropertySetup<System.Func<Sample.CalculatorMode>, System.Action<Sample.CalculatorMode>, Sample.CalculatorMode>", TypeOf("Mode"));
+            Assert.Equal("Moq.IPropertySetup<System.Func<string, int?>, System.Action<string, int?>, int?>", TypeOf("Item"));
         }
 
         [Fact]
-        public void InvokesTargetThenReturnsCurrentSetupWithoutItsInvocation()
+        public void InvokesTargetWithinSetupScope()
         {
             var result = new MockSetupGenerator().Run(GeneratorTester.CreateCompilation(Calculator, Usage("Sample.ICalculator")), out _);
             var source = result.GeneratedTrees.Single().ToString();
 
             Assert.Contains(
                 """
-                        public static global::Moq.Sdk.IMockSetup Add(this global::Moq.IMock<global::Sample.ICalculator> mock, int x, int y)
-                        {
-                            global::Moq.Sdk.MockContext.CurrentSetup = null;
-                            mock.Object.Add(x, y);
-                            var setup = global::Moq.Sdk.MockContext.CurrentSetup ?? global::Moq.Sdk.CallContext.ThrowUnexpectedNull<global::Moq.Sdk.IMockSetup>();
-                            global::Moq.Sdk.MockRuntime.Get(setup.Invocation.Target).Invocations.Remove(setup.Invocation);
-                            return setup;
-                        }
+                            public global::Moq.ISetup<global::System.Func<int, int, int>, int> Add(int x, int y)
+                            {
+                                using (global::Moq.Sdk.SetupFactory.Begin())
+                                {
+                                    mock.Object.Add(x, y);
+                                    return global::Moq.Sdk.SetupFactory.Create<global::System.Func<int, int, int>, int>();
+                                }
+                            }
                 """.Replace("\r\n", "\n"),
                 source);
 
-            Assert.Contains("_ = mock.Object.Mode;", source);
-            Assert.Contains("mock.Object.Mode = value;", source);
-            Assert.Contains("_ = mock.Object[name];", source);
-            Assert.Contains("mock.Object[name] = value;", source);
+            Assert.Contains("static x => _ = x.Mode, static (x, value) => x.Mode = value);", source);
+            Assert.Contains("x => _ = x[name], (x, value) => x[name] = value);", source);
             Assert.Contains("mock.Object.TryAdd(ref x, ref y, out z);", source);
+            Assert.Contains("public delegate bool TryAdd(ref int x, ref int y, out int? z);", source);
+            Assert.Contains("global::Moq.Sdk.SetupFactory.GetEventHandler<global::System.EventHandler>(mock, \"TurnedOn\")?.Invoke(mock.Object, global::System.EventArgs.Empty);", source);
         }
 
         [Fact]
-        public void ExtensionsCanBeInvokedOnMock()
+        public void ExtensionsCanBeUsedWithInferredHandlers()
         {
             new MockSetupGenerator().Run(GeneratorTester.CreateCompilation(Calculator,
                 """
                 using Moq;
-                using Moq.Sdk;
                 using Sample;
+                using static Moq.Syntax;
 
                 static class Usage
                 {
                     static void Run()
                     {
-                        var calculator = Mock.Of2<ICalculator>();
-                        int x = 1, y = 2;
+                        var calculator = Mock.Get(Mock.Of<ICalculator>());
+                        int a = 1, b = 2;
 
-                        IMockSetup setup = calculator.Add(1, 2);
-                        setup = calculator.Add(1, 2, 3);
-                        setup = calculator.TryAdd(ref x, ref y, out var z);
-                        setup = calculator.Mode();
-                        setup = calculator.Mode(CalculatorMode.Scientific);
-                        setup = calculator.Item("foo");
-                        setup = calculator.Item("foo", 5);
-                        setup = calculator.TurnOn();
-                        setup = Mock.Get(Mock.Of<ICalculator>()).Recall("foo");
+                        calculator.Add(1, 2).Returns(3);
+                        calculator.Add(Any<int>(), Any<int>()).Returns((x, y) => x + y).Once();
+                        calculator.Add(1, 2, 3).Callback((x, y, z) => { }).Returns(() => 6);
+                        calculator.TryAdd(ref a, ref b, out var c).Returns((ref x, ref y, out z) =>
+                        {
+                            z = x + y;
+                            return true;
+                        });
+                        calculator.Mode.Returns(CalculatorMode.Scientific);
+                        calculator.Mode.Get().Callback(() => { });
+                        calculator.Mode.Set(CalculatorMode.Standard).Callback(mode => { });
+                        calculator.IsOn.Returns(true);
+                        calculator.Item("foo").Returns(5);
+                        calculator.Item(Any<string>()).Set(5).Throws<System.InvalidOperationException>();
+                        calculator.TurnOn().Callback(() => { }).Throws(new System.InvalidOperationException());
+                        calculator.Store("a", 1).Callback((name, value) => { });
+                        calculator.Recall("a").Returns((int?)null);
+                        calculator.RaiseTurnedOn();
+                        calculator.RaiseTurnedOn(System.EventArgs.Empty);
+                        calculator.RaiseTurnedOn(null, System.EventArgs.Empty);
                     }
                 }
                 """), out var output);
@@ -221,13 +296,17 @@ namespace Moq.CodeAnalysis.UnitTests
                     TResult Map<TSource, TResult>(TSource source, Func<TSource, TResult> map) where TSource : notnull where TResult : TSource?;
                     void Copy<T>(T[] items) where T : unmanaged;
                     IEnumerable<T> Query<T>() where T : class?;
+                    bool TryGet<T>(int id, out T? value) where T : class;
                 }
                 """,
                 Usage("IRepository")), out var output);
 
             Assert.Equal(
-                new[] { "Copy<T>(T[])", "Get<T>(int)", "Map<TSource, TResult>(TSource, System.Func<TSource, TResult>)", "Query<T>()", "Save<T>(T)" },
-                Extensions(output, "IRepository").OrderBy(signature => signature, StringComparer.Ordinal));
+                new[] { "Copy<T>(T[])", "Get<T>(int)", "Map<TSource, TResult>(TSource, System.Func<TSource, TResult>)", "Query<T>()", "Save<T>(T)", "TryGet<T>(int, out T?)" },
+                Members(output, "IRepository"));
+            Assert.Equal(
+                "Moq.ISetup<Moq.MockSetupExtensions.IRepository.TryGet<T>, bool>",
+                Assert.Single(Blocks(output, "IRepository")).GetMembers("TryGet").OfType<IMethodSymbol>().Single().ReturnType.ToDisplayString());
             Assert.Empty(GeneratedDiagnostics(output));
         }
 
@@ -244,6 +323,7 @@ namespace Moq.CodeAnalysis.UnitTests
                 {
                     void Log(string @event, Level level = Level.Error, string? category = null, double weight = 0.5, params object[] args);
                     void Register(object mock, object setup, object value);
+                    string this[int mock] { get; }
                 }
 
                 static class Calls
@@ -252,12 +332,49 @@ namespace Moq.CodeAnalysis.UnitTests
                     {
                         logger.Log("started");
                         logger.Log("done", Level.Info, "app", 1, "a", "b");
-                        logger.Register(1, 2, 3);
+                        logger.Register(1, 2, 3).Callback((mock, setup, value) => { });
+                        logger.Item(1).Returns("one");
                     }
                 }
-                """,
-                Usage("ILogger")), out var output);
+                """), out var output);
 
+            Assert.Empty(GeneratedDiagnostics(output));
+        }
+
+        [Fact]
+        public void UsesCustomDelegatesForSignaturesNotRepresentableByFuncOrAction()
+        {
+            new MockSetupGenerator().Run(GeneratorTester.CreateCompilation(
+                """
+                using Moq;
+
+                public interface IMath
+                {
+                    int Sum(in int x, in int y);
+                    int Sum(ref int x);
+                    void Many(int a1, int a2, int a3, int a4, int a5, int a6, int a7, int a8, int a9, int a10, int a11, int a12, int a13, int a14, int a15, int a16, int a17);
+                }
+
+                static class Calls
+                {
+                    static void Run(Moq.IMock<IMath> math)
+                    {
+                        int a = 1;
+                        math.Sum(in a, in a).Returns((in x, in y) => x + y);
+                        math.Sum(ref a).Returns((ref x) => x);
+                    }
+                }
+                """), out var output);
+
+            var block = Assert.Single(Blocks(output, "IMath"));
+            Assert.Equal(
+                new[]
+                {
+                    "Moq.ISetup<Moq.MockSetupExtensions.IMath.Many>",
+                    "Moq.ISetup<Moq.MockSetupExtensions.IMath.Sum, int>",
+                    "Moq.ISetup<Moq.MockSetupExtensions.IMath.Sum2, int>",
+                },
+                block.GetMembers().OfType<IMethodSymbol>().Select(x => x.ReturnType.ToDisplayString()).OrderBy(x => x, StringComparer.Ordinal));
             Assert.Empty(GeneratedDiagnostics(output));
         }
 
@@ -272,12 +389,32 @@ namespace Moq.CodeAnalysis.UnitTests
                 """,
                 Usage("IC")), out var output);
 
-            Assert.Equal(new[] { "Run()", "Stop()", "Value()", "Value(int)" }, Extensions(output, "IC").OrderBy(signature => signature, StringComparer.Ordinal));
+            Assert.Equal(new[] { "Run()", "Stop()", "Value" }, Members(output, "IC"));
 
             var source = result.GeneratedTrees.Single().ToString();
             Assert.Contains("((global::IA)mock.Object).Run();", source);
             Assert.Contains("((global::IB)mock.Object).Stop();", source);
-            Assert.Contains("_ = mock.Object.Value;", source);
+            Assert.Contains("static x => _ = x.Value, static (x, value) => x.Value = value);", source);
+        }
+
+        [Fact]
+        public void SkipsMembersWhoseNameIsTakenByAnotherKindOfMember()
+        {
+            var result = new MockSetupGenerator().Run(GeneratorTester.CreateCompilation(
+                """
+                using System;
+
+                public interface IA { int Value { get; } }
+                public interface IB { void Value(); }
+                public interface IC : IA, IB
+                {
+                    event EventHandler Changed;
+                    void RaiseChanged(string reason);
+                }
+                """,
+                Usage("IC")), out var output);
+
+            Assert.Equal(new[] { "RaiseChanged(string)", "Value" }, Members(output, "IC"));
         }
 
         [Fact]
@@ -285,12 +422,90 @@ namespace Moq.CodeAnalysis.UnitTests
         {
             new MockSetupGenerator().Run(GeneratorTester.CreateCompilation(Usage("System.Collections.Generic.IList<int>")), out var output);
 
-            var extensions = Extensions(output, "System.Collections.Generic.IList<int>");
+            var members = Members(output, "System.Collections.Generic.IList<int>");
 
-            Assert.Contains("Add(int)", extensions);
-            Assert.Contains("Item(int)", extensions);
-            Assert.Contains("Item(int, int)", extensions);
-            Assert.Contains("GetEnumerator()", extensions);
+            Assert.Contains("Add(int)", members);
+            Assert.Contains("Item(int)", members);
+            Assert.Contains("Count", members);
+            Assert.Contains("GetEnumerator()", members);
+            Assert.Empty(GeneratedDiagnostics(output));
+        }
+
+        [Fact]
+        public void SupportsDelegateTypes()
+        {
+            new MockSetupGenerator().Run(GeneratorTester.CreateCompilation(
+                """
+                using System;
+                using Moq;
+
+                public delegate bool TryParse(string value, out int result);
+
+                static class Calls
+                {
+                    static void Run(IMock<Func<int, string>> format, IMock<TryParse> parse, IMock<Action> run)
+                    {
+                        format.Invoke(1).Returns("one");
+                        parse.Invoke("1", out _).Returns((string value, out int result) =>
+                        {
+                            result = 1;
+                            return true;
+                        });
+                        run.Invoke().Callback(() => { });
+                    }
+                }
+                """), out var output);
+
+            Assert.Equal("Moq.ISetup<System.Func<int, string>, string>", Assert.Single(Blocks(output, "System.Func<int, string>")).GetMembers("Invoke").OfType<IMethodSymbol>().Single().ReturnType.ToDisplayString());
+            Assert.Equal("Moq.ISetup<TryParse, bool>", Assert.Single(Blocks(output, "TryParse")).GetMembers("Invoke").OfType<IMethodSymbol>().Single().ReturnType.ToDisplayString());
+            Assert.Empty(GeneratedDiagnostics(output));
+        }
+
+        [Fact]
+        public void RaisesEventsWithSenderOrMirroredParameters()
+        {
+            new MockSetupGenerator().Run(GeneratorTester.CreateCompilation(
+                """
+                using System;
+                using System.ComponentModel;
+                using Moq;
+
+                public delegate void Progress(int percent, string message);
+
+                public interface IWorker : INotifyPropertyChanged
+                {
+                    event Progress Progressed;
+                    event EventHandler<int> Completed;
+                    event Action<string> Logged;
+                    event Func<int> Requested;
+                }
+
+                static class Calls
+                {
+                    static void Run(Moq.IMock<IWorker> worker)
+                    {
+                        worker.RaisePropertyChanged(new PropertyChangedEventArgs("Name"));
+                        worker.RaiseProgressed(50, "half");
+                        worker.RaiseCompleted(42);
+                        worker.RaiseCompleted(worker, 42);
+                        worker.RaiseLogged("hi");
+                        worker.RaiseRequested();
+                    }
+                }
+                """), out var output);
+
+            Assert.Equal(
+                new[]
+                {
+                    "RaiseCompleted(int)",
+                    "RaiseCompleted(object?, int)",
+                    "RaiseLogged(string)",
+                    "RaiseProgressed(int, string)",
+                    "RaisePropertyChanged(System.ComponentModel.PropertyChangedEventArgs)",
+                    "RaisePropertyChanged(object?, System.ComponentModel.PropertyChangedEventArgs)",
+                    "RaiseRequested()",
+                },
+                Members(output, "IWorker"));
             Assert.Empty(GeneratedDiagnostics(output));
         }
 
@@ -299,18 +514,48 @@ namespace Moq.CodeAnalysis.UnitTests
         {
             new MockSetupGenerator().Run(GeneratorTester.CreateCompilation(
                 """
+                namespace Moq
+                {
+                    public partial class Mock<T> where T : class
+                    {
+                        public void Reset() { }
+                    }
+                }
+
                 public interface IConflicts
                 {
                     object Object { get; }
                     void Behavior();
                     void CallBase(int count);
                     string ToString(int format);
+                    int Sdk { get; }
+                    void Reset();
                     void Run();
                 }
                 """,
                 Usage("IConflicts")), out var output);
 
-            Assert.Equal(new[] { "Run()" }, Extensions(output, "IConflicts"));
+            Assert.Equal(new[] { "Run()" }, Members(output, "IConflicts"));
+        }
+
+        [Fact]
+        public void SkipsMembersWithRefLikeTypesOrRefReturns()
+        {
+            new MockSetupGenerator().Run(GeneratorTester.CreateCompilation(
+                """
+                using System;
+
+                public interface IBuffer
+                {
+                    void Write(ReadOnlySpan<byte> data);
+                    Span<byte> GetSpan();
+                    ref int GetRef();
+                    void Flush();
+                }
+                """,
+                Usage("IBuffer")), out var output);
+
+            Assert.Equal(new[] { "Flush()" }, Members(output, "IBuffer"));
         }
 
         [Fact]
@@ -339,7 +584,51 @@ namespace Moq.CodeAnalysis.UnitTests
                 """,
                 Usage("Derived")), out var output);
 
-            Assert.Equal(new[] { "Abstract()", "Value()", "Virtual()" }, Extensions(output, "Derived").OrderBy(signature => signature, StringComparer.Ordinal));
+            Assert.Equal(
+                new[] { "Abstract()", "RaiseChanged()", "RaiseChanged(System.EventArgs)", "RaiseChanged(object?, System.EventArgs)", "Value", "Virtual()" },
+                Members(output, "Derived"));
+            Assert.Equal(
+                "Moq.IPropertySetup<System.Func<int>, int>",
+                Assert.Single(Blocks(output, "Derived")).GetMembers("Value").OfType<IPropertySymbol>().Single().Type.ToDisplayString());
+            Assert.Empty(GeneratedDiagnostics(output));
+        }
+
+        [Fact]
+        public void PrefersMostDerivedMockedType()
+        {
+            new MockSetupGenerator().Run(GeneratorTester.CreateCompilation(Calculator,
+                """
+                using Moq;
+                using Sample;
+
+                public class Calculator : ICalculator
+                {
+                    public virtual event System.EventHandler? TurnedOn;
+                    public virtual bool IsOn { get; }
+                    public virtual CalculatorMode Mode { get; set; }
+                    public virtual int Add(int x, int y) => x + y;
+                    public virtual int Add(int x, int y, int z) => x + y + z;
+                    public virtual bool TryAdd(ref int x, ref int y, out int? z) { z = x + y; return true; }
+                    public virtual void TurnOn() { }
+                    public virtual int? this[string name] { get => null; set { } }
+                    public virtual void Store(string name, int value) { }
+                    public virtual int? Recall(string name) => null;
+                    public virtual void Clear(string name) { }
+                }
+
+                static class Calls
+                {
+                    static void Run(IMock<ICalculator> calculator, IMock<Calculator> concrete)
+                    {
+                        calculator.Add(1, 2).Returns(3);
+                        concrete.Add(1, 2).Returns(3);
+                        concrete.Mode.Returns(CalculatorMode.Scientific);
+                        concrete.Item("a").Returns(1);
+                        concrete.RaiseTurnedOn();
+                    }
+                }
+                """), out var output);
+
             Assert.Empty(GeneratedDiagnostics(output));
         }
 
@@ -357,7 +646,7 @@ namespace Moq.CodeAnalysis.UnitTests
                 """,
                 Usage("ILegacy")), out var output);
 
-            Assert.Equal(new[] { "New()", "Old()" }, Extensions(output, "ILegacy").OrderBy(signature => signature, StringComparer.Ordinal));
+            Assert.Equal(new[] { "New()", "Old()" }, Members(output, "ILegacy"));
             Assert.Contains("[global::System.Obsolete(\"Use New\")]", result.GeneratedTrees.Single().ToString());
             Assert.Empty(GeneratedDiagnostics(output));
         }
@@ -386,6 +675,44 @@ namespace Moq.CodeAnalysis.UnitTests
                 """), out _);
 
             Assert.Empty(result.GeneratedTrees);
+        }
+
+        [Fact]
+        public void RendersIndexersAsExtensionIndexersAfterCSharp14()
+        {
+            var compilation = GeneratorTester.CreateCompilation(LanguageVersion.Preview, Calculator, Usage("Sample.ICalculator"));
+
+            var result = GeneratorTester.CreateDriver(GeneratorTester.GetParseOptions(compilation), new MockSetupGenerator())
+                .RunGenerators(compilation).GetRunResult();
+
+            var source = result.GeneratedTrees.Single().ToString();
+            Assert.Contains("global::System.Action<string, int?>, int?> this[string name]", source);
+            Assert.DoesNotContain(" Item(string name)", source);
+        }
+
+        [Fact]
+        public void ReportsUnsupportedLanguageVersion()
+        {
+            var compilation = GeneratorTester.CreateCompilation(LanguageVersion.CSharp13, Calculator, Usage("Sample.ICalculator"));
+
+            var result = GeneratorTester.CreateDriver(GeneratorTester.GetParseOptions(compilation), new MockSetupGenerator())
+                .RunGenerators(compilation).GetRunResult();
+
+            Assert.Empty(result.GeneratedTrees);
+            var diagnostic = Assert.Single(result.Diagnostics);
+            Assert.Equal(LanguageVersionNotSupported.Id, diagnostic.Id);
+            Assert.Contains("13.0", diagnostic.GetMessage());
+        }
+
+        [Fact]
+        public void DoesNotReportUnsupportedLanguageVersionWithoutMocks()
+        {
+            var compilation = GeneratorTester.CreateCompilation(LanguageVersion.CSharp13, Calculator);
+
+            var result = GeneratorTester.CreateDriver(GeneratorTester.GetParseOptions(compilation), new MockSetupGenerator())
+                .RunGenerators(compilation).GetRunResult();
+
+            Assert.Empty(result.Diagnostics);
         }
 
         [Fact]
@@ -420,16 +747,35 @@ namespace Moq.CodeAnalysis.UnitTests
             $$"""
             static class {{name}}
             {
-                static object Run() => Moq.Mock.Of2<{{type}}>();
+                static object Run() => Moq.Mock.Of<{{type}}>();
             }
             """;
 
-        static string[] Extensions(Compilation output, string mockedType) =>
-            output.GetTypeByMetadataName("Moq.MockSetupExtensions")?.GetMembers().OfType<IMethodSymbol>()
-                .Where(method => method.Parameters[0].Type is INamedTypeSymbol { TypeArguments.Length: 1 } mock &&
+        static string[] HintNames(GeneratorDriverRunResult result) => result.GeneratedTrees
+            .Select(tree => System.IO.Path.GetFileName(tree.FilePath))
+            .OrderBy(name => name, StringComparer.Ordinal)
+            .ToArray();
+
+        static INamedTypeSymbol[] Blocks(Compilation output, string mockedType) =>
+            output.GetTypeByMetadataName("Moq.MockSetupExtensions")?.GetTypeMembers()
+                .Where(block => block.IsExtension &&
+                    block.ExtensionParameter?.Type is INamedTypeSymbol { TypeArguments.Length: 1 } mock &&
                     mock.TypeArguments[0].ToDisplayString() == mockedType)
-                .Select(method => $"{method.Name}{TypeParameters(method)}({string.Join(", ", method.Parameters.Skip(1).Select(Parameter))})")
                 .ToArray() ?? [];
+
+        static string[] Members(Compilation output, string mockedType) => Blocks(output, mockedType)
+            .SelectMany(block => block.GetMembers())
+            .Select(member => member switch
+            {
+                IMethodSymbol { MethodKind: MethodKind.Ordinary } method =>
+                    $"{method.Name}{TypeParameters(method)}({string.Join(", ", method.Parameters.Select(Parameter))})",
+                IPropertySymbol { IsIndexer: true } indexer => $"this[{string.Join(", ", indexer.Parameters.Select(Parameter))}]",
+                IPropertySymbol property => property.Name,
+                _ => null,
+            })
+            .OfType<string>()
+            .OrderBy(signature => signature, StringComparer.Ordinal)
+            .ToArray();
 
         static string TypeParameters(IMethodSymbol method) => method.TypeParameters.Length == 0 ? "" :
             $"<{string.Join(", ", method.TypeParameters.Select(parameter => parameter.Name))}>";
