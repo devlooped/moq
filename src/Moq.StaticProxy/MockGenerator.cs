@@ -139,6 +139,11 @@ namespace Moq
                         symbol.Symbol.Kind != SymbolKind.Method)
                         continue;
 
+                    // Only intercepted members can return recursive mocks
+                    if (symbol.Symbol.IsStatic || symbol.Symbol.IsSealed ||
+                        !(symbol.Symbol.IsAbstract || symbol.Symbol.IsVirtual || symbol.Symbol.IsOverride))
+                        continue;
+
                     var methodSymbol = symbol.Symbol as IMethodSymbol;
                     var propertySymbol = symbol.Symbol as IPropertySymbol;
 

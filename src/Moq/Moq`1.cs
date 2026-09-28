@@ -10,15 +10,13 @@ namespace Moq
     /// Provides the Moq specific configurations on top of an <see cref="Sdk.IMock{T}"/> that 
     /// the Moq API provides beyond the SDK.
     /// </summary>
+    /// <remarks>
+    /// Decorates the given <see cref="IMock{T}"/> with Moq specific 
+    /// properties.
+    /// </remarks>
     [EditorBrowsable(EditorBrowsableState.Never)]
-    public class Moq<T> : MockDecorator<T>, IMoq<T> where T : class
+    public class Moq<T>(IMock<T> mock) : MockDecorator<T>(mock), IMoq<T> where T : class
     {
-        /// <summary>
-        /// Decorates the given <see cref="IMock{T}"/> with Moq specific 
-        /// properties.
-        /// </summary>
-        public Moq(IMock<T> mock) : base(mock) { }
-
         /// <summary>
         /// Gets or sets the <see cref="MockBehavior"/> for the mock.
         /// </summary>

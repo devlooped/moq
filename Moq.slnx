@@ -1,4 +1,6 @@
 <Solution>
+  <Project Path="src/Moq.CodeAnalysis.UnitTests/Moq.CodeAnalysis.UnitTests.csproj" />
+  <Project Path="src/Moq.CodeAnalysis/Moq.CodeAnalysis.csproj" />
   <Project Path="src/Moq.CodeFixes.UnitTests/Moq.CodeFixes.UnitTests.csproj" />
   <Project Path="src/Moq.CodeFixes/Moq.CodeFixes.csproj" />
   <Project Path="src/Moq.DynamicProxy/Moq.DynamicProxy.csproj" />

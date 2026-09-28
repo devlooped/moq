@@ -4,6 +4,7 @@
     <TargetFrameworks>net48;net10.0</TargetFrameworks>
     <Nullable>annotations</Nullable>
     <CopyLocalLockFileAssemblies>true</CopyLocalLockFileAssemblies>
+    <EmitCompilerGeneratedFiles>true</EmitCompilerGeneratedFiles>
   </PropertyGroup>
 
   <ItemGroup>
@@ -40,6 +41,7 @@
     <ProjectReference Include="..\Moq.DynamicProxy\Moq.DynamicProxy.csproj" />
     <ProjectReference Include="..\Moq.Sdk\Moq.Sdk.csproj" />
     <ProjectReference Include="..\Moq\Moq.csproj" />
+    <ProjectReference Include="..\Moq.CodeAnalysis\Moq.CodeAnalysis.csproj" OutputItemType="Analyzer" ReferenceOutputAssembly="false" />
   </ItemGroup>
     
 </Project>

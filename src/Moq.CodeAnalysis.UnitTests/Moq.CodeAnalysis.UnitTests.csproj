@@ -1,0 +1,28 @@
+<Project Sdk="Microsoft.NET.Sdk">
+
+  <PropertyGroup>
+    <TargetFrameworks>net48;net10.0</TargetFrameworks>
+  </PropertyGroup>
+
+  <ItemGroup>
+    <PackageReference Include="Microsoft.NET.Test.Sdk" />
+    <PackageReference Include="Microsoft.TestPlatform.ObjectModel" />
+    <PackageReference Include="xunit" />
+    <PackageReference Include="xunit.runner.console" />
+    <PackageReference Include="xunit.runner.msbuild" Condition="'$(TargetFramework)' == 'net48'" />
+    <PackageReference Include="xunit.runner.visualstudio" />
+
+    <PackageReference Include="Microsoft.CodeAnalysis.CSharp" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <ProjectReference Include="..\Moq.CodeAnalysis\Moq.CodeAnalysis.csproj" />
+    <ProjectReference Include="..\Moq\Moq.csproj" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <None Include="..\Moq.Package\Mock.cs" Link="Moq\Mock.cs" CopyToOutputDirectory="PreserveNewest" />
+    <None Include="..\Moq.Package\Mock.Overloads.cs" Link="Moq\Mock.Overloads.cs" CopyToOutputDirectory="PreserveNewest" />
+  </ItemGroup>
+
+</Project>
