@@ -29,17 +29,24 @@ namespace Moq.CodeAnalysis.UnitTests
         /// <summary>
         /// Creates a compilation of the given sources that references Moq.
         /// </summary>
-        public static CSharpCompilation CreateCompilation(params string[] sources) => CSharpCompilation.Create(
+        public static CSharpCompilation CreateCompilation(params string[] sources) => CreateCompilation(LanguageVersion.Latest, sources);
+
+        /// <summary>
+        /// Creates a compilation of the given sources that references Moq, using the given language version.
+        /// </summary>
+        public static CSharpCompilation CreateCompilation(LanguageVersion version, params string[] sources) => CSharpCompilation.Create(
             "TestProject",
-            sources.Concat(moqSources).Select((source, index) => CSharpSyntaxTree.ParseText(source, parseOptions, path: $"Test{index}.cs")),
+            sources.Concat(moqSources).Select((source, index) => CSharpSyntaxTree.ParseText(source, parseOptions.WithLanguageVersion(version), path: $"Test{index}.cs")),
             references,
             new CSharpCompilationOptions(OutputKind.DynamicallyLinkedLibrary, nullableContextOptions: NullableContextOptions.Enable));
 
         public static SyntaxTree ParseText(string source, string path) => CSharpSyntaxTree.ParseText(source, parseOptions, path: path);
 
-        public static GeneratorDriver CreateDriver(params IIncrementalGenerator[] generators) => CSharpGeneratorDriver.Create(
+        public static GeneratorDriver CreateDriver(params IIncrementalGenerator[] generators) => CreateDriver(parseOptions, generators);
+
+        public static GeneratorDriver CreateDriver(CSharpParseOptions options, params IIncrementalGenerator[] generators) => CSharpGeneratorDriver.Create(
             generators.Select(GeneratorExtensions.AsSourceGenerator),
-            parseOptions: parseOptions,
+            parseOptions: options,
             driverOptions: new GeneratorDriverOptions(IncrementalGeneratorOutputKind.None, trackIncrementalGeneratorSteps: true));
 
         /// <summary>
@@ -48,7 +55,7 @@ namespace Moq.CodeAnalysis.UnitTests
         /// </summary>
         public static GeneratorDriverRunResult Run(this IIncrementalGenerator generator, Compilation compilation, out Compilation output)
         {
-            var driver = CreateDriver(generator).RunGeneratorsAndUpdateCompilation(compilation, out output, out var diagnostics);
+            var driver = CreateDriver(GetParseOptions(compilation), generator).RunGeneratorsAndUpdateCompilation(compilation, out output, out var diagnostics);
 
             Assert.Empty(diagnostics);
             Assert.Empty(output.GetDiagnostics().Where(d => d.Severity == DiagnosticSeverity.Error));
@@ -71,7 +78,7 @@ namespace Moq.CodeAnalysis.UnitTests
         /// </summary>
         public static void AssertIncremental(this IIncrementalGenerator generator, Compilation compilation, Compilation next, params string[] trackingNames)
         {
-            var driver = CreateDriver(generator).RunGenerators(compilation);
+            var driver = CreateDriver(GetParseOptions(compilation), generator).RunGenerators(compilation);
             var first = driver.GetRunResult();
             var second = driver.RunGenerators(next).GetRunResult();
 
@@ -101,6 +108,12 @@ namespace Moq.CodeAnalysis.UnitTests
             }
         }
 
+        /// <summary>
+        /// Gets the parse options of the given compilation, so generated sources match its language version.
+        /// </summary>
+        public static CSharpParseOptions GetParseOptions(Compilation compilation)
+            => compilation.SyntaxTrees.FirstOrDefault()?.Options as CSharpParseOptions ?? parseOptions;
+
         static IEnumerable<string> GetFrameworkReferences()
         {
             if (AppContext.GetData("TRUSTED_PLATFORM_ASSEMBLIES") is string assemblies)
@@ -109,7 +122,8 @@ namespace Moq.CodeAnalysis.UnitTests
             var runtime = Path.GetDirectoryName(typeof(object).Assembly.Location)!;
             return new[] { "mscorlib.dll", "System.dll", "System.Core.dll", "System.Runtime.dll", "netstandard.dll" }
                 .Select(file => Path.Combine(runtime, file))
-                .Where(File.Exists);
+                .Where(File.Exists)
+                .Concat(new[] { typeof(System.Threading.Tasks.ValueTask<>).Assembly.Location, typeof(Span<>).Assembly.Location });
         }
 
         static void AssertCacheable(object? value, string step)
