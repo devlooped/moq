@@ -1,6 +1,6 @@
 using System;
-using Stunts;
 using Sample;
+using Stunts;
 using Xunit;
 using Xunit.Abstractions;
 

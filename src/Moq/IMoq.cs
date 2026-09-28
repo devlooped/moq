@@ -1,5 +1,5 @@
-using Stunts;
 using Moq.Sdk;
+using Stunts;
 
 namespace Moq
 {

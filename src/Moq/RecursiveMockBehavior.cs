@@ -2,8 +2,8 @@ using System;
 using System.ComponentModel;
 using System.Linq;
 using System.Reflection;
-using Stunts;
 using Moq.Sdk;
+using Stunts;
 
 namespace Moq
 {

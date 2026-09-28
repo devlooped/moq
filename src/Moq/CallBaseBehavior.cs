@@ -1,7 +1,7 @@
 using System.ComponentModel;
 using System.Linq;
-using Stunts;
 using Moq.Sdk;
+using Stunts;
 
 namespace Moq
 {

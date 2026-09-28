@@ -1,5 +1,5 @@
-using Stunts.CodeAnalysis;
 using Moq.Sdk;
+using Stunts.CodeAnalysis;
 
 namespace Moq
 {

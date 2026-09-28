@@ -1,8 +1,8 @@
 using System;
 using System.Collections.Generic;
 using System.Linq;
-using Stunts;
 using Moq.Sdk;
+using Stunts;
 
 namespace Moq
 {
