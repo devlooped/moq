@@ -1,0 +1,6 @@
+<Project>
+  <!-- VSTest runs net48 tests through mono, which the Linux CI image does not have. -->
+  <PropertyGroup Condition="'$(IsTestProject)' == 'true' and !$([MSBuild]::IsOSPlatform('windows')) and $(TargetFrameworks.Contains('net48'))">
+    <TargetFrameworks>$(TargetFrameworks.Replace('net48;', '').Replace(';net48', ''))</TargetFrameworks>
+  </PropertyGroup>
+</Project>
