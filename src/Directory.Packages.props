@@ -56,7 +56,7 @@
     <PackageVersion Include="Microsoft.Build.Tasks.Core" Version="17.14.28" />
     <!-- Tasks.Core 17.14.28 pulls 9.0.0, which is below the 9.0.15 advisory fix. -->
     <PackageVersion Include="System.Security.Cryptography.Xml" Version="9.0.20" />
-    <PackageVersion Include="Microsoft.Build.Locator" Version="1.2.6" />
+    <PackageVersion Include="Microsoft.Build.Locator" Version="1.11.2" />
     <PackageVersion Include="MSBuild.StructuredLogger" Version="2.1.176" />
   </ItemGroup>
   
