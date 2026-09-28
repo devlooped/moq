@@ -147,6 +147,6 @@ public abstract partial class CodeFixVerifier : DiagnosticVerifier
 
         //after applying all of the code fixes, compare the resulting string to the inputted one
         var actual = GetStringFromDocument(document ?? throw new InvalidOperationException());
-        Assert.Equal(fixedSource, actual);
+        Assert.Equal(NormalizeLineEndings(fixedSource), NormalizeLineEndings(actual));
     }
 }
