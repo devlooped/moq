@@ -6,7 +6,9 @@
 
   <ItemGroup Label="Core">
     <PackageVersion Include="Microsoft.NETFramework.ReferenceAssemblies" Version="1.0.0" />
-    <PackageVersion Include="ThisAssembly" Version="1.0.0-rc.1" />
+    <!-- 1.0.0-rc.1 generators call Path.GetDirectoryName(Assembly.Location), which is empty
+         under the .NET 10 compiler and crashes every ThisAssembly generator (CS8785 / path1). -->
+    <PackageVersion Include="ThisAssembly" Version="2.1.6" />
     <PackageVersion Update="ThisAssembly" Version="42.42.42" Condition="Exists('$(MSBuildThisFileDirectory)..\..\ThisAssembly\bin\')" />
     <PackageVersion Include="NuGetizer" Version="1.5.1" />
     <PackageVersion Update="NuGetizer" Version="42.42.42" Condition="Exists('$(MSBuildThisFileDirectory)..\..\nugetizer\bin\')" />

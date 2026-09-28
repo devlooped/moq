@@ -226,4 +226,16 @@
   <Import Project="Directory.targets" Condition="Exists('Directory.targets')"/>
   <Import Project="Directory.targets.user" Condition="Exists('Directory.targets.user')" />
 
+  <!-- ThisAssembly.Resources 2.x batches %(FileExtension) across every EmbeddedResource.
+       VSSDK injects an absolute Empty.resx that has no FileExtension, which is MSB4096.
+       Qualified metadata reads as empty instead of failing, so we can fill it in first. -->
+  <Target Name="EnsureEmbeddedResourceFileExtension" BeforeTargets="_InjectResourcesAdditionalFiles">
+    <ItemGroup>
+      <EmbeddedResource>
+        <FileExtension Condition="'%(EmbeddedResource.FileExtension)' == '' and '%(Extension)' != ''">%(Extension)</FileExtension>
+        <FileExtension Condition="'%(EmbeddedResource.FileExtension)' == '' and '%(Extension)' == ''">.resx</FileExtension>
+      </EmbeddedResource>
+    </ItemGroup>
+  </Target>
+
 </Project>
