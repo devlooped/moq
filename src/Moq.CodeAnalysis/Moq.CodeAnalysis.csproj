@@ -1,0 +1,18 @@
+<Project Sdk="Microsoft.NET.Sdk">
+
+  <PropertyGroup>
+    <TargetFramework>netstandard2.0</TargetFramework>
+    <PackFolder>analyzers\dotnet\cs</PackFolder>
+    <IsRoslynComponent>true</IsRoslynComponent>
+    <EnforceExtendedAnalyzerRules>true</EnforceExtendedAnalyzerRules>
+    <!-- Generators here must be incremental (RS1042) and load in csc without workspaces (RS1038). -->
+    <WarningsAsErrors>$(WarningsAsErrors);RS1038;RS1042</WarningsAsErrors>
+  </PropertyGroup>
+
+  <ItemGroup>
+    <PackageReference Include="NuGetizer" PrivateAssets="all" />
+    <PackageReference Include="Microsoft.CodeAnalysis.Common" Pack="false" />
+    <PackageReference Include="Microsoft.CodeAnalysis.CSharp" Pack="false" />
+  </ItemGroup>
+
+</Project>
