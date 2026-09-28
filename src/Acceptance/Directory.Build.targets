@@ -1,5 +1,7 @@
 <Project>
-  <!-- Prevent importing the shared targets -->
+  <!-- Prevent importing the shared targets. Still apply the net10-only non-Windows policy. -->
+  <Import Project="..\Directory.targets" Condition="Exists('..\Directory.targets')" />
+
   <ItemGroup>
     <PackageReference Update="Stunts" Version="$(StuntsVersion)" />
   </ItemGroup>

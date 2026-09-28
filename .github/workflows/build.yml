@@ -73,7 +73,12 @@ jobs:
 
       - name: 🧪 test
         shell: pwsh
-        run: dnx --yes retest -- --no-build
+        run: |
+          if ($IsWindows) {
+            dnx --yes retest -- --no-build
+          } else {
+            dnx --yes retest -- --no-build --framework net10.0
+          }
 
       - name: 🐛 logs
         uses: actions/upload-artifact@v4

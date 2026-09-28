@@ -1,6 +1,10 @@
 <Project>
-  <!-- VSTest runs net48 tests through mono, which the Linux CI image does not have. -->
-  <PropertyGroup Condition="'$(IsTestProject)' == 'true' and !$([MSBuild]::IsOSPlatform('windows')) and $(TargetFrameworks.Contains('net48'))">
-    <TargetFrameworks>$(TargetFrameworks.Replace('net48;', '').Replace(';net48', ''))</TargetFrameworks>
+  <!-- Non-Windows is plain net10. net48 and net461 run on mono, which we do not use. -->
+  <PropertyGroup Condition="'$(OS)' != 'Windows_NT'">
+    <TargetFrameworks Condition="'$(TargetFrameworks)' == 'net48' or '$(TargetFrameworks)' == 'net461'">net10.0</TargetFrameworks>
+    <TargetFrameworks Condition="$(TargetFrameworks.Contains('net48;'))">$(TargetFrameworks.Replace('net48;', ''))</TargetFrameworks>
+    <TargetFrameworks Condition="$(TargetFrameworks.Contains(';net48'))">$(TargetFrameworks.Replace(';net48', ''))</TargetFrameworks>
+    <TargetFrameworks Condition="$(TargetFrameworks.Contains('net461;'))">$(TargetFrameworks.Replace('net461;', ''))</TargetFrameworks>
+    <TargetFrameworks Condition="$(TargetFrameworks.Contains(';net461'))">$(TargetFrameworks.Replace(';net461', ''))</TargetFrameworks>
   </PropertyGroup>
 </Project>
