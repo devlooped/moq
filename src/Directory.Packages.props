@@ -47,7 +47,7 @@
     <PackageVersion Include="xunit.runner.console" Version="2.4.1" />
     <PackageVersion Include="xunit.runner.msbuild" Version="2.4.1" />
     <PackageVersion Include="xunit.runner.visualstudio" Version="2.4.3" />
-    <PackageVersion Include="System.ComponentModel.Composition" Version="5.0.0" />
+    <PackageVersion Include="System.ComponentModel.Composition" Version="10.0.12" />
     <PackageVersion Include="ManualStunts" Version="$(StuntsVersion)" />
   </ItemGroup>
 
@@ -55,7 +55,7 @@
     <PackageVersion Include="Microsoft.Build" Version="17.14.28" />
     <PackageVersion Include="Microsoft.Build.Tasks.Core" Version="17.14.28" />
     <!-- Tasks.Core 17.14.28 pulls 9.0.0, which is below the 9.0.15 advisory fix. -->
-    <PackageVersion Include="System.Security.Cryptography.Xml" Version="9.0.20" />
+    <PackageVersion Include="System.Security.Cryptography.Xml" Version="10.0.12" />
     <PackageVersion Include="Microsoft.Build.Locator" Version="1.2.6" />
     <PackageVersion Include="MSBuild.StructuredLogger" Version="2.1.176" />
   </ItemGroup>
