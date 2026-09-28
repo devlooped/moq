@@ -36,7 +36,7 @@
 
     <!-- Unit tests need the native SQLite bundle (macOS). lib.e_sqlite3 is pinned above the 2.1.11 advisory. -->
     <PackageVersion Include="SQLitePCLRaw.bundle_green" Version="2.1.11" />
-    <PackageVersion Include="SQLitePCLRaw.lib.e_sqlite3" Version="2.1.13" />
+    <PackageVersion Include="SQLitePCLRaw.lib.e_sqlite3" Version="3.53.3" />
   </ItemGroup>
 
   <ItemGroup Label="Tests">
