@@ -4,13 +4,13 @@ using System.Collections.Immutable;
 using System.Linq;
 using System.Runtime.CompilerServices;
 using System.Threading;
-using Stunts;
-using Stunts.CodeAnalysis;
-using Stunts.Processors;
 using Microsoft.CodeAnalysis;
 using Microsoft.CodeAnalysis.CSharp.Syntax;
 using Moq.Processors;
 using Moq.Sdk;
+using Stunts;
+using Stunts.CodeAnalysis;
+using Stunts.Processors;
 
 namespace Moq
 {

@@ -1,6 +1,6 @@
-using Stunts.CodeAnalysis;
 using Microsoft.CodeAnalysis;
 using Microsoft.CodeAnalysis.Diagnostics;
+using Stunts.CodeAnalysis;
 
 namespace Moq
 {

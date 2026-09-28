@@ -1,7 +1,7 @@
 using System;
 using System.Reflection;
-using Stunts;
 using Sample;
+using Stunts;
 using Xunit;
 
 namespace Moq.Sdk.Tests

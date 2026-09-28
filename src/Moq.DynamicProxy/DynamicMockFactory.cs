@@ -2,8 +2,8 @@ using System;
 using System.Linq;
 using System.Reflection;
 using System.Threading;
-using Stunts;
 using Castle.DynamicProxy;
+using Stunts;
 
 namespace Moq.Sdk
 {

@@ -1,8 +1,8 @@
 using System;
 using System.ComponentModel;
 using System.Diagnostics;
-using Stunts;
 using Moq.Sdk;
+using Stunts;
 
 namespace Moq
 {

@@ -1,9 +1,9 @@
 using System;
 using System.ComponentModel;
 using System.Threading.Tasks;
-using Stunts;
 using Moq.Sdk;
 using Sample;
+using Stunts;
 using Xunit;
 using Xunit.Abstractions;
 using static Moq.Syntax;
