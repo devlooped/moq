@@ -1,4 +1,7 @@
 ﻿using System;
+using System.Reflection;
+using Moq.Sdk;
+using Stunts;
 
 namespace Moq
 {
@@ -14,7 +17,7 @@ namespace Moq
         /// Verifies all occurrence constraints on the given mock' setups, and 
         /// allows further verification on the returned instance.
         /// </summary>
-        public static T Verify<T>(T mock) where T : class => Moq.Verify.Called(mock);
+        public static IMock<T> Verify<T>(IMock<T> mock) where T : class => Moq.Verify.Called(mock);
 
         /// <summary>
         /// Matches any value of the given type.
@@ -72,5 +75,81 @@ namespace Moq
         /// </summary>
         /// <seealso cref="SetupScope"/>
         public static IDisposable Setup() => new SetupScope();
+
+        /// <summary>
+        /// Sets up the last member invoked on a mock by the <paramref name="member"/> function, 
+        /// which can be a recursive call (i.e. <c>Setup(() => mock.Object.Child.Value)</c>). 
+        /// Handlers for the returned setup receive the invocation arguments.
+        /// </summary>
+        public static ISetup<Func<IArgumentCollection, TResult>, TResult> Setup<TResult>(Func<TResult> member)
+        {
+            using (SetupFactory.Begin())
+            {
+                member();
+                return new SetupHandle<Func<IArgumentCollection, TResult>, TResult>(SetupFactory.Current(), untyped: true);
+            }
+        }
+
+        /// <summary>
+        /// Sets up the last void member invoked on a mock by the <paramref name="member"/> action, 
+        /// which can be a recursive call (i.e. <c>Setup(() => mock.Object.Child.Execute())</c>). 
+        /// Handlers for the returned setup receive the invocation arguments.
+        /// </summary>
+        public static ISetup<Action<IArgumentCollection>> Setup(Action member)
+        {
+            using (SetupFactory.Begin())
+            {
+                member();
+                return new SetupHandle<Action<IArgumentCollection>>(SetupFactory.Current(), untyped: true);
+            }
+        }
+
+        /// <summary>
+        /// Sets up the mock member referenced by <paramref name="member"/> for any argument values, 
+        /// typically used to access and set ref/out arguments via a custom delegate with the same signature, 
+        /// like <c>SetupRef&lt;TryParse&gt;(mock.Object.TryParse)</c>.
+        /// </summary>
+        public static ISetupRef<TDelegate> SetupRef<TDelegate>(TDelegate member) where TDelegate : Delegate
+        {
+            if (member == null)
+                throw new ArgumentNullException(nameof(member));
+
+            using (SetupFactory.Begin())
+            {
+                var parameters = member.GetMethodInfo().GetParameters();
+                var arguments = new object?[parameters.Length];
+                var defaults = new DefaultValueProvider(false);
+                for (var i = 0; i < arguments.Length; i++)
+                {
+                    var parameter = parameters[i];
+                    var type = parameter.ParameterType.IsByRef ? parameter.ParameterType.GetElementType()! : parameter.ParameterType;
+                    MockSetup.Push(new AnyMatcher(type));
+                    if (!parameter.IsOut)
+                        arguments[i] = defaults.GetDefault(type);
+                }
+
+                member.DynamicInvoke(arguments);
+                return new SetupHandle<TDelegate>(SetupFactory.Current());
+            }
+        }
+
+        /// <summary>
+        /// Sets up the mock member referenced by the delegate returned from <paramref name="member"/> 
+        /// for any argument values. Use this overload when there is a recursive mock involved, 
+        /// like <c>SetupRef&lt;TryParse&gt;(() => mock.Object.Parser.TryParse)</c>.
+        /// </summary>
+        public static ISetupRef<TDelegate> SetupRef<TDelegate>(Func<TDelegate> member) where TDelegate : Delegate
+        {
+            if (member == null)
+                throw new ArgumentNullException(nameof(member));
+
+            TDelegate target;
+            using (new SetupScope())
+            {
+                target = member();
+            }
+
+            return SetupRef(target);
+        }
     }
 }

@@ -2,6 +2,7 @@
 using System;
 using Moq.Sdk;
 using Xunit;
+using static Moq.Syntax;
 
 namespace Moq.Scenarios.MockOf2
 {
@@ -24,7 +25,7 @@ namespace Moq.Scenarios.MockOf2
             Assert.IsAssignableFrom<IRoot>(mock.Object);
             Assert.StartsWith(MockNaming.DefaultRootNamespace, mock.Object.GetType().Namespace, StringComparison.Ordinal);
 
-            using (mock.Object.Setup())
+            using (Setup())
             {
                 _ = mock.Object.Child;
             }

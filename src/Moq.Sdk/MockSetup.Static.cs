@@ -26,6 +26,21 @@ namespace Moq.Sdk
         }
 
         /// <summary>
+        /// Removes and returns the argument matchers pushed so far in the current <see cref="CallContext{T}"/>, 
+        /// so they can be pushed again (see <see cref="Push(IArgumentMatcher)"/>) for a deferred invocation.
+        /// </summary>
+        public static IArgumentMatcher[] TakeMatchers()
+        {
+            var matchers = CallContext<Queue<IArgumentMatcher>>.GetData(() => new Queue<IArgumentMatcher>());
+            if (matchers == null || matchers.Count == 0)
+                return Array.Empty<IArgumentMatcher>();
+
+            var result = matchers.ToArray();
+            matchers.Clear();
+            return result;
+        }
+
+        /// <summary>
         /// Freezes the argument matchers for the given method invocation, taking the collected 
         /// matchers so far in the <see cref="CallContext{T}"/> with the key <see cref="Queue{IArgumentMatcher}"/>.
         /// </summary>
@@ -45,13 +60,15 @@ namespace Moq.Sdk
             {
                 var argument = invocation.Arguments.GetValue(i);
                 var parameter = invocation.Arguments[i].Parameter;
+                var parameterType = parameter.ParameterType.IsByRef ?
+                    parameter.ParameterType.GetElementType()! : parameter.ParameterType;
 
                 // This is a bit fuzzy since we compare the actual argument value against the 
                 // default value for the parameter type, or the type of the matcher in the 
                 // queue of argument matchers to see if applies instead.
-                if (Equals(argument, defaultValue.GetDefault(parameter.ParameterType)) &&
+                if (Equals(argument, defaultValue.GetDefault(parameterType)) &&
                     currentMatchers.Count != 0 &&
-                    parameter.ParameterType.IsAssignableFrom(currentMatchers.Peek().ArgumentType))
+                    parameterType.IsAssignableFrom(currentMatchers.Peek().ArgumentType))
                 {
                     finalMatchers.Add(currentMatchers.Dequeue());
                 }

@@ -120,11 +120,8 @@
   <data name="Legacy_AsInterfaceNotImplemented" xml:space="preserve">
     <value>Cannot convert target mock to the requested interface.</value>
   </data>
-  <data name="Returns_DelegateExpected" xml:space="preserve">
-    <value>Expected a delegate argument.</value>
-  </data>
-  <data name="Setup_DelegateExpected" xml:space="preserve">
-    <value>Expected a delegate argument.</value>
+  <data name="SetupNotFound" xml:space="preserve">
+    <value>No mock member was invoked for the setup. Only virtual, abstract and interface members of mocks can be set up.</value>
   </data>
   <data name="TargetNotLooseOrStrict" xml:space="preserve">
     <value>The target does not have either {0} or {1} behaviors.</value>

@@ -19,11 +19,11 @@ namespace Moq
 
         /// <summary>
         /// Verifies all setups that had an occurrence constraint applied, 
-        /// and allows specific verifications to be performed on the returned 
-        /// object too.
+        /// and returns a verifier mock where each member invocation verifies 
+        /// the member was called at least once.
         /// </summary>
-        /// <returns>An object that can be used to perform additional call verifications.</returns>
-        public static T Called<T>(T target) where T : class => Calls(target);
+        /// <returns>A mock that can be used to perform additional call verifications.</returns>
+        public static IMock<T> Called<T>(IMock<T> mock) where T : class => GetVerifier(mock, new CalledBehavior());
 
         /// <summary>
         /// Verifies a method invocation matching the <paramref name="function"/> was executed 
@@ -121,11 +121,11 @@ namespace Moq
 
         /// <summary>
         /// Verifies all setups that had an occurrence constraint applied, 
-        /// and allows specific verifications to be performed on the returned 
-        /// object too.
+        /// and returns a verifier mock where each member invocation verifies 
+        /// the member was never called.
         /// </summary>
-        /// <returns>An object that can be used to perform additional call verifications.</returns>
-        public static T NotCalled<T>(T target) where T : class => GetVerifier<T>(GetVerified(target), true);
+        /// <returns>A mock that can be used to perform additional call verifications.</returns>
+        public static IMock<T> NotCalled<T>(IMock<T> mock) where T : class => GetVerifier(mock, new NotCalledBehavior());
 
         /// <summary>
         /// Verifies a method invocation matching the <paramref name="function"/> was never called.
@@ -143,11 +143,11 @@ namespace Moq
 
         /// <summary>
         /// Verifies all setups that had an occurrence constraint applied, 
-        /// and allows specific verifications to be performed on the returned 
-        /// object too.
+        /// and returns a verifier mock where member invocations can be 
+        /// verified with occurrence constraints, like <c>.Exactly(2)</c>.
         /// </summary>
-        /// <returns>An object that can be used to perform additional call verifications.</returns>
-        public static T Calls<T>(T target) where T : class => GetVerifier<T>(GetVerified(target));
+        /// <returns>A mock that can be used to perform additional call verifications.</returns>
+        public static IMock<T> Calls<T>(IMock<T> mock) where T : class => GetVerifier(mock, null);
 
         /// <summary>
         /// Allows performing custom verification against all actual calls that match the 
@@ -184,12 +184,11 @@ namespace Moq
         }
 
         /// <summary>
-        /// Gets the mock after verifying that all setups that specified occurrence 
+        /// Gets the mock runtime after verifying that all setups that specified occurrence 
         /// constraints have succeeded.
         /// </summary>
-        static IMockRuntime GetVerified<T>(T target) where T : class
+        static IMockRuntime GetVerified(IMockRuntime mock)
         {
-            var mock = MockRuntime.Get(target);
             var failures = (from pipeline in mock.Setups
                             where pipeline.Setup.Occurrence != null
                             let times = pipeline.Setup.Occurrence!.Value
@@ -205,40 +204,47 @@ namespace Moq
         }
 
         /// <summary>
-        /// Gets a clone of the original mock for verification purposes.
+        /// Gets a clone of the original mock for verification purposes, after 
+        /// verifying all occurrence constraints on the original.
         /// </summary>
         /// <param name="mock">The mock to be cloned.</param>
-        /// <param name="notCalled">Whether to add a behavior that verifies the invocations performed on 
-        /// the clone were never performed on the original mock.
+        /// <param name="verifier">Optional behavior that verifies the invocations performed on 
+        /// the clone against the invocations performed on the original mock.
         /// </param>
-        static T GetVerifier<T>(IMockRuntime mock, bool notCalled = false) where T : class
+        static IMock<T> GetVerifier<T>(IMock<T> mock, IStuntBehavior? verifier) where T : class
         {
+            var runtime = GetVerified(mock.Sdk);
+
             // If the mock is already being verified, we don't need to clone again.
-            if (mock.State.TryGetValue<bool>(typeof(Verify), out var verifying) && verifying)
-                return (T)mock.Object;
+            if (IsVerifying(runtime))
+                return mock;
 
             // Otherwise, we create a verification copy that does not record invocations 
             // and has default behavior.
-            var clone = MockRuntime.Clone(mock);
+            var clone = MockRuntime.Clone(runtime);
 
             var recording = clone.Behaviors.OfType<MockRecordingBehavior>().FirstOrDefault();
             if (recording != null)
                 clone.Behaviors.Remove(recording);
 
-            if (notCalled)
+            if (verifier != null)
                 clone.Behaviors.Insert(
                     clone.Behaviors.IndexOf(clone.Behaviors.OfType<MockContextBehavior>().First()) + 1,
-                    new NotCalledBehavior());
+                    verifier);
 
             // Sets up the right behaviors for a loose mock
             clone.Behavior = MockBehavior.Loose;
 
             clone.State.Set(typeof(Verify), true);
 
-            return (T)clone.Object;
+            return new MockView<T>((T)clone.Object);
         }
 
-        class NotCalledBehavior : IStuntBehavior
+        /// <summary>
+        /// Verifies that invocations performed on a verifier were performed at 
+        /// least once on the original mock.
+        /// </summary>
+        internal class CalledBehavior : IStuntBehavior
         {
             public bool AppliesTo(IMethodInvocation invocation) => true;
 
@@ -246,7 +252,26 @@ namespace Moq
             {
                 var mock = MockRuntime.Get(invocation.Target);
                 var setup = MockContext.CurrentSetup ?? CallContext.ThrowUnexpectedNull<IMockSetup>();
-                if (mock.Invocations.Where(x => setup.AppliesTo(x)).Any())
+                if (!mock.Invocations.Any(x => setup.AppliesTo(x)))
+                    throw new VerifyException(mock, setup);
+
+                return next.Invoke(invocation, next);
+            }
+        }
+
+        /// <summary>
+        /// Verifies that invocations performed on a verifier were never 
+        /// performed on the original mock.
+        /// </summary>
+        internal class NotCalledBehavior : IStuntBehavior
+        {
+            public bool AppliesTo(IMethodInvocation invocation) => true;
+
+            public IMethodReturn Execute(IMethodInvocation invocation, ExecuteHandler next)
+            {
+                var mock = MockRuntime.Get(invocation.Target);
+                var setup = MockContext.CurrentSetup ?? CallContext.ThrowUnexpectedNull<IMockSetup>();
+                if (mock.Invocations.Any(x => setup.AppliesTo(x)))
                     throw new VerifyException(mock, setup);
 
                 return next.Invoke(invocation, next);
