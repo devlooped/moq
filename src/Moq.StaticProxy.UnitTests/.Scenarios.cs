@@ -10,7 +10,6 @@ using System.Text;
 using System.Threading;
 using Microsoft.CodeAnalysis;
 using Microsoft.CodeAnalysis.CSharp;
-using Microsoft.CodeAnalysis.Testing;
 using Xunit;
 
 namespace Moq.StaticProxy.UnitTests
@@ -49,6 +48,10 @@ namespace Moq.StaticProxy.UnitTests
                 string.Join(Environment.NewLine, diagnostics.Where(d => d.Id != "CS0436").Select(d => d.ToString())));
 
             var assembly = compilation.Emit();
+            Assert.Contains(assembly.GetTypes(), t =>
+                t.Namespace?.StartsWith(Sdk.MockNaming.DefaultRootNamespace, StringComparison.Ordinal) == true &&
+                t.GetInterfaces().Any(i => i.FullName == typeof(Sdk.IMocked).FullName));
+
             var type = assembly.GetTypes().FirstOrDefault(t => t.GetInterfaces().Any(i => i.Name == nameof(IRunnable)));
 
             Assert.NotNull(type);
@@ -88,15 +91,6 @@ namespace Moq.StaticProxy.UnitTests
 
         static (ImmutableArray<Diagnostic>, Compilation) GetGeneratedOutput(string path)
         {
-            ReferenceAssemblies assemblies;
-
-#if NET48
-            assemblies = ReferenceAssemblies.NetFramework.Net48.Default;
-#else
-            assemblies = ReferenceAssemblies.Net.Net100;
-#endif
-
-            var references = assemblies.ResolveAsync(default, default).Result;
             var libs = new HashSet<string>(File.ReadAllLines("lib.txt"), StringComparer.OrdinalIgnoreCase)
                 .Distinct(new FileNameComparer())
                 .ToDictionary(x => Path.GetFileName(x), StringComparer.OrdinalIgnoreCase);
@@ -153,14 +147,10 @@ namespace Moq.StaticProxy.UnitTests
             Compilation compilation = CSharpCompilation.Create(
                 Path.GetFileNameWithoutExtension(path),
                 sources,
-                references.AddRange(args.MetadataReferences
-                    .Where(x =>
-                        !x.Reference.EndsWith("netstandard.dll", StringComparison.Ordinal) &&
-                        !x.Reference.EndsWith("mscorlib.dll", StringComparison.Ordinal) &&
-                        !Path.GetFileName(x.Reference).StartsWith("System", StringComparison.Ordinal))
+                args.MetadataReferences
                     .Select(x => libs.TryGetValue(Path.GetFileName(x.Reference), out var lib) ?
                         MetadataReference.CreateFromFile(lib) :
-                        MetadataReference.CreateFromFile(x.Reference))),
+                        MetadataReference.CreateFromFile(x.Reference)),
                 args.CompilationOptions.WithCryptoKeyFile(null).WithOutputKind(OutputKind.DynamicallyLinkedLibrary));
 
             Predicate<Diagnostic> ignored = d =>

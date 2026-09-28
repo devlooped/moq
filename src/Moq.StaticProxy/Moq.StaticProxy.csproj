@@ -9,23 +9,24 @@
     <PackFolder>tools\$(TargetFramework)</PackFolder>
     <!-- ISourceGenerator is obsolete in the Roslyn 4.14 reference but still what this generator implements. -->
     <NoWarn>$(NoWarn);RS1042</NoWarn>
+    <!-- The generator runs in csc, which does not load the workspace or editor features. -->
+    <WarningsAsErrors>$(WarningsAsErrors);RS1038</WarningsAsErrors>
   </PropertyGroup>
 
   <ItemGroup>
     <PackageReference Include="NuGetizer" PrivateAssets="all" />
     <PackageReference Include="Stunts.StaticProxy" Pack="false" />
+    <PackageReference Include="Stunts.CodeAnalysis" Pack="false" />
 
     <PackageReference Include="Microsoft.CodeAnalysis.CSharp.CodeStyle" Pack="false" />
     <PackageReference Include="Microsoft.CodeAnalysis.Common" Pack="false" />
     <PackageReference Include="Microsoft.CodeAnalysis.CSharp" Pack="false" />
-    <PackageReference Include="Microsoft.CodeAnalysis.VisualBasic" Pack="false" />
 
     <PackageReference Include="Microsoft.Bcl.AsyncInterfaces" Pack="false" />
     <PackageReference Include="Microsoft.Bcl.HashCode" Pack="false" />
   </ItemGroup>
 
   <ItemGroup>
-    <ProjectReference Include="..\Moq.CodeAnalysis\Moq.CodeAnalysis.csproj" Pack="false" />
     <ProjectReference Include="..\Moq.Sdk\Moq.Sdk.csproj" Pack="false" />
   </ItemGroup>
 
@@ -33,7 +34,10 @@
   <Target Name="ResolveReferences" />
   <Target Name="AddDependencies" Condition="'$(IsPackable)' != 'true'" AfterTargets="Build" BeforeTargets="GetPackageContents" DependsOnTargets="ResolveReferences">
     <ItemGroup Condition="'$(TargetFramework)' != ''">
-      <AnalyzerFile Include="@(ReferenceCopyLocalPaths)" Exclude="'%(Filename)%(Extension)' == 'Microsoft.CodeAnalysis.dll' or &#xD;&#xA;                             '%(Filename)%(Extension)' == 'Microsoft.CodeAnalysis.CSharp.dll' or &#xD;&#xA;                             '%(Filename)%(Extension)' == 'Microsoft.CodeAnalysisVisualBasic.dll'" Condition="'%(ReferenceCopyLocalPaths.AssetType)' != 'resources'" />
+      <AnalyzerFile Include="@(ReferenceCopyLocalPaths)"
+                    Condition="'%(ReferenceCopyLocalPaths.AssetType)' != 'resources'
+                               and '%(Filename)' != 'Microsoft.CodeAnalysis'
+                               and '%(Filename)' != 'Microsoft.CodeAnalysis.CSharp'" />
       <PackageFile Include="@(AnalyzerFile -> '%(FullPath)')" PackagePath="tools\$(TargetFramework)\%(Filename)%(Extension)" />
     </ItemGroup>
   </Target>

@@ -40,7 +40,6 @@
   </ItemGroup>
 
   <ItemGroup Label="Tests">
-    <PackageVersion Include="Microsoft.CodeAnalysis.CSharp.Analyzer.Testing" Version="1.1.4" />
     <PackageVersion Include="Microsoft.NET.Test.Sdk" Version="17.14.1" />
     <PackageVersion Include="Microsoft.TestPlatform.ObjectModel" Version="17.14.1" />
     <PackageVersion Include="xunit" Version="2.4.1" />
