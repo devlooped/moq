@@ -29,7 +29,7 @@ namespace Moq.Sdk.Tests
 
             Assert.NotNull(recording.Execute(invocation, (m, n) => m.CreateReturn()));
 
-            Assert.Single(target.Mock.Invocations);
+            Assert.Single(target.Runtime.Invocations);
         }
 
         [Fact]
@@ -44,7 +44,7 @@ namespace Moq.Sdk.Tests
                 Assert.NotNull(tracking.Execute(invocation, (m, n) => m.CreateReturn()));
             }
 
-            Assert.Empty(target.Mock.Invocations);
+            Assert.Empty(target.Runtime.Invocations);
         }
 
         class TrackingMock : FakeMock

@@ -23,7 +23,7 @@ namespace Moq.Tests
 
             Assert.IsAssignableFrom<IMock<ICalculator>>(calculator);
             Assert.IsAssignableFrom<ICalculator>(calculator.Object);
-            Assert.Same(calculator.Object, calculator.Object.AsMock().Object);
+            Assert.Same(calculator.Object, MockRuntime.Get(calculator.Object).Object);
         }
 
         [Fact]
@@ -43,7 +43,7 @@ namespace Moq.Tests
             calculator.Add(2, 3);
             calculator.Mode();
 
-            Assert.Empty(calculator.Invocations);
+            Assert.Empty(calculator.Sdk.Invocations);
         }
 
         [Fact]
@@ -119,7 +119,7 @@ namespace Moq.Tests
             var called = false;
 
             var setup = calculator.Mode(CalculatorMode.Scientific);
-            calculator.GetPipeline(setup).Behaviors.Add(new AnonymousMockBehavior((m, i, next) =>
+            calculator.Sdk.GetPipeline(setup).Behaviors.Add(new AnonymousMockBehavior((m, i, next) =>
             {
                 called = true;
                 return i.CreateValueReturn(null, i.Arguments);
@@ -150,7 +150,7 @@ namespace Moq.Tests
             int x = 5, y = 10;
 
             var setup = calculator.TryAdd(ref x, ref y, out _);
-            calculator.GetPipeline(setup).Behaviors.Add(new AnonymousMockBehavior((m, i, next) =>
+            calculator.Sdk.GetPipeline(setup).Behaviors.Add(new AnonymousMockBehavior((m, i, next) =>
             {
                 i.Arguments.Set(2, (int?)(i.Arguments.Get<int>(0) + i.Arguments.Get<int>(1)));
                 return i.CreateValueReturn(true, i.Arguments);
@@ -171,7 +171,7 @@ namespace Moq.Tests
 
             var setup = calculator.Store("a", Any<int>());
 
-            Assert.Equal(2, calculator.Invocations.Count(setup.AppliesTo));
+            Assert.Equal(2, calculator.Sdk.Invocations.Count(setup.AppliesTo));
         }
 
         [Fact]
@@ -194,16 +194,16 @@ namespace Moq.Tests
             var calculator = Mock.Of2<Calculator>();
 
             calculator.Returns(calculator.Add(2, 3), 42);
-            Assert.Empty(calculator.Invocations);
+            Assert.Empty(calculator.Sdk.Invocations);
 
             Assert.Equal(42, calculator.Object.Add(2, 3));
-            Assert.Single(calculator.Invocations);
+            Assert.Single(calculator.Sdk.Invocations);
         }
 
         static IMethodInvocation Invocation(IMock<ICalculator> mock, Action<ICalculator> action)
         {
             action(mock.Object);
-            return mock.Invocations.Last();
+            return mock.Sdk.Invocations.Last();
         }
     }
 
@@ -213,7 +213,7 @@ namespace Moq.Tests
         /// Makes the given <paramref name="setup"/> return the given <paramref name="value"/>.
         /// </summary>
         public static void Returns<T>(this IMock<T> mock, IMockSetup setup, object? value) where T : class
-            => mock.GetPipeline(setup).Behaviors.Add(new AnonymousMockBehavior(
+            => mock.Sdk.GetPipeline(setup).Behaviors.Add(new AnonymousMockBehavior(
                 (m, i, next) => i.CreateValueReturn(value, i.Arguments), "Returns"));
     }
 }

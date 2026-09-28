@@ -23,7 +23,7 @@ namespace Moq
         /// </remarks>
         public static void Initialize(this IMocked mocked, MockBehavior behavior = MockBehavior.Loose)
         {
-            var mock = mocked.Mock;
+            var mock = mocked.Runtime;
             var behaviors = mock.Behaviors;
             (behaviors as ISupportInitialize)?.BeginInit();
 
@@ -31,7 +31,7 @@ namespace Moq
             {
                 behaviors.Clear();
 
-                mocked.AsMoq().Behavior = behavior;
+                mock.Behavior = behavior;
 
                 behaviors.Add(new SetupScopeBehavior());
                 behaviors.Add(new MockContextBehavior());

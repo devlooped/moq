@@ -1,4 +1,4 @@
-﻿using System.ComponentModel;
+using System.ComponentModel;
 using Moq.Sdk;
 
 namespace Moq
@@ -17,21 +17,21 @@ namespace Moq
             if (target is IMocked mocked && mocked != null)
             {
                 // Configure CallBase at the Mock level
-                mocked.AsMoq().CallBase = true;
+                MockRuntimeExtensions.SetCallBase(MockRuntime.Get(mocked), true);
             }
             else if (MockContext.CurrentInvocation != null)
             {
                 // Configure CallBase at the invocation level
-                MockContext.CurrentInvocation.Target.AsMock()
+                MockRuntime.Get(MockContext.CurrentInvocation.Target)
                     .GetPipeline(MockContext.CurrentSetup ?? CallContext.ThrowUnexpectedNull<IMockSetup>())
                     .Behaviors.Add(new AnonymousMockBehavior(
                          (m, i, next) =>
                          {
                              // set CallBase
-                             i.Context[nameof(IMoq.CallBase)] = true;
-                             return next().Invoke(i.Target.AsMock(), i, next);
+                             i.Context[nameof(IMock.CallBase)] = true;
+                             return next().Invoke(MockRuntime.Get(i.Target), i, next);
                          },
-                         nameof(IMoq.CallBase)));
+                         nameof(IMock.CallBase)));
             }
             // TODO: else throw?
 

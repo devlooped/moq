@@ -1,4 +1,4 @@
-﻿using System.ComponentModel;
+using System.ComponentModel;
 using Moq.Sdk;
 
 namespace Moq
@@ -14,7 +14,7 @@ namespace Moq
         /// </summary>
         public static T Named<T>(this T target, string name) where T : class
         {
-            target.AsMock().State.Set("Name", name);
+            MockRuntime.Get(target).State.Set("Name", name);
             return target;
         }
     }

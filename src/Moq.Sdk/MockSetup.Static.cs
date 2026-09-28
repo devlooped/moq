@@ -38,7 +38,7 @@ namespace Moq.Sdk
 
             var finalMatchers = new List<IArgumentMatcher>();
             var defaultValue = (invocation.Target as IMocked)?.
-                Mock.Behaviors.OfType<DefaultValueBehavior>().FirstOrDefault()?.Provider ??
+                Runtime.Behaviors.OfType<DefaultValueBehavior>().FirstOrDefault()?.Provider ??
                 new DefaultValueProvider();
 
             for (var i = 0; i < invocation.Arguments.Count; i++)

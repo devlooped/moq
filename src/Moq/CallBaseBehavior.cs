@@ -19,7 +19,7 @@ namespace Moq
         public IMethodReturn Execute(IMethodInvocation invocation, ExecuteHandler next)
         {
             // Check if CallBase is configured at the Mock or Invocation level
-            var shouldCallBase = invocation.Target.AsMoq().CallBase || invocation.Context.ContainsKey(nameof(IMoq.CallBase));
+            var shouldCallBase = MockRuntimeExtensions.GetCallBase(MockRuntime.Get(invocation.Target)) || invocation.Context.ContainsKey(nameof(IMock.CallBase));
 
             if (shouldCallBase)
             {
@@ -28,7 +28,7 @@ namespace Moq
 
                 // If there is a matching setup for the current invocation, skip the strict 
                 // behavior because CallBase should be called instead
-                if (invocation.Target.AsMock().Behaviors.OfType<IMockBehaviorPipeline>().Any(x => x.AppliesTo(invocation)))
+                if (MockRuntime.Get(invocation.Target).Behaviors.OfType<IMockBehaviorPipeline>().Any(x => x.AppliesTo(invocation)))
                     invocation.SkipBehaviors.Add(typeof(StrictMockBehavior));
             }
 

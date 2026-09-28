@@ -35,7 +35,7 @@ namespace Moq.CodeAnalysis
 
         public static MockSetup? Render(Compilation compilation, MockedType mocked, CancellationToken cancellation)
         {
-            if (compilation.GetTypeByMetadataName("Moq.Sdk.IMock`1") is not { } mockType ||
+            if (compilation.GetTypeByMetadataName("Moq.IMock`1") is not { } mockType ||
                 DocumentationCommentId.GetSymbolsForReferenceId(mocked.Id, compilation)
                     .OfType<INamedTypeSymbol>()
                     .FirstOrDefault(x => x.ContainingAssembly.Identity.GetDisplayName() == mocked.Assembly) is not { } type ||
@@ -216,7 +216,7 @@ namespace Moq.CodeAnalysis
             output.Append("            ").Append(invocation(self)).Append('\n');
             output.Append("            var ").Append(setup).Append(" = global::Moq.Sdk.MockContext.CurrentSetup ?? global::Moq.Sdk.CallContext.ThrowUnexpectedNull<")
                 .Append(MockSetup).Append(">();\n");
-            output.Append("            global::Moq.Sdk.MockExtensions.AsMock(").Append(setup).Append(".Invocation.Target).Invocations.Remove(")
+            output.Append("            global::Moq.Sdk.MockRuntime.Get(").Append(setup).Append(".Invocation.Target).Invocations.Remove(")
                 .Append(setup).Append(".Invocation);\n");
             output.Append("            return ").Append(setup).Append(";\n");
             output.Append("        }\n");

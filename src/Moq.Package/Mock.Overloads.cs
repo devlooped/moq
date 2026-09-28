@@ -92,39 +92,39 @@ namespace Moq
         /// </summary>
         [MockGenerator]
         [CompilerGenerated]
-        public static IMock<T> Of2<T>(params object[] constructorArgs) where T : class => Create<T>(MockBehavior.Loose, constructorArgs).AsMock();
+        public static IMock<T> Of2<T>(params object[] constructorArgs) where T : class => new MockView<T>(Create<T>(MockBehavior.Loose, constructorArgs));
 
         [MockGenerator]
         [CompilerGenerated]
-        public static IMock<T> Of2<T, T1>(params object[] constructorArgs) where T : class => Create<T>(MockBehavior.Loose, constructorArgs, typeof(T1)).AsMock();
+        public static IMock<T> Of2<T, T1>(params object[] constructorArgs) where T : class => new MockView<T>(Create<T>(MockBehavior.Loose, constructorArgs, typeof(T1)));
 
         [MockGenerator]
         [CompilerGenerated]
-        public static IMock<T> Of2<T, T1, T2>(params object[] constructorArgs) where T : class => Create<T>(MockBehavior.Loose, constructorArgs, typeof(T1), typeof(T2)).AsMock();
+        public static IMock<T> Of2<T, T1, T2>(params object[] constructorArgs) where T : class => new MockView<T>(Create<T>(MockBehavior.Loose, constructorArgs, typeof(T1), typeof(T2)));
 
         [MockGenerator]
         [CompilerGenerated]
-        public static IMock<T> Of2<T, T1, T2, T3>(params object[] constructorArgs) where T : class => Create<T>(MockBehavior.Loose, constructorArgs, typeof(T1), typeof(T2), typeof(T3)).AsMock();
+        public static IMock<T> Of2<T, T1, T2, T3>(params object[] constructorArgs) where T : class => new MockView<T>(Create<T>(MockBehavior.Loose, constructorArgs, typeof(T1), typeof(T2), typeof(T3)));
 
         [MockGenerator]
         [CompilerGenerated]
-        public static IMock<T> Of2<T, T1, T2, T3, T4>(params object[] constructorArgs) where T : class => Create<T>(MockBehavior.Loose, constructorArgs, typeof(T1), typeof(T2), typeof(T3), typeof(T4)).AsMock();
+        public static IMock<T> Of2<T, T1, T2, T3, T4>(params object[] constructorArgs) where T : class => new MockView<T>(Create<T>(MockBehavior.Loose, constructorArgs, typeof(T1), typeof(T2), typeof(T3), typeof(T4)));
 
         [MockGenerator]
         [CompilerGenerated]
-        public static IMock<T> Of2<T, T1, T2, T3, T4, T5>(params object[] constructorArgs) where T : class => Create<T>(MockBehavior.Loose, constructorArgs, typeof(T1), typeof(T2), typeof(T3), typeof(T4), typeof(T5)).AsMock();
+        public static IMock<T> Of2<T, T1, T2, T3, T4, T5>(params object[] constructorArgs) where T : class => new MockView<T>(Create<T>(MockBehavior.Loose, constructorArgs, typeof(T1), typeof(T2), typeof(T3), typeof(T4), typeof(T5)));
 
         [MockGenerator]
         [CompilerGenerated]
-        public static IMock<T> Of2<T, T1, T2, T3, T4, T5, T6>(params object[] constructorArgs) where T : class => Create<T>(MockBehavior.Loose, constructorArgs, typeof(T1), typeof(T2), typeof(T3), typeof(T4), typeof(T5), typeof(T6)).AsMock();
+        public static IMock<T> Of2<T, T1, T2, T3, T4, T5, T6>(params object[] constructorArgs) where T : class => new MockView<T>(Create<T>(MockBehavior.Loose, constructorArgs, typeof(T1), typeof(T2), typeof(T3), typeof(T4), typeof(T5), typeof(T6)));
 
         [MockGenerator]
         [CompilerGenerated]
-        public static IMock<T> Of2<T, T1, T2, T3, T4, T5, T6, T7>(params object[] constructorArgs) where T : class => Create<T>(MockBehavior.Loose, constructorArgs, typeof(T1), typeof(T2), typeof(T3), typeof(T4), typeof(T5), typeof(T6), typeof(T7)).AsMock();
+        public static IMock<T> Of2<T, T1, T2, T3, T4, T5, T6, T7>(params object[] constructorArgs) where T : class => new MockView<T>(Create<T>(MockBehavior.Loose, constructorArgs, typeof(T1), typeof(T2), typeof(T3), typeof(T4), typeof(T5), typeof(T6), typeof(T7)));
 
         [MockGenerator]
         [CompilerGenerated]
-        public static IMock<T> Of2<T, T1, T2, T3, T4, T5, T6, T7, T8>(params object[] constructorArgs) where T : class => Create<T>(MockBehavior.Loose, constructorArgs, typeof(T1), typeof(T2), typeof(T3), typeof(T4), typeof(T5), typeof(T6), typeof(T7), typeof(T8)).AsMock();
+        public static IMock<T> Of2<T, T1, T2, T3, T4, T5, T6, T7, T8>(params object[] constructorArgs) where T : class => new MockView<T>(Create<T>(MockBehavior.Loose, constructorArgs, typeof(T1), typeof(T2), typeof(T3), typeof(T4), typeof(T5), typeof(T6), typeof(T7), typeof(T8)));
 
         /// <summary>
         /// Creates a mock that inherits or implements the type <typeparamref name="T"/> 
@@ -132,38 +132,38 @@ namespace Moq
         /// </summary>
         [MockGenerator]
         [CompilerGenerated]
-        public static IMock<T> Of2<T>(MockBehavior behavior, params object[] constructorArgs) where T : class => Create<T>(behavior, constructorArgs).AsMock();
+        public static IMock<T> Of2<T>(MockBehavior behavior, params object[] constructorArgs) where T : class => new MockView<T>(Create<T>(behavior, constructorArgs));
 
         [MockGenerator]
         [CompilerGenerated]
-        public static IMock<T> Of2<T, T1>(MockBehavior behavior, params object[] constructorArgs) where T : class => Create<T>(behavior, constructorArgs, typeof(T1)).AsMock();
+        public static IMock<T> Of2<T, T1>(MockBehavior behavior, params object[] constructorArgs) where T : class => new MockView<T>(Create<T>(behavior, constructorArgs, typeof(T1)));
 
         [MockGenerator]
         [CompilerGenerated]
-        public static IMock<T> Of2<T, T1, T2>(MockBehavior behavior, params object[] constructorArgs) where T : class => Create<T>(behavior, constructorArgs, typeof(T1), typeof(T2)).AsMock();
+        public static IMock<T> Of2<T, T1, T2>(MockBehavior behavior, params object[] constructorArgs) where T : class => new MockView<T>(Create<T>(behavior, constructorArgs, typeof(T1), typeof(T2)));
 
         [MockGenerator]
         [CompilerGenerated]
-        public static IMock<T> Of2<T, T1, T2, T3>(MockBehavior behavior, params object[] constructorArgs) where T : class => Create<T>(behavior, constructorArgs, typeof(T1), typeof(T2), typeof(T3)).AsMock();
+        public static IMock<T> Of2<T, T1, T2, T3>(MockBehavior behavior, params object[] constructorArgs) where T : class => new MockView<T>(Create<T>(behavior, constructorArgs, typeof(T1), typeof(T2), typeof(T3)));
 
         [MockGenerator]
         [CompilerGenerated]
-        public static IMock<T> Of2<T, T1, T2, T3, T4>(MockBehavior behavior, params object[] constructorArgs) where T : class => Create<T>(behavior, constructorArgs, typeof(T1), typeof(T2), typeof(T3), typeof(T4)).AsMock();
+        public static IMock<T> Of2<T, T1, T2, T3, T4>(MockBehavior behavior, params object[] constructorArgs) where T : class => new MockView<T>(Create<T>(behavior, constructorArgs, typeof(T1), typeof(T2), typeof(T3), typeof(T4)));
 
         [MockGenerator]
         [CompilerGenerated]
-        public static IMock<T> Of2<T, T1, T2, T3, T4, T5>(MockBehavior behavior, params object[] constructorArgs) where T : class => Create<T>(behavior, constructorArgs, typeof(T1), typeof(T2), typeof(T3), typeof(T4), typeof(T5)).AsMock();
+        public static IMock<T> Of2<T, T1, T2, T3, T4, T5>(MockBehavior behavior, params object[] constructorArgs) where T : class => new MockView<T>(Create<T>(behavior, constructorArgs, typeof(T1), typeof(T2), typeof(T3), typeof(T4), typeof(T5)));
 
         [MockGenerator]
         [CompilerGenerated]
-        public static IMock<T> Of2<T, T1, T2, T3, T4, T5, T6>(MockBehavior behavior, params object[] constructorArgs) where T : class => Create<T>(behavior, constructorArgs, typeof(T1), typeof(T2), typeof(T3), typeof(T4), typeof(T5), typeof(T6)).AsMock();
+        public static IMock<T> Of2<T, T1, T2, T3, T4, T5, T6>(MockBehavior behavior, params object[] constructorArgs) where T : class => new MockView<T>(Create<T>(behavior, constructorArgs, typeof(T1), typeof(T2), typeof(T3), typeof(T4), typeof(T5), typeof(T6)));
 
         [MockGenerator]
         [CompilerGenerated]
-        public static IMock<T> Of2<T, T1, T2, T3, T4, T5, T6, T7>(MockBehavior behavior, params object[] constructorArgs) where T : class => Create<T>(behavior, constructorArgs, typeof(T1), typeof(T2), typeof(T3), typeof(T4), typeof(T5), typeof(T6), typeof(T7)).AsMock();
+        public static IMock<T> Of2<T, T1, T2, T3, T4, T5, T6, T7>(MockBehavior behavior, params object[] constructorArgs) where T : class => new MockView<T>(Create<T>(behavior, constructorArgs, typeof(T1), typeof(T2), typeof(T3), typeof(T4), typeof(T5), typeof(T6), typeof(T7)));
 
         [MockGenerator]
         [CompilerGenerated]
-        public static IMock<T> Of2<T, T1, T2, T3, T4, T5, T6, T7, T8>(MockBehavior behavior, params object[] constructorArgs) where T : class => Create<T>(behavior, constructorArgs, typeof(T1), typeof(T2), typeof(T3), typeof(T4), typeof(T5), typeof(T6), typeof(T7), typeof(T8)).AsMock();
+        public static IMock<T> Of2<T, T1, T2, T3, T4, T5, T6, T7, T8>(MockBehavior behavior, params object[] constructorArgs) where T : class => new MockView<T>(Create<T>(behavior, constructorArgs, typeof(T1), typeof(T2), typeof(T3), typeof(T4), typeof(T5), typeof(T6), typeof(T7), typeof(T8)));
     }
 }

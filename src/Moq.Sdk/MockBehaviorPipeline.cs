@@ -37,7 +37,7 @@ namespace Moq.Sdk
         /// </summary>
         public IMethodReturn Execute(IMethodInvocation invocation, ExecuteHandler next)
         {
-            var mock = (invocation.Target as IMocked)?.Mock ?? throw new ArgumentException(ThisAssembly.Strings.TargetNotMock);
+            var mock = (invocation.Target as IMocked)?.Runtime ?? throw new ArgumentException(ThisAssembly.Strings.TargetNotMock);
 
             // NOTE: the mock behavior is like a sub-pipeline within the overall stunt 
             // behavior pipeline, where all the behaviors added automatically apply 

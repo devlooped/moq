@@ -15,7 +15,7 @@ namespace Moq
         /// <summary>
         /// Gets the configuration and introspection for the given mocked instance.
         /// </summary>
-        public static IMoq<T> Get<T>(T instance) where T : class => new Moq<T>(instance.AsMock());
+        public static IMock<T> Get<T>(T instance) where T : class => new MockView<T>(instance);
 
         /// <summary>
         /// Creates the mock instance by using the specified types to 

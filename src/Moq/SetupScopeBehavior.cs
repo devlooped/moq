@@ -31,7 +31,7 @@ namespace Moq
         /// </summary>
         public IMethodReturn Execute(IMethodInvocation invocation, ExecuteHandler next)
         {
-            foreach (var behavior in invocation.Target.AsMock().Behaviors.Where(x => !setupScopeBehaviors.Contains(x.GetType())))
+            foreach (var behavior in MockRuntime.Get(invocation.Target).Behaviors.Where(x => !setupScopeBehaviors.Contains(x.GetType())))
             {
                 invocation.SkipBehaviors.Add(behavior.GetType());
             }

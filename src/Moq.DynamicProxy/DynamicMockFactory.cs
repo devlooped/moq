@@ -36,19 +36,19 @@ namespace Moq.Sdk
             // The lazy-calculated value allows us to provide a new interceptor for every retrieval. 
             // Add first-class support in statebag for this pattern of either Func<T> for values, or 
             // Lazy<T>, since both could be quite useful for expensive state that may be needed lazily.
-            mocked.Mock.State.Set(".ctor", () => new object[] { new IInterceptor[] { new MockInterceptor(), getDefaultInterceptor() } }.Concat(constructorArguments).ToArray());
+            mocked.Runtime.State.Set(".ctor", () => new object[] { new IInterceptor[] { new MockInterceptor(), getDefaultInterceptor() } }.Concat(constructorArguments).ToArray());
 
             return mocked;
         }
 
         class MockInterceptor : IInterceptor
         {
-            IMock? mock;
+            IMockRuntime? mock;
 
             public void Intercept(IInvocation invocation)
             {
                 if (invocation.Method.DeclaringType == typeof(IMocked))
-                    invocation.ReturnValue = LazyInitializer.EnsureInitialized(ref mock, () => new DefaultMock((IStunt)invocation.Proxy));
+                    invocation.ReturnValue = LazyInitializer.EnsureInitialized(ref mock, () => new DefaultMockRuntime((IStunt)invocation.Proxy));
                 else
                     invocation.Proceed();
             }

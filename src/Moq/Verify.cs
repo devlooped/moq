@@ -14,7 +14,7 @@ namespace Moq
         /// <summary>
         /// Gets whether the given mock is being verified.
         /// </summary>
-        internal static bool IsVerifying(IMock mock)
+        internal static bool IsVerifying(IMockRuntime mock)
             => mock.State.TryGetValue<bool>(typeof(Verify), out var verifying) && verifying;
 
         /// <summary>
@@ -65,7 +65,7 @@ namespace Moq
             {
                 function();
                 var setup = MockContext.CurrentSetup ?? CallContext.ThrowUnexpectedNull<IMockSetup>();
-                var mock = (MockContext.CurrentInvocation ?? CallContext.ThrowUnexpectedNull<IMethodInvocation>()).Target.AsMock();
+                var mock = MockRuntime.Get((MockContext.CurrentInvocation ?? CallContext.ThrowUnexpectedNull<IMethodInvocation>()).Target);
                 var calls = mock.Invocations.Where(x => setup.AppliesTo(x));
                 if (!times.Validate(calls.Count()))
                     throw new VerifyException(mock, setup, message);
@@ -112,7 +112,7 @@ namespace Moq
             {
                 action();
                 var setup = MockContext.CurrentSetup ?? CallContext.ThrowUnexpectedNull<IMockSetup>();
-                var mock = (MockContext.CurrentInvocation ?? CallContext.ThrowUnexpectedNull<IMethodInvocation>()).Target.AsMock();
+                var mock = MockRuntime.Get((MockContext.CurrentInvocation ?? CallContext.ThrowUnexpectedNull<IMethodInvocation>()).Target);
                 var calls = mock.Invocations.Where(x => setup.AppliesTo(x));
                 if (!times.Validate(calls.Count()))
                     throw new VerifyException(mock, setup, message);
@@ -125,7 +125,7 @@ namespace Moq
         /// object too.
         /// </summary>
         /// <returns>An object that can be used to perform additional call verifications.</returns>
-        public static T NotCalled<T>(T target) where T : class => GetVerifier(GetVerified(target), true);
+        public static T NotCalled<T>(T target) where T : class => GetVerifier<T>(GetVerified(target), true);
 
         /// <summary>
         /// Verifies a method invocation matching the <paramref name="function"/> was never called.
@@ -147,7 +147,7 @@ namespace Moq
         /// object too.
         /// </summary>
         /// <returns>An object that can be used to perform additional call verifications.</returns>
-        public static T Calls<T>(T target) where T : class => GetVerifier(GetVerified(target));
+        public static T Calls<T>(T target) where T : class => GetVerifier<T>(GetVerified(target));
 
         /// <summary>
         /// Allows performing custom verification against all actual calls that match the 
@@ -161,7 +161,7 @@ namespace Moq
             {
                 function();
                 var setup = MockContext.CurrentSetup ?? CallContext.ThrowUnexpectedNull<IMockSetup>();
-                var mock = (MockContext.CurrentInvocation ?? CallContext.ThrowUnexpectedNull<IMethodInvocation>()).Target.AsMock();
+                var mock = MockRuntime.Get((MockContext.CurrentInvocation ?? CallContext.ThrowUnexpectedNull<IMethodInvocation>()).Target);
                 calls.Invoke(mock.Invocations.Where(x => setup.AppliesTo(x)));
             }
         }
@@ -178,7 +178,7 @@ namespace Moq
             {
                 action();
                 var setup = MockContext.CurrentSetup ?? CallContext.ThrowUnexpectedNull<IMockSetup>();
-                var mock = (MockContext.CurrentInvocation ?? CallContext.ThrowUnexpectedNull<IMethodInvocation>()).Target.AsMock();
+                var mock = MockRuntime.Get((MockContext.CurrentInvocation ?? CallContext.ThrowUnexpectedNull<IMethodInvocation>()).Target);
                 calls.Invoke(mock.Invocations.Where(x => setup.AppliesTo(x)));
             }
         }
@@ -187,9 +187,9 @@ namespace Moq
         /// Gets the mock after verifying that all setups that specified occurrence 
         /// constraints have succeeded.
         /// </summary>
-        static IMock<T> GetVerified<T>(T target) where T : class
+        static IMockRuntime GetVerified<T>(T target) where T : class
         {
-            var mock = target.AsMock();
+            var mock = MockRuntime.Get(target);
             var failures = (from pipeline in mock.Setups
                             where pipeline.Setup.Occurrence != null
                             let times = pipeline.Setup.Occurrence!.Value
@@ -211,15 +211,15 @@ namespace Moq
         /// <param name="notCalled">Whether to add a behavior that verifies the invocations performed on 
         /// the clone were never performed on the original mock.
         /// </param>
-        static T GetVerifier<T>(IMock<T> mock, bool notCalled = false) where T : class
+        static T GetVerifier<T>(IMockRuntime mock, bool notCalled = false) where T : class
         {
             // If the mock is already being verified, we don't need to clone again.
             if (mock.State.TryGetValue<bool>(typeof(Verify), out var verifying) && verifying)
-                return mock.Object;
+                return (T)mock.Object;
 
             // Otherwise, we create a verification copy that does not record invocations 
             // and has default behavior.
-            var clone = mock.Clone();
+            var clone = MockRuntime.Clone(mock);
 
             var recording = clone.Behaviors.OfType<MockRecordingBehavior>().FirstOrDefault();
             if (recording != null)
@@ -231,11 +231,11 @@ namespace Moq
                     new NotCalledBehavior());
 
             // Sets up the right behaviors for a loose mock
-            new Moq<T>(clone).Behavior = MockBehavior.Loose;
+            clone.Behavior = MockBehavior.Loose;
 
             clone.State.Set(typeof(Verify), true);
 
-            return clone.Object;
+            return (T)clone.Object;
         }
 
         class NotCalledBehavior : IStuntBehavior
@@ -244,7 +244,7 @@ namespace Moq
 
             public IMethodReturn Execute(IMethodInvocation invocation, ExecuteHandler next)
             {
-                var mock = invocation.Target.AsMock();
+                var mock = MockRuntime.Get(invocation.Target);
                 var setup = MockContext.CurrentSetup ?? CallContext.ThrowUnexpectedNull<IMockSetup>();
                 if (mock.Invocations.Where(x => setup.AppliesTo(x)).Any())
                     throw new VerifyException(mock, setup);

@@ -144,7 +144,7 @@ namespace Moq.CodeAnalysis.UnitTests
             {
                 Assert.True(method.IsExtensionMethod);
                 Assert.Equal("Moq.Sdk.IMockSetup", method.ReturnType.ToDisplayString());
-                Assert.Equal("Moq.Sdk.IMock<Sample.ICalculator>", method.Parameters[0].Type.ToDisplayString());
+                Assert.Equal("Moq.IMock<Sample.ICalculator>", method.Parameters[0].Type.ToDisplayString());
             });
         }
 
@@ -156,12 +156,12 @@ namespace Moq.CodeAnalysis.UnitTests
 
             Assert.Contains(
                 """
-                        public static global::Moq.Sdk.IMockSetup Add(this global::Moq.Sdk.IMock<global::Sample.ICalculator> mock, int x, int y)
+                        public static global::Moq.Sdk.IMockSetup Add(this global::Moq.IMock<global::Sample.ICalculator> mock, int x, int y)
                         {
                             global::Moq.Sdk.MockContext.CurrentSetup = null;
                             mock.Object.Add(x, y);
                             var setup = global::Moq.Sdk.MockContext.CurrentSetup ?? global::Moq.Sdk.CallContext.ThrowUnexpectedNull<global::Moq.Sdk.IMockSetup>();
-                            global::Moq.Sdk.MockExtensions.AsMock(setup.Invocation.Target).Invocations.Remove(setup.Invocation);
+                            global::Moq.Sdk.MockRuntime.Get(setup.Invocation.Target).Invocations.Remove(setup.Invocation);
                             return setup;
                         }
                 """.Replace("\r\n", "\n"),
@@ -198,7 +198,7 @@ namespace Moq.CodeAnalysis.UnitTests
                         setup = calculator.Item("foo");
                         setup = calculator.Item("foo", 5);
                         setup = calculator.TurnOn();
-                        setup = Mock.Of<ICalculator>().AsMock().Recall("foo");
+                        setup = Mock.Get(Mock.Of<ICalculator>()).Recall("foo");
                     }
                 }
                 """), out var output);
@@ -248,7 +248,7 @@ namespace Moq.CodeAnalysis.UnitTests
 
                 static class Calls
                 {
-                    static void Run(Moq.Sdk.IMock<ILogger> logger)
+                    static void Run(Moq.IMock<ILogger> logger)
                     {
                         logger.Log("started");
                         logger.Log("done", Level.Info, "app", 1, "a", "b");
@@ -302,8 +302,8 @@ namespace Moq.CodeAnalysis.UnitTests
                 public interface IConflicts
                 {
                     object Object { get; }
-                    void State();
-                    void Invocations(int count);
+                    void Behavior();
+                    void CallBase(int count);
                     string ToString(int format);
                     void Run();
                 }

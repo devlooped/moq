@@ -6,8 +6,13 @@ namespace Moq
     /// <summary>
     /// Provides configuration information for a mock.
     /// </summary>
-    public interface IMoq : IMock
+    public interface IMock : IFluentInterface
     {
+        /// <summary>
+        /// The mocked object instance.
+        /// </summary>
+        object Object { get; }
+
         /// <summary>
         /// Gets the <see cref="MockBehavior"/> of the mock.
         /// </summary>
@@ -20,8 +25,8 @@ namespace Moq
         DefaultValueProvider DefaultValue { get; set; }
 
         /// <summary>
-		/// Whether the base member virtual implementation will be called for mocked classes if no setup is matched.
-		/// Defaults to <see langword="false"/>.
+        /// Whether the base member virtual implementation will be called for mocked classes if no setup is matched.
+        /// Defaults to <see langword="false"/>.
         /// </summary>
         bool CallBase { get; set; }
     }

@@ -34,7 +34,7 @@ namespace Moq.Sdk
                 {
                     try
                     {
-                        var mock = ((IMocked)invocation.Target).Mock;
+                        var mock = ((IMocked)invocation.Target).Runtime;
                         mock.Invocations.Remove(invocation);
                         if (mock.State.TryGetValue<Delegate>(info.Name, out var handler) &&
                             handler != null)
@@ -65,7 +65,7 @@ namespace Moq.Sdk
                     if (invocation.Arguments.Count == 1 &&
                         invocation.Arguments.GetValue(0) is Delegate handler)
                     {
-                        var mock = ((IMocked)invocation.Target).Mock;
+                        var mock = ((IMocked)invocation.Target).Runtime;
                         if (invocation.MethodBase.Name.StartsWith("add_", StringComparison.Ordinal))
                             CombineDelegate(info, handler, mock);
                         else
@@ -77,7 +77,7 @@ namespace Moq.Sdk
             return next(invocation, next);
         }
 
-        static void CombineDelegate(EventInfo info, Delegate handler, IMock mock)
+        static void CombineDelegate(EventInfo info, Delegate handler, IMockRuntime mock)
         {
             var state = mock.State.GetOrAdd(info.Name, () => handler);
             if (state != handler)
@@ -101,7 +101,7 @@ namespace Moq.Sdk
             }
         }
 
-        static void RemoveDelegate(EventInfo info, Delegate handler, IMock mock)
+        static void RemoveDelegate(EventInfo info, Delegate handler, IMockRuntime mock)
         {
             if (mock.State.TryGetValue<Delegate>(info.Name, out var state))
             {

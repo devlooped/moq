@@ -1,4 +1,4 @@
-﻿using System.ComponentModel;
+using System.ComponentModel;
 using System.Linq;
 using Moq.Sdk;
 
@@ -27,7 +27,7 @@ namespace Moq
             if (setup != null)
             {
                 setup.Occurrence = Sdk.Times.AtLeastOnce;
-                var mock = setup.Invocation.Target.AsMock();
+                var mock = MockRuntime.Get(setup.Invocation.Target);
                 if (Verify.IsVerifying(mock))
                 {
                     var calls = mock.Invocations.Where(call => setup.AppliesTo(call));
@@ -53,7 +53,7 @@ namespace Moq
             if (setup != null)
             {
                 setup.Occurrence = Sdk.Times.Once;
-                var mock = setup.Invocation.Target.AsMock();
+                var mock = MockRuntime.Get(setup.Invocation.Target);
                 if (Verify.IsVerifying(mock))
                 {
                     var calls = mock.Invocations.Where(call => setup.AppliesTo(call)).Take(2).ToArray();
@@ -79,7 +79,7 @@ namespace Moq
             if (setup != null)
             {
                 setup.Occurrence = Sdk.Times.Never;
-                var mock = setup.Invocation.Target.AsMock();
+                var mock = MockRuntime.Get(setup.Invocation.Target);
                 if (Verify.IsVerifying(mock))
                 {
                     if (mock.Invocations.Where(call => setup.AppliesTo(call)).Any())
@@ -104,7 +104,7 @@ namespace Moq
             if (setup != null)
             {
                 setup.Occurrence = Sdk.Times.Exactly(callCount);
-                var mock = setup.Invocation.Target.AsMock();
+                var mock = MockRuntime.Get(setup.Invocation.Target);
                 if (Verify.IsVerifying(mock))
                 {
                     if (mock.Invocations.Where(call => setup.AppliesTo(call)).Count() != callCount)

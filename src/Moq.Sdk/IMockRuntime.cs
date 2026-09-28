@@ -4,9 +4,11 @@ using Stunts;
 namespace Moq.Sdk
 {
     /// <summary>
-    /// Provides introspection information about a mock.
+    /// Provides introspection and low-level access to the runtime 
+    /// state of a mock: its behavior pipeline, invocations, setups 
+    /// and arbitrary state.
     /// </summary>
-    public interface IMock : IStunt
+    public interface IMockRuntime : IStunt
     {
         /// <summary>
         /// Returns a <see cref="IMockBehaviorPipeline"/> for the given <see cref="IMockSetup"/>.
@@ -20,7 +22,7 @@ namespace Moq.Sdk
         ICollection<IMethodInvocation> Invocations { get; }
 
         /// <summary>
-        /// The mock object this introspection data belongs to.
+        /// The mock object this runtime belongs to.
         /// </summary>
         object Object { get; }
 

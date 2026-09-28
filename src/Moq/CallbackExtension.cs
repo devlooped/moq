@@ -16,7 +16,7 @@ namespace Moq
             var setup = MockContext.CurrentSetup;
             if (setup != null)
             {
-                var mock = setup.Invocation.Target.AsMock();
+                var mock = MockRuntime.Get(setup.Invocation.Target);
 
                 mock.Invocations.Remove(setup.Invocation);
                 var behavior = mock.GetPipeline(setup);
@@ -37,7 +37,7 @@ namespace Moq
 
                             // Note we're tweaking the GetNextBehavior to always 
                             // call us, before invoking the actual next behavior.
-                            var result = wrapped.Execute(m, i, () => (IMock _, IMethodInvocation __, GetNextMockBehavior ___) =>
+                            var result = wrapped.Execute(m, i, () => (IMockRuntime _, IMethodInvocation __, GetNextMockBehavior ___) =>
                             {
                                 callback(i.Arguments);
                                 called = true;

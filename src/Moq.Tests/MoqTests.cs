@@ -28,7 +28,7 @@ namespace Moq.Tests
 
             calculator.Setup(c => c.TurnOn());
 
-            Assert.Empty(calculator.AsMock().Invocations);
+            Assert.Empty(MockRuntime.Get(calculator).Invocations);
         }
 
         [Fact]
@@ -41,10 +41,10 @@ namespace Moq.Tests
             EventHandler handler = (sender, args) => raised = true;
             calculator.TurnedOn += handler;
 
-            Assert.Equal(1, calculator.AsMock().Invocations.Count);
+            Assert.Equal(1, MockRuntime.Get(calculator).Invocations.Count);
             calculator.TurnedOn += Raise();
             // Raising events should not increase invocation count.
-            Assert.Equal(1, calculator.AsMock().Invocations.Count);
+            Assert.Equal(1, MockRuntime.Get(calculator).Invocations.Count);
 
             Assert.True(raised);
 
@@ -415,7 +415,7 @@ namespace Moq.Tests
 
             Assert.Equal(4, calculator.Add(2, 2));
 
-            Assert.Equal(1, calculator.AsMock().Invocations.Count);
+            Assert.Equal(1, MockRuntime.Get(calculator).Invocations.Count);
         }
 
         [Fact]
@@ -424,7 +424,7 @@ namespace Moq.Tests
             var calculator = Mock.Of<ICalculator>();
 
             calculator.TurnOn();
-            Assert.Single(calculator.AsMock().InvocationsFor(c => c.TurnOn()));
+            Assert.Single(MockRuntime.InvocationsFor(() => calculator.TurnOn()));
 
             calculator.Add(2, 3);
 
@@ -434,8 +434,8 @@ namespace Moq.Tests
             var ex = Record.Exception(() => calculator.Verify(c => c.Store(Any<string>(), Any<int>())));
 
             Assert.IsAssignableFrom<VerifyException>(ex);
-            Assert.Single(calculator.AsMock().InvocationsFor(c => c.Add(2, 3)));
-            Assert.Empty(calculator.AsMock().InvocationsFor(c => c.Add(Not(2), Not(3))));
+            Assert.Single(MockRuntime.InvocationsFor(() => calculator.Add(2, 3)));
+            Assert.Empty(MockRuntime.InvocationsFor(() => calculator.Add(Not(2), Not(3))));
         }
 
         [Fact]

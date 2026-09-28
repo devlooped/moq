@@ -7,16 +7,16 @@ using Xunit;
 
 namespace Moq.Sdk.Tests
 {
-    public class DefaultMockTests
+    public class DefaultMockRuntimeTests
     {
         [Fact]
         public void ThrowsIfNullStunt()
-            => Assert.Throws<ArgumentNullException>(() => new DefaultMock(null));
+            => Assert.Throws<ArgumentNullException>(() => new DefaultMockRuntime(null));
 
         [Fact]
         public void AddsMockContextBehavior()
         {
-            var mock = new DefaultMock(new FakeStunt());
+            var mock = new DefaultMockRuntime(new FakeStunt());
 
             Assert.Contains(mock.Behaviors, x => x is MockContextBehavior);
         }
@@ -24,7 +24,7 @@ namespace Moq.Sdk.Tests
         [Fact]
         public void AddsMockRecordingBehavior()
         {
-            var mock = new DefaultMock(new FakeStunt());
+            var mock = new DefaultMockRuntime(new FakeStunt());
 
             Assert.Contains(mock.Behaviors, x => x is MockRecordingBehavior);
         }
@@ -32,7 +32,7 @@ namespace Moq.Sdk.Tests
         [Fact]
         public void PreventsDuplicateMockContextBehavior()
         {
-            var mock = new DefaultMock(new FakeStunt());
+            var mock = new DefaultMockRuntime(new FakeStunt());
 
             Assert.Throws<InvalidOperationException>(() => mock.Behaviors.Add(new MockContextBehavior()));
         }
@@ -40,7 +40,7 @@ namespace Moq.Sdk.Tests
         [Fact]
         public void PreventsDuplicateMockRecordingBehavior()
         {
-            var mock = new DefaultMock(new FakeStunt());
+            var mock = new DefaultMockRuntime(new FakeStunt());
 
             Assert.Throws<InvalidOperationException>(() => mock.Behaviors.Add(new MockRecordingBehavior()));
         }
@@ -50,7 +50,7 @@ namespace Moq.Sdk.Tests
         {
             var stunt = new FakeStunt();
             // Forces initialization of the default mock.
-            Assert.NotNull(stunt.Mock);
+            Assert.NotNull(stunt.Runtime);
 
             var setup = new MockSetup(
                 MethodInvocation.Create(stunt, typeof(FakeStunt).GetMethod("Do")),
@@ -63,13 +63,13 @@ namespace Moq.Sdk.Tests
             stunt.AddBehavior((m, n) => n(m, n));
             Assert.Equal(initialBehaviors + 2, stunt.Behaviors.Count);
 
-            Assert.Single(stunt.Mock.Setups);
-            Assert.Same(behavior, stunt.Mock.GetPipeline(setup));
+            Assert.Single(stunt.Runtime.Setups);
+            Assert.Same(behavior, stunt.Runtime.GetPipeline(setup));
 
             stunt.Behaviors.Remove(behavior);
 
             Assert.Equal(initialBehaviors + 1, stunt.Behaviors.Count);
-            Assert.Empty(stunt.Mock.Setups);
+            Assert.Empty(stunt.Runtime.Setups);
         }
 
         [Fact]
@@ -77,39 +77,39 @@ namespace Moq.Sdk.Tests
         {
             var stunt = new FakeStunt();
             // Forces initialization of the default mock.
-            Assert.NotNull(stunt.Mock);
+            Assert.NotNull(stunt.Runtime);
 
             var initialBehaviors = stunt.Behaviors.Count;
             var setup = new MockSetup(
                 MethodInvocation.Create(stunt, typeof(FakeStunt).GetMethod("Do")),
                 Array.Empty<IArgumentMatcher>());
 
-            var behavior = stunt.Mock.GetPipeline(setup);
+            var behavior = stunt.Runtime.GetPipeline(setup);
 
             Assert.NotNull(behavior);
             Assert.Equal(initialBehaviors + 1, stunt.Behaviors.Count);
-            Assert.Single(stunt.Mock.Setups);
+            Assert.Single(stunt.Runtime.Setups);
         }
 
         [Fact]
         public void TracksTargetObject()
         {
             var stunt = new FakeStunt();
-            Assert.Same(stunt, stunt.Mock.Object);
+            Assert.Same(stunt, stunt.Runtime.Object);
         }
 
         [Fact]
         public void InitializesState()
-            => Assert.NotNull(new FakeStunt().Mock.State);
+            => Assert.NotNull(new FakeStunt().Runtime.State);
 
         class FakeStunt : IStunt, IMocked
         {
             readonly BehaviorPipeline pipeline = new BehaviorPipeline();
-            DefaultMock mock;
+            DefaultMockRuntime mock;
 
             public IList<IStuntBehavior> Behaviors => pipeline.Behaviors;
 
-            public IMock Mock => LazyInitializer.EnsureInitialized(ref mock, () => new DefaultMock(this));
+            public IMockRuntime Runtime => LazyInitializer.EnsureInitialized(ref mock, () => new DefaultMockRuntime(this));
 
             public void Do() => pipeline.Execute(MethodInvocation.Create(this, MethodBase.GetCurrentMethod()));
         }
