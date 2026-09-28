@@ -5,17 +5,17 @@ namespace Moq.Sdk
 {
     /// <summary>
     /// Interface implemented by mocks that allows accessing 
-    /// the <see cref="IMock"/> interface for introspecting 
+    /// the <see cref="IMockRuntime"/> for introspecting 
     /// a mock instance.
     /// </summary>
     [CompilerGenerated]
     public interface IMocked
     {
         /// <summary>
-        /// The introspection information for the current mock.
+        /// The runtime information for the current mock.
         /// </summary>
-        [DebuggerDisplay("Invocations = {Mock.Invocations.Count}", Name = nameof(IMocked) + "." + nameof(Mock))]
+        [DebuggerDisplay("Invocations = {Runtime.Invocations.Count}", Name = nameof(IMocked) + "." + nameof(Runtime))]
         [DebuggerBrowsable(DebuggerBrowsableState.RootHidden)]
-        IMock Mock { get; }
+        IMockRuntime Runtime { get; }
     }
 }

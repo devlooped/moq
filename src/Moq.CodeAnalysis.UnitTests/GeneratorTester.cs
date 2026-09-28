@@ -15,7 +15,7 @@ namespace Moq.CodeAnalysis.UnitTests
         static readonly CSharpParseOptions parseOptions = new(LanguageVersion.Latest);
 
         static readonly MetadataReference[] references = GetFrameworkReferences()
-            .Concat(new[] { typeof(Sdk.IMock).Assembly, typeof(IMoq).Assembly, typeof(Stunts.IStunt).Assembly }.Select(x => x.Location))
+            .Concat(new[] { typeof(Sdk.IMockRuntime).Assembly, typeof(IMock).Assembly, typeof(Stunts.IStunt).Assembly }.Select(x => x.Location))
             .Distinct(StringComparer.OrdinalIgnoreCase)
             .Select(path => (MetadataReference)MetadataReference.CreateFromFile(path))
             .ToArray();

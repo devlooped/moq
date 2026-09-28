@@ -27,7 +27,7 @@ namespace Moq.Sdk.Tests
             var behavior = new AnonymousMockBehavior((m, i, n) => { called = true; return i.CreateReturn(); }, "test");
             var mock = new FakeMock();
 
-            behavior.Execute(mock.Mock, new MethodInvocation(mock, typeof(object).GetMethod(nameof(object.ToString))), () => null);
+            behavior.Execute(mock.Runtime, new MethodInvocation(mock, typeof(object).GetMethod(nameof(object.ToString))), () => null);
 
             Assert.True(called);
         }
@@ -41,7 +41,7 @@ namespace Moq.Sdk.Tests
             behavior.Execute(new MethodInvocation(mock, typeof(object).GetMethod(nameof(object.ToString))),
                 (m, n) => m.CreateReturn());
 
-            Assert.Equal(1, mock.Mock.Invocations.Count);
+            Assert.Equal(1, mock.Runtime.Invocations.Count);
         }
 
         [Fact]
@@ -51,7 +51,7 @@ namespace Moq.Sdk.Tests
 
             Assert.Throws<ArgumentException>(() => behavior.Execute(new MethodInvocation(
                 new object(),
-                typeof(Mocked).GetProperty(nameof(IMocked.Mock)).GetGetMethod()),
+                typeof(Mocked).GetProperty(nameof(IMocked.Runtime)).GetGetMethod()),
                 (m, n) => m.CreateReturn()));
         }
 

@@ -35,7 +35,7 @@ namespace Moq
                 if (result.ReturnValue == null)
                 {
                     // Turn the null value into a mock for the current invocation setup
-                    var currentMock = ((IMocked)invocation.Target).Mock;
+                    var currentMock = ((IMocked)invocation.Target).Runtime;
                     // NOTE: this invocation will throw if there isn't a matching 
                     // mock for the given return type in the same assembly as the 
                     // current mock. It might be tricky to diagnose at run-time, 
@@ -47,7 +47,7 @@ namespace Moq
                         invocation.Target.GetType().Assembly,
                         info.ReturnType,
                         new Type[0],
-                        new object[0])).Mock;
+                        new object[0])).Runtime;
 
                     // Clone the current mock's behaviors, except for the setups and the 
                     // context and recording behaviors which are added already by default.

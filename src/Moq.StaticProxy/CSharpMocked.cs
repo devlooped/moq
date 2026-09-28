@@ -39,7 +39,7 @@ namespace Moq.Processors
                     field.Declaration.Variables.Any(decl => decl.Identifier.ToString() == "mock")))
                 {
                     var field = FieldDeclaration(
-                        VariableDeclaration(IdentifierName(Identifier(nameof(IMock))))
+                        VariableDeclaration(IdentifierName(Identifier(nameof(IMockRuntime))))
                             .WithVariables(SingletonSeparatedList(VariableDeclarator(Identifier("mock"))))
                         );
 
@@ -65,9 +65,9 @@ namespace Moq.Processors
                     }
                 }
 
-                if (!node.Members.OfType<PropertyDeclarationSyntax>().Any(prop => prop.Identifier.ToString() == nameof(IMocked.Mock)))
+                if (!node.Members.OfType<PropertyDeclarationSyntax>().Any(prop => prop.Identifier.ToString() == nameof(IMocked.Runtime)))
                 {
-                    var property = PropertyDeclaration(IdentifierName(nameof(IMock)), nameof(IMocked.Mock))
+                    var property = PropertyDeclaration(IdentifierName(nameof(IMockRuntime)), nameof(IMocked.Runtime))
                         // Make IMocked properties explicit.
                         .WithExplicitInterfaceSpecifier(
                             ExplicitInterfaceSpecifier(
@@ -86,7 +86,7 @@ namespace Moq.Processors
                                         Argument(NameColon("target"), Token(SyntaxKind.RefKeyword), IdentifierName("mock")),
                                         Argument(ParenthesizedLambdaExpression(
                                             ObjectCreationExpression(
-                                                IdentifierName(nameof(DefaultMock)))
+                                                IdentifierName(nameof(DefaultMockRuntime)))
                                             .WithArgumentList(ArgumentList(SingletonSeparatedList(Argument(
                                                 ThisExpression()
                                             ))))
@@ -96,7 +96,7 @@ namespace Moq.Processors
                         ))
                       .WithSemicolonToken(Token(SyntaxKind.SemicolonToken));
 
-                    // Try to insert the Mock property following the Behaviors property
+                    // Try to insert the Runtime property following the Behaviors property
                     var behaviors = node.Members.OfType<PropertyDeclarationSyntax>().FirstOrDefault(prop => prop.Identifier.ToString() == nameof(IStunt.Behaviors));
                     if (behaviors != null)
                         node = node.InsertNodesAfter(behaviors, new[] { property });

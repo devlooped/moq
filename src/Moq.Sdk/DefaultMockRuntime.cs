@@ -9,12 +9,12 @@ using Stunts;
 namespace Moq.Sdk
 {
     /// <summary>
-    /// Default implementation of the mock introspection API <see cref="IMock"/>, 
+    /// Default implementation of the mock runtime API <see cref="IMockRuntime"/>, 
     /// which also ensures that the <see cref="IStunt.Behaviors"/> contains 
     /// the <see cref="MockContextBehavior"/> when initially created.
     /// </summary>
-    [DebuggerDisplay("Invocations = {Invocations.Count}", Name = nameof(IMocked) + "." + nameof(IMocked.Mock))]
-    public class DefaultMock : IMock
+    [DebuggerDisplay("Invocations = {Invocations.Count}", Name = nameof(IMocked) + "." + nameof(IMocked.Runtime))]
+    public class DefaultMockRuntime : IMockRuntime
     {
         [DebuggerBrowsable(DebuggerBrowsableState.Never)]
         readonly IStunt stunt;
@@ -22,9 +22,9 @@ namespace Moq.Sdk
         readonly ConcurrentDictionary<IMockSetup, IMockBehaviorPipeline> setupBehaviorMap = new ConcurrentDictionary<IMockSetup, IMockBehaviorPipeline>();
 
         /// <summary>
-        /// Initializes the default <see cref="IMock"/> implementation for the given <paramref name="stunt"/>.
+        /// Initializes the default <see cref="IMockRuntime"/> implementation for the given <paramref name="stunt"/>.
         /// </summary>
-        public DefaultMock(IStunt stunt)
+        public DefaultMockRuntime(IStunt stunt)
         {
             this.stunt = stunt ?? throw new ArgumentNullException(nameof(stunt));
             var behaviors = stunt.Behaviors;

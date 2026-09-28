@@ -1,4 +1,4 @@
-﻿using System;
+using System;
 using System.Diagnostics;
 using System.Linq;
 using Microsoft.CodeAnalysis.Host;
@@ -17,11 +17,11 @@ static class WorkspaceServices
             MefHostServices.DefaultAssemblies.Concat(new[]
             {
                     // Moq.Sdk.dll
-                    typeof(IMock).Assembly,
+                    typeof(IMockRuntime).Assembly,
                     // Moq.CodeFixes.dll
                     typeof(MockValidateTypesAnalyzer).Assembly,
                     // Moq.dll
-                    typeof(IMoq).Assembly,
+                    typeof(Moq.IMock).Assembly,
             }));
     }
 

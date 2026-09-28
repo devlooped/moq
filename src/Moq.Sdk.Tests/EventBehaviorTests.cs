@@ -38,7 +38,7 @@ namespace Moq.Sdk.Tests
             EventHandler handler = (_, __) => { };
             mock.Empty += handler;
 
-            Assert.True(mock.AsMock().State.TryGetValue<Delegate>(nameof(IEventful.Empty), out var e));
+            Assert.True(MockRuntime.Get(mock).State.TryGetValue<Delegate>(nameof(IEventful.Empty), out var e));
             Assert.Contains(handler, e.GetInvocationList());
         }
 
@@ -53,11 +53,11 @@ namespace Moq.Sdk.Tests
             mock.Empty += handler;
             mock.Empty -= handler;
 
-            Assert.True(mock.AsMock().State.TryGetValue<Delegate>(nameof(IEventful.Empty), out var e));
+            Assert.True(MockRuntime.Get(mock).State.TryGetValue<Delegate>(nameof(IEventful.Empty), out var e));
             Assert.Null(e);
 
             mock.Empty += handler;
-            Assert.True(mock.AsMock().State.TryGetValue<Delegate>(nameof(IEventful.Empty), out e));
+            Assert.True(MockRuntime.Get(mock).State.TryGetValue<Delegate>(nameof(IEventful.Empty), out e));
             Assert.Contains(handler, e.GetInvocationList());
         }
 

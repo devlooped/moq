@@ -5,30 +5,28 @@ using Xunit;
 
 namespace Moq.Sdk.Tests
 {
-    public class MockExtensionsTests
+    public class MockRuntimeTests
     {
         [Fact]
-        public void MockAsT()
+        public void GetReturnsMockedRuntime()
         {
             var target = new FakeMock();
-            var mock = target.Mock;
-            var generic = target.AsMock();
 
-            Assert.Equal(generic.Behaviors, mock.Behaviors);
-            Assert.Same(generic.Object, mock.Object);
-            Assert.Same(((IMock)generic).Object, mock.Object);
-            Assert.Same(generic.Invocations, mock.Invocations);
-            Assert.Equal(generic.Setups, mock.Setups);
-            Assert.Same(generic.State, mock.State);
+            Assert.Same(target.Runtime, MockRuntime.Get(target));
+            Assert.Same(target, MockRuntime.Get(target).Object);
         }
 
         [Fact]
+        public void TryGetReturnsFalseForNonMocked()
+            => Assert.False(MockRuntime.TryGet(new object(), out _));
+
+        [Fact]
         public void ThrowsArgumentExceptionForNonMocked()
-            => Assert.Throws<ArgumentException>(() => new object().AsMock());
+            => Assert.Throws<ArgumentException>(() => MockRuntime.Get(new object()));
 
         [Fact]
         public void ThrowsArgumentExceptionForNull()
-            => Assert.Throws<ArgumentException>(() => default(object).AsMock());
+            => Assert.Throws<ArgumentException>(() => MockRuntime.Get(default!));
 
         [Fact]
         public void CanAssertInvocations()
@@ -37,10 +35,10 @@ namespace Moq.Sdk.Tests
             target.AddBehavior(new DefaultValueBehavior());
 
             target.TurnOn();
-            Assert.Single(target.AsMock().InvocationsFor(c => c.TurnOn()));
+            Assert.Single(MockRuntime.InvocationsFor(() => target.TurnOn()));
 
             Assert.Equal(0, target.Add(2, 3));
-            Assert.Single(target.AsMock().InvocationsFor(c => c.Add(2, 3)));
+            Assert.Single(MockRuntime.InvocationsFor(() => target.Add(2, 3)));
         }
 
         class FakeCalls : FakeMock

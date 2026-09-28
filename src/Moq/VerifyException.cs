@@ -1,4 +1,4 @@
-﻿using Moq.Sdk;
+using Moq.Sdk;
 
 namespace Moq
 {
@@ -12,7 +12,7 @@ namespace Moq
         /// Initializes the exception with the target 
         /// mock and setup that failed to match invocations.
         /// </summary>
-        public VerifyException(IMock mock, IMockSetup setup, string? message = null)
+        public VerifyException(IMockRuntime mock, IMockSetup setup, string? message = null)
             : this(mock, new[] { setup }, message)
         {
         }
@@ -21,10 +21,10 @@ namespace Moq
         /// Initializes the exception with the target 
         /// mock and setup(s) that failed to match invocations.
         /// </summary>
-        public VerifyException(IMock mock, IMockSetup[] setups, string? message = null)
+        public VerifyException(IMockRuntime mock, IMockSetup[] setups, string? message = null)
             : base(message ?? ThisAssembly.Strings.VerifyExceptionMessage)
         {
-            Mock = mock;
+            Runtime = mock;
             Setups = setups;
         }
 
@@ -37,6 +37,6 @@ namespace Moq
         /// <summary>
         /// The mock that was tested.
         /// </summary>
-        public IMock Mock { get; }
+        public IMockRuntime Runtime { get; }
     }
 }

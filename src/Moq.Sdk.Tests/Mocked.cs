@@ -7,10 +7,10 @@ namespace Moq.Sdk.Tests
 {
     public class Mocked : IMocked, IStunt
     {
-        IMock mock;
+        IMockRuntime mock;
         readonly IList<IStuntBehavior> behaviors = new ObservableCollection<IStuntBehavior>();
 
-        public IMock Mock => LazyInitializer.EnsureInitialized(ref mock, () => new DefaultMock(this));
+        public IMockRuntime Runtime => LazyInitializer.EnsureInitialized(ref mock, () => new DefaultMockRuntime(this));
 
         public IList<IStuntBehavior> Behaviors => behaviors;
     }

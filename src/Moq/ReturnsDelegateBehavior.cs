@@ -16,7 +16,7 @@ namespace Moq
 
         public ReturnsDelegateBehavior(Delegate @delegate) => this.@delegate = @delegate;
 
-        public IMethodReturn Execute(IMock mock, IMethodInvocation invocation, GetNextMockBehavior next)
+        public IMethodReturn Execute(IMockRuntime mock, IMethodInvocation invocation, GetNextMockBehavior next)
         {
             var values = invocation.Arguments.Select(prm => invocation.Arguments.GetValue(prm.Name)).ToArray();
             var returnValue = @delegate.DynamicInvoke(values);

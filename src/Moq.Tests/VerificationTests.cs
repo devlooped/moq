@@ -273,7 +273,7 @@ namespace Moq.Tests
             calculator.Mode.Returns(CalculatorMode.Scientific).Exactly(2);
 
             var mock = Mock.Get(calculator);
-            foreach (var invocation in mock.Invocations)
+            foreach (var invocation in mock.Sdk.Invocations)
             {
                 output.WriteLine((string)invocation.Context[nameof(Environment.StackTrace)]);
             }

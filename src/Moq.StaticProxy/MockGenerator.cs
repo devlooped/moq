@@ -59,8 +59,8 @@ namespace Moq
                 if (generatorAttr == null)
                     yield break;
 
-                var moqmodule = context.Compilation.GetTypeByMetadataName("Moq.IMoq")!.ContainingModule;
-                var sdkmodule = context.Compilation.GetTypeByMetadataName(typeof(IMock).FullName!)!.ContainingModule;
+                var moqmodule = context.Compilation.GetTypeByMetadataName("Moq.IMock")!.ContainingModule;
+                var sdkmodule = context.Compilation.GetTypeByMetadataName(typeof(IMockRuntime).FullName!)!.ContainingModule;
 
                 foreach (var node in nodes)
                 {

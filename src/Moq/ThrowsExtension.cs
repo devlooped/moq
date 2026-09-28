@@ -42,7 +42,7 @@ namespace Moq
             var setup = MockContext.CurrentSetup;
             if (setup != null)
             {
-                var mock = setup.Invocation.Target.AsMock();
+                var mock = MockRuntime.Get(setup.Invocation.Target);
 
                 mock.Invocations.Remove(setup.Invocation);
                 var behavior = mock.GetPipeline(setup);

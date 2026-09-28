@@ -22,7 +22,7 @@ namespace Moq
         /// </summary>
         public IMethodReturn Execute(IMethodInvocation invocation, ExecuteHandler next)
         {
-            var moq = invocation.Target.AsMoq();
+            var moq = MockRuntime.Get(invocation.Target);
             if (moq.Behavior != MockBehavior.Strict)
             {
                 invocation.SkipBehaviors.Add(typeof(StrictMockBehavior));
@@ -32,7 +32,7 @@ namespace Moq
             // We need this to skip the StrictBehavior in the CallBaseBehavior
             if (SetupScope.IsActive)
             {
-                invocation.Target.AsMock()
+                MockRuntime.Get(invocation.Target)
                     .GetPipeline(MockContext.CurrentSetup ?? CallContext.ThrowUnexpectedNull<IMockSetup>());
             }
 

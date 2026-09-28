@@ -19,7 +19,7 @@ namespace Moq.Sdk
         /// </summary>
         public IMethodReturn Execute(IMethodInvocation invocation, ExecuteHandler next)
         {
-            invocation.Target.AsMock().Invocations.Add(invocation);
+            MockRuntime.Get(invocation.Target).Invocations.Add(invocation);
 
             return next.Invoke(invocation, next);
         }

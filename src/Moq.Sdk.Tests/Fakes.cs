@@ -8,15 +8,15 @@ namespace Moq.Sdk.Tests
 {
     public class FakeMock : IStunt, IMocked
     {
-        readonly DefaultMock mock;
+        readonly DefaultMockRuntime mock;
 
         protected BehaviorPipeline Pipeline = new BehaviorPipeline();
 
-        public FakeMock() => mock = new DefaultMock(this);
+        public FakeMock() => mock = new DefaultMockRuntime(this);
 
         public IList<IStuntBehavior> Behaviors => Pipeline.Behaviors;
 
-        public IMock Mock => mock;
+        public IMockRuntime Runtime => mock;
     }
 
     public class FakeSetup : IMockSetup

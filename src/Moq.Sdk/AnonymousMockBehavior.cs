@@ -41,7 +41,7 @@ namespace Moq.Sdk
         /// <summary>
         /// Executes the delegate received in the constructor.
         /// </summary>
-        public IMethodReturn Execute(IMock mock, IMethodInvocation invocation, GetNextMockBehavior next)
+        public IMethodReturn Execute(IMockRuntime mock, IMethodInvocation invocation, GetNextMockBehavior next)
             => behavior(mock, invocation, next);
 
         /// <summary>

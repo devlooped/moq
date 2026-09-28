@@ -27,14 +27,14 @@ namespace Moq.Sdk
                (invocation.MethodBase.Name.StartsWith("set_", StringComparison.Ordinal) && invocation.MethodBase.GetParameters().Length == 1));
 
         /// <summary>
-        /// Gets or sets the value of the given property as an entry in the mock <see cref="IMock.State"/>.
+        /// Gets or sets the value of the given property as an entry in the mock <see cref="IMockRuntime.State"/>.
         /// </summary>
         public IMethodReturn Execute(IMethodInvocation invocation, ExecuteHandler next)
         {
             if (invocation == null) throw new ArgumentNullException(nameof(invocation));
 
             var state = (invocation.Target as IMocked ?? throw new ArgumentException(ThisAssembly.Strings.TargetNotMock, nameof(invocation)))
-                .Mock.State;
+                .Runtime.State;
 
             if (invocation.MethodBase.Name.StartsWith("get_", StringComparison.Ordinal) &&
                 state.TryGetValue<object>("_" + invocation.MethodBase.Name.Substring(4), out var value))
