@@ -1,6 +1,6 @@
-﻿using System.Linq;
+using System.Linq;
 using System.Threading;
-using Avatars;
+using Stunts;
 using Microsoft.CodeAnalysis;
 using Microsoft.CodeAnalysis.CSharp;
 using Microsoft.CodeAnalysis.CSharp.Syntax;
@@ -97,7 +97,7 @@ namespace Moq.Processors
                       .WithSemicolonToken(Token(SyntaxKind.SemicolonToken));
 
                     // Try to insert the Mock property following the Behaviors property
-                    var behaviors = node.Members.OfType<PropertyDeclarationSyntax>().FirstOrDefault(prop => prop.Identifier.ToString() == nameof(IAvatar.Behaviors));
+                    var behaviors = node.Members.OfType<PropertyDeclarationSyntax>().FirstOrDefault(prop => prop.Identifier.ToString() == nameof(IStunt.Behaviors));
                     if (behaviors != null)
                         node = node.InsertNodesAfter(behaviors, new[] { property });
                     else

@@ -1,0 +1,107 @@
+name: 'triage'
+on:
+  schedule:
+    - cron: '42 0 1,15 * *'
+
+  workflow_dispatch:
+    # Manual triggering through the GitHub UI, API, or CLI
+    inputs:
+      daysBeforeClose:
+        description: "Days before closing stale or need info issues"
+        required: true
+        default: "30"
+      daysBeforeStale:
+        description: "Days before labeling stale"
+        required: true
+        default: "180"
+      daysSinceClose:
+        description: "Days since close to lock"
+        required: true
+        default: "30"
+      daysSinceUpdate:
+        description: "Days since update to lock"
+        required: true
+        default: "30"
+
+permissions:
+  actions: write # For managing the operation state cache
+  issues: write
+  contents: read
+
+jobs:
+  stale:
+    # Do not run on forks
+    if: github.repository_owner == 'devlooped' 
+    runs-on: ubuntu-latest
+    steps:
+      - name: ⌛ rate
+        shell: pwsh
+        if: github.event_name != 'workflow_dispatch'
+        env:
+          GH_TOKEN: ${{ secrets.DEVLOOPED_TOKEN }}        
+        run: |
+          # add random sleep since we run on fixed schedule
+          $wait = get-random -max 180
+          echo "Waiting random $wait seconds to start"          
+          sleep $wait
+          # get currently authenticated user rate limit info
+          $rate = gh api rate_limit | convertfrom-json | select -expandproperty rate
+          # if we don't have at least 100 requests left, wait until reset
+          if ($rate.remaining -lt 100) {
+              $wait = ($rate.reset - (Get-Date (Get-Date).ToUniversalTime() -UFormat %s))
+              if ($wait -gt 300) {
+                  echo "Rate limit remaining is $($rate.remaining), reset in $wait seconds (more than 5'). Aborting."
+                  exit 1
+              }
+              echo "Rate limit remaining is $($rate.remaining), waiting $wait seconds to reset"
+              sleep $wait
+              $rate = gh api rate_limit | convertfrom-json | select -expandproperty rate
+              echo "Rate limit has reset to $($rate.remaining) requests"
+          }
+        
+      - name: ✏️ stale labeler
+        # pending merge: https://github.com/actions/stale/pull/1176
+        uses: kzu/stale@c8450312ba97b204bf37545cb249742144d6ca69
+        with:
+          ascending: true # Process the oldest issues first
+          stale-issue-label: 'stale'
+          stale-issue-message: |
+            Due to lack of recent activity, this issue has been labeled as 'stale'. 
+            It will be closed if no further activity occurs within ${{ fromJson(inputs.daysBeforeClose || 30  ) }} more days. 
+            Any new comment will remove the label.
+          close-issue-message: |
+            This issue will now be closed since it has been labeled 'stale' without activity for ${{ fromJson(inputs.daysBeforeClose || 30  ) }} days.
+          days-before-stale: ${{ fromJson(inputs.daysBeforeStale || 180) }}  
+          days-before-close: ${{ fromJson(inputs.daysBeforeClose || 30  ) }}
+          days-before-pr-close: -1 # Do not close PRs labeled as 'stale'
+          exempt-all-milestones: true
+          exempt-all-assignees: true
+          exempt-issue-labels: priority,sponsor,backed
+          exempt-authors: kzu
+
+      - name: 🤘 checkout actions
+        uses: actions/checkout@v4
+        with:
+          repository: 'microsoft/vscode-github-triage-actions'
+          ref: v42
+
+      - name: ⚙ install actions
+        run: npm install --production
+
+      - name: 🔒 issues locker
+        uses: ./locker
+        with:
+          token: ${{ secrets.DEVLOOPED_TOKEN }}
+          ignoredLabel: priority
+          daysSinceClose:  ${{ fromJson(inputs.daysSinceClose  || 30) }}
+          daysSinceUpdate: ${{ fromJson(inputs.daysSinceUpdate || 30) }}
+
+      - name: 🔒 need info closer
+        uses: ./needs-more-info-closer
+        with:
+          token: ${{ secrets.DEVLOOPED_TOKEN }}
+          label: 'need info'
+          closeDays:  ${{ fromJson(inputs.daysBeforeClose  || 30) }}
+          closeComment: "This issue has been closed automatically because it needs more information and has not had recent activity.\n\nHappy Coding!"
+          pingDays: 80
+          pingComment: "Hey @${assignee}, this issue might need further attention.\n\n@${author}, you can help us out by closing this issue if the problem no longer exists, or adding more information."

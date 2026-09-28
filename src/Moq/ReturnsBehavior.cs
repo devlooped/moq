@@ -1,7 +1,7 @@
-﻿using System;
+using System;
 using System.ComponentModel;
 using System.Diagnostics;
-using Avatars;
+using Stunts;
 using Moq.Sdk;
 
 namespace Moq

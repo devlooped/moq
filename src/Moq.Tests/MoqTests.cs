@@ -1,7 +1,7 @@
-﻿using System;
+using System;
 using System.ComponentModel;
 using System.Threading.Tasks;
-using Avatars;
+using Stunts;
 using Moq.Sdk;
 using Sample;
 using Xunit;

@@ -1,8 +1,8 @@
-﻿using System;
+using System;
 using System.Linq;
 using System.Reflection;
 using System.Threading;
-using Avatars;
+using Stunts;
 using Castle.DynamicProxy;
 
 namespace Moq.Sdk
@@ -10,11 +10,11 @@ namespace Moq.Sdk
     /// <summary>
     /// Provides an <see cref="IMockFactory"/> that creates types at run-time using Castle DynamicProxy.
     /// </summary>
-    public class DynamicMockFactory : DynamicAvatarFactory, IMockFactory
+    public class DynamicMockFactory : DynamicStuntFactory, IMockFactory
     {
         /// <inheritdoc />
         public object CreateMock(Assembly mocksAssembly, Type baseType, Type[] implementedInterfaces, object[] constructorArguments)
-            => CreateAvatar(mocksAssembly, baseType, implementedInterfaces, constructorArguments);
+            => CreateStunt(mocksAssembly, baseType, implementedInterfaces, constructorArguments);
 
         /// <summary>
         /// Creates the mock proxy.
@@ -48,7 +48,7 @@ namespace Moq.Sdk
             public void Intercept(IInvocation invocation)
             {
                 if (invocation.Method.DeclaringType == typeof(IMocked))
-                    invocation.ReturnValue = LazyInitializer.EnsureInitialized(ref mock, () => new DefaultMock((IAvatar)invocation.Proxy));
+                    invocation.ReturnValue = LazyInitializer.EnsureInitialized(ref mock, () => new DefaultMock((IStunt)invocation.Proxy));
                 else
                     invocation.Proceed();
             }

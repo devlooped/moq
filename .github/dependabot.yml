@@ -6,4 +6,46 @@ updates:
 - package-ecosystem: nuget
   directory: /
   schedule:
-    interval: weekly
+    interval: daily
+  groups:
+    Azure:
+      patterns:
+        - "Azure*"
+        - "Microsoft.Azure*"
+    Identity:
+      patterns:
+        - "System.IdentityModel*"
+        - "Microsoft.IdentityModel*"
+    System:
+      patterns:
+        - "System*"
+      exclude-patterns:
+        - "System.IdentityModel*"
+    Extensions:
+      patterns:
+        - "Microsoft.Extensions*"
+      exclude-patterns:
+        - "Microsoft.Extensions.AI*"
+    ExtensionsAI:
+      patterns:
+        - "Microsoft.Extensions.AI*"
+    Web:
+      patterns:
+        - "Microsoft.AspNetCore*"
+    OpenTelemetry:
+      patterns:
+        - "OpenTelemetry*"
+    Tests:
+      patterns:
+        - "Microsoft.NET.Test*"
+        - "xunit*"
+        - "coverlet*"
+    ThisAssembly:
+      patterns:
+        - "ThisAssembly*"
+    ProtoBuf:
+      patterns:
+        - "protobuf-*"
+    Spectre:
+      patterns:
+        - "Spectre.Console*"

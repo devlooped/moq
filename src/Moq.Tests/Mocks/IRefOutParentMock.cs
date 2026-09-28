@@ -14,18 +14,18 @@ using System;
 using System.Collections.Generic;
 using System.Collections.ObjectModel;
 using System.Reflection;
-using Avatars;
+using Stunts;
 using System.Runtime.CompilerServices;
 
 namespace Mocks
 {
-    public partial class IRefOutParentMock : IRefOutParent, IAvatar, IMocked
+    public partial class IRefOutParentMock : IRefOutParent, IStunt, IMocked
     {
         readonly BehaviorPipeline pipeline = new BehaviorPipeline();
         IMock mock;
 
         [CompilerGenerated]
-        IList<IAvatarBehavior> IAvatar.Behaviors => pipeline.Behaviors;
+        IList<IStuntBehavior> IStunt.Behaviors => pipeline.Behaviors;
 
         IMock IMocked.Mock => LazyInitializer.EnsureInitialized(ref mock, () => new DefaultMock(this));
 

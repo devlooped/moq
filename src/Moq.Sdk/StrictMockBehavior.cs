@@ -1,4 +1,4 @@
-using Avatars;
+using Stunts;
 
 namespace Moq.Sdk
 {
@@ -7,7 +7,7 @@ namespace Moq.Sdk
     /// mock behavior could not be applied before reaching this 
     /// fallback behavior.
     /// </summary>
-    public class StrictMockBehavior : IAvatarBehavior
+    public class StrictMockBehavior : IStuntBehavior
     {
         /// <summary>
         /// Always returns <see langword="true" />

@@ -1,106 +1,108 @@
-﻿name: build
+﻿# Builds and runs tests in all three supported OSes
+# Pushes CI feed if secrets.SLEET_CONNECTION is provided
+
+name: build
 on: 
+  workflow_dispatch:
+    inputs:
+      configuration:
+        type: choice
+        description: Configuration
+        options: 
+        - Release
+        - Debug
   push:
-    branches: [ '*' ]
+    branches: [ main, 'feature/*', 'rel/*' ]
+    paths-ignore:
+      - changelog.md
+      - readme.md
   pull_request:
     types: [opened, synchronize, reopened]
 
 env:
   DOTNET_NOLOGO: true
+  PackOnBuild: true
+  GeneratePackageOnBuild: true
+  VersionPrefix: 42.42.${{ github.run_number }}
+  VersionLabel: ${{ github.ref }}
+  GH_TOKEN: ${{ secrets.GH_TOKEN }}
+  MSBUILDTERMINALLOGGER: auto
+  Configuration: ${{ github.event.inputs.configuration || 'Release' }}
+  SLEET_FEED_URL: ${{ vars.SLEET_FEED_URL }}
 
 defaults:
   run:
     shell: bash
 
 jobs:
+  os-matrix:
+    runs-on: ubuntu-latest
+    outputs:
+      matrix: ${{ steps.lookup.outputs.matrix }}
+    steps:
+      - name: 🤘 checkout
+        uses: actions/checkout@v4
+        
+      - name: 🔎 lookup
+        id: lookup
+        shell: pwsh
+        run: |
+          $path = './.github/workflows/os-matrix.json'
+          $os = if (test-path $path) { cat $path } else { '["ubuntu-latest"]' }
+          echo "matrix=$os" >> $env:GITHUB_OUTPUT
+
+  build:
+    needs: os-matrix
+    name: build-${{ matrix.os }}
+    runs-on: ${{ matrix.os }}
+    strategy:
+      matrix:
+        os: ${{ fromJSON(needs.os-matrix.outputs.matrix) }}
+    steps:
+      - name: 🤘 checkout
+        uses: actions/checkout@v4
+        with: 
+          submodules: recursive
+          fetch-depth: 0
+
+      - name: ⚙ dotnet
+        uses: devlooped/actions-dotnet-env@v1
+
+      - name: 🙏 build
+        run: dotnet build -m:1 -bl:build.binlog
+
+      - name: 🧪 test
+        shell: pwsh
+        run: dnx --yes retest -- --no-build
+
+      - name: 🐛 logs
+        uses: actions/upload-artifact@v4
+        if: runner.debug && always()
+        with:
+          name: logs
+          path: '*.binlog'
+
+      - name: 🚀 sleet
+        env:
+          SLEET_CONNECTION: ${{ secrets.SLEET_CONNECTION }}
+        if: env.SLEET_CONNECTION != ''
+        run: |
+          dotnet tool update sleet -g --allow-downgrade --version $(curl -s --compressed ${{ vars.SLEET_FEED_URL }} | jq '.["sleet:version"]' -r)        
+          sleet push bin --config none -f --verbose -p "SLEET_FEED_CONTAINER=nuget" -p "SLEET_FEED_CONNECTIONSTRING=${{ secrets.SLEET_CONNECTION }}" -p "SLEET_FEED_TYPE=azure" || echo "No packages found"
+
   dotnet-format:
     runs-on: ubuntu-latest
     steps:
       - name: 🤘 checkout
-        uses: actions/checkout@v2
-      - name: ⚙ dotnet 10.0.x
-        uses: actions/setup-dotnet@v4
-        with:
-          dotnet-version: 10.0.x
-      - name: 🙏 restore
-        run: dotnet restore
+        uses: actions/checkout@v4
+        with: 
+          submodules: recursive
+          fetch-depth: 0
+
+      - name: ⚙ dotnet
+        uses: devlooped/actions-dotnet-env@v1
+
       - name: ✓ ensure format
-        run: dotnet format --check -v:diag
-
-  build:
-    name: ${{ matrix.os }}
-    runs-on: ${{ matrix.os }}
-    needs: dotnet-format
-    strategy:
-      matrix:
-        os: [ubuntu-latest, windows-latest, macOS-latest]
-    steps:
-      - name: 🤘 checkout
-        uses: actions/checkout@v2
-      - name: ⚙ dotnet 10.0.x
-        uses: actions/setup-dotnet@v4
-        with:
-          dotnet-version: 10.0.x
-      - name: 🙏 build
-        run: dotnet msbuild -r -m:1 -bl:build.binlog -p:versionsuffix="$GITHUB_REF.$GITHUB_RUN_NUMBER"
-      - name: 🧪 test net10.0
-        run: dotnet test --no-build -f net10.0
-      - name: 🧪 test net48
-        run: dotnet test --no-build
-        if: matrix.os == 'windows-latest'
-      - name: 🔼 logs
-        if: ${{ always() }}
-        uses: actions/upload-artifact@v2
-        with:
-          name: ${{ matrix.os }}
-          path: |
-            *.binlog
-            **/coverage.cobertura.xml
-      - name: 🔼 packages
-        uses: actions/upload-artifact@v2
-        with:
-          name: bin
-          path: bin/*.nupkg
-
-  acceptance:
-    name: acceptance-${{ matrix.os }}
-    runs-on: ${{ matrix.os }}
-    needs: build
-    strategy:
-      matrix:
-        os: [ubuntu-latest, windows-latest, macOS-latest]
-    steps:
-      - name: 🤘 checkout
-        uses: actions/checkout@v2
-      - name: 🔽 packages
-        uses: actions/download-artifact@v2
-        with:
-          name: bin
-          path: bin
-      - name: ⚙ dotnet 10.0.x
-        uses: actions/setup-dotnet@v4
-        with:
-          dotnet-version: 10.0.x
-      - name: 🧪 test
-        run: dotnet test -m:1 -p:versionsuffix="$GITHUB_REF.$GITHUB_RUN_NUMBER"
-        working-directory: src/Acceptance
-
-  push:
-    name: push nuget.ci
-    runs-on: ubuntu-latest
-    needs: [build, acceptance]
-    steps:
-      - name: 🔽 packages
-        uses: actions/download-artifact@v2
-        with:
-          name: bin
-          path: bin
-      - name: ⚙ dotnet 2.1.x
-        uses: actions/setup-dotnet@v1
-        if: matrix.os == 'ubuntu-latest'
-        with:
-          dotnet-version: 2.1.x
-      - name: 🚀 sleet
         run: |
-          dotnet tool install -g --version 3.2.0 sleet 
-          sleet push bin --config none -f --verbose -p "SLEET_FEED_CONTAINER=nuget" -p "SLEET_FEED_CONNECTIONSTRING=${{ secrets.SLEET_CONNECTION }}" -p "SLEET_FEED_TYPE=azure"
+          dotnet format whitespace --verify-no-changes -v:diag --exclude ~/.nuget
+          dotnet format style --verify-no-changes -v:diag --exclude ~/.nuget

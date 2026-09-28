@@ -11,7 +11,7 @@ using System;
 using System.Collections.Generic;
 using System.Collections.ObjectModel;
 using System.Reflection;
-using Avatars;
+using Stunts;
 using System.Runtime.CompilerServices;
 using Moq.Tests.Recursive;
 using System.Threading;
@@ -19,12 +19,12 @@ using Moq.Sdk;
 
 namespace Mocks
 {
-    public partial class IRecursiveLeafMock : IRecursiveLeaf, IAvatar, IMocked
+    public partial class IRecursiveLeafMock : IRecursiveLeaf, IStunt, IMocked
     {
         readonly BehaviorPipeline pipeline = new BehaviorPipeline();
 
         [CompilerGenerated]
-        IList<IAvatarBehavior> IAvatar.Behaviors => pipeline.Behaviors;
+        IList<IStuntBehavior> IStunt.Behaviors => pipeline.Behaviors;
 
         [CompilerGenerated]
         public string Name { get => pipeline.Execute<string>(MethodInvocation.Create(this, MethodBase.GetCurrentMethod())); set => pipeline.Execute(MethodInvocation.Create(this, MethodBase.GetCurrentMethod(), value)); }

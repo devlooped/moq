@@ -1,4 +1,4 @@
-using Avatars;
+using Stunts;
 
 namespace Moq.Sdk
 {
@@ -6,7 +6,7 @@ namespace Moq.Sdk
     /// Records invocations performed on the mock, as long as 
     /// <see cref="SetupScope.IsActive"/> is <see langword="false" />.
     /// </summary>
-    public class MockRecordingBehavior : IAvatarBehavior
+    public class MockRecordingBehavior : IStuntBehavior
     {
         /// <summary>
         /// Returns <see langword="true"/> if <see cref="SetupScope.IsActive"/> is <see langword="false" />, 

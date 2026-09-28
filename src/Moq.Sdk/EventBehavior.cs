@@ -2,17 +2,17 @@ using System;
 using System.Diagnostics;
 using System.Linq;
 using System.Reflection;
-using Avatars;
+using Stunts;
 
 namespace Moq.Sdk
 {
     /// <summary>
-    /// An <see cref="IAvatarBehavior"/> that keeps track of backing delegates 
+    /// An <see cref="IStuntBehavior"/> that keeps track of backing delegates 
     /// for events, combining and removing handlers from them as += and -= 
     /// are invoked on the mock. Also raises events when an <see cref="EventRaiser"/> 
     /// exists in the <see cref="CallContext"/>.
     /// </summary>
-    public class EventBehavior : IAvatarBehavior
+    public class EventBehavior : IStuntBehavior
     {
         /// <summary>
         /// Determines whether the given invocation is an event 

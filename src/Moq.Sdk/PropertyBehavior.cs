@@ -1,13 +1,13 @@
 using System;
-using Avatars;
+using Stunts;
 
 namespace Moq.Sdk
 {
     /// <summary>
-    /// An <see cref="IAvatarBehavior"/> that keeps track of property 
+    /// An <see cref="IStuntBehavior"/> that keeps track of property 
     /// get/set invocations so that a stunt behaves like a stub.
     /// </summary>
-    public class PropertyBehavior : IAvatarBehavior
+    public class PropertyBehavior : IStuntBehavior
     {
         /// <summary>
         /// Whether invoking a property setter requires the mock to be in a 

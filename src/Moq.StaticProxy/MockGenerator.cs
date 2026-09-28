@@ -1,12 +1,12 @@
-﻿using System;
+using System;
 using System.Collections.Generic;
 using System.Collections.Immutable;
 using System.Linq;
 using System.Runtime.CompilerServices;
 using System.Threading;
-using Avatars;
-using Avatars.CodeAnalysis;
-using Avatars.Processors;
+using Stunts;
+using Stunts.CodeAnalysis;
+using Stunts.Processors;
 using Microsoft.CodeAnalysis;
 using Microsoft.CodeAnalysis.CSharp.Syntax;
 using Moq.Processors;
@@ -21,11 +21,11 @@ namespace Moq
     [Generator]
     public class MockGenerator : ISourceGenerator
     {
-        readonly AvatarGenerator generator;
+        readonly StuntGenerator generator;
 
         public MockGenerator()
         {
-            generator = new AvatarGenerator()
+            generator = new StuntGenerator()
                 .WithNamingConvention(new MockNamingConvention())
                 .WithGeneratorAttribute(typeof(MockGeneratorAttribute))
                 .WithProcessor(new DefaultImports(typeof(IMocked).Namespace, typeof(LazyInitializer).Namespace))
@@ -46,7 +46,7 @@ namespace Moq
 
         public void Initialize(GeneratorInitializationContext context) => generator.Initialize(context);
 
-        class RecursiveMockCandidatesReceiver : IAvatarCandidatesReceiver
+        class RecursiveMockCandidatesReceiver : IStuntCandidatesReceiver
         {
             readonly Type generatorAttribute;
             readonly List<SyntaxNode> nodes = new();

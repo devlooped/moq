@@ -2,7 +2,7 @@ using System;
 using System.ComponentModel;
 using System.Linq;
 using System.Reflection;
-using Avatars;
+using Stunts;
 using Moq.Sdk;
 
 namespace Moq
@@ -13,7 +13,7 @@ namespace Moq
     /// are turned into mocks automatically.
     /// </summary>
     [EditorBrowsable(EditorBrowsableState.Never)]
-    public class RecursiveMockBehavior : IAvatarBehavior
+    public class RecursiveMockBehavior : IStuntBehavior
     {
         /// <summary>
         /// Only applies if there is an active setup.

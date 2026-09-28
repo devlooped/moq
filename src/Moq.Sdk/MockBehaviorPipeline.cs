@@ -1,13 +1,13 @@
 using System;
 using System.Collections.ObjectModel;
 using System.Diagnostics;
-using Avatars;
+using Stunts;
 
 namespace Moq.Sdk
 {
     /// <summary>
     /// Default implementation of <see cref="IMockBehaviorPipeline"/>, which 
-    /// provides a sub-pipeline of behaviors within the <see cref="IAvatar"/>'s 
+    /// provides a sub-pipeline of behaviors within the <see cref="IStunt"/>'s 
     /// <see cref="BehaviorPipeline"/>, which is only run if the current invocation 
     /// matches the <see cref="Setup"/>.
     /// </summary>

@@ -1,7 +1,7 @@
 using System;
 using System.ComponentModel;
 using System.Reflection;
-using Avatars;
+using Stunts;
 using Xunit;
 
 namespace Moq.Sdk.Tests

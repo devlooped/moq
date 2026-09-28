@@ -1,5 +1,5 @@
-﻿using System.Collections.Generic;
-using Avatars;
+using System.Collections.Generic;
+using Stunts;
 
 namespace Moq.Sdk
 {
@@ -41,9 +41,9 @@ namespace Moq.Sdk
         public virtual IEnumerable<IMockBehaviorPipeline> Setups => mock.Setups;
 
         /// <summary>
-        /// See <see cref="IAvatar.Behaviors"/>.
+        /// See <see cref="IStunt.Behaviors"/>.
         /// </summary>
-        public virtual IList<IAvatarBehavior> Behaviors => mock.Behaviors;
+        public virtual IList<IStuntBehavior> Behaviors => mock.Behaviors;
 
         /// <summary>
         /// See <see cref="IMock.GetPipeline(IMockSetup)"/>.

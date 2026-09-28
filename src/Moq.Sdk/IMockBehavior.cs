@@ -1,4 +1,4 @@
-﻿using Avatars;
+using Stunts;
 
 namespace Moq.Sdk
 {

@@ -1,5 +1,5 @@
-﻿using System;
-using Avatars;
+using System;
+using Stunts;
 using Xunit;
 
 namespace Moq.Sdk.Tests

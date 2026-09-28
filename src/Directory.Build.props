@@ -1,49 +1,80 @@
-<Project TreatAsLocalProperty="VersionSuffix">
+<Project TreatAsLocalProperty="VersionPrefix">
+  <!-- To extend/change the defaults, create a Directory.props alongside this file -->
+
+  <PropertyGroup Label="CI" Condition="'$(CI)' == ''">
+    <CI>false</CI>
+    <!-- GH, CircleCI, GitLab and BitBucket already use CI -->
+    <CI Condition="'$(TF_BUILD)' == 'true' or 
+                   '$(TEAMCITY_VERSION)' != '' or 
+                   '$(APPVEYOR)' != '' or 
+                   '$(BuildRunner)' == 'MyGet' or 
+                   '$(JENKINS_URL)' != '' or 
+                   '$(TRAVIS)' == 'true' or 
+                   '$(BUDDY)' == 'true'">true</CI>
+  </PropertyGroup>
 
   <PropertyGroup>
-    <Authors>kzu</Authors>
+    <!-- The Microsoft.Managed.Core.targets use this property to use deterministic source paths in CI builds -->
+    <ContinuousIntegrationBuild>$(CI)</ContinuousIntegrationBuild>
+  </PropertyGroup>
+
+  <PropertyGroup Label="NuGet">
+    <Authors>Daniel Cazzulino</Authors>
+    <Company>Devlooped</Company>
     <Copyright>Copyright (C) Daniel Cazzulino and Contributors. All rights reserved.</Copyright>
     <PackageRequireLicenseAcceptance>false</PackageRequireLicenseAcceptance>
     <PackageLicenseExpression>MIT</PackageLicenseExpression>
-    <!--<PackageIcon>icon.png</PackageIcon>-->
 
-    <VersionPrefix>42.42.42</VersionPrefix>
-    <VersionSuffix>$(VersionSuffix.Replace('refs/heads/', ''))</VersionSuffix>
-    <VersionSuffix Condition="$(VersionSuffix.Contains('refs/pull/'))">$(VersionSuffix.TrimEnd('.0123456789'))</VersionSuffix>
-    <VersionSuffix>$(VersionSuffix.Replace('refs/pull/', 'pr'))</VersionSuffix>
-    <VersionSuffix>$(VersionSuffix.Replace('/merge', ''))</VersionSuffix>
-    <VersionSuffix>$(VersionSuffix.Replace('/', '-'))</VersionSuffix>
+    <!-- Pick src-level readme+icon automatically (icon.png preferred, logo.png fallback) -->
+    <PackageIcon Condition="Exists('$(MSBuildThisFileDirectory)logo.png')">logo.png</PackageIcon>
+    <PackageIcon Condition="Exists('$(MSBuildThisFileDirectory)icon.png')">icon.png</PackageIcon>
+    <PackageReadmeFile Condition="'$(PackReadme)' != 'false' and Exists('$(MSBuildThisFileDirectory)readme.md')">readme.md</PackageReadmeFile>
+    <!-- Pick project-level readme+icon overrides automatically -->
+    <PackageIcon Condition="Exists('$(MSBuildProjectDirectory)\logo.png')">logo.png</PackageIcon>
+    <PackageIcon Condition="Exists('$(MSBuildProjectDirectory)\icon.png')">icon.png</PackageIcon>
+    <PackageReadmeFile Condition="'$(PackReadme)' != 'false' and Exists('$(MSBuildProjectDirectory)\readme.md')">readme.md</PackageReadmeFile>
 
     <PublishRepositoryUrl>true</PublishRepositoryUrl>
     <GenerateRepositoryUrlAttribute>true</GenerateRepositoryUrlAttribute>
 
     <PackageOutputPath Condition="'$(PackageOutputPath)' == ''">$([System.IO.Path]::GetFullPath('$(MSBuildThisFileDirectory)..\bin'))</PackageOutputPath>
 
+    <!-- Use Directory.Packages.props if possible. NOTE: other MSBuild SDKs (i.e. NoTargets/Traversal) do not support central packages -->
+    <ManagePackageVersionsCentrally Condition="Exists('$(MSBuildThisFileDirectory)Directory.Packages.props')">true</ManagePackageVersionsCentrally>
+    <CentralPackageFloatingVersionsEnabled>true</CentralPackageFloatingVersionsEnabled>
+
+    <!-- Ensure MSBuild tooling can access package artifacts always via PKG_[PackageId] -->
+    <GeneratePathProperty>true</GeneratePathProperty>
+    <!-- Avoid warnings for test projects when we run dotnet pack on the whole solution. -->
+    <WarnOnPackingNonPackableProject>false</WarnOnPackingNonPackableProject>
+    <!-- See https://learn.microsoft.com/en-us/nuget/consume-packages/package-references-in-project-files#prunepackagereference-specification -->
+    <RestoreEnablePackagePruning>true</RestoreEnablePackagePruning>
+
+    <!-- Needed to improve nuget default for empty PackageId. Workaround for https://github.com/NuGet/Home/issues/14928 -->
+    <ImportNuGetBuildTasksPackTargetsFromSdk>false</ImportNuGetBuildTasksPackTargetsFromSdk>
+  </PropertyGroup>
+
+  <PropertyGroup Label="Build">
+    <Configuration Condition="'$(Configuration)' == '' and $(CI)">Release</Configuration>
+    <LangVersion>Latest</LangVersion>
+
+    <!-- See https://docs.microsoft.com/en-us/dotnet/standard/assembly/reference-assemblies -->
     <ProduceReferenceAssembly>false</ProduceReferenceAssembly>
+    <!-- Because they are small and super useful and supported everywhere -->
     <DebugType>embedded</DebugType>
     <DebugSymbols>true</DebugSymbols>
     <Nullable>enable</Nullable>
+    <!-- See https://www.meziantou.net/csharp-compiler-strict-mode.htm -->
+    <Features>strict</Features>
+    
+    <!-- Simplify namespaces by defaulting to the single root name -->
+    <RootNamespace>$(MSBuildProjectName)</RootNamespace>
+    <RootNamespaceDot>$(MSBuildProjectName.IndexOf('.'))</RootNamespaceDot>
+    <RootNamespace Condition="'$(RootNamespaceDot)' != '-1'">$(MSBuildProjectName.Substring(0, $(RootNamespaceDot)))</RootNamespace>
 
-    <!-- CodeAnalysis.Analyzers 3.11 adds every .resx as an AdditionalFile and
-         blanks ThisAssembly.Strings' SourceItemType, so the strings generator emits nothing. -->
-    <SkipAddAllResxFilesAsAdditionalFiles>true</SkipAddAllResxFilesAsAdditionalFiles>
+    <!-- We typically don't want these files shown in the solution explorer -->
+    <DefaultItemExcludes>$(DefaultItemExcludes);*.binlog;*.zip;*.rsp;*.items;**/TestResults/**/*.*</DefaultItemExcludes>
 
-    <DefaultItemExcludes>$(DefaultItemExcludes);*.binlog;*.zip;*.rsp;*.items;TestResults/**/*.*</DefaultItemExcludes>
-
-    <!-- Use Directory.Packages.props -->
-    <ManagePackageVersionsCentrally Condition="'$(ManagePackageVersionsCentrally)' == '' and ('$(MSBuildProjectExtension)' == '.csproj' or '$(MSBuildProjectExtension)' == '.vbproj')">true</ManagePackageVersionsCentrally>
-
-    <RestoreSources>https://pkg.kzu.io/index.json;https://api.nuget.org/v3/index.json;https://pkgs.dev.azure.com/dnceng/public/_packaging/dotnet-tools/nuget/v3/index.json;$(RestoreSources)</RestoreSources>
-    <RestoreSources Condition="Exists('$(MSBuildThisFileDirectory)..\..\nugetizer\bin\')">$([System.IO.Path]::GetFullPath('$(MSBuildThisFileDirectory)..\..\nugetizer\bin'));$(RestoreSources)</RestoreSources>
-    <RestoreSources Condition="Exists('$(MSBuildThisFileDirectory)..\..\avatar\bin\')">$([System.IO.Path]::GetFullPath('$(MSBuildThisFileDirectory)..\..\avatar\bin'));$(RestoreSources)</RestoreSources>
-    <RestoreSources Condition="Exists('$(MSBuildThisFileDirectory)..\..\ThisAssembly\bin\')">$([System.IO.Path]::GetFullPath('$(MSBuildThisFileDirectory)..\..\ThisAssembly\bin'));$(RestoreSources)</RestoreSources>
-
-    <AssemblyOriginatorKeyFile>$(MSBuildThisFileDirectory)Moq.snk</AssemblyOriginatorKeyFile>
-    <PublicKey>00240000048000009400000006020000002400005253413100040000010001009f7a95086500f8f66d892174803850fed9c22225c2ccfff21f39c8af8abfa5415b1664efd0d8e0a6f7f2513b1c11659bd84723dc7900c3d481b833a73a2bcf1ed94c16c4be64d54352c86956c89930444e9ac15124d3693e3f029818e8410f167399d6b995324b635e95353ba97bfab856abbaeb9b40c9b160070c6325e22ddc</PublicKey>
-    <PublicKeyToken>69f491c39445e920</PublicKeyToken>
-    <SignAssembly>true</SignAssembly>
-
-    <!-- Allows source control information to always be present in ThisAssembly -->
     <EnableSourceLink>true</EnableSourceLink>
     <EnableSourceControlManagerQueries>true</EnableSourceControlManagerQueries>
     <EmbedUntrackedSources>true</EmbedUntrackedSources>
@@ -52,39 +83,114 @@
     <!-- Generate satellite assemblies using csc.exe to avoid some al.exe issues. See https://github.com/dotnet/msbuild/pull/2726 -->
     <GenerateSatelliteAssembliesForCore>true</GenerateSatelliteAssembliesForCore>
 
-    <TypeNameFormatterInternal>false</TypeNameFormatterInternal>
+    <!-- See: https://www.cazzulino.com/project-dependencies-as-project-references.html -->
+    <AddSyntheticProjectReferencesForSolutionDependencies>false</AddSyntheticProjectReferencesForSolutionDependencies>
+
+    <!-- Don't warn for packages using semver 2.0 -->
+    <NoWarn>NU5105;$(NoWarn)</NoWarn>
+    <!-- Turn warnings into errors in CI or Release builds -->
+    <WarningsAsErrors Condition="$(CI) or '$(Configuration)' == 'Release'">true</WarningsAsErrors>
+    
+    <!-- Preserve transitively copied content in VS: https://github.com/dotnet/msbuild/issues/1054#issuecomment-847959047 -->
+    <MSBuildCopyContentTransitively>true</MSBuildCopyContentTransitively>
+    
+    <!-- Global tools should run on whatever latest runtime is installed. See https://docs.microsoft.com/en-us/dotnet/core/versions/selection#framework-dependent-apps-roll-forward -->
+    <RollForward>LatestMinor</RollForward>
   </PropertyGroup>
 
-  <PropertyGroup Label="Preview - To be removed by .NET 5.0 RTW">
-    <LangVersion>Preview</LangVersion>
-    <SuppressNETCoreSdkPreviewMessage>true</SuppressNETCoreSdkPreviewMessage>
+  <PropertyGroup Label="StrongName" Condition="Exists('$(MSBuildThisFileDirectory)kzu.snk')">
+    <!-- We use a single oss signing key for consumers that need strong-named assemblies -->
+    <AssemblyOriginatorKeyFile>$(MSBuildThisFileDirectory)kzu.snk</AssemblyOriginatorKeyFile>
+    <!-- These properties make it easier to add internals visible to other projects, even when signing is involved.
+         For example, you can simply add: 
+          <InternalsVisibleTo Include="MyProject.UnitTests" />
+
+         and the key will be appended automatically.
+    -->
+    <PublicKey>002400000480000094000000060200000024000052534131000400000100010051155fd0ee280be78d81cc979423f1129ec5dd28edce9cd94fd679890639cad54c121ebdb606f8659659cd313d3b3db7fa41e2271158dd602bb0039a142717117fa1f63d93a2d288a1c2f920ec05c4858d344a45d48ebd31c1368ab783596b382b611d8c92f9c1b3d338296aa21b12f3bc9f34de87756100c172c52a24bad2db</PublicKey>
+    <PublicKeyToken>00352124762f2aa5</PublicKeyToken>
+    <SignAssembly>true</SignAssembly>
   </PropertyGroup>
 
-  <PropertyGroup Label="CI" Condition="'$(CI)' == ''">
-    <CI>false</CI>
-    <CI Condition="'$(TF_BUILD)' == 'true' or '$(GITHUB_ACTIONS)' == 'true'">true</CI>
+  <PropertyGroup Label="Version">
+    <!-- Versioning: when building locally, it's always 42.42.42. 
+         This makes it always bigger than any public package version, and 
+         consistent and fixed for dogfooding. 
+         NuGetizer nukes the package cache on build, making this straightforward too.
+         CI (non-release) builds pass in a VersionSuffix property to append a label 
+         after the fixed prefix. This allows dogfooding a branch build.
+         The suffix is sanitized and optionally turned into 
+    -->
+    <VersionPrefix Condition="$(VersionPrefix) == ''">42.42.42</VersionPrefix>
   </PropertyGroup>
 
-  <PropertyGroup>
-    <ContinuousIntegrationBuild>$(CI)</ContinuousIntegrationBuild>
-    <PackOnBuild Condition="'$(PackOnBuild)' == ''">$(CI)</PackOnBuild>
+  <PropertyGroup Label="Version" Condition="$(VersionLabel) != ''">
+    <_VersionLabel>$(VersionLabel.Replace('refs/heads/', ''))</_VersionLabel>
+    <_VersionLabel>$(_VersionLabel.Replace('refs/tags/v', ''))</_VersionLabel>
+
+    <!-- For PRs, we just need a fixed package version numbered after the PR # itself, so remove the commits # at the end -->
+    <_VersionLabel Condition="$(_VersionLabel.Contains('refs/pull/'))">$(VersionLabel.TrimEnd('.0123456789'))</_VersionLabel>
+    <!-- Next replace the prefix for simply 'pr', so we end up with 'pr99/merge' by default -->
+    <_VersionLabel>$(_VersionLabel.Replace('refs/pull/', 'pr'))</_VersionLabel>
+    <!-- Remove the /merge now, if present -->
+    <_VersionLabel>$(_VersionLabel.Replace('/merge', ''))</_VersionLabel>
+    <!-- Finally sanitize the branch with dashes, so we can build path-separated branches, like rel/v1.0.0 or feature/foo -->
+    <_VersionLabel>$(_VersionLabel.Replace('/', '-'))</_VersionLabel>
+    <!-- And underscores which are also invalid labels, so we can use branches like dev/feature_foo -->
+    <_VersionLabel>$(_VersionLabel.Replace('_', '-'))</_VersionLabel>
+
+    <!-- Set sanitized version to the actual version suffix used in build/pack -->
+    <VersionSuffix Condition="!$(VersionLabel.Contains('refs/tags/'))">$(_VersionLabel)</VersionSuffix>
+    <!-- Special case for tags, the label is actually the version. Backs compat since passed-in value overrides MSBuild-set one -->
+    <Version Condition="$(VersionLabel.Contains('refs/tags/'))">$(_VersionLabel)</Version>
+
+    <!-- In order for latest from main/master to always be greatest when using -prerelease switch on install/run, 
+         we change the scheme as follows:
+         - main/master remain as today: VersionPrefix: 42.42.${{ github.run_number }}  (from yaml)
+         - others: VersionPrefix: 42.42.0-[label].${{ github.run_number }}
+    -->
+    <IsMaster Condition="$(VersionLabel.Contains('refs/heads/main')) or $(VersionLabel.Contains('refs/heads/master'))">true</IsMaster>
+    <VersionPrefix Condition="'$(IsMaster)' != 'true'">42.42.0</VersionPrefix>
+    <VersionSuffix Condition="'$(IsMaster)' != 'true'">$(VersionSuffix).$(GITHUB_RUN_NUMBER)</VersionSuffix>
   </PropertyGroup>
 
-  <ItemGroup Condition="'$(ManagePackageVersionsCentrally)' == 'true'">
-    <PackageReference Include="Microsoft.SourceLink.GitHub" PrivateAssets="all" Visible="false" />
-    <PackageReference Include="Microsoft.NETFramework.ReferenceAssemblies" PrivateAssets="all" Visible="false" />
-    <PackageReference Include="NuGetizer" PrivateAssets="all" Visible="false" />
-    <PackageReference Include="ThisAssembly" PrivateAssets="all" Visible="false" />
+  <ItemGroup Label="ThisAssembly.Project">
+    <ProjectProperty Include="CI" />
+  
+    <ProjectProperty Include="Version" />
+    <ProjectProperty Include="VersionPrefix" />
+    <ProjectProperty Include="VersionSuffix" />
+
+    <ProjectProperty Include="PublicKey" />
+    <ProjectProperty Include="PublicKeyToken" />
   </ItemGroup>
 
-  <!-- Will only apply for cross-targeting, will be overriden by common targets typically. 
-       This is here for packaging projects only, which upon resolving references from dotnet-nugetize 
-       will call GetTargetPath and that would otherwise fail -->
-  <Target Name="GetTargetPath" DependsOnTargets="_SetGetTargetPathInnerTarget;DispatchToInnerBuilds" />
-  <Target Name="_SetGetTargetPathInnerTarget" Returns="@(InnerOutput)">
-    <PropertyGroup  Condition="'$(InnerTargets)' == ''">
-      <InnerTargets>GetTargetPath</InnerTargets>
-    </PropertyGroup>
-  </Target>
+  <ItemGroup Label="Throw">
+    <Using Include="System.ArgumentException" Static="true" />
+    <Using Include="System.ArgumentOutOfRangeException" Static="true" />
+    <Using Include="System.ArgumentNullException" Static="true" />
+  </ItemGroup>
 
+  <ItemGroup Label="OSMF" Condition="Exists('$(MSBuildThisFileDirectory)..\osmfeula.txt')">
+    <Content Include="$(MSBuildThisFileDirectory)..\osmfeula.txt" Link="osmfeula.txt" Pack="true" PackagePath="OSMFEULA.txt" Visible="false" />
+  </ItemGroup>
+
+  <Import Project="Directory.props" Condition="Exists('Directory.props')"/>
+  <Import Project="Directory.props.user" Condition="Exists('Directory.props.user')" />
+
+  <!-- If the imported props changed ManagePackageVersionsCentrally, we need to replicate 
+       the Version defaults from Microsoft.NET.DefaultAssemblyInfo.targets since it's too 
+       early here and Directory.Packages.props will be imported right after this time, 
+       meaning dependencies that expect to use the currently building Version would not 
+       get the expected value.
+   -->
+  <PropertyGroup Condition="'$(ManagePackageVersionsCentrally)' == 'true' and '$(Version)' == ''">
+    <VersionPrefix Condition=" '$(VersionPrefix)' == '' ">1.0.0</VersionPrefix>
+    <Version Condition=" '$(VersionSuffix)' != '' ">$(VersionPrefix)-$(VersionSuffix)</Version>
+    <Version Condition=" '$(Version)' == '' ">$(VersionPrefix)</Version>
+  </PropertyGroup>
+
+  <!-- Implemented by SDK in .targets, guaranteeing it's overwritten. Added here since we add a DependsOnTargets to it. 
+       Covers backwards compatiblity with non-SDK projects. -->
+  <Target Name="InitializeSourceControlInformation" />
 </Project>

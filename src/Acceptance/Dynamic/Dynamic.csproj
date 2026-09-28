@@ -16,7 +16,7 @@
     <PackageReference Include="xunit" Version="2.4.1" />
     <PackageReference Include="xunit.runner.visualstudio" Version="2.4.3" />
     <PackageReference Include="Moq" Version="$(Version)" />
-    <PackageReference Include="ManualAvatars" Version="$(AvatarVersion)" />
+    <PackageReference Include="ManualStunts" Version="$(StuntsVersion)" />
   </ItemGroup>
 
 </Project>

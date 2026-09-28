@@ -11,7 +11,7 @@ using System;
 using System.Collections.Generic;
 using System.Collections.ObjectModel;
 using System.Reflection;
-using Avatars;
+using Stunts;
 using System.Runtime.CompilerServices;
 using Sample;
 using System.Threading;
@@ -21,14 +21,14 @@ using System.Diagnostics;
 namespace Mocks
 {
     [DebuggerDisplay("{DebuggerDisplay,nq}")]
-    public partial class ICalculatorMock : ICalculator, IAvatar, IMocked
+    public partial class ICalculatorMock : ICalculator, IStunt, IMocked
     {
         [DebuggerBrowsable(DebuggerBrowsableState.Never)]
         readonly BehaviorPipeline pipeline = new BehaviorPipeline();
 
         [DebuggerBrowsable(DebuggerBrowsableState.Never)]
         [CompilerGenerated]
-        IList<IAvatarBehavior> IAvatar.Behaviors => pipeline.Behaviors;
+        IList<IStuntBehavior> IStunt.Behaviors => pipeline.Behaviors;
 
         [CompilerGenerated]
         public int? this[string name] { get => pipeline.Execute<int?>(MethodInvocation.Create(this, MethodBase.GetCurrentMethod(), name)); set => pipeline.Execute(MethodInvocation.Create(this, MethodBase.GetCurrentMethod(), name, value)); }

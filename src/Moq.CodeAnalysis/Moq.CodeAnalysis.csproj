@@ -1,5 +1,4 @@
-﻿<Project Sdk="Microsoft.NET.Sdk">
-  <Sdk Name="Microsoft.Build.CentralPackageVersions" />
+<Project Sdk="Microsoft.NET.Sdk">
 
   <PropertyGroup>
     <TargetFramework>netstandard2.0</TargetFramework>
@@ -7,8 +6,9 @@
   </PropertyGroup>
 
   <ItemGroup>
-    <PackageReference Include="Avatar" />
-    <PackageReference Include="Avatar.CodeAnalysis" Pack="false" />
+    <PackageReference Include="NuGetizer" PrivateAssets="all" />
+    <PackageReference Include="Stunts" />
+    <PackageReference Include="Stunts.CodeAnalysis" Pack="false" />
     <PackageReference Include="Superpower" PrivateAssets="all" />
     <PackageReference Include="Microsoft.CodeAnalysis.CSharp" Pack="false" />
     <PackageReference Include="Microsoft.CodeAnalysis.CSharp.Workspaces" Pack="false" />
