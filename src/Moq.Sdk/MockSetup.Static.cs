@@ -1,7 +1,7 @@
-﻿using System;
+using System;
 using System.Collections.Generic;
 using System.Linq;
-using Avatars;
+using Stunts;
 
 namespace Moq.Sdk
 {

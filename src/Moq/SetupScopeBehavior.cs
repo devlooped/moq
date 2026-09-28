@@ -2,7 +2,7 @@ using System;
 using System.Collections.Generic;
 using System.ComponentModel;
 using System.Linq;
-using Avatars;
+using Stunts;
 using Moq.Sdk;
 
 namespace Moq
@@ -11,7 +11,7 @@ namespace Moq
     /// A behavior that skips all behaviors that do not apply during a setup scope.
     /// </summary>
     [EditorBrowsable(EditorBrowsableState.Never)]
-    class SetupScopeBehavior : IAvatarBehavior
+    class SetupScopeBehavior : IStuntBehavior
     {
         static readonly HashSet<Type> setupScopeBehaviors = new HashSet<Type>
         {

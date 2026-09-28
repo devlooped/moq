@@ -1,8 +1,6 @@
 <Project>
   <!-- Prevent importing the shared targets -->
   <ItemGroup>
-    <PackageVersion Include="NuGetizer" Version="0.4.9" />
-    <PackageVersion Update="NuGetizer" Version="42.42.42" Condition="Exists('$(MSBuildThisFileDirectory)..\..\..\nugetizer\bin\')" />
-    <PackageReference Update="Avatar" Version="$(AvatarVersion)" />
+    <PackageReference Update="Stunts" Version="$(StuntsVersion)" />
   </ItemGroup>
 </Project>

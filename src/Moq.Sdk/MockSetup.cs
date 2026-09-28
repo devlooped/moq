@@ -1,9 +1,9 @@
-﻿using System;
+using System;
 using System.Diagnostics;
 using System.Linq;
 using System.Reflection;
 using System.Text;
-using Avatars;
+using Stunts;
 using TypeNameFormatter;
 
 namespace Moq.Sdk

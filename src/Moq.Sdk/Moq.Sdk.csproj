@@ -10,12 +10,12 @@
   </ItemGroup>  
   
   <ItemGroup>
-    <PackageReference Include="Avatar" />
+    <PackageReference Include="NuGetizer" PrivateAssets="all" />
+    <PackageReference Include="Stunts" />
     <PackageReference Include="TypeNameFormatter.Sources" />
     <PackageReference Include="Microsoft.Bcl.HashCode" />
     <PackageReference Include="Ben.Demystifier" />
     <PackageReference Include="IFluentInterface" PrivateAssets="all" />
-    <PackageReference Include="ThisAssembly" PrivateAssets="all" />
     <PackageReference Include="Microsoft.CodeAnalysis.CSharp.CodeStyle" Pack="false" />
   </ItemGroup>
 

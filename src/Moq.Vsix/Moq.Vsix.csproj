@@ -1,4 +1,4 @@
-﻿<Project>
+<Project>
   <Import Sdk="Microsoft.NET.Sdk" Project="Sdk.props" />
 
   <PropertyGroup>
@@ -8,6 +8,8 @@
   </PropertyGroup>
 
   <PropertyGroup>
+    <!-- VSIX deployment uses Visual Studio setup APIs that dotnet msbuild cannot run. -->
+    <DeployExtension Condition="'$(MSBuildRuntimeType)' == 'Core'">false</DeployExtension>
     <GeneratePkgDefFile>false</GeneratePkgDefFile>
     <IncludeAssemblyInVSIXContainer>false</IncludeAssemblyInVSIXContainer>
     <IncludeDebugSymbolsInVSIXContainer>true</IncludeDebugSymbolsInVSIXContainer>
@@ -17,9 +19,16 @@
   </PropertyGroup>
 
   <ItemGroup>
-    <PackageReference Include="Microsoft.VSSDK.BuildTools" Condition="'$(MSBuildRuntimeType)' == 'Full'" />
-    <PackageReference Include="Avatar" />
-    <PackageReference Include="Avatar.CodeAnalysis" />
+    <PackageReference Include="Stunts" />
+    <PackageReference Include="Stunts.CodeAnalysis" />
+  </ItemGroup>
+
+  <!-- The VSSDK build tools and the VS SDK are Windows-only; condition them so the project still loads cross-platform. -->
+  <ItemGroup Condition="'$(OS)' == 'Windows_NT'">
+    <PackageReference Include="Microsoft.VisualStudio.SDK" ExcludeAssets="runtime" />
+    <PackageReference Include="MessagePack" />
+    <PackageReference Include="Microsoft.VisualStudio.SDK.Analyzers" PrivateAssets="all" />
+    <PackageReference Include="Microsoft.VSSDK.BuildTools" PrivateAssets="all" />
   </ItemGroup>
 
   <PropertyGroup>
@@ -47,8 +56,8 @@
   <Target Name="AddPrivateAssets" BeforeTargets="GetVsixSourceItems">
     <ItemGroup>
       <VSIXSourceItem Include="@(RuntimeCopyLocalItems)"
-                      Condition="'%(NuGetPackageId)' == 'Avatar' or 
-                                 '%(NuGetPackageId)' == 'Avatar.CodeAnalysis'"/>
+                      Condition="'%(NuGetPackageId)' == 'Stunts' or 
+                                 '%(NuGetPackageId)' == 'Stunts.CodeAnalysis'"/>
     </ItemGroup>
   </Target>
 

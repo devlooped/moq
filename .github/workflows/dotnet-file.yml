@@ -1,0 +1,21 @@
+# Synchronizes .netconfig-configured files with dotnet-file
+name: dotnet-file
+on:
+  workflow_dispatch:
+  schedule:
+    - cron: "0 0 * * *"
+  push:
+    branches: [ 'dotnet-file' ]
+
+env:
+  DOTNET_NOLOGO: true
+
+jobs:
+  run:
+    permissions:
+      contents: write
+    uses: devlooped/oss/.github/workflows/dotnet-file-core.yml@main
+    secrets: 
+      BOT_NAME: ${{ secrets.BOT_NAME }}
+      BOT_EMAIL: ${{ secrets.BOT_EMAIL }}
+      GH_TOKEN: ${{ secrets.GH_TOKEN }}

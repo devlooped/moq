@@ -1,18 +1,4 @@
 <Solution>
-  <Folder Name="/Solution Items/">
-    <File Path=".editorconfig" />
-    <File Path="Directory.Build.rsp" />
-    <File Path="README.md" />
-    <File Path="src/Directory.Build.props" />
-    <File Path="src/Directory.Build.targets" />
-    <File Path="src/Directory.Packages.props" />
-  </Folder>
-  <Folder Name="/Solution Items/workflows/">
-    <File Path=".github/dependabot.yml" />
-    <File Path=".github/workflows/build.yml" />
-    <File Path=".github/workflows/release.yml" />
-    <File Path="azure-pipelines.yml" />
-  </Folder>
   <Project Path="src/Moq.CodeAnalysis.UnitTests/Moq.CodeAnalysis.UnitTests.csproj" />
   <Project Path="src/Moq.CodeAnalysis/Moq.CodeAnalysis.csproj" />
   <Project Path="src/Moq.DynamicProxy/Moq.DynamicProxy.csproj" />

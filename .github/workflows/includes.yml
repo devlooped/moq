@@ -1,0 +1,75 @@
+name: +Mᐁ includes
+on: 
+  workflow_dispatch:
+  push:
+    branches:
+      - 'main'
+    paths:
+      - '**.md'
+      - '!changelog.md'
+      - 'osmfeula.txt'
+
+jobs:
+  includes:
+    runs-on: ubuntu-latest
+    env:
+      PR_TOKEN: ${{ secrets.DEVLOOPED_TOKEN || secrets.GH_TOKEN }}
+    permissions:
+      contents: write
+      pull-requests: write
+    steps:
+      - name: 🤖 defaults
+        uses: devlooped/actions-bot@v1
+        with:
+          name: ${{ secrets.BOT_NAME }}
+          email: ${{ secrets.BOT_EMAIL }}
+          gh_token: ${{ env.PR_TOKEN }}
+          github_token: ${{ secrets.GITHUB_TOKEN }}
+
+      - name: 🤘 checkout
+        uses: actions/checkout@v4
+        with: 
+          token: ${{ env.PR_TOKEN || github.token }}
+
+      - name: +Mᐁ includes
+        uses: devlooped/actions-includes@v2
+
+      - name: 📝 OSMF EULA
+        shell: pwsh
+        run: |
+          $file = "osmfeula.txt"
+          $props = "src/Directory.Build.props"
+          if (-not (test-path $file) -or -not (test-path $props)) {
+            exit 0
+          }
+
+          $product = dotnet msbuild $props -getproperty:Product
+          if (-not $product) { 
+            write-error 'To use OSMF EULA, ensure the $(Product) property is set in Directory.props'
+            exit 1
+          }
+          
+          ((get-content -raw $file) -replace '\$product\$',$product).trim() | set-content $file
+
+      - name: ✍ pull request
+        if: env.PR_TOKEN != ''
+        uses: peter-evans/create-pull-request@v8
+        with:
+          add-paths: |
+            **.md
+            *.txt
+          base: main
+          branch: markdown-includes
+          delete-branch: true
+          labels: dependencies
+          author: ${{ env.BOT_AUTHOR }}
+          committer: ${{ env.BOT_AUTHOR }}
+          commit-message: +Mᐁ includes
+          title: +Mᐁ includes
+          body: +Mᐁ includes
+          token: ${{ env.PR_TOKEN }}
+
+      - name: ⚠️ skip pull request
+        if: env.PR_TOKEN == ''
+        shell: bash
+        run: echo "::warning::Skipping PR creation because neither DEVLOOPED_TOKEN nor GH_TOKEN is configured. GITHUB_TOKEN cannot create pull requests in this repository."

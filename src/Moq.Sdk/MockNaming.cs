@@ -1,5 +1,5 @@
-﻿using System;
-using Avatars;
+using System;
+using Stunts;
 
 namespace Moq.Sdk
 {
@@ -30,7 +30,7 @@ namespace Moq.Sdk
         /// and the given <paramref name="suffix"/> appended to the type name.
         /// </summary>
         public static string GetName(string suffix, Type baseType, Type[] additionalInterfaces)
-            => AvatarNaming.GetName(suffix, baseType, additionalInterfaces);
+            => StuntNaming.GetName(suffix, baseType, additionalInterfaces);
 
         /// <summary>
         /// Gets the runtime mock full name from its base type and optional additional interfaces,
@@ -49,6 +49,6 @@ namespace Moq.Sdk
         /// Gets the runtime mock full name from its base type and implemented interfaces.
         /// </summary>
         public static string GetFullName(string rootNamespace, string suffix, Type baseType, params Type[] additionalInterfaces)
-            => AvatarNaming.GetFullName(rootNamespace, suffix, baseType, additionalInterfaces);
+            => StuntNaming.GetFullName(rootNamespace, suffix, baseType, additionalInterfaces);
     }
 }

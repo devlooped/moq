@@ -6,15 +6,15 @@ using System.Runtime.CompilerServices;
 using System.Threading;
 using Moq.Sdk;
 using Sample;
-using Avatars;
+using Stunts;
 
 namespace Mocks
 {
-    public partial class CalculatorMock : Calculator, IMocked, IAvatar
+    public partial class CalculatorMock : Calculator, IMocked, IStunt
     {
         BehaviorPipeline pipeline = new BehaviorPipeline();
 
-        public IList<IAvatarBehavior> Behaviors => pipeline.Behaviors;
+        public IList<IStuntBehavior> Behaviors => pipeline.Behaviors;
 
         public override event EventHandler TurnedOn
         {

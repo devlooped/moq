@@ -1,11 +1,11 @@
-﻿#pragma warning disable CS0436
+#pragma warning disable CS0436
 using System;
 using Xunit;
 
 namespace Moq.Scenarios.MultipleUses
 {
     /// <summary>
-    /// Multiple uses of the avatar factory method only result in one 
+    /// Multiple uses of the stunt factory method only result in one 
     /// such type being generated (IWO, no compilation errors because 
     /// of duplicate types.
     /// </summary>

@@ -1,4 +1,4 @@
-﻿<Project Sdk="Microsoft.Build.NoTargets/2.0.1" DefaultTargets="Pack">
+﻿<Project Sdk="Microsoft.Build.NoTargets" DefaultTargets="Pack">
     <PropertyGroup>
         <TargetFramework>netstandard2.0</TargetFramework>
         <PackageId>Moq</PackageId>
@@ -15,8 +15,7 @@
         <PackageFile Include="@(None)" PackFolder="buildTransitive\netstandard2.0" />
     </ItemGroup>
     <ItemGroup>
-        <PackageReference Include="Microsoft.SourceLink.GitHub" Version="1.0.0" Visible="false" Pack="false" />
-        <PackageReference Include="NuGetizer" Version="0.4.9" Visible="false" />
+        <PackageReference Include="NuGetizer" Version="1.5.1" Visible="false" />
         <PackageReference Update="NuGetizer" Version="42.42.42" Visible="false" Condition="Exists('$(MSBuildThisFileDirectory)..\..\..\nugetizer\bin\')" />
     </ItemGroup>
     <ItemGroup>

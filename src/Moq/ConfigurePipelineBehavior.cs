@@ -1,5 +1,5 @@
 using System.ComponentModel;
-using Avatars;
+using Stunts;
 using Moq.Sdk;
 
 namespace Moq
@@ -9,7 +9,7 @@ namespace Moq
     /// specified for the mock.
     /// </summary>
     [EditorBrowsable(EditorBrowsableState.Never)]
-    class ConfigurePipelineBehavior : IAvatarBehavior
+    class ConfigurePipelineBehavior : IStuntBehavior
     {
         /// <summary>
         /// Always applies to all invocations.

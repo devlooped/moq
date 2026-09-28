@@ -1,0 +1,39 @@
+<Project>
+  <PropertyGroup>
+    <Product>Moq</Product>
+    <ImplicitUsings>true</ImplicitUsings>
+    <Authors>kzu</Authors>
+
+    <!-- CodeAnalysis.Analyzers 3.11 adds every .resx as an AdditionalFile and
+         blanks ThisAssembly.Strings' SourceItemType, so the strings generator emits nothing. -->
+    <SkipAddAllResxFilesAsAdditionalFiles>true</SkipAddAllResxFilesAsAdditionalFiles>
+    <TypeNameFormatterInternal>false</TypeNameFormatterInternal>
+    <PackOnBuild Condition="'$(PackOnBuild)' == ''">$(CI)</PackOnBuild>
+
+    <!-- NoTargets/Traversal projects do not support central package versions. -->
+    <ManagePackageVersionsCentrally Condition="'$(MSBuildProjectExtension)' != '.csproj' and '$(MSBuildProjectExtension)' != '.vbproj'">false</ManagePackageVersionsCentrally>
+
+    <RestoreAdditionalProjectSources>https://kzu.blob.core.windows.net/nuget/index.json;$(RestoreAdditionalProjectSources)</RestoreAdditionalProjectSources>
+    <RestoreAdditionalProjectSources Condition="Exists('$(MSBuildThisFileDirectory)..\..\nugetizer\bin\')">$([System.IO.Path]::GetFullPath('$(MSBuildThisFileDirectory)..\..\nugetizer\bin'));$(RestoreAdditionalProjectSources)</RestoreAdditionalProjectSources>
+    <RestoreAdditionalProjectSources Condition="Exists('$(MSBuildThisFileDirectory)..\..\stunts\bin\')">$([System.IO.Path]::GetFullPath('$(MSBuildThisFileDirectory)..\..\stunts\bin'));$(RestoreAdditionalProjectSources)</RestoreAdditionalProjectSources>
+    <RestoreAdditionalProjectSources Condition="Exists('$(MSBuildThisFileDirectory)..\..\ThisAssembly\bin\')">$([System.IO.Path]::GetFullPath('$(MSBuildThisFileDirectory)..\..\ThisAssembly\bin'));$(RestoreAdditionalProjectSources)</RestoreAdditionalProjectSources>
+
+    <AssemblyOriginatorKeyFile>$(MSBuildThisFileDirectory)Moq.snk</AssemblyOriginatorKeyFile>
+    <PublicKey>00240000048000009400000006020000002400005253413100040000010001009f7a95086500f8f66d892174803850fed9c22225c2ccfff21f39c8af8abfa5415b1664efd0d8e0a6f7f2513b1c11659bd84723dc7900c3d481b833a73a2bcf1ed94c16c4be64d54352c86956c89930444e9ac15124d3693e3f029818e8410f167399d6b995324b635e95353ba97bfab856abbaeb9b40c9b160070c6325e22ddc</PublicKey>
+    <PublicKeyToken>69f491c39445e920</PublicKeyToken>
+    <SignAssembly>true</SignAssembly>
+  </PropertyGroup>
+
+  <ItemGroup Condition="'$(ManagePackageVersionsCentrally)' == 'true'">
+    <PackageReference Include="Microsoft.NETFramework.ReferenceAssemblies" PrivateAssets="all" Visible="false" />
+    <PackageReference Include="ThisAssembly" PrivateAssets="all" Visible="false" />
+  </ItemGroup>
+
+  <!-- Packaging projects resolve references via dotnet-nugetize, which calls GetTargetPath. -->
+  <Target Name="GetTargetPath" DependsOnTargets="_SetGetTargetPathInnerTarget;DispatchToInnerBuilds" />
+  <Target Name="_SetGetTargetPathInnerTarget" Returns="@(InnerOutput)">
+    <PropertyGroup Condition="'$(InnerTargets)' == ''">
+      <InnerTargets>GetTargetPath</InnerTargets>
+    </PropertyGroup>
+  </Target>
+</Project>

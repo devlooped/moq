@@ -1,4 +1,4 @@
-﻿<Project Sdk="Microsoft.NET.Sdk">
+<Project Sdk="Microsoft.NET.Sdk">
 
   <PropertyGroup>
     <TargetFramework>netstandard2.0</TargetFramework>
@@ -12,7 +12,8 @@
   </PropertyGroup>
 
   <ItemGroup>
-    <PackageReference Include="Avatar.StaticProxy" Pack="false" />
+    <PackageReference Include="NuGetizer" PrivateAssets="all" />
+    <PackageReference Include="Stunts.StaticProxy" Pack="false" />
 
     <PackageReference Include="Microsoft.CodeAnalysis.CSharp.CodeStyle" Pack="false" />
     <PackageReference Include="Microsoft.CodeAnalysis.Common" Pack="false" />

@@ -13,8 +13,8 @@
       $([System.IO.Path]::GetFullPath('$(MSBuildThisFileDirectory)../../../nugetizer/bin'));
       $(RestoreSources)
     </RestoreSources>
-    <RestoreSources Condition="Exists('$(MSBuildThisFileDirectory)../../../avatar/bin/')">
-      $([System.IO.Path]::GetFullPath('$(MSBuildThisFileDirectory)../../../avatar/bin'));
+    <RestoreSources Condition="Exists('$(MSBuildThisFileDirectory)../../../stunts/bin/')">
+      $([System.IO.Path]::GetFullPath('$(MSBuildThisFileDirectory)../../../stunts/bin'));
       $(RestoreSources)
     </RestoreSources>
   </PropertyGroup>

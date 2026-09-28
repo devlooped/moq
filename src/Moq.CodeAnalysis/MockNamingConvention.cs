@@ -1,4 +1,4 @@
-﻿using Avatars.CodeAnalysis;
+using Stunts.CodeAnalysis;
 using Moq.Sdk;
 
 namespace Moq

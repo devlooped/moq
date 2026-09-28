@@ -1,15 +1,15 @@
-﻿using System.Collections.ObjectModel;
-using Avatars;
+using System.Collections.ObjectModel;
+using Stunts;
 
 namespace Moq.Sdk
 {
     /// <summary>
-    /// An <see cref="IAvatarBehavior"/> that applies a set of behaviors 
+    /// An <see cref="IStuntBehavior"/> that applies a set of behaviors 
     /// selectively when the current invocation satisfies the 
     /// <see cref="IMockSetup.AppliesTo(IMethodInvocation)"/> method for 
     /// this instance's <see cref="Setup"/>.
     /// </summary>
-    public interface IMockBehaviorPipeline : IAvatarBehavior
+    public interface IMockBehaviorPipeline : IStuntBehavior
     {
         /// <summary>
         /// List of behaviors that should be executed whenever the 

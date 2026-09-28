@@ -1,6 +1,6 @@
-﻿using System;
+using System;
 using System.Reflection;
-using Avatars;
+using Stunts;
 using Moq.Sdk;
 
 namespace Moq

@@ -11,7 +11,7 @@ using System;
 using System.Collections.Generic;
 using System.Collections.ObjectModel;
 using System.Reflection;
-using Avatars;
+using Stunts;
 using System.Runtime.CompilerServices;
 using System.ComponentModel;
 using System.Threading;
@@ -19,11 +19,11 @@ using Moq.Sdk;
 
 namespace Mocks
 {
-    public partial class INotifyPropertyChangedMock : INotifyPropertyChanged, IAvatar, IMocked
+    public partial class INotifyPropertyChangedMock : INotifyPropertyChanged, IStunt, IMocked
     {
         readonly BehaviorPipeline pipeline = new BehaviorPipeline();
 
-        IList<IAvatarBehavior> IAvatar.Behaviors => pipeline.Behaviors;
+        IList<IStuntBehavior> IStunt.Behaviors => pipeline.Behaviors;
 
 
         public override bool Equals(object obj) => pipeline.Execute<bool>(MethodInvocation.Create(this, MethodBase.GetCurrentMethod(), obj));

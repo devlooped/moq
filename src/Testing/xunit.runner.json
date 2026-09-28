@@ -1,7 +1,0 @@
-﻿{
-  "appDomain": "required",
-  "parallelizeAssembly": false,
-  "parallelizeTestCollections": false,
-  "methodDisplay": "classAndMethod",
-  "shadowCopy": false
-}

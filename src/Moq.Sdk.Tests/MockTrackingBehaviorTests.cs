@@ -1,5 +1,5 @@
-﻿using System.Reflection;
-using Avatars;
+using System.Reflection;
+using Stunts;
 using Xunit;
 
 namespace Moq.Sdk.Tests

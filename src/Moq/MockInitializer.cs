@@ -1,5 +1,5 @@
-﻿using System.ComponentModel;
-using Avatars;
+using System.ComponentModel;
+using Stunts;
 using Moq.Sdk;
 
 namespace Moq

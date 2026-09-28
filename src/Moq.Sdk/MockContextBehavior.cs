@@ -1,6 +1,6 @@
 using System;
 using System.Diagnostics;
-using Avatars;
+using Stunts;
 
 namespace Moq.Sdk
 {
@@ -13,7 +13,7 @@ namespace Moq.Sdk
     /// respectively.
     /// </para>
     /// </summary>
-    public class MockContextBehavior : IAvatarBehavior
+    public class MockContextBehavior : IStuntBehavior
     {
         /// <summary>
         /// Returns <see langword="true"/> since it tracks all invocations.

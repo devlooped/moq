@@ -7,7 +7,6 @@
   </PropertyGroup>
 
   <ItemGroup>
-    <PackageReference Include="Microsoft.NETFramework.ReferenceAssemblies" />
     <PackageReference Include="Microsoft.NET.Test.Sdk" />
     <PackageReference Include="Microsoft.TestPlatform.ObjectModel" />
     <PackageReference Include="xunit" />
@@ -21,6 +20,7 @@
     <PackageReference Include="Microsoft.CodeAnalysis.VisualBasic.Features" />
     <PackageReference Include="Microsoft.CodeAnalysis.VisualBasic.Workspaces" />
     <PackageReference Include="SQLitePCLRaw.bundle_green" />
+    <PackageReference Include="SQLitePCLRaw.lib.e_sqlite3" />
   </ItemGroup>
 
   <ItemGroup>

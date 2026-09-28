@@ -13,8 +13,8 @@
     <Asset Type="Microsoft.VisualStudio.Analyzer" d:Source="Project" d:ProjectName="Moq.CodeAnalysis" Path="|Moq.CodeAnalysis|"/>
     <Asset Type="Microsoft.VisualStudio.MefComponent" d:Source="Project" d:ProjectName="Moq.Sdk" Path="|Moq.Sdk|"/>
     <Asset Type="Microsoft.VisualStudio.Analyzer" d:Source="Project" d:ProjectName="Moq.Sdk" Path="|Moq.Sdk|"/>
-    <Asset Type="Microsoft.VisualStudio.MefComponent" d:Source="File" Path="Avatar"/>
-    <Asset Type="Microsoft.VisualStudio.MefComponent" d:Source="File" Path="Avatar.CodeAnalysis"/>
+    <Asset Type="Microsoft.VisualStudio.MefComponent" d:Source="File" Path="Stunts"/>
+    <Asset Type="Microsoft.VisualStudio.MefComponent" d:Source="File" Path="Stunts.CodeAnalysis"/>
     <Asset Type="Microsoft.VisualStudio.MefComponent" d:Source="File" Path="Superpower"/>
   </Assets>
   <Prerequisites>

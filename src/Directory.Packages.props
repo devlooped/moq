@@ -1,61 +1,59 @@
 <Project>
 
   <PropertyGroup>
-    <AvatarVersion>42.42.42-main.434</AvatarVersion>
-    <AvatarVersion Condition="Exists('$(MSBuildThisFileDirectory)..\..\avatar\bin\')">42.42.42</AvatarVersion>
+    <StuntsVersion>[1.0.0-beta.2]</StuntsVersion>
   </PropertyGroup>
 
   <ItemGroup Label="Core">
-    <PackageVersion Include="Microsoft.SourceLink.GitHub" Version="1.0.0" />
     <PackageVersion Include="Microsoft.NETFramework.ReferenceAssemblies" Version="1.0.0" />
     <PackageVersion Include="ThisAssembly" Version="1.0.0-rc.1" />
     <PackageVersion Update="ThisAssembly" Version="42.42.42" Condition="Exists('$(MSBuildThisFileDirectory)..\..\ThisAssembly\bin\')" />
-    <PackageVersion Include="NuGetizer" Version="0.4.9" />
+    <PackageVersion Include="NuGetizer" Version="1.5.1" />
     <PackageVersion Update="NuGetizer" Version="42.42.42" Condition="Exists('$(MSBuildThisFileDirectory)..\..\nugetizer\bin\')" />
-    <PackageVersion Include="Avatar" Version="$(AvatarVersion)" />
-    <PackageVersion Include="Avatar.CodeAnalysis" Version="$(AvatarVersion)" />
-    <PackageVersion Include="Avatar.DynamicProxy" Version="$(AvatarVersion)" />
-    <PackageVersion Include="Avatar.StaticProxy" Version="$(AvatarVersion)" />
+    <PackageVersion Include="Stunts" Version="$(StuntsVersion)" />
+    <PackageVersion Include="Stunts.CodeAnalysis" Version="$(StuntsVersion)" />
+    <PackageVersion Include="Stunts.DynamicProxy" Version="$(StuntsVersion)" />
+    <PackageVersion Include="Stunts.StaticProxy" Version="$(StuntsVersion)" />
     <PackageVersion Include="Microsoft.CSharp" Version="4.7.0" />
   </ItemGroup>
 
   <ItemGroup Label="Roslyn">
-    <PackageVersion Include="Microsoft.CodeAnalysis.Common" Version="4.14.0" />
-    <PackageVersion Include="Microsoft.CodeAnalysis.CSharp" Version="4.14.0" />
-    <PackageVersion Include="Microsoft.CodeAnalysis.CSharp.Features" Version="4.14.0" />
-    <PackageVersion Include="Microsoft.CodeAnalysis.CSharp.Workspaces" Version="4.14.0"/>
-    <PackageVersion Include="Microsoft.CodeAnalysis.VisualBasic" Version="4.14.0" />
-    <PackageVersion Include="Microsoft.CodeAnalysis.VisualBasic.Features" Version="4.14.0" />
-    <PackageVersion Include="Microsoft.CodeAnalysis.VisualBasic.Workspaces" Version="4.14.0" />
+    <PackageVersion Include="Microsoft.CodeAnalysis.Common" Version="5.0.0" />
+    <PackageVersion Include="Microsoft.CodeAnalysis.CSharp" Version="5.0.0" />
+    <PackageVersion Include="Microsoft.CodeAnalysis.CSharp.Features" Version="5.0.0" />
+    <PackageVersion Include="Microsoft.CodeAnalysis.CSharp.Workspaces" Version="5.0.0"/>
+    <PackageVersion Include="Microsoft.CodeAnalysis.VisualBasic" Version="5.0.0" />
+    <PackageVersion Include="Microsoft.CodeAnalysis.VisualBasic.Features" Version="5.0.0" />
+    <PackageVersion Include="Microsoft.CodeAnalysis.VisualBasic.Workspaces" Version="5.0.0" />
     <PackageVersion Include="Microsoft.CodeAnalysis.CSharp.CodeStyle" Version="3.8.0" />
 
-    <PackageVersion Include="Microsoft.Bcl.HashCode" Version="1.1.0" />
+    <PackageVersion Include="Microsoft.Bcl.HashCode" Version="6.0.0" />
     
     <!-- For packaging purposes -->
     <PackageVersion Include="Microsoft.Bcl.AsyncInterfaces" Version="9.0.0" />
 
-    <!-- Unit tests need to pack this for tests to run on macOS, for example -->
-    <PackageVersion Include="SQLitePCLRaw.bundle_green" Version="2.0.4" />
+    <!-- Unit tests need the native SQLite bundle (macOS). lib.e_sqlite3 is pinned above the 2.1.11 advisory. -->
+    <PackageVersion Include="SQLitePCLRaw.bundle_green" Version="2.1.11" />
+    <PackageVersion Include="SQLitePCLRaw.lib.e_sqlite3" Version="2.1.13" />
   </ItemGroup>
 
   <ItemGroup Label="Tests">
     <PackageVersion Include="Microsoft.CodeAnalysis.CSharp.Analyzer.Testing" Version="1.1.4" />
-    <PackageVersion Include="Microsoft.NETFramework.ReferenceAssemblies" Version="1.0.0" />
-    <PackageVersion Include="Microsoft.NET.Test.Sdk" Version="16.7.1" />
-    <PackageVersion Include="Microsoft.TestPlatform.ObjectModel" Version="16.7.1" />
+    <PackageVersion Include="Microsoft.NET.Test.Sdk" Version="17.14.1" />
+    <PackageVersion Include="Microsoft.TestPlatform.ObjectModel" Version="17.14.1" />
     <PackageVersion Include="xunit" Version="2.4.1" />
     <PackageVersion Include="xunit.runner.console" Version="2.4.1" />
     <PackageVersion Include="xunit.runner.msbuild" Version="2.4.1" />
     <PackageVersion Include="xunit.runner.visualstudio" Version="2.4.3" />
-    <PackageVersion Include="coverlet.collector" Version="1.3.0" />
-    <PackageVersion Include="coverlet.msbuild" Version="2.9.0" />
     <PackageVersion Include="System.ComponentModel.Composition" Version="5.0.0" />
-    <PackageVersion Include="ManualAvatars" Version="$(AvatarVersion)" />
+    <PackageVersion Include="ManualStunts" Version="$(StuntsVersion)" />
   </ItemGroup>
 
   <ItemGroup Label="MSBuild">
-    <PackageVersion Include="Microsoft.Build" Version="16.6.0" />
-    <PackageVersion Include="Microsoft.Build.Tasks.Core" Version="16.6.0" />
+    <PackageVersion Include="Microsoft.Build" Version="17.14.28" />
+    <PackageVersion Include="Microsoft.Build.Tasks.Core" Version="17.14.28" />
+    <!-- Tasks.Core 17.14.28 pulls 9.0.0, which is below the 9.0.15 advisory fix. -->
+    <PackageVersion Include="System.Security.Cryptography.Xml" Version="9.0.20" />
     <PackageVersion Include="Microsoft.Build.Locator" Version="1.2.6" />
     <PackageVersion Include="MSBuild.StructuredLogger" Version="2.1.176" />
   </ItemGroup>
@@ -63,11 +61,14 @@
   <ItemGroup>
     <PackageVersion Include="IFluentInterface" Version="2.0.4" />
     <PackageVersion Include="TypeNameFormatter.Sources" Version="1.0.1" />
-    <PackageVersion Include="Castle.Core" Version="4.4.1" />
     <PackageVersion Include="Superpower" Version="2.3.0" />
     <PackageVersion Include="Ben.Demystifier" Version="0.1.4" />
 
-    <PackageVersion Include="Microsoft.VSSDK.BuildTools" Version="16.7.3069" />
+    <!-- 2.5.192 from the VS SDK is affected by GHSA-hv8m-jj95-wg3x; 2.5.305 is the patched 2.5 line. -->
+    <PackageVersion Include="MessagePack" Version="2.5.305" />
+    <PackageVersion Include="Microsoft.VisualStudio.SDK" Version="17.14.40265" />
+    <PackageVersion Include="Microsoft.VisualStudio.SDK.Analyzers" Version="17.7.113" />
+    <PackageVersion Include="Microsoft.VSSDK.BuildTools" Version="17.14.2142" />
   </ItemGroup>
 
 </Project>

@@ -2,12 +2,12 @@
 
   <PropertyGroup>
     <MoqAnalyzerDir>$(MSBuildThisFileDirectory)..\..\tools\netstandard2.0</MoqAnalyzerDir>
-    <!-- SourceGeneratorSupported provided by Avatar.targets -->
+    <!-- SourceGeneratorSupported provided by Stunts.targets -->
     <RegisterStaticMockFactory Condition="'$(RegisterStaticMockFactory)' == '' and 
                                           '$(SourceGeneratorSupported)' == 'true'">true</RegisterStaticMockFactory>
   </PropertyGroup>
   
-  <!-- Avatar provides this property -->
+  <!-- Stunts provides this property -->
   <ItemGroup Condition="'$(SourceGeneratorSupported)' == 'true'">
     <CompilerVisibleProperty Include="DebugMoqSourceGenerator" />
     <CompilerVisibleProperty Include="MoqAnalyzerDir" />
