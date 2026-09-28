@@ -1,6 +1,7 @@
 using System;
 using System.Collections.Generic;
 using System.Linq;
+using System.Text.RegularExpressions;
 using System.Threading;
 using Microsoft.CodeAnalysis;
 using Microsoft.CodeAnalysis.CodeActions;
@@ -79,4 +80,13 @@ public abstract partial class CodeFixVerifier : DiagnosticVerifier
         root = Formatter.Format(root, Formatter.Annotation, simplifiedDoc.Project.Solution.Workspace);
         return root.GetText().ToString();
     }
+
+    /// <summary>
+    /// Replaces every CRLF, CR or LF in <paramref name="text"/> with LF.
+    /// </summary>
+    /// <remarks>
+    /// Fixtures carry whatever line endings git checked out, while the formatter
+    /// emits the platform newline for the nodes a fix adds.
+    /// </remarks>
+    static string NormalizeLineEndings(string text) => Regex.Replace(text, @"\r\n|\r|\n", "\n");
 }
