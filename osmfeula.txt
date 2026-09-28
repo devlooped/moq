@@ -2,7 +2,7 @@ End User License Agreement
 
 This Open Source Maintenance Fee Agreement ("Agreement") is a legal agreement
 between you ("User") and Devlooped ("Project") for the use of
-$product$ ("Software"), an open source software project licensed under
+Moq ("Software"), an open source software project licensed under
 the MIT License ("OSI License"), an OSI-approved open source license.
 Project offers a Binary Release of the Software to Users in exchange for a
 maintenance fee ("Fee"). "Binary Release" refers to pre-compiled executable
