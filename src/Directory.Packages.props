@@ -64,7 +64,7 @@
     <PackageVersion Include="IFluentInterface" Version="2.1.0" />
     <PackageVersion Include="TypeNameFormatter.Sources" Version="1.0.1" />
     <PackageVersion Include="Superpower" Version="2.3.0" />
-    <PackageVersion Include="Ben.Demystifier" Version="0.1.4" />
+    <PackageVersion Include="Ben.Demystifier" Version="0.4.1" />
 
     <!-- 2.5.192 from the VS SDK is affected by GHSA-hv8m-jj95-wg3x; 2.5.305 is the patched 2.5 line. -->
     <PackageVersion Include="MessagePack" Version="2.5.305" />
