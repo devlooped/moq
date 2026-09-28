@@ -1,6 +1,6 @@
 using System;
 using System.ComponentModel;
-using Moq.Sdk;
+using System.Runtime.CompilerServices;
 using Stunts;
 
 namespace Moq
@@ -11,62 +11,51 @@ namespace Moq
     [EditorBrowsable(EditorBrowsableState.Never)]
     public static partial class CallbackExtension
     {
-        static TResult Callback<TResult>(this TResult target, Action<IArgumentCollection> callback)
+        /// <summary>
+        /// Specifies a callback to invoke when the void member is called, which receives 
+        /// the invocation arguments and can set ref/out arguments.
+        /// </summary>
+        public static ISetup<TDelegate> Callback<TDelegate>(this ISetup<TDelegate> setup, TDelegate callback)
+            where TDelegate : Delegate
         {
-            var setup = MockContext.CurrentSetup;
-            if (setup != null)
-            {
-                var mock = MockRuntime.Get(setup.Invocation.Target);
+            if (callback == null)
+                throw new ArgumentNullException(nameof(callback));
 
-                mock.Invocations.Remove(setup.Invocation);
-                var behavior = mock.GetPipeline(setup);
+            if (setup.IsUntyped() && callback is Action<IArgumentCollection> untyped)
+                setup.AddCallback(untyped);
+            else
+                setup.AddCallback(args => callback.InvokeWith(args), callback.HasRefOut());
 
-                // If there is already a behavior wrap it instead, 
-                // so we can do a callback after even it if it's a 
-                // short-circuiting one like Returns.
-                if (behavior.Behaviors.Count > 0)
-                {
-                    var wrapped = behavior.Behaviors[behavior.Behaviors.Count - 1];
-                    behavior.Behaviors.RemoveAt(behavior.Behaviors.Count - 1);
-                    behavior.Behaviors.Add(new AnonymousMockBehavior(
-                        (m, i, next) =>
-                        {
-                            // If the wrapped target does not invoke the next 
-                            // behavior (us), then we invoke the callback explicitly.
-                            var called = false;
+            return setup;
+        }
 
-                            // Note we're tweaking the GetNextBehavior to always 
-                            // call us, before invoking the actual next behavior.
-                            var result = wrapped.Execute(m, i, () => (IMockRuntime _, IMethodInvocation __, GetNextMockBehavior ___) =>
-                            {
-                                callback(i.Arguments);
-                                called = true;
-                                return next()(m, i, next);
-                            });
+        /// <summary>
+        /// Specifies a callback to invoke when the member is called, which receives the invocation arguments.
+        /// </summary>
+        public static ISetup<Func<IArgumentCollection, TResult>, TResult> Callback<TResult>(this ISetup<Func<IArgumentCollection, TResult>, TResult> setup, Action<IArgumentCollection> callback)
+        {
+            if (callback == null)
+                throw new ArgumentNullException(nameof(callback));
 
-                            // The Returns behavior does not invoke the GetNextBehavior, 
-                            // and therefore we won't have been called in that case, 
-                            // so call the callback before returning.
-                            if (!called)
-                                callback(i.Arguments);
+            if (setup.IsUntyped())
+                setup.AddCallback(callback);
+            else
+                setup.AddCallback(args => callback((IArgumentCollection)args.GetValue(0)!));
 
-                            return result;
-                        }, "Callback")
-                   );
-                }
-                else
-                {
-                    behavior.Behaviors.Add(new AnonymousMockBehavior(
-                        (m, i, next) =>
-                        {
-                            callback(i.Arguments);
-                            return next()(m, i, next);
-                        }, "Callback")
-                   );
-                }
-            }
+            return setup;
+        }
 
-            return target;
+        /// <summary>
+        /// Specifies a callback to invoke when the member is called.
+        /// </summary>
+        [OverloadResolutionPriority(-1)]
+        public static TSetup Callback<TSetup>(this TSetup setup, Action callback) where TSetup : ISetup
+        {
+            if (callback == null)
+                throw new ArgumentNullException(nameof(callback));
+
+            setup.AddCallback(_ => callback());
+            return setup;
         }
     }
 }

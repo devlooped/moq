@@ -7,9 +7,9 @@ using Stunts;
 namespace Moq
 {
     /// <summary>
-    /// A custom behavior for returning values, so that 
-    /// the actual value to return can be replaced on successive
-    /// <see cref="ReturnsExtension"/> method calls.
+    /// A custom behavior for returning values (or throwing exceptions), so that 
+    /// the actual outcome can be replaced on successive <see cref="ReturnsExtension"/> 
+    /// and <see cref="ThrowsExtension"/> method calls.
     /// </summary>
     [DebuggerDisplay("{DebuggerValue}", Name = "Returns", Type = nameof(ReturnsBehavior))]
     [EditorBrowsable(EditorBrowsableState.Never)]
@@ -19,6 +19,8 @@ namespace Moq
         Func<IArgumentCollection, object?> getter;
         [DebuggerBrowsable(DebuggerBrowsableState.Never)]
         object? value;
+        [DebuggerBrowsable(DebuggerBrowsableState.Never)]
+        Exception? exception;
 
         public ReturnsBehavior(Func<IArgumentCollection, object?> valueGetter) => getter = valueGetter;
 
@@ -28,12 +30,20 @@ namespace Moq
             getter = _ => value;
         }
 
+        public ReturnsBehavior(Exception exception)
+        {
+            getter = _ => null;
+            Exception = exception;
+        }
+
         [DebuggerBrowsable(DebuggerBrowsableState.Never)]
         public object? Value
         {
+            get => value;
             set
             {
                 this.value = value;
+                exception = null;
                 getter = _ => this.value;
             }
         }
@@ -44,16 +54,30 @@ namespace Moq
             get => getter;
             set
             {
-                // Clear previous constant value, if any.
+                // Clear previous constant value or exception, if any.
                 this.value = null;
+                exception = null;
                 getter = value;
             }
         }
 
         [DebuggerBrowsable(DebuggerBrowsableState.Never)]
-        object DebuggerValue => value ?? "<function>";
+        public Exception? Exception
+        {
+            get => exception;
+            set
+            {
+                this.value = null;
+                exception = value;
+            }
+        }
+
+        [DebuggerBrowsable(DebuggerBrowsableState.Never)]
+        object DebuggerValue => (object?)exception ?? value ?? "<function>";
 
         public IMethodReturn Execute(IMockRuntime mock, IMethodInvocation invocation, GetNextMockBehavior next)
-            => invocation.CreateValueReturn(getter(invocation.Arguments), invocation.Arguments);
+            => exception != null ?
+                invocation.CreateExceptionReturn(exception) :
+                invocation.CreateValueReturn(getter(invocation.Arguments), invocation.Arguments);
     }
 }

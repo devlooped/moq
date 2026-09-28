@@ -38,6 +38,12 @@
   </ItemGroup>
 
   <ItemGroup>
+    <!-- Old setup syntax test data, rewritten along with MOQ001 for the typed setups API. -->
+    <Compile Remove="MOQ001\*Diagnostic*.cs" />
+    <None Include="MOQ001\*Diagnostic*.cs" CopyToOutputDirectory="PreserveNewest" />
+  </ItemGroup>
+
+  <ItemGroup>
     <FileConstant Include="**/*.cs" Exclude="obj/**/*.*;bin/**/*.*;Helpers/**/*.*" />
   </ItemGroup>
 

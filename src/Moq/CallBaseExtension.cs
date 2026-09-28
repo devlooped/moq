@@ -10,32 +10,20 @@ namespace Moq
     public static class CallBaseExtension
     {
         /// <summary>
-        /// Specifies to call the base member virtual implementations by default.
+        /// Specifies to call the base member virtual implementation when the setup is matched. 
+        /// To call base members by default, use <see cref="IMock.CallBase"/> instead.
         /// </summary>
-        public static T CallBase<T>(this T target)
+        public static TSetup CallBase<TSetup>(this TSetup setup) where TSetup : ISetup
         {
-            if (target is IMocked mocked && mocked != null)
-            {
-                // Configure CallBase at the Mock level
-                MockRuntimeExtensions.SetCallBase(MockRuntime.Get(mocked), true);
-            }
-            else if (MockContext.CurrentInvocation != null)
-            {
-                // Configure CallBase at the invocation level
-                MockRuntime.Get(MockContext.CurrentInvocation.Target)
-                    .GetPipeline(MockContext.CurrentSetup ?? CallContext.ThrowUnexpectedNull<IMockSetup>())
-                    .Behaviors.Add(new AnonymousMockBehavior(
-                         (m, i, next) =>
-                         {
-                             // set CallBase
-                             i.Context[nameof(IMock.CallBase)] = true;
-                             return next().Invoke(MockRuntime.Get(i.Target), i, next);
-                         },
-                         nameof(IMock.CallBase)));
-            }
-            // TODO: else throw?
+            setup.GetPipeline().Behaviors.Add(new AnonymousMockBehavior(
+                (m, i, next) =>
+                {
+                    i.Context[nameof(IMock.CallBase)] = true;
+                    return next().Invoke(m, i, next);
+                },
+                nameof(IMock.CallBase)));
 
-            return target;
+            return setup;
         }
     }
 }

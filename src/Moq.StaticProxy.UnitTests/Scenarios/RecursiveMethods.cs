@@ -1,5 +1,6 @@
 ﻿#pragma warning disable CS0436
 using Xunit;
+using static Moq.Syntax;
 
 namespace Moq.Scenarios.RecursiveMethods
 {
@@ -9,10 +10,7 @@ namespace Moq.Scenarios.RecursiveMethods
         {
             var mock = Mock.Of<IFoo>();
 
-            using (mock.Setup())
-            {
-                mock.GetBar().GetBaz().Name.Returns("hi");
-            }
+            Setup(() => mock.GetBar().GetBaz().Name).Returns("hi");
 
             Assert.Equal("hi", mock.GetBar().GetBaz().Name);
         }

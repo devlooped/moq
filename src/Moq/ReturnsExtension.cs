@@ -1,8 +1,7 @@
 using System;
 using System.ComponentModel;
-using System.Linq;
+using System.Runtime.CompilerServices;
 using System.Threading.Tasks;
-using Moq.Sdk;
 using Stunts;
 
 namespace Moq
@@ -16,189 +15,121 @@ namespace Moq
         /// <summary>
         /// Sets the return value for a property or non-void method.
         /// </summary>
-        public static TResult Returns<TResult>(this TResult target, TResult value)
+        [OverloadResolutionPriority(1)]
+        public static ISetup<TDelegate, TResult> Returns<TDelegate, TResult>(this ISetup<TDelegate, TResult> setup, TResult value)
         {
-            var setup = MockContext.CurrentSetup;
-            if (setup != null)
-            {
-                var mock = MockRuntime.Get(setup.Invocation.Target);
-                mock.Invocations.Remove(setup.Invocation);
-                var behavior = mock.GetPipeline(setup);
-                var returnBehavior = behavior.Behaviors.OfType<ReturnsBehavior>().FirstOrDefault();
-                if (returnBehavior != null)
-                    returnBehavior.Value = value;
-                else
-                    behavior.Behaviors.Add(new ReturnsBehavior(value));
-            }
-
-            return target;
+            setup.SetReturnValue(value);
+            return setup;
         }
 
         /// <summary>
         /// Sets the return value for a property or non-void method to 
-        /// be evaluated dynamically using the given function on every 
-        /// call.
+        /// be evaluated dynamically using the given function on every call.
         /// </summary>
-        public static TResult Returns<TResult>(this TResult target, Func<TResult> value)
+        public static ISetup<TDelegate, TResult> Returns<TDelegate, TResult>(this ISetup<TDelegate, TResult> setup, Func<TResult> value)
         {
-            var setup = MockContext.CurrentSetup;
-            if (setup != null)
-            {
-                var mock = MockRuntime.Get(setup.Invocation.Target);
-                mock.Invocations.Remove(setup.Invocation);
-                var behavior = mock.GetPipeline(setup);
-                var returnBehavior = behavior.Behaviors.OfType<ReturnsBehavior>().FirstOrDefault();
-                if (returnBehavior != null)
-                    returnBehavior.ValueGetter = _ => value();
-                else
-                    behavior.Behaviors.Add(new ReturnsBehavior(_ => value()));
-            }
-
-            return target;
+            setup.SetReturnValue(_ => value());
+            return setup;
         }
 
         /// <summary>
-        /// Sets the return value for a property or non-void method to 
-        /// be evaluated dynamically using the given function on every 
-        /// call, while allowing access to all arguments of the invocation, 
-        /// including ref/out arguments.
+        /// Sets the return value for a property or non-void method to be calculated 
+        /// on every call by the given <paramref name="handler"/>, which receives the 
+        /// invocation arguments and can set ref/out arguments.
         /// </summary>
-        public static TResult Returns<TResult>(this TResult target, Func<IArgumentCollection, TResult> value)
+        public static ISetup<TDelegate, TResult> Returns<TDelegate, TResult>(this ISetup<TDelegate, TResult> setup, TDelegate handler)
+            where TDelegate : Delegate
         {
-            var setup = MockContext.CurrentSetup;
-            if (setup != null)
-            {
-                var mock = MockRuntime.Get(setup.Invocation.Target);
-                mock.Invocations.Remove(setup.Invocation);
-                var behavior = mock.GetPipeline(setup);
-                var returnBehavior = behavior.Behaviors.OfType<ReturnsBehavior>().FirstOrDefault();
-                if (returnBehavior != null)
-                    returnBehavior.ValueGetter = x => value(x);
-                else
-                    behavior.Behaviors.Add(new ReturnsBehavior(x => value(x)));
-            }
+            if (handler == null)
+                throw new ArgumentNullException(nameof(handler));
 
-            return target;
+            if (setup.IsUntyped() && handler is Func<IArgumentCollection, TResult> untyped)
+                setup.SetReturnValue(args => untyped(args));
+            else
+                setup.SetReturnValue(args => handler.InvokeWith(args));
+
+            return setup;
         }
 
         /// <summary>
-        /// Sets the return value for a property or non-void async method.
+        /// Sets the return value for a member set up with a custom delegate to be calculated 
+        /// on every call by the given <paramref name="handler"/>, which receives the 
+        /// invocation arguments and can set ref/out arguments.
         /// </summary>
-        public static Task<TResult> ReturnsAsync<TResult>(this Task<TResult> target, TResult value)
+        public static ISetupRef<TDelegate> Returns<TDelegate>(this ISetupRef<TDelegate> setup, TDelegate handler)
+            where TDelegate : Delegate
         {
-            target.Returns(Task.FromResult(value));
-            return target;
+            if (handler == null)
+                throw new ArgumentNullException(nameof(handler));
+
+            setup.SetReturnValue(args => handler.InvokeWith(args));
+            return setup;
         }
 
         /// <summary>
-        /// Sets the return value for a property or non-void async method.
+        /// Sets the result value for an async property or method.
         /// </summary>
-        public static Task<TResult> ReturnsAsync<TResult>(this Task<TResult> target, Func<TResult> value)
+        [OverloadResolutionPriority(2)]
+        public static ISetup<TDelegate, Task<TResult>> Returns<TDelegate, TResult>(this ISetup<TDelegate, Task<TResult>> setup, TResult value)
         {
-            target.Returns(() => Task.FromResult(value()));
-            return target;
+            setup.SetReturnValue(_ => Task.FromResult(value));
+            return setup;
         }
 
         /// <summary>
-        /// Sets the return value for a property or non-void async method to 
-        /// be evaluated dynamically using the given function on every 
-        /// call, while allowing access to all arguments of the invocation, 
-        /// including ref/out arguments.
+        /// Sets the result value for an async property or method to be 
+        /// evaluated dynamically using the given function on every call.
         /// </summary>
-        public static Task<TResult> ReturnsAsync<TResult>(this Task<TResult> target, Func<IArgumentCollection, TResult> value)
+        [OverloadResolutionPriority(2)]
+        public static ISetup<TDelegate, Task<TResult>> Returns<TDelegate, TResult>(this ISetup<TDelegate, Task<TResult>> setup, Func<TResult> value)
         {
-            target.Returns(args => Task.FromResult(value(args)));
-            return target;
+            setup.SetReturnValue(_ => Task.FromResult(value()));
+            return setup;
         }
 
         /// <summary>
-        /// Sets the return value for a property or non-void async method.
+        /// Sets the result value for an async method to be calculated on every call 
+        /// by the given <paramref name="handler"/>, which receives the invocation arguments.
         /// </summary>
-        public static ValueTask<TResult> ReturnsAsync<TResult>(this ValueTask<TResult> target, TResult value)
+        [OverloadResolutionPriority(2)]
+        public static ISetup<Func<IArgumentCollection, Task<TResult>>, Task<TResult>> Returns<TResult>(this ISetup<Func<IArgumentCollection, Task<TResult>>, Task<TResult>> setup, Func<IArgumentCollection, TResult> handler)
         {
-            target.Returns(() => new ValueTask<TResult>(Task.FromResult(value)));
-            return target;
+            var untyped = setup.IsUntyped();
+            setup.SetReturnValue(args => Task.FromResult(handler(untyped ? args : (IArgumentCollection)args.GetValue(0)!)));
+            return setup;
         }
 
         /// <summary>
-        /// Sets the return value for a property or non-void async method.
+        /// Sets the result value for an async method to be calculated on every call 
+        /// by the given <paramref name="handler"/>, which receives the invocation arguments.
         /// </summary>
-        public static ValueTask<TResult> ReturnsAsync<TResult>(this ValueTask<TResult> target, Func<TResult> value)
+        [OverloadResolutionPriority(2)]
+        public static ISetup<Func<IArgumentCollection, ValueTask<TResult>>, ValueTask<TResult>> Returns<TResult>(this ISetup<Func<IArgumentCollection, ValueTask<TResult>>, ValueTask<TResult>> setup, Func<IArgumentCollection, TResult> handler)
         {
-            target.Returns(() => new ValueTask<TResult>(Task.FromResult(value())));
-            return target;
+            var untyped = setup.IsUntyped();
+            setup.SetReturnValue(args => new ValueTask<TResult>(handler(untyped ? args : (IArgumentCollection)args.GetValue(0)!)));
+            return setup;
         }
 
         /// <summary>
-        /// Sets the return value for a property or non-void async method to 
-        /// be evaluated dynamically using the given function on every 
-        /// call, while allowing access to all arguments of the invocation, 
-        /// including ref/out arguments.
+        /// Sets the result value for an async property or method.
         /// </summary>
-        public static ValueTask<TResult> ReturnsAsync<TResult>(this ValueTask<TResult> target, Func<IArgumentCollection, TResult> value)
+        [OverloadResolutionPriority(2)]
+        public static ISetup<TDelegate, ValueTask<TResult>> Returns<TDelegate, TResult>(this ISetup<TDelegate, ValueTask<TResult>> setup, TResult value)
         {
-            target.Returns(args => new ValueTask<TResult>(Task.FromResult(value(args))));
-            return target;
+            setup.SetReturnValue(_ => new ValueTask<TResult>(value));
+            return setup;
         }
 
         /// <summary>
-        /// Invokes the given delegate when the method being set up is invoked, typically used 
-        /// to access and set ref/out arguments in a typed fashion. Used in combination 
-        /// with <see cref="SetupExtension.Setup{TDelegate}(object, TDelegate)"/>.
+        /// Sets the result value for an async property or method to be 
+        /// evaluated dynamically using the given function on every call.
         /// </summary>
-        /// <typeparam name="TDelegate">The lambda to invoke when the setup method runs.</typeparam>
-        /// <param name="target">The setup being performed.</param>
-        /// <param name="handler">The lambda to invoke when the setup is matched.</param>
-        public static void Returns<TDelegate>(this ISetup<TDelegate> target, TDelegate handler)
+        [OverloadResolutionPriority(2)]
+        public static ISetup<TDelegate, ValueTask<TResult>> Returns<TDelegate, TResult>(this ISetup<TDelegate, ValueTask<TResult>> setup, Func<TResult> value)
         {
-            if (handler is not Delegate @delegate)
-                throw new ArgumentException(ThisAssembly.Strings.Returns.DelegateExpected, nameof(handler));
-
-            using (new SetupScope())
-            {
-                // Simulate Any<T> matchers for each member parameter
-                var parameters = @delegate.Method.GetParameters();
-                object?[] arguments = new object[parameters.Length];
-                var defaultValue = new DefaultValueProvider(false);
-                for (var i = 0; i < arguments.Length; i++)
-                {
-                    var parameter = parameters[i];
-
-                    MockSetup.Push(new AnyMatcher(parameter.IsOut ? parameter.ParameterType.GetElementType() : parameter.ParameterType));
-                    if (!parameter.IsOut)
-                        arguments[i] = defaultValue.GetDefault(parameter.ParameterType);
-                }
-
-                target.Delegate.DynamicInvoke(arguments);
-
-                // Now we'd have a setup in place and an actual invocation.
-                var setup = MockContext.CurrentSetup;
-                if (setup != null)
-                {
-                    MockRuntime.Get(setup.Invocation.Target)
-                        .GetPipeline(setup)
-                        .Behaviors.Add(new ReturnsDelegateBehavior(@delegate));
-                }
-            }
-        }
-
-        static TResult? Returns<TResult>(Delegate value, ExecuteMockDelegate behavior)
-        {
-            var setup = MockContext.CurrentSetup;
-            if (setup != null)
-            {
-                // TODO: Is this even necessary given that IntelliSense gives us
-                // the right compiler safety already?
-                setup.Invocation.EnsureCompatible(value);
-
-                var mock = MockRuntime.Get(setup.Invocation.Target);
-                mock.Invocations.Remove(setup.Invocation);
-                var mockBehavior = mock.GetPipeline(setup);
-
-                mockBehavior.Behaviors.Add(new AnonymousMockBehavior(behavior, "Returns(() => ...)"));
-            }
-
-            return default;
+            setup.SetReturnValue(_ => new ValueTask<TResult>(value()));
+            return setup;
         }
     }
 }

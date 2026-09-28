@@ -12,111 +12,44 @@ namespace Moq
     public static class OccurrenceExtension
     {
         /// <summary>
-        /// Supports legacy API and forwards to <see cref="AtLeastOnce{TResult}(TResult)"/>.
+        /// Forwards to <see cref="AtLeastOnce{TSetup}(TSetup)"/>.
         /// </summary>
-        [EditorBrowsable(EditorBrowsableState.Never)]
-        public static TResult Verifiable<TResult>(this TResult target) => AtLeastOnce(target);
+        public static TSetup Verifiable<TSetup>(this TSetup setup) where TSetup : ISetup => setup.Occurs(Times.AtLeastOnce);
 
         /// <summary>
-        /// Specifies that the current fluent invocation is expected to be 
-        /// called at least once.
+        /// Specifies that the setup is expected to be called at least once.
         /// </summary>
-        public static TResult AtLeastOnce<TResult>(this TResult target)
-        {
-            var setup = MockContext.CurrentSetup;
-            if (setup != null)
-            {
-                setup.Occurrence = Sdk.Times.AtLeastOnce;
-                var mock = MockRuntime.Get(setup.Invocation.Target);
-                if (Verify.IsVerifying(mock))
-                {
-                    var calls = mock.Invocations.Where(call => setup.AppliesTo(call));
-                    if (!calls.Any())
-                        throw new VerifyException(mock, setup);
-                }
-            }
-            else
-            {
-                // TODO: throw if no setup?
-            }
-
-            return target;
-        }
+        public static TSetup AtLeastOnce<TSetup>(this TSetup setup) where TSetup : ISetup => setup.Occurs(Times.AtLeastOnce);
 
         /// <summary>
-        /// Specifies that the current fluent invocation is expected to be 
-        /// called exactly once.
+        /// Specifies that the setup is expected to be called exactly once.
         /// </summary>
-        public static TResult Once<TResult>(this TResult target)
-        {
-            var setup = MockContext.CurrentSetup;
-            if (setup != null)
-            {
-                setup.Occurrence = Sdk.Times.Once;
-                var mock = MockRuntime.Get(setup.Invocation.Target);
-                if (Verify.IsVerifying(mock))
-                {
-                    var calls = mock.Invocations.Where(call => setup.AppliesTo(call)).Take(2).ToArray();
-                    if (calls.Length != 1)
-                        throw new VerifyException(mock, setup);
-                }
-            }
-            else
-            {
-                // TODO: throw if no setup?
-            }
-
-            return target;
-        }
+        public static TSetup Once<TSetup>(this TSetup setup) where TSetup : ISetup => setup.Occurs(Times.Once);
 
         /// <summary>
-        /// Specifies that the current fluent invocation is expected to never 
-        /// be called.
+        /// Specifies that the setup is expected to never be called.
         /// </summary>
-        public static TResult Never<TResult>(this TResult target)
-        {
-            var setup = MockContext.CurrentSetup;
-            if (setup != null)
-            {
-                setup.Occurrence = Sdk.Times.Never;
-                var mock = MockRuntime.Get(setup.Invocation.Target);
-                if (Verify.IsVerifying(mock))
-                {
-                    if (mock.Invocations.Where(call => setup.AppliesTo(call)).Any())
-                        throw new VerifyException(mock, setup);
-                }
-            }
-            else
-            {
-                // TODO: throw if no setup?
-            }
-
-            return target;
-        }
+        public static TSetup Never<TSetup>(this TSetup setup) where TSetup : ISetup => setup.Occurs(Times.Never);
 
         /// <summary>
-        /// Specifies that the current fluent invocation is expected to be 
-        /// called exactly the given <paramref name="callCount"/> number of times.
+        /// Specifies that the setup is expected to be called exactly the 
+        /// given <paramref name="callCount"/> number of times.
         /// </summary>
-        public static TResult Exactly<TResult>(this TResult target, int callCount)
-        {
-            var setup = MockContext.CurrentSetup;
-            if (setup != null)
-            {
-                setup.Occurrence = Sdk.Times.Exactly(callCount);
-                var mock = MockRuntime.Get(setup.Invocation.Target);
-                if (Verify.IsVerifying(mock))
-                {
-                    if (mock.Invocations.Where(call => setup.AppliesTo(call)).Count() != callCount)
-                        throw new VerifyException(mock, setup);
-                }
-            }
-            else
-            {
-                // TODO: throw if no setup?
-            }
+        public static TSetup Exactly<TSetup>(this TSetup setup, int callCount) where TSetup : ISetup => setup.Occurs(Times.Exactly(callCount));
 
-            return target;
+        static TSetup Occurs<TSetup>(this TSetup setup, Times times) where TSetup : ISetup
+        {
+            var sdk = setup.Sdk;
+            sdk.Occurrence = times;
+
+            var runtime = setup.GetRuntime();
+            if (!Verify.IsVerifying(runtime))
+                // Ensures the setup is registered with the mock so it's verified later.
+                runtime.GetPipeline(sdk);
+            else if (!times.Validate(runtime.Invocations.Count(sdk.AppliesTo)))
+                throw new VerifyException(runtime, sdk);
+
+            return setup;
         }
     }
 }

@@ -24,6 +24,8 @@
   <ItemGroup>
     <Compile Remove="DelegateMocksTests.cs" />
     <Compile Remove="LegacyTests.cs" />
+    <!-- Migrated to the typed setups API in a later stage. -->
+    <Compile Remove="CallBaseTests.cs;MoqTests.cs;MoqTTests.cs;RecursiveMocksTests.cs;RefOutTests.cs;VerificationTests.cs" />
   </ItemGroup>
   
   <ItemGroup>

@@ -37,8 +37,9 @@ namespace Moq.Sdk
         [EditorBrowsable(EditorBrowsableState.Advanced)]
         public static IMockRuntime Clone(IMockRuntime runtime)
         {
+            // Proxies that need constructor arguments save them in the state.
             if (!runtime.State.TryGetValue<object[]>(".ctor", out var ctor))
-                throw new ArgumentException("No constructor state found for cloning.");
+                ctor = Array.Empty<object>();
 
             var clone = ((IMocked)Activator.CreateInstance(runtime.Object.GetType(), ctor)).Runtime;
             clone.State = runtime.State.Clone();
