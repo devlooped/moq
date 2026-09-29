@@ -19,8 +19,6 @@
     <PackageReference Include="Microsoft.CodeAnalysis.CSharp.Workspaces" />
     <PackageReference Include="Microsoft.CodeAnalysis.VisualBasic.Features" />
     <PackageReference Include="Microsoft.CodeAnalysis.VisualBasic.Workspaces" />
-    <PackageReference Include="SQLitePCLRaw.bundle_green" />
-    <PackageReference Include="SQLitePCLRaw.lib.e_sqlite3" />
   </ItemGroup>
 
   <ItemGroup>

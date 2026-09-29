@@ -47,7 +47,7 @@ namespace Moq.Sdk
             return (value == null ||
                 typeof(T) == value.GetType() ||
                 typeof(T).IsAssignableFrom(value.GetType())) &&
-                condition((T)value);
+                condition((T?)value);
         }
 
         /// <summary>

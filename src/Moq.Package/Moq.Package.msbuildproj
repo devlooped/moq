@@ -5,6 +5,8 @@
         <Title>Moq</Title>
         <Description>The most popular and friendly mocking framework for .NET</Description>
         <PackageTags>moq mocking mock</PackageTags>
+        <!-- Avoids a SQLite warning from anycpu from a buildTransitive .props we get transitively from CSharp.Workspaces -->
+        <RuntimeIdentifier>any</RuntimeIdentifier>
     </PropertyGroup>
     <ItemGroup>
         <Content Include="*.cs" Exclude="Mock.StaticFactory.*" CodeLanguage="cs" TargetFramework="netstandard2.0" BuildAction="Compile" />
