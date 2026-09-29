@@ -1,6 +1,4 @@
-# moq vNext
-
-The most popular and friendly mocking framework for .NET
+# moq
 
 [![Version](https://img.shields.io/endpoint?url=https://shields.kzu.io/vpre/Moq/main&label=nuget.ci&color=brightgreen)](https://pkg.kzu.io/index.json)
 [![Status](https://github.com/moq/moq/workflows/build/badge.svg?branch=main)](https://github.com/moq/moq/actions?query=branch%3Amain+workflow%3Abuild+)
@@ -9,9 +7,14 @@ The most popular and friendly mocking framework for .NET
 [![GitHub](https://img.shields.io/badge/-source-181717.svg?logo=GitHub)](https://github.com/moq/moq)
 
 
-> **IMPORTANT**: this repository is for the *upcoming* version of Moq. Issues and source for the current stable Moq v4.x are at https://github.com/moq/moq4
+> [!IMPORTANT]
+> This branch now contains the *upcoming* version of Moq (v5).
+> Source and license for the current stable Moq v4.x are at the [v4 branch](https://github.com/devlooped/moq/tree/v4)
 
-CI package feed: https://pkg.kzu.io/index.json
+CI package feed: https://pkg.kzu.app/index.json
+
+<!-- #content -->
+The most popular and friendly mocking framework for .NET
 
 ## Usage
 
@@ -61,18 +64,7 @@ partial class Mock<T>
 
 The lower-level runtime (invocations, setups, state and behaviors) is available from any mock via 
 `mock.Sdk`. See [Moq SDK](docs/MoqSdk.md).
-
-## Building the repository
-
-```
-dotnet msbuild
-```
-
-Running tests:
-
-```
-dotnet test
-```
+<!-- #content -->
 
 ## Testing built packages locally
 
@@ -102,45 +94,7 @@ You can also do use project properties (or a *Directory.Build.props* to affect a
 ```
 
 Every time the packages are produced, the local nuget cache is cleared, so that a subsequent restore in VS will 
-automatically cause the updated version to be unpacked again. The locally built version will always have the version [42.42.42](https://en.wikipedia.org/wiki/42_(number)#The_Hitchhiker's_Guide_to_the_Galaxy).
+automatically cause the updated version to be unpacked again. 
+The locally built version will always have the version [42.42.42](https://en.wikipedia.org/wiki/42_(number)#The_Hitchhiker's_Guide_to_the_Galaxy).
 
-
-![Sponsors](https://raw.githubusercontent.com/devlooped/oss/main/assets/images/sponsors.svg) Sponsors
-============
-
-
-Special thanks to the following gold sponsors of this project:
-
-<a href="https://github.com/aws"><img src="https://avatars.githubusercontent.com/u/2232217?s=70&v=4" alt="Supported by Amazon Web Services" title="Supported by Amazon Web Services"></a>
-<a href="https://github.com/clarius"><img src="https://avatars.githubusercontent.com/u/71888636?s=70&v=4" alt="Supported by Clarius" title="Supported by Clarius"></a>
-
-And to all our sponsors!
-
-<!-- sponsors -->
-
-<a href='https://github.com/KirillOsenkov'>
-  <img src='https://github.com/devlooped/devlooped.github.io/raw/main/.github/avatars/KirillOsenkov.svg' alt='Kirill Osenkov' title='Kirill Osenkov'>
-</a>
-<a href='https://github.com/augustoproiete'>
-  <img src='https://github.com/devlooped/devlooped.github.io/raw/main/.github/avatars/augustoproiete.svg' alt='C. Augusto Proiete' title='C. Augusto Proiete'>
-</a>
-<a href='https://github.com/sandrock'>
-  <img src='https://github.com/devlooped/devlooped.github.io/raw/main/.github/avatars/sandrock.svg' alt='SandRock' title='SandRock'>
-</a>
-<a href='https://github.com/aws'>
-  <img src='https://github.com/devlooped/devlooped.github.io/raw/main/.github/avatars/aws.svg' alt='Amazon Web Services' title='Amazon Web Services'>
-</a>
-<a href='https://github.com/MelbourneDeveloper'>
-  <img src='https://github.com/devlooped/devlooped.github.io/raw/main/.github/avatars/MelbourneDeveloper.svg' alt='Christian Findlay' title='Christian Findlay'>
-</a>
-<a href='https://github.com/clarius'>
-  <img src='https://github.com/devlooped/devlooped.github.io/raw/main/.github/avatars/clarius.svg' alt='Clarius Org' title='Clarius Org'>
-</a>
-<a href='https://github.com/MFB-Technologies-Inc'>
-  <img src='https://github.com/devlooped/devlooped.github.io/raw/main/.github/avatars/MFB-Technologies-Inc.svg' alt='MFB Technologies, Inc.' title='MFB Technologies, Inc.'>
-</a>
-
-<!-- sponsors -->
-<br><br>
-*[get mentioned here too](https://github.com/sponsors/devlooped)!*
-
+<!-- include https://github.com/devlooped/sponsors/raw/main/footer.md -->
