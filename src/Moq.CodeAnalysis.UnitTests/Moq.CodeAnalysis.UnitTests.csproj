@@ -23,6 +23,8 @@
   <ItemGroup>
     <None Include="..\Moq.Package\Mock.cs" Link="Moq\Mock.cs" CopyToOutputDirectory="PreserveNewest" />
     <None Include="..\Moq.Package\Mock.Overloads.cs" Link="Moq\Mock.Overloads.cs" CopyToOutputDirectory="PreserveNewest" />
+    <None Include="..\Moq.Package\Mock`1.cs" Link="Moq\Mock`1.cs" CopyToOutputDirectory="PreserveNewest" />
+    <None Include="..\Moq.Package\Mock`1.Overloads.cs" Link="Moq\Mock`1.Overloads.cs" CopyToOutputDirectory="PreserveNewest" />
   </ItemGroup>
 
 </Project>

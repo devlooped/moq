@@ -7,4 +7,9 @@
     <MoqPublicKeyToken>00352124762f2aa5</MoqPublicKeyToken>
   </PropertyGroup>
 
+  <!-- Typed setups are generated as C# 14 extension members. -->
+  <PropertyGroup Condition="'$(MSBuildProjectExtension)' == '.csproj' and '$(LangVersion)' == ''">
+    <LangVersion>latest</LangVersion>
+  </PropertyGroup>
+
 </Project>

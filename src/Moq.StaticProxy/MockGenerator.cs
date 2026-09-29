@@ -16,7 +16,8 @@ namespace Moq
 {
     /// <summary>
     /// Generates mocks by inspecting the current compilation for 
-    /// invocations to methods annotated with [MockGenerator].
+    /// invocations to methods and object creations with constructors 
+    /// annotated with [MockGenerator].
     /// </summary>
     [Generator]
     public class MockGenerator : ISourceGenerator
@@ -30,6 +31,7 @@ namespace Moq
                 .WithGeneratorAttribute(typeof(MockGeneratorAttribute))
                 .WithProcessor(new DefaultImports(typeof(IMocked).Namespace, typeof(LazyInitializer).Namespace))
                 .WithProcessor(new CSharpMocked())
+                .WithSyntaxReceiver(() => new MockCreationCandidatesReceiver(typeof(MockGeneratorAttribute)))
                 .WithSyntaxReceiver(() => new RecursiveMockCandidatesReceiver(typeof(MockGeneratorAttribute)));
         }
 
@@ -45,6 +47,49 @@ namespace Moq
         }
 
         public void Initialize(GeneratorInitializationContext context) => generator.Initialize(context);
+
+        /// <summary>
+        /// Collects object creations, like <c>new Mock&lt;T, T1&gt;()</c>, whose constructor 
+        /// is annotated with [MockGenerator], and mocks the type arguments of the created type.
+        /// </summary>
+        class MockCreationCandidatesReceiver : IStuntCandidatesReceiver
+        {
+            readonly Type generatorAttribute;
+            readonly List<BaseObjectCreationExpressionSyntax> creations = new();
+
+            public MockCreationCandidatesReceiver(Type generatorAttribute) => this.generatorAttribute = generatorAttribute;
+
+            public IEnumerable<(SyntaxNode source, INamedTypeSymbol[] candidate)> GetCandidates(ProcessorContext context)
+            {
+                var generatorAttr = context.Compilation.GetTypeByMetadataName(generatorAttribute.FullName);
+                if (generatorAttr == null)
+                    yield break;
+
+                foreach (var creation in creations)
+                {
+                    var semantic = context.Compilation.GetSemanticModel(creation.SyntaxTree);
+                    if (semantic.GetSymbolInfo(creation, context.CancellationToken).Symbol is not IMethodSymbol { MethodKind: MethodKind.Constructor } ctor ||
+                        ctor.ContainingType.TypeArguments.IsEmpty ||
+                        !ctor.OriginalDefinition.GetAttributes().Any(attr => SymbolEqualityComparer.Default.Equals(attr.AttributeClass, generatorAttr)))
+                        continue;
+
+                    var types = ctor.ContainingType.TypeArguments.OfType<INamedTypeSymbol>().ToArray();
+                    // Open generic or unmockable types are flagged by the corresponding analyzer.
+                    if (types.Length != ctor.ContainingType.TypeArguments.Length ||
+                        types.Any(type => type.TypeKind == TypeKind.Error || type.GetMembers().OfType<IMethodSymbol>()
+                            .SelectMany(method => method.Parameters).Any(parameter => parameter.Type.Kind == SymbolKind.PointerType)))
+                        continue;
+
+                    yield return (creation, types);
+                }
+            }
+
+            public void OnVisitSyntaxNode(SyntaxNode syntaxNode)
+            {
+                if (syntaxNode is BaseObjectCreationExpressionSyntax creation)
+                    creations.Add(creation);
+            }
+        }
 
         class RecursiveMockCandidatesReceiver : IStuntCandidatesReceiver
         {
@@ -81,8 +126,8 @@ namespace Moq
                     bool IsGeneratedMock(ISymbol symbol) =>
                         symbol.DeclaringSyntaxReferences.Length == 1 &&
                         symbol.DeclaringSyntaxReferences[0].GetSyntax(context.CancellationToken) is VariableDeclaratorSyntax variable &&
-                        variable.Initializer?.Value is InvocationExpressionSyntax create &&
-                        semantic.GetSymbolInfo(create, context.CancellationToken).Symbol is IMethodSymbol method &&
+                        variable.Initializer?.Value is InvocationExpressionSyntax or BaseObjectCreationExpressionSyntax &&
+                        semantic.GetSymbolInfo(variable.Initializer.Value, context.CancellationToken).Symbol is IMethodSymbol method &&
                         method.GetAttributes().Any(attr => SymbolEqualityComparer.Default.Equals(attr.AttributeClass, generatorAttr));
 
                     bool IsMockFlow(ImmutableArray<ISymbol> data) =>

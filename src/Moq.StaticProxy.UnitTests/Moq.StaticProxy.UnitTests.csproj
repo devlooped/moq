@@ -13,6 +13,8 @@
   <ItemGroup>
     <Compile Include="..\Moq.Package\Mock.cs" Link="Moq\Mock.cs" CopyToOutputDirectory="PreserveNewest" />
     <Compile Include="..\Moq.Package\Mock.Overloads.cs" Link="Moq\Mock.Overloads.cs" CopyToOutputDirectory="PreserveNewest" />
+    <Compile Include="..\Moq.Package\Mock`1.cs" Link="Moq\Mock`1.cs" CopyToOutputDirectory="PreserveNewest" />
+    <Compile Include="..\Moq.Package\Mock`1.Overloads.cs" Link="Moq\Mock`1.Overloads.cs" CopyToOutputDirectory="PreserveNewest" />
     <Compile Include="..\Moq.Package\Mock.StaticFactory.cs" Link="Moq\Mock.StaticFactory.cs" CopyToOutputDirectory="PreserveNewest" />
   </ItemGroup>
 

@@ -15,19 +15,30 @@ namespace Moq
         /// <summary>
         /// Gets the configuration and introspection for the given mocked instance.
         /// </summary>
-        public static IMock<T> Get<T>(T instance) where T : class => new MockView<T>(instance);
+        /// <exception cref="ArgumentException">The <paramref name="instance"/> is not a mock.</exception>
+        public static Mock<T> Get<T>(T instance) where T : class => new Mock<T>(new MockView<T>(instance), created: false);
+
+        /// <summary>
+        /// Gets the configuration and introspection for the given mocked instance 
+        /// as the <typeparamref name="T"/> it implements.
+        /// </summary>
+        /// <exception cref="ArgumentException">The <paramref name="instance"/> is not a mock.</exception>
+        /// <exception cref="InvalidCastException">The mock does not implement <typeparamref name="T"/>.</exception>
+        public static Mock<T> Get<T>(object instance) where T : class => new Mock<T>(new MockView<T>((T)instance), created: false);
 
         /// <summary>
         /// Creates the mock instance by using the specified types to 
         /// lookup the mock type in the assembly defining this class.
         /// </summary>
-        static T Create<T>(MockBehavior behavior, object[] constructorArgs, params Type[] interfaces) where T : class
+        internal static T Create<T>(MockBehavior behavior, object[] constructorArgs, params Type[] interfaces) where T : class
         {
-            var mocked = (IMocked)MockFactory.Default.CreateMock(typeof(Mock).Assembly, typeof(T), interfaces, constructorArgs);
+            var mock = MockFactory.Default.CreateMock(typeof(Mock).Assembly, typeof(T), interfaces, constructorArgs);
+            // Delegate mocks are delegates bound to the mocked instance.
+            var mocked = (IMocked)(mock is Delegate @delegate ? @delegate.Target : mock);
 
             mocked.Initialize(behavior);
 
-            return (T)mocked;
+            return (T)mock;
         }
     }
 }
