@@ -30,7 +30,4 @@
     </Compile>
   </ItemGroup>
 
-  <Import Project="Moq.DynamicProxy.targets" 
-          Condition="'$(RegisterStaticMockFactory)' != 'true' and  Exists('Moq.DynamicProxy.targets')" />
-
 </Project>

@@ -33,7 +33,7 @@
 
   <ItemGroup>
     <None Update="@(None)" PackFolder="build\netstandard2.0" />
-    <PackageFile Include="@(None)" PackFolder="buildTransitive\netstandard2.0" />
+    <PackageFile Include="@(None)" PackFolder="buildTransitive\netstandard2.0" Visible="true" />
   </ItemGroup>
 
 </Project>
