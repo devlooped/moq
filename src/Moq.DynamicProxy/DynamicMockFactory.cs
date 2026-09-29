@@ -36,7 +36,9 @@ namespace Moq.Sdk
             // The lazy-calculated value allows us to provide a new interceptor for every retrieval. 
             // Add first-class support in statebag for this pattern of either Func<T> for values, or 
             // Lazy<T>, since both could be quite useful for expensive state that may be needed lazily.
-            mocked.Runtime.State.Set(".ctor", () => new object[] { new IInterceptor[] { new MockInterceptor(), getDefaultInterceptor() } }.Concat(constructorArguments).ToArray());
+            // Mixins (i.e. for delegate mocks) precede the interceptors in the proxy constructor.
+            var mixins = options.MixinData.Mixins.ToArray();
+            mocked.Runtime.State.Set(".ctor", () => mixins.Concat(new object[] { new IInterceptor[] { new MockInterceptor(), getDefaultInterceptor() } }).Concat(constructorArguments).ToArray());
 
             return mocked;
         }

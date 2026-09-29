@@ -18,27 +18,11 @@
   </ItemGroup>
 
   <ItemGroup>
-    <Compile Remove="Mocks\**" />
-  </ItemGroup>
-
-  <ItemGroup>
-    <Compile Remove="DelegateMocksTests.cs" />
-    <Compile Remove="LegacyTests.cs" />
-    <!-- Migrated to the typed setups API in a later stage. -->
-    <Compile Remove="CallBaseTests.cs;MoqTests.cs;MoqTTests.cs;RecursiveMocksTests.cs;RefOutTests.cs;VerificationTests.cs" />
-  </ItemGroup>
-  
-  <ItemGroup>
     <Compile Include="..\Moq.Package\Mock.cs" Link="Moq\Mock.cs" />
     <Compile Include="..\Moq.Package\Mock.Overloads.cs" Link="Moq\Mock.Overloads.cs" />
     <Compile Include="..\Moq.Package\Mock`1.cs" Link="Moq\Mock`1.cs" />
     <Compile Include="..\Moq.Package\Mock`1.Overloads.cs" Link="Moq\Mock`1.Overloads.cs" />
     <Compile Include="..\Moq.DynamicProxy\Mock.DynamicFactory.cs" Link="Moq\Mock.DynamicFactory.cs" />
-  </ItemGroup>
-  
-  <ItemGroup>
-    <None Include="DelegateMocksTests.cs" />
-    <None Include="LegacyTests.cs" />
   </ItemGroup>
   
   <ItemGroup>

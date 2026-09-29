@@ -8,36 +8,54 @@ namespace Moq.Tests.Recursive
         [Fact]
         public void CanSetupRecursiveMockProperty()
         {
-            var mock = Mock.Of<IRecursiveRoot>(MockBehavior.Loose);
+            var mock = new Mock<IRecursiveRoot>();
 
-            mock.Setup(m => m.Branch.Leaf.Name).Returns("foo");
+            Setup(() => mock.Object.Branch.Leaf.Name).Returns("foo");
 
-            Assert.Equal("foo", mock.Branch.Leaf.Name);
+            Assert.Equal("foo", mock.Object.Branch.Leaf.Name);
         }
 
         [Fact]
         public void CanSetupRecursiveMockMethod()
         {
-            var mock = Mock.Of<IRecursiveRoot>(MockBehavior.Loose);
+            var mock = new Mock<IRecursiveRoot>();
 
-            mock.Setup(m => m.Branch.GetLeaf(1).Name).Returns("foo");
+            Setup(() => mock.Object.Branch.GetLeaf(1).Name).Returns("foo");
 
-            Assert.Equal("foo", mock.Branch.GetLeaf(1).Name);
-            Assert.Null(mock.Branch.GetLeaf(0));
+            Assert.Equal("foo", mock.Object.Branch.GetLeaf(1).Name);
+            Assert.Null(mock.Object.Branch.GetLeaf(0));
         }
 
         [Fact]
         public void CanSetupRecursiveMockMethodInSetupScope()
         {
-            var mock = Mock.Of<IRecursiveRoot>(MockBehavior.Loose);
+            var mock = new Mock<IRecursiveRoot>();
+            IRecursiveLeaf leaf;
 
             using (Setup())
             {
-                mock.Branch.GetLeaf(1).Name.Returns("foo");
+                leaf = mock.Object.Branch.GetLeaf(1);
             }
 
-            Assert.Equal("foo", mock.Branch.GetLeaf(1).Name);
-            Assert.Null(mock.Branch.GetLeaf(0));
+            Mock.Get(leaf).Name.Returns("foo");
+
+            Assert.Equal("foo", mock.Object.Branch.GetLeaf(1).Name);
+            Assert.Null(mock.Object.Branch.GetLeaf(0));
+        }
+
+        [Fact]
+        public void ReusesRecursiveMockAcrossSetups()
+        {
+            var mock = new Mock<IRecursiveRoot>();
+
+            Setup(() => mock.Object.Branch.Leaf.Name).Returns("foo");
+            var branch = mock.Object.Branch;
+
+            Setup(() => mock.Object.Branch.GetLeaf(1).Name).Returns("bar");
+
+            Assert.Same(branch, mock.Object.Branch);
+            Assert.Equal("foo", mock.Object.Branch.Leaf.Name);
+            Assert.Equal("bar", mock.Object.Branch.GetLeaf(1).Name);
         }
     }
 

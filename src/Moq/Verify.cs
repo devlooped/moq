@@ -237,7 +237,12 @@ namespace Moq
 
             clone.State.Set(typeof(Verify), true);
 
-            return new MockView<T>((T)clone.Object);
+            // Delegate mocks are delegates bound to the mocked instance.
+            var instance = typeof(Delegate).IsAssignableFrom(typeof(T)) ?
+                Delegate.CreateDelegate(typeof(T), clone.Object, clone.Object.GetType().GetMethod(nameof(Action.Invoke))!) :
+                clone.Object;
+
+            return new MockView<T>((T)instance);
         }
 
         /// <summary>

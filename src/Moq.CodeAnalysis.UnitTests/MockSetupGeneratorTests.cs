@@ -91,7 +91,7 @@ namespace Moq.CodeAnalysis.UnitTests
                     {
                         Mock.Of<ICalculator>();
                         Mock.Of<ICalculator, IDisposable>();
-                        Mock.Of2<ICalculator>(MockBehavior.Strict);
+                        Mock.Get(Mock.Of<ICalculator>(MockBehavior.Strict));
                         Mock.Of<IServiceProvider>();
                     }
                 }

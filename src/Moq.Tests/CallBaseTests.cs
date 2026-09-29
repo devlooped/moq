@@ -9,74 +9,74 @@ namespace Moq.Tests
         [Fact]
         public void CallBaseNotCalled()
         {
-            var mock = Mock.Of<Calculator>();
+            var mock = new Mock<Calculator>();
 
-            mock.TurnOn();
+            mock.Object.TurnOn();
 
-            Assert.False(mock.TurnOnCalled);
+            Assert.False(mock.Object.TurnOnCalled);
         }
 
         [Fact]
         public void CallBaseCalledForMockConfig()
         {
-            var mock = Mock.Of<Calculator>().CallBase();
+            var mock = new Mock<Calculator> { CallBase = true };
 
-            mock.TurnOn();
+            mock.Object.TurnOn();
 
-            Assert.True(mock.TurnOnCalled);
+            Assert.True(mock.Object.TurnOnCalled);
         }
 
         [Fact]
         public void CallBaseCalledForInvocationConfig()
         {
-            var mock = Mock.Of<Calculator>();
+            var mock = new Mock<Calculator>();
 
-            mock.Setup(x => x.TurnOn()).CallBase();
+            mock.TurnOn().CallBase();
 
-            mock.TurnOn();
+            mock.Object.TurnOn();
 
-            Assert.True(mock.TurnOnCalled);
+            Assert.True(mock.Object.TurnOnCalled);
         }
 
         [Fact]
         public void ThrowsForStrictMockAndMissingSetup()
         {
             // Configure CallBase at the Mock level
-            var mock = Mock.Of<Calculator>(MockBehavior.Strict).CallBase();
+            var mock = new Mock<Calculator>(MockBehavior.Strict) { CallBase = true };
 
-            Assert.Throws<StrictMockException>(() => mock.TurnOn());
+            Assert.Throws<StrictMockException>(() => mock.Object.TurnOn());
         }
 
         [Fact]
         public void CallBaseCalledForStrictMockAndMockConfig()
         {
             // Configure CallBase at the Mock level
-            var mock = Mock.Of<Calculator>(MockBehavior.Strict).CallBase();
+            var mock = new Mock<Calculator>(MockBehavior.Strict) { CallBase = true };
 
-            mock.Setup(x => x.TurnOn()).CallBase();
+            mock.TurnOn().CallBase();
 
-            mock.TurnOn();
+            mock.Object.TurnOn();
 
-            Assert.True(mock.TurnOnCalled);
+            Assert.True(mock.Object.TurnOnCalled);
 
             // And we make sure we throw for other missing setups
-            Assert.Throws<StrictMockException>(() => mock.Recall(""));
+            Assert.Throws<StrictMockException>(() => mock.Object.Recall(""));
         }
 
         [Fact]
-        public void CallBaseCalledForStrickMockAndInvocationConfig()
+        public void CallBaseCalledForStrictMockAndInvocationConfig()
         {
-            var mock = Mock.Of<Calculator>(MockBehavior.Strict);
+            var mock = new Mock<Calculator>(MockBehavior.Strict);
 
             // Configure CallBase at the invocation level
-            mock.Setup(x => x.TurnOn()).CallBase();
+            mock.TurnOn().CallBase();
 
-            mock.TurnOn();
+            mock.Object.TurnOn();
 
-            Assert.True(mock.TurnOnCalled);
+            Assert.True(mock.Object.TurnOnCalled);
 
             // And we make sure we throw for other missing setups
-            Assert.Throws<StrictMockException>(() => mock.Recall(""));
+            Assert.Throws<StrictMockException>(() => mock.Object.Recall(""));
         }
     }
 }

@@ -4,7 +4,7 @@ using Moq.Sdk;
 using Xunit;
 using static Moq.Syntax;
 
-namespace Moq.Scenarios.MockOf2
+namespace Moq.Scenarios.MockGet
 {
     public interface IRoot
     {
@@ -12,14 +12,14 @@ namespace Moq.Scenarios.MockOf2
     }
 
     /// <summary>
-    /// Mock.Of2 returns the IMock introspection API for a statically 
-    /// generated mock, which also generates recursive mocks.
+    /// Mock.Get returns the Mock{T} for a statically generated mock, 
+    /// which also generates recursive mocks.
     /// </summary>
     public class Test : IRunnable
     {
         public void Run()
         {
-            var mock = Mock.Of2<IRoot>();
+            var mock = Mock.Get(Mock.Of<IRoot>());
 
             Assert.NotNull(mock);
             Assert.IsAssignableFrom<IRoot>(mock.Object);
