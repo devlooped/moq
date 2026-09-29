@@ -32,7 +32,7 @@
     <PackageVersion Include="Microsoft.Bcl.HashCode" Version="6.0.0" />
     
     <!-- For packaging purposes -->
-    <PackageVersion Include="Microsoft.Bcl.AsyncInterfaces" Version="9.0.0" />
+    <PackageVersion Include="Microsoft.Bcl.AsyncInterfaces" Version="10.0.12" />
 
     <!-- Unit tests need the native SQLite bundle (macOS). lib.e_sqlite3 is pinned above the 2.1.11 advisory. -->
     <PackageVersion Include="SQLitePCLRaw.bundle_green" Version="2.1.11" />
