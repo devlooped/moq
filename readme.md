@@ -13,6 +13,55 @@ The most popular and friendly mocking framework for .NET
 
 CI package feed: https://pkg.kzu.io/index.json
 
+## Usage
+
+```csharp
+using Moq;
+using static Moq.Syntax;
+
+var calc = new Mock<ICalculator>();       // or Mock.Get(Mock.Of<ICalculator>())
+
+// Typed setups are generated for every mocked type's members (C# 14+).
+calc.Add(2, 3).Returns(5);
+calc.Add(Any<int>(), Any<int>()).Returns((x, y) => x + y);
+calc.Mode.Returns(CalculatorMode.Scientific);
+calc.TurnOn().Throws(new InvalidOperationException());
+calc.RaiseTurnedOn();
+
+// Any language version, and members that collide with the mock's own (i.e. Object, CallBase), 
+// or recursive setups: invoke the mocked object within a setup lambda.
+Setup(() => calc.Object.Memory.Recall()).Returns(42);
+
+// ref/out parameters: typed setups receive them in the handler...
+int x = Any<int>(), y = Any<int>();
+calc.TryAdd(ref x, ref y, out _).Returns((ref a, ref b, out sum) => { sum = a + b; return true; });
+// ...or use a custom delegate, which a code fix generates for you from SetupRef(parser.Object.TryParse).
+SetupRef<TryParse>(parser.Object.TryParse).Returns((string input, out DateTimeOffset date) => DateTimeOffset.TryParse(input, out date));
+
+// Verification
+Verify.Called(calc).Add(2, 3).Once();
+Verify.NotCalled(calc).TurnOn();
+Verify.Called(() => calc.Object.Add(2, 3), times: 1);
+
+// Additional interfaces
+var disposable = new Mock<ICalculator, IDisposable>().As<IDisposable>();
+```
+
+`Mock<T>` and `Mock.Of<T>` are compiled into your test project as source, so you can customize 
+how every mock is created with a partial class:
+
+```csharp
+namespace Moq;
+
+partial class Mock<T>
+{
+    partial void OnCreated() => this.Sdk.Name = typeof(T).Name;
+}
+```
+
+The lower-level runtime (invocations, setups, state and behaviors) is available from any mock via 
+`mock.Sdk`. See [Moq SDK](docs/MoqSdk.md).
+
 ## Building the repository
 
 ```

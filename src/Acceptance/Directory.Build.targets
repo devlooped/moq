@@ -3,6 +3,7 @@
   <Import Project="..\Directory.targets" Condition="Exists('..\Directory.targets')" />
 
   <ItemGroup>
-    <PackageReference Update="Stunts" Version="$(StuntsVersion)" />
+    <!-- The package just packed from this repository, restored from ../../bin. -->
+    <PackageVersion Include="Moq" Version="$(Version)" />
   </ItemGroup>
 </Project>

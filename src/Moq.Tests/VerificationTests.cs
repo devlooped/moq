@@ -1,4 +1,4 @@
-﻿using Sample;
+using Sample;
 using Xunit;
 
 namespace Moq.Tests
@@ -12,15 +12,15 @@ namespace Moq.Tests
 
             calculator.Add(2, 3).Returns(5).Once();
 
-            Assert.ThrowsAny<VerifyException>(() => Syntax.Verify(calculator));
+            Assert.ThrowsAny<VerifyException>(() => Verify.Called(calculator));
 
             calculator.Object.Add(2, 3);
 
-            Syntax.Verify(calculator);
+            Verify.Called(calculator);
 
             calculator.Object.Add(2, 3);
 
-            Assert.ThrowsAny<VerifyException>(() => Syntax.Verify(calculator));
+            Assert.ThrowsAny<VerifyException>(() => Verify.Called(calculator));
         }
 
         [Fact]
@@ -28,15 +28,15 @@ namespace Moq.Tests
         {
             var calculator = new Mock<ICalculator>();
 
-            Assert.Throws<VerifyException>(() => Syntax.Verify(calculator).Add(2, 3).Once());
+            Assert.Throws<VerifyException>(() => Verify.Called(calculator).Add(2, 3).Once());
 
             calculator.Object.Add(2, 3);
 
-            Syntax.Verify(calculator).Add(2, 3).Once();
+            Verify.Called(calculator).Add(2, 3).Once();
 
             calculator.Object.Add(2, 3);
 
-            Assert.Throws<VerifyException>(() => Syntax.Verify(calculator).Add(2, 3).Once());
+            Assert.Throws<VerifyException>(() => Verify.Called(calculator).Add(2, 3).Once());
         }
 
         [Fact]
@@ -46,11 +46,11 @@ namespace Moq.Tests
 
             calculator.Add(2, 3).Returns(5).Never();
 
-            Syntax.Verify(calculator);
+            Verify.Called(calculator);
 
             calculator.Object.Add(2, 3);
 
-            Assert.Throws<VerifyException>(() => Syntax.Verify(calculator));
+            Assert.Throws<VerifyException>(() => Verify.Called(calculator));
         }
 
         [Fact]
@@ -75,15 +75,15 @@ namespace Moq.Tests
             calculator.Add(2, 3).Returns(5).Exactly(2);
             calculator.Object.Add(2, 3);
 
-            Assert.Throws<VerifyException>(() => Syntax.Verify(calculator));
+            Assert.Throws<VerifyException>(() => Verify.Called(calculator));
 
             calculator.Object.Add(2, 3);
 
-            Syntax.Verify(calculator);
+            Verify.Called(calculator);
 
             calculator.Object.Add(2, 3);
 
-            Assert.Throws<VerifyException>(() => Syntax.Verify(calculator));
+            Assert.Throws<VerifyException>(() => Verify.Called(calculator));
         }
 
         [Fact]

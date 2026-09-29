@@ -1,21 +1,8 @@
 <Project TreatAsLocalProperty="VersionSuffix">
-  <PropertyGroup>
-    <ManagePackageVersionsCentrally>false</ManagePackageVersionsCentrally>
-  </PropertyGroup>
   <Import Project="..\Directory.Build.props" />
   <PropertyGroup>
-    <RestoreSources>
-      $(MSBuildThisFileDirectory)../../bin;
-      https://pkg.kzu.io/index.json;
-      https://api.nuget.org/v3/index.json
-    </RestoreSources>
-    <RestoreSources Condition="Exists('$(MSBuildThisFileDirectory)../../../nugetizer/bin/')">
-      $([System.IO.Path]::GetFullPath('$(MSBuildThisFileDirectory)../../../nugetizer/bin'));
-      $(RestoreSources)
-    </RestoreSources>
-    <RestoreSources Condition="Exists('$(MSBuildThisFileDirectory)../../../stunts/bin/')">
-      $([System.IO.Path]::GetFullPath('$(MSBuildThisFileDirectory)../../../stunts/bin'));
-      $(RestoreSources)
-    </RestoreSources>
+    <!-- Isolates the locally packed Moq from the global packages folder. Delete it to restore a newly packed Moq with the same version. -->
+    <RestorePackagesPath>$(MSBuildThisFileDirectory).nuget\packages</RestorePackagesPath>
+    <IsPackable>false</IsPackable>
   </PropertyGroup>
 </Project>

@@ -34,7 +34,7 @@ namespace Moq
         {
             var mock = MockFactory.Default.CreateMock(typeof(Mock).Assembly, typeof(T), interfaces, constructorArgs);
             // Delegate mocks are delegates bound to the mocked instance.
-            var mocked = (IMocked)(mock is Delegate @delegate ? @delegate.Target : mock);
+            var mocked = (IMocked)(mock is Delegate @delegate ? @delegate.Target! : mock);
 
             mocked.Initialize(behavior);
 

@@ -2,21 +2,20 @@
 
   <PropertyGroup>
     <TargetFrameworks>net48;net10.0</TargetFrameworks>
-    <!-- This means the static generator isn't supported -->
+    <!-- Covers run-time proxies and the setup API available below C# 14, where there are no typed setups. -->
+    <RegisterStaticMockFactory>false</RegisterStaticMockFactory>
     <LangVersion>8.0</LangVersion>
+    <ImplicitUsings>disable</ImplicitUsings>
   </PropertyGroup>
 
   <ItemGroup>
-    <Compile Include="..\Static\Tests.cs" Link="Tests.cs" />
-  </ItemGroup>
-
-  <ItemGroup>
-    <PackageReference Include="Microsoft.NET.Test.Sdk" Version="16.7.1" />
-    <PackageReference Include="Microsoft.TestPlatform.ObjectModel" Version="16.7.1" />
-    <PackageReference Include="xunit" Version="2.4.1" />
-    <PackageReference Include="xunit.runner.visualstudio" Version="2.4.3" />
-    <PackageReference Include="Moq" Version="$(Version)" />
-    <PackageReference Include="ManualStunts" Version="$(StuntsVersion)" />
+    <PackageReference Include="Microsoft.NET.Test.Sdk" />
+    <PackageReference Include="Microsoft.TestPlatform.ObjectModel" />
+    <PackageReference Include="xunit" />
+    <PackageReference Include="xunit.runner.visualstudio" />
+    <PackageReference Include="Moq" />
+    <PackageReference Include="ManualStunts" />
+    <Using Remove="@(Using)" />
   </ItemGroup>
 
 </Project>
