@@ -1,7 +1,9 @@
 using System;
 using System.ComponentModel;
+using System.Linq;
 using Moq.Sdk;
 using Sample;
+using Stunts;
 using Xunit;
 using static Moq.Syntax;
 
@@ -234,6 +236,58 @@ namespace Moq.Tests
 
             _ = calculator.Object.Mode;
             Assert.Throws<VerifyException>(() => Verify.Called(calculator));
+        }
+
+        [Fact]
+        public void SetupExposesSdkInvocation()
+        {
+            var calculator = new Mock<ICalculator>();
+
+            var setup = calculator.Add(2, 3).Sdk;
+
+            Assert.Equal(nameof(ICalculator.Add), setup.Invocation.MethodBase.Name);
+            Assert.True(setup.AppliesTo(Invocation(calculator, c => c.Add(2, 3))));
+            Assert.False(setup.AppliesTo(Invocation(calculator, c => c.Add(3, 2))));
+        }
+
+        [Fact]
+        public void SetupUsesArgumentMatchers()
+        {
+            var calculator = new Mock<ICalculator>();
+
+            var setup = calculator.Add(Any<int>(), Any<int>(i => i > 5)).Sdk;
+
+            Assert.True(setup.AppliesTo(Invocation(calculator, c => c.Add(1, 10))));
+            Assert.False(setup.AppliesTo(Invocation(calculator, c => c.Add(1, 2))));
+        }
+
+        [Fact]
+        public void SetupDistinguishesOverloads()
+        {
+            var calculator = new Mock<ICalculator>();
+
+            var setup = calculator.Add(1, 2, 3).Sdk;
+
+            Assert.Equal(3, setup.Invocation.Arguments.Count);
+            Assert.False(setup.AppliesTo(Invocation(calculator, c => c.Add(1, 2))));
+        }
+
+        [Fact]
+        public void CanCountInvocationsAgainstSetup()
+        {
+            var calculator = new Mock<ICalculator>();
+
+            calculator.Object.Store("a", 1);
+            calculator.Object.Store("b", 2);
+            calculator.Object.Store("a", 3);
+
+            Assert.Equal(2, calculator.Sdk.Invocations.Count(calculator.Store("a", Any<int>()).Sdk.AppliesTo));
+        }
+
+        static IMethodInvocation Invocation(IMock<ICalculator> mock, Action<ICalculator> action)
+        {
+            action(mock.Object);
+            return mock.Sdk.Invocations.Last();
         }
     }
 }

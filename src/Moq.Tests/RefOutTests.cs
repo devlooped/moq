@@ -2,39 +2,55 @@ using System;
 using Sample;
 using Stunts;
 using Xunit;
-using Xunit.Abstractions;
+using static Moq.Syntax;
 
 namespace Moq.Tests.RefOut
 {
     public class RefOutTests
     {
-        readonly ITestOutputHelper output;
-
-        public RefOutTests(ITestOutputHelper output) => this.output = output;
-
         [Fact]
         public void CanUseRefOut()
         {
-            var mock = Mock.Of<ICalculator>();
+            var mock = new Mock<ICalculator>();
             int x = 10;
             int y = 20;
-            int? z;
 
-            mock.TryAdd(ref x, ref y, out z)
-                .Returns(true);
+            mock.TryAdd(ref x, ref y, out _).Returns(true);
 
-            Assert.True(mock.TryAdd(ref x, ref y, out z));
+            Assert.True(mock.Object.TryAdd(ref x, ref y, out _));
         }
 
         [Fact]
         public void CanSetRefOutReturns()
         {
-            var mock = Mock.Of<ICalculator>();
+            var mock = new Mock<ICalculator>();
+            int x = 10;
+            int y = 20;
+
+            mock.TryAdd(ref x, ref y, out _)
+                .Returns((ref int a, ref int b, out int? c) =>
+                {
+                    c = a + b;
+                    a = 15;
+                    b = 25;
+                    return true;
+                });
+
+            Assert.True(mock.Object.TryAdd(ref x, ref y, out var z));
+            Assert.Equal(15, x);
+            Assert.Equal(25, y);
+            Assert.Equal(30, z);
+        }
+
+        [Fact]
+        public void CanSetRefOutReturnsFromUntypedArguments()
+        {
+            var mock = new Mock<ICalculator>();
             int x = 10;
             int y = 20;
             int? z;
 
-            mock.TryAdd(ref x, ref y, out z)
+            Setup(() => mock.Object.TryAdd(ref x, ref y, out z))
                 .Returns(c =>
                 {
                     c.Set(2, (int?)(c.Get<int>(0) + c.Get<int>(1)));
@@ -43,7 +59,7 @@ namespace Moq.Tests.RefOut
                     return true;
                 });
 
-            Assert.True(mock.TryAdd(ref x, ref y, out z));
+            Assert.True(mock.Object.TryAdd(ref x, ref y, out z));
             Assert.Equal(15, x);
             Assert.Equal(25, y);
             Assert.Equal(30, z);
@@ -52,30 +68,29 @@ namespace Moq.Tests.RefOut
         [Fact]
         public void CanSetTypedOut()
         {
-            var mock = Mock.Of<ICalculator>();
+            var mock = new Mock<ICalculator>();
 
-            mock.Setup<TryAdd>(mock.TryAdd)
+            SetupRef<TryAdd>(mock.Object.TryAdd)
                 .Returns((ref int x, ref int y, out int? z) => (z = x + y) == z);
 
             var x1 = 10;
             var y1 = 20;
-            int? z1;
 
-            Assert.True(mock.TryAdd(ref x1, ref y1, out z1));
+            Assert.True(mock.Object.TryAdd(ref x1, ref y1, out var z1));
             Assert.Equal(30, z1);
         }
 
         [Fact]
         public void CanSetTypedOutInRecursiveMock()
         {
-            var mock = Mock.Of<IRefOutParent>();
+            var mock = new Mock<IRefOutParent>();
             var expected = DateTimeOffset.Now;
             var value = expected.ToString("O");
 
-            mock.Setup<TryParse>(() => mock.RefOut.TryParse)
+            SetupRef<TryParse>(() => mock.Object.RefOut.TryParse)
                 .Returns((string input, out DateTimeOffset date) => DateTimeOffset.TryParse(value, out date));
 
-            Assert.True(mock.RefOut.TryParse(value, out var actual));
+            Assert.True(mock.Object.RefOut.TryParse(value, out var actual));
             Assert.Equal(expected, actual);
         }
 

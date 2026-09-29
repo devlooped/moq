@@ -36,6 +36,13 @@ namespace Moq
                 {
                     // Turn the null value into a mock for the current invocation setup
                     var currentMock = ((IMocked)invocation.Target).Runtime;
+                    var setup = currentMock.GetPipeline(MockContext.CurrentSetup ?? CallContext.ThrowUnexpectedNull<IMockSetup>());
+                    var returnBehavior = setup.Behaviors.OfType<ReturnsBehavior>().FirstOrDefault();
+
+                    // Setup scopes bypass existing setups, so reuse the recursive mock from a previous setup.
+                    if (returnBehavior?.Value is IMocked existing && info.ReturnType.IsInstanceOfType(existing))
+                        return invocation.CreateValueReturn(existing, WithOutputs(invocation, result));
+
                     // NOTE: this invocation will throw if there isn't a matching 
                     // mock for the given return type in the same assembly as the 
                     // current mock. It might be tricky to diagnose at run-time, 
@@ -60,29 +67,34 @@ namespace Moq
                     }
 
                     // Set up the current invocation to return the created value
-                    var setup = currentMock.GetPipeline(MockContext.CurrentSetup ?? CallContext.ThrowUnexpectedNull<IMockSetup>());
-                    var returnBehavior = setup.Behaviors.OfType<ReturnsBehavior>().FirstOrDefault();
                     if (returnBehavior != null)
                         returnBehavior.Value = recursiveMock.Object;
                     else
                         setup.Behaviors.Add(new ReturnsBehavior(recursiveMock.Object));
 
-                    // Copy over values from the result, so that outputs contain the default values.
-                    var arguments = invocation.Arguments;
-                    for (var i = 0; i < arguments.Count; i++)
-                    {
-                        var parameter = arguments[i].Parameter;
-                        if (parameter.IsOut)
-                            arguments.SetValue(i, result.Outputs.GetValue(parameter.Name));
-                    }
-
-                    return invocation.CreateValueReturn(recursiveMock.Object, arguments);
+                    return invocation.CreateValueReturn(recursiveMock.Object, WithOutputs(invocation, result));
                 }
 
                 return result;
             }
 
             return next.Invoke(invocation, next);
+        }
+
+        /// <summary>
+        /// Copies over values from the result, so that outputs contain the default values.
+        /// </summary>
+        static IArgumentCollection WithOutputs(IMethodInvocation invocation, IMethodReturn result)
+        {
+            var arguments = invocation.Arguments;
+            for (var i = 0; i < arguments.Count; i++)
+            {
+                var parameter = arguments[i].Parameter;
+                if (parameter.IsOut)
+                    arguments.SetValue(i, result.Outputs.GetValue(parameter.Name));
+            }
+
+            return arguments;
         }
     }
 }

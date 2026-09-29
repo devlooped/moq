@@ -126,9 +126,15 @@ namespace Moq
                     bool IsGeneratedMock(ISymbol symbol) =>
                         symbol.DeclaringSyntaxReferences.Length == 1 &&
                         symbol.DeclaringSyntaxReferences[0].GetSyntax(context.CancellationToken) is VariableDeclaratorSyntax variable &&
-                        variable.Initializer?.Value is InvocationExpressionSyntax or BaseObjectCreationExpressionSyntax &&
-                        semantic.GetSymbolInfo(variable.Initializer.Value, context.CancellationToken).Symbol is IMethodSymbol method &&
-                        method.GetAttributes().Any(attr => SymbolEqualityComparer.Default.Equals(attr.AttributeClass, generatorAttr));
+                        variable.Initializer?.Value is ExpressionSyntax initializer &&
+                        IsGeneratorCall(initializer);
+
+                    // Also covers wrapped generator calls, such as Mock.Get(Mock.Of<T>()).
+                    bool IsGeneratorCall(ExpressionSyntax expression) =>
+                        expression is InvocationExpressionSyntax or BaseObjectCreationExpressionSyntax &&
+                        semantic.GetSymbolInfo(expression, context.CancellationToken).Symbol is IMethodSymbol method &&
+                        (method.GetAttributes().Any(attr => SymbolEqualityComparer.Default.Equals(attr.AttributeClass, generatorAttr)) ||
+                         expression is InvocationExpressionSyntax { ArgumentList.Arguments.Count: 1 } invocation && IsGeneratorCall(invocation.ArgumentList.Arguments[0].Expression));
 
                     bool IsMockFlow(ImmutableArray<ISymbol> data) =>
                         data.Length == 1 && IsGeneratedMock(data[0]);

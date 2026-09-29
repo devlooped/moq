@@ -5,54 +5,45 @@ using Moq.Sdk;
 using Sample;
 using Stunts;
 using Xunit;
-using Xunit.Abstractions;
 using static Moq.Syntax;
 
 namespace Moq.Tests
 {
-    using static Moq.Syntax;
-
     public class MoqTests
     {
-        readonly ITestOutputHelper output;
-
-        public MoqTests(ITestOutputHelper output)
-        {
-            this.output = output;
-        }
-
         [Fact]
         public void SetupDoesNotRecordCalls()
         {
-            var calculator = Mock.Of<ICalculator>();
+            var calculator = new Mock<ICalculator>();
 
-            calculator.Setup(c => c.TurnOn());
+            calculator.TurnOn();
 
-            Assert.Empty(MockRuntime.Get(calculator).Invocations);
+            Assert.Empty(calculator.Sdk.Invocations);
         }
 
         [Fact]
         public void CanRaiseEvents()
         {
-            var calculator = Mock.Of<ICalculator>().Named("calculator");
+            var calculator = new Mock<ICalculator>();
+            calculator.Sdk.Name = "calculator";
 
             var raised = false;
 
             EventHandler handler = (sender, args) => raised = true;
-            calculator.TurnedOn += handler;
+            calculator.Object.TurnedOn += handler;
 
-            Assert.Equal(1, MockRuntime.Get(calculator).Invocations.Count);
-            calculator.TurnedOn += Raise();
+            Assert.Single(calculator.Sdk.Invocations);
+            calculator.Object.TurnedOn += Raise();
             // Raising events should not increase invocation count.
-            Assert.Equal(1, MockRuntime.Get(calculator).Invocations.Count);
+            Assert.Single(calculator.Sdk.Invocations);
 
             Assert.True(raised);
 
             raised = false;
-            calculator.TurnedOn -= handler;
-            calculator.TurnedOn -= handler;
+            calculator.Object.TurnedOn -= handler;
+            calculator.Object.TurnedOn -= handler;
 
-            calculator.TurnedOn += Raise();
+            calculator.Object.TurnedOn += Raise();
 
             Assert.False(raised);
         }
@@ -60,13 +51,12 @@ namespace Moq.Tests
         [Fact]
         public void CanRaiseEventsWithArgs()
         {
-            var mock = Mock.Of<INotifyPropertyChanged>();
-            mock.InsertBehavior(0, new EventBehavior());
+            var mock = new Mock<INotifyPropertyChanged>();
 
             var property = "";
-            mock.PropertyChanged += (sender, args) => property = args.PropertyName;
+            mock.Object.PropertyChanged += (sender, args) => property = args.PropertyName;
 
-            mock.PropertyChanged += Raise<PropertyChangedEventHandler>(new PropertyChangedEventArgs("Mode"));
+            mock.Object.PropertyChanged += Raise<PropertyChangedEventHandler>(new PropertyChangedEventArgs("Mode"));
 
             Assert.Equal("Mode", property);
         }
@@ -74,56 +64,48 @@ namespace Moq.Tests
         [Fact]
         public void CanSetupPropertyViaReturns()
         {
-            var calculator = Mock.Of<ICalculator>();
+            var calculator = new Mock<ICalculator>();
 
             calculator.Mode.Returns(CalculatorMode.Standard);
 
-            var mode = calculator.Mode;
-
-            Assert.Equal(CalculatorMode.Standard, mode);
+            Assert.Equal(CalculatorMode.Standard, calculator.Object.Mode);
         }
 
         [Fact]
         public void CanSetupPropertyDirectly()
         {
-            var calculator = Mock.Of<ICalculator>();
+            var calculator = new Mock<ICalculator>();
 
-            calculator.Mode = CalculatorMode.Scientific;
+            calculator.Object.Mode = CalculatorMode.Scientific;
 
-            var mode = calculator.Mode;
-
-            Assert.Equal(CalculatorMode.Scientific, mode);
+            Assert.Equal(CalculatorMode.Scientific, calculator.Object.Mode);
         }
 
         [Fact]
         public void CanSetupPropertyTwiceViaReturns()
         {
-            var calculator = Mock.Of<ICalculator>();
+            var calculator = new Mock<ICalculator>();
 
             calculator.Mode.Returns(CalculatorMode.Standard);
             calculator.Mode.Returns(CalculatorMode.Scientific);
 
-            var mode = calculator.Mode;
-
-            Assert.Equal(CalculatorMode.Scientific, mode);
+            Assert.Equal(CalculatorMode.Scientific, calculator.Object.Mode);
         }
 
         [Fact]
         public void CanSetupMethodWithArgumentsViaReturns()
         {
-            var calculator = Mock.Of<ICalculator>();
+            var calculator = new Mock<ICalculator>();
 
             calculator.Add(2, 3).Returns(5);
 
-            var result = calculator.Add(2, 3);
-
-            Assert.Equal(5, result);
+            Assert.Equal(5, calculator.Object.Add(2, 3));
         }
 
         [Fact]
         public void CanSetupMethodWithDifferentArgumentsViaReturns()
         {
-            var calculator = Mock.Of<ICalculator>();
+            var calculator = new Mock<ICalculator>();
 
             calculator.Add(2, 2).Returns(4);
             calculator.Add(2, 3).Returns(5);
@@ -131,20 +113,20 @@ namespace Moq.Tests
             calculator.Add(10, Any<int>()).Returns(10);
             calculator.Add(Any<int>(i => i > 20), Any<int>()).Returns(20);
 
-            Assert.Equal(5, calculator.Add(2, 3));
-            Assert.Equal(4, calculator.Add(2, 2));
-            Assert.Equal(10, calculator.Add(10, 2));
-            Assert.Equal(20, calculator.Add(25, 20));
+            Assert.Equal(5, calculator.Object.Add(2, 3));
+            Assert.Equal(4, calculator.Object.Add(2, 2));
+            Assert.Equal(10, calculator.Object.Add(10, 2));
+            Assert.Equal(20, calculator.Object.Add(25, 20));
         }
 
         [Fact]
         public void CanReturnFunction()
         {
-            var calculator = Mock.Of<ICalculator>();
+            var calculator = new Mock<ICalculator>();
 
             calculator.Add(2, 2).Returns(() => 4);
 
-            Assert.Equal(4, calculator.Add(2, 2));
+            Assert.Equal(4, calculator.Object.Add(2, 2));
         }
 
         public interface IAsync
@@ -158,341 +140,299 @@ namespace Moq.Tests
         [Fact]
         public async Task CanReturnAsyncFunction()
         {
-            var mock = Mock.Of<IAsync>();
+            var mock = new Mock<IAsync>();
 
-            mock.RunAsync(5).ReturnsAsync(true);
+            mock.RunAsync(5).Returns(true);
 
-            Assert.True(await mock.RunAsync(5));
+            Assert.True(await mock.Object.RunAsync(5));
         }
 
         [Fact]
         public async Task CanReturnAsyncValueFunction()
         {
-            var mock = Mock.Of<IAsync>();
+            var mock = new Mock<IAsync>();
 
-            mock.RunValueAsync(5).ReturnsAsync(true);
+            mock.RunValueAsync(5).Returns(true);
 
-            Assert.True(await mock.RunValueAsync(5));
+            Assert.True(await mock.Object.RunValueAsync(5));
         }
 
         [Fact]
         public async Task ThrowsAsync()
         {
-            var mock = Mock.Of<IAsync>();
+            var mock = new Mock<IAsync>();
 
             mock.RunAsync(5).Throws<InvalidOperationException>();
 
-            await Assert.ThrowsAsync<InvalidOperationException>(async () => await mock.RunAsync(5));
+            await Assert.ThrowsAsync<InvalidOperationException>(async () => await mock.Object.RunAsync(5));
         }
 
         [Fact]
         public async Task ThrowsAsyncWithException()
         {
-            var mock = Mock.Of<IAsync>();
+            var mock = new Mock<IAsync>();
 
             mock.RunAsync(5).Throws(new InvalidOperationException());
 
-            await Assert.ThrowsAsync<InvalidOperationException>(async () => await mock.RunAsync(5));
+            await Assert.ThrowsAsync<InvalidOperationException>(async () => await mock.Object.RunAsync(5));
         }
 
         [Fact]
         public async Task ThrowsValueAsync()
         {
-            var mock = Mock.Of<IAsync>();
+            var mock = new Mock<IAsync>();
 
             mock.RunValueAsync(5).Throws<InvalidOperationException>();
 
-            await Assert.ThrowsAsync<InvalidOperationException>(async () => await mock.RunValueAsync(5));
+            await Assert.ThrowsAsync<InvalidOperationException>(async () => await mock.Object.RunValueAsync(5));
         }
 
         [Fact]
         public async Task ThrowsValueAsyncWithException()
         {
-            var mock = Mock.Of<IAsync>();
+            var mock = new Mock<IAsync>();
 
             mock.RunValueAsync(5).Throws(new InvalidOperationException());
 
-            await Assert.ThrowsAsync<InvalidOperationException>(async () => await mock.RunValueAsync(5));
+            await Assert.ThrowsAsync<InvalidOperationException>(async () => await mock.Object.RunValueAsync(5));
         }
 
         [Fact]
         public async Task ThrowsVoidAsync()
         {
-            var mock = Mock.Of<IAsync>();
+            var mock = new Mock<IAsync>();
 
             mock.RunVoidAsync().Throws<InvalidOperationException>();
 
-            await Assert.ThrowsAsync<InvalidOperationException>(async () => await mock.RunVoidAsync());
+            await Assert.ThrowsAsync<InvalidOperationException>(async () => await mock.Object.RunVoidAsync());
         }
 
         [Fact]
         public async Task ThrowsVoidAsyncWithException()
         {
-            var mock = Mock.Of<IAsync>();
+            var mock = new Mock<IAsync>();
 
             mock.RunVoidAsync().Throws(new InvalidOperationException());
 
-            await Assert.ThrowsAsync<InvalidOperationException>(async () => await mock.RunVoidAsync());
+            await Assert.ThrowsAsync<InvalidOperationException>(async () => await mock.Object.RunVoidAsync());
         }
 
         [Fact]
         public async Task ThrowsValueVoidAsync()
         {
-            var mock = Mock.Of<IAsync>();
+            var mock = new Mock<IAsync>();
 
             mock.RunVoidValueAsync().Throws<InvalidOperationException>();
 
-            await Assert.ThrowsAsync<InvalidOperationException>(async () => await mock.RunVoidValueAsync());
+            await Assert.ThrowsAsync<InvalidOperationException>(async () => await mock.Object.RunVoidValueAsync());
         }
 
         [Fact]
         public async Task ThrowsValueVoidAsyncWithException()
         {
-            var mock = Mock.Of<IAsync>();
+            var mock = new Mock<IAsync>();
 
             mock.RunVoidValueAsync().Throws(new InvalidOperationException());
 
-            await Assert.ThrowsAsync<InvalidOperationException>(async () => await mock.RunVoidValueAsync());
+            await Assert.ThrowsAsync<InvalidOperationException>(async () => await mock.Object.RunVoidValueAsync());
         }
 
         [Fact]
         public void CanReturnFunctionWithArgs()
         {
-            var calculator = Mock.Of<ICalculator>();
+            var calculator = new Mock<ICalculator>();
 
-            calculator.Add(Any<int>(), Any<int>()).Returns((int x, int y) => x + y);
+            calculator.Add(Any<int>(), Any<int>()).Returns((x, y) => x + y);
 
-            Assert.Equal(4, calculator.Add(2, 2));
-            Assert.Equal(5, calculator.Add(2, 3));
+            Assert.Equal(4, calculator.Object.Add(2, 2));
+            Assert.Equal(5, calculator.Object.Add(2, 3));
         }
 
         [Fact]
-        public void CanSetupMethodWithDifferentArgumentsViaTypedReturns()
+        public void CanReturnFunctionWithUntypedArgs()
         {
-            var calculator = Mock.Of<ICalculator>();
+            var calculator = new Mock<ICalculator>();
 
-            calculator
-                .Add(Any<int>(), Any<int>())
-                .Returns<int, int, int>((x, y) => x + y);
+            Setup(() => calculator.Object.Add(Any<int>(), Any<int>()))
+                .Returns(args => args.Get<int>(0) * args.Get<int>(1));
 
-            Assert.Equal(5, calculator.Add(2, 3));
-            Assert.Equal(4, calculator.Add(2, 2));
-            Assert.Equal(12, calculator.Add(10, 2));
+            Assert.Equal(6, calculator.Object.Add(2, 3));
         }
 
         [Fact]
         public void CanInvokeCallback()
         {
-            var calculator = Mock.Of<ICalculator>();
+            var calculator = new Mock<ICalculator>();
             var called = false;
 
             calculator.Add(Any<int>(), Any<int>())
                 .Callback(() => called = true)
-                .Returns((int x, int y) => x + y);
+                .Returns((x, y) => x + y);
 
-            calculator.Add(2, 2);
-
+            Assert.Equal(4, calculator.Object.Add(2, 2));
             Assert.True(called);
         }
 
         [Fact]
         public void CanInvokeTwoCallbacks()
         {
-            var calculator = Mock.Of<ICalculator>();
-            var called1 = false;
-            var called2 = false;
+            var calculator = new Mock<ICalculator>();
+            var called1 = 0;
+            var called2 = 0;
 
             calculator.Add(Any<int>(), Any<int>())
-                .Callback((int _, int __) => called1 = true)
-                .Callback((int _, int __) => called2 = true)
-                .Returns((int x, int y) => x + y);
+                .Callback((x, y) => called1 = x)
+                .Callback((x, y) => called2 = y)
+                .Returns((x, y) => x + y);
 
-            calculator.Add(2, 2);
+            calculator.Object.Add(2, 3);
 
-            Assert.True(called1);
-            Assert.True(called2);
+            Assert.Equal(2, called1);
+            Assert.Equal(3, called2);
         }
 
         [Fact]
         public void CanInvokeCallbackAfterReturn()
         {
-            var calculator = Mock.Of<ICalculator>();
+            var calculator = new Mock<ICalculator>();
             var called = false;
 
             calculator.Add(Any<int>(), Any<int>())
-                .Returns((int x, int y) => x + y)
+                .Returns((x, y) => x + y)
                 .Callback(() => called = true);
 
-            calculator.Add(2, 2);
-
+            Assert.Equal(4, calculator.Object.Add(2, 2));
             Assert.True(called);
         }
 
         [Fact]
         public void ThrowsWithException()
         {
-            var calculator = Mock.Of<ICalculator>();
+            var calculator = new Mock<ICalculator>();
 
-            calculator
-                .Add(2, 3)
-                .Throws(new ArgumentException());
+            calculator.Add(2, 3).Throws(new ArgumentException());
 
-            Assert.Throws<ArgumentException>(() => calculator.Add(2, 3));
+            Assert.Throws<ArgumentException>(() => calculator.Object.Add(2, 3));
         }
 
         [Fact]
         public void ThrowsWithExceptionType()
         {
-            var calculator = Mock.Of<ICalculator>();
+            var calculator = new Mock<ICalculator>();
 
-            calculator
-                .Add(2, 3)
-                .Throws<ArgumentException>();
+            calculator.Add(2, 3).Throws<ArgumentException>();
 
-            Assert.Throws<ArgumentException>(() => calculator.Add(2, 3));
+            Assert.Throws<ArgumentException>(() => calculator.Object.Add(2, 3));
         }
 
         [Fact]
         public void CanSetupPropertyViaReturnsForStrictMock()
         {
-            var calculator = Mock.Of<ICalculator>(MockBehavior.Strict);
+            var calculator = new Mock<ICalculator>(MockBehavior.Strict);
 
-            // NOTE: since the mock is strict, we need to tell we're going to set it up
-            using (Setup())
-            {
-                calculator.Mode.Returns(CalculatorMode.Scientific);
-            }
+            calculator.Mode.Returns(CalculatorMode.Scientific);
 
-            var mode = calculator.Mode;
-
-            Assert.Equal(CalculatorMode.Scientific, mode);
-            Assert.Throws<StrictMockException>(() => calculator.Add(2, 4));
+            Assert.Equal(CalculatorMode.Scientific, calculator.Object.Mode);
+            Assert.Throws<StrictMockException>(() => calculator.Object.Add(2, 4));
         }
 
         [Fact]
         public void CanSetupPropertyForStrictMock()
         {
-            var calculator = Mock.Of<ICalculator>(MockBehavior.Strict);
+            var calculator = new Mock<ICalculator>(MockBehavior.Strict);
 
-            calculator.Setup(c => c.Mode).Returns(CalculatorMode.Scientific);
+            Setup(() => calculator.Object.Mode).Returns(CalculatorMode.Scientific);
 
-            var mode = calculator.Mode;
-
-            Assert.Equal(CalculatorMode.Scientific, mode);
-            Assert.Throws<StrictMockException>(() => calculator.Add(2, 4));
-        }
-
-        [Fact]
-        public void CanSetupPropertyWithValueForStrictMock()
-        {
-            var calculator = Mock.Of<ICalculator>(MockBehavior.Strict);
-
-            calculator.Setup(c => c.Mode).Returns(CalculatorMode.Scientific);
-
-            var mode = calculator.Mode;
-
-            Assert.Equal(CalculatorMode.Scientific, mode);
-            Assert.Throws<StrictMockException>(() => calculator.IsOn);
+            Assert.Equal(CalculatorMode.Scientific, calculator.Object.Mode);
+            Assert.Throws<StrictMockException>(() => calculator.Object.Add(2, 4));
+            Assert.Throws<StrictMockException>(() => calculator.Object.IsOn);
         }
 
         [Fact]
         public void CanSetupVoidMethod()
         {
-            var calculator = Mock.Of<ICalculator>(MockBehavior.Strict);
+            var calculator = new Mock<ICalculator>(MockBehavior.Strict);
 
-            calculator.Setup(c => c.TurnOn())
-                .Throws<InvalidOperationException>();
+            calculator.TurnOn().Throws<InvalidOperationException>();
 
-            Assert.Throws<InvalidOperationException>(() => calculator.TurnOn());
+            Assert.Throws<InvalidOperationException>(() => calculator.Object.TurnOn());
         }
 
         [Fact]
         public void CanAccessMockInfoFromInstance()
         {
-            var calculator = Mock.Of<ICalculator>();
+            var calculator = new Mock<ICalculator>();
 
-            calculator.Add(Any<int>(), Any<int>()).Returns((int x, int y) => x + y);
+            calculator.Add(Any<int>(), Any<int>()).Returns((x, y) => x + y);
 
-            Assert.Equal(4, calculator.Add(2, 2));
-
-            Assert.Equal(1, MockRuntime.Get(calculator).Invocations.Count);
+            Assert.Equal(4, calculator.Object.Add(2, 2));
+            Assert.Single(MockRuntime.Get(calculator.Object).Invocations);
+            Assert.Same(calculator.Sdk, Mock.Get(calculator.Object).Sdk);
         }
 
         [Fact]
         public void CanAssertInvocations()
         {
-            var calculator = Mock.Of<ICalculator>();
+            var calculator = new Mock<ICalculator>();
 
-            calculator.TurnOn();
-            Assert.Single(MockRuntime.InvocationsFor(() => calculator.TurnOn()));
+            calculator.Object.TurnOn();
+            Assert.Single(MockRuntime.InvocationsFor(() => calculator.Object.TurnOn()));
 
-            calculator.Add(2, 3);
+            calculator.Object.Add(2, 3);
 
-            calculator.Verify(c => c.TurnOn());
-            calculator.Verify(c => c.Add(Any<int>(), Any<int>()));
+            Verify.Called(() => calculator.Object.TurnOn());
+            Verify.Called(() => calculator.Object.Add(Any<int>(), Any<int>()));
 
-            var ex = Record.Exception(() => calculator.Verify(c => c.Store(Any<string>(), Any<int>())));
+            var ex = Record.Exception(() => Verify.Called(() => calculator.Object.Store(Any<string>(), Any<int>())));
 
             Assert.IsAssignableFrom<VerifyException>(ex);
-            Assert.Single(MockRuntime.InvocationsFor(() => calculator.Add(2, 3)));
-            Assert.Empty(MockRuntime.InvocationsFor(() => calculator.Add(Not(2), Not(3))));
+            Assert.Single(MockRuntime.InvocationsFor(() => calculator.Object.Add(2, 3)));
+            Assert.Empty(MockRuntime.InvocationsFor(() => calculator.Object.Add(Not(2), Not(3))));
         }
 
         [Fact]
         public void ChangeDefaultValue()
         {
-            var calculator = Mock.Of<ICalculator>();
-            var moq = Mock.Get(calculator);
+            var calculator = new Mock<ICalculator>();
 
-            Assert.Equal(MockBehavior.Loose, moq.Behavior);
+            Assert.Equal(MockBehavior.Loose, calculator.Behavior);
+            Assert.Equal(0, calculator.Object.Add(5, 5));
 
-            var value = calculator.Add(5, 5);
+            calculator.DefaultValue.Register(() => 10);
 
-            Assert.Equal(0, value);
-
-            moq.DefaultValue.Register(() => 10);
-
-            value = calculator.Add(5, 5);
-
-            Assert.Equal(10, value);
+            Assert.Equal(10, calculator.Object.Add(5, 5));
         }
 
         [Fact]
         public void ChangeBehavior()
         {
-            var calculator = Mock.Of<ICalculator>();
-            var moq = Mock.Get(calculator);
+            var calculator = new Mock<ICalculator>();
 
-            Assert.Equal(MockBehavior.Loose, moq.Behavior);
+            Assert.Equal(MockBehavior.Loose, calculator.Behavior);
 
             // Does not throw
-            calculator.Add(5, 5);
+            calculator.Object.Add(5, 5);
 
-            moq.Behavior = MockBehavior.Strict;
+            calculator.Behavior = MockBehavior.Strict;
 
-            Assert.Throws<StrictMockException>(() => calculator.Add(5, 5));
+            Assert.Throws<StrictMockException>(() => calculator.Object.Add(5, 5));
         }
 
         [Fact]
         public void ChangingBehaviorPreservesDefaultValue()
         {
-            var calculator = Mock.Of<ICalculator>();
-            var moq = Mock.Get(calculator);
+            var calculator = new Mock<ICalculator>();
 
-            Assert.Equal(MockBehavior.Loose, moq.Behavior);
+            Assert.Equal(0, calculator.Object.Add(5, 5));
 
-            var value = calculator.Add(5, 5);
-            Assert.Equal(0, value);
+            calculator.DefaultValue.Register(() => 10);
+            Assert.Equal(10, calculator.Object.Add(5, 5));
 
-            moq.DefaultValue.Register(() => 10);
-            value = calculator.Add(5, 5);
-            Assert.Equal(10, value);
+            calculator.Behavior = MockBehavior.Strict;
+            Assert.Throws<StrictMockException>(() => calculator.Object.Add(5, 5));
 
-            moq.Behavior = MockBehavior.Strict;
-            Assert.Throws<StrictMockException>(() => calculator.Add(5, 5));
-
-            moq.Behavior = MockBehavior.Loose;
-            Assert.Equal(10, calculator.Add(5, 5));
+            calculator.Behavior = MockBehavior.Loose;
+            Assert.Equal(10, calculator.Object.Add(5, 5));
         }
     }
 }

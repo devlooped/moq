@@ -1,173 +1,167 @@
-﻿using System;
-using Sample;
+﻿using Sample;
 using Xunit;
-using Xunit.Abstractions;
-using static Moq.Syntax;
 
 namespace Moq.Tests
 {
     public class VerificationTests
     {
-        readonly ITestOutputHelper output;
-
-        public VerificationTests(ITestOutputHelper output) => this.output = output;
-
         [Fact]
         public void VerifySyntaxOnceOnSetup()
         {
-            var calculator = Mock.Of<ICalculator>();
+            var calculator = new Mock<ICalculator>();
 
             calculator.Add(2, 3).Returns(5).Once();
 
-            Assert.ThrowsAny<VerifyException>(() => Verify(calculator));
+            Assert.ThrowsAny<VerifyException>(() => Syntax.Verify(calculator));
 
-            calculator.Add(2, 3);
+            calculator.Object.Add(2, 3);
 
-            // TODO: We should have a this.Verify() extension method for backs compat.
-            Verify(calculator);
+            Syntax.Verify(calculator);
 
-            calculator.Add(2, 3);
+            calculator.Object.Add(2, 3);
 
-            Assert.ThrowsAny<VerifyException>(() => Verify(calculator));
+            Assert.ThrowsAny<VerifyException>(() => Syntax.Verify(calculator));
         }
 
         [Fact]
         public void VerifySyntaxOnceOnVerify()
         {
-            var calculator = Mock.Of<ICalculator>();
+            var calculator = new Mock<ICalculator>();
 
-            Assert.Throws<VerifyException>(() => Verify(calculator).Add(2, 3).Once());
+            Assert.Throws<VerifyException>(() => Syntax.Verify(calculator).Add(2, 3).Once());
 
-            calculator.Add(2, 3);
+            calculator.Object.Add(2, 3);
 
-            Verify(calculator).Add(2, 3).Once();
+            Syntax.Verify(calculator).Add(2, 3).Once();
 
-            calculator.Add(2, 3);
+            calculator.Object.Add(2, 3);
 
-            Assert.Throws<VerifyException>(() => Verify(calculator).Add(2, 3).Once());
+            Assert.Throws<VerifyException>(() => Syntax.Verify(calculator).Add(2, 3).Once());
         }
 
         [Fact]
         public void VerifySyntaxNeverOnSetup()
         {
-            var calculator = Mock.Of<ICalculator>();
+            var calculator = new Mock<ICalculator>();
 
             calculator.Add(2, 3).Returns(5).Never();
 
-            Verify(calculator);
+            Syntax.Verify(calculator);
 
-            calculator.Add(2, 3);
+            calculator.Object.Add(2, 3);
 
-            Assert.Throws<VerifyException>(() => Verify(calculator));
+            Assert.Throws<VerifyException>(() => Syntax.Verify(calculator));
         }
 
         [Fact]
         public void VerifySyntaxNeverOnVerify()
         {
-            var calculator = Mock.Of<ICalculator>();
+            var calculator = new Mock<ICalculator>();
 
             calculator.Add(2, 3).Returns(5);
 
-            Verify(calculator).Add(2, 3).Never();
+            Verify.NotCalled(calculator).Add(2, 3);
 
-            calculator.Add(2, 3);
+            calculator.Object.Add(2, 3);
 
-            Assert.Throws<VerifyException>(() => Verify(calculator).Add(2, 3).Never());
+            Assert.Throws<VerifyException>(() => Verify.NotCalled(calculator).Add(2, 3));
         }
 
         [Fact]
         public void VerifySyntaxExactlyOnSetup()
         {
-            var calculator = Mock.Of<ICalculator>();
+            var calculator = new Mock<ICalculator>();
 
             calculator.Add(2, 3).Returns(5).Exactly(2);
-            calculator.Add(2, 3);
+            calculator.Object.Add(2, 3);
 
-            Assert.Throws<VerifyException>(() => Verify(calculator));
+            Assert.Throws<VerifyException>(() => Syntax.Verify(calculator));
 
-            calculator.Add(2, 3);
+            calculator.Object.Add(2, 3);
 
-            Verify(calculator);
+            Syntax.Verify(calculator);
 
-            calculator.Add(2, 3);
+            calculator.Object.Add(2, 3);
 
-            Assert.Throws<VerifyException>(() => Verify(calculator));
+            Assert.Throws<VerifyException>(() => Syntax.Verify(calculator));
         }
 
         [Fact]
         public void VerifySyntaxExactlyOnVerify()
         {
-            var calculator = Mock.Of<ICalculator>();
+            var calculator = new Mock<ICalculator>();
 
             calculator.Add(2, 3).Returns(5);
-            calculator.Add(2, 3);
+            calculator.Object.Add(2, 3);
 
-            Assert.Throws<VerifyException>(() => Verify(calculator).Add(2, 3).Exactly(2));
+            Assert.Throws<VerifyException>(() => Verify.Called(calculator).Add(2, 3).Exactly(2));
 
-            calculator.Add(2, 3);
+            calculator.Object.Add(2, 3);
 
-            Verify(calculator).Add(2, 3).Exactly(2);
+            Verify.Called(calculator).Add(2, 3).Exactly(2);
 
-            calculator.Add(2, 3);
+            calculator.Object.Add(2, 3);
 
-            Assert.Throws<VerifyException>(() => Verify(calculator).Add(2, 3).Never());
+            Assert.Throws<VerifyException>(() => Verify.Called(calculator).Add(2, 3).Exactly(2));
         }
 
         [Fact]
         public void VerifyPropertySet()
         {
-            var calculator = Mock.Of<ICalculator>();
+            var calculator = new Mock<ICalculator>();
 
-            Assert.Throws<VerifyException>(() => Verify.Called(() => calculator.Mode = CalculatorMode.Scientific));
+            Assert.Throws<VerifyException>(() => Verify.Called(() => calculator.Object.Mode = CalculatorMode.Scientific));
+            Assert.Throws<VerifyException>(() => Verify.Called(calculator).Mode.Set(CalculatorMode.Scientific));
 
-            calculator.Mode = CalculatorMode.Scientific;
+            calculator.Object.Mode = CalculatorMode.Scientific;
 
-            Verify.Called(() => calculator.Mode = CalculatorMode.Scientific);
+            Verify.Called(() => calculator.Object.Mode = CalculatorMode.Scientific);
+            Verify.Called(calculator).Mode.Set(CalculatorMode.Scientific);
         }
 
         [Fact]
         public void VerifyVoidMethod()
         {
-            var calculator = Mock.Of<ICalculator>();
+            var calculator = new Mock<ICalculator>();
 
-            Assert.Throws<VerifyException>(() => Verify.Called(() => calculator.TurnOn()));
+            Assert.Throws<VerifyException>(() => Verify.Called(() => calculator.Object.TurnOn()));
 
-            calculator.TurnOn();
+            calculator.Object.TurnOn();
 
-            Verify.Called(() => calculator.TurnOn());
+            Verify.Called(() => calculator.Object.TurnOn());
 
-            Assert.Throws<VerifyException>(() => Verify.Called(() => calculator.TurnOn(), 2));
+            Assert.Throws<VerifyException>(() => Verify.Called(() => calculator.Object.TurnOn(), 2));
 
-            calculator.TurnOn();
+            calculator.Object.TurnOn();
 
-            Verify.Called(() => calculator.TurnOn(), 2);
+            Verify.Called(() => calculator.Object.TurnOn(), 2);
         }
 
         [Fact]
         public void VerifyNotCalled()
         {
-            var calculator = Mock.Of<ICalculator>();
+            var calculator = new Mock<ICalculator>();
 
-            Verify.NotCalled(() => calculator.TurnOn());
-            Verify.NotCalled(() => calculator.Add(2, 3));
+            Verify.NotCalled(() => calculator.Object.TurnOn());
+            Verify.NotCalled(() => calculator.Object.Add(2, 3));
 
-            calculator.TurnOn();
-            calculator.Add(2, 3);
+            calculator.Object.TurnOn();
+            calculator.Object.Add(2, 3);
 
-            Assert.Throws<VerifyException>(() => Verify.NotCalled(() => calculator.TurnOn()));
-            Assert.Throws<VerifyException>(() => Verify.NotCalled(() => calculator.Add(2, 3)));
+            Assert.Throws<VerifyException>(() => Verify.NotCalled(() => calculator.Object.TurnOn()));
+            Assert.Throws<VerifyException>(() => Verify.NotCalled(() => calculator.Object.Add(2, 3)));
         }
 
         [Fact]
         public void VerifyNotCalledFluent()
         {
-            var calculator = Mock.Of<ICalculator>();
+            var calculator = new Mock<ICalculator>();
 
             Verify.NotCalled(calculator).TurnOn();
             Verify.NotCalled(calculator).Add(2, 3);
 
-            calculator.TurnOn();
-            calculator.Add(2, 3);
+            calculator.Object.TurnOn();
+            calculator.Object.Add(2, 3);
 
             Assert.Throws<VerifyException>(() => Verify.NotCalled(calculator).TurnOn());
             Assert.Throws<VerifyException>(() => Verify.NotCalled(calculator).Add(2, 3));
@@ -176,15 +170,15 @@ namespace Moq.Tests
         [Fact]
         public void VerifyCalls()
         {
-            var calculator = Mock.Of<ICalculator>();
+            var calculator = new Mock<ICalculator>();
 
-            calculator.Setup(c => c.TurnOn()).Once();
+            calculator.TurnOn().Once();
             calculator.Add(2, 3).Returns(5).Once();
 
             Assert.Throws<VerifyException>(() => Verify.Calls(calculator));
 
-            calculator.TurnOn();
-            calculator.Add(2, 3);
+            calculator.Object.TurnOn();
+            calculator.Object.Add(2, 3);
 
             Verify.Calls(calculator);
         }
@@ -192,129 +186,65 @@ namespace Moq.Tests
         [Fact]
         public void VerifyCallsCustom()
         {
-            var calculator = Mock.Of<ICalculator>();
+            var calculator = new Mock<ICalculator>();
 
-            calculator.Setup(c => c.TurnOn()).Once();
+            calculator.TurnOn().Once();
             calculator.Add(2, 3).Returns(5).Once();
 
             Verify.Calls(
-                () => calculator.TurnOn(),
+                () => calculator.Object.TurnOn(),
                 calls => Assert.Empty(calls));
 
-            calculator.TurnOn();
+            calculator.Object.TurnOn();
 
             Verify.Calls(
-                () => calculator.TurnOn(),
+                () => calculator.Object.TurnOn(),
                 calls => Assert.Single(calls));
         }
 
         [Fact]
-        public void VerifyExtensionAction()
+        public void VerifyActionWithTimesAndMessage()
         {
-            var calculator = Mock.Of<ICalculator>();
+            var calculator = new Mock<ICalculator>();
 
             // At least once
-            Assert.Throws<VerifyException>(() => calculator.Verify(x => x.TurnOn()));
+            Assert.Throws<VerifyException>(() => Verify.Called(() => calculator.Object.TurnOn()));
             // Once
-            Assert.Throws<VerifyException>(() => calculator.Verify(x => x.TurnOn(), 1));
+            Assert.Throws<VerifyException>(() => Verify.Called(() => calculator.Object.TurnOn(), 1));
             // At least once with message
-            Assert.Throws<VerifyException>(() => calculator.Verify(x => x.TurnOn(), "Should have been called!"));
+            var ex = Assert.Throws<VerifyException>(() => Verify.Called(() => calculator.Object.TurnOn(), "Should have been called!"));
+            Assert.Contains("Should have been called!", ex.Message);
             // Once with message
-            Assert.Throws<VerifyException>(() => calculator.Verify(x => x.TurnOn(), 1, "Should have been called!"));
+            Assert.Throws<VerifyException>(() => Verify.Called(() => calculator.Object.TurnOn(), 1, "Should have been called!"));
 
-            calculator.TurnOn();
+            calculator.Object.TurnOn();
 
-            // At least once
-            calculator.Verify(x => x.TurnOn());
-            // Once
-            calculator.Verify(x => x.TurnOn(), 1);
-            // At least once with message
-            calculator.Verify(x => x.TurnOn(), "Should have been called!");
-            // Once with message
-            calculator.Verify(x => x.TurnOn(), 1, "Should have been called!");
+            Verify.Called(() => calculator.Object.TurnOn());
+            Verify.Called(() => calculator.Object.TurnOn(), 1);
+            Verify.Called(() => calculator.Object.TurnOn(), "Should have been called!");
+            Verify.Called(() => calculator.Object.TurnOn(), 1, "Should have been called!");
         }
 
         [Fact]
-        public void VerifyExtensionFunction()
+        public void VerifyFunctionWithTimesAndMessage()
         {
-            var calculator = Mock.Of<ICalculator>();
+            var calculator = new Mock<ICalculator>();
 
             // At least once
-            Assert.Throws<VerifyException>(() => calculator.Verify(x => x.Add(2, 3)));
+            Assert.Throws<VerifyException>(() => Verify.Called(() => calculator.Object.Add(2, 3)));
             // Once
-            Assert.Throws<VerifyException>(() => calculator.Verify(x => x.Add(2, 3), 1));
+            Assert.Throws<VerifyException>(() => Verify.Called(() => calculator.Object.Add(2, 3), 1));
             // At least once with message
-            Assert.Throws<VerifyException>(() => calculator.Verify(x => x.Add(2, 3), "Should have been called!"));
+            Assert.Throws<VerifyException>(() => Verify.Called(() => calculator.Object.Add(2, 3), "Should have been called!"));
             // Once with message
-            Assert.Throws<VerifyException>(() => calculator.Verify(x => x.Add(2, 3), 1, "Should have been called!"));
-            // Times.Once with message
-            Assert.Throws<VerifyException>(() => calculator.Verify(x => x.Add(2, 3).Once(), "Should have been called!"));
+            Assert.Throws<VerifyException>(() => Verify.Called(() => calculator.Object.Add(2, 3), 1, "Should have been called!"));
 
-            calculator.Add(2, 3);
+            calculator.Object.Add(2, 3);
 
-            // At least once
-            calculator.Verify(x => x.Add(2, 3));
-            // Once
-            calculator.Verify(x => x.Add(2, 3), 1);
-            // At least once with message
-            calculator.Verify(x => x.Add(2, 3), "Should have been called!");
-            // Once with message
-            calculator.Verify(x => x.Add(2, 3), 1, "Should have been called!");
-            // Times.Once with message
-            calculator.Verify(x => x.Add(2, 3).Once(), "Should have been called!");
-        }
-
-        //[Fact]
-        internal void CanVerify()
-        {
-            var calculator = Mock.Of<ICalculator>();
-
-            calculator.Add(2, 3).Returns(5).Once();
-            calculator.Mode.Returns(CalculatorMode.Scientific).Exactly(2);
-
-            var mock = Mock.Get(calculator);
-            foreach (var invocation in mock.Sdk.Invocations)
-            {
-                output.WriteLine((string)invocation.Context[nameof(Environment.StackTrace)]);
-            }
-
-            // Syntax-based, follows straightforward setup approach, no lambdas.
-            Verify(calculator).Mode = CalculatorMode.Scientific;
-            Verify(calculator).Add(2, 3);
-
-            // Verify all "verifiable" calls, i.e. those with 
-            // a Once/Never/etc. setup.
-            Verify(calculator);
-            // Long form, with no lambda
-            Verify.Called(calculator);
-
-            // equivalent non-syntax version
-            //calculator.Verify().Add(2, 3);
-            Verify(calculator).Add(1, 1).Never();
-
-            // Explicit Verify, still no lambdas, long form of Syntax
-            Verify.Called(calculator).Add(2, 3).Exactly(2);
-            // Explicit Verify, still no lambdas, long form of Syntax
-            Verify.NotCalled(calculator).Add(2, 3);
-
-            // For the case where you want keep the mock in "running" mode after the verify. 
-
-            Verify.Called(() => calculator.Add(2, 3).Once());
-            Verify.NotCalled(() => calculator.TurnOn());
-
-            // More advanced verification, access calls via lambda
-            Verify.Calls(
-                () => calculator.Add(2, 3),
-                calls => Assert.Single(calls));
-            // Works for void/action
-            Verify.Calls(
-                () => calculator.TurnOn(),
-                calls => Assert.Single(calls));
-
-            // Verify all "verifiable" calls, i.e. those with 
-            // a Once/Never/etc. setup.
-            Verify.Calls(calculator);
-            // calculator.Verify();
+            Verify.Called(() => calculator.Object.Add(2, 3));
+            Verify.Called(() => calculator.Object.Add(2, 3), 1);
+            Verify.Called(() => calculator.Object.Add(2, 3), "Should have been called!");
+            Verify.Called(() => calculator.Object.Add(2, 3), 1, "Should have been called!");
         }
     }
 }

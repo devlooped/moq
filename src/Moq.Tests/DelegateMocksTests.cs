@@ -1,6 +1,8 @@
 ﻿using System;
 using System.ComponentModel;
+using Moq.Sdk;
 using Xunit;
+using static Moq.Syntax;
 
 namespace Moq.Tests
 {
@@ -9,42 +11,45 @@ namespace Moq.Tests
         [Fact]
         public void CanMockDelegate()
         {
-            new Mock<EventHandler>();
+            var mock = new Mock<EventHandler>();
+
+            mock.Object.Invoke(this, EventArgs.Empty);
+
+            Assert.Single(mock.Sdk.Invocations);
         }
 
         [Fact]
         public void CanVerifyLooseMockDelegateWithNoReturnValue()
         {
-            var mockIntAcceptingAction = new Mock<Action<int>>(MockBehavior.Loose);
+            var action = new Mock<Action<int>>(MockBehavior.Loose);
 
-            Use(mockIntAcceptingAction.Object, 3);
+            Use(action.Object, 3);
 
-            mockIntAcceptingAction.Verify(act => act(3));
+            Verify.Called(action).Invoke(3);
+            Verify.Called(() => action.Object(3));
         }
 
         [Fact]
         public void CanSetupStrictMockDelegateWithNoReturnValue()
         {
-            var mockIntAcceptingAction = new Mock<Action<int>>(MockBehavior.Strict);
+            var action = new Mock<Action<int>>(MockBehavior.Strict);
 
-            mockIntAcceptingAction.Setup(act => act(7));
+            action.Invoke(7);
 
-            Use(mockIntAcceptingAction.Object, 7);
+            Use(action.Object, 7);
+            Assert.Throws<StrictMockException>(() => Use(action.Object, 8));
         }
 
         [Fact]
         public void CanVerifyLooseMockDelegateWithReturnValue()
         {
-            var mockIntAcceptingStringReturningAction = new Mock<Func<int, string>>(MockBehavior.Loose);
+            var func = new Mock<Func<int, string>>(MockBehavior.Loose);
 
-            mockIntAcceptingStringReturningAction
-                .Setup(f => f(It.IsAny<int>()))
-                .Returns("hello");
+            func.Invoke(Any<int>()).Returns("hello");
 
-            var result = UseAndGetReturn(mockIntAcceptingStringReturningAction.Object, 96);
+            var result = UseAndGetReturn(func.Object, 96);
 
-            mockIntAcceptingStringReturningAction
-                .Verify(f => f(96));
+            Verify.Called(func).Invoke(96);
             Assert.Equal("hello", result);
         }
 
@@ -52,16 +57,15 @@ namespace Moq.Tests
         public void CanSubscribeMockDelegateAsEventListener()
         {
             var notifyingObject = new NotifyingObject();
-            var mockListener = new Mock<PropertyChangedEventHandler>();
-            notifyingObject.PropertyChanged += mockListener.Object;
+            var listener = new Mock<PropertyChangedEventHandler>();
+            notifyingObject.PropertyChanged += listener.Object;
 
             notifyingObject.Value = 5;
 
             // That should have caused one event to have been fired.
-            mockListener
-                .Verify(l => l(notifyingObject,
-                               It.Is<PropertyChangedEventArgs>(e => e.PropertyName == "Value")),
-                        Times.Once());
+            Verify.Called(listener)
+                .Invoke(notifyingObject, Any<PropertyChangedEventArgs>(e => e?.PropertyName == "Value"))
+                .Once();
         }
 
         [Fact]
@@ -71,6 +75,7 @@ namespace Moq.Tests
             // consider themselves to be proxying for the same method.
             var mock1 = new Mock<PropertyChangedEventHandler>();
             var mock2 = new Mock<PropertyChangedEventHandler>();
+
             Assert.Same(mock1.Object.Method, mock2.Object.Method);
         }
 
@@ -79,15 +84,14 @@ namespace Moq.Tests
         {
             var out1 = 42;
             var methMock = new Mock<TypeOutAction<int>>();
-            methMock.Setup(t => t.Invoke(out out1));
+            methMock.Invoke(out _).Callback((out int x) => x = out1);
             var dlgtMock = new Mock<DelegateOutAction<int>>();
-            dlgtMock.Setup(f => f(out out1));
+            dlgtMock.Invoke(out _).Callback((out int x) => x = out1);
 
-            var methOut1 = default(int);
-            methMock.Object.Invoke(out methOut1);
-            var dlgtOut1 = default(int);
-            dlgtMock.Object(out dlgtOut1);
+            methMock.Object.Invoke(out var methOut1);
+            dlgtMock.Object(out var dlgtOut1);
 
+            Assert.Equal(42, methOut1);
             Assert.Equal(methOut1, dlgtOut1);
         }
 
@@ -96,34 +100,33 @@ namespace Moq.Tests
         {
             var ref1 = 42;
             var methMock = new Mock<TypeRefAction<int>>(MockBehavior.Strict);
-            methMock.Setup(t => t.Invoke(ref ref1));
+            methMock.Invoke(ref ref1).Once();
             var dlgtMock = new Mock<DelegateRefAction<int>>(MockBehavior.Strict);
-            dlgtMock.Setup(f => f(ref ref1));
+            dlgtMock.Invoke(ref ref1).Once();
 
             var methRef1 = 42;
             methMock.Object.Invoke(ref methRef1);
             var dlgtRef1 = 42;
             dlgtMock.Object(ref dlgtRef1);
 
-            methMock.VerifyAll();
-            dlgtMock.VerifyAll();
+            Verify.Calls(methMock);
+            Verify.Calls(dlgtMock);
         }
 
         [Fact]
         public void CanHandleOutParameterOfFuncAsSameAsReturnableMethod()
         {
-            var out1 = 42;
             var methMock = new Mock<TypeOutFunc<int, int>>();
-            methMock.Setup(t => t.Invoke(out out1)).Returns(114514);
+            methMock.Invoke(out _).Returns((out int x) => (x = 42) + 114472);
             var dlgtMock = new Mock<DelegateOutFunc<int, int>>();
-            dlgtMock.Setup(f => f(out out1)).Returns(114514);
+            dlgtMock.Invoke(out _).Returns((out int x) => (x = 42) + 114472);
 
-            var methOut1 = default(int);
-            var methResult = methMock.Object.Invoke(out methOut1);
-            var dlgtOut1 = default(int);
-            var dlgtResult = dlgtMock.Object(out dlgtOut1);
+            var methResult = methMock.Object.Invoke(out var methOut1);
+            var dlgtResult = dlgtMock.Object(out var dlgtOut1);
 
+            Assert.Equal(42, methOut1);
             Assert.Equal(methOut1, dlgtOut1);
+            Assert.Equal(114514, methResult);
             Assert.Equal(methResult, dlgtResult);
         }
 
@@ -132,46 +135,37 @@ namespace Moq.Tests
         {
             var ref1 = 42;
             var methMock = new Mock<TypeRefFunc<int, int>>(MockBehavior.Strict);
-            methMock.Setup(t => t.Invoke(ref ref1)).Returns(114514);
+            methMock.Invoke(ref ref1).Returns(114514).Once();
             var dlgtMock = new Mock<DelegateRefFunc<int, int>>(MockBehavior.Strict);
-            dlgtMock.Setup(f => f(ref ref1)).Returns(114514);
+            dlgtMock.Invoke(ref ref1).Returns(114514).Once();
 
             var methRef1 = 42;
             var methResult = methMock.Object.Invoke(ref methRef1);
             var dlgtRef1 = 42;
             var dlgtResult = dlgtMock.Object(ref dlgtRef1);
 
-            methMock.VerifyAll();
-            dlgtMock.VerifyAll();
+            Verify.Calls(methMock);
+            Verify.Calls(dlgtMock);
+            Assert.Equal(114514, methResult);
             Assert.Equal(methResult, dlgtResult);
         }
 
-        static void Use(Action<int> action, int valueToPass)
-        {
-            action(valueToPass);
-        }
+        static void Use(Action<int> action, int valueToPass) => action(valueToPass);
 
-        static string UseAndGetReturn(Func<int, string> func, int valueToPass)
-        {
-            return func(valueToPass);
-        }
+        static string UseAndGetReturn(Func<int, string> func, int valueToPass) => func(valueToPass);
 
         class NotifyingObject : INotifyPropertyChanged
         {
-            public event PropertyChangedEventHandler PropertyChanged;
+            public event PropertyChangedEventHandler? PropertyChanged;
 
             int value;
             public int Value
             {
-                get { return value; }
+                get => value;
                 set
                 {
                     this.value = value;
-                    var listeners = PropertyChanged;
-                    if (listeners != null)
-                    {
-                        listeners(this, new PropertyChangedEventArgs("Value"));
-                    }
+                    PropertyChanged?.Invoke(this, new PropertyChangedEventArgs("Value"));
                 }
             }
         }
