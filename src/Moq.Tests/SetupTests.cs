@@ -22,23 +22,11 @@ namespace Moq.Tests
 
         static IMock<T> Create<T>() where T : class => Mock.Get(Mock.Of<T>());
 
-        static ISetup<TDelegate, TResult> Typed<TDelegate, TResult>(Func<TResult> member)
-        {
-            using (SetupFactory.Begin())
-            {
-                member();
-                return SetupFactory.Create<TDelegate, TResult>();
-            }
-        }
+        static ISetup<TDelegate, TResult> Typed<TDelegate, TResult>(Action member)
+            => SetupFactory.Capture<TDelegate, TResult>(member);
 
         static ISetup<TDelegate> Typed<TDelegate>(Action member)
-        {
-            using (SetupFactory.Begin())
-            {
-                member();
-                return SetupFactory.Create<TDelegate>();
-            }
-        }
+            => SetupFactory.Capture<TDelegate>(member);
 
         [Fact]
         public void SetupDoesNotRecordInvocation()

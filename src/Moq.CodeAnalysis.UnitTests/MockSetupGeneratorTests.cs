@@ -226,19 +226,13 @@ namespace Moq.CodeAnalysis.UnitTests
             Assert.Contains(
                 """
                             public global::Moq.ISetup<global::System.Func<int, int, int>, int> Add(int x, int y)
-                            {
-                                using (global::Moq.Sdk.SetupFactory.Begin())
-                                {
-                                    mock.Object.Add(x, y);
-                                    return global::Moq.Sdk.SetupFactory.Create<global::System.Func<int, int, int>, int>();
-                                }
-                            }
+                                => global::Moq.Sdk.SetupFactory.Capture<global::System.Func<int, int, int>, int>(() => mock.Object.Add(x, y));
                 """.Replace("\r\n", "\n"),
                 source);
 
             Assert.Contains("static x => _ = x.Mode, static (x, value) => x.Mode = value);", source);
             Assert.Contains("x => _ = x[name], (x, value) => x[name] = value);", source);
-            Assert.Contains("mock.Object.TryAdd(ref x, ref y, out z);", source);
+            Assert.Contains("mock.Object.TryAdd(ref moq, ref moq2, out moq3), x, y, z);", source);
             Assert.Contains("public delegate bool TryAdd(ref int x, ref int y, out int? z);", source);
             Assert.Contains("global::Moq.Sdk.SetupFactory.GetEventHandler<global::System.EventHandler>(mock, \"TurnedOn\")?.Invoke(mock.Object, global::System.EventArgs.Empty);", source);
         }
@@ -397,8 +391,8 @@ namespace Moq.CodeAnalysis.UnitTests
             Assert.Equal(new[] { "Run()", "Stop()", "Value" }, Members(output, "IC"));
 
             var source = result.GeneratedTrees.Single().ToString();
-            Assert.Contains("((global::IA)mock.Object).Run();", source);
-            Assert.Contains("((global::IB)mock.Object).Stop();", source);
+            Assert.Contains("((global::IA)mock.Object).Run())", source);
+            Assert.Contains("((global::IB)mock.Object).Stop())", source);
             Assert.Contains("static x => _ = x.Value, static (x, value) => x.Value = value);", source);
         }
 

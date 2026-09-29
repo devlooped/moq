@@ -12,13 +12,37 @@ namespace Moq
     /// </summary>
     static class SetupExtensions
     {
-        public static IMockRuntime GetRuntime(this ISetup setup) => MockRuntime.Get(setup.Sdk.Invocation.Target);
+        internal static IMockRuntime GetRuntime(this ISetup setup) => MockRuntime.Get(setup.Sdk.Invocation.Target);
 
-        public static IMockBehaviorPipeline GetPipeline(this ISetup setup) => setup.GetRuntime().GetPipeline(setup.Sdk);
+        internal static IMockBehaviorPipeline GetPipeline(this ISetup setup) => setup.GetRuntime().GetPipeline(setup.Sdk);
 
-        public static bool IsUntyped(this ISetup setup) => setup is IUntypedSetup { Untyped: true };
+        /// <summary>
+        /// Applies a handler for the setup's capture path.
+        /// A syntax setup passes the invocation's argument collection.
+        /// A typed setup passes the member arguments.
+        /// </summary>
+        internal static void SetHandlerResult<TResult>(this ISetup setup, Delegate handler, Func<TResult, object?> adapt)
+        {
+            if (setup is ITypedSetup { IsTyped: false } && handler is Func<IArgumentCollection, TResult> syntax)
+                setup.SetReturnValue(args => adapt(syntax(args)));
+            else
+                setup.SetReturnValue(args => adapt((TResult)handler.InvokeWith(args)!));
+        }
 
-        public static void SetReturnValue(this ISetup setup, object? value)
+        /// <summary>
+        /// Applies a callback for the setup's capture path.
+        /// A syntax setup passes the invocation's argument collection.
+        /// A typed setup passes the member arguments.
+        /// </summary>
+        internal static void AddHandler(this ISetup setup, Delegate handler)
+        {
+            if (setup is ITypedSetup { IsTyped: false } && handler is Action<IArgumentCollection> syntax)
+                setup.AddCallback(syntax);
+            else
+                setup.AddCallback(args => handler.InvokeWith(args), handler.HasRefOut());
+        }
+
+        internal static void SetReturnValue(this ISetup setup, object? value)
         {
             var pipeline = setup.GetPipeline();
             if (pipeline.Behaviors.OfType<ReturnsBehavior>().FirstOrDefault() is { } returns)
@@ -27,7 +51,7 @@ namespace Moq
                 pipeline.Behaviors.Add(new ReturnsBehavior(value));
         }
 
-        public static void SetReturnValue(this ISetup setup, Func<IArgumentCollection, object?> getter)
+        internal static void SetReturnValue(this ISetup setup, Func<IArgumentCollection, object?> getter)
         {
             var pipeline = setup.GetPipeline();
             if (pipeline.Behaviors.OfType<ReturnsBehavior>().FirstOrDefault() is { } returns)
@@ -36,7 +60,7 @@ namespace Moq
                 pipeline.Behaviors.Add(new ReturnsBehavior(getter));
         }
 
-        public static void SetException(this ISetup setup, Exception exception)
+        internal static void SetException(this ISetup setup, Exception exception)
         {
             var pipeline = setup.GetPipeline();
             if (pipeline.Behaviors.OfType<ReturnsBehavior>().FirstOrDefault() is { } returns)
@@ -45,7 +69,7 @@ namespace Moq
                 pipeline.Behaviors.Add(new ReturnsBehavior(exception));
         }
 
-        public static void AddCallback(this ISetup setup, Action<IArgumentCollection> callback, bool setsOutputs = false)
+        internal static void AddCallback(this ISetup setup, Action<IArgumentCollection> callback, bool setsOutputs = false)
         {
             var pipeline = setup.GetPipeline();
             // Callbacks run in the order they were added, before any other behaviors.
@@ -56,7 +80,7 @@ namespace Moq
         /// Invokes a delegate matching the member signature with the invocation arguments, 
         /// propagating back any ref/out values it sets.
         /// </summary>
-        public static object? InvokeWith(this Delegate handler, IArgumentCollection arguments)
+        internal static object? InvokeWith(this Delegate handler, IArgumentCollection arguments)
         {
             var values = new object?[arguments.Count];
             for (var i = 0; i < values.Length; i++)
@@ -85,7 +109,7 @@ namespace Moq
         /// <summary>
         /// Whether the delegate sets any ref/out values.
         /// </summary>
-        public static bool HasRefOut(this Delegate handler)
+        internal static bool HasRefOut(this Delegate handler)
             => handler.GetMethodInfo().GetParameters().Any(x => x.ParameterType.IsByRef) ||
                handler.GetType().GetMethod("Invoke")?.GetParameters().Any(x => x.ParameterType.IsByRef) == true;
     }

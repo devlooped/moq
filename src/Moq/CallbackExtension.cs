@@ -21,11 +21,7 @@ namespace Moq
             if (callback == null)
                 throw new ArgumentNullException(nameof(callback));
 
-            if (setup.IsUntyped() && callback is Action<IArgumentCollection> untyped)
-                setup.AddCallback(untyped);
-            else
-                setup.AddCallback(args => callback.InvokeWith(args), callback.HasRefOut());
-
+            setup.AddHandler(callback);
             return setup;
         }
 
@@ -37,11 +33,7 @@ namespace Moq
             if (callback == null)
                 throw new ArgumentNullException(nameof(callback));
 
-            if (setup.IsUntyped())
-                setup.AddCallback(callback);
-            else
-                setup.AddCallback(args => callback((IArgumentCollection)args.GetValue(0)!));
-
+            setup.AddHandler(callback);
             return setup;
         }
 

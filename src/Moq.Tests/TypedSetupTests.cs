@@ -1,6 +1,7 @@
 using System;
 using System.ComponentModel;
 using System.Linq;
+using System.Threading.Tasks;
 using Moq.Sdk;
 using Sample;
 using Stunts;
@@ -36,6 +37,60 @@ namespace Moq.Tests
 
             Assert.Equal(5, calculator.Object.Add(2, 3));
             Assert.Equal(0, calculator.Object.Add(1, 1));
+        }
+
+        public interface IArguments
+        {
+            int Count(IArgumentCollection arguments);
+            Task<int> CountAsync(IArgumentCollection arguments);
+        }
+
+        [Fact]
+        public void TypedSetupPassesMemberArgumentCollection()
+        {
+            var invocation = InvocationWithTwoArguments();
+            var query = Mock.Get(Mock.Of<IArguments>());
+
+            query.Count(invocation).Returns(args => args.Count);
+            query.CountAsync(invocation).Returns(args => args.Count);
+
+            Assert.Equal(invocation.Count, query.Object.Count(invocation));
+            Assert.Equal(invocation.Count, query.Object.CountAsync(invocation).Result);
+        }
+
+        [Fact]
+        public void SyntaxSetupPassesInvocationArguments()
+        {
+            var invocation = InvocationWithTwoArguments();
+            var query = Mock.Get(Mock.Of<IArguments>());
+
+            Setup(() => query.Object.Count(invocation)).Returns(args => args.Count);
+
+            Assert.Equal(1, query.Object.Count(invocation));
+        }
+
+        [Fact]
+        public void DefaultArgumentStaysConstantBesideMatcher()
+        {
+            var calculator = Mock.Get(Mock.Of<ICalculator>());
+            var matches = 0;
+
+            calculator.Store(null!, Any<int>()).Callback((string name, int value) => matches++);
+
+            calculator.Object.Store(null!, 7);
+            calculator.Object.Store(null!, 1);
+            calculator.Object.Store("a", 7);
+
+            Assert.Equal(2, matches);
+        }
+
+        static IArgumentCollection InvocationWithTwoArguments()
+        {
+            var calculator = Mock.Get(Mock.Of<ICalculator>());
+            IArgumentCollection? invocation = null;
+            Setup(() => calculator.Object.Add(2, 3)).Callback(args => invocation = args);
+            calculator.Object.Add(2, 3);
+            return invocation!;
         }
 
         [Fact]

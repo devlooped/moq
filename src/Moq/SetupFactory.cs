@@ -11,10 +11,48 @@ namespace Moq.Sdk
     public static class SetupFactory
     {
         /// <summary>
-        /// Begins a setup scope for a single member invocation on a mock, 
+        /// Invokes a typed setup member and returns the setup it produced.
+        /// </summary>
+        public static ISetup<TDelegate, TResult> Capture<TDelegate, TResult>(Action invoke)
+        {
+            using (Begin())
+            {
+                invoke();
+                return Create<TDelegate, TResult>();
+            }
+        }
+
+        /// <summary>
+        /// Invokes a void typed setup member and returns the setup it produced.
+        /// </summary>
+        public static ISetup<TDelegate> Capture<TDelegate>(Action invoke)
+        {
+            using (Begin())
+            {
+                invoke();
+                return Create<TDelegate>();
+            }
+        }
+
+        /// <summary>
+        /// Invokes a typed setup member through <paramref name="member"/> so ref and out arguments can be passed.
+        /// </summary>
+        public static ISetup<TDelegate, TResult> Capture<TDelegate, TResult>(TDelegate member, object? argument, params object?[] arguments)
+            where TDelegate : Delegate
+            => Invoke<TDelegate, TResult>(member, With(argument, arguments));
+
+        /// <summary>
+        /// Invokes a void typed setup member through <paramref name="member"/> so ref and out arguments can be passed.
+        /// </summary>
+        public static ISetup<TDelegate> Capture<TDelegate>(TDelegate member, object? argument, params object?[] arguments)
+            where TDelegate : Delegate
+            => Invoke<TDelegate>(member, With(argument, arguments));
+
+        /// <summary>
+        /// Begins a setup scope for a single member invocation on a mock,
         /// which can be retrieved afterwards with one of the <c>Create</c> overloads.
         /// </summary>
-        public static IDisposable Begin()
+        internal static IDisposable Begin()
         {
             MockContext.CurrentSetup = null;
             return new SetupScope();
@@ -23,12 +61,44 @@ namespace Moq.Sdk
         /// <summary>
         /// Creates the setup for the void member just invoked within a <see cref="Begin"/> scope.
         /// </summary>
-        public static ISetup<TDelegate> Create<TDelegate>() => new SetupHandle<TDelegate>(Current());
+        internal static ISetup<TDelegate> Create<TDelegate>() => new SetupHandle<TDelegate>(Current());
 
         /// <summary>
         /// Creates the setup for the non-void member just invoked within a <see cref="Begin"/> scope.
         /// </summary>
-        public static ISetup<TDelegate, TResult> Create<TDelegate, TResult>() => new SetupHandle<TDelegate, TResult>(Current());
+        internal static ISetup<TDelegate, TResult> Create<TDelegate, TResult>() => new SetupHandle<TDelegate, TResult>(Current());
+
+        static ISetup<TDelegate, TResult> Invoke<TDelegate, TResult>(Delegate member, object?[] arguments)
+        {
+            if (member == null)
+                throw new ArgumentNullException(nameof(member));
+
+            using (Begin())
+            {
+                member.DynamicInvoke(arguments);
+                return Create<TDelegate, TResult>();
+            }
+        }
+
+        static ISetup<TDelegate> Invoke<TDelegate>(Delegate member, object?[] arguments)
+        {
+            if (member == null)
+                throw new ArgumentNullException(nameof(member));
+
+            using (Begin())
+            {
+                member.DynamicInvoke(arguments);
+                return Create<TDelegate>();
+            }
+        }
+
+        static object?[] With(object? argument, object?[] arguments)
+        {
+            var values = new object?[arguments.Length + 1];
+            values[0] = argument;
+            Array.Copy(arguments, 0, values, 1, arguments.Length);
+            return values;
+        }
 
         /// <summary>
         /// Creates a lazy setup for a read-only property.
