@@ -12,5 +12,14 @@ namespace Moq.CodeFixes
             DiagnosticSeverity.Info,
             true,
             ThisAssembly.Strings.SimplifySetup.Description);
+
+        public static DiagnosticDescriptor HiddenMember { get; } = new DiagnosticDescriptor(
+            "MOQ002",
+            ThisAssembly.Strings.HiddenMember.Title,
+            Resources.HiddenMember_Message,
+            "Usage",
+            DiagnosticSeverity.Info,
+            true,
+            ThisAssembly.Strings.HiddenMember.Description);
     }
 }

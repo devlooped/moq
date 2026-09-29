@@ -8,7 +8,7 @@ using Microsoft.CodeAnalysis.CodeActions;
 using Microsoft.CodeAnalysis.CodeFixes;
 using Microsoft.CodeAnalysis.Editing;
 using Microsoft.CodeAnalysis.Simplification;
-using Superpower.Parsers;
+using Moq.CodeFixes;
 using CS = Microsoft.CodeAnalysis.CSharp.Syntax;
 using CSFactory = Microsoft.CodeAnalysis.CSharp.SyntaxFactory;
 using VB = Microsoft.CodeAnalysis.VisualBasic.Syntax;
@@ -17,13 +17,16 @@ using VBFactory = Microsoft.CodeAnalysis.VisualBasic.SyntaxFactory;
 namespace Moq
 {
     /// <summary>
-    /// Generates code for custom delegates used for ref/out mocking.
+    /// Generates code for custom delegates used for ref/out mocking with <c>SetupRef</c>, 
+    /// like <c>SetupRef&lt;TryParse&gt;(mock.Object.TryParse)</c>.
     /// </summary>
     [ExportCodeFixProvider(LanguageNames.CSharp, LanguageNames.VisualBasic, Name = nameof(CustomDelegateCodeFix))]
     public class CustomDelegateCodeFix : CodeFixProvider
     {
         /// <inheritdoc />
         public override ImmutableArray<string> FixableDiagnosticIds { get; } = ImmutableArray.Create(
+            "CS0411",  // The type arguments for method 'SetupRef<TDelegate>' cannot be inferred from the usage.
+            "BC36645", // Data type(s) of the type parameter(s) in method 'SetupRef' cannot be inferred from these arguments.
             "CS1503",  // cannot convert from 'method group' to 'Action<...>'
             "CS1593",  // Delegate 'Action<...>' does not take 0 arguments
             "BC31143", // Method '..' does not have a signature compatible with delegate '...'.
@@ -56,6 +59,16 @@ namespace Moq
             if (node.IsKind(Microsoft.CodeAnalysis.CSharp.SyntaxKind.Argument))
                 node = ((CS.ArgumentSyntax)node).Expression;
 
+            // Type inference errors are reported on the setup method name or the whole invocation.
+            if (node is CS.InvocationExpressionSyntax { ArgumentList.Arguments.Count: 1 } csInvocation)
+                node = csInvocation.ArgumentList.Arguments[0].Expression;
+            else if (node.Parent is CS.InvocationExpressionSyntax { ArgumentList.Arguments.Count: 1 } csParent && csParent.Expression == node)
+                node = csParent.ArgumentList.Arguments[0].Expression;
+            else if (node is VB.InvocationExpressionSyntax { ArgumentList.Arguments.Count: 1 } vbInvocation)
+                node = vbInvocation.ArgumentList.Arguments[0].GetExpression();
+            else if (node.Parent is VB.InvocationExpressionSyntax { ArgumentList.Arguments.Count: 1 } vbParent && vbParent.Expression == node)
+                node = vbParent.ArgumentList.Arguments[0].GetExpression();
+
             var setup = document.Project.Language == LanguageNames.CSharp ?
                 (SyntaxNode)node.Ancestors().OfType<CS.InvocationExpressionSyntax>().FirstOrDefault() :
                 node.Ancestors().OfType<VB.InvocationExpressionSyntax>().FirstOrDefault();
@@ -78,6 +91,7 @@ namespace Moq
                 return;
 
             IMethodSymbol? targetMethod = null;
+            SyntaxNode? receiver = null;
 
             // CS1593 case
             if (node is CS.LambdaExpressionSyntax)
@@ -89,8 +103,7 @@ namespace Moq
                 if (memberNode == null)
                     return;
 
-                targetMethod = semantic.GetSymbolInfo(memberNode)
-                    .CandidateSymbols.OfType<IMethodSymbol>().FirstOrDefault();
+                targetMethod = GetMethod(semantic.GetSymbolInfo(memberNode));
             }
             // "BC30581" case
             else if (node is VB.UnaryExpressionSyntax && node.IsKind(Microsoft.CodeAnalysis.VisualBasic.SyntaxKind.AddressOfExpression))
@@ -102,23 +115,28 @@ namespace Moq
                 if (memberNode == null)
                     return;
 
-                targetMethod = semantic.GetSymbolInfo(memberNode)
-                    .CandidateSymbols.OfType<IMethodSymbol>().FirstOrDefault();
+                targetMethod = GetMethod(semantic.GetSymbolInfo(memberNode));
+                receiver = ((VB.MemberAccessExpressionSyntax)memberNode).Expression;
             }
             else
             {
-                // CS1503 and BC31143 of direct method group
-                var memberSymbol = semantic.GetSymbolInfo(node);
-                if (memberSymbol.CandidateSymbols.IsDefaultOrEmpty ||
-                    memberSymbol.CandidateSymbols.First().Kind != SymbolKind.Method)
-                    return;
-
-                targetMethod = (IMethodSymbol)memberSymbol.CandidateSymbols.First();
+                // CS0411, CS1503 and BC31143 of direct method group
+                targetMethod = GetMethod(semantic.GetSymbolInfo(node));
+                receiver = (node as CS.MemberAccessExpressionSyntax)?.Expression;
             }
 
+            // A method group on a recursive mock, like mock.Object.Parser.TryParse, must be 
+            // resolved within the setup, so it's wrapped in a lambda.
+            var recursive = receiver != null &&
+                semantic.GetSymbolInfo(receiver).Symbol is { Kind: SymbolKind.Property or SymbolKind.Method } member &&
+                !(member.Name == "Object" && MockSyntax.GetMockedType(member.ContainingType) != null);
+
             if (targetMethod != null)
-                context.RegisterCodeFix(new SetupDelegateCodeAction(document, setup, targetMethod), context.Diagnostics);
+                context.RegisterCodeFix(new SetupDelegateCodeAction(document, setup, targetMethod, recursive), context.Diagnostics);
         }
+
+        static IMethodSymbol? GetMethod(SymbolInfo info)
+            => info.Symbol as IMethodSymbol ?? info.CandidateSymbols.OfType<IMethodSymbol>().FirstOrDefault();
 
         /// <inheritdoc />
         public sealed override FixAllProvider? GetFixAllProvider() => null;
@@ -128,12 +146,14 @@ namespace Moq
             readonly Document document;
             readonly IMethodSymbol symbol;
             readonly SyntaxNode setup;
+            readonly bool recursive;
 
-            public SetupDelegateCodeAction(Document document, SyntaxNode setup, IMethodSymbol symbol)
+            public SetupDelegateCodeAction(Document document, SyntaxNode setup, IMethodSymbol symbol, bool recursive)
             {
                 this.document = document;
                 this.setup = setup;
                 this.symbol = symbol;
+                this.recursive = recursive;
             }
 
             public override string? EquivalenceKey => symbol.ToDisplayString(SymbolDisplayFormat.FullyQualifiedFormat) +
@@ -182,33 +202,11 @@ namespace Moq
                     if (!@delegate.IsEquivalentTo(tempDelegate, true))
                     {
                         // Generate the delegate name using full Type+Member name.
-                        var semantic = await document.GetSemanticModelAsync(cancellationToken);
-                        if (semantic == null)
-                            return document;
-
-                        SyntaxNode? memberNode = setup.IsKind(Microsoft.CodeAnalysis.CSharp.SyntaxKind.InvocationExpression) ?
-                            ((setup as CS.InvocationExpressionSyntax)?.Expression as CS.MemberAccessExpressionSyntax)?.Expression :
-                            ((setup as VB.InvocationExpressionSyntax)?.Expression as VB.MemberAccessExpressionSyntax)?.Expression;
-
-                        if (memberNode == null)
-                            return document;
-
-                        var mock = semantic.GetSymbolInfo(memberNode);
-
-                        if (mock.Symbol != null &&
-                            (mock.Symbol.Kind == SymbolKind.Local ||
-                             mock.Symbol.Kind == SymbolKind.Field))
-                        {
-                            var type = mock.Symbol.Kind == SymbolKind.Local ?
-                                ((ILocalSymbol)mock.Symbol).Type :
-                                ((IFieldSymbol)mock.Symbol).Type;
-
-                            delegateName = type.MetadataName + symbol.Name;
-                            signature = generator.WithName(signature, delegateName);
-                            root = root.InsertNodesAfter(member, new[] { signature });
-                            // Find the updated setup
-                            node = FindSetup(root);
-                        }
+                        delegateName = symbol.ContainingType.Name + symbol.Name;
+                        signature = generator.WithName(signature, delegateName);
+                        root = root.InsertNodesAfter(member, new[] { signature });
+                        // Find the updated setup
+                        node = FindSetup(root);
                     }
                 }
 
@@ -218,17 +216,8 @@ namespace Moq
                 if (node == null || node.Parent == null)
                     return document;
 
-                // Detect recursive mock access and wrap in a Func<TDelegate>
-                if (node.Parent.ChildNodes()
-                        .OfType<CS.ArgumentListSyntax>()
-                        .Where(list => !list.Arguments.Select(arg => arg.Expression).OfType<CS.LambdaExpressionSyntax>().Any())
-                        .SelectMany(list => list.DescendantNodes().OfType<CS.MemberAccessExpressionSyntax>())
-                        .Count() > 1 ||
-                    node.Parent.ChildNodes()
-                        .OfType<VB.ArgumentListSyntax>()
-                        .Where(list => !list.Arguments.Select(arg => arg.GetExpression()).OfType<VB.LambdaExpressionSyntax>().Any())
-                        .SelectMany(list => list.DescendantNodes().OfType<VB.MemberAccessExpressionSyntax>())
-                        .Count() > 1)
+                // Wrap recursive mock access in a Func<TDelegate>
+                if (recursive)
                 {
                     var expression = node.Parent.ChildNodes().Last()
                         .DescendantNodes()

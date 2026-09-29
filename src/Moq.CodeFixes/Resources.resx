@@ -125,16 +125,28 @@
 delegate to set up this method directly with the right Returns signature.</value>
     <comment>Description for completion</comment>
   </data>
+  <data name="HiddenMember_Description" xml:space="preserve">
+    <value>Members of the mocked type that are hidden by a member of the mock, or that have no generated typed setup, can be set up by invoking them on the mocked object with Setup(() => mock.Object.Member(...)).</value>
+  </data>
+  <data name="HiddenMember_Message" xml:space="preserve">
+    <value>'{0}' binds to the mock rather than setting up '{1}'</value>
+  </data>
+  <data name="HiddenMember_Title" xml:space="preserve">
+    <value>Mock member hides a member of the mocked type</value>
+  </data>
+  <data name="HiddenMemberCodeFix_TitleFormat" xml:space="preserve">
+    <value>Set up '{0}' on the mocked object</value>
+  </data>
   <data name="MoqRequired" xml:space="preserve">
     <value>Project '{0}' does not reference the required Moq assembly.</value>
   </data>
   <data name="SimplifySetup_Description" xml:space="preserve">
-    <value>Setup can be simplified by using the static Syntax class.</value>
+    <value>Members invoked directly on the mocked object can be set up with the generated typed setup members of the mock instead.</value>
   </data>
   <data name="SimplifySetup_Message" xml:space="preserve">
-    <value>Setup can be simplified by using the static Syntax class.</value>
+    <value>Setup can be simplified to '{0}'</value>
   </data>
   <data name="SimplifySetup_Title" xml:space="preserve">
-    <value>Simplify setup</value>
+    <value>Use typed setup</value>
   </data>
 </root>

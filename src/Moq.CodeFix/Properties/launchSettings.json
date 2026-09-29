@@ -1,9 +1,0 @@
-{
-  "profiles": {
-    "Moq.Analyzer": {
-      "commandName": "Executable",
-      "executablePath": "$(VsInstallRoot)\\Common7\\IDE\\devenv.exe",
-      "commandLineArgs": "$(SolutionDir)Samples\\Samples.sln"
-    }
-  }
-}

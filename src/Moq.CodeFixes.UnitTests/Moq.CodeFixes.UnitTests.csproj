@@ -24,6 +24,7 @@
   </ItemGroup>
 
   <ItemGroup>
+    <ProjectReference Include="..\Moq.CodeAnalysis\Moq.CodeAnalysis.csproj" />
     <ProjectReference Include="..\Moq.CodeFixes\Moq.CodeFixes.csproj" />
     <ProjectReference Include="..\Moq.Sdk\Moq.Sdk.csproj" />
     <ProjectReference Include="..\Moq\Moq.csproj" />
@@ -37,16 +38,6 @@
     <Compile Include="..\Moq.DynamicProxy\Mock.DynamicFactory.cs" Link="Moq\Mock.DynamicFactory.cs" />
     <Compile Update="@(Compile)" CopyToOutputDirectory="PreserveNewest" />
     <None Update="@(None)" CopyToOutputDirectory="PreserveNewest" />
-  </ItemGroup>
-
-  <ItemGroup>
-    <!-- Old setup syntax test data, rewritten along with MOQ001 for the typed setups API. -->
-    <Compile Remove="MOQ001\*Diagnostic*.cs" />
-    <None Include="MOQ001\*Diagnostic*.cs" CopyToOutputDirectory="PreserveNewest" />
-  </ItemGroup>
-
-  <ItemGroup>
-    <FileConstant Include="**/*.cs" Exclude="obj/**/*.*;bin/**/*.*;Helpers/**/*.*" />
   </ItemGroup>
 
 </Project>

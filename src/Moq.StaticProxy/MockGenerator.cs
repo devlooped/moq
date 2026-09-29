@@ -50,7 +50,7 @@ namespace Moq
 
         /// <summary>
         /// Collects object creations, like <c>new Mock&lt;T, T1&gt;()</c>, whose constructor 
-        /// is annotated with [MockGenerator], and mocks the type arguments of the created type.
+        /// or created type is annotated with [MockGenerator], and mocks the type arguments of the created type.
         /// </summary>
         class MockCreationCandidatesReceiver : IStuntCandidatesReceiver
         {
@@ -70,7 +70,8 @@ namespace Moq
                     var semantic = context.Compilation.GetSemanticModel(creation.SyntaxTree);
                     if (semantic.GetSymbolInfo(creation, context.CancellationToken).Symbol is not IMethodSymbol { MethodKind: MethodKind.Constructor } ctor ||
                         ctor.ContainingType.TypeArguments.IsEmpty ||
-                        !ctor.OriginalDefinition.GetAttributes().Any(attr => SymbolEqualityComparer.Default.Equals(attr.AttributeClass, generatorAttr)))
+                        !ctor.OriginalDefinition.GetAttributes().Concat(ctor.ContainingType.OriginalDefinition.GetAttributes())
+                            .Any(attr => SymbolEqualityComparer.Default.Equals(attr.AttributeClass, generatorAttr)))
                         continue;
 
                     var types = ctor.ContainingType.TypeArguments.OfType<INamedTypeSymbol>().ToArray();
@@ -133,7 +134,8 @@ namespace Moq
                     bool IsGeneratorCall(ExpressionSyntax expression) =>
                         expression is InvocationExpressionSyntax or BaseObjectCreationExpressionSyntax &&
                         semantic.GetSymbolInfo(expression, context.CancellationToken).Symbol is IMethodSymbol method &&
-                        (method.GetAttributes().Any(attr => SymbolEqualityComparer.Default.Equals(attr.AttributeClass, generatorAttr)) ||
+                        (method.GetAttributes().Concat(method.MethodKind == MethodKind.Constructor ? method.ContainingType.OriginalDefinition.GetAttributes() : ImmutableArray<AttributeData>.Empty)
+                            .Any(attr => SymbolEqualityComparer.Default.Equals(attr.AttributeClass, generatorAttr)) ||
                          expression is InvocationExpressionSyntax { ArgumentList.Arguments.Count: 1 } invocation && IsGeneratorCall(invocation.ArgumentList.Arguments[0].Expression));
 
                     bool IsMockFlow(ImmutableArray<ISymbol> data) =>
