@@ -3,29 +3,29 @@ using Moq.Sdk;
 
 namespace Moq
 {
-    interface IUntypedSetup
+    interface ITypedSetup
     {
         /// <summary>
-        /// Whether the setup handlers receive the invocation <see cref="Stunts.IArgumentCollection"/> 
-        /// instead of the individual arguments.
+        /// Whether handlers receive the member arguments.
+        /// A syntax setup sets this to <see langword="false"/> and handlers receive the invocation's argument collection.
         /// </summary>
-        bool Untyped { get; }
+        bool IsTyped { get; }
     }
 
     [DebuggerDisplay("{Sdk}")]
-    class SetupHandle<TDelegate>(IMockSetup setup, bool untyped = false) : ISetupRef<TDelegate>, IUntypedSetup
+    class SetupHandle<TDelegate>(IMockSetup setup, bool IsTyped = true) : ISetupRef<TDelegate>, ITypedSetup
     {
         public IMockSetup Sdk => setup;
 
-        public bool Untyped => untyped;
+        public bool IsTyped { get; } = IsTyped;
     }
 
     [DebuggerDisplay("{Sdk}")]
-    class SetupHandle<TDelegate, TResult>(IMockSetup setup, bool untyped = false) : ISetup<TDelegate, TResult>, IUntypedSetup
+    class SetupHandle<TDelegate, TResult>(IMockSetup setup, bool IsTyped = true) : ISetup<TDelegate, TResult>, ITypedSetup
     {
         public IMockSetup Sdk => setup;
 
-        public bool Untyped => untyped;
+        public bool IsTyped { get; } = IsTyped;
     }
 
     /// <summary>
@@ -33,7 +33,7 @@ namespace Moq
     /// on the mock when the setup is actually used.
     /// </summary>
     [DebuggerDisplay("{member,nq}")]
-    class PropertySetupHandle<T, TGetter, TSetter, TValue> : IPropertySetup<TGetter, TSetter, TValue> where T : class
+    class PropertySetupHandle<T, TGetter, TSetter, TValue> : IPropertySetup<TGetter, TSetter, TValue>, ITypedSetup where T : class
     {
         [DebuggerBrowsable(DebuggerBrowsableState.Never)]
         readonly IMock<T> mock;
@@ -61,6 +61,8 @@ namespace Moq
 
         [DebuggerBrowsable(DebuggerBrowsableState.Never)]
         public IMockSetup Sdk => setup ??= SetupGetter();
+
+        public bool IsTyped => true;
 
         public ISetup<TGetter, TValue> Get()
         {

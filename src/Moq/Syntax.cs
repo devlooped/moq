@@ -80,7 +80,7 @@ namespace Moq
             using (SetupFactory.Begin())
             {
                 member();
-                return new SetupHandle<Func<IArgumentCollection, TResult>, TResult>(SetupFactory.Current(), untyped: true);
+                return new SetupHandle<Func<IArgumentCollection, TResult>, TResult>(SetupFactory.Current(), IsTyped: false);
             }
         }
 
@@ -94,7 +94,7 @@ namespace Moq
             using (SetupFactory.Begin())
             {
                 member();
-                return new SetupHandle<Action<IArgumentCollection>>(SetupFactory.Current(), untyped: true);
+                return new SetupHandle<Action<IArgumentCollection>>(SetupFactory.Current(), IsTyped: false);
             }
         }
 

@@ -43,11 +43,7 @@ namespace Moq
             if (handler == null)
                 throw new ArgumentNullException(nameof(handler));
 
-            if (setup.IsUntyped() && handler is Func<IArgumentCollection, TResult> untyped)
-                setup.SetReturnValue(args => untyped(args));
-            else
-                setup.SetReturnValue(args => handler.InvokeWith(args));
-
+            setup.SetHandlerResult<TResult>(handler, result => result);
             return setup;
         }
 
@@ -62,7 +58,7 @@ namespace Moq
             if (handler == null)
                 throw new ArgumentNullException(nameof(handler));
 
-            setup.SetReturnValue(args => handler.InvokeWith(args));
+            setup.SetHandlerResult<object?>(handler, result => result);
             return setup;
         }
 
@@ -94,8 +90,7 @@ namespace Moq
         [OverloadResolutionPriority(2)]
         public static ISetup<Func<IArgumentCollection, Task<TResult>>, Task<TResult>> Returns<TResult>(this ISetup<Func<IArgumentCollection, Task<TResult>>, Task<TResult>> setup, Func<IArgumentCollection, TResult> handler)
         {
-            var untyped = setup.IsUntyped();
-            setup.SetReturnValue(args => Task.FromResult(handler(untyped ? args : (IArgumentCollection)args.GetValue(0)!)));
+            setup.SetHandlerResult<TResult>(handler, result => Task.FromResult(result));
             return setup;
         }
 
@@ -106,8 +101,7 @@ namespace Moq
         [OverloadResolutionPriority(2)]
         public static ISetup<Func<IArgumentCollection, ValueTask<TResult>>, ValueTask<TResult>> Returns<TResult>(this ISetup<Func<IArgumentCollection, ValueTask<TResult>>, ValueTask<TResult>> setup, Func<IArgumentCollection, TResult> handler)
         {
-            var untyped = setup.IsUntyped();
-            setup.SetReturnValue(args => new ValueTask<TResult>(handler(untyped ? args : (IArgumentCollection)args.GetValue(0)!)));
+            setup.SetHandlerResult<TResult>(handler, result => new ValueTask<TResult>(result));
             return setup;
         }
 

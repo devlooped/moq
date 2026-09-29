@@ -163,16 +163,37 @@ namespace Moq.CodeAnalysis
                 AppendDocs(method, $"Sets up <c>{EscapeXml(method.ToDisplayString(docFormat))}</c>.");
                 members.Append("            public ").Append(setup).Append(' ').Append(name).Append(typeParameters)
                     .Append('(').Append(string.Join(", ", method.Parameters.Select(x => RenderParameter(x, withDefault: true)))).Append(')')
-                    .Append(constraints).Append('\n')
-                    .Append("            {\n")
-                    .Append("                using (").Append(Factory).Append(".Begin())\n")
-                    .Append("                {\n")
-                    .Append("                    ").Append(Target(self, cast)).Append('.').Append(name).Append(typeParameters)
-                    .Append('(').Append(string.Join(", ", method.Parameters.Select(RenderArgument))).Append(");\n")
-                    .Append("                    return ").Append(Factory).Append(".Create<").Append(setup.Substring(Setup.Length + 1)).Append("();\n")
-                    .Append("                }\n")
-                    .Append("            }\n")
-                    .Append('\n');
+                    .Append(constraints).Append('\n');
+
+                var typeArguments = setup.Substring(Setup.Length + 1);
+                var target = Target(self, cast);
+                if (method.Parameters.Any(x => x.RefKind != RefKind.None))
+                {
+                    var used = new HashSet<string>(method.Parameters.Select(x => x.Name)) { self };
+                    var lambda = method.Parameters.Select(parameter => (parameter, lambdaName: Unique("moq", used, suffix: true))).ToArray();
+
+                    members.Append("            {\n");
+                    foreach (var parameter in method.Parameters.Where(x => x.RefKind == RefKind.Out))
+                        members.Append("                ").Append(Escape(parameter.Name)).Append(" = default!;\n");
+
+                    members.Append("                return ").Append(Factory).Append(".Capture<").Append(typeArguments).Append("((")
+                        .Append(string.Join(", ", lambda.Select(x => RenderParameter(x.parameter, x.lambdaName))))
+                        .Append(") => ").Append(target).Append('.').Append(name).Append(typeParameters).Append('(')
+                        .Append(string.Join(", ", lambda.Select(x => RenderArgument(x.parameter, x.lambdaName))))
+                        .Append("), ")
+                        .Append(string.Join(", ", method.Parameters.Select(x => Escape(x.Name))))
+                        .Append(");\n")
+                        .Append("            }\n");
+                }
+                else
+                {
+                    members.Append("                => ").Append(Factory).Append(".Capture<").Append(typeArguments).Append("(() => ")
+                        .Append(target).Append('.').Append(name).Append(typeParameters).Append('(')
+                        .Append(string.Join(", ", method.Parameters.Select(RenderArgument)))
+                        .Append("));\n");
+                }
+
+                members.Append('\n');
             }
 
             void RenderProperty(IPropertySymbol property, string? cast)
@@ -438,6 +459,9 @@ namespace Moq.CodeAnalysis
         static string Cast(string target, string? cast) => cast is null ? target : $"(({cast}){target})";
 
         static string RenderParameter(IParameterSymbol parameter, bool withDefault)
+            => RenderParameter(parameter, Escape(parameter.Name), withDefault);
+
+        static string RenderParameter(IParameterSymbol parameter, string name, bool withDefault = false)
         {
             var builder = new StringBuilder();
             if (parameter.IsParams)
@@ -455,7 +479,7 @@ namespace Moq.CodeAnalysis
                 _ => "",
             });
 
-            builder.Append(parameter.Type.ToDisplayString(typeFormat)).Append(' ').Append(Escape(parameter.Name));
+            builder.Append(parameter.Type.ToDisplayString(typeFormat)).Append(' ').Append(name);
 
             if (withDefault && parameter.HasExplicitDefaultValue)
                 builder.Append(" = ").Append(RenderDefault(parameter));
@@ -463,13 +487,15 @@ namespace Moq.CodeAnalysis
             return builder.ToString();
         }
 
-        static string RenderArgument(IParameterSymbol parameter) => parameter.RefKind switch
+        static string RenderArgument(IParameterSymbol parameter) => RenderArgument(parameter, Escape(parameter.Name));
+
+        static string RenderArgument(IParameterSymbol parameter, string name) => parameter.RefKind switch
         {
             RefKind.Ref => "ref ",
             RefKind.Out => "out ",
             RefKind.In or RefKind.RefReadOnlyParameter => "in ",
             _ => "",
-        } + Escape(parameter.Name);
+        } + name;
 
         static string RenderDefault(IParameterSymbol parameter)
         {
