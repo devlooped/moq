@@ -24,6 +24,8 @@ namespace Moq.CodeAnalysis.UnitTests
         [
             File.ReadAllText(Path.Combine("Moq", "Mock.cs")),
             File.ReadAllText(Path.Combine("Moq", "Mock.Overloads.cs")),
+            File.ReadAllText(Path.Combine("Moq", "Mock`1.cs")),
+            File.ReadAllText(Path.Combine("Moq", "Mock`1.Overloads.cs")),
         ];
 
         /// <summary>

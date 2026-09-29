@@ -25,6 +25,8 @@ namespace Moq.StaticProxy.UnitTests
             "IRunnable.cs",
             "Mock.cs",
             "Mock.Overloads.cs",
+            "Mock`1.cs",
+            "Mock`1.Overloads.cs",
             "Mock.StaticFactory.cs"
         };
 

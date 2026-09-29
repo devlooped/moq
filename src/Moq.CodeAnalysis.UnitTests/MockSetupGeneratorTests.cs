@@ -121,6 +121,8 @@ namespace Moq.CodeAnalysis.UnitTests
                 public interface IConstructor { void Run(); }
                 public interface IDerived { void Run(); }
                 public interface IGot { void Run(); }
+                public interface IPrimary { void Run(); }
+                public interface IAdditional { void Run(); }
                 public interface INotMocked { void Run(); }
 
                 [MockGenerator]
@@ -148,6 +150,7 @@ namespace Moq.CodeAnalysis.UnitTests
                         new Constructor<IConstructor>();
                         new DerivedFactory<IDerived>();
                         new Plain<INotMocked>();
+                        IMock<IPrimary> primary = new Mock<IPrimary, IAdditional>(MockBehavior.Strict);
                     }
                 }
                 """), out _);
@@ -155,12 +158,14 @@ namespace Moq.CodeAnalysis.UnitTests
             Assert.Equal(
                 new[]
                 {
+                    "MockSetupExtensions.IAdditional.g.cs",
                     "MockSetupExtensions.IConstructor.g.cs",
                     "MockSetupExtensions.ICreated.g.cs",
                     "MockSetupExtensions.IDerived.g.cs",
                     "MockSetupExtensions.IField.g.cs",
                     "MockSetupExtensions.IGot.g.cs",
                     "MockSetupExtensions.IParameter.g.cs",
+                    "MockSetupExtensions.IPrimary.g.cs",
                     "MockSetupExtensions.ITargetTyped.g.cs",
                 },
                 HintNames(result));
@@ -516,7 +521,7 @@ namespace Moq.CodeAnalysis.UnitTests
                 """
                 namespace Moq
                 {
-                    public partial class Mock<T> where T : class
+                    partial class Mock<T>
                     {
                         public void Reset() { }
                     }
@@ -530,6 +535,7 @@ namespace Moq.CodeAnalysis.UnitTests
                     string ToString(int format);
                     int Sdk { get; }
                     void Reset();
+                    void As();
                     void Run();
                 }
                 """,
