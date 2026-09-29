@@ -1,7 +1,7 @@
 <Project>
 
   <PropertyGroup>
-    <StuntsVersion>[1.0.0-beta.2]</StuntsVersion>
+    <StuntsVersion>[1.0.0-beta.3]</StuntsVersion>
   </PropertyGroup>
 
   <ItemGroup Label="Core">

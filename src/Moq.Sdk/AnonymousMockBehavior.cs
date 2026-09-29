@@ -19,7 +19,7 @@ namespace Moq.Sdk
         /// Creates an instance of the invokable behavior with the given 
         /// delegate and friendly display name.
         /// </summary>
-        public AnonymousMockBehavior(ExecuteMockDelegate invoke, string displayName = null)
+        public AnonymousMockBehavior(ExecuteMockDelegate invoke, string displayName = "")
             : this(invoke, new Lazy<string>(() => displayName))
         {
         }

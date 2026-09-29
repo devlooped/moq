@@ -51,6 +51,8 @@
 
     <!-- https://github.com/Microsoft/extendvs/issues/57 -->
     <ProjectReference Update="@(ProjectReference)" Name="%(Filename)" />
+
+    <PackageReference Update="ThisAssembly" IncludeAssets="none" />
   </ItemGroup>
 
   <Target Name="AddPrivateAssets" BeforeTargets="GetVsixSourceItems">

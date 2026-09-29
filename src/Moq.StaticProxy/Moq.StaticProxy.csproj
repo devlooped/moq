@@ -1,4 +1,4 @@
-<Project Sdk="Microsoft.NET.Sdk">
+﻿<Project Sdk="Microsoft.NET.Sdk">
 
   <PropertyGroup>
     <TargetFramework>netstandard2.0</TargetFramework>
@@ -7,10 +7,12 @@
     <DisableTransitiveFrameworkReferences>true</DisableTransitiveFrameworkReferences>
     <CopyLocalLockFileAssemblies>true</CopyLocalLockFileAssemblies>
     <PackFolder>tools\$(TargetFramework)</PackFolder>
-    <!-- ISourceGenerator is obsolete in the Roslyn 4.14 reference but still what this generator implements. -->
-    <NoWarn>$(NoWarn);RS1042</NoWarn>
+    <!-- RS1042: ISourceGenerator is obsolete in the Roslyn 4.14 reference but still what this generator implements. -->
+    <!-- RS1035: The symbol 'GeneratorExecutionContext' is banned for use by analyzers: Non-incremental source generators should not be used, implement IIncrementalGenerator instead -->
+    <NoWarn>$(NoWarn);RS1042;RS1035</NoWarn>
     <!-- The generator runs in csc, which does not load the workspace or editor features. -->
     <WarningsAsErrors>$(WarningsAsErrors);RS1038</WarningsAsErrors>
+    <EnforceExtendedAnalyzerRules>true</EnforceExtendedAnalyzerRules>
   </PropertyGroup>
 
   <ItemGroup>
