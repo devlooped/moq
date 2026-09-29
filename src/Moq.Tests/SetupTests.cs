@@ -551,13 +551,13 @@ namespace Moq.Tests
             Setup(() => calculator.Object.TurnOn()).Once();
             Setup(() => calculator.Object.Add(1, 1)).Never();
 
-            Assert.Throws<VerifyException>(() => Syntax.Verify(calculator));
+            Assert.Throws<VerifyException>(() => Verify.Called(calculator));
 
             calculator.Object.TurnOn();
-            Syntax.Verify(calculator);
+            Verify.Called(calculator);
 
             calculator.Object.Add(1, 1);
-            Assert.Throws<VerifyException>(() => Syntax.Verify(calculator));
+            Assert.Throws<VerifyException>(() => Verify.Called(calculator));
         }
 
         [Fact]

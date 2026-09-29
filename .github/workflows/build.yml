@@ -80,6 +80,15 @@ jobs:
             dnx --yes retest -- --no-build --framework net10.0
           }
 
+      - name: 🧪 acceptance
+        shell: pwsh
+        run: |
+          if ($IsWindows) {
+            dotnet test src/Acceptance/Acceptance.sln -bl:acceptance.binlog
+          } else {
+            dotnet test src/Acceptance/Acceptance.sln -bl:acceptance.binlog --framework net10.0
+          }
+
       - name: 🐛 logs
         uses: actions/upload-artifact@v4
         if: runner.debug && always()

@@ -14,12 +14,6 @@ namespace Moq
     public static class Syntax
     {
         /// <summary>
-        /// Verifies all occurrence constraints on the given mock' setups, and 
-        /// allows further verification on the returned instance.
-        /// </summary>
-        public static IMock<T> Verify<T>(IMock<T> mock) where T : class => Moq.Verify.Called(mock);
-
-        /// <summary>
         /// Matches any value of the given type.
         /// </summary>
         /// <typeparam name="T">The type of the argument.</typeparam>

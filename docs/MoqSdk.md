@@ -19,7 +19,7 @@ MyProxy
 
 The SDK extends the *Stunts* [AppliesTo](../src/Stunts/Stunts/IStuntBehavior.cs#L14) concept (a simple boolean given an [IMethodInvocation](../src/Stunts/Stunts/IMethodInvocation.cs)) and turns into a flexible argument matching strategy configured via the mock's setup operations. The responsibility for matching an invocation to a given setup is in [MockSetup.AppliesTo](https://github.com/moq/moq/blob/master/src/Moq/Moq.Sdk/MockSetup.cs#L32) in Moq.
 
-The SDK also extends the *Stunts* code generation, automatically implementing [IMock](https://github.com/moq/moq/blob/master/src/Moq/Moq.Sdk/IMock.cs) on all generated classes. This interface gives the mocking library author access to the following key features of a mock:
+The SDK also extends the *Stunts* code generation, automatically implementing [IMocked](../src/Moq.Sdk/IMocked.cs) on all generated classes. Its `Runtime` property exposes the [IMockRuntime](../src/Moq.Sdk/IMockRuntime.cs), which gives the mocking library author access to the key features of a mock described in [Mock Introspection](#mock-introspection).
 
 The first step in getting your mocking API going is to provide a static factory method for your mocks. *Moq* itself provides this via the [Mock.Of](https://github.com/moq/moq/blob/master/src/Moq/Moq/contentFiles/cs/netstandard2.0/Mock.Overloads.cs) static method overloads, which follows the same approach as the [Stunt.Of](https://github.com/moq/moq/blob/master/docs/Stunts.md#stunt-factory) factory, and leverages the code generation provided by the Stunts and Moq SDKs to emit the "proxy" classes (a.k.a. *stunts*) into the test/app assembly itself.
 
@@ -75,11 +75,16 @@ In the case above, the resulting mock won't be very useful, since it doesn't hav
 
 ## Mock Introspection
 
-All generated mocks implement `IMocked`, from which you can retrieve the mock introspection information via the `IMock Mock { get; }` property. The [IMock](https://github.com/moq/moq/blob/master/src/Moq/Moq.Sdk/IMock.cs) exposes:
+All generated mocks implement `IMocked`, from which you can retrieve the mock introspection information via the `IMockRuntime Runtime { get; }` property. `MockRuntime.Get(object)` does the same for any mocked instance, and Moq exposes it as the `Sdk` extension property on its (higher-level) `IMock<T>`, as in `mock.Sdk`. The [IMockRuntime](../src/Moq.Sdk/IMockRuntime.cs) exposes:
 
 * `Invocations`: a list of all invocations performed on the mock, which can be modified at will.
 * `Setups`: an enumeration of the configured mock behaviors (sub-pipelines) within the overall behaviors of the stunt.
 * `State`: a general purpose, concurrent-safe state bag associated with the mock.
+* `Behaviors`: the overall stunt behavior pipeline (from `IStunt`).
+
+Libraries can surface their own settings as extension properties over `IMockRuntime` backed by `State`, the way Moq provides `Name`, `Behavior`, `DefaultValue` and `CallBase` (i.e. `mock.Sdk.Name = "calculator"`).
+
+Moq typed setups and the `Setup(() => ...)` syntax both return an `ISetup` whose `Sdk` property is the underlying `IMockSetup`, so extenders can add their own setup verbs on top of the same pipeline.
 
 The introspection API has been heavily annotated with debugger hints so that when inspecting a mock in the debugger, the rendering is useful and easy to explore:
 
