@@ -80,6 +80,15 @@ namespace Moq.CodeFixes {
         }
         
         /// <summary>
+        ///   Looks up a localized string similar to &apos;{0}&apos; binds to the mock rather than setting up &apos;{1}&apos;.
+        /// </summary>
+        internal static string HiddenMember_Message {
+            get {
+                return ResourceManager.GetString("HiddenMember_Message", resourceCulture);
+            }
+        }
+        
+        /// <summary>
         ///   Looks up a localized string similar to Project &apos;{0}&apos; does not reference the required Moq assembly..
         /// </summary>
         internal static string MoqRequired {
@@ -89,7 +98,7 @@ namespace Moq.CodeFixes {
         }
         
         /// <summary>
-        ///   Looks up a localized string similar to Setup can be simplified by using the static Syntax class..
+        ///   Looks up a localized string similar to Members invoked directly on the mocked object can be set up with the generated typed setup members of the mock instead..
         /// </summary>
         internal static string SimplifySetup_Description {
             get {
@@ -98,7 +107,7 @@ namespace Moq.CodeFixes {
         }
         
         /// <summary>
-        ///   Looks up a localized string similar to Setup can be simplified by using the static Syntax class..
+        ///   Looks up a localized string similar to Setup can be simplified to &apos;{0}&apos;.
         /// </summary>
         internal static string SimplifySetup_Message {
             get {
@@ -107,7 +116,7 @@ namespace Moq.CodeFixes {
         }
         
         /// <summary>
-        ///   Looks up a localized string similar to Simplify setup.
+        ///   Looks up a localized string similar to Use typed setup.
         /// </summary>
         internal static string SimplifySetup_Title {
             get {

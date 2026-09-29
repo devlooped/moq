@@ -1,6 +1,5 @@
 ﻿using System;
 using System.Collections.Immutable;
-using System.IO;
 using System.Linq;
 using System.Threading;
 using System.Threading.Tasks;
@@ -18,18 +17,12 @@ namespace Moq.CodeFixes
     {
         static readonly CompletionItemRules rules = CompletionItemRules.Create(selectionBehavior: CompletionItemSelectionBehavior.SoftSelection);
 
-        public override Task<CompletionDescription> GetDescriptionAsync(Document document, CompletionItem item, CancellationToken cancellationToken)
+        public override Task<CompletionDescription?> GetDescriptionAsync(Document document, CompletionItem item, CancellationToken cancellationToken)
         {
             if (!item.Tags.Contains(nameof(CustomDelegateCompletion)))
                 return base.GetDescriptionAsync(document, item, cancellationToken);
 
-            return Task.FromResult(CompletionDescription.FromText(ThisAssembly.Strings.CustomDelegateCompletion.Description));
-        }
-
-        public override Task<CompletionChange> GetChangeAsync(Document document, CompletionItem item, char? commitKey, CancellationToken cancellationToken)
-        {
-            File.AppendAllText(Path.Combine(Path.GetTempPath(), nameof(CustomDelegateCompletion) + ".txt"), nameof(GetChangeAsync));
-            return base.GetChangeAsync(document, item, commitKey, cancellationToken);
+            return Task.FromResult<CompletionDescription?>(CompletionDescription.FromText(ThisAssembly.Strings.CustomDelegateCompletion.Description));
         }
 
         public override async Task ProvideCompletionsAsync(CompletionContext context)
@@ -72,15 +65,6 @@ namespace Moq.CodeFixes
                 !semantic.GetSymbolInfo(invocation, cancellation).CandidateSymbols.Any(IsSetupScope))
                 return;
 
-            if (invocation.Expression is not MemberAccessExpressionSyntax member)
-                return;
-
-            var symbol = semantic.GetSymbolInfo(member.Expression, cancellation).Symbol;
-            var target = symbol as ITypeSymbol ?? (symbol as ILocalSymbol)?.Type;
-
-            if (symbol == null || target == null)
-                return;
-
             var start = invocation.ArgumentList.Span.Start + 1;
             var length = span.End - start;
             // Wrong length, shouldn't happen, but bail just in case.
@@ -90,23 +74,39 @@ namespace Moq.CodeFixes
             var existing = (await document.GetTextAsync(cancellation).ConfigureAwait(false))
                 .GetSubText(new TextSpan(start, length)).ToString();
 
-            // In this case, completion would already have the right items, no need to annotate.
-            if (existing.StartsWith(symbol.Name + "."))
-                return;
-
-            // List all the members of the target type that have ref/out parameter
-            var members = target.GetMembers().OfType<IMethodSymbol>()
-                .Where(m => m.Parameters.Any(p => p.RefKind == RefKind.Ref || p.RefKind == RefKind.Out)).ToArray();
-
-            foreach (var candidate in members)
+            // Offer the ref/out members of the mocks in scope, like mock.Object.TryParse.
+            foreach (var mock in semantic.LookupSymbols(start))
             {
-                context.AddItem(CompletionItem.Create(
-                    displayText: symbol.Name + "." + candidate.Name,
-                    sortText: symbol.Name + "." + candidate.Name,
-                    filterText: symbol.Name + "." + candidate.Name,
-                    tags: ImmutableArray.Create(WellKnownTags.Method).Add(nameof(CustomDelegateCompletion)),
-                    rules: rules,
-                    inlineDescription: "Setup via delegate"));
+                var type = mock switch
+                {
+                    ILocalSymbol local => local.Type,
+                    IParameterSymbol parameter => parameter.Type,
+                    IFieldSymbol field => field.Type,
+                    IPropertySymbol property => property.Type,
+                    _ => null,
+                };
+
+                if (MockSyntax.GetMockedType(type) is not { } target)
+                    continue;
+
+                var prefix = mock.Name + ".Object.";
+                // In this case, completion would already have the right items, no need to annotate.
+                if (existing.StartsWith(prefix))
+                    continue;
+
+                var members = target.GetMembers().OfType<IMethodSymbol>()
+                    .Where(m => m.Parameters.Any(p => p.RefKind == RefKind.Ref || p.RefKind == RefKind.Out));
+
+                foreach (var candidate in members)
+                {
+                    context.AddItem(CompletionItem.Create(
+                        displayText: prefix + candidate.Name,
+                        sortText: prefix + candidate.Name,
+                        filterText: prefix + candidate.Name,
+                        tags: ImmutableArray.Create(WellKnownTags.Method).Add(nameof(CustomDelegateCompletion)),
+                        rules: rules,
+                        inlineDescription: "Setup via delegate"));
+                }
             }
         }
 

@@ -109,6 +109,7 @@ namespace Moq
         /// typically used to access and set ref/out arguments via a custom delegate with the same signature, 
         /// like <c>SetupRef&lt;TryParse&gt;(mock.Object.TryParse)</c>.
         /// </summary>
+        [SetupScope]
         public static ISetupRef<TDelegate> SetupRef<TDelegate>(TDelegate member) where TDelegate : Delegate
         {
             if (member == null)
@@ -138,6 +139,7 @@ namespace Moq
         /// for any argument values. Use this overload when there is a recursive mock involved, 
         /// like <c>SetupRef&lt;TryParse&gt;(() => mock.Object.Parser.TryParse)</c>.
         /// </summary>
+        [SetupScope]
         public static ISetupRef<TDelegate> SetupRef<TDelegate>(Func<TDelegate> member) where TDelegate : Delegate
         {
             if (member == null)
