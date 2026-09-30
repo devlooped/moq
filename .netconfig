@@ -99,8 +99,8 @@
 	weak
 [file ".gitignore"]
 	url = https://github.com/devlooped/oss/blob/main/.gitignore
-	sha = ff61659751374b95c7a8a0477c908a8119f756f0
-	etag = e5865f083db45081a7b4eaa518018971b34e6ef93f917ac510dea96d27f792b3
+	sha = fefbf3606e7bb7f483951e3107200a2f45ee52e0
+	etag = 5bdfd49876c886aaa6b7026960261af9b587e7cc3baa0f4584db34d9cebbd3f4
 	weak
 [file "_config.yml"]
 	url = https://github.com/devlooped/oss/blob/main/_config.yml
