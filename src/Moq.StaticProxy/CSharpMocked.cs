@@ -27,6 +27,8 @@ namespace Moq.Processors
             {
                 node = (ClassDeclarationSyntax)base.VisitClassDeclaration(node)!;
 
+                node = (ClassDeclarationSyntax)new FieldReferenceRewriter().Visit(node)!;
+
                 if (node.BaseList != null && !node.BaseList.Types.Any(x =>
                     x.ToString() == nameof(IMocked) ||
                     x.ToString() == typeof(IMocked).FullName))
@@ -105,6 +107,58 @@ namespace Moq.Processors
                 }
 
                 return node;
+            }
+
+            class FieldReferenceRewriter : CSharpSyntaxRewriter
+            {
+                public override SyntaxNode VisitMemberAccessExpression(MemberAccessExpressionSyntax node)
+                {
+                    if (node.Expression is IdentifierNameSyntax { Identifier.ValueText: "pipeline" } pipeline)
+                    {
+                        node = node.WithExpression(MemberAccessExpression(
+                            SyntaxKind.SimpleMemberAccessExpression,
+                            ThisExpression(),
+                            pipeline));
+                    }
+
+                    return base.VisitMemberAccessExpression(node)!;
+                }
+
+                public override SyntaxNode VisitInvocationExpression(InvocationExpressionSyntax node)
+                {
+                    if (node.Expression is IdentifierNameSyntax { Identifier.ValueText: "implementation" } implementation)
+                    {
+                        node = node.WithExpression(MemberAccessExpression(
+                            SyntaxKind.SimpleMemberAccessExpression,
+                            ThisExpression(),
+                            implementation));
+                    }
+
+                    return base.VisitInvocationExpression(node)!;
+                }
+
+                public override SyntaxNode VisitBinaryExpression(BinaryExpressionSyntax node)
+                {
+                    if (node.IsKind(SyntaxKind.EqualsExpression) || node.IsKind(SyntaxKind.NotEqualsExpression))
+                    {
+                        if (node.Left is IdentifierNameSyntax { Identifier.ValueText: "implementation" } left &&
+                            node.Right.IsKind(SyntaxKind.NullLiteralExpression))
+                            node = node.WithLeft(MemberAccessExpression(SyntaxKind.SimpleMemberAccessExpression, ThisExpression(), left));
+                        else if (node.Right is IdentifierNameSyntax { Identifier.ValueText: "implementation" } right &&
+                            node.Left.IsKind(SyntaxKind.NullLiteralExpression))
+                            node = node.WithRight(MemberAccessExpression(SyntaxKind.SimpleMemberAccessExpression, ThisExpression(), right));
+                    }
+
+                    return base.VisitBinaryExpression(node)!;
+                }
+
+                public override SyntaxNode VisitIsPatternExpression(IsPatternExpressionSyntax node)
+                {
+                    if (node.Expression is IdentifierNameSyntax { Identifier.ValueText: "implementation" } implementation)
+                        node = node.WithExpression(MemberAccessExpression(SyntaxKind.SimpleMemberAccessExpression, ThisExpression(), implementation));
+
+                    return base.VisitIsPatternExpression(node)!;
+                }
             }
         }
     }
