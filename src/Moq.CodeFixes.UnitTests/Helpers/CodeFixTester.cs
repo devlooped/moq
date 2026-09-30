@@ -69,12 +69,18 @@ namespace Moq.CodeFixes.UnitTests
         /// <summary>
         /// Gets the diagnostics reported by the analyzer in the given document, sorted by location.
         /// </summary>
-        public static async Task<Diagnostic[]> GetDiagnosticsAsync(this Document document, DiagnosticAnalyzer analyzer)
+        public static async Task<Diagnostic[]> GetDiagnosticsAsync(
+            this Document document,
+            DiagnosticAnalyzer analyzer,
+            AnalyzerConfigOptionsProvider? options = null)
         {
             var compilation = await document.Project.GetCompilationAsync() ?? throw new InvalidOperationException();
             var tree = await document.GetSyntaxTreeAsync();
 
-            return (await compilation.WithAnalyzers(ImmutableArray.Create(analyzer)).GetAnalyzerDiagnosticsAsync())
+            return (await compilation.WithAnalyzers(
+                    ImmutableArray.Create(analyzer),
+                    options is null ? null : new AnalyzerOptions(ImmutableArray<AdditionalText>.Empty, options))
+                .GetAnalyzerDiagnosticsAsync())
                 .Where(x => x.Location.SourceTree == tree)
                 .OrderBy(x => x.Location.SourceSpan.Start)
                 .ToArray();
