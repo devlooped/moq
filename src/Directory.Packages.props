@@ -20,19 +20,19 @@
   </ItemGroup>
 
   <ItemGroup Label="Roslyn">
-    <PackageVersion Include="Microsoft.CodeAnalysis.Common" Version="5.0.0" />
-    <PackageVersion Include="Microsoft.CodeAnalysis.CSharp" Version="5.0.0" />
-    <PackageVersion Include="Microsoft.CodeAnalysis.CSharp.Features" Version="5.0.0" />
-    <PackageVersion Include="Microsoft.CodeAnalysis.CSharp.Workspaces" Version="5.0.0"/>
-    <PackageVersion Include="Microsoft.CodeAnalysis.VisualBasic" Version="5.0.0" />
-    <PackageVersion Include="Microsoft.CodeAnalysis.VisualBasic.Features" Version="5.0.0" />
-    <PackageVersion Include="Microsoft.CodeAnalysis.VisualBasic.Workspaces" Version="5.0.0" />
+    <PackageVersion Include="Microsoft.CodeAnalysis.Common" Version="5.9.0" />
+    <PackageVersion Include="Microsoft.CodeAnalysis.CSharp" Version="5.9.0" />
+    <PackageVersion Include="Microsoft.CodeAnalysis.CSharp.Features" Version="5.9.0" />
+    <PackageVersion Include="Microsoft.CodeAnalysis.CSharp.Workspaces" Version="5.9.0"/>
+    <PackageVersion Include="Microsoft.CodeAnalysis.VisualBasic" Version="5.9.0" />
+    <PackageVersion Include="Microsoft.CodeAnalysis.VisualBasic.Features" Version="5.9.0" />
+    <PackageVersion Include="Microsoft.CodeAnalysis.VisualBasic.Workspaces" Version="5.9.0" />
     <PackageVersion Include="Microsoft.CodeAnalysis.CSharp.CodeStyle" Version="3.8.0" />
 
     <PackageVersion Include="Microsoft.Bcl.HashCode" Version="6.0.0" />
     
     <!-- For packaging purposes -->
-    <PackageVersion Include="Microsoft.Bcl.AsyncInterfaces" Version="9.0.0" />
+    <PackageVersion Include="Microsoft.Bcl.AsyncInterfaces" Version="10.0.12" />
 
     <!-- Unit tests need the native SQLite bundle (macOS). lib.e_sqlite3 is pinned above the 2.1.11 advisory. -->
     <PackageVersion Include="SQLitePCLRaw.bundle_green" Version="2.1.11" />
@@ -52,7 +52,7 @@
 
   <ItemGroup Label="MSBuild">
     <PackageVersion Include="Microsoft.Build" Version="17.14.28" />
-    <PackageVersion Include="Microsoft.Build.Tasks.Core" Version="17.14.28" />
+    <PackageVersion Include="Microsoft.Build.Tasks.Core" Version="18.10.1" />
     <!-- Tasks.Core 17.14.28 pulls 9.0.0, which is below the 9.0.15 advisory fix. -->
     <PackageVersion Include="System.Security.Cryptography.Xml" Version="9.0.20" />
     <PackageVersion Include="Microsoft.Build.Locator" Version="1.2.6" />
