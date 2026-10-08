@@ -53,16 +53,16 @@ namespace Moq.Processors
                     {
                         node = node.InsertNodesAfter(pipeline, new[]
                         {
-                            field.WithLeadingTrivia(pipeline.GetLeadingTrivia())
+                            field.WithLeadingTrivia(pipeline.GetLeadingTrivia().Add(CarriageReturnLineFeed))
+                                 .WithTrailingTrivia(CarriageReturnLineFeed)
                         });
                     }
                     else
                     {
                         node = node.InsertNodesBefore(node.Members.First(), new[]
                         {
-                            field.WithLeadingTrivia(ElasticTab, ElasticTab)
-                                 .NormalizeWhitespace()
-                                 .WithTrailingTrivia(CarriageReturnLineFeed, CarriageReturnLineFeed)
+                            field.WithLeadingTrivia(CarriageReturnLineFeed, Whitespace("        "))
+                                 .WithTrailingTrivia(CarriageReturnLineFeed)
                         });
                     }
                 }
@@ -96,7 +96,9 @@ namespace Moq.Processors
                                     }))
                                 )
                         ))
-                      .WithSemicolonToken(Token(SyntaxKind.SemicolonToken));
+                      .WithSemicolonToken(Token(SyntaxKind.SemicolonToken))
+                      .WithLeadingTrivia(CarriageReturnLineFeed, Whitespace("        "))
+                      .WithTrailingTrivia(CarriageReturnLineFeed);
 
                     // Try to insert the Runtime property following the Behaviors property
                     var behaviors = node.Members.OfType<PropertyDeclarationSyntax>().FirstOrDefault(prop => prop.Identifier.ToString() == nameof(IStunt.Behaviors));
