@@ -7,6 +7,8 @@ updates:
   directory: /
   schedule:
     interval: daily
+  ignore:
+    - dependency-name: "Microsoft.CodeAnalysis*"
   groups:
     Azure:
       patterns:
