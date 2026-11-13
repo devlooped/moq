@@ -26,7 +26,8 @@ jobs:
       - name: ⚙ ruby
         uses: ruby/setup-ruby@v1
         with:
-          ruby-version: 3.0.3
+          # ubuntu-latest is Ubuntu 26.04, which only ships Ruby 3.2 and newer.
+          ruby-version: '3.4'
 
       - name: ⚙ changelog
         run: |
