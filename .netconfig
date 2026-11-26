@@ -49,8 +49,8 @@
 	weak
 [file ".github/dependabot.yml"]
 	url = https://github.com/devlooped/oss/blob/main/.github/dependabot.yml
-	sha = 387f0616b2c56adc4f33f2858da818f7e0d92ef3
-	etag = a1aaba1440e5ee2a7b7f93fc0fb004d4e1d4d9780350c753f7c429e37241345a
+	sha = f14eef1c8fd55e275bd630f7392c190cbfce8cea
+	etag = 3f1ed461d9011d78f57966ab4f34f442a67db878b24278ae1bb39d2af3d0ad1b
 	weak
 [file ".github/release.yml"]
 	url = https://github.com/devlooped/oss/blob/main/.github/release.yml
@@ -69,8 +69,8 @@
 	weak
 [file ".github/workflows/changelog.yml"]
 	url = https://github.com/devlooped/oss/blob/main/.github/workflows/changelog.yml
-	sha = 5fb172362c767bef7c36478f1a6bdc264723f8f9
-	etag = ad1efa56d6024ee1add2bcda81a7e4e38d0e9069473c6ff70374d5ce06af1f5a
+	sha = 6687d5aa313eab371d2eb8befca9d429fc003765
+	etag = 9b98bce827aeef23b83001120dde1dbd9b8a9f9f256db052df952b8c411a4cb1
 	weak
 [file ".github/workflows/dotnet-env.yml"]
 	url = https://github.com/devlooped/oss/blob/main/.github/workflows/dotnet-env.yml
